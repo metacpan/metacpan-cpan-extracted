@@ -1,6 +1,6 @@
 # NAME
 
-[Google::GeoCoder::Smart](https://metacpan.org/pod/Google::GeoCoder::Smart) - Simple Google Geocoding API client
+Google::GeoCoder::Smart - Simple Google Geocoding API client
 
 # SYNOPSIS
 
@@ -25,7 +25,7 @@
 
 # DESCRIPTION
 
-This module provides a lightweight wrapper around the Google Geocoding API
+[Google::GeoCoder::Smart](https://metacpan.org/pod/Google::GeoCoder::Smart) provides a lightweight wrapper around the Google Geocoding API
 v3 endpoint:
 
     https://maps.googleapis.com/maps/api/geocode/json

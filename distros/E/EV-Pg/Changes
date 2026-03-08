@@ -1,0 +1,27 @@
+0.01  2026-03-06
+    - Async queries (query, query_params)
+    - Prepared statements (prepare, query_prepared, describe_prepared,
+      describe_portal)
+    - Pipeline mode (enter/exit, pipeline_sync, send_pipeline_sync,
+      send_flush_request)
+    - Single-row mode, chunked rows (libpq >= 17)
+    - COPY IN/OUT with backpressure (put_copy_data, put_copy_end,
+      get_copy_data, on_drain)
+    - LISTEN/NOTIFY (on_notify)
+    - Connection via string or keyword/value params (connect, connect_params)
+    - Connection string parsing (conninfo_parse)
+    - Connection reset/finish
+    - Cancel (sync PQcancel, async cancel_async for libpq >= 17)
+    - Close prepared/portal (libpq >= 17)
+    - Structured error fields (error_fields)
+    - Result metadata (result_meta with inserted_oid)
+    - Protocol tracing (trace, untrace, set_trace_flags)
+    - Connection introspection (conninfo, connection_used_password,
+      connection_used_gssapi, connection_needs_password, hostaddr,
+      ssl_attribute, ssl_attribute_names, protocol_version)
+    - Error verbosity and context visibility settings
+    - Notice receiver (on_notice)
+    - Escape/quoting utilities (escape_literal, escape_identifier,
+      escape_bytea, unescape_bytea)
+    - Password encryption (encrypt_password)
+    - Short aliases (q, qp, qx, dp, quote, quote_id, pid)

@@ -20,7 +20,8 @@ Prologix GPIB-USB Controller and compatibles, including:
    (requires Device::SerialPort)
 
 LinuxGpib compatible devices
-   (requires linux-gpib from https://sourceforge.net/projects/linux-gpib and its LinuxGpib perl module)
+   (requires linux-gpib from https://sourceforge.net/projects/linux-gpib and its LinuxGpib perl module (included in the
+   languages/perl directory)
    (Tested with linux-gpib-4.3.5 and Keysight 82357B on Ubuntu 22.10)
 
 INSTALLATION

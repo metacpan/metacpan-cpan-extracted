@@ -16,7 +16,7 @@ my $build = Module::Build->new(
       'Struct::Dumb' => 0,
    },
    test_requires => {
-      'Test::Future::IO::Impl' => '0.19', # latest
+      'Test::Future::IO::Impl' => '0.20', # latest
       'Test2::V0' => 0,
    },
    configure_requires => {

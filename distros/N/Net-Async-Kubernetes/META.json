@@ -35,7 +35,7 @@
             "IO::Async::Notifier" : "0",
             "IO::K8s" : "1.000",
             "IO::Socket::SSL" : "0",
-            "Kubernetes::REST" : "1.003",
+            "Kubernetes::REST" : "1.100",
             "Net::Async::HTTP" : "0.49",
             "URI" : "0",
             "perl" : "5.020"
@@ -62,7 +62,7 @@
       "x_IRC" : "irc://irc.perl.org/#kubernetes",
       "x_IRC_user" : "Getty"
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -389,7 +389,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.005",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

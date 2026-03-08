@@ -1,4 +1,4 @@
-# Copyright 2005-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2005-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Annotation::Git;
 use strict;
 use warnings;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 use Getopt::Long;
 
@@ -120,7 +120,7 @@ Devel::Cover::Annotation::Git - Annotate with git information
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -135,13 +135,9 @@ This module is designed to be called from the C<cover> program.
 
  Devel::Cover
 
-=head1 BUGS
-
-Huh?
-
 =head1 LICENCE
 
-Copyright 2005-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2005-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

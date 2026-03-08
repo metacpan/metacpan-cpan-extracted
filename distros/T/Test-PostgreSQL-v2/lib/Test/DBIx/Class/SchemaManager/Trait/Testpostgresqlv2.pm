@@ -1,6 +1,6 @@
 package Test::DBIx::Class::SchemaManager::Trait::Testpostgresqlv2;
 
-$Test::DBIx::Class::SchemaManager::Trait::Testpostgresqlv2::VERSION   = '2.03';
+$Test::DBIx::Class::SchemaManager::Trait::Testpostgresqlv2::VERSION   = '2.04';
 $Test::DBIx::Class::SchemaManager::Trait::Testpostgresqlv2::AUTHORITY = 'cpan:MANWAR';
 
 use Moose::Role;
@@ -14,7 +14,7 @@ Test::DBIx::Class::SchemaManager::Trait::Testpostgresqlv2 - Use Test::PostgreSQL
 
 =head1 VERSION
 
-Version 2.03
+Version 2.04
 
 =head1 SYNOPSIS
 

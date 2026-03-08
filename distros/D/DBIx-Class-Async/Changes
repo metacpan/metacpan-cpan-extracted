@@ -1,5 +1,25 @@
 Revision history for DBIx::Class::Async
 
+0.64 2026-03-02
+     [BUG FIXES]
+     - Fix InflateColumn::DateTime inflation on async worker path (PR#138)
+       Workers correctly inflate datetime columns but deserialise results
+       back to the parent as raw strings. The parent holds no active DB
+       connection so ->storage returns nothing; formatter detection now
+       reads the DSN once at connect time and stores it on _async_db
+       as _datetime_formatter.
+
+     - _inflate_row re-inflates datetime columns in the parent using this
+       formatter, and sets it on the resulting DateTime object so that
+       stringification produces database-native output rather than
+       DateTime's bare ISO8601 format.
+
+       The fix is gated behind isa('DBIx::Class::InflateColumn::DateTime')
+       and is a no-op for schemas that do not load that component.
+
+     [IMPROVEMENTS]
+     - Updated pod spelling test script to use Test::Spelling::Stopwords.
+
 0.63 2026-02-27
      [BUG FIXES]
      - delete() on a ResultSet with group_by and/or having

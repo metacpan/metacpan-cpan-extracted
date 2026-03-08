@@ -3,7 +3,7 @@ Locale::Codes::Currency_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Tue Dec  2 16:06:17 EST 2025
+#    Generated on: Mon Mar  2 13:00:48 EST 2026
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.86';
+$VERSION='3.87';
 
 $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(ADP) => q(Andorran Peseta),
@@ -23,6 +23,7 @@ $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(AZM) => q(Azerbaijanian Manat),
    q(BEF) => q(Belgian Franc),
    q(BGL) => q(Lev),
+   q(BGN) => q(Bulgarian Lev),
    q(BYB) => q(Belarussian Ruble),
    q(CUC) => q(Peso Convertible),
    q(CYP) => q(Cyprus Pound),
@@ -85,6 +86,7 @@ $Locale::Codes::Retired{'currency'}{'num'}{'code'} = {
    q(931) => q(Peso Convertible),
    q(932) => q(Zimbabwe Dollar),
    q(937) => q(Bolivar),
+   q(975) => q(Bulgarian Lev),
    q(998) => q(US Dollar (Same day)),
 };
 
@@ -98,6 +100,7 @@ $Locale::Codes::Retired{'currency'}{'alpha'}{'name'} = {
    q(bolivar) => [ q(VEF), q(Bolivar) ],
    q(bolivar fuerte) => [ q(VEF), q(Bolivar Fuerte) ],
    q(bond markets units european composite unit (eurco)) => [ q(XBA), q(Bond Markets Units European Composite Unit (EURCO)) ],
+   q(bulgarian lev) => [ q(BGN), q(Bulgarian Lev) ],
    q(candian dollar) => [ q(CAD), q(Candian Dollar) ],
    q(cape verde escudo) => [ q(CVE), q(Cape Verde Escudo) ],
    q(cedi) => [ q(GHS), q(Cedi) ],
@@ -183,6 +186,7 @@ $Locale::Codes::Retired{'currency'}{'num'}{'name'} = {
    q(belarussian ruble) => [ q(974), q(Belarussian Ruble) ],
    q(bolivar) => [ q(937), q(Bolivar) ],
    q(bolivar fuerte) => [ q(937), q(Bolivar Fuerte) ],
+   q(bulgarian lev) => [ q(975), q(Bulgarian Lev) ],
    q(cape verde escudo) => [ q(132), q(Cape Verde Escudo) ],
    q(cedi) => [ q(936), q(Cedi) ],
    q(comoro franc) => [ q(174), q(Comoro Franc) ],

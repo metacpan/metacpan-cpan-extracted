@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1beta3::ExemptPriorityLevelConfiguration;
 # ABSTRACT: ExemptPriorityLevelConfiguration describes the configurable aspects of the handling of exempt requests. In the mandatory exempt configuration object the values in the fields here can be modified by authorized users, unlike the rest of the C<spec>.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s lendablePercent => Int;
@@ -23,7 +23,7 @@ IO::K8s::Api::Flowcontrol::V1beta3::ExemptPriorityLevelConfiguration - ExemptPri
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 lendablePercent
 

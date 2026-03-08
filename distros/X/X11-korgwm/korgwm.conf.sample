@@ -1,4 +1,4 @@
-# Default configuration is as follows.
+# Sample configuration is as follows.
 # korgwm tries to find the config in such an order:
 #   /etc/korgwm/korgwm.conf
 #   /usr/local/etc/korgwm/korgwm.conf
@@ -27,12 +27,18 @@ initial_pointer_position: center
 mouse_follow: 1
 # If set: tag will be switched together with a window during win_move_tag(). Stay on current tag otherwise
 move_follow: 1
+# Do not warp mouse pointer whenever it is over any korgwm window (panel, expose, etc.)
+warp_ignore_korgwm: 1
+# Completely disable mouse teleportation (except window resize)
+mouse_nowarp: 0
 # Start own notifications server to improve urgency experience. Disable if you want to use another one
 notification_server: 1
 # Command which is used to set relevant screen positions on each RandR event
-randr_cmd: 'xrandr --output HDMI-A-0 --left-of eDP --auto --output DisplayPort-0 --right-of eDP --auto'
+randr_cmd: 'korgwm_xrandr || xrandr --auto'
 # Enable/disable setting the colour for root window
 set_root_color: 0
+# If true, run "setxkbmap -rules evdev" before hotkeys processing. Disable to get more control
+setxkb_evdev: 1
 # Debug level 1--9. Levels >= 7 MAY LEAK SENSITIVE INFORMATION
 debug: 0
 
@@ -50,9 +56,17 @@ panel_end:
   - lang
 # Hide tags with no windows on the panel
 hide_empty_tags: 1
-# Format strings for bar widgets
+# Switch to a previous tag when trying to select already active one
+tag_rotate: 1
+# The character which is used to show that the battery is charging
+battery_charging_character: '∴'
+# Format string for the battery percentage, use %% to add percent sign
 battery_format: '%s'
-clock_format: ' %a, %e %B %H:%M'
+# Enable/disable display of the battery percentage when it's full
+battery_hide_charged: 1
+# Format string for the clock, see strftime(3)
+clock_format: ' %a %e %B %H:%M'
+# Format string for the language selector
 lang_format: ' %s '
 # Mapping of the languages to strings on the panel
 lang_names:
@@ -88,8 +102,8 @@ color_expose: 0x232426
 # Regular fg colour, basically for text everywhere
 color_fg: 0xA3BABF
 # How to mark a tag if it has urgent windows and is not active
-color_urgent_bg: 0x464729
-color_urgent_fg: 0xFFFF00
+color_urgent_bg: 0xFFFF00
+color_urgent_fg: 0x464729
 
 ## Hotkeys, see API.pm for description of possible functions
 hotkeys:
@@ -98,6 +112,10 @@ hotkeys:
   XF86AudioRaiseVolume: 'nop()'
   XF86MonBrightnessDown: 'nop()'
   XF86MonBrightnessUp: 'nop()'
+  XF86AudioPlay: 'exec(playerctl play-pause)'
+  XF86AudioStop: 'exec(playerctl stop)'
+  XF86AudioPrev: 'exec(playerctl previous)'
+  XF86AudioNext: 'exec(playerctl next)'
   XF86WakeUp: 'nop()'
   Print: 'exec(flameshot gui)'
   alt_F4: 'win_close()'
@@ -112,8 +130,9 @@ hotkeys:
   mod_7: 'tag_select(7)'
   mod_8: 'tag_select(8)'
   mod_9: 'tag_select(9)'
+  mod_-: 'toggle_calendar()'
   mod_=: 'exec(galculator)'
-  mod_CR: 'exec(urxvt)'
+  mod_CR: 'exec(xkb-switch -s us; urxvt)'
   mod_F1: 'screen_select(1)'
   mod_F2: 'screen_select(2)'
   mod_F3: 'screen_select(3)'
@@ -130,6 +149,9 @@ hotkeys:
   mod_alt_F3: 'exec(pactl set-sink-volume 0 +10%)'
   mod_alt_F5: 'exec(light -U 20)'
   mod_alt_F6: 'exec(light -A 20)'
+  mod_alt_F10: 'layout_set(narrow)'
+  mod_alt_F11: 'layout_set(columns)'
+  mod_alt_F12: 'layout_set(grid)'
   mod_ctrl_h: 'layout_resize(h)'
   mod_ctrl_j: 'layout_resize(j)'
   mod_ctrl_k: 'layout_resize(k)'
@@ -144,7 +166,8 @@ hotkeys:
   mod_l: 'focus_move(l)'
   mod_m: 'win_toggle_maximize()'
   mod_r: 'exec(xkb-switch -s us; rofi -show drun)'
-  mod_s: 'mark_window()'
+  mod_s: 'mark_switch_window()'
+  mod_p: 'win_toggle_pinned()'
   mod_ctrl_1: 'tag_append(1)'
   mod_ctrl_2: 'tag_append(2)'
   mod_ctrl_3: 'tag_append(3)'
@@ -163,7 +186,7 @@ hotkeys:
   mod_shift_7: 'win_move_tag(7)'
   mod_shift_8: 'win_move_tag(8)'
   mod_shift_9: 'win_move_tag(9)'
-  mod_shift_CR: 'exec(urxvt -name urxvt-float)'
+  mod_shift_CR: 'exec(xkb-switch -s us; urxvt -name urxvt-float -g 120x32)'
   mod_shift_F1: 'win_move_screen(1)'
   mod_shift_F2: 'win_move_screen(2)'
   mod_shift_F3: 'win_move_screen(3)'
@@ -180,45 +203,82 @@ hotkeys:
   mod_shift_j: 'focus_swap(j)'
   mod_shift_k: 'focus_swap(k)'
   mod_shift_l: 'focus_swap(l)'
-  mod_shift_s: 'mark_switch_window()'
+  mod_shift_s: 'mark_window()'
   mod_shift_w: 'exec(firefox --new-instance)'
   mod_w: 'exec(firefox --new-instance --private-window)'
 
 ## Rules applied to new windows by WM_CLASS
-# floating  -- should the window be tiled (by default for non-transient) or floating
-# follow    -- focus new window and switch to it's screen & tag
-# screen    -- preferred screen to attach the window to (starts with 1)
-# tag       -- preferred tag to attach the window to (starts with 1)
-# placement -- takes precedence over screen & tag (see description and example below)
+# floating        -- should the window be tiled (by default for non-transient) or floating
+# follow          -- focus new window and switch to it's screen & tag
+# pinned          -- make the window always ahead of others
+# screen          -- preferred screen to attach the window to (starts with 1)
+# tag             -- preferred tag to attach the window to (starts with 1)
+# placement       -- takes precedence over screen & tag (see description and example below)
+# soft_placement  -- just like placement but used with lower priority and during special events (see handle_screens())
 #
-# Placement is an array indexed over number of screens.
+# There is no any validation, so take care using 'placement'!
+# Placement is an array indexed over number of screens:
+#   - ~       # element #0 means a configuration with no displays
+#   - [1, 6]  # element #1 aka 1 display connected: place the window on the 6th tag of the first screen
+#   - [1, 4]  # element #2 aka 2 displays connected: place the window on the first screen, 4th tag
+# Placement could also be defined as an array of hashes:
+#   - if_screens: 2 # the window should be placed on the 1st screen and 5th tag when there are 2 displays connected
+#     screen: 1
+#     tag: 5
 # Value should be an undef (~) or an array of [ screen, tag ] (both starts with 1).
-# There is no any validation, so take care using 'placement'.
 # Either you connect more screens than specified, or the placement is undef; the default screen and tag will be used.
 rules:
   evolution:
     follow: 0
-    tag: 3      # place it on the first screen, tag #3
+    tag: 3
   org.gnome.Evolution:
     follow: 0
-    screen: 1   # place it on the first screen
-    tag: 3      # place it on the tag #3
+    screen: 1
+    tag: 3
+  evolution-alarm-notify:
+    floating: 1
+    urgent: 1
+  rofi:
+    pinned: 1
+  flameshot:
+    floating: 1
+    pinned: 1
   galculator:
     floating: 1
   mattermost:
+    # see Placement above
+    # 0 screens: we don't care
+    # 1 screens: place it on the only screen, tag #4
+    # 2 screens: place it on the second screen, tag #4
+    # 3 screens: place it on the third screen, tag #4
     placement:
-      - ~       # 0 screens: we don't care
-      - [1, 4]  # 1 screens: place it on the only screen, tag #4
-      - [2, 4]  # 2 screens: place it on the second screen, tag #4
-      - [3, 4]  # 3 screens: place it on the third screen, tag #4
+      - if_screens: 1
+        screen: 1
+        tag: 4
+      - if_screens: 2
+        screen: 2
+        tag: 4
+      - if_screens: 3
+        screen: 3
+        tag: 4
     follow: 1
+  google-chrome:
+    # see Placement above
+    # During screen topology change (HDMI/DP hotplug) in case of:
+    # - 2 screens connected => by default move Chrome to 2nd screen, tag #7
+    # - 3 screens connected => by default move Chrome to 2nd screen, tag #7
+    # "by default" means in the absense of $pref_position and 'placement' rules for the window
+    soft_placement:
+      - if_screens: 2
+        screen: 2
+        tag: 7
+      - if_screens: 3
+        screen: 2
+        tag: 7
   urxvt-float:
     floating: 1
   xeyes:
     floating: 1
-  evolution-alarm-notify:
-    floating: 1
-    urgent: 1
 
 ## List of WM_NAME of windows which we want to see despite unset WM_CLASS
 noclass_whitelist:
@@ -229,4 +289,4 @@ noclass_whitelist:
 autostart:
   - 'exec(setxkbmap -layout us,ru -option grp:alt_shift_toggle,compose:ralt)'
 
-# vim: ft=yaml ts=2 sw=2 cc=119 :
+# vim: set ft=yaml ts=2 sw=2 cc=119 :

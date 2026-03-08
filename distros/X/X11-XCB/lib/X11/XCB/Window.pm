@@ -202,8 +202,8 @@ sub _create {
     $self->_update_wm_class if defined($self->wm_class) || defined($self->instance);
 
     if (!$self->no_protocols) {
-        my $atomname = $x->atom(name => 'WM_PROTOCOLS');
-        my $atomtype = $x->atom(name => 'ATOM');
+        my $atomname = $x->atom(name => 'WM_PROTOCOLS', create => 1);
+        my $atomtype = $x->atom(name => 'ATOM'); # predefined
         my $atoms = pack('L*', map { $_->id } @{$self->protocols});
 
         $x->change_property(
@@ -298,8 +298,8 @@ sub _update_name {
     return $self->_create unless $self->_created;
 
     my $conn = $self->_conn;
-    my $atomname = $conn->atom(name => '_NET_WM_NAME');
-    my $atomtype = $conn->atom(name => 'UTF8_STRING');
+    my $atomname = $conn->atom(name => '_NET_WM_NAME', create => 1);
+    my $atomtype = $conn->atom(name => 'UTF8_STRING', create => 1);
     my $strlen;
 
     # Disable UTF8 mode to get the raw amount of bytes in this string
@@ -320,7 +320,7 @@ sub _update_name {
 sub _update_fullscreen {
     my $self = shift;
     my $conn = $self->_conn;
-    my $atomname = $conn->atom(name => '_NET_WM_STATE');
+    my $atomname = $conn->atom(name => '_NET_WM_STATE', create => 1);
 
     $self->_create unless ($self->_created);
 
@@ -344,7 +344,7 @@ sub _update_fullscreen {
                 $event{window},
                 $event{type},
                 ($self->fullscreen ? _NET_WM_STATE_ADD : _NET_WM_STATE_REMOVE),
-                $conn->atom(name => '_NET_WM_STATE_FULLSCREEN')->id,
+                $conn->atom(name => '_NET_WM_STATE_FULLSCREEN', create => 1)->id,
                 0,
                 1, # normal application
         );
@@ -356,10 +356,10 @@ sub _update_fullscreen {
                 $packed
         );
     } else {
-        my $atomtype = $conn->atom(name => 'ATOM');
+        my $atomtype = $conn->atom(name => 'ATOM'); # predefined
         my $atoms;
         if ($self->fullscreen) {
-            my $atom = $conn->atom(name => '_NET_WM_STATE_FULLSCREEN');
+            my $atom = $conn->atom(name => '_NET_WM_STATE_FULLSCREEN', create => 1);
             $atoms = pack('L', $atom->id);
         }
 
@@ -392,8 +392,8 @@ sub _update_border {
 sub _update_type {
     my $self = shift;
     my $conn = $self->_conn;
-    my $atomname = $conn->atom(name => '_NET_WM_WINDOW_TYPE');
-    my $atomtype = $conn->atom(name => 'ATOM');
+    my $atomname = $conn->atom(name => '_NET_WM_WINDOW_TYPE', create => 1);
+    my $atomtype = $conn->atom(name => 'ATOM'); # predefined
 
     # If we are not mapped, this property will be set when creating the window
     return unless ($self->_created);
@@ -413,8 +413,8 @@ sub _update_type {
 sub _update_transient_for {
     my $self = shift;
     my $conn = $self->_conn;
-    my $atomname = $conn->atom(name => 'WM_TRANSIENT_FOR');
-    my $atomtype = $conn->atom(name => 'WINDOW');
+    my $atomname = $conn->atom(name => 'WM_TRANSIENT_FOR', create => 1);
+    my $atomtype = $conn->atom(name => 'WINDOW'); # predefined
 
     # If we are not mapped, this property will be set when creating the window
     return unless ($self->_created);
@@ -436,8 +436,8 @@ sub _update_wm_class {
     return unless $self->_created;
 
     my $conn = $self->_conn;
-    my $atomname = $conn->atom(name => 'WM_CLASS');
-    my $atomtype = $conn->atom(name => 'STRING');
+    my $atomname = $conn->atom(name => 'WM_CLASS'); # predefined
+    my $atomtype = $conn->atom(name => 'STRING'); # predefined
 
     # Fall back to the wm_class if instance is not defined.
     my $instance = $self->instance // $self->wm_class;
@@ -457,8 +457,8 @@ sub _update_wm_class {
 sub _update_client_leader {
     my $self = shift;
     my $conn = $self->_conn;
-    my $atomname = $conn->atom(name => 'WM_CLIENT_LEADER');
-    my $atomtype = $conn->atom(name => 'WINDOW');
+    my $atomname = $conn->atom(name => 'WM_CLIENT_LEADER', create => 1);
+    my $atomtype = $conn->atom(name => 'WINDOW'); # predefined
 
     # If we are not mapped, this property will be set when creating the window
     return unless ($self->_created);
@@ -573,7 +573,7 @@ sub state {
     my ($self) = @_;
 
     my $conn = $self->_conn;
-    my $state = $conn->atom(name => 'WM_STATE')->id;
+    my $state = $conn->atom(name => 'WM_STATE')->id; # predefined
     my $cookie = $conn->get_property(0, $self->id, $state, 0, 0, 8);
     my $reply = $conn->get_property_reply($cookie->{sequence});
     return unpack('L', $reply->{value});

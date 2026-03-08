@@ -88,7 +88,7 @@ use bytes ();
 require Exporter;
 require DynaLoader;
 
-our $VERSION     = '0.26';
+our $VERSION     = '0.27';
 our @ISA         = qw(Exporter DynaLoader);
 our %EXPORT_TAGS = ( 'all' => [ qw() ] );
 our @EXPORT_OK   = ( @{ $EXPORT_TAGS{'all'} } );

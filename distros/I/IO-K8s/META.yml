@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/pplu/io-k8s-p5/issues
   homepage: https://github.com/pplu/io-k8s-p5
   repository: https://github.com/pplu/io-k8s-p5.git
-version: '1.005'
+version: '1.006'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -286,7 +286,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.005'
+          tag: '1.006'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

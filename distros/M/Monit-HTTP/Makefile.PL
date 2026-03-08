@@ -11,8 +11,8 @@ my %WriteMakefileArgs = (
   "AUTHOR" => "Angelo Failla <pallotron\@gmail.com>, Dean Hamstead <dean\@fragfest.com.au>",
   "BUILD_REQUIRES" => {
     "Module::Build" => "0.28",
+    "Test2::V1" => 0,
     "Test::MockModule" => 0,
-    "Test::More" => 0,
     "Test::Trap" => 0
   },
   "CONFIGURE_REQUIRES" => {
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +56,7 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
+  "Test2::V1" => 0,
   "Test::MockModule" => 0,
   "Test::More" => 0,
   "Test::Trap" => 0,

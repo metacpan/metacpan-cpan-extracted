@@ -1,5 +1,5 @@
 package Marky::Bookmarker;
-$Marky::Bookmarker::VERSION = '0.0602';
+$Marky::Bookmarker::VERSION = '0.0604';
 # ABSTRACT: Marky::Bookmarker - adding bookmarks
 
 use common::sense;
@@ -211,7 +211,7 @@ Marky::Bookmarker - Marky::Bookmarker - adding bookmarks
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 SYNOPSIS
 
@@ -230,7 +230,7 @@ Marky::Bookmarker - adding bookmarks
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 METHODS
 

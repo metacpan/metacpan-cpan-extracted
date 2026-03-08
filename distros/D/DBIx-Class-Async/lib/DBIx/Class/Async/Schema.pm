@@ -1,6 +1,6 @@
 package DBIx::Class::Async::Schema;
 
-$DBIx::Class::Async::Schema::VERSION   = '0.63';
+$DBIx::Class::Async::Schema::VERSION   = '0.64';
 $DBIx::Class::Async::Schema::AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -11,7 +11,7 @@ DBIx::Class::Async::Schema - Non-blocking, worker-pool based Proxy for DBIx::Cla
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =head1 SYNOPSIS
 
@@ -139,6 +139,26 @@ sub connect {
 
     # Populate the inflator map
     $async_db->{_custom_inflators} = $self->_build_inflator_map($native_schema);
+
+    # Store the datetime formatter once at connect time.
+    # _inflate_row uses this to re-inflate datetime columns that
+    # InflateColumn::DateTime handles in the worker but sends back
+    # as raw strings to the parent.
+    my $dsn = ref($args[0]) eq 'ARRAY' ? $args[0][0] : $args[0] // '';
+    my $formatter;
+    if ($dsn =~ /dbi:Pg/i) {
+        eval { require DateTime::Format::Pg;
+               $formatter = DateTime::Format::Pg->new };
+    }
+    elsif ($dsn =~ /dbi:mysql/i) {
+        eval { require DateTime::Format::MySQL;
+               $formatter = DateTime::Format::MySQL->new };
+    }
+    elsif ($dsn =~ /dbi:SQLite/i) {
+        eval { require DateTime::Format::SQLite;
+               $formatter = DateTime::Format::SQLite->new };
+    }
+    $async_db->{_datetime_formatter} = $formatter if $formatter;
 
     my $storage = DBIx::Class::Async::Storage::DBI->new(
         schema   => $self,

@@ -1,0 +1,74 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Data-ZPath
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Data-ZPath
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+ lib/Data/ZPath/_Ctx.pm
+ lib/Data/ZPath/_Evaluate.pm
+ lib/Data/ZPath/_Lexer.pm
+ lib/Data/ZPath/_Node.pm
+ lib/Data/ZPath/_Parser.pm
+ lib/Data/ZPath/_ScalarProxy.pm
+ t/integration/faceless_tests_port.t
+ t/integration/numeric_qualifiers.t
+ t/integration/simple_tests.t
+ t/integration/ztemplate/basic.t
+ t/unit/Data/ZPath.t
+ t/unit/Data/ZPath/Node.t
+ t/unit/Data/ZPath/NodeList.t
+ t/unit/Data/ZPath/_Ctx.t
+ t/unit/Data/ZPath/_Lexer.t
+ t/unit/Data/ZPath/_ScalarProxy.t
+Copyright: Copyright 2026 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ t/integration/ztemplate/cycle-a.tmpl
+ t/integration/ztemplate/cycle-b.tmpl
+ t/integration/ztemplate/include-main.tmpl
+ t/integration/ztemplate/parts/child.tmpl
+ t/integration/ztemplate/parts/grandchild.tmpl
+ t/integration/ztemplate/sample.tmpl
+ t/share/tests.txt
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/Data/ZPath.pm
+ lib/Data/ZPath/Node.pm
+ lib/Data/ZPath/NodeList.pm
+ lib/Text/ZTemplate.pm
+ t/00start.t
+ t/01basic.t
+Copyright: This software is copyright (c) 2026 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2026 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2026 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

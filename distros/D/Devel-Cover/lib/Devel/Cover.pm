@@ -1,4 +1,4 @@
-# Copyright 2001-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -7,14 +7,14 @@
 
 package Devel::Cover;
 
-use v5.12.0;
+use v5.20.0;
 use strict;
 use warnings;
 
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.51'; # VERSION
+  our $VERSION = '1.52'; # VERSION
 }
 
 use DynaLoader ();
@@ -388,8 +388,7 @@ sub populate_run {
   my $self = shift;
 
   $Run{OS}   = $^O;
-  $Run{perl} = $] < 5.010 ? join ".", map ord, split //, $^V : sprintf "%vd",
-    $^V;
+  $Run{perl} = sprintf "%vd", $^V;
   $Run{dir}     = $Dir;
   $Run{run}     = $0;
   $Run{name}    = $Dir;
@@ -1079,9 +1078,13 @@ my %Original;
         my $false = $true->sibling;
         if (!(
              $cx < 1
-          && (is_scope($true) && $true->name ne "null")
-          && (is_scope($false) || is_ifelse_cont($false))
           && $self->{'expand'} < 7
+          && (
+              B::class($false) eq "NULL" # sub:  empty else optimised to NULL
+              || $false->name eq "null"  # main: empty else optimised to null op
+              || ((is_scope($true) && $true->name ne "null")
+                  && (is_scope($false) || is_ifelse_cont($false)))
+          )
         ))
         {
           { local $Collect; $cond = $self->deparse($cond, 8) }
@@ -1129,7 +1132,7 @@ my %Original;
     # print STDERR "left [$left], right [$right]\n";
     my ($file, $line) = ($File, $Line);
 
-    $blockname &&= $self->keyword($blockname) if $] >= 5.016000;
+    $blockname &&= $self->keyword($blockname);
     if ($cx < 1 && is_scope($right) && $blockname && $self->{expand} < 7) {
       # print STDERR 'if ($a) {$b}', "\n";
       # if ($a) {$b}
@@ -1356,7 +1359,7 @@ Devel::Cover - Code coverage metrics for Perl
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -1447,13 +1450,14 @@ reported.
 
 =over
 
-=item * Perl 5.12.0 or greater.
+=item * Perl 5.20.0 or greater.
 
-The latest version of Devel::Cover on which Perl 5.10 was supported was 1.38.
-The latest version of Devel::Cover on which Perl 5.8 was supported was 1.23.
-Perl versions 5.6.1 and 5.6.2 were not supported after version 1.22.  Perl
-versions 5.6.0 and earlier were never supported.  Using Devel::Cover with Perl
-5.8.7 was always problematic and frequently lead to crashes.
+The latest version of Devel::Cover on which Perl 5.12 to 5.18 was supported was
+1.51.  The latest version of Devel::Cover on which Perl 5.10 was supported was
+1.38.  The latest version of Devel::Cover on which Perl 5.8 was supported was
+1.23.  Perl versions 5.6.1 and 5.6.2 were not supported after version 1.22.
+Perl versions 5.6.0 and earlier were never supported.  Using Devel::Cover with
+Perl 5.8.7 was always problematic and frequently lead to crashes.
 
 Different versions of perl may give slightly different results due to changes
 in the op tree.
@@ -1631,7 +1635,7 @@ followed by the name of the coverage criterion which is uncoverable.  There
 may then be further information depending on the nature of the uncoverable
 construct.
 
-In all cases as L<class> attribute may be included in L<details>.  At present a
+In all cases a L<class> attribute may be included in L<details>.  At present a
 single class attribute is recognised: L<ignore_covered_err>.  Normally, an
 error is flagged if code marked as L<uncoverable> is covered.  When the
 L<ignore_covered_err> attribute is specified then such errors will not be
@@ -1885,7 +1889,7 @@ Please report new bugs on GitHub.
 
 =head1 LICENCE
 
-Copyright 2001-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

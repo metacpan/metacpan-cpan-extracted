@@ -16,13 +16,18 @@ my $keys = {
             "CR"    => 0xFF0D,              # XK_Return
             "TAB"   => 0xFF09,              # XK_Tab
             "Print" => 0xFF61,              # XK_Print
-    (map {; "F$_"   => 0xFFBD + $_ } 1..9), # XK_Fx
+    (map {; "F$_"   => 0xFFBD + $_ } 1..12), # XK_Fx
     "XF86MonBrightnessUp"   => 0x1008FF02,
     "XF86MonBrightnessDown" => 0x1008FF03,
     "XF86AudioLowerVolume"  => 0x1008FF11,
     "XF86AudioMute"         => 0x1008FF12,
     "XF86AudioRaiseVolume"  => 0x1008FF13,
+    "XF86AudioPlay"         => 0x1008FF14,
+    "XF86AudioStop"         => 0x1008FF15,
+    "XF86AudioPrev"         => 0x1008FF16,
+    "XF86AudioNext"         => 0x1008FF17,
     "XF86WakeUp"            => 0x1008FF2B,
+    "XF86AudioPause"        => 0x1008FF31,
 };
 
 # xcb modifiers
@@ -63,13 +68,16 @@ sub hotkey($hotkey, $cmd) {
 }
 
 sub init {
+    # Override xkb rules to support XF86 media keys via xf86-input-evdev
+    qx(setxkbmap -rules evdev) if $cfg->{setxkb_evdev};
+
     # Init keymap
     $keymap = $X->get_keymap();
 
     # Prepare reverse mapping
     for (my $i = $#{ $keymap }; $i > 0; $i--) {
         my $keycode = $keymap->[$i] or next;
-        $keycodes->{$keycode->[0]} = $i;
+        push @{ $keycodes->{$keycode->[0]} }, $i;
     }
 
     # Parse hotkeys from config and fill %$hotkeys
@@ -115,7 +123,10 @@ sub init {
     my $root_id = $X->root->id;
     for my $key (keys %{ $hotkeys }) {
         for my $mask (keys %{ $hotkeys->{$key} }) {
-            $X->grab_key(0, $root_id, $mask, $keycodes->{$key}, GRAB_MODE_ASYNC, GRAB_MODE_ASYNC);
+            # In case of improper setxkbmap (when "us" is not on the first place) keycodes could be undefined
+            my $keycodes_list = $keycodes->{$key} // croak "Keycode for key '$key' is not defined on X11 server!";
+
+            $X->grab_key(0, $root_id, $mask, $_, GRAB_MODE_ASYNC, GRAB_MODE_ASYNC) for @{ $keycodes_list };
         }
     }
     $X->flush();

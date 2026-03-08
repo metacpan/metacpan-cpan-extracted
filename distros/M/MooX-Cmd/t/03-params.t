@@ -15,24 +15,24 @@ use ThirdTestApp;
 
 {
     local @ARGV;
-    my $cmd = SecondTestApp->new_with_cmd(command_execute_method_name => "run");
-    my $rv = test_cmd_ok($cmd, []);
+    my $cmd            = SecondTestApp->new_with_cmd(command_execute_method_name => "run");
+    my $rv             = test_cmd_ok($cmd, []);
     my @execute_return = @{$rv->execute_rv};
     is_deeply(\@execute_return, [$cmd], 'Checking result of "SecondTestApp(command_base => "SecondTestApp::Cmd") => []"');
 }
 
 {
     local @ARGV;
-    my $cmd = SecondTestApp->new_with_cmd(command_base => "SecondTestApp::Cmd");
-    my $rv = test_cmd_ok($cmd, []);
+    my $cmd            = SecondTestApp->new_with_cmd(command_base => "SecondTestApp::Cmd");
+    my $rv             = test_cmd_ok($cmd, []);
     my @execute_return = @{$rv->execute_rv};
     is_deeply(\@execute_return, [$cmd], 'Checking result of "SecondTestApp(command_base => "SecondTestApp::Cmd") => []"');
 }
 
 {
     local @ARGV;
-    my $cmd = SecondTestApp->new_with_cmd(command_creation_chain_methods => "new");
-    my $rv = test_cmd_ok($cmd, []);
+    my $cmd            = SecondTestApp->new_with_cmd(command_creation_chain_methods => "new");
+    my $rv             = test_cmd_ok($cmd, []);
     my @execute_return = @{$rv->execute_rv};
     is_deeply(\@execute_return, [$cmd], 'Checking result of "SecondTestApp(command_creation_chain_methods => "new") => []"');
 }
@@ -45,7 +45,7 @@ use ThirdTestApp;
             cwo => "SecondTestApp::Cmd::cwo"
         }
     );
-    my $rv = test_cmd_ok($cmd, []);
+    my $rv             = test_cmd_ok($cmd, []);
     my @execute_return = @{$rv->execute_rv};
     is_deeply(\@execute_return, [$cmd],
         'Checking result of "SecondTestApp(command_commands => {ifc => "SecondTestApp::Cmd::ifc", cwo => "SecondTestApp::Cmd::cwo"}) => []"'
@@ -58,7 +58,7 @@ use ThirdTestApp;
         command_base                   => "SecondTestApp::Cmd",
         command_creation_chain_methods => "new"
     );
-    my $rv = test_cmd_ok($cmd, []);
+    my $rv             = test_cmd_ok($cmd, []);
     my @execute_return = @{$rv->execute_rv};
     is_deeply(\@execute_return, [$cmd], 'Checking result of "SecondTestApp(command_base => "SecondTestApp::Cmd") => []"');
 }
@@ -66,21 +66,21 @@ use ThirdTestApp;
 {
     local @ARGV = qw(foo);
     my $cmd = ThirdTestApp->new_with_cmd(command_execute_from_new => undef);
-    my $rv = test_cmd_ok($cmd, [qw(foo)]);
+    my $rv  = test_cmd_ok($cmd, [qw(foo)]);
     is($rv->execute_rv, undef, 'Checking result of "ThirdTestApp(command_execute_from_new => undef) => []"');
 }
 
 {
     local @ARGV = qw(foo);
     my $cmd = ThirdTestApp->new_with_cmd(command_execute_from_new => 0);
-    my $rv = test_cmd_ok($cmd, [qw(foo)]);
+    my $rv  = test_cmd_ok($cmd, [qw(foo)]);
     is_deeply($rv->execute_rv, undef, 'Checking result of "ThirdTestApp(command_execute_from_new => 0) => []"');
 }
 
 {
     local @ARGV;
-    my $cmd = SecondTestApp->new_with_cmd(command_execute_return_method_name => "was_haste");
-    my $rv = test_cmd_ok($cmd, []);
+    my $cmd            = SecondTestApp->new_with_cmd(command_execute_return_method_name => "was_haste");
+    my $rv             = test_cmd_ok($cmd, []);
     my @execute_return = @{$rv->execute_rv};
     is_deeply(\@execute_return, [$cmd],
         'Checking result of "SecondTestApp(command_execute_return_method_name => "was_haste") => []"');

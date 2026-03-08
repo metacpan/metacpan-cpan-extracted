@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1beta1::MatchCondition;
 # ABSTRACT: MatchCondition represents a condition which must be fulfilled for a request to be sent to a webhook.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s expression => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Admissionregistration::V1beta1::MatchCondition - MatchCondition re
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 expression
 

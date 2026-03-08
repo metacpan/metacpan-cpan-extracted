@@ -1,6 +1,6 @@
 package Langertha::Plugin::Langfuse;
 # ABSTRACT: Langfuse observability plugin for any PluginHost
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 use Moose;
 use Future::AsyncAwait;
 use Time::HiRes qw( gettimeofday );
@@ -439,7 +439,7 @@ Langertha::Plugin::Langfuse - Langfuse observability plugin for any PluginHost
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 

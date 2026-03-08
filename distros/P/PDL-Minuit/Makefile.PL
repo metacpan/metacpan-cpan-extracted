@@ -73,11 +73,17 @@ WriteMakefile(
   %items,
   'ABSTRACT' => 'Minuit 1 optimization routines for PDL',
   'LICENSE' => 'perl',
-  'CONFIGURE_REQUIRES' =>  { "PDL" => '2.093', "ExtUtils::F77" => '1.26' },
-  'PREREQ_PM' => {
-    'PDL' => '2.093',
+  'CONFIGURE_REQUIRES' =>  {
+    "PDL" => '2.094',
+    "ExtUtils::F77" => '1.26',
   },
-  TEST_REQUIRES => { "Test::More" => '0.88' },
+  'PREREQ_PM' => {
+    'PDL' => '2.094', # Test::PDL
+  },
+  TEST_REQUIRES => {
+    "Test::More" => '0.88',
+    'Test::PDL' => '0.22',
+  },
   META_MERGE => {
     "meta-spec" => { version => 2 },
     resources => {

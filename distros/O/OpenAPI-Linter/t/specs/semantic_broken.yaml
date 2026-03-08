@@ -1,0 +1,19 @@
+openapi: 3.1.0
+info:
+  title: Semantic Broken
+  version: 1.0.0
+  description: Test API
+  license:
+    name: MIT
+paths:
+  /items:
+    post:
+      summary: Create item
+      operationId: createItem
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object

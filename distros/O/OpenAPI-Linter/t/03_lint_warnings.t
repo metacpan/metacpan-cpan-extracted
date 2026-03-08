@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+
 use Test::More;
 use OpenAPI::Linter;
 
@@ -9,52 +10,73 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Test API',
+        paths   => {},
+        info    => {
+            title   => 'Test API',
             version => '1.0.0',
         },
-        paths => {},
     };
 
-    my $linter = OpenAPI::Linter->new(spec => $spec);
+    my $linter   = OpenAPI::Linter->new(spec => $spec);
+    my @warnings = $linter->find_issues;
+    @warnings    = grep { $_->{level} eq 'WARN' } @warnings;
 
-    my @warnings = $linter->find_issues(level => 'WARN');
-
-    ok(grep({ $_->{message} =~ /Missing info.description/ } @warnings),
+    ok(grep({ $_->{message} =~ /info.*description/i } @warnings),
        'Detects missing info.description');
-    ok(grep({ $_->{message} =~ /Missing info.license/ } @warnings),
+    ok(grep({ $_->{message} =~ /info.*license/i     } @warnings),
        'Detects missing license');
 }
 
 # Test: Missing operation descriptions
 {
     my $spec = {
-        openapi => '3.0.3',
-        info => {
-            title => 'Test API',
-            version => '1.0.0',
+        openapi  => '3.0.3',
+        security => [{ apiKey => [] }],
+        info     => {
+            title       => 'Test API',
+            version     => '1.0.0',
             description => 'A test API',
-            license => { name => 'MIT' },
+            license     => { name => 'MIT' },
+        },
+        components => {
+            securitySchemes => {
+                apiKey => {
+                    type => 'apiKey',
+                    name => 'X-API-Key',
+                    in   => 'header',
+                },
+            },
         },
         paths => {
             '/users' => {
                 get => {
-                    summary => 'Get users',
+                    summary     => 'Get users',
+                    operationId => 'getUsers',
+                    security    => [{ apiKey => [] }],
+                    responses   => {
+                        '200'   => { description => 'OK' },
+                    },
                 },
                 post => {
                     description => 'Create user',
+                    summary     => 'Create user',
+                    operationId => 'createUser',
+                    security    => [{ apiKey => [] }],
+                    responses   => {
+                        '201'   => { description => 'Created' },
+                    },
                 },
             },
         },
     };
 
-    my $linter = OpenAPI::Linter->new(spec => $spec);
+    my $linter   = OpenAPI::Linter->new(spec => $spec);
+    my @warnings = $linter->find_issues;
+    @warnings    = grep { $_->{level} eq 'WARN' } @warnings;
 
-    my @warnings = $linter->find_issues(level => 'WARN');
-
-    ok(grep({ $_->{message} =~ /Missing description for get \/users/ } @warnings),
+    ok(grep({ $_->{message} =~ /Operation get \/users.*missing a description/ } @warnings),
        'Detects missing operation description');
-    ok(!grep({ $_->{message} =~ /post \/users/ } @warnings),
+    ok(!grep({ $_->{message} =~ /post \/users.*missing a description/         } @warnings),
        'Does not warn when description exists');
 }
 
@@ -62,36 +84,44 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Test API',
-            version => '1.0.0',
+        info    => {
+            title       => 'Test API',
+            version     => '1.0.0',
             description => 'Test',
-            license => { name => 'MIT' },
+            license     => { name => 'MIT' },
         },
-        paths => {},
+        security   => [{ apiKey => [] }],
         components => {
+            securitySchemes => {
+                apiKey => {
+                    type => 'apiKey',
+                    name => 'X-API-Key',
+                    in   => 'header',
+                },
+            },
             schemas => {
                 User => {
                     type => 'object',
                     properties => {
-                        id => { type => 'integer' },
+                        id   => { type => 'integer' },
                         name => {
-                            type => 'string',
+                            type        => 'string',
                             description => 'User name',
                         },
                     },
                 },
             },
         },
+        paths => {},
     };
 
-    my $linter = OpenAPI::Linter->new(spec => $spec);
+    my $linter   = OpenAPI::Linter->new(spec => $spec);
+    my @warnings = $linter->find_issues;
+    @warnings    = grep { $_->{level} eq 'WARN' } @warnings;
 
-    my @warnings = $linter->find_issues(level => 'WARN');
-
-    ok(grep({ $_->{message} =~ /Schema User.id missing description/ } @warnings),
+    ok(grep({ $_->{message} =~ /Property 'id'.*missing description/    } @warnings),
        'Detects missing property description');
-    ok(!grep({ $_->{message} =~ /User.name/ } @warnings),
+    ok(!grep({ $_->{message} =~ /Property 'name'.*missing description/ } @warnings),
        'Does not warn when property description exists');
 }
 
@@ -100,13 +130,20 @@ use OpenAPI::Linter;
     my $spec = {
         openapi => '3.0.3',
         info => {
-            title => 'Test API',
-            version => '1.0.0',
+            title       => 'Test API',
+            version     => '1.0.0',
             description => 'Test',
-            license => { name => 'MIT' },
+            license     => { name => 'MIT' },
         },
-        paths => {},
+        security   => [{ apiKey => [] }],
         components => {
+            securitySchemes => {
+                apiKey => {
+                    type => 'apiKey',
+                    name => 'X-API-Key',
+                    in   => 'header',
+                },
+            },
             schemas => {
                 BadSchema => {
                     properties => {
@@ -115,13 +152,14 @@ use OpenAPI::Linter;
                 },
             },
         },
+        paths => {},
     };
 
-    my $linter = OpenAPI::Linter->new(spec => $spec);
+    my $linter   = OpenAPI::Linter->new(spec => $spec);
+    my @warnings = $linter->find_issues;
+    @warnings    = grep { $_->{level} eq 'WARN' } @warnings;
 
-    my @warnings = $linter->find_issues(level => 'WARN');
-
-    ok(grep({ $_->{message} =~ /Schema BadSchema missing type/ } @warnings),
+    ok(grep({ $_->{message} =~ /Schema 'BadSchema'.*missing type/ } @warnings),
        'Detects missing schema type');
 }
 

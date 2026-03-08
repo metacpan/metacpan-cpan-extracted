@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153518;
+our $VERSION = 1.20260306161710;
 
 my $formatters = [
                 {
@@ -60,16 +60,16 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"2572223", "Bujumbura",
+"2572225", "Bujumbura",
 "2572221", "Bujumbura",
+"2572230", "North\ zone",
+"2572220", "Bujumbura",
+"2572240", "Central\ east\ zone",
+"2572222", "Bujumbura",
 "2572227", "Rural\ areas",
 "2572224", "Bujumbura",
-"2572226", "West\ zone",
-"2572222", "Bujumbura",
-"2572220", "Bujumbura",
-"2572225", "Bujumbura",
-"2572240", "Central\ east\ zone",
 "2572250", "South\ zone",
-"2572230", "North\ zone",};
+"2572226", "West\ zone",};
 my $timezones = {
                '' => [
                        'Africa/Bujumbura'

@@ -392,6 +392,11 @@ subtest 'Chat with system_prompt + plugin injection — both present' => sub {
     return $http;
   });
 
+  sub build_tool_chat_request {
+    my ($self, $conversation, $formatted_tools, %extra) = @_;
+    return $self->chat_request($conversation, tools => $formatted_tools, %extra);
+  }
+
   sub format_tools {
     my ($self, $tools) = @_;
     return $tools;  # pass-through
@@ -429,7 +434,6 @@ subtest 'Chat with system_prompt + plugin injection — both present' => sub {
   }
 
   sub think_tag_filter { 0 }
-  sub hermes_tools { 0 }
   sub json { JSON::MaybeXS->new(utf8 => 1) }
 
   __PACKAGE__->meta->make_immutable;

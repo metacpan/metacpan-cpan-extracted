@@ -4,13 +4,13 @@
       "Sven Willenbuecher <sven.willenbuecher@gmx.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Getopt-Guided",
    "no_index" : {
@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "CPAN::Meta" : "0",
             "ExtUtils::MakeMaker" : "6.76",
             "ExtUtils::MakeMaker::CPANfile" : "0.09",
             "File::Spec::Functions" : "0",
@@ -38,6 +39,7 @@
          "requires" : {
             "Carp" : "1.32",
             "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
             "perl" : "5.010000",
             "strict" : "0",
             "warnings" : "0"
@@ -45,10 +47,12 @@
       },
       "test" : {
          "requires" : {
+            "Config" : "0",
             "File::Basename" : "0",
             "File::Spec::Functions" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "1.001005",
+            "Test::Needs" : "0",
             "Test::Output" : "0",
             "Test::Script" : "1.31",
             "Test::Warn" : "0"
@@ -58,7 +62,7 @@
    "provides" : {
       "Getopt::Guided" : {
          "file" : "lib/Getopt/Guided.pm",
-         "version" : "v3.0.3"
+         "version" : "v3.1.0"
       }
    },
    "release_status" : "stable",
@@ -72,5 +76,6 @@
          "web" : "https://codeberg.org/XSven/Getopt-Guided"
       }
    },
-   "version" : "v3.0.3"
+   "version" : "v3.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

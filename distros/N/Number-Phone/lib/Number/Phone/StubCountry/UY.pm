@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153526;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -109,25 +109,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"5984364", "Trinidad\/Flores",
-"598433", "Canelones",
-"598464", "Melo\/Cerro\ Largo",
+$areanames{en} = {"598473", "Salto",
+"5982", "Montevideo",
 "598435", "Florida",
-"598453", "Mercedes\/Soriano",
+"598444", "Minas\/Lavalleja",
+"598472", "Paysandu",
 "598462", "Rivera",
-"598473", "Salto",
+"598453", "Mercedes\/Soriano",
+"598464", "Melo\/Cerro\ Largo",
+"598433", "Canelones",
+"598477", "Artigas",
 "598445", "Treinta\ y\ Tres",
-"598447", "Rocha",
 "598456", "Fray\ Bentos\/Rio\ Negro",
+"5984364", "Trinidad\/Flores",
+"59842", "San\ Carlos",
+"598447", "Rocha",
+"598436", "Durazno",
 "598452", "Colonia\ del\ Scaramento",
 "598463", "Tacuarembo",
-"598436", "Durazno",
-"598434", "San\ Jose\ de\ Mayo",
-"598477", "Artigas",
-"5982", "Montevideo",
-"598472", "Paysandu",
-"59842", "San\ Carlos",
-"598444", "Minas\/Lavalleja",};
+"598434", "San\ Jose\ de\ Mayo",};
 my $timezones = {
                '' => [
                        'America/Montevideo'

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeSpec;
 # ABSTRACT: NodeSpec describes the attributes that a node is created with.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s configSource => 'Core::V1::NodeConfigSource';
@@ -38,7 +38,7 @@ IO::K8s::Api::Core::V1::NodeSpec - NodeSpec describes the attributes that a node
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 configSource
 

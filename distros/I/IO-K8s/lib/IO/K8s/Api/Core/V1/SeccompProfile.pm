@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SeccompProfile;
 # ABSTRACT: SeccompProfile defines a pod/container's seccomp profile settings. Only one profile source may be set.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s localhostProfile => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::SeccompProfile - SeccompProfile defines a pod/container'
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 localhostProfile
 

@@ -1,0 +1,17 @@
+use strict;
+use warnings;
+
+use Getopt::Guided qw( EXIT_SUCCESS EXIT_USAGE getopts );
+
+sub run {
+  shift;
+  my @argv = @_ ? @_ : @ARGV;
+
+  unless ( eval { getopts( '-a:b', my %opts, @argv ) } ) {
+    return ( warn( $@ ), 255 ) if $@;
+    return EXIT_USAGE
+  }
+  EXIT_SUCCESS
+}
+
+exit( __PACKAGE__->run )

@@ -400,15 +400,9 @@ subtest 'Circles and Ellipses' => sub {
     
     # Test circle
     lives_ok { $g->circle(5, 5, 1) } 'circle succeeds';
-    
-    # Test circle with custom steps
-    lives_ok { $g->circle(5, 5, 1, 50) } 'circle with custom steps succeeds';
-    
+        
     # Test ellipse
     lives_ok { $g->ellipse(5, 5, 1, 2) } 'ellipse succeeds';
-    
-    # Test ellipse with custom steps
-    lives_ok { $g->ellipse(5, 5, 1, 2, 50) } 'ellipse with custom steps succeeds';
     
     # Test invalid parameters
     dies_ok { $g->circle(1, 1) } 'circle without radius dies';
@@ -432,15 +426,12 @@ subtest 'Circles and Ellipses' => sub {
 
 # Test 7: Arcs
 subtest 'Arcs' => sub {
-    plan tests => 6;
+    plan tests => 5;
     
     my $g = Graphics::Penplotter::GcodeXY->new(xsize => 10, ysize => 10, units => 'in');
     
     # Test arc
     lives_ok { $g->arc(5, 5, 1, 0, 90) } 'arc succeeds';
-    
-    # Test arc with custom steps
-    lives_ok { $g->arc(5, 5, 1, 0, 180, 50) } 'arc with custom steps succeeds';
     
     # Test arcto
     $g->moveto(1, 1);

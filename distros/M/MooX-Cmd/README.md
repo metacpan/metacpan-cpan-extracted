@@ -1,47 +1,87 @@
-## Name
+# MooX::Cmd
 
-    MooX::Cmd - Giving an easy Moo style way to make command organized CLI apps
+**Command-organized CLI apps with Moo**
 
-## Description
+MooX::Cmd makes it easy to build command-line applications with nested subcommands, all using the lightweight [Moo](https://metacpan.org/pod/Moo) OOP framework. Commands form a tree structure mirrored in your package hierarchy -- each command gets its own class, its own options, and its own `execute` method.
 
-    Eases the writing of command line utilities, accepting commands and
-    subcommands and so on. These commands can form a tree, which is
-    mirrored in the package structure. On invocation each command along
-    the path through the tree (starting from the toplevel command
-    through to the most specific one) is instanciated.
+[![CPAN Version](https://img.shields.io/cpan/v/MooX-Cmd.svg)](https://metacpan.org/pod/MooX::Cmd)
 
-## Author
+## Quick Start
 
-    Torsten Raudssus, "<torsten at raudss.us>"
-    Jens Rehsack, "<rehsack at cpan.org>"
+```perl
+package MyApp;
+use Moo;
+use MooX::Cmd;
 
-## BUGS
+sub execute {
+    my ($self, $args, $chain) = @_;
+    say "Hello from MyApp!";
+}
 
-    Please report any bugs or feature requests to "bug-moox-cmd
-    at rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=MooX-Cmd>. I
-    will be notified, and then you'll automatically be notified
-    of progress on your bug as I make changes.
+package MyApp::Cmd::greet;
+use Moo;
+use MooX::Cmd;
 
-## Support
+sub execute {
+    my ($self, $args, $chain) = @_;
+    say "Hello, @{$args}!";
+}
 
-  Repository
+package main;
+MyApp->new_with_cmd;
+```
 
-    http://github.com/Getty/p5-moox-cmd
-    Pull request and additional contributors are welcome
+```
+$ myapp greet World
+Hello, World!
+```
 
-  Issue Tracker
+## Features
 
-    http://github.com/Getty/p5-moox-cmd/issues
-    http://rt.cpan.org/NoAuth/Bugs.html?Dist=MooX-Cmd
-    bug-moox-cmd at rt.cpan.org
+- Nested subcommand trees (`myapp foo bar baz`)
+- Command chain with full access to parent instances
+- Integrates seamlessly with [MooX::Options](https://metacpan.org/pod/MooX::Options) for option parsing
+- Optional [MooX::ConfigFromFile](https://metacpan.org/pod/MooX::ConfigFromFile) support
+- Optional abbreviated commands via [Text::Abbrev](https://metacpan.org/pod/Text::Abbrev)
+- Testing utilities via [MooX::Cmd::Tester](https://metacpan.org/pod/MooX::Cmd::Tester)
 
-## License And Copyright
+## How It Works
 
-    Copyright 2012-2013 Torsten Raudssus, Copyright 2013-2014 Jens Rehsack.
+Commands are discovered via [Module::Pluggable](https://metacpan.org/pod/Module::Pluggable) under `YourApp::Cmd::*`. Subcommands nest further: `YourApp::Cmd::Foo::Cmd::Bar` handles `yourapp foo bar`.
 
-    This program is free software; you can redistribute it and/or modify it
-    under the terms of either: the GNU General Public License as published
-    by the Free Software Foundation; or the Artistic License.
+Each command in the chain is instantiated. Only the most specific (deepest) command's `execute` is called, but all parent instances are available through the command chain.
 
-    See <http://dev.perl.org/licenses/> for more information.
+## With MooX::Options
+
+```perl
+package MyApp;
+use Moo;
+use MooX::Cmd;
+use MooX::Options;
+
+option verbose => (is => 'ro', doc => 'Enable verbose output');
+
+sub execute {
+    my ($self, $args, $chain) = @_;
+    say "Running in verbose mode" if $self->verbose;
+}
+```
+
+```
+$ myapp --verbose
+Running in verbose mode
+```
+
+## Installation
+
+```
+cpanm MooX::Cmd
+```
+
+## Documentation
+
+Full documentation is available on [MetaCPAN](https://metacpan.org/pod/MooX::Cmd).
+
+## License
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

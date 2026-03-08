@@ -9,6 +9,19 @@ Example:
 ```
 ansi-encode examples/usa.ans
 ```
+
+## AMD Logo
+
+![AMD Logo](../images/amd.png?raw=true "AMD Logo")
+
+## Atari Logo
+
+![Atari Logo](../images/atari.png?raw=true "Atari Logo")
+
+## Commodore Logo
+
+![Commodore Logo](../images/commodore.png?raw=true "Commodore Logo")
+
 ## IBM Logo
 
 ![IBM Logo](../images/ibm.png?raw=true "IBM Logo")

@@ -174,3 +174,12 @@ docker run --rm derfnull/efa-m:latest --version
 
 Documentation is not available in this image. Please refer to the
 [online efa-m manual](https://man.finalrewind.org/1/efa-m/) instead.
+
+## References
+
+Mirrors of the efa-m / Travel::Status::DE::EFA repository are available at
+
+* [Chaosdorf](https://chaosdorf.de/git/derf/Travel-Status-DE-EFA)
+* [Codeberg](https://codeberg.org/derf/Travel-Status-DE-EFA/)
+* [Finalrewind](https://git.finalrewind.org/derf/Travel-Status-DE-EFA/)
+* [GitHub](https://github.com/derf/Travel-Status-DE-EFA)

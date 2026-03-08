@@ -9,6 +9,11 @@ print $fh <<'END';
 #include "perl.h"
 #include "XSUB.h"
 
+#ifndef newSVbool
+#define newSVbool(value) newSVsv(boolSV(value))
+#endif
+
+
 typedef struct statx* File__StatX;
 
 #define statx_new(class) safecalloc(1, sizeof(struct statx))

@@ -1,13 +1,14 @@
-#!/usr/bin/perl  ## no critic (ProhibitExcessMainComplexity)
+#!/usr/bin/perl
+## no critic (ProhibitLongLines)
 
-# Copyright 2001-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
 # The latest version of this software should be available from my homepage:
 # https://pjcj.net
 
-require 5.012000;
+require 5.020000;
 
 use strict;
 use warnings;
@@ -19,7 +20,7 @@ use Data::Dumper        ();
 
 local $| = 1;
 
-my $Version  = "1.51";
+my $Version  = "1.52";
 my $Latest_t = "5.042000";
 my $Author   = 'paul@pjcj.net';
 my $Inc_str  = do {
@@ -35,7 +36,7 @@ my $Inc_str  = do {
 open my $i, ">", "lib/Devel/Cover/Inc.pm"
   or die "Cannot open lib/Devel/Cover/Inc.pm: $!";
 print $i <<"EOI";
-# Copyright 2001-2025, Paul Johnson (paul\@pjcj.net)
+# Copyright 2001-2026, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -78,6 +79,43 @@ EOM
 EOI
 close $i or die "Cannot close lib/Devel/Cover/Inc.pm: $!";
 
+# Set up git hooks if in a git repo
+if (-d ".git" && -d ".git/hooks") {
+  for my $hook (qw( commit-msg prepare-commit-msg )) {
+    my $path   = ".git/hooks/$hook";
+    my $target = "../../utils/$hook-hook";
+    if (!-e $path) {
+      if (symlink $target, $path) {
+        print "Created git $hook hook\n";
+      } else {
+        warn "Could not create $hook hook: $!\n";
+      }
+    }
+  }
+
+  # Install pre-commit hooks if pre-commit is available
+  if (-f ".pre-commit-config.yaml") {
+    my $pre_commit = `which pre-commit 2>/dev/null`;
+    chomp $pre_commit;
+    if ($pre_commit && -x $pre_commit) {
+      print "Installing pre-commit hooks ...\n";
+      my $result = system "pre-commit install --install-hooks";
+      if ($result == 0) {
+        print "Pre-commit hooks installed successfully\n";
+      } else {
+        print "Pre-commit hook installation failed (exit code: $result)\n";
+        print "  To install manually, run:\n";
+        print "    pre-commit install --install-hooks\n";
+      }
+    } else {
+      print "pre-commit not found, skipping pre-commit hook installation\n";
+      print "  Install with: brew install pre-commit\n";
+      print "    (or pip install pre-commit)\n";
+      print "  Then run: pre-commit install --install-hooks\n";
+    }
+  }
+}
+
 print "Writing tests ........ ";
 
 for my $d (qw( t t/e2e )) {
@@ -104,7 +142,7 @@ for my $t (readdir $dir) {
   print $test <<EOT;
 #!$^X
 
-# Copyright 2002-2025, Paul Johnson (paul\@pjcj.net)
+# Copyright 2002-2026, Paul Johnson (paul\@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -284,7 +322,7 @@ my $Opts = {
   NAME             => "Devel::Cover",
   VERSION          => $Version,
   AUTHOR           => 'Paul Johnson <paul@pjcj.net>',
-  MIN_PERL_VERSION => "5.012",
+  MIN_PERL_VERSION => "5.020",
   ABSTRACT_FROM    => "lib/Devel/Cover.pm",
   DIR              => [],
   EXE_FILES        => [ map "bin/$_", qw( cover gcov2perl cpancover ) ],
@@ -311,7 +349,9 @@ sub MY::postamble {
   my %tests;
   @tests{@Tests} = map { (my $t = $_) =~ s/\W/_/g; "cover_db_$t" } @Tests;
   my @reports = qw(
-    compilation html_basic html_minimal html html_subtle sort text2 text vim
+    compilation html_basic html_minimal html
+    html_subtle sort       text2        text
+    vim
   );
 
   qq[
@@ -368,6 +408,15 @@ t : pure_all
 no_replace_ops_t : pure_all
 \t DEVEL_COVER_OPTIONS=-replace_ops,0 exec make t
 
+xt : pure_all
+\t exec yath test -j20 --show-times --qvf xt
+
+at : pure_all
+\t exec yath test -j20 --qvf xt t
+
+tt : pure_all
+\t dc build-and-test-all
+
 DB = cover_db
 
 dump :
@@ -382,10 +431,20 @@ gold : pure_all
 \t \$(PERL) utils/create_gold \$(TEST)
 
 all_test :
-\t exec \$(PERL) utils/all_versions make t
+\t \$(PERL) utils/all_versions make t
 
 all_gold :
 \t \$(PERL) utils/create_all_gold \$(TEST)
+
+precommit :
+\t pre-commit run
+
+precommit_all :
+\t pre-commit run --all-files
+
+lint : precommit_all
+
+lint_changes : precommit
 
 _delete_db : pure_all
 \t rm -rf cover_db

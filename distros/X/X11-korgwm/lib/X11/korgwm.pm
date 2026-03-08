@@ -6,10 +6,10 @@ use strict;
 use warnings;
 use feature 'signatures';
 
-our $VERSION = "5.0";
+our $VERSION = "6.1";
 
 # Third-party includes
-use X11::XCB 0.23 ':all';
+use X11::XCB 0.24 ':all';
 use X11::XCB::Connection;
 use AnyEvent;
 use List::Util qw( any first min max none );
@@ -67,9 +67,11 @@ my $prevent_window_errors;
 our $exit_trigger;
 # Array for selecting preferred tag during screen change event
 my @preferred_tags = ();
+# Array of CODErefs to be called at the end of handle_screens()
+our @handle_screens_post_hooks;
 
 ## Define functions
-# Handles any screen change
+# Handle any screen change
 sub handle_screens {
     my @xscreens = @{ $X->screens() };
 
@@ -83,7 +85,7 @@ sub handle_screens {
     my %curr_screens;
     for my $s (@xscreens) {
         my ($x, $y, $w, $h) = map { $s->rect->$_ } qw( x y width height );
-        $curr_screens{"$x,$y,$w,$h"} = undef;
+        $curr_screens{"$w,$h,$x,$y"} = undef;
 
         # Update visible area information
         $visible_min_x = defined $visible_min_x ? min($visible_min_x, $x)      : $x;
@@ -131,9 +133,13 @@ sub handle_screens {
     }
 
     # Sort screens based on X axis and store them in @screens
-    DEBUG1 and carp "Old screens: (@screens)";
-    @screens = map { $screens{$_} } sort { (split /,/, $a)[0] <=> (split /,/, $b)[0] or $a <=> $b } keys %screens;
-    DEBUG1 and carp "New screens: (@screens)";
+    DEBUG2 and carp "Old screens: (@screens)";
+    @screens = map { $screens{$_} } sort {
+        (split /,/, $a)[2] <=> (split /,/, $b)[2] or # sort by x
+        (split /,/, $a)[3] <=> (split /,/, $b)[3] or # sort by y
+        $a cmp $b # sort somehow
+    } keys %screens;
+    DEBUG2 and carp "New screens: (@screens)";
 
     # Assign indexes to use them during possible next handle_screens events
     $screens[$_]->{idx} = $_ for 0..$#screens;
@@ -148,9 +154,17 @@ sub handle_screens {
         unless ($pref_position) {
             # Here is the last chance for windows having no preferred position. We're almost ready to skip them
             my $rules = $cfg->{rules}->{ $win->{cached_class} } or next;
-            ref(my $placement = $rules->{ placement }) eq 'ARRAY' or next;
+            my ($pref_screen, $pref_tag);
 
-            my ($pref_screen, $pref_tag) = map { max($_ - 1, 0) } @{ $placement->[ @screens ] // next };
+            for my $section (qw( soft_placement placement )) {
+                if (ref(my $placement = $rules->{ $section }) eq 'ARRAY') {
+                    if (ref(my $desired = $placement->[ @screens ]) eq 'ARRAY') {
+                        ($pref_screen, $pref_tag) = map { max($_ - 1, 0) } @{ $desired };
+                    }
+                }
+            }
+
+            next unless defined $pref_screen and defined $pref_tag;
             next if $pref_screen >= @screens or $pref_tag >= @{ $cfg->{ws_names} };
 
             # I solemnly swear that I am up to no good
@@ -185,10 +199,21 @@ sub handle_screens {
             my $pref_tag = $preferred_tags->[ $screen->{idx} ] // croak "Invalid tag in preferred_tags";
             $screen->tag_set_active($pref_tag, rotate => 0);
         }
+    } else {
+        # there is no $preferred_tags for this screen configuration, try to select the only tag with a window
+        for my $screen (@screens) {
+            my @tags_with_windows = grep { defined $_->first_window(1) } @{ $screen->{tags} };
+            next if @tags_with_windows != 1;
+            next if $screen->current_tag() == $tags_with_windows[0];
+            $screen->tag_set_active($tags_with_windows[0]->{idx}, rotate => 0);
+        }
     }
 
     # Refresh all the screens as we could've moved some windows around
     $_->refresh() for @screens;
+
+    # Call all required hooks at the end of handle_screens()
+    $_->() for @handle_screens_post_hooks;
 }
 
 # Scan for existing windows and handle them
@@ -250,7 +275,13 @@ sub handle_existing_windows {
 # Destroy and Unmap events handler
 sub annihilate_window($wid) {
     my $win = delete $windows->{$wid};
-    return unless $win;
+
+    # Window is unmanaged or unknown, teardown and return
+    unless ($win) {
+        pinned_remove(X11::korgwm::Window->mock($wid));
+        return;
+    }
+
     $win->{_hidden} = 1;
 
     # Ignore Window errors [code=3] closing multiple window at a time
@@ -295,6 +326,7 @@ sub annihilate_window($wid) {
     }
 
     focus_prev_remove($win);
+    pinned_remove($win);
 
     # Clean-up cached classes index
     if (my $class = $win->{cached_class}) {
@@ -362,9 +394,19 @@ sub FireInTheHole {
 
     # Ignore not interesting events
     add_event_ignore(CREATE_NOTIFY());
-    add_event_ignore(MAP_NOTIFY());
     add_event_ignore(CONFIGURE_NOTIFY());
     add_event_ignore(FOCUS_OUT());
+
+    # We have to parse MapNotifies as some windows ignore substructure redirection
+    add_event_cb(MAP_NOTIFY(), sub($evt) {
+        my $wid = $evt->{window};
+        return if exists $windows->{$wid};
+
+        # Process rules for unmanaged windows
+        my $class = X11::korgwm::Window::_class($wid) or return;
+        my $rule = $cfg->{rules}->{$class} or return;
+        $rule->{pinned} and pinned_add(X11::korgwm::Window->mock($wid));
+    });
 
     # Add several important event handlers
     add_event_cb(MAP_REQUEST(), sub($evt) {
@@ -481,11 +523,17 @@ sub FireInTheHole {
         # This lines will apply rules
         $win->toggle_floating(1) if $floating;
         $win->urgency_raise(1) if $rule->{urgent};
+        $win->toggle_pinned() if $rule->{pinned};
 
-        # The reason of floating does not matter here so checking the object directly
-        prevent_enter_notify() if $win->{floating};
+        # I'm not sure if we properly maximize it in case we already have $tag->{maximized}
+        $win->toggle_maximize(1, allow_invisible => 1) if first {
+            atom("_NET_WM_STATE_FULLSCREEN") == $_
+        } @{ $win->get_property("_NET_WM_STATE", "ATOM") // [] };
 
-        if ($tag->{max_window} and not $win->relative_for($tag->{max_window})) {
+        # We probably want to prevent EnterNotify for any MapRequest despite floatingness of the window
+        prevent_enter_notify();
+
+        if ($tag->{max_window} and not $win == $tag->{max_window} and not $win->relative_for($tag->{max_window})) {
             # There is some maximized window on the tag and $win is not transient for it or its children
             # TODO consider if we want to respect $follow here
             DEBUG2 and carp "Window $win is starting _hidden() behind some maximized one";
@@ -646,7 +694,10 @@ sub FireInTheHole {
         my $limit = 1024;
         while ($limit--) {
             my $evt = $X->poll_for_event();
-            last unless $evt;
+            unless ($evt) {
+                Gtk3::main_iteration_do(0);
+                last;
+            }
 
             # MotionNotifies(6) are ignored anyways. No room for error
             DEBUG9 and $evt->{response_type} != 6 and warn Dumper $evt;
@@ -722,7 +773,7 @@ And these for Archlinux:
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023--2025 Sergei Zhmylev E<lt>zhmylove@narod.ru<gt>
+Copyright (c) 2023--2026 Sergei Zhmylev E<lt>zhmylove@narod.ruE<gt>
 
 MIT License.  Full text is in LICENSE.
 

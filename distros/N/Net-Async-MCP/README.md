@@ -33,10 +33,16 @@ my $mcp = Net::Async::MCP->new(server => $server);
 $loop->add($mcp);
 
 # Stdio: spawn external MCP server
-my $mcp_ext = Net::Async::MCP->new(
+my $mcp_stdio = Net::Async::MCP->new(
     command => ['npx', '@anthropic/mcp-server-web-search'],
 );
-$loop->add($mcp_ext);
+$loop->add($mcp_stdio);
+
+# HTTP: remote MCP server
+my $mcp_http = Net::Async::MCP->new(
+    url => 'https://example.com/mcp',
+);
+$loop->add($mcp_http);
 
 # Same API for all transports
 async sub main {
@@ -60,7 +66,7 @@ main()->get;
 |-----------|-------------|----------|
 | **InProcess** | `server => $mcp_server` | Perl MCP::Server in same process |
 | **Stdio** | `command => [...]` | External servers (any language) |
-| **HTTP** | `url => '...'` | Remote servers (planned) |
+| **HTTP** | `url => '...'` | Remote servers (Streamable HTTP) |
 
 ## Installation
 
@@ -74,6 +80,7 @@ cpanm Net::Async::MCP
 - [Future::AsyncAwait](https://metacpan.org/pod/Future::AsyncAwait) >= 0.66
 - [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS)
 - [MCP](https://metacpan.org/pod/MCP) >= 0.07 (recommended, required for InProcess transport)
+- [Net::Async::HTTP](https://metacpan.org/pod/Net::Async::HTTP) (recommended, required for HTTP transport)
 
 ## See also
 

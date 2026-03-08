@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.6.0
+## Version v1.7.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2025/10/30
+## Modified 2026/03/01
 ## All rights reserved
 ## 
 ## 
@@ -39,7 +39,7 @@ BEGIN
     our $CLDR_VERSION = '48.0';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.6.0';
+    our $VERSION = 'v1.7.0';
 };
 
 use strict;
@@ -2404,7 +2404,7 @@ my $plural_rules =
     },
 };
 
-# Aliasing
+# NOTE: Aliasing for plural forms
 my $aliases =
 {
     # 1: other
@@ -5024,7 +5024,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.6.0
+    v1.7.0
 
 =head1 DESCRIPTION
 

@@ -5,6 +5,7 @@ package X11::korgwm::Config;
 use strict;
 use warnings;
 use feature 'signatures';
+use List::Util qw( first );
 use YAML::Tiny;
 use X11::korgwm::Common;
 
@@ -17,7 +18,9 @@ BEGIN {
     $cfg->{api_port} = ($ENV{KORGWM_DEBUG_PORT} // "") =~ m/^(\d+)$/s ? $1 : 27015;
 
     $cfg->{api_timeout} = 5;
+    $cfg->{battery_charging_character} = chr(0x2234);
     $cfg->{battery_format} = "%s";
+    $cfg->{battery_hide_charged} = 1;
     $cfg->{border_width} = 1;
     $cfg->{clock_format} = " %a %e %B %H:%M";
     $cfg->{color_battery_low} = '0xFF0000';
@@ -26,27 +29,29 @@ BEGIN {
     $cfg->{color_border} = '0x232426';
     $cfg->{color_expose} = '0x232426';
     $cfg->{color_fg} = '0xA3BABF';
-    $cfg->{color_urgent_bg} = '0x464729';
-    $cfg->{color_urgent_fg} = '0xFFFF00';
+    $cfg->{color_urgent_bg} = '0xFFFF00';
+    $cfg->{color_urgent_fg} = '0x464729';
     $cfg->{color_append_bg} = '0x262729';
     $cfg->{color_append_fg} = '0xF502C8';
     $cfg->{expose_spacing} = 15;
     $cfg->{expose_show_id} = 1;
     $cfg->{font} = "DejaVu Sans Mono 10";
     $cfg->{hide_empty_tags} = 1;
+    $cfg->{tag_rotate} = 1;
     $cfg->{initial_pointer_position} = "center"; # values: undef, "center", "hidden"
     $cfg->{lang_format} = " %s ";
     $cfg->{lang_names} = { 0 => chr(0x00a3), 1 => chr(0x20bd) };
     $cfg->{mouse_follow} = 1;
+    $cfg->{mouse_nowarp} = 0;
     $cfg->{move_follow} = 1;
+    $cfg->{warp_ignore_korgwm} = 1;
     $cfg->{notification_server} = 1;
     $cfg->{panel_end} = [qw( battery clock lang )];
     $cfg->{panel_height} = 20;
     $cfg->{panel_hide} = undef;
-    $cfg->{randr_cmd} = q(xrandr --output HDMI-A-0 --left-of eDP --auto --output DisplayPort-0 --right-of eDP --auto);
-    ## For 4K screens we perhaps need to override:
-    # --output HDMI-A-0 --left-of eDP --mode 1920x1080 --output DisplayPort-0 --right-of eDP --mode 1920x1080
+    $cfg->{randr_cmd} = "korgwm_xrandr || xrandr --auto";
     $cfg->{set_root_color} = 0;
+    $cfg->{setxkb_evdev} = 1;
     $cfg->{title_max_len} = 128;
     $cfg->{ws_names} = [qw( 1 2 3 4 5 6 7 8 9 )];
 
@@ -65,26 +70,32 @@ BEGIN {
                 "mod_TAB"               => "focus_prev()",
                 "alt_TAB"               => "focus_cycle(forward)",
                 "alt_shift_TAB"         => "focus_cycle(backward)",
-                "mod_CR"                => "exec(urxvt)",
-                "mod_shift_CR"          => "exec(urxvt -name urxvt-float)",
+                "mod_CR"                => "exec(xkb-switch -s us; urxvt)",
+                "mod_shift_CR"          => "exec(xkb-switch -s us; urxvt -name urxvt-float -g 120x32)",
                 "mod_a"                 => "win_toggle_always_on()",
                 "mod_shift_ctrl_l"      => "exec(lock)",
                 "mod_e"                 => "expose()",
                 "mod_shift_s"           => "mark_window()",
                 "mod_s"                 => "mark_switch_window()",
                 "mod_f"                 => "win_toggle_floating()",
+                "mod_p"                 => "win_toggle_pinned()",
                 "mod_g"                 => "exec(google-chrome --simulate-outdated-no-au --new-window --incognito)",
                 "mod_shift_g"           => "exec(google-chrome --simulate-outdated-no-au --new-window)",
                 "mod_m"                 => "win_toggle_maximize()",
                 "mod_r"                 => "exec(xkb-switch -s us; rofi -show drun)",
                 "mod_w"                 => "exec(firefox --new-instance --private-window)",
                 "mod_shift_w"           => "exec(firefox --new-instance)",
+                "mod_-"                 => "toggle_calendar()",
                 "mod_="                 => "exec(galculator)",
                 "mod_ctrl_shift_q"      => "exit()",
                 "Print"                 => "exec(flameshot gui)",
                 "XF86AudioLowerVolume"  => "nop()",
                 "XF86AudioMute"         => "nop()",
+                "XF86AudioNext"         => "exec(playerctl next)",
+                "XF86AudioPlay"         => "exec(playerctl play-pause)",
+                "XF86AudioPrev"         => "exec(playerctl previous)",
                 "XF86AudioRaiseVolume"  => "nop()",
+                "XF86AudioStop"         => "exec(playerctl stop)",
                 "XF86MonBrightnessDown" => "nop()",
                 "XF86MonBrightnessUp"   => "nop()",
                 "XF86WakeUp"            => "nop()",
@@ -93,16 +104,26 @@ BEGIN {
                 "mod_alt_F3"            => "exec(pactl set-sink-volume 0 +10%)",
                 "mod_alt_F5"            => "exec(light -U 20)",
                 "mod_alt_F6"            => "exec(light -A 20)",
+                "mod_alt_F10"           => "layout_set(narrow)",
+                "mod_alt_F11"           => "layout_set(columns)",
+                "mod_alt_F12"           => "layout_set(grid)",
     };
 
     $cfg->{rules} = {
-        "mattermost"                    => { placement => [undef, [1, 4], [2, 4], [3, 4]], follow => 1 },
         "evolution"                     => { tag => 3, follow => 0 },
+        "evolution-alarm-notify"        => { floating => 1, urgent => 1 },
         "org.gnome.Evolution"           => { screen => 1, tag => 3, follow => 0 },
+        "rofi"                          => { pinned => 1 },
+        "google-chrome"                 => { soft_placement => [
+                map { +{ if_screens => $_, screen => 2, tag => 7 } } 2, 3
+            ] },
+        "flameshot"                     => { pinned => 1, floating => 1 },
         "galculator"                    => { floating => 1 },
+        "mattermost"                    => { follow => 1, placement => [
+                map { +{ if_screens => $_, screen => $_, tag => 4 } } 1..3
+            ] },
         "urxvt-float"                   => { floating => 1 },
         "xeyes"                         => { floating => 1 },
-        "evolution-alarm-notify"        => { floating => 1, urgent => 1 },
     };
 
     $cfg->{noclass_whitelist} = ["Event Tester", "glxgears"];
@@ -111,8 +132,10 @@ BEGIN {
 
     # Read local configs
     for my $file (
-        "/etc/korgwm/korgwm.conf", "/usr/local/etc/korgwm/korgwm.conf",
-        "$ENV{HOME}/.korgwmrc", "$ENV{HOME}/.config/korgwm/korgwm.conf"
+        defined $ENV{KORGWM_DEBUG_CONFIG} ? $ENV{KORGWM_DEBUG_CONFIG} : (
+            "/etc/korgwm/korgwm.conf", "/usr/local/etc/korgwm/korgwm.conf",
+            "$ENV{HOME}/.korgwmrc", "$ENV{HOME}/.config/korgwm/korgwm.conf"
+        )
     ) {
         next unless -f $file;
         my $rcfg;
@@ -124,11 +147,33 @@ BEGIN {
         %{ $cfg } = (%{ $cfg }, %{ $rcfg });
     }
 
+    # Right after reading the config, make a copy of it
+    if (defined $ENV{KORGWM_DEBUG_CONFIG}) {
+        eval "require Storable";
+        Storable->import("dclone");
+        our $debug_config = dclone($cfg);
+    }
+
     # Prepare whitelist of windows which we want to see with unset WM_CLASS
     $cfg->{noclass_whitelist} = { map { ($_, 1) } @{ $cfg->{noclass_whitelist} } };
 
     # Normalize numeric values
     $_ = hexnum for @{ $cfg }{grep /^color_/, keys %{ $cfg }};
+
+    # Allow new syntax for placement
+    for my $name (keys %{ $cfg->{rules} }) {
+        for my $section (qw( placement soft_placement )) {
+            next unless ref(my $ref = $cfg->{rules}->{$name}->{$section}) eq 'ARRAY';
+
+            # If at least one HASH, we assume the whole section should be converted to ARRAY
+            next unless first { ref($_) eq 'HASH' } @{ $ref };
+
+            # $ref has HASH entries, so we need to convert all it's values to array refs
+            my @arr;
+            $arr[$_->{if_screens}] = [$_->{screen}, $_->{tag}] for @{ $ref };
+            $cfg->{rules}->{$name}->{$section} = \@arr;
+        }
+    }
 
     # Setup the DEBUG
     ## Allow override via environment and create a closure

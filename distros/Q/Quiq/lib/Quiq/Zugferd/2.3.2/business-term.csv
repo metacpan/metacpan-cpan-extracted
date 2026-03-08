@@ -20,6 +20,7 @@ BT-99;0;;Betrag des Zuschlags auf Dokumentenebene
 BT-20;0;;Zahlungsbedingungen
 BT-21;0;;Code zum Freitext der Rechnung
 BT-22;0;;Freitext zur Rechnung
+BT-23;0;;Geschäftsprozesstyp
 BT-24;1;profilKennung;Spezifikationskennung (Kennung des Profils)
 BT-27;1;verkaeufer.name;Name des Verkäufers
 BT-29;0;;Kennung des Verkäufers
@@ -27,6 +28,8 @@ BT-30-1;;0;Kennung des Schemas
 BT-30;0;;Kennung der rechtlichen Registrierung des Verkäufers
 BT-31-0;2;;Art der Steuernummer
 BT-31;2;;Umsatzsteuer-Identifikationsnummer des Verkäufers
+BT-34;0;;Elektronische Adresse des Verkäufers
+BT-34-1;0;;Kennung des Schemas
 BT-35;0;;Zeile 1 der Verkäuferanschrift
 BT-36;0;;Zeile 2 der Verkäuferanschrift
 BT-37;0;;Stadt der Verkäuferanschrift
@@ -36,10 +39,13 @@ BT-40;2;;Ländercode der Verkäuferanschrift
 BT-41-0;0;;Abteilungsname
 BT-41;0;;Kontaktstelle des Verkäufers
 BT-42;0;;Telefonnummer der Kontaktstelle des Verkäufers
+BT-43;0;;E-Mail-Adresse der Kontaktstelle des Verkäufers
 BT-44;1;kaeufer.name;Name des Käufers
 BT-46;0;;Kundennummer
 BT-48-0;0;;Art der Steuernummer
 BT-48;0;;Umsatzsteuer-Identifikationsnummer des Käufers
+BT-49;0;;Elektronische Adresse des Käufers
+BT-49-1;0;;Kennung des Schemas
 BT-50;0;;Zeile 1 der Käuferanschrift
 BT-51;0;;Zeile 2 der Käuferanschrift B
 BT-52;0;;Stadt der Käuferanschrift

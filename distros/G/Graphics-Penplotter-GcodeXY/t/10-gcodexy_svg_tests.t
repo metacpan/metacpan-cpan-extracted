@@ -70,6 +70,7 @@ subtest 'SVG Import Basic Shapes' => sub {
   <line x1="10" y1="10" x2="50" y2="50" />
   <rect x="60" y="10" width="40" height="40" />
   <circle cx="130" cy="30" r="20" />
+  <ellipse cx="100" cy="100" rx="50" ry="50" />
 </svg>};
     
     my $svg_file = File::Spec->catfile($dir, 'shapes.svg');

@@ -9,8 +9,8 @@ Time::OlsonTZ::Data - Olson timezone data
     $version = olson_version;
 
     use Time::OlsonTZ::Data qw(
-	olson_canonical_names olson_link_names olson_all_names
-	olson_links olson_country_selection);
+        olson_canonical_names olson_link_names olson_all_names
+        olson_links olson_country_selection);
 
     $names = olson_canonical_names;
     $names = olson_link_names;
@@ -37,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.202503";
+our $VERSION = "0.202601";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -77,7 +77,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2025c";
+use constant olson_version => "2026a";
 
 =item olson_code_version
 
@@ -89,7 +89,7 @@ piece of information.
 
 =cut
 
-use constant olson_code_version => "2025c";
+use constant olson_code_version => "2026a";
 
 =item olson_data_version
 
@@ -101,7 +101,7 @@ piece of information.
 
 =cut
 
-use constant olson_data_version => "2025c";
+use constant olson_data_version => "2026a";
 
 =back
 

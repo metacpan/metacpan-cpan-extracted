@@ -1,13 +1,16 @@
 Changes
+CONTRIBUTING.md
 lib/Google/GeoCoder/Smart.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 ppport.h
 README.md
+SECURITY.md
 Smart.xs
 t/Google-GeoCoder-Smart.t
 t/fixtures/geocode-ok.json
-test.pl
+t/manifest-accounting.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

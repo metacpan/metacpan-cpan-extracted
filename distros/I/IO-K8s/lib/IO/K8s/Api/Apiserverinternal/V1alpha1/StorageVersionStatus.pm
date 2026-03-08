@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionStatus;
 # ABSTRACT: API server instances report the versions they can decode and the version they encode objects to when persisting objects in the backend.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s commonEncodingVersion => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Apiserverinternal::V1alpha1::StorageVersionStatus - API server ins
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 commonEncodingVersion
 

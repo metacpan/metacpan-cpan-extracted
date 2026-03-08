@@ -1,5 +1,12 @@
 Revision history for Env-Dot
 
+0.020     2026-03-05 11:53:04+01:00 Europe/Stockholm
+            * Add parameter 'read => { required => <boolean> }' to 'use Env::Dot;'.
+            * Remove unnecessary Cwd requirement from test file.
+            * Remove unnecessary FindBin version requirement from test files.
+            * Fix temp dir name.
+            * Correct typo.
+
 0.019     2026-01-12 18:17:15+01:00 Europe/Stockholm
             * Fix version in Windows test.
             * Deactivate .github/workflows/perltest.yml.

@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+
 use Test::More;
 use OpenAPI::Linter;
 
@@ -9,8 +10,8 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.0.3',
-        info => { title => 'Test API', version => '1.0.0' },
-        paths => {},
+        info    => { title => 'Test API', version => '1.0.0' },
+        paths   => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);
@@ -22,8 +23,8 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.1.0',
-        info => { title => 'Test API', version => '1.0.0' },
-        paths => {},
+        info    => { title => 'Test API', version => '1.0.0' },
+        paths   => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec, version => '3.1.0');
@@ -33,7 +34,7 @@ use OpenAPI::Linter;
 # Test 3: Constructor dies without spec or file
 {
     eval { OpenAPI::Linter->new };
-    like($@, qr/spec => HASHREF required/, 'Dies without spec or file');
+    like($@, qr/A 'spec' file path or data is required/, 'Dies without spec or file');
 }
 
 done_testing;

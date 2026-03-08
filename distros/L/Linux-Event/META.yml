@@ -23,7 +23,8 @@ requires:
   Linux::Event::Clock: '0.011'
   Linux::Event::Timer: '0.01'
   Linux::FD::Signal: '0'
+  Test2::V0: '0'
   perl: '5.036000'
 resources: {}
-version: '0.007'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

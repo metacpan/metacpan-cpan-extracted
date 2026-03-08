@@ -1,12 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2024 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2026 -- leonerd@leonerd.org.uk
 
-package String::Tagged::HTML 0.03;
+package String::Tagged::HTML 0.04;
 
-use v5.14;
+use v5.20;
 use warnings;
+
+use feature qw( postderef signatures );
+no warnings qw( experimental::postderef experimental::signatures );
 
 use base qw( String::Tagged );
 String::Tagged->VERSION( '0.20' );
@@ -16,6 +19,8 @@ String::Tagged->VERSION( '0.20' );
 C<String::Tagged::HTML> - handle HTML content using C<String::Tagged>
 
 =head1 SYNOPSIS
+
+=for highlighter language=perl
 
    use String::Tagged::HTML;
 
@@ -31,6 +36,8 @@ This subclass of L<String::Tagged> provides a method, C<as_html>, for rendering
 the string as an HTML fragment, using the tags to provide formatting. For
 example, the SYNOPSIS example will produce the output
 
+=for highlighter language=html
+
    <h1>An <b>important</b> message</h1>
 
 With the exception of tags named C<raw>, a tag applied to an extent of the
@@ -39,12 +46,16 @@ same name. If the tag's value is a C<HASH> reference, then this hash will be
 used to provide additional attributes for the HTML element. Tags whose names
 begin with C<_> will be ignored for this purpose.
 
+=for highlighter language=perl
+
    my $str = String::Tagged::HTML->new( "click " )
       ->append_tagged( "here", a => { href => "/see/other.html" } );
 
    print $str->as_html( "p" );
 
 Z<>
+
+=for highlighter language=html
 
    <p>click <a href="/see/other.html">here</a></p>
 
@@ -53,6 +64,8 @@ true value, such as C<1>.
 
 The special tag named C<raw> disables HTML entity escaping over its extent.
 
+=for highlighter language=perl
+
    my $str = String::Tagged::HTML->new( "This <content> is escaped" );
 
    my $br = String::Tagged::HTML->new_tagged( "<br/>", raw => 1 );
@@ -60,6 +73,8 @@ The special tag named C<raw> disables HTML entity escaping over its extent.
    print +( $str . $br )->as_html( "p" );
 
 Z<>
+
+=for highlighter language=html
 
    <p>This &lt;content&gt; is escaped<br/></p>
 
@@ -76,12 +91,16 @@ then used to generate the C<style> tag.
 As an extra convenience, any remaining underscores in the tag name will be
 converted to hyphens in the style property name.
 
+=for highlighter language=perl
+
    my $str = String::Tagged::HTML->new( "Some big text" );
    $str->apply_tag( 5, 3, _span_style_font_size => "large" );
 
    print $str->as_html
 
 Z<>
+
+=for highlighter language=html
 
    Some <span style="font-size: large;">big</span> text
 
@@ -93,6 +112,8 @@ have to break a single C<String::Tagged> tag into multiple regions. In the
 following example, the C<i> tag has been split in two to allow it to overlap
 correctly with C<b>.
 
+=for highlighter language=perl
+
    my $str = String::Tagged::HTML->new( "bbb b+i iii" );
    $str->apply_tag( 0, 7, b => 1 );
    $str->apply_tag( 4, 7, i => 1 );
@@ -100,6 +121,8 @@ correctly with C<b>.
    print $str->as_html
 
 Z<>
+
+=for highlighter language=html
 
    <b>bbb <i>b+i</i></b><i> iii</i>
 
@@ -112,6 +135,8 @@ provided for converting C<String::Tagged::Formatting> tags into a form that
 can be rendered into standalone HTML.
 
 The following tag conversions are supported:
+
+=for highlighter
 
    bold                 <strong>
    under                <u>
@@ -138,6 +163,8 @@ L<String::Tagged|String::Tagged/CONSTRUCTORS>, the following is provided.
 
 =head2 new_raw
 
+=for highlighter language=perl
+
    $st = String::Tagged::HTML->new_raw( $str );
 
 Returns a new C<String::Tagged::HTML> instance with the C<raw> tag applied
@@ -146,10 +173,8 @@ containing already-rendered HTML fragments.
 
 =cut
 
-sub new_raw
+sub new_raw ( $class, $str )
 {
-   my $class = shift;
-   my ( $str ) = @_;
    return $class->new_tagged( $str, raw => 1 );
 }
 
@@ -174,10 +199,8 @@ behaviour can be disabled by passing a defined-but-false value.
 
 =cut
 
-sub new_from_formatting
+sub new_from_formatting ( $class, $orig, %params )
 {
-   my ( $class, $orig, %params ) = @_;
-
    my $ret = $class->clone( $orig,
       only_tags => [qw( bold italic under strike monospace sizepos fg bg link )],
       convert_tags => {
@@ -186,22 +209,18 @@ sub new_from_formatting
          under     => "u",
          # strike stands as is
          monospace => "tt",
-         sizepos   => sub {
-            my ( $k, $v ) = @_;
+         sizepos   => sub  ( $k, $v ) {
             return "sup" => 1 if $v eq "super";
             return "sub" => 1 if $v eq "sub";
             return;
          },
-         fg => sub {
-            my ( $k, $v ) = @_;
+         fg => sub ( $k, $v ) {
             return _span_style_color => "#" . $v->as_rgb8->hex;
          },
-         bg => sub {
-            my ( $k, $v ) = @_;
+         bg => sub ( $k, $v ) {
             return _span_style_background_color => "#" . $v->as_rgb8->hex;
          },
-         link => sub {
-            my ( $k, $v ) = @_;
+         link => sub ( $k, $v ) {
             return unless defined( my $uri = $v->{uri} );
             return a => { href => $uri };
          },
@@ -232,11 +251,8 @@ work if that module is not available.
 
 =cut
 
-sub parse_html
+sub parse_html ( $class, $content )
 {
-   my $class = shift;
-   my ( $content ) = @_;
-
    require HTML::TreeBuilder;
 
    my $tree = HTML::TreeBuilder->new_from_content( $content );
@@ -245,10 +261,8 @@ sub parse_html
    return _traverse_html( $class, $body );
 }
 
-sub _traverse_html
+sub _traverse_html ( $class, $node )
 {
-   my ( $class, $node ) = @_;
-
    # Plain text
    return $class->new( $node ) if !ref $node;
 
@@ -271,9 +285,8 @@ L<String::Tagged|String::Tagged/METHODS>.
 
 =cut
 
-sub _escape_html
+sub _escape_html ( $s )
 {
-   my $s = $_[0];
    $s =~ s/([<>&"'])/$1 eq "<" ? "&lt;" :
                      $1 eq ">" ? "&gt;" :
                      $1 eq "&" ? "&amp;" :
@@ -282,12 +295,9 @@ sub _escape_html
    $s;
 }
 
-sub _cmp_tag_values
+sub _cmp_tag_values ( $self, $name, $v1, $v2 )
 {
-   my $self = shift;
-   my ( $name, $v1, $v2 ) = @_;
-
-   return ( $v1 == $v2 ) if grep { $name eq $_ } qw( b i u small );
+   return ( $v1 == $v2 ) if grep { $name eq $_ } qw( b i u small strong em tt super sub );
    return ( $v1->{href} eq $v2->{href} ) if $name eq "a";
    return ( $v1->{style} eq $v2->{style} ) if $name eq "span";
    die "String::Tagged::HTML does not recognise the tag name '$name'\n";
@@ -303,29 +313,22 @@ of the given name. If not defined, no outer wrapping will be performed.
 
 =cut
 
-sub _build_style
+sub _build_style ( $style )
 {
-   my ( $style ) = @_;
-
    return join " ", map {
       my $prop = $_ =~ s/_/-/gr;
       "$prop: $style->{$_};"
    } sort keys %$style;
 }
 
-sub as_html
+sub as_html ( $self, $elem = undef )
 {
-   my $self = shift;
-   my ( $elem ) = @_;
-
    my $ret = "";
 
    my @tags_in_effect; # of [ $name, $value ]
 
    $self->iter_extents_nooverlap(
-      sub {
-         my ( $e, %tags ) = @_;
-
+      sub ( $e, %tags ) {
          # _span_style_... hackery
          my %span_style;
          foreach my $k ( grep m/^_/, keys %tags ) {
@@ -341,14 +344,14 @@ sub as_html
 
          my $i;
          for( $i = 0; $i < @tags_in_effect; $i++ ) {
-            my ( $tag, $value ) = @{ $tags_in_effect[$i] };
+            my ( $tag, $value ) = $tags_in_effect[$i]->@*;
             last if !exists $tags{$tag};
             last if !$self->_cmp_tag_values( $tag, $value, $tags{$tag} );
             delete $tags{$tag};
          }
 
          while( @tags_in_effect > $i ) {
-            my ( $tag ) = @{ pop @tags_in_effect };
+            my ( $tag ) = ( pop @tags_in_effect )->@*;
             $ret .= "</$tag>";
          }
 
@@ -366,8 +369,7 @@ sub as_html
          }
 
          $self->iter_substr_nooverlap(
-            sub {
-               my ( $str, %tags ) = @_;
+            sub ( $str, %tags ) {
                $ret .= ( $tags{raw} ? $str : _escape_html( $str ) );
             },
             start => $e->start,
@@ -378,7 +380,7 @@ sub as_html
    );
 
    while( @tags_in_effect ) {
-      my ( $tag ) = @{ pop @tags_in_effect };
+      my ( $tag ) = ( pop @tags_in_effect )->@*;
       $ret .= "</$tag>";
    }
 

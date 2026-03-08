@@ -1,5 +1,22 @@
 Revision history for IO-K8s
 
+1.006     2026-03-01 02:55:20Z
+  - Fix struct_to_object destroying pre-built objects: when a typed IO::K8s
+    object was passed into a parent constructor (e.g. PersistentVolumeClaim in
+    StatefulSet.volumeClaimTemplates), _inflate_struct treated the blessed
+    object as a non-HASH ref and returned {}, producing an empty object.
+    Now passes through objects that already match the expected class.
+  - Harden _inflate_struct against blessed objects: if a blessed object
+    reaches _inflate_struct despite the struct_to_object guard, it now
+    extracts data via TO_JSON instead of silently returning {}.
+  - Add explicit Scalar::Util import to IO::K8s (was used unimported).
+  - Added comprehensive test suite: passthrough tests (t/23), combination
+    tests with 35 subtests (t/24), real-world YAML manifest round-trip tests
+    from popular projects like Kubernetes Dashboard, CoreDNS, Prometheus,
+    Argo CD, NGINX Ingress, Grafana (t/25), and build-and-verify tests
+    constructing manifests via Perl API and checking output (t/26).
+    Total: 1047 assertions across 29 test files.
+
 1.005     2026-02-28 06:43:29Z
   - Fixed _inflate_struct not recognizing sanitized field names (x-kubernetes-*,
     $ref, etc.) during JSON deserialization — Bool coercion and type inflation

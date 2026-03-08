@@ -197,21 +197,18 @@ Works with **all engines** that support tool calling (see table above).
 
 ### Hermes-Native Tool Calling
 
-For models that support the [Hermes tool calling format](https://nousresearch.com/) (via `<tool_call>` XML tags) but lack API-level tool support, enable `hermes_tools`:
+For models that support the [Hermes tool calling format](https://nousresearch.com/) (via `<tool_call>` XML tags) but lack API-level tool support, engines compose `Langertha::Role::HermesTools`:
 
 ```perl
-# NousResearch has hermes_tools enabled by default
+# NousResearch, AKI, and AKIOpenAI compose HermesTools out of the box
 my $nous = Langertha::Engine::NousResearch->new(
     api_key     => $ENV{NOUSRESEARCH_API_KEY},
     mcp_servers => [$mcp],
 );
 
-# Any OpenAI-compatible API or Ollama model can opt in
-my $ollama = Langertha::Engine::Ollama->new(
-    url          => 'http://localhost:11434',
-    model        => 'hermes3',
-    hermes_tools => 1,
-    mcp_servers  => [$mcp],
+my $aki = Langertha::Engine::AKI->new(
+    api_key     => $ENV{AKI_API_KEY},
+    mcp_servers => [$mcp],
 );
 ```
 

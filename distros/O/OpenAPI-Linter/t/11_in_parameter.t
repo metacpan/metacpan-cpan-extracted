@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+
 use Test::More;
 use OpenAPI::Linter;
 
@@ -10,7 +11,7 @@ use OpenAPI::Linter;
     my $spec = {
         openapi => '3.0.3',
         info => {
-            title => 'Test API',
+            title   => 'Test API',
             version => '1.0.0',
         },
         paths => {
@@ -18,10 +19,10 @@ use OpenAPI::Linter;
                 get => {
                     parameters => [
                         {
-                            name => 'id',
-                            in => 'path',
+                            name     => 'id',
+                            in       => 'path',
                             required => 1,  # Boolean true
-                            schema => { type => 'string' }
+                            schema   => { type => 'string' }
                         }
                     ],
                     responses => {
@@ -54,18 +55,18 @@ use OpenAPI::Linter;
     my $spec = {
         openapi => '3.0.3',
         info => {
-            title => 'Test API',
+            title   => 'Test API',
             version => '1.0.0',
         },
         paths => {
             '/users' => {
-                get => {
+                get  => {
                     parameters => [
                         {
-                            name => 'limit',
-                            in => 'query',
+                            name     => 'limit',
+                            in       => 'query',
                             required => 1,  # Boolean true (will be coerced)
-                            schema => { type => 'integer' }
+                            schema   => { type => 'integer' }
                         }
                     ],
                     responses => {
@@ -102,8 +103,8 @@ use OpenAPI::Linter;
     foreach my $in_value (@valid_in_values) {
         my $spec = {
             openapi => '3.0.3',
-            info => {
-                title => 'Test API',
+            info    => {
+                title   => 'Test API',
                 version => '1.0.0',
             },
             paths => {
@@ -111,8 +112,8 @@ use OpenAPI::Linter;
                     get => {
                         parameters => [
                             {
-                                name => 'test_param',
-                                in => $in_value,
+                                name   => 'test_param',
+                                in     => $in_value,
                                 schema => { type => 'string' }
                             }
                         ],
@@ -142,19 +143,19 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Test API',
+        info    => {
+            title   => 'Test API',
             version => '1.0.0',
         },
         paths => {
             '/items' => {
-                get => {
+                get  => {
                     parameters => [
                         {
-                            name => 'filter',
-                            in => 'query',
+                            name        => 'filter',
+                            in          => 'query',
                             description => 'Filter items',
-                            schema => {
+                            schema      => {
                                 type => 'string',
                                 enum => ['active', 'inactive']
                             }
@@ -189,39 +190,39 @@ use OpenAPI::Linter;
 # Test 5: Complete valid spec should pass validation
 {
     my $spec = {
-        openapi => '3.0.3',
-        info => {
-            title => 'Complete Test API',
-            version => '1.0.0',
+        openapi => '3.1.0',
+        info    => {
+            title       => 'Complete Test API',
+            version     => '1.0.0',
             description => 'A test API'
         },
         paths => {
             '/users/{userId}' => {
                 get => {
-                    summary => 'Get user by ID',
+                    summary    => 'Get user by ID',
                     parameters => [
                         {
-                            name => 'userId',
-                            in => 'path',
+                            name     => 'userId',
+                            in       => 'path',
                             required => 1,
-                            schema => { type => 'string' }
+                            schema   => { type => 'string' }
                         },
                         {
-                            name => 'expand',
-                            in => 'query',
+                            name     => 'expand',
+                            in       => 'query',
                             required => 0,
-                            schema => { type => 'boolean' }
+                            schema   => { type => 'boolean' }
                         }
                     ],
                     responses => {
                         '200' => {
                             description => 'User found',
-                            content => {
+                            content     => {
                                 'application/json' => {
                                     schema => {
                                         type => 'object',
                                         properties => {
-                                            id => { type => 'string' },
+                                            id   => { type => 'string' },
                                             name => { type => 'string' }
                                         }
                                     }

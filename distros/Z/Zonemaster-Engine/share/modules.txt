@@ -2,8 +2,8 @@ Basic
 Address
 Connectivity
 Consistency
-DNSSEC
 Delegation
+DNSSEC
 Nameserver
 Syntax
 Zone

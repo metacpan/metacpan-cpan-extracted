@@ -52,23 +52,23 @@
    "provides" : {
       "SVG" : {
          "file" : "lib/SVG.pm",
-         "version" : "2.88"
+         "version" : "2.89"
       },
       "SVG::DOM" : {
          "file" : "lib/SVG/DOM.pm",
-         "version" : "2.88"
+         "version" : "2.89"
       },
       "SVG::Element" : {
          "file" : "lib/SVG/Element.pm",
-         "version" : "2.88"
+         "version" : "2.89"
       },
       "SVG::Extension" : {
          "file" : "lib/SVG/Extension.pm",
-         "version" : "2.88"
+         "version" : "2.89"
       },
       "SVG::XML" : {
          "file" : "lib/SVG/XML.pm",
-         "version" : "2.88"
+         "version" : "2.89"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/manwar/SVG"
       }
    },
-   "version" : "2.88",
+   "version" : "2.89",
    "x_contributors" : [
       "Peter Wainwright",
       "Ian Hickson",

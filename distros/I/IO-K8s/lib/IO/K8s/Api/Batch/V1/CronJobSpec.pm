@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::CronJobSpec;
 # ABSTRACT: CronJobSpec describes how the job execution will look like and when it will actually run.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s concurrencyPolicy => Str;
@@ -41,7 +41,7 @@ IO::K8s::Api::Batch::V1::CronJobSpec - CronJobSpec describes how the job executi
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 concurrencyPolicy
 

@@ -1,5 +1,16 @@
 Revision history for Yote-Spiderpup
 
+0.06  2026-02-24
+    - Fixed loop item argument passing: dynamic attribute/content functions
+      now receive (module, loop_item, loop_idx) matching the template
+      convention (m, item) =>. Previously loop_item was passed as the first
+      arg and loop_idx as the second, making the second param the index
+      instead of the item.
+    - Fixed RecipeConditional condition evaluation to pass module as first
+      arg, fixing conditions like (m, s) => s.completed inside for loops
+    - Fixed setAttribute to use DOM property for 'value' attribute on form
+      elements (textarea/input), preventing stale display after user edits
+
 0.03  2026-02-22
     - Slot scoping: slot content now resolves variables from the parent scope
       where the component is used, not the slot-owning component's scope

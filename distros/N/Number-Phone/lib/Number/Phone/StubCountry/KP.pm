@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153523;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -82,23 +82,23 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"850195", "Pyongyang",
-"85021", "Pyongyang",
-"85067", "Kanggye",
+$areanames{en} = {"85057", "Wonsan",
 "85079", "Hyesan",
-"8508", "Rason",
+"85045", "Haeju",
+"85049", "Kaesong",
+"85073", "Chongjin",
+"8502381", "Pyongyang",
 "85039", "Nampo",
 "85028", "Pyongyang",
-"85049", "Kaesong",
-"85031", "Pyongyang",
-"85041", "Sariwon",
-"8502381", "Pyongyang",
-"85053", "Hamhung",
-"85073", "Chongjin",
-"85027", "Pyongyang",
-"85045", "Haeju",
+"850195", "Pyongyang",
+"85067", "Kanggye",
 "85061", "Sinuiju",
-"85057", "Wonsan",};
+"85053", "Hamhung",
+"85041", "Sariwon",
+"85021", "Pyongyang",
+"85027", "Pyongyang",
+"8508", "Rason",
+"85031", "Pyongyang",};
 my $timezones = {
                '' => [
                        'Asia/Seoul'

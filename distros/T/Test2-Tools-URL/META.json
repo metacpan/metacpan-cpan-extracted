@@ -4,7 +4,7 @@
       "Graham Ollis <plicease@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -21,6 +21,13 @@
          }
       },
       "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.79",
+            "Software::License::Perl_5" : "0"
+         },
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
@@ -40,11 +47,11 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Test2::Compare" : "0.000060",
-            "Test2::Compare::Base" : "0.000060",
-            "Test2::Compare::Custom" : "0.000060",
-            "Test2::Compare::Hash" : "0.000060",
-            "Test2::Compare::String" : "0.000060",
+            "Test2::Compare" : "0.000121",
+            "Test2::Compare::Base" : "0.000121",
+            "Test2::Compare::Custom" : "0.000121",
+            "Test2::Compare::Hash" : "0.000121",
+            "Test2::Compare::String" : "0.000121",
             "URI" : "1.61",
             "URI::QueryParam" : "0",
             "perl" : "5.008001"
@@ -69,13 +76,14 @@
          "web" : "https://github.com/uperl/Test2-Tools-URL"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
-      "Paul Durden (alabamapaul, PDURDEN)"
+      "Paul Durden (alabamapaul, PDURDEN)",
+      "Yoshikazu Sawa (yoshikazusawa)"
    ],
-   "x_generated_by_perl" : "v5.33.6",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

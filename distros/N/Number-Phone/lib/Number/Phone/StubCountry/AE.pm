@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153517;
+our $VERSION = 1.20260306161710;
 
 my $formatters = [
                 {
@@ -58,7 +58,7 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '[2-4679][2-8]\\d{6}',
                 'geographic' => '[2-4679][2-8]\\d{6}',
-                'mobile' => '5[024-68]\\d{7}',
+                'mobile' => '5[02-68]\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(700[05]\\d{5})|(900[02]\\d{5})|(600[25]\\d{5})',
@@ -69,35 +69,35 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"97144", "Dubai",
+$areanames{en} = {"97196", "Fujairah",
+"97143", "Dubai",
 "97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97173", "Ras\ Alkhaimah",
-"97177", "Ras\ Alkhaimah",
-"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97145", "Dubai",
-"97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97175", "Ras\ Alkhaimah",
+"97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97142", "Dubai",
+"97178", "Ras\ Alkhaimah",
+"97198", "Fujairah",
 "97195", "Fujairah",
 "97176", "Ras\ Alkhaimah",
-"97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97194", "Fujairah",
-"97178", "Ras\ Alkhaimah",
-"97172", "Ras\ Alkhaimah",
-"97175", "Ras\ Alkhaimah",
-"97196", "Fujairah",
-"97147", "Dubai",
-"97143", "Dubai",
-"97192", "Fujairah",
+"97177", "Ras\ Alkhaimah",
 "97174", "Ras\ Alkhaimah",
-"97198", "Fujairah",
+"97194", "Fujairah",
 "9713", "Al\ Ain",
-"97193", "Fujairah",
-"97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97142", "Dubai",
-"97148", "Dubai",
-"97146", "Dubai",
 "97197", "Fujairah",
+"97172", "Ras\ Alkhaimah",
 "97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97148", "Dubai",
+"97173", "Ras\ Alkhaimah",
+"97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97145", "Dubai",
+"97146", "Dubai",
+"97193", "Fujairah",
+"97192", "Fujairah",
+"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97144", "Dubai",
+"97147", "Dubai",
+"97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
 "9712", "Abu\ dhabi",};
 my $timezones = {
                '' => [

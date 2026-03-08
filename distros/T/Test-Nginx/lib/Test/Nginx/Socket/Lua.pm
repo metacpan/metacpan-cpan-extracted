@@ -2,7 +2,7 @@ package Test::Nginx::Socket::Lua;
 
 use Test::Nginx::Socket -Base;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 my $code = $ENV{TEST_NGINX_INIT_BY_LUA};
 
@@ -74,7 +74,7 @@ Yichun "agentzh" Zhang (章亦春) C<< <agentzh@gmail.com> >>, OpenResty Inc.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2009-2016, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
+Copyright (c) 2009-2025, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
 
 This module is licensed under the terms of the BSD license.
 

@@ -25,7 +25,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.235';
+our $VERSION = '1.236';
 
 # -----------------------------------------------------------------------------
 
@@ -62,6 +62,8 @@ sub new {
         umsatzsteuerId => undef,   # BT-31
         kontakt => undef,          # BT-41
         telefon => undef,          # BT-42
+        email => undef,            # BT-34
+        contactEmail => undef,     # BT-43
     );
     $self->set(@_);
 
@@ -72,7 +74,7 @@ sub new {
 
 =head1 VERSION
 
-1.235
+1.236
 
 =head1 AUTHOR
 

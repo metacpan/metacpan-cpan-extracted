@@ -1,12 +1,12 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Simple Google Geocoding API client",
    "author" : [
       "TTG <ttg@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -34,11 +34,28 @@
          "requires" : {
             "HTTP::Tiny" : "0",
             "JSON::PP" : "0",
-            "URI::Escape" : "0"
+            "URI::Escape" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
          }
       }
    },
+   "provides" : {
+      "Google::GeoCoder::Smart" : {
+         "file" : "lib/Google/GeoCoder/Smart.pm",
+         "version" : "v2.6.6"
+      }
+   },
    "release_status" : "stable",
-   "version" : "v2.6.3",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/ttgrules/Google-Geocoder-Smart"
+      }
+   },
+   "version" : "v2.6.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -20,10 +20,10 @@ no_index:
 provides:
   Test::DBIx::Class::SchemaManager::Trait::Testpostgresqlv2:
     file: lib/Test/DBIx/Class/SchemaManager/Trait/Testpostgresqlv2.pm
-    version: '2.03'
+    version: '2.04'
   Test::PostgreSQL::v2:
     file: lib/Test/PostgreSQL/v2.pm
-    version: '2.03'
+    version: '2.04'
 requires:
   File::Spec: '0'
   File::Temp: '0'
@@ -35,5 +35,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/Test-PostgreSQL-v2/issues
   repository: https://github.com/manwar/Test-PostgreSQL-v2.git
-version: '2.03'
+version: '2.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,24 @@
 Revision history for Kubernetes-REST
 
+1.100     2026-03-04 16:41:39Z
+ - Pod Log API: new log() method for retrieving and streaming pod logs.
+   Supports one-shot (returns full log text) and streaming mode (on_line
+   callback with Kubernetes::REST::LogEvent objects). Streaming mode supports
+   follow, tailLines, sinceSeconds, sinceTime, timestamps, previous,
+   limitBytes, and container parameters.
+ - New Kubernetes::REST::LogEvent class for typed log line events
+ - Public building block methods for async wrappers: build_path(),
+   prepare_request(), check_response(), inflate_object(), inflate_list(),
+   process_watch_chunk(), process_log_chunk(). These provide a stable public
+   API for event-based systems like Net::Async::Kubernetes to integrate
+   without relying on internal methods.
+
+1.004     2026-02-28 18:46:30Z
+ - Fix resource name pluralization in _build_path: correctly handle words ending
+   in ss/sh/ch/x/z (e.g. Ingress -> ingresses, NetworkPolicy -> networkpolicies),
+   consonant+y (e.g. Policy -> policies), and avoid double-s for words already
+   ending in s.
+
 1.003     2026-02-28 01:05:55Z
  - Kubernetes::REST::Kubeconfig: add in-cluster service account auto-detection.
    When no kubeconfig file is found, automatically falls back to using the

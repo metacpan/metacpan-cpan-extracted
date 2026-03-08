@@ -1,25 +1,30 @@
 Revision history for Perl extension Google::RestApi.
 
-2.1.0 2025-02-15
+2.1.1 2026-03-02
+        - Fixed doc that claude incorrectly updated.
+        - Replaced pod2doc script with standard one.
+        - Added MANIFEST.SKIP
+
+2.1.0 2026-02-15
         - Upgrade Type::Params to latest.
         - Increase test coverage.
         - Small refactor.
 
 2.0.0 2026-02-15
-        - Regenerate all exchange mock files from live API for Calendar, Gmail, Tasks, and Docs.                                                                                                                                                  
+        - Regenerate all exchange mock files from live API for Calendar, Gmail, Tasks, and Docs.
         - Add live resource creation to sub-resource tests for integration testing.
-        - Fix JSON::MaybeXS bareword errors (missing parentheses on true/false calls).                                                                                                                                                            
-        - Fix PerlX::Maybe missing 'provided' export.                                                                                                                                                                                             
+        - Fix JSON::MaybeXS bareword errors (missing parentheses on true/false calls).
+        - Fix PerlX::Maybe missing 'provided' export.
         - Remove unused mock helpers and empty exchange file.
         - Block network traffic in TestBase fallback branch.
-        - BREAKING CHANGE: DriveApi3::list uses names params instead of positional,
+        - BREAKING CHANGE: DriveApi3::list uses names params instead of positional.
 
 1.2.0 2026-02-14
         - Build out drive api calls.
 
 1.1.1 2026-02-13
-        - Separate Test::* from prod code. <= dkechang
-        - Add github workflow. <= dkechang
+        - Separate Test::* from prod code. <= dkechag
+        - Add github workflow.             <= dkechag
 
 1.1.0 2026-01-04
         - Fill out missing API calls for sheets, should be comprehensive now.

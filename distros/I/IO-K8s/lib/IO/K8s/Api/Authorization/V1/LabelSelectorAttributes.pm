@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::LabelSelectorAttributes;
 # ABSTRACT: LabelSelectorAttributes indicates a label limited access. Webhook authors are encouraged to * ensure rawSelector and requirements are not both set * consider the requirements field if set * not try to parse or consider the rawSelector field if set. This is to avoid another CVE-2022-2880 (i.e. getting different systems to agree on how exactly to parse a query is not something we want), see https://www.oxeye.io/resources/golang-parameter-smuggling-attack for more details. For the *SubjectAccessReview endpoints of the kube-apiserver: * If rawSelector is empty and requirements are empty, the request is not limited. * If rawSelector is present and requirements are empty, the rawSelector will be parsed and limited if the parsing succeeds. * If rawSelector is empty and requirements are present, the requirements should be honored * If rawSelector is present and requirements are present, the request is invalid.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s rawSelector => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Authorization::V1::LabelSelectorAttributes - LabelSelectorAttribut
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 rawSelector
 

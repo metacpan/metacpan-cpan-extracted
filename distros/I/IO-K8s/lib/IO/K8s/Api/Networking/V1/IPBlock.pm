@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::IPBlock;
 # ABSTRACT: IPBlock describes a particular CIDR (Ex. "192.168.1.0/24","2001:db8::/64") that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The except entry describes CIDRs that should not be included within this rule.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s cidr => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Networking::V1::IPBlock - IPBlock describes a particular CIDR (Ex.
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 cidr
 

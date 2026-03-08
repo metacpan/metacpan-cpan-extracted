@@ -1,0 +1,18 @@
+Revision history for Net-Async-NATS
+
+0.002     2026-03-07 19:44:22Z
+
+  - Fix connect hang: retain TCP connect Future to prevent garbage collection
+  - Fix INFO parsing to tolerate trailing whitespace
+  - Add regression test for Future retention (t/04-connect-future-retain.t)
+
+0.001     2026-03-05 00:23:20Z
+
+  - Initial release
+  - Publish/Subscribe messaging
+  - Request/Reply with auto-generated inbox subjects
+  - Wildcard subscriptions (* and >)
+  - Queue group subscriptions
+  - Automatic PING/PONG keepalive handling
+  - Reconnect with subscription replay
+  - Server INFO processing

@@ -1,6 +1,6 @@
 package Langertha::Role::OpenAICompatible;
 # ABSTRACT: Role for OpenAI-compatible API format
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 use Moose::Role;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
@@ -40,9 +40,13 @@ sub list_models_path { '/models' }
 
 
 sub list_models_request {
-  my ($self) = @_;
+  my ($self, %params) = @_;
+  my $url = $self->url.$self->list_models_path;
+  if ($params{after}) {
+    $url .= '?after='.$params{after};
+  }
   return $self->generate_http_request(
-    GET => $self->url.$self->list_models_path,
+    GET => $url,
     sub { $self->list_models_response(shift) },
   );
 }
@@ -51,7 +55,7 @@ sub list_models_request {
 sub list_models_response {
   my ($self, $response) = @_;
   my $data = $self->parse_response($response);
-  return $data->{data};
+  return $data;
 }
 
 
@@ -66,20 +70,28 @@ sub list_models {
     }
   }
 
-  # Fetch from API
-  my $request = $self->list_models_request;
-  my $response = $self->user_agent->request($request);
-  my $models = $request->response_call->($response);
+  # Fetch all pages
+  my @all_models;
+  my $after;
+  for my $page (1..100) {
+    my $request = $self->list_models_request($after ? (after => $after) : ());
+    my $response = $self->user_agent->request($request);
+    my $data = $request->response_call->($response);
+    my $models = ref $data eq 'HASH' ? ($data->{data} // []) : $data;
+    push @all_models, @$models;
+    last unless ref $data eq 'HASH' && $data->{has_more} && $data->{last_id};
+    $after = $data->{last_id};
+  }
 
   # Extract IDs and update cache
-  my @model_ids = map { $_->{id} } @$models;
+  my @model_ids = map { $_->{id} } @all_models;
   $self->_models_cache({
     timestamp => time,
-    models => $models,
+    models => \@all_models,
     model_ids => \@model_ids,
   });
 
-  return $opts{full} ? $models : \@model_ids;
+  return $opts{full} ? \@all_models : \@model_ids;
 }
 
 
@@ -336,7 +348,7 @@ Langertha::Role::OpenAICompatible - Role for OpenAI-compatible API format
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 
@@ -423,16 +435,18 @@ does not include C</v1>).
 =head2 list_models_request
 
     my $request = $engine->list_models_request;
+    my $request = $engine->list_models_request(after => $last_id);
 
 Generates an HTTP GET request for the models endpoint using
-C<list_models_path>. Returns an HTTP request object.
+C<list_models_path>. Pass C<after> for cursor-based pagination.
+Returns an HTTP request object.
 
 =head2 list_models_response
 
-    my $models = $engine->list_models_response($http_response);
+    my $data = $engine->list_models_response($http_response);
 
-Parses the C</v1/models> response. Returns an ArrayRef of model objects
-(each with at least an C<id> field).
+Parses the C</v1/models> response. Returns the full response hashref
+including C<data>, C<has_more>, and C<last_id> for pagination.
 
 =head2 list_models
 
@@ -445,9 +459,11 @@ Parses the C</v1/models> response. Returns an ArrayRef of model objects
     my $fresh = $engine->list_models(force_refresh => 1);
 
 Fetches available models from the C</v1/models> endpoint with caching.
-By default returns an ArrayRef of model ID strings. Pass C<full =E<gt> 1>
-for full model objects. Results are cached for C<models_cache_ttl> seconds
-(default: 3600). Pass C<force_refresh =E<gt> 1> to bypass the cache.
+Automatically paginates through all pages using cursor-based pagination
+(C<has_more> / C<after>). By default returns an ArrayRef of model ID
+strings. Pass C<full =E<gt> 1> for full model objects. Results are cached
+for C<models_cache_ttl> seconds (default: 3600). Pass C<force_refresh =E<gt> 1>
+to bypass the cache.
 
 =head2 embedding_request
 

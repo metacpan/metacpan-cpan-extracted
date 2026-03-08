@@ -30,6 +30,14 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   # @inc       == ( 'lib', 'local/lib/perl5' )
   # @argv      == ()
 
+=head1 GENERAL
+
+This module adheres to the L<Semantic
+Versioning|http://semver.org/spec/v2.0.0.html> scheme.  All public functions
+(C<getopts()>, C<processopts()>, C<readopts()>, C<print_version_info()>)
+and public constants (EOOD, EXIT_SUCCESS, EXIT_FAILURE, EXIT_USAGE) provided
+by this module are exported on request.
+
 =head1 DESCRIPTION
 
 The
@@ -145,8 +153,7 @@ incrementable flag.
 =head1 SEMANTIC
 
 The C<processopts( \@@ )> function adds semantic to the parse result provided
-by the C<getopts()> function. The C<processopts()> function is exported on
-request.
+by the C<getopts()> function.
 
 The command-line arguments list C<@argv> is the first parameter of the
 C<processopts()> function.  The list must be passed by reference. A possible
@@ -178,28 +185,51 @@ name as its second, and with the option-argument indicator (or flag-type
 indicator) as its third argument. If the option (or flag) has no indicator,
 the third argument is an empty string. The callback function is invoked in
 scalar context. If the callback function returns the end of options delimiter
-(C<-->), the C<processopts()> function stops prematurely. C<EOOD> is a constant
-that returns the end of options delimiter. The constant is exported on request.
+(C<-->), the C<processopts()> function stops prematurely. EOOD is a constant
+that returns the end of options delimiter.
 
 The C<processopts()> function returns true (C<!!1>) on success; otherwise the
 function returns false (C<!!0>). If the function stops prematurely, its return
 value for true changes to the option name prefixed by the options delimiter.
 
-=head1 C<-V>
+=head1 "-V"
 
 The GNU coding standard provides some guideline how a "-V" (version) option
-should behave. This module exports the C<print_version_info()> function on
-request. It can be used as a "-V" option destination callback function. The
-function implements some recommendations. It prints information about the
-program name L<$0|perlvar/$0>, and its version to standard output. As a
-second information line it prints the version of the perl interpreter to
+should behave. This module provides the C<print_version_info()> function. It
+can be used as a "-V" option destination callback function. The function
+implements some recommendations. It prints information about the program name
+(the basename of L<$0|perlvar/$0>), and its version to standard output. As
+a second information line it prints the version of the perl interpreter to
 standard output too. Example output:
 
-  utility v1.2.3
+  foo v1.2.3
   perl v5.14.2
 
 The function returns the end of options delimiter, so that the C<processopts()>
 function stops prematurely.
+
+=head1 DEFAULT OPTIONS
+
+The C<readopts( \@ )> function reads default command-line options from a
+rcfile and prepends them to the command-line arguments list C<@argv>. This
+function is usually called immediately before the C<processopts()> function.
+
+The basename of the rcfile is the program name with the
+extension C<rc>. The dirname of the rcfile is defined by the
+environment variable XDG_CONFIG_HOME (L<XDG Base Directory
+Specification|https://specifications.freedesktop.org/basedir/latest/>).
+
+The rcfile must contain one option per line. This implies that options must
+not be grouped. Each line is either a simple flag name or an option name
+followed by a space character and an option-argument value. Neither the
+flag name nor the option name should start with the option delimiter (C<->).
+Option-argument values should not be quoted even if they include spaces.
+Example rcfile content:
+
+  # verbose
+  v
+  # jobs
+  j 9
 
 =head1 SEE ALSO
 

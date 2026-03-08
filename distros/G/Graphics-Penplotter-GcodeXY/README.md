@@ -51,6 +51,13 @@ need `Image::SVG::Transform` and `XML::Parser` and `Image::SVG::Path` and `POSIX
 
         Specifies the spacing of the hatching lines.
 
+    - hatchangle
+
+        Specifies the angle of the hatching lines in degrees.  `0` (the default)
+        gives horizontal lines; `90` gives vertical lines; `45` gives diagonal
+        lines running from lower-left to upper-right.  Positive values rotate the
+        lines counter-clockwise.
+
     - header
 
         Specifies a header to be inserted at the start of the output file. The default is
@@ -365,6 +372,23 @@ error condition (e.g. insufficient arguments).
 
     Inserts the penup command, causing the pen to be lifted from the paper.
 
+- polygon\_clip(x1,y1, x2,y2, ..., xn,yn)
+
+    Add a polygon to an internal clipping queue for hidden-line removal. Polygons added
+    with `polygon_clip` are not immediately emitted to the current path; instead they are
+    kept in a queue. When a new polygon overlaps previously queued polygons, any parts
+    of the previously queued polygons that lie underneath the new polygon are removed.
+
+    The method accepts the same parameters as `polygon` (a list of coordinate pairs).
+    Returns 1 on success.
+
+- polygon\_clip\_end()
+
+    Flush the internal clipping queue into the current segment path. Remaining visible
+    segments from previously queued polygons are emitted into the current path using
+    the existing `_addpath` mechanism (moveto/lineto entries). The clip queue is
+    cleared. Returns 1 on success.
+
 - polygon(x1,y1, x2,y2, ..., xn,yn)
 
     The `polygon` method is multi-function, allowing many shapes to be created and
@@ -427,6 +451,12 @@ error condition (e.g. insufficient arguments).
 - sethatchsep(width)
 
     When hatching, the space between hatch lines is set to `width`.
+
+- sethatchangle(degrees)
+
+    Set the angle of the hatch lines.  `0` (the default) gives horizontal
+    lines; `90` gives vertical lines.  See also the `hatchangle` constructor
+    argument.
 
 - skewX(degrees)
 
@@ -492,6 +522,17 @@ error condition (e.g. insufficient arguments).
 As noted above, the SVG specification (900 pages) is only partially implemented, and just one layer
 can be used. I suspect that diagnostics about pen travel distance may not always be correct.
 Clipping is not supported. Layering is not supported officially, but can be simulated.
+
+# SEE ALSO
+
+[Graphics::Penplotter::GcodeXY::Geometry2D](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3AGeometry2D),
+[Graphics::Penplotter::GcodeXY::Postscript](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3APostscript),
+[Graphics::Penplotter::GcodeXY::SVG](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3ASVG),
+[Graphics::Penplotter::GcodeXY::Split](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3ASplit),
+[Graphics::Penplotter::GcodeXY::Hatch](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3AHatch),
+[Graphics::Penplotter::GcodeXY::Font](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3AFont),
+[Graphics::Penplotter::GcodeXY::Vpype](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3AVpype),
+[Graphics::Penplotter::GcodeXY::Optimize](https://metacpan.org/pod/Graphics%3A%3APenplotter%3A%3AGcodeXY%3A%3AOptimize)
 
 # AUTHOR
 

@@ -1,0 +1,318 @@
+#!/usr/bin/env perl
+use v5.36;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Getopt::Long qw(GetOptions);
+use Pod::Usage   qw(pod2usage);
+use Remote::Perl;
+
+# -- Option parsing ------------------------------------------------------------
+
+my $rsh           = 'ssh';
+my $pipe_cmd      = 0;
+my $window        = 65_536;
+my $eval_code     = undef;
+my $stdin_file    = undef;
+my $stdin_str     = undef;
+my $serve_modules = 0;
+my @inc_local;
+my $tmpfile       = 0;
+my $tmpfile_mode  = undef;
+my $no_data_warn  = 0;
+my $help          = 0;
+my $version       = 0;
+
+GetOptions(
+    'rsh=s'               => \$rsh,
+    'pipe-cmd'            => \$pipe_cmd,
+    'window-size=i'       => \$window,
+    'e=s'                 => \$eval_code,
+    'stdin-file=s'        => \$stdin_file,
+    'stdin-str=s'         => \$stdin_str,
+    'serve-modules!'      => \$serve_modules,
+    'inc-local=s@'        => \@inc_local,
+    'tmpfile!'            => \$tmpfile,
+    'tmpfile-mode=s'      => \$tmpfile_mode,
+    'no-data-warn'        => \$no_data_warn,
+    'help|h'              => \$help,
+    'version|V'           => \$version,
+) or pod2usage(2);
+
+pod2usage(-verbose => 1, -exitstatus => 0) if $help;
+
+if ($version) {
+    print "remperl $Remote::Perl::VERSION\n";
+    exit 0;
+}
+
+# -- Build the remote command --------------------------------------------------
+
+my @cmd;
+if ($pipe_cmd) {
+    my $spec = shift @ARGV
+        // die "remperl: --pipe-cmd requires a command argument\n";
+    @cmd = ('sh', '-c', $spec);
+}
+else {
+    my $host = shift @ARGV
+        // die "remperl: missing host argument\n";
+    @cmd = ($rsh, $host, 'perl');
+}
+
+# -- Source: file or -e --------------------------------------------------------
+
+my $script;
+if (!defined $eval_code) {
+    $script = shift @ARGV
+        // die "remperl: missing script argument (or use -e CODE)\n";
+}
+
+# -- stdin ---------------------------------------------------------------------
+
+die "remperl: --stdin-file and --stdin-str are mutually exclusive\n"
+    if defined $stdin_file && defined $stdin_str;
+
+my $stdin;
+if (defined $stdin_str) {
+    $stdin = $stdin_str;
+}
+elsif (defined $stdin_file) {
+    open(my $fh, '<', $stdin_file)
+        or die "remperl: cannot open '$stdin_file': $!\n";
+    binmode($fh);
+    $stdin = $fh;
+}
+else {
+    $stdin = \*STDIN;
+}
+
+# -- Connect and run -----------------------------------------------------------
+
+STDOUT->autoflush(1);
+
+my @inc = (@inc_local, @INC);
+
+die "remperl: unknown --tmpfile-mode value '$tmpfile_mode'\n"
+    if defined $tmpfile_mode && $tmpfile_mode !~ /^(auto|linux|perl|named|off)$/;
+
+# --tmpfile-mode implies --tmpfile; --tmpfile alone means auto.
+$tmpfile = 1 if defined $tmpfile_mode;
+my $tmpfile_val = !$tmpfile                       ? 0
+                : !defined($tmpfile_mode)         ? 'auto'
+                : $tmpfile_mode eq 'off'          ? 0
+                :                                   $tmpfile_mode;
+
+my $r = Remote::Perl->new(
+    cmd       => \@cmd,
+    window    => $window,
+    serve     => $serve_modules,
+    inc       => \@inc,
+    tmpfile   => $tmpfile_val,
+    data_warn => ($no_data_warn ? 0 : 1),
+);
+
+# Forward signals through the protocol so the remote executor receives them
+# regardless of transport (SSH, docker, etc.).
+for my $sig (qw(INT TERM QUIT HUP)) {
+    $SIG{$sig} = sub { eval { $r->send_signal($sig) } };
+}
+
+my @script_args = @ARGV;
+
+my %run_opts = (
+    on_stdout => sub { print STDOUT $_[0] },
+    on_stderr => sub { print STDERR $_[0] },
+    stdin     => $stdin,
+    args      => \@script_args,
+);
+
+my ($rc, $msg) = defined($eval_code)
+    ? $r->run_code($eval_code, %run_opts)
+    : $r->run_file($script,   %run_opts);
+
+print STDERR "remperl: $msg\n" if $rc && defined $msg && length $msg;
+
+$r->disconnect;
+exit($rc // 1);
+
+__END__
+
+=head1 NAME
+
+remperl - run Perl scripts on remote machines over any pipe transport
+
+=head1 SYNOPSIS
+
+  remperl [options] HOST script.pl [script-args...]
+  remperl [options] HOST -e CODE [script-args...]
+  remperl --pipe-cmd [options] COMMAND script.pl [script-args...]
+
+C<HOST> accepts: C<hostname>, C<user@hostname>, C<ssh://[user@]host[:port]>.
+
+=head1 DESCRIPTION
+
+C<remperl> connects to a remote Perl interpreter through an arbitrary pipe
+command, bootstraps a self-contained protocol client on the remote end, and
+executes Perl code there.  C<STDOUT> and C<STDERR> from the remote script are
+relayed in real time; local C<STDIN> is forwarded on demand.
+
+When C<--serve-modules> is enabled, any module not found in the remote's own
+C<@INC> is fetched transparently from the local machine.  The remote machine
+needs no pre-installed dependencies beyond a bare Perl interpreter.
+
+For the library interface, see L<Remote::Perl>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--rsh>=I<EXECUTABLE>
+
+SSH-like command to use (default: C<ssh>).  Invoked as
+C<EXECUTABLE HOST perl>.
+
+=item B<--pipe-cmd>
+
+Treat the first positional argument as a complete pipe command instead of a
+hostname.  The command is interpreted by C<sh -c>, so quoting and environment
+variable assignments work as expected.
+
+=item B<-e> I<CODE>
+
+Evaluate CODE on the remote side instead of running a script file.
+
+=item B<--stdin-file>=I<FILE>
+
+Read remote STDIN from FILE instead of local STDIN.
+
+=item B<--stdin-str>=I<STRING>
+
+Use STRING verbatim as remote STDIN.  Mutually exclusive with
+C<--stdin-file>.
+
+=item B<--window-size>=I<N>
+
+Initial flow-control credit per stream in bytes (default: 65536).
+
+=item B<--serve-modules>
+
+Enable module serving: missing modules are fetched from the local machine's
+C<@INC> on demand.  Disabled by default.  Use C<--no-serve-modules> to
+explicitly disable.
+
+=item B<--inc-local>=I<PATH>
+
+Prepend PATH to the local C<@INC> used when serving modules.  May be
+specified multiple times.
+
+=item B<--tmpfile>
+
+Enable do-file execution mode, which is required for scripts that use
+C<__DATA__> sections.  The strategy is chosen automatically: C<linux>
+(C<O_TMPFILE>, no directory entry) is tried first, falling back to
+C<perl> (C<open('+E<gt>', undef)>).  Use C<--no-tmpfile> to explicitly
+disable.
+
+=item B<--tmpfile-mode>=I<STRATEGY>
+
+Override the do-file strategy.  Implies C<--tmpfile>.  I<STRATEGY> may
+be one of:
+
+=over 8
+
+=item C<auto>  Try linux, fall back to perl (same as bare C<--tmpfile>).
+
+=item C<linux>  Use C<O_TMPFILE> (Linux 3.11+).
+
+=item C<perl>  Use C<open('+E<gt>', undef)>.
+
+=item C<named>  Use L<File::Temp>; the file persists until the remote script exits.  Required if the script reopens C<__FILE__> or passes its path to child processes.
+
+=item C<off>  Explicitly disable do-file mode (same as C<--no-tmpfile>).
+
+=back
+
+=item B<--no-data-warn>
+
+Suppress the warning emitted when a script contains C<__DATA__> but
+C<--tmpfile> is not set.
+
+=item B<--version>
+
+Print the version and exit.
+
+=item B<--help>
+
+Print this message and exit.
+
+=back
+
+=head1 EXAMPLES
+
+Run a script on a remote host:
+
+  remperl hostx myscript.pl
+
+Pass C<user@hostname> directly to ssh:
+
+  remperl alice@hostx myscript.pl
+
+Evaluate inline code:
+
+  remperl hostx -e 'use Some::Module; print Some::Module->greet'
+
+Pass arguments to the remote script:
+
+  remperl hostx myscript.pl arg1 arg2 "arg three"
+
+Pipe stdin to the remote script:
+
+  echo "hello" | remperl hostx myscript.pl
+
+Use a custom ssh-like executable:
+
+  remperl --rsh=my-ssh hostx myscript.pl
+
+Use an arbitrary pipe command (Docker, kubectl, etc.):
+
+  remperl --pipe-cmd 'docker exec -i mycontainer perl' myscript.pl
+  remperl --pipe-cmd 'kubectl exec -i mypod -- perl' myscript.pl
+  remperl --pipe-cmd 'nice ssh hostx perl' myscript.pl
+
+=head1 SECURITY
+
+Authentication and access control are the transport's responsibility (SSH
+keys, container permissions, etc.).
+
+Module serving (C<--serve-modules>) is disabled by default.  When enabled,
+the remote side can request any module by filename; the local side searches
+C<@INC> and returns the source.  Path traversal sequences (C<..>) in module
+filenames are rejected.  Only enable module serving with endpoints you trust
+or when the exposure of your local C<@INC> contents is acceptable.
+
+=head1 REQUIREMENTS
+
+Perl 5.36 or later on the local machine.  Perl 5.10 or later on the remote
+machine.  No non-core modules required on either side.
+
+=head1 NOTES
+
+C<__DATA__> sections require C<--tmpfile>.  Without it, code before
+C<__DATA__> runs correctly but C<< <DATA> >> reads return nothing, and a
+warning is printed.  C<__END__> stops parsing as usual regardless.
+
+=head1 SEE ALSO
+
+L<Remote::Perl> -- the library interface.
+
+=head1 AUTHOR
+
+Pied Crow <crow@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

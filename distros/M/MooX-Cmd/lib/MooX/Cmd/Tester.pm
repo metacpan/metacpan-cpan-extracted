@@ -1,9 +1,8 @@
 package MooX::Cmd::Tester;
-
+# ABSTRACT: MooX cli app commands tester
+our $VERSION = '1.000';
 use strict;
 use warnings;
-
-our $VERSION = "0.017";
 
 require Exporter;
 use Test::More import => ['!pass'];
@@ -26,13 +25,15 @@ BEGIN
     };
 }
 
+
 sub result_class { 'MooX::Cmd::Tester::Result' }
+
 
 sub test_cmd
 {
     my ($app, $argv) = @_;
 
-    my $result = _run_with_capture($app, $argv);
+    my $result    = _run_with_capture($app, $argv);
     my $exit_code = defined $result->{error} ? ((0 + $!) || -1) : 0;
 
     $result->{error}
@@ -46,6 +47,7 @@ sub test_cmd
         }
     );
 }
+
 
 sub test_cmd_ok
 {
@@ -167,9 +169,22 @@ for my $attr (qw(app cmd stdout stderr output error execute_rv exit_code))
     }
 }
 
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 MooX::Cmd::Tester - MooX cli app commands tester
+
+=head1 VERSION
+
+version 1.000
 
 =head1 SYNOPSIS
 
@@ -194,7 +209,10 @@ The test coverage of most CLI apps is somewhere between poor and wretched.
 With the same approach as L<App::Cmd::Tester> comes MooX::Cmd::Tester to
 ease writing tests for CLI apps.
 
-=head1 FUNCTIONS
+=head2 result_class
+
+Builder for result class to use. Returns C<MooX::Cmd::Tester::Result> by
+default.
 
 =head2 test_cmd
 
@@ -208,37 +226,25 @@ command_name and command_chain are not totally scrambled.
 
 It returns an object with following attributes/accessors:
 
-=head3 app
+=over
 
-Name of package of App
+=item app - Name of package of App
 
-=head3 cmd
+=item cmd - Name of executed (1st level) command
 
-Name of executed (1st level) command
+=item stdout - Content of stdout
 
-=head3 stdout
+=item stderr - Content of stderr
 
-Content of stdout
+=item output - Content of merged stdout and stderr
 
-=head3 stderr
+=item error - the exception thrown by running the application (if any)
 
-Content of stderr
+=item execute_rv - return values from execute
 
-=head3 output
+=item exit_code - 0 on success, $! when error occurred and $! available, -1 otherwise
 
-Content of merged stdout and stderr
-
-=head3 error
-
-the exception thrown by running the application (if any)
-
-=head3 execute_rv
-
-return values from execute
-
-=head3 exit_code
-
-0 on success, $! when error occurred and $! available, -1 otherwise
+=back
 
 =head2 test_cmd_ok
 
@@ -251,27 +257,36 @@ Returns the same object C<test_cmd> returns.
 
 If an error occurred, no additional test is done (behavior as C<test_cmd>).
 
-=head2 result_class
-
-Builder for result class to use. Returns C<MooX::Cmd::Tester::Result> by
-default.
-
 =head1 ACKNOWLEDGEMENTS
 
 MooX::Cmd::Tester is I<inspired> by L<App::Cmd::Tester> from Ricardo Signes.
 In fact, I reused the entire design and adopt it to the requirements of
 MooX::Cmd.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 SUPPORT
 
-Copyright 2013-2017 Jens Rehsack.
+=head2 Issues
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-moox-cmd/issues>.
 
-See L<http://dev.perl.org/licenses/> for more information.
+=head2 IRC
+
+Join C<#web-simple> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

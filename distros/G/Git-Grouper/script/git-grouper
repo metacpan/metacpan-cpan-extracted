@@ -1,0 +1,769 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2025-11-11'; # DATE
+our $DIST = 'Git-Grouper'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+Perinci::CmdLine::Any->new(
+    url => '/Git/Grouper/',
+    subcommands => {
+        "ls-groups" => { url => '/Git/Grouper/ls_groups' },
+        "get-repo-group" => { url => '/Git/Grouper/get_repo_group' },
+        "filter-repo-has-group" => { url => '/Git/Grouper/filter_repo_has_group' },
+        "filter-repo-lacks-group" => { url => '/Git/Grouper/filter_repo_lacks_group' },
+        "filter-repo-orphan" => { url => '/Git/Grouper/filter_repo_orphan' },
+        "filter-repo-not-orphan" => { url => '/Git/Grouper/filter_repo_not_orphan' },
+        "filter-repo-multiple-group" => { url => '/Git/Grouper/filter_repo_multiple_group' },
+        "filter-repo-single-group" => { url => '/Git/Grouper/filter_repo_single_group' },
+        "configure-repo" => { url => '/Git/Grouper/configure_repo' },
+    },
+    #default_subcommand => 'get-repo-group',
+    read_env => 0,
+    read_config => 0,
+    log => 1,
+)->run;
+
+1;
+# ABSTRACT: Categorize git repositories into one/more groups and perform actions on them
+# PODNAME: git-grouper
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+git-grouper - Categorize git repositories into one/more groups and perform actions on them
+
+=head1 VERSION
+
+This document describes version 0.001 of git-grouper (from Perl distribution Git-Grouper), released on 2025-11-11.
+
+=head1 SYNOPSIS
+
+=head2 Listing groups and repositories
+
+List all defined groups:
+
+ % git-grouper ls-groups      ; # just list the names
+ % git-grouper ls-groups -l   ; # list names & summaries
+
+Check which group(s) do repositories belong to:
+
+ % git-grouper get-repo-group REPO1 REPO2 ...
+
+List repositories that belong to specified group(s):
+
+ % git-grouper filter-repo-has-group GROUP REPO1 REPO2 ...
+ % git-grouper filter-repo-has-group 'GROUP1&GROUP2' REPO1 REPO2 ... ; # repos must belong to all of specified groups
+ % git-grouper filter-repo-has-group 'GROUP1|GROUP2' REPO1 REPO2 ... ; # repos must belong to any of specified groups
+
+List repositories that do not belong to specified group(s):
+
+ % git-grouper filter-repo-lacks-group GROUP REPO1 REPO2 ...
+ % git-grouper filter-repo-lacks-group 'GROUP1&GROUP2' REPO1 REPO2 ... ; # repos must not belong to any of specified groups
+ % git-grouper filter-repo-lacks-group 'GROUP1|GROUP2' REPO1 REPO2 ... ; # repos must not belong to just one of specified groups
+
+List repositories that do not belong to any group:
+
+ % git-grouper filter-repo-orphan REPO1 REPO2 ...
+
+List repositories that belong to a group or more:
+
+ % git-grouper filter-repo-not-orphan REPO1 REPO2 ...
+
+List repositories that belong to multiple (instead of a single) group:
+
+ % git-grouper filter-repo-multiple-group REPO1 REPO2 ...
+
+List repositories that belong to just one (instead of multiple) group:
+
+ % git-grouper filter-repo-single-group REPO1 REPO2 ...
+
+=head2 Listing remotes
+
+ TODO
+
+=head2 Configuring repositories based on group's attributes
+
+ % git-grouper configure-repo REPO1 REPO2 ...
+
+=head1 DESCRIPTION
+
+B<git-grouper> is a tool to categorize your git repository into one of
+predefined groups. Later, you can: 1) set your repository's remotes, username,
+email, etc based on the group's attributes; 2) perform actions on a group of
+repositories.
+
+Why group git repositories? To perform actions on a set of git repositories in
+one go. Also, another reason is to set remotes or username/email based on a
+group's characteristics instead of individually. One case where this can be
+useful is when restoring repositories from backup via cloning. You might want to
+clone from local backup instead of from origin, but when cloning git will set
+origin of your restored repository to your backup. With git-grouper, you can
+restore the origin (as well as other remotes) from a configuration.
+
+To use git-grouper, you first create a configuration file in L<IOD> format, e.g.
+at I<~/.config/git-grouper.conf>. In it, you define your groups, remotes, nad
+other things. Details on the configuration can be read in the L</CONFIGURATION
+FILE> section. After that, you can use run this command with one of the
+available subcommands (see L</SYNOPSIS>).
+
+=head1 SUBCOMMANDS
+
+=head2 B<configure-repo>
+
+Configure repo based on group's attributes.
+
+=head2 B<filter-repo-has-group>
+
+Only list repos that belong to specified group(s).
+
+=head2 B<filter-repo-lacks-group>
+
+Only list repos that do not belong to specified group(s).
+
+=head2 B<filter-repo-multiple-group>
+
+Only list repos that belong to at least two groups.
+
+=head2 B<filter-repo-not-orphan>
+
+Only list repos that belong to at least one group.
+
+=head2 B<filter-repo-orphan>
+
+Only list repos that do not belong to any group(s).
+
+=head2 B<filter-repo-single-group>
+
+Only list repos that belong to just a single group.
+
+=head2 B<get-repo-group>
+
+Determine the group(s) of specified repos.
+
+=head2 B<ls-groups>
+
+List defined groups.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--help>, B<-h>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Options for subcommand configure-repo
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand filter-repo-has-group
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--group-spec>=I<s>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand filter-repo-lacks-group
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--group-spec>=I<s>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 2nd command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand filter-repo-multiple-group
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand filter-repo-not-orphan
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand filter-repo-orphan
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand filter-repo-single-group
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand get-repo-group
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=back
+
+=head2 Options for subcommand ls-groups
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--detail>, B<-l>
+
+(No description)
+
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C git-grouper git-grouper
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete git-grouper 'p/*/`git-grouper`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+Configuration file is in L<IOD> format, which is based on INI that is familiar
+to most. Groups and remotes are written as IOD sections, much like in git
+configuration.
+
+=head2 A sample configuration file
+
+ [remote "github"]
+ url_template = git@github.com:[% github_username %]/[% repo_name %].git
+ fetch = +refs/heads/*:refs/remotes/origin/*
+
+ [remote "github_company1"]
+ url_template = git@github.com+company1:company1/[% repo_name %].git
+ fetch = +refs/heads/*:refs/remotes/origin/*
+
+ [remote "privbak"]
+ url_template = ssh://u1@hostname:/path/to/[% repo_name %].git
+ fetch = +refs/heads/*:refs/remotes/gitbak/*
+
+ [group "company1"]
+ repo_name_pattern = /^company1-/
+ remotes = ["github_company1", "privbak"]
+ username = foo
+ email = foo@company1.com
+
+ [group "priv_perl"]
+ repo_name_pattern = /^perl-/
+ has_tags = ["priv"]
+ remotes = ["github", "privbak"]
+ username = perlancar
+ email = perlancar@gmail.com
+
+ [group "perl"]
+ repo_name_pattern = /^perl-/
+ github_username = perlancar
+ remotes = ["github", "privbak"]
+ username = perlancar
+ email = perlancar@gmail.com
+
+ [group "other"]
+ repo_name_pattern = /^./
+ remotes = ["privbak"]
+ username = foo
+ email = foo@example.com
+
+=head2 Group definition
+
+ [group GROUPNAME]
+ ; filter keys
+ repo_pattern_name = /REGEX/
+ has_all_tags = [TAG1, TAG2, ...]
+ has_any_tags = [TAG1, TAG2, ...]
+ lacks_all_tags = [TAG1, TAG2, ...]
+ lacks_any_tags = [TAG1, TAG2, ...]
+
+ ; attribute keys
+ remotes = [REMOTE1, REMOTE2, ...]
+ user_name = SOME NAME
+ email = EMAIL@ADDRESS
+
+Group name must be an I<identifier>, which means it must start with a letter or
+underscore, and contains only alphanumeric characters.
+
+A group definition contains I<filter keys> (keys which specify which
+repositories can belong to this group) and I<attribute keys> (keys that set what
+attributes repositories in this group should have). To belong to the group,
+I<all> filters must be satisfied.
+
+Note that instead of satisfying all filters, you can also make a repository
+belong to a group by having an empty file named C<.group-GROUPNAME> in the
+top-level directory.
+
+=over
+
+=item * repo_pattern_name
+
+A regex pattern. Repositories that have names that match this pattern will
+satisfy this filter.
+
+=item * has_all_tags
+
+An array of strings (tags). Repositories must have all the specified tags to
+satisfy this filter. Tags are identifiers. Repository can be tagged by having an
+empty file that is named C<.tag-TAGNAME> in the top-level directory.
+
+=item * has_any_tags
+
+An array of strings (tags). Repositories just need to have one of the specified
+tags to satisfy this filter.
+
+=item * lacks_all_tags
+
+An array of strings (tags). Repositories must lack all the specified tags to
+satisfy this filter.
+
+=item * lacks_any_tags
+
+An array of strings (tags). Repositories just need to lack any the specified
+tags to satisfy this filter.
+
+=back
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Git-Grouper>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Git-Grouper>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Grouper>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

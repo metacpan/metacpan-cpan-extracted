@@ -4,7 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   Test2::V0: '0'
-  Test::Future::IO::Impl: '0.19'
+  Test::Future::IO::Impl: '0.20'
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
@@ -17,7 +17,7 @@ name: Future-IO-Impl-KQueue
 provides:
   Future::IO::Impl::KQueue:
     file: lib/Future/IO/Impl/KQueue.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Future: '0'
   Future::IO: '0.20'
@@ -27,5 +27,5 @@ requires:
   perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

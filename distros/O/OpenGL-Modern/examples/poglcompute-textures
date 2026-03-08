@@ -1,0 +1,258 @@
+#!perl
+
+use strict;
+use warnings;
+use OpenGL::Modern qw(
+  glewCreateContext glewInit glpSetAutoCheckErrors glewDestroyContext
+  glpErrorString glGetError glGetString
+  glGenTextures_p glBindTexture glDeleteTextures_p
+  glTexImage1D_c glTexImage2D_c glTexParameteri
+  glGetTexLevelParameteriv_p glGetIntegerv_p
+  glPixelStorei glGetTexImage_c
+  glActiveTexture
+  glCreateShader glDeleteShader glShaderSource_p glCompileShader
+  glAttachShader glDetachShader
+  glGetShaderiv_p glGetShaderInfoLog_p
+  glCreateProgram glDeleteProgram glLinkProgram glUseProgram
+  glGetProgramiv_p glGetProgramInfoLog_p
+  glGetUniformLocation glUniform1i glGetActiveUniform_p
+  glGenFramebuffers_p glBindFramebuffer glDeleteFramebuffers_p
+  glFramebufferTexture glCheckFramebufferStatus
+  glGenBuffers_p glDeleteBuffers_p glBindBuffer glBufferData_c
+  glViewport glVertexAttribPointer_c
+  glEnableVertexAttribArray glDisableVertexAttribArray
+  glDrawArrays glFinish
+  GL_FRAMEBUFFER GL_COLOR_ATTACHMENT0 GL_FRAMEBUFFER_COMPLETE
+  GL_UNPACK_ALIGNMENT GL_PACK_ALIGNMENT
+  GL_TEXTURE_2D GL_R32F GL_RED GL_FLOAT GL_COLOR_BUFFER_BIT
+  GL_PROXY_TEXTURE_1D GL_PROXY_TEXTURE_2D
+  GL_TEXTURE_MIN_FILTER GL_TEXTURE_MAG_FILTER
+  GL_TEXTURE0 GL_TEXTURE1
+  GL_TEXTURE_WIDTH GL_TEXTURE_HEIGHT
+  GL_MAX_TEXTURE_SIZE GL_MAX_VIEWPORT_DIMS GL_MAX_TEXTURE_BUFFER_SIZE
+  GL_TEXTURE_WRAP_S GL_TEXTURE_WRAP_T GL_NEAREST GL_CLAMP_TO_EDGE
+  GL_VERSION GLEW_OK
+  GL_COMPILE_STATUS GL_LINK_STATUS GL_FALSE
+  GL_VERTEX_SHADER GL_FRAGMENT_SHADER
+  GL_ARRAY_BUFFER GL_STATIC_DRAW GL_TRIANGLE_STRIP
+);
+use PDL;
+
+sub with_time (&$) {
+  require Time::HiRes;
+  my @t = Time::HiRes::gettimeofday();
+  my $ret = &{$_[0]}();
+  printf "$_[1]: %g ms\n", Time::HiRes::tv_interval(\@t) * 1000;
+  $ret;
+}
+
+sub binescalate (&$) {
+  my ($f, $val) = @_;
+  return undef if !$f->($val);
+  while (1) {
+    last if !$f->(my $next = $val * 2);
+    $val = $next;
+  }
+  $val;
+}
+
+sub binsearch (&$$$) {
+  my ($f, $low, $high, $eps) = @_;
+  my ($low_good, $high_good) = map !!$f->($_), $low, $high;
+  return undef if !!$low_good == !!$high_good;
+  while (1) {
+    return $high_good ? $high : $low if (my $diff = $high - $low) <= $eps;
+    my $mid = $low + ($diff / 2);
+    my $mid_good = !!$f->($mid);
+    (($mid_good ? $high_good : $low_good) ? ($high, $high_good) : ($low, $low_good))
+       = ($mid, $mid_good);
+  }
+}
+
+print "Perl $^V OpenGL::Modern $OpenGL::Modern::VERSION PDL $PDL::VERSION\n";
+
+glewCreateContext(2, 1) == GLEW_OK or die "glewCreateContext failed";
+glewInit() == GLEW_OK or die "glewInit failed";
+glpSetAutoCheckErrors(1);
+print "OpenGL ", glGetString(GL_VERSION), "\n";
+print "Max texture dim = @{[ glGetIntegerv_p(GL_MAX_TEXTURE_SIZE) ]}\n";
+print "Max viewport dims = (@{[ glGetIntegerv_p(GL_MAX_VIEWPORT_DIMS) ]})\n";
+sub prox1d {
+  eval { glTexImage1D_c(GL_PROXY_TEXTURE_1D, 0, GL_R32F, $_[0], 0, GL_RED, GL_FLOAT, 0) };
+  return if $@;
+  glGetTexLevelParameteriv_p(GL_PROXY_TEXTURE_1D, 0, GL_TEXTURE_WIDTH);
+}
+my $max_tex = binescalate(\&prox1d, 20);
+print "Max 1D texture size, binescalated = $max_tex\n";
+$max_tex = int(0.5 + binsearch(\&prox1d, $max_tex, $max_tex * 2, 1));
+print "Max 1D texture size, binsearched = $max_tex\n";
+
+my $vertex_shader = <<'EOF';
+#version 120
+attribute vec2 pos;
+varying vec2 texLoc;
+void main() {
+  gl_Position = vec4(pos, 0.0, 1.0);
+  texLoc = (pos + 1.0) / 2.0;
+}
+EOF
+
+my $fragment_shader = <<'EOF';
+#version 120
+uniform sampler2D tex;
+varying vec2 texLoc;
+
+void main() {
+  float x = texture2D(tex, texLoc).r;
+  float y = pow(x, 2);
+  gl_FragColor = vec4(y, 0, 0, 1);
+}
+EOF
+
+my $pos_data = float('1.0 -1.0; 1.0 1.0; -1.0 -1.0; -1.0 1.0');
+my $program = compile_program($vertex_shader, $fragment_shader);
+my ($size, $utype, $name) = glGetActiveUniform_p($program, 0);
+print "glGetActiveUniform_p: (size=$size, type=@{[
+  OpenGL::Modern::enum2name('UniformType', $utype)
+]}, name=$name)\n";
+my $tex_uniform = glGetUniformLocation($program, "tex");
+my $attrib_buffer = glGenBuffers_p(1);
+glBindBuffer(GL_ARRAY_BUFFER, $attrib_buffer);
+glBufferData_c(GL_ARRAY_BUFFER, $pos_data->nbytes, $pos_data->make_physical->address_data, GL_STATIC_DRAW);
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+sub prox2d {
+  eval { glTexImage2D_c(GL_PROXY_TEXTURE_2D, 0, GL_R32F, @_[0,0], 0, GL_RED, GL_FLOAT, 0) };
+  return if $@;
+  glGetTexLevelParameteriv_p(GL_PROXY_TEXTURE_2D, 0, GL_TEXTURE_WIDTH);
+}
+my $max_dim2d = int(0.5 + (binsearch(\&prox2d, 1, 1581, 1)//1581));
+my ($xdim, $ydim) = ($max_dim2d, $max_dim2d);
+my $p = sequence(float, $xdim, $ydim);
+my ($skip0, $skip1) = map int(($_-1) / 2), $xdim, $ydim;
+my $slicearg = join ',', map '::'.$_, $skip0, $skip1;
+print "Source data: ", $p->slice($slicearg);
+my $p_cpu_squared = with_time { $p ** 2 } 'square CPU';
+print "Squared on CPU: ", $p_cpu_squared->slice($slicearg);
+
+my ($type, $internalformat, $format) = (GL_FLOAT, GL_R32F, GL_RED);
+my ($srcTextureID) = glGenTextures_p(1);
+with_time {
+glActiveTexture(GL_TEXTURE0);
+glBindTexture(GL_TEXTURE_2D, $srcTextureID);
+glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+my $input = $p;
+die "Input as texture must have 2 dims, but has [@{[$input->{Points}->dims]}]" if $input->ndims != 2;
+my ($dim0, $dim1) = $input->dims;
+glTexImage2D_c(GL_TEXTURE_2D, 0, $internalformat, $dim0, $dim1,
+  0, $format, $type, $input->address_data);
+tex_parameters();
+glBindTexture(GL_TEXTURE_2D, 0);
+} 'setup src texture';
+
+my ($destTextureID) = glGenTextures_p(1);
+glActiveTexture(GL_TEXTURE1);
+glBindTexture(GL_TEXTURE_2D, $destTextureID);
+my ($dim0, $dim1) = ($xdim, $ydim);
+glTexImage2D_c(GL_TEXTURE_2D, 0, $internalformat, $dim0, $dim1,
+  0, $format, $type, 0);
+tex_parameters();
+glBindTexture(GL_TEXTURE_2D, 0);
+
+my ($fbo_id) = glGenFramebuffers_p(1);
+glBindFramebuffer(GL_FRAMEBUFFER, $fbo_id);
+glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, $destTextureID, 0);
+my $fbstat = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+die "FBO Status error: " . glpErrorString(glGetError()) if !$fbstat;
+die "FBO Status: ".OpenGL::Modern::enum2name('FramebufferStatus', $fbstat)
+  if $fbstat != GL_FRAMEBUFFER_COMPLETE;
+
+glFinish();
+with_time {
+glViewport(0,0,$xdim,$ydim);
+glBindBuffer(GL_ARRAY_BUFFER, $attrib_buffer);
+glVertexAttribPointer_c(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+glEnableVertexAttribArray(0);
+glActiveTexture(GL_TEXTURE0); # do before bind
+glBindTexture(GL_TEXTURE_2D, $srcTextureID);
+glUseProgram($program);
+glUniform1i($tex_uniform, 0);
+glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+glUseProgram(0);
+glDisableVertexAttribArray(0);
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+glFinish();
+} 'render' for 1..10;
+
+my $p2 = zeroes(float, $xdim, $ydim);
+with_time {
+glBindTexture(GL_TEXTURE_2D, $destTextureID);
+my ($w, $h) = map glGetTexLevelParameteriv_p(GL_TEXTURE_2D, 0, $_), GL_TEXTURE_WIDTH, GL_TEXTURE_HEIGHT;
+print "Texture $w x $h\n";
+glPixelStorei(GL_PACK_ALIGNMENT, 1);
+glGetTexImage_c(GL_TEXTURE_2D, 0, $format, $type, $p2->address_data);
+glBindTexture(GL_TEXTURE_2D, 0);
+} 'copy dest to CPU';
+print "From GPU: ", $p2->slice($slicearg);
+
+END {
+glBindTexture(GL_TEXTURE_2D, 0);
+glDeleteTextures_p($_) for grep $_, $srcTextureID, $destTextureID;
+glBindFramebuffer(GL_FRAMEBUFFER, 0);
+glDeleteFramebuffers_p($_) for grep $_, $fbo_id;
+glUseProgram(0);
+glDeleteProgram($_) for grep $_, $program;
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+glDeleteBuffers_p($_) for grep $_, $attrib_buffer;
+glewDestroyContext();
+}
+
+sub tex_parameters {
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+sub compile_shader {
+  my ($type, $src) = @_;
+  my $shader = glCreateShader($type);
+  glShaderSource_p($shader, $src);
+  glCompileShader($shader);
+  my $status = glGetShaderiv_p($shader, GL_COMPILE_STATUS);
+  if ($status == GL_FALSE) {
+    my $str = sprintf("%s shader compilation failed!\n",
+        $type == GL_VERTEX_SHADER ? "Vertex" : "Fragment");
+    $str .= glGetShaderInfoLog_p($shader);
+    glDeleteShader($shader);
+    die $str;
+  }
+  $shader;
+}
+
+sub compile_program {
+  my ($vsrc, $fsrc, $prelink) = @_;
+  my $vShader = compile_shader(GL_VERTEX_SHADER, $vsrc);
+  my $fShader = $fsrc && eval { compile_shader(GL_FRAGMENT_SHADER, $fsrc) };
+  if (my $err = $@) {
+    glDeleteShader($vShader);
+    die $err;
+  }
+  my $program = glCreateProgram();
+  glAttachShader($program, $vShader);
+  glAttachShader($program, $fShader) if $fsrc;
+  $prelink->($program) if $prelink;
+  glLinkProgram($program);
+  my $status = glGetProgramiv_p($program, GL_LINK_STATUS);
+  glDetachShader($program, $vShader);
+  glDetachShader($program, $fShader) if $fsrc;
+  glDeleteShader($vShader);
+  glDeleteShader($fShader) if $fsrc;
+  if ($status == GL_FALSE) {
+    my $str = "Program linker failed.\n";
+    $str .= glGetProgramInfoLog_p($program);
+    glDeleteProgram($program);
+    die $str;
+  }
+  $program;
+}

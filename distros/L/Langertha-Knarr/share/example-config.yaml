@@ -1,0 +1,61 @@
+# Knarr — Langertha LLM Proxy Configuration
+# See: https://github.com/Getty/langertha-knarr
+
+listen:
+  - "127.0.0.1:8080"    # OpenAI/Anthropic clients
+  - "127.0.0.1:11434"   # Ollama clients (native port)
+  # - "127.0.0.1:8000"  # vLLM clients (optional)
+
+# Model routing: model name → Langertha engine
+# Values support ${ENV_VAR} interpolation
+models:
+  gpt-4o:
+    engine: OpenAI
+    # api_key from LANGERTHA_OPENAI_API_KEY env (engine default)
+
+  gpt-4o-mini:
+    engine: OpenAI
+    model: gpt-4o-mini
+
+  claude-sonnet:
+    engine: Anthropic
+    model: claude-sonnet-4-6
+    api_key: ${ANTHROPIC_API_KEY}  # explicit ENV reference
+
+  minimax:
+    engine: MiniMax
+    model: MiniMax-M2.1
+    api_key: ${MINIMAX_API_KEY}
+
+  local-llama:
+    engine: OllamaOpenAI
+    url: http://localhost:11434/v1
+    model: llama3.2
+
+  deepseek:
+    engine: DeepSeek
+    model: deepseek-chat
+
+# Default engine for models without explicit config (optional)
+default:
+  engine: OpenAI
+
+# Auto-discover models from configured engines
+auto_discover: true
+
+# Passthrough: forward requests directly to upstream APIs
+# Client's own API key is used — no key duplication needed
+# Use 'true' for default URLs, or set custom upstream URLs
+passthrough:
+  anthropic: https://api.anthropic.com
+  openai: https://api.openai.com
+# Shorthand: passthrough: true  (enables all with defaults)
+
+# Optional: proxy authentication
+# proxy_api_key: your-secret-key
+
+# Optional: Langfuse tracing (or set env vars)
+# langfuse:
+#   url: http://localhost:3000
+#   public_key: pk-lf-...
+#   secret_key: sk-lf-...

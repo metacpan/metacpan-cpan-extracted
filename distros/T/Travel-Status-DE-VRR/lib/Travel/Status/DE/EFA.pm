@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.18';
+our $VERSION = '3.19';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -237,6 +237,7 @@ sub new {
 			itdDateYear       => $dt->year,
 			itdTimeHour       => $dt->hour,
 			itdTimeMinute     => $dt->minute,
+			limit             => $opt{num_results} // 40,
 			name_dm           =>
 			  uri_escape( encode( $encoding, $opt{name} ), '^A-Za-z0-9-._~ ' ),
 		};
@@ -750,7 +751,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 3.18
+version 3.19
 
 =head1 DESCRIPTION
 
@@ -813,6 +814,10 @@ B<stop> (stop/station name).
 
 Request departures for the date/time specified by I<DateTime object>.
 Default: now.
+
+=item B<num_results> => I<n>
+
+Request up to I<n> departures. Default: 40.
 
 =item B<full_routes> => B<0>|B<1>
 
@@ -974,7 +979,7 @@ efa-m(1), Travel::Status::DE::EFA::Departure(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2025 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2026 Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

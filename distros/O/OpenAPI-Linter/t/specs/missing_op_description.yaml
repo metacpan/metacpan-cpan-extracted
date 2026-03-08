@@ -1,0 +1,19 @@
+openapi: 3.1.0
+info:
+  title: No Description
+  version: 1.0.0
+  description: Test API
+  license:
+    name: MIT
+paths:
+  /items:
+    get:
+      summary: Get items
+      operationId: getItems
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array

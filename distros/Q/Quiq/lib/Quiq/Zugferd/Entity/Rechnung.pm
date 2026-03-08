@@ -25,7 +25,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.235';
+our $VERSION = '1.236';
 
 use Quiq::Zugferd::Entity::Freitext;
 
@@ -57,6 +57,7 @@ sub new {
     my $self = $class->SUPER::new(
         # Profil EN16931
         profilKennung => 'urn:cen.eu:en16931:2017', # BT-24
+        geschaeftsprozessTyp => undef,              # BT-23
         rechnungsart => undef,                      # BT-3
         rechnungsnummer => undef,                   # BT-1
         rechnungsdatum => undef,                    # BT-2
@@ -134,7 +135,7 @@ sub addFreitext {
 
 =head1 VERSION
 
-1.235
+1.236
 
 =head1 AUTHOR
 

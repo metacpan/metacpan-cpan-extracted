@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceConversion;
 # ABSTRACT: CustomResourceConversion describes how to convert different versions of a CR.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s strategy => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceCon
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 strategy
 

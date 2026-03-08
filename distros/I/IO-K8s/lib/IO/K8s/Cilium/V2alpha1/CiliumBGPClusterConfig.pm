@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfig;
 # ABSTRACT: Cilium BGP cluster configuration
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumbgpclusterconfigs';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfig - Cilium BGP cluster configura
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

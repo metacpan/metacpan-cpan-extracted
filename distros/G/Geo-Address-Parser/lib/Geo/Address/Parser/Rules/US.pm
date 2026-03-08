@@ -5,7 +5,7 @@ use warnings;
 use Exporter 'import';
 our @EXPORT_OK = qw(parse_address);
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 

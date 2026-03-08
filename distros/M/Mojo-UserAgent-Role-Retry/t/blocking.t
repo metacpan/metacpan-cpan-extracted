@@ -59,10 +59,23 @@ use Test::More;
   get 'no_more_than_retry_max_counter' => sub {
     shift->render( text => ++$no_more_than_retry_max_counter, status => 429 );
   };
+
+  my $redirect_counter = 0;
+  my $target_counter = 0;
+  get '/redirect' => sub {
+    my $c = shift;
+    $redirect_counter++;
+    $c->redirect_to('/target');
+  };
+  get '/target' => sub {
+    my $c = shift;
+    $target_counter++;
+    $c->render( text => "target: $target_counter, redirect: $redirect_counter" );
+  };
 }
 
 my $t = Test::Mojo->new;
-$t->ua( Mojo::UserAgent->with_roles('+Retry')->new( retries => 5 ) );
+$t->ua( Mojo::UserAgent->with_roles('+Retry')->new( retries => 5, max_redirects => 5 ) );
 
 $t->get_ok('/')->status_is(200)->content_is(1);
 $t->get_ok('/ok_if_twice')->status_is(200)->content_is(2);
@@ -71,5 +84,7 @@ $t->get_ok('/ok_if_you_wait_5s')->status_is(200)->content_is(2);
 $t->get_ok('/ok_if_you_wait_3yrs')->status_is(200)->content_is(2);
 $t->get_ok('/no_more_than_retry_max_counter')->status_is(429)
   ->content_is( $t->ua->retries + 1 );
+$t->get_ok('/redirect')->status_is(200)
+  ->content_is( "target: 1, redirect: 1" );
 
 done_testing;

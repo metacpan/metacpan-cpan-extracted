@@ -19,13 +19,13 @@ if ( $^O eq 'MSWin32' ) {
   $libs = '-lGL -lX11';
 }
 my %buildargs = (
-  LIBS             => $libs,
+  !$libs ? () : (LIBS => $libs),
   DEFINE           => $define,
   INC              => $include,
-  $DYNS ? ( dynamic_lib => $DYNS ) : (),
+  !$DYNS ? () : ( dynamic_lib => $DYNS ),
 );
 die "$@\nOS unsupported\n" if !eval { assert_lib %buildargs; 1 };
-WriteConfigPM({ LIBS => $libs || $DYNS->{OTHERLDFLAGS} });
+WriteConfigPM({ LIBS => $libs || $DYNS->{OTHERLDFLAGS}, DEFINE => $define });
 
 WriteMakefile(
   NAME => 'OpenGL::Modern',
@@ -40,7 +40,6 @@ WriteMakefile(
     'Devel::CheckLib' => 0,
   },
   TEST_REQUIRES => {
-    'Capture::Tiny' => 0,
     'Test::More' => '0.88',
   },
   TYPEMAPS => [qw(lib/OpenGL/Modern/Install/typemap)],

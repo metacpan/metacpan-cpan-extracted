@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test2::V1 -import;
+plan tests => 6;
 use Test::MockModule;
 use Test::Trap qw/ :on_fail(diag_all) /;
 use Monit::HTTP ':constants';
@@ -87,7 +88,7 @@ SKIP: {
     is( $services[1], 'localhost', 'should be: localhost' );
 
     my $status = $hd->service_status( $services[0] );
-    is_deeply(
+    is(
         $status,
         {
             'pid'      => '6513',
@@ -115,7 +116,7 @@ SKIP: {
     );
 
     $status = $hd->service_status( $services[1] );
-    is_deeply(
+    is(
         $status,
         {
             'monitor' => '1',
@@ -138,4 +139,3 @@ SKIP: {
     );
 
 }
-

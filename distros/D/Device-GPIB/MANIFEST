@@ -25,6 +25,7 @@ lib/Device/GPIB/Tektronix/SI5010.pm
 lib/Device/GPIB/Controllers/LinuxGpib.pm
 lib/Device/GPIB/Controllers/Prologix.pm
 lib/Device/GPIB/Controllers/Serial.pm
+lib/Device/GPIB/Controllers/TCP.pm
 lib/Device/GPIB/Generic.pm
 Makefile.PL
 bin/afg310.pl
@@ -32,6 +33,7 @@ bin/afg5101.pl
 bin/dc5009.pl
 bin/dm5010.pl
 bin/dm5110.pl
+bin/device.pl
 bin/gpib.pl
 bin/hp3456a.pl
 bin/hp3577.pl

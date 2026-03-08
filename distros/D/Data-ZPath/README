@@ -1,0 +1,98 @@
+NAME
+    Data::ZPath - ZPath implementation for Perl
+
+SYNOPSIS
+      use Data::ZPath;
+      use XML::LibXML;
+
+      my $path = Data::ZPath->new('./foo/bar');
+      my $dom  = XML::LibXML->load_xml( string => '<foo><bar>5</bar></foo>' );
+
+      my $result  = $path->first($dom);      # 5
+      my @results = $path->all($dom);        # ( 5 )
+
+      my $hashref = { foo => { bar => 6 } };
+      my $result2 = $path->first($hashref);  # 6
+
+      $path->each($hashref, sub { $_ *= 2 }); # increments bar -> 12
+
+DESCRIPTION
+    Implements the ZPath grammar and core functions described at
+    https://zpath.me.
+
+    Key parsing rules from zpath.me:
+
+    *   Paths are UNIX-like segments separated by "/".
+
+    *   Segments can be: "*", "**", ".", "..", "..*", a name, "#n", "name#n",
+        a function call, and any segment can have qualifiers "[expr]" (zero or
+        more).
+
+    *   Binary operators require whitespace on both sides.
+
+    *   Ternary "? :" requires whitespace around "?" and ":".
+
+    *   Top-level expression may be a comma-separated list of expressions.
+
+METHODS
+  new($expr)
+    Compile a ZPath expression.
+
+  first($root)
+    Evaluate and return the first primitive value.
+
+  all($root)
+    Evaluate and return all primitive values.
+
+  evaluate($root)
+    Evaluate matches.
+
+    In list context, returns a list of Data::ZPath::Node objects. In scalar
+    context, returns a Data::ZPath::NodeList object wrapping those nodes.
+
+    This is the low-level API used by the convenience methods.
+
+  last($root)
+    Evaluate and return the last primitive value.
+
+  `each($root, $callback)`
+    Evaluate and invoke callback for each matched Perl scalar, aliasing $_ so
+    modifications write back.
+
+PACKAGE VARIABLES
+    $Data::ZPath::Epsilon
+        The desired error tolerance when the zpath `==` and `!=` operators
+        compare floating point numbers for equality. Defaults to 1e-08.
+
+        If you need to change this, it is recommended that you use `local` in
+        the smallest scope possible.
+
+    $Data::ZPath::UseBigInt
+        If true, the number("123...") function will return a Math::BigInt
+        object for any numbers too big to be represented accurately by Perl's
+        native numeric type. Defaults to true.
+
+    $Data::ZPath::XmlIgnoreWS
+        Ignore XML text nodes consisting only of whitespace. Default true.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-data-zpath/issues>.
+
+SEE ALSO
+    <https://zpath.me>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2026 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -16,7 +16,7 @@ package Device::GPIB::Controllers::Serial;
 use strict;
 use Device::SerialPort;
 
-$Device::GPIB::Controllers::Serial::VERSION = '0.01';
+$Device::GPIB::Controllers::Serial::VERSION = '0.02';
 
 sub new($$)
 {
@@ -49,10 +49,19 @@ sub new($$)
     $self->{serialport} = Device::SerialPort->new($portname);
     if (!$self->{serialport})
     {
-	$self->warning("Could not open serial port $portname: $!");
+	die "Could not open serial:$port: $!";
 	return;
     }
+
     $self->{serialport}->baudrate($self->{Baudrate});
+    # Sigh: Baud rate setting does not work correctly on Ubuntu 25.10
+    # because Device::SerialPort is trying to set eg the flags from symbolic bauds rates like
+    # B9600 instead of integer 9600
+    if ($^O == "linux")
+    {
+	$self->{serialport}->{"C_ISPEED"} = $self->{Baudrate};
+	$self->{serialport}->{"C_OSPEED"} = $self->{Baudrate};
+    }
     $self->{serialport}->databits($self->{Databits});
     $self->{serialport}->parity($self->{Parity});
     $self->{serialport}->stopbits($self->{Stopbits});
@@ -60,25 +69,32 @@ sub new($$)
     $self->{serialport}->read_char_time($self->{ReadCharTimeout});
     $self->{serialport}->read_const_time(100);
     $self->{serialport}->stty_icanon(0);
-
-    $self->{CurrentPad} = -1;
-    $self->{CurrentSad} = -1;
-
-    return unless $self->initialised();
-
+    
+#    $self->{serialport}->stty_onlcr(0);
+#    $self->{serialport}->stty_echoctl(0);
+    $self->{serialport}->stty_echo(0);
+#    $self->{serialport}->stty_echoe(0);
+#    $self->{serialport}->stty_echok(0);
+#    $self->{serialport}->stty_echonl(0);
+#    $self->{serialport}->stty_echoke(0);
+#    $self->{serialport}->stty_echoctl(0);
+#    $self->{serialport}->stty_ignpar(1);
+#    system("stty -F /dev/ttyUSB0");
+    
     return $self;
-}
-
-sub initialised($)
-{
-    my ($self) = @_;
-
-    return 1; # OK
 }
 
 sub isSerial($)
 {
     return 1;
+}
+
+sub writeLowLevel($$)
+{
+    my ($self, $s) = @_;
+#    my $x = unpack('H*', $s);
+#    print "Serial writeLowLevel: $x\n";
+    return $self->{serialport}->write($s); 
 }
 
 sub send($$)
@@ -91,7 +107,14 @@ sub send($$)
 	my $x = unpack('H*', $s);
 	print "COMMAND HEX: $x\n";
     }
-    return $self->{serialport}->write($s . "\n"); 
+    return $self->{serialport}->writeLowLevel($s . "\n"); 
+}
+
+sub readLowLevel($$)
+{
+    my ($self, $count) = @_;
+
+    return $self->{serialport}->read($count);
 }
 
 sub read_to_timeout($)
@@ -153,15 +176,6 @@ sub read_to_eol($)
     return $buf;
 }
 
-# REad until a char or timeout.
-# $waitfor can be either 'eoi' or the decimal number of the char < 256
-sub read_until_timeout_or($$)
-{
-    my ($self, $waitfor) = @_;
-    
-    return $self->read_to_eol();
-}
-
 sub read($$$)
 {
     my ($self, $pad, $sad) = @_;
@@ -180,15 +194,14 @@ sub warning($)
 {
     my ($self, $s) = @_;
 
-    print "WARNING: $s\n";
+    Device::GPIB::Controller::warning($s);
 }
 
 sub debug($)
 {
     my ($self, $s) = @_;
 
-    print "DEBUG: $s\n"
-	if $Device::GPIB::Controller::debug;
+    Device::GPIB::Controller::debug($s);
 }
 
 sub close($)

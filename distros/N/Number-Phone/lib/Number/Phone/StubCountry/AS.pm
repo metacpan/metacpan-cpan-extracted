@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153518;
+our $VERSION = 1.20260306161710;
 
 my $formatters = [
                 {
@@ -51,34 +51,25 @@ my $formatters = [
               ];
 
 my $validators = {
-                'fixed_line' => '
-          6846(?:
-            22|
-            33|
-            44|
-            55|
-            77|
-            88|
-            9[19]
+                'geographic' => '(
+          684(?:
+            274|
+            6(?:
+              22|
+              33|
+              44|
+              55|
+              77|
+              88|
+              9[19]
+            )
           )\\d{4}
-        ',
-                'geographic' => '
-          6846(?:
-            22|
-            33|
-            44|
-            55|
-            77|
-            88|
-            9[19]
-          )\\d{4}
-        ',
-                'mobile' => '
+        |
           684(?:
             2(?:
               48|
               5[2468]|
-              7[26]
+              7[246]
             )|
             7(?:
               3[13]|
@@ -86,7 +77,7 @@ my $validators = {
               82
             )
           )\\d{4}
-        ',
+        )',
                 'pager' => '',
                 'personal_number' => '
           52(?:
@@ -119,7 +110,7 @@ my $validators = {
           5(?:
             00|
             2[125-9]|
-            33|
+            3[23]|
             44|
             66|
             77|
@@ -2397,6 +2388,9 @@ my $timezones = {
                         ],
                '352' => [
                           'America/New_York'
+                        ],
+               '353' => [
+                          'America/Chicago'
                         ],
                '354' => [
                           'America/Toronto'

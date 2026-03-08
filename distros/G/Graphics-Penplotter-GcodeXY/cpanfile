@@ -10,6 +10,7 @@ requires 'Math::Bezier';
 requires 'Math::Trig';
 requires 'Image::SVG::Transform';
 requires 'XML::Parser';
+requires 'XML::LibXML';
 requires 'Image::SVG::Path';
 requires 'POSIX';
 requires 'List::Util';
@@ -17,5 +18,6 @@ requires 'Font::FreeType';
 requires 'Term::ANSIColor';
 requires 'File::Temp';
 requires 'Readonly';
+requires 'Role::Tiny', '2.000';
 
 test_requires 'File::Spec';

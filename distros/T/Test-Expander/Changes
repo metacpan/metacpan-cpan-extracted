@@ -1,5 +1,8 @@
 Changelog for Test-Expander
 
+2.5.2 2026-02-28
+    - Consider different file path delimiters in different operating systems during testing.
+
 2.5.1 2024-08-31
     - Defatalize 'define once only' warning during direct symbol table access.
 

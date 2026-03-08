@@ -11,20 +11,39 @@ readme :
 MAKE_FRAG
 }
 
+my $module_file    = 'lib/Google/GeoCoder/Smart.pm';
+my $module_version = MM->parse_version($module_file);
+
 WriteMakefile(
-    NAME              => 'Google::GeoCoder::Smart',
-    VERSION_FROM      => 'lib/Google/GeoCoder/Smart.pm', # finds $VERSION
-    PREREQ_PM         => {
-      'HTTP::Tiny'  => '0',
-      'JSON::PP'    => '0',
-      'URI::Escape' => '0',
+  NAME             => 'Google::GeoCoder::Smart',
+  VERSION_FROM     => $module_file,                      # finds $VERSION
+  MIN_PERL_VERSION => '5.010000',
+  LICENSE          => 'perl',
+  PREREQ_PM        => {
+    'HTTP::Tiny'  => '0',
+    'JSON::PP'    => '0',
+    'URI::Escape' => '0',
+  },
+  TEST_REQUIRES => {
+    'Test2::V0' => '0',
+  },
+  META_MERGE => {
+    resources => {
+      repository => 'https://github.com/ttgrules/Google-Geocoder-Smart',
     },
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/Google/GeoCoder/Smart.pm', # retrieve abstract from module
-       AUTHOR         => 'TTG <ttg@cpan.org>') : ()),
-    LIBS              => [''], # e.g., '-lm'
-    DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
-    INC               => '-I.', # e.g., '-I. -I/usr/include/other'
-	# Un-comment this if you add C files to link with later:
-    # OBJECT            => '$(O_FILES)', # link all the C files too
+    provides => {
+      'Google::GeoCoder::Smart' => {
+        file    => $module_file,
+        version => $module_version,
+      },
+    },
+  },
+  ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+    (ABSTRACT_FROM => $module_file,    # retrieve abstract from module
+      AUTHOR       => 'TTG <ttg@cpan.org>') : ()),
+  LIBS   => [''],    # e.g., '-lm'
+  DEFINE => '',      # e.g., '-DHAVE_SOMETHING'
+  INC    => '-I.',   # e.g., '-I. -I/usr/include/other'
+  # Un-comment this if you add C files to link with later:
+  # OBJECT            => '$(O_FILES)', # link all the C files too
 );

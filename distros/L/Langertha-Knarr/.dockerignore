@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+Langertha-Knarr-*/
+*.tar.gz
+.build/
+blib/
+
+# Tests (not needed in image)
+t/
+
+# Documentation (not needed in image)
+README.md
+CLAUDE.md
+dist.ini
+cpanfile
+
+# Docker files
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# IDE / editor
+.vscode/
+.idea/
+*~
+*.sw[op]
+
+# Local configs (don't bake in secrets)
+knarr.yaml
+*.env
+.env
+.env.*
+
+# Claude Code
+.claude/
+.devcontainer.json

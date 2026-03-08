@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153524;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -58,7 +58,7 @@ my $validators = {
             9[2457]
           )\\d{5}
         ',
-                'mobile' => '3[2-46-9]\\d{7}',
+                'mobile' => '3[2-9]\\d{7}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
@@ -66,27 +66,27 @@ my $validators = {
                 'voip' => '22\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"26120722", "Manakara",
-"2612054", "Ambatondrazaka",
-"2612057", "Maroantsetra\/Sainte\ Marie",
+$areanames{en} = {"2612092", "Taolañaro",
+"2612044", "Antsirabe",
+"2612067", "Antsohihy",
+"2612082", "Antsiranana",
+"2612047", "Ambositra",
+"2612073", "Farafangana",
+"2612075", "Fianarantsoa",
 "2612053", "Toamasina",
-"2612092", "Taolañaro",
+"2612095", "Morondava",
 "2612022", "Antananarivo",
 "2612076", "Antananarivo",
-"2612062", "Mahajanga",
-"2612075", "Fianarantsoa",
-"2612067", "Antsohihy",
-"2612044", "Antsirabe",
-"2612047", "Ambositra",
-"2612056", "Moramanga",
 "2612094", "Toliary",
+"2612057", "Maroantsetra\/Sainte\ Marie",
 "2612086", "Nosy\ Be",
+"2612056", "Moramanga",
+"2612062", "Mahajanga",
+"2612054", "Ambatondrazaka",
 "2612088", "Sambava",
 "26120729", "Mananjary",
-"2612095", "Morondava",
-"2612082", "Antsiranana",
-"2612073", "Farafangana",
-"2612069", "Maintirano",};
+"2612069", "Maintirano",
+"26120722", "Manakara",};
 my $timezones = {
                '' => [
                        'Indian/Antananarivo'

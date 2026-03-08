@@ -186,20 +186,11 @@ grpc_slice METHOD_MAINTENANCE_HASH_KV;
 grpc_slice METHOD_MAINTENANCE_MOVE_LEADER;
 grpc_slice METHOD_AUTH_STATUS;
 
-/* Initialize all cached method slices - thread-safe via atomic flag */
+/* Initialize all cached method slices (called once from BOOT) */
 void init_method_slices(void) {
-    static volatile int initialized = 0;
-    static volatile int initializing = 0;
-
-    /* Double-checked locking pattern using volatile flags.
-     * grpc_slice_from_static_string is idempotent, so worst case
-     * in a race is redundant initialization, not corruption. */
+    static int initialized = 0;
     if (initialized) return;
-
-    /* Simple spin if another thread is initializing */
-    while (__sync_lock_test_and_set(&initializing, 1)) {
-        if (initialized) return;
-    }
+    initialized = 1;
 
     METHOD_KV_RANGE = grpc_slice_from_static_string("/etcdserverpb.KV/Range");
     METHOD_KV_PUT = grpc_slice_from_static_string("/etcdserverpb.KV/Put");
@@ -246,9 +237,4 @@ void init_method_slices(void) {
     METHOD_MAINTENANCE_HASH_KV = grpc_slice_from_static_string("/etcdserverpb.Maintenance/HashKV");
     METHOD_MAINTENANCE_MOVE_LEADER = grpc_slice_from_static_string("/etcdserverpb.Maintenance/MoveLeader");
     METHOD_AUTH_STATUS = grpc_slice_from_static_string("/etcdserverpb.Auth/AuthStatus");
-
-    /* Memory barrier ensures all writes are visible before setting initialized */
-    __sync_synchronize();
-    initialized = 1;
-    __sync_lock_release(&initializing);
 }

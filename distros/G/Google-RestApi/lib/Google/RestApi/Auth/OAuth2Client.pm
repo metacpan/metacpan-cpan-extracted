@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::OAuth2Client;
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 use Google::RestApi::Setup;
 
@@ -245,7 +245,7 @@ save your token file.
 
 =head1 AUTHOR
 
-Robin Murray E<lt>mvsjes@cpan.ork<gt>, copied and modifed from Net::Google::DataAPI::Auth::OAuth2.
+Robin Murray mvsjes@cpan.org, copied and modifed from Net::Google::DataAPI::Auth::OAuth2.
 
 =head1 SEE ALSO
 

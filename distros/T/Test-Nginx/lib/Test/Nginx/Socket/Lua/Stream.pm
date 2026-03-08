@@ -4,7 +4,7 @@ use v5.10.1;
 use Test::Nginx::Socket::Lua -Base;
 use Test::Nginx::Util qw( $ServerPort $ServerAddr );
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 sub get_best_long_bracket_level ($);
 sub quote_as_lua_str ($);
@@ -25,16 +25,21 @@ add_block_preprocessor(sub {
     my $stream_req = $block->stream_request;
     my $stream_req2 = $block->stream_request2;
     my $stream_req3 = $block->stream_request3;
+    my $steam_listen_option = $block->steam_listen_option;
+    my $steam_listen_option2 = $block->steam_listen_option2;
+    my $steam_listen_option3 = $block->steam_listen_option3;
 
     if (defined $stream_server_config || defined $stream_config) {
         $stream_server_config //= '';
         $stream_config //= '';
+        $steam_listen_option //= '';
+        chomp($steam_listen_option);
 
         my $new_main_config = <<_EOC_;
 stream {
 $stream_config
     server {
-        listen $port;
+        listen $port $steam_listen_option;
 
 $stream_server_config
     }
@@ -42,9 +47,11 @@ _EOC_
 
         if (defined $stream_server_config2) {
             my $port2 = $port + 1;
+            $steam_listen_option2 //= '';
+            chomp($steam_listen_option2);
             $new_main_config .= <<_EOC_;
     server {
-        listen $port2;
+        listen $port2 $steam_listen_option2;
 
 $stream_server_config2
     }
@@ -54,9 +61,11 @@ _EOC_
 
         if (defined $stream_server_config3) {
             my $port3 = $port + 2;
+            $steam_listen_option3 //= '';
+            chomp($steam_listen_option3);            
             $new_main_config .= <<_EOC_;
     server {
-        listen $port3;
+        listen $port3 $steam_listen_option3;
 
 $stream_server_config3
     }
@@ -247,7 +256,6 @@ _EOC_
             $block->set_value("request", "GET /t\n");
         }
     }
-
     my $stream_response = $block->stream_response;
     if (defined $stream_response) {
         if (defined $block->response_body) {
@@ -418,7 +426,7 @@ Yichun "agentzh" Zhang (章亦春) C<< <agentzh@gmail.com> >>, OpenResty Inc.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2009-2016, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
+Copyright (c) 2009-2025, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
 
 This module is licensed under the terms of the BSD license.
 

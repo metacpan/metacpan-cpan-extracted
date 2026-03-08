@@ -190,8 +190,13 @@ isnt $@, '', 'scaling-down of output dim 1 throws error';
 {
 # test reshape with no args
 my $x = ones 3,1,4;
+ok eq_array( [ $x->dimincs ], [1,3,3] ), "dimincs";
+my $xslice = $x->slice('0:1');
+ok eq_array( [ $xslice->dimincs ], [1,3,3] ), "dimincs after slice"
+  or diag explain [ $xslice->dimincs ];
 my $y = $x->reshape;
 ok eq_array( [ $y->dims ], [3,4] ), "reshape()";
+ok eq_array( [ $y->dimincs ], [1,3] ), "dimincs after reshape";
 }
 
 {
@@ -445,6 +450,8 @@ is_pdl $y->shape, indx(2,1,1,2), "concatenating an empty and a scalar on the rig
 $y = pdl(5,$x);
 is_pdl $y, pdl([[[5,0]]],[[[0,0]]]), "concatenating an empty and a scalar on the left gives the right answer";
 }
+
+is_pdl pdl(Math::Complex->make(1,2)), pdl('1+2i'), 'pdl(Math::Complex obj)';
 
 # cat problems
 eval {cat(1, pdl(1,2,3), {}, 6)};
@@ -763,6 +770,17 @@ my $p = pdl(-3);
 $p->inplace->convert(ushort);
 is_pdl $p, ushort(-3), 'inplace convert negative to ushort right';
 ok $p, 'inplace convert negative to ushort non-zero';
+
+my $from = pdl(5);
+my $to = $from->convert_flowing(float);
+is $to->type, 'float';
+is_pdl $to, float(5);
+$to++;
+is_pdl $to, float(6);
+is_pdl $from, pdl(6);
+$from++;
+is_pdl $to, float(7);
+is_pdl $from, pdl(7);
 }
 
 for (['ones', 1], ['zeroes', 0], ['nan', '.*NaN'], ['inf', '.*Inf'], ['i', 'i', 'cdouble']) {

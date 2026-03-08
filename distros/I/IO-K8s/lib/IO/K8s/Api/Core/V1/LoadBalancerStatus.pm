@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::LoadBalancerStatus;
 # ABSTRACT: LoadBalancerStatus represents the status of a load-balancer.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s ingress => ['Core::V1::LoadBalancerIngress'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::LoadBalancerStatus - LoadBalancerStatus represents the s
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 ingress
 

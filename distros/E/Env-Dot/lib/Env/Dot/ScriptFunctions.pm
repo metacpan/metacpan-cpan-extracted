@@ -15,7 +15,7 @@ use Carp;
 
 # ABSTRACT: Read environment variables from a .env file
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use constant {
     OPTION_FILE_TYPE         => q{file:type},
@@ -105,7 +105,7 @@ Env::Dot::ScriptFunctions - Read environment variables from a .env file
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 

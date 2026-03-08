@@ -1,0 +1,9 @@
+openapi: 3.0.3
+info:
+  title: Broken Syntax
+  version: 1.0.0
+paths:
+  /users:
+    get:
+      summary: This line has bad indentation
+     description: Missing required indent here

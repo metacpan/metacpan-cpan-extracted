@@ -1,3 +1,8 @@
+0.002     2026-03-07 05:14:23Z
+  - Added HTTP transport for remote MCP servers (Streamable HTTP spec)
+  - Improved .gitignore with proper directory patterns, tar.gz, cover_db,
+    Carton, and editor backup entries
+
 0.001     2026-02-20 03:25:51Z
   - Initial release
   - InProcess transport for direct MCP::Server interaction

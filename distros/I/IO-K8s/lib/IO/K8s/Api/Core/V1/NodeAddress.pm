@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeAddress;
 # ABSTRACT: NodeAddress contains information for the node's address.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s address => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::NodeAddress - NodeAddress contains information for the n
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 address
 

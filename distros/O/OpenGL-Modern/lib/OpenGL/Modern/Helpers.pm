@@ -31,105 +31,28 @@ use OpenGL::Modern qw(
 
 OpenGL::Modern::Helpers - example usage of raw pointers from perl
 
-=head1 WARNING
-
-This API is an experiment and will change!
-
 =head1 OpenGL::Modern API Implementation
 
-This module exists to support the use of the OpenGL::Modern
+This module existed to support the use of the OpenGL::Modern
 package for OpenGL bindings by documenting details of the
 implementation and giving example routines showing the
 use from perl.
 
-=head2 Implementation
-
 OpenGL::Modern is an XS module providings bindings to the
-C OpenGL library for graphics.  As such, it needs to handle
-conversion of input arguments from perl into the required
-datatypes for the C OpenGL API, it then calls the OpenGL
-routine, and then converts the return value (if any) from
-the C API datatype into an appropriate Perl type.
+C OpenGL library for graphics. As of 0.0403, it now has C<_p>
+bindings for all functions with pointers that have metadata in the
+OpenGL XML registry (see
+L<https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/refs/heads/main/xml/gl.xml>).
+All of the "helper" versions of routines that implemented C<_p>
+versions on top of C<_c> versions now just import and re-export the
+native C<_p> versions.
 
-=head3 Scalar Values
-
-Routines that take scalar values and return scalar
-values at the C level, are nicely mapped by the built in
-typemap conversions.  For example:
-
-  GLenum
-  glCheckNamedFramebufferStatus(GLuint framebuffer, GLenum target);
-
-where the functions takes two values, one an integer and
-one an enumeration which is basically an integer value
-as well.  The return value is another enumeration/integer
-value.  Since perl scalars can hold integers, the default
-XS implementation from perl would be prototyped in perl
-as
-
-  $status = glCheckNamedFramebufferStatus($framebuffer, $target);
-
-or, taking advantage of the binding of all the OpenGL
-enumerations to perl constant functions we could write
-
-  $status = glCheckNamedFramebufferStatus($framebuffer, GL_DRAW_FRAMEBUFFER);
-
-The key here is explicit scalar values and types which makes
-the XS perl implementation essentially the same at the C one
-just with perl scalars in place of C typed values.
-Of the 2743 OpenGL API routines, 1092 have scalar input
-and return values and can be considered implemented as
-is.
-
-=head3 Pointer Values
-
-The remaining OpenGL routines all have one (or more)
-pointer argument or return value which are not so
-simply mapped into perl because the use of pointers
-from C does not fully determine the use of those
-values:
-
-=over 4
-
-=item *
-Pointers can be used to return values from routines
-
-=item *
-Pointers can be used to pass single input values
-
-=item *
-Pointers can be used to pass multiple input values
-
-=item *
-Pointers can be used to return multiple input values
-
-=back
-
-The current XS implementation now represents non-char
-type pointers as the typemap T_PTR and the string and
-character pointers are T_PV.  The routines will be
-renamed with an added _c so as to indicate that the
-mapping is the direct C one.
-
-These _c routines closely match the OpenGL C API but
-it requires that the perl user hand manage the allocation,
-initialization, packing and unpacking, etc for each
-function call.
-
-Please see this source file for the implementations of
-
-  glGetShaderInfoLog_p
-  glGetProgramInfoLog_p
-  glGetVersion_p
-
-  croak_on_gl_error
-
-showing the use of some utility routines to interface
-to the OpenGL API routines.  OpenGL::Modern::Helpers
-will be kept up to date with each release to document
-the API implementations and usage as the bindings
-evolve and improve.  Once standardized and stable,
-a final version of Helpers.pm will be released.
+See the automatically-generated documentation in L<OpenGL::Modern>
+for interfaces for all OpenGL functions that are bound, which is
+pretty much all of them, since the list comes from GLEW. Some only
+have C<_c> bindings as noted above, due to incomplete metadata in
+the registry. Since that is largely only true for routines that
+were removed in 3.2+ "core" profiles, that is unlikely to change.
 
 =cut
 

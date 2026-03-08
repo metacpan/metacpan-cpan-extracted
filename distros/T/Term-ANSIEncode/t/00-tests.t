@@ -34,8 +34,7 @@ diag("\r" . colored(['bright_green'], '▏') . colored(['cyan on_black'], q{   |
 diag("\r" . colored(['bright_green'], '▏') . colored(['cyan on_black'], q{   |_|\___||___/\__|_|_| |_|\__, | }) . colored(['green'], '▏'));
 diag("\r" . colored(['bright_green'], '▏') . colored(['cyan on_black'], q{                             __/ | }) . colored(['green'], '▏'));
 diag("\r" . colored(['bright_green'], '▏') . colored(['white on_black'], q{Term::ANSIEncode}) . colored(['cyan on_black'],q{            |___/  }) . colored(['green'], '▏'));
-diag("\r" . colored(['bright_green'], '▏                                   ') . colored(['green'], '▏'));
-diag("\r" . colored(['bright_green'], "\e[53m                                    "));
+diag("\r" . colored(['bright_green'], "\e[4m▏                                   ") . colored(['green'], '▏'));
 diag("\r  \n\r  " x 12 . "\e[13A");
 diag("\r  \n\r" . colored(['bright_yellow on_magenta'],sprintf('%-25s',' Testing object creation ')));
 my $ansi = Term::ANSIEncode->new();

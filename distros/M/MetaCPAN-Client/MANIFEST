@@ -23,6 +23,8 @@ examples/complex-nested-either-and.pl
 examples/complex.pl
 examples/contributors.pl
 examples/cover.pl
+examples/cve.pl
+examples/cve_list.pl
 examples/distribution.pl
 examples/download_url.pl
 examples/es_filter.pl

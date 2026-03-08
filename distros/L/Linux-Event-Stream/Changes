@@ -1,0 +1,14 @@
+Revision history for Linux-Event-Stream
+
+0.001  2026-03-01
+  - Initial release of Linux::Event::Stream (buffered, backpressure-aware I/O).
+  - Fix: persist write offset across partial syswrite() progress so buffered_bytes()
+    and watermark backpressure state update correctly when writes are EAGAIN-limited.
+  - Tests: add deterministic watermark test that polls unblock state via timer.
+
+0.002  2026-03-01
+  - Add framed/message mode: internal read buffering with a configurable codec and
+    on_message callback for complete messages.
+  - Add built-in codecs: line, netstring, and u32be length-prefix.
+  - Add write_message() for codec-encoded writes and last_error() for diagnosing
+    codec/buffer failures (errno 0).

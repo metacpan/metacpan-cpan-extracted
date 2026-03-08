@@ -1,0 +1,32 @@
+openapi: 3.1.0
+info:
+  title: Valid API
+  version: 1.0.0
+  description: A valid OpenAPI specification
+  license:
+    name: MIT
+security:
+  - apiKey: []
+paths:
+  /users:
+    get:
+      summary: Get users
+      description: Returns a list of users
+      operationId: getUsers
+      security:
+        - apiKey: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+components:
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: X-API-Key
+      'in': header

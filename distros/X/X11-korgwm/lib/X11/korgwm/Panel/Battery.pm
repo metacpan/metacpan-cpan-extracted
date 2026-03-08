@@ -11,25 +11,33 @@ use X11::korgwm::Common;
 use X11::korgwm::Panel;
 
 # Add panel element
-&X11::korgwm::Panel::add_element("battery", sub($el) {
+&X11::korgwm::Panel::add_element("battery", sub($el, %params) {
     AE::timer 0, 30, sub {
-        my ($txt, $fd, $color);
+        my ($val, $txt, $fd, $battery_low);
 
         # Get current value
-        open $fd, "<", "/sys/class/power_supply/BAT0/capacity" or return;
-        $txt = 0 + <$fd>;
-        $color = sprintf '#%x', $cfg->{color_battery_low} if $txt < 16;
+        my $bat = (sort glob "/sys/class/power_supply/BAT*")[0] or return;
+        -d $bat or return;
+
+        open $fd, "<", "$bat/capacity" or return;
+        $val = 0 + <$fd>;
+        $battery_low = 1 if $val <= 16;
         close $fd;
 
+        # Prepare percentage text
+        $txt = sprintf $cfg->{battery_format}, $val;
+
         # Process status
-        open $fd, "<", "/sys/class/power_supply/BAT0/status" or return;
+        open $fd, "<", "$bat/status" or return;
         unless (<$fd> eq "Discharging\n") {
-            $txt = "" if $txt == 100;
-            $txt .= chr(0x2234);
+            $txt = "" if $val == 100 and $cfg->{battery_hide_charged};
+            $txt .= $cfg->{battery_charging_character};
         }
         close $fd;
 
-        $el->txt(sprintf($cfg->{battery_format}, $txt), $color ? $color : ());
+        $el->set_text($txt);
+        $el->get_style_context()->remove_class($_) for @{ $el->get_style_context()->list_classes() // [] };
+        $el->get_style_context()->add_class('battery-low') if $battery_low;
     };
 });
 

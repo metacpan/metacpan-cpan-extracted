@@ -314,6 +314,24 @@ removed</code></pre></div></div>
     removed</pre>
 </div>
 
+<div class="case" data-name="pre/code block with newline as &lt;br&gt; tag">
+  <div class="input"><div><pre><code>First line<br>Second line<br>Third line</code></pre></div></div>
+
+  <pre class="expected">    First line
+    Second line
+    Third line</pre>
+</div>
+
+<div class="case" data-name="fenced pre/code block with newline as &lt;br&gt; tag" data-options='{"codeBlockStyle": "fenced"}'>
+  <div class="input"><div><pre><code>First line<br>Second line<br>Third line</code></pre></div></div>
+
+  <pre class="expected">```
+First line
+Second line
+Third line
+```</pre>
+</div>
+
 <div class="case" data-name="fenced pre/code block" data-options='{"codeBlockStyle": "fenced"}'>
   <div class="input">
     <pre><code>def a_fenced_code block; end</code></pre>

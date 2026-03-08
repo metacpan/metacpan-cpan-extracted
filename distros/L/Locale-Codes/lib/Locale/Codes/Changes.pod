@@ -24,6 +24,14 @@ changes that you use, feel free to contact me.  Based on my available
 time and the time until the next release is scheduled, I will try to
 do a release any time the standards change.
 
+=head1 VERSION 3.87  (2026-03-02  sbeck)
+
+=over 5
+
+=item NEW CODE(s)
+
+=back
+
 =head1 VERSION 3.86  (2025-12-02  sbeck)
 
 =over 5
@@ -1476,7 +1484,7 @@ Currently maintained by Sullivan Beck (sbeck@cpan.org).
 =head1 COPYRIGHT
 
    Copyright (c) 2001-2010 Neil Bowers
-   Copyright (c) 2010-2025 Sullivan Beck
+   Copyright (c) 2010-2026 Sullivan Beck
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

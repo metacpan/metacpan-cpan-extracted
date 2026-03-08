@@ -13,7 +13,7 @@ use base qw( Exporter );
 our @EXPORT = qw( url url_base url_component url_scheme url_host url_secure url_insecure url_mail_to );
 
 # ABSTRACT: Compare a URL in your Test2 test
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 
 sub url (&)
@@ -220,7 +220,7 @@ Test2::Tools::URL - Compare a URL in your Test2 test
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 
@@ -230,8 +230,8 @@ version 0.06
  is(
    "http://example.com/path1/path2?query=1#fragment",
    url {
-     url_scheme             => 'http';
-     url_host               => 'example.com';
+     url_scheme 'http';
+     url_host   'example.com';
      url_component path     => '/path1/path2';
      url_component query    => { query => 1 };
      url_component fragment => 'fragment';
@@ -393,9 +393,11 @@ Contributors:
 
 Paul Durden (alabamapaul, PDURDEN)
 
+Yoshikazu Sawa (yoshikazusawa)
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017-2021 by Graham Ollis.
+This software is copyright (c) 2017-2024 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

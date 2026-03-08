@@ -6,6 +6,8 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
+share/openapi-3.0.json
+share/openapi-3.1.json
 script/openapi-linter
 t/00_load.t
 t/01_basic.t
@@ -21,6 +23,9 @@ t/10_path_parameter_fix.t
 t/11_in_parameter.t
 t/12_path-non-hash-fix.t
 t/13_path-non-hash-elements.t
+t/14_linter.t
+t/15_bundled_schema.t
+t/16_location.t
 t/data/minimal.yaml
 t/data/missing_descriptions.yaml
 t/data/missing_info.yaml
@@ -29,5 +34,11 @@ t/data/missing_required.yaml
 t/data/missing_schema_fields.yaml
 t/manifest.t
 t/pod.t
+t/specs/bad_refs.yaml
+t/specs/invalid_syntax.yaml
+t/specs/missing_required.yaml
+t/specs/semantic_broken.yaml
+t/specs/valid_api.yaml
+t/specs/missing_op_description.yaml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

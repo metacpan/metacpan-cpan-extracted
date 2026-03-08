@@ -50,36 +50,19 @@ static void process_user_list_response(pTHX_ pending_call_t *pc);
 static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op);
 static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_ops, size_t *dst_n);
 
-/* Reconnection functions */
-static void reconnect_channel(ev_etcd_t *client);
 static void health_timer_callback(EV_P_ ev_timer *w, int revents);
 
-/* No timer helper needed - async watcher is always active */
-
-/* Reconnect to the next endpoint */
+/* Reconnect to the next endpoint (or same if only one) */
 static void reconnect_channel(ev_etcd_t *client) {
-    if (client->endpoint_count <= 1) {
-        /* Only one endpoint, just recreate channel to same endpoint */
-        if (client->channel) {
-            grpc_channel_destroy(client->channel);
-            client->channel = NULL;
-        }
-        client->channel = etcd_create_insecure_channel(client->endpoints[0], NULL);
-        /* Channel creation failure is non-fatal; operations will fail with errors */
-        return;
-    }
+    if (client->endpoint_count > 1)
+        client->current_endpoint = (client->current_endpoint + 1) % client->endpoint_count;
 
-    /* Move to next endpoint */
-    client->current_endpoint = (client->current_endpoint + 1) % client->endpoint_count;
-
-    /* Destroy old channel and create new one */
     if (client->channel) {
         grpc_channel_destroy(client->channel);
         client->channel = NULL;
     }
     client->channel = etcd_create_insecure_channel(
         client->endpoints[client->current_endpoint], NULL);
-    /* Channel creation failure is non-fatal; operations will fail with errors */
 }
 
 /*
@@ -324,29 +307,30 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
             watch_call_t *wc = (watch_call_t *)base;
             if (success) {
                     /* Process the first message that was received in the initial batch */
-                    if (wc->recv_buffer) {
+                    if (wc->recv_buffer && wc->active) {
                         process_watch_response(aTHX_ wc);
                     }
                     /* Re-arm to receive more messages */
                     if (wc->active) {
                         watch_rearm_recv(aTHX_ wc);
                     } else {
-                        /* First response set active=0 (e.g., server cancel) */
                         cleanup_watch(aTHX_ wc);
                     }
                 } else {
-                    dSP;
-                    ENTER;
-                    SAVETMPS;
-                    PUSHMARK(SP);
-                    EXTEND(SP, 2);
-                    PUSHs(&PL_sv_undef);
-                    PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL,
-                        "Watch setup failed", 18, "watch")));
-                    PUTBACK;
-                    call_sv(wc->callback, G_DISCARD);
-                    FREETMPS;
-                    LEAVE;
+                    if (wc->active) {
+                        dSP;
+                        ENTER;
+                        SAVETMPS;
+                        PUSHMARK(SP);
+                        EXTEND(SP, 2);
+                        PUSHs(&PL_sv_undef);
+                        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL,
+                            "Watch setup failed", 18, "watch")));
+                        PUTBACK;
+                        call_sv(wc->callback, G_DISCARD);
+                        FREETMPS;
+                        LEAVE;
+                    }
                     cleanup_watch(aTHX_ wc);
                 }
             } else if (base->type == CALL_TYPE_LEASE_KEEPALIVE_RECV) {
@@ -708,11 +692,14 @@ static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op) {
 
         hv_store(del, "deleted", 7, newSViv(dr->deleted), 0);
 
-        AV *prev_kvs = newAV();
-        for (size_t i = 0; i < dr->n_prev_kvs; i++) {
-            av_push(prev_kvs, kv_to_hashref(aTHX_ dr->prev_kvs[i]));
+        if (dr->n_prev_kvs > 0) {
+            AV *prev_kvs = newAV();
+            av_extend(prev_kvs, dr->n_prev_kvs - 1);
+            for (size_t i = 0; i < dr->n_prev_kvs; i++) {
+                av_push(prev_kvs, kv_to_hashref(aTHX_ dr->prev_kvs[i]));
+            }
+            hv_store(del, "prev_kvs", 8, newRV_noinc((SV *)prev_kvs), 0);
         }
-        hv_store(del, "prev_kvs", 8, newRV_noinc((SV *)prev_kvs), 0);
 
         hv_store(hv, "response_delete_range", 21, newRV_noinc((SV *)del), 0);
     }
@@ -907,238 +894,101 @@ static void process_auth_response(pTHX_ pending_call_t *pc) {
 }
 
 /* Helper macro for simple header-only responses */
-#define PROCESS_HEADER_ONLY_RESPONSE(func_name, response_type, unpack_func, free_func) \
+#define PROCESS_HEADER_ONLY_RESPONSE(func_name, response_type, unpack_func, free_func, source) \
 static void func_name(pTHX_ pending_call_t *pc) { \
-    dSP; \
+    BEGIN_RESPONSE_HANDLER(pc, source); \
     \
-    if (pc->status != GRPC_STATUS_OK) { \
-        ENTER; \
-        SAVETMPS; \
-        PUSHMARK(SP); \
-        EXTEND(SP, 2); \
-        PUSHs(&PL_sv_undef); \
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ \
-                                  pc->status, \
-                                  (const char *)GRPC_SLICE_START_PTR(pc->status_details), \
-                                  GRPC_SLICE_LENGTH(pc->status_details), \
-                                  "rpc"))); \
-        PUTBACK; \
-        call_sv(pc->callback, G_DISCARD); \
-        FREETMPS; \
-        LEAVE; \
-        return; \
-    } \
-    \
-    if (!pc->recv_buffer) { \
-        ENTER; \
-        SAVETMPS; \
-        PUSHMARK(SP); \
-        EXTEND(SP, 2); \
-        PUSHs(&PL_sv_undef); \
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "No response received", 20, "internal"))); \
-        PUTBACK; \
-        call_sv(pc->callback, G_DISCARD); \
-        FREETMPS; \
-        LEAVE; \
-        return; \
-    } \
-    \
-    grpc_byte_buffer_reader reader; \
-    if (!grpc_byte_buffer_reader_init(&reader, pc->recv_buffer)) { \
-        ENTER; \
-        SAVETMPS; \
-        PUSHMARK(SP); \
-        EXTEND(SP, 2); \
-        PUSHs(&PL_sv_undef); \
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to read response buffer", 30, "internal"))); \
-        PUTBACK; \
-        call_sv(pc->callback, G_DISCARD); \
-        FREETMPS; \
-        LEAVE; \
-        return; \
-    } \
-    \
-    grpc_slice slice = grpc_byte_buffer_reader_readall(&reader); \
-    grpc_byte_buffer_reader_destroy(&reader); \
-    \
-    response_type *resp = unpack_func( \
-        NULL, \
-        GRPC_SLICE_LENGTH(slice), \
-        GRPC_SLICE_START_PTR(slice) \
-    ); \
-    grpc_slice_unref(slice); \
-    \
-    if (!resp) { \
-        ENTER; \
-        SAVETMPS; \
-        PUSHMARK(SP); \
-        EXTEND(SP, 2); \
-        PUSHs(&PL_sv_undef); \
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to parse response", 24, "internal"))); \
-        PUTBACK; \
-        call_sv(pc->callback, G_DISCARD); \
-        FREETMPS; \
-        LEAVE; \
-        return; \
-    } \
+    response_type *resp; \
+    UNPACK_RESPONSE(pc, resp, unpack_func); \
     \
     HV *result = newHV(); \
     add_header_to_hv(aTHX_ result, resp->header); \
-    \
     free_func(resp, NULL); \
     \
-    ENTER; \
-    SAVETMPS; \
-    PUSHMARK(SP); \
-    EXTEND(SP, 2); \
-    PUSHs(sv_2mortal(newRV_noinc((SV *)result))); \
-    PUSHs(&PL_sv_undef); \
-    PUTBACK; \
-    call_sv(pc->callback, G_DISCARD); \
-    FREETMPS; \
-    LEAVE; \
+    CALL_SUCCESS_CALLBACK(pc->callback, result); \
 }
 
 PROCESS_HEADER_ONLY_RESPONSE(process_user_add_response,
-                             Etcdserverpb__AuthUserAddResponse,
-                             etcdserverpb__auth_user_add_response__unpack,
-                             etcdserverpb__auth_user_add_response__free_unpacked)
+    Etcdserverpb__AuthUserAddResponse,
+    etcdserverpb__auth_user_add_response__unpack,
+    etcdserverpb__auth_user_add_response__free_unpacked, "user_add")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_user_delete_response,
-                             Etcdserverpb__AuthUserDeleteResponse,
-                             etcdserverpb__auth_user_delete_response__unpack,
-                             etcdserverpb__auth_user_delete_response__free_unpacked)
+    Etcdserverpb__AuthUserDeleteResponse,
+    etcdserverpb__auth_user_delete_response__unpack,
+    etcdserverpb__auth_user_delete_response__free_unpacked, "user_delete")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_user_change_password_response,
-                             Etcdserverpb__AuthUserChangePasswordResponse,
-                             etcdserverpb__auth_user_change_password_response__unpack,
-                             etcdserverpb__auth_user_change_password_response__free_unpacked)
+    Etcdserverpb__AuthUserChangePasswordResponse,
+    etcdserverpb__auth_user_change_password_response__unpack,
+    etcdserverpb__auth_user_change_password_response__free_unpacked, "user_change_password")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_auth_enable_response,
-                             Etcdserverpb__AuthEnableResponse,
-                             etcdserverpb__auth_enable_response__unpack,
-                             etcdserverpb__auth_enable_response__free_unpacked)
+    Etcdserverpb__AuthEnableResponse,
+    etcdserverpb__auth_enable_response__unpack,
+    etcdserverpb__auth_enable_response__free_unpacked, "auth_enable")
 
-PROCESS_HEADER_ONLY_RESPONSE(process_auth_disable_response,
-                             Etcdserverpb__AuthDisableResponse,
-                             etcdserverpb__auth_disable_response__unpack,
-                             etcdserverpb__auth_disable_response__free_unpacked)
+/* auth_disable needs to clear the stored auth token */
+static void process_auth_disable_response(pTHX_ pending_call_t *pc) {
+    BEGIN_RESPONSE_HANDLER(pc, "auth_disable");
+
+    Etcdserverpb__AuthDisableResponse *resp;
+    UNPACK_RESPONSE(pc, resp, etcdserverpb__auth_disable_response__unpack);
+
+    HV *result = newHV();
+    add_header_to_hv(aTHX_ result, resp->header);
+    etcdserverpb__auth_disable_response__free_unpacked(resp, NULL);
+
+    if (pc->client->auth_token) {
+        memset(pc->client->auth_token, 0, pc->client->auth_token_len);
+        Safefree(pc->client->auth_token);
+        pc->client->auth_token = NULL;
+        pc->client->auth_token_len = 0;
+    }
+
+    CALL_SUCCESS_CALLBACK(pc->callback, result);
+}
 
 PROCESS_HEADER_ONLY_RESPONSE(process_role_add_response,
-                             Etcdserverpb__AuthRoleAddResponse,
-                             etcdserverpb__auth_role_add_response__unpack,
-                             etcdserverpb__auth_role_add_response__free_unpacked)
+    Etcdserverpb__AuthRoleAddResponse,
+    etcdserverpb__auth_role_add_response__unpack,
+    etcdserverpb__auth_role_add_response__free_unpacked, "role_add")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_role_delete_response,
-                             Etcdserverpb__AuthRoleDeleteResponse,
-                             etcdserverpb__auth_role_delete_response__unpack,
-                             etcdserverpb__auth_role_delete_response__free_unpacked)
+    Etcdserverpb__AuthRoleDeleteResponse,
+    etcdserverpb__auth_role_delete_response__unpack,
+    etcdserverpb__auth_role_delete_response__free_unpacked, "role_delete")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_role_grant_permission_response,
-                             Etcdserverpb__AuthRoleGrantPermissionResponse,
-                             etcdserverpb__auth_role_grant_permission_response__unpack,
-                             etcdserverpb__auth_role_grant_permission_response__free_unpacked)
+    Etcdserverpb__AuthRoleGrantPermissionResponse,
+    etcdserverpb__auth_role_grant_permission_response__unpack,
+    etcdserverpb__auth_role_grant_permission_response__free_unpacked, "role_grant_permission")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_role_revoke_permission_response,
-                             Etcdserverpb__AuthRoleRevokePermissionResponse,
-                             etcdserverpb__auth_role_revoke_permission_response__unpack,
-                             etcdserverpb__auth_role_revoke_permission_response__free_unpacked)
+    Etcdserverpb__AuthRoleRevokePermissionResponse,
+    etcdserverpb__auth_role_revoke_permission_response__unpack,
+    etcdserverpb__auth_role_revoke_permission_response__free_unpacked, "role_revoke_permission")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_user_grant_role_response,
-                             Etcdserverpb__AuthUserGrantRoleResponse,
-                             etcdserverpb__auth_user_grant_role_response__unpack,
-                             etcdserverpb__auth_user_grant_role_response__free_unpacked)
+    Etcdserverpb__AuthUserGrantRoleResponse,
+    etcdserverpb__auth_user_grant_role_response__unpack,
+    etcdserverpb__auth_user_grant_role_response__free_unpacked, "user_grant_role")
 
 PROCESS_HEADER_ONLY_RESPONSE(process_user_revoke_role_response,
-                             Etcdserverpb__AuthUserRevokeRoleResponse,
-                             etcdserverpb__auth_user_revoke_role_response__unpack,
-                             etcdserverpb__auth_user_revoke_role_response__free_unpacked)
+    Etcdserverpb__AuthUserRevokeRoleResponse,
+    etcdserverpb__auth_user_revoke_role_response__unpack,
+    etcdserverpb__auth_user_revoke_role_response__free_unpacked, "user_revoke_role")
 
 /* Process role_get response - returns permissions */
 static void process_role_get_response(pTHX_ pending_call_t *pc) {
-    dSP;
+    BEGIN_RESPONSE_HANDLER(pc, "role_get");
 
-    if (pc->status != GRPC_STATUS_OK) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_
-                                  pc->status,
-                                  (const char *)GRPC_SLICE_START_PTR(pc->status_details),
-                                  GRPC_SLICE_LENGTH(pc->status_details),
-                                  "rpc")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    if (!pc->recv_buffer) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "No response received", 20, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_byte_buffer_reader reader;
-    if (!grpc_byte_buffer_reader_init(&reader, pc->recv_buffer)) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to read response buffer", 30, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_slice slice = grpc_byte_buffer_reader_readall(&reader);
-    grpc_byte_buffer_reader_destroy(&reader);
-
-    Etcdserverpb__AuthRoleGetResponse *resp = etcdserverpb__auth_role_get_response__unpack(
-        NULL,
-        GRPC_SLICE_LENGTH(slice),
-        GRPC_SLICE_START_PTR(slice)
-    );
-    grpc_slice_unref(slice);
-
-    if (!resp) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to parse response", 24, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
+    Etcdserverpb__AuthRoleGetResponse *resp;
+    UNPACK_RESPONSE(pc, resp, etcdserverpb__auth_role_get_response__unpack);
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
 
-    /* Build permissions array */
     AV *perms = newAV();
     for (size_t i = 0; i < resp->n_perm; i++) {
         Etcdserverpb__Permission *p = resp->perm[i];
@@ -1153,7 +1003,6 @@ static void process_role_get_response(pTHX_ pending_call_t *pc) {
         }
         hv_store(perm, "perm_type", 9, newSVpv(perm_type, 0), 0);
 
-        /* Handle NULL data pointer for bytes fields */
         if (p->key.data) {
             hv_store(perm, "key", 3, newSVpvn((char *)p->key.data, p->key.len), 0);
         }
@@ -1167,325 +1016,70 @@ static void process_role_get_response(pTHX_ pending_call_t *pc) {
 
     etcdserverpb__auth_role_get_response__free_unpacked(resp, NULL);
 
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    EXTEND(SP, 2);
-    PUSHs(sv_2mortal(newRV_noinc((SV *)result)));
-    PUSHs(&PL_sv_undef);
-    PUTBACK;
-    call_sv(pc->callback, G_DISCARD);
-    FREETMPS;
-    LEAVE;
+    CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
 /* Process role_list response - returns roles list */
 static void process_role_list_response(pTHX_ pending_call_t *pc) {
-    dSP;
+    BEGIN_RESPONSE_HANDLER(pc, "role_list");
 
-    if (pc->status != GRPC_STATUS_OK) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_
-                                  pc->status,
-                                  (const char *)GRPC_SLICE_START_PTR(pc->status_details),
-                                  GRPC_SLICE_LENGTH(pc->status_details),
-                                  "rpc")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    if (!pc->recv_buffer) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "No response received", 20, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_byte_buffer_reader reader;
-    if (!grpc_byte_buffer_reader_init(&reader, pc->recv_buffer)) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to read response buffer", 30, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_slice slice = grpc_byte_buffer_reader_readall(&reader);
-    grpc_byte_buffer_reader_destroy(&reader);
-
-    Etcdserverpb__AuthRoleListResponse *resp = etcdserverpb__auth_role_list_response__unpack(
-        NULL,
-        GRPC_SLICE_LENGTH(slice),
-        GRPC_SLICE_START_PTR(slice)
-    );
-    grpc_slice_unref(slice);
-
-    if (!resp) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to parse response", 24, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
+    Etcdserverpb__AuthRoleListResponse *resp;
+    UNPACK_RESPONSE(pc, resp, etcdserverpb__auth_role_list_response__unpack);
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
 
-    /* Build roles array */
     AV *roles = newAV();
     for (size_t i = 0; i < resp->n_roles; i++) {
-        /* Handle NULL string in repeated field */
         av_push(roles, resp->roles[i] ? newSVpv(resp->roles[i], 0) : newSVpvn("", 0));
     }
     hv_store(result, "roles", 5, newRV_noinc((SV *)roles), 0);
 
     etcdserverpb__auth_role_list_response__free_unpacked(resp, NULL);
 
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    EXTEND(SP, 2);
-    PUSHs(sv_2mortal(newRV_noinc((SV *)result)));
-    PUSHs(&PL_sv_undef);
-    PUTBACK;
-    call_sv(pc->callback, G_DISCARD);
-    FREETMPS;
-    LEAVE;
+    CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
 /* Process user_get response - returns roles assigned to user */
 static void process_user_get_response(pTHX_ pending_call_t *pc) {
-    dSP;
+    BEGIN_RESPONSE_HANDLER(pc, "user_get");
 
-    if (pc->status != GRPC_STATUS_OK) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_
-                                  pc->status,
-                                  (const char *)GRPC_SLICE_START_PTR(pc->status_details),
-                                  GRPC_SLICE_LENGTH(pc->status_details),
-                                  "rpc")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    if (!pc->recv_buffer) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "No response received", 20, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_byte_buffer_reader reader;
-    if (!grpc_byte_buffer_reader_init(&reader, pc->recv_buffer)) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to read response buffer", 30, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_slice slice = grpc_byte_buffer_reader_readall(&reader);
-    grpc_byte_buffer_reader_destroy(&reader);
-
-    Etcdserverpb__AuthUserGetResponse *resp = etcdserverpb__auth_user_get_response__unpack(
-        NULL,
-        GRPC_SLICE_LENGTH(slice),
-        GRPC_SLICE_START_PTR(slice)
-    );
-    grpc_slice_unref(slice);
-
-    if (!resp) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to parse response", 24, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
+    Etcdserverpb__AuthUserGetResponse *resp;
+    UNPACK_RESPONSE(pc, resp, etcdserverpb__auth_user_get_response__unpack);
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
 
-    /* Build roles array */
     AV *roles = newAV();
     for (size_t i = 0; i < resp->n_roles; i++) {
-        /* Handle NULL string in repeated field */
         av_push(roles, resp->roles[i] ? newSVpv(resp->roles[i], 0) : newSVpvn("", 0));
     }
     hv_store(result, "roles", 5, newRV_noinc((SV *)roles), 0);
 
     etcdserverpb__auth_user_get_response__free_unpacked(resp, NULL);
 
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    EXTEND(SP, 2);
-    PUSHs(sv_2mortal(newRV_noinc((SV *)result)));
-    PUSHs(&PL_sv_undef);
-    PUTBACK;
-    call_sv(pc->callback, G_DISCARD);
-    FREETMPS;
-    LEAVE;
+    CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
 /* Process user_list response - returns users list */
 static void process_user_list_response(pTHX_ pending_call_t *pc) {
-    dSP;
+    BEGIN_RESPONSE_HANDLER(pc, "user_list");
 
-    if (pc->status != GRPC_STATUS_OK) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_
-                                  pc->status,
-                                  (const char *)GRPC_SLICE_START_PTR(pc->status_details),
-                                  GRPC_SLICE_LENGTH(pc->status_details),
-                                  "rpc")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    if (!pc->recv_buffer) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "No response received", 20, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_byte_buffer_reader reader;
-    if (!grpc_byte_buffer_reader_init(&reader, pc->recv_buffer)) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to read response buffer", 30, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
-
-    grpc_slice slice = grpc_byte_buffer_reader_readall(&reader);
-    grpc_byte_buffer_reader_destroy(&reader);
-
-    Etcdserverpb__AuthUserListResponse *resp = etcdserverpb__auth_user_list_response__unpack(
-        NULL,
-        GRPC_SLICE_LENGTH(slice),
-        GRPC_SLICE_START_PTR(slice)
-    );
-    grpc_slice_unref(slice);
-
-    if (!resp) {
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL, \
-            "Failed to parse response", 24, "internal")));
-        PUTBACK;
-        call_sv(pc->callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
-        return;
-    }
+    Etcdserverpb__AuthUserListResponse *resp;
+    UNPACK_RESPONSE(pc, resp, etcdserverpb__auth_user_list_response__unpack);
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
 
-    /* Build users array */
     AV *users = newAV();
     for (size_t i = 0; i < resp->n_users; i++) {
-        /* Handle NULL string in repeated field */
         av_push(users, resp->users[i] ? newSVpv(resp->users[i], 0) : newSVpvn("", 0));
     }
     hv_store(result, "users", 5, newRV_noinc((SV *)users), 0);
 
     etcdserverpb__auth_user_list_response__free_unpacked(resp, NULL);
 
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    EXTEND(SP, 2);
-    PUSHs(sv_2mortal(newRV_noinc((SV *)result)));
-    PUSHs(&PL_sv_undef);
-    PUTBACK;
-    call_sv(pc->callback, G_DISCARD);
-    FREETMPS;
-    LEAVE;
+    CALL_SUCCESS_CALLBACK(pc->callback, result);
 }
 
 MODULE = EV::Etcd  PACKAGE = EV::Etcd  PREFIX = ev_etcd_
@@ -1496,8 +1090,6 @@ BOOT:
     I_EV_API("EV::Etcd");
     grpc_init();
     init_method_slices();
-    /* Seed random number generator for backoff jitter */
-    srand((unsigned int)(time(NULL) ^ getpid()));
 
 EV::Etcd
 ev_etcd_new(class, ...)
@@ -5091,12 +4683,24 @@ CODE:
 }
 
 void
-ev_etcd_election_observe(client, name, callback, ...)
+ev_etcd_election_observe(client, name, ...)
     EV::Etcd client
     SV *name
-    SV *callback
 CODE:
 {
+    /* Parse arguments: election_observe(name, [opts,] callback) */
+    SV *opts = NULL;
+    SV *callback;
+
+    if (items == 3) {
+        callback = ST(2);
+    } else if (items == 4) {
+        opts = ST(2);
+        callback = ST(3);
+    } else {
+        croak("Usage: $client->election_observe($name, [\\%%opts,] $callback)");
+    }
+
     VALIDATE_CALLBACK(callback);
 
     STRLEN name_len;
@@ -5104,14 +4708,11 @@ CODE:
     VALIDATE_KEY_SIZE(name_len);
 
     int auto_reconnect = 1;
-    if (items > 3) {
-        SV *opts_sv = ST(3);
-        if (SvROK(opts_sv) && SvTYPE(SvRV(opts_sv)) == SVt_PVHV) {
-            HV *opts = (HV *)SvRV(opts_sv);
-            SV **sv_ar = hv_fetch(opts, "auto_reconnect", 14, 0);
-            if (sv_ar && *sv_ar) {
-                auto_reconnect = SvTRUE(*sv_ar);
-            }
+    if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
+        HV *hv = (HV *)SvRV(opts);
+        SV **sv_ar = hv_fetch(hv, "auto_reconnect", 14, 0);
+        if (sv_ar && *sv_ar) {
+            auto_reconnect = SvTRUE(*sv_ar);
         }
     }
 

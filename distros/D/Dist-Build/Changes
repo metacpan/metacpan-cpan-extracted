@@ -1,5 +1,8 @@
 Revision history for Dist-Build
 
+0.027     2026-03-05 23:31:41+01:00 Europe/Brussels
+          - Rewrite to remove s///r construct for 5.10 compatibility
+
 0.026     2026-02-21 13:58:34+01:00 Europe/Brussels
           - Stop using filename helpers from ParseXS
           - chdir back at end of test for better cleanup

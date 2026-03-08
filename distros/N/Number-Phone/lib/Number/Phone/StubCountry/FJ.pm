@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153522;
+our $VERSION = 1.20260306161712;
 
 my $formatters = [
                 {
@@ -72,11 +72,11 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"67988", "Vanua\ Levu",
+"67965", "Coral\ Coast\/Sigatoka",
 "6793", "Suva\ City\/Nausori\/Korovou",
 "67967", "Nadi",
 "67985", "Vanua\ Levu",
-"67966", "Lautoka\/Ba\/Vatukoula\/Tavua\/Rakiraki",
-"67965", "Coral\ Coast\/Sigatoka",};
+"67966", "Lautoka\/Ba\/Vatukoula\/Tavua\/Rakiraki",};
 my $timezones = {
                '' => [
                        'Pacific/Fiji'

@@ -1,5 +1,5 @@
 package Marky::Controller::Db;
-$Marky::Controller::Db::VERSION = '0.0602';
+$Marky::Controller::Db::VERSION = '0.0604';
 #ABSTRACT: Marky::Controller::Db - Database controller for Marky
 
 use Mojo::Base 'Mojolicious::Controller';
@@ -55,7 +55,7 @@ Marky::Controller::Db - Marky::Controller::Db - Database controller for Marky
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 SYNOPSIS
 
@@ -99,7 +99,7 @@ Marky::Controller::Db - Database controller for Marky
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 AUTHOR
 

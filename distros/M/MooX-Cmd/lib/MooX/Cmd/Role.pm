@@ -1,9 +1,8 @@
 package MooX::Cmd::Role;
-
+# ABSTRACT: MooX cli app commands do this
+our $VERSION = '1.000';
 use strict;
 use warnings;
-
-our $VERSION = "0.017";
 
 use Moo::Role;
 
@@ -14,113 +13,23 @@ use Text::ParseWords 'shellwords';
 use Module::Pluggable::Object;
 
 use List::MoreUtils qw/first_index first_result/;
-use Scalar::Util qw/blessed/;
-use Params::Util qw/_ARRAY/;
+use Scalar::Util    qw/blessed/;
+use Params::Util    qw/_ARRAY/;
 
-=head1 NAME
-
-MooX::Cmd::Role - MooX cli app commands do this
-
-=head1 SYNOPSIS
-
-=head2 using role and want behavior as MooX::Cmd
-
-  package MyFoo;
-  
-  with MooX::Cmd::Role;
-  
-  sub _build_command_execute_from_new { 1 }
-
-  package main;
-
-  my $cmd = MyFoo->new_with_cmd;
-
-=head2 using role and don't execute immediately
-
-  package MyFoo;
-
-  with MooX::Cmd::Role;
-  use List::MoreUtils qw/ first_idx /;
-
-  sub _build_command_base { "MyFoo::Command" }
-
-  sub _build_command_execute_from_new { 0 }
-
-  sub execute {
-      my $self = shift;
-      my $chain_idx = first_idx { $self == $_ } @{$self->command_chain};
-      my $next_cmd = $self->command_chain->{$chain_idx+1};
-      $next_cmd->owner($self);
-      $next_cmd->execute;
-  }
-
-  package main;
-
-  my $cmd = MyFoo->new_with_cmd;
-  $cmd->command_chain->[-1]->run();
-
-=head2 explicit expression of some implicit stuff
-
-  package MyFoo;
-
-  with MooX::Cmd::Role;
-
-  sub _build_command_base { "MyFoo::Command" }
-
-  sub _build_command_execute_method_name { "run" }
-
-  sub _build_command_execute_from_new { 0 }
-
-  package main;
-
-  my $cmd = MyFoo->new_with_cmd;
-  $cmd->command_chain->[-1]->run();
-
-=head1 DESCRIPTION
-
-MooX::Cmd::Role is made for modern, flexible Moo style to tailor cli commands.
-
-=head1 ATTRIBUTES
-
-=head2 command_args
-
-ARRAY-REF of args on command line
-
-=cut
 
 has 'command_args' => (is => "ro");
 
-=head2 command_chain
-
-ARRAY-REF of commands lead to this instance
-
-=cut
 
 has 'command_chain' => (is => "ro");
 
-=head2 command_chain_end
-
-COMMAND accesses the finally detected command in chain
-
-=cut
 
 has 'command_chain_end' => (is => "lazy");
 
 sub _build_command_chain_end { $_[0]->command_chain->[-1] }
 
-=head2 command_name
-
-ARRAY-REF the name of the command lead to this command
-
-=cut
 
 has 'command_name' => (is => "ro");
 
-=head2 command_commands
-
-HASH-REF names of other commands 
-
-=cut
 
 has 'command_commands' => (is => "lazy");
 
@@ -146,73 +55,36 @@ sub _build_command_commands
     \%cmds;
 }
 
-=head2 command_base
-
-STRING base of command plugins
-
-=cut
 
 has command_base => (is => "lazy");
 
 sub _build_command_base { $_[0] . '::Cmd'; }
 
-=head2 command_execute_method_name
-
-STRING name of the method to invoke to execute a command, default "execute"
-
-=cut
 
 has command_execute_method_name => (is => "lazy");
 
 sub _build_command_execute_method_name { "execute" }
 
-=head2 command_execute_return_method_name
-
-STRING I have no clue what that is good for ...
-
-=cut
 
 has command_execute_return_method_name => (is => "lazy");
 
 sub _build_command_execute_return_method_name { "execute_return" }
 
-=head2 command_creation_method_name
-
-STRING name of constructor
-
-=cut
 
 has command_creation_method_name => (is => "lazy");
 
 sub _build_command_creation_method_name { "new_with_cmd" }
 
-=head2 command_creation_chain_methods
-
-ARRAY-REF names of methods to chain for creating object (from L</command_creation_method_name>)
-
-=cut
 
 has command_creation_chain_methods => (is => "lazy");
 
 sub _build_command_creation_chain_methods { ['new_with_options', 'new'] }
 
-=head2 command_execute_from_new
-
-BOOL true when constructor shall invoke L</command_execute_method_name>, false otherwise
-
-=cut
 
 has command_execute_from_new => (is => "lazy");
 
 sub _build_command_execute_from_new { 0 }
 
-=head1 METHODS
-
-=head2 new_with_cmd
-
-initializes by searching command line args for commands and invoke them
-
-=cut
 
 sub new_with_cmd { goto &_initialize_from_cmd; }
 
@@ -323,7 +195,7 @@ sub _initialize_from_cmd
             $cmd_plugin = $creation_method->($cmd);
             push @{$self->command_chain}, $cmd_plugin;
 
-            my $cemn = $cmd_plugin->can("command_execute_method_name");
+            my $cemn     = $cmd_plugin->can("command_execute_method_name");
             my $exec_fun = $cemn ? $cemn->() : $self->command_execute_method_name();
             $self->command_execute_from_new
               and $self->{$self->command_execute_return_method_name} =
@@ -340,25 +212,161 @@ sub _initialize_from_cmd
     return $self;
 }
 
-=head2 execute_return
-
-returns the content of $self->{execute_return}
-
-=cut
 
 # XXX should be an r/w attribute - can be renamed on loading ...
 sub execute_return { $_[0]->{execute_return} }
 
-=head1 LICENSE AND COPYRIGHT
+1;
 
-Copyright 2012-2013 Torsten Raudssus, Copyright 2013-2017 Jens Rehsack.
+__END__
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+=pod
 
-See L<http://dev.perl.org/licenses/> for more information.
+=encoding UTF-8
+
+=head1 NAME
+
+MooX::Cmd::Role - MooX cli app commands do this
+
+=head1 VERSION
+
+version 1.000
+
+=head1 SYNOPSIS
+
+=head2 using role and want behavior as MooX::Cmd
+
+  package MyFoo;
+
+  with MooX::Cmd::Role;
+
+  sub _build_command_execute_from_new { 1 }
+
+  package main;
+
+  my $cmd = MyFoo->new_with_cmd;
+
+=head2 using role and don't execute immediately
+
+  package MyFoo;
+
+  with MooX::Cmd::Role;
+  use List::MoreUtils qw/ first_idx /;
+
+  sub _build_command_base { "MyFoo::Command" }
+
+  sub _build_command_execute_from_new { 0 }
+
+  sub execute {
+      my $self = shift;
+      my $chain_idx = first_idx { $self == $_ } @{$self->command_chain};
+      my $next_cmd = $self->command_chain->{$chain_idx+1};
+      $next_cmd->owner($self);
+      $next_cmd->execute;
+  }
+
+  package main;
+
+  my $cmd = MyFoo->new_with_cmd;
+  $cmd->command_chain->[-1]->run();
+
+=head2 explicit expression of some implicit stuff
+
+  package MyFoo;
+
+  with MooX::Cmd::Role;
+
+  sub _build_command_base { "MyFoo::Command" }
+
+  sub _build_command_execute_method_name { "run" }
+
+  sub _build_command_execute_from_new { 0 }
+
+  package main;
+
+  my $cmd = MyFoo->new_with_cmd;
+  $cmd->command_chain->[-1]->run();
+
+=head1 DESCRIPTION
+
+MooX::Cmd::Role is made for modern, flexible Moo style to tailor cli commands.
+
+=head2 command_args
+
+ARRAY-REF of args on command line
+
+=head2 command_chain
+
+ARRAY-REF of commands lead to this instance
+
+=head2 command_chain_end
+
+COMMAND accesses the finally detected command in chain
+
+=head2 command_name
+
+ARRAY-REF the name of the command lead to this command
+
+=head2 command_commands
+
+HASH-REF names of other commands
+
+=head2 command_base
+
+STRING base of command plugins
+
+=head2 command_execute_method_name
+
+STRING name of the method to invoke to execute a command, default "execute"
+
+=head2 command_execute_return_method_name
+
+STRING name of the attribute for storing the return value of execute
+
+=head2 command_creation_method_name
+
+STRING name of constructor
+
+=head2 command_creation_chain_methods
+
+ARRAY-REF names of methods to chain for creating object (from L</command_creation_method_name>)
+
+=head2 command_execute_from_new
+
+BOOL true when constructor shall invoke L</command_execute_method_name>, false otherwise
+
+=head2 new_with_cmd
+
+initializes by searching command line args for commands and invoke them
+
+=head2 execute_return
+
+returns the content of $self->{execute_return}
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-moox-cmd/issues>.
+
+=head2 IRC
+
+Join C<#web-simple> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-1;

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumEndpointSlice;
 # ABSTRACT: Cilium endpoint slice for scalable endpoint tracking
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumendpointslices';
@@ -21,7 +21,7 @@ IO::K8s::Cilium::V2alpha1::CiliumEndpointSlice - Cilium endpoint slice for scala
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

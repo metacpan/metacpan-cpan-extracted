@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::KQueue 0.01;
+package Future::IO::Impl::KQueue 0.02;
 
 use v5.20;
 use warnings;
@@ -120,17 +120,12 @@ sub _tick ( $ )
             $kq->EV_SET( $e->[KQ_IDENT], EVFILT_WRITE, EV_DELETE );
          }
       }
-      elsif( $filter == EVFILT_SIGNAL ) {
-         my $signum = $e->[KQ_IDENT];
-         if( $signum == POSIX::SIGCHLD ) {
-            foreach my $pid ( keys %waitpids_by_pid ) {
-               next unless waitpid( $pid, POSIX::WNOHANG ) > 0;
-               my $wstatus = $?;
+      elsif( $filter == EVFILT_PROC ) {
+         my $pid = $e->[KQ_IDENT];
+         my $wstatus = $e->[KQ_DATA];
 
-               my $fs = delete $waitpids_by_pid{$pid};
-               $_->done( $wstatus ) for @$fs;
-            }
-         }
+         my $fs = delete $waitpids_by_pid{$pid};
+         $_->done( $wstatus ) for @$fs;
       }
       else {
          die "Oopsie event filter=$filter <@$e>";
@@ -191,14 +186,11 @@ sub poll ( $, $fh, $events )
    my $pollers = $pollers_by_refaddr{$refaddr} //= [];
 
    my $f = Future::IO::Impl::KQueue::_Future->new;
-   my $poller = Poller( $events, $f );
-
-   push @$pollers, $poller;
 
    defined( my $fileno = $fh->fileno ) or
       carp "Filehandle $fh lost its fileno (was closed?) during poll";
 
-   my $mask = 0;
+   my $mask = $events;
    $mask |= $_->events for ( $pollers_by_refaddr{$refaddr} // [] )->@*;
 
    my $got_epipe;
@@ -230,42 +222,37 @@ sub poll ( $, $fh, $events )
       # until the next call to _tick.
       push @deferred_epipe, $f;
    }
+   else {
+      push @$pollers, Poller( $events, $f );
+   }
 
    return $f;
 }
 
-# We can't use IO::KQueue's EVFILT_PROC here because of a small bug. KQueue.xs
-# defines the `fflags` field as u_short rather than u_int, which means it
-# truncates the `NOTE_EXIT` flag which we'd need to have access to.
-# I would report that upstream, but the repo is currently marked readonly and
-# seems abandoned. :(
-#
-# For now we'll just use the usual SIGCHLD wrapper trick from Ppoll.
-
-my $captured_sigchld;
-
 sub waitpid ( $, $pid )
 {
-   unless( $captured_sigchld ) {
-      $SIG{CHLD} and $SIG{CHLD} ne "IGNORE" and
-         warn "Future::IO::Impl::KQueue is replacing \$SIG{CHLD}";
-
-      kqueue();
-
-      $kq->EV_SET( POSIX::SIGCHLD, EVFILT_SIGNAL, EV_ADD );
-
-      $captured_sigchld = 1;
-   }
+   kqueue();
 
    my $f = Future::IO::Impl::KQueue::_Future->new;
 
-   if( waitpid( $pid, POSIX::WNOHANG ) > 0 ) {
-      my $wstatus = $?;
-      $f->done( $wstatus );
-      return $f;
+   push $waitpids_by_pid{$pid}->@*, $f;
+
+   my $got_esrch;
+   eval { $kq->EV_SET( $pid, EVFILT_PROC, EV_ADD, NOTE_EXIT ); 1 } or
+      ( $! == POSIX::ESRCH and ++$got_esrch ) or
+      die $@;
+
+   if( $got_esrch ) {
+      if( waitpid( $pid, POSIX::WNOHANG ) > 0 ) {
+         my $wstatus = $?;
+         $f->done( $wstatus );
+      }
+      else {
+         die "TODO: got ESRCH but wasn't able to waitpid";
+      }
    }
 
-   push $waitpids_by_pid{$pid}->@*, $f;
+   # TODO: on_cancel?
 
    return $f;
 }

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::ContainerResourceMetricStatus;
 # ABSTRACT: ContainerResourceMetricStatus indicates the current value of a resource metric known to Kubernetes, as specified in requests and limits, describing a single container in each pod in the current scale target (e.g. CPU or memory).  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the "pods" source.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s container => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Autoscaling::V2::ContainerResourceMetricStatus - ContainerResource
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 container
 

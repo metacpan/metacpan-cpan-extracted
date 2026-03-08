@@ -10,6 +10,7 @@ build_requires:
   MARC::File::XML: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Unicode::UTF8: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -40,9 +41,10 @@ requires:
   Mo::utils: 0.06
   Module::Pluggable: 0
   perl: 5.6.2
+  utf8: 0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/MARC-Validator/issues
   homepage: https://github.com/michal-josef-spacek/MARC-Validator
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Validator
-version: '0.10'
+version: '0.13'

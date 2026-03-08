@@ -1,5 +1,21 @@
 # Change Log
 
+## [2.0.0 - 2026-03-06]
+
+### Added
+
+- People can now have two parents. The module correctly finds the most recent
+  common ancestor through either parent's line, taking the shortest path.
+
+### Changed
+
+- The module now uses `Feature::Compat::Class` to provide better compatibility
+  across different Perl versions while retaining the modern `class` syntax
+
+### Tests
+
+- Added descriptive labels to all tests in `t/03-cousins.t`
+
 ## [1.0.2 - 2025-07-07]
 
 - Added: use v5.38

@@ -1,0 +1,13 @@
+unshift @INC, "\/tmp\/nvim\.mikkoi\/WW6qwl\/1224\/\.\.\/lib", "t\/lib", "lib", "local\/lib\/perl5",
+  "\/home\/mikkoi\/other\/own_github\/Pinto\/lib",
+  "\/home\/mikkoi\/other\/own_github\/Dist\-Zilla\-Plugin\-Test\-Perl\-Critic\/lib",
+  "\/home\/mikkoi\/other\/own_github\/dist\-zilla\-pluginbundle\-mikkoi\/lib",
+"\/home\/mikkoi\/other\/own_github\/perl\-dist\-zilla\-plugin\-authorsignaturetest\/Dist\-Zilla\-Plugin\-AuthorSignatureTest\-0\.03\/lib",
+  "\/home\/mikkoi\/other\/own_github\/Dist\-Zilla\-Plugin\-Signature\/Dist\-Zilla\-Plugin\-Signature\-1\.252700\/lib",
+  "\/home\/mikkoi\/other\/own_github\/Software\-License\/Software\-License\-0\.104008\/lib",
+  "\/home\/mikkoi\/other\/own_github\/software\-policies\/lib",
+  "\/home\/mikkoi\/other\/own_github\/dist\-zilla\-plugin\-software\-policies\/lib",
+  "\/home\/mikkoi\/\.anyenv\/envs\/plenv\/versions\/5\.10\.1\/lib\/perl5\/5\.10\.1\/x86_64\-linux",
+  "\/home\/mikkoi\/\.anyenv\/envs\/plenv\/versions\/5\.10\.1\/lib\/perl5\/5\.10\.1",
+  "\/home\/mikkoi\/\.anyenv\/envs\/plenv\/versions\/5\.10\.1\/lib\/perl5\/site_perl\/5\.10\.1\/x86_64\-linux",
+  "\/home\/mikkoi\/\.anyenv\/envs\/plenv\/versions\/5\.10\.1\/lib\/perl5\/site_perl\/5\.10\.1", "\."

@@ -5,7 +5,7 @@
     xmlns:udt="urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100">
   <rsm:ExchangedDocumentContext>
     <ram:BusinessProcessSpecifiedDocumentContextParameter>
-      <ram:ID schemeID=""></ram:ID>
+      <ram:ID schemeID="">BT-23</ram:ID>
     </ram:BusinessProcessSpecifiedDocumentContextParameter>
     <ram:GuidelineSpecifiedDocumentContextParameter>
       <ram:ID schemeID="">BT-24</ram:ID>
@@ -203,7 +203,7 @@
             <ram:CompleteNumber>BT-42</ram:CompleteNumber>
           </ram:TelephoneUniversalCommunication>
           <ram:EmailURIUniversalCommunication>
-            <ram:URIID schemeID=""></ram:URIID>
+            <ram:URIID schemeID="">BT-43</ram:URIID>
             <ram:CompleteNumber></ram:CompleteNumber>
           </ram:EmailURIUniversalCommunication>
         </ram:DefinedTradeContact>
@@ -217,7 +217,7 @@
           <ram:CountrySubDivisionName>BT-39</ram:CountrySubDivisionName>
         </ram:PostalTradeAddress>
         <ram:URIUniversalCommunication>
-          <ram:URIID schemeID=""></ram:URIID>
+          <ram:URIID schemeID="BT-34-1">BT-34</ram:URIID>
           <ram:CompleteNumber></ram:CompleteNumber>
         </ram:URIUniversalCommunication>
         <ram:SpecifiedTaxRegistration>
@@ -255,7 +255,7 @@
           <ram:CountrySubDivisionName></ram:CountrySubDivisionName>
         </ram:PostalTradeAddress>
         <ram:URIUniversalCommunication>
-          <ram:URIID schemeID=""></ram:URIID>
+          <ram:URIID schemeID="BT-49-1">BT-49</ram:URIID>
           <ram:CompleteNumber></ram:CompleteNumber>
         </ram:URIUniversalCommunication>
         <ram:SpecifiedTaxRegistration>

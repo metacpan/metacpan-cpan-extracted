@@ -1,4 +1,4 @@
-package Text::HTML::Turndown 0.10;
+package Text::HTML::Turndown 0.11;
 use 5.020;
 use Moo 2;
 use experimental 'signatures';
@@ -128,11 +128,26 @@ our %COMMONMARK_RULES = (
             )
         },
         replacement => sub( $content, $node, $options, $context ) {
-            return (
-                "\n\n    " .
-                ($node->firstNonBlankChild->textContent =~ s/\n/\n    /gr) .
-                "\n\n"
-            )
+            my @textChildren = $node->firstNonBlankChild->nonBlankChildNodes;
+            # Replace any <br> with a newline:
+            @textChildren = map {
+                if( $_->nodeType == 3 ) {
+                    $_->textContent =~ s/\n/\n    /gr
+                } elsif( $_->nodeType == 1 and uc $_->nodeName eq 'BR' ) {
+                    "\n    "
+                } else {
+                    # could be an HTML comment
+                    ''
+                }
+            } @textChildren;
+            my $res = (
+                join( '',
+                  "\n\n    ",
+                  @textChildren,
+                  "\n\n",
+                )
+            );
+            return $res;
         },
     },
 
@@ -150,11 +165,26 @@ our %COMMONMARK_RULES = (
             my $className = $node->firstChild->getAttribute('class') || '';
             (my $language) = ($className =~ /language-(\S+)/);
             $language //= '';
-            my $code = $node->firstChild->textContent;
+            my @textChildren = $node->firstNonBlankChild->nonBlankChildNodes;
+            # Replace any <br> with a newline:
+            @textChildren = map {
+                if( $_->nodeType == 3 ) {
+                    $_->textContent
+                } elsif( $_->nodeType == 1 and uc $_->nodeName eq 'BR' ) {
+                    "\n"
+                } else {
+                    # could be an HTML comment
+                    ''
+                }
+            } @textChildren;
+            if( @textChildren ) {
+                $textChildren[-1] =~ s/\n\z//;
+            }
+
             my $fenceChar = substr( $options->{fence}, 0, 1 );
             my $fenceSize = 3;
             my $fenceInCodeRegex = qr{^${fenceChar}{$fenceSize,}};
-            for ($code =~ /($fenceInCodeRegex)/gm) {
+            for ($content =~ /($fenceInCodeRegex)/gm) {
                 if (length( $_ ) >= $fenceSize) {
                     $fenceSize = length( $_ ) + 1
                 }
@@ -162,8 +192,9 @@ our %COMMONMARK_RULES = (
 
             my $fence = $fenceChar x $fenceSize;
             return (
-              "\n\n" . $fence . $language . "\n" .
-              ($code =~ s/\n$//r ) .
+              join '',
+              "\n\n" . $fence . $language . "\n",
+              @textChildren,
               "\n" . $fence . "\n\n"
             )
           }
@@ -275,7 +306,6 @@ our %COMMONMARK_RULES = (
         replacement => sub( $content, $node, $options, $context ) {
             if (!$content) { return '' };
             $content =~ s/\r?\n|\r/ /g;
-
             my $extraSpace = $content =~ /^`|^ .*?[^ ].* $|`$/ ? ' ' : '';
             my $delimiter = '`';
             my @matches = $content =~ /`+/gm;
@@ -474,13 +504,11 @@ sub replacementForNode( $self, $node, $context ) {
         $content =~s/^\s+//;
         $content =~s/\s+$//;
     }
-
     my $res = (
           $whitespace->{leading}
         . $rule->{replacement}->($content, $node, $self->options, $context)
         . $whitespace->{trailing}
     );
-
     $res
 }
 

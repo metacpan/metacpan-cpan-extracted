@@ -5,7 +5,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -101,7 +101,7 @@
    "provides" : {
       "Module::Build::Tiny" : {
          "file" : "lib/Module/Build/Tiny.pm",
-         "version" : "0.052"
+         "version" : "0.053"
       }
    },
    "release_status" : "stable",
@@ -115,8 +115,8 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/module-build-tiny"
       }
    },
-   "version" : "0.052",
-   "x_generated_by_perl" : "v5.40.1",
+   "version" : "0.053",
+   "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

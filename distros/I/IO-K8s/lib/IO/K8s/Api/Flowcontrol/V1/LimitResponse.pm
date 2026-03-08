@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1::LimitResponse;
 # ABSTRACT: LimitResponse defines how to handle requests that can not be executed right now.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s queuing => 'Flowcontrol::V1::QueuingConfiguration';
@@ -23,7 +23,7 @@ IO::K8s::Api::Flowcontrol::V1::LimitResponse - LimitResponse defines how to hand
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 queuing
 

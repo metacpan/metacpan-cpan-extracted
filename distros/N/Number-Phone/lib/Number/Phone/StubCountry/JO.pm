@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153523;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -243,41 +243,41 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"962265", "Irbid",
-"962323", "Karak",
-"962321", "Ma\’an",
-"96264", "Amman",
-"962622", "Greater\ Amman",
-"962320", "Aqaba",
-"962532", "Madaba",
-"962534", "Balqa",
-"962536", "Zarqa",
-"962325", "Maan",
-"962263", "Jarash",
+$areanames{en} = {"962531", "Madaba",
 "962537", "Zarqa",
 "96265", "Amman",
-"962538", "Zarqa",
-"962269", "Irbid",
-"96227", "Irbid",
-"9623262", "Southern\ Region",
-"962539", "Zarqa",
-"962268", "Ajloun",
-"96263", "Amman",
-"962531", "Madaba",
-"962533", "Balqa",
-"962266", "Mafraq",
-"962264", "Ajloun",
-"962262", "Mafraq",
-"962322", "Tafileh",
-"962620", "Amman",
-"962530", "Zarqa",
-"962625", "Amman",
-"962324", "Aqaba",
-"962535", "Balqa",
-"962327", "Karak",
 "962647", "Greater\ Amman",
+"962620", "Amman",
+"962535", "Balqa",
+"962539", "Zarqa",
+"962320", "Aqaba",
+"962536", "Zarqa",
+"962534", "Balqa",
+"962268", "Ajloun",
+"96264", "Amman",
+"962532", "Madaba",
+"962533", "Balqa",
 "9623260", "Tafileh",
-"962267", "Jarash",};
+"962264", "Ajloun",
+"962323", "Karak",
+"962266", "Mafraq",
+"962622", "Greater\ Amman",
+"962262", "Mafraq",
+"96263", "Amman",
+"962538", "Zarqa",
+"962263", "Jarash",
+"962324", "Aqaba",
+"962322", "Tafileh",
+"962625", "Amman",
+"962267", "Jarash",
+"962530", "Zarqa",
+"962269", "Irbid",
+"962265", "Irbid",
+"962321", "Ma\’an",
+"96227", "Irbid",
+"962327", "Karak",
+"9623262", "Southern\ Region",
+"962325", "Maan",};
 my $timezones = {
                '' => [
                        'Asia/Amman'

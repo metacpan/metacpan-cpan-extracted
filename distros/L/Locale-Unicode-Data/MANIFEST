@@ -11,6 +11,8 @@ README
 README.md
 scripts/cldr-schema.sql
 scripts/create_database.pl
+scripts/patches/cldr-48/supplemental/supplementalData.patch
+scripts/patches/README.md
 SIGNATURE
 t/00.load.t
 t/01.locale-data.t

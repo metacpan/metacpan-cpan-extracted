@@ -2,13 +2,65 @@
 # pod format but with special interpretation of some =for directives)
 
 package # hide from PAUSE/MetaCPAN
+  PDL::Doc::SelectJustPod;
+use strict;
+use warnings;
+use parent qw(Pod::Simple::JustPod);
+
+sub select_head1s {
+  my ($self, @titles) = @_;
+  $self->{interested_head1s}{$_} = 1 for @titles;
+  $self;
+}
+
+sub select_head2 {
+  my ($self, $name) = @_;
+  $self->{interested_head2} = $name;
+  $self;
+}
+
+sub end_head1 {
+  my $self = shift;
+  my ($text) = $self->{buffer} =~ /=head1 +(.*)\z/;
+  $self->{current_head1} = $text;
+  delete $self->{current_head2};
+  $self->SUPER::end_head1(@_);
+}
+
+sub end_head2 {
+  my $self = shift;
+  my ($text) = $self->{buffer} =~ /=head2 +(.*)\z/;
+  $self->{current_head2} = $text;
+  $self->SUPER::end_head2(@_);
+}
+
+sub start_for {
+  my $self = shift;
+  my ($attrs) = @_;
+  $self->{buffer} .= "@$attrs{qw(~really target)}\n\n";
+}
+
+sub emit {
+  my ($self) = @_;
+  print { $self->{output_fh} } $self->{buffer}, "\n\n" # superclass adds "" at start which inserts a space
+    if $self->{buffer} ne ''
+    and $self->{interested_head1s}{$self->{current_head1} // ''}
+    and ($self->{current_head2}//'') =~ /\b\Q$self->{interested_head2}\E\b/;
+  $self->{buffer} = "";
+}
+
+sub end_Document { # only override is not adding "=cut"
+  my $self = shift;
+  $self->emit;        # Make sure buffer gets flushed
+}
+
+package # hide from PAUSE/MetaCPAN
   PDL::PodParser;
 use strict;
 use warnings;
 use PDL::Core '';
-use Pod::Select;
-
-our @ISA = qw(Pod::Select);
+use Pod::Simple::PullParser;
+use parent qw(Pod::Text);
 
 our %Title = ('Example' => 'Example',
 	  'Ref'     => 'Reference',
@@ -18,79 +70,72 @@ our %Title = ('Example' => 'Example',
           'Bad'     => 'Bad value support',
 	 );
 
+my @h1s = qw(OPERATORS FUNCTIONS CONSTRUCTORS METHODS);
 sub new {
   my $class = shift;
   my $parser = $class->SUPER::new(@_);
-  bless $parser,$class; # just in case
-
-  $parser->select("METHODS|OPERATORS|CONSTRUCTORS|FUNCTIONS|NAME");
+  $parser->accept_targets(qw(bad example ref options sig usage));
+  @{ $parser->{interested_head1s} }{@h1s} = (1) x @h1s;
   $parser->{CURFUNC} = undef;
   $parser->{SYMHASH} = {};
-  $parser->{INBLOCK} = 0;
   $parser->{Mode} = "";
   $parser->{verbose} = 0;
   $parser->{NAME} = 'UNKNOWN';
-  return $parser;
+  $parser;
 }
 
-sub command {
-  my ($this,$cmd,$txt,$line_num,$pod_para) = @_;
-  $this->{Parmode} = 'Body';
+sub cmd_head1 {
+  my ($this, $attrs, $text) = @_;
+  $this->{Mode} = $text;
+  $this->{Parmode} = $text =~ /NAME/ ? 'NAME' : 'Body';
+  '';
+}
 
-  if ($cmd eq 'head1') {
-    $this->{Mode} = $txt;
-    $this->{Parmode} = 'Body';
-    $this->{Parmode} = 'NAME' if $txt =~ /NAME/;
-  } elsif ($this->{Mode} =~ /NAME/) {
-    # do nothing (was 'last' but that was probably a mistake)
-  } elsif ($cmd eq 'head2') {
-    return $this->SUPER::command($cmd,$txt,$line_num,$pod_para) if $txt =~ /^The\s/; # heuristic to deal with GSL::CDF descriptive =head2
-    # A function can have multiple names (ex: zeros and zeroes),
-    # so split at the commas
-    my @funcs = split(',',$txt);
-    # Remove parentheses (so myfunc and myfunc() both work)
-    my @names = map {$1 if m/\s*([^\s\(]+)\s*/} @funcs;
-    barf "error parsing function list '$txt'"
-      unless $#funcs == $#names;
-    # check for signatures
-    my $sym = $this->{SYMHASH};
-    for (@funcs) {
-      $sym->{$1}->{Module} = $this->{NAME} if m/\s*([^\s(]+)\s*/;
-      $sym->{$1}->{Sig} = $2  if m/\s*([^\s(]+)\s*\(\s*(.+)\s*\)\s*$/;
-    }
-    # make the first one the current function
-    $sym->{$names[0]}->{Names} = join(',',@names) if $#names > 0;
-    my $name = shift @names;
-    # Make the other names cross-reference the first name
-    $sym->{$_}->{Crossref} = $name for (@names);
-    my $sig = $sym->{$name}->{Sig};
-    # diagnostic output
-    print "\nFunction '".join(',',($name,@names))."'\n" if $this->{verbose};
-    print "\n\tSignature: $sig\n" if defined $sig && $this->{verbose};
-    $this->{CURFUNC} = $name;
-  } elsif ($cmd eq 'for') {
-    $this->check_for_mode($txt,$pod_para) if $cmd eq 'for';
+sub cmd_head2 {
+  my ($this, $attrs, $text) = @_;
+  return if $text =~ /^The\s/; # heuristic to deal with GSL::CDF descriptive =head2
+  return if !$this->{interested_head1s}{$this->{Mode} // ''};
+  # A function can have multiple names (ex: zeros and zeroes),
+  # so split at the commas
+  my @funcs = split ',', $text;
+  # Remove parentheses (so myfunc and myfunc() both work)
+  my @names = map {$1 if m/\s*([^\s\(]+)\s*/} @funcs;
+  barf "error parsing function list '$text'"
+    unless @funcs == @names;
+  # check for signatures
+  my $sym = $this->{SYMHASH};
+  for (@funcs) {
+    $sym->{$1}{Module} = $this->{NAME} if m/\s*([^\s(]+)\s*/;
+    $sym->{$1}{Sig} = $2               if m/\s*([^\s(]+)\s*\(\s*(.+)\s*\)\s*$/;
   }
-  local $this->{Parmode} = 'Body';
-  $this->SUPER::command($cmd,$txt,$line_num,$pod_para);
+  # make the first one the current function
+  $sym->{$names[0]}{Names} = join(',',@names) if $#names > 0;
+  my $name = shift @names;
+  # Make the other names cross-reference the first name
+  $sym->{$_}{Crossref} = $name for @names;
+  my $sig = $sym->{$name}{Sig};
+  # diagnostic output
+  print "\nFunction '".join(',',($name,@names))."'\n" if $this->{verbose};
+  print "\n\tSignature: $sig\n" if defined $sig && $this->{verbose};
+  $this->{CURFUNC} = $name;
 }
 
-sub check_for_mode {
-  my ($this,$txt,$pod_para) = @_;
-  if ($txt =~ /^(sig|example|ref|opt|usage|bad|body)/i) {
-    $this->{Parmode} = ucfirst lc $1;
-    print "switched now to '$1' mode\n" if $this->{VERBOSE};
-    print "\n\t$Title{$this->{Parmode}}\n"
-      unless $this->{Parmode} =~ /Body/ || !$this->{verbose};
-  }
+sub cmd_for {
+  my ($this, $attrs, $text) = @_;
+  return if !$this->{interested_head1s}{$this->{Mode} // ''};
+  my $tgt = $attrs->{target};
+  $tgt = 'opt' if $tgt eq 'options';
+  $this->{Parmode} = ucfirst lc $tgt;
+  print "switched now to '$tgt' mode\n" if $this->{verbose};
+  print "\n\t$Title{$this->{Parmode}}\n"
+    if $this->{Parmode} !~ /Body/ && $this->{verbose};
+  '';
 }
 
-sub textblock {
-  my $this = shift;
-  my $txt = shift;
-  $this->checkmode($txt);
-  local $this->{INBLOCK} = 1;
-  $this->SUPER::textblock($txt,@_);
+sub cmd_para {
+  my ($this, $attrs, $text) = @_;
+  return if $this->{Mode} ne 'NAME' and !$this->{interested_head1s}{$this->{Mode} // ''};
+  $this->checkmode($text);
   $this->{Parmode} = 'Body'; # and reset parmode
 }
 
@@ -102,25 +147,22 @@ sub checkmode {
     $this->{Parmode} = 'Body';
     return;
   }
-  unless ($this->{Parmode} =~ /Body/ || $this->{INBLOCK}) {
+  unless ($this->{Parmode} =~ /Body/) {
     my $func = $this->{CURFUNC};
     die "no function defined\n" unless defined $func;
-    local $this->{INBLOCK} = 1; # can interpolate call textblock?
-    my $itxt = $verbatim ? $txt : $this->interpolate($txt);
-    $this->{SYMHASH}->{$func}->{$this->{Parmode}} .=
-      $this->trim($itxt,$verbatim);
+    $this->{SYMHASH}{$func}{$this->{Parmode}} .=
+      $this->trim($txt,$verbatim);
     my $cr = ($verbatim && $this->{Parmode} ne 'Sig') ? "\n" : "";
-    my $out = "\n\t\t$cr".$this->trim($itxt,$verbatim);
+    my $out = "\n\t\t$cr".$this->trim($txt,$verbatim);
     print "$out\n$cr" if $this->{verbose};
   }
   $this->{Parmode} = 'Body';
 }
 
-sub verbatim {
-  my $this = shift;
-  my $txt = shift;
-  $this->checkmode($txt,1);
-  $this->SUPER::verbatim($txt,@_);
+sub cmd_verbatim {
+  my ($this, $attrs, $text) = @_;
+  return if !$this->{interested_head1s}{$this->{Mode} // ''};
+  $this->checkmode($text,1);
 }
 
 # this needs improvement
@@ -132,11 +174,9 @@ sub trim {
   $txt =~ s/(signature|usage):\s*//i if $this->{Parmode} eq 'Sig' ||
 			   $this->{Parmode} eq 'Usage';
   if ($this->{Parmode} eq 'Sig') {
-
     $txt =~ s/^\s*//;
     $txt =~ s/\s*$//;
     while( $txt =~ s/^\((.*)\)$/$1/ ) {}; # Strip BALANCED brackets
-
   }
   for (split "\n", $txt) {
     s/^\s*(.*)\s*$/$1/ unless $verbatim;
@@ -146,7 +186,6 @@ sub trim {
   chomp $ntxt;
   return $ntxt;
 }
-
 
 =head1 NAME
 
@@ -211,9 +250,12 @@ Individual functions or methods in these section are introduced by
 where signature is the argumentlist for a PP defined function as
 explained in L<PDL::PP>. Generally, PDL documentation is in valid POD
 format (see L<perlpod>) but uses the C<=for> directive in a
-special way. The C<=for> directive is used to flag to the PDL Pod
+special (and non-conformant) way. The C<=for> directive is used to
+flag to the PDL Pod
 parser that information is following that will be used to generate
-online help.
+online help. In the POD standard, C<=for> is used to provide
+information in I<that> paragraph. PDL uses it to signal information
+is in the I<following> paragraph.
 
 The PDL Pod parser recognises the following C<=for> directives:
 
@@ -245,7 +287,7 @@ function, e.g.,
 
       wpic($pdl,$filename[,{ options... }])
 
-=item Opt
+=item Options
 
 lists options for the current function, e.g.,
 
@@ -382,8 +424,8 @@ maintenance of this documentation for such functions the 'Doc' field
 has been introduced into the definition of C<pp_def> (see again L<PDL::PP>)
 which will take care that name and signature of the so defined function
 are documented in this way (for examples of this usage see, for example,
-the PDL::Slices module, especially F<slices.pd> and the resulting
-F<Slices.pm>). Similarly, the 'BadDoc' field provides a means of
+L<PDL::Slices>.
+Similarly, the 'BadDoc' field provides a means of
 specifying information on how the routine handles the presence of
 bad values: this will be automatically created if
 C<BadDoc> is not supplied, or set to C<undef>.
@@ -416,10 +458,11 @@ use File::Basename;
 use File::Spec::Functions qw(file_name_is_absolute abs2rel rel2abs catdir catfile);
 use Cwd (); # to help Debian packaging
 use Config;
+use Encode;
 
 our $pager = $ENV{PERLDOC_PAGER} // $ENV{PAGER} // $Config{pager};
 
-=head1 INSTANCE METHODS
+=head1 METHODS
 
 =head2 new
 
@@ -433,7 +476,24 @@ sub new {
   $this->{File} = [@files];
   $this->{Scanned} = [];
   $this->{Outfile} = $files[0];
-  return $this;
+  $this;
+}
+
+=head2 new_from_hash
+
+  $onlinedc = PDL::Doc->new_from_hash(\%hash);
+
+The hash must conform to the 3-level hash format.
+
+=cut
+
+sub new_from_hash {
+  my ($type, $hash) = @_;
+  my $this = bless {},$type;
+  $this->{File} = [];
+  $this->{Scanned} = [];
+  $this->{SYMS} = $hash;
+  $this;
 }
 
 =head2 addfiles
@@ -469,15 +529,8 @@ sub ensuredb {
   my ($this) = @_;
   while (my $fi = pop @{$this->{File}}) {
     open my $fh, $fi or barf "can't open database $fi, scan docs first";
-    binmode $fh;
-    my ($plen,$txt);
-    while (read $fh, $plen,2) {
-      my ($len) = unpack "S", $plen;
-      read $fh, $txt, $len;
-      my ($sym, $module, @a) = split chr(0), $txt;
-      push @a, "" if @a % 2; # Add null string at end if necessary -- solves bug with missing REF section.
-      $this->{SYMS}{$sym}{$module} = { @a, Dbfile => $fi }; # keep the origin pdldoc.db path
-    }
+    my $got_hash = decodedb($fh, $fi);
+    merge_hash($this->{SYMS} ||= {}, $got_hash);
     push @{$this->{Scanned}}, $fi;
   }
   return $this->{SYMS};
@@ -494,21 +547,8 @@ sub savedb {
   my ($this) = @_;
   my $hash = $this->ensuredb;
   open my $fh, '>', $this->{Outfile} or barf "can't write to symdb $this->{Outfile}: $!";
-  binmode $fh;
-  while (my ($name,$mods_hash) = each %$hash) {
-    next if 0 == scalar(%$mods_hash);
-    while (my ($module,$val) = each %$mods_hash) {
-      my $fi = $val->{File};
-      $val->{File} = abs2rel($fi, dirname($this->{Outfile}))
-        #store paths to *.pm files relative to pdldoc.db
-        if file_name_is_absolute($fi) && -f $fi;
-      delete $val->{Dbfile}; # no need to store Dbfile
-      my $txt = join(chr(0),$name,$module,%$val);
-      print $fh pack("S",length($txt)).$txt;
-    }
-  }
+  encodedb($hash, $fh, dirname($this->{Outfile}));
 }
-
 
 =head2 gethash
 
@@ -528,17 +568,17 @@ The symhash is a multiply nested hash ref with the following structure:
                   Sig    => 'signature string',
                   Bad    => 'bad documentation string',
                   ...
-                  },
              },
+     },
      function_name => {
              module::name => {
                   Module => 'module::name',
                   Sig    => 'signature string',
                   Bad    => 'bad documentation string',
                   ...
-                  },
              },
- }
+     },
+ };
 
 The three-layer structure is designed to allow the symhash (and the
 underlying database) to handle functions that have the same name but
@@ -612,17 +652,18 @@ sub search {
   $pattern = $this->checkregex($pattern);
 
   while (my ($name,$mods_hash) = each %$hash) {
-      while (my ($module,$val) = each %$mods_hash) {
-	FIELD: for (@$fields) {
-	    if ($_ eq 'Name' and $name =~ /$pattern/i
-		or defined $val->{$_} and $val->{$_} =~ /$pattern/i) {
-		$val = $hash->{$val->{Crossref}}->{$module} #we're going to assume that any Crossref'd documentation is also in this module
-		if defined $val->{Crossref} && defined $hash->{$val->{Crossref}}->{$module};
-		push @match, [$name,$module,$val];
-		last FIELD;
-	    }
-	}
+    while (my ($module,$val) = each %$mods_hash) {
+      FIELD: for (@$fields) {
+        if ($_ eq 'Name' and $name =~ /$pattern/i
+            or defined $val->{$_} and $val->{$_} =~ /$pattern/i
+        ) {
+          $val = $hash->{$val->{Crossref}}{$module} #we're going to assume that any Crossref'd documentation is also in this module
+            if defined $val->{Crossref} && defined $hash->{$val->{Crossref}}{$module};
+          push @match, [$name,$module,$val];
+          last FIELD;
+        }
       }
+    }
   }
   @match = sort {$a->[0] cmp $b->[0]} @match if (@match && $sort);
   return @match;
@@ -660,63 +701,13 @@ sub scan {
   barf "can't find file '$file'" unless -f $file;
   $file = Cwd::abs_path($file); # help Debian packaging
   $verbose = 0 unless defined $verbose;
-
-  open my $infile, '<', $file;
-  # XXXX convert to absolute path
-  # my $outfile = '/tmp/'.basename($file).'.pod';
-  open my $outfile, '>', \(my $outfile_text);
-
-  # Handle RPM etc. case where we are building away from the final
-  # location. Alright it's a hack - KGB
+  my $text = do { open my $infile, '<', $file or die "$file: $!"; local $/; <$infile> };
+  # Handle RPM etc. case where we are building away from the final location
   my $file2 = $file;
   $file2 =~ s/^$ENV{BUILDROOTPREFIX}// if $ENV{BUILDROOTPREFIX};
-
-  my $parser = PDL::PodParser->new;
-  $parser->{verbose} = $verbose;
-  eval { $parser->parse_from_filehandle($infile,$outfile) };
-  warn "cannot parse '$file' ($@)" if $@ and $@ ne "no function defined\n";
-
-  my $hash = $this->{SYMS} ||= {};
-  my $n = 0;
-  $_->{File} = $file2, $n++ for values %{ $parser->{SYMHASH} };
-  while (my ($key,$val) = each %{ $parser->{SYMHASH} }) {
-    #set up the 3-layer hash/database structure: $hash->{funcname}->{PDL::SomeModule} = $val
-    if (defined($val->{Module})) {
-	$hash->{$key}{$val->{Module}} = $val;
-    } else {
-	warn "no Module for $key in $file2\n";
-    }
-  }
-
-  # KGB pass2 - scan for module name and function
-  # alright I admit this is kludgy but it works
-  # and one can now find modules with 'apropos'
-
-  open $infile, '<', $file;
-  $outfile_text = '';
-  $parser = PDL::PodParser->new;
-  $parser->select('NAME');
-  eval { $parser->parse_from_filehandle($infile,$outfile) };
-  warn "cannot parse '$file'" if $@;
-
-  my @namelines = split("\n",$outfile_text);
-  my ($name,$does);
-  for (@namelines) {
-     if (/^(PDL) (-) (.*)/ or  /^\s*(Inline::Pdlpp)\s*(-*)?\s*(.*)\s*$/ or /\s*(PDL::[\w:]*)\s*(-*)?\s*(.*)\s*$/) {
-	$name = $1; $does = $3;
-     }
-     if (/^\s*([a-z][a-z0-9]*) (-+) (.*)/) { # lowercase shell script name
-       $name = $1; $does = $3;
-       ($name,$does) = (undef,undef) unless $does =~ /shell|script/i;
-     }
-   }
-   $does = 'Hmmm ????' if $does and $does =~ /^\s*$/;
-   my $type = ($file =~ /\.pod$/ ?
-	       ($does =~ /shell|script/i && $name =~ /^[a-z][a-z0-9]*$/) ? 'Script:'
-	       : 'Manual:'
-	       : 'Module:');
-   $hash->{$name}{$name} = {Ref=>"$type $does",File=>$file2} if $name and $name !~ /^\s*$/;
-   return $n;
+  my $mod_hash = scantext($text, $file2, $verbose);
+  merge_hash($this->{SYMS} ||= {}, $mod_hash);
+  scalar values %$mod_hash; # how many functions found
 }
 
 =head2 scantree
@@ -734,14 +725,21 @@ sub scantree {
   print "Scanning $dir ... \n\n";
   my $ntot = 0;
   my $sub = sub {
-    return if $File::Find::name !~ /\.(?:pm|pod)$/;
+    return if -d $File::Find::name;
+    return if
+      $File::Find::dir !~ /script$/ and
+      $File::Find::name !~ /\.(?:pm|pod)$/;
     return if $File::Find::name =~ /(?:Index\.pod|PP\.pm)$/ or
       $File::Find::dir =~ m#/PP#;
     printf "%-20s", $_.'...';
     $ntot += my $n = $this->scan($File::Find::name,$verbose);
     print "\t$n functions\n";
   };
-  File::Find::find($sub,$dir);
+  File::Find::find({
+    no_chdir => 1,
+    wanted => $sub,
+    preprocess => sub { sort @_ }
+  }, $dir);
   print "\nfound $ntot functions\n";
   $ntot;
 }
@@ -770,7 +768,114 @@ sub funcdocs {
 
 =head1 FUNCTIONS
 
+=head2 decodedb
+
+  $hash = decodedb($fh, $filename);
+
+Decode the 3-level hash out of a saved PDL::Doc database.
+
 =cut
+
+sub decodedb {
+  my ($fh, $filename) = @_;
+  binmode $fh;
+  my %hash;
+  while (read $fh, my $plen, 2) {
+    my ($len) = unpack "v", $plen;
+    read $fh, my($txt), $len;
+    $txt = Encode::decode('UTF-8', $txt);
+    my ($sym, $module, @a) = split chr(0), $txt;
+    push @a, "" if @a % 2; # Add null string at end if necessary -- solves bug with missing REF section.
+    $hash{$sym}{$module} = { @a, Dbfile => $filename }; # keep the origin pdldoc.db path
+  }
+  \%hash;
+}
+
+=head2 merge_hash
+
+  merge_hash(\%pdldoc_into, \%pdldoc_from); # for 3-level hash only
+
+Merge a 3-level PDL::Doc hash into another one.
+
+=cut
+
+sub merge_hash {
+  my ($into, $from) = @_;
+  for my $func (keys %$from) {
+    my $val = $from->{$func};
+    # copy the 3-layer hash/database structure: $into->{funcname}{'PDL::SomeModule'} = {Ref=>...}
+    for my $func_mod (keys %$val) {
+      $into->{$func}{$func_mod} = $val->{$func_mod};
+    }
+  }
+}
+
+=head2 encodedb
+
+  encodedb($hash, $fh, $outdir);
+
+=cut
+
+sub encodedb {
+  my ($hash, $fh, $outdir) = @_;
+  binmode $fh;
+  for my $name (sort keys %$hash) {
+    my $mods_hash = $hash->{$name};
+    for my $module (sort keys %$mods_hash) {
+      my $val = $mods_hash->{$module};
+      my $fi = $val->{File};
+      $val->{File} = abs2rel($fi, $outdir)
+        #store paths to *.pm files relative to pdldoc.db
+        if file_name_is_absolute($fi) && -f $fi;
+      delete $val->{Dbfile}; # no need to store Dbfile
+      my $txt = Encode::encode('UTF-8', join chr(0),$name,$module,map +($_=>$val->{$_}), sort keys %$val);
+      print $fh pack("v",length($txt)).$txt;
+    }
+  }
+}
+
+=head2 scantext
+
+  $hash = scantext($module_text, $filename, $verbose);
+
+Scan a single string (intended to be the contents of a file),
+returning a hash of the functions found therein.
+
+=cut
+
+sub scantext {
+  my ($text, $filename, $verbose) = @_;
+  my $parser = PDL::PodParser->new;
+  $parser->{verbose} = $verbose;
+  open my $outfile, '>', \(my $outfile_text);
+  $parser->output_fh($outfile);
+  eval { $parser->parse_string_document($text) };
+  warn "cannot parse: $@" if $@ and $@ ne "no function defined\n";
+  my %hash;
+  $_->{File} = $filename for values %{ $parser->{SYMHASH} };
+  for my $key (sort keys %{ $parser->{SYMHASH} }) {
+    my $val = $parser->{SYMHASH}{$key};
+    #set up the 3-layer hash/database structure: $hash{funcname}{'PDL::SomeModule'} = $val
+    if (defined($val->{Module})) {
+      $hash{$key}{$val->{Module}} = $val;
+    } else {
+      warn "no Module for $key in $filename\n";
+    }
+  }
+  # pass2 - scan for module name and function
+  $parser = Pod::Simple::PullParser->new;
+  $parser->set_source(\$text);
+  my $title = eval { $parser->get_title };
+  warn("cannot parse '$filename'"), return \%hash if $@;
+  my ($name,$does) = split /\s*-+\s*/, $title, 2;
+  $does = 'Hmmm ????' if $does and $does =~ /^\s*$/;
+  my $type =
+    $filename =~ /script/ ? 'Script:' :
+    $filename =~ /\.pod$/ ? 'Manual:' :
+      'Module:';
+  $hash{$name}{$name} = {Ref=>"$type $does",File=>$filename} if $name and $name !~ /^\s*$/;
+  \%hash;
+}
 
 sub funcdocs_fromfile {
   my ($func,$file) = @_;
@@ -784,24 +889,13 @@ sub funcdocs_fromfile {
   print $out "Docs from $file\n\n";
 }
 
-sub extrdoc {
-  my ($func,$file) = @_;
-  open my $out, '>', \(my $out_text);
-  funcdocs_fromfile($func,$file,$out);
-  return $out_text;
-}
-
 sub getfuncdocs {
   my ($func,$in,$out) = @_;
-  my $parser = Pod::Select->new;
-#  $parser->select("\\(METHODS\\|OPERATORS\\|CONSTRUCTORS\\|FUNCTIONS\\|METHODS\\)/$func(\\(.*\\)*\\s*");
-  foreach my $foo(qw/FUNCTIONS OPERATORS CONSTRUCTORS METHODS/) {
-      seek $in,0,0;
-      $parser->select("$foo/(.*,\\s+)*$func(\\(.*\\))*(\\s*|,\\s+.*)");
-      $parser->parse_from_filehandle($in,$out);
-  }
+  my $parser = PDL::Doc::SelectJustPod->new;
+  $parser->select_head1s(qw(OPERATORS FUNCTIONS CONSTRUCTORS METHODS));
+  $parser->select_head2($func);
+  $parser->parse_from_file($in,$out);
 }
-
 
 =head2 add_module
 
@@ -878,10 +972,10 @@ own code.
  # Print the reference line for zeroes:
  print map{$_->{Ref}} values %{$pdldoc->gethash->{zeroes}};
  # Or, if you remember that zeroes is in PDL::Core:
- print $pdldoc->gethash->{zeroes}->{PDL::Core}->{Ref};
+ print $pdldoc->gethash->{zeroes}{'PDL::Core'}{Ref};
 
  # Get info for all the functions whose examples use zeroes
- my @entries = $pdldoc->search('zeroes','Example',1);
+ my @entries = $pdldoc->search('zeroes','Example',1,1);
 
  # All the functions that use zeroes in their example:
  print "Functions that use 'zeroes' in their examples include:\n";
@@ -908,12 +1002,12 @@ own code.
 
 =head2 Finding Modules
 
-How can you tell if you've gotten a module for one of your entries?
+How can you tell if you've got a module for one of your entries?
 The Ref entry will begin with 'Module:' if it's a module. In code:
 
  # Prints:
  #  Module: fundamental PDL functionality and vectorization/broadcasting
- print $pdldoc->gethash->{'PDL::Core'}->{'PDL::Core'}->{Ref}, "\n"
+ print $pdldoc->gethash->{'PDL::Core'}{'PDL::Core'}{Ref}, "\n"
 
 =head1 BUGS
 

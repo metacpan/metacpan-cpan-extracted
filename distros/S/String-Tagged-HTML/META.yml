@@ -16,11 +16,11 @@ name: String-Tagged-HTML
 provides:
   String::Tagged::HTML:
     file: lib/String/Tagged/HTML.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   String::Tagged: '0.20'
-  perl: '5.014'
+  perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

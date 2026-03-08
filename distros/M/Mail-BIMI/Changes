@@ -1,3 +1,6 @@
+3.20260302 2026-03-03 Australia/Melbourne
+  - CA: Updated the CA list to include ssl.com
+
 3.20260203 2026-02-04 Australia/Melbourne
   - VMC: Improved parser for X509 Subject lines which should silence some warnings
     when the old parser could not properly parse a Subject string.

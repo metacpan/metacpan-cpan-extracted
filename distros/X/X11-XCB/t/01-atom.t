@@ -1,7 +1,7 @@
 #!perl
 # vim:ts=4:sw=4:expandtab
 
-use Test::More tests => 9;
+use Test::More tests => 11;
 use Test::Deep;
 use Test::Exception;
 use X11::XCB qw(:all);
@@ -16,7 +16,7 @@ my $x;
 SKIP: {
     eval { $x = X11::XCB::Connection->new; };
 
-    skip "Could not setup X11 connection", 8 if $@ or $x->has_error();
+    skip "Could not setup X11 connection", 10 if $@ or $x->has_error();
 
     my $atom = $x->atom(name => 'PRIMARY');
 
@@ -42,6 +42,13 @@ SKIP: {
     isa_ok($other_invalid, 'X11::XCB::Atom');
 
     ok(!$other_invalid->exists, 'Fresh invalid atom does not exist');
+
+    # We also should be able to create likely non-existent atom explicitly
+    my $created = $x->atom(name => 'this_atom_should_exist', create => 1);
+
+    isa_ok($created, 'X11::XCB::Atom');
+
+    ok($created->exists, 'Non-existent atom created');
 }
 
 diag( "Testing X11::XCB, Perl $], $^X" );

@@ -1,5 +1,5 @@
 package File::StatX;
-$File::StatX::VERSION = '0.003';
+$File::StatX::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ File::StatX - StatX for Perl
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

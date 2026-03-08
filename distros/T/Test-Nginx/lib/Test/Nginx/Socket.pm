@@ -6,7 +6,7 @@ use lib 'inc';
 use v5.10.1;
 use Test::Base -Base;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 use POSIX qw( SIGQUIT SIGKILL SIGTERM SIGHUP );
 use Encode;
@@ -22,6 +22,7 @@ use Digest::SHA ();
 use POSIX ":sys_wait_h";
 
 use Test::Nginx::Util;
+use JSON::PP;
 
 #use Smart::Comments::JSON '###';
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
@@ -38,7 +39,7 @@ our @EXPORT = qw( env_to_nginx is_str plan run_tests run_test
   server_name
   server_addr server_root html_dir server_port server_port_for_client
   timeout no_nginx_manager check_accum_error_log
-  add_block_preprocessor bail_out add_cleanup_handler
+  add_block_preprocessor bail_out add_test_cleanup_handler add_cleanup_handler
   add_response_body_check
 );
 
@@ -379,6 +380,8 @@ sub get_req_from_block ($) {
             my $i = 0;
             my $prq = "";
             for my $request (@$reqs) {
+                $request = expand_env_in_text $request, $name, $Test::Nginx::Util::RandPorts;
+
                 my $conn_type;
                 if ($i == @$reqs - 1) {
                     $conn_type = 'close';
@@ -1191,6 +1194,8 @@ sub check_error_log ($$$$) {
             bail_out("$name - No --- grep_error_log_out defined but --- grep_error_log is defined");
         }
 
+        $expected = expand_env_in_text $expected, $name, $Test::Nginx::Util::RandPorts;
+
         #warn "ref grep error log: ", ref $expected;
 
         if (ref $expected && ref $expected eq 'ARRAY') {
@@ -1432,18 +1437,56 @@ sub check_shutdown_error_log ($$) {
     my $lines;
 
     my $pats = $block->shutdown_error_log;
+    if (defined $pats) {
+        if (!ref $pats) {
+            chomp $pats;
+            my @lines = split /\n+/, $pats;
+            $pats = \@lines;
 
-    if (!ref $pats) {
-        chomp $pats;
-        my @lines = split /\n+/, $pats;
-        $pats = \@lines;
+        } elsif (ref $pats eq 'Regexp') {
+            $pats = [$pats];
 
-    } elsif (ref $pats eq 'Regexp') {
-        $pats = [$pats];
+        } else {
+            my @clone = @$pats;
+            $pats = \@clone;
+        }
 
-    } else {
-        my @clone = @$pats;
-        $pats = \@clone;
+        $lines ||= error_log_data();
+        #warn "error log data: ", join "\n", @$lines;
+        for my $line (@$lines) {
+            for my $pat (@$pats) {
+                next if !defined $pat;
+
+                if (ref $pat && $line =~ /$pat/ || $line =~ /\Q$pat\E/) {
+                    SKIP: {
+                        skip "$name - shutdown_error_log - tests skipped due to dry_run", 1 if $dry_run;
+                        pass("$name - pattern \"$pat\" matches a line in error.log");
+                    }
+                    undef $pat;
+                }
+            }
+        }
+
+        for my $pat (@$pats) {
+            if (defined $pat) {
+                SKIP: {
+                    skip "$name - shutdown_error_log - tests skipped due to dry_run", 1 if $dry_run;
+                    fail("$name - pattern \"$pat\" should match a line in error.log");
+                    #die join("", @$lines);
+                }
+            }
+        }
+
+        for my $line (@$lines) {
+            #warn "test $line\n";
+            if ($line =~ /\bAssertion .*? failed\.$/) {
+                my $tb = Test::More->builder;
+                $tb->no_ending(1);
+
+                chomp $line;
+                fail("$name - $line");
+            }
+        }
     }
 
     if (defined $block->no_shutdown_error_log) {
@@ -1498,43 +1541,6 @@ sub check_shutdown_error_log ($$) {
                     pass("$name - pattern \"$p\" does not match a line in error.log");
                 }
             }
-        }
-    }
-
-    $lines ||= error_log_data();
-    #warn "error log data: ", join "\n", @$lines;
-    for my $line (@$lines) {
-        for my $pat (@$pats) {
-            next if !defined $pat;
-
-            if (ref $pat && $line =~ /$pat/ || $line =~ /\Q$pat\E/) {
-                SKIP: {
-                    skip "$name - shutdown_error_log - tests skipped due to dry_run", 1 if $dry_run;
-                    pass("$name - pattern \"$pat\" matches a line in error.log");
-                }
-                undef $pat;
-            }
-        }
-    }
-
-    for my $pat (@$pats) {
-        if (defined $pat) {
-            SKIP: {
-                skip "$name - shutdown_error_log - tests skipped due to dry_run", 1 if $dry_run;
-                fail("$name - pattern \"$pat\" should match a line in error.log");
-                #die join("", @$lines);
-            }
-        }
-    }
-
-    for my $line (@$lines) {
-        #warn "test $line\n";
-        if ($line =~ /\bAssertion .*? failed\.$/) {
-            my $tb = Test::More->builder;
-            $tb->no_ending(1);
-
-            chomp $line;
-            fail("$name - $line");
         }
     }
 }
@@ -1612,6 +1618,14 @@ sub transform_response_body ($$$) {
 sub check_response_body ($$$$$$) {
     my ($block, $res, $dry_run, $req_idx, $repeated_req_idx, $need_array) = @_;
     my $name = $block->name;
+    my $write_resp_body_file = $block->write_resp_body_file;
+    if (defined $write_resp_body_file && defined $res) {
+        my $got_body = $res->content // '';
+        open my $out, ">$write_resp_body_file"
+            or bail_out "$name - failed to write to file '$write_resp_body_file': $!";
+        print $out $got_body;
+        close $out;
+    }
     if (   defined $block->response_body
         || defined $block->response_body_eval )
     {
@@ -1619,6 +1633,16 @@ sub check_response_body ($$$$$$) {
         if ( defined $content ) {
             $content =~ s/^TE: deflate,gzip;q=0\.3\r\n//gms;
             $content =~ s/^Connection: TE, close\r\n//gms;
+        }
+
+        if ( defined $block->response_body_json_sort ) {
+            my $js = JSON::PP->new;
+            $js->canonical(1);
+            my $obj;
+            my $rc = eval { $obj = $js->loose(1)->decode($content); 1; };
+            if ($rc) {
+                $content = $js->encode($obj) . "\n";
+            }
         }
 
         my $expected;
@@ -1646,6 +1670,7 @@ sub check_response_body ($$$$$$) {
         unless (!defined $expected || ref $expected) {
             $expected =~ s/\$ServerPort\b/$ServerPort/g;
             $expected =~ s/\$ServerPortForClient\b/$ServerPortForClient/g;
+            $expected = expand_env_in_text $expected, $name, $Test::Nginx::Util::RandPorts;
         }
 
         #warn show_all_chars($content);
@@ -2365,11 +2390,12 @@ sub gen_curl_cmd_from_req ($$) {
     }
 
     if (use_http3($block)) {
-        push @args, '--http3';
+        push @args, '--http3-only';
+        push @args, '-k';
         $curl_protocol = "https";
 
     } elsif (use_http2($block)) {
-        push @args, '--http2', '--http2-prior-knowledge';
+        push @args, '--http2-prior-knowledge';
     }
 
     if ($meth eq 'HEAD') {
@@ -2984,6 +3010,16 @@ For example,
 
     bail_out("something bad happened!");
 
+=head2 add_test_cleanup_handler
+
+Register custom cleanup handler for the current perl/prove process by specifying a Perl subroutine object as the argument.
+
+For example,
+
+    add_test_cleanup_handler(sub ($block) {
+        print $block->name, " finish";
+    });
+
 =head2 add_cleanup_handler
 
 Register custom cleanup handler for the current perl/prove process by specifying a Perl subroutine object as the argument.
@@ -3153,8 +3189,7 @@ The following sections are supported:
 Enforces the test scaffold to use the HTTP/2 wire protocol to send the test request.
 
 Under the hood, the test scaffold uses the `curl` command-line utility to do the wire communication
-with the NGINX server. The `curl` utility must be recent enough to support both the C<--http2>
-and C<--http2-prior-knowledge> command-line options.
+with the NGINX server. The `curl` utility must be recent enough to support C<--http2-prior-knowledge> command-line options.
 
 B<WARNING:> not all the sections and features are supported when this C<--- http2> section is
 specified. For example, this section cannot be used with C<--- pipelined_requests> or
@@ -3247,6 +3282,20 @@ current test block. Default to "localhost".
 =head2 init
 
 Run a piece of Perl code specified as the content of this C<--- init> section before running the tests for the blocks. Note that it is only run once before *all* the repeated requests for this test block.
+
+=head2 post_setup_server_root
+
+Run a piece of Perl code specified as the content of this C<--- post_setup_server_root> section to customization the test nginx instance for testing.
+Unlike C<--- init> section, C<--- post_setup_server_root> will preserve the changes in C<servroot/conf>.
+
+In its most basic form, this section looks like that:
+
+    --- post_setup_server_root
+    use Cwd qw(cwd);
+    my $root_dir = cwd();
+    `ln -sf ${root_dir}/t/data/mime.types ${root_dir}/t/servroot/conf/mime.types`;
+
+This will create a symbolic link for file C<mime.types>, allow nginx to loading it by C<include mime.types;>
 
 =head2 request
 
@@ -3525,6 +3574,15 @@ If the response_body_filters value can also be an two-dimensional array referenc
     [[\&CORE::uc, \&CORE::lc], [\&CORE::uc]]
     --- response_body eval
     ['hello', 'HELLO']
+
+=head2 response_body_json_sort
+
+Because the order of the json string output by the lua-cjson is uncertain.
+In order to compare the output result, we need to sort the response body.
+
+    --- response_body_json_sort
+    --- response_body
+    {"a": 1, "b": 2}
 
 =head2 response_body
 
@@ -4300,6 +4358,12 @@ Specifies the expected TCP query received by the embedded TCP server.
 
 If C<tcp_query> is specified, C<tcp_query_len> defaults to the length of the value of C<tcp_query>.
 
+=head2 tcp_query_auto_timeout
+
+If you don't know the query data length in advance, you can specify this option with an timeout argument.
+
+The default timeout for reading from peer is 0.1 sec.
+
 =head2 tcp_shutdown
 
 Shuts down the reading part, writing part, or both in the embedded TCP server as soon as a new connection is established. Its value specifies which part to shut down: 0 for read part only, 1 for write part only, and 2 for both directions.
@@ -4322,7 +4386,8 @@ Normal request and response cycle is not done. But you can still use the
 C<error_log> section to check if there is an error message to be seen.
 
 This is meant to test bogus configuration is noticed and given proper
-error message. It is normal to see stderr error message when running these tests.
+error message. It is normal to see stderr error message when running these tests
+(you can use L<suppress_stderr> to suppress these messages).
 
 Below is an example:
 
@@ -4343,6 +4408,10 @@ This configuration ignores C<TEST_NGINX_USE_VALGRIND>
 C<TEST_NGINX_USE_STAP> or C<TEST_NGINX_CHECK_LEAK> since there is no point to check other things when the nginx is expected to die right away.
 
 This directive is handled before checking C<TEST_NGINX_IGNORE_MISSING_DIRECTIVES>.
+
+=head2 suppress_stderr
+
+Send stderr of the nginx to the /dev/null. Useful with L<must_die>.
 
 =head2 server_addr_for_client
 
@@ -4365,8 +4434,7 @@ Enables the "http2" test mode by enforcing using the (plain text) HTTP/2 protoco
 test request.
 
 Under the hood, the test scaffold uses the `curl` command-line utility to do the wire communication
-with the NGINX server. The `curl` utility must be recent enough to support both the C<--http2>
-and C<--http2-prior-knowledge> command-line options.
+with the NGINX server. The `curl` utility must be recent enough to support C<--http2-prior-knowledge> command-line options.
 
 B<WARNING:> not all the sections and features are supported in the "http2" test mode. For example, the L<pipelined_requests> and
 L<raw_request> will still use the HTTP/1 protocols even in the "http2" test mode. Similarly, test blocks explicitly require
@@ -4598,6 +4666,21 @@ If this environment is set to the number C<1> or any other
 non-zero numbers, then it is equivalent to taking the value
 C<--tool=memcheck --leak-check=full>.
 
+=head2 TEST_NGINX_VALGRIND_EXIT_ON_FIRST_ERR
+
+If set, Test::Nginx will add C<--exit-on-first-error=yes --error-exitcode=1> options for the valgrind.
+
+Nginx is actually started with
+C<valgrind -q $TEST_NGINX_USE_VALGRIND --gen-suppressions=all --suppressions=valgrind.suppress --exit-on-first-error=yes --error-exitcode=1>,
+the suppressions option being used only if there is actually
+a valgrind.suppress file.
+
+If this environment is set to the number C<1> or any other
+non-zero numbers, then it is equivalent to taking the value
+C<--exit-on-first-error=yes --error-exitcode=1>.
+
+You would prefer to turn on this option when multiple invalid memory accesses exist.
+
 =head2 TEST_NGINX_USE_RR
 
 Uses Mozilla rr to record the execution of the nginx server run by the test
@@ -4685,6 +4768,16 @@ This environment can be used to specify a event API type to be used by Nginx. Po
 For example,
 
     $ TEST_NGINX_EVENT_TYPE=select prove -r t
+
+=head2 TEST_NGINX_LD_PRELOAD
+
+This environment can be used to specify LD_PRELOAD to be used by Nginx.
+Specifying the LD_PRELOAD environment directly in the command line is undesirable
+because it will affect other processes other than nginx.
+
+For example,
+
+    $ TEST_NGINX_LD_PRELOAD=/usr/lib64/libasan.so prove -r t
 
 =head2 TEST_NGINX_ERROR_LOG
 
@@ -4911,7 +5004,7 @@ Antoine BONAVITA C<< <antoine.bonavita@gmail.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2009-2016, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
+Copyright (c) 2009-2025, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
 
 Copyright (c) 2011-2012, Antoine BONAVITA C<< <antoine.bonavita@gmail.com> >>.
 

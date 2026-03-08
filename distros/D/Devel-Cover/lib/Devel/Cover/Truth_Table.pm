@@ -176,7 +176,7 @@ sub error {
 package Devel::Cover::Truth_Table;
 use warnings;
 use strict;
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 #-------------------------------------------------------------------------------
 # Subroutine : new()
@@ -483,7 +483,7 @@ Devel::Cover::Truth_Table - Truth tables for coverage objects.
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -579,10 +579,6 @@ Merge entries from C<$sub_table> into left column of table.
 =head1 SEE ALSO
 
 Devel::Cover
-
-=head1 BUGS
-
-None that I'm aware of...
 
 =head1 LICENSE
 

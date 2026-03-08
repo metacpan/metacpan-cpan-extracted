@@ -1,5 +1,4 @@
-use feature 'class';
-no warnings 'experimental::class';
+use Feature::Compat::Class;
 
 class TestPerson2;
 

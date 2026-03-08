@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153524;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -140,11 +140,10 @@ my $validators = {
           )
         ',
                 'mobile' => '
-          2131[89]\\d{4}|
           21(?:
             1[013-5]|
             2\\d|
-            3[2-9]
+            3[1-9]
           )\\d{5}|
           (?:
             45|
@@ -161,70 +160,70 @@ my $validators = {
                 'voip' => '39\\d{7}'
               };
 my %areanames = ();
-$areanames{pl} = {"4824", "Płock",
-"4822", "Warszawa",
-"4887", "Suwałki",
-"4833", "Bielsko\-Biała",
-"4885", "Białystok",
-"4842", "Łódź",
-"4829", "Ostrołęka",
-"4874", "Wałbrzych",
-"4882", "Chełm",
-"4886", "Łomża",
-"4871", "Wrocław",
-"4859", "Słupsk",
-"4867", "Piła",
-"4883", "Biała\ Podlaska",
-"4854", "Włocławek",};
-$areanames{en} = {"4834", "Częstochowa",
-"4881", "Lublin",
-"4812", "Kraków",
-"4843", "Sieradz",
-"4814", "Tarnów",
-"4855", "Elbląg",
-"4832", "Katowice",
-"4871", "Wroclaw",
-"4862", "Kalisz",
-"4895", "Gorzów\ Wielkopolski",
-"4876", "Legnica",
-"4823", "Ciechanów",
-"4886", "Lomża",
-"4815", "Tarnobrzeg",
-"4841", "Kielce",
-"4854", "Wloclawek",
-"4817", "Rzeszów",
-"4852", "Bydgoszcz",
-"4883", "Biala\ Podlaska",
-"4848", "Radom",
-"4867", "Pila",
-"4865", "Leszno",
-"4894", "Koszalin",
-"4846", "Skierniewice",
-"4859", "Slupsk",
-"4858", "Gdańsk",
-"4887", "Suwalki",
-"4833", "Bielsko\-Biala",
-"4842", "Lódź",
-"4885", "Bialystok",
-"4829", "Ostrolęka",
-"4813", "Krosno",
-"4844", "Piotrków\ Trybunalski",
-"4875", "Jelenia\ Góra",
-"4877", "Opole",
-"4822", "Warsaw",
-"4856", "Toruń",
-"4891", "Szczecin",
+$areanames{en} = {"4812", "Kraków",
 "4863", "Konin",
 "4824", "Plock",
 "4874", "Walbrzych",
-"4882", "Chelm",
-"4818", "Nowy\ Sącz",
-"4884", "Zamość",
-"4861", "Poznań",
-"4825", "Siedlce",
-"4889", "Olsztyn",
+"4885", "Bialystok",
+"4894", "Koszalin",
+"4848", "Radom",
+"4887", "Suwalki",
+"4834", "Częstochowa",
+"4881", "Lublin",
+"4844", "Piotrków\ Trybunalski",
+"4855", "Elbląg",
+"4858", "Gdańsk",
+"4895", "Gorzów\ Wielkopolski",
+"4813", "Krosno",
+"4862", "Kalisz",
 "4816", "Przemyśl",
-"4868", "Zielona\ Góra",};
+"4854", "Wloclawek",
+"4871", "Wroclaw",
+"4877", "Opole",
+"4891", "Szczecin",
+"4825", "Siedlce",
+"4841", "Kielce",
+"4875", "Jelenia\ Góra",
+"4884", "Zamość",
+"4859", "Slupsk",
+"4868", "Zielona\ Góra",
+"4852", "Bydgoszcz",
+"4817", "Rzeszów",
+"4823", "Ciechanów",
+"4876", "Legnica",
+"4833", "Bielsko\-Biala",
+"4882", "Chelm",
+"4889", "Olsztyn",
+"4843", "Sieradz",
+"4846", "Skierniewice",
+"4815", "Tarnobrzeg",
+"4818", "Nowy\ Sącz",
+"4822", "Warsaw",
+"4861", "Poznań",
+"4856", "Toruń",
+"4814", "Tarnów",
+"4829", "Ostrolęka",
+"4867", "Pila",
+"4842", "Lódź",
+"4883", "Biala\ Podlaska",
+"4832", "Katowice",
+"4886", "Lomża",
+"4865", "Leszno",};
+$areanames{pl} = {"4887", "Suwałki",
+"4874", "Wałbrzych",
+"4885", "Białystok",
+"4824", "Płock",
+"4871", "Wrocław",
+"4854", "Włocławek",
+"4833", "Bielsko\-Biała",
+"4882", "Chełm",
+"4859", "Słupsk",
+"4886", "Łomża",
+"4883", "Biała\ Podlaska",
+"4842", "Łódź",
+"4829", "Ostrołęka",
+"4867", "Piła",
+"4822", "Warszawa",};
 my $timezones = {
                '' => [
                        'Europe/Warsaw'

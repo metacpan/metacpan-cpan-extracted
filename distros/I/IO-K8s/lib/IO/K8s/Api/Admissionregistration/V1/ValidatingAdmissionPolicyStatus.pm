@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicyStatus;
 # ABSTRACT: ValidatingAdmissionPolicyStatus represents the status of an admission validation policy.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Admissionregistration::V1::ValidatingAdmissionPolicyStatus - Valid
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 conditions
 

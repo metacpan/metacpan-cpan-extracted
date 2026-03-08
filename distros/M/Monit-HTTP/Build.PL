@@ -9,8 +9,8 @@ use Module::Build 0.28;
 my %module_build_args = (
   "build_requires" => {
     "Module::Build" => "0.28",
+    "Test2::V1" => 0,
     "Test::MockModule" => 0,
-    "Test::More" => 0,
     "Test::Trap" => 0
   },
   "configure_requires" => {
@@ -24,7 +24,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Monit-HTTP",
-  "dist_version" => "0.07",
+  "dist_version" => "0.08",
   "license" => "mit",
   "module_name" => "Monit::HTTP",
   "recursive_test_files" => 1,
@@ -56,6 +56,7 @@ my %fallback_build_requires = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
+  "Test2::V1" => 0,
   "Test::MockModule" => 0,
   "Test::More" => 0,
   "Test::Trap" => 0,

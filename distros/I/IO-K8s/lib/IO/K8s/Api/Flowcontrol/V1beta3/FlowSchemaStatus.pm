@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1beta3::FlowSchemaStatus;
 # ABSTRACT: FlowSchemaStatus represents the current state of a FlowSchema.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s conditions => ['Flowcontrol::V1beta3::FlowSchemaCondition'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Flowcontrol::V1beta3::FlowSchemaStatus - FlowSchemaStatus represen
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 conditions
 

@@ -1,6 +1,6 @@
 package Langertha::Chat;
 # ABSTRACT: Chat abstraction wrapping an engine with optional overrides
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 use Moose;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -176,19 +176,13 @@ sub _gather_tools {
 }
 
 sub _tool_loop_iteration {
-  my ( $self, $engine, $conversation, $formatted_tools, $hermes, $hermes_system_msg, $iteration ) = @_;
+  my ( $self, $engine, $conversation, $formatted_tools, $iteration ) = @_;
 
   # Plugin hook: before LLM call
   $conversation = $self->_run_plugin_before_llm_call($conversation, $iteration)->get;
 
   # Build and send the request
-  my $request;
-  if ($hermes) {
-    my @conv = ( $hermes_system_msg, @$conversation );
-    $request = $engine->chat_request(\@conv, $self->_extra);
-  } else {
-    $request = $engine->chat_request($conversation, tools => $formatted_tools, $self->_extra);
-  }
+  my $request = $engine->build_tool_chat_request($conversation, $formatted_tools, $self->_extra);
 
   my $response = $engine->user_agent->request($request);
   my $data = ref $response eq 'HASH'
@@ -218,29 +212,15 @@ sub simple_chat_with_tools {
   my $formatted_tools = $engine->format_tools($all_tools);
   my $conversation = $self->_build_messages(@messages);
 
-  my $hermes = $engine->can('hermes_tools') && $engine->hermes_tools;
-  my $hermes_system_msg;
-  if ($hermes) {
-    my $tools_json = $engine->json->encode($formatted_tools);
-    my $tool_prompt = sprintf($engine->hermes_tool_prompt, $tools_json);
-    $hermes_system_msg = { role => 'system', content => $tool_prompt };
-  }
-
   for my $iteration (1..$self->tool_max_iterations) {
     ($conversation, my $data) = $self->_tool_loop_iteration(
-      $engine, $conversation, $formatted_tools, $hermes, $hermes_system_msg, $iteration,
+      $engine, $conversation, $formatted_tools, $iteration,
     );
 
-    # Extract tool calls
-    my $tool_calls = $hermes
-      ? $engine->_hermes_parse_tool_calls($data)
-      : $engine->response_tool_calls($data);
+    my $tool_calls = $engine->response_tool_calls($data);
 
-    # No tool calls = done
     unless (@$tool_calls) {
-      my $text = $hermes
-        ? $engine->_hermes_text_content($data)
-        : $engine->response_text_content($data);
+      my $text = $engine->response_text_content($data);
       if ($engine->think_tag_filter) {
         ($text) = $engine->filter_think_content($text);
       }
@@ -250,9 +230,7 @@ sub simple_chat_with_tools {
     # Execute each tool call
     my @results;
     for my $tc (@$tool_calls) {
-      my ( $name, $input ) = $hermes
-        ? ( $tc->{name}, $tc->{arguments} )
-        : $engine->extract_tool_call($tc);
+      my ( $name, $input ) = $engine->extract_tool_call($tc);
 
       $log->debugf("[Chat] Calling tool: %s", $name);
 
@@ -283,12 +261,7 @@ sub simple_chat_with_tools {
       push @results, { tool_call => $tc, result => $result };
     }
 
-    # Append to conversation
-    if ($hermes) {
-      push @$conversation, $engine->_hermes_build_tool_results($data, \@results);
-    } else {
-      push @$conversation, $engine->format_tool_results($data, \@results);
-    }
+    push @$conversation, $engine->format_tool_results($data, \@results);
   }
 
   die "Tool calling loop exceeded " . $self->tool_max_iterations . " iterations";
@@ -305,24 +278,10 @@ async sub simple_chat_with_tools_f {
   my $formatted_tools = $engine->format_tools($all_tools);
   my $conversation = $self->_build_messages(@messages);
 
-  my $hermes = $engine->can('hermes_tools') && $engine->hermes_tools;
-  my $hermes_system_msg;
-  if ($hermes) {
-    my $tools_json = $engine->json->encode($formatted_tools);
-    my $tool_prompt = sprintf($engine->hermes_tool_prompt, $tools_json);
-    $hermes_system_msg = { role => 'system', content => $tool_prompt };
-  }
-
   for my $iteration (1..$self->tool_max_iterations) {
     $conversation = await $self->_run_plugin_before_llm_call($conversation, $iteration);
 
-    my $request;
-    if ($hermes) {
-      my @conv = ( $hermes_system_msg, @$conversation );
-      $request = $engine->chat_request(\@conv, $self->_extra);
-    } else {
-      $request = $engine->chat_request($conversation, tools => $formatted_tools, $self->_extra);
-    }
+    my $request = $engine->build_tool_chat_request($conversation, $formatted_tools, $self->_extra);
 
     my $response = await $engine->_async_http->do_request(request => $request);
     unless ($response->is_success) {
@@ -332,14 +291,10 @@ async sub simple_chat_with_tools_f {
     my $data = $engine->parse_response($response);
     $data = await $self->_run_plugin_after_llm_response($data, $iteration);
 
-    my $tool_calls = $hermes
-      ? $engine->_hermes_parse_tool_calls($data)
-      : $engine->response_tool_calls($data);
+    my $tool_calls = $engine->response_tool_calls($data);
 
     unless (@$tool_calls) {
-      my $text = $hermes
-        ? $engine->_hermes_text_content($data)
-        : $engine->response_text_content($data);
+      my $text = $engine->response_text_content($data);
       if ($engine->think_tag_filter) {
         ($text) = $engine->filter_think_content($text);
       }
@@ -348,9 +303,7 @@ async sub simple_chat_with_tools_f {
 
     my @results;
     for my $tc (@$tool_calls) {
-      my ( $name, $input ) = $hermes
-        ? ( $tc->{name}, $tc->{arguments} )
-        : $engine->extract_tool_call($tc);
+      my ( $name, $input ) = $engine->extract_tool_call($tc);
 
       my @plugin_tc = await $self->_plugin_pipeline_tool_call($name, $input);
       unless (@plugin_tc) {
@@ -375,11 +328,7 @@ async sub simple_chat_with_tools_f {
       push @results, { tool_call => $tc, result => $result };
     }
 
-    if ($hermes) {
-      push @$conversation, $engine->_hermes_build_tool_results($data, \@results);
-    } else {
-      push @$conversation, $engine->format_tool_results($data, \@results);
-    }
+    push @$conversation, $engine->format_tool_results($data, \@results);
   }
 
   die "Tool calling loop exceeded " . $self->tool_max_iterations . " iterations";
@@ -403,7 +352,7 @@ Langertha::Chat - Chat abstraction wrapping an engine with optional overrides
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 

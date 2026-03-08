@@ -1,5 +1,5 @@
 package Date::Manip;
-# Copyright (c) 2010-2025 Sullivan Beck.  All rights reserved.
+# Copyright (c) 2010-2026 Sullivan Beck.  All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -11,7 +11,7 @@ use strict;
 use Exporter;
 
 our $VERSION;
-$VERSION='6.98';
+$VERSION='6.99';
 
 our (@ISA,@EXPORT);
 

@@ -103,7 +103,7 @@ is_pdl $empty->magnover, float('BAD'), "bad flag gets set on empty magnover";
 
 is_pdl zeroes(4)->magnover, pdl(0), 'magnover correct for real zeroes';
 is_pdl sequence(4)->magnover, pdl(3.741657), 'magnover correct for real sequence';
-is_pdl +(sequence(4)+i())->magnover, cdouble(4.242640), 'magnover correct for complex';
+is_pdl +(sequence(4)+i())->magnover, double(4.242640), 'magnover correct for complex';
 
 #Test subroutines directly.
 
@@ -146,7 +146,7 @@ is longlong([10,0,-4])->borover(), -2, "borover with no BAD values";
 #     .... 1111 1100
 #AND: .... 1111 1000 = -8
 
-is( longlong([-6,~0,-4])->bandover(), -8, "bandover with no BAD values");
+is_pdl longlong([-6,~0,-4])->bandover(), longlong(-8), "bandover with no BAD values";
 
 #   0000 1010
 #   1111 1100

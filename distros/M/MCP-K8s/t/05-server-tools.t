@@ -416,7 +416,10 @@ subtest 'k8s_logs permission denied' => sub {
   like($result, qr/Permission denied/, 'logs denied for wrong namespace');
 };
 
-subtest 'tool descriptions include available resources' => sub {
+subtest 'tool descriptions include available resources after discovery' => sub {
+  # Descriptions are lazy — trigger update (happens automatically in run_stdio)
+  $k8s->_update_tool_descriptions;
+
   my $list_tool = find_tool($k8s->server, 'k8s_list');
   like($list_tool->description, qr/pods/, 'list description mentions pods');
   like($list_tool->description, qr/test-ns/, 'list description mentions namespace');

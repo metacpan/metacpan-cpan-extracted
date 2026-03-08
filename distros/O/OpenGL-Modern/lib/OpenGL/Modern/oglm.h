@@ -1,18 +1,17 @@
 extern int _done_glewInit;
 extern int _auto_check_errors;
 
+#define OGLM_CROAK_IF_ERR(name, cleanup) \
+  { \
+    int err = glGetError(); /* spec: once one happens, no more recorded */ \
+    if (err != GL_NO_ERROR) { \
+      cleanup; \
+      croak(#name ": OpenGL error: 0x%04x %s", err, gl_error_string(err)); \
+    } \
+  }
 #define OGLM_CHECK_ERR(name, cleanup) \
   if (_auto_check_errors) { \
-    int err = GL_NO_ERROR; \
-    int error_count = 0; \
-    while ((err = glGetError()) != GL_NO_ERROR) { \
-      warn(#name ": OpenGL error: %d %s", err, gl_error_string(err)); \
-      error_count++; \
-    } \
-    if (error_count) { \
-      cleanup; \
-      croak(#name ": %d OpenGL errors encountered.", error_count); \
-    } \
+    OGLM_CROAK_IF_ERR(name, cleanup) \
   }
 #define OGLM_GLEWINIT \
   if (!_done_glewInit) { \

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153522;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -62,32 +62,32 @@ my $validators = {
                 'voip' => '3[89]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"29981", "Maniitsoq",
+$areanames{en} = {"29961", "Nanortalik",
 "29994", "Ilulissat",
-"29989", "Aasiaat",
-"29986", "Sisimiut",
-"29995", "Uummannaq",
-"299691", "Ivittuut",
-"29966", "Narsaq",
-"29961", "Nanortalik",
-"29935", "Nuuk",
-"29987", "Kangaatsiaq",
-"29934", "Nuuk",
-"29968", "Paamiut",
-"29936", "Nuuk",
 "29931", "Nuuk",
+"29981", "Maniitsoq",
 "29997", "Qaanaaq",
-"29964", "Qaqortoq",
-"29932", "Nuuk",
-"29992", "Qeqertasuaq",
-"29933", "Nuuk",
-"29985", "Sisimiut",
-"29998", "Tasiilaq",
 "29996", "Upernavik",
+"29933", "Nuuk",
+"29998", "Tasiilaq",
 "29999", "Ittoqqortoormiit",
+"29995", "Uummannaq",
+"29932", "Nuuk",
+"299691", "Ivittuut",
+"29964", "Qaqortoq",
+"29934", "Nuuk",
 "29984", "Kangerlussuaq",
+"29987", "Kangaatsiaq",
 "29937", "Nuuk",
-"29991", "Qasigannguit",};
+"29991", "Qasigannguit",
+"29936", "Nuuk",
+"29986", "Sisimiut",
+"29968", "Paamiut",
+"29992", "Qeqertasuaq",
+"29966", "Narsaq",
+"29935", "Nuuk",
+"29985", "Sisimiut",
+"29989", "Aasiaat",};
 my $timezones = {
                '' => [
                        'America/Godthab',

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Scroll;
 # ABSTRACT: A MetaCPAN::Client scroller
-$MetaCPAN::Client::Scroll::VERSION = '2.038000';
+$MetaCPAN::Client::Scroll::VERSION = '2.039000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_hashref >;
@@ -143,7 +143,7 @@ sub _fetch_next {
 
     my $res = $self->ua->post(
         sprintf( '%s/_search/scroll?scroll=%s&size=%s', $self->base_url, $self->time, $self->size ),
-        { content => $self->_id }
+        { content => encode_json { scroll_id => $self->_id } }
     );
 
     croak "failed to fetch next scrolled batch"
@@ -187,7 +187,7 @@ MetaCPAN::Client::Scroll - A MetaCPAN::Client scroller
 
 =head1 VERSION
 
-version 2.038000
+version 2.039000
 
 =head1 METHODS
 

@@ -1,4 +1,4 @@
-# Copyright 2002-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2002-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Test;
 use strict;
 use warnings;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 use Carp;
 
@@ -320,8 +320,8 @@ sub create_gold {
   my $self = shift;
 
   # Pod::Coverage not available on all versions, but it must be there on
-  # 5.12.0
-  return if $self->{criteria} =~ /\bpod\b/ && $] != 5.012000;
+  # 5.20.0
+  return if $self->{criteria} =~ /\bpod\b/ && $] != 5.020000;
 
   my ($base, $v) = $self->cover_gold;
   my $gold     = "$base.$v";
@@ -394,7 +394,7 @@ Devel::Cover::Test - Internal module for testing
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 METHODS
 
@@ -497,13 +497,9 @@ of Perl will be overridden as though it is 5.26.
 
 Runs command, most likely obtained from L</test_command> sub.
 
-=head1 BUGS
-
-Huh?
-
 =head1 LICENCE
 
-Copyright 2001-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

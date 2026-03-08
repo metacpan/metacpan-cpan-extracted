@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+
 use Test::More;
 use OpenAPI::Linter;
 
@@ -18,11 +19,11 @@ BEGIN {
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Valid API',
+        paths   => {},
+        info    => {
+            title   => 'Valid API',
             version => '1.0.0',
         },
-        paths => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec, version => '3.0.3');
@@ -36,11 +37,11 @@ BEGIN {
 {
     my $spec = {
         openapi => '3.1.0',
-        info => {
-            title => 'Valid API',
+        paths   => {},
+        info    => {
+            title   => 'Valid API',
             version => '1.0.0',
         },
-        paths => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec, version => '3.1.0');
@@ -55,7 +56,7 @@ BEGIN {
     my $spec = {
         openapi => '3.0.3',
         # Missing info
-        paths => {},
+        paths   => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);
@@ -71,12 +72,12 @@ BEGIN {
 # Test: Invalid spec - wrong openapi version format
 {
     my $spec = {
-        openapi => '3',  # Should be '3.0.3' or similar
-        info => {
-            title => 'Test',
+        openapi => 'not-a-version',  # Should be '3.0.3' or similar
+        paths   => {},
+        info    => {
+            title   => 'Test',
             version => '1.0.0',
         },
-        paths => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);
@@ -89,14 +90,15 @@ BEGIN {
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Test',
+        paths   => {},
+        info    => {
+            title   => 'Test',
             version => 123,  # Should be string
         },
-        paths => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);
+    is($linter->{version}, '3.0.3', 'Invalid version defaults to 3.1.0');
     my @errors = $linter->validate_schema();
 
     ok(scalar(@errors) > 0, 'Invalid info.version type returns errors');
@@ -106,9 +108,9 @@ BEGIN {
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Complete API',
-            version => '1.0.0',
+        info    => {
+            title       => 'Complete API',
+            version     => '1.0.0',
             description => 'A complete API',
         },
         paths => {
@@ -121,7 +123,7 @@ BEGIN {
                             content => {
                                 'application/json' => {
                                     schema => {
-                                        type => 'array',
+                                        type  => 'array',
                                         items => {
                                             '$ref' => '#/components/schemas/User',
                                         },
@@ -136,11 +138,11 @@ BEGIN {
         components => {
             schemas => {
                 User => {
-                    type => 'object',
-                    required => ['id', 'name'],
+                    type       => 'object',
+                    required   => ['id', 'name'],
                     properties => {
                         id => {
-                            type => 'integer',
+                            type   => 'integer',
                             format => 'int64',
                         },
                         name => {
@@ -163,8 +165,8 @@ BEGIN {
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Test',
+        info    => {
+            title   => 'Test',
             version => '1.0.0',
         },
         paths => {
@@ -188,11 +190,11 @@ BEGIN {
     for my $version (qw(3.0.0 3.0.1 3.0.2 3.0.3)) {
         my $spec = {
             openapi => $version,
-            info => {
-                title => 'Test API',
+            paths   => {},
+            info    => {
+                title   => 'Test API',
                 version => '1.0.0',
             },
-            paths => {},
         };
 
         my $linter = OpenAPI::Linter->new(spec => $spec, version => $version);
@@ -205,11 +207,11 @@ BEGIN {
     for my $version (qw(3.1.0 3.1.1)) {
         my $spec = {
             openapi => $version,
-            info => {
-                title => 'Test API',
+            paths   => {},
+            info    => {
+                title   => 'Test API',
                 version => '1.0.0',
             },
-            paths => {},
         };
 
         my $linter = OpenAPI::Linter->new(spec => $spec, version => $version);
@@ -223,26 +225,32 @@ BEGIN {
 {
     my $spec = {
         openapi => '2.0',
-        info => {
-            title => 'Test',
+        paths   => {},
+        info    => {
+            title   => 'Test',
             version => '1.0.0',
         },
-        paths => {},
     };
 
-    my $linter = OpenAPI::Linter->new(spec => $spec, version => '2.0');
+    my $linter = OpenAPI::Linter->new(spec => $spec);
 
-    eval { $linter->validate_schema() };
-    like($@, qr/Unsupported OpenAPI version/,
-         'Dies with clear error for unsupported version');
+    # Should NOT die - it auto-detects and uses 3.0.3 schema
+    my @errors = $linter->validate_schema();
+
+    # OpenAPI 2.0 spec validated against 3.0.3 schema should fail
+    ok(scalar(@errors) > 0, 'OpenAPI 2.0 spec fails validation with 3.x schema');
+
+    # Check that errors mention version incompatibility
+    my $error_str = join(' ', map { $_->{message} // '' } @errors);
+    like($error_str, qr/openapi|version|2\.0/i, 'Detects OpenAPI 2.0 incompatibility');
 }
 
 # Test: Return value is array in list context
 {
     my $spec = {
         openapi => '3.0.3',
-        info => { title => 'Test', version => '1.0' },
-        paths => {},
+        info    => { title => 'Test', version => '1.0' },
+        paths   => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);
@@ -255,12 +263,12 @@ BEGIN {
 {
     my $spec = {
         openapi => '3.0.3',
-        info => {
-            title => 'Test',
+        paths   => {},
+        info    => {
+            title   => 'Test',
             version => '1.0.0',
             # Missing description - lint warning, but valid schema
         },
-        paths => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);

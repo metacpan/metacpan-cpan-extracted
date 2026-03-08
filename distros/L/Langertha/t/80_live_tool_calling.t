@@ -66,11 +66,28 @@ $server->tool(
   },
 );
 
+$server->tool(
+  name        => 'get_secret_code',
+  description => 'Returns the secret code for the given room name. You MUST call this tool to get the code, do not guess.',
+  input_schema => {
+    type       => 'object',
+    properties => {
+      room => { type => 'string', description => 'The room name to look up' },
+    },
+    required => ['room'],
+  },
+  code => sub {
+    my ($self, $args) = @_;
+    return $self->text_result("XYLOPHONE-42");
+  },
+);
+
 my $loop = IO::Async::Loop->new;
 my $mcp = Net::Async::MCP->new(server => $server);
 $loop->add($mcp);
 
 my $prompt = 'What is 7 plus 15? Use the add tool to calculate this. Answer with just the number.';
+my $secret_prompt = 'What is the secret code for room "lobby"? Use the get_secret_code tool. Reply with just the code.';
 
 async sub test_engine {
   my ($name, $engine) = @_;
@@ -79,12 +96,18 @@ async sub test_engine {
   diag "$name response: $response";
 }
 
+async sub test_engine_secret {
+  my ($name, $engine) = @_;
+  my $response = await $engine->chat_with_tools_f($secret_prompt);
+  like($response, qr/XYLOPHONE-42/, "$name: secret code tool returned correct result");
+  diag "$name secret response: $response";
+}
+
 async sub run_tests {
   await $mcp->initialize;
 
   my $tools = await $mcp->list_tools;
-  is(scalar @$tools, 1, 'MCP server has 1 tool');
-  is($tools->[0]{name}, 'add', 'tool is add');
+  is(scalar @$tools, 2, 'MCP server has 2 tools');
 
   # --- Anthropic ---
   if ($ENV{TEST_LANGERTHA_ANTHROPIC_API_KEY}) {
@@ -128,7 +151,7 @@ async sub run_tests {
     eval {
       await test_engine('Groq', Langertha::Engine::Groq->new(
         api_key => $ENV{TEST_LANGERTHA_GROQ_API_KEY},
-        model => 'llama-3.3-70b-versatile', mcp_servers => [$mcp],
+        model => 'moonshotai/kimi-k2-instruct', mcp_servers => [$mcp],
       ));
     };
     diag "Groq error: $@" if $@;
@@ -192,6 +215,7 @@ async sub run_tests {
     eval {
       await test_engine('Cerebras', Langertha::Engine::Cerebras->new(
         api_key => $ENV{TEST_LANGERTHA_CEREBRAS_API_KEY},
+        model => 'llama3.1-8b',
         mcp_servers => [$mcp],
       ));
     };
@@ -254,18 +278,30 @@ async sub run_tests {
     diag "vLLM/$model error: $@" if $@;
   }
 
-  # --- AKI.IO (via OpenAI-compatible API) ---
+  # --- AKI.IO (via OpenAI-compatible API, HermesTools) ---
   if ($ENV{TEST_LANGERTHA_AKI_API_KEY}) {
     require Langertha::Engine::AKIOpenAI;
-    # Pick a chat model from available endpoints
-    my $aki_model = $ENV{TEST_LANGERTHA_AKI_MODEL} || 'llama3_8b_chat';
+    my $aki_model = $ENV{TEST_LANGERTHA_AKI_OPENAI_MODEL} || 'qwen3-chat';
     eval {
-      await test_engine("AKI/$aki_model", Langertha::Engine::AKIOpenAI->new(
+      await test_engine_secret("AKIOpenAI/$aki_model", Langertha::Engine::AKIOpenAI->new(
         api_key => $ENV{TEST_LANGERTHA_AKI_API_KEY},
         model => $aki_model, mcp_servers => [$mcp],
       ));
     };
-    diag "AKI/$aki_model error: $@" if $@;
+    diag "AKIOpenAI/$aki_model error: $@" if $@;
+  }
+
+  # --- AKI.IO (native API, HermesTools) ---
+  if ($ENV{TEST_LANGERTHA_AKI_API_KEY}) {
+    require Langertha::Engine::AKI;
+    my $aki_model = $ENV{TEST_LANGERTHA_AKI_NATIVE_MODEL} || 'qwen3_chat';
+    eval {
+      await test_engine_secret("AKI-native/$aki_model", Langertha::Engine::AKI->new(
+        api_key => $ENV{TEST_LANGERTHA_AKI_API_KEY},
+        model => $aki_model, mcp_servers => [$mcp],
+      ));
+    };
+    diag "AKI-native/$aki_model error: $@" if $@;
   }
 
   # --- Ollama ---

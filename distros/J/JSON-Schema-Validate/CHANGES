@@ -1,5 +1,39 @@
 Revision history for Perl module JSON::Schema::Validate
 
+v0.9.0 2026-03-01T13:44:36+0900
+    [Format Validation]
+    - Fixed the 'iri' format validator, which was far too permissive: its third
+      regex alternative (\A[^\s]+\z) accepted any non-whitespace string as a valid
+      IRI, including plain words with no scheme. The validator now requires a proper
+      RFC 3987 scheme (ASCII letter followed by letters, digits, '+', '-', or '.'),
+      consistent with the existing 'uri' validator. The /u flag is retained to allow
+      Unicode characters in the path and query components.
+    [Performance]
+    - _canon() and _clone() now use a state variable for the JSON object
+      instead of re-instantiating it on every call.
+
+v0.8.1 2026-03-01T00:46:08+0900
+    - Minor documentation update
+
+v0.8.0 2026-03-01T00:20:46+0900
+    [Dependencies]
+    - Removed DateTime::Duration as a dependency. DateTime::Duration->new() accepted
+      any numeric values without complaint and therefore provided no validation beyond
+      what the regex already enforced; it has been dropped entirely.
+    - register_builtin_formats() now probes for Time::Piece (core since perl 5.10)
+      before falling back to DateTime for the 'date-time' and 'date' format validators.
+      Priority order is now: DateTime::Format::ISO8601 > Time::Piece > DateTime > regex.
+
+    [Format Validation]
+    - Tightened the 'duration' format validator (RFC 3339 / ISO 8601):
+        * Week form (PnW) is now handled separately and correctly; mixing week
+          designators with other date/time designators is rejected per ISO 8601.
+        * A bare 'P' or 'PT' with no components is now correctly rejected.
+        * The 'T' separator is rejected when not followed by at least one time
+          designator (lookahead guard added).
+    - The 'duration' validator is now self-contained (pure regex); no module is
+      required or attempted.
+
 v0.7.0 2025-12-18T13:09:00+0900
   - Added is_valid() convenience method: boolean validation that defaults to
     max_errors => 1 and stores the first (and only) error retrievable via error().

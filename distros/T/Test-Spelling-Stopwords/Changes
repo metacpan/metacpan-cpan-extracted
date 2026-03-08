@@ -1,0 +1,33 @@
+Revision history for Test::Spelling::Stopwords
+
+0.03 2026-03-07
+     [IMPROVEMENTS]
+     - Added GitHub issues to Makefile.PL script.
+
+0.02 2026-03-01
+     [UNIT TESTS]
+     - Added standard unit tests (t/pod.t and t/manifest.t)
+     - Added t/spell-pod.t to try its own medicine.
+     - Added project .stopwords file.
+
+     [POD]
+     - Tidied up pod to make unit test happy.
+
+0.01 2026-03-01
+     [Initial Release]
+      - POD spell-checking with automatic project-specific stopword discovery.
+      - Two-layer stopword architecture: Pod::Wordlist (community vocabulary)
+        merged with project-specific .stopwords at runtime, mirroring the
+        filtering that gen-stopwords applies at generation time.
+      - Line-number reporting for every misspelling found, making failures
+        fast to locate and fix.
+      - Freshness check warns via diag when .stopwords is older than any
+        source file, prompting regeneration.
+      - POD formatting codes stripped entirely before aspell invocation,
+        preventing false positives such as 'Egt' from E<gt> fragments.
+      - Graceful skip_all when aspell is absent, .stopwords is missing, or
+        no POD files are found.
+      - Companion gen-stopwords script installed to $PATH for automatic
+        stopword generation filtered through Pod::Wordlist.
+      - All configuration overridable via environment variables (SPELL_LANG,
+        STOPWORD_FILE, SPELL_DIRS, ASPELL_CMD) or set_* functions

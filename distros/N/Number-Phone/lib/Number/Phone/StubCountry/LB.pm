@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153523;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -101,13 +101,13 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96128", "Bekaa",
-"96127", "South\ Lebanon",
-"96124", "Metn",
-"96125", "Chouf",
+$areanames{en} = {"96126", "North\ Lebanon",
 "96121", "Beirut",
-"96126", "North\ Lebanon",
-"96129", "Jbeil\ \&\ Keserwan",};
+"96127", "South\ Lebanon",
+"96125", "Chouf",
+"96129", "Jbeil\ \&\ Keserwan",
+"96124", "Metn",
+"96128", "Bekaa",};
 my $timezones = {
                '' => [
                        'Asia/Beirut'

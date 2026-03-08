@@ -5,7 +5,6 @@ use warnings;
 use Test::More;
 use OpenGL::Modern ':all';
 use OpenGL::Modern::Helpers 'glGetVersion_p';
-use Capture::Tiny 'capture';
 
 SKIP: {
     plan skip_all => "glewContext did not succeed, skipping live tests"
@@ -18,31 +17,22 @@ SKIP: {
     glClear GL_COLOR;
     pass "didn't crash yet";
 
-    my ( $out, $err ) = capture {
-        eval { $@ = undef; glpCheckErrors };
-    };
-    like $err, qr/OpenGL error: 1281/,          "got expected errors";
-    like $@,   qr/1 OpenGL errors encountered/, "can check for errors manually";
+    eval { glpCheckErrors };
+    like $@, qr/OpenGL error: 0x0501/, "got expected error";
 
-    eval { $@ = undef; glpSetAutoCheckErrors 3 };
+    eval { glpSetAutoCheckErrors 3 };
     is $@, "Usage: glpSetAutoCheckErrors(1|0)\n", "glpSetAutoCheckErrors only accepts 2 values";
 
     glpSetAutoCheckErrors 1;
-    ( $out, $err ) = capture {
-        eval { $@ = undef; glClear GL_COLOR };
-    };
-    like $err, qr/OpenGL error: 1281/,          "got expected errors";
-    like $@,   qr/1 OpenGL errors encountered/, "errors cause crashes now";
+    eval { glClear GL_COLOR };
+    like $@, qr/OpenGL error: 0x0501/, "got expected errors";
 
     glpSetAutoCheckErrors 0;
     glClear GL_COLOR;
     pass "crashes are gone again";
 
-    ( $out, $err ) = capture {
-        eval { $@ = undef; glpCheckErrors };
-    };
-    like $err, qr/OpenGL error: 1281/,          "got expected errors";
-    like $@,   qr/1 OpenGL errors encountered/, "but we can still check for errors manually";
+    eval { glpCheckErrors };
+    like $@, qr/OpenGL error: 0x0501/, "but can still check for errors manually";
 
     done_testing;
 }

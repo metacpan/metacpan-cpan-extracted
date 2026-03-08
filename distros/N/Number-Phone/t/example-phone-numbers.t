@@ -1,7 +1,7 @@
 
         # automatically generated file, don't edit
         #
-        # Copyright 2025 David Cantrell, derived from data from libphonenumber
+        # Copyright 2026 David Cantrell, derived from data from libphonenumber
         # http://code.google.com/p/libphonenumber/
         #
         # Licensed under the Apache License, Version 2.0 (the "License");
@@ -2080,19 +2080,19 @@
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['BE','+32470123456'],
+        args    => ['BE','+32450001234'],
         methods => ['is_mobile'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['BE','470123456'],
+        args    => ['BE','450001234'],
         methods => ['is_mobile'],
         test_country => 1,
     },
 {
         class   => 'Number::Phone::Lib',
-        args    => ['+32470123456'],
+        args    => ['+32450001234'],
         methods => ['is_mobile'],
         test_country => 1,
     },

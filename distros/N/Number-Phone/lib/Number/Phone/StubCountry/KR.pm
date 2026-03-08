@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153523;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -185,40 +185,40 @@ my $validators = {
                 'voip' => '70\\d{8}'
               };
 my %areanames = ();
-$areanames{en} = {"822", "Seoul",
-"8261", "Jeonnam",
-"8262", "Gwangju",
-"8264", "Jeju",
-"8263", "Jeonbuk",
-"8242", "Daejeon",
-"8253", "Daegu",
-"8241", "Chungnam",
-"8254", "Gyeongbuk",
-"8233", "Gangwon",
-"8255", "Gyeongnam",
-"8231", "Gyeonggi",
-"8232", "Incheon",
-"8244", "Sejong\ City",
-"8252", "Ulsan",
-"8243", "Chungbuk",
-"8251", "Busan",};
-$areanames{ko} = {"8263", "전북",
-"8264", "제주",
-"8262", "광주",
-"8261", "전남",
-"822", "서울",
-"8251", "부산",
-"8252", "울산",
-"8243", "충북",
-"8244", "세종",
-"8232", "인천",
-"8231", "경기",
-"8255", "경남",
-"8233", "강원",
-"8254", "경북",
-"8241", "충남",
+$areanames{ko} = {"8233", "강원",
 "8242", "대전",
-"8253", "대구",};
+"8232", "인천",
+"8243", "충북",
+"8241", "충남",
+"8255", "경남",
+"8244", "세종",
+"8231", "경기",
+"8253", "대구",
+"8263", "전북",
+"8262", "광주",
+"8252", "울산",
+"8254", "경북",
+"8264", "제주",
+"8261", "전남",
+"8251", "부산",
+"822", "서울",};
+$areanames{en} = {"8264", "Jeju",
+"8254", "Gyeongbuk",
+"8251", "Busan",
+"822", "Seoul",
+"8261", "Jeonnam",
+"8263", "Jeonbuk",
+"8253", "Daegu",
+"8252", "Ulsan",
+"8262", "Gwangju",
+"8241", "Chungnam",
+"8231", "Gyeonggi",
+"8244", "Sejong\ City",
+"8255", "Gyeongnam",
+"8242", "Daejeon",
+"8233", "Gangwon",
+"8243", "Chungbuk",
+"8232", "Incheon",};
 my $timezones = {
                '' => [
                        'Asia/Seoul'

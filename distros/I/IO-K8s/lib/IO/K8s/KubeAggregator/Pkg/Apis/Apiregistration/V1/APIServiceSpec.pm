@@ -1,6 +1,6 @@
 package IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceSpec;
 # ABSTRACT: APIServiceSpec contains information for locating and communicating with a server. Only https is supported, though you are able to disable certificate verification.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s caBundle => Str;
@@ -38,7 +38,7 @@ IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceSpec - APISer
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 caBundle
 

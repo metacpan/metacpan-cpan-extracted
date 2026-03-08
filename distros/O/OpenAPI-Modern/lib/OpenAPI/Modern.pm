@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.127-14-gd0c9ccf8
+package OpenAPI::Modern; # git description: v0.128-4-gfa69e8f9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.128';
+our $VERSION = '0.129';
 
 use 5.020;
 use utf8;
@@ -850,14 +850,16 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
   my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
 
   if (any { $_ eq 'string' || $_ eq 'number' || $_ eq 'boolean' || $_ eq 'null' } @types) {
-    return E($state, 'cannot deserialize to %s type%s', 'requested', @types > 1 ? 's' : '')
+    return E($state,
+        'cannot deserialize to %s type%s%s', !@types ? 'any' : 'requested', @types > 1 ? 's' : '',
+        @types ? ' ('.join(', ', @types).')' : '')
       if not coerce_primitive(\$data, \@types);
   }
   elsif (any { $_ eq 'array' || $_ eq 'object' } @types) {
     return E($state, 'deserializing query parameters to arrays or objects is not currently supported');
   }
   else {
-    return E($state, 'cannot deserialize to %s type%s', !@types ? 'any' : 'requested', @types > 1 ? 's' : '');
+    return E($state, 'cannot deserialize to any types');
   }
 
   $self->_evaluate_subschema(\$data, $param_obj->{schema},
@@ -1116,7 +1118,8 @@ sub _deserialize_style ($self, $data, $state, %opt) {
   }
 
   return E({ %$state, data_path => jsonp($state->{data_path}, $name) },
-    'cannot deserialize to %s type%s', !@types ? 'any' : 'requested', @types > 1 ? 's' : '');
+    'cannot deserialize to %s type%s%s', !@types ? 'any' : 'requested', @types > 1 ? 's' : '',
+    @types ? ' ('.join(', ', @types).')' : '');
 }
 
 sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
@@ -1667,7 +1670,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.128
+version 0.129
 
 =head1 SYNOPSIS
 

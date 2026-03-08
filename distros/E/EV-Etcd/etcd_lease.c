@@ -20,7 +20,12 @@ void process_lease_grant_response(pTHX_ pending_call_t *pc) {
     UNPACK_RESPONSE(pc, resp, etcdserverpb__lease_grant_response__unpack);
 
     if (resp->error && strlen(resp->error) > 0) {
-        CALL_SIMPLE_ERROR_CALLBACK(pc->callback, resp->error);
+        dSP;
+        ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP, 2);
+        PUSHs(&PL_sv_undef);
+        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL,
+            resp->error, strlen(resp->error), "lease_grant")));
+        PUTBACK; call_sv(pc->callback, G_DISCARD); FREETMPS; LEAVE;
         etcdserverpb__lease_grant_response__free_unpacked(resp, NULL);
         return;
     }
@@ -183,7 +188,14 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
 
     if (resp->ttl == 0) {
         kc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Lease expired");
+        {
+            dSP;
+            ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP, 2);
+            PUSHs(&PL_sv_undef);
+            PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_NOT_FOUND,
+                "Lease expired", 13, "keepalive")));
+            PUTBACK; call_sv(kc->callback, G_DISCARD); FREETMPS; LEAVE;
+        }
         etcdserverpb__lease_keep_alive_response__free_unpacked(resp, NULL);
         return;
     }

@@ -1,5 +1,66 @@
 Revision history for OpenAPI::Linter
 
+0.19 2026-03-07
+     [IMPROVEMENTS]
+     - Added GitHub issues to Makefile.PL script.
+
+0.18  2026-03-05
+      [ENHANCEMENTS]
+      - Added pod to the openapi-linter script to get it indexed by CPAN.
+
+0.17  2026-03-04
+      [ENHANCEMENTS]
+      - Bundled OpenAPI meta-schemas (3.0.x and 3.1.x) under share/ to
+        eliminate network dependency during validation. Schema resolution
+        now works offline and is deterministic across all environments
+        (dev checkout, make test, CPAN install, CI). Schema files are
+        located via a three-level resolution strategy: environment variable
+        override ($ENV{OPENAPI_LINTER_SCHEMA_DIR}), directory walk from
+        __FILE__, then File::ShareDir::dist_file().
+
+      - Restored and completed OpenAPI::Linter::Location. Issues returned
+        by find_issues() and validate_schema() now carry a 'location' key
+        holding an OpenAPI::Linter::Location object instead of a plain
+        'path' string. The object stringifies to the dot-separated path
+        for backwards compatibility, and additionally exposes:
+        - file()     — spec file name
+        - line()     — 1-based line number (0 if unknown)
+        - column()   — 1-based column number (0 if unknown)
+        - position() — "file:line:col" string for editor/CI integration
+        Line/column tracking applies to both structural (schema) and
+        semantic (lint) checks, for both YAML and JSON spec files.
+
+      - Added _check_schema_array_items: recursively checks all component
+        schemas (including nested properties, allOf/anyOf/oneOf) for array
+        types missing the required 'items' keyword. Reported as ERROR with
+        rule 'array-items-required'.
+
+      [BUG FIXES]
+      - _check_server_variables: changed truth test to exists() so server
+        variables with a default of "" or 0 are no longer false positives.
+
+      - _check_server_variables: a server URL that is entirely a bare
+        placeholder (e.g. "{siteUrl}") with no variables block is now
+        reported as WARN instead of ERROR. This pattern is common in
+        real-world published specs where the consumer is expected to
+        supply the base URL. Mixed URLs such as "https://{host}/api" with
+        an undefined variable remain ERROR. Behaviour is documented in
+        the POD under "Servers".
+
+      - _check_server_variables: split error message into a clean
+        single-line 'message' and a separate 'hint' field carrying
+        indented remediation advice. CLI now prints the hint below the
+        error line when present.
+
+      [BACKWARDS COMPATIBILITY]
+      - Location objects stringify to the path string, so existing code
+        using "$issue->{location}" or printf "%s" continues to work
+        without modification.
+      - OpenAPI::Linter::Location->new() accepts both named arguments
+        (preferred) and the legacy 3-arg positional form.
+      - The schema_url constructor argument is retained for callers that
+        need to force a specific schema source.
+
 0.16  2025-12-06
       - Proposed path for issue #1:
 

@@ -7,6 +7,8 @@
 # - Prologix USB-GPIB adapter
 # - AR488 for Arduino from Twilight-Logic: https://github.com/Twilight-Logic/AR488
 #   (tested with Arduino Nano and custom wiring interface)
+# - AR488-ESP for esp32 https://github.com/douardda/AR488-ESP32, however not
+# fully tested
 #
 # Default port params are OK for Prologix at 9600 baud
 # For AR488 on Linux, need -port /dev/ttyUSB0:115200
@@ -15,18 +17,39 @@
 # $Id: $
 
 package Device::GPIB::Controllers::Prologix;
-our @ISA = qw(Device::GPIB::Controllers::Serial);
 
 use strict;
-use Device::GPIB::Controllers::Serial;
+use Module::Load;
 
-$Device::GPIB::Controllers::Prologix::VERSION = '0.10';
+$Device::GPIB::Controllers::Prologix::VERSION = '0.11';
 
 sub new($$)
 {
     my ($class, $port) = @_;
-    my $self = $class->SUPER::new($port); # Call parent constructor
-    # Add child-specific initialization here
+
+    my $self = {};
+    bless $self, $class;
+    
+    if ($port =~ /^tcp:(.+)/i)
+    {
+	load Device::GPIB::Controllers::TCP;
+	$self->{transport} = Device::GPIB::Controllers::TCP->new($1);
+    }
+    elsif ($port =~ /^serial:(.+)/i)
+    {
+	load Device::GPIB::Controllers::Serial;
+	$self->{transport} = Device::GPIB::Controllers::Serial->new($1);
+    }
+    else
+    {
+	# Historical default
+	load Device::GPIB::Controllers::Serial;
+	$self->{transport} = Device::GPIB::Controllers::Serial->new($port);
+    }
+
+    $self->{CurrentPad} = -1;
+    $self->{CurrentSad} = -1;
+    return unless $self->initialised();
     return $self;
 
 }
@@ -49,16 +72,43 @@ sub initialised($)
 	}
 	
 	return unless $self->{DeviceVersion} =~ /^Prologix/ || $self->{DeviceVersion} =~ /^AR488/;
-	# Set the Prologix compatible into a state we like
-	$self->auto(0);
-	return unless $self->auto() == 0;
+	
+	# Set the Prologix or compatible into a state we like as a controller
+	return unless $self->actAsController();
+	
 	$self->read_tmo_ms(3000); # Some devices need a long timeout
+
 	return 1; # OK
     }
     $self->debug("Gave up trying to read version from the controller");
     return; # Fail
 }
 
+sub actAsController($)
+{
+    my ($self) = @_;
+
+    $self->mode(1); # Controller
+    $self->eoi(1);         # Assert EOI at the end of a send
+    $self->auto(0); # Dont automatically go into read mode after a write
+    return unless $self->auto() == 0;
+    return 1;
+}
+
+sub actAsDevice($)
+{
+    my ($self) = @_;
+
+    $self->eoi(1);         # Assert EOI at the end of a send
+    $self->eot_char("\n"); # Prologic will emit this 
+    $self->eot_enable(1);  # Enable the eot_char to be sent to us when it detects EOI from the controller
+    $self->mode(0);        # Device mode
+    return unless $self->mode() == 0;
+    return 1;
+}
+
+# Some clients need to know if they are directly connected by the Serial controller
+# In this case they are not.
 sub isSerial($)
 {
     return 0;
@@ -76,7 +126,7 @@ sub sendControllerCommand($$)
 	my $x = unpack('H*', $s);
 	print "CONTROLLER COMMAND HEX: $x\n";
     }
-    return $self->{serialport}->write($s . "\n"); # \n to trigger Prologix Controller execution
+    return $self->{transport}->writeLowLevel($s . "\r"); # \r to trigger Prologix Controller and AR488-ESP32
 }
 
 # Escapes Prologix special characters
@@ -92,7 +142,7 @@ sub send($$)
 	my $x = unpack('H*', $s);
 	print "GPIB COMMAND HEX: $x\n";
     }
-    return $self->{serialport}->write($s . "\n"); # \n to trigger Prologix Controller transmission
+    return $self->{transport}->writeLowLevel($s . "\r"); # \r to trigger Prologix Controller transmission
 }
 
 # Escapes Prologix special characters
@@ -104,6 +154,11 @@ sub sendTo($$$$)
     return $self->send($s);
 }
 
+sub read_to_eol($)
+{
+    my ($self) = @_;
+    return $self->{transport}->read_to_eol();
+}
 
 # REad until a char or timeout.
 # $waitfor can be either 'eoi' or the decimal number of the char < 256
@@ -135,17 +190,38 @@ sub read_binary($$$)
     return $self->read_to_timeout();
 }
 
+sub warning($)
+{
+    my ($self, $s) = @_;
+
+    Device::GPIB::Controller::warning($s);
+}
+
+sub debug($)
+{
+    my ($self, $s) = @_;
+
+    Device::GPIB::Controller::debug($s);
+}
+
 sub close($)
 {
     my ($self) = @_;
 
-    if ($self->{serialport})
+    if ($self->{transport})
     {
 	# Sigh: AR488 will fail to complete last command if we close too soon.
 	sleep(1) if $self->{DeviceVersion} =~ /^AR488/;
-	$self->{serialport}->close();
-	undef $self->{serialport};
+	$self->{transport}->close();
+	undef $self->{transport};
     }
+}
+
+sub DESTROY($)
+{
+    my ($self) = @_;
+
+    $self->close();
 }
 
 ###
@@ -503,7 +579,7 @@ Read data from the addressed instrument until EOI or timeout.
 =item read_binary
 
 Reads binary data from the addressed instrument until a timeout expires.
-The binary data s delivered verbatim, adn can enclude the EOL character.
+The binary data is delivered verbatim, and can enclude the EOL character.
  
 =item version
 

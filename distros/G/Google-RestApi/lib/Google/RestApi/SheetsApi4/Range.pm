@@ -79,7 +79,7 @@ package Google::RestApi::SheetsApi4::Range;
 # too complex, and the simple workaround is to just A1:B2.
 # [A1, B2]
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 use Google::RestApi::Setup;
 

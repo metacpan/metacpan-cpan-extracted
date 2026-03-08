@@ -1,6 +1,6 @@
 package Net::Async::MCP::Transport::InProcess;
 # ABSTRACT: In-process MCP transport via direct MCP::Server calls
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -93,7 +93,7 @@ Net::Async::MCP::Transport::InProcess - In-process MCP transport via direct MCP:
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

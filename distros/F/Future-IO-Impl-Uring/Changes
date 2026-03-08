@@ -1,5 +1,8 @@
 Revision history for Future-IO-Impl-Uring
 
+0.009     2026-03-01 15:29:09+01:00 Europe/Brussels
+          - Declare dependency on correct version of Future::IO
+
 0.008     2026-02-20 13:16:56+01:00 Europe/Brussels
           - Postpone ring instantiation until first use
 

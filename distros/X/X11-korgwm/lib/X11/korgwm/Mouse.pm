@@ -23,7 +23,7 @@ sub _motion_regular($evt) {
     return if $focus->{screen} == $screen;
 
     # This code runs only during inter-screen movement
-    $screen->focus();
+    $screen->focus(warp_method => "focus");
     $X->flush();
 }
 
@@ -51,7 +51,14 @@ sub _motion_resize($evt) {
 sub _motion_move($evt) {
     # Prepare and amend the vector
     my ($new_x, $new_y) = map { $_motion_win->{$_} + $evt->{"root_$_"} - $_motion_start{$_} } qw( x y );
-    $new_y = $cfg->{panel_height} if $new_y < $cfg->{panel_height};
+
+    # Handle inter-screen movement, prevent panel overlapping
+    my $new_screen = screen_by_xy($evt->{event_x}, $evt->{event_y});
+    if ($new_screen) {
+        $new_y = $new_screen->{y} + $cfg->{panel_height} if $new_y < $new_screen->{y} + $cfg->{panel_height};
+    } else {
+        $new_y = $visible_min_y + $cfg->{panel_height} if $new_y < $visible_min_y + $cfg->{panel_height};
+    }
     @{ _motion_start }{qw( x y )} = @{ $evt }{qw( root_x root_y )};
 
     # Execute real movement
@@ -59,11 +66,11 @@ sub _motion_move($evt) {
     $_motion_win->move($new_x, $new_y);
 
     # Check if the pointer went outside the screen
-    my $new_screen;
-    if ($new_screen = screen_by_xy($evt->{event_x}, $evt->{event_y}) and $focus->{screen} != $new_screen) {
+    if ($new_screen and $focus->{screen} != $new_screen) {
         my $always_on = $_motion_win->{always_on};
         $focus->{screen}->win_remove($_motion_win, 1);
-        $focus->{screen}->{panel}->title();
+        my $old_focus = $focus->{screen}->current_tag()->{focus};
+        $focus->{screen}->{panel}->title($old_focus ? $old_focus->title() : "");
         $new_screen->win_add($_motion_win, $always_on);
         $focus->{screen} = $new_screen;
         $new_screen->{panel}->title($_motion_win->title());
@@ -84,7 +91,14 @@ sub init {
     add_event_cb(BUTTON_PRESS, sub($evt) {
         # Skip clicks on root and non-floating windows
         $_motion_win = $windows->{ $evt->{child} };
-        return unless $_motion_win and $_motion_win->{floating};
+        return unless $_motion_win;
+
+        # There is a case when some 'popup' (unknown to WM) window stole input focus.
+        # In this case I want mod+click to forcefully focus the window under the pointer.
+        $_motion_win->focus();
+
+        # The code below works only for floating windows
+        return unless $_motion_win->{floating};
 
         # Determine how did we got here and set proper motion notify handler
         if ($evt->{detail} == 1) {
@@ -137,7 +151,7 @@ sub init {
         my $new_screen = screen_by_xy($evt->{root_x}, $evt->{root_y});
         $focus->{screen} = $new_screen;
 
-        $win->focus() if ($focus->{window} // 0) != $win;
+        $win->focus() if $focus->{window} != $win;
     });
 
     # Grab pointer

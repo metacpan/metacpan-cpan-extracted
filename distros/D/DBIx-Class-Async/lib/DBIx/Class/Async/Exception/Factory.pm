@@ -1,6 +1,6 @@
 package DBIx::Class::Async::Exception::Factory;
 
-$DBIx::Class::Async::Exception::Factory::VERSION   = '0.63';
+$DBIx::Class::Async::Exception::Factory::VERSION   = '0.64';
 $DBIx::Class::Async::Exception::Factory::AUTHORITY = 'cpan:MANWAR';
 
 use strict;
@@ -19,7 +19,7 @@ DBIx::Class::Async::Exception::Factory - Translate raw DBIx::Class errors into t
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =head1 SYNOPSIS
 

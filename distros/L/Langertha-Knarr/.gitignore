@@ -1,0 +1,41 @@
+# Dist::Zilla build artifacts
+Langertha-Knarr-*/
+*.tar.gz
+/.build/
+
+# Perl artifacts
+/blib/
+/_build/
+/Build
+/Makefile
+/MYMETA.*
+/pm_to_blib
+/MANIFEST.bak
+*.o
+*.bs
+*.sw[op]
+
+# Local/test configs
+knarr.yaml
+.env
+.env.*
+!.env.example
+
+# Docker
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# IDE / editor
+.vscode/
+.idea/
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude Code session data
+.claude/memory/
+.claude/plans/
+.claude/settings.local.json
+.devcontainer.json

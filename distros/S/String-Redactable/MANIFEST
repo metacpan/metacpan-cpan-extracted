@@ -1,0 +1,21 @@
+Changes
+examples/demo.pl
+INSTALL.SKIP
+lib/String/Redactable.pm
+lib/Tie/String/Redactable.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+SECURITY.md
+t/load.t
+t/placeholder.t
+t/pod.t
+t/pod_coverage.t
+t/redact.t
+t/test_manifest
+t/tie.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

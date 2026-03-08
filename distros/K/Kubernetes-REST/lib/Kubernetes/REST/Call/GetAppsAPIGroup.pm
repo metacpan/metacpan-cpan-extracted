@@ -1,5 +1,5 @@
 package Kubernetes::REST::Call::GetAppsAPIGroup;
-our $VERSION = '1.003';
+our $VERSION = '1.100';
 # ABSTRACT: Deprecated - use the new Kubernetes::REST API instead
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ Kubernetes::REST::Call::GetAppsAPIGroup - Deprecated - use the new Kubernetes::R
 
 =head1 VERSION
 
-version 1.003
+version 1.100
 
 =head1 SUPPORT
 

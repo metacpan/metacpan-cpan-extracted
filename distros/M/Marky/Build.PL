@@ -18,7 +18,7 @@ my %module_build_args = (
     "Kathryn Andersen <perlkat\@katspace.org>"
   ],
   "dist_name" => "Marky",
-  "dist_version" => "0.0602",
+  "dist_version" => "0.0604",
   "license" => "perl",
   "module_name" => "Marky",
   "recursive_test_files" => 1,

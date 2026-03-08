@@ -1,6 +1,6 @@
 package MCP::K8s::Permissions;
 # ABSTRACT: RBAC discovery and permission checking for Kubernetes
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 use Moo;
 use Carp qw( croak );
 use Scalar::Util qw( weaken );
@@ -25,6 +25,11 @@ has _rules => (
   default => sub { {} },
 );
 
+has _discovered => (
+  is      => 'rw',
+  default => 0,
+);
+
 sub discover {
   my ($self) = @_;
 
@@ -47,6 +52,7 @@ sub discover {
   }
 
   $self->_rules(\%rules);
+  $self->_discovered(1);
   return $self;
 }
 
@@ -97,10 +103,17 @@ sub _discover_namespace {
   return \%ns_rules;
 }
 
+sub ensure_discovered {
+  my ($self) = @_;
+  return $self if $self->_discovered;
+  return $self->discover;
+}
+
 sub can_do {
   my ($self, $verb, $resource_plural, $namespace) = @_;
 
 
+  $self->ensure_discovered;
   $namespace //= '';
 
   my $ns_rules = $self->_rules->{$namespace};
@@ -121,6 +134,7 @@ sub allowed_resources {
   my ($self, $verb, $namespace) = @_;
 
 
+  $self->ensure_discovered;
   $namespace //= '';
 
   my $ns_rules = $self->_rules->{$namespace};
@@ -149,6 +163,7 @@ sub allowed_namespaces {
   my ($self) = @_;
 
 
+  $self->ensure_discovered;
   return grep { $_ ne '' } sort keys %{ $self->_rules };
 }
 
@@ -156,6 +171,7 @@ sub can_read_logs {
   my ($self, $namespace) = @_;
 
 
+  $self->ensure_discovered;
   $namespace //= '';
   my $ns_rules = $self->_rules->{$namespace};
   return 0 unless $ns_rules;
@@ -174,6 +190,7 @@ sub summary {
   my ($self) = @_;
 
 
+  $self->ensure_discovered;
   my @lines;
   push @lines, "# Kubernetes RBAC Permissions\n";
 
@@ -244,7 +261,7 @@ MCP::K8s::Permissions - RBAC discovery and permission checking for Kubernetes
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

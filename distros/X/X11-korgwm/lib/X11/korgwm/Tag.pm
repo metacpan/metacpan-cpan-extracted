@@ -19,6 +19,7 @@ sub new($class, $screen) {
         screen => $screen,
         layout => undef,
         max_window => undef,
+        focus_prev => [],
         windows_float => [],
         windows_tiled => [],
         windows_appended => [],
@@ -67,7 +68,10 @@ sub hide($self) {
 # - noselect => do not call select() to avoid warp_pointer()
 sub show($self, %opts) {
     # Redefine layout if needed
-    $self->{layout} //= X11::korgwm::Layout->new();
+    $self->{layout} //= X11::korgwm::Layout->new(
+        func => $self->{layout_func},
+        reverse_windows => $self->{reverse_windows},
+    );
     DEBUG8 and carp "tag->show($self, @{[%opts]})";
 
     # Map all windows from the tag
@@ -107,15 +111,17 @@ sub show($self, %opts) {
     if (defined $focus_win and exists $focus_win->{on_tags}->{$self}) {
         # If this window is focused on this tag, just give it a focus
         $focus_win->focus();
-    } else {
-        # Try to focus previously focused window (or any window)
-        if (my $win = $self->{focus} || $self->first_window()) {
-            if ($win->{floating} or $win->{maximized} or $opts{noselect}) {
-                $win->focus(); # floating, maximized, always_on
-            } else {
-                $win->select(); # tiled
-            }
+    } elsif (my $win = $self->{focus} || focus_prev_get($self->{focus_prev}) || $self->first_window()) {
+        # Try to focus previously focused window (or any window on the tag)
+        if ($opts{noselect}) {
+            # Looks like for the situations, when we do not want to warp any case (see Screen.pm /panel)
+            $win->focus();
+        } else {
+            $win->select(bypass_single_window_warp => 1);
         }
+    } else {
+        # If focused window is hidden (it's on the same screen and another tag) we want to drop focus
+        $focus->{screen}->focus();
     }
 
     $X->flush();
@@ -124,7 +130,10 @@ sub show($self, %opts) {
 sub win_add($self, $win) {
     $win->{on_tags}->{$self} = $self;
 
-    $self->{urgent_windows}->{$win} = undef if $win->urgency_get();
+    if ($win->urgency_get()) {
+        $self->{urgent_windows}->{$win} = undef;
+        $self->{screen}->{panel}->ws_set_urgent($self->{idx} + 1, 1);
+    }
     $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1);
 
     $self->{max_window} = $win if $win->{maximized};
@@ -137,7 +146,10 @@ sub win_add($self, $win) {
 # XXX this function is also used for appended windows
 sub win_remove($self, $win, $norefresh = undef) {
     delete $win->{on_tags}->{$self};
+
+    # Process urgency
     delete $self->{urgent_windows}->{$win};
+    $self->{screen}->{panel}->ws_set_urgent($self->{idx} + 1, 0) unless keys %{ $self->{urgent_windows} };
 
     $self->{max_window} = undef if $win == ($self->{max_window} // 0);
 
@@ -148,12 +160,18 @@ sub win_remove($self, $win, $norefresh = undef) {
     # Remove title when removing focused window
     $self->{screen}->{panel}->title() if $win == $focus->{window};
 
+    # Remove layout when removing the last window
+    $self->{layout} = undef unless $self->first_window(1);
+
     # Update panel if tag becomes empty
     $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 0)
         if $cfg->{hide_empty_tags} and not $self->first_window();
 
+    # Remove the window from tag->focus_prev
+    focus_prev_remove($win, $self->{focus_prev});
+
     # Clean preferred focus for this tag if needed
-    $self->{focus} = undef if $win == $self->{focus};
+    $self->{focus} = focus_prev_get($self->{focus_prev}) if $win == $self->{focus};
 
     # If this tag is visible, call screen refresh
     $self->{screen}->refresh() if not $norefresh and $self == $self->{screen}->current_tag();
@@ -247,6 +265,17 @@ sub drop_appends($self) {
     $self->{screen}->{panel}->ws_drop_appends();
 
     $self->{windows_appended} = [];
+}
+
+# Set layout function and windows order for tag; layout should be re-created using show()
+sub layout_set($self, $func_name, $reverse_windows=1) {
+    return unless exists $X11::korgwm::Layout::layouts{ $func_name };
+
+    $self->{layout_func} = $func_name;
+    $self->{reverse_windows} = $reverse_windows;
+    $self->{layout} = undef;
+
+    return 1; # Executor relies on the rc to call show()
 }
 
 1;

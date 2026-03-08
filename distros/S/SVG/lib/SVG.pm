@@ -7,7 +7,7 @@ use SVG::XML;
 use parent       qw(SVG::Element SVG::Extension);
 use Scalar::Util qw/weaken/;
 
-our $VERSION = '2.88';
+our $VERSION = '2.89';
 
 =pod
 
@@ -623,19 +623,21 @@ Generate the title of the image.
 
 =head2 desc
 
-    $tag = $svg->desc(%attributes)
+    $svg->desc(id => 'image-description')->cdata('This image shows a red circle');
 
-Generate the description of the image.
-
-    my $tag = $svg->desc(id=>'document-desc')->cdata('This is a description');
+Add a description element to the SVG document. The <desc> element provides a
+text-accessible description of the container or graphics element. It is
+primarily used for accessibility (screen readers) and is not rendered visually.
 
 =head2 comment
 
-    $tag = $svg->comment(@comments)
+    $svg->comment('Single comment');
+    $svg->comment('Part 1', 'Part 2', 'Part 3');
 
-Generate the description of the image.
-
-    my $tag = $svg->comment('comment 1','comment 2','comment 3');
+Add a comment to the SVG document. Comments are rendered as standard XML
+comments. If multiple strings are provided, they are concatenated with
+spaces. Unlike the 'desc' element, comments are generally ignored by user
+agents and are not part of the DOM tree for accessibility.
 
 =head2 pi (Processing Instruction)
 
@@ -743,6 +745,11 @@ B<Output:> a hash reference consisting of the following key-value pair:
 
     # add the polyline to the SVG document
     $p = $svg->polyline(%$points, id=>'pline1');
+
+B<Note:> The attribute returned depends on the element type:
+C<-type =E<gt> 'path'> returns C<< { d => ... } >>,
+while C<-type =E<gt> 'polygon'> and C<-type =E<gt> 'polyline'>
+return C<< { points => ... } >>.
 
 B<Aliases:> get_path set_path
 
@@ -1543,7 +1550,7 @@ Ronan Oger, RO IT Systemms GmbH, cpan@roitsystems.com
 
 =head1 MAINTAINER
 
-L<Gabor Szabo|http://szabgab.com/>
+L<Mohammad Sajid Anwar|https://manwar.org/>
 
 =head1 CREDITS
 

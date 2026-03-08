@@ -1,0 +1,132 @@
+NAME
+    Loop::Util - loop helper keywords
+
+SYNOPSIS
+      use Loop::Util;
+  
+      my @array = qw(foo bar baz quux);
+  
+      for my $item (@array) {
+  
+        iffirst {
+          print "Items\n";
+          print "-" x length($item), "\n";
+        }
+    
+        print "$item\n";
+    
+        iflast {
+          print "-" x length($item), "\n";
+          print "Count: ", scalar(@array), "\n";
+        }
+      }
+
+DESCRIPTION
+    This module adds statement keywords:
+
+    *   `loop BLOCK`, `loop (EXPR) BLOCK`
+
+        `loop` introduces new loop forms.
+
+          loop { ... }
+          loop(3) { ... }
+          loop(get_number()) { ... }
+
+        `loop` also supports a single-statement form:
+
+          loop process_input();
+          loop(3) process_input();
+
+        Parentheses are required around the loop count expression. If no count
+        is given, the loop is infinite, but `last` can be used to jump out of
+        the loop. (The `next` and `redo` keywords also work as expected.)
+
+    *   `iffirst [LABEL] BLOCK [else BLOCK]`
+
+        Runs `BLOCK` only on the first loop iteration; if an `else` block is
+        present it runs for subsequent iterations.
+
+        When `LABEL` is present, `iffirst` checks that labeled loop context
+        instead of the innermost loop. This is useful in nested loops:
+
+          OUTER: loop(2) {
+            loop(3) {
+              iffirst OUTER { say "hi" }
+            }
+          }
+
+        `iffirst` works in `loop{}` loops, and also in `for`/`foreach` loops
+        over arrays and lists. Calling `iffirst` in other loop kinds throws a
+        runtime error.
+
+    *   `iflast [LABEL] BLOCK [else BLOCK]`
+
+        Runs `BLOCK` only on the last loop iteration; if an `else` block is
+        present it runs for not-last iterations.
+
+        When `LABEL` is present, `iflast` checks that labeled loop context
+        instead of the innermost loop.
+
+        `iflast` works in finite `loop{}` loops, and also in `for`/`foreach`
+        loops over arrays and lists. Calling `iflast` in other loop kinds
+        throws a runtime error.
+
+    *   `ifodd [LABEL] BLOCK [else BLOCK]`
+
+        Runs `BLOCK` for odd-numbered iterations (1st, 3rd, 5th...). If an
+        `else` block is present, it runs on even-numbered iterations.
+
+        Note that if you loop through an array, the first iteration (an odd
+        iteration) has index number 0 (an even number).
+
+        When `LABEL` is present, `ifodd` checks that labeled loop context
+        instead of the innermost loop.
+
+        `ifodd` works in `loop{}` loops, and also in `for`/`foreach` loops
+        over arrays and lists. Calling `ifodd` in other loop kinds throws a
+        runtime error.
+
+    *   `ifeven [LABEL] BLOCK [else BLOCK]`
+
+        Runs `BLOCK` for even-numbered iterations (2nd, 4th, 6th...). If an
+        `else` block is present, it runs on odd-numbered iterations.
+
+        Note that if you loop through an array, the first iteration (an odd
+        iteration) has index number 0 (an even number).
+
+        When `LABEL` is present, `ifeven` checks that labeled loop context
+        instead of the innermost loop.
+
+        `ifeven` works in `loop{}` loops, and also in `for`/`foreach` loops
+        over arrays and lists. Calling `ifeven` in other loop kinds throws a
+        runtime error.
+
+    *   `__IX__`
+
+        Psuedo-constant that returns the current zero-based index of the loop.
+
+        It should work for `loop{}` loops as well as `for`/`foreach` loops
+        over arrays or lists. In other contexts where no index can be
+        determined, it returns `undef`.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-loop-util/issues>.
+
+SEE ALSO
+    Acme::Loopy, Syntax::Keyword::Loop.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2026 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::DaemonSet;
 # ABSTRACT: DaemonSet represents the configuration of a daemon set.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Apps::V1::DaemonSet - DaemonSet represents the configuration of a 
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

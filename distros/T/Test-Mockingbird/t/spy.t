@@ -19,8 +19,8 @@ cmp_ok(MyClass::do_something('arg2', 'arg3'), 'eq', 'done something', 'routine i
 my @calls = $spy->();
 diag(Data::Dumper->new([\@calls])->Dump()) if($ENV{'TEST_VERBOSE'});
 is(scalar(@calls), 2, 'Captured two calls');
-is_deeply($calls[0], ['arg1'], 'Captured first call arguments');
-is_deeply($calls[1], ['arg2', 'arg3'], 'Captured second call arguments');
+is_deeply($calls[0], ['MyClass::do_something', 'arg1'], 'Captured first call arguments');
+is_deeply($calls[1], ['MyClass::do_something', 'arg2', 'arg3'], 'Captured second call arguments');
 
 Test::Mockingbird::restore_all();
 

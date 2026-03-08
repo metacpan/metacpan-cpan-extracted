@@ -60,31 +60,38 @@ for my $g (1 .. 10) {
 my $rel = Genealogy::Relationship->new;
 
 for (1 .. 10) {
-  is($rel->get_relationship(@{$generations[$_]}), $expected[$_][0]);
-  is($rel->get_relationship($generations[1][0], $generations[$_][1]), $expected[$_][1]);
+  is($rel->get_relationship(@{$generations[$_]}), $expected[$_][0],
+    "get_relationship for generation $_ peers: $expected[$_][0]");
+  is($rel->get_relationship($generations[1][0], $generations[$_][1]), $expected[$_][1],
+    "get_relationship from generation 1 to generation $_: $expected[$_][1]");
 }
 
 is($rel->get_relationship($generations[8][0], $generations[10][1]),
-   'Seventh cousin twice removed');
+   'Seventh cousin twice removed', 'Relationship between generation 8 and generation 10: Seventh cousin twice removed');
 is($rel->get_relationship($generations[3][0], $generations[9][1]),
-   'Second cousin six times removed');
+   'Second cousin six times removed', 'Relationship between generation 3 and generation 9: Second cousin six times removed');
 is($rel->get_relationship($generations[9][0], $generations[9][1]),
-   'Eighth cousin');
+   'Eighth cousin', 'Relationship between generation 9 peers: Eighth cousin');
 is($rel->get_relationship($generations[8][0], $generations[5][1]),
-   'Fourth cousin three times removed');
+   'Fourth cousin three times removed', 'Relationship between generation 8 and generation 5: Fourth cousin three times removed');
 
 # can_ok($rel, 'abbr');
 
 # Test a higher number for abbr
 $rel = Genealogy::Relationship->new(abbr => 4);
-is($rel->get_relationship($generations[1][0], $generations[5][1]), 'Great, great, great uncle');
-is($rel->get_relationship($generations[1][0], $generations[6][1]), '4 x great uncle');
+is($rel->get_relationship($generations[1][0], $generations[5][1]), 'Great, great, great uncle',
+  'Great, great, great uncle with abbr => 4');
+is($rel->get_relationship($generations[1][0], $generations[6][1]), '4 x great uncle',
+  '4 x great uncle with abbr => 4');
 
 # Turn off abbr
 $rel = Genealogy::Relationship->new(abbr => 0);
-is($rel->get_relationship($generations[1][0], $generations[3][1]), 'Great uncle');
-is($rel->get_relationship($generations[1][0], $generations[4][1]), 'Great, great uncle');
-is($rel->get_relationship($generations[1][0], $generations[5][1]), 'Great, great, great uncle');
+is($rel->get_relationship($generations[1][0], $generations[3][1]), 'Great uncle',
+  'Great uncle with abbr disabled');
+is($rel->get_relationship($generations[1][0], $generations[4][1]), 'Great, great uncle',
+  'Great, great uncle with abbr disabled');
+is($rel->get_relationship($generations[1][0], $generations[5][1]), 'Great, great, great uncle',
+  'Great, great, great uncle with abbr disabled');
 
 
 done_testing;

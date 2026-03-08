@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.009';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);

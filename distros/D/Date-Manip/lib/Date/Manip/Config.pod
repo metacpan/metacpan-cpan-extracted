@@ -1,4 +1,4 @@
-# Copyright (c) 1996-2025 Sullivan Beck. All rights reserved.
+# Copyright (c) 1996-2026 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -668,6 +668,20 @@ DATE must be a date in one of the two formats:
 
    YYYY-MM-DD-HH:MN:SS
    YYYYMMDDHH:MN:SS
+
+=head1 MISCELLANEOUS CONFIGURATION VARIABLES
+
+=over 4
+
+=item B<Use_POSIX_Printf>
+
+In the date printf function, most of the directives match the POSIX
+directives.  However, a small number of them do not.
+
+With this option set to 1, all of the directives will match the
+POSIX directives.
+
+=back
 
 =head1 DEPRECATED CONFIGURATION VARIABLES
 

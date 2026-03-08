@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package Text::SlackEmoji 0.010;
+package Text::SlackEmoji 0.011;
 # ABSTRACT: data for mapping Slack :emoji_strings: into Unicode text
 
 use File::ShareDir ();
@@ -73,7 +73,7 @@ Text::SlackEmoji - data for mapping Slack :emoji_strings: into Unicode text
 
 =head1 VERSION
 
-version 0.010
+version 0.011
 
 =head1 SYNOPSIS
 
@@ -128,10 +128,6 @@ Ricardo Signes <cpan@semiotic.systems>
 =for stopwords Ricardo Signes Rob N ★
 
 =over 4
-
-=item *
-
-Ricardo Signes <rjbs@cpan.org>
 
 =item *
 

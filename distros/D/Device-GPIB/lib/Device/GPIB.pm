@@ -26,8 +26,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '1.3';
-
+our $VERSION = '1.4';
 
 # Preloaded methods go here.
 
@@ -85,9 +84,14 @@ A wrapper that will load the appropriate Controller module depending on a port/d
 argument passed to it. The following port/device names are supported:
 
 Prologix:[port[:baud:databits:parity:stopbits:handshake]]
+Prologix:serial:[port[:baud:databits:parity:stopbits:handshake]]
+Prologix:tcp:[address:port]
+AR488:[port[:baud:databits:parity:stopbits:handshake]]   #same as Prologix:serial
+AR488:serial:[port[:baud:databits:parity:stopbits:handshake]]   #same as Prologix:serial
+AR488:tcp:[address:port]   #same as Prologix:tcp
 LinuxGpib:[board_index]]
-port[:baud:databits:parity:stopbits:handshake]] # defaults to Prologix
-SERIAL:[baud:databits:parity:stopbits:handshake]]
+port[:baud:databits:parity:stopbits:handshake]] # defaults to Prologix/AR488 serial
+SERIAL:[baud:databits:parity:stopbits:handshake]] # defaults to Prologix/AR488 serial
 
 Examples:
 
@@ -154,6 +158,10 @@ not have enough time to send the last command to the addressed
 device. We have added a short delay after device close to ensure the
 last command is sent.
 
+AR488 supports has also been tested with the AR488-ESP32 variant
+from https://github.com/douardda/AR488-ESP32
+on ESP32
+
 LinuxGpib
 
 The LinuxGpib drivers and supporting software are excellent and very
@@ -185,7 +193,7 @@ DM5110.pm Digital Multimeter plugin
 PFG5105.pm Programmable Function Generator plugin
 PS5010.pm Power Supply plugin
 DC5009.pm Digital Counter plugin
-LA1240.pm  Logic Analyser (Serial interface only; GPIB not yet tested)
+LA1240.pm Logic Analyser
 AFG5101.pm Arbitrary Function Generator plugin
 DM5010.pm Digital Multimeter plugin
 MI5010.pm Multifunction Interface plugin

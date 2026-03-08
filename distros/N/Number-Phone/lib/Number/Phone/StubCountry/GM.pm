@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153522;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -99,52 +99,52 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"220566", "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol",
-"2204416", "Tujereng",
-"220553", "Soma",
-"2204488", "Sibanor",
-"2205678", "Brikama\-Ba",
-"22042", "Banjul",
-"220446", "Kotu\/Senegambia",
-"2205541", "Kwenella",
-"2205542", "Nyorojattaba",
-"220574", "Kaur",
-"2205665", "Kuntaur",
-"2205666", "Numeyel",
-"2204481", "Brikama\/Kanilia",
-"2205710", "Barra",
-"2204410", "Brufut",
-"2204482", "Brikama\/Kanilia",
-"2205738", "Ngensanjal",
-"2204414", "Sanyang",
-"2204417", "Sanyang",
-"2204489", "Bwiam",
-"2205714", "Ndugukebbe",
-"2205725", "Iliasa",
-"2204412", "Tanji",
-"22043", "Bundung\/Serekunda",
-"2205723", "Njabakunda",
-"2204480", "Bondali",
-"220567", "Sotuma",
-"2204483", "Brikama\/Kanilia",
-"2205720", "Kerewan",
-"2204484", "Brikama\/Kanilia",
-"2205546", "Kudang",
-"2204487", "Faraba",
-"2204485", "Kafuta",
-"2204419", "Kartong",
-"220447", "Yundum",
-"2205674", "Bansang",
-"2205543", "Japeneh\/Soma",
-"2205544", "Bureng",
-"2205547", "Jareng",
-"2204486", "Gunjur",
-"2205545", "Pakaliba",
-"22044195", "Berending",
+$areanames{en} = {"220567", "Sotuma",
 "2205676", "Georgetown",
-"220449", "Bakau",
+"2205541", "Kwenella",
+"2204414", "Sanyang",
+"22043", "Bundung\/Serekunda",
+"2204486", "Gunjur",
+"22042", "Banjul",
+"2205542", "Nyorojattaba",
+"2204487", "Faraba",
+"220566", "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol",
+"2204481", "Brikama\/Kanilia",
+"2205666", "Numeyel",
+"2204419", "Kartong",
+"2205546", "Kudang",
+"2204482", "Brikama\/Kanilia",
+"2205547", "Jareng",
+"2204488", "Sibanor",
+"2205545", "Pakaliba",
+"2205674", "Bansang",
+"2204416", "Tujereng",
+"2205678", "Brikama\-Ba",
+"2205710", "Barra",
+"2204417", "Sanyang",
+"2205665", "Kuntaur",
+"2204484", "Brikama\/Kanilia",
+"220447", "Yundum",
+"2205738", "Ngensanjal",
+"2204489", "Bwiam",
+"2205725", "Iliasa",
+"2204485", "Kafuta",
+"2205544", "Bureng",
 "2205735", "Farafenni",
-"2205540", "Kaiaf",};
+"2204412", "Tanji",
+"220446", "Kotu\/Senegambia",
+"220574", "Kaur",
+"220553", "Soma",
+"2204410", "Brufut",
+"2205543", "Japeneh\/Soma",
+"22044195", "Berending",
+"220449", "Bakau",
+"2205540", "Kaiaf",
+"2205723", "Njabakunda",
+"2204483", "Brikama\/Kanilia",
+"2205714", "Ndugukebbe",
+"2205720", "Kerewan",
+"2204480", "Bondali",};
 my $timezones = {
                '' => [
                        'Africa/Banjul'

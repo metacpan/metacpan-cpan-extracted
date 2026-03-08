@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.06
+    version 0.07
 
 SYNOPSIS
 
@@ -14,8 +14,8 @@ SYNOPSIS
      is(
        "http://example.com/path1/path2?query=1#fragment",
        url {
-         url_scheme             => 'http';
-         url_host               => 'example.com';
+         url_scheme 'http';
+         url_host   'example.com';
          url_component path     => '/path1/path2';
          url_component query    => { query => 1 };
          url_component fragment => 'fragment';
@@ -176,9 +176,11 @@ AUTHOR
 
     Paul Durden (alabamapaul, PDURDEN)
 
+    Yoshikazu Sawa (yoshikazusawa)
+
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2017-2021 by Graham Ollis.
+    This software is copyright (c) 2017-2024 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

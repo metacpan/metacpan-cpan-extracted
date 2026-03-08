@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from minuit.pd! Don't modify!
 #
 package PDL::Minuit;
 
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.001';
+   our $VERSION = '0.002';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Minuit $VERSION;
@@ -22,7 +22,8 @@ use DynaLoader;
 
 
 
-#line 17 "minuit.pd"
+
+#line 15 "minuit.pd"
 
 =head1 NAME
 
@@ -64,7 +65,7 @@ and migrad minimization algorithms (see Minuit manual for more details).
 
 =cut
 
-#line 59 "minuit.pd"
+#line 57 "minuit.pd"
 use strict;
 use warnings;
 
@@ -86,17 +87,17 @@ sub mn_init{
 	$mn_options->{$key} = $args->{$key} if exists $args->{$key};
     }
   }
-	
+
   # Check if there was a valid F77 available and barf
   # if there was not and the user is trying to pass Log
 
-  if (defined($mn_options->{Log})) { 
+  if (defined($mn_options->{Log})) {
     $mn_options->{Unit} = 88 unless defined $mn_options->{Unit};
   }
   else { $mn_options->{Unit} = 6; }
-           
-  if (defined (my $logfile = $mn_options->{Log})){ 
-    if (-e $logfile) { unlink $logfile; }   
+
+  if (defined (my $logfile = $mn_options->{Log})){
+    if (-e $logfile) { unlink $logfile; }
     mn_abre($mn_options->{Unit},$logfile,'new');
   }
 
@@ -108,7 +109,7 @@ sub mn_init{
   }
 
 }
-#line 112 "Minuit.pm"
+#line 113 "Minuit.pm"
 
 *mninit = \&PDL::Minuit::mninit;
 
@@ -126,7 +127,7 @@ sub mn_init{
 
 
 
-#line 136 "minuit.pd"
+#line 134 "minuit.pd"
 
 sub mn_def_pars{
   my $pars  = shift;
@@ -165,7 +166,7 @@ sub mn_def_pars{
 
   mn_cierra($mn_options->{Unit}) if defined $mn_options->{Log};
 }
-#line 169 "Minuit.pm"
+#line 170 "Minuit.pm"
 
 *mnparm = \&PDL::Minuit::mnparm;
 
@@ -173,35 +174,28 @@ sub mn_def_pars{
 
 
 
-#line 196 "minuit.pd"
+#line 194 "minuit.pd"
 
 sub mn_excm{
   my $command = shift;
-  
+
   my $fun_ref = $mn_options->{Function};
 
-  my ($arglis,$narg);
-  if ( @_ ) { $arglis = shift; $narg = nelem($arglis);}
-  else { $arglis = pdl(0); $narg = 0; }
-   
+  my ($arglis);
+  if ( @_ ) { $arglis = shift; }
+  else { $arglis = empty(); }
   if ( @_ ) { barf "Usage : mn_excm($command, [$arglis]) \n"; }
-
   if (defined (my $logfile = $mn_options->{Log})){
     mn_abre($mn_options->{Unit},$logfile,'old');
   }
-
-  my $iflag = pdl(0);
-
-  $iflag = mnexcm($arglis, $narg, $command, $fun_ref,$mn_options->{N});
+  my $iflag = mnexcm($arglis, $command, $fun_ref,$mn_options->{N});
   warn "Problem executing command '$command' " unless ($iflag == 0);
-
   if (defined (my $logfile = $mn_options->{Log})){
     mn_cierra($mn_options->{Unit});
   }
-
-  return $iflag;
+  $iflag;
 }
-#line 205 "Minuit.pm"
+#line 199 "Minuit.pm"
 
 *mnexcm = \&PDL::Minuit::mnexcm;
 
@@ -209,7 +203,7 @@ sub mn_excm{
 
 
 
-#line 238 "minuit.pd"
+#line 229 "minuit.pd"
 
   sub mn_pout{
     barf "Usage: mn_pout(par_number)" unless ($#_ == 0);
@@ -233,9 +227,9 @@ sub mn_excm{
       mn_cierra($mn_options->{Unit});
     }
 
-    return ($val,$err,$bnd1,$bnd2,$ivarbl,$par_name);    
+    return ($val,$err,$bnd1,$bnd2,$ivarbl,$par_name);
   }
-#line 239 "Minuit.pm"
+#line 233 "Minuit.pm"
 
 *mnpout = \&PDL::Minuit::mnpout;
 
@@ -243,7 +237,7 @@ sub mn_excm{
 
 
 
-#line 277 "minuit.pd"
+#line 268 "minuit.pd"
 
   sub mn_stat{
      if (defined (my $logfile = $mn_options->{Log})){
@@ -258,7 +252,7 @@ sub mn_excm{
 
      return ($fmin,$fedm,$errdef,$npari,$nparx,$istat);
   }
-#line 262 "Minuit.pm"
+#line 256 "Minuit.pm"
 
 *mnstat = \&PDL::Minuit::mnstat;
 
@@ -266,10 +260,9 @@ sub mn_excm{
 
 
 
-#line 301 "minuit.pd"
+#line 292 "minuit.pd"
 
   sub mn_emat{
-   
     if (defined (my $logfile = $mn_options->{Log})){
       mn_abre($mn_options->{Unit},$logfile,'old');
     }
@@ -283,11 +276,10 @@ sub mn_excm{
     if (defined (my $logfile = $mn_options->{Log})){
       mn_cierra($mn_options->{Unit});
     }
-    
-    return $mat;
 
+    $mat;
   }
-#line 291 "Minuit.pm"
+#line 283 "Minuit.pm"
 
 *mnemat = \&PDL::Minuit::mnemat;
 
@@ -295,7 +287,7 @@ sub mn_excm{
 
 
 
-#line 331 "minuit.pd"
+#line 320 "minuit.pd"
 
   sub mn_err{
 
@@ -317,7 +309,7 @@ sub mn_excm{
 
     return ($eplus,$eminus,$eparab,$globcc);
   }
-#line 321 "Minuit.pm"
+#line 313 "Minuit.pm"
 
 *mnerrs = \&PDL::Minuit::mnerrs;
 
@@ -325,34 +317,25 @@ sub mn_excm{
 
 
 
-#line 361 "minuit.pd"
+#line 350 "minuit.pd"
 
   sub mn_contour{
     barf "Usage: mn_contour(par_number_1,par_number_2,npt)" unless ($#_ == 2);
     my $par_num_1 = shift;
     my $par_num_2 = shift;
     my $npt = shift;
-
     my $fun_ref = $mn_options->{Function};
-
     my $n = $mn_options->{N};
     if (($par_num_1 < 1) || ($par_num_1 > $n)) { barf "Parameter numbers range from 1 to $n "; }
     if (($par_num_2 < 1) || ($par_num_2 > $n)) { barf "Parameter numbers range from 1 to $n "; }
     if ($npt < 5) { barf "Have to specify at least 5 points in routine contour "; }
-
-    my $xpt = zeroes($npt);
-    my $ypt = zeroes($npt);
-    my $nfound = pdl->new;
-
-    mncont($par_num_1,$par_num_2,$npt,$xpt,$ypt,$nfound,$fun_ref,$n);
-
+    my ($xpt, $ypt, $nfound) = mncont($par_num_1,$par_num_2,$npt,$fun_ref,$n);
     if (defined (my $logfile = $mn_options->{Log})){
       mn_cierra($mn_options->{Unit});
     }
-
-    return ($xpt,$ypt,$nfound);
+    ($xpt,$ypt,$nfound);
   }
-#line 356 "Minuit.pm"
+#line 339 "Minuit.pm"
 
 *mncont = \&PDL::Minuit::mncont;
 
@@ -360,24 +343,28 @@ sub mn_excm{
 
 
 
-#line 400 "minuit.pd"
+#line 381 "minuit.pd"
+
+=head1 FUNCTIONS
 
 =head2 mn_init()
 
 =for ref
 
-The function mn_init() does the basic initialization of the fit. The first argument
+The function mn_init() does the basic initialization of the fit.
+
+The first argument
 has to be a reference to the function to be minimized. The function
 to be minimized has to receive five arguments
 ($npar,$grad,$fval,$xval,$iflag). The first is the number
 of parameters currently variable. The second is the gradient
-of the function (which is not necessarily used, see 
+of the function (which is not necessarily used, see
 the Minuit documentation). The third is the current value of the
-function. The fourth is an ndarray with the values of the parameters. 
+function. The fourth is an ndarray with the values of the parameters.
 The fifth is an integer flag, which indicates what
 the function is supposed to calculate. The function has to
-return the  values ($fval,$grad), the function value and 
-the function gradient. 
+return the  values ($fval,$grad), the function value and
+the function gradient.
 
 There are three optional arguments to mn_init(). By default, the output of Minuit
 will come through STDOUT unless a filename $logfile is given
@@ -386,35 +373,31 @@ if it already exists. Additionally, a title can be given to the fit
 by the Title option, the default is 'Minuit Fit'. If the output is
 written to a logfile, this is assigned Fortran unit number 88. If for
 whatever reason you want to have control over the unit number
-that Fortran associates to the logfile, you can pass the number 
+that Fortran associates to the logfile, you can pass the number
 through the Unit option.
-
-=for usage
 
 Usage:
 
- mn_init($function_ref,{Log=>$logfile,Title=>$title,Unit=>$unit})
+=for usage
 
-=for example
+ mn_init($function_ref,{Log=>$logfile,Title=>$title,Unit=>$unit})
 
 Example:
 
- mn_init(\&my_function);
+=for example
 
+ mn_init(\&my_function);
  #same as above but outputting to a file 'log.out'.
  #title for fit is 'My fit'
  mn_init(\&my_function,
 	 {Log => 'log.out', Title => 'My fit'});
-
  sub my_function{
     # the five variables input to the function to be minimized
     # xval is an ndarray containing the current values of the parameters
     my ($npar,$grad,$fval,$xval,$iflag) = @_;
-
     # Here is code computing the value of the function
     # and potentially also its gradient
     # ......
-
     # return the two variables. If no gradient is being computed
     # just return the $grad that came as input
     return ($fval, $grad);
@@ -424,18 +407,20 @@ Example:
 
 =for ref
 
-The function mn_def_pars() defines the initial values of the parameters of the function to 
-be minimized and the value of the initial steps around these values that the 
+Defines the initial values of the parameters of the function to
+be minimized.
+
+The value of the initial steps around these values that the
 minimizer will use for the first variations of the parameters in the search for the minimum.
-There are several optional arguments. One allows assigning names to these parameters which 
+There are several optional arguments. One allows assigning names to these parameters which
 otherwise get names (Par_0, Par_1,....,Par_n) by default. Another two arguments can give
-lower and upper bounds for the parameters via two ndarrays. If the lower and upper bound for a 
+lower and upper bounds for the parameters via two ndarrays. If the lower and upper bound for a
 given parameter are both equal to 0 then the parameter is unbound. By default these lower and
-upper bound ndarrays are set to  zeroes(n), where n is the number of parameters, i.e. the 
-parameters are unbound by default. 
+upper bound ndarrays are set to  zeroes(n), where n is the number of parameters, i.e. the
+parameters are unbound by default.
 
 The function needs two input variables: an ndarray giving the initial values of the
-parameters and another ndarray giving the initial steps. An optional reference to a 
+parameters and another ndarray giving the initial steps. An optional reference to a
 perl array with the  variable names can be passed, as well as ndarrays
 with upper and lower bounds for the parameters (see example below).
 
@@ -445,78 +430,70 @@ It returns an integer variable which is 0 upon success.
 
 Usage:
 
- $iflag = mn_def_pars($pars, $steps,{Names => \@names, 
+ $iflag = mn_def_pars($pars, $steps,{Names => \@names,
 			Lower_bounds => $lbounds,
 			Upper_bounds => $ubounds})
 
-=for example
-
 Example:
 
+=for example
+
  #initial parameter values
- my $pars = pdl(2.5,3.0);          
-
+ my $pars = pdl(2.5,3.0);
  #steps
- my $steps = pdl(0.3,0.5);     
-
- #parameter names    
+ my $steps = pdl(0.3,0.5);
+ #parameter names
  my @names = ('intercept','slope');
-
  #use mn_def_pars with default parameter names (Par_0,Par_1,...)
  my $iflag = mn_def_pars($pars,$steps);
-
  #use of mn_def_pars explicitly specify parameter names
  $iflag = mn_def_pars($pars,$steps,{Names => \@names});
-
- # specify lower and upper bounds for the parameters. 
+ # specify lower and upper bounds for the parameters.
  # The example below leaves parameter 1 (intercept) unconstrained
  # and constrains parameter 2 (slope) to be between 0 and 100
  my $lbounds = pdl(0, 0);
  my $ubounds = pdl(0, 100);
-
- $iflag = mn_def_pars($pars,$steps,{Names => \@names, 
+ $iflag = mn_def_pars($pars,$steps,{Names => \@names,
 			Lower_bounds => $lbounds,
 			Upper_bounds => $ubounds}});
-
  #same as above because $lbounds is by default zeroes(n)
- $iflag = mn_def_pars($pars,$steps,{Names => \@names, 
+ $iflag = mn_def_pars($pars,$steps,{Names => \@names,
 			Upper_bounds => $ubounds}});
 
 =head2 mn_excm()
 
-The function mn_excm() executes a Minuit command passed as
-a string. The first argument is the command string and an optional
+=for ref
+
+Execute a Minuit command passed as a string.
+
+The first argument is the command string and an optional
 second argument is an ndarray with arguments to the command.
-The available commands are listed in Chapter 4 of the Minuit 
+The available commands are listed in Chapter 4 of the Minuit
 manual (see url below).
 
 It returns an integer variable which is 0 upon success.
 
-=for usage
-
 Usage:
+
+=for usage
 
  $iflag = mn_excm($command_string, {$arglis})
 
-=for example
-
 Example:
+
+=for example
 
   #start a simplex minimization
   my $iflag = mn_excm('simplex');
-
   #same as above but specify the maximum allowed numbers of
-  #function calls in the minimization 
+  #function calls in the minimization
   my $arglist = pdl(1000);
   $iflag = mn_excm('simplex',$arglist);
-
   #start a migrad minimization
   $iflag = mn_excm('migrad')
-
   #set Minuit strategy in order to get the most reliable results
   $arglist = pdl(2)
   $iflag = mn_excm('set strategy',$arglist);
-
   # each command can be specified by a minimal string that uniquely
   # identifies it (see Chapter 4 of Minuit manual). The command above
   # is equivalent to:
@@ -524,24 +501,30 @@ Example:
 
 =head2 mn_pout()
 
-The function mn_pout() gets the current value of a parameter. It 
-takes as input the parameter number and returns an array with the
+=for ref
+
+Get the current value of a parameter.
+
+It takes as input the parameter number and returns an array with the
 parameter value, the current estimate of its uncertainty (0 if
-parameter is constant), lower bound on the parameter, if any 
+parameter is constant), lower bound on the parameter, if any
 (otherwise 0), upper bound on the parameter, if any (otherwise 0),
 integer flag (which is equal to the parameter number if variable,
 zero if the parameter is constant and negative if parameter is
 not defined) and the parameter name.
 
-=for usage
-
 Usage:
+
+=for usage
 
      ($val,$err,$bnd1,$bnd2,$ivarbl,$par_name) = mn_pout($par_number);
 
 =head2 mn_stat()
 
-The function mn_stat() gets the current status of the minimization.
+=for ref
+
+Gets the current status of the minimization.
+
 It returns an array with the best function value found so far,
 the estimated vertical distance remaining to minimum, the value
 of UP defining parameter uncertainties (default is 1), the number
@@ -550,44 +533,53 @@ and an integer flag indicating how good the covariance matrix is
 (0=not calculated at all; 1=diagonal approximation, not accurate;
 2=full matrix, but forced positive definite; 3=full accurate matrix)
 
-=for usage
-
 Usage:
+
+=for usage
 
     ($fmin,$fedm,$errdef,$npari,$nparx,$istat) = mn_stat();
 
 =head2 mn_emat()
 
-The function mn_emat returns the covariance matrix as an ndarray.
+=for ref
 
-=for usage
+Returns the covariance matrix as an ndarray.
 
 Usage:
+
+=for usage
 
   $emat = mn_emat();
 
 =head2 mn_err()
 
-The function mn_err() returns the current existing values for 
-the error in the fitted parameters. It returns an array
-with the positive error, the negative error, the "parabolic" 
+=for ref
+
+Returns the current existing values for the error in the fitted parameters.
+
+It returns an array
+with the positive error, the negative error, the "parabolic"
 parameter error from the error matrix and the global correlation
 coefficient, which is a number between 0 and 1 which gives
 the correlation between the requested parameter and that linear
-combination of all other parameters which is most strongly 
+combination of all other parameters which is most strongly
 correlated with it. Unless the command 'MINOS' has been issued via
 the function mn_excm(), the first three values will be equal.
 
-=for usage
-
 Usage:
+
+=for usage
 
   ($eplus,$eminus,$eparab,$globcc) = mn_err($par_number);
 
 =head2 mn_contour()
 
-The function mn_contour() finds contours of the function being minimized
-with respect to two chosen parameters. The contour level is given by 
+=for ref
+
+Finds contours of the function being minimized with respect to two
+chosen parameters.
+
+The contour level is given by
 F_min + UP, where F_min is the minimum of the function and UP is the ERRordef
 specified by the user, or 1.0 by default (see Minuit manual). The contour
 calculated by this function is dynamic, in the sense that it represents the
@@ -596,15 +588,15 @@ minimum of the function being minimized with respect to all the other NPAR-2 par
 
 The function takes as input the parameter numbers with respect to which the contour
 is to be determined (two) and the number of points $npt required on the contour (>4).
-It returns an array with ndarrays $xpt,$ypt containing the coordinates of the contour 
+It returns an array with ndarrays $xpt,$ypt containing the coordinates of the contour
 and a variable $nfound indicating the number of points actually found in the contour.
 If all goes well $nfound will be equal to $npt, but it can be negative if the input
 arguments are not valid, zero if less than four points have been found or <$npt if the
 program could not find $npt points.
 
-=for usage
+Usage:
 
-Usage: 
+=for usage
 
   ($xpt,$ypt,$nfound) = mn_contour($par_number_1,$par_number_2,$npt)
 
@@ -612,20 +604,18 @@ Usage:
 
 L<PDL>
 
-The Minuit documentation is online at
-
-  http://wwwasdoc.web.cern.ch/wwwasdoc/minuit/minmain.html
+The Minuit documentation is online at L<https://web.archive.org/web/20030712204534/http://wwwasdoc.web.cern.ch/wwwasdoc/minuit/minmain.html>.
 
 =head1 AUTHOR
 
 This file copyright (C) 2007 Andres Jordan <ajordan@eso.org>.
-All rights reserved. There is no warranty. You are allowed to redistribute this 
+All rights reserved. There is no warranty. You are allowed to redistribute this
 software/documentation under certain conditions. For details, see the file
 COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 629 "Minuit.pm"
+#line 619 "Minuit.pm"
 
 # Exit with OK status
 

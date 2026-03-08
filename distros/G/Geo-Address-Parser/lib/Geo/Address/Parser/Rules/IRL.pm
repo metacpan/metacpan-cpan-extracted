@@ -35,7 +35,7 @@ Returns a hashref with keys:
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # heuristics for detecting building/venue names
 my $BUILDING_RE = qr/\b(?:house|hall|mill|centre|center|museum|church|hotel|inn|club|school|library|theatre)\b/i;

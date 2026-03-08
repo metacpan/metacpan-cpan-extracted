@@ -1,3 +1,4 @@
+.stopwords
 Changes
 lib/DBIx/Class/Async.pm
 lib/DBIx/Class/Async/SelectNormaliser.pm
@@ -122,15 +123,17 @@ t/152-sql-consistency.t
 t/153-dbic-async-exception.t
 t/154-grouped-delete.t
 t/155-select-normaliser.t
+t/156-resultset-inflate-datetime.t
 t/benchmark.pl
 t/manifest.t
 t/pod.t
-t/spelling.t
+t/spell-pod.t
 t/lib/TestSchema.pm
 t/lib/TestSchema/Result/User.pm
 t/lib/TestSchema/Result/Order.pm
 t/lib/TestSchema/Result/Product.pm
 t/lib/TestSchema/Result/Event.pm
+t/lib/TestSchema/Result/Job.pm
 t/lib/TestSchema/Result/Cog.pm
 t/lib/TestSchema/Result/Thing.pm
 t/lib/TestSchema/Result/Sprocket.pm

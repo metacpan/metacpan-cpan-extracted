@@ -1,6 +1,6 @@
 package IO::K8s::Role::Resource;
 # ABSTRACT: Role providing Kubernetes resource instance behavior
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use v5.10;
 use Moo::Role;
 use JSON::MaybeXS ();
@@ -228,7 +228,7 @@ IO::K8s::Role::Resource - Role providing Kubernetes resource instance behavior
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SUPPORT
 

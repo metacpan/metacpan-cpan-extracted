@@ -1,4 +1,4 @@
-package Debug::Easy 2.21;
+package Debug::Easy 2.24;
 
 use strict;
 # use warnings;
@@ -319,34 +319,32 @@ sub new {
     my $class = shift;
     my ($filename, $dir, $suffix) = fileparse($0);
     my $tm   = time;
-    my $self = {
-        'LogLevel'           => 'ERR',                                                                    # Default is errors only
-        'Type'               => 'fh',                                                                     # Default is a filehandle
-        'Path'               => '/var/log',                                                               # Default path should type be unix
-        'FileHandle'         => \*STDERR,                                                                 # Default filehandle is STDERR
-        'MasterStart'        => $tm,
-        'ANY_LastStamp'      => $tm,                                                                      # Initialize main benchmark
-        'ERR_LastStamp'      => $tm,                                                                      # Initialize the ERR benchmark
-        'WARN_LastStamp'     => $tm,                                                                      # Initialize the WARN benchmark
-        'INFO_LastStamp'     => $tm,                                                                      # Initialize the INFO benchmark
-        'NOTICE_LastStamp'   => $tm,                                                                      # Initialize the NOTICE benchmark
-        'DEBUG_LastStamp'    => $tm,                                                                      # Initialize the DEBUG benchmark
-        'DEBUGMAX_LastStamp' => $tm,                                                                      # Initialize the DEBUGMAX benchmark
-        'Color'              => TRUE,                                                                     # Default to colorized output
-        'DateStamp'          => colored(['yellow'], '%date%'),
-        'TimeStamp'          => colored(['yellow'], '%time%'),
-        'Epoch'              => colored(['cyan'],   '%epoch%'),
-        'Padding'            => -20,                                                                      # Default padding is 20 spaces
-        'Lines-Padding'      => -2,
-        'Subroutine-Padding' =>  0,
-        'Line-Padding'       =>  0,
+    my $self = { # The keys are set to upper-case later in the initialization
+        'LOGLEVEL'           => 'ERR',                                                                    # Default is errors only
+        'TYPE'               => 'fh',                                                                     # Default is a filehandle
+        'PATH'               => '/var/log',                                                               # Default path should type be unix
+        'FILEHANDLE'         => \*STDERR,                                                                 # Default filehandle is STDERR
+        'MASTERSTART'        => $tm,
+        'ANY_LASTSTAMP'      => $tm,                                                                      # Initialize main benchmark
+        'ERR_LASTSTAMP'      => $tm,                                                                      # Initialize the ERR benchmark
+        'WARN_LASTSTAMP'     => $tm,                                                                      # Initialize the WARN benchmark
+        'INFO_LASTSTAMP'     => $tm,                                                                      # Initialize the INFO benchmark
+        'NOTICE_LASTSTAMP'   => $tm,                                                                      # Initialize the NOTICE benchmark
+        'DEBUG_LASTSTAMP'    => $tm,                                                                      # Initialize the DEBUG benchmark
+        'DEBUGMAX_LASTSTAMP' => $tm,                                                                      # Initialize the DEBUGMAX benchmark
+        'COLOR'              => TRUE,                                                                     # Default to colorized output
+        'DATESTAMP'          => colored(['yellow'], '%date%'),
+        'TIMESTAMP'          => colored(['yellow'], '%time%'),
+        'EPOCH'              => colored(['cyan'],   '%epoch%'),
+        'PADDING'            => -20,                                                                      # Default padding is 20 spaces
+        'LINES-PADDING'      => -2,
+        'SUBROUTINE-PADDING' =>  0,
+        'LINE-PADDING'       =>  0,
         'PARENT'             => $$,
-        'Prefix'             => '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] ',
-        'DEBUGMAX-Prefix'    => '%Date% %Time% %Benchmark% %Loglevel%[%Module%][%Lines%] ',
-        'Filename'           => '[' . colored(['magenta'], $filename) . ']',
-#        'TIMEZONE'           => DateTime::TimeZone->new(name => 'local'),
-#        'DATETIME'           => DateTime->now('time_zone' => DateTime::TimeZone->new(name => 'local')),
-        'ANSILevel'          => {
+        'GLOBAL-PREFIX'      => '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] ',
+        'DEBUGMAX-PREFIX'    => '%Date% %Time% %Benchmark% %Loglevel%[%Module%][%Lines%] ',
+        'FILENAME'           => '[' . colored(['magenta'], $filename) . ']',
+        'ANSILEVEL'          => {
             'ERR'      => colored(['white on_red'],        '[ ERROR  ]'),
             'WARN'     => colored(['black on_yellow'],     '[WARNING ]'),
             'NOTICE'   => colored(['yellow'],              '[ NOTICE ]'),
@@ -384,14 +382,11 @@ sub new {
     $self->{'LOGLEVEL_VALUE'} = $LevelLogic{ $self->{'LOGLEVEL'} };
 
     # Cache thread support check for hot path
-    my $use_threads = ($Config{'useithreads'} && eval { require threads; 1 }) ? 1 : 0;
-    $self->{'USE_THREADS'} = $use_threads;
+    $self->{'USE_THREADS'} = ($Config{'useithreads'}) ? 1 : 0;
 
     # This instructs the ANSIColor library to turn off coloring,
     # if the Color attribute is set to zero.
     unless ($self->{'COLOR'}) {
-#        local $ENV{'ANSI_COLORS_DISABLED'} = TRUE; # Only this module should be set
-
         # If COLOR is FALSE, then clear color data from ANSILEVEL, as these were
         # defined before color was turned off.
         $self->{'ANSILEVEL'} = {
@@ -408,34 +403,32 @@ sub new {
         $self->{'FILENAME'}  = '[' . $filename . ']'; # Ensure filename without color
     }
 
-    foreach my $lvl (@Levels) {
-        $self->{"$lvl-PREFIX"} = $self->{'PREFIX'} unless (exists($self->{"$lvl-PREFIX"}) && defined($self->{"$lvl-PREFIX"}));
+    foreach my $lvl (@Levels) { # Set any undefined prefix to the global prefix
+        $self->{"$lvl-PREFIX"} = $self->{'GLOBAL-PREFIX'} unless (exists($self->{"$lvl-PREFIX"}) && defined($self->{"$lvl-PREFIX"}));
     }
 
     # Precompute static prefix templates per level to minimize per-line substitutions.
     # We will leave dynamic tokens (%date%, %time%, %epoch%, %Benchmark%) for runtime.
     $self->{'_PREFIX_TEMPLATES'} = {};
     foreach my $lvl (@Levels) {
-        my $tmpl = $self->{"$lvl-PREFIX"} . ''; # copy
+        my $tmpl     = $self->{"$lvl-PREFIX"} . ''; # copy
         my $forked   = ($PARENT ne $$) ? 'C' : 'P';
         my $threaded = 'PT-';
         if ($self->{'USE_THREADS'}) {
-            my $tid = threads->can('tid') ? threads->tid() : 0;
+            my $tid   = threads->can('tid') ? threads->tid() : 0;
             $threaded = ($tid && $tid > 0) ? sprintf('T%02d', $tid) : 'PT-';
         }
 
-        # Static substitutions
-        $tmpl =~ s/\%PID\%/$$/gi;
-        $tmpl =~ s/\%Loglevel\%/$self->{'ANSILEVEL'}->{$lvl}/gi;
-        $tmpl =~ s/\%Filename\%/$self->{'FILENAME'}/gi;
-        $tmpl =~ s/\%Fork\%/$forked/gi;
-        $tmpl =~ s/\%Thread\%/$threaded/gi;
+		my %mp = (
+			'PID'      => $$,
+			'Loglevel' => $self->{'ANSILEVEL'}->{$lvl},
+			'Filename' => $self->{'FILENAME'},
+			'Fork'     => $forked,
+			'Thread'   => $threaded,
+		);
 
-        # Leave dynamic tokens for runtime:
-        # %Lines%, %Lastline%, %Subroutine%, %Module% (caller-dependent)
-        # %Date%, %Time%, %Epoch% (colorized stamp placeholders)
-        # %date%, %time%, %epoch% (raw values)
-        # %Benchmark%
+        # Static substitutions
+		$tmpl =~ s/\%(PID|Loglevel|Filename|Fork|Thread)\%/$mp{$1}/gei;
 
         $self->{'_PREFIX_TEMPLATES'}->{$lvl} = $tmpl;
     }
@@ -488,28 +481,18 @@ sub debug {
     return if ($self->{'LOGLEVEL_VALUE'} < $LevelLogic{$level});
 
     my @messages;
-    if (ref($msgs) eq 'SCALAR' || ref($msgs) eq '') {
-        push(@messages, $msgs);
+	if (ref($msgs) =~ /HASH|CODE|FORMAT|IO/) {
+        push(@messages, _send_to_Dumper($msgs));
     } elsif (ref($msgs) eq 'ARRAY') {
         @messages = @{$msgs};
     } else {
-        push(@messages, Dumper($msgs));
+        push(@messages, $msgs);
     }
-    my ($sname, $cline, $nested, $subroutine, $thisBench, $thisBench2, $sline, $short) = ('', '', '', '', '', '', '', '');
-    # Set up dumper variables for friendly output
-
-    local $Data::Dumper::Terse         = TRUE;
-    local $Data::Dumper::Indent        = TRUE;
-    local $Data::Dumper::Useqq         = TRUE;
-    local $Data::Dumper::Deparse       = TRUE;
-    local $Data::Dumper::Quotekeys     = TRUE;
-    local $Data::Dumper::Trailingcomma = TRUE;
-    local $Data::Dumper::Sortkeys      = TRUE;
-    local $Data::Dumper::Purity        = TRUE;
-
+    my ($sname, $cline, $nested, $subroutine, $thisBench, $sline, $short) = ('', '', '', '', '', '', '');
     # Figure out the proper caller tree and line number ladder
     # But only if it's part of the effective level prefix, else don't waste time.
-    my $effective_prefix = $self->{ $level . '-PREFIX' } || $self->{'PREFIX'};
+	# The effective level prefix can be different for each call to debug.  It cannot be cached.
+    my $effective_prefix = $self->{ $level . '-PREFIX' } || $self->{'GLOBAL-PREFIX'};
     if ($effective_prefix =~ /\%(Subroutine|Module|Lines|Lastline)\%/i) {    # %P = Subroutine, %l = Line number(s)
         my $package = '';
         my $count   = 1;
@@ -562,41 +545,21 @@ sub debug {
 
     # Figure out the benchmarks, but only if it is in the prefix
     if ($effective_prefix =~ /\%Benchmark\%/i) {
-
         # For multiline output, only output the bench data on the first line.  Use padded spaces for the rest.
         $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
-        $thisBench2 = ' ' x length($thisBench);
     } ## end if ($effective_prefix ...)
     my $first = TRUE;                # Set the first line flag.
 
     # Buffer lines to reduce syscalls for multi-line messages
     my $buffer = '';
 
-    foreach my $msg (@messages) {    # Loop through each line of output and format accordingly.
-        if (ref($msg) ne '') {
-            $msg = Dumper($msg);
-        }
-        if ($msg =~ /\n/s) {         # If the line contains newlines, then it too must be split into multiple lines.
-            my @message = split(/\n/, $msg);
-            foreach my $line (@message) {    # Loop through the split lines and format accordingly.
-                $buffer .= $self->_format_line($level, $nested, $line, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $short);
-                $buffer .= "\n";
-                $first = FALSE;              # Clear the first line flag.
-            }
-        } else {    # This line does not contain newlines.  Treat it as a single line.
-            $buffer .= $self->_format_line($level, $nested, $msg, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $short);
-            $buffer .= "\n";
-        }
-        $first = FALSE;    # Clear the first line flag.
-    } ## end foreach my $msg (@messages)
-
     my $fh = $self->{'FILEHANDLE'};
-    if ($level eq 'INFO' && $self->{'LOGLEVEL'} eq 'VERBOSE') {    # Trap verbose flag and temporarily drop the prefix.
+    if ($level eq 'INFO' && $self->{'LOGLEVEL'} eq 'VERBOSE') {
         # For verbose, we need to print messages without prefixes.
         # Extract lines and print only message contents.
         foreach my $msg (@messages) {
             if (ref($msg) ne '') {
-                $msg = Dumper($msg);
+                $msg = _send_to_Dumper($msg);
             }
             if ($msg =~ /\n/s) {
                 my @message = split(/\n/, $msg);
@@ -607,75 +570,82 @@ sub debug {
                 print $fh "$msg\n";
             }
         }
-    } elsif ($level eq 'DEBUGMAX') {                               # Special version of DEBUG.  Extremely verbose debugging and quite noisy
-        if ($self->{'LOGLEVEL'} eq 'DEBUGMAX') {
+    } else {
+        my ($sec,$min,$hour,$mday,$mon,$year) = localtime();
+        my $Date     = sprintf('%02d/%02d/%04d', $mday, ($mon + 1), (1900 + $year));
+        my $Time     = sprintf('%02d:%02d:%02d', $hour, $min, $sec);
+        my $epoch    = time;
+
+        foreach my $msg (@messages) {    # Loop through each line of output and format accordingly.
+            if (ref($msg) =~ /HASH|ARRAY|CODE|FORMAT|IO/) {
+                $msg = _send_to_Dumper($msg);
+            }
+            if ($msg =~ /\n/s) {         # If the line contains newlines, then it too must be split into multiple lines.
+                my @message = split(/\n/, $msg);
+                foreach my $line (@message) {    # Loop through the split lines and format accordingly.
+                    $buffer .= $self->_format_line($level, $nested, $line, $first, $thisBench, $subroutine, $cline, $sline, $short, $Date, $Time, $epoch);
+                    $buffer .= "\n";
+                    $first = FALSE;              # Clear the first line flag.
+                }
+            } else {    # This line does not contain newlines.  Treat it as a single line.
+                $buffer .= $self->_format_line($level, $nested, $msg, $first, $thisBench, $subroutine, $cline, $sline, $short);
+                $buffer .= "\n";
+            }
+            $first = FALSE;    # Clear the first line flag.
+        } ## end foreach my $msg (@messages)
+        if ($level eq 'DEBUGMAX') {                               # Special version of DEBUG.  Extremely verbose debugging and quite noisy
+            if ($self->{'LOGLEVEL'} eq 'DEBUGMAX') {
+                print $fh $buffer;
+            }
+        } else {
             print $fh $buffer;
         }
-    } else {
-        print $fh $buffer;
     }
 
     $self->{'ANY_LASTSTAMP'} = time;
     $self->{ $level . '_LASTSTAMP' } = time;
 } ## end sub debug
 
+sub _send_to_Dumper {
+    local $Data::Dumper::Terse         = TRUE;
+    local $Data::Dumper::Indent        = TRUE;
+    local $Data::Dumper::Useqq         = TRUE;
+    local $Data::Dumper::Deparse       = TRUE;
+    local $Data::Dumper::Quotekeys     = TRUE;
+    local $Data::Dumper::Trailingcomma = TRUE;
+    local $Data::Dumper::Sortkeys      = TRUE;
+    local $Data::Dumper::Purity        = TRUE;
+    return(Dumper(@_));
+}
+
 # Internal: format a single line for logging (without printing)
 sub _format_line {
-    my ($self, $level, $padding, $msg, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $shortsub) = @_;
+    my ($self, $level, $padding, $msg, $first, $thisBench, $subroutine, $cline, $sline, $shortsub, $Date, $Time, $epoch) = @_;
 
     # Build prefix based on precomputed template and runtime substitutions
     my $tmpl = $self->{'_PREFIX_TEMPLATES'}->{$level};
     $tmpl = $self->{"$level-PREFIX"} . '' unless defined $tmpl; # Fallback safety
 
     # Clone template since we mutate
-    my $prefix = $tmpl . '';
+    my $prefix = "$tmpl";
 
-    # Apply caller-derived fields only if present in the effective level prefix
-    if ($prefix =~ /\%Lines\%/i)     { $prefix =~ s/\%Lines\%/$cline/gi; }
-    if ($prefix =~ /\%Lastline\%/i)  { $prefix =~ s/\%Lastline\%/$sline/gi; }
-    if ($prefix =~ /\%Subroutine\%/i){ $prefix =~ s/\%Subroutine\%/$shortsub/gi; }
-    if ($prefix =~ /\%Module\%/i)    { $prefix =~ s/\%Module\%/$subroutine/gi; }
-
-    my ($sec,$min,$hour,$mday,$mon,$year) = localtime();
-#    my $timezone = $self->{'TIMEZONE'} || DateTime::TimeZone->new(name => 'local');
-#    my $dt       = $self->{'DATETIME'};
-#    my $Date     = sprintf('%02d %03s %03s, %04d', $mday, $months[$mon], $days[$wday], (1900 + $year));
-    my $Date     = sprintf('%02d/%02d/%04d', $mday, ($mon + 1), (1900 + $year));
-    my $Time     = sprintf('%02d:%02d:%02d', $hour, $min, $sec);
-    my $epoch    = time;
-
-    # Apply dynamic tokens
-    if ($first) {
-        $prefix =~ s/\%Benchmark\%/$thisBench/gi;
-    } else {
-        $prefix =~ s/\%Benchmark\%/$thisBench2/gi;
-    }
-    $prefix =~ s/\%Date\%/$self->{'DATESTAMP'}/gi;
-    $prefix =~ s/\%Time\%/$self->{'TIMESTAMP'}/gi;
-    $prefix =~ s/\%Epoch\%/$self->{'EPOCH'}/gi;
-    $prefix =~ s/\%date\%/$Date/gi;
-    $prefix =~ s/\%time\%/$Time/gi;
-    $prefix =~ s/\%epoch\%/$epoch/gi;
+	my %mp = ( # Create a temporary index
+		'Benchmark'  => ($first) ? $thisBench : ' ' x length($thisBench),
+		'Lines'      => $cline,
+		'Lastline'   => $cline,
+		'Subroutine' => $shortsub,
+		'Module'     => $subroutine,
+		'Date'       => $self->{'DATESTAMP'},
+		'Time'       => $self->{'TIMESTAMP'},
+		'Epoch'      => $self->{'EPOCH'},
+		'date'       => $Date,
+		'time'       => $Time,
+		'epoch'      => $epoch,
+	);
+	$prefix =~ s/\%(Lines|Lastline|Subroutine|Module|Date|Time|Epoch|date|time|epoch)\%/$mp{$1}/ge;
 
     return "$prefix$padding$msg";
 }
-
-sub _send_to_logger {    # Legacy path: retained for backward compatibility but routed via _format_line
-    my ($self, $level, $padding, $msg, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $shortsub) = @_;
-
-    my $fh = $self->{'FILEHANDLE'};
-    if ($level eq 'INFO' && $self->{'LOGLEVEL'} eq 'VERBOSE') {    # Trap verbose flag and temporarily drop the prefix.
-        print $fh "$msg\n";
-    } elsif ($level eq 'DEBUGMAX') {                               # Special version of DEBUG.  Extremely verbose debugging and quite noisy
-        if ($self->{'LOGLEVEL'} eq 'DEBUGMAX') {
-            my $line = $self->_format_line($level, $padding, $msg, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $shortsub);
-            print $fh "$line\n";
-        }
-    } else {
-        my $line = $self->_format_line($level, $padding, $msg, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $shortsub);
-        print $fh "$line\n";
-    }
-} ## end sub _send_to_logger
 
 =head2 B<ERR> or B<ERROR>
 

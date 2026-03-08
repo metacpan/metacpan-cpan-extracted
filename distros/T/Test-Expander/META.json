@@ -1,10 +1,10 @@
 {
    "abstract" : "Expansion of test functionalities that appear to be frequently used while testing.",
    "author" : [
-      "Jurij Fajnberg <fajnbergj@gmail.com>"
+      "Juri Fainberg <fajnbergj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,7 +40,7 @@
             "Getopt::Long" : "0",
             "Importer" : "0",
             "PadWalker" : "0",
-            "Path::Tiny" : "0.144",
+            "Path::Tiny" : "0.150",
             "Scalar::Readonly" : "0",
             "Test2::API" : "0",
             "Test2::Tools::Basic" : "0",
@@ -69,6 +69,6 @@
          "web" : "https://github.com/jsf116/Test-Expander"
       }
    },
-   "version" : "v2.5.1",
+   "version" : "v2.5.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

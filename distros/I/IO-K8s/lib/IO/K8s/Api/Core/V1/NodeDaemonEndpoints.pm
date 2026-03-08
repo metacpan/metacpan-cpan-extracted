@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeDaemonEndpoints;
 # ABSTRACT: NodeDaemonEndpoints lists ports opened by daemons running on the Node.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s kubeletEndpoint => 'Core::V1::DaemonEndpoint';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::NodeDaemonEndpoints - NodeDaemonEndpoints lists ports op
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 kubeletEndpoint
 

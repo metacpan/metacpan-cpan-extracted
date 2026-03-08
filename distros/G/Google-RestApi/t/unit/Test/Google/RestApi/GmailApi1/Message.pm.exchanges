@@ -63,7 +63,7 @@ response:
           },
           {
             "name": "Message-Id",
-            "value": "\u003cCAM=e+8o6Vz9tMy9+EaO_q81fxxTbo5Dd53-WTg2VQ6nCCZ_Y7A@mail.gmail.com\u003e"
+            "value": "\u003cTEST-MESSAGE-ID@mail.gmail.com\u003e"
           },
           {
             "name": "From",

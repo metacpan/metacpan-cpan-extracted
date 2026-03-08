@@ -5,26 +5,31 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v3.0.3';
+$Getopt::Guided::VERSION = 'v3.1.0';
 
-# Options Delimiter
+# Options Delimiter constant
 sub OD () { '-' }
-# End Of Options Delimiter
+# End Of Options Delimiter constant
 sub EOOD () { '--' }
-# Flag Indicator Character Class
+# Flag Indicator Character Class constant
 sub FICC () { '[!+]' }
-# Option-Argument Indicator Character Class
+# Option-Argument Indicator Character Class constant
 sub OAICC () { '[,:]' }
-# Perl boolean true value ( IV == 1 )
+# Perl boolean true constant ( IV == 1 )
 sub TRUE () { !!1 }
-# Perl boolean false value
+# Perl boolean false constant
 sub FALSE () { !!0 }
+# Common exit status constants
+sub EXIT_SUCCESS () { 0 }
+sub EXIT_FAILURE () { 1 }
+sub EXIT_USAGE ()   { 2 }
 
-@Getopt::Guided::EXPORT_OK = qw( EOOD getopts print_version_info processopts );
+@Getopt::Guided::EXPORT_OK =
+  qw( EOOD EXIT_SUCCESS EXIT_FAILURE EXIT_USAGE getopts processopts readopts print_version_info );
 
-sub basename ( $ ) {
+sub program_name () {
   require File::Basename;
-  goto &File::Basename::basename
+  File::Basename::basename( $0 )
 }
 
 sub croakf ( $@ ) {
@@ -144,7 +149,7 @@ sub getopts ( $\%;\@ ) {
     %$opts = ();
     # Prepare and print warning message:
     # Program name, type of error, and invalid option character
-    warn sprintf( "%s: %s -- %s\n", basename( $0 ), @error ) ## no critic ( RequireCarping )
+    warn sprintf( "%s: %s -- %s\n", program_name(), @error ) ## no critic ( RequireCarping )
   }
 
   @error == 0
@@ -158,7 +163,7 @@ sub print_version_info {
   #               the caller's package name is Getopt::Guided
   # call frame 1: a run() function/method (the caller) usually calls processopts()
   #               the caller's package name is whatever it is (could be "main")
-  printf STDOUT "%s %s\nperl v%vd\n", basename( $0 ), ( caller( 1 ) // 'main' )->VERSION, $^V;
+  printf STDOUT "%s %s\nperl v%vd\n", program_name(), ( caller( 1 ) // 'main' )->VERSION, $^V;
   EOOD
 }
 
@@ -200,6 +205,30 @@ sub processopts ( \@@ ) {
   }
 
   TRUE
+}
+
+# https://metacpan.org/pod/Getopt::ArgvFile
+# https://pasdoc.github.io/ConfigFileOption
+sub readopts ( \@ ) {
+  my ( $argv ) = @_;
+
+  require File::Spec::Functions;
+  return unless -f ( my $file = File::Spec::Functions::catfile( $ENV{ XDG_CONFIG_HOME }, program_name() . 'rc' ) );
+
+  open my $fh, '<:encoding(UTF-8)', $file ## no critic ( RequireBriefOpen )
+    or croakf "Cannot open file '%s' for reading (%s)", $file, $!;
+
+  while ( <$fh> ) {
+    chomp;
+    next if m/\A (?: \#.* | ) \z/x;
+    if ( m/\A ( [[:alnum:]] ) (?: \ ( .+ ) )? \z/x ) {
+      unshift @$argv, ( OD . $1, defined $2 ? $2 : () );
+      next
+    }
+    croakf "File '%s' contains the invalid line '%s'", $file, $_
+  }
+
+  undef
 }
 
 1

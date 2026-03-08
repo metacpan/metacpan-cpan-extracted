@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## JSON Schema Validator - ~/lib/JSON/Schema/Validate.pm
-## Version v0.7.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.9.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/11/07
-## Modified 2025/12/17
+## Modified 2026/03/01
 ## All rights reserved
 ## 
 ## 
@@ -23,7 +23,7 @@ BEGIN
     use Scalar::Util qw( blessed looks_like_number reftype refaddr );
     use List::Util qw( first any all );
     use Encode ();
-    our $VERSION = 'v0.7.0';
+    our $VERSION = 'v0.9.0';
 };
 
 use v5.16.0;
@@ -349,8 +349,7 @@ sub prune_instance
     # to remain consistent with validate().
     if( $self->{normalize_instance} )
     {
-        my $json = JSON->new->allow_nonref(1)->canonical(1);
-        $data = $json->decode( $json->encode( $data ) );
+        $data = _clone( $data );
     }
 
     return( $self->_prune_with_schema( $self->{schema}, $data ) );
@@ -368,10 +367,10 @@ sub register_builtin_formats
 {
     my( $self ) = @_;
 
-    require DateTime;
-    require DateTime::Duration;
     local $@;
     my $has_iso  = eval{ require DateTime::Format::ISO8601; 1 } ? 1 : 0;
+    my $has_tp   = eval{ require Time::Piece; 1 } ? 1 : 0;
+    my $has_dt   = eval{ require DateTime; 1 } ? 1 : 0;
     my $has_idn  = eval{ require Net::IDN::Encode; 1 } ? 1 : 0;
     # perl -MRegexp::Common=Email::Address -lE 'say $Regexp::Common::RE{Email}{Address}'
     state $email_re = qr/\A(?:(?^u:(?:(?^u:(?>(?^u:(?^u:(?>(?^u:(?>(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|\.|\s*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))+"\s*))+))|(?>(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))*"(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))+))?)(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*<(?^u:(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))*"(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))\@(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*\[(?:\s*(?^u:(?^u:[^\[\]\\])|(?^u:\\(?^u:[^\x0A\x0D]))))*\s*\](?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))))>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))|(?^u:(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*"(?^u:(?^u:[^\\"])|(?^u:\\(?^u:[^\x0A\x0D])))*"(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))\@(?^u:(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*(?^u:(?>[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+(?:\.[^\x00-\x1F\x7F()<>\[\]:;@\\,."\s]+)*))(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*))|(?^u:(?>(?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*\[(?:\s*(?^u:(?^u:[^\[\]\\])|(?^u:\\(?^u:[^\x0A\x0D]))))*\s*\](?^u:(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))|(?>\s+))*)))))(?>(?^u:(?>\s*\((?:\s*(?^u:(?^u:(?>[^()\\]+))|(?^u:\\(?^u:[^\x0A\x0D]))|))*\s*\)\s*))*)))\z/;
@@ -390,7 +389,6 @@ sub register_builtin_formats
             return( eval{ DateTime::Format::ISO8601->parse_datetime( $s ) ? 1 : 0 } ? 1 : 0 );
         }
 
-        # Fallback: parse and validate with DateTime itself
         # YYYY-MM-DDThh:mm:ss[.fraction](Z|±hh:mm)
         return(0) unless( $s =~ /\A
             (\d{4})-(\d{2})-(\d{2})      # date
@@ -402,20 +400,34 @@ sub register_builtin_formats
 
         my( $y, $m, $d, $H, $M, $S ) = ( $1, $2, $3, $4, $5, $6 );
 
-        my $ok = eval
+        # Time::Piece is a core module (available since perl 5.10): use it first
+        if( $has_tp )
         {
-            DateTime->new(
-                year   => $y,
-                month  => $m,
-                day    => $d,
-                hour   => $H,
-                minute => $M,
-                second => $S,
-            );
-            1;
-        };
+            # strptime validates calendar correctness (e.g. rejects Feb 30)
+            # We feed it the bare datetime without offset/fraction (already captured above)
+            my $bare = sprintf( '%04d-%02d-%02dT%02d:%02d:%02d', $y, $m, $d, $H, $M, $S );
+            return( eval{ Time::Piece->strptime( $bare, '%Y-%m-%dT%H:%M:%S' ); 1 } ? 1 : 0 );
+        }
 
-        return( $ok ? 1 : 0 );
+        # Fall back to DateTime if available
+        if( $has_dt )
+        {
+            return( eval
+            {
+                DateTime->new(
+                    year   => $y,
+                    month  => $m,
+                    day    => $d,
+                    hour   => $H,
+                    minute => $M,
+                    second => $S
+                );
+                1
+            } ? 1 : 0 );
+        }
+
+        # Last resort: the regex above was already sufficient for structural checks
+        return(1);
     };
 
     $F{'date'} = sub
@@ -424,7 +436,21 @@ sub register_builtin_formats
         return(0) unless( defined( $s ) && !ref( $s ) );
         return(0) unless( $s =~ /\A(\d{4})-(\d{2})-(\d{2})\z/ );
         my( $y, $m, $d ) = ( $1, $2, $3 );
-        return eval{ DateTime->new( year => $y, month => $m, day => $d ); 1 } ? 1 : 0;
+
+        # Time::Piece is core — prefer it
+        if( $has_tp )
+        {
+            return( eval{ Time::Piece->strptime( $s, '%Y-%m-%d' ); 1 } ? 1 : 0 );
+        }
+
+        # Fall back to DateTime if available
+        if( $has_dt )
+        {
+            return( eval{ DateTime->new( year => $y, month => $m, day => $d ); 1 } ? 1 : 0 );
+        }
+
+        # Last resort: structural regex already passed above
+        return(1);
     };
 
     $F{'time'} = sub
@@ -446,30 +472,32 @@ sub register_builtin_formats
         \z/x ? 1 : 0;
     };
 
-    # Duration
+    # Duration (RFC 3339 §5.6 / ISO 8601)
+    # Valid:   P1Y, P3M, P1Y2M3DT4H5M6S, PT10S, P1W
+    # Invalid: P, PT, P1Y2M3DT  (T with nothing after it, or no designator at all)
     $F{'duration'} = sub
     {
         my( $s ) = @_;
         return(0) unless( defined( $s ) && !ref( $s ) );
-        return(0) unless( $s =~ /\A
-            P(?:
-                (?:(\d+)Y)?
-                (?:(\d+)M)?
-                (?:(\d+)D)?
-            )?
+
+        # Week form: PnW (stands alone; no mixing with other designators per ISO 8601)
+        return(1) if( $s =~ /\AP\d+W\z/ );
+
+        # Full form: at least one date *or* time component must be present
+        # The T separator must be followed by at least one time designator
+        return( $s =~ /\A
+            P
+            (?:(\d+)Y)?
+            (?:(\d+)M)?
+            (?:(\d+)D)?
             (?:T
+                (?=\d)          # T must be followed by at least one digit
                 (?:(\d+)H)?
                 (?:(\d+)M)?
                 (?:(\d+(?:\.\d+)?)S)?
             )?
-        \z/x );
-        my( $y, $mo, $d, $h, $mi, $se ) = ( $1 || 0, $2 || 0, $3 || 0, $4 || 0, $5 || 0, $6 || 0 );
-        return eval{
-            DateTime::Duration->new(
-                years => $y, months => $mo, days => $d,
-                hours => $h, minutes => $mi, seconds => $se
-            ); 1;
-        } ? 1 : 0;
+        \z/x && ( defined($1) || defined($2) || defined($3) || defined($4) || defined($5) || defined($6) )
+            ? 1 : 0 );
     };
 
     # Email / IDN email
@@ -602,7 +630,10 @@ sub register_builtin_formats
     {
         my( $s ) = @_;
         return(0) unless( defined( $s ) && !ref( $s ) );
-        return( $s =~ /\A[\p{L}\p{N}\.\-]+:[^\s]+|\A\/\/[^\s]+|\A[^\s]+\z/u ? 1 : 0 );
+        # Must have a scheme (letters followed by colon) per RFC 3987 §2.2
+        # Scheme: ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+        # After scheme: at least one non-whitespace character
+        return( $s =~ /\A[A-Za-z][A-Za-z0-9+\-.]*:[^\s]+\z/u ? 1 : 0 );
     };
 
     # UUID
@@ -795,8 +826,7 @@ sub validate
     # Because Perl scalar are not JSON scalar, we force the Perl structure into strict JSON types, eliminating all Perl duality and guaranteeing predictable validation semantics.
     if( $self->{normalize_instance} )
     {
-        my $json = JSON->new->allow_nonref(1)->canonical(1);
-        $data = $json->decode( $json->encode( $data ) );
+        $data = _clone( $data );
     }
 
     # Optional pre-validation pruning of unknown properties / nested objects.
@@ -1003,7 +1033,7 @@ sub _apply_ref
 sub _canon
 {
     my( $v ) = @_;
-    my $json = JSON->new->allow_nonref(1)->canonical(1)->convert_blessed(1);
+    state $json = JSON->new->allow_nonref(1)->canonical(1)->convert_blessed(1);
     return( $json->encode( $v ) );
 }
 
@@ -1032,7 +1062,7 @@ sub _check_vocabulary_required
 sub _clone
 {
     my( $v ) = @_;
-    my $json = JSON->new->allow_nonref(1)->canonical(1);
+    state $json = JSON->new->allow_nonref(1)->canonical(1);
     return( $json->decode( $json->encode( $v ) ) );
 }
 
@@ -4459,9 +4489,13 @@ In your HTML:
     }
     </script>
 
+See also the live demonstration on CodePen: L<https://codepen.io/jdeguest/pen/vEGjNYX>
+
+and the original announcement on Reddit: L<https://www.reddit.com/r/perl/comments/1p80dne/showcase_localised_json_schema_validation_in_perl/>
+
 =head1 VERSION
 
-v0.7.0
+v0.9.0
 
 =head1 DESCRIPTION
 
@@ -4545,7 +4579,7 @@ Call C<register_builtin_formats> to install default validators for the following
 
 =item * C<date-time>, C<date>, C<time>, C<duration>
 
-Leverages L<DateTime> and L<DateTime::Format::ISO8601> when available (falls back to strict regex checks). Duration uses L<DateTime::Duration>.
+For C<date-time> and C<date>, leverages L<DateTime::Format::ISO8601> when available, then falls back to L<Time::Piece> (core since perl 5.10), then to L<DateTime> if installed, and finally to strict regex checks. C<duration> is validated entirely by a strict ISO 8601 regex; no external module is required or used.
 
 =item * C<email>, C<idn-email>
 
@@ -4561,7 +4595,7 @@ Strict regex-based validation.
 
 =item * C<uri>, C<uri-reference>, C<iri>
 
-Reasonable regex checks for scheme and reference forms (heuristic, not a full RFC parser).
+Reasonable regex checks: C<uri> and C<iri> require a proper RFC-compliant scheme (C<ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )> followed by C<:>); C<iri> additionally permits Unicode characters in the path and query components. C<uri-reference> allows an optional scheme. None of these is a full RFC 2396/3987 parser.
 
 =item * C<uuid>
 
@@ -5498,7 +5532,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<perl>, L<DateTime>, L<DateTime::Format::ISO8601>, L<DateTime::Duration>, L<Regexp::Common>, L<Net::IDN::Encode>, L<JSON::PP>
+L<perl>, L<Time::Piece>, L<DateTime>, L<DateTime::Format::ISO8601>, L<Regexp::Common>, L<Net::IDN::Encode>, L<JSON::PP>
 
 L<JSON::Schema>, L<JSON::Validator>
 

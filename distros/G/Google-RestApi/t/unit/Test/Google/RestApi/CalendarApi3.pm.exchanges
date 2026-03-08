@@ -103,24 +103,24 @@ response:
     {
      "items": [
       {
-       "id": "78qlfj56o4vcjt0nd63ul2e1rr8cqii3@import.calendar.google.com",
-       "summary": "Village Wellness Appointments"
+       "id": "import-cal-001@import.calendar.google.com",
+       "summary": "Personal Calendar 1"
       },
       {
-       "id": "mi6lj40nr9qa41po0ngnmlear4@group.calendar.google.com",
+       "id": "group-cal-001@group.calendar.google.com",
        "summary": "AAW"
       },
       {
-       "id": "ea6vu9fhgbuvcg5etga2k11mhs@group.calendar.google.com",
-       "summary": "Nan Calendar"
+       "id": "group-cal-002@group.calendar.google.com",
+       "summary": "Personal Calendar 2"
       },
       {
-       "id": "family05775073520338832520@group.calendar.google.com",
+       "id": "group-cal-003@group.calendar.google.com",
        "summary": "Family"
       },
       {
-       "id": "en.canadian#holiday@group.v.calendar.google.com",
-       "summary": "Holidays in Canada"
+       "id": "en.country#holiday@group.v.calendar.google.com",
+       "summary": "Holidays in Country"
       },
       {
        "id": "test.user@gmail.com",
@@ -180,24 +180,24 @@ response:
     {
      "items": [
       {
-       "id": "78qlfj56o4vcjt0nd63ul2e1rr8cqii3@import.calendar.google.com",
-       "summary": "Village Wellness Appointments"
+       "id": "import-cal-001@import.calendar.google.com",
+       "summary": "Personal Calendar 1"
       },
       {
-       "id": "mi6lj40nr9qa41po0ngnmlear4@group.calendar.google.com",
+       "id": "group-cal-001@group.calendar.google.com",
        "summary": "AAW"
       },
       {
-       "id": "ea6vu9fhgbuvcg5etga2k11mhs@group.calendar.google.com",
-       "summary": "Nan Calendar"
+       "id": "group-cal-002@group.calendar.google.com",
+       "summary": "Personal Calendar 2"
       },
       {
-       "id": "family05775073520338832520@group.calendar.google.com",
+       "id": "group-cal-003@group.calendar.google.com",
        "summary": "Family"
       },
       {
-       "id": "en.canadian#holiday@group.v.calendar.google.com",
-       "summary": "Holidays in Canada"
+       "id": "en.country#holiday@group.v.calendar.google.com",
+       "summary": "Holidays in Country"
       },
       {
        "id": "test.user@gmail.com",

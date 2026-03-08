@@ -16,6 +16,7 @@ our @EXPORT = qw(
     add_event_cb add_event_ignore hexnum init_extension replace_event_cb screen_by_xy pointer %marked_windows
     $visible_min_x $visible_min_y $visible_max_x $visible_max_y $prevent_focus_in $prevent_enter_notify $cpu_saver
     focus_prev_push focus_prev_remove focus_prev_get prevent_focus_in prevent_enter_notify $cached_classes atom
+    gtk_init pinned_list pinned_add pinned_remove pinned_check
     );
 
 # NOTE all the debug functions are defined in Config.pm
@@ -40,8 +41,11 @@ our $prevent_focus_in;
 our $prevent_enter_notify;
 
 # focus_prev() is now implemented as a functional interface and allows switch between more than two windows
-my @focus_prev;
+my $focus_prev_global = [];
 my $focus_prev_size = 5;
+
+# Some windows could be always on top of the stack; to avoid confusion with "always_on [tag]" I name them "pinned"
+my %pinned_windows;
 
 # Helpers for extensions
 sub add_event_cb($id, $sub) {
@@ -69,20 +73,37 @@ sub init_extension($name, $first_event) {
 }
 
 # focus_prev helpers
-sub focus_prev_push($win) {
+sub focus_prev_push($win, $storage = $focus_prev_global) {
     return unless defined $win;
-    focus_prev_remove($win);
-    push @focus_prev, $win;
-    shift @focus_prev if @focus_prev > $focus_prev_size;
+    focus_prev_remove($win, $storage);
+    push @{ $storage }, $win;
+    shift @{ $storage } if @{ $storage } > $focus_prev_size;
 }
 
-sub focus_prev_remove($win) {
+sub focus_prev_remove($win, $storage = $focus_prev_global) {
     return unless defined $win;
-    @focus_prev = grep { $_ != $win } @focus_prev;
+    @{ $storage } = grep { $_ != $win } @{ $storage };
 }
 
-sub focus_prev_get() {
-    (grep { $_ != $focus->{window} } @focus_prev)[-1];
+sub focus_prev_get($storage = $focus_prev_global) {
+    (grep { $_ != $focus->{window} } @{ $storage })[-1];
+}
+
+# pinned_windows helpers
+sub pinned_add($win) {
+    $pinned_windows{ $win->{id} } = $win;
+}
+
+sub pinned_remove($win) {
+    delete $pinned_windows{ $win->{id} };
+}
+
+sub pinned_list() {
+    values %pinned_windows;
+}
+
+sub pinned_check($win) {
+    exists $pinned_windows{ $win->{id} };
 }
 
 # Preventor functions to avoid code copy-pasting
@@ -112,6 +133,83 @@ sub pointer($wid = $X->root->id) {
 sub atom($name) {
     return $atoms{$name} if defined $atoms{$name};
     $atoms{$name} = $X->intern_atom_reply($X->intern_atom(0, length($name), $name)->{sequence})->{atom};
+}
+
+# GTK initialization (called either from Panel or Expose)
+sub gtk_init() {
+    return if $X11::korgwm::gtk_init;
+    Gtk3::disable_setlocale();
+    Gtk3::init();
+
+    my $color_bg = sprintf "#%06x", $cfg->{color_bg};
+    my $color_fg = sprintf "#%06x", $cfg->{color_fg};
+    my $color_append_bg = sprintf "#%06x", $cfg->{color_append_bg};
+    my $color_append_fg = sprintf "#%06x", $cfg->{color_append_fg};
+    my $color_battery_low = sprintf '#%06x', $cfg->{color_battery_low};
+    my $color_border = sprintf "#%06x", $cfg->{color_border};
+    my $color_expose = sprintf "#%06x", $cfg->{color_expose};
+    my $color_urgent_bg = sprintf "#%06x", $cfg->{color_urgent_bg};
+    my $color_urgent_fg = sprintf "#%06x", $cfg->{color_urgent_fg};
+    my ($font_name, $font_size) = $cfg->{font} =~ /(.+)\s+(\d+)$/ or die "Font: $cfg->{font} has invalid format";
+
+    my $css_provider = Gtk3::CssProvider->new();
+    my $css = qq[
+    * {
+        background-color: $color_bg;
+        border-radius: 0;
+        color: $color_fg;
+        font-family: $font_name;
+        font-size: ${font_size}pt;
+    }
+
+    .expose, .expose > * {
+        background-color: $color_expose;
+    }
+
+    .append {
+        background-color: $color_append_bg;
+        color: $color_append_fg;
+    }
+
+    .urgent {
+        background-color: $color_urgent_bg;
+        color: $color_urgent_fg;
+    }
+
+    .battery-low {
+        color: $color_battery_low;
+    }
+
+    calendar {
+        border-color: $color_border;
+        border: $cfg->{border_width}px solid;
+    }
+
+    calendar > * {
+        padding: 0 10px;
+    }
+
+    calendar.header {
+        border-bottom: 0px;
+    }
+
+    calendar:indeterminate {
+        color: alpha(currentColor, 0.3);
+    }
+
+    .active, calendar:selected {
+        background-color: $color_fg;
+        color: $color_bg;
+    }
+    ];
+
+    $css_provider->load_from_data($css);
+    Gtk3::StyleContext::add_provider_for_screen(
+        Gtk3::Gdk::Screen::get_default(),
+        $css_provider,
+        Gtk3::STYLE_PROVIDER_PRIORITY_APPLICATION()
+    );
+    $X11::korgwm::gtk_init = 1;
 }
 
 1;

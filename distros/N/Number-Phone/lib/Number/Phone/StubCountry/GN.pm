@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153522;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -74,27 +74,27 @@ my $validators = {
                 'voip' => '722\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"2243042", "Sangoya",
-"224307", "Kankan",
-"2243053", "Pita",
-"2243091", "N\'Zérékoré",
-"2243098", "Kissidougou",
-"224302", "Fria",
-"2243041", "Conakry",
-"2243061", "Kindia",
-"2243068", "Mamou",
-"2243046", "Boussoura",
-"2243069", "Dalaba",
-"2243045", "Conakry",
-"2243032", "Kamsar",
+$areanames{en} = {"224308", "Faranah",
 "2243031", "Boké",
-"2243043", "Conakry",
 "2243094", "Macenta",
+"2243042", "Sangoya",
 "2243097", "Guéckédou",
-"22430613", "Télimélé",
-"224308", "Faranah",
+"224307", "Kankan",
+"2243098", "Kissidougou",
+"2243043", "Conakry",
+"2243045", "Conakry",
+"2243069", "Dalaba",
+"2243061", "Kindia",
+"2243041", "Conakry",
+"2243032", "Kamsar",
+"2243046", "Boussoura",
+"2243047", "Conakry",
+"224302", "Fria",
 "2243051", "Labé",
-"2243047", "Conakry",};
+"2243091", "N\'Zérékoré",
+"22430613", "Télimélé",
+"2243053", "Pita",
+"2243068", "Mamou",};
 my $timezones = {
                '' => [
                        'Africa/Conakry'

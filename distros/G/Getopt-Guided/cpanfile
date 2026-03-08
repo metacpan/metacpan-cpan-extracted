@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 on configure => sub {
+  requires 'CPAN::Meta'                    => '0';
   requires 'ExtUtils::MakeMaker'           => '6.76';    # Offers the RECURSIVE_TEST_FILES, NO_PERLLOCAL features
   requires 'ExtUtils::MakeMaker::CPANfile' => '0';       # Needs at least ExtUtils::MakeMaker 6.52
   requires 'File::Spec::Functions'         => '0';
@@ -10,19 +11,24 @@ on configure => sub {
 };
 
 on runtime => sub {
-  requires 'Carp'           => '1.32';                   # Don't vivify @CARP_NOT and @ISA in caller's namespace
-  requires 'File::Basename' => '0';
-  requires 'perl'           => '5.010000';
-  requires 'strict'         => '0';
-  requires 'warnings'       => '0'
+  requires 'Carp'                  => '1.32';            # Don't vivify @CARP_NOT and @ISA in caller's namespace
+  requires 'File::Basename'        => '0';
+  requires 'File::Spec::Functions' => '0';
+  requires 'perl'                  => '5.010000';
+  requires 'strict'                => '0';
+  requires 'warnings'              => '0'
 };
 
 on test => sub {
+  requires 'Config'                => '0';
   requires 'File::Basename'        => '0';
   requires 'File::Spec::Functions' => '0';
-  requires 'Test::Fatal'           => ( $] < 5.012000 ? '<= 0.017' : '0' );
-  requires 'Test::More'            => '1.001005';                             # Subtests accept args
-  requires 'Test::Output'          => '0';
-  requires 'Test::Script'          => '1.31';
-  requires 'Test::Warn'            => '0'
+  # https://github.com/charsbar/ExtUtils-MakeMaker-CPANfile/issues/1
+  # Tricked by "# TODO: better range handling"
+  requires 'Test::Fatal'  => ( $] < 5.012000 ? '== 0.017' : '0' );
+  requires 'Test::More'   => '1.001005';                             # Subtests accept args
+  requires 'Test::Needs'  => '0';
+  requires 'Test::Output' => '0';
+  requires 'Test::Script' => '1.31';
+  requires 'Test::Warn'   => '0'
 }

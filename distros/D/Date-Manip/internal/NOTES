@@ -37,7 +37,7 @@ Run the following:
    cd tzdata
    grep Rule africa antarctica asia australasia europe northamerica \
              southamerica | \
-      awk '{print $3}' | sort -u | egrep '^[1-9]' | sort -n | tail -1
+      awk '{print $3}' | sort -u | grep -E '^[1-9]' | sort -n | tail -1
    cd ..
 
 Make sure that the value for $keep_years (in internal/data.misc.pl) is greater
@@ -123,8 +123,8 @@ In internal/benchmarks directory
 #########################################################################
 Before every release, spellcheck the documents:
 
-   for i in `find lib -type f -name \*.pod | egrep -v 'Lang\/' |
-             egrep -v Zones.pod` ;do
+   for i in `find lib -type f -name \*.pod | grep -E -v 'Lang/' |
+             grep -E -v Zones.pod` ;do
       pod2text $i > $i.txt
       ispell -p internal/module.isp $i.txt
       rm -f $i.txt $i.txt.bak
@@ -140,7 +140,7 @@ Before every release, spellcheck the documents:
 Update the copyright
 
    y=`date '+%Y'`
-   for i in `find . -type f | egrep -v '.git' | xargs egrep -l 'Copyright \(c\) ....\-.... Sullivan Beck'` ;do
+   for i in `find . -type f | grep -E -v '.git' | xargs grep -E -l "Copyright \(c\) ....-.... Sullivan Beck"` ;do
      sed -e "s,\(Copyright (c) ....\)\-.... \(Sullivan Beck\),\1-$y \2," $i > z
      mv z $i
    done

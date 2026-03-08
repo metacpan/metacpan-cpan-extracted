@@ -3,7 +3,6 @@ abstract: 'Perl extension to Modern OpenGL API up to 4.6'
 author:
   - 'Chris Marshall <chm@cpan.org>'
 build_requires:
-  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
   Test::More: '0.88'
 configure_requires:
@@ -26,5 +25,5 @@ resources:
   IRC: irc://irc.perl.org/#pogl
   bugtracker: https://github.com/Perl-GPU/OpenGL-Modern/issues
   repository: https://github.com/Perl-GPU/OpenGL-Modern.git
-version: '0.0403'
+version: '0.0404'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

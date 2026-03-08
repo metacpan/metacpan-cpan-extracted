@@ -109,7 +109,7 @@ $| = 1;
 if ($version) {
     $ansi->ansi_output($ansi->get_version());
 } elsif ($ansi_modes) {
-    my $out = "\n[% B_YELLOW %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
+    my $out = "\n[% B_YELLOW %][% BOLD %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
     if ($ansi->{'CAPS'}->{'3 BIT'}) {
         $out .= "    ANSI  3 BIT:  [% GREEN %]Supported[% RESET %]\n";
     } else {
@@ -140,25 +140,28 @@ if ($version) {
 ###
     my $sample_frames = <<'FRAMES';
 
-[% BOX BRIGHT YELLOW,1,9,17,5,DOUBLE        %]This is a text box with a DOUBLE frame[% ENDBOX %]
-[% BOX BRIGHT GREEN,18,9,20,5,THIN          %]This is a text box with a THIN frame[% ENDBOX %]
-[% BOX BRIGHT RED,39,9,16,5,THICK           %]This is a text box with a THICK frame[% ENDBOX %]
-[% BOX BRIGHT BLUE,56,9,16,5,CIRCLE         %]This is a text box with a CIRCLE frame[% ENDBOX %]
-[% BOX PINK,1,14,20,5,ROUNDED               %]This is a text box with a ROUNDED frame[% ENDBOX %]
-[% BOX ORANGE,18,19,16,5,BLOCK              %]This is a text box with a BLOCK frame[% ENDBOX %]
-[% BOX BRIGHT BLUE,1,19,16,5,WEDGE          %]This is a text box with a WEDGE frame[% ENDBOX %]
-[% BOX MAGENTA,53,18,14,6,DOTS              %]This is a text box with a DOTS frame[% ENDBOX %]
-[% BOX CYAN,22,14,17,5,DIAMOND              %]This is a text box with a DIAMOND frame[% ENDBOX %]
-[% BOX WHITE,41,14,22,4,STAR                %]This is a text box with a STAR frame[% ENDBOX %]
-[% BOX RED,35,19,17,5,SQUARE                %]This is a text box with a SQUARE frame[% ENDBOX %]
-[% BOX BRIGHT WHITE,1,24,17,5,DITHERED      %]This is a text box with a DITHERED frame[% ENDBOX %]
-[% BOX BRIGHT MAGENTA,19,24,17,5,HEARTS     %]This is a text box with a HEARTS frame[% ENDBOX %]
-[% BOX SADDLE BROWN,37,24,17,5,CHRISTIAN    %]This is a text box with a CHRISTIAN frame[% ENDBOX %]
-[% BOX ROYAL BLUE,55,24,17,5,ARROWS         %]This is a text box with an ARROWS frame[% ENDBOX %]
-[% BOX FOREST GREEN,1,29,22,5,PARALLELOGRAM %]This is a text box with a PARALLELOGRAM frame[% ENDBOX %]
-[% BOX CRIMSON,24,29,17,5,BIG WEDGE         %]This is a text box with a BIG WEDGE frame[% ENDBOX %]
-[% BOX SALMON,42,29,17,5,BIG ARROWS         %]This is a text box with a BIG ARROWS frame[% ENDBOX %]
-[% BOX YELLOW,60,29,16,5,NOTES              %]This is a text box with a NOTES frame[% ENDBOX %]
+[% BOX BRIGHT YELLOW,1,9,17,5,DOUBLE             %]This is a text box with a DOUBLE frame[% ENDBOX %]
+[% BOX BRIGHT GREEN,18,9,20,5,THIN               %]This is a text box with a THIN frame[% ENDBOX %]
+[% BOX BRIGHT RED,39,9,16,5,THICK                %]This is a text box with a THICK frame[% ENDBOX %]
+[% BOX BRIGHT BLUE,56,9,16,5,CIRCLE              %]This is a text box with a CIRCLE frame[% ENDBOX %]
+[% BOX PINK,1,14,20,5,ROUNDED                    %]This is a text box with a ROUNDED frame[% ENDBOX %]
+[% BOX ORANGE,18,19,16,5,BLOCK                   %]This is a text box with a BLOCK frame[% ENDBOX %]
+[% BOX BRIGHT BLUE,1,19,16,5,WEDGE               %]This is a text box with a WEDGE frame[% ENDBOX %]
+[% BOX MAGENTA,53,18,14,6,DOTS                   %]This is a text box with a DOTS frame[% ENDBOX %]
+[% BOX CYAN,22,14,17,5,DIAMOND                   %]This is a text box with a DIAMOND frame[% ENDBOX %]
+[% BOX WHITE,41,14,22,4,STAR                     %]This is a text box with a STAR frame[% ENDBOX %]
+[% BOX RED,35,19,17,5,SQUARE                     %]This is a text box with a SQUARE frame[% ENDBOX %]
+[% BOX BRIGHT WHITE,1,24,17,5,DITHERED           %]This is a text box with a DITHERED frame[% ENDBOX %]
+[% BOX BRIGHT MAGENTA,19,24,17,5,HEARTS          %]This is a text box with a HEARTS frame[% ENDBOX %]
+[% BOX SADDLE BROWN,37,24,18,5,CHRISTIAN         %]This is a text box with a CHRISTIAN frame[% ENDBOX %]
+[% BOX ROYAL BLUE,56,24,17,5,ARROWS              %]This is a text box with an ARROWS frame[% ENDBOX %]
+[% BOX FOREST GREEN,1,29,22,5,PARALLELOGRAM      %]This is a text box with a PARALLELOGRAM frame[% ENDBOX %]
+[% BOX CRIMSON,24,29,17,5,BIG WEDGE              %]This is a text box with a BIG WEDGE frame[% ENDBOX %]
+[% BOX SALMON,42,29,17,5,BIG ARROWS              %]This is a text box with a BIG ARROWS frame[% ENDBOX %]
+[% BOX YELLOW,60,29,16,5,NOTES                   %]This is a text box with a NOTES frame[% ENDBOX %]
+[% BOX LIME,1,34,20,5,ARROWHEADS                 %]This is a text box with a ARROWHEADS frame[% ENDBOX %]
+[% BOX VIVID TANGERINE,23,34,22,5,FAT ARROWHEADS %]This is a text box with a FAT ARROWHEADS frame[% ENDBOX %]
+[% BOX WATERSPOUT,47,34,18,5,SOLID               %]This is a text box with a SOLID frame[% ENDBOX %]
 
 FRAMES
 ###
@@ -218,7 +221,7 @@ FRAMES
     if (defined($search) && $search ne '') {
         $temp .= charnames::string_vianame($search);
     } else {
-        $temp .= "\nAssembling character dump...";
+        print "\nAssembling character dump...";
         my $start = $ansi->{'start'};
         foreach my $code (@list) {
             my $name = charnames::viacode($code);
@@ -227,7 +230,7 @@ FRAMES
             }
         }
     }
-	$ansi->ansi_output($temp . "\n");
+	$ansi->ansi_output("$temp\n");
 } elsif ($unicode) {
     print "\nAssembling unicode glyphs...";
     my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
@@ -693,5 +696,13 @@ Richard Kelsch
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 
 L<https://perlfoundation.org/artistic-license-20.html>
+
+=head1 GITHUB
+
+=over 4
+
+=item https://github.com/richcsst/ansi-encode
+
+=back
 
 =cut

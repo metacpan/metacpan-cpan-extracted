@@ -17,3 +17,19 @@ Revision history for Perl extension Device::GPIB.
 
 1.3   2025-11-04
       - Added support for GPIB interfaces to Tektronix 1240 Logic Analyzer with 1200C02 GPIB comms pack
+
+1.4   2026-02-24
+      - Testing serial with AR488-ESP32-esp32 https://github.com/douardda/AR488-ESP32
+      which support Prologix command set
+      - Fixed a problem with baud rates, revealed by AR488-ESP32: on recent versions of
+      Linx, perl Device::SerialPort does not set the
+      baud rate of a serial USB port properly. It passes the value of the symbolic variables, say B115200 = 0x00001002 to
+      cfsetospeed() and cfsetispeed(), where it should (at least for recent Linux) pass the integer value of
+      the actual baud rate B115200. On linux we now set the correct baud rate directly in the serial port
+      structure which is ugly but necessary.
+      - Refactored Prologix.pm so it can use either TCP or Serial transports,in order to support AR488-ESP32
+      over TCPIP
+      - Refactored controller and transport warning() and debug() to all go through Device::GPIB::Controller::warning()
+      and Device::GPIB::Controller::debug() for easy overriding and redirecting.
+      - Testing with linux-gpib 4.3.7, some changes required.
+      

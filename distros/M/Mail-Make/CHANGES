@@ -1,0 +1,49 @@
+Revision history for Perl module Mail::Make
+
+v0.21.0 2026-03-07T03:04:20+0900
+    - Initial public release on CPAN
+
+    [Core features]
+    - Fluent API for constructing MIME email messages (plain text, HTML,
+      multipart/alternative, multipart/mixed, inline attachments)
+    - Mail::Make::Entity: full MIME entity model with streaming serialisation
+      via Mail::Make::Stream, Mail::Make::Stream::Base64, and
+      Mail::Make::Stream::QuotedPrint
+    - Mail::Make::Headers and subclasses: typed header objects for
+      Content-Type (with parameter handling and RFC 2231 encoding),
+      Content-Transfer-Encoding, Content-Disposition, Subject (RFC 2047
+      encoded-word), and Message-ID (UUID-based generation)
+    - Mail::Make::Body::InCore and Mail::Make::Body::File: transparent
+      in-memory and on-disk body storage; large attachments never loaded
+      into RAM unless explicitly requested
+    - Configurable memory threshold (max_body_in_memory_size) and explicit
+      use_temp_file option for streaming large messages
+    - Entity::length() mirrors print() without buffering the entire message
+    - Headers::as_string() with RFC 2822 field ordering and line folding
+
+    [SMTP delivery (smtpsend)]
+    - Net::SMTP integration with plain TCP, SSL/TLS, and STARTTLS support
+    - SASL authentication (PLAIN/LOGIN preferred, DIGEST-MD5/CRAM-MD5
+      intentionally excluded as deprecated); Authen::SASL used directly to
+      avoid mechanism negotiation pitfalls
+    - Passphrase supplied as string or CODE reference
+    - Bcc stripping from the transmitted copy
+    - Recipient validation and credential checks before opening the
+      network connection
+
+    [OpenPGP (Mail::Make::GPG, RFC 3156)]
+    - gpg_sign(): multipart/signed with detached armoured signature;
+      configurable digest algorithm (default SHA-256, SHA-512 tested)
+    - gpg_encrypt(): multipart/encrypted (RFC 3156 §4)
+    - gpg_sign_encrypt(): inline sign-then-encrypt
+    - Passphrase supplied as string, CODE reference, or undef (gpg-agent)
+    - Optional public-key auto-fetch from keyserver
+    - Requires IPC::Run and File::Which; gpg binary located automatically
+      (gpg2 preferred, gpg fallback) or specified explicitly via GpgBin
+    - RFC 3156 §5.1 compliance: Part 1 of multipart/signed carries only
+      Content-* headers; RFC 2822 envelope fields (From, To, Subject, Date,
+      Message-ID) appear solely on the outer wrapper
+    - Signature verified correct by Thunderbird (SHA-256 and SHA-512),
+      Enigmail, and gpg --verify against all four structural variants:
+      sign-only, sign SHA-512, encrypt-only, sign+encrypt
+

@@ -371,3 +371,20 @@
 1.90    Feb 17, 2026
 
         Added image examples to README.me in "examples" directory
+
+1.91    Feb 22, 2026
+
+        Improved tokens help output.
+
+1.92    Feb 24, 2026
+
+        Added more frames
+        Removed redundant color definitions
+
+1.93    Mar 03, 2026
+
+        Added more tokens and macro tokens.
+
+1.94    Mar 03, 2026
+
+        Added the extra tokens to the -t option

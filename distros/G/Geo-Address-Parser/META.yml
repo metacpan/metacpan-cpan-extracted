@@ -18,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150011'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,5 +41,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser
   homepage: https://metacpan.org/pod/Geo::Address::Parser
   repository: git://github.com/nigelhorne/Geo-Address-Parser.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

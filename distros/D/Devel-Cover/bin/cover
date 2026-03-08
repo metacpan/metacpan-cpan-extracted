@@ -1,21 +1,19 @@
 #!/usr/bin/perl
 
-# Copyright 2001-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2001-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
 # The latest version of this software should be available from my homepage:
 # https://pjcj.net
 
-require 5.12.0;
-
-use strict;
+use 5.20.0;
 use warnings;
 
 our $VERSION;
 
 BEGIN {
-  our $VERSION = '1.51'; # VERSION
+  our $VERSION = '1.52'; # VERSION
 }
 
 use Devel::Cover::DB  ();
@@ -522,7 +520,7 @@ cover - report coverage statistics
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -701,15 +699,9 @@ With the -test option the exit status of the underlying test run is returned.
 
 L<Devel::Cover>
 
-=head1 BUGS
-
-Did I mention that this is alpha code?
-
-See the BUGS file.
-
 =head1 LICENCE
 
-Copyright 2001-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

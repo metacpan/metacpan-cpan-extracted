@@ -32,7 +32,6 @@ requires 'YAML::Any';
 requires 'aliased';
 requires 'autodie';
 requires 'autovivification';
-requires 'constant';
 
 on configure => sub {
     requires 'ExtUtils::MakeMaker';
@@ -52,4 +51,8 @@ on test => sub {
     requires 'Test::Pod::Coverage';
     requires 'Test::Perl::Critic';
     requires 'Perl::Critic::TooMuchCode';
+};
+
+on 'develop' => sub {
+    requires 'Pod::Markdown';
 };

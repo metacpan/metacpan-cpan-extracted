@@ -1,5 +1,8 @@
 Revision history for Geo-Address-Parser
 
+0.08	Tue Mar  3 05:49:45 EST 2026
+	Added support for France
+
 0.07	Fri Feb  6 11:01:53 EST 2026
 	parse(): Don't put undefs in the output hash
 	Addresses in Canada could say "Unsupported country"

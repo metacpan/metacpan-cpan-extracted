@@ -7,13 +7,17 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/api.t
+t/critic.t
+t/data/.config/finerc
+t/data/script/broken
+t/data/script/fine
 t/extension.t
+t/load.t
 t/print_version_info.t
 t/processopts.t
+t/readopts.t
+t/script.t
 t/standard.t
-t/utility.t
-t/utility/broken
-t/utility/fine
 t/validation.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

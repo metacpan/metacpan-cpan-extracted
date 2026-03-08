@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ScopedResourceSelectorRequirement;
 # ABSTRACT: A scoped-resource selector requirement is a selector that contains values, a scope name, and an operator that relates the scope name and values.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s operator => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ScopedResourceSelectorRequirement - A scoped-resource se
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 operator
 

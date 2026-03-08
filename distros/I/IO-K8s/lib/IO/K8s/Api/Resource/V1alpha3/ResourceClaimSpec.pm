@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourceClaimSpec;
 # ABSTRACT: ResourceClaimSpec defines what is being requested in a ResourceClaim and how to configure it.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s controller => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourceClaimSpec - ResourceClaimSpec defines 
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 controller
 

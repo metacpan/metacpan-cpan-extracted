@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::Watcher;
 # ABSTRACT: Auto-reconnecting Kubernetes watch as IO::Async::Notifier
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -118,7 +118,7 @@ sub _start_watch {
 
     my $rest = $self->kube->_rest;
     my $class = $rest->expand_class($self->resource);
-    my $path = $rest->_build_path($class,
+    my $path = $rest->build_path($class,
         ($self->namespace ? (namespace => $self->namespace) : ()),
     );
 
@@ -133,7 +133,7 @@ sub _start_watch {
     $params{fieldSelector} = $self->field_selector
         if defined $self->field_selector;
 
-    my $req = $rest->_prepare_request('GET', $path, parameters => \%params);
+    my $req = $rest->prepare_request('GET', $path, parameters => \%params);
 
     weaken(my $weak_self = $self);
 
@@ -142,7 +142,7 @@ sub _start_watch {
         return unless $weak_self;
 
         my $buffer = $weak_self->{_buffer};
-        for my $result ($rest->_process_watch_chunk($class, \$buffer, $chunk)) {
+        for my $result ($rest->process_watch_chunk($class, \$buffer, $chunk)) {
             $weak_self->{_buffer} = $buffer;
 
             if ($result->{resourceVersion}) {
@@ -245,7 +245,7 @@ Net::Async::Kubernetes::Watcher - Auto-reconnecting Kubernetes watch as IO::Asyn
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

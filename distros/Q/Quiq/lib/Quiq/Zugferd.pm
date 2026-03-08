@@ -42,7 +42,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.235';
+our $VERSION = '1.236';
 
 use Quiq::PerlModule;
 use Quiq::Path;
@@ -924,6 +924,7 @@ sub toXml {
         '--',
         # Rechnung (allgemeine Angaben)
         'BT-24' => $rch->profilKennung,
+        'BT-23' => $rch->geschaeftsprozessTyp,
         'BT-3' => $rch->rechnungsart,
         'BT-1' => $rch->rechnungsnummer,
         $rch->transferDate('rechnungsdatum','BT-2'),
@@ -948,6 +949,9 @@ sub toXml {
         'BT-40' => $rch->verkaeufer->land,
         'BT-41' => $rch->verkaeufer->kontakt,
         'BT-42' => $rch->verkaeufer->telefon,
+        'BT-34' => $rch->verkaeufer->email,
+        'BT-34-1' => $rch->verkaeufer->email? '0088': undef,
+        'BT-43' => $rch->verkaeufer->contactEmail,
         # 'BT-14' => $rch->verkaeufer->auftragsreferenz,
         'BT-31' => $rch->verkaeufer->umsatzsteuerId,
         'BT-31-0' => 'VA',
@@ -955,6 +959,8 @@ sub toXml {
         'BT-44' => $rch->kaeufer->name,
         'BT-56' => $rch->kaeufer->kontakt,
         'BT-46' => $rch->kaeufer->kundennummer,
+        'BT-49' => $rch->kaeufer->email,
+        'BT-49-1' => $rch->kaeufer->email? '0088': undef,
         'BT-50' => $rch->kaeufer->strasse,
         'BT-53' => $rch->kaeufer->plz,
         'BT-52' => $rch->kaeufer->ort,
@@ -1453,7 +1459,7 @@ Klassen:
 
 =head1 VERSION
 
-1.235
+1.236
 
 =head1 AUTHOR
 

@@ -1,6 +1,6 @@
 package DBIx::Class::Async::ResultSet;
 
-$DBIx::Class::Async::ResultSet::VERSION   = '0.63';
+$DBIx::Class::Async::ResultSet::VERSION   = '0.64';
 $DBIx::Class::Async::ResultSet::AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -9,7 +9,7 @@ DBIx::Class::Async::ResultSet - Non-blocking resultset proxy with Future-based e
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,13 @@ my %ACCUMULATING_ATTRS = map { $_ => 1 } qw(
     order_by
     group_by
     having
+);
+
+my %DATETIME_COLUMN_TYPES = map { $_ => 1 } qw(
+    datetime timestamp timestamptz
+    timestamp\ with\ time\ zone
+    timestamp\ without\ time\ zone
+    date time
 );
 
 =head1 METHODS
@@ -3888,6 +3895,51 @@ sub _inflate_row {
         if (exists $hash->{$col} && $inflators->{$col}{inflate}) {
             # This turns your JSON string back into a HASH ref!
             $hash->{$col} = $inflators->{$col}{inflate}->($hash->{$col});
+        }
+    }
+
+    # ------------------------------------------------------------------
+    # Inflate datetime columns for result classes that load
+    # InflateColumn::DateTime. The worker inflates correctly but sends
+    # raw strings back to the parent. We re-inflate here using the
+    # storage formatter detected from the DSN, since the parent process
+    # holds no active DB connection and ->storage returns nothing.
+    # This also applies the PR#138 fix by setting the formatter on the
+    # resulting DateTime object.
+    # ------------------------------------------------------------------
+    my $result_source = $self->result_source;
+    my $result_class  = $result_source->result_class;
+
+    if ( $result_class->isa('DBIx::Class::InflateColumn::DateTime') ) {
+        my $formatter = $db->{_datetime_formatter};
+        my $parse_dt;
+
+        if ($formatter) {
+            $parse_dt = $formatter->isa('DateTime::Format::Pg')
+                ? sub { $formatter->parse_timestamptz($_[0]) }
+                : sub { $formatter->parse_datetime($_[0]) };
+        }
+
+        if ($parse_dt) {
+            for my $col (keys %$hash) {
+                next unless defined $hash->{$col};
+                next if ref $hash->{$col};
+                next if $inflators->{$col};
+
+                my $col_info  = eval { $result_source->column_info($col) } // {};
+                my $data_type = lc( $col_info->{data_type} // '' );
+                next unless $DATETIME_COLUMN_TYPES{$data_type};
+                next if exists $col_info->{inflate_datetime}
+                    && !$col_info->{inflate_datetime};
+
+                my $dt = eval { $parse_dt->( $hash->{$col} ) };
+                next if $@ || !defined $dt;
+
+                $dt->set_formatter($formatter)
+                    if eval { $dt->isa('DateTime') } && !$dt->formatter;
+
+                $hash->{$col} = $dt;
+            }
         }
     }
 

@@ -1,0 +1,21 @@
+Revision history for Langertha-Knarr
+
+0.004     2026-03-03 05:22:38Z
+
+  - Fix routing priority: passthrough before default engine fallback
+  - Add passthrough-only mode (no API keys needed)
+  - Add KNARR_TRACE_NAME / --trace-name for custom Langfuse trace names
+  - Support LANGFUSE_BASE_URL env var (in addition to LANGFUSE_URL)
+  - Strip quotes from env values (Docker --env-file compatibility)
+  - Strip Accept-Encoding/Content-Encoding in passthrough (no gzip issues)
+  - Rewrite POD: passthrough proxy as primary use case
+  - Fix Langertha dependency version to 0.303
+  - Fix author URL
+
+0.001     2026-03-03 04:00:32Z
+
+  - Initial release
+  - Multi-format LLM proxy: OpenAI, Anthropic, Ollama
+  - Passthrough mode with Langfuse tracing
+  - Docker container mode with auto-detect from ENV
+  - CLI: start, container, models, check, init

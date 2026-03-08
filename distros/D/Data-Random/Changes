@@ -1,5 +1,9 @@
 Revision history for Perl module Data::Random
 
+0.15      2026-03-01 00:15:18-08:00 America/Los_Angeles
+          - fix one more escaped whitespace warning missed in 0.14
+          Thanks to JKEENAN (James E Keenan) for the fix
+
 0.14      2025-10-11 03:23:58-07:00 America/Los_Angeles
           - work around new warning in perl-5.43.2 about escaping whitespace
           - fix repository URL typo in dist.ini that caused broken MetaCPAN links

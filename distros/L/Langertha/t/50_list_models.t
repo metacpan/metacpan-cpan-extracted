@@ -47,7 +47,7 @@ sub mock_response {
 }
 
 subtest 'OpenAI response parsing' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   use_ok('Langertha::Engine::OpenAI');
 
@@ -56,11 +56,12 @@ subtest 'OpenAI response parsing' => sub {
 
   my $engine = Langertha::Engine::OpenAI->new(api_key => 'test-key');
 
-  # Test response parsing
-  my $models = $engine->list_models_response($response);
+  # Test response parsing — returns full response hash for pagination support
+  my $data = $engine->list_models_response($response);
 
-  is(ref($models), 'ARRAY', 'Returns array of models');
-  is(scalar(@$models), 5, 'Parsed 5 models from fixture');
+  is(ref($data), 'HASH', 'Returns hash with response data');
+  is(ref($data->{data}), 'ARRAY', 'Has models array');
+  is(scalar(@{$data->{data}}), 5, 'Parsed 5 models from fixture');
 };
 
 subtest 'Anthropic response parsing' => sub {
@@ -102,7 +103,7 @@ subtest 'Gemini response parsing' => sub {
 };
 
 subtest 'Groq response parsing' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   use_ok('Langertha::Engine::Groq');
 
@@ -112,14 +113,15 @@ subtest 'Groq response parsing' => sub {
   my $engine = Langertha::Engine::Groq->new(api_key => 'test-key');
 
   # Test response parsing
-  my $models = $engine->list_models_response($response);
+  my $data = $engine->list_models_response($response);
 
-  is(ref($models), 'ARRAY', 'Returns array of models');
-  is(scalar(@$models), 4, 'Parsed 4 models from fixture');
+  is(ref($data), 'HASH', 'Returns hash with response data');
+  is(ref($data->{data}), 'ARRAY', 'Has models array');
+  is(scalar(@{$data->{data}}), 4, 'Parsed 4 models from fixture');
 };
 
 subtest 'Mistral response parsing' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   use_ok('Langertha::Engine::Mistral');
 
@@ -129,14 +131,15 @@ subtest 'Mistral response parsing' => sub {
   my $engine = Langertha::Engine::Mistral->new(api_key => 'test-key');
 
   # Test response parsing
-  my $models = $engine->list_models_response($response);
+  my $data = $engine->list_models_response($response);
 
-  is(ref($models), 'ARRAY', 'Returns array of models');
-  is(scalar(@$models), 3, 'Parsed 3 models from fixture');
+  is(ref($data), 'HASH', 'Returns hash with response data');
+  is(ref($data->{data}), 'ARRAY', 'Has models array');
+  is(scalar(@{$data->{data}}), 3, 'Parsed 3 models from fixture');
 };
 
 subtest 'DeepSeek response parsing' => sub {
-  plan tests => 3;
+  plan tests => 4;
 
   use_ok('Langertha::Engine::DeepSeek');
 
@@ -146,10 +149,11 @@ subtest 'DeepSeek response parsing' => sub {
   my $engine = Langertha::Engine::DeepSeek->new(api_key => 'test-key');
 
   # Test response parsing
-  my $models = $engine->list_models_response($response);
+  my $data = $engine->list_models_response($response);
 
-  is(ref($models), 'ARRAY', 'Returns array of models');
-  is(scalar(@$models), 2, 'Parsed 2 models from fixture');
+  is(ref($data), 'HASH', 'Returns hash with response data');
+  is(ref($data->{data}), 'ARRAY', 'Has models array');
+  is(scalar(@{$data->{data}}), 2, 'Parsed 2 models from fixture');
 };
 
 subtest 'OpenAI list_models_request construction' => sub {

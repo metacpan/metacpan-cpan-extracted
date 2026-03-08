@@ -1,5 +1,25 @@
 Revision history for Langertha
 
+0.304     2026-03-07 02:05:27Z
+    - New role: Langertha::Role::HermesTools — extracted Hermes-style XML
+      tool calling into a dedicated role. Engines compose this role instead
+      of setting a hermes_tools flag. Cleaner polymorphic dispatch: Role::Tools
+      provides the tool loop and default native API path, HermesTools overrides
+      build_tool_chat_request to inject tools into the system prompt.
+    - Role::Tools cleaned up: removed all hermes branching, private _hermes_*
+      methods, and hermes_tools attribute. Five polymorphic methods
+      (format_tools, response_tool_calls, extract_tool_call,
+      format_tool_results, response_text_content) are now provided by either
+      the engine (native) or HermesTools (XML).
+    - AKI.pm (native API): added tool calling support via HermesTools role
+      with hermes_extract_content override for AKI's response format.
+    - AKIOpenAI.pm: composes HermesTools role (replaces hermes_tools flag).
+    - NousResearch.pm: composes HermesTools role (replaces hermes_tools flag).
+    - Raider and Chat: simplified tool loop — removed all hermes if/else
+      branching, uses polymorphic build_tool_chat_request.
+
+0.303     2026-03-01 03:24:11Z
+
 0.302     2026-02-27 03:48:44Z
     - Fix list_models URL construction: add overridable list_models_path
       method to Role::OpenAICompatible (default: /models). Mistral

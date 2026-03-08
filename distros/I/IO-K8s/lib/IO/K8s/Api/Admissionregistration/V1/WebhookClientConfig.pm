@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::WebhookClientConfig;
 # ABSTRACT: WebhookClientConfig contains the information to make a TLS connection with the webhook
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s caBundle => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Admissionregistration::V1::WebhookClientConfig - WebhookClientConf
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 caBundle
 

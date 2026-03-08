@@ -1,6 +1,6 @@
 package IO::K8s::CertManager::V1::ClusterIssuer;
 # ABSTRACT: cert-manager cluster-scoped certificate issuer
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject
     api_version     => 'cert-manager.io/v1',
     resource_plural => 'clusterissuers';
@@ -24,7 +24,7 @@ IO::K8s::CertManager::V1::ClusterIssuer - cert-manager cluster-scoped certificat
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

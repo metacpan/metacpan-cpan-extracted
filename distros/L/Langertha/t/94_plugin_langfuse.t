@@ -393,6 +393,10 @@ subtest 'Chat with Langfuse + tools creates spans for tool calls' => sub {
       return MockChatRequest->new(sub { $data });
     }
 
+    sub build_tool_chat_request {
+      my ($self, $conversation, $formatted_tools, %extra) = @_;
+      return $self->chat_request($conversation, tools => $formatted_tools, %extra);
+    }
     sub format_tools { $_[1] }
     sub response_tool_calls { $_[1]->{tool_calls} // [] }
     sub extract_tool_call { ($_[1]->{name}, $_[1]->{input} // {}) }
@@ -406,7 +410,6 @@ subtest 'Chat with Langfuse + tools creates spans for tool calls' => sub {
     sub response_text_content { $_[1]->{final_text} // '' }
     sub parse_response { $_[1] }
     sub think_tag_filter { 0 }
-    sub hermes_tools { 0 }
 
     __PACKAGE__->meta->make_immutable;
   }

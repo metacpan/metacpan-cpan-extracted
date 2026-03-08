@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::CVE;
 # ABSTRACT: A Permission data object
-$MetaCPAN::Client::CVE::VERSION = '2.038000';
+$MetaCPAN::Client::CVE::VERSION = '2.039000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -43,7 +43,7 @@ MetaCPAN::Client::CVE - A Permission data object
 
 =head1 VERSION
 
-version 2.038000
+version 2.039000
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,4 @@
-package Mojo::Transaction::HTTP::Role::Retry 0.002;
+package Mojo::Transaction::HTTP::Role::Retry 0.003;
 
 # ABSTRACT: Adds a retries attribute
 
@@ -21,7 +21,7 @@ Mojo::Transaction::HTTP::Role::Retry - Adds a retries attribute
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

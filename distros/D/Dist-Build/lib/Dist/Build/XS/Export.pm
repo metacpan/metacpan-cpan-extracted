@@ -1,5 +1,5 @@
 package Dist::Build::XS::Export;
-$Dist::Build::XS::Export::VERSION = '0.026';
+$Dist::Build::XS::Export::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -98,7 +98,7 @@ Dist::Build::XS::Export - Dist::Build extension to export headers for other XS m
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 SYNOPSIS
 

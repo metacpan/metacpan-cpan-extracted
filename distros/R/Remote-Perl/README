@@ -1,0 +1,19 @@
+remperl -- Remote Perl
+----------------------
+
+Run Perl scripts on remote machines over any pipe-based transport, with transparent
+dependency injection and both CLI and library interfaces.
+
+remperl connects to a remote Perl interpreter through an arbitrary pipe command,
+bootstraps a protocol client on the remote end, and then executes Perl code there.
+If module serving is enabled, missing modules are fetched transparently from the
+local machine on demand; the remote machine needs no pre-installed dependencies
+beyond a bare Perl interpreter.
+
+See "perldoc remperl" for CLI reference and "perldoc Remote::Perl" for the library API.
+
+Requirements
+------------
+
+  Local:  Perl 5.36+
+  Remote: bare Perl 5.10+ (no modules needed beyond core)

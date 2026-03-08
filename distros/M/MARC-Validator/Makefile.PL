@@ -30,6 +30,7 @@ requires 'MARC::Field008' => 0;
 requires 'MARC::Leader' => 0.08;
 requires 'Mo::utils' => 0.06;
 requires 'Module::Pluggable' => 0;
+requires 'utf8' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/MARC-Validator/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/MARC-Validator';
 resources 'repository' => 'git://github.com/michal-josef-spacek/MARC-Validator';
@@ -39,8 +40,9 @@ test_requires 'File::Object' => 0;
 test_requires 'MARC::File::XML' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.10';
+version '0.13';
 
 # Run.
 WriteAll();

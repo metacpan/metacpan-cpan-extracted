@@ -11,6 +11,7 @@ README.md
 cpanfile
 dist.ini
 lib/Net/Async/MCP.pm
+lib/Net/Async/MCP/Transport/HTTP.pm
 lib/Net/Async/MCP/Transport/InProcess.pm
 lib/Net/Async/MCP/Transport/Stdio.pm
 t/00_load.t

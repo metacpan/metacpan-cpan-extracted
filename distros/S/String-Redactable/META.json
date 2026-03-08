@@ -1,0 +1,62 @@
+{
+   "abstract" : "A string that automatically redacts itself",
+   "author" : [
+      "brian d foy <briandfoy@pobox.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "String-Redactable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::More" : "1",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/string-redactable/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/string-redactable",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/string-redactable",
+         "web" : "https://github.com/briandfoy/string-redactable"
+      }
+   },
+   "version" : "0.901",
+   "x_extra_modules" : [],
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -29,11 +29,23 @@ sub new($class, $id) {
     bless { id => $id, sid => $sid++, on_tags => {}, pref_position => [] }, $class;
 }
 
+# ctor for mock windows when we need blessed objects
+sub mock($class, $id) {
+    bless { id => $id }, $class;
+}
+
 sub DESTROY($self) {
     # Wanna free some resources? Do it inside Destroy handler: korgwm.pm/annihilate_window()
     1;
 }
 
+# Returns:
+# - in scalar context: just a value
+# - in list context: the value and reply object itself
+# The value could be modified depending on the $prop_type:
+# - UTF-8 is being decoded on the fly
+# - WINDOW CARDINAL is unpacked as a single int
+# - ATOM is unpacked as [ int, int, int... ] for each ATOM in the reply
 sub _get_property($wid, $prop_name, $prop_type='UTF8_STRING', $ret_length=8) {
     my $aname = atom($prop_name);
     my $atype = atom($prop_type);
@@ -44,8 +56,11 @@ sub _get_property($wid, $prop_name, $prop_type='UTF8_STRING', $ret_length=8) {
     my $value = $prop ? $prop->{value} : undef;
 
     # Convert to internal format
-    $value = decode('UTF-8', $value) if defined $value and $prop_type eq 'UTF8_STRING';
-    ($value) = unpack('L', $value) if defined $value and $prop_type eq 'WINDOW';
+    if (defined $value) {
+        $value = decode('UTF-8', $value) if $prop_type eq 'UTF8_STRING';
+        ($value) = unpack('L', $value) if $prop_type eq 'WINDOW';
+        $value = [ unpack 'L' x $prop->{value_len}, $value ] if $prop_type eq 'ATOM';
+    }
 
     return wantarray ? ($value, $prop) : $value;
 }
@@ -87,6 +102,11 @@ sub _title($wid) {
     # long_length is a 32-bit multiplies of data; UTF8 usually encodes a char up to 8 bytes, so multipler is 2:
     my $title = _get_property($wid, "_NET_WM_NAME", "UTF8_STRING", 2 * $cfg->{title_max_len});
     $title = _get_property($wid, "WM_NAME", "STRING", $cfg->{title_max_len}) unless length $title;
+    return "" unless defined $title;
+    $title =~ s/\n/ /g;
+    $title =~ s/ *$//g;
+    $title =~ s/^ *//g;
+    $title =~ s/\p{Grapheme_Extend}/?/g;
     $title;
 }
 
@@ -167,13 +187,18 @@ sub _stack_below($self, $top) {
 # Place windows in a stack calling above/below only once per window
 sub _stack_place(@stack) {
     return unless @stack;
+
+    # Infuse @stack with pinned windows, removing duplicates
+    my @pinned = pinned_list();
+    @stack = (@pinned, grep { not pinned_check($_) } @stack) if @pinned;
+
     my $above = shift @stack;
     my %seen = ($above => undef);
     $above->_stack_above();
 
     for my $win (@stack) {
-        next if exists $seen{$win};
-        $seen{$win} = undef;
+        next if exists $seen{ $win->{id} };
+        $seen{ $win->{id} } = undef;
         $win->_stack_below($above);
         $above = $win;
     }
@@ -267,6 +292,9 @@ sub focus($self) {
     $tag->{focus} = $self unless $self->{always_on};
     $focus->{window} = $self;
     $focus->{screen} = $self->{always_on} || $focus_screens[0];
+
+    # NOTE $tag is probably defined here any case
+    focus_prev_push($self, $tag->{focus_prev});
 
     $X->flush();
 }
@@ -487,10 +515,17 @@ sub toggle_maximize($self, $action, %opts) {
         $_->_hide() for $tag->windows();
     } else {
         $tag->{max_window} = undef;
-        $self->resize_and_move(@{ $self }{qw( x y w h )}) unless $invisible_win;
+        unless ($invisible_win) {
+            $self->resize_and_move(@{ $self }{qw( x y w h )});
+            $self->warp_pointer() if $cfg->{mouse_follow} and 1 < $tag->windows();
+        }
     }
 
     $tag->show() unless $invisible_win;
+}
+
+sub toggle_pinned($self) {
+    pinned_remove($self) or pinned_add($self);
 }
 
 sub toggle_always_on($self) {
@@ -515,7 +550,7 @@ sub close($self) {
     my $len = $prop->{value_len};
 
     # Use ICCCM to gently ask client to close the window
-    if ($len and first { $_ == $icccm_del_win } unpack "L" x $len, $value) {
+    if ($len and first { $_ == $icccm_del_win } @{ $value }) {
         my $packed = pack('CCSLLLL', CLIENT_MESSAGE, 32, 0, $self->{id}, atom("WM_PROTOCOLS"),
             atom("WM_DELETE_WINDOW"), TIME_CURRENT_TIME);
         $X->send_event(0, $self->{id}, EVENT_MASK_STRUCTURE_NOTIFY, $packed);
@@ -597,10 +632,16 @@ sub urgent_by_class(@classes) {
     @found;
 }
 
-sub warp_pointer($self) {
+# Almost just warp pointer to the window. Does nothing if the window already owns the pointer.
+sub warp_pointer($self, %opts) {
+    return if $cfg->{mouse_nowarp};
+
     # Do nothing if this window already owns the pointer not in (0, 0) position
     my $ptr = pointer();
     return if $self->{id} == ($ptr->{child} // 0) and sum0 map { $ptr->{$_} // () } qw( root_x root_y );
+
+    # Do nothing if user does not want to warp pointer out of the korgwm windows
+    return if $cfg->{warp_ignore_korgwm} and $ptr->{child} and _class($ptr->{child}) eq "korgwm";
 
     # We have to re-stack windows if the win is floating, so call focus() explicitly
     $self->focus() if $self->{floating};
@@ -708,6 +749,7 @@ sub size_hints_get($self) {
 # Options:
 # - bypass_prevent_enter_notify
 # - bypass_prevent_focus_in
+# - bypass_single_window_warp       do not warp if the window is the only window on it's tag
 sub select($self, %opts) {
     my @tags = $self->tags();
     my $tag = shift @tags // ($self->{always_on} && $self->{always_on}->current_tag());
@@ -728,6 +770,10 @@ sub select($self, %opts) {
     }
 
     $self->focus();
+
+    return 0 if $opts{bypass_single_window_warp} and 1 == $tag->windows();
+
+    # Warp pointer if needed
     $self->warp_pointer();
 
     return 0;

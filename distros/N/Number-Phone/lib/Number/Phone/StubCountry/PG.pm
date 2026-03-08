@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153524;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -85,12 +85,12 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"67542", "Madang",
+"67545", "Sepik",
 "6756", "MP\/Gulf\/Tabubil\/Kiunga",
-"6753", "NCD",
 "67547", "Morobe",
-"6759", "Islands",
 "6755", "Highlands",
-"67545", "Sepik",};
+"6753", "NCD",
+"6759", "Islands",};
 my $timezones = {
                '' => [
                        'Pacific/Port_Moresby'

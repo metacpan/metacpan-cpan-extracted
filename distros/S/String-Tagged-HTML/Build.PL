@@ -7,7 +7,7 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'String::Tagged::HTML',
    requires => {
-      'perl' => '5.014',
+      'perl' => '5.020',
       'String::Tagged' => '0.20',
    },
    test_requires => {

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::TokenRequestSpec;
 # ABSTRACT: TokenRequestSpec contains client provided parameters of a token request.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s audiences => [Str], 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Authentication::V1::TokenRequestSpec - TokenRequestSpec contains c
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 audiences
 

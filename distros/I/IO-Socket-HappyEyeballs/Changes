@@ -1,0 +1,18 @@
+0.002     2026-03-06 03:14:15Z
+
+  - RFC 8305 Section 7.2: Last Resort Local Synthesis for broken AAAA records
+  - NAT64 prefix detection via RFC 7050 (ipv4only.arpa)
+  - IPv6 address synthesis from IPv4 via NAT64 prefix
+  - New method: last_resort_delay() for configuring synthesis delay (default 2s)
+  - Use AI_ADDRCONFIG for initial resolution, drop it in Last Resort fallback path
+
+0.001     2026-03-05 20:26:52Z
+
+  - Initial release
+  - Implements RFC 8305 (Happy Eyeballs v2) connection algorithm
+  - Address interleaving per RFC 8305 Section 4
+  - Configurable Connection Attempt Delay (default 250ms per RFC 8305 Section 5)
+  - Address family caching with configurable TTL
+  - Parallel non-blocking connection attempts via select()
+  - -override import flag to transparently patch IO::Socket::IP globally
+  - Override only intercepts outgoing TCP; UDP, listeners, Unix sockets unaffected

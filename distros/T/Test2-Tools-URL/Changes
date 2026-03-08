@@ -1,5 +1,8 @@
 Revision history for Test2-Tools-URL
 
+0.07      2026-03-07 10:07:04 -0700
+  - Fixed synopsis example (yoshikazusawa++, gh#10)
+
 0.06      2021-03-23 15:29:53 -0600
   - Added: url_scheme, url_host, url_secure and url_insecure, url_mail_to checks (gh#6)
   - Added: user and password components for FTP URLs (gh#6)

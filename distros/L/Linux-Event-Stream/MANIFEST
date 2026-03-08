@@ -1,0 +1,21 @@
+Changes
+examples/01_socketpair_echo.pl
+examples/02_line_codec_echo.pl
+examples/03_manual_line_echo.pl
+lib/Linux/Event/Stream.pm
+lib/Linux/Event/Stream/Codec.pm
+lib/Linux/Event/Stream/Codec/Line.pm
+lib/Linux/Event/Stream/Codec/Netstring.pm
+lib/Linux/Event/Stream/Codec/U32BE.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/01-socketpair-basic.t
+t/02-watermarks.t
+t/03-close-after-drain.t
+t/04-framed-line.t
+t/05-max-inbuf.t
+t/06-write-message.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

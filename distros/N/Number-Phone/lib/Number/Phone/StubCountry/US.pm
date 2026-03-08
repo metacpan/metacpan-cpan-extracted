@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153526;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -52,18 +52,13 @@ my $formatters = [
 
 my $validators = {
                 'geographic' => '(
-          3052(?:
-            0[0-8]|
-            [1-9]\\d
-          )\\d{4}|
           (?:
-            2742|
-            305[3-9]
+            274[27]|
+            (?:
+              472|
+              983
+            )[2-47-9]
           )\\d{6}|
-          (?:
-            472|
-            983
-          )[2-47-9]\\d{6}|
           (?:
             2(?:
               0[1-35-9]|
@@ -77,12 +72,12 @@ my $validators = {
               8[13]
             )|
             3(?:
-              0[1-47-9]|
+              0[1-57-9]|
               1[02-9]|
               2[013-79]|
               3[0-24679]|
               4[167]|
-              5[0-2]|
+              5[0-3]|
               6[01349]|
               8[056]
             )|
@@ -152,18 +147,13 @@ my $validators = {
             )
           )[2-9]\\d{6}
         |
-          3052(?:
-            0[0-8]|
-            [1-9]\\d
-          )\\d{4}|
           (?:
-            2742|
-            305[3-9]
+            274[27]|
+            (?:
+              472|
+              983
+            )[2-47-9]
           )\\d{6}|
-          (?:
-            472|
-            983
-          )[2-47-9]\\d{6}|
           (?:
             2(?:
               0[1-35-9]|
@@ -177,12 +167,12 @@ my $validators = {
               8[13]
             )|
             3(?:
-              0[1-47-9]|
+              0[1-57-9]|
               1[02-9]|
               2[013-79]|
               3[0-24679]|
               4[167]|
-              5[0-2]|
+              5[0-3]|
               6[01349]|
               8[056]
             )|
@@ -284,7 +274,7 @@ my $validators = {
           5(?:
             00|
             2[125-9]|
-            33|
+            3[23]|
             44|
             66|
             77|
@@ -303,7 +293,7 @@ my $validators = {
             88
           )[2-9]\\d{6}
         ',
-                'voip' => '305209\\d{4}'
+                'voip' => ''
               };
 use Number::Phone::NANP::Data;
 sub areaname {
@@ -2560,6 +2550,9 @@ my $timezones = {
                         ],
                '352' => [
                           'America/New_York'
+                        ],
+               '353' => [
+                          'America/Chicago'
                         ],
                '354' => [
                           'America/Toronto'

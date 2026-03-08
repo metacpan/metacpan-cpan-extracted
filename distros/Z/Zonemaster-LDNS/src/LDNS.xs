@@ -1657,20 +1657,32 @@ rr_new_from_string(class,str)
     PPCODE:
         ldns_status s;
         ldns_rr *rr;
-        char rrclass[40];
         char *rrtype;
+        SV* package;
         SV* rr_sv;
+        HV* stash;
 
         s = ldns_rr_new_frm_str(&rr, str, 0, NULL, NULL);
         if(s != LDNS_STATUS_OK)
         {
             croak("Failed to build RR: %s", ldns_get_errorstr_by_id(s));
         }
+
         rrtype = ldns_rr_type2str(ldns_rr_get_type(rr));
-        snprintf(rrclass, 39, "Zonemaster::LDNS::RR::%s", rrtype);
+        package = newSVpvf("Zonemaster::LDNS::RR::%s", rrtype);
         free(rrtype);
+
         rr_sv = sv_newmortal();
-        sv_setref_pv(rr_sv, rrclass, rr);
+
+        /* Don’t bless objects into classes that don’t exist. */
+        stash = gv_stashsv(package, 0);
+        if (stash != NULL) {
+            sv_setref_pv(rr_sv, SvPVX(package), rr);
+        }
+        else {
+            sv_setref_pv(rr_sv, "Zonemaster::LDNS::RR", rr);
+        }
+
         PUSHs(rr_sv);
 
 char *

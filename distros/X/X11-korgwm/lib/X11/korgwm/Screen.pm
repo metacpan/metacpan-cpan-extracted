@@ -10,17 +10,25 @@ use X11::XCB ':all';
 use X11::korgwm::Tag;
 use X11::korgwm::Common;
 
-sub new($class, $x, $y, $w, $h) {
+# Simplify object usage
+use Scalar::Util qw( refaddr );
+use overload '""' => sub { sprintf "%s[id:%s]", overload::StrVal($_[0]), $_[0]->{id} // "undef" };
+use overload '==' => sub { (refaddr($_[0]) // 0) == (refaddr($_[1]) // 0) };
+use overload '!=' => sub { (refaddr($_[0]) // 0) != (refaddr($_[1]) // 0) };
+use overload cmp => sub { (refaddr($_[0]) // 0) cmp (refaddr($_[1]) // 0) };
+
+sub new($class, $w, $h, $x, $y) {
+    # tags iterator
     my $idx = 0;
     my $self = bless {}, $class;
-    $self->{id} = "$x,$y,$w,$h";
+    $self->{id} = "$w,$h,$x,$y";
     $self->{always_on} = [];
     $self->{focus} = undef;
     $self->{tag_curr} = 0;
     $self->{tag_prev} = 0;
     $self->{tags} = [ map { X11::korgwm::Tag->new($self) } @{ $cfg->{ws_names} } ];
     $_->{idx} = $idx++ for @{ $self->{tags} };
-    $self->{panel} = X11::korgwm::Panel->new(0, $w, $x,
+    $self->{panel} = X11::korgwm::Panel->new(0, $w, $x, $y,
         sub ($btn, $ws) { $self->tag_set_active($ws - 1, noselect => 1) }
     );
     $self->{x} = $x;
@@ -48,14 +56,14 @@ sub destroy($self, $new_screen) {
     %{ $self } = ();
 }
 
-# Set $tag_new_id visible for $self screen
+# Set $tag_new_id visible for $self screen ($tag_new_id starting from 0)
 # Options:
 # - rotate => switch to previously selected tag if $tag_new_id is already active
 # Options are also passed to $tag->show() as-is
 sub tag_set_active($self, $tag_new_id, %opts) {
     $opts{rotate} //= 1;
 
-    $tag_new_id = $self->{tag_prev} if $opts{rotate} and $tag_new_id == $self->{tag_curr};
+    $tag_new_id = $self->{tag_prev} if $cfg->{tag_rotate} and $opts{rotate} and $tag_new_id == $self->{tag_curr};
     return if $tag_new_id == $self->{tag_curr};
 
     # Remember previous tag
@@ -104,29 +112,35 @@ sub win_remove($self, $win, $norefresh = undef) {
     $tag->win_remove($win, $norefresh);
 
     # Remove from always_on
-    if (($win->{always_on} // 0) == $self) {
+    if ($self == $win->{always_on}) {
         my $arr = $self->{always_on};
         $win->{always_on} = undef;
         @{ $arr } = grep { $win != $_ } @{ $arr };
     }
 }
 
-sub focus($self) {
+sub focus($self, %params) {
     my $tag = $self->current_tag();
+    my $warp_method = $params{warp_method} // "select";
 
-    if (defined $self->{focus} and exists $self->{focus}->{on_tags}->{$tag}) {
+    if (defined $self->{focus} and exists $self->{focus}->{on_tags}->{ $tag }) {
         # self->focus already points to some window on active tag
         # This condition just looks prettier in this way, so if-clause is empty
     } else {
+        # Either: $self->{focus} undefined or it does not belong to the $tag
+
+        # Drop input focus to avoid input on hidden windows
+        $X->set_input_focus(INPUT_FOCUS_POINTER_ROOT, $X->root->id, TIME_CURRENT_TIME);
+
         # Focus some window on active tag. It's ok if it return undef
-        my $win = $tag->first_window();
+        my $win = focus_prev_get($tag->{focus_prev}) // $tag->first_window();
         $self->{focus} = $win;
     }
 
     # If there is a win, focus it; otherwise just reset panel title and update focus structure
     if (defined $self->{focus}) {
         # This will set focus->{screen} as well
-        $self->{focus}->focus();
+        $self->{focus}->$warp_method();
     } else {
         $focus->{screen} = $self;
         $self->{panel}->title();
@@ -137,9 +151,12 @@ sub set_active($self, $window = undef) {
     $self->focus();
     $self->refresh();
     if ($window) {
-        $window->warp_pointer();
+        $window->select();
     } else {
-        $X->root->warp_pointer(int($self->{x} + $self->{w} / 2 - 1), int($self->{h} / 2 - 1));
+        # Warp pointer only when pointer does not already belong to the screen
+        my ($ptr_x, $ptr_y) = map { ($_->{root_x}, $_->{root_y}) } pointer();
+        $X->root->warp_pointer(int($self->{x} + $self->{w} / 2 - 1), int($self->{h} / 2 - 1))
+        unless defined $ptr_x and defined $ptr_y and $self->contains_xy($ptr_x, $ptr_y);
     }
     $X->flush();
 }

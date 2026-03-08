@@ -61,7 +61,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.235';
+our $VERSION = '1.236';
 
 use Quiq::Option;
 use Quiq::Path;
@@ -159,15 +159,6 @@ sub exec {
         -print => \$print,
     );
 
-    # my $rsy = File::Rsync->new(
-    #     -archive => 1,
-    #     -verbose => 1,
-    #     -delete => 1,
-    #     -dry_run => $dryRun,
-    #     src => $src,
-    #     dest => $dest,
-    # );
-
     my $rsy = File::Rsync->new({
         'path-to-rsync' => Quiq::Path->findProgram('rsync'),
         archive => 1,
@@ -194,6 +185,7 @@ sub exec {
         #
         #     sending incremental file list
         #     PROTOKOLL
+        #
         #     sent X bytes  received X bytes  X.00 bytes/sec
         #     total size is X speedup is X.X
         #
@@ -234,7 +226,7 @@ sub exec {
 
 =head1 VERSION
 
-1.235
+1.236
 
 =head1 AUTHOR
 

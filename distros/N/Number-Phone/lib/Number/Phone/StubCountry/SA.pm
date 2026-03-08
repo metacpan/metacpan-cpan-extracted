@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153525;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -71,7 +71,7 @@ my $validators = {
           )\\d{6}
         ',
                 'mobile' => '
-          579[01]\\d{5}|
+          579[0-8]\\d{5}|
           5(?:
             [013-689]\\d|
             7[0-8]
@@ -84,17 +84,17 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96611", "Riyadh\/Kharj",
-"96613", "Dammam\/Khobar\/Dahran",
-"96616", "Hail\/Qasim",
-"96617", "Abha\/Najran\/Jezan",
+$areanames{en} = {"96613", "Dammam\/Khobar\/Dahran",
 "96614", "Madenah\/Arar\/Tabuk\/Yanbu",
+"96616", "Hail\/Qasim",
+"96611", "Riyadh\/Kharj",
+"96617", "Abha\/Najran\/Jezan",
 "96612", "Makkah\/Jeddah",};
-$areanames{ar} = {"96617", "أبها\/نجران\/جازان",
-"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
-"96612", "مكة\/جدة",
+$areanames{ar} = {"96612", "مكة\/جدة",
+"96617", "أبها\/نجران\/جازان",
 "96611", "الرياض\/الخرج",
 "96616", "حائل\/القصيم",
+"96614", "المدينة\ المنورة\/عرعر\/تبوك\/ينبع\ البحر",
 "96613", "الدمام\/الخبر\/الظهران",};
 my $timezones = {
                '' => [

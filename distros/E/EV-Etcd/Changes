@@ -1,5 +1,13 @@
 Revision history for EV-Etcd
 
+0.04  2026-03-02
+    - Add missing use EV () before XSLoader::load
+
+0.03  2026-03-02
+    - Fix error sources, election_observe arg order, watch early-cancel
+    - Clear auth token on auth_disable
+    - Deduplicate response handlers, remove dead code
+
 0.02  2026-02-10
     - Initial release
     - KV operations: get, put, delete, range, txn (compare-and-swap)

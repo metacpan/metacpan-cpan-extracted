@@ -1,0 +1,58 @@
+XML::PugiXML - Perl binding for pugixml C++ XML parser
+
+SYNOPSIS
+
+    use XML::PugiXML;
+
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item id="1">Hello</item></root>');
+
+    my $root = $doc->root;
+    print $root->child('item')->text;            # Hello
+    print $root->child('item')->attr('id')->value; # 1
+
+    # XPath
+    my $node = $doc->select_node('//item[@id="1"]');
+
+    # Compiled XPath
+    my $xpath = $doc->compile_xpath('//item');
+    my @items = $xpath->evaluate_nodes($root);
+
+    # Modify
+    my $new = $root->append_child('item');
+    $new->set_text('World');
+    $new->set_attr('id', '2');
+    print $doc->to_string("  ", XML::PugiXML::FORMAT_INDENT());
+
+DESCRIPTION
+
+Fast XML parsing, XPath support, and DOM manipulation via pugixml.
+
+INSTALLATION
+
+    cpanm Alien::pugixml
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+PERFORMANCE
+
+Benchmarked against XML::LibXML (100-5000 element documents):
+
+    Parsing:          8-12x faster
+    XPath queries:    2-13x faster
+    Tree traversal:   15-17x faster
+    DOM modification: 2-11x faster
+    Serialization:    2-4x faster
+
+See bench/benchmark.pl for details.
+
+DEPENDENCIES
+
+    Alien::pugixml (build-time)
+    Perl 5.10+
+
+LICENSE
+
+Same terms as Perl itself.

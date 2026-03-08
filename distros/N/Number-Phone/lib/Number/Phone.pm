@@ -19,7 +19,7 @@ use Devel::Deprecations::Environmental
     OldPerl => { unsupported_from => '2024-03-09', older_than => '5.14.0' };
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '4.0009';
+our $VERSION = '4.0010';
 
 my $NOSTUBS = 0;
 sub import {
@@ -185,6 +185,8 @@ so the appropriate country-specific module is loaded if available.
 
 If you pass in a bogus country code not recognised by
 Number::Phone::Country, the constructor will return undef.
+
+MSISDN format is supported.
 
 =head1 INCOMPATIBLE CHANGES
 
@@ -861,10 +863,8 @@ Please report bugs by at L<https://github.com/DrHyde/perl-modules-Number-Phone/i
 
 =head1 MAILING LIST
 
-There is a mailing list for discussion and help. Please subscribe at
-L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/number-phone>.
-
-Kindly hosted by L<Shadowcat|http://scsys.co.uk>.
+There is a mailing list for announcements, discussion and help. Please
+subscribe at L<https://groups.google.com/g/number-phone>.
 
 =head1 SEE ALSO
 
@@ -877,7 +877,7 @@ L<git://github.com/DrHyde/perl-modules-Number-Phone.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2004 - 2025 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2004 - 2026 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

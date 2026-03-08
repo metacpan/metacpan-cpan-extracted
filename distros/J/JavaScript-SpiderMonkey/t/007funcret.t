@@ -13,8 +13,6 @@ use strict;
 use Test::More qw(no_plan);
 
 use JavaScript::SpiderMonkey;
-use Log::Log4perl qw(:easy);
-Log::Log4perl->easy_init($ERROR);
 
 my $buffer = "";
 

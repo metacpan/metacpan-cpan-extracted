@@ -1,5 +1,5 @@
 package Kubernetes::REST::Networking;
-our $VERSION = '1.003';
+our $VERSION = '1.100';
 # ABSTRACT: DEPRECATED - v0 API group for Networking resources
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Networking - DEPRECATED - v0 API group for Networking resource
 
 =head1 VERSION
 
-version 1.003
+version 1.100
 
 =head1 SYNOPSIS
 

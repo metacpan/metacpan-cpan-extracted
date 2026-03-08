@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use Test2::V0;
 
-use Cwd;
 use FindBin    qw( $RealBin );
 use File::Spec ();
 my $lib_path;

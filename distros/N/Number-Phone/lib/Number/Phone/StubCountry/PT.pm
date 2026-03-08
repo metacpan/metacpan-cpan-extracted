@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153525;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -127,58 +127,58 @@ my $validators = {
                 'voip' => '30\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"351275", "Covilhã",
-"351289", "Faro",
-"351271", "Guarda",
-"351231", "Mealhada",
-"351258", "Viana\ do\ Castelo",
-"351235", "Arganil",
-"35122", "Porto",
-"351283", "Odemira",
-"351257", "Braga",
-"351244", "Leiria",
-"351252", "V\.\ N\.\ de\ Famalicão",
-"351261", "Torres\ Vedras",
-"351265", "Setúbal",
-"351241", "Abrantes",
-"351282", "Portimão",
-"351245", "Portalegre",
-"351266", "Évora",
-"351292", "Horta",
+$areanames{en} = {"351283", "Odemira",
 "351253", "Braga",
-"351274", "Proença\-a\-Nova",
-"351276", "Chaves",
-"351236", "Pombal",
-"351234", "Aveiro",
-"351259", "Vila\ Real",
-"351273", "Bragança",
-"351269", "Santiago\ do\ Cacém",
-"351233", "Figueira\ da\ Foz",
-"351285", "Moura",
-"351242", "Ponte\ de\ Sôr",
-"351281", "Tavira",
-"351279", "Moncorvo",
-"351254", "Peso\ da\ Régua",
-"351256", "S\.\ João\ da\ Madeira",
-"351239", "Coimbra",
-"351291", "Funchal",
-"351263", "Vila\ Franca\ de\ Xira",
-"35121", "Lisbon",
-"351295", "Angra\ do\ Heroísmo",
-"351284", "Beja",
-"351286", "Castro\ Verde",
-"351243", "Santarém",
-"351278", "Mirandela",
-"351238", "Seia",
-"351255", "Penafiel",
-"351251", "Valença",
 "351262", "Caldas\ da\ Rainha",
-"351296", "Ponta\ Delgada",
-"351272", "Castelo\ Branco",
-"351249", "Torres\ Novas",
-"351268", "Estremoz",
+"351263", "Vila\ Franca\ de\ Xira",
+"351292", "Horta",
+"351252", "V\.\ N\.\ de\ Famalicão",
 "351277", "Idanha\-a\-Nova",
-"351232", "Viseu",};
+"351245", "Portalegre",
+"351249", "Torres\ Novas",
+"351282", "Portimão",
+"351271", "Guarda",
+"351243", "Santarém",
+"351265", "Setúbal",
+"351269", "Santiago\ do\ Cacém",
+"351295", "Angra\ do\ Heroísmo",
+"351255", "Penafiel",
+"351259", "Vila\ Real",
+"351274", "Proença\-a\-Nova",
+"351285", "Moura",
+"351276", "Chaves",
+"351289", "Faro",
+"351238", "Seia",
+"351242", "Ponte\ de\ Sôr",
+"351234", "Aveiro",
+"351278", "Mirandela",
+"351236", "Pombal",
+"35121", "Lisbon",
+"351231", "Mealhada",
+"351266", "Évora",
+"351279", "Moncorvo",
+"351241", "Abrantes",
+"351286", "Castro\ Verde",
+"351275", "Covilhã",
+"351284", "Beja",
+"351296", "Ponta\ Delgada",
+"351256", "S\.\ João\ da\ Madeira",
+"351254", "Peso\ da\ Régua",
+"351261", "Torres\ Vedras",
+"351273", "Bragança",
+"351281", "Tavira",
+"351272", "Castelo\ Branco",
+"351244", "Leiria",
+"351251", "Valença",
+"351291", "Funchal",
+"351257", "Braga",
+"351233", "Figueira\ da\ Foz",
+"35122", "Porto",
+"351232", "Viseu",
+"351268", "Estremoz",
+"351258", "Viana\ do\ Castelo",
+"351239", "Coimbra",
+"351235", "Arganil",};
 $areanames{pt} = {"35121", "Lisboa",};
 my $timezones = {
                '' => [

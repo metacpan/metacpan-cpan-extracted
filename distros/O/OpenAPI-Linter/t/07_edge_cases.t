@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+
 use Test::More;
 use OpenAPI::Linter;
 
@@ -9,8 +10,8 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.0.3',
-        info => { title => 'Test', version => '1.0' },
-        paths => {},
+        info    => { title => 'Test', version => '1.0' },
+        paths   => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);
@@ -21,9 +22,9 @@ use OpenAPI::Linter;
 # Test: Empty components object
 {
     my $spec = {
-        openapi => '3.0.3',
-        info => { title => 'Test', version => '1.0' },
-        paths => {},
+        openapi    => '3.0.3',
+        info       => { title => 'Test', version => '1.0' },
+        paths      => {},
         components => {},
     };
 
@@ -36,9 +37,9 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.0.3',
-        info => { title => 'Test', version => '1.0' },
-        paths => {},
-        components => {
+        info    => { title => 'Test', version => '1.0' },
+        paths   => {},
+        components  => {
             schemas => {
                 SimpleString => {
                     type => 'string',
@@ -56,8 +57,8 @@ use OpenAPI::Linter;
 {
     my $spec = {
         openapi => '3.0.3',
-        info => { title => 'Test', version => '1.0' },
-        paths => {},
+        info    => { title => 'Test', version => '1.0' },
+        paths   => {},
     };
 
     my $linter = OpenAPI::Linter->new(spec => $spec);

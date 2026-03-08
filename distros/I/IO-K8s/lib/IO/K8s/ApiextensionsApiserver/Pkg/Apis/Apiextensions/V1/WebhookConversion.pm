@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookConversion;
 # ABSTRACT: WebhookConversion describes how to call a conversion webhook
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s clientConfig => 'Apiextensions::V1::WebhookClientConfig';
@@ -23,7 +23,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookConversion
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 clientConfig
 

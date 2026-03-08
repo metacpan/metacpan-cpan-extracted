@@ -1076,8 +1076,8 @@ response:
   content: |
     {
       "emailAddress": "test.user@gmail.com",
-      "messagesTotal": 41030,
-      "threadsTotal": 20565,
+      "messagesTotal": 1000,
+      "threadsTotal": 500,
       "historyId": "21211568"
     }
   headers:

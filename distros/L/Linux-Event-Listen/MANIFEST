@@ -1,6 +1,7 @@
 Changes
 examples/01_basic.pl
 examples/02_unix_basic.pl
+examples/03_stream_line_codec_echo.pl
 lib/Linux/Event/Listen.pm
 LICENSE
 Makefile.PL

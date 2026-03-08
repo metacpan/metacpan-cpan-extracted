@@ -4,6 +4,7 @@ cpanfile
 lib/Geo/Address/Parser.pm
 lib/Geo/Address/Parser/Rules/AU.pm
 lib/Geo/Address/Parser/Rules/CA.pm
+lib/Geo/Address/Parser/Rules/FR.pm
 lib/Geo/Address/Parser/Rules/IRL.pm
 lib/Geo/Address/Parser/Rules/NZ.pm
 lib/Geo/Address/Parser/Rules/UK.pm
@@ -21,6 +22,7 @@ t/cli.t
 t/comment-spelling.t
 t/eof.t
 t/eol.t
+t/fr.t
 t/fuzz.t
 t/irl.t
 t/nz.t

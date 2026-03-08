@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPRequest;
-our $VERSION = '1.003';
+our $VERSION = '1.100';
 # ABSTRACT: HTTP request object
 use Moo;
 use Types::Standard qw/Str HashRef/;
@@ -56,7 +56,7 @@ Kubernetes::REST::HTTPRequest - HTTP request object
 
 =head1 VERSION
 
-version 1.003
+version 1.100
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Kubernetes::REST::Authentication;
-our $VERSION = '1.003';
+our $VERSION = '1.100';
 # ABSTRACT: DEPRECATED - v0 API group for Authentication resources
 use Moo;
 extends 'Kubernetes::REST::V0Group';
@@ -20,7 +20,7 @@ Kubernetes::REST::Authentication - DEPRECATED - v0 API group for Authentication 
 
 =head1 VERSION
 
-version 1.003
+version 1.100
 
 =head1 SYNOPSIS
 

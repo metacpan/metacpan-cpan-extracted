@@ -1,0 +1,167 @@
+#!/usr/bin/env perl
+# PODNAME: knarr
+# ABSTRACT: Langertha LLM Proxy with Langfuse Tracing
+use strict;
+use warnings;
+use Langertha::Knarr::CLI;
+Langertha::Knarr::CLI->new_with_cmd;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+knarr - Langertha LLM Proxy with Langfuse Tracing
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+    knarr <command> [options]
+
+    knarr start                              # Start with ./knarr.yaml
+    knarr start -c production.yaml -p 9090   # Custom config and port
+    knarr container                          # Auto-start from environment (Docker mode)
+    knarr init > knarr.yaml                  # Generate config from environment
+    knarr init -e .env -e .env.local         # Scan .env files
+    knarr models                             # List configured models
+    knarr models --format json               # JSON output
+    knarr check                              # Validate config file
+
+=head1 DESCRIPTION
+
+C<knarr> is the command-line interface for L<Langertha::Knarr>, an LLM proxy
+that accepts requests in OpenAI, Anthropic, or Ollama format, routes them to
+any Langertha backend engine, and traces everything via Langfuse.
+
+See L<Langertha::Knarr> for full documentation including Docker usage, config
+file format, routing behaviour, and environment variable reference.
+
+=head1 COMMANDS
+
+=over
+
+=item B<start> — Start the proxy server using a config file
+
+=item B<container> — Auto-start from environment variables, no config file needed (Docker mode)
+
+=item B<init> — Scan environment and .env files for API keys, print generated YAML config
+
+=item B<models> — List all configured and auto-discovered models
+
+=item B<check> — Validate the config file and report configuration status
+
+=back
+
+=head1 GLOBAL OPTIONS
+
+=over
+
+=item B<-c>, B<--config> I<path>
+
+Config file path. Defaults to C<./knarr.yaml>.
+
+=item B<-v>, B<--verbose>
+
+Enable verbose logging to stderr.
+
+=back
+
+=head1 START OPTIONS
+
+=over
+
+=item B<-p>, B<--port> I<port>
+
+Port to listen on. Overrides the C<listen> setting in the config file.
+
+=item B<-H>, B<--host> I<host>
+
+Host to bind to. Overrides the C<listen> setting in the config file.
+
+=item B<-w>, B<--workers> I<n>
+
+Number of worker processes. Defaults to C<1>.
+
+=item B<-n>, B<--trace-name> I<name>
+
+Langfuse trace name. Overrides C<KNARR_TRACE_NAME> and the config file.
+
+=back
+
+=head1 CONTAINER OPTIONS
+
+=over
+
+=item B<-H>, B<--host> I<host>
+
+Host to bind to. Defaults to C<0.0.0.0> (all interfaces).
+
+=item B<-w>, B<--workers> I<n>
+
+Number of worker processes. Defaults to C<1>.
+
+=item B<-n>, B<--trace-name> I<name>
+
+Langfuse trace name.
+
+=back
+
+=head1 INIT OPTIONS
+
+=over
+
+=item B<-e>, B<--env-file> I<path>
+
+Additional .env file to scan. Repeatable. C<.env> and C<.env.local> in the
+current directory are scanned automatically.
+
+=item B<-l>, B<--listen> I<addr>
+
+Listen address to include in generated config. Repeatable. Defaults to
+C<127.0.0.1:8080> and C<127.0.0.1:11434>.
+
+=item B<-o>, B<--output> I<path>
+
+Write generated config to a file instead of stdout.
+
+=back
+
+=head1 MODELS OPTIONS
+
+=over
+
+=item B<-f>, B<--format> I<format>
+
+Output format: C<table> (default) or C<json>.
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/langertha-knarr/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

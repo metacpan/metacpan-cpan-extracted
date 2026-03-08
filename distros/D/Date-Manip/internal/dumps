@@ -12,7 +12,7 @@ for file in `cd tzdata/dump; echo *` ;do
 
    # Create the new dump.  Ignore lines with the year 0001 and 9999.
 
-   perl -I./lib examples/dm_zdump -v $tz | egrep -v '0001|9999' > z.dump.new
+   perl -I./lib examples/dm_zdump -v $tz | grep -E -v '0001|9999' > z.dump.new
    ln=`wc -l z.dump.new | awk '{print $1}'`
 
    # Copy the old dump.  Ignore the 2 first and 2 last lines.

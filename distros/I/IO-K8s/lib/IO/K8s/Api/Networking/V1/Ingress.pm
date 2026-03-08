@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::Ingress;
 # ABSTRACT: Ingress is a collection of rules that allow inbound connections to reach the endpoints defined by a backend. An Ingress can be configured to give services externally-reachable urls, load balance traffic, terminate SSL, offer name based virtual hosting etc.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced', 'IO::K8s::Role::Routable';
 sub _route_format { 'ingress' }
@@ -25,7 +25,7 @@ IO::K8s::Api::Networking::V1::Ingress - Ingress is a collection of rules that al
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

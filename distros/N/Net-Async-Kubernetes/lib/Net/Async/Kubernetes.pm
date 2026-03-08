@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes;
 # ABSTRACT: Async Kubernetes client for IO::Async
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -160,13 +160,13 @@ sub list {
 
     my $rest = $self->_rest;
     my $class = $rest->expand_class($short_class);
-    my $path = $rest->_build_path($class, %args);
-    my $req = $rest->_prepare_request('GET', $path);
+    my $path = $rest->build_path($class, %args);
+    my $req = $rest->prepare_request('GET', $path);
 
     return $self->_do_request($req)->then(sub {
         my ($response) = @_;
-        $rest->_check_response($response, "list $short_class");
-        return Future->done($rest->_inflate_list($class, $response));
+        $rest->check_response($response, "list $short_class");
+        return Future->done($rest->inflate_list($class, $response));
     });
 }
 
@@ -190,13 +190,13 @@ sub get {
     my $class = $rest->expand_class($short_class);
     return Future->fail("name required for get") unless $args{name};
 
-    my $path = $rest->_build_path($class, %args);
-    my $req = $rest->_prepare_request('GET', $path);
+    my $path = $rest->build_path($class, %args);
+    my $req = $rest->prepare_request('GET', $path);
 
     return $self->_do_request($req)->then(sub {
         my ($response) = @_;
-        $rest->_check_response($response, "get $short_class");
-        return Future->done($rest->_inflate_object($class, $response));
+        $rest->check_response($response, "get $short_class");
+        return Future->done($rest->inflate_object($class, $response));
     });
 }
 
@@ -210,13 +210,13 @@ sub create {
         ? $object->metadata->namespace
         : undef;
 
-    my $path = $rest->_build_path($class, namespace => $namespace);
-    my $req = $rest->_prepare_request('POST', $path, body => $object->TO_JSON);
+    my $path = $rest->build_path($class, namespace => $namespace);
+    my $req = $rest->prepare_request('POST', $path, body => $object->TO_JSON);
 
     return $self->_do_request($req)->then(sub {
         my ($response) = @_;
-        $rest->_check_response($response, "create " . ref($object));
-        return Future->done($rest->_inflate_object($class, $response));
+        $rest->check_response($response, "create " . ref($object));
+        return Future->done($rest->inflate_object($class, $response));
     });
 }
 
@@ -230,13 +230,13 @@ sub update {
     my $name = $metadata->name or croak "object must have metadata.name";
     my $namespace = $metadata->namespace;
 
-    my $path = $rest->_build_path($class, name => $name, namespace => $namespace);
-    my $req = $rest->_prepare_request('PUT', $path, body => $object->TO_JSON);
+    my $path = $rest->build_path($class, name => $name, namespace => $namespace);
+    my $req = $rest->prepare_request('PUT', $path, body => $object->TO_JSON);
 
     return $self->_do_request($req)->then(sub {
         my ($response) = @_;
-        $rest->_check_response($response, "update " . ref($object));
-        return Future->done($rest->_inflate_object($class, $response));
+        $rest->check_response($response, "update " . ref($object));
+        return Future->done($rest->inflate_object($class, $response));
     });
 }
 
@@ -282,14 +282,14 @@ sub patch {
     my $content_type = $patch_types{$patch_type}
         // return Future->fail("Unknown patch type '$patch_type'");
 
-    my $path = $rest->_build_path($class, name => $name, namespace => $namespace);
-    my $req = $rest->_prepare_request('PATCH', $path,
+    my $path = $rest->build_path($class, name => $name, namespace => $namespace);
+    my $req = $rest->prepare_request('PATCH', $path,
         body => $patch, content_type => $content_type);
 
     return $self->_do_request($req)->then(sub {
         my ($response) = @_;
-        $rest->_check_response($response, "patch $class");
-        return Future->done($rest->_inflate_object($class, $response));
+        $rest->check_response($response, "patch $class");
+        return Future->done($rest->inflate_object($class, $response));
     });
 }
 
@@ -324,12 +324,12 @@ sub delete {
         $namespace = $args{namespace};
     }
 
-    my $path = $rest->_build_path($class, name => $name, namespace => $namespace);
-    my $req = $rest->_prepare_request('DELETE', $path);
+    my $path = $rest->build_path($class, name => $name, namespace => $namespace);
+    my $req = $rest->prepare_request('DELETE', $path);
 
     return $self->_do_request($req)->then(sub {
         my ($response) = @_;
-        $rest->_check_response($response, "delete $class");
+        $rest->check_response($response, "delete $class");
         return Future->done(1);
     });
 }
@@ -427,7 +427,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,6 @@
 package Langertha::Raider;
 # ABSTRACT: Autonomous agent with conversation history and MCP tools
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 use Moose;
 use Future::AsyncAwait;
 use Time::HiRes qw( gettimeofday tv_interval );
@@ -245,6 +245,12 @@ has embedding_engine => (
 );
 
 
+has no_session_embeddings => (
+  is => 'ro',
+  default => sub { 0 },
+);
+
+
 has _session_embeddings => (
   is => 'ro',
   isa => 'ArrayRef',
@@ -267,6 +273,13 @@ sub clear_history {
   my ( $self ) = @_;
   $self->history([]);
   splice @{$self->_injections};
+  return $self;
+}
+
+
+sub add_history {
+  my ( $self, $role, $content ) = @_;
+  push @{$self->history}, { role => $role, content => $content };
   return $self;
 }
 
@@ -772,6 +785,7 @@ sub _switch_engine_tool {
 
 sub _get_embedding_engine {
   my ( $self ) = @_;
+  return undef if $self->no_session_embeddings;
   return $self->embedding_engine if $self->has_embedding_engine;
   my $engine = $self->engine;
   return $engine if $engine->does('Langertha::Role::Embedding');
@@ -972,15 +986,6 @@ async sub raid_f {
     @conversation = @{await $plugin->plugin_build_conversation(\@conversation)};
   }
 
-  # Hermes mode setup
-  my $hermes = $engine->can('hermes_tools') && $engine->hermes_tools;
-  my $hermes_system_msg;
-  if ($hermes) {
-    my $tools_json = $engine->json->encode($formatted_tools);
-    my $tool_prompt = sprintf($engine->hermes_tool_prompt, $tools_json);
-    $hermes_system_msg = { role => 'system', content => $tool_prompt };
-  }
-
   my $raid_iterations = 0;
   my $raid_tool_calls = 0;
   my @injected_history;
@@ -996,8 +1001,6 @@ async sub raid_f {
     model_params     => $model_params,
     user_msgs        => \@user_msgs,
     conversation     => \@conversation,
-    hermes           => $hermes,
-    hermes_system_msg => $hermes_system_msg,
     raid_iterations  => \$raid_iterations,
     raid_tool_calls  => \$raid_tool_calls,
     injected_history => \@injected_history,
@@ -1016,8 +1019,6 @@ async sub _run_raid_loop {
   my $model_params     = $state->{model_params};
   my $user_msgs        = $state->{user_msgs};
   my $conversation     = $state->{conversation};
-  my $hermes           = $state->{hermes};
-  my $hermes_system_msg = $state->{hermes_system_msg};
   my $raid_iterations  = $state->{raid_iterations};
   my $raid_tool_calls  = $state->{raid_tool_calls};
   my $injected_history = $state->{injected_history};
@@ -1035,18 +1036,6 @@ async sub _run_raid_loop {
       $tool_server_map = $new_map;
       $state->{formatted_tools} = $formatted_tools;
       $state->{tool_server_map} = $tool_server_map;
-
-      # Re-evaluate hermes mode for the (possibly new) engine
-      $hermes = $engine->can('hermes_tools') && $engine->hermes_tools;
-      $state->{hermes} = $hermes;
-      if ($hermes) {
-        my $tools_json = $engine->json->encode($formatted_tools);
-        my $tool_prompt = sprintf($engine->hermes_tool_prompt, $tools_json);
-        $hermes_system_msg = { role => 'system', content => $tool_prompt };
-      } else {
-        $hermes_system_msg = undef;
-      }
-      $state->{hermes_system_msg} = $hermes_system_msg;
 
       $self->_tools_dirty(0);
     }
@@ -1089,18 +1078,12 @@ async sub _run_raid_loop {
     }
 
     # Build and send the request
-    my $request;
-    if ($hermes) {
-      my @conv = ( $hermes_system_msg, @$conversation );
-      $request = $engine->chat_request(\@conv);
-    } else {
-      $request = $engine->chat_request($conversation, tools => $formatted_tools);
-    }
+    my $request = $engine->build_tool_chat_request($conversation, $formatted_tools);
 
     my $response = await $engine->_async_http->do_request(request => $request);
 
     unless ($response->is_success) {
-      die "".(ref $engine)." raid request failed: ".$response->status_line;
+      die "".(ref $engine)." raid request failed: ".$response->status_line."\n".$response->content;
     }
 
     my $data = $engine->parse_response($response);
@@ -1118,21 +1101,11 @@ async sub _run_raid_loop {
     my $langfuse_usage = $langfuse ? $self->_langfuse_usage($data) : undef;
 
     # Extract tool calls
-    my $tool_calls;
-    if ($hermes) {
-      $tool_calls = $engine->_hermes_parse_tool_calls($data);
-    } else {
-      $tool_calls = $engine->response_tool_calls($data);
-    }
+    my $tool_calls = $engine->response_tool_calls($data);
 
     # No tool calls means done — extract final text
     unless (@$tool_calls) {
-      my $text;
-      if ($hermes) {
-        $text = $engine->_hermes_text_content($data);
-      } else {
-        $text = $engine->response_text_content($data);
-      }
+      my $text = $engine->response_text_content($data);
       if ($engine->think_tag_filter) {
         ($text) = $engine->filter_think_content($text);
       }
@@ -1204,7 +1177,7 @@ async sub _run_raid_loop {
         model                 => $engine->chat_model,
         input                 => $conversation,
         output                => $engine->json->encode([map {
-          $hermes ? $_->{name} : ($engine->extract_tool_call($_))[0]
+          ($engine->extract_tool_call($_))[0]
         } @$tool_calls]),
         start_time            => $iter_t0,
         end_time              => $post_llm_t,
@@ -1216,12 +1189,7 @@ async sub _run_raid_loop {
     # Execute each tool call
     my @results;
     for my $tc (@$tool_calls) {
-      my ( $name, $input );
-      if ($hermes) {
-        ( $name, $input ) = ( $tc->{name}, $tc->{arguments} );
-      } else {
-        ( $name, $input ) = $engine->extract_tool_call($tc);
-      }
+      my ( $name, $input ) = $engine->extract_tool_call($tc);
 
       # Plugin hook: inspect/transform before tool execution
       my @plugin_tc = await $self->_plugin_pipeline_tool_call($name, $input);
@@ -1377,19 +1345,14 @@ async sub _run_raid_loop {
         metadata => {
           tool_calls => scalar @$tool_calls,
           tools_used => [map {
-            $hermes ? $_->{tool_call}{name} : ($engine->extract_tool_call($_->{tool_call}))[0]
+            ($engine->extract_tool_call($_->{tool_call}))[0]
           } @results],
         },
       );
     }
 
     # Append assistant + tool results to conversation and session_history
-    my @tool_msgs;
-    if ($hermes) {
-      @tool_msgs = $engine->_hermes_build_tool_results($data, \@results);
-    } else {
-      @tool_msgs = $engine->format_tool_results($data, \@results);
-    }
+    my @tool_msgs = $engine->format_tool_results($data, \@results);
     push @$conversation, @tool_msgs;
     $self->_push_session_history(@tool_msgs);
   }
@@ -1410,7 +1373,6 @@ async sub respond_f {
   my $pending_tc = $cont->{pending_tc};
   my @results    = @{$cont->{results_so_far}};
   my $engine     = $state->{engine};
-  my $hermes     = $state->{hermes};
 
   # Add the answer as the tool result for the pending self-tool call
   my $answer_result = {
@@ -1421,12 +1383,7 @@ async sub respond_f {
 
   # Execute remaining tool calls from the same batch
   for my $tc (@{$cont->{remaining_tcs}}) {
-    my ( $name, $input );
-    if ($hermes) {
-      ( $name, $input ) = ( $tc->{name}, $tc->{arguments} );
-    } else {
-      ( $name, $input ) = $engine->extract_tool_call($tc);
-    }
+    my ( $name, $input ) = $engine->extract_tool_call($tc);
 
     if ($name =~ /^raider_/ && $self->has_raider_mcp) {
       my $self_result = $self->_execute_self_tool($name, $input);
@@ -1463,12 +1420,7 @@ async sub respond_f {
   }
 
   # Format tool results and append to conversation
-  my @tool_msgs;
-  if ($hermes) {
-    @tool_msgs = $engine->_hermes_build_tool_results($data, \@results);
-  } else {
-    @tool_msgs = $engine->format_tool_results($data, \@results);
-  }
+  my @tool_msgs = $engine->format_tool_results($data, \@results);
   push @{$state->{conversation}}, @tool_msgs;
   $self->_push_session_history(@tool_msgs);
 
@@ -1499,7 +1451,7 @@ Langertha::Raider - Autonomous agent with conversation history and MCP tools
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 
@@ -1781,12 +1733,27 @@ to control which engine is used during raids.
 
 Optional engine with L<Langertha::Role::Embedding> for semantic history search.
 When not set, auto-detects if the main C<engine> supports embeddings.
+Set L</no_session_embeddings> to disable auto-detection.
+
+=head2 no_session_embeddings
+
+When true, disables automatic embedding computation for session history
+entries. Useful when the engine supports embeddings but calling it would
+cause issues (e.g. self-referencing proxy deadlock).
 
 =head2 clear_history
 
     $raider->clear_history;
 
 Clears conversation history and pending injections while preserving metrics.
+
+=head2 add_history
+
+    $raider->add_history('user', 'Hello');
+    $raider->add_history('assistant', 'Hi there!');
+
+Appends a message to the conversation history. Useful for replaying
+persisted messages into a fresh Raider instance.
 
 =head2 inject
 

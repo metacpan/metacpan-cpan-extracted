@@ -1,0 +1,11 @@
+--- supplementalData.xml.orig	2025-10-25 00:46:38
++++ supplementalData.xml	2025-10-30 17:15:45
+@@ -5582,7 +5582,7 @@
+ 		<reference type="R1224" uri="http://en.wikipedia.org/wiki/Blin_language">[missing]</reference>
+ 		<reference type="R1225" uri="https://www.cia.gov/library/publications/the-world-factbook/geos/gh.html">English official in education, 36.1% 2000 census</reference>
+ 		<reference type="R1226" uri="http://www.ethnologue.com/show_language.asp?code=saf">no other info available for now</reference>
+-		<reference type="R1227" uri="ttps://translatorswithoutborders.org/language-data-for-el-salvador">[missing]</reference>
++		<reference type="R1227" uri="https://translatorswithoutborders.org/language-data-for-el-salvador">[missing]</reference>
+ 		<reference type="R1228" uri="http://www.ethnologue.com/show_language.asp?code=rkt">language also called Kamta in India</reference>
+ 		<reference type="R1229" uri="http://en.wikipedia.org/wiki/Languages_of_Brunei">Modern use of Arabic (Jawi) seems to be minimal, but is co-official with ms; set to 5% for now.</reference>
+ 		<reference type="R1230" uri="http://en.wikipedia.org/wiki/Khmu_language">[missing]</reference>

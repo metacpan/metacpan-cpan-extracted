@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "IO::Async::Notifier" => 0,
     "IO::K8s" => "1.000",
     "IO::Socket::SSL" => 0,
-    "Kubernetes::REST" => "1.003",
+    "Kubernetes::REST" => "1.100",
     "Net::Async::HTTP" => "0.49",
     "URI" => 0
   },
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %FallbackPrereqs = (
   "IO::Async::Notifier" => 0,
   "IO::K8s" => "1.000",
   "IO::Socket::SSL" => 0,
-  "Kubernetes::REST" => "1.003",
+  "Kubernetes::REST" => "1.100",
   "Net::Async::HTTP" => "0.49",
   "Test::Exception" => 0,
   "Test::More" => "0.98",

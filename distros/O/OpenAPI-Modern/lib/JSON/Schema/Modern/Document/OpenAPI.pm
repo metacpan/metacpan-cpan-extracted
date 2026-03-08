@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.128';
+our $VERSION = '0.129';
 
 use 5.020;
 use utf8;
@@ -629,7 +629,7 @@ sub upgrade ($self, $to_version = SUPPORTED_OAD_VERSIONS->[-1]) {
     }
   }
 
-  if ($to_oas_version eq '3.2') {
+  if ($to_oas_version ge '3.2') {
     foreach my $schema_path ($self->get_entity_locations('response')) {
       my $subschema = $self->get($schema_path);
       delete $subschema->{description}
@@ -757,7 +757,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.128
+version 0.129
 
 =head1 SYNOPSIS
 

@@ -3,12 +3,11 @@ use v5.36;
 use strict;
 use warnings;
 
-use Linux::Event::Scheduler;
+our $VERSION = '0.009';
 
-our $VERSION = '0.007';
-
+use Scalar::Util qw(looks_like_number);
 use Carp qw(croak);
-
+use Linux::Event::Scheduler;
 use Linux::Event::Clock;
 use Linux::Event::Timer;
 use Linux::Event::Backend::Epoll;
@@ -399,6 +398,9 @@ sub _dispatch_due ($self) {
   return;
 }
 
+
+use Scalar::Util qw(looks_like_number);
+
 sub _rearm_timer ($self) {
   my $next = $self->{sched}->next_deadline_ns;
 
@@ -409,16 +411,22 @@ sub _rearm_timer ($self) {
 
   my $remain_ns = $self->{clock}->remaining_ns($next);
 
+  return if !defined $remain_ns;
+  return if !looks_like_number($remain_ns);
+
   if ($remain_ns <= 0) {
-    # timerfd APIs treat 0 as "disarm". For due/overdue timers we must
-    # arm a *minimal* non-zero delay so the kernel wakes us promptly.
+    # Minimal non-zero delay (fixed decimal, no exponent).
     my $min_s = sprintf('%.9f', 1 / 1_000_000_000);
     $self->{timer}->after($min_s);
     return;
   }
 
   my $after_s = $remain_ns / 1_000_000_000;
-  $self->{timer}->after($after_s);
+
+  return if !looks_like_number($after_s);
+
+  # IMPORTANT: format to fixed decimal so Timer::_num accepts it.
+  $self->{timer}->after(sprintf('%.9f', $after_s));
 
   return;
 }

@@ -54,7 +54,7 @@
    "provides" : {
       "Time::OlsonTZ::Data" : {
          "file" : "lib/Time/OlsonTZ/Data.pm",
-         "version" : "0.202503"
+         "version" : "0.202601"
       }
    },
    "release_status" : "stable",
@@ -71,6 +71,6 @@
          "web" : "https://github.com/Grinnz/Time-OlsonTZ-Data"
       }
    },
-   "version" : "0.202503",
+   "version" : "0.202601",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

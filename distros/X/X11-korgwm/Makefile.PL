@@ -26,6 +26,7 @@ WriteMakefile(
         x_authority     => "cpan:ZHMYLOVE",
         x_contributors  => [], # Feel free to add yourself here ;-)
     },
+    MIN_PERL_VERSION => "5.20.0",
     PREREQ_PM       => {
         "AnyEvent"                      => "0",
         "AnyEvent::DBus"                => "0",
@@ -42,7 +43,7 @@ WriteMakefile(
         "POSIX"                         => "0",
         "Scalar::Util"                  => "0",
         "Storable"                      => "0",
-        "X11::XCB"                      => "0.23",
+        "X11::XCB"                      => "0.24",
         "YAML::Tiny"                    => "0",
     },
     TEST_REQUIRES   => { "Test::More" => "0" },

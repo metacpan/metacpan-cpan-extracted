@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ResourceQuotaSpec;
 # ABSTRACT: ResourceQuotaSpec defines the desired hard limits to enforce for Quota.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s hard => { Str => 1 };
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ResourceQuotaSpec - ResourceQuotaSpec defines the desire
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 hard
 

@@ -5,9 +5,10 @@ use v5.10;
 use Moo;
 use Module::Runtime qw(require_module);
 use JSON::MaybeXS;
+use Scalar::Util ();
 use namespace::clean;
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -391,6 +392,10 @@ sub struct_to_object {
 
     # Two arguments: class and params
     my $class = $self->expand_class($class_or_struct);
+
+    # Already an object of the right class — pass through as-is
+    return $params if Scalar::Util::blessed($params) && $params->isa($class);
+
     $self->load_class($class);
     my $inflated = $self->_inflate_struct($class, $params);
     return $class->new(%$inflated);
@@ -434,6 +439,14 @@ sub new_object {
 
 sub _inflate_struct {
     my ($self, $class, $params) = @_;
+
+    # Blessed objects should be caught by struct_to_object before reaching
+    # here.  If one does slip through (defensive), extract its data rather
+    # than silently returning {} which would create an empty object.
+    if (Scalar::Util::blessed($params)) {
+        return $params->TO_JSON if $params->can('TO_JSON');
+        return {};
+    }
 
     return {} unless ref $params eq 'HASH';
 
@@ -567,7 +580,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,28 @@
+bin/remperl
+Changes
+examples/non-core-module.pl
+examples/signal-catcher.pl
+examples/whoami.pl
+lib/Remote/Perl.pm
+lib/Remote/Perl/Bootstrap.pm
+lib/Remote/Perl/Client.pm
+lib/Remote/Perl/FlowControl.pm
+lib/Remote/Perl/ModuleServer.pm
+lib/Remote/Perl/Protocol.pm
+lib/Remote/Perl/Transport.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/api.t
+t/bootstrap.t
+t/cli.t
+t/lib/Remote/Perl/Test/Greeter.pm
+t/modules.t
+t/perl-parity.t
+t/protocol.t
+t/tmpfile.t
+xt/check-dividers.t
+xt/end-to-end.t
+xt/old-perl.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

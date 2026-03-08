@@ -56,6 +56,22 @@ my $rv = $api->watch('Pod',
         say $event->type . ': ' . $event->object->metadata->name;
     },
 );
+
+# Get pod logs (one-shot)
+my $text = $api->log('Pod', 'my-pod',
+    namespace => 'default',
+    tailLines => 100,
+);
+
+# Stream pod logs (like kubectl logs -f)
+$api->log('Pod', 'my-pod',
+    namespace => 'default',
+    follow    => 1,
+    on_line   => sub {
+        my ($event) = @_;
+        say $event->line;
+    },
+);
 ```
 
 ## Using kubeconfig
@@ -133,6 +149,35 @@ sub call { ... }
 sub call_streaming { ... }
 ```
 
+## Building Blocks for Async Wrappers
+
+Async wrappers like [Net::Async::Kubernetes](https://metacpan.org/pod/Net::Async::Kubernetes) need access to the request/response pipeline without going through the synchronous convenience methods. The following public methods provide a stable API for this:
+
+- `expand_class($short)` - Resolve short name (e.g., `'Pod'`) to full IO::K8s class
+- `build_path($class, %args)` - Build REST API URL path from class metadata
+- `prepare_request($method, $path, %opts)` - Build HTTP request with auth headers
+- `check_response($response, $context)` - Validate HTTP status (croaks on error)
+- `inflate_object($class, $response)` - Decode JSON response to typed object
+- `inflate_list($class, $response)` - Decode JSON response to typed list
+- `process_watch_chunk($class, \$buf, $chunk)` - Parse NDJSON watch stream
+- `process_log_chunk(\$buf, $chunk)` - Parse plain-text log stream
+
+```perl
+# Example: async log streaming
+my $class = $rest->expand_class('Pod');
+my $path = $rest->build_path($class, name => $name, namespace => $ns) . '/log';
+my $req = $rest->prepare_request('GET', $path, parameters => { follow => 'true' });
+
+# Execute through your own event loop
+my $buffer = '';
+$async_http->request($req->url, sub {
+    my ($chunk) = @_;
+    for my $event ($rest->process_log_chunk(\$buffer, $chunk)) {
+        say $event->line;
+    }
+});
+```
+
 ## CLI Tools
 
 ### kube_client
@@ -197,12 +242,13 @@ See `Kubernetes::REST::Example` for full CRD documentation including AutoGen fro
 
 ## Features
 
-- **Simple API**: `list()`, `get()`, `create()`, `update()`, `patch()`, `delete()`, `watch()`
+- **Simple API**: `list()`, `get()`, `create()`, `update()`, `patch()`, `delete()`, `watch()`, `log()`
 - **Kubeconfig support**: Token auth, client certs, exec credential plugins, in-cluster service account auto-detection
 - **Pluggable HTTP backend**: LWP::UserAgent (default), HTTP::Tiny, or custom
 - **HTTP debugging**: LWP::ConsoleLogger support out of the box
 - **Patch support**: Strategic merge patch, JSON merge patch (RFC 7396), JSON patch (RFC 6902)
 - **Watch API**: Stream resource changes with resumable watches via resourceVersion tracking
+- **Pod Log API**: Retrieve or stream pod logs with `log()`, supports follow, tailLines, container selection, and more
 - **Automatic URL building**: Uses IO::K8s class metadata to construct proper API endpoints
 - **CRD support**: Use custom resource classes with the standard API
 - **Short class names**: Use `'Pod'` instead of `'IO::K8s::Api::Core::V1::Pod'`

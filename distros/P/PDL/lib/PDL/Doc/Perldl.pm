@@ -10,7 +10,7 @@ from the I<perldl> shell as well as the
 I<pdldoc> command-line program.
 
 Autoload files are also matched, via a search of the PDLLIB autoloader
-tree.  That behavior can be switched off with the variable 
+tree.  That behavior can be switched off with the variable
 C<$PERLDL::STRICT_DOCS> (true: don't search autoload tree; false: search
 the autoload tree.)
 
@@ -47,11 +47,8 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw( apropos aproposover usage help sig badinfo whatis );
 
 use PDL::Doc;
-use Pod::Select;
-use Pod::PlainText;
+use Pod::Text;
 use Cwd; # to help Debian packaging
-
-$PDL::onlinedoc = PDL::Doc->new(FindStdFile());
 
 # Find std file
 
@@ -59,19 +56,11 @@ sub FindStdFile {
   my ($f) = PDL::Doc::_find_inc([qw(PDL pdldoc.db)], 0);
   warn("Unable to find PDL/pdldoc.db in ".join(":",@INC)."\n"), return if !defined $f;
   print "Found docs database $f\n" if $PDL::verbose;
-  print "Type 'help' for online help\n" if $PDL::verbose;
   return $f;
 }
 
 # used to find out how wide the screen should be
-# for printmatch() - really should check for a 
-# sensible lower limit (for printmatch >~ 40
-# would be my guess)
-#
-# taken from Pod::Text (v1.0203), then hacked to get it
-# to work (at least on my solaris and linux
-# machines)
-#
+# for format_ref - really should check for a sensible lower limit
 sub screen_width {
   local $@;
   eval {
@@ -81,13 +70,9 @@ sub screen_width {
 }
 
 sub printmatch {
-    my @match = @_;
-    if (@match) {
-	foreach my $t ( format_ref( @_ ) ) { print $t; }
-    } else {
-	print "no match\n\n";
-    }
-} # sub: print_match()
+  return print "no match\n" if !@_;
+  print for format_ref(@_);
+}
 
 # given a long module name, return the (perhaps shortened) module name.
 
@@ -104,46 +89,42 @@ sub shortmod {
 
 # return a string containing a formated version of the Ref string
 # for the given matches
-#
+my $LONG_FMT = "%s ...\n " . ' 'x15 . "%-*s  %s\n";
+my $NORMAL_FMT = "%-15s %-*s  %s\n";
 sub format_ref {
   my @match = @_;
   my @text = ();
-
   #finding the max width before doing the printing means looping through @match an extra time; so be it.
   my @module_shorthands = map { shortmod($_->[1]) } @match;
   my $max_mod_length = -1;
   map {$max_mod_length = length if (length>$max_mod_length) } @module_shorthands;
-
-
   my $width = screen_width()-17-1-$max_mod_length;
-  my $parser = Pod::PlainText->new( width => $width, indent => 0, sentence => 0 );
-
+  my @parser_args = (width => $width, indent => 0, sentence => 0);
+  my %seen;
   for my $m (@match) {
-    my $ref = $m->[2]{Ref} ||
-      ( (defined $m->[2]{CustomFile})
-        ? "[No ref avail. for `".$m->[2]{CustomFile}."']"
-        : "[No reference available]"
-     );
-
     my $name = $m->[0];
     my $module = shortmod($m->[1]);
-
-    $ref = $parser->interpolate( $ref );
-    $ref = $parser->reformat( $ref );
-
-    # remove last new lines (so substitution doesn't append spaces at end of text)
-    $ref =~ s/\n*$//;
-    $ref =~ s/\n/"\n                ".' 'x($max_mod_length+2)/eg;
-    $ref =~ s/^\s*//;
-    if ( length($name) > 15 ) {
-      push @text, sprintf "%s ...\n " . ' 'x15 . "%-*s  %s\n", $name, $max_mod_length, $module, $ref;
+    my $ref = $m->[2]{Ref};
+    if (!$ref) {
+      $ref = defined $m->[2]{CustomFile}
+        ? "[No ref avail. for `".$m->[2]{CustomFile}."']"
+        : "[No reference available]";
+    } elsif ($seen{$ref}) {
+      $ref = "[As $seen{$ref}]";
     } else {
-      push @text, sprintf "%-15s %-*s  %s\n", $name, $max_mod_length, $module, $ref;
+      $seen{$ref} = $name;
+      my $parser = Pod::Text->new(@parser_args);
+      $parser->output_string(\my $out_text);
+      $parser->parse_string_document("=encoding utf8\n\n$ref");
+      $ref = $out_text;
+      $ref =~ s/\n*$//; # remove last newlines so no append spaces at end
+      $ref =~ s/\n/"\n".' 'x($max_mod_length+18)/eg;
+      $ref =~ s/^\s*//;
     }
+    push @text, sprintf length($name) > 15 ? $LONG_FMT : $NORMAL_FMT, $name, $max_mod_length, $module, $ref;
   }
-  return wantarray ? @text : $text[0];
-
-} # sub: format_ref()
+  wantarray ? @text : $text[0];
+}
 
 =head2 apropos
 
@@ -183,7 +164,6 @@ with the C<help> function
 
 sub aproposover {
     die "Usage: aproposover \$funcname\n" if !@_;
-    die "no online doc database" unless defined $PDL::onlinedoc;
     my $func = shift;
     $func =~ s:\/:\\\/:g;
     search_docs("m/$func/",['Name','Ref','Module'],1);
@@ -191,9 +171,9 @@ sub aproposover {
 
 sub apropos  {
     die "Usage: apropos \$funcname\n" unless $#_>-1;
-    die "no online doc database" unless defined $PDL::onlinedoc;
     my $func = shift;
     printmatch aproposover $func;
+    '';
 }
 
 =head2 PDL::Doc::Perldl::search_docs
@@ -208,6 +188,7 @@ sub search_docs {
     my ($func,$types,$sortflag,$exact) = @_;
     my @match;
 
+    $PDL::onlinedoc //= PDL::Doc->new(FindStdFile());
     @match = $PDL::onlinedoc->search($func,$types,$sortflag);
     push(@match,find_autodoc( $func, $exact ) );
 
@@ -218,17 +199,16 @@ sub search_docs {
 
 =head2 PDL::Doc::Perldl::finddoc
 
-=for ref 
+=for ref
 
 Internal interface to the PDL documentation searcher
 
 =cut
 
-sub finddoc  {
+sub finddoc {
     local $SIG{PIPE}= sub {}; # Prevent crashing if user exits the pager
 
     die 'Usage: doc $topic' unless $#_>-1;
-    die "no online doc database" unless defined $PDL::onlinedoc;
     my $topic = shift;
 
     # See if it matches a PDL function name
@@ -241,17 +221,15 @@ sub finddoc  {
     my @match = search_docs("m/^(PDL::)?".$t2."\$/",['Name'],0) ; #matches: ^PDL::topic$ or ^topic$
 
     unless(@match) {
-      
       print "No PDL docs for '$topic'. Using 'whatis'. (Try 'apropos $topic'?)\n\n";
       whatis($topic);
       return;
-
     }
 
     # print out the matches
-
     open my $out, "| pod2text | $PDL::Doc::pager";
-    
+    binmode $out, ':encoding(UTF-8)';
+
     if($subfield) {
       if($subfield <= @match) {
 	@match = ($match[$subfield-1]);
@@ -261,7 +239,7 @@ sub finddoc  {
 	$subfield = undef;
       }
     }
-    
+
     my $num_pdl_pod_matches = scalar @match;
     my $pdl_pod_matchnum = 0;
 
@@ -303,22 +281,22 @@ sub finddoc  {
        } else {
           if(defined $m->[2]{CustomFile}) {
 
-             my $parser= Pod::Select->new;
+             require Pod::Text;
+             my $parser = Pod::Text->new;
              print $out "=head1 Autoload file \"".$m->[2]{CustomFile}."\"\n\n";
              $parser->parse_from_file($m->[2]{CustomFile},$out);
              print $out "\n\n=head2 Docs from\n\n".$m->[2]{CustomFile}."\n\n";
 
           } else {
 
-             print $out "=head1 Module ",$m->[2]{Module}, "\n\n";
-#	     print STDERR "calling funcdocs(" . $m->[0] . ", " . $m->[1] . ")\n";
-             $PDL::onlinedoc->funcdocs($m->[0],$m->[1],$out);
+             print $out "=encoding utf8\n\n=head1 Module ",$m->[2]{Module}, "\n\n";
+             $PDL::onlinedoc->funcdocs(@$m[0,1],$out);
 
           }
 
        }
     }
-  }
+}
 
 
 =head2 find_autodoc
@@ -340,7 +318,7 @@ sub find_autodoc {
     my $topic = shift;
     my $exact = shift;
     my $matcher;
-    # Fix up regexps and exact matches for the special case of 
+    # Fix up regexps and exact matches for the special case of
     # searching the autoload dirs...
     if($exact) {
 	$topic =~ s/\(\)$//;  # "func()" -> "func"
@@ -361,7 +339,7 @@ sub find_autodoc {
     return unless(@main::PDLLIB);
     @main::PDLLIB_EXPANDED = PDL::AutoLoader::expand_path(@main::PDLLIB)
 	unless(@main::PDLLIB_EXPANDED);
-    
+
     for my $dir(@main::PDLLIB_EXPANDED) {
 	if($exact) {
 	    my $file = $dir . "/" . "$topic";
@@ -385,7 +363,7 @@ sub find_autodoc {
 }
 
 
-=head2 usage
+=head2 usage, badinfo
 
 =for ref
 
@@ -393,49 +371,55 @@ Prints usage information for a PDL function
 
 =for usage
 
- Usage: usage 'func'
+ Usage: usage func
 
 =for example
 
-   pdl> usage 'inner'
-
-   inner           P::Primitive  Inner product over one dimension
-
-   Signature: inner(a(n); b(n); [o]c())
-
-
+  pdl> usage inner
+  inner           P::Primitive  Inner product over one dimension
+    Signature:
+      (a(n); b(n); [o]c())
+       Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+         float double ldouble cfloat cdouble cldouble)
+    Usage:
+      $c = inner($a, $b);
+      inner($a, $b, $c);  # all arguments given
+      $c = $a->inner($b); # method call
+      $a->inner($b, $c);
+    Bad value support:
+      If "a() * b()" contains only bad data,
+      c() is set bad. Otherwise c() will have its bad flag cleared,
+      as it will not contain any bad values.
 
 =cut
 
 sub usage {
-    die 'Usage: usage $funcname' unless $#_>-1;
-    die "no online doc database" unless defined $PDL::onlinedoc;
-    print usage_string(@_);
+  die 'Usage: usage $funcname' unless $#_>-1;
+  print usage_string(@_);
+  ''
 }
-sub usage_string{
-    my $func = shift;
-    my $str = "";
+*badinfo = \&usage;
+sub usage_string {
+  my $func = shift;
+  my $str = "";
+  return "no match\n" unless
     my @match = search_docs("m/^(PDL::)?$func\$|\:\:$func\$/",['Name']);
-    my $count = @match;
-    unless ($count) { $str = "\n  no match\n" }
-    else {
-	#this sorts by namespace depth by counting colons in the name.
-	#PDL::Ufunc::max comes before PDL::GSL::RNG::max, for example.
-	foreach my $m(sort { scalar(()=$a->[1]=~/\:/g) <=> scalar(()=$b->[1]=~/\:/g) } @match){
-	    $str .= "\n" . format_ref( $m );
-	    my ($name,$module,$hash) = @{$m};
-	    #$str .= sprintf ( (' 'x16)."(Module %s)\n\n", $hash->{Module} );
-	    $str.="\n";
-	    die "No usage info found for $func\n" if (!defined $hash->{Example} && !defined $hash->{Sig} &&
-						      !defined $hash->{Usage});
-	    $str .= "  Signature: $name($hash->{Sig})\n\n" if defined $hash->{Sig};
-	    for (['Usage','Usage'],['Opt','Options'],['Example','Example']) {
-		$str .= "  $_->[1]:\n".&allindent($hash->{$_->[0]},10)."\n" if defined $hash->{$_->[0]};
-	    }
-	    $str .= '='x20 unless 1==$count--;
-	}
+  my $count = @match;
+  #this sorts by namespace depth by counting colons in the name.
+  #PDL::Ufunc::max comes before PDL::GSL::RNG::max, for example.
+  foreach my $m (sort { scalar(()=$a->[1]=~/\:/g) <=> scalar(()=$b->[1]=~/\:/g) } @match) {
+    $str .= "\n" . format_ref( $m );
+    my ($name,$module,$hash) = @$m;
+    die "No usage info found for $func\n" if !grep defined, @$hash{qw(Example Sig Usage)};
+    for (grep $hash->{$_->[0]},
+      ['Sig','Signature'],['Usage','Usage'],['Opt','Options'],
+      ['Example','Example'],['Bad','Bad value support'],
+    ) {
+        $str .= "  $_->[1]:\n".allindent($hash->{$_->[0]},4)."\n";
     }
-    return $str;
+    $str .= '='x20 unless 1==$count--;
+  }
+  $str;
 }
 
 =head2 sig
@@ -461,7 +445,6 @@ doesn't break -- it causes broadcasting.  See L<PDL::PP> and L<PDL::Broadcasting
 
 sub sig {
 	die "Usage: sig \$funcname\n" unless $#_>-1;
-	die "no online doc database" unless defined $PDL::onlinedoc;
 	my $func = shift;
 	my @match = search_docs("m/^(PDL::)?$func\$|\:\:$func\$/",['Name']);
 	my $count = @match;
@@ -476,17 +459,17 @@ sub sig {
 }
 
 sub allindent {
-	my ($txt,$n) = @_;
-	my ($ntxt,$tspc) = ($txt,' 'x8);
-	$ntxt =~ s/^\s*$//mg;
-	$ntxt =~ s/\t/$tspc/g;
-	my $minspc = length $txt;
-	for (split '\n', $txt) { if (/^(\s*)/)
-          { $minspc = length $1 if length $1 < $minspc } }
-	$n -= $minspc;
-	$tspc = ' 'x abs($n);
-	$ntxt =~ s/^/$tspc/mg if $n > 0;
-	return $ntxt;
+  my ($txt,$n) = @_;
+  my ($ntxt,$tspc) = ($txt,' 'x8);
+  $ntxt =~ s/^\s*$//mg;
+  $ntxt =~ s/\t/$tspc/g;
+  my $minspc = length $txt;
+  for (split '\n', $txt) { if (/^(\s*)/)
+    { $minspc = length $1 if length $1 < $minspc } }
+  $n -= $minspc;
+  $tspc = ' 'x abs($n);
+  $ntxt =~ s/^/$tspc/mg if $n > 0;
+  $ntxt;
 }
 
 
@@ -525,7 +508,7 @@ sub whatis_r {
   my $prefix = shift;
   my $indent = shift;
   my $x = shift;
-  
+
   unless(defined $x) {
     print $prefix,"<undef>\n";
     return;
@@ -547,19 +530,19 @@ sub whatis_r {
       my $pre = sprintf("%s  %2d: "," "x$indent,$el);
       whatis_r($pre,$indent + $PDL::Doc::Perldl::array_indent, $x->[$el]);
       last if($el == $PDL::Doc::Perldl::max_arraylen);
-    } 
+    }
     printf "%s   ... \n"," " x $indent
       if($#$x > $PDL::Doc::Perldl::max_arraylen);
 
     return;
   }
-      
+
   if(ref $x eq 'HASH') {
     print "${prefix}Hash (".scalar(keys %$x)." elements)\n";
     my $key;
     for $key(sort keys %$x) {
       my $pre = " " x $indent .
-	        " $key: " . 
+	        " $key: " .
 		(" "x($PDL::Doc::Perldl::max_keylen - length($key))) ;
 
       whatis_r($pre,$indent + $PDL::Doc::Perldl::hash_indent, $x->{$key});
@@ -582,7 +565,7 @@ sub whatis_r {
     local $PDL::debug = 1;
 
     $y = ( (UNIVERSAL::isa($x,'PDL') && $x->nelem < 5 && $x->ndims < 2)
-	   ? 
+	   ?
 	   ": $x" :
 	   ": *****"
 	   );
@@ -642,10 +625,10 @@ The following commands support online help in the perldl shell:
  help vars      -- print information about all current ndarrays
 
  whatis <expr>  -- Describe the type and structure of an expression or ndarray.
- apropos 'word' -- search for keywords/function names 
+ apropos 'word' -- search for keywords/function names
  usage          -- print usage information for a given PDL function
+                   including support for bad values
  sig            -- print signature of PDL function
- badinfo        -- information on the support for bad values
 
  ('?' is an alias for 'help';  '??' is an alias for 'apropos'.)
 
@@ -659,64 +642,5 @@ EOH
   }
   ''
 }
-
-=head2 badinfo
-
-=for ref
-
-provides information on the bad-value support of a function
-
-And has a horrible name.
-
-=for usage
-
- badinfo 'func'
-
-=for example
-
-  pdl> badinfo 'inner'
-  Bad value support for inner (in module PDL::Primitive)
-      If "a() * b()" contains only bad data, "c()" is set bad. Otherwise "c()"
-      will have its bad flag cleared, as it will not contain any bad values.
-
-
-=cut
-
-# need to get this to format the output - want a format_bad()
-# subroutine that's like - but much simpler - than format_ref()
-#
-sub badinfo {
-    my $func = shift;
-    die "Usage: badinfo \$funcname\n" unless defined $func;
-
-    die "no online doc database" unless defined $PDL::onlinedoc;
-
-    local $SIG{PIPE}= sub {}; # Prevent crashing if user exits the pager
-
-    my @match = search_docs("m/^(PDL::)?$func\$|\:\:$func\$/",['Name']);
-    my $count = @match;
-    if ( $count ) {
-	my ($pagerstr, $noinfostr) = ('', '');
-	foreach my $m(@match) {
-	    my ($name,$module,$hash) = @{$m};
-	    my $info = $hash->{Bad};
-	    if ( defined $info ) {
-		$name=~s/^(.*)\:\:(\w*)$/$2/;
-
-		$pagerstr .= "=head1 Bad value support for $name (in module $module)\n\n$info\n";
-	    } else {
-		$noinfostr .= "\n  No information on bad-value support found for $func (in module $module)\n";
-	    }
-	}
-	if ($pagerstr){
-	    open my $out, "| pod2text | $PDL::Doc::pager";
-	    print $out $pagerstr, $noinfostr;
-	} else {
-	    print $noinfostr;
-	}
-    } else {
-	print "\n  no match\n";
-    }
-} # sub: badinfo()
 
 1; # OK

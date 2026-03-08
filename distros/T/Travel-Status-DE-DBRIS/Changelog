@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.25 - Thu Mar 05 2026
+
+    * ...::Formation::Sector: Remove cube_meters and cube_percent accessors.
+      The corresponding data is no longer provided by the backend.
+
 Travel::Status::DE::DBRIS 0.24 - Sun Feb 22 2026
 
     * Increase default timeout to 20 seconds to deal with bahn.de's WAF now

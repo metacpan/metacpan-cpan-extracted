@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
 	ABSTRACT         => 'Expansion of test functionalities that appear to be frequently used while testing.',
-	AUTHOR           => 'Jurij Fajnberg <fajnbergj@gmail.com>',
+	AUTHOR           => 'Juri Fainberg <fajnbergj@gmail.com>',
 	DISTNAME         => 'Test-Expander',
 	LICENSE          => 'perl',
 	MIN_PERL_VERSION => '5.014',
@@ -22,7 +22,7 @@ WriteMakefile(
 		'Getopt::Long'          => 0,
 		'Importer'              => 0,
 		'PadWalker'             => 0,
-		'Path::Tiny'            => '0.144',
+		'Path::Tiny'            => '0.150',
 		'Scalar::Readonly'      => 0,
 		'Test::Builder' 				=> 0,
 		'Test2::API'   					=> 0,

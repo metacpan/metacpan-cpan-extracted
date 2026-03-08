@@ -1,0 +1,439 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use File::Find;
+use File::Spec;
+use Cwd qw(abs_path);
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+our $VERSION = '0.03';
+
+=head1 NAME
+
+gen-stopwords - Generate a .stopwords file for Test::Spelling::Stopwords
+
+=head1 VERSION
+
+Version 0.03
+
+=head1 SYNOPSIS
+
+    gen-stopwords [OPTIONS]
+
+    # Basic usage (scans current directory, writes .stopwords)
+    gen-stopwords
+
+    # Specify language and output file
+    gen-stopwords --lang en_US --output t/.stopwords
+
+    # Scan specific directories
+    gen-stopwords --dir lib --dir bin --dir t
+
+    # Preview without writing
+    gen-stopwords --dry-run --verbose
+
+    # Show this help
+    gen-stopwords --help
+
+=head1 DESCRIPTION
+
+Scans Perl source files (F<.pm>, F<.pl>, F<.pod>, F<.t>) and uses B<aspell>
+to identify words that are not in the standard dictionary.  Those words are
+collected into a F<.stopwords> file that your spelling test (e.g.
+C<Test::Spelling>) can use to suppress false positives.
+
+The generator:
+
+=over 4
+
+=item * Strips POD formatting codes (C<E<gt>>, C<L<...>>, C<C<...>>, etc.)
+before passing lines to aspell, preventing artefacts like C<Egt>.
+
+=item * Uses C<--run-together> so compound identifiers such as C<ResultSet>
+and C<PendingChange> are handled correctly.
+
+=item * Optionally seeds the list from your personal aspell wordlist
+(F<~/.aspell.en.pws>) so project-specific words already known to you are
+included automatically.
+
+=item * Skips build/vendor directories (F<.git>, F<blib>, F<local>, etc.)
+to keep the output clean.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-l>, B<--lang> I<LANG>
+
+Aspell language code to use. Defaults to C<en_GB>.
+
+=item B<-o>, B<--output> I<FILE>
+
+Path of the stopwords file to write. Defaults to C<.stopwords> in the
+current directory.
+
+=item B<-p>, B<--pws> I<FILE>
+
+Path to your personal aspell wordlist. Defaults to
+F<~/.aspell.en.pws>.  Use C<--no-global> to skip this entirely.
+
+=item B<-d>, B<--dir> I<DIR>
+
+Directory to scan. May be specified multiple times. Defaults to C<.>
+(current directory).
+
+=item B<-m>, B<--min-len> I<N>
+
+Minimum word length to include. Defaults to C<2>.
+
+=item B<-v>, B<--verbose>
+
+Print the name of every file processed and extra detail.
+
+=item B<-q>, B<--quiet>
+
+Suppress all non-error output.
+
+=item B<-n>, B<--dry-run>
+
+Show what would be written without actually creating or modifying the
+output file.
+
+=item B<--no-global>
+
+Do not load words from the personal aspell wordlist.
+
+=item B<-V>, B<--version>
+
+Print the version and exit.
+
+=item B<-h>, B<--help>
+
+Print this help message and exit.
+
+=back
+
+=cut
+
+#
+#
+# CLI Options
+
+my %opt = (
+    lang      => 'en_GB',
+    output    => '.stopwords',
+    pws       => File::Spec->catfile($ENV{HOME} // '.', '.aspell.en.pws'),
+    dirs      => [],
+    min_len   => 2,
+    verbose   => 0,
+    quiet     => 0,
+    dry_run   => 0,
+    no_global => 0,
+);
+
+GetOptions(
+    'lang|l=s'    => \$opt{lang},
+    'output|o=s'  => \$opt{output},
+    'pws|p=s'     => \$opt{pws},
+    'dir|d=s@'    => \$opt{dirs},
+    'min-len|m=i' => \$opt{min_len},
+    'verbose|v'   => \$opt{verbose},
+    'quiet|q'     => \$opt{quiet},
+    'dry-run|n'   => \$opt{dry_run},
+    'no-global'   => \$opt{no_global},
+    'help|h'      => sub { pod2usage(-exitval => 0, -verbose => 2) },
+    'version|V'   => sub { print "gen-stopwords $VERSION\n"; exit 0 },
+) or pod2usage(-exitval => 1, -verbose => 1);
+
+# Default to current directory if no --dir given
+push @{ $opt{dirs} }, '.' unless @{ $opt{dirs} };
+
+# Directories/patterns to prune during File::Find traversal
+my @PRUNE_DIRS = qw(
+    .git .build .svn .hg
+    blib _build local cover_db extlib
+    node_modules vendor
+);
+
+my $PRUNE_RE = do {
+    my $pat  = join '|', map { quotemeta } @PRUNE_DIRS;
+    qr/^(?:$pat)$/;
+};
+
+my $SOURCE_RE = qr/\.(pm|pod|pl|t)$/;
+
+#
+#
+# Helpers
+
+sub info  { print @_, "\n" unless $opt{quiet} }
+sub debug { print @_, "\n" if $opt{verbose} && !$opt{quiet} }
+sub warn_ { warn  @_, "\n" }
+
+sub check_aspell {
+    my $out = `aspell --version 2>&1`;
+    die "ERROR: aspell not found or not executable. Please install aspell.\n"
+        unless $? == 0 && $out =~ /aspell/i;
+}
+
+sub aspell_list {
+    my ($line, $lang) = @_;
+
+    (my $escaped = $line) =~ s/'/'\\''/g;
+    return `echo '$escaped' | aspell list -l $lang --run-together 2>/dev/null`;
+}
+
+#
+#
+# Load Pod::Wordlist — the shared Perl community vocabulary
+
+sub load_pod_wordlist {
+    my $known = shift;
+
+    unless (eval 'require Pod::Wordlist; 1') {
+        warn_ "WARNING: Pod::Wordlist not found (cpanm Pod::Wordlist). "
+            . "Skipping — .stopwords may contain redundant common Perl terms.";
+        return 0;
+    }
+
+    # Pod::Wordlist stores its words in %Pod::Wordlist::Wordlist
+    my $wordlist = do { no strict 'refs'; \%{ 'Pod::Wordlist::Wordlist' } };
+
+    my $count = 0;
+    for my $word (keys %$wordlist) {
+        $known->{ lc $word } = 1;
+        $count++;
+    }
+
+    debug("  Loaded $count word(s) from Pod::Wordlist");
+    return $count;
+}
+
+#
+#
+# Load global personal wordlist (.aspell.en.pws)
+
+sub load_global_words {
+    my ($path, $list) = @_;
+
+    return unless !$opt{no_global} && -e $path;
+
+    open my $fh, '<', $path
+        or do { warn_ "WARNING: Cannot open $path: $!"; return };
+
+    my @lines = <$fh>;
+    close $fh;
+
+    shift @lines;    # skip aspell header line
+
+    my $count = 0;
+    for (@lines) {
+        next unless /\S/;
+        s/^\s+|\s+$//g;
+        $list->{ lc($_) }++;
+        $count++;
+    }
+
+    debug("  Loaded $count word(s) from $path");
+}
+
+#
+#
+# Scan source files and collect unrecognised words via aspell
+
+sub scan_project {
+    my ($dirs, $lang, $stop_file, $known, $stopwords) = @_;
+
+    my $stop_abs  = eval { abs_path($stop_file) } // $stop_file;
+    my $processed = 0;
+    my $skipped   = 0;
+    my $filtered  = 0;
+
+    find({
+        wanted => sub {
+            my $name = $_;
+
+            if (-d $name && $name =~ $PRUNE_RE) {
+                $File::Find::prune = 1;
+                return;
+            }
+
+            return unless -f $name && $name =~ $SOURCE_RE;
+
+            my $abs = eval { abs_path($name) } // $name;
+            if ($abs eq $stop_abs) {
+                $skipped++;
+                return;
+            }
+
+            debug("  Processing: $File::Find::name");
+            $processed++;
+
+            open my $fh, '<', $name
+                or do { warn_ "WARNING: Cannot open $File::Find::name: $!"; return };
+
+            while (my $line = <$fh>) {
+                # Strip POD formatting codes entirely — prevents 'Egt' artefacts
+                $line =~ s/[A-Z]<[^>]+>//g;
+
+                my $result = aspell_list($line, $lang);
+                next unless $result;
+
+                for my $word (split /\n/, $result) {
+                    $word =~ s/^\s+|\s+$//g;
+                    next unless length($word) >= $opt{min_len};
+
+                    my $clean = lc $word;
+                    $clean =~ s/'s$//;
+
+                    # Skip if Pod::Wordlist or personal wordlist already covers it
+                    if ($known->{$clean}) {
+                        $filtered++;
+                        debug("    Skipping '$clean' (covered by Pod::Wordlist or personal wordlist)");
+                        next;
+                    }
+
+                    $stopwords->{$clean}++;
+                }
+            }
+
+            close $fh;
+        },
+        no_chdir => 0,
+    }, @$dirs);
+
+    # Explicit return ensures we always hand back three defined integers.
+    # find() itself returns undef, so we must never let it be the implicit
+    # return value of this sub — that is what causes the "uninitialized"
+    # warning at the call site when $filtered is assigned from it.
+    return ($processed, $skipped, $filtered + 0);
+}
+
+#
+#
+# Write .stopwords
+
+sub write_stopwords {
+    my ($path, $lang, $list) = @_;
+
+    if ($opt{dry_run}) {
+        info("DRY RUN — would write " . scalar(keys %$list) . " term(s) to $path");
+        if ($opt{verbose}) {
+            print "  $_\n" for sort keys %$list;
+        }
+        return;
+    }
+
+    open my $fh, '>', $path
+        or die "ERROR: Cannot write to $path: $!\n";
+
+    print $fh "# Auto-generated stopwords for $lang\n";
+    print $fh "# Generated by gen-stopwords v$VERSION on " . localtime() . "\n";
+    print $fh "# Do not edit manually — re-run gen-stopwords to regenerate.\n";
+    print $fh join("\n", sort keys %$list), "\n";
+
+    close $fh;
+}
+
+#
+#
+# Main Program
+
+check_aspell();
+
+info("gen-stopwords v$VERSION");
+info("Language : $opt{lang}");
+info("Output   : $opt{output}");
+info("Dirs     : " . join(', ', @{ $opt{dirs} }));
+
+# %known     - words NOT to add (covered by Pod::Wordlist or personal wordlist)
+# %stopwords - words to write (project-specific only)
+my (%known, %stopwords);
+
+unless ($opt{no_wordlist}) {
+    info("Loading Pod::Wordlist...");
+    my $n = load_pod_wordlist(\%known);
+    info("  $n word(s) loaded — these will be filtered from output.") if $n;
+}
+
+load_global_words($opt{pws}, \%known);
+
+info("Scanning source files...");
+my ($processed, $skipped, $filtered) = scan_project(
+    $opt{dirs}, $opt{lang}, $opt{output}, \%known, \%stopwords
+);
+
+write_stopwords($opt{output}, $opt{lang}, \%stopwords);
+
+info(sprintf(
+    "Done. Scanned %d file(s), skipped %d, filtered %d already-known term(s).",
+    $processed, $skipped, $filtered,
+));
+info(sprintf(
+    "%s %d project-specific term(s) to %s.",
+    $opt{dry_run} ? 'Would write' : 'Wrote',
+    scalar(keys %stopwords),
+    $opt{output},
+));
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item * Perl 5.14+
+
+=item * B<aspell> must be installed and on C<$PATH>.
+
+=back
+
+=head1 EXIT STATUS
+
+Exits C<0> on success, C<1> on usage error, and dies with a descriptive
+message on fatal errors (missing aspell, unwritable output, etc.).
+
+=head1 AUTHOR
+
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
+
+=head1 REPOSITORY
+
+L<https://github.com/manwar/Test-Spelling-Stopwords>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Mohammad Sajid Anwar.
+
+This program  is  free software; you can redistribute it and / or modify it under
+the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full
+license at:
+L<http://www.perlfoundation.org/artistic_license_2_0>
+Any  use,  modification, and distribution of the Standard or Modified Versions is
+governed by this Artistic License.By using, modifying or distributing the Package,
+you accept this license. Do not use, modify, or distribute the Package, if you do
+not accept this license.
+If your Modified Version has been derived from a Modified Version made by someone
+other than you,you are nevertheless required to ensure that your Modified Version
+ complies with the requirements of this license.
+This  license  does  not grant you the right to use any trademark,  service mark,
+tradename, or logo of the Copyright Holder.
+This license includes the non-exclusive, worldwide, free-of-charge patent license
+to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
+Package with respect to any patent claims licensable by the Copyright Holder that
+are  necessarily  infringed  by  the  Package. If you institute patent litigation
+(including  a  cross-claim  or  counterclaim) against any party alleging that the
+Package constitutes direct or contributory patent infringement,then this Artistic
+License to you shall terminate on the date that such litigation is filed.
+Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR
+NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
+REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

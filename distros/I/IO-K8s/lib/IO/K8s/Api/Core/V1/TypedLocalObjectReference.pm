@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::TypedLocalObjectReference;
 # ABSTRACT: TypedLocalObjectReference contains enough information to let you locate the typed referenced object inside the same namespace.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s apiGroup => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::TypedLocalObjectReference - TypedLocalObjectReference co
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 apiGroup
 

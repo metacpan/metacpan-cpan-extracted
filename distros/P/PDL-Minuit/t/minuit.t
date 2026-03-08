@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use PDL::LiteF;
 use Test::More;
+use Test::PDL;
 use PDL::Minuit;
 use File::Temp qw( tempfile tempdir );
 require File::Spec;
@@ -35,20 +36,48 @@ ok !mn_excm('minos');
 
 my $emat = mn_emat();
 my $emat_test = pdl [[0.34545455, -0.054545455], [-0.054545455,  0.012121212]];
-ok(all(approx $emat, $emat_test)) or diag $emat;
+is_pdl $emat, $emat_test or diag $emat;
 
 my @got = mn_pout(1);
-ok(approx $got[0], pdl 3) or diag "@got";
+is_pdl $got[0], pdl('3');
+is_pdl $got[1], pdl('0.587753');
+is_pdl $got[2], pdl('0');
+is_pdl $got[3], pdl('0');
+is_pdl $got[4], pdl('1');
+is $got[5], 'intercept ';
 
-mn_err(1);
-mn_stat();
+my @got2 = mn_pout(2);
+is_pdl $got2[0], pdl('4');
+is_pdl $got2[1], pdl('0.110096');
+is_pdl $got2[2], pdl('0');
+is_pdl $got2[3], pdl('0');
+is_pdl $got2[4], pdl('2');
+is $got2[5], 'slope     ';
+
+my @r1 = mn_err(1);
+is_pdl $r1[0], pdl('0.587753');
+is_pdl $r1[1], pdl('-0.587753');
+is_pdl $r1[2], pdl('0.587753');
+is_pdl $r1[3], pdl('0.842927');
+my @r1a = mn_err(2);
+is_pdl $r1a[0], pdl('0.110096');
+is_pdl $r1a[1], pdl('-0.110096');
+is_pdl $r1a[2], pdl('0.110096');
+is_pdl $r1a[3], pdl('0.842927');
+my @r2 = mn_stat();
+is_pdl $r2[0], pdl('0');
+is_pdl $r2[1], pdl('0');
+is_pdl $r2[2], pdl('1');
+is_pdl $r2[3], longlong('2');
+is_pdl $r2[4], longlong('2');
+is_pdl $r2[5], longlong('3');
 
 done_testing;
 
-sub chi2{
+sub chi2 {
     my ($npar,$grad,$fval,$xval,$iflag) = @_;
     if($iflag == 4){
         $fval = (($y - $xval->slice(0) - $xval->slice(1)*$x)**2)->sumover;
     }
-    return ($fval,$grad);
+    ($fval,$grad);
 }

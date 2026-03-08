@@ -18,7 +18,7 @@ sub _carp {
     return warn @_, " at $file line $line\n";
 }
 
-our $VERSION = '1.302162';
+our $VERSION = '1.302191';
 
 use Test::Builder::Module;
 our @ISA    = qw(Test::Builder::Module);
@@ -123,8 +123,8 @@ sub isnt ($$;$) {
     return $tb->isnt_eq(@_);
 }
 
-*isn't = \&isnt;
-# ' to unconfuse syntax higlighters
+# make this available as isn't()
+*isn::t = \&isnt;
 
 #line 445
 
@@ -582,7 +582,7 @@ sub skip {
     last SKIP;
 }
 
-#line 1431
+#line 1440
 
 sub todo_skip {
     my( $why, $how_many ) = @_;
@@ -603,7 +603,7 @@ sub todo_skip {
     last TODO;
 }
 
-#line 1486
+#line 1495
 
 sub BAIL_OUT {
     my $reason = shift;
@@ -612,7 +612,7 @@ sub BAIL_OUT {
     $tb->BAIL_OUT($reason);
 }
 
-#line 1525
+#line 1534
 
 #'#
 sub eq_array {
@@ -752,7 +752,7 @@ WHOA
     }
 }
 
-#line 1672
+#line 1681
 
 sub eq_hash {
     local @Data_Stack = ();
@@ -787,7 +787,7 @@ sub _eq_hash {
     return $ok;
 }
 
-#line 1731
+#line 1740
 
 sub eq_set {
     my( $a1, $a2 ) = @_;
@@ -812,6 +812,6 @@ sub eq_set {
     );
 }
 
-#line 1995
+#line 2004
 
 1;

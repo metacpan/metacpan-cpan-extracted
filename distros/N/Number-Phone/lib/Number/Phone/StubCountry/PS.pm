@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153525;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -69,21 +69,21 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"970222", "Jericho\/Hebron",
-"970923", "Nablus",
-"970229", "Ramallah\/Al\-Bireh",
-"970925", "Tubas",
-"970824", "North\ Gaza",
+$areanames{en} = {"970824", "North\ Gaza",
+"970926", "Tulkarm",
+"970222", "Jericho\/Hebron",
+"970820", "Khan\ Yunis",
 "970826", "Gaza",
 "970424", "Jenin",
-"970227", "Bethlehem",
-"970929", "Qalqilya\/Salfit",
-"970926", "Tulkarm",
+"970923", "Nablus",
 "970223", "Jerusalem",
-"970820", "Khan\ Yunis",
-"970825", "Deir\ al\-Balah",
+"970229", "Ramallah\/Al\-Bireh",
 "970821", "Rafah",
-"970828", "Gaza",};
+"970925", "Tubas",
+"970828", "Gaza",
+"970825", "Deir\ al\-Balah",
+"970929", "Qalqilya\/Salfit",
+"970227", "Bethlehem",};
 my $timezones = {
                '' => [
                        'Europe/Bucharest'

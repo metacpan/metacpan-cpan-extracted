@@ -1,0 +1,19 @@
+Revision history for XML-PugiXML
+
+0.01  2026-03-04
+    - Initial release
+    - Fast XML parsing via pugixml (8-12x faster than XML::LibXML)
+    - Document: load_file, load_string, save_file, to_string, reset
+    - DOM navigation: root, child, children, parent, first_child, last_child,
+      next_sibling, previous_sibling, find_child_by_attribute
+    - Attributes: attr, attrs, append_attr, prepend_attr, set_attr, remove_attr
+    - Modification: append_child, prepend_child, insert_child_before/after,
+      append_copy, prepend_copy, insert_copy_before/after, remove_child
+    - Special nodes: append_cdata, append_comment, append_pi
+    - XPath: select_node, select_nodes, compile_xpath with
+      evaluate_node/nodes/string/number/boolean
+    - Node info: name, value, text, type, path, hash, offset_debug, valid
+    - Attribute types: as_int, as_uint, as_llong, as_ullong, as_double, as_bool
+    - Parse/format constants for fine-grained control
+    - UTF-8 support
+    - Reference-counted memory model (nodes keep document alive)

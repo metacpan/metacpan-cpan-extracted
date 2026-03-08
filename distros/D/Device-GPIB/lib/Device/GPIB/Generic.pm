@@ -75,6 +75,14 @@ sub read($)
     $self->{Device}->read($self->{Address});
 }
 
+# Wrapper for device read_to_eol()
+sub read_to_eol($)
+{
+    my ($self) = @_;
+
+    $self->{Device}->read_to_eol($self->{Address});
+}
+
 # Wrapper for device read_binary()
 sub read_binary($)
 {
@@ -127,6 +135,20 @@ sub trigger()
     my ($self) = @_;
 
     $self->{Device}->trg($self->{Address});
+}
+
+sub actAsDevice()
+{
+    my ($self) = @_;
+    
+    $self->{Device}->actAsDevice();
+}
+
+sub mode()
+{
+    my ($self, $mode) = @_;
+    print "CALLED generic mode $mode\n";
+    $self->{Device}->mode($mode);
 }
 
 # Set a new address to talk to
@@ -189,7 +211,7 @@ sub executeCommand()
 {
     my ($self, $command) = @_;
 
-    print "execute $command\n" if $main::opt_debug;
+    $self->{Device}->debug("executeCommand: $command\n") if $main::opt_debug;
     return if (index($command, '#') == 0); # Comment
     return if length($command) == 0; # Empty
     

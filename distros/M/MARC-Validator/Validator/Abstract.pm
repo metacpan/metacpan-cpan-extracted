@@ -8,7 +8,7 @@ use Data::MARC::Validator::Report::Plugin 0.02;
 use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool check_required);
 
-our $VERSION = 0.10;
+our $VERSION = 0.13;
 
 # Constructor.
 sub new {
@@ -26,6 +26,9 @@ sub new {
 	# Filters.
 	$self->{'filters'} = [];
 
+	# Recommendation.
+	$self->{'recommendation'} = 0;
+
 	# Record id definition.
 	$self->{'record_id_def'} = '001';
 
@@ -37,6 +40,9 @@ sub new {
 
 	# Check 'debug'.
 	check_bool($self, 'debug');
+
+	# Check 'recommendation'.
+	check_bool($self, 'recommendation');
 
 	# Check 'record_id_def'.
 	check_required($self, 'record_id_def');
@@ -105,6 +111,14 @@ sub process {
 	err __PACKAGE__.' is abstract class.';
 }
 
+sub set_filters {
+	my ($self, @filters) = @_;
+
+	$self->{'filters'} = \@filters;
+
+	return;
+}
+
 sub struct {
 	my $self = shift;
 
@@ -151,6 +165,7 @@ MARC::Validator::Abstract - Abstract class for MARC::Validator plugins.
  my $name = $obj->name;
  my $process = $obj->process($marc_record);
  $obj->postprocess;
+ $obj->set_filters(@filters);
  my $struct_hr = $obj->struct;
  my $version = $obj->version;
 
@@ -174,6 +189,12 @@ Constructor.
 Debug mode.
 
 Default value is 0.
+
+=item * C<filters>
+
+List of filter strings.
+
+Default value is [].
 
 =item * C<record_id_def>
 
@@ -235,6 +256,14 @@ Returns undef.
  $obj->proces($marc_record);
 
 Process L<MARC::Record> instance.
+
+Returns undef.
+
+=head2 C<set_filters>
+
+ $obj->set_filters(@filters);
+
+Set filters to the object.
 
 Returns undef.
 
@@ -540,6 +569,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.10
+0.13
 
 =cut

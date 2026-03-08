@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153523;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [];
 
@@ -135,57 +135,57 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"68624", "Bairiki",
-"68635", "Butaritari",
-"686652", "Bikenibeu",
-"68675229", "Bikenibeu",
-"68644", "Tabiteuea\ South",
-"68675500", "Phoenix\ Islands",
-"68682", "Kiritimati",
-"68675481", "Line\ Islands",
-"68675400", "Phoenix\ Islands",
-"68685", "Kanton",
-"68675126", "Betio",
-"68627", "Tarawa",
-"68643", "Tabiteuea\ North",
-"68647", "Nikunau",
-"68623", "Bairiki",
-"686653", "Gilbert\ Islands",
-"68641", "Abemama",
-"686650", "Bairiki",
-"68639", "Kuria",
-"68646", "Beru",
-"68638", "Maiana",
-"68626", "Betio",
-"68632", "North\ Tarawa",
-"68621", "Bairiki",
-"68683", "Fanning",
-"68675022", "Bairiki",
-"68645", "Onotoa",
-"68675021", "Bairiki",
-"686654", "Gilbert\ Islands",
-"68634", "Marakei",
-"68625", "Betio",
-"68672700", "Gilbert\ Islands",
-"68675300", "Gilbert\ Islands",
-"68681", "Kiritimati",
-"68640", "Aranuka",
-"68633", "Abaiang",
-"68675228", "Bikenibeu",
-"68675381", "Line\ Islands",
-"68684", "Washington",
-"68637", "Banaba",
-"686651", "Betio",
-"68622", "Bairiki",
+$areanames{en} = {"68675021", "Bairiki",
 "68631", "North\ Tarawa",
-"68675125", "Betio",
-"68636", "Makin",
-"68649", "Arorae",
-"686655", "Phoenix\ Islands",
+"68672700", "Gilbert\ Islands",
+"68624", "Bairiki",
+"68642", "Nonouti",
+"686650", "Bairiki",
+"68626", "Betio",
+"68675381", "Line\ Islands",
+"68643", "Tabiteuea\ North",
+"68675022", "Bairiki",
+"68682", "Kiritimati",
 "68628", "Bikenibeu",
+"68625", "Betio",
+"68683", "Fanning",
 "68629", "Bikenibeu",
+"68647", "Nikunau",
+"68675126", "Betio",
+"686655", "Phoenix\ Islands",
+"68675500", "Phoenix\ Islands",
+"68634", "Marakei",
+"68621", "Bairiki",
+"68675300", "Gilbert\ Islands",
+"68636", "Makin",
+"686652", "Bikenibeu",
+"68635", "Butaritari",
+"68639", "Kuria",
+"686653", "Gilbert\ Islands",
+"68638", "Maiana",
+"68641", "Abemama",
+"68681", "Kiritimati",
+"68627", "Tarawa",
+"68675229", "Bikenibeu",
+"68632", "North\ Tarawa",
+"68675228", "Bikenibeu",
+"68633", "Abaiang",
+"68675481", "Line\ Islands",
+"68675125", "Betio",
+"686651", "Betio",
+"68644", "Tabiteuea\ South",
+"68637", "Banaba",
+"68684", "Washington",
+"68645", "Onotoa",
+"686654", "Gilbert\ Islands",
+"68649", "Arorae",
 "68648", "Tamana",
-"68642", "Nonouti",};
+"68685", "Kanton",
+"68623", "Bairiki",
+"68675400", "Phoenix\ Islands",
+"68640", "Aranuka",
+"68646", "Beru",
+"68622", "Bairiki",};
 my $timezones = {
                '' => [
                        'Pacific/Enderbury',

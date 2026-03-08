@@ -27,7 +27,7 @@ my ( $dir, $dir_path );
 sub create_test_file {
     my ( $dirs, $fn, $content, $args ) = @_;
     $dir = File::Temp->newdir(
-        TEMPLATE => 'temp-envassert-test-XXXXX',
+        TEMPLATE => 'temp-envdot-test-XXXXX',
         CLEANUP  => $args->{'cleanup'} // 1,
         DIR      => File::Spec->tmpdir,
     );

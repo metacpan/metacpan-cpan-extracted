@@ -1,5 +1,5 @@
 package Kubernetes::REST::Call::v1beta1::Extensions::ListNamespacedNetworkPolicy;
-our $VERSION = '1.003';
+our $VERSION = '1.100';
 # ABSTRACT: Deprecated - use the new Kubernetes::REST API instead
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ Kubernetes::REST::Call::v1beta1::Extensions::ListNamespacedNetworkPolicy - Depre
 
 =head1 VERSION
 
-version 1.003
+version 1.100
 
 =head1 SUPPORT
 

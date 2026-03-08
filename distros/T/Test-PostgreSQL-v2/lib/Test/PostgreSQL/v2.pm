@@ -1,6 +1,6 @@
 package Test::PostgreSQL::v2;
 
-$Test::PostgreSQL::v2::VERSION   = '2.03';
+$Test::PostgreSQL::v2::VERSION   = '2.04';
 $Test::PostgreSQL::v2::AUTHORITY = 'cpan:MANWAR';
 
 use strict;
@@ -22,7 +22,7 @@ Test::PostgreSQL::v2 - A modern, isolated PostgreSQL executable runner for tests
 
 =head1 VERSION
 
-Version 2.03
+Version 2.04
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ Version 2.03
 
     # The instance is automatically stopped and cleaned up when $pg goes out of scope
 
-=head2 Usage with Test::DBIx::Class
+B<Usage with Test::DBIx::Class>
 
 The recommended way to use this module with L<Test::DBIx::Class> is via the
 bundled C<Testpostgresqlv2> trait, which handles all lifecycle and
@@ -86,7 +86,7 @@ aging L<Test::PostgreSQL>. It addresses modern Linux environment constraints
 (like Ubuntu 24.04+) by isolating sockets in temporary directories and
 correctly discovering modern Postgres binaries.
 
-=head2 CONSTRUCTOR
+=head1 CONSTRUCTOR
 
 B<new(%args)>
 
@@ -95,22 +95,22 @@ performs the following steps:
 
 =over 4
 
-=item 1. Binary Discovery: Searches for C<initdb> and C<postgres>
+=item * Binary Discovery: Searches for C<initdb> and C<postgres>
 (or C<postmaster>). It respects the C<POSTGRES_HOME> environment variable
 if set, falling back to the system C<PATH>.
 
-=item 2. Workspace Isolation: Creates a unique C<tempdir> for the data
+=item * Workspace Isolation: Creates a unique C<tempdir> for the data
 cluster and unix sockets (via the C<-k> flag). This avoids permission
 conflicts with system-wide PostgreSQL socket directories like
 C</var/run/postgresql>.
 
-=item 3. Automatic Port Selection: If no port is provided, it dynamically
+=item * Automatic Port Selection: If no port is provided, it dynamically
 searches for an available port on the specified host.
 
-=item 4. Cluster Initialisation: Runs C<initdb> with C<trust>
+=item * Cluster Initialisation: Runs C<initdb> with C<trust>
 authentication and C<--nosync> for maximum test performance.
 
-=item 5. Daemonisation & Readiness: Forks the server process and polls
+=item * Daemonisation & Readiness: Forks the server process and polls
 the host/port until the instance is ready to accept connections. If the
 server fails to start, it slurps the C<pg.log> into a C<croak> message for
 immediate debugging.

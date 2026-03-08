@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodDNSConfig;
 # ABSTRACT: PodDNSConfig defines the DNS parameters of a pod in addition to those generated from DNSPolicy.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s nameservers => [Str];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::PodDNSConfig - PodDNSConfig defines the DNS parameters o
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 nameservers
 

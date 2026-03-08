@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storagemigration::V1alpha1::StorageVersionMigrationStatus;
 # ABSTRACT: Status of the storage version migration.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s conditions => ['Storagemigration::V1alpha1::MigrationCondition'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Storagemigration::V1alpha1::StorageVersionMigrationStatus - Status
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 conditions
 

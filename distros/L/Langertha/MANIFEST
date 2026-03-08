@@ -84,6 +84,7 @@ lib/Langertha/Role/Chat.pm
 lib/Langertha/Role/ContextSize.pm
 lib/Langertha/Role/Embedding.pm
 lib/Langertha/Role/HTTP.pm
+lib/Langertha/Role/HermesTools.pm
 lib/Langertha/Role/ImageGeneration.pm
 lib/Langertha/Role/JSON.pm
 lib/Langertha/Role/KeepAlive.pm

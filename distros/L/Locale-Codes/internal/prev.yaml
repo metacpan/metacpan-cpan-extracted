@@ -3015,7 +3015,6 @@ country:
       AT: Austria
       AU: Australia
       AW: Aruba
-      AX: Aland Islands
       AZ: Azerbaijan
       BA: Bosnia and Herzegovina
       BB: Barbados
@@ -3068,7 +3067,6 @@ country:
       EC: Ecuador
       EE: Estonia
       EG: Egypt
-      EH: Western Sahara
       ER: Eritrea
       ES: Spain
       ET: Ethiopia
@@ -3185,7 +3183,6 @@ country:
       PM: Saint Pierre and Miquelon
       PN: Pitcairn
       PR: Puerto Rico
-      PS: Palestine, State of
       PT: Portugal
       PW: Palau
       PY: Paraguay
@@ -3217,7 +3214,6 @@ country:
       SG: Singapore
       SH: Saint Helena, Ascension, and Tristan Da Cunha
       SI: Slovenia
-      SJ: Svalbard and Jan Mayen
       SK: Slovakia
       SL: Sierra Leone
       SM: San Marino
@@ -3249,7 +3245,6 @@ country:
       TZ: Tanzania
       UA: Ukraine
       UG: Uganda
-      UM: United States Minor Outlying Islands
       US: United States of America
       UY: Uruguay
       UZ: Uzbekistan
@@ -3310,9 +3305,6 @@ country:
       aksai chin and other areas: 
         - QO
         - Aksai Chin And Other Areas
-      aland islands: 
-        - AX
-        - Aland Islands
       albania: 
         - AL
         - Albania
@@ -3913,9 +3905,6 @@ country:
       palau: 
         - PW
         - Palau
-      palestine, state of: 
-        - PS
-        - Palestine, State of
       palmyra atoll: 
         - XL
         - Palmyra Atoll
@@ -4063,9 +4052,6 @@ country:
       svalbard: 
         - XR
         - Svalbard
-      svalbard and jan mayen: 
-        - SJ
-        - Svalbard and Jan Mayen
       sweden: 
         - SE
         - Sweden
@@ -4132,9 +4118,6 @@ country:
       united kingdom of great britain and northern ireland: 
         - GB
         - United Kingdom of Great Britain and Northern Ireland
-      united states minor outlying islands: 
-        - UM
-        - United States Minor Outlying Islands
       united states of america: 
         - US
         - United States of America
@@ -4168,9 +4151,6 @@ country:
       west bank: 
         - XW
         - West Bank
-      western sahara: 
-        - EH
-        - Western Sahara
       yemen: 
         - YE
         - Yemen
@@ -4186,7 +4166,6 @@ country:
       AFG: Afghanistan
       AGO: Angola
       AIA: Anguilla
-      ALA: Aland Islands
       ALB: Albania
       AND: Andorra
       ARE: United Arab Emirates
@@ -4253,7 +4232,6 @@ country:
       ECU: Ecuador
       EGY: Egypt
       ERI: Eritrea
-      ESH: Western Sahara
       ESP: Spain
       EST: Estonia
       ETH: Ethiopia
@@ -4369,7 +4347,6 @@ country:
       PRK: Korea, North
       PRT: Portugal
       PRY: Paraguay
-      PSE: Palestine, State of
       PYF: French Polynesia
       QAT: Qatar
       REU: Reunion
@@ -4382,7 +4359,6 @@ country:
       SGP: Singapore
       SGS: South Georgia and South Sandwich Islands
       SHN: Saint Helena, Ascension, and Tristan Da Cunha
-      SJM: Svalbard and Jan Mayen
       SLB: Solomon Islands
       SLE: Sierra Leone
       SLV: El Salvador
@@ -4417,7 +4393,6 @@ country:
       TZA: Tanzania
       UGA: Uganda
       UKR: Ukraine
-      UMI: United States Minor Outlying Islands
       URY: Uruguay
       USA: United States of America
       UZB: Uzbekistan
@@ -4493,9 +4468,6 @@ country:
       aksai chin and other areas: 
         - XQO
         - Aksai Chin And Other Areas
-      aland islands: 
-        - ALA
-        - Aland Islands
       albania: 
         - ALB
         - Albania
@@ -5096,9 +5068,6 @@ country:
       palau: 
         - PLW
         - Palau
-      palestine, state of: 
-        - PSE
-        - Palestine, State of
       palmyra atoll: 
         - XPL
         - Palmyra Atoll
@@ -5246,9 +5215,6 @@ country:
       svalbard: 
         - XSV
         - Svalbard
-      svalbard and jan mayen: 
-        - SJM
-        - Svalbard and Jan Mayen
       sweden: 
         - SWE
         - Sweden
@@ -5315,9 +5281,6 @@ country:
       united kingdom of great britain and northern ireland: 
         - GBR
         - United Kingdom of Great Britain and Northern Ireland
-      united states minor outlying islands: 
-        - UMI
-        - United States Minor Outlying Islands
       united states of america: 
         - USA
         - United States of America
@@ -5351,9 +5314,6 @@ country:
       west bank: 
         - XWB
         - West Bank
-      western sahara: 
-        - ESH
-        - Western Sahara
       yemen: 
         - YEM
         - Yemen
@@ -5438,7 +5398,6 @@ country:
       239: South Georgia and South Sandwich Islands
       242: Fiji
       246: Finland
-      248: Aland Islands
       250: France
       254: French Guiana
       258: French Polynesia
@@ -5447,7 +5406,6 @@ country:
       266: Gabon
       268: Georgia
       270: Gambia
-      275: Palestine, State of
       276: Germany
       288: Ghana
       292: Gibraltar
@@ -5530,7 +5488,6 @@ country:
       574: Norfolk Island
       578: Norway
       580: Northern Mariana Islands
-      581: United States Minor Outlying Islands
       583: Micronesia (Federated States of)
       584: Marshall Islands
       585: Palau
@@ -5576,9 +5533,7 @@ country:
       724: Spain
       728: South Sudan
       729: Sudan
-      732: Western Sahara
       740: Suriname
-      744: Svalbard and Jan Mayen
       748: Eswatini
       752: Sweden
       756: Switzerland
@@ -5676,9 +5631,6 @@ country:
       aksai chin and other areas: 
         - 937
         - Aksai Chin And Other Areas
-      aland islands: 
-        - 248
-        - Aland Islands
       albania: 
         - '008'
         - Albania
@@ -6279,9 +6231,6 @@ country:
       palau: 
         - 585
         - Palau
-      palestine, state of: 
-        - 275
-        - Palestine, State of
       palmyra atoll: 
         - 927
         - Palmyra Atoll
@@ -6429,9 +6378,6 @@ country:
       svalbard: 
         - 930
         - Svalbard
-      svalbard and jan mayen: 
-        - 744
-        - Svalbard and Jan Mayen
       sweden: 
         - 752
         - Sweden
@@ -6498,9 +6444,6 @@ country:
       united kingdom of great britain and northern ireland: 
         - 826
         - United Kingdom of Great Britain and Northern Ireland
-      united states minor outlying islands: 
-        - 581
-        - United States Minor Outlying Islands
       united states of america: 
         - 840
         - United States of America
@@ -6534,9 +6477,6 @@ country:
       west bank: 
         - 934
         - West Bank
-      western sahara: 
-        - 732
-        - Western Sahara
       yemen: 
         - 887
         - Yemen
@@ -14982,7 +14922,7 @@ language:
       grb: Grebo
       grc: Ancient Greek (to 1453)
       grd: Guruntum-Mbaaru
-      gre: Greek, Modern (1453-)
+      gre: Modern Greek (1453-)
       grg: Madi
       grh: Gbiri-Niragu
       gri: Ghari
@@ -17269,7 +17209,7 @@ language:
       nbi: Mao Naga
       nbj: Ngarinyman
       nbk: Nake
-      nbl: Ndebele, South
+      nbl: South Ndebele
       nbm: Ngbaka Ma'bo
       nbn: Kuri
       nbo: Nkukoli
@@ -17308,7 +17248,7 @@ language:
       ndb: Kenswei Nsei
       ndc: Ndau
       ndd: Nde-Nsele-Nta
-      nde: Ndebele, North
+      nde: North Ndebele
       ndf: Nadruvian
       ndg: Ndengereko
       ndh: Ndali
@@ -17542,7 +17482,7 @@ language:
       nny: Nyangga
       nnz: Nda'nda'
       noa: Woun Meu
-      nob: Bokmal, Norwegian
+      nob: Norwegian Bokmal
       noc: Nuk
       nod: Northern Thai
       noe: Nimadi
@@ -23548,9 +23488,6 @@ language:
       bokha: 
         - ybk
         - Bokha
-      bokmal, norwegian: 
-        - nob
-        - Bokmal, Norwegian
       boko (benin): 
         - bqc
         - Boko (Benin)
@@ -27409,9 +27346,6 @@ language:
       greek sign language: 
         - gss
         - Greek Sign Language
-      greek, modern (1453-): 
-        - gre
-        - Greek, Modern (1453-)
       green gelao: 
         - giq
         - Green Gelao
@@ -34399,6 +34333,9 @@ language:
       modang: 
         - mxd
         - Modang
+      modern greek (1453-): 
+        - gre
+        - Modern Greek (1453-)
       modole: 
         - mqo
         - Modole
@@ -35335,12 +35272,6 @@ language:
       nde-nsele-nta: 
         - ndd
         - Nde-Nsele-Nta
-      ndebele, north: 
-        - nde
-        - Ndebele, North
-      ndebele, south: 
-        - nbl
-        - Ndebele, South
       ndemli: 
         - nml
         - Ndemli
@@ -36070,6 +36001,9 @@ language:
       north muyu: 
         - kti
         - North Muyu
+      north ndebele: 
+        - nde
+        - North Ndebele
       north nuaulu: 
         - nni
         - North Nuaulu
@@ -36343,6 +36277,9 @@ language:
       norwegian: 
         - nor
         - Norwegian
+      norwegian bokmal: 
+        - nob
+        - Norwegian Bokmal
       norwegian nynorsk: 
         - nno
         - Norwegian Nynorsk
@@ -40156,6 +40093,9 @@ language:
       south muyu: 
         - kts
         - South Muyu
+      south ndebele: 
+        - nbl
+        - South Ndebele
       south nuaulu: 
         - nxl
         - South Nuaulu
@@ -44966,7 +44906,7 @@ language:
       efi: Efik
       egy: Egyptian (Ancient)
       eka: Ekajuk
-      ell: Greek, Modern (1453-)
+      ell: Modern Greek (1453-)
       elx: Elamite
       eng: English
       enm: English, Middle (1100-1500)
@@ -45150,8 +45090,8 @@ language:
       nap: Neapolitan
       nau: Nauru
       nav: Navajo
-      nbl: Ndebele, South
-      nde: Ndebele, North
+      nbl: South Ndebele
+      nde: North Ndebele
       ndo: Ndonga
       nds: Low German
       nep: Nepali
@@ -45161,7 +45101,7 @@ language:
       niu: Niuean
       nld: Dutch
       nno: Norwegian Nynorsk
-      nob: Bokmal, Norwegian
+      nob: Norwegian Bokmal
       nog: Nogai
       non: Norse, Old
       nor: Norwegian
@@ -45512,9 +45452,6 @@ language:
       blissymbols: 
         - zbl
         - Blissymbols
-      bokmal, norwegian: 
-        - nob
-        - Bokmal, Norwegian
       bosnian: 
         - bos
         - Bosnian
@@ -45821,9 +45758,6 @@ language:
       greek, ancient (to 1453): 
         - grc
         - Greek, Ancient (to 1453)
-      greek, modern (1453-): 
-        - ell
-        - Greek, Modern (1453-)
       guarani: 
         - grn
         - Guarani
@@ -46208,6 +46142,9 @@ language:
       mirandese: 
         - mwl
         - Mirandese
+      modern greek (1453-): 
+        - ell
+        - Modern Greek (1453-)
       mohawk: 
         - moh
         - Mohawk
@@ -46247,12 +46184,6 @@ language:
       navajo: 
         - nav
         - Navajo
-      ndebele, north: 
-        - nde
-        - Ndebele, North
-      ndebele, south: 
-        - nbl
-        - Ndebele, South
       ndonga: 
         - ndo
         - Ndonga
@@ -46289,6 +46220,9 @@ language:
       north american indian languages: 
         - nai
         - North American Indian languages
+      north ndebele: 
+        - nde
+        - North Ndebele
       northern frisian: 
         - frr
         - Northern Frisian
@@ -46298,6 +46232,9 @@ language:
       norwegian: 
         - nor
         - Norwegian
+      norwegian bokmal: 
+        - nob
+        - Norwegian Bokmal
       norwegian nynorsk: 
         - nno
         - Norwegian Nynorsk
@@ -46544,6 +46481,9 @@ language:
       south american indian languages: 
         - sai
         - South American Indian languages
+      south ndebele: 
+        - nbl
+        - South Ndebele
       southern altai: 
         - alt
         - Southern Altai

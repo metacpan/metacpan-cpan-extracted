@@ -1,7 +1,24 @@
+### 1.20260306
+
+- dmarc_sqlite_to_mysql: added new script
+- mysql: enable SSL for newer MySQL. Fix schema for new import.
+- dmarc_receive: eval un(g)zip, so imperfect archives don't interrupt loop
+- dmarc_view_reports: --geoip fixed
+- dmarc_view_reports: add --limit and --sort options
+
+### 1.20260301
+
+- dmarc_receive: support gzip, zip, and XML files #277
+- dmarc_view_reports: add --rid filter #276
+- dmarc_view_reports: add negation support in filters #275
+- fix(sp): base effective policy on request domain #273
+
 ### 1.20260226
 
 - feat: replace jqGrid with DataTables in web UI #269
 - doc: remove invalid reference to evalated #267
+- doc: bump copyright to 2026
+- updated PSL
 
 ### 1.20250805
 

@@ -30,14 +30,13 @@
  * Same 9-state DFA as the 64-bit version, but state offsets are chosen
  * by an SMT solver so all transition rows fit in a plain uint32_t.
  *
- * S_ERROR = 0: error transitions contribute nothing to a row (OR with 0),
- * so each row is built by OR-ing (target_offset << source_offset) for
- * non-error transitions only. Unset fields read back as 0 = S_ERROR.
+ * S_ERROR = 0: error transitions contribute nothing to a row value
+ * since (S_ERROR << offset) == 0 for any offset.
  *
  * State offsets (bit positions within each row):
  *
- *   S_ACCEPT =  6  Start / Accept
  *   S_ERROR  =  0  Invalid byte seen (absorbing)
+ *   S_ACCEPT =  6  Start / Accept
  *   S_TAIL1  = 16  Expect 1 more tail byte  (80-BF -> S_ACCEPT)
  *   S_TAIL2  =  1  Expect 2 more tail bytes (80-BF -> S_TAIL1)
  *   S_E0     = 19  After E0:    next tail must be A0-BF -> S_TAIL1
@@ -89,14 +88,22 @@
 #include <stdbool.h>
 #include <string.h>
 
+#if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && (_M_IX86_FP >= 2))
+#  define UTF8_VALID_HAS_SSE2 1
+#  include <emmintrin.h>
+#elif defined(__aarch64__)
+#  define UTF8_VALID_HAS_NEON 1
+#  include <arm_neon.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define S_ACCEPT  6
 #define S_ERROR   0
-#define S_TAIL2   1
+#define S_ACCEPT  6
 #define S_TAIL1  16
+#define S_TAIL2   1
 #define S_E0     19
 #define S_ED     25
 #define S_F0     11
@@ -105,29 +112,36 @@ extern "C" {
 
 /* clang-format off */
 
-/* Encode one non-error transition: when in state src, go to state tgt. */
-#define T(src, tgt) ((uint32_t)(tgt) << (src))
+#define DFA_ROW(accept,error,tail1,tail2,e0,ed,f0,f1_f3,f4) \
+  ( ((uint32_t)(accept) << S_ACCEPT) \
+  | ((uint32_t)(error)  << S_ERROR) \
+  | ((uint32_t)(tail1)  << S_TAIL1) \
+  | ((uint32_t)(tail2)  << S_TAIL2) \
+  | ((uint32_t)(e0)     << S_E0) \
+  | ((uint32_t)(ed)     << S_ED) \
+  | ((uint32_t)(f0)     << S_F0) \
+  | ((uint32_t)(f1_f3)  << S_F1_F3) \
+  | ((uint32_t)(f4)     << S_F4) )
 
-#define ASCII_ROW T(S_ACCEPT, S_ACCEPT)
-#define LEAD2_ROW T(S_ACCEPT, S_TAIL1)
-#define LEAD3_ROW T(S_ACCEPT, S_TAIL2)
-#define LEAD4_ROW T(S_ACCEPT, S_F1_F3)
-#define E0_ROW    T(S_ACCEPT, S_E0)
-#define ED_ROW    T(S_ACCEPT, S_ED)
-#define F0_ROW    T(S_ACCEPT, S_F0)
-#define F4_ROW    T(S_ACCEPT, S_F4)
-#define ERROR_ROW 0u
+#define ERR S_ERROR
+
+#define ASCII_ROW DFA_ROW(S_ACCEPT,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR)
+#define LEAD2_ROW DFA_ROW(S_TAIL1,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR)
+#define LEAD3_ROW DFA_ROW(S_TAIL2,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR)
+#define LEAD4_ROW DFA_ROW(S_F1_F3,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR)
+#define ERROR_ROW DFA_ROW(ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR)
 
 /*
  * Continuation byte rows.
+ * Columns: ACCEPT  ERROR  TAIL1      TAIL2      E0        ED        F0         F1_F3      F4
  *
- * 80-8F: TAIL1->ACCEPT, TAIL2->TAIL1, ED->TAIL1, F1_F3->TAIL2, F4->TAIL2
- * 90-9F: TAIL1->ACCEPT, TAIL2->TAIL1, ED->TAIL1, F0->TAIL2,    F1_F3->TAIL2
- * A0-BF: TAIL1->ACCEPT, TAIL2->TAIL1, E0->TAIL1, F0->TAIL2,    F1_F3->TAIL2
+ * 80-8F:   ERR     ERR    ->ACCEPT   ->TAIL1    ->ERR     ->TAIL1   ->ERR      ->TAIL2    ->TAIL2
+ * 90-9F:   ERR     ERR    ->ACCEPT   ->TAIL1    ->ERR     ->TAIL1   ->TAIL2    ->TAIL2    ->ERR
+ * A0-BF:   ERR     ERR    ->ACCEPT   ->TAIL1    ->TAIL1   ->ERR     ->TAIL2    ->TAIL2    ->ERR
  */
-#define CONT_80_8F  (T(S_TAIL1,S_ACCEPT) | T(S_TAIL2,S_TAIL1) | T(S_ED,S_TAIL1)  | T(S_F1_F3,S_TAIL2) | T(S_F4,S_TAIL2))
-#define CONT_90_9F  (T(S_TAIL1,S_ACCEPT) | T(S_TAIL2,S_TAIL1) | T(S_ED,S_TAIL1)  | T(S_F0,S_TAIL2)    | T(S_F1_F3,S_TAIL2))
-#define CONT_A0_BF  (T(S_TAIL1,S_ACCEPT) | T(S_TAIL2,S_TAIL1) | T(S_E0,S_TAIL1)  | T(S_F0,S_TAIL2)    | T(S_F1_F3,S_TAIL2))
+#define CONT_80_8F DFA_ROW(ERR,ERR,S_ACCEPT,S_TAIL1,ERR,    S_TAIL1,ERR,     S_TAIL2,S_TAIL2)
+#define CONT_90_9F DFA_ROW(ERR,ERR,S_ACCEPT,S_TAIL1,ERR,    S_TAIL1,S_TAIL2, S_TAIL2,ERR)
+#define CONT_A0_BF DFA_ROW(ERR,ERR,S_ACCEPT,S_TAIL1,S_TAIL1,ERR,    S_TAIL2, S_TAIL2,ERR)
 
 static const uint32_t utf8_dfa[256] = {
   // 00-7F
@@ -200,7 +214,7 @@ static const uint32_t utf8_dfa[256] = {
   [0xDE]=LEAD2_ROW,[0xDF]=LEAD2_ROW,
 
   // E0: first cont A0-BF
-  [0xE0]=E0_ROW,
+  [0xE0]=DFA_ROW(S_E0,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR),
 
   // E1-EC: 3-byte lead
   [0xE1]=LEAD3_ROW,[0xE2]=LEAD3_ROW,[0xE3]=LEAD3_ROW,[0xE4]=LEAD3_ROW,
@@ -208,60 +222,95 @@ static const uint32_t utf8_dfa[256] = {
   [0xE9]=LEAD3_ROW,[0xEA]=LEAD3_ROW,[0xEB]=LEAD3_ROW,[0xEC]=LEAD3_ROW,
 
   // ED: first cont 80-9F
-  [0xED]=ED_ROW,
+  [0xED]=DFA_ROW(S_ED,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR),
 
   // EE-EF: 3-byte lead
   [0xEE]=LEAD3_ROW,[0xEF]=LEAD3_ROW,
 
   // F0: first cont 90-BF
-  [0xF0]=F0_ROW,
+  [0xF0]=DFA_ROW(S_F0,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR),
 
   // F1-F3: 4-byte lead
   [0xF1]=LEAD4_ROW,[0xF2]=LEAD4_ROW,[0xF3]=LEAD4_ROW,
 
   // F4: first cont 80-8F
-  [0xF4]=F4_ROW,
+  [0xF4]=DFA_ROW(S_F4,ERR,ERR,ERR,ERR,ERR,ERR,ERR,ERR),
 
   // F5-FF: invalid
   [0xF5]=ERROR_ROW,[0xF6]=ERROR_ROW,[0xF7]=ERROR_ROW,[0xF8]=ERROR_ROW,
   [0xF9]=ERROR_ROW,[0xFA]=ERROR_ROW,[0xFB]=ERROR_ROW,[0xFC]=ERROR_ROW,
   [0xFD]=ERROR_ROW,[0xFE]=ERROR_ROW,[0xFF]=ERROR_ROW,
 };
+
 /* clang-format on */
 
-#undef T
-#undef S_TAIL2
 #undef S_TAIL1
+#undef S_TAIL2
 #undef S_E0
 #undef S_ED
 #undef S_F0
 #undef S_F1_F3
 #undef S_F4
 
+#undef ERR
+#undef DFA_ROW
 #undef ASCII_ROW
 #undef CONT_80_8F
 #undef CONT_90_9F
 #undef CONT_A0_BF
 #undef LEAD2_ROW
-#undef E0_ROW
 #undef LEAD3_ROW
-#undef ED_ROW
-#undef F0_ROW
 #undef LEAD4_ROW
-#undef F4_ROW
 #undef ERROR_ROW
 
-#if defined(__SSE2__) || defined(_M_X64) || defined(_M_IX86)
-#  include <emmintrin.h>
-#elif defined(__aarch64__)
-#  include <arm_neon.h>
-#endif
+static inline uint32_t utf8_dfa_step(uint32_t state, unsigned char c) {
+  return (utf8_dfa[c] >> state) & 31;
+}
+
+static inline uint32_t utf8_dfa_run(uint32_t state,
+                                    const unsigned char* src,
+                                    size_t len) {
+  for (size_t i = 0; i < len; i++)
+    state = utf8_dfa_step(state, src[i]);
+  return state;
+}
+
+static inline size_t utf8_maximal_subpart(const char* src, size_t len) {
+  const unsigned char* s = (const unsigned char*)src;
+  uint32_t state = S_ACCEPT;
+
+  for (size_t i = 0; i < len; i++) {
+    state = utf8_dfa_step(state, s[i]);
+    switch (state) {
+      case S_ACCEPT:
+        return i + 1;
+      case S_ERROR:
+        return i > 0 ? i : 1;
+    }
+  }
+  return len;
+}
+
+static inline size_t utf8_maximal_prefix(const char* src, size_t len) {
+  const unsigned char* s = (const unsigned char*)src;
+  uint32_t state = S_ACCEPT;
+  size_t prefix = 0;
+
+  for (size_t i = 0; i < len; i++) {
+    state = utf8_dfa_step(state, s[i]);
+    if (state == S_ACCEPT)
+      prefix = i + 1;
+    else if (state == S_ERROR)
+      break;
+  }
+  return prefix;
+}
 
 static inline bool utf8_check_ascii_block16(const unsigned char *s) {
-#if defined(__SSE2__) || defined(_M_X64) || defined(_M_IX86)
+#if defined(UTF8_VALID_HAS_SSE2)
   __m128i v = _mm_loadu_si128((const __m128i *)s);
   return _mm_movemask_epi8(v) == 0;
-#elif defined(__aarch64__)
+#elif defined(UTF8_VALID_HAS_NEON)
   uint8x16_t v = vld1q_u8(s);
   uint8x16_t high = vshrq_n_u8(v, 7);
   return vmaxvq_u8(high) == 0;
@@ -281,39 +330,21 @@ static inline bool utf8_check(const char* src, size_t slen, size_t* cursor) {
 
   // Process 16-byte chunks; skip DFA when state is clean and chunk is ASCII
   while (len >= 16) {
-    if (state != S_ACCEPT || !utf8_check_ascii_block16(s)) {
-      for (size_t i = 0; i < 16; i++)
-        state = (utf8_dfa[s[i]] >> state) & 31;
-    }
+    if (state != S_ACCEPT || !utf8_check_ascii_block16(s))
+      state = utf8_dfa_run(state, s, 16);
     s += 16;
     len -= 16;
   }
 
-  for (size_t i = 0; i < len; i++)
-    state = (utf8_dfa[s[i]] >> state) & 31;
-
+  state = utf8_dfa_run(state, s, len);
   if (state == S_ACCEPT) {
     if (cursor)
       *cursor = slen;
     return true;
   }
 
-  if (!cursor)
-    return false;
-
-  s = (const unsigned char*)src;
-  len = slen;
-
-  size_t off = 0;
-  state = S_ACCEPT;
-  for (size_t i = 0; i < len; i++) {
-    state = (utf8_dfa[s[i]] >> state) & 31;
-    if (state == S_ACCEPT)
-      off = i + 1;
-    else if (state == S_ERROR)
-      break;
-  }
-  *cursor = off;
+  if (cursor)
+    *cursor = utf8_maximal_prefix(src, slen);
   return false;
 }
 
@@ -321,19 +352,98 @@ static inline bool utf8_valid(const char *src, size_t len) {
   return utf8_check(src, len, NULL);
 }
 
-static inline size_t utf8_maximal_subpart(const char* src, size_t len) {
+static inline bool utf8_check_constant(const char* src,
+                                       size_t slen,
+                                       size_t* cursor) {
   const unsigned char* s = (const unsigned char*)src;
+  size_t len = slen;
   uint32_t state = S_ACCEPT;
 
+  // Process 16-byte chunks
+  while (len >= 16) {
+    state = utf8_dfa_run(state, s, 16);
+    s += 16;
+    len -= 16;
+  }
+
+  state = utf8_dfa_run(state, s, len);
+  if (state == S_ACCEPT) {
+    if (cursor)
+      *cursor = slen;
+    return true;
+  }
+
+  if (cursor)
+    *cursor = utf8_maximal_prefix(src, slen);
+  return false;
+}
+
+static inline bool utf8_valid_constant(const char* src, size_t len) {
+  return utf8_check_constant(src, len, NULL);
+}
+
+/*
+ * Streaming API
+ *
+ * utf8_stream_t holds the DFA state between calls. Initialize with
+ * utf8_stream_init() before the first call to utf8_stream_check().
+ *
+ * utf8_stream_check() validates the next chunk of a UTF-8 stream and
+ * returns the number of bytes forming complete, valid sequences. Any
+ * remaining bytes at the end of the chunk (an incomplete sequence
+ * crossing a chunk boundary) must be prepended to the next chunk by
+ * the caller.
+ *
+ * If eof is true and the stream does not end on a sequence boundary,
+ * the input is treated as ill-formed.
+ *
+ * On error, (size_t)-1 is returned and *cursor, if non-NULL, is set
+ * to the byte offset of the start of the invalid or truncated sequence
+ * within src. The stream state is automatically reset to S_ACCEPT so
+ * the caller can resume from the next byte without reinitializing.
+ */
+typedef struct {
+  uint32_t state;
+} utf8_stream_t;
+
+static inline void
+utf8_stream_init(utf8_stream_t *s) {
+  s->state = S_ACCEPT;
+}
+
+static inline size_t utf8_stream_check(utf8_stream_t* s,
+                                       const char* src,
+                                       size_t len,
+                                       bool eof,
+                                       size_t* cursor) {
+  const unsigned char* p = (const unsigned char*)src;
+  uint32_t state = s->state;
+  size_t last_accept = 0;
+
   for (size_t i = 0; i < len; i++) {
-    state = (utf8_dfa[s[i]] >> state) & 31;
-    switch (state) {
-      case S_ACCEPT:
-        return i + 1;
-      case S_ERROR:
-        return i > 0 ? i : 1;
+    state = utf8_dfa_step(state, p[i]);
+    if (state == S_ACCEPT)
+      last_accept = i + 1;
+    else if (state == S_ERROR) {
+      s->state = S_ACCEPT;
+      if (cursor)
+        *cursor = last_accept;
+      return (size_t)-1;
     }
   }
+
+  s->state = state;
+
+  if (state != S_ACCEPT) {
+    if (eof) {
+      s->state = S_ACCEPT;
+      if (cursor)
+        *cursor = last_accept;
+      return (size_t)-1;
+    }
+    return last_accept;
+  }
+
   return len;
 }
 

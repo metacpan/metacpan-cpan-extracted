@@ -11,7 +11,7 @@ use Error::Pure::Utils qw(err_get);
 use MARC::Leader 0.08;
 use MARC::Field008;
 
-our $VERSION = 0.10;
+our $VERSION = 0.13;
 
 sub module_name {
 	my $self = shift;
@@ -126,8 +126,7 @@ sub _process_errors {
 	if (@record_errors) {
 		push @{$self->{'errors'}}, Data::MARC::Validator::Report::Plugin::Errors->new(
 			'errors' => \@record_errors,
-			# TODO process
-			'filters' => [],
+			'filters' => $self->{'filters'},
 			'record_id' => $record_id,
 		);
 	}

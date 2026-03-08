@@ -4,8 +4,9 @@ WriteMakefile(
     NAME              => 'Genealogy::Relationship',
     VERSION_FROM      => 'lib/Genealogy/Relationship.pm',
     PREREQ_PM         => {
-        List::Util      => 0,
-        Lingua::EN::Numbers => 0,
+        List::Util           => 0,
+        Lingua::EN::Numbers  => 0,
+        'Feature::Compat::Class' => 0,
     },
     BUILD_REQUIRES    => {
         Test::More      => 0,
@@ -14,7 +15,7 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Genealogy/Relationship.pm',
     AUTHOR            => 'Dave Cross <dave@perlhacks.com>',
     LICENSE           => 'perl',
-    MIN_PERL_VERSION  => '5.38.0',
+    MIN_PERL_VERSION  => '5.20.0',
     META_MERGE        => {
         'meta-spec' => { version => 2 },
         resources => {

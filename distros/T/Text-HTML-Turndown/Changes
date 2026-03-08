@@ -1,3 +1,8 @@
+0.11 2026-03-05
+    * Properly handle <br> tags within <pre><code>... blocks
+      Pressing enter in such blocks within contentEditable elements in the
+      browser inserts a <br> tag instead of a newline
+
 0.10 2026-01-11
     * Nicely indent generated Markdown tables
     * Simplify handling of <table> tags

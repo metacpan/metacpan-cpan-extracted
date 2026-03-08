@@ -24,7 +24,7 @@ plan skip_all => 'disabled' if $config->{pod_spelling_system}->{skip};
 
 chdir(File::Spec->catdir($FindBin::Bin, File::Spec->updir, File::Spec->updir));
 
-add_stopwords(@{ $config->{pod_spelling_system}->{stopwords} });
+add_stopwords($config->{pod_spelling_system}->{stopwords}->@*);
 add_stopwords(qw(
 Plicease
 stdout

@@ -26,6 +26,7 @@ use Zonemaster::LDNS::RR::GID;
 use Zonemaster::LDNS::RR::GPOS;
 use Zonemaster::LDNS::RR::HINFO;
 use Zonemaster::LDNS::RR::HIP;
+use Zonemaster::LDNS::RR::HTTPS;
 use Zonemaster::LDNS::RR::IPSECKEY;
 use Zonemaster::LDNS::RR::ISDN;
 use Zonemaster::LDNS::RR::KEY;
@@ -66,6 +67,7 @@ use Zonemaster::LDNS::RR::SOA;
 use Zonemaster::LDNS::RR::SPF;
 use Zonemaster::LDNS::RR::SRV;
 use Zonemaster::LDNS::RR::SSHFP;
+use Zonemaster::LDNS::RR::SVCB;
 use Zonemaster::LDNS::RR::TA;
 use Zonemaster::LDNS::RR::TALINK;
 use Zonemaster::LDNS::RR::TKEY;
@@ -132,7 +134,20 @@ This class overloads stringify and comparisons ('""', '<=>' and 'cmp').
 
 =item new($string)
 
-Creates a new RR object of a suitable subclass, given a string representing an RR in common presentation format.
+Creates a new RR object, which is an instance of a suitable subclass of
+L<Zonemaster::LDNS::RR>, given a string representing an RR in common
+presentation format.
+
+If a subclass of L<Zonemaster::LDNS::RR> exists that is suitable for the
+resource record’s type (e.g. L<Zonemaster::LDNS::RR::AAAA>,
+L<Zonemaster::LDNS::RR::TXT>, etc.), then the resulting object is an instance
+of that subclass.
+
+If no such subclass exists (e.g. when passed a resource record of an unknown
+type or a type not yet supported by Zonemaster-LDNS), the resulting object is
+an instance of L<Zonemaster::LDNS::RR>. The instance methods defined in this
+class will still work, but there is no support for structured access to the
+resource record’s RDATA.
 
 =back
 

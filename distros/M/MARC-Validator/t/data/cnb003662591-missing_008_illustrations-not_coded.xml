@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01213cam a2200289 i 4500</leader>
+  <controlfield tag="001">cpk20243662591</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20241218111416.0</controlfield>
+  <controlfield tag="008">211021s1950    xr |||||||||| ||| ||cze||</controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb003662591</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA010</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">551</subfield>
+    <subfield code="x">Geologie. Meteorologie. Klimatologie</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">7</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Kettner, Radim,</subfield>
+    <subfield code="d">1891-1967</subfield>
+    <subfield code="7">jk01060110</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Geologické profily devonem mezi Heřmanovicemi a Vrbnem ve Slezsku /</subfield>
+    <subfield code="c">Radim Kettner</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">nákladem Královské české společnosti nauk,</subfield>
+    <subfield code="c">1950</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">20 stran :</subfield>
+    <subfield code="b">1 mapa</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Věstník Královské české společnosti nauk. Třída mathematicko-přírodovědecká ;</subfield>
+    <subfield code="v">ročník 1949, číslo X</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">regionální geologie</subfield>
+    <subfield code="7">ph125075</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">devon</subfield>
+    <subfield code="7">ph117389</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Vrbno pod Pradědem (Česko : oblast)</subfield>
+    <subfield code="7">ge132358</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Heřmanovice (Česko)</subfield>
+    <subfield code="7">ge334257</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">separáty</subfield>
+    <subfield code="7">fd131867</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Věstník Královské české společnosti nauk.</subfield>
+    <subfield code="p">Třída matematicko-přírodovědecká</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">003662591</subfield>
+  </datafield>
+</record>
+
+</collection>

@@ -1,3 +1,14 @@
+0.002     2026-03-05 21:29:05Z
+
+  - MCP::K8s now inherits from MCP::Server instead of composing it
+  - Backward compatible: ->server returns $self
+  - Lazy permission discovery: RBAC discovery no longer runs at
+    construction time, only when actually needed (first tool call
+    or run_stdio). Allows creating MCP::K8s instances without a
+    cluster connection.
+  - Tool descriptions are updated dynamically after discovery
+    instead of eagerly during BUILD
+
 0.001     2026-02-24 02:12:29Z
 
   - Initial release

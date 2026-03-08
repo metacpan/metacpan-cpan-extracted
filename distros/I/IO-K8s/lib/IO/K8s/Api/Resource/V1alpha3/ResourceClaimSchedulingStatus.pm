@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourceClaimSchedulingStatus;
 # ABSTRACT: ResourceClaimSchedulingStatus contains information about one particular ResourceClaim with "WaitForFirstConsumer" allocation mode.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourceClaimSchedulingStatus - ResourceClaimS
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 name
 

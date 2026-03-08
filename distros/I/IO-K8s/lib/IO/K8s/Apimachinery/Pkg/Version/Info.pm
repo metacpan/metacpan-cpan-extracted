@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Version::Info;
 # ABSTRACT: Info contains versioning information. how we'll want to distribute that information.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s buildDate => Str, 'required';
@@ -35,7 +35,7 @@ IO::K8s::Apimachinery::Pkg::Version::Info - Info contains versioning information
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SUPPORT
 

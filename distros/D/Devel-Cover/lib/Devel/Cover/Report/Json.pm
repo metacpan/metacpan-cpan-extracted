@@ -1,4 +1,4 @@
-# Copyright 2014-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2014-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -10,7 +10,7 @@ package Devel::Cover::Report::Json;
 use strict;
 use warnings;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 use Devel::Cover::DB::IO::JSON;
 # use Devel::Cover::Dumper;  # For debugging
@@ -50,7 +50,7 @@ Devel::Cover::Report::Json - JSON backend for Devel::Cover
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -65,13 +65,9 @@ It is designed to be called from the C<cover> program.
 
  Devel::Cover
 
-=head1 BUGS
-
-Huh?
-
 =head1 LICENCE
 
-Copyright 2014-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2014-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

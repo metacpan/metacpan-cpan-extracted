@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153526;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -83,24 +83,24 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{sq} = {"383390", "Gjakovë",
-"38338", "Prishtinë",
-"38339", "Pejë",
-"38328", "Mitrovicë",};
-$areanames{en} = {"38328", "Mitrovica",
-"38339", "Peja",
-"383290", "Ferizaj",
-"383390", "Gjakova",
-"383280", "Gjilan",
-"38338", "Prishtina",
-"38329", "Prizren",};
-$areanames{sr} = {"383290", "Урошевац",
-"38328", "Косовска\ Митровица",
+$areanames{sr} = {"38328", "Косовска\ Митровица",
+"383290", "Урошевац",
 "38339", "Пећ",
-"38338", "Приштина",
 "38329", "Призрен",
 "383390", "Ђаковица",
+"38338", "Приштина",
 "383280", "Гњилане",};
+$areanames{sq} = {"383390", "Gjakovë",
+"38338", "Prishtinë",
+"38328", "Mitrovicë",
+"38339", "Pejë",};
+$areanames{en} = {"38329", "Prizren",
+"383390", "Gjakova",
+"38338", "Prishtina",
+"383280", "Gjilan",
+"38328", "Mitrovica",
+"38339", "Peja",
+"383290", "Ferizaj",};
 my $timezones = {
                '' => [
                        'Europe/Belgrade'

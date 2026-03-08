@@ -1,4 +1,4 @@
-# Copyright 2017-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2017-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -12,7 +12,7 @@ use warnings;
 
 use Fcntl ":flock";
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 sub new {
   my $class = shift;
@@ -84,7 +84,7 @@ Devel::Cover::DB::IO::Base - Base class for IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -100,13 +100,9 @@ L<Devel::Cover>
 
 =head1 METHODS
 
-=head1 BUGS
-
-Huh?
-
 =head1 LICENCE
 
-Copyright 2017-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2017-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

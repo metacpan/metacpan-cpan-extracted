@@ -28,14 +28,14 @@ my @options =
 &GetOptions(@options) || &usage;
 &usage if $main::opt_h;
 my $port = '/dev/ttyUSB0';
-my $address = 0;
+my $address = 2;
 my $output_file = 'output.png';
 
 $output_file = $ARGV[0] if defined $ARGV[0];
 
 $port = $main::opt_port if defined $main::opt_port;
 $address = $main::opt_address if defined $main::opt_address;
-$Device::GPIB::Controller::debug = 1 if $main::opt_debug;
+Device::GPIB::Controller::enableDebug(1) if $main::opt_debug;
 
 my $d = Device::GPIB::Controller->new($port);
 

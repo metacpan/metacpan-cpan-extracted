@@ -1,0 +1,47 @@
+---
+abstract: 'Strict, Fluent MIME Email Builder'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
+  lib: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mail-Make
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Authen::SASL: '2.2000'
+  Data::UUID: '1.227'
+  Encode: '3.21'
+  Exporter: '5.77'
+  File::Which: '1.27'
+  IPC::Run: '20250809.0'
+  MIME::Base64: '3.16'
+  MIME::QuotedPrint: '3.16'
+  Module::Generic: v1.1.3
+  Net::SMTP: '3.06'
+  URI::Escape::XS: '0.14'
+  bytes: '0'
+  constant: '0'
+  parent: '0'
+  perl: '5.028000'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/Mail-Make/issues
+  repository: https://gitlab.com/jackdeguest/Mail-Make
+version: v0.21.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

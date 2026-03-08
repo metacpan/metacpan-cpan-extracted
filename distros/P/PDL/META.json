@@ -25,7 +25,7 @@
             "ExtUtils::MakeMaker" : "0",
             "ExtUtils::ParseXS" : "3.21",
             "File::Path" : "0",
-            "Pod::Select" : "0"
+            "Pod::Simple" : "3.40"
          }
       },
       "configure" : {
@@ -51,7 +51,7 @@
             "Filter::Util::Call" : "0",
             "List::Util" : "1.33",
             "Math::Complex" : "0",
-            "Pod::Select" : "0",
+            "Pod::Simple" : "3.40",
             "Scalar::Util" : "0",
             "Storable" : "1.03",
             "Text::Balanced" : "2.05",
@@ -83,6 +83,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.100",
+   "version" : "2.103",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumEgressGatewayPolicy;
 # ABSTRACT: Cilium egress gateway policy
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumegressgatewaypolicies';
@@ -23,7 +23,7 @@ IO::K8s::Cilium::V2::CiliumEgressGatewayPolicy - Cilium egress gateway policy
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

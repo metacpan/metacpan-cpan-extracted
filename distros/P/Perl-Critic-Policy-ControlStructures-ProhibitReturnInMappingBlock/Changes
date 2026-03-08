@@ -1,0 +1,6 @@
+Revision history for Perl extension Perl-Critic-Policy-ControlStructures-ProhibitReturnInMappingBlock
+
+0.01 2026-03-05T09:37:26Z
+
+    - Initial release, forked from Perl-Critic-Policy-ControlStructures-ProhibitReturnInDoBlock by utgwkk
+    - Detect "return" in map, grep, and sort blocks

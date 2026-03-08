@@ -3,7 +3,7 @@ package Test::Nginx::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 use base 'Exporter';
 
@@ -25,6 +25,7 @@ use Carp qw( croak );
 
 our $ConfigVersion;
 our $FilterHttpConfig;
+our $RandPorts;
 my $LoadedIPCRun;
 
 our $NoLongString = undef;
@@ -42,11 +43,16 @@ our $UseRr = $ENV{TEST_NGINX_USE_RR};
 
 our $Verbose = $ENV{TEST_NGINX_VERBOSE};
 
+our $ld_preload = $ENV{LD_PRELOAD};
+
+our $ValgrindExitOnFirstErr = $ENV{TEST_NGINX_VALGRIND_EXIT_ON_FIRST_ERR};
+
 our $LatestNginxVersion = 0.008039;
 
 our $NoNginxManager = $ENV{TEST_NGINX_NO_NGINX_MANAGER} || 0;
 our $Profiling = 0;
 
+sub expand_env_in_text ($$$);
 sub use_http2 ($);
 sub use_http3 ($);
 
@@ -222,7 +228,9 @@ sub gen_rand_port (;$$) {
             LocalAddr => $ServerAddr,
             LocalPort => $port,
             Proto => 'tcp',
+            Listen => 5,
             Timeout => 0.1,
+            Reuse => 1,
         );
 
         if (defined $sock) {
@@ -345,6 +353,7 @@ sub use_hup() {
 }
 
 our @CleanupHandlers;
+our @TestCleanupHandlers;
 our @BlockPreprocessors;
 
 our $Randomize              = $ENV{TEST_NGINX_RANDOMIZE};
@@ -484,6 +493,7 @@ sub master_process_enabled (@) {
 }
 
 our @EXPORT = qw(
+    expand_env_in_text
     use_http2
     use_http3
     env_to_nginx
@@ -504,9 +514,11 @@ our @EXPORT = qw(
     stap_out_fname
     bail_out
     add_cleanup_handler
+    add_test_cleanup_handler
     access_log_data
     error_log_data
     setup_server_root
+    run_customer_init_script
     write_config_file
     get_canon_version
     get_nginx_version
@@ -518,6 +530,7 @@ our @EXPORT = qw(
     $ServerPortForClient
     $ServerPort
     $NginxVersion
+    $PcreVersion
     $PidFile
     $ServRoot
     $ConfFile
@@ -571,6 +584,7 @@ our $CheckErrorLog;
 our $CheckShutdownErrorLog;
 
 our $NginxVersion;
+our $PcreVersion;
 our $NginxRawVersion;
 our $OpenSSLVersion;
 
@@ -598,6 +612,7 @@ our $HtmlDir    = File::Spec->catfile($ServRoot, 'html');
 our $ConfDir    = File::Spec->catfile($ServRoot, 'conf');
 our $ConfFile   = File::Spec->catfile($ConfDir, 'nginx.conf');
 our $PidFile    = File::Spec->catfile($LogDir, 'nginx.pid');
+our $CacheDir   = File::Spec->catfile($ServRoot, 'cache');
 
 sub parse_time ($) {
     my $tm = shift;
@@ -625,6 +640,10 @@ sub server_root () {
 
 sub add_cleanup_handler ($) {
    unshift @CleanupHandlers, shift;
+}
+
+sub add_test_cleanup_handler ($) {
+   unshift @TestCleanupHandlers, shift;
 }
 
 sub bail_out (@) {
@@ -724,6 +743,17 @@ sub kill_process ($$$) {
     }
 }
 
+sub cleanup_test ($) {
+    my $block = shift;
+    if ($Verbose) {
+        warn "cleaning up test ", $block->name;
+    }
+
+    for my $hdl (@TestCleanupHandlers) {
+       $hdl->($block);
+    }
+}
+
 sub cleanup () {
     if ($Verbose) {
         warn "cleaning up everything";
@@ -797,7 +827,9 @@ sub check_prev_block_shutdown_error_log () {
     my $name = $block->name;
     my $dry_run;
 
-    if (defined $block->shutdown_error_log) {
+    if (defined($block->shutdown_error_log)
+        || defined($block->no_shutdown_error_log))
+    {
         if ($UseHup) {
             $dry_run = 1;
         }
@@ -817,6 +849,8 @@ sub run_tests () {
         #warn "[INFO] Using nginx version $NginxVersion ($NginxRawVersion)\n";
     }
 
+    $PcreVersion = get_pcre_version();
+
     if (!defined $ENV{TEST_NGINX_SERVER_PORT}) {
         $ENV{TEST_NGINX_SERVER_PORT} = $ServerPort;
     }
@@ -828,6 +862,7 @@ sub run_tests () {
 
         $block->set_value("name", $0 . " " . $block->name);
         run_test($block);
+        cleanup_test($block);
 
         $PrevBlock = $block;
     }
@@ -858,7 +893,7 @@ sub setup_server_root ($) {
             }}, $ServRoot);
 
         } else {
-            remove_tree($HtmlDir, $LogDir);
+            remove_tree($CacheDir, $HtmlDir, $LogDir);
             rmdir $ServRoot or
                 bail_out "Can't remove $ServRoot (not empty?): $!";
         }
@@ -887,6 +922,18 @@ sub setup_server_root ($) {
 
     mkdir $ConfDir or
         bail_out "Failed to do mkdir $ConfDir\n";
+}
+
+sub run_customer_init_script ($) {
+    my $block = shift;
+    my $name = $block->name;
+
+    if ($block->post_setup_server_root) {
+        eval $block->post_setup_server_root;
+        if ($@) {
+            bail_out("$name - post_setup_server_root failed: $@");
+        }
+    }
 }
 
 sub write_user_files ($$) {
@@ -949,7 +996,7 @@ sub write_user_files ($$) {
                 }
             }
 
-            $body = expand_env_in_text($body, $name, $rand_ports);
+            $body = expand_env_in_text $body, $name, $rand_ports;
 
             open my $out, ">$path" or
                 bail_out "$name - Cannot open $path for writing: $!\n";
@@ -987,7 +1034,7 @@ sub write_config_file ($$$) {
         master_off();
     }
 
-    $http_config = expand_env_in_text($http_config, $name, $rand_ports);
+    $http_config = expand_env_in_text $http_config, $name, $rand_ports;
 
     if (!defined $config) {
         $config = '';
@@ -1021,17 +1068,17 @@ sub write_config_file ($$$) {
     if ($LoadModules) {
         my @modules = map { "load_module $_;" } grep { $_ } split /\s+/, $LoadModules;
         if (@modules) {
-            $main_config .= join " ", @modules;
+            $main_config = join " ", @modules, $main_config;
         }
     }
 
-    $main_config = expand_env_in_text($main_config, $name, $rand_ports);
+    $main_config = expand_env_in_text $main_config, $name, $rand_ports ;
 
     if (!defined $post_main_config) {
         $post_main_config = '';
     }
 
-    $post_main_config = expand_env_in_text($post_main_config, $name, $rand_ports);
+    $post_main_config = expand_env_in_text $post_main_config, $name, $rand_ports;
 
     if ($CheckLeak || $Benchmark) {
         $LogLevel = 'warn';
@@ -1041,6 +1088,8 @@ sub write_config_file ($$$) {
     if (!$err_log_file) {
         $err_log_file = $ErrLogFile;
     }
+
+    $err_log_file = expand_env_in_text $err_log_file, $name, $rand_ports;
 
     if (!defined $server_name) {
         $server_name = $ServerName;
@@ -1074,6 +1123,9 @@ _EOC_
     }
 
     my $listen_opts = '';
+    # To maintain compatibility with old test cases, the $http2_directive
+    # and listen directive need to be placed on the same line.
+    my $http2_directive = '';
 
     $ServerConfigHttp3 = '';
     if (use_http3($block)) {
@@ -1090,7 +1142,11 @@ _EOC_
         }
 
     } elsif (use_http2($block)) {
-        $listen_opts .= " http2";
+        if ($NginxVersion >= "1.019009") {
+            $http2_directive = "http2 on;";
+        } else {
+            $listen_opts .= " http2";
+        }
     }
 
     if ($ReusePort) {
@@ -1111,6 +1167,33 @@ _EOC_
         $keepalive_timeout = int($keepalive_timeout_sec * 1000);
     }
 
+    my $nginx_V = `$NginxBinary -V 2>&1`;
+    my $fastcgi_temp_path = "fastcgi_temp_path $ServRoot/fastcgi_temp;";
+    my $scgi_temp_path = "scgi_temp_path $ServRoot/scgi_temp;";
+    my $uwsgi_temp_path = "uwsgi_temp_path $ServRoot/uwsgi_temp;";
+    my $proxy_temp_path = "proxy_temp_path $ServRoot/proxy_temp;";
+    my $client_body_temp_path = "client_body_temp_path $ServRoot/client_body_temp;";
+
+    if ($nginx_V =~ /--without-http_fastcgi_module/) {
+        $fastcgi_temp_path = '';
+    }
+
+    if ($nginx_V =~ /--without-http_scgi_module/) {
+        $scgi_temp_path = '';
+    }
+
+    if ($nginx_V =~ /--without-http_uwsgi_module/) {
+        $uwsgi_temp_path = '';
+    }
+
+    if ($http_config =~ /\bproxy_temp_path\b/) {
+        $proxy_temp_path ='';
+    }
+
+    if ($http_config =~ /\bclient_body_temp_path\b/) {
+        $client_body_temp_path ='';
+    }
+
     print $out <<_EOC_;
 #env LUA_PATH;
 #env LUA_CPATH;
@@ -1118,7 +1201,7 @@ _EOC_
 $main_config
 
 http {
-    access_log $AccLogFile;
+    access_log $AccLogFile; $client_body_temp_path $proxy_temp_path $fastcgi_temp_path $scgi_temp_path $uwsgi_temp_path
     #access_log off;
 
     default_type text/plain;
@@ -1126,10 +1209,10 @@ http {
 
 $http_config
     server {
-        listen          $ServerPort$listen_opts;
+        listen          $ServerPort$listen_opts;$http2_directive
 _EOC_
 
-    # when using http3, wo both listen on tcp for http and udp for http3
+    # when using http3, we both listen on tcp for http and udp for http3
     if (use_http3($block)) {
         my $h3_listen_opts = $listen_opts;
         if ($h3_listen_opts !~ /\breuseport\b/) {
@@ -1137,7 +1220,7 @@ _EOC_
         }
 
         print $out <<_EOC_;
-        listen          $ServerPort$h3_listen_opts http3;
+        listen          $ServerPort$h3_listen_opts quic;
 _EOC_
     } else {
         print $out <<_EOC_;
@@ -1175,7 +1258,7 @@ _EOC_
     if ($UseHup) {
         print $out <<_EOC_;
     server {
-        listen          $ServerPort$listen_opts;
+        listen          $ServerPort$listen_opts; $http2_directive
         server_name     'Test-Nginx';
 
         location = /ver {
@@ -1199,6 +1282,16 @@ events {
 
     worker_connections  $WorkerConnections;
 _EOC_
+
+    if (defined $block->no_mockeagain) {
+        if (defined $ld_preload) {
+            my $new_ld_preload = $ld_preload;
+            $new_ld_preload =~ s/[^ ]+mockeagain.so//;
+            $ENV{LD_PRELOAD} = $new_ld_preload;
+        }
+    } else {
+        $ENV{LD_PRELOAD} = $ld_preload;
+    }
 
     if ($EventType) {
         print $out <<_EOC_;
@@ -1247,7 +1340,7 @@ sub get_nginx_version () {
         $OpenSSLVersion = get_canon_version_for_OpenSSL($1, $2, $3, $4);
     }
 
-    if ($out =~ m{(?:nginx|openresty)[^/]*/(\d+)\.(\d+)\.(\d+)}s) {
+    if ($out =~ m{(?:nginx|openresty+?)[^/]*/(\d+)\.(\d+)\.(\d+)}s) {
         $NginxRawVersion = "$1.$2.$3";
         return get_canon_version($1, $2, $3);
     }
@@ -1258,6 +1351,34 @@ sub get_nginx_version () {
     }
 
     bail_out("Failed to parse the output of \"nginx -V\": $out\n");
+}
+
+sub get_pcre_version () {
+    my $out = `$NginxBinary -V 2>&1`;
+    if (!defined ($out) || $? != 0) {
+        $out //= "";
+        bail_out("Failed to get the pcre version of the Nginx in PATH: $out");
+    }
+
+    my $ver = 0;
+    my $without_pcre2 = 0;
+    if ($out =~ /nginx version: .*\/(\d)\.(\d+)(?:\.\d+)+/) {
+        $ver = $1 * 100 + $2;
+    }
+
+    if ($out =~ /--without-pcre2/) {
+        $without_pcre2 = 1;
+    }
+
+    if ($ver >= 125 && $without_pcre2 == 0) {
+        return 2;
+
+    } elsif ($out =~ /pcre/) {
+        return 1;
+
+    } else {
+        return 0;
+    }
 }
 
 sub get_pid_from_pidfile ($) {
@@ -1303,7 +1424,7 @@ sub test_config_version ($$) {
         my $http_protocol = "http";
 
         if (use_http2($block)) {
-            $extra_curl_opts .= ' --http2 --http2-prior-knowledge';
+            $extra_curl_opts .= ' --http2-prior-knowledge';
         }
 
         #server Test-Nginx only listen on http(tcp port) when http3 is enabled
@@ -1501,11 +1622,33 @@ sub run_test ($) {
         undef $FirstTime;
     }
 
+    # add test case name to the asan log name.
+    if (defined($ENV{ASAN_OPTIONS})) {
+        if (!defined $ENV{ORI_ASAN_OPTIONS}) {
+            $ENV{ORI_ASAN_OPTIONS} = $ENV{ASAN_OPTIONS};
+        }
+        my $asan_opts = $ENV{ORI_ASAN_OPTIONS};
+        my $tag = $name;
+        if ($tag =~ /t\/([-_a-z0-9A-Z\/]+)\.t TEST (\d+):/) {
+            $tag = "$1-t$2";
+            $tag =~ s#/#-#g;
+            if ($asan_opts =~ /log_path=([^,]+)/) {
+                my $log_path = $1;
+                $asan_opts =~ s/log_path=[^,]+,?//;
+                $asan_opts .= ",log_path=$log_path-$tag";
+                $ENV{ASAN_OPTIONS} = $asan_opts;
+            }
+
+        } else {
+            warn "unknown log name: $tag";
+        }
+    }
     my $rand_ports = {};
+    $RandPorts = $rand_ports;
 
     my $config = $block->config;
 
-    $config = expand_env_in_text($config, $name, $rand_ports);
+    $config = expand_env_in_text $config, $name, $rand_ports;
 
     my $dry_run = 0;
     my $should_restart = 1;
@@ -1818,6 +1961,7 @@ sub run_test ($) {
                     }
 
                     setup_server_root($first_time);
+                    run_customer_init_script($block);
                     write_user_files($block, $rand_ports);
                     write_config_file($block, $config, $rand_ports);
 
@@ -1924,6 +2068,7 @@ start_nginx:
 
             #warn "*** Restarting the nginx server...\n";
             setup_server_root($first_time);
+            run_customer_init_script($block);
             write_user_files($block, $rand_ports);
             write_config_file($block, $config, $rand_ports);
             #warn "nginx binary: $NginxBinary";
@@ -1942,9 +2087,36 @@ start_nginx:
             my $cmd;
 
             if ($NginxVersion >= 0.007053) {
-                $cmd = "$NginxBinary -p $ServRoot/ -c $ConfFile > /dev/null";
+                $cmd = "$NginxBinary -e $ServRoot/logs/error.log -p $ServRoot/ -c $ConfFile > /dev/null";
             } else {
                 $cmd = "$NginxBinary -c $ConfFile > /dev/null";
+            }
+
+            my $LD_PRELOAD = $ENV{LD_PRELOAD};
+            if (defined $ENV{TEST_NGINX_LD_PRELOAD}) {
+                if (defined $LD_PRELOAD) {
+                    $LD_PRELOAD = "$ENV{TEST_NGINX_LD_PRELOAD} $LD_PRELOAD";
+                } else {
+                    $LD_PRELOAD = $ENV{TEST_NGINX_LD_PRELOAD};
+                }
+
+                $cmd = qq!LD_PRELOAD="$LD_PRELOAD" $cmd!;
+            }
+
+            my $mockeagain = $ENV{MOCKEAGAIN};
+            if (defined($mockeagain) && $mockeagain ne ""
+                && defined($LD_PRELOAD) && $LD_PRELOAD =~ /mockeagain.so/)
+            {
+                my $t = $ENV{TEST_NGINX_EVENT_TYPE};
+                my $pp = $ENV{TEST_NGINX_POSTPONE_OUTPUT};
+
+                if (!defined($t) || $t ne "poll") {
+                    warn "Warning: $name TEST_NGINX_EVENT_TYPE should be poll\n";
+                }
+            }
+
+            if (defined $block->suppress_stderr) {
+                $cmd .= " 2> /dev/null";
             }
 
             if ($UseRr) {
@@ -1955,7 +2127,17 @@ start_nginx:
                 my $opts;
 
                 if ($UseValgrind =~ /^\d+$/) {
-                    $opts = "--tool=memcheck --leak-check=full --show-possibly-lost=no";
+                    $opts = "--tool=memcheck --leak-check=full --keep-debuginfo=yes --show-possibly-lost=no";
+                    if ($ValgrindExitOnFirstErr) {
+                        my $help_out = `valgrind --help`;
+                        if ($help_out =~ /exit-on-first-error/) {
+                            $opts .= " --exit-on-first-error=yes --error-exitcode=1";
+
+                        } else {
+                            warn "WARNING: valgrind does not support "
+                               . "--exit-on-first-error option\n";
+                        }
+                    }
 
                     if (-f 'valgrind.suppress') {
                         $cmd = "valgrind --num-callers=100 -q $opts --gen-suppressions=all --suppressions=valgrind.suppress $cmd";
@@ -2215,7 +2397,7 @@ request:
 
             my $target = $block->tcp_listen;
 
-            $target = expand_env_in_text($target, $name, $rand_ports);
+            $target = expand_env_in_text $target, $name, $rand_ports;
 
             my $reply = $block->tcp_reply;
             if (!defined $reply && !defined $block->tcp_shutdown) {
@@ -2353,8 +2535,26 @@ request:
                         warn "TCP server reading request...\n";
                     }
 
+                    my $timeout = 0.1;
+                    my $select = IO::Select->new($client);
+                    if (defined($block->tcp_query_auto_timeout)) {
+                        $client->blocking(0);
+                        if ($block->tcp_query_auto_timeout ne "") {
+                            $timeout = $block->tcp_query_auto_timeout + 0;
+                        }
+                    }
+
                     while (1) {
                         my $b;
+                        if (defined($block->tcp_query_auto_timeout)) {
+                            if (!$select->can_read($timeout)) {
+                                if ($Verbose) {
+                                    warn "tcp_query read timeout\n";
+                                }
+                                last;
+                            }
+                        }
+
                         my $ret = $client->recv($b, 4096);
                         if (!defined $ret) {
                             die "failed to receive: $!\n";
@@ -2370,22 +2570,33 @@ request:
                         # flush read data to the file as soon as possible:
 
                         if ($tcp_query_file) {
-                            open my $out, ">$tcp_query_file"
-                                or die "cannot open $tcp_query_file for writing: $!\n";
+                            my $tmpfile = "$tcp_query_file.tmp";
+                            open my $out, ">$tmpfile"
+                                or die "cannot open $tmpfile for writing: $!\n";
 
                             if ($Verbose) {
-                                warn "writing received data [$buf] to file $tcp_query_file\n";
+                                warn "writing received data [$buf] to file $tmpfile\n";
                             }
 
                             print $out $buf;
                             close $out;
+                            # rename is atomic on Unix
+                            rename $tmpfile, $tcp_query_file
+                                or die "cannot rename $tmpfile to $tcp_query_file: $!\n";
                         }
 
-                        if (!$req_len || length($buf) >= $req_len) {
+                        if (!defined($block->tcp_query_auto_timeout) && (!$req_len || length($buf) >= $req_len)) {
                             if ($Verbose) {
+                                $req_len //= 0;
                                 warn "len: ", length($buf), ", req len: $req_len\n";
                             }
                             last;
+                        }
+                    }
+
+                    if (!$tcp_query_file) {
+                        if ($Verbose) {
+                            warn "received data [$buf]\n";
                         }
                     }
                 }
@@ -2483,6 +2694,9 @@ request:
             }
 
             my $target = $block->udp_listen;
+
+            $target = expand_env_in_text $target, $name, $rand_ports;
+
             if ($target =~ /^\d+$/) {
                 my $port = $target;
 
@@ -2550,15 +2764,19 @@ request:
                 }
 
                 if ($udp_query_file) {
-                    open my $out, ">$udp_query_file"
-                        or die "cannot open $udp_query_file for writing: $!\n";
+                    my $tmpfile = "$udp_query_file.tmp";
+                    open my $out, ">$tmpfile"
+                        or die "cannot open $tmpfile for writing: $!\n";
 
                     if ($Verbose) {
-                        warn "writing received data [$buf] to file $udp_query_file\n";
+                        warn "writing received data [$buf] to file $tmpfile\n";
                     }
 
                     print $out $buf;
                     close $out;
+                    # rename is atomic on UNIX
+                    rename $tmpfile, $udp_query_file
+                        or die "cannot rename $tmpfile to $udp_query_file: $!\n";
                 }
 
                 my $delay = parse_time($block->udp_reply_delay);
@@ -2880,7 +3098,6 @@ sub use_http2 ($) {
         my $pat = qr{(proxy_pass .*:\$(server_port|TEST_NGINX_SERVER_PORT)
                     | ngx.req.raw_header
                     | lua_check_client_abort
-                    | ngx.location.capture
                     | ngx.req.socket
                     | ngx.req.read_body)}x;
         if (defined $block->config) {

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153525;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -71,15 +71,15 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"21679", "Ariana\/Ben\ Arous\/Manouba\/Tunis",
-"21673", "Chebba\/Hamman\-Sousse\/Khenis\/Mahdia\/Monastir\/Sousse",
-"21676", "Gafsa\/Sidi\ Bouzid\/Tozeur",
-"21671", "Ariana\/Ben\ Arous\/Carthage\/Tunis",
-"21675", "Gabes\/Kebili\/Medenine\/Tataouine",
+$areanames{en} = {"21678", "Beja\/Jendouba\/Kef\/La\ Kef\/Siliana\/Tabarka",
 "21674", "Agareb\/Sfax",
+"21673", "Chebba\/Hamman\-Sousse\/Khenis\/Mahdia\/Monastir\/Sousse",
+"21675", "Gabes\/Kebili\/Medenine\/Tataouine",
 "21672", "Bizerte\/Nabeul\/Zaghouan",
+"21679", "Ariana\/Ben\ Arous\/Manouba\/Tunis",
+"21671", "Ariana\/Ben\ Arous\/Carthage\/Tunis",
 "21677", "Haffouz\/Kairouan\/Kasserine",
-"21678", "Beja\/Jendouba\/Kef\/La\ Kef\/Siliana\/Tabarka",
+"21676", "Gafsa\/Sidi\ Bouzid\/Tozeur",
 "21670", "Ben\ Arous",};
 my $timezones = {
                '' => [

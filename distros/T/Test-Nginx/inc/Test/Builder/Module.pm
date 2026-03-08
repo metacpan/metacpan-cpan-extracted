@@ -8,7 +8,7 @@ use Test::Builder;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '1.302162';
+our $VERSION = '1.302191';
 
 
 #line 73
@@ -71,5 +71,7 @@ sub import_extra { }
 sub builder {
     return Test::Builder->new;
 }
+
+#line 180
 
 1;

@@ -6,6 +6,7 @@ use Carp;
 use Try::Tiny;
 
 has 'name' => (is => 'ro', isa => 'Str', required => 1, trigger => \&_request);
+has 'create' => (is => 'ro', isa => 'Int', default => 0);
 has 'id' => (is => 'ro', isa => 'Int', lazy_build => 1);
 has '_sequence' => (is => 'rw', isa => 'Int');
 has '_conn' => (is => 'ro', required => 1);
@@ -34,7 +35,8 @@ sub _request {
 
     # Place the request directly after the name is set, we get the reply later
     my $request = $self->_conn->intern_atom(
-        1, # do not create the atom if it does not exist
+        # do not create the atom if it does not exist and not asked explicitly
+        $self->create ? 0 : 1,
         length($self->name),
         $self->name
     );

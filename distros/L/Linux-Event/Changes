@@ -1,5 +1,11 @@
 Revision history for Linux-Event
 
+0.009  2026-002-28
+  - fixed error where perl's scientific notation stringifies
+
+0.008  2026-002-28
+  - fixed error where _rearm_timer cannot comput remaining duration and returns a non number
+
 0.007  2026-02-22
   - Fix: $loop->waker now installs an internal read watcher that drains the wakeup fd.
     This makes $waker->signal (and $loop->stop after waker creation) reliably wake a

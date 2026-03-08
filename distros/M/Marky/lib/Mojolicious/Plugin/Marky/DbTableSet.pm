@@ -1,5 +1,5 @@
 package Mojolicious::Plugin::Marky::DbTableSet;
-$Mojolicious::Plugin::Marky::DbTableSet::VERSION = '0.0602';
+$Mojolicious::Plugin::Marky::DbTableSet::VERSION = '0.0604';
 #ABSTRACT: Mojolicious::Plugin::Marky::DbTableSet - querying one database table
 
 use Mojo::Base 'Mojolicious::Plugin';
@@ -131,10 +131,10 @@ sub _do_query {
     my $p = $c->param('p');
     my $where = $c->param('where');
     my $n = $c->param('n');
-    my $sort_by = $c->param("${db}_sort_by");
-    my $sort_by2 = $c->param("${db}_sort_by2");
-    my $sort_by3 = $c->param("${db}_sort_by3");
-    my $sort_by4 = $c->param("${db}_sort_by4");
+    my $sort_by = $c->param("sort_by");
+    my $sort_by2 = $c->param("sort_by2");
+    my $sort_by3 = $c->param("sort_by3");
+    my $sort_by4 = $c->param("sort_by4");
 
     my $delterm = $c->param('delterm');
     if ($delterm && $q)
@@ -380,7 +380,7 @@ Mojolicious::Plugin::Marky::DbTableSet - Mojolicious::Plugin::Marky::DbTableSet 
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 SYNOPSIS
 
@@ -397,7 +397,7 @@ Mojolicious::Plugin::Marky::DbTableSet - querying one database table
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 REGISTER
 

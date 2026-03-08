@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::HostPathVolumeSource;
 # ABSTRACT: Represents a host path mapped into a pod. Host path volumes do not support ownership management or SELinux relabeling.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s path => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::HostPathVolumeSource - Represents a host path mapped int
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 path
 

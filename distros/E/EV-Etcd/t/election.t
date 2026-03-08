@@ -53,7 +53,7 @@ my $t1 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
 SKIP: {
-    skip "no lease id", 20 unless $lease_id;
+    skip "no lease id", 15 unless $lease_id;
 
     # Test 3-6: Campaign for leadership
     $client->election_campaign($election_name, $lease_id, "initial-value", sub {
@@ -79,7 +79,7 @@ SKIP: {
     EV::run;
 
     SKIP: {
-        skip "no leader key", 16 unless $leader_key;
+        skip "no leader key", 11 unless $leader_key;
 
         # Test 7-9: Get current leader
         $client->election_leader($election_name, sub {

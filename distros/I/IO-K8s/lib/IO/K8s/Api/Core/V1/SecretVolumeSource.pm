@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SecretVolumeSource;
 # ABSTRACT: Adapts a Secret into a volume. The contents of the target Secret's Data field will be presented in a volume as files using the keys in the Data field as the file names. Secret volumes support ownership management and SELinux relabeling.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s defaultMode => Int;
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::SecretVolumeSource - Adapts a Secret into a volume. The 
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 defaultMode
 

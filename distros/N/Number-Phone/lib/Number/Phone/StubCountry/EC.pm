@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153522;
+our $VERSION = 1.20260306161712;
 
 my $formatters = [
                 {
@@ -73,13 +73,13 @@ my $validators = {
                 'voip' => '[2-7]890\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"59327", "Azuay\/Cañar\/Morona\ Santiago",
-"59345", "Manabí\/Los\ Ríos\/Galápagos",
-"59322", "Pichincha",
-"59344", "Guayas",
-"59347", "Loja\/El\ Oro\/Zamora\ Chinchipe",
+$areanames{en} = {"59345", "Manabí\/Los\ Ríos\/Galápagos",
 "59326", "Carchi\/Imbabura\/Esmeraldas\/Sucumbíos\/Napo\/Orellana",
-"59323", "Cotopaxi\/Tungurahua\/Chimborazo\/Bolívar\/Pastaza",};
+"59347", "Loja\/El\ Oro\/Zamora\ Chinchipe",
+"59344", "Guayas",
+"59323", "Cotopaxi\/Tungurahua\/Chimborazo\/Bolívar\/Pastaza",
+"59327", "Azuay\/Cañar\/Morona\ Santiago",
+"59322", "Pichincha",};
 my $timezones = {
                '' => [
                        'America/Guayaquil',

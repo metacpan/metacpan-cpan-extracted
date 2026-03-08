@@ -1,4 +1,4 @@
-# Copyright 2010-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2010-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -78,13 +78,9 @@ Build utility functions for Devel::Cover.
 
 =head1 METHODS
 
-=head1 BUGS
-
-Huh?
-
 =head1 LICENCE
 
-Copyright 2001-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2001-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01564nam a22003371i 4500</leader>
+  <controlfield tag="001">nos190241911001</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20200814133116.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">001211s1903    xr            000 | fre  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000344109</subfield>
+    <subfield code="z">cnb002025043</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="q">(Brožováno)</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">KLG001</subfield>
+    <subfield code="d">ABA001</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="041" ind1="0" ind2=" ">
+    <subfield code="a">fre</subfield>
+    <subfield code="a">cze</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Scribe, Eugène,</subfield>
+    <subfield code="d">1791-1861</subfield>
+    <subfield code="7">jn19981002121</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="3">
+    <subfield code="a">Le verre d' eau, ou, Les effets et les causes :</subfield>
+    <subfield code="b">comédie en cinq actes /</subfield>
+    <subfield code="c">par Scribe ; pro střední školy české s poznámkami a slovníčkem vydal Josef Kubín</subfield>
+  </datafield>
+  <datafield tag="246" ind1="3" ind2="0">
+    <subfield code="a">Effets et les causes</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Telč :</subfield>
+    <subfield code="b">Knihkupectví a nakladatelství Emila Šolce,</subfield>
+    <subfield code="c">[1903?]</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">115 s. :</subfield>
+    <subfield code="b">43 s. slovníček ;</subfield>
+    <subfield code="c">8°</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Školní knihovna děl německých a francouzských : výbor z německých a francouzských spisovatelů doby nové k četbě školní i domácí na školách středních dle požadavků nových učebních osnov ;</subfield>
+    <subfield code="v">svazek VIII.</subfield>
+  </datafield>
+  <datafield tag="505" ind1="0" ind2=" ">
+    <subfield code="a">Poznámky a slovníček ke Scribenově komedii Le verre d' éau</subfield>
+  </datafield>
+  <datafield tag="546" ind1=" " ind2=" ">
+    <subfield code="a">Částečně český text</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Kubín, Josef Štefan,</subfield>
+    <subfield code="d">1864-1965</subfield>
+    <subfield code="7">jk01070421</subfield>
+    <subfield code="4">cwt</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Školní knihovna děl německých a francouzských</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">https://kramerius.svkhk.cz/uuid/uuid:33cfecca-56e4-40c6-8755-dceaa11dc7f0</subfield>
+    <subfield code="y">Digitalizovaný dokument (SVK Hradec Králové)</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">Emil Šolc</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000344109</subfield>
+  </datafield>
+</record>
+
+</collection>

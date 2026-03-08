@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/Test/Mockingbird.pm
 LICENSE
 Makefile.PL
@@ -16,7 +17,11 @@ t/gv.t
 t/inject.t
 t/manifest.t
 t/mock.t
+t/mock_scoped.t
 t/object.t
+t/pod-cm.t
+t/pod.t
+t/shorthand.t
 t/spy.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

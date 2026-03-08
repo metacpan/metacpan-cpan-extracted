@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::HelmChart;
 # ABSTRACT: K3s Helm chart deployment
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject
     api_version     => 'helm.cattle.io/v1',
     resource_plural => 'helmcharts';
@@ -23,7 +23,7 @@ IO::K8s::K3s::V1::HelmChart - K3s Helm chart deployment
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

@@ -11,11 +11,11 @@ use URI::Escape qw(uri_escape_utf8);
 
 our @EXPORT = qw(geocode parse);
 
-our $VERSION = "v2.6.3";
+our $VERSION = "v2.6.6";
 
 =head1 NAME
 
-L<Google::GeoCoder::Smart|https://metacpan.org/pod/Google::GeoCoder::Smart> - Simple Google Geocoding API client
+Google::GeoCoder::Smart - Simple Google Geocoding API client
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ L<Google::GeoCoder::Smart|https://metacpan.org/pod/Google::GeoCoder::Smart> - Si
 
 =head1 DESCRIPTION
 
-This module provides a lightweight wrapper around the Google Geocoding API
+L<Google::GeoCoder::Smart|https://metacpan.org/pod/Google::GeoCoder::Smart> provides a lightweight wrapper around the Google Geocoding API
 v3 endpoint:
 
   https://maps.googleapis.com/maps/api/geocode/json

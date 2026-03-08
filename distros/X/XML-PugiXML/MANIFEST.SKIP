@@ -1,0 +1,23 @@
+# Build artifacts
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+\.o$
+\.c$
+\.bs$
+\.so$
+
+# VCS/CI
+^\.git/
+^\.github/
+
+# Editor/IDE
+\.swp$
+~$
+\.claude/
+
+# Distribution artifacts
+^XML-PugiXML-
+^MANIFEST\.bak$

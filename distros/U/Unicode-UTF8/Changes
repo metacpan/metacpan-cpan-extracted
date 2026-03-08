@@ -1,3 +1,10 @@
+0.68 2026-03-02
+ - Include correct version of utf8_valid.h header.
+
+0.67 2026-03-02
+ - Fix SIMD feature gating for x86; avoid SSE2 intrinsics on non-SSE2 i686 builds
+ - Use Dist::Zilla for the distro (Thanks to Dan Book, @Grinnz++ for the migration)
+
 0.66 2026-02-25
  - Rewrote the UTF-8 validator using a shift-based DFA from
    https://github.com/chansen/c-utf8-valid by the same author.

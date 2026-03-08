@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::TokenRequest;
 # ABSTRACT: TokenRequest contains parameters of a service account token.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s audience => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Storage::V1::TokenRequest - TokenRequest contains parameters of a 
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 audience
 

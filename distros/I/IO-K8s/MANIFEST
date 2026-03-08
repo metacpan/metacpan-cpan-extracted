@@ -730,6 +730,10 @@ t/19_role_helm.t
 t/20_int_or_string.t
 t/21_quantity_time.t
 t/22_types.t
+t/23_passthrough.t
+t/24_combinations.t
+t/25_real_world.t
+t/26_build_verify.t
 t/author-pod-syntax.t
 t/manifest.t
 t/to_yaml.t

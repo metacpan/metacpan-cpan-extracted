@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+
 use Test::More;
 use OpenAPI::Linter;
 
@@ -14,19 +15,40 @@ my @test_cases = (
             info    => {
                 title       => 'Test API',
                 version     => '1.0.0',
-                description => 'Test',
+                # description intentionally missing - want warning
                 license     => { name => 'MIT' }
             },
+            servers => [
+                { url => 'https://api.example.com/v1' }
+            ],
+            security => [{ apiKey => [] }],
             paths => {
                 '/users' => {
-                    parameters => [
-                        { name => 'apiKey', in => 'header' }
-                    ],
+                    # NO parameters block - removed to avoid OpenAPI 3.0.3 validation bug
                     get => {
-                        summary   => 'Get users',
+                        summary      => 'Get users',
+                        operationId  => 'getUsers',
+                        security     => [{ apiKey => [] }],
+                        # description intentionally missing - want warning
                         responses => {
-                            '200' => { description => 'OK' }
+                            '200' => {
+                                description => 'OK',
+                                content => {
+                                    'application/json' => {
+                                        schema => { type => 'object' }
+                                    }
+                                }
+                            }
                         }
+                    }
+                }
+            },
+            components => {
+                securitySchemes => {
+                    apiKey => {
+                        type => 'apiKey',
+                        name => 'X-API-Key',
+                        'in' => 'header',
                     }
                 }
             }
@@ -43,14 +65,37 @@ my @test_cases = (
                 description => 'Test',
                 license     => { name => 'MIT' }
             },
+            servers => [
+                { url => 'https://api.example.com/v1' }
+            ],
+            security => [{ apiKey => [] }],
             paths => {
                 '/users' => {
                     'x-custom-extension' => 'some value',
                     get => {
-                        summary   => 'Get users',
+                        summary      => 'Get users',
+                        operationId  => 'getUsers',
+                        security     => [{ apiKey => [] }],
+                        # description intentionally missing - want warning
                         responses => {
-                            '200' => { description => 'OK' }
+                            '200' => {
+                                description => 'OK',
+                                content     => {
+                                    'application/json' => {
+                                        schema => { type => 'object' }
+                                    }
+                                }
+                            }
                         }
+                    }
+                }
+            },
+            components => {
+                securitySchemes => {
+                    apiKey => {
+                        type => 'apiKey',
+                        name => 'X-API-Key',
+                        'in' => 'header',
                     }
                 }
             }
@@ -67,16 +112,39 @@ my @test_cases = (
                 description => 'Test',
                 license     => { name => 'MIT' }
             },
-            paths => {
+            servers => [
+                { url => 'https://api.example.com/v1' }
+            ],
+            security => [{ apiKey => [] }],
+            paths    => {
                 '/users' => {
                     servers => [
                         { url => 'https://api.example.com' }
                     ],
                     get => {
-                        summary => 'Get users',
+                        summary      => 'Get users',
+                        operationId  => 'getUsers',
+                        security     => [{ apiKey => [] }],
+                        # description intentionally missing - want warning
                         responses => {
-                            '200' => { description => 'OK' }
+                            '200' => {
+                                description => 'OK',
+                                content => {
+                                    'application/json' => {
+                                        schema => { type => 'object' }
+                                    }
+                                }
+                            }
                         }
+                    }
+                }
+            },
+            components => {
+                securitySchemes => {
+                    apiKey => {
+                        type => 'apiKey',
+                        name => 'X-API-Key',
+                        'in' => 'header',
                     }
                 }
             }
@@ -90,19 +158,43 @@ my @test_cases = (
             info    => {
                 title       => 'Test API',
                 version     => '1.0.0',
-                description => 'Test',
+                # description intentionally missing - want warning
                 license     => { name => 'MIT' }
             },
+            servers => [
+                { url => 'https://api.example.com/v1' }
+            ],
+            security => [{ apiKey => [] }],
             paths => {
                 '/users' => {
-                    summary     => 'User operations',
-                    description => 'All user operations',
-                    parameters  => [{ name => 'apiKey', in => 'header' }],
-                    servers     => [{ url => 'https://api.example.com' }],
+                    summary        => 'User operations',
+                    # NO parameters block - removed to avoid OpenAPI 3.0.3 validation bug
+                    servers        => [{ url => 'https://api.example.com' }],
                     'x-deprecated' => 1,
                     get => {
-                        summary   => 'Get users',
-                        responses => { '200' => { description => 'OK' }}
+                        summary      => 'Get users',
+                        operationId  => 'getUsers',
+                        security     => [{ apiKey => [] }],
+                        # description intentionally missing - want warning
+                        responses => {
+                            '200' => {
+                                description => 'OK',
+                                content     => {
+                                    'application/json' => {
+                                        schema => { type => 'object' }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            components => {
+                securitySchemes => {
+                    apiKey => {
+                        type => 'apiKey',
+                        name => 'X-API-Key',
+                        'in' => 'header',
                     }
                 }
             }
@@ -136,11 +228,23 @@ foreach my $test (@test_cases) {
 
         # Test 3: Should find correct number of operation description issues
         my @op_issues = grep {
-            $_->{message} =~ /Missing description for/
+            $_->{message} =~ /missing a description/i
         } @issues;
 
         is(scalar(@op_issues), $test->{expected_op_issues},
             "Should find $test->{expected_op_issues} operation description issue(s)");
+
+        # Optional debug: show all issues if count doesn't match
+        if (scalar(@op_issues) != $test->{expected_op_issues}) {
+            diag("Found these operation issues:");
+            foreach my $issue (@op_issues) {
+                diag("  - $issue->{message}");
+            }
+            diag("All issues found:");
+            foreach my $issue (@issues) {
+                diag("  [$issue->{level}] $issue->{message}");
+            }
+        }
     };
 }
 

@@ -24,8 +24,8 @@
       "build" : {
          "requires" : {
             "Module::Build" : "0.28",
+            "Test2::V1" : "0",
             "Test::MockModule" : "0",
-            "Test::More" : "0",
             "Test::Trap" : "0"
          }
       },
@@ -93,7 +93,7 @@
          "web" : "https://github.com/djzort/perl-monit-http-api"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_contributors" : [
       "Dean Hamstead <djzort@cpan.org>"
    ],

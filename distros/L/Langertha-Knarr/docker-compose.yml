@@ -1,0 +1,38 @@
+services:
+  knarr:
+    image: raudssus/langertha-knarr
+    # Or build locally: build: .
+    ports:
+      - "8080:8080"
+      - "11434:11434"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - LANGFUSE_URL=http://langfuse:3000
+    depends_on:
+      - langfuse
+
+  langfuse:
+    image: langfuse/langfuse:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@db:5432/langfuse
+      - NEXTAUTH_SECRET=knarr-langfuse-secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - SALT=knarr-salt
+    depends_on:
+      - db
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=langfuse
+      - POSTGRES_PASSWORD=langfuse
+      - POSTGRES_DB=langfuse
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

@@ -1,0 +1,5 @@
+TYPEMAP
+XML::PugiXML         T_PTROBJ
+XML::PugiXML::Node   T_PTROBJ
+XML::PugiXML::Attr   T_PTROBJ
+XML::PugiXML::XPath  T_PTROBJ

@@ -1,5 +1,15 @@
 Revision history for Perl extension SVG.
 
+2.89  2026-03-05 MANWAR
+      - Fix RT#136789: Corrected misleading documentation for comment() and
+        desc() methods.
+      - Fixed logic in SVG::Element::xmlify to ensure comment elements are
+        correctly rendered as XML comments rather than standard tags.
+      - Updated desc() documentation to use cdata() for content, preventing
+        hash assignment warnings.
+      - Improved get_path() documentation to clarify return attributes (d vs
+        points) based on element type.
+
 2.88  2026.02.23 MANWAR
       [Bug Fix]
       - Fixed: element methods (circle, title, rect, path, etc.) were

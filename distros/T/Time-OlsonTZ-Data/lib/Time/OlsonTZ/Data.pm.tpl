@@ -9,8 +9,8 @@ Time::OlsonTZ::Data - Olson timezone data
     $version = olson_version;
 
     use Time::OlsonTZ::Data qw(
-	olson_canonical_names olson_link_names olson_all_names
-	olson_links olson_country_selection);
+        olson_canonical_names olson_link_names olson_all_names
+        olson_links olson_country_selection);
 
     $names = olson_canonical_names;
     $names = olson_link_names;

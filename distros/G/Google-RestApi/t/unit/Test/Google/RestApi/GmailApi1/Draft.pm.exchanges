@@ -105,7 +105,7 @@ response:
             },
             {
               "name": "Message-Id",
-              "value": "\u003cCAM=e+8oS5q1DMtke5=rOND2M8_8w3mW2y_=qCdYTJmaL+KsJYA@mail.gmail.com\u003e"
+              "value": "\u003cTEST-MESSAGE-ID@mail.gmail.com\u003e"
             },
             {
               "name": "From",

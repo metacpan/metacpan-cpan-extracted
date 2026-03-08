@@ -18,14 +18,15 @@ Geo::Address::Parser - Lightweight country-aware address parser from flat text
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Supported countries and their corresponding rule modules
 my %COUNTRY_MODULE = (
+	FR => 'Geo::Address::Parser::Rules::FR',
 	US => 'Geo::Address::Parser::Rules::US',
 	USA => 'Geo::Address::Parser::Rules::US',
 	UK => 'Geo::Address::Parser::Rules::UK',
@@ -34,6 +35,7 @@ my %COUNTRY_MODULE = (
 	'CANADA' => 'Geo::Address::Parser::Rules::CA',
 	AU => 'Geo::Address::Parser::Rules::AU',
 	'AUSTRALIA' => 'Geo::Address::Parser::Rules::AU',
+	'FRANCE' => 'Geo::Address::Parser::Rules::FR',
 	IE => 'Geo::Address::Parser::Rules::IRL',     # Ireland ISO code
 	IRL => 'Geo::Address::Parser::Rules::IRL',    # 3-letter code
 	'IRELAND' => 'Geo::Address::Parser::Rules::IRL', # Full name

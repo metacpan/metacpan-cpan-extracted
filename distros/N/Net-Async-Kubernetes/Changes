@@ -1,5 +1,11 @@
 Revision history for Net-Async-Kubernetes
 
+0.005     2026-03-04 17:14:31Z
+ - Use public Kubernetes::REST building-block API (build_path,
+   prepare_request, check_response, inflate_object, inflate_list,
+   process_watch_chunk) instead of private underscore methods.
+   Requires Kubernetes::REST >= 1.100.
+
 0.004     2026-02-28 01:39:32Z
 
 0.003     2026-02-28 01:11:24Z

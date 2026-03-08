@@ -1,6 +1,6 @@
 package IO::K8s::Role::SpecBuilder;
 # ABSTRACT: Role for deep-path spec manipulation on CRD objects
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use Moo::Role;
 use Scalar::Util qw(looks_like_number);
 
@@ -176,7 +176,7 @@ IO::K8s::Role::SpecBuilder - Role for deep-path spec manipulation on CRD objects
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SUPPORT
 

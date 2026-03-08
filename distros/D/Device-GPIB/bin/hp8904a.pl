@@ -33,7 +33,7 @@ my $address = 26;
 
 $port = $main::opt_port if defined $main::opt_port;
 $address = $main::opt_address if defined $main::opt_address;
-$Device::GPIB::Controller::debug = 1 if $main::opt_debug;
+Device::GPIB::Controller::enableDebug(1) if $main::opt_debug;
 
 my $d = Device::GPIB::Controller->new($port);
 

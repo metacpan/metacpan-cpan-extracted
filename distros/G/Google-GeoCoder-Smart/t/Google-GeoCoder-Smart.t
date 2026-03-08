@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 
-use Test::More;
-
-BEGIN { use_ok('Google::GeoCoder::Smart') }
+use Test2::V0;
+use Google::GeoCoder::Smart ();
 
 sub _read_file {
   my ($path) = @_;

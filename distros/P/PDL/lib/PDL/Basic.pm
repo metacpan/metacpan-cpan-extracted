@@ -31,296 +31,262 @@ use PDL::Exporter;
 use PDL::Options;
 
 our @ISA=qw/PDL::Exporter/;
-our @EXPORT_OK = qw/ ndcoords rvals axisvals allaxisvals xvals yvals zvals sec ins hist whist
-	similar_assign transpose sequence xlinvals ylinvals
-	zlinvals axislinvals/;
+our @EXPORT_OK = qw(
+  sec ins hist whist similar_assign transpose
+  allaxisvals ndcoords sequence rvals
+  axisvals xvals yvals zvals
+  allaxislinvals axislinvals xlinvals ylinvals zlinvals
+  allaxislogvals axislogvals xlogvals ylogvals zlogvals
+);
 our %EXPORT_TAGS = (Func=>[@EXPORT_OK]);
 
 # Exportable functions
-*axisvals       = \&PDL::axisvals;
-*allaxisvals       = \&PDL::allaxisvals;
-*sec            = \&PDL::sec;
-*ins            = \&PDL::ins;
-*hist           = \&PDL::hist;
-*whist           = \&PDL::whist;
-*similar_assign = \&PDL::similar_assign;
-*transpose      = \&PDL::transpose;
-*xlinvals 	= \&PDL::xlinvals;
-*ylinvals 	= \&PDL::ylinvals;
-*zlinvals 	= \&PDL::zlinvals;
+for (@EXPORT_OK) {
+  no strict 'refs';
+  *$_ = \&{ $PDL::{$_} };
+}
 
-=head2 xvals
+=head2 axisvals, xvals, yvals, zvals
 
 =for ref
 
-Fills an ndarray with X index values.  Uses similar specifications to
-L</zeroes> and L</new_from_specification>.
+Fills an ndarray with index values on X, Y, Z, or Nth dimension
 
-CAVEAT:
-
-If you use the single argument ndarray form (top row
+Uses similar specifications to L<zeroes|PDL::Core/zeroes> and
+L<new_from_specification|PDL::Core/new_from_specification>.
+B<CAVEAT>: If you use the single argument ndarray form (top row
 in the usage table) the output will have the same type as the input,
-except that as of 2.064, the returned ndarray will default to at least type
-C<double>. As of 2.085, this will respect a given type as in the second
+except that between 2.064 and 2.100, the returned ndarray will
+default to at least type C<double>; as of 2.101 this upgrade is
+relaxed to C<float>.
+As of 2.085, this will respect a given type as in the second
 or third form below.
 
 =for usage
 
- $x = xvals($somearray); # at least type double
+ $x = xvals($somearray); # at least type float
  $x = xvals([OPTIONAL TYPE],$nx,$ny,$nz...);
  $x = xvals([OPTIONAL TYPE], $somarray->dims);
+ $y = yvals($somearray); yvals(inplace($somearray));
+ $y = yvals([OPTIONAL TYPE],$nx,$ny,$nz...);
+ $z = zvals($somearray); zvals(inplace($somearray));
+ $z = zvals([OPTIONAL TYPE],$nx,$ny,$nz...);
+ $axisv = axisvals ($ndarray, $nth);
+ $axisv = $ndarray->axisvals($nth);
+ $axisv = axisvals ([type,] $nth, $dim0, $dim1, ...); # new in PDL 2.101
+ $axisv = axisvals ($nth, [type,] $dim0, $dim1, ...); # new in PDL 2.101
 
-etc. see L<zeroes|PDL::Core/zeroes>.
-
-=for example
-
-  pdl> print xvals zeroes(5,10)
-  [
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-   [0 1 2 3 4]
-  ]
-
-=head2 yvals
-
-=for ref
-
-Fills an ndarray with Y index values.  See the CAVEAT for L</xvals>.
-
-=for usage
-
- $x = yvals($somearray); yvals(inplace($somearray));
- $x = yvals([OPTIONAL TYPE],$nx,$ny,$nz...);
-
-etc. see L<zeroes|PDL::Core/zeroes>.
+See also L</allaxisvals>, which generates all axis values
+simultaneously in a form useful for L</range>, L</interpND>,
+L</indexND>, etc.
 
 =for example
 
- pdl> print yvals zeroes(5,10)
- [
-  [0 0 0 0 0]
-  [1 1 1 1 1]
-  [2 2 2 2 2]
-  [3 3 3 3 3]
-  [4 4 4 4 4]
-  [5 5 5 5 5]
-  [6 6 6 6 6]
-  [7 7 7 7 7]
-  [8 8 8 8 8]
-  [9 9 9 9 9]
- ]
+  pdl> print xvals zeroes(5,2)
+  [
+   [0 1 2 3 4]
+   [0 1 2 3 4]
+  ]
+  pdl> print yvals zeroes(5,2)
+  [
+   [0 0 0 0 0]
+   [1 1 1 1 1]
+  ]
+  pdl> print zvals zeroes(3,2,2)
+  [
+   [
+    [0 0 0]
+    [0 0 0]
+   ]
+   [
+    [1 1 1]
+    [1 1 1]
+   ]
+  ]
 
-=head2 zvals
+=cut
+
+sub PDL::axisvals {
+  my $type_given = grep +(ref($_[$_])||'') eq 'PDL::Type', 0..2;
+  my ($first_non_ref) = grep !ref $_[$_], 0..$#_;
+  my ($nth) = splice @_, $first_non_ref, 1;
+  axisvals2(&PDL::Core::_construct,$nth,$type_given);
+}
+
+# We need this version for xvals etc to work in place
+sub axisvals2 {
+  my($dummy,$nth,$keep_type) = @_;
+  $dummy = PDL::Core::float($dummy)
+    if !$keep_type && $dummy->get_datatype < PDL::Core::float()->enum;
+  return $dummy .= 0 if $dummy->getndims <= $nth; # 'kind of' consistency
+  (0==$nth ? $dummy : $dummy->xchg(0,$nth))->inplace->axisvalues;
+  $dummy;
+}
+
+# Conveniently named interfaces to axisvals()
+sub PDL::xvals { unshift @_, 0; goto &axisvals; }
+sub PDL::yvals { unshift @_, 1; goto &axisvals; }
+sub PDL::zvals { unshift @_, 2; goto &axisvals; }
+
+=head2 axislinvals, xlinvals, ylinvals, zlinvals
 
 =for ref
 
-Fills an ndarray with Z index values.  See the CAVEAT for L</xvals>.
-
-=for usage
-
- $x = zvals($somearray); zvals(inplace($somearray));
- $x = zvals([OPTIONAL TYPE],$nx,$ny,$nz...);
-
-etc. see L<zeroes|PDL::Core/zeroes>.
-
-=for example
-
- pdl> print zvals zeroes(3,4,2)
- [
-  [
-   [0 0 0]
-   [0 0 0]
-   [0 0 0]
-   [0 0 0]
-  ]
-  [
-   [1 1 1]
-   [1 1 1]
-   [1 1 1]
-   [1 1 1]
-  ]
- ]
-
-=head2 xlinvals
-
-=for ref
-
-X axis values between endpoints (see L</xvals>).
-Works with dim-length of one as of 2.093, giving the starting point.
+Axis values linearly spaced between endpoints (see L</xvals>).
 
 =for usage
 
  $w = zeroes(100,100);
- $x = $w->xlinvals(0.5,1.5);
+ $x = $w->xlinvals(0.5,1.5);  # can give ndarrays as start and endpoints
  $y = $w->ylinvals(-2,-1);
- # calculate Z for X between 0.5 and 1.5 and
- # Y between -2 and -1.
- $z = f($x,$y);
+ $z = f($x,$y); # calculate Z for X from 0.5 to 1.5, Y from -2 to -1
+ # alternatively (new in PDL 2.101):
+ $x = xlinvals(0.5,1.5,100);  # can give ndarrays as start and endpoints
+ $y = xlinvals(-2,-1,100); # x = along 0-th dim
+ $z = f(meshgrid($x,$y));  # should go faster as meshgrid makes better locality
+ $pdl = xlinvals(float,0.5,1.5,100);        # can specify type
+ $x = $w->axislinvals(0,0.5,1.5);           # same as xlinvals
+ $x = axislinvals(0,0.5,1.5,100,100);       # same as xlinvals
+ $x = axislinvals(float,0,0.5,1.5,100,100); # same as xlinvals
+ $x = axislinvals(0,float,0.5,1.5,100,100); # same as xlinvals
 
 C<xlinvals>, C<ylinvals> and C<zlinvals> return an ndarray with the same shape
-as their first argument and linearly scaled values between the two other
+as their first argument if an ndarray, and linearly scaled values between the two other
 arguments along the given axis.
-
-=head2 ylinvals
-
-=for ref
-
-Y axis values between endpoints (see L</yvals>).
-
-See L</xlinvals> for more information.
-
-=head2 zlinvals
-
-=for ref
-
-Z axis values between endpoints (see L</zvals>).
-
-See L</xlinvals> for more information.
-
-=head2 xlogvals
-
-=for ref
-
-X axis values logarithmically spaced between endpoints (see L</xvals>).
 Works with dim-length of one as of 2.093, giving the starting point.
+As of 2.101, instead of giving an ndarray you can give an optional
+type at the start, and dimensions after the two mandatory arguments.
+
+=cut
+
+sub _dimcheck {
+  my ($pdl, $whichdim, $name) = @_;
+  barf "Given non-PDL '$pdl'" if !UNIVERSAL::isa($pdl, 'PDL');
+  my $dimlength = $pdl->getdim($whichdim);
+  barf "Must have at least one element in dimension for $name" if $dimlength < 1;
+  $dimlength;
+}
+sub _extract_endpoints {
+  my ($v1, $v2);
+  my @pdl_inds = grep UNIVERSAL::isa($_[$_], 'PDL'), 2..$#_; # not the invocant
+  if (@pdl_inds < 2) {
+    my @nonref_inds = grep !ref $_[$_], 0..$#_;
+    $v2 = splice @_, $nonref_inds[2], 1;
+    $v1 = splice @_, $nonref_inds[1], 1;
+  } else {
+    $v2 = splice @_, $pdl_inds[1], 1;
+    $v1 = splice @_, $pdl_inds[0], 1;
+  }
+  ($v1, $v2);
+}
+sub _linvals {
+  my ($name) = splice @_, 0, 1;
+  my ($first_non_ref) = grep !ref $_[$_], 0..$#_;
+  my $whichdim = $_[$first_non_ref];
+  my ($v1, $v2) = &_extract_endpoints;
+  my $pdl = &axisvals;
+  my $dimlength = _dimcheck($pdl, $whichdim, $name);
+  $pdl *= (($v2 - $v1) / ($dimlength > 1 ? ($dimlength-1) : 1));
+  $pdl += $v1;
+}
+sub PDL::axislinvals { unshift @_, 'axislinvals'; goto &_linvals; }
+sub PDL::xlinvals { unshift @_, 'xlinvals', 0; goto &_linvals; }
+sub PDL::ylinvals { unshift @_, 'ylinvals', 1; goto &_linvals; }
+sub PDL::zlinvals { unshift @_, 'zlinvals', 2; goto &_linvals; }
+
+=head2 axislogvals, xlogvals, ylogvals, zlogvals
+
+=for ref
+
+Axis values logarithmically spaced between endpoints (see L</xvals>).
 
 =for usage
 
  $w = zeroes(100,100);
  $x = $w->xlogvals(1e-6,1e-3);
- $y = $w->ylinvals(1e-4,1e3);
- # calculate Z for X between 1e-6 and 1e-3 and
- # Y between 1e-4 and 1e3.
- $z = f($x,$y);
+ $y = $w->ylogvals(1e-4,1e3);
+ $z = f($x,$y); # calculate Z for X from 1e-6 to 1e-3, Y from 1e-4 to 1e3
+ # alternatively (new in PDL 2.101):
+ $x = xlogvals(1e-6,1e-3,100);
+ $y = xlogvals(1e-4,1e3,100); # x = along 0-th dim
+ $z = f(meshgrid($x,$y));  # should go faster as meshgrid makes better locality
+ $pdl = xlogvals(float,1e-6,1e-3,100); # can specify type
+ $x = $w->axislogvals(0,0.5,1.5);           # same as xlogvals
+ $x = axislogvals(0,0.5,1.5,100,100);       # same as xlogvals
+ $x = axislogvals(float,0,0.5,1.5,100,100); # same as xlogvals
+ $x = axislogvals(0,float,0.5,1.5,100,100); # same as xlogvals
 
 C<xlogvals>, C<ylogvals> and C<zlogvals> return an ndarray with the same shape
 as their first argument and logarithmically scaled values between the two other
 arguments along the given axis.
-
-=head2 ylogvals
-
-=for ref
-
-Y axis values logarithmically spaced between endpoints (see L</yvals>).
-
-See L</xlogvals> for more information.
-
-=head2 zlogvals
-
-=for ref
-
-Z axis values logarithmically spaced between endpoints (see L</zvals>).
-
-See L</xlogvals> for more information.
+Works with dim-length of one as of 2.093, giving the starting point.
+As of 2.101, instead of giving an ndarray you can give an optional
+type at the start, and dimensions after the two mandatory arguments.
 
 =cut
-
-# Conveniently named interfaces to axisvals()
-
-sub xvals { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->xvals : PDL->xvals(@_) }
-sub yvals { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->yvals : PDL->yvals(@_) }
-sub zvals { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->zvals : PDL->zvals(@_) }
-sub PDL::xvals {
-    my $type_given = grep +(ref($_[$_])||'') eq 'PDL::Type', 0..1;
-    axisvals2(&PDL::Core::_construct,0,$type_given);
-}
-sub PDL::yvals {
-    my $type_given = grep +(ref($_[$_])||'') eq 'PDL::Type', 0..1;
-    axisvals2(&PDL::Core::_construct,1,$type_given);
-}
-sub PDL::zvals {
-    my $type_given = grep +(ref($_[$_])||'') eq 'PDL::Type', 0..1;
-    axisvals2(&PDL::Core::_construct,2,$type_given);
-}
-
-sub _dimcheck {
-  my ($pdl, $whichdim, $name) = @_;
-  my $dim = $pdl->getdim($whichdim);
-  barf "Must have at least one element in dimension for $name" if $dim < 1;
-  $dim;
-}
-sub _linvals {
-  my ($pdl, $v1, $v2, $dim, $method) = @_;
-  $pdl->$method * (($v2 - $v1) / ($dim > 1 ? ($dim-1) : 1)) + $v1;
-}
-sub PDL::xlinvals {
-  _linvals(@_[0..2], _dimcheck($_[0], 0, 'xlinvals'), 'xvals');
-}
-sub PDL::ylinvals {
-  _linvals(@_[0..2], _dimcheck($_[0], 1, 'ylinvals'), 'yvals');
-}
-sub PDL::zlinvals {
-  _linvals(@_[0..2], _dimcheck($_[0], 2, 'zlinvals'), 'zvals');
-}
 
 sub _logvals {
-  my ($pdl, $min, $max, $dim, $method) = @_;
+  my ($name) = splice @_, 0, 1;
+  my ($first_non_ref) = grep !ref $_[$_], 0..$#_;
+  my $whichdim = $_[$first_non_ref];
+  my ($min, $max) = &_extract_endpoints;
   barf "min and max must be positive" if $min <= 0 || $max <= 0;
   my ($lmin,$lmax) = map log($_), $min, $max;
-  exp($pdl->$method * (($lmax - $lmin) / ($dim > 1 ? ($dim-1) : 1)) + $lmin);
+  my $pdl = &axisvals;
+  my $dimlength = _dimcheck($pdl, $whichdim, $name);
+  $pdl .= exp($pdl * (($lmax - $lmin) / ($dimlength > 1 ? ($dimlength-1) : 1)) + $lmin);
 }
-sub PDL::xlogvals {
-  _logvals(@_[0..2], _dimcheck($_[0], 0, 'xlogvals'), 'xvals');
-}
-sub PDL::ylogvals {
-  _logvals(@_[0..2], _dimcheck($_[0], 1, 'ylogvals'), 'yvals');
-}
-sub PDL::zlogvals {
-  _logvals(@_[0..2], _dimcheck($_[0], 2, 'zlogvals'), 'zvals');
-}
+sub PDL::axislogvals { unshift @_, 'axislogvals'; goto &_logvals; }
+sub PDL::xlogvals { unshift @_, 'xlogvals', 0; goto &_logvals; }
+sub PDL::ylogvals { unshift @_, 'ylogvals', 1; goto &_logvals; }
+sub PDL::zlogvals { unshift @_, 'zlogvals', 2; goto &_logvals; }
 
-=head2 allaxisvals
-
-=for ref
-
-Synonym for L</ndcoords> - enumerates all coordinates in a
-PDL or dim list, adding an extra dim on the front to accommodate
-the vector coordinate index (the form expected by L</indexND>,
-L</range>, and L</interpND>).  See L</ndcoords> for more detail.
-
-=for usage
-
-  $indices = allaxisvals($pdl);
-  $indices = allaxisvals(@dimlist);
-  $indices = allaxisvals($type,@dimlist);
-
-=cut
-
-=head2 ndcoords
+=head2 ndcoords, allaxisvals, allaxislinvals, allaxislogvals
 
 =for ref
 
 Enumerate pixel coordinates for an N-D ndarray
 
-Returns an enumerated list of coordinates suitable for use in
-L<indexND|PDL::Slices/indexND> or L<range|PDL::Slices/range>: you feed
+C<ndcoords> and C<allaxisvals> return an enumerated list of coordinates
+suitable for use in
+L<indexND|PDL::Slices/indexND>, L<range|PDL::Slices/range>, or
+L<interpND|PDL::Primitive/interpND>: you feed
 in a dimension list and get out an ndarray whose 0th dimension runs over
 dimension index and whose 1st through Nth dimensions are the
 dimensions given in the input.  If you feed in an ndarray instead of a
-perl list, then the dimension list is used, as in L</xvals> etc.
+perl list, then its dimension list is used, as in L</xvals> etc.
 
 Unlike L</xvals> etc., if you supply an ndarray input, you get
 out an ndarray of the default ndarray type: double.   This causes less
 surprises than the previous default of keeping the data type of
 the input ndarray since that rarely made sense in most usages.
 
+C<allaxislinvals> and C<allaxislogvals> enumerate a list of linear-
+or logarithm-spaced values respectively, like their non-C<all> counterparts.
+
 =for usage
 
-  $indices = ndcoords($pdl);
-  $indices = ndcoords(@dimlist);
-  $indices = ndcoords($type,@dimlist);
+  $indices = ndcoords($pdl);                   # double
+  $indices = ndcoords(@dimlist);               # double
+  $indices = ndcoords($type,$pdl);             # $type
+  $indices = $pdl->ndcoords($type);            # $type
+  $indices = ndcoords($type,@dimlist);         # $type
+  $indices = allaxisvals($pdl);
+  $indices = allaxisvals(@dimlist);
+  $indices = allaxisvals($type,$pdl);
+  $indices = allaxisvals($type,@dimlist);
+  $linvals = allaxislinvals($pdl,$start,$end); # start and end can be ndarrays
+  $linvals = allaxislinvals($type,$pdl,$start,$end);     # also here
+  $linvals = allaxislinvals($type,$start,$end,@dimlist); # also here
+  $linvals = allaxislinvals($start,$end,@dimlist);       # not here
+  $linvals = allaxislogvals($pdl,$start,$end);
+  $linvals = allaxislogvals($type,$pdl,$start,$end);
+  $linvals = allaxislogvals($start,$end,@dimlist);
+  $linvals = allaxislogvals($type,$start,$end,@dimlist);
 
 =for example
 
   pdl> print ndcoords(2,3)
-
   [
    [
     [0 0]
@@ -335,59 +301,78 @@ the input ndarray since that rarely made sense in most usages.
     [1 2]
    ]
   ]
-
   pdl> $w = zeroes(byte,2,3);        # $w is a 2x3 byte ndarray
-  pdl> $y = ndcoords($w);            # $y inherits $w's type
+  pdl> $y = ndcoords($w);            # $y is double to avoid problems
   pdl> $c = ndcoords(long,$w->dims); # $c is a long ndarray, same dims as $y
+  pdl> $d = ndcoords(long,$w);       # $d overrides the default double
   pdl> help $y;
-  This variable is   Byte D [2,2,3]              P            0.01Kb
+  This variable is Double D [2,2,3]        P            0.09KB
   pdl> help $c;
-  This variable is   Long D [2,2,3]              P            0.05Kb
+  This variable is   Long D [2,2,3]        P            0.05KB
 
 =cut
 
-sub PDL::ndcoords {
+sub _allvals_construct {
   my $type;
-  if(ref $_[0] eq 'PDL::Type') {
-    $type = shift;
+  if (my ($type_ind) = grep ref $_[$_] eq 'PDL::Type', 0..$#_) {
+    $type = splice @_, $type_ind, 1;
   }
-  my @dims = (ref $_[0]) ? (shift)->dims : @_;
-  my @d = @dims;
-  unshift(@d,scalar(@dims));
-  unshift(@d,$type) if defined($type);
-  my $out = PDL->zeroes(@d);
-  for my $d (0..$#dims) {
-    my $w = $out->index($d);
-    $w = $w->mv($d,0) if $d != 0;
-    $w .= xvals($w->type, $w->dims);
-  }
+  my @dims = ref($_[0]) ? shift->dims : @_;
+  PDL->zeroes(defined($type) ? $type : (), scalar(@dims), @dims);
+}
+sub PDL::ndcoords {
+  my $out = &_allvals_construct;
+  axisvals2($out->slice("($_)"), $_, 1) for 0..$out->ndims-2;
   $out;
 }
-*ndcoords = *allaxisvals = *PDL::allaxisvals = \&PDL::ndcoords;
+*PDL::allaxisvals = \&PDL::ndcoords;
+sub _nonref_vals2 {
+  my ($first_non_ref) = grep !ref $_[$_], 0..$#_;
+  splice @_, $first_non_ref, 2;
+}
+sub PDL::allaxislinvals {
+  unshift @_, 1; # dummy for _extract_endpoints "whichdim"
+  my ($v1, $v2) = &_extract_endpoints;
+  shift @_; # drop dummy
+  my $out = &_allvals_construct;
+  $out->slice("($_)")->inplace->axislinvals($_,$v1,$v2) for 0..$out->ndims-2;
+  $out;
+}
+sub PDL::allaxislogvals {
+  unshift @_, 1; # dummy for _extract_endpoints "whichdim"
+  my ($v1, $v2) = &_extract_endpoints;
+  shift @_; # drop dummy
+  my $out = &_allvals_construct;
+  $out->slice("($_)")->inplace->axislogvals($_,$v1,$v2) for 0..$out->ndims-2;
+  $out;
+}
 
-=head2 hist
+=head2 hist, whist
 
 =for ref
 
-Create histogram of an ndarray
+Create histogram, or weighted histogram, of an ndarray
 
 =for usage
 
  $hist = hist($data);
  ($xvals,$hist) = hist($data);
-
-or
-
+ # or:
  $hist = hist($data,$min,$max,$step);
  ($xvals,$hist) = hist($data,[$min,$max,$step]);
+ # weighted:
+ $whist = whist($data, $wt, [$min,$max,$step]);
+ ($xvals,$whist) = whist($data, $wt, [$min,$max,$step]);
 
-If C<hist> is run in list context, C<$xvals> gives the
-computed bin centres as double values.
+If requested, C<$xvals> gives the computed bin centres
+as type double values.  C<$data> and C<$wt> should have
+the same dimensionality and extents.
 
-A nice idiom (with
-L<PDL::Graphics::Simple>) is
+A nice idiom (with L<PDL::Graphics::Simple>) is
 
- bins hist($data), {yrange=>[0,$data->dim(0)]};  # Plot histogram
+ bins hist($data), {yrange=>[0,$data->dim(0)]};        # Plot histogram
+ bin whist $data, $wt;                                 # weighted histogram
+ bins whist($data, $wt), {yrange=>[0,$data->dim(0)]};  # weighted histogram
 
 =for example
 
@@ -396,87 +381,54 @@ L<PDL::Graphics::Simple>) is
  pdl> $h = hist $y,0,20,1; # hist with step 1, min 0 and 20 bins
  pdl> p $h
  [0 0 0 0 0 0 2 3 1 3 5 4 4 4 0 0 0 0 0 0]
-
-=cut
-
-sub PDL::hist {
-    my $usage = "\n" . '  Usage:          $hist  = hist($data)' . "\n" .
-                       '                  $hist  = hist($data,$min,$max,$step)' . "\n" .
-                       '          ($xvals,$hist) = hist($data)' . "\n" .
-                       '          ($xvals,$hist) = hist($data,$min,$max,$step)' . "\n" ;
-    barf($usage) if $#_<0;
-    my($pdl,$min,$max,$step)=@_;
-    ($step, $min, my $bins, my $xvals) =
-        _hist_bin_calc($pdl, $min, $max, $step, wantarray());
-    PDL::Primitive::histogram($pdl->flat,(my $hist = null),
-			      $step,$min,$bins);
-    return wantarray() ? ($xvals,$hist) : $hist;
-}
-
-=head2 whist
-
-=for ref
-
-Create a weighted histogram of an ndarray
-
-=for usage
-
- $hist = whist($data, $wt, [$min,$max,$step]);
- ($xvals,$hist) = whist($data, $wt, [$min,$max,$step]);
-
-If requested, C<$xvals> gives the computed bin centres
-as type double values.  C<$data> and C<$wt> should have
-the same dimensionality and extents.
-
-A nice idiom (with
-L<PDL::Graphics::Simple>) is
-
- bin whist $data, $wt;  # Plot histogram
- bins whist($data, $wt), {yrange=>[0,$data->dim(0)]};  # Plot histogram
-
-=for example
-
- pdl> p $y
- [13 10 13 10 9 13 9 12 11 10 10 13 7 6 8 10 11 7 12 9 11 11 12 6 12 7]
+ # or, weighted:
  pdl> $wt = grandom($y->nelem)
  pdl> $h = whist $y, $wt, 0, 20, 1 # hist with step 1, min 0 and 20 bins
  pdl> p $h
  [0 0 0 0 0 0 -0.49552342  1.7987439 0.39450696  4.0073722 -2.6255299 -2.5084501  2.6458365  4.1671676 0 0 0 0 0 0]
 
-
 =cut
+
+sub PDL::hist {
+    barf(<<'EOF') if !@_;
+  Usage:          $hist  = hist($data)
+                  $hist  = hist($data,$min,$max,$step)
+          ($xvals,$hist) = hist($data)
+          ($xvals,$hist) = hist($data,$min,$max,$step)
+EOF
+    my ($pdl,$min,$max,$step) = @_;
+    ($step, $min, my $bins, my $xvals) =
+        _hist_bin_calc($pdl, $min, $max, $step, wantarray);
+    my $hist = PDL::Primitive::histogram($pdl->flat, $step,$min,$bins);
+    wantarray ? ($xvals,$hist) : $hist;
+}
 
 sub PDL::whist {
     barf('Usage: ([$xvals],$hist) = whist($data,$wt,[$min,$max,$step])')
             if @_ < 2;
-    my($pdl,$wt,$min,$max,$step)=@_;
+    my ($pdl,$wt,$min,$max,$step) = @_;
     ($step, $min, my $bins, my $xvals) =
-        _hist_bin_calc($pdl, $min, $max, $step, wantarray());
-
-    PDL::Primitive::whistogram($pdl->flat,$wt->flat,
-			       (my $hist = null), $step, $min, $bins);
-    return wantarray() ? ($xvals,$hist) : $hist;
+        _hist_bin_calc($pdl, $min, $max, $step, wantarray);
+    my $hist = PDL::Primitive::whistogram($pdl->flat,$wt->flat, $step, $min, $bins);
+    wantarray ? ($xvals,$hist) : $hist;
 }
 
 sub _hist_bin_calc {
-    my($pdl,$min,$max,$step,$wantarray)=@_;
-    $min = $pdl->min() unless defined $min;
-    $max = $pdl->max() unless defined $max;
+    my ($pdl,$min,$max,$step,$wantarray) = @_;
     my $nelem = $pdl->nelem;
     barf "empty ndarray, no values to work with" if $nelem == 0;
-
-    $step = ($max-$min)/(($nelem>10_000) ? 100 : sqrt($nelem)) unless defined $step;
+    $min //= $pdl->min;
+    $max //= $pdl->max;
+    $step //= ($max-$min)/(($nelem>10_000) ? 100 : sqrt($nelem));
     barf "step is zero (or all data equal to one value)" if $step == 0;
-
     my $bins = int(($max-$min)/$step+0.5);
     print "hist with step $step, min $min and $bins bins\n"
 	if $PDL::debug;
+    return ( $step, $min, $bins ) if !$wantarray;
     # Need to use double for $xvals here
-    my $xvals = $min + $step/2 + sequence(PDL::Core::double,$bins)*$step if $wantarray;
-
-    return ( $step, $min, $bins, $xvals );
+    my $xvals = $min + $step/2 + sequence(PDL::Core::double,$bins)*$step;
+    ( $step, $min, $bins, $xvals );
 }
-
 
 =head2 sequence
 
@@ -504,7 +456,6 @@ etc. see L<zeroes|PDL::Core/zeroes>.
 
 =cut
 
-sub sequence { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->sequence : PDL->sequence(@_) }
 sub PDL::sequence {
     my $type_given = grep +(ref($_[$_])||'') eq 'PDL::Type', 0..1;
     $type_given ||= ref($_[0]) && UNIVERSAL::isa($_[0], 'PDL'); # instance method
@@ -582,120 +533,86 @@ well-known norms.
 
 =cut
 
-sub rvals { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? $_[0]->rvals(@_[1..$#_]) : PDL->rvals(@_) }
 sub PDL::rvals { # Return radial distance from given point and offset
-    my $opt = pop @_ if ref($_[$#_]) eq "HASH";
-    my %opt = defined $opt ?
-               iparse( {
-			CENTRE  => undef, # needed, otherwise centre/center handling painful
-			Squared => 0,
-		       }, $opt ) : ();
-    my $r = &PDL::Core::_construct;
-    my @pos;
-    if(defined $opt{CENTRE}){
-	my $pos = PDL->topdl($opt{CENTRE});
-	barf "Center should be a 1D vector" unless $pos->getndims==1;
-	barf "Center has more coordinates than dimensions of ndarray" if $pos->dim(0) > $r->getndims;
-	@pos = $pos->list;
-    }
-    my $offset;
-    $r .= 0.0;
-    my $tmp = $r->copy;
-    my $i;
-    for ($i=0; $i<$r->getndims; $i++) {
-         $offset = (defined $pos[$i] ? $pos[$i] : int($r->getdim($i)/2));
-	 # Note careful coding for speed and min memory footprint
-	 PDL::Primitive::axisvalues((0==$i?$tmp:$tmp->xchg(0,$i))->inplace);
-	 $tmp -= $offset; $tmp *= $tmp;
-         $r += $tmp;
-    }
-    return $opt{Squared} ? $r : $r->inplace->sqrt;
+  my $opt = ref($_[-1]) eq "HASH" ? pop @_ : undef;
+  my %opt = defined $opt ?
+    iparse( {
+      CENTRE  => undef, # needed, otherwise centre/center handling painful
+      Squared => 0,
+    }, $opt ) : ();
+  my $r = &PDL::Core::_construct;
+  my @pos;
+  if (defined $opt{CENTRE}) {
+    my $pos = PDL->topdl($opt{CENTRE});
+    barf "Center should be a 1D vector" unless $pos->getndims==1;
+    barf "Center has more coordinates than dimensions of ndarray" if $pos->dim(0) > $r->getndims;
+    @pos = $pos->list;
+  }
+  my $offset;
+  $r .= 0.0;
+  my $tmp = $r->copy;
+  my $i;
+  for ($i=0; $i<$r->getndims; $i++) {
+    $offset = $pos[$i] // int($r->getdim($i)/2);
+    # Note careful coding for speed and min memory footprint
+    axisvals2($tmp, $i, 1);
+    $tmp -= $offset; $tmp *= $tmp;
+    $r += $tmp;
+  }
+  return $opt{Squared} ? $r : $r->inplace->sqrt;
 }
 
-=head2 axisvals
+=head2 sec
 
 =for ref
 
-Fills an ndarray with index values on Nth dimension
+Take a subsection of an ndarray with given coordinates.
 
 =for usage
 
- $z = axisvals ($ndarray, $nth);
-
-This is the routine, for which L</xvals>, L</yvals> etc
-are mere shorthands. C<axisvals> can be used to fill along any dimension,
-using a parameter.
-
-See also L</allaxisvals>, which generates all axis values
-simultaneously in a form useful for L</range>, L</interpND>,
-L</indexND>, etc.
-
-Note the 'from specification' style (see L<zeroes|PDL::Core/zeroes>) is
-not available here, for obvious reasons.
+  $new  = sec($input,  $x1, $x2, $y1, $y2, $z1, $z2, ... ) # Take subsection
 
 =cut
 
-sub PDL::axisvals {
-	my($this,$nth) = @_;
-	my $dummy = $this->new_or_inplace;
-	if($dummy->getndims() <= $nth) {
-		# This is 'kind of' consistency...
-		$dummy .= 0;
-		return $dummy;
-	}
-	my $bar = 0==$nth ? $dummy : $dummy->xchg(0,$nth);
-	PDL::Primitive::axisvalues($bar->inplace);
-	return $dummy;
+sub PDL::sec {
+  my ($this,@coords) = @_;
+  @coords = map int, @coords;
+  my @maps;
+  push @maps, shift(@coords).":".shift(@coords) while @coords;
+  $this->slice(join ',',@maps)->sever;
 }
 
-# We need this version for xvals etc to work in place
-sub axisvals2 {
-	my($dummy,$nth,$keep_type) = @_;
-	$dummy = PDL::Core::double($dummy)
-	  if !$keep_type && $dummy->get_datatype < PDL::Core::double()->enum;
-	if($dummy->getndims() <= $nth) {
-		# This is 'kind of' consistency...
-		$dummy .= 0;
-		return $dummy;
-	}
-	my $bar = 0==$nth ? $dummy : $dummy->xchg(0,$nth);
-	PDL::Primitive::axisvalues($bar->inplace);
-	return $dummy;
-}
-sub PDL::sec {
-	my($this,@coords) = @_;
-	my $i; my @maps;
-	while($#coords > -1) {
-		$i = int(shift @coords) ;
-		push @maps, "$i:".int(shift @coords);
-	}
-	my $tmp = PDL->null;
-	$tmp .= $this->slice(join ',',@maps);
-	return $tmp;
-}
+=head2 ins
+
+=for ref
+
+Insert one ndarray into another at given coordinates.
+
+=for usage
+
+  $newimage = ins($bigimage,$smallimage,$x,$y,$z...) # Insert at x,y,z
+
+=cut
 
 sub PDL::ins {
-	my($this,$what,@coords) = @_;
-	my $w = PDL::Core::alltopdl($PDL::name,$what);
-	my $tmp;
-	if($this->is_inplace) {
-	  $this->set_inplace(0);
-	} else {
-	  $this = $this->copy;
-	}
-	($tmp = $this->slice(
-	   (join ',',map {int($coords[$_]).":".
-	   	((int($coords[$_])+$w->getdim($_)-1)<$this->getdim($_) ?
-	   	(int($coords[$_])+$w->getdim($_)-1):$this->getdim($_))
-	   	}
-	   	0..$#coords)))
-		.= $w;
-	return $this;
+  my ($this,$what,@coords) = @_;
+  my $w = PDL->topdl($what);
+  $this = $this->new_or_inplace;
+  my @thisdims = $this->dims;
+  my @wdims_m1 = map $_-1, $w->dims;
+  @coords = map int, @coords;
+  $this->slice(
+     join ',',map $coords[$_].":".
+          (($coords[$_]+$wdims_m1[$_])<$thisdims[$_] ?
+           ($coords[$_]+$wdims_m1[$_]):$thisdims[$_]),
+          0..$#coords)
+          .= $w;
+  $this;
 }
 
 sub PDL::similar_assign {
-  my($from,$to) = @_;
-  if((my $fd = join ',',@{$from->dims}) ne (my $td = join ',',@{$to->dims})) {
+  my ($from,$to) = @_;
+  if ((my $fd = join ',',@{$from->dims}) ne (my $td = join ',',@{$to->dims})) {
     barf "Similar_assign: dimensions [$fd] and [$td] do not match!\n";
   }
   $to .= $from;

@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.66';
+our $VERSION = '2.67';
 
 our @ALL =
 qw(
@@ -1864,7 +1864,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2025c' }
+sub OlsonVersion { '2026a' }
 
 
 1;

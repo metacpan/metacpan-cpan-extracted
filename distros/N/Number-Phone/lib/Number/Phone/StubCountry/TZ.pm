@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153526;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -56,7 +56,7 @@ my $validators = {
                 'mobile' => '
           (?:
             6[1-35-9]|
-            7[13-9]
+            7[013-9]
           )\\d{7}
         ',
                 'pager' => '',
@@ -71,13 +71,13 @@ my $validators = {
                 'voip' => '41\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"25527", "Arusha\/Manyara\/Kilimanjaro\/Tanga",
+$areanames{en} = {"25524", "Zanzibar",
 "25528", "Mwanza\/Shinyanga\/Mara\/Geita\/Simiyu\/Kagera\/Kigoma",
-"25524", "Zanzibar",
-"25522", "Dar\-Es\-Salaam",
+"25523", "Coast\/Morogoro\/Lindi\/Mtwara",
 "25525", "Mbeya\/Songwe\/Ruvuma\/Katavi\/Rukwa",
-"25526", "Dodoma\/Iringa\/Njombe\/Singida\/Tabora",
-"25523", "Coast\/Morogoro\/Lindi\/Mtwara",};
+"25522", "Dar\-Es\-Salaam",
+"25527", "Arusha\/Manyara\/Kilimanjaro\/Tanga",
+"25526", "Dodoma\/Iringa\/Njombe\/Singida\/Tabora",};
 my $timezones = {
                '' => [
                        'Africa/Dar_es_Salaam'

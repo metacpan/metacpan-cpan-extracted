@@ -63,3 +63,12 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Corrected the behavior of an empty array.
 	- Fixed tests.
 	- The manual has been corrected.
+
+0.599 Thu Mar 05 05:09:09 2026
+	- Improved behavior of %%%VAR tag: for SCALAR and REFerences to SCALAR support for internal %%%ADD[E]: tags is enabled.
+	- Added the ability to set facultative options (def|esc|ignore|silent|debug) in the template itself.
+	- Optimized algorithms.
+	- Fixed tests.
+	- Increased diversity of code test coverage.
+	- The manual has been corrected.
+

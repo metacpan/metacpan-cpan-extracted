@@ -1372,12 +1372,12 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for usage
 
- $C = tricpy($A);        # using default of uplo=0
+ $C = tricpy($A);            # using default of uplo=0
  $C = tricpy($A, $uplo);
- tricpy($A, $uplo, $C);  # all arguments given
- $C = $A->tricpy;        # method call
+ $C = tricpy($A, $uplo, $C); # all arguments given
+ $C = $A->tricpy;            # method call
  $C = $A->tricpy($uplo);
- $A->tricpy($uplo, $C);
+ $C = $A->tricpy($uplo, $C);
 
 =for ref
 

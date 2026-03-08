@@ -51,7 +51,9 @@
             "Math::Trig" : "0",
             "POSIX" : "0",
             "Readonly" : "0",
+            "Role::Tiny" : "2.000",
             "Term::ANSIColor" : "0",
+            "XML::LibXML" : "0",
             "XML::Parser" : "0",
             "perl" : "v5.38.2"
          }
@@ -66,7 +68,39 @@
    "provides" : {
       "Graphics::Penplotter::GcodeXY" : {
          "file" : "lib/Graphics/Penplotter/GcodeXY.pm",
-         "version" : "v0.6.3"
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::Font" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Font.pm",
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::Geometry2D" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Geometry2D.pm",
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::Hatch" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Hatch.pm",
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::Optimize" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Optimize.pm",
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::Postscript" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Postscript.pm",
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::SVG" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/SVG.pm",
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::Split" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Split.pm",
+         "version" : "v0.7.2"
+      },
+      "Graphics::Penplotter::GcodeXY::Vpype" : {
+         "file" : "lib/Graphics/Penplotter/GcodeXY/Vpype.pm",
+         "version" : "v0.7.2"
       }
    },
    "release_status" : "stable",
@@ -78,7 +112,7 @@
          "web" : "https://github.com/gamk67/Graphics-Penplotter-GcodeXY"
       }
    },
-   "version" : "v0.6.3",
+   "version" : "v0.7.2",
    "x_contributors" : [
       "gamk67 <31990368+gamk67@users.noreply.github.com>"
    ],

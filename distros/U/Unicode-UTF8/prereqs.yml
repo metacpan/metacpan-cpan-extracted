@@ -1,0 +1,14 @@
+runtime:
+  requires:
+    perl: '5.008001'
+    Carp: 0
+    Exporter: 0
+    XSLoader: 0
+test:
+  requires:
+    Test::More: '0.47'
+    Test::Fatal: '0.006'
+    Encode: '1.9801'
+configure:
+  requires:
+    Devel::AssertC99: 0

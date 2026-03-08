@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::IngressClass;
 # ABSTRACT: IngressClass represents the class of the Ingress, referenced by the Ingress Spec. The `ingressclass.kubernetes.io/is-default-class` annotation can be used to indicate that an IngressClass should be considered default. When a single IngressClass resource has this annotation set to true, new Ingress resources without a class specified will be assigned this default class.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject;
 
 
@@ -20,7 +20,7 @@ IO::K8s::Api::Networking::V1::IngressClass - IngressClass represents the class o
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

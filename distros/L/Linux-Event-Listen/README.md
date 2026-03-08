@@ -34,6 +34,44 @@ my $listen = Linux::Event::Listen->new(
 $loop->run;
 ```
 
+
+### Canonical server pattern: Listen + Stream + line codec
+
+If you are building a message-oriented protocol over TCP (for example, one JSON
+value per line), a common pattern is to wrap each accepted client socket in
+L<Linux::Event::Stream> and let Stream handle buffering and framing.
+
+This example uses Stream's built-in C<line> codec (Linux::Event::Stream 0.002+):
+
+```perl
+use v5.36;
+use Linux::Event;
+use Linux::Event::Listen;
+use Linux::Event::Stream;
+
+my $loop = Linux::Event->new;
+
+Linux::Event::Listen->new(
+  loop => $loop,
+  host => '127.0.0.1',
+  port => 3000,
+
+  on_accept => sub ($loop, $client_fh, $peer, $listen) {
+    Linux::Event::Stream->new(
+      loop       => $loop,
+      fh         => $client_fh,
+      codec      => 'line',
+      on_message => sub ($stream, $line, $data) {
+        $stream->write_message("echo: $line");
+        $stream->close_after_drain if $line eq 'quit';
+      },
+    );
+  },
+);
+
+$loop->run;
+```
+
 ## Usage (UNIX)
 
 ```perl

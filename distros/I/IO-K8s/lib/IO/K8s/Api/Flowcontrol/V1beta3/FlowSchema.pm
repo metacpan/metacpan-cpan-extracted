@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1beta3::FlowSchema;
 # ABSTRACT: FlowSchema defines the schema of a group of flows. Note that a flow is made up of a set of inbound API requests with similar attributes and is identified by a pair of strings: the name of the FlowSchema and a "flow distinguisher".
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Flowcontrol::V1beta3::FlowSchema - FlowSchema defines the schema o
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

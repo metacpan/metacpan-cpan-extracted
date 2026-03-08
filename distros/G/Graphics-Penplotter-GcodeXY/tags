@@ -1,0 +1,324 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	Development	//
+Graphics::Penplotter::GcodeXY	lib/Graphics/Penplotter/GcodeXY.pm	/^package Graphics::Penplotter::GcodeXY v0.6.6;$/;"	p
+Graphics::Penplotter::GcodeXY::_LiangBarsky	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _LiangBarsky ( $self, $botx, $boty, $topx, $topy, $x0src, $y0src, $x1src, $y1src ) {$/;"	s
+Graphics::Penplotter::GcodeXY::_a2c	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _a2c ($self, $x1, $y1, $rx, $ry, $phi, $fa, $fs, $x2, $y2) {$/;"	s
+Graphics::Penplotter::GcodeXY::_addfastmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addfastmove ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_addhsegmentpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addhsegmentpath ($self, $key, $sx, $sy, $dx, $dy) {$/;"	s
+Graphics::Penplotter::GcodeXY::_addmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addmove ($self, $x, $y, $speed) {$/;"	s
+Graphics::Penplotter::GcodeXY::_addpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addpath ($self, $key, $sx, $sy, $dx, $dy) {$/;"	s
+Graphics::Penplotter::GcodeXY::_addslowmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addslowmove ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_addtopage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addtopage ($self, $data) {$/;"	s
+Graphics::Penplotter::GcodeXY::_adjust	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _adjust ($self, $lref, $rref) {$/;"	s
+Graphics::Penplotter::GcodeXY::_approximate_unit_arc	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _approximate_unit_arc ($theta1, $delta_theta) {$/;"	s
+Graphics::Penplotter::GcodeXY::_bbox_from_points	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _bbox_from_points ($self, @pts) {$/;"	s
+Graphics::Penplotter::GcodeXY::_bbox_intersect	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _bbox_intersect ($self, $a, $b) {$/;"	s
+Graphics::Penplotter::GcodeXY::_calc_numsteps	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _calc_numsteps ($self, $ra, $rb) {$/;"	s
+Graphics::Penplotter::GcodeXY::_calc_sq_distance	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _calc_sq_distance ($x1, $y1, $x2, $y2) {$/;"	s
+Graphics::Penplotter::GcodeXY::_checkl	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _checkl ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_checkp	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _checkp ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_closepage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _closepage ($self, $out = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::_closepath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _closepath ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_corners	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _corners ($self, $dest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_croak	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _croak ($self, $msg) {$/;"	s
+Graphics::Penplotter::GcodeXY::_cross2	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _cross2 ($self, $v1x, $v1y, $v2x, $v2y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_curseg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _curseg ($self, $line) {$/;"	s
+Graphics::Penplotter::GcodeXY::_curve3	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _curve3 ($self, $x1, $y1, $x2, $y2, $x3, $y3) {$/;"	s
+Graphics::Penplotter::GcodeXY::_curve4	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _curve4 ($self, $x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4) {$/;"	s
+Graphics::Penplotter::GcodeXY::_doglyphs	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _doglyphs ($self, $face, $s, $fill) {$/;"	s
+Graphics::Penplotter::GcodeXY::_dohatching	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dohatching ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_dopath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dopath ($self, $d) {$/;"	s
+Graphics::Penplotter::GcodeXY::_dot2	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dot2 ($self, $ux, $uy, $vx, $vy) {$/;"	s
+Graphics::Penplotter::GcodeXY::_dotransform	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dotransform ($self, $t) {$/;"	s
+Graphics::Penplotter::GcodeXY::_drop	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _drop ($self, $line, $refrest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_endtag	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _endtag ($self, $expat, $element, %attr) {$/;"	s
+Graphics::Penplotter::GcodeXY::_error	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _error ($self, $msg) {$/;"	s
+Graphics::Penplotter::GcodeXY::_fabs	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fabs ($val) {$/;"	s
+Graphics::Penplotter::GcodeXY::_fastmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fastmove ($self, $line, $xs, $ys, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_feq	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _feq ($x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_fillet	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fillet ($self, $p1x, $p1y, $p2x, $p2y, $p3x, $p3y, $p4x, $p4y, $r) {$/;"	s
+Graphics::Penplotter::GcodeXY::_flushHsegments	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _flushHsegments ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_flushPsegments	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _flushPsegments ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_fprintf	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fprintf ($info, @args) {$/;"	s
+Graphics::Penplotter::GcodeXY::_genfastmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _genfastmove ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_genmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _genmove ($self, $mode, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_genslowmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _genslowmove ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_get_arc_center	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _get_arc_center ($x1, $y1, $x2, $y2, $fa, $fs, $rx, $ry, $sin_phi, $cos_phi) {$/;"	s
+Graphics::Penplotter::GcodeXY::_get_bbox	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _get_bbox ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_getsegintersect	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _getsegintersect ($self, $p0x, $p0y, $p1x, $p1y, $p2x, $p2y, $p3x, $p3y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_hoptimize	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _hoptimize ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_identical	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _identical ($self, $seg1, $seg2) {$/;"	s
+Graphics::Penplotter::GcodeXY::_in_unitfied	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _in_unitfied ($self, $p) {$/;"	s
+Graphics::Penplotter::GcodeXY::_keep	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _keep ($self, $line, $refrest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_linecoefs	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _linecoefs ($self, $p1x, $p1y, $p2x, $p2y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_linetopoint	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _linetopoint ($self, $a, $b, $c, $px, $py) {$/;"	s
+Graphics::Penplotter::GcodeXY::_newhpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _newhpath ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_openpage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _openpage ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_optimize	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _optimize ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_p_to_d	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _p_to_d ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_parse	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _parse ($self, $ss) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern1	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern1 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern10	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern10 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern11	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern11 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern2	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern2 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern3	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern3 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern4	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern4 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern5	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern5 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern6	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern6 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern7	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern7 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern8	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern8 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pattern9	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern9 ($self, $line, $rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_penlock	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _penlock ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_penlocked	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _penlocked ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_penunlock	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _penunlock ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_point_in_poly	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _point_in_poly ($self, $px, $py, @poly) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pointperp	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pointperp ($self, $a, $b, $c, $px, $py) {$/;"	s
+Graphics::Penplotter::GcodeXY::_prPseg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _prPseg ($self, $index) {$/;"	s
+Graphics::Penplotter::GcodeXY::_premulmat	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _premulmat ($self, $aref, $bref) {$/;"	s
+Graphics::Penplotter::GcodeXY::_pt_unitfied	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pt_unitfied ($self, $p) {$/;"	s
+Graphics::Penplotter::GcodeXY::_recbezier3	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _recbezier3 ($self, $x1, $y1, $x2, $y2, $x3, $y3, $level) {$/;"	s
+Graphics::Penplotter::GcodeXY::_recbezier4	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _recbezier4 ($self, $x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4, $level) {$/;"	s
+Graphics::Penplotter::GcodeXY::_sameside	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _sameside ($self, $y, $seg1, $seg2) {$/;"	s
+Graphics::Penplotter::GcodeXY::_setprevious	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _setprevious ($self, $op, $xn, $yn) {$/;"	s
+Graphics::Penplotter::GcodeXY::_sheetinfo	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _sheetinfo ($self, $dest) {$/;"	s
+Graphics::Penplotter::GcodeXY::_slowmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _slowmove ($self, $line, $xs, $ys, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_starttag	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _starttag ($self, $expat, $element, %attr) {$/;"	s
+Graphics::Penplotter::GcodeXY::_stats	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _stats ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::_svg_value_to_inches	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _svg_value_to_inches ($value) {$/;"	s
+Graphics::Penplotter::GcodeXY::_svgconvert	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _svgconvert ($self, $value) {$/;"	s
+Graphics::Penplotter::GcodeXY::_transform	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _transform ($self, $npts, $ptsref) {$/;"	s
+Graphics::Penplotter::GcodeXY::_traverse_libxml	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _traverse_libxml ($self, $node) {$/;"	s
+Graphics::Penplotter::GcodeXY::_u_to_d	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _u_to_d ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_u_to_p	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _u_to_p ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::_unit_vector_angle	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _unit_vector_angle ($ux, $uy, $vx, $vy) {$/;"	s
+Graphics::Penplotter::GcodeXY::_warn	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _warn ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::addcomment	lib/Graphics/Penplotter/GcodeXY.pm	/^sub addcomment ($self, $s) {$/;"	s
+Graphics::Penplotter::GcodeXY::addfontpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub addfontpath ($self, @paths) {$/;"	s
+Graphics::Penplotter::GcodeXY::addtopage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub addtopage ($self, $data) {$/;"	s
+Graphics::Penplotter::GcodeXY::arc	lib/Graphics/Penplotter/GcodeXY.pm	/^sub arc ($self, $x, $y, $r, $start, $finish, $steps = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::arcto	lib/Graphics/Penplotter/GcodeXY.pm	/^sub arcto ($self, $x2, $y2, $x4, $y4, $r) {$/;"	s
+Graphics::Penplotter::GcodeXY::arrowhead	lib/Graphics/Penplotter/GcodeXY.pm	/^sub arrowhead ($self, $length, $width, $type = 'open') {$/;"	s
+Graphics::Penplotter::GcodeXY::box	lib/Graphics/Penplotter/GcodeXY.pm	/^sub box ($self, $x1, $y1, $x2 = undef, $y2 = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::boxR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub boxR ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::boxround	lib/Graphics/Penplotter/GcodeXY.pm	/^sub boxround ($self, $r, $bx, $by, $tx, $ty) {$/;"	s
+Graphics::Penplotter::GcodeXY::circle	lib/Graphics/Penplotter/GcodeXY.pm	/^sub circle ($self, $x, $y, $r, $steps = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::currentpoint	lib/Graphics/Penplotter/GcodeXY.pm	/^sub currentpoint ($self, $new_x = undef, $new_y = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::curve	lib/Graphics/Penplotter/GcodeXY.pm	/^sub curve ($self, @control) {$/;"	s
+Graphics::Penplotter::GcodeXY::curveto	lib/Graphics/Penplotter/GcodeXY.pm	/^sub curveto ($self, @control) {$/;"	s
+Graphics::Penplotter::GcodeXY::degrees	lib/Graphics/Penplotter/GcodeXY.pm	/^sub degrees ($rad) {$/;"	s
+Graphics::Penplotter::GcodeXY::do_pendown	lib/Graphics/Penplotter/GcodeXY.pm	/^sub do_pendown ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::do_penup	lib/Graphics/Penplotter/GcodeXY.pm	/^sub do_penup ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::ellipse	lib/Graphics/Penplotter/GcodeXY.pm	/^sub ellipse ($self, $x, $y, $a, $b, $steps = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::exporteps	lib/Graphics/Penplotter/GcodeXY.pm	/^sub exporteps ($self, $gcout = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::exportsvg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub exportsvg ($self, $gcout = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::findfont	lib/Graphics/Penplotter/GcodeXY.pm	/^sub findfont ($self, $name) {$/;"	s
+Graphics::Penplotter::GcodeXY::getsegpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub getsegpath ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::grestore	lib/Graphics/Penplotter/GcodeXY.pm	/^sub grestore ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::gsave	lib/Graphics/Penplotter/GcodeXY.pm	/^sub gsave ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::importsvg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub importsvg ($self, $file) {$/;"	s
+Graphics::Penplotter::GcodeXY::init	lib/Graphics/Penplotter/GcodeXY.pm	/^sub init ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::initmatrix	lib/Graphics/Penplotter/GcodeXY.pm	/^sub initmatrix ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::line	lib/Graphics/Penplotter/GcodeXY.pm	/^sub line ($self, $x1, $y1 = undef, $x2 = undef, $y2 = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::lineR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub lineR ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::moveto	lib/Graphics/Penplotter/GcodeXY.pm	/^sub moveto ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::movetoR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub movetoR ($self, $x, $y) {$/;"	s
+Graphics::Penplotter::GcodeXY::new	lib/Graphics/Penplotter/GcodeXY.pm	/^sub new ($class, %data) {$/;"	s
+Graphics::Penplotter::GcodeXY::newpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub newpath ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::output	lib/Graphics/Penplotter/GcodeXY.pm	/^sub output ($self, $file = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::pageborder	lib/Graphics/Penplotter/GcodeXY.pm	/^sub pageborder ($self, $margin) {$/;"	s
+Graphics::Penplotter::GcodeXY::pendown	lib/Graphics/Penplotter/GcodeXY.pm	/^sub pendown ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::penup	lib/Graphics/Penplotter/GcodeXY.pm	/^sub penup ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::polygon	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygon ($self, $x, $y, @rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::polygonC	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygonC ($self, @coords) {$/;"	s
+Graphics::Penplotter::GcodeXY::polygonR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygonR ($self, @coords) {$/;"	s
+Graphics::Penplotter::GcodeXY::polygon_clip	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygon_clip ($self, $x, $y, @rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::polygon_clip_end	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygon_clip_end ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::polygonround	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygonround ($self, $r, @rest) {$/;"	s
+Graphics::Penplotter::GcodeXY::printcorner	lib/Graphics/Penplotter/GcodeXY.pm	/^sub printcorner ($self, $sx, $sy) {$/;"	s
+Graphics::Penplotter::GcodeXY::radians	lib/Graphics/Penplotter/GcodeXY.pm	/^sub radians ($deg) {$/;"	s
+Graphics::Penplotter::GcodeXY::rotate	lib/Graphics/Penplotter/GcodeXY.pm	/^sub rotate ($self, $a, $rxx = undef, $ryy = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::scale	lib/Graphics/Penplotter/GcodeXY.pm	/^sub scale ($self, $sx, $sy = undef, $rxx = undef, $ryy = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::setfont	lib/Graphics/Penplotter/GcodeXY.pm	/^sub setfont ($self, $font, $size = undef) {$/;"	s
+Graphics::Penplotter::GcodeXY::setfontsize	lib/Graphics/Penplotter/GcodeXY.pm	/^sub setfontsize ($self, $size) {$/;"	s
+Graphics::Penplotter::GcodeXY::sethatchsep	lib/Graphics/Penplotter/GcodeXY.pm	/^sub sethatchsep ($self, $sep) {$/;"	s
+Graphics::Penplotter::GcodeXY::skewX	lib/Graphics/Penplotter/GcodeXY.pm	/^sub skewX ($self, $deg) {$/;"	s
+Graphics::Penplotter::GcodeXY::skewY	lib/Graphics/Penplotter/GcodeXY.pm	/^sub skewY ($self, $deg) {$/;"	s
+Graphics::Penplotter::GcodeXY::split	lib/Graphics/Penplotter/GcodeXY.pm	/^sub split ($self, $dest, $file) {$/;"	s
+Graphics::Penplotter::GcodeXY::stroke	lib/Graphics/Penplotter/GcodeXY.pm	/^sub stroke ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::strokefill	lib/Graphics/Penplotter/GcodeXY.pm	/^sub strokefill ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::stroketext	lib/Graphics/Penplotter/GcodeXY.pm	/^sub stroketext ($self, $face, $string) {$/;"	s
+Graphics::Penplotter::GcodeXY::stroketextfill	lib/Graphics/Penplotter/GcodeXY.pm	/^sub stroketextfill ($self, $face, $string) {$/;"	s
+Graphics::Penplotter::GcodeXY::textwidth	lib/Graphics/Penplotter/GcodeXY.pm	/^sub textwidth ($self, $face, $s) {$/;"	s
+Graphics::Penplotter::GcodeXY::translate	lib/Graphics/Penplotter/GcodeXY.pm	/^sub translate ($self, $tx, $ty) {$/;"	s
+Graphics::Penplotter::GcodeXY::translateC	lib/Graphics/Penplotter/GcodeXY.pm	/^sub translateC ($self) {$/;"	s
+Graphics::Penplotter::GcodeXY::vpype_linesort	lib/Graphics/Penplotter/GcodeXY.pm	/^sub vpype_linesort ($self) {$/;"	s
+HATCH	lib/Graphics/Penplotter/GcodeXY.pm	/^            HATCH:$/;"	l
+HEADER	lib/Graphics/Penplotter/GcodeXY.pm	/^    HEADER:$/;"	l
+INSTRUCTION	lib/Graphics/Penplotter/GcodeXY.pm	/^    INSTRUCTION:$/;"	l
+LINE	lib/Graphics/Penplotter/GcodeXY.pm	/^            LINE:$/;"	l
+NEXT4	lib/Graphics/Penplotter/GcodeXY.pm	/^            NEXT4:$/;"	l
+PAIR	lib/Graphics/Penplotter/GcodeXY.pm	/^            PAIR:$/;"	l
+SEGMENT	lib/Graphics/Penplotter/GcodeXY.pm	/^    SEGMENT:$/;"	l
+_LiangBarsky	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _LiangBarsky ( $self, $botx, $boty, $topx, $topy, $x0src, $y0src, $x1src, $y1src ) {$/;"	s
+_a2c	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _a2c ($self, $x1, $y1, $rx, $ry, $phi, $fa, $fs, $x2, $y2) {$/;"	s
+_addfastmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addfastmove ($self, $x, $y) {$/;"	s
+_addhsegmentpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addhsegmentpath ($self, $key, $sx, $sy, $dx, $dy) {$/;"	s
+_addmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addmove ($self, $x, $y, $speed) {$/;"	s
+_addpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addpath ($self, $key, $sx, $sy, $dx, $dy) {$/;"	s
+_addslowmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addslowmove ($self, $x, $y) {$/;"	s
+_addtopage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _addtopage ($self, $data) {$/;"	s
+_adjust	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _adjust ($self, $lref, $rref) {$/;"	s
+_approximate_unit_arc	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _approximate_unit_arc ($theta1, $delta_theta) {$/;"	s
+_bbox_from_points	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _bbox_from_points ($self, @pts) {$/;"	s
+_bbox_intersect	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _bbox_intersect ($self, $a, $b) {$/;"	s
+_calc_numsteps	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _calc_numsteps ($self, $ra, $rb) {$/;"	s
+_calc_sq_distance	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _calc_sq_distance ($x1, $y1, $x2, $y2) {$/;"	s
+_checkl	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _checkl ($self) {$/;"	s
+_checkp	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _checkp ($self) {$/;"	s
+_closepage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _closepage ($self, $out = undef) {$/;"	s
+_closepath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _closepath ($self) {$/;"	s
+_corners	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _corners ($self, $dest) {$/;"	s
+_croak	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _croak ($self, $msg) {$/;"	s
+_cross2	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _cross2 ($self, $v1x, $v1y, $v2x, $v2y) {$/;"	s
+_curseg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _curseg ($self, $line) {$/;"	s
+_curve3	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _curve3 ($self, $x1, $y1, $x2, $y2, $x3, $y3) {$/;"	s
+_curve4	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _curve4 ($self, $x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4) {$/;"	s
+_doglyphs	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _doglyphs ($self, $face, $s, $fill) {$/;"	s
+_dohatching	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dohatching ($self) {$/;"	s
+_dopath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dopath ($self, $d) {$/;"	s
+_dot2	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dot2 ($self, $ux, $uy, $vx, $vy) {$/;"	s
+_dotransform	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _dotransform ($self, $t) {$/;"	s
+_drop	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _drop ($self, $line, $refrest) {$/;"	s
+_endtag	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _endtag ($self, $expat, $element, %attr) {$/;"	s
+_error	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _error ($self, $msg) {$/;"	s
+_fabs	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fabs ($val) {$/;"	s
+_fastmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fastmove ($self, $line, $xs, $ys, $x, $y) {$/;"	s
+_feq	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _feq ($x, $y) {$/;"	s
+_fillet	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fillet ($self, $p1x, $p1y, $p2x, $p2y, $p3x, $p3y, $p4x, $p4y, $r) {$/;"	s
+_flushHsegments	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _flushHsegments ($self) {$/;"	s
+_flushPsegments	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _flushPsegments ($self) {$/;"	s
+_fprintf	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _fprintf ($info, @args) {$/;"	s
+_genfastmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _genfastmove ($self, $x, $y) {$/;"	s
+_genmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _genmove ($self, $mode, $x, $y) {$/;"	s
+_genslowmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _genslowmove ($self, $x, $y) {$/;"	s
+_get_arc_center	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _get_arc_center ($x1, $y1, $x2, $y2, $fa, $fs, $rx, $ry, $sin_phi, $cos_phi) {$/;"	s
+_get_bbox	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _get_bbox ($self) {$/;"	s
+_getsegintersect	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _getsegintersect ($self, $p0x, $p0y, $p1x, $p1y, $p2x, $p2y, $p3x, $p3y) {$/;"	s
+_hoptimize	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _hoptimize ($self) {$/;"	s
+_identical	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _identical ($self, $seg1, $seg2) {$/;"	s
+_in_unitfied	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _in_unitfied ($self, $p) {$/;"	s
+_keep	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _keep ($self, $line, $refrest) {$/;"	s
+_linecoefs	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _linecoefs ($self, $p1x, $p1y, $p2x, $p2y) {$/;"	s
+_linetopoint	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _linetopoint ($self, $a, $b, $c, $px, $py) {$/;"	s
+_newhpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _newhpath ($self) {$/;"	s
+_openpage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _openpage ($self) {$/;"	s
+_optimize	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _optimize ($self) {$/;"	s
+_p_to_d	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _p_to_d ($self, $x, $y) {$/;"	s
+_parse	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _parse ($self, $ss) {$/;"	s
+_pattern1	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern1 ($self, $line, $rest) {$/;"	s
+_pattern10	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern10 ($self, $line, $rest) {$/;"	s
+_pattern11	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern11 ($self, $line, $rest) {$/;"	s
+_pattern2	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern2 ($self, $line, $rest) {$/;"	s
+_pattern3	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern3 ($self, $line, $rest) {$/;"	s
+_pattern4	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern4 ($self, $line, $rest) {$/;"	s
+_pattern5	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern5 ($self, $line, $rest) {$/;"	s
+_pattern6	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern6 ($self, $line, $rest) {$/;"	s
+_pattern7	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern7 ($self, $line, $rest) {$/;"	s
+_pattern8	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern8 ($self, $line, $rest) {$/;"	s
+_pattern9	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pattern9 ($self, $line, $rest) {$/;"	s
+_penlock	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _penlock ($self) {$/;"	s
+_penlocked	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _penlocked ($self) {$/;"	s
+_penunlock	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _penunlock ($self) {$/;"	s
+_point_in_poly	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _point_in_poly ($self, $px, $py, @poly) {$/;"	s
+_pointperp	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pointperp ($self, $a, $b, $c, $px, $py) {$/;"	s
+_prPseg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _prPseg ($self, $index) {$/;"	s
+_premulmat	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _premulmat ($self, $aref, $bref) {$/;"	s
+_pt_unitfied	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _pt_unitfied ($self, $p) {$/;"	s
+_recbezier3	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _recbezier3 ($self, $x1, $y1, $x2, $y2, $x3, $y3, $level) {$/;"	s
+_recbezier4	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _recbezier4 ($self, $x1, $y1, $x2, $y2, $x3, $y3, $x4, $y4, $level) {$/;"	s
+_sameside	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _sameside ($self, $y, $seg1, $seg2) {$/;"	s
+_setprevious	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _setprevious ($self, $op, $xn, $yn) {$/;"	s
+_sheetinfo	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _sheetinfo ($self, $dest) {$/;"	s
+_slowmove	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _slowmove ($self, $line, $xs, $ys, $x, $y) {$/;"	s
+_starttag	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _starttag ($self, $expat, $element, %attr) {$/;"	s
+_stats	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _stats ($self) {$/;"	s
+_svg_value_to_inches	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _svg_value_to_inches ($value) {$/;"	s
+_svgconvert	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _svgconvert ($self, $value) {$/;"	s
+_transform	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _transform ($self, $npts, $ptsref) {$/;"	s
+_traverse_libxml	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _traverse_libxml ($self, $node) {$/;"	s
+_u_to_d	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _u_to_d ($self, $x, $y) {$/;"	s
+_u_to_p	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _u_to_p ($self, $x, $y) {$/;"	s
+_unit_vector_angle	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _unit_vector_angle ($ux, $uy, $vx, $vy) {$/;"	s
+_warn	lib/Graphics/Penplotter/GcodeXY.pm	/^sub _warn ($self, $x, $y) {$/;"	s
+addcomment	lib/Graphics/Penplotter/GcodeXY.pm	/^sub addcomment ($self, $s) {$/;"	s
+addfontpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub addfontpath ($self, @paths) {$/;"	s
+addtopage	lib/Graphics/Penplotter/GcodeXY.pm	/^sub addtopage ($self, $data) {$/;"	s
+arc	lib/Graphics/Penplotter/GcodeXY.pm	/^sub arc ($self, $x, $y, $r, $start, $finish, $steps = undef) {$/;"	s
+arcto	lib/Graphics/Penplotter/GcodeXY.pm	/^sub arcto ($self, $x2, $y2, $x4, $y4, $r) {$/;"	s
+arrowhead	lib/Graphics/Penplotter/GcodeXY.pm	/^sub arrowhead ($self, $length, $width, $type = 'open') {$/;"	s
+box	lib/Graphics/Penplotter/GcodeXY.pm	/^sub box ($self, $x1, $y1, $x2 = undef, $y2 = undef) {$/;"	s
+boxR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub boxR ($self, $x, $y) {$/;"	s
+boxround	lib/Graphics/Penplotter/GcodeXY.pm	/^sub boxround ($self, $r, $bx, $by, $tx, $ty) {$/;"	s
+circle	lib/Graphics/Penplotter/GcodeXY.pm	/^sub circle ($self, $x, $y, $r, $steps = undef) {$/;"	s
+currentpoint	lib/Graphics/Penplotter/GcodeXY.pm	/^sub currentpoint ($self, $new_x = undef, $new_y = undef) {$/;"	s
+curve	lib/Graphics/Penplotter/GcodeXY.pm	/^sub curve ($self, @control) {$/;"	s
+curveto	lib/Graphics/Penplotter/GcodeXY.pm	/^sub curveto ($self, @control) {$/;"	s
+degrees	lib/Graphics/Penplotter/GcodeXY.pm	/^sub degrees ($rad) {$/;"	s
+do_pendown	lib/Graphics/Penplotter/GcodeXY.pm	/^sub do_pendown ($self) {$/;"	s
+do_penup	lib/Graphics/Penplotter/GcodeXY.pm	/^sub do_penup ($self) {$/;"	s
+doheader	script/gcode-simulator.pl	/^sub doheader {$/;"	s
+dotriangle	examples/triangles.pl	/^sub dotriangle {$/;"	s
+ellipse	lib/Graphics/Penplotter/GcodeXY.pm	/^sub ellipse ($self, $x, $y, $a, $b, $steps = undef) {$/;"	s
+exporteps	lib/Graphics/Penplotter/GcodeXY.pm	/^sub exporteps ($self, $gcout = undef) {$/;"	s
+exportsvg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub exportsvg ($self, $gcout = undef) {$/;"	s
+findfont	lib/Graphics/Penplotter/GcodeXY.pm	/^sub findfont ($self, $name) {$/;"	s
+getsegpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub getsegpath ($self) {$/;"	s
+grestore	lib/Graphics/Penplotter/GcodeXY.pm	/^sub grestore ($self) {$/;"	s
+gsave	lib/Graphics/Penplotter/GcodeXY.pm	/^sub gsave ($self) {$/;"	s
+importsvg	lib/Graphics/Penplotter/GcodeXY.pm	/^sub importsvg ($self, $file) {$/;"	s
+init	lib/Graphics/Penplotter/GcodeXY.pm	/^sub init ($self) {$/;"	s
+initmatrix	lib/Graphics/Penplotter/GcodeXY.pm	/^sub initmatrix ($self) {$/;"	s
+line	lib/Graphics/Penplotter/GcodeXY.pm	/^sub line ($self, $x1, $y1 = undef, $x2 = undef, $y2 = undef) {$/;"	s
+lineR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub lineR ($self, $x, $y) {$/;"	s
+moveto	lib/Graphics/Penplotter/GcodeXY.pm	/^sub moveto ($self, $x, $y) {$/;"	s
+movetoR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub movetoR ($self, $x, $y) {$/;"	s
+new	lib/Graphics/Penplotter/GcodeXY.pm	/^sub new ($class, %data) {$/;"	s
+newpath	lib/Graphics/Penplotter/GcodeXY.pm	/^sub newpath ($self) {$/;"	s
+output	lib/Graphics/Penplotter/GcodeXY.pm	/^sub output ($self, $file = undef) {$/;"	s
+pageborder	lib/Graphics/Penplotter/GcodeXY.pm	/^sub pageborder ($self, $margin) {$/;"	s
+parse	script/gcode-simulator.pl	/^sub parse {$/;"	s
+parse	script/gcodebb	/^sub parse {$/;"	s
+pendown	lib/Graphics/Penplotter/GcodeXY.pm	/^sub pendown ($self) {$/;"	s
+penup	lib/Graphics/Penplotter/GcodeXY.pm	/^sub penup ($self) {$/;"	s
+polygon	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygon ($self, $x, $y, @rest) {$/;"	s
+polygonC	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygonC ($self, @coords) {$/;"	s
+polygonR	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygonR ($self, @coords) {$/;"	s
+polygon_clip	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygon_clip ($self, $x, $y, @rest) {$/;"	s
+polygon_clip_end	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygon_clip_end ($self) {$/;"	s
+polygonround	lib/Graphics/Penplotter/GcodeXY.pm	/^sub polygonround ($self, $r, @rest) {$/;"	s
+printcoords	script/gcode-simulator.pl	/^sub printcoords {$/;"	s
+printcorner	lib/Graphics/Penplotter/GcodeXY.pm	/^sub printcorner ($self, $sx, $sy) {$/;"	s
+printline	script/gcode-simulator.pl	/^sub printline {$/;"	s
+pythagorastree	examples/pythagoras.pl	/^sub pythagorastree {$/;"	s
+quit	script/gcode-simulator.pl	/^sub quit {$/;"	s
+radians	lib/Graphics/Penplotter/GcodeXY.pm	/^sub radians ($deg) {$/;"	s
+rotate	lib/Graphics/Penplotter/GcodeXY.pm	/^sub rotate ($self, $a, $rxx = undef, $ryy = undef) {$/;"	s
+scale	lib/Graphics/Penplotter/GcodeXY.pm	/^sub scale ($self, $sx, $sy = undef, $rxx = undef, $ryy = undef) {$/;"	s
+setfont	lib/Graphics/Penplotter/GcodeXY.pm	/^sub setfont ($self, $font, $size = undef) {$/;"	s
+setfontsize	lib/Graphics/Penplotter/GcodeXY.pm	/^sub setfontsize ($self, $size) {$/;"	s
+sethatchsep	lib/Graphics/Penplotter/GcodeXY.pm	/^sub sethatchsep ($self, $sep) {$/;"	s
+skewX	lib/Graphics/Penplotter/GcodeXY.pm	/^sub skewX ($self, $deg) {$/;"	s
+skewY	lib/Graphics/Penplotter/GcodeXY.pm	/^sub skewY ($self, $deg) {$/;"	s
+split	lib/Graphics/Penplotter/GcodeXY.pm	/^sub split ($self, $dest, $file) {$/;"	s
+stroke	lib/Graphics/Penplotter/GcodeXY.pm	/^sub stroke ($self) {$/;"	s
+strokefill	lib/Graphics/Penplotter/GcodeXY.pm	/^sub strokefill ($self) {$/;"	s
+stroketext	lib/Graphics/Penplotter/GcodeXY.pm	/^sub stroketext ($self, $face, $string) {$/;"	s
+stroketextfill	lib/Graphics/Penplotter/GcodeXY.pm	/^sub stroketextfill ($self, $face, $string) {$/;"	s
+textwidth	lib/Graphics/Penplotter/GcodeXY.pm	/^sub textwidth ($self, $face, $s) {$/;"	s
+translate	lib/Graphics/Penplotter/GcodeXY.pm	/^sub translate ($self, $tx, $ty) {$/;"	s
+translateC	lib/Graphics/Penplotter/GcodeXY.pm	/^sub translateC ($self) {$/;"	s
+vpype_linesort	lib/Graphics/Penplotter/GcodeXY.pm	/^sub vpype_linesort ($self) {$/;"	s

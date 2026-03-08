@@ -1,0 +1,17 @@
+.gitignore
+bench/benchmark.pl
+Changes
+eg/build_document.pl
+eg/error_handling.pl
+eg/modify_tree.pl
+eg/parse_and_query.pl
+lib/XML/PugiXML.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+PugiXML.xs
+README
+t/01-basic.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

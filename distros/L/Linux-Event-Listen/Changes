@@ -1,5 +1,12 @@
 Revision history for Linux-Event-Listen
 
+0.016  2026-03-01
+  - Fix POD errors.
+
+0.015  2026-03-01
+  - Documentation: add canonical server example using Linux::Event::Stream with the line codec.
+  - Add examples/03_stream_line_codec_echo.pl demonstrating Listen + Stream framing.
+
 0.014  2026-02-22
   - Restore GitHub CI badge in README.
 

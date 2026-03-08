@@ -1,25 +1,35 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+5.0.2 2026-03-04 (part of Zonemaster v2025.2.1 release)
+
+ [Fixes]
+ - Adds check for cryptographic SHA-1 support at installation
+   (#245)
+ - Declares Test::Exception as a test-time dependency at
+   installation (#244)
+ - Makes it more robust when dealing with unknown resource
+   record types (#241)
+
 
 5.0.1 2025-12-17 (part of Zonemaster v2025.2 release)
 
  [Fixes]
-- Updates LDNS submodule to v1.8.4 #202
-- RRList.pm: drop misplaced =back  #233
+ - Updates LDNS submodule to v1.8.4 #202
+ - RRList.pm: drop misplaced =back  #233
 
 
 5.0.0 2025-06-26 (part of Zonemaster v2025.1 release)
 
  [Breaking changes]
-- Raises minimum Perl version to v5.26.0 #228
+ - Raises minimum Perl version to v5.26.0 #228
 
  [Features]
-- Improves performance by removing dubious code #217
+ - Improves performance by removing dubious code #217
 
  [Fixes]
-- Updates Dockerfile for release 2025.1 #229
-- Removes unused feature "randomized capitalization" #207
-- Fixes export of methods #219
+ - Updates Dockerfile for release 2025.1 #229
+ - Removes unused feature "randomized capitalization" #207
+ - Fixes export of methods #219
 
 
 4.1.0 2024-12-09 (part of Zonemaster v2024.2 release)

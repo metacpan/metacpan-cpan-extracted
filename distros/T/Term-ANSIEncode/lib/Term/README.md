@@ -169,6 +169,15 @@ These tokens have an end token where text to be wrapped have text between the to
 | WRAP | ENDWRAP | Begins text block to be word-wrapped |
 | JUSTIFIED | ENDJUSTIFIED | Begins text block to be word-wrapped and justified |
 
+## MACRO TOKENS
+
+These tokens take a "count" value.
+
+| **Token** | **Parameters** | **Description** |
+| --- | --- | --- |
+| SPACES | count | Output spaces |
+| CHAR | character,count | Output a single character "count" number of times |
+
 ## AUTHOR & COPYRIGHT
 
 Richard Kelsch

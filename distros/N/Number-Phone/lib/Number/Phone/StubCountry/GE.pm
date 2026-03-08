@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153522;
+our $VERSION = 1.20260306161712;
 
 my $formatters = [
                 {
@@ -157,7 +157,7 @@ my $validators = {
                   [03][01]|
                   [124]\\d|
                   5[2-6]|
-                  7[0-4]
+                  7[0-6]
                 )|
                 4\\d\\d
               )|
@@ -213,80 +213,80 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"995353", "Gurdjaani",
-"995494", "lanchxuti",
 "995496", "Ozurgeti",
-"995364", "Aspindza",
-"995366", "Adigeni",
-"995412", "Abasha",
-"995350", "Telavi",
-"995426", "Kobuleti",
-"995345", "Stefanstminda\/Kazbegi",
-"995424", "Shuaxevi",
-"995417", "Chkhorotskhu",
-"995443", "Gagra",
-"995341", "Rustavi",
-"995359", "TetriTskaro",
-"995432", "Vani",
+"995494", "lanchxuti",
+"995362", "Akhalkalaki",
+"995479", "Chiatura",
 "995418", "Martvili",
-"995374", "Tigvi",
-"995472", "Tsageri",
-"995437", "Lentekhi",
-"995358", "Bolnisi",
-"995419", "Choxatauri",
-"995433", "Kharagauli",
-"995473", "Oni",
+"995447", "Gali",
+"995345", "Stefanstminda\/Kazbegi",
+"995349", "Akhmeta",
 "995371", "Kaspi",
-"995448", "Gulripshi",
-"995413", "Senaki",
-"995365", "Akhaltsikhe",
-"995495", "Khoni",
+"995363", "Tsalka",
 "995352", "Kvareli",
 "995491", "Terdjola",
-"995410", "Mestia",
-"995447", "Gali",
-"995361", "Ninotsminda",
-"995439", "Ambrolauri",
-"995442", "Sukhumi",
-"995425", "Qeda",
-"995346", "Dusheti",
-"995357", "Marneuli",
-"995344", "Tskhinvali",
-"995479", "Chiatura",
-"99532", "Tbilisi",
-"995492", "Zestafoni",
-"995351", "Sagaredjo",
-"995362", "Akhalkalaki",
-"995416", "Tsalendjikha",
-"995427", "Xelvachauri",
-"995355", "Signagi",
-"995414", "Xobi",
-"995422", "Batumi",
-"995445", "Ochamchire",
-"995367", "Bordjomi",
+"995365", "Akhaltsikhe",
 "995497", "Tkibuli",
-"995436", "Tskaltubo",
-"995434", "Bagdati",
-"995368", "Khashuri",
-"995349", "Akhmeta",
-"995372", "Gardabani",
-"995435", "Sachkhere",
-"995431", "Kutaisi",
 "995369", "Kareli",
-"995373", "Mtskheta",
-"995348", "Tianeti",
-"995370", "Gori",
-"995360", "Dmanisi",
-"995411", "Samtredia",
-"995493", "Poti",
-"995363", "Tsalka",
-"995415", "Zugdidi",
-"995356", "DedoplisTskaro",
-"995347", "Djava",
-"995354", "Lagodekhi",
 "995446", "Tkvarcheli",
+"995472", "Tsageri",
 "995444", "Gudauta",
+"995374", "Tigvi",
 "995342", "Akhalgori",
-"995423", "Xulo",};
+"995473", "Oni",
+"995355", "Signagi",
+"995359", "TetriTskaro",
+"995432", "Vani",
+"995448", "Gulripshi",
+"995417", "Chkhorotskhu",
+"995411", "Samtredia",
+"995360", "Dmanisi",
+"995422", "Batumi",
+"995350", "Telavi",
+"995423", "Xulo",
+"995433", "Kharagauli",
+"995414", "Xobi",
+"995439", "Ambrolauri",
+"995435", "Sachkhere",
+"995416", "Tsalendjikha",
+"995425", "Qeda",
+"995445", "Ochamchire",
+"995366", "Adigeni",
+"995364", "Aspindza",
+"995492", "Zestafoni",
+"995356", "DedoplisTskaro",
+"995493", "Poti",
+"995354", "Lagodekhi",
+"995341", "Rustavi",
+"995347", "Djava",
+"995410", "Mestia",
+"995442", "Sukhumi",
+"995373", "Mtskheta",
+"995361", "Ninotsminda",
+"995495", "Khoni",
+"995367", "Bordjomi",
+"995351", "Sagaredjo",
+"995357", "Marneuli",
+"995443", "Gagra",
+"995346", "Dusheti",
+"995372", "Gardabani",
+"995344", "Tskhinvali",
+"995426", "Kobuleti",
+"995424", "Shuaxevi",
+"995434", "Bagdati",
+"995419", "Choxatauri",
+"995436", "Tskaltubo",
+"995415", "Zugdidi",
+"995348", "Tianeti",
+"99532", "Tbilisi",
+"995368", "Khashuri",
+"995427", "Xelvachauri",
+"995412", "Abasha",
+"995437", "Lentekhi",
+"995431", "Kutaisi",
+"995413", "Senaki",
+"995370", "Gori",
+"995358", "Bolnisi",};
 my $timezones = {
                '' => [
                        'Asia/Tbilisi'

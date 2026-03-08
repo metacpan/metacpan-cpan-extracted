@@ -63,7 +63,7 @@ YAML
           instanceLocation => '',
           keywordLocation => '/discriminator',
           absoluteKeywordLocation => $doc_uri.'#/components/schemas/pet/discriminator',
-          error => 'missing required discriminator property "petType"',
+          error => 'missing required discriminator property "petType" and no defaultMapping present',
         },
       ],
     },
@@ -170,6 +170,32 @@ YAML
       ),
     },
     'no mapping for petType found',
+  );
+
+
+  my $schema = $openapi->openapi_schema;
+  $schema->{components}{schemas}{pet}{discriminator}{defaultMapping} = 'generic_pet';
+  $schema->{components}{schemas}{pet}{anyOf}[2] = { '$ref' => '#/components/schemas/generic_pet' };
+  $schema->{components}{schemas}{generic_pet} = {
+    properties => {
+      swims => { const => false },
+      meow => { const => false },
+    },
+  };
+
+  $openapi = OpenAPI::Modern->new(openapi_uri => $doc_uri, openapi_schema => $schema);
+
+  cmp_result(
+    $openapi->evaluator->evaluate(
+      {
+        # petType not provided - use defaultMapping
+        meow => false,
+        swims => false,
+      },
+      $doc_uri->clone->fragment('/components/schemas/pet'),
+    )->TO_JSON,
+    { valid => true },
+    'defaultMapping is used as a fallback',
   );
 };
 

@@ -57,6 +57,7 @@ my $msg = replication( $file, $info, ofile => $ofile, def => 1, ignore => 1 ) //
 
 is( @$msg, 0, "Test #2: '$file' without errors");
 
+
 sub read_file {
 	my $file = shift;
 
@@ -71,6 +72,7 @@ sub read_file {
 
 	return \@msg;
 }
+
 
 ###Test 3
 lives_ok { $msg = read_file( $ofile ) } "Test #3.1: $ofile read";
@@ -856,7 +858,6 @@ my $msg_ref_19_2 = [
 is_deeply( $msg, $msg_ref_19_2, "Test #19.2: '$file_s'");
 
 
-
 ###Test 20
 lives_ok { $msg = read_file( $ofile_s ) } "Test #20.1: $ofile_s read";
 
@@ -999,11 +1000,19 @@ SPECIFY VALUE of myParam! %%%V: myParam  %-- substitutes Variable
 etc...
 \begin{tcolorbox}
 \rule{0mm}{4.5em}%%%VAR: myParam -- substitutes Variable as well
-...
+head \ldots
 ... SPECIFY VALUE of myParam!
-...
+tail \ldots
 %%%END:
 \end{tcolorbox}
+%%%VAR: myParam %-- substitutes Variable as well
+\mbox{ %%%ADD:%
+\rule{0mm}{4.5em} %%%ADD:
+head \ldots %%%ADD:
+... SPECIFY VALUE of myParam!
+tail \ldots %%%ADDE:%
+} %%%ADDE:
+%%%END:
 \begin{tabular}{%
 c
 %%%VAR: myArray
@@ -1071,8 +1080,13 @@ VALUE 4 & VALUE 2 & VALUE 1 & VALUE 0
 %%%TDZ: %-- beginning of The Dead Zone.
 \end{tabular}
 ...
-\begin{tabbing}
 %%%ENDZ: -- end of The Dead Zone
+%%%VAR: myRefScalar
+\begin{center} %%%ADD:
+... SPECIFY VALUE of myRefScalar!
+\end{center} %%%ADDE:
+%%%END:
+\begin{tabbing}
 %%%VAR: myTable_hash
 %%%ADDX: \\\\
    SPECIFY VALUE 'A'! %%%V: A%
@@ -1088,8 +1102,11 @@ etc...
 
 lives_ok { &save_file( $file_s, \$tex2 ) } "Test #26.1: $file_s save of USAGE";
 
+$rs = 'Reference to SCALAR';
+
 $info = {
 		myParam => 'Blah-blah blah-blah blah-blah',
+		myRefScalar => \$rs,
 		myArray => [2024, 2025, 2026, 2027],
 		myHash => {year0 => 123456, year1 => 789012, year2 => 345678, year3 => 901234},
 		myTable_array => [ # custom user variable ARRAY-ARRAY
@@ -1128,6 +1145,10 @@ $msg_ref_s = [
 '\\begin{tcolorbox}',
 '\\rule{0mm}{4.5em}Blah-blah blah-blah blah-blah-- substitutes Variable as well',
 '\\end{tcolorbox}',
+'\\mbox{\\rule{0mm}{4.5em}',
+'head \\ldots',
+'Blah-blah blah-blah blah-blah%-- substitutes Variable as well',
+'tail \\ldots}',
 '\\begin{tabular}{%',
 'c',
 'llll}',
@@ -1190,6 +1211,9 @@ $msg_ref_s = [
 ' &22 &21 &20\\\\',
 '\\end{tabular}',
 '...',
+'\\begin{center}',
+'Reference to SCALAR',
+'\\end{center}',
 '\\begin{tabbing}',
 '00 \=01 \=02',
 '\\\\',

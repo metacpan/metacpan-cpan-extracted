@@ -1,6 +1,6 @@
 package Langertha::Role::JSON;
 # ABSTRACT: Role for JSON
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 use Moose::Role;
 use JSON::MaybeXS;
 
@@ -28,7 +28,7 @@ Langertha::Role::JSON - Role for JSON
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head2 json
 

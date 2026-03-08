@@ -1,6 +1,6 @@
 package DBIx::Class::Async::Exception::MissingColumn;
 
-$DBIx::Class::Async::Exception::MissingColumn::VERSION   = '0.63';
+$DBIx::Class::Async::Exception::MissingColumn::VERSION   = '0.64';
 $DBIx::Class::Async::Exception::MissingColumn::AUTHORITY = 'cpan:MANWAR';
 
 use strict;
@@ -15,7 +15,7 @@ columns on insert
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =head1 SYNOPSIS
 

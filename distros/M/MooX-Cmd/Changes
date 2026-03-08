@@ -1,4 +1,5 @@
-Revision history for Perl module MooX::Cmd
+1.000     2026-02-28 19:14:47Z
+    - Switch to Dist::Zilla with @Author::GETTY plugin bundle
 
 0.017	2017-12-19
     - bump author requirement for proper Perl::Tidy to 20171214

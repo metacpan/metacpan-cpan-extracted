@@ -7,10 +7,10 @@ use utf8;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 Travel::Status::DE::DBRIS::Formation::Sector->mk_ro_accessors(
-	qw(name start_percent end_percent length_percent start_meters end_meters length_meters cube_meters cube_percent)
+	qw(name start_percent end_percent length_percent start_meters end_meters length_meters)
 );
 
 sub new {
@@ -26,12 +26,9 @@ sub new {
 		start_meters  => $section{start},
 		end_meters    => $section{end},
 		length_meters => $section{end} - $section{start},
-		cube_meters   => $section{cubePosition},
 		start_percent => ( $section{start} - $platform{start} )
 		  * 100 / $platform_length,
 		end_percent => ( $section{end} - $platform{start} )
-		  * 100 / $platform_length,
-		cube_percent => ( $section{cubePosition} - $platform{start} )
 		  * 100 / $platform_length,
 	};
 

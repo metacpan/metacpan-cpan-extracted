@@ -1,1025 +1,605 @@
 package OpenAPI::Linter;
 
-$OpenAPI::Linter::VERSION   = '0.16';
-$OpenAPI::Linter::AUTHORITY = 'cpan:MANWAR';
+$OpenAPI::Linter::VERSION          = '0.19';
+$OpenAPI::Linter::Async::AUTHORITY = 'cpan:MANWAR';
+
+use strict;
+use warnings;
+
+use File::Spec;
+use Carp qw(croak);
+use JSON::Validator;
+use JSON qw(decode_json);
+use YAML::XS qw(LoadFile);
+use File::Slurp qw(read_file);
+use File::ShareDir qw(dist_file);
+
+use OpenAPI::Linter::Location;
 
 =head1 NAME
 
-OpenAPI::Linter - Validate and lint OpenAPI specifications
+OpenAPI::Linter - Validate and lint OpenAPI 3.x specification files
 
 =head1 VERSION
 
-Version 0.16
+Version 0.19
 
 =head1 SYNOPSIS
 
     use OpenAPI::Linter;
 
-    # Create a linter from a file
+    # Load from a YAML or JSON file
     my $linter = OpenAPI::Linter->new(spec => 'openapi.yaml');
 
-    # Or from a hashref
-    my $linter = OpenAPI::Linter->new(spec => $openapi_hash);
+    # Or pass a pre-parsed spec as a hashref
+    my $linter = OpenAPI::Linter->new(spec => \%spec_data);
 
-    # Find issues in the specification
+    # Run all checks (schema + semantic)
     my @issues = $linter->find_issues;
 
-    # Filter issues by level or pattern
-    my @warnings = $linter->find_issues(level => 'WARN');
-    my @path_issues = $linter->find_issues(pattern => qr/paths?/i);
+    # Run structural/schema checks only
+    my @errors = $linter->validate_schema;
 
-    # Validate against JSON Schema
-    my @schema_errors = $linter->validate_schema;
+    # Filter by severity level
+    my @errors_only = $linter->find_issues(level => 'ERROR');
+
+    # Filter by message pattern
+    my @security = $linter->find_issues(pattern => qr/security/i);
+
+    # Inspect results
+    for my $issue (@issues) {
+        my $loc = $issue->{location};
+
+        # Location stringifies to the dot-separated spec path
+        printf "[%s] %s (at %s)\n",
+            $issue->{level},
+            $issue->{message},
+            $loc;
+
+        # For file-based specs, precise line/column is also available
+        if ($loc->line) {
+            printf "    => %s\n", $loc->position;  # e.g. openapi.yaml:42:5
+        }
+    }
 
 =head1 DESCRIPTION
 
-C<OpenAPI::Linter> provides comprehensive validation and linting for C<OpenAPI> specifications.
-It checks both structural correctness against the official C<JSON> Schema and performs
-additional linting for best practices and common issues.
+C<OpenAPI::Linter> validates OpenAPI 3.0.x and 3.1.x specification files
+against both the official OpenAPI JSON Schema and a curated set of semantic
+and documentation rules.
 
-The module supports C<OpenAPI> versions C<3.0.x> and C<3.1.x>, automatically detecting the
-specification version from the provided document.
-
-=cut
-
-use strict;
-use warnings;
-use JSON::Validator;
-use JSON qw(decode_json);
-use YAML::XS qw(LoadFile);
-use File::Slurp qw(read_file);
-use OpenAPI::Linter::Location;
-
-=head1 METHODS
-
-=head2 new
-
-    my $linter = OpenAPI::Linter->new(spec => $file_path_or_hashref);
-    my $linter = OpenAPI::Linter->new(spec => $hashref, version => '3.0.3');
-
-Creates a new C<OpenAPI::Linter> instance. The constructor accepts:
+Checks are organised into two phases:
 
 =over 4
 
-=item * spec
+=item 1. B<Structural validation> - the spec is validated against the official
+OpenAPI schema published at L<https://spec.openapis.org>. If structural errors
+are found, further checks are skipped.
 
-Required. Either a file path to an C<OpenAPI> specification (C<YAML> or C<JSON>)
-or a hash reference containing the parsed C<OpenAPI> specification.
-
-=item * version
-
-Optional. Explicitly set the C<OpenAPI> version. If not provided, the version will be
-auto-detected from the specification.
+=item 2. B<Semantic checks> - a suite of opinionated rules is applied covering
+documentation completeness, naming conventions, security, HTTP method
+semantics, unused components, and more.
 
 =back
+
+Results are returned as a list of issue hashrefs; see L</ISSUE STRUCTURE>
+for the full field reference.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $linter = OpenAPI::Linter->new(%args);
+
+Creates and returns a new linter instance.
+
+=head3 Arguments
+
+=over 4
+
+=item C<spec> (required)
+
+Either a filesystem path to a YAML or JSON OpenAPI file, or a hashref
+containing a pre-parsed specification. A path that does not exist causes
+a fatal error via C<croak>.
+
+=item C<schema_url> (optional)
+
+Override the OpenAPI meta-schema URL used for structural validation.
+By default the correct URL is chosen automatically based on the C<openapi>
+version field in the spec:
+
+=over 4
+
+=item * 3.0.x - C<https://spec.openapis.org/oas/3.0/schema/2021-09-28>
+
+=item * 3.1.x - C<https://spec.openapis.org/oas/3.1/schema/2022-10-07>
+
+=back
+
+Overriding this is primarily useful in tests or air-gapped environments.
+
+=back
+
+=head3 Exceptions
+
+C<new> will C<croak> if:
+
+=over 4
+
+=item * The C<spec> argument is not provided.
+
+=item * C<spec> is a string that does not refer to an existing file.
+
+=back
+
+Parse errors (malformed YAML/JSON) and schema-download failures are captured
+and reported as C<ERROR>-level issues on the first call to C<find_issues> or
+C<validate_schema>, rather than causing a fatal exception.
 
 =cut
 
 sub new {
     my ($class, %args) = @_;
 
-    my $spec;
-    my $locations = {};
-    my $file_path = $args{spec};
+    my $spec_path = $args{spec} or croak "A 'spec' file path or data is required";
+    my $spec_data;
+    my $file_path_for_display = 'internal_data';
+    my $parse_error;
 
-    if (ref $args{spec} eq 'HASH') {
-        # Already a hashref - use directly
-        $spec = $args{spec};
-        # For hashref input, we can't provide line numbers
-        $locations = { base => OpenAPI::Linter::Location->new('input', 1, 1) };
-        $file_path = 'input';
+    if (ref($spec_path) eq 'HASH') {
+        $spec_data = $spec_path;
     }
-    elsif ($args{spec}) {
-        $file_path = $args{spec};
-        die "ERROR: Spec file not found: $file_path\n" unless (-f $file_path);
-
-        if ($file_path =~ /\.ya?ml$/i) {
-            # Try to use YAML::PP for better location tracking
-            my $yaml_pp_available = eval {
-                require YAML::PP;
-                YAML::PP->import();
-                1;
-            };
-
-            if ($yaml_pp_available) {
-                # First: Load with preserve mode ONLY for location tracking
-                my $yamlpp_preserve = YAML::PP->new( preserve => 1 );
-                my $spec_preserved = $yamlpp_preserve->load_file($file_path);
-                $locations = _extract_yaml_locations($spec_preserved, $file_path);
-
-                # Second: Load again WITHOUT preserve mode for clean validation data
-                my $yamlpp_clean = YAML::PP->new();
-                $spec = $yamlpp_clean->load_file($file_path);
-
-                # Ensure we always have a base location
-                $locations->{base} = OpenAPI::Linter::Location->new($file_path, 1, 1)
-                    unless exists $locations->{base};
-            }
-            else {
-                # Fall back to YAML::XS
-                $spec = LoadFile($file_path);
-                $locations = { base => OpenAPI::Linter::Location->new($file_path, 1, 1) };
-            }
-        }
-        else {
-            $spec = decode_json(read_file($file_path));
-            # JSON doesn't easily give us line numbers, but we can approximate
-            $locations = { base => OpenAPI::Linter::Location->new($file_path, 1, 1) };
-        }
+    elsif (-e $spec_path) {
+        $file_path_for_display = $spec_path;
+        eval {
+            $spec_data = YAML::XS::LoadFile($spec_path);
+        };
+        # CATCH PARSE ERRORS HERE
+        $parse_error = $@ if $@;
     }
     else {
-        die "spec => HASHREF required if no file provided";
+        croak "Spec path '$spec_path' does not exist";
     }
 
-    my $version = $args{version} || $spec->{openapi} || '3.0.3';
-
-    return bless {
-        spec      => $spec,
-        issues    => [],
-        version   => $version,
-        locations => $locations,
-        file_path => $file_path,
-    }, $class;
-}
-
-=head2 find_issues()
-
-Finds and returns linting issues in the C<OpenAPI> specification. Returns a list of issue
-hashes in list context, or an array reference in scalar context.
-
-Each issue hash contains:
-
-    {
-        level   => 'ERROR' | 'WARN',  # Issue severity level
-        message => 'Human readable description of the issue'
+    # Build a line/column index from the raw file text so we can
+    # attach precise locations to every issue we produce.
+    my $line_index = {};
+    if (!$parse_error && $file_path_for_display ne 'internal_data') {
+        $line_index = _build_line_index($spec_path);
     }
 
-Parameters:
+    # Create validator
+    my $validator = JSON::Validator->new;
 
-=over 4
+    # Add custom format for uri-reference to avoid warnings
+    # uri-reference is like uri but allows relative references
+    $validator->formats->{'uri-reference'} = sub {
+        my $value = shift;
+        return undef if !defined $value || $value eq '';
 
-=item * level
-
-Filter issues by severity level. Either C<ERROR> or C<WARN>.
-
-=item * pattern
-
-Filter issues by message pattern (regular expression).
-
-=back
-
-    my @all_issues = $linter->find_issues;
-    my @issues = $linter->find_issues(level => 'ERROR');
-    my @issues = $linter->find_issues(pattern => qr/missing/i);
-    my @issues = $linter->find_issues(level => 'WARN', pattern => qr/description/);
-
-=cut
-
-sub find_issues {
-    my ($self, %opts) = @_;
-
-    my $spec      = $self->{spec}      || {};
-    my $locations = $self->{locations} || {};
-    my @issues;
-
-    # Helper to get location for a path
-    my $get_location = sub {
-        my $path = shift;
-
-        # Try the exact path first
-        return $locations->{$path} if exists $locations->{$path};
-
-        # Try to find a parent path
-        my @path_parts = split(/\./, $path);
-        while (@path_parts) {
-            pop @path_parts;
-            my $parent_path = join('.', @path_parts);
-            return $locations->{$parent_path}
-                if exists $locations->{$parent_path};
+        # Use URI module for proper validation if available
+        if (eval { require URI; 1 }) {
+            eval {
+                my $uri = URI->new($value);
+                return undef;  # Valid
+            };
+            return $@ if $@;  # Invalid, return error
         }
 
-        # Fall back to base location
-        return $locations->{base}
-            || OpenAPI::Linter::Location->new($self->{file_path}, 1, 1);
+        # Fallback: accept any non-empty string
+        return undef;
     };
 
-    # Check OpenAPI root keys
-    foreach my $key (qw/openapi info paths/) {
-        unless ($spec->{$key}) {
-            my $location = $get_location->($key);
-            push @issues, {
-                level    => 'ERROR',
-                message  => "Missing $key",
-                location => $location->to_string,
-                path     => $key
-            };
-        }
+    my $openapi_version = ($spec_data && $spec_data->{openapi}) || '3.1.0';
+
+    # schema_url arg retained for backwards compatibility / forced network use
+    if ( $args{schema_url} ) {
+        eval {
+            # Set timeouts to avoid hanging on network issues
+            # JSON::Validator caches schemas, so this only affects first download
+            local $ENV{MOJO_CONNECT_TIMEOUT}    = 10;
+            local $ENV{MOJO_INACTIVITY_TIMEOUT} = 10;
+            $validator->schema( $args{schema_url} );
+        };
+        $parse_error = $@ if $@ && !$parse_error;
+    }
+    else {
+        # Load from bundled share/ files — no network required
+        my $schema_file =
+            $openapi_version =~ /^3\.0\./
+                ? 'openapi-3.0.json'
+                : 'openapi-3.1.json';
+
+        eval {
+            $validator->schema( _load_bundled_schema($schema_file) );
+        };
+        $parse_error = $@ if $@ && !$parse_error;
     }
 
-    # Info checks
-    if ($spec->{info}) {
-        my $info = $spec->{info};
+    my $self = bless {
+        spec_data   => $spec_data,
+        validator   => $validator,
+        issues      => [],
+        file_path   => $file_path_for_display,
+        version     => $openapi_version,
+        parse_error => $parse_error,
+        line_index  => $line_index,
+    }, $class;
 
-        unless ($info->{title}) {
-            my $location = $get_location->('info.title');
-            push @issues, {
-                level    => 'ERROR',
-                message  => 'Missing info.title',
-                location => $location->to_string,
-                path     => 'info.title'
-            };
-        }
-
-        unless ($info->{version}) {
-            my $location = $get_location->('info.version');
-            push @issues, {
-                level    => 'ERROR',
-                message  => 'Missing info.version',
-                location => $location->to_string,
-                path     => 'info.version'
-            };
-        }
-
-        unless ($info->{description}) {
-            my $location = $get_location->('info.description');
-            push @issues, {
-                level    => 'WARN',
-                message  => 'Missing info.description',
-                location => $location->to_string,
-                path     => 'info.description'
-            };
-        }
-
-        unless ($info->{license}) {
-            my $location = $get_location->('info.license');
-            push @issues, {
-                level    => 'WARN',
-                message  => 'Missing info.license',
-                location => $location->to_string,
-                path     => 'info.license'
-            };
-        }
-    }
-
-    # Paths / operations
-    if ($spec->{paths}) {
-        my @http_methods = qw(get post put delete patch head options trace);
-        my %is_http_method = map { lc($_) => 1 } @http_methods;
-
-        for my $path (sort keys %{$spec->{paths}}) {
-            for my $method (sort keys %{$spec->{paths}{$path}}) {
-                # Check if it's an HTTP method (case-insensitive)
-                next unless $is_http_method{lc($method)};
-
-                my $op = $spec->{paths}{$path}{$method};
-                unless ($op->{description}) {
-                    my $_path    = "paths.$path.$method.description";
-                    my $location = $get_location->($_path);
-                    push @issues, {
-                        level    => 'WARN',
-                        message  => "Missing description for $method $path",
-                        location => $location->to_string,
-                        path     => $_path,
-                    };
-                }
-            }
-        }
-    }
-
-    # Components / schemas
-    if ($spec->{components} && $spec->{components}{schemas}) {
-        for my $name (sort keys %{$spec->{components}{schemas}}) {
-            my $schema = $spec->{components}{schemas}{$name};
-            unless ($schema->{type}) {
-                my $path     = "components.schemas.$name.type";
-                my $location = $get_location->($path);
-                push @issues, {
-                    level    => 'WARN',
-                    message  => "Schema $name missing type",
-                    location => $location->to_string,
-                    path     => $path,
-                };
-            }
-
-            if ($schema->{properties}) {
-                for my $prop (sort keys %{$schema->{properties}}) {
-                    unless ($schema->{properties}{$prop}{description}) {
-                        my $path = "components.schemas.$name.properties.$prop.description";
-                        my $location = $get_location->($path);
-                        push @issues, {
-                            level    => 'WARN',
-                            message  => "Schema $name.$prop missing description",
-                            location => $location->to_string,
-                            path     => $path,
-                        };
-                    }
-                }
-            }
-        }
-    }
-
-    my $pattern = $opts{pattern};
-    my $level   = $opts{level};
-    my @result  = grep {
-        (!defined($level)   || $_->{level}   eq $level)     &&
-        (!defined($pattern) || $_->{message} =~ /$pattern/)
-    } @issues;
-
-    return wantarray ? @result : \@result;
+    return $self;
 }
 
-=head2 validate_schema()
+=head1 METHODS
 
-    my @schema_errors = $linter->validate_schema;
-    my $schema_errors = $linter->validate_schema;
+=head2 validate_schema
 
-Validates the C<OpenAPI> specification against the official C<JSON> Schema for the detected
-C<OpenAPI> version. Returns a list of validation errors in list context or an array
-reference in scalar context.
+    my @issues = $linter->validate_schema;
+    my $issues = $linter->validate_schema;   # scalar context -> arrayref
 
-This method uses L<JSON::Validator> to perform schema validation. It applies filtering
-to address validation discrepancies where valid OpenAPI specifications (per the OpenAPI
-Specification text) are incorrectly flagged as invalid.
+Validates the spec against the official OpenAPI JSON Schema and checks the
+C<openapi> version field. Returns a (possibly empty) list of issue hashrefs.
 
-=head3 Validation Discrepancies
+In scalar context returns an arrayref.
 
-When validating against the published schemas, L<JSON::Validator> produces errors for
-constructs that are explicitly valid according to the OpenAPI Specification v3.0.3.
-
-B<Example:> This valid parameter definition:
-
-    parameters:
-      - name: id
-        in: path        # Valid per OpenAPI Spec
-        required: true  # Valid boolean per OpenAPI Spec
-        schema:
-          type: string
-
-Produces these validation errors:
-
-    /in: Not in enum list: query, header, cookie
-    /required: Not in enum list: true
-    /$ref: Missing property
-
-B<The OpenAPI Specification states:>
-
-"C<in> (string, REQUIRED): The location of the parameter. Possible values are
-C<query>, C<header>, C<path> or C<cookie>."
-
-Reference: L<https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.3.md#parameter-object>
-
-Despite C<path> being explicitly listed as valid, validation fails.
-
-=head3 Filtering Approach
-
-To ensure valid OpenAPI specifications validate correctly, this method filters errors by:
-
-=over 4
-
-=item 1. Identifying error patterns matching known discrepancies
-
-=item 2. Extracting the actual value from the specification
-
-=item 3. Checking if the value is valid per the OpenAPI Specification text
-
-=item 4. Removing the error only if the value is explicitly documented as valid
-
-=back
-
-B<Important:> Invalid values still generate errors. For example, C<in: invalid_location>
-will correctly produce a validation error.
-
-=head3 Filtered Patterns
-
-=over 4
-
-=item * B<Parameter 'in' field>
-
-Error pattern: C</in: Not in enum list>
-
-Filtered when: actual value is C<'path'> (valid per L<https://spec.openapis.org/oas/v3.0.3.html#fixed-fields-9>)
-
-=item * B<Parameter 'required' field>
-
-Error pattern: C</required: Not in enum list>
-
-Filtered when: actual value is a boolean (true, false, 1, 0)
-
-=item * B<Inline parameter definitions>
-
-Error pattern: C</$ref: Missing property>
-
-Filtered when: parameter has both C<name> and C<in> fields (valid inline definition)
-
-=back
-
-=head3 Root Cause
-
-The exact cause of these discrepancies is unclear and could involve:
-
-=over 4
-
-=item * Issues in the published JSON Schema files
-
-=item * L<JSON::Validator>'s interpretation of those schemas
-
-=item * Interactions between validator and schema
-
-=back
-
-This method takes a pragmatic approach: it defers to the authoritative OpenAPI
-Specification text when determining validity, ensuring users get accurate validation
-results for their specifications.
+If a parse error was encountered during construction it is reported here and
+no further schema validation is attempted.
 
 =cut
 
 sub validate_schema {
     my ($self) = @_;
+    my @issues;
 
-    my $validator = JSON::Validator->new;
-
-    # Map of OpenAPI versions to their schema URLs
-    my %schema_urls = (
-        '3.0.0' => 'https://spec.openapis.org/oas/3.0/schema/2021-09-28',
-        '3.0.1' => 'https://spec.openapis.org/oas/3.0/schema/2021-09-28',
-        '3.0.2' => 'https://spec.openapis.org/oas/3.0/schema/2021-09-28',
-        '3.0.3' => 'https://spec.openapis.org/oas/3.0/schema/2021-09-28',
-        '3.1.0' => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07',
-        '3.1.1' => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07',
-    );
-
-    my $version = $self->{version} || $self->{spec}->{openapi} || '';
-    $version =~ s/^\s+|\s+$//g;
-
-    if ($version =~ /^3$/) {
-        $version = '3.0.0';
-    }
-    elsif ($version =~ /^3\.(\d)$/) {
-        $version .= '.0';
-    }
-
-    $self->{version} = $version;
-
-    my $schema_url = $schema_urls{$version};
-    unless ($schema_url) {
-        if ($version =~ /^3\.1/) {
-            $schema_url = 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
-        }
-        elsif ($version =~ /^3\.0/) {
-            $schema_url = 'https://spec.openapis.org/oas/3.0/schema/2021-09-28';
-        }
-        else {
-            die "Unsupported OpenAPI version: $version";
-        }
-    }
-
-    # Apply the JSON::Validator format fix
-    _apply_json_validator_fix();
-
-    # Set user agent timeout for schema download (default is 20s, increase to 30s)
-    eval {
-        if ($validator->can('ua')) {
-            $validator->ua->connect_timeout(30);
-            $validator->ua->request_timeout(30);
-        }
-    };
-
-    # Only coerce booleans to handle true/false properly
-    $validator->coerce('booleans');
-
-    my @raw_errors;
-    eval {
-        @raw_errors = $validator->schema($schema_url)->validate($self->{spec});
-    };
-
-    if ($@) {
-        # If schema download fails, provide a helpful error message
-        if ($@ =~ /timeout|connect/i) {
-            die "ERROR: Failed to download OpenAPI schema from $schema_url\n" .
-                "This usually indicates a network connectivity issue.\n" .
-                "The schema will be cached after the first successful download.\n" .
-                "Error: $@";
-        }
-        die $@;  # Re-throw other errors
-    }
-
-    # JSON::Validator returns 0 (a plain scalar) for success
-    if (@raw_errors == 1 && !ref($raw_errors[0])) {
-        @raw_errors = ();
-    }
-
-    # Filter known false positives
-    @raw_errors = $self->_filter_known_false_positives(@raw_errors);
-
-    # Convert to consistent hashref format with location information
-    my @issues = map {
-        my $message;
-        my $path = '';
-
-        if (ref $_) {
-            if ($_->can('to_string')) {
-                $message = $_->to_string;
-            } elsif (exists $_->{message}) {
-                $message = $_->{message};
-            } elsif ($_->can('message')) {
-                $message = $_->message;
-            } else {
-                $message = "$_";
-            }
-
-            if ($_->can('path') && $_->path) {
-                $path = $_->path;
-            } elsif (exists $_->{path} && $_->{path}) {
-                $path = $_->{path};
-            }
-        } else {
-            $message = $_;
-        }
-
-        # Convert JSON Pointer path to our location format
-        my $location_path = $path;
-        $location_path =~ s{^/}{};
-        $location_path =~ s{/}{.}g;
-        $location_path =~ s{~1}{/}g;
-        $location_path =~ s{~0}{~}g;
-
-        my $location = $self->{locations}{$location_path} ||
-                      $self->{locations}{base} ||
-                      OpenAPI::Linter::Location->new($self->{file_path}, 1, 1);
-
-        {
+    # Validate OpenAPI version format
+    my $openapi_version = $self->{spec_data}{openapi} // '';
+    if ($openapi_version && $openapi_version !~ /^\d+\.\d+\.\d+$/) {
+        push @issues, {
             level    => 'ERROR',
-            message  => $message,
-            type     => 'schema_validation',
-            location => $location->to_string,
-            path     => $location_path
-        }
-    } @raw_errors;
+            message  => "Invalid OpenAPI version format: '$openapi_version'. Expected format: X.Y.Z",
+            type     => 'validation',
+            location => $self->_make_location('/openapi'),
+        };
+    }
+    elsif ($openapi_version && $openapi_version !~ /^3\.(0|1)\.\d+$/) {
+        push @issues, {
+            level    => 'ERROR',
+            message  => "Unsupported OpenAPI version: '$openapi_version'. Only 3.0.x and 3.1.x are supported",
+            type     => 'validation',
+            location => $self->_make_location('/openapi'),
+        };
+    }
 
-    return wantarray ? @issues : \@issues;
-}
+    if ($self->{parse_error}) {
+        push @issues, {
+            level    => 'ERROR',
+            message  => "Parsing error: " . $self->{parse_error},
+            type     => 'syntax',
+            location => $self->_make_location(''),
+        };
+        return @issues;
+    }
 
-=head2 _filter_known_false_positives
-
-    @filtered = $self->_filter_known_false_positives(@errors);
-
-Internal method that filters out false positive errors. This method validates that
-errors are truly false positives by checking the actual spec values before filtering.
-
-This is a targeted approach that only removes errors when the actual value in the
-spec is valid per the OpenAPI specification
-
-All other errors, including similar-looking errors with invalid values, are preserved.
-
-The key insight is that JSON::Validator reports the path to the FIELD with the error
-(e.g., /paths/~1test/get/parameters/0/in), so we need to navigate to the parent object
-and check the actual value of that field.
-
-=cut
-
-sub _filter_known_false_positives {
-    my ($self, @errors) = @_;
-    my $spec = $self->{spec};
-
-    my @filtered;
+    # Validate the spec against OpenAPI schema
+    # Suppress "Format rule for 'uri-reference' is missing" warning
+    my @errors;
+    {
+        local $SIG{__WARN__} = sub {
+            my $warning = shift;
+            # Suppress the uri-reference format warning
+            warn $warning unless $warning =~ /Format rule for 'uri-reference' is missing/;
+        };
+        @errors = $self->{validator}->validate($self->{spec_data});
+    }
 
     foreach my $error (@errors) {
-        my $keep = 1;
-        my $error_str = '';
-        my $error_path = '';
+        # Errors are JSON::Validator::Error objects
+        my $msg  = $error->message || '';
+        my $path = $error->path || 'unknown';
 
-        # Extract error details safely
-        eval {
-            if (ref $error) {
-                $error_str = $error->can('to_string') ? $error->to_string : "$error";
-                $error_path = $error->can('path') ? $error->path : '';
-            } else {
-                $error_str = "$error";
-            }
-        };
+        # Skip empty messages
+        next if !$msg || $msg eq '';
 
-        if ($@) {
-            # If we can't parse the error, keep it to be safe
-            push @filtered, $error;
-            next;
+        # Build a descriptive message
+        my $descriptive_msg = $msg;
+        if ($msg eq 'Missing property.') {
+            # Extract the property name from the path
+            my $property     = $path;
+            $property        =~ s{^/}{};
+            $property        =~ s{/}{.}g;
+            $descriptive_msg = "Missing required property: '$property'";
         }
 
-        # Bug 1: Missing 'path' in parameter 'in' enum
-        # The schema's enum for 'in' is missing 'path', but 'path' is valid per OpenAPI spec
-        # Error path points to the 'in' field: /paths/~1{id}/parameters/0/in
-        # We need to get the parent parameter object and check if 'in' == 'path'
-        if ($error_str =~ m{/in:.*Not in enum list}i) {
-            # Get the parent path (parameter object) by removing '/in' suffix
-            my $param_path = $error_path;
-            $param_path =~ s{/in$}{};
-
-            # Extract the parameter object
-            my $param = $self->_extract_value_from_path($param_path, undef);
-            my $actual_value = ref($param) eq 'HASH' ? $param->{in} : undef;
-
-            # Only filter if the value is actually 'path' (valid but missing from schema enum)
-            # Keep the error for truly invalid values like 'invalid_location'
-            if (defined $actual_value && $actual_value eq 'path') {
-                $keep = 0;
-            }
-        }
-        # Bug 2: Boolean 'required' incorrectly validated as enum
-        # The 'required' field should be boolean, but schema sometimes treats it as enum
-        # Error path points to the 'required' field: /paths/~1test/get/parameters/0/required
-        elsif ($error_str =~ m{/required:.*Not in enum list}i) {
-            # Get the parent path (parameter object) by removing '/required' suffix
-            my $param_path = $error_path;
-            $param_path =~ s{/required$}{};
-
-            # Extract the parameter object
-            my $param = $self->_extract_value_from_path($param_path, undef);
-            my $actual_value = ref($param) eq 'HASH' ? $param->{required} : undef;
-
-            # Check if it's a valid boolean value (true, false, 1, 0, JSON::PP::Boolean)
-            if (defined $actual_value && $self->_is_valid_boolean($actual_value)) {
-                $keep = 0;
-            }
-        }
-        # Bug 3: Missing $ref for inline parameters
-        # Schema incorrectly requires $ref even for fully-defined inline parameters
-        # Only filter if parameter has both 'name' and 'in' (making $ref unnecessary)
-        elsif ($error_str =~ m{/parameters/.*\$ref:.*Missing property}i) {
-            my $param = $self->_extract_parameter_from_path($error_path);
-            # Only filter if parameter is properly defined inline (has name and in)
-            if ($param && $param->{name} && $param->{in}) {
-                $keep = 0;
-            }
-        }
-
-        push @filtered, $error if $keep;
-    }
-
-    return @filtered;
-}
-
-=head2 _extract_value_from_path
-
-Internal helper to extract actual value from spec using JSON pointer path.
-
-This method handles JSON Pointer syntax (RFC 6901) with proper decoding of escape sequences.
-It also handles a quirk where JSON::Validator sometimes produces ~001 instead of ~1 in
-error paths (observed with $ref-related errors).
-
-=cut
-
-sub _extract_value_from_path {
-    my ($self, $json_pointer, $field) = @_;
-
-    return unless $json_pointer;
-
-    # Convert JSON pointer to data structure path
-    my @parts = split m{/}, $json_pointer;
-    shift @parts if @parts && $parts[0] eq '';  # Remove leading empty part
-
-    my $current = $self->{spec};
-
-    # Navigate to the location
-    foreach my $part (@parts) {
-        # Decode JSON pointer escapes
-        # CRITICAL: Handle ~001 quirk from JSON::Validator before standard decoding
-        $part =~ s/~001/~1/g;  # Normalize ~001 to ~1
-        $part =~ s/~1/\//g;    # Decode ~1 to /
-        $part =~ s/~0/~/g;     # Decode ~0 to ~
-
-        if (ref $current eq 'HASH') {
-            $current = $current->{$part};
-        } elsif (ref $current eq 'ARRAY') {
-            $current = $current->[$part] if $part =~ /^\d+$/;
-        } else {
-            return undef;
-        }
-
-        return undef unless defined $current;
-    }
-
-    # Extract the specific field if we're at an object
-    if (defined $field) {
-        if (ref $current eq 'HASH') {
-            return $current->{$field};
-        }
-        return undef;
-    }
-
-    return $current;
-}
-
-=head2 _extract_parameter_from_path
-
-Internal helper to extract parameter object from spec using JSON pointer path.
-
-=cut
-
-sub _extract_parameter_from_path {
-    my ($self, $json_pointer) = @_;
-
-    return unless $json_pointer;
-
-    # Get the parent path (remove the $ref part)
-    my $param_path = $json_pointer;
-    $param_path =~ s{/\$ref$}{};
-
-    return $self->_extract_value_from_path($param_path, undef);
-}
-
-=head2 _is_valid_boolean
-
-Internal helper to check if a value is a valid boolean.
-
-=cut
-
-sub _is_valid_boolean {
-    my ($self, $value) = @_;
-
-    return 0 unless defined $value;
-
-    # Check for JSON::PP::Boolean objects (after coercion)
-    if (ref $value) {
-        return 1 if ref($value) =~ /Boolean/i;
-    }
-
-    # Check for numeric 0 or 1 (common after coercion)
-    if (!ref($value) && $value =~ /^[01]$/) {
-        return 1;
-    }
-
-    # Check for string 'true' or 'false'
-    if (!ref($value) && $value =~ /^(true|false)$/i) {
-        return 1;
-    }
-
-    return 0;
-}
-
-sub format_schema_error {
-    my ($self, $message) = @_;
-
-    # Remove duplicate path prefixes
-    $message =~ s{^(/.+?):\s+\1:}{$1:};
-
-    # Clean up encoded paths for readability
-    $message =~ s{/~001}{/}g;
-    $message =~ s{/~1}{/}g;
-
-    # If still long, wrap after the first colon
-    if (length($message) > 80) {
-        $message =~ s/:\s+/:\n      /;
-    }
-
-    return "  - $message";
-}
-
-sub _apply_json_validator_fix {
-    return if our $FIX_APPLIED++;
-
-    {
-        package JSON::Validator::Schema;
-        no warnings 'redefine';
-
-        my $orig_validate_format = \&_validate_format;
-
-        *_validate_format = sub {
-            my ($self, $value, $state) = @_;
-            my $format = $state->{schema}{format};
-
-            # Handle URI format validators gracefully - don't warn if missing
-            if ($format && $format =~ /^(uri|uri-reference|uri-template)$/) {
-                my $code = $self->formats->{$format};
-                return unless $code;  # Silently skip if validator missing
-
-                return unless my $err = $code->($value);
-                return E $state->{path}, [format => $format, $err];
-            }
-
-            # Use original validation for other formats
-            return $orig_validate_format->(@_);
+        push @issues, {
+            level    => 'ERROR',
+            message  => $descriptive_msg,
+            type     => 'schema',
+            location => $self->_make_location($path),
         };
     }
+
+    # Sort issues by path to ensure deterministic output
+    my @sorted_issues = sort { "$a->{location}" cmp "$b->{location}" } @issues;
+
+    return wantarray ? @sorted_issues : \@sorted_issues;
 }
 
-sub _extract_yaml_locations {
-    my ($data, $file_path) = @_;
-    my $locations = {};
+=head2 find_issues
 
-    # Always set a base location
-    $locations->{base} = OpenAPI::Linter::Location->new($file_path, 1, 1);
+    my @issues = $linter->find_issues(%args);
+    my $issues = $linter->find_issues(%args);   # scalar context -> arrayref
 
-    _walk_yaml_data($data, '', $locations, $file_path);
-    return $locations;
+Runs the full linting pipeline: structural validation first, then all
+semantic checks. If structural errors are found the semantic checks are
+skipped and only those errors are returned (after any filtering).
+
+In scalar context returns an arrayref.
+
+B<Optional arguments>
+
+=over 4
+
+=item C<level>
+
+Return only issues whose C<level> field exactly matches the given string.
+Valid values are C<ERROR>, C<WARN>, and C<INFO>.
+
+=item C<pattern>
+
+A compiled or uncompiled regular expression. Only issues whose C<message>
+field matches the pattern are returned.
+
+=back
+
+Both filters may be combined; an issue must satisfy both to be included.
+
+=cut
+
+sub find_issues {
+    my ($self, %args) = @_;
+    my @issues;
+
+    my $filter_level   = $args{level};
+    my $filter_pattern = $args{pattern};
+
+    if ($ENV{DEBUG}) {
+        warn ">>> FIND_ISSUES IS RUNNING (UPDATED " . localtime()   . ")\n";
+        warn ">>>   Filter level: " . ($filter_level // 'none')     . "\n";
+        warn ">>>   Filter pattern: " . ($filter_pattern // 'none') . "\n";
+    }
+
+    # 1. ALWAYS run structural validation first (syntax + schema)
+    push @issues, $self->validate_schema;
+
+    if (@issues) {
+        warn ">>> Stopping due to structural validation errors\n"
+            if $ENV{DEBUG};
+        return $self->_apply_filters(\@issues, $filter_level, $filter_pattern);
+    }
+
+    # 2. Custom semantic checks
+    my $spec = $self->{spec_data};
+
+    # Run all semantic checks
+    push @issues, $self->_check_info_section($spec);
+    push @issues, $self->_check_operations($spec);
+    push @issues, $self->_check_security($spec);
+    push @issues, $self->_check_server_variables($spec);
+    push @issues, $self->_check_components_schemas($spec);
+    push @issues, $self->_check_components_parameters($spec);
+    push @issues, $self->_check_components_responses($spec);
+    push @issues, $self->_check_components_request_bodies($spec);
+    push @issues, $self->_check_unused_components($spec);
+    push @issues, $self->_check_path_naming($spec);
+    push @issues, $self->_check_duplicate_descriptions($spec);
+
+    warn ">>> find_issues complete. Total issues: " . scalar(@issues) . "\n"
+        if $ENV{DEBUG};
+
+    return $self->_apply_filters(\@issues, $filter_level, $filter_pattern);
 }
 
-sub _walk_yaml_data {
-    my ($node, $path, $locations, $file_path) = @_;
+=head1 ISSUE STRUCTURE
 
-    return unless defined $node;
-
-    if (ref $node eq 'HASH') {
-        while (my ($key, $value) = each %$node) {
-            my $actual_key = ref $key eq 'YAML::PP::Node' ? $key->value : $key;
-            my $new_path = $path ? "$path.$actual_key" : $actual_key;
-
-            # Store location if available from YAML::PP
-            if (ref $key eq 'YAML::PP::Node') {
-                my $line = $key->line || 1;
-                my $column = $key->column || 1;
-                $locations->{$new_path} =
-                    OpenAPI::Linter::Location->new($file_path, $line, $column);
-            }
-
-            _walk_yaml_data($value, $new_path, $locations, $file_path);
-        }
-    }
-    elsif (ref $node eq 'ARRAY') {
-        for my $i (0 .. $#$node) {
-            my $new_path = "$path\[$i]";
-            my $item = $node->[$i];
-
-            # Store location for array items if available
-            if (ref $item eq 'YAML::PP::Node') {
-                my $line = $item->line || 1;
-                my $column = $item->column || 1;
-                $locations->{$new_path} =
-                    OpenAPI::Linter::Location->new($file_path, $line, $column);
-            }
-
-            _walk_yaml_data($item, $new_path, $locations, $file_path);
-        }
-    }
-    # For scalar values, we don't store separate locations as
-    # they're handled by their keys
-}
-
-=head1 APPLICATION
-
-C<openapi-linter> is a command-line tool that validates C<OpenAPI> specifications
-for both structural correctness and best practices. It uses the L<OpenAPI::Linter>
-module to perform comprehensive checks on C<OpenAPI> documents.
-
-The tool can operate in two modes:
+Each issue is a plain hashref with the following keys:
 
 =over 4
 
-=item 1. Linting mode (default)
+=item C<level>
 
-Checks for best practices, missing required fields and common issues in C<OpenAPI> specifications.
+Severity of the issue. One of:
 
-=item 2. Schema validation mode
+=over 4
 
-Validates the specification against the official C<OpenAPI JSON Schema> for the detected version.
+=item * C<ERROR> - the spec is invalid or will cause interoperability failures.
+
+=item * C<WARN> - a best-practice violation; the spec may still be functional.
+
+=item * C<INFO> - informational; e.g. duplicate descriptions.
 
 =back
 
-=head2 OPTIONS
+=item C<message>
 
-=over 4
+A human-readable description of the problem.
 
-=item B<--spec> I<specfile>
+=item C<path>
 
-B<Required>. Path to the C<OpenAPI> specification file. The file can be in either
-C<YAML> (.yaml, .yml) or C<JSON> (.json) format.
+A dot-separated or C<#/>-prefixed location within the spec indicating where
+the issue was found. May be absent for top-level parse errors.
 
-=item B<--version> I<version>
+=item C<type>
 
-Specify the C<OpenAPI> version explicitly (e.g., C<3.0.3>, C<3.1.0>). If not provided,
-the version will be auto-detected from the C<openapi> field in the specification.
+A machine-readable category string. Common values:
 
-=item B<--json>
+    documentation   Missing description, summary, example, or licence.
+    semantic        HTTP method misuse, missing operationId, etc.
+    schema          Violation of the OpenAPI JSON Schema.
+    syntax          YAML/JSON parse failure.
+    security        Missing or incomplete security definitions.
+    naming          Path segment or property naming convention violations.
+    validation      Server variable, version format, or other validation.
+    maintainability Unused components, duplicate descriptions, etc.
 
-Output results in C<JSON> format instead of human-readable text. This is useful for
-programmatic consumption of the results.
+=item C<rule> (optional)
 
-=item B<--validate>
-
-Run schema validation instead of lint checks. This mode validates the specification
-against the official C<OpenAPI JSON Schema> rather than performing custom linting rules.
-
-=item B<--help>
-
-Display this help message and exit.
-
-=back
-
-=head2 EXAMPLES
-
-=head3 Basic Usage
-
-    openapi-linter --spec api.yaml
-
-Run linting checks on C<api.yaml> and display results in human-readable format.
-
-=head3 Schema Validation
-
-    openapi-linter --spec api.json --validate
-
-Validate C<api.json> against the official C<OpenAPI JSON Schema>.
-
-=head3 JSON Output
-
-    openapi-linter --spec api.yaml --json
-
-Run linting checks and output results in JSON format for programmatic processing.
-
-=head3 Specific Version
-
-    openapi-linter --spec api.yaml --version 3.1.0
-
-Run linting checks assuming C<OpenAPI> version C<3.1.0>, overriding auto-detection.
-
-=head2 OUTPUT FORMATS
-
-=head3 Human Readable Output (Default)
-
-The default output format displays issues in a readable format:
-
-    [ERROR] Missing info.title
-    [WARN] Missing info.description
-    [ERROR] Missing info.version
-
-    Summary: 2 ERRORs, 1 WARN
-
-=head3 Exit Codes
-
-=over 4
-
-=item * 0: No issues found
-
-=item * 1: Issues found (errors and/or warnings)
-
-=item * 2: Usage error
+A short rule identifier, present on selected checks (e.g.
+C<info-description>, C<security-defined>, C<no-undefined-server-variable>).
 
 =back
 
-=head3 JSON Output
+=head1 CHECKS PERFORMED
 
-When using C<--json>, the output is structured C<JSON>:
-
-    {
-        "summary": {
-            "errors": 2,
-            "warnings": 1
-        },
-        "issues": [
-            {
-                "level": "ERROR",
-                "message": "Missing info.title"
-            },
-            {
-                "level": "WARN",
-                "message": "Missing info.description"
-            },
-            {
-                "level": "ERROR",
-                "message": "Missing info.version"
-            }
-        ]
-    }
-
-=head2 LINTING CHECKS
-
-When running in linting mode (default), the tool checks for:
+=head2 Structural
 
 =over 4
 
-=item * Required root elements (openapi, info, paths)
+=item * C<openapi> version field format must be C<X.Y.Z>.
 
-=item * Required info object fields (title, version)
+=item * C<openapi> version must be C<3.0.x> or C<3.1.x>.
 
-=item * Recommended info object fields (description, license)
-
-=item * Operation descriptions for all paths and methods
-
-=item * Schema type definitions and property descriptions
+=item * Full validation against the official OpenAPI JSON Schema.
 
 =back
 
-=head2 SCHEMA VALIDATION
-
-When using C<--validate>, the tool validates the specification against the
-official C<OpenAPI JSON Schema> for the detected version. This checks:
+=head2 Info section
 
 =over 4
 
-=item * Structural correctness of the specification
+=item * C<info.description> is present.
 
-=item * Data types and format compliance
-
-=item * Required fields according to the C<OpenAPI> specification
-
-=item * Valid references and schema composition
+=item * C<info.license> is present.
 
 =back
 
-=head2 SUPPORTED OPENAPI VERSIONS
+=head2 Operations (paths)
 
 =over 4
 
-=item * OpenAPI 3.0.0, 3.0.1, 3.0.2, 3.0.3
+=item * Every operation has a C<description>, C<summary>, and C<operationId>.
 
-=item * OpenAPI 3.1.0, 3.1.1
+=item * C<GET> and C<DELETE> operations do not include a C<requestBody>.
+
+=item * C<requestBody> has a C<description>.
+
+=item * Non-path parameters have a C<description>.
+
+=item * Path parameters declare C<required: true>.
+
+=item * Every operation has at least one 2xx response.
+
+=item * Every response object has a C<description>.
+
+=item * Response schemas that include content have a C<type> or C<$ref>.
+
+=item * C<POST> operations should return C<201 Created>.
+
+=item * C<204 No Content> responses must not include a body.
+
+=item * C<GET> operations should not return C<201>.
+
+=back
+
+=head2 Security
+
+Checked only when the spec defines C<components.securitySchemes>.
+
+=over 4
+
+=item * A root-level C<security> field is present.
+
+=item * Each operation either has its own C<security> field or inherits one
+from the root.
+
+=back
+
+=head2 Servers
+
+=over 4
+
+=item * Every C<{variable}> placeholder in a server URL is declared in
+C<servers[n].variables>.
+
+=item * A server URL that consists entirely of a single bare placeholder
+(e.g. C<"{siteUrl}">), with no variables block, is downgraded to C<WARN>
+rather than C<ERROR>. This pattern is common in published specs to indicate
+that the consumer must supply the base URL. It is still reported so the
+spec author is aware, but it is not treated as a hard error. Any other URL
+that mixes literal text with an undefined variable (e.g.
+C<"https://{host}/api">) remains an C<ERROR>.
+
+=back
+
+=head2 Components
+
+=over 4
+
+=item * Every schema in C<components.schemas> has a C<description>, C<type>,
+and (for object schemas) an C<example> or C<examples>.
+
+=item * Every schema property has a C<description> and uses camelCase naming.
+
+=item * Every entry in C<components.parameters> has a C<description>.
+
+=item * Every entry in C<components.responses> has a C<description>.
+
+=item * Every entry in C<components.requestBodies> has a C<description>.
+
+=item * Schemas, responses, and request bodies defined in C<components> but
+never referenced via C<$ref> are reported as unused.
+
+=back
+
+=head2 Path naming
+
+=over 4
+
+=item * Static path segments must be kebab-case
+(C<[a-z][a-z0-9]*(-[a-z][a-z0-9]*)*>).
+
+=back
+
+=head2 Duplicate descriptions
+
+=over 4
+
+=item * Identical descriptions across multiple component schemas are flagged
+at C<INFO> level.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<DEBUG>
+
+Set to a true value to emit verbose diagnostic output to C<STDERR> tracing
+the linter's internal execution.
+
+    DEBUG=1 perl myscript.pl
+
+=item C<MOJO_CONNECT_TIMEOUT> / C<MOJO_INACTIVITY_TIMEOUT>
+
+Temporarily set to C<10> seconds during schema download to prevent indefinite
+hangs on network failures.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item L<JSON::Validator>
+
+=item L<JSON>
+
+=item L<YAML::XS>
+
+=item L<File::Slurp>
+
+=item L<URI> (optional - used for stricter C<uri-reference> format validation
+when available)
 
 =back
 
@@ -1027,28 +607,1243 @@ official C<OpenAPI JSON Schema> for the detected version. This checks:
 
 =over 4
 
-=item C<"spec => HASHREF required if no file provided">
+=item C<A 'spec' file path or data is required>
 
-The C<spec> parameter to C<new> must be either a file path or a hash reference containing
-the C<OpenAPI> specification.
+You called C<new> without supplying the C<spec> argument.
 
-=item C<"Unsupported OpenAPI version: %s">
+=item C<Spec path '%s' does not exist>
 
-The C<OpenAPI> version specified in the document or provided to the constructor is not supported.
+The string passed as C<spec> is not a path to an existing file.
+
+=item C<Parsing error: ...>
+
+The file could not be parsed as YAML or JSON. The underlying error from
+L<YAML::XS> is included in the message.
 
 =back
+
+=head1 BUGS AND LIMITATIONS
+
+=over 4
+
+=item * C<$ref> resolution is shallow: only direct C<$ref> usage in operation
+C<requestBody>, C<responses>, C<parameters>, and response C<content> schemas
+is tracked for the unused-components check. Nested or recursive C<$ref>
+usage is not followed.
+
+=item * The unused-components check for C<components.parameters> only reports
+a parameter named C<fragment> (for Redocly toolchain compatibility). All
+other unused parameters are silently ignored.
+
+=item * Examples, headers, links, and callbacks inside C<components> are not
+checked.
+
+=item * The schema is downloaded from C<spec.openapis.org> on first use and
+cached by L<JSON::Validator>. Subsequent instantiations reuse the cache.
+In environments without internet access, pass a local C<schema_url>.
+
+=back
+
+=cut
+
+#
+#
+# Filtering Helper
+
+sub _apply_filters {
+    my ($self, $issues_ref, $filter_level, $filter_pattern) = @_;
+    my @issues = @$issues_ref;
+
+    if ($filter_level || $filter_pattern) {
+        my @filtered;
+        foreach my $issue (@issues) {
+            next if $filter_level   && $issue->{level} ne $filter_level;
+            next if $filter_pattern && $issue->{message} !~ $filter_pattern;
+            push @filtered, $issue;
+        }
+        @issues = @filtered;
+    }
+
+    return wantarray ? @issues : \@issues;
+}
+
+#
+#
+# Info Section Checks
+
+sub _check_info_section {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    warn ">>> CHECKING INFO SECTION\n" if $ENV{DEBUG};
+
+    if ($spec->{info}) {
+        # Check for info.description
+        unless ($spec->{info}{description}) {
+            push @issues, {
+                level    => 'WARN',
+                rule     => 'info-description',
+                message  => "API info is missing description",
+                location => $self->_make_location("info.description"),
+                type     => 'documentation',
+            };
+            warn ">>>   ⚠ Added WARN: missing info.description\n"
+                if $ENV{DEBUG};
+        }
+
+        # Check for info.license
+        unless ($spec->{info}{license}) {
+            push @issues, {
+                level    => 'WARN',
+                rule     => 'info-license',
+                message  => "API info is missing license",
+                location => $self->_make_location("info.license"),
+                type     => 'documentation',
+            };
+            warn ">>>   ⚠ Added WARN: missing info.license\n"
+                if $ENV{DEBUG};
+        }
+    }
+
+    return @issues;
+}
+
+#
+#
+# Operations Checks
+
+sub _check_operations {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless $spec->{paths};
+
+    warn ">>> Found paths section\n" if $ENV{DEBUG};
+
+    foreach my $path (sort keys %{$spec->{paths}}) {
+        foreach my $method (sort keys %{$spec->{paths}{$path}}) {
+            next if $method =~ /^x-/;
+            next if $method eq 'parameters';
+
+            my $op = $spec->{paths}{$path}{$method};
+            next unless ref($op) eq 'HASH';
+
+            if ($ENV{DEBUG}) {
+                warn ">>> PROCESSING OPERATION: $method $path\n";
+                warn ">>>   Operation keys: " . join(', ', keys %$op) . "\n";
+            }
+
+            push @issues, $self->_check_operation_description($path, $method, $op);
+            push @issues, $self->_check_operation_summary($path, $method, $op);
+            push @issues, $self->_check_operation_id($path, $method, $op);
+            push @issues, $self->_check_request_body_method($path, $method, $op);
+            push @issues, $self->_check_operation_parameters($path, $method, $op);
+            push @issues, $self->_check_request_body_description($path, $method, $op);
+            push @issues, $self->_check_success_responses($path, $method, $op);
+            push @issues, $self->_check_response_descriptions($path, $method, $op);
+            push @issues, $self->_check_post_201_rule($path, $method, $op);
+            push @issues, $self->_check_204_content_rule($path, $method, $op);
+            push @issues, $self->_check_get_201_rule($path, $method, $op);
+
+            if ($ENV{DEBUG}) {
+                warn ">>>   Finished processing $method $path\n";
+                warn ">>>   ---\n";
+            }
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_operation_description {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    unless ($op->{description}) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Operation $method $path is missing a description",
+            location => $self->_make_location("paths.$path.$method"),
+            type     => 'semantic',
+        };
+        warn ">>>   ⚠ Added WARN: missing description\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+sub _check_operation_summary {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    if (exists $op->{summary}) {
+        if (defined $op->{summary} && $op->{summary} =~ /^\s*$/) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Operation $method $path has empty summary",
+                location => $self->_make_location("paths.$path.$method.summary"),
+                type     => 'documentation',
+            };
+            warn ">>>   ⚠ Added WARN: empty summary\n"
+                if $ENV{DEBUG};
+        }
+    } else {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Operation $method $path is missing a summary",
+            location => $self->_make_location("paths.$path.$method"),
+            type     => 'documentation',
+        };
+        warn ">>>   ⚠ Added WARN: missing summary\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+sub _check_operation_id {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    unless ($op->{operationId}) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Operation $method $path is missing operationId",
+            location => $self->_make_location("paths.$path.$method"),
+            type     => 'semantic',
+        };
+        warn ">>>   ⚠ Added WARN: missing operationId\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+sub _check_request_body_method {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    if ($method =~ /^(get|delete)$/ && $op->{requestBody}) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Operation $method $path should not have requestBody",
+            location => $self->_make_location("paths.$path.$method.requestBody"),
+            type     => 'semantic',
+        };
+        warn ">>>   ⚠ Added WARN: should not have requestBody\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+sub _check_operation_parameters {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    return @issues unless $op->{parameters};
+
+    warn ">>>   Has " . scalar(@{$op->{parameters}}) . " parameters\n"
+        if $ENV{DEBUG};
+
+    for my $i (0 .. $#{$op->{parameters}}) {
+        my $param = $op->{parameters}[$i];
+        next if $param->{'$ref'};
+
+        # Path parameter must be required
+        if ($param->{in} && $param->{in} eq 'path') {
+            if (exists $param->{required} && !$param->{required}) {
+                push @issues, {
+                    level    => 'ERROR',
+                    message  => "Path parameter " . $param->{name}
+                                . " must be required",
+                    location => $self->_make_location("paths.$path.$method.parameters[$i]"),
+                    type     => 'semantic',
+                };
+                warn ">>>   ❌ Added ERROR: path parameter must be required\n"
+                    if $ENV{DEBUG};
+            }
+        }
+
+        # Check parameter description for non-path parameters
+        if ($param->{in} && $param->{in} ne 'path' && !$param->{description}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Parameter '" . $param->{name}
+                            . "' is missing description",
+                location => $self->_make_location("paths.$path.$method.parameters[$i]"),
+                type     => 'documentation',
+            };
+            warn ">>>   ⚠ Added WARN: parameter missing description\n"
+                if $ENV{DEBUG};
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_request_body_description {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    if ($op->{requestBody} && ref($op->{requestBody}) eq 'HASH') {
+        unless ($op->{requestBody}{description}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Request body in $method $path is missing description",
+                location => $self->_make_location("paths.$path.$method.requestBody"),
+                type     => 'documentation',
+            };
+            warn ">>>   ⚠ Added WARN: request body missing description\n"
+                if $ENV{DEBUG};
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_success_responses {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    warn ">>>   CHECKING success response for $method $path\n"
+        if $ENV{DEBUG};
+
+    my ($has_success, $has_200, $has_201, $has_204) = $self->_analyze_responses($op);
+
+    unless ($has_success) {
+        push @issues, {
+            level    => 'ERROR',
+            message  => "Operation $method $path missing success response (2xx)",
+            location => $self->_make_location("paths.$path.$method"),
+            type     => 'semantic',
+        };
+        warn ">>>   ❌ ADDED ERROR for missing success response\n"
+            if $ENV{DEBUG};
+    }
+
+    # Store response analysis in operation for other checks
+    $op->{_response_analysis} = {
+        has_success => $has_success,
+        has_200     => $has_200,
+        has_201     => $has_201,
+        has_204     => $has_204,
+    };
+
+    return @issues;
+}
+
+sub _analyze_responses {
+    my ($self, $op) = @_;
+
+    my $has_success = 0;
+    my $has_200     = 0;
+    my $has_201     = 0;
+    my $has_204     = 0;
+
+    if (exists $op->{responses}) {
+        warn ">>>   ✓ Has 'responses' key\n" if $ENV{DEBUG};
+
+        if (ref($op->{responses}) eq 'HASH') {
+            my @status_codes = keys %{$op->{responses}};
+            warn ">>>   Status codes: " . (join ', ', @status_codes) . "\n"
+                if $ENV{DEBUG};
+
+            foreach my $status (@status_codes) {
+                if ($status =~ /^2\d\d$|^2xx$|^success$|^default$/i) {
+                    $has_success = 1;
+                    $has_200     = 1 if $status eq '200';
+                    $has_201     = 1 if $status eq '201';
+                    $has_204     = 1 if $status eq '204';
+                    warn ">>>   ✓ Found success response: $status\n"
+                        if $ENV{DEBUG};
+                }
+            }
+        } else {
+            warn ">>>   ⚠ WARNING: responses is not a HASH, it's a "
+                 . ref($op->{responses}) . "\n"
+                if $ENV{DEBUG};
+        }
+    } else {
+        warn ">>>   ❌ NO 'responses' key at all!\n" if $ENV{DEBUG};
+    }
+
+    return ($has_success, $has_200, $has_201, $has_204);
+}
+
+sub _check_response_descriptions {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    return @issues unless ($op->{responses}
+                           && ref($op->{responses}) eq 'HASH');
+
+    foreach my $status (keys %{$op->{responses}}) {
+        my $response = $op->{responses}{$status};
+        next unless ref($response) eq 'HASH';
+
+        unless ($response->{description}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Response $status in $method $path is missing description",
+                location => $self->_make_location("paths.$path.$method.responses.$status"),
+                type     => 'documentation',
+            };
+            warn ">>>   ⚠ Added WARN: response $status missing description\n"
+                if $ENV{DEBUG};
+        }
+
+        push @issues, $self->_check_response_schema($path, $method, $status, $response);
+    }
+
+    return @issues;
+}
+
+sub _check_response_schema {
+    my ($self, $path, $method, $status, $response) = @_;
+    my @issues;
+
+    return @issues unless $response->{content};
+
+    foreach my $content_type (keys %{$response->{content}}) {
+        my $media = $response->{content}{$content_type};
+        next unless $media->{schema};
+
+        if (!exists $media->{schema}{type} && !$media->{schema}{'$ref'}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Response $status in $method $path has content type $content_type but schema missing type",
+                location => $self->_make_location("paths.$path.$method.responses.$status.content.$content_type.schema"),
+                type     => 'semantic',
+            };
+            warn ">>>   ⚠ Added WARN: response schema missing type\n"
+                if $ENV{DEBUG};
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_post_201_rule {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    my $analysis    = $op->{_response_analysis} || {};
+    my $has_success = $analysis->{has_success};
+    my $has_201     = $analysis->{has_201};
+
+    if ($method eq 'post' && $has_success && !$has_201) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "POST operation $method $path should return 201 Created (got 200)",
+            location => $self->_make_location("paths.$path.$method.responses"),
+            type     => 'semantic',
+        };
+        warn ">>>   ⚠ Added WARN: POST should return 201 Created\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+sub _check_204_content_rule {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    my $analysis = $op->{_response_analysis} || {};
+    my $has_204  = $analysis->{has_204};
+
+    if ($has_204 && $op->{responses}{204}{content}) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "204 No Content response should not have content body",
+            location => $self->_make_location("paths.$path.$method.responses.204.content"),
+            type     => 'semantic',
+        };
+        warn ">>>   ⚠ Added WARN: 204 response has content\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+sub _check_get_201_rule {
+    my ($self, $path, $method, $op) = @_;
+    my @issues;
+
+    my $analysis = $op->{_response_analysis} || {};
+    my $has_201  = $analysis->{has_201};
+
+    if ($method eq 'get' && $has_201) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "GET operation $method $path should return 200 OK (not 201)",
+            location => $self->_make_location("paths.$path.$method.responses.201"),
+            type     => 'semantic',
+        };
+        warn ">>>   ⚠ Added WARN: GET should not return 201\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+#
+#
+# Security Checks
+
+sub _check_security {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    # Only check security if spec has security schemes defined
+    return @issues unless $spec->{components}
+                          && $spec->{components}{securitySchemes};
+
+    warn ">>> CHECKING SECURITY RULES\n"
+        if $ENV{DEBUG};
+
+    # Check root level security
+    unless ($spec->{security}) {
+        warn ">>>   Root security missing - adding ERROR\n" if $ENV{DEBUG};
+        push @issues, {
+            level    => 'ERROR',
+            rule     => 'security-defined',
+            message  => "API root level missing security definition",
+            location => $self->_make_location("#/security"),
+            type     => 'security',
+        };
+    }
+
+    # Check each operation for security
+    push @issues, $self->_check_operation_security($spec);
+
+    return @issues;
+}
+
+sub _check_operation_security {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless $spec->{paths};
+    return @issues unless $spec->{components}
+                          && $spec->{components}{securitySchemes};
+
+    warn ">>>   Checking operation security\n"
+        if $ENV{DEBUG};
+
+    foreach my $path (keys %{$spec->{paths}}) {
+        foreach my $method (keys %{$spec->{paths}{$path}}) {
+            next if $method =~ /^x-|^parameters$/;
+            my $op = $spec->{paths}{$path}{$method};
+            next unless ref($op) eq 'HASH';
+
+            unless ($op->{security} || $spec->{security}) {
+                warn ">>>   ❌ Operation $method $path missing security\n" if $ENV{DEBUG};
+                push @issues, {
+                    level    => 'ERROR',
+                    rule     => 'security-defined',
+                    message  => "Operation $method $path missing security definition",
+                    location => $self->_make_location("paths.$path.$method.security"),
+                    type     => 'security',
+                };
+            }
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_server_variables {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless $spec->{servers};
+
+    warn ">>>   Checking server variables\n"
+        if $ENV{DEBUG};
+
+    foreach my $server_idx (0 .. $#{$spec->{servers}}) {
+        my $server = $spec->{servers}[$server_idx];
+        next unless $server->{url};
+
+        while ($server->{url} =~ /\{([^}]+)\}/g) {
+            my $var = $1;
+
+            unless ($server->{variables} && exists $server->{variables}{$var}) {
+
+                # A URL that is entirely a single variable placeholder (e.g.
+                # "{siteUrl}") is a common real-world pattern used to indicate
+                # that the base URL must be supplied by the consumer. It is
+                # technically invalid OpenAPI but widely accepted in published
+                # specs. We downgrade this specific case to WARN rather than
+                # ERROR, and still report it so the spec author is aware.
+
+                my $is_bare_placeholder =
+                    $server->{url} =~ /^\{[^}]+\}$/ ? 1 : 0;
+
+                my ($level, $message, $hint) =
+                    !$server->{variables}
+                    ? (
+                        $is_bare_placeholder ? 'WARN' : 'ERROR',
+                        $is_bare_placeholder
+                            ? "Server URL is a bare placeholder '{$var}' with no variables block — consumer must supply the base URL"
+                            : "Server URL contains variable '{$var}' but no variables block is defined",
+                        "Add a 'variables' block, e.g.: variables:\n    $var:\n      default: 'your-value'",
+                    )
+                    : (
+                        'ERROR',
+                        "Server variable '{$var}' is used in the URL but not defined in the variables block",
+                        undef,
+                    );
+
+                warn ">>>   $level: $message\n" if $ENV{DEBUG};
+                push @issues, {
+                    level    => $level,
+                    rule     => 'no-undefined-server-variable',
+                    message  => $message,
+                    hint     => $hint,
+                    type     => 'validation',
+                    location => $self->_make_location("servers.$server_idx.url"),
+                };
+            }
+        }
+    }
+
+    return @issues;
+}
+
+#
+#
+# Components Checks
+
+sub _check_components_schemas {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless ($spec->{components}
+                           && $spec->{components}{schemas});
+
+    warn ">>> Found components.schemas section\n"
+        if $ENV{DEBUG};
+
+    foreach my $schema_name (sort keys %{$spec->{components}{schemas}}) {
+        my $schema = $spec->{components}{schemas}{$schema_name};
+
+        push @issues, $self->_check_schema_description($schema_name, $schema);
+        push @issues, $self->_check_schema_type($schema_name, $schema);
+        push @issues, $self->_check_schema_example($schema_name, $schema);
+        push @issues, $self->_check_schema_properties($schema_name, $schema);
+        push @issues, $self->_check_schema_array_items($schema_name, $schema, '');
+    }
+
+    return @issues;
+}
+
+sub _check_schema_description {
+    my ($self, $schema_name, $schema) = @_;
+    my @issues;
+
+    unless ($schema->{description}) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Schema '$schema_name' is missing description",
+            location => $self->_make_location("components.schemas.$schema_name"),
+            type     => 'documentation',
+        };
+    }
+
+    return @issues;
+}
+
+sub _check_schema_type {
+    my ($self, $schema_name, $schema) = @_;
+    my @issues;
+
+    unless ($schema->{type}) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Schema '$schema_name' is missing type",
+            location => $self->_make_location("components.schemas.$schema_name.type"),
+            type     => 'semantic',
+        };
+        warn ">>>   ⚠ Added WARN: schema missing type\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+sub _check_schema_example {
+    my ($self, $schema_name, $schema) = @_;
+    my @issues;
+
+    if ($schema->{type} && $schema->{type} eq 'object') {
+        unless ($schema->{example} || $schema->{examples}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Schema '$schema_name' is missing example",
+                location => $self->_make_location("components.schemas.$schema_name"),
+                type     => 'documentation',
+            };
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_schema_properties {
+    my ($self, $schema_name, $schema) = @_;
+    my @issues;
+
+    return @issues unless $schema->{properties};
+
+    foreach my $prop (sort keys %{$schema->{properties}}) {
+        my $prop_schema = $schema->{properties}{$prop};
+        push @issues, $self->_check_property_naming($schema_name, $prop);
+        push @issues, $self->_check_property_description($schema_name, $prop, $prop_schema);
+    }
+
+    return @issues;
+}
+
+sub _check_property_naming {
+    my ($self, $schema_name, $prop) = @_;
+    my @issues;
+
+    if ($prop !~ /^[a-z][a-zA-Z0-9]+$/) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Property '$prop' should be camelCase",
+            location => $self->_make_location("components.schemas.$schema_name.properties.$prop"),
+            type     => 'naming',
+        };
+    }
+
+    return @issues;
+}
+
+sub _check_property_description {
+    my ($self, $schema_name, $prop, $prop_schema) = @_;
+    my @issues;
+
+    unless ($prop_schema->{description}) {
+        push @issues, {
+            level    => 'WARN',
+            message  => "Property '$prop' is missing description",
+            location => $self->_make_location("components.schemas.$schema_name.properties.$prop"),
+            type     => 'documentation',
+        };
+        warn ">>>   ⚠ Added WARN: property $prop missing description\n"
+            if $ENV{DEBUG};
+    }
+
+    return @issues;
+}
+
+# Recursively walk a schema and report any sub-schema that declares
+# type:array without a corresponding items keyword.
+#
+# OpenAPI 3.0.x requires items when type is array (inherited from
+# JSON Schema draft-07).  OpenAPI 3.1.x technically allows omitting
+# items but it is almost always a mistake in practice.
+#
+# $path is the dot-separated path suffix built up during recursion,
+# e.g. "properties.metadata.properties.fields".
+
+sub _check_schema_array_items {
+    my ($self, $schema_name, $schema, $path) = @_;
+    my @issues;
+
+    return @issues unless ref($schema) eq 'HASH';
+
+    # Check this node
+    if (($schema->{type} // '') eq 'array' && !exists $schema->{items}) {
+        my $full_path = "components.schemas.$schema_name"
+                      . ($path ? ".$path" : '');
+        push @issues, {
+            level    => 'ERROR',
+            rule     => 'array-items-required',
+            message  => "Schema '$schema_name'"
+                      . ($path ? " property '$path'" : '')
+                      . " has type 'array' but is missing required 'items' keyword",
+            type     => 'schema',
+            location => $self->_make_location($full_path),
+        };
+        warn ">>>   ERROR: array schema missing items at $full_path\n"
+            if $ENV{DEBUG};
+    }
+
+    # Recurse into properties
+    if (ref($schema->{properties}) eq 'HASH') {
+        foreach my $prop (sort keys %{$schema->{properties}}) {
+            my $sub_path = $path ? "$path.properties.$prop" : "properties.$prop";
+            push @issues, $self->_check_schema_array_items(
+                $schema_name, $schema->{properties}{$prop}, $sub_path
+            );
+        }
+    }
+
+    # Recurse into items itself (arrays of arrays)
+    if (ref($schema->{items}) eq 'HASH') {
+        my $sub_path = $path ? "$path.items" : 'items';
+        push @issues, $self->_check_schema_array_items(
+            $schema_name, $schema->{items}, $sub_path
+        );
+    }
+
+    # Recurse into allOf / anyOf / oneOf
+    for my $keyword (qw(allOf anyOf oneOf)) {
+        next unless ref($schema->{$keyword}) eq 'ARRAY';
+        for my $i (0 .. $#{$schema->{$keyword}}) {
+            my $sub_path = $path ? "$path.$keyword.$i" : "$keyword.$i";
+            push @issues, $self->_check_schema_array_items(
+                $schema_name, $schema->{$keyword}[$i], $sub_path
+            );
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_components_parameters {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless ($spec->{components}
+                           && $spec->{components}{parameters});
+
+    warn ">>> Found components.parameters section\n"
+        if $ENV{DEBUG};
+
+    foreach my $param_name (sort keys %{$spec->{components}{parameters}}) {
+        my $param = $spec->{components}{parameters}{$param_name};
+        unless ($param->{description}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Parameter '$param_name' is missing description",
+                location => $self->_make_location("components.parameters.$param_name"),
+                type     => 'documentation',
+            };
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_components_responses {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless ($spec->{components}
+                           && $spec->{components}{responses});
+
+    warn ">>> Found components.responses section\n"
+        if $ENV{DEBUG};
+
+    foreach my $resp_name (sort keys %{$spec->{components}{responses}}) {
+        my $response = $spec->{components}{responses}{$resp_name};
+        unless ($response->{description}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Response '$resp_name' is missing description",
+                location => $self->_make_location("components.responses.$resp_name"),
+                type     => 'documentation',
+            };
+        }
+    }
+
+    return @issues;
+}
+
+sub _check_components_request_bodies {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless ($spec->{components}
+                           && $spec->{components}{requestBodies});
+
+    warn ">>> Found components.requestBodies section\n"
+        if $ENV{DEBUG};
+
+    foreach my $req_name (sort keys %{$spec->{components}{requestBodies}}) {
+        my $request = $spec->{components}{requestBodies}{$req_name};
+        unless ($request->{description}) {
+            push @issues, {
+                level    => 'WARN',
+                message  => "Request body '$req_name' is missing description",
+                location => $self->_make_location("components.requestBodies.$req_name"),
+                type     => 'documentation',
+            };
+        }
+    }
+
+    return @issues;
+}
+
+#
+#
+# Unused Components Check
+
+sub _check_unused_components {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    warn ">>> Checking for unused components\n"
+        if $ENV{DEBUG};
+
+    my %used_components = $self->_find_used_components($spec);
+
+    return @issues unless $spec->{components};
+
+    # Schemas - always report
+    if ($spec->{components}{schemas}) {
+        foreach my $name (sort keys %{$spec->{components}{schemas}}) {
+            my $ref = "#/components/schemas/$name";
+            unless ($used_components{$ref}) {
+                push @issues, {
+                    level    => 'WARN',
+                    message  => "Component '$name' is defined but never used",
+                    location => $self->_make_location("components.schemas.$name"),
+                    type     => 'maintainability',
+                };
+            }
+        }
+    }
+
+    # Responses - always report
+    if ($spec->{components}{responses}) {
+        foreach my $name (sort keys %{$spec->{components}{responses}}) {
+            my $ref = "#/components/responses/$name";
+            unless ($used_components{$ref}) {
+                push @issues, {
+                    level    => 'WARN',
+                    message  => "Component '$name' is defined but never used",
+                    location => $self->_make_location("components.responses.$name"),
+                    type     => 'maintainability',
+                };
+            }
+        }
+    }
+
+    # RequestBodies - always report
+    if ($spec->{components}{requestBodies}) {
+        foreach my $name (sort keys %{$spec->{components}{requestBodies}}) {
+            my $ref = "#/components/requestBodies/$name";
+            unless ($used_components{$ref}) {
+                push @issues, {
+                    level    => 'WARN',
+                    message  => "Component '$name' is defined but never used",
+                    location => $self->_make_location("components.requestBodies.$name"),
+                    type     => 'maintainability',
+                };
+            }
+        }
+    }
+
+    # Parameters - only report 'fragment' (Redocly compatibility)
+    if ($spec->{components}{parameters}) {
+        foreach my $name (sort keys %{$spec->{components}{parameters}}) {
+            if ($name eq 'fragment') {
+                my $ref = "#/components/parameters/$name";
+                unless ($used_components{$ref}) {
+                    push @issues, {
+                        level    => 'WARN',
+                        message  => "Component '$name' is defined but never used",
+                        location => $self->_make_location("components.parameters.$name"),
+                        type     => 'maintainability',
+                    };
+                }
+            }
+        }
+    }
+
+    # EXAMPLES, HEADERS, LINKS, CALLBACKS - IGNORED
+
+    return @issues;
+}
+
+sub _find_used_components {
+    my ($self, $spec) = @_;
+    my %used_components;
+
+    return %used_components unless $spec->{paths};
+
+    foreach my $path (keys %{$spec->{paths}}) {
+        foreach my $method (sort keys %{$spec->{paths}{$path}}) {
+            next if $method =~ /^x-/;
+            next if $method eq 'parameters';
+
+            my $op = $spec->{paths}{$path}{$method};
+            next unless ref($op) eq 'HASH';
+            next unless $method =~ /^(get|put|post|delete|options|head|patch|trace)$/i;
+
+            # Check requestBody refs
+            if ($op->{requestBody} && $op->{requestBody}{'$ref'}) {
+                $used_components{$op->{requestBody}{'$ref'}} = 1;
+            }
+
+            # Check response refs
+            if ($op->{responses} && ref($op->{responses}) eq 'HASH') {
+                foreach my $status (keys %{$op->{responses}}) {
+                    my $response = $op->{responses}{$status};
+                    if ($response->{'$ref'}) {
+                        $used_components{$response->{'$ref'}} = 1;
+                    }
+                    if ($response->{content}) {
+                        foreach my $ct (keys %{$response->{content}}) {
+                            my $media = $response->{content}{$ct};
+                            if ($media->{schema} && $media->{schema}{'$ref'}) {
+                                $used_components{$media->{schema}{'$ref'}} = 1;
+                            }
+                        }
+                    }
+                }
+            }
+
+            # Check parameter refs
+            if ($op->{parameters}) {
+                foreach my $param (@{$op->{parameters}}) {
+                    if ($param->{'$ref'}) {
+                        $used_components{$param->{'$ref'}} = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    return %used_components;
+}
+
+#
+#
+# Path Naming Convention Checks
+
+sub _check_path_naming {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    return @issues unless $spec->{paths};
+
+    warn ">>> Checking path naming conventions\n"
+        if $ENV{DEBUG};
+
+    foreach my $path (sort keys %{$spec->{paths}}) {
+        my @segments = split '/', $path;
+        foreach my $segment (@segments) {
+            next if $segment =~ /^\{.*\}$/;
+            next if $segment eq '';
+            if ($segment !~ /^[a-z][a-z0-9]*(?:-[a-z][a-z0-9]*)*$/) {
+                push @issues, {
+                    level    => 'WARN',
+                    message  => "Path segment '$segment' should be kebab-case",
+                    location => $self->_make_location("paths.$path"),
+                    type     => 'naming',
+                };
+            }
+        }
+    }
+
+    return @issues;
+}
+
+#
+#
+# Duplicate Descriptions Check
+
+sub _check_duplicate_descriptions {
+    my ($self, $spec) = @_;
+    my @issues;
+
+    warn ">>> Checking for duplicate descriptions\n"
+        if $ENV{DEBUG};
+
+    my %descriptions;
+    if ($spec->{components} && $spec->{components}{schemas}) {
+        foreach my $schema_name (sort keys %{$spec->{components}{schemas}}) {
+            my $schema = $spec->{components}{schemas}{$schema_name};
+            if ($schema->{description}) {
+                my $desc = $schema->{description};
+                $desc    =~ s/\s+/ /g;
+                $desc    =~ s/^\s+|\s+$//g;
+                push @{$descriptions{$desc}},
+                    "components.schemas.$schema_name";
+            }
+        }
+    }
+
+    foreach my $desc (sort keys %descriptions) {
+        my @locations = @{$descriptions{$desc}};
+        if (@locations > 1) {
+            push @issues, {
+                level    => 'INFO',
+                message  => "Duplicate description found in "
+                            . join(', ', @locations),
+                location => $self->_make_location($locations[0]),
+                type     => 'maintainability',
+            };
+            warn ">>> Added INFO: duplicate description ("
+                 . scalar(@locations) . " occurrences)\n"
+                 if $ENV{DEBUG};
+        }
+    }
+
+    return @issues;
+}
+
+# Locate a bundled schema file.
+# Resolution order:
+#   1. $ENV{OPENAPI_LINTER_SCHEMA_DIR}  — CI / offline override
+#   2. share/ relative to this source   — dev checkout (prove -l)
+#   3. File::ShareDir::dist_file()      — installed via CPAN
+sub _schema_file {
+    my ($filename) = @_;
+
+    # 1. Explicit override — highest priority
+    if ( my $dir = $ENV{OPENAPI_LINTER_SCHEMA_DIR} ) {
+        my $path = File::Spec->catfile( $dir, $filename );
+        return $path if -f $path;
+        croak "OPENAPI_LINTER_SCHEMA_DIR set but '$path' not found";
+    }
+
+    # 2. Split __FILE__ into directory components and try share/ at each
+    #    ancestor, walking upward by popping one component at a time.
+    #    Works for both:
+    #      prove -l  => /path/to/dist/lib/OpenAPI/Linter.pm
+    #      make test => /path/to/dist/blib/lib/OpenAPI/Linter.pm
+    #    Bounded to 20 iterations — enough for any real directory depth.
+    my @parts = File::Spec->splitdir( File::Spec->rel2abs(__FILE__) );
+    pop @parts;
+
+    for ( 1 .. 20 ) {
+        pop @parts;
+        last unless @parts;
+        my $candidate = File::Spec->catfile( @parts, 'share', $filename );
+        return $candidate if -f $candidate;
+    }
+
+    # 3. Installed via CPAN
+    return dist_file( 'OpenAPI-Linter', $filename );
+}
+
+# Load and return a schema hashref from a bundled JSON file.
+sub _load_bundled_schema {
+    my ($filename) = @_;
+    my $path = _schema_file($filename);
+    open my $fh, '<:encoding(UTF-8)', $path
+        or croak "Cannot open bundled schema '$path': $!";
+    my $raw    = do { local $/; <$fh> };
+    my $schema = eval { decode_json($raw) };
+    croak "Failed to parse bundled schema '$path': $@" if $@;
+    return $schema;
+}
+
+# Build a lookup table: "dot.separated.path" => { line => N, column => N }
+#
+# Strategy: scan the raw file line by line. For each line we detect
+# whether it looks like a YAML key or a JSON key and record the first
+# occurrence. This is intentionally heuristic - it handles the vast
+# majority of real-world specs without requiring a full-parse event API.
+#
+# YAML keys  matched as:   ^(\s*)([\w./{}~-]+)\s*:
+# JSON keys  matched as:   ^(\s*)"([^"]+)"\s*:
+#
+# The leading whitespace length is used as the column number.
+
+sub _build_line_index {
+    my ($file) = @_;
+    my %index;
+
+    open my $fh, '<:encoding(UTF-8)', $file or return \%index;
+
+    my $is_json = $file =~ /\.json$/i;
+    my @stack;         # tracks the current path as an array of key segments
+    my @indent_stack;  # parallel stack of indent levels
+
+    my $line_no = 0;
+    while (my $line = <$fh>) {
+        $line_no++;
+        chomp $line;
+
+        my ($indent, $key);
+        if ($is_json) {
+            next unless $line =~ /^(\s*)"([^"]+)"\s*:/;
+            ($indent, $key) = (length($1), $2);
+        }
+        else {
+            next unless $line =~ /^(\s*)([\w.\/{}\~-][^:]*?)\s*:/;
+            ($indent, $key) = (length($1), $2);
+            $key =~ s/\s+$//;
+        }
+
+        # Pop stack entries that are at the same or deeper indent
+        while (@indent_stack && $indent_stack[-1] >= $indent) {
+            pop @stack;
+            pop @indent_stack;
+        }
+
+        push @stack,        $key;
+        push @indent_stack, $indent;
+
+        my $path = join '.', @stack;
+        $index{$path} //= { line => $line_no, column => $indent + 1 };
+    }
+
+    return \%index;
+}
+
+# Look up line/column for a dot-separated path, falling back gracefully
+# if the path (or a prefix of it) is not in the index.
+
+sub _resolve_location {
+    my ($self, $path) = @_;
+
+    my $idx = $self->{line_index};
+
+    # Exact match
+    if (exists $idx->{$path}) {
+        return ($idx->{$path}{line}, $idx->{$path}{column});
+    }
+
+    # Try progressively shorter prefixes
+    my @parts = split /\./, ($path // '');
+    while (@parts > 1) {
+        pop @parts;
+        my $prefix = join '.', @parts;
+        if (exists $idx->{$prefix}) {
+            return ($idx->{$prefix}{line}, $idx->{$prefix}{column});
+        }
+    }
+
+    return (0, 0);    # unknown
+}
+
+# Factory: build an OpenAPI::Linter::Location from a path string.
+
+sub _make_location {
+    my ($self, $path) = @_;
+    my ($line, $col) = $self->_resolve_location($path // '');
+    return OpenAPI::Linter::Location->new(
+        path   => $path // '',
+        file   => $self->{file_path},
+        line   => $line,
+        column => $col,
+    );
+}
 
 =head1 SEE ALSO
 
 =over 4
 
-=item * L<JSON::Validator> - Used for schema validation
+=item * L<JSON::Validator> - the underlying schema-validation engine.
 
-=item * L<OpenAPI::Modern> - Alternative OpenAPI implementation
+=item * L<Mojolicious::Plugin::OpenAPI> - runtime OpenAPI validation for
+Mojolicious applications.
 
-=item * L<https://www.openapis.org/> - OpenAPI Initiative
+=item * L<OpenAPI::Modern> - another OpenAPI validation toolkit.
 
-=item * L<https://swagger.io/specification/> - OpenAPI Specification
+=item * The OpenAPI Specification - L<https://spec.openapis.org/oas/latest.html>
 
 =back
 
@@ -1092,26 +1887,21 @@ L<https://metacpan.org/dist/OpenAPI-Linter/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2025 Mohammad Sajid Anwar.
+Copyright (C) 2026 Mohammad Sajid Anwar.
 
 This program  is  free software; you can redistribute it and / or modify it under
 the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full
 license at:
-
 L<http://www.perlfoundation.org/artistic_license_2_0>
-
 Any  use,  modification, and distribution of the Standard or Modified Versions is
 governed by this Artistic License.By using, modifying or distributing the Package,
 you accept this license. Do not use, modify, or distribute the Package, if you do
 not accept this license.
-
 If your Modified Version has been derived from a Modified Version made by someone
 other than you,you are nevertheless required to ensure that your Modified Version
  complies with the requirements of this license.
-
 This  license  does  not grant you the right to use any trademark,  service mark,
 tradename, or logo of the Copyright Holder.
-
 This license includes the non-exclusive, worldwide, free-of-charge patent license
 to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
 Package with respect to any patent claims licensable by the Copyright Holder that
@@ -1119,7 +1909,6 @@ are  necessarily  infringed  by  the  Package. If you institute patent litigatio
 (including  a  cross-claim  or  counterclaim) against any party alleging that the
 Package constitutes direct or contributory patent infringement,then this Artistic
 License to you shall terminate on the date that such litigation is filed.
-
 Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
 CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
 WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR

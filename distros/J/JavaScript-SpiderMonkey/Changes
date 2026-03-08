@@ -1,5 +1,8 @@
 Revision history for Perl extension JavaScript::SpiderMonkey.
 
+0.27 (06/03/2026)
+    (tb) Removed Log::Log4perl from t/007funcret.t
+
 0.26 (20/02/2026)
     (tb) Ported to mozjs-60 and mozjs-78 (SpiderMonkey 60 and 78)
     (tb) Rewrote Makefile.PL to use ExtUtils::PkgConfig, auto-detecting

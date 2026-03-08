@@ -1240,26 +1240,24 @@ sub PDL::swcols{
 
 =for ref
 
-  Read columns into ndarrays using full regexp pattern matching.
+Read columns into ndarrays using full regexp pattern matching.
 
-  Options:
+Options:
+
+=for options
 
   UNDEFINED: This option determines what will be done for undefined
   values. For instance when reading a comma-separated file of the type
   C<1,2,,4> where the C<,,> indicates a missing value.
-
   The default value is to assign C<$PDL::undefval> to undefined values,
   but if C<UNDEFINED> is set this is used instead. This would normally
   be set to a number, but if it is set to C<Bad> and PDL is compiled
   with Badvalue support (see L<PDL::Bad>) then undefined values are set to
   the appropriate badvalue and the column is marked as bad.
-
   DEFTYPE: Sets the default type of the columns - see the documentation for
    L</rcols>
-
   TYPES:   A reference to a Perl array with types for each column - see
   the documentation for L</rcols>
-
   BUFFERSIZE: The number of lines to extend the ndarray by. It might speed
   up the reading a little bit by setting this to the number of lines in the
   file, but in general L</rasc> is a better choice
@@ -1369,11 +1367,11 @@ of C<$1>, C<$2> etc.
 
 =cut
 
-#line 1141 "lib/PDL/IO/Misc.pd"
+#line 1138 "lib/PDL/IO/Misc.pd"
 sub PDL::isbigendian { return 0; };
 *isbigendian = \&PDL::isbigendian;
 
-#line 1147 "lib/PDL/IO/Misc.pd"
+#line 1144 "lib/PDL/IO/Misc.pd"
 
 =head2 rcube
 
@@ -1429,7 +1427,7 @@ sub rcube {
 
       return $cube;
 }
-#line 1433 "lib/PDL/IO/Misc.pm"
+#line 1431 "lib/PDL/IO/Misc.pm"
 
 
 =head2 rasc
@@ -1517,7 +1515,7 @@ separated from the PDL distribution, the copyright notice
 should be included in the file.
 
 =cut
-#line 1521 "lib/PDL/IO/Misc.pm"
+#line 1519 "lib/PDL/IO/Misc.pm"
 
 # Exit with OK status
 

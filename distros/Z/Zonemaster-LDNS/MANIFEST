@@ -119,6 +119,7 @@ lib/Zonemaster/LDNS/RR/GID.pm
 lib/Zonemaster/LDNS/RR/GPOS.pm
 lib/Zonemaster/LDNS/RR/HINFO.pm
 lib/Zonemaster/LDNS/RR/HIP.pm
+lib/Zonemaster/LDNS/RR/HTTPS.pm
 lib/Zonemaster/LDNS/RR/IPSECKEY.pm
 lib/Zonemaster/LDNS/RR/ISDN.pm
 lib/Zonemaster/LDNS/RR/KEY.pm
@@ -159,6 +160,7 @@ lib/Zonemaster/LDNS/RR/SOA.pm
 lib/Zonemaster/LDNS/RR/SPF.pm
 lib/Zonemaster/LDNS/RR/SRV.pm
 lib/Zonemaster/LDNS/RR/SSHFP.pm
+lib/Zonemaster/LDNS/RR/SVCB.pm
 lib/Zonemaster/LDNS/RR/TA.pm
 lib/Zonemaster/LDNS/RR/TALINK.pm
 lib/Zonemaster/LDNS/RR/TKEY.pm

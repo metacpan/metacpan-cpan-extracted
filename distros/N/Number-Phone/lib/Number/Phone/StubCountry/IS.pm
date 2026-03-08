@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153523;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -129,10 +129,10 @@ my $validators = {
                 'voip' => '49[0-24-79]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"35456", "Reykjavík\/Vesturbær\/Miðbærinn",
+$areanames{en} = {"35442", "Keflavík",
 "3545", "Reykjavík",
+"35456", "Reykjavík\/Vesturbær\/Miðbærinn",
 "35446", "Akureyri",
-"35442", "Keflavík",
 "35455", "Reykjavík\/Vesturbær\/Miðbærinn",};
 my $timezones = {
                '' => [

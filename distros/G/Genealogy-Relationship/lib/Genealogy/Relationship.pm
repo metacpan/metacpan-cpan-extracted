@@ -15,7 +15,7 @@ Genealogy::Relationship - calculate the relationship between two people
     my $aunt        = Person->new( ... );
     my $cousin      = Person->new( ... );
 
-    my $common_ancestor = $rel->get_most_recent_common_ancestor(
+    my $common_ancestor = $rel->most_recent_common_ancestor(
       $me, $cousin,
     );
     say $common_ancestor->name; # Grandfather's name
@@ -38,10 +38,14 @@ The objects that you use with this module need to implement three methods:
 
 =over 4
 
-=item * parent
+=item * parents
 
-This method should return the object which is the parent of the current
-person.
+This method should return an array reference containing the objects which are
+the parents of the current person. The array reference can contain zero, one
+or two objects.
+
+If an object does not have a C<parents()> method, then the module will fall
+back to using a C<parent()> method that returns a single parent object.
 
 =item * id
 
@@ -58,12 +62,13 @@ the character 'm' or 'f'.
 =head2 Note
 
 THe objects that you use with this class can actually have different names
-for these methods. C<parent>, C<id> and C<gender> are the default names
-used by this module, but you can change them by passing the correct names
+for these methods. C<parent>, C<parents>, C<id> and C<gender> are the default
+names used by this module, but you can change them by passing the correct names
 to the constructor. For example:
 
     my $rel = Genealogy::Relationship->new(
       parent_field_name     => 'progenitor',
+      parents_field_name    => 'progenitors',
       identifier_field_name => 'person_id',
       gender_field_name     => 'sex',
     );
@@ -71,22 +76,9 @@ to the constructor. For example:
 =head2 Limitations
 
 This module was born out of a need I had while creating
-L<https://lineofsuccession.co.uk/>. This leads to a limitation
-that I hope to remove at a later date.
-
-=over 4
-
-=item *
-
-Each person in the tree is expected to have only one parent. This is, of
-course, about half of the usual number. It's like that because for the line
-of succession I'm tracing bloodlines and only one parent is ever going to
-be significant.
-
-I realise that this is a significant limitation and I'll be thinking about
-how to fix it as soon as possible.
-
-=back
+L<https://lineofsuccession.co.uk/>. Relationship calculations are based on
+finding the most recent common ancestor between two people, and choosing the
+path that uses the fewest generations.
 
 =head2 Constructor
 
@@ -111,18 +103,19 @@ consider putting a caching layer in front of C<get_relationship>.
 
 =cut
 
-use v5.38;
-use feature 'class';
-no warnings 'experimental::class';
+use strict;
+use warnings;
+use Feature::Compat::Class;
 
 class Genealogy::Relationship;
 
 use List::Util qw[first];
 use Lingua::EN::Numbers qw[num2en num2en_ordinal];
 
-our $VERSION = '1.0.2';
+our $VERSION = '2.0.0';
 
 field $parent_field_name :param = 'parent';
+field $parents_field_name :param = 'parents';
 field $identifier_field_name :param = 'id';
 field $gender_field_name :param = 'gender';
 
@@ -154,7 +147,9 @@ The following methods are defined.
 =head2 most_recent_common_ancestor
 
 Given two person objects, returns the person who is the most recent common
-ancestor for the given people.
+ancestor for the given people. When multiple common ancestors exist at the
+same distance, returns the one reachable via the fewest total generations
+across both people.
 
 =cut
 
@@ -165,36 +160,103 @@ method most_recent_common_ancestor {
   return $person1
     if $person1->$identifier_field_name eq $person2->$identifier_field_name;
 
-  my @ancestors1 = ($person1, $self->get_ancestors($person1));
-  my @ancestors2 = ($person2, $self->get_ancestors($person2));
+  my $map1 = $self->_ancestor_map($person1);
+  my $map2 = $self->_ancestor_map($person2);
 
-  for my $anc1 (@ancestors1) {
-    for my $anc2 (@ancestors2) {
-      return $anc1
-        if $anc1->$identifier_field_name eq $anc2->$identifier_field_name;
+  my ($best_person, $best_total);
+
+  for my $id (keys %$map1) {
+    if (exists $map2->{$id}) {
+      my $total = $map1->{$id}{distance} + $map2->{$id}{distance};
+      if (!defined $best_total || $total < $best_total) {
+        $best_total  = $total;
+        $best_person = $map1->{$id}{person};
+      }
     }
   }
 
-  die "Can't find a common ancestor.\n";
+  die "Can't find a common ancestor.\n" unless defined $best_person;
+
+  return $best_person;
+}
+
+=head2 _get_parents
+
+Internal method. Given a person object, returns a list of that person's
+parents. Uses the C<parents_field_name> method if the person object supports
+it; otherwise falls back to the configured C<parent_field_name> method.
+
+=cut
+
+method _get_parents {
+  my ($person) = @_;
+
+  if ($person->can($parents_field_name)) {
+    return @{ $person->$parents_field_name() };
+  }
+
+  my $parent = $person->$parent_field_name;
+  return defined $parent ? ($parent) : ();
+}
+
+=head2 _ancestor_map
+
+Internal method. Given a person object, returns a hash reference mapping
+each ancestor's identifier to a hash containing C<distance> (number of
+generations from the given person) and C<person> (the ancestor object).
+The person themself is included at distance zero.
+
+=cut
+
+method _ancestor_map {
+  my ($person) = @_;
+
+  my %map;
+  my @queue = ([$person, 0]);
+
+  while (@queue) {
+    my ($current, $dist) = @{ shift @queue };
+    my $id = $current->$identifier_field_name;
+
+    next if exists $map{$id};
+
+    $map{$id} = { distance => $dist, person => $current };
+
+    for my $parent ($self->_get_parents($current)) {
+      push @queue, [$parent, $dist + 1];
+    }
+  }
+
+  return \%map;
 }
 
 =head2 get_ancestors
 
 Given a person object, returns a list of person objects, one for each
-ancestor of the given person.
+ancestor of the given person. When a person has two parents, all ancestors
+from both parent lines are included (breadth-first order).
 
-The first person in the list will be the person's parent and the last person
-will be their most distant ancestor.
+The first entries in the list will be the person's direct parent(s) and the
+last person will be their most distant ancestor.
 
 =cut
 
 method get_ancestors {
   my ($person) = @_;
 
-  my @ancestors = ();
+  my %visited;
+  my @ancestors;
+  my @queue = ($person);
 
-  while (defined ($person = $person->$parent_field_name)) {
-    push @ancestors, $person;
+  while (@queue) {
+    my $current = shift @queue;
+    for my $parent ($self->_get_parents($current)) {
+      my $id = $parent->$identifier_field_name;
+      unless ($visited{$id}++) {
+        push @ancestors, $parent;
+        push @queue, $parent;
+      }
+    }
   }
 
   return @ancestors;
@@ -328,6 +390,9 @@ the number of generations between the first person and their most recent
 common ancestor. The second integer is the number of generations between
 the second person and their most recent common ancestor.
 
+When a person has two parents, the shortest path to the common ancestor
+is used.
+
 =cut
 
 method get_relationship_coords {
@@ -337,18 +402,27 @@ method get_relationship_coords {
   return (0, 0)
     if $person1->$identifier_field_name eq $person2->$identifier_field_name;
 
-  my @ancestors1 = ($person1, $self->get_ancestors($person1));
-  my @ancestors2 = ($person2, $self->get_ancestors($person2));
+  my $map1 = $self->_ancestor_map($person1);
+  my $map2 = $self->_ancestor_map($person2);
 
-  for my $i (0 .. $#ancestors1) {
-    for my $j (0 .. $#ancestors2) {
-      return ($i, $j)
-        if $ancestors1[$i]->$identifier_field_name
-          eq $ancestors2[$j]->$identifier_field_name;
+  my ($best_i, $best_j, $best_total);
+
+  for my $id (keys %$map1) {
+    if (exists $map2->{$id}) {
+      my $i     = $map1->{$id}{distance};
+      my $j     = $map2->{$id}{distance};
+      my $total = $i + $j;
+      if (!defined $best_total || $total < $best_total) {
+        $best_total = $total;
+        $best_i     = $i;
+        $best_j     = $j;
+      }
     }
   }
 
-  die "Can't work out the relationship.\n";
+  die "Can't work out the relationship.\n" unless defined $best_total;
+
+  return ($best_i, $best_j);
 }
 
 =head2 get_relationship_ancestors
@@ -357,9 +431,12 @@ Given two people, returns lists of people linking those two people
 to their most recent common ancestor.
 
 The return value is a reference to an array containing two array
-references. The first references array contains the person1 and
-all their ancestors up to an including the most recent common
+references. The first referenced array contains the person1 and
+all their ancestors up to and including the most recent common
 ancestor. The second list does the same for person2.
+
+When a person has two parents, the shortest path to the common ancestor
+is used.
 
 =cut
 
@@ -369,19 +446,48 @@ method get_relationship_ancestors {
   my $mrca = $self->most_recent_common_ancestor($person1, $person2)
     or die "There is no most recent common ancestor\n";
 
-  my (@ancestors1, @ancestors2);
+  return [
+    $self->_path_to_ancestor($person1, $mrca),
+    $self->_path_to_ancestor($person2, $mrca),
+  ];
+}
 
-  for ($person1, $self->get_ancestors($person1)) {
-    push @ancestors1, $_;
-    last if $_->$identifier_field_name eq $mrca->$identifier_field_name;
+=head2 _path_to_ancestor
+
+Internal method. Given a person object and a target ancestor object, returns
+an array reference containing the shortest path from the person to the
+ancestor (inclusive of both endpoints). Uses breadth-first search so that
+the shortest path is always found, even when a person has two parents.
+
+=cut
+
+method _path_to_ancestor {
+  my ($person, $target) = @_;
+
+  my $target_id = $target->$identifier_field_name;
+  my $person_id = $person->$identifier_field_name;
+
+  return [$person] if $person_id eq $target_id;
+
+  # BFS to find the shortest path
+  my @queue   = ([$person]);
+  my %visited = ($person_id => 1);
+
+  while (@queue) {
+    my $path    = shift @queue;
+    my $current = $path->[-1];
+
+    for my $parent ($self->_get_parents($current)) {
+      my $parent_id = $parent->$identifier_field_name;
+      next if $visited{$parent_id}++;
+
+      my $new_path = [@$path, $parent];
+      return $new_path if $parent_id eq $target_id;
+      push @queue, $new_path;
+    }
   }
 
-  for ($person2, $self->get_ancestors($person2)) {
-    push @ancestors2, $_;
-    last if $_->$identifier_field_name eq $mrca->$identifier_field_name;
-  }
-
-  return [ \@ancestors1, \@ancestors2 ];
+  die "No path found to ancestor\n";
 }
 
 =head1 AUTHOR
@@ -394,7 +500,7 @@ perl(1)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2023, Magnum Solutions Ltd.  All Rights Reserved.
+Copyright (C) 2018-2026, Magnum Solutions Ltd.  All Rights Reserved.
 
 This script is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

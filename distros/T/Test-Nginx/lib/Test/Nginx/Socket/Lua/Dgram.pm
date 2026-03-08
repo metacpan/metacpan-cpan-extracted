@@ -4,7 +4,7 @@ use v5.10.1;
 use Test::Nginx::Socket::Lua -Base;
 use Test::Nginx::Util qw( $ServerPort $ServerAddr );
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 sub get_best_long_bracket_level ($);
 sub quote_as_lua_str ($);
@@ -444,7 +444,7 @@ Yichun "agentzh" Zhang (章亦春) C<< <agentzh@gmail.com> >>, OpenResty Inc.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2016, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
+Copyright (c) 2016 ~ 2025, Yichun Zhang C<< <agentzh@gmail.com> >>, OpenResty Inc.
 
 This module is licensed under the terms of the BSD license.
 

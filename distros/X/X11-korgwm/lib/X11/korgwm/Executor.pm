@@ -84,7 +84,7 @@ our @parser = (
     }}],
 
     # Window close or toggle floating / maximize / always_on
-    [qr/win_(close|toggle_(?:floating|maximize|always_on))\(\)/, sub ($arg) { return sub {
+    [qr/win_(close|toggle_(?:floating|maximize|always_on|pinned))\(\)/, sub ($arg) { return sub {
         my $win = $focus->{window};
         return unless defined $win;
 
@@ -93,6 +93,7 @@ our @parser = (
         $arg eq "toggle_floating"   ? $win->toggle_floating()   :
         $arg eq "toggle_maximize"   ? $win->toggle_maximize(2)  :
         $arg eq "toggle_always_on"  ? $win->toggle_always_on()  :
+        $arg eq "toggle_pinned"     ? $win->toggle_pinned()     :
         croak "Unknown win_toggle_$arg function called"         ;
 
         $focus->{screen}->refresh();
@@ -106,7 +107,9 @@ our @parser = (
 
         return if $win->{always_on};
 
-        my $screen = $focus->{screen};
+        my ($screen, @multiple) = $win->screens();
+        croak "win_move_tag() not implemented for windows on multiple screens" if @multiple;
+
         my $new_tag = $screen->{tags}->[$arg - 1] or return;
         my $curr_tag = $screen->current_tag();
         return if $new_tag == $curr_tag;
@@ -117,11 +120,8 @@ our @parser = (
 
         # Follow the window if required
         if ($cfg->{move_follow}) {
-            # Move pointer out of the window to avoid EnterNotify
-            $X->warp_pointer(0, $X->root->id, 0, 0, 0, 0, 0, 0);
-            $X->flush();
-
-            # Prevent FocusIn events
+            # Prevent unwanted events
+            prevent_enter_notify();
             prevent_focus_in();
 
             $screen->{focus} = $win;
@@ -152,13 +152,12 @@ our @parser = (
         return unless defined $win;
 
         my $new_screen = $screens[$arg - 1] or return;
-        my $old_screen = $focus->{screen};
+        my ($old_screen, @multiple) = $win->screens();
+        croak "win_move_screen() not implemented for windows on multiple screens" if @multiple;
         return if $new_screen == $old_screen;
         return if $new_screen->current_tag->{max_window} and $win->{maximized};
 
-        # Move pointer out of the window to avoid EnterNotify
-        $X->warp_pointer(0, $X->root->id, 0, 0, 0, 0, 0, 0);
-        $X->flush();
+        prevent_enter_notify();
 
         my $always_on = $win->{always_on};
         $old_screen->win_remove($win, 1);
@@ -213,6 +212,14 @@ our @parser = (
         $win->swap($new);
     }}],
 
+    # Change the layout
+    [qr/layout_set\((\w+\s*(,\s*\d+)?)\)/, sub ($arg) { return sub {
+        my ($func, $reverse) = split /\s*,\s*/, $arg;
+        my $tag = $focus->{screen}->current_tag();
+        $tag->layout_set($func, $reverse) or return;
+        $tag->show();
+    }}],
+
     # Resize the layout
     [qr/layout_resize\(([hjkl])\)/, sub ($arg) { return sub {
         my $win = $focus->{window};
@@ -239,6 +246,23 @@ our @parser = (
     # Expose windows
     [qr/expose\(\)/, sub ($arg) { return sub {
         &X11::korgwm::Expose::expose();
+    }}],
+
+    # Open the calendar
+    [qr/toggle_calendar\(\)/, sub ($arg) { return sub {
+        my $screen = $focus->{screen} // return carp "Focus screen undefined";
+        my $ebox = $screen->{panel}->{"_ebox:clock"} // return carp "_ebox:clock undefined";
+        my $win = $ebox->get_window() // return carp "Can't find relevant Panel window";
+        my $display = $win->get_display() // return carp "Can't find Panel display";
+        my $device_manager = $display->get_device_manager() // return carp "Can't find device manager";
+        my $device = $device_manager->get_client_pointer() // return carp "Can't find mouse pointer device";
+
+        my $event = Gtk3::Gdk::Event->new('button-press');
+        $event->button(Gtk3::Gdk::BUTTON_PRIMARY());
+        $event->window($win);
+        $event->send_event(Gtk3::true());
+        $event->device($device);
+        Gtk3::main_do_event($event);
     }}],
 
     # Make some window urgent by class
@@ -305,7 +329,7 @@ DEBUG_API and push @parser,
     }}],
 ;
 
-# Parses $cmd and returns corresponding \&sub
+# Parse $cmd and return corresponding \&sub
 sub parse($cmd) {
     for my $known (@parser) {
         return $known->[1]->($1) if $cmd =~ m{^$known->[0]$}s;

@@ -15,7 +15,8 @@ my $outdb  = shift @ARGV;
 my $outindex  = shift @ARGV;
 
 unless (defined $dirarg) {
-	($dirarg = $INC{'PDL.pm'}) =~ s/PDL\.pm$//i;
+	($dirarg = $INC{'PDL.pm'}) =~ s/[\/\\]*PDL\.pm$//i;
+	if ($dirarg =~ /^blib/) { $dirarg .= ",blib/script,blib/lib/Inline" }
 	umask 0022;
 	print "DIR = $dirarg\n";
 }
@@ -30,7 +31,7 @@ my $onldc = PDL::Doc->new;
 $onldc->outfile($outdb);
 
 foreach my $dir (@dirs) {
-    $onldc->scantree($dir."/PDL",$opt_v);
+    $onldc->scantree($dir =~ /script|Inline$/ ? $dir : $dir."/PDL",$opt_v);
     $onldc->scan($dir."/PDL.pm",$opt_v) if (-s $dir."/PDL.pm");
 }
 
@@ -71,7 +72,6 @@ for (@mans) {
 }
 
 $pod = <<'EOPOD';
-
   =back
 
   =head1 PDL scripts
@@ -83,12 +83,11 @@ print $podfh $pod;
 print $podfh "=over 4\n\n";
 for (@scripts) {
   my $ref = $_->[2]->{Ref};
-  $ref =~ s/Script:/L<$_->[0]|PDL::$_->[0]> -/;
+  $ref =~ s/Script:/L<$_->[0]> -/;
   print $podfh "=item *\n\n$ref\n\n";
 }
 
 $pod = <<'EOPOD';
-
   =back
 
   =head1 PDL modules
@@ -100,18 +99,12 @@ print $podfh $pod;
 print $podfh "=over 4\n\n";
 for (@mods) {
   my $ref = $_->[2]->{Ref};
-  next unless $_->[0] =~ /^PDL/;
-  if( $_->[0] eq 'PDL'){ # special case needed to find the main PDL.pm file.
-	  $ref =~ s/Module:/L<PDL> -/;
-	  print $podfh "=item *\n\n$ref\n\n";
-	  next;
-  }
+  next unless $_->[0] =~ /^PDL|Inline::Pdlpp/;
   $ref =~ s/Module:/L<$_->[0]> -/;
   print $podfh "=item *\n\n$ref\n\n";
 }
 
-$pod = <<'EOPOD';
-
+$pod = <<EOPOD;
   =back
 
   =head1 HISTORY

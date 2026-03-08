@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.235';
+our $VERSION = '1.236';
 
 =encoding utf8
 
@@ -1074,7 +1074,7 @@ L<Quiq::Zugferd::Tree> - Operatonen auf ZUGFeRD-Baum
 
 =head1 VERSION
 
-1.235
+1.236
 
 =head1 AUTHOR
 

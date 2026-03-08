@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::PodSchedulingContextSpec;
 # ABSTRACT: PodSchedulingContextSpec describes where resources for the Pod are needed.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s potentialNodes => [Str];
@@ -23,7 +23,7 @@ IO::K8s::Api::Resource::V1alpha3::PodSchedulingContextSpec - PodSchedulingContex
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 potentialNodes
 

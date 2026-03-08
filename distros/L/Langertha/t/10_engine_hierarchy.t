@@ -276,15 +276,28 @@ is(Langertha::Engine::Mistral->new(api_key => 'k')->default_model, 'mistral-smal
 
 use Langertha::Engine::MiniMax;
 
-test_openai_cloud_engine(
-  class => 'Langertha::Engine::MiniMax',
-  name => 'MiniMax',
-  url => 'https://api.minimax.io/v1',
-  model => 'MiniMax-M2.5',
-  env_var => 'LANGERTHA_MINIMAX_API_KEY',
-  has_tools => 1,
-);
-is(Langertha::Engine::MiniMax->new(api_key => 'k')->default_model, 'MiniMax-M2.5', 'MiniMax default_model');
+# MiniMax uses Anthropic-compatible API (extends Anthropic, not OpenAIBase)
+ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::Anthropic'), 'MiniMax isa Anthropic');
+ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::Remote'), 'MiniMax isa Remote');
+ok(!Langertha::Engine::MiniMax->isa('Langertha::Engine::OpenAIBase'), 'MiniMax is NOT OpenAIBase');
+ok(Langertha::Engine::MiniMax->does('Langertha::Role::Chat'), 'MiniMax does Chat');
+ok(Langertha::Engine::MiniMax->does('Langertha::Role::Streaming'), 'MiniMax does Streaming');
+ok(Langertha::Engine::MiniMax->does('Langertha::Role::Tools'), 'MiniMax does Tools');
+ok(Langertha::Engine::MiniMax->does('Langertha::Role::StaticModels'), 'MiniMax does StaticModels');
+{
+  my $m = Langertha::Engine::MiniMax->new(api_key => 'test-key');
+  is($m->url, 'https://api.minimax.io/anthropic', 'MiniMax url default correct');
+  is($m->default_model, 'MiniMax-M2.5', 'MiniMax default_model');
+
+  local $ENV{LANGERTHA_MINIMAX_API_KEY} = 'env-key-12345';
+  my $m2 = Langertha::Engine::MiniMax->new;
+  is($m2->api_key, 'env-key-12345', 'MiniMax reads api_key from LANGERTHA_MINIMAX_API_KEY');
+
+  my $req = $m->chat('test prompt');
+  is($req->method, 'POST', 'MiniMax chat request is POST');
+  like($req->uri, qr{/v1/messages$}, 'MiniMax chat endpoint is /v1/messages');
+  is($req->header('x-api-key'), 'test-key', 'MiniMax uses x-api-key header');
+}
 
 # --- NousResearch ---
 
@@ -301,7 +314,7 @@ test_openai_cloud_engine(
 is(Langertha::Engine::NousResearch->new(api_key => 'k')->default_model, 'Hermes-4-70B', 'NousResearch default_model');
 {
   my $nous = Langertha::Engine::NousResearch->new(api_key => 'k');
-  ok($nous->hermes_tools, 'NousResearch has hermes_tools enabled by default');
+  ok($nous->does('Langertha::Role::HermesTools'), 'NousResearch uses HermesTools');
 }
 
 # --- AKIOpenAI ---

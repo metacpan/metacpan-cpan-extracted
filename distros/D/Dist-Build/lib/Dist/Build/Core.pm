@@ -1,5 +1,5 @@
 package Dist::Build::Core;
-$Dist::Build::Core::VERSION = '0.026';
+$Dist::Build::Core::VERSION = '0.027';
 use strict;
 use warnings;
 
@@ -269,7 +269,7 @@ sub add_methods {
 			on    => $pattern,
 			subst => sub {
 				my ($source) = @_;
-				my $target = $source =~ s/\.PL\z//r;
+				(my $target = $source) =~ s/\.PL\z//;
 				$planner->create_node(
 					target       => $target,
 					dependencies => [ $source ],
@@ -403,7 +403,7 @@ Dist::Build::Core - core functions for Dist::Build
 
 =head1 VERSION
 
-version 0.026
+version 0.027
 
 =head1 DESCRIPTION
 

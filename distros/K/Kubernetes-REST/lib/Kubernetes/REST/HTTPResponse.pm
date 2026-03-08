@@ -1,5 +1,5 @@
 package Kubernetes::REST::HTTPResponse;
-our $VERSION = '1.003';
+our $VERSION = '1.100';
 # ABSTRACT: HTTP response object
 use Moo;
 use Types::Standard qw/Str Int/;
@@ -25,7 +25,7 @@ Kubernetes::REST::HTTPResponse - HTTP response object
 
 =head1 VERSION
 
-version 1.003
+version 1.100
 
 =head1 SYNOPSIS
 

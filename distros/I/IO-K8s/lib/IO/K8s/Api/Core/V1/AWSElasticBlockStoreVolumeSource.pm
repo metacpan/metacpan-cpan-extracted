@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::AWSElasticBlockStoreVolumeSource;
 # ABSTRACT: Represents a Persistent Disk resource in AWS. An AWS EBS disk must exist before mounting to a container. The disk must also be in the same AWS zone as the kubelet. An AWS EBS disk can only be mounted as read/write once. AWS EBS volumes support ownership management and SELinux relabeling.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s fsType => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::AWSElasticBlockStoreVolumeSource - Represents a Persiste
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 fsType
 

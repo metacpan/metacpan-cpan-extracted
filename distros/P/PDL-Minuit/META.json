@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -28,17 +28,18 @@
       "configure" : {
          "requires" : {
             "ExtUtils::F77" : "1.26",
-            "PDL" : "2.093"
+            "PDL" : "2.094"
          }
       },
       "runtime" : {
          "requires" : {
-            "PDL" : "2.093"
+            "PDL" : "2.094"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test::More" : "0.88",
+            "Test::PDL" : "0.22"
          }
       }
    },
@@ -54,7 +55,7 @@
          "web" : "https://github.com/PDLPorters/PDL-Minuit"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_IRC" : "irc://irc.perl.org/#pdl",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -46,4 +46,37 @@ use Kubernetes::REST::AuthToken;
     is($api->expand_class('MyCustomResource'), 'IO::K8s::Api::Custom::V1::MyCustomResource', 'Custom resource map works');
 }
 
+# Test _build_path pluralization rules
+{
+    my $api = Kubernetes::REST->new(
+        server => Kubernetes::REST::Server->new(endpoint => 'http://example.com'),
+        credentials => Kubernetes::REST::AuthToken->new(token => 'FakeToken'),
+        resource_map_from_cluster => 0,
+    );
+
+    # Simple +s: pod -> pods
+    my $path = $api->_build_path('IO::K8s::Api::Core::V1::Pod');
+    like($path, qr{/pods$}, 'Pod -> pods (simple +s)');
+
+    # Simple +s: node -> nodes
+    $path = $api->_build_path('IO::K8s::Api::Core::V1::Node');
+    like($path, qr{/nodes$}, 'Node -> nodes (simple +s)');
+
+    # Already ends in s (Namespace -> namespaces... but Namespace ends in 'e', +s)
+    $path = $api->_build_path('IO::K8s::Api::Core::V1::Namespace');
+    like($path, qr{/namespaces$}, 'Namespace -> namespaces (ends in e, +s)');
+
+    # ss/sh/ch/x/z -> +es: Ingress -> ingresses
+    $path = $api->_build_path('IO::K8s::Api::Networking::V1::Ingress');
+    like($path, qr{/ingresses$}, 'Ingress -> ingresses (ss ending -> +es)');
+
+    # consonant+y -> ies: NetworkPolicy -> networkpolicies
+    $path = $api->_build_path('IO::K8s::Api::Networking::V1::NetworkPolicy');
+    like($path, qr{/networkpolicies$}, 'NetworkPolicy -> networkpolicies (consonant+y -> ies)');
+
+    # ConfigMap -> configmaps (simple +s)
+    $path = $api->_build_path('IO::K8s::Api::Core::V1::ConfigMap');
+    like($path, qr{/configmaps$}, 'ConfigMap -> configmaps (simple +s)');
+}
+
 done_testing;

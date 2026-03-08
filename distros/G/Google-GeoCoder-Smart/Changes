@@ -1,5 +1,19 @@
 Revision history for Perl extension Google::GeoCoder::Smart.
 
+2.6.5  Wed Mar 04 00:00:00 2026
+  - Fixed MANIFEST accounting for release tarballs by including MANIFEST.SKIP
+    in MANIFEST and tightening MANIFEST.SKIP rules
+  - Added CI coverage that runs tests from a built/extracted distribution
+    tarball
+
+2.6.4  Wed Mar 04 00:00:00 2026
+  - Added explicit CPAN metadata in Makefile.PL (perl version, license,
+    repository resource, and provides)
+  - Added SECURITY.md and CONTRIBUTING.md
+  - Added test coverage for MANIFEST/MANIFEST.SKIP file accounting
+  - Removed legacy root test.pl so tests are discovered from t/ only
+  - Updated POD NAME section format for abstract detection
+
 2.6.2  Fri Feb 27 00:00:00 2026
   - Added `t/fixtures/geocode-ok.json` to MANIFEST so packaged tarballs include
     the fixture required by module tests

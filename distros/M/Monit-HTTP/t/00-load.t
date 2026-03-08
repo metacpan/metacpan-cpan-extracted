@@ -1,9 +1,8 @@
 #!perl
 
-use Test::More tests => 1;
+use Test2::V1 '-import';
+plan(1);
 
-BEGIN {
-    use_ok( 'Monit::HTTP' );
-}
+use ok 'Monit::HTTP';
 
 diag( "Testing Monit::HTTP $Monit::HTTP::VERSION, Perl $], $^X" );

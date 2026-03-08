@@ -20,7 +20,9 @@ my @options =
      'spoll',               # Spoll the device and print the results
      'trigger',             # Send a GET trigger to this device
      'local',               # Set the GPIB local
-     'file=s@'              # File(s) to read commands from
+     'file=s@',             # File(s) to read commands from
+     'loop=n',              # Loop this number of times. 0 means forever
+     'loopdelay=n',         # Delay n seconds between loops
     );
 
 &GetOptions(@options) || &usage;
@@ -30,7 +32,7 @@ my $address = 7;
 
 $port = $main::opt_port if defined $main::opt_port;
 $address = $main::opt_address if defined $main::opt_address;
-$Device::GPIB::Controller::debug = 1 if $main::opt_debug;
+Device::GPIB::Controller::enableDebug(1) if $main::opt_debug;
 
 my $d = Device::GPIB::Controller->new($port);
 exit unless $d;
@@ -44,28 +46,38 @@ exit unless $gpib;
 # On some devices clr will reset everything :-)
 $d->clr() unless defined $main::opt_noclear;
 
-$gpib->executeCommandsFromFiles(@main::opt_file);
-$gpib->executeCommands(@ARGV);
+my $loop_count = 0;
 
-if (defined $main::opt_trigger)
+do
 {
-    $gpib->trigger();
-}
+    $gpib->executeCommandsFromFiles(@main::opt_file);
+    $gpib->executeCommands(@ARGV);
 
-if (defined $main::opt_spoll)
-{
-    my @spoll = $gpib->spoll();
-    if (@spoll)
+
+    if (defined $main::opt_trigger)
     {
-	print @spoll;
-	print "\n";
+	$gpib->trigger();
     }
-}
 
-if (defined $main::opt_local)
-{
-    $d->loc();
+    if (defined $main::opt_spoll)
+    {
+	my @spoll = $gpib->spoll();
+	if (@spoll)
+	{
+	    print @spoll;
+	    print "\n";
+	}
+    }
+
+    if (defined $main::opt_local)
+    {
+	$d->loc();
+    }
+
+    sleep($main::opt_loopdelay)
+	if $main::opt_loopdelay;
 }
+while (defined $main::opt_loop && ($main::opt_loop == 0 || (++$loop_count < $main::opt_loop)));
 
 sub usage
 {

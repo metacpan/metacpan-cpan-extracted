@@ -1,4 +1,4 @@
-require 5.036_000;
+require 5.038_000;
 
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence

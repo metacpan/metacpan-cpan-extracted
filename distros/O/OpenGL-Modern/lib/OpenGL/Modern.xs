@@ -108,15 +108,7 @@ OUTPUT:
 void
 glpCheckErrors()
 CODE:
-    int err = GL_NO_ERROR;
-    int error_count = 0;
-    while ( ( err = glGetError() ) != GL_NO_ERROR ) {
-        /* warn( "OpenGL error: %d", err ); */
-        warn( "glpCheckErrors: OpenGL error: %d %s", err, gl_error_string(err) );
-	error_count++;
-    }
-    if( error_count )
-      croak( "glpCheckErrors: %d OpenGL errors encountered.", error_count );
+  OGLM_CROAK_IF_ERR(glpCheckErrors, )
 
 const char *
 glpErrorString(err)

@@ -1,6 +1,6 @@
 package Langertha::Engine::Anthropic;
 # ABSTRACT: Anthropic API
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -359,7 +359,7 @@ Langertha::Engine::Anthropic - Anthropic API
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 

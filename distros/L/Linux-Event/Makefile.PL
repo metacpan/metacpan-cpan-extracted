@@ -18,6 +18,7 @@ WriteMakefile(
   },
   PREREQ_PM       => {
     'Carp'                => 0,
+    'Test2::V0'           => 0,
     'Linux::Epoll'        => 0,
     'Linux::FD::Signal'   => 0,
     'Linux::Event::Timer' => 0.010,

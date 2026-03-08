@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SleepAction;
 # ABSTRACT: SleepAction describes a "sleep" action.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s seconds => Int, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::SleepAction - SleepAction describes a "sleep" action.
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 seconds
 

@@ -69,71 +69,71 @@
    "provides" : {
       "DBIx::Class::Async" : {
          "file" : "lib/DBIx/Class/Async.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Exception" : {
          "file" : "lib/DBIx/Class/Async/Exception.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Exception::AmbiguousColumn" : {
          "file" : "lib/DBIx/Class/Async/Exception/AmbiguousColumn.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Exception::Factory" : {
          "file" : "lib/DBIx/Class/Async/Exception/Factory.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Exception::MissingColumn" : {
          "file" : "lib/DBIx/Class/Async/Exception/MissingColumn.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Exception::NoSuchRelationship" : {
          "file" : "lib/DBIx/Class/Async/Exception/NoSuchRelationship.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Exception::NotInStorage" : {
          "file" : "lib/DBIx/Class/Async/Exception/NotInStorage.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Exception::RelationshipAsColumn" : {
          "file" : "lib/DBIx/Class/Async/Exception/RelationshipAsColumn.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::ResultSet" : {
          "file" : "lib/DBIx/Class/Async/ResultSet.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::ResultSet::Pager" : {
          "file" : "lib/DBIx/Class/Async/ResultSet/Pager.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::ResultSetColumn" : {
          "file" : "lib/DBIx/Class/Async/ResultSetColumn.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Row" : {
          "file" : "lib/DBIx/Class/Async/Row.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Schema" : {
          "file" : "lib/DBIx/Class/Async/Schema.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::SelectNormaliser" : {
          "file" : "lib/DBIx/Class/Async/SelectNormaliser.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Storage" : {
          "file" : "lib/DBIx/Class/Async/Storage.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Storage::DBI" : {
          "file" : "lib/DBIx/Class/Async/Storage/DBI.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       },
       "DBIx::Class::Async::Storage::DBI::Cursor" : {
          "file" : "lib/DBIx/Class/Async/Storage/DBI/Cursor.pm",
-         "version" : "0.63"
+         "version" : "0.64"
       }
    },
    "release_status" : "stable",
@@ -147,6 +147,6 @@
          "web" : "https://github.com/manwar/DBIx-Class-Async"
       }
    },
-   "version" : "0.63",
+   "version" : "0.64",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

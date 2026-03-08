@@ -54,11 +54,11 @@
    "provides" : {
       "Data::Random" : {
          "file" : "lib/Data/Random.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       },
       "Data::Random::WordList" : {
          "file" : "lib/Data/Random/WordList.pm",
-         "version" : "0.14"
+         "version" : "0.15"
       }
    },
    "release_status" : "stable",
@@ -73,7 +73,7 @@
          "web" : "https://github.com/barefootcoder/Data-Random"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
       "Buddy Burden <barefootcoder@gmail.com>",
       "James E Keenan <jkeenan@cpan.org>",

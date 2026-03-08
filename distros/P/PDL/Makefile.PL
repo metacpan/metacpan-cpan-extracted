@@ -15,7 +15,7 @@ my @cpan_deps = my @prereq = (
   'Filter::Util::Call'  => 0,         # for PDL::NiceSlice
   'Filter::Simple'      => 0.88,      # for new PDL::NiceSlice
   'List::Util'          => '1.33',
-  'Pod::Select'         => 0,         # version TBD for PDL::Doc
+  'Pod::Simple'         => '3.40',    # for PDL::Doc
   'Scalar::Util'        => 0,
   'Storable'            => 1.03,      # for PDL::IO::Storable
   'Text::Balanced'      => '2.05',    # for PDL::NiceSlice
@@ -97,7 +97,7 @@ my %makefile_hash = (
   BUILD_REQUIRES => {
     'ExtUtils::MakeMaker' => 0,
     'File::Path'          => 0,
-    'Pod::Select'         => 0,
+    'Pod::Simple'         => '3.40',
     'ExtUtils::ParseXS'   => '3.21', # ExtUtils::Typemaps::tidy_type
   },
   MIN_PERL_VERSION => '5.016',

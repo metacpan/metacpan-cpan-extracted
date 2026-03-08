@@ -38,9 +38,68 @@ is_pdl $lin1, pdl([5]), 'length-one *linvals gives starting point';
 eval { zeroes(0)->xlinvals(5,10) };
 like $@, qr/at least/, 'cannot have length-zero dim *linvals';
 my $byte_xvals = ones( byte, 300 )->xvals;
-is $byte_xvals->type, 'double', 'byte->xvals type double';
+is $byte_xvals->type, 'float', 'byte->xvals type float';
 is $byte_xvals->at(280), 280,'non-overflow xvals from byte ndarray';
 is xvals(short, 2)->type, 'short', 'xvals respects specified type';
+my ($base, $exp) = (zeroes(3,3), pdl('0;0.5;1'));
+is_pdl $base->slice('0')->inplace->ylinvals(0,1), $exp, 'inplace->linvals returns right';
+is_pdl $base->slice('0'), $exp, 'inplace->linvals updates input';
+($base, $exp) = (zeroes(3,3), pdl('1;3;9'));
+is_pdl $base->slice('0')->inplace->ylogvals(1,9), $exp, 'inplace->logvals returns right';
+is_pdl $base->slice('0'), $exp, 'inplace->logvals updates input';
+}
+
+{ # (x|y|z)(lin|log)vals taking size parameters
+is_pdl xlinvals(1,1.5,3), pdl(1,1.25,1.5);
+is_pdl xlinvals(float,1,1.5,3), float(1,1.25,1.5);
+is_pdl pdl(3)->xlinvals(float,1,1.5,3), float(1,1.25,1.5);
+is_pdl axislinvals(0,1,1.5,3), pdl(1,1.25,1.5);
+is_pdl axislinvals(float,0,1,1.5,3), float(1,1.25,1.5);
+is_pdl pdl(3)->axislinvals(float,0,1,1.5,3), float(1,1.25,1.5);
+is_pdl pdl(3)->axislinvals(0,float,1,1.5,3), float(1,1.25,1.5);
+is_pdl xlogvals(1,9,3), pdl(1,3,9);
+is_pdl xlogvals(float,1,9,3), float(1,3,9);
+is_pdl pdl(3)->xlogvals(float,1,9,3), float(1,3,9);
+is_pdl axislogvals(0,1,9,3), pdl(1,3,9);
+is_pdl axislogvals(float,0,1,9,3), float(1,3,9);
+is_pdl pdl(3)->axislogvals(float,0,1,9,3), float(1,3,9);
+is_pdl pdl(3)->axislogvals(0,float,1,9,3), float(1,3,9);
+}
+
+is_pdl ins(xvals(3,3), yvals(2,2), 1, 1), pdl('0 1 2; 0 0 0; 0 1 1');
+is_pdl ins(xvals(4,4), yvals(2,2), 1, 1), pdl('0 1 2 3; 0 0 0 3; 0 1 1 3; 0 1 2 3');
+is_pdl sec(xvals(4,4), 1,2, 1,2), pdl('1 2; 1 2');
+
+{
+is_pdl zeroes(float,2,5)->ylinvals(
+  pdl('-0.05 -0.046047701'), pdl('1.05 1.049781')
+), my $axis_exp = float('
+  -0.05 -0.046047701;
+  0.225 0.22790948;
+  0.5   0.50186666;
+  0.775 0.77582383;
+  1.05  1.049781
+');
+is_pdl ylinvals(float,pdl('-0.05 -0.046047701'), pdl('1.05 1.049781'),2,5), $axis_exp;
+is_pdl zeroes(3,3)->allaxislinvals(1,1.5), my $exp = pdl('
+  [1 1;    1.25 1;    1.5 1]
+  [1 1.25; 1.25 1.25; 1.5 1.25]
+  [1 1.5;  1.25 1.5;  1.5 1.5]
+');
+is_pdl allaxislinvals(1,1.5,3,3), $exp;
+is_pdl allaxislinvals(double,pdl(1),pdl(1.5),3,3), $exp;
+is_pdl zeroes(float,3,3)->allaxislinvals(1,1.5), $exp;
+is_pdl zeroes(float,3,3)->allaxislinvals(pdl(1),pdl(1.5)), $exp;
+is_pdl zeroes(float,3,3)->allaxislinvals(float,1,1.5), $exp->float;
+is_pdl allaxislinvals(float,zeroes(float,3,3),1,1.5), $exp->float;
+is_pdl allaxislinvals(float,1,1.5,3,3), $exp->float;
+is_pdl zeroes(3,3)->allaxislogvals(1,9), $exp = pdl('
+  [1 1; 3 1; 9 1]
+  [1 3; 3 3; 9 3]
+  [1 9; 3 9; 9 9]
+');
+is_pdl allaxislogvals(1,9,3,3), $exp;
+is_pdl allaxislogvals(float,1,9,3,3), $exp->float;
 }
 
 {
@@ -90,6 +149,28 @@ is_pdl $h, pdl(qw{ 0 0 0 0 0 0 0.21012603 -1.4716175 0.14107419 -2.2025149
 }
 
 is_pdl xvals(zeroes 3,2), pdl '0 1 2; 0 1 2';
+is_pdl xvals(zeroes float, 3,2), float '0 1 2; 0 1 2';
+is_pdl xvals(3,2), pdl '0 1 2; 0 1 2';
+is_pdl xvals(float,3,2), float '0 1 2; 0 1 2';
+is_pdl axisvals(zeroes(3,2), 0), pdl '0 1 2; 0 1 2';
+is_pdl axisvals(zeroes(3,2), 1), pdl '0 0 0; 1 1 1';
+is_pdl axisvals(zeroes(3,2), 2), pdl '0 0 0; 0 0 0';
+is_pdl axisvals(0,3,2), pdl('0 1 2; 0 1 2');
+is_pdl axisvals(1,3,2), pdl('0 0 0; 1 1 1');
+is_pdl axisvals(2,3,2), pdl('0 0 0; 0 0 0');
+is_pdl axisvals(float,0,3,2), float('0 1 2; 0 1 2');
+is_pdl axisvals(float,1,3,2), float('0 0 0; 1 1 1');
+is_pdl axisvals(float,2,3,2), float('0 0 0; 0 0 0');
+is_pdl axisvals(0,float,3,2), float('0 1 2; 0 1 2');
+is_pdl axisvals(1,float,3,2), float('0 0 0; 1 1 1');
+is_pdl axisvals(2,float,3,2), float('0 0 0; 0 0 0');
+{
+my $z = zeroes(3,2);
+is_pdl $z->axisvals(1), pdl('0 0 0; 1 1 1'), 'returns with non-inplace';
+is_pdl $z, pdl('0 0 0; 0 0 0'), 'non-inplace not mutated';
+is_pdl $z->inplace->axisvals(1), pdl('0 0 0; 1 1 1'), 'returns with inplace';
+is_pdl $z, pdl('0 0 0; 1 1 1'), 'inplace mutated';
+}
 is_pdl pdl(indx, [9,8,7])->sequence, pdl(indx,0..2), "sequence as instance-method should preserve type, dims, right values";
 
 done_testing;

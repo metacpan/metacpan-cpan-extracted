@@ -7,8 +7,8 @@ use strict;
 use v5.10;
 
 package Monit::HTTP;
-$Monit::HTTP::VERSION = '0.07';
-use HTTP::Tiny;
+$Monit::HTTP::VERSION = '0.08';
+use HTTP::Tiny ();
 use XML::Fast;
 use Carp qw( croak );
 
@@ -308,7 +308,7 @@ sub command_run {
     croak "Don't understand this action\n"
         unless grep { $command eq $_ } keys %{MONIT_ACTIONS()};
 
-    if(not defined $service) {
+    if (not defined $service) {
         $self->{is_success} = 0;
         croak "Service not specified\n";
     }
@@ -338,7 +338,7 @@ Monit::HTTP - An OOP interface to Monit.
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -499,12 +499,12 @@ Constructor method, which creates a new C<Monit::HTTP> object.
 This constructor can be called passing a list of various parameters:
 
     my $monit = Monit::HTTP->new(
-                    hostname => 'localhost',
-                    port     => 2812,
-                    use_auth => 0,
-                    username => 'admin',
-                    password => 'monit'
-        );
+            hostname => 'localhost',
+            port     => 2812,
+            use_auth => 0,
+            username => 'admin',
+            password => 'monit'
+    );
 
 B<FYI> The values above are the default values in case no argument
 is passed to the constructor.

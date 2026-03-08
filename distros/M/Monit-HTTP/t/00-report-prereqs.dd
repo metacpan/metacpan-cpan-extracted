@@ -2,8 +2,8 @@ do { my $x = {
        'build' => {
                     'requires' => {
                                     'Module::Build' => '0.28',
+                                    'Test2::V1' => '0',
                                     'Test::MockModule' => '0',
-                                    'Test::More' => '0',
                                     'Test::Trap' => '0'
                                   }
                   },

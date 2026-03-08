@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153525;
+our $VERSION = 1.20260306161714;
 
 my $formatters = [
                 {
@@ -88,25 +88,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"96322", "Al\-Rakkah",
-"96331", "Homs",
-"96312", "Al\-Nebek",
+$areanames{en} = {"96314", "Al\-Quneitra",
 "96341", "Lattakia",
-"96352", "Alhasakah",
-"96316", "Al\-Swedaa",
-"96351", "Deir\ Ezzour",
-"96311", "Damascus\ and\ rural\ areas",
-"96321", "Aleppo",
-"96314", "Al\-Quneitra",
-"96343", "Tartous",
-"96333", "Hamah",
-"96313", "Al\-Zabadani",
-"96323", "Edleb",
-"96334", "Palmyra",
-"96315", "Dara",
-"96325", "Menbej",
 "96353", "Al\-Kameshli",
-"96344", "Hamah",};
+"96352", "Alhasakah",
+"96311", "Damascus\ and\ rural\ areas",
+"96344", "Hamah",
+"96331", "Homs",
+"96334", "Palmyra",
+"96321", "Aleppo",
+"96313", "Al\-Zabadani",
+"96315", "Dara",
+"96343", "Tartous",
+"96312", "Al\-Nebek",
+"96351", "Deir\ Ezzour",
+"96316", "Al\-Swedaa",
+"96323", "Edleb",
+"96322", "Al\-Rakkah",
+"96325", "Menbej",
+"96333", "Hamah",};
 my $timezones = {
                '' => [
                        'Asia/Damascus'

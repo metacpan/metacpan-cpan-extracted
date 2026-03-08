@@ -12,8 +12,49 @@ use X11::korgwm::Common;
 use X11::korgwm::Panel;
 
 # Add panel element
-&X11::korgwm::Panel::add_element("clock", sub($el) {
-    AE::timer 0, 1, sub { $el->txt(strftime($cfg->{clock_format}, localtime) =~ s/  +/ /gr) };
+&X11::korgwm::Panel::add_element("clock", sub($el, %params) {
+    my $ebox = $params{ebox} or croak "Clock EventBox undefined";
+    my $panel = $params{panel} or croak "Clock Panel undefined";
+
+    # Handle separate calendar for each panel
+    my $calendar;
+    my $calendar_x_base = $panel->{x} + $panel->{width};
+    my $calendar_y_base = $panel->{y} + $panel->{height};
+
+    # Allocate a destructor
+    my $calendar_destroy = sub {
+        return unless $calendar;
+        pinned_remove(X11::korgwm::Window->mock($calendar->get_window()->get_xid()));
+        $calendar->destroy();
+        undef $calendar;
+    };
+
+    # Create new GtkCalendar window
+    $ebox->signal_connect('button-press-event', sub ($obj, $e) {
+        return $calendar_destroy->() if $calendar;
+
+        # Create and show the calendar
+        $calendar = Gtk3::Window->new('popup');
+        my $widget = Gtk3::Calendar->new();
+        $widget->signal_connect("month-changed" => sub {
+            my ($d, $m, $y) = (localtime)[3, 4, 5];
+            $y += 1900;
+            if ($widget->get_property('month') == $m and $widget->get_property('year') == $y) {
+                $widget->select_day($d)
+            } else {
+                $widget->select_day(0);
+            }
+        });
+        $calendar->add($widget);
+        $calendar->show_all;
+        pinned_add(X11::korgwm::Window->mock($calendar->get_window()->get_xid()));
+
+        # Move it to the right side of the relevant screen
+        $calendar->move($calendar_x_base - ($calendar->get_size())[0], $calendar_y_base);
+    });
+
+    # Return watcher
+    AE::timer 0, 1, sub { $el->set_text(strftime($cfg->{clock_format}, localtime) =~ s/  +/ /gr) };
 });
 
 1;

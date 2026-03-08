@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a06feca6a4dbd4932d4da7052bad4f2aa104b607091f1dbf6384bf111702f369 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 d7cb09ac5dd14a74b32a7274bb8c1f976dd8075bc61f540063e0ecf484f73c58 Changes
+SHA256 3a0ef4a2e4db7536c4de68626ae6ccdcf5d5a869f535fb17f83ddccbdfa85cfe INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 f292bc66352b70ef34052cfabcd965629d9909bd301691df442fda5c942b5cc3 MANIFEST
+SHA256 fc7b217b707f6247b5c6b8e679a0e20b69c55e9a61b125fc7b722713b4d82140 META.json
+SHA256 3998c8c7a0176362ce46942fc8dff39bb7cced11068650b93fe334fe6da24301 META.yml
+SHA256 04978e244c1f7a060e69c06bea2eb2e501d8669b9230b96dafb28cf8c1c6f1f2 Makefile.PL
+SHA256 198483503aee0f49d7d2f9027e62285fa5659302b8e844ea73ce8e7b8427aed9 README
+SHA256 b5121444aa1e58a45e33f45a2ffae572e90b8ebdf2dd489cbe00da9cbf390543 dist.ini
+SHA256 396d4af37580021473b58dc0e27ab00885e84fadaa0d7ec46309592026b89c18 doap.ttl
+SHA256 3dc9f10fe9b2d287cc56769d75773367fe84632ce3f6a8ce3372d7aab85dde7a lib/Data/ZPath.pm
+SHA256 54f75307a493cf1af7f08f18a2cc34e110b45895df98b17145a2ccb482d9c252 lib/Data/ZPath/Node.pm
+SHA256 ee8215c376a194d0d7f6187435892601586e4014b8123142222dfcc3cb0a6900 lib/Data/ZPath/NodeList.pm
+SHA256 d5d2254ac5f9801c54ff1a7b8ee761974593c9b17d6658384f10980f58d7bcd1 lib/Data/ZPath/_Ctx.pm
+SHA256 219091d7300befb7f548f7144a0702e78d2dde708c1b8c1e20a310e79a0df45b lib/Data/ZPath/_Evaluate.pm
+SHA256 0fb2cbb08e5398329e7dd8c7b2b3ca0a0fa3a363368e0d6afc8b5b58ffcdf647 lib/Data/ZPath/_Lexer.pm
+SHA256 f127e61e784ea60397e77104f6c56e2eed2e8eddddca2dce4cc8acbe55abe46a lib/Data/ZPath/_Node.pm
+SHA256 a0a79d4ddebcf1b07dda67b445bec2a62982c042518d0896fec0766fcc19d93a lib/Data/ZPath/_Parser.pm
+SHA256 8e15783c5057472bf1cc76e964d9f6aa8b720d881c5290bfc24ac123c2e872e0 lib/Data/ZPath/_ScalarProxy.pm
+SHA256 dd5d26778ecc2f4514d7bb4e7a76e3afc4d728544d4259df457bfb664014b425 lib/Text/ZTemplate.pm
+SHA256 ae00d9332819976b13b7f6f1a5dc69d87dd0212890dae23f5467b032953c0244 t/00start.t
+SHA256 282009f1d76c05e89084b21896d766b30e70ea2b95e7a513e0309ec071b5bac2 t/01basic.t
+SHA256 13e861658c62a0b1a1a4c3ee4f773edb5668399e22551b556828511ca7a9a10c t/integration/faceless_tests_port.t
+SHA256 61beda935256b6fe02a27d8724162f7c57510f86d23b9af228cef0804d48c8cb t/integration/numeric_qualifiers.t
+SHA256 133c56dc92c0ea3287209a4ea61fcfc5d798bf1d1ce014c2fe2d6c53c7889a27 t/integration/simple_tests.t
+SHA256 682343621a7c931c1d93e9775a5b70d1e4449c2ca5533589f6920fbf05fbb30e t/integration/ztemplate/basic.t
+SHA256 d49bdf1623907b6b7d37ac58e5df7e2bd73818d0c8b17d9a348ce3c5b2a57ead t/integration/ztemplate/cycle-a.tmpl
+SHA256 3f6ac7f44e4c7eb5cc2d9117a4ec65b617af26a205cd6a20984e5e1114469599 t/integration/ztemplate/cycle-b.tmpl
+SHA256 c86928287ea7914f42ba9ebb0c92c4db24e34886835b201131c4767c5882edd7 t/integration/ztemplate/include-main.tmpl
+SHA256 0761725b3ec58380f1e606331bb2da3c303d34ad32d6d1fcaa09f48c6927a2a9 t/integration/ztemplate/parts/child.tmpl
+SHA256 badfe8975b6cf4fb1efb230529b5d37c7c87ad8616a42b95fe07e89137ddbbc2 t/integration/ztemplate/parts/grandchild.tmpl
+SHA256 cc38685dd4d2671a879a36b616c3fcd7dbbad59e85e1b5f34968f61d39b87253 t/integration/ztemplate/sample.tmpl
+SHA256 3db80eb1b7c5f14ce9803890cc4e5808ad1e534c6878ba8708a51202e3784c88 t/share/tests.txt
+SHA256 2fc1f1db642f3b70ca3ab1c46a4f25e659bf419273999c55cae47567092efbde t/unit/Data/ZPath.t
+SHA256 fe6e8b7d37152eb1e83488cae3ed5fa8ed9a8741afa2c79b9757d73fb733aaf0 t/unit/Data/ZPath/Node.t
+SHA256 295623e616dd5d4701aaed26639813e4c40f5820c7e83ab896cc4847ff72b67e t/unit/Data/ZPath/NodeList.t
+SHA256 49757ac83f3519ee37f842904195c8d2c9c2b1469c5628313f09727ff6a436e6 t/unit/Data/ZPath/_Ctx.t
+SHA256 dfccb14c5799eeb0c8675e8511142eac0d41b569916a44e218be6ed48751f861 t/unit/Data/ZPath/_Lexer.t
+SHA256 49ef9a80650e19e92305be1bb76f7af38eb72c4163e428db70e825b34bd8921a t/unit/Data/ZPath/_ScalarProxy.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaaoY3QAKCRDOv4Eoaip9
+Oe6PAJ99QLn3WWCzjqzn07Ky3Qk9gcl/zQCeJ8SEGnDs9yeY+FWVAaZlnfHsrjA=
+=kFmP
+-----END PGP SIGNATURE-----

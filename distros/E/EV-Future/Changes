@@ -1,0 +1,10 @@
+Revision history for EV-Future
+
+0.02    Wed Mar  4 2026
+        - Fix build installing dev scripts, dead XS guard in series error path
+        - Complete POD and distribution hygiene
+        - Expand test coverage (async unsafe, out-of-order parallel_limit)
+
+0.01    Sun Mar  1 2026
+        - Initial release with parallel, parallel_limit, series in XS
+        - Safe and unsafe modes, series cancellation

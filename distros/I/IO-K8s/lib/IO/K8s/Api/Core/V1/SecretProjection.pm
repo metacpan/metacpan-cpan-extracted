@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SecretProjection;
 # ABSTRACT: Adapts a secret into a projected volume. The contents of the target Secret's Data field will be presented in a projected volume as files using the keys in the Data field as the file names. Note that this is identical to a secret volume source without the default mode.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s items => ['Core::V1::KeyToPath'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::SecretProjection - Adapts a secret into a projected volu
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 items
 

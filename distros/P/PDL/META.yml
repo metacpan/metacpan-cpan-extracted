@@ -7,7 +7,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   ExtUtils::ParseXS: '3.21'
   File::Path: '0'
-  Pod::Select: '0'
+  Pod::Simple: '3.40'
   Test::Deep: '0'
   Test::Exception: '0'
   Test::Warn: '0'
@@ -40,7 +40,7 @@ requires:
   Filter::Util::Call: '0'
   List::Util: '1.33'
   Math::Complex: '0'
-  Pod::Select: '0'
+  Pod::Simple: '3.40'
   Scalar::Util: '0'
   Storable: '1.03'
   Text::Balanced: '2.05'
@@ -50,5 +50,5 @@ resources:
   bugtracker: https://github.com/PDLPorters/pdl/issues
   homepage: http://pdl.perl.org/
   repository: git://github.com/PDLPorters/pdl.git
-version: '2.100'
+version: '2.103'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

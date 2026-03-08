@@ -8,15 +8,11 @@
 #if PERL_API_REVISION != 5
 #error This module is only for Perl 5
 #else
-#if PERL_API_VERSION == 36
-#else
 #if PERL_API_VERSION == 38
-#define RC_CHARCLASS_RENAME
-#define RC_REGNODE_REFACTOR
 #else
 #if PERL_API_VERSION == 40
-#define RC_CHARCLASS_RENAME
-#define RC_REGNODE_REFACTOR
+#else
+#if PERL_API_VERSION == 42
 #else
 #error Unsupported PERL_API_VERSION
 #endif
@@ -30,15 +26,9 @@
 
 #define LETTER_COUNT ('z' - 'a' + 1)
 
-#ifndef RC_REGNODE_REFACTOR
-#define RC_BRANCH_REGNODE_SIZE 1
-#define RC_CURLY_REGNODE_SIZE 2
-#define INFINITE_COUNT 0xffff
-#else
 #define RC_BRANCH_REGNODE_SIZE 2
 #define RC_CURLY_REGNODE_SIZE 4
 #define INFINITE_COUNT 0x7fffffff
-#endif
 
 #define ALNUM_BLOCK 0x0001
 #define SPACE_BLOCK 0x0002
@@ -80,37 +70,13 @@ typedef struct
     int spent;
 } Arrow;
 
-#ifndef RC_REGNODE_REFACTOR
-#define RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES ANYOF_SHARED_d_UPPER_LATIN1_UTF8_STRING_MATCHES_non_d_RUNTIME_USER_PROP
-#define RC_ANYOF_NON_UTF8_MATCHES_ALL_NON_ASCII ANYOF_SHARED_d_MATCHES_ALL_NON_UTF8_NON_ASCII_non_d_WARN_SUPER
-#else
-#define RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES ANYOF_HAS_EXTRA_RUNTIME_MATCHES
-#define RC_ANYOF_NON_UTF8_MATCHES_ALL_NON_ASCII ANYOFD_NON_UTF8_MATCHES_ALL_NON_ASCII__shared
-
 #define	ARG_LOC(p)	(((struct regnode_1 *)p)->arg1.u32)
-#endif
-
-#ifndef RC_CHARCLASS_RENAME
-#define HANDY_CC_VERTSPACE _CC_VERTSPACE
-#define HANDY_CC_WORDCHAR _CC_WORDCHAR
-
-#define rc_generic_isCC_A(c, classnum) _generic_isCC_A(c, classnum)
-#else
-#define HANDY_CC_VERTSPACE CC_VERTSPACE_
-#define HANDY_CC_WORDCHAR CC_WORDCHAR_
-
-#define rc_generic_isCC_A(c, classnum) generic_isCC_A_(c, classnum)
-#endif
 
 #define GET_LITERAL(a) (((char *)((a)->rn + 1)) + (a)->spent)
 
 #define GET_OFFSET(rn) (NEXT_OFF(rn) ? NEXT_OFF(rn) : get_synth_offset(rn))
 
-#ifndef RC_REGNODE_REFACTOR
-typedef U16 CurlyCount;
-#else
 typedef U32 CurlyCount;
-#endif
 
 /* Most functions below have this signature. The first parameter is a
    flag set after the comparison actually matched something, second
@@ -194,11 +160,11 @@ static unsigned char alphanumeric_classes[REGNODE_MAX];
 /* true flags for NALNUM and its subsets, 0 otherwise */
 static unsigned char non_alphanumeric_classes[REGNODE_MAX];
 
-static unsigned char word_posix_regclasses[HANDY_CC_VERTSPACE + 1];
+static unsigned char word_posix_regclasses[CC_VERTSPACE_ + 1];
 
-static unsigned char non_word_posix_regclasses[HANDY_CC_VERTSPACE + 1];
+static unsigned char non_word_posix_regclasses[CC_VERTSPACE_ + 1];
 
-static unsigned char newline_posix_regclasses[HANDY_CC_VERTSPACE + 1];
+static unsigned char newline_posix_regclasses[CC_VERTSPACE_ + 1];
 
 /* Simplified hierarchy of character classes; ignoring the difference
    between classes (i.e. IsAlnum & IsWord), which we probably
@@ -236,7 +202,7 @@ static U32 regclass_subset[] = { ALNUM_BLOCK,
                                  HORIZONTAL_SPACE_BLOCK,
                                  VERTICAL_SPACE_BLOCK, VERTICAL_SPACE_BLOCK };
 
-static U32 posix_regclass_blocks[HANDY_CC_VERTSPACE + 1] = {
+static U32 posix_regclass_blocks[CC_VERTSPACE_ + 1] = {
     ALNUM_BLOCK /* _CC_WORDCHAR == 0 */,
     NUMBER_BLOCK /* _CC_DIGIT == 1 */,
     ALPHA_BLOCK /* _CC_ALPHA == 2 */,
@@ -255,7 +221,7 @@ static U32 posix_regclass_blocks[HANDY_CC_VERTSPACE + 1] = {
     VERTICAL_SPACE_BLOCK /* _CC_VERTSPACE == 15 */,
 };
 
-static unsigned char *posix_regclass_bitmaps[HANDY_CC_VERTSPACE + 1] = {
+static unsigned char *posix_regclass_bitmaps[CC_VERTSPACE_ + 1] = {
     word_bc.bitmap,
     digit.bitmap,
     alpha_bc.bitmap,
@@ -274,7 +240,7 @@ static unsigned char *posix_regclass_bitmaps[HANDY_CC_VERTSPACE + 1] = {
     vertical_whitespace.bitmap
 };
 
-static unsigned char *posix_regclass_nbitmaps[HANDY_CC_VERTSPACE + 1] = {
+static unsigned char *posix_regclass_nbitmaps[CC_VERTSPACE_ + 1] = {
     word_bc.nbitmap,
     digit.nbitmap,
     0,
@@ -858,7 +824,7 @@ static int convert_map(Arrow *a, U32 *map)
     assert((OP(a->rn) == ANYOF) || (OP(a->rn) == ANYOFD));
     assert(map);
 
-    if (ANYOF_FLAGS(a->rn) & (RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES | ANYOF_INVERT))
+    if (ANYOF_FLAGS(a->rn) & (ANYOF_HAS_EXTRA_RUNTIME_MATCHES | ANYOF_INVERT))
     {
         return convert_regclass_map(a, map);
     }
@@ -1037,11 +1003,7 @@ static int get_synth_offset(regnode *p)
         /* other flags obviously exist, but they haven't been seen yet
            and it isn't clear what they mean */
         unsigned int unknown = FLAGS(p) &
-            ~(ANYOF_INVERT
-#ifndef RC_REGNODE_REFACTOR
-              | ANYOF_MATCHES_ALL_ABOVE_BITMAP
-#endif
-              | RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES);
+            ~(ANYOF_INVERT | ANYOF_HAS_EXTRA_RUNTIME_MATCHES);
         if (unknown)
         {
             /* p[10] seems always 0 on Linux, but 0xfbfaf9f8 seen on
@@ -1808,7 +1770,7 @@ static unsigned char get_bitmap_byte(regnode *p, int i)
 
     bitmap = (unsigned char *)(p + 2);
     if ((i >= 16) && (OP(p) == ANYOFD) &&
-        (FLAGS(p) & RC_ANYOF_NON_UTF8_MATCHES_ALL_NON_ASCII))
+        (FLAGS(p) & ANYOFD_NON_UTF8_MATCHES_ALL_NON_ASCII__shared))
     {
         loc = 0xff;
     }
@@ -1883,13 +1845,6 @@ static int compare_anyof_multiline(int anchored, Arrow *a1, Arrow *a2)
 
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert((OP(a2->rn) == MBOL) || (OP(a2->rn) == MEOL));
-
-#ifndef RC_REGNODE_REFACTOR
-    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-    {
-        return compare_mismatch(anchored, a1, a2);
-    }
-#endif
 
     init_bit_flag(&bf, '\n');
     for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
@@ -2054,13 +2009,8 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
     assert((OP(a2->rn) == ANYOF) || (OP(a2->rn) == ANYOFD));
 
     extra_left = ANYOF_FLAGS(a1->rn) &
-        RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES;
-#ifndef RC_REGNODE_REFACTOR
-    if ((extra_left || (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)) &&
-        !(a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP))
-#else
+        ANYOF_HAS_EXTRA_RUNTIME_MATCHES;
     if (extra_left)
-#endif
     {
         U32 m1, m2;
         int cr1, cr2;
@@ -2070,8 +2020,8 @@ static int compare_anyof_anyof(int anchored, Arrow *a1, Arrow *a2)
            aren't the same - this duplicates the code to get to the
            invlist, but works even for non-standard ones,
            e.g. [\da] */
-        if ((FLAGS(a1->rn) & RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES) &&
-            (FLAGS(a2->rn) & RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES))
+        if ((FLAGS(a1->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES) &&
+            (FLAGS(a2->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES))
         {
             SV *invlist1 = get_invlist_sv(a1);
             SV *invlist2 = get_invlist_sv(a2);
@@ -2131,7 +2081,7 @@ static int compare_anyof_anyofr(int anchored, Arrow *a1, Arrow *a2)
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert(OP(a2->rn) == ANYOFR);
 
-    if (ANYOF_FLAGS(a1->rn) & RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES)
+    if (ANYOF_FLAGS(a1->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES)
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -2233,7 +2183,7 @@ static int compare_anyof_anyofm(int anchored, Arrow *a1, Arrow *a2)
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert(OP(a2->rn) == ANYOFM);
 
-    if (ANYOF_FLAGS(a1->rn) & RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES)
+    if (ANYOF_FLAGS(a1->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES)
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -2296,8 +2246,8 @@ static int compare_anyof_nanyofm(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "left flags = 0x%x\n", FLAGS(a1->rn)); */
 
-    if ((FLAGS(a1->rn) & RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES) ||
-        ((FLAGS(a1->rn) & RC_ANYOF_NON_UTF8_MATCHES_ALL_NON_ASCII) &&
+    if ((FLAGS(a1->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES) ||
+        ((FLAGS(a1->rn) & ANYOFD_NON_UTF8_MATCHES_ALL_NON_ASCII__shared) &&
          !(FLAGS(a1->rn) & ANYOF_INVERT)))
     {
         return compare_mismatch(anchored, a1, a2);
@@ -2506,7 +2456,7 @@ static int compare_exact_posix(int anchored, Arrow *a1, Arrow *a2)
 
     seq = GET_LITERAL(a1);
 
-    if (!rc_generic_isCC_A(*seq, FLAGS(a2->rn)))
+    if (!generic_isCC_A_(*seq, FLAGS(a2->rn)))
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -2528,7 +2478,7 @@ static int compare_exactf_posix(int anchored, Arrow *a1, Arrow *a2)
 
     for (i = 0; i < 2; ++i)
     {
-        if (!rc_generic_isCC_A(unf[i], FLAGS(a2->rn)))
+        if (!generic_isCC_A_(unf[i], FLAGS(a2->rn)))
         {
             return compare_mismatch(anchored, a1, a2);
         }
@@ -2547,7 +2497,7 @@ static int compare_exact_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     seq = GET_LITERAL(a1);
 
-    if (rc_generic_isCC_A(*seq, FLAGS(a2->rn)))
+    if (generic_isCC_A_(*seq, FLAGS(a2->rn)))
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -2570,7 +2520,7 @@ static int compare_exactf_negative_posix(int anchored, Arrow *a1, Arrow *a2)
 
     for (i = 0; i < 2; ++i)
     {
-        if (rc_generic_isCC_A(unf[i], FLAGS(a2->rn)))
+        if (generic_isCC_A_(unf[i], FLAGS(a2->rn)))
         {
             return compare_mismatch(anchored, a1, a2);
         }
@@ -2605,12 +2555,7 @@ static int compare_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "right flags = %d\n", FLAGS(a2->rn)); */
 
-    if (!(FLAGS(a2->rn) & (
-              RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES
-#ifndef RC_REGNODE_REFACTOR
-              | ANYOF_MATCHES_ALL_ABOVE_BITMAP
-#endif
-              )))
+    if (!(FLAGS(a2->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES))
     {
         U32 right_map;
 
@@ -2664,12 +2609,7 @@ static int compare_negative_posix_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "left %d -> 0x%x\n", FLAGS(a1->rn), (unsigned)left_block); */
 
-    if (!(FLAGS(a2->rn) & (
-              RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES
-#ifndef RC_REGNODE_REFACTOR
-              | ANYOF_MATCHES_ALL_ABOVE_BITMAP
-#endif
-              )))
+    if (!(FLAGS(a2->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES))
     {
         U32 right_map;
 
@@ -3024,7 +2964,7 @@ static int compare_exact_lnbreak(int anchored, Arrow *a1, Arrow *a2)
     }
 
     /* otherwise, check vertical space */
-    if (!rc_generic_isCC_A(*cur, HANDY_CC_VERTSPACE))
+    if (!generic_isCC_A_(*cur, CC_VERTSPACE_))
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -3069,13 +3009,6 @@ static int compare_sany_anyof(int anchored, Arrow *a1, Arrow *a2)
 
     /* fprintf(stderr, "left flags = 0x%x, right flags = 0x%x\n",
        a1->rn->flags, a2->rn->flags); */
-
-#ifndef RC_REGNODE_REFACTOR
-    if (a2->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-    {
-        return compare_right_full(anchored, a1, a2);
-    }
-#endif
 
     return compare_mismatch(anchored, a1, a2);
 }
@@ -3258,7 +3191,7 @@ static int compare_anyof_posixa(int anchored, Arrow *a1, Arrow *a2)
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert(OP(a2->rn) == POSIXA);
 
-    if (ANYOF_FLAGS(a1->rn) & RC_ANYOF_HAS_EXTRA_RUNTIME_MATCHES)
+    if (ANYOF_FLAGS(a1->rn) & ANYOF_HAS_EXTRA_RUNTIME_MATCHES)
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -3446,7 +3379,7 @@ static int compare_posix_lnbreak(int anchored, Arrow *a1, Arrow *a2)
         (OP(a1->rn) == POSIXA));
     assert(OP(a2->rn) == LNBREAK);
 
-    if (FLAGS(a1->rn) != HANDY_CC_VERTSPACE)
+    if (FLAGS(a1->rn) != CC_VERTSPACE_)
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -3463,13 +3396,6 @@ static int compare_anyof_exact(int anchored, Arrow *a1, Arrow *a2)
 
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert(OP(a2->rn) == EXACT);
-
-#ifndef RC_REGNODE_REFACTOR
-    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-    {
-        return compare_mismatch(anchored, a1, a2);
-    }
-#endif
 
     seq = GET_LITERAL(a2);
     init_bit_flag(&bf, *((unsigned char *)seq));
@@ -3558,13 +3484,6 @@ static int compare_anyof_exactf(int anchored, Arrow *a1, Arrow *a2)
 
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert((OP(a2->rn) == EXACTF) || (OP(a2->rn) == EXACTFU));
-
-#ifndef RC_REGNODE_REFACTOR
-    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-    {
-        return compare_mismatch(anchored, a1, a2);
-    }
-#endif
 
     seq = GET_LITERAL(a2);
     init_unfolded(unf, *seq);
@@ -4841,13 +4760,6 @@ static int compare_bound(int anchored, Arrow *a1, Arrow *a2,
     {
         /* fprintf(stderr, "next is bitmap; flags = 0x%x\n", left.rn->flags); */
 
-#ifndef RC_REGNODE_REFACTOR
-        if (left.rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-        {
-            return compare_mismatch(anchored, a1, a2);
-        }
-#endif
-
         for (i = 0; i < ANYOF_BITMAP_SIZE; ++i)
         {
             if (get_bitmap_byte(left.rn, i) & ~bitmap[i])
@@ -4981,13 +4893,6 @@ static int compare_anyof_bound(int anchored, Arrow *a1, Arrow *a2)
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert(OP(a2->rn) == BOUND);
 
-#ifndef RC_REGNODE_REFACTOR
-    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-    {
-        return compare_mismatch(anchored, a1, a2);
-    }
-#endif
-
     return compare_anyof_bounds(anchored, a1, a2, 0, word_bc.nbitmap);
 }
 
@@ -4995,13 +4900,6 @@ static int compare_anyof_nbound(int anchored, Arrow *a1, Arrow *a2)
 {
     assert((OP(a1->rn) == ANYOF) || (OP(a1->rn) == ANYOFD));
     assert(OP(a2->rn) == NBOUND);
-
-#ifndef RC_REGNODE_REFACTOR
-    if (a1->rn->flags & ANYOF_MATCHES_ALL_ABOVE_BITMAP)
-    {
-        return compare_mismatch(anchored, a1, a2);
-    }
-#endif
 
     return compare_anyof_bounds(anchored, a1, a2, 0, word_bc.bitmap);
 }
@@ -5148,7 +5046,7 @@ static int compare_negative_posix_word_bound(int anchored, Arrow *a1, Arrow *a2)
 
     /* we could accept _CC_ALPHANUMERIC as well but let's postpone it
        until we see the need */
-    if (FLAGS(a1->rn) != HANDY_CC_WORDCHAR)
+    if (FLAGS(a1->rn) != CC_WORDCHAR_)
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -5164,7 +5062,7 @@ static int compare_negative_posix_word_nbound(int anchored, Arrow *a1, Arrow *a2
 
     /* we could accept _CC_ALPHANUMERIC as well but let's postpone it
        until we see the need */
-    if (FLAGS(a1->rn) != HANDY_CC_WORDCHAR)
+    if (FLAGS(a1->rn) != CC_WORDCHAR_)
     {
         return compare_mismatch(anchored, a1, a2);
     }
@@ -5371,17 +5269,6 @@ void rc_init()
 
     memset(word_posix_regclasses, 0,
         SIZEOF_ARRAY(word_posix_regclasses));
-#ifndef RC_CHARCLASS_RENAME
-    word_posix_regclasses[_CC_WORDCHAR] =
-        word_posix_regclasses[_CC_DIGIT] =
-        word_posix_regclasses[_CC_ALPHA] =
-        word_posix_regclasses[_CC_LOWER] =
-        word_posix_regclasses[_CC_UPPER] =
-        word_posix_regclasses[_CC_UPPER] =
-        word_posix_regclasses[_CC_ALPHANUMERIC] =
-        word_posix_regclasses[_CC_CASED] =
-        word_posix_regclasses[_CC_XDIGIT] = 1;
-#else
     word_posix_regclasses[CC_WORDCHAR_] =
         word_posix_regclasses[CC_DIGIT_] =
         word_posix_regclasses[CC_ALPHA_] =
@@ -5391,35 +5278,20 @@ void rc_init()
         word_posix_regclasses[CC_ALPHANUMERIC_] =
         word_posix_regclasses[CC_CASED_] =
         word_posix_regclasses[CC_XDIGIT_] = 1;
-#endif
 
     memset(non_word_posix_regclasses, 0,
         SIZEOF_ARRAY(non_word_posix_regclasses));
-#ifndef RC_CHARCLASS_RENAME
-    non_word_posix_regclasses[_CC_PUNCT] =
-        non_word_posix_regclasses[_CC_SPACE] =
-        non_word_posix_regclasses[_CC_BLANK] =
-        non_word_posix_regclasses[_CC_VERTSPACE] = 1;
-#else
     non_word_posix_regclasses[CC_PUNCT_] =
         non_word_posix_regclasses[CC_SPACE_] =
         non_word_posix_regclasses[CC_BLANK_] =
         non_word_posix_regclasses[CC_VERTSPACE_] = 1;
-#endif
 
     memset(newline_posix_regclasses, 0,
         SIZEOF_ARRAY(newline_posix_regclasses));
-#ifndef RC_CHARCLASS_RENAME
-    newline_posix_regclasses[_CC_SPACE] =
-        newline_posix_regclasses[_CC_CNTRL] =
-        newline_posix_regclasses[_CC_ASCII] =
-        newline_posix_regclasses[_CC_VERTSPACE] = 1;
-#else
     newline_posix_regclasses[CC_SPACE_] =
         newline_posix_regclasses[CC_CNTRL_] =
         newline_posix_regclasses[CC_ASCII_] =
         newline_posix_regclasses[CC_VERTSPACE_] = 1;
-#endif
 
     memset(trivial_nodes, 0, SIZEOF_ARRAY(trivial_nodes));
     trivial_nodes[SUCCEED] = trivial_nodes[NOTHING] =

@@ -21,8 +21,6 @@ no_index:
     - t
     - inc
 requires:
-  DateTime: '0'
-  DateTime::Duration: '0'
   Encode: '0'
   JSON: '0'
   List::Util: '0'
@@ -36,5 +34,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/JSON-Schema-Validate/issues
   repository: https://gitlab.com/jackdeguest/JSON-Schema-Validate
-version: v0.7.0
+version: v0.9.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

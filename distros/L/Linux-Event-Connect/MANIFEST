@@ -1,0 +1,20 @@
+Changes
+examples/01_connect_raw.pl
+examples/02_connect_stream.pl
+lib/Linux/Event/Connect.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/01-validate.t
+t/02-connect-refused.t
+t/03-cancel.t
+t/04-success-local.t
+t/05-no-timeout-after-success.t
+t/06-bracket-host.t
+t/07-unix-success.t
+t/08-sockaddr-success.t
+t/09-stress-many-refused.t
+t/10-gai-failure.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

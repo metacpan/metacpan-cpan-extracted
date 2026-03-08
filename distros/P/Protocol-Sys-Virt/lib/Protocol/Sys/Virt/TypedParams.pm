@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.0.0
+#                   and LibVirt version v12.1.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -14,7 +14,7 @@ use v5.14.1;
 use warnings;
 use Syntax::Operator::Elem qw( elem_str );
 
-package Protocol::Sys::Virt::TypedParams v12.0.8;
+package Protocol::Sys::Virt::TypedParams v12.1.0;
 
 
 use Carp qw(croak);
@@ -212,7 +212,7 @@ Protocol::Sys::Virt::TypedParams - Helper routines for typed parameter values
 
 =head1 VERSION
 
-v12.0.8
+v12.1.0
 
 =head1 SYNOPSYS
 

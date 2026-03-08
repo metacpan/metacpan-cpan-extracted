@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::NetworkPolicySpec;
 # ABSTRACT: NetworkPolicySpec provides the specification of a NetworkPolicy
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s egress => ['Networking::V1::NetworkPolicyEgressRule'];
@@ -29,7 +29,7 @@ IO::K8s::Api::Networking::V1::NetworkPolicySpec - NetworkPolicySpec provides the
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 egress
 

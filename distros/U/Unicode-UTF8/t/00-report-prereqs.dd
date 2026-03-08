@@ -1,0 +1,40 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Devel::AssertC99' => '0',
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Devel::PPPort' => '3.23',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Exporter' => '0',
+                                      'XSLoader' => '0',
+                                      'perl' => '5.008001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Encode' => '1.9801',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::Fatal' => '0.006',
+                                   'Test::More' => '0.47'
+                                 }
+                 }
+     };
+  $x;
+ }

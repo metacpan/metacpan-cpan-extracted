@@ -18,10 +18,6 @@ jobs:
         os: [ macos-latest, windows-latest ]
         perl: [ "5" ]
         include:
-          - { os: "ubuntu-latest", perl: "5.12" }
-          - { os: "ubuntu-latest", perl: "5.14" }
-          - { os: "ubuntu-latest", perl: "5.16" }
-          - { os: "ubuntu-latest", perl: "5.18" }
           - { os: "ubuntu-latest", perl: "5.20" }
           - { os: "ubuntu-latest", perl: "5.22" }
           - { os: "ubuntu-latest", perl: "5.24" }
@@ -33,7 +29,8 @@ jobs:
           - { os: "ubuntu-latest", perl: "5.36" }
           - { os: "ubuntu-latest", perl: "5.38" }
           - { os: "ubuntu-latest", perl: "5.40" }
-          - { os: "ubuntu-latest", perl: "5.40", perl-threaded: true }
+          - { os: "ubuntu-latest", perl: "5.42" }
+          - { os: "ubuntu-latest", perl: "5.42", perl-threaded: true }
 
     steps:
       - name: Checkout code

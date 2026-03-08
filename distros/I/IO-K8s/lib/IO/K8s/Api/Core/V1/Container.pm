@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Container;
 # ABSTRACT: A single application container that you want to run within a pod.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s args => [Str];
@@ -89,7 +89,7 @@ IO::K8s::Api::Core::V1::Container - A single application container that you want
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 args
 

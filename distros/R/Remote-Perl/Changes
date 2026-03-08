@@ -1,0 +1,11 @@
+Revision history for Remote::Perl
+
+0.002  2026-03-06
+  - Added --tmpfile for scripts that use __DATA__/__END__.
+  - Clear up pollution of pragmas and imports that would make scripts
+    behave differently when run through remperl.
+  - Always pass through exit code, even when the remote die()s.
+  - Support older Perls (down to 5.10) on the remote side.
+
+0.001  2026-03-05
+  - Initial release.

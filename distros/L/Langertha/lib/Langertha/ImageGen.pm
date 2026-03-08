@@ -1,6 +1,6 @@
 package Langertha::ImageGen;
 # ABSTRACT: Image generation abstraction wrapping an engine with optional overrides
-our $VERSION = '0.302';
+our $VERSION = '0.304';
 use Moose;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -112,7 +112,7 @@ Langertha::ImageGen - Image generation abstraction wrapping an engine with optio
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 

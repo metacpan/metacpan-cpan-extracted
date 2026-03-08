@@ -1,4 +1,4 @@
-# Copyright 2014-2025, Paul Johnson (paul@pjcj.net)
+# Copyright 2014-2026, Paul Johnson (paul@pjcj.net)
 
 # This software is free.  It is licensed under the same terms as Perl itself.
 
@@ -15,7 +15,7 @@ use base "Devel::Cover::DB::IO::Base";
 use Sereal::Decoder;
 use Sereal::Encoder;
 
-our $VERSION = '1.51'; # VERSION
+our $VERSION = '1.52'; # VERSION
 
 my ($Decoder, $Encoder);
 
@@ -63,7 +63,7 @@ Devel::Cover::DB::IO::Sereal - Sereal based IO routines for Devel::Cover::DB
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 SYNOPSIS
 
@@ -101,13 +101,9 @@ Returns a perl data structure representing the data read from $file.
 
 Writes $data to $file in the format specified when creating $io.
 
-=head1 BUGS
-
-Huh?
-
 =head1 LICENCE
 
-Copyright 2011-2025, Paul Johnson (paul@pjcj.net)
+Copyright 2011-2026, Paul Johnson (paul@pjcj.net)
 
 This software is free.  It is licensed under the same terms as Perl itself.
 

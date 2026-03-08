@@ -27,19 +27,19 @@ no_index:
 provides:
   SVG:
     file: lib/SVG.pm
-    version: '2.88'
+    version: '2.89'
   SVG::DOM:
     file: lib/SVG/DOM.pm
-    version: '2.88'
+    version: '2.89'
   SVG::Element:
     file: lib/SVG/Element.pm
-    version: '2.88'
+    version: '2.89'
   SVG::Extension:
     file: lib/SVG/Extension.pm
-    version: '2.88'
+    version: '2.89'
   SVG::XML:
     file: lib/SVG/XML.pm
-    version: '2.88'
+    version: '2.89'
 requires:
   Exporter: '0'
   Scalar::Util: '0'
@@ -50,7 +50,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/manwar/SVG.git
-version: '2.88'
+version: '2.89'
 x_contributors:
   - 'Peter Wainwright'
   - 'Ian Hickson'

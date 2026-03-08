@@ -78,6 +78,11 @@ has watch_events => (
     default => sub { {} },
 );
 
+has log_lines => (
+    is => 'ro',
+    default => sub { {} },
+);
+
 sub add_response {
     my ($self, $method, $path, $data) = @_;
     my $key = lc($method) . $path;
@@ -95,6 +100,19 @@ sub call {
     my $path = $req->uri // $req->url // '';
     # Strip host from url if present
     $path =~ s{^https?://[^/]+}{};
+
+    # Strip query parameters for path matching
+    my $clean_path = $path;
+    $clean_path =~ s{\?.*}{};
+
+    # Check for log lines (one-shot mode, log paths end with /log)
+    if (my $lines = $self->log_lines->{$clean_path}) {
+        return Test::Kubernetes::Mock::Response->new(
+            status => 200,
+            content => join("\n", @$lines) . "\n",
+        );
+    }
+
     my $key = lc($method) . $path;
     $key =~ s{/}{_}g;
     $key =~ s{_+}{_}g;  # collapse multiple underscores
@@ -124,6 +142,11 @@ sub add_watch_events {
     $self->watch_events->{$path} = $events;
 }
 
+sub add_log_lines {
+    my ($self, $path, $lines) = @_;
+    $self->log_lines->{$path} = $lines;
+}
+
 sub call_streaming {
     my ($self, $req, $callback) = @_;
 
@@ -132,12 +155,23 @@ sub call_streaming {
     # Strip query parameters for key lookup
     $path =~ s{\?.*}{};
 
+    # Check for log lines first (log paths end with /log)
+    if (my $lines = $self->log_lines->{$path}) {
+        for my $line (@$lines) {
+            $callback->($line . "\n", undef);
+        }
+        return Test::Kubernetes::Mock::Response->new(
+            status => 200,
+        );
+    }
+
+    # Check for watch events
     my $events = $self->watch_events->{$path};
 
     unless ($events) {
         return Test::Kubernetes::Mock::Response->new(
             status => 404,
-            content => '{"kind":"Status","status":"Failure","message":"no watch events for path"}',
+            content => '{"kind":"Status","status":"Failure","message":"no streaming data for path"}',
         );
     }
 

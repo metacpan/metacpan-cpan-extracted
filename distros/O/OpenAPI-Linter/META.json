@@ -1,5 +1,5 @@
 {
-   "abstract" : "Lint and validate OpenAPI specification files",
+   "abstract" : "Validate and lint OpenAPI 3.x specification files",
    "author" : [
       "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
    ],
@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "File::Slurp" : "0",
+            "IO::Socket::SSL" : "2.009",
             "JSON" : "0",
             "JSON::Validator" : "0",
             "YAML::XS" : "0"
@@ -42,21 +43,24 @@
    "provides" : {
       "OpenAPI::Linter" : {
          "file" : "lib/OpenAPI/Linter.pm",
-         "version" : "0.16"
+         "version" : "0.19"
       },
       "OpenAPI::Linter::Location" : {
          "file" : "lib/OpenAPI/Linter/Location.pm",
-         "version" : "0.16"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/OpenAPI-Linter/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/OpenAPI-Linter.git",
          "web" : "https://github.com/manwar/OpenAPI-Linter"
       }
    },
-   "version" : "0.16",
+   "version" : "0.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

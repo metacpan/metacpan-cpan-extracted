@@ -3,7 +3,7 @@ package SVG::Element;
 use strict;
 use warnings;
 
-our $VERSION = '2.88';
+our $VERSION = '2.89';
 
 =pod
 
@@ -110,9 +110,8 @@ sub xmlify {
     }
 
     #prep the tag
-    if ( $self->{-comment} ) {
-        $xml .= $self->xmlcomment( $self->{-comment} );
-        return $xml;
+    if ( $self->{-name} eq 'comment' && $self->{-comment} ) {
+       return $self->xmlcomment( $self->{-comment} );
     }
     elsif ( $self->{-name} eq 'document' ) {
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1beta1::ServiceCIDR;
 # ABSTRACT: ServiceCIDR defines a range of IP addresses using CIDR format (e.g. 192.168.0.0/24 or 2001:db2::/64). This range is used to allocate ClusterIPs to Service objects.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Networking::V1beta1::ServiceCIDR - ServiceCIDR defines a range of 
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

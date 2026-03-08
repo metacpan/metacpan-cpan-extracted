@@ -29,7 +29,7 @@ lib/SVG/Extension.pm
 lib/SVG/XML.pm
 LICENSE
 Makefile.PL
-MANIFEST            This list of files
+MANIFEST
 README
 t/00-load.t
 t/00-new.t
@@ -60,6 +60,7 @@ t/30-shapes.t
 t/31-credit.t
 t/32-nocredit-in-use.t
 t/33-use-empty-import.t
+t/34-comment-desc.t
 t/duplicate_credits.t
 xt/author/manifest.t
 xt/author/perl-critic-tidy.t

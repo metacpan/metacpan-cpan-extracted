@@ -5,8 +5,12 @@ t/01-load.t
 t/02-ancestors.t
 t/03-cousins.t
 t/04-attribute-names.t
+t/05-two-parents.t
+t/06-parents-field-name.t
 t/lib/TestPerson.pm
 t/lib/TestPerson2.pm
+t/lib/TestPerson3.pm
+t/lib/TestPersonWithParents.pm
 README.md
 Changes.md
 META.yml                                 Module YAML meta-data (added by MakeMaker)

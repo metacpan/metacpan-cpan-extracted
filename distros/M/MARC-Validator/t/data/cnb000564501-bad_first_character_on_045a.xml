@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01373nam a22003611  4500</leader>
+  <controlfield tag="001">nos190104979022</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20191105072932.0</controlfield>
+  <controlfield tag="008">000203s1925    xr     c p    ||| 0 cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000564501</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">CBA001</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+    <subfield code="a">e-xo---</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">--x1</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">94(437)</subfield>
+    <subfield code="x">Dějiny Česka a Slovenska</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">8</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">37.016</subfield>
+    <subfield code="x">Učební osnovy. Vyučovací předměty. Učebnice</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">22</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">94(437.3)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">94(437.6)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(075.2)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Caha, Arnošt,</subfield>
+    <subfield code="d">1891-1935</subfield>
+    <subfield code="7">jk01020519</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Malé dějiny česko-slovenské /</subfield>
+    <subfield code="c">žactvu škol obecných napsal Arnošt Caha</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">19. vyd. [i.e. 20. vyd.]</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Brno :</subfield>
+    <subfield code="b">Dědictví Havlíčkovo,</subfield>
+    <subfield code="c">1925</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">62 s. ;</subfield>
+    <subfield code="c">8°</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Školní příručky Dědictví Havlíčkova ;</subfield>
+    <subfield code="v">5</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">S 11 obrázky a mapkou</subfield>
+  </datafield>
+  <datafield tag="648" ind1=" " ind2="7">
+    <subfield code="a">do 1918</subfield>
+    <subfield code="7">ch460606</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Česko</subfield>
+    <subfield code="7">ge128065</subfield>
+    <subfield code="x">dějiny</subfield>
+    <subfield code="y">do 1918</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Slovensko</subfield>
+    <subfield code="7">ge128580</subfield>
+    <subfield code="x">dějiny</subfield>
+    <subfield code="y">do 1918</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">učebnice základních škol</subfield>
+    <subfield code="7">fd133773</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Školní příručky Dědictví Havlíčkova</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">http://krameriusndk.nkp.cz/search/handle/uuid:c65243c0-5289-11ec-aea4-5ef3fc9bb22f</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000564501</subfield>
+  </datafield>
+</record>
+
+</collection>

@@ -24,6 +24,7 @@ Zonemaster::LDNS::RR::GID		    T_PTROBJ
 Zonemaster::LDNS::RR::GPOS		    T_PTROBJ
 Zonemaster::LDNS::RR::HINFO	    T_PTROBJ
 Zonemaster::LDNS::RR::HIP		    T_PTROBJ
+Zonemaster::LDNS::RR::HTTPS	    T_PTROBJ
 Zonemaster::LDNS::RR::IPSECKEY	    T_PTROBJ
 Zonemaster::LDNS::RR::ISDN		    T_PTROBJ
 Zonemaster::LDNS::RR::KEY		    T_PTROBJ
@@ -64,6 +65,7 @@ Zonemaster::LDNS::RR::SOA		    T_PTROBJ
 Zonemaster::LDNS::RR::SPF		    T_PTROBJ
 Zonemaster::LDNS::RR::SRV		    T_PTROBJ
 Zonemaster::LDNS::RR::SSHFP	    T_PTROBJ
+Zonemaster::LDNS::RR::SVCB	    T_PTROBJ
 Zonemaster::LDNS::RR::TA		    T_PTROBJ
 Zonemaster::LDNS::RR::TALINK	    T_PTROBJ
 Zonemaster::LDNS::RR::TKEY		    T_PTROBJ

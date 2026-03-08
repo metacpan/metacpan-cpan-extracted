@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::ServiceAccount;
 
-our $VERSION = '2.1.0';
+our $VERSION = '2.1.1';
 
 use Google::RestApi::Setup;
 
@@ -74,7 +74,7 @@ Google::RestApi::Auth::ServiceAccount - Service Account support for Google Rest 
 
 =head1 AUTHOR
 
-Robin Murray E<lt>mvsjes@cpan.ork<gt>.
+Robin Murray mvsjes@cpan.org
 
 =head1 SEE ALSO
 

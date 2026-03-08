@@ -1,0 +1,58 @@
+{
+   "abstract" : "Perl binding for pugixml C++ XML parser",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "XML-PugiXML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::pugixml" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::pugixml" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-xml-pugixml/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/vividsnow/perl5-xml-pugixml.git",
+         "web" : "https://github.com/vividsnow/perl5-xml-pugixml"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,5 +1,9 @@
 Revision history for Monit::HTTP
 
+0.08    3 Mar 2026
+        - Chage from Test::More to Test2
+        - Minor adjustments
+
 0.07    28 Jan 2026
         - Pod typos
         - Generate urls from sprintf templates

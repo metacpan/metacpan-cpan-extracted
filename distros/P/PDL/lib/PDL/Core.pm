@@ -404,7 +404,7 @@ gives you the same answer as
 
   $x = pdl([[1,2,3],[2,undef,undef]]);
 
-If your PDL module has bad values compiled into it (see L<PDL::Bad>), 
+If your PDL module has bad values compiled into it (see L<PDL::Bad>),
 you can pass BAD values into the constructor within pre-existing PDLs.
 The BAD values are automatically kept BAD and propagated correctly.
 
@@ -561,6 +561,24 @@ Return ndarray dimensions as a perl list
 
 See also L</shape> which returns an ndarray instead.
 
+=head2 dimincs
+
+=for ref
+
+Return ndarray C<dimincs> as a perl list, reflecting any
+vaffine transformations of which this is a child.
+
+=for usage
+
+ @dimincs = $ndarray->dimincs
+
+=for example
+
+ pdl> p zeroes(10,3,22)->dimincs
+ 1 10 30
+ pdl> p zeroes(10,3,22)->t->dimincs
+ 10 1 30
+
 =head2 shape
 
 =for ref
@@ -683,6 +701,17 @@ sub PDL::tocomplex {
   $pdl->type->real ? $pdl->r2C : $pdl;
 }
 
+=head2 setdims
+
+=for ref
+
+Sets the ndarray's dimension list. A very low-level routine which
+does not do any checks, so use with caution.
+
+=for usage
+
+ $ndarray->setdims(\@dimlist);
+
 =head2 set_datatype
 
 =for ref
@@ -731,7 +760,6 @@ NOTE: NOT a method! This is because get_datatype returns
 
  pdl> p howbig(ushort([1..10])->get_datatype)
  2
-
 
 =head2 update_data_from
 
@@ -950,7 +978,7 @@ more examples of usage.
 use Scalar::Util;       # for looks_like_number test
 use Carp 'carp';        # for carping (warnings in caller's context)
 
-# This is the code that handles string arguments. It has now gotten quite large,
+# This is the code that handles string arguments. It has now got quite large,
 # so here's the basic explanation. I want to allow expressions like 2, 1e3, +4,
 # bad, nan, inf, and more. Checking this can get tricky. This croaks when it
 # finds:
@@ -1224,7 +1252,7 @@ sub _establish_type {
   return $PDL_CD if UNIVERSAL::isa($item, 'Math::Complex');
   return max($item->type->enum, $sofar) if UNIVERSAL::isa($item, 'PDL');
   return $PDL_D if ref($item) ne 'ARRAY';
-  #  only need to check first item for an array of complex vals 
+  #  only need to check first item for an array of complex vals
   return $MAX_TYPE if _establish_type($item->[0], $sofar) == $MAX_TYPE;
   #  only need to recurse for items that are refs
   #  as $sofar will be $PDL_D at a minimum
@@ -1232,7 +1260,7 @@ sub _establish_type {
 }
 
 sub PDL::new {
-   return $_[0]->copy if ref($_[0]);
+   return $_[0]->copy if ref($_[0]) and UNIVERSAL::isa($_[0], 'PDL');
    my $this = shift;
    my $type = ref($_[0]) eq 'PDL::Type' ? shift->enum : undef;
    my $value = (@_ > 1 ? [@_] : shift);
@@ -1283,13 +1311,17 @@ sub PDL::new {
          }
       }
    }
+   elsif (blessed($value) and UNIVERSAL::isa($value, 'Math::Complex')) {
+      $new->setdims([]);
+      set_c($new, [], $value);
+   }
    elsif (blessed($value)) { # Object
-       $new = $value->copy;
+      $new = $value->copy;
    }
    else {
-       barf("Can not interpret argument $value of type ".ref($value) );
+      barf("Can not interpret argument $value of type ".ref($value) );
    }
-   return $new;
+   $new;
 }
 
 
@@ -1487,7 +1519,7 @@ need to physicalise them (though there are exceptions).
 =for ref
 
 A more "careful" function than C<make_physical>. For ndarrays
-without a vaffine transformations as parent, it will just call
+without a vaffine transformation as parent, it will just call
 C<make_physical>. Otherwise, it will update the vaffine transformation
 bookkeeping.
 
@@ -1795,12 +1827,14 @@ it is treated as a list of dimensions that should be clumped together
 into one. The resulting
 clumped dim is placed at the position of the lowest index in the list.
 This convention ensures that C<clump> does the expected thing in
-the usual cases. The following example demonstrates typical usage:
+the usual cases. The following examples demonstrate usage:
 
-  $x = sequence 2,3,3,3,5; # 5D ndarray
-  $c = $x->clump(1..3);    # clump all the dims 1 to 3 into one
-  print $c->info;          # resulting 3D ndarray has clumped dim at pos 1
-  PDL: Double D [2,27,5]
+  zeroes(2,3,5,7)->clump(-1)->info  # PDL: Double D [210]
+  zeroes(2,3,5,7)->clump(-2)->info  # PDL: Double D [30,7]
+  zeroes(2,3,5,7)->clump(2)->info   # PDL: Double D [6,5,7]
+  zeroes(2,3,5,7)->clump(3)->info   # PDL: Double D [30,7]
+  zeroes(2,3,5,7)->clump(1,2)->info # PDL: Double D [2,15,7]
+  zeroes(2,3,5,7)->clump(1,3)->info # PDL: Double D [2,21,5]
 
 Data flows back and forth as usual with slicing routines.
 
@@ -2870,6 +2904,8 @@ for details on using ndarrays in the dimensions list.
 =cut
 
 sub _construct {
+    barf "No args given" if !@_;
+    unshift @_, 'PDL' if !UNIVERSAL::can($_[0], 'new_from_specification');
     @_>1 ? $_[0]->new_from_specification(@_[1..$#_]) : $_[0]->new_or_inplace;
 }
 sub ones { ref($_[0]) && ref($_[0]) ne 'PDL::Type' ? PDL::ones($_[0]) : PDL->ones(@_) }
@@ -3020,7 +3056,7 @@ preserves dataflow:
   ]
  ]
 
-Important: ndarrays are changed inplace!  
+Important: ndarrays are changed inplace!
 
 Note: If C<$x> is connected to any other PDL (e.g. if it is a slice)
 then the connection is first severed.
@@ -3111,6 +3147,9 @@ sub PDL::flat :lvalue { # fall through if < 2D
 
 Generic datatype conversion function
 
+Works on ndarrays and normal numbers. Returns input if already that
+type.
+
 =for usage
 
  $y = convert($x, $newtype);
@@ -3141,6 +3180,37 @@ sub PDL::convert {
   return $pdl->_convert_int($type)->sever if !$pdl->is_inplace;
   $pdl->set_datatype($type);
   $pdl;
+}
+
+=head2 convert_flowing
+
+=for ref
+
+Generic datatype data-flowing conversion function
+
+=for usage
+
+ $y = convert_flowing($x, $newtype);
+ $y = $x->convert_flowing($newtype);
+
+C<$newtype> is a type number or L<PDL::Type> object, for convenience they are
+returned by C<long()> etc when called without arguments.
+Only works on ndarrays, not normal numbers. Returns input if already that
+type. Establishes two-way dataflow between the two ndarrays.
+
+=cut
+
+my $CONVERT_FLOW_ERR = "Usage: \$y = convert_flowing(\$pdl, \$newtype)\n";
+sub PDL::convert_flowing {
+  barf $CONVERT_FLOW_ERR if @_ != 2;
+  my ($pdl,$type) = @_;
+  barf $CONVERT_FLOW_ERR if !UNIVERSAL::isa($pdl, 'PDL');
+  barf "Tried to convert_flowing(null)" if $pdl->isnull;
+  barf "Cannot convert_flowing inplace" if $pdl->is_inplace;
+  $type = $type->enum if ref($type) eq 'PDL::Type';
+  barf $CONVERT_FLOW_ERR unless Scalar::Util::looks_like_number($type);
+  return $pdl if $pdl->get_datatype == $type;
+  $pdl->_convert_int($type);
 }
 
 =head2 Datatype_conversions

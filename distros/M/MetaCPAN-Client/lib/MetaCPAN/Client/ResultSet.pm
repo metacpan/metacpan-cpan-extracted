@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::ResultSet;
 # ABSTRACT: A Result Set
-$MetaCPAN::Client::ResultSet::VERSION = '2.038000';
+$MetaCPAN::Client::ResultSet::VERSION = '2.039000';
 use Moo;
 use Carp;
 
@@ -12,8 +12,8 @@ has type => (
     is       => 'ro',
     isa      => sub {
         croak 'Invalid type' unless
-            grep { $_ eq $_[0] } qw<author distribution favorite
-                                   file module rating release mirror package>;
+            grep { $_ eq $_[0] } qw<author cover cve distribution favorite
+                                   file module permission rating release mirror package>;
     },
     lazy => 1,
 );
@@ -91,7 +91,8 @@ sub aggregations {
 
 sub _build_class {
     my $self = shift;
-    return 'MetaCPAN::Client::' . ucfirst $self->type;
+    my $type = $self->type eq 'cve' ? 'CVE' : ( ucfirst $self->type );
+    return 'MetaCPAN::Client::' . $type;
 }
 
 1;
@@ -108,7 +109,7 @@ MetaCPAN::Client::ResultSet - A Result Set
 
 =head1 VERSION
 
-version 2.038000
+version 2.039000
 
 =head1 DESCRIPTION
 

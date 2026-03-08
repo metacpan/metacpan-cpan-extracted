@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 ######################################################################
 # Testcase:     Run the sample code from the README file
 # Revision:     $Revision$

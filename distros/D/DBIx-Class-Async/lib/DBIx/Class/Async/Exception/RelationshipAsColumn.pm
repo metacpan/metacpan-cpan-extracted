@@ -1,6 +1,6 @@
 package DBIx::Class::Async::Exception::RelationshipAsColumn;
 
-$DBIx::Class::Async::Exception::RelationshipAsColumn::VERSION   = '0.63';
+$DBIx::Class::Async::Exception::RelationshipAsColumn::VERSION   = '0.64';
 $DBIx::Class::Async::Exception::RelationshipAsColumn::AUTHORITY = 'cpan:MANWAR';
 
 use strict;
@@ -15,7 +15,7 @@ name passed where a column was expected
 
 =head1 VERSION
 
-Version 0.63
+Version 0.64
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ our %EXPORT_TAGS = ('all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.593';
+our $VERSION = '0.599';
 our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
 our @logs;
 our $nlo = 1; # Number Line Output, start of 1
@@ -295,18 +295,31 @@ sub _line_decryption {
 			}
 
 		}
-		elsif( (ref $$vardata eq 'HASH' and ( ref $$vardata->{ $$key } eq 'HASH' or ref $$vardata->{ $$key } eq 'ARRAY'))
-			or (ref $$vardata eq 'ARRAY' and ( ref $$vardata->[ $$key ] eq 'HASH' or ref $$vardata->[ $$key ] eq 'ARRAY'))
+		elsif( (ref $$vardata eq 'HASH' and (
+					   ref $$vardata->{ $$key } eq 'HASH'
+					or ref $$vardata->{ $$key } eq 'ARRAY'
+					or ref \$$vardata->{ $$key } eq 'SCALAR'
+					or ref $$vardata->{ $$key } eq 'SCALAR' # REF->SCALAR
+				)
+			)
+			or (ref $$vardata eq 'ARRAY' and (
+					   ref $$vardata->[ $$key ] eq 'HASH'
+					or ref $$vardata->[ $$key ] eq 'ARRAY'
+					or ref \$$vardata->[ $$key ] eq 'SCALAR'
+					or ref $$vardata->[ $$key ] eq 'SCALAR' # REF->SCALAR
+				)
+			)
 		) {
+			my $vk = ref $$vardata eq 'HASH' ? $$vardata->{ $$key } : $$vardata->[ $$key ];
+			my $sclr = (ref \$vk eq 'SCALAR' or ref $vk eq 'SCALAR') ? 1 : 0;
+
 			# Index of column in target table
 			my $j = ( @$columns && exists( $columns->[-1]{ki} ) ) ?
 						@$columns :
 						($#$columns // 0);
-			$j = 0 if $j < 0; # JIC
+			$j = 0 if $j < 0 or $sclr;
 
-			my $vk = ref $$vardata eq 'HASH' ? $$vardata->{ $$key } : $$vardata->[ $$key ];
-
-			if( $$z =~/%%%V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
+			if( ! $sclr and $$z =~/%%%V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
 				# this V-variable is nested in a VAR-structure
 				my $ki = $1; # name (key or index) of V-variable
 				my $Np = $2; # NO \par
@@ -366,10 +379,7 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 				}
 				elsif( ref $vk eq 'HASH'
 						and ( (ref \$vk->{$ki} eq 'SCALAR' and defined( $vk->{$ki} ) )
-							or (ref \$vk->{$ki} eq 'REF'
-								and ref $vk->{$ki} eq 'SCALAR'
-								and defined( ${ $vk->{$ki} } )
-							)
+							or ( ref $vk->{$ki} eq 'SCALAR' and defined( ${ $vk->{$ki} } ) )
 							or ( $ki eq '@'
 								and exists($vk->{$ki})
 								and ref $vk->{$ki} eq 'ARRAY'
@@ -394,7 +404,7 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 				}
 
 				if( $+{t} eq 'E') { # %%%ADDE:
-					if( @$columns && exists( $columns->[-1]{ki} ) && ! $columns->[$j] ) {
+					if( @$columns && exists( $columns->[-1]{ki} ) && (! $columns->[$j] or $sclr) ) {
 						push @{ $columns->[-1]{tail} }, $s;
 					}
 					else {
@@ -403,7 +413,7 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 				}
 				else {
 					push @{ $columns->[$j]{head} }, $s;
-					$columns->[$j]{eX}{ $#{ $columns->[$j]{head} } } = undef if $+{t} eq 'X'; # $$chkVAR && ...  %%%ADDX:
+					$columns->[$j]{eX}{ $#{ $columns->[$j]{head} } } = undef if ! $sclr and $+{t} eq 'X'; # $$chkVAR && ...  %%%ADDX:
 				}
 			}
 
@@ -498,6 +508,10 @@ push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if $DEBUG && $op->{def};
 		return;
 
 	}
+	elsif( $$z =~/%%%V:\s*=(def|esc|ignore|silent|debug)=\s*(\S*)/) { # setting up facultative options
+		$op->{$1} = $2 || 0;
+		return;
+	}
 	elsif( $$z =~/%%%V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
 		my $k = $+{k};
 
@@ -544,7 +558,7 @@ push @logs, "~~> l.$. WARNING#3: unknown sub-key '$sk' in %%%V:". $k if $DEBUG o
 			if( ref \$d eq 'SCALAR') {
 				$v = $d;
 			}
-			elsif( ref \$d eq 'REF' and ref $d eq 'SCALAR') { # REF->SCALAR
+			elsif( ref $d eq 'SCALAR') { # REF->SCALAR
 				$v = $$d;
 			}
 			else {
@@ -590,7 +604,7 @@ sub _data_redef {
 		return 0;
 	}
 
-	if( ref \$d eq 'SCALAR' or (ref \$d eq 'REF' and ref $d eq 'SCALAR')) {
+	if( ref \$d eq 'SCALAR' or ref $d eq 'SCALAR') {
 		$$k = $sk;
 	}
 	else {
@@ -621,7 +635,7 @@ sub _chk_var {
 				elsif(ref \$d eq 'SCALAR') {
 					$$chkVAR |= 0b00100;
 				}
-				elsif(ref \$d eq 'REF' and ref $d eq 'SCALAR') {
+				elsif(ref $d eq 'SCALAR') { # REF->SCALAR
 					$$chkVAR |= 0b01000;
 				}
 				else {
@@ -641,7 +655,7 @@ push @logs, "~~> l.$. WARNING#6: mixed types (ARRAY with HASH with SCALAR or oth
 			return 1;
 		}
 	}
-	elsif( ref \$vk eq 'SCALAR') {
+	elsif( ref \$vk eq 'SCALAR' or ref $vk eq 'SCALAR') {
 		$columns->[0]{ki} = $k;
 		&_set_column( $Np, $$paste, $columns->[0] );
 	}
@@ -657,6 +671,7 @@ push @logs, "~~> l.$. WARNING#6: mixed types (ARRAY with HASH with SCALAR or oth
 # VALUE output
 sub _v_print {
 	my( $fh, $k, $v, $el, $op ) = @_;
+	$v = $$v if ref $v eq 'SCALAR';
 
 	our $DEBUG;
 	our @logs;
@@ -736,9 +751,7 @@ sub _s_a_prn {
 	my( $fh, $i, $values, $el, $op, $border, $col ) = @_;
 
 	my $val = $values->[$i];
-	if( ref \$val eq 'REF' and ref $val eq 'SCALAR') {
-		$val = $$val;
-	}
+	$val = $$val if ref $val eq 'SCALAR';
 
 	if( ref \$val eq 'SCALAR') {
 		&_hvt_print( $fh, $i, $val, $el, $op, $$border );
@@ -826,8 +839,8 @@ sub _var_output {
 	our @logs;
 	our $nlo;
 
-	if( ref \$values eq 'SCALAR') { # key => SCALAR
-		&_v_print( $fh, $key, $values, $columns->[0], $op );
+	if( ref \$values eq 'SCALAR' or ref $values eq 'SCALAR') { # key => SCALAR
+		&_hvt_print( $fh, $key, $values, $columns->[0], $op );
 		return;
 	}
 
@@ -855,7 +868,7 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 
 				my $val;
 				if( defined $ki ) {
-					if((ref \$d eq 'SCALAR') or (ref \$d eq 'REF' and ref $d eq 'SCALAR')) { # (ARRAY.SCALAR or ARRAY.REF->SCALAR) in regular vector
+					if( ref \$d eq 'SCALAR' or ref $d eq 'SCALAR') { # (ARRAY.SCALAR or ARRAY.REF->SCALAR) in regular vector
 
 						if( $ki =~/^[\d,\-]+$/) {
 						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
@@ -928,7 +941,7 @@ push @logs, "~~> l.$. NOT defined %%%V:". $ki if $DEBUG;
 				if( ref \$values->{$ki} eq 'SCALAR' and defined( $values->{$ki} )) { # HASH.SCALAR
 					$val = $values->{$ki};
 				}
-				elsif( ref \$values->{$ki} eq 'REF' and ref $values->{$ki} eq 'SCALAR') { # HASH.REF->SCALAR
+				elsif( ref $values->{$ki} eq 'SCALAR' and defined( ${ $values->{$ki} } )) { # HASH.REF->SCALAR
 					$val = ${ $values->{$ki} };
 				}
 				elsif( $ki eq '@' and ref $values->{'@'} eq 'ARRAY') {
@@ -939,7 +952,7 @@ push @logs, "~~> l.$. NOT defined %%%V:". $ki if $DEBUG;
 						if( ref \$values->{$k} eq 'SCALAR') {
 							$v = $values->{$k};
 						}
-						elsif( ref \$values->{$k} eq 'REF' and ref $values->{$k} eq 'SCALAR') {
+						elsif( ref $values->{$k} eq 'SCALAR') {
 							$v = ${ $values->{$k} };
 						}
 						elsif( $op->{def} ) {
@@ -1023,17 +1036,26 @@ with fillable fields C<myParam>, C<myArray>, C<myHash>, C<myTable_array>, and C<
   \maketitle
   %%%ENDZ: -- end of The Dead Zone
 
-  SPECIFY VALUE of myParam! %%%V: myParam  %-- substitutes Variable
+  SPECIFY VALUE of myParam! %%%V: myParam  %-- substitutes SCALAR var
 
   etc...
 
   \begin{tcolorbox}
-  \rule{0mm}{4.5em}%%%VAR: myParam -- substitutes Variable as well
+  \rule{0mm}{4.5em}%%%VAR: myParam -- substitutes SCALAR var as well
   ...
   ... SPECIFY VALUE of myParam!
   ...
   %%%END:
   \end{tcolorbox}
+
+  %%%VAR: myParam %-- SCALAR substitution with support for internal ADD[E] tags
+  \mbox{ %%%ADD:%
+  \rule{0mm}{4.5em} %%%ADD:
+  head \ldots %%%ADD:
+  ... SPECIFY VALUE of myParam!
+  tail \ldots %%%ADDE:%
+  } %%%ADDE:
+  %%%END:
 
   \begin{tabular}{%
   c
@@ -1169,6 +1191,12 @@ Ready (filled, completed) TeX file (or the console output result, i.e. STDOUT):
   \begin{tcolorbox}
   \rule{0mm}{4.5em}Blah-blah blah-blah blah-blah-- substitutes Variable as well
   \end{tcolorbox}
+
+  \mbox{\rule{0mm}{4.5em}
+  head \ldots
+  Blah-blah blah-blah blah-blah%-- SCALAR substitution with support for internal ADD[E] tags
+  tail \ldots}
+
   \begin{tabular}{%
   c
   llll}
@@ -1296,7 +1324,7 @@ File and directory names and paths to them must not contain space characters.
 In the names of C<%%%V:> and C<%%%VAR:> tags (keys and indexes), it is possible (preferably) to use 
 only C<[a-zA-Z0-9_]> symbols, since other symbols are currently or will be reserved in the future.
 
-Currently, symbols: C<%>, C<@>, C<:>, and C</> have a special purpose.
+Currently, symbols: C<%>, C<@>, C<:>, C<=>, and C</> have a special purpose.
 
 
 =head1 ABSTRACT
@@ -1370,7 +1398,7 @@ CONCLUSION: standalone C<%%%V:> tag (outside C<%%%VAR:> scope) can be used to se
 C<%%%V:> can be nested in an ARRAY or HASH C<%%%VAR:> tag,
 but in SCALAR or REF C<%%%VAR:> it will not work and will be discarded.
 
-There's a special C<variable_name> - C<@>, which means to "B<use all elements of an ARRAY>".
+There's a special C<variable_name> = C<@>, which means to "B<use all elements of an ARRAY>".
 Therefore, this only makes sense for ARRAY variables (see example above).
 
 Using C<@> for HASH variables is also acceptable.
@@ -1380,15 +1408,39 @@ they are inserted into TeX template.
 
 
 =item *
-B< C<%%%VAR: variable_name> > is start of full form of regular (SCALAR) or complex (HASH, ARRAY) C<variable_name>,
+B< C<%%%VAR: variable_name> > is start of full form of regular (SCALAR, REF.SCALAR) or complex (HASH, ARRAY) C<variable_name>,
 preserving preceding TeX up to C<%%%VAR:> but completely replacing everything up to first C<%%%END:> 
 (C<%%%ENDT:>, C<%%%ENDZ:>, or a new C<%%%VAR:>, or C<%%%TDZ:>) tag inclusive.
 
-  Blah, blah, \ldots blah. %%%VAR: myParam
+  Blah, blah, \ldots blah:  %%%VAR: myParam
   Blah, blah, \ldots
   \ldots
-
   Blah, \ldots %%%END:
+
+or a template like this with additional internal C<%%%ADD:> and C<%%%ADDE:> tags:
+
+  %%%VAR: myParam
+  \mbox{ %%%ADD:%
+  \rule{0mm}{4.5em} %%%ADD:
+  head \ldots %%%ADD:
+  ... SPECIFY VALUE of myParam!
+  tail \ldots %%%ADDE:%
+  } %%%ADDE:
+  %%%END:
+
+If C<myParam = 1234567890> (it's SCALAR), then that template will lead to the creation of such a TeX fragment:
+
+  Blah, blah, \ldots blah: 1234567890
+
+or respectively:
+
+  \mbox{\rule{0mm}{4.5em}
+  head \ldots
+  1234567890
+  tail \ldots}
+
+BTW: if C<myParam> is B<undefined> and facultative option (see below) C<def> is set (e.g. 1),
+then these fragments B<will be missing> from the finished TeX.
 
 Usually HASH and ARRAY I<variable_name> are used in the template to create (fill) tables.
 
@@ -1490,6 +1542,9 @@ this text will be added here: C<Tail blah, blah, \ldots>.
 If the following C<%%%V:> tag is not present, then the text is output B<at the end of all> C<keys> or C<indexes> (columns)
 each table (filled area) row.
 
+C<%%%ADD:> can also be used for SCALAR and REF.SCALAR variable,
+but without C<%%%V:> tag because it is redundant and not supported (see above).
+
 BTW: 
 By combining auxiliary parameters and the C<def> facultative option (see below), which specifies discarding (ignoring) 
 C<undefined> values and their associated C<%%%ADD:> structures, you can create a logic scheme for disabling C<%%%ADD:> tags.
@@ -1523,6 +1578,12 @@ it differs in that text is added B<after> variable specified in C<%%%V:> tag.
 This C<%%%ADDE:> tag must follow immediately after C<%%%V:> tag 
 (i.e. there should not be C<%%%ADD:> tag before it), otherwise it will also become 
 a regular C<%%%ADD:> tag, for example for the next C<%%%V:>.
+
+C<%%%ADDE:> can also be used for SCALAR and REF.SCALAR variable, 
+but without C<%%%V:> tag because it is redundant and not supported.
+Here you must correctly place C<%%%ADD:> and C<%%%ADDE:> tags yourself:
+C<%%%ADD:> denotes what will come before the variable value,
+and C<%%%ADDE:> - after it (see above).
 
 
 =item 3.
@@ -1622,6 +1683,8 @@ BTW: if the value of C<$info> structure starts with C<%%%:> tag, then this tag i
 (e.g. C<%%%:$\frac{12345}{67890}$> is converted to C<$\frac{12345}{67890}$>),
 and the value itself is not masked, it is skipped.
 
+This option can also be changed dynamically in the template itself using global C<%%%V:=esc= 0|1|~ > tag.
+
 
 =item C<def>
 
@@ -1633,17 +1696,26 @@ i.e. dictates that only C<defined> values be B<into account>.
 This option is useful, for example, for creating merged cells in tables (using C<\multicolumn> LaTeX-command)
 and applies to all incoming data. Also this option can be used as an ON or OFF switch (see above).
 
-=item C<ignore> 
+This option can also be changed dynamically in the template itself using global C<%%%V:=def= 0|1 > tag.
+
+
+=item C<ignore>
 
 This option specifies silently ignore undefined B<name|key|index> of C<%%%V:> and C<%%%VAR:> tags:
 
   my $msg = replication( $source, $info, ignore =>1 );
 
-=item C<silent> 
+This option can also be changed dynamically in the template itself using global C<%%%V:=ignore= 0|1 > tag.
+
+
+=item C<silent>
 
 This option activates silent mode of operation:
 
   my $msg = replication( $source, $info, silent =>1 );
+
+This option can also be changed dynamically in the template itself using global C<%%%V:=silent= 0|1 > tag.
+
 
 =item C<debug>
 
@@ -1657,6 +1729,7 @@ This option sets local debug mode:
     say for @$msg;
   }
 
+This option can also be changed dynamically in the template itself using global C<%%%V:=debug= 0|1 > tag.
 
 Another way is to set the C<$DEBUG> package variable to enable debugging messages (global debug mode).
 
@@ -1670,7 +1743,7 @@ C<replication> returns C<undef> or a reference to an error (and/or debug) messag
 =head2 tex_escape( $value [, '~'] )
 
 Masks (or replaces with equivalents) the active TeX characters C<&> C<%> C<$> C<#> C<_> C<{> C<}> C<^> C<\>
-to C<\&> C<\%> C<\$> C<\#> C<\_> C<\{> C<\}> C<\^{}> C<\textbackslash> in the input C<$value>.
+to C<\&> C<\%> C<\$> C<\#> C<\_> C<\{> C<\}> C<\^{}> C<\textbackslash{}> in the input C<$value>.
 
   tex_escape( $value );
 

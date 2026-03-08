@@ -1,5 +1,5 @@
 package Mail::DMARC::Report::Store::SQL;
-our $VERSION = '1.20260226';
+our $VERSION = '1.20260306';
 use strict;
 use warnings;
 
@@ -63,13 +63,32 @@ sub retrieve {
         push @params, $args{end};
     };
     if ( $args{author} ) {
-        $query .= $self->grammar->and_arg('a.org_name');
-        push @params, $args{author};
+        my ( $op, $val ) = $self->_negate_arg( $args{author} );
+        $query .= $self->grammar->and_arg('a.org_name', $op);
+        push @params, $val;
     };
     if ( $args{from_domain} ) {
-        $query .= $self->grammar->and_arg('fd.domain');
-        push @params, $args{from_domain};
+        my ( $op, $val ) = $self->_negate_arg( $args{from_domain} );
+        $query .= $self->grammar->and_arg('fd.domain', $op);
+        push @params, $val;
     };
+
+    my $sort_by = lc( $args{sort_by} || 'rid' );
+    $sort_by = 'rid' if $sort_by eq 'id';
+
+    my %allowed_sort = map { $_ => 1 } qw( rid author from_domain begin end );
+    $sort_by = 'rid' if !$allowed_sort{$sort_by};
+
+    my $sort_order = uc( $args{sort_order} || 'DESC' );
+    $sort_order = 'DESC' if $sort_order ne 'ASC' && $sort_order ne 'DESC';
+
+    $query .= $self->grammar->order_by( $sort_by, $sort_order );
+
+    if ( defined $args{limit} ) {
+        croak "limit must be a positive integer"
+            if $args{limit} !~ /^\d+$/ || $args{limit} < 1;
+        $query .= $self->grammar->limit( $args{limit} );
+    }
 
     my $reports = $self->query( $query, \@params );
 
@@ -78,6 +97,14 @@ sub retrieve {
         $_->{end} = join(" ", split(/T/, $self->epoch_to_iso( $_->{end} )));
     };
     return $reports;
+}
+
+sub _negate_arg {
+    my ( $self, $val ) = @_;
+    if ( substr($val, 0, 1) eq '!' ) {
+        return ( '!=', substr($val, 1) );
+    }
+    return ( '=', $val );
 }
 
 sub next_todo {
@@ -296,7 +323,7 @@ sub get_report_policy_published {
 }
 
 sub get_rr {
-    my ($self,@args) = @_;
+    my ($self, @args) = @_;
     croak "invalid parameters" if @args % 2;
     my %args = @args;
     # warn Dumper(\%args);
@@ -401,11 +428,11 @@ sub row_exists {
 }
 
 sub insert_agg_record {
-    my ($self, $row_id, $rec) = @_;
+    my ($self, $report_id, $rec) = @_;
 
-    return 1 if $self->row_exists( $row_id, $rec);
+    return 1 if $self->row_exists( $report_id, $rec);
 
-    $row_id = $self->insert_rr( $row_id, $rec )
+    my $row_id = $self->insert_rr( $report_id, $rec )
         or croak "failed to insert report row";
 
     my $reasons = $rec->row->policy_evaluated->reason;
@@ -689,7 +716,7 @@ Mail::DMARC::Report::Store::SQL - store and retrieve reports from a SQL RDBMS
 
 =head1 VERSION
 
-version 1.20260226
+version 1.20260306
 
 =head1 DESCRIPTION
 

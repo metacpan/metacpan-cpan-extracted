@@ -38,7 +38,6 @@
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0",
             "Test::More" : "0.88"
          }
       }
@@ -55,6 +54,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pogl"
    },
-   "version" : "0.0403",
+   "version" : "0.0404",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

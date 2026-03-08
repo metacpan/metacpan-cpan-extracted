@@ -1,0 +1,8 @@
+0.002   2025-11-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: identifier::no_u, identifier::no_u_delim.
+
+
+0.001   2025-11-11  Released-By: PERLANCAR
+
+        - First release.

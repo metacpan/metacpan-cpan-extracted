@@ -1,5 +1,5 @@
 package Marky;
-$Marky::VERSION = '0.0602';
+$Marky::VERSION = '0.0604';
 # ABSTRACT: web application for bookmark databases
 
 use Mojo::Base 'Mojolicious';
@@ -137,7 +137,7 @@ Marky - web application for bookmark databases
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Marky - web application for bookmark databases
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 AUTHOR
 

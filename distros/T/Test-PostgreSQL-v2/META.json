@@ -48,11 +48,11 @@
    "provides" : {
       "Test::DBIx::Class::SchemaManager::Trait::Testpostgresqlv2" : {
          "file" : "lib/Test/DBIx/Class/SchemaManager/Trait/Testpostgresqlv2.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       },
       "Test::PostgreSQL::v2" : {
          "file" : "lib/Test/PostgreSQL/v2.pm",
-         "version" : "2.03"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/manwar/Test-PostgreSQL-v2"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

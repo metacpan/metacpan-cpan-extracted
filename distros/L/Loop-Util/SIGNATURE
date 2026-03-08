@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 65a433ea48c5aa7160ca208ec891eb1ace5c0357eb846c4d274b06fc89aa0c13 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 0cc9cb8ad64ddbc6dcbc827bc6325d7e2353c859c238883e11b8a2db268ab639 Changes
+SHA256 f90c664a806bb8a69b931c1b97ee48df815ae25353327bd87391c42a55e2aec3 INSTALL
+SHA256 ca1cc40b3da7bebb1b0368764650ad38ac603b31a25fbc5b6f9fb217cc6fa1e8 LICENSE
+SHA256 773113a80367d0cc92a076a8f4ebe4fb6d634925fbfd3134fb79792f423588ef MANIFEST
+SHA256 d2775a90399cae8146c49893f39bb71643f3406ee0e2a59b36a6283ee98c2909 META.json
+SHA256 1857d320119b6c72fb40ce95ca303f8d9170f94694ded19ad30de426dc5f9a04 META.yml
+SHA256 30660b04a05ae063ee3129dc0deb192f73ac86dbfb894e5907928b494633d713 Makefile.PL
+SHA256 edd91ef2f92f2143a4b613bc07976f4560cc90813208920b072c3dd2dd59024f README
+SHA256 5e56477052a27e3e650ace389b45d8613d5894d21b0e246d83593ed1b1559e2e Util.xs
+SHA256 fb24f25568c34fb479ef563c1dd9ea7db3b7a804b220a163d21a16145e280743 dist.ini
+SHA256 65644e649775a9494a40cfbd56e306272223c9093bc77c4c0749212774c73810 doap.ttl
+SHA256 87953eb7a4a778a9b0959517eea4349c96be32fe31cf15bcc9ec6f4e99cc4031 lib/Loop/Util.pm
+SHA256 ad599ba07ccba9ef867a7399bb3ef7c83faf7a6350d3dc90f1377c99bebdd72e ppport.h
+SHA256 ae00d9332819976b13b7f6f1a5dc69d87dd0212890dae23f5467b032953c0244 t/00start.t
+SHA256 055efca22b3faa0482c842b434c3a826ea0576ca955db260fe40366a91b63800 t/01basic.t
+SHA256 e033fd53bf74271d4fcaa97561f0165d497daae419932ef177f154c61145b8ee t/integration/context_nesting.t
+SHA256 a797d64f6b8a98362ae76c00493289d842de44c287014b1faec01cbd451da900 t/integration/first_else.t
+SHA256 3032a01110bc2f555eeaaa2e00491cc288ad53cf8570852ca41b06c0dbf2ba4d t/integration/iffirst_label.t
+SHA256 e257ae763d44c65c27f88890deae7113127e8548cd66212ec57c21fba94b689f t/integration/import_keywords.t
+SHA256 77a8d67d33a1ce365a4d71d471ec4cad5b7ed102499dc9ded47407e792cb3874 t/integration/ix_keyword.t
+SHA256 c4de1ff7cf0b0baae6453f70496040e735d235d91d7b97c10a50a2b251dd95ca t/integration/loop_keyword.t
+SHA256 b67d1690094ca382bbb3fca09f06c2a92b309e0f583dec5a166928dcfafce62a t/integration/odd_even.t
+SHA256 d072f13e8e7a36734a8b12003311b9c3881ff5f0995ca4d0d6d52ccc87392370 t/integration/simple.t
+SHA256 b31c58b1ed2618eb0696f2a7589de01075cad68ac3a46eac2f03123694ed099e t/integration/sub_call.t
+SHA256 9bf119d9eaf6bb7827ca9e0f88acc7d382f3e6e328daac8cab4c472b5f16a38b t/integration/while.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCaay7LgAKCRDOv4Eoaip9
+OfKmAJ0Tm7bBcTd6laihnE3F0zupFghwYwCghz0v0BCMETqtKWah+I2LGOdQLQc=
+=plsj
+-----END PGP SIGNATURE-----

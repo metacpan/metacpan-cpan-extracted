@@ -1,4 +1,4 @@
-package Mojo::UserAgent::Role::Retry 0.002;
+package Mojo::UserAgent::Role::Retry 0.003;
 
 # ABSTRACT: Retry requests on failure
 
@@ -18,11 +18,15 @@ has retry_wait_max => 20;
 has retry_policy   => sub {
   return sub {
     my $tx = shift;
-    if ( $tx->error
-      || ( $tx->res->code && ( $tx->res->code == 429 || $tx->res->code == 503 ) ) )
-    {
-      return 0;
-    }
+
+    my $err = $tx->error;
+    if (!$err) { return 1; }
+
+    my $code = $err->{code};
+    if (!$code) { return 0; }
+
+    if ($code == 429 || $code == 503) { return 0; }
+
     return 1;
   };
 };
@@ -45,7 +49,7 @@ around start => sub {
   }
 
   if ( !$cb ) {
-    $self->$orig($tx);
+    $tx = $self->$orig($tx);
     if ( $self->retry_policy->($tx) )     { return $tx; }
     if ( $tx->retries >= $self->retries ) { return $tx; }
     sleep $self->_retry_wait_time($tx);
@@ -105,7 +109,7 @@ Mojo::UserAgent::Role::Retry - Retry requests on failure
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -164,10 +168,8 @@ codes.
 
   my $ua = Mojo::UserAgent->with_roles('+Retry')->new(retry_policy => sub {
     # Retry on 418 HTTP response codes
-    return sub {
-      if (shift->res->code == 418) { return 0; }
-      return 1;
-    }
+    if (shift->res->code == 418) { return 0; }
+    return 1;
   });
 
 =head1 SEE ALSO

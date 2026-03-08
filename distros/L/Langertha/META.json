@@ -74,7 +74,7 @@
          "web" : "https://github.com/Getty/langertha"
       }
    },
-   "version" : "0.302",
+   "version" : "0.304",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -396,7 +396,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.302",
+                  "tag" : "0.304",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

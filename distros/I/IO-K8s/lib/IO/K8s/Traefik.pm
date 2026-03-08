@@ -1,6 +1,6 @@
 package IO::K8s::Traefik;
 # ABSTRACT: Traefik CRD resource map provider for IO::K8s
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
 
@@ -33,7 +33,7 @@ IO::K8s::Traefik - Traefik CRD resource map provider for IO::K8s
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 

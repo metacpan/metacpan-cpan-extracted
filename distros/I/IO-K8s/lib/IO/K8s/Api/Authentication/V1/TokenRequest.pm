@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::TokenRequest;
 # ABSTRACT: TokenRequest requests a token for a given service account.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Authentication::V1::TokenRequest - TokenRequest requests a token f
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

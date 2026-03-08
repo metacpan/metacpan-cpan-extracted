@@ -2,9 +2,12 @@
 
 use strict;
 use warnings;
+
 use JSON;
 use Getopt::Long;
 use OpenAPI::Linter;
+
+our $VERSION = '0.19';
 
 my $spec;
 my $version;
@@ -63,6 +66,12 @@ if ($json_output) {
             else {
                 printf "[%s] %s\n", $i->{level}, $message;
             }
+
+            # Print remediation hint if present, indented for readability
+            if ($i->{hint}) {
+                (my $hint = $i->{hint}) =~ s/^/    /mg;
+                print "$hint\n";
+            }
         }
         printf "\nSummary: %d ERROR%s, %d WARN%s\n",
             $errors, $errors == 1 ? '' : 's',
@@ -99,3 +108,125 @@ Examples:
 USAGE
     exit($exit_code // 0);
 }
+
+__END__
+
+=pod
+
+=head1 NAME
+
+openapi-linter - Validate and lint OpenAPI specification files.
+
+=head1 VERSION
+
+Version 0.19
+
+=head1 SYNOPSIS
+
+  openapi-linter --spec api.yaml [options]
+
+=head1 DESCRIPTION
+
+C<openapi-linter> is a command-line utility designed to analyse OpenAPI
+(Swagger) specification files for structural correctness and best practices.
+It supports both standard linting and strict schema validation.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--spec E<lt>specfileE<gt>>
+
+B<Required.> Path to the OpenAPI specification file. Supports both B<YAML> and B<JSON> formats.
+
+=item B<--version E<lt>versionE<gt>>
+
+Explicitly specify the OpenAPI version (e.g., C<3.0.3>, C<3.1.0>). If omitted, the
+linter attempts to detect the version from the spec file.
+
+=item B<--json>
+
+Enables machine-readable output. Results will be printed as a pretty-printed
+JSON object containing a summary and an array of issues.
+
+=item B<--validate>
+
+Switches mode from general linting to strict schema validation against official
+OpenAPI meta-schemas.
+
+=item B<--help>
+
+Displays a brief usage summary and exits.
+
+=back
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item B<0>
+
+Success. No errors or warnings were found.
+
+=item B<1>
+
+Issues found. One or more errors or warnings were detected in the specification.
+
+=item B<2>
+
+Invalid arguments. The script was called with incorrect parameters or a missing spec file.
+
+=back
+
+=head1 EXAMPLES
+
+  # Basic linting
+  openapi-linter --spec api.yaml
+
+  # Run strict schema validation
+  openapi-linter --spec api.json --validate
+
+  # Output results to a file in JSON format
+  openapi-linter --spec api.yaml --json > report.json
+
+=head1 AUTHOR
+
+Mohammad Sajid Anwar, C<< <mohammad.anwar at yahoo.com> >>
+
+=head1 REPOSITORY
+
+L<https://github.com/manwar/OpenAPI-Linter>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2026 Mohammad Sajid Anwar.
+
+This program  is  free software; you can redistribute it and / or modify it under
+the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full
+license at:
+L<http://www.perlfoundation.org/artistic_license_2_0>
+Any  use,  modification, and distribution of the Standard or Modified Versions is
+governed by this Artistic License.By using, modifying or distributing the Package,
+you accept this license. Do not use, modify, or distribute the Package, if you do
+not accept this license.
+If your Modified Version has been derived from a Modified Version made by someone
+other than you,you are nevertheless required to ensure that your Modified Version
+ complies with the requirements of this license.
+This  license  does  not grant you the right to use any trademark,  service mark,
+tradename, or logo of the Copyright Holder.
+This license includes the non-exclusive, worldwide, free-of-charge patent license
+to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
+Package with respect to any patent claims licensable by the Copyright Holder that
+are  necessarily  infringed  by  the  Package. If you institute patent litigation
+(including  a  cross-claim  or  counterclaim) against any party alleging that the
+Package constitutes direct or contributory patent infringement,then this Artistic
+License to you shall terminate on the date that such litigation is filed.
+Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR
+NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
+REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

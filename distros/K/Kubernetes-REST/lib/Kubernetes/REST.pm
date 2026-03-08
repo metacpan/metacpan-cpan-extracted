@@ -1,5 +1,5 @@
 package Kubernetes::REST;
-our $VERSION = '1.003';
+our $VERSION = '1.100';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
@@ -13,6 +13,7 @@ use Kubernetes::REST::HTTPRequest;
 use IO::K8s;
 use IO::K8s::List;
 use Kubernetes::REST::WatchEvent;
+use Kubernetes::REST::LogEvent;
 
 has server => (
     is => 'ro',
@@ -274,10 +275,13 @@ sub _build_path {
         $resource = $class->resource_plural;
     } else {
         $resource = lc($kind);
-        $resource .= 's' unless $resource =~ /s$/;
-        # Handle special plurals
-        $resource =~ s/ys$/ies/;  # Policy -> policies
-        $resource =~ s/sss$/ses/; # Status -> statuses
+        if ($resource =~ /(?:ss|sh|ch|x|z)$/) {
+            $resource .= 'es';        # class -> classes, ingress -> ingresses
+        } elsif ($resource =~ /[^aeiou]y$/) {
+            $resource =~ s/y$/ies/;   # policy -> policies
+        } elsif ($resource !~ /s$/) {
+            $resource .= 's';         # pod -> pods
+        }
     }
 
     # Build path based on API group
@@ -424,6 +428,77 @@ sub _process_watch_chunk {
     }
 
     return @events;
+}
+
+sub _process_log_chunk {
+    my ($self, $buffer_ref, $chunk) = @_;
+    $$buffer_ref .= $chunk;
+
+    my @events;
+    while ($$buffer_ref =~ s/^([^\n]*)\n//) {
+        my $line = $1;
+        push @events, Kubernetes::REST::LogEvent->new(line => $line);
+    }
+
+    return @events;
+}
+
+# ============================================================================
+# PUBLIC BUILDING BLOCKS FOR ASYNC WRAPPERS
+#
+# These methods expose the internal request/response pipeline as a stable API
+# for async wrappers (e.g. Net::Async::Kubernetes) that need to build requests,
+# process responses, and handle streaming without going through the sync
+# convenience methods (list, get, watch, log, etc.).
+# ============================================================================
+
+sub build_path {
+    my ($self, @args) = @_;
+
+
+    return $self->_build_path(@args);
+}
+
+sub prepare_request {
+    my ($self, @args) = @_;
+
+
+    return $self->_prepare_request(@args);
+}
+
+sub check_response {
+    my ($self, @args) = @_;
+
+
+    return $self->_check_response(@args);
+}
+
+sub inflate_object {
+    my ($self, @args) = @_;
+
+
+    return $self->_inflate_object(@args);
+}
+
+sub inflate_list {
+    my ($self, @args) = @_;
+
+
+    return $self->_inflate_list(@args);
+}
+
+sub process_watch_chunk {
+    my ($self, @args) = @_;
+
+
+    return $self->_process_watch_chunk(@args);
+}
+
+sub process_log_chunk {
+    my ($self, @args) = @_;
+
+
+    return $self->_process_log_chunk(@args);
 }
 
 # Convenience: prepare + call in one step (used by sync CRUD methods)
@@ -660,6 +735,78 @@ sub watch {
     return $last_rv;
 }
 
+sub log {
+    my ($self, $short_class, @rest) = @_;
+
+
+    # Support: log('Pod', 'name', ...) and log('Pod', name => 'name', ...)
+    my %args;
+    if (@rest >= 1 && !ref($rest[0]) && $rest[0] !~ /^(name|namespace|container|follow|tailLines|sinceSeconds|sinceTime|timestamps|previous|limitBytes|on_line)$/) {
+        $args{name} = shift @rest;
+        %args = (%args, @rest);
+    } elsif (@rest % 2 == 0) {
+        %args = @rest;
+    } else {
+        croak "Invalid arguments to log()";
+    }
+
+    croak "name required for log" unless $args{name};
+
+    my $on_line      = delete $args{on_line};
+    my $container    = delete $args{container};
+    my $follow       = delete $args{follow};
+    my $tail_lines   = delete $args{tailLines};
+    my $since_seconds = delete $args{sinceSeconds};
+    my $since_time   = delete $args{sinceTime};
+    my $timestamps   = delete $args{timestamps};
+    my $previous     = delete $args{previous};
+    my $limit_bytes  = delete $args{limitBytes};
+
+    my $class = $self->expand_class($short_class);
+    my $path = $self->_build_path($class, %args) . '/log';
+
+    my %params;
+    $params{container}    = $container     if defined $container;
+    $params{follow}       = 'true'         if $follow;
+    $params{tailLines}    = $tail_lines    if defined $tail_lines;
+    $params{sinceSeconds} = $since_seconds if defined $since_seconds;
+    $params{sinceTime}    = $since_time    if defined $since_time;
+    $params{timestamps}   = 'true'         if $timestamps;
+    $params{previous}     = 'true'         if $previous;
+    $params{limitBytes}   = $limit_bytes   if defined $limit_bytes;
+
+    if ($on_line) {
+        # Streaming mode
+        my $req = $self->_prepare_request('GET', $path, parameters => \%params);
+
+        my $buffer = '';
+        my $data_callback = sub {
+            my ($chunk) = @_;
+            for my $event ($self->_process_log_chunk(\$buffer, $chunk)) {
+                $on_line->($event);
+            }
+        };
+
+        my $response = $self->io->call_streaming($req, $data_callback);
+        $self->_check_response($response, "log $short_class");
+
+        # Process any remaining data in buffer (last line without trailing newline)
+        if (length $buffer) {
+            $on_line->(Kubernetes::REST::LogEvent->new(line => $buffer));
+        }
+
+        return;
+    } else {
+        # One-shot mode
+        my $response = $self->_request('GET', $path, undef,
+            %params ? (parameters => \%params) : (),
+        );
+        $self->_check_response($response, "log $short_class");
+
+        return $response->content;
+    }
+}
+
 1;
 
 __END__
@@ -674,7 +821,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.003
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -818,6 +965,61 @@ Compare the local L<IO::K8s> class definition against the cluster's OpenAPI sche
 
 Returns the comparison result from C<< IO::K8s::Resource->compare_to_schema >>.
 
+=head2 build_path
+
+    my $class = $api->expand_class('Pod');
+    my $path = $api->build_path($class, name => 'my-pod', namespace => 'default');
+    # => /api/v1/namespaces/default/pods/my-pod
+
+Build the REST API URL path for a resource class. Takes a fully-qualified class name (from L</expand_class>) and optional C<name>/C<namespace> arguments.
+
+This is a public API for async wrappers like L<Net::Async::Kubernetes> that need to construct request paths independently.
+
+=head2 prepare_request
+
+    my $req = $api->prepare_request('GET', $path,
+        parameters => \%params,
+        body       => \%body,
+    );
+
+Build a L<Kubernetes::REST::HTTPRequest> with method, full URL, authorization headers, and optional query parameters or JSON body.
+
+This is a public API for async wrappers that execute HTTP requests through their own event loop.
+
+=head2 check_response
+
+    $api->check_response($response, "get Pod");
+
+Validate an HTTP response. Croaks with a descriptive error if the status code is >= 400. Returns the response on success.
+
+=head2 inflate_object
+
+    my $pod = $api->inflate_object($class, $response);
+
+Decode the JSON response body and inflate it into a typed L<IO::K8s> object.
+
+=head2 inflate_list
+
+    my $list = $api->inflate_list($class, $response);
+
+Decode the JSON response body and inflate the C<items> array into an L<IO::K8s::List> of typed objects.
+
+=head2 process_watch_chunk
+
+    my @results = $api->process_watch_chunk($class, \$buffer, $chunk);
+
+Process a chunk of NDJSON watch data. Appends the chunk to the buffer, extracts complete lines, and returns a list of hashrefs with C<event> (L<Kubernetes::REST::WatchEvent>), C<resourceVersion>, C<is_error>, and C<error_code>.
+
+This is a public API for async wrappers that handle streaming watch responses through their own event loop.
+
+=head2 process_log_chunk
+
+    my @events = $api->process_log_chunk(\$buffer, $chunk);
+
+Process a chunk of plain-text log data. Appends the chunk to the buffer, extracts complete lines, and returns a list of L<Kubernetes::REST::LogEvent> objects.
+
+This is a public API for async wrappers that handle streaming log responses through their own event loop.
+
 =head2 list
 
     my $list = $api->list('Pod', namespace => 'default');
@@ -908,6 +1110,32 @@ Watch for changes to resources. Uses the Kubernetes Watch API with chunked trans
 Returns the last C<resourceVersion> seen. Croaks on 410 Gone (resourceVersion too old).
 
 See L<Kubernetes::REST/watch> for detailed documentation and resumable watch patterns.
+
+=head2 log
+
+    # One-shot: get full log as string
+    my $text = $api->log('Pod', 'my-pod',
+        namespace => 'default',
+        tailLines => 100,
+    );
+
+    # Streaming: callback per log line
+    $api->log('Pod', 'my-pod',
+        namespace => 'default',
+        follow    => 1,
+        on_line   => sub {
+            my ($event) = @_;  # Kubernetes::REST::LogEvent
+            say $event->line;
+        },
+    );
+
+Retrieve logs from a pod. Supports two modes:
+
+B<One-shot> (without C<on_line>): Returns the full log text as a string.
+
+B<Streaming> (with C<on_line>): Calls the callback for each log line with a L<Kubernetes::REST::LogEvent> object. Blocks until the stream ends (or the server closes the connection).
+
+The streaming mode is designed for event-based systems like L<IO::Async> — see L<Net::Async::Kubernetes> for async integration.
 
 =head1 NAME
 
@@ -1221,12 +1449,99 @@ B<Resumable watch pattern:>
 Returns the last C<resourceVersion> seen. Croaks on 410 Gone with a
 message to re-list.
 
+=head2 log($class, $name, %args)
+
+Retrieve logs from a pod. Two modes:
+
+B<One-shot> (without C<on_line>): Returns the full log text as a string.
+
+    my $text = $api->log('Pod', 'my-pod',
+        namespace => 'default',
+        tailLines => 100,
+    );
+
+B<Streaming> (with C<on_line>): Calls the callback for each log line with a
+L<Kubernetes::REST::LogEvent> object. Blocks until the stream ends.
+
+    $api->log('Pod', 'my-pod',
+        namespace => 'default',
+        follow    => 1,
+        on_line   => sub {
+            my ($event) = @_;
+            say $event->line;
+        },
+    );
+
+B<Optional arguments:>
+
+=over 4
+
+=item container - Container name (for multi-container pods)
+
+=item follow - Stream logs (like C<kubectl logs -f>)
+
+=item tailLines - Number of lines from the end to show
+
+=item sinceSeconds - Logs from the last N seconds
+
+=item sinceTime - Logs since RFC3339 timestamp
+
+=item timestamps - Prepend timestamps to each line
+
+=item previous - Logs from the previous container restart
+
+=item limitBytes - Byte limit for the response
+
+=back
+
 =head2 fetch_resource_map()
 
 Fetch the resource map from the cluster's OpenAPI spec (/openapi/v2 endpoint).
 Returns a hashref mapping short resource names (e.g., "Pod") to full IO::K8s
 class paths. This method is called automatically if C<resource_map_from_cluster>
 is enabled.
+
+=head1 BUILDING BLOCKS FOR ASYNC WRAPPERS
+
+Async wrappers like L<Net::Async::Kubernetes> need access to the request/response
+pipeline without going through the synchronous convenience methods. The following
+public methods provide this:
+
+=over 4
+
+=item * C<expand_class($short)> - Resolve short name to full class
+
+=item * C<build_path($class, %args)> - Build REST API URL path
+
+=item * C<prepare_request($method, $path, %opts)> - Build HTTP request with auth
+
+=item * C<check_response($response, $context)> - Validate HTTP status
+
+=item * C<inflate_object($class, $response)> - JSON to typed object
+
+=item * C<inflate_list($class, $response)> - JSON to typed list
+
+=item * C<process_watch_chunk($class, \$buf, $chunk)> - Parse NDJSON watch stream
+
+=item * C<process_log_chunk(\$buf, $chunk)> - Parse plain-text log stream
+
+=back
+
+Example async integration:
+
+    # Build request using Kubernetes::REST
+    my $class = $rest->expand_class('Pod');
+    my $path = $rest->build_path($class, name => $name, namespace => $ns) . '/log';
+    my $req = $rest->prepare_request('GET', $path, parameters => { follow => 'true' });
+
+    # Execute through your own event loop
+    my $buffer = '';
+    $async_http->request($req->url, sub {
+        my ($chunk) = @_;
+        for my $event ($rest->process_log_chunk(\$buffer, $chunk)) {
+            $on_line->($event);
+        }
+    });
 
 =head1 PLUGGABLE IO ARCHITECTURE
 
@@ -1237,13 +1552,16 @@ without changing any API logic.
 
 The pipeline for each API call:
 
-    1. _prepare_request()    - builds HTTPRequest (method, url, headers, body)
-    2. io->call()            - executes request (pluggable backend)
-    3. _check_response()     - validates HTTP status
-    4. _inflate_object/list  - decodes JSON + inflates IO::K8s objects
+    1. prepare_request()    - builds HTTPRequest (method, url, headers, body)
+    2. io->call()           - executes request (pluggable backend)
+    3. check_response()     - validates HTTP status
+    4. inflate_object/list  - decodes JSON + inflates IO::K8s objects
 
 For watch, step 2 uses C<io-E<gt>call_streaming()> and step 4 uses
-C<_process_watch_chunk()> which parses NDJSON and inflates each event.
+C<process_watch_chunk()> which parses NDJSON and inflates each event.
+
+For log, step 2 uses C<io-E<gt>call_streaming()> and step 4 uses
+C<process_log_chunk()> which parses plain-text lines into L<Kubernetes::REST::LogEvent> objects.
 
 To implement a custom IO backend, consume L<Kubernetes::REST::Role::IO>
 and implement C<call($req)> and C<call_streaming($req, $callback)>.
@@ -1293,6 +1611,8 @@ reference implementations.
 =over
 
 =item * L<Kubernetes::REST::WatchEvent> - Watch event object
+
+=item * L<Kubernetes::REST::LogEvent> - Log event object
 
 =item * L<Kubernetes::REST::HTTPRequest> - HTTP request object
 

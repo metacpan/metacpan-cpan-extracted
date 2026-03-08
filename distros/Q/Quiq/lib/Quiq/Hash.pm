@@ -63,7 +63,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.235';
+our $VERSION = '1.236';
 
 use Scalar::Util ();
 use Quiq::Stacktrace;
@@ -1766,7 +1766,7 @@ Das Benchmark-Programm (bench-hash):
 
 =head1 VERSION
 
-1.235
+1.236
 
 =head1 AUTHOR
 

@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.90;
+package Term::ANSIEncode 1.94;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -59,32 +59,35 @@ BEGIN {
     our @EXPORT_OK = qw(ansi_colors);
 } ## end BEGIN
 
-our $VERSION = '1.90';
+our $VERSION = '1.94';
 
 # Package-level caches so large tables are built only once per process.
 our $GLOBAL_ANSI_META = _global_ansi_meta();
 
 # Table of styles. Each entry is [tl,tr,bl,br,top,bot,vl,vr]
 our %STYLES = (
-    DEFAULT       => ['╔', '╗', '╚', '╝', '═', '═', '║', '║'],
-    THIN          => ['┌', '┐', '└', '┘', '─', '─', '│', '│'],
-    ROUND         => ['╭', '╮', '╰', '╯', '─', '─', '│', '│'],
-    THICK         => ['┏', '┓', '┗', '┛', '━', '━', '┃', '┃'],
-    BLOCK         => ['🬚', '🬩', '🬌', '🬍', '🬋', '🬋', '▌', '▐'],
-    WEDGE         => ['🭊', '🬿', '🭥', '🭚', '▅', '🮄', '█', '█'],
-    'BIG WEDGE'   => ['◢', '◣', '◥', '◤', '█', '█', '█', '█'],
-    DOTS          => ['🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄'],
-    DIAMOND       => ['⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫'],
-    STAR          => ['⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑'],
-    CIRCLE        => ['○', '○', '○', '○', '○', '○', '○', '○'],
-    SQUARE        => ['∎', '∎', '∎', '∎', '∎', '∎', '∎', '∎'],
-    DITHERED      => ['▒', '▒', '▒', '▒', '▒', '▒', '▒', '▒'],
-    HEART         => ['♥', '♥', '♥', '♥', '♥', '♥', '♥', '♥'],
-    CHRISTIAN     => ['🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇'],
-    NOTES         => ['♪', '♪', '♪', '♪', '♪', '♪', '♪', '♪'],
-    PARALLELOGRAM => ['▰', '▰', '▰', '▰', '▰', '▰', '▰', '▰'],
-    'BIG ARROWS'  => ['▶', '▶', '◀', '◀', '▶', '◀', '▲', '▼'],
-    ARROWS        => ['🡕', '🡖', '🡔', '🡗', '🡒', '🡐', '🡑', '🡓'],
+    DEFAULT          => ['╔', '╗', '╚', '╝', '═', '═', '║', '║'],
+    THIN             => ['┌', '┐', '└', '┘', '─', '─', '│', '│'],
+    ROUND            => ['╭', '╮', '╰', '╯', '─', '─', '│', '│'],
+    THICK            => ['┏', '┓', '┗', '┛', '━', '━', '┃', '┃'],
+    BLOCK            => ['🬚', '🬩', '🬌', '🬍', '🬋', '🬋', '▌', '▐'],
+    WEDGE            => ['🭊', '🬿', '🭥', '🭚', '▅', '🮄', '█', '█'],
+    'BIG WEDGE'      => ['◢', '◣', '◥', '◤', '█', '█', '█', '█'],
+    DOTS             => ['🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄'],
+    DIAMOND          => ['⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫'],
+    STAR             => ['⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑'],
+    CIRCLE           => ['○', '○', '○', '○', '○', '○', '○', '○'],
+    SQUARE           => ['∎', '∎', '∎', '∎', '∎', '∎', '∎', '∎'],
+    DITHERED         => ['▒', '▒', '▒', '▒', '▒', '▒', '▒', '▒'],
+    HEART            => ['♥', '♥', '♥', '♥', '♥', '♥', '♥', '♥'],
+    CHRISTIAN        => ['🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇'],
+    NOTES            => ['♪', '♪', '♪', '♪', '♪', '♪', '♪', '♪'],
+    PARALLELOGRAM    => ['▰', '▰', '▰', '▰', '▰', '▰', '▰', '▰'],
+    'BIG ARROWS'     => ['▶', '▶', '◀', '◀', '▶', '◀', '▲', '▼'],
+    ARROWS           => ['🡕', '🡖', '🡔', '🡗', '🡒', '🡐', '🡑', '🡓'],
+	ARROWHEADS       => ['🠉', '🠋', '🠉', '🠋', '🠊', '🠈', '🠉', '🠋'],
+	'FAT ARROWHEADS' => ['🡅', '🡇', '🡅', '🡇', '🡆', '🡄', '🡅', '🡇'],
+	SOLID            => ['█', '█', '█', '█', '█', '█', '█', '█'],
 );
 
 sub new {
@@ -248,7 +251,7 @@ TOKENS
                 }
                 foreach my $name (@names) {
                     if ($self->_type($self->{'ansi_meta'}->{'foreground'}->{$name}->{'out'}) eq $code) {
-                        if ($name =~ /^(DEFAULT|NAVY|COLOR 16|COLOR 17|BLACK|MEDIUM BLUE|ARMY GREEN|BISTRE|BULGARIAN ROSE|CHARCOAL|COOL BLACK|DARK BLUE|DARK GREEN|DARK JUNGLE GREEN|DARK MIDNIGHT BLUE|DUKE BLUE|EGYPTIAN BLUE|MEDIUM JUNGLE GREEN|MIDNIGHT BLUE|NAVY BLUE|ONYX|OXFORD BLUE|PHTHALO BLUE|PHTHALO GREEN|PRUSSIAN BLUE|SAINT PATRICK BLUE|SEAL BROWN|SMOKEY BLACK|ULTRAMARINE|ZINNWALDITE BROWN)$/) {
+                        if ($name =~ /^(DEFAULT|NAVY|GRAY [0-9]|COLOR 1[6-8]|BLACK|MEDIUM BLUE|ARMY GREEN|BISTRE|BULGARIAN ROSE|CHARCOAL|COOL BLACK|DARK BLUE|DARK GREEN|DARK JUNGLE GREEN|DARK MIDNIGHT BLUE|DUKE BLUE|EGYPTIAN BLUE|MEDIUM JUNGLE GREEN|MIDNIGHT BLUE|NAVY BLUE|ONYX|OXFORD BLUE|PHTHALO BLUE|PHTHALO GREEN|PRUSSIAN BLUE|SAINT PATRICK BLUE|SEAL BROWN|SMOKEY BLACK|ULTRAMARINE|ZINNWALDITE BROWN)$/) {
                             $to .= $bar . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]│' . sprintf(' %-38s ',$self->ansi_description('foreground',$name)) . "$bar\n";
                         } else {
                             $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]' . $bar . sprintf(' %-38s ',$self->ansi_description('foreground',$name)) . "$bar\n";
@@ -286,6 +289,9 @@ TOKENS
         $to .= "$bar " . sprintf('%34s','') . " $bar " . sprintf('%-38s',       'PARALLELOGRAM') . " $bar\n";
         $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s', '') . " $bar\n";
         $to .= "$bar " . sprintf('%-34s','ENDBOX') . " $bar " . sprintf('%-38s', 'Ends the BOX token function') . " $bar\n";
+        $to .= '[% BRIGHT CYAN %]│ ' . '─' x 34 . " $bar [% BRIGHT CYAN %]" . '─' x 38 . ' │[% RESET %]' . "\n";
+		$to .= "$bar " . sprintf('%-34s','SPACES count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of spaces') . " $bar\n";
+		$to .= "$bar " . sprintf('%-34s','CHAR character,count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of "character"') . " $bar\n";
     }
     $to .= '[% BRIGHT GREEN %]╰' . '─' x 36 . '┴' . '─' x 40 . '╯[% RESET %]' . "\n";
 
@@ -295,6 +301,9 @@ TOKENS
 
         $new = '[% FAINT %][% ITALIC %] color     [% RESET %]';
         $to =~ s/ color     /$new/gs;
+
+		$new = '[% FAINT %][% ITALIC %]character[% RESET %],[% FAINT %][% ITALIC %]count[% RESET %]';
+        $to =~ s/character,count/$new/gs;
 
         $new = '[% FAINT %][% ITALIC %] count     [% RESET %]';
         $to =~ s/ count     /$new/gs;
@@ -334,7 +343,7 @@ sub _add_row {
 
     my $text = '';
     my $format  = Text::Format->new(
-		'columns'     => 37,
+		'columns'     => 38,
 		'tabstop'     => 4,
 		'extraSpace'  => TRUE,
 		'firstIndent' => 0,
@@ -422,13 +431,13 @@ sub ansi_colors {
     my $grey   = '[% GRAY 8 %]';
     my $off    = '[% RESET %]';
     my $w      = 9;
-    my $string = '[% CLS %][% BRIGHT YELLOW %] 3 BIT     [% RESET %]';
+    my $string = '[% CLS %][% BRIGHT YELLOW %][% BOLD %] 3 BIT     [% RESET %]';
     if ($params->{'4 BIT'}) {
-        $string .= '[% BRIGHT YELLOW %]4 BIT            [% RESET %]';
+        $string .= '[% BRIGHT YELLOW %][% BOLD %]4 BIT            [% RESET %]';
         $w = 26;
     }
     if ($params-> {'24 BIT'}) {
-        $string .= '[% BRIGHT YELLOW %]24 BIT[% RESET %]';
+        $string .= '[% BRIGHT YELLOW %][% BOLD %]24 BIT[% RESET %]';
         $w = 59;
     }
     $string .= "\n" . '━' x $w . "\n";
@@ -484,7 +493,7 @@ sub ansi_colors {
         }
     } ## end foreach my $color (@colors)
 
-    $string .= "\n[% BRIGHT YELLOW %] 8 BIT$off\n" . ('─' x 60) . _generate_8bit_colors() if (defined($params) && $params->{'8 BIT'});
+    $string .= "\n[% BRIGHT YELLOW %][% BOLD %] 8 BIT$off\n" . ('─' x 60) . _generate_8bit_colors() if (defined($params) && $params->{'8 BIT'});
     return ($string);
 } ## end sub ansi_colors
 
@@ -516,7 +525,7 @@ sub _generate_8bit_colors {
         my $_i = ($i * 36) + 40;     # 16, 28, 40
         $output .= "\n";
         if ($i == 6) {
-            $output .= "\n\[\% BRIGHT YELLOW \%\] GRAY \[\% RESET \%\]\n";
+            $output .= "\n\[\% BRIGHT YELLOW \%\]\[\% BOLD \%\] GRAY \[\% RESET \%\]\n";
         }
         foreach my $j (0 .. 11) {    # 35
             if (($_i + $j) <= 21) {
@@ -526,7 +535,7 @@ sub _generate_8bit_colors {
             }
         } ## end foreach my $j (0 .. 11)
     } ## end foreach my $i (0 .. 6)
-    $output .= "\n" . '[% BRIGHT YELLOW %] GRAY[% RESET %]' . "\n";
+    $output .= "\n" . '[% BRIGHT YELLOW %][% BOLD %] GRAY[% RESET %]' . "\n";
     foreach my $count (0 .. 23) {
         if ($count < 12) {
             $output .= '[% WHITE %][% B_GRAY ' . $count . ' %]' . sprintf(' %3d ', $count) . '[% RESET %]';
@@ -765,6 +774,8 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SS2' => { 'out' => $esc . 'N',  'desc' => 'Single Shift 2' },
             'SS3' => { 'out' => $esc . 'O',  'desc' => 'Single Shift 3' },
             'ST'  => { 'out' => $esc . "\\", 'desc' => 'String Terminator' },
+#           SPACES count
+#           CHAR count
         },
 
         'clear' => {
@@ -836,7 +847,6 @@ sub _global_ansi_meta {    # prefills the hash cache
         'foreground' => {
             'AIR FORCE BLUE'                => { 'out' => $csi . '38;2;93;138;168m',  'desc' => 'Air Force blue' },
             'ALICE BLUE'                    => { 'out' => $csi . '38;2;240;248;255m', 'desc' => 'Alice blue' },
-            'ALICE BLUE'                    => { 'out' => $csi . '38;2;240;248;255m', 'desc' => 'Alice blue' },
             'ALIZARIN CRIMSON'              => { 'out' => $csi . '38;2;227;38;54m',   'desc' => 'Alizarin crimson' },
             'ALMOND'                        => { 'out' => $csi . '38;2;239;222;205m', 'desc' => 'Almond' },
             'AMARANTH'                      => { 'out' => $csi . '38;2;229;43;80m',   'desc' => 'Amaranth' },
@@ -847,7 +857,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'ANTI-FLASH WHITE'              => { 'out' => $csi . '38;2;242;243;244m', 'desc' => 'Anti-flash white' },
             'ANTIQUE BRASS'                 => { 'out' => $csi . '38;2;205;149;117m', 'desc' => 'Antique brass' },
             'ANTIQUE FUCHSIA'               => { 'out' => $csi . '38;2;145;92;131m',  'desc' => 'Antique fuchsia' },
-            'ANTIQUE WHITE'                 => { 'out' => $csi . '38;2;250;235;215m', 'desc' => 'Antique white' },
             'ANTIQUE WHITE'                 => { 'out' => $csi . '38;2;250;235;215m', 'desc' => 'Antique white' },
             'AO'                            => { 'out' => $csi . '38;2;0;128;0m',     'desc' => 'Ao' },
             'APPLE GREEN'                   => { 'out' => $csi . '38;2;141;182;0m',   'desc' => 'Apple green' },
@@ -866,7 +875,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'AUROMETALSAURUS'               => { 'out' => $csi . '38;2;110;127;128m', 'desc' => 'AuroMetalSaurus' },
             'AWESOME'                       => { 'out' => $csi . '38;2;255;32;82m',   'desc' => 'Awesome' },
             'AZURE'                         => { 'out' => $csi . '38;2;0;127;255m',   'desc' => 'Azure' },
-            'AZURE'                         => { 'out' => $csi . '38;2;240;255;255m', 'desc' => 'Azure' },
             'AZURE MIST'                    => { 'out' => $csi . '38;2;240;255;255m', 'desc' => 'Azure mist' },
             'BABY BLUE'                     => { 'out' => $csi . '38;2;137;207;240m', 'desc' => 'Baby blue' },
             'BABY BLUE EYES'                => { 'out' => $csi . '38;2;161;202;241m', 'desc' => 'Baby blue eyes' },
@@ -879,14 +887,11 @@ sub _global_ansi_meta {    # prefills the hash cache
             'BEAU BLUE'                     => { 'out' => $csi . '38;2;188;212;230m', 'desc' => 'Beau blue' },
             'BEAVER'                        => { 'out' => $csi . '38;2;159;129;112m', 'desc' => 'Beaver' },
             'BEIGE'                         => { 'out' => $csi . '38;2;245;245;220m', 'desc' => 'Beige' },
-            'BEIGE'                         => { 'out' => $csi . '38;2;245;245;220m', 'desc' => 'Beige' },
-            'BISQUE'                        => { 'out' => $csi . '38;2;255;228;196m', 'desc' => 'Bisque' },
             'BISQUE'                        => { 'out' => $csi . '38;2;255;228;196m', 'desc' => 'Bisque' },
             'BISTRE'                        => { 'out' => $csi . '38;2;61;43;31m',    'desc' => 'Bistre' },
             'BITTERSWEET'                   => { 'out' => $csi . '38;2;254;111;94m',  'desc' => 'Bittersweet' },
             'BLACK'                         => { 'out' => $csi . '30m',               'desc' => 'Black' },
             'BLANCHED ALMOND'               => { 'out' => $csi . '38;2;255;235;205m', 'desc' => 'Blanched almond' },
-            'BLANCHED ALMOND'               => { 'out' => $csi . '38;2;255;235;205m', 'desc' => 'Blanched Almond' },
             'BLEU DE FRANCE'                => { 'out' => $csi . '38;2;49;140;231m',  'desc' => 'Bleu de France' },
             'BLIZZARD BLUE'                 => { 'out' => $csi . '38;2;172;229;238m', 'desc' => 'Blizzard Blue' },
             'BLOND'                         => { 'out' => $csi . '38;2;250;240;190m', 'desc' => 'Blond' },
@@ -895,7 +900,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'BLUE GRAY'                     => { 'out' => $csi . '38;2;102;153;204m', 'desc' => 'Blue Gray' },
             'BLUE GREEN'                    => { 'out' => $csi . '38;2;13;152;186m',  'desc' => 'Blue green' },
             'BLUE PURPLE'                   => { 'out' => $csi . '38;2;138;43;226m',  'desc' => 'Blue purple' },
-            'BLUE VIOLET'                   => { 'out' => $csi . '38;2;138;43;226m',  'desc' => 'Blue violet' },
             'BLUE VIOLET'                   => { 'out' => $csi . '38;2;138;43;226m',  'desc' => 'Blue violet' },
             'BLUSH'                         => { 'out' => $csi . '38;2;222;93;131m',  'desc' => 'Blush' },
             'BOLE'                          => { 'out' => $csi . '38;2;121;68;59m',   'desc' => 'Bole' },
@@ -911,7 +915,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'BRIGHT BLUE'                   => { 'out' => $csi . '94m',               'desc' => 'Bright blue' },
             'BRIGHT CERULEAN'               => { 'out' => $csi . '38;2;29;172;214m',  'desc' => 'Bright cerulean' },
             'BRIGHT CYAN'                   => { 'out' => $csi . '96m',               'desc' => 'Bright cyan' },
-            'BRIGHT GREEN'                  => { 'out' => $csi . '38;2;102;255;0m',   'desc' => 'Bright green' },
             'BRIGHT GREEN'                  => { 'out' => $csi . '92m',               'desc' => 'Bright green' },
             'BRIGHT LAVENDER'               => { 'out' => $csi . '38;2;191;148;228m', 'desc' => 'Bright lavender' },
             'BRIGHT MAGENTA'                => { 'out' => $csi . '95m',               'desc' => 'Bright magenta' },
@@ -928,7 +931,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'BRITISH RACING GREEN'          => { 'out' => $csi . '38;2;0;66;37m',     'desc' => 'British racing green' },
             'BRONZE'                        => { 'out' => $csi . '38;2;205;127;50m',  'desc' => 'Bronze' },
             'BROWN'                         => { 'out' => $csi . '38;2;165;42;42m',   'desc' => 'Brown' },
-            'BROWN'                         => { 'out' => $csi . '38;2;165;42;42m',   'desc' => 'Brown' },
             'BUBBLE GUM'                    => { 'out' => $csi . '38;2;255;193;204m', 'desc' => 'Bubble gum' },
             'BUBBLES'                       => { 'out' => $csi . '38;2;231;254;255m', 'desc' => 'Bubbles' },
             'BUFF'                          => { 'out' => $csi . '38;2;240;220;130m', 'desc' => 'Buff' },
@@ -942,7 +944,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'BYZANTINE'                     => { 'out' => $csi . '38;2;189;51;164m',  'desc' => 'Byzantine' },
             'BYZANTIUM'                     => { 'out' => $csi . '38;2;112;41;99m',   'desc' => 'Byzantium' },
             'CADET'                         => { 'out' => $csi . '38;2;83;104;114m',  'desc' => 'Cadet' },
-            'CADET BLUE'                    => { 'out' => $csi . '38;2;95;158;160m',  'desc' => 'Cadet blue' },
             'CADET BLUE'                    => { 'out' => $csi . '38;2;95;158;160m',  'desc' => 'Cadet blue' },
             'CADET GRAY'                    => { 'out' => $csi . '38;2;145;163;176m', 'desc' => 'Cadet grey' },
             'CADMIUM GREEN'                 => { 'out' => $csi . '38;2;0;107;60m',    'desc' => 'Cadmium green' },
@@ -983,11 +984,9 @@ sub _global_ansi_meta {    # prefills the hash cache
             'CHAMPAGNE'                     => { 'out' => $csi . '38;2;250;214;165m', 'desc' => 'Champagne' },
             'CHARCOAL'                      => { 'out' => $csi . '38;2;54;69;79m',    'desc' => 'Charcoal' },
             'CHARTREUSE'                    => { 'out' => $csi . '38;2;127;255;0m',   'desc' => 'Chartreuse' },
-            'CHARTREUSE'                    => { 'out' => $csi . '38;2;127;255;0m',   'desc' => 'Chartreuse' },
             'CHERRY'                        => { 'out' => $csi . '38;2;222;49;99m',   'desc' => 'Cherry' },
             'CHERRY BLOSSOM PINK'           => { 'out' => $csi . '38;2;255;183;197m', 'desc' => 'Cherry blossom pink' },
             'CHESTNUT'                      => { 'out' => $csi . '38;2;205;92;92m',   'desc' => 'Chestnut' },
-            'CHOCOLATE'                     => { 'out' => $csi . '38;2;210;105;30m',  'desc' => 'Chocolate' },
             'CHOCOLATE'                     => { 'out' => $csi . '38;2;210;105;30m',  'desc' => 'Chocolate' },
             'CHROME YELLOW'                 => { 'out' => $csi . '38;2;255;167;0m',   'desc' => 'Chrome yellow' },
             'CINEREOUS'                     => { 'out' => $csi . '38;2;152;129;123m', 'desc' => 'Cinereous' },
@@ -1005,7 +1004,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'COPPER ROSE'                   => { 'out' => $csi . '38;2;153;102;102m', 'desc' => 'Copper rose' },
             'COQUELICOT'                    => { 'out' => $csi . '38;2;255;56;0m',    'desc' => 'Coquelicot' },
             'CORAL'                         => { 'out' => $csi . '38;2;255;127;80m',  'desc' => 'Coral' },
-            'CORAL'                         => { 'out' => $csi . '38;2;255;127;80m',  'desc' => 'Coral' },
             'CORAL PINK'                    => { 'out' => $csi . '38;2;248;131;121m', 'desc' => 'Coral pink' },
             'CORAL RED'                     => { 'out' => $csi . '38;2;255;64;64m',   'desc' => 'Coral red' },
             'CORDOVAN'                      => { 'out' => $csi . '38;2;137;63;69m',   'desc' => 'Cordovan' },
@@ -1020,13 +1018,11 @@ sub _global_ansi_meta {    # prefills the hash cache
             'COTTON CANDY'                  => { 'out' => $csi . '38;2;255;188;217m', 'desc' => 'Cotton candy' },
             'CREAM'                         => { 'out' => $csi . '38;2;255;253;208m', 'desc' => 'Cream' },
             'CRIMSON'                       => { 'out' => $csi . '38;2;220;20;60m',   'desc' => 'Crimson' },
-            'CRIMSON'                       => { 'out' => $csi . '38;2;220;20;60m',   'desc' => 'Crimson' },
             'CRIMSON GLORY'                 => { 'out' => $csi . '38;2;190;0;50m',    'desc' => 'Crimson glory' },
             'CRIMSON RED'                   => { 'out' => $csi . '38;2;153;0;0m',     'desc' => 'Crimson Red' },
             'CYAN'                          => { 'out' => $csi . '36m',               'desc' => 'Cyan' },
             'DAFFODIL'                      => { 'out' => $csi . '38;2;255;255;49m',  'desc' => 'Daffodil' },
             'DANDELION'                     => { 'out' => $csi . '38;2;240;225;48m',  'desc' => 'Dandelion' },
-            'DARK BLUE'                     => { 'out' => $csi . '38;2;0;0;139m',     'desc' => 'Dark blue' },
             'DARK BLUE'                     => { 'out' => $csi . '38;2;0;0;139m',     'desc' => 'Dark blue' },
             'DARK BROWN'                    => { 'out' => $csi . '38;2;101;67;33m',   'desc' => 'Dark brown' },
             'DARK BYZANTIUM'                => { 'out' => $csi . '38;2;93;57;84m',    'desc' => 'Dark byzantium' },
@@ -1035,27 +1031,20 @@ sub _global_ansi_meta {    # prefills the hash cache
             'DARK CHESTNUT'                 => { 'out' => $csi . '38;2;152;105;96m',  'desc' => 'Dark chestnut' },
             'DARK CORAL'                    => { 'out' => $csi . '38;2;205;91;69m',   'desc' => 'Dark coral' },
             'DARK CYAN'                     => { 'out' => $csi . '38;2;0;139;139m',   'desc' => 'Dark cyan' },
-            'DARK CYAN'                     => { 'out' => $csi . '38;2;0;139;139m',   'desc' => 'Dark cyan' },
             'DARK ELECTRIC BLUE'            => { 'out' => $csi . '38;2;83;104;120m',  'desc' => 'Dark electric blue' },
             'DARK GOLDEN ROD'               => { 'out' => $csi . '38;2;184;134;11m',  'desc' => 'Dark golden rod' },
             'DARK GOLDENROD'                => { 'out' => $csi . '38;2;184;134;11m',  'desc' => 'Dark goldenrod' },
             'DARK GRAY'                     => { 'out' => $csi . '38;2;169;169;169m', 'desc' => 'Dark gray' },
-            'DARK GRAY'                     => { 'out' => $csi . '38;2;169;169;169m', 'desc' => 'Dark gray' },
             'DARK GREEN'                    => { 'out' => $csi . '38;2;0;100;0m',     'desc' => 'Dark green' },
-            'DARK GREEN'                    => { 'out' => $csi . '38;2;1;50;32m',     'desc' => 'Dark green' },
             'DARK JUNGLE GREEN'             => { 'out' => $csi . '38;2;26;36;33m',    'desc' => 'Dark jungle green' },
-            'DARK KHAKI'                    => { 'out' => $csi . '38;2;189;183;107m', 'desc' => 'Dark khaki' },
             'DARK KHAKI'                    => { 'out' => $csi . '38;2;189;183;107m', 'desc' => 'Dark khaki' },
             'DARK LAVA'                     => { 'out' => $csi . '38;2;72;60;50m',    'desc' => 'Dark lava' },
             'DARK LAVENDER'                 => { 'out' => $csi . '38;2;115;79;150m',  'desc' => 'Dark lavender' },
-            'DARK MAGENTA'                  => { 'out' => $csi . '38;2;139;0;139m',   'desc' => 'Dark magenta' },
             'DARK MAGENTA'                  => { 'out' => $csi . '38;2;139;0;139m',   'desc' => 'Dark magenta' },
             'DARK MIDNIGHT BLUE'            => { 'out' => $csi . '38;2;0;51;102m',    'desc' => 'Dark midnight blue' },
             'DARK OLIVE GREEN'              => { 'out' => $csi . '38;2;85;107;47m',   'desc' => 'Dark olive green' },
             'DARK OLIVE GREEN'              => { 'out' => $csi . '38;2;85;107;47m',   'desc' => 'Dark olive green' },
             'DARK ORANGE'                   => { 'out' => $csi . '38;2;255;140;0m',   'desc' => 'Dark orange' },
-            'DARK ORANGE'                   => { 'out' => $csi . '38;2;255;140;0m',   'desc' => 'Dark orange' },
-            'DARK ORCHID'                   => { 'out' => $csi . '38;2;153;50;204m',  'desc' => 'Dark orchid' },
             'DARK ORCHID'                   => { 'out' => $csi . '38;2;153;50;204m',  'desc' => 'Dark orchid' },
             'DARK PASTEL BLUE'              => { 'out' => $csi . '38;2;119;158;203m', 'desc' => 'Dark pastel blue' },
             'DARK PASTEL GREEN'             => { 'out' => $csi . '38;2;3;192;60m',    'desc' => 'Dark pastel green' },
@@ -1065,16 +1054,12 @@ sub _global_ansi_meta {    # prefills the hash cache
             'DARK POWDER BLUE'              => { 'out' => $csi . '38;2;0;51;153m',    'desc' => 'Dark powder blue' },
             'DARK RASPBERRY'                => { 'out' => $csi . '38;2;135;38;87m',   'desc' => 'Dark raspberry' },
             'DARK RED'                      => { 'out' => $csi . '38;2;139;0;0m',     'desc' => 'Dark red' },
-            'DARK RED'                      => { 'out' => $csi . '38;2;139;0;0m',     'desc' => 'Dark red' },
-            'DARK SALMON'                   => { 'out' => $csi . '38;2;233;150;122m', 'desc' => 'Dark salmon' },
             'DARK SALMON'                   => { 'out' => $csi . '38;2;233;150;122m', 'desc' => 'Dark salmon' },
             'DARK SCARLET'                  => { 'out' => $csi . '38;2;86;3;25m',     'desc' => 'Dark scarlet' },
             'DARK SEA GREEN'                => { 'out' => $csi . '38;2;143;188;143m', 'desc' => 'Dark sea green' },
             'DARK SEA GREEN'                => { 'out' => $csi . '38;2;143;188;143m', 'desc' => 'Dark sea green' },
             'DARK SIENNA'                   => { 'out' => $csi . '38;2;60;20;20m',    'desc' => 'Dark sienna' },
             'DARK SLATE BLUE'               => { 'out' => $csi . '38;2;72;61;139m',   'desc' => 'Dark slate blue' },
-            'DARK SLATE BLUE'               => { 'out' => $csi . '38;2;72;61;139m',   'desc' => 'Dark slate blue' },
-            'DARK SLATE GRAY'               => { 'out' => $csi . '38;2;47;79;79m',    'desc' => 'Dark slate gray' },
             'DARK SLATE GRAY'               => { 'out' => $csi . '38;2;47;79;79m',    'desc' => 'Dark slate gray' },
             'DARK SPRING GREEN'             => { 'out' => $csi . '38;2;23;114;69m',   'desc' => 'Dark spring green' },
             'DARK TAN'                      => { 'out' => $csi . '38;2;145;129;81m',  'desc' => 'Dark tan' },
@@ -1082,8 +1067,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'DARK TAUPE'                    => { 'out' => $csi . '38;2;72;60;50m',    'desc' => 'Dark taupe' },
             'DARK TERRA COTTA'              => { 'out' => $csi . '38;2;204;78;92m',   'desc' => 'Dark terra cotta' },
             'DARK TURQUOISE'                => { 'out' => $csi . '38;2;0;206;209m',   'desc' => 'Dark turquoise' },
-            'DARK TURQUOISE'                => { 'out' => $csi . '38;2;0;206;209m',   'desc' => 'Dark turquoise' },
-            'DARK VIOLET'                   => { 'out' => $csi . '38;2;148;0;211m',   'desc' => 'Dark violet' },
             'DARK VIOLET'                   => { 'out' => $csi . '38;2;148;0;211m',   'desc' => 'Dark violet' },
             'DARTMOUTH GREEN'               => { 'out' => $csi . '38;2;0;105;62m',    'desc' => 'Dartmouth green' },
             'DAVY GRAY'                     => { 'out' => $csi . '38;2;85;85;85m',    'desc' => 'Davy grey' },
@@ -1101,17 +1084,13 @@ sub _global_ansi_meta {    # prefills the hash cache
             'DEEP MAGENTA'                  => { 'out' => $csi . '38;2;204;0;204m',   'desc' => 'Deep magenta' },
             'DEEP PEACH'                    => { 'out' => $csi . '38;2;255;203;164m', 'desc' => 'Deep peach' },
             'DEEP PINK'                     => { 'out' => $csi . '38;2;255;20;147m',  'desc' => 'Deep pink' },
-            'DEEP PINK'                     => { 'out' => $csi . '38;2;255;20;147m',  'desc' => 'Deep pink' },
             'DEEP SAFFRON'                  => { 'out' => $csi . '38;2;255;153;51m',  'desc' => 'Deep saffron' },
-            'DEEP SKY BLUE'                 => { 'out' => $csi . '38;2;0;191;255m',   'desc' => 'Deep sky blue' },
             'DEEP SKY BLUE'                 => { 'out' => $csi . '38;2;0;191;255m',   'desc' => 'Deep sky blue' },
             'DEFAULT'                       => { 'out' => $csi . '39m',               'desc' => 'Default Foreground/Background Color' },
             'DENIM'                         => { 'out' => $csi . '38;2;21;96;189m',   'desc' => 'Denim' },
             'DESERT'                        => { 'out' => $csi . '38;2;193;154;107m', 'desc' => 'Desert' },
             'DESERT SAND'                   => { 'out' => $csi . '38;2;237;201;175m', 'desc' => 'Desert sand' },
             'DIM GRAY'                      => { 'out' => $csi . '38;2;105;105;105m', 'desc' => 'Dim gray' },
-            'DIM GRAY'                      => { 'out' => $csi . '38;2;105;105;105m', 'desc' => 'Dim gray' },
-            'DODGER BLUE'                   => { 'out' => $csi . '38;2;30;144;255m',  'desc' => 'Dodger blue' },
             'DODGER BLUE'                   => { 'out' => $csi . '38;2;30;144;255m',  'desc' => 'Dodger blue' },
             'DOGWOOD ROSE'                  => { 'out' => $csi . '38;2;215;24;104m',  'desc' => 'Dogwood rose' },
             'DOLLAR BILL'                   => { 'out' => $csi . '38;2;133;187;101m', 'desc' => 'Dollar bill' },
@@ -1148,18 +1127,15 @@ sub _global_ansi_meta {    # prefills the hash cache
             'FIELD DRAB'                    => { 'out' => $csi . '38;2;108;84;30m',   'desc' => 'Field drab' },
             'FIRE ENGINE RED'               => { 'out' => $csi . '38;2;206;32;41m',   'desc' => 'Fire engine red' },
             'FIREBRICK'                     => { 'out' => $csi . '38;2;178;34;34m',   'desc' => 'Firebrick' },
-            'FIREBRICK'                     => { 'out' => $csi . '38;2;178;34;34m',   'desc' => 'Firebrick' },
             'FLAME'                         => { 'out' => $csi . '38;2;226;88;34m',   'desc' => 'Flame' },
             'FLAMINGO PINK'                 => { 'out' => $csi . '38;2;252;142;172m', 'desc' => 'Flamingo pink' },
             'FLAVESCENT'                    => { 'out' => $csi . '38;2;247;233;142m', 'desc' => 'Flavescent' },
             'FLAX'                          => { 'out' => $csi . '38;2;238;220;130m', 'desc' => 'Flax' },
             'FLORAL WHITE'                  => { 'out' => $csi . '38;2;255;250;240m', 'desc' => 'Floral white' },
-            'FLORAL WHITE'                  => { 'out' => $csi . '38;2;255;250;240m', 'desc' => 'Floral white' },
             'FLUORESCENT ORANGE'            => { 'out' => $csi . '38;2;255;191;0m',   'desc' => 'Fluorescent orange' },
             'FLUORESCENT PINK'              => { 'out' => $csi . '38;2;255;20;147m',  'desc' => 'Fluorescent pink' },
             'FLUORESCENT YELLOW'            => { 'out' => $csi . '38;2;204;255;0m',   'desc' => 'Fluorescent yellow' },
             'FOLLY'                         => { 'out' => $csi . '38;2;255;0;79m',    'desc' => 'Folly' },
-            'FOREST GREEN'                  => { 'out' => $csi . '38;2;34;139;34m',   'desc' => 'Forest green' },
             'FOREST GREEN'                  => { 'out' => $csi . '38;2;34;139;34m',   'desc' => 'Forest green' },
             'FRENCH BEIGE'                  => { 'out' => $csi . '38;2;166;123;91m',  'desc' => 'French beige' },
             'FRENCH BLUE'                   => { 'out' => $csi . '38;2;0;114;187m',   'desc' => 'French blue' },
@@ -1170,14 +1146,11 @@ sub _global_ansi_meta {    # prefills the hash cache
             'FULVOUS'                       => { 'out' => $csi . '38;2;228;132;0m',   'desc' => 'Fulvous' },
             'FUZZY WUZZY'                   => { 'out' => $csi . '38;2;204;102;102m', 'desc' => 'Fuzzy Wuzzy' },
             'GAINSBORO'                     => { 'out' => $csi . '38;2;220;220;220m', 'desc' => 'Gainsboro' },
-            'GAINSBORO'                     => { 'out' => $csi . '38;2;220;220;220m', 'desc' => 'Gainsboro' },
             'GAMBOGE'                       => { 'out' => $csi . '38;2;228;155;15m',  'desc' => 'Gamboge' },
-            'GHOST WHITE'                   => { 'out' => $csi . '38;2;248;248;255m', 'desc' => 'Ghost white' },
             'GHOST WHITE'                   => { 'out' => $csi . '38;2;248;248;255m', 'desc' => 'Ghost white' },
             'GINGER'                        => { 'out' => $csi . '38;2;176;101;0m',   'desc' => 'Ginger' },
             'GLAUCOUS'                      => { 'out' => $csi . '38;2;96;130;182m',  'desc' => 'Glaucous' },
             'GLITTER'                       => { 'out' => $csi . '38;2;230;232;250m', 'desc' => 'Glitter' },
-            'GOLD'                          => { 'out' => $csi . '38;2;255;215;0m',   'desc' => 'Gold' },
             'GOLD'                          => { 'out' => $csi . '38;2;255;215;0m',   'desc' => 'Gold' },
             'GOLDEN BROWN'                  => { 'out' => $csi . '38;2;153;101;21m',  'desc' => 'Golden brown' },
             'GOLDEN POPPY'                  => { 'out' => $csi . '38;2;252;194;0m',   'desc' => 'Golden poppy' },
@@ -1189,7 +1162,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'GRAY ASPARAGUS'                => { 'out' => $csi . '38;2;70;89;69m',    'desc' => 'Gray asparagus' },
             'GREEN'                         => { 'out' => $csi . '32m',               'desc' => 'Green' },
             'GREEN BLUE'                    => { 'out' => $csi . '38;2;17;100;180m',  'desc' => 'Green Blue' },
-            'GREEN YELLOW'                  => { 'out' => $csi . '38;2;173;255;47m',  'desc' => 'Green yellow' },
             'GREEN YELLOW'                  => { 'out' => $csi . '38;2;173;255;47m',  'desc' => 'Green yellow' },
             'GRULLO'                        => { 'out' => $csi . '38;2;169;154;134m', 'desc' => 'Grullo' },
             'GUPPIE GREEN'                  => { 'out' => $csi . '38;2;0;255;127m',   'desc' => 'Guppie green' },
@@ -1204,26 +1176,21 @@ sub _global_ansi_meta {    # prefills the hash cache
             'HELIOTROPE'                    => { 'out' => $csi . '38;2;223;115;255m', 'desc' => 'Heliotrope' },
             'HOLLYWOOD CERISE'              => { 'out' => $csi . '38;2;244;0;161m',   'desc' => 'Hollywood cerise' },
             'HONEYDEW'                      => { 'out' => $csi . '38;2;240;255;240m', 'desc' => 'Honeydew' },
-            'HONEYDEW'                      => { 'out' => $csi . '38;2;240;255;240m', 'desc' => 'Honeydew' },
             'HOOKER GREEN'                  => { 'out' => $csi . '38;2;73;121;107m',  'desc' => 'Hooker green' },
             'HOT MAGENTA'                   => { 'out' => $csi . '38;2;255;29;206m',  'desc' => 'Hot magenta' },
-            'HOT PINK'                      => { 'out' => $csi . '38;2;255;105;180m', 'desc' => 'Hot pink' },
             'HOT PINK'                      => { 'out' => $csi . '38;2;255;105;180m', 'desc' => 'Hot pink' },
             'HUNTER GREEN'                  => { 'out' => $csi . '38;2;53;94;59m',    'desc' => 'Hunter green' },
             'ICTERINE'                      => { 'out' => $csi . '38;2;252;247;94m',  'desc' => 'Icterine' },
             'INCHWORM'                      => { 'out' => $csi . '38;2;178;236;93m',  'desc' => 'Inchworm' },
             'INDIA GREEN'                   => { 'out' => $csi . '38;2;19;136;8m',    'desc' => 'India green' },
             'INDIAN RED'                    => { 'out' => $csi . '38;2;205;92;92m',   'desc' => 'Indian red' },
-            'INDIAN RED'                    => { 'out' => $csi . '38;2;205;92;92m',   'desc' => 'Indian red' },
             'INDIAN YELLOW'                 => { 'out' => $csi . '38;2;227;168;87m',  'desc' => 'Indian yellow' },
-            'INDIGO'                        => { 'out' => $csi . '38;2;75;0;130m',    'desc' => 'Indigo' },
             'INDIGO'                        => { 'out' => $csi . '38;2;75;0;130m',    'desc' => 'Indigo' },
             'INTERNATIONAL KLEIN'           => { 'out' => $csi . '38;2;0;47;167m',    'desc' => 'International Klein' },
             'INTERNATIONAL ORANGE'          => { 'out' => $csi . '38;2;255;79;0m',    'desc' => 'International orange' },
             'IRIS'                          => { 'out' => $csi . '38;2;90;79;207m',   'desc' => 'Iris' },
             'ISABELLINE'                    => { 'out' => $csi . '38;2;244;240;236m', 'desc' => 'Isabelline' },
             'ISLAMIC GREEN'                 => { 'out' => $csi . '38;2;0;144;0m',     'desc' => 'Islamic green' },
-            'IVORY'                         => { 'out' => $csi . '38;2;255;255;240m', 'desc' => 'Ivory' },
             'IVORY'                         => { 'out' => $csi . '38;2;255;255;240m', 'desc' => 'Ivory' },
             'JADE'                          => { 'out' => $csi . '38;2;0;168;107m',   'desc' => 'Jade' },
             'JASMINE'                       => { 'out' => $csi . '38;2;248;222;126m', 'desc' => 'Jasmine' },
@@ -1233,7 +1200,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'JUNE BUD'                      => { 'out' => $csi . '38;2;189;218;87m',  'desc' => 'June bud' },
             'JUNGLE GREEN'                  => { 'out' => $csi . '38;2;41;171;135m',  'desc' => 'Jungle green' },
             'KELLY GREEN'                   => { 'out' => $csi . '38;2;76;187;23m',   'desc' => 'Kelly green' },
-            'KHAKI'                         => { 'out' => $csi . '38;2;195;176;145m', 'desc' => 'Khaki' },
             'KHAKI'                         => { 'out' => $csi . '38;2;240;230;140m', 'desc' => 'Khaki' },
             'KU CRIMSON'                    => { 'out' => $csi . '38;2;232;0;13m',    'desc' => 'KU Crimson' },
             'LA SALLE GREEN'                => { 'out' => $csi . '38;2;8;120;48m',    'desc' => 'La Salle Green' },
@@ -1243,9 +1209,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'LAUREL GREEN'                  => { 'out' => $csi . '38;2;169;186;157m', 'desc' => 'Laurel green' },
             'LAVA'                          => { 'out' => $csi . '38;2;207;16;32m',   'desc' => 'Lava' },
             'LAVENDER'                      => { 'out' => $csi . '38;2;230;230;250m', 'desc' => 'Lavender' },
-            'LAVENDER'                      => { 'out' => $csi . '38;2;230;230;250m', 'desc' => 'Lavender' },
             'LAVENDER BLUE'                 => { 'out' => $csi . '38;2;204;204;255m', 'desc' => 'Lavender blue' },
-            'LAVENDER BLUSH'                => { 'out' => $csi . '38;2;255;240;245m', 'desc' => 'Lavender blush' },
             'LAVENDER BLUSH'                => { 'out' => $csi . '38;2;255;240;245m', 'desc' => 'Lavender blush' },
             'LAVENDER GRAY'                 => { 'out' => $csi . '38;2;196;195;208m', 'desc' => 'Lavender gray' },
             'LAVENDER INDIGO'               => { 'out' => $csi . '38;2;148;87;235m',  'desc' => 'Lavender indigo' },
@@ -1255,54 +1219,39 @@ sub _global_ansi_meta {    # prefills the hash cache
             'LAVENDER PURPLE'               => { 'out' => $csi . '38;2;150;123;182m', 'desc' => 'Lavender purple' },
             'LAVENDER ROSE'                 => { 'out' => $csi . '38;2;251;160;227m', 'desc' => 'Lavender rose' },
             'LAWN GREEN'                    => { 'out' => $csi . '38;2;124;252;0m',   'desc' => 'Lawn green' },
-            'LAWN GREEN'                    => { 'out' => $csi . '38;2;124;252;0m',   'desc' => 'Lawn green' },
             'LEMON'                         => { 'out' => $csi . '38;2;255;247;0m',   'desc' => 'Lemon' },
-            'LEMON CHIFFON'                 => { 'out' => $csi . '38;2;255;250;205m', 'desc' => 'Lemon chiffon' },
             'LEMON CHIFFON'                 => { 'out' => $csi . '38;2;255;250;205m', 'desc' => 'Lemon chiffon' },
             'LEMON LIME'                    => { 'out' => $csi . '38;2;191;255;0m',   'desc' => 'Lemon lime' },
             'LEMON YELLOW'                  => { 'out' => $csi . '38;2;255;244;79m',  'desc' => 'Lemon Yellow' },
             'LIGHT APRICOT'                 => { 'out' => $csi . '38;2;253;213;177m', 'desc' => 'Light apricot' },
-            'LIGHT BLUE'                    => { 'out' => $csi . '38;2;173;216;230m', 'desc' => 'Light blue' },
             'LIGHT BLUE'                    => { 'out' => $csi . '38;2;173;216;230m', 'desc' => 'Light blue', },
             'LIGHT BROWN'                   => { 'out' => $csi . '38;2;181;101;29m',  'desc' => 'Light brown' },
             'LIGHT CARMINE PINK'            => { 'out' => $csi . '38;2;230;103;113m', 'desc' => 'Light carmine pink' },
             'LIGHT CORAL'                   => { 'out' => $csi . '38;2;240;128;128m', 'desc' => 'Light coral' },
-            'LIGHT CORAL'                   => { 'out' => $csi . '38;2;240;128;128m', 'desc' => 'Light coral' },
             'LIGHT CORNFLOWER BLUE'         => { 'out' => $csi . '38;2;147;204;234m', 'desc' => 'Light cornflower blue' },
             'LIGHT CRIMSON'                 => { 'out' => $csi . '38;2;245;105;145m', 'desc' => 'Light Crimson' },
-            'LIGHT CYAN'                    => { 'out' => $csi . '38;2;224;255;255m', 'desc' => 'Light cyan' },
             'LIGHT CYAN'                    => { 'out' => $csi . '38;2;224;255;255m', 'desc' => 'Light cyan' },
             'LIGHT FUCHSIA PINK'            => { 'out' => $csi . '38;2;249;132;239m', 'desc' => 'Light fuchsia pink' },
             'LIGHT GOLDEN ROD YELLOW'       => { 'out' => $csi . '38;2;250;250;210m', 'desc' => 'Light golden rod yellow' },
             'LIGHT GOLDENROD YELLOW'        => { 'out' => $csi . '38;2;250;250;210m', 'desc' => 'Light goldenrod yellow' },
             'LIGHT GRAY'                    => { 'out' => $csi . '38;2;211;211;211m', 'desc' => 'Light gray' },
-            'LIGHT GRAY'                    => { 'out' => $csi . '38;2;211;211;211m', 'desc' => 'Light gray' },
-            'LIGHT GREEN'                   => { 'out' => $csi . '38;2;144;238;144m', 'desc' => 'Light green' },
             'LIGHT GREEN'                   => { 'out' => $csi . '38;2;144;238;144m', 'desc' => 'Light green' },
             'LIGHT KHAKI'                   => { 'out' => $csi . '38;2;240;230;140m', 'desc' => 'Light khaki' },
             'LIGHT PASTEL PURPLE'           => { 'out' => $csi . '38;2;177;156;217m', 'desc' => 'Light pastel purple' },
             'LIGHT PINK'                    => { 'out' => $csi . '38;2;255;182;193m', 'desc' => 'Light pink' },
-            'LIGHT PINK'                    => { 'out' => $csi . '38;2;255;182;193m', 'desc' => 'Light pink' },
-            'LIGHT SALMON'                  => { 'out' => $csi . '38;2;255;160;122m', 'desc' => 'Light salmon' },
             'LIGHT SALMON'                  => { 'out' => $csi . '38;2;255;160;122m', 'desc' => 'Light salmon' },
             'LIGHT SALMON PINK'             => { 'out' => $csi . '38;2;255;153;153m', 'desc' => 'Light salmon pink' },
             'LIGHT SEA GREEN'               => { 'out' => $csi . '38;2;32;178;170m',  'desc' => 'Light sea green' },
-            'LIGHT SEA GREEN'               => { 'out' => $csi . '38;2;32;178;170m',  'desc' => 'Light sea green' },
             'LIGHT SKY BLUE'                => { 'out' => $csi . '38;2;135;206;250m', 'desc' => 'Light sky blue' },
-            'LIGHT SKY BLUE'                => { 'out' => $csi . '38;2;135;206;250m', 'desc' => 'Light sky blue' },
-            'LIGHT SLATE GRAY'              => { 'out' => $csi . '38;2;119;136;153m', 'desc' => 'Light slate gray' },
             'LIGHT SLATE GRAY'              => { 'out' => $csi . '38;2;119;136;153m', 'desc' => 'Lisght slate gray' },
             'LIGHT STEEL BLUE'              => { 'out' => $csi . '38;2;176;196;222m', 'desc' => 'Light steel blue' },
             'LIGHT TAUPE'                   => { 'out' => $csi . '38;2;179;139;109m', 'desc' => 'Light taupe' },
             'LIGHT THULIAN PINK'            => { 'out' => $csi . '38;2;230;143;172m', 'desc' => 'Light Thulian pink' },
             'LIGHT YELLOW'                  => { 'out' => $csi . '38;2;255;255;224m', 'desc' => 'Light yellow' },
-            'LIGHT YELLOW'                  => { 'out' => $csi . '38;2;255;255;237m', 'desc' => 'Light yellow' },
             'LILAC'                         => { 'out' => $csi . '38;2;200;162;200m', 'desc' => 'Lilac' },
             'LIME'                          => { 'out' => $csi . '38;2;191;255;0m',   'desc' => 'Lime' },
-            'LIME GREEN'                    => { 'out' => $csi . '38;2;50;205;50m',   'desc' => 'Lime green' },
             'LIME GREEN'                    => { 'out' => $csi . '38;2;50;205;50m',   'desc' => 'Lime Green' },
             'LINCOLN GREEN'                 => { 'out' => $csi . '38;2;25;89;5m',     'desc' => 'Lincoln green' },
-            'LINEN'                         => { 'out' => $csi . '38;2;250;240;230m', 'desc' => 'Linen' },
             'LINEN'                         => { 'out' => $csi . '38;2;250;240;230m', 'desc' => 'Linen' },
             'LION'                          => { 'out' => $csi . '38;2;193;154;107m', 'desc' => 'Lion' },
             'LIVER'                         => { 'out' => $csi . '38;2;83;75;79m',    'desc' => 'Liver' },
@@ -1319,7 +1268,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'MANGO TANGO'                   => { 'out' => $csi . '38;2;255;130;67m',  'desc' => 'Mango Tango' },
             'MANTIS'                        => { 'out' => $csi . '38;2;116;195;101m', 'desc' => 'Mantis' },
             'MAROON'                        => { 'out' => $csi . '38;2;128;0;0m',     'desc' => 'Maroon' },
-            'MAROON'                        => { 'out' => $csi . '38;2;128;0;0m',     'desc' => 'Maroon' },
             'MAUVE'                         => { 'out' => $csi . '38;2;224;176;255m', 'desc' => 'Mauve' },
             'MAUVE TAUPE'                   => { 'out' => $csi . '38;2;145;95;109m',  'desc' => 'Mauve taupe' },
             'MAUVELOUS'                     => { 'out' => $csi . '38;2;239;152;170m', 'desc' => 'Mauvelous' },
@@ -1328,7 +1276,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'MEDIUM AQUA MARINE'            => { 'out' => $csi . '38;2;102;205;170m', 'desc' => 'Medium aqua marine' },
             'MEDIUM AQUAMARINE'             => { 'out' => $csi . '38;2;102;221;170m', 'desc' => 'Medium aquamarine' },
             'MEDIUM BLUE'                   => { 'out' => $csi . '38;2;0;0;205m',     'desc' => 'Medium blue' },
-            'MEDIUM BLUE'                   => { 'out' => $csi . '38;2;0;0;205m',     'desc' => 'Medium blue' },
             'MEDIUM CANDY APPLE RED'        => { 'out' => $csi . '38;2;226;6;44m',    'desc' => 'Medium candy apple red' },
             'MEDIUM CARMINE'                => { 'out' => $csi . '38;2;175;64;53m',   'desc' => 'Medium carmine' },
             'MEDIUM CHAMPAGNE'              => { 'out' => $csi . '38;2;243;229;171m', 'desc' => 'Medium champagne' },
@@ -1336,36 +1283,25 @@ sub _global_ansi_meta {    # prefills the hash cache
             'MEDIUM JUNGLE GREEN'           => { 'out' => $csi . '38;2;28;53;45m',    'desc' => 'Medium jungle green' },
             'MEDIUM LAVENDER MAGENTA'       => { 'out' => $csi . '38;2;221;160;221m', 'desc' => 'Medium lavender magenta' },
             'MEDIUM ORCHID'                 => { 'out' => $csi . '38;2;186;85;211m',  'desc' => 'Medium orchid' },
-            'MEDIUM ORCHID'                 => { 'out' => $csi . '38;2;186;85;211m',  'desc' => 'Medium orchid' },
             'MEDIUM PERSIAN BLUE'           => { 'out' => $csi . '38;2;0;103;165m',   'desc' => 'Medium Persian blue' },
-            'MEDIUM PURPLE'                 => { 'out' => $csi . '38;2;147;112;219m', 'desc' => 'Medium purple' },
             'MEDIUM PURPLE'                 => { 'out' => $csi . '38;2;147;112;219m', 'desc' => 'Medium purple' },
             'MEDIUM RED VIOLET'             => { 'out' => $csi . '38;2;187;51;133m',  'desc' => 'Medium red violet' },
             'MEDIUM SEA GREEN'              => { 'out' => $csi . '38;2;60;179;113m',  'desc' => 'Medium sea green' },
-            'MEDIUM SEA GREEN'              => { 'out' => $csi . '38;2;60;179;113m',  'desc' => 'Medium sea green' },
-            'MEDIUM SLATE BLUE'             => { 'out' => $csi . '38;2;123;104;238m', 'desc' => 'Medium slate blue' },
             'MEDIUM SLATE BLUE'             => { 'out' => $csi . '38;2;123;104;238m', 'desc' => 'Medium slate blue' },
             'MEDIUM SPRING BUD'             => { 'out' => $csi . '38;2;201;220;135m', 'desc' => 'Medium spring bud' },
-            'MEDIUM SPRING GREEN'           => { 'out' => $csi . '38;2;0;250;154m',   'desc' => 'Medium spring green' },
             'MEDIUM SPRING GREEN'           => { 'out' => $csi . '38;2;0;250;154m',   'desc' => 'Medium spring green' },
             'MEDIUM TAUPE'                  => { 'out' => $csi . '38;2;103;76;71m',   'desc' => 'Medium taupe' },
             'MEDIUM TEAL BLUE'              => { 'out' => $csi . '38;2;0;84;180m',    'desc' => 'Medium teal blue' },
             'MEDIUM TURQUOISE'              => { 'out' => $csi . '38;2;72;209;204m',  'desc' => 'Medium turquoise' },
-            'MEDIUM TURQUOISE'              => { 'out' => $csi . '38;2;72;209;204m',  'desc' => 'Medium turquoise' },
-            'MEDIUM VIOLET RED'             => { 'out' => $csi . '38;2;199;21;133m',  'desc' => 'Medium violet red' },
             'MEDIUM VIOLET RED'             => { 'out' => $csi . '38;2;199;21;133m',  'desc' => 'Medium violet red' },
             'MELON'                         => { 'out' => $csi . '38;2;253;188;180m', 'desc' => 'Melon' },
-            'MIDNIGHT BLUE'                 => { 'out' => $csi . '38;2;25;25;112m',   'desc' => 'Midnight blue' },
             'MIDNIGHT BLUE'                 => { 'out' => $csi . '38;2;25;25;112m',   'desc' => 'Midnight blue' },
             'MIDNIGHT GREEN'                => { 'out' => $csi . '38;2;0;73;83m',     'desc' => 'Midnight green' },
             'MIKADO YELLOW'                 => { 'out' => $csi . '38;2;255;196;12m',  'desc' => 'Mikado yellow' },
             'MINT'                          => { 'out' => $csi . '38;2;62;180;137m',  'desc' => 'Mint' },
-            'MINT CREAM'                    => { 'out' => $csi . '38;2;245;255;250m', 'desc' => 'Mint cream' },
             'MINT CREAM'                    => { 'out' => $csi . '38;2;245;255;250m', 'desc' => 'Mint green' },
             'MINT GREEN'                    => { 'out' => $csi . '38;2;152;255;152m', 'desc' => 'Mint green' },
             'MISTY ROSE'                    => { 'out' => $csi . '38;2;255;228;225m', 'desc' => 'Misty rose' },
-            'MISTY ROSE'                    => { 'out' => $csi . '38;2;255;228;225m', 'desc' => 'Misty rose' },
-            'MOCCASIN'                      => { 'out' => $csi . '38;2;250;235;215m', 'desc' => 'Moccasin' },
             'MOCCASIN'                      => { 'out' => $csi . '38;2;255;228;181m', 'desc' => 'Moccasin' },
             'MODE BEIGE'                    => { 'out' => $csi . '38;2;150;113;23m',  'desc' => 'Mode beige' },
             'MOONSTONE BLUE'                => { 'out' => $csi . '38;2;115;169;194m', 'desc' => 'Moonstone blue' },
@@ -1382,7 +1318,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'NAPIER GREEN'                  => { 'out' => $csi . '38;2;42;128;0m',    'desc' => 'Napier green' },
             'NAPLES YELLOW'                 => { 'out' => $csi . '38;2;250;218;94m',  'desc' => 'Naples yellow' },
             'NAVAJO WHITE'                  => { 'out' => $csi . '38;2;255;222;173m', 'desc' => 'Navajo white' },
-            'NAVAJO WHITE'                  => { 'out' => $csi . '38;2;255;222;173m', 'desc' => 'Navajo white' },
             'NAVY'                          => { 'out' => $csi . '38;5;17m',          'desc' => 'Navy' },
             'NAVY BLUE'                     => { 'out' => $csi . '38;2;0;0;128m',     'desc' => 'Navy blue' },
             'NEON CARROT'                   => { 'out' => $csi . '38;2;255;163;67m',  'desc' => 'Neon Carrot' },
@@ -1395,13 +1330,10 @@ sub _global_ansi_meta {    # prefills the hash cache
             'OFFICE GREEN'                  => { 'out' => $csi . '38;2;0;128;0m',     'desc' => 'Office green' },
             'OLD GOLD'                      => { 'out' => $csi . '38;2;207;181;59m',  'desc' => 'Old gold' },
             'OLD LACE'                      => { 'out' => $csi . '38;2;253;245;230m', 'desc' => 'Old lace' },
-            'OLD LACE'                      => { 'out' => $csi . '38;2;253;245;230m', 'desc' => 'Old lace' },
             'OLD LAVENDER'                  => { 'out' => $csi . '38;2;121;104;120m', 'desc' => 'Old lavender' },
             'OLD MAUVE'                     => { 'out' => $csi . '38;2;103;49;71m',   'desc' => 'Old mauve' },
             'OLD ROSE'                      => { 'out' => $csi . '38;2;192;128;129m', 'desc' => 'Old rose' },
             'OLIVE'                         => { 'out' => $csi . '38;2;128;128;0m',   'desc' => 'Olive' },
-            'OLIVE'                         => { 'out' => $csi . '38;2;128;128;0m',   'desc' => 'Olive' },
-            'OLIVE DRAB'                    => { 'out' => $csi . '38;2;107;142;35m',  'desc' => 'Olive drab' },
             'OLIVE DRAB'                    => { 'out' => $csi . '38;2;107;142;35m',  'desc' => 'Olive Drab' },
             'OLIVE GREEN'                   => { 'out' => $csi . '38;2;186;184;108m', 'desc' => 'Olive Green' },
             'OLIVINE'                       => { 'out' => $csi . '38;2;154;185;115m', 'desc' => 'Olivine' },
@@ -1410,9 +1342,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'ORANGE'                        => { 'out' => $csi . '38;5;202m',         'desc' => 'Orange' },
             'ORANGE PEEL'                   => { 'out' => $csi . '38;2;255;159;0m',   'desc' => 'Orange peel' },
             'ORANGE RED'                    => { 'out' => $csi . '38;2;255;69;0m',    'desc' => 'Orange red' },
-            'ORANGE RED'                    => { 'out' => $csi . '38;2;255;69;0m',    'desc' => 'Orange red' },
             'ORANGE YELLOW'                 => { 'out' => $csi . '38;2;248;213;104m', 'desc' => 'Orange Yellow' },
-            'ORCHID'                        => { 'out' => $csi . '38;2;218;112;214m', 'desc' => 'Orchid' },
             'ORCHID'                        => { 'out' => $csi . '38;2;218;112;214m', 'desc' => 'Orchid' },
             'OTTER BROWN'                   => { 'out' => $csi . '38;2;101;67;33m',   'desc' => 'Otter brown' },
             'OUTER SPACE'                   => { 'out' => $csi . '38;2;65;74;76m',    'desc' => 'Outer Space' },
@@ -1434,7 +1364,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'PALE GOLDEN ROD'               => { 'out' => $csi . '38;2;238;232;170m', 'desc' => 'Pale golden rod' },
             'PALE GOLDENROD'                => { 'out' => $csi . '38;2;238;232;170m', 'desc' => 'Pale goldenrod' },
             'PALE GREEN'                    => { 'out' => $csi . '38;2;152;251;152m', 'desc' => 'Pale green' },
-            'PALE GREEN'                    => { 'out' => $csi . '38;2;152;251;152m', 'desc' => 'Pale green' },
             'PALE LAVENDER'                 => { 'out' => $csi . '38;2;220;208;255m', 'desc' => 'Pale lavender' },
             'PALE MAGENTA'                  => { 'out' => $csi . '38;2;249;132;229m', 'desc' => 'Pale magenta' },
             'PALE PINK'                     => { 'out' => $csi . '38;2;250;218;221m', 'desc' => 'Pale pink' },
@@ -1446,9 +1375,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'PALE TAUPE'                    => { 'out' => $csi . '38;2;188;152;126m', 'desc' => 'Pale taupe' },
             'PALE TURQUOISE'                => { 'out' => $csi . '38;2;175;238;238m', 'desc' => 'Pale turquoise' },
             'PALE VIOLET RED'               => { 'out' => $csi . '38;2;219;112;147m', 'desc' => 'Pale violet red' },
-            'PALE VIOLET RED'               => { 'out' => $csi . '38;2;219;112;147m', 'desc' => 'Pale violet red' },
             'PANSY PURPLE'                  => { 'out' => $csi . '38;2;120;24;74m',   'desc' => 'Pansy purple' },
-            'PAPAYA WHIP'                   => { 'out' => $csi . '38;2;255;239;213m', 'desc' => 'Papaya whip' },
             'PAPAYA WHIP'                   => { 'out' => $csi . '38;2;255;239;213m', 'desc' => 'Papaya whip' },
             'PARIS GREEN'                   => { 'out' => $csi . '38;2;80;200;120m',  'desc' => 'Paris Green' },
             'PASTEL BLUE'                   => { 'out' => $csi . '38;2;174;198;207m', 'desc' => 'Pastel blue' },
@@ -1465,7 +1392,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'PATRIARCH'                     => { 'out' => $csi . '38;2;128;0;128m',   'desc' => 'Patriarch' },
             'PAYNE GRAY'                    => { 'out' => $csi . '38;2;83;104;120m',  'desc' => 'Payne grey' },
             'PEACH'                         => { 'out' => $csi . '38;2;255;229;180m', 'desc' => 'Peach' },
-            'PEACH PUFF'                    => { 'out' => $csi . '38;2;255;218;185m', 'desc' => 'Peach puff' },
             'PEACH PUFF'                    => { 'out' => $csi . '38;2;255;218;185m', 'desc' => 'Peach puff' },
             'PEACH YELLOW'                  => { 'out' => $csi . '38;2;250;223;173m', 'desc' => 'Peach yellow' },
             'PEAR'                          => { 'out' => $csi . '38;2;209;226;49m',  'desc' => 'Pear' },
@@ -1493,16 +1419,13 @@ sub _global_ansi_meta {    # prefills the hash cache
             'PISTACHIO'                     => { 'out' => $csi . '38;2;147;197;114m', 'desc' => 'Pistachio' },
             'PLATINUM'                      => { 'out' => $csi . '38;2;229;228;226m', 'desc' => 'Platinum' },
             'PLUM'                          => { 'out' => $csi . '38;2;221;160;221m', 'desc' => 'Plum' },
-            'PLUM'                          => { 'out' => $csi . '38;2;221;160;221m', 'desc' => 'Plum' },
             'PORTLAND ORANGE'               => { 'out' => $csi . '38;2;255;90;54m',   'desc' => 'Portland Orange' },
-            'POWDER BLUE'                   => { 'out' => $csi . '38;2;176;224;230m', 'desc' => 'Powder blue' },
             'POWDER BLUE'                   => { 'out' => $csi . '38;2;176;224;230m', 'desc' => 'Powder blue' },
             'PRINCETON ORANGE'              => { 'out' => $csi . '38;2;255;143;0m',   'desc' => 'Princeton orange' },
             'PRUSSIAN BLUE'                 => { 'out' => $csi . '38;2;0;49;83m',     'desc' => 'Prussian blue' },
             'PSYCHEDELIC PURPLE'            => { 'out' => $csi . '38;2;223;0;255m',   'desc' => 'Psychedelic purple' },
             'PUCE'                          => { 'out' => $csi . '38;2;204;136;153m', 'desc' => 'Puce' },
             'PUMPKIN'                       => { 'out' => $csi . '38;2;255;117;24m',  'desc' => 'Pumpkin' },
-            'PURPLE'                        => { 'out' => $csi . '38;2;128;0;128m',   'desc' => 'Purple' },
             'PURPLE'                        => { 'out' => $csi . '38;2;128;0;128m',   'desc' => 'Purple' },
             'PURPLE HEART'                  => { 'out' => $csi . '38;2;105;53;156m',  'desc' => 'Purple Heart' },
             'PURPLE MOUNTAIN MAJESTY'       => { 'out' => $csi . '38;2;150;120;182m', 'desc' => 'Purple mountain majesty' },
@@ -1541,9 +1464,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'ROSEWOOD'                      => { 'out' => $csi . '38;2;101;0;11m',    'desc' => 'Rosewood' },
             'ROSSO CORSA'                   => { 'out' => $csi . '38;2;212;0;0m',     'desc' => 'Rosso corsa' },
             'ROSY BROWN'                    => { 'out' => $csi . '38;2;188;143;143m', 'desc' => 'Rosy brown' },
-            'ROSY BROWN'                    => { 'out' => $csi . '38;2;188;143;143m', 'desc' => 'Rosy brown' },
             'ROYAL AZURE'                   => { 'out' => $csi . '38;2;0;56;168m',    'desc' => 'Royal azure' },
-            'ROYAL BLUE'                    => { 'out' => $csi . '38;2;65;105;225m',  'desc' => 'Royal blue' },
             'ROYAL BLUE'                    => { 'out' => $csi . '38;2;65;105;225m',  'desc' => 'Royal blue' },
             'ROYAL FUCHSIA'                 => { 'out' => $csi . '38;2;202;44;146m',  'desc' => 'Royal fuchsia' },
             'ROYAL PURPLE'                  => { 'out' => $csi . '38;2;120;81;169m',  'desc' => 'Royal purple' },
@@ -1556,17 +1477,14 @@ sub _global_ansi_meta {    # prefills the hash cache
             'RUST'                          => { 'out' => $csi . '38;2;183;65;14m',   'desc' => 'Rust' },
             'SACRAMENTO STATE GREEN'        => { 'out' => $csi . '38;2;0;86;63m',     'desc' => 'Sacramento State green' },
             'SADDLE BROWN'                  => { 'out' => $csi . '38;2;139;69;19m',   'desc' => 'Saddle brown' },
-            'SADDLE BROWN'                  => { 'out' => $csi . '38;2;139;69;19m',   'desc' => 'Saddle brown' },
             'SAFETY ORANGE'                 => { 'out' => $csi . '38;2;255;103;0m',   'desc' => 'Safety orange' },
             'SAFFRON'                       => { 'out' => $csi . '38;2;244;196;48m',  'desc' => 'Saffron' },
             'SAINT PATRICK BLUE'            => { 'out' => $csi . '38;2;35;41;122m',   'desc' => 'Saint Patrick Blue' },
-            'SALMON'                        => { 'out' => $csi . '38;2;250;128;114m', 'desc' => 'Salmon' },
             'SALMON'                        => { 'out' => $csi . '38;2;255;140;105m', 'desc' => 'Salmon' },
             'SALMON PINK'                   => { 'out' => $csi . '38;2;255;145;164m', 'desc' => 'Salmon pink' },
             'SAND'                          => { 'out' => $csi . '38;2;194;178;128m', 'desc' => 'Sand' },
             'SAND DUNE'                     => { 'out' => $csi . '38;2;150;113;23m',  'desc' => 'Sand dune' },
             'SANDSTORM'                     => { 'out' => $csi . '38;2;236;213;64m',  'desc' => 'Sandstorm' },
-            'SANDY BROWN'                   => { 'out' => $csi . '38;2;244;164;96m',  'desc' => 'Sandy brown' },
             'SANDY BROWN'                   => { 'out' => $csi . '38;2;244;164;96m',  'desc' => 'Sandy brown' },
             'SANDY TAUPE'                   => { 'out' => $csi . '38;2;150;113;23m',  'desc' => 'Sandy taupe' },
             'SAP GREEN'                     => { 'out' => $csi . '38;2;80;125;42m',   'desc' => 'Sap green' },
@@ -1577,7 +1495,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SCREAMIN GREEN'                => { 'out' => $csi . '38;2;118;255;122m', 'desc' => 'Screamin Green' },
             'SEA BLUE'                      => { 'out' => $csi . '38;2;0;105;148m',   'desc' => 'Sea blue' },
             'SEA GREEN'                     => { 'out' => $csi . '38;2;46;139;87m',   'desc' => 'Sea green' },
-            'SEA GREEN'                     => { 'out' => $csi . '38;2;46;139;87m',   'desc' => 'Sea green' },
             'SEA SHELL'                     => { 'out' => $csi . '38;2;255;245;238m', 'desc' => 'Sea shell' },
             'SEAL BROWN'                    => { 'out' => $csi . '38;2;50;20;20m',    'desc' => 'Seal brown' },
             'SEASHELL'                      => { 'out' => $csi . '38;2;255;245;238m', 'desc' => 'Seashell' },
@@ -1587,29 +1504,21 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SHAMROCK'                      => { 'out' => $csi . '38;2;69;206;162m',  'desc' => 'Shamrock' },
             'SHAMROCK GREEN'                => { 'out' => $csi . '38;2;0;158;96m',    'desc' => 'Shamrock green' },
             'SHOCKING PINK'                 => { 'out' => $csi . '38;2;252;15;192m',  'desc' => 'Shocking pink' },
-            'SIENNA'                        => { 'out' => $csi . '38;2;136;45;23m',   'desc' => 'Sienna' },
             'SIENNA'                        => { 'out' => $csi . '38;2;160;82;45m',   'desc' => 'Sienna' },
-            'SILVER'                        => { 'out' => $csi . '38;2;192;192;192m', 'desc' => 'Silver' },
             'SILVER'                        => { 'out' => $csi . '38;2;192;192;192m', 'desc' => 'Silver' },
             'SINOPIA'                       => { 'out' => $csi . '38;2;203;65;11m',   'desc' => 'Sinopia' },
             'SKOBELOFF'                     => { 'out' => $csi . '38;2;0;116;116m',   'desc' => 'Skobeloff' },
             'SKY BLUE'                      => { 'out' => $csi . '38;2;135;206;235m', 'desc' => 'Sky blue' },
-            'SKY BLUE'                      => { 'out' => $csi . '38;2;135;206;235m', 'desc' => 'Sky blue' },
             'SKY MAGENTA'                   => { 'out' => $csi . '38;2;207;113;175m', 'desc' => 'Sky magenta' },
             'SLATE BLUE'                    => { 'out' => $csi . '38;2;106;90;205m',  'desc' => 'Slate blue' },
-            'SLATE BLUE'                    => { 'out' => $csi . '38;2;106;90;205m',  'desc' => 'Slate blue' },
-            'SLATE GRAY'                    => { 'out' => $csi . '38;2;112;128;144m', 'desc' => 'Slate gray' },
             'SLATE GRAY'                    => { 'out' => $csi . '38;2;112;128;144m', 'desc' => 'Slate gray' },
             'SMALT'                         => { 'out' => $csi . '38;2;0;51;153m',    'desc' => 'Smalt' },
             'SMOKEY TOPAZ'                  => { 'out' => $csi . '38;2;147;61;65m',   'desc' => 'Smokey topaz' },
             'SMOKY BLACK'                   => { 'out' => $csi . '38;2;16;12;8m',     'desc' => 'Smoky black' },
             'SNOW'                          => { 'out' => $csi . '38;2;255;250;250m', 'desc' => 'Snow' },
-            'SNOW'                          => { 'out' => $csi . '38;2;255;250;250m', 'desc' => 'Snow' },
             'SPIRO DISCO BALL'              => { 'out' => $csi . '38;2;15;192;252m',  'desc' => 'Spiro Disco Ball' },
             'SPRING BUD'                    => { 'out' => $csi . '38;2;167;252;0m',   'desc' => 'Spring bud' },
             'SPRING GREEN'                  => { 'out' => $csi . '38;2;0;255;127m',   'desc' => 'Spring green' },
-            'SPRING GREEN'                  => { 'out' => $csi . '38;2;0;255;127m',   'desc' => 'Spring green' },
-            'STEEL BLUE'                    => { 'out' => $csi . '38;2;70;130;180m',  'desc' => 'Steel blue' },
             'STEEL BLUE'                    => { 'out' => $csi . '38;2;70;130;180m',  'desc' => 'Steel blue' },
             'STIL DE GRAIN YELLOW'          => { 'out' => $csi . '38;2;250;218;94m',  'desc' => 'Stil de grain yellow' },
             'STIZZA'                        => { 'out' => $csi . '38;2;153;0;0m',     'desc' => 'Stizza' },
@@ -1618,7 +1527,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SUNGLOW'                       => { 'out' => $csi . '38;2;255;204;51m',  'desc' => 'Sunglow' },
             'SUNSET'                        => { 'out' => $csi . '38;2;250;214;165m', 'desc' => 'Sunset' },
             'SUNSET ORANGE'                 => { 'out' => $csi . '38;2;253;94;83m',   'desc' => 'Sunset Orange' },
-            'TAN'                           => { 'out' => $csi . '38;2;210;180;140m', 'desc' => 'Tan' },
             'TAN'                           => { 'out' => $csi . '38;2;210;180;140m', 'desc' => 'Tan' },
             'TANGELO'                       => { 'out' => $csi . '38;2;249;77;0m',    'desc' => 'Tangelo' },
             'TANGERINE'                     => { 'out' => $csi . '38;2;242;133;0m',   'desc' => 'Tangerine' },
@@ -1629,11 +1537,9 @@ sub _global_ansi_meta {    # prefills the hash cache
             'TEA GREEN'                     => { 'out' => $csi . '38;2;208;240;192m', 'desc' => 'Tea green' },
             'TEA ROSE'                      => { 'out' => $csi . '38;2;244;194;194m', 'desc' => 'Tea rose' },
             'TEAL'                          => { 'out' => $csi . '38;2;0;128;128m',   'desc' => 'Teal' },
-            'TEAL'                          => { 'out' => $csi . '38;2;0;128;128m',   'desc' => 'Teal' },
             'TEAL BLUE'                     => { 'out' => $csi . '38;2;54;117;136m',  'desc' => 'Teal blue' },
             'TEAL GREEN'                    => { 'out' => $csi . '38;2;0;109;91m',    'desc' => 'Teal green' },
             'TERRA COTTA'                   => { 'out' => $csi . '38;2;226;114;91m',  'desc' => 'Terra cotta' },
-            'THISTLE'                       => { 'out' => $csi . '38;2;216;191;216m', 'desc' => 'Thistle' },
             'THISTLE'                       => { 'out' => $csi . '38;2;216;191;216m', 'desc' => 'Thistle' },
             'THULIAN PINK'                  => { 'out' => $csi . '38;2;222;111;161m', 'desc' => 'Thulian pink' },
             'TICKLE ME PINK'                => { 'out' => $csi . '38;2;252;137;172m', 'desc' => 'Tickle Me Pink' },
@@ -1641,7 +1547,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'TIGER EYE'                     => { 'out' => $csi . '38;2;224;141;60m',  'desc' => 'Tiger eye' },
             'TIMBERWOLF'                    => { 'out' => $csi . '38;2;219;215;210m', 'desc' => 'Timberwolf' },
             'TITANIUM YELLOW'               => { 'out' => $csi . '38;2;238;230;0m',   'desc' => 'Titanium yellow' },
-            'TOMATO'                        => { 'out' => $csi . '38;2;255;99;71m',   'desc' => 'Tomato' },
             'TOMATO'                        => { 'out' => $csi . '38;2;255;99;71m',   'desc' => 'Tomato' },
             'TOOLBOX'                       => { 'out' => $csi . '38;2;116;108;192m', 'desc' => 'Toolbox' },
             'TOPAZ'                         => { 'out' => $csi . '38;2;255;200;124m', 'desc' => 'Topaz' },
@@ -1652,7 +1557,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'TUFTS BLUE'                    => { 'out' => $csi . '38;2;65;125;193m',  'desc' => 'Tufts Blue' },
             'TUMBLEWEED'                    => { 'out' => $csi . '38;2;222;170;136m', 'desc' => 'Tumbleweed' },
             'TURKISH ROSE'                  => { 'out' => $csi . '38;2;181;114;129m', 'desc' => 'Turkish rose' },
-            'TURQUOISE'                     => { 'out' => $csi . '38;2;48;213;200m',  'desc' => 'Turquoise' },
             'TURQUOISE'                     => { 'out' => $csi . '38;2;64;224;208m',  'desc' => 'Turquoise' },
             'TURQUOISE BLUE'                => { 'out' => $csi . '38;2;0;255;239m',   'desc' => 'Turquoise blue' },
             'TURQUOISE GREEN'               => { 'out' => $csi . '38;2;160;214;180m', 'desc' => 'Turquoise green' },
@@ -1687,7 +1591,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'VERMILION'                     => { 'out' => $csi . '38;2;227;66;52m',   'desc' => 'Vermilion' },
             'VERONICA'                      => { 'out' => $csi . '38;2;160;32;240m',  'desc' => 'Veronica' },
             'VIOLET'                        => { 'out' => $csi . '38;2;238;130;238m', 'desc' => 'Violet' },
-            'VIOLET'                        => { 'out' => $csi . '38;2;238;130;238m', 'desc' => 'Violet' },
             'VIOLET BLUE'                   => { 'out' => $csi . '38;2;50;74;178m',   'desc' => 'Violet Blue' },
             'VIOLET RED'                    => { 'out' => $csi . '38;2;247;83;148m',  'desc' => 'Violet Red' },
             'VIRIDIAN'                      => { 'out' => $csi . '38;2;64;130;109m',  'desc' => 'Viridian' },
@@ -1699,7 +1602,6 @@ sub _global_ansi_meta {    # prefills the hash cache
             'WARM BLACK'                    => { 'out' => $csi . '38;2;0;66;66m',     'desc' => 'Warm black' },
             'WATERSPOUT'                    => { 'out' => $csi . '38;2;0;255;255m',   'desc' => 'Waterspout' },
             'WENGE'                         => { 'out' => $csi . '38;2;100;84;82m',   'desc' => 'Wenge' },
-            'WHEAT'                         => { 'out' => $csi . '38;2;245;222;179m', 'desc' => 'Wheat' },
             'WHEAT'                         => { 'out' => $csi . '38;2;245;222;179m', 'desc' => 'Wheat' },
             'WHITE'                         => { 'out' => $csi . '37m',               'desc' => 'White' },
             'WHITE SMOKE'                   => { 'out' => $csi . '38;2;245;245;245m', 'desc' => 'White smoke' },
@@ -2092,6 +1994,20 @@ Ends text block to be word-wrapped and justified
 
 =back
 
+=head2 MACROS
+
+=over 4
+
+=item SPACES count
+
+Output "count" number of spaces
+
+=item CHAR character,count
+
+Output "count" number of "character".  Only ONE character is allowed.
+
+=back
+
 =head1 AUTHOR & COPYRIGHT
 
 Richard Kelsch
@@ -2103,3 +2019,13 @@ Richard Kelsch
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at;
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
+
+=head1 GITHUB
+
+=over 4
+
+=item https://github.com/richcsst/ansi-encode
+
+=back
+
+=cut

@@ -1,0 +1,7 @@
+# Changes for String::Redactable
+
+0.901 2026-03-02T17:39:32Z
+	* first release of a module to help hide sensitive string
+
+0.001_01 2025-04-20T19:31:08Z
+	* initial creation and import

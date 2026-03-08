@@ -324,6 +324,11 @@ const booleanAttrs = new Set([
   'multiple', 'autofocus', 'autoplay', 'controls', 'loop', 'muted', 'open'
 ]);
 
+// DOM properties that must be set via el.prop = val (not setAttribute).
+// Textarea/input .value must use the property; setAttribute('value',...) only
+// sets the default value and doesn't update the displayed content after user edits.
+const domProperties = new Set(['value']);
+
 function setAttribute( el, attr, val ) {
   if (attr === 'textcontent') {
     el.textContent = val;
@@ -334,6 +339,10 @@ function setAttribute( el, attr, val ) {
     } else {
       el.removeAttribute(attr);
     }
+  } else if (domProperties.has(attr)) {
+    // Form control properties: set via DOM property, not HTML attribute.
+    // Only update if changed to avoid resetting cursor position.
+    if (el[attr] !== val) el[attr] = val;
   } else {
     el.setAttribute( attr, val );
   }
@@ -557,7 +566,7 @@ class Recipe {
         return;
       }
       if (typeof structureNode.content === 'function') {
-        domNode.textContent = structureNode.content.call(me, loop_item, loop_idx);
+        domNode.textContent = structureNode.content.call(me, me, loop_item, loop_idx);
         this.updatableElements.push([structureNode, domNode, scope]);
       }
       return;
@@ -661,7 +670,7 @@ class Recipe {
         for (const [attr, val] of Object.entries(attrs)) {
           if (attr.startsWith('!')) continue;
           if (attr in componentInstance.vars) {
-            componentInstance.vars[attr] = typeof val === 'function' ? val.call(me, loop_item, loop_idx) : val;
+            componentInstance.vars[attr] = typeof val === 'function' ? val.call(me, me, loop_item, loop_idx) : val;
           }
         }
         this.updatableRecipes.push(componentInstance);
@@ -753,11 +762,11 @@ class Recipe {
         if (typeof val === 'function') {
           if (attr.startsWith('on')) {
             const eventName = attr.substring(2).toLowerCase();
-            const handler = (e) => { val.call(me, e, loop_item, loop_idx); this.refresh(); };
+            const handler = (e) => { val.call(me, e, loop_item, loop_idx); this.refresh(loop_item, loop_idx); };
             el.addEventListener(eventName, handler);
             this.eventHandlers.push({ node: el, eventName, handler });
           } else {
-            setAttribute(el, attr, val.call(me, loop_item, loop_idx));
+            setAttribute(el, attr, val.call(me, me, loop_item, loop_idx));
             this.updatableElements.push([structureNode, el, scope]);
           }
         }
@@ -807,7 +816,7 @@ class Recipe {
       const con = structureNode.content;
       let text;
       if (typeof con === 'function') {
-        el = document.createTextNode(con.call(me,loop_item,loop_idx));
+        el = document.createTextNode(con.call(me, me, loop_item,loop_idx));
         // a pair - the second refreshes the first
         this.updatableElements.push( [structureNode, el, scope ]);
       } else {
@@ -925,7 +934,7 @@ class Recipe {
           for (const [attr,val] of Object.entries(attrs)) {
             if (attr.startsWith('!')) continue;  // Skip special attributes like !name
             if (attr in componentInstance.vars) {
-              componentInstance.vars[attr] = typeof val === 'function' ? val.call(me,loop_item,loop_idx) : val;
+              componentInstance.vars[attr] = typeof val === 'function' ? val.call(me, me, loop_item,loop_idx) : val;
             }
           }
           this.updatableRecipes.push( componentInstance );
@@ -998,11 +1007,11 @@ class Recipe {
               if (attr.startsWith('on') ) {
                 // Store handler info for cleanup in destroy() - addEventListener returns undefined
                 const eventName = attr.substring(2).toLowerCase();
-                const handler = (e) => { val.call(me,e, loop_item, loop_idx); this.refresh() };
+                const handler = (e) => { val.call(me,e, loop_item, loop_idx); this.refresh(loop_item, loop_idx) };
                 el.addEventListener(eventName, handler);
                 this.eventHandlers.push({ node: el, eventName, handler });
               } else {
-                setAttribute( el, attr, val.call(me,loop_item,loop_idx) );
+                setAttribute( el, attr, val.call(me, me, loop_item,loop_idx) );
                 this.updatableElements.push( [structureNode, el, scope ] );
               }
             } else {
@@ -1035,7 +1044,7 @@ class Recipe {
         const [node, el, scope] = pair;
         const me = scope || this.me();
         if (node.content) {
-          el.textContent = node.content.call(me,loop_item, loop_idx);
+          el.textContent = node.content.call(me, me, loop_item, loop_idx);
         } else {
           const attrs = node.attributes;
           for (const [attr,val] of Object.entries(attrs)) {
@@ -1043,7 +1052,7 @@ class Recipe {
                 attr !== 'slot' &&
                 !attr.startsWith('on')
                 && typeof val === 'function') {
-              setAttribute( el, attr, val.call(me,loop_item, loop_idx));
+              setAttribute( el, attr, val.call(me, me, loop_item, loop_idx));
             }
           }
         }
@@ -1122,10 +1131,18 @@ class RecipeLoop extends Recipe {
     this._containerEl = el;
     this.loopNode = node;
   }
-  me() { return this.scope || this.parentModule; }
+  me() {
+    if (this.scope) return this.scope;
+    // Walk past intermediate RC/RL helpers to find the actual Recipe component
+    let p = this.parentModule;
+    while (p instanceof RecipeConditional || p instanceof RecipeLoop) {
+      p = p.parentModule;
+    }
+    return p;
+  }
   renderLoop( loop_item, loop_idx ) {
     // the attributes are already adjusted for attach_to before this is called
-    const forItems = this.loopNode.attributes.for.call(this.me(), loop_item, loop_idx);
+    const forItems = this.loopNode.attributes.for.call(this.me(), this.me(), loop_item, loop_idx);
     const loopKids = this.loopNode.children;
     forItems.forEach( (l_item,l_idx) => {
       for (let idx=0; idx < loopKids.length; idx++) {
@@ -1148,7 +1165,15 @@ class RecipeConditional extends Recipe {
     super(el);
     this._containerEl = el;
   }
-  me() { return this.scope || this.parentModule; }
+  me() {
+    if (this.scope) return this.scope;
+    // Walk past intermediate RC/RL helpers to find the actual Recipe component
+    let p = this.parentModule;
+    while (p instanceof RecipeConditional || p instanceof RecipeLoop) {
+      p = p.parentModule;
+    }
+    return p;
+  }
   addBranch( ifstruct ) {
     this.branches.push( ifstruct );
   }
@@ -1157,7 +1182,7 @@ class RecipeConditional extends Recipe {
     for (const idx in this.branches) {
       const branch = this.branches[idx];
       const cond = branch.attributes.condition;
-      if (branch.tag === 'else' || (typeof cond  === 'function' ? cond.call( this.me(), loop_item, loop_idx ) : cond) ) {
+      if (branch.tag === 'else' || (typeof cond  === 'function' ? cond.call( this.me(), this.me(), loop_item, loop_idx ) : cond) ) {
         return idx;
       }
     }

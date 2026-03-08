@@ -514,7 +514,7 @@ the variable **$TEST\_FILE** is unset and not exported.
 
 # AUTHOR
 
-Jurij Fajnberg, &lt;fajnbergj at gmail.com>
+Juri Fainberg, &lt;fajnbergj at gmail.com>
 
 # BUGS
 
@@ -523,7 +523,7 @@ Please report any bugs or feature requests through the web interface at
 
 # COPYRIGHT AND LICENSE
 
-Copyright (c) 2021-2024 Jurij Fajnberg
+Copyright (c) 2021-2026 Juri Fainberg
 
 This program is free software; you can redistribute it and/or modify it under the same terms
 as the Perl 5 programming language system itself.

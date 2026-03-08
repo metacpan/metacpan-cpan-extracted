@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153523;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -93,35 +93,35 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9445", "Ratnapura",
-"9482", "Kandy",
+$areanames{en} = {"9421", "Jaffna",
+"9427", "Polonnaruwa",
+"9445", "Ratnapura",
 "9454", "Nawalapitiya\,\ Kandy",
-"9411", "Colombo",
-"9438", "Panadura\,\ Kalutara",
+"9435", "Kegalle",
+"9467", "Kalmunai\,\ Ampara",
+"9491", "Galle",
+"9425", "Anuradhapura",
+"9432", "Chilaw\,\ Puttalam",
 "9447", "Hambantota",
 "9441", "Matara",
-"9435", "Kegalle",
-"9452", "Nuwara\ Eliya",
-"9466", "Matale",
-"9426", "Trincomalee",
 "9431", "Negombo\,\ Gampaha",
 "9437", "Kurunegala",
-"9421", "Jaffna",
-"9427", "Polonnaruwa",
-"9436", "Avissawella\,\ Colombo",
-"9467", "Kalmunai\,\ Ampara",
 "9465", "Batticaloa",
-"9425", "Anuradhapura",
-"9433", "Gampaha",
-"9434", "Kalutara",
+"9463", "Ampara",
+"9426", "Trincomalee",
+"9452", "Nuwara\ Eliya",
+"9424", "Vavuniya",
+"9411", "Colombo",
+"9466", "Matale",
 "9451", "Hatton\,\ Nuwara\ Eliya",
 "9457", "Bandarawela\,\ Badulla",
-"9432", "Chilaw\,\ Puttalam",
+"9423", "Mannar",
+"9482", "Kandy",
+"9433", "Gampaha",
+"9438", "Panadura\,\ Kalutara",
+"9434", "Kalutara",
 "9455", "Badulla",
-"9491", "Galle",
-"9424", "Vavuniya",
-"9463", "Ampara",
-"9423", "Mannar",};
+"9436", "Avissawella\,\ Colombo",};
 my $timezones = {
                '' => [
                        'Asia/Colombo'

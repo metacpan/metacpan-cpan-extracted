@@ -1,5 +1,5 @@
 package Marky::DbTable;
-$Marky::DbTable::VERSION = '0.0602';
+$Marky::DbTable::VERSION = '0.0604';
 #ABSTRACT: Marky::DbTable - querying one database table
 
 use common::sense;
@@ -151,13 +151,13 @@ EOT
     if (!defined $self->{tag_query_template})
     {
         $self->{tag_query_template} =<<'EOT';
-<a title="Remove tag" href="{$url}/{?tags_query [$tags_query]}?deltag={$tag}{?q &q=[$q]}{?p &p=[$p]}{?where &where=[$where]}" class="tag button"><span class="fa fa-tag"></span> {$tag} <span class="remove fa fa-remove"></span></a>
+<a title="Remove tag" href="{$url}/{?tags_query [$tags_query]}?deltag={$tag}{?q &q=[$q]}{?p &p=[$p]}{?n &n=[$n]}{?sort_by &sort_by=[$sort_by]}{?sort_by2 &sort_by2=[$sort_by2]}{?sort_by3 &sort_by3=[$sort_by3]}{?sort_by4 &sort_by4=[$sort_by4]}{?where &where=[$where]}" class="tag button"><span class="fa fa-tag"></span> {$tag} <span class="remove fa fa-remove"></span></a>
 EOT
     }
     if (!defined $self->{q_query_template})
     {
         $self->{q_query_template} =<<'EOT';
-<a title="Remove term" href="{$url}/{?tags_query tags/[$tags_query]}?delterm={$qterm}{?q &q=[$q]}{?p &p=[$p]}{?where &where=[$where]}" class="tag button"><span class="fa fa-question"></span> {$qterm} <span class="remove fa fa-close"></span></a>
+<a title="Remove term" href="{$url}/{?tags_query tags/[$tags_query]}?delterm={$qterm}{?q &q=[$q]}{?p &p=[$p]}{?n &n=[$n]}{?sort_by &sort_by=[$sort_by]}{?sort_by2 &sort_by2=[$sort_by2]}{?sort_by3 &sort_by3=[$sort_by3]}{?sort_by4 &sort_by4=[$sort_by4]}{?where &where=[$where]}" class="tag button"><span class="fa fa-question"></span> {$qterm} <span class="remove fa fa-close"></span></a>
 EOT
     }
     if (!defined $self->{results_template})
@@ -175,8 +175,8 @@ EOT
     {
         $self->{pagination_template} =<<'EOT';
 <div class="pagination">
-<span class="prev">{?prev_page <a title="Prev" class="prevnext" href="[$location]/[$tq]?p=[$prev_page]&q=[$q]&where=[$where]">}<span class="fa fa-chevron-left"></span> Prev{?prev_page </a>}</span>
-<span class="next">{?next_page <a title="Next" href="[$location]/[$tq]?p=[$next_page]&q=[$q]&where=[$where]">}Next <span class="fa fa-chevron-right"></span>{?next_page </a>}</span>
+<span class="prev">{?prev_page <a title="Prev" class="prevnext" href="[$location]/[$tq]?p=[$prev_page]&n=[$n]&sort_by=[$sort_by]&sort_by2=[$sort_by2]&sort_by3=[$sort_by3]&sort_by4=[$sort_by4]&q=[$q]&where=[$where]">}<span class="fa fa-chevron-left"></span> Prev{?prev_page </a>}</span>
+<span class="next">{?next_page <a title="Next" href="[$location]/[$tq]?p=[$next_page]&n=[$n]&sort_by=[$sort_by]&sort_by2=[$sort_by2]&sort_by3=[$sort_by3]&sort_by4=[$sort_by4]&q=[$q]&where=[$where]">}Next <span class="fa fa-chevron-right"></span>{?next_page </a>}</span>
 </div>
 EOT
     }
@@ -794,7 +794,7 @@ sub _format_searchform {
     @os = ();
     foreach my $sf (qw(sort_by sort_by2 sort_by3 sort_by4))
     {
-        push @os, "<select name='${db}_$sf'>";
+        push @os, "<select name='$sf'>";
         push @os, "<option value=''> </option>";
         foreach my $s (sort @{$self->{sort_columns}})
         {
@@ -1019,7 +1019,11 @@ sub _format_tag_collection {
     my $qquery = '';
     my @qq = ();
     push @qq, "q=$args{q}" if $args{q};
-    push @qq, "p=$args{p}" if $args{p};
+    push @qq, "n=$args{n}" if $args{n};
+    push @qq, "sort_by=$args{sort_by}" if $args{sort_by};
+    push @qq, "sort_by2=$args{sort_by2}" if $args{sort_by2};
+    push @qq, "sort_by3=$args{sort_by3}" if $args{sort_by3};
+    push @qq, "sort_by4=$args{sort_by4}" if $args{sort_by4};
     my $qquery = join('&', @qq);
 
     my $tobj = Text::NeatTemplate->new();
@@ -1143,7 +1147,7 @@ Marky::DbTable - Marky::DbTable - querying one database table
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 SYNOPSIS
 
@@ -1160,7 +1164,7 @@ Marky::DbTable - querying one database table
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 METHODS
 

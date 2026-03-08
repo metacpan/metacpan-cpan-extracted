@@ -1,3 +1,8 @@
+images/amd.png
+images/atari.png
+images/commodore.png
+images/README.md
+images/author.jpg
 images/ANSI-Encode.png
 images/help.png
 images/supported.png
@@ -15,6 +20,9 @@ images/timex-sinclair-2068.png
 images/timex-sinclair.png
 images/usa.png
 images/windows.png
+examples/amd.ans
+examples/commodore.ans
+examples/atari.ans
 examples/ibm.ans
 examples/ms-dos.ans
 examples/sinclair.ans
@@ -26,8 +34,11 @@ examples/timex-sinclair.ans
 examples/usa.ans
 examples/windows.ans
 examples/README.md
+font-installer/README.md
+t/README.md
 AUTHOR.md
 bin/ansi-encode
+bin/README.md
 Changes
 HISTORY.md
 ignore.txt

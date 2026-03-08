@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ReplicationControllerCondition;
 # ABSTRACT: ReplicationControllerCondition describes the state of a replication controller at a certain point.
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -32,7 +32,7 @@ IO::K8s::Api::Core::V1::ReplicationControllerCondition - ReplicationControllerCo
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 lastTransitionTime
 

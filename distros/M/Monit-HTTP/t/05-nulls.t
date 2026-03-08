@@ -2,12 +2,13 @@
 
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test2::V1 '-import';
+plan(3);
 use Test::Trap qw/ :on_fail(diag_all) /;
 
 use Monit::HTTP ':constants';
 
-#my $hd = new Monit::HTTP(
+#my $hd = Monit::HTTP->new(
 #    hostname => 'localhost',
 #    port => 'port',
 #    username => 'admin',
@@ -31,3 +32,4 @@ $hd->set_port(14566);
 my @r = trap { $hd->get_services() };
 like( $trap->die, qr{Error while connecting to}, 'Die on localhost with alt port' );
 }
+

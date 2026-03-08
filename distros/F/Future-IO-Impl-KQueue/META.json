@@ -32,14 +32,14 @@
       "test" : {
          "requires" : {
             "Test2::V0" : "0",
-            "Test::Future::IO::Impl" : "0.19"
+            "Test::Future::IO::Impl" : "0.20"
          }
       }
    },
    "provides" : {
       "Future::IO::Impl::KQueue" : {
          "file" : "lib/Future/IO/Impl/KQueue.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@
 
 
 
-# Copyright 2025 David Cantrell, derived from data from libphonenumber
+# Copyright 2026 David Cantrell, derived from data from libphonenumber
 # http://code.google.com/p/libphonenumber/
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20251210153524;
+our $VERSION = 1.20260306161713;
 
 my $formatters = [
                 {
@@ -104,25 +104,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2232075", "Bamako",
-"223218", "Gao\/Kidal",
-"223449", "Bamako",
-"2232073", "Bamako",
-"223215", "Kayes",
+$areanames{en} = {"2232078", "Bamako",
+"223443", "Bamako",
+"223216", "Sikasso",
+"223214", "Mopti",
+"223212", "Koulikoro",
 "2232074", "Bamako",
+"2232076", "Bamako",
 "223442", "Bamako",
 "2232077", "Bamako",
-"2232072", "Bamako",
-"2232070", "Bamako",
-"223202", "Bamako",
+"2232071", "Bamako",
+"223218", "Gao\/Kidal",
+"223215", "Kayes",
+"2232073", "Bamako",
 "223219", "Tombouctou",
-"223443", "Bamako",
-"223214", "Mopti",
-"223216", "Sikasso",
-"223212", "Koulikoro",
-"2232078", "Bamako",
-"2232076", "Bamako",
-"2232071", "Bamako",};
+"2232075", "Bamako",
+"2232072", "Bamako",
+"223449", "Bamako",
+"2232070", "Bamako",
+"223202", "Bamako",};
 my $timezones = {
                '' => [
                        'Africa/Bamako'

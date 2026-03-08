@@ -4,11 +4,13 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-MojoUserAgentRoleRetry-0.001.tar.gz
 lib/Mojo/Transaction/HTTP/Role/Retry.pm
 lib/Mojo/UserAgent/Role/Retry.pm
 t/blocking.t
+t/custom_policy.t
+t/default_policy.t
 t/net_error.t
 t/non_blocking.t
+t/redirect.t
 t/retry_after.t
 t/ws.t

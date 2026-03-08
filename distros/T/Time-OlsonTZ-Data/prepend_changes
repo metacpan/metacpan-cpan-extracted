@@ -1,5 +1,10 @@
 #!perl
 
+# This software is copyright (c) 2025 by Dan Book <dbook@cpan.org>.
+
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+
 use 5.040;
 use Path::Tiny 'path';
 use Time::Piece 'localtime';

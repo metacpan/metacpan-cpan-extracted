@@ -3,17 +3,20 @@ abstract: 'Read .env file and turn its content into environment variables for di
 author:
   - 'Mikko Koivunalho <mikkoi@cpan.org>'
 build_requires:
+  Data::Dumper: '0'
   File::Basename: '0'
   File::Path: '0'
   File::Temp: '0'
   FileHandle: '0'
-  FindBin: '1.51'
+  FindBin: '0'
   Test2::Require: '0'
+  Test2::Tools::GenTemp: '0'
   Test2::V0: '0'
   Test::Script: '1.28'
   base: '0'
   lib: '0'
   perl: '5.010'
+  utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.010'
@@ -47,7 +50,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Env-Dot
   homepage: https://metacpan.org/dist/Env-Dot
   repository: git://github.com/mikkoi/env-dot.git
-version: '0.019'
+version: '0.020'
 x_contributors:
   - 'David Kaufman <david@gigawatt.org>'
   - 'Twata <twata_1@yahoo.co.jp>'

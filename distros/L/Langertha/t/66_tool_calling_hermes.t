@@ -26,7 +26,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
   );
 
   ok($nous->does('Langertha::Role::OpenAICompatible'), 'NousResearch composes OpenAICompatible');
-  is($nous->hermes_tools, 1, 'NousResearch: hermes_tools defaults to 1');
+  ok($nous->does('Langertha::Role::HermesTools'), 'NousResearch composes HermesTools');
   is($nous->default_model, 'Hermes-4-70B', 'default model');
   ok($nous->can('chat_with_tools_f'), 'has chat_with_tools_f');
   is_deeply($nous->mcp_servers, [], 'mcp_servers defaults to empty');
@@ -86,7 +86,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 }
 
 # ========================================================================
-# OpenAI with hermes_tools off (default)
+# OpenAI does NOT compose HermesTools
 # ========================================================================
 
 {
@@ -95,22 +95,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     model   => 'test',
   );
 
-  is($openai->hermes_tools, 0, 'OpenAI: hermes_tools defaults to 0');
-}
-
-# ========================================================================
-# OpenAI with hermes_tools on
-# ========================================================================
-
-{
-  my $openai = Langertha::Engine::OpenAI->new(
-    api_key      => 'test-key',
-    model        => 'test',
-    hermes_tools => 1,
-  );
-
-  is($openai->hermes_tools, 1, 'OpenAI: hermes_tools can be enabled');
-  like($openai->hermes_tool_prompt, qr/<tool_call>/, 'OpenAI hermes prompt works');
+  ok(!$openai->does('Langertha::Role::HermesTools'), 'OpenAI: does not compose HermesTools');
 }
 
 # ========================================================================
@@ -139,7 +124,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 }
 
 # ========================================================================
-# _hermes_parse_tool_calls — single tool call
+# response_tool_calls — single tool call
 # ========================================================================
 
 {
@@ -157,14 +142,14 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  my $calls = $nous->_hermes_parse_tool_calls($data);
+  my $calls = $nous->response_tool_calls($data);
   is(scalar @$calls, 1, 'one tool call parsed');
   is($calls->[0]{name}, 'add', 'tool call name');
   is_deeply($calls->[0]{arguments}, { a => 7, b => 15 }, 'tool call arguments');
 }
 
 # ========================================================================
-# _hermes_parse_tool_calls — multiple tool calls
+# response_tool_calls — multiple tool calls
 # ========================================================================
 
 {
@@ -184,7 +169,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  my $calls = $nous->_hermes_parse_tool_calls($data);
+  my $calls = $nous->response_tool_calls($data);
   is(scalar @$calls, 2, 'two tool calls parsed');
   is($calls->[0]{name}, 'add', 'first tool call name');
   is($calls->[1]{name}, 'multiply', 'second tool call name');
@@ -192,7 +177,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 }
 
 # ========================================================================
-# _hermes_parse_tool_calls — no tool calls
+# response_tool_calls — no tool calls
 # ========================================================================
 
 {
@@ -210,12 +195,12 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  my $calls = $nous->_hermes_parse_tool_calls($data);
+  my $calls = $nous->response_tool_calls($data);
   is(scalar @$calls, 0, 'no tool calls in plain text');
 }
 
 # ========================================================================
-# _hermes_parse_tool_calls — empty/undef content
+# response_tool_calls — empty/undef content
 # ========================================================================
 
 {
@@ -224,12 +209,12 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     model   => 'test',
   );
 
-  is_deeply($nous->_hermes_parse_tool_calls({}), [], 'empty data returns empty');
-  is_deeply($nous->_hermes_parse_tool_calls({ choices => [] }), [], 'empty choices returns empty');
+  is_deeply($nous->response_tool_calls({}), [], 'empty data returns empty');
+  is_deeply($nous->response_tool_calls({ choices => [] }), [], 'empty choices returns empty');
 }
 
 # ========================================================================
-# _hermes_parse_tool_calls — malformed JSON inside tags (skipped)
+# response_tool_calls — malformed JSON inside tags (skipped)
 # ========================================================================
 
 {
@@ -248,13 +233,13 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  my $calls = $nous->_hermes_parse_tool_calls($data);
+  my $calls = $nous->response_tool_calls($data);
   is(scalar @$calls, 1, 'malformed JSON skipped, valid one parsed');
   is($calls->[0]{name}, 'add', 'valid tool call extracted');
 }
 
 # ========================================================================
-# _hermes_text_content — strips tool_call tags
+# response_text_content — strips tool_call tags
 # ========================================================================
 
 {
@@ -272,11 +257,11 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  is($nous->_hermes_text_content($data), "Some text before\n\nSome text after", 'tool_call tags stripped, text preserved');
+  is($nous->response_text_content($data), "Some text before\n\nSome text after", 'tool_call tags stripped, text preserved');
 }
 
 # ========================================================================
-# _hermes_text_content — plain text (no tags)
+# response_text_content — plain text (no tags)
 # ========================================================================
 
 {
@@ -294,11 +279,11 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  is($nous->_hermes_text_content($data), 'The result is 22.', 'text trimmed, no tags to strip');
+  is($nous->response_text_content($data), 'The result is 22.', 'text trimmed, no tags to strip');
 }
 
 # ========================================================================
-# _hermes_build_tool_results
+# format_tool_results
 # ========================================================================
 
 {
@@ -325,7 +310,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     },
   ];
 
-  my @messages = $nous->_hermes_build_tool_results($data, $results);
+  my @messages = $nous->format_tool_results($data, $results);
   is(scalar @messages, 2, 'two messages (assistant + tool result)');
 
   is($messages[0]{role}, 'assistant', 'first is assistant');
@@ -342,7 +327,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
 }
 
 # ========================================================================
-# _hermes_build_tool_results — custom response tag
+# format_tool_results — custom response tag
 # ========================================================================
 
 {
@@ -368,13 +353,13 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     },
   ];
 
-  my @messages = $engine->_hermes_build_tool_results($data, $results);
+  my @messages = $engine->format_tool_results($data, $results);
   like($messages[1]{content}, qr/<fn_response>/, 'custom response tag used');
   unlike($messages[1]{content}, qr/<tool_response>/, 'default response tag not used');
 }
 
 # ========================================================================
-# _hermes_parse_tool_calls — custom call tag
+# response_tool_calls — custom call tag
 # ========================================================================
 
 {
@@ -393,7 +378,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  my $calls = $engine->_hermes_parse_tool_calls($data);
+  my $calls = $engine->response_tool_calls($data);
   is(scalar @$calls, 1, 'custom call tag parsed');
   is($calls->[0]{name}, 'add', 'tool name from custom tag');
 
@@ -407,12 +392,12 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  my $calls2 = $engine->_hermes_parse_tool_calls($data_default_tag);
+  my $calls2 = $engine->response_tool_calls($data_default_tag);
   is(scalar @$calls2, 0, 'default tag NOT matched when custom tag is set');
 }
 
 # ========================================================================
-# _hermes_text_content — custom call tag stripped
+# response_text_content — custom call tag stripped
 # ========================================================================
 
 {
@@ -431,7 +416,7 @@ my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1);
     }],
   };
 
-  is($engine->_hermes_text_content($data), 'Result:', 'custom call tag stripped from text');
+  is($engine->response_text_content($data), 'Result:', 'custom call tag stripped from text');
 }
 
 # ========================================================================

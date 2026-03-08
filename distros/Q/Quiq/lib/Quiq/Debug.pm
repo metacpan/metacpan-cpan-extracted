@@ -21,13 +21,14 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.235';
+our $VERSION = '1.236';
 
 use Data::Printer color=>{string=>'black'};
 use Data::Printer ();
 use Quiq::Path;
 use Quiq::Shell;
 use Quiq::Terminal;
+use Encode ();
 
 # -----------------------------------------------------------------------------
 
@@ -245,9 +246,87 @@ sub showDiff {
 
 # -----------------------------------------------------------------------------
 
+=head3 showRdiff() - Zeige Differenz einer Datei in zwei Verzeichnissen, lokal und remote
+
+=head4 Synopsis
+
+  $str = $this->showRdiff($lRoot,$rRoot,$file,%options);
+
+=head4 Arguments
+
+=over 4
+
+=item $lRoot
+
+Lokales Wurzelverzeichnis
+
+=item $rRoot
+
+Remote Wurzelverzeichnis (per ssh erreichbar)
+
+=back
+
+=head4 Options
+
+=over 4
+
+=item -commandOnly => $bool (Default: 0)
+
+Zeige nur das Kommando, führe es jedoch nicht aus.
+
+=back
+
+=head4 Returns
+
+(String) Differenz, wie sie von diff(1) dargestellt wird.
+
+=head4 Description
+
+Das Kommando ermittelt die Differenz einer Datei in zwei Verzeichnissen
+mit der gleichen Struktur, wobei das eine Verzeichnis lokal und das
+andere remote ist, und liefert diese Differenz zurück.
+
+=head4 Example
+
+Differenz einer Datei in ZUGFeRD-Installation in Entwicklungs-
+und Produktivumgebung:
+
+  $ perl -MQuiq::Debug -E 'print Quiq::Debug->showRdiff($ENV{"ZUGFERD_HOME"},"z3po\@z3po:/opt/Zugferd","etc/niederlassung.csv")'
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub showRdiff {
+    my $this = shift;
+
+    # Argumente und Optionen
+
+    my $commandOnly = 0;
+
+    my $argA = $this->parameters(3,3,\@_,
+        -commandOnly => \$commandOnly,
+    );
+    my ($lRoot,$rRoot,$file) = @$argA;
+
+    # Operation ausführen
+
+    my $sh = Quiq::Shell->new;
+
+    my ($login,$root) = split /:/,$rRoot,2;
+
+    my $cmd = "ssh $login cat $root/$file | diff $lRoot/$file -";
+    my $str = $sh->exec($cmd,-sloppy=>1,-capture=>'stdout+stderr');
+    # $str = Encode::decode('UTF-8',$str);
+
+    return $str;
+}
+
+# -----------------------------------------------------------------------------
+
 =head1 VERSION
 
-1.235
+1.236
 
 =head1 AUTHOR
 

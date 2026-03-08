@@ -15,8 +15,8 @@ readonly_off( $Test::Expander::TEST_FILE );
 subtest 'test file exists' => sub {
   plan( 2 );
 
-  lives_ok { $METHOD_REF->( $TEMP_FILE ) }    'executed';
-  is( $Test::Expander::TEST_FILE, $TEMP_FILE, q('$TEMP_FILE' set) );
+  lives_ok { $METHOD_REF->( $TEMP_FILE ) } 'executed';
+  is( $Test::Expander::TEST_FILE =~ s{\\}{/}gr, $TEMP_FILE =~ s{\\}{/}gr, q('$TEMP_FILE' set) );
 };
 
 subtest 'test file does not exist' => sub {
@@ -26,5 +26,5 @@ subtest 'test file does not exist' => sub {
   $Test::Expander::TEST_FILE = '';
 
   lives_ok { $METHOD_REF->( $TEMP_FILE ) } 'executed';
-  is( $Test::Expander::TEST_FILE, '',      q('$TEMP_FILE' not set) );
+  is( $Test::Expander::TEST_FILE,               '',                       q('$TEMP_FILE' not set) );
 };

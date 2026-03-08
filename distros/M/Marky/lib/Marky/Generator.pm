@@ -1,5 +1,5 @@
 package Marky::Generator;
-$Marky::Generator::VERSION = '0.0602';
+$Marky::Generator::VERSION = '0.0604';
 # ABSTRACT: Marky::Generator - generates boilerplate for marky webapp
 
 use Mojo::Base 'Mojolicious::Command';
@@ -32,7 +32,7 @@ Marky::Generator - Marky::Generator - generates boilerplate for marky webapp
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head1 NAME
 
@@ -40,7 +40,7 @@ Marky::Generator - generates boilerplate for marky webapp
 
 =head1 VERSION
 
-version 0.0602
+version 0.0604
 
 =head2 init
 

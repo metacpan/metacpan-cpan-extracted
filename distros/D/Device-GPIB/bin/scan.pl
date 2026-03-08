@@ -31,7 +31,7 @@ $verbose = $main::opt_verbose if defined $main::opt_verbose;
 $port = $main::opt_port if defined $main::opt_port;
 $start = $main::opt_start if defined $main::opt_start;
 $end = $main::opt_end if defined $main::opt_end;
-$Device::GPIB::Controller::debug = 1 if $main::opt_debug;
+Device::GPIB::Controller::enableDebug(1) if $main::opt_debug;
 
 die "Start address is after end address" unless $start <= $end;
 

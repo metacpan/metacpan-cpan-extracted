@@ -1,22 +1,17 @@
 package Langertha::Engine::MiniMax;
-# ABSTRACT: MiniMax API
-our $VERSION = '0.302';
+# ABSTRACT: MiniMax API (Anthropic-compatible)
+our $VERSION = '0.304';
 use Moose;
 use Carp qw( croak );
 
-extends 'Langertha::Engine::OpenAIBase';
+extends 'Langertha::Engine::Anthropic';
 
-with 'Langertha::Role::Tools';
 with 'Langertha::Role::StaticModels';
 
 
-sub _build_supported_operations {[qw(
-  createChatCompletion
-)]}
-
 has '+url' => (
   lazy => 1,
-  default => sub { 'https://api.minimax.io/v1' },
+  default => sub { 'https://api.minimax.io/anthropic' },
 );
 
 sub _build_api_key {
@@ -26,6 +21,8 @@ sub _build_api_key {
 }
 
 sub default_model { 'MiniMax-M2.5' }
+
+sub default_response_size { 4096 }
 
 sub _build_static_models {[
   { id => 'MiniMax-M2.5' },
@@ -48,11 +45,11 @@ __END__
 
 =head1 NAME
 
-Langertha::Engine::MiniMax - MiniMax API
+Langertha::Engine::MiniMax - MiniMax API (Anthropic-compatible)
 
 =head1 VERSION
 
-version 0.302
+version 0.304
 
 =head1 SYNOPSIS
 
@@ -76,11 +73,12 @@ version 0.302
 =head1 DESCRIPTION
 
 Provides access to L<MiniMax|https://www.minimax.io/> models via their
-OpenAI-compatible API. Composes L<Langertha::Role::OpenAICompatible> with
-MiniMax's endpoint (C<https://api.minimax.io/v1>) and API key handling.
+Anthropic-compatible API at C<https://api.minimax.io/anthropic>.
 
 MiniMax is a Chinese AI company based in Shanghai, offering large language
-models with strong coding, reasoning, and agentic capabilities.
+models with strong coding, reasoning, and agentic capabilities. Their API
+is Anthropic-compatible (recommended by MiniMax) and supports tool calling,
+extended thinking, and streaming.
 
 B<Available text models:>
 
@@ -106,27 +104,21 @@ agentic capabilities.
 See L<https://platform.minimax.io/docs/guides/models-intro> for the full
 model catalog including audio, video, and music models.
 
-Supports chat, streaming, and tool calling. Embeddings, transcription, and
-dynamic model listing (C</v1/models>) are not supported.
-
-B<Coding Plan:> MiniMax offers a Coding Plan subscription with web search
-and image understanding APIs for coding workflows. See
-L<https://platform.minimax.io/docs/coding-plan/intro>.
+Supports chat, streaming, tool calling, and extended thinking. Embeddings,
+transcription, images, and documents are not supported via this endpoint.
 
 Get your API key at L<https://platform.minimax.io/> and set
 C<LANGERTHA_MINIMAX_API_KEY> in your environment.
-
-B<THIS API IS WORK IN PROGRESS>
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<https://platform.minimax.io/docs/> - Official MiniMax API documentation
+=item * L<https://platform.minimax.io/docs/api-reference/text-anthropic-api> - MiniMax Anthropic API docs
 
-=item * L<Langertha::Role::OpenAICompatible> - OpenAI API format role
+=item * L<Langertha::Engine::Anthropic> - Base Anthropic engine
 
-=item * L<Langertha::Engine::DeepSeek> - Another OpenAI-compatible engine
+=item * L<Langertha::Role::Tools> - MCP tool calling interface
 
 =back
 

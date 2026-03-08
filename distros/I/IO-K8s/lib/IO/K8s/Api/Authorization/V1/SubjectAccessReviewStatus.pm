@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::SubjectAccessReviewStatus;
 # ABSTRACT: SubjectAccessReviewStatus
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 use IO::K8s::Resource;
 
 k8s allowed => Bool, 'required';
@@ -29,7 +29,7 @@ IO::K8s::Api::Authorization::V1::SubjectAccessReviewStatus - SubjectAccessReview
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head2 allowed
 
