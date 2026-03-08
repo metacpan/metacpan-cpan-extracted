@@ -1,6 +1,6 @@
 package Adam::Plugin;
 # ABSTRACT: A base class for Adam/Moses plugins
-our $VERSION = '1.000';
+our $VERSION = '1.002';
 use Moose;
 use namespace::autoclean;
 
@@ -71,7 +71,7 @@ Adam::Plugin - A base class for Adam/Moses plugins
 
 =head1 VERSION
 
-version 1.000
+version 1.002
 
 =head1 DESCRIPTION
 

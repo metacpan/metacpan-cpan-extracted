@@ -15,6 +15,7 @@
 #include <string.h>
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__)) || defined(__HAIKU__)
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <termios.h>

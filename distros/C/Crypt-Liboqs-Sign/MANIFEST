@@ -1,0 +1,17 @@
+Changes
+lib/Crypt/Liboqs/Sign.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+Sign.xs
+t/00-load.t
+t/all_algorithms.t
+t/compat_pqclean.t
+t/falcon512.t
+t/falcon1024.t
+t/mldsa44.t
+t/mldsa65.t
+t/mldsa87.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

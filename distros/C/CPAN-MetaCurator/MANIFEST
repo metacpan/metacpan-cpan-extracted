@@ -25,9 +25,9 @@ README
 scripts/build.db.sh
 scripts/create.tables.pl
 scripts/drop.tables.pl
-scripts/export.as.tree.pl
-scripts/export.as.tree.sh
 scripts/export.modules2csv.pl
+scripts/export.tree.pl
+scripts/export.tree.sh
 scripts/flowchart.pl
 scripts/populate.sqlite.tables.pl
 scripts/read.tiddlers.pl

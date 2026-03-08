@@ -1,6 +1,6 @@
 package Moses;
 # ABSTRACT: A framework for building IRC bots quickly and easily.
-our $VERSION = '1.000';
+our $VERSION = '1.002';
 use MooseX::POE ();
 use Moose::Exporter;
 use Adam;
@@ -134,7 +134,7 @@ Moses - A framework for building IRC bots quickly and easily.
 
 =head1 VERSION
 
-version 1.000
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -166,9 +166,14 @@ version 1.000
 
 =head1 DESCRIPTION
 
-Moses is declarative sugar for building IRC bots based on the L<Adam> IRC Bot.
-Moses is designed to minimize the amount of work you have to do to make an IRC
-bot functional, and to make the process as declarative as possible.
+Moses is declarative sugar for building IRC bots based on the L<Adam> IRC bot
+framework. Moses is designed to minimize the amount of work you have to do to
+make an IRC bot functional, and to make the process as declarative as possible.
+
+Bots can run in two modes: the default L<POE> event loop via C<run()>, or an
+L<IO::Async> mode via C<async()> that enables integration with
+L<IO::Async>-based components such as L<Net::Async::MCP> or
+L<Net::Async::HTTP>. The async mode requires L<IO::Async::Loop::POE>.
 
 =head2 nickname
 

@@ -1052,8 +1052,6 @@ flush(s, output, f=LZMA_FINISH)
             break;
     }
 
-    /* TODO -- ??? */
-    /* RETVAL =  (RETVAL == LZMA_STREAM_END ? LZMA_OK : RETVAL) ; */
     s->last_error = RETVAL ;
 
     s->compressedBytes    += cur_length + increment - s->stream.avail_out ;

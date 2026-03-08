@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Crypt-NaCl-Sodium",
    "no_index" : {
@@ -90,7 +90,7 @@
    "provides" : {
       "Crypt::NaCl::Sodium" : {
          "file" : "lib/Crypt/NaCl/Sodium.pm",
-         "version" : "2.002"
+         "version" : "2.003"
       }
    },
    "release_status" : "stable",
@@ -105,13 +105,14 @@
          "web" : "https://github.com/cpan-authors/crypt-nacl-sodium"
       }
    },
-   "version" : "2.002",
+   "version" : "2.003",
    "x_contributors" : [
+      "Brad Barden <perlmodules@5c30.org>",
       "Chase Whitener <capoeirab@cpan.org>",
       "Timothy Legge <timlegge@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.42.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,3 +1,19 @@
+0.001001 Mar 7 2026
+
+SECURITY UPDATE (CVE-2026-30910): Combined aead encryption, combined signature
+creation, and bin2hex functions did not check that output size will be less
+than SIZE_MAX, which could lead to integer wraparound causing an undersized
+output buffer. This can cause a crash in bin2hex and encryption algorithms
+other than aes256gcm. For aes256gcm encryption and signatures, an undersized
+buffer could lead to buffer overflow.
+
+Encountering this issue is unlikely as the message length would need to be very
+large.
+
+Additional changes:
+
+- update README
+
 0.001000 Jan 21 2026
 
 - large re-factor (mostly just deduplication) of perl module code. one
@@ -25,11 +41,11 @@ January 3, 2026 which includes a fix for the vulnerability.
 
 vulnerability notes:
 
-* C::S::XS::curve25519::core_ed25519_is_valid_point could have improperly
+- C::S::XS::curve25519::core_ed25519_is_valid_point could have improperly
   reported invalid curve points as valid. only users of this low-level function
   (e.g., for implementing custom crypto) are affected.
 
-* this update only affects users of the bundled version of libsodium. users
+- this update only affects users of the bundled version of libsodium. users
   of an externally-provided libsodium (e.g., software packaged by operating
   system distribution) must update that library to a not-vulnerable version.
   for those external library users, this Crypt::Sodium::XS update is not

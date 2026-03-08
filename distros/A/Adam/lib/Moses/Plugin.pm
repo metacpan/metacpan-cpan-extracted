@@ -1,6 +1,6 @@
 package Moses::Plugin;
 # ABSTRACT: Sugar for Moses Plugins
-our $VERSION = '1.000';
+our $VERSION = '1.002';
 use Moose       ();
 use MooseX::POE ();
 use Moose::Exporter;
@@ -50,7 +50,7 @@ Moses::Plugin - Sugar for Moses Plugins
 
 =head1 VERSION
 
-version 1.000
+version 1.002
 
 =head1 DESCRIPTION
 

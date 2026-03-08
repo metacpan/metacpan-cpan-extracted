@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>55a34a9a-094f-412b-a4de-e7c5de4502a0</MessageSerialNumber>
-  <MessageDate>Fri, 27 Feb 2026 04:21:01 GMT</MessageDate>
+  <MessageSerialNumber>c1dd34eb-839a-4cf4-8d7f-d2966290a834</MessageSerialNumber>
+  <MessageDate>Fri, 6 Mar 2026 04:17:57 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -37,8 +37,12 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>6600000-6999999</Range>
+          <Range>6600000-6998999</Range>
           <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>6999000-6999999</Range>
+          <Length>5</Length>
         </Rule>
         <Rule>
           <Range>7000000-7999999</Range>
@@ -1759,11 +1763,11 @@
       <Agency>Brazil</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-0199999</Range>
+          <Range>0000000-0299999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>0200000-2499999</Range>
+          <Range>0300000-2499999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
@@ -1779,11 +1783,11 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>5000000-6199999</Range>
+          <Range>5000000-6349999</Range>
           <Length>4</Length>
         </Rule>
         <Rule>
-          <Range>6200000-7999999</Range>
+          <Range>6350000-7999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
@@ -1791,11 +1795,11 @@
           <Length>5</Length>
         </Rule>
         <Rule>
-          <Range>8182500-8264999</Range>
+          <Range>8182500-8199999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>8265000-8999999</Range>
+          <Range>8200000-8999999</Range>
           <Length>5</Length>
         </Rule>
         <Rule>
@@ -1803,12 +1807,34 @@
           <Length>6</Length>
         </Rule>
         <Rule>
-          <Range>9024500-9784999</Range>
+          <Range>9024500-9754999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>9785000-9999999</Range>
+          <Range>9755000-9999999</Range>
           <Length>6</Length>
+        </Rule>
+      </Rules>
+    </Group>
+    <Group>
+      <Prefix>978-69990</Prefix>
+      <Agency>Zambia registration group</Agency>
+      <Rules>
+        <Rule>
+          <Range>0000000-4999999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>5000000-5099999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>5100000-9969999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9970000-9999999</Range>
+          <Length>3</Length>
         </Rule>
       </Rules>
     </Group>

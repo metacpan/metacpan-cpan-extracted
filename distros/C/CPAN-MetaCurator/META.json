@@ -87,6 +87,6 @@
          "web" : "https://github.com/ronsavage/CPAN-MetaCurator"
       }
    },
-   "version" : "1.09",
+   "version" : "1.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -25,7 +25,7 @@ Moses::Declare - MooseX::Declare syntax for Moses bots
 
 =head1 VERSION
 
-version 1.000
+version 1.002
 
 =head1 SYNOPSIS
 

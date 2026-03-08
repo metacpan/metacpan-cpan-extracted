@@ -4,7 +4,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Cwd;
 use LWP::Simple;
@@ -33,17 +33,17 @@ class Container::Builder {
 	field $os = 'debian';
 	field $arch = 'amd64';
 	field $os_version :param = 'bookworm';
-	field @layers = ();
+	field @layers :reader(get_layers);
 	field $original_dir = Cwd::getcwd();
 	field $runas = 'root';
 	field $work_dir = '/';
-	field @entry = ();
-	field @cmd = ();
-	field @env = ();
-	field %deb_packages = ();
-	field @dirs = ();
-	field @users = ();
-	field @groups = ();
+	field @entry :reader(get_entry);
+	field @cmd :reader(get_cmd);
+	field %env :reader(get_env);
+	field %deb_packages;
+	field @dirs :reader(get_dirs);
+	field @users :reader(get_users);
+	field @groups :reader(get_groups);
 	field $packages; 
 
 	# Podman will use the Container::Builder::Config digest as the identifier for your imported container. Users might want to have this ID.
@@ -242,7 +242,7 @@ class Container::Builder {
 	# Sets an environment variable, similar to ENV in Dockerfile
 	method set_env($key, $value) {
 		# TODO: probably needs some escaping for nasty value's or values with an '=', ...
-		push @env, "$key=$value";
+		$env{$key} = $value;
 	}
 
 	# Set entrypoint
@@ -291,7 +291,8 @@ class Container::Builder {
 
 		# We need to generate our artifacts before we can call the Config, because we need the sizes and digests of the layers...
 		my $config = Container::Builder::Config->new();
-		my $config_json = $config->generate_config($runas, \@env, \@entry, \@cmd, $work_dir, \@layers);
+		my @envarr = map { $_ . '=' . $env{$_} } keys(%env);
+		my $config_json = $config->generate_config($runas, \@envarr, \@entry, \@cmd, $work_dir, \@layers);
 		$tar->add_file('blobs/sha256/' . $config->get_digest(), $config_json, 0644, 0, 0);
 		$ctr_digest = $config->get_digest();
 
@@ -316,10 +317,6 @@ class Container::Builder {
 	method get_digest() {
 		die "Run build() first" if ! $ctr_digest;
 		$ctr_digest;
-	}
-
-	method get_layers() {
-		@layers
 	}
 }
 

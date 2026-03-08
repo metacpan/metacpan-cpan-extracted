@@ -1,6 +1,6 @@
 package Crypt::NaCl::Sodium;
 
-our $VERSION = '2.002';
+our $VERSION = '2.003';
 our $XS_VERSION = $VERSION;
 
 use strict;

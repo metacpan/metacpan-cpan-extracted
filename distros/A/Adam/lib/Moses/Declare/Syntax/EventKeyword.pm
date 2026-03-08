@@ -32,7 +32,7 @@ Moses::Declare::Syntax::EventKeyword - Event keyword for Moses::Declare
 
 =head1 VERSION
 
-version 1.000
+version 1.002
 
 =head1 SUPPORT
 

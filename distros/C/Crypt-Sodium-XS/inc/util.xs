@@ -57,6 +57,8 @@ SV * sodium_bin2hex(SV * bytes)
 
   CODE:
   bytes_buf = SvPVbyte(bytes, bytes_len);
+  if (bytes_len > SIZE_MAX / 2)
+    croak("Message too large.");
   out_len = bytes_len * 2;
   Newx(out_buf, out_len + 1, char);
   if (out_buf == NULL)

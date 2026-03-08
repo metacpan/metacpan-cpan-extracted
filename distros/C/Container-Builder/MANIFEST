@@ -22,10 +22,12 @@ lib/Container/Builder/Layer/SingleFile.pm
 lib/Container/Builder/Layer/Tar.pm
 lib/Container/Builder/Manifest.pm
 lib/Container/Builder/Tar.pm
+t/00_new.t
 t/01_config.t
 t/02_manifest.t
 t/03_index.t
 t/04_copy.t
+t/05_builder.t
 t/author-pod-syntax.t
 t/haha/hehe/hihi/ghehe.txt
 t/haha/hehe/hihi/lib/lob.txt

@@ -39,7 +39,7 @@ SV * sign(SV * msg, SV * sk)
   PREINIT:
   protmem *msg_pm = NULL, *sk_pm = NULL;
   unsigned char *msg_buf, *sk_buf, *smsg_buf;
-  STRLEN msg_len, sk_len, sk_req_len, sig_len;
+  STRLEN msg_len, sk_len, sk_req_len, sig_len, out_len;
   int (*func)(unsigned char *, unsigned long long *, const unsigned char *,
               unsigned long long, const unsigned char *);
 
@@ -64,6 +64,10 @@ SV * sign(SV * msg, SV * sk)
   else
     msg_buf = (unsigned char *)SvPVbyte(msg, msg_len);
 
+  if (SIZE_MAX - sig_len < msg_len)
+    croak("Message too large");
+  out_len = msg_len + sig_len;
+
   if (sv_derived_from(sk, MEMVAULT_CLASS)) {
     sk_pm = protmem_get(aTHX_ sk, MEMVAULT_CLASS);
     sk_buf = sk_pm->pm_ptr;
@@ -85,7 +89,7 @@ SV * sign(SV * msg, SV * sk)
     protmem *smsg_pm;
     int ret;
 
-    smsg_pm = protmem_init(aTHX_ sig_len + msg_len, msg_pm->flags);
+    smsg_pm = protmem_init(aTHX_ out_len, msg_pm->flags);
     if (smsg_pm == NULL) {
       if (sk_pm)
         protmem_release(aTHX_ sk_pm, PROTMEM_FLAG_MPROTECT_RO);
@@ -119,19 +123,17 @@ SV * sign(SV * msg, SV * sk)
       RETVAL = protmem_to_sv(aTHX_ smsg_pm, MEMVAULT_CLASS);
   }
   else {
-    STRLEN smsg_len = sig_len + msg_len;
-
-    Newx(smsg_buf, smsg_len + 1, unsigned char);
+    Newx(smsg_buf, out_len + 1, unsigned char);
     if (smsg_buf == NULL) {
       if (sk_pm)
         protmem_release(aTHX_ sk_pm, PROTMEM_FLAG_MPROTECT_RO);
       croak("sign: Failed to allocate memory");
     }
-    smsg_buf[smsg_len] = '\0';
+    smsg_buf[out_len] = '\0';
 
     if (func(smsg_buf, NULL, msg_buf, msg_len, sk_buf) == 0) {
       RETVAL = newSV(0);
-      sv_usepvn_flags(RETVAL, (char *)smsg_buf, smsg_len, SV_HAS_TRAILING_NUL);
+      sv_usepvn_flags(RETVAL, (char *)smsg_buf, out_len, SV_HAS_TRAILING_NUL);
     }
   }
 

@@ -4,7 +4,7 @@ use Test::More;
 use Archive::Tar;
 use Container::Builder;
 
-my $builder = Container::Builder->new(debian_pkg_hostname => '');
+my $builder = Container::Builder->new(debian_pkg_hostname => 'iaan.be');
 # haha gets renamed to /app
 $builder->copy('t/haha', '/app', 0755, 0, 0);
 $builder->copy('t/haha/', '/app', 0755, 0, 0);

@@ -15,11 +15,11 @@ use Moo;
 
 use File::Slurper 'read_lines';
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 # -----------------------------------------------
 
-sub export_as_tree
+sub export_tree
 {
 	my($self) = @_;
 
@@ -82,7 +82,7 @@ sub export_as_tree
 
 	return 0;
 
-} # End of export_as_tree.
+} # End of export_tree.
 
 # --------------------------------------------------
 
@@ -116,7 +116,6 @@ sub format_text
 	my($self, $leaf_id, $pad, $topic)	= @_;
 	my(@lines)							= grep{length} split(/\n/, $$topic{text});
 	@lines								= map{s/\s+$//; s/^-\s//; s/:$//; $_} @lines;
-	my($inside_see_also)				= false;
 	my($line_id)						= $leaf_id;
 	my($index)							= 0;
 	my($token_re)						= qr/^o/o;
@@ -126,8 +125,12 @@ sub format_text
 	my($item, @items);
 	my($line);
 	my(%node_type);
-	my(@see_also);
+	my(@pre_pre);
+	my(%special_case, @see_also);
 	my($token);
+
+	$special_case{pre_pre}	= false;
+	$special_case{see_also}	= false;
 
 	while ($index <= $#lines)
 	{
@@ -139,8 +142,32 @@ sub format_text
 		next if ($line =~ /o See also/); # For the moment.
 		next if ($line !~ /^o (.+)/);
 
-		$token				= $1 || '';
-		$item				= {href => '', id => ++$line_id, text => ''};
+		$token	= $1 || '';
+		$item	= {href => '', id => ++$line_id, text => ''};
+
+=pod
+		if ($line =~ /<pre>/)
+		{
+			$special_case{pre_pre} = true;
+
+			next;
+		}
+		elsif ($special_case{pre_pre})
+		{
+			if ($line =~ /<\/pre>/)
+			{
+				$special_case{pre_pre} = false;
+
+				$$item{html}	= '<button id="trigger">Hover over me</button>';
+				$$item{text}	= $token;
+			}
+			else
+			{
+				push @pre_pre, $line;
+			}
+		}
+=cut
+
 		$node_type{acronym}	= $$topic{title} eq 'Acronyms' ? true : false;
 		$node_type{topic}	= $$pad{topic_names}{$token} ? true : false;
 		$node_type{unknown}	= ! ($node_type{acronym} || $node_type{topic});
@@ -163,7 +190,10 @@ sub format_text
 			$self -> logger -> debug("Unknown: $token");
 		}
 
-		if (defined $lines[$index + 1])
+		if ($$topic{title} eq 'FAQ')
+		{
+		}
+		elsif (defined $lines[$index + 1])
 		{
 			$$item{html}	= "<a href = '@{[$lines[$index + 1]]}' target = '_blank'>$token - @{[$lines[$index]]}</a>";
 			$$item{text}	= "";
@@ -175,49 +205,6 @@ sub format_text
 			$self -> logger -> warn("Undefined token @ $line");
 		}
 
-=pod
-			$self -> logger -> debug("Pushed acronym $token");
-
-			$index += 2;
-
-			$finished = $lines[$index] =~ $token_re ? true : false;
-
-			$self -> logger -> debug("  Test $lines[$index] => $finished");
-
-			while (! $finished)
-			{
-				$$item{id}++;
-
-				$$item{html}	= '';
-				$$item{text}	= $lines[$index];
-
-				push @items, $item;
-
-				$self -> logger -> debug("  & $$item{id} => $$item{text}");
-
-				$index++;
-
-				$finished = true if ( (! $lines[$index]) || ($lines[$index] =~ $token_re) || ($index > $#lines) );
-
-				$self -> logger -> debug("  Test $lines[$index] => $finished");
-
-				#push @items, {html => '', text => '</ul>'} if ($finished);
-			}
-=cut
-=pod
-		}
-		elsif ($node_type{topic})
-		{
-			# These are counted in Database.build_pad().
-
-			$$item{html}	= "#$$pad{topic_html_ids}{$token} [topic]";
-			$$item{text}	= $token;
-
-			push @items, $item;
-
-			$self -> logger -> debug("Pushed topic $$item{html}");
-		}
-=cut
 =pod
 
 	my($count) = 0;

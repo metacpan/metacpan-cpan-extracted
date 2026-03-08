@@ -25,7 +25,7 @@ has constants_csv_path =>
 	required	=> 0,
 );
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 # -----------------------------------------------
 
@@ -80,7 +80,7 @@ sub import_csv_file
 
 	close $io;
 
-	$self -> logger -> info("Stored $count records into '$table_name'");
+	$self -> logger -> info("Stored $count records into table '$table_name'");
 
 } # End of import_csv_file.
 
@@ -130,7 +130,7 @@ sub populate_constants_table
 	$$pad{$table_name}		= $self -> read_table($table_name);
 	my($constants_count)	= $#{$$pad{$table_name} } + 1;
 
-	$self -> logger -> info("Finished populate_constants_table(). Stored $constants_count records into '$table_name'");
+	$self -> logger -> info("Finished populate_constants_table(). Stored $constants_count records into table '$table_name'");
 
 }	# End of populate_constants_table.
 

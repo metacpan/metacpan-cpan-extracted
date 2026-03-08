@@ -425,7 +425,7 @@ void aead_chacha20poly1305_encrypt( \
   SV *ct, *adata_out = NULL;
   unsigned char *msg_buf, *adata_buf = NULL, *nonce_buf, *key_buf, *ct_buf, *adata_out_buf;
   STRLEN msg_len, adata_len = 0, nonce_len, key_len;
-  STRLEN adata_req_len, nonce_req_len, key_req_len;
+  STRLEN adata_req_len, nonce_req_len, key_req_len, out_len;
   int (*comb_func)(unsigned char *, unsigned long long *, const unsigned char *,
                    unsigned long long, const unsigned char *, unsigned long long,
                    const unsigned char *, const unsigned char *, const unsigned char *);
@@ -562,9 +562,11 @@ void aead_chacha20poly1305_encrypt( \
                     SV_HAS_TRAILING_NUL);
   }
   else {
-    STRLEN ct_len = adata_req_len + msg_len;
+    if (SIZE_MAX - adata_req_len < msg_len)
+      croak("Message too large");
+    out_len = adata_req_len + msg_len;
 
-    Newx(ct_buf, ct_len + 1, unsigned char);
+    Newx(ct_buf, out_len + 1, unsigned char);
     if (ct_buf == NULL) {
       if (msg_pm)
         protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
@@ -572,13 +574,13 @@ void aead_chacha20poly1305_encrypt( \
         protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO);
       croak("aead_encrypt: Failed to allocate memory");
     }
-    ct_buf[ct_len] = '\0';
+    ct_buf[out_len] = '\0';
 
     comb_func(ct_buf, NULL, msg_buf, msg_len,
               adata_buf, adata_len, NULL, nonce_buf, key_buf);
 
     ct = newSV(0);
-    sv_usepvn_flags(ct, (char *)ct_buf, ct_len, SV_HAS_TRAILING_NUL);
+    sv_usepvn_flags(ct, (char *)ct_buf, out_len, SV_HAS_TRAILING_NUL);
   }
 
   if (key_pm && protmem_release(aTHX_ key_pm, PROTMEM_FLAG_MPROTECT_RO) != 0) {
@@ -844,7 +846,7 @@ void encrypt(SV * self, SV * msg, SV * nonce, SV * adata = &PL_sv_undef)
   protmem *precalc_pm, *msg_pm = NULL;
   SV *ct, *adata_out = NULL;
   unsigned char *msg_buf, *adata_buf = NULL, *nonce_buf, *ct_buf, *adata_out_buf;
-  STRLEN msg_len, adata_len = 0, nonce_len;
+  STRLEN msg_len, adata_len = 0, nonce_len, out_len;
 
   PPCODE:
   nonce_buf = (unsigned char *)SvPVbyte(nonce, nonce_len);
@@ -904,23 +906,25 @@ void encrypt(SV * self, SV * msg, SV * nonce, SV * adata = &PL_sv_undef)
                     crypto_aead_aes256gcm_ABYTES, SV_HAS_TRAILING_NUL);
   }
   else {
-    STRLEN ct_len = crypto_aead_aes256gcm_ABYTES + msg_len;
+    if (SIZE_MAX - crypto_aead_aes256gcm_ABYTES < msg_len)
+      croak("Message too large");
+    out_len = crypto_aead_aes256gcm_ABYTES + msg_len;
 
-    Newx(ct_buf, ct_len + 1, unsigned char);
+    Newx(ct_buf, out_len + 1, unsigned char);
     if (ct_buf == NULL) {
       protmem_release(aTHX_ precalc_pm, PROTMEM_FLAG_MPROTECT_RW);
       if (msg_pm)
         protmem_release(aTHX_ msg_pm, PROTMEM_FLAG_MPROTECT_RO);
       croak("encrypt: Failed to allocate memory");
     }
-    ct_buf[ct_len] = '\0';
+    ct_buf[out_len] = '\0';
 
     crypto_aead_aes256gcm_encrypt_afternm(
       ct_buf, NULL, msg_buf, msg_len, adata_buf, adata_len,
       NULL, nonce_buf, (crypto_aead_aes256gcm_state *)precalc_pm->pm_ptr);
 
     ct = newSV(0);
-    sv_usepvn_flags(ct, (char *)ct_buf, ct_len, SV_HAS_TRAILING_NUL);
+    sv_usepvn_flags(ct, (char *)ct_buf, out_len, SV_HAS_TRAILING_NUL);
   }
 
   if (protmem_release(aTHX_ precalc_pm, PROTMEM_FLAG_MPROTECT_RW) != 0) {

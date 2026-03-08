@@ -1,0 +1,13 @@
+^\.git/
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MYMETA
+^Sign\.o$
+^Sign\.c$
+^Sign\.bs$
+^Crypt-Liboqs-Sign-
+\.tar\.gz$
+\.bak$
+~$

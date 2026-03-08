@@ -1,5 +1,12 @@
 Revision history for Perl extension CPAN::MetaCurator.
 
+1.11  2026-02-20T12:52:19
+	- Special-case topic FAQ because it is formatted differently than the other topics.
+	- Special-case <pre>...</pre> with a simple message for now.
+
+1.10  2026-02-17T17:18:19
+	- Cleanup script now include_packages switch is useless. Rerun to test
+
 1.09  2026-02-16T16:36:00
 	- Move all modules in lib/CPAN/MetaCurator/Util up 1 level and fix all references to match.
 	- This just simplifies the dir structure.

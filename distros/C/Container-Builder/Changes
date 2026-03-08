@@ -1,5 +1,9 @@
 Revision history for Container-Builder
 
+0.10  2026-03-07 21:57:25 GMT
+	- Fix crash on debugging Perls (-DDEBUGGING). https://github.com/adriaandens/Container-Builder/issues/1
+	- Add more tests.
+
 0.09  2026-03-01 22:37:01 CET
 	- Restructure Index json to hopefully avoid triggering "Perl_av_new_alloc: Assertion size > 0 failed".
 

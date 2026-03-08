@@ -1,10 +1,8 @@
 package CPAN::MetaCurator;
 
 use 5.36.0;
-use parent 'CPAN::MetaCurator::Database';
-use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 #-------------------------------------------------
 
@@ -16,15 +14,37 @@ our $VERSION = '1.09';
 
 Note: My web host and I use case-sensitive file systems.
 
-Steps (2026-01-25):
-	a. cd ~/perl.modules/CPAN-MetaCurator/
-	b. cp /dev/null log/development.log
-	c. Browse Perl.Wiki.html
-	d. In the 'Tools' tab click 'export all'
-	e. In the pop-up, click 'JSON format'
-	f. cp ~/Downloads/tiddlers.json data/cpan.metacurator.tiddlers.json
-	h. build.module.sh CPAN::MetaCurator 1.03
-	i. scripts/build.db.sh
+A: Prepare wikis
+1: cd ~/savage.net.au/
+2: Edit Perl.Wiki, etc. Includes updating the release date. Save to ~/Downloads/
+3: cp ~/Downloads/*.Wiki.html to misc/
+4: git commit -am"Update Perl.Wiki V 1.xx"
+5: mv ~/Downloads/*.Wiki.html to $DH
+
+B: Export Perl.Wiki.html
+1: In the 'Tools' tab click 'export all'
+2: In the export menu click 'JSON format'. This creates ~/Downloads/tiddlers.json
+3: cd ~/perl.modules/CPAN-MetaCurator
+4: mv ~/Downloads/tiddlers.json data/tiddlers.json
+
+C: Rebuild Perl Wiki Tree
+1: Run scripts/build.db.sh to import tiddlers.json file into database data/cpan.metacurator.sqlite
+2: Run scripts/export.tree.sh to export database to html/cpan.metacurator.tree.html
+3: Run script to backup new files: bu5.sh savage.net.au
+
+D: Patch ~/savage.net.au/index.html
+1: cd ~/perl.modules/Local-Website
+2: Edit Local::Website::Util::PatchIndex's sub parser() if necessary
+3: Run scripts/parse.index.sh to patch ~/savage.net.au/index.html
+4: cp index.html $DH
+5: cp misc/*.Wiki.html $DH/misc
+
+E: Upload
+1: Upload Perl.Wiki.html, etc to savage.net.au
+2: Upload index.html
+3: Log in to blogs.perl.org
+4: Post details of the uploads
+5: Wait ... Check how it appears on blogs.perl.org. Takes about 1 min
 
 =head1 Machine-Readable Change Log
 

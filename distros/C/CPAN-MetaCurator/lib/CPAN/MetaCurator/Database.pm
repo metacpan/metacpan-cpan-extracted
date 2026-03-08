@@ -89,7 +89,7 @@ has time_option =>
 	required	=> 0,
 );
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 # -----------------------------------------------
 

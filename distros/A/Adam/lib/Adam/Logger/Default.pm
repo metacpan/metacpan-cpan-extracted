@@ -1,8 +1,22 @@
 package Adam::Logger::Default;
 # ABSTRACT: Default logger for Adam bots
-our $VERSION = '1.000';
+our $VERSION = '1.002';
 use Moose;
+use POSIX qw( strftime );
 
+
+sub log_dispatch_conf {
+  return {
+    class     => 'Log::Dispatch::Screen',
+    min_level => 'debug',
+    stderr    => 1,
+    callbacks => sub {
+      my %p = @_;
+      my $ts = strftime('%Y-%m-%d %H:%M:%S', localtime);
+      return "[$ts] [$p{level}] $p{message}\n";
+    },
+  };
+}
 
 with qw(
   Adam::Logger::API
@@ -23,11 +37,12 @@ Adam::Logger::Default - Default logger for Adam bots
 
 =head1 VERSION
 
-version 1.000
+version 1.002
 
 =head1 DESCRIPTION
 
 Default logging implementation for Adam bots using L<MooseX::LogDispatch::Levels>.
+Log messages include timestamps in C<[YYYY-MM-DD HH:MM:SS]> format.
 
 =head1 SUPPORT
 

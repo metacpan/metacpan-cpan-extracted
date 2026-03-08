@@ -1,6 +1,6 @@
 package oses;
 # ABSTRACT: A shortcut in the fashion of oose.pm
-our $VERSION = '1.000';
+our $VERSION = '1.002';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ oses - A shortcut in the fashion of oose.pm
 
 =head1 VERSION
 
-version 1.000
+version 1.002
 
 =head1 SYNOPSIS
 

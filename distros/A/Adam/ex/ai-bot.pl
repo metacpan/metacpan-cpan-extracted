@@ -506,19 +506,15 @@ sub _send_to_channel {
     }
     push @chunks, $line if length $line;
   }
-  # Send first line immediately, rest with delay based on previous line length
+  # Send each line with a delay BEFORE it, simulating typing time
   # ~30 chars/sec typing speed, minimum 1.5s delay
   my $cumulative = 0;
   for my $i (0 .. $#chunks) {
-    if ($i == 0) {
-      $self->privmsg($channel => $chunks[$i]);
-    } else {
-      my $delay = length($chunks[$i - 1]) / 30;
-      $delay = 1.5 if $delay < 1.5;
-      $delay += 5 if $chunks[$i - 1] =~ /\.{3}\s*\*?\s*$/;
-      $cumulative += $delay;
-      POE::Kernel->delay_add( _send_line => $cumulative, $channel, $chunks[$i] );
-    }
+    my $delay = length($chunks[$i]) / 30;
+    $delay = 1.5 if $delay < 1.5;
+    $delay += 5 if $i > 0 && $chunks[$i - 1] =~ /\.{3}\s*\*?\s*$/;
+    $cumulative += $delay;
+    POE::Kernel->delay_add( _send_line => $cumulative, $channel, $chunks[$i] );
   }
 }
 
@@ -600,7 +596,7 @@ event _process_buffer => sub {
     "<$prefix> $_->{msg}";
   } @messages);
 
-  $self->info("Processing buffer:\n$input");
+  $self->info("Processing buffer for $channel:\n$input");
 
   $self->_pending_raid({ input => $input, channel => $channel, messages => \@messages });
   $self->_do_raid;
@@ -760,6 +756,7 @@ event irc_public => sub {
   my ( $nick ) = split /!/, $nickstr;
   return if $nick eq $self->get_nickname;
   my $channel = ref $channels ? $channels->[0] : $channels;
+  $self->info("$channel <$nick> $msg");
   $self->_last_activity(time());
   $self->_buffer_message($channel, $nick, $msg);
 };
@@ -768,6 +765,7 @@ event irc_join => sub {
   my ( $self, $nickstr, $channel ) = @_[ OBJECT, ARG0, ARG1 ];
   my ( $nick, $host ) = split /!/, $nickstr, 2;
   return if $nick eq $self->get_nickname;
+  $self->info("$channel $nick ($host) joined");
   $self->_last_activity(time());
   $self->_buffer_message($channel, 'system',
     "$nick ($host) has joined the channel. Greet them if you like!");
@@ -777,6 +775,7 @@ event irc_part => sub {
   my ( $self, $nickstr, $channel, $reason ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
   my ( $nick, $host ) = split /!/, $nickstr, 2;
   return if $nick eq $self->get_nickname;
+  $self->info("$channel $nick ($host) parted" . ($reason ? ": $reason" : ''));
   $self->_last_activity(time());
   my $msg = "$nick ($host) has left the channel";
   $msg .= ": $reason" if $reason;
@@ -794,6 +793,7 @@ event irc_quit => sub {
   my ( $self, $nickstr, $reason ) = @_[ OBJECT, ARG0, ARG1 ];
   my ( $nick, $host ) = split /!/, $nickstr, 2;
   return if $nick eq $self->get_nickname;
+  $self->info("$nick ($host) quit" . ($reason ? ": $reason" : ''));
   $self->_last_activity(time());
   my $channel = $self->_default_channel;
 
@@ -824,9 +824,9 @@ event irc_msg => sub {
   my ( $self, $nickstr, $recipients, $msg ) = @_[ OBJECT, ARG0, ARG1, ARG2 ];
   my ( $nick, $host ) = split /!/, $nickstr, 2;
   return if $nick eq $self->get_nickname;
+  $self->info("PM <$nick> ($host) $msg");
   $self->_last_activity(time());
   my $channel = $self->_default_channel;
-  $self->info("Private message from $nick: $msg");
   $self->_buffer_message($channel, 'system',
     "PRIVATE MESSAGE from $nick ($host): $msg — You can reply using send_private_message.");
 };

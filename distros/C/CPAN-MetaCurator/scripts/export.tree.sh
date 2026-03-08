@@ -2,7 +2,7 @@
 
 cd $HOME/perl.modules/CPAN-MetaCurator/
 
-scripts/export.as.tree.pl
+scripts/export.tree.pl
 
 declare -x SOURCE=html/cpan.metacurator.tree.html
 declare -x DEST=$DH/misc

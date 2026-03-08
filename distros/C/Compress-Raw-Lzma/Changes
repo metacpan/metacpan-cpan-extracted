@@ -1,6 +1,17 @@
 CHANGES
 -------
 
+  2.220 7 March 2026
+
+      * Update to version 2.220
+        Sat Mar 7 10:41:27 2026 +0000
+        2d40b01b1233a09db7ac7ae41aa587d2ed7cacd0
+
+      * Remove obsolete TODO
+        Sat Mar 7 10:31:35 2026 +0000
+        Change by @michal-josef-spacek via https://github.com/pmqs/Compress-Raw-Lzma/pull/19
+        879037f30e47231d69c98ca6a4ae1fe27078e8bb
+
   2.219 24 February 2026
 
       * Fix typo
@@ -37,7 +48,7 @@ CHANGES
 
       * Remove unused constants (#17)
         Tue Feb 24 16:54:14 2026 +0000
-        Changes by @michal-josef-spacek
+        Change by @michal-josef-spacek via https://github.com/pmqs/Compress-Raw-Lzma/pull/17
         ec9fa928e838d61fec5830fd47323ab108538735
 
       * Update to version 2.219
@@ -46,7 +57,7 @@ CHANGES
 
       * Improvements of documentation (#15)
         Tue Feb 24 12:07:07 2026 +0000
-        Changes by @michal-josef-spacek
+        Change by @michal-josef-spacek via https://github.com/pmqs/Compress-Raw-Lzma/pull/15
         5407ee30848b8cf11ddcc40e105afc6157c1e2d2
 
   2.217 31 January 2026

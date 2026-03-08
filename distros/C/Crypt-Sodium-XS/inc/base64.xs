@@ -67,7 +67,6 @@ SV * sodium_base642bin(SV * bytes, int variant = sodium_base64_VARIANT_URLSAFE_N
   }
 
   bytes_buf = SvPVbyte(bytes, bytes_len);
-  /* should check for overflow... */
   out_len = ((bytes_len + 3) & ~3) / 4 * 3;
   Newx(out_buf, out_len + 1, char);
   if (out_buf == NULL)

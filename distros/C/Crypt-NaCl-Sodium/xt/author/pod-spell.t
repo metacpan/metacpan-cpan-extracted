@@ -15,6 +15,8 @@ ASE
 Alex
 BEFORENMBYTES
 Bacause
+Barden
+Brad
 Burzyński
 BytesLocker
 CPAN
@@ -73,6 +75,7 @@ memzero
 nonces
 onetimeauth
 packageable
+perlmodules
 plaintext
 precalculated
 precalculation

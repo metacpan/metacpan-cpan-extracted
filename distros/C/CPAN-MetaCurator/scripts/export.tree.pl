@@ -16,7 +16,7 @@ sub process
 
 	return CPAN::MetaCurator::Export
 			-> new(home_path => $options{home_path}, log_level => $options{log_level}, output_path => $options{output_path})
-			-> export_as_tree;
+			-> export_tree;
 
 } # End of process.
 

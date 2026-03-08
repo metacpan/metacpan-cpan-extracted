@@ -1,0 +1,9 @@
+Revision history for Crypt-Liboqs-Sign
+
+0.01    2026-03-07
+        - Initial release
+        - Drop-in replacement for Crypt::PQClean::Sign
+        - Supports all liboqs signature algorithms: Falcon, ML-DSA,
+          SPHINCS+, Dilithium, MAYO, CROSS, OV, SNOVA
+        - Backward-compatible function names with Crypt::PQClean::Sign
+        - Dynamic function generation for all enabled algorithms

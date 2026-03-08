@@ -17,8 +17,7 @@ sub process
 	my(%options)	= @_;
 
 	return CPAN::MetaCurator::Import
-			-> new(home_path => $options{home_path}, include_packages => $options{include_packages}, log_level => $options{log_level})
-			-> populate_all_tables;
+			-> new(home_path => $options{home_path}, log_level => $options{log_level}) -> populate_all_tables;
 
 } # End of process.
 
@@ -65,8 +64,7 @@ populate.sqlite.tables.pl [options]
 
 	Options:
 	-help
-	-home_path
-	-include_packages 0/1
+	-home_path string
 	-log_level info
 
 All switches can be reduced to a single letter, except of course -he and -ho.
@@ -86,12 +84,6 @@ Print help and exit.
 The path to the directory containing data/ and html/. Unpack distro to populate.
 
 Default: $ENV{HOME}/perl.modules/CPAN-MetaCurator.
-
-=item -include_packages 0/1
-
-Include processing of data/02packages.details.txt in the import.
-
-Default: 0 (Don't include).
 
 =item -log_level String
 

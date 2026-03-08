@@ -46,10 +46,10 @@ resources:
   bugtracker: https://github.com/adriaandens/Container-Builder/issues
   homepage: https://github.com/adriaandens/Container-Builder
   repository: https://github.com/adriaandens/Container-Builder.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - 'Adriaan Dens <adriaan.dens@gmail.com>'
-x_generated_by_perl: v5.40.1
+x_generated_by_perl: v5.40.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1
