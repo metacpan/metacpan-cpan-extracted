@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::NetworkPolicyPeer;
 # ABSTRACT: NetworkPolicyPeer describes a peer to allow traffic to/from. Only certain combinations of fields are allowed
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s ipBlock => 'Networking::V1::IPBlock';
@@ -26,7 +26,7 @@ IO::K8s::Api::Networking::V1::NetworkPolicyPeer - NetworkPolicyPeer describes a 
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 ipBlock
 

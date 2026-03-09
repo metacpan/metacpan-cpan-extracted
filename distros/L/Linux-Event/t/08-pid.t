@@ -11,7 +11,7 @@ BEGIN {
   eval { require Linux::FD::Pid; 1 } or plan skip_all => "Linux::FD::Pid not installed";
 }
 
-my $loop = Linux::Event->new;
+my $loop = Linux::Event->new( model => 'reactor' );
 
 my $pid = fork();
 if (!defined $pid) {

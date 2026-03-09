@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::INI;
 # VERSION
 # ABSTRACT: Parse INI format from a SecretBuffer
-$Crypt::SecretBuffer::INI::VERSION = '0.019';
+$Crypt::SecretBuffer::INI::VERSION = '0.020';
 use strict;
 use warnings;
 use Carp;
@@ -235,6 +235,11 @@ sub parse {
    return $root;
 }
 
+# avoid depending on namespace::clean
+delete @{Crypt::SecretBuffer::INI::}{qw(
+   carp confess croak secret MATCH_NEGATE MATCH_MULTI ISO8859_1
+)};
+
 1;
 
 __END__
@@ -405,7 +410,7 @@ This function dies on any parse errors.
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

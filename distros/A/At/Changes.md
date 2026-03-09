@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4] - 2026-03-09
+
+### Added
+- Added high-level helpers for...
+  - Rrepository management: `create_record`, `delete_record`, `put_record`, and `apply_writes`
+  - Direct PDS binary uploads: `upload_blob`
+  - Identity resolution: `resolve_did_to_handle`
+
+## [1.3] - 2026-03-08
+
+### Added
+- Added support for `atproto-proxy` header in `At::UserAgent` to allow PDS proxying of requests to external services like `chat.bsky.*`.
+- Added `skip_ath` option to DPoP proof generation, as required by the DPoP spec for refresh token exchanges.
+- Added automatic `DPoP-Nonce` management and retry logic to `At::UserAgent::Mojo`.
+- Added support in `At::Protocol::Session` to correctly serialize and resume all metadata fields including `scope`, `token_type`, and `dpop_key_jwk`.
+
+## [1.2] - 2026-03-08
+
+### Added
+
+- Groundwork for data sync support
+
 ## [1.1] - 2026-01-24
 
 - Fix ::Builder prereqs
@@ -138,7 +160,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Original version.
 
-[Unreleased]: https://github.com/sanko/At.pm/compare/1.1...HEAD
+[Unreleased]: https://github.com/sanko/At.pm/compare/1.4...HEAD
+[1.4]: https://github.com/sanko/At.pm/compare/1.3...1.4
+[1.3]: https://github.com/sanko/At.pm/compare/1.2...1.3
+[1.2]: https://github.com/sanko/At.pm/compare/1.1...1.2
 [1.1]: https://github.com/sanko/At.pm/compare/1.0...1.1
 [1.0]: https://github.com/sanko/At.pm/compare/0.18...1.0
 [0.18]: https://github.com/sanko/At.pm/compare/0.17...0.18

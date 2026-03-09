@@ -1,6 +1,6 @@
 package IO::K8s::Role::Resource;
 # ABSTRACT: Role providing Kubernetes resource instance behavior
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use v5.10;
 use Moo::Role;
 use JSON::MaybeXS ();
@@ -88,7 +88,8 @@ sub to_json {
 sub TO_YAML {
     my $self = shift;
     require YAML::PP;
-    return YAML::PP::Dump($self->TO_JSON);
+    my $yp = YAML::PP->new(schema => [qw/JSON/], boolean => 'JSON::PP');
+    return $yp->dump_string($self->TO_JSON);
 }
 
 sub to_yaml {
@@ -228,7 +229,7 @@ IO::K8s::Role::Resource - Role providing Kubernetes resource instance behavior
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SUPPORT
 

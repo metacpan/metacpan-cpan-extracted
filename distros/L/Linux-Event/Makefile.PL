@@ -23,5 +23,7 @@ WriteMakefile(
     'Linux::FD::Signal'   => 0,
     'Linux::Event::Timer' => 0.010,
     'Linux::Event::Clock' => 0.011,
+    'IO::Uring'           => 0,
+    'Time::Spec'          => 0,
   },
 );

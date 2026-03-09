@@ -1,5 +1,5 @@
 package Business::NAB::AccountInformation::Group;
-$Business::NAB::AccountInformation::Group::VERSION = '0.02';
+$Business::NAB::AccountInformation::Group::VERSION = '0.03';
 =head1 NAME
 
 Business::NAB::AccountInformation::Group

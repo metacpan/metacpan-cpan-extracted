@@ -9,6 +9,7 @@ MANIFEST
 ppport.h
 private/MakeUtil.pm
 README
+SECURITY.md
 t/001version.t
 t/02filters.t
 t/09limitoutput.t

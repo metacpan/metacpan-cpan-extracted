@@ -10,21 +10,21 @@ use IO::K8s;
 
 {
     package Test::Mock::CiliumNetworkPolicy;
-    use Moo;
+    use IO::K8s::Resource;
     sub api_version { 'cilium.io/v2' }
     sub kind { 'CiliumNetworkPolicy' }
 }
 
 {
     package Test::Mock::CiliumNetworkPolicyV2;
-    use Moo;
+    use IO::K8s::Resource;
     sub api_version { 'cilium.io/v2' }
     sub kind { 'NetworkPolicy' }
 }
 
 {
     package Test::Mock::ThirdPartyNetworkPolicy;
-    use Moo;
+    use IO::K8s::Resource;
     sub api_version { 'example.com/v1' }
     sub kind { 'NetworkPolicy' }
 }

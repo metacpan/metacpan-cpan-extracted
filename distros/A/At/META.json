@@ -41,9 +41,15 @@
       }
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
+            "CPAN::Meta" : "2.150012",
+            "Exporter" : "5.57",
             "ExtUtils::Helpers" : "0.028",
             "ExtUtils::Install" : "0",
             "ExtUtils::InstallPaths" : "0.002",
@@ -51,8 +57,10 @@
             "File::Find" : "0",
             "File::Path" : "0",
             "File::Spec::Functions" : "0",
+            "Getopt::Long" : "2.36",
             "JSON::PP" : "2",
             "Path::Tiny" : "0",
+            "Test2::V1" : "0",
             "perl" : "v5.42.0"
          }
       },
@@ -84,6 +92,7 @@
       "runtime" : {
          "recommends" : {
             "CBOR::Free" : "0",
+            "InterPlanetary" : "0",
             "Mojo::UserAgent" : "0"
          },
          "requires" : {
@@ -109,7 +118,7 @@
    "provides" : {
       "At" : {
          "file" : "lib/At.pm",
-         "version" : "1.1"
+         "version" : "1.4"
       },
       "At::Error" : {
          "file" : "lib/At/Error.pm",
@@ -132,14 +141,16 @@
          "version" : "1.0"
       },
       "At::Protocol::Session" : {
-         "file" : "lib/At/Protocol/Session.pm"
+         "file" : "lib/At/Protocol/Session.pm",
+         "version" : "1.3"
       },
       "At::Protocol::URI" : {
          "file" : "lib/At/Protocol/URI.pm",
          "version" : "1.0"
       },
       "At::UserAgent" : {
-         "file" : "lib/At/UserAgent.pm"
+         "file" : "lib/At/UserAgent.pm",
+         "version" : "1.3"
       }
    },
    "release_status" : "stable",
@@ -157,7 +168,7 @@
          "web" : "https://github.com/sanko/At.pm"
       }
    },
-   "version" : "1.1",
+   "version" : "1.4",
    "x_contributors" : [
       "Akiomi Kamakura <akiomik@gmail.com>",
       "Alberto Roura <mail@albertoroura.com>",

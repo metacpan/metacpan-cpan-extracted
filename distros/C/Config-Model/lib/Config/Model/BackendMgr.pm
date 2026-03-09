@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendMgr 2.158;
+package Config::Model::BackendMgr 2.159;
 
 use Mouse;
 use strict;
@@ -522,7 +522,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

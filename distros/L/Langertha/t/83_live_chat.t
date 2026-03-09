@@ -24,6 +24,7 @@ BEGIN {
   push @available, 'ollamaopenai' if $ENV{TEST_LANGERTHA_OLLAMA_URL};
   push @available, 'vllm'         if $ENV{TEST_LANGERTHA_VLLM_URL};
   push @available, 'llamacpp'     if $ENV{TEST_LANGERTHA_LLAMACPP_URL};
+  push @available, 'lmstudio'     if $ENV{TEST_LANGERTHA_LMSTUDIO_URL};
   unless (@available) {
     plan skip_all => 'No TEST_LANGERTHA_* env vars set';
   }
@@ -195,6 +196,35 @@ if ($ENV{TEST_LANGERTHA_LLAMACPP_URL}) {
   require Langertha::Engine::LlamaCpp;
   test_chat('LlamaCpp', Langertha::Engine::LlamaCpp->new(
     url => $ENV{TEST_LANGERTHA_LLAMACPP_URL},
+  ));
+}
+
+# --- LMStudio ---
+if ($ENV{TEST_LANGERTHA_LMSTUDIO_URL}) {
+  require Langertha::Engine::LMStudio;
+  require Langertha::Engine::LMStudioAnthropic;
+  require Langertha::Engine::LMStudioOpenAI;
+  my $model = $ENV{TEST_LANGERTHA_LMSTUDIO_MODEL} || 'default';
+  test_chat("LMStudio/$model", Langertha::Engine::LMStudio->new(
+    url => $ENV{TEST_LANGERTHA_LMSTUDIO_URL},
+    model => $model,
+    $ENV{TEST_LANGERTHA_LMSTUDIO_API_KEY}
+      ? (api_key => $ENV{TEST_LANGERTHA_LMSTUDIO_API_KEY})
+      : (),
+  ));
+
+  test_chat("LMStudioAnthropic/$model", Langertha::Engine::LMStudioAnthropic->new(
+    url => $ENV{TEST_LANGERTHA_LMSTUDIO_URL},
+    model => $model,
+    api_key => ($ENV{TEST_LANGERTHA_LMSTUDIO_API_KEY} || 'lmstudio'),
+  ));
+
+  test_chat("LMStudioOpenAI/$model", Langertha::Engine::LMStudioOpenAI->new(
+    url => $ENV{TEST_LANGERTHA_LMSTUDIO_URL} . '/v1',
+    model => $model,
+    $ENV{TEST_LANGERTHA_LMSTUDIO_API_KEY}
+      ? (api_key => $ENV{TEST_LANGERTHA_LMSTUDIO_API_KEY})
+      : (),
   ));
 }
 

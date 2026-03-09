@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.6.2
+## Version v0.6.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/23
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -59,7 +59,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.6.2';
+    our $VERSION = 'v0.6.3';
 };
 
 BEGIN
@@ -614,68 +614,6 @@ sub _make_my_own
     }
 }
 
-sub FREEZE
-{
-    my $self = CORE::shift( @_ );
-    my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self );
-    my %hash  = %$self;
-    # Return an array reference rather than a list so this works with Sereal and CBOR
-    # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
-    # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
-}
-
-sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
-
-sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
-
-# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
-# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
-sub THAW
-{
-    my( $self, undef, @args ) = @_;
-    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
-    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
-    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
-    my $new;
-    # Storable pattern requires to modify the object it created rather than returning a new one
-    if( CORE::ref( $self ) )
-    {
-        foreach( CORE::keys( %$hash ) )
-        {
-            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
-        }
-        $new = $self;
-    }
-    else
-    {
-        $new = CORE::bless( $hash => $class );
-    }
-    CORE::return( $new );
-}
-
-sub TO_JSON
-{
-    my $self = CORE::shift( @_ );
-    CORE::return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
-    CORE::return( $self->{dt}->stringify );
-}
-
-# NOTE: DESTROY
-# Avoid getting caught by AUTOLOAD
-DESTROY
-{
-    # <https://perldoc.perl.org/perlobj#Destructors>
-    CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = CORE::shift( @_ );
-    CORE::return if( !CORE::defined( $self ) );
-    undef( $self->{dt} ) if( defined( $self->{dt} ) );
-    return( $self );
-};
-
 # NOTE: AUTOLOAD
 AUTOLOAD
 {
@@ -725,6 +663,132 @@ AUTOLOAD
         return( $self->error( "No method \"$method\" available in DateTime" ) );
     }
 };
+
+# NOTE: DESTROY
+# Avoid getting caught by AUTOLOAD
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+    undef( $self->{dt} ) if( defined( $self->{dt} ) );
+
+    # For non-object context, we need to call cleanup to ensure there is no leftover
+    my $class   = ref( $self );
+    my $err_key = $class;
+    my $repo    = Module::Generic::Global->new( 'local_tz' => $class, key => $err_key );
+    $repo->cleanup;
+    return( $self );
+};
+
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+    my $dt         = $self->{dt} || return;
+    my $tz         = $dt->time_zone->name;
+    my $fmt        = $dt->formatter;
+    my $locale     = $dt->locale->code;
+    my $hash = 
+    {
+        year        => $dt->year,
+        month       => $dt->month,
+        day         => $dt->day,
+        hour        => $dt->hour,
+        minute      => $dt->minute,
+        second      => $dt->second,
+        nanosecond  => $dt->nanosecond,
+    };
+    $hash->{time_zone} = $tz if( $tz );
+    $hash->{formatter} = $fmt if( $fmt );
+    $hash->{locale}    = $locale if( $locale );
+    
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+sub STORABLE_thaw_post_processing
+{
+    my $obj   = shift( @_ );
+    my @keys  = %$obj;
+    my $class = ref( $obj );
+    my $hash  = {};
+    @$hash{ @keys } = @$obj{ @keys };
+    my $self = bless( $hash => $class );
+    return( $self );
+}
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my @keys = qw( year month day hour minute second nanosecond time_zone formatter locale );
+    my $opts = {};
+    foreach my $prop ( @keys )
+    {
+        if( exists( $hash->{ $prop } ) &&
+            defined( $hash->{ $prop } ) &&
+            length( $hash->{ $prop } ) )
+        {
+            $opts->{ $prop } = $hash->{ $prop };
+        }
+    }
+
+    local $@;
+    my $dt = eval
+    {
+        require DateTime;
+        DateTime->new( %$opts );
+    };
+    if( $@ )
+    {
+        require Module::Generic;
+        warn( "Error thawing the DateTime object: $@\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled() );
+    }
+
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        $self->{dt} = $dt;
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( { dt => $dt } => $class );
+    }
+    CORE::return( $new );
+}
+
+sub TO_JSON
+{
+    my $self = CORE::shift( @_ );
+    CORE::return( '' ) if( !$self->{dt} || !Scalar::Util::blessed( $self->{dt} ) );
+    CORE::return( $self->{dt}->stringify );
+}
 
 # NOTE: package Module::Generic::DateTime::Interval
 package Module::Generic::DateTime::Interval;
@@ -1176,7 +1240,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.6.2
+    v0.6.3
 
 =head1 DESCRIPTION
 

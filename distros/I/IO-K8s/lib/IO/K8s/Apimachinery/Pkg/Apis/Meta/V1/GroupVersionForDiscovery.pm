@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::GroupVersionForDiscovery;
 # ABSTRACT: GroupVersion contains the "group/version" and "version" string of a version. It is made a struct to keep extensibility.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s groupVersion => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::GroupVersionForDiscovery - GroupVers
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 groupVersion
 

@@ -16,7 +16,7 @@ use Socket qw(AF_UNIX SOCK_STREAM);
 local $SIG{ALRM} = sub { die "timeout\n" };
 alarm 5;
 
-sub make_loop () { return Linux::Event::Loop->new( backend => 'epoll' ) }
+sub make_loop () { return Linux::Event::Loop->new( model => 'reactor', backend => 'epoll' ) }
 
 subtest "watch() replaces existing watcher on same fd" => sub {
   my $loop = make_loop();

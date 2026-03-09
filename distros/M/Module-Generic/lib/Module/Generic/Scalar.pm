@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.4.3
+## Version v1.4.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/05/28
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -81,7 +81,7 @@ BEGIN
         fallback => 1,
     );
     $DEBUG = 0;
-    our $VERSION = 'v1.4.3';
+    our $VERSION = 'v1.4.4';
 };
 
 use v5.26.1;
@@ -299,6 +299,7 @@ sub error
     my $class = ref( $self ) || $self;
     my $o;
     no strict 'refs';
+    # We absolutely need to have a per object repository, because our instances are scalar references; we cannot store an exception object within it.
     my $repo = Module::Generic::Global->new( 'errors' => $self );
 
     if( @_ )
@@ -338,7 +339,7 @@ sub error
 
         $o = $ex_class->new( $args );
         $repo->set( $o );
-        $ERROR = $o;
+        # $ERROR = $o;
 
         # try-catch
         local $@;
@@ -535,8 +536,7 @@ sub pass_error
     my $err;
     my $ex_class;
     no strict 'refs';
-    my $err_key = HAS_THREADS() ? CORE::join( ';', $class, $$, threads->tid ) : CORE::join( ';', $class, $$ );
-    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+    my $repo = Module::Generic::Global->new( 'errors' => $self );
 
     if( scalar( @_ ) )
     {
@@ -582,7 +582,7 @@ sub pass_error
     {
         my $o = ( CORE::defined( $ex_class ) ? bless( $err => $ex_class ) : $err );
         $repo->set( $o );
-        $ERROR = $o;
+        # $ERROR = $o;
     }
     # If the error provided is not an object, we call error to create one
     else
@@ -925,20 +925,28 @@ sub DESTROY
     {
         $obj->remove;
     }
-    if( my $obj = Module::Generic::Global->new( 'loaded_classes' => $self ) )
-    {
-        $obj->remove;
-    }
+
+    # For non-object context, we need to call cleanup to ensure there is no leftover
+    # We cannot cleanup here the 'loaded_classes', because we need the class that is cached to build the key, and we do not have it at this very moment.
 };
 
 sub FREEZE
 {
-    my $self = CORE::shift( @_ );
+    my $self       = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self ) || $self;
+    my $class      = CORE::ref( $self ) || $self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $$self] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
     CORE::return( $$self );
 }

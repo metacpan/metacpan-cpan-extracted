@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAIBase;
 # ABSTRACT: Base class for OpenAI-compatible engines
-our $VERSION = '0.304';
+our $VERSION = '0.305';
 use Moose;
 use Carp qw( croak );
 
@@ -38,7 +38,7 @@ Langertha::Engine::OpenAIBase - Base class for OpenAI-compatible engines
 
 =head1 VERSION
 
-version 0.304
+version 0.305
 
 =head1 SYNOPSIS
 

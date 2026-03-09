@@ -1,45 +1,8 @@
 package Langertha::Raider::Result;
 # ABSTRACT: Result object from a Raider raid
-our $VERSION = '0.304';
+our $VERSION = '0.305';
 use Moose;
-
-use overload
-  '""' => sub { $_[0]->text // '' },
-  fallback => 1;
-
-
-has type => (
-  is  => 'ro',
-  isa => 'Str',
-  required => 1,
-);
-
-
-has text => (
-  is  => 'ro',
-  isa => 'Str',
-  predicate => 'has_text',
-);
-
-
-has content => (
-  is  => 'ro',
-  isa => 'Str',
-  predicate => 'has_content',
-);
-
-
-has options => (
-  is  => 'ro',
-  isa => 'ArrayRef',
-  predicate => 'has_options',
-);
-
-
-sub is_final    { $_[0]->type eq 'final' }
-sub is_question { $_[0]->type eq 'question' }
-sub is_pause    { $_[0]->type eq 'pause' }
-sub is_abort    { $_[0]->type eq 'abort' }
+extends 'Langertha::Result';
 
 
 __PACKAGE__->meta->make_immutable;
@@ -58,7 +21,7 @@ Langertha::Raider::Result - Result object from a Raider raid
 
 =head1 VERSION
 
-version 0.304
+version 0.305
 
 =head1 SYNOPSIS
 
@@ -83,57 +46,42 @@ version 0.304
 
 =head1 DESCRIPTION
 
-Wraps the outcome of a L<Langertha::Raider/raid_f> call. The C<type> field
-indicates what happened:
-
-=over 4
-
-=item C<final> - The LLM produced a final text answer (in C<text>).
-
-=item C<question> - The agent used C<raider_ask_user> and needs a response
-(question in C<content>, optional choices in C<options>).
-
-=item C<pause> - The agent used C<raider_pause> and is waiting to be resumed
-(reason in C<content>).
-
-=item C<abort> - The agent used C<raider_abort> and stopped (reason in C<content>).
-
-=back
-
-Uses C<overload> so stringification returns C<text>, preserving backward
-compatibility with code that treats raid results as plain strings.
+Backward-compatible Raider-specific result class. It now subclasses
+L<Langertha::Result> so Raider and Raid orchestration can share the same
+result semantics.
 
 =head2 type
 
-Result type: C<final>, C<question>, C<pause>, or C<abort>.
+Inherited from L<Langertha::Result>. One of C<final>, C<question>,
+C<pause>, or C<abort>.
 
 =head2 text
 
-The final text answer from the LLM. Only set when C<type> is C<final>.
+Inherited from L<Langertha::Result>. Final response text payload.
 
 =head2 content
 
-The question, pause reason, or abort reason. Set for non-final result types.
+Inherited from L<Langertha::Result>. Question/pause/abort message.
 
 =head2 options
 
-Optional list of choices for a C<question> result.
+Inherited from L<Langertha::Result>. Optional choices for question results.
 
 =head2 is_final
 
-Returns true if this is a final text answer.
+Inherited predicate helper from L<Langertha::Result>.
 
 =head2 is_question
 
-Returns true if the agent is asking the user a question.
+Inherited predicate helper from L<Langertha::Result>.
 
 =head2 is_pause
 
-Returns true if the agent has paused.
+Inherited predicate helper from L<Langertha::Result>.
 
 =head2 is_abort
 
-Returns true if the agent has aborted.
+Inherited predicate helper from L<Langertha::Result>.
 
 =head1 SUPPORT
 

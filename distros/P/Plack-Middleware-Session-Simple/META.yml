@@ -12,7 +12,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.16, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,12 +31,14 @@ no_index:
 provides:
   Plack::Middleware::Session::Simple:
     file: lib/Plack/Middleware/Session/Simple.pm
-    version: '0.04'
+    version: '0.05'
   Plack::Middleware::Session::Simple::Session:
     file: lib/Plack/Middleware/Session/Simple.pm
+recommends:
+  Crypt::SysRandom::XS: '0'
 requires:
   Cookie::Baker: '0.02'
-  Digest::SHA1: '2.13'
+  Crypt::SysRandom: '0'
   Plack: '1.0029'
   Scalar::Util: '0'
   Tie::Hash: '0'
@@ -45,9 +47,12 @@ requires:
 resources:
   bugtracker: https://github.com/kazeburo/Plack-Middleware-Session-Simple/issues
   homepage: https://github.com/kazeburo/Plack-Middleware-Session-Simple
-  repository: git://github.com/kazeburo/Plack-Middleware-Session-Simple.git
-version: '0.04'
+  repository: https://github.com/kazeburo/Plack-Middleware-Session-Simple.git
+version: '0.05'
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'bayashi <bayashi@cpan.org>'
   - 'vividsnow <vividsnow@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

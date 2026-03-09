@@ -5,16 +5,16 @@ use strict ;
 use warnings;
 use bytes;
 
-use Compress::Raw::Zlib  2.217 ;
-use IO::Compress::Base::Common  2.217 qw(:Status );
+use Compress::Raw::Zlib  2.218 ;
+use IO::Compress::Base::Common  2.218 qw(:Status );
 
-use IO::Uncompress::Base  2.217 ;
-use IO::Uncompress::Adapter::Inflate  2.217 ;
+use IO::Uncompress::Base  2.218 ;
+use IO::Uncompress::Adapter::Inflate  2.218 ;
 
 require Exporter ;
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $RawInflateError);
 
-$VERSION = '2.217';
+$VERSION = '2.218';
 $RawInflateError = '';
 
 @ISA    = qw(IO::Uncompress::Base Exporter);

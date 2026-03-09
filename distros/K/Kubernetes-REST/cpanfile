@@ -2,7 +2,7 @@ requires 'LWP::UserAgent';
 recommends 'LWP::ConsoleLogger';
 recommends 'HTTP::Tiny';
 requires 'IO::Socket::SSL';
-requires 'IO::K8s', '1.000';
+requires 'IO::K8s', '1.008';
 requires 'Moo';
 requires 'MooX::Cmd';
 requires 'MooX::Options';

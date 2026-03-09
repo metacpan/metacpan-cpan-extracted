@@ -1,6 +1,6 @@
 package IO::K8s::Api::Events::V1::EventSeries;
 # ABSTRACT: EventSeries contain information on series of events, i.e. thing that was/is happening continuously for some time. How often to update the EventSeries is up to the event reporters. The default event reporter in "k8s.io/client-go/tools/events/event_broadcaster.go" shows how this struct is updated on heartbeats and can guide customized reporter implementations.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s count => Int, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Events::V1::EventSeries - EventSeries contain information on serie
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 count
 

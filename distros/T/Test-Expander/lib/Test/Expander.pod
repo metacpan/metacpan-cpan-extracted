@@ -53,7 +53,7 @@ B<Test::Expander> - Expansion of test functionalities that appear to be frequent
     ],
     -tempdir => {};
 
-  # Override the builtin 'close' in the name space of explicitly supplied class / module to be tested:
+  # Overrides the builtin 'close' in the name space of explicitly supplied class / module to be tested:
   my $close_success;
   use Test::Expander
     -builtins => { close => sub { $close_success ? CORE::close( shift ) : 0 } },
@@ -61,6 +61,34 @@ B<Test::Expander> - Expansion of test functionalities that appear to be frequent
 
   # Activates immediate stop of test execution if any assertion fails:
   use Test::Expander -bail => 1;
+
+  # Performs execution of test cases applying table driven testing approach (TDT, also known as data driven testing)
+  based on the test table stored in a separate .tdt file:
+  use Test::Expander;
+  const my %TEST_CASES => test_table();
+  while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+    # Use $test_name and $test_params in a generic way e.g.
+    # is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+    ...
+  }
+
+  # Performs execution of test cases applying TDT approach based on the test table stored in the __DATA__ section:
+  use Test::Expander;
+  const my %TEST_CASES => test_table( [ <DATA> ] );
+  while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+    # Use $test_name and $test_params in a generic way e.g.
+    # is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+    ...
+  }
+  __DATA__
+  +---------------------------------------------------------+
+  |                              |          | param | param |
+  |                              | expected |   1   |   2   |
+  |------------------------------+----------+-------+-------|
+  | 'param2' omitted             |     0    | 'abc' |       |
+  | both parameters set to true  |     1    |   1   |   1   |
+  | both parameters set to false |     0    |   0   |   0   |
+  +---------------------------------------------------------+
 
 =head1 DESCRIPTION
 
@@ -92,6 +120,152 @@ now look like
   $CLASS->$METHOD( $arg0, $arg1 )
 
 and hence clearly manifest that this chunk is about the testee.
+
+=item
+
+Repetition of structurally identical assertions with different parameters for testing of various branches.
+This is exactly why the L<table driven testing|https://en.wikipedia.org/wiki/Data-driven_testing> has been introduced
+ages ago (e.g. for L<Java|https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.452> and then full-blown for
+L<Go|https://go.dev/wiki/TableDrivenTests> and other programming languagues).
+
+As a result, the function B<test_table> is exported by default providing a possibility to avoid copy-and-paste
+implementing test cases differing by applied parameters only.
+This reduces the complexity of tests and hence increases its maintainability and adjustability in accordance with
+the changes of testee.
+
+The function B<test_table> can be used in two different ways:
+
+=over 2
+
+=item Loading test table from a separate file.
+
+This file has the same name as the current test file but the extension B<.tdt> instead of B<.t>.
+This means, if the test file name is B<t/Foo/Bar/baz.t>,
+then the table is expected to be located in the file B<t/Foo/Bar/baz.tdt>.
+
+This way may be reasonable if a single table can be used for all test cases in the current test file.
+
+Assuming such a test file should verify whether the function B<Foo::Bar::baz> returns
+
+=over 2
+
+=item B<0>
+
+if the first parameter contains the string B<'abc'> and the second parameter is omitted,
+
+=item B<1>
+
+if both the first and the second parameters contain B<1>,
+
+=item and, finally, B<0>
+
+if both the first and the second parameters contain B<0>.
+
+=back
+
+Then the file B<t/Foo/Bar/baz.tdt> might look as follows:
+
+  +---------------------------------------------------------+
+  |                              |          | param | param |
+  |                              | expected |   1   |   2   |
+  |------------------------------+----------+-------+-------|
+  | 'param2' omitted             |     0    | 'abc' |       |
+  | both parameters set to true  |     1    |   1   |   1   |
+  | both parameters set to false |     0    |   0   |   0   |
+  +---------------------------------------------------------+
+
+And the corresponding file B<t/Foo/Bar/baz.t> would contain:
+
+  use Test::Expander;
+  const my %TEST_CASES => test_table();
+  while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+    is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+  }
+
+=item Explicitly supplying test table as a reference to array, each single element of which represents a table line.
+
+This way may be reasonable if different test cases in the current test file require different test tables.
+
+Such table can be passed explicitly as an array reference:
+
+  use Test::Expander;
+  subtest 'case 1' => sub {
+    const my %TEST_CASES => test_tables(
+      [
+        '+---------------------------------------------------------+',
+        '|                              |          | param | param |',
+        '|                              | expected |   1   |   2   |',
+        '|------------------------------+----------+-------+-------|',
+        "| 'param2' omitted             |     0    | 'abc' |       |",
+        '| both parameters set to true  |     1    |   1   |   1   |',
+        '| both parameters set to false |     0    |   0   |   0   |',
+        '+---------------------------------------------------------+',
+      ]
+    );
+    while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+      is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+    }
+  };
+  subtest 'case 2' => sub {
+    const my %TEST_CASES => test_tables(
+      [
+        '+------------------------------+',
+        '|          |           | param |',
+        '|          | expected  |   1   |',
+        '|----------+-----------+-------|',
+        "| error 1  | 'ERROR 1' |   2   |",
+        "| error 2  | 'ERROR 2' |   3   |",
+        '+------------------------------+',
+      ]
+    );
+    while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+      throws_ok { $METHOD_REF->( $test_params{ param1 } ) } qr/$test_params{ expected }/, $test_name;
+    }
+  };
+
+Or both tables can be transferred to the B<DATA> section of the current test file making the source code more readable:
+
+  use Test::Expander;
+  const my $TEST_CASES => eval( join( '', <DATA> ) );
+  my $subtest_name;
+  $subtest_name = 'case 1';
+  subtest $subtest_name => sub {
+    const my $SUB_TABLE => test_table( $TEST_CASES->{ $subtest_name } );
+    while ( my $test_name, $test_params = each( %$SUB_TABLE ) ) {
+      is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+    }
+  };
+  $subtest_name = 'case 1';
+  subtest $subtest_name => sub {
+    const my $SUB_TABLE => test_table( $TEST_CASES->{ $subtest_name } );
+    while ( my $test_name, $test_params = each( %$SUB_TABLE ) ) {
+      throws_ok { $METHOD_REF->( $test_params{ param1 } ) } qr/$test_params{ expected }/, $test_name;
+    }
+  };
+  __DATA__
+  {
+    'case 1' => [
+      '+---------------------------------------------------------+',
+      '|                              |          | param | param |',
+      '|                              | expected |   1   |   2   |',
+      '|------------------------------+----------+-------+-------|',
+      "| 'param2' omitted             |     0    | 'abc' |       |",
+      '| both parameters set to true  |     1    |   1   |   1   |',
+      '| both parameters set to false |     0    |   0   |   0   |',
+      '+---------------------------------------------------------+',
+    ],
+    'case 2' => [
+      '+------------------------------+',
+      '|          |           | param |',
+      '|          | expected  |   1   |',
+      '|----------+-----------+-------|',
+      "| error 1  | 'ERROR 1' |   2   |",
+      "| error 2  | 'ERROR 2' |   3   |",
+      '+------------------------------+',
+    ],
+  }
+
+=back
 
 =item
 

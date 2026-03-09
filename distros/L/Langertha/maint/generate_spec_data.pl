@@ -26,6 +26,7 @@ my @specs = (
   { yaml => 'openai.yaml',  module => 'OpenAI',  abstract => 'Pre-computed OpenAPI operations for OpenAI' },
   { yaml => 'mistral.yaml', module => 'Mistral', abstract => 'Pre-computed OpenAPI operations for Mistral' },
   { yaml => 'ollama.yaml',  module => 'Ollama',  abstract => 'Pre-computed OpenAPI operations for Ollama' },
+  { yaml => 'lmstudio.yaml', module => 'LMStudio', abstract => 'Pre-computed OpenAPI operations for LM Studio native API' },
 );
 
 for my $spec (@specs) {

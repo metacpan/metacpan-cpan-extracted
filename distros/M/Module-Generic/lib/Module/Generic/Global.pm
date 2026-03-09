@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Contextual Global Storage - ~/lib/Module/Generic/Global.pm
-## Version v0.1.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Module Generic - ~/lib/Module/Generic/Global.pm
+## Version v1.1.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/05/06
-## Modified 2025/05/06
+## Modified 2026/01/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,8 @@ BEGIN
     use warnings::register;
     use parent qw( Exporter );
     use vars qw(
-        $MOD_PERL $REPO $MUTEX $ERRORS $LOCKS $LOCK_MUTEX $DEBUG $PerlConfig
+        $MOD_PERL $REPO $MUTEX $ERRORS $LOCKS $STATS $ORDER $SIZES $CLEANUP $NS_LOCKS
+        $LOCK_MUTEX $REFCOUNTS $DEBUG $PerlConfig $DEFAULT_SERIALISER $MAX_STORE_BYTES
         @EXPORT_OK %EXPORT_TAGS $VERSION
     );
     use Config;
@@ -52,16 +53,32 @@ BEGIN
 
     sub IN_THREAD () { CORE::return( $PerlConfig->{useithreads} && $INC{'threads.pm'} && threads->tid != 0 ? 1 : 0 ); }
 
-    use constant MOD_PERL => $MOD_PERL;
+    sub MOD_PERL () { CORE::return( $MOD_PERL ); }
 
     my $mpm;
     my $mpm_threaded    = 0;
     my $use_mutex       = 0;
     my $need_shared     = CAN_THREADS();
     our( $MUTEX, $LOCK_MUTEX );
+    # The user data repository
     our $REPO           = {};
+    # Special repository for error objects
     our $ERRORS         = {};
+    # Used for repositories locking mechanism
     our $LOCKS          = {};
+    # Light data used to collect statistic for reporting with stat()
+    our $STATS          = {};
+    # To keep track of the keys, and order them by age
+    our $ORDER          = {};
+    # To put a cap on data size in bytes
+    our $SIZES          = {};
+    # For cleanup_register
+    our $CLEANUP        = {};
+    # To perform locking on namespaces
+    our $NS_LOCKS       = {};
+    # To keep track of repositories that use a shared key. When it hits 0, it gets removed
+    our $REFCOUNTS      = {};
+    our $MAX_STORE_BYTES= 5242880;
     # Check if we are running under Apache Worker/Event MPM
     if( $MOD_PERL )
     {
@@ -158,9 +175,22 @@ BEGIN
         my %repo :shared;
         my %errs :shared;
         my %locks :shared;
-        $REPO   = \%repo;
-        $ERRORS = \%errs;
-        $LOCKS  = \%locks;
+        my %stats :shared;
+        my %order :shared;
+        my %sizes :shared;
+        my %cleanup :shared;
+        my %ns_locks :shared;
+        my %refcounts :shared;
+        $REPO     = \%repo;
+        $ERRORS   = \%errs;
+        $LOCKS    = \%locks;
+        $STATS    = \%stats;
+        # To keep track of the keys
+        $ORDER    = \%order;
+        $SIZES    = \%sizes;
+        $CLEANUP  = \%cleanup;
+        $NS_LOCKS = \%ns_locks;
+        $REFCOUNTS = \%refcounts;
     }
 
     sub _NEED_SHARED () { CORE::return( $need_shared ); }
@@ -170,8 +200,8 @@ BEGIN
 
     our @EXPORT_OK = qw( CAN_THREADS HAS_THREADS IN_THREAD MOD_PERL MPM HAS_MPM_THREADS );
     our %EXPORT_TAGS = ( 'const' => [@EXPORT_OK] );
-
-    our $VERSION = 'v0.1.0';
+    our $DEFAULT_SERIALISER = 'Storable::Improved';
+    our $VERSION = 'v1.1.0';
 };
 
 use strict;
@@ -188,18 +218,109 @@ sub new
     my $what = shift( @_ );
     unless( defined( $what ) && CORE::ref( $what ) )
     {
-        return( $this->error( "No controller element was provided for this namespace $ns" ) ) if( !$what );
+        return( $this->error( "No controller element was provided for this namespace $ns" ) ) if( !CORE::length( $what // '' ) );
     }
     my $opts = $this->_get_args_as_hash( @_ );
 
     my $ref = 
     {
-        _namespace  => $ns,
-        _key        => undef,
-        _mode       => undef,
-        _error      => undef,
-        debug       => ( $opts->{debug} // $DEBUG // 0 ),
+        _namespace      => $ns,
+        _key            => undef,
+        _mode           => undef,
+        _error          => undef,
+        debug           => ( $opts->{debug} // $DEBUG // 0 ),
+        serialiser      => ( $DEFAULT_SERIALISER || 'Storable::Improved' ),
+        # Default value
+        max_store_bytes => ( $MAX_STORE_BYTES // 0 ),
     };
+    if( CORE::exists( $opts->{on_get} ) &&
+        CORE::defined( $opts->{on_get} ) )
+    {
+        my( $cb, $args ) = $this->_get_args_for_callback( $opts->{on_get} );
+        return if( !$cb && $this->error );
+        $ref->{on_get}      = $cb if( defined( $cb ) );
+        $ref->{on_get_args} = $args if( defined( $args ) );
+    }
+
+    if( CORE::exists( $opts->{serialiser} ) &&
+        CORE::defined( $opts->{serialiser} ) )
+    {
+        $ref->{serialiser} = $opts->{serialiser};
+    }
+    elsif( CORE::exists( $opts->{serializer} ) &&
+        CORE::defined( $opts->{serializer} ) )
+    {
+        $ref->{serialiser} = $opts->{serializer};
+    }
+
+    if( CORE::exists( $opts->{max_size} ) &&
+        $opts->{max_size} =~ /^\d+$/ )
+    {
+        $ref->{max_size} = $opts->{max_size};
+    }
+
+    if( CORE::exists( $opts->{max_store_bytes} ) &&
+        $opts->{max_store_bytes} =~ /^\d+$/ )
+    {
+        $ref->{max_store_bytes} = $opts->{max_store_bytes};
+    }
+
+    if( CORE::exists( $opts->{max_total_bytes} ) &&
+        $opts->{max_total_bytes} =~ /^\d+$/ )
+    {
+        $ref->{max_total_bytes} = $opts->{max_total_bytes};
+    }
+
+    # Are we expected to keep a counter of callers using a given namespace, so that upon reaching 0, it gets automatically removed?
+    if( CORE::exists( $opts->{refcount} ) )
+    {
+        if( ( defined( $opts->{refcount} ) &&
+              CORE::length( $opts->{refcount} ) &&
+              $opts->{refcount} =~ /^0|1$/
+            )
+            ||
+            !defined( $opts->{refcount} )
+            ||
+            !CORE::length( $opts->{refcount} // '' ) )
+        {
+            $ref->{refcount} = $opts->{refcount};
+        }
+        else
+        {
+            require overload;
+            return( $this->error( "Unsupported value for 'refcount' (", overload::StrVal( $opts->{refcount} // 'undef' ), "). It must be either 1, 0, undef or an empty string." ) );
+        }
+    }
+
+    if( defined( $ref->{max_store_bytes} ) &&
+        $ref->{max_store_bytes} =~ /^\d+$/ &&
+        $ref->{max_store_bytes} > 0 &&
+        defined( $ref->{max_total_bytes} ) &&
+        $ref->{max_total_bytes} =~ /^\d+$/ &&
+        $ref->{max_total_bytes} > 0 &&
+        $ref->{max_store_bytes} > $ref->{max_total_bytes} )
+    {
+        warn( "You have set the maximum byte size of an element ($ref->{max_store_bytes}) to be greater than the total byte size alllwed for all elements ($ref->{max_total_bytes}" ) if( warnings::enabled() );
+    }
+
+    # The 'key', if any, must NOT be any reference. It must be a plain scalar.
+    if( CORE::exists( $opts->{key} ) &&
+        defined( $opts->{key} ) &&
+        CORE::length( $opts->{key} ) &&
+        ref( $opts->{key} ) )
+    {
+        require overload;
+        if( Scalar::Util::blessed( $opts->{key} ) &&
+            overload::Method( $opts->{key} => '""' ) )
+        {
+            $opts->{key} = "$opts->{key}";
+        }
+        else
+        {
+            return( $this->error( "The key you provided '$opts->{key}' (", overload::StrVal( $opts->{key} ), ") is a reference. You must pass a key as a plain scalar imstead." ) );
+        }
+    }
+
     my $self = bless( $ref => ( ref( $this ) || $this ) );
 
     # Special case if the context is 'system', and neither a class name, nor an object
@@ -207,6 +328,8 @@ sub new
     {
         $self->{_key}  = 'system';
         $self->{_mode} = 'system';
+        # Enabled reference counts, so this repository gets removed when its count hits 0
+        $self->{refcount} = 1;
     }
     elsif( Scalar::Util::blessed( $what ) )
     {
@@ -224,10 +347,58 @@ sub new
         # Class-level keys have granular identification only down to the process ID, so they can be shared among threads, if need be.
         $self->{_key}  = $opts->{key} ? $opts->{key} : join( ';', $class, $$ );
         $self->{_mode} = 'class';
+        # Enabled reference counts, so this repository gets removed when its count hits 0
+        $self->{refcount} = 1;
     }
     else
     {
         return( $self->error( "Module::Generic::Global->new requires either a class name or an object to be provided." ) );
+    }
+
+    # We are being required to keep track of reference counts, either explicitly by the caller, or implicitly by ourself based on the arguments we received.
+    if( $self->{refcount} )
+    {
+        my $ns    = $self->{_namespace};
+        my $key   = $self->{_key} // '';
+        if( !CORE::exists( $REFCOUNTS->{ $ns } ) )
+        {
+            # $self->__message( 4, "The repository for namespace '$ns' does not exist yet, creating it now." );
+            # $self->__message( 4, "_NEED_SHARED has value '", ( _NEED_SHARED // 'undef' ), "'" );
+            if( _NEED_SHARED )
+            {
+                # $self->__message( 4, "Initialising shared repository for namespace '$ns'." );
+                my %refcount :shared;
+                $REFCOUNTS->{ $ns } = \%refcount;
+            }
+            else
+            {
+                # $self->__message( 4, "Initialising non-shared repository for namespace '$ns'." );
+                $REFCOUNTS->{ $ns } = {};
+            }
+        }
+        my $refns = $REFCOUNTS->{ $ns };
+        if( !CORE::exists( $refns->{ $key } ) && _NEED_SHARED )
+        {
+            $self->_lock_write( $refns ) || return( $self->error( "Unable to lock namespace for new shared refcounts slot." ) );
+            my $shared_refcount :shared = 0;
+            $refns->{ $key } = $shared_refcount;
+            $self->_unlock;
+            $self->__message( 5, "Pre-shared new refcount slot for key '$key' in namespace '$ns'." );
+        }
+
+        my $refcount = \$refns->{ $key };
+        $$refcount //= 0;
+        $self->_lock_write( $refcount ) || return( $self->error( "Unable to lock the repository to write to it." ) );
+        $$refcount++;
+        $self->_unlock;
+    }
+
+    if( $opts->{auto_cleanup} )
+    {
+        my %cleanup_opts = ref( $opts->{auto_cleanup} ) eq 'HASH'
+            ? %{$opts->{auto_cleanup}}
+            : ();
+        $self->cleanup_register( %cleanup_opts );
     }
     return( $self );
 }
@@ -237,24 +408,105 @@ sub new
     *clear = \&remove;
 }
 
+sub cleanup
+{
+    my $self = shift( @_ );
+    $self->_decrement;
+    return( $self );
+}
+
+# Only for Apache/mod_perl
 sub cleanup_register
 {
-    my( $this, $r ) = @_;
-    # Apache memory cleanup
-    if( $r && Scalar::Util::blessed( $r ) && $r->isa( 'Apache2::RequestRec' ) )
+    my $self = shift( @_ );
+    my $opts = {};
+    my $r;
+    # Legacy
+    if( @_ == 1 &&
+        defined( $_[0] ) &&
+        Scalar::Util::blessed( $_[0] ) &&
+        $_[0]->isa( 'Apache2::RequestRec' ) )
     {
-        eval
-        {
-            $r->pool->cleanup_register(sub
-            {
-                my $r = shift( @_ );
-                $r->log->notice( "Clearing REPO keys: ", join( ", ", keys %$REPO ) ) if( $DEBUG );
-                %$REPO      = ();
-                %$ERRORS    = ();
-                %$LOCKS     = ();
-            }, $r );
-        };
+        $r = shift( @_ );
     }
+    else
+    {
+        $opts = $self->_get_args_as_hash( @_ );
+        $r = $opts->{r}; # Allow explicit
+    }
+
+    if( !ref( $self ) )
+    {
+        warn( "${self}::cleanup_register() cannot be called as a class function anymore. Use an instance instead." ) if( warnings::enabled() );
+        return;
+    }
+
+    my $callback    = $opts->{callback} if( ref( $opts->{callback} ) eq 'CODE' );
+    my $namespaces  = $opts->{namespaces} // [$self->{_namespace}]; # Default to self ns
+    my %keep = map{ $_ => 1 } @{ $opts->{keep} || [] };
+    if( !$r && $MOD_PERL )
+    {
+        local $@;
+        $r = eval{ Apache2::RequestUtil->request };
+        if( $@ || !$r || !Scalar::Util::blessed($r) || !$r->isa('Apache2::RequestRec') )
+        {
+            $self->__message( 3, "No valid Apache request for cleanup: $@" );
+            return(1); # Skip
+        }
+    }
+    return(1) unless( $r ); # Non-mod_perl: Rely on END
+
+    my $r_id = Scalar::Util::refaddr( $r );
+    $self->_lock_write( \$CLEANUP->{ $r_id } ) || return( $self->error( 'Lock fail for cleanup track.' ) );
+    $CLEANUP->{ $r_id } //= { ns => {}, keep => {} };
+    $CLEANUP->{ $r_id }->{ns}{ $_ } = 1 for( @$namespaces );
+    %{$CLEANUP->{ $r_id }->{keep}} = %keep;
+    $self->_unlock;
+
+    my $weaken_self = $self;
+    Scalar::Util::weaken( $weaken_self );
+    local $@;
+    eval
+    {
+        $r->pool->cleanup_register(sub
+        {
+            my $args = shift( @_ );
+            my( $me, $this_r, $cb ) = @$args;
+            return if( !$me );
+
+            my $this_r_id = Scalar::Util::refaddr( $this_r );
+            $me->_lock_read( $CLEANUP ) || return;
+            my $data = $CLEANUP->{ $this_r_id };
+            $me->_unlock;
+            if( $data )
+            {
+                my @to_clear = grep{ !$data->{keep}->{ $_ } } keys( %{$data->{ns}} );
+                if( @to_clear )
+                {
+                    $this_r->log->notice( "Clearing namespaces: ", join( ', ', @to_clear) ) if( $DEBUG );
+                    foreach my $ns ( @to_clear )
+                    {
+                        delete( $REPO->{ $ns } );
+                        delete( $ORDER->{ $ns } );
+                        delete( $SIZES->{ $ns } );
+                        delete( $NS_LOCKS->{ $ns } );
+
+                        foreach my $k ( keys( %$STATS ) )
+                        {
+                            next if( index( $k, $ns . ';' ) != 0 );
+                            delete( $STATS->{ $k } );
+                        }
+                    }
+                }
+                $me->_lock_write( $CLEANUP ) || return;
+                delete( $CLEANUP->{ $this_r_id } );
+                $me->_unlock;
+            }
+            $cb->( $me, $this_r ) if( $cb );
+        }, [ $weaken_self, $r, $callback ] );
+    };
+    $self->__message( 3, "Cleanup register error: $@" ) if( $@ );
+    return(1);
 }
 
 sub clear_error
@@ -290,6 +542,7 @@ sub error
         my $msg = join( '', @_ );
         my $ex = Module::Generic::Global::Exception->new({ message => $msg, code => 500, skip_frames => 1 });
         warn( $ex ) if( warnings::enabled() );
+        # $self->__message( 4, "Is \$ERRORS shared ? ", ( HAS_THREADS && threads::shared::is_shared( $ERRORS ) ? 'yes' : 'no' ) );
         $self->_lock_write( $ERRORS, delay => ERROR_DELAY ) || die( "Unable to get a lock on \$ERRORS" );
         $self->{_error} = $ex if( ref( $self ) );
         eval
@@ -332,16 +585,42 @@ sub exists
     my $key  = $self->{_key} || die( "No key is set." );
     # Make sure the repository is shared if needed
     $self->_share_repo( $ns );
+    return(0) if( !CORE::exists( $REPO->{ $ns } ) );
     return( CORE::exists( $REPO->{ $ns }->{ $key } ) ? 1 : 0 );
 }
 
 sub get
 {
     my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
     my $ns   = $self->{_namespace} || die( "No namespace is set." );
     my $key  = $self->{_key} || die( "No key is set." );
+    my( $cb, $args );
+    if( CORE::exists( $opts->{on_get} ) &&
+        CORE::defined( $opts->{on_get} ) )
+    {
+        ( $cb, $args ) = $self->_get_args_for_callback( $opts->{on_get} );
+        return if( !$cb && $self->error );
+    }
+    else
+    {
+        $cb   = $self->{on_get} if( CORE::exists( $self->{on_get} ) );
+        $args = $self->{on_get_args} if( CORE::exists( $self->{on_get_args} ) );
+    }
+    $self->__message( 7, "Called for namespace '$ns' and key '$key' from class ", [caller]->[0], " at line ", [caller]->[2], " in sub ", [caller(1)]->[3] );
     # Make sure the repository is shared if needed
     $self->_share_repo( $ns );
+ 
+     # We avoid autovivification
+    if( !CORE::exists( $REPO->{ $ns }->{ $key } ) )
+    {
+        $self->__message( 7, "No data to deserialise yet." );
+        return;
+    }
+
+    # $self->__message( 4, "\$REPO->{ $ns } is ", overload::StrVal( $REPO->{ $ns } ) );
+    # $self->__message( 4, "HAS_THREADS is '", ( HAS_THREADS // 'undef' ), "'" );
+    # $self->__message( 4, "Is \$REPO->{ $ns } shared already ? ", ( HAS_THREADS && threads::shared::is_shared( $REPO->{ $ns } ) ? 'yes' : 'no' ) );
     my $ref  = \$REPO->{ $ns }->{ $key };
     $$ref //= undef;
     $self->_lock_read( $ref ) || return( $self->error( "Unable to lock the repository to read from it." ) );
@@ -349,36 +628,93 @@ sub get
     $self->_unlock;
     if( CORE::length( $store // '' ) )
     {
-        my $value;
-        local $@;
-        eval
+        $self->__message( 7, "Deserialising stored data '$store'" );
+        my $value = $self->_deserialise( $store );
+        if( !defined( $value ) && $self->error )
         {
-            $value = Storable::Improved::thaw( $store );
-        };
-        if( $@ )
-        {
-            return( $self->error( "Failed to deserialise data: $@" ) );
+            return;
         }
+
         if( defined( $value ) && Scalar::Util::blessed( $value ) && $value->isa( 'Module::Generic::Global::Scalar' ) )
         {
             $value = $value->as_string;
+        }
+        if( defined( $cb ) )
+        {
+            local $@;
+            my $rv = eval
+            {
+                local $_ = $self;
+                $cb->( $value, ( defined( $args ) ? @$args : () ) );
+            };
+            if( $@ )
+            {
+                return( $self->error( "Error with callback after deserialising object: $@" ) );
+            }
+            return( $rv );
         }
         return( $value );
     }
     else
     {
+        $self->__message( 7, "No data to deserialise yet." );
         return( $store );
     }
 }
 
+sub key { return( shift->{_key} ); }
+
 sub length
 {
-    my $self = shift( @_ );
-    my $ns   = $self->{_namespace} || die( "No namespace is set." );
-    # Make sure the repository is shared if needed
+    my( $self ) = @_;
+    my $ns  = $self->{_namespace} || die( "No namespace is set." );
+
     $self->_share_repo( $ns );
-    return(0) unless( CORE::exists( $REPO->{ $ns } ) && CORE::ref( $REPO->{ $ns } ) eq 'HASH' );
-    return( scalar( keys( %{$REPO->{ $ns }} ) ) );
+
+    if( !CORE::exists( $REPO->{ $ns } ) )
+    {
+        $self->__message( 7, "The following keys were found for namespace '$ns': ''" );
+        $self->__message( 7, "ORDER repo contains: ''" );
+        return(0);
+    }
+
+    my @keys = CORE::keys( %{ $REPO->{ $ns } } );
+    $self->__message( 5, "Found ", scalar( @keys ), " keys: '", join( ', ', @keys ), "'" );
+
+    # Optional: if your "deleted" state is empty string, you probably want to exclude them
+    # to avoid resurrected empty slots being counted.
+    # This requires reading each value carefully without autoviv: we already have keys, so it's safe.
+    my @alive;
+    for my $k ( @keys )
+    {
+        next if( !CORE::exists( $REPO->{ $ns }->{ $k } ) );
+
+        my $ref = \$REPO->{ $ns }->{ $k };
+        $$ref //= '';
+        $self->_lock_read( $ref ) || next;
+        my $v = $$ref;
+        $self->_unlock;
+
+        # next if( !defined( $v ) || $v eq '' );
+        push( @alive, $k );
+    }
+
+    $self->__message( 7, "The following keys were found for namespace '$ns': '", join( ', ', sort( @alive ) ), "'" );
+
+    if( CORE::exists( $ORDER->{ $ns } ) )
+    {
+        my $order_ref = $ORDER->{ $ns };
+        $self->_lock_read( $order_ref ) || return( $self->error( "Unable to lock order to read it." ) );
+        my @order = @{$ORDER->{ $ns }};
+        $self->_unlock;
+        $self->__message( 7, "ORDER repo contains: '", join( ', ', @order ), "'" );
+    }
+    else
+    {
+        $self->__message( 7, "ORDER repo contains: ''" );
+    }
+
+    return( scalar( @alive ) );
 }
 
 sub lock
@@ -396,12 +732,14 @@ sub lock
         eval{ $rv = CORE::lock( $lock_ref ) };
         if( $@ )
         {
+            $self->__message( 3, "Error locking \$lock_ref (", overload::StrVal( $lock_ref // 'undef' ), "): $@" );
             return( $self->error({
                 message => "Failed to acquire shared lock for key $key: $@",
                 class => 'Module::Generic::Global::Exception',
                 code => 503
             }) );
         }
+        $self->__message( 4, "Acquired shared lock for key $key" );
         # We return the value returned by CORE::lock, which, when it goes out of scopre in the caller's block, the lock also will be automatically removed.
         return( $rv );
     }
@@ -410,17 +748,28 @@ sub lock
         my $rv = $self->_lock_mutex( $LOCK_MUTEX, delay => RETRY_DELAY, rw => 1 );
         if( !$rv )
         {
+            $self->__message( 3, "Failed to acquire shared lock for key $key after ", MAX_RETRIES, " retries" );
             return( $self->error( {
                 message => "Failed to acquire shared lock for key $key after ", MAX_RETRIES, " retries",
                 class => 'Module::Generic::Global::Exception',
                 code => 503
             } ) );
         }
+        $self->__message( 4, "Acquired shared lock for key $key with mutex" );
         # Return a special private object that will unlock the mutex when it gets out of scope, just like CORE::lock() does, so the user does not have to worry about calling unlock()
         return( Module::Generic::Global::Guard->new( $LOCK_MUTEX ) );
     }
     return(1);
 }
+
+sub max_store_bytes
+{
+    my $self = shift( @_ );
+    $self->{max_store_bytes} = shift( @_ ) if( @_ );
+    return( $self->{max_store_bytes} );
+}
+
+sub namespace { return( shift->{_namespace} ); }
 
 sub remove
 {
@@ -431,13 +780,42 @@ sub remove
     $self->_share_repo( $ns );
     if( !CORE::exists( $REPO->{ $ns }->{ $key } ) )
     {
+        # $self->__message( 4, "The repository \$REPO->{ $ns }->{ $key } does not exist, so there is nothing to remove." );
         return(1);
     }
     my $ref  = \$REPO->{ $ns }->{ $key };
     $$ref //= '';
     $self->_lock_write( $ref ) || return( $self->error( "Unable to lock the repository to write to it." ) );
+    my $removed_len = CORE::length( $$ref // '' );
     CORE::delete( $REPO->{ $ns }->{ $key } );
     $self->_unlock;
+
+    # The last one out of the door, please shut the light: we remove the namespace if re are using refcounts.
+    # It can be called in void.
+    $self->_decrement;
+
+    # Housekeeping
+    if( $removed_len > 0 )
+    {
+        $self->_lock_write( $SIZES->{ $ns } ) || return( $self->error( "Unable to update sizes on remove." ) );
+        ${$SIZES->{ $ns }} -= $removed_len;
+        $self->_unlock;
+    }
+
+    # We remove from order array to keep it clean
+    my $order_ref = $ORDER->{ $ns };
+    $self->_lock_write( $order_ref ) || return( $self->error( "Unable to lock order array for removal." ) );
+    @{$ORDER->{ $ns }} = grep{ CORE::length( $_ // '' ) && $_ ne $key } @{$ORDER->{ $ns }};
+    $self->_unlock;
+
+    # Collect some statistics
+    my $stat_key = join( ';', $ns, $key );
+    if( CORE::exists( $STATS->{ $stat_key } ) )
+    {
+        $self->_lock_write( $STATS ) || return( $self->error( "Unable to lock stats for share check." ) );
+        CORE::delete( $STATS->{ $stat_key } );
+        $self->_unlock;
+    }
     return(1);
 }
 
@@ -446,29 +824,385 @@ sub set
     my( $self, $value ) = @_;
     my $ns  = $self->{_namespace} || die( "No namespace is set." );
     my $key = $self->{_key} || die( "No key is set." );
-    $value = ref( $value // '' ) ? $value : Module::Generic::Global::Scalar->new( \$value );
-    my $store = eval{ Storable::Improved::freeze( $value ) };
-    local $@;
-    if( $@ )
+    $self->__message( 7, "Called for namespace '$ns' and key '$key' from class ", [caller]->[0], " at line ", [caller]->[2], " in sub ", [caller(1)]->[3] );
+    $self->__message( 7, "Requested to store value '", overload::StrVal( $value // 'undef' ), "'" );
+    my $raw_len;
+    if( !ref( $value ) )
     {
-        return( $self->error( "Failed to serialise object: $@" ) );
+        $raw_len = CORE::length( $value // '' );
+        $value = Module::Generic::Global::Scalar->new( \$value );
     }
-    # Make sure the repository is shared if needed
+    local $@;
+    my $store = $self->_serialise( $value );
+    if( !defined( $store ) && $self->error )
+    {
+        return;
+    }
+
+    # Source of truth for accounting: actual stored bytes
+    my $len    = CORE::length( $store // '' );
+    $raw_len //= $len;
+    # Check for the total bytes stores in this namespace, and if we exceed or not our threshold
+    my $max = $self->max_store_bytes;
+    # Warn about some nonsense whereby the maximum bytes size of an element is higher than the total byte size of all elements.
+    if( defined( $max ) &&
+        $max =~ /^\d+$/ &&
+        $max > 0 &&
+        defined( $self->{max_total_bytes} ) &&
+        $self->{max_total_bytes} =~ /^\d+$/ &&
+        $self->{max_total_bytes} > 0 &&
+        $max > $self->{max_total_bytes} )
+    {
+        warn( "You have set the maximum byte size of an element ($max) to be greater than the total byte size alllwed for all elements ($self->{max_total_bytes}" ) if( warnings::enabled() );
+    }
+
+    $self->__message( 4, "Checking if byte length of value provided ($raw_len) is bigger than maximum allowed ($max)" );
+    if( defined( $max ) &&
+        $max =~ /^\d+$/ &&
+        $max > 0 &&
+        $raw_len > $max )
+    {
+        $self->__message( 4, "The value to be stored is $raw_len bytes, which exceeds the maximum allowed of $max bytes. Returning an error now." );
+        return( $self->error( "Refusing to store ${raw_len} bytes in Module::Generic::Global (limit ${max})." ) );
+    }
+
+    # Make sure the repository is shared if needed (moved up for early init)
     $self->_share_repo( $ns );
+
+    # Pre-create shared slot if new key and in shared mode (fixes invalid shared scalar on autoviv)
+    my $is_new_key = CORE::exists( $REPO->{ $ns }->{ $key } ) ? 0 : 1;
+
+    if( !CORE::exists( $REPO->{ $ns }->{ $key } ) && _NEED_SHARED )
+    {
+        # Lock per-ns shared scalar
+        $self->_lock_write( $NS_LOCKS->{ $ns } ) || return( $self->error( "Unable to lock namespace for new shared slot." ) );
+        my $shared_slot :shared = '';
+        $REPO->{ $ns }->{ $key } = $shared_slot;
+        $self->_unlock;
+        $self->__message( 5, "Pre-shared new slot for key '$key' in namespace '$ns'." );
+    }
+
+    $self->__message( 7, "Value to store is ", $len, " bytes long (", overload::StrVal( $store ), ")." );
+    my $old_len = 0;
+    if( CORE::exists( $REPO->{ $ns }->{ $key } ) )
+    {
+        my $ref = \$REPO->{ $ns }->{ $key };
+        $$ref //= '';
+        $self->_lock_read( $ref ) || return( $self->error( "Unable to read old len." ) );
+        $old_len = CORE::length( $$ref // '' );
+        $self->_unlock;
+    }
+
+    my $delta = $len - $old_len;
+    if( $self->{max_total_bytes} && $self->{max_total_bytes} > 0 )
+    {
+        $self->_lock_read( $SIZES->{ $ns } ) || return( $self->error( "Unable to lock sizes." ) );
+        my $current_total = ${$SIZES->{ $ns }} // 0;
+        $self->_unlock;
+        # No need to check for previous entry to evictate, since this new one already exceeds the tal
+        if( $len > $self->{max_total_bytes} )
+        {
+            $self->__message( 6, "The new value has a size of ${len} bytes, which exceeds the maximum total bytes allowed ($self->{max_total_bytes})." );
+            return( $self->error( "Refusing to store ", ( $len ), " bytes;  The byte size of this value exceeds in itself the total byte value size of $self->{max_total_bytes} bytes for this key ${key}." ) );
+        }
+
+        # Only o this if we exceed the threshold. Very straightforward, very fast.
+        # We make sure that this one new item byte size does not exceed as itself, the maximum allowed.
+        if( ( $current_total + $delta ) > $self->{max_total_bytes} )
+        {
+            $self->__message( 4, "The new total byte size (", ( $current_total + $delta ), ") would exceed the maximum of '$self->{max_total_bytes}'. Evicting older entries." );
+            my $order_ref = $ORDER->{ $ns };
+            $self->_lock_write( $order_ref ) || return( $self->error( "Unable to lock order for total eviction." ) );
+            while( @{$ORDER->{ $ns }} && $current_total + $delta > $self->{max_total_bytes} )
+            {
+                my $evict_key = shift( @{$ORDER->{ $ns }} );
+                # Do not evict self if overwrite
+                if( CORE::exists( $REPO->{ $ns }->{ $evict_key } ) && $evict_key ne $key )
+                {
+                    my $evict_ref = \$REPO->{ $ns }->{ $evict_key };
+                    $$evict_ref //= '';
+                    $self->_lock_write( $evict_ref ) || last;
+                    my $evict_len = CORE::length( $$evict_ref // '' );
+                    CORE::delete( $REPO->{ $ns }->{ $evict_key } );
+                    $self->_unlock;
+                    # Update sizes (lock separately to avoid deep nest)
+                    $self->_lock_write( $SIZES->{ $ns } ) || last;
+                    ${$SIZES->{ $ns }} -= $evict_len;
+                    $self->_unlock;
+                    # Clear stat too
+                    my $evict_stat_key = join( ';', $ns, $evict_key );
+                    if( CORE::exists( $STATS->{ $evict_stat_key } ) )
+                    {
+                        my $evict_stat_ref = \$STATS->{ $evict_stat_key };
+                        $$evict_stat_ref //= 0;
+                        $self->_lock_write( $evict_stat_ref ) || last;
+                        CORE::delete( $STATS->{ $evict_stat_key } );
+                        $self->_unlock;
+                    }
+                    $current_total -= $evict_len;
+                    $self->__message( 4, "Evicted '$evict_key' ($evict_len bytes) from '$ns' for max_total_bytes ($self->{max_total_bytes})." );
+                }
+            }
+            $self->_unlock; # Unlock order
+            if( $current_total + $delta > $self->{max_total_bytes} )
+            {
+                return( $self->error( "Refusing to store ", ( $len ), " bytes; the new total (", ( $current_total + $delta ), ") would exceed max_total_bytes ($self->{max_total_bytes}) even after eviction." ) );
+            }
+        }
+    }
+
+    if( $self->{max_size} &&
+        $self->{max_size} =~ /^\d+$/ &&
+        $self->{max_size} > 0 &&
+        $is_new_key &&
+        scalar( keys( %{$REPO->{ $ns }} ) ) > $self->{max_size} )
+    {
+        $self->__message( 4, "The size of repository for namespace '$ns' is '", scalar( keys( %{$REPO->{ $ns }} ) ), "', which exceeds the maximum size allowed ($self->{max_size})." );
+        my $order_ref = $ORDER->{ $ns };
+        $self->_lock_write( $order_ref ) || return( $self->error( "Unable to lock order array for eviction." ) );
+        while( @{$ORDER->{ $ns }} )
+        {
+            my $old_key = shift( @{$ORDER->{ $ns }} );
+            $self->__message( 4, "Checking keys to evit: processing key '$old_key' with namespace size of '", scalar( keys( %{$REPO->{ $ns }} ) ), "'" );
+            if( CORE::exists( $REPO->{ $ns }->{ $old_key } ) )
+            {
+                my $old_ref = \$REPO->{ $ns }->{ $old_key };
+                $$old_ref //= '';
+                $self->_lock_write( $old_ref ) || last;
+                my $old_bytes = CORE::length( $$old_ref // '' );
+                CORE::delete( $REPO->{ $ns }->{ $old_key } );
+                $self->_unlock;
+
+                $self->_lock_write( $SIZES->{ $ns } ) || last;
+                ${$SIZES->{ $ns }} -= $old_bytes;
+                $self->_unlock;
+
+                my $old_stat_key = join( ';', $ns, $old_key );
+                if( CORE::exists( $STATS->{ $old_stat_key } ) )
+                {
+                    my $old_stat_ref = \$STATS->{ $old_stat_key };
+                    $$old_stat_ref //= 0;
+                    $self->_lock_write( $old_stat_ref ) || last;
+                    CORE::delete( $STATS->{ $old_stat_key } );
+                    $self->_unlock;
+                }
+
+                $self->__message( 4, "The total number of items in namespace '$ns' is now ", scalar( keys( %{$REPO->{ $ns }} ) ), ". Evicted oldest key '$old_key' from namespace '$ns' to enforce max_size of '$self->{max_size}'." );
+                last;
+            }
+        }
+        $self->_unlock;
+    }
+
+    # $self->__message( 4, "\$REPO->{ $ns } is ", overload::StrVal( $REPO->{ $ns } ) );
     my $ref = \$REPO->{ $ns }->{ $key };
     $$ref //= '';
     $self->_lock_write( $ref ) || return( $self->error( "Unable to lock the repository to write to it." ) );
     $$ref = $store;
+
+    if( $delta != 0 )
+    {
+        $self->_lock_write( $SIZES->{ $ns } ) || return( $self->error( "Unable to update sizes." ) );
+        ${$SIZES->{ $ns }} += $delta;
+        $self->_unlock;
+    }
+
+    # Refresh recency: move key to the end (new OR overwrite)
+    my $order_ref = $ORDER->{ $ns };
+    $self->_lock_write( $order_ref ) || return( $self->error( "Unable to lock order array for insertion." ) );
+
+    @{$ORDER->{ $ns }} = grep{ ( $_ // '' ) ne $key } @{$ORDER->{ $ns }};
+    push( @{$ORDER->{ $ns }}, $key );
+
+    $self->_unlock;
+
+    # Collect some statistics
+    my $stat_key = join( ';', $ns, $key );
+    my $stat_ref = \$STATS->{ $stat_key };
+    $$stat_ref //= 0;
+    $self->_lock_write( $stat_ref ) || return( $self->error( "Unable to lock stats." ) );
+    $$stat_ref = $len;
     $self->_unlock;
     return(1);
+}
+
+sub stat
+{
+    my( $self, $limit ) = @_;
+    $limit ||= 20;
+
+    my @items;
+    $self->_lock_read( $STATS ) || return;
+    @items = sort{ ( $STATS->{ $b } || 0 ) <=> ( $STATS->{ $a } || 0 ) } keys( %$STATS );
+    $self->_unlock;
+    $self->__message( 4, "STATS contains ", scalar( @items ) );
+
+    splice( @items, $limit ) if( @items > $limit );
+
+    my $out = [];
+    foreach my $k ( @items )
+    {
+        push( @$out, { key => $k, bytes => ( $STATS->{ $k } || 0 ) } );
+    }
+    return( $out );
 }
 
 sub unlock
 {
     my $self = shift( @_ );
     return(1) unless( defined( $LOCK_MUTEX ) );
-    $LOCK_MUTEX->unlock;
+    local $@;
+    eval
+    {
+        $LOCK_MUTEX->unlock;
+    };
+    $self->__message( 3, "Unlock error: $@" ) if( $@ );
     return(1);
+}
+
+sub _decrement
+{
+    my $self = shift( @_ );
+    return(1) unless( $self->{refcount} );
+    my $ns  = $self->{_namespace};
+    my $key = $self->{_key} // '';
+    $self->_share_repo( $ns );
+    return(1) if( !CORE::exists( $REFCOUNTS->{ $ns }->{ $key } ) );
+    my $ref = \$REFCOUNTS->{ $ns }->{ $key };
+    $$ref //= 0;
+    $self->_lock_write( $ref ) || return( $self->error( "Unable to lock refcounts counter for update." ) );
+    if( $$ref > 0 )
+    {
+        $$ref--;
+    }
+    # A bit paranoid given the only place where this is reduced is here, but why not?
+    elsif( $$ref < 0 )
+    {
+        $self->__message( 6, "Refcount underflow with value '", $$ref, "' for $ns;$key" );
+        $$ref = 0;
+    }
+    if( $$ref == 0 )
+    {
+        $self->remove;
+        CORE::delete( $REFCOUNTS->{ $ns }->{ $key } );
+    }
+    $self->_unlock;
+    return(1);
+}
+
+sub _deserialise
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    return( '' ) if( !CORE::length( $data ) );
+    my $serialiser = $self->{serialiser} || $DEFAULT_SERIALISER || 'Storable::Improved';
+    # try-catch
+    local $@;
+    if( $serialiser eq 'CBOR' || $serialiser eq 'CBOR::XS' )
+    {
+        eval( "require CBOR::XS;" );
+        if( $@ )
+        {
+            return( $self->error( "Unable to load serialiser CBOR::XS: $@" ) );
+        }
+    }
+    else
+    {
+        eval( "require $serialiser;" );
+        if( $@ )
+        {
+            return( $self->error( "Unable to load serialiser $serialiser: $@" ) );
+        }
+        if( $serialiser eq 'Sereal' )
+        {
+            eval( "require Sereal::Decoder;" );
+            if( $@ )
+            {
+                return( $self->error( "Unable to load serialiser Sereal::Decoder: $@" ) );
+            }
+        }
+    }
+
+    if( ref( $serialiser ) eq 'CODE' )
+    {
+        my $ref = eval
+        {
+            return( $serialiser->( $data, 'thaw' ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to deserialise data with user-provided callback: $@" ) );
+        }
+        return( $ref );
+    }
+    elsif( $serialiser eq 'CBOR' || $serialiser eq 'CBOR::XS' )
+    {
+        my $cbor = CBOR::XS->new;
+        $cbor->allow_sharing(1);
+        my $ref;
+        eval
+        {
+            ( $ref, my $bytes ) = $cbor->decode_prefix( $data );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to deserialise data with $serialiser: $@" ) );
+        }
+        return( $ref );
+    }
+    elsif( $serialiser eq 'CBOR::Free' )
+    {
+        my $ref = eval
+        {
+            no warnings;
+            return( CBOR::Free::decode( $data ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to deserialise data with $serialiser: $@" ) );
+        }
+        return( $ref );
+    }
+    elsif( $serialiser eq 'Sereal' )
+    {
+        my $dec = Sereal::Decoder->new;
+        my $is_sereal = sub
+        {
+            my $type = Sereal::Decoder->looks_like_sereal( $_[0] );
+        };
+        my $decoded;
+        eval
+        {
+            $is_sereal->( $data ) if( $self->debug );
+            $dec->decode( $data => $decoded );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to deserialise with $serialiser ", CORE::length( $data ), " bytes of data (", ( CORE::length( $data ) > 128 ? ( substr( $data, 0, 128 ) . '(trimmed)' ) : $data ), ": $@" ) );
+        }
+        return( $decoded );
+    }
+    elsif( $serialiser eq 'Storable::Improved' || $serialiser eq 'Storable' )
+    {
+        my $rv = eval
+        {
+            my $code = $serialiser->can( 'thaw' );
+            if( !defined( $code ) )
+            {
+                die( "The class $serialiser does not support the method 'thaw'." );
+            }
+            return( $code->( $data ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to deserialise data with $serialiser: $@" ) );
+        }
+        return( $rv );
+    }
+    else
+    {
+        return( $self->error( "Unsupporterd serialiser \"$serialiser\"." ) );
+    }
 }
 
 sub _get_args_as_hash
@@ -479,11 +1213,68 @@ sub _get_args_as_hash
     {
         $ref = shift( @_ );
     }
-    elsif( !( scalar( @_ ) % 2 ) )
+    else
     {
-        $ref = { @_ };
+        my %args = @_;
+        $ref = \%args;
     }
     return( $ref );
+}
+
+sub _get_args_for_callback
+{
+    my $self = shift( @_ );
+    my $this = shift( @_ ) || return;
+    my( $cb, $args );
+    # The user has provided the callback as an array. For example:
+    # on_get => [
+    #     sub{ "Hello world!" },
+    #     [qw( arg1 arg2 arg3 )],
+    # ];
+    #
+    # or:
+    # on_get => [
+    #     sub{ "Hello world!" },
+    #     qw( arg1 arg2 arg3 ),
+    # ];
+    if( CORE::ref( $this ) eq 'ARRAY' )
+    {
+        if( scalar( @$this ) )
+        {
+            if( CORE::ref( $this->[0] ) ne 'CODE' )
+            {
+                return( $self->error( "Option on_get must be a CODE reference." ) );
+            }
+            $cb = $this->[0];
+            if( scalar( @$this ) > 1 )
+            {
+                # If the user provided an array reference as the second argument, we use it as the list of parameters to pass the callback
+                if( scalar( @$this ) == 2 &&
+                    CORE::ref( $this->[1] ) eq 'ARRAY' )
+                {
+                    $args = $this->[1];
+                }
+                # Otherwise, the user has passed a list of arguments that will become the list of parameters to pass the callback
+                else
+                {
+                    $args = [@$this[1..$#$this]];
+                }
+            }
+        }
+    }
+    # The user has provided just on argument, and it is the callback itself
+    elsif( CORE::ref( $this ) eq 'CODE' )
+    {
+        $cb = $this;
+    }
+    else
+    {
+        return( $self->error( "Option on_get must be a CODE reference." ) );
+    }
+    # We make sure that if there is no $args, then there is no second argument whose value would be undef.
+    # Instead, the callback would see only 1 argument.
+    return( $cb, ( defined( $args ) ? $args : () ) ) if( defined( $cb ) );
+    return;
 }
 
 sub _lock
@@ -528,14 +1319,19 @@ sub _lock_mutex
     {
         # try-catch
         local $@;
-        my $rc;
-        eval{ $rc = $rw ? $mutex->trywrlock : $mutex->tryrdlock };
+        my $rc = eval{ $rw ? $mutex->trywrlock : $mutex->tryrdlock };
         if( $@ )
         {
             warn( "Unable to acquire ", ( $rw ? 'write' : 'read' ), " lock using mutex from APR::ThreadRWLock: $@" );
             return;
         }
-        return(1) if( !$rc );
+
+        if( !$rc )
+        {
+            $self->__message( 4, 'Acquired ' . ( $rw ? 'write' : 'read' ) . ' lock.' );
+            return(1);
+        }
+
         if( $rc == &APR::Const::EAGAIN || $rc == &APR::Const::EBUSY )
         {
             # Exponential backoff
@@ -546,6 +1342,7 @@ sub _lock_mutex
         }
     }
 
+    $self->__message( 3, 'Failed to acquire lock after ' . MAX_RETRIES . ' retries.' );
     warn( "Failed to acquire write lock" );
     return(0);
 }
@@ -568,7 +1365,7 @@ sub _lock_read
     return( $self->_lock( $ref, %$opts ) );
 }
 
-sub _message
+sub __message
 {
     my $self = shift( @_ );
     my $required_level;
@@ -606,7 +1403,7 @@ sub _message
     $msg =~ s/\n$//gs;
     my $long_msg = "## ${pkg}::${sub2}() [$line]${proc_info}: " . join( "\n## ", split( /\n/, $msg ) );
     my( $r, $s );
-    if( MOD_PERL )
+    if( $MOD_PERL )
     {
         # try-catch
         local $@;
@@ -636,25 +1433,194 @@ sub _message
     return(1);
 }
 
+sub _serialise
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    return( '' ) if( !CORE::length( $data ) );
+    my $serialiser = $self->{serialiser} || $DEFAULT_SERIALISER || 'Storable::Improved';
+    if( $serialiser eq 'CBOR' || $serialiser eq 'CBOR::XS' )
+    {
+        eval( "require CBOR::XS;" );
+        if( $@ )
+        {
+            return( $self->error( "Unable to load serialiser CBOR::XS: $@" ) );
+        }
+    }
+    else
+    {
+        eval( "require $serialiser;" );
+        if( $@ )
+        {
+            return( $self->error( "Unable to load serialiser $serialiser: $@" ) );
+        }
+        if( $serialiser eq 'Sereal' )
+        {
+            eval( "require Sereal::Encoder;" );
+            if( $@ )
+            {
+                return( $self->error( "Unable to load serialiser Sereal::Encoder: $@" ) );
+            }
+        }
+    }
+
+    # try-catch
+    local $@;
+    if( ref( $serialiser ) eq 'CODE' )
+    {
+        my $serialised = eval
+        {
+            return( $serialiser->( $data, 'freeze' ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to serialise data with user-provided callback: $@" ) );
+        }
+        return( $serialised );
+    }
+    elsif( $serialiser eq 'CBOR' || $serialiser eq 'CBOR::XS' )
+    {
+        my $cbor = CBOR::XS->new;
+        $cbor->allow_sharing(1);
+        my $serialised = eval
+        {
+            $cbor->encode( $data );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to serialise data with $serialiser: $@" ) );
+        }
+        return( $serialised );
+    }
+    elsif( $serialiser eq 'CBOR::Free' )
+    {
+        my $serialised = eval
+        {
+            CBOR::Free::encode( $data );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to serialise data with $serialiser: $@" ) );
+        }
+        return( $serialised );
+    }
+    elsif( $serialiser eq 'Sereal' )
+    {
+        my $enc = Sereal::Encoder->new;
+        my $serialised = eval
+        {
+            $enc->encode( $data );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to serialise data with $serialiser: $@" ) );
+        }
+        return( $serialised );
+    }
+    elsif( $serialiser eq 'Storable::Improved' || $serialiser eq 'Storable' )
+    {
+        my $serialised = eval
+        {
+            my $code = $serialiser->can( 'freeze' );
+            if( !defined( $code ) )
+            {
+                die( "Class $serialiser has no method 'freeze' to serialise data." );
+            }
+            return( $code->( $data ) );
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error trying to serialise data with $serialiser: $@" ) );
+        }
+        return( $serialised );
+    }
+    else
+    {
+        return( $self->error( "Unsupporterd serialiser \"$serialiser\"." ) );
+    }
+}
+
 sub _share_repo
 {
     my $self = shift( @_ );
     my $ns   = shift( @_ ) || die( "No namespace is set." );
     if( !CORE::exists( $REPO->{ $ns } ) )
     {
+        # $self->__message( 4, "The repository for namespace '$ns' does not exist yet, creating it now." );
+        # $self->__message( 4, "_NEED_SHARED has value '", ( _NEED_SHARED // 'undef' ), "'" );
         if( _NEED_SHARED )
         {
+            # $self->__message( 4, "Initialising shared repository for namespace '$ns'." );
             my %sub_repo :shared;
             $REPO->{ $ns } = \%sub_repo;
         }
         else
         {
+            # $self->__message( 4, "Initialising non-shared repository for namespace '$ns'." );
             $REPO->{ $ns } = {};
         }
     }
     else
     {
         # $REPO->{ $ns } already exists.
+        # $self->__message( 4, "\$REPO->{ $ns } (", overload::StrVal( $REPO->{ $ns } ), ") already exists, and is shared ? ", ( HAS_THREADS && threads::shared::is_shared( $REPO->{ $ns } ) ? 'yes' : 'no' ) );
+    }
+
+    # To keep track of they keys in a given namespace
+    if( !CORE::exists( $ORDER->{ $ns } ) )
+    {
+        if( _NEED_SHARED )
+        {
+            my @sub_order :shared;
+            $ORDER->{ $ns } = \@sub_order;
+        }
+        else
+        {
+            $ORDER->{ $ns } = [];
+        }
+    }
+
+    # To keep track of repositories size, and to later act accordingly
+    if( !CORE::exists( $SIZES->{ $ns } ) )
+    {
+        if( _NEED_SHARED )
+        {
+            my $sub_size :shared = 0;
+            $SIZES->{ $ns } = \$sub_size;
+        }
+        else
+        {
+            $SIZES->{ $ns } = \0;
+        }
+    }
+
+    if( !CORE::exists( $NS_LOCKS->{ $ns } ) )
+    {
+        if( _NEED_SHARED )
+        {
+            my $ns_lock :shared = 0;
+            $NS_LOCKS->{ $ns } = \$ns_lock;
+        }
+        else
+        {
+            $NS_LOCKS->{ $ns } = \0;
+        }
+    }
+
+    if( $self->{refcount} )
+    {
+        if( !CORE::exists( $REFCOUNTS->{ $ns } ) )
+        {
+            if( _NEED_SHARED )
+            {
+                my %refcounts :shared;
+                $REFCOUNTS->{ $ns } = \%refcounts;
+            }
+            else
+            {
+                $REFCOUNTS->{ $ns } = {};
+            }
+        }
     }
     return(1);
 }
@@ -664,6 +1630,20 @@ sub _unlock
     $MUTEX->unlock if( USE_MUTEX );
     return(1);
 }
+
+# NOTE: END
+END
+{
+    %$REPO      = ();
+    %$ERRORS    = ();
+    %$LOCKS     = ();
+    %$STATS     = ();
+    %$ORDER     = ();
+    %$SIZES     = ();
+    %$CLEANUP   = ();
+    %$NS_LOCKS  = ();
+    %$REFCOUNTS = ();
+};
 
 {
     # NOTE: Module::Generic::Global::Guard
@@ -744,7 +1724,16 @@ sub _unlock
         my $class = CORE::ref( $self ) || $self;
         # Return an array reference rather than a list so this works with Sereal and CBOR
         # On or before Sereal version 4.023, Sereal did not support multiple values returned
-        CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+        if( $serialiser eq 'Sereal' )
+        {
+            require Sereal::Encoder;
+            require version;
+
+            if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+            {
+                CORE::return( [$class, $$self] );
+            }
+        }
         # But Storable want a list with the first element being the serialised element
         CORE::return( $$self );
     }
@@ -1058,31 +2047,96 @@ Module::Generic::Global - Contextual global storage by namespace, class or objec
     # System-level repository
     # Here 'system' is a special keyword
     my $repo = Module::Generic::Global->new( 'system_setting' => 'system' );
+
     # Inside Some::Module:
     $repo->set( $some_value );
+
     # Inside Another::Module
     my $repo = Module::Generic::Global->new( 'system_setting' => 'system' );
     my $value = $repo->get; # $some_value retrieved
 
     {
         $repo->lock;
-        # Do something
-        # Lock is freed once it is out of scope
-    }
+        # do something safely
+    } # lock released at end of scope
+
+    # With limits
+    my $limited = Module::Generic::Global->new( 'bounded' => 'My::Module',
+        max_size        => 10,          # max keys in namespace
+        max_store_bytes => 1024,        # max bytes per stored item (serialised)
+        max_total_bytes => 4096         # max bytes total in namespace (serialised)
+    );
+    $limited->set( 'data' ); # Evicts if over
+
+    # With auto-cleanup (mod_perl)
+    my $auto = Module::Generic::Global->new( 'temp' => 'My::Module',
+        auto_cleanup => 1  # Auto-registers cleanup for self namespace
+    );
+    # Or with options
+    my $custom_auto = Module::Generic::Global->new(
+        'multi' => 'My::Module',
+        auto_cleanup =>
+        {
+            namespaces => ['temp', 'cache'],
+            keep       => ['persistent'],
+            callback   => sub
+            {
+                my( $repo, $r ) = @_;
+                $r->log->notice( "Cleanup for " . $repo->namespace );
+            },
+        }
+    );
+
+    # Manual cleanup register (mod_perl)
+    $repo->cleanup_register( r => $apache_r ); # clears default namespace unless overridden
+    $repo->cleanup_register(
+        r          => $apache_r,
+        namespaces => ['extra'],
+        keep       => ['save'],
+        callback   => sub { ... },
+    );
 
 =head1 VERSION
 
-    v0.1.0
+    v1.1.0
 
 =head1 DESCRIPTION
 
-This module provides contextual, thread/process-safe global storage for modules that want to isolate data per-class or per-object, or even across modules (with the C<system> context), using namespaces. Supports Perl ithreads or APR-based threading environments.
+This module provides contextual, thread/process-safe global storage, organised by namespace and a context key derived from a class name, object identity, or the special C<system> context. Supports Perl ithreads or APR-based threading environments.
 
-It can be used to store and access data in global repository whether Perl operates under a single process, under threads, including Apache Worker/Event MPM with mod_perl2
+It has no dependencies except for L<Scalar::Util> and L<Storable::Improved>
+
+It is designed to work in:
+
+=over 4
+
+=item * single-process non-threaded Perl
+
+=item * Perl ithreads (L<threads> / L<threads::shared>)
+
+=item * mod_perl under threaded MPMs (Worker/Event), including a fallback to L<APR::ThreadRWLock> when shared variables are not available
+
+=back
+
+Values are serialised before storage (default C<Storable::Improved>) and deserialised on retrieval.
 
 The repository used is locked in read or write mode before being accessed ensuring no collision and integrity.
 
 It is designed to store one value at a time in the specified namespace in the global repository.
+
+=head2 Notes on context and scope
+
+The repository is stored in memory. This means:
+
+=over 4
+
+=item * Under a multi-process server (such as Apache), the C<system> context is per-process.
+
+=item * Under threads, values may be shared within a process depending on the runtime environment and the locking backend.
+
+=back
+
+In other words: C<system> means "system within this process/runtime context", not "system across all server processes".
 
 =head1 CONSTRUCTOR
 
@@ -1099,6 +2153,41 @@ It is designed to store one value at a time in the specified namespace in the gl
     my $repo2 = Module::Generic::Global->new( 'cache' => $obj );
     my $repo2 = Module::Generic::Global->new( 'cache' => $obj, key => $unique_key );
     my $repo2 = Module::Generic::Global->new( 'cache' => $obj, { key => $unique_key } );
+
+    # Declaring a callback used by the get() method
+    my $repo = Module::Generic::Global->new( 'cache' => $obj,
+        key => $unique_key,
+        on_get => sub
+        {
+            my $cache = shift( @_ );
+            my $repo  = $_; # The object is accessible as $_
+        },
+        serialiser => 'Sereal',
+    );
+
+    # Or by providing some values in the callback
+    my $repo = Module::Generic::Global->new( 'cache' => $obj,
+        key => $unique_key,
+        on_get => [sub
+            {
+                my $cache = shift( @_ );
+                my $repo  = $_; # The object is accessible as $_
+            },
+            host => 'localhost', user => 'john', password => 'some secret', port => 12345
+        ]
+    );
+
+    # or by providing the arguments as an array reference
+    my $repo = Module::Generic::Global->new( 'cache' => $obj,
+        key => $unique_key,
+        on_get => [sub
+            {
+                my $cache = shift( @_ );
+                my $repo  = $_; # The object is accessible as $_
+            },
+            [ host => 'localhost', user => 'john', password => 'some secret', port => 12345 ]
+        ]
+    );
 
 =head2 new
 
@@ -1118,15 +2207,152 @@ A context key is composed of:
 
 However, if a context is C<system>, then the C<key> is also automatically set to C<system>.
 
-Possible options are:
+For object-level repositories, when running under Perl ithreads and C<threads> is loaded, the thread id is included in the default key.
+
+=head3 Possible options
 
 =over 4
 
+=item * C<auto_cleanup>
+
+Enable auto cleanup mode. This is disabled by default. When enabled, this will empty the global repository. When running under mod_perl, this will call cleanup_register using L<Apache2::RequestUtil/request>. If C<GlobalRequest> of mod_perl is not enabled, or an error occurs, it will be caught, so this is safe to use.
+
+Supported values are:
+
+=over 8
+
+=item * C<0> (default)
+
+=item * C<1> (enable with default behaviour)
+
+=item * a hash reference of options passed to L</cleanup_register>
+
+=back
+
+Example:
+
+    Module::Generic::Global->new( 'cache' => $module_class, 
+        auto_cleanup =>
+        {
+            namespaces => ['ns1','ns2'],
+            keep => ['persistent'],
+            callback => sub
+            {
+                my( $repo, $r ) = @_;
+                $r->log->notice( "Module::Generic::Global clean up ", $repo->namespace, " occurred." );
+            }
+        }
+    );
+
+C<auto_cleanup> does not accept a plain CODE reference as a mode; use the hashref form and pass C<callback> instead.
+
 =item * C<key>
 
-Specifies explicitly a key to use
+Specifies explicitly a key to use instead of the default computed key.
 
 Please note that this option would be discarded if the C<context> is set to C<system>
+
+=item * C<max_size>
+
+Maximum number of keys in a namespace (integer > 0). If exceeded on C<set>, older entries are evicted.
+
+Eviction order is based on the internal ordering list, which is updated on successful C<set>. Overwriting an existing key refreshes its recency.
+
+=item * C<max_store_bytes>
+
+Maximum allowed size (in bytes) for a single stored value (integer > 0). The size is based on the serialised representation (and for scalars, the raw scalar size is also checked).
+
+Default: 5MB (5242880).
+
+=item * C<max_total_bytes>
+
+Maximum allowed total size (in bytes) for all stored values in a namespace (integer > 0). If exceeded on C<set>, older entries are evicted until the new total fits, otherwise C<set> fails.
+
+Eviction order is based on the internal ordering list, which is updated on successful C<set>. Overwriting an existing key refreshes its recency.
+
+=item * C<on_get>
+
+Registers a callback that is automatically executed after a successful call to L</get>.
+
+This is useful to restore contextual dependencies after deserialisation (e.g. re-attaching a database connection object).
+
+The callback can be provided as:
+
+=over 8
+
+=item * a code reference
+
+    on_get => sub { ... }
+
+=item * an array reference of callback + arguments
+
+    on_get => [
+        sub { my( $value, @args ) = @_; ... },
+        [ 'arg1', 'arg2' ],
+    ];
+
+or:
+
+    on_get => [
+        sub { my( $value, @args ) = @_; ... },
+        'arg1',
+        'arg2',
+    ];
+
+=back
+
+When the callback is executed, C<$_> is locally set to the current repository object instance.
+
+This allows the callback to access the repository without altering the callback argument list.
+
+Example:
+
+    on_get => sub
+    {
+        my( $value ) = @_;
+        my $repo = $_;
+        return( $value );
+    };
+
+You may override the callback per-call by passing C<on_get> to L</get>.
+
+=item * C<refcount>
+
+When the C<refcount> option is provided (boolean C<0>/C<1>/empty string or C<undef>), the repository enables reference counting for automatic cleanup.
+
+C<Module::Generic::Global> will count increment on creation and decrement on destroy—entries remove when hitting C<0>. Implicitly enabled for class-level contexts (string controller, no key) to manage shared lifetime. For keyed or object-level, opt-in via C<< refcount => 1 >>.
+
+=item * C<serialiser> or C<serializer>
+
+Specify a serialiser to use instead of the default value set in the global variable C<$DEFAULT_SERIALISER>, which is, by default, set to C<Storable::Improved>
+
+The serialiser will be used to freeze and thaw the data.
+
+Supported serialiser are:
+
+=over 8
+
+=item * C<CBOR> or C<CBOR::XS>
+
+=item * C<CBOR::Free>
+
+=item * C<Sereal>
+
+=item * C<Storable> or C<Storable::Improved>
+
+=item * A CODE reference, called as C<< $serialiser->( $data, 'freeze' ) >> or C<< $serialiser->( $data, 'thaw' ) >>
+
+=back
+
+When a code reference is provided, the following arguments will be provided:
+
+=over 8
+
+=item 1. the data to serialise or to deserialiser
+
+=item 2. the key word C<freeze> or C<thaw> depending on the action.
+
+=back
 
 =back
 
@@ -1147,7 +2373,7 @@ This prepares a cleanup callback to empty the global variables when the Apache/m
 
 It takes an L<Apache2::RequestRec> as its sole argument.
 
-=head2 Pod::Coverage clear
+=for Pod::Coverage clear
 
 =head2 clear_error
 
@@ -1156,7 +2382,7 @@ It takes an L<Apache2::RequestRec> as its sole argument.
 
 This clear the error for the current object, and the latest recorded error stored as a global variable.
 
-=head2 Pod::Coverage debug
+=for Pod::Coverage debug
 
 =head2 error
 
@@ -1173,16 +2399,105 @@ Returns true (C<1>) if a value is currently stored under the context, o false (C
 
 =head2 get
 
-Retrieves the stored value, deserialising it using L<Storable::Improved> if it was serialised, and return it.
+Retrieves the stored value, deserialising it using the preferred serialiser if it was serialised, and return it.
 
 If an error occurs, it returns C<undef> in scalar context, or an empty list in list context.
+
+The callback registered via the C<on_get> option (constructor) is executed after deserialisation.
+You may also override the callback on a per-call basis by passing C<on_get> to C<get()>.
+
+=head3 Examples
+
+=head4 Basic usage
+
+    my $repo = Module::Generic::Global->new( table_cache => 'system' );
+    my $cache = $repo->get;
+
+=head4 Using an on_get callback declared once at construction time
+
+This is useful when your cached objects require contextual restoration after deserialisation.
+
+    my $repo = Module::Generic::Global->new(
+        table_cache => 'system',
+        on_get => sub
+        {
+            my( $value ) = @_;
+            my $repo = $_;
+
+            # Example of a post-thaw adjustment
+            # $value->some_init_method if( ref( $value ) );
+
+            return( $value );
+        }
+    );
+
+    my $cache = $repo->get;
+
+=head4 Passing extra arguments to the callback
+
+    my $repo = Module::Generic::Global->new(
+        table_cache => 'system',
+        on_get => [
+            sub
+            {
+                my( $value, $prefix ) = @_;
+                my $repo = $_;
+                # Do something with $value and $prefix
+                return( $value );
+            },
+            "tables-cache: ",
+        ],
+    );
+
+    my $cache = $repo->get;
+
+=head4 Overriding the callback explicitly at get() time
+
+This overrides the callback that was optionally provided at construction.
+
+    my $cache = $repo->get(
+        on_get => sub
+        {
+            my( $value ) = @_;
+            my $repo = $_;
+            return( $value );
+        }
+    );
+
+=head4 Re-attaching a database connection after deserialisation
+
+This pattern is typical when serialising objects that should not store runtime resources such as DBI handles.
+
+    my $repo = Module::Generic::Global->new(
+        table_cache => 'system',
+        on_get => sub
+        {
+            my( $tables ) = @_;
+            my $repo = $_;
+
+            return if( !ref( $tables ) );
+
+            # Example: rebind a connection object after thaw
+            # $tables->dbo( $dbo );
+
+            return( $tables );
+        }
+    );
+
+    my $tables = $repo->get;
+
+=head2 key
+
+Returns the computed or explicit key used by this instance.
+
+This is read-only.
 
 =head2 length
 
     my $repo = Module::Generic::Global->new( 'my_repo' => 'My::Module' );
     say $repo->length;
 
-Returns the number of elements in the namespace.
+Returns the number of keys currently present in the namespace (as seen in the repository).
 
 =head2 lock
 
@@ -1196,9 +2511,13 @@ Sets a lock to ensure the manipulation done is thread-safe. If the code runs in 
 
 When the lock gets out of scope, it is automatically removed.
 
+=head2 namespace
+
+Returns the current namespace used in this instance. This is read-only.
+
 =head2 remove
 
-Removes the stored value for the current context.
+Removes the stored value for the current namespace and key, updates ordering and size accounting, and removes per-key stats.
 
 This can also be called as C<clear>
 
@@ -1208,9 +2527,41 @@ This can also be called as C<clear>
 
 Stores a scalar or serialisable reference in the current namespace and context. This overwrite any previous value for the same context.
 
-The value provided is serialised using L<Storable::Improved> before it is stored in the global repository.
+The value provided is serialised using the preferred serialiser before it is stored in the global repository.
+
+On success, updates:
+
+=over 4
+
+=item * per-namespace total bytes accounting
+
+=item * per-key stored byte stats
+
+=item * ordering list (the key is moved to the end on every successful set, including overwrites)
+
+=back
+
+If limits are configured (C<max_store_bytes>, C<max_total_bytes>, C<max_size>), older entries may be evicted on set.
 
 Returns true upon success, and upon error, return C<undef> in scalar context, or an empty list in list context.
+
+=head2 stat
+
+Returns an array reference of hash references describing the largest entries in C<$STATS> (sorted by stored bytes), limited by the provided limit (default 20).
+
+It contains the following properties:
+
+=over 4
+
+=item * C<bytes>
+
+The size in bytes for the current value.
+
+=item * C<key>
+
+The repository key.
+
+=back
 
 =head2 unlock
 
@@ -1224,7 +2575,9 @@ It is usually not necessary to call this explicitly, because when the lock set p
 
 =head1 CONSTANTS
 
-The constants that can be imported into your namespace are:
+The constants can be imported into your namespace with:
+
+    use Module::Generic::Global ':const';
 
 =head2 CAN_THREADS
 
@@ -1377,6 +2730,10 @@ The module’s thread-safety relies on:
 
 =item * B<Key Isolation>: Thread-specific keys (C<< <refaddr>;<pid>;<tid> >>) isolate object-level data when created in different threads.
 
+=item * B<Reference Counting>
+
+When C<refcount> is enabled upon instantiation, repositories use internal counts to auto-remove entries on last reference destroy, preventing leaks in shared contexts. Counts are per-namespace/key, thread-safe via locking.
+
 =back
 
 In environments where C<%INC> manipulation (e.g., by L<forks>) emulates L<threads>, C<HAS_THREADS> and C<IN_THREAD> may return true. This is generally safe, as L<forks> provides a compatible C<tid> method, but users in untrusted environments should verify C<$INC{'threads.pm'}> points to the actual L<threads> module.
@@ -1413,4 +2770,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

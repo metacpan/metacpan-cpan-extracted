@@ -47,6 +47,7 @@ Makefile.PL
 MANIFEST
 private/MakeUtil.pm
 README
+SECURITY.md
 t/000prereq.t
 t/001bzip2.t
 t/001zlib-generic-deflate.t

@@ -40,6 +40,7 @@ my @choices = $backend->get_choice ;
 
 ok( (scalar grep { $_ eq 'IniFile'} @choices), "IniFile plugin backend was found") ;
 
+# test help from backends provided by Config::Model
 SKIP: {
     skip "this help is available after Config::Model is built", 1 unless
         $Config::Model::VERSION < 3;
@@ -51,6 +52,7 @@ SKIP: {
          "Found IniFile doc in pod") ;
 }
 
+# test help for backend provided by Master class above
 my $help = $backend->get_help('cds_file') ;
 is($help,"file ...", "cds_file help was kept") ;
 

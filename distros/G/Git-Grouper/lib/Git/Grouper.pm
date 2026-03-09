@@ -14,7 +14,7 @@ use Perinci::Object qw(envresmulti);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2025-11-11'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(git_grouper_group);
 
@@ -530,7 +530,7 @@ sub _fill_template {
 }
 
 sub _configure_repo_single {
-    my ($row, $config) = @_;
+    my ($row, $config, $args) = @_;
 
     local $CWD = $row->{repo0};
 
@@ -556,6 +556,7 @@ sub _configure_repo_single {
       SET_REMOTES: {
             last unless $group->{remotes};
 
+            my %configured_remotes;
             my @existing_remotes;
             {
                 system({capture_stdout=>\my $out}, "git", "remote");
@@ -582,7 +583,7 @@ sub _configure_repo_single {
                 }
 
                 my @remotenames_to_set = ($remotename);
-                unshift @remotenames_to_set, "origin" if $i == 0;
+                unshift @remotenames_to_set, "origin" if $i == 0; # origin is always set to the first (main) remote
 
                 for my $remotename_to_set (@remotenames_to_set) {
                     if (grep {$_ eq $remotename_to_set} @existing_remotes) {
@@ -594,9 +595,19 @@ sub _configure_repo_single {
                         system "git", "remote", "add", $remotename_to_set, $url;
                         log_error("Can't add remote %s: %s", $remotename_to_set, explain_child_error()) if $?;
                     }
+                    $configured_remotes{$remotename_to_set}++;
                 } # for $remotename_to_set
+            } # for $remotename
+
+            if ($args->{clean_remotes}) {
+                for my $remotename (@existing_remotes) {
+                    next if $configured_remotes{$remotename};
+                    log_info "  Deleting remote $remotename because it's not in groups configuration";
+                    system "git", "remote", "remove", $remotename;
+                    log_error("Can't remove remote %s: %s", $remotename, explain_child_error()) if $?;
+                }
             }
-        }
+        } # SET_REMOTES
 
     } # for $groupname
     [200];
@@ -608,6 +619,10 @@ $SPEC{configure_repo} = {
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        clean_remotes => {
+            summary => 'Delete all remotes not specified by the group configuration',
+            schema => 'bool*',
+        },
     },
 };
 sub configure_repo {
@@ -618,12 +633,12 @@ sub configure_repo {
     my $envres = envresmulti();
   REPO:
     for my $row (@$rows) {
-        log_debug "Processing repo %s (group=%s) ...", $row->{repo0}, $row->{groups};
+        log_info "Configuring repo %s (group=%s) ...", $row->{repo0}, $row->{groups};
         if ($row->{groups} eq '') {
             log_debug "  Skipping repo because it does not belong to any group";
             next REPO;
         }
-        my $res = _configure_repo_single($row, $config);
+        my $res = _configure_repo_single($row, $config, \%args);
         $envres->add_result($res->[0], $res->[1], {item_id=>$row->{repo}});
     }
     $envres->as_struct;
@@ -644,7 +659,7 @@ Git::Grouper - Categorize git repositories into one/more groups and perform acti
 
 =head1 VERSION
 
-This document describes version 0.001 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-11.
+This document describes version 0.002 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-11.
 
 =head1 SYNOPSIS
 
@@ -668,6 +683,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<clean_remotes> => I<bool>
+
+Delete all remotes not specified by the group configuration.
 
 =item * B<config> => I<hash>
 

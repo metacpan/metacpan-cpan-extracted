@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 
-package Config::Model::Describe 2.158;
+package Config::Model::Describe 2.159;
 
 use Carp;
 use strict;
@@ -143,7 +143,6 @@ sub describe {
     };
 
     my @scan_args = (
-        fallback => 'all',
         auto_vivify           => 0,
         list_element_cb       => $list_element_cb,
         check_list_element_cb => $check_list_element_cb,
@@ -218,7 +217,7 @@ Config::Model::Describe - Provide a description of a node element
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

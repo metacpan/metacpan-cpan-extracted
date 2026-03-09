@@ -17,8 +17,10 @@ return [
             [qw/my_hash my_hash2 my_hash3/] => {
                 type       => 'hash',
                 index_type => 'string',
-                cargo_type => 'leaf',
-                cargo_args => { value_type => 'string' },
+                cargo => {
+                    type => 'leaf',
+                    value_type => 'string'
+                },
             },
 
             choice_list => {
@@ -73,8 +75,12 @@ return [
 
             refer_to_check_list_and_choice => {
                 type => 'check_list',
-                refer_to =>
-                  [ '- refer_to_2_list + - $var', var => '- indirection ', ],
+                computed_refer_to => {
+                    formula => '- refer_to_2_list + - $var',
+                    variables => {
+                        var => '- indirection ',
+                    }
+                },
                 choice => [qw/A1 A2 A3/],
             },
 

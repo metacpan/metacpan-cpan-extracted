@@ -1,6 +1,6 @@
 package IO::K8s::Types::Net;
 # ABSTRACT: Type::Tiny constraints for IP addresses and CIDR notation
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use v5.10;
 use Type::Library -base, -declare => qw( IPv4 IPv6 IPAddress CIDR NetIP );
 use Type::Utils -all;
@@ -63,7 +63,7 @@ IO::K8s::Types::Net - Type::Tiny constraints for IP addresses and CIDR notation
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SUPPORT
 

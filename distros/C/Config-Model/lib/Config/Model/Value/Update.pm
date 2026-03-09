@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value::Update 2.158;
+package Config::Model::Value::Update 2.159;
 
 use v5.20;
 use Mouse;
@@ -110,7 +110,7 @@ Config::Model::Value::Update - Retrieve data from several external files
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ Return all files and subpaths used to extract data.
 =head2 get_update_value
 
 Try to get data from the external files. The files are tried in the same order as the
-C<files> parameter. Data is returned at the first succesful try.
+C<files> parameter. Data is returned at the first successful try.
 If no data can be found, either if all files are missing or all
 subpath do not yield data, this function either returns, warns or
 die, depending on the value of C<when_missing> parameter.

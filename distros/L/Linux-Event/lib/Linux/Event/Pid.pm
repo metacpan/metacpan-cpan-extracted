@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -166,115 +166,62 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Pid - pidfd-backed process exit notifications for Linux::Event
+Linux::Event::Pid - pidfd-backed process-exit subscriptions for Linux::Event::Reactor
 
 =head1 SYNOPSIS
 
+<<<<<<< HEAD
+=======
   use v5.36;
   use Linux::Event;
 
-  my $loop = Linux::Event->new;
+  my $loop = Linux::Event->new( model => 'reactor' );
 
   my $pid = fork() // die "fork: $!";
   if ($pid == 0) { exit 42 }
 
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
   my $sub = $loop->pid($pid, sub ($loop, $pid, $status, $data) {
-    $loop->stop;
-
-    if (defined $status) {
-      my $code = $status >> 8;
-      say "child $pid exited with $code";
-    }
+    ...
   });
-
-  $loop->run;
 
 =head1 DESCRIPTION
 
-This module integrates Linux pid file descriptors (pidfd) into L<Linux::Event>.
-It opens a pidfd using L<Linux::FD::Pid> and watches it via epoll. When the
-pidfd becomes readable, the callback is invoked.
+C<Linux::Event::Pid> adapts Linux pidfds into the reactor loop. It opens a
+pidfd using L<Linux::FD::Pid>, watches it like any other readable filehandle,
+and invokes the callback when the target process exits.
 
-This is a Linux-native alternative to C<SIGCHLD> wakeups. Exit status is only
-available when the watched PID is a child of the current process.
+Most users access it through C<< $loop->pid(...) >>.
 
-=head1 CALLBACK SIGNATURE
+=head1 CALLBACK ABI
 
-  sub ($loop, $pid, $status, $data) { ... }
+Pid callbacks receive four arguments:
 
-Exactly four arguments are passed. C<$status> is a raw wait status compatible
-with the usual POSIX wait macros (e.g. C<WIFEXITED>, C<WEXITSTATUS>). If exit
-status is unavailable, C<$status> is C<undef>.
+  $cb->($loop, $pid, $status, $data)
 
+When C<reap =E<gt> 1> is in effect and the target is a child process,
+C<$status> is the wait status value. Otherwise it may be C<undef>.
 
+=head1 OPTIONS
 
-=head1 SEMANTICS
-
-=over 4
-
-=item * One subscription per PID (replacement semantics).
-
-Registering C<pid()> again for the same PID replaces the previous handler.
-
-=item * One-shot delivery.
-
-When the process exit is observed and a defined wait status is obtained (when
-C<reap =E<gt> 1>), the callback is invoked once and the subscription is
-automatically canceled.
-
-=item * Reaping.
-
-By default C<reap =E<gt> 1> and Linux::Event attempts a non-blocking wait via
-C<< Linux::FD::Pid->wait(WEXITED|WNOHANG) >>. Exit status is only available for
-child processes; if reaping fails (for example, because the PID is not a child),
-an exception is thrown. Use C<reap =E<gt> 0> to receive an exit notification
-without attempting to reap or obtain a status.
-
-=item * Subscription cancellation is idempotent.
-
-=back
-
-=head1 METHODS
-
-=head2 pid
-
-  my $sub = $loop->pid($pid, $cb, %opts);
-
-Registers a handler for the given C<$pid>. One handler per PID is allowed;
-registering again replaces the previous handler.
-
-Options:
+Recognized subscription options:
 
 =over 4
 
-=item * data => $any
+=item * C<data>
 
-Optional user data passed to the callback.
-
-=item * reap => 1|0
-
-Defaults to 1. If true, Linux::Event attempts to reap the child using a
-non-blocking wait and passes the wait status. If false, no wait is attempted
-and C<$status> will be undef.
+=item * C<reap>
 
 =back
 
-The returned subscription supports C<< $sub->cancel >> which is idempotent.
+=head1 SUBSCRIPTIONS
 
-=head1 DEPENDENCIES
+The returned subscription object supports C<cancel>.
 
-Requires L<Linux::FD::Pid> and a kernel that supports C<pidfd_open(2)>.
+=head1 SEE ALSO
 
-=head1 AUTHOR
-
-Joshua S. Day
-
-=head1 LICENSE
-
-Same terms as Perl itself.
-
-=head1 VERSION
-
-This document describes Linux::Event::Pid version 0.006.
+L<Linux::Event::Reactor>,
+L<Linux::Event::Loop>,
+L<Linux::FD::Pid>
 
 =cut

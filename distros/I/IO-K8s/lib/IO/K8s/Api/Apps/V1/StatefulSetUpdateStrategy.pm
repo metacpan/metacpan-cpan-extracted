@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::StatefulSetUpdateStrategy;
 # ABSTRACT: StatefulSetUpdateStrategy indicates the strategy that the StatefulSet controller will use to perform updates.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s rollingUpdate => 'Apps::V1::RollingUpdateStatefulSetStrategy';
@@ -23,7 +23,7 @@ IO::K8s::Api::Apps::V1::StatefulSetUpdateStrategy - StatefulSetUpdateStrategy in
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 rollingUpdate
 

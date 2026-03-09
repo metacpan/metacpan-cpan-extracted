@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.158;
+package Config::Model::AnyId 2.159;
 
 use 5.020;
 
@@ -1075,7 +1075,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

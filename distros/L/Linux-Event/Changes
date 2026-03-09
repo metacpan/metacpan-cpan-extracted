@@ -1,4 +1,40 @@
+{{$NEXT}}
+
+<<<<<<< HEAD
+  * Bump version to 0.010 for the post-restructure release candidate.
+
+  * Rewrite and expand POD across the selector, reactor, proactor, backend contract, and support modules so the dual-engine architecture is explained consistently.
+
+  * Refresh the examples directory to reflect the current reactor/proactor structure and retire stale pre-restructure examples.
+
+  * Update README and CI example checking so user-facing documentation stays aligned with the code.
+=======
+  * Require explicit model selection in Linux::Event::Loop and Linux::Event->new.
+    Constructor calls must now pass model => 'reactor' or model => 'proactor'.
+
+  * Refresh tests, examples, README, and POD to reflect explicit model
+    selection and the post-restructure architecture.
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
+
+  * Restructure the core loop into a forward-looking selector/engine layout.
+    Linux::Event::Loop is now the front-door selector, with the readiness
+    engine in Linux::Event::Reactor and the epoll backend in
+    Linux::Event::Reactor::Backend::Epoll.
+
+  * Add Linux::Event::Reactor::Backend and Linux::Event::Proactor::Backend
+    contract modules with backend contract POD for both engine families.
+
+  * Update the test suite and examples to use the new reactor backend
+    namespace and add a selector test covering reactor and proactor model
+    construction.
+
 Revision history for Linux-Event
+
+0.010  2026-03-09
+  - Require explicit model selection in Linux::Event::Loop and Linux::Event->new.
+  - Refresh tests, examples, README, and POD for the reactor/proactor selector architecture.
+  - Add release preparation helper script and GitHub release notes for 0.010.
+
 
 0.009  2026-002-28
   - fixed error where perl's scientific notation stringifies

@@ -1,5 +1,5 @@
 package Kubernetes::REST::Role::IO;
-our $VERSION = '1.100';
+our $VERSION = '1.102';
 # ABSTRACT: Interface role for HTTP backends
 use Moo::Role;
 
@@ -8,6 +8,12 @@ requires 'call';
 
 
 requires 'call_streaming';
+
+
+sub supports_duplex {
+    my ($self) = @_;
+    return $self->can('call_duplex') ? 1 : 0;
+}
 
 
 1;
@@ -24,7 +30,7 @@ Kubernetes::REST::Role::IO - Interface role for HTTP backends
 
 =head1 VERSION
 
-version 1.100
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -41,6 +47,12 @@ version 1.100
     sub call_streaming {
         my ($self, $req, $data_callback) = @_;
         # Execute HTTP request with streaming callback
+        ...
+    }
+
+    # Optional: full-duplex transport (WebSocket/SPDY)
+    sub call_duplex {
+        my ($self, $req, %callbacks) = @_;
         ...
     }
 
@@ -65,6 +77,17 @@ Must return a L<Kubernetes::REST::HTTPResponse> with C<status> and C<content>.
 Required. Execute an HTTP request with streaming response. The C<$data_callback> is called with each chunk of data as it arrives: C<< $data_callback->($chunk) >>.
 
 Must return a L<Kubernetes::REST::HTTPResponse> when the stream ends.
+
+=head2 supports_duplex
+
+    if ($io->supports_duplex) {
+        ...
+    }
+
+Optional capability probe for full-duplex protocols used by Kubernetes
+subresources such as pod port-forward and exec/attach streams.
+
+Returns true if the backend implements C<call_duplex>, false otherwise.
 
 =head1 SEE ALSO
 
@@ -107,13 +130,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez Torres <jlmartin@cpan.org> (JLMARTIN, original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Jose Luis Martinez.
+This software is Copyright (c) 2019-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

@@ -1,5 +1,5 @@
 package Business::NAB::AccountInformation::Account;
-$Business::NAB::AccountInformation::Account::VERSION = '0.02';
+$Business::NAB::AccountInformation::Account::VERSION = '0.03';
 =head1 NAME
 
 Business::NAB::AccountInformation::Account
@@ -154,6 +154,14 @@ sub new_from_record ( $class, @record ) {
 
     while ( my @tc_pair = splice( @transaction_code_values, 0, 2 ) ) {
         my ( $transaction_code, $amount_or_count ) = @tc_pair;
+
+        # amounts can use an optional trailing sign, to indicate
+        # a credit/debit so we need to take that into account
+        $amount_or_count =~ s/(\D)//g;
+
+        if ( $1 && $1 =~ /-/ ) {
+            $amount_or_count *= -1;
+        }
 
         $transaction_code_values->{ $transaction_code }
             = $amount_or_count;

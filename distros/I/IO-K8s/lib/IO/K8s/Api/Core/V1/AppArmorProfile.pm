@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::AppArmorProfile;
 # ABSTRACT: AppArmorProfile defines a pod or container's AppArmor settings.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s localhostProfile => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::AppArmorProfile - AppArmorProfile defines a pod or conta
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 localhostProfile
 

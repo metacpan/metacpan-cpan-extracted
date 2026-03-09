@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::AzureDiskVolumeSource;
 # ABSTRACT: AzureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s cachingMode => Str;
@@ -35,7 +35,7 @@ IO::K8s::Api::Core::V1::AzureDiskVolumeSource - AzureDisk represents an Azure Da
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 cachingMode
 

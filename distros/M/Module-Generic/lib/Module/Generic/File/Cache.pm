@@ -54,7 +54,7 @@ sub init
     $self->{size}       = 0;
     $self->{tmpdir}     = sys_tmpdir();
     $self->{_init_strict_use_sub} = 1;
-    # Storable keps breaking :(
+    # Storable keeps breaking :(
     # I leave the feature of using it as a choice to the user, but defaults to JSON.
     # Other possibilities could be cbor, sereal and storable
     $self->{_packing_method} = 'json';
@@ -386,6 +386,7 @@ sub read
         $data = $buffer;
     }
 
+    $self->__message( 5, "read(): unpacked data of type ", ( ref($data) || 'SCALAR' ), " with value: ", overload::StrVal( $data ) );
 
     # data decoded is not a reference and size was provided and is greater than 0
     if( !ref( $data ) && scalar( @_ ) > 2 && int( $_[2] ) > 0 )
@@ -818,7 +819,9 @@ sub DESTROY
     print( STDERR "\t${prefix}: Destroying object with cache file \"${fname}\"\n" ) if( $DEBUG >= 4 );
     $self->unlock;
 
-    my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    my $class         = CORE::ref( $self );
+    my $repo          = Module::Generic::Global->new( 'cache' => $class, key => $class );
+    my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => $class, key => $class );
     $file2obj_repo->lock;
     my $f2o_data = $file2obj_repo->get;
     if( defined( $f2o_data ) && ref( $f2o_data // '' ) eq 'HASH' )
@@ -849,6 +852,9 @@ sub DESTROY
         $file2obj_repo->set( $f2o_data );
         $file2obj_repo->unlock;
     }
+    # For non-object context, we need to call cleanup to ensure there is no leftover
+    $repo->cleanup;
+    $file2obj_repo->cleanup;
 
     # Are we expected to clean up and remove the cache file?
     if( $self->destroy )
@@ -863,12 +869,32 @@ sub FREEZE
     my $self = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
-    my %hash  = %$self;
+    my @props = qw(
+        binmode base64 create destroy exclusive id key locked mode owner removed serial size
+        _packing_method _cache_dir _cache_file
+    );
+    my $hash  = {};
+    foreach my $prop ( @props )
+    {
+        if( exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
@@ -883,8 +909,8 @@ sub THAW
     my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
     my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
     my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
-    my $new;
     # Storable pattern requires to modify the object it created rather than returning a new one
+    my $new;
     if( CORE::ref( $self ) )
     {
         foreach( CORE::keys( %$hash ) )
@@ -904,10 +930,28 @@ sub THAW
 END
 {
     my $repo = Module::Generic::Global->new( 'cache' => __PACKAGE__, key => __PACKAGE__ );
-    my $repo_data = $repo->get;
-    return unless( defined( $repo_data ) && ref( $repo_data ) eq 'ARRAY' );
+    my $repo_data;
+    if( $repo )
+    {
+        $repo_data = $repo->get;
+        return unless( defined( $repo_data ) && ref( $repo_data ) eq 'ARRAY' );
+    }
+    else
+    {
+        warn( "Error instantiating a new Module::Generic::Global object for 'cache': ", Module::Generic::Global->error );
+        return;
+    }
     my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => __PACKAGE__, key => __PACKAGE__ );
-    my $f2o_data = $file2obj_repo->get;
+    my $f2o_data;
+    if( $file2obj_repo )
+    {
+        $f2o_data = $file2obj_repo->get;
+    }
+    else
+    {
+        warn( "Error instantiating a new Module::Generic::Global object for 'file2object_repo': ", Module::Generic::Global->error );
+        return;
+    }
 
     my $prefix = __PACKAGE__ . '::END';
     printf( STDERR "${prefix}: %d objects in repo to check.\n", scalar( @$repo_data ) ) if( $DEBUG >= 4 );

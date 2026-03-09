@@ -5,7 +5,7 @@ use warnings;
 use Encode qw(decode_utf8);
 use Test2::API qw(context);
 
-our $VERSION = "0.06";
+our $VERSION = "0.07";
 
 our $SEPARATOR = ' ';
 
@@ -226,24 +226,24 @@ sub _create_filtered_subtest {
         my $hub = $ctx->hub;
 
         $hub->set_meta(subtest_name => $name);
-        my @stacked_subtest_names = map { $_->get_meta('subtest_name') } $ctx->stack->all;
+
+        # Collect subtest names from the hub stack, skipping hubs without
+        # metadata (e.g., created by run_subtest / subtest_streamed which
+        # bypass the overridden subtest).
+        my @stacked_subtest_names = grep { defined } map { $_->get_meta('subtest_name') } $ctx->stack->all;
+        my $has_unknown_hub = @stacked_subtest_names != $ctx->stack->all;
+
         my $current_subtest_fullname = join $SEPARATOR, @stacked_subtest_names;
 
-        # If a parent subtest matches, run all children
-        if ($current_subtest_fullname =~ $filter) {
-            my $pass = $original_subtest->($name, $params, $code, @args);
-            $ctx->release;
-            return $pass;
-        }
+        # Run if: direct/parent match, or descendant match, or fail-safe.
+        # When unknown hubs exist, descendant matching via index() is unreliable
+        # (runtime path doesn't align with file-parsed structure), so we fall
+        # back to running the subtest to avoid accidentally skipping tests.
+        my $should_run = $current_subtest_fullname =~ $filter
+            || $has_unknown_hub
+            || grep { index($_, $current_subtest_fullname . $SEPARATOR) == 0 && $_ =~ $filter } @$target_all_subtests;
 
-        # Check if any descendant subtest matches
-        my @matching_descendants = grep {
-            # Check if this subtest is a descendant of current subtest
-            index($_, $current_subtest_fullname . $SEPARATOR) == 0
-                && $_ =~ $filter
-        } @$target_all_subtests;
-
-        if (@matching_descendants) {
+        if ($should_run) {
             my $pass = $original_subtest->($name, $params, $code, @args);
             $ctx->release;
             return $pass;

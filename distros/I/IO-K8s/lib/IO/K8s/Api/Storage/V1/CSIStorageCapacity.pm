@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::CSIStorageCapacity;
 # ABSTRACT: CSIStorageCapacity stores the result of one CSI GetCapacity call. For a given StorageClass, this describes the available capacity in a particular topology segment. This can be used when considering where to instantiate new PersistentVolumes.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -30,7 +30,7 @@ IO::K8s::Api::Storage::V1::CSIStorageCapacity - CSIStorageCapacity stores the re
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.5.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.5.3
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/08/30
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -43,7 +43,7 @@ BEGIN
     );
     # Do we allow the use of object as hash keys?
     our $KEY_OBJECT = 0;
-    our( $VERSION ) = 'v1.5.1';
+    our( $VERSION ) = 'v1.5.3';
 };
 
 use strict;
@@ -426,12 +426,12 @@ sub merge
 
 {
     no warnings 'once';
-    *message = \&_message;
+    *message = \&__message;
     *message_check = \&_message_check;
     *message_frame = \&_message_frame;
     *message_log = \&_message_log;
     *message_log_io = \&_message_log_io;
-    *messagef = \&_messagef;
+    *messagef = \&__messagef;
 }
 
 sub noexec
@@ -551,13 +551,13 @@ sub _internal
     }
 }
 
-sub _message
+sub __message
 {
     my $self = shift( @_ );
     my $obj = $self->_tie_object;
     my $flag = $obj->enable;
     $obj->enable(0) if( $flag );
-    my $rv = $self->SUPER::_message( @_, { skip_frames => 1 } );
+    my $rv = $self->SUPER::__message( @_, { skip_frames => 1 } );
     $obj->enable(1) if( $flag );
     return( $rv );
 }
@@ -606,13 +606,13 @@ sub _message_log_io
     return( $rv );
 }
 
-sub _messagef
+sub __messagef
 {
     my $self = shift( @_ );
     my $obj = $self->_tie_object;
     my $flag = $obj->enable;
     $obj->enable(0) if( $flag );
-    my $rv = $self->SUPER::_messagef( @_ );
+    my $rv = $self->SUPER::__messagef( @_ );
     $obj->enable(1) if( $flag );
     return( $rv );
 }
@@ -738,7 +738,16 @@ sub FREEZE
     $obj->enable(0) if( !$flag );
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%data] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, \%data] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%data );
 }

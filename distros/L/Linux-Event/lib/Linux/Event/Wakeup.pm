@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -108,98 +108,49 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Wakeup - eventfd-backed wakeups for Linux::Event
+Linux::Event::Wakeup - eventfd-backed wakeup primitive for Linux::Event::Reactor
 
 =head1 SYNOPSIS
 
-  use v5.36;
-  use Linux::Event;
-
-  my $loop  = Linux::Event->new;
-
-  # Create once during initialization:
   my $waker = $loop->waker;
 
-  # From another thread (or a forked child), wake the loop:
+<<<<<<< HEAD
+  # from another thread or cooperating producer
   $waker->signal;
+=======
+  my $loop = Linux::Event->new( model => 'reactor' );
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
+
+  # in the loop
+  my $count = $waker->drain;
 
 =head1 DESCRIPTION
 
-This module provides a minimal, Linux-native wakeup primitive for
-L<Linux::Event> based on C<eventfd(2)>. It is intended to be used as a
-building block for thread and process integration without adding policy to
-the core loop.
+C<Linux::Event::Wakeup> provides an eventfd-backed wakeup mechanism for the
+reactor. The usual pattern is to enqueue work elsewhere, then signal the waker
+so the loop can wake promptly and drain that work source.
 
-The wakeup is implemented internally using C<eventfd(2)> and exposed to the
-loop as a readable filehandle.
-
-When created via C<< $loop->waker >>, the loop installs an internal watcher
-that drains the wakeup fd automatically. This guarantees that
-C<< $waker->signal >> (and C<< $loop->stop >> after waker creation) can
-reliably wake a blocking backend wait.
-
-The wakeup fd is reserved for loop wakeups and must not be watched directly
-by user code.
-
-=head1 SEMANTICS
-
-The semantics contract for the single-waker model is:
-
-=over 4
-
-=item * Exactly one waker per loop (cached by C<< $loop->waker >>).
-
-=item * Created lazily on first use; never destroyed during loop lifetime.
-
-=item * The loop installs an internal read watcher that drains the wakeup fd.
-
-=item * User code must not call C<< $loop->watch($waker->fh, ...) >>,
-        as this would replace the loop's internal watcher and break wakeup semantics.
-
-=item * C<signal()> is safe from any thread.
-
-=item * C<drain()> is non-blocking and returns the coalesced count.
-
-=back
+Most users obtain the waker through C<< $loop->waker >>. The reactor installs an
+internal read watcher for the eventfd so stop and explicit wakeups can break a
+blocking backend wait.
 
 =head1 METHODS
 
 =head2 fh
 
-  my $fh = $waker->fh;
-
-Returns the readable filehandle for this eventfd.
+Return the eventfd-backed filehandle.
 
 =head2 signal
 
-  $waker->signal;      # increment by 1
-  $waker->signal($n);  # increment by $n
-
-Increments the eventfd counter. Multiple signals coalesce in the kernel.
+Increment the wakeup counter.
 
 =head2 drain
 
-  my $count = $waker->drain;
+Drain pending wakeups and return the number observed.
 
-Drains the eventfd counter (non-blocking) and returns the total number of
-signals coalesced since the last drain.
+=head1 SEE ALSO
 
-=head1 DEPENDENCIES
-
-Wakeup support requires L<Linux::FD::Event> (part of the C<Linux::FD> distribution).
-The dependency is loaded lazily so you can still use the core loop features
-(timers and I/O watchers) without it.
-
-=head1 AUTHOR
-
-Joshua S. Day
-
-=head1 LICENSE
-
-Same terms as Perl itself.
-
-=head1 VERSION
-
-This document describes Linux::Event::Wakeup version 0.007.
+L<Linux::Event::Reactor>,
+L<Linux::Event::Loop>
 
 =cut

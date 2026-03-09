@@ -1,6 +1,6 @@
 package IO::K8s::Api::Discovery::V1::ForZone;
 # ABSTRACT: ForZone provides information about which zones should consume this endpoint.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Discovery::V1::ForZone - ForZone provides information about which 
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 name
 

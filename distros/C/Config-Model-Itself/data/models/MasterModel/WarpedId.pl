@@ -46,36 +46,40 @@ return [
                         B => { max_nb => 2 }
                     }
                 },
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::WarpedIdSlave'
+                cargo => {
+                    type        => 'node',
+                    config_class_name => 'MasterModel::WarpedIdSlave'
+                }
             },
             'multi_warp' => {
                 type       => 'hash',
                 index_type => 'integer',
                 min_index  => 0,
                 max_index  => 3,
-                default    => [ 0 .. 3 ],
+                default_keys => [ 0 .. 3 ],
                 warp       => {
                     follow  => [ '- version', '- macro' ],
                     'rules' => [
-                        [ '2', 'C' ] => { max => 7, default => [ 0 .. 7 ] },
-                        [ '2', 'A' ] => { max => 7, default => [ 0 .. 7 ] }
+                        [ '2', 'C' ] => { max => 7, default_keys => [ 0 .. 7 ] },
+                        [ '2', 'A' ] => { max => 7, default_keys => [ 0 .. 7 ] }
                     ]
                 },
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::WarpedIdSlave'
+                cargo => {
+                    type        => 'node',
+                    config_class_name => 'MasterModel::WarpedIdSlave'
+                }
             },
 
             'hash_with_warped_value' => {
                 type       => 'hash',
                 index_type => 'string',
-                cargo_type => 'leaf',
                 level      => 'hidden',
                 warp => {
                     follow  => '- macro',
                     'rules' => { 'A' => { level => 'normal', }, }
                 },
-                cargo_args => {
+                cargo => {
+                    type => 'leaf',
                     value_type => 'string',
                     warp       => {
                         follow  => '- macro',
@@ -88,7 +92,7 @@ return [
                 index_type  => 'integer',
                 min_index   => 0,
                 max_index   => 3,
-                auto_create => [ 0 .. 3 ],
+                auto_create_keys => [ 0 .. 3 ],
                 'warp'      => {
                     follow  => [ '- version', '- macro' ],
                     'rules' => [
@@ -98,8 +102,10 @@ return [
                           { max => 7, auto_create_keys => [ 0 .. 7 ] }
                     ],
                 },
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::WarpedIdSlave'
+                cargo => {
+                    type        => 'node',
+                    config_class_name => 'MasterModel::WarpedIdSlave'
+                }
             }
         ]
     ]

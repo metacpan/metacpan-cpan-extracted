@@ -17,15 +17,15 @@ name: Future-IO-Impl-KQueue
 provides:
   Future::IO::Impl::KQueue:
     file: lib/Future/IO/Impl/KQueue.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Future: '0'
   Future::IO: '0.20'
-  Future::IO::ImplBase: '0'
+  Future::IO::ImplBase: '0.22'
   IO::KQueue: '0.39'
   Struct::Dumb: '0'
   perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ServiceSpec;
 # ABSTRACT: ServiceSpec describes the attributes that a user creates on a service.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s allocateLoadBalancerNodePorts => Bool;
@@ -77,7 +77,7 @@ IO::K8s::Api::Core::V1::ServiceSpec - ServiceSpec describes the attributes that 
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 allocateLoadBalancerNodePorts
 

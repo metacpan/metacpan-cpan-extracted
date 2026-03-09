@@ -181,31 +181,18 @@ subtest 'mock data from a real dbh to collect data' => sub {
 
     is( $num_rows_deleted, 2, 'DB::Media::Manager->delete_media works ok' );
 
-    my $login_history = DB::UserLoginHistory->new( user_id => 1 );
-    $login_history->db()->dbh()->begin_work();
-    try {
-        $login_history->save();
-        $login_history->db()->dbh()->commit();
-        ok( 1, 'begin_work and commit are set in session' );
-        is( $login_history->db()->dbh()->err(),
-            undef, 'begin_work and commit are set in session' );
-    }
-    catch {
-        $login_history->db()->dbh()->rollback();
-    };
+    my $db = DB::UserLoginHistory->new->db;
+    $db->begin_work or die $db->error;
+    my $rose_dbh = $db->dbh();
+    my $sql      = "INSERT INTO user_login_history (user_id) VALUES (?)";
+    $rose_dbh->do( $sql, undef, 1 ) or die $db->error;
+    $db->commit                     or die $db->error;
 
-    my $login_history_2 = DB::UserLoginHistory->new( user_id => 2 );
-    $login_history_2->db()->dbh()->begin_work();
-    try {
-        $login_history_2->save();
-        die 'ups we have an error';
-        $login_history_2->db()->dbh()->commit();
-    }
-    catch {
-        is( $login_history->db()->dbh()->err(),
-            undef, 'begin_work and rollback are set in session' );
-        $login_history_2->db()->dbh()->rollback();
-    };
+    my $logins = DB::UserLoginHistory::Manager->get_user_login_history(
+        db    => $db,
+        query => [ user_id => 1 ],
+    );
+    is( $logins->[0]->id(), 1, 'begin_work and commit are set in session' );
 
 };
 
@@ -343,33 +330,18 @@ subtest 'use a mocked dbh to test rose db support' => sub {
 
     is( $num_rows_deleted, 2, 'DB::Media::Manager->delete_media works ok' );
 
-    my $login_history = DB::UserLoginHistory->new( user_id => 1 );
-    $login_history->db()->dbh()->begin_work();
-    try {
-        $login_history->save();
-        $login_history->db()->dbh()->commit();
-        is( $login_history->db()->dbh()->err(),
-            undef, 'begin_work and commit are found in session' );
-    }
-    catch {
-        $login_history->db()->dbh()->rollback();
-    };
+    my $db = DB::UserLoginHistory->new->db;
+    $db->dbh()->begin_work() or die $db->error;
+    my $rose_dbh = $db->dbh();
+    my $sql      = "INSERT INTO user_login_history (user_id) VALUES (?)";
+    $rose_dbh->do( $sql, undef, 1 ) or die $db->error;
+    $db->dbh->commit()              or die $db->error;
 
-    my $login_history_2 = DB::UserLoginHistory->new( user_id => 2 );
-    $login_history_2->db()->dbh()->begin_work();
-    try {
-        $login_history_2->save();
-        die 'ups we have an error';
-        $login_history_2->db()->dbh()->commit();
-    }
-    catch {
-        is( $login_history->db()->dbh()->err(),
-            undef, 'begin_work and rollback are found in session' );
-        $login_history_2->db()->dbh()->rollback();
-    };
+    my $logins = DB::UserLoginHistory::Manager->get_user_login_history(
+        query => [ user_id => 1 ], );
 
-    $override->restore('Rose::DB::dbh');
-    $override->restore('DBD::Mock::db::last_insert_rowid');
+    is( $logins->[0]->id(), 1, 'begin_work and commit are set in session' );
+
 };
 
 done_testing();

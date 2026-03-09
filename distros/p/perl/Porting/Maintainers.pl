@@ -973,6 +973,11 @@ our %Modules = (
             qw{.ChangeLog.swp},
             qr{^\.github/}
         ],
+
+        'CUSTOMIZED'   => [
+	    # Customized by 6ea7dace3401e25dcf8318146be82c03e07a6a72
+	    'lib/Pod/Simple/HTMLLegacy.pm',
+	],
     },
 
     'Pod::Usage' => {
@@ -1312,6 +1317,9 @@ our %Modules = (
         # only necessary with the CPAN release.
         'CUSTOMIZED'   => [
             'lib/version.pm',
+
+            # Customized by ba04a9040af061424b6d6f0b1e888cd3ce4b3d9f
+            'vutil.c',
          ],
 
         'MAP' => {

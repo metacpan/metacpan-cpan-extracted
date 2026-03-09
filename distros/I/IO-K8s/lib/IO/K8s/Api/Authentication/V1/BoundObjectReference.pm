@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::BoundObjectReference;
 # ABSTRACT: BoundObjectReference is a reference to an object that a token is bound to.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s apiVersion => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Authentication::V1::BoundObjectReference - BoundObjectReference is
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 apiVersion
 

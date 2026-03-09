@@ -1,5 +1,5 @@
 package IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceList;
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 # ABSTRACT: Deprecated - use IO::K8s::List instead
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceList - Deprec
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SUPPORT
 

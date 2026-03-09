@@ -20,7 +20,7 @@ for (1..$N) {
 }
 close $w or die "close w: $!";
 
-my $loop = Linux::Event->new;
+my $loop = Linux::Event->new( model => 'reactor' );
 
 my $buf = '';
 my $lines = 0;

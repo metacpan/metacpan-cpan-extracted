@@ -1,5 +1,23 @@
 Revision history for Kubernetes-REST
 
+1.102     2026-03-09 08:36:25Z
+ - Pod Exec API: new `exec()` method in active v1 API.
+   Builds `/exec` requests, supports repeated `command=` parameters and stream
+   toggles (stdin/stdout/stderr/tty), and passes duplex callbacks
+   (on_open/on_frame/on_close/on_error) to IO backends.
+
+1.101     2026-03-08 23:49:18Z
+ - Raise minimum required IO::K8s version to 1.008.
+   Needed for CRD YAML serialization correctness with JSON booleans in
+   passthrough/hash fields (fix in IO::K8s 1.008).
+ - Pod Port-Forward API: new port_forward() method in active v1 API.
+   Builds /portforward requests, supports multiple ports, and passes duplex
+   callbacks (on_open/on_frame/on_close/on_error) to IO backends.
+ - _prepare_request now supports array query parameters (repeated key=value)
+   and explicit header overrides/additions.
+ - Kubernetes::REST::Role::IO adds supports_duplex() capability probe and
+   documents optional call_duplex() transport hook.
+
 1.100     2026-03-04 16:41:39Z
  - Pod Log API: new log() method for retrieving and streaming pod logs.
    Supports one-shot (returns full log text) and streaming mode (on_line

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Iterator.pm
-## Version v1.2.3
+## Version v1.2.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/05/28
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     use Config;
     use Scalar::Util ();
     use Wanted;
-    our( $VERSION ) = 'v1.2.3';
+    our( $VERSION ) = 'v1.2.4';
 };
 
 use v5.12.0;
@@ -286,15 +286,32 @@ sub value { return( shift->{value} ); }
 
 sub FREEZE
 {
-    my $self = CORE::shift( @_ );
+    my $self       = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self );
-    my %hash  = %$self;
+    my $class      = CORE::ref( $self );
+    my @props      = qw( elements pos _started );
+    my $hash       = {};
+    foreach my $prop ( @props )
+    {
+        if( exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }

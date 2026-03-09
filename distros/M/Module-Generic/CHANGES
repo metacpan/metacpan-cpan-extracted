@@ -1,11 +1,39 @@
 Revision history for Perl module Module::Generic
 
+v1.2.0 2026-03-08T22:47:58+0900
+    - Added new module Module::Generic::File::Magic providing file type and MIME type detection
+      through a three-level backend cascade: an XS binding to libmagic (loaded at runtime via
+      dlopen, requiring only the libmagic1 runtime package, so no libmagic-dev at build time),
+      a pure-Perl JSON backend using a bundled magic signature database derived from the
+      freedesktop.org shared-mime-info XML, and a final fallback to the file(1) subprocess.
+      The active backend is available via $Module::Generic::File::Magic::BACKEND and the
+      backend() method. All MAGIC_* flag constants are exported via the :flags tag.
+    - Added Generic.xs to the distribution to provide the XS backend for
+      Module::Generic::File::Magic. The XS MODULE is declared as Module::Generic so that
+      XSLoader resolves Generic.so correctly; PACKAGE = Module::Generic::File::Magic ensures
+      all XS functions are installed in the correct namespace.
+    - Added lib/Module/Generic/File/magic.json: a compact JSON magic signature database
+      generated from the upstream freedesktop.org shared-mime-info XML (630 entries, covering
+      binary signatures with offset ranges, endianness-aware integer types, AND sub-matches,
+      and bitmask support).
+    - Added scripts/gen_magic_json.pl: a generator script to regenerate magic.json from an
+      updated freedesktop.org XML source. Supports XML::LibXML, XML::Twig, and XML::Parser.
+      Included in the distribution for reference but not installed by make install.
+    - Added unit test t/32.file_magic.t for Module::Generic::File::Magic.
+    - Updated Module::Generic::Finfo to use Module::Generic::File::Magic for mime_type()
+      detection, replacing the previous File::MMagic::XS / File::MMagic fallback chain.
+    - Updated Module::Generic::File to add the alias method 'stringify' to 'load_utf8'
+    - Added the option 'pretty' to the method 'unload_perl' in Module::Generic::File
+    - Improved Module::Generic::Global by allowing a new option 'on_get' to set a callback upon deserialisation
+    - Improved Module::Generic::File, and especially the subroutine 'tmpfile'
+    - Improved cleanup in Module::Generic::Global
+
 v1.1.3 2025-10-24T21:08:39+0900
     - Improved method colour_parse(), and related unit tests
     - Added methods force_tty() to affect colour messaging output, and colour_max_depth() used in colour_parse() for coloured debugging output.
 
 v1.1.2 2025-10-19T16:37:01+0900
-    - Corrected method error(9 to also check for non-empty . Gitlab #5
+    - Corrected method error() to also check for non-empty . Gitlab #5
 
 v1.1.1 2025-10-12T07:53:51+0900
     - Correcting method _load_class to respect the 'no_import' option.

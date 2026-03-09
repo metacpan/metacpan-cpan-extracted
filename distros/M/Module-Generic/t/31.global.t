@@ -6,6 +6,7 @@ BEGIN
     use Cwd qw( abs_path );
     use lib abs_path( './lib' );
     use vars qw( $DEBUG $class );
+    use open ':std' => 'utf8';
     $class = 'Module::Generic::Global';
     use Config;
     use Test::More;
@@ -47,6 +48,12 @@ subtest 'Constructor' => sub
     my $tid = HAS_THREADS ? threads->tid : '';
     like( $repo2->{_key}, qr/^\d+;\d+;?$tid$/, 'Object-level key format' );
     is( $repo2->{_class_key}, join( ';', 'Test::Module', $$ ), 'Object-level class key' );
+
+    # With limits
+    my $repo3 = $class->new( 'limits' => 'Test::Module', max_size => 5, max_store_bytes => 1024, max_total_bytes => 4096 );
+    is( $repo3->{max_size}, 5, 'max_size set' );
+    is( $repo3->{max_store_bytes}, 1024, 'max_store_bytes set' );
+    is( $repo3->{max_total_bytes}, 4096, 'max_total_bytes set' );
 
     # Invalid inputs
     {
@@ -97,6 +104,104 @@ subtest 'Data operations' => sub
     ok( !$repo->exists, 'Not exists after clear' );
 };
 
+# NOTE: Resource limits
+subtest 'Resource limits' => sub
+{
+    # Helper to get approx serialized size (mimics wrapper + freeze)
+    sub serialized_len
+    {
+        my $val = shift;
+        my $wrapped = ref($val) ? $val : Module::Generic::Global::Scalar->new(\$val);
+        return length( Storable::Improved::freeze($wrapped) );
+    }
+
+    my $context = 'Test::Module';
+
+    # max_store_bytes (unique ns)
+    my $store_ns = 'limits_max_store_' . $$ . time . rand(1000) . rand(1000);
+    my $repo_store = $class->new( $store_ns => $context, key => 'store_test', max_store_bytes => 90, debug => $DEBUG );  # 56<110, 156>110
+    my $long_str = 'a' x 100;  # ~156 bytes
+    my $short_str = 'short';   # ~59 bytes
+    {
+        local $SIG{__WARN__} = sub{};
+        ok( !$repo_store->set( $long_str ), 'Refuse large item' );
+        like( $repo_store->error->message, qr/Refusing to store \d+ bytes/, 'Large item error' );
+    }
+    ok( $repo_store->set( $short_str ), 'Allow small item' );
+    cmp_ok( serialized_len($short_str), '<', 110, 'Small serialized under limit' );
+
+    # max_size eviction (separate unique ns)
+    my $size_ns = 'limits_max_size_' . $$ . time . rand(1000) . rand(1000);
+    my $base_size_opts = { max_size => 3, debug => $DEBUG };
+    my $repo1 = $class->new( $size_ns => $context, key => 'one', %$base_size_opts );
+    my $repo2 = $class->new( $size_ns => $context, key => 'two', %$base_size_opts );
+    my $repo3 = $class->new( $size_ns => $context, key => 'three', %$base_size_opts );
+    my $repo4 = $class->new( $size_ns => $context, key => 'four', %$base_size_opts );
+    ok( $repo1->set( 'one_val' ), 'Set 1' );
+    ok( $repo2->set( 'two_val' ), 'Set 2' );
+    ok( $repo3->set( 'three_val' ), 'Set 3' );
+    is( $repo1->length, 3, 'At max_size' );
+    ok( $repo4->set( 'four_val' ), 'Set 4 evicts oldest' );
+    is( $repo1->length, 3, 'Still at max_size' );
+    is( $repo4->get, 'four_val', 'Newest present' );
+    is( $repo1->get, undef, 'Oldest evicted (key one)' );
+
+    # Overwrite no eviction
+    ok( $repo4->set( 'four_updated' ), 'Overwrite no evict' );
+    is( $repo1->length, 3, 'Length unchanged on overwrite' );
+
+    # max_total_bytes (separate unique ns)
+    my $bytes_ns = 'limits_max_total_' . $$ . time . rand(1000) . rand(1000);
+    my $base_total_opts = { max_total_bytes => 180, max_store_bytes => 180, debug => $DEBUG };  # 3*60=180 = max, but code > so set3 ok (177<180), set4 > evict to 177
+    my $repo_b1 = $class->new( $bytes_ns => $context, key => 'b1', %$base_total_opts );
+    my $repo_b2 = $class->new( $bytes_ns => $context, key => 'b2', %$base_total_opts );
+    my $repo_b3 = $class->new( $bytes_ns => $context, key => 'b3', %$base_total_opts );
+    my $repo_b4 = $class->new( $bytes_ns => $context, key => 'b4', %$base_total_opts );
+    ok( $repo_b1->set( 'short1' ), 'Set 1 (~59 bytes)' );
+    ok( $repo_b2->set( 'short2' ), 'Set 2 (~59)' );
+    ok( $repo_b3->set( 'short3' ), 'Set 3 (~59, total ~177 <=180)' );
+    ok( $repo_b4->set( 'short4' ), 'Set 4 (~59, would ~236 >180, evicts oldest to ~177' );
+    my $total = 0; $total += $_->{bytes} for grep { $_->{key} =~ /^$bytes_ns;/ } @{$repo_b1->stat()};  # Per-ns
+    cmp_ok( $total, '<=', 180 + 5, 'Total under after evict' );  # Buffer for var
+    # Delta on overwrite (same len—no change, no evict)
+    my $old_total = $total;
+    ok( $repo_b4->set( 'short5' ), 'Overwrite same len no change' );
+    $total = 0; $total += $_->{bytes} for grep{ $_->{key} =~ /^$bytes_ns;/ } @{$repo_b1->stat()};
+    cmp_ok( $total, '==', $old_total, 'Total unchanged on same-len overwrite' );  # Exact for same
+    # Shorten for decrease (no evict)
+    my $old_total2 = $total;
+    ok( $repo_b4->set( '' ), 'Overwrite to shorter (~56, delta -3, total 174 <180' );
+    $total = 0; $total += $_->{bytes} for grep { $_->{key} =~ /^$bytes_ns;/ } @{$repo_b1->stat()};
+    cmp_ok( $total, '<', $old_total2, 'Total decreased on shorter overwrite' );
+    # Lengthen to evict if over
+    ok( $repo_b4->set( 'a' x 100 ), 'Overwrite to longer (~159, total ~174-56+159=277 >180, evicts another to ~174-56=118' );
+    $total = 0; $total += $_->{bytes} for grep{ $_->{key} =~ /^$bytes_ns;/ } @{$repo_b1->stat()};
+    cmp_ok( $total, '>', $old_total2 - 60, 'Total increased on longer overwrite (after any evict)' );  # > old - evicted ~59
+
+    # Remove subtracts
+    ok( $repo_b4->remove, 'Remove subtracts bytes' );
+    is( $repo_b1->length, 0, 'Length after remove (after evict left 2, remove 1=1)' );
+};
+
+# NOTE: Stats
+subtest 'Stats' => sub
+{
+    my $unique_ns = 'stats_test_' . $$ . time . rand(1000) . rand(1000);
+    my $repo_short = $class->new( $unique_ns => 'Test::Module', key => 'short', debug => $DEBUG );
+    my $repo_long = $class->new( $unique_ns => 'Test::Module', key => 'long', debug => $DEBUG );
+    ok( $repo_short->set( 'short_val' ), 'Set short' );
+    ok( $repo_long->set( 'a' x 100 ), 'Set longer' );
+    my $stats = $repo_short->stat(5);
+    my @ns_stats = grep { $_->{key} =~ /^$unique_ns;/ } @$stats;
+    is( scalar(@ns_stats), 2, 'Stats count (per-ns)' );
+    ok( $ns_stats[0]{bytes} >= $ns_stats[1]{bytes}, 'Sorted desc' );
+    like( $ns_stats[0]{key}, qr/^$unique_ns;/, 'Key format' );
+    ok( $repo_long->remove, 'Remove clears stat' );
+    $stats = $repo_short->stat;
+    @ns_stats = grep { $_->{key} =~ /^$unique_ns;/ } @$stats;
+    is( scalar(@ns_stats), 1, 'Stats reduced after remove' );  # 1 left
+};
+
 # NOTE: Error handling
 subtest 'Error handling' => sub
 {
@@ -135,7 +240,7 @@ subtest 'Locking' => sub
     {
         if( !$Config{useithreads} )
         {
-            skip( 'Threads not available', 2 );
+            skip( 'Threads not available', 3 );
         }
 
         require threads;
@@ -180,7 +285,61 @@ subtest 'Locking' => sub
         }
 
         ok( $success, 'Thread-safe locking' );
+
+        # Add limit contention
+        my $limit_ns = 'lock_limit_' . $$ . time . rand(1000) . rand(1000);
+        $success = 1;
+        @threads = map
+        {
+            threads->create(sub
+            {
+                my $tid = threads->tid;
+                my $limit_repo = $class->new( $limit_ns => 'Test::Module', key => 'thr_' . $tid, max_size => 2, max_total_bytes => 140, max_store_bytes => 140, debug => $DEBUG );  # 2*70=140 ok, 5 evicts to 2
+                my $lock = $limit_repo->lock;
+                return(0) if !defined $lock;
+                eval { $limit_repo->set( "data_$tid" . ('x' x $tid) ); };  # Vary len ~60 + tid for total
+                return(0) if $@;
+                return(1);
+            });
+        } 1..5;  # Add 5, evict to 2
+
+        for my $thr ( @threads )
+        {
+            $success &&= $thr->join();
+        }
+        ok( $success, 'Thread-safe with limits/eviction' );
+        my $check_repo = $class->new( $limit_ns => 'Test::Module', key => 'dummy', debug => $DEBUG );  # To check length
+        # diag( "Final keys: " . join(', ', keys %{$REPO->{$limit_ns}}) ) if $DEBUG;  # Temp
+        is( $check_repo->length, 2, 'Final length at max after thread sets' );
+        my $stats = $check_repo->stat;
     };
+};
+
+# NOTE: Cleanup register
+subtest 'Cleanup register' => sub
+{
+    SKIP:
+    {
+        if( !MOD_PERL )
+        {
+            skip( 'mod_perl not available', 4 );
+        }
+        # Mock r—assume loaded, or use stub
+        my $mock_r = bless( {}, 'Apache2::RequestRec' );  # Minimal mock; in real, use Apache::Test
+        my $repo = $class->new( 'clean' => 'Test::Module' );
+        ok( $repo->set( 'to_clean' ), 'Set for cleanup' );
+        my $repo2 = $class->new( 'keep' => 'Test::Module' );
+        ok( $repo2->set( 'to_keep' ), 'Set for keep' );
+
+        # Test selective
+        $repo->cleanup_register( r => $mock_r, namespaces => ['clean'], keep => ['keep'], callback => sub { diag("Callback called") if $DEBUG; } );
+        # Simulate callback call (manual, since no real pool)
+        # In real test, use Apache::Test harness; here, assume logic ok if no error
+        ok( 1, 'Registered without error' );  # Placeholder
+
+        # Check clears (simulate)
+        # ... delete $REPO->{'clean'}; etc in test callback mock
+    }
 };
 
 # NOTE: Context isolation

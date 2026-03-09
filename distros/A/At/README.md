@@ -26,7 +26,7 @@ $at->post( 'com.atproto.repo.createRecord' => {
 # Streaming the Firehose
 my $fh = $at->firehose(sub ( $header, $body, $err ) {
     return warn $err if $err;
-    say "New event: " . $header->{t};
+    say 'New event: ' . $header->{t};
 });
 $fh->start();
 # ... Start event loop (e.g. Mojo::IOLoop->start) ...
@@ -161,7 +161,7 @@ my $res = $at->post( 'com.atproto.server.createAccount' => {
 
 # Working With Data: Records and Repositories
 
-Data in the AT Protocol is stored in "repositories" as "records". Each record belongs to a "collection" (defined by a
+Data in the AT Protocol is stored in 'repositories' as 'records'. Each record belongs to a 'collection' (defined by a
 Lexicon).
 
 ## Creating a Post
@@ -211,7 +211,7 @@ my $fh = $at->firehose(sub ( $header, $body, $err ) {
     }
 
     if ($header->{t} eq '#commit') {
-        say "New commit in repo: " . $body->{repo};
+        say 'New commit in repo: ' . $body->{repo};
     }
 });
 
@@ -279,6 +279,11 @@ Initiates the OAuth 2.0 Authorization Code flow. Returns the authorization URL.
 
 Exchanges the authorization code for tokens and completes the OAuth flow.
 
+## `oauth_refresh()`
+
+Uses the session's refresh token to obtain a new set of access and refresh tokens. Automatically handles DPoP nonces
+and spec-compliant proof generation (omitting `ath` during refresh).
+
 ## `login( $handle, $app_password )`
 
 Performs legacy password-based authentication. **Deprecated: Use OAuth instead.**
@@ -307,6 +312,41 @@ Returns a new [At::Protocol::Firehose](https://metacpan.org/pod/At%3A%3AProtocol
 
 Resolves a handle to a DID.
 
+## `resolve_did_to_handle( $did )`
+
+Reverse resolution: resolves a DID to its primary handle.
+
+## `atproto_proxy( [ $service_did ] )`
+
+Gets or sets the `atproto-proxy` header value on the underlying user agent. When set, requests will be sent to the
+primary `host` but include this header, signaling the PDS to proxy the request to the specified service.
+
+Example for Bluesky Chat:
+
+```
+$at->http->at_protocol_proxy("did:web:api.bsky.chat#bsky_chat");
+```
+
+## `upload_blob( $data, $mime_type )`
+
+Uploads a raw binary blob to the PDS. Returns the blob's metadata (CID, etc).
+
+## `create_record( $collection, $record, [ $rkey ] )`
+
+Helper to create a new record in a specific collection. Automatically uses the authenticated user's DID.
+
+## `delete_record( $collection, $rkey )`
+
+Helper to delete a record from a specific collection.
+
+## `put_record( $collection, $rkey, $record, [ $swapRecord ] )`
+
+Helper to write a record (creating or updating it) at a specific rkey.
+
+## `apply_writes( $writes, [ $swapCommit ] )`
+
+Atomic multi-record update. `$writes` should be an arrayref of create/update/delete operations.
+
 ## `collection_scope( $collection, [ $action ] )`
 
 Helper to generate granular OAuth scopes (e.g., `repo:app.bsky.feed.post?action=create`).
@@ -318,6 +358,43 @@ Returns the current [At::Protocol::Session](https://metacpan.org/pod/At%3A%3APro
 ## `did()`
 
 Returns the DID of the authenticated user.
+
+## `peer_id_for_did( $did )`
+
+Resolves an AT Protocol DID to a libp2p PeerID. This is used to discover the user's data on the P2P network.
+
+## `get_repo_head( $did )`
+
+Retrieves the current MST (Merkle Search Tree) root CID for a user's repository via the `com.atproto.sync.getHead`
+endpoint.
+
+## `get_block( $cid_str, [ $target_peer_id ] )`
+
+Retrieves a raw block by its CID. If an `ipfs_node` was provided to the constructor, this method will:
+
+- Check the local blockstore.
+- Attempt to fetch the block via Bitswap from the provided `$target_peer_id`.
+- Fall back to the centralized PDS via HTTP if the block is not found in the P2P network.
+
+Returns a [Future](https://metacpan.org/pod/Future) that resolves to the block data.
+
+# Decentralized Data Synchronization
+
+When an `ipfs_node` is provided to the [At](https://metacpan.org/pod/At) constructor, the library enables peer-to-peer data synchronization
+compliant with the AT Protocol Sync specification ([https://atproto.com/specs/sync](https://atproto.com/specs/sync)).
+
+## Peer-to-Peer Repository Mirroring
+
+By combining `peer_id_for_did` and `get_block`, this library can mirror entire user repositories without relying on a
+centralized Relay or PDS. The process involves:
+
+- Identity bridging: Converting the user's DID to a libp2p PeerID.
+- Root resolution: Getting the latest MST root CID.
+- MST traversal: Recursively walking the Merkle Search Tree.
+- Block exchange: Using Bitswap to fetch missing blocks from peers.
+
+This decentralized approach significantly reduces the load on centralized infrastructure and enables data availability
+even during outages of primary service providers.
 
 # ERROR HANDLING
 

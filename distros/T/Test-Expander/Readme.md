@@ -3,7 +3,7 @@
 **Test::Expander** - Expansion of test functionalities that appear to be frequently used while testing.
 
 # SYNOPSIS
-```perl
+
     # Tries to automatically determine, which class / module and method / subroutine are to be tested,
     # creates neither a temporary directory, nor a temporary file:
     use Test::Expander;
@@ -51,7 +51,7 @@
       ],
       -tempdir => {};
 
-    # Override the builtin 'close' in the name space of explicitly supplied class / module to be tested:
+    # Overrides the builtin 'close' in the name space of explicitly supplied class / module to be tested:
     my $close_success;
     use Test::Expander
       -builtins => { close => sub { $close_success ? CORE::close( shift ) : 0 } },
@@ -59,7 +59,35 @@
 
     # Activates immediate stop of test execution if any assertion fails:
     use Test::Expander -bail => 1;
-```
+
+    # Performs execution of test cases applying table driven testing approach (TDT, also known as data driven testing)
+    based on the test table stored in a separate .tdt file:
+    use Test::Expander;
+    const my %TEST_CASES => test_table();
+    while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+      # Use $test_name and $test_params in a generic way e.g.
+      # is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+      ...
+    }
+
+    # Performs execution of test cases applying TDT approach based on the test table stored in the __DATA__ section:
+    use Test::Expander;
+    const my %TEST_CASES => test_table( [ <DATA> ] );
+    while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+      # Use $test_name and $test_params in a generic way e.g.
+      # is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+      ...
+    }
+    __DATA__
+    +---------------------------------------------------------+
+    |                              |          | param | param |
+    |                              | expected |   1   |   2   |
+    |------------------------------+----------+-------+-------|
+    | 'param2' omitted             |     0    | 'abc' |       |
+    | both parameters set to true  |     1    |   1   |   1   |
+    | both parameters set to false |     0    |   0   |   0   |
+    +---------------------------------------------------------+
+
 # DESCRIPTION
 
 The primary objective of **Test::Expander** is to provide additional convenience while testing based on
@@ -78,14 +106,150 @@ This, of course, can be stored in additional variables declared somewhere at the
     a single change of path and / or base name of the corresponding test file.
 
     An additional benefit of suggested approach is a better readability of tests, where chunks like
-    ```perl
+
         Foo::Bar->baz( $arg0, $arg1 )
-    ```
+
     now look like
-    ```perl
+
         $CLASS->$METHOD( $arg0, $arg1 )
-    ```
+
     and hence clearly manifest that this chunk is about the testee.
+
+- Repetition of structurally identical assertions with different parameters for testing of various branches.
+This is exactly why the [table driven testing](https://en.wikipedia.org/wiki/Data-driven_testing) has been introduced
+ages ago (e.g. for [Java](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.452) and then full-blown for
+[Go](https://go.dev/wiki/TableDrivenTests) and other programming languagues).
+
+    As a result, the function **test\_table** is exported by default providing a possibility to avoid copy-and-paste
+    implementing test cases differing by applied parameters only.
+    This reduces the complexity of tests and hence increases its maintainability and adjustability in accordance with
+    the changes of testee.
+
+    The function **test\_table** can be used in two different ways:
+
+    - Loading test table from a separate file.
+
+        This file has the same name as the current test file but the extension **.tdt** instead of **.t**.
+        This means, if the test file name is **t/Foo/Bar/baz.t**,
+        then the table is expected to be located in the file **t/Foo/Bar/baz.tdt**.
+
+        This way may be reasonable if a single table can be used for all test cases in the current test file.
+
+        Assuming such a test file should verify whether the function **Foo::Bar::baz** returns
+
+        - **0**
+
+            if the first parameter contains the string **'abc'** and the second parameter is omitted,
+
+        - **1**
+
+            if both the first and the second parameters contain **1**,
+
+        - and, finally, **0**
+
+            if both the first and the second parameters contain **0**.
+
+        Then the file **t/Foo/Bar/baz.tdt** might look as follows:
+
+          +---------------------------------------------------------+
+          |                              |          | param | param |
+          |                              | expected |   1   |   2   |
+          |------------------------------+----------+-------+-------|
+          | 'param2' omitted             |     0    | 'abc' |       |
+          | both parameters set to true  |     1    |   1   |   1   |
+          | both parameters set to false |     0    |   0   |   0   |
+          +---------------------------------------------------------+
+
+        And the corresponding file **t/Foo/Bar/baz.t** would contain:
+
+            use Test::Expander;
+            const my %TEST_CASES => test_table();
+            while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+              is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+            }
+
+    - Explicitly supplying test table as a reference to array, each single element of which represents a table line.
+
+        This way may be reasonable if different test cases in the current test file require different test tables.
+
+        Such table can be passed explicitly as an array reference:
+
+            use Test::Expander;
+            subtest 'case 1' => sub {
+              const my %TEST_CASES => test_tables(
+                [
+                  '+---------------------------------------------------------+',
+                  '|                              |          | param | param |',
+                  '|                              | expected |   1   |   2   |',
+                  '|------------------------------+----------+-------+-------|',
+                  "| 'param2' omitted             |     0    | 'abc' |       |",
+                  '| both parameters set to true  |     1    |   1   |   1   |',
+                  '| both parameters set to false |     0    |   0   |   0   |',
+                  '+---------------------------------------------------------+',
+                ]
+              );
+              while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+                is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+              }
+            };
+            subtest 'case 2' => sub {
+              const my %TEST_CASES => test_tables(
+                [
+                  '+------------------------------+',
+                  '|          |           | param |',
+                  '|          | expected  |   1   |',
+                  '|----------+-----------+-------|',
+                  "| error 1  | 'ERROR 1' |   2   |",
+                  "| error 2  | 'ERROR 2' |   3   |",
+                  '+------------------------------+',
+                ]
+              );
+              while ( my $test_name, $test_params = each( %TEST_CASES ) ) {
+                throws_ok { $METHOD_REF->( $test_params{ param1 } ) } qr/$test_params{ expected }/, $test_name;
+              }
+            };
+
+        Or both tables can be transferred to the **DATA** section of the current test file making the source code more readable:
+
+            use Test::Expander;
+            const my $TEST_CASES => eval( join( '', <DATA> ) );
+            my $subtest_name;
+            $subtest_name = 'case 1';
+            subtest $subtest_name => sub {
+              const my $SUB_TABLE => test_table( $TEST_CASES->{ $subtest_name } );
+              while ( my $test_name, $test_params = each( %$SUB_TABLE ) ) {
+                is( $METHOD_REF->( $test_params{ param1 }, $test_params{ param2 } ), $test_params{ expected }, $test_name );
+              }
+            };
+            $subtest_name = 'case 1';
+            subtest $subtest_name => sub {
+              const my $SUB_TABLE => test_table( $TEST_CASES->{ $subtest_name } );
+              while ( my $test_name, $test_params = each( %$SUB_TABLE ) ) {
+                throws_ok { $METHOD_REF->( $test_params{ param1 } ) } qr/$test_params{ expected }/, $test_name;
+              }
+            };
+            __DATA__
+            {
+              'case 1' => [
+                '+---------------------------------------------------------+',
+                '|                              |          | param | param |',
+                '|                              | expected |   1   |   2   |',
+                '|------------------------------+----------+-------+-------|',
+                "| 'param2' omitted             |     0    | 'abc' |       |",
+                '| both parameters set to true  |     1    |   1   |   1   |',
+                '| both parameters set to false |     0    |   0   |   0   |',
+                '+---------------------------------------------------------+',
+              ],
+              'case 2' => [
+                '+------------------------------+',
+                '|          |           | param |',
+                '|          | expected  |   1   |',
+                '|----------+-----------+-------|',
+                "| error 1  | 'ERROR 1' |   2   |",
+                "| error 2  | 'ERROR 2' |   3   |",
+                '+------------------------------+',
+              ],
+            }
 
 - The frequent necessity of introduction of temporary directory and / or temporary file usually leads to the usage of
 modules [File::Temp::tempdir](https://metacpan.org/pod/File::Temp) or [Path::Tiny](https://metacpan.org/pod/Path::Tiny)
@@ -93,9 +257,9 @@ providing the methods / funtions **tempdir** and **tempfile**.
 
     This, however, can significantly be simplified (and the size of test file can be reduced) requesting such introduction
     via the options supported by **Test::Expander**:
-    ```perl
+
         use Test::Expander -tempdir => {}, -tempfile => {};
-    ```
+
 - Another fuctionality frequently used in tests relates to the work with files and directories:
 reading, writing, creation, etc. Because almost all features required in such cases are provided by
 [Path::Tiny](https://metacpan.org/pod/Path::Tiny), some functions of this module are also exported from
@@ -128,9 +292,9 @@ The term "partially" means that the option `--subtest` can only be applied to se
 immediate stop of test file execution if one of the tests fails.
 
     This feature can be applied both for the whole test file using the **-bail** option
-    ```perl
+
         use Test::Expander -bail => 1;
-    ```
+
     and for a part of it using the functions **bail\_on\_failure** and **restore\_failure\_handler** to activate and deactivate
     this reaction, correspondingly.
 
@@ -142,7 +306,7 @@ immediate stop of test file execution if one of the tests fails.
         the RegEx match is in any case possible.
 
         Assuming the test script **t/my\_test.t** contains
-        ```perl
+
             use strict;
             use warnings;
 
@@ -169,20 +333,20 @@ immediate stop of test file execution if one of the tests fails.
             subtest 'my subtest with [' => sub {
               # some test function calls
             };
-        ```
+
         Then, if the subtest **my next higher level subtest** with all embedded subtests and the subtest **my subtest with \[**
         should be executed, the corresponding [prove](https://metacpan.org/pod/prove) call
         can look like one of the following variants:
-        ```sh
+
             prove -v -b t/basic.t :: --subtest_name 'next|embedded|deepest' --subtest_name '['
             prove -v -b t/basic.t :: --subtest_name 'next' --subtest_name 'embedded' --subtest_name 'deepest' --subtest_name '['
-        ```
+
         This kind of subtest selection is pretty convenient but has a significant restriction:
         you cannot select an embedded subtest without its higher-level subtests.
         I.e. if you would try to run the following command
-        ```sh
+
             prove -v -b t/basic.t :: --subtest_name 'deepest' --subtest_name '['
-        ```
+
         the subtest **my next higher level subtest** including all embedded subtests will be skipped, so that even the subtest
         **my deepest subtest** will not be executed although this was your goal.
 
@@ -193,7 +357,7 @@ immediate stop of test file execution if one of the tests fails.
         The selection by number means that the value supplied along with `--subtest_number` option is the sequence of numbers
         representing required subtest in the test file.
         Let's add to the source code of **t/my\_test.t** some comments illustrating the numbers of each subtest:
-        ```perl
+
             use strict;
             use warnings;
 
@@ -220,14 +384,14 @@ immediate stop of test file execution if one of the tests fails.
             subtest 'my subtest with [' => sub { # subtest No. 2
               # some test function calls
             };
-        ```
+
         Taking this into consideration we can combine subtest numbers starting from the highest level and separate single levels
         by the slash sign to get the unique number of any subtest we intend to execute.
         Doing so, if we only want to execute the subtests **my deepest subtest** (its number is **1/0/0**) and
         **my subtest with \[** (its number is **2**), this can easily be done with the following command:
-        ```sh
+
             prove -v -b t/basic.t :: --subtest_number '1/0/0' --subtest_number '2'
-        ```
+
 **Test::Expander** combines all advanced possibilities provided by [Test2::V0](https://metacpan.org/pod/Test2::V0)
 with some specific functions only available in the older module [Test::More](https://metacpan.org/pod/Test::More)
 (which allows a smooth migration from [Test::More](https://metacpan.org/pod/Test::More)-based tests to
@@ -320,9 +484,9 @@ related to this class / module should be **t/**_Foo_**/**_Bar_**/**_Baz_ or **xt
 (the name of the top-level directory in this relative name - **t**, or **xt**, or **my\_test** is not important) -
 otherwise the module name cannot be put into the exported variable **$CLASS** and, if you want to use this variable,
 should be supplied as the value of **-target**:
-```perl
+
     use Test::Expander -target => 'Foo::Bar::Baz';
-```
+
 This recognition can explicitly be deactivated if the value of **-target** is **undef**, so that no class / module
 will be loaded and, correspondingly, the variables **$CLASS**, **$METHOD**, and **$METHOD\_REF** will not be exported.
 
@@ -334,9 +498,9 @@ to be tested and its reference, correspondingly, otherwise both variables are ne
 
 Also in this case evaluation and export of the variables **$METHOD** and **$METHOD\_REF** can be prevented
 by passing of **undef** as value of the option **-method**:
-```perl
+
     use Test::Expander -target => undef;
-```
+
 Finally, **Test::Expander** supports testing inside of a clean environment containing only some clearly
 specified environment variables required for the particular test.
 Names and values of these environment variables should be configured in files,
@@ -377,42 +541,41 @@ All remaining elements of the **%ENV** hash gets emptied (without localization) 
     - the cascading definition of environment variables can be used, which means that
         - during the evaluation of current line environment variables defined in the same file above can be applied.
         For example if such **.env** file contains
-            ```perl
+
                 VAR1 = 'ABC'
                 VAR2 = lc( $ENV{ VAR1 } )
-            ```
+
             and neither **VAR1** nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same or other
             **.env** files, the **%ENV** hash will contain at least the following entries:
-            ```perl
+
                 VAR1 => 'ABC'
                 VAR2 => 'abc'
-            ```
+
         - during the evaluation of current line also environment variables defined in a higher-level **.env** file can be used.
         For example if **t/Foo/Bar/Baz.env** contains
-            ```perl
+
                 VAR0 = 'XYZ '
-            ```
+
             and **t/Foo/Bar/Baz/myMethod.env** contains
-            ```perl
+
                 VAR1 = 'ABC'
                 VAR2 = lc( $ENV{ VAR0 } . $ENV{ VAR1 } )
-            ```
+
             and neither **VAR0**, nor **VAR1**, nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same
             or other **.env** files, the **%ENV** hash will contain at least the following entries:
-            ```perl
+
                 VAR0 => 'XYZ '
                 VAR1 => 'ABC'
                 VAR2 => 'xyz abc'
-            ```
     - the value of the environment variable (if provided) is evaluated by the
     [string eval](https://perldoc.perl.org/functions/eval) so that
         - constant values must be quoted;
         - variables and subroutines must not be quoted:
-            ```perl
+
                 NAME_CONST = 'VALUE'
                 NAME_VAR   = $KNIB::App::MyApp::Constants::ABC
                 NAME_FUNC  = join(' ', $KNIB::App::MyApp::Constants::DEF)
-            ```
+
 All environment variables set up in this manner are logged to STDOUT
 using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
 
@@ -494,19 +657,19 @@ this is reported at the very begin of test execution.
     the option **-builtin** should be used instead!)
     to verify if the testee properly reacts both on its success and failure.
     For this purpose a reasonable implementation might look as follows:
-    ```perl
+
         my $close_success;
         BEGIN {
           *CORE::GLOBAL::close = sub (*) { $close_success ? CORE::close( shift ) : 0 }
         }
 
         use Test::Expander;
-    ```
+
 - Array elements of the value supplied along with the option **-lib** are evaluated using
 [string eval](https://perldoc.perl.org/functions/eval) so that constant strings would need duplicated quotes e.g.
-    ```perl
+
         use Test::Expander -lib => [ q('my_test_lib') ];
-    ```
+
 - If the value to be assigned to an environment variable after evaluation of an **.env** file is undefined,
 such assignment is skipped.
 - If **Test::Expander** is used in one-line mode (with the **-e** option),

@@ -1,5 +1,10 @@
 Revision history for Getopt-Long-Bash
 
+0.8.0 2026-03-09T07:53:38Z
+
+    - Add negative alias (~) for option negation (short and long)
+    - Show deny aliases with ~/~~ prefix in help output
+
 0.7.2 2026-02-11T09:40:06Z
 
     - Fix numeric comparison bug in permute loop (string > vs -gt)

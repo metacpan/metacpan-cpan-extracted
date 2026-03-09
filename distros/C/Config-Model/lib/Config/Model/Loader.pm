@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.158;
+package Config::Model::Loader 2.159;
 
 use Carp;
 use strict;
@@ -1160,7 +1160,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 
@@ -1316,8 +1316,9 @@ real C<\n> (LF in Unix).
 
 =item xxx:.foreach_match(yy) or xxx:~yy
 
-Go down using C<xxx> element and loop over the ids that match the regex
-specified by C<yy>. (For C<hash>).
+Go down using C<xxx> element and loop over the ids that match the
+regex specified by C<yy>. (For C<hash> only. This does B<not> apply to
+C<list> elements).
 
 For instance, with C<OpenSsh> model, you could do
 

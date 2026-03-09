@@ -1,5 +1,5 @@
 {
-   "abstract" : "Front door for the Linux::Event ecosystem",
+   "abstract" : "Front door for the Linux::Event reactor and proactor ecosystem",
    "author" : [
       "Joshua S. Day"
    ],
@@ -33,17 +33,19 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "IO::Uring" : "0",
             "Linux::Epoll" : "0",
             "Linux::Event::Clock" : "0.011",
             "Linux::Event::Timer" : "0.01",
             "Linux::FD::Signal" : "0",
             "Test2::V0" : "0",
+            "Time::Spec" : "0",
             "perl" : "5.036000"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.009",
+   "version" : "0.010",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

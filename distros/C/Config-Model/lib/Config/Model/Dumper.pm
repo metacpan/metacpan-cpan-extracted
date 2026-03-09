@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Dumper 2.158;
+package Config::Model::Dumper 2.159;
 
 use Carp;
 use strict;
@@ -220,7 +220,6 @@ sub dump_tree {
     };
 
     my @scan_args = (
-        fallback => 'all',
         auto_vivify           => $auto_v,
         list_element_cb       => $list_element_cb,
         hash_element_cb       => $hash_element_cb,
@@ -262,7 +261,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

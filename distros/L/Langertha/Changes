@@ -1,5 +1,69 @@
 Revision history for Langertha
 
+0.305     2026-03-08 21:51:01Z
+    - New engine base class: Langertha::Engine::AnthropicBase for
+      Anthropic-compatible APIs (shared /v1/messages chat/streaming/tool/model
+      handling and Anthropic rate-limit parsing). Anthropic now extends this
+      base, and MiniMax + LMStudioAnthropic were migrated to extend it too.
+    - New engine: Langertha::Engine::LMStudio — native LM Studio local REST
+      API adapter (POST /api/v1/chat, SSE streaming with message.delta/chat.end,
+      GET /api/v1/models). Supports optional bearer auth via
+      LANGERTHA_LMSTUDIO_API_KEY, plus basic auth via URL userinfo.
+      Includes openai() helper returning a Langertha::Engine::LMStudioOpenAI
+      instance for LM Studio's /v1 endpoint.
+    - New engine: Langertha::Engine::LMStudioOpenAI for LM Studio's
+      OpenAI-compatible /v1 endpoint (defaults api_key to C<lmstudio>).
+    - New engine: Langertha::Engine::LMStudioAnthropic for LM Studio's
+      Anthropic-compatible /v1/messages endpoint. Includes LMStudio->anthropic
+      helper for easy conversion from native engine instances; defaults api_key
+      to C<lmstudio>.
+    - New OpenAPI spec: share/lmstudio.yaml with operationIds for LM Studio
+      native chat and model listing, plus Langertha::Spec::LMStudio for
+      pre-computed operation lookup.
+    - Tests: extend t/00_load.t, t/10_engine_hierarchy.t, and
+      t/11_basic_auth.t to cover LMStudio loading, inheritance/roles,
+      request mapping, and auth behavior.
+      Extend t/83_live_chat.t with optional LM Studio live coverage via
+      TEST_LANGERTHA_LMSTUDIO_URL, TEST_LANGERTHA_LMSTUDIO_MODEL, and
+      TEST_LANGERTHA_LMSTUDIO_API_KEY.
+    - Documentation: add POD for LMStudio, LMStudioOpenAI, and
+      LMStudioAnthropic helpers/attributes and expand README examples
+      to include explicit LMStudioOpenAI/LMStudioAnthropic class usage.
+    - Orchestration foundation on top of Raider:
+      add Langertha::Role::Runnable (run_f contract),
+      Langertha::RunContext (input/state/artifacts/metadata/trace + branch/merge),
+      Langertha::Raid base class, and concrete orchestrators
+      Langertha::Raid::Sequential, Langertha::Raid::Parallel, Langertha::Raid::Loop.
+      Supports nested composition of Raider and Raid nodes.
+    - Unified result model:
+      add Langertha::Result as common result abstraction (final/question/pause/abort),
+      and make Langertha::Raider::Result a backward-compatible subclass so Raider
+      and Raid share the same result semantics.
+    - Raider compatibility + interface:
+      Raider now composes Langertha::Role::Runnable and exposes run_f($ctx)
+      as an orchestration-friendly wrapper around raid_f while keeping existing
+      public raid_f/respond_f behavior intact.
+    - Raider fixes:
+      _gather_tools_f now uses the active engine (not always the default engine),
+      and Langfuse model parameters are recalculated after engine/tool dirtiness
+      refresh during runtime engine switching.
+    - Raider respond_f consistency:
+      plugin_after_tool_call hooks are now applied to remaining tool calls during
+      continuation flow (self-tools and MCP tools), matching main loop behavior.
+    - Tests:
+      add t/96_raid_orchestration.t covering Runnable compatibility, sequential/
+      parallel/loop orchestration, nested Raid trees, context propagation and
+      parallel isolation/merge semantics, result propagation (final/question/pause/abort),
+      and error paths for all orchestrator types.
+      Extend t/00_load.t to include new modules.
+    - Documentation:
+      add inline POD for all new orchestration/result/context modules and
+      refresh Raider::Result POD to reflect shared result inheritance.
+      Extend README with a new "Raid — Workflow Orchestration" section
+      (RunContext, Sequential/Parallel/Loop, unified results, nesting),
+      plus a top-level table of contents, architecture overview, and a
+      minimal sequential orchestration example.
+
 0.304     2026-03-07 02:05:27Z
     - New role: Langertha::Role::HermesTools — extracted Hermes-style XML
       tool calling into a dedicated role. Engines compose this role instead

@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::PEM;
 # VERSION
 # ABSTRACT: Parse PEM format from a SecretBuffer
-$Crypt::SecretBuffer::PEM::VERSION = '0.019';
+$Crypt::SecretBuffer::PEM::VERSION = '0.020';
 use strict;
 use warnings;
 use Carp;
@@ -177,6 +177,12 @@ sub serialize {
    return $out;
 }
 
+# avoid depending on namespace::clean
+delete @{Crypt::SecretBuffer::PEM::}{qw(
+   carp confess croak blessed secret span MATCH_NEGATE MATCH_REVERSE MATCH_ANCHORED MATCH_MULTI
+   ISO8859_1 BASE64
+)};
+
 1;
 
 __END__
@@ -313,7 +319,7 @@ falling back to the L</headers> hashref.
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

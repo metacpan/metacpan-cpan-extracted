@@ -1,0 +1,190 @@
+---
+X_No_Archive: Yes
+abstract: 'The AT Protocol for Social Networking'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Module::Build::Tiny: '0'
+  Test2::V0: '0'
+configure_requires:
+  CPAN::Meta: '2.150012'
+  Exporter: '5.57'
+  ExtUtils::Helpers: '0.028'
+  ExtUtils::Install: '0'
+  ExtUtils::InstallPaths: '0.002'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '2.36'
+  JSON::PP: '2'
+  Path::Tiny: '0'
+  Test2::V1: '0'
+  perl: v5.42.0
+dynamic_config: 0
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+keywords: []
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: At
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+optional_features:
+  websockets:
+    description: 'Websocket based streaming services'
+    requires:
+      CBOR::Free: '0'
+      Mojo::UserAgent: '0'
+provides:
+  At:
+    file: lib/At.pm
+    version: '1.4'
+  At::Error:
+    file: lib/At/Error.pm
+    version: '1.1'
+  At::Protocol::DID:
+    file: lib/At/Protocol/DID.pm
+    version: '1.0'
+  At::Protocol::Firehose:
+    file: lib/At/Protocol/Firehose.pm
+    version: '1.0'
+  At::Protocol::Handle:
+    file: lib/At/Protocol/Handle.pm
+    version: '1.0'
+  At::Protocol::NSID:
+    file: lib/At/Protocol/NSID.pm
+    version: '1.0'
+  At::Protocol::Session:
+    file: lib/At/Protocol/Session.pm
+    version: '1.3'
+  At::Protocol::URI:
+    file: lib/At/Protocol/URI.pm
+    version: '1.0'
+  At::UserAgent:
+    file: lib/At/UserAgent.pm
+    version: '1.3'
+recommends:
+  CBOR::Free: '0'
+  InterPlanetary: '0'
+  Mojo::UserAgent: '0'
+requires:
+  Crypt::JWT: '0'
+  Crypt::PK::ECC: '0'
+  File::ShareDir::Tiny: '0'
+  IO::Socket::SSL: '1.42'
+  JSON::PP: '0'
+  MIME::Base64: '0'
+  Net::SSLeay: '1.49'
+  Path::Tiny: '0'
+  Time::Moment: '0'
+  URI: '0'
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/sanko/At.pm/issues
+  homepage: https://github.com/sanko/At.pm
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/sanko/At.pm.git
+version: '1.4'
+x_contributors:
+  - 'Akiomi Kamakura <akiomik@gmail.com>'
+  - 'Alberto Roura <mail@albertoroura.com>'
+  - 'Alice <81575558+aliceisjustplaying@users.noreply.github.com>'
+  - 'Alona Enraght-Moony <nixon.emoony@gmail.com>'
+  - 'Ansh <anshnanda10@gmail.com>'
+  - 'Arthur Pinheiro <arthurpinheiro@protonmail.com>'
+  - 'Christian De Angelis <christiandeange@gmail.com>'
+  - 'Connor Stack <sirconnorstack@gmail.com>'
+  - 'Cooper Edmunds <cooper6789@gmail.com>'
+  - 'Damien Tournoud <damien@platform.sh>'
+  - 'Daniel Holmgren <dtholmgren@gmail.com>'
+  - 'David Buchanan <d@vidbuchanan.co.uk>'
+  - 'David Wood <davidwood@aliyun.com>'
+  - 'Dean van Dugteren <31391056+deanpress@users.noreply.github.com>'
+  - 'Dimitris Apostolou <dimitris.apostolou@icloud.com>'
+  - 'Elijah <129013612+Evalprime@users.noreply.github.com>'
+  - 'Emily Liu <emilyliu7321@gmail.com>'
+  - 'Emily Liu <emilyliu732l@gmail.com>'
+  - 'Emma MB <emma@meredithblack.com>'
+  - 'Eric Bailey <git@esb.lol>'
+  - 'Feroz Salam <feroz@argh.in>'
+  - 'Foysal Ahamed <cfaion341@gmail.com>'
+  - 'Foysal Ahamed <foysal@blueskyweb.xyz>'
+  - 'Gabe <gabemeola@gmail.com>'
+  - 'Hailey <hailey@blueskyweb.xyz>'
+  - 'Hailey <me@haileyok.com>'
+  - 'Harlan T Wood <harlantwood@users.noreply.github.com>'
+  - 'Hwee-Boon Yar <hboon@motionobj.com>'
+  - 'Ilya Siamionau <ilya@marshal.dev>'
+  - 'Jaga Santagostino <jagasantagostino@gmail.com>'
+  - 'Jake Gold <52801504+Jacob2161@users.noreply.github.com>'
+  - 'Jake Gold <jake@blueskyweb.xyz>'
+  - 'James Garbutt <43081j@users.noreply.github.com>'
+  - 'Jay Graber <arcalinea@gmail.com>'
+  - 'Jeff Hodges <jeff@somethingsimilar.com>'
+  - 'Jerry Chen <jerry@apache.org>'
+  - 'Jess Porter <github@lolnerd.net>'
+  - 'Josh Soref <2119212+jsoref@users.noreply.github.com>'
+  - 'Kev 🐶 <kevslashnull@gmail.com>'
+  - 'Kim Hallberg <hallberg.kim@gmail.com>'
+  - 'Markus Amalthea Magnuson <markus@polyscopic.works>'
+  - 'Mary <148872143+mary-ext@users.noreply.github.com>'
+  - 'Matthieu Sieben <matthieu.sieben@gmail.com>'
+  - 'Matthieu Sieben <matthieusieben@users.noreply.github.com>'
+  - 'Max Graey <maxgraey@gmail.com>'
+  - 'Michał Gibowski <gibowski@gmail.com>'
+  - 'Miles Zimmerman <miles@zim.dev>'
+  - 'Mustafa Yafes Akbaş <62028911+yafesdot@users.noreply.github.com>'
+  - 'Patrick Linnane <patrick@linnane.io>'
+  - 'Patryk <Matrix89@users.noreply.github.com>'
+  - 'Paul Frazee <pfrazee@gmail.com>'
+  - 'Paul Lindner <lindner@inuus.com>'
+  - 'Pyrox <pyrox@pyrox.dev>'
+  - 'Roj <rojserbest@gmail.com>'
+  - 'Ryan Barrett <git@ryanb.org>'
+  - 'Ryan Barrett <github@ryanb.org>'
+  - 'Ryan Winchester <ryanwinchester@users.noreply.github.com>'
+  - 'S. Ota <1632335+susumuota@users.noreply.github.com>'
+  - 'Safa Safari <safasafari.ss@gmail.com>'
+  - 'Samuel Newman <mozzius@protonmail.com>'
+  - 'Shinya Kato / 加藤 真也 <contact@shinyakato.dev>'
+  - 'Shoshána Abigail <72781354+LilahTovMoon@users.noreply.github.com>'
+  - 'Takumi Fujiwara <jiftech.stlfy@gmail.com>'
+  - 'Wes Bos <wesbos@gmail.com>'
+  - 'Wes Todd <wes@wesleytodd.com>'
+  - 'Whyrusleeping <why@ipfs.io>'
+  - 'YOCKOW <YOCKOW@users.noreply.github.com>'
+  - 'Yoshihiro Sugi <sugi1982@gmail.com>'
+  - 'bnewbold <bnewbold@robocracy.org>'
+  - 'dan <dan.abramov@gmail.com>'
+  - 'devin ivy <devinivy@gmail.com>'
+  - 'dumbmoron <136796770+dumbmoron@users.noreply.github.com>'
+  - 'futur <me@futuristick.ca>'
+  - 'github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
+  - 'intrnl <intrnl28+github@gmail.com>'
+  - 'jimmylee <send@jimmy.email>'
+  - 'joev <105156480+j0ev@users.noreply.github.com>'
+  - 'mehdiMj <mehdi.is@live.com>'
+  - 'noriaki watanabe <nabeyang@gmail.com>'
+  - 'rafael <rafael@blueskyweb.xyz>'
+  - 'surfdude29 <149612116+surfdude29@users.noreply.github.com>'
+  - 'this.julio <julio.valerio2@live.lagcc.cuny.edu>'
+  - 'tsinghuacoder <tsinghuacoder@icloud.com>'
+  - 'zhuowei <zhuoweizhang@yahoo.com>'
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/**
+  - eg/debug_connection.pl
+  - eg/debug_dpop.pl
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

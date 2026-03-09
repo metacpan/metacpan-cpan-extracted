@@ -1,5 +1,6 @@
 CHANGES
 CONTRIBUTING.md
+Generic.xs
 lib/Module/Generic.pm
 lib/Module/Generic/Array.pm
 lib/Module/Generic/Array.pod
@@ -13,6 +14,8 @@ lib/Module/Generic/Exception.pm
 lib/Module/Generic/File.pm
 lib/Module/Generic/File/Cache.pm
 lib/Module/Generic/File/IO.pm
+lib/Module/Generic/File/magic.json
+lib/Module/Generic/File/Magic.pm
 lib/Module/Generic/File/Mmap.pm
 lib/Module/Generic/Finfo.pm
 lib/Module/Generic/Global.pm
@@ -44,6 +47,7 @@ MANIFEST
 META.yml
 README
 README.md
+scripts/gen_magic_json.pl
 scripts/startup.pl
 SIGNATURE			Public-key signature (added by MakeMaker)
 t/00.load.t
@@ -79,6 +83,7 @@ t/28.exception.t
 t/29.null.t
 t/30.modperl.t
 t/31.global.t
+t/32.file_magic.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t

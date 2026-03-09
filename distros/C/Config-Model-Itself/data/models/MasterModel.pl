@@ -58,8 +58,10 @@ return [
             std_id => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::SlaveZ',
+                cargo => {
+                    type => 'node',
+                    config_class_name => 'MasterModel::SlaveZ',
+                }
             },
             sub_slave => {
                 type              => 'node',
@@ -117,23 +119,21 @@ return [
         class_description => "Master description",
         level             => [ [qw/hash_a tree_macro int_v/] => 'important' ],
 
-        read_config => {
+        rw_config => {
             backend     => 'cds_file',
             config_dir  => 'conf_data',
             auto_create => 1,
-        },
-        write_config => [{
-            backend    => 'cds_file',
-            config_dir => 'conf_data',
             file       => 'mymaster.cds',
-        }],
+        },
 
         element => [
             std_id => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::SlaveZ',
+                cargo => {
+                    type => 'node',
+                    config_class_name => 'MasterModel::SlaveZ',
+                }
             },
             integer_with_warn_if => {
                 type        => 'leaf',
@@ -148,19 +148,23 @@ return [
             },
             [qw/lista listb/] => {
                 type       => 'list',
-                cargo_type => 'leaf',
-                cargo_args => { value_type => 'string' },
+                cargo => {
+                    type => 'leaf',
+                    value_type => 'string',
+                }
             },
             [qw/ac_list/] => {
                 type            => 'list',
-                cargo_type      => 'leaf',
                 auto_create_ids => 3,
-                cargo_args      => { value_type => 'string' },
+                cargo => {
+                    type => 'leaf',
+                    value_type => 'string'
+                },
             },
             "list_XLeds" => {
                 type       => 'list',
-                cargo_type => 'leaf',
-                cargo_args => {
+                cargo => {
+                    type => 'leaf',
                     value_type => 'integer',
                     min        => 1,
                     max        => 3
@@ -169,13 +173,17 @@ return [
             [qw/hash_a hash_b/] => {
                 type       => 'hash',
                 index_type => 'string',
-                cargo_type => 'leaf',
-                cargo_args => { value_type => 'string' },
+                cargo => {
+                    type => 'leaf',
+                    value_type => 'string'
+                },
             },
             olist => {
                 type              => 'list',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::SlaveZ',
+                cargo => {
+                    type => 'node',
+                    config_class_name => 'MasterModel::SlaveZ',
+                }
             },
             tree_macro => {
                 type       => 'leaf',

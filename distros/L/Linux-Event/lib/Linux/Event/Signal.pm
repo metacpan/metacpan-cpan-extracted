@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -208,92 +208,47 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Signal - signalfd integration for Linux::Event
+Linux::Event::Signal - signalfd adaptor for Linux::Event::Reactor
 
 =head1 SYNOPSIS
 
+<<<<<<< HEAD
+=======
   use v5.36;
   use Linux::Event;
 
-  my $loop = Linux::Event->new;
+  my $loop = Linux::Event->new( model => 'reactor' );
 
+  # Subscribe via the loop convenience method:
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
   my $sub = $loop->signal('INT', sub ($loop, $sig, $count, $data) {
     $loop->stop;
   });
 
-  $loop->run;
-
 =head1 DESCRIPTION
 
-This module provides Linux C<signalfd> integration for L<Linux::Event::Loop>.
-The loop exposes this via C<< $loop->signal(...) >>, but all implementation
-details live here to keep C<Loop.pm> small.
+C<Linux::Event::Signal> adapts signalfd-style signal delivery into the reactor
+loop. Most users access it through C<< $loop->signal(...) >> rather than
+constructing it directly.
 
-The semantics for this feature are frozen by the project's M2.1 signals
-contract:
+Signal subscriptions are loop primitives. They are not a general-purpose signal
+framework.
 
-=over 4
+=head1 CALLBACK ABI
 
-=item * One signalfd per loop (created lazily on first registration)
+Signal callbacks receive four arguments:
 
-=item * Single or multiple signals accepted at registration time
+  $cb->($loop, $signal_name, $count, $data)
 
-=item * One handler per signal; subsequent registration replaces
+C<$count> is the number of queued deliveries drained in the current dispatch.
 
-=item * Callback signature (strict): C<< ($loop, $sig, $count, $data) >>
+=head1 SUBSCRIPTIONS
 
-=item * No fan-out policy; users can implement fan-out themselves
-
-=item * Returned subscription handle supports idempotent C<cancel>
-
-=back
-
-=head1 METHODS
-
-=head2 new(loop => $loop)
-
-Create a signal adaptor bound to the given loop.
-
-=head2 signal($sig_or_list, $cb, %opt) -> $subscription
-
-Register one (or many) signals and associate them with a callback.
-
-C<$sig_or_list> may be:
-
-=over 4
-
-=item * a signal number
-
-=item * a signal name (C<'INT'>) or with prefix (C<'SIGINT'>)
-
-=item * an arrayref of the above
-
-=back
-
-Options:
-
-=over 4
-
-=item * C<data> - arbitrary user value passed as the final callback argument
-
-=back
-
-Returns a subscription handle object with a C<cancel> method.
+The returned subscription object supports C<cancel>.
 
 =head1 SEE ALSO
 
-L<Linux::Event::Loop>, L<Linux::FD>, L<signalfd(2)>
-
-=head1 VERSION
-
-This document describes Linux::Event::Signal version 0.006.
-
-=head1 AUTHOR
-
-Joshua S. Day
-
-=head1 LICENSE
-
-Same terms as Perl itself.
+L<Linux::Event::Reactor>,
+L<Linux::Event::Loop>
 
 =cut

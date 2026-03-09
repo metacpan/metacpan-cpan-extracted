@@ -1,6 +1,6 @@
 package IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::ServiceReference;
 # ABSTRACT: ServiceReference holds a reference to Service.legacy.k8s.io
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s name => Str;
@@ -26,7 +26,7 @@ IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::ServiceReference - Serv
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 name
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::MetricIdentifier;
 # ABSTRACT: MetricIdentifier defines the name and optionally selector for a metric
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Autoscaling::V2::MetricIdentifier - MetricIdentifier defines the n
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 name
 

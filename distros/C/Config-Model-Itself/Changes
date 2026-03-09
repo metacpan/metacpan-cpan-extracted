@@ -1,3 +1,8 @@
+2.027 2026-03-08
+
+  Misc:
+    * Depends on Config::Model::TkUI >= 1.381 (Closes #8)
+
 2.026 2026-03-06
 
   Misc:

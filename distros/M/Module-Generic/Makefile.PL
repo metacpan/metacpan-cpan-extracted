@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Config;
+use File::Spec;
 
 sub MY::distsignature
 {
@@ -20,6 +22,8 @@ my %WriteMakefileArgs = (
     VERSION_FROM        => 'lib/Module/Generic.pm',
     ABSTRACT_FROM       => 'lib/Module/Generic.pm',
     PL_FILES            => {},
+    LIBS                => [''],
+    INC                 => '',
     PREREQ_PM           => {
         'common::sense'         => 0,
         'overload'              => 0,
@@ -54,6 +58,7 @@ my %WriteMakefileArgs = (
         # 'File::MMagic::XS' => '0.09008',
         'File::MMagic'          => '1.30',
         'File::Spec'            => '3.73',
+        'File::Which'           => 0,
         # Core module
         'I18N::Langinfo'        => '0.17',
         'IO::Dir'               => '1.41',
@@ -96,6 +101,8 @@ my %WriteMakefileArgs = (
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 't/test_empty.csv t/test_out.csv' },
+    # scripts/ is included in the distribution for reference but not installed
+    EXE_FILES           => [],
     ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
@@ -112,6 +119,8 @@ my %WriteMakefileArgs = (
         },
     }) : ()),
 );
+
+_check_libmagic();
 
 # NOTE: Apache2 test units preparation
 # The rest below is for tests under Apache/modperl2
@@ -235,9 +244,25 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
         local $@;
         eval
         {
-            require Apache2::BuildConfig;
             require File::Spec;
+        };
+        if( $@ )
+        {
+            die( "You are missing somehow the core module File::Spec\n" );
+        }
+
+        eval
+        {
             require File::Which;
+        };
+        if( $@ )
+        {
+            die( "You are missing somehow the core module File::Which\n" );
+        }
+
+        eval
+        {
+            require Apache2::BuildConfig;
         };
         # perl -MApache2::BuildConfig -MData::Pretty -lE 'my $c=Apache2::BuildConfig->new; say Data::Pretty::dump($c)'
         if( !$@ )
@@ -247,9 +272,14 @@ if( !$@ && !$ENV{NO_MOD_PERL} )
             undef( $apxs ) unless( -e( $apxs ) );
             print( STDERR "Found apxs at $apxs\n" ) if( $MY_DEBUG );
         }
+        else
+        {
+            print( STDERR "Failed loading Apache2::BuildConfig: $@\n" ) if( $MY_DEBUG );
+        }
 
         if( !$apxs )
         {
+            print( STDERR "Trying to find apxs using File::Which...\n" ) if( $MY_DEBUG );
             local $@;
             eval
             {
@@ -435,4 +465,54 @@ WriteMakefile(%WriteMakefileArgs);
 sub clean_files
 {
     return( [@scripts] );
+}
+
+# For Module::Generic::File::Magic
+# No magic.h, no libmagic-dev required at build time.
+# libmagic.so.1 is optional — falls back to JSON / file(1).
+sub _check_libmagic
+{
+    my $cc     = $Config{cc};
+    my $tmpdir = File::Spec->tmpdir();
+    my $src    = File::Spec->catfile( $tmpdir, "probe_libmagic_$$.c" );
+    my $bin    = File::Spec->catfile( $tmpdir, "probe_libmagic_$$"   );
+
+    open( my $fh, '>', $src ) or return;
+    print $fh <<'END_C';
+#include <dlfcn.h>
+#include <stdio.h>
+int main(void)
+{
+    void* h = dlopen( "libmagic.so.1", RTLD_LAZY );
+    if( !h ) h = dlopen( "libmagic.so",      RTLD_LAZY );
+    if( !h ) h = dlopen( "libmagic.1.dylib", RTLD_LAZY );
+    if( !h ) h = dlopen( "libmagic.dylib",   RTLD_LAZY );
+    if( !h )
+    {
+        fprintf( stderr, "libmagic not found\n" );
+        return 1;
+    }
+    dlclose( h );
+    return 0;
+}
+END_C
+    close( $fh );
+
+    my $found = ( system( "$cc -o $bin $src -ldl 2>/dev/null" ) == 0 )
+             && ( system( "$bin 2>/dev/null" ) == 0 );
+    unlink( $src, $bin );
+
+    if( $found )
+    {
+        print "libmagic found — xs backend will be active at runtime.\n";
+    }
+    else
+    {
+        print "\n*** libmagic not found.\n";
+        print "*** The module will use the JSON / hardcoded / file(1) fallback backends.\n";
+        print "*** To enable the faster xs backend:\n";
+        print "***   Debian / Ubuntu   : sudo apt-get install libmagic1\n";
+        print "***   RPM-based systems : sudo yum install file-libs\n";
+        print "***   macOS (Homebrew)  : brew install libmagic\n\n";
+    }
 }

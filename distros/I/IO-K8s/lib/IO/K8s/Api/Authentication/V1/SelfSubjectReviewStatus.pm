@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::SelfSubjectReviewStatus;
 # ABSTRACT: SelfSubjectReviewStatus is filled by the kube-apiserver and sent back to a user.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s userInfo => 'Authentication::V1::UserInfo';
@@ -20,7 +20,7 @@ IO::K8s::Api::Authentication::V1::SelfSubjectReviewStatus - SelfSubjectReviewSta
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 userInfo
 

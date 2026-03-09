@@ -3,12 +3,14 @@
 #
 #  (C) Paul Evans, 2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::KQueue 0.02;
+package Future::IO::Impl::KQueue 0.03;
 
 use v5.20;
 use warnings;
 use base qw( Future::IO::ImplBase );
 use Future::IO qw( POLLIN POLLOUT POLLPRI POLLHUP POLLERR POLLNVAL );
+
+Future::IO::ImplBase->VERSION( '0.22' );
 
 use feature qw( postderef signatures );
 no warnings qw( experimental::postderef experimental::signatures );
@@ -60,31 +62,23 @@ readonly_struct Poller => [qw( events f )];
 my %pollers_by_refaddr;
 my @deferred_epipe;
 
-readonly_struct Alarm => [qw( time f )];
-my @alarms;
-
 my %waitpids_by_pid;
 
 my $kq;
 sub kqueue () { $kq //= IO::KQueue->new; }
 
-sub _tick ( $ )
+sub _new_future ( $ ) { return Future::IO::Impl::KQueue::_Future->new }
+
+sub _tick ( $class )
 {
    kqueue();
 
-   my $timeout = undef;
-   if( @alarms ) {
-      # These are sorted by time order, so head is soonest
-      $timeout = $alarms[0]->time - time();
-      $timeout = 0 if $timeout < 0;
-
-      # $timeout in msec
-      $timeout *= 1000;
-   }
+   my $timeout = $class->_timeout;
 
    $timeout = 0 if @deferred_epipe;
 
-   my @events = $kq->kevent( $timeout );
+   # $timeout in msec
+   my @events = $kq->kevent( defined $timeout ? $timeout * 1000 : undef );
 
    foreach my $e ( @events ) {
       my $filter = $e->[KQ_FILTER];
@@ -120,22 +114,24 @@ sub _tick ( $ )
             $kq->EV_SET( $e->[KQ_IDENT], EVFILT_WRITE, EV_DELETE );
          }
       }
-      elsif( $filter == EVFILT_PROC ) {
-         my $pid = $e->[KQ_IDENT];
-         my $wstatus = $e->[KQ_DATA];
+      elsif( $filter == EVFILT_SIGNAL ) {
+         my $signum = $e->[KQ_IDENT];
+         if( $signum == POSIX::SIGCHLD ) {
+            foreach my $pid ( keys %waitpids_by_pid ) {
+               next unless waitpid( $pid, POSIX::WNOHANG ) > 0;
+               my $wstatus = $?;
 
-         my $fs = delete $waitpids_by_pid{$pid};
-         $_->done( $wstatus ) for @$fs;
+               my $fs = delete $waitpids_by_pid{$pid};
+               $_->done( $wstatus ) for @$fs;
+            }
+         }
       }
       else {
          die "Oopsie event filter=$filter <@$e>";
       }
    }
 
-   my $now = time();
-   while( @alarms and $alarms[0]->time <= $now ) {
-      ( shift @alarms )->f->done;
-   }
+   $class->_manage_timers;
 
    if( @deferred_epipe ) {
       my @f = @deferred_epipe; @deferred_epipe = ();
@@ -148,31 +144,7 @@ sub _tick ( $ )
 # We can't use KQueue's EVFILT_TIMER for sleep() and alarm() because timeout
 # values would have to be unique. It can't support multiple separate timers
 # with the exact same expiry time :(
-
-sub alarm ( $class, $time )
-{
-   my $f = Future::IO::Impl::KQueue::_Future->new;
-
-   # TODO: Binary search
-   my $idx = 0;
-   $idx++ while $idx < @alarms and $alarms[$idx]->time < $time;
-
-   splice @alarms, $idx, 0, Alarm( $time, $f );
-
-   $f->on_cancel( sub ( $self ) {
-      my $idx = 0;
-      $idx++ while $idx < @alarms and $alarms[$idx]->f != $self;
-
-      splice @alarms, $idx, 1, ();
-   } );
-
-   return $f;
-}
-
-sub sleep ( $class, $secs )
-{
-   $class->alarm( time() + $secs );
-}
+# Instead we just use the timer queue supplied by Future::IO::ImplBase 0.22
 
 sub poll ( $, $fh, $events )
 {
@@ -229,30 +201,38 @@ sub poll ( $, $fh, $events )
    return $f;
 }
 
+# We can't use IO::KQueue's EVFILT_PROC here because of a small bug. KQueue.xs
+# defines the `fflags` field as u_short rather than u_int, which means it
+# truncates the `NOTE_EXIT` flag which we'd need to have access to.
+# I would report that upstream, but the repo is currently marked readonly and
+# seems abandoned. :(
+#
+# For now we'll just use the usual SIGCHLD wrapper trick from Ppoll.
+
+my $captured_sigchld;
+
 sub waitpid ( $, $pid )
 {
-   kqueue();
+   unless( $captured_sigchld ) {
+      $SIG{CHLD} and $SIG{CHLD} ne "IGNORE" and
+         warn "Future::IO::Impl::KQueue is replacing \$SIG{CHLD}";
+
+      kqueue();
+
+      $kq->EV_SET( POSIX::SIGCHLD, EVFILT_SIGNAL, EV_ADD );
+
+      $captured_sigchld = 1;
+   }
 
    my $f = Future::IO::Impl::KQueue::_Future->new;
 
-   push $waitpids_by_pid{$pid}->@*, $f;
-
-   my $got_esrch;
-   eval { $kq->EV_SET( $pid, EVFILT_PROC, EV_ADD, NOTE_EXIT ); 1 } or
-      ( $! == POSIX::ESRCH and ++$got_esrch ) or
-      die $@;
-
-   if( $got_esrch ) {
-      if( waitpid( $pid, POSIX::WNOHANG ) > 0 ) {
-         my $wstatus = $?;
-         $f->done( $wstatus );
-      }
-      else {
-         die "TODO: got ESRCH but wasn't able to waitpid";
-      }
+   if( waitpid( $pid, POSIX::WNOHANG ) > 0 ) {
+      my $wstatus = $?;
+      $f->done( $wstatus );
+      return $f;
    }
 
-   # TODO: on_cancel?
+   push $waitpids_by_pid{$pid}->@*, $f;
 
    return $f;
 }

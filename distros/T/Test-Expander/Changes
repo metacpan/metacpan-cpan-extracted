@@ -1,5 +1,8 @@
 Changelog for Test-Expander
 
+2.6.0 2026-03-08
+    - Support TDT (test driven testing).
+
 2.5.2 2026-02-28
     - Consider different file path delimiters in different operating systems during testing.
 

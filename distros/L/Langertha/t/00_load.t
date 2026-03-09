@@ -14,11 +14,15 @@ my @modules = qw(
   Langertha::Engine::AKI
   Langertha::Engine::AKIOpenAI
   Langertha::Engine::Anthropic
+  Langertha::Engine::AnthropicBase
   Langertha::Engine::Cerebras
   Langertha::Engine::DeepSeek
   Langertha::Engine::Gemini
   Langertha::Engine::Groq
   Langertha::Engine::LlamaCpp
+  Langertha::Engine::LMStudio
+  Langertha::Engine::LMStudioAnthropic
+  Langertha::Engine::LMStudioOpenAI
   Langertha::Engine::MiniMax
   Langertha::Engine::Mistral
   Langertha::Engine::NousResearch
@@ -32,6 +36,13 @@ my @modules = qw(
   Langertha::Engine::Whisper
   Langertha::Raider
   Langertha::Raider::Result
+  Langertha::Result
+  Langertha::RunContext
+  Langertha::Role::Runnable
+  Langertha::Raid
+  Langertha::Raid::Sequential
+  Langertha::Raid::Parallel
+  Langertha::Raid::Loop
   Langertha::Request::HTTP
   Langertha::Response
   Langertha::Role::Langfuse

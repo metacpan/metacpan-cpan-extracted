@@ -387,4 +387,16 @@ subtest codepointcmp => sub {
    is( secret($utf16)->span(encoding => 'UTF16LE') cmp $unicode, 0, 'utf16 cmp utf8' );
 };
 
+subtest clean_namespace => sub {
+   my $ns= \%Crypt::SecretBuffer::Span::;
+   my @public= qw(
+      append_to buf buffer can clone cmp consume_bom copy copy_to default_trim_regex encoding
+      ends_with last_error len length lim ltrim memcmp new parse parse_asn1_der_length
+      parse_base128be parse_base128le parse_lenprefixed pos rparse rtrim scan set_up_us_the_bom
+      starts_with subspan trim
+   );
+   is( [ grep /^[a-z]/ && $_ ne 'isa', sort keys %$ns ], \@public )
+      or diag explain $ns;
+};
+
 done_testing;

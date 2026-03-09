@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ConfigMapNodeConfigSource;
 # ABSTRACT: ConfigMapNodeConfigSource contains the information to reference a ConfigMap as a config source for the Node. This API is deprecated since 1.22: https://git.k8s.io/enhancements/keps/sig-node/281-dynamic-kubelet-configuration
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s kubeletConfigKey => Str, 'required';
@@ -32,7 +32,7 @@ IO::K8s::Api::Core::V1::ConfigMapNodeConfigSource - ConfigMapNodeConfigSource co
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 kubeletConfigKey
 

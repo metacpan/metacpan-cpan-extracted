@@ -3,10 +3,21 @@ use strict;
 use warnings;
 use Test::More;
 use YAML::PP;
+use JSON::PP ();
 
 use IO::K8s;
 
 my $k8s = IO::K8s->new;
+
+{
+    package My::BoolCRD;
+    use IO::K8s::APIObject
+        api_version     => 'example.com/v1',
+        resource_plural => 'boolcrds';
+
+    with 'IO::K8s::Role::Namespaced';
+    k8s spec => { Str => 1 };
+}
 
 subtest 'ConfigMap to_yaml' => sub {
     my $cm = $k8s->new_object('ConfigMap', {
@@ -92,6 +103,26 @@ subtest 'TO_YAML vs to_yaml' => sub {
     my $TO_YAML = $cm->TO_YAML;
 
     is $to_yaml, $TO_YAML, 'to_yaml and TO_YAML return same content';
+};
+
+subtest 'CRD to_yaml handles JSON booleans in passthrough spec hash' => sub {
+    require IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta;
+
+    my $obj = My::BoolCRD->new(
+        metadata => IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::ObjectMeta->new(
+            name => 'bool-crd',
+            namespace => 'default',
+        ),
+        spec => {
+            enabled => JSON::PP::true,
+            tls     => JSON::PP::false,
+        },
+    );
+
+    my $yaml = $obj->to_yaml;
+    ok $yaml, 'to_yaml returns content';
+    like $yaml, qr/enabled:\s*true/, 'boolean true serialized';
+    like $yaml, qr/tls:\s*false/, 'boolean false serialized';
 };
 
 done_testing;

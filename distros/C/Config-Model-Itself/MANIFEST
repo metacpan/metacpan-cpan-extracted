@@ -60,6 +60,8 @@ t/itself_snippet.t
 t/list_itself_structure.t
 t/load_write_itself.t
 t/meta-class.t
+t/perl-critic.t
+t/perlcriticrc
 t/pod.t
 t/pod_gen.t
 weaver.ini

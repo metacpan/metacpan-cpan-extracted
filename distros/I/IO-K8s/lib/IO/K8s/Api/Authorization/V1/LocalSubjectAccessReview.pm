@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::LocalSubjectAccessReview;
 # ABSTRACT: LocalSubjectAccessReview checks whether or not a user or group can perform an action in a given namespace. Having a namespace scoped resource makes it much easier to grant namespace scoped policy that includes permissions checking.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Authorization::V1::LocalSubjectAccessReview - LocalSubjectAccessRe
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

@@ -1,10 +1,10 @@
 package Langertha::Engine::MiniMax;
 # ABSTRACT: MiniMax API (Anthropic-compatible)
-our $VERSION = '0.304';
+our $VERSION = '0.305';
 use Moose;
 use Carp qw( croak );
 
-extends 'Langertha::Engine::Anthropic';
+extends 'Langertha::Engine::AnthropicBase';
 
 with 'Langertha::Role::StaticModels';
 
@@ -49,7 +49,7 @@ Langertha::Engine::MiniMax - MiniMax API (Anthropic-compatible)
 
 =head1 VERSION
 
-version 0.304
+version 0.305
 
 =head1 SYNOPSIS
 
@@ -116,7 +116,7 @@ C<LANGERTHA_MINIMAX_API_KEY> in your environment.
 
 =item * L<https://platform.minimax.io/docs/api-reference/text-anthropic-api> - MiniMax Anthropic API docs
 
-=item * L<Langertha::Engine::Anthropic> - Base Anthropic engine
+=item * L<Langertha::Engine::AnthropicBase> - Base Anthropic-compatible engine
 
 =item * L<Langertha::Role::Tools> - MCP tool calling interface
 

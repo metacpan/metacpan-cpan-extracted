@@ -89,12 +89,13 @@
             "Mojo::UserAgent" : "0"
          },
          "requires" : {
-            "At" : "0.19",
+            "At" : "0",
             "HTTP::Tiny" : "0",
             "Mozilla::CA" : "0",
             "Path::Tiny" : "0",
             "URI" : "0",
-            "perl" : "v5.40.0"
+            "URI::QueryParam" : "0",
+            "perl" : "v5.42.0"
          }
       },
       "test" : {
@@ -106,7 +107,7 @@
    "provides" : {
       "Bluesky" : {
          "file" : "lib/Bluesky.pm",
-         "version" : "0.20"
+         "version" : "1.00"
       }
    },
    "release_status" : "stable",
@@ -124,10 +125,13 @@
          "web" : "https://github.com/sanko/Bluesky.pm"
       }
    },
-   "version" : "0.20",
+   "version" : "1.00",
    "x_ignore" : [
       "github",
       ".gitignore",
-      ".tidyallrc"
+      ".tidyallrc",
+      ".clang-format",
+      ".github/**",
+      "session.json"
    ]
 }

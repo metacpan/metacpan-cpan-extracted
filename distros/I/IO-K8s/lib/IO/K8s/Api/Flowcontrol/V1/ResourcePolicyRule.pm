@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1::ResourcePolicyRule;
 # ABSTRACT: ResourcePolicyRule is a predicate that matches some resource requests, testing the request's verb and the target resource. A ResourcePolicyRule matches a resource request if and only if: (a) at least one member of verbs matches the request, (b) at least one member of apiGroups matches the request, (c) at least one member of resources matches the request, and (d) either (d1) the request does not specify a namespace (i.e., `Namespace==""`) and clusterScope is true or (d2) the request specifies a namespace and least one member of namespaces matches the request's namespace.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s apiGroups => [Str], 'required';
@@ -32,7 +32,7 @@ IO::K8s::Api::Flowcontrol::V1::ResourcePolicyRule - ResourcePolicyRule is a pred
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 apiGroups
 

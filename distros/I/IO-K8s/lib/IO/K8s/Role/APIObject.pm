@@ -1,6 +1,6 @@
 package IO::K8s::Role::APIObject;
 # ABSTRACT: Role for top-level Kubernetes API objects
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use Moo::Role;
 use Types::Standard qw( InstanceOf Maybe );
 use Scalar::Util qw(blessed);
@@ -344,7 +344,7 @@ IO::K8s::Role::APIObject - Role for top-level Kubernetes API objects
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 metadata
 

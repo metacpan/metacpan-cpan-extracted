@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Condition;
 # ABSTRACT: Condition contains details for one aspect of the current state of this API Resource.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time, 'required';
@@ -35,7 +35,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::Condition - Condition contains detai
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 lastTransitionTime
 

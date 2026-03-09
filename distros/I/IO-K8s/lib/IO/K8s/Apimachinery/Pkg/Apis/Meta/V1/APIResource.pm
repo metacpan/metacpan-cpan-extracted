@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResource;
 # ABSTRACT: APIResource specifies the name of a resource and whether it is namespaced.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s categories => [Str];
@@ -47,7 +47,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIResource - APIResource specifies 
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 categories
 

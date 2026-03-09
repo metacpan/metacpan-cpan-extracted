@@ -4,24 +4,24 @@ use strict ;
 use warnings;
 use bytes;
 
-use IO::Compress::Base::Common  2.217 qw(:Status );
-use IO::Compress::RawDeflate 2.217 ();
-use IO::Compress::Adapter::Deflate 2.217 ;
-use IO::Compress::Adapter::Identity 2.217 ;
-use IO::Compress::Zlib::Extra 2.217 ;
-use IO::Compress::Zip::Constants 2.217 ;
+use IO::Compress::Base::Common  2.218 qw(:Status );
+use IO::Compress::RawDeflate 2.218 ();
+use IO::Compress::Adapter::Deflate 2.218 ;
+use IO::Compress::Adapter::Identity 2.218 ;
+use IO::Compress::Zlib::Extra 2.218 ;
+use IO::Compress::Zip::Constants 2.218 ;
 
 use File::Spec();
 use Config;
 
-use Compress::Raw::Zlib  2.217 ();
+use Compress::Raw::Zlib  2.218 ();
 
 BEGIN
 {
     eval { require IO::Compress::Adapter::Bzip2 ;
-           IO::Compress::Adapter::Bzip2->VERSION( 2.217 );
+           IO::Compress::Adapter::Bzip2->VERSION( 2.218 );
            require IO::Compress::Bzip2 ;
-           IO::Compress::Bzip2->VERSION( 2.217 );
+           IO::Compress::Bzip2->VERSION( 2.218 );
          } ;
 
     eval { require IO::Compress::Adapter::Lzma ;
@@ -47,7 +47,7 @@ require Exporter ;
 
 our ($VERSION, @ISA, @EXPORT_OK, %EXPORT_TAGS, %DEFLATE_CONSTANTS, $ZipError);
 
-$VERSION = '2.217';
+$VERSION = '2.218';
 $ZipError = '';
 
 @ISA = qw(IO::Compress::RawDeflate Exporter);

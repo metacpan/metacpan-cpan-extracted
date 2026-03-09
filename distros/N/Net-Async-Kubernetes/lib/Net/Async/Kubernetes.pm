@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes;
 # ABSTRACT: Async Kubernetes client for IO::Async
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -10,12 +10,14 @@ use Scalar::Util qw(blessed);
 use IO::Socket::SSL;
 use Future;
 use URI;
+use Protocol::WebSocket::Request;
 use Kubernetes::REST;
 use Kubernetes::REST::Server;
 use Kubernetes::REST::AuthToken;
 use Kubernetes::REST::HTTPRequest;
 use Kubernetes::REST::HTTPResponse;
 use Kubernetes::REST::WatchEvent;
+use Kubernetes::REST::LogEvent;
 
 sub configure {
     my ($self, %params) = @_;
@@ -335,6 +337,218 @@ sub delete {
 }
 
 
+sub log {
+    my ($self, $short_class, @rest_args) = @_;
+
+    my $rest = $self->_rest;
+    my %args;
+
+    # Support: log('Pod', 'name', ...) and log('Pod', name => 'name', ...)
+    if (@rest_args >= 1
+        && !ref($rest_args[0])
+        && $rest_args[0] !~ /^(name|namespace|container|follow|tailLines|sinceSeconds|sinceTime|timestamps|previous|limitBytes|on_line)$/
+    ) {
+        $args{name} = shift @rest_args;
+        return Future->fail("Invalid arguments to log()") if @rest_args % 2;
+        %args = (%args, @rest_args);
+    } elsif (@rest_args % 2 == 0) {
+        %args = @rest_args;
+    } else {
+        return Future->fail("Invalid arguments to log()");
+    }
+
+    return Future->fail("name required for log") unless $args{name};
+
+    my $on_line       = delete $args{on_line};
+    my $container     = delete $args{container};
+    my $follow        = delete $args{follow};
+    my $tail_lines    = delete $args{tailLines};
+    my $since_seconds = delete $args{sinceSeconds};
+    my $since_time    = delete $args{sinceTime};
+    my $timestamps    = delete $args{timestamps};
+    my $previous      = delete $args{previous};
+    my $limit_bytes   = delete $args{limitBytes};
+
+    my $class = $rest->expand_class($short_class);
+    my $path = $rest->build_path($class, %args) . '/log';
+
+    my %params;
+    $params{container}    = $container     if defined $container;
+    $params{follow}       = 'true'         if $follow;
+    $params{tailLines}    = $tail_lines    if defined $tail_lines;
+    $params{sinceSeconds} = $since_seconds if defined $since_seconds;
+    $params{sinceTime}    = $since_time    if defined $since_time;
+    $params{timestamps}   = 'true'         if $timestamps;
+    $params{previous}     = 'true'         if $previous;
+    $params{limitBytes}   = $limit_bytes   if defined $limit_bytes;
+
+    if ($on_line) {
+        my $req = $rest->prepare_request('GET', $path, parameters => \%params);
+        my $buffer = '';
+
+        return $self->_do_streaming_request($req, sub {
+            my ($chunk) = @_;
+            for my $event ($rest->process_log_chunk(\$buffer, $chunk)) {
+                $on_line->($event);
+            }
+        })->then(sub {
+            my ($response) = @_;
+            $rest->check_response($response, "log $short_class");
+            if (length $buffer) {
+                $on_line->(Kubernetes::REST::LogEvent->new(line => $buffer));
+            }
+            return Future->done(undef);
+        });
+    }
+
+    my $req = $rest->prepare_request('GET', $path,
+        %params ? (parameters => \%params) : (),
+    );
+    return $self->_do_request($req)->then(sub {
+        my ($response) = @_;
+        $rest->check_response($response, "log $short_class");
+        return Future->done($response->content);
+    });
+}
+
+
+sub port_forward {
+    my ($self, $short_class, @rest_args) = @_;
+
+    my $rest = $self->_rest;
+    my %args;
+
+    # Support: port_forward('Pod', 'name', ...) and port_forward('Pod', name => 'name', ...)
+    if (@rest_args >= 1
+        && !ref($rest_args[0])
+        && $rest_args[0] !~ /^(name|namespace|ports|subprotocol|on_open|on_frame|on_close|on_error)$/
+    ) {
+        $args{name} = shift @rest_args;
+        return Future->fail("Invalid arguments to port_forward()") if @rest_args % 2;
+        %args = (%args, @rest_args);
+    } elsif (@rest_args % 2 == 0) {
+        %args = @rest_args;
+    } else {
+        return Future->fail("Invalid arguments to port_forward()");
+    }
+
+    return Future->fail("name required for port_forward") unless $args{name};
+
+    my $ports = delete $args{ports};
+    return Future->fail("ports required for port_forward") unless defined $ports;
+    $ports = [$ports] unless ref($ports) eq 'ARRAY';
+    return Future->fail("ports required for port_forward") unless @$ports;
+    for my $p (@$ports) {
+        return Future->fail("invalid port '$p' for port_forward")
+            unless defined($p) && $p =~ /^\d+$/ && $p > 0 && $p <= 65535;
+    }
+
+    my $subprotocol = delete $args{subprotocol} // 'v4.channel.k8s.io';
+    my $on_open  = delete $args{on_open};
+    my $on_frame = delete $args{on_frame};
+    my $on_close = delete $args{on_close};
+    my $on_error = delete $args{on_error};
+
+    my $class = $rest->expand_class($short_class);
+    my $path = $rest->build_path($class, %args) . '/portforward';
+
+    # Keep compatibility with Kubernetes::REST >= 1.100 by expanding repeated
+    # ports query params here instead of relying on arrayref parameter support.
+    my $query = join('&', map { "ports=$_" } @$ports);
+    my $path_with_query = $query ? "$path?$query" : $path;
+
+    my $req = $rest->prepare_request('GET', $path_with_query,
+        headers    => {
+            Accept                   => '*/*',
+            Connection               => 'Upgrade',
+            Upgrade                  => 'websocket',
+            'Sec-WebSocket-Protocol' => $subprotocol,
+        },
+    );
+
+    return $self->_do_duplex_request($req,
+        on_open  => $on_open,
+        on_frame => $on_frame,
+        on_close => $on_close,
+        on_error => $on_error,
+    );
+}
+
+
+sub exec {
+    my ($self, $short_class, @rest_args) = @_;
+
+    my $rest = $self->_rest;
+    my %args;
+
+    # Support: exec('Pod', 'name', ...) and exec('Pod', name => 'name', ...)
+    if (@rest_args >= 1
+        && !ref($rest_args[0])
+        && $rest_args[0] !~ /^(name|namespace|command|container|stdin|stdout|stderr|tty|subprotocol|on_open|on_frame|on_close|on_error)$/
+    ) {
+        $args{name} = shift @rest_args;
+        return Future->fail("Invalid arguments to exec()") if @rest_args % 2;
+        %args = (%args, @rest_args);
+    } elsif (@rest_args % 2 == 0) {
+        %args = @rest_args;
+    } else {
+        return Future->fail("Invalid arguments to exec()");
+    }
+
+    return Future->fail("name required for exec") unless $args{name};
+
+    my $command = delete $args{command};
+    return Future->fail("command required for exec") unless defined $command;
+    $command = [$command] unless ref($command) eq 'ARRAY';
+    return Future->fail("command required for exec") unless @$command;
+    for my $part (@$command) {
+        return Future->fail("invalid command element for exec")
+            unless defined($part) && !ref($part) && length $part;
+    }
+
+    my $container = delete $args{container};
+    my $stdin  = delete($args{stdin})  ? 1 : 0;
+    my $stdout = exists($args{stdout}) ? (delete($args{stdout}) ? 1 : 0) : 1;
+    my $stderr = exists($args{stderr}) ? (delete($args{stderr}) ? 1 : 0) : 1;
+    my $tty    = delete($args{tty})    ? 1 : 0;
+
+    my $subprotocol = delete $args{subprotocol} // 'v4.channel.k8s.io';
+    my $on_open  = delete $args{on_open};
+    my $on_frame = delete $args{on_frame};
+    my $on_close = delete $args{on_close};
+    my $on_error = delete $args{on_error};
+
+    my $class = $rest->expand_class($short_class);
+    my $path = $rest->build_path($class, %args) . '/exec';
+
+    my %params = (
+        command => $command,
+        stdin   => $stdin  ? 'true' : 'false',
+        stdout  => $stdout ? 'true' : 'false',
+        stderr  => $stderr ? 'true' : 'false',
+        tty     => $tty    ? 'true' : 'false',
+    );
+    $params{container} = $container if defined $container;
+
+    my $req = $rest->prepare_request('GET', $path,
+        parameters => \%params,
+        headers    => {
+            Accept                   => '*/*',
+            Connection               => 'Upgrade',
+            Upgrade                  => 'websocket',
+            'Sec-WebSocket-Protocol' => $subprotocol,
+        },
+    );
+
+    return $self->_do_duplex_request($req,
+        on_open  => $on_open,
+        on_frame => $on_frame,
+        on_close => $on_close,
+        on_error => $on_error,
+    );
+}
+
+
 # ============================================================================
 # WATCHER FACTORY
 # ============================================================================
@@ -413,6 +627,209 @@ sub _do_streaming_request {
     });
 }
 
+sub _do_duplex_request {
+    my ($self, $req, %callbacks) = @_;
+    my $loop = eval { $self->loop };
+    return Future->fail("port_forward requires Net::Async::Kubernetes to be added to an IO::Async::Loop")
+        unless $loop;
+
+    my $on_open  = $callbacks{on_open};
+    my $on_frame = $callbacks{on_frame};
+    my $on_close = $callbacks{on_close};
+    my $on_error = $callbacks{on_error};
+
+    my $ws_url = $self->_build_websocket_url($req->url);
+    my $ws_req = $self->_build_websocket_request($req);
+
+    my $client;
+    my $session;
+    my $close_notified = 0;
+
+    my $detach_client = sub {
+        return unless $client;
+        return unless $client->can('parent');
+        return unless $client->parent && $client->parent == $self;
+        $self->remove_child($client);
+    };
+
+    my $notify_error = sub {
+        my ($err) = @_;
+        return unless ref($on_error) eq 'CODE';
+        my $ok = eval { $on_error->($err); 1 };
+        return if $ok;
+        warn $@;
+    };
+
+    my $notify_close = sub {
+        return if $close_notified++;
+        if (ref($on_close) eq 'CODE') {
+            my $ok = eval { $on_close->(@_); 1 };
+            $notify_error->($@) unless $ok;
+        }
+        $detach_client->();
+    };
+
+    my $dispatch_frame = sub {
+        my ($bytes) = @_;
+        return unless ref($on_frame) eq 'CODE';
+        return unless defined $bytes;
+        return unless length $bytes;
+
+        my $channel = ord(substr($bytes, 0, 1));
+        my $payload = substr($bytes, 1);
+        my $ok = eval { $on_frame->($channel, $payload); 1 };
+        $notify_error->($@) unless $ok;
+    };
+
+    $client = $self->_make_websocket_client(
+        on_binary_frame => sub {
+            my (undef, $bytes) = @_;
+            $dispatch_frame->($bytes);
+        },
+        on_text_frame => sub {
+            my (undef, $text) = @_;
+            return unless defined $text;
+            my $bytes = $text;
+            utf8::encode($bytes) if utf8::is_utf8($bytes);
+            $dispatch_frame->($bytes);
+        },
+        on_close_frame => sub {
+            my (undef, $payload) = @_;
+            $notify_close->($payload);
+        },
+        on_read_error => sub {
+            my (undef, $errno, $msg) = @_;
+            my $err = defined $msg && length $msg ? $msg : ($errno // 'websocket read error');
+            $notify_error->($err);
+        },
+        on_write_error => sub {
+            my (undef, $errno, $msg) = @_;
+            my $err = defined $msg && length $msg ? $msg : ($errno // 'websocket write error');
+            $notify_error->($err);
+        },
+        on_closed => sub {
+            $notify_close->();
+        },
+    );
+
+    $self->add_child($client);
+
+    return $client->connect(
+        url => $ws_url,
+        req => $ws_req,
+        $self->_ssl_options,
+    )->then(sub {
+        $session = Net::Async::Kubernetes::PortForwardSession->new(
+            ws_client => $client,
+        );
+
+        if (ref($on_open) eq 'CODE') {
+            my $ok = eval { $on_open->($session); 1 };
+            $notify_error->($@) unless $ok;
+        }
+
+        return Future->done($session);
+    })->else(sub {
+        my ($error) = @_;
+        $notify_error->($error);
+        $detach_client->();
+        return Future->fail($error);
+    });
+}
+
+sub _build_websocket_url {
+    my ($self, $url) = @_;
+    $url =~ s/^https:/wss:/i;
+    $url =~ s/^http:/ws:/i;
+    return $url;
+}
+
+sub _build_websocket_request {
+    my ($self, $req) = @_;
+    my $headers = $req->headers || {};
+
+    my @extra_headers;
+    my $subprotocol;
+
+    for my $name (keys %$headers) {
+        my $value = $headers->{$name};
+        next unless defined $value;
+
+        my $lc = lc($name);
+        if ($lc eq 'sec-websocket-protocol') {
+            $subprotocol = $value;
+            next;
+        }
+        next if $lc eq 'connection';
+        next if $lc eq 'upgrade';
+        next if $lc eq 'host';
+        next if $lc eq 'sec-websocket-key';
+        next if $lc eq 'sec-websocket-version';
+
+        push @extra_headers, $name, $value;
+    }
+
+    return Protocol::WebSocket::Request->new(
+        headers => \@extra_headers,
+        (defined $subprotocol ? (subprotocol => $subprotocol) : ()),
+    );
+}
+
+sub _make_websocket_client {
+    my ($self, %args) = @_;
+    require Net::Async::WebSocket::Client;
+    return Net::Async::WebSocket::Client->new(%args);
+}
+
+package Net::Async::Kubernetes::PortForwardSession;
+
+use strict;
+use warnings;
+use Carp qw(croak);
+
+sub new {
+    my ($class, %args) = @_;
+    croak "ws_client required" unless $args{ws_client};
+    return bless \%args, $class;
+}
+
+sub ws_client { $_[0]->{ws_client} }
+
+sub write_channel {
+    my ($self, $channel, $payload) = @_;
+
+    croak "channel required for write_channel" unless defined $channel;
+    croak "invalid channel '$channel' for write_channel"
+        unless $channel =~ /^\d+$/ && $channel >= 0 && $channel <= 255;
+
+    $payload = '' unless defined $payload;
+    croak "payload must be a plain string for write_channel" if ref($payload);
+
+    return $self->ws_client->send_binary_frame(chr($channel) . $payload);
+}
+
+{
+    no warnings 'once';
+    *write = \&write_channel;
+}
+
+sub close {
+    my ($self, %args) = @_;
+    my $code = $args{code};
+    my $payload = exists $args{payload} ? $args{payload} : '';
+
+    croak "payload must be a plain string for close" if ref($payload);
+    croak "invalid websocket close code '$code'"
+        if defined($code) && ($code !~ /^\d+$/ || $code < 1000 || $code > 4999);
+
+    my $close_payload = defined($code) ? pack('n', $code) . $payload : $payload;
+    my $ret = $self->ws_client->send_close_frame($close_payload);
+    $self->ws_client->close_when_empty if $self->ws_client->can('close_when_empty');
+    return $ret;
+}
+
+package Net::Async::Kubernetes;
+
 1;
 
 __END__
@@ -427,7 +844,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -465,6 +882,36 @@ version 0.005
 
     $kube->delete('Pod', 'nginx', namespace => 'default')->get;
 
+    # Pod logs (one-shot)
+    my $text = $kube->log('Pod', 'nginx',
+        namespace => 'default',
+        tailLines => 100,
+    )->get;
+
+    # Pod logs (streaming)
+    $kube->log('Pod', 'nginx',
+        namespace => 'default',
+        follow    => 1,
+        on_line   => sub { my ($event) = @_; say $event->line },
+    )->get;
+
+    # Port-forward (built-in websocket duplex support)
+    my $pf = $kube->port_forward('Pod', 'nginx',
+        namespace => 'default',
+        ports     => [8080],
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    )->get;
+
+    $pf->write_channel(0, "GET / HTTP/1.1\r\n\r\n");
+    $pf->close(code => 1000);
+
+    # Pod exec (websocket duplex)
+    my $exec = $kube->exec('Pod', 'nginx',
+        namespace => 'default',
+        command   => ['sh', '-c', 'id'],
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    )->get;
+
     # Watcher with auto-reconnect
     my $watcher = $kube->watcher('Pod',
         namespace   => 'default',
@@ -479,9 +926,11 @@ version 0.005
 
 C<Net::Async::Kubernetes> is an async Kubernetes client built on L<IO::Async>.
 It extends L<IO::Async::Notifier> and uses L<Net::Async::HTTP> for
-non-blocking HTTP communication.
+non-blocking HTTP communication, plus L<Net::Async::WebSocket::Client> for
+duplex subresources like pod port-forward.
 
-All CRUD methods return L<Future> objects. The L<Net::Async::Kubernetes::Watcher>
+All CRUD, log, port-forward, and exec methods return L<Future> objects. The
+L<Net::Async::Kubernetes::Watcher>
 provides auto-reconnecting event streaming with separate callbacks per
 event type.
 
@@ -682,6 +1131,72 @@ Arguments:
 
 =back
 
+=head2 log
+
+    # One-shot mode (Future resolves to full text)
+    my $text = $kube->log('Pod', 'my-pod',
+        namespace => 'default',
+        tailLines => 100,
+    )->get;
+
+    # Streaming mode (Future resolves when stream ends)
+    $kube->log('Pod', 'my-pod',
+        namespace => 'default',
+        follow    => 1,
+        on_line   => sub {
+            my ($event) = @_;  # Kubernetes::REST::LogEvent
+            say $event->line;
+        },
+    )->get;
+
+Retrieve logs from a pod.
+
+Without C<on_line>, returns a L<Future> that resolves to the full log text.
+
+With C<on_line>, opens a streaming request and invokes the callback once per
+line with L<Kubernetes::REST::LogEvent> objects. The returned L<Future>
+resolves when the stream ends.
+
+=head2 port_forward
+
+    my $f = $kube->port_forward('Pod', 'my-pod',
+        namespace => 'default',
+        ports     => [8080, 8443],
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    );
+    my $session = $f->get;
+
+Create an async pod port-forward session request.
+
+Returns a L<Future> that resolves to the duplex session object returned by the
+transport backend. The default transport returns a
+L<Net::Async::Kubernetes::PortForwardSession> object.
+
+C<on_open> receives the created session object.
+
+C<on_frame> receives C<($channel, $payload)> where the first byte of each
+binary websocket frame is decoded as Kubernetes channel id.
+
+=head2 exec
+
+    my $f = $kube->exec('Pod', 'my-pod',
+        namespace => 'default',
+        command   => ['sh', '-c', 'id'],
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    );
+    my $session = $f->get;
+
+Create an async pod exec session request.
+
+Returns a L<Future> that resolves to the duplex session object returned by the
+transport backend. The default transport returns a
+L<Net::Async::Kubernetes::PortForwardSession> object.
+
+C<on_open> receives the created session object.
+
+C<on_frame> receives C<($channel, $payload)> where the first byte of each
+binary websocket frame is decoded as Kubernetes channel id.
+
 =head2 watcher
 
     my $watcher = $kube->watcher('Pod',
@@ -717,7 +1232,7 @@ Net::Async::Kubernetes - Async Kubernetes client for IO::Async
 =head1 SEE ALSO
 
 L<Net::Async::Kubernetes::Watcher>, L<Kubernetes::REST>, L<IO::Async>,
-L<IO::K8s>
+L<IO::K8s>, L<Net::Async::WebSocket::Client>
 
 =head1 SUPPORT
 
@@ -740,10 +1255,9 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software, licensed under:
-
-  The Apache License, Version 2.0, January 2004
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

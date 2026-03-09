@@ -3756,7 +3756,13 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
             break;
 
         case OP_COND_EXPR:
+            /* OP_COND_EXPR is the only op where we have to propagate
+             * context to *both* branches. Recurse on the first branch,
+             * then iterate on the second branch.
+             */
             o = OpSIBLING(cUNOPo->op_first);
+            doref(o, type, set_op_ref);
+            o = OpSIBLING(o);
             continue;
 
         case OP_RV2SV:
@@ -3829,22 +3835,12 @@ Perl_doref(pTHX_ OP *o, I32 type, bool set_op_ref)
             break;
         } /* switch */
 
-        while (1) {
-            if (o == top_op)
-                return scalar(top_op); /* at top; no parents/siblings to try */
-            if (OpHAS_SIBLING(o)) {
-                o = o->op_sibparent;
-                /* Normally skip all siblings and go straight to the parent;
-                 * the only op that requires two children to be processed
-                 * is OP_COND_EXPR */
-                if (!OpHAS_SIBLING(o)
-                        && o->op_sibparent->op_type == OP_COND_EXPR)
-                    break;
-                continue;
-            }
-            o = o->op_sibparent; /* try parent's next sibling */
-        }
+        /* whole tree has been scanned for ref stuff; now propagate
+         * scalar context */
+        return scalar(top_op);
+
     } /* while */
+
 }
 
 
@@ -8341,6 +8337,7 @@ Perl_utilize(pTHX_ int aver, I32 floor, OP *version, OP *idop, OP *arg)
         else {
             PL_hints &= ~HINT_ASCII_ENCODING;
         }
+        notify_parser_that_encoding_changed();
 
         PL_prevailing_version = shortver;
     }
@@ -9665,7 +9662,7 @@ S_op_is_cv_xsub(pTHX_ OP *o, XSUBADDR_t xsub)
         }
 
         case OP_PADCV:
-            cv = (CV *)PAD_SVl(o->op_targ);
+            cv = find_lexical_cv(o->op_targ);
             assert(cv && SvTYPE(cv) == SVt_PVCV);
             break;
 
@@ -9683,10 +9680,18 @@ S_op_is_cv_xsub(pTHX_ OP *o, XSUBADDR_t xsub)
 static bool
 S_op_is_call_to_cv_xsub(pTHX_ OP *o, XSUBADDR_t xsub)
 {
-    if(o->op_type != OP_ENTERSUB)
+    if (o->op_type != OP_ENTERSUB)
         return false;
 
-    OP *cvop = cLISTOPx(cUNOPo->op_first)->op_last;
+    /* entersub may be a UNOP, not a LISTOP, so we can't just use op_last */
+    OP *aop = cUNOPo->op_first;
+    if (!OpHAS_SIBLING(aop)) {
+        aop = cUNOPx(aop)->op_first;
+    }
+    aop = OpSIBLING(aop);
+    OP *cvop;
+    for (cvop = aop; OpHAS_SIBLING(cvop); cvop = OpSIBLING(cvop)) ;
+
     return op_is_cv_xsub(cvop, xsub);
 }
 

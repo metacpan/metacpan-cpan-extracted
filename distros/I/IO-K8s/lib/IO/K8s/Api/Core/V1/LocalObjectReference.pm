@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::LocalObjectReference;
 # ABSTRACT: LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s name => Str;
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::LocalObjectReference - LocalObjectReference contains eno
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 name
 

@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20260220';
+our $VERSION = '5.20260308';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -453,6 +453,7 @@ sub changes_between {
     5.043006 => '2025-12-20',
     5.043007 => '2026-01-19',
     5.043008 => '2026-02-20',
+    5.042001 => '2026-03-08',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -24482,6 +24483,18 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.042001 => {
+        delta_from => 5.042000,
+        changed => {
+            'B::Op_private'         => '5.042001',
+            'Config'                => '5.042001',
+            'Module::CoreList'      => '5.20260308',
+            'Module::CoreList::Utils'=> '5.20260308',
+            'POSIX'                 => '2.23_01',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -26205,6 +26218,13 @@ sub is_core
         removed => {
         }
     },
+    5.042001 => {
+        delta_from => 5.042,
+        changed => {
+        },
+        removed => {
+        }
+    },
 );
 
 %deprecated = _undelta(\%deprecated);
@@ -26616,7 +26636,6 @@ sub is_core
     'Test2::EventFacet::Trace'=> 'cpan',
     'Test2::Formatter'      => 'cpan',
     'Test2::Formatter::TAP' => 'cpan',
-    'Test2::Handle'         => 'cpan',
     'Test2::Hub'            => 'cpan',
     'Test2::Hub::Interceptor'=> 'cpan',
     'Test2::Hub::Interceptor::Terminator'=> 'cpan',
@@ -26713,9 +26732,6 @@ sub is_core
     'Test2::Util::Times'    => 'cpan',
     'Test2::Util::Trace'    => 'cpan',
     'Test2::V0'             => 'cpan',
-    'Test2::V1'             => 'cpan',
-    'Test2::V1::Base'       => 'cpan',
-    'Test2::V1::Handle'     => 'cpan',
     'Test2::Workflow'       => 'cpan',
     'Test2::Workflow::BlockBase'=> 'cpan',
     'Test2::Workflow::Build'=> 'cpan',
@@ -27183,7 +27199,6 @@ sub is_core
     'Test2::EventFacet::Trace'=> 'https://github.com/Test-More/test-more/issues',
     'Test2::Formatter'      => 'https://github.com/Test-More/test-more/issues',
     'Test2::Formatter::TAP' => 'https://github.com/Test-More/test-more/issues',
-    'Test2::Handle'         => 'https://github.com/Test-More/test-more/issues',
     'Test2::Hub'            => 'https://github.com/Test-More/test-more/issues',
     'Test2::Hub::Interceptor'=> 'https://github.com/Test-More/test-more/issues',
     'Test2::Hub::Interceptor::Terminator'=> 'https://github.com/Test-More/test-more/issues',
@@ -27280,9 +27295,6 @@ sub is_core
     'Test2::Util::Times'    => 'https://github.com/Test-More/test-more/issues',
     'Test2::Util::Trace'    => 'https://github.com/Test-More/test-more/issues',
     'Test2::V0'             => 'https://github.com/Test-More/test-more/issues',
-    'Test2::V1'             => 'https://github.com/Test-More/test-more/issues',
-    'Test2::V1::Base'       => 'https://github.com/Test-More/test-more/issues',
-    'Test2::V1::Handle'     => 'https://github.com/Test-More/test-more/issues',
     'Test2::Workflow'       => 'https://github.com/Test-More/test-more/issues',
     'Test2::Workflow::BlockBase'=> 'https://github.com/Test-More/test-more/issues',
     'Test2::Workflow::Build'=> 'https://github.com/Test-More/test-more/issues',

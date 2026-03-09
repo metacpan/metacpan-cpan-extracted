@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/TieHash.pm
-## Version v1.2.2
+## Version v1.2.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2023/12/05
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,10 +19,10 @@ BEGIN
     use vars qw( $VERSION $PAUSED $MOD_PERL );
     use Scalar::Util ();
     # When true _exclude returns always false.
-    # This is used by Module::Generic::_message, because Module::Generic is always part of
+    # This is used by Module::Generic::__message, because Module::Generic is always part of
     # the exclusion list
     our $PAUSED = 0;
-    our $VERSION = 'v1.2.2';
+    our $VERSION = 'v1.2.3';
     if( exists( $ENV{MOD_PERL} )
         &&
         ( $MOD_PERL = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
@@ -75,6 +75,7 @@ sub TIEHASH
         object_repo => {},
     };
     my $self = bless( $hash => ( ref( $this ) || $this ) );
+#     $self->__message( 1, "Debug value is '", ( $opts->{debug} // 0 ), "'" );
     return( $self );
 }
 
@@ -142,10 +143,13 @@ sub FETCH
     my $repo = $self->{object_repo};
     my $key  = shift( @_ );
     my $caller = caller;
+    # $self->__message( 0, "FETCH($caller)[owner calling, enable=$self->{enable}] for key '${key}' is caller ${caller} excluded ? ", ( $self->_exclude( $caller ) ? 'yes' : 'no' ), " and is object enabled ? ", ( $self->{enable} ? 'yes' : 'no' ) );
     # require Devel::StackTrace;
     # my $trace = Devel::StackTrace->new;
+    # $self->__message( 4, "Is caller '$caller' excluded ? ", ( $self->_exclude( $caller ) ? 'yes' : 'no' ), ". Trace is: $trace" );
     if( $self->_exclude( $caller ) || !$self->{enable} )
     {
+        # $self->__message( 4, "FETCH($caller)[owner calling, enable=$self->{enable}] <- '$key' <- '$self->{$key}'" );
         return( wantarray ? () : undef ) if( !CORE::exists( $self->{ $key } ) );
         return( $self->{ $key } )
     }
@@ -153,10 +157,13 @@ sub FETCH
     {
         if( ref( $key ) && $self->{key_object} )
         {
+            # $self->__message( 4, "fetching reference key '", overload::StrVal( $key ), "'" );
             return( $repo->{ Scalar::Util::refaddr( $key ) }->[1] );
         }
         else
         {
+            # $self->__message( 4, "fetching non-reference key '$key'" );
+            # $self->__message( 4, "Value '", ( $data->{ $key } // 'undef' ), "' looks like a number? ", ( Scalar::Util::looks_like_number( $data->{ $key } ) ? 'yes' : 'no' ) );
             return( wantarray ? () : undef ) if( !CORE::exists( $data->{ $key } ) );
             return( $data->{ $key } );
         }
@@ -189,6 +196,7 @@ sub NEXTKEY
     my $keys = ref( $self->{ITERATOR} ) ? $self->{ITERATOR} : [];
     my $key = shift( @$keys );
     return if( !defined( $key ) );
+#     $self->__message( 4, "Returning next key '$key'." );
     if( index( $key, $mark ) == 0 )
     {
         return( $repo->{ substr( $key, length( $mark ), -2 ) }->[0] );
@@ -221,6 +229,7 @@ sub STORE
     if( $self->_exclude( $caller ) || !$self->{enable} )
     {
         # print( STDERR "STORE($caller)[owner calling] <- '$key' -> '$val'\n" );
+        # $self->__message( 4, "STORE($caller)[owner calling] <- '$key' -> '", ( my $copy = $val ), "'" );
         $self->{ $key } = $val;
     }
     else
@@ -230,6 +239,7 @@ sub STORE
         if( ref( $val ) eq 'HASH' &&
             !tied( %$val ) )
         {
+            # $self->__message( 4, "Value to store is an hash reference containing ", scalar( keys( %$val ) ), " item(s) and not tied yet. Tieing it now." );
             my @items = %$val;
             my $this = tie( %$val, ref( $self ) );
             while( @items )
@@ -242,11 +252,13 @@ sub STORE
         if( ref( $key ) && $self->{key_object} )
         {
             my $addr = Scalar::Util::refaddr( $key );
+            # $self->__message( 4, "Storing a reference key (", overload::StrVal( $key ), ") with address $addr and value '$val'" );
             $repo->{ $addr } = [$key, $val];
             $data->{ "${mark}${addr}__" } = $val;
         }
         else
         {
+            # $self->__message( 4, "Storing a non-reference key '$key' with value '", ( my $copy = $val ), "'" );
             $data->{ $key } = $val;
         }
     }
@@ -273,7 +285,7 @@ sub _exclude
     return( !$PAUSED && CORE::exists( $self->{disable}->{ $caller } ) );
 }
 
-sub _message
+sub __message
 {
     my $this = shift( @_ );
     my $self = ( ref( $this ) ? $this : {} );
@@ -356,6 +368,7 @@ sub TO_JSON
     my $data = $self->{data};
     my $repo = $self->{object_repo};
 #     my( $pack, $file, $line ) = caller;
+#     $self->__message( 4, "Called from $pack at $line" );
     # Array reference of array reference, each containing the original key-object -> the corresponding value
     my $objects = [values( %$repo )];
     my $options = {};
@@ -424,7 +437,7 @@ Also, if you set the global variable C<$PAUSED>, then, the exclusion mechanism w
 
 =head1 VERSION
 
-    v1.2.2
+    v1.2.3
 
 =for Pod::Coverage key_object
 

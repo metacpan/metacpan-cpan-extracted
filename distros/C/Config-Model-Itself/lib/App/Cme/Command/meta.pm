@@ -9,7 +9,7 @@
 #
 # ABSTRACT: Work on the configuration model of an application
 
-package App::Cme::Command::meta 2.026;
+package App::Cme::Command::meta 2.027;
 
 use strict ;
 use warnings ;
@@ -27,7 +27,7 @@ use Config::Model::Itself ;
 use YAML::PP qw/Load Dump/;
 
 use Tk ;
-use Config::Model::TkUI ;
+use Config::Model::TkUI 1.381;
 use Config::Model::Itself::TkEditUI ;
 use Path::Tiny 0.125; # for mkdir
 
@@ -257,7 +257,7 @@ sub load_meta_plugin {
     $root_model_dir =~ s!::!/!g;
     my $write_sub = sub {
             $rw_obj->write_model_plugin(
-                plugin_dir => "$cm_lib_dir/models/$root_model_dir.d",
+                plugin_dir => $cm_lib_dir->child("models/$root_model_dir.d"),
                 plugin_name => $plugin_name
             );
         } ;
@@ -422,7 +422,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.026
+version 2.027
 
 =head1 SYNOPSIS
 

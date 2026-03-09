@@ -11,7 +11,7 @@ my $build = Module::Build->new(
 
       'Future' => 0,
       'Future::IO' => '0.20',
-      'Future::IO::ImplBase' => 0,
+      'Future::IO::ImplBase' => '0.22',
       'IO::KQueue' => '0.39',
       'Struct::Dumb' => 0,
    },

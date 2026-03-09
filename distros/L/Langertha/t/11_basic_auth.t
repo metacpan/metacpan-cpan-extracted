@@ -82,6 +82,69 @@ use Langertha::Engine::OllamaOpenAI;
     'OllamaOpenAI: credentials correct');
 }
 
+# --- LMStudio native: self-hosted with basic auth ---
+
+use Langertha::Engine::LMStudio;
+
+{
+  my $lm = Langertha::Engine::LMStudio->new(
+    url => 'http://alice:secret@lmstudio.internal:1234',
+    model => 'test-model',
+  );
+  my $req = $lm->chat('hello');
+
+  unlike($req->uri, qr/alice:secret/, 'LMStudio: userinfo stripped');
+  like($req->uri, qr{^http://lmstudio\.internal:1234/api/v1/chat$}, 'LMStudio: native endpoint path');
+
+  my $auth = $req->header('Authorization');
+  like($auth, qr/^Basic /, 'LMStudio: Basic auth set');
+  my (undef, $encoded) = split(' ', $auth, 2);
+  is(decode_base64($encoded), 'alice:secret',
+    'LMStudio: credentials correct');
+}
+
+# --- LMStudioAnthropic: self-hosted with basic auth ---
+
+use Langertha::Engine::LMStudioAnthropic;
+
+{
+  my $lm = Langertha::Engine::LMStudioAnthropic->new(
+    url => 'http://alice:secret@lmstudio.internal:1234',
+    model => 'test-model',
+  );
+  my $req = $lm->chat('hello');
+
+  unlike($req->uri, qr/alice:secret/, 'LMStudioAnthropic: userinfo stripped');
+  like($req->uri, qr{^http://lmstudio\.internal:1234/v1/messages$}, 'LMStudioAnthropic: endpoint path');
+
+  my $auth = $req->header('Authorization');
+  like($auth, qr/^Basic /, 'LMStudioAnthropic: Basic auth set');
+  my (undef, $encoded) = split(' ', $auth, 2);
+  is(decode_base64($encoded), 'alice:secret',
+    'LMStudioAnthropic: credentials correct');
+
+  is($req->header('x-api-key'), 'lmstudio', 'LMStudioAnthropic: x-api-key header set');
+}
+
+# --- LMStudioOpenAI: self-hosted with basic auth ---
+
+use Langertha::Engine::LMStudioOpenAI;
+
+{
+  my $lm = Langertha::Engine::LMStudioOpenAI->new(
+    url => 'http://alice:secret@lmstudio.internal:1234/v1',
+    model => 'test-model',
+  );
+  my $req = $lm->chat('hello');
+
+  unlike($req->uri, qr/alice:secret/, 'LMStudioOpenAI: userinfo stripped');
+  like($req->uri, qr{^http://lmstudio\.internal:1234/v1/chat/completions$}, 'LMStudioOpenAI: endpoint path');
+
+  # Default LMStudioOpenAI api_key=lmstudio overrides Basic auth
+  my $auth = $req->header('Authorization');
+  is($auth, 'Bearer lmstudio', 'LMStudioOpenAI: default Bearer auth takes precedence over Basic');
+}
+
 # --- Ollama native: non-OpenAI engine also supports basic auth ---
 
 use Langertha::Engine::Ollama;

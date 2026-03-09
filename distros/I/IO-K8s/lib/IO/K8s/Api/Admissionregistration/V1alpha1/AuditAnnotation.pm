@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1alpha1::AuditAnnotation;
 # ABSTRACT: AuditAnnotation describes how to produce an audit annotation for an API request.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Admissionregistration::V1alpha1::AuditAnnotation - AuditAnnotation
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 key
 

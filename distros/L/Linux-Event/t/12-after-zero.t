@@ -6,7 +6,7 @@ use warnings;
 use Test2::V0;
 use Linux::Event;
 
-my $loop = Linux::Event->new;
+my $loop = Linux::Event->new( model => 'reactor' );
 
 my $ran = 0;
 

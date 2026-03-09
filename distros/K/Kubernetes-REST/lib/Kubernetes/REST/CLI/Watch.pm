@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Watch;
-our $VERSION = '1.100';
+our $VERSION = '1.102';
 # ABSTRACT: CLI for watching Kubernetes resources
 use Moo;
 use MooX::Options;
@@ -227,7 +227,7 @@ Kubernetes::REST::CLI::Watch - CLI for watching Kubernetes resources
 
 =head1 VERSION
 
-version 1.100
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -295,13 +295,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez Torres <jlmartin@cpan.org> (JLMARTIN, original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Jose Luis Martinez.
+This software is Copyright (c) 2019-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

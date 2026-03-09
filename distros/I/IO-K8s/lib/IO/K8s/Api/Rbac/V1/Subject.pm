@@ -1,6 +1,6 @@
 package IO::K8s::Api::Rbac::V1::Subject;
 # ABSTRACT: Subject contains a reference to the object or user identities a role binding applies to.  This can either hold a direct API object reference, or a value for non-objects such as user and group names.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s apiGroup => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Rbac::V1::Subject - Subject contains a reference to the object or 
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 apiGroup
 

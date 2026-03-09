@@ -1,9 +1,10 @@
 package Crypt::SecretBuffer::PEM::Headers;
 # VERSION
 # ABSTRACT: Inspect or alter arrayref of PEM headers as if it was a hashref
-$Crypt::SecretBuffer::PEM::Headers::VERSION = '0.019';
+$Crypt::SecretBuffer::PEM::Headers::VERSION = '0.020';
 use strict;
 use warnings;
+use Scalar::Util 'blessed';
 use Carp;
 use Crypt::SecretBuffer qw( span );
 if ("$]" <  5.016) {
@@ -128,6 +129,9 @@ sub get_array {
    my $ret= $self->_find_key_idx($key);
    my $kv= $self->{raw_kv_array};
    $_= $kv->[$_+1] for @$ret;
+   if ($self->unicode_values) {
+      utf8::decode($_) for @$ret
+   }
    return $ret;
 }
 
@@ -221,17 +225,20 @@ sub Crypt::SecretBuffer::PEM::Headers::_HASH::FIRSTKEY { $_[0][1]= [ $_[0][0]->k
 sub Crypt::SecretBuffer::PEM::Headers::_HASH::NEXTKEY  { shift @{$_[0][1]} }
 # This class is used to bless the tied hash making it both a magic
 # hashref and an object with methods.
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::raw_kv_array   { ${tied %{+shift}}->raw_kv_array(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::unicode_keys   { ${tied %{+shift}}->unicode_keys(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::unicode_values { ${tied %{+shift}}->unicode_values(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::trim_keys      { ${tied %{+shift}}->trim_keys(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::caseless_keys  { ${tied %{+shift}}->caseless_keys(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::keys           { ${tied %{+shift}}->keys(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::get            { ${tied %{+shift}}->get(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::get_array      { ${tied %{+shift}}->get_array(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::set            { ${tied %{+shift}}->set(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::delete         { ${tied %{+shift}}->delete(@_) }
-sub Crypt::SecretBuffer::PEM::Headers::_Proxy::append         { ${tied %{+shift}}->append(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::raw_kv_array   { tied(%{+shift})->[0]->raw_kv_array(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::unicode_keys   { tied(%{+shift})->[0]->unicode_keys(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::unicode_values { tied(%{+shift})->[0]->unicode_values(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::trim_keys      { tied(%{+shift})->[0]->trim_keys(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::caseless_keys  { tied(%{+shift})->[0]->caseless_keys(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::keys           { tied(%{+shift})->[0]->keys(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::get            { tied(%{+shift})->[0]->get(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::get_array      { tied(%{+shift})->[0]->get_array(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::set            { tied(%{+shift})->[0]->set(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::delete         { tied(%{+shift})->[0]->delete(@_) }
+sub Crypt::SecretBuffer::PEM::Headers::_Proxy::append         { tied(%{+shift})->[0]->append(@_) }
+
+# avoid depending on namespace::clean
+delete @{Crypt::SecretBuffer::PEM::Headers::}{qw( carp croak confess span fc blessed )};
 
 1;
 
@@ -356,7 +363,7 @@ Delete all headers matching C<$name>, and return the values deleted.
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

@@ -7,9 +7,23 @@ Bluesky - Bluesky Client Library in Perl
 ```perl
 use Bluesky;
 my $bsky = Bluesky->new();
-$bsky->login( 'sanko', '1111-2222-3333-4444' );
-$bsky->createPost( ... );
-# To be continued...
+
+# Interactive OAuth Authentication (Recommended)
+$bsky->oauth_helper(
+    handle => 'user.bsky.social',
+    listen => 1, # Automatically catch the redirect
+    on_success => sub { say 'Logged in!' }
+);
+
+# Posting
+$bsky->createPost( text => 'Hello from Perl!' );
+
+# Streaming
+my $fh = $bsky->firehose(sub ( $header, $body, $err ) {
+    return warn $err if $err;
+    say 'New event: ' . $header->{t};
+});
+$fh->start();
 ```
 
 # DESCRIPTION
@@ -37,6 +51,75 @@ Expected parameters include:
 
     This is the app password not the account's password. App passwords are generated at
     [https://bsky.app/settings/app-passwords](https://bsky.app/settings/app-passwords).
+
+## `oauth_start( $handle, $client_id, $redirect_uri, [ $scope ] )`
+
+Initiates the OAuth 2.0 Authorization Code flow. Returns the authorization URL.
+
+```perl
+my $url = $bsky->oauth_start(
+    'user.bsky.social',
+    'http://localhost',
+    'http://127.0.0.1:8888/callback'
+);
+```
+
+## `oauth_callback( $code, $state )`
+
+Exchanges the authorization code for tokens and completes the OAuth flow.
+
+```
+$bsky->oauth_callback( $code, $state );
+```
+
+## `oauth_helper( %args )`
+
+A high-level helper to manage the entire OAuth flow. This is the recommended way to authenticate for interactive
+applications.
+
+```perl
+$bsky->oauth_helper(
+    handle     => 'user.bsky.social',
+    listen     => 1,
+    on_success => sub ($self) {
+        say 'Authenticated as ' . $self->did;
+    }
+);
+```
+
+Expected parameters include:
+
+- `handle` - required
+
+    The user's handle or DID.
+
+- `listen`
+
+    Boolean. If true, attempts to start a local HTTP server (using [Mojolicious::Lite](https://metacpan.org/pod/Mojolicious%3A%3ALite)) to automatically capture the
+    `code` and `state` from the redirect.
+
+- `redirect`
+
+    The redirect URI. Defaults to `http://127.0.0.1:8888/callback`.
+
+- `scope`
+
+    The requested OAuth scopes. Defaults to `atproto chat.bsky.convo`.
+
+- `on_success`
+
+    A callback subroutine invoked after a successful login. Receives the `$bsky` object as an argument.
+
+## `firehose( $callback, [ $url ] )`
+
+Returns a new [At::Protocol::Firehose](https://metacpan.org/pod/At%3A%3AProtocol%3A%3AFirehose) client for real-time streaming.
+
+```perl
+my $fh = $bsky->firehose(sub ($header, $body, $err) { ... });
+$fh->start();
+```
+
+See [At::Protocol::Firehose](https://metacpan.org/pod/At%3A%3AProtocol%3A%3AFirehose) for more details.
 
 # Feed and Content
 
@@ -69,7 +152,7 @@ Expected parameters include:
 $bsky->getTimeline();
 ```
 
-Get a view of the requesting account's home timeline. This is expected to be some form of reverse-chronological feed.
+Get a view of the requesting account's home timeline. This is expected to some form of reverse-chronological feed.
 
 Expected parameters include:
 
@@ -87,10 +170,26 @@ Expected parameters include:
 
 - `cursor`
 
+## `getFeed( ... )`
+
+```
+$bsky->getFeed( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/3l6oveex3ii2l' );
+```
+
+Get a hydrated feed from a feed generator.
+
+## `getFeedSkeleton( ... )`
+
+```
+$bsky->getFeedSkeleton( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/3l6oveex3ii2l' );
+```
+
+Get a feed skeleton (list of URIs) from a feed generator.
+
 ## `getAuthorFeed( ... )`
 
 ```perl
-$bsky->getAuthorFeed( actor => 'sankor.bsky.social' );
+$bsky->getAuthorFeed( actor => 'sankorobinson.com' );
 ```
 
 Get a view of an actor's 'author feed' (post and reposts by the author).
@@ -154,6 +253,22 @@ Expected parameters include:
 
 Returns an error if the thread cannot be found.
 
+## `getFeed( ... )`
+
+```
+$bsky->getFeed( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/3l6oveex3ii2l' );
+```
+
+Get a hydrated feed from a feed generator.
+
+## `getFeedSkeleton( ... )`
+
+```
+$bsky->getFeedSkeleton( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/3l6oveex3ii2l' );
+```
+
+Get a feed skeleton (list of URIs) from a feed generator.
+
 ## `getPost( ... )`
 
 ```
@@ -211,6 +326,102 @@ Expected parameters include:
     Default: 50, Minimum: 1, Maximum: 100.
 
 - `cursor`
+
+## `getBookmarks( ... )`
+
+```
+$bsky->getBookmarks();
+```
+
+Get private bookmarks for the authorized account.
+
+## `createBookmark( ... )`
+
+```
+$bsky->createBookmark( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l' );
+```
+
+Create a private bookmark for a post.
+
+## `deleteBookmark( ... )`
+
+```
+$bsky->deleteBookmark( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l' );
+```
+
+Delete a private bookmark.
+
+## `getQuotes( ... )`
+
+```perl
+$bsky->getQuotes( uri => 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l' );
+```
+
+Get quotes of a post.
+
+## `getActorLikes( ... )`
+
+```perl
+$bsky->getActorLikes( actor => 'sankorobinson.com' );
+```
+
+Get a list of posts liked by an actor.
+
+## `searchPosts( ... )`
+
+```perl
+$bsky->searchPosts( q => 'perl' );
+```
+
+Find posts matching search criteria.
+
+## `getSuggestedFeeds( ... )`
+
+```
+$bsky->getSuggestedFeeds();
+```
+
+Get suggested feed generators.
+
+## `describeFeedGenerator( )`
+
+```
+$bsky->describeFeedGenerator();
+```
+
+Get information about a feed generator.
+
+## `getFeedGenerator( ... )`
+
+```
+$bsky->getFeedGenerator( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.generator/3l6oveex3ii2l' );
+```
+
+Get information about a feed generator.
+
+## `getFeedGenerators( ... )`
+
+```perl
+$bsky->getFeedGenerators( feeds => [ ... ] );
+```
+
+Get information about multiple feed generators.
+
+## `getActorFeeds( ... )`
+
+```perl
+$bsky->getActorFeeds( actor => 'sankorobinson.com' );
+```
+
+Get a list of feed generators created by an actor.
+
+## `getRepostedBy( ... )`
+
+```perl
+$bsky->getRepostedBy( uri => 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l' );
+```
+
+Get repost records which reference a subject (by AT-URI and CID).
 
 ## `createPost( ... )`
 
@@ -286,6 +497,26 @@ Expected parameters include:
     ```perl
     $bsky->createPost( reply_to => 'at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3lbvllq2kul27', text => 'Exactly!' );
     ```
+
+- `reply_gate`
+
+    Arrayref of rules to restrict who can reply to this post.
+
+    Supported rules:
+
+    - `mention` - Only users mentioned in the post can reply.
+    - `following` - Only users the author follows can reply.
+    - `list` - Only users in a specific moderation list can reply (requires `reply_gate_list`).
+
+    Example:
+
+    ```perl
+    $bsky->createPost( text => 'Private post', reply_gate => ['following'] );
+    ```
+
+- `reply_gate_list`
+
+    The AT-URI of a moderation list to use with the `list` rule in `reply_gate`.
 
 - `embed`
 
@@ -451,6 +682,40 @@ Expected parameters include:
 
 On success, commit info is returned.
 
+## `repost( ... )`
+
+```
+$bsky->repost( 'at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.post/3lcdwvquo7y25' );
+```
+
+Repost a post.
+
+Expected parameters include:
+
+- `uri` - required
+
+    The AT-URI of the post.
+
+- `cid`
+
+    If undefined, the post is fetched to gather this for you.
+
+## `deleteRepost( ... )`
+
+```
+$bsky->deleteRepost( 'at://did:plc:pwqewimhd3rxc4hg6ztwrcyj/app.bsky.feed.repost/3lcdwvquo7y25' );
+```
+
+Remove a repost record.
+
+## `uploadBlob( ... )`
+
+```perl
+$bsky->uploadBlob( $data, mime_type => 'image/png' );
+```
+
+Upload a blob (file/data) to the PDS. This is a wrapper around `uploadFile`.
+
 # Social Graph
 
 Methods documented in this section deal with relationships between the authorized user and other members of the social
@@ -459,7 +724,7 @@ network.
 ## `block( ... )`
 
 ```
-$bsky->block( 'sankor.bsky.social' );
+$bsky->block( 'sankorobinson.com' );
 ```
 
 Blocks a user.
@@ -496,6 +761,468 @@ Expected parameters include:
 
 Returns a list of actor profile views on success.
 
+## `deleteBlock( ... )`
+
+```
+$bsky->deleteBlock( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.block/3l6oveex3ii2l' );
+```
+
+Unblocks a user by removing the block record.
+
+## `follow( ... )`
+
+```
+$bsky->follow( 'sankorobinson.com' );
+```
+
+Follows a user.
+
+## `deleteFollow( ... )`
+
+```
+$bsky->deleteFollow( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.follow/3l6oveex3ii2l' );
+```
+
+Unfollows a user by removing the follow record.
+
+## `getFollows( ... )`
+
+```
+$bsky->getFollows( 'sankorobinson.com' );
+```
+
+Enumerates who an account is following.
+
+## `getFollowers( ... )`
+
+```
+$bsky->getFollowers( 'sankorobinson.com' );
+```
+
+Enumerates who is following an account.
+
+## `getKnownFollowers( ... )`
+
+```
+$bsky->getKnownFollowers( 'sankorobinson.com' );
+```
+
+Enumerates followers of an account that the authorized user also follows (mutuals).
+
+## `getRelationships( ... )`
+
+```perl
+$bsky->getRelationships( actors => ['sankorobinson.com', 'bsky.app'] );
+```
+
+Enumerates relationships between the authorized user and other actors.
+
+## `getMutes( ... )`
+
+```
+$bsky->getMutes();
+```
+
+Enumerate actors that the authorized user has muted.
+
+## `muteThread( ... )`
+
+```
+$bsky->muteThread( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l' );
+```
+
+Mute a thread.
+
+## `unmuteThread( ... )`
+
+```
+$bsky->unmuteThread( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l' );
+```
+
+Unmute a thread.
+
+## `getLists( ... )`
+
+```
+$bsky->getLists( 'sankorobinson.com' );
+```
+
+Enumerate moderation lists created by an actor.
+
+## `getList( ... )`
+
+```
+$bsky->getList( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.list/3l6oveex3ii2l' );
+```
+
+Get detailed view of a moderation list.
+
+## `getStarterPack( ... )`
+
+```
+$bsky->getStarterPack( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.starterpack/3l6oveex3ii2l' );
+```
+
+Get a detailed view of a starter pack.
+
+## `getStarterPacks( ... )`
+
+```
+$bsky->getStarterPacks( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.starterpack/3l6oveex3ii2l' );
+```
+
+Get views for a list of starter packs.
+
+## `getActorStarterPacks( ... )`
+
+```
+$bsky->getActorStarterPacks( 'sankorobinson.com' );
+```
+
+Get starter packs created by an actor.
+
+# Actors
+
+Methods in this section deal with profile information and actor discovery.
+
+## `getProfile( ... )`
+
+```
+$bsky->getProfile( 'sankorobinson.com' );
+```
+
+Get detailed profile view of an actor.
+
+## `getPreferences( )`
+
+```
+$bsky->getPreferences();
+```
+
+Get private preferences for the authorized account.
+
+## `putPreferences( ... )`
+
+```
+$bsky->putPreferences( [ ... ] );
+```
+
+Update private preferences for the authorized account.
+
+## `upsertProfile( &callback )`
+
+```perl
+$bsky->upsertProfile( sub (%existing) {
+    return { %existing, displayName => 'New Name' };
+});
+```
+
+Retrieve the current profile, allow a callback to modify it, and then update it.
+
+## `getProfiles( ... )`
+
+```perl
+$bsky->getProfiles( actors => ['sankorobinson.com', 'bsky.app'] );
+```
+
+Get detailed profile views of multiple actors.
+
+## `getSuggestions( )`
+
+```
+$bsky->getSuggestions();
+```
+
+Get a list of suggested actors.
+
+## `searchActors( ... )`
+
+```perl
+$bsky->searchActors( q => 'perl' );
+```
+
+Search for actors.
+
+## `searchActorsTypeahead( ... )`
+
+```perl
+$bsky->searchActorsTypeahead( q => 'san' );
+```
+
+Find actor suggestions for a partial search term.
+
+## `mute( ... )`
+
+```
+$bsky->mute( 'sankorobinson.com' );
+```
+
+Mutes an actor.
+
+## `unmute( ... )`
+
+```
+$bsky->unmute( 'sankorobinson.com' );
+```
+
+Unmutes an actor.
+
+## `muteModList( ... )`
+
+```
+$bsky->muteModList( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.list/3l6oveex3ii2l' );
+```
+
+Mutes all actors in a moderation list.
+
+## `unmuteModList( ... )`
+
+```
+$bsky->unmuteModList( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.list/3l6oveex3ii2l' );
+```
+
+Unmutes all actors in a moderation list.
+
+## `blockModList( ... )`
+
+```
+$bsky->blockModList( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.list/3l6oveex3ii2l' );
+```
+
+Blocks all actors in a moderation list.
+
+## `unblockModList( ... )`
+
+```
+$bsky->unblockModList( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.listblock/3l6oveex3ii2l' );
+```
+
+Unblocks a moderation list.
+
+# Moderation
+
+## `mute( ... )`
+
+```
+$bsky->mute( 'sankorobinson.com' );
+```
+
+Mutes an actor.
+
+## `unmute( ... )`
+
+```
+$bsky->unmute( 'sankorobinson.com' );
+```
+
+Unmutes an actor.
+
+## `report( $subject, $reason_type, [ $reason ] )`
+
+Submits a moderation report.
+
+Expected parameters:
+
+- `$subject` - The AT-URI or DID being reported.
+- `$reason_type` - Lexicon-defined reason (e.g., `com.atproto.moderation.defs#reasonSpam`).
+- `$reason` - Optional free-text description.
+
+# Notifications
+
+Methods in this section deal with notifications.
+
+## `listNotifications( ... )`
+
+```
+$bsky->listNotifications();
+```
+
+Enumerate notifications for the authorized user.
+
+## `countUnreadNotifications( )`
+
+```
+$bsky->countUnreadNotifications();
+```
+
+Count unread notifications.
+
+## `updateSeenNotifications( [ $seenAt ] )`
+
+```
+$bsky->updateSeenNotifications();
+```
+
+Update when notifications were last seen.
+
+# Identity
+
+Methods in this section deal with handle and DID resolution.
+
+## `resolveHandle( ... )`
+
+```
+$bsky->resolveHandle( 'sankorobinson.com' );
+```
+
+Resolves a handle to a DID.
+
+## `updateHandle( ... )`
+
+```
+$bsky->updateHandle( 'new-handle.bsky.social' );
+```
+
+Updates the handle for the authorized user.
+
+## `describeServer( )`
+
+```
+$bsky->describeServer();
+```
+
+Describes the server's account creation requirements and capabilities.
+
+## `listRecords( ... )`
+
+```perl
+$bsky->listRecords( repo => 'sankorobinson.com', collection => 'app.bsky.feed.post' );
+```
+
+List records in a repository collection.
+
+## `getLabelerServices( ... )`
+
+```perl
+$bsky->getLabelerServices( dids => [ ... ] );
+```
+
+Get views of labeler services.
+
+# Chat
+
+Methods in this section deal with direct messaging and conversations.
+
+## `listConvos( [...] )`
+
+```
+$bsky->listConvos();
+```
+
+Enumerates conversations for the authorized user.
+
+## `getConvo( $convoId )`
+
+```
+$bsky->getConvo( $convoId );
+```
+
+Get a detailed view of a conversation.
+
+## `getConvoForMembers( actors => [ ... ] )`
+
+```perl
+$bsky->getConvoForMembers( actors => [ 'did:plc:...' ] );
+```
+
+Get or create a conversation for a list of members.
+
+## `getMessages( convoId => ..., [...] )`
+
+```perl
+$bsky->getMessages( convoId => $convoId );
+```
+
+Get messages in a conversation.
+
+## `sendMessage( $convoId, { text => ... } )`
+
+```perl
+$bsky->sendMessage( $convoId, { text => 'Hello!' } );
+```
+
+Send a message to a conversation.
+
+## `acceptConvo( $convoId )`
+
+```
+$bsky->acceptConvo( $convoId );
+```
+
+Accept a conversation request.
+
+## `leaveConvo( $convoId )`
+
+```
+$bsky->leaveConvo( $convoId );
+```
+
+Leave a conversation.
+
+## `updateRead( $convoId, [ $messageId ] )`
+
+```
+$bsky->updateRead( $convoId );
+```
+
+Update the read status of a conversation.
+
+## `muteConvo( $convoId )`
+
+```
+$bsky->muteConvo( $convoId );
+```
+
+Mute a conversation.
+
+## `unmuteConvo( $convoId )`
+
+```
+$bsky->unmuteConvo( $convoId );
+```
+
+Unmute a conversation.
+
+## `addReaction( $convoId, $messageId, $reaction )`
+
+```
+$bsky->addReaction( $convoId, $messageId, '👍' );
+```
+
+Add a reaction to a message.
+
+## `removeReaction( $convoId, $messageId, $reaction )`
+
+```
+$bsky->removeReaction( $convoId, $messageId, '👍' );
+```
+
+Remove a reaction from a message.
+
+## `deleteMessageForSelf( $convoId, $messageId )`
+
+```
+$bsky->deleteMessageForSelf( $convoId, $messageId );
+```
+
+Delete a message for the local user.
+
+## `getConvoAvailability( [...] )`
+
+```
+$bsky->getConvoAvailability();
+```
+
+Check if the authorized user can join conversations.
+
+## `getLog( [...] )`
+
+```
+$bsky->getLog();
+```
+
+Get a log of chat events.
+
 # See Also
 
 [At](https://metacpan.org/pod/At) - AT Protocol library
@@ -503,6 +1230,12 @@ Returns a list of actor profile views on success.
 [App::bsky](https://metacpan.org/pod/App%3A%3Absky) - Bluesky client on the command line
 
 [https://docs.bsky.app/docs/api/](https://docs.bsky.app/docs/api/)
+
+# Perl Starter Pack
+
+I've created a starter pack of Perl folks on Bluesky.
+
+Follow it at [https://bsky.app/starter-pack/sankorobinson.com/3lk3xd5utq52s](https://bsky.app/starter-pack/sankorobinson.com/3lk3xd5utq52s) and get in touch to have yourself added.
 
 # LICENSE
 

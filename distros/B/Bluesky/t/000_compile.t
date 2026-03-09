@@ -1,11 +1,11 @@
 use Test2::V0 '!subtest';
 use Test2::Util::Importer 'Test2::Tools::Subtest' => ( subtest_streamed => { -as => 'subtest' } );
 use Test2::Plugin::UTF8;
-use JSON::Tiny qw[decode_json];
+use JSON::PP   qw[decode_json];
 use Path::Tiny qw[path];
 use HTTP::Tiny;
 use utf8;
-use v5.40;
+use v5.42;
 
 # Dev
 # https://github.com/bluesky-social/atproto/tree/main/packages/api
@@ -129,8 +129,8 @@ subtest getReplyRefs => sub {
         },
         'reply';
 };
+my $login;
 subtest auth => sub {
-    my $login;
     my $path = path(__FILE__)->sibling('test_auth.json')->realpath;    # Public and totally worthless auth info
     skip_all 'failed to locate auth data' unless $path->exists;
     my $auth = decode_json $path->slurp_utf8;
@@ -190,22 +190,24 @@ subtest auth => sub {
             end;
         }, 'getPostThread( ... )';
         is my $stable_post = $bsky->getPost('at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l'), hash {
-            field author      => D();
-            field cid         => D();
-            field embed       => E();
-            field indexedAt   => D();
-            field labels      => D();
-            field likeCount   => D();
-            field quoteCount  => D();
-            field record      => D();
-            field replyCount  => D();
-            field repostCount => D();
-            field threadgate  => E();
-            field uri         => D();
-            field viewer      => D();
+            field author        => D();
+            field cid           => D();
+            field embed         => E();
+            field indexedAt     => D();
+            field labels        => D();
+            field likeCount     => D();
+            field quoteCount    => D();
+            field record        => D();
+            field replyCount    => D();
+            field repostCount   => D();
+            field threadgate    => E();
+            field uri           => D();
+            field viewer        => D();
+            field bookmarkCount => D();
+            field debug         => E();
             end;
         }, 'getPost( ... )';
-        isa_ok $bsky->getPost('at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii20'), ['At::Error'], 'getPost( ... ) with bad uri';
+        is $bsky->getPost('at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii20'), U(), 'getPost( ... ) with bad uri';
         is my $posts = $bsky->getPosts(
             'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l6oveex3ii2l',
             'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3lbvgvbvcf22c'
@@ -238,7 +240,7 @@ subtest auth => sub {
                 field validationStatus => D();
                 end;
             }, 'plain text';
-            is my $reply = $bsky->createPost( reply_to => $post->{uri}, text => <<'END'),
+            is my $reply = $bsky->createPost( reply_to => $post->{uri}, text => <<'END' ),
 Just another test.
 
 This isn't a hashtag but #this is! This is a double ##hashtag.
@@ -264,7 +266,7 @@ END
             is my $image_reply = $bsky->createPost(
                 reply_to => $post->{uri},
                 embed    => { images => [ { image => $img->{content}, alt => 'Lorem Picsum', mime => $img->{headers}{'content-type'} } ] },
-                text     => <<'END'),
+                text     => <<'END' ),
 Yet another test.
 
 But with an image this time!
@@ -320,195 +322,54 @@ END
                 end
             }, 'list of blocks';
         };
-    }
-};
-if (0) {
-
-    # }
-    my $login = 0;
-    #
-    subtest 'upsertProfile correctly handles CAS failures' => sub {
-        my $original = getProfileDisplayName();
-    SKIP: {
-            $original // skip 'failed to get display name';
-            ok $bsky->upsertProfile(
+    };
+    subtest 'Actor' => sub {
+        $login || skip_all "$login";
+        subtest 'upsertProfile' => sub {
+            my $original = getProfileDisplayName();
+            $original // skip_all 'failed to get display name';
+            my $res = $bsky->upsertProfile(
                 sub (%existing) {
-                    %existing, displayName => localtime . ' [' . ( int rand time ) . ']';
+                    return { %existing, displayName => localtime . ' [Testing]' };
                 }
-                ),
-                'upsertProfile';
-            #
-            {
-                my $todo = todo 'Bluesky might take a little time to commit changes';
-                my $ok   = 0;
-                for ( 1 .. 3 ) {
-                    last if $ok = $original ne getProfileDisplayName();
-                    diag 'giving Bluesky a moment to catch up...';
-                    sleep 2;
-                }
-                ok $ok, 'displayName has changed';
-            }
-        }
-    };
-    subtest 'pull author feed' => sub {
-        $login || skip_all "$login";
-        is my $feed = $bsky->getAuthorFeed( actor => 'did:plc:z72i7hdynmk6r22z27h6tvur', filter => 'posts_and_author_threads', limit => 30 ), hash {
-            field cursor => D();
-            field feed   => D();    # Feed items are subject to change
-            end;
-        }, 'getAuthorFeed( ... )';
-    };
-    subtest 'pull post thread' => sub {
-        $login || skip_all "$login";
-        is my $thread = $bsky->getPostThread( uri => 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l2s5xxv2ze2c' ), hash {
-            field threadgate => E();
-            field thread     => meta {    # Feed items are subject to change
-                prop isa     => 'At::Lexicon::app::bsky::feed::defs::threadViewPost';
-                prop reftype => 'HASH';
-            };
-            end;
-        }, 'getPostThread( ... )';
-    };
-    subtest 'pull post' => sub {
-        $login || skip_all "$login";
-        is my $post = $bsky->getPost('at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l2s5xxv2ze2c'), hash {
-            field posts => array {
-                item meta {
-                    prop blessed => 'At::Lexicon::app::bsky::feed::defs::postView'
-                };
-                end;
-            };
-            end;
-        }, 'getPost( ... )';
-    };
-    subtest 'pull reposts' => sub {
-        $login || skip_all "$login";
-        is my $reposts = $bsky->getRepostedBy( uri => 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3l2s5xxv2ze2c' ), hash {
-            field cursor     => D();
-            field cid        => E();
-            field repostedBy => D();    # array
-            field uri        => D();    # AT-uri
-            end;
-        }, 'getRepostedBy( ... )';
-    };
-    {
-        my $post;
-        subtest 'post plain text content' => sub {
-            $login || skip_all "$login";
-            is $post = $bsky->post( text => 'Testing' ), hash {    # com.atproto.repo.createRecord#output
-                field cid => D();                                  # CID
-                field uri => D();                                  # AT-uri
-                etc;                                               # might also contain commit and validationStatus
-            }, 'post( ... )';
-        };
-        {
-            my $like;
-            subtest 'like the post we just created' => sub {
-                $login || skip_all "$login";
-                $post  || skip_all "$post";
-                is $like = $bsky->like( $post->{uri}, $post->{cid} ), hash {
+            );
+            ok $res, 'upsertProfile' or diag( ref $res ? $res->message : 'Error: ' . ( $res // 'undef' ) );
 
-                    # com.atproto.repo.createRecord#output
-                    field cid => D();    # CID
-                    field uri => D();    # AT-uri
-                    etc;                 # might also contain commit and validationStatus
-                }, 'like(...)';
-            };
-            subtest 'delete like we just created' => sub {
-                $login || skip_all "$login";
-                $post  || skip_all "$post";
-                $like  || skip_all "$like";
-                is $bsky->deleteLike( $like->{uri} ), hash {
-                    field commit => hash {
-                        field cid => D();    # CID
-                        field rev => D();
-                        end;
-                    };
-                    etc;
-                }, 'deleteLike(...)';
-            };
-        }
-        {
-            my $repost;
-            subtest 'repost the post we just created' => sub {
-                $login || skip_all "$login";
-                $post  || skip_all "$post";
-                is $repost = $bsky->repost( $post->{uri}, $post->{cid} ), hash {
-
-                    # com.atproto.repo.createRecord#output
-                    field cid => D();    # CID
-                    field uri => D();    # AT-uri
-                    etc;                 # might also contain commit and validationStatus
-                }, 'repost(...)';
-            };
-            subtest 'delete repost we just created' => sub {
-                $login  || skip_all "$login";
-                $post   || skip_all "$post";
-                $repost || skip_all "$repost";
-                is $bsky->deleteRepost( $repost->{uri} ), hash {
-                    field commit => hash {
-                        field cid => D();    # CID
-                        field rev => D();
-                        end;
-                    };
-                    etc;
-                }, 'deleteRepost(...)';
-            };
-        }
-        subtest 'delete the post we created earlier' => sub {
-            $login || skip_all "$login";
-            $post  || skip_all "$post";
-            is my $delete = $bsky->deletePost( $post->{uri} ), hash {
-                field commit => hash {
-                    field cid => D();    # CID
-                    field rev => D();
-                    end;
-                };
-                etc;
-            }, 'deletePost(...)';
+            # Restore
+            my $res2 = $bsky->upsertProfile( sub (%existing) { return { %existing, displayName => $original } } );
+            ok $res2, 'restore profile' or diag( ref $res2 ? $res2->message : 'Error: ' . ( $res2 // 'undef' ) );
         };
-    }
-    subtest 'get our own follows' => sub {
-        $login || skip_all "$login";
-        is my $follows = $bsky->getFollows( $bsky->did ), hash {
-            field cursor  => E();
-            field follows => D();    # array of At::Lexicon::app::bsky::actor::defs::profileView objects
-            field subject => D();    # profileview
-            end;
-        }, 'getFollows( ... )';
+        is my $profiles    = $bsky->getProfiles( actors => [ $bsky->did, 'bsky.app' ] ), array {etc}, 'getProfiles';
+        is my $suggestions = $bsky->getSuggestions(),                                    array {etc}, 'getSuggestions';
+        is my $search      = $bsky->searchActors( q => 'perl' ),                         array {etc}, 'searchActors';
+        is my $typeahead   = $bsky->searchActorsTypeahead( q => 'sanko' ),               array {etc}, 'searchActorsTypeahead';
     };
-    subtest 'get our own followers' => sub {
+    subtest 'Notifications' => sub {
         $login || skip_all "$login";
-        is my $followers = $bsky->getFollowers( $bsky->did ), hash {
-            field cursor    => E();
-            field followers => D();    # array of At::Lexicon::app::bsky::actor::defs::profileView objects
-            field subject   => D();    # profileview
-            end;
-        }, 'getFollowers( ... )';
+        is my $notifs = $bsky->listNotifications(),        array {etc}, 'listNotifications';
+        is my $unread = $bsky->countUnreadNotifications(), E(),         'countUnreadNotifications';
+        my $res = $bsky->updateSeenNotifications();
+        ok $res, 'updateSeenNotifications' or diag( ref $res ? $res->message : 'Error: ' . ( $res // 'undef' ) );
     };
-    {
+    subtest 'Social graph - Follows' => sub {
+        $login || skip_all "$login";
+        is my $follows   = $bsky->getFollows( $bsky->did ),   array {etc}, 'getFollows( ... )';
+        is my $followers = $bsky->getFollowers( $bsky->did ), array {etc}, 'getFollowers( ... )';
+        my $rels = $bsky->getRelationships( actors => ['bsky.app'] );
+        is $rels, array {etc}, 'getRelationships' or diag( ref $rels ? $rels->message : 'Error: ' . ( $rels // 'undef' ) );
         my $follow;
-        subtest 'follow myself' => sub {
-            $login || skip_all "$login";
-            is $follow = $bsky->follow( $bsky->did ), hash {
+        subtest 'follow/unfollow' => sub {
+            is $follow = $bsky->follow('bsky.app'), hash {
                 field cid => D();
                 field uri => D();
-                etc;    # might also contain commit and validationStatus
+                etc;
             }, 'follow( ... )';
-        };
-        subtest 'delete the follow record we created earlier' => sub {
-            $login  || skip_all "$login";
-            $follow || skip_all "$follow";
             is my $delete = $bsky->deleteFollow( $follow->{uri} ), hash {
-                field commit => hash {
-                    field cid => D();    # CID
-                    field rev => D();
-                    end;
-                };
+                field commit => hash {etc};
                 etc;
             }, 'deleteFollow(...)';
         };
-    }
-}
+    };
+};
 #
 done_testing;

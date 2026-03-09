@@ -36,13 +36,10 @@
             "App::Cme::Common" : "0",
             "Carp" : "0",
             "Config::Model" : "2.157",
-            "Config::Model::TkUI" : "1.378",
+            "Config::Model::TkUI" : "1.381",
             "Config::Model::Value" : "0",
             "Data::Compare" : "0",
             "Data::Dumper" : "0",
-            "File::Basename" : "0",
-            "File::Find" : "0",
-            "File::Path" : "0",
             "IO::File" : "0",
             "Log::Log4perl" : "1.11",
             "Mouse" : "0",
@@ -64,13 +61,16 @@
          "requires" : {
             "App::Cmd::Tester" : "0",
             "Config::Model::Tester::Setup" : "0",
+            "English" : "0",
             "File::Copy::Recursive" : "0",
+            "File::Spec" : "0",
             "Getopt::Long" : "0",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
             "Test::File::Contents" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.00",
             "Text::Diff" : "0"
          }
@@ -89,7 +89,7 @@
          "web" : "http://github.com/dod38fr/config-model-itself"
       }
    },
-   "version" : "2.026",
+   "version" : "2.027",
    "x_generated_by_perl" : "v5.40.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "LGPL-2.1"

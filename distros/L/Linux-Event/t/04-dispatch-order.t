@@ -11,14 +11,14 @@ for my $m (qw(Linux::Epoll Linux::Event::Clock Linux::Event::Timer)) {
 use Linux::Event::Loop;
 
 # Pull masks from the Epoll backend (authoritative for this loop)
-use Linux::Event::Backend::Epoll ();
+use Linux::Event::Reactor::Backend::Epoll ();
 
-my $READABLE = Linux::Event::Backend::Epoll::READABLE();
-my $WRITABLE = Linux::Event::Backend::Epoll::WRITABLE();
-my $ERR      = Linux::Event::Backend::Epoll::ERR();
-my $HUP      = Linux::Event::Backend::Epoll::HUP();
+my $READABLE = Linux::Event::Reactor::Backend::Epoll::READABLE();
+my $WRITABLE = Linux::Event::Reactor::Backend::Epoll::WRITABLE();
+my $ERR      = Linux::Event::Reactor::Backend::Epoll::ERR();
+my $HUP      = Linux::Event::Reactor::Backend::Epoll::HUP();
 
-sub make_loop () { Linux::Event::Loop->new( backend => 'epoll' ) }
+sub make_loop () { Linux::Event::Loop->new( model => 'reactor', backend => 'epoll' ) }
 
 subtest "dispatch order: read before write" => sub {
     my $loop = make_loop();

@@ -1,5 +1,5 @@
 package Business::NAB::Australian::DirectEntry::Payments::DetailRecord;
-$Business::NAB::Australian::DirectEntry::Payments::DetailRecord::VERSION = '0.02';
+$Business::NAB::Australian::DirectEntry::Payments::DetailRecord::VERSION = '0.03';
 =head1 NAME
 
 Business::NAB::Australian::DirectEntry::Payments::DetailRecord

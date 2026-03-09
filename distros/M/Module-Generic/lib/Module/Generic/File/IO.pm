@@ -506,8 +506,19 @@ sub DESTROY
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
-    # NOTE: Storable creates a dummy object as a SCALAR instead of GLOB, so we need to check.
-    $self->close if( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' && $self->opened );
+
+    if( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' )
+    {
+        my $fd = $self->fileno;
+        if( $fd )
+        {
+            my $repo_key = $fd;
+            my $repo = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => $repo_key );
+            $repo->cleanup;
+        }
+        # NOTE: Storable creates a dummy object as a SCALAR instead of GLOB, so we need to check.
+        $self->close if( $self->opened );
+    }
 }
 
 sub FREEZE
@@ -517,7 +528,16 @@ sub FREEZE
     my $class = CORE::ref( $self ) || $self;
     my $args = $self->args;
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \@$args] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, \@$args] );
+        }
+    }
     CORE::return( $class, \@$args )
 }
 

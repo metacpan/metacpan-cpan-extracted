@@ -13,7 +13,7 @@ use Linux::Event::Loop;
 local $SIG{ALRM} = sub { die "timeout\n" };
 alarm 5;
 
-my $loop = Linux::Event::Loop->new( backend => 'epoll' );
+my $loop = Linux::Event::Loop->new( model => 'reactor', backend => 'epoll' );
 
 subtest "close-safety + fd reuse: old watcher must not fire on reused fd" => sub {
     pipe(my $r1, my $w1) or die "pipe failed: $!";

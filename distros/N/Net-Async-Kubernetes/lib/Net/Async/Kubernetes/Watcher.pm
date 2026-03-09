@@ -1,6 +1,6 @@
 package Net::Async::Kubernetes::Watcher;
 # ABSTRACT: Auto-reconnecting Kubernetes watch as IO::Async::Notifier
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 use parent 'IO::Async::Notifier';
@@ -245,7 +245,7 @@ Net::Async::Kubernetes::Watcher - Auto-reconnecting Kubernetes watch as IO::Asyn
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -421,10 +421,9 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
-This is free software, licensed under:
-
-  The Apache License, Version 2.0, January 2004
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

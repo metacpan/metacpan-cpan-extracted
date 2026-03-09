@@ -19,10 +19,11 @@ return [
             [qw/my_hash my_hash2 my_hash3/] => {
                 type       => 'hash',
                 index_type => 'string',
-                cargo_type => 'leaf',
-                cargo_args => { value_type => 'string' },
+                cargo => {
+                    type => 'leaf',
+                    value_type => 'string'
+                },
             },
-
         ]
     ]
 ];

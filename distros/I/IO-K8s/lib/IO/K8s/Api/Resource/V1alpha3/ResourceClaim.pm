@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourceClaim;
 # ABSTRACT: ResourceClaim describes a request for access to resources in the cluster, for use by workloads. For example, if a workload needs an accelerator device with specific properties, this is how that request is expressed. The status stanza tracks whether this claim has been satisfied and what specific resources have been allocated. This is an alpha type and requires enabling the DynamicResourceAllocation feature gate.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourceClaim - ResourceClaim describes a requ
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

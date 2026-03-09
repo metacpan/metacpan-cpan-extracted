@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ResourceFieldSelector;
 # ABSTRACT: ResourceFieldSelector represents container resources (cpu, memory) and their output format
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s containerName => Str;
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ResourceFieldSelector - ResourceFieldSelector represents
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 containerName
 

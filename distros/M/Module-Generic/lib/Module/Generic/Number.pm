@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.3.3
+## Version v2.3.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/05/28
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,6 +29,8 @@ BEGIN
         # I know there is the nomethod feature, but I need to provide return_object set to true or false
         # And I do not necessarily want to catch all the operation.
         '""' => sub { return( shift->{_number} ); },
+        # numeric context
+        '0+' => \&as_number,
         '-' => sub { return( shift->compute( @_, { op => '-', return_object => 1 }) ); },
         '+' => sub { return( shift->compute( @_, { op => '+', return_object => 1 }) ); },
         '*' => sub { return( shift->compute( @_, { op => '*', return_object => 1 }) ); },
@@ -114,7 +116,7 @@ BEGIN
         threads::shared->import();
         our $LOCALE_LOCK :shared;
     }
-    our( $VERSION ) = 'v2.3.3';
+    our( $VERSION ) = 'v2.3.4';
 };
 
 use v5.26.1;
@@ -542,6 +544,10 @@ sub init
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{_original} = $num;
+    $self->{_fields} = [qw(
+        lang decimal_fill encoding neg_format kilo_suffix mega_suffix giga_suffix
+        kibi_suffix mebi_suffix gibi_suffix _number
+    )];
     my $default = $self->default;
     my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
     # perllocale: "If no second argument is provided and the category is LC_ALL, the result is implementation-dependent. It may be a string of concatenated locale names (separator also implementation-dependent) or a single locale name."
@@ -756,6 +762,12 @@ sub as_boolean
     my $self = shift( @_ );
     $self->_load_class( 'Module::Generic::Boolean' ) || return( $self->pass_error );
     return( Module::Generic::Boolean->new( $self->{_number} ? 1 : 0 ) );
+}
+
+sub as_number
+{
+    my $self = shift( @_ );
+    return( $self->{_number} + 0 );
 }
 
 sub as_scalar
@@ -1796,13 +1808,60 @@ sub _set_get_prop
 
 sub FREEZE
 {
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
+    # process-local state.
+    my @props = ( @{$self->{_fields}}, keys( %$map ) );
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub FREEZE
+{
     my $self = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, \%hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }

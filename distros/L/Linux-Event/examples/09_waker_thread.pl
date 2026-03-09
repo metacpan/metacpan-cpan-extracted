@@ -14,7 +14,7 @@ use Linux::Event;
 # - The waker is watched like any other readable fd.
 # - A worker thread enqueues work and signals the waker to wake epoll_wait.
 
-my $loop  = Linux::Event->new;
+my $loop  = Linux::Event->new( model => 'reactor' );
 my $waker = $loop->waker;
 
 my $q = Thread::Queue->new;

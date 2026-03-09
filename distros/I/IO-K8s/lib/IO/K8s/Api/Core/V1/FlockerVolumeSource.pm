@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::FlockerVolumeSource;
 # ABSTRACT: Represents a Flocker volume mounted by the Flocker agent. One and only one of datasetName and datasetUUID should be set. Flocker volumes do not support ownership management or SELinux relabeling.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s datasetName => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::FlockerVolumeSource - Represents a Flocker volume mounte
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 datasetName
 

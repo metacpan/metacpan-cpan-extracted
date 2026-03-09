@@ -23,16 +23,16 @@ class    #
     field $meta : reader = CPAN::Meta->load_file('META.json');
 
     # Params to Build script
-    field $install_base : param  //= '';
-    field $installdirs : param   //= '';
-    field $uninst : param        //= 0;    # Make more sense to have a ./Build uninstall command but...
-    field $install_paths : param //= ExtUtils::InstallPaths->new( dist_name => $meta->name );
-    field $verbose : param(v)    //= 0;
-    field $dry_run : param       //= 0;
-    field $pureperl : param      //= 0;
-    field $jobs : param          //= 1;
-    field $destdir : param       //= '';
-    field $prefix : param        //= '';
+    field $install_base  : param    //= '';
+    field $installdirs   : param    //= '';
+    field $uninst        : param    //= 0;    # Make more sense to have a ./Build uninstall command but...
+    field $install_paths : param    //= ExtUtils::InstallPaths->new( dist_name => $meta->name );
+    field $verbose       : param(v) //= 0;
+    field $dry_run       : param    //= 0;
+    field $pureperl      : param    //= 0;
+    field $jobs          : param    //= 1;
+    field $destdir       : param    //= '';
+    field $prefix        : param    //= '';
     #
     ADJUST {
         -e 'META.json' or die "No META information provided\n";

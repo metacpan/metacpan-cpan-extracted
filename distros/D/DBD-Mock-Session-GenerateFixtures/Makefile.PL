@@ -2,22 +2,19 @@ use strict;
 use warnings;
 
 use ExtUtils::MakeMaker;
+use File::Which qw(which);
+
+# Use a private registry for this class
 
 # Check for required system dependencies
 print "Checking system dependencies...\n";
 
 # Check if 'mysqld' is installed
-my $mysqld_check       = system("which mysqld > /dev/null 2>&1");
-my $mysql_config_check = system("which mysql_config > /dev/null 2>&1");
+my $mysqld_check = which('mysqld') || which('mariadb');
 
-if ( $mysqld_check != 0 ) {
+if (!$mysqld_check) {
     print STDERR
 "'mysqld' is not found on the system. Please ensure MySQL is installed.\n";
-}
-
-if ( $mysql_config_check != 0 ) {
-    print STDERR
-"'mysql_config' is not found on the system. Please ensure MySQL development headers are installed.\n";
 }
 
 my $TEST_REQUIRES = {
@@ -34,7 +31,7 @@ my $TEST_REQUIRES = {
     'autodie'                   => '2.37',
 };
 my $mysql_detected;
-if ( $mysqld_check == 0 && $mysql_config_check == 0 ) {
+if ( $mysqld_check ) {
     print "MySQL detected. Adding MySQL-related test dependencies...\n";
     $TEST_REQUIRES->{'DBD::mysql'}      = '5.012';
     $TEST_REQUIRES->{'Rose::DB::MySQL'} = '0.774';
@@ -66,6 +63,7 @@ WriteMakefile(
         'Readonly'         => '2.05',
         'Data::Walk'       => '2.01',
         'Try::Tiny'        => '0.32',
+        'File::Which'      => '1.27'
     },
     TEST_REQUIRES    => $TEST_REQUIRES,
     MIN_PERL_VERSION => '5.14.4',

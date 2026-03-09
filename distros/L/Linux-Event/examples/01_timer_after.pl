@@ -9,7 +9,7 @@ use lib "$Bin/../lib";
 
 use Linux::Event;
 
-my $loop = Linux::Event->new( backend => 'epoll' );
+my $loop = Linux::Event->new( model => 'reactor', backend => 'epoll' );
 
 say "timer_after: scheduling in 0.050s";
 

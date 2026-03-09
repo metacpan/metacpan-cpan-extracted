@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.128-4-gfa69e8f9
+package OpenAPI::Modern; # git description: v0.129-5-g0a2e6205
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.129';
+our $VERSION = '0.130';
 
 use 5.020;
 use utf8;
@@ -872,10 +872,11 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
 
   return 1 if grep fc $header_name eq fc $_, qw(Accept Content-Type Authorization);
 
-  # header names and values must be utf8-encoded for transmission
-  my $encoded_header_name = Encode::encode('UTF-8', $header_name, Encode::DIE_ON_ERR | Encode::LEAVE_SRC);
+  # temporary, until the ABNF is enforced in the OAD schema
+  return E($state, 'non-ascii character detected in header name: not deserializable')
+    if $header_name =~ /[^\x00-\x7F]/;
 
-  if (not $headers->every_header($encoded_header_name)->@*) {
+  if (not $headers->every_header($header_name)->@*) {
     return E({ %$state, keyword => 'required' }, 'missing header: %s', $header_name)
       if $header_obj->{required};
     return 1;
@@ -883,12 +884,12 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
 
   return E({ %$state, data_path => jsonp($state->{data_path}, $header_name) },
       'wide character detected in header value: not deserializable')
-    if any { /[^\x00-\xFF]/ } $headers->every_header($encoded_header_name)->@*;
+    if any { /[^\x00-\xFF]/ } $headers->every_header($header_name)->@*;
 
   # validate as a single comma-concatenated string, presumably to be decoded
   return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1,
         data_path => jsonp($state->{data_path}, $header_name) },
-      $header_obj, \ $headers->header($encoded_header_name))
+      $header_obj, \ $headers->header($header_name))
     if exists $header_obj->{content};
 
   # RFC9112 §5.1-3: "The field line value does not include that leading or trailing whitespace: OWS
@@ -911,7 +912,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   my $data = $self->_deserialize_style(
     # , and = delimiters are not percent-encoded
     Mojo::Util::url_escape(join(',',
-        map s/^\s*//r =~ s/\s*\z//r, $headers->every_header($encoded_header_name)->@*),
+        map s/^\s*//r =~ s/\s*\z//r, $headers->every_header($header_name)->@*),
       '^A-Za-z0-9\-._~:/?#[\]@!$&\'()*+,;='),  # unreserved and reserved
     my $s = { %$state, errors => [] },
     style => $header_obj->{style}//'simple',
@@ -957,9 +958,9 @@ sub _validate_querystring_parameter ($self, $state, $param_obj, $uri) {
 # data comes in as a string
 # when parsing fails, $state->{errors} is populated;
 # otherwise, the return value is the fully deserialized data, parsed into the correct type(s)
-# (which may be undef = null; note the difference from () which indicates an error)
-# This method is not appropriate for header parameters, which should never be percent-decoded.
-# %opt is (:$style, :$explode, :$name, :$schema)
+# (which may be undef = null; note the difference from () which indicates no data, and possibly an
+# error)
+# %opt is (:$style, :$explode, :$name, :$schema, $strip_internal_ws)
 sub _deserialize_style ($self, $data, $state, %opt) {
   # numbers and builtin bools can be treated as strings, but reject references
   croak 'only strings can be deserialized' if ref $data;
@@ -1278,12 +1279,16 @@ sub _type_in_schema ($self, $schema, $state) {
   return (qw(array object boolean string number), $state->{vocabularies}[0] =~ /::OpenAPI_3_0\z/ ? () : 'null')
     if ref $schema ne 'HASH';
 
+  my $schema_info = $self->evaluator->_fetch_from_uri(my $uri = canonical_uri($state));
+  abort($state, 'EXCEPTION: unable to find resource "%s"', $uri) if not $schema_info;
+
+  if (my $types = ($schema_info->{document}{_type_in_schema}//={})->{$schema_info->{document_path}}) {
+    return @$types;
+  }
+
   # as in __eval_keyword_id...
   my $id_keyword = $state->{specification_version} eq 'draft4' ? 'id' : '$id';
   if (exists $schema->{$id_keyword} and $schema->{$id_keyword} !~ /^#/) {
-    my $schema_info = $self->evaluator->_fetch_from_uri(my $uri = canonical_uri($state));
-    abort({ %$state, keyword => $id_keyword }, 'EXCEPTION: unable to find resource "%s"', $uri)
-      if not $schema_info;
     # these will all be correct when we are at the schema root, or if we are here via a $ref,
     # but not if we are organically passing through this subschema and pass an '$id'.
     $state->{initial_schema_uri} = $schema_info->{canonical_uri};
@@ -1356,7 +1361,10 @@ sub _type_in_schema ($self, $schema, $state) {
     push @types, [ keys %not_types ];
   }
 
-  return intersect_types(@types);
+  my @final_types = intersect_types(@types);
+  $schema_info->{document}{_type_in_schema}{$schema_info->{document_path}} = \@final_types;
+
+  return @final_types;
 }
 
 # given an object, use the subschema for each value to determine the correct value for that value
@@ -1670,7 +1678,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.129
+version 0.130
 
 =head1 SYNOPSIS
 

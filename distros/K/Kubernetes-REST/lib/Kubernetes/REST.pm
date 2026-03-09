@@ -1,5 +1,5 @@
 package Kubernetes::REST;
-our $VERSION = '1.100';
+our $VERSION = '1.102';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
@@ -327,13 +327,19 @@ sub _prepare_request {
     my $content_type = $opts{content_type} // 'application/json';
     my $body = $opts{body};
     my $parameters = $opts{parameters};
+    my $extra_headers = $opts{headers} // {};
 
     # Append query parameters to URL
     if ($parameters && %$parameters) {
         my @pairs;
         for my $key (sort keys %$parameters) {
             my $val = $parameters->{$key};
-            push @pairs, "$key=$val" if defined $val;
+            next unless defined $val;
+            if (ref($val) eq 'ARRAY') {
+                push @pairs, map { "$key=$_" } grep { defined } @$val;
+            } else {
+                push @pairs, "$key=$val";
+            }
         }
         if (@pairs) {
             $url .= ($url =~ /\?/ ? '&' : '?') . join('&', @pairs);
@@ -350,6 +356,9 @@ sub _prepare_request {
     my $token = $self->credentials->token;
     if (defined $token && length $token) {
         $headers{'Authorization'} = 'Bearer ' . $token;
+    }
+    if ($extra_headers && ref($extra_headers) eq 'HASH') {
+        @headers{keys %$extra_headers} = values %$extra_headers;
     }
 
     return Kubernetes::REST::HTTPRequest->new(
@@ -449,7 +458,7 @@ sub _process_log_chunk {
 # These methods expose the internal request/response pipeline as a stable API
 # for async wrappers (e.g. Net::Async::Kubernetes) that need to build requests,
 # process responses, and handle streaming without going through the sync
-# convenience methods (list, get, watch, log, etc.).
+# convenience methods (list, get, watch, log, port_forward, exec, etc.).
 # ============================================================================
 
 sub build_path {
@@ -807,6 +816,135 @@ sub log {
     }
 }
 
+sub port_forward {
+    my ($self, $short_class, @rest) = @_;
+
+
+    my %args;
+    if (@rest >= 1 && !ref($rest[0]) && $rest[0] !~ /^(name|namespace|ports|subprotocol|on_open|on_frame|on_close|on_error)$/) {
+        $args{name} = shift @rest;
+        %args = (%args, @rest);
+    } elsif (@rest % 2 == 0) {
+        %args = @rest;
+    } else {
+        croak "Invalid arguments to port_forward()";
+    }
+
+    croak "name required for port_forward" unless $args{name};
+
+    my $ports = delete $args{ports};
+    croak "ports required for port_forward" unless defined $ports;
+    $ports = [$ports] unless ref($ports) eq 'ARRAY';
+    croak "ports required for port_forward" unless @$ports;
+    for my $p (@$ports) {
+        croak "invalid port '$p' for port_forward"
+            unless defined($p) && $p =~ /^\d+$/ && $p > 0 && $p <= 65535;
+    }
+
+    my $subprotocol = delete $args{subprotocol} // 'v4.channel.k8s.io';
+    my $on_open  = delete $args{on_open};
+    my $on_frame = delete $args{on_frame};
+    my $on_close = delete $args{on_close};
+    my $on_error = delete $args{on_error};
+
+    my $class = $self->expand_class($short_class);
+    my $path = $self->_build_path($class, %args) . '/portforward';
+
+    my $req = $self->_prepare_request('GET', $path,
+        parameters => { ports => $ports },
+        headers    => {
+            Accept                 => '*/*',
+            Connection             => 'Upgrade',
+            Upgrade                => 'websocket',
+            'Sec-WebSocket-Protocol' => $subprotocol,
+        },
+    );
+
+    my $io = $self->io;
+    unless ($io->can('call_duplex')) {
+        croak "IO backend does not support port_forward(): missing call_duplex()";
+    }
+
+    return $io->call_duplex($req,
+        on_open  => $on_open,
+        on_frame => $on_frame,
+        on_close => $on_close,
+        on_error => $on_error,
+    );
+}
+
+sub exec {
+    my ($self, $short_class, @rest) = @_;
+
+
+    my %args;
+    if (@rest >= 1 && !ref($rest[0]) && $rest[0] !~ /^(name|namespace|command|container|stdin|stdout|stderr|tty|subprotocol|on_open|on_frame|on_close|on_error)$/) {
+        $args{name} = shift @rest;
+        %args = (%args, @rest);
+    } elsif (@rest % 2 == 0) {
+        %args = @rest;
+    } else {
+        croak "Invalid arguments to exec()";
+    }
+
+    croak "name required for exec" unless $args{name};
+
+    my $command = delete $args{command};
+    croak "command required for exec" unless defined $command;
+    $command = [$command] unless ref($command) eq 'ARRAY';
+    croak "command required for exec" unless @$command;
+    for my $part (@$command) {
+        croak "invalid command element for exec"
+            unless defined($part) && !ref($part) && length $part;
+    }
+
+    my $container = delete $args{container};
+    my $stdin  = delete($args{stdin})  ? 1 : 0;
+    my $stdout = exists($args{stdout}) ? (delete($args{stdout}) ? 1 : 0) : 1;
+    my $stderr = exists($args{stderr}) ? (delete($args{stderr}) ? 1 : 0) : 1;
+    my $tty    = delete($args{tty})    ? 1 : 0;
+
+    my $subprotocol = delete $args{subprotocol} // 'v4.channel.k8s.io';
+    my $on_open  = delete $args{on_open};
+    my $on_frame = delete $args{on_frame};
+    my $on_close = delete $args{on_close};
+    my $on_error = delete $args{on_error};
+
+    my $class = $self->expand_class($short_class);
+    my $path = $self->_build_path($class, %args) . '/exec';
+
+    my %params = (
+        command => $command,
+        stdin   => $stdin  ? 'true' : 'false',
+        stdout  => $stdout ? 'true' : 'false',
+        stderr  => $stderr ? 'true' : 'false',
+        tty     => $tty    ? 'true' : 'false',
+    );
+    $params{container} = $container if defined $container;
+
+    my $req = $self->_prepare_request('GET', $path,
+        parameters => \%params,
+        headers    => {
+            Accept                   => '*/*',
+            Connection               => 'Upgrade',
+            Upgrade                  => 'websocket',
+            'Sec-WebSocket-Protocol' => $subprotocol,
+        },
+    );
+
+    my $io = $self->io;
+    unless ($io->can('call_duplex')) {
+        croak "IO backend does not support exec(): missing call_duplex()";
+    }
+
+    return $io->call_duplex($req,
+        on_open  => $on_open,
+        on_frame => $on_frame,
+        on_close => $on_close,
+        on_error => $on_error,
+    );
+}
+
 1;
 
 __END__
@@ -821,7 +959,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.100
+version 1.102
 
 =head1 SYNOPSIS
 
@@ -982,7 +1120,12 @@ This is a public API for async wrappers like L<Net::Async::Kubernetes> that need
         body       => \%body,
     );
 
-Build a L<Kubernetes::REST::HTTPRequest> with method, full URL, authorization headers, and optional query parameters or JSON body.
+Build a L<Kubernetes::REST::HTTPRequest> with method, full URL, authorization
+headers, and optional query parameters or JSON body.
+
+Query parameter values may be scalars or arrayrefs (arrayrefs are emitted as
+repeated C<key=value> pairs). Extra request headers can be provided via
+C<headers =E<gt> \%headers>.
 
 This is a public API for async wrappers that execute HTTP requests through their own event loop.
 
@@ -1137,6 +1280,44 @@ B<Streaming> (with C<on_line>): Calls the callback for each log line with a L<Ku
 
 The streaming mode is designed for event-based systems like L<IO::Async> — see L<Net::Async::Kubernetes> for async integration.
 
+=head2 port_forward
+
+    my $session = $api->port_forward('Pod', 'my-pod',
+        namespace => 'default',
+        ports     => [8080, 8443],
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    );
+
+Start a full-duplex pod port-forward session.
+
+This method requires an IO backend that implements C<call_duplex>. The default
+L<Kubernetes::REST::LWPIO> and L<Kubernetes::REST::HTTPTinyIO> backends do not
+currently provide duplex transport.
+
+Returns whatever the IO backend returns for C<call_duplex> (typically a
+session/handle object managed by that backend).
+
+=head2 exec
+
+    my $session = $api->exec('Pod', 'my-pod',
+        namespace => 'default',
+        command   => ['sh', '-c', 'echo hello'],
+        stdin     => 0,
+        stdout    => 1,
+        stderr    => 1,
+        tty       => 0,
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    );
+
+Start a full-duplex pod exec session via the C</exec> subresource.
+
+This method requires an IO backend that implements C<call_duplex>. The default
+L<Kubernetes::REST::LWPIO> and L<Kubernetes::REST::HTTPTinyIO> backends do not
+currently provide duplex transport.
+
+Returns whatever the IO backend returns for C<call_duplex> (typically a
+session/handle object managed by that backend).
+
 =head1 NAME
 
 Kubernetes::REST - A Perl REST Client for the Kubernetes API
@@ -1153,7 +1334,7 @@ This version has been completely rewritten. Key changes that may affect your cod
 
 The old method-per-operation API (e.g., C<< $api->Core->ListNamespacedPod(...) >>)
 has been replaced with a simple API: C<list>, C<get>, C<create>, C<update>,
-C<patch>, C<delete>, C<watch>.
+C<patch>, C<delete>, C<watch>, C<log>, C<port_forward>, C<exec>.
 
 =item * B<Old API still works but deprecated>
 
@@ -1200,7 +1381,8 @@ object.
 
 Optional. HTTP backend for making requests. Must consume the
 L<Kubernetes::REST::Role::IO> role (i.e. implement C<call($req)> and
-C<call_streaming($req, $callback)>). Defaults to L<Kubernetes::REST::LWPIO>
+C<call_streaming($req, $callback)>; optional C<call_duplex($req, %callbacks)> for
+full-duplex subresources such as pod port-forward). Defaults to L<Kubernetes::REST::LWPIO>
 (L<LWP::UserAgent>), which supports L<LWP::ConsoleLogger> for HTTP debugging.
 
 To use the lighter L<HTTP::Tiny> backend instead:
@@ -1494,6 +1676,85 @@ B<Optional arguments:>
 
 =back
 
+=head2 port_forward($class, $name, %args)
+
+Start a Kubernetes pod port-forward session via the C</portforward>
+subresource.
+
+    my $session = $api->port_forward('Pod', 'my-pod',
+        namespace => 'default',
+        ports     => [8080, 8443],
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+        on_close  => sub { ... },
+        on_error  => sub { my ($err) = @_; ... },
+    );
+
+B<Required arguments:>
+
+=over 4
+
+=item name - Pod name
+
+=item ports - Local/remote port list as arrayref or scalar (e.g. C<[8080, 8443]>)
+
+=back
+
+B<Optional arguments:>
+
+=over 4
+
+=item namespace - Namespace (for namespaced resources)
+
+=item subprotocol - WebSocket subprotocol (default: C<v4.channel.k8s.io>)
+
+=item on_open, on_frame, on_close, on_error - Duplex transport callbacks passed to IO backend
+
+=back
+
+Requires an IO backend implementing C<call_duplex>. The default sync backends
+currently do not provide duplex transport.
+
+=head2 exec($class, $name, %args)
+
+Start a Kubernetes pod exec session via the C</exec> subresource.
+
+    my $session = $api->exec('Pod', 'my-pod',
+        namespace => 'default',
+        command   => ['sh', '-c', 'echo hello'],
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+        on_close  => sub { ... },
+        on_error  => sub { my ($err) = @_; ... },
+    );
+
+B<Required arguments:>
+
+=over 4
+
+=item name - Pod name
+
+=item command - Command as arrayref or scalar (e.g. C<['sh', '-c', 'id']>)
+
+=back
+
+B<Optional arguments:>
+
+=over 4
+
+=item namespace - Namespace (for namespaced resources)
+
+=item container - Container name (for multi-container pods)
+
+=item stdin, stdout, stderr, tty - Stream toggles (defaults: stdin=false, stdout=true, stderr=true, tty=false)
+
+=item subprotocol - WebSocket subprotocol (default: C<v4.channel.k8s.io>)
+
+=item on_open, on_frame, on_close, on_error - Duplex transport callbacks passed to IO backend
+
+=back
+
+Requires an IO backend implementing C<call_duplex>. The default sync backends
+currently do not provide duplex transport.
+
 =head2 fetch_resource_map()
 
 Fetch the resource map from the cluster's OpenAPI spec (/openapi/v2 endpoint).
@@ -1667,13 +1928,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez Torres <jlmartin@cpan.org> (JLMARTIN, original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Jose Luis Martinez.
+This software is Copyright (c) 2019-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

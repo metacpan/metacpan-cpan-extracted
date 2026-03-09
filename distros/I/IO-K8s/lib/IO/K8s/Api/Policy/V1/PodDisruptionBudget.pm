@@ -1,6 +1,6 @@
 package IO::K8s::Api::Policy::V1::PodDisruptionBudget;
 # ABSTRACT: PodDisruptionBudget is an object to define the max disruption that can be caused to a collection of pods
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -24,7 +24,7 @@ IO::K8s::Api::Policy::V1::PodDisruptionBudget - PodDisruptionBudget is an object
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ConfigMapProjection;
 # ABSTRACT: Adapts a ConfigMap into a projected volume. The contents of the target ConfigMap's Data field will be presented in a projected volume as files using the keys in the Data field as the file names, unless the items element is populated with specific mappings of keys to paths. Note that this is identical to a configmap volume source without the default mode.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s items => ['Core::V1::KeyToPath'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ConfigMapProjection - Adapts a ConfigMap into a projecte
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 items
 

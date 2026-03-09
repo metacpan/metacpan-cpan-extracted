@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Report 2.158;
+package Config::Model::Report 2.159;
 
 use Carp;
 use strict;
@@ -57,7 +57,6 @@ sub report {
     };
 
     my @scan_args = (
-        fallback => 'all',
         auto_vivify => 0,
         leaf_cb     => $std_cb,
     );
@@ -90,7 +89,7 @@ Config::Model::Report - Reports data from config tree
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

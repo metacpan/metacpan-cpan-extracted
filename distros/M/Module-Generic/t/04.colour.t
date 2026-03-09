@@ -2,6 +2,7 @@
 
 # t/04.colour.t - terminal coloured message
 
+use open ':std' => 'utf8';
 use Test::More qw( no_plan );
 use strict;
 use warnings;
@@ -9,7 +10,6 @@ use utf8;
 use vars qw( $DEBUG );
 use Cwd qw( abs_path );
 use lib abs_path( './lib' );
-use open ':std' => 'utf8';
 $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 
 BEGIN { use_ok( 'Module::Generic' ) || BAIL_OUT( "Unable to load Module::Generic" ); }

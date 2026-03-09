@@ -105,7 +105,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v2.3.3
+    v2.3.4
 
 =head1 DESCRIPTION
 
@@ -257,6 +257,12 @@ Return the number object as a L<Module::Generic::Array> object.
 =head2 as_boolean
 
 Return the number object as  a L<Module::Generic::Boolean> object.
+
+=head2 as_number
+
+Returns the object as a regular perl number.
+
+Internally, it returns the underlying number + 0 to ensure perl converts it to a number.
 
 =head2 as_scalar
 

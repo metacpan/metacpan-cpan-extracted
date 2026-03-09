@@ -1,6 +1,6 @@
 package Langertha::Engine::DeepSeek;
 # ABSTRACT: DeepSeek API
-our $VERSION = '0.304';
+our $VERSION = '0.305';
 use Moose;
 use Carp qw( croak );
 
@@ -44,7 +44,7 @@ Langertha::Engine::DeepSeek - DeepSeek API
 
 =head1 VERSION
 
-version 0.304
+version 0.305
 
 =head1 SYNOPSIS
 

@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use v5.36;
 use strict;
@@ -200,34 +200,48 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Scheduler - Internal timer queue for Linux::Event
-
-=head1 SYNOPSIS
-
-  # Internal module. See Linux::Event::Loop.
+Linux::Event::Scheduler - Internal monotonic timer queue for Linux::Event::Reactor
 
 =head1 DESCRIPTION
 
-This package implements the timer queue used by L<Linux::Event::Loop>.
-It stores timers keyed by monotonic time and supports popping all
-expired timers for a given time point.
+C<Linux::Event::Scheduler> is the internal deadline queue used by the reactor.
+It stores callbacks keyed by monotonic nanosecond deadlines and returns expired
+items in deadline order.
 
-This module is not intended for direct use.
+This module is internal. Its API is documented only to explain the structure of
+this distribution, not as a stable user-facing contract.
 
 =head1 METHODS
 
-This class is internal; method names and behavior may change without notice.
+=head2 new(clock => $clock)
 
-=head1 AUTHOR
+Create a scheduler bound to a clock object that provides C<now_ns> and
+C<deadline_in_ns>.
 
-Joshua S. Day
+=head2 after_ns($delta_ns, $cb)
 
-=head1 LICENSE
+Schedule a callback relative to the current time.
 
-Same terms as Perl itself.
+=head2 at_ns($deadline_ns, $cb)
 
-=head1 VERSION
+Schedule a callback for an absolute monotonic deadline.
 
-This document describes Linux::Event::Scheduler version 0.006.
+=head2 cancel($id)
+
+Cancel an existing timer by id.
+
+=head2 next_deadline_ns
+
+Return the next live deadline, if any.
+
+=head2 pop_expired
+
+Return all expired entries as C<[ $id, $cb, $deadline_ns ]> tuples.
+
+=head1 SEE ALSO
+
+L<Linux::Event::Reactor>,
+L<Linux::Event::Clock>,
+L<Linux::Event::Timer>
 
 =cut

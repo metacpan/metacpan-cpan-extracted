@@ -1,6 +1,6 @@
 package IO::K8s::Api::Rbac::V1::PolicyRule;
 # ABSTRACT: PolicyRule holds information that describes a policy rule, but does not contain information about who the rule applies to or which namespace the rule applies to.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s apiGroups => [Str];
@@ -32,7 +32,7 @@ IO::K8s::Api::Rbac::V1::PolicyRule - PolicyRule holds information that describes
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 apiGroups
 

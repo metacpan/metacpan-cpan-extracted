@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceColumnDefinition;
 # ABSTRACT: CustomResourceColumnDefinition specifies a column for server side printing.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s description => Str;
@@ -35,7 +35,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceCol
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 description
 

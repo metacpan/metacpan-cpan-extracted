@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumEndpoint;
 # ABSTRACT: Cilium endpoint representing a pod's network state
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumendpoints';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumEndpoint - Cilium endpoint representing a pod's netwo
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

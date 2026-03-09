@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SecretKeySelector;
 # ABSTRACT: SecretKeySelector selects a key of a Secret.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::SecretKeySelector - SecretKeySelector selects a key of a
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 key
 

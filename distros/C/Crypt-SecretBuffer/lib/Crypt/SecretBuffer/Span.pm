@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::Span;
 # VERSION
 # ABSTRACT: Reference a span of bytes within a SecretBuffer
-$Crypt::SecretBuffer::Span::VERSION = '0.019';
+$Crypt::SecretBuffer::Span::VERSION = '0.020';
 use strict;
 use warnings;
 use Crypt::SecretBuffer; # loads XS methods into this package
@@ -327,7 +327,7 @@ This is B<not> a locale-aware comparison.
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 AUTHOR
 

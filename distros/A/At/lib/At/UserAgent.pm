@@ -11,13 +11,19 @@ use experimental 'try';
 use feature 'class';
 no warnings 'experimental::class';
 
-class At::UserAgent {
+class At::UserAgent 1.3 {
     field $accessJwt  : reader : param = undef;
     field $refreshJwt : reader : param = undef;
     field $token_type : reader : param = 'Bearer';
     field $dpop_key   : reader : param = undef;
     field $dpop_nonce;
     field $auth;
+    field $at_protocol_proxy : param = undef;
+
+    method at_protocol_proxy ( $new_val = undef ) {
+        $at_protocol_proxy = $new_val if defined $new_val;
+        return $at_protocol_proxy;
+    }
 
     method dpop_nonce ( $new_val = undef ) {
         $dpop_nonce = $new_val if defined $new_val;
@@ -42,7 +48,7 @@ class At::UserAgent {
         }
     }
 
-    method _generate_dpop_proof( $url, $method ) {
+    method _generate_dpop_proof( $url, $method, $skip_ath = 0 ) {
         return unless $dpop_key;
         my $jwk_json = $dpop_key->export_key_jwk('public');
         my $jwk      = JSON::PP::decode_json($jwk_json);
@@ -55,7 +61,7 @@ class At::UserAgent {
             = { jti => Crypt::PRNG::random_string_from( $chars, 32 ), htm => $method, htu => $htu->as_string, iat => $now, exp => $now + 60, };
         $payload->{nonce} = $dpop_nonce if defined $dpop_nonce;
 
-        if ($accessJwt) {
+        if ( $accessJwt && !$skip_ath ) {
             $payload->{ath} = MIME::Base64::encode_base64url( Digest::SHA::sha256($accessJwt) );
             $payload->{ath} =~ s/=+$//;
         }
@@ -66,15 +72,15 @@ class At::UserAgent {
     method post             ( $url, $req = undef ) { die "Abstract" }
     method websocket        ( $url, $cb )          { die "Abstract" }
 }
-
-class At::UserAgent::Tiny : isa(At::UserAgent) {
+class    #
+    At::UserAgent::Tiny : isa(At::UserAgent) {
     use HTTP::Tiny;
     field $agent : param
         = HTTP::Tiny->new( agent => 'At.pm/Tiny', default_headers => { 'Content-Type' => 'application/json', Accept => 'application/json' } );
 
     method get( $url, $req = {} ) {
         $req //= {};
-        $req->{headers}{DPoP} = $self->_generate_dpop_proof( $url, 'GET' ) if $self->token_type eq 'DPoP';
+        $req->{headers}{DPoP} = $self->_generate_dpop_proof( $url, 'GET', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
         my $res
             = $agent->get( $url . ( defined $req->{content} && keys %{ $req->{content} } ? '?' . $agent->www_form_urlencode( $req->{content} ) : '' ),
             { defined $req->{headers} ? ( headers => $req->{headers} ) : () } );
@@ -100,7 +106,7 @@ class At::UserAgent::Tiny : isa(At::UserAgent) {
 
     method post( $url, $req = {} ) {
         $req //= {};
-        $req->{headers}{DPoP} = $self->_generate_dpop_proof( $url, 'POST' ) if $self->token_type eq 'DPoP';
+        $req->{headers}{DPoP} = $self->_generate_dpop_proof( $url, 'POST', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
         my $content;
         if ( defined $req->{content} ) {
             if ( $req->{encoding} && $req->{encoding} eq 'form' ) {
@@ -145,26 +151,45 @@ class At::UserAgent::Tiny : isa(At::UserAgent) {
         $self->auth($token);
         $agent->{default_headers}{Authorization} = $token;
     }
-}
-
-class At::UserAgent::Mojo : isa(At::UserAgent) {
+    } class    #
+    At::UserAgent::Mojo : isa(At::UserAgent) {
     field $agent : param = do { require Mojo::UserAgent; Mojo::UserAgent->new };
 
     method get( $url, $req = {} ) {
         $req //= {};
         my $headers = { %{ $req->{headers} // {} } };
-        $headers->{Authorization} = $self->auth                                if defined $self->auth;
-        $headers->{DPoP}          = $self->_generate_dpop_proof( $url, 'GET' ) if $self->token_type eq 'DPoP';
+        if ( $self->at_protocol_proxy ) {
+            $headers->{'atproto-proxy'} = $self->at_protocol_proxy;
+        }
+        $headers->{Authorization} = $self->auth                                                  if defined $self->auth;
+        $headers->{DPoP}          = $self->_generate_dpop_proof( $url, 'GET', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
+        if ( $ENV{DEBUG} ) {
+            say "[DEBUG] [At] GET $url";
+            say "[DEBUG] [At] Headers: " . JSON::PP::encode_json($headers);
+        }
         my $tx  = $agent->get( $url, $headers, defined $req->{content} ? ( form => $req->{content} ) : () );
         my $res = $tx->result;
         if ( my $nonce = $res->headers->header('DPoP-Nonce') ) { $self->dpop_nonce($nonce); }
+        if ( $ENV{DEBUG} ) {
+            say "[DEBUG] [At] Response Code: " . $res->code;
+            say "[DEBUG] [At] Response Headers: " . JSON::PP::encode_json( $res->headers->to_hash );
+        }
         if ( $res->code == 401 || $res->code == 400 ) {
             my $body = $res->body // '';
             if ( $body =~ /use_dpop_nonce/i ) {
-                $headers->{DPoP} = $self->_generate_dpop_proof( $url, 'GET' ) if $self->token_type eq 'DPoP';
-                $tx              = $agent->get( $url, $headers, defined $req->{content} ? ( form => $req->{content} ) : () );
-                $res             = $tx->result;
+                say "[DEBUG] [At] Retrying with fresh DPoP nonce..."                            if $ENV{DEBUG};
+                $headers->{DPoP} = $self->_generate_dpop_proof( $url, 'GET', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
+                if ( $ENV{DEBUG} ) {
+                    say "[DEBUG] [At] GET (Retry) $url";
+                    say "[DEBUG] [At] Headers (Retry): " . JSON::PP::encode_json($headers);
+                }
+                $tx  = $agent->get( $url, $headers, defined $req->{content} ? ( form => $req->{content} ) : () );
+                $res = $tx->result;
                 if ( my $nonce = $res->headers->header('DPoP-Nonce') ) { $self->dpop_nonce($nonce); }
+                if ( $ENV{DEBUG} ) {
+                    say "[DEBUG] [At] Response Code (Retry): " . $res->code;
+                    say "[DEBUG] [At] Response Headers (Retry): " . JSON::PP::encode_json( $res->headers->to_hash );
+                }
             }
         }
         if ( $res->is_success ) {
@@ -194,8 +219,15 @@ class At::UserAgent::Mojo : isa(At::UserAgent) {
     method post( $url, $req = {} ) {
         $req //= {};
         my $headers = { %{ $req->{headers} // {} } };
-        $headers->{Authorization} = $self->auth                                 if defined $self->auth;
-        $headers->{DPoP}          = $self->_generate_dpop_proof( $url, 'POST' ) if $self->token_type eq 'DPoP';
+        if ( $self->at_protocol_proxy ) {
+            $headers->{'atproto-proxy'} = $self->at_protocol_proxy;
+        }
+        $headers->{Authorization} = $self->auth                                                   if defined $self->auth;
+        $headers->{DPoP}          = $self->_generate_dpop_proof( $url, 'POST', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
+        if ( $ENV{DEBUG} ) {
+            say "[DEBUG] [At] POST $url";
+            say "[DEBUG] [At] Headers: " . JSON::PP::encode_json($headers);
+        }
         my %args;
         if ( defined $req->{content} ) {
             if    ( $req->{encoding} && $req->{encoding} eq 'form' ) { $args{form}    = $req->{content}; }
@@ -205,13 +237,26 @@ class At::UserAgent::Mojo : isa(At::UserAgent) {
         my $tx  = $agent->post( $url, $headers, %args );
         my $res = $tx->result;
         if ( my $nonce = $res->headers->header('DPoP-Nonce') ) { $self->dpop_nonce($nonce); }
+        if ( $ENV{DEBUG} ) {
+            say "[DEBUG] [At] Response Code: " . $res->code;
+            say "[DEBUG] [At] Response Headers: " . JSON::PP::encode_json( $res->headers->to_hash );
+        }
         if ( $res->code == 401 || $res->code == 400 ) {
             my $body = $res->body // '';
             if ( $body =~ /use_dpop_nonce/i ) {
-                $headers->{DPoP} = $self->_generate_dpop_proof( $url, 'POST' ) if $self->token_type eq 'DPoP';
-                $tx              = $agent->post( $url, $headers, %args );
-                $res             = $tx->result;
+                say "[DEBUG] [At] Retrying with fresh DPoP nonce..."                             if $ENV{DEBUG};
+                $headers->{DPoP} = $self->_generate_dpop_proof( $url, 'POST', $req->{skip_ath} ) if $self->token_type eq 'DPoP';
+                if ( $ENV{DEBUG} ) {
+                    say "[DEBUG] [At] POST (Retry) $url";
+                    say "[DEBUG] [At] Headers (Retry): " . JSON::PP::encode_json($headers);
+                }
+                $tx  = $agent->post( $url, $headers, %args );
+                $res = $tx->result;
                 if ( my $nonce = $res->headers->header('DPoP-Nonce') ) { $self->dpop_nonce($nonce); }
+                if ( $ENV{DEBUG} ) {
+                    say "[DEBUG] [At] Response Code (Retry): " . $res->code;
+                    say "[DEBUG] [At] Response Headers (Retry): " . JSON::PP::encode_json( $res->headers->to_hash );
+                }
             }
         }
         if ( $res->is_success ) {
@@ -260,8 +305,7 @@ class At::UserAgent::Mojo : isa(At::UserAgent) {
         );
     }
     method _set_auth_header($token) { $self->auth($token); }
-}
-1;
+    } 1;
 __END__
 
 =pod

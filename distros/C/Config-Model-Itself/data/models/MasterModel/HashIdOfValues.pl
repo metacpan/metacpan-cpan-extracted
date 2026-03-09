@@ -12,8 +12,10 @@ use warnings;
 
 my @element = (
     # Value constructor args are passed in their specific array ref
-    cargo_type => 'leaf',
-    cargo_args => { value_type => 'string' },
+    cargo => {
+        type => 'leaf',
+        value_type => 'string'
+    }
 );
 
 return [
@@ -32,25 +34,25 @@ return [
             hash_with_auto_created_id => {
                 type        => 'hash',
                 index_type  => 'string',
-                auto_create => 'yada',
+                auto_create_keys => ['yada'],
                 @element
             },
             hash_with_several_auto_created_id => {
                 type        => 'hash',
                 index_type  => 'string',
-                auto_create => [qw/x y z/],
+                auto_create_keys => [qw/x y z/],
                 @element
             },
             [qw/hash_with_default_id hash_with_default_id_2/] => {
                 type       => 'hash',
                 index_type => 'string',
-                default    => 'yada',
+                default_keys => ['yada'],
                 @element
             },
             hash_with_several_default_keys => {
                 type       => 'hash',
                 index_type => 'string',
-                default    => [qw/x y z/],
+                default_keys => [qw/x y z/],
                 @element
             },
             hash_follower => {

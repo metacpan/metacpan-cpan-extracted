@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1beta1::ReferenceGrant;
 # ABSTRACT: Gateway API cross-namespace reference permission
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1beta1',
     resource_plural => 'referencegrants';
@@ -23,7 +23,7 @@ IO::K8s::GatewayAPI::V1beta1::ReferenceGrant - Gateway API cross-namespace refer
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

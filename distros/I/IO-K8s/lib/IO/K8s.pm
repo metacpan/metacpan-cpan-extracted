@@ -8,7 +8,7 @@ use JSON::MaybeXS;
 use Scalar::Util ();
 use namespace::clean;
 
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -454,7 +454,7 @@ sub _inflate_struct {
     my %opaque_fields = map { $_ => 1 } qw(fieldsV1 rawExtension raw);
 
     # Get attribute info from the registry (keyed by Perl attr name)
-    my $attr_info = IO::K8s::Resource::_k8s_attr_info($class);
+    my $attr_info = $class->_k8s_attr_info;
 
     # Build reverse map: JSON key → Perl attr name (for sanitized names)
     my %json_to_perl;
@@ -580,7 +580,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SYNOPSIS
 

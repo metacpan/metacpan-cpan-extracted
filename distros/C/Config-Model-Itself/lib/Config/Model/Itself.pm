@@ -7,21 +7,21 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.026;
+package Config::Model::Itself 2.027;
 
 use Mouse ;
 use Config::Model 2.157;
 use v5.20;
+use strict;
+use warnings;
 use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 use IO::File ;
 use Log::Log4perl 1.11;
 use Carp ;
 use Data::Dumper ;
 use Scalar::Util qw/weaken/;
-use File::Find ;
-use File::Path ;
-use File::Basename ;
 use Data::Compare ;
 use Path::Tiny 0.125; # for mkdir
 use Mouse::Util::TypeConstraints;
@@ -547,7 +547,7 @@ sub write_all ($self, %args) {
     }
 
     # remove existing files that contain only deleted classes
-    foreach my $goner (%map_to_write) {
+    foreach my $goner (sort keys %map_to_write) {
         $logger->debug("Removing model file $goner.");
         $dir->child($goner)->remove;
     }
@@ -604,7 +604,7 @@ sub write_model_plugin ($self, %args) {
         my @notes = $self->meta_root->grab("class:$class")->dump_annotations_as_pod ;
         my $plugin_file = $class.'.pl';
         $plugin_file =~ s!::!/!g;
-        write_model_file ("$plugin_dir/$plugin_name/$plugin_file", [], \@notes, [ $data ]);
+        write_model_file ($plugin_dir->child($plugin_name)->child($plugin_file), [], \@notes, [ $data ]);
     }
 
     $self->meta_instance->clear_changes ;
@@ -620,15 +620,18 @@ sub read_model_plugin ($self, %args) {
     croak "read_model_plugin: unexpected parameters ",join(' ', keys %args) if %args ;
 
     my @files ;
-    my $wanted = sub {
-        my $n = $File::Find::name ;
-        push @files, $n if (-f $_ and not /~$/
-                            and $n !~ /CVS/
-                            and $n !~ m!.(svn|orig|pod)$!
-                            and $n =~ m!\.d/$plugin_name!
-                           ) ;
+    my $wanted = sub ($path, $) {
+        if ($path->is_file
+            and not /~$/
+            and not /CVS/
+            and not m!.(orig|pod)$!
+            and m!\.d/$plugin_name!
+        ) {
+            say "add $path";
+            push @files, $path;
+        }
     } ;
-    find ($wanted, $plugin_dir ) ;
+    path($plugin_dir)->visit($wanted, { recurse => 1 } ) ;
 
     foreach my $load_file (@files) {
         $self->read_plugin_file($load_file);
@@ -642,9 +645,7 @@ sub read_plugin_file {
     $logger->info("trying to read plugin $load_file");
     my $class_element = $self->meta_root->fetch_element('class') ;
 
-    $load_file = "./$load_file" if $load_file !~ m!^/! and -e $load_file;
-
-    my $plugin = do $load_file ;
+    my $plugin = do $load_file->absolute ;
 
     unless ($plugin) {
         if ($@) {die "couldn't parse $load_file: $@"; }
@@ -661,29 +662,18 @@ sub read_plugin_file {
 
     # load annotations
     $logger->info("loading annotations from plugin file $load_file");
-    my $fh = IO::File->new($load_file) || die "Can't open $load_file: $!" ;
-    my @lines = $fh->getlines ;
-    $fh->close;
-    $self->meta_root->load_pod_annotation(join('',@lines)) ;
+    $self->meta_root->load_pod_annotation($load_file->slurp_utf8) ;
     return;
 }
 
-#
-# New subroutine "write_model_file" extracted - Mon Mar 12 13:38:29 2012.
-#
 sub write_model_file {
-    my $wr_file  = shift;
+    my $wr_file  = shift; # Path::Tiny object
     my $comments = shift ;
     my $notes    = shift;
     my $data     = shift;
 
-    my $wr_dir = dirname($wr_file);
-    unless ( -d $wr_dir ) {
-        mkpath( $wr_dir, 0, oct(755) ) || die "Can't mkpath $wr_dir:$!";
-    }
+    $wr_file->parent->mkdir();
 
-    my $wr = IO::File->new( $wr_file, '>' )
-      || croak "Cannot open file $wr_file:$!" ;
     $logger->info("in $wr_file");
 
     my $dumper = Data::Dumper->new( [ \@$data ] );
@@ -696,13 +686,10 @@ sub write_model_file {
     # munge pod text embedded in values to avoid spurious pod formatting
     $dump =~ s/\n=/\n'.'=/g;
 
-    $wr->print( @$comments ) ;
-    $wr->print( "use strict;\nuse warnings;\n\n" );
-    $wr->print( "return $dump;\n\n" );
-
-    $wr->print( join( "\n", @$notes ) );
-
-    $wr->close;
+    $wr_file->spew_utf8(
+        @$comments,
+        join("\n", "use strict;","use warnings;","", "return $dump;", "", @$notes)
+    );
 
     return;
 }
@@ -858,7 +845,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.026
+version 2.027
 
 =head1 SYNOPSIS
 
@@ -942,7 +929,8 @@ structure of the read directory is respected.
 
 =head2 write_model_plugin( plugin_dir => foo, plugin_name => bar )
 
-Write plugin models in the  passed C<plugin_dir> directory. The written file is path is
+Write plugin models in the  passed C<plugin_dir> directory (expected to be a L<Path::Tiny> object).
+The written file is path is
 made of plugin name and class names. E.g. a plugin named C<bar> for class
 C<Foo::Bar> is written in C<bar/Foo/Bar.pl> file. This file is to be used
 by L<augment_config_class|Config::Model/"augment_config_class (name => '...', class_data )">

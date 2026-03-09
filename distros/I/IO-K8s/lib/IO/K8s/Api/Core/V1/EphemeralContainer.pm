@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EphemeralContainer;
 # ABSTRACT: An EphemeralContainer is a temporary container that you may add to an existing Pod for user-initiated activities such as debugging. Ephemeral containers have no resource or scheduling guarantees, and they will not be restarted when they exit or when a Pod is removed or restarted. The kubelet may evict a Pod if an ephemeral container causes the Pod to exceed its resource allocation. To add an ephemeral container, use the ephemeralcontainers subresource of an existing Pod. Ephemeral containers may not be removed or restarted.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s args => [Str];
@@ -92,7 +92,7 @@ IO::K8s::Api::Core::V1::EphemeralContainer - An EphemeralContainer is a temporar
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 args
 

@@ -7,11 +7,12 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.158;
+package Config::Model::Instance 2.159;
 
 use 5.20.0;
 
 use strict;
+use warnings ;
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
 
@@ -24,6 +25,7 @@ with "Config::Model::Role::Utils";
 use File::Path;
 use Path::Tiny;
 use Log::Log4perl qw(get_logger :levels);
+use Carp qw/carp croak confess cluck/;
 
 use Config::Model::TypeConstraints;
 use Config::Model::Exception;
@@ -32,10 +34,6 @@ use Config::Model::Loader;
 use Config::Model::SearchElement;
 use Config::Model::Iterator;
 use Config::Model::ObjTreeScanner;
-
-use warnings ;
-
-use Carp qw/carp croak confess cluck/;
 
 my $logger        = get_logger("Instance");
 my $change_logger = get_logger("Anything::Change");
@@ -372,7 +370,6 @@ sub _stuff_clear {
     };
 
     my $wiper = Config::Model::ObjTreeScanner->new(
-        fallback        => 'all',
         auto_vivify     => 0,
         check           => 'skip',
         leaf_cb         => $leaf_cb,
@@ -659,7 +656,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

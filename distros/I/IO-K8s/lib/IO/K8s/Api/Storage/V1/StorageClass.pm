@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::StorageClass;
 # ABSTRACT: StorageClass describes the parameters for a class of storage for which PersistentVolumes can be dynamically provisioned. StorageClasses are non-namespaced; the name of the storage class according to etcd is in ObjectMeta.Name.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject;
 
 
@@ -38,7 +38,7 @@ IO::K8s::Api::Storage::V1::StorageClass - StorageClass describes the parameters 
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

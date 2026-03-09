@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2alpha1::CiliumBGPNodeConfig;
 # ABSTRACT: Cilium BGP per-node configuration
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumbgpnodeconfigs';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2alpha1::CiliumBGPNodeConfig - Cilium BGP per-node configurati
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

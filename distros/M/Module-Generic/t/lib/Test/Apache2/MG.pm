@@ -45,7 +45,7 @@ sub handler : method
     my $debug = int( $r->dir_config( 'MG_DEBUG' ) // 0 );
     $r->log_error( "$class: MG_DEBUG value set to '$debug'" );
     Apache2::RequestUtil->request( $r );
-    Module::Generic::Global->cleanup_register( $r );
+    # Module::Generic::Global->cleanup_register( $r );
     # Call the inner module to instantiate a new object
     my $obj = MyObject->new( request => $r, debug => $debug );
     if( !$obj )

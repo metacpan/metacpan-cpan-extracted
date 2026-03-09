@@ -351,13 +351,22 @@ sub DESTROY
 
 sub FREEZE
 {
-    my $self = CORE::shift( @_ );
+    my $self       = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self ) || $self;
-    my %hash  = %{*$self};
+    my $class      = CORE::ref( $self ) || $self;
+    my %hash       = %{*$self};
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, \%hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }

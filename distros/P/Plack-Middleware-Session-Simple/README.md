@@ -12,7 +12,7 @@ Plack::Middleware::Session::Simple - Make Session Simple
         my $counter = $env->{'psgix.session'}->{counter}++;
         [200,[], ["counter => $counter"]];
     };
-    
+
     builder {
         enable 'Session::Simple',
             store => Cache::Memcached::Fast::Safe->new({servers=>[..]}),
@@ -24,7 +24,7 @@ Plack::Middleware::Session::Simple - Make Session Simple
 
 Plack::Middleware::Session::Simple is a yet another session management module.
 This middleware has compatibility with Plack::Middleware::Session by
-supporting psgix.session and psgi.session.options. 
+supporting psgix.session and psgi.session.options.
 You can reduce unnecessary accessing to store and Set-Cookie header.
 
 This module uses Cookie to keep session state. does not support URI based session state.
@@ -58,8 +58,8 @@ This module uses Cookie to keep session state. does not support URI based sessio
                 [200,[], ["login"]];
             },
         };
-        
-        my $res = $app->(req_to_psgi(GET "/")); #res does not have Set-Cookie    
+
+        my $res = $app->(req_to_psgi(GET "/")); #res does not have Set-Cookie
         my $res = $app->(req_to_psgi(GET "/login")); #res has Set-Cookie
 
     If you have a plan to use session\_id as csrf token, you must not disable keep\_empty.
@@ -74,7 +74,7 @@ This module uses Cookie to keep session state. does not support URI based sessio
 
 - expires
 
-    Cookie's expires date time. several formats are supported. see [Cookie::Baker](https://metacpan.org/pod/Cookie::Baker) for details.
+    Cookie's expires date time. several formats are supported. see [Cookie::Baker](https://metacpan.org/pod/Cookie%3A%3ABaker) for details.
     if nothing is supplied then it will not be included in the cookie, which means the session expires per browser session.
 
 - secure

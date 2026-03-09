@@ -8,14 +8,14 @@ use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
-use Linux::Event::Backend::Epoll;
+use Linux::Event::Reactor::Backend::Epoll;
 
 # Regression: EPOLLONESHOT must reliably re-arm on modify() even if the effective
 # event set is unchanged.
 
 pipe(my $r, my $w) or die "pipe: $!";
 
-my $backend = Linux::Event::Backend::Epoll->new;
+my $backend = Linux::Event::Reactor::Backend::Epoll->new;
 
 my $READABLE = 0x01;
 my $ONESHOT  = 0x20;

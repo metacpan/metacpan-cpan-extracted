@@ -4,7 +4,6 @@ use warnings;
 
 use Test::More;
 
-# Linux::Event depends on these runtime modules.
 for my $m (qw(Linux::Epoll Linux::Event::Clock Linux::Event::Timer)) {
   eval "require $m; 1" or plan skip_all => "$m not available: $@";
 }
@@ -12,10 +11,13 @@ for my $m (qw(Linux::Epoll Linux::Event::Clock Linux::Event::Timer)) {
 my @mods = qw(
   Linux::Event
   Linux::Event::Loop
+  Linux::Event::Reactor
+  Linux::Event::Reactor::Backend
+  Linux::Event::Reactor::Backend::Epoll
+  Linux::Event::Proactor
+  Linux::Event::Proactor::Backend
   Linux::Event::Signal
   Linux::Event::Watcher
-  Linux::Event::Backend
-  Linux::Event::Backend::Epoll
 );
 
 for my $m (@mods) {

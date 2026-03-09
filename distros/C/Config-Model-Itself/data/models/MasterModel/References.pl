@@ -17,8 +17,10 @@ return [
             if => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::References::If',
+                cargo => {
+                    type => 'node',
+                    config_class_name => 'MasterModel::References::If',
+                }
             },
             trap => {
                 type       => 'leaf',
@@ -41,8 +43,10 @@ return [
             node => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::References::Node',
+                cargo => {
+                    type => 'node',
+                    config_class_name => 'MasterModel::References::Node',
+                }
             },
         ]
     ],
@@ -57,17 +61,22 @@ return [
             if => {
                 type       => 'leaf',
                 value_type => 'reference',
-                refer_to   => [ '  - host:$h if ', h => '- host' ]
+                computed_refer_to   => {
+                    formula => '  - host:$h if ',
+                    variables => {h => '- host'}
+                }
             },
             ip => {
                 type       => 'leaf',
                 value_type => 'string',
-                compute    => [
-                    '$ip',
-                    ip   => '- host:$h if:$card ip',
-                    h    => '- host',
-                    card => '- if'
-                ]
+                compute    => {
+                    formula => '$ip',
+                    variables => {
+                        ip   => '- host:$h if:$card ip',
+                        h    => '- host',
+                        card => '- if'
+                    }
+                }
             }
         ]
     ],
@@ -77,25 +86,31 @@ return [
             host => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::References::Host'
+                cargo => {
+                    type        => 'node',
+                    config_class_name => 'MasterModel::References::Host'
+                }
             },
             lan => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::References::Lan'
+                cargo => {
+                    type        => 'node',
+                    config_class_name => 'MasterModel::References::Lan'
+                }
             },
             host_and_choice => {
                 type       => 'leaf',
                 value_type => 'reference',
-                refer_to   => ['- host '],
+                refer_to   => '- host ',
                 choice     => [qw/foo bar/]
             },
             dumb_list => {
                 type       => 'list',
-                cargo_type => 'leaf',
-                cargo_args => { value_type => 'string' }
+                cargo => {
+                    type => 'leaf',
+                    value_type => 'string'
+                }
             },
             refer_to_list_enum => {
                 type       => 'leaf',

@@ -14,7 +14,7 @@ use utf8;
 
 use lib 't/lib';
 use Helper;
-use JSON::Schema::Modern::Utilities qw(is_bool get_type is_type);
+use JSON::Schema::Modern::Utilities qw(is_bool get_type is_type jsonp_set);
 use OpenAPI::Modern::Utilities qw(coerce_primitive uri_encode);
 
 my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
@@ -35,6 +35,31 @@ no warnings 'redefine';
 };
 
 my $keyword_path = '/paths/~1foo/get/parameters/0';
+
+sub _init_test ($data_path, $param_obj_data) {
+  my $state = {
+    initial_schema_uri => $openapi->openapi_uri,
+    traversed_keyword_path => '',
+    keyword_path => $keyword_path,
+    data_path => $data_path,
+    specification_version => 'draft2020-12',
+    vocabularies => OAS_VOCABULARIES,
+    errors => [],
+    depth => 0,
+  };
+
+  # hack, to allow _fetch_from_uri and cache to work: patch schema, content
+  jsonp_set($openapi->openapi_document->schema, $state->{keyword_path}.'/'.$_, $param_obj_data->{$_})
+    foreach keys %$param_obj_data;
+
+  $openapi->openapi_document->{_type_in_schema} //= {};
+  my $path = $state->{keyword_path};
+  my $len = length $path;
+  delete $openapi->openapi_document->{_type_in_schema}{$_}
+    foreach grep substr($_, 0, $len) eq $path, keys $openapi->openapi_document->{_type_in_schema}->%*;
+
+  return $state;
+}
 
 subtest 'path parameters' => sub {
   my @tests = (
@@ -157,6 +182,17 @@ subtest 'path parameters' => sub {
       [ 'simple', false, { 'R,X' => '100', G => '200', 'B,Y' => '150' }, 'R%2CX,100,G,200,B%2CY,150' ],
       [ 'simple', true,  { 'R,X' => '100', G => '200', 'B=Y' => '150' }, 'R%2CX=100,G=200,B%3DY=150' ],
     ],
+    [
+      [ qw(style name explode content input) ],
+      [ 'simple', 'cølör', false, [ 'blue−black', 'blackish,green', '100𝑥brown=fl¡p' ],
+        'blue%E2%88%92black,blackish%2Cgreen,100%F0%9D%91%A5brown=fl%C2%A1p' ],
+      [ 'simple', 'cølör', true, [ 'blue−black', 'blackish,green', '100𝑥brown=fl¡p' ],
+        'blue%E2%88%92black,blackish%2Cgreen,100%F0%9D%91%A5brown=fl%C2%A1p' ],
+      [ 'simple', 'cølör', false, { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+        'blue%E2%88%92black,yes!,blackish%2Cgreen,%C2%BFno%3f,100%F0%9D%91%A5brown,fl%C2%A1p' ],
+      [ 'simple', 'cølör', true, { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+        'blue%E2%88%92black=yes!,blackish%2Cgreen=%C2%BFno%3f,100%F0%9D%91%A5brown=fl%C2%A1p' ],
+    ],
 
     {
       name => 'non-ascii characters in path captures must be percent-encoded',
@@ -224,12 +260,6 @@ subtest 'path parameters' => sub {
       content => [ undef, false, 42, '100' ],
     },
     {
-      name => 'explode=false, array with non-ascii name and values',
-      param_obj => { name => 'cølör', schema => { type => 'array' } },
-      input => 'blue%E2%88%92black,blackish%2Cgreen,100%F0%9D%91%A5brown=fl%C2%A1p',
-      content => [ 'blue−black', 'blackish,green', '100𝑥brown=fl¡p' ],
-    },
-    {
       name => 'explode=true, array with non-string items',
       param_obj => { name => 'color', explode => true, schema => {
           type => 'array',
@@ -242,12 +272,6 @@ subtest 'path parameters' => sub {
         } },
       input => ',0,42,100',
       content => [ undef, false, 42, '100' ],
-    },
-    {
-      name => 'explode=true, array with non-ascii name and values',
-      param_obj => { name => 'cølör', explode => true, schema => { type => 'array' } },
-      input => 'blue%E2%88%92black,blackish%2Cgreen,100%F0%9D%91%A5brown=fl%C2%A1p',
-      content => [ 'blue−black', 'blackish,green', '100𝑥brown=fl¡p' ],
     },
     {
       name => 'string or object prefers object',
@@ -301,12 +325,6 @@ subtest 'path parameters' => sub {
       content => { a => undef, b => false, c => 42, d => '100' },
     },
     {
-      name => 'explode=false, object with non-ascii name and values',
-      param_obj => { name => 'cølör', schema => { type => 'object' } },
-      input => 'blue%E2%88%92black,yes!,blackish%2Cgreen,%C2%BFno%3f,100%F0%9D%91%A5brown,fl%C2%A1p',
-      content => { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
-    },
-    {
       name => 'explode=true, bad object',
       param_obj => { name => 'color', explode => true, schema => { type => 'object' } },
       input => 'R=100,G=200,B=',
@@ -351,12 +369,6 @@ subtest 'path parameters' => sub {
       input => 'a,b=0,c=42,d=100',
       content => { a => undef, b => false, c => 42, d => '100' },
     },
-    {
-      name => 'explode=true, object with non-ascii name and values',
-      param_obj => { name => 'cølör', explode => true, schema => { type => 'object' } },
-      input => 'blue%E2%88%92black=yes!,blackish%2Cgreen=%C2%BFno%3f,100%F0%9D%91%A5brown=fl%C2%A1p',
-      content => { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
-    },
 
     # style=matrix
 
@@ -374,6 +386,11 @@ subtest 'path parameters' => sub {
       [ 'matrix', '', ';color' ],
       [ 'matrix', 'red', ';color=red' ],
       [ 'matrix', 'red;green=blue', ';color=red%3Bgreen%3Dblue' ],
+    ],
+    [
+      [ qw(style name content input) ],
+        # ; and = are in the reserved set and not encoded
+      [ 'matrix', 'cølör', 'red﹠green', ';c%C3%B8l%C3%B6r=red%EF%B9%A0green' ],
     ],
     [
       [ qw(style explode content input) ],
@@ -400,6 +417,17 @@ subtest 'path parameters' => sub {
       [ 'matrix', false, { 'R,X' => '100', G => '200', 'B,Y' => '150' }, ';color=R%2CX,100,G,200,B%2CY,150' ],
       [ 'matrix', true,  { 'R,X' => '100', G => '200', 'B=Y' => '150' }, ';R%2CX=100;G=200;B%3DY=150' ],
       [ 'matrix', true,  { color => 'brown' }, ';color=blue;color=black;color=brown' ],
+    ],
+    [
+      [ qw(style name explode content input) ],
+      [ 'matrix', 'cølör', false, [ 'blue−black', 'blackish,green', '100𝑥brown' ],
+        ';c%C3%B8l%C3%B6r=blue%E2%88%92black,blackish%2Cgreen,100%F0%9D%91%A5brown' ],
+      [ 'matrix', 'cølör', true,  [ 'blue−black', 'blackish,green', '100𝑥brown' ],
+        ';c%C3%B8l%C3%B6r=blue%E2%88%92black;c%C3%B8l%C3%B6r=blackish%2Cgreen;c%C3%B8l%C3%B6r=100%F0%9D%91%A5brown' ],
+      [ 'matrix', 'cølör', false, { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+        ';c%C3%B8l%C3%B6r=blue%E2%88%92black,yes!,blackish%2Cgreen,%C2%BFno%3f,100%F0%9D%91%A5brown,fl%C2%A1p' ],
+      [ 'matrix', 'cølör', true,  { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
+        ';blue%E2%88%92black=yes!;blackish%2Cgreen=%C2%BFno%3f;100%F0%9D%91%A5brown=fl%C2%A1p' ],
     ],
 
     {
@@ -448,12 +476,6 @@ subtest 'path parameters' => sub {
       ],
     },
     {
-      name => 'string with non-ascii name and value',
-      param_obj => { name => 'cølör', style => 'matrix' },
-      input => uri_encode(';cølör=red﹠green'),     # ; and = are in the reserved set and not encoded
-      content => 'red﹠green',
-    },
-    {
       name => 'explode=false, array with non-string items',
       param_obj => { name => 'color', style => 'matrix', schema => {
           type => 'array',
@@ -466,12 +488,6 @@ subtest 'path parameters' => sub {
         } },
       input => ';color=,0,42,100',
       content => [ undef, false, 42, '100' ],
-    },
-    {
-      name => 'explode=false, array with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'matrix', schema => { type => 'array' } },
-      input => ';c%C3%B8l%C3%B6r=blue%E2%88%92black,blackish%2Cgreen,100%F0%9D%91%A5brown',
-      content => [ 'blue−black', 'blackish,green', '100𝑥brown' ],
     },
     {
       name => 'explode=true, array of empty values with error',
@@ -518,12 +534,6 @@ subtest 'path parameters' => sub {
         } },
       input => ';color;color=0;color=42;color=100',
       content => [ undef, false, 42, '100' ],
-    },
-    {
-      name => 'explode=true, array with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'matrix', explode => true, schema => { type => 'array' } },
-      input => ';c%C3%B8l%C3%B6r=blue%E2%88%92black;c%C3%B8l%C3%B6r=blackish%2Cgreen;c%C3%B8l%C3%B6r=100%F0%9D%91%A5brown',
-      content => [ 'blue−black', 'blackish,green', '100𝑥brown' ],
     },
     {
       # '=' is only appended when the serialized value is not empty
@@ -585,12 +595,6 @@ subtest 'path parameters' => sub {
       content => { a => undef, b => false, c => 42, d => '100' },
     },
     {
-      name => 'explode=false, object with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'matrix', schema => { type => 'object' } },
-      input => ';c%C3%B8l%C3%B6r=blue%E2%88%92black,yes!,blackish%2Cgreen,%C2%BFno%3f,100%F0%9D%91%A5brown,fl%C2%A1p',
-      content => { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
-    },
-    {
       name => 'explode=true, object of empty values with bad =',
       param_obj => { name => 'color', style => 'matrix', explode => true, schema => { type => [qw(array object)] } },
       input => ';R=',
@@ -629,12 +633,6 @@ subtest 'path parameters' => sub {
         } },
       input => ';a;b=0;c=42;d=100',
       content => { a => undef, b => false, c => 42, d => '100' },
-    },
-    {
-      name => 'explode=true, object with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'matrix', explode => true, schema => { type => 'object' } },
-      input => ';blue%E2%88%92black=yes!;blackish%2Cgreen=%C2%BFno%3f;100%F0%9D%91%A5brown=fl%C2%A1p',
-      content => { 'blue−black' => 'yes!', 'blackish,green' => '¿no?', '100𝑥brown' => 'fl¡p' },
     },
 
     # style=label
@@ -675,10 +673,18 @@ subtest 'path parameters' => sub {
       [ 'label', true,  [ qw(blue black brown) ], '.blue.black.brown' ],
       [ 'label', false, [ 'red.green', 'blue' ], '.red%2Egreen,blue' ],
       [ 'label', true,  [ 'red.green', 'blue' ], '.red%2Egreen.blue' ],
+      [ 'label', false, [ 'blue−black', 'blackish,gr.e.en', '100𝑥brown' ],
+        '.blue%E2%88%92black,blackish%2Cgr%2Ee%2Een,100%F0%9D%91%A5brown' ],
+      [ 'label', true,  [ 'blue−black', 'blackish,gr.e.en', '100𝑥brown' ],
+        '.blue%E2%88%92black.blackish%2Cgr%2Ee%2Een.100%F0%9D%91%A5brown' ],
       [ 'label', false, { qw(R 100 G 200 B 150) }, '.R,100,G,200,B,150' ],
       [ 'label', true,  { qw(R 100 G 200 B 150) }, '.R=100.G=200.B=150' ],
       [ 'label', false, { 'R.X' => '100', G => '200', 'B,Y' => '150' }, '.R%2EX,100,G,200,B%2CY,150' ],
       [ 'label', true,  { 'R.X' => '100', G => '200', 'B=Y' => '150' }, '.R%2EX=100.G=200.B%3DY=150' ],
+      [ 'label', false, { 'blue−black' => 'yes!', 'blackish,gr.e.en' => '¿no?', '100𝑥brown' => 'fl¡p' },
+        '.blue%E2%88%92black,yes!,blackish%2Cgr%2Ee%2Een,%C2%BFno%3f,100%F0%9D%91%A5brown,fl%C2%A1p' ],
+      [ 'label', true,  { 'blue−black' => 'yes!', 'blackish,gr.e.en' => '¿no?', '100𝑥brown' => 'fl¡p' },
+        '.blue%E2%88%92black=yes!.blackish%2Cgr%2Ee%2Een=%C2%BFno%3f.100%F0%9D%91%A5brown=fl%C2%A1p' ],
     ],
 
     {
@@ -715,12 +721,6 @@ subtest 'path parameters' => sub {
       content => [ undef, false, 42, '100' ],
     },
     {
-      name => 'explode=false, array with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'label', schema => { type => 'array' } },
-      input => '.blue%E2%88%92black,blackish%2Cgr%2Ee%2Een,100%F0%9D%91%A5brown',
-      content => [ 'blue−black', 'blackish,gr.e.en', '100𝑥brown' ],
-    },
-    {
       name => 'explode=true, array with non-string items',
       param_obj => { name => 'color', style => 'label', explode => true, schema => {
           type => 'array',
@@ -733,12 +733,6 @@ subtest 'path parameters' => sub {
         } },
       input => '..0.42.100',
       content => [ undef, false, 42, '100' ],
-    },
-    {
-      name => 'explode=true, array with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'label', explode => true, schema => { type => 'array' } },
-      input => '.blue%E2%88%92black.blackish%2Cgr%2Ee%2Een.100%F0%9D%91%A5brown',
-      content => [ 'blue−black', 'blackish,gr.e.en', '100𝑥brown' ],
     },
     {
       name => 'explode=false, bad object',
@@ -784,12 +778,6 @@ subtest 'path parameters' => sub {
         } },
       input => '.a,,b,0,c,42,d,100',
       content => { a => undef, b => false, c => 42, d => '100' },
-    },
-    {
-      name => 'explode=false, object with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'label', schema => { type => 'object' } },
-      input => '.blue%E2%88%92black,yes!,blackish%2Cgr%2Ee%2Een,%C2%BFno%3f,100%F0%9D%91%A5brown,fl%C2%A1p',
-      content => { 'blue−black' => 'yes!', 'blackish,gr.e.en' => '¿no?', '100𝑥brown' => 'fl¡p' },
     },
     {
       name => 'explode=true, object with bad =',
@@ -849,12 +837,6 @@ subtest 'path parameters' => sub {
       input => '.a.b=0.c=42.d=100',
       content => { a => undef, b => false, c => 42, d => '100' },
     },
-    {
-      name => 'explode=true, object with non-ascii name and values',
-      param_obj => { name => 'cølör', style => 'label', explode => true, schema => { type => 'object' } },
-      input => '.blue%E2%88%92black=yes!.blackish%2Cgr%2Ee%2Een=%C2%BFno%3f.100%F0%9D%91%A5brown=fl%C2%A1p',
-      content => { 'blue−black' => 'yes!', 'blackish,gr.e.en' => '¿no?', '100𝑥brown' => 'fl¡p' },
-    },
   );
 
   @tests = map +(
@@ -862,9 +844,9 @@ subtest 'path parameters' => sub {
       ? map +{
           name => defined $_->{explode} ? 'explode='.($_->{explode}?'true':'false') : '',
           param_obj => {
-            name => 'color',
+            name => $_->{name}//'color',
             style => $_->{style},
-            defined $_->{explode} ? (explode => $_->{explode}) : (),
+            defined $_->{explode} ? $_->%{explode} : (),
             schema => { type => get_type($_->{content}) },
           },
           $_->%{qw(input content)},
@@ -895,16 +877,8 @@ subtest 'path parameters' => sub {
 
       undef $parameter_content;
       my $previous_call_count = $call_count;
-      my $state = {
-        initial_schema_uri => $openapi->openapi_uri,
-        traversed_keyword_path => '',
-        keyword_path => $keyword_path,
-        data_path => '/request/uri/path',
-        specification_version => 'draft2020-12',
-        vocabularies => OAS_VOCABULARIES,
-        errors => [],
-        depth => 0,
-      };
+
+      my $state = _init_test('/request/uri/path', +{ $param_obj->%{qw(schema content)} });
 
       my $valid = $openapi->_validate_path_parameter($state, $param_obj,
         { defined $test->{input} ? ($param_obj->{name} => $test->{input}) : () });
@@ -916,7 +890,7 @@ subtest 'path parameters' => sub {
       cmp_result(
         [ map $_->TO_JSON, $state->{errors}->@* ],
         $test->{errors}//[],
-        'path '.$test->{name}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
+        ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
       );
 
       if (not exists $test->{content}) {
@@ -928,7 +902,7 @@ subtest 'path parameters' => sub {
         is_equal(
           $parameter_content,
           $test->{content},
-          'path '.$test->{name}.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
+          defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
         );
       }
     };
@@ -1070,16 +1044,8 @@ subtest 'query parameters' => sub {
     };
 
     undef $parameter_content;
-    my $state = {
-      initial_schema_uri => $openapi->openapi_uri,
-      traversed_keyword_path => '',
-      keyword_path => $keyword_path,
-      data_path => '/request/uri/query',
-      specification_version => 'draft2020-12',
-      vocabularies => OAS_VOCABULARIES,
-      errors => [],
-      depth => 0,
-    };
+
+    my $state = _init_test('/request/uri/query', +{ $param_obj->%{qw(schema content)} });
 
     my $name = $param_obj->{name};
     ()= $openapi->_validate_query_parameter($state, $param_obj, Mojo::URL->new('https://example.com/blah?'.$test->{queries}));
@@ -1127,16 +1093,16 @@ subtest 'header parameters' => sub {
       content => 3, # number, not string!
     },
     {
-      header_obj => { name => 'Cølör', content => { 'application/json' => { schema => { type => 'string' } } } },
+      header_obj => { content => { 'application/json' => { schema => { type => 'string' } } } },
       values => [ "\"red\xef\xb9\xa0green\"" ],
       content => 'red﹠green',
     },
     {
-      header_obj => { name => 'Cølör', content => { 'application/json' => { schema => { type => 'string' } } } },
+      header_obj => { content => { 'application/json' => { schema => { type => 'string' } } } },
       values => [ 'ಠ_ಠ' ],
       errors => [
         {
-          instanceLocation => '/response/header/Cølör',
+          instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
           error => 'wide character detected in header value: not deserializable',
@@ -1210,23 +1176,23 @@ subtest 'header parameters' => sub {
       ],
     },
     {
-      header_obj => { name => 'Mîssiñg', required => true },
+      header_obj => { name => 'Missing', required => true },
       values => undef,
       errors => [
         {
           instanceLocation => '/response/header',
           keywordLocation => $keyword_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'missing header: Mîssiñg',
+          error => 'missing header: Missing',
         },
       ],
     },
     {
-      header_obj => { name => 'Cølör' },
+      header_obj => {},
       values => [ 'ಠ_ಠ' ],
       errors => [
         {
-          instanceLocation => '/response/header/Cølör',
+          instanceLocation => '/response/header/My-Header',
           keywordLocation => $keyword_path,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
           error => 'wide character detected in header value: not deserializable',
@@ -1278,7 +1244,7 @@ subtest 'header parameters' => sub {
       ],
     },
     {
-      header_obj => { name => 'Cølör' },
+      header_obj => {},
       values => [ "red\xef\xb9\xa0green" ],
       content => 'red﹠green',
     },
@@ -1289,7 +1255,7 @@ subtest 'header parameters' => sub {
       ? map +{
           name => defined $_->{explode} ? 'explode='.($_->{explode}?'true':'false') : '',
           header_obj => {
-            defined $_->{explode} ? (explode => $_->{explode}) : (),
+            defined $_->{explode} ? $_->%{explode} : (),
             schema => { type => get_type($_->{content}) },
           },
           $_->%{qw(values content)},
@@ -1330,16 +1296,8 @@ subtest 'header parameters' => sub {
 
       undef $parameter_content;
       my $previous_call_count = $call_count;
-      my $state = {
-        initial_schema_uri => $openapi->openapi_uri,
-        traversed_keyword_path => '',
-        keyword_path => $keyword_path,
-        data_path => '/response/header',
-        specification_version => 'draft2020-12',
-        vocabularies => OAS_VOCABULARIES,
-        errors => [],
-        depth => 0,
-      };
+
+      my $state = _init_test('/response/header', +{ $param_obj->%{qw(schema content)} });
 
       my $headers = Mojo::Headers->new;
       $headers->add(Encode::encode('UTF-8', $param_obj->{name}, Encode::DIE_ON_ERR | Encode::LEAVE_SRC), $test->{values}->@*)
@@ -1354,7 +1312,7 @@ subtest 'header parameters' => sub {
       cmp_result(
         [ map $_->TO_JSON, $state->{errors}->@* ],
         $test->{errors}//[],
-        'header '.$param_obj->{name}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
+        ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
       );
 
       if (not exists $test->{content}) {
@@ -1366,7 +1324,7 @@ subtest 'header parameters' => sub {
         is_equal(
           $parameter_content,
           $test->{content},
-          'header '.$param_obj->{name}.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
+          defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
         );
       }
     };
@@ -1378,6 +1336,11 @@ subtest 'type inference and coercion' => sub {
     openapi_uri => 'http://localhost:1234/api',
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
 components:
+  parameters:
+    MyParameter:
+      name: my_parameter
+      in: query
+      schema: {}    # placeholder so fetching schema info will work
   schemas:
     my_type1:
       type: [ object, array ]
@@ -1626,6 +1589,14 @@ YAML
 
     ) {
       my ($expected_types, $schema) = @$test;
+
+      # hack, to allow _fetch_from_uri and cache to work
+      jsonp_set($openapi->openapi_document->schema, $state->{keyword_path}, $schema);
+      $openapi->openapi_document->{_type_in_schema} //= {};
+      my $path = $state->{keyword_path};
+      my $len = length $path;
+      delete $openapi->openapi_document->{_type_in_schema}{$_}
+        foreach grep substr($_, 0, $len) eq $path, keys $openapi->openapi_document->{_type_in_schema}->%*;
 
       my @types = $openapi->_type_in_schema($schema, { %$state });
       cmp_result(

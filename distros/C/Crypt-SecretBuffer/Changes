@@ -1,3 +1,6 @@
+Version 0.020 - 2026-03-08
+  - Fix bugs in ::PEM->headers (unicode_values, call methods on tied hash)
+
 Version 0.019 - 2026-03-05
   - Method 'memcmp' and Span->cmp are now constant-time operations, protecting
     against timing attacks when comparing passwords.

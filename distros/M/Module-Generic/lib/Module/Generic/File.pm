@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.15.0
+## Version v0.15.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/09/30
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -143,7 +143,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.15.0';
+    our $VERSION = 'v0.15.1';
 };
 
 use v5.12.0;
@@ -351,7 +351,7 @@ sub as
 # This class does not convert to an HASH, but the TO_JSON method will convert to a string
 sub as_hash { return( $_[0] ); }
 
-sub atime { return( shift->finfo->atime ); }
+sub atime { return( shift->finfo->reset->atime ); }
 
 # sub auto_remove { return( shift->_set_get_boolean( 'auto_remove', @_ ) ); }
 sub auto_remove
@@ -452,11 +452,11 @@ sub basename { return( scalar( shift->baseinfo( @_ ) ) ); }
 
 sub binmode { return( shift->_filehandle_method( 'binmode', 'file', @_ ) ); }
 
-sub block_size { return( shift->finfo->block_size ); }
+sub block_size { return( shift->finfo->reset->block_size ); }
 
 sub blocking { return( shift->_filehandle_method( 'blocking', 'file', @_ ) ); }
 
-sub blocks { return( shift->finfo->blocks ); }
+sub blocks { return( shift->finfo->reset->blocks ); }
 
 sub can_append
 {
@@ -759,7 +759,7 @@ sub chmod
     elsif( $this =~ /^[augo]+[=+-][rwx]+/ )
     {
         # Credits: David Golden for this nifty code borrowed from Path::Tiny
-        $mode = $self->finfo->mode;
+        $mode = $self->finfo->reset->mode;
         foreach my $def ( CORE::split( /,[[:blank:]\h]*/, $this ) )
         {
             if( /^(?<who>[augo]+)(?<what>[=+-])(?<perms>[rwx]+)$/ )
@@ -1096,7 +1096,7 @@ sub copy { return( shift->_move_or_copy( copy => @_ ) ); }
 
 sub cp { return( shift->copy( @_ ) ); }
 
-sub ctime { return( shift->finfo->ctime ); }
+sub ctime { return( shift->finfo->reset->ctime ); }
 
 sub cwd
 {
@@ -1151,7 +1151,7 @@ sub delete
     return( $self );
 }
 
-sub device { return( shift->finfo->device ); }
+sub device { return( shift->finfo->reset->device ); }
 
 sub digest
 {
@@ -1614,7 +1614,7 @@ sub getline { return( shift->_filehandle_method( 'getline', 'file', @_ ) ); }
 
 sub getlines { return( shift->_filehandle_method( 'getlines', 'file', @_ ) ); }
 
-sub gid { return( shift->finfo->gid ); }
+sub gid { return( shift->finfo->reset->gid ); }
 
 sub glob
 {
@@ -1731,7 +1731,7 @@ sub has_valid_name
     return( $name !~ /$ILLEGAL_CHARACTERS/ ? $self->true : $self->false );
 }
 
-sub inode { return( shift->finfo->inode ); }
+sub inode { return( shift->finfo->reset->inode ); }
 
 sub ioctl { return( shift->_filehandle_method( 'ioctl', 'file', @_ ) ); }
 
@@ -1899,9 +1899,9 @@ sub join
     return( $self->new( $new, debug => $self->debug, os => $self->{os} ) );
 }
 
-sub last_accessed { return( shift->finfo->atime ); }
+sub last_accessed { return( shift->finfo->reset->atime ); }
 
-sub last_modified { return( shift->finfo->mtime ); }
+sub last_modified { return( shift->finfo->reset->mtime ); }
 
 sub length
 {
@@ -2252,10 +2252,12 @@ sub load_csv
     my( $enc, $first_row );
     if( $opts->{detect_bom} )
     {
+        $self->__message( 6, "Checking for BOM in CSV file." );
         if( $opened )
         {
             $self->close;
         }
+        $self->__message( 6, "Opening the CSV file ${file} in raw mode." );
         $opened = $io = $self->open( '<', { binmode => 'raw' } ) || return( $self->pass_error );
         my $buffer = $self->getline;
         defined( $buffer ) or return( $self->pass_error );
@@ -3233,15 +3235,15 @@ sub mmap
     }
 }
 
-sub mode { return( shift->finfo->mode ); }
+sub mode { return( shift->finfo->reset->mode ); }
 
 sub move { return( shift->_move_or_copy( move => @_ ) ); }
 
-sub mtime { return( shift->finfo->mtime ); }
+sub mtime { return( shift->finfo->reset->mtime ); }
 
 sub mv { return( shift->move( @_ ) ); }
 
-sub nlink { return( shift->finfo->nlink ); }
+sub nlink { return( shift->finfo->reset->nlink ); }
 
 sub open
 {
@@ -3493,7 +3495,7 @@ sub printf { return( shift->_filehandle_method( 'printf', 'file', @_ ) ); }
 
 sub println { return( shift->_filehandle_method( 'say', 'file', @_ ) ); }
 
-sub rdev { return( shift->finfo->rdev ); }
+sub rdev { return( shift->finfo->reset->rdev ); }
 
 sub read
 {
@@ -4033,13 +4035,18 @@ sub spurt { return( shift->unload( @_ ) ); }
 
 sub spurt_utf8 { return( shift->unload_utf8( @_ ) ); }
 
-sub stat { return( shift->finfo ); }
+sub stat { return( shift->finfo->reset ); }
 
 sub stderr { return( &_function2method( \@_ )->_standard_io( 'stderr', @_ ) ); }
 
 sub stdin { return( &_function2method( \@_ )->_standard_io( 'stdin', @_ ) ); }
 
 sub stdout { return( &_function2method( \@_ )->_standard_io( 'stdout', @_ ) ); }
+
+{
+    no warnings 'once';
+    *stringify = \&load_utf8;
+}
 
 sub suffix { return( shift->extension( @_ ) ); }
 
@@ -4119,6 +4126,10 @@ sub tempfile
     # $fname .= $opts->{suffix} if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^\.[\w\-\_]+$/ );
     if( CORE::defined( $opts->{suffix} ) && CORE::length( $opts->{suffix} ) && $opts->{suffix} =~ /^[\w\-\_\.]+$/ )
     {
+        if( $opts->{suffix} !~ /[A-Za-z0-9_]/ )
+        {
+            warnings::warn( "Warning only: suffix provided looks unusual: \"$opts->{suffix}\"\n" ) if( warnings::enabled() );
+        }
         substr( $opts->{suffix}, 0, 0, '.' ) if( substr( $opts->{suffix}, 0, 1 ) ne '.' );
         $fname .= $opts->{suffix};
     }
@@ -4158,7 +4169,7 @@ sub tempfile
     {
         $dir = $sys_tmpdir;
     }
-    CORE:delete( @$opts{ qw( dir suffix ) } );
+    CORE::delete( @$opts{ qw( dir suffix ) } );
     $opts->{open} //= 0;
     my $open = CORE::delete( $opts->{open} );
     $opts->{resolved} = 1;
@@ -4275,7 +4286,7 @@ sub type
     return( $self->_set_get_scalar( 'type' ) );
 }
 
-sub uid { return( shift->finfo->uid ); }
+sub uid { return( shift->finfo->reset->uid ); }
 
 sub ungetc { return( shift->_filehandle_method( 'ungetc', 'file', @_ ) ); }
 
@@ -4638,10 +4649,10 @@ sub unload_json
     my $j = $self->new_json->allow_tags(0) || return( $self->pass_error );
     my $equi =
     {
-        order => 'canonical',
+        order   => 'canonical',
         ordered => 'canonical',
-        sorted => 'canonical',
-        sort => 'canonical',
+        sorted  => 'canonical',
+        sort    => 'canonical',
     };
 
     foreach my $opt ( keys( %$opts ) )
@@ -4684,7 +4695,13 @@ sub unload_perl
     my $data = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $callback;
-    if( $opts->{callback} && ref( $opts->{callback} ) eq 'CODE' )
+    if( $opts->{pretty} )
+    {
+        $self->_load_class( 'Data::Pretty' ) ||
+            return( $self->error );
+        $callback = sub{ return( Data::Pretty::dump( @_ ) ); };
+    }
+    elsif( $opts->{callback} && ref( $opts->{callback} ) eq 'CODE' )
     {
         $callback = $opts->{callback};
     }
@@ -5431,16 +5448,20 @@ sub DESTROY
     }
 
     my $repo_key = CORE::join( ';', ( ref( $self ) || $self ), "$file", $$, ( HAS_THREADS ? threads->tid : () ) );
-    my $repo = Module::Generic::Global->new( 'files_to_remove' => $self, key => $repo_key ) ||
+    my $repo     = Module::Generic::Global->new( 'files_to_remove' => $self, key => $repo_key ) ||
         die( Module::Generic::Global->error );
     $repo->remove;
+    # For non-object context, we need to call cleanup to ensure there is no leftover
+    my $repo_locks = Module::Generic::Global->new( 'fd_locks' => CORE::ref( $self ), key => "$file" );
+    $repo_locks->cleanup;
+
     # Could use also O_TEMPORARY provided by Fcntl to instruct the system to automatically
     # remove the file, but it is not supported on all platforms.
     my $orig = $self->{_orig};
     if( $self->auto_remove )
     {
         my @info = caller();
-        my $sub = [caller(1)]->[3];
+        my $sub  = [caller(1)]->[3];
         return unless( -e( $file ) );
         if( $self->is_dir )
         {
@@ -5463,13 +5484,32 @@ sub FREEZE
     my $self = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
-    my %hash  = %$self;
-    CORE::delete( @hash{ qw( opened _handle ) } );
+    my @props = qw(
+        autoflush auto_remove base_dir base_file collapse debug filename glob max_recursion
+        os resolved type use_file_map _orig
+    );
+    my $hash  = {};
+    foreach my $prop ( @props )
+    {
+        if( exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
@@ -5775,9 +5815,13 @@ Module::Generic::File - File Object Abstraction Class
         always_quote => 1,
     ) || die( $file->error );
 
+    my $data = $file->load_utf8;
+    # also, as an alias:
+    my $data = $file->stringify;
+
 =head1 VERSION
 
-    v0.15.0
+    v0.15.1
 
 =head1 DESCRIPTION
 
@@ -5887,6 +5931,8 @@ Provided with an C<OS> name, and this will return a filename with a format suita
 
 This is a shortcut to L<Module::Generic::Finfo/atime>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 auto_remove
 
 This takes a boolean value and enables or disables the auto remove of temporary file or directory created by this module upon perl cleanup phase.
@@ -5939,6 +5985,8 @@ Sets or get the file binmode.
 
 This is a shortcut to L<Module::Generic::Finfo/block_size>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 blocking
 
 Turns on or off blocking or non-blocking io for file opened.
@@ -5946,6 +5994,8 @@ Turns on or off blocking or non-blocking io for file opened.
 =head2 blocks
 
 This is a shortcut to L<Module::Generic::Finfo/blocks>
+
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
 
 =head2 can_append
 
@@ -6113,6 +6163,8 @@ On success, this returns a md5 hex digest of the underlying file.
 
 This is a shortcut to L<Module::Generic::Finfo/ctime>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 cwd
 
 Returns a new L<Module::Generic::File> object representing the current working directory.
@@ -6124,6 +6176,8 @@ This will attempt to remove the underlying directory or file and returns the cur
 =head2 device
 
 This is a shortcut to L<Module::Generic::Finfo/device>
+
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
 
 =head2 digest
 
@@ -6375,9 +6429,11 @@ This is a thin wrapper around L<IO::Handle> method of the same name.
 
 This is a shortcut to L<Module::Generic::Finfo/gid>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 glob
 
-Provided with a pattern with meta characters, or using the current object underlying filename by default, and this will call L<perlfunc/glob> to resolve those meta characters, if any. For example:
+Provided with a pattern with meta characters, or using the current object underlying filename by default, and this will call L<File::Glob/bsd_glob> to resolve those meta characters, if any. For example:
 
 C<~joe/some/file.txt> would be resolved to C</home/joe/some/file.txt>
 
@@ -6492,6 +6548,8 @@ The regular expression used is: C<< [\x5C\/\|\015\012\t\013\*\"\?\<\:\>] >>
 
 This is a shortcut to L<Module::Generic::Finfo/inode>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 ioctl
 
 This is a thin wrapper around L<IO::Handle> method of the same name.
@@ -6578,9 +6636,13 @@ It does not use nor affect the current object used and it can actually be called
 
 This is a shortcut to L<Module::Generic::Finfo/atime>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 last_modified
 
 This is a shortcut to L<Module::Generic::Finfo/mtime>
+
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
 
 =head2 length
 
@@ -6589,6 +6651,8 @@ This returns the size of the element as a L<Module::Generic::Number> object.
 if the element does not yet exist, L<Module::Generic::Number> object representing the value 0 is returned.
 
 This uses L<Module::Generic::Finfo/size>
+
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
 
 =head2 line
 
@@ -6960,7 +7024,6 @@ This method locks the file using a combination of L<perlfunc/flock>, ensuring th
 
 It takes either a numeric argument representing the flag bitwise, or a list or hash reference of optional parameters, such as:
 
-
 Accepts either a numeric bitwise flag (e.g., C<LOCK_EX | LOCK_NB>) or an hash or hash reference of options:
 
 =over 4
@@ -7212,6 +7275,8 @@ L</mmap> is not thread-safe for shared mappings. Use it only in single-threaded 
 
 This is a shortcut to L<Module::Generic::Finfo/mode>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 move
 
 This behaves exactly like L</copy> except it moves the element instead of copying it.
@@ -7222,6 +7287,8 @@ Note that you can use C<mv> as a method shortcut instead.
 
 This is a shortcut to L<Module::Generic::Finfo/mtime>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 mv
 
 Shorthand for L</move>
@@ -7229,6 +7296,8 @@ Shorthand for L</move>
 =head2 nlink
 
 This is a shortcut to L<Module::Generic::Finfo/nlink>
+
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
 
 =head2 open
 
@@ -7323,6 +7392,8 @@ Calls L<perlfunc/say> on the file handle and pass it whatever arguments is provi
 =head2 rdev
 
 This is a shortcut to L<Module::Generic::Finfo/rdev>
+
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
 
 =head2 read
 
@@ -7525,6 +7596,8 @@ This is an alias for L</unload_utf8>
 
 Returns the value from L</finfo>
 
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
+
 =head2 stderr
 
 This returns a filehandle object referencing C<STDERR>. It takes an optional hash or hash reference of following options:
@@ -7608,6 +7681,10 @@ Or you can also call it from another C<Module::Generic::File> object:
     use Module::Generic::File qw( file );
     my $f = file( $some_file_name );
     my $out = $f->stdout;
+
+=head2 stringify
+
+This is an alias for L</load_utf8>
 
 =head2 symlink
 
@@ -7722,6 +7799,8 @@ If there is no value set, this will try to guess it.
 =head2 uid
 
 This is a shortcut to L<Module::Generic::Finfo/uid>
+
+It ensures the information returned is always fresh by calling L<Module::Generic::Finfo/reset>
 
 =head2 ungetc
 
@@ -7911,7 +7990,7 @@ Boolean. This option is ignored, because the JSON data are saved to file using U
 
 =head2 unload_perl
 
-Just like L</unload>, this takes some perl data structure (most likely an hash or an array), and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode> and save the perl data structure to it using either L<Data::Dump> or a callback code if one is provided.
+Just like L</unload>, this takes some perl data structure (most likely an hash or an array), and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode> and save the perl data structure to it using either L<Data::Pretty> (with the option C<pretty>), L<Data::Dump> or a callback code if one is provided.
 
 If no callback option is specified and L<Data::Dump> is not installed, this will return an error.
 
@@ -7934,6 +8013,10 @@ Integer. This is the size threshold of binary data above which it will be conver
 =item C<max_width>
 
 Integer. This is the line width threshold after which a new line will be inserted by L<Data::Dump>. The default is 60.
+
+=item C<pretty>
+
+Boolean (C<0> or C<1>). If true, then this will use L<Data::Pretty> instead of L<Data::Dump>. If it is not installed, it will return an L<error|Module::Generic/error>.
 
 =back
 

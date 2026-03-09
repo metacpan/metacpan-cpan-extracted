@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.158;
+package Config::Model::Value 2.159;
 
 use v5.20;
 
@@ -822,17 +822,13 @@ sub get_info {
     return @items ;
 }
 
-sub get_help {
-    my $self = shift;
-
+sub get_help ($self, $on_value = '') {
     my $help = $self->{help};
 
-    return $help unless @_;
-
-    my $on_value = shift;
-    return unless defined $on_value;
+    return $help unless $on_value;
 
     my $fallback = $help->{'.'} || $help -> {'.*'};
+    # try longest keys first, the first one that matches wins
     foreach my $k (sort { length($b) cmp length($a) } keys %$help) {
         next if $k eq '' or $k eq '.*';
         return $help->{$k} if $on_value =~ /^$k/;
@@ -2036,7 +2032,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

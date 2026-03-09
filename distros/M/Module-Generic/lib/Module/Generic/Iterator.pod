@@ -29,7 +29,7 @@ Module::Generic::Iterator - An Array Iterator Object Class
 
 =head1 VERSION
 
-    v1.2.3
+    v1.2.4
 
 =head1 DESCRIPTION
 

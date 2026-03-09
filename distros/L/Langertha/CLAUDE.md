@@ -21,6 +21,12 @@ prove -lv t/60_tool_calling.t  # Single test, verbose
 ```
 Engine::Remote              url required, JSON + HTTP
   │
+  ├── Engine::AnthropicBase /v1/messages format, x-api-key auth, SSE streaming
+  │     │
+  │     ├── Anthropic       Claude models, thinking blocks, tool_use
+  │     ├── MiniMax         Anthropic-compatible Shanghai provider
+  │     └── LMStudioAnthropic LM Studio Anthropic-compatible endpoint
+  │
   ├── Engine::OpenAIBase    /chat/completions format, Bearer auth, SSE streaming
   │     │
   │     │  Cloud providers (url has default, api_key from env)
@@ -43,7 +49,6 @@ Engine::Remote              url required, JSON + HTTP
   │     └── LlamaCpp        llama.cpp server, embeddings
   │
   │  Non-OpenAI formats (own request/response handling)
-  ├── Anthropic             x-api-key auth, content blocks, thinking, tool_use
   ├── Gemini                ?key= auth, functionDeclarations, thought parts
   ├── Ollama                native /api/chat, NDJSON streaming, OpenAPI spec
   └── AKI                   key-in-body auth, EU/Germany, /api/call/{model}

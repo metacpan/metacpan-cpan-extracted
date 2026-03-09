@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Boolean.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/20
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
         fallback => 1;
     $true  = do{ bless( \( my $dummy = 1 ) => 'Module::Generic::Boolean' ) };
     $false = do{ bless( \( my $dummy = 0 ) => 'Module::Generic::Boolean' ) };
-    our( $VERSION ) = 'v1.2.1';
+    our( $VERSION ) = 'v1.2.2';
 };
 
 use v5.26.1;
@@ -108,7 +108,16 @@ sub FREEZE
     my $class = CORE::ref( $self );
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, $$self] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $$self] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
     CORE::return( $$self );
 }

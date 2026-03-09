@@ -16,21 +16,7 @@ BEGIN {
    $ENV{PERLREPL_HISTLEN} = 500;
 }
 
-BEGIN {
-   my $minversion = "1.003011";
-   eval " use Devel::REPL $minversion ";
-   if ($@) {
-      my ($perldl) = $0;
-      $perldl =~ s/pdl2\.bat$/perldl.bat/;
-      $perldl =~ s/pdl2$/perldl/;
-      warn "pdl2: Devel::REPL version $minversion not found, running '$perldl' instead...\n";
-      do $perldl;
-      warn "pdl2: could not 'do $perldl'\n";
-      $perldl =~ s{^[^/\\]*[/\\]}{};
-      do $perldl;
-      die "pdl2: could not 'do $perldl'\n";
-   }
-}
+use Devel::REPL 1.003011;
 
 use PDL::Perldl2::Script 'run';
 

@@ -193,4 +193,67 @@ subtest header_manipulation => sub {
       'added new key/value' );
 };
 
+subtest header_tied_hash_obj => sub {
+   my $pem= Crypt::SecretBuffer::PEM->new(
+      content => 'example',
+      header_kv => [
+         A => 1,
+         a => 2,
+         ' A ' => 3,
+      ]
+   );
+   is( { %{$pem->headers} }, { A => 1, a => 2, ' A ' => 3 }, 'dump headers hash' );
+   $pem->headers->caseless_keys(1)->trim_keys(1);
+   is( { %{$pem->headers} }, { A => [1,2,3] }, 'dump headers hash with casefolding and trim' );
+};
+
+subtest header_unicode => sub {
+   my $canonical= "-----BEGIN SOMETHING-----\n"
+                . "\xE8\xA9\xA6: -\xE8\xA9\xA6-\n"
+                . "\n"
+                . "VGVzdA==\n"
+                . "-----END SOMETHING-----\n";
+   my $pem= Crypt::SecretBuffer::PEM->parse(secret($canonical)->span);
+   is( $pem,
+       object {
+         call label => 'SOMETHING';
+         # should be bytes
+         call header_kv => [
+            "\xE8\xA9\xA6", "-\xE8\xA9\xA6-",
+         ];
+         call headers => object {
+            call [ unicode_keys => 1 ], T;
+            call [ unicode_values => 1 ], T;
+            # should be unicode
+            call [ get => "\x{8A66}" ] => "-\x{8A66}-";
+         };
+         # original scalars should be unchanged
+         call header_kv => [
+            "\xE8\xA9\xA6", "-\xE8\xA9\xA6-",
+         ];
+         call content => object {
+            call [ memcmp => "VGVzdA==\n" ], 0;
+            call [ cmp => "Test" ], 0;
+         };
+       },
+       'parse'
+   ) or diag explain $pem;
+
+   is( $pem->serialize->memcmp($canonical), 0, 'serialize' );
+};
+
+my %perl_internal= map +($_ => 1), qw( isa can import );
+subtest clean_namespace => sub {
+   my $ns= \%Crypt::SecretBuffer::PEM::;
+   my @public= qw( buffer content header_kv headers label new parse parse_all serialize );
+   is( [ grep /^[a-z]/ && !$perl_internal{$_}, sort keys %$ns ], \@public, 'PEM' )
+      or diag explain $ns;
+
+   $ns= \%Crypt::SecretBuffer::PEM::Headers::;
+   @public= qw( append caseless_keys delete get get_array keys new raw_kv_array set trim_keys
+                unicode_keys unicode_values );
+   is( [ grep /^[a-z]/ && !$perl_internal{$_}, sort keys %$ns ], \@public, 'PEM::Headers' )
+      or diag explain $ns;
+};
+
 done_testing;

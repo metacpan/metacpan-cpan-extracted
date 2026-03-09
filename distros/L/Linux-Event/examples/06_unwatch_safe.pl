@@ -11,7 +11,7 @@ use Linux::Event;
 
 pipe(my $r, my $w) or die "pipe failed: $!";
 
-my $loop = Linux::Event->new( backend => 'epoll' );
+my $loop = Linux::Event->new( model => 'reactor', backend => 'epoll' );
 
 say "unwatch_safe: unwatch on never-watched handle returns " . ($loop->unwatch($r) ? 1 : 0);
 

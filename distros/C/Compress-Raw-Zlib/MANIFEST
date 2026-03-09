@@ -19,6 +19,7 @@ typemap
 Makefile.PL
 private/MakeUtil.pm
 MANIFEST
+SECURITY.md
 ppport.h
 config.in
 zlib-src/adler32.c

@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDefinitionCondition;
 # ABSTRACT: CustomResourceDefinitionCondition contains details for the current condition of this pod.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -32,7 +32,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::CustomResourceDef
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 lastTransitionTime
 

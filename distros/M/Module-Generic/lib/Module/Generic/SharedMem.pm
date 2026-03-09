@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.5.4
+## Version v0.5.5
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2025/07/30
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -121,7 +121,7 @@ EOT
         lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.5.4';
+    our $VERSION = 'v0.5.5';
 };
 
 use v5.26.1;
@@ -492,8 +492,8 @@ sub open
     local $@;
     eval
     {
-        my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => CORE::ref( $self ) );
-        my $serial2semid_hash = $serial2semid_repo->get // {};
+        my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => $serial );
+        my $serial2semid = $serial2semid_repo->get;
         # The user passed it explicitly
         if( defined( $opts->{semid} ) )
         {
@@ -505,9 +505,9 @@ sub open
             $semid = $semaphore_id;
         }
         # The semaphore ID is stored in the global shared hash
-        elsif( !$create && CORE::exists( $serial2semid_hash->{ $serial } ) )
+        elsif( !$create && defined( $serial2semid ) )
         {
-            $semid = $serial2semid_hash->{ $serial };
+            $semid = $serial2semid;
         }
         else
         {
@@ -520,8 +520,7 @@ sub open
             if( defined( $semid ) && $create )
             {
                 $serial2semid_repo->lock;
-                $serial2semid_hash->{ $serial } = $semid;
-                $serial2semid_repo->set( $serial2semid_hash );
+                $serial2semid_repo->set( $semid );
                 $serial2semid_repo->unlock;
             }
         }
@@ -810,9 +809,9 @@ sub remove_semaphore
     my $semid = shift( @_ ) || $self->semid;
     return( $self->error( "No semaphore id provided nor found for shared memory id '$id'. You must open the shared memory first to remove semaphore." ) ) if( !length( $semid // '' ) );
     my $serial = $self->serial;
-    my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => CORE::ref( $self ), key => $serial );
     $serial2semid_repo->lock;
-    my $serial2semid_hash = $serial2semid_repo->get // {};
+    my $serial2semid = $serial2semid_repo->get;
     my $repo_modified = 0;
     # Should we really remove this part ?
     # if( $semid eq '0' )
@@ -845,10 +844,9 @@ sub remove_semaphore
         {
             # Treat as success since semaphore is gone
             $rv = 1;
-            if( defined( $serial ) && CORE::exists( $serial2semid_hash->{ $serial } ) )
+            if( defined( $serial ) && defined( $serial2semid ) )
             {
-                CORE::delete( $serial2semid_hash->{ $serial } );
-                $repo_modified++;
+                $serial2semid_repo->remove;
             }
         }
         else
@@ -858,14 +856,12 @@ sub remove_semaphore
     }
     else
     {
-        if( defined( $serial ) && CORE::exists( $serial2semid_hash->{ $serial } ) )
+        if( defined( $serial ) && defined( $serial2semid ) )
         {
-            CORE::delete( $serial2semid_hash->{ $serial } );
-            $repo_modified++;
+            $serial2semid_repo->remove;
         }
         # return(1);
     }
-    $serial2semid_repo->set( $serial2semid_hash ) if( $repo_modified );
     $serial2semid_repo->unlock;
     $self->removed_semaphore( $rv ? 1 : 0 );
     $self->semid( undef() );
@@ -1329,6 +1325,23 @@ sub DESTROY
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( $self->{id} );
+
+    # For non-object context, we need to call cleanup to ensure there is no leftover
+    my $class  = CORE::ref( $self );
+    my $serial = $self->serial;
+    if( $serial )
+    {
+        my $serial2semid_repo = Module::Generic::Global->new( 'serial2semid' => $class, key => $serial );
+        $serial2semid_repo->cleanup;
+    }
+    my $shem_repo = Module::Generic::Global->new( 'shem_repo' => $class, key => $class );
+    $shem_repo->cleanup;
+    if( $self->{id} )
+    {
+        my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => $class, key => $self->{id} );
+        $id2obj_repo->cleanup;
+    }
+
     $self->unlock;
     $self->detach;
     my $rv = $self->remove_semaphore;
@@ -1345,16 +1358,28 @@ sub DESTROY
 
 sub FREEZE
 {
-    my $self = CORE::shift( @_ );
+    my $self       = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self );
-    my %hash  = %$self;
-    CORE::delete( @hash{ qw( addr id locked owner removed removed_semaphore semid ) } );
+    my $class      = CORE::ref( $self );
+    # We skip 'owner' on purpose, since it represents the process ID
+    my @props      = qw(
+        base64 create destroy destroy_semaphore exclusive key mode
+        serial size _packing_method
+    );
+    my $hash  = {};
+    foreach my $prop ( @props )
+    {
+        if( exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+    # CORE::delete( @hash{ qw( addr id locked owner removed removed_semaphore semid ) } );
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    CORE::return( [$class, $hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
@@ -1481,7 +1506,16 @@ sub THAW
         my @array = @$self;
         # Return an array reference rather than a list so this works with Sereal
         # On or before Sereal version 4.023, Sereal did not support multiple values returned
-        CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+        if( $serialiser eq 'Sereal' )
+        {
+            require Sereal::Encoder;
+            require version;
+        
+            if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+            {
+                CORE::return( [$class, \@array] );
+            }
+        }
         # But CBOR and Storable want a list with the first element being the serialised element
         CORE::return( $class, \@array );
     }

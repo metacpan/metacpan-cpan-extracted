@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TLSOption;
 # ABSTRACT: Traefik TLS configuration options
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'tlsoptions';
@@ -23,7 +23,7 @@ IO::K8s::Traefik::V1alpha1::TLSOption - Traefik TLS configuration options
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

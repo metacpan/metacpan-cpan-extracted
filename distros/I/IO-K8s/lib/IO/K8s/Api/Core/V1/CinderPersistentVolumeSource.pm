@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::CinderPersistentVolumeSource;
 # ABSTRACT: Represents a cinder volume resource in Openstack. A Cinder volume must exist before mounting to a container. The volume must also be in the same region as the kubelet. Cinder volumes support ownership management and SELinux relabeling.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s fsType => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::CinderPersistentVolumeSource - Represents a cinder volum
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 fsType
 

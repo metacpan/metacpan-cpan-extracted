@@ -1,5 +1,20 @@
 Revision history for IO-K8s
 
+1.008     2026-03-08 23:36:05Z
+
+1.007     2026-03-08 15:01:36Z
+  - Fix import leak: using an IO::K8s class (e.g. use IO::K8s::Api::Core::V1::Secret)
+    no longer contaminates the caller's namespace with the k8s DSL function or
+    IO::K8s::Role::Resource. Previously, _setup_class used extends (inheritance),
+    causing every IO::K8s subclass to inherit Resource's import method and re-run
+    _setup_class on any package that loaded it. Now uses Moo::Role composition
+    (apply_roles_to_package) instead, so the import method stays in IO::K8s::Resource.
+  - IO::K8s::Resource no longer composes IO::K8s::Role::Resource itself (it is
+    NOT a resource, it is the DSL/setup class).
+  - _k8s_attr_info is now called as a method on the target class (via the composed
+    Role::Resource) instead of as a direct function call on IO::K8s::Resource.
+  - Added regression test t/27_no_import_leak.t.
+
 1.006     2026-03-01 02:55:20Z
   - Fix struct_to_object destroying pre-built objects: when a typed IO::K8s
     object was passed into a parent constructor (e.g. PersistentVolumeClaim in

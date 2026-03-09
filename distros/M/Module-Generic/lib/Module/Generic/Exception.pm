@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Exception.pm
-## Version v1.4.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.4.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/04/19
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,7 +29,7 @@ BEGIN
     $CALLER_LEVEL = 0;
     $CALLER_INTERNAL->{'Module::Generic'}++;
     $CALLER_INTERNAL->{'Module::Generic::Exception'}++;
-    our $VERSION = 'v1.4.0';
+    our $VERSION = 'v1.4.1';
 };
 
 BEGIN
@@ -209,16 +209,6 @@ sub line { return( shift->reset(@_)->_set_get_scalar( 'line', @_ ) ); }
 
 sub locale { return( shift->reset(@_)->_set_get_scalar( 'lang', @_ ) ); }
 
-# sub message
-# {
-#     my( $self, $mesg ) = @_;
-#     if( defined( $mesg ) )
-#     {
-#         $self->{message} = $mesg;
-#     }
-#     return( $self->{message} );
-# }
-
 sub message { return( shift->reset(@_)->_set_get_scalar( {
     field => 'message',
     callbacks => 
@@ -226,6 +216,7 @@ sub message { return( shift->reset(@_)->_set_get_scalar( {
         set => sub
         {
             my( $self, $val ) = @_;
+            $self->__message( 12, "Value being set is '", ( $val // 'undef' ), "' (", overload::StrVal( $val // '' ), ")" );
             if( defined( $val ) && !$self->lang )
             {
                 if( $self->_can( $val => 'locale' ) )
@@ -343,12 +334,30 @@ sub FREEZE
     my $self = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
-    my %hash  = %$self;
+    # We purposely exclude the trace object to save space.
+    my @props = qw( cause code debug file lang line message package retry_after skip_frames subroutine type );
+    my $hash  = {};
+    foreach my $prop ( @props )
+    {
+        if( exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
@@ -439,7 +448,7 @@ or, re-using an exception object:
 
 =head1 VERSION
 
-    v1.4.0
+    v1.4.1
 
 =head1 DESCRIPTION
 

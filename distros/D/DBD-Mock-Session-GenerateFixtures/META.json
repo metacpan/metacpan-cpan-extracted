@@ -40,6 +40,7 @@
             "File::Path" : "2.18",
             "File::Slurper" : "0.014",
             "File::Spec" : "3.75",
+            "File::Which" : "1.27",
             "Readonly" : "2.05",
             "Sub::Override" : "0.12",
             "Try::Tiny" : "0.32",
@@ -49,14 +50,17 @@
       "test" : {
          "requires" : {
             "DBD::SQLite" : "1.74",
+            "DBD::mysql" : "5.012",
             "DBI" : "1.643",
             "Exporter::NoWork" : "0.03",
             "Rose::DB" : "0.786",
+            "Rose::DB::MySQL" : "0.774",
             "Rose::DB::Object" : "0.822",
             "Rose::DB::Object::Loader" : "0.799",
             "Rose::DB::Object::Manager" : "0.813",
             "Sub::Override" : "0.12",
             "Test2::V0" : "0.000145",
+            "Test::mysqld" : "1.0030",
             "Try::Tiny" : "0.32",
             "autodie" : "2.37"
          }
@@ -68,6 +72,6 @@
          "url" : "https://github.com/DragosTrif/DBD-Fixtures"
       }
    },
-   "version" : 1.01,
+   "version" : 1.11,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

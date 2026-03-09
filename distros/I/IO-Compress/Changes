@@ -1,6 +1,36 @@
 CHANGES
 -------
 
+  2.218 8 March 2026
+
+    * Refresh zipdetails to version 4.005 Sourced from https://github.com/pmqs/zipdetails
+      Sun Mar 8 15:07:58 2026 +0000
+      13528f57cffecebdddc2f04e5d6dc7590b0acd3e
+
+    * version 2.218
+      Sun Mar 8 14:28:31 2026 +0000
+      3e0ff70d9dd75749a3c03efb666af8d7adff2a19
+
+    * Add SECURITY.md,  Fixes #69
+      Sun Mar 8 14:03:41 2026 +0000
+      b95e8a32051aa3d7d69e7e60acf3eb7c0c274a7b
+
+    * fix spelling typo
+      Tue Feb 24 19:47:01 2026 +0000
+      ecd61fa10ef1d1b9bc30662bfccf68d75118103a
+
+    * Refresh Changes file
+      Sun Feb 1 11:04:49 2026 +0000
+      c9f81969de01d90104f7abbaafe09608af92bbf1
+
+    * Update release date in README
+      Sun Feb 1 11:02:46 2026 +0000
+      ce5ff6ea860443bc27ca180993852eb6ef1a63e8
+
+    * Refresh zipdetails from https://github.com/pmqs/zipdetails
+      Sun Feb 1 10:58:21 2026 +0000
+      0fa7ba236438fb2e022f9f2bb92caac25f075cc5
+
   2.217 1 February 2026
 
     * Update release date in README

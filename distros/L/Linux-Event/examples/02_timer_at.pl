@@ -9,7 +9,7 @@ use lib "$Bin/../lib";
 use Linux::Event;
 
 # Create loop (epoll backend)
-my $loop = Linux::Event->new( backend => 'epoll' );
+my $loop = Linux::Event->new( model => 'reactor', backend => 'epoll' );
 
 # Refresh cached monotonic time once before computing an absolute deadline
 $loop->clock->tick;  # tick() updates the cached monotonic time :contentReference[oaicite:1]{index=1}

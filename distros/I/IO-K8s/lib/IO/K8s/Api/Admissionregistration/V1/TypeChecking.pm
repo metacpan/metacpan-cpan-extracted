@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::TypeChecking;
 # ABSTRACT: TypeChecking contains results of type checking the expressions in the ValidatingAdmissionPolicy
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s expressionWarnings => ['Admissionregistration::V1::ExpressionWarning'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Admissionregistration::V1::TypeChecking - TypeChecking contains re
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 expressionWarnings
 

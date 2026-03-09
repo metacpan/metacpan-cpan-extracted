@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::VolumeAttachmentSpec;
 # ABSTRACT: VolumeAttachmentSpec is the specification of a VolumeAttachment request.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s attacher => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Storage::V1::VolumeAttachmentSpec - VolumeAttachmentSpec is the sp
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 attacher
 

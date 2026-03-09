@@ -9,7 +9,7 @@ use lib "$Bin/../lib";
 use Linux::Event;
 use POSIX ();
 
-my $loop = Linux::Event->new( backend => 'epoll' );
+my $loop = Linux::Event->new( model => 'reactor', backend => 'epoll' );
 
 my $sub = $loop->signal('USR1', sub ($loop, $sig, $count, $data) {
   print "got signal=$sig count=$count\n";

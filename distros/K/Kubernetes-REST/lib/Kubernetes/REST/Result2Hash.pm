@@ -1,5 +1,5 @@
 package Kubernetes::REST::Result2Hash;
-our $VERSION = '1.100';
+our $VERSION = '1.102';
 # ABSTRACT: DEPRECATED - v0 compatibility stub
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ Kubernetes::REST::Result2Hash - DEPRECATED - v0 compatibility stub
 
 =head1 VERSION
 
-version 1.100
+version 1.102
 
 =head1 DESCRIPTION
 
@@ -55,13 +55,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez Torres <jlmartin@cpan.org> (JLMARTIN, original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Jose Luis Martinez.
+This software is Copyright (c) 2019-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

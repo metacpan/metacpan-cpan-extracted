@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Iterator 2.158;
+package Config::Model::Iterator 2.159;
 
 use v5.20;
 use Carp;
@@ -82,7 +82,6 @@ sub new ($type, %args){
     # called indirectly through wizard-helper own call-backs
 
     $self->{scanner} = Config::Model::ObjTreeScanner->new(
-        fallback        => 'all',
         hash_element_cb => sub { $self->hash_element_cb(@_) },
         list_element_cb => sub { $self->hash_element_cb(@_) },
         node_content_cb => sub { $self->node_content_cb(@_) },
@@ -289,7 +288,7 @@ Config::Model::Iterator - Iterates forward or backward a configuration tree
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

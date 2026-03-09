@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::DumpAsData 2.158;
+package Config::Model::DumpAsData 2.159;
 
 use Carp;
 use strict;
@@ -126,7 +126,6 @@ sub dump_as_data {
 
     my @scan_args = (
         check      => delete $args{check}      || 'yes',
-        fallback   => 'all',
         auto_vivify           => $auto_v,
         list_element_cb       => $list_element_cb,
         check_list_element_cb => $check_list_element_cb,
@@ -217,7 +216,6 @@ sub dump_annotations_as_pod {
 
     my @scan_args = (
         check      => delete $args{check}      || 'yes',
-        fallback   => 'all',
         leaf_cb    => $std_cb,
         node_content_cb => $node_content_cb,
         hash_element_cb => $hash_element_cb,
@@ -264,7 +262,7 @@ Config::Model::DumpAsData - Dump configuration content as a perl data structure
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

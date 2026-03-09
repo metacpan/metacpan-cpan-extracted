@@ -83,7 +83,7 @@ subtest 'class generation from schema' => sub {
     is($class, 'IO::K8s::_AUTOGEN_test::test::example::v1::MyResource', 'correct class name');
     ok($class->can('new'), 'class has new');
     ok($class->can('TO_JSON'), 'class has TO_JSON');
-    ok($class->isa('IO::K8s::Resource'), 'inherits from IO::K8s::Resource');
+    ok($class->does('IO::K8s::Role::Resource'), 'composes IO::K8s::Role::Resource');
 
     # Create instance
     my $obj = $class->new(

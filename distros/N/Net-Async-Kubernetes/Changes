@@ -1,5 +1,28 @@
 Revision history for Net-Async-Kubernetes
 
+0.006     2026-03-09 08:37:54Z
+ - Add async Pod Log API via `log()`.
+   Supports one-shot mode (Future resolves to full text) and streaming mode
+   (`on_line` callback with Kubernetes::REST::LogEvent objects).
+   Streaming mode supports follow, tailLines, sinceSeconds, sinceTime,
+   timestamps, previous, limitBytes, and container parameters.
+ - Add mock log test coverage (`t/09-mock-log.t`) and extend mock transport
+   with generic streaming chunk support for log streams.
+ - Add active `port_forward()` API that builds Kubernetes port-forward requests
+   and delegates to duplex transport (`_do_duplex_request`).
+ - Implement default websocket duplex transport for `port_forward()` using
+   Net::Async::WebSocket::Client, including channel frame decoding and a
+   `Net::Async::Kubernetes::PortForwardSession` helper (`write_channel`,
+   `close`).
+ - Add duplex transport tests (`t/13-duplex-transport.t`) for websocket
+   handshake wiring, frame handling, session writes/closes, and connect errors.
+ - Add active `exec()` API that builds Kubernetes pod `/exec` requests with
+   repeated `command=` parameters and stream toggles
+   (stdin/stdout/stderr/tty).
+ - Add async exec test coverage (`t/14-mock-exec.t`) and duplex transport
+   assertions for exec in `t/13-duplex-transport.t`.
+ - Raise minimum versions to Kubernetes::REST 1.101 and IO::K8s 1.008.
+
 0.005     2026-03-04 17:14:31Z
  - Use public Kubernetes::REST building-block API (build_path,
    prepare_request, check_response, inflate_object, inflate_list,

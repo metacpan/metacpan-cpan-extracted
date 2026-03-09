@@ -474,6 +474,7 @@ subtest "serialisation" => sub
     my $has_base64 = $o->_has_base64(1);
     SKIP:
     {
+        local $SIG{__WARN__} = sub{};
         my $serialiser = 'CBOR::Free';
         if( !$o->_load_class( $serialiser ) )
         {
@@ -515,6 +516,7 @@ subtest "serialisation" => sub
 
     SKIP:
     {
+        local $SIG{__WARN__} = sub{};
         my $serialiser = 'CBOR::XS';
         if( !$o->_load_class( $serialiser ) )
         {
@@ -555,6 +557,7 @@ subtest "serialisation" => sub
 
     SKIP:
     {
+        local $SIG{__WARN__} = sub{};
         my $serialiser = 'Sereal';
         if( !$o->_load_class( $serialiser ) )
         {
@@ -595,6 +598,7 @@ subtest "serialisation" => sub
     
     SKIP:
     {
+        local $SIG{__WARN__} = sub{};
         my $serialiser = 'Storable';
         if( !$o->_load_class( $serialiser ) )
         {

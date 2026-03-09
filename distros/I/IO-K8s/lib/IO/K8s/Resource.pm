@@ -1,15 +1,14 @@
 package IO::K8s::Resource;
 # ABSTRACT: Base class for all Kubernetes resources
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use v5.10;
-use Moo;
+use Moo ();
+use Moo::Role ();
 use Import::Into;
 use Package::Stash;
 use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Int Maybe Str );
 use IO::K8s::Types qw( IntOrStr Quantity Time );
 use Scalar::Util qw(blessed);
-
-with 'IO::K8s::Role::Resource';
 
 # Registry: class -> attr -> { type, class, is_array, is_hash, is_bool, is_int }
 # Use 'our' to make it a proper package variable accessible via symbol table
@@ -68,14 +67,12 @@ sub import {
 
 sub _setup_class {
     my ($class, $target) = @_;
-    require Moo;
-    require Import::Into;
     Moo->import::into($target);
     Types::Standard->import::into($target, qw( Str Int Bool ));
     IO::K8s::Types->import::into($target, qw( IntOrStr Quantity Time ));
-    $target->can('extends')->(__PACKAGE__);
+    Moo::Role->apply_roles_to_package($target, 'IO::K8s::Role::Resource');
     my $stash = Package::Stash->new($target);
-    $stash->add_symbol('&k8s', sub { IO::K8s::Resource::_k8s($target, @_) });
+    $stash->add_symbol('&k8s', sub { $class->_k8s($target, @_) });
 }
 
 sub _expand_class {
@@ -116,7 +113,7 @@ sub _sanitize_attr_name {
 }
 
 sub _k8s {
-    my ($caller, $name, $type_spec, $required_marker) = @_;
+    my ($class, $caller, $name, $type_spec, $required_marker) = @_;
 
     my $json_key = $name;
     my $attr_name = _sanitize_attr_name($name);
@@ -225,7 +222,7 @@ IO::K8s::Resource - Base class for all Kubernetes resources
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 SYNOPSIS
 

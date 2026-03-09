@@ -1,6 +1,6 @@
 package IO::K8s::Api::Networking::V1::NetworkPolicyIngressRule;
 # ABSTRACT: NetworkPolicyIngressRule describes a particular set of traffic that is allowed to the pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and from.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s from => ['Networking::V1::NetworkPolicyPeer'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Networking::V1::NetworkPolicyIngressRule - NetworkPolicyIngressRul
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 from
 

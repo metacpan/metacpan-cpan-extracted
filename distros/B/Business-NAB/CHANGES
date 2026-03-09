@@ -1,10 +1,29 @@
 ==================================================
-Changes from 2024-12-10 00:00:00 +0000 to present.
+Changes from 2025-03-09 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.02 at 2025-12-10 14:43:23 +0000
+version 0.03 at 2026-03-09 08:47:09 +0000
 -----------------------------------------
+
+  Change: c3eb4bafa2f52ee35028e5f5e26034edc50c911e
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2026-03-09 09:44:37 +0000
+
+    handle signed amounts in BAI files
+
+    the amount is "expressed with two implied decimal places and
+    *optional trailing sign*" (emphasis mine). if we get a -ve trailing
+    sign then DTRT to convert the int to a -ve int so the totals are
+    correct
+
+    add some test coverage in the form of a file that exercises this 
+
+  Change: 62831a98db0bcf12a319d634acdbd488fd0c8fa1
+  Author: Lee Johnson <lee@payprop.com>
+  Date : 2025-12-10 15:45:34 +0000
+
+    add dzil config for CPAN release 
 
   Change: 7907d40edf3de7ebd8b475308638652d7141e6ad
   Author: Lee Johnson <lee@payprop.com>

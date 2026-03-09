@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::HTTPHeader;
 # ABSTRACT: HTTPHeader describes a custom header to be used in HTTP probes
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::HTTPHeader - HTTPHeader describes a custom header to be 
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 name
 

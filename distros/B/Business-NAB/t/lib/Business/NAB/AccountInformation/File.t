@@ -256,4 +256,16 @@ subtest 'new_from_file (BAI2)' => sub {
 
 };
 
+$example_file = "$Bin/../example_files/account_information_neg.bai";
+
+subtest 'new_from_file (BAI2, negative control total)' => sub {
+
+    isa_ok(
+        $File = $class->new_from_file( $example_file ),
+        $class,
+    );
+
+    ok( $File->is_bai2, '->is_bai2' );
+};
+
 done_testing();

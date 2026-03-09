@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Annotation 2.158;
+package Config::Model::Annotation 2.159;
 
 use Mouse;
 use English;
@@ -70,7 +70,6 @@ sub get_annotation_hash {
         hash_element_cb => \&my_hash_element_cb,
         list_element_cb => \&my_list_element_cb,
         node_element_cb => \&my_node_element_cb,
-        fallback        => 'all',
     );
     my $root = $self->instance->config_root;
 
@@ -164,7 +163,7 @@ Config::Model::Annotation - Read and write configuration annotations
 
 =head1 VERSION
 
-version 2.158
+version 2.159
 
 =head1 SYNOPSIS
 

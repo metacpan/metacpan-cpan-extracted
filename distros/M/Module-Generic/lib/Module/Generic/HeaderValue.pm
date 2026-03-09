@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/HeaderValue.pm
-## Version v0.4.2
+## Version v0.4.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/03
-## Modified 2022/11/09
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -46,7 +46,7 @@ BEGIN
     our $DELIMITERS = qr/["\(\),\/:;<=>\?\@\[\]{}]+/;
     # Visible ASCII, i.e. 32 to 126
     our $VCHAR = qr/[\032-\126]+/;
-    our $VCHAR_WITHOUT_DELIM = q/\!\#\$\%\'\*\+\-\.\&\-A-Z\^_\`a-z\|\~/;
+    our $VCHAR_WITHOUT_DELIM = q/\!\#\$\%\&\'\*\+\-\.\^_\`\|\~A-Za-z0-9/;
     # rfc7230 <https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.6>
     # TOKEN_REGEXP = 
     # "!" / "#" / "$" / "%" / "&" / "'" / "*"
@@ -55,7 +55,7 @@ BEGIN
     # ; any VCHAR, except delimiters
     # our $TOKEN_REGEXP = qr/[^[:cntrl:]()<>\@,;:\\"\/\[\]\?\=\{\}[:blank:]\h]+/;
     # More explicit version from the previous and also based on rfc7230, section 3.2.6
-    our $TOKEN_REGEXP = qr/[\!#\$\%\&'\*\+\-\.\^_\`\|\~[:alnum:]$VCHAR_WITHOUT_DELIM]+/;
+    our $TOKEN_REGEXP = qr/[${VCHAR_WITHOUT_DELIM}]+/;
     # "<any OCTET except CTLs, but including LWS>"
     # <https://datatracker.ietf.org/doc/html/rfc2616#section-2.2>
     our $TEXT_REGEXP  = qr/(?>[[:blank:]\h]|[^[:cntrl:]\"])*+/;
@@ -66,7 +66,7 @@ BEGIN
     # our $TYPE_REGEXP  = qr/(?:[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+)|$TOKEN_REGEXP/;
     # our $TOKEN_REGEXP = qr/[!#$%&'*+.^_`|~0-9A-Za-z-]+/;
     # our $TEXT_REGEXP  = qr/[\u000b\u0020-\u007e\u0080-\u00ff]+|$COOKIE_DATA_RE/;
-    our $VERSION = 'v0.4.2';
+    our $VERSION = 'v0.4.3';
 };
 
 use strict;
@@ -267,7 +267,7 @@ sub as_string
                 {
                     return( $self->error( "Invalid parameter name: \"" . $params->[$i] . "\"" ) );
                 }
-                elsif( $token_max_len > 0 && CORE::length( $params->[$i] ) )
+                elsif( $token_max_len > 0 && CORE::length( $params->[$i] ) > $token_max_len )
                 {
                     return( $self->error( "Parameter name \"", substr( $params->[$i], 0, $token_max_len ), "\" exceeds the maximum length of $token_max_len" ) );
                 }
@@ -338,6 +338,7 @@ sub qstring
         return( $self->error( 'Invalid parameter value' ) );
     }
 
+    # An empty string is valid as a quoted-string per RFC 2616
     $str =~ s/$QUOTE_REGEXP/\\$1/g;
     return( '"' . $str . '"' );
 }
@@ -410,7 +411,7 @@ sub value_data
     {
         return( $ref->first );
     }
-    # either nothing or more than 1
+    # Either empty (returns undef) or 2-element: [name, value]
     else
     {
         return( $ref->second );
@@ -431,15 +432,32 @@ sub value_name
 
 sub FREEZE
 {
-    my $self = CORE::shift( @_ );
+    my $self       = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self );
-    my %hash  = %$self;
+    my $class      = CORE::ref( $self );
+    my @props      = qw( original value decode encode params token_max value_max );
+    my $hash       = {};
+    foreach my $prop ( @props )
+    {
+        if( exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
@@ -494,7 +512,7 @@ Module::Generic::HeaderValue - Generic Header Value Parser
 
 =head1 VERSION
 
-    v0.4.2
+    v0.4.3
 
 =head1 DESCRIPTION
 
@@ -561,7 +579,7 @@ You can control what acceptable attribute length and attribute's value length is
 Takes a header value that contains potentially multiple values separated by a proper comma and this returns an array object (L<Module::Generic::Array>) of L<Module::Generic::HeaderValue> objects.
 
     my $all = Module::Generic::HeaderValue->new_from_multi(
-        q{site_prefs=lang%3Den-GB}; Path=/; Expires=Monday, 01-Nov-2021 17:12:40 GMT; SameSite=Strict, csrf=9849724969dbcffd48c074b894c8fbda14610dc0ae62fac0f78b2aa091216e0b.1635825594; Path=/account; Secure
+        q{site_prefs=lang%3Den-GB; Path=/; Expires=Monday, 01-Nov-2021 17:12:40 GMT; SameSite=Strict, csrf=9849724969dbcffd48c074b894c8fbda14610dc0ae62fac0f78b2aa091216e0b.1635825594; Path=/account; Secure}
     );
 
 Note that the comma in this string is found to be a separator only when it is followed by some token itself followed by C<=>, C<;>, C<,> or the end of string.
@@ -604,7 +622,7 @@ Takes an integer. This is the maximum size of a token. Defaults to 0, i.e. no li
 
 =head2 as_string
 
-Returns the object as a string suitable to be added in a n HTTP header.
+Returns the object as a string suitable to be added in an HTTP header.
 
 If L</encode> is set and there is a token value, then this will be url escaped.
 

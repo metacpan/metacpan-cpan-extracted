@@ -1,0 +1,58 @@
+openapi: 3.1.0
+info:
+  title: LM Studio Native REST API
+  version: 1.0.0
+  description: |
+    Minimal OpenAPI description for LM Studio native endpoints used by Langertha.
+servers:
+  - url: http://localhost:1234
+    description: LM Studio local server
+paths:
+  /api/v1/chat:
+    post:
+      operationId: chat
+      summary: Generate a chat response (optionally streaming)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - input
+              properties:
+                model:
+                  type: string
+                input:
+                  description: Text or array of message objects
+                  oneOf:
+                    - type: string
+                    - type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          content:
+                            type: string
+                system_prompt:
+                  type: string
+                temperature:
+                  type: number
+                max_output_tokens:
+                  type: integer
+                context_length:
+                  type: integer
+                stream:
+                  type: boolean
+      responses:
+        '200':
+          description: Chat response
+  /api/v1/models:
+    get:
+      operationId: listModels
+      summary: List locally available models
+      responses:
+        '200':
+          description: Model list

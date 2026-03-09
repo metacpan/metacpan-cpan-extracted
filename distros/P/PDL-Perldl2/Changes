@@ -1,3 +1,7 @@
+2.003 2026-03-08
+- use lib/ repo layout, pdl2 assumes deps present
+- stop using Pod::Select which didn't help anything
+
 2.002 2024-11-26
 - upload with "PDL::Perldl2" in a .pm
 

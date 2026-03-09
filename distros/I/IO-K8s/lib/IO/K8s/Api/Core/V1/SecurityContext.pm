@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SecurityContext;
 # ABSTRACT: SecurityContext holds security configuration that will be applied to a container. Some fields are present in both SecurityContext and PodSecurityContext.  When both are set, the values in SecurityContext take precedence.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s allowPrivilegeEscalation => Bool;
@@ -53,7 +53,7 @@ IO::K8s::Api::Core::V1::SecurityContext - SecurityContext holds security configu
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 allowPrivilegeEscalation
 

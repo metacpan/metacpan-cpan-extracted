@@ -195,4 +195,14 @@ END
 END
 };
 
+subtest clean_namespace => sub {
+   my $ns= \%Crypt::SecretBuffer::INI::;
+   my @public= qw(
+      bare_keys comment_delim field_config import inline_comments key_value_delim new parse
+      parse_next section_delim trim_chars
+   );
+   is( [ grep /^[a-z]/ && $_ ne 'isa', sort keys %$ns ], \@public )
+      or diag explain $ns;
+};
+
 done_testing;

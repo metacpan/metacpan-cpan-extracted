@@ -10,7 +10,7 @@ use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 # Setup loop + waker
 # ------------------------------------------------------------------------------
 
-my $loop  = Linux::Event->new;
+my $loop  = Linux::Event->new( model => 'reactor' );
 my $waker = $loop->waker;
 
 # ------------------------------------------------------------------------------

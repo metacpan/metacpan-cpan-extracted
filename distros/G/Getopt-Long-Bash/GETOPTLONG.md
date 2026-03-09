@@ -316,6 +316,7 @@ declare -A OPTS=(
     # |            | |||      DESCRIPTION                    INITIAL VALUE
     # |            | |||      |                              |
     [ verbose    | v          # Output verbose information  ]=
+    [ sweep      | w | ~W     # Enable sweep (-W disables)  ]=1
     [ output     | o :        # Specify output file         ]=/dev/stdout
     [ mode       | m ?        # Operation mode (optional)   ]=
     [ include    | i @        # Include path (multiple ok)  ]=()
@@ -329,7 +330,7 @@ declare -A OPTS=(
 
 *   **`name`:** (Required) The long option name following `--` (e.g., `verbose`).  Can contain hyphens (e.g., `very-verbose`). This is also the default base for the variable name where the option's value is stored (hyphens replaced by underscores), unless a `destination_var` is provided (see Section 3.3).
 
-*   **`aliases`:** (Optional) One or more option aliases, each following a `-` (e.g., `v`).  Multiple aliases can be specified, separated by `|` (e.g., `long|s|t`).  If only a short name is defined (e.g., `[s:]`), it also serves as the base for the variable name, unless a `destination_var` is provided (see Section 3.3).
+*   **`aliases`:** (Optional) One or more option aliases, each following a `-` (e.g., `v`).  Multiple aliases can be specified, separated by `|` (e.g., `long|s|t`).  If only a short name is defined (e.g., `[s:]`), it also serves as the base for the variable name, unless a `destination_var` is provided (see Section 3.3).  Prefixing an alias with `~` creates a **negative alias** that negates the option (equivalent to `--no-<name>`).  For example, `[sweep|w|~W]` makes `-W` behave like `--no-sweep`.  This works for both short and long aliases: `[verbose|v|~q|~quiet]` makes both `-q` and `--quiet` negate `--verbose`.  Applying `--no-` to a negative alias results in double negation (e.g., `--no-quiet` enables the option).
 
 *   **`type` (Type Specifier):** (Optional) A single character that specifies how the option handles arguments. If omitted, it defaults to `+` (flag/counter type).  Possible values are:
     *   `+`: Flag option. See section 3.2.1 for behavior.
@@ -366,6 +367,8 @@ Act as switches that do not take arguments and can be used as both simple flags 
     *   `[verbose|v  # Verbose output ]=` (Equivalent to `[verbose|v+]`)
     *   `[debug|d+   # Debug level    ]=0` (Initial value for easier variable reference)
     *   `[feature|f  # Enable feature ]=`
+    *   `[sweep|w|~W # Enable sweep   ]=1` (with negative alias `-W`)
+    *   `[verbose|v|~q|~quiet]=` (`-q`/`--quiet` negate, `--no-quiet` re-enables)
 
 *   **How to Specify:** `-v`, `--verbose`, `--debug`, `-d`, `--feature`
 
@@ -373,6 +376,7 @@ Act as switches that do not take arguments and can be used as both simple flags 
     *   First specification: Variable is set to `1`
     *   Multiple specifications (e.g., `-vvv` or `--debug --debug`): Variable value increments
     *   Specifying with `no-` prefix (e.g., `--no-debug`): Variable is reset to empty string
+    *   Specifying with a negative alias (e.g., `-W` for `[sweep|w|~W]`, or `--quiet` for `[verbose|v|~q|~quiet]`): Variable is reset to empty string, equivalent to `--no-<name>`
 
 *   **Use Cases:** Boolean flags, verbosity levels, debug levels. Setting an initial numeric value (e.g., `]=0`) makes variable reference simpler in arithmetic contexts like `(( debug > 0 ))`.
 

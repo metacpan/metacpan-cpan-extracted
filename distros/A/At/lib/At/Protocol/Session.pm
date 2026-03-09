@@ -2,7 +2,7 @@ use v5.42;
 use feature 'class';
 no warnings 'experimental::class';
 
-class At::Protocol::Session {
+class At::Protocol::Session 1.3 {
     field $accessJwt : param : reader //= ();
     field $did          : param : reader;
     field $handle       : param : reader = ();
@@ -32,7 +32,8 @@ class At::Protocol::Session {
             defined $handle ? ( handle => $handle . "" ) : (),
             token_type => $token_type,
             defined $dpop_key_jwk ? ( dpop_key_jwk => $dpop_key_jwk ) : (), defined $client_id ? ( client_id => $client_id ) : (),
-            defined $pds ? ( pds => $pds . "" ) : (),
+            defined $pds          ? ( pds => $pds . "" )  : (), defined $scope  ? ( scope => $scope ) : (), defined $email ? ( email => $email ) : (),
+            defined $status       ? ( status => $status ) : (), defined $active ? ( active => $active ) : (),
         };
     }
 }

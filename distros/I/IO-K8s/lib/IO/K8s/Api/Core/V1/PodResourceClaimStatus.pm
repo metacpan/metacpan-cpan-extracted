@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodResourceClaimStatus;
 # ABSTRACT: PodResourceClaimStatus is stored in the PodStatus for each PodResourceClaim which references a ResourceClaimTemplate. It stores the generated name for the corresponding ResourceClaim.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::PodResourceClaimStatus - PodResourceClaimStatus is store
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 name
 

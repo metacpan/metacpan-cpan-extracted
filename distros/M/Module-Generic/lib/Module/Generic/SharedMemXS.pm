@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.3.3
+## Version v0.3.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2025/07/30
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -112,7 +112,7 @@ EOT
         lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
         'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.3';
+    our $VERSION = 'v0.3.4';
 };
 
 use v5.26.1;
@@ -480,7 +480,7 @@ sub open
 
     # Array to maintain the order in which shared memory object were created, so they can
     # be removed in that order
-    my $shem_repo = Module::Generic::Global->new( 'shem_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
+    my $shem_repo   = Module::Generic::Global->new( 'shem_repo' => CORE::ref( $self ), key => CORE::ref( $self ) );
     my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => CORE::ref( $self ), key => $id );
     $shem_repo->lock;
     my $all_shem = $shem_repo->get // [];
@@ -1304,7 +1304,20 @@ sub DESTROY
     CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( $self->{_ipc_shared} );
     my $shm = $self->{_ipc_shared};
+
+    # For non-object context, we need to call cleanup to ensure there is no leftover
+    my $class = CORE::ref( $self );
+    my $id    = $shm->id if( $shm );
+    my $shem_repo   = Module::Generic::Global->new( 'shem_repo' => $class, key => $class );
+    $shem_repo->cleanup;
+    if( $id )
+    {
+        my $id2obj_repo = Module::Generic::Global->new( 'id2obj' => $class, key => $id );
+        $id2obj_repo->cleanup;
+    }
+
     CORE::return if( $shm->id );
+
     $self->unlock;
     $self->detach;
     my $rv = $self->remove_semaphore;
@@ -1321,17 +1334,37 @@ sub DESTROY
 
 sub FREEZE
 {
-    my $self = CORE::shift( @_ );
+    my $self       = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self );
-    my %hash  = %$self;
-    CORE::delete( @hash{ qw( owner ) } );
-    $hash{_was_opened} = $self->{_ipc_shared} ? 1 : 0;
+    my $class      = CORE::ref( $self );
+    # We skip 'owner' on purpose, since it represents the process ID
+    my @props      = qw(
+        base64 create destroy destroy_semaphore exclusive key mode
+        serial size _packing_method
+    );
+    my $hash  = {};
+    foreach my $prop ( @props )
+    {
+        if( exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+    $hash->{_was_opened} = $self->{_ipc_shared} ? 1 : 0;
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
@@ -1536,7 +1569,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.3.3
+    v0.3.4
 
 =head1 DESCRIPTION
 

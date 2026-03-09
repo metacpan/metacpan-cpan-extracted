@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::VolumeAttachmentStatus;
 # ABSTRACT: VolumeAttachmentStatus is the status of a VolumeAttachment request.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s attachError => 'Storage::V1::VolumeError';
@@ -29,7 +29,7 @@ IO::K8s::Api::Storage::V1::VolumeAttachmentStatus - VolumeAttachmentStatus is th
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 attachError
 

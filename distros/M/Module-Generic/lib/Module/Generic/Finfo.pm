@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.5.3
+## Version v0.5.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2025/08/22
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -66,7 +66,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.5.3';
+    our $VERSION = 'v0.5.4';
 };
 
 use v5.26.1;
@@ -115,13 +115,13 @@ sub blocks
     return( $self->new_number( $data->[ FINFO_BLOCKS ] ) );
 }
 
-sub can_read { return( -r( shift->filepath ) ); }
-
-sub can_write { return( -w( shift->filepath ) ); }
-
 sub can_exec { return( -x( shift->filepath ) ); }
 
 sub can_execute { return( -x( shift->filepath ) ); }
+
+sub can_read { return( -r( shift->filepath ) ); }
+
+sub can_write { return( -w( shift->filepath ) ); }
 
 sub csize { return( shift->size ); }
 
@@ -373,17 +373,45 @@ sub user
     return( $self->new_scalar( scalar( getpwuid( $data->[ FINFO_UID ] ) ) ) );
 }
 
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+    my $repo = Module::Generic::Global->new( 'local_tz' => 'system' );
+    $repo->cleanup;
+};
+
 sub FREEZE
 {
     my $self = CORE::shift( @_ );
     my $serialiser = CORE::shift( @_ ) // '';
     my $class = CORE::ref( $self );
-    my %hash  = %$self;
+    my @props = qw( filepath _data );
+    my $hash  = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
+    CORE::return( $class, $hash );
 }
 
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
@@ -655,7 +683,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.5.3
+    v0.5.4
 
 =head1 DESCRIPTION
 

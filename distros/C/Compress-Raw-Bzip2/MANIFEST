@@ -5,6 +5,7 @@ typemap
 fallback/constants.h
 fallback/constants.xs
 MANIFEST
+SECURITY.md
 private/MakeUtil.pm
 ppport.h
 t/000prereq.t

@@ -1,6 +1,6 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.5.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.6.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -28,6 +28,7 @@ const our $FMT_INVALID_ENV_ENTRY       => "Erroneous line %d of '%s' containing 
 const our $FMT_INVALID_VALUE           => "Option '%s' passed along with invalid value '%s'\n";
 const our $FMT_INVALID_SUBTEST_NUMBER  => "\nInvalid subtest number: '%s'\n";
 const our $FMT_KEEP_ENV_VAR            => "Keep environment variable '%s' containing '%s' because it is not reassigned in file '%s'";
+const our $FMT_MISSING_TDT             => "Cannot read '%s' for table driven testing: %s\n";
 const our $FMT_NEW_FAILED              => '%s->new died.%s';
 const our $FMT_NEW_SUCCEEDED           => "An object of class '%s' isa '%s'";
 const our $FMT_REPLACEMENT             => $EXCEPTION_PREFIX . '%s line %s.';
@@ -44,12 +45,14 @@ const our $FMT_USE_IMPLEMENTATION      => 'package %s; use %s%s; 1';
 
 const our $MSG_BAIL_OUT                => 'Test failed.';
 const our $MSG_ERROR_WAS               => ' Error was: ';
+const our $MSG_NO_TABLE_HEADER         => "No header of test table detected!\n";
 const our $MSG_UNEXPECTED_EXCEPTION    => 'Unexpectedly caught exception: ';
 
 const our $NOTE                        => sub { my ( $format, @args ) = @_; note( sprintf( $format, @args ) ) };
 
 const our $REGEX_ANY_EXTENSION         => qr/ \. [^.]+ $/x;
 const our $REGEX_CLASS_HIERARCHY_LEVEL => qr/^( \w+ ) (?: :: ( .+ ) )?/x;
+const our $REGEX_TABLE_SEPARATOR       => qr/\s*\|\s*/;
 const our $REGEX_TOP_DIR_IN_PATH       => qr{^ ( [^/]+ ) }x;
 const our $REGEX_VERSION_NUMBER        => qr/^ \d+ (?: \. \d+ )* $/x;
 
@@ -62,6 +65,16 @@ const our %MOST_CONSTANTS_TO_EXPORT    => (
   '$TEMP_DIR'   => sub { $_[ 0 ] },
   '$TEMP_FILE'  => sub { $_[ 0 ] },
   '$TEST_FILE'  => sub { $_[ 0 ] },
+);
+const our %OPTION_PARSER               => (
+  -bail     => 1,
+  -builtins => 1,
+  -color    => 1,
+  -lib      => 1,
+  -method   => 1,
+  -target   => 1,
+  -tempdir  => 1,
+  -tempfile => 1,
 );
 const our %REST_CONSTANTS_TO_EXPORT    => (
   '$METHOD'     => sub { $_[ 0 ] },

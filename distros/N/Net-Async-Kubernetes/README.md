@@ -6,7 +6,9 @@ All API calls return [Future](https://metacpan.org/pod/Future) objects for non-b
 
 ## Features
 
-- **Future-based CRUD**: `list()`, `get()`, `create()`, `update()`, `patch()`, `delete()`
+- **Future-based CRUD + logs**: `list()`, `get()`, `create()`, `update()`, `patch()`, `delete()`, `log()`
+- **Port-forward API**: `port_forward()` with built-in WebSocket duplex transport
+- **Exec API**: `exec()` with built-in WebSocket duplex transport
 - **Streaming watch** with auto-reconnect and resumable `resourceVersion` tracking
 - **Event callbacks**: `on_added`, `on_modified`, `on_deleted`, `on_error`, `on_event`
 - **Client-side filtering**: `names` (regex/string/array) and `event_types` for declarative event filtering
@@ -71,6 +73,42 @@ my $patched = $kube->patch('Deployment', 'web',
 
 # Delete a resource
 $kube->delete('Pod', 'nginx', namespace => 'default')->get;
+
+# One-shot pod logs
+my $text = $kube->log('Pod', 'nginx',
+    namespace => 'default',
+    tailLines => 100,
+)->get;
+
+# Stream pod logs (like kubectl logs -f)
+$kube->log('Pod', 'nginx',
+    namespace => 'default',
+    follow    => 1,
+    on_line   => sub { my ($event) = @_; say $event->line },
+)->get;
+
+# Port-forward (built-in websocket duplex support)
+my $pf = $kube->port_forward('Pod', 'nginx',
+    namespace => 'default',
+    ports     => [8080],
+    on_frame  => sub {
+        my ($channel, $payload) = @_;
+        ...
+    },
+)->get;
+
+$pf->write_channel(0, "GET / HTTP/1.1\r\n\r\n");
+$pf->close(code => 1000);
+
+# Exec (built-in websocket duplex support)
+my $exec = $kube->exec('Pod', 'nginx',
+    namespace => 'default',
+    command   => ['sh', '-c', 'id'],
+    on_frame  => sub {
+        my ($channel, $payload) = @_;
+        ...
+    },
+)->get;
 
 # Watch for changes with auto-reconnect
 my $watcher = $kube->watcher('Pod',

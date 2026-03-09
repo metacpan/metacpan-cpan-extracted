@@ -6,7 +6,7 @@ use warnings;
 use POSIX qw(WIFEXITED WEXITSTATUS WIFSIGNALED WTERMSIG);
 use Linux::Event;
 
-my $loop = Linux::Event->new;
+my $loop = Linux::Event->new( model => 'reactor' );
 
 my $pid = fork();
 die "fork: $!" if !defined $pid;

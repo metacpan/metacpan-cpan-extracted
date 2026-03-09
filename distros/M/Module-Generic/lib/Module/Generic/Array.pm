@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v2.3.0
+## Version v2.3.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/08/03
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -37,7 +37,7 @@ BEGIN
     use Module::Generic::Global ':const';
 
     $DEBUG = 0;
-    our $VERSION = 'v2.3.0';
+    our $VERSION = 'v2.3.1';
 };
 
 use v5.26.1;
@@ -315,7 +315,7 @@ sub error
 
         $o = $ex_class->new( $args );
         $repo->set( $o );
-        $ERROR = $o;
+        # $ERROR = $o;
 
         # try-catch
         local $@;
@@ -749,6 +749,83 @@ sub pack
 {
     my $self = CORE::shift( @_ );
     CORE::return( $self->_scalar( CORE::pack( $_[0], @$self ) ) );
+}
+
+sub pass_error
+{
+    my $self = CORE::shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $opts = {};
+    my $err;
+    my $ex_class;
+    no strict 'refs';
+    my $repo = Module::Generic::Global->new( 'errors' => $self );
+
+    if( scalar( @_ ) )
+    {
+        # Either an hash defining a new error and this will be passed along to error(); or
+        # an hash with a single property: { class => 'Some::ExceptionClass' }
+        if( CORE::scalar( @_ ) == 1 && CORE::ref( $_[0] ) eq 'HASH' )
+        {
+            $opts = $_[0];
+        }
+        else
+        {
+            # $self->pass_error( $error_object, { class => 'Some::ExceptionClass' } );
+            if( CORE::scalar( @_ ) > 1 && CORE::ref( $_[-1] ) eq 'HASH' )
+            {
+                $opts = CORE::pop( @_ );
+            }
+            $err = $_[0];
+        }
+    }
+    # We set $ex_class only if the hash provided is a one-element hash and not an error-defining hash
+    $ex_class = CORE::delete( $opts->{class} ) if( CORE::scalar( CORE::keys( %$opts ) ) == 1 && [CORE::keys( %$opts )]->[0] eq 'class' );
+
+    # called with no argument, most likely from the same class to pass on an error 
+    # set up earlier by another method; or
+    # with an hash containing just one argument class => 'Some::ExceptionClass'
+    if( !CORE::defined( $err ) && ( !CORE::scalar( @_ ) || CORE::defined( $ex_class ) ) )
+    {
+        my $error = $repo->get;
+        if( !CORE::defined( $error ) )
+        {
+            warnings::warnif( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
+        }
+        else
+        {
+            $err = ( CORE::defined( $ex_class ) ? bless( $error => $ex_class ) : $error );
+        }
+    }
+    elsif( CORE::defined( $err ) && 
+           Scalar::Util::blessed( $err ) && 
+           ( CORE::scalar( @_ ) == 1 || 
+             ( CORE::scalar( @_ ) == 2 && CORE::defined( $ex_class ) ) 
+           ) )
+    {
+        my $o = ( CORE::defined( $ex_class ) ? bless( $err => $ex_class ) : $err );
+        $repo->set( $o );
+        # $ERROR = $o;
+    }
+    # If the error provided is not an object, we call error to create one
+    else
+    {
+        return( $self->error( @_ ) );
+    }
+
+    if( want( 'OBJECT' ) )
+    {
+        # try-catch
+        local $@;
+        if( !$self->_is_class_loaded( 'Module::Generic::Null' ) )
+        {
+            eval( 'require Module::Generic::Null' );
+            die( "Unable to load module Module::Generic::Null" ) if( $@ );
+        }
+        my $null = Module::Generic::Null->new( $err, { has_error => 1 });
+        rreturn( $null );
+    }
+    return;
 }
 
 sub pop
@@ -1206,13 +1283,14 @@ sub DESTROY
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
 
-    for my $namespace ( qw( errors return loaded_classes ) )
+    foreach my $k ( qw( return errors ) )
     {
-        if( my $obj = Module::Generic::Global->new( $namespace => $self ) )
-        {
-            $obj->remove;
-        }
+        my $repo = Module::Generic::Global->new( $k => $self );
+        $repo->remove;
     }
+
+    # For non-object context, we need to call cleanup to ensure there is no leftover
+    # We cannot cleanup here the 'loaded_classes7, because we need the class that is cached to build the key, and we do not have it at this very moment.
 }
 
 sub FREEZE
@@ -1223,7 +1301,16 @@ sub FREEZE
     my @array = @$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \@array] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, \@array] );
+        }
+    }
     # But Storable want a list with the first element being the serialised element
     CORE::return( $class, \@array );
 }

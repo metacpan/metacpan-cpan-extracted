@@ -10,7 +10,7 @@ for my $m (qw(Linux::Epoll Linux::Event::Clock Linux::Event::Timer)) {
 
 use Linux::Event::Loop;
 
-my $loop = Linux::Event::Loop->new( backend => 'epoll' );
+my $loop = Linux::Event::Loop->new( model => 'reactor', backend => 'epoll' );
 
 my @order;
 

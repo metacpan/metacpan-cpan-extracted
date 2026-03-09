@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ClusterTrustBundleProjection;
 # ABSTRACT: ClusterTrustBundleProjection describes how to select a set of ClusterTrustBundle objects and project their contents into the pod filesystem.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s labelSelector => 'Meta::V1::LabelSelector';
@@ -32,7 +32,7 @@ IO::K8s::Api::Core::V1::ClusterTrustBundleProjection - ClusterTrustBundleProject
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 labelSelector
 

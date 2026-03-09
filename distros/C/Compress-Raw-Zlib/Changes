@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  2.222 27 February 2026
+
+    * Add SECURITY.md. Fixes #40
+      Sun Mar 8 12:02:45 2026 +0000
+      c637bc61cbc91eb9b7064491c4ea56b5ce810b30
+
+    * Fix spelling typos
+      Sun Mar 8 11:06:36 2026 +0000
+      26fdd596d867bbbfd35de32c8efe5267a9c52545
+
   2.221 27 February 2026
 
     * Merge remote-tracking branch 'refs/remotes/origin/master'

@@ -7,7 +7,6 @@ use warnings;
 use DBI;
 use Carp 'croak';
 use Exporter::NoWork;
-use Rose::DB::Object::Loader;
 
 use DB;
 use autodie;
@@ -192,7 +191,26 @@ CREATE TABLE IF NOT EXISTS media (
 SQL
 
     $dbh->do($sql_media);
+    my $login_table = <<"SQL";
+    CREATE TABLE IF NOT EXISTS user_login_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    login_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
+) ENGINE=InnoDB;
+SQL
 
+    $dbh->do($login_table);
+
+    my $create_procedure = <<"SQL";
+    CREATE PROCEDURE IF NOT EXISTS pr_user_login_history(IN p_id INT)
+    BEGIN
+        SELECT *
+        FROM user_login_history
+        WHERE id = p_id;
+    END
+SQL
+
+    $dbh->do($create_procedure);
     return 1;
 }
 

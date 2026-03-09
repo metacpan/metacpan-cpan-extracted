@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ProjectedVolumeSource;
 # ABSTRACT: Represents a projected volume source
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s defaultMode => Int;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ProjectedVolumeSource - Represents a projected volume so
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 defaultMode
 

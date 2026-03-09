@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::Variable;
 # ABSTRACT: Variable is the definition of a variable that is used for composition. A variable is defined as a named expression.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s expression => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Admissionregistration::V1::Variable - Variable is the definition o
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 expression
 

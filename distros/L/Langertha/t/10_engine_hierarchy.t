@@ -52,6 +52,23 @@ like($@, qr/url/, 'OpenAIBase requires url');
   like($@, qr/requires model/, 'OpenAIBase default_model croaks');
 }
 
+# --- AnthropicBase inherits Remote ---
+
+use Langertha::Engine::AnthropicBase;
+
+ok(Langertha::Engine::AnthropicBase->isa('Langertha::Engine::Remote'), 'AnthropicBase isa Remote');
+ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::Models'), 'AnthropicBase does Models');
+ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::Chat'), 'AnthropicBase does Chat');
+ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::Streaming'), 'AnthropicBase does Streaming');
+ok(Langertha::Engine::AnthropicBase->does('Langertha::Role::Tools'), 'AnthropicBase does Tools');
+ok(!Langertha::Engine::AnthropicBase->does('Langertha::Role::OpenAICompatible'), 'AnthropicBase does NOT OpenAICompatible');
+
+{
+  my $base = Langertha::Engine::AnthropicBase->new(url => 'http://test.invalid', api_key => 'test-key');
+  eval { $base->default_model };
+  like($@, qr/requires model/, 'AnthropicBase default_model croaks');
+}
+
 # ======================================================================
 # Part 2: Non-OpenAI engines (extend Remote directly)
 # ======================================================================
@@ -61,6 +78,7 @@ like($@, qr/url/, 'OpenAIBase requires url');
 use Langertha::Engine::Anthropic;
 
 ok(Langertha::Engine::Anthropic->isa('Langertha::Engine::Remote'), 'Anthropic isa Remote');
+ok(Langertha::Engine::Anthropic->isa('Langertha::Engine::AnthropicBase'), 'Anthropic isa AnthropicBase');
 ok(!Langertha::Engine::Anthropic->isa('Langertha::Engine::OpenAIBase'), 'Anthropic is NOT OpenAIBase');
 ok(Langertha::Engine::Anthropic->does('Langertha::Role::Chat'), 'Anthropic does Chat');
 ok(Langertha::Engine::Anthropic->does('Langertha::Role::Streaming'), 'Anthropic does Streaming');
@@ -115,6 +133,132 @@ ok(Langertha::Engine::Ollama->does('Langertha::Role::OpenAPI'), 'Ollama does Ope
   is($o->default_model, 'llama3.3', 'Ollama model set');
   my $req = $o->chat('hello');
   like($req->uri, qr{/api/chat$}, 'Ollama uses native /api/chat endpoint');
+}
+
+# --- LMStudio ---
+
+use Langertha::Engine::LMStudio;
+
+ok(Langertha::Engine::LMStudio->isa('Langertha::Engine::Remote'), 'LMStudio isa Remote');
+ok(!Langertha::Engine::LMStudio->isa('Langertha::Engine::OpenAIBase'), 'LMStudio is NOT OpenAIBase');
+ok(Langertha::Engine::LMStudio->does('Langertha::Role::Models'), 'LMStudio does Models');
+ok(Langertha::Engine::LMStudio->does('Langertha::Role::OpenAPI'), 'LMStudio does OpenAPI');
+ok(Langertha::Engine::LMStudio->does('Langertha::Role::Chat'), 'LMStudio does Chat');
+ok(Langertha::Engine::LMStudio->does('Langertha::Role::Streaming'), 'LMStudio does Streaming');
+ok(Langertha::Engine::LMStudio->does('Langertha::Role::Temperature'), 'LMStudio does Temperature');
+ok(Langertha::Engine::LMStudio->does('Langertha::Role::ResponseSize'), 'LMStudio does ResponseSize');
+ok(Langertha::Engine::LMStudio->does('Langertha::Role::ContextSize'), 'LMStudio does ContextSize');
+
+{
+  my $lm = Langertha::Engine::LMStudio->new(model => 'test-model');
+  is($lm->url, 'http://localhost:1234', 'LMStudio url defaults correctly');
+  is($lm->default_model, 'default', 'LMStudio default_model');
+  is($lm->api_key, undef, 'LMStudio api_key is undef when not configured');
+
+  my $req = $lm->chat('hello');
+  like($req->uri, qr{/api/v1/chat$}, 'LMStudio chat endpoint');
+  is($req->header('Authorization'), undef, 'LMStudio no Authorization header by default');
+  ok($lm->can_operation('chat'), 'LMStudio supports OpenAPI operation chat');
+  ok($lm->can_operation('listModels'), 'LMStudio supports OpenAPI operation listModels');
+
+  my $body = $json->decode($req->content);
+  is($body->{model}, 'test-model', 'LMStudio request has model');
+  is($body->{input}, 'hello', 'LMStudio request maps message to input');
+
+  my $oai = $lm->openai;
+  ok($oai->isa('Langertha::Engine::LMStudioOpenAI'), 'LMStudio->openai returns LMStudioOpenAI engine');
+  is($oai->url, 'http://localhost:1234/v1', 'LMStudio->openai uses /v1 endpoint');
+  is($oai->model, 'test-model', 'LMStudio->openai carries model');
+  is($oai->api_key, 'lmstudio', 'LMStudio->openai defaults api_key to lmstudio');
+
+  my $anth = $lm->anthropic;
+  ok($anth->isa('Langertha::Engine::LMStudioAnthropic'), 'LMStudio->anthropic returns LMStudioAnthropic engine');
+  is($anth->url, 'http://localhost:1234', 'LMStudio->anthropic keeps base URL');
+  is($anth->model, 'test-model', 'LMStudio->anthropic carries model');
+}
+
+{
+  local $ENV{LANGERTHA_LMSTUDIO_API_KEY} = 'env-key-12345';
+  my $lm = Langertha::Engine::LMStudio->new(model => 'test-model');
+  is($lm->api_key, 'env-key-12345', 'LMStudio reads api_key from LANGERTHA_LMSTUDIO_API_KEY');
+  my $req = $lm->chat('hello');
+  is($req->header('Authorization'), 'Bearer env-key-12345', 'LMStudio sets Bearer header when api_key configured');
+
+  my $oai = $lm->openai;
+  is($oai->api_key, 'env-key-12345', 'LMStudio->openai carries api_key');
+
+  my $anth = $lm->anthropic;
+  is($anth->api_key, 'env-key-12345', 'LMStudio->anthropic carries api_key');
+}
+
+{
+  my $lm = Langertha::Engine::LMStudio->new(
+    model => 'test-model',
+    system_prompt => 'You are test',
+    context_size => 4096,
+    response_size => 333,
+    temperature => 0.1,
+  );
+  my $req = $lm->chat('hello');
+  my $body = $json->decode($req->content);
+  is($body->{system_prompt}, 'You are test', 'LMStudio sends system_prompt');
+  is($body->{context_length}, 4096, 'LMStudio maps context_size to context_length');
+  is($body->{max_output_tokens}, 333, 'LMStudio maps response_size to max_output_tokens');
+  is($body->{temperature}, 0.1, 'LMStudio passes temperature');
+}
+
+# --- LMStudioOpenAI ---
+
+use Langertha::Engine::LMStudioOpenAI;
+
+ok(Langertha::Engine::LMStudioOpenAI->isa('Langertha::Engine::OpenAIBase'), 'LMStudioOpenAI isa OpenAIBase');
+ok(Langertha::Engine::LMStudioOpenAI->isa('Langertha::Engine::Remote'), 'LMStudioOpenAI isa Remote');
+ok(Langertha::Engine::LMStudioOpenAI->does('Langertha::Role::Embedding'), 'LMStudioOpenAI does Embedding');
+ok(Langertha::Engine::LMStudioOpenAI->does('Langertha::Role::Tools'), 'LMStudioOpenAI does Tools');
+
+{
+  my $lm = Langertha::Engine::LMStudioOpenAI->new(model => 'test-model');
+  is($lm->url, 'http://localhost:1234/v1', 'LMStudioOpenAI url defaults correctly');
+  is($lm->default_model, 'default', 'LMStudioOpenAI default_model');
+  is($lm->api_key, 'lmstudio', 'LMStudioOpenAI api_key defaults to lmstudio');
+  my $req = $lm->chat('hello');
+  like($req->uri, qr{/chat/completions$}, 'LMStudioOpenAI uses /chat/completions');
+  is($req->header('Authorization'), 'Bearer lmstudio', 'LMStudioOpenAI sets default bearer header');
+}
+
+{
+  local $ENV{LANGERTHA_LMSTUDIO_API_KEY} = 'env-key-12345';
+  my $lm = Langertha::Engine::LMStudioOpenAI->new(model => 'test-model');
+  is($lm->api_key, 'env-key-12345', 'LMStudioOpenAI reads api_key from LANGERTHA_LMSTUDIO_API_KEY');
+}
+
+# --- LMStudioAnthropic ---
+
+use Langertha::Engine::LMStudioAnthropic;
+
+ok(Langertha::Engine::LMStudioAnthropic->isa('Langertha::Engine::AnthropicBase'), 'LMStudioAnthropic isa AnthropicBase');
+ok(Langertha::Engine::LMStudioAnthropic->isa('Langertha::Engine::Remote'), 'LMStudioAnthropic isa Remote');
+ok(!Langertha::Engine::LMStudioAnthropic->isa('Langertha::Engine::OpenAIBase'), 'LMStudioAnthropic is NOT OpenAIBase');
+ok(Langertha::Engine::LMStudioAnthropic->does('Langertha::Role::Chat'), 'LMStudioAnthropic does Chat');
+ok(Langertha::Engine::LMStudioAnthropic->does('Langertha::Role::Streaming'), 'LMStudioAnthropic does Streaming');
+ok(Langertha::Engine::LMStudioAnthropic->does('Langertha::Role::Tools'), 'LMStudioAnthropic does Tools');
+
+{
+  my $lm = Langertha::Engine::LMStudioAnthropic->new(model => 'test-model');
+  is($lm->url, 'http://localhost:1234', 'LMStudioAnthropic url defaults correctly');
+  is($lm->api_key, 'lmstudio', 'LMStudioAnthropic api_key defaults to lmstudio');
+  is($lm->default_model, 'default', 'LMStudioAnthropic default_model');
+
+  my $req = $lm->chat('hello');
+  like($req->uri, qr{/v1/messages$}, 'LMStudioAnthropic uses Anthropic messages endpoint');
+  is($req->header('x-api-key'), 'lmstudio', 'LMStudioAnthropic sets x-api-key');
+  is($req->header('anthropic-version'), '2023-06-01', 'LMStudioAnthropic sets anthropic-version');
+}
+
+{
+  local $ENV{LANGERTHA_LMSTUDIO_API_KEY} = 'env-key-12345';
+  my $lm = Langertha::Engine::LMStudioAnthropic->new(model => 'test-model');
+  is($lm->api_key, 'env-key-12345', 'LMStudioAnthropic reads api_key from LANGERTHA_LMSTUDIO_API_KEY');
 }
 
 # --- AKI ---
@@ -277,7 +421,7 @@ is(Langertha::Engine::Mistral->new(api_key => 'k')->default_model, 'mistral-smal
 use Langertha::Engine::MiniMax;
 
 # MiniMax uses Anthropic-compatible API (extends Anthropic, not OpenAIBase)
-ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::Anthropic'), 'MiniMax isa Anthropic');
+ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::AnthropicBase'), 'MiniMax isa AnthropicBase');
 ok(Langertha::Engine::MiniMax->isa('Langertha::Engine::Remote'), 'MiniMax isa Remote');
 ok(!Langertha::Engine::MiniMax->isa('Langertha::Engine::OpenAIBase'), 'MiniMax is NOT OpenAIBase');
 ok(Langertha::Engine::MiniMax->does('Langertha::Role::Chat'), 'MiniMax does Chat');
@@ -537,6 +681,9 @@ for my $class (qw(
   Langertha::Engine::Replicate
   Langertha::Engine::HuggingFace
   Langertha::Engine::LlamaCpp
+  Langertha::Engine::LMStudio
+  Langertha::Engine::LMStudioOpenAI
+  Langertha::Engine::LMStudioAnthropic
 )) {
   ok($class->isa('Langertha::Engine::Remote'), "$class isa Remote");
   ok($class->does('Langertha::Role::JSON'), "$class does JSON (via Remote)");

@@ -1,6 +1,6 @@
 package Langertha;
 # ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
-our $VERSION = '0.304';
+our $VERSION = '0.305';
 use utf8;
 use strict;
 use warnings;
@@ -63,7 +63,7 @@ Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
 
 =head1 VERSION
 
-version 0.304
+version 0.305
 
 =head1 SYNOPSIS
 
@@ -120,7 +120,7 @@ B<THIS API IS WORK IN PROGRESS.>
 
 =over 4
 
-=item * B<20 engines> -- unified API across cloud and local LLM providers
+=item * B<23 engines> -- unified API across cloud and local LLM providers
 
 =item * B<Chat, streaming, embeddings, transcription, image generation>
 
@@ -216,6 +216,12 @@ L<Future::AsyncAwait>, and sets L<Langertha::Plugin> as superclass.
 =item * L<Langertha::Engine::OllamaOpenAI> - Ollama via OpenAI-compatible API
 
 =item * L<Langertha::Engine::LlamaCpp> - llama.cpp server (chat, embeddings)
+
+=item * L<Langertha::Engine::LMStudio> - LM Studio native local REST API
+
+=item * L<Langertha::Engine::LMStudioOpenAI> - LM Studio via OpenAI-compatible API
+
+=item * L<Langertha::Engine::LMStudioAnthropic> - LM Studio via Anthropic-compatible API
 
 =item * L<Langertha::Engine::AKI> - AKI.IO native API (EU/Germany)
 

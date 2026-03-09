@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1::ExpressionWarning;
 # ABSTRACT: ExpressionWarning is a warning information that targets a specific expression.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s fieldRef => Str, 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Admissionregistration::V1::ExpressionWarning - ExpressionWarning i
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 fieldRef
 

@@ -17,52 +17,60 @@ return [
             recursive_slave => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::RSlave',
+                cargo => {
+                    type        => 'node',
+                    config_class_name => 'MasterModel::RSlave',
+                }
             },
             big_compute => {
                 type       => 'hash',
                 index_type => 'string',
-                cargo_type => 'leaf',
-                cargo_args => {
+                cargo => {
+                    type => 'leaf',
                     value_type => 'string',
-                    compute    => [
-                        'macro is $m, my idx: &index, '
+                    compute    => {
+                        formula => 'macro is $m, my idx: &index, '
                           . 'my element &element, '
                           . 'upper element &element($up), '
-                          . 'up idx &index($up)',
-                        'm' => '!  macro',
-                        up  => '-'
-                    ]
+                        . 'up idx &index($up)',
+                        variables => {
+                            'm' => '!  macro',
+                            up  => '-'
+                        }
+                    }
                 },
             },
             big_replace => {
                 type       => 'leaf',
                 value_type => 'string',
-                compute    => [
-                    'trad idx $replace{&index($up)}',
-                    up      => '-',
+                compute    => {
+                    formula => 'trad idx $replace{&index($up)}',
+                    variables => {
+                        up      => '-',
+                    },
                     replace => {
                         l1 => 'level1',
                         l2 => 'level2'
                     }
-                ]
+                }
             },
             macro_replace => {
                 type       => 'hash',
                 index_type => 'string',
-                cargo_type => 'leaf',
-                cargo_args => {
+                cargo => {
+                    type => 'leaf',
                     value_type => 'string',
-                    compute    => [
-                        'trad macro is $macro{$m}',
-                        'm'   => '!  macro',
-                        macro => {
+                    compute    => {
+                        formula => 'trad macro is $replace{$m}',
+                        variables => {
+                            'm'   => '!  macro',
+                        },
+                        replace => {
                             A => 'macroA',
                             B => 'macroB',
                             C => 'macroC'
                         }
-                    ]
+                    }
                 },
             }
         ],
@@ -86,8 +94,10 @@ return [
             'recursive_slave' => {
                 type              => 'hash',
                 index_type        => 'string',
-                cargo_type        => 'node',
-                config_class_name => 'MasterModel::RSlave',
+                cargo => {
+                    type        => 'node',
+                    config_class_name => 'MasterModel::RSlave',
+                }
             },
             W => {
                 type       => 'leaf',
@@ -112,7 +122,12 @@ return [
             Comp => {
                 type       => 'leaf',
                 value_type => 'string',
-                compute    => [ 'macro is $m', 'm' => '- - macro' ],
+                compute    => {
+                    formula => 'macro is $m',
+                    variables => {
+                        'm' => '- - macro'
+                    }
+                },
             },
         ],
     ],
@@ -193,31 +208,39 @@ return [
             'compute' => {
                 type       => 'leaf',
                 value_type => 'string',
-                compute =>
-                  [ 'macro is $m, my element is &element', 'm' => '-  macro' ]
+                compute => {
+                    formula => 'macro is $m, my element is &element',
+                    variables => {
+                        'm' => '-  macro'
+                    }
+                }
             },
 
             'var_path' => {
                 type       => 'leaf',
                 value_type => 'string',
                 mandatory  => 1,        # will croak if value cannot be computed
-                compute    => [
-                    'get_element is $element_table{$s}, indirect value is \'$v\'',
-                    's'           => '- $where',
-                    where         => '- where_is_element',
-                    v             => '- $element_table{$s}',
-                    element_table => {
+                compute    => {
+                    formula => 'get_element is $replace{$s}, indirect value is \'$v\'',
+                    variables => {
+                        's'           => '- $where',
+                        where         => '- where_is_element',
+                        v             => '- $replace{$s}',
+                    },
+                    replace => {
                         qw/m_value_element m_value
-                          compute_element compute/
+                           compute_element compute/
                     }
-                ]
+                }
             },
 
             'class' => {
                 type       => 'hash',
                 index_type => 'string',
-                cargo_type => 'leaf',
-                cargo_args => { value_type => 'string' },
+                cargo => {
+                    type => 'leaf',
+                    value_type => 'string'
+                },
             },
             'warped_out_ref' => {
                 type       => 'leaf',

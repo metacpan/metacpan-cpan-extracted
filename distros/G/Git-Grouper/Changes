@@ -1,3 +1,8 @@
+0.002   2025-11-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [subcommand configure-repo] Add option --clean-remotes.
+
+
 0.001   2025-11-11  Released-By: PERLANCAR
 
         - Initial release.

@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::Gateway;
 # ABSTRACT: Gateway API network gateway
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'gateways';
@@ -23,7 +23,7 @@ IO::K8s::GatewayAPI::V1::Gateway - Gateway API network gateway
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head1 DESCRIPTION
 

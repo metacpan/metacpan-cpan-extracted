@@ -1,6 +1,16 @@
 CHANGES
 -------
 
+  2.221 8 March 2026
+
+      * version 2.221
+        Sun Mar 8 13:54:24 2026 +0000
+        5e439376a3fcc532b9725133f4323adff435ad22
+
+      * Add SECURITY.md
+        Sun Mar 8 12:20:30 2026 +0000
+        20f7128eab9b0361a188a4edb181064a7dd85b29
+
   2.220 7 March 2026
 
       * Update to version 2.220

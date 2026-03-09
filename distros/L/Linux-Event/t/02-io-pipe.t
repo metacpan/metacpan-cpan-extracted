@@ -13,7 +13,7 @@ use Linux::Event::Loop;
 
 pipe(my $r, my $w) or die "pipe failed: $!";
 
-my $loop = Linux::Event::Loop->new( backend => 'epoll' );
+my $loop = Linux::Event::Loop->new( model => 'reactor', backend => 'epoll' );
 
 my $got = '';
 

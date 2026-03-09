@@ -40,6 +40,7 @@ my $plugin_rw_obj = Config::Model::Itself -> new(
     cm_lib_dir => 'data',
 ) ;
 
+# read MasterModel in layered mode so it's handled as a default values
 $meta_plugin_inst->layered_start ;
 
 $plugin_rw_obj -> read_all(
@@ -50,10 +51,13 @@ ok(1,"Read all models in data dir in layered mode") ;
 
 $meta_plugin_inst->layered_stop ;
 
-# modify model, X_base_class2 is not a mistake
-$meta_plugin_root->load(q!class:MasterModel::X_base_class2 element:X#"X note" help:Cv="Mighty help for Cv"!);
-$meta_plugin_root->load(q!class:MasterModel element:a_string warn_if_match:meh msg="said meh"!);
+# modify model, this modification is not done in layered mode, so it's
+# handled as user modification. Note that X_base_class2 is not a
+# mistake.
+$meta_plugin_root->load('class:MasterModel::X_base_class2 element:X#"X note" help:Cv="Mighty help for Cv"');
+$meta_plugin_root->load('class:MasterModel element:a_string warn_if_match:meh msg="said meh"');
 
+# write just the user's modification of the model, i.e. the plugin
 $plugin_rw_obj->write_model_plugin(plugin_dir => $wr_plugin, plugin_name => $plugin_name) ;
 
 my %expected_plugin;
@@ -117,9 +121,10 @@ foreach my $name (keys %expected_plugin) {
     );
 }
 
+# create another independent model
 my $meta_plugin_inst2 = $meta_model->instance(
     root_class_name => 'Itself::Model',
-    instance_name   => 'itself_plugin',
+    instance_name   => 'itself_plugin_2',
     root_dir        => $wr_model1,
 );
 ok($meta_plugin_inst2,"Read Itself::Model and created instance for model plugin") ;
@@ -139,7 +144,7 @@ $plugin_rw_obj2->read_all(
 
 ok(1,"Read all models in data dir in layered mode") ;
 
-$meta_plugin_inst->layered_stop ;
+$meta_plugin_inst2->layered_stop ;
 
 $plugin_rw_obj2->read_model_plugin(plugin_dir => $wr_plugin, plugin_name => $plugin_name) ;
 

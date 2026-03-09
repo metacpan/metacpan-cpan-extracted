@@ -19,7 +19,9 @@ t/Test/Expander/_determine_testee.env
 t/Test/Expander/_determine_testee.t
 t/Test/Expander/_error.t
 t/Test/Expander/_export_most_symbols.t
+t/Test/Expander/_load_tdt.t
 t/Test/Expander/_new_test_message.t
+t/Test/Expander/_parse_color.t
 t/Test/Expander/_parse_options.t
 t/Test/Expander/_set_env.t
 t/Test/Expander/_subtest_conditional.t
@@ -38,7 +40,6 @@ t/Test/Expander/NoCLASS/NoMETHOD.t
 t/Test/Expander/NoCLASS/NoMETHOD_only.t
 t/Test/Expander/require_ok.t
 t/Test/Expander/restore_failure_handler.t
+t/Test/Expander/test_table.t
 t/Test/Expander/throws_ok.t
 t/Test/Expander/use_ok.t
-Test-Expander-2.5.1.tar.gz
-Test-Expander-2.5.2.tar.gz

@@ -4,7 +4,7 @@ use 5.008005;
 use strict;
 use warnings;
 use parent qw/Plack::Middleware/;
-use Digest::SHA1 qw//;
+use Crypt::SysRandom qw/random_bytes/;
 use Cookie::Baker;
 use Plack::Util;
 use Scalar::Util qw/blessed/;
@@ -22,7 +22,7 @@ use Plack::Util::Accessor qw/
     serializer
 /;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 sub prepare_app {
     my $self = shift;
@@ -40,7 +40,7 @@ sub prepare_app {
 
     if ( !$self->sid_generator ) {
         $self->sid_generator(sub{
-            Digest::SHA1::sha1_hex(rand() . $$ . {} . time)
+            unpack('H*', Crypt::SysRandom::random_bytes(20));
         });
     }
     if ( !$self->sid_validator ) {
@@ -58,7 +58,7 @@ sub call {
 
     my $tied;
     if ($id && $session) {
-        $tied = tie my %session, 
+        $tied = tie my %session,
             'Plack::Middleware::Session::Simple::Session', %$session;
         $env->{'psgix.session'} = \%session;
         $env->{'psgix.session.options'} = {
@@ -66,7 +66,7 @@ sub call {
         };
     } else {
         my $id = $self->{sid_generator}->();
-        $tied = tie my %session, 
+        $tied = tie my %session,
             'Plack::Middleware::Session::Simple::Session';
         $env->{'psgix.session'} = \%session;
         $env->{'psgix.session.options'} = {
@@ -122,7 +122,7 @@ sub finalize {
             $options->{id} = $self->{sid_generator}->();
             my $val = $session->[0];
             $val = $self->{serializer}->[0]->($val) if $self->{serializer};
-            $self->{store}->set($options->{id}, $val);            
+            $self->{store}->set($options->{id}, $val);
         } else {
             my $val = $session->[0];
             $val = $self->{serializer}->[0]->($val) if $self->{serializer};
@@ -133,10 +133,10 @@ sub finalize {
     if ( $set_cookie ) {
         if ($options->{expire}) {
             $self->_set_cookie(
-                $options->{id}, $res, %$options, expires => 'now'); 
+                $options->{id}, $res, %$options, expires => 'now');
         } else {
             $self->_set_cookie(
-                $options->{id}, $res, %$options); 
+                $options->{id}, $res, %$options);
         }
     }
 }
@@ -155,7 +155,7 @@ sub _set_cookie {
         $options{expires} = $self->{expires};
     }
 
-    my $cookie = bake_cookie( 
+    my $cookie = bake_cookie(
         $self->{cookie_name}, {
             value => $id,
             %options,
@@ -217,7 +217,7 @@ Plack::Middleware::Session::Simple - Make Session Simple
         my $counter = $env->{'psgix.session'}->{counter}++;
         [200,[], ["counter => $counter"]];
     };
-    
+
     builder {
         enable 'Session::Simple',
             store => Cache::Memcached::Fast::Safe->new({servers=>[..]}),
@@ -230,7 +230,7 @@ Plack::Middleware::Session::Simple - Make Session Simple
 
 Plack::Middleware::Session::Simple is a yet another session management module.
 This middleware has compatibility with Plack::Middleware::Session by
-supporting psgix.session and psgi.session.options. 
+supporting psgix.session and psgi.session.options.
 You can reduce unnecessary accessing to store and Set-Cookie header.
 
 This module uses Cookie to keep session state. does not support URI based session state.
@@ -266,8 +266,8 @@ If disabled, Plack::Middleware::Session::Simple does not output Set-Cookie heade
             [200,[], ["login"]];
         },
     };
-    
-    my $res = $app->(req_to_psgi(GET "/")); #res does not have Set-Cookie    
+
+    my $res = $app->(req_to_psgi(GET "/")); #res does not have Set-Cookie
     my $res = $app->(req_to_psgi(GET "/login")); #res has Set-Cookie
 
 If you have a plan to use session_id as csrf token, you must not disable keep_empty.
@@ -315,7 +315,7 @@ serialize,deserialize method. Optional. This is useful with Cache::FastMmap
     $app;
   };
 
-=back 
+=back
 
 =head1 LICENSE
 
@@ -329,4 +329,3 @@ it under the same terms as Perl itself.
 Masahiro Nagano E<lt>kazeburo@gmail.comE<gt>
 
 =cut
-

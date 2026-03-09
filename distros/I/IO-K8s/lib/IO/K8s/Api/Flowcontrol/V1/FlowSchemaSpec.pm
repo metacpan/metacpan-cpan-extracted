@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1::FlowSchemaSpec;
 # ABSTRACT: FlowSchemaSpec describes how the FlowSchema's specification looks like.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s distinguisherMethod => 'Flowcontrol::V1::FlowDistinguisherMethod';
@@ -29,7 +29,7 @@ IO::K8s::Api::Flowcontrol::V1::FlowSchemaSpec - FlowSchemaSpec describes how the
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 distinguisherMethod
 

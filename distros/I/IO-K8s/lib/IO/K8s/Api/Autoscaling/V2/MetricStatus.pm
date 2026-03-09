@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::MetricStatus;
 # ABSTRACT: MetricStatus describes the last-read state of a single metric.
-our $VERSION = '1.006';
+our $VERSION = '1.008';
 use IO::K8s::Resource;
 
 k8s containerResource => 'Autoscaling::V2::ContainerResourceMetricStatus';
@@ -35,7 +35,7 @@ IO::K8s::Api::Autoscaling::V2::MetricStatus - MetricStatus describes the last-re
 
 =head1 VERSION
 
-version 1.006
+version 1.008
 
 =head2 containerResource
 

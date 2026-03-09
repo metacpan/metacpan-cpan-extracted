@@ -1,14 +1,16 @@
 package Langertha::Raider;
 # ABSTRACT: Autonomous agent with conversation history and MCP tools
-our $VERSION = '0.304';
+our $VERSION = '0.305';
 use Moose;
 use Future::AsyncAwait;
 use Time::HiRes qw( gettimeofday tv_interval );
 use Carp qw( croak );
 use Module::Runtime qw( use_module );
+use Scalar::Util qw( blessed );
 use Langertha::Raider::Result;
+use Langertha::RunContext;
 
-with 'Langertha::Role::PluginHost';
+with 'Langertha::Role::PluginHost', 'Langertha::Role::Runnable';
 
 
 has engine => (
@@ -472,8 +474,8 @@ sub register_session_history_tool {
 
 
 sub _langfuse_model_parameters {
-  my ( $self ) = @_;
-  my $e = $self->engine;
+  my ( $self, $engine ) = @_;
+  my $e = $engine // $self->active_engine;
   my %p;
   $p{temperature} = $e->temperature if $e->can('has_temperature') && $e->has_temperature;
   $p{max_tokens} = $e->get_response_size if $e->can('get_response_size') && $e->get_response_size;
@@ -834,10 +836,32 @@ sub raid {
   return $self->raid_f(@messages)->get;
 }
 
+async sub run_f {
+  my ( $self, $ctx ) = @_;
+  $ctx = Langertha::RunContext->new(input => $ctx)
+    unless blessed($ctx) && $ctx->isa('Langertha::RunContext');
+
+  my $input = $ctx->input;
+  my @messages = ref($input) eq 'ARRAY' ? @{$input} : ($input);
+  @messages = grep { defined } @messages;
+
+  my $result = await $self->raid_f(@messages);
+
+  if ($result->is_final && $result->has_text) {
+    $ctx->input($result->text);
+    $ctx->state->{last_output} = $result->text;
+  }
+  $ctx->state->{last_result_type} = $result->type;
+  $ctx->state->{last_result} = $result->as_hash if $result->can('as_hash');
+  $ctx->history($self->history) if $ctx->can('history');
+
+  return $result->with_context($ctx);
+}
+
 
 async sub _gather_tools_f {
   my ( $self ) = @_;
-  my $engine = $self->engine;
+  my $engine = $self->active_engine;
   my ( @all_tools, %tool_server_map );
 
   # Engine MCP servers
@@ -964,7 +988,7 @@ async sub raid_f {
     unless @$all_tools;
 
   my $formatted_tools = $engine->format_tools($all_tools);
-  my $model_params = $langfuse ? $self->_langfuse_model_parameters : undef;
+  my $model_params = $langfuse ? $self->_langfuse_model_parameters($engine) : undef;
 
   # Build new user messages
   my @user_msgs = map {
@@ -1036,6 +1060,10 @@ async sub _run_raid_loop {
       $tool_server_map = $new_map;
       $state->{formatted_tools} = $formatted_tools;
       $state->{tool_server_map} = $tool_server_map;
+      if ($langfuse) {
+        $model_params = $self->_langfuse_model_parameters($engine);
+        $state->{model_params} = $model_params;
+      }
 
       $self->_tools_dirty(0);
     }
@@ -1388,6 +1416,9 @@ async sub respond_f {
     if ($name =~ /^raider_/ && $self->has_raider_mcp) {
       my $self_result = $self->_execute_self_tool($name, $input);
       if ($self_result->{type} eq 'result') {
+        for my $plugin (@{$self->_plugin_instances}) {
+          $self_result = await $plugin->plugin_after_tool_call($name, $input, $self_result);
+        }
         push @results, { tool_call => $tc, result => $self_result };
         ${$state->{raid_tool_calls}}++;
       }
@@ -1405,6 +1436,10 @@ async sub respond_f {
         isError => JSON::MaybeXS->true,
       });
     });
+
+    for my $plugin (@{$self->_plugin_instances}) {
+      $result = await $plugin->plugin_after_tool_call($name, $input, $result);
+    }
 
     push @results, { tool_call => $tc, result => $result };
     ${$state->{raid_tool_calls}}++;
@@ -1451,7 +1486,7 @@ Langertha::Raider - Autonomous agent with conversation history and MCP tools
 
 =head1 VERSION
 
-version 0.304
+version 0.305
 
 =head1 SYNOPSIS
 

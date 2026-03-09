@@ -4,13 +4,13 @@
       "Juri Fainberg <fajnbergj@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Test-Expander",
    "no_index" : {
@@ -69,6 +69,5 @@
          "web" : "https://github.com/jsf116/Test-Expander"
       }
    },
-   "version" : "v2.5.2",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "v2.6.0"
 }

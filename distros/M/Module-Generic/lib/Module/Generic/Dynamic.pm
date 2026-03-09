@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.3.0
+## Version v1.3.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2025/09/10
+## Modified 2026/01/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use Module::Generic::Global ':const';
     use Scalar::Util ();
     our $DEBUG = 0;
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.3.1';
 };
 
 use strict;
@@ -284,7 +284,16 @@ sub FREEZE
     my %hash  = %$self;
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, \%hash] );
+        }
+    }
     # But CBOR and Storable want a list with the first element being the serialised element
     CORE::return( $class, \%hash );
 }

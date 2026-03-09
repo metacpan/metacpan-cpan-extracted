@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -203,97 +203,134 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Watcher - Mutable watcher handle for Linux::Event::Loop
+Linux::Event::Watcher - Mutable readiness watcher handle for Linux::Event::Reactor
 
 =head1 SYNOPSIS
 
+<<<<<<< HEAD
+  my $watcher = $loop->watch(
+    $fh,
+    read => sub ($loop, $fh, $watcher) {
+      ...
+=======
   use v5.36;
   use Linux::Event;
 
-  my $loop = Linux::Event->new;
-
-  my $conn = My::Conn->new(...);
+  my $loop = Linux::Event->new( model => 'reactor' );
 
   my $w = $loop->watch($fh,
-    read  => \&My::Conn::on_read,
-    write => \&My::Conn::on_write,
-    error => \&My::Conn::on_error,  # optional
-    data  => $conn,                  # optional
+    read => sub ($loop, $fh, $w) {
+      my $buf;
+      my $n = sysread($fh, $buf, 8192);
+
+      if (!defined $n || $n == 0) {
+        $w->cancel;
+        close $fh;
+        return;
+      }
+
+      # ... handle $buf ...
+    },
+
+    write => sub ($loop, $fh, $w) {
+      # fd became writable
+      $w->disable_write; # typical: only enable when you actually have pending output
+    },
+
+    error => sub ($loop, $fh, $w) {
+      # error readiness reported (see DISPATCH SEMANTICS)
+      $w->cancel;
+      close $fh;
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
+    },
   );
 
-  $w->disable_write;
-
-  # later...
-  $w->enable_write;
-
-  # stop watching (does not close the fh)
-  $w->cancel;
+  $watcher->disable_read;
+  $watcher->enable_read;
+  $watcher->cancel;
 
 =head1 DESCRIPTION
 
-A watcher is a lightweight mutable handle owned by the loop. It stores callbacks,
-enable/disable state, and optional user data. The loop manages backend polling
-and dispatch.
+C<Linux::Event::Watcher> is the lightweight handle returned by
+L<Linux::Event::Reactor/watch>. It stores the current callbacks, enablement
+flags, filehandle metadata, and a user data slot.
 
-Watchers do not own the underlying filehandle; user code is responsible for
-closing resources. Recommended teardown order is C<< $w->cancel; close $fh; >>.
+The watcher does not own backend policy. Methods that change interest state
+simply delegate back into the loop.
 
 =head1 METHODS
 
-=head2 loop / fh / fd
+=head2 loop, fh, fd
 
-Accessors for the owning loop, the watched filehandle, and its file descriptor.
+Basic accessors.
 
-=head2 data
+=head2 is_active
 
-Get/set the user data slot:
+True while the watcher is still registered with the loop.
 
-  my $data = $w->data;
-  $w->data($new);
+=head2 data([$new])
 
-=head2 on_read / on_write / on_error
+Get or set the user data slot.
 
-Install or replace handlers. Passing undef removes the handler and disables it.
+=head2 edge_triggered([$bool])
 
-=head2 enable_read / disable_read
-=head2 enable_write / disable_write
-=head2 enable_error / disable_error
+Get or set edge-triggered mode.
 
-Toggle dispatch. Interest masks are inferred from installed handlers and enable
-state. Note: epoll reports errors regardless of interest; enable/disable only
-controls dispatch of C<error>.
+=head2 oneshot([$bool])
 
-=head2 edge_triggered / oneshot
+Get or set one-shot mode.
 
-Advanced epoll behaviors. These update the backend registration immediately.
+=head2 on_read([$cb])
+
+=head2 on_write([$cb])
+
+=head2 on_error([$cb])
+
+Install or replace callbacks.
+
+=head2 enable_read, disable_read
+
+=head2 enable_write, disable_write
+
+=head2 enable_error, disable_error
+
+Toggle callback enablement.
 
 =head2 cancel
 
-Remove the watcher from the loop/backend. This operation is idempotent.
+Remove the watcher from the loop.
 
-=head1 CALLBACK SIGNATURES
+=head1 CALLBACK ABI
 
-Handlers are invoked as:
+Watcher callbacks receive:
 
-  read  => sub ($loop, $fh, $watcher) { ... }
-  write => sub ($loop, $fh, $watcher) { ... }
-  error => sub ($loop, $fh, $watcher) { ... }
+<<<<<<< HEAD
+  $cb->($loop, $fh, $watcher)
+=======
+=head2 Error readiness ordering
 
-=head1 DISPATCH SEMANTICS
+If an epoll event indicates an error condition (for example C<EPOLLERR>), the loop
+dispatches to the watcher's C<error> callback first (if installed and enabled)
+and returns.
 
-On EPOLLERR, the loop calls C<error> first (if installed+enabled) and returns.
-If no error handler is installed, EPOLLERR behaves like both readable and writable.
+If no C<error> callback is installed/enabled, error readiness may be treated as
+readable and/or writable (depending on the platform and backend behavior). Do not
+rely on a specific fallback; install an C<error> handler if you want explicit
+error handling.
 
-On EPOLLHUP, read readiness is triggered (EOF detection via read() returning 0).
+=head2 Hangup / EOF
+
+On hangup conditions (for example C<EPOLLHUP>), readable readiness is typically
+delivered so user code can observe EOF via C<read(2)> returning 0.
 
 =head1 VERSION
 
-This document describes Linux::Event::Watcher version 0.006.
+This document describes Linux::Event::Watcher version 0.009.
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
 
-=head1 AUTHOR
+=head1 SEE ALSO
 
-Joshua S. Day
+L<Linux::Event::Reactor>,
+L<Linux::Event::Loop>
 
-=head1 LICENSE
-
-Same terms as Perl itself.
+=cut

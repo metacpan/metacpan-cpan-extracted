@@ -1,207 +1,257 @@
 [![CI](https://github.com/haxmeister/perl-linux-event/actions/workflows/ci.yml/badge.svg)](https://github.com/haxmeister/perl-linux-event/actions/workflows/ci.yml)
 
-Linux::Event **0.006** is the first stable API release. It provides a minimal, Linux-native event loop built on epoll, timerfd, signalfd, eventfd, and pidfd.
-
-## Additional Linux primitives
-
-Beyond timers and I/O watchers, Linux::Event can integrate:
-
-- **Signals** via `signalfd` (`$loop->signal(...)`)
-- **Wakeups** via `eventfd` (`$loop->waker`, then watch `$waker->fh`)
-- **Process exit** via `pidfd` (`$loop->pid($pid, ...)` for child exit notifications)
-
-See the `examples/` directory for working, minimal scripts.
-
 # Linux::Event
 
-A Linux-focused, backend-swappable event loop framework.
+Linux::Event is a Linux-native event-loop distribution for Perl with two peer execution models:
 
-**Status:** EXPERIMENTAL / WORK IN PROGRESS\
-**Current Version:** 0.006 (stable)
+- **Reactor** for readiness-based I/O
+- **Proactor** for completion-based I/O
 
-------------------------------------------------------------------------
+The public front door is `Linux::Event::Loop`, and `Linux::Event->new` is a convenient shortcut to it.
 
-## Overview
+<<<<<<< HEAD
+## Architecture
+=======
+The goal is a **small, explicit, composable foundation** for building
+high-performance event-driven systems on Linux. Model selection is explicit
+and mandatory: choose reactor or proactor when constructing a loop.
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
 
-`Linux::Event` provides a clean, layered architecture:
+```text
+Linux::Event::Loop
+    |
+    +-- Linux::Event::Reactor
+    |       |
+    |       +-- Linux::Event::Reactor::Backend::Epoll
+    |
+    +-- Linux::Event::Proactor
+            |
+            +-- Linux::Event::Proactor::Backend::Uring
+            +-- Linux::Event::Proactor::Backend::Fake
+```
 
-User Code\
-↓\
-Linux::Event::Watcher\
-↓\
-Linux::Event::Loop (policy layer)\
-├── Linux::Event::Clock\
-├── Linux::Event::Timer\
-├── Linux::Event::Scheduler\
-└── Backend (mechanism layer)
+## What this distribution contains
 
-### Design Goals
+Core modules in this repository:
 
--   Clear, minimal public API
--   No epoll mask exposure
--   Mutable watcher handles
--   Backend-swappable architecture
--   Nanosecond precision internally
--   Seconds-based public timer API
--   Foundation for future socket/server abstractions
+- `Linux::Event` - front door shortcut returning `Linux::Event::Loop`
+- `Linux::Event::Loop` - selector and delegating public API
+- `Linux::Event::Reactor` - readiness engine
+- `Linux::Event::Reactor::Backend` - readiness backend contract
+- `Linux::Event::Reactor::Backend::Epoll` - epoll backend
+- `Linux::Event::Watcher` - mutable reactor watcher handle
+- `Linux::Event::Signal` - signalfd adaptor
+- `Linux::Event::Wakeup` - eventfd-backed wakeup primitive
+- `Linux::Event::Pid` - pidfd-backed process exit notifications
+- `Linux::Event::Scheduler` - internal monotonic deadline queue
+- `Linux::Event::Proactor` - completion engine
+- `Linux::Event::Proactor::Backend` - completion backend contract
+- `Linux::Event::Proactor::Backend::Uring` - io_uring backend
+- `Linux::Event::Proactor::Backend::Fake` - deterministic testing backend
+- `Linux::Event::Operation` - in-flight operation object
+- `Linux::Event::Error` - lightweight proactor error object
 
-------------------------------------------------------------------------
+## Ecosystem layering
+
+<<<<<<< HEAD
+This distribution intentionally stays at the loop-and-primitives layer.
+=======
+Linux::Event
+    Front door for the Linux::Event ecosystem. Construct a
+    Linux::Event::Loop by explicitly choosing reactor or proactor mode.
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
+
+Companion distributions provide higher-level networking and process-building blocks:
+
+- `Linux::Event::Listen` - server-side socket acquisition
+- `Linux::Event::Connect` - client-side nonblocking connect
+- `Linux::Event::Stream` - buffered I/O and backpressure for established filehandles
+- `Linux::Event::Fork` - asynchronous child-process helpers
+- `Linux::Event::Clock` - monotonic time helpers
+- `Linux::Event::Timer` - timerfd wrapper used by the reactor
+
+Canonical networking composition:
+
+```text
+Listen / Connect
+<<<<<<< HEAD
+        |
+      Stream
+        |
+   your protocol
+```
+=======
+        
+      Stream
+        
+  Application protocol
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
+
+## Choosing a model
+
+<<<<<<< HEAD
+Use the **reactor** when you want readiness notifications over existing filehandles:
+=======
+Linux::Event::Listen  Linux::Event::Stream  your protocol
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
+
+```perl
+use v5.36;
+use Linux::Event;
+
+<<<<<<< HEAD
+my $loop = Linux::Event->new(model => 'reactor');
+=======
+Linux::Event::Connect  Linux::Event::Stream  your protocol
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
+
+$loop->after(0.250, sub ($loop) {
+  say "timer fired";
+  $loop->stop;
+});
+
+$loop->run;
+```
+
+Use the **proactor** when you want explicit operation objects and completion callbacks:
+
+```perl
+use v5.36;
+use Linux::Event::Loop;
+
+my $loop = Linux::Event::Loop->new(
+  model   => 'proactor',
+  backend => 'uring',
+);
+
+my $op = $loop->read(
+  fh          => $fh,
+  len         => 4096,
+  on_complete => sub ($op, $result, $data) {
+    return if $op->is_cancelled;
+    die $op->error->message if $op->failed;
+
+    say "read $result->{bytes} bytes";
+  },
+);
+
+while ($loop->live_op_count) {
+  $loop->run_once;
+}
+```
 
 ## Installation
 
 Development install:
 
-    perl Makefile.PL
-    make
-    make test
-    make install
+```bash
+perl Makefile.PL
+make
+make test
+make install
+```
 
-Requires:
+Primary dependencies include:
 
--   Linux
--   Linux::Epoll
--   Linux::Event::Clock \>= 0.011
--   Linux::Event::Timer \>= 0.010
+<<<<<<< HEAD
+- Linux
+- `Linux::Epoll`
+- `Linux::Event::Clock >= 0.011`
+- `Linux::Event::Timer >= 0.010`
+- `IO::Uring` and `Time::Spec` for the real proactor backend
+=======
+    Linux
+    Linux::Epoll
+    Linux::Event::Clock >= 0.011
+    Linux::Event::Timer >= 0.010
+    IO::Uring and Time::Spec for proactor mode
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
 
-------------------------------------------------------------------------
+The proactor test suite also supports a fake backend for deterministic testing.
 
-# Basic Usage
+## Examples
 
-    use v5.36;
-    use Linux::Event;
+The `examples/` directory is organized around the current architecture and includes:
 
-    my $loop = Linux::Event->new( backend => 'epoll' );
+<<<<<<< HEAD
+- reactor timers, watchers, signals, wakeups, and pidfd examples
+- proactor timer, read/write, and socket lifecycle examples
+- deeper reactor benchmarking and regression scripts
+=======
+    my $loop = Linux::Event->new(
+        model => 'reactor',
+    );
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
 
-    $loop->after(0.250, sub ($loop) {
-        say "250ms elapsed";
+The CI workflow syntax-checks all examples so they do not silently rot.
+
+## Status
+
+<<<<<<< HEAD
+This project is still pre-1.0 and is being actively refined toward a cohesive forward-looking architecture. Large structural cleanup is expected during this stage so the eventual stable API lands in a cleaner shape.
+=======
+---------------------------------------------------------------------
+
+## Additional Linux primitives
+
+Linux::Event integrates several Linux kernel facilities.
+
+Signals via signalfd
+
+    $loop->signal('INT', sub ($loop, $sig) {
         $loop->stop;
     });
 
-    $loop->run;
+Wakeups via eventfd
 
-Timers use seconds (float allowed). Internally everything is stored in
-nanoseconds.
-
-------------------------------------------------------------------------
-
-# Watching Filehandles
-
-Create a watcher with `watch(...)`.
-
-Interest is inferred from installed handlers.
-
-    my $conn = My::Conn->new(...);
-
-    my $w = $loop->watch(
-        $fh,
-        read  => \&My::Conn::on_read,
-        write => \&My::Conn::on_write,
-        data  => $conn,
-    );
-
-Handlers are invoked as:
-
-    sub on_read ($loop, $fh, $watcher) {
-        my $conn = $watcher->data;
-        ...
-    }
-
-------------------------------------------------------------------------
-
-## Watcher Object
-
-`watch()` returns a `Linux::Event::Watcher`.
-
-It is a mutable handle.
-
-### Common Methods
-
-    $w->enable_write;
-    $w->disable_write;
-
-    $w->on_read(sub { ... });
-    $w->on_write(sub { ... });
-
-    $w->data($obj);
-    my $obj = $w->data;
-
-    $w->cancel;
-
-------------------------------------------------------------------------
-
-## Edge Triggered Mode
-
-Advanced users may enable edge-triggered behavior:
-
-    my $w = $loop->watch(
-        $fh,
-        read => \&on_read,
-        edge_triggered => 1,
-    );
-
-Important: In edge-triggered mode, read handlers must drain the
-filehandle until EAGAIN.
-
-Level-triggered mode (default) is safer and recommended unless you
-understand epoll semantics.
-
-------------------------------------------------------------------------
-
-# Timer API
-
-Timers are simple and seconds-based.
-
-    my $id = $loop->after(0.100, sub ($loop) {
-        ...
+    my $w = $loop->waker(sub ($loop) {
+        say "woken";
     });
 
-Cancel:
+Process exit notifications via pidfd
 
-    $loop->cancel($id);
+    $loop->pid($pid, sub ($loop, $pid, $status) {
+        say "child exited";
+    });
 
-Absolute deadline (monotonic timebase):
+See the examples/ directory for complete scripts.
 
-    $loop->at($deadline_seconds, sub ($loop) { ... });
+---------------------------------------------------------------------
 
-------------------------------------------------------------------------
+## Example: TCP server
 
-# Architecture
+    use v5.36;
+    use Linux::Event;
+    use Linux::Event::Listen;
+    use Linux::Event::Stream;
 
-### Loop (Policy)
+    my $loop = Linux::Event->new(
+        model => 'reactor',
+    );
 
--   Owns scheduler
--   Owns timer rearm logic
--   Dispatches expired timers
--   Manages watcher state
+    Linux::Event::Listen->new(
+        loop => $loop,
+        host => '127.0.0.1',
+        port => 3000,
 
-### Backend (Mechanism)
+        on_accept => sub ($loop, $fh, $peer, $listen) {
 
--   Waits for readiness
--   Converts epoll events to internal mask
--   Dispatches to loop
+            Linux::Event::Stream->new(
+                loop => $loop,
+                fh   => $fh,
 
-Currently implemented:
+                codec => 'line',
 
--   Linux::Event::Backend::Epoll
+                on_message => sub ($stream, $line) {
+                    $stream->write_message("echo: $line");
+                },
+            );
+        },
+    );
 
-Future:
+$loop->run;
+>>>>>>> 1401c31 (prep for cpan and release, new tool added)
 
--   Backend::Uring
--   Hybrid backends
--   Possibly select fallback
+## License
 
-------------------------------------------------------------------------
-
-# Development Status
-
-This is a developer release.
-
-The architecture is stabilizing, but APIs may change before 0.01.
-
-Not yet recommended for production use.
-
-------------------------------------------------------------------------
-
-# Repository
-
-https://github.com/haxmeister/perl-linux-event
+Same terms as Perl itself.

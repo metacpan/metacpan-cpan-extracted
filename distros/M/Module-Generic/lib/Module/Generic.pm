@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.1.3
+## Version v1.2.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2025/10/21
+## Modified 2026/03/08
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -31,6 +31,7 @@ BEGIN
     $PARSE_DATETIME_RELATIVE_RE $PARSE_DATES_ALL_RE $PARSE_DATE_NON_STDANDARD2_RE
     );
     use utf8;
+    use B ();
     use Config;
     use Class::Load ();
     use Clone ();
@@ -99,7 +100,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.1.3';
+    our $VERSION     = 'v1.2.0';
 };
 
 use v5.26.1;
@@ -229,8 +230,8 @@ sub _load_class;
 sub _load_classes;
 sub _looks_like_path;
 sub _lvalue;
-sub _message;
-sub _messagef;
+sub __message;
+sub __messagef;
 sub _message_check;
 sub _message_frame;
 sub _message_log;
@@ -412,9 +413,12 @@ sub clear_error
     my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
 
     $this->{error} = '';
-    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+    # $self->__message( 6, "Are we running under threads, switching to shared data ? ", ( $rv ? 'yes' : 'no' ) );
+    $self->__message( 106, "Are we running under threads, switching to shared data ? ", ( HAS_THREADS ? 'yes' : 'no' ) );
+    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key ) ||
+        die( Module::Generic::Global->error );
     $repo->remove;
-    ${ $class . '::ERROR' } = '';
+    # ${ $class . '::ERROR' } = '';
     return( $self );
 }
 
@@ -498,7 +502,15 @@ sub deserialise
             return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !$f->exists );
             return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( $f->is_directory );
             return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( $f->is_empty );
+            if( $opts->{lock} )
+            {
+                if( !$f->lock( shared => 1 ) )
+                {
+                    warn( "Could not acquire shared lock on '$f': ", $f->error ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                }
+            }
             my $data = $f->load( binmode => 'raw' );
+            $f->unlock if( $opts->{lock} );
             return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
             my $ref;
             # try-catch
@@ -559,21 +571,28 @@ sub deserialise
             return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !$f->exists );
             return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( $f->is_directory );
             return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( $f->is_empty );
+            if( $opts->{lock} )
+            {
+                if( !$f->lock( shared => 1 ) )
+                {
+                    warn( "Could not acquire shared lock on '$f': ", $f->error ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                }
+            }
             my $data = $f->load( binmode => 'raw' );
+            $f->unlock if( $opts->{lock} );
             return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
-            my $ref;
             # try-catch
             local $@;
-            eval
+            my $ref = eval
             {
                 if( defined( $base64 ) )
                 {
                     my $decoded = $base64->[1]->( $data );
-                    $ref = CBOR::Free::decode( $decoded );
+                    return( CBOR::Free::decode( $decoded ) );
                 }
                 else
                 {
-                    $ref = CBOR::Free::decode( $data );
+                    return( CBOR::Free::decode( $data ) );
                 }
             };
             if( $@ )
@@ -585,20 +604,19 @@ sub deserialise
         elsif( exists( $opts->{data} ) )
         {
             return( $self->error( "Data provided to deserialise with $class is empty." ) ) if( !defined( $opts->{data} ) || !length( $opts->{data} ) );
-            my $ref;
             # try-catch
             local $@;
-            eval
+            my $ref = eval
             {
                 no warnings;
                 if( defined( $base64 ) )
                 {
                     my $decoded = $base64->[1]->( $opts->{data} );
-                    $ref = CBOR::Free::decode( $decoded );
+                    return( CBOR::Free::decode( $decoded ) );
                 }
                 else
                 {
-                    $ref = CBOR::Free::decode( $opts->{data} );
+                    return( CBOR::Free::decode( $opts->{data} ) );
                 }
             };
             if( $@ )
@@ -636,7 +654,15 @@ sub deserialise
             return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !$f->exists );
             return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( $f->is_directory );
             return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( $f->is_empty );
+            if( $opts->{lock} )
+            {
+                if( !$f->lock( shared => 1 ) )
+                {
+                    warn( "Could not acquire shared lock on '$f': ", $f->error ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                }
+            }
             my $data = $f->load( binmode => 'raw' );
+            $f->unlock if( $opts->{lock} );
             return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
             my $ref;
             # try-catch
@@ -711,15 +737,22 @@ sub deserialise
                 return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !$f->exists );
                 return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( $f->is_directory );
                 return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( $f->is_empty );
+                if( $opts->{lock} )
+                {
+                    if( !$f->lock( shared => 1 ) )
+                    {
+                        warn( "Could not acquire shared lock on '$f': ", $f->error ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                    }
+                }
                 my $data = $f->load( binmode => 'raw' );
+                $f->unlock if( $opts->{lock} );
                 return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
                 my $decoded = $base64->[1]->( $data );
-                my $result;
                 # try-catch
                 local $@;
-                eval
+                my $result = eval
                 {
-                    $result = $dec->decode( $decoded );
+                    $dec->decode( $decoded );
                 };
                 if( $@ )
                 {
@@ -729,12 +762,11 @@ sub deserialise
             }
             else
             {
-                my $result;
                 # try-catch
                 local $@;
-                eval
+                my $result = eval
                 {
-                    $result = $dec->decode_from_file( "$opts->{file}" => $code );
+                    $dec->decode_from_file( "$opts->{file}" => $code );
                 };
                 if( $@ )
                 {
@@ -804,23 +836,23 @@ sub deserialise
             }
             if( ref( $info ) eq 'HASH' )
             {
-                if( $this->{debug} || $opts->{debug} )
-                {
-                    print( STDOUT <<EOT );
-Byte order... : $info->{byteorder}
-File......... : $info->{file}
-Header size.. : $info->{hdrsize}
-Integer size. : $info->{intsize}
-Long size.... : $info->{longsize}
-Major version : $info->{major}
-Minor version : $info->{minor}
-Net order.... : $info->{netorder}
-NV size...... : $info->{nvsize}
-PTR size..... : $info->{ptrsize}
-Version...... : $info->{version}
-Version NV... : $info->{version_nv}
-EOT
-                }
+#                 if( $this->{debug} || $opts->{debug} )
+#                 {
+#                     print( STDERR <<EOT );
+# Byte order... : $info->{byteorder}
+# File......... : $info->{file}
+# Header size.. : $info->{hdrsize}
+# Integer size. : $info->{intsize}
+# Long size.... : $info->{longsize}
+# Major version : $info->{major}
+# Minor version : $info->{minor}
+# Net order.... : $info->{netorder}
+# NV size...... : $info->{nvsize}
+# PTR size..... : $info->{ptrsize}
+# Version...... : $info->{version}
+# Version NV... : $info->{version_nv}
+# EOT
+#                 }
 
                 if( defined( $base64 ) )
                 {
@@ -828,9 +860,15 @@ EOT
                     return( $self->error( "File provided \"$opts->{file}\" does not exist." ) ) if( !$f->exists );
                     return( $self->error( "File provided \"$opts->{file}\" is actually a directory." ) ) if( $f->is_directory );
                     return( $self->error( "File provided \"$opts->{file}\" to deserialise is empty." ) ) if( $f->is_empty );
-                    $f->lock( shared => 1 ) if( $opts->{lock} );
+                    if( $opts->{lock} )
+                    {
+                        if( !$f->lock( shared => 1 ) )
+                        {
+                            warn( "Could not acquire shared lock on '$f': ", $f->error ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                        }
+                    }
                     my $data = $f->load( binmode => 'raw' );
-                    $f->unlock;
+                    $f->unlock if( $opts->{lock} );
                     return( $self->pass_error( $f->error ) ) if( !defined( $data ) );
                     my $decoded = $base64->[1]->( $data );
                     # try-catch
@@ -892,9 +930,15 @@ EOT
             else
             {
                 my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
-                $f->lock( shared => 1 ) if( $opts->{lock} );
+                if( $opts->{lock} )
+                {
+                    if( !$f->lock( shared => 1 ) )
+                    {
+                        warn( "Could not acquire shared lock on '$f': ", $f->error ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+                    }
+                }
                 my $data = $f->load( binmode => 'raw' );
-                $f->unlock;
+                $f->unlock if( $opts->{lock} );
                 return( $data ) if( !defined( $data ) || !length( $data ) );
                 # try-catch
                 local $@;
@@ -1152,6 +1196,7 @@ sub error
         # Note Taken from Carp to find the right point in the stack to start from
         my $caller_func;
         $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
+        $self->__message( 105, "Called with error message '", $args->{message}, "'" );
         # What type of expected value we support to prevent perl error upon undef.
         # By default: object
         if( exists( $args->{want} ) && 
@@ -1189,15 +1234,21 @@ sub error
                 # We have to die, because we have an error within another error
                 die( __PACKAGE__ . "::error() is unable to load exception class \"$ex_class\": $@" ) if( $@ );
             }
+            $self->__message( 105, "Creating error object with class $ex_class" );
             $o = $ex_class->new( $args );
         }
 
+        $self->__message( 105, "Storing exception object (", $self->_str_val( $o // 'undef' ), ") in our current object ", $self->_str_val( $self // 'undef' ) );
         $this->{error} = $o;
         # We need to also store the object in the global $ERRORS repository, because when a class constructor fails, it may call 'error' using its newly instantiated object, but the caller can only get the error by calling 'error' as a class function, such as My::Module->error
         # my $rv = $self->_ensure_shared_elements;
+        # $self->__message( 6, "Are we running under threads, switching to shared data ? ", ( $rv ? 'yes' : 'no' ) );
+        $self->__message( 106, "Are we running under threads, switching to shared data ? ", ( HAS_THREADS ? 'yes' : 'no' ) );
+        $self->__message( 106, "Storing the error object in the global \$ERRORS" );
         $repo->set( $o );
         # For backward compatibility, so the user can access $My::Module::ERROR
-        ${ $class . '::ERROR' } = $o;
+        # ${ $class . '::ERROR' } = $o;
+        # $self->__message( 106, "Entry in \$ERRORS for key '$err_key' is ", CORE::length( $repo->get // 'undef' ), " bytes big, and \$${class}\::ERROR is '", $self->_str_val( ${ $class . '::ERROR' } // 'undef' ), "'" );
 
         my $err_callback = $self->_on_error;
         if( !defined( $err_callback ) &&
@@ -1290,6 +1341,7 @@ sub error
         }
         elsif( $this->{fatal} || $args->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
         {
+            $self->__message( 105, "We are instructed to die with the newly created exception object ", $self->_str_val( $o // 'undef' ) );
             # my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
             # die( $@ ? $o : $enc_str );
             die( $o );
@@ -1303,8 +1355,10 @@ sub error
             else
             {
                 local $@;
+                $self->__message( 106, "Encoding error string '$o' (", $o->message, ")" );
                 my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
                 # Display warnings if warnings for this class is registered and enabled or if not registered
+                $self->__message( 106, "Encoded error string is '$enc_str'" );
                 warn( $@ ? $o : $enc_str );
             }
         }
@@ -1351,27 +1405,34 @@ sub error
         {
             if( $args->{object} )
             {
+                $self->__message( 105, "Caller is in object context, returning a Null object to caller ", [caller]->[0], " at line ", [caller]->[2] );
                 rreturn( $want_return->{object}->() );
             }
             else
             {
+                $self->__message( 106, "The caller (", [caller]->[0], " at line ", [caller]->[2], ") context is ${want_what}. Returning now with appropriate value to caller ", [caller]->[0], " at line ", [caller]->[2] );
                 rreturn( $want_return->{ $want_what }->() );
             }
         }
         elsif( $args->{lvalue} && want( 'RVALUE' ) )
         {
+            $self->__message( 105, "Caller is in rvalue context, returning nothing (undef or empty list to caller ", [caller]->[0], " at line ", [caller]->[2] );
             rreturn;
         }
+        $self->__message( 105, "Returning nothing (undef or empty list) to caller ", [caller]->[0], " at line ", [caller]->[2] );
         return;
     }
     # Done with mutator mode
 
+    $self->__message( 104, "Called in accessor mode from ", [caller]->[0], " from line ", [caller]->[2], " for class $class and object \$self ", $self->_str_val( $self // 'undef' ), ". Called as a class function ? ", ( $i_am_blessed ? 'no' : 'yes' ), ". Do we have an error on record ? ", ( $this->{error} ? 'yes' : 'no' ) );
+    # $self->__message( 105, "Returning error object -> ", $self->_str_val( ref( $self ) ? ( $this->{error} // '' ) : ( ${ $class . '::ERROR' } // '' ) ) );
     if( $i_am_blessed )
     {
         # To avoid the perl error of 'called on undefined value' and so the user can do
-        # $o->error->_message for example without concerning himself/herself whether an exception object is actually set
+        # $o->error->__message for example without concerning himself/herself whether an exception object is actually set
         if( !$this->{error} )
         {
+            $self->__message( 106, "There is no error object in our object (", $self->_str_val( $self // 'undef' ), "), and caller (", [caller]->[0], " at line ", [caller]->[2], ") context is ${want_what}. Returning now with appropriate value." );
             if( $want_what && 
                 CORE::exists( $want_return->{ $want_what } ) &&
                 scalar( grep( /^$want_what$/i, @$want_ok ) ) )
@@ -1381,14 +1442,17 @@ sub error
         }
         else
         {
+            $self->__message( 105, "Returning error object (", $self->_str_val( $this->{error} // 'undef' ), ") found within our object (", $self->_str_val( $self // 'undef' ), ")." );
             return( $this->{error} );
         }
     }
 
+    $self->__message( 106, "Do we have an entry for the key '$err_key' in the global \$ERRORS ? ", ( $repo->exists ? 'yes' : 'no' ), ". \$ERRORS contains ", $repo->length, " errors." );
     $o = $repo->get;
     if( CORE::defined( $o ) && CORE::length( $o ) )
     {
         # Found an exception object using Module::Generic::Global
+        $self->__message( 106, "Object retrieved is '", $self->_str_val( $o // 'undef' ), "'" );
     }
     elsif( !CAN_THREADS &&
         CORE::defined( ${ $class . '::ERROR' } ) &&
@@ -1396,7 +1460,8 @@ sub error
         # Other inheriting moduls might do the same
         CORE::length( ${ $class . '::ERROR' } ) )
     {
-        $o = ${ $class . '::ERROR' };
+        $self->__message( 106, "Retrieving the stored object as-is (not frozen) from the global variable \$ERROR from package $class" );
+        # $o = ${ $class . '::ERROR' };
         warn( "Accessing ${class}::ERROR is deprecated; use ${class}->error instead" ) if( $self->_warnings_is_enabled );
     }
     return( $o );
@@ -1438,7 +1503,7 @@ sub init
     $this->{_init_params_order} = [] unless( ref( $this->{_init_params_order} ) );
     # If no debug level was provided when calling message, this level will be assumed
     # Example: message( "Hello" );
-    # If _message_default_level was set to 3, this would be equivalent to message( 3, "Hello" )
+    # If __message_default_level was set to 3, this would be equivalent to message( 3, "Hello" )
     $this->{_init_strict_use_sub} = 0 unless( length( $this->{_init_strict_use_sub} ) );
     $this->{_log_handler} = '' unless( length( $this->{_log_handler} ) );
     $this->{_message_default_level} = 0;
@@ -1481,6 +1546,7 @@ sub init
     if( @_ )
     {
         my @args = @_;
+        $self->__message( 105, "Args (\@args) provided is -> ", sub{ $self->Module::Generic::dump( \@args ) } );
         my $vals;
         if( ref( $args[0] ) eq 'HASH' ||
             ( Scalar::Util::blessed( $args[0] ) && $args[0]->isa( 'Module::Generic::Hash' ) ) )
@@ -1493,6 +1559,7 @@ sub init
         }
         elsif( ref( $args[0] ) eq 'ARRAY' )
         {
+            # $self->__message( 103, "Got an array ref" );
             $vals = $args[0];
         }
         # Special case when there is an undefined value passed (null) even though it is declared as a hash or object
@@ -1533,6 +1600,7 @@ sub init
         if( CORE::exists( $this->{_init_preprocess} ) &&
             ref( $this->{_init_preprocess} ) eq 'CODE' )
         {
+            $self->__message( 112, "Init pre-process found, executing callback with an array containing ", scalar( @$vals ), " elements." );
             $vals = eval
             {
                 $this->{_init_preprocess}->( $vals );
@@ -1547,6 +1615,7 @@ sub init
             {
                 die( "Pre-processing of init data returned a ", ( ref( $vals ) // 'string' ), ", but was expecting an array reference." );
             }
+            $self->__message( 112, "Init pre-process returned an array containing ", scalar( @$vals ), " elements -> ", sub{ $self->Module::Generic::dump( $vals ) } );
         }
 
         # Check if there is a debug parameter, and if we find one, set it first so that that 
@@ -1570,13 +1639,16 @@ sub init
             my $orig = $name;
             my $transformed = ( $name =~ tr/-/_/ );
             my $meth = $self->can( $name );
+            $self->__message( 112, "Initialising field $name with value '", ( $val // 'undef' ), "' (", $self->_str_val( $val // 'undef' ), "). Is method $name defined? ", ( defined( $meth ) ? 'yes' : 'no' ) );
             if( defined( $meth ) )
             {
                 # if( !defined( $self->$name( $val ) ) )
+                $self->__message( 114, "Calling method '$name' ($meth) with value '", $self->_str_val( $val // 'undef' ), "'" );
                 if( !defined( $meth->( $self, $val ) ) )
                 {
                     if( defined( $val ) && $self->error )
                     {
+                        $self->__message( 104, "Error while instantiating object for class '", ref( $self ), "': ", $self->error );
                         warn( "Warning: method $name returned undef while initialising object ", ref( $self ), ": ", ( $self->error ? $self->error->message : '' ), "\n" );
                         return;
                     }
@@ -1585,6 +1657,7 @@ sub init
             }
             elsif( $this->{_init_strict_use_sub} )
             {
+                $self->__message( 103, "Unknown method '$name' in class $pkg -> ", sub{ $self->_get_stack_trace->as_string });
                 $self->error( "Unknown method $name in class $pkg" );
                 next;
             }
@@ -1653,8 +1726,8 @@ sub log_handler { return( shift->_set_get_code( '_log_handler', @_ ) ); }
 
 {
     no warnings 'once';
-    # NOTE: aliasing message to _message
-    *message = \&_message;
+    # NOTE: aliasing message to __message
+    *message = \&__message;
 
     # NOTE: aliasing messagec to message_colour
     *messagec = \&message_colour;
@@ -1674,8 +1747,8 @@ sub log_handler { return( shift->_set_get_code( '_log_handler', @_ ) ); }
     # NOTE: aliasing message_log_io to _message_log_io
     *message_log_io = \&_message_log_io;
 
-    # NOTE: aliasing messagef to _messagef
-    *messagef = \&_messagef;
+    # NOTE: aliasing messagef to __messagef
+    *messagef = \&__messagef;
 }
 
 sub new_array
@@ -1912,7 +1985,7 @@ sub pass_error
     my $callback;
     no strict 'refs';
     my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
-    my $repo = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+    my $repo    = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
 
     if( scalar( @_ ) )
     {
@@ -1944,10 +2017,12 @@ sub pass_error
     # with an hash containing just one argument class => 'Some::ExceptionClass'
     if( !defined( $err ) && ( !scalar( @_ ) || defined( $ex_class ) ) )
     {
+        $self->__message( 106, "Passing on error..." );
         my $error;
         if( Scalar::Util::blessed( $self ) )
         {
             $error = $this->{error};
+            $self->__message( 106, "Error found from within our object: ", $self->_str_val( $error // 'undef' ) );
         }
         elsif( $repo->exists )
         {
@@ -1971,12 +2046,16 @@ sub pass_error
              ( scalar( @_ ) == 2 && defined( $ex_class ) ) 
            ) )
     {
+        $self->__message( 106, "Received exception object ", $self->_str_val( $err // 'undef' ), " from caller ", [caller]->[0], " at line ", [caller]->[2] );
         # If necessary, we re-bless the error object to the designated class
         my $o = ( defined( $ex_class ) ? bless( $err => $ex_class ) : $err );
+        $self->__message( 106, "Storing the error object provided", ( defined( $ex_class ) ? " after having blessed it with class $ex_class" : '' ), ' ', $self->_str_val( $o // 'undef' ), " in our current object (", $self->_str_val( $self // 'undef' ), ")" );
         $this->{error} = $o;
         # We ned to be backward compatible, and allow the user to access $My::Module::ERROR
+        $self->__message( 106, "pass_error() was called as a class function $class->pass_error, storing the provided error object in the global \$ERRORS" );
+        $self->__message( 106, "Are we running under threads, switching to shared data ? ", ( HAS_THREADS ? 'yes' : 'no' ) );
         $repo->set( $o );
-        ${ $class . '::ERROR' } = $o;
+        # ${ $class . '::ERROR' } = $o;
         $this->{error}->code( $code ) if( defined( $code ) );
         my $err_callback = $self->_on_error;
         $err_callback = $callback if( !defined( $err_callback ) && defined( $callback ) );
@@ -2000,16 +2079,19 @@ sub pass_error
     # If the error provided is not an object, we call error to create one
     else
     {
+        $self->__message( 106, "Creating an object from the arguments provided." );
         return( $self->error( @_ ) );
     }
 
     if( want( 'OBJECT' ) )
     {
+        $self->__message( 106, "We are in object context, returning a Module::Generic::Null object." );
         $self->_load_class( 'Module::Generic::Null' ) ||
             die( "Unable to load Module::Generic::Null" );
         my $null = Module::Generic::Null->new( $err, { debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
+    $self->__message( 106, "Simply returning undef or an empty list with to caller ", [caller]->[0], " from line ", [caller]->[2] );
     return;
 }
 
@@ -2024,6 +2106,7 @@ sub serialise
     my $class = $opts->{serialiser} || $opts->{serializer} || $SERIALISER;
     return( $self->error( "No serialiser class was provided nor set in \$Module::Generic::SERIALISER" ) ) if( !defined( $class ) || !length( $class ) );
     $opts->{base64} //= '';
+    $self->__message( 104, "Serialising data using serialiser $class" );
 
     if( $class eq 'CBOR' || $class eq 'CBOR::XS' )
     {
@@ -2042,6 +2125,7 @@ sub serialise
     my $base64;
     if( defined( $opts->{base64} ) && $opts->{base64} )
     {
+        $self->__message( 104, "Base64 is required." );
         $base64 = $self->_has_base64( $opts->{base64} );
         return( $self->error( "base64 option '$opts->{base64}' has been provided for deserialising, but could not get handlers." ) ) if( !$base64 );
         if( ref( $base64 ) ne 'ARRAY' ||
@@ -2080,18 +2164,42 @@ sub serialise
         };
         if( $@ )
         {
+            $self->__message( 104, "Error serialising data using $class: $@" );
             return( $self->error( "Error trying to serialise data with $class: $@" ) );
         }
 
+        $self->__message( 104, CORE::length( $serialised ), " bytes of serialised data was produced by $class" );
         if( defined( $base64 ) )
         {
             $serialised = $base64->[0]->( $serialised );
+            $self->__message( 104, "Serialised data is in base64 and is now ", CORE::length( $serialised ), " bytes." );
         }
 
         if( exists( $opts->{file} ) && $opts->{file} )
         {
+            $self->__message( 104, "A file was provided to unload serialised data -> '$opts->{file}'" );
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
-            $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+            my $cache_dir = $f->parent;
+            my $tmp = $self->new_tempfile(
+                ( $cache_dir->can_write ? ( dir => $cache_dir ) : () ),
+                suffix => 'bin',
+            ) || return( $self->pass_error( $f->error ) );
+            # Need to open the file to lock it.
+            $f->open( '>', { binmode => ':raw' } ) || return( $self->pass_error( $f->error ) );
+            $f->lock( exclusive => 1 ) || return( $self->pass_error( $f->error ) );
+            if( !$tmp->unload( $serialised, { binmode => 'raw' } ) )
+            {
+                $f->unlock;
+                $tmp->unlink if( $tmp->exists );
+                return( $self->pass_error( $f->error ) );
+            }
+            if( !$tmp->rename( $f, overwrite => 1 ) )
+            {
+                $f->unlock;
+                $tmp->unlink if( $tmp->exists );
+                return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
+            }
+            $f->unlock;
         }
         return( $serialised );
     }
@@ -2116,18 +2224,43 @@ sub serialise
         };
         if( $@ )
         {
+            $self->__message( 104, "Error serialising data using $class: $@" );
             return( $self->error( "Error trying to serialise data with $class: $@" ) );
         }
 
+        $self->__message( 104, CORE::length( $serialised ), " bytes of serialised data was produced by $class" );
         if( defined( $base64 ) )
         {
             $serialised = $base64->[0]->( $serialised );
+            $self->__message( 104, "Serialised data is in base64 and is now ", CORE::length( $serialised ), " bytes." );
         }
 
         if( exists( $opts->{file} ) && $opts->{file} )
         {
+            $self->__message( 104, "A file was provided to unload serialised data -> '$opts->{file}'" );
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
-            $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+            my $cache_dir = $f->parent;
+            # $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+            my $tmp = $self->new_tempfile(
+                ( $cache_dir->can_write ? ( dir => $cache_dir ) : () ),
+                suffix => 'bin',
+            ) || return( $self->pass_error( $f->error ) );
+            # Need to open the file to lock it.
+            $f->open( '>', { binmode => ':raw' } ) || return( $self->pass_error( $f->error ) );
+            $f->lock( exclusive => 1 ) || return( $self->pass_error( $f->error ) );
+            if( !$tmp->unload( $serialised, { binmode => 'raw' } ) )
+            {
+                $f->unlock;
+                $tmp->unlink if( $tmp->exists );
+                return( $self->pass_error( $f->error ) );
+            }
+            if( !$tmp->rename( $f, overwrite => 1 ) )
+            {
+                $f->unlock;
+                $tmp->unlink if( $tmp->exists );
+                return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
+            }
+            $f->unlock;
         }
         return( $serialised );
     }
@@ -2157,18 +2290,43 @@ sub serialise
         };
         if( $@ )
         {
+            $self->__message( 104, "Error serialising data using $class: $@" );
             return( $self->error( "Error trying to serialise data with $class: $@" ) );
         }
 
+        $self->__message( 104, CORE::length( $serialised ), " bytes of serialised data was produced by $class" );
         if( defined( $base64 ) )
         {
             $serialised = $base64->[0]->( $serialised );
+            $self->__message( 104, "Serialised data is in base64 and is now ", CORE::length( $serialised ), " bytes." );
         }
 
         if( exists( $opts->{file} ) && $opts->{file} )
         {
+            $self->__message( 104, "A file was provided to unload serialised data -> '$opts->{file}'" );
             my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
-            $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+            my $cache_dir = $f->parent;
+            # $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+            my $tmp = $self->new_tempfile(
+                ( $cache_dir->can_write ? ( dir => $cache_dir ) : () ),
+                suffix => 'bin',
+            ) || return( $self->pass_error( $f->error ) );
+            # Need to open the file to lock it.
+            $f->open( '>', { binmode => ':raw' } ) || return( $self->pass_error( $f->error ) );
+            $f->lock( exclusive => 1 ) || return( $self->pass_error( $f->error ) );
+            if( !$tmp->unload( $serialised, { binmode => 'raw' } ) )
+            {
+                $f->unlock;
+                $tmp->unlink if( $tmp->exists );
+                return( $self->pass_error( $f->error ) );
+            }
+            if( !$tmp->rename( $f, overwrite => 1 ) )
+            {
+                $f->unlock;
+                $tmp->unlink if( $tmp->exists );
+                return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
+            }
+            $f->unlock;
         }
         return( $serialised );
     }
@@ -2185,12 +2343,36 @@ sub serialise
         my $enc = Sereal::Encoder->new( $ref );
         if( exists( $opts->{file} ) && $opts->{file} )
         {
+            $self->__message( 104, "A file was provided to unload serialised data -> '$opts->{file}'" );
+            my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+            my $cache_dir = $f->parent;
+            my $tmp = $self->new_tempfile(
+                ( $cache_dir->can_write ? ( dir => $cache_dir ) : () ),
+                suffix => 'bin',
+            ) || return( $self->pass_error( $f->error ) );
+            # Need to open the file to lock it.
+            $f->open( '>', { binmode => ':raw' } ) || return( $self->pass_error( $f->error ) );
+            $f->lock( exclusive => 1 ) || return( $self->pass_error( $f->error ) );
             if( defined( $base64 ) )
             {
                 my $serialised = $enc->encode( $data );
+                $self->__message( 104, CORE::length( $serialised ), " bytes of serialised data was produced by $class" );
                 $serialised = $base64->[0]->( $serialised );
-                my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
-                $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+                $self->__message( 104, "Serialised data is in base64 and is now ", CORE::length( $serialised ), " bytes." );
+                # $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+                if( !$tmp->unload( $serialised, { binmode => 'raw' } ) )
+                {
+                    $f->unlock;
+                    $tmp->unlink if( $tmp->exists );
+                    return( $self->pass_error( $f->error ) );
+                }
+                if( !$tmp->rename( $f, overwrite => 1 ) )
+                {
+                    $f->unlock;
+                    $tmp->unlink if( $tmp->exists );
+                    return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
+                }
+                $f->unlock;
                 return( $serialised );
             }
             else
@@ -2199,12 +2381,23 @@ sub serialise
                 local $@;
                 my $rv = eval
                 {
-                    $enc->encode_to_file( "$opts->{file}", $data, ( exists( $opts->{append} ) ? $opts->{append} : 0 ) );
+                    $enc->encode_to_file( "$tmp", $data, ( exists( $opts->{append} ) ? $opts->{append} : 0 ) );
                 };
                 if( $@ )
                 {
+                    $f->unlock;
+                    $tmp->unlink if( $tmp->exists );
+                    $self->__message( 104, "Error serialising data using $class: $@" );
                     return( $self->error( "Error trying to serialise data with $class: $@" ) );
                 }
+                $self->__message( 104, CORE::length( $rv ), " bytes of serialised data was produced by $class" );
+                if( !$tmp->rename( $f, overwrite => 1 ) )
+                {
+                    $f->unlock;
+                    $tmp->unlink if( $tmp->exists );
+                    return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
+                }
+                $f->unlock;
                 return( $rv );
             }
         }
@@ -2218,11 +2411,14 @@ sub serialise
             };
             if( $@ )
             {
+                $self->__message( 104, "Error serialising data using $class: $@" );
                 return( $self->error( "Error trying to serialise data with $class: $@" ) );
             }
 
+            $self->__message( 104, CORE::length( $serialised ), " bytes of serialised data was produced by $class" );
             if( defined( $base64 ) )
             {
+                $self->__message( 104, "Serialised data to base64." );
                 return( $base64->[0]->( $serialised ) );
             }
             return( $serialised );
@@ -2233,6 +2429,7 @@ sub serialise
     {
         if( exists( $opts->{file} ) && $opts->{file} )
         {
+            $self->__message( 104, "A file was provided to unload serialised data -> '$opts->{file}'" );
             if( defined( $base64 ) )
             {
                 my $serialised;
@@ -2245,12 +2442,40 @@ sub serialise
                     return( $self->error( "The class $class does not support the method 'freeze'." ) );
                 }
                 $serialised = $base64->[0]->( $serialised );
+                $self->__message( 104, "Serialised data is in base64 and is now ", CORE::length( $serialised ), " bytes." );
                 my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
-                $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+                # $f->unload( $serialised, { binmode => 'raw' } ) || return( $self->pass_error( $f->error ) );
+                my $cache_dir = $f->parent;
+                my $tmp = $self->new_tempfile(
+                    ( $cache_dir->can_write ? ( dir => $cache_dir ) : () ),
+                    suffix => 'bin',
+                ) || return( $self->pass_error( $f->error ) );
+                # Need to open the file to lock it.
+                $f->open( '>', { binmode => ':raw' } ) || return( $self->pass_error( $f->error ) );
+                $f->lock( exclusive => 1 ) || return( $self->pass_error( $f->error ) );
+                if( !$tmp->unload( $serialised, { binmode => 'raw' } ) )
+                {
+                    $f->unlock;
+                    $tmp->unlink if( $tmp->exists );
+                    return( $self->pass_error( $f->error ) );
+                }
+                if( !$tmp->rename( $f, overwrite => 1 ) )
+                {
+                    $f->unlock;
+                    $tmp->unlink if( $tmp->exists );
+                    return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
+                }
+                $f->unlock;
                 return( $serialised );
             }
             elsif( $opts->{lock} )
             {
+                my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+                my $cache_dir = $f->parent;
+                my $tmp = $self->new_tempfile(
+                    ( $cache_dir->can_write ? ( dir => $cache_dir ) : () ),
+                    suffix => 'bin',
+                ) || return( $self->pass_error( $f->error ) );
                 # try-catch
                 local $@;
                 my $rv = eval
@@ -2260,16 +2485,29 @@ sub serialise
                     {
                         die( "The class $class does not support the method 'lock_store'." );
                     }
-                    return( $code->( $data => "$opts->{file}" ) );
+                    return( $code->( $data => "$tmp" ) );
                 };
                 if( $@ )
                 {
+                    $tmp->unlink if( $tmp->exists );
+                    $self->__message( 104, "Error serialising data using $class: $@" );
                     return( $self->error( "Error trying to serialise data with $class: $@" ) );
+                }
+                if( !$tmp->rename( $f, overwrite => 1 ) )
+                {
+                    $tmp->unlink if( $tmp->exists );
+                    return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
                 }
                 return( $rv );
             }
             else
             {
+                my $f = $self->new_file( $opts->{file} ) || return( $self->pass_error );
+                my $cache_dir = $f->parent;
+                my $tmp = $self->new_tempfile(
+                    ( $cache_dir->can_write ? ( dir => $cache_dir ) : () ),
+                    suffix => 'bin',
+                ) || return( $self->pass_error( $f->error ) );
                 # try-catch
                 local $@;
                 my $rv = eval
@@ -2283,13 +2521,22 @@ sub serialise
                 };
                 if( $@ )
                 {
+                    $tmp->unlink if( $tmp->exists );
+                    $self->__message( 104, "Error serialising data using $class: $@" );
                     return( $self->error( "Error trying to serialise data with $class: $@" ) );
+                }
+                $self->__message( 104, CORE::length( $rv ), " bytes of serialised data was produced by $class" );
+                if( !$tmp->rename( $f, overwrite => 1 ) )
+                {
+                    $tmp->unlink if( $tmp->exists );
+                    return( $self->error( "Could not replace cache file '$f' with '$tmp': ", $tmp->error ) );
                 }
                 return( $rv );
             }
         }
         elsif( exists( $opts->{io} ) )
         {
+            $self->__message( 104, "Serialising using class $class and file handle '$opts->{io}'" );
             return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to serialise data to." ) ) if( ( Scalar::Util::reftype( $opts->{io} ) // '' ) ne 'GLOB' );
             if( defined( $base64 ) )
             {
@@ -2302,10 +2549,13 @@ sub serialise
                 {
                     return( $self->error( "The class $class does not support the method 'freeze'." ) );
                 }
+                $self->__message( 104, CORE::length( $serialised ), " bytes of serialised data was produced by $class" );
                 $serialised = $base64->[0]->( $serialised );
+                $self->__message( 104, "Serialised data is in base64 and is now ", CORE::length( $serialised ), " bytes." );
 
                 my $bytes = syswrite( $opts->{io}, $serialised );
                 return( $self->error( "Unable to write ", CORE::length( $serialised ), " bytes of Storable serialised data to file handle '$opts->{io}': $!" ) ) if( !defined( $bytes ) );
+                $self->__message( 104, "Wrote ", ( $bytes // 'undef' ), " bytes of data to file handle $opts->{io}" );
                 return( $serialised );
             }
             else
@@ -2319,10 +2569,12 @@ sub serialise
                     {
                         die( "Class $class does not support the method 'store_fd'." );
                     }
+                    $self->__message( 104, "Calling subroutine 'store_fd' to serialise data from file handle $opts->{io}" );
                     return( $code->( $data => $opts->{io} ) );
                 };
                 if( $@ )
                 {
+                    $self->__message( 104, "Error serialising data using $class: $@" );
                     return( $self->error( "Error trying to serialise data with $class: $@" ) );
                 }
                 return( $rv );
@@ -2339,15 +2591,18 @@ sub serialise
                 {
                     die( "Class $class has no method 'freeze' to serialise data." );
                 }
+                    $self->__message( 104, "Calling subroutine 'freeze' to serialise ", CORE::length( $data ), " bytes of data." );
                 return( $code->( $data ) );
             };
             if( $@ )
             {
+                $self->__message( 104, "Error serialising data using $class: $@" );
                 return( $self->error( "Error trying to serialise data with $class: $@" ) );
             }
 
             if( defined( $base64 ) )
             {
+                $self->__message( 104, "Serialised data to base64." );
                 return( $base64->[0]->( $serialised ) );
             }
             return( $serialised );
@@ -2508,6 +2763,7 @@ sub __instantiate_object
         {
             for( my $i = 0; $i < scalar( @$class ); $i++ )
             {
+                $self->__message( 107, "Loading class '", ( $class->[0] // 'undef' ), "'." );
                 next unless( defined( $class->[0] ) );
                 # try-catch
                 local $@;
@@ -2520,6 +2776,7 @@ sub __instantiate_object
         }
         else
         {
+            $self->__message( 107, "Loading class '$class'." );
             # try-catch
             local $@;
             my $rc = eval{ Class::Load::load_class( $class ) };
@@ -2528,9 +2785,11 @@ sub __instantiate_object
                 return( $self->error( "Error trying to load class '$class': $@" ) );
             }
         }
+        # $self->__message( 106, "Loading class ${class} resulted in return value '${rc}'" );
         @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
         if( defined( $callback ) )
         {
+            $self->__message( 107, "Calling callback to get new object." );
             local $_ = $self;
             $o = $callback->(
                 $class => [@_],
@@ -2538,12 +2797,13 @@ sub __instantiate_object
         }
         else
         {
-            my $args = \@_; $self->_message( 7, "Creating a new ${class} object using arguments '", CORE::join( "', '", map( $self->_str_val( $_ // 'undef' ), @_ ) ), "': ", sub{ $self->Module::Generic::dump( $args) } );
+            my $args = \@_; $self->__message( 107, "Creating a new ${class} object using arguments '", CORE::join( "', '", map( $self->_str_val( $_ // 'undef' ), @_ ) ), "': ", sub{ $self->Module::Generic::dump( $args) } );
             $o = scalar( @_ ) ? $class->new( @_ ) : $class->new;
         }
     };
     if( $@ )
     {
+        $self->__message( 107, "Error instantiating new $class object: $@" );
         if( $self->_can( $@ => 'message' ) )
         {
             return( $self->error({ code => 500, message => $@->message }) );
@@ -2553,8 +2813,10 @@ sub __instantiate_object
             return( $self->error({ code => 500, message => $@ }) );
         }
     }
+    $self->__message( 107, "Unable to instantiate an object of class $class." ) if( !defined( $o ) );
     return( $self->error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
     $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
+    $self->__message( 107, "Returning new class $class object." );
     return( $o );
 }
 
@@ -2807,6 +3069,7 @@ sub _is_class_loaded
     my $class = shift( @_ );
     my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
     my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
+    $self->__message( 106, "Are we running under threads, switching to shared data ? ", ( HAS_THREADS ? 'yes' : 'no' ) );
     if( $MOD_PERL )
     {
         # https://perl.apache.org/docs/2.0/api/Apache2/Module.html#C_loaded_
@@ -2816,20 +3079,24 @@ sub _is_class_loaded
     # elsif( HAS_THREADS && $repo->exists )
     elsif( $repo->exists )
     {
+        $self->__message( 112, "Class $class is already loaded under threads -> ", ( $repo->get // 'undef' ) );
         return(1);
     }
     else
     {
+        $self->__message( 112, "Checking if class $class is loaded using \%INC." );
         ( my $pm = $class ) =~ s{::}{/}gs;
         $pm .= '.pm';
         if( CORE::exists( $INC{ $pm } ) )
         {
+            $self->__message( 112, "Found class $class already loaded using \%INC." );
             $repo->set(1);
             return(1);
         }
     }
     no strict 'refs';
     my $ns = \%{ $class . '::' };
+    $self->__message( 112, "Checking if class $class is loaded using class namespace." );
     if( exists( $ns->{ISA} ) || 
         exists( $ns->{BEGIN} ) || 
         (
@@ -2838,9 +3105,11 @@ sub _is_class_loaded
             defined( ${*{\$ns->{VERSION}}{SCALAR}} )
         ) )
     {
+        $self->__message( 112, "Found class $class already loaded using class namespace." );
         $repo->set(1);
         return(1);
     }
+    $self->__message( 112, "Class $class is not loaded yet." );
     return(0);
 }
 
@@ -2892,6 +3161,8 @@ sub _is_ip
     my $ip   = shift( @_ );
     return(0) if( !defined( $ip ) || !length( $ip ) );
     $self->_load_class( 'Regexp::Common', 'net' ) || return( $self->pass_error );
+    $self->__message( 112, "Regexp IPv4 is: ", ( $RE{net}{IPv4} // 'undef' ) );
+    $self->__message( 112, "Regexp IPv6 is: ", ( $RE{net}{IPv6} // 'undef' ) );
 
     # We need to return either 1 or 0. By default, perl return undef for false
     # supports IPv4 and IPv6 in CIDR notation or not
@@ -2902,20 +3173,24 @@ sub _is_ip
 sub _is_number
 {
     return(0) if( scalar( @_ < 2 ) );
-    my( $self, $num ) = @_;
-    return(0) if( !defined( $num ) || !length( $num ) );
-    if( my $isok = Scalar::Util::looks_like_number( $num ) )
-    {
-        return(1);
-    }
-    # If the hexadecimal value is a string, it will return false, so we use regular expression.
-    elsif( $num =~ /^0x[0-9A-F]+$/i )
-    {
-        return(1);
-    }
-    $self->_load_class( 'Regexp::Common' ) || return( $self->pass_error );
-    no warnings 'once';
-    return( $num =~ /^$Regexp::Common::RE{num}{real}$/ );
+    my( $self, $v ) = @_;
+
+    return(0) if( ref( $v ) );
+    return(0) unless( defined( $v ) );
+
+    # Accept only scalars that actually carry numeric flags.
+    # JSON marks numbers with IOK/NOK; plain strings (even "12") will not have them.
+    my $sv    = B::svref_2object( \$v );
+    my $flags = $sv->FLAGS;
+
+    local $@;
+    # SVf_IOK = 0x02000000, SVf_NOK = 0x04000000 on most builds;
+    # we do not hardcode constants—B::SV’s FLAGS is stable to test with these bitmasks.
+    # Use string eval to avoid importing platform-specific constants.
+    my $SVf_IOK = eval{ B::SVf_IOK() } || 0x02000000;
+    my $SVf_NOK = eval{ B::SVf_NOK() } || 0x04000000;
+
+    return( ( $flags & ( $SVf_IOK | $SVf_NOK ) ) ? 1 : 0 );
 }
 
 sub _is_object
@@ -2945,15 +3220,17 @@ sub _load_class
 {
     my $self = shift( @_ );
     my $class = shift( @_ ) || return( $self->error( "No package name was provided to load." ) );
+    $self->__message( 112, "Loading class '$class'" );
 
     # Rigorous validation
     return( $self->error( "Class name is empty." ) ) unless( length( $class ) );
 
     my $opts = {};
     $opts = pop( @_ ) if ( ref( $_[-1] ) eq 'HASH' );
+    #$self->__message( 112, "Using the parameters to load class $class: ", sub{ $self->dump( $opts ) } );
 
     # Validate options
-    my %valid_opts = map { $_ => 1 } qw( caller version no_import );
+    my %valid_opts = map{ $_ => 1 } qw( caller version no_import force );
     foreach my $key ( keys( %$opts ) )
     {
         return( $self->error( "Invalid option: $key" ) ) unless ( exists( $valid_opts{ $key } ) );
@@ -2964,24 +3241,31 @@ sub _load_class
     }
 
     my $args = $self->_get_args_as_array( @_ );
+    #$self->__message( 112, "Using the arguments to load class $class: ", sub{ $self->dump( $args ) } );
 
     # Get the caller's package so we load the module in context
     my $caller_class = $opts->{caller} || CORE::caller;
+    $self->__message( 112, "Loading class $class into caller's namespace $caller_class" );
 
     # Return if already loaded (threads aware)
     my $is_loaded = $self->_is_class_loaded( $class );
-    if( $is_loaded )
+    if( $is_loaded && !$opts->{force} )
     {
+        $self->__message( 112, "Class $class is already loaded." );
         if( scalar( @$args ) )
         {
+            $self->__message( 112, "Importing $class with ", scalar( @$args ), " arguments." );
             my $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
+            $self->__message( 112, "Executing: $pl" );
             eval( $pl );
+            $self->__message( 112, "Error importing class $class into caller's namespace ${caller_class}: $@" ) if( $@ );
             return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
         }
         return( $class );
     }
     # Use a shared variable for locking in threaded environments
     # What we retrieved from _is_class_loaded is not a threaded shared value, so we have to do this instead:
+    $self->__message( 106, "Are we running under threads, switching to shared data ? ", ( HAS_THREADS ? 'yes' : 'no' ) );
     my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
     my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
 
@@ -2991,8 +3275,11 @@ sub _load_class
         local $SIG{__DIE__} = sub{};
         local $@;
         my $pl = "package ${caller_class}; require $class;";
+        $self->__message( 112, "Evaluating code '$pl' under threads." );
         eval( $pl );
+        $self->__message( 112, "Error loading class: $@" ) if( $@ );
         return( $self->error( "Unable to load package ${class}: $@\nCode executed was:\n${pl}" ) ) if( $@ );
+        $self->__message( 112, "Checking for version ? ", ( $has_version ? "yes -> $opts->{version}" : 'no' ) );
         if( $has_version )
         {
             eval{ $class->VERSION( $opts->{version} ) };
@@ -3001,11 +3288,15 @@ sub _load_class
 
         unless( $opts->{no_import} )
         {
+            $self->__message( 112, "Importing $class with ", scalar( @$args ), " arguments." );
             $pl = "package ${caller_class}; $class->import(" . ( scalar( @$args ) ? "'" . join( "', '", @$args ) . "'" : '' ) . ");";
+            $self->__message( 112, "Executing: $pl" );
             eval( $pl );
+            $self->__message( 112, "Error importing class $class into caller's namespace ${caller_class}: $@" ) if( $@ );
             return( $self->error( "Error importing class $class into caller's namespace ${caller_class}: $@" ) ) if( $@ );
         }
         $repo->set(1);
+        $self->__message( 112, "Class $class successfully loaded." );
     }
 
     return( $self->_is_class_loaded( $class ) ? $class : '' );
@@ -3024,13 +3315,32 @@ sub _load_classes
     return( $self );
 }
 
+sub _look_like_number
+{
+    return(0) if( scalar( @_ < 2 ) );
+    my( $self, $num ) = @_;
+    return(0) if( !defined( $num ) || !length( $num ) );
+    if( my $isok = Scalar::Util::looks_like_number( $num ) )
+    {
+        return(1);
+    }
+    # If the hexadecimal value is a string, it will return false, so we use regular expression.
+    elsif( $num =~ /^0x[0-9A-F]+$/i )
+    {
+        return(1);
+    }
+    $self->_load_class( 'Regexp::Common' ) || return( $self->pass_error );
+    no warnings 'once';
+    return( $num =~ /^$Regexp::Common::RE{num}{real}$/ );
+}
+
 sub _lvalue : lvalue { return( shift->_set_get_callback( @_ ) ); }
 
-sub _message
+sub __message
 {
-    my $self = shift( @_ );
+    my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
-    my $this = $self->_obj2h;
+    my $this  = $self->_obj2h;
     no strict 'refs';
     no warnings 'once';
     if( $this->{verbose} || 
@@ -3040,12 +3350,14 @@ sub _message
         ( scalar( @_ ) && ref( $_[-1] ) eq 'HASH' && CORE::exists( $_[-1]->{debug} ) && $_[-1]->{debug} ) )
     {
         my $r;
-        if( $MOD_PERL )
+        # We check which phase we are in, because in destruction phase, Apache2::ApacheRec is not available.
+        if( $MOD_PERL && ${^GLOBAL_PHASE} ne 'DESTRUCT' )
         {
             # try-catch
             local $@;
             eval
             {
+                local $SIG{__WARN__} = sub{};
                 $r = Apache2::RequestUtil->request;
             };
             if( $@ )
@@ -3131,13 +3443,13 @@ sub _message
 
         my $info = 
         {
-        'formatted' => $mesg,
-        'message'   => $txt,
-        'file'      => $file,
-        'line'      => $line,
-        'package'   => $class,
-        'sub'       => $sub2,
-        'level'     => ( $_[0] =~ /^\d+$/ ? $_[0] : CORE::exists( $opts->{level} ) ? $opts->{level} : 0 ),
+            'formatted' => $mesg,
+            'message'   => $txt,
+            'file'      => $file,
+            'line'      => $line,
+            'package'   => $class,
+            'sub'       => $sub2,
+            'level'     => ( $_[0] =~ /^\d+$/ ? $_[0] : CORE::exists( $opts->{level} ) ? $opts->{level} : 0 ),
         };
         $info->{type} = $opts->{type} if( $opts->{type} );
 
@@ -3352,7 +3664,7 @@ sub _message_log_io
     return( $self->_set_get( 'log_io' ) );
 }
 
-sub _messagef
+sub __messagef
 {
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
@@ -3396,8 +3708,9 @@ sub _messagef
         my $txt = sprintf( $fmt, map( ( ref( $_ ) eq 'CODE' && !$this->{_msg_no_exec_sub} ) ? $_->() : $_, @$ref ) );
         $txt = $self->colour_parse( $txt ) if( $opts->{colour} );
         $opts->{message} = $txt;
+        $opts->{skip_frames} = 1 unless( exists( $opts->{skip_frames} ) );
         $opts->{level} = $level if( defined( $level ) );
-        return( $self->_message( ( $level || 0 ), $opts ) );
+        return( $self->__message( ( $level || 0 ), $opts ) );
     }
     return(1);
 }
@@ -4127,10 +4440,12 @@ sub _set_get_callback : lvalue
     my $wantarray = HAS_THREADS ? threads->wantarray() : wantarray();
     $context->{wantarray} = defined( $wantarray ) ? $wantarray ? 'LIST' : 'SCALAR' : 'VOID';
     $context->{wantarray0} = defined( wantarray() ) ? wantarray() ? 'LIST' : 'SCALAR' : 'VOID';
+    $self->__message( 112, "Determining caller context with Wanted for field '", ( $field // 'undef' ), "' and wantarray() wants $context->{wantarray} and regular wantarray wants $context->{wantarray0}." );
     my $args;
     my @rv;
     if( want( qw( LVALUE ASSIGN ) ) )
     {
+        $self->__message( 112, "Caller expects LVALUE ASSIGN with value '", $self->_str_val( $args // 'undef' ), "'" );
         $args = [want( 'ASSIGN' )];
         $context->{assign}++;
         $context->{lvalue}++;
@@ -4142,23 +4457,31 @@ sub _set_get_callback : lvalue
             $args = [@_];
         }
 
+        $self->__message( 112, "Caller is not in a LVALUE ASSIGN context, and there are ", scalar( @$args ), " argument(s) provided: '", join( "', '", map( $self->_str_val( $_ // 'undef' ), @$args ) ), "'" );
+        $self->__message( 112, "Checking for LVALUE or RVALUE context." );
         if( want( 'LVALUE' ) )
         {
+            $self->__message( 112, "Caller is in a LVALUE context." );
             $context->{lvalue}++;
         }
         elsif( want( 'RVALUE' ) )
         {
+            $self->__message( 112, "Caller is in a RVALUE context." );
             $context->{rvalue}++;
         }
 
+        $self->__message( 112, "Checking other context in non lvalue-assign context." );
         my $expect = Wanted::context();
+        $self->__message( 112, "Caller expects $expect" );
         $context->{ lc( $expect ) }++ if( length( $expect ) );
         $context->{count} = Wanted::want( 'COUNT' );
     }
     $context->{eval} = $^S;
+    $self->__message( 112, "_set_get_callback called with ", ( defined( $field ) ? "field $field and " : "no field and " ), "context is -> ", sub{ $self->Module::Generic::dump( $context ) } );
 
     if( CORE::defined( $args ) && scalar( @$args ) )
     {
+        $self->__message( 112, "Called for mutator callback with ", scalar( @$args ), " arguments." );
         # try-catch
         local $@;
         local $_ = $context;
@@ -4170,6 +4493,7 @@ sub _set_get_callback : lvalue
         {
             eval{ $rv[0] = $setter->( $self, @$args ) };
         }
+        $self->__message( 104, "Mutator triggered an exception: $@" ) if( $@ );
 
         if( $@ )
         {
@@ -4193,16 +4517,20 @@ sub _set_get_callback : lvalue
             $self->error( $err );
         }
 
+        $self->__message( 112, "Mutator callback returned -> ", sub{ $self->Module::Generic::dump( \@rv ) } );
         if( ( !scalar( @rv ) || ( scalar( @rv ) == 1 && !defined( $rv[0] ) ) ) && 
             ( my $has_error = $self->error ) )
         {
+            $self->__message( 112, "Callback returned nothing, but found an error set." );
             if( $context->{assign} )
             {
+                $self->__message( 112, "We are in assign, returning a private property (__lvalue_error) of our object with value undef." );
                 $data->{__lvalue_error} = undef;
                 return( $data->{__lvalue_error} );
             }
             else
             {
+                $self->__message( 112, "Not in assign context, passing the error." );
                 return( $self->pass_error );
             }
         }
@@ -4210,8 +4538,10 @@ sub _set_get_callback : lvalue
         {
             if( $context->{assign} || $context->{lvalue} )
             {
+                $self->__message( 112, "We are in assign or lvalue context with value -> ", $self->_str_val( $rv[0] // 'undef' ) );
                 if( defined( $field ) )
                 {
+                    $self->__message( 112, "Field parameter is provided ($field), storing and returning its value." );
                     $data->{ $field } = $rv[0]; # Store setter's result
                     # return( $data->{ $field } );
                     tie( my $scalar, 'Module::Generic::LvalueGuard',
@@ -4224,26 +4554,32 @@ sub _set_get_callback : lvalue
                 }
                 else
                 {
+                    $self->__message( 112, "No field parameter, returning private property (__lvalue) with callback value." );
                     return( $data->{__lvalue} = $rv[0] );
                 }
             }
             elsif( $context->{list} )
             {
+                $self->__message( 112, "We are in list context." );
                 return( @rv );
             }
             else
             {
+                $self->__message( 112, "We are in some other context, probably rvalue (", ( $context->{rvalue} ? 'yes' : 'no' ), ")." );
                 if( !defined( $rv[0] ) && $context->{object} )
                 {
+                    $self->__message( 112, "Empty value returned in object context, returning Null object." );
                     $self->_load_class( 'Module::Generic::Null' ) ||
                         return( $self->pass_error );
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
+                $self->__message( 112, "Returning callback single value -> ", $self->_str_val( $rv[0] // 'undef' ) );
                 rreturn( $rv[0] );
             }
         }
     }
 
+    $self->__message( 112, "Callback for accessor callback." );
     # try-catch
     local $@;
     local $_ = $context;
@@ -4260,31 +4596,40 @@ sub _set_get_callback : lvalue
     if( !scalar( @rv ) && 
         ( my $has_error = $self->error ) )
     {
+        $self->__message( 112, "Callback returned nothing, but found an error set." );
         if( $context->{rvalue} )
         {
+            $self->__message( 112, "We are in rvalue context." );
             if( $context->{object} )
             {
+                $self->__message( 112, "We are in rvalue and object context, returning a Null object." );
                 $self->_load_class( 'Module::Generic::Null' ) ||
                     return( $self->pass_error );
                 rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
             }
+            $self->__message( 112, "Returning undef or empty list." );
             rreturn;
         }
         else
         {
+            $self->__message( 112, "We are in some other context." );
             if( $context->{object} )
             {
+                $self->__message( 112, "We are in object context, returning a Null object." );
                 $self->_load_class( 'Module::Generic::Null' ) ||
                     return( $self->pass_error );
                 return( Module::Generic::Null->new( wants => 'OBJECT' ) );
             }
+            $self->__message( 112, "Returning undef or empty list." );
             return;
         }
     }
     else
     {
+        $self->__message( 112, "No error, all is well, accessor callback returned ", scalar( @rv ), " value(s)." );
         if( $context->{lvalue} && defined( $field ) )
         {
+            $self->__message( 112, "In lvalue context without args, returning field $field for lvalue access." );
             tie( my $scalar, 'Module::Generic::LvalueGuard',
                 value => $data->{ $field },
                 get   => $getter,
@@ -4295,35 +4640,45 @@ sub _set_get_callback : lvalue
         }
         elsif( $context->{rvalue} )
         {
+            $self->__message( 112, "We are in rvalue context." );
             if( $context->{list} )
             {
+                $self->__message( 112, "Returning a list." );
                 rreturn( @rv );
             }
             else
             {
+                $self->__message( 112, "Returning a scalar." );
                 if( !defined( $rv[0] ) && $context->{object} )
                 {
+                    $self->__message( 112, "Value returned is empty or undef and we are in object context, returning a Null object." );
                     $self->_load_class( 'Module::Generic::Null' ) ||
                         return( $self->pass_error );
                     rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
+                $self->__message( 112, "Returning the single value returned by callback -> '", $self->_str_val( $rv[0] // 'undef' ), "'" );
                 rreturn( $rv[0] );
             }
         }
         else
         {
+            $self->__message( 112, "We are in some other context." );
             if( $context->{list} )
             {
+                $self->__message( 112, "Returning a list." );
                 return( @rv );
             }
             else
             {
+                $self->__message( 112, "Returning a scalar." );
                 if( !defined( $rv[0] ) && $context->{object} )
                 {
+                    $self->__message( 112, "Value returned is empty or undef and we are in object context, returning a Null object." );
                     $self->_load_class( 'Module::Generic::Null' ) ||
                         return( $self->pass_error );
                     return( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 }
+                $self->__message( 112, "Returning the single value returned by callback -> ", ( $rv[0] // 'undef' ), " (", $self->_str_val( $rv[0] // 'undef' ), ")." );
                 return( $rv[0] );
             }
         }
@@ -4352,11 +4707,13 @@ sub _set_get_class
         return;
     }
 
+    $self->__message( 112, "Creating class for field $field with definition -> ", sub{ $self->Module::Generic::dump( $def ) } );
     my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
 
     if( @_ )
     {
-        my $hash = shift( @_ );
+        # my $hash = shift( @_ );
+        my $hash = $self->_get_args_as_hash( @_ );
         $hash->{debug} = $self->debug if( ref( $hash ) eq 'HASH' && !exists( $hash->{debug} ) );
         # my $o = $class->new( $hash );
         # my $o = $self->__instantiate_object( $field, $class, ( %$hash, debug => $self->debug ) );
@@ -4648,6 +5005,7 @@ sub _set_get_glob : lvalue
             # Convoluted, but that's because reftype returns undef for false, and this would trigger the annoying warning 'Use of uninitialized value in string ne'
             if( defined( $arg ) && ( Scalar::Util::reftype( $arg // '' ) // '' ) ne 'GLOB' )
             {
+                $self->__message( 104, "Value being set ($arg) is not a glob." );
                 return( $self->error( "Method $field takes only a glob, but value provided ($arg) is not supported" ) );
             }
 
@@ -5049,6 +5407,7 @@ sub _set_get_hash_as_object
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     unless( Class::Load::is_class_loaded( $class ) )
     {
+        $self->__message( 106, "Generating a new perl class ${class}" );
         my $perl .= <<EOT;
 package $class;
 BEGIN
@@ -5070,13 +5429,16 @@ EOT
         die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ( ref( $self ) || $self ), "\": $@" ) if( $@ );
     }
 
+    # $self->__message( 106, "Instantiating object from dynamic class ${class} with arguments: '", join( "', '", @_ ), "'" );
     if( @_ )
     {
         my $hash = shift( @_ );
         no warnings 'once';
         $Module::Generic::Dynamic::DEBUG = $self->debug unless( CORE::exists( $hash->{debug} ) );
+        $self->__message( 107, "Instantiating a new $class object for field '$field' and hash reference $hash" );
         my $o = $self->__instantiate_object( $field, $class, $hash ) || return( $self->pass_error );
         $self->clear_error;
+        $self->__message( 107, "Associating resulting object ", $self->_str_val( $o // 'undef' ), " to \$data->{ $field }" );
         $data->{ $field } = $o;
     }
 
@@ -5141,6 +5503,7 @@ sub _set_get_ip : lvalue
             my $arg = shift( @_ );
             my $ctx = $_;
             my $v = $arg;
+            $self->__message( 112, "Setting value '", ( $arg // 'undef' ), "' to object field '$field'." );
 
             if( defined( $check ) )
             {
@@ -5162,6 +5525,7 @@ sub _set_get_ip : lvalue
             # If the user provided a string, let's check it
             elsif( length( $v ) && !$self->_is_ip( $v ) )
             {
+                $self->__message( 106, "Value provided ($v) is not a valid IP." );
                 return( $self->error( "Value provided ($v) is not a valid ip address." ) );
             }
             $data->{ $field } = $self->new_scalar( $v );
@@ -5187,9 +5551,11 @@ sub _set_get_ip : lvalue
                 }
                 if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
                 {
+                    $self->__message( 112, "Executing callback passing new value '", ( $v // 'undef' ), "'" );
                     # try-catch
                     local $@;
                     $v = eval{ $coderef->( $self, $v ) };
+                    $self->__message( 112, "Callback done. Object field $field value is now '", ( $v // 'undef' ), "'" );
                     if( $@ )
                     {
                         return( $self->error( "Error while executing callback for field '$field', and value '", $self->_str_val( $v ), "': $@" ) );
@@ -5659,6 +6025,7 @@ sub _set_get_number : lvalue
             elsif( defined( $constraint ) && 
                 ( $val + 0 ) !~ /^$constraint$/ )
             {
+                $self->__message( 114, "Contraint $opts->{constraint} check failed for value '$val' and regexp: ", ( $constraint // 'undef' ) );
                 return( $self->error( "The value provided for this object numeric field '$field' is not a valid ", ( ref( $opts->{constraint} ) eq 'Regexp' ? 'value' : CORE::exists( $constraint_names->{ $opts->{constraint} } ) ? $constraint_names->{ $opts->{constraint} } : $opts->{constraint} ), "." ) );
             }
             else
@@ -6542,6 +6909,7 @@ sub _set_get_object_without_init
             if( defined( $check ) )
             {
                 my $val = $_[0];
+                $self->__message( 112, "Checking value provided (", $self->_str_val( $val // 'undef' ), ") for '$field'." );
                 # try-catch
                 local $@;
                 my $rv = eval{ $check->( $self, $val ) };
@@ -6555,12 +6923,14 @@ sub _set_get_object_without_init
             # User removed the value by passing it an undefined value
             if( !defined( $_[0] ) )
             {
+                $self->__message( 112, "Value provided is undef" );
                 $data->{ $field } = undef();
             }
             # User pass an object
             elsif( Scalar::Util::blessed( $_[0] ) )
             {
                 my $o = shift( @_ );
+                $self->__message( 112, "Value provided for '$field' is blessed. Checking if it is among the supported classes: ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ) );
                 if( ref( $class ) eq 'ARRAY' )
                 {
                     my $ok = 0;
@@ -6577,15 +6947,18 @@ sub _set_get_object_without_init
                 {
                     return( $self->error( "Object provided (", ref( $o ), ") for $field is not a valid $class object" ) ) if( !$o->isa( "$class" ) );
                 }
+                $self->__message( 112, "Ok, object provided for '$field' is a valid class object of '", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), "'." );
                 $data->{ $field } = $o;
             }
             elsif( ( ref( $class ) // '' ) eq 'ARRAY' && !defined( $callback ) )
             {
                 # Cannot instantiate an object, when specified allowed classes is an array, because we would not know which class to use, unless there is a callback that would take of it of course.
+                $self->__message( 112, "Parameters received to instantiate a class object for '$field', but multiple allowed classes were provided." );
                 return( $self->error( "Cannot instantiate a class object for '$field' with multiple classes being set." ) );
             }
             else
             {
+                $self->__message( 112, scalar( @_ ), " parameters provided. Instantiating a new class '$class'" );
                 # return( $self->error( "Only undef or an ", ( ref( $class ) eq 'ARRAY' ? join( ', ', @$class ) : $class ), " object can be provided." ) );
                 my $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class, @_ );
                 if( !defined( $o ) )
@@ -6605,6 +6978,7 @@ sub _set_get_object_without_init
         elsif( ( ref( $class ) // '' ) eq 'ARRAY' && !defined( $callback ) )
         {
             # Cannot instantiate an object, when specified allowed classes is an array, because we would not know which class to use.
+            $self->__message( 112, "Parameters received to instaantiate a class object, but multiple allowed classes were provided." );
             return( $self->error( "Cannot instantiate a class object for '$field' with multiple classes being set." ) );
         }
         else
@@ -6640,11 +7014,14 @@ sub _set_get_object_without_init
                 }
             }
         }
+        $self->__message( 112, "Did we find a callback for $field ? ", defined( $coderef ) ? 'yes' : 'no' );
         if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
         {
+            $self->__message( 112, "Executing callback for $field passing new value '", $self->_str_val( $data->{ $field } // 'undef' ), "'" );
             # try-catch
             local $@;
             my $rv = eval{ $coderef->( $self, $data->{ $field } ) };
+            $self->__message( 112, "Callback done. Object field $field value is now '", $self->_str_val( $data->{ $field } // 'undef' ), "'" );
             if( $@ )
             {
                 return( $self->error( "Error while executing callback for field '$field', and value '", $self->_str_val( $data->{ $field } ), "': $@" ) );
@@ -6663,6 +7040,7 @@ sub _set_get_object_without_init
     # We only execute callbacks in accessor mode
     unless( @_ )
     {
+        $self->__message( 112, "Property '$field' value is '", $self->_str_val( $data->{ $field } // 'undef' ), "'" );
         my $v = $data->{ $field };
         if( scalar( keys( %$callbacks ) ) &&
             CORE::exists( $callbacks->{get} ) &&
@@ -6670,6 +7048,7 @@ sub _set_get_object_without_init
         {
             $v = $callbacks->{get}->( $self, $v );
         }
+        $self->__message( 112, "Returning property '$field' value -> '", $self->_str_val( $v // 'undef' ), "'" );
         return( $v );
     }
     # If nothing has been set for this field, ie no object, but we are called in chain, this will fail on purpose.
@@ -6710,6 +7089,7 @@ sub _set_get_scalar : lvalue
         get => sub
         {
             my $self = shift( @_ );
+            $self->__message( 112, "Property '$field' value is '", $self->_str_val( $data->{ $field } // 'undef' ), "'" );
             my $v = $data->{ $field };
             if( scalar( keys( %$callbacks ) ) && 
                 CORE::exists( $callbacks->{get} ) &&
@@ -6717,6 +7097,7 @@ sub _set_get_scalar : lvalue
             {
                 $v = $callbacks->{get}->( $self, $v );
             }
+            $self->__message( 112, "Returning property '$field' value -> '", $self->_str_val( $v // 'undef' ), "'" );
             return( $v );
         },
         set => sub
@@ -6727,6 +7108,7 @@ sub _set_get_scalar : lvalue
             {
                 return( $self->error( "Method $field takes only a scalar, but value provided ($val) is a reference" ) );
             }
+            $self->__message( 112, "Setting value '", ( $val // 'undef' ), "' to object field '$field'." );
             my $original_val = $val;
             if( defined( $check ) )
             {
@@ -6759,9 +7141,11 @@ sub _set_get_scalar : lvalue
             }
             if( defined( $coderef ) && ref( $coderef ) eq 'CODE' )
             {
+                $self->__message( 112, "Executing callback passing new value '", ( $val // 'undef' ), "'" );
                 # try-catch
                 local $@;
                 my $rv = eval{ $coderef->( $self, $val ) };
+                $self->__message( 112, "Callback done. Object field $field value is now '", ( $val // 'undef' ), "'" );
                 if( $@ )
                 {
                     return( $self->error( "Error while executing callback for field '$field', and value '", $self->_str_val( $val ), "': $@" ) );
@@ -6774,6 +7158,7 @@ sub _set_get_scalar : lvalue
                 # Update with callback’s result
                 $data->{ $field } = $rv;
             }
+            $self->__message( 106, "Returning field '$field' value '", ( $data->{ $field } // 'undef' ), "'." );
             return( $data->{ $field } );
         },
         field => $field,
@@ -6944,6 +7329,7 @@ sub _set_get_scalar_as_object : lvalue
             }
 
             my $o = $data->{ $field };
+            # $self->__message( 112, "Got here for value '", $self->_str_val( $val // 'undef' ), "' and current value '", $self->_str_val( $o // 'undef' ), "'" );
             if( ref( $o ) )
             {
                 $o->set( $val );
@@ -6961,6 +7347,7 @@ sub _set_get_scalar_as_object : lvalue
             }
             $self->clear_error;
 
+            $self->__message( 112, "Do we have a callback set? ", ( scalar( keys( %$callbacks ) ) ? 'yes' : 'no' ) );
             my $coderef;
             if( scalar( keys( %$callbacks ) ) && 
                 ( CORE::exists( $callbacks->{add} ) || CORE::exists( $callbacks->{set} ) ) )
@@ -6981,7 +7368,10 @@ sub _set_get_scalar_as_object : lvalue
             {
                 # try-catch
                 local $@;
+                # $self->__message( 104, "Executing callback passing new value" );
                 my $rv = eval{ $coderef->( $self, $data->{ $field } ) };
+                # $self->__message( 104, "Callback done." );
+                $self->__message( 112, "Callback done. Object field $field value is now '", ( $data->{ $field } // 'undef' ), "'" );
 
                 if( $@ )
                 {
@@ -6998,6 +7388,7 @@ sub _set_get_scalar_as_object : lvalue
 
             if( !$self->_is_a( $data->{ $field } => 'Module::Generic::Scalar' ) )
             {
+                $self->__message( 104, "Instantiating a new Module::Generic::Scalar object with the value '", $self->_str_val( $data->{ $field } ). "' (", ( $data->{ $field } // 'undef' ), ")." );
                 $self->_load_class( 'Module::Generic::Scalar' ) ||
                     return( $self->pass_error );
                 my $val = $get_value->( $data->{ $field } );
@@ -7007,8 +7398,10 @@ sub _set_get_scalar_as_object : lvalue
                     warn( Module::Generic::Scalar->error );
                     return( $self->pass_error( Module::Generic::Scalar->error ) );
                 }
+                $self->__message( 104, "After Module::Generic::Scalar object instantiation, \$data->{ $field } is now '", $self->_str_val( $data->{ $field } ). "' (", ( $data->{ $field } // 'undef' ), ")." );
             }
 
+            $self->__message( 104, "\$data->{ $field } is now '", $self->_str_val( $data->{ $field } ), "'" );
             my $v = $data->{ $field };
             if( !$v->defined )
             {
@@ -7363,6 +7756,7 @@ sub _set_get_version : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            $self->__message( 112, "Loading class '$version_class'" );
             $self->_load_class( $version_class ) || return( $self->pass_error );
             if( !CORE::defined( $data->{ $field } ) )
             {
@@ -7404,24 +7798,30 @@ sub _set_get_version : lvalue
                 }
                 return( $self->error( "Invalid value provided." ) ) if( !$rv );
             }
+            $self->__message( 112, "Loading class '$version_class'" );
             $self->_load_class( $version_class ) || return( $self->pass_error );
             my $v = $arg;
+            $self->__message( 112, "Checking version argument provided '", ( defined( $v ) ? $v : 'undef' ), "'" );
             my $version;
             # If the user wants to remove it
             if( !defined( $v ) )
             {
+                $self->__message( 112, "Version value provided is undef, ok." );
                 $data->{ $field } = $v;
             }
             elsif( $self->_is_a( $v => $version_class ) )
             {
+                $self->__message( 112, "Version value provided is an object of class $version_class, ok." );
                 $version = $v;
             }
             # If the user provided a string, let's check it
             elsif( length( $v ) )
             {
+                $self->__message( 112, "Version value provided is a regular string, parsing it." );
                 my $error;
                 if( $v !~ /^$VERSION_LAX_REGEX$/ )
                 {
+                    $self->__message( 112, "Version '$v' does not look like a proper version." );
                     $error = "Value provided is not a valid version.";
                 }
                 else
@@ -7431,6 +7831,7 @@ sub _set_get_version : lvalue
                     eval
                     {
                         $version = $version_class->can( 'parse' ) ? $version_class->parse( "$v" ) : $version_class->new( "$v" );
+                        $self->__message( 112, "Parsing version '$v' yielded the object '", $self->_str_val( $version // 'undef' ), "', ok." );
                     };
                     if( $@ )
                     {
@@ -7529,6 +7930,7 @@ sub _warnings_is_enabled
     # I hate dying, but here this is a show-stopper
     die( "Object provided is undef!\n" ) if( @_ && !defined( $_[0] ) );
     my $obj = @_ ? shift( @_ ) : $self;
+    # $self->__message( 105, "Are warnings registered for '", ( ref( $obj ) || $obj ), "' ? ", ( $self->_warnings_is_registered( $obj ) ? 'yes' : 'no' ) );
     return(0) if( !$self->_warnings_is_registered( $obj ) );
     return( warnings::enabled( ref( $obj ) || $obj ) );
 }
@@ -7563,7 +7965,7 @@ sub as_hash
     my $added_subs = CORE::exists( $me->{_added_method} ) && ref( $me->{_added_method} ) eq 'HASH'
         ? $me->{_added_method}
         : {};
-
+    
     my $crawl;
     $crawl = sub
     {
@@ -7582,15 +7984,17 @@ sub as_hash
             $type = substr( $dataref, 0, $i );
             $id = substr( $dataref, $i + 2, -1 );
         }
-
+        
         my $levels = shift( @_ );
         my $prefix = join( '->', @$levels ) . ':';
-
+        $self->__message( 112, "$prefix Processing $strval of type $type and class ", ( $class // 'undef' ) );
+        
         if( defined( $class ) )
         {
             if( $class eq 'JSON::PP::Boolean' ||
                 $class eq 'Module::Generic::Boolean' )
             {
+                $self->__message( 113, "$prefix Converting known boolean object." );
                 return( $$this ? 1 : 0 );
             }
             # NOTE: Not sure why I did this, because as_hash is about converting into hash, not stringifying everything
@@ -7598,6 +8002,7 @@ sub as_hash
             #     overload::Overloaded( $this ) && 
             #     overload::Method( $this, '""' ) )
             # {
+            #     $self->__message( 105, "$prefix object supports 'as_hash' and can stringify." );
             #     return( $this . '' );
             # }
             elsif( $this->can( 'as_hash' ) )
@@ -7608,22 +8013,26 @@ sub as_hash
                 }
                 elsif( ++$seen->{ Scalar::Util::refaddr( $this ) } < 2 )
                 {
+                    $self->__message( 112, "$prefix object supports 'as_hash', but cannot stringify." );
                     my $old_debug;
                     $old_debug = $this->debug if( $this->can( 'debug' ) );
                     my $rv = $this->as_hash( { %$p, seen => $seen, levels => $levels } );
                     $this->debug( $old_debug ) if( defined( $old_debug ) );
-
+                    
                     if( Scalar::Util::blessed( $rv ) )
                     {
+                        $self->__message( 112, "$prefix $strval->as_hash() returned a blessed value (", $self->_str_val( $rv // 'undef' ), ")." );
                         return( $crawl->( $rv, [@$levels, $strval] ) );
                     }
                     else
                     {
+                        $self->__message( 112, "$prefix $strval->as_hash() returned a ", ( ref( $rv ) ? lc( ref( $rv ) ) . ' reference' : "string ($rv)" ) );
                         return( $rv );
                     }
                 }
                 else
                 {
+                    $self->__message( 112, "$prefix $strval has already been procesed, avoid looping, returning it as-is." );
                     return( $this );
                 }
             }
@@ -7633,6 +8042,7 @@ sub as_hash
             # elsif( overload::Overloaded( $this ) && 
             #     overload::Method( $this, '""' ) )
             # {
+            #     $self->__message( 105, "$prefix $strval can stringify, and can it do $strval->TO_JSON ? ", ( $this->can( 'TO_JSON' ) ? 'yes' : 'no' ), " and is option 'json' enabled ? ", ( $p->{json} ? 'yes' : 'no' ), ". Stringifying it ? ", ( ( $p->{json} && $this->can( 'TO_JSON' ) ) ? 'no' : 'yes' ) );
             #     if( $p->{json} && $this->can( 'TO_JSON' ) )
             #     {
             #         return( $this );
@@ -7644,11 +8054,13 @@ sub as_hash
             # }
             else
             {
+                $self->__message( 112, "$prefix $strval cannot do as_hash, returning it (", $self->_str_val( $this // 'undef' ), ") as-is." );
                 return( $this );
             }
         }
         elsif( $type eq 'HASH' )
         {
+            $self->__message( 112, "$prefix $strval is an hash reference." );
             my $hash = {};
             foreach my $k ( keys( %$this ) )
             {
@@ -7666,6 +8078,7 @@ sub as_hash
         }
         elsif( $type eq 'ARRAY' )
         {
+            $self->__message( 112, "$prefix $strval is an array reference." );
             my $array = [];
             for( my $i = 0; $i < scalar( @$this ); $i++ )
             {
@@ -7683,25 +8096,30 @@ sub as_hash
         }
         elsif( !ref( $this ) )
         {
+            $self->__message( 113, "$prefix $strval is a ", ( defined( $this ) ? 'defined' : 'undefined' ), ' string.' );
             defined( $this )
                 ? return( $this )
                 : return;
         }
         elsif( $type eq 'SCALAR' )
         {
+            $self->__message( 113, "$prefix $strval is a scalar reference." );
             my $str = $$this;
             return( \$str );
         }
         elsif( $type eq 'CODE' )
         {
+            $self->__message( 113, "$prefix $strval is a code reference." );
             return( $this );
         }
         elsif( $type eq 'GLOB' )
         {
+            $self->__message( 113, "$prefix $strval is a glob reference." );
             return( $this );
         }
         elsif( $type eq 'VSTRING' )
         {
+            $self->__message( 113, "$prefix $strval is a version string." );
             return( $this );
         }
         else
@@ -7709,7 +8127,8 @@ sub as_hash
             die( "$prefix: Unknown reference ", $self->_str_val( $this // 'undef' ), " with value $this" );
         }
     };
-
+    
+    $self->__message( 112, "Converting object ", $self->_str_val( $self // 'undef' ), " into an hash reference." );
     my $ref = {};
     my @keys = ();
     if( $self->_is_array( $keys ) && scalar( @$keys ) )
@@ -8041,7 +8460,7 @@ sub colour_format
                 _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
             });
         }
-        elsif( $self->_message( 9, "Checking if rgb value exists for colour '$col'" ) &&
+        elsif( $self->__message( 109, "Checking if rgb value exists for colour '$col'" ) &&
                ( $col_ref = $self->colour_to_rgb( $col ) ) )
         {
             # $code = $map->{ $col };
@@ -8185,6 +8604,7 @@ sub colour_parse
     my $map = {}; @$map{ @opens } = @closes;
     my $force_tty = $self->force_tty;
     my $is_tty = defined( $force_tty ) ? $force_tty : $self->_is_tty;
+    $self->__message( 120, "Is tty enabled ? ", ( $is_tty ? 'yes' : 'no' ) );
     my $max_depth = $self->colour_max_depth // 10;
     my $normal = "\e[m";
 
@@ -8427,7 +8847,7 @@ sub colour_parse
                     _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
                 });
             }
-            elsif( $self->_message( 9, "Checking if rgb value exists for colour '$col'" ) &&
+            elsif( $self->__message( 109, "Checking if rgb value exists for colour '$col'" ) &&
                    ( $col_ref = $self->colour_to_rgb( $col ) ) )
             {
                 # $code = $map->{ $col };
@@ -8532,13 +8952,16 @@ sub colour_parse
                 colour    => $fg,
                 bg_colour => $bg,
             };
+            $self->__message( 120, "\$process_params->(): Params regular expression matched -> ", sub{ $self->Module::Generic::dump( $def ) } );
         }
         else
         {
+            $self->__message( 120, "\$process_params->(): Params regular expression failed to match. Trying to eval '$params' instead." );
             # Only allow characters that make sense for hash-like parameters.
             # This forbids variables, code blocks, Perl ops, backticks, etc.
             if( $params =~ /[^a-zA-Z0-9_,\=>\s\h[:blank:]'"\|\(\)\.\-]/ )
             {
+                $self->__message( 120, "\$process_params->(): Illegal characters found inside eval." );
                 return;
             }
             # illegal functions that have no business being here, and could pass through the previous check
@@ -8548,6 +8971,7 @@ sub colour_parse
                     readpipe|sysopen|unlink|rename|chmod|chown|utime|truncate|mkdir|rmdir|opendir|readdir|closedir|glob
                 )\b/i )
             {
+                $self->__message( 120, "\$process_params->(): Illegal functions used inside eval." );
                 return;
             }
 
@@ -8555,20 +8979,25 @@ sub colour_parse
             local $SIG{__DIE__} = sub{};
             local $@;
             my @res = eval( $params );
+            $self->__message( 120, "\$process_params->(): evaluating '$params' produced -> ", sub{ $self->Module::Generic::dump( \@res ) } );
             $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
             if( $@ || ref( $def ) ne 'HASH' )
             {
                 my $err = $@ || "Invalid styling \"${params}\"";
+                $self->__message( 120, "\$process_params->(): Error evaluating '$params' -> $@" );
                 $def = {};
             }
         }
 
         if( scalar( keys( %$def ) ) )
         {
+            $self->__message( 120, "\$process_params->(): colour definition is: ", sub{ $self->Module::Generic::dump( $def ) } );
             my $ref = $colour_format->( $def );
+            $self->__message( 120, "\$process_params->(): Returning -> ", sub{ $self->Module::Generic::dump( $ref ) } );
             return if( !$ref || !scalar( @$ref ) );
             return( $ref );
         }
+        $self->__message( 120, "\$process_params->(): Returning nothing." );
         return;
     };
 
@@ -8597,12 +9026,17 @@ sub colour_parse
 #         $close_d = $args->{close} ? ( ref( $args->{close} ) ? $args->{close} : qr{?<close_d>\Q$args->{close})} )  : $close;
         $open_d  = $args->{open}  ? $args->{open}  : $open;
         $close_d = $args->{close} ? $args->{close} : $close;
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Using \$open_d '$open_d', and \$close_d '$close_d' with closing counter '$counter'" );
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Processing string '", ( $chunk // 'undef' ), "'" );
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Have we inherited some formatting ? ", ( $args->{format} ? sub{ ' yes -> ' . $self->Module::Generic::dump( $args->{format} ) } : 'no' ) );
         # We found our closing mark
         if( defined( $args->{open} ) &&
             defined( $args->{close} ) &&
             $chunk =~ s/^(?<content>.*?)(${open_d}\/${close_d})// )
         {
             my $content = $+{content};
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Text '", ( $copy // 'undef' ), "' is now '", ( $chunk // 'undef' ), "' and \$content is '", ( $content // 'undef' ), "' after removing a closing tag '$2'" );
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found some text content followed by a close tag '$2'. Checking if captured content contains an open one within data -> '", ( $content // 'undef' ), "'." );
             # Whether the parameters are in the form of 'bold underline red' or "style => 'bold', colour => 'red'", either way, the parameters must start with an alphabetic character. No space is allowed.
             # Also, since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
             my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
@@ -8611,6 +9045,7 @@ sub colour_parse
             if( $content =~ /${open_re}(?=[a-zA-Z]+)/ )
             {
                 # Found an opening delimiter before our closing tag, returning the text untouched.
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found an opening delimiter before our closing tag in text content captured (", ( $content // 'undef' ), "), most likely embedded formatting, continuing." );
                 $chunk = $copy;
             }
             elsif( !$is_tty )
@@ -8619,6 +9054,7 @@ sub colour_parse
             }
             else
             {
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: No undesired open delimiter found. Do we have formatting ? ", ( $args->{format} ? 'yes' : 'no' ) );
                 if( my $fmt_ref = $args->{format} )
                 {
                     # We cannot make the assumption that there are any formatting parameters found, and returned by $process_params
@@ -8629,6 +9065,7 @@ sub colour_parse
                     }
                     else
                     {
+                        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Formatting was passed down to us, using it -> ", sub{ $self->Module::Generic::dump( $fmt_ref ) } );
                         my $fmt = CORE::join( '', @$fmt_ref );
                         # We differentiate text with and without new lines, because if there are multiple lines, we skip the empty ones.
                         # However, if there are no multiple line, we surround that (possibly empty) line with the formatting and the normaliser.
@@ -8656,6 +9093,7 @@ sub colour_parse
                 }
                 # We reduce the closing tag counter since we found one.
                 $counter-- if( $counter > 0 );
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: \$content is now '", quotemeta( $content // 'undef' ), "'." );
                 $out = $content;
                 # We can only use this once, and if we do not remove it now, it would be used again later in our code...
                 delete( $args->{format} );
@@ -8667,6 +9105,7 @@ sub colour_parse
         # We have to do this in two steps, because we cannot use an hash reference in the first part of the regular expression, such as:
         # s{^(?<before>.*?)(?<open>$open)(?<params>[a-zA-Z]+)(?:<more_params>.*?)(?<close>$map->{ \1 })}
         # So, we need to do this in two steps
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Checking for some text followed by an opening delimiter, and possibly the begining of some parameters from the string '", ( $chunk // 'undef' ), "'" );
         # Special case for '{' or '['
         # Since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
         my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
@@ -8675,6 +9114,7 @@ sub colour_parse
         $chunk =~ s{^(?<before>.*?)(?<open>$open_re)(?<params>[a-zA-Z]+)(?<remaining>.*?)$}
         {
             my $re = { %+ };
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found -> ", sub{ $self->Module::Generic::dump( $re ) } );
             # Unless the open and close delimiters have already been set and confirmed, i.e. they have been passed as arguments, we set them as Regexp now.
             unless( $args->{open_d} )
             {
@@ -8691,6 +9131,7 @@ sub colour_parse
                 defined( $args->{close} ) &&
                 $before =~ /${open_d}\/${close_d}/ )
             {
+                $self->__message( 120, "The leading text has a closing tag, so we append the normaliser \$normal" );
                 my( $before_close, $after_close ) = split( /${open_d}\/${close_d}/, $before, 2 );
                 if( !$is_tty )
                 {
@@ -8721,21 +9162,27 @@ sub colour_parse
                 $out .= $before;
             }
 
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Checking remaining text '", ( $remaining // 'undef' ), "'" );
             # Closing delimiter for the open tag
             if( $remaining =~ s/^(?<more_params>.*?)${close_d}// )
             {
                 my $params2 = $+{more_params};
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found more formatting parameters '", ( $params2 // 'undef' ), "' followed by a closing delimiter." );
                 # We search for another opening delimiter, which would be an error, since we are not closed yet, but could happen.
                 if( $params2 =~ /(?:$open_d)(?=[a-zA-Z]+)/ )
                 {
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: The 'remaining' part contains some opening delimiter, so it seems there is a user-error. Returning the backed up string '", ( $copy // 'undef' ), "'" );
                     $copy;
                 }
                 else
                 {
                     # Ok, found parameters + close delimiter
                     $params .= $params2;
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Ok, we found some more parameters in the 'remaining' capture. \$params is now '", ( $params // 'undef' ), "'. Calling \$process_params->()" );
                     # Get back an array reference of formatting.
                     my $fmt = $process_params->( $params );
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: \$process_params->() returned -> ", sub{ $self->Module::Generic::dump( $fmt ) } );
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Calling ourself recursively to parse the rest of the string caught in 'remaining' -> '", ( $remaining // 'undef' ), "'" );
                     my $rv = $parse->( $remaining => {
                         open    => $open_d,
                         close   => $close_d,
@@ -8745,21 +9192,25 @@ sub colour_parse
                         # We keep track of the number of valid open tags we got, so we can decide to remove any usless one (if its corresponding open tag was improper), or to replace them with a normaliser
                         counter => ( $fmt ? ( $counter + 1 ) : $counter ),
                     });
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Our recursive run returned '", quotemeta( $rv // 'undef' ), "'" );
                     $rv;
                 }
             }
             # We could not find a close delimiter; we call the whole thing off
             else
             {
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Failed to find a closing delimier in the 'remaining' capture. This is a user-error. Stopping here, and returning the text unaltered -> '", ( $copy // 'undef' ), "'" );
                 $copy;
             }
             # Or, we search for a closing delimiter
             # Once we have the closing delimiter, we get the colour formatting the the parmeters in between.
         }gexs;
         $out .= $chunk;
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Resulting output is so far '", quotemeta( $out // 'undef' ), "'" );
 
         if( $is_tty && exists( $args->{format} ) && defined( $args->{format} ) )
         {
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Some colour formatting was passed down to us. Applying it now." );
             $out = CORE::join( '', @{$args->{format}} ) . $out;
         }
         # Also ensure that any closing tag leftovers are replaced by the special formatter $normal. $normal closes formatting, so using it is safe.
@@ -8768,9 +9219,11 @@ sub colour_parse
         if( ( $args->{open} && $args->{close} ) ||
             ( $open_d && $close_d && $open_d ne $open ) )
         {
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Removing possible closing tags from string '", quotemeta( $out // 'undef' ), "'" );
             $out =~ s/(?:${open_d}\/${close_d})/$normal/;
         }
 
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Done. Returning the final resulting formatted string '", quotemeta( $out // 'undef' ), "'" );
         return( $out );
     };
     return( $parse->( $txt ) );
@@ -9010,7 +9463,7 @@ sub message_colour
         $opts = pop( @$args );
     }
     $opts->{colour} = 1;
-    return( $self->_message( @$args, $opts ) );
+    return( $self->__message( @$args, $opts ) );
 }
 PERL
     # NOTE: messagef_colour()
@@ -9033,7 +9486,7 @@ sub messagef_colour
         $opts = pop( @$args );
     }
     $opts->{colour} = 1;
-    return( $self->_messagef( @$args, $opts ) );
+    return( $self->__messagef( @$args, $opts ) );
 }
 PERL
     # NOTE: printer()
@@ -9188,45 +9641,47 @@ sub __create_class
         $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
         $class = ( ref( $self ) || $self ) . "\::${new_class}";
     }
+    $self->__message( 112, "Class to be used is '$class' (", ( Class::Load::is_class_loaded( $class ) ? "already loaded" : "not yet loaded" ), ") and dictionary is: ", sub{ $self->Module::Generic::dump( $def ) } );
     if( Class::Load::is_class_loaded( $class ) )
     {
         my $ref = eval( "\\%${class}::" );
+        # $self->__message( 112, "Class $class seems to be already loaded. Symbols are -> ", sub{ $self->Module::Generic::dump( $ref ) } );
     }
 
     unless( Class::Load::is_class_loaded( $class ) )
     {
         my $type2func =
         {
-        array               => '_set_get_array',
-        # Alias for 'array_as_object'
-        array_object        => '_set_get_array_as_object',
-        array_as_object     => '_set_get_array_as_object',
-        boolean             => '_set_get_boolean',
-        class               => '_set_get_class',
-        class_array         => '_set_get_class_array',
-        class_array_object  => '_set_get_class_array_object',
-        code                => '_set_get_code',
-        datetime            => '_set_get_datetime',
-        decimal             => '_set_get_number',
-        file                => '_set_get_file',
-        float               => '_set_get_number',
-        glob                => '_set_get_glob',
-        hash                => '_set_get_hash',
-        hash_as_object      => '_set_get_hash_as_mix_object',
-        integer             => '_set_get_number',
-        ip                  => '_set_get_ip',
-        long                => '_set_get_number',
-        number              => '_set_get_number',
-        object              => '_set_get_object',
-        object_no_init      => '_set_get_object_without_init',
-        object_array        => '_set_get_object_array',
-        object_array_object => '_set_get_object_array_object',
-        scalar              => '_set_get_scalar',
-        scalar_as_object    => '_set_get_scalar_as_object',
-        scalar_or_object    => '_set_get_scalar_or_object',
-        uri                 => '_set_get_uri',
-        uuid                => '_set_get_uuid',
-        version             => '_set_get_version',
+            array               => '_set_get_array',
+            # Alias for 'array_as_object'
+            array_object        => '_set_get_array_as_object',
+            array_as_object     => '_set_get_array_as_object',
+            boolean             => '_set_get_boolean',
+            class               => '_set_get_class',
+            class_array         => '_set_get_class_array',
+            class_array_object  => '_set_get_class_array_object',
+            code                => '_set_get_code',
+            datetime            => '_set_get_datetime',
+            decimal             => '_set_get_number',
+            file                => '_set_get_file',
+            float               => '_set_get_number',
+            glob                => '_set_get_glob',
+            hash                => '_set_get_hash',
+            hash_as_object      => '_set_get_hash_as_mix_object',
+            integer             => '_set_get_number',
+            ip                  => '_set_get_ip',
+            long                => '_set_get_number',
+            number              => '_set_get_number',
+            object              => '_set_get_object',
+            object_no_init      => '_set_get_object_without_init',
+            object_array        => '_set_get_object_array',
+            object_array_object => '_set_get_object_array_object',
+            scalar              => '_set_get_scalar',
+            scalar_as_object    => '_set_get_scalar_as_object',
+            scalar_or_object    => '_set_get_scalar_or_object',
+            uri                 => '_set_get_uri',
+            uuid                => '_set_get_uuid',
+            version             => '_set_get_version',
         };
         # Alias
         $type2func->{string} = $type2func->{scalar};
@@ -9285,6 +9740,7 @@ EOT
                 next;
             }
             my $type = lc( $info->{type} );
+            $self->__message( 112, "Processing method $f as type $type in class $class" );
             # Convenience
             $info->{class} = $info->{package} if( $info->{package} && !length( $info->{class} ) );
             if( !defined( $type ) )
@@ -9333,6 +9789,7 @@ EOT
                 # $d->Sortkeys( 1 );
                 # my $hash_str = $d->Dump;
                 my $hash_str = Data::Dump::dump( $this_def );
+                $self->__message( 112, "For field $f, using dictionary definition string -> $hash_str" );
                 CORE::push( @$code_lines, "sub ${f} { return( shift->${func}( '${f}', ${hash_str}, \@_ ) ); }" );
             }
             elsif( $type eq 'version' && ( exists( $info->{def} ) || exists( $info->{definition} ) ) )
@@ -9349,6 +9806,86 @@ EOT
         CORE::push( @$code_lines, "sub _fields { return( shift->_set_get_array_as_object( '_fields', \@_ ) ); }" );
         $perl .= join( "\n\n", @$code_lines );
 
+        $perl .= <<'EOT';
+# NOTE: For CBOR and Sereal
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    my @props = grep( /^\w+/, keys( %$self ) );
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub STORABLE_thaw_post_processing
+{
+    my $obj   = shift( @_ );
+    my @keys  = %$obj;
+    my $class = ref( $obj );
+    my $hash  = {};
+    @$hash{ @keys } = @$obj{ @keys };
+    my $self = bless( $hash => $class );
+    return( $self );
+}
+
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref   = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
+EOT
+
         $perl .= <<EOT;
 
 
@@ -9357,6 +9894,7 @@ sub TO_JSON { return( shift->as_hash ); }
 1;
 
 EOT
+        $self->__message( 112, "Evaluating code -> $perl" );
         local $@;
         my $rc = eval( $perl );
         die( "Unable to dynamically create module $class: $@" ) if( $@ );
@@ -9409,7 +9947,7 @@ sub _get_datetime_regexp
             (?<month>\d{1,2})
             [^\d\+]
             (?<day>\d{1,2})
-            (?<sep>[\s\t]+)
+            (?<sep>[[:blank:]\h]+)
             (?<hour>\d{1,2})
             (?<t_sep>[^\d\+])
             (?<minute>\d{1,2})
@@ -10047,6 +10585,7 @@ PERL
 sub _is_empty
 {
     my $self = shift( @_ );
+    # $self->__message( 104, "Got here with '", join( "', '", @_ ), "'" );
     return(1) if( !@_ );
     return(1) if( !defined( $_[0] ) );
     if( (
@@ -10063,6 +10602,7 @@ sub _is_empty
     elsif( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' &&
         !scalar( @{$_[0]} ) )
     {
+        # $self->__message( 104, "Found that array $_[0] (is blessed ? ", ( Scalar::Util::blessed( $_[0] ) ? 'yes' : 'no' ), ") is empty with ", scalar( @{$_[0]} ), " element. is_empty on array returns -> ", $_[0]->is_empty );
         return(1);
     }
     elsif( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' &&
@@ -10314,8 +10854,6 @@ PERL
     _parse_timestamp => <<'PERL',
 # Ref:
 # <https://en.wikipedia.org/wiki/Date_format_by_country>
-# Ref:
-# <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
 {
     my $self = shift( @_ );
@@ -10388,6 +10926,7 @@ sub _parse_timestamp
         }
     }
 
+    $self->__message( 104, "Using time zone '", ( defined( $tz ) ? $tz->name : 'undef' ), "'" );
     # my $tz = DateTime::TimeZone->new( name => 'Europe/Berlin' );
     unless( DateTime->can( 'TO_JSON' ) )
     {
@@ -10461,6 +11000,7 @@ sub _parse_timestamp
     if( $str =~ /^$PARSE_DATE_FRACTIONAL1_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_FRACTIONAL1_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         my @buff = ();
         my @buff_fmt = ();
         push( @buff, '%F %T' );
@@ -10479,6 +11019,7 @@ sub _parse_timestamp
         {
             if( CORE::defined( $re->{tz1} ) && length( $re->{tz1} ) )
             {
+                $self->__message( 105, "\tFound timezone as digits '", ( $re->{tz1} // 'undef' ), "'" );
                 $fmt->{time_zone} = $opt->{time_zone} = $re->{tz};
                 my $tz_sign = substr( $re->{tz1}, 0, 1 );
                 if( $tz_sign eq '+' || $tz_sign eq '-' )
@@ -10495,6 +11036,7 @@ sub _parse_timestamp
             }
             elsif( CORE::defined( $re->{tz2} ) && length( $re->{tz2} ) )
             {
+                $self->__message( 105, "\tFound timezone as alias '", ( $re->{tz2} // 'undef' ), "'" );
                 $self->_load_class( 'DateTime::TimeZone::Catalog::Extend' ) ||
                     warn( "Warning only: could not load module DateTime::TimeZone::Catalog::Extend: ", $self->error, "\n" ) if( $self->_warnings_is_enabled );
                 my $map = DateTime::TimeZone::Catalog::Extend->zone_map;
@@ -10518,6 +11060,7 @@ sub _parse_timestamp
         # $opt->{pattern} = '%F %T%z';
         $opt->{pattern} = join( '', @buff );
         $fmt->{pattern} = join( '', @buff_fmt );
+        $self->__message( 104, "String is '$str', parsing pattern is '$opt->{pattern}' and formatting pattern is '$fmt->{pattern}'" );
     }
     # 2019-06-19 23:23:57.000000000+0900
     # From PostgreSQL: 2019-06-20 11:02:36.306917+09
@@ -10526,6 +11069,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_WITH_MILI_SECONDS_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_WITH_MILI_SECONDS_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $opt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . ( defined( $re->{time_short} ) ? '%H:%M' : '%T' );
         $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . ( defined( $re->{time_short} ) ? $re->{time_short} : $re->{time} );
         if( length( $re->{milli} ) )
@@ -10550,6 +11094,7 @@ sub _parse_timestamp
             $fmt->{pattern} .= 'Z';
             $fmt->{time_zone} = $opt->{time_zone} = 'UTC';
         }
+        $self->__message( 105, "Using pattern '$opt->{pattern}' for datetime string '$str' and formatter '$fmt->{pattern}'" );
     }
     # From SQLite: 2019-06-20 02:03:14
     # From MySQL: 2019-06-20 11:04:01
@@ -10557,6 +11102,7 @@ sub _parse_timestamp
     elsif( $str =~ /^(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})$/ )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'SQL' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         # $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . $re->{time};
         $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . '%T';
         $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . $re->{time};
@@ -10574,6 +11120,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_HTTP_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_HTTP_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $opt->{pattern} = $fmt->{pattern} = q{%a, %d %b %Y %T GMT};
         $fmt->{time_zone} = $opt->{time_zone} = 'UTC';
     }
@@ -10591,6 +11138,8 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_NON_STDANDARD_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_NON_STDANDARD_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
+        $self->__message( 104, "Non-standard date found with regexp captured -> ", sub{ $self->dump( $re ) } );
         my @buff = ();
         my @buff_fmt = ();
         if( $re->{wd} || $re->{wd_long} )
@@ -10657,6 +11206,7 @@ sub _parse_timestamp
         }
         $opt->{pattern} = join( '', @buff );
         $fmt->{pattern} = join( '', @buff_fmt );
+        $self->__message( 104, "String is '$str', parsing pattern is '$opt->{pattern}' and formatting pattern is '$fmt->{pattern}'" );
     }
     # Fri Mar 25 12:18:36 2011
     # Fri Mar 25 12:16:25 ADT 2011
@@ -10665,6 +11215,8 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_NON_STDANDARD2_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_NON_STDANDARD2_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
+        $self->__message( 104, "Non-standard date found with regexp captured -> ", sub{ $self->dump( $re ) } );
         my @buff = ();
         my @buff_fmt = ();
         if( $re->{wd} || $re->{wd_long} )
@@ -10708,6 +11260,7 @@ sub _parse_timestamp
         push( @buff_fmt, length( $re->{year} ) == 2 ? '%y' : '%Y' );
         $opt->{pattern} = join( '', @buff );
         $fmt->{pattern} = join( '', @buff_fmt );
+        $self->__message( 104, "String is '$str', parsing pattern is '$opt->{pattern}' and formatting pattern is '$fmt->{pattern}'" );
     }
     # 2019-06-20
     # 2019/06/20
@@ -10716,6 +11269,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_ONLY_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_ONLY_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $str = join( $re->{d_sep}, @$re{qw( year month day )} );
         $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) );
     }
@@ -10724,6 +11278,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_ONLY_US_SHORT_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_ONLY_US_SHORT_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $opt->{pattern} = $fmt->{pattern} = '%Y,' . $re->{sep1} . '%b' . $re->{sep2} . '%d';
     }
     # 17 Feb, 2014
@@ -10731,6 +11286,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_ONLY_EU_SHORT_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_ONLY_EU_SHORT_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $opt->{pattern} = $fmt->{pattern} = '%d' . $re->{sep1} . '%b,' . $re->{sep2} . '%Y';
     }
     # February 17, 2009
@@ -10738,6 +11294,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_ONLY_US_LONG_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_ONLY_US_LONG_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $opt->{pattern} = $fmt->{pattern} = '%B' . $re->{sep1} . '%d,' . $re->{sep2} . '%Y';
     }
     # 15 July 2021
@@ -10745,6 +11302,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_ONLY_EU_LONG_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_ONLY_EU_LONG_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $opt->{pattern} = $fmt->{pattern} = '%d' . $re->{sep1} . '%B' . $re->{sep2} . '%Y';
     }
     # 22.04.2016
@@ -10754,6 +11312,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_DOTTED_ONLY_EU_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_DOTTED_ONLY_EU_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         # $opt->{pattern} = $fmt->{pattern} = join( $re->{sep}, qw( %d %m %Y ) );
         $opt->{pattern} = $fmt->{pattern} = "%d$re->{sep}" . ( $re->{blank1} // '' ) . "%m$re->{sep}" . ( $re->{blank2} // '' ) . "%Y" . ( $re->{trailing_dot} // '' );
         $fmt->{leading_zero} = 1 if( substr( $re->{day}, 0, 1 ) == 0 || substr( $re->{month}, 0, 1 ) == 0 );
@@ -10795,6 +11354,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_ROMAN_RE$/xi )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_ROMAN_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $re->{month} = $roman2regular->{ $re->{month} };
         $str = join( '-', @$re{qw( year month day )} );
         $opt->{pattern} = '%F';
@@ -10846,6 +11406,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_DIGITS_ONLY_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 105, "Pattern of type 'PARSE_DATE_DIGITS_ONLY_RE' matched -> ", sub{ $self->Module::Generic::dump( $re ) } );
         $opt->{pattern} = '%F';
         $str = join( '-', @$re{qw( year month day )} );
         $fmt->{pattern} = join( '', qw( %Y %m %d ) );
@@ -10857,6 +11418,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATETIME_JP_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 104, "Japanese date found with regexp captured -> ", sub{ $self->dump( $re ) } );
         use utf8;
         $self->_load_class( 'DateTime::Format::JP' ) || return( $self->pass_error );
         my $pattern;
@@ -10889,6 +11451,7 @@ sub _parse_timestamp
         }
 
         my $parser;
+        $self->__message( 104, "Calling DateTime::Format::JP with pattern '$pattern'" );
         # try-catch
         local $@;
         eval
@@ -10928,6 +11491,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATE_TIMESTAMP_RE$/x )
     {
         my $re = { %+ };
+        $self->__message( 104, "Unix timestamp found with regexp captured -> ", sub{ $self->Module::Generic::dump( $re ) } );
         # try-catch
         local $@;
         my $dt;
@@ -10935,6 +11499,7 @@ sub _parse_timestamp
         {
             $dt = DateTime->from_epoch( epoch => $str, time_zone => $tz );
             $opt->{pattern} = ( CORE::index( $str, '.' ) != -1 ? '%s.%' . CORE::length( $re->{milli} ) . 'N' : '%s' );
+            $self->__message( 104, "Calling formatter with pattern '$opt->{pattern}'" );
             my $strp = DateTime::Format::Strptime->new( %$opt );
             $dt->set_formatter( $strp );
         };
@@ -10948,6 +11513,7 @@ sub _parse_timestamp
     elsif( $str =~ /^$PARSE_DATETIME_RELATIVE_RE$/x )
     {
         my( $num, $unit ) = ( $1, $2 );
+        $self->__message( 105, "Pattern of type 'PARSE_DATETIME_RELATIVE_RE' matched with number '$num' and unit '$unit'" );
         $unit = 's' if( !length( $unit ) );
         my $interval =
         {
@@ -11001,14 +11567,19 @@ sub _parse_timestamp
     local $@;
     eval
     {
+        $self->__message( 105, "Instantiating datetime parser with options -> ", sub{ $self->dump( $opt ) } );
         my $strp = DateTime::Format::Strptime->new( %$opt );
         $dt = $strp->parse_datetime( $str );
+        $self->__message( 105, "Parser returned datetime object '", $self->_str_val( $dt // 'undef' ), "'" );
+        $self->__message( 105, "Instantiating datetime formatter with options -> ", sub{ $self->dump( $fmt ) } );
         my $strp2 = $formatter->new( %$fmt );
         # To enable the date string to be stringified to its original format
         $dt->set_formatter( $strp2 ) if( $dt );
+        $self->__message( 105, "Returning datetime object '", ( defined( $dt ) ? $self->_str_val( $dt // 'undef' ) : 'undef' ), "'" );
     };
     if( $@ )
     {
+        $self->__message( 105, "Error creating a DateTime object with the timestamp '$str': $@" );
         return( $self->error( "Error creating a DateTime object with the timestamp '$str': $@" ) );
     }
     return( $dt );
@@ -11114,7 +11685,7 @@ sub _set_get_datetime : lvalue
                 {
                     return( $self->error( "Error getting the DateTime::Format::Strptime object for format '$fmt': $@" ) );
                 }
-
+    
                 eval
                 {
                     $time->set_formatter( $strp );
@@ -11289,8 +11860,10 @@ sub _set_get_datetime : lvalue
             }
             my $now = $process->( $time ) || do
             {
+                $self->__message( 105, "Error processing datetime '", ( defined( $time ) ? $self->_str_val( $time // 'undef' ) : 'undef' ), "'" );
                 return( $self->pass_error );
             };
+            $self->__message( 105, "Setting datetime object '", ( defined( $now ) ? $self->_str_val( $now // 'undef' ) : 'undef' ), "'" );
             $data->{ $field } = $now;
             $self->clear_error;
 
@@ -11415,8 +11988,10 @@ sub _set_get_enum : lvalue
         {
             my $self = shift( @_ );
             my $arg = shift( @_ );
+            $self->__message( 112, "Value received for enum field '$field' is '", ( $arg // 'undef' ), "'" );
             if( defined( $check ) )
             {
+                $self->__message( 112, "Check code is defined, calling now." );
                 # try-catch
                 local $@;
                 my $rv = eval{ $check->( $self, $arg ) };
@@ -11429,14 +12004,17 @@ sub _set_get_enum : lvalue
 
             if( defined( $arg ) )
             {
+                $self->__message( 112, "Checking if value '$arg' for enum field '$field' is among allowed ones: '", join( "', '", @$allowed ), "'" );
                 my $is_ok = $case_sensitive
                     ? scalar( grep( $_ eq ( $arg // '' ), @$allowed ) )
                     : scalar( grep( /^\Q$arg\E/i, @$allowed ) );
+                $self->__message( 112, "Is field '$field' enum value provided ($arg) ok ? ", ( $is_ok ? 'yes' : 'no' ) );
                 return( $self->error( "Invalid value '", $self->_str_val( $arg // 'undef' ), "'" ) ) if( !$is_ok );
                 $data->{ $field } = $arg;
             }
             else
             {
+                $self->__message( 112, "No value was provided. Setting enum field '$field' to undef" );
                 $data->{ $field } = undef;
             }
             $self->clear_error;
@@ -11460,6 +12038,7 @@ sub _set_get_enum : lvalue
                     # try-catch
                     local $@;
                     my $rv = eval{ $coderef->( $self, $data->{ $field } ) };
+                    $self->__message( 112, "Callback done. Object field $field value is now '", ( $data->{ $field } // 'undef' ), "'" );
                     if( $@ )
                     {
                         return( $self->error( "Error while executing callback for field '$field', and value '", $self->_str_val( $data->{ $field } ), "': $@" ) );
@@ -11665,77 +12244,13 @@ PERL
     return(1);
 }
 
-sub DEBUG
-{
-    my $self = shift( @_ );
-    my $pkg  = ref( $self ) || $self;
-    my $this = $self->_obj2h;
-    no strict 'refs';
-    return( ${ $pkg . '::DEBUG' } );
-}
-
-# NOTE: Works with CBOR and Sereal <https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW-CALLBACK-MECHANISM>
-sub FREEZE
-{
-    my $self = CORE::shift( @_ );
-    my $serialiser = CORE::shift( @_ ) // '';
-    my $class = CORE::ref( $self );
-    my $ref = $self->_obj2h;
-    my %hash = %$ref;
-    $hash{_is_glob} = ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' ? 1 : 0;
-    # Return an array reference rather than a list so this works with Sereal and CBOR
-    # On or before Sereal version 4.023, Sereal did not support multiple values returned
-    CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
-    # But Storable want a list with the first element being the serialised element
-    CORE::return( $class, \%hash );
-}
-
-# sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
-
-# sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
-
-# NOTE: Works with CBOR and Sereal <https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW-CALLBACK-MECHANISM>
-sub THAW
-{
-    my( $self, undef, @args ) = @_;
-    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
-    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
-    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
-    my $is_glob = CORE::delete( $hash->{_is_glob} );
-    my $new;
-    if( $is_glob )
-    {
-        $new = CORE::ref( $self ) ? $self : $class->new_glob;
-        foreach( CORE::keys( %$hash ) )
-        {
-            *$new->{ $_ } = CORE::delete( $hash->{ $_ } );
-        }
-    }
-    else
-    {
-        # Storable pattern requires to modify the object it created rather than returning a new one
-        if( CORE::ref( $self ) )
-        {
-            foreach( CORE::keys( %$hash ) )
-            {
-                $self->{ $_ } = CORE::delete( $hash->{ $_ } );
-            }
-            $new = $self;
-        }
-        else
-        {
-            $new = bless( $hash => $class );
-        }
-    }
-    CORE::return( $new );
-}
-
 # NOTE: class function
 # Used internally also in Module::Generic::Exception
 sub UNIVERSAL::create_class
 {
     my $class = shift( @_ );
     my $self = __PACKAGE__;
+    # $self->__message( 104, "Arguments received for class '$class' are: '", join( "', '", map( overload::StrVal( $_ // 'undef' ), @_ ) ), "'" );
     return( $self->error( "No class name was provided." ) ) if( $self->_is_empty( $class ) );
     my $opts = $self->_get_args_as_hash( @_ );
     my $parent = $opts->{extends} || $self;
@@ -11901,6 +12416,7 @@ EOT
                     return( $self->error( "I was expecting a fields definition hash reference for dynamic class in class '${class}' with method \"${meth}\", but instead got '${this_def}'." ) );
                 }
                 my $hash_str = Data::Dump::dump( $this_def );
+                $self->__message( 112, "For field ${meth}, using dictionary definition string -> ${hash_str}" );
                 CORE::push( @$code_lines, "sub ${meth} { return( shift->${func}( '${meth}', ${hash_str}, \@_ ) ); }" );
             }
             elsif( $type eq 'version' && ( exists( $def->{def} ) || exists( $def->{definition} ) ) )
@@ -11929,6 +12445,8 @@ sub TO_JSON
 1;
 
 EOT
+    $self->__message( 112, "Evaluating code -> $perl" );
+    $self->__message( 106, "Are we running under threads, switching to shared data ? ", ( HAS_THREADS ? 'yes' : 'no' ) );
     my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
     my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
     {
@@ -11943,24 +12461,6 @@ EOT
     }
     return( $class );
 }
-
-sub VERBOSE
-{
-    my $self = shift( @_ );
-    my $pkg  = ref( $self ) || $self;
-    my $this = $self->_obj2h;
-    no strict 'refs';
-    return( ${ $pkg . '::VERBOSE' } );
-}
-
-sub DESTROY
-{
-    # <https://perldoc.perl.org/perlobj#Destructors>
-    CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
-    my $self = CORE::shift( @_ );
-    CORE::return if( !CORE::defined( $self ) );
-};
 
 # NOTE:: AUTOLOAD
 sub AUTOLOAD : lvalue
@@ -12243,6 +12743,111 @@ sub AUTOLOAD : lvalue
     }
 };
 
+sub DEBUG
+{
+    my $self = shift( @_ );
+    my $pkg  = ref( $self ) || $self;
+    my $this = $self->_obj2h;
+    no strict 'refs';
+    return( ${ $pkg . '::DEBUG' } );
+}
+
+sub DESTROY
+{
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    CORE::local( $., $@, $!, $^E, $? );
+    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    my $self = CORE::shift( @_ );
+    CORE::return if( !CORE::defined( $self ) );
+
+    my $class   = CORE::ref( $self ) || $self;
+    my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
+    my $repo    = Module::Generic::Global->new( 'errors' => $class, key => $err_key );
+    $repo->cleanup;
+
+    my $log_repo = Module::Generic::Global->new( 'debug_log_io' => $class );
+    $log_repo->cleanup;
+
+    my $local_tz_repo = Module::Generic::Global->new( 'globals' => $class, key => 'has_local_tz' );
+    $local_tz_repo->cleanup;
+
+    # We cannot cleanup here the 'loaded_classes7, because we need the class that is cached to build the key, and we do not have it at this very moment.
+};
+
+# NOTE: Works with CBOR and Sereal <https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW-CALLBACK-MECHANISM>
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my $ref = $self->_obj2h;
+    my %hash = %$ref;
+    $hash{_is_glob} = ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' ? 1 : 0;
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    # On or before Sereal version 4.023, Sereal did not support multiple values returned
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) <= version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, \%hash] );
+        }
+    }
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, \%hash );
+}
+
+# sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
+
+# sub STORABLE_thaw { CORE::return( CORE::shift->THAW( @_ ) ); }
+
+# NOTE: Works with CBOR and Sereal <https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW-CALLBACK-MECHANISM>
+sub THAW
+{
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $is_glob = CORE::delete( $hash->{_is_glob} );
+    my $new;
+    if( $is_glob )
+    {
+        $new = CORE::ref( $self ) ? $self : $class->new_glob;
+        foreach( CORE::keys( %$hash ) )
+        {
+            *$new->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+    }
+    else
+    {
+        # Storable pattern requires to modify the object it created rather than returning a new one
+        if( CORE::ref( $self ) )
+        {
+            foreach( CORE::keys( %$hash ) )
+            {
+                $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+            }
+            $new = $self;
+        }
+        else
+        {
+            $new = bless( $hash => $class );
+        }
+    }
+    CORE::return( $new );
+}
+
+sub VERBOSE
+{
+    my $self = shift( @_ );
+    my $pkg  = ref( $self ) || $self;
+    my $this = $self->_obj2h;
+    no strict 'refs';
+    return( ${ $pkg . '::VERBOSE' } );
+}
+
 {
     # Credits to the module Sentinel for the idea of using a tied scalar.
     # NOTE: Module::Generic::LvalueGuard
@@ -12469,7 +13074,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.1.3
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -17046,7 +17651,6 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
 
-You can use, copy, modify and redistribute this package and associated
-files under the same terms as Perl itself.
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.
 
 =cut

@@ -18,7 +18,7 @@ use Readonly;
 use Data::Walk;
 use Try::Tiny;
 
-our $VERSION = 1.01;
+our $VERSION = 1.11;
 
 our $override;
 my $JSON_OBJ = Cpanel::JSON::XS->new()->utf8->pretty();
@@ -91,8 +91,7 @@ sub _initialize {
         $self->_set_mock_dbh($data);
     }
     else {
-        croak
-"No mocked data is available, you can resolve this by providing the 'dbh'
+        croak "No mocked data is available, you can resolve this by providing the 'dbh'
 		argument to the 'new' method to generate it. Alternatively, you can pass either
 		a file or data argument to the 'new' method";
     }
@@ -114,6 +113,7 @@ sub _set_mock_dbh {
 
     my $dbh_session = DBD::Mock::Session->new( $PROGRAM_NAME => @{$data} );
     $self->_override_dbi_mocked_prepare( $MOCKED_DBI_METHODS{mocked_prepare} );
+
     $dbh->{mock_session} = $dbh_session;
     $self->{dbh}         = $dbh;
 
@@ -125,23 +125,15 @@ sub _override_dbi_methods {
 
     $self->_override_dbi_execute( $MOCKED_DBI_METHODS{execute} );
     $self->_override_dbi_bind_param( $MOCKED_DBI_METHODS{bind_param} );
-    $self->_override_dbi_fetchrow_hashref(
-        $MOCKED_DBI_METHODS{fetchrow_hashref} );
-    $self->_override_dbi_fetchrow_arrayref(
-        $MOCKED_DBI_METHODS{fetchrow_arrayref} );
+    $self->_override_dbi_fetchrow_hashref( $MOCKED_DBI_METHODS{fetchrow_hashref} );
+    $self->_override_dbi_fetchrow_arrayref( $MOCKED_DBI_METHODS{fetchrow_arrayref} );
     $self->_override_dbi_fetchrow_array( $MOCKED_DBI_METHODS{fetchrow_array} );
-    $self->_override_dbi_selectall_arrayref(
-        $MOCKED_DBI_METHODS{selectall_arrayref} );
-    $self->_override_dbi_selectall_hashref(
-        $MOCKED_DBI_METHODS{selectall_hashref} );
-    $self->_override_dbi_selectcol_arrayref(
-        $MOCKED_DBI_METHODS{selectcol_arrayref} );
-    $self->_override_dbi_selectrow_array(
-        $MOCKED_DBI_METHODS{selectrow_array} );
-    $self->_override_dbi_selectrow_arrayref(
-        $MOCKED_DBI_METHODS{selectrow_arrayref} );
-    $self->_override_dbi_selectrow_hashref(
-        $MOCKED_DBI_METHODS{selectrow_hashref} );
+    $self->_override_dbi_selectall_arrayref( $MOCKED_DBI_METHODS{selectall_arrayref} );
+    $self->_override_dbi_selectall_hashref( $MOCKED_DBI_METHODS{selectall_hashref} );
+    $self->_override_dbi_selectcol_arrayref( $MOCKED_DBI_METHODS{selectcol_arrayref} );
+    $self->_override_dbi_selectrow_array( $MOCKED_DBI_METHODS{selectrow_array} );
+    $self->_override_dbi_selectrow_arrayref( $MOCKED_DBI_METHODS{selectrow_arrayref} );
+    $self->_override_dbi_selectrow_hashref( $MOCKED_DBI_METHODS{selectrow_hashref} );
     $self->_override_dbi_fecth( $MOCKED_DBI_METHODS{fetch} );
     $self->_override_dbi_prepare_cached( $MOCKED_DBI_METHODS{prepare_cached} );
     $self->_override_dbi_prepare( $MOCKED_DBI_METHODS{prepare} );
@@ -186,7 +178,8 @@ sub _override_dbi_execute {
         sub {
             my ( $sth, @args ) = @_;
 
-            my $sql    = $sth->{Statement};
+            my $sql    = $sth->{Statement} // $sth->{Database}->{Statement} // '';
+            $sql = $self->_normalize_sql($sql);
             my $retval = $orig_execute->( $sth, @args );
 
             my $col_names;
@@ -196,7 +189,8 @@ sub _override_dbi_execute {
             }
             catch {
                 my $error = $_;
-                say $error;
+
+                # say STDERR $error;
             };
 
             my $rows       = $sth->rows();
@@ -207,7 +201,7 @@ sub _override_dbi_execute {
             };
 
             my $result = [];
-            if ( $sql =~ m/^INSERT|^UPDATE|^DELETE/i ) {
+            if ( $sql =~ m/^INSERT|^UPDATE|^DELETE/i && $retval ) {
                 push @$result, ['rows'];
                 foreach my $row ( 1 .. $rows ) {
                     push @{$result}, [];
@@ -219,7 +213,14 @@ sub _override_dbi_execute {
               if ref $self->{bind_params}
               && scalar @{ $self->{bind_params} } > 0;
 
-            push @{ $self->{result} }, $query_data;
+            # query failed:
+            if ( !$retval ) {
+                $query_data->{failure} = [ 5, 'Ooops!' ];
+                $query_data->{results} = undef;
+            }
+
+            push @{ $self->{result} }, $query_data
+              if $sql !~ m/BEGIN|COMMIT/;
             $self->_write_to_file();
             $self->{bind_params} = [];
             $self->{sth}         = $sth;
@@ -263,10 +264,9 @@ sub _override_dbi_fetchrow_hashref {
             my ($sth) = @_;
 
             my $retval = $orig_selectrow_hashref->($sth);
-
+            $self->{result}->[-1]->{col_names} = $sth->{NAME};
             if ( ref $retval && !defined $self->{result}->[-1]->{results} ) {
-                my $query_results =
-                  $self->_set_hashref_response( $sth, $retval );
+                my $query_results = $self->_set_hashref_response( $sth, $retval );
                 push @{ $self->{result}->[-1]->{results} }, $query_results;
                 $self->_write_to_file();
             }
@@ -290,7 +290,7 @@ sub _override_dbi_fetchrow_arrayref {
             my ($sth) = @_;
 
             my $retval = $orig_selectrow_arrayref->($sth);
-
+            $self->{result}->[-1]->{col_names} = $sth->{NAME};
             my @retval = ();
             if ( ref $retval ) {
                 @retval = @{$retval};
@@ -317,6 +317,7 @@ sub _override_dbi_fetchrow_array {
             my ($sth) = @_;
 
             my @retval = $orig_selectrow_array->($sth);
+            $self->{result}->[-1]->{col_names} = $sth->{NAME};
 
             if ( scalar @retval ) {
                 push @{ $self->{result}->[-1]->{results} }, \@retval;
@@ -342,9 +343,8 @@ sub _override_dbi_selectall_arrayref {
         sub {
             my ( $dbh, $sql, $slice, @parmas ) = @_;
 
-            my $retval =
-              $orig_selectall_arrayref->( $dbh, $sql, $slice, @parmas );
-            my $data = [];
+            my $retval = $orig_selectall_arrayref->( $dbh, $sql, $slice, @parmas );
+            my $data   = [];
 
             if ( ref $retval ) {
                 my $col_names = $self->_get_current_record_column_names();
@@ -379,17 +379,14 @@ sub _override_dbi_selectall_hashref {
         sub {
             my ( $dbh, $statement, $key_field, $attr, @bind_values ) = @_;
 
-            my $retval = $orig_selectall_hashref->(
-                $dbh, $statement, $key_field, $attr, @bind_values
-            );
+            my $retval = $orig_selectall_hashref->( $dbh, $statement, $key_field, $attr, @bind_values );
 
             my $col_names = $self->_get_current_record_column_names();
             my $mock_data = [];
 
             walk sub {
                 my $rows = $_;
-                if ( ref $rows && scalar keys %{$rows} == scalar @{$col_names} )
-                {
+                if ( ref $rows && scalar keys %{$rows} == scalar @{$col_names} ) {
                     my %data = %$rows;
                     push @{$mock_data}, [ @data{ @{$col_names} } ];
                     $self->_write_to_file();
@@ -418,9 +415,7 @@ sub _override_dbi_selectcol_arrayref {
             my ( $dbh, $statement, $attr, @bind_values ) = @_;
             my $mocked_data = [];
 
-            my $retval = $orig_selectcol_arrayref->(
-                $dbh, $statement, $attr, @bind_values
-            );
+            my $retval  = $orig_selectcol_arrayref->( $dbh, $statement, $attr, @bind_values );
             my @db_data = @{$retval};
 
             my $length = 1;
@@ -462,9 +457,7 @@ sub _override_dbi_selectrow_array {
             }
 
             my $sql    = $sth->{Statement};
-            my @retval = $original_selectrow_array->(
-                $dbh, $statement, $attr, @bind_values
-            );
+            my @retval = $original_selectrow_array->( $dbh, $statement, $attr, @bind_values );
 
             my $query_data = {
                 statement    => $sql,
@@ -503,9 +496,7 @@ sub _override_dbi_selectrow_arrayref {
             }
 
             my $sql    = $sth->{Statement};
-            my $retval = $original_selectrow_arrayref->(
-                $dbh, $statement, $attr, @bind_values
-            );
+            my $retval = $original_selectrow_arrayref->( $dbh, $statement, $attr, @bind_values );
 
             my $query_data = {
                 statement    => $sql,
@@ -544,9 +535,7 @@ sub _override_dbi_selectrow_hashref {
             }
 
             my $sql    = $sth->{Statement};
-            my $retval = $original_selectrow_hashref->(
-                $dbh, $statement, $attr, @bind_values
-            );
+            my $retval = $original_selectrow_hashref->( $dbh, $statement, $attr, @bind_values );
 
             $self->{result}->[-1]->{results} =
               [ $self->_set_hashref_response( $sth, $retval ) ];
@@ -569,13 +558,13 @@ sub _override_dbi_fecth {
         sub {
             my ( $sth, @args ) = @_;
             my $row = $original_fetch->( $sth, @args );
+            my $sql = $sth->{Statement} // $sth->{Database}->{Statement} // '';
             if ( ref $row ) {
                 my @shallow_copy = @{$row};
-                if (   $sth->{Statement} =~ /WHERE/i
-                    && $sth->{Statement} !~ /ORDER BY/i )
+                if (   $sql =~ /WHERE/i
+                    && $sql !~ /ORDER BY/i )
                 {
-                    unshift @{ $self->{result}->[-1]->{results} },
-                      \@shallow_copy;
+                    unshift @{ $self->{result}->[-1]->{results} }, \@shallow_copy;
                 }
                 else {
                     push @{ $self->{result}->[-1]->{results} }, \@shallow_copy;
@@ -675,8 +664,7 @@ sub _override_dbi_commit {
         sub {
             my $dbh = shift;
 
-            push @{ $self->{result} },
-              { statement => 'COMMIT', col_names => undef, results => [ [] ] };
+            push @{ $self->{result} }, { statement => 'COMMIT', col_names => undef, results => [ [] ] };
             $self->_write_to_file();
             return $original_commit->($dbh);
         }
@@ -708,6 +696,12 @@ sub _override_dbi_rollback {
 sub _normalize_sql {
     my ( $self, $sql ) = @_;
 
+    # 1. remove multi-linie comments /* ... */
+    $sql =~ s/\/\*.*?\*\///gs;
+
+    # 2. remove single-line comments -- ...
+    $sql =~ s/--.*$//gm;
+
     $sql =~ s/\s+/ /g;
     $sql =~ s/^\s+|\s+$//g;
 
@@ -723,7 +717,8 @@ sub _get_current_record_column_names {
 sub _process_mock_data {
     my ( $self, $data ) = @_;
 
-    foreach my $row ( @{$data} ) {
+    while ( my ( $index, $row ) = each( @{$data} ) ) {
+
         if ( $row->{col_names} ) {
             my $cols = delete $row->{col_names};
             unshift @{ $row->{results} }, $cols;
@@ -743,11 +738,9 @@ sub _set_fixtures_file {
         $self->{fixture_file} = $file;
     }
     else {
-        my ( $volume, $directory, $test_file ) =
-          File::Spec->splitpath($PROGRAM_NAME);
+        my ( $volume, $directory, $test_file ) = File::Spec->splitpath($PROGRAM_NAME);
         make_path( $directory . $FIXTURE_DIR );
-        my $default_fixture_file =
-          $directory . $FIXTURE_DIR . "$test_file.json";
+        my $default_fixture_file = $directory . $FIXTURE_DIR . "$test_file.json";
         $self->{fixture_file} = $default_fixture_file;
     }
 

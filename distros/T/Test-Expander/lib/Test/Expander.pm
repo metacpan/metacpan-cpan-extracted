@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.5.2';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.6.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -27,13 +27,14 @@ use Test2::Tools::Subtest;
 use Test::Expander::Constants qw(
   $DIE $FALSE
   $FMT_INVALID_COLOR $FMT_INVALID_DIRECTORY $FMT_INVALID_ENV_ENTRY $FMT_INVALID_VALUE $FMT_INVALID_SUBTEST_NUMBER
-  $FMT_KEEP_ENV_VAR $FMT_NEW_FAILED $FMT_NEW_SUCCEEDED $FMT_REPLACEMENT $FMT_REQUIRE_DESCRIPTION
+  $FMT_MISSING_TDT $FMT_KEEP_ENV_VAR $FMT_NEW_FAILED $FMT_NEW_SUCCEEDED $FMT_REPLACEMENT $FMT_REQUIRE_DESCRIPTION
   $FMT_REQUIRE_IMPLEMENTATION $FMT_SEARCH_PATTERN $FMT_SET_ENV_VAR $FMT_SET_TO $FMT_SKIP_ENV_VAR $FMT_UNSET_VAR
-  $FMT_UNKNOWN_OPTION $FMT_USE_DESCRIPTION $FMT_USE_IMPLEMENTATION $MSG_BAIL_OUT $MSG_ERROR_WAS $MSG_UNEXPECTED_EXCEPTION
+  $FMT_UNKNOWN_OPTION $FMT_USE_DESCRIPTION $FMT_USE_IMPLEMENTATION
+  $MSG_BAIL_OUT $MSG_ERROR_WAS $MSG_NO_TABLE_HEADER $MSG_UNEXPECTED_EXCEPTION
   $NOTE
-  $REGEX_ANY_EXTENSION $REGEX_CLASS_HIERARCHY_LEVEL $REGEX_TOP_DIR_IN_PATH $REGEX_VERSION_NUMBER
+  $REGEX_ANY_EXTENSION $REGEX_CLASS_HIERARCHY_LEVEL $REGEX_TABLE_SEPARATOR $REGEX_TOP_DIR_IN_PATH $REGEX_VERSION_NUMBER
   $TRUE
-  %COLORS %MOST_CONSTANTS_TO_EXPORT %REST_CONSTANTS_TO_EXPORT
+  %COLORS %MOST_CONSTANTS_TO_EXPORT %OPTION_PARSER %REST_CONSTANTS_TO_EXPORT
 );
 
 my $ok_orig = \&Test2::API::Context::ok;
@@ -78,6 +79,7 @@ our @EXPORT = (
   qw( tempdir tempfile ),
   qw( cwd path ),
   qw( BAIL_OUT bail_on_failure dies_ok is_deeply lives_ok new_ok require_ok restore_failure_handler throws_ok use_ok ),
+  qw( test_table ),
 );
 
 {
@@ -166,6 +168,35 @@ sub restore_failure_handler {
   *Test2::API::Context::ok = $ok_orig;
 
   return;
+}
+
+sub test_table {
+  my $data = @_ ? shift : _load_tdt();
+  chomp( my @data = @$data );
+
+  my ( $header, $title_inline ) = _test_table_header( \@data );
+
+  my %test_table;
+  while ( my $title = shift( @data ) ) {
+    next if $title =~ /^[+\-$REGEX_TABLE_SEPARATOR]-/;
+    my @line;
+    if ( $title_inline ) {
+      ( undef, $title, @line ) = split( $REGEX_TABLE_SEPARATOR, $title );
+      unshift( @line, undef );
+    }
+    else {
+      ( undef, $title ) = split( $REGEX_TABLE_SEPARATOR, $title );
+      @line             = split( $REGEX_TABLE_SEPARATOR, shift( @data ) );
+    }
+
+    foreach my $index ( 1 .. $#$header ) {
+      my $value = $line[ $index ] // '';
+      ## no critic (ProhibitStringyEval)
+      $test_table{ $title }->{ $header->[ $index ] } = eval( $value );
+    }
+  }
+
+  return %test_table;
 }
 
 sub throws_ok ( &$;$ ) {
@@ -284,6 +315,14 @@ sub _export_symbols {
   return;
 }
 
+sub _load_tdt {
+  my $tdt_file   = $TEST_FILE =~ s/$REGEX_ANY_EXTENSION/.tdt/r;
+  my $test_table = eval { path( $tdt_file)->slurp };
+  $DIE->( $FMT_MISSING_TDT, $tdt_file, $@ =~ s/\n//gr =~ s/ at .+//ir ) if $@;
+
+  return [ split( m{$/}, $test_table ) ];
+}
+
 sub _mock_builtins {
   my ( $options ) = @_;
 
@@ -303,7 +342,71 @@ sub _new_test_message {
   return $@ ? sprintf( $FMT_NEW_FAILED, $class, _error() ) : sprintf( $FMT_NEW_SUCCEEDED, $class, $class );
 }
 
-sub _parse_options {                                        ## no critic (ProhibitExcessComplexity)
+sub _parse_bail {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  _set_failure_handler(
+    sub {
+      # uncoverable subroutine
+      bail_out( $MSG_BAIL_OUT )                             # uncoverable statement
+    }
+  );
+
+  return;
+}
+
+sub _parse_builtins {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
+  while ( my ( $sub_name, $sub_ref ) = each( %$option_value ) ) {
+    $DIE->( $FMT_INVALID_VALUE, $option_name . "->{ $sub_name }", $sub_ref ) if ref( $sub_ref ) ne 'CODE';
+  }
+  $options->{ $option_name } = $option_value;
+
+  return;
+}
+
+sub _parse_color {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  keys( %colors );
+  while ( my ( $color_name, $color_value ) = each( %colors ) ) {
+    if ( exists( $option_value->{ $color_name } ) ) {
+      my $requested_color = $option_value->{ $color_name };
+      if ( defined( $requested_color ) ) {
+        eval { color( $requested_color ) };
+        $DIE->( $FMT_INVALID_COLOR, $requested_color, $color_name ) if $@;
+      }
+      $colors{ $color_name } = $requested_color;
+    }
+  }
+  foreach my $color_name ( keys( %$option_value ) ) {
+    $DIE->( $FMT_UNKNOWN_OPTION, $option_name, $color_name ) unless exists( $colors{ $color_name } );
+  }
+
+  return;
+}
+
+sub _parse_lib {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'ARRAY';
+  $options->{ $option_name } = $option_value;
+
+  return;
+}
+
+sub _parse_method {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value );
+  $METHOD = $options->{ $option_name } = $option_value;
+
+  return;
+}
+
+sub _parse_options {
   my ( $exports, $test_file ) = @_;
 
   my $options = {};
@@ -311,60 +414,38 @@ sub _parse_options {                                        ## no critic (Prohib
     $DIE->( $FMT_UNKNOWN_OPTION, $option_name, shift( @$exports ) // '' ) if $option_name !~ /^-\w/;
 
     my $option_value = shift( @$exports );
-    if ( $option_name eq '-bail' ) {                        ## no critic (ProhibitCascadingIfElse)
-      _set_failure_handler(
-        sub {
-          # uncoverable subroutine
-          bail_out( $MSG_BAIL_OUT )                         # uncoverable statement
-        }
-      );
-    }
-    elsif ( $option_name eq '-builtins' ) {
-      $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
-      while ( my ( $sub_name, $sub_ref ) = each( %$option_value ) ) {
-        $DIE->( $FMT_INVALID_VALUE, $option_name . "->{ $sub_name }", $sub_ref ) if ref( $sub_ref ) ne 'CODE';
-      }
-      $options->{ $option_name } = $option_value;
-    }
-    elsif ( $option_name eq '-color' ) {
-      while ( my ( $color_name, $color_value ) = each( %colors ) ) {
-        if ( exists( $option_value->{ $color_name } ) ) {
-          my $requested_color = $option_value->{ $color_name };
-          $DIE->( $FMT_INVALID_COLOR, $requested_color, $color_name )
-            if defined( $requested_color ) && !defined( color( $requested_color ) );
-          $colors{ $color_name } = $requested_color;
-        }
-      }
-      foreach my $color_name ( keys( %$option_value ) ) {
-        $DIE->( $FMT_UNKNOWN_OPTION, $option_name, $color_name ) unless exists( $colors{ $color_name } );
-      }
-    }
-    elsif ( $option_name eq '-lib' ) {
-      $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'ARRAY';
-      $options->{ $option_name } = $option_value;
-    }
-    elsif ( $option_name eq '-method' ) {
-      $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value );
-      $METHOD = $options->{ $option_name } = $option_value;
-    }
-    elsif ( $option_name eq '-target' ) {
-      $options->{ $option_name } = $option_value;
-    }
-    elsif ( $option_name eq '-tempdir' ) {
-      $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
-      $TEMP_DIR = tempdir( CLEANUP => 1, %$option_value );
-    }
-    elsif ( $option_name eq '-tempfile' ) {
-      $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
-      my $file_handle;
-      ( $file_handle, $TEMP_FILE ) = tempfile( UNLINK => 1, %$option_value );
-    }
-    else {
-      $options->{ $option_name } = $option_value;
-    }
+    my $parser       = exists( $OPTION_PARSER{ $option_name } ) ? '_parse_' . substr( $option_name, 1 ) : '_take_over';
+    { no strict qw( refs ); $parser->( $options, $option_name, $option_value ) }
   }
 
   return _determine_testee( $options, $test_file );
+}
+
+sub _parse_target {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  $options->{ $option_name } = $option_value;
+
+  return;
+}
+
+sub _parse_tempdir {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
+  $TEMP_DIR = tempdir( CLEANUP => 1, %$option_value );
+
+  return;
+}
+
+sub _parse_tempfile {
+  my ( $options, $option_name, $option_value ) = @_;
+
+    $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
+    my $file_handle;
+    ( $file_handle, $TEMP_FILE ) = tempfile( UNLINK => 1, %$option_value );
+
+  return;
 }
 
 sub _read_env_file {
@@ -487,6 +568,36 @@ sub _subtest_conditional {
   }
 
   return;
+}
+
+sub _take_over {
+  my ( $options, $option_name, $option_value ) = @_;
+
+  $options->{ $option_name } = $option_value;
+
+  return;
+}
+
+sub _test_table_header {
+  my ( $data ) = @_;
+
+  my $header = [];
+  while ( my $titles = shift( @$data ) ) {
+    @$header ? last : next if $titles =~ /^[+\-$REGEX_TABLE_SEPARATOR]-/;
+    my @line = split( $REGEX_TABLE_SEPARATOR, $titles );
+    foreach my $index ( 1 .. $#line ) {
+      $line    [ $index ] = ' ' if $line[ $index ] eq '';
+      $header->[ $index ] = defined( $header->[ $index ] ) ? $header->[ $index ] . $line[ $index ] : $line[ $index ];
+    }
+  }
+  die( $MSG_NO_TABLE_HEADER ) unless @$header;
+
+  $header->[ 0 ] = '';
+  s/^\s+|\s+$//g foreach @$header;
+  my $title_in_line = $header->[ 1 ] eq '';
+  shift( @$header ) if $title_in_line;
+
+  return ( $header, $title_in_line );
 }
 
 sub _use_imports {
