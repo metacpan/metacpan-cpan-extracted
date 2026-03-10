@@ -25,11 +25,14 @@ BEGIN
         if eval { require Test::NoWarnings ;  Test::NoWarnings->import; 1 };
 
 
-    my $VERSION = '2.218';
-    my @NAMES = qw(
+    my $DEP_VERSION = '2.218';
+    my @DEP_NAMES = qw(
 			Compress::Raw::Bzip2
 			Compress::Raw::Zlib
+            );
 
+    my $VERSION = '2.219';
+    my @NAMES = qw(
 			Compress::Zlib
 
             IO::Compress::Adapter::Bzip2
@@ -63,13 +66,17 @@ BEGIN
     my @OPT = qw(
 			);
 
-    plan tests => 1 + 2 + @NAMES + @OPT + $extra ;
+    plan tests => 1 + 2 + @NAMES + @DEP_NAMES + @OPT + $extra ;
 
     foreach my $name (@NAMES)
     {
         use_ok($name, $VERSION);
     }
 
+    foreach my $name (@DEP_NAMES)
+    {
+        use_ok($name, $DEP_VERSION);
+    }
 
     foreach my $name (@OPT)
     {

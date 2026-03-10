@@ -20,7 +20,7 @@ int32_t SPVM__Thread__ThisThread__get_id(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   *thread_id = std::this_thread::get_id();
   
-  void* obj_thread_id = env->new_object_by_name(env, stack, "Thread::ID", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_thread_id = env->new_object_by_name(env, stack, "Thread::ID", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   env->set_pointer(env, stack, obj_thread_id, (void*)thread_id);

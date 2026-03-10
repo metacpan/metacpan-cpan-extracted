@@ -18,10 +18,12 @@ my @files = (
     'bin/cpandak',
     'lib/App/CpanDak.pm',
     'lib/App/CpanDak/Specials.pm',
+    't/add-version-spec.t',
     't/base.t',
     't/env.t',
     't/patch.t',
     't/specials.t',
+    't/specials/App-CpanDak.options.yml',
     't/specials/Dak-Test.configure.env.yml',
     't/specials/test-dist.patch',
     't/test-dist/README.txt'

@@ -1,0 +1,53 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Archive::CAR::Utils - Low-level utilities for CAR archives
+
+=head1 SYNOPSIS
+
+    use Archive::CAR::Utils qw(encode_varint decode_varint decode_cid);
+
+    # Internal binary manipulation
+
+=head1 DESCRIPTION
+
+Archive::CAR::Utils provides internal helper functions for varint encoding/decoding and CID retrieval from binary
+streams.
+
+=head1 FUNCTIONS
+
+=head2 C<encode_varint($value)>
+
+Encodes an integer into an unsigned varint (LEB128).
+
+=head2 C<decode_varint($fh_or_scalar)>
+
+Decodes an unsigned varint from a filehandle or scalar string.
+
+=head2 C<decode_cid($fh)>
+
+Wrapper around L<Archive::CAR::CID/decode>.
+
+=head2 C<systell($fh)>
+
+Returns the current byte position in the given filehandle using standard buffered C<tell()>. Despite the name, this no
+longer uses C<sysseek> for improved compatibility.
+
+=head1 SEE ALSO
+
+L<Archive::CAR>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

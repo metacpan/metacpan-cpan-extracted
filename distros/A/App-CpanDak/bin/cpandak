@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use App::CpanDak;
-our $VERSION = '0.0.2'; # VERSION
+our $VERSION = '0.1.0'; # VERSION
 # PODNAME: cpandak
 # ABSTRACT: cpanm, with some sort of distroprefs
 
@@ -23,7 +23,7 @@ cpandak - cpanm, with some sort of distroprefs
 
 =head1 VERSION
 
-version 0.0.2
+version 0.1.0
 
 =head1 SYNOPSIS
 

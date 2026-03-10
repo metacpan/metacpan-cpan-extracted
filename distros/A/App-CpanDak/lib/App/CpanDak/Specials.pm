@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use CPAN::Meta::YAML;
 
-our $VERSION = '0.0.2'; # VERSION
+our $VERSION = '0.1.0'; # VERSION
 # ABSTRACT: fetch and expose the "special" instructions for distributions
 
 
@@ -119,7 +119,7 @@ App::CpanDak::Specials - fetch and expose the "special" instructions for distrib
 
 =head1 VERSION
 
-version 0.0.2
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -194,6 +194,7 @@ strings as keys. Example:
 
     ---
     notest: 1
+    add_version_spec: "> 0.9.3, != 1.1.0"
 
 =head2 C<option_for>
 

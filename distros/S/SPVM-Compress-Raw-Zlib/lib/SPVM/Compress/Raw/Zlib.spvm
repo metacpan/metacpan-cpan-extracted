@@ -2,7 +2,7 @@
 # MIT License
 
 class Compress::Raw::Zlib {
-  version "0.007";
+  version "0.008";
   
   use Resource::Zlib;
   

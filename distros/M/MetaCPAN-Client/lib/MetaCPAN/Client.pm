@@ -2,9 +2,10 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.039000';
+$MetaCPAN::Client::VERSION = '2.040000';
 use Moo;
 use Carp;
+use JSON::MaybeXS qw< JSON >;
 use Ref::Util qw< is_arrayref is_hashref is_ref >;
 use URI::Escape qw< uri_escape_utf8 >;
 
@@ -393,7 +394,7 @@ sub _reverse_deps {
                     bool => {
                         must => [
                             { term => { 'status'     => 'latest' } },
-                            { term => { 'authorized' => 1        } },
+                            { term => { 'authorized' => JSON->true } },
                         ]
                     }
                 },
@@ -468,7 +469,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.039000
+version 2.040000
 
 =head1 SYNOPSIS
 

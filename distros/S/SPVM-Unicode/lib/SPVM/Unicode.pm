@@ -1,6 +1,6 @@
 package SPVM::Unicode;
 
-our $VERSION = "0.055";
+our $VERSION = "0.056";
 
 1;
 

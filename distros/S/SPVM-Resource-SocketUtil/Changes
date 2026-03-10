@@ -1,3 +1,6 @@
+1.006 2025-03-10
+  [Internal Changes]
+    * Refactor tests.
 1.005 2025-02-23
   [Changes]
     * Change the C language standard from GNU99 to C99 to improve portability.

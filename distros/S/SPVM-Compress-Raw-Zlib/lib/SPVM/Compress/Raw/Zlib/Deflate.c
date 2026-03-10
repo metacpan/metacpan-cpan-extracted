@@ -13,7 +13,7 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate___deflateInit(SPVM_ENV* env, SPVM_VAL
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
   int32_t level = env->get_field_int_by_name(env, stack, obj_self, "Level", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
@@ -30,7 +30,7 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate___deflateInit(SPVM_ENV* env, SPVM_VAL
   int32_t strategy = env->get_field_int_by_name(env, stack, obj_self, "Strategy", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
-  void* obj_dictionary = env->get_field_string_by_name(env, stack, obj_self, "Dictionary", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_dictionary = env->get_field_string_by_name(env, stack, obj_self, "Dictionary", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   z_stream* st_z_stream = env->new_memory_block(env, stack, sizeof(z_stream));
@@ -58,7 +58,7 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate___deflateInit(SPVM_ENV* env, SPVM_VAL
     goto END_OF_FUNC;
   }
   
-  void* obj_z_stream = env->new_pointer_object_by_name(env, stack, "Compress::Raw::Zlib::Z_stream", st_z_stream, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_z_stream = env->new_pointer_object_by_name(env, stack, "Compress::Raw::Zlib::Z_stream", st_z_stream, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   env->set_field_object_by_name(env, stack, obj_self, "z_stream", obj_z_stream, &error_id, __func__, FILE_NAME, __LINE__);
@@ -84,7 +84,7 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate___deflateParams(SPVM_ENV* env, SPVM_V
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
   int32_t level = env->get_field_int_by_name(env, stack, obj_self, "Level", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
@@ -109,9 +109,9 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__deflateReset(SPVM_ENV* env, SPVM_VAL
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
-  void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
@@ -132,13 +132,13 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__deflateTune(SPVM_ENV* env, SPVM_VALU
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   int good_length = stack[1].ival;
   int max_lazy = stack[2].ival;
   int nice_length = stack[3].ival;
   int max_chain = stack[4].ival;
   
-  void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
@@ -159,11 +159,11 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__deflate(SPVM_ENV* env, SPVM_VALUE* s
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
-  void* obj_input = stack[1].oval;
+  SPVM_OBJ* obj_input = stack[1].oval;
   
-  void* obj_output_ref = stack[2].oval;
+  SPVM_OBJ* obj_output_ref = stack[2].oval;
   
   if (!obj_input) {
     error_id = env->die(env, stack, "The input $input must be define.", __func__, FILE_NAME, __LINE__);
@@ -175,7 +175,7 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__deflate(SPVM_ENV* env, SPVM_VALUE* s
     goto END_OF_FUNC;
   }
   
-  void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
@@ -236,10 +236,10 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__deflate(SPVM_ENV* env, SPVM_VALUE* s
   
   output_length -= st_z_stream->avail_out;
   
-  void* obj_output = env->new_string(env, stack, output, output_length);
+  SPVM_OBJ* obj_output = env->new_string(env, stack, output, output_length);
   
   if (AppendOutput) {
-    void* obj_output_arg = env->get_elem_object(env, stack, obj_output_ref, 0);
+    SPVM_OBJ* obj_output_arg = env->get_elem_object(env, stack, obj_output_ref, 0);
     
     if (obj_output_arg) {
       obj_output = env->concat(env, stack, obj_output_arg, obj_output);
@@ -263,9 +263,9 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__flush(SPVM_ENV* env, SPVM_VALUE* sta
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
-  void* obj_output_ref = stack[1].oval;
+  SPVM_OBJ* obj_output_ref = stack[1].oval;
   
   int32_t flush_type = stack[2].ival;
   
@@ -274,7 +274,7 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__flush(SPVM_ENV* env, SPVM_VALUE* sta
     goto END_OF_FUNC;
   }
   
-  void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   z_stream* st_z_stream = env->get_pointer(env, stack, obj_z_stream);
@@ -333,10 +333,10 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__flush(SPVM_ENV* env, SPVM_VALUE* sta
   
   output_length -= st_z_stream->avail_out;
   
-  void* obj_output = env->new_string(env, stack, output, output_length);
+  SPVM_OBJ* obj_output = env->new_string(env, stack, output, output_length);
   
   if (AppendOutput) {
-    void* obj_output_arg = env->get_elem_object(env, stack, obj_output_ref, 0);
+    SPVM_OBJ* obj_output_arg = env->get_elem_object(env, stack, obj_output_ref, 0);
     
     if (obj_output_arg) {
       obj_output = env->concat(env, stack, obj_output_arg, obj_output);
@@ -360,9 +360,9 @@ int32_t SPVM__Compress__Raw__Zlib__Deflate__DESTROY(SPVM_ENV* env, SPVM_VALUE* s
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
-  void* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_z_stream = env->get_field_object_by_name(env, stack, obj_self, "z_stream", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { goto END_OF_FUNC; }
   
   if (obj_z_stream) {

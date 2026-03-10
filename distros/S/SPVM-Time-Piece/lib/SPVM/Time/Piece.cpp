@@ -21,9 +21,9 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  void* obj_self = stack[0].oval;
+  SPVM_OBJ* obj_self = stack[0].oval;
   
-  void* obj_format = stack[1].oval;
+  SPVM_OBJ* obj_format = stack[1].oval;
   
   if (!obj_format) {
     const char* format = "%a, %d %b %Y %H:%M:%S %Z";
@@ -38,14 +38,14 @@ int32_t SPVM__Time__Piece__strftime(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   const char* format = env->get_chars(env, stack, obj_format);
   
-  void* obj_tm = env->get_field_object_by_name(env, stack, obj_self, "tm", &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_tm = env->get_field_object_by_name(env, stack, obj_self, "tm", &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   struct tm* st_tm = (struct tm*)env->get_pointer(env, stack, obj_tm);
   
   int32_t max_length = format_length + 160;
   
-  void* obj_ret = NULL;
+  SPVM_OBJ* obj_ret = NULL;
   
   while (1) {
     
@@ -83,7 +83,7 @@ int32_t SPVM__Time__Piece__strptime_tm(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;
   
-  void* obj_string = stack[0].oval;
+  SPVM_OBJ* obj_string = stack[0].oval;
   
   if (!obj_string) {
     return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
@@ -91,7 +91,7 @@ int32_t SPVM__Time__Piece__strptime_tm(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   const char* string = env->get_chars(env, stack, obj_string);
   
-  void* obj_format = stack[1].oval;
+  SPVM_OBJ* obj_format = stack[1].oval;
   
   if (!obj_format) {
     return env->die(env, stack, "$format must be defined.", __func__, FILE_NAME, __LINE__);
@@ -110,7 +110,7 @@ int32_t SPVM__Time__Piece__strptime_tm(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "std::get_time failed.", __func__, FILE_NAME, __LINE__);
   }
   
-  void* obj_tm = env->new_pointer_object_by_name(env, stack, "Sys::Time::Tm", st_tm, &error_id, __func__, FILE_NAME, __LINE__);
+  SPVM_OBJ* obj_tm = env->new_pointer_object_by_name(env, stack, "Sys::Time::Tm", st_tm, &error_id, __func__, FILE_NAME, __LINE__);
   if (error_id) { return error_id; }
   
   stack[0].oval = obj_tm;

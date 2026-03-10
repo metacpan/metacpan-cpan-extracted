@@ -3,7 +3,7 @@ package Yote::Spiderpup;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use CSS::LESSp;
 use Data::Dumper;
@@ -839,11 +839,22 @@ sub render_ssr_node {
     # <slot/> tag: render the slot children with the parent's vars
     # Pass $vars (component's own vars) as parent_component_vars so nested
     # components in slot content know their "parent component" for scoping
+    # Named slots only render children with matching slot="name" attribute;
+    # default (unnamed) slots only render children without a slot attribute.
     if ($tag eq 'slot') {
         if ($slot_children && @$slot_children) {
+            my $slot_name = $attrs->{name};
             my $slot_html = '';
             my $child_seen = {};
             for my $i (0 .. $#$slot_children) {
+                my $child = $slot_children->[$i];
+                next unless $child;
+                my $child_slot = ($child->{attributes} // {})->{slot};
+                if ($slot_name) {
+                    next unless defined $child_slot && $child_slot eq $slot_name;
+                } else {
+                    next if defined $child_slot;
+                }
                 $slot_html .= $self->render_ssr_node(
                     $slot_children, $i,
                     $slot_vars // $vars,

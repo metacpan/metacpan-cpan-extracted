@@ -1,6 +1,20 @@
 CHANGES
 -------
 
+  2.219 9 March 2026
+
+    * Fix a few  typos
+      Mon Mar 9 12:03:18 2026 +0000
+      132941df2afe808142ca525f361d18ebb3a7f882
+
+    * Squash repeated semicolons
+      Mon Mar 9 12:02:15 2026 +0000
+      3cd732119e823688a26ba7fbf3a99bd0be18bc88
+
+    * Make dependent version checking consistent amd update module to version 2.219. Fixes #70
+      Mon Mar 9 11:51:37 2026 +0000
+      b81179d2db053da540d77af4a61ec449b91fca6e
+
   2.218 8 March 2026
 
     * Refresh zipdetails to version 4.005 Sourced from https://github.com/pmqs/zipdetails

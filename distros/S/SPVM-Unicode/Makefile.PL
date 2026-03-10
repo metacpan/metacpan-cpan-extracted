@@ -19,7 +19,7 @@ unless ($meta) {
 }
 
 my %configure_and_runtime_requires = (
-  'SPVM' => '0.990120',
+  'SPVM' => '0.990143',
 );
 WriteMakefile(
   NAME              => 'SPVM::Unicode',

@@ -6,7 +6,7 @@ no warnings 'experimental::class', 'experimental::builtin', 'experimental::for_l
 #~ |------3-33-----------------------------|
 #~ |-5-55------4-44-5-55----353--3-33-/1~--|
 #~ |---------------------335---33----------|
-class At 1.4 {
+class At 1.5 {
     use Carp qw[];
     use experimental 'try';
     use File::ShareDir::Tiny qw[dist_dir];
@@ -404,7 +404,8 @@ class At 1.4 {
                 }
                 elsif ( $schema->{format} eq 'handle' ) {
                     require At::Protocol::Handle;
-                    return At::Protocol::Handle->new($data);
+                    try { return At::Protocol::Handle->new($data); }
+                    catch ($e) { return $data; }
                 }
             }
             $data;
@@ -553,14 +554,19 @@ class At 1.4 {
             sub {
                 my $car_data = $self->get( 'com.atproto.sync.getBlocks' => { did => $did, cids => [$cid_str] } );
                 return undef unless $car_data;
-                require InterPlanetary::CAR;
-                my $car = InterPlanetary::CAR->new();
+                require Archive::CAR;
+                require Archive::CAR::v1;
+                my $car = Archive::CAR::v1->new();
                 open my $fh, '<', \$car_data;
-                my $blocks = $car->decode($fh);
-                if ( exists $blocks->{$cid_str} ) {
+                $car->read($fh);
 
-                    #~ say "[HTTP] Successfully retrieved block $cid_str via HTTP.";
-                    return $blocks->{$cid_str};
+                # Archive::CAR blocks is an arrayref of { cid => CIDobj, data => ... }
+                for my $block ( @{ $car->blocks } ) {
+
+                    # CIDs are complex objects, to_string should work for matching
+                    # But the CID in the CAR might be different multibase than $cid_str
+                    # For now, simplistic comparison or raw check
+                    return $block->{data} if $block->{cid}->to_string eq $cid_str;
                 }
                 return undef;
             }

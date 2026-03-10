@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.043';
+our $VERSION = '1.044';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.042' => [qw[
@@ -311,7 +311,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.043
+Version 1.044
 
 =head1 SYNOPSIS
 
@@ -999,25 +999,25 @@ L<perl5400delta/:reader attribute for field variables>
 
 =head3 :writer
 
-L<perldelta/New :writer attribute on field variables>
+L<perl5421delta/New :writer attribute on field variables>
 
 =head3 my_method
 
-L<perldelta/Lexical method declaration using my method>
+L<perl5421delta/Lexical method declaration using my method>
 
 =head3 ->&
 
-L<< perldelta/Lexical method invocation operator ->& >>
+L<< perl5421delta/Lexical method invocation operator ->& >>
 
 Alias: lexical-method-invocation-operator
 
 =head3 unicode16.0
 
-L<perldelta/Unicode 16.0 supported>
+L<perl5421delta/Unicode 16.0 supported>
 
 =head3 ^^=
 
-L<perldelta/Assigning logical xor ^^= operator>
+L<perl5421delta/Assigning logical xor ^^= operator>
 
 Alias: assign-logical-xor
 
@@ -1114,7 +1114,7 @@ L<Perl::MinimumVersion>, L<Perl::MinimumVersion::Fast>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013 - 2025 E. Choroba.
+Copyright 2013 - 2026 E. Choroba.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

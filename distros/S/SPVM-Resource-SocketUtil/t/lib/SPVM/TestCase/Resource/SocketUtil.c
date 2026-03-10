@@ -3,8 +3,6 @@
 #include "spvm_socket_util.h"
 
 int32_t SPVM__TestCase__Resource__SocketUtil__test(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   // spvm_socket_errno
   {
@@ -18,7 +16,7 @@ int32_t SPVM__TestCase__Resource__SocketUtil__test(SPVM_ENV* env, SPVM_VALUE* st
   // spvm_socket_strerror_string
   {
     errno = 0;
-    void* strerror = spvm_socket_strerror_string(env, stack, EWOULDBLOCK, 0);
+    const char* strerror = spvm_socket_strerror_string(env, stack, EWOULDBLOCK, 0);
     if (!strerror) {
       stack[0].ival = 0;
     }

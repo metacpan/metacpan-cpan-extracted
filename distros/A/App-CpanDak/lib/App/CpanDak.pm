@@ -7,7 +7,7 @@ use App::CpanDak::Specials;
 use App::cpanminus::fatscript ();
 our @ISA=('App::cpanminus::script'); ## no critic(ProhibitExplicitISA)
 
-our $VERSION = '0.0.2'; # VERSION
+our $VERSION = '0.1.0'; # VERSION
 # ABSTRACT: cpanm, with some sort of distroprefs
 
 
@@ -68,6 +68,64 @@ sub search_cpanmetadb_history {
 }
 
 # here we actually do the things
+
+sub _match_module {
+    my ($self, $module, $version_spec) = @_;
+
+    return $version_spec unless ref($version_spec);
+    if (my $module_version = $version_spec->{$module}) {
+        return $module_version;
+    }
+    if (my $star_version = $version_spec->{'*'}) { ## no critic(ProhibitNoisyQuotes)
+        return $star_version;
+    }
+    return undef;
+}
+
+sub search_module {
+    my ($self, $module, $version) = @_;
+
+    my $found = $self->next::method($module, $version)
+        or return;
+
+    my $version_spec = $self->{dak_specials}->option_for($found, 'add_version_spec')
+        or return $found;
+
+    my $add_module_version = $self->_match_module($module, $version_spec)
+        or return $found;
+
+    my $specials_file = $self->{dak_specials}->match_for($found,'.options.yml');
+    my $msg = "for $module";
+    $msg .= ", $version was requested" if $version;
+    $msg .= ", $specials_file added $add_module_version, we found $found->{module_version}";
+
+    my $combined_version = $version
+        ? "$version, $add_module_version"
+        : $add_module_version;
+
+    my $found_already;
+    my $satisfy_worked = eval {
+        $found_already = $self->satisfy_version(
+            $module, $found->{module_version},
+            $combined_version,
+        );
+        1;
+    };
+
+    if (!$satisfy_worked) {
+        my $error = $@;
+        $self->diag("$msg, checking the combined version failed\n");
+        die $error; ## no critic(RequireCarping)
+    }
+
+    if ($found_already) {
+        $self->diag("$msg, no need to search again\n");
+        return $found;
+    }
+
+    $self->diag("$msg, searching again\n");
+    return $self->next::method($module, $combined_version);
+}
 
 sub fetch_module {
     my $self = shift;
@@ -139,7 +197,7 @@ App::CpanDak - cpanm, with some sort of distroprefs
 
 =head1 VERSION
 
-version 0.0.2
+version 0.1.0
 
 =head1 SYNOPSIS
 
@@ -160,7 +218,7 @@ distributions (Distroprefs)>.
 
 =head2 Warning
 
-This is a mostly a hack; it will I<not> work on C<cpanminus> 1.79 or
+This is mostly a hack; it will I<not> work on C<cpanminus> 1.79 or
 later (those future versions are a complete rewrite, based on
 C<Menlo>).
 
@@ -196,12 +254,28 @@ environment
 
 =item C<.options.yml>
 
-general processing options; currently only C<notest> (Perl-style
-boolean) is implemented: if set, no tests will be run for this
+general processing options:
+
+=over 4
+
+=item C<notest>
+
+Perl-style boolean, if true, no tests will be run for this
 distribution
 
     ---
     notest: 1
+
+=item C<add_version_spec>
+
+version specification that will be added to the requirements for this
+distribution (but see L</Additional Version Specifications> for
+details).
+
+    ---
+    add_version_spec: "> 0.9.3, != 1.1.0"
+
+=back
 
 =item C<.configure.env.yml>
 
@@ -220,7 +294,101 @@ environment variables to set before running running those phases
 
 =back
 
-See also L<App::CpanDak::Specials> for more details.
+See also L<App::CpanDak::Specials>.
+
+=head2 Additional Version Specifications
+
+As far as Perl is concerned, I<modules> carry versions, distributions
+don't (mainly because neither Perl-the-language nor perl-the-runtime
+know what a distribution is).
+
+I<CPAN distributions> do carry versions, though, and while most recent
+distributions have the same version as all the modules they contain,
+this is never guaranteed.
+
+So, adding version specifications at the distribution level is just
+not going to work reliably.
+
+When asked to install a module (possibly with some version
+specification of its own), this application does the following:
+
+=over 4
+
+=item *
+
+find the distribution that contains the module (with a version that satisfies the specification)
+
+=item *
+
+find the C<.options.yml> file matching that distribution
+
+=item *
+
+get the C<add_version_spec> value from it, for the module we're installing (see below)
+
+=item *
+
+combine the original version specification with this additional one
+
+=item *
+
+if the module we found satisfies the combined specification, use it
+
+=item *
+
+otherwise, find a distribution that contains the module with a version that satisfies the combined specification
+
+=back
+
+Notice that the process is I<not> recursive: we search at most twice.
+
+C<add_version_spec> can be a string, or a dictionary mapping module
+names to strings:
+
+=over 4
+
+=item *
+
+if it's a string, it's used for any module found in that distribution
+
+=item *
+
+if it's a dictionary, the value for the module we're installing is used
+
+=item *
+
+unless there's no such value, in which case we use the value for C<*>
+
+=back
+
+So, in F<specials/ACME-Example.options.yml>:
+
+    add_version_spec: "== 1.0.0"
+
+would pin all modules found in the C<ACME-Example> distribution to
+version 1.0.0,
+
+    add_version_spec:
+      "*": "== 1.0.0"
+
+would do the same,
+
+    add_version_spec:
+      "ACME::Example::Weird": "== 1.0.0"
+
+would only pin the C<ACME::Example::Weird> module, so if we're asked
+to install C<ACME::Example::Plain>, we'd install the latest version of
+the distribution.
+
+When would this be useful? C<Module-Release-2.136> contains
+C<Module::Release> 2.136 and C<Module::Release::MetaCPAN> 2.131, so if
+you wanted to pin that distribution regardless of which of its modules
+is requested, you would need to write a F<Module-Release.options.yml>
+containing:
+
+    add_version_spec:
+      "Module::Release": "== 2.136"
+      "*": "== 2.131"
 
 =head1 AUTHOR
 

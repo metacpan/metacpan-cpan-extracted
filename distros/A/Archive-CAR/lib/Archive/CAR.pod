@@ -1,0 +1,77 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Archive::CAR - Content Addressable Archive (CAR) reader and writer
+
+=head1 SYNOPSIS
+
+    use Archive::CAR;
+
+    # Load a CAR file
+    my $car = Archive::CAR->from_file('data.car');
+
+    say 'CAR Version: ' . $car->version;
+
+    # Access roots
+    for my $root ($car->roots->@*) {
+        # $root is an Archive::CAR::CID object
+        say 'Root CID: ' . $root->to_string;
+    }
+
+    # Access blocks
+    for my $block ($car->blocks->@*) {
+        my $cid = $block->{cid};
+        my $data = $block->{data};
+        say 'Block ' . $cid->to_string . ' is ' . length($data) . ' bytes';
+    }
+
+=head1 DESCRIPTION
+
+Archive::CAR provides support for the Content Addressable Archive format used by IPFS. A CAR file is a serialized
+stream of IPLD blocks (CID + data) concatenated together, usually starting with a header that identifies the "roots" of
+the data DAG (Directed Acyclic Graph).
+
+This module supports both CAR v1 (simple concatenation) and CAR v2 which adds an index for fast random access.
+
+=head1 METHODS
+
+=head2 C<from_file($path)>
+
+Constructs an Archive::CAR object by parsing the file at the given path. Detects version automatically.
+
+=head2 C<write($filename, $roots, $blocks, [ $version ])>
+
+Writes a new CAR file. C<$roots> is an arrayref of CIDs, and C<$blocks> is an arrayref of hashes containing C<cid> and
+C<data>. C<$version> defaults to 1.
+
+=head2 C<version()>
+
+Returns the version of the CAR file (1 or 2).
+
+=head2 C<roots()>
+
+Returns an array reference of L<Archive::CAR::CID> objects that are the designated entry points for this archive.
+
+=head2 C<blocks()>
+
+Returns an array reference of hashes, where each hash contains C<cid> (an L<Archive::CAR::CID> object) and C<data> (the
+raw binary block).
+
+=head1 SEE ALSO
+
+L<https://ipld.io/specs/transport/car/>, L<Archive::CAR::CID>, L<Archive::CAR::v1>, L<Archive::CAR::v2>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

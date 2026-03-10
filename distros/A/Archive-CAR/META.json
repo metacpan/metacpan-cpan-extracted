@@ -1,0 +1,101 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "The CAR format (Content Addressable aRchives) can be used to store content addressable objects in the form of IPLD block data as a sequence of bytes; typically in a file with a .car filename extension.",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "description" : "The CAR format (Content Addressable aRchives) can be used to store content addressable objects in the form of IPLD block data as a sequence of bytes; typically in a file with a .car filename extension.",
+   "dynamic_config" : 1,
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Archive-CAR",
+   "no_index" : {
+      "directory" : [],
+      "file" : [],
+      "namespace" : [],
+      "package" : []
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test2::Suite" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CBOR::Free" : "0.32",
+            "Crypt::PRNG" : "0",
+            "Digest::SHA" : "0",
+            "JSON::PP" : "0",
+            "Path::Tiny" : "0",
+            "perl" : "v5.40.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Archive::CAR" : {
+         "file" : "lib/Archive/CAR.pm",
+         "version" : "v0.0.3"
+      },
+      "Archive::CAR::CID" : {
+         "file" : "lib/Archive/CAR/CID.pm",
+         "version" : "v0.0.3"
+      },
+      "Archive::CAR::Indexer" : {
+         "file" : "lib/Archive/CAR/Indexer.pm",
+         "version" : "v0.0.3"
+      },
+      "Archive::CAR::Utils" : {
+         "file" : "lib/Archive/CAR/Utils.pm",
+         "version" : "v0.0.3"
+      },
+      "Archive::CAR::v1" : {
+         "file" : "lib/Archive/CAR/v1.pm",
+         "version" : "v0.0.3"
+      },
+      "Archive::CAR::v2" : {
+         "file" : "lib/Archive/CAR/v2.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/Archive-CAR.pm/issues"
+      },
+      "homepage" : "https://github.com/sanko/Archive-CAR.pm",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sanko/Archive-CAR.pm.git",
+         "web" : "https://github.com/sanko/Archive-CAR.pm"
+      }
+   },
+   "version" : "v0.0.3",
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".clang-format",
+      ".github/**"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

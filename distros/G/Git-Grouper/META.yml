@@ -19,7 +19,7 @@ name: Git-Grouper
 provides:
   Git::Grouper:
     file: lib/Git/Grouper.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   App::GitUtils: '0.004'
   Config::IOD::Reader: '0.344'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Git-Grouper
   homepage: https://metacpan.org/release/Git-Grouper
   repository: git://github.com/perlancar/perl-Git-Grouper.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.040002'

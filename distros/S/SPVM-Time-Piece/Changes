@@ -1,3 +1,8 @@
+0.009 2026-03-10
+  [Internal Changes]
+    * Use native types in all places.
+  [Requirement Changes]
+    * Require SPVM 0.990143.
 0.008 2026-01-30
   [Requirement Changes]
     * Require SPVM 0.990120.

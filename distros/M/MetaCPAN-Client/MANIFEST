@@ -84,6 +84,7 @@ t/api/release.t
 t/api/reverse-dependencies.t
 t/entity.t
 t/lib/Functions.pm
+t/query_boolean.t
 t/request.t
 t/result_custom.t
 t/resultset.t

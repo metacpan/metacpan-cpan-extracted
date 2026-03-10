@@ -1,0 +1,47 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Archive::CAR::v1 - CAR v1 archive format implementation
+
+=head1 SYNOPSIS
+
+    use Archive::CAR::v1;
+
+    my $v1 = Archive::CAR::v1->new();
+    open my $fh, '<:raw', 'archive.car';
+    $v1->read($fh);
+
+=head1 DESCRIPTION
+
+C<Archive::CAR::v1> implements the reading and writing of Content Addressable Archive (CAR) version 1 files. It handles
+the concatenation of CID-prefixed data blocks.
+
+=head1 METHODS
+
+=head2 read($fh, [ $limit ])
+
+Reads CAR v1 data from the given filehandle using standard buffered I/O.
+
+=head2 write($fh, $roots, $blocks)
+
+Writes CAR v1 data to the given filehandle using standard buffered I/O. C<$roots> is an arrayref of CIDs, and
+C<$blocks> is an arrayref of hashes containing C<cid> and C<data>.
+
+=head1 SEE ALSO
+
+L<https://ipld.io/specs/transport/car/carv1/>, L<Archive::CAR>, L<Archive::CAR::v2>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

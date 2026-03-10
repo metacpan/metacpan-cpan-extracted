@@ -9,7 +9,7 @@ const char* FILE_NAME = "Unicode.c";
 
 int32_t SPVM__Unicode__uchar(SPVM_ENV* env, SPVM_VALUE* stack) {
   
-  void* obj_str = stack[0].oval;
+  SPVM_OBJ* obj_str = stack[0].oval;
   
   const char* str = env->get_chars(env, stack, obj_str);
   int32_t str_len = env->length(env, stack, obj_str);
@@ -57,7 +57,7 @@ int32_t SPVM__Unicode__uchar_to_utf8(SPVM_ENV* env, SPVM_VALUE* stack) {
     return 0;
   }
   
-  void* obj_utf8_bytes = env->new_byte_array(env, stack, utf8_len);
+  SPVM_OBJ* obj_utf8_bytes = env->new_byte_array(env, stack, utf8_len);
   
   int8_t* utf8_bytes = env->get_elems_byte(env, stack, obj_utf8_bytes);
   memcpy((char*)utf8_bytes, tmp_utf8_bytes, utf8_len);

@@ -1,0 +1,61 @@
+---
+X_No_Archive: Yes
+abstract: 'The CAR format (Content Addressable aRchives) can be used to store content addressable objects in the form of IPLD block data as a sequence of bytes; typically in a file with a .car filename extension.'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test2::Suite: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0'
+dynamic_config: 1
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+keywords: []
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-CAR
+no_index:
+  directory: []
+  file: []
+  namespace: []
+  package: []
+provides:
+  Archive::CAR:
+    file: lib/Archive/CAR.pm
+    version: v0.0.3
+  Archive::CAR::CID:
+    file: lib/Archive/CAR/CID.pm
+    version: v0.0.3
+  Archive::CAR::Indexer:
+    file: lib/Archive/CAR/Indexer.pm
+    version: v0.0.3
+  Archive::CAR::Utils:
+    file: lib/Archive/CAR/Utils.pm
+    version: v0.0.3
+  Archive::CAR::v1:
+    file: lib/Archive/CAR/v1.pm
+    version: v0.0.3
+  Archive::CAR::v2:
+    file: lib/Archive/CAR/v2.pm
+    version: v0.0.3
+requires:
+  CBOR::Free: '0.32'
+  Crypt::PRNG: '0'
+  Digest::SHA: '0'
+  JSON::PP: '0'
+  Path::Tiny: '0'
+  perl: v5.40.0
+resources:
+  bugtracker: https://github.com/sanko/Archive-CAR.pm/issues
+  homepage: https://github.com/sanko/Archive-CAR.pm
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/sanko/Archive-CAR.pm.git
+version: v0.0.3
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/**
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

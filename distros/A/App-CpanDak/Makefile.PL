@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::LoadModule" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "0.0.2",
+  "VERSION" => "0.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

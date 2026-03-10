@@ -1,0 +1,41 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Archive::CAR::Indexer - Index generator for CAR archives
+
+=head1 SYNOPSIS
+
+    use Archive::CAR::Indexer;
+
+    my $indexer = Archive::CAR::Indexer->new();
+    my $index_data = $indexer->generate_index($blocks);
+
+=head1 DESCRIPTION
+
+Archive::CAR::Indexer is an internal utility used to generate sorted multihash indexes for CAR v2 archives. It
+currently supports index format 0x0400 (Multihash Index Sorted).
+
+=head1 METHODS
+
+=head2 C<generate_index($blocks)>
+
+Generates a binary index for an arrayref of block records. Each record must contain a C<cid> object and an C<offset>.
+
+=head1 SEE ALSO
+
+L<Archive::CAR::v2>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

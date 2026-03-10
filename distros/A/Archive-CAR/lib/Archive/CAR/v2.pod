@@ -1,0 +1,53 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Archive::CAR::v2 - CAR version 2 implementation
+
+=head1 SYNOPSIS
+
+    use Archive::CAR::v2;
+
+    my $v2 = Archive::CAR::v2->new();
+    $v2->read($file_handle);
+
+=head1 DESCRIPTION
+
+Archive::CAR::v2 implements the reading and writing of Content Addressable Archive (CAR) version 2 files. This version
+adds a fixed-length header and an optional index for fast block access.
+
+=head1 METHODS
+
+=head2 C<version()>
+
+Returns 2.
+
+=head2 C<read($fh)>
+
+Reads the CAR v2 header and the inner CAR v1 archive using standard buffered I/O.
+
+=head2 C<write($fh, $roots, $blocks)>
+
+Writes a CAR v2 archive with a generated index using standard buffered I/O.
+
+=head2 C<header()>
+
+Returns a hash reference containing v2 header metadata.
+
+=head1 SEE ALSO
+
+L<https://ipld.io/specs/transport/car/carv2/>, L<Archive::CAR>, L<Archive::CAR::v1>, L<Archive::CAR::Indexer>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

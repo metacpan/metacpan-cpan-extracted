@@ -781,6 +781,8 @@ class Recipe {
       looper.renderLoop(loop_item, loop_idx);
       this.updatableRecipes.push(looper);
     } else if (tag === 'slot') {
+      // Clear SSR content — renderSlots will re-render live slot content
+      while (el.firstChild) el.removeChild(el.firstChild);
       let recipeInstance = new RecipeSlot(el);
       recipeInstance.parentModule = this;
       if (attrs.name) {
@@ -1024,13 +1026,21 @@ class Recipe {
           const looper = new RecipeLoop(el,structureNode);
           looper.parentModule = this;
           looper.scope = scope;
-          looper.renderLoop( el, loop_item, loop_idx);
+          looper.renderLoop( loop_item, loop_idx);
           this.updatableRecipes.push( looper );
         }
         else { //normal children
           for (let idx = 0; idx < children.length; idx++) {
             this.render( el, children, idx, loop_item, loop_idx, scope );
           }
+        }
+        // Re-apply select value after children (options) are rendered;
+        // setting el.value before options exist is a no-op in browsers
+        if (tag === 'select' && attrs.value !== undefined) {
+          const v = typeof attrs.value === 'function'
+            ? attrs.value.call(me, me, loop_item, loop_idx)
+            : attrs.value;
+          el.value = v;
         }
       }
     }
@@ -1152,8 +1162,14 @@ class RecipeLoop extends Recipe {
   }
 
   refresh(loop_item, loop_idx ) {
+    // Preserve parent select value across option re-renders
+    const parentEl = this._containerEl.parentElement;
+    const savedSelectVal = parentEl && parentEl.tagName === 'SELECT' ? parentEl.value : undefined;
     empty(this._containerEl);
     this.renderLoop( loop_item, loop_idx );
+    if (savedSelectVal !== undefined) {
+      parentEl.value = savedSelectVal;
+    }
   }
 } //class RecipeLoop
 

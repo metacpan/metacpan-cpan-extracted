@@ -1,0 +1,75 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Archive::CAR::CID - Lightweight Content Identifier (CID) for CAR archives
+
+=head1 SYNOPSIS
+
+    use Archive::CAR::CID;
+
+    # CIDs are usually obtained via Archive::CAR
+    my $cid = Archive::CAR::CID->decode($file_handle);
+
+    say "Version: " . $cid->version;
+    say "Codec:   " . $cid->codec;
+    say "Digest:  " . unpack("H*", $cid->digest);
+
+=head1 DESCRIPTION
+
+Archive::CAR::CID is a minimal implementation of the Content Identifier (CID) specification, specifically tailored for
+use with CAR archives. It provides the necessary fields to identify data blocks without the overhead of a full
+Multiformats stack.
+
+=head1 METHODS
+
+=head2 C<version()>
+
+Returns the CID version (0 or 1).
+
+=head2 C<codec()>
+
+Returns the IPLD codec code (e.g., 0x71 for dag-cbor).
+
+=head2 C<hash()>
+
+Returns the multihash type code (e.g., 0x12 for sha2-256).
+
+=head2 C<digest()>
+
+Returns the raw binary digest.
+
+=head2 C<raw()>
+
+Returns the raw binary representation of the CID.
+
+=head2 C<to_string()>
+
+Returns a hexadecimal string representation of the raw CID bytes (or base32 for CIDv1).
+
+=head2 C<decode($fh)>
+
+Class method. Decodes a binary CID from a filehandle using standard buffered I/O.
+
+=head2 C<from_raw($bytes)>
+
+Class method. Creates a CID object from a raw byte string. This is useful for CIDs obtained from external sources like
+firehose events.
+
+=head1 SEE ALSO
+
+L<Archive::CAR>, L<https://github.com/multiformats/cid>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

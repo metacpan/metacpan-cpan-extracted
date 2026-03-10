@@ -91,8 +91,8 @@
       },
       "runtime" : {
          "recommends" : {
+            "Archive::CAR" : "0",
             "CBOR::Free" : "0",
-            "InterPlanetary" : "0",
             "Mojo::UserAgent" : "0"
          },
          "requires" : {
@@ -118,7 +118,7 @@
    "provides" : {
       "At" : {
          "file" : "lib/At.pm",
-         "version" : "1.4"
+         "version" : "1.5"
       },
       "At::Error" : {
          "file" : "lib/At/Error.pm",
@@ -168,7 +168,7 @@
          "web" : "https://github.com/sanko/At.pm"
       }
    },
-   "version" : "1.4",
+   "version" : "1.5",
    "x_contributors" : [
       "Akiomi Kamakura <akiomik@gmail.com>",
       "Alberto Roura <mail@albertoroura.com>",

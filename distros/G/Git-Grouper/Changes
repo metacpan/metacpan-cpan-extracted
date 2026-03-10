@@ -1,3 +1,9 @@
+0.003   2025-11-11  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Group that does not have any filter keys should not
+          match all repos.
+
+
 0.002   2025-11-11  Released-By: PERLANCAR; Urgency: medium
 
         - [subcommand configure-repo] Add option --clean-remotes.
