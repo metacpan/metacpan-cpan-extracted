@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Zip;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -12,8 +12,9 @@ use List::Util qw(first);
 
 use XML::LibXML;
 
+use EBook::Ishmael::CharDet;
 use EBook::Ishmael::Dir;
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_path_id is_image_path);
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::TextToHtml;
 use EBook::Ishmael::Unzip qw(unzip safe_tmp_unzip);
@@ -65,7 +66,7 @@ sub _files {
         if (-d $f) {
             $self->_files($f);
         } elsif (-f $f and is_image_path($f)) {
-            push @{ $self->{_images} }, $f;
+            push @{ $self->{_images} }, [ $f, image_path_id($f) ];
         } elsif (-f $f and $f =~ /\.(x?html?|txt)$/) {
             push @{ $self->{_content} }, $f;
         }
@@ -77,7 +78,7 @@ sub new {
 
     my $class = shift;
     my $file  = shift;
-    my $enc   = shift // 'UTF-8';
+    my $enc   = shift;
     my $net   = shift // 1;
 
     my $self = {
@@ -128,8 +129,12 @@ sub html {
         if ($f =~ /\.txt$/) {
             open my $fh, '<', $f
                 or die "Failed to open $f for reading: $!\n";
-            my $text = do { local $/ = undef; readline $fh };
+            binmode $fh;
+            my $text = do { local $/; <$fh> };
             close $fh;
+            if (not defined $self->{Encode}) {
+                $self->{Encode} = chardet($text) // 'ASCII';
+            }
             $html .= text2html(decode($self->{Encode}, $text));
         } else {
             my $dom = XML::LibXML->load_html(
@@ -161,27 +166,30 @@ sub raw {
     my $self = shift;
     my $out  = shift;
 
-    my $raw = join "\n\n", map {
-        if ($_ =~ /\.txt$/) {
-            open my $fh, '<', $_
-                or die "Failed to open $_ for reading: $!\n";
-            my $text = decode(
-                $self->{Encode},
-                do { local $/ = undef; readline $fh }
-            );
+    my $raw;
+    for my $c (@{ $self->{_content} }) {
+        if ($c =~ /\.txt$/) {
+            open my $fh, '<', $c
+                or die "Failed to open $c for reading: $!\n";
+            binmode $fh;
+            my $r = do { local $/; <$fh> };
             close $fh;
-            $text;
+            if (not defined $self->{Encode}) {
+                $self->{Encode} = chardet($r) // 'ASCII';
+            }
+            $raw .= decode($self->{Encode}, $r) . "\n\n";
         } else {
             my $dom = XML::LibXML->load_html(
-                location => $_,
+                location => $c,
                 recover => 2,
                 no_network => !$self->{Network},
             );
             my ($body) = $dom->findnodes('/html/body');
             $body //= $dom->documentElement;
-            $body->textContent;
+            $raw .= $body->textContent . "\n\n";
         }
-    } @{ $self->{_content} };
+    }
+    $raw =~ s/\n\n//;
 
     if (defined $out) {
         open my $fh, '>', $out
@@ -215,28 +223,16 @@ sub has_cover {
 sub cover {
 
     my $self = shift;
-    my $out  = shift;
 
-    return undef unless $self->has_cover;
+    return (undef, undef) unless $self->has_cover;
 
-    my $img;
+    open my $fh, '<', $self->{_cover}[0]
+        or die "Failed to open $self->{_cover}[0] for reading: $!\n";
+    binmode $fh;
+    my $bin = do { local $/ = undef; readline $fh };
+    close $fh;
 
-    open my $rh, '<', $self->{_cover}
-        or die "Failed to open $self->{_cover} for reading: $!\n";
-    binmode $rh;
-    my $bin = do { local $/ = undef; readline $rh };
-    close $rh;
-
-    if (defined $out) {
-        open my $wh, '>', $out
-            or die "Failed to open $out for writing: $!\n";
-        binmode $wh;
-        print { $wh } $bin;
-        close $wh;
-        return $out;
-    } else {
-        return $bin;
-    }
+    return ($bin, $self->{_cover}[1]);
 
 }
 
@@ -254,16 +250,16 @@ sub image {
     my $n    = shift;
 
     if ($n >= $self->image_num) {
-        return undef;
+        return (undef, undef);
     }
 
-    open my $fh, '<', $self->{_images}[$n]
-        or die "Failed to open $self->{_images}[$n] for reading: $!\n";
+    open my $fh, '<', $self->{_images}[$n][0]
+        or die "Failed to open $self->{_images}[$n][0] for reading: $!\n";
     binmode $fh;
     my $img = do { local $/ = undef; readline $fh };
     close $fh;
 
-    return \$img;
+    return ($img, $self->{_images}[$n][1]);
 
 }
 

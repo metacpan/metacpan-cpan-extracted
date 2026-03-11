@@ -28,6 +28,7 @@ requires:
   LWP::Protocol::https: '0'
   Log::Any: '0'
   MIME::Base64: '0'
+  Module::Pluggable: '0'
   Module::Runtime: '0'
   Moose: '0'
   MooseX::NonMoose: '0'
@@ -42,7 +43,7 @@ resources:
   bugtracker: https://github.com/Getty/langertha/issues
   homepage: https://github.com/Getty/langertha
   repository: https://github.com/Getty/langertha.git
-version: '0.305'
+version: '0.307'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -292,7 +293,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.305'
+          tag: '0.307'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

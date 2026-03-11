@@ -1,8 +1,9 @@
 Revision history for Adam
 
-1.002     2026-03-08 05:06:55Z
+1.003     2026-03-11 02:08:02Z
+        + Administrative update to cleanup the provides for CPAN
 
-1.001     2026-03-07 19:44:57Z
+1.002     2026-03-08 05:06:55Z
 	+ Updated POD: Adam and Moses now document IO::Async support and dual event loop modes
 	+ ai-bot example: multi-channel support with per-channel message buffers
 	+ ai-bot example: SYSTEM_PROMPT env var for custom system prompt additions
@@ -11,6 +12,9 @@ Revision history for Adam
 	+ ai-bot example: info-level logging for all incoming IRC events (public, join, part, quit, PM) with channel/source
 	+ Default logger now includes timestamps in [YYYY-MM-DD HH:MM:SS] [level] format
 	+ Fixed stray =cut in Adam.pm that hid async() and stop() methods from compilation
+	+ Fixed logger timestamps: log_dispatch_conf callback instead of around log
+
+1.001     2026-03-07 19:44:57Z
 
 1.000     2026-03-07 03:12:40Z
 	+ Switched to @Author::GETTY Dist::Zilla plugin bundle

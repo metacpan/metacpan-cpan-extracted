@@ -7,6 +7,12 @@ my @modules = qw(
   Langertha::Knarr::Config
   Langertha::Knarr::Router
   Langertha::Knarr::Tracing
+  Langertha::Knarr::RequestLog
+  Langertha::Knarr::Input
+  Langertha::Knarr::Input::Tools
+  Langertha::Knarr::Output
+  Langertha::Knarr::Output::Tools
+  Langertha::Knarr::Metrics
   Langertha::Knarr::Proxy::OpenAI
   Langertha::Knarr::Proxy::Anthropic
   Langertha::Knarr::Proxy::Ollama

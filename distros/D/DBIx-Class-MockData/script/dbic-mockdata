@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use DBIx::Class::MockData;
+
+=head1 NAME
+
+dbic-mockdata - Generate mock test data for a DBIx::Class schema
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 SYNOPSIS
+
+  dbic-mockdata --schema-dir /path/to/lib \
+                --namespace MyApp::Schema \
+                --dsn "dbi:SQLite:dbname=test.db" [options]
+
+=head1 DESCRIPTION
+
+Connects the given DBIx::Class schema and hands it to
+L<DBIx::Class::MockData> to generate and insert mock rows.
+
+=head1 OPTIONS
+
+  --schema-dir   Directory containing the schema classes           (required)
+  --namespace    Top-level schema package name, e.g. MyApp::Schema (required)
+  --dsn          DBI DSN string, e.g. "dbi:Pg:dbname=mydb"         (required)
+  --user         Database username
+  --password     Database password
+  --rows         Rows to insert per table (default: 5)
+  --seed         Random seed for reproducible output
+  --deploy       Create tables that do not yet exist
+  --wipe         Drop and recreate all tables before inserting (destructive)
+  --dry-run      Print generated values without inserting
+  --verbose      Print debug output
+  --help         Show this help
+
+=cut
+
+my %opt = (rows => 5);
+
+GetOptions(
+    \%opt,
+    'schema-dir=s',
+    'namespace=s',
+    'dsn=s',
+    'user=s',
+    'password=s',
+    'rows=i',
+    'seed=i',
+    'deploy',
+    'wipe',
+    'dry-run',
+    'verbose',
+    'help|h',
+) or pod2usage(2);
+
+pod2usage(0) if $opt{help};
+die "ERROR: --schema-dir is required\n"  unless $opt{'schema-dir'};
+die "ERROR: --namespace is required\n"   unless $opt{namespace};
+die "ERROR: --dsn is required\n"         unless $opt{dsn} || $opt{'dry-run'};
+
+# Connect the schema — this is DBIx::Class's job, not ours
+
+my $schema_dir = $opt{'schema-dir'};
+my $namespace  = $opt{namespace};
+
+{
+    use File::Spec;
+    my $dir = File::Spec->rel2abs($schema_dir);
+    # Step up one level if dir IS the top namespace component
+    my $top  = (split /::/, $namespace)[0];
+    my $base = (File::Spec->splitdir($dir))[-1];
+    if ($base eq $top) {
+        $dir = File::Spec->catdir((File::Spec->splitdir($dir))[0 .. -2]);
+    }
+    push @INC, $dir unless grep { $_ eq $dir } @INC;
+}
+
+(my $mod = $namespace) =~ s{::}{/}g;
+eval { require "$mod.pm" };
+die "Could not load '$namespace': $@\n" if $@;
+
+{
+    no strict 'refs';
+    if ($namespace->can('load_namespaces') && !$namespace->sources) {
+        eval { $namespace->load_namespaces };
+    }
+}
+
+my @connect_info = ($opt{dsn} // 'dbi:SQLite::memory:');
+push @connect_info, $opt{user}     if defined $opt{user};
+push @connect_info, $opt{password} if defined $opt{password};
+
+my $schema = eval { $namespace->connect(@connect_info) };
+die "Could not connect schema: $@\n" if $@;
+
+# Hand the connected schema to MockData
+
+my $mock = DBIx::Class::MockData->new(
+    schema     => $schema,
+    schema_dir => $schema_dir,
+    rows       => $opt{rows},
+    verbose    => $opt{verbose} // 0,
+    (defined $opt{seed} ? (seed => $opt{seed}) : ()),
+);
+
+eval {
+    if    ($opt{'dry-run'}) { $mock->dry_run          }
+    elsif ($opt{wipe})      { $mock->wipe->generate   }
+    elsif ($opt{deploy})    { $mock->deploy->generate }
+    else                    { $mock->generate         }
+};
+die $@ if $@;

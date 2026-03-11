@@ -1,6 +1,6 @@
 package Langertha::Role::ResponseFormat;
 # ABSTRACT: Role for an engine where you can specify structured output
-our $VERSION = '0.305';
+our $VERSION = '0.307';
 use Moose::Role;
 
 has response_format => (
@@ -25,7 +25,7 @@ Langertha::Role::ResponseFormat - Role for an engine where you can specify struc
 
 =head1 VERSION
 
-version 0.305
+version 0.307
 
 =head2 response_format
 

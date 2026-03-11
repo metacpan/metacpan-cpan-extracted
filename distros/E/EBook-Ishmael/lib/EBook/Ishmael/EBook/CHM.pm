@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CHM;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -13,16 +13,14 @@ use XML::LibXML;
 
 use EBook::Ishmael::Dir;
 use EBook::Ishmael::EBook::Metadata;
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_path_id image_size);
 use EBook::Ishmael::ShellQuote qw(safe_qx);
 
 # TODO: Make more of an effort to find metadata
-# TODO: Add support for Windows via hh.exe
-# I have tried to add hh support before, and it didn't work out well because
-# hh doesn't know how to handle quoted arguments for some reason.
 
 my $HAS_CHMLIB = defined which('extract_chmLib');
-our $CAN_TEST = $HAS_CHMLIB;
+my $HAS_HH = defined which('hh.exe');
+our $CAN_TEST = $HAS_CHMLIB || $HAS_HH;
 
 my $MAGIC = 'ITSF';
 
@@ -42,14 +40,20 @@ sub _extract {
 
     my $self = shift;
 
-    if (!$HAS_CHMLIB) {
-        die "Cannot extract CHM $self->{Source}; extract_chmLib not installed\n";
+    if ($HAS_CHMLIB) {
+        safe_qx('extract_chmLib', $self->{Source}, $self->{_extract});
+        unless ($? >> 8 == 0) {
+            die "Failed to run 'extract_chmLib' on $self->{Source}\n";
+        }
+    } elsif ($HAS_HH) {
+        safe_qx('hh.exe', '-decompile', $self->{_extract}, $self->{Source});
+        unless ($? >> 8 == 0) {
+            die "Failed to run 'hh.exe' on $self->{Source}\n";
+        }
+    } else {
+        die "Cannot extract CHM $self->{Source}; extract_chmLib nor hh.exe installed\n";
     }
 
-    safe_qx('extract_chmLib', $self->{Source}, $self->{_extract});
-    unless ($? >> 8 == 0) {
-        die "Failed to run 'extract_chmLib' on $self->{Source}\n";
-    }
 
     return 1;
 
@@ -127,33 +131,12 @@ sub _images {
     for my $f (dir($dir)) {
         if (-d $f) {
             $self->_images($f);
-        } elsif (is_image_path($f)) {
-            push @{ $self->{_images} }, $f;
+        } elsif (-f $f) {
+            my $format = image_path_id($f);
+            next if not defined $format;
+            push @{ $self->{_images} }, [ $f, $format ];
         }
     }
-
-    # Get image and data pairs.
-    my @imgdat = map {
-
-        open my $fh, '<', $_
-            or die "Failed to open $_ for reading: $!\n";
-        binmode $fh;
-
-        [ $_, do { local $/ = undef; readline $fh } ];
-
-    } @{ $self->{_images} };
-
-    my @covers =
-        map { $_->[0] }
-        # Sort by size, we want the largest image
-        sort { -s $a->[0] <=> -s $b->[0] }
-        # Cover images probably have at least a 1.3 height-width ratio.
-        grep { $_->[1][1] / $_->[1][0] >= 1.3 }
-        grep { defined $_->[1] }
-        map { [ $_->[0], image_size(\$_->[1]) ] }
-        @imgdat;
-
-    $self->{_cover} = $covers[-1] if @covers;
 
     return 1;
 
@@ -205,7 +188,6 @@ sub new {
         _extract => undef,
         _images  => [],
         _content => [],
-        _cover   => undef,
     };
 
     bless $self, $class;
@@ -306,33 +288,42 @@ sub has_cover {
 
     my $self = shift;
 
-    return defined $self->{_cover};
+    return $self->image_num > 0;
 
 }
 
 sub cover {
 
     my $self = shift;
-    my $out  = shift;
 
-    return undef unless $self->has_cover;
+    return (undef, undef) unless $self->has_cover;
 
-    open my $rh, '<', $self->{_cover}
-        or die "Failed to open $self->{_cover} for reading: $!\n";
-    binmode $rh;
-    my $bin = do { local $/ = undef; readline $rh };
-    close $rh;
-
-    if (defined $out) {
-        open my $wh, '>', $out
-            or die "Failed to open $out for writing: $!\n";
-        binmode $wh;
-        print { $wh } $bin;
-        close $wh;
-        return $out;
-    } else {
-        return $bin;
+    # Find largest image with a 1.3 height-width ratio, which is most likely
+    # the cover image.
+    my $cover;
+    for my $i (0 .. $self->image_num - 1) {
+        my ($data, $format) = $self->image($i);
+        my $size = image_size($data, $format);
+        if (not defined $size) {
+            next;
+        }
+        # Cover images probably have at least a 1.3 height-width ratio.
+        if ($size->[1] / $size->[0] < 1.3) {
+            next;
+        }
+        if (
+            not defined $cover or
+            $cover->[2][0] * $cover->[2][1] < $size->[1] * $size->[0]
+        ) {
+            $cover = [ $data, $format, $size ];
+        }
     }
+
+    if (not defined $cover) {
+        return (undef, undef);
+    }
+
+    return ($cover->[0], $cover->[1]);
 
 }
 
@@ -350,16 +341,16 @@ sub image {
     my $n    = shift;
 
     if ($n >= $self->image_num) {
-        return undef;
+        return (undef, undef);
     }
 
-    open my $fh, '<', $self->{_images}[$n]
-        or die "Failed to open $self->{_images}[$n] for reading: $!\n";
+    open my $fh, '<', $self->{_images}[$n][0]
+        or die "Failed to open $self->{_images}[$n][0] for reading: $!\n";
     binmode $fh;
     my $img = do { local $/ =  undef; readline $fh };
     close $fh;
 
-    return \$img;
+    return ($img, $self->{_images}[$n][1]);
 
 }
 

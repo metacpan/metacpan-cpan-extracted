@@ -1,6 +1,6 @@
 package LangerthaX;
 # ABSTRACT: Bring your own viking!
-our $VERSION = '0.305';
+our $VERSION = '0.307';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ LangerthaX - Bring your own viking!
 
 =head1 VERSION
 
-version 0.305
+version 0.307
 
 =head1 DESCRIPTION
 
@@ -27,6 +27,10 @@ The C<LangerthaX> namespace is the conventional home for third-party
 extensions to L<Langertha>. If you are building a module that extends or
 integrates with Langertha but does not belong in the core distribution,
 publish it under C<LangerthaX::>.
+
+For custom engines, publish under C<LangerthaX::Engine::*>. L<Langertha>
+resolves configured engine names against both C<Langertha::Engine::*> and
+C<LangerthaX::Engine::*>.
 
 =head1 SEE ALSO
 

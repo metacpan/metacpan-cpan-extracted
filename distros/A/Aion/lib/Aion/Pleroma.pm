@@ -3,11 +3,11 @@ package Aion::Pleroma;
 
 use common::sense;
 
-# Источник конфигурации - аннотации
-use config INI => 'etc/annotation/eon.ann';
-
-# Один из источников конфигурации
-use config PLEROMA => {};
+use config {
+	INI => 'etc/annotation/eon.ann',
+	PLEROMA => {},
+	AUTOWARE => 1,
+};
 
 use Aion;
 
@@ -54,10 +54,11 @@ sub get {
 		eval "require $pkg" or die unless $pkg->can('new') || $pkg->can('does');
 		$self->{eon}{$key} = $pkg->$method;
 	}
+	elsif(AUTOWARE and $key =~ /^([\w:]+)(#\w+)?$/ and eval "require $1") { $self->autoware($key)->get($key) }
 	else { undef }
 }
 
-# Получить эон из контейнера и исключение, если его там нет
+# Получить эон из контейнера или исключение, если его там нет
 sub resolve {
 	my ($self, $key) = @_;
 	
@@ -71,8 +72,8 @@ sub autoware {
 	$action = "$pkg#$sub";
 	$key //= $action =~ /#new$/? $pkg: $action;
 
-	if(my $action2 = $self->pleroma->{$key}) {
-		die "Added eon $key twice, with $action ne $action2" if $action2 ne $action;
+	if(my $action_exists = $self->pleroma->{$key}) {
+		die "Added eon $key twice, with $action ne $action_exists" if $action_exists ne $action;
 	}
 	else {
 		$self->pleroma->{$key} = $action;
@@ -108,6 +109,20 @@ An eon is created when requesting from a container via the C<get> or C<resolve> 
 The container is in the C<$Aion::pleroma> variable and can be replaced with C<local>.
 
 The configuration for creating eons is obtained from the C<PLEROMA> config and the annotation file (created by the C<Aion::Annotation> package). The annotation file can be replaced via the C<INI> config.
+
+=head1 CONFIG
+
+Module settings that can be set in C<.config.pm>:
+
+=over
+
+=item * INI => 'etc/annotation/eon.ann' – annotation file.
+
+=item * PLEROMA => {} – additional set of eons.
+
+=item * AUTOWARE => 1 – load modules automatically, even if they are not specified in the configuration.
+
+=back
 
 =head1 FEATURES
 

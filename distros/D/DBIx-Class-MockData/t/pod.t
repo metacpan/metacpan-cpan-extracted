@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+eval { require Test::Pod; Test::Pod->import };
+plan skip_all => 'Test::Pod required' if $@;
+
+all_pod_files_ok();

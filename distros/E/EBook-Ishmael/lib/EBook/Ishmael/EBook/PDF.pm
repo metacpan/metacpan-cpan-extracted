@@ -1,18 +1,19 @@
 package EBook::Ishmael::EBook::PDF;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
 use File::Temp qw(tempfile tempdir);
+use Time::Piece;
 
 use File::Which;
 use XML::LibXML;
 
 use EBook::Ishmael::Dir;
 use EBook::Ishmael::EBook::Metadata;
+use EBook::Ishmael::ImageID qw(image_path_id);
 use EBook::Ishmael::ShellQuote qw(safe_qx);
-use EBook::Ishmael::Time qw(guess_time);
 
 # This module basically delegates the task of processing PDFs to some of
 # Poppler's utilities. The processing is quite inefficient, and the output is
@@ -45,15 +46,39 @@ sub heuristic {
 
 }
 
+sub _parse_pdf_date {
+
+    my ($date) = @_;
+    $date =~ s/^D://;
+    $date =~ s/'//g;
+
+    my ($year, $month, $day, $hour, $min, $sec, $tz) =
+        $date =~ /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(Z|[+-]\d{4})$/
+        or die "Invalid PDF date\n";
+
+    if ($tz eq 'Z') {
+        $tz = '+0000';
+    }
+
+    my $tp = eval {
+        Time::Piece->strptime(
+            "$year $month $day $hour $min $sec $tz",
+            '%Y %m %d %H %M %S %z',
+        )
+    } or die "Failed to parse '$date'\n";
+    return $tp->epoch;
+
+}
+
 sub _get_metadata {
 
     my $self = shift;
 
     my %meta = (
         'Author'       => sub { $self->{Metadata}->add_author(shift) },
-        'CreationDate' => sub { $self->{Metadata}->set_created(eval { guess_time(shift) }) },
+        'CreationDate' => sub { $self->{Metadata}->set_created(eval { _parse_pdf_date(shift) }) },
         'Creator'      => sub { $self->{Metadata}->add_contributor(shift) },
-        'ModDate'      => sub { $self->{Metadata}->set_modified(eval { guess_time(shift) }) },
+        'ModDate'      => sub { $self->{Metadata}->set_modified(eval { _parse_pdf_date(shift) }) },
         'PDF version'  => sub { $self->{Metadata}->set_format('PDF ' . shift) },
         'Producer'     => sub { $self->{Metadata}->add_contributor(shift) },
         'Title'        => sub { $self->{Metadata}->set_title(shift) },
@@ -63,7 +88,7 @@ sub _get_metadata {
         die "Cannot read PDF $self->{Source}: pdfinfo not installed\n";
     }
 
-    my $info = safe_qx('pdfinfo', $self->{Source});
+    my $info = safe_qx('pdfinfo', '-rawdates', $self->{Source});
     unless ($? >> 8 == 0) {
         die "Failed to run 'pdfinfo' on $self->{Source}\n";
     }
@@ -94,7 +119,11 @@ sub _images {
         die "Failed to run 'pdfimages' on $self->{Source}\n";
     }
 
-    @{ $self->{_images} } = dir($self->{_imgdir});
+    for my $f (dir($self->{_imgdir})) {
+        my $format = image_path_id($f);
+        next if not defined $format;
+        push @{ $self->{_images} }, [ $f, $format ];
+    }
 
     return 1;
 
@@ -216,7 +245,6 @@ sub has_cover { 1 }
 sub cover {
 
     my $self = shift;
-    my $out  = shift;
 
     unless ($HAS_PDFTOPNG or $HAS_CONVERT) {
         die "Cannot dump PDF $self->{Source} cover: pdftopng or convert not installed\n";
@@ -256,22 +284,14 @@ sub cover {
         die;
     }
 
-    open my $rh, '<', $png
+    open my $fh, '<', $png
         or die "Failed to open $png for reading: $!\n";
-    binmode $rh;
-    my $bin = do { local $/ = undef; readline $rh };
-    close $rh;
+    binmode $fh;
+    my $bin = do { local $/ = undef; readline $fh };
+    close $fh;
 
-    if (defined $out) {
-        open my $wh, '>', $out
-            or die "Failed to open $out for writing: $!\n";
-        binmode $wh;
-        print { $wh } $bin;
-        close $wh;
-        return $out;
-    } else {
-        return $bin;
-    }
+    return ($bin, 'png');
+
 
 }
 
@@ -293,16 +313,16 @@ sub image {
     my $n    = shift;
 
     if ($n >= $self->image_num) {
-        return undef;
+        return (undef, undef);
     }
 
-    open my $fh, '<', $self->{_images}[$n]
-        or die "Failed to open $self->{_images}[$n]: $!\n";
+    open my $fh, '<', $self->{_images}[$n][0]
+        or die "Failed to open $self->{_images}[$n][0]: $!\n";
     binmode $fh;
     my $img = do { local $/ = undef; readline $fh };
     close $fh;
 
-    return \$img;
+    return ($img, $self->{_images}[$n][1]);
 
 }
 

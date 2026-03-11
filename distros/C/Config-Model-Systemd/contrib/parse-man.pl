@@ -484,6 +484,12 @@ $meta_root->load(
        element:SetLoginEnvironment upstream_default~'
 );
 
+# doc for RefreshOnReload is misleading
+$meta_root->load(
+    '! class:Systemd::Section::Service
+       element:RefreshOnReload value_type=uniline replace:.clear'
+);
+
 
 # these warping instructions are used for most services. Services are
 # disabled when a service file is a symlink to /dev/null

@@ -1,5 +1,5 @@
 package Crypt::HSM::Slot;
-$Crypt::HSM::Slot::VERSION = '0.027';
+$Crypt::HSM::Slot::VERSION = '0.028';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Slot - A PKCS11 slot
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 

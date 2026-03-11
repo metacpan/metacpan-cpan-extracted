@@ -29,7 +29,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "MooX-XSConstructor";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003002>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-001>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-002>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003002>, <http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003003>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-moox-xsconstructor>;
@@ -109,6 +109,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-XSConstructor-0.003002.tar.gz>;
 	doap:revision        "0.003002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/v_0-003003>
+	a                    doap:Version;
+	dc:identifier        "MooX-XSConstructor-0.003003"^^xsd:string;
+	dc:issued            "2026-03-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "-wrapconstructor option.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/MooX-XSConstructor-0.003003.tar.gz>;
+	doap:revision        "0.003003"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

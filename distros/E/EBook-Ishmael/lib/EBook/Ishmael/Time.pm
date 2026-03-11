@@ -1,6 +1,6 @@
 package EBook::Ishmael::Time;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 

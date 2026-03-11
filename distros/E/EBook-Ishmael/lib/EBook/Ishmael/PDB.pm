@@ -1,16 +1,67 @@
 package EBook::Ishmael::PDB;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
-
-use EBook::Ishmael::PDB::Record;
 
 my $HEADER_COMMON = 78;
 my $RECORD_INFO = 8;
 
 # Offset of Palm's Epoch (Jan 1, 1904) from Unix's Epoch (Jan 1, 1970)
 my $EPOCH_OFFSET = -2082844800;
+
+package EBook::Ishmael::PDB::Record {
+
+    sub new {
+
+        my $class  = shift;
+        my $data   = shift;
+        my $params = shift;
+
+        my $self = {
+            Data => $data,
+            Off  => $params->{Offset},
+            Attr => $params->{Attributes},
+            UID  => $params->{UID},
+        };
+
+        return bless $self, $class;
+
+    }
+
+    sub data {
+
+        my $self = shift;
+
+        return $self->{Data};
+
+    }
+
+    sub offset {
+
+        my $self = shift;
+
+        return $self->{Off};
+
+    }
+
+    sub attributes {
+
+        my $self = shift;
+
+        return $self->{Attr};
+
+    }
+
+    sub uid {
+
+        my $self = shift;
+
+        return $self->{UID};
+
+    }
+
+}
 
 sub new {
 
@@ -359,6 +410,50 @@ Returns array of record objects in the PDB object.
 =head2 $s = $p->size()
 
 Returns the PDB's size.
+
+=head1 EBook::Ishmael::PDB::Record
+
+Class representing a PDB record, returned by the PDB's C<record()> method.
+
+=head1 METHODS
+
+=head2 $rec = EBook::Ishmael::PDB::Record->new($data, %params)
+
+Creates a new record.
+
+The following are valid parameters, and all are required.
+
+=over 4
+
+=item Offset
+
+Offset of data in PDB database.
+
+=item Attributes
+
+Bitmask of record attributes.
+
+=item UID
+
+UID of record.
+
+=back
+
+=head2 $data = $rec->data()
+
+Returns data held in record.
+
+=head2 $off = $rec->offset()
+
+Returns offset of record.
+
+=head2 $attr = $rec->attributes()
+
+Returns record's attribute bitmask.
+
+=head2 $uid = $rec->uid()
+
+Returns record's UID.
 
 =head1 AUTHOR
 

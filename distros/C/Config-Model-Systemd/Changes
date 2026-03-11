@@ -1,3 +1,11 @@
+0.260.1 2026-03-10
+
+  Model update:
+    * update model from systemd 260 doc
+
+  Model generator (parse-man.pl) changes:
+    * override definition of RefreshOnReload
+
 0.258.1 2025-10-18
 
   Model update:

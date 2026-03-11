@@ -1,0 +1,106 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Codec::CBOR - DAG-CBOR encoder and decoder
+
+=head1 SYNOPSIS
+
+    use Codec::CBOR;
+
+    my $codec = Codec::CBOR->new();
+
+    # Encode data to CBOR bytes
+    my $bytes = $codec->encode({
+        t    => '#commit',
+        repo => 'did:plc:123',
+        data => { key => 'value' }
+    });
+
+    # Decode CBOR bytes back to Perl data
+    my $data = $codec->decode($bytes);
+
+    # Decode a sequence of concatenated CBOR objects
+    my @objects = $codec->decode_sequence($concatenated_bytes);
+
+=head1 DESCRIPTION
+
+Codec::CBOR is a thin, pure Perl implementation of the Concise Binary Object Representation (CBOR) format, specifically
+optimized for DAG-CBOR as used in the L<AT|At> Protocol and L<IPFS|Interplanetary>.
+
+=head2 DAG-CBOR Compliance
+
+This module implements the following DAG-CBOR requirements:
+
+=over
+
+=item * Deterministic map encoding: Map keys are sorted by length (shorter first), then lexically.
+
+=item * Tag 42 support: Special handling for Content Identifiers (CIDs).
+
+=item * No indefinite lengths: Only definite length arrays and maps are supported.
+
+=back
+
+=head1 METHODS
+
+=head2 C<new()>
+
+Constructor. Returns a new C<Codec::CBOR> instance.
+
+=head2 C<encode($data)>
+
+Encodes a Perl data structure into a CBOR byte string.
+
+=over
+
+=item * Strings: Encoded as Major Type 3 (UTF-8) if they are not references.
+
+=item * Byte strings: Encoded as Major Type 2 if provided as a scalar reference (e.g., C<\$binary_data>).
+
+=item * Tags: Registered class handlers can produce tagged values (Major Type 6).
+
+=back
+
+=head2 C<decode($input)>
+
+Decodes a single CBOR object from a byte string or a filehandle. Returns the decoded Perl data structure.
+
+=head2 C<decode_sequence($input)>
+
+Decodes a sequence of concatenated CBOR objects. Returns an array (in list context) or an arrayref.
+
+=head2 C<add_tag_handler($tag, $callback)>
+
+Registers a callback to handle a specific CBOR tag during decoding.
+
+    $codec->add_tag_handler(42 => sub ($data) {
+        return My::CID->from_raw($data);
+    });
+
+=head2 C<add_class_handler($class, $callback)>
+
+Registers a callback to handle a specific Perl class during encoding.
+
+    $codec->add_class_handler('My::CID' => sub ($codec, $obj) {
+        return $codec->_encode_tag(42, $obj->raw);
+    });
+
+=head1 SEE ALSO
+
+L<Archive::CAR>, L<At>, L<https://cbor.io/>, L<https://ipld.io/specs/codecs/dag-cbor/>, L<CBOR::Free>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2. Other copyrights, terms, and conditions may apply to data transmitted through this module.
+
+=cut

@@ -1,0 +1,304 @@
+GNU 通用公共?可?
+
+版本 3，2007 年 6 月 29 日
+
+版?所有 (C) 2007 自由?件基金会，公司 <https://fsf.org/>
+
+允?任何人?制和分?本?可?文件的完整副本，但不允??其?行更改。
+
+序言
+
+GNU
+通用公共?可?是一个自由的、具有反版?概念的?件和其他?型作品的?可?。
+
+大多数?件和其他?用作品的?可?旨在剥??共享和更改作品的自由。相比之下，GNU
+通用公共?可?旨在保??共享和更改程序所有版本的自由----以?保它?所有用?保持?自由?件。我?，自由?件基金会，将
+GNU
+通用公共?可?用于我?的大部分?件；它也?用于作者以??方式?布的任何其他作品。?也可以将其?用于?的程序。
+
+当我???自由?件?，我?指的是自由，而不是价格。我?的通用公共?可?旨在?保?有自由分?自由?件的副本（如果?愿意，可以收?），?收到源代?或可以在需要??得它，?可以更改?件或在新自由程序中使用其中的一部分，并且?知道?可以做?些事情。
+
+?了保??的?利，我?需要防止其他人剥??的?些?利或要求?放弃?些?利。因此，如果?分??件的副本，或者如果?修改它，?有某些?任：尊重他人自由的?任。
+
+例如，如果?分?此?程序的副本，无?是免?的?是收?的，?都必?将?收到的相同自由???接收者。?必??保他?也收到或可以?得源代?。并且?必?向他?展示?些条款，以便他?知道自己的?利。
+
+使用 GNU GPL 的??人?通??个??保??的?利：(1)
+??件主?版?，以及 (2)
+提供此?可?，?予??制、分?和/或修改它的法律?可。
+
+?了保???人?和作者，GPL
+明?解??此自由?件不提供任何保?。?了用?和作者的利益，GPL
+要求将修改后的版本???已更改，以便他?的??不会被??地?咎于先前版本的作者。
+
+某些??的??目的是拒?用???以安装或?行其中的?件的修改版本，尽管制造商可以??做。?与保?用?更改?件的自由的目?从根本上是不兼容的。???用的系?模式?生在个人使用的?品?域，而?正是最不可接受的地方。因此，我???了?个
+GPL
+版本来禁止?些?品的??做法。如果此???在其他?域大量出?，我?准?在未来版本的
+GPL 中将此条款?展到?些?域，以保?用?的自由。
+
+最后，?个程序都不断受到?件?利的威?。各国不?允??利限制通用?算机上?件的??和使用，但在允?的国家，我?希望避免?用于自由程序的?利可能使其??上成??有的特殊危?。?了防止??情况，GPL
+?保?利不能用于使程序不自由。
+
+以下是?制、分?和修改的精?条款和条件。
+
+条款和条件
+
+0. 定?。
+
+“本?可?”是指 GNU 通用公共?可?的第 3 版。
+
+“版?”也指?用于其他?型作品（如半?体掩模）的?似版?的法律。
+
+“程序”是指根据本?可??可的任何可版?作品。?个被?可人被称?“?”。“被?可人”和“接收者”可以是个人或??。
+
+“修改”作品是指以需要版??可的方式?制或改?作品的全部或部分，而不是制作完全相同的副本。?果作品被称?早期作品的“修改版本”或“基于”早期作品的作品。
+
+“受保?作品”是指未修改的程序或基于?程序的作品。
+
+“?播”作品是指?作品?行任何操作，如果没有?可，?将根据?用的版?法直接或?接承担侵??任，除非在?算机上?行它或修改私人副本。?播包括?制、分?（无?是否修改）、向公?提供，以及在某些国家/地区?包括其他活?。
+
+“?送”作品是指任何?型的?播，使其他方能?制作或接收副本。?通??算机网?与用??行交互，而不??副本，?不属于?送。
+
+交互式用?界面会?示“?当的法律声明”，因?它包含一个方便且?眼的特征，?特征
+(1) ?示?当的版?声明，以及 (2)
+告知用??作品不提供任何保?（除非提供保?），被?可人可以根据本?可??送?作品，以及如何?看本?可?的副本。如果界面?示用?命令或??列表（例如菜?），?列表中的一个?眼?目?足此?准。
+
+1. 源代?。
+
+作品的“源代?”是指用于?其?行修改的首?形式。“目?代?”是指作品的任何非源代?形式。
+
+“?准接口”是指要?是由公?的?准机?定?的官方?准，要?是??特定?程?言指定的接口，是在??言中工作的??人?广泛使用的接口。
+
+可?行作品的“系??”包括除整个作品之外的任何内容，?些内容 (a)
+包含在主要?件的正常包装形式中，但不是?主要?件的一部分，并且 (b)
+?用于使?作品与?主要?件一起使用，或??一??准接口，?接口的??以源代?形式向公?提供。在??情况下，“主要?件”是指可?行作品?行的特定操作系?（如果有）的主要基本?件（内核、窗口系?等），或用于生成?作品的??器，或用于?行它的目?代?解?器。
+
+目?代?形式的作品的“相?源代?”是指生成、安装和（?于可?行作品）?行目?代?以及修改?作品所需的所有源代?，包括控制?些活?的脚本。但是，它不包括作品的系??，或在?行?些活?中未修改使用但不是作品一部分的通用工具或通常可用的自由程序。例如，相?源代?包括与作品的源文件??的接口定?文件，以及作品?????需要的共享?和???接子程序的源代?，例如?些子程序与作品的其他部分之?的密切数据通信或控制流。
+
+相?源代?不需要包含用?可以从相?源代?的其他部分自?重新生成的任何内容。
+
+源代?形式的作品的相?源代?是同一个作品。
+
+2. 基本?限。
+
+根据本?可?授予的所有?利均在程序的版?期限内授予，并且在?足?定条件的情况下不可撤?。本?可?明?????行未修改程序的无限?可。?当?出内容?成受保?作品?，?行受保?作品的?出才受本?可?的?束。本?可?承??由版?法提供的合理使用或其他同等?利。
+
+只要?的?可?仍然有效，?就可以制作、?行和?播?不?送的受保?作品，而无需任何条件。?可以将受保?作品?送?他人，其唯一目的是?他??????行修改，或??提供?行?些作品的?施，前提是?在?送?不控制版?的所有材料?遵守本?可?的条款。因此，??制作或?行受保?作品的人?必?完全代表?，在?的指?和控制下?行，并且在条款中禁止他?在与??系之外?制?的受版?材料。
+
+?在以下?定的条件下才允?在任何其他情况下?送。不允?再?可；第 10
+?使其不必要。
+
+3. 根据反?避法保?用?的合法?利。
+
+根据 1996 年 12 月 20 日通?的 WIPO 版?条?第 11
+条或禁止或限制?避此?措施的?似法律，任何受保?作品均不得被??任何?用法律下的有效技?措施的一部分。
+
+当??送受保?作品?，?将放弃任何禁止?避技?措施的法律?力，只要通?行使本?可?下?于受保?作品的?利来?施此??避，并且?声明?无意限制作品的操作或修改，作???作品用?的?制?行手段，?或第三方的合法?利禁止?避技?措施。
+
+4. ?送完整副本。
+
+?可以以?收到的任何介??送程序的源代?的完整副本，前提是?在?个副本上?着且?当地?布?当的版?声明；完整保留所有声明本?可?和根据第
+7
+?添加的任何非?可条款?用于代?的通知；完整保留所有没有保?的通知；并向所有接收者提供本?可?以及程序。
+
+?可以??个??送的副本收取任何价格或不收取任何价格，并且?可以付?提供支持或保修保?。
+
+5. ?送修改后的源代?版本。
+
+?可以根据第 4
+?的条款，以源代?的形式?送基于程序的作品，或用于从程序生成它的修改，前提是?也?足所有以下条件
+
+-   a) ?作品必??有?眼的通知，?明??其?行了修改，并?出相?日期。
+-   b) ?作品必??有?眼的通知，?明它已根据本?可?以及根据第 7
+    ?添加的任何条件?布。此要求修改了第 4
+    ?中“完整保留所有通知”的要求。
+-   c)
+    ?必?根据本?可??可整个作品（作?一个整体）?任何?得副本的人。因此，本?可?以及任何?用的第
+    7
+    ?附加条款将?用于整个作品及其所有部分，无?它?如何包装。本?可?不允?以任何其他方式?可?作品，但如果??独收到此??可，它不会使此??可无效。
+-   d)
+    如果作品具有交互式用?界面，??个界面都必??示?当的法律声明；但是，如果程序具有不?示?当法律声明的交互式界面，??的作品无需使其??做。
+
+将受保?作品与其他?独且独立的作品（本?上不是受保?作品的?展，并且未与其?合形成更大的程序）?合在存?或分?介?的卷中或之上，如果??合及其?生的版?不用于限制??合用?的???限或合法?利，超出各个作品允?的范?，?称?“聚合”。将受保?的作品包含在聚合中不会?致本?可??用于聚合的其他部分。
+
+6. ?送非源代?形式。
+
+?可以按照第4?和第5?的条款，以目?代?形式?播受保?的作品，前提是??必?按照本?可?的条款，以以下方式之一?播机器可?的相?源代?：
+
+-   a)
+    在?物?品（包括物理分?介?）中或以?物?品体?的形式?播目?代?，并附?固定在通常用于?件交?的耐用物理介?上的相?源代?。
+-   b)
+    在?物?品（包括物理分?介?）中或以?物?品体?的形式?播目?代?，并附?一??面?价，??价有效期至少三年，并且在????品型号提供?件或客?支持的??内有效，以便向任何?有?目?代?的人提供以下????：（1）以不高于?????行此源代??播而?生的合理成本的价格，在通常用于?件交?的耐用物理介?上，提供??品中受本?可?保?的所有?件的相?源代?的副本；或者（2）免?从网?服?器??并?制相?源代?。
+-   c)
+    ?播目?代?的?独副本，并附?一?提供相?源代?的?面?价。此替代方案?允?偶?且非商?性地使用，并且?当?收到附?此??价的目?代??，才允?使用，?符合第6b小?的?定。
+-   d)
+    通?从指定地点（免?或收?）提供???限来?播目?代?，并以相同方式通?同一地点免?提供?相?源代?的同等???限。?无需要求接收者在?制目?代?的同??制相?源代?。如果?制目?代?的地点是网?服?器，?相?源代?可能位于?一个服?器（由?或第三方??），?服?器支持等效的?制功能，前提是?在目?代?旁???清晰的?明，?明在?里可以找到相?源代?。无??个服?器托管相?源代?，?仍有???保其在?足?些要求所需的??内可用。
+-   e)
+    使用点?点???播目?代?，前提是?告知其他?等方，?作品的目?代?和相?源代?正根据第6d小?的?定向公?免?提供。
+
+目?代?中可分?的部分，其源代?作?系??被排除在相?源代?之外，不必包含在?播目?代?作品中。
+
+“用??品”是指（1）“消?品”，?意味着通常用于个人、家庭或家庭用途的任何有形个人??；或（2）?并入住宅而??或?售的任何物品。在?定?品是否?消?品?，有疑?的情况?有利于覆盖范?。?于特定用?收到的特定?品，“通常使用”是指???品的典型或常?用途，而与特定用?的身?或特定用???使用或?期或被期望使用??品的方式无?。无??品是否具有??性的商?、工?或非消?用途，只要此?用途不代表??品的唯一重要使用模式，??品都是消?品。
+
+“用??品的安装信息”是指安装和?行?用??品中受保?作品的修改版本，以及来自其相?源代?的修改版本所需的任何方法、程序、授?密?或其他信息。?些信息必?足以?保修改后的目?代?的持?功能在任何情况下都不会??因??行了修改而被阻止或干?。
+
+如果?在本?下在用??品中或与用??品一起?播，或???了在用??品中使用而?播目?代?作品，并且??播?生在将用??品的占有?和使用?永久或定期（无?如何定?交易）?移?接收者的交易中，?本?下?播的相?源代?必?附?安装信息。但是，如果无?是??是任何第三方都无法在用??品上安装修改后的目?代?（例如，?作品已安装在ROM中），?此要求不?用。
+
+提供安装信息的要求不包括?接收者修改或安装的作品或?已修改或安装?作品的用??品??提供支持服?、保修或更新的要求。当修改本身?网?的?行?生重大不利影?或?反网?通信的??和???，可以拒???网?。
+
+根据本??播的相?源代?和提供的安装信息必?采用公???的格式（并且以源代?形式向公?提供?施），并且在解??、?取或?制?无需特殊的密?或密?。
+
+7. 附加条款。
+
+“附加?可”是指通??本?可?的一个或多个条件?行例外?理来?充本?可?条款的条款。?用于整个程序的附加?可???已包含在本?可?中，前提是它?在?用法律下有效。如果附加?可??用于程序的一部分，??部分可以在?些?可下?独使用，但整个程序仍然受本?可?管?，而无需考?附加?可。
+
+当??播受保?作品的副本?，?可以??从?副本或其任何部分?除任何附加?可。（附加?可可以?写?在?修改作品的某些情况下要求自行?除。）?可以??添加到受保?作品的材料添加附加?可，?于?些材料，??有或可以提供?当的版??可。
+
+尽管本?可?有任何其他?定，?于?添加到受保?作品中的材料，?可以（如果?材料的版?持有人授?）使用以下条款?充本?可?的条款：
+
+-   a) 免除保修或以不同于本?可?第15?和第16?条款的方式限制?任；或
+-   b)
+    要求在?材料或包含?材料的作品?示的?当法律声明中保留指定的合理法律声明或作者署名；或
+-   c)
+    禁止歪曲?材料的来源，或要求以合理的方式将?材料的修改版本???与原始版本不同；或
+-   d) 限制将?可人或?材料作者的姓名用于宣?目的；或
+-   e) 拒?授予商?法下的?利，以使用某些商品名称、商?或服???；或
+-   f)
+    要求?播?材料（或其修改版本）的任何人通?合同承担?接收者的?任，??些合同假?直接?加??些?可人和作者的任何?任???材料的?可人和作者。
+
+所有其他非允?的附加条款都被??第10?含?内的“?一?限制”。如果程序在?收到?或其任何部分包含声明它受本?可?管?以及?一?限制的条款，?可以?除?条款。如果?可文档包含?一?限制，但允?根据本?可?重新?可或?播，?可以将受??可文档条款管?的材料添加到受保?的作品中，前提是?一?限制不会在重新?可或?播后??存在。
+
+如果?根据本?向受保?的作品添加条款，?必?在相?的源文件中放置一?声明，?明?用于?些文件的附加条款，或?明在?里可以找到?用的条款的通知。
+
+附加条款（允?或不允?）可以以?独?面?可的形式?明，也可以以例外形式?明；上述要求以任何一?方式均?用。
+
+8. ?止。
+
+除非本?可?明??定，否??不得?播或修改受保?的作品。任何其他???播或修改它的行?均无效，并将自??止?在本?可?下的?利（包括根据第11?第三段授予的任何?利?可）。
+
+但是，如果?停止所有?反本?可?的行?，??从特定版?持有人?得的?可将恢?：（a）??恢?，除非且直到版?持有人明?且最??止?的?可；以及（b）永久恢?，如果版?持有人未在?停止??行?后
+60 天之前通?某?合理方式通知???行?。
+
+此外，如果版?持有人通?某?合理方式通知???行?，?是?第一次收到?版?持有人?于?反本?可?（?于任何作品）的通知，并且?在收到通知后
+30 天内?正??行?，??从特定版?持有人?得的?可将永久恢?。
+
+根据本??止?的?利不会?止根据本?可?从?那里收到副本或?利的各方的?可。如果?的?利已?止且未永久恢?，??没有?格根据第10??得相同材料的新?可。
+
+9. ?有副本无需接受。
+
+?无需接受本?可?即可接收或?行?程序的副本。?因使用点?点??来接收副本而?生的受保?作品的?助?播也不需要接受。但是，除了本?可?之外，没有任何?西授予??播或修改任何受保?作品的?限。如果?不接受本?可?，?些行?将侵犯版?。因此，通?修改或?播受保?的作品，?表示?接受本?可???做。
+
+10. 向下游接收者自??可。
+
+?次??播受保?的作品?，接收者都会自?从原始?可人那里?得?可，以?行、修改和?播?作品，但需遵守本?可?。?不???制第三方遵守本?可?。
+
+“?体交易”是指?移??控制?或一个??的大部分??，或拆分??或合并??的交易。如果受保?作品的?播是由?体交易引起的，??交易的?一方接收到?作品的副本，也将?得?方的前任所有人在先前段落下?有或可以?予的??作品的任何?可，以及从前任所有人??得?作品相?源代?的占有?，如果前任所有人?有?源代?或可以通?合理的努力?得?源代?。
+
+?不得?根据本?可?授予或??的?利的行使施加任何?一?的限制。例如，?不得?根据本?可?授予的?利的行使施加?可?、版税或其他?用，并且?不得提起??（包括??中的反?或交叉??），指控任何?利?要求因制造、使用、?售、要?出售或?口?程序或其任何部分而受到侵犯。
+
+11. ?利。
+
+“?献者”是指授?根据本?可?使用?程序或以?程序?基?的作品的版?持有人。因此?可的作品称??献者的“?献者版本”。
+
+?献者的“基本?利?要求”是指?献者?有或控制的所有?利?要求（无?是否已??得或此后?得），?些?利?要求会因本?可?允?的某?方式制造、使用或?售其?献者版本而受到侵犯，但不包括?因?一?修改?献者版本而受到侵犯的?要求。就本定?而言，“控制”包括以符合本?可?要求的方式授予?利子?可?的?利。
+
+?位?献者根据其基本?利?利要求，授予?一?非独占的、全球性的、免版税的?利?可，允??制作、使用、?售、提供?售、?口以及以其他方式?行、修改和?播其?献者版本的作品内容。
+
+在以下三个段落中，“?利?可”是指任何明?的??或承?，无?其名称如何，均指不?行?利（例如明??可?施?利或承?不起??利侵?）。“授予”一方?利?可，是指?成此???或承?，不??方?行?利。
+
+如果?在知情的情况下依??利?可??受保?的作品，并且?作品的相?源代?无法通?公共网?服?器或其他易于??的方式免?且根据本?可?的条款供任何人?制，那??必?
+(1) 使相?源代?可以如此?取，或 (2)
+安排放弃就此特定作品享受?利?可的利益，或 (3)
+以符合本?可?要求的方式安排将?利?可?展到下游接收者。“知情依?”是指???知?，若非??利?可，?在某个国家/地区??受保?的作品，或?的接收者在某个国家/地区使用受保?的作品，将侵犯?有理由??在?国家/地区有效的一?或多?可??的?利。
+
+如果?根据或?合?个交易或安排，??或通?促成??的方式?播受保?的作品，并向部分接收受保?作品的当事方授予?利?可，授?他?使用、?播、修改或??受保?作品的特定副本，那??授予的?利?可将自??展到受保?作品及其衍生作品的所有接收者。
+
+如果一??利?可不包括其覆盖范?内的内容，禁止行使，或以不以行使本?可?明?授予的一?或多??利?条件，???利?可具有“??性”。如果?与第三方存在分??件??的安排，?根据???作品的活?程度向第三方付款，并且第三方根据?安排向任何将从?那里接收受保?作品的当事方授予??性的?利?可，(a)
+与???的受保?作品副本（或从?些副本制作的副本）有?，或 (b)
+主要??包含受保?作品的特定?品或??，并且与?些?品或??有?，除非?在
+2007 年 3 月 28
+日之前?成?安排或授予??利?可，否??不得??受保?的作品。
+
+本?可?中的任何内容均不得解??排除或限制任何?含的?可或根据?用的?利法可能??有效的其他侵???。
+
+12. 不放弃他人自由。
+
+如果??施加（无?是通?法院命令、??或其他方式）与本?可?条件相矛盾的条件，?它?不会免除?遵守本?可?的条件。如果?无法??受保?的作品，以便同??足?在本?可?下的??和任何其他相???，那?作??果，?可能根本无法??它。例如，如果?同意某些条款，?些条款要求?向从??接收程序的人?收取?一???的版税，那??唯一可以同??足?些条款和本?可?的方式就是完全不???程序。
+
+13. 与 GNU Affero 通用公共?可?一起使用。
+
+尽管本?可?有任何其他?定，?仍有?将任何受保?的作品与根据 GNU Affero
+通用公共?可?第 3
+版?可的作品?接或?合成一个?独的?合作品，并??由此?生的作品。本?可?的条款将???用于作?受保?作品的部分，但
+GNU Affero 通用公共?可?第 13
+条?于通?网??行交互的特殊要求将?用于??合作品。
+
+14. 本?可?的修?版本。
+
+自由?件基金会可能会不??布 GNU
+通用公共?可?的修?版和/或新版本。?些新版本在精神上将与当前版本相似，但在??上可能会有所不同，以解决新的??或担?。
+
+?个版本都有一个不同的版本号。如果程序指定 GNU
+通用公共?可?的某个?号版本“或任何更高版本”?用于它，?可以??遵循??号版本或自由?件基金会?布的任何更高版本的条款和条件。如果程序未指定
+GNU 通用公共?可?的版本号，?可以??自由?件基金会?布的任何版本。
+
+如果程序指定代理可以决定可以使用 GNU
+通用公共?可?的?些未来版本，??代理公?声明接受某个版本将永久授????程序???版本。
+
+更高版本的?可?可能会???外的或不同的?限。但是，???遵循更高版本不会?任何作者或版?持有人施加?外的??。
+
+15. 免?声明。
+
+在?用法律允?的范?内，本程序不提供任何担保。除非?有?面?明，版?持有人和/或其他当事方“按原?”提供本程序，不提供任何形式的明示或暗示担保，包括但不限于???性和特定用途?用性的暗示担保。?于本程序的?量和性能的全部??由?承担。如果本程序被?明存在缺陷，?将承担所有必要的?修、修理或更正的?用。
+
+16. ?任限制。
+
+在任何情况下，除非?用法律要求或?有?面?定，否?任何版?持有人或任何其他根据上述允?修改和/或??本程序的当事方均不??承担任何?害???任，包括因使用或无法使用本程序而引起的任何一般性、特殊性、偶然性或??性?害??（包括但不限于数据?失或数据被呈?不准?或?或第三方遭受的?失或本程序无法与其他程序一起?行），即使?持有人或其他当事方已被告知可能?生此??害??。
+
+17. 第 15 和 16 条的解?。
+
+如果上述担保免?声明和?任限制无法根据其条款在当地?生法律效力，???法院??用与最接近??放弃与本程序相?的全部民事?任的当地法律，除非担保或?任承担伴随有?的本程序副本。
+
+条款和条件?束
+
+如何将?些条款?用于?的新程序
+
+如果???一个新的程序，并且希望它能?公?提供最大的便利，那????一目?的最佳方法是将其制作?自由?件，以便?个人都可以根据?些条款重新分?和更改。
+
+?此，?将以下声明附加到程序中。最安全的方法是将它?附加到?个源文件的??，以最有效地声明排除担保；?个文件?至少包含“版?”行和指向完整声明所在位置的指?。
+
+        <one line to give the program's name and a brief idea of what it does.>
+        Copyright (C) <year>  <name of author>
+
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <https://gnu.ac.cn/licenses/>.
+
+??添加有?如何通??子?件和???件与??系的信息。
+
+如果?程序具有?端交互功能，?使其在以交互模式????出如下?短的通知
+
+        <program>  Copyright (C) <year>  <name of author>
+        This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+        This is free software, and you are welcome to redistribute it
+        under certain conditions; type `show c' for details.
+
+假?的命令 `show w` 和 `show c`
+??示通用公共?可?的相?部分。当然，?程序的命令可能不同；?于 GUI
+界面，?可以使用“?于框”。
+
+如果需要，?????的雇主（如果?是程序?）或学校（如果有）?署?程序的“版?免?声明”。有?此主?以及如何?用和遵循
+GNU GPL 的更多信息，?参? <https://gnu.ac.cn/licenses/>。
+
+GNU
+通用公共?可?不允?将?的程序并入?有程序。如果?的程序是一个子例程?，?可能会??允??有?用程序与???接更有用。如果?想??做，?使用
+GNU ?通用公共?可?而不是本?可?。但首先，???
+<https://gnu.ac.cn/licenses/why-not-lgpl.html>。

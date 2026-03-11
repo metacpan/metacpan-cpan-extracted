@@ -9,6 +9,7 @@ requires 'LWP::Protocol::https';
 requires 'MIME::Base64';
 requires 'Log::Any';
 requires 'Module::Runtime';
+requires 'Module::Pluggable';
 requires 'Moose';
 requires 'MooseX::NonMoose';
 requires 'OpenAPI::Modern', '>= 0.089';  # needs v0.089+ for updated evaluator handling

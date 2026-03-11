@@ -3,6 +3,13 @@ use warnings;
 use Test::More;
 use File::Temp qw( tempfile );
 
+BEGIN {
+  package LangerthaX::Engine::TestKnarr;
+  sub new { my ($class, %args) = @_; bless \%args, $class }
+  sub simple_chat { return 'ok' }
+  $INC{'LangerthaX/Engine/TestKnarr.pm'} = __FILE__;
+}
+
 use Langertha::Knarr::Config;
 use Langertha::Knarr::Router;
 
@@ -119,6 +126,26 @@ YAML
 
   eval { $router->resolve('') };
   like $@, qr/No model specified/, 'empty model croaks';
+}
+
+# Test: resolve custom LangerthaX engine
+{
+  my ($fh, $file) = tempfile(SUFFIX => '.yaml', UNLINK => 1);
+  print $fh <<'YAML';
+models:
+  custom:
+    engine: TestKnarr
+    model: custom-model
+YAML
+  close $fh;
+
+  my $config = Langertha::Knarr::Config->new(file => $file);
+  my $router = Langertha::Knarr::Router->new(config => $config);
+
+  my ($engine, $model) = $router->resolve('custom');
+  ok $engine, 'custom engine resolved';
+  isa_ok $engine, 'LangerthaX::Engine::TestKnarr';
+  is $model, 'custom-model', 'custom model resolved';
 }
 
 done_testing;

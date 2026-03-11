@@ -213,16 +213,6 @@ This controls the C<memory.min> or C<memory.low> control group attribute.
 For details about this control group attribute, see L<Memory Interface
 Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
 
-Units may have their children use a default C<memory.min> or
-C<memory.low> value by specifying C<DefaultMemoryMin> or
-C<DefaultMemoryLow>, which has the same semantics as
-C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
-which has the same semantics as C<StartupMemoryLow>.
-This setting does not affect C<memory.min> or C<memory.low>
-in the unit itself.
-Using it to set a default child allocation is only useful on kernels older than 5.7,
-which do not support the C<memory_recursiveprot> cgroup2 mount option.
-
 While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
 C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
 the startup and shutdown phases. Using C<StartupMemoryLow> allows prioritizing specific services at
@@ -255,16 +245,6 @@ useful in order to always inherit all of the protection afforded by ancestors.
 This controls the C<memory.min> or C<memory.low> control group attribute.
 For details about this control group attribute, see L<Memory Interface
 Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
-
-Units may have their children use a default C<memory.min> or
-C<memory.low> value by specifying C<DefaultMemoryMin> or
-C<DefaultMemoryLow>, which has the same semantics as
-C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
-which has the same semantics as C<StartupMemoryLow>.
-This setting does not affect C<memory.min> or C<memory.low>
-in the unit itself.
-Using it to set a default child allocation is only useful on kernels older than 5.7,
-which do not support the C<memory_recursiveprot> cgroup2 mount option.
 
 While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
 C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
@@ -1082,6 +1062,26 @@ Programs in the unit will be only able to use the eth2 network interface.
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'BindNetworkInterface',
+      {
+        'description' => 'Takes the name of a network interface. This option causes every socket created by processes of this
+unit to be bound to the specified network interface.
+
+It is specially useful to confine a process to a VRF, when the program does not offer native support
+for it. It is equivalent to running the program using C<ip vrf exec>.
+
+In systems using C<nss-resolve>, the interface used for DNS resolution can be chosen
+by using the C<SYSTEMD_NSS_RESOLVE_IFINDEX> environment variable.
+
+The feature is implemented with C<cgroup/sock_create> cgroup-bpf hooks.
+
+Example:
+    [Service]
+    BindNetworkInterface=vrf-mgmt
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'NFTSet',
       {
         'description' => 'This setting provides a method for integrating dynamic cgroup, user and group IDs into
@@ -1097,7 +1097,7 @@ consists of a colon-separated tuple of source type (one of C<cgroup>,
 C<user> or C<group>), NFT address family (one of
 C<arp>, C<bridge>, C<inet>, C<ip>,
 C<ip6>, or C<netdev>), table name and set name. The names of tables
-and sets must conform to lexical restrictions of NFT table names. The type of the element used in
+and sets must conform to lexicographic restrictions of NFT table names. The type of the element used in
 the NFT filter must match the type implied by the directive (C<cgroup>,
 C<user> or C<group>) as shown in the table below. When a control
 group or a unit is realized, the corresponding ID will be appended to the NFT sets and it will be
@@ -1165,7 +1165,7 @@ the socket and the service unit, however it often makes sense to maintain one co
 one more restricted, depending on the use case.
 
 Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+support is not enabled in the underlying kernel or container manager). These settings will have no effect in
 that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
 (requires C<Delegate>=C<yes>) instead of using this setting.',
         'type' => 'leaf',
@@ -1200,7 +1200,7 @@ the socket and the service unit, however it often makes sense to maintain one co
 one more restricted, depending on the use case.
 
 Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+support is not enabled in the underlying kernel or container manager). These settings will have no effect in
 that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
 (requires C<Delegate>=C<yes>) instead of using this setting.',
         'type' => 'leaf',
@@ -1652,7 +1652,7 @@ L<systemd-coredump(8)>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 258 doc',
+    'generated_by' => 'parse-man.pl from systemd 260 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

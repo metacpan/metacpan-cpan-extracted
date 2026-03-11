@@ -2,25 +2,27 @@
 #include "ptypes.h"
 
 #include "primality.h"
+#include "lucas_seq.h"
 #include "gmp_main.h"  /* primality_pretest */
 #include "bls75.h"
 #include "ecpp.h"
 #include "factor.h"
 
-#define FUNC_is_perfect_square 1
 #define FUNC_mpz_logn
 #include "utility.h"
+#define FUNC_is_perfect_square 1
+#include "misc_ui.h"
 
 #define NSMALLPRIMES 54
 static const unsigned char sprimes[NSMALLPRIMES] = {2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199,211,223,227,229,233,239,241,251};
 
 
 /* 0 fail, 1 pass, -1 nothing.  Modifies base a */
-static int _preprocess_base(mpz_t n, mpz_t a)
+static int _preprocess_base(const mpz_t n, mpz_t a)
 {
   if (mpz_cmp_ui(a, 1) <= 0)
     croak("Base %ld is invalid", mpz_get_si(a));
-  if (mpz_cmp_ui(n, 3) <= 0)
+  if (mpz_cmp_ui(n, 2) <= 0)
     return (mpz_cmp_ui(n, 2) >= 0);
 
   if (mpz_cmp_ui(a, 2) > 0) {
@@ -33,7 +35,7 @@ static int _preprocess_base(mpz_t n, mpz_t a)
   return -1;
 }
 
-int is_pseudoprime(mpz_t n, mpz_t a)
+int is_pseudoprime(const mpz_t n, mpz_t a)
 {
   mpz_t nm1;
   int res;
@@ -49,7 +51,7 @@ int is_pseudoprime(mpz_t n, mpz_t a)
   return res;
 }
 
-int is_euler_pseudoprime(mpz_t n, mpz_t a)
+int is_euler_pseudoprime(const mpz_t n, mpz_t a)
 {
   mpz_t nm1, ap;
   int res;
@@ -81,7 +83,7 @@ int is_euler_pseudoprime(mpz_t n, mpz_t a)
   return res;
 }
 
-static int mrx(/*destroyed*/mpz_t x, /*destroyed*/ mpz_t d, mpz_t n, UV s)
+static int mrx(/*destroyed*/mpz_t x, /*destroyed*/ mpz_t d, const mpz_t n, UV s)
 {
   UV r;
   mpz_powm(x, x, d, n);
@@ -99,14 +101,14 @@ static int mrx(/*destroyed*/mpz_t x, /*destroyed*/ mpz_t d, mpz_t n, UV s)
 }
 
 
-int miller_rabin(mpz_t n, mpz_t a)
+int miller_rabin(const mpz_t n, mpz_t a)
 {
   mpz_t d, x;
   int cmpr, rval = 1;
 
   cmpr = mpz_cmp_ui(n, 2);
   if (cmpr == 0)     return 1;  /* 2 is prime */
-  if (cmpr < 0)      return 0;  /* below 2 is composite */
+  if (cmpr < 0)      return 0;  /* below 2 is not prime */
   if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   if (mpz_cmp_ui(a, 1) <= 0) croak("Base %ld is invalid", mpz_get_si(a));
 
@@ -126,14 +128,14 @@ int miller_rabin(mpz_t n, mpz_t a)
   mpz_clear(x);
   return rval;
 }
-int miller_rabin_ui(mpz_t n, unsigned long a)
+int miller_rabin_ui(const mpz_t n, unsigned long a)
 {
   mpz_t d, x;
   int cmpr, rval = 1;
 
   cmpr = mpz_cmp_ui(n, 2);
   if (cmpr == 0)     return 1;  /* 2 is prime */
-  if (cmpr < 0)      return 0;  /* below 2 is composite */
+  if (cmpr < 0)      return 0;  /* below 2 is not prime */
   if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   if (a <= 1) croak("Base %lu is invalid", a);
 
@@ -153,7 +155,7 @@ int miller_rabin_ui(mpz_t n, unsigned long a)
   return rval;
 }
 
-int is_miller_prime(mpz_t n, int assume_grh)
+int is_miller_prime(const mpz_t n, int assume_grh)
 {
   mpz_t d, x, D;
   UV s, maxa, a;
@@ -162,7 +164,7 @@ int is_miller_prime(mpz_t n, int assume_grh)
   {
     int cmpr = mpz_cmp_ui(n, 2);
     if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is composite */
+    if (cmpr < 0)      return 0;  /* below 2 is not prime */
     if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   }
 
@@ -207,7 +209,7 @@ int is_miller_prime(mpz_t n, int assume_grh)
   return rval;
 }
 
-int miller_rabin_random(mpz_t n, UV numbases, char* seedstr)
+int miller_rabin_random(const mpz_t n, UV numbases, char* seedstr)
 {
   gmp_randstate_t randstate;
   mpz_t t, base;
@@ -257,7 +259,7 @@ int miller_rabin_random(mpz_t n, UV numbases, char* seedstr)
 }
 
 
-int is_euler_plumb_pseudoprime(mpz_t n)
+int is_euler_plumb_pseudoprime(const mpz_t n)
 {
   unsigned int nmod8;
   mpz_t x, two;
@@ -279,216 +281,6 @@ int is_euler_plumb_pseudoprime(mpz_t n)
   }
   mpz_clear(two); mpz_clear(x);
   return result;
-}
-
-/* Returns Lucas sequence  U_k mod n and V_k mod n  defined by P,Q */
-void lucas_seq(mpz_t U, mpz_t V, mpz_t n, IV P, IV Q, mpz_t k,
-               mpz_t Qk, mpz_t t)
-{
-  UV b = mpz_sizeinbase(k, 2);
-  IV D = P*P - 4*Q;
-
-  if (mpz_cmp_ui(n, 2) < 0) croak("Lucas sequence modulus n must be > 1");
-  MPUassert( mpz_cmp_ui(k, 0) >= 0, "lucas_seq: k is negative" );
-  MPUassert( mpz_cmp_si(n,(P>=0) ? P : -P) > 0, "lucas_seq: P is out of range");
-  MPUassert( mpz_cmp_si(n,(Q>=0) ? Q : -Q) > 0, "lucas_seq: Q is out of range");
-  MPUassert( D != 0, "lucas_seq: D is zero" );
-
-  if (mpz_cmp_ui(k, 0) <= 0) {
-    mpz_set_ui(U, 0);
-    mpz_set_ui(V, 2);
-    return;
-  }
-  if (mpz_even_p(n)) {
-    /* If n is even, then we can't divide by 2.  Do it differently. */
-    alt_lucas_seq(U, V, n, P, Q, k, Qk, t);
-    return;
-  }
-
-  mpz_set_ui(U, 1);
-  mpz_set_si(V, P);
-  mpz_set_si(Qk, Q);
-
-  if (Q == 1) {
-    /* Use the fast V method if possible.  Much faster with small n. */
-    mpz_set_si(t, P*P-4);
-    if (P > 2 && mpz_invert(t, t, n)) {
-      /* Compute V_k and V_{k+1}, then computer U_k from them. */
-      mpz_set_si(V, P);
-      mpz_set_si(U, P*P-2);
-      while (b > 1) {
-        b--;
-        if (mpz_tstbit(k, b-1)) {
-          mpz_mul(V, V, U);  mpz_sub_ui(V, V, P);  mpz_mod(V, V, n);
-          mpz_mul(U, U, U);  mpz_sub_ui(U, U, 2);  mpz_mod(U, U, n);
-        } else {
-          mpz_mul(U, V, U);  mpz_sub_ui(U, U, P);  mpz_mod(U, U, n);
-          mpz_mul(V, V, V);  mpz_sub_ui(V, V, 2);  mpz_mod(V, V, n);
-        }
-      }
-      mpz_mul_ui(U, U, 2);
-      mpz_submul_ui(U, V, P);
-      mpz_mul(U, U, t);
-    } else {
-      /* Fast computation of U_k and V_k, specific to Q = 1 */
-      while (b > 1) {
-        mpz_mulmod(U, U, V, n, t);     /* U2k = Uk * Vk */
-        mpz_mul(V, V, V);
-        mpz_sub_ui(V, V, 2);
-        mpz_mod(V, V, n);               /* V2k = Vk^2 - 2 Q^k */
-        b--;
-        if (mpz_tstbit(k, b-1)) {
-          mpz_mul_si(t, U, D);
-                                      /* U:  U2k+1 = (P*U2k + V2k)/2 */
-          mpz_mul_si(U, U, P);
-          mpz_add(U, U, V);
-          if (mpz_odd_p(U)) mpz_add(U, U, n);
-          mpz_fdiv_q_2exp(U, U, 1);
-                                      /* V:  V2k+1 = (D*U2k + P*V2k)/2 */
-          mpz_mul_si(V, V, P);
-          mpz_add(V, V, t);
-          if (mpz_odd_p(V)) mpz_add(V, V, n);
-          mpz_fdiv_q_2exp(V, V, 1);
-        }
-      }
-    }
-  } else {
-    while (b > 1) {
-      mpz_mulmod(U, U, V, n, t);     /* U2k = Uk * Vk */
-      mpz_mul(V, V, V);
-      mpz_submul_ui(V, Qk, 2);
-      mpz_mod(V, V, n);               /* V2k = Vk^2 - 2 Q^k */
-      mpz_mul(Qk, Qk, Qk);            /* Q2k = Qk^2 */
-      b--;
-      if (mpz_tstbit(k, b-1)) {
-        mpz_mul_si(t, U, D);
-                                    /* U:  U2k+1 = (P*U2k + V2k)/2 */
-        mpz_mul_si(U, U, P);
-        mpz_add(U, U, V);
-        if (mpz_odd_p(U)) mpz_add(U, U, n);
-        mpz_fdiv_q_2exp(U, U, 1);
-                                    /* V:  V2k+1 = (D*U2k + P*V2k)/2 */
-        mpz_mul_si(V, V, P);
-        mpz_add(V, V, t);
-        if (mpz_odd_p(V)) mpz_add(V, V, n);
-        mpz_fdiv_q_2exp(V, V, 1);
-
-        mpz_mul_si(Qk, Qk, Q);
-      }
-      mpz_mod(Qk, Qk, n);
-    }
-  }
-  mpz_mod(U, U, n);
-  mpz_mod(V, V, n);
-}
-
-void alt_lucas_seq(mpz_t Uh, mpz_t Vl, mpz_t n, IV P, IV Q, mpz_t k,
-                   mpz_t Ql, mpz_t t)
-{
-  mpz_t Vh, Qh;
-  int j, s = mpz_scan1(k,0), b = mpz_sizeinbase(k,2);
-
-  if (mpz_sgn(k) <= 0) {
-    mpz_set_ui(Uh, 0);
-    mpz_set_ui(Vl, 2);
-    return;
-  }
-
-  mpz_set_ui(Uh, 1);
-  mpz_set_ui(Vl, 2);
-  mpz_set_ui(Ql, 1);
-  mpz_init_set_si(Vh,P);
-  mpz_init_set_ui(Qh,1);
-
-  for (j = b; j > s; j--) {
-    mpz_mul(Ql, Ql, Qh);
-    mpz_mod(Ql, Ql, n);
-    if (mpz_tstbit(k, j)) {
-      mpz_mul_si(Qh, Ql, Q);
-      mpz_mul(Uh, Uh, Vh);
-      mpz_mul_si(t, Ql, P);  mpz_mul(Vl, Vl, Vh); mpz_sub(Vl, Vl, t);
-      mpz_mul(Vh, Vh, Vh); mpz_sub(Vh, Vh, Qh); mpz_sub(Vh, Vh, Qh);
-    } else {
-      mpz_set(Qh, Ql);
-      mpz_mul(Uh, Uh, Vl);  mpz_sub(Uh, Uh, Ql);
-      mpz_mul_si(t, Ql, P);  mpz_mul(Vh, Vh, Vl); mpz_sub(Vh, Vh, t);
-      mpz_mul(Vl, Vl, Vl);  mpz_sub(Vl, Vl, Ql);  mpz_sub(Vl, Vl, Ql);
-    }
-    mpz_mod(Qh, Qh, n);
-    mpz_mod(Uh, Uh, n);
-    mpz_mod(Vh, Vh, n);
-    mpz_mod(Vl, Vl, n);
-  }
-  mpz_mul(Ql, Ql, Qh);
-  mpz_mul_si(Qh, Ql, Q);
-  mpz_mul(Uh, Uh, Vl);  mpz_sub(Uh, Uh, Ql);
-  mpz_mul_si(t, Ql, P);  mpz_mul(Vl, Vl, Vh);  mpz_sub(Vl, Vl, t);
-  mpz_mul(Ql, Ql, Qh);
-  mpz_clear(Qh);  mpz_clear(Vh);
-  mpz_mod(Ql, Ql, n);
-  mpz_mod(Uh, Uh, n);
-  mpz_mod(Vl, Vl, n);
-  for (j = 0; j < s; j++) {
-    mpz_mul(Uh, Uh, Vl);
-    mpz_mul(Vl, Vl, Vl);  mpz_sub(Vl, Vl, Ql);  mpz_sub(Vl, Vl, Ql);
-    mpz_mul(Ql, Ql, Ql);
-    mpz_mod(Ql, Ql, n);
-    mpz_mod(Uh, Uh, n);
-    mpz_mod(Vl, Vl, n);
-  }
-}
-
-void lucasuv(mpz_t Uh, mpz_t Vl, IV P, IV Q, mpz_t k)
-{
-  mpz_t Vh, Ql, Qh, t;
-  int j, s, n;
-
-  if (mpz_sgn(k) <= 0) {
-    mpz_set_ui(Uh, 0);
-    mpz_set_ui(Vl, 2);
-    return;
-  }
-
-  mpz_set_ui(Uh, 1);
-  mpz_set_ui(Vl, 2);
-  mpz_init_set_si(Vh,P);
-  mpz_init(t);
-
-  s = mpz_scan1(k, 0);     /* number of zero bits at the end */
-  n = mpz_sizeinbase(k,2);
-
-  /* It is tempting to try to pull out the various Q operations when Q=1 or
-   * Q=-1.  This doesn't lead to any immediate savings.  Don't bother unless
-   * there is a way to reduce the actual operations involving U and V. */
-  mpz_init_set_ui(Ql,1);
-  mpz_init_set_ui(Qh,1);
-
-  for (j = n; j > s; j--) {
-    mpz_mul(Ql, Ql, Qh);
-    if (mpz_tstbit(k, j)) {
-      mpz_mul_si(Qh, Ql, Q);
-      mpz_mul(Uh, Uh, Vh);
-      mpz_mul_si(t, Ql, P);  mpz_mul(Vl, Vl, Vh); mpz_sub(Vl, Vl, t);
-      mpz_mul(Vh, Vh, Vh); mpz_sub(Vh, Vh, Qh); mpz_sub(Vh, Vh, Qh);
-    } else {
-      mpz_set(Qh, Ql);
-      mpz_mul(Uh, Uh, Vl);  mpz_sub(Uh, Uh, Ql);
-      mpz_mul_si(t, Ql, P);  mpz_mul(Vh, Vh, Vl); mpz_sub(Vh, Vh, t);
-      mpz_mul(Vl, Vl, Vl);  mpz_sub(Vl, Vl, Ql);  mpz_sub(Vl, Vl, Ql);
-    }
-  }
-  mpz_mul(Ql, Ql, Qh);
-  mpz_mul_si(Qh, Ql, Q);
-  mpz_mul(Uh, Uh, Vl);  mpz_sub(Uh, Uh, Ql);
-  mpz_mul_si(t, Ql, P);  mpz_mul(Vl, Vl, Vh);  mpz_sub(Vl, Vl, t);
-  mpz_mul(Ql, Ql, Qh);
-  mpz_clear(Qh);  mpz_clear(t);  mpz_clear(Vh);
-  for (j = 0; j < s; j++) {
-    mpz_mul(Uh, Uh, Vl);
-    mpz_mul(Vl, Vl, Vl);  mpz_sub(Vl, Vl, Ql);  mpz_sub(Vl, Vl, Ql);
-    mpz_mul(Ql, Ql, Ql);
-  }
-  mpz_clear(Ql);
 }
 
 int lucas_lehmer(UV p)
@@ -562,7 +354,7 @@ int lucas_lehmer(UV p)
 }
 
 /* Returns:  -1 unknown, 0 composite, 2 definitely prime */
-int llr(mpz_t N)
+int llr(const mpz_t N)
 {
   mpz_t v, k, V, U, Qk, t;
   UV i, n, P;
@@ -622,7 +414,7 @@ DONE_LLR:
   return res;
 }
 /* Returns:  -1 unknown, 0 composite, 2 definitely prime */
-int proth(mpz_t N)
+int proth(const mpz_t N)
 {
   mpz_t v, k, a;
   UV n;
@@ -637,28 +429,26 @@ int proth(mpz_t N)
   /* N = k * 2^n + 1 */
   if (mpz_sizeinbase(k,2) <= n) {
     mpz_init(a);
-    for (i = 0; i < 25 && res == -1; i++) {
+    /* Sze (2018) form without Jacobi tests */
+    mpz_tdiv_q_2exp(k, v, 1);
+    for (i = 0; i < 30 && res == -1; i++) {
       mpz_set_ui(a, sprimes[i]);
-      if (mpz_jacobi(a, N) == -1)
-        res = 0;
-    }
-    /* (a,N) = -1 if res=0.  Do Proth primality test. */
-    if (res == 0) {
-      mpz_tdiv_q_2exp(k, v, 1);
       mpz_powm(a, a, k, N);
-      if (mpz_cmp(a, v) == 0)
-        res = 2;
+      if (mpz_cmp_ui(a,1) != 0)
+        res = (mpz_cmp(a, v) == 0)  ?  2  :  0;
     }
     mpz_clear(a);
   }
   /* TODO: look into Rao (2018): k*2^n+1 for n>1, k prime */
   /* if (n > 1 && res == -1 && _GMP_BPSW(k)) { ... } */
   mpz_clear(k); mpz_clear(v);
-  if (res != -1 && get_verbose_level() > 1) printf("N shown %s with Proth\n", res ? "prime" : "composite");
-  fflush(stdout);
+  if (res != -1 && get_verbose_level() > 1) {
+    printf("N shown %s with Proth\n", res ? "prime" : "composite");
+    fflush(stdout);
+  }
   return res;
 }
-int is_proth_form(mpz_t N)
+int is_proth_form(const mpz_t N)
 {
   mpz_t v, k;
   UV n;
@@ -675,7 +465,7 @@ int is_proth_form(mpz_t N)
   return res;
 }
 
-static int lucas_selfridge_params(IV* P, IV* Q, mpz_t n, mpz_t t)
+static int lucas_selfridge_params(IV* P, IV* Q, const mpz_t n, mpz_t t)
 {
   IV D = 5;
   UV Dui = (UV) D;
@@ -698,7 +488,7 @@ static int lucas_selfridge_params(IV* P, IV* Q, mpz_t n, mpz_t t)
   return 1;
 }
 
-static int lucas_extrastrong_params(IV* P, IV* Q, mpz_t n, mpz_t t, UV inc)
+static int lucas_extrastrong_params(IV* P, IV* Q, const mpz_t n, mpz_t t, UV inc)
 {
   UV tP = 3;
   if (inc < 1 || inc > 256)
@@ -708,7 +498,7 @@ static int lucas_extrastrong_params(IV* P, IV* Q, mpz_t n, mpz_t t, UV inc)
     UV gcd = mpz_gcd_ui(NULL, n, D);
     if (gcd > 1 && mpz_cmp_ui(n, gcd) != 0)
       return 0;
-    mpz_set_ui(t, D);
+    mpz_set_uv(t, D);
     if (mpz_jacobi(t, n) == -1)
       break;
     if (tP == (3+20*inc) && mpz_perfect_square_p(n))
@@ -738,7 +528,7 @@ static int lucas_extrastrong_params(IV* P, IV* Q, mpz_t n, mpz_t t, UV inc)
  * Testing on my x86_64 machine, the strong Lucas code is over 35% faster than
  * T.R. Nicely's implementation, and over 40% faster than David Cleaver's.
  */
-int _GMP_is_lucas_pseudoprime(mpz_t n, int strength)
+int _GMP_is_lucas_pseudoprime(const mpz_t n, int strength)
 {
   mpz_t d, U, V, Qk, t;
   IV P, Q;
@@ -749,7 +539,7 @@ int _GMP_is_lucas_pseudoprime(mpz_t n, int strength)
   {
     int cmpr = mpz_cmp_ui(n, 2);
     if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is composite */
+    if (cmpr < 0)      return 0;  /* below 2 is not prime */
     if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   }
 
@@ -827,7 +617,7 @@ int _GMP_is_lucas_pseudoprime(mpz_t n, int strength)
  * Lucas pseudoprimes.  With increment = 2, we produce Pari's results (we've
  * added the necessary GCD with D so we produce somewhat fewer).
  */
-int _GMP_is_almost_extra_strong_lucas_pseudoprime(mpz_t n, UV increment)
+int _GMP_is_almost_extra_strong_lucas_pseudoprime(const mpz_t n, UV increment)
 {
   mpz_t d, V, W, t;
   UV P, s;
@@ -836,7 +626,7 @@ int _GMP_is_almost_extra_strong_lucas_pseudoprime(mpz_t n, UV increment)
   {
     int cmpr = mpz_cmp_ui(n, 2);
     if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is composite */
+    if (cmpr < 0)      return 0;  /* below 2 is not prime */
     if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   }
 
@@ -946,14 +736,14 @@ int _GMP_is_almost_extra_strong_lucas_pseudoprime(mpz_t n, UV increment)
   return rval;
 }
 
-int is_perrin_pseudoprime(mpz_t n, int restricted)
+int is_perrin_pseudoprime(const mpz_t n, int restricted)
 {
   mpz_t S[6], T[6], T01, T34, T45, t;
   int cmpr, i, j, rval;
 
   cmpr = mpz_cmp_ui(n, 2);
   if (cmpr == 0)     return 1;  /* 2 is prime */
-  if (cmpr < 0)      return 0;  /* below 2 is composite */
+  if (cmpr < 0)      return 0;  /* below 2 is not prime */
   if (restricted > 2 && mpz_even_p(n)) return 0;
 
   { /* Simple filter for composites */
@@ -1043,10 +833,10 @@ DONE_PERRIN:
   for (i=0; i < 6; i++)
     mpz_clear(S[i]);
   mpz_clear(t);
-  return rval;
+  return rval ? 1 : 0;
 }
 
-int is_frobenius_pseudoprime(mpz_t n, IV P, IV Q)
+int is_frobenius_pseudoprime(const mpz_t n, IV P, IV Q)
 {
   mpz_t t, Vcomp, d, U, V, Qk;
   IV D;
@@ -1056,7 +846,7 @@ int is_frobenius_pseudoprime(mpz_t n, IV P, IV Q)
   {
     int cmpr = mpz_cmp_ui(n, 2);
     if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is composite */
+    if (cmpr < 0)      return 0;  /* below 2 is not prime */
     if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   }
   mpz_init(t);
@@ -1075,7 +865,7 @@ int is_frobenius_pseudoprime(mpz_t n, IV P, IV Q)
     } while (k == 1);
   } else {
     D = P*P-4*Q;
-    if (is_perfect_square( D >= 0 ? D : -D, 0 ))
+    if (is_perfect_square( D >= 0 ? D : -D ))
       croak("Frobenius invalid P,Q: (%"IVdf",%"IVdf")", P, Q);
     mpz_set_si(t, D);
     k = mpz_jacobi(t, n);
@@ -1108,7 +898,7 @@ int is_frobenius_pseudoprime(mpz_t n, IV P, IV Q)
   if (k == 1) {
     mpz_set_si(Vcomp, 2);
   } else {
-    mpz_set_si(Vcomp, Q);
+    mpz_set_iv(Vcomp, Q);
     mpz_mul_ui(Vcomp, Vcomp, 2);
     mpz_mod(Vcomp, Vcomp, n);
   }
@@ -1127,7 +917,7 @@ int is_frobenius_pseudoprime(mpz_t n, IV P, IV Q)
 }
 
 /* Use Crandall/Pomerance, steps from Loebenberger 2008 */
-int is_frobenius_cp_pseudoprime(mpz_t n, UV ntests)
+int is_frobenius_cp_pseudoprime(const mpz_t n, UV ntests)
 {
   mpz_t t, a, b, d, w1, wm, wm1, m;
   UV tn;
@@ -1221,7 +1011,7 @@ int is_frobenius_cp_pseudoprime(mpz_t n, UV ntests)
 }
 
 /* New code based on draft paper */
-int _GMP_is_frobenius_underwood_pseudoprime(mpz_t n)
+int _GMP_is_frobenius_underwood_pseudoprime(const mpz_t n)
 {
   mpz_t temp1, temp2, n_plus_1, s, t;
   unsigned long a, ap2, len;
@@ -1231,7 +1021,7 @@ int _GMP_is_frobenius_underwood_pseudoprime(mpz_t n)
   {
     int cmpr = mpz_cmp_ui(n, 2);
     if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is composite */
+    if (cmpr < 0)      return 0;  /* below 2 is not prime */
     if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   }
 
@@ -1292,7 +1082,7 @@ int _GMP_is_frobenius_underwood_pseudoprime(mpz_t n)
   return rval;
 }
 
-int _GMP_is_frobenius_khashin_pseudoprime(mpz_t n)
+int _GMP_is_frobenius_khashin_pseudoprime(const mpz_t n)
 {
   mpz_t t, ta, tb, ra, rb, a, b, n_minus_1;
   unsigned long c = 1;
@@ -1301,7 +1091,7 @@ int _GMP_is_frobenius_khashin_pseudoprime(mpz_t n)
   {
     int cmpr = mpz_cmp_ui(n, 2);
     if (cmpr == 0)     return 1;  /* 2 is prime */
-    if (cmpr < 0)      return 0;  /* below 2 is composite */
+    if (cmpr < 0)      return 0;  /* below 2 is not prime */
     if (mpz_even_p(n)) return 0;  /* multiple of 2 is composite */
   }
   if (mpz_perfect_square_p(n)) return 0;
@@ -1363,7 +1153,7 @@ int _GMP_is_frobenius_khashin_pseudoprime(mpz_t n)
 
 
 
-int _GMP_BPSW(mpz_t n)
+int _GMP_BPSW(const mpz_t n)
 {
   if (mpz_cmp_ui(n, 4) < 0)
     return (mpz_cmp_ui(n, 1) <= 0) ? 0 : 2;
@@ -1381,7 +1171,7 @@ int _GMP_BPSW(mpz_t n)
 }
 
 /* Assume n is a BPSW PRP, return 1 (no result), 0 (composite), 2 (prime) */
-int is_deterministic_miller_rabin_prime(mpz_t n)
+int is_deterministic_miller_rabin_prime(const mpz_t n)
 {
   mpz_t t;
   int i, res = 1, maxp = 0;
@@ -1435,7 +1225,7 @@ int is_deterministic_miller_rabin_prime(mpz_t n)
  * find it a composite.
  */
 
-int _GMP_is_prob_prime(mpz_t n)
+int _GMP_is_prob_prime(const mpz_t n)
 {
   /*  Step 1: Look for small divisors.  This is done purely for performance.
    *          It is *not* a requirement for the BPSW test. */
@@ -1448,7 +1238,7 @@ int _GMP_is_prob_prime(mpz_t n)
   return _GMP_BPSW(n);
 }
 
-int is_bpsw_dmr_prime(mpz_t n)
+int is_bpsw_dmr_prime(const mpz_t n)
 {
   int prob_prime = _GMP_BPSW(n);
   if (prob_prime == 1) {
@@ -1458,7 +1248,7 @@ int is_bpsw_dmr_prime(mpz_t n)
   return prob_prime;
 }
 
-int _GMP_is_prime(mpz_t n)
+int _GMP_is_prime(const mpz_t n)
 {
   UV nbits;
   /* Similar to is_prob_prime, but put LLR before BPSW, then do more testing */
@@ -1491,9 +1281,9 @@ int _GMP_is_prime(mpz_t n)
   /* For small numbers, try a quick BLS75 proof. */
   if (prob_prime == 1) {
     if (is_proth_form(n))
-      prob_prime = _GMP_primality_bls_nm1(n, 2 /* effort */, 0 /* cert */);
+      prob_prime = BLS_primality_nm1(n, 2 /* effort */, 0 /* cert */);
     else if (nbits <= 150)
-      prob_prime = _GMP_primality_bls_nm1(n, 0 /* effort */, 0 /* cert */);
+      prob_prime = BLS_primality_nm1(n, 0 /* effort */, 0 /* cert */);
     /* We could do far better by calling bls75_hybrid, especially with a
      * larger effort.  But that takes more time.  I've decided it isn't worth
      * the extra time here.  We'll still try a very quick N-1 proof. */
@@ -1524,11 +1314,14 @@ int _GMP_is_prime(mpz_t n)
    * We can also perform random sampling to get empirical data, which shows
    * a probability of less than 1e-12 at 65 bits, and lowering as the number
    * of bits increases.  One extra test is all that is necessary.
+   *
+   * Recall that to get here with prob_prime=1 means n is 83+ bits, has no
+   * factors under 1009, passed a SPSP-2 test, and an extra-strong Lucas test.
    */
 
   if (prob_prime == 1) {
-    UV ntests = 1;
-    prob_prime = miller_rabin_random(n, ntests, 0);
+    UV n_extra_tests = 1;
+    prob_prime = miller_rabin_random(n, n_extra_tests, 0);
     /* prob_prime = _GMP_is_frobenius_underwood_pseudoprime(n); */
     /* prob_prime = _GMP_is_frobenius_khashin_pseudoprime(n); */
   }
@@ -1544,7 +1337,7 @@ int _GMP_is_prime(mpz_t n)
 }
 
 
-int _GMP_is_provable_prime(mpz_t n, char** prooftext)
+int _GMP_is_provable_prime(const mpz_t n, char** prooftext)
 {
   int prob_prime = primality_pretest(n);
   if (prob_prime != 1)  return prob_prime;
@@ -1572,14 +1365,22 @@ int _GMP_is_provable_prime(mpz_t n, char** prooftext)
   if (prob_prime != 1)  return prob_prime;
 
   /* We can choose a primality proving algorithm:
-   *   AKS    _GMP_is_aks_prime       really slow, don't bother
-   *   N-1    _GMP_primality_bls_nm1  small or special numbers
-   *   ECPP   _GMP_ecpp               fastest in general
+   *   AKS      _GMP_is_aks_prime       really slow, don't bother
+   *   N-1      BLS_primality_nm1       small or special numbers
+   *   N+1      BLS_primality_np1       small or special numbers
+   *   N-1/N+1  BLS_primality           small or special numbers
+   *   ECPP     _GMP_ecpp               fastest in general
    */
 
-  /* Give n-1 a small go */
-  prob_prime = _GMP_primality_bls_nm1(n, is_proth_form(n) ? 3 : 1, prooftext);
-  if (prob_prime != 1)  return prob_prime;
+  if (prooftext) {
+    /* Give n-1 a small go */
+    prob_prime = BLS_primality_nm1(n, is_proth_form(n) ? 3 : 1, prooftext);
+    if (prob_prime != 1)  return prob_prime;
+  } else {
+    /* See if there's an easy n-1 / n+1 hybrid proof */
+    prob_prime = BLS_primality(n, is_proth_form(n) ? 3 : 1, prooftext);
+    if (prob_prime != 1)  return prob_prime;
+  }
 
   /* ECPP */
   prob_prime = _GMP_ecpp(n, prooftext);

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -9,9 +9,8 @@ use Encode qw(from_to);
 use XML::LibXML;
 
 use EBook::Ishmael::Decode qw(palmdoc_decode);
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_id);
 use EBook::Ishmael::PDB;
-use EBook::Ishmael::MobiHuff;
 use EBook::Ishmael::Time qw(guess_time);
 
 # Many thanks to Tommy Persson, the original author of mobi2html, a script
@@ -26,6 +25,8 @@ my $CREATOR = 'MOBI';
 my $RECSIZE = 4096;
 
 my $NULL_INDEX = 0xffffffff;
+
+my $UNPACK_Q = !! eval { unpack "Q>", 1 };
 
 sub heuristic {
 
@@ -56,6 +57,163 @@ sub heuristic {
     $ver = unpack "N", $ver;
 
     return $ver != 8;
+
+}
+
+
+# Many thanks to Calibre, much of the code in this module was based on their
+# huffman decoder.
+
+package EBook::Ishmael::EBook::Mobi::MobiHuff {
+
+    my $HUFF_HDR = pack "A4 N", 'HUFF', 24;
+    my $CDIC_HDR = pack "A4 N", 'CDIC', 16;
+
+    sub _load_huff {
+
+        my $self = shift;
+        my $huff = shift;
+
+        unless (substr($huff, 0, 8) eq $HUFF_HDR) {
+            die "Invalid MOBI HUFF header\n";
+        }
+
+        my @off = unpack "N N", substr $huff, 8, 8;
+
+        @{ $self->{dict1} } = map {
+
+            my $len  = $_ & 0x1f;
+            my $term = $_ & 0x80;
+            my $max  = $_ >> 8;
+
+            if ($len == 0) {
+                die "Invalid MOBI HUFF dictionary\n";
+            }
+
+            if ($len <= 8 and !$term) {
+                die "Invalid MOBI HUFF dictionary\n";
+            }
+
+            $max = (($max + 1) << (32 - $len)) - 1;
+
+            [ $len, $term, $max ];
+
+        } unpack "N256", substr $huff, $off[0], 4 * 256;
+
+        my @dict2 = unpack "N64", substr $huff, $off[1], 4 * 64;
+
+        my @mins = (0, map { $dict2[$_] } grep { $_ % 2 == 0 } (0 .. $#dict2));
+        my @maxs = (0, map { $dict2[$_] } grep { $_ % 2 != 0 } (0 .. $#dict2));
+
+        $self->{mincode} = [ map { $mins[$_] << (32 - $_) } (0 .. $#mins) ];
+        $self->{maxcode} = [ map { (($maxs[$_] + 1) << (32 - $_)) - 1 } (0 .. $#maxs) ];
+
+        return 1;
+
+    }
+
+    sub _load_cdic {
+
+        my $self = shift;
+        my $cdic = shift;
+
+        unless (substr($cdic, 0, 8) eq $CDIC_HDR) {
+            die "Invalid MOBI CDIC header\n";
+        }
+
+        my ($phrases, $bits) = unpack "N N", substr $cdic, 8, 8;
+
+        my $n = min(1 << $bits, $phrases - @{ $self->{dictionary} });
+
+        push @{ $self->{dictionary} }, map {
+
+            my $blen = unpack "n", substr $cdic, 16 + $_;
+
+            [
+                substr($cdic, 18 + $_, $blen & 0x7fff),
+                $blen & 0x8000,
+            ];
+
+        } unpack "n$n", substr $cdic, 16;
+
+        return 1;
+
+    }
+
+    sub new {
+
+        my $class = shift;
+        my $huff  = shift;
+        my @cdic  = @_;
+
+        my $self = {
+            dict1 => [],
+            dictionary => [],
+            mincode => [],
+            maxcode => [],
+        };
+
+        bless $self, $class;
+
+        $self->_load_huff($huff);
+
+        for my $c (@cdic) {
+            $self->_load_cdic($c);
+        }
+
+        return $self;
+
+    }
+
+    sub decode {
+
+        my $self = shift;
+        my $data = shift;
+
+        my $left = length($data) * 8;
+        $data .= "\x00" x 8;
+        my $pos = 0;
+        my $x = unpack "Q>", $data;
+        my $n = 32;
+
+        my $s = '';
+
+        while (1) {
+
+            if ($n <= 0) {
+                $pos += 4;
+                $x = unpack "Q>", substr $data, $pos, 8;
+                $n += 32;
+            }
+            my $code = ($x >> $n) & ((1 << 32) - 1);
+
+            my ($len, $term, $max) = @{ $self->{dict1}[$code >> 24] };
+            unless ($term) {
+                $len += 1 while $code < $self->{mincode}[$len];
+                $max = $self->{maxcode}[$len];
+            }
+
+            $n    -= $len;
+            $left -= $len;
+            last if $left < 0;
+
+            my $r = ($max - $code) >> (32 - $len);
+
+            my ($slice, $flag) = @{ $self->{dictionary}[$r] };
+
+            unless ($flag) {
+                $self->{dictionary}[$r] = [];
+                $slice = $self->decode($slice);
+                $self->{dictionary}[$r] = [ $slice, 1 ];
+            }
+
+            $s .= $slice;
+
+        }
+
+        return $s;
+
+    }
 
 }
 
@@ -682,13 +840,13 @@ sub new {
 
     if ($self->{_compression} == 17480) {
 
-        unless ($EBook::Ishmael::MobiHuff::UNPACK_Q) {
+        unless ($UNPACK_Q) {
             die "Cannot read AZW $self->{Source}; perl does not support " .
                 "unpacking 64-bit integars\n";
         }
 
         my @huffs = map { $self->{_pdb}->record($_)->data } ($hoff .. $hoff + $hcount - 1);
-        $self->{_huff} = EBook::Ishmael::MobiHuff->new(@huffs);
+        $self->{_huff} = EBook::Ishmael::EBook::Mobi::MobiHuff->new(@huffs);
     }
 
     if ($self->{_length} >= 0xe3 and $self->{_version} >= 5) {
@@ -718,8 +876,9 @@ sub new {
     if (defined $self->{_imgrec}) {
         for my $i ($self->{_imgrec} .. $self->{_lastcont}) {
             my $img = $self->{_pdb}->record($i)->data;
-            my $id = image_id(\$img);
-            push @{ $self->{_images} }, $i if defined $id;
+            my $format = image_id($img);
+            next if not defined $format;
+            push @{ $self->{_images} }, [ $i, $format ];
         }
     }
 
@@ -729,7 +888,7 @@ sub new {
 
     if (
         defined $self->{_coverrec} and
-        not grep { $self->{_coverrec} == $_ } @{ $self->{_images} }
+        not grep { $self->{_coverrec} == $_->[0] } @{ $self->{_images} }
     ) {
         undef $self->{_coverrec};
     }
@@ -900,20 +1059,13 @@ sub cover {
     my $self = shift;
     my $out  = shift;
 
-    return undef unless $self->has_cover;
+    return (undef, undef) unless $self->has_cover;
 
     my $bin = $self->{_pdb}->record($self->{_coverrec})->data;
+    my $format = image_id($bin);
+    return (undef, undef) if not defined $format;
 
-    if (defined $out) {
-        open my $fh, '>', $out
-            or die "Failed to open $out for writing: $!\n";
-        binmode $fh;
-        print { $fh } $out;
-        close $fh;
-        return $out;
-    } else {
-        return $bin;
-    }
+    return ($bin, $format);
 
 }
 
@@ -931,12 +1083,12 @@ sub image {
     my $n    = shift;
 
     if ($n >= $self->image_num) {
-        return undef;
+        return (undef, undef);
     }
 
-    my $img = $self->{_pdb}->record($self->{_images}->[$n])->data;
+    my $img = $self->{_pdb}->record($self->{_images}->[$n][0])->data;
 
-    return \$img;
+    return ($img, $self->{_images}[$n][1]);
 
 }
 

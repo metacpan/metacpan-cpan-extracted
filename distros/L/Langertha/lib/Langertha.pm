@@ -1,12 +1,14 @@
 package Langertha;
 # ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
-our $VERSION = '0.305';
+our $VERSION = '0.307';
 use utf8;
 use strict;
 use warnings;
 
+use Carp ();
 use Import::Into;
-use Module::Runtime qw( use_module );
+use Module::Pluggable::Object ();
+use Module::Runtime qw( require_module use_module );
 
 my %_sugar_plugins;  # per-class plugin accumulator
 
@@ -48,6 +50,97 @@ sub import {
   }
 }
 
+sub _module_path {
+  my ($module) = @_;
+  my $path = $module;
+  $path =~ s{::}{/}g;
+  return $path . '.pm';
+}
+
+sub _is_missing_module_error {
+  my ($err, $module) = @_;
+  return 0 unless defined $err && length $err;
+  my $pm_path = _module_path($module);
+  return index($err, "Can't locate $pm_path in \@INC") >= 0 ? 1 : 0;
+}
+
+sub discover_modules_in_scope {
+  my ($class, %args) = @_;
+  my $search_path = $args{search_path};
+  $search_path = ['Langertha::Engine', 'LangerthaX::Engine']
+    unless ref($search_path) eq 'ARRAY' && @$search_path;
+
+  my $finder = Module::Pluggable::Object->new(
+    search_path => $search_path,
+    require     => 0,
+    inner       => 0,
+  );
+
+  my %seen;
+  my @modules = grep { defined $_ && length $_ && !$seen{$_}++ } $finder->plugins;
+  return [ sort @modules ];
+}
+
+sub available_engine_classes {
+  my ($class) = @_;
+  return $class->discover_modules_in_scope(
+    search_path => ['Langertha::Engine', 'LangerthaX::Engine'],
+  );
+}
+
+sub available_engine_ids {
+  my ($class) = @_;
+  my %ids;
+  for my $module (@{$class->available_engine_classes}) {
+    next unless $module =~ /::([^:]+)\z/;
+    $ids{lc($1)} = 1;
+  }
+  return [ sort keys %ids ];
+}
+
+sub resolve_engine_class {
+  my ($class, $engine) = @_;
+  Carp::croak("No engine specified") unless defined($engine) && length($engine);
+
+  my @candidates;
+  if ($engine =~ /::/) {
+    @candidates = ($engine);
+  } else {
+    my @ordered = ("Langertha::Engine::$engine", "LangerthaX::Engine::$engine");
+    my %available = map { $_ => 1 } @{$class->available_engine_classes};
+    @candidates = grep { $available{$_} } @ordered;
+    @candidates = @ordered unless @candidates;
+  }
+
+  my @errors;
+  for my $candidate (@candidates) {
+    my $ok = eval {
+      require_module($candidate);
+      1;
+    };
+    return $candidate if $ok;
+    my $err = $@;
+    if (!_is_missing_module_error($err, $candidate)) {
+      Carp::croak($err);
+    }
+    push @errors, $candidate;
+  }
+
+  Carp::croak(
+    "Engine '$engine' not found (tried: " . join(', ', @errors) . ")"
+  );
+}
+
+sub new_engine {
+  my ($class, $engine, @args) = @_;
+  Carp::croak("No engine specified") unless defined($engine) && length($engine);
+  Carp::croak("Engine constructor arguments must be key/value pairs")
+    if @args % 2;
+
+  my $engine_class = $class->resolve_engine_class($engine);
+  return $engine_class->new(@args);
+}
+
 
 1;
 
@@ -63,7 +156,7 @@ Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
 
 =head1 VERSION
 
-version 0.305
+version 0.307
 
 =head1 SYNOPSIS
 
@@ -120,7 +213,7 @@ B<THIS API IS WORK IN PROGRESS.>
 
 =over 4
 
-=item * B<23 engines> -- unified API across cloud and local LLM providers
+=item * B<24 engines> -- unified API across cloud and local LLM providers
 
 =item * B<Chat, streaming, embeddings, transcription, image generation>
 
@@ -179,6 +272,42 @@ function for applying plugins by short name.
 C<use Langertha qw( Plugin )> imports L<Moose> and
 L<Future::AsyncAwait>, and sets L<Langertha::Plugin> as superclass.
 
+=head2 Engine Discovery
+
+Langertha discovers engine modules in scope via L<Module::Pluggable> across
+both namespaces:
+
+=over 4
+
+=item * C<Langertha::Engine::*>
+
+=item * C<LangerthaX::Engine::*>
+
+=back
+
+Useful class methods:
+
+=over 4
+
+=item * C<< Langertha->available_engine_classes >>
+
+Returns discovered fully-qualified engine class names.
+
+=item * C<< Langertha->available_engine_ids >>
+
+Returns discovered engine IDs (lowercased short names).
+
+=item * C<< Langertha->resolve_engine_class($name_or_class) >>
+
+Resolves short names (for example C<OpenAI>) with core-first lookup,
+or accepts fully-qualified class names.
+
+=item * C<< Langertha->new_engine($name_or_class, %args) >>
+
+Resolves and constructs an engine instance in one call.
+
+=back
+
 =head2 Engine Modules
 
 =over 4
@@ -200,6 +329,8 @@ L<Future::AsyncAwait>, and sets L<Langertha::Plugin> as superclass.
 =item * L<Langertha::Engine::Gemini> - Google Gemini models (Flash, Pro)
 
 =item * L<Langertha::Engine::vLLM> - vLLM inference server
+
+=item * L<Langertha::Engine::SGLang> - SGLang inference server
 
 =item * L<Langertha::Engine::HuggingFace> - HuggingFace Inference Providers
 

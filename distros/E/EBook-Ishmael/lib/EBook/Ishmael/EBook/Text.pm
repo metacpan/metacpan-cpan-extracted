@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -8,6 +8,7 @@ use Encode qw(decode);
 use File::Basename;
 use File::Spec;
 
+use EBook::Ishmael::CharDet;
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::TextToHtml;
 
@@ -27,7 +28,7 @@ sub new {
 
     my $class = shift;
     my $file  = shift;
-    my $enc   = shift // 'UTF-8';
+    my $enc   = shift;
 
     my $self = {
         Source   => undef,
@@ -52,15 +53,7 @@ sub html {
     my $self = shift;
     my $out  = shift;
 
-    open my $rh, '<', $self->{Source}
-        or die "Failed to open $self->{Source} for reading: $!\n";
-    my $html = text2html(
-        decode(
-            $self->{Encode},
-            do { local $/ = undef; <$rh> }
-        )
-    );
-    close $rh;
+    my $html = text2html($self->raw);
 
     if (defined $out) {
         open my $wh, '>', $out
@@ -82,11 +75,15 @@ sub raw {
 
     open my $rh, '<', $self->{Source}
         or die "Failed to open $self->{Source} for reading: $!\n";
-    my $raw = decode(
-        $self->{Encode},
-        do { local $/ = undef; <$rh> }
-    );
+    binmode $rh;
+    my $raw = do { local $/; <$rh> };
     close $rh;
+
+    if (not defined $self->{Encode}) {
+        $self->{Encode} = chardet($raw) // 'ASCII';
+    }
+    say $self->{Encode};
+    $raw = decode($self->{Encode}, $raw);
 
     if (defined $out) {
         open my $wh, '>', $out
@@ -111,10 +108,10 @@ sub metadata {
 
 sub has_cover { 0 }
 
-sub cover { undef }
+sub cover { (undef, undef) }
 
 sub image_num { 0 }
 
-sub image { undef }
+sub image { (undef, undef) }
 
 1;

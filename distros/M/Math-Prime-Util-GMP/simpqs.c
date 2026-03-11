@@ -82,6 +82,8 @@
 #endif
 
 #include "utility.h"
+#include "misc_ui.h"
+#include "rootmod.h"
 
 /* DANAJ: Modify matrix code to do 64-bit-padded character arrays */
 typedef unsigned char* row_t;  /* row of an F2 matrix */
@@ -490,7 +492,7 @@ static void computeFactorBase(mpz_t n, unsigned long B,unsigned long multiplier)
   }
   prime_iterator_destroy(&iter);
 #ifdef LARGESTP
-  gmp_printf("Largest prime less than %Zd\n",p);
+  gmp_printf("Largest prime less than %lu\n",p);
 #endif
 
   /* Allocate and compute the number of bits required to store each prime */
@@ -517,7 +519,7 @@ static void tonelliShanks(unsigned long numPrimes, mpz_t n, mpz_t * sqrts)
   mpz_set_ui(sqrts[0], 0);
   for (i = 1; i < numPrimes; i++) {
     mpz_set_ui(fbprime, factorBase[i]);
-    sqrtmod_t(sqrts[i], n, fbprime, t1, t2, t3, t4);
+    sqrtmodp_t(sqrts[i], n, fbprime, t1, t2, t3, t4);
   }
   mpz_clear(t1); mpz_clear(t2); mpz_clear(t3); mpz_clear(t4);
   mpz_clear(fbprime);
@@ -1417,8 +1419,9 @@ static int mainRoutine(
     return nfactors;
 }
 
-int _GMP_simpqs(mpz_t n, mpz_t* farray)
+int _GMP_simpqs(const mpz_t n, mpz_t* farray)
 {
+  mpz_t nred;
   unsigned long numPrimes, Mdiv2, multiplier, decdigits, relSought;
   int result = 0;
   int verbose = get_verbose_level();
@@ -1433,28 +1436,32 @@ int _GMP_simpqs(mpz_t n, mpz_t* farray)
   gmp_printf("%Zd (%ld decimal digits)\n", n, decdigits);
 #endif
 
+  mpz_init_set(nred, n);
+
   /* It's important to remove small factors. */
   {
     UV p;
     PRIME_ITERATOR(iter);
     for (p = 2; p < 1000; p = prime_iterator_next(&iter)) {
-      if (mpz_cmp_ui(n, p*p) < 0) break;
-      while (mpz_divisible_ui_p(n, p)) {
+      if (mpz_cmp_ui(nred, p*p) < 0) break;
+      while (mpz_divisible_ui_p(nred, p)) {
         mpz_set_ui(farray[result++], p);
-        mpz_divexact_ui(n, n, p);
+        mpz_divexact_ui(nred, nred, p);
       }
     }
-    decdigits = mpz_sizeinbase(n,10);
-    if (decdigits < MINDIG)
+    decdigits = mpz_sizeinbase(nred,10);
+    if (decdigits < MINDIG) {
+      mpz_clear(nred);
       return result;
-    mpz_set(farray[result], n);
+    }
+    mpz_set(farray[result], nred);
   }
 
   /* Get a preliminary number of primes, pick a multiplier, apply it */
   numPrimes = (decdigits <= 91) ? primesNo[decdigits-MINDIG] : 64000;
-  multiplier = knuthSchroeppel(n, numPrimes);
-  mpz_mul_ui(n, n, multiplier);
-  decdigits = mpz_sizeinbase(n, 10);
+  multiplier = knuthSchroeppel(nred, numPrimes);
+  mpz_mul_ui(nred, nred, multiplier);
+  decdigits = mpz_sizeinbase(nred, 10);
 
   if (decdigits<=91) {
     numPrimes=primesNo[decdigits-MINDIG];
@@ -1490,11 +1497,12 @@ int _GMP_simpqs(mpz_t n, mpz_t* farray)
   /* We probably need fewer than this */
   relSought = numPrimes;
   initFactorBase();
-  computeFactorBase(n, numPrimes, multiplier);
+  computeFactorBase(nred, numPrimes, multiplier);
 
-  result += mainRoutine(numPrimes, Mdiv2, relSought, n, farray+result, multiplier);
+  result += mainRoutine(numPrimes, Mdiv2, relSought, nred, farray+result, multiplier);
 
   clearFactorBase();
+  mpz_clear(nred);
   if (verbose>2) {
     int i;
     gmp_printf("# qs:");

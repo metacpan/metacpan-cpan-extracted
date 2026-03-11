@@ -13,6 +13,18 @@ msgstr "The container is in the `$Aion::pleroma` variable and can be replaced wi
 msgid "Конфигурацию для создания эонов получает из конфига `PLEROMA` и файла аннотаций (создаётся пакетом `Aion::Annotation`). Файл аннотаций можно заменить через конфиг `INI`."
 msgstr "The configuration for creating eons is obtained from the `PLEROMA` config and the annotation file (created by the `Aion::Annotation` package). The annotation file can be replaced via the `INI` config."
 
+msgid "Настройки модуля, которые можно установить в `.config.pm`:"
+msgstr "Module settings that can be set in `.config.pm`:"
+
+msgid ""
+"* INI => 'etc/annotation/eon.ann' – файл аннотаций.\n"
+"* PLEROMA => {} – дополнительный набор эонов.\n"
+"* AUTOWARE => 1 – подгружать модули автоматически, даже если они не прописаны в конфигурации."
+msgstr ""
+"* INI => 'etc/annotation/eon.ann' – annotation file.\n"
+"* PLEROMA => {} – additional set of eons.\n"
+"* AUTOWARE => 1 – load modules automatically, even if they are not specified in the configuration."
+
 msgid "Файл с аннотациями."
 msgstr "Annotation file."
 

@@ -67,6 +67,52 @@
          }
       }
    },
+   "provides" : {
+      "Adam" : {
+         "file" : "lib/Adam.pm",
+         "version" : "1.003"
+      },
+      "Adam::Logger::API" : {
+         "file" : "lib/Adam/Logger/API.pm",
+         "version" : "1.003"
+      },
+      "Adam::Logger::Default" : {
+         "file" : "lib/Adam/Logger/Default.pm",
+         "version" : "1.003"
+      },
+      "Adam::Plugin" : {
+         "file" : "lib/Adam/Plugin.pm",
+         "version" : "1.003"
+      },
+      "Moses" : {
+         "file" : "lib/Moses.pm",
+         "version" : "1.003"
+      },
+      "Moses::Declare" : {
+         "file" : "lib/Moses/Declare.pm",
+         "version" : "1.003"
+      },
+      "Moses::Declare::Syntax::BotKeyword" : {
+         "file" : "lib/Moses/Declare/Syntax/BotKeyword.pm",
+         "version" : "1.003"
+      },
+      "Moses::Declare::Syntax::EventKeyword" : {
+         "file" : "lib/Moses/Declare/Syntax/EventKeyword.pm",
+         "version" : "1.003"
+      },
+      "Moses::Declare::Syntax::PluginKeyword" : {
+         "file" : "lib/Moses/Declare/Syntax/PluginKeyword.pm",
+         "version" : "1.003"
+      },
+      "Moses::Plugin" : {
+         "file" : "lib/Moses/Plugin.pm",
+         "version" : "1.003"
+      },
+      "oses" : {
+         "file" : "lib/oses.pm",
+         "version" : "1.003"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -81,7 +127,7 @@
       "x_IRC" : "irc://irc.perl.org/#ai",
       "x_IRC_user" : "Getty"
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -408,7 +454,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.002",
+                  "tag" : "1.003",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -497,6 +543,46 @@
             "version" : "6.037"
          },
          {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.037"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "MetaProvides::Package",
+            "version" : "2.004003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Class",
+            "config" : {
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               }
+            },
+            "name" : "MetaProvides::Class",
+            "version" : "2.001001"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.037"
@@ -544,6 +630,11 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.037"
          }
       ],

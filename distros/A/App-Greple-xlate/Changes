@@ -1,5 +1,12 @@
 Revision history for Perl extension App-Greple-xlate
 
+1.01 2026-03-11T07:21:18Z
+
+    - Replace embedded getoptlong.sh with Getopt::Long::Bash module
+    - Fix option parsing to stop at first non-option argument (PERMUTE)
+    - Add documentation about DeepL next-gen model behavior changes
+    - Fix MASKPATTERN markup in documentation
+
 1.00 2026-01-23T01:53:06Z
 
     - Replace App::cdif::Command with Command::Run

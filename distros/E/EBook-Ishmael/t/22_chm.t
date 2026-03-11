@@ -8,12 +8,12 @@ use File::Spec;
 
 use EBook::Ishmael::EBook;
 use EBook::Ishmael::EBook::CHM;
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_id);
 
 my $TEST_CHM = $ENV{TEST_CHM} // $EBook::Ishmael::EBook::CHM::CAN_TEST;
 
 unless ($TEST_CHM) {
-    plan skip_all => "TEST_CHM set to 0 or chmlib not installed";
+    plan skip_all => "TEST_CHM set to 0 or extract_chmLib nor hh.exe installed";
 }
 
 # I couldn't be bothered to figure out how to use Microsoft's CHM creator, so
@@ -34,22 +34,22 @@ ok($ebook->metadata->modified, 'metadata modified ok');
 ok($ebook->html, "html ok");
 ok($ebook->raw,  "raw ok");
 
-ok(!$ebook->has_cover, "has no cover");
+subtest 'cover ok' => sub {
+    TODO: {
+        local $TODO = "can't determine whether cover exists prior to dumping";
+        ok(!$ebook->has_cover, "has no cover");
+    }
+    my ($img, $format) = $ebook->cover;
+    ok(! defined $img && ! defined $format, 'no cover found');
+};
 
-ok(! defined $ebook->cover, "has no cover");
-
-is($ebook->image_num, 2, "image count ok");
-
-is(
-    image_id($ebook->image(0)),
-    "gif",
-    "image #0 ok"
-);
-
-is(
-    image_id($ebook->image(1)),
-    "gif",
-    "image #1 ok"
-);
+subtest 'images ok' => sub {
+    is($ebook->image_num, 2, 'image count ok');
+    for my $i (0, 1) {
+        my ($img, $format) = $ebook->image($i);
+        is($format, 'gif', "image #$i is gif");
+        is(image_id($img), 'gif', "image #$i looks like gif");
+    }
+};
 
 done_testing();

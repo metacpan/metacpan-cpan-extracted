@@ -73,7 +73,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
 =head1 VERSION
 
-    Version 1.00
+    Version 1.01
 
 =cut
 
@@ -114,14 +114,11 @@ git_topdir() {
 # Setup
 ##############################################################################
 
-# Set PATH for getoptlong.sh
+# Get share directory
 share=$(dist_dir App::Greple::xlate 2>/dev/null) || share=
 basedir="${0%/*/*}"
-if [[ $share ]]; then
-    PATH="$share/getoptlong:$PATH"
-elif [[ -f $basedir/share/getoptlong/getoptlong.sh ]]; then
+if [[ ! $share && -d $basedir/share ]]; then
     share="$basedir/share"
-    PATH="$share/getoptlong:$PATH"
 fi
 
 # Find dozo command
@@ -241,7 +238,7 @@ Usage: $myname [ options ] -t LANG FILE [ greple options ]
 END
 
 declare -A OPTS=(
-    [&USAGE]="$USAGE" [&REQUIRE]=0.2
+    [&USAGE]="$USAGE" [&REQUIRE]=0.8 [&PERMUTE]=
     # Basic options
     [     debug | d     # debug mode (enables trace)       ]=
     [     trace         # trace mode                       ]=

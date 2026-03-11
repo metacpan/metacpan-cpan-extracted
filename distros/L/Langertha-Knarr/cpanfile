@@ -1,6 +1,6 @@
 
-requires 'Langertha', '>= 0.303';
-requires 'Mojolicious', '>= 9.0';
+requires 'Langertha', '0.307';
+requires 'Mojolicious', '9.0';
 requires 'Moo';
 requires 'MooX::Cmd';
 requires 'MooX::Options';

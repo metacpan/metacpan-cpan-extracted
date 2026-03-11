@@ -1,4 +1,7 @@
 
+For new functions:
+  .h, .c, XS, export, t/02, Changes, doc, test
+
 - prime_count - needs the pc(#) option as well as pc(#,#)
 
 - Do a GMP version of LMO prime_count.  Possible versions:
@@ -77,9 +80,6 @@
   About 3 minutes vs. 7-8 just by using gmp_printf.
   Using sieve_range doesn't help, as the issue is the massive return array.
 
-- More efficient version of ramanujan_tau?  MPU has an hclassno implementation
-  now.  FLINT does an interesting method as well.
-
 - Consider ranged ramanujan_tau.  See:
   https://cs.uwaterloo.ca/journals/JIS/VOL13/Lygeros/lygeros5.pdf
   Where we could compute a number of hclassno values, then generate the
@@ -89,12 +89,11 @@
   certs possible.
 
 - consider probabilistic is_primitive_root for large inputs
+  [2024:  what does this mean?]
 
 - Verify speed and memory use of GMP's two binomials for various versions
   and compare.  Looks like Luschny sent his changes after 5.0.0.
   https://gmplib.org/list-archives/gmp-discuss/2010-February/004036.html
-
-- faster znprimroot
 
 - Identify places where 32-bit GMP on 64-bit Perl will trip us up.
 
@@ -106,23 +105,6 @@
   All current calls are testing primality, so don't need multiple returns.
   Changing the XS call to return multiple values might be useful.
 
-- mpu 'use bigint; $n=14299; say is_prime($n); say Math::Prime::Util::GMP::is_nplus1_prime($n)'
-  n=14299  F2=52 R2=275.  s=3,r=-37.  This passes theorem 17.
-  qi=2  p=66,q=2,d=4348
-  qi=13 p=45,q=1,d=2021
-  5543 also
-  all examples of this seem to be n+1 = 2 * [many small factors]
-
-  n = 5543 = 23*241, n+1=5544
-  n+1 = F2 * R2 = 88 * 63.  R2>1.  gcd(F2,R2)=1.
-  q_1 = 2    p=19,q=5,d=341
-  q_2 = 11   p=18,q=50,d=124
-  By Corollary 8, N is prime.
-  By Theorem 17, N is prime.
-  r2 = 63    p=11,q=29,d=5
-  By Corollary 10, N is prime
-  By Theorem 19, N is prime
-
 - zeta below -20 or so is increasingly wrong.  We should use reflection
   formula, but that requires some new functions.  The MPU interface doesn't
   even allow negative inputs at all so it isn't critical.
@@ -132,8 +114,7 @@
 - gamma, lngamma
   See http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.527.8519
   https://www.researchgate.net/publication/272039164_A_new_fast_asymptotic_series_for_the_gamma_function
-
-- lambertw should use increasing precision.
+  https://arxiv.org/pdf/2301.09699.pdf
 
 - Euler using:
    = binary splitting
@@ -150,12 +131,76 @@
 
 - tinyqs needs a destroy to clear all the init vars
 
-- maybe export rising_factorial and falling_factorial.
-
 - clean up dependencies links.  We now have to include *every* C file to
   compile SIMPQS standalone.  Completely unnecessary, but some utility
   functions are pulling in other things.
 
-- add sumliouville, prime_bigomega, prime_omega
+- add sumliouville
+  almost_prime_count(k,n)
+  nth_almost_prime(k,n)
+  smooth_count
+  rough_count
+  qnr
 
-- smooth/rough number functions
+- make the Bernoulli number cache incremental
+
+- fromdigits input digit array arguably should be signed bigints.
+
+- optimize prime_omega, prime_bigomega
+
+- Rademacher partitions
+
+- overpartitions
+  https://arxiv.org/pdf/2303.15895
+
+- rootmod, rootmodp
+- allsqrtmod
+- allrootmod
+
+- znlog is needed by rootmod
+  simple rho
+  distinguished point rho
+
+- next_perfect_power, prev_perfect_power
+  https://github.com/trizen/sidef/commit/81af8f018cca4ab7813d4cfaa46fd2e45796a52d
+
+- make is_carmichael deterministic test go faster
+
+- have trial factor use treesieve static function.
+
+- the 2021 BPSW test
+  https://arxiv.org/pdf/2006.14425
+  https://community.wolfram.com/groups/-/m/t/2344199?p_p_auth=UZ0BHnEu
+
+- Look into FLINT's poly ramanujan tau method by Fredrik Johansson.
+
+- Fubini
+
+- subfactorial for large enough n should use floor((n!+1)/e).  See Sidef.
+
+- factorial_valuation.  See MPU's util.c and
+  https://github.com/trizen/sidef/commit/e25e9b8429837fb32642bb77275592700f577829
+
+- Look at Sidef's factor_upto(n,limit)
+
+- better hclassno
+
+- consider exporting a sieve segment or sieve from/to routine.  Then our
+  trial iterator can sieve segments, vecprod them, do gcd.  Maybe a
+  prime_iterator_next64 to get 64 values.
+
+- many files cache small primes.  Do it once.  primes under 64k.
+
+- faster next/prev perfect power, look for odd powers, no loop needed.
+
+- addmod, mulmod, powmod, divmod -- work with GMP version 36 if n > 0
+
+- finish looking at all mp*_ui functions to check for UV/IV vs long use.
+
+- check overflow in prime iterator / trial division for 32-bit unsigned long.
+
+- binomialmod better using factorialmod:
+  factorial_valuation and _binoval, then use factorialmod
+  also maybe better factorialmod
+
+- real functions should have a settable default precision

@@ -14,7 +14,7 @@ App::Greple::xlate - greple 的翻译支持模块
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -77,7 +77,7 @@ Version 1.00
 
     --xlate-setopt maskfile=MASKPATTERN
 
-这会将文件 \`MASKPATTERN\` 的每一行作为正则表达式解释，翻译匹配的字符串，并在处理后恢复。以 `#` 开头的行会被忽略。
+这将把文件的每一行 `MASKPATTERN` 解释为正则表达式，翻译与其匹配的字符串，并在处理后还原。以 `#` 开头的行将被忽略。
 
 复杂的模式可以使用反斜杠转义换行写在多行上。
 

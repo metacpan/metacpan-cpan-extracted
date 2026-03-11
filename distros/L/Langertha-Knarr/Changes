@@ -1,5 +1,42 @@
 Revision history for Langertha-Knarr
 
+0.007     2026-03-10 20:05:00Z
+
+  - Resolve configured engines through both `Langertha::Engine::*` and
+    `LangerthaX::Engine::*` (including fully-qualified class names).
+  - Add router test coverage for `LangerthaX::Engine::*` custom engines.
+  - Tighten dependency minimums in cpanfile:
+    `Langertha 0.307`, `Mojolicious 9.0`.
+  - Update README and POD docs to describe custom engine resolution order.
+  - Dockerfile: add optional `LANGERTHA_SRC` build arg to inject unreleased
+    Langertha source when CPAN indexers lag.
+  - dist.ini release Docker build supports optional
+    `KNARR_DOCKER_BUILD_ARGS='...'` passthrough for temporary build overrides,
+    including GitHub release-dist URL examples and a note against
+    `/archive/refs/*` source archives for dzil dists.
+  - dist.ini now uploads `Langertha-Knarr-%v.tar.gz` to GitHub releases
+    (`Getty/langertha-knarr`) via `gh` during post-release hooks.
+  - dist.ini now runs `${GH_BIN:-gh}` directly in separate `run_after_release`
+    steps (no pre-check, no chained `&&`), so hooks use invoking-shell runtime
+    environment/path.
+
+0.005     2026-03-10 14:48:05Z
+
+  - Add primary Knarr normalization modules (core-backed):
+    `Langertha::Knarr::Input`, `Langertha::Knarr::Output`, `Langertha::Knarr::Metrics`.
+  - Bump `Langertha` dependency to `>= 0.306`.
+
+  - Add request policy hooks in `build_app`:
+    - `before_request` hook to inspect/mutate/block requests before routing
+    - `api_key_validator` hook for dynamic per-request key authorization
+  - Add cross-format tool bridging between OpenAI and Anthropic request/response shapes
+    (including `tools`, `tool_choice`, `tool_calls`, `tool_use`, and `tool_result`)
+  - Add Hermes tool XML bridging:
+    - Parse `<tool_call>{...}</tool_call>` into OpenAI `tool_calls`
+    - Parse `<tool_call>{...}</tool_call>` into Anthropic `tool_use` blocks
+  - Route OpenAI `tools` through Hermes-capable engines by normalizing tool schema
+  - Extend proxy/unit/integration tests for hook behavior and tool-bridge paths
+
 0.004     2026-03-03 05:22:38Z
 
   - Fix routing priority: passthrough before default engine fallback

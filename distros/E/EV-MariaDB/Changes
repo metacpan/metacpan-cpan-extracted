@@ -1,0 +1,16 @@
+0.01  2026-03-07
+    - Async queries via MariaDB non-blocking API
+    - Query pipelining via mysql_send_query/mysql_read_query_result
+    - Prepared statements (prepare, execute, close_stmt, stmt_reset)
+    - Column metadata (field names) returned with query/execute results
+    - Streaming row-by-row results via query_stream
+    - Async transaction control (commit, rollback, autocommit)
+    - BLOB/TEXT streaming via send_long_data/bind_params
+    - Async graceful close via close_async
+    - set_charset for runtime character set changes
+    - Connection utility ops: ping, reset_connection, select_db, change_user
+    - Connection options (timeouts, compression, charset, SSL, multi_statements)
+    - Accessors: insert_id, warning_count, info, error_number, sqlstate
+    - Multi-result set drain for multi-statement queries
+    - Escape functions
+    - Short method aliases (q, prep, reconnect, disconnect, errstr, errno)

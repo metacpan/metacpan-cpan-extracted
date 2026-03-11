@@ -3,6 +3,10 @@ use common::sense; use open qw/:std :utf8/;  use Carp qw//; use Cwd qw//; use Fi
 # 
 # Aion::Emitter - диспетчер событий
 # 
+# # VERSION
+# 
+# 0.1.0
+# 
 # # SYNOPSIS
 # 
 # Файл lib/Event/BallEvent.pm:

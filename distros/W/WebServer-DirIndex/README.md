@@ -1,5 +1,8 @@
 # WebServer::DirIndex
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/davorg-cpan/webserver-dirindex/perltest.yml)
+![CPAN Version](https://img.shields.io/cpan/v/WebServer-DirIndex)
+
 Directory index data for web server listings.
 
 ## Synopsis
@@ -29,9 +32,10 @@ render a directory index page for a web server. It provides access to the
 list of file entries and can generate an HTML page via
 [WebServer::DirIndex::HTML](lib/WebServer/DirIndex/HTML.pm).
 
-The distribution includes three modules:
+The distribution includes four modules:
 
 - **WebServer::DirIndex** — reads a directory and exposes file entries.
+- **WebServer::DirIndex::File** - contains details of a single file in the directory.
 - **WebServer::DirIndex::HTML** — renders the HTML directory index page.
 - **WebServer::DirIndex::CSS** — provides standard and "pretty" CSS stylesheets.
 
@@ -49,6 +53,15 @@ make install
 - [HTTP::Date](https://metacpan.org/pod/HTTP::Date)
 - [Plack](https://metacpan.org/pod/Plack)
 - [URI::Escape](https://metacpan.org/pod/URI::Escape)
+
+## Code, bugs and questions
+
+This module is available [on CPAN](https://metacpan.org/pod/WebServer::DirIndex).
+
+The code is available [on GitHub](https://github.com/davorg-cpan/webserver-dirindex).
+
+For any questions, bug reports or suggestions, please use the
+[issue tracker](https://github.com/davorg-cpan/webserver-dirindex).
 
 ## Author
 

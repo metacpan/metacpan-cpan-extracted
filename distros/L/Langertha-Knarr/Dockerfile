@@ -1,11 +1,17 @@
 FROM perl:5.38-slim
 
+ARG LANGERTHA_SRC=""
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN cpanm --notest \
-    Langertha \
+RUN if [ -n "$LANGERTHA_SRC" ]; then \
+      cpanm --notest "$LANGERTHA_SRC"; \
+    else \
+      cpanm --notest Langertha; \
+    fi \
+    && cpanm --notest \
     Mojolicious \
     Moo \
     MooX::Cmd \

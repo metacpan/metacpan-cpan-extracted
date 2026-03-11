@@ -35,12 +35,6 @@ L<systemd.resource-control(5)>,
 which configure resource control settings for the processes of the
 service.
 
-If SysV init compat is enabled, systemd automatically creates service units that wrap SysV init
-scripts (the service name is the same as the name of the script, with a C<.service>
-suffix added); see
-L<systemd-sysv-generator(8)>.
-
-
 The L<systemd-run(1)>
 command allows creating C<.service> and C<.scope> units dynamically
 and transiently from the command line.
@@ -192,16 +186,6 @@ This controls the C<memory.min> or C<memory.low> control group attribute.
 For details about this control group attribute, see L<Memory Interface
 Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
 
-Units may have their children use a default C<memory.min> or
-C<memory.low> value by specifying C<DefaultMemoryMin> or
-C<DefaultMemoryLow>, which has the same semantics as
-C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
-which has the same semantics as C<StartupMemoryLow>.
-This setting does not affect C<memory.min> or C<memory.low>
-in the unit itself.
-Using it to set a default child allocation is only useful on kernels older than 5.7,
-which do not support the C<memory_recursiveprot> cgroup2 mount option.
-
 While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
 C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
 the startup and shutdown phases. Using C<StartupMemoryLow> allows prioritizing specific services at
@@ -232,16 +216,6 @@ useful in order to always inherit all of the protection afforded by ancestors.
 This controls the C<memory.min> or C<memory.low> control group attribute.
 For details about this control group attribute, see L<Memory Interface
 Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
-
-Units may have their children use a default C<memory.min> or
-C<memory.low> value by specifying C<DefaultMemoryMin> or
-C<DefaultMemoryLow>, which has the same semantics as
-C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
-which has the same semantics as C<StartupMemoryLow>.
-This setting does not affect C<memory.min> or C<memory.low>
-in the unit itself.
-Using it to set a default child allocation is only useful on kernels older than 5.7,
-which do not support the C<memory_recursiveprot> cgroup2 mount option.
 
 While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
 C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
@@ -994,6 +968,24 @@ Example 3: mixed
 Programs in the unit will be only able to use the eth2 network interface.
 I< Optional. Type uniline.  > 
 
+=head2 BindNetworkInterface
+
+Takes the name of a network interface. This option causes every socket created by processes of this
+unit to be bound to the specified network interface.
+
+It is specially useful to confine a process to a VRF, when the program does not offer native support
+for it. It is equivalent to running the program using C<ip vrf exec>.
+
+In systems using C<nss-resolve>, the interface used for DNS resolution can be chosen
+by using the C<SYSTEMD_NSS_RESOLVE_IFINDEX> environment variable.
+
+The feature is implemented with C<cgroup/sock_create> cgroup-bpf hooks.
+
+Example:
+    [Service]
+    BindNetworkInterface=vrf-mgmt
+. I< Optional. Type uniline.  > 
+
 =head2 NFTSet
 
 This setting provides a method for integrating dynamic cgroup, user and group IDs into
@@ -1009,7 +1001,7 @@ consists of a colon-separated tuple of source type (one of C<cgroup>,
 C<user> or C<group>), NFT address family (one of
 C<arp>, C<bridge>, C<inet>, C<ip>,
 C<ip6>, or C<netdev>), table name and set name. The names of tables
-and sets must conform to lexical restrictions of NFT table names. The type of the element used in
+and sets must conform to lexicographic restrictions of NFT table names. The type of the element used in
 the NFT filter must match the type implied by the directive (C<cgroup>,
 C<user> or C<group>) as shown in the table below. When a control
 group or a unit is realized, the corresponding ID will be appended to the NFT sets and it will be
@@ -1075,7 +1067,7 @@ the socket and the service unit, however it often makes sense to maintain one co
 one more restricted, depending on the use case.
 
 Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+support is not enabled in the underlying kernel or container manager). These settings will have no effect in
 that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
 (requires C<Delegate>=C<yes>) instead of using this setting. I< Optional. Type uniline.  > 
 
@@ -1108,7 +1100,7 @@ the socket and the service unit, however it often makes sense to maintain one co
 one more restricted, depending on the use case.
 
 Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+support is not enabled in the underlying kernel or container manager). These settings will have no effect in
 that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
 (requires C<Delegate>=C<yes>) instead of using this setting. I< Optional. Type uniline.  > 
 
@@ -1559,8 +1551,8 @@ to C<RootDirectory> however mounts a file system hierarchy from a block device n
 or loopback file instead of a directory. The device node or file system image file needs to contain a
 file system without a partition table, or a file system within an MBR/MS-DOS or GPT partition table
 with only a single Linux-compatible partition, or a set of file systems within a GPT partition table
-that follows the
-L<Discoverable Partitions
+that follows the L<UAPI.2
+Discoverable Partitions
 Specification|https://uapi-group.org/specifications/specs/discoverable_partitions_specification>.
 
 When C<DevicePolicy> is set to C<closed> or
@@ -1590,8 +1582,7 @@ Takes a comma-separated list of mount options that will be used on disk images s
 C<RootImage>. Optionally a partition name can be prefixed, followed by colon, in
 case the image has multiple partitions, otherwise partition name C<root> is implied.
 Options for multiple partitions can be specified in a single line with space separators. Assigning an empty
-string removes previous assignments. Duplicated options are ignored. For a list of valid mount options, please
-refer to
+string removes previous assignments. For a list of valid mount options, please refer to
 L<mount(8)>.
 
 Valid partition names follow the
@@ -1732,6 +1723,18 @@ The default policy for C<ExtensionImagePolicy> is:
     usr=verity+signed+encrypted+unprotected+absent
 . I< Optional. Type uniline.  > 
 
+=head2 RootMStack
+
+Takes a path to a
+L<systemd.mstack(7)>
+directory encapsulating a mount stack consisting of layers and bind mounts. Similar to
+C<RootDirectory> and C<RootImage> this runs the service off a
+distinct root file system, in this case set up via C<overlayfs>.
+
+Since C<.mstack/> directories may reference disk images (DDIs) similar device
+policy extensions and dependencies are in effect when C<RootMStack> is used as are
+if C<RootImage> is used. I< Optional. Type uniline.  > 
+
 =head2 MountAPIVFS
 
 Takes a boolean argument. If on, a private mount namespace for the unit's processes is created
@@ -1809,16 +1812,16 @@ C<procfs>. I< Optional. Type enum. choice: 'all', 'pid'.  >
 
 =head2 BindPaths
 
-Configures unit-specific bind mounts. A bind mount makes a particular file or directory
-available at an additional place in the unit's view of the file system. Any bind mounts created with this
-option are specific to the unit, and are not visible in the host's mount table. This option expects a
-whitespace separated list of bind mount definitions. Each definition consists of a colon-separated triple of
-source path, destination path and option string, where the latter two are optional. If only a source path is
-specified the source and destination is taken to be the same. The option string may be either
-C<rbind> or C<norbind> for configuring a recursive or non-recursive bind
-mount. If the destination path is omitted, the option string must be omitted too.
-Each bind mount definition may be prefixed with C<->, in which case it will be ignored
-when its source path does not exist.
+Configures unit-specific bind mounts. A bind mount makes a particular file or
+directory available at an additional place in the unit's view of the file system. Any bind mounts
+created with this option are specific to the unit, and are not visible in the host's mount
+table. This option expects a whitespace separated list of bind mount definitions. Each definition
+consists of a colon-separated triple of source path, destination path and option string, where the
+latter two are optional. If only a source path is specified the source and destination is taken to be
+the same. The option string may be either C<rbind> or C<norbind> for
+configuring a recursive or non-recursive bind mount. If the destination path is omitted, the option
+string must be omitted too.  Each bind mount definition may be prefixed with C<->, in
+which case it will be ignored when its source path does not exist or is not accessible.
 
 C<BindPaths> creates regular writable bind mounts (unless the source file system mount
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
@@ -1843,16 +1846,16 @@ C<ProtectHome=tmpfs> should be used instead. I< Optional. Type list of uniline. 
 
 =head2 BindReadOnlyPaths
 
-Configures unit-specific bind mounts. A bind mount makes a particular file or directory
-available at an additional place in the unit's view of the file system. Any bind mounts created with this
-option are specific to the unit, and are not visible in the host's mount table. This option expects a
-whitespace separated list of bind mount definitions. Each definition consists of a colon-separated triple of
-source path, destination path and option string, where the latter two are optional. If only a source path is
-specified the source and destination is taken to be the same. The option string may be either
-C<rbind> or C<norbind> for configuring a recursive or non-recursive bind
-mount. If the destination path is omitted, the option string must be omitted too.
-Each bind mount definition may be prefixed with C<->, in which case it will be ignored
-when its source path does not exist.
+Configures unit-specific bind mounts. A bind mount makes a particular file or
+directory available at an additional place in the unit's view of the file system. Any bind mounts
+created with this option are specific to the unit, and are not visible in the host's mount
+table. This option expects a whitespace separated list of bind mount definitions. Each definition
+consists of a colon-separated triple of source path, destination path and option string, where the
+latter two are optional. If only a source path is specified the source and destination is taken to be
+the same. The option string may be either C<rbind> or C<norbind> for
+configuring a recursive or non-recursive bind mount. If the destination path is omitted, the option
+string must be omitted too.  Each bind mount definition may be prefixed with C<->, in
+which case it will be ignored when its source path does not exist or is not accessible.
 
 C<BindPaths> creates regular writable bind mounts (unless the source file system mount
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
@@ -1952,14 +1955,13 @@ L<os-release(5)>.
 To disable the safety check that the extension-release file name matches the image file name, the
 C<x-systemd.relax-extension-release-check> mount option may be appended.
 
-This option can be used together with a C<notify-reload> service type and
-L<systemd.v(7)>
-to manage configuration updates. When such a service carrying confext images is reloaded via
-systemctl reload foo.service or equivalent D-Bus method, the confext itself will
-be reloaded to pick up any changes. This only applies to confext extensions. Note that in case a
-service has this configuration enabled at first, and then it is subsequently removed in an update
-followed by a daemon-reload operation, reloading the confexts will be a no-op, and a full service
-restart is required instead. See
+If a service employs this option with
+L<systemd.v(7)>,
+and has C<RefreshOnReload=extensions> enabled (the default), the confexts will
+be refreshed to pick up any changes on service reload. This only applies to confext extensions.
+Note that in case a service has this configuration enabled at first, and then it is subsequently
+removed in an update followed by a daemon-reload operation, reloading the confexts will be a no-op,
+and a full service restart is required instead. See
 L<systemd.service(5)>
 also for details.
 
@@ -1999,14 +2001,13 @@ file, with the appropriate metadata which matches C<RootImage>/C<RootDirectory>
 or the host. See:
 L<os-release(5)>.
 
-This option can be used together with a C<notify-reload> service type and
-L<systemd.v(7)>
-to manage configuration updates. When such a service carrying confext directories is reloaded via
-systemctl reload foo.service or equivalent D-Bus method, the confext itself will
-be reloaded to pick up any changes. This only applies to confext extensions. Note that in case a
-service has this configuration enabled at first, and then it is subsequently removed in an update
-followed by a daemon-reload operation, reloading the confexts will be a no-op, and a full service
-restart is required instead. See
+If a service employs this option with
+L<systemd.v(7)>,
+and has C<RefreshOnReload=extensions> enabled (the default), the confexts will
+be refreshed to pick up any changes on service reload. This only applies to confext extensions.
+Note that in case a service has this configuration enabled at first, and then it is subsequently
+removed in an update followed by a daemon-reload operation, reloading the confexts will be a no-op,
+and a full service restart is required instead. See
 L<systemd.service(5)>
 also for details.
 
@@ -3306,9 +3307,9 @@ details. I< Optional. Type integer.  >
 =head2 CPUSchedulingPolicy
 
 Sets the CPU scheduling policy for executed processes. Takes one of C<other>,
-C<batch>, C<idle>, C<fifo> or C<rr>. See
+C<batch>, C<idle>, C<fifo>, C<rr> or C<ext>. See
 L<sched_setscheduler(2)> for
-details. I< Optional. Type enum. choice: 'batch', 'fifo', 'idle', 'other', 'rr'.  > 
+details. I< Optional. Type enum. choice: 'batch', 'ext', 'fifo', 'idle', 'other', 'rr'.  > 
 
 =head2 CPUSchedulingPriority
 
@@ -4695,6 +4696,16 @@ no
 
 
 
+=head2 UserNamespacePath
+
+Takes an absolute file system path referring to a Linux user namespace
+pseudo-file (i.e. a file like C</proc/$PID/ns/user> or a bind mount or symlink to
+one). When set the invoked processes are added to the user namespace referenced by that path. The
+path has to point to a valid namespace file at the moment the processes are forked off. If this
+option is used C<PrivateUsers> has no effect.
+
+This option is only available for system services. I< Optional. Type uniline.  > 
+
 =head2 NetworkNamespacePath
 
 Takes an absolute file system path referring to a Linux network namespace
@@ -4776,6 +4787,36 @@ Note that this functionality might not be available, for example if KSM is disab
 kernel, or the kernel does not support controlling KSM at the process level through
 L<prctl(2)>. I< Optional. Type boolean.  > 
 
+=head2 MemoryTHP
+
+Transparent Hugepages (THPs) is a Linux kernel feature that manages memory
+using larger pages (2MB on x86, compared to the default 4KB). The main goal is to improve memory management
+efficiency and system performance, especially for memory-intensive applications.
+However, it can cause drawbacks in some scenarios, such as memory regression and latency spikes.
+THP policy is governed for the entire system via C</sys/kernel/mm/transparent_hugepage/enabled>.
+However, it can be overridden for individual workloads via
+L<prctl(2)>.
+C<MemoryTHP> may be used to disable THPs at process invocation time to stop providing
+THPs for workloads where the drawbacks outweigh the advantages.
+When C<MemoryTHP> is set to C<inherit> or not set at all, systemd
+inherits THP settings from the process that starts it and no
+L<prctl(2)>C<PR_SET_THP_DISABLE> call is made.
+When set to C<disable>, C<MemoryTHP> disables THPs completely for the process,
+irrespecitive of global THP controls.
+When set to C<madvise>, C<MemoryTHP> disables THPs for the process except when
+specifically requested via L<madvise(2)>
+by the process with C<MADV_HUGEPAGE> or C<MADV_COLLAPSE>.
+When set to C<system>, C<MemoryTHP> resets the THP policy to system wide policy.
+This can be used when the process that starts systemd has already disabled THPs via
+C<PR_SET_THP_DISABLE>, and we want to restore the system default THP setting at
+process invocation time. For details, see
+L<Transparent Hugepage Support|https://docs.kernel.org/admin-guide/mm/transhuge.html>
+in the kernel documentation.
+
+Note that this functionality might not be available, for example if THP is disabled in the
+kernel, or the kernel does not support controlling THP at the process level through
+L<prctl(2)>. I< Optional. Type uniline.  > 
+
 =head2 PrivatePIDs
 
 Takes a boolean argument. Defaults to false. If enabled, sets up a new PID namespace
@@ -4808,16 +4849,17 @@ no
 
 =head2 PrivateUsers
 
-Takes a boolean argument or one of C<self>, C<identity>,
-or C<full>. Defaults to false. If enabled, sets up a new user namespace for the
-executed processes and configures a user and group mapping. If set to a true value or
-C<self>, a minimal user and group mapping is configured that maps the
-C<root> user and group as well as the unit's own user and group to themselves and
-everything else to the C<nobody> user and group. This is useful to securely detach
-the user and group databases used by the unit from the rest of the system, and thus to create an
-effective sandbox environment. All files, directories, processes, IPC objects and other resources
-owned by users/groups not equaling C<root> or the unit's own will stay visible from
-within the unit but appear owned by the C<nobody> user and group.
+Takes a boolean argument or one of C<self>,
+C<identity>, C<full> or C<managed>. Defaults to
+false. If enabled, sets up a new user namespace for the executed processes and configures a user and
+group mapping. If set to a true value or C<self>, a minimal user and group mapping is
+configured that maps the C<root> user and group as well as the unit's own user and
+group to themselves and everything else to the C<nobody> user and group. This is
+useful to securely detach the user and group databases used by the unit from the rest of the system,
+and thus to create an effective sandbox environment. All files, directories, processes, IPC objects
+and other resources owned by users/groups not equaling C<root> or the unit's own will
+stay visible from within the unit but appear owned by the C<nobody> user and
+group.
 
 If the parameter is C<identity>, user namespacing is set up with an identity
 mapping for the first 65536 UIDs/GIDs. Any UIDs/GIDs above 65536 will be mapped to the
@@ -4830,14 +4872,21 @@ mapping for all UIDs/GIDs. In addition, for system services, C<full> allows the 
 to call setgroups() system calls (by setting
 C</proc/pid/setgroups> to C<allow>).
 Similar to C<identity>, this does not provide UID/GID isolation, but it does provide
-process capability isolation.
+process capability isolation. If this mode is enabled, all unit processes are run without privileges
+in the host user namespace (regardless of whether the unit's own user/group is
+C<root> or not). Specifically this means that the process will have zero process
+capabilities on the host's user namespace, but full capabilities within the service's user
+namespace. Settings such as C<CapabilityBoundingSet> will affect only the latter,
+and there's no way to acquire additional capabilities in the host's user namespace.
 
-If this mode is enabled, all unit processes are run without privileges in the host user
-namespace (regardless of whether the unit's own user/group is C<root> or not). Specifically
-this means that the process will have zero process capabilities on the host's user namespace, but
-full capabilities within the service's user namespace. Settings such as
-C<CapabilityBoundingSet> will affect only the latter, and there's no way to acquire
-additional capabilities in the host's user namespace.
+If the parameter is C<managed> a transient, dynamically allocated range of
+65536 UIDs/GIDs is allocated for the unit, and a UID/GID mapping is assigned to the unit's process
+so the UID/GID 0 from inside the unit maps to the first UID/GID of the allocated mapping. Note that
+in this mode the UID/GID the service process will run as is different depending if looking from the
+host side (where it will be a high, dynamically assigned UID) or from inside the unit (where it will
+be 0). Also note that this mode will enable file system UID mapping for the file systems this service
+accesses, mapping the "foreign" UID range on disk to the selected dynamic UID range at
+runtime.
 
 When this setting is set up by a per-user instance of the service manager, the mapping of the
 C<root> user and group to itself is omitted (unless the user manager is root).
@@ -4849,7 +4898,7 @@ normally supported by the per-user instances of the service manager.
 This setting is particularly useful in conjunction with
 C<RootDirectory>/C<RootImage>, as the need to synchronize the user and group
 databases in the root directory and on the host is reduced, as the only users and groups who need to be matched
-are C<root>, C<nobody> and the unit's own user and group. I< Optional. Type enum. choice: 'full', 'identity', 'no', 'self', 'yes'.  > 
+are C<root>, C<nobody> and the unit's own user and group. I< Optional. Type enum. choice: 'full', 'identity', 'managed', 'no', 'self', 'yes'.  > 
 
 =over 4
 
@@ -5635,10 +5684,11 @@ continuation, and the newline itself is discarded. A backslash followed by any o
 ignored; both the backslash and the following character are preserved verbatim. Leading and trailing
 whitespace outside of the double quotes is discarded.
 
-The argument passed should be an absolute filename or wildcard expression, optionally prefixed with
-C<->, which indicates that if the file does not exist, it will not be read and no error or
-warning message is logged. This option may be specified more than once in which case all specified files are
-read. If the empty string is assigned to this option, the list of file to read is reset, all prior assignments
+The argument passed should be an absolute filename or wildcard expression. If the file does not
+exist, cannot be read, or contains invalid content, the service will fail to start. To make the file
+optional, prefix the path with C<->, which causes all errors related to the file to be
+silently ignored. This option may be specified more than once in which case all specified files are read.
+If the empty string is assigned to this option, the list of files to read is reset, all prior assignments
 have no effect.
 
 The files listed with this directive will be read shortly before the process is executed (more
@@ -6921,8 +6971,8 @@ exits, like the ones described above. I< Optional. Type list of uniline.  >
 
 =head2 ExecReload
 
-Commands to execute to trigger a configuration reload in the service. This argument
-takes multiple command lines, following the same scheme as described for
+Commands to execute to trigger a configuration reload in the service. This setting
+may take multiple command lines, following the same scheme as described for
 C<ExecStart> above. Use of this setting is optional. Specifier and environment
 variable substitution is supported here following the same scheme as for
 C<ExecStart>.
@@ -6932,19 +6982,29 @@ set to the main process of the daemon, and may be used for command lines like th
 
     ExecReload=kill -HUP $MAINPID
 
-Note however that reloading a daemon by enqueuing a signal (as with the example line above) is
-usually not a good choice, because this is an asynchronous operation and hence not suitable when
-ordering reloads of multiple services against each other. It is thus strongly recommended to either
-use C<Type>=C<notify-reload> in place of
-C<ExecReload>, or to set C<ExecReload> to a command that not only
-triggers a configuration reload of the daemon, but also synchronously waits for it to complete. For
-example, L<dbus-broker(1)>
+Note however that reloading a daemon by enqueuing a signal without completion notification
+(as is the case with the example line above) is usually not a good choice, because this is an
+asynchronous operation and hence not suitable when ordering reloads of multiple services against
+each other. It is thus strongly recommended to either use C<Type=notify-reload>,
+or to set C<ExecReload> to a command that not only triggers a configuration reload
+of the daemon, but also synchronously waits for it to complete. For example, L<dbus-broker(1)>
 uses the following:
 
     ExecReload=busctl call org.freedesktop.DBus \
     /org/freedesktop/DBus org.freedesktop.DBus \
     ReloadConfig
-. I< Optional. Type list of uniline.  > 
+
+
+This setting can be combined with C<Type=notify-reload>, in which case
+the service main process is signaled after all specified command lines finish execution. Specially,
+if C<RELOADING=1> notification is received before C<ExecReload>
+completes, the signaling is skipped and the service manager immediately starts listening for
+C<READY=1>. I< Optional. Type list of uniline.  > 
+
+=head2 ExecReloadPost
+
+Commands to execute after a successful reload operation. Syntax for this setting
+is exactly the same as C<ExecReload>. I< Optional. Type list of uniline.  > 
 
 =head2 ExecStop
 
@@ -7019,11 +7079,29 @@ as "5min 20s". Defaults to 100ms. I< Optional. Type uniline.  >
 
 =head2 RestartSteps
 
-Configures the number of steps to take to increase the interval
+Configures the number of exponential steps to take to increase the interval
 of auto-restarts from C<RestartSec> to C<RestartMaxDelaySec>.
-Takes a positive integer or 0 to disable it. Defaults to 0.
+Takes a positive integer or 0 to disable it. Defaults to 0. Hint: values
+between 3 and 5 are good choices when exponential backoff is desired.
 
-This setting is effective only if C<RestartMaxDelaySec> is also set. I< Optional. Type uniline.  > 
+Example:
+
+    RestartSec=10s
+    RestartSteps=4
+    RestartMaxDelaySec=160s
+
+This will produce the following restart intervals: 10s, 20s, 40s, 80s, 160s, 160s, 160s, etc.
+Notice the geometric interpolation and the resulting constant ratio between intervals; here it is 2.
+The formula for the ratio is
+
+(C<RestartMaxDelaySec> / C<RestartSec>)^(1 / C<RestartSteps>)
+. A (repeating) delay equal to C<RestartMaxDelaySec> is always
+reached after
+C<RestartSteps> + 1
+ steps.
+
+This setting is effective only if C<RestartMaxDelaySec> is also set and
+C<RestartSec> is not zero. I< Optional. Type uniline.  > 
 
 =head2 RestartMaxDelaySec
 
@@ -7032,7 +7110,8 @@ as the interval goes up with C<RestartSteps>. Takes a value
 in the same format as C<RestartSec>, or C<infinity>
 to disable the setting. Defaults to C<infinity>.
 
-This setting is effective only if C<RestartSteps> is also set. I< Optional. Type uniline.  > 
+This setting is effective only if C<RestartSteps> is also set and
+C<RestartSec> is not zero. I< Optional. Type uniline.  > 
 
 =head2 TimeoutStartSec
 
@@ -7352,18 +7431,14 @@ option or not. I< Optional. Type uniline.  >
 
 =head2 RootDirectoryStartOnly
 
-Takes a boolean argument. If true, the root
-directory, as configured with the
+Takes a boolean argument. If true, the root directory, as configured with the
 C<RootDirectory> option (see
 L<systemd.exec(5)>
-for more information), is only applied to the process started
-with C<ExecStart>, and not to the various
-other C<ExecStartPre>,
-C<ExecStartPost>,
-C<ExecReload>, C<ExecStop>,
-and C<ExecStopPost> commands. If false, the
-setting is applied to all configured commands the same way.
-Defaults to false. I< Optional. Type boolean.  > 
+for more information), is only applied to the process started with C<ExecStart>,
+and not to the various other C<ExecStartPre>, C<ExecStartPost>,
+C<ExecReload>, C<ExecReloadPost>, C<ExecStop>,
+and C<ExecStopPost> commands. If false, the setting is applied to all
+configured commands the same way. Defaults to false. I< Optional. Type boolean.  > 
 
 =over 4
 
@@ -7543,11 +7618,13 @@ terminate services earlier, before the kernel would have to act.
 This setting takes one of C<continue>, C<stop> or
 C<kill>. If set to C<continue> and a process in the unit is
 killed by the OOM killer, this is logged but the unit continues running. If set to
-C<stop> the event is logged but the unit is terminated cleanly by the service
-manager. If set to C<kill> and one of the unit's processes is killed by the OOM
-killer the kernel is instructed to kill all remaining processes of the unit too, by setting the
-C<memory.oom.group> attribute to C<1>; also see kernel
-page L<Control Group v2|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
+C<stop> the event is logged and the unit's processes are terminated cleanly by the
+service manager. If set to C<kill> and one of the unit's processes is killed by the
+OOM killer the kernel is instructed to kill all remaining processes of the unit too, by setting the
+C<memory.oom.group> attribute to C<1>; also see kernel page
+L<Control Group v2|https://docs.kernel.org/admin-guide/cgroup-v2.html>. In case of
+both C<stop> and C<kill>, the service ultimately ends up in the
+C<oom-kill> failed state after which C<Restart> may apply.
 
 Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>
@@ -7600,6 +7677,24 @@ Configures the UNIX process signal to send to the service's main process when as
 to reload the service's configuration. Defaults to C<SIGHUP>. This option has no
 effect unless C<Type>=C<notify-reload> is used, see
 above. I< Optional. Type uniline.  > 
+
+=head2 RefreshOnReload
+
+Takes a boolean argument, or a list of resources defined in
+L<systemd.exec(5)>.
+Possible values are C<extensions> and C<credentials>, separated by space.
+Prepending the list with a single tilde character (C<~>) inverts the effect.
+Defaults to C<extensions>. An empty assignment resets the list to default. If enabled,
+the corresponding resources (C<ExtensionImages>/C<ExtensionDirectories>
+for C<extensions> and C<LoadCredential>/C<ImportCredential>/
+C<SetCredential> (along with their C<Encrypted> counterparts)
+for C<credentials>) will be refreshed on service reload. If C<yes>,
+all resources listed above that are used by the service shall be refreshed.
+
+Specially, if this option is set explicitly, and the respective resources are in use,
+the service may be reloaded without any actual reload mechanism (C<ExecReload>
+or C<Type=notify-reload>) for notifying the main process, in which case the reload
+is considered complete immediately after refreshing. I< Optional. Type uniline.  > 
 
 =head2 FailureAction
 

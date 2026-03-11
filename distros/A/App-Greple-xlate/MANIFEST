@@ -72,7 +72,6 @@ t/04_xlate_script.t
 t/05_translate.t
 t/Util.pm
 xt/author/api_translate.t
-share/getoptlong/getoptlong.sh
 t/runner/README.md
 t/runner/Runner.pm
 META.yml

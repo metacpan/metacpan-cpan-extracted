@@ -59,6 +59,14 @@ DESCRIPTION
         Returns the class's name if it successfully replaced the constructor.
         Returns undef otherwise.
 
+        MooX::XSConstructor's import method will normally run `setup_for` for
+        you at the end of your class's runtime phase. This is normally the
+        right time to do it. You can alternatively have it run when the first
+        object of your class gets constructed. To indicate you prefer that,
+        use:
+
+          use MooX::XSConstructor -wrapconstructor;
+
     `MooX::XSConstructor->is_suitable_class( $class )`
         Checks that the class is a suitable Moo class for replacing the
         constructor of. `setup_for` calls this, so you don't actually need to

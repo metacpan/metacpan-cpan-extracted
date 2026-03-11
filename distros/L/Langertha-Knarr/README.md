@@ -113,6 +113,24 @@ docker run --env-file .env -p 8080:8080 -p 11434:11434 raudssus/langertha-knarr
 Knarr reads the file, detects which providers have keys, configures them
 with sensible default models, and starts serving.
 
+## Docker Build (Temporary CPAN Indexer Bypass)
+
+Default build flow stays unchanged:
+
+```bash
+docker build -t raudssus/langertha-knarr .
+```
+
+If CPAN indexers lag behind new releases, inject a direct CPAN dist path for `Langertha`:
+
+```bash
+docker build -t raudssus/langertha-knarr \
+  --build-arg LANGERTHA_SRC='GETTY/Langertha-0.307.tar.gz' \
+  .
+```
+
+`LANGERTHA_SRC` is passed directly to `cpanm` (for example `AUTHOR/Dist-x.yyy.tar.gz` or a tarball URL).
+
 ## Docker Compose
 
 The included `docker-compose.yml` starts Knarr with Langfuse tracing
@@ -278,6 +296,23 @@ curl http://localhost:11434/api/tags
 
 All formats support streaming — SSE for OpenAI/Anthropic, NDJSON for Ollama.
 
+### Tool Calling Bridge
+
+Knarr can bridge tool-calling payloads across API formats when a client format
+and backend engine format differ.
+
+- OpenAI client format to Anthropic-compatible backend:
+  OpenAI `tools`/`tool_choice` and assistant `tool_calls` are mapped to
+  Anthropic `tools`/`tool_choice` + `tool_use`/`tool_result` blocks.
+- Anthropic client format to OpenAI-compatible backend:
+  Anthropic tool blocks are mapped to OpenAI `tool_calls` and `tool` messages.
+- Hermes-style tool output support:
+  If a backend emits Hermes XML (`<tool_call>{...}</tool_call>`), Knarr parses
+  it and exposes native tool-call structures to OpenAI and Anthropic clients.
+
+This lets you test tool behavior through one endpoint while targeting different
+engine families behind Knarr.
+
 ## Use Cases
 
 ### Claude Code through any backend
@@ -384,6 +419,12 @@ passthrough:
 
 Config values support `${ENV_VAR}` interpolation — variables are resolved
 at startup.
+
+`models.<name>.engine` resolves in this order:
+
+- `Langertha::Engine::<EngineName>`
+- `LangerthaX::Engine::<EngineName>`
+- Fully-qualified class name if you set one directly
 
 ### Passthrough Mode
 
@@ -524,6 +565,29 @@ Mojo::Server::Daemon->new(
   app    => $app,
   listen => ['http://127.0.0.1:8080'],
 )->run;
+```
+
+You can also add request policy hooks when building the app:
+
+```perl
+my $app = Langertha::Knarr->build_app(
+  config => $config,
+  before_request => sub ($c, $ctx) {
+    # $ctx: proxy_class, type, format, body, model_name, stream, messages, params
+    return {
+      stop    => 1,
+      status  => 418,
+      message => 'embeddings disabled by policy',
+      type    => 'policy_denied',
+    } if $ctx->{type} eq 'embedding';
+    return;
+  },
+  api_key_validator => sub ($c, $ctx) {
+    # $ctx: api_key, raw_auth, path, method, content_type
+    return { allow => 1 } if $ctx->{api_key} eq 'allow-key';
+    return { allow => 0, status => 403, message => 'forbidden' };
+  },
+);
 ```
 
 ### Using the Config and Router Independently

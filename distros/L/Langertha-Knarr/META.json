@@ -4,7 +4,7 @@
       "Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
          "requires" : {
             "File::ShareDir::ProjectDistDir" : "0",
             "JSON::MaybeXS" : "0",
-            "Langertha" : "0.303",
+            "Langertha" : "0.307",
             "Log::Any" : "0",
             "MIME::Base64" : "0",
             "Module::Runtime" : "0",
@@ -64,7 +64,7 @@
          "web" : "https://github.com/Getty/langertha-knarr"
       }
    },
-   "version" : "0.004",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -91,37 +91,37 @@
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::GETTY/@Filter/ManifestSkip",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::GETTY/@Filter/MetaYAML",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::License",
             "name" : "@Author::GETTY/@Filter/License",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Author::GETTY/@Filter/Readme",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::GETTY/@Filter/ExtraTests",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::GETTY/@Filter/ExecDir",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::GETTY/@Filter/ShareDir",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -131,27 +131,27 @@
                }
             },
             "name" : "@Author::GETTY/@Filter/MakeMaker",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::GETTY/@Filter/Manifest",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Author::GETTY/@Filter/TestRelease",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::ConfirmRelease",
             "name" : "@Author::GETTY/@Filter/ConfirmRelease",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Author::GETTY/@Filter/UploadToCPAN",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
@@ -160,7 +160,9 @@
                   "fatal_errors" : 1,
                   "quiet" : 0,
                   "run" : [
-                     "docker build -t raudssus/langertha-knarr:%v -t raudssus/langertha-knarr:latest -t raudssus/langertha-knarr:$(echo %v | cut -d. -f1) %d",
+                     "${GH_BIN:-gh} release view %v -R Getty/langertha-knarr >/dev/null 2>&1 || ${GH_BIN:-gh} release create %v -R Getty/langertha-knarr --title %v --notes 'Dist::Zilla release'",
+                     "${GH_BIN:-gh} release upload %v -R Getty/langertha-knarr Langertha-Knarr-%v.tar.gz --clobber",
+                     "docker build ${KNARR_DOCKER_BUILD_ARGS:-} -t raudssus/langertha-knarr:%v -t raudssus/langertha-knarr:latest -t raudssus/langertha-knarr:$(echo %v | cut -d. -f1) %d",
                      "docker push raudssus/langertha-knarr:%v",
                      "docker push raudssus/langertha-knarr:$(echo %v | cut -d. -f1)",
                      "docker push raudssus/langertha-knarr:latest"
@@ -174,17 +176,17 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::GETTY/MetaConfig",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::GETTY/MetaJSON",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::GETTY/PodSyntaxTests",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -334,7 +336,7 @@
                }
             },
             "name" : "@Author::GETTY/@Git::VersionManager/pluginbundle version",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
@@ -404,7 +406,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.007",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -438,7 +440,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@Author::GETTY/@Git::VersionManager/NextRelease",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -490,52 +492,52 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.032"
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.032"
+            "version" : "6.037"
          }
       ],
       "zilla" : {
@@ -543,7 +545,7 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.032"
+         "version" : "6.037"
       }
    },
    "x_authority" : "cpan:GETTY",

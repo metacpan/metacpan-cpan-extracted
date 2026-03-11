@@ -5,8 +5,9 @@ use warnings;
 package MooX::XSConstructor;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.003002';
+our $VERSION   = '0.003003';
 
+use Class::Method::Modifiers 'install_modifier';
 use Moo 2.004000 ();
 use Moo::Object ();
 use Hook::AfterRuntime;
@@ -174,7 +175,21 @@ sub setup_for {
 sub import {
 	my $self = shift;
 	my $caller = caller;
-	after_runtime { $self->setup_for( $caller ) };
+	if ( @_ and $_[0] eq '-wrapconstructor' ) {
+		after_runtime {
+			install_modifier $caller => around => new => sub {
+				my $pp_constructor = shift;
+				my $object = $pp_constructor->( @_ );
+				$self->setup_for( $caller );
+				return $object;
+			};
+		};
+	}
+	else {
+		after_runtime {
+			$self->setup_for( $caller )
+		};
+	}
 }
 
 sub is_xs  {
@@ -265,6 +280,13 @@ been added (using C<has> or role composition).
 
 Returns the class's name if it successfully replaced the constructor.
 Returns undef otherwise.
+
+MooX::XSConstructor's import method will normally run C<setup_for> for you
+at the end of your class's runtime phase. This is normally the right time
+to do it. You can alternatively have it run when the first object of your
+class gets constructed. To indicate you prefer that, use:
+
+  use MooX::XSConstructor -wrapconstructor; 
 
 =item C<< MooX::XSConstructor->is_suitable_class( $class ) >>
 

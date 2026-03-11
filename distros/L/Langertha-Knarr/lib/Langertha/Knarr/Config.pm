@@ -1,5 +1,5 @@
 package Langertha::Knarr::Config;
-our $VERSION = '0.004';
+our $VERSION = '0.007';
 # ABSTRACT: YAML configuration loader and validator
 use Moo;
 use YAML::PP;
@@ -129,6 +129,28 @@ has default_engine => (
 sub _build_default_engine {
   my ($self) = @_;
   return $self->data->{default} // undef;
+}
+
+has log_file => (
+  is      => 'lazy',
+  builder => '_build_log_file',
+);
+
+
+sub _build_log_file {
+  my ($self) = @_;
+  return $self->data->{logging}{file} // _strip_quotes($ENV{KNARR_LOG_FILE}) // undef;
+}
+
+has log_dir => (
+  is      => 'lazy',
+  builder => '_build_log_dir',
+);
+
+
+sub _build_log_dir {
+  my ($self) = @_;
+  return $self->data->{logging}{dir} // _strip_quotes($ENV{KNARR_LOG_DIR}) // undef;
 }
 
 has langfuse => (
@@ -382,6 +404,14 @@ sub generate_config {
   return join("\n", @lines) . "\n";
 }
 
+# Strip surrounding quotes from env values (Docker --env-file includes them literally)
+sub _strip_quotes {
+  my $v = shift;
+  return $v unless defined $v;
+  $v =~ s/^["']|["']$//g;
+  return $v;
+}
+
 
 1;
 
@@ -397,7 +427,7 @@ Langertha::Knarr::Config - YAML configuration loader and validator
 
 =head1 VERSION
 
-version 0.004
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -461,6 +491,16 @@ C<api_key>, C<url>, C<system_prompt>, C<temperature>, and C<response_size>.
 HashRef from the C<default:> config section, or C<undef> if not set. At
 minimum contains C<engine>. Used as the fallback when a model name is not
 explicitly configured and no passthrough URL matches.
+
+=head2 log_file
+
+Path to a JSONL log file for request logging. Resolved from
+C<logging.file> in config or C<KNARR_LOG_FILE> environment variable.
+
+=head2 log_dir
+
+Path to a directory for per-request JSON log files. Resolved from
+C<logging.dir> in config or C<KNARR_LOG_DIR> environment variable.
 
 =head2 langfuse
 
@@ -555,6 +595,8 @@ Returns a string.
 =item * L<Langertha::Knarr::Router> — Uses config to resolve models to engines
 
 =item * L<Langertha::Knarr::Tracing> — Uses config for Langfuse credentials
+
+=item * L<Langertha::Knarr::RequestLog> — Uses config for request logging paths
 
 =back
 

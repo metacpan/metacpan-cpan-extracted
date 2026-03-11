@@ -3,7 +3,7 @@ use warnings;
 use Feature::Compat::Class;
 use WebServer::DirIndex::HTML;
 
-class WebServer::DirIndex v0.1.0 {
+class WebServer::DirIndex v0.1.1 {
 
   use Path::Tiny;
   use HTTP::Date;

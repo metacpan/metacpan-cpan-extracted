@@ -1,5 +1,33 @@
 Revision history for Langertha
 
+0.307     2026-03-10 17:42:28Z
+
+    - Add new OpenAI-compatible self-hosted engine:
+      Langertha::Engine::SGLang.
+    - Add engine-scope module discovery via Module::Pluggable in Langertha:
+      `available_engine_classes`, `available_engine_ids`,
+      and generic `discover_modules_in_scope`.
+    - Update `resolve_engine_class` to use discovered module scope
+      (`Langertha::Engine::*` + `LangerthaX::Engine::*`) with deterministic
+      core-first lookup.
+    - Add `Langertha->new_engine($name_or_class, %args)` helper for
+      resolve+load+construct in one call.
+    - Document third-party custom engines under `LangerthaX::Engine::*`
+      and include resolver behavior in docs.
+    - Add tests for discovered engine classes/ids and LangerthaX fallback
+      (`t/99-engine-resolution.t` + `t/lib` fixture module).
+    - Extend load/hierarchy/readme coverage for the new SGLang engine.
+    - Add `Module::Pluggable` as a direct runtime dependency.
+
+0.306     2026-03-10 13:37:01Z
+
+    - Add new shared core modules for cross-format normalization:
+      Langertha::Input(+::Tools), Langertha::Output(+::Tools),
+      and Langertha::Metrics.
+    - Core modules centralize tool schema conversion (OpenAI/Anthropic/Ollama),
+      Hermes XML extraction/normalization, and usage/cost metric normalization.
+    - Add core tests t/97_input_output.t and t/98_metrics.t and extend t/00_load.t.
+
 0.305     2026-03-08 21:51:01Z
     - New engine base class: Langertha::Engine::AnthropicBase for
       Anthropic-compatible APIs (shared /v1/messages chat/streaming/tool/model

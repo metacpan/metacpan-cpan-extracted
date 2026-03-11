@@ -1,5 +1,18 @@
 Revision history for Perl module EBook::Ishmael.
 
+2.03  Mar 10 2026
+  - Fix MobiHuff and PDB::Record package names.
+
+2.02  Mar 10 2026
+  - ishmael now attempts to heuristically guess an ebook's character encoding
+    when the encoding is not explicitely specified instead of blindly assuming
+    UTF-8.
+  - Imporve PDF date parsing.
+  - Improve image and cover dumping.
+  - Add support for dumping CHMs via hh.exe on Windows.
+  - 'pjson' and 'pxml' --metadata options are completely removed. Please use
+    'json' and 'xml' instead.
+
 2.01  Feb 19 2026
   - Fix time parsing for different versions of Time::Piece.
 

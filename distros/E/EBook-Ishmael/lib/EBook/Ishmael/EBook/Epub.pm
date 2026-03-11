@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -11,6 +11,7 @@ use File::Spec;
 use XML::LibXML;
 
 use EBook::Ishmael::EBook::Metadata;
+use EBook::Ishmael::ImageID qw(mimetype_id);
 use EBook::Ishmael::Time qw(guess_time);
 use EBook::Ishmael::Unzip qw(unzip safe_tmp_unzip);
 
@@ -172,34 +173,32 @@ sub _read_rootfile {
 
     # Get list of images
     for my $item ($xpc->findnodes('./package:item', $manif)) {
+        my $mime = $item->getAttribute('media-type');
+        next if not defined $mime;
 
-        next unless ($item->getAttribute('media-type') // '') =~ /^image\//;
+        my $format = mimetype_id($mime);
+        next if not defined $format;
 
         my $href = $item->getAttribute('href') or next;
         $href = File::Spec->catfile($self->{_contdir}, $href);
+        next if not -f $href;
 
-        push @{ $self->{_images} }, $href if -f $href;
+        push @{ $self->{_images} }, [ $href, $format ];
 
     }
 
     my ($covmeta) = $xpc->findnodes('./package:meta[@name="cover"]', $meta);
-
     # Put if code in own block so that we can last out of it.
     if (defined $covmeta) {{
-
         my $covcont = $covmeta->getAttribute('content') or last;
-
         my ($covitem) = $xpc->findnodes("./package:item[\@id=\"$covcont\"]", $manif)
             or last;
-
         my $covhref = $covitem->getAttribute('href') or last;
-
+        my $covmime = $covitem->getAttribute('media-type') or last;
+        my $format = mimetype_id($covmime) or last;
         my $covpath = File::Spec->catfile($self->{_contdir}, $covhref);
-
         last unless -f $covpath;
-
-        $self->{_cover} = $covpath;
-
+        $self->{_cover} = [ $covpath, $format ];
     }}
 
     return 1;
@@ -364,26 +363,16 @@ sub has_cover {
 sub cover {
 
     my $self = shift;
-    my $out  = shift;
 
-    return undef unless defined $self->{_cover};
+    return (undef, undef) if not $self->has_cover;
 
-    open my $rh, '<', $self->{_cover}
-        or die "Failed to open $self->{_cover} for reading: $!\n";
-    binmode $rh;
-    my $bin = do { local $/ = undef; readline $rh };
-    close $rh;
+    open my $fh, '<', $self->{_cover}[0]
+        or die "Failed to open $self->{_cover}[0] for reading: $!\n";
+    binmode $fh;
+    my $img = do { local $/; readline $fh };
+    close $fh;
 
-    if (defined $out) {
-        open my $wh, '>', $out
-            or die "Failed to open $out for writing: $!\n";
-        binmode $wh;
-        print { $wh } $bin;
-        close $wh;
-        return $out;
-    } else {
-        return $bin;
-    }
+    return ($img, $self->{_cover}[1]);
 
 }
 
@@ -401,16 +390,16 @@ sub image {
     my $n    = shift;
 
     if ($n >= $self->image_num) {
-        return undef;
+        return (undef, undef);
     }
 
-    open my $fh, '<', $self->{_images}[$n]
-        or die "Failed to open $self->{_images}[$n] for reading: $!\n";
+    open my $fh, '<', $self->{_images}[$n][0]
+        or die "Failed to open $self->{_images}[$n][0] for reading: $!\n";
     binmode $fh;
     my $img = do { local $/ = undef; readline $fh };
     close $fh;
 
-    return \$img;
+    return ($img, $self->{_images}[$n][1]);
 
 }
 

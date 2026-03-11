@@ -1,3 +1,11 @@
+0.004   2025-11-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix checking lacks_any_tags key.
+
+        - [subcommand configure-repo] When given --clean-remotes, delete
+          all remotes first so the order will follow group's definition.
+
+
 0.003   2025-11-11  Released-By: PERLANCAR; Urgency: high
 
         - [bugfix] Group that does not have any filter keys should not

@@ -1,5 +1,152 @@
 Revision history for Perl module Math::Prime::Util::GMP
 
+0.53 2026-03-11
+
+    [ADDED]
+
+    - bernvec(n)               compute/cache/return even Bernoulli numbers
+    - faulhaber_sum(n,p)       fast sum of k^p for k=1..n
+    - fromdigits(\@d[,base])   convert digit array ref to base 10 number
+    - fromdigits(str[,base])   convert string to base 10 number
+    - is_smooth(n,k)           is n a k-smooth number
+    - is_rough(n,k)            is n a k-rough number
+    - is_powerful(n[,k])       is n a k-powerful number (default k=2)
+    - is_practical(n)          is n a practical number
+    - is_trial_prime(n)        primality using trial division
+    - is_almost_prime(k,n)     does n have exactly k prime factors
+    - is_divisible(n,d)        is n exactly divisible by d
+    - is_congruent(n,c,d)      is n congruent to c mod d
+    - is_qr(a,n)               is n a quadratic residue mod n
+    - is_square_free(n)        1 if n does not have any repeated factors
+    - is_powerfree(n[,k])      1 if n does not have a factor p^k (default k=2)
+    - powerfree_count(n[,k])   count of k-powerfree numbers <= n
+    - nth_powerfree(n[,k])     the nth k-powerfree number
+    - next_powerfree(n[,k])    the next k-powerfree number > n
+    - prev_powerfree(n[,k])    the previous k-powerfree number < n
+    - prime_bigomega(n)        number of factors (with multiplicity)
+    - prime_omega(n)           number of factors (distinct)
+    - powerful_count(n[,k])    count of k-powerful numbers <= n
+    - is_perfect_power(n)      is n a perfect power (1,4,8,9,16,25,..)
+    - next_perfect_power(n)    next perfect power: p > n
+    - prev_perfect_power(n)    previous perfect power: p < n
+    - perfect_power_count(n)      count of perfect powers <= n
+    - perfect_power_count(lo,hi)  count of perfect powers <= lo <= n <= hi
+    - nth_perfect_power(n)        the nth perfect power
+    - nth_perfect_power_approx(n) fast approximate nth perfect power
+    - prime_power_count(n)     count of prime powers <= n
+    - prime_power_count(lo,hi) count of prime powers <= lo <= n <= hi
+    - lshiftint(n,[k])         left shift n by k bits (default 1)
+    - rshiftint(n,[k])         right shift n by k bits (default 1)
+    - rashiftint(n,[k])        arithmetic right shift n by k bits
+    - add1int(n)               increment n
+    - sub1int(n)               decrement n
+    - signint(n)               sign of n (-1, 0, 1)
+    - cmpint(a,b)              compare (-1,0,1 for a<b, a=b, a>b)
+    - cmpabsint(a,b)           compare absolute values
+    - setbit(n,k)              set bit k of n
+    - clrbit(n,k)              clear bit k of n
+    - notbit(n,k)              complement bit k of n
+    - tstbit(n,k)              return bit k of n (0 or 1)
+    - bitand(a,b)              bitwise and
+    - bitor(a,b)               bitwise or
+    - bitxor(a,b)              bitwise xor
+    - bitnot(n)                bitwise not (complement)
+    - chinese2([a,m],...)      like chinese, but also returns modulo
+    - cdivint(a,b)             integer a/b quotient  (ceiling)
+    - fdivrem(a,b)             integer a/b quo + rem (floor)
+    - cdivrem(a,b)             integer a/b quo + rem (ceiling)
+    - submod(a,b,n)            (a - b) % n
+    - muladdmod(a, b, c, n)    (a * b + c) % n
+    - mulsubmod(a, b, c, n)    (a * b - c) % n
+    - lucasumod(P,Q,k,n)       modular Lucas U value
+    - lucasvmod(P,Q,k,n)       modular Lucas V value
+    - lucasuvmod(P,Q,k,n)      (U(P,Q)_k mod n, V(P,Q)_k mod n)
+    - lucasuv(P,Q,k)           Lucas sequence  (U(P,Q)_k, V(P,Q)_k)
+    - cheb_factor              Unexported, factoring smooth p-1/p+1
+    - falling_factorial(x,n)   Factorial of x to the n falling
+    - rising_factorial(x,n)    Factorial of x to the n rising
+    - binomialmod(n,k,m)       Binomial(n,k) mod m
+
+    [FIXES]
+
+    - sieve_range with tiny start and depth values could sieve one deeper
+      than precisely requested.
+
+    - is_ecpp_prime() returns 1 or 0, rather than 2 or 0.  This matches the
+      documentation and other functions (e.g. bls75, miller, aks).
+
+    - harmfrac(0) returns zero.
+
+    - ei > 100 called euler constant with incorrect precision.
+
+    - divmod (a,0,1) = 0, to match MPU, Pari, and Math::BigInt.
+      divmod (a,1,n) = a mod n.  It was returning 0 in some cases.
+
+    - zeta could round the last digit wrong in rare cases.
+
+    - lucas_sequence did not always match modded lucasu and lucasv.
+      Removed some unnecessary restrictions on P and Q.
+      Qk=powmod(Q,k,n) wasn't true for k=0.  Fixed.
+      Large IV P and P could overflow internally.  Fixed.
+
+    - lcm(-n) now returns n instead of -n.
+      znorder(a,-n) now returns znorder(a,n) instead of -n.
+
+    - chinese uses absolute values of modulus.
+
+    - lcm with no arguments returns 1 rather than 0.
+
+    - sqrtmod now works with composites and uses absolute value of modulus.
+
+    - is_carmichael for 51+ digit inputs uses random bases.  Github #34.
+
+    - is_pseudoprime(k,base) was incorrect for some single digit k with
+      non-standard base.  Github #36.
+
+    - powreal and rootreal now return undef for cases where they would divide
+      by zero or have a complex result.
+
+    - polygonal_nth and is_polygonal accept large k.
+
+    - addmod etc. use |n| as the modulus for negative n instead of error.
+
+    - binomial with first argument large enough to overflow unsigned long
+      could sometimes use a truncated argument.
+
+    - factorialmod(n,0) returns undef, factorialmod(n,-m) uses abs(m).
+
+    - trial_factor(1) returns () insted of (1), to match factor (and MPU).
+
+    - lambertw(x) with x > 10^308 would return -1.  Fixed.
+
+    [PERFORMANCE]
+
+    - The first 100 Bernoulli numbers are cached, and more will be cached
+      by bernvec or faulhaber_sum.
+
+    - Add faster factorialmod code.  5-10x faster for large inputs.
+
+    - factoring with many small factors, e.g. a factorial, is much faster.
+
+    - znorder is slightly faster for general inputs, and much faster for n
+      with many factors (e.g. a factorial).  Github #38.
+
+    - znprimroot with large powers is much faster.
+
+    - Faster ramanujan_tau(n).
+
+    [OTHER]
+
+    - valuation(n,k) now will error if k < 2.  This follows Pari and SAGE.
+
+    - lucasu and lucasv accept bigint P and Q values.
+
+    - divisors takes an optional second argument.
+
+    - divisors(0) returns an empty list, sigma(0) returns 0.
+
+    - Use PERL_NO_GET_CONTEXT for smaller size and better performance.
+
 0.52 2020-06-22
 
     [ADDED]

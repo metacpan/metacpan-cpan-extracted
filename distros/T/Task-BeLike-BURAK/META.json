@@ -4,7 +4,7 @@
       "Burak Gursoy"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "task",
       "belike"
@@ -33,10 +33,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Acme::CPANAuthors::Turkish" : "0.20",
             "App::Ack" : "0",
             "App::HTTPThis" : "0",
-            "App::Sys::Info" : "0.13",
             "Capture::Tiny" : "0.22",
             "Carp::Always" : "0",
             "Devel::Size" : "0.73",
@@ -54,15 +52,11 @@
             "Dist::Zilla::Plugin::Test::Compile" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "File::HomeDir" : "0",
-            "GD::SecurityImage" : "1.70",
-            "GD::Thumbnail" : "1.35",
             "HTML::Parser" : "0",
             "HTML::TableParser" : "0",
             "JSON::XS" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
-            "Lingua::TR::ASCII" : "0.11",
-            "MP3::M3U::Parser" : "2.30",
             "Mojolicious" : "0",
             "Net::GitHub" : "0",
             "Parallel::ForkManager" : "0",
@@ -74,7 +68,6 @@
             "Sub::Private" : "0",
             "Sub::Talisman" : "0",
             "Task::CPAN::Reporter" : "0",
-            "Task::Lingua::Any::Numbers" : "0.17",
             "Template" : "3.102",
             "Term::ReadKey" : "0",
             "Term::ReadLine::Perl" : "0",
@@ -82,12 +75,11 @@
             "Test::Pod" : "0",
             "Test::Pod::Coverage" : "0",
             "Text::Table" : "0",
-            "Text::Template::Simple" : "0.83",
             "Throwable::Factory" : "0",
             "Time::Duration" : "0",
             "Unicode::Casing" : "0.12",
             "criticism" : "1.02",
-            "perl" : "5.012",
+            "perl" : "5.040",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -101,8 +93,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::More" : "0",
-            "perl" : "5.012"
+            "Test::More" : "0"
          }
       }
    },
@@ -117,12 +108,12 @@
          "web" : "https://github.com/burak/CPAN-Task-BeLike-BURAK"
       }
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_contributors" : [
       "Burak Gursoy"
    ],
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

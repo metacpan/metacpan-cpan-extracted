@@ -1,6 +1,6 @@
 package Moses;
 # ABSTRACT: A framework for building IRC bots quickly and easily.
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 use MooseX::POE ();
 use Moose::Exporter;
 use Adam;
@@ -134,7 +134,7 @@ Moses - A framework for building IRC bots quickly and easily.
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

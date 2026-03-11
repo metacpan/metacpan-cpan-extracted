@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CB;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use File::Which;
 use List::Util qw(max);
 
 use EBook::Ishmael::Dir;
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_path_id);
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::Unzip qw(safe_tmp_unzip);
 
@@ -28,8 +28,10 @@ sub _images {
     for my $f (dir($dir)) {
         if (-d $f) {
             push @img, _images($f);
-        } elsif (-f $f and is_image_path($f)) {
-            push @img, $f;
+        } elsif (-f $f) {
+            my $format = image_path_id($f);
+            next if not defined $format;
+            push @img, [ $f, $format ];
         }
     }
 
@@ -135,25 +137,16 @@ sub has_cover {
 sub cover {
 
     my $self = shift;
-    my $out  = shift;
 
-    return undef unless $self->has_cover;
+    return (undef, undef) unless $self->has_cover;
 
-    my $img;
+    open my $fh, '<', $self->{_images}[0][0]
+        or die "Failed to open $self->{_images}[0][0] for reading: $!\n";
+    binmode $fh;
+    my $img = do { local $/; readline $fh };
+    close $fh;
 
-    open my $rh, '<', $self->{_images}[0]
-        or die "Failed to open $self->{_images}[0] for reading: $!\n";
-    binmode $rh;
-    open my $wh, '>', $out // \$img
-        or die sprintf "Failed to open %s for writing: $!\n", $out // 'in-memory scalar';
-    binmode $wh;
-
-    print { $wh } do { local $/ = undef; readline $rh };
-
-    close $rh;
-    close $wh;
-
-    return $out // $img;
+    return ($img, $self->{_images}[0][1]);
 
 }
 
@@ -171,16 +164,16 @@ sub image {
     my $n    = shift;
 
     if ($n >= $self->image_num) {
-        return undef;
+        return (undef, undef);
     }
 
-    open my $fh, '<', $self->{_images}[$n]
-        or die "Failed to open $self->{_images}[$n] for reading: $!\n";
+    open my $fh, '<', $self->{_images}[$n][0]
+        or die "Failed to open $self->{_images}[$n][0] for reading: $!\n";
     binmode $fh;
-    my $img = do { local $/ = undef; readline $fh };
+    my $img = do { local $/; readline $fh };
     close $fh;
 
-    return \$img;
+    return ($img, $self->{_images}[$n][1]);
 
 }
 

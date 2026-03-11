@@ -14,7 +14,7 @@ use Perinci::Object qw(envresmulti);
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2025-11-11'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(git_grouper_group);
 
@@ -264,22 +264,22 @@ sub get_repo_group {
 
             my $num_filters;
 
-            #log_trace "Matching repo %s with group %s ...", $repo, $group->{group};
+            log_trace "Matching repo %s with group %s ...", $repo, $group->{group};
             if ($group->{repo_name_pattern}) {
                 $num_filters++;
                 if ($repo !~ $group->{repo_name_pattern}) {
-                    #log_trace "  Skipped group %s (repo %s does not match repo_name_pattern pattern %s)", $group->{group}, $repo, $group->{repo_name_pattern};
+                    log_trace "  Skipped group %s (repo %s does not match repo_name_pattern pattern %s)", $group->{group}, $repo, $group->{repo_name_pattern};
                     next GROUP;
                 }
             }
 
             my @repo_tags = map { my $val = $_; $val =~ s/^\.tag-//; $val } glob(".tag-*");
-            #log_trace "Repo's tags: %s", \@repo_tags;
+            log_trace "  Repo's tags: %s", \@repo_tags;
             if ($group->{has_all_tags}) {
                 $num_filters++;
                 for my $tag (@{ $group->{has_all_tags} }) {
                     if (!(grep { $_ eq $tag } @repo_tags)) {
-                        #log_trace "  Skipped group %s (repo %s lacks tag %s)", $group->{group}, $repo, $tag;
+                        log_trace "  Skipped group %s (repo %s lacks tag %s)", $group->{group}, $repo, $tag;
                         next GROUP;
                     }
                 }
@@ -288,7 +288,7 @@ sub get_repo_group {
                 $num_filters++;
                 for my $tag (@{ $group->{lacks_all_tags} }) {
                     if (grep { $_ eq $tag } @repo_tags) {
-                        #log_trace "  Skipped group %s (repo %s has tag %s)", $group->{group}, $repo, $tag;
+                        log_trace "  Skipped group %s (repo %s has tag %s)", $group->{group}, $repo, $tag;
                         next GROUP;
                     }
                 }
@@ -297,31 +297,34 @@ sub get_repo_group {
                 $num_filters++;
                 for my $tag (@{ $group->{has_any_tags} }) {
                     if (grep { $_ eq $tag } @repo_tags) {
-                        #log_trace "  Including group %s (repo %s has tag %s)", $group->{group}, $repo, $tag;
+                        log_trace "  Including group %s (repo %s has tag %s)", $group->{group}, $repo, $tag;
                         goto SATISFY_FILTER_HAS_ANY_TAGS;
                     }
                 }
-                #log_trace "  Skipped group %s (repo %s does not have any tag %s)", $group->{group}, $repo, $group->{has_any_tags};
+                log_trace "  Skipped group %s (repo %s does not have any tag %s)", $group->{group}, $repo, $group->{has_any_tags};
                 next GROUP;
               SATISFY_FILTER_HAS_ANY_TAGS:
             }
 
-            if ($group->{has_any_tags}) {
+            if ($group->{lacks_any_tags}) {
                 $num_filters++;
                 for my $tag (@{ $group->{lacks_any_tags} }) {
                     if (!(grep { $_ eq $tag } @repo_tags)) {
-                        #log_trace "  Including group %s (repo %s lacks tag %s)", $group->{group}, $repo, $tag;
+                        log_trace "  Including group %s (repo %s lacks tag %s)", $group->{group}, $repo, $tag;
                         goto SATISFY_FILTER_LACKS_ANY_TAGS;
                     }
                 }
-                #log_trace "  Skipped group %s (repo %s does not lack any tag %s)", $group->{group}, $repo, $group->{lacks_any_tags};
+                log_trace "  Skipped group %s (repo %s does not lack any tag %s)", $group->{group}, $repo, $group->{lacks_any_tags};
                 next GROUP;
               SATISFY_FILTER_LACKS_ANY_TAGS:
             }
 
           MATCH_GROUP:
             if ($num_filters) {
+                log_trace "  Group $group->{group} matches";
                 push @{ $res->{groups} }, $group->{group};
+            } else {
+                log_trace "  Group $group->{group} does NOT match (no filters satisfied)";
             }
         } # FIND_GROUP
 
@@ -573,6 +576,15 @@ sub _configure_repo_single {
                 log_trace "Existing remotes: %s", \@existing_remotes;
             }
 
+            if ($args->{clean_remotes}) {
+                for my $remotename (@existing_remotes) {
+                    log_info "  Deleting remote $remotename first";
+                    system "git", "remote", "remove", $remotename;
+                    log_error("Can't remove remote %s: %s", $remotename, explain_child_error()) if $?;
+                }
+                @existing_remotes = ();
+            }
+
             my $i = -1;
             for my $remotename (@{ $group->{remotes} }) {
                 my $remote = $config->{remotes}{$remotename};
@@ -607,15 +619,6 @@ sub _configure_repo_single {
                     $configured_remotes{$remotename_to_set}++;
                 } # for $remotename_to_set
             } # for $remotename
-
-            if ($args->{clean_remotes}) {
-                for my $remotename (@existing_remotes) {
-                    next if $configured_remotes{$remotename};
-                    log_info "  Deleting remote $remotename because it's not in groups configuration";
-                    system "git", "remote", "remove", $remotename;
-                    log_error("Can't remove remote %s: %s", $remotename, explain_child_error()) if $?;
-                }
-            }
         } # SET_REMOTES
 
     } # for $groupname
@@ -668,7 +671,7 @@ Git::Grouper - Categorize git repositories into one/more groups and perform acti
 
 =head1 VERSION
 
-This document describes version 0.003 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-11.
+This document describes version 0.004 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-11.
 
 =head1 SYNOPSIS
 

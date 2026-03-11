@@ -211,6 +211,10 @@ C<masked>, and cannot be activated. Use this as an
 effective way to fully disable a unit, making it impossible to
 start it even manually.
 
+Files (including directories) with names that match certain patterns are
+generally ignored. This includes names that start with a C<.> or
+end with a C<.ignore>.
+
 The unit file format is covered by the
 L<Interface
 Portability and Stability Promise|https://systemd.io/PORTABILITY_AND_STABILITY/>.
@@ -427,9 +431,10 @@ dependency cannot be specified directly.',
           'value_type' => 'uniline'
         },
         'description' => "Configures requirement dependencies, very similar in style to
-C<Requires>. However, this dependency type is stronger: in addition to the effect of
-C<Requires> it declares that if the unit bound to is stopped, this unit will be stopped
-too. This means a unit bound to another unit that suddenly enters inactive state will be stopped too.
+C<Requires>. However, this dependency type is stronger: in addition to the effects of
+C<Requires>, which already stops (or restarts) the configuring unit when a listed unit is
+explicitly stopped (or restarted), it also does so when a listed unit stops unexpectedly (which includes when it
+fails).
 Units can suddenly, unexpectedly enter inactive state for different reasons: the main process of a service unit
 might terminate on its own choice, the backing device of a device unit might be unplugged or the mount point of
 a mount unit might be unmounted without involvement of the system and service manager.
@@ -700,8 +705,11 @@ C<replace-irreversibly>,
 C<isolate>,
 C<flush>,
 C<ignore-dependencies> or
-C<ignore-requirements>. Defaults to
-C<replace>. Specifies how the units listed in
+C<ignore-requirements>.
+C<OnFailureJobMode> defaults to
+C<replace>,
+C<OnSuccessJobMode> defaults to
+C<fail>. Specifies how the units listed in
 C<OnSuccess>/C<OnFailure> will be enqueued. See
 L<systemctl(1)>\'s
 C<--job-mode=> option for details on the
@@ -720,8 +728,11 @@ C<replace-irreversibly>,
 C<isolate>,
 C<flush>,
 C<ignore-dependencies> or
-C<ignore-requirements>. Defaults to
-C<replace>. Specifies how the units listed in
+C<ignore-requirements>.
+C<OnFailureJobMode> defaults to
+C<replace>,
+C<OnSuccessJobMode> defaults to
+C<fail>. Specifies how the units listed in
 C<OnSuccess>/C<OnFailure> will be enqueued. See
 L<systemctl(1)>\'s
 C<--job-mode=> option for details on the
@@ -1468,6 +1479,17 @@ resides on a file system on top of a loopback block device, only encryption abov
 detected. It is not detected whether the file system backing the loopback block device is encrypted.',
         'type' => 'list'
       },
+      'ConditionPathIsSocket',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'C<ConditionPathIsSocket> is similar to
+C<ConditionPathExists> but verifies that a certain path exists and is a
+socket.',
+        'type' => 'list'
+      },
       'ConditionDirectoryNotEmpty',
       {
         'cargo' => {
@@ -2023,6 +2045,20 @@ into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'AssertPathIsSocket',
+      {
+        'description' => "Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'AssertDirectoryNotEmpty',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
@@ -2234,7 +2270,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 258 doc',
+    'generated_by' => 'parse-man.pl from systemd 260 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

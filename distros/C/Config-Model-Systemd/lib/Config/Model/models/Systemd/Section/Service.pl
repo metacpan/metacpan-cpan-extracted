@@ -44,12 +44,6 @@ L<systemd.resource-control(5)>,
 which configure resource control settings for the processes of the
 service.
 
-If SysV init compat is enabled, systemd automatically creates service units that wrap SysV init
-scripts (the service name is the same as the name of the script, with a C<.service>
-suffix added); see
-L<systemd-sysv-generator(8)>.
-
-
 The L<systemd-run(1)>
 command allows creating C<.service> and C<.scope> units dynamically
 and transiently from the command line.
@@ -315,8 +309,8 @@ exits, like the ones described above.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Commands to execute to trigger a configuration reload in the service. This argument
-takes multiple command lines, following the same scheme as described for
+        'description' => 'Commands to execute to trigger a configuration reload in the service. This setting
+may take multiple command lines, following the same scheme as described for
 C<ExecStart> above. Use of this setting is optional. Specifier and environment
 variable substitution is supported here following the same scheme as for
 C<ExecStart>.
@@ -326,19 +320,34 @@ set to the main process of the daemon, and may be used for command lines like th
 
     ExecReload=kill -HUP $MAINPID
 
-Note however that reloading a daemon by enqueuing a signal (as with the example line above) is
-usually not a good choice, because this is an asynchronous operation and hence not suitable when
-ordering reloads of multiple services against each other. It is thus strongly recommended to either
-use C<Type>=C<notify-reload> in place of
-C<ExecReload>, or to set C<ExecReload> to a command that not only
-triggers a configuration reload of the daemon, but also synchronously waits for it to complete. For
-example, L<dbus-broker(1)>
+Note however that reloading a daemon by enqueuing a signal without completion notification
+(as is the case with the example line above) is usually not a good choice, because this is an
+asynchronous operation and hence not suitable when ordering reloads of multiple services against
+each other. It is thus strongly recommended to either use C<Type=notify-reload>,
+or to set C<ExecReload> to a command that not only triggers a configuration reload
+of the daemon, but also synchronously waits for it to complete. For example, L<dbus-broker(1)>
 uses the following:
 
     ExecReload=busctl call org.freedesktop.DBus \\
     /org/freedesktop/DBus org.freedesktop.DBus \\
     ReloadConfig
-',
+
+
+This setting can be combined with C<Type=notify-reload>, in which case
+the service main process is signaled after all specified command lines finish execution. Specially,
+if C<RELOADING=1> notification is received before C<ExecReload>
+completes, the signaling is skipped and the service manager immediately starts listening for
+C<READY=1>.',
+        'type' => 'list'
+      },
+      'ExecReloadPost',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'Commands to execute after a successful reload operation. Syntax for this setting
+is exactly the same as C<ExecReload>.',
         'type' => 'list'
       },
       'ExecStop',
@@ -426,11 +435,29 @@ as "5min 20s". Defaults to 100ms.',
       },
       'RestartSteps',
       {
-        'description' => 'Configures the number of steps to take to increase the interval
+        'description' => 'Configures the number of exponential steps to take to increase the interval
 of auto-restarts from C<RestartSec> to C<RestartMaxDelaySec>.
-Takes a positive integer or 0 to disable it. Defaults to 0.
+Takes a positive integer or 0 to disable it. Defaults to 0. Hint: values
+between 3 and 5 are good choices when exponential backoff is desired.
 
-This setting is effective only if C<RestartMaxDelaySec> is also set.',
+Example:
+
+    RestartSec=10s
+    RestartSteps=4
+    RestartMaxDelaySec=160s
+
+This will produce the following restart intervals: 10s, 20s, 40s, 80s, 160s, 160s, 160s, etc.
+Notice the geometric interpolation and the resulting constant ratio between intervals; here it is 2.
+The formula for the ratio is
+
+(C<RestartMaxDelaySec> / C<RestartSec>)^(1 / C<RestartSteps>)
+. A (repeating) delay equal to C<RestartMaxDelaySec> is always
+reached after
+C<RestartSteps> + 1
+ steps.
+
+This setting is effective only if C<RestartMaxDelaySec> is also set and
+C<RestartSec> is not zero.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -441,7 +468,8 @@ as the interval goes up with C<RestartSteps>. Takes a value
 in the same format as C<RestartSec>, or C<infinity>
 to disable the setting. Defaults to C<infinity>.
 
-This setting is effective only if C<RestartSteps> is also set.',
+This setting is effective only if C<RestartSteps> is also set and
+C<RestartSec> is not zero.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -810,18 +838,14 @@ option or not.',
       },
       'RootDirectoryStartOnly',
       {
-        'description' => 'Takes a boolean argument. If true, the root
-directory, as configured with the
+        'description' => 'Takes a boolean argument. If true, the root directory, as configured with the
 C<RootDirectory> option (see
 L<systemd.exec(5)>
-for more information), is only applied to the process started
-with C<ExecStart>, and not to the various
-other C<ExecStartPre>,
-C<ExecStartPost>,
-C<ExecReload>, C<ExecStop>,
-and C<ExecStopPost> commands. If false, the
-setting is applied to all configured commands the same way.
-Defaults to false.',
+for more information), is only applied to the process started with C<ExecStart>,
+and not to the various other C<ExecStartPre>, C<ExecStartPost>,
+C<ExecReload>, C<ExecReloadPost>, C<ExecStop>,
+and C<ExecStopPost> commands. If false, the setting is applied to all
+configured commands the same way. Defaults to false.',
         'type' => 'leaf',
         'upstream_default' => 'no',
         'value_type' => 'boolean',
@@ -1023,11 +1047,13 @@ terminate services earlier, before the kernel would have to act.
 This setting takes one of C<continue>, C<stop> or
 C<kill>. If set to C<continue> and a process in the unit is
 killed by the OOM killer, this is logged but the unit continues running. If set to
-C<stop> the event is logged but the unit is terminated cleanly by the service
-manager. If set to C<kill> and one of the unit\'s processes is killed by the OOM
-killer the kernel is instructed to kill all remaining processes of the unit too, by setting the
-C<memory.oom.group> attribute to C<1>; also see kernel
-page L<Control Group v2|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
+C<stop> the event is logged and the unit\'s processes are terminated cleanly by the
+service manager. If set to C<kill> and one of the unit\'s processes is killed by the
+OOM killer the kernel is instructed to kill all remaining processes of the unit too, by setting the
+C<memory.oom.group> attribute to C<1>; also see kernel page
+L<Control Group v2|https://docs.kernel.org/admin-guide/cgroup-v2.html>. In case of
+both C<stop> and C<kill>, the service ultimately ends up in the
+C<oom-kill> failed state after which C<Restart> may apply.
 
 Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>
@@ -1084,6 +1110,26 @@ If the empty string is assigned, the entire list of open files defined prior to 
 to reload the service\'s configuration. Defaults to C<SIGHUP>. This option has no
 effect unless C<Type>=C<notify-reload> is used, see
 above.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RefreshOnReload',
+      {
+        'description' => 'Takes a boolean argument, or a list of resources defined in
+L<systemd.exec(5)>.
+Possible values are C<extensions> and C<credentials>, separated by space.
+Prepending the list with a single tilde character (C<~>) inverts the effect.
+Defaults to C<extensions>. An empty assignment resets the list to default. If enabled,
+the corresponding resources (C<ExtensionImages>/C<ExtensionDirectories>
+for C<extensions> and C<LoadCredential>/C<ImportCredential>/
+C<SetCredential> (along with their C<Encrypted> counterparts)
+for C<credentials>) will be refreshed on service reload. If C<yes>,
+all resources listed above that are used by the service shall be refreshed.
+
+Specially, if this option is set explicitly, and the respective resources are in use,
+the service may be reloaded without any actual reload mechanism (C<ExecReload>
+or C<Type=notify-reload>) for notifying the main process, in which case the reload
+is considered complete immediately after refreshing.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

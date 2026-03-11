@@ -1,6 +1,6 @@
 package Langertha::Engine::Remote;
 # ABSTRACT: Base class for all remote engines
-our $VERSION = '0.305';
+our $VERSION = '0.307';
 use Moose;
 
 use Langertha::RateLimit;
@@ -65,7 +65,7 @@ Langertha::Engine::Remote - Base class for all remote engines
 
 =head1 VERSION
 
-version 0.305
+version 0.307
 
 =head1 SYNOPSIS
 

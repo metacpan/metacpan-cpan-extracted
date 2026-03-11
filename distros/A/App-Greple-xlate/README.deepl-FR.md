@@ -14,7 +14,7 @@ App::Greple::xlate - module d'aide à la traduction pour greple
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -77,7 +77,7 @@ Il arrive que des parties de texte ne soient pas traduites. Par exemple, les bal
 
     --xlate-setopt maskfile=MASKPATTERN
 
-Chaque ligne du fichier \`MASKPATTERN\` sera interprétée comme une expression régulière, traduira les chaînes de caractères qui y correspondent et reviendra en arrière après le traitement. Les lignes commençant par `#` sont ignorées.
+Cela interprétera chaque ligne du fichier `MASKPATTERN` comme une expression régulière, traduira les chaînes qui correspondent et reviendra en arrière après le traitement. Les lignes commençant par `#` sont ignorées.
 
 Un motif complexe peut être écrit sur plusieurs lignes avec une barre oblique inverse et une nouvelle ligne.
 

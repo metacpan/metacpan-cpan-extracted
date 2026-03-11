@@ -32,6 +32,7 @@ my @modules = qw(
   Langertha::Engine::OllamaOpenAI
   Langertha::Engine::Perplexity
   Langertha::Engine::Replicate
+  Langertha::Engine::SGLang
   Langertha::Engine::vLLM
   Langertha::Engine::Whisper
   Langertha::Raider
@@ -48,6 +49,11 @@ my @modules = qw(
   Langertha::Role::Langfuse
   Langertha::Role::OpenAICompatible
   Langertha::Role::Tools
+  Langertha::Input
+  Langertha::Input::Tools
+  Langertha::Output
+  Langertha::Output::Tools
+  Langertha::Metrics
   LangerthaX
 );
 

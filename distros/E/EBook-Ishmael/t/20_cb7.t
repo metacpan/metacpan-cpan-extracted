@@ -8,7 +8,7 @@ use File::Spec;
 
 use EBook::Ishmael::EBook;
 use EBook::Ishmael::EBook::CB7;
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_id);
 
 my $TEST_CB7 = $ENV{TEST_CB7} // $EBook::Ishmael::EBook::CB7::CAN_TEST;
 
@@ -32,23 +32,20 @@ ok($ebook->metadata->modified, 'metadata modified ok');
 ok(!$ebook->html, "html ok");
 ok(!$ebook->raw,  "raw ok");
 
-ok($ebook->has_cover, "has cover");
+subtest 'cover ok' => sub {
+    ok($ebook->has_cover, "has cover");
+    my ($img, $format) = $ebook->cover;
+    is($format, 'png', 'cover is png');
+    is(image_id($img), 'png', 'cover looks like png');
+};
 
-ok($ebook->cover, "cover ok");
-is(
-    image_id(\($ebook->cover)),
-    "png",
-    "cover looks like a png"
-);
-
-is($ebook->image_num, 28, "image count ok");
-
-for my $i (0 .. 27) {
-    is(
-        image_id($ebook->image($i)),
-        "png",
-        "image #$i ok"
-    );
-}
+subtest 'images ok' => sub {
+    is($ebook->image_num, 28, 'image count ok');
+    for my $i (0 .. 27) {
+        my ($img, $format) = $ebook->image($i);
+        is($format, 'png', "image #$i is png");
+        is(image_id($img), 'png', "image #$i looks like png");
+    }
+};
 
 done_testing();

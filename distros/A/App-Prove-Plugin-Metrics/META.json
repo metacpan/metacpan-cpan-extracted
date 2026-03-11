@@ -1,0 +1,38 @@
+{
+	"version":"0.0.1",
+	"name":"App-Prove-Plugin-Metrics",
+	"author":["Brian Blackmore <brian@mediaalpha.com>"],
+	"abstract":"Emit metrics from Perl unit tests",
+	"license":["gpl_3"],
+	"prereqs":{
+		"configure":{
+			"requires":{
+				"Module::Build::Tiny":"0.040"
+			}
+		},
+		"runtime":{
+			"requires":{
+				"perl":"5.8.0",
+				"Carp":"1.38",
+				"Fcntl":"5.8.0",
+				"Test::Harness":"3.42"
+			}
+		},
+		"test":{
+			"requires":{
+				"Test::More":"0.61"
+			}
+		}
+	},
+	"resources":{
+		"bugtracker":{ "web":"https://github.com/MediaAlpha/perl-app-prove-plugin-metrics" },
+		"repository":{ "url":"git://github.com/MediaAlpha/perl-app-prove-plugin-metrics.git" }
+	},
+	"dynamic_config":1,
+	"generated_by":"Brian Blackmore",
+	"meta-spec":{
+		"url":"http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+		"version":"2"
+	},
+	"release_status":"stable"
+}

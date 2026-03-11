@@ -6,6 +6,10 @@ Home page:    <https://metacpan.org/release/MooX-XSConstructor>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=MooX-XSConstructor>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003003	2026-03-10
+
+ - Added: -wrapconstructor option.
+
 0.003002	2026-01-20
 
  [ Bug Fixes ]

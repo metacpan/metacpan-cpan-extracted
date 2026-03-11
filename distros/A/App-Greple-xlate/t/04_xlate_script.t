@@ -80,4 +80,28 @@ subtest 'Docker option delegation' => sub {
     like($out, qr/-K.*kill/, '-K option is documented');
 };
 
+# Test: PERMUTE disabled - options after filename are not consumed by xlate
+subtest 'PERMUTE disabled - options after filename pass through' => sub {
+    # With PERMUTE disabled, option parsing stops at the first non-option
+    # argument (filename).  Options after the filename should be passed
+    # through to greple, not interpreted by xlate.
+
+    # -s after filename should NOT be interpreted as xlate's --silent
+    my $out = `$xlate -n -t JA test.txt -s 2>&1`;
+    unlike($out, qr/--no-xlate-progress/,
+	   '-s after filename is not interpreted as --silent');
+    like($out, qr/test\.txt\b/,
+	 'filename is in the command');
+    like($out, qr/test\.txt.*-s/,
+	 '-s is passed through to greple after filename');
+
+    # Unknown greple options after filename should not cause error
+    $out = `$xlate -n -t JA test.txt --color=never 2>&1`;
+    my $exit = $? >> 8;
+    is($exit, 0,
+       'unknown option after filename does not cause error');
+    like($out, qr/--color=never/,
+	 'greple option is passed through');
+};
+
 done_testing;

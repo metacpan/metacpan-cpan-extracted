@@ -1,0 +1,41 @@
+Revision history for DBIx::Class::MockData
+
+0.02  2026-03-11
+
+      - Makefile.PL: added provides block to META_MERGE so MetaCPAN correctly
+        indexes DBIx::Class::MockData with its version.
+      - README.md: corrected SYNOPSIS to use new() with a pre-connected schema
+        instead of the removed schema() entry point.
+
+
+0.01  2026-03-11
+
+      First release.
+
+      New features:
+      - new() constructor accepts a connected DBIx::Class::Schema object and
+        schema_dir; connection is entirely the caller's responsibility.
+      - deploy()   -- creates missing tables via DBIx::Class schema deployment.
+      - wipe()     -- drops all tables and redeploys from scratch (test use only).
+      - generate() -- introspects all result sources, resolves FK insertion order
+                      via topological sort, and inserts randomly generated rows.
+      - dry_run()  -- prints generated values without touching the database.
+      - All public methods return $self for call chaining.
+
+      Data generation:
+      - Values derived entirely from each column's declared data_type.
+      - Contextual strings for varchar/text columns matched on column name
+        (email, slug, title, status, url, etc.).
+      - Unique and PK columns salted with a per-run random value to prevent
+        cross-run constraint violations.
+      - Optional seed argument for fully reproducible output.
+
+      CLI tool:
+      - script/dbic-mockdata with --schema-dir, --namespace, --dsn, --deploy,
+        --wipe, --dry-run, --rows, --seed, --verbose, --help.
+
+      Test suite:
+      - t/01-basic.t  -- unit tests with inline schema.
+      - t/02-schema.t -- integration tests against t/lib/TestSchema
+                         (Author -> Book -> Review FK chain).
+      - t/03-cli.t    -- subprocess tests for the CLI script via IPC::Open3.

@@ -81,7 +81,7 @@
    "provides" : {
       "Aion::Emitter" : {
          "file" : "lib/Aion/Emitter.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.1.0"
       },
       "Aion::Emitter::ListenersRun" : {
          "file" : "lib/Aion/Emitter/ListenersRun.pm"
@@ -99,7 +99,7 @@
          "web" : "https://github.com/darviarush/perl-aion-emitter"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.1.0",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>"

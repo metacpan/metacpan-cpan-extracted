@@ -50,9 +50,10 @@
 #endif
 #define FUNC_mpz_log2 1
 #include "utility.h"
+#include "poly.h"
 
 
-static int test_anr(UV a, mpz_t n, UV r, mpz_t* px, mpz_t* py)
+static int test_anr(UV a, const mpz_t n, UV r, mpz_t* px, mpz_t* py)
 {
   int retval = 1;
   UV i, n_mod_r;
@@ -61,7 +62,7 @@ static int test_anr(UV a, mpz_t n, UV r, mpz_t* px, mpz_t* py)
   for (i = 0; i < r; i++)
     mpz_set_ui(px[i], 0);
 
-  mpz_set_ui(px[0], a);
+  mpz_set_uv(px[0], a);
   mpz_set_ui(px[1], 1);
 
   poly_mod_pow(py, px, n, r, n);
@@ -81,11 +82,12 @@ static int test_anr(UV a, mpz_t n, UV r, mpz_t* px, mpz_t* py)
 }
 
 #if AKS_VARIANT != AKS_VARIANT_V6
-static int is_primitive_root_uiprime(mpz_t n, UV r)
+static int is_primitive_root_uiprime(const mpz_t n, UV r)
 {
   int res;
   mpz_t zr;
-  mpz_init_set_ui(zr, r);
+  mpz_init(zr);
+  mpz_set_uv(zr, r);
   res = is_primitive_root(n, zr, 1);
   mpz_clear(zr);
   return res;
@@ -104,7 +106,7 @@ static UV largest_factor(UV n) {
 }
 #endif
 #if AKS_VARIANT == AKS_VARIANT_BERN41
-int bern41_acceptable(mpz_t n, UV r, UV s, mpz_t t1, mpz_t t2)
+int bern41_acceptable(const mpz_t n, UV r, UV s, mpz_t t1, mpz_t t2)
 {
   double scmp = ceil(sqrt( (r-1)/3.0 )) * mpz_log2(n);
   UV d = (UV) (0.5 * (r-1));
@@ -125,7 +127,7 @@ int bern41_acceptable(mpz_t n, UV r, UV s, mpz_t t1, mpz_t t2)
 
 
 
-int is_aks_prime(mpz_t n)
+int is_aks_prime(const mpz_t n)
 {
   mpz_t *px, *py;
   int retval;
@@ -147,16 +149,16 @@ int is_aks_prime(mpz_t n)
   {
     mpz_t sqrtn, t;
     double log2n;
-    UV limit, startr;
+    unsigned long limit, startr;
     PRIME_ITERATOR(iter);
 
     mpz_init(sqrtn);
     mpz_sqrt(sqrtn, n);
 
     log2n = mpz_log2(n);
-    limit = (UV) floor( log2n * log2n );
+    limit = (unsigned long) floor( log2n * log2n );
 
-    if (_verbose>1) gmp_printf("# AKS checking order_r(%Zd) to %"UVuf"\n", n, (unsigned long) limit);
+    if (_verbose>1) gmp_printf("# AKS checking order_r(%Zd) to %lu\n", n, limit);
 
     /* Using a native r limits us to ~2000 digits in the worst case (r ~ log^5n)
      * but would typically work for 100,000+ digits (r ~ log^3n).  This code is
@@ -180,7 +182,7 @@ int is_aks_prime(mpz_t n)
     if (retval != 2) return retval;
 
     /* Since r is prime, phi(r) = r-1. */
-    s = (UV) floor( sqrt(r-1) * log2n );
+    s = (unsigned long) floor( sqrt(r-1) * log2n );
   }
 #elif AKS_VARIANT == AKS_VARIANT_BORNEMANN /* Bernstein + Voloch */
   {
@@ -239,7 +241,7 @@ int is_aks_prime(mpz_t n)
       if (mpz_cmp_ui(n, r) <= 0) break;
       r = prime_iterator_next(&iter);
       q = largest_factor(r-1);
-      mpz_set_ui(t, r);
+      mpz_set_uv(t, r);
       mpz_powm_ui(t, n, (r-1)/q, t);
       if (mpz_cmp_ui(t, 1) <= 0) continue;
       scmp = 2 * floor(sqrt(r)) * mpz_log2(n);
@@ -294,28 +296,29 @@ int is_aks_prime(mpz_t n)
   }
 #elif AKS_VARIANT == AKS_VARIANT_BERN23
   { /* Bernstein 2003, theorem 2.3 (simplified) */
-    UV q, d, limit;
+    unsigned long q, d, limit;
+    unsigned long limit;
     double slim, scmp, sbin, x, log2n;
     mpz_t t, t2;
     PRIME_ITERATOR(iter);
     mpz_init(t);  mpz_init(t2);
     log2n = mpz_log2(n);
-    limit = (UV) floor( log2n * log2n );
+    limit = (unsigned long) floor( log2n * log2n );
     r = 2;
     s = 0;
     while (1) {
       /* todo: Check r|n and r >= sqrt(n) here instead of waiting */
       if (mpz_cmp_ui(n, r) <= 0) break;
       r++;
-      UV gcd = mpz_gcd_ui(NULL, n, r);
+      unsigned long gcd = mpz_gcd_ui(NULL, n, r);
       if (gcd != 1) { mpz_clear(t); mpz_clear(t2); return 0; }
-      UV v = mpz_order_ui(r, n, limit);
+      unsigned long v = mpz_order_ui(r, n, limit);
       if (v >= limit) continue;
 
       mpz_set_ui(t2, r);
       totient(t, t2);
       q = mpz_get_ui(t);
-      UV phiv = q/v;
+      unsigned long phiv = q/v;
       /* printf("phi(%lu)/v = %lu/%lu = %lu\n", r, q, v, phiv); */
 
       /* This is extremely inefficient. */
@@ -393,6 +396,7 @@ int is_aks_prime(mpz_t n)
       { mpz_clear(tmp); mpz_clear(tmp2); return 0; }
     /* If we checked divisibility to sqrt(n), then it is prime. */
     mpz_sqrt(tmp, n);
+    /* TODO: slim UV / ui */
     if (mpz_cmp_ui(tmp, slim) <= 0)
       { mpz_clear(tmp); mpz_clear(tmp2); return 1; }
 
@@ -400,7 +404,7 @@ int is_aks_prime(mpz_t n)
     if (_verbose > 1) printf("# aks checking fermat to %"UVuf"\n", s);
     mpz_sub_ui(tmp2, n, 1);
     for (i = 2; i <= s; i++) {
-      mpz_set_ui(tmp, i);
+      mpz_set_uv(tmp, i);
       mpz_powm(tmp, tmp, tmp2, n);
       if (mpz_cmp_ui(tmp, 1) != 0)
         { mpz_clear(tmp); mpz_clear(tmp2); return 0; }

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -129,7 +129,7 @@ Dumps the ebook's raw, unformatted text contents.
 
 Returns bool of whether the ebook has a cover image or not.
 
-=head2 $cover = $e->cover([$out])
+=head2 ($cover, $format) = $e->cover()
 
 Dumps the ebook's cover image data. Returns C<undef> is there is no cover.
 
@@ -137,7 +137,7 @@ Dumps the ebook's cover image data. Returns C<undef> is there is no cover.
 
 Returns the number of images in the ebook.
 
-=head2 $img = $e->image($n)
+=head2 ($img, $format) = $e->image($n)
 
 Returns a scalar ref C<$img> of image data from image C<$n> (starting from
 C<0>). Returns C<undef> if the image is not available.

@@ -80,7 +80,7 @@ like(
 
 like(
 	exception { Bar->new(abc => "x", xyz => 123) },
-	qr/not an integer/,
+	qr/(not an integer|failed type constraint)/,
 	'type constraint works'
 );
 

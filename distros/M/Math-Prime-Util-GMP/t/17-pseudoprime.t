@@ -18,10 +18,11 @@ use Math::Prime::Util::GMP qw/
    is_perrin_pseudoprime
    is_prime
    is_bpsw_prime
-   lucas_sequence lucasu lucasv
+   lucas_sequence lucasu lucasv lucasumod lucasvmod lucasuv lucasuvmod
    miller_rabin_random
    primes/;
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
+my $use64 = (~0 > 4294967295);
 
 # pseudoprimes from 2-100k for many bases
 
@@ -101,7 +102,36 @@ my %lucas_sequences = (
   "323 5 -1 81" => [153,195,322],
   "49001 25 117 24501" => [20933,18744,19141],
   "18971 10001 -1 4743" => [5866,14421,18970],
+  "18970 47 -17 18969" => [17108,10950,17543],
+
+  "4 1 -1 951" => [2,0,3],
+  "4 2 -1 951" => [1,2,3],
+  "8 1 -1 47" => [1,7,7],
+  "8 2 -1 47" => [1,6,7],
+  "5 1 -1 0" => [0,2,1],
+  "5 2 -1 0" => [0,2,1],
+  "5 1 -1 66" => [3,3,1],
+  "5 2 -1 66" => [0,3,1],
+  "1001 -4 4 50" => [173,827,562],
+  "1001 -4 7 50" => [87,457,595],
+  "1001 1 -1 50" => [330,486,1],
+  "5 1 -1 4" => [3,2,1],
+  "3 6 9 36" => [0,0,0],
+  "5 10 25 101" => [0,0,0],
+  "6 10 25 101" => [5,4,1],
+  "3 -6 9 0" => [0,2,1],
+
+  "1 30 1 15" => [0,0,0],
+  "3 3 3 1" => [1,0,0],
+  "3 -30 -30 1" => [1,0,0],
+  "1 9 5 0" => [0,0,0],      # Everything mod 1
 );
+# Test to make P*P-2 and P*P-4Q overflow.
+if ($use64) {
+  $lucas_sequences{"124838608575421729 82826032115733949 1 9"} = [qw/105023007914661659 30068202713672712 1/];
+} else {
+  $lucas_sequences{"1248386085 828260321 1 9"} = [177951510, 794464463, 1];
+}
 
 my @primes128 = (qw/
   216807359884357411648908138950271200947
@@ -128,28 +158,43 @@ my @comp128 = (qw/
   276174467950103435998583356206846142651
 /);
 
+my @perrint = (
+  [271441, 0],
+  ["167385219121", 1],
+  ["24708862470601", 2],
+  ["102690901", 3],
+);
 
-plan tests => 0 + 9
+
+plan tests => 0 + 8
                 + 3
                 + 6
                 + $num_pseudoprimes
                 + 1  # mr base 2    2-4k
                 + 9  # mr with large bases
                 + 3  # multiple bases
+                + 1  # small extra_strong
                 + scalar @small_lucas_trials
-                + scalar(keys %lucas_sequences)
+                + 2*scalar(keys %lucas_sequences)
+                + 7  # lucasuv
                 + 7  # lucasu lucasv
+                + 8  # lucasumod lucasvmod lucasuvmod
+              # skipping these:
               # + $num_large_pseudoprime_tests
                 + 18*$extra  # Large Carmichael numbers
                 + 2 # M-R-random
                 + 5 * scalar(@primes128)  # strong probable prime tests
                 + 5 * scalar(@comp128)    # strong probable prime tests
                 + 15  # Check Frobenius for small primes
-                + 2   # mrr with seed and neg bases
+                + 3   # mrr with seed and neg bases
+                + 4  *scalar(@perrint)    # Perrin pseudoprime types
+                + 2   # Test for unusual single digit pseudoprimes
+                + 3   # Implicit base 2
                 + 0;
 
-eval { is_strong_pseudoprime(2047); };
-like($@, qr/no base/i, "is_strong_pseudoprime with no base fails");
+# no base is no implicit 2
+#eval { is_strong_pseudoprime(2047); };
+#like($@, qr/no base/i, "is_strong_pseudoprime with no base fails");
 eval { no warnings; is_strong_pseudoprime(2047, undef); };
 like($@, qr/(defined|empty)/i, "is_strong_pseudoprime with base undef fails");
 eval { is_strong_pseudoprime(2047, ''); };
@@ -164,15 +209,13 @@ eval { no warnings; is_strong_pseudoprime(undef, 2); };
 like($@, qr/(defined|empty)/i, "is_strong_pseudoprime(undef,2) is invalid");
 eval { is_strong_pseudoprime('', 2); };
 like($@, qr/(positive|empty)/i, "is_strong_pseudoprime('',2) is invalid");
-eval { is_strong_pseudoprime(-7, 2); };
-like($@, qr/positive/i, "is_strong_pseudoprime(-7,2) is invalid");
+is(is_strong_pseudoprime(-7), 0, "is_strong_pseudoprime(-7) returns 0");
 
 eval { no warnings; is_strong_lucas_pseudoprime(undef); };
 like($@, qr/empty string/i, "is_strong_lucas_pseudoprime(undef) is invalid");
 eval { is_strong_lucas_pseudoprime(''); };
 like($@, qr/empty string/i, "is_strong_lucas_pseudoprime('') is invalid");
-eval { is_strong_lucas_pseudoprime(-7); };
-like($@, qr/integer/i, "is_strong_lucas_pseudoprime(-7) is invalid");
+is(is_strong_lucas_pseudoprime(-7), 0, "is_strong_lucas_pseudoprime(-7) returns 0");
 
 
 is( is_strong_pseudoprime(0, 2), 0, "spsp(0, 2) shortcut composite");
@@ -243,6 +286,9 @@ is(is_pseudoprime(162401, 2, 3, 5, 7, 11, 13), 1, "162401 is a Fermat pseudoprim
 is(is_euler_pseudoprime(1857241, 2, 3, 5, 7, 11, 13), 1, "1857241 is an Euler pseudoprime to bases 2,3,5,7,11,13");
 is(is_strong_pseudoprime("3474749660383", 2, 3, 5, 7, 11, 13), 1, "3474749660383 is a strong pseudoprime to bases 2,3,5,7,11,13");
 
+# Verify extra strong for a few small primes
+is_deeply( [grep { is_extra_strong_lucas_pseudoprime($_) } 1..100], [@{primes(2,100)}], "The first 100 primes are selected by is_extra_strong_lucas_pseudoprime" );
+
 # Verify Lucas for some small numbers
 for my $n (@small_lucas_trials) {
   next if $n == 5459 || $n == 5777 || $n == 10877 || $n == 16109 || $n == 18971;
@@ -257,7 +303,17 @@ for my $n (@small_lucas_trials) {
 while (my($params, $expect) = each (%lucas_sequences)) {
   my ($n, $p, $q, $k) = split(' ', $params);
   is_deeply( [lucas_sequence($n,$p,$q,$k)], $expect, "Lucas sequence $params" );
+  is_deeply( [lucasuvmod($p,$q,$k,$n)], [(@$expect)[0,1]], "Lucas sequence $params" );
 }
+
+is_deeply([lucasuv(-2,1,77)], [qw/77 -2/], "lucasuv(-2,1,77)");
+is_deeply([lucasuv(-2,1,78)], [qw/-78 2/], "lucasuv(-2,1,78)");
+is_deeply([lucasuv(1976,5,16)], [qw/27339861985064795494009991734166003120303617064256 54023428922685428704171689548869287975320852979063746/], "lucasuv(7,1,26)");
+is_deeply([lucasuv(7,1,26)], [qw/809297742799991694151 5428934300813767249007/], "lucasuv(7,1,26)");
+is_deeply([lucasuv(7,-1,26)], [qw/2158253550553860723607 15712323016961952435651/], "lucasuv(7,-1,26)");
+is_deeply([lucasuv(11,9,26)], [qw/14406755521422156274321643 132823723015101341506439623/], "lucasuv(11,9,26)");
+is_deeply([lucasuv(1,-1,27)], [qw/196418 439204/], "lucasuv(1,-1,27)");
+
 {
   is( lucasu(1,-1,1001), "70330367711422815821835254877183549770181269836358732742604905087154537118196933579742249494562611733487750449241765991088186363265450223647106012053374121273867339111198139373125598767690091902245245323403501", "Fibonacci(1001)" );
   is( lucasv(1,-1,1001), "157263483085297728693212310227264801375310590871102293547568363266227647954095037360550009174721122072079595635402411260638605742511929970292048335339367003086933714987796078672982630775099044177835579021861251", "Lucas(1001)" );
@@ -284,6 +340,28 @@ while (my($params, $expect) = each (%lucas_sequences)) {
   $str = $n;
   substr($str, 15, -15, "...");
   is( $str, "580334188745259...957502147624960", "lucasv(10,8,88321)" );
+}
+
+{
+  is(lucasumod('12191546079288003221', 1, 343, '13581893559735945553'), '7312819742654600913', 'lucasumod(12191546079288003221,1,343,13581893559735945553)');
+  is(lucasvmod('12191546079288003221', 1, 343, '13581893559735945553'), '5377771953708190494', 'lucasvmod(12191546079288003221,1,343,13581893559735945553)');
+
+  # Arbitrary large numbers
+  my $P = '2934820398402938092384095959923845';
+  my $Q = '982340928309238409293484384234';
+  my $k = 7;
+  my $n = '93284902384902384902389999977';
+  my $expU = '25334869115319721344893191735';
+  my $expV = '69387036616346396045108433732';
+
+  is(lucasumod($P, $Q, $k, $n), $expU, 'lucasumod with large P and Q');
+  is(lucasvmod($P, $Q, $k, $n), $expV, 'lucasvmod with large P and Q');
+  is_deeply([lucasuvmod($P, $Q, $k, $n)], [$expU,$expV], 'lucasuvmod with large P and Q');
+
+  # If we use modint(value,$n) on these, we get $expU and $expV.
+  is(lucasu($P, $Q, $k), '638982808433522085545526796419139574565194569084879688961370201789461273036864463739989850080992114905246599468477822532880603380773729456663882472537224263398682230515459999540010010351118370161596871', "lucasu for large P and Q");
+  is(lucasv($P, $Q, $k), '1875299780419497557538948612956167552951772186106753300376504920556962412200502591917907602290572119239861996582993221578397134916418952408512789835017751871121324009103483441761790314370208020327461156252066033716180814973870096415215', "lucasv for large P and Q");
+  is_deeply([lucasuv($P, $Q, $k)], [qw/638982808433522085545526796419139574565194569084879688961370201789461273036864463739989850080992114905246599468477822532880603380773729456663882472537224263398682230515459999540010010351118370161596871 1875299780419497557538948612956167552951772186106753300376504920556962412200502591917907602290572119239861996582993221578397134916418952408512789835017751871121324009103483441761790314370208020327461156252066033716180814973870096415215/], "lucasuv for large P and Q");
 }
 
 if ($extra) {
@@ -369,3 +447,42 @@ for my $p (2,3,5,7,11,13,17,19,23,29,31,37,41,43,47) {
 is(miller_rabin_random("5948714251747610466954817160823054375857",30,"0x6c7b06f2333c8390"), 1, "miller_rabin_random with a seed");
 # Test mrr with a negative number of bases
 ok(!eval { miller_rabin_random(10007,-4); },   "MRR(10007,-4)");
+# Test mrr with too many bases
+is(miller_rabin_random(123457,1000000), 1, "miller_rabin_random with excessive base number");
+
+###### Perrin pseudoprimes
+for my $pdata (@perrint) {
+  my($n, $is) = @$pdata;
+  my @name = ('unresticted', 'minimal restricted', 'Adams/Shanks', 'Grantham');
+  for my $type (0 .. 3) {
+    if ($is >= $type) {
+      is( is_perrin_pseudoprime($n, $type), 1, "$n is a $name[$type] Perrin pseudoprime" );
+    } else {
+      is( is_perrin_pseudoprime($n, $type), 0, "$n is not a $name[$type] Perrin pseudoprime" );
+    }
+  }
+}
+
+###### Tests for Github #36
+ok( is_pseudoprime(4,5), "4 is a base 5 pseudoprime" );
+ok( is_pseudoprime(8,9), "8 is a base 9 pseudoprime" );
+
+###### Implicit base 2
+{
+  my(@ns) = (2047,3277,121,703,781,1541);
+  my(@carm) = (1729, 2821, 6601, 8911);
+
+  is_deeply( [map { is_pseudoprime($_, 2) } @ns],
+             [map { is_pseudoprime($_)    } @ns],
+             "implicit base 2" );
+
+  my(@bases235) = (2,3,5);
+  is_deeply( [map { is_pseudoprime($_, 2, 3, 5)   } @carm],
+             [map { is_pseudoprime($_, @bases235) } @carm],
+             "is_pseudoprime can take array of bases" );
+
+  my(@basesnull) = ();
+  is_deeply( [map { is_pseudoprime($_, 2)          } @ns],
+             [map { is_pseudoprime($_, @basesnull) } @ns],
+             "empty array of bases is implicit base 2" );
+}

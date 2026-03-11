@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Metadata;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -318,6 +318,8 @@ sub add_contributor {
     push @{ $self->{Contributor} }, @add;
 
 }
+
+1;
 
 =head1 NAME
 

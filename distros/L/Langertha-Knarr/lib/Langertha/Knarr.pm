@@ -1,5 +1,5 @@
 package Langertha::Knarr;
-our $VERSION = '0.004';
+our $VERSION = '0.007';
 # ABSTRACT: LLM Proxy with Langfuse Tracing
 use strict;
 use warnings;
@@ -10,6 +10,7 @@ use Log::Any qw( $log );
 use Langertha::Knarr::Config;
 use Langertha::Knarr::Router;
 use Langertha::Knarr::Tracing;
+use Langertha::Knarr::RequestLog;
 use Langertha::Knarr::Proxy::OpenAI;
 use Langertha::Knarr::Proxy::Anthropic;
 use Langertha::Knarr::Proxy::Ollama;
@@ -21,6 +22,7 @@ sub build_app {
     || Langertha::Knarr::Config->new(file => $opts{config_file});
   my $router = Langertha::Knarr::Router->new(config => $config_obj);
   my $tracing = Langertha::Knarr::Tracing->new(config => $config_obj);
+  my $request_log = Langertha::Knarr::RequestLog->new(config => $config_obj);
 
   my $app = Mojolicious->new;
   $app->secrets(['knarr-llm-proxy']);
@@ -30,23 +32,70 @@ sub build_app {
   $app->ua->request_timeout(300);
 
   # Store objects in app helper
-  $app->helper(knarr_config  => sub { $config_obj });
-  $app->helper(knarr_router  => sub { $router });
-  $app->helper(knarr_tracing => sub { $tracing });
+  $app->helper(knarr_config      => sub { $config_obj });
+  $app->helper(knarr_router      => sub { $router });
+  $app->helper(knarr_tracing     => sub { $tracing });
+  $app->helper(knarr_request_log => sub { $request_log });
+  $app->helper(knarr_before_request_hook => sub { $opts{before_request} });
+  $app->helper(knarr_api_key_validator   => sub { $opts{api_key_validator} });
 
   # Auth middleware
-  if ($config_obj->has_proxy_api_key) {
+  if ($config_obj->has_proxy_api_key || $opts{api_key_validator}) {
     $app->hook(before_dispatch => sub ($c) {
       my $path = $c->req->url->path->to_string;
       return if $path eq '/health';
-      my $auth = $c->req->headers->header('Authorization')
-              // $c->req->headers->header('x-api-key')
-              // '';
-      my $key = $config_obj->proxy_api_key;
-      $auth =~ s/^Bearer\s+//i;
-      unless ($auth eq $key) {
-        $c->render(json => { error => { message => 'Invalid API key', type => 'authentication_error' } }, status => 401);
-        return $c->rendered;
+
+      my ($raw_auth, $api_key) = _extract_request_api_key($c);
+
+      if ($config_obj->has_proxy_api_key) {
+        my $key = $config_obj->proxy_api_key;
+        unless ($api_key eq $key) {
+          $c->render(json => { error => { message => 'Invalid API key', type => 'authentication_error' } }, status => 401);
+          return $c->rendered;
+        }
+      }
+
+      if (my $validator = $c->knarr_api_key_validator) {
+        my $decision = eval {
+          $validator->($c, {
+            api_key     => $api_key,
+            raw_auth    => $raw_auth,
+            path        => $path,
+            method      => $c->req->method,
+            content_type => ($c->req->headers->content_type // ''),
+          });
+        };
+
+        if ($@) {
+          my $err = "$@";
+          $err =~ s/\s+$//;
+          $log->errorf("api_key_validator failed: %s", $err);
+          $c->render(json => { error => { message => "api_key_validator error: $err", type => 'server_error' } }, status => 500);
+          return $c->rendered;
+        }
+
+        my ($allow, $status, $message, $type);
+        if (ref($decision) eq 'HASH') {
+          $allow   = $decision->{allow} ? 1 : 0;
+          $status  = $decision->{status} // 403;
+          $message = $decision->{message} // 'Request not allowed for this API key';
+          $type    = $decision->{type} // 'authorization_error';
+        } elsif (defined $decision) {
+          $allow   = $decision ? 1 : 0;
+          $status  = 403;
+          $message = 'Request not allowed for this API key';
+          $type    = 'authorization_error';
+        } else {
+          $allow   = 0;
+          $status  = 403;
+          $message = 'Request not allowed for this API key';
+          $type    = 'authorization_error';
+        }
+
+        unless ($allow) {
+          $c->render(json => { error => { message => $message, type => $type } }, status => $status);
+          return $c->rendered;
+        }
       }
     });
   }
@@ -92,9 +141,10 @@ sub build_app {
 
 
 sub _handle_request ($c, $proxy_class, $type) {
-  my $router  = $c->knarr_router;
-  my $tracing = $c->knarr_tracing;
-  my $body    = $c->req->json;
+  my $router      = $c->knarr_router;
+  my $tracing     = $c->knarr_tracing;
+  my $request_log = $c->knarr_request_log;
+  my $body        = $c->req->json;
 
   unless ($body) {
     $c->render(json => { error => { message => 'Invalid JSON body', type => 'invalid_request_error' } }, status => 400);
@@ -105,12 +155,49 @@ sub _handle_request ($c, $proxy_class, $type) {
   my $stream     = $proxy_class->extract_stream($body);
   my $messages   = $proxy_class->extract_messages($body);
   my $params     = $proxy_class->extract_params($body);
+  my $format     = $proxy_class->format_name;
+
+  if (my $hook = $c->knarr_before_request_hook) {
+    my $ctx = {
+      proxy_class => $proxy_class,
+      type        => $type,
+      format      => $format,
+      body        => $body,
+      model_name  => $model_name,
+      stream      => $stream,
+      messages    => $messages,
+      params      => $params,
+    };
+
+    my $hook_result = eval { $hook->($c, $ctx) };
+    if ($@) {
+      my $err = "$@";
+      $err =~ s/\s+$//;
+      $log->errorf("before_request hook failed: %s", $err);
+      $c->render(json => $proxy_class->format_error("before_request hook error: $err", 'server_error'), status => 500);
+      return;
+    }
+
+    if (ref($hook_result) eq 'HASH' && $hook_result->{stop}) {
+      my $status = $hook_result->{status} // 400;
+      my $message = $hook_result->{message} // 'Request blocked by before_request hook';
+      my $type_name = $hook_result->{type} // 'request_blocked';
+      $c->render(json => $proxy_class->format_error($message, $type_name), status => $status);
+      return;
+    }
+
+    $body       = $ctx->{body}       if exists $ctx->{body};
+    $model_name = $ctx->{model_name} if exists $ctx->{model_name};
+    $stream     = $ctx->{stream}     if exists $ctx->{stream};
+    $messages   = $ctx->{messages}   if exists $ctx->{messages};
+    $params     = $ctx->{params}     if exists $ctx->{params};
+  }
 
   # 1. Try explicit config / discovered models first
   my ($engine, $resolved_model) = eval { $router->resolve($model_name, skip_default => 1) };
 
   if ($engine) {
-    _route_to_engine($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $type);
+    _route_to_engine($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $request_log, $type);
     return;
   }
 
@@ -126,7 +213,16 @@ sub _handle_request ($c, $proxy_class, $type) {
       params   => $params,
       format   => $proxy_class->format_name,
     );
-    _handle_passthrough($c, $proxy_class, $upstream, $body, $model_name, $tracing, $trace_id);
+    my $log_handle = $request_log->start_request(
+      model    => $model_name,
+      format   => $proxy_class->format_name,
+      engine   => "passthrough:$pt_format",
+      path     => $c->req->url->path->to_string,
+      stream   => $body->{stream},
+      messages => $messages,
+      params   => $params,
+    );
+    _handle_passthrough($c, $proxy_class, $upstream, $body, $model_name, $tracing, $trace_id, $request_log, $log_handle);
     return;
   }
 
@@ -134,7 +230,7 @@ sub _handle_request ($c, $proxy_class, $type) {
   ($engine, $resolved_model) = eval { $router->resolve($model_name) };
 
   if ($engine) {
-    _route_to_engine($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $type);
+    _route_to_engine($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $request_log, $type);
     return;
   }
 
@@ -142,7 +238,7 @@ sub _handle_request ($c, $proxy_class, $type) {
   $c->render(json => $proxy_class->format_error($err, 'model_not_found'), status => 404);
 }
 
-sub _route_to_engine ($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $type) {
+sub _route_to_engine ($c, $proxy_class, $engine, $resolved_model, $messages, $params, $stream, $tracing, $request_log, $type) {
   my $trace_id = $tracing->start_trace(
     model    => $resolved_model,
     engine   => ref($engine),
@@ -150,46 +246,106 @@ sub _route_to_engine ($c, $proxy_class, $engine, $resolved_model, $messages, $pa
     params   => $params,
     format   => $proxy_class->format_name,
   );
+  my $log_handle = $request_log->start_request(
+    model    => $resolved_model,
+    format   => $proxy_class->format_name,
+    engine   => ref($engine),
+    path     => $c->req->url->path->to_string,
+    stream   => $stream,
+    messages => $messages,
+    params   => $params,
+  );
 
   if ($stream) {
-    _handle_streaming($c, $proxy_class, $engine, $messages, $params, $resolved_model, $tracing, $trace_id);
+    _handle_streaming($c, $proxy_class, $engine, $messages, $params, $resolved_model, $tracing, $trace_id, $request_log, $log_handle);
   } else {
-    _handle_sync($c, $proxy_class, $engine, $messages, $params, $resolved_model, $tracing, $trace_id, $type);
+    _handle_sync($c, $proxy_class, $engine, $messages, $params, $resolved_model, $tracing, $trace_id, $request_log, $log_handle, $type);
   }
 }
 
-sub _handle_sync ($c, $proxy_class, $engine, $messages, $params, $model, $tracing, $trace_id, $type) {
+sub _handle_sync ($c, $proxy_class, $engine, $messages, $params, $model, $tracing, $trace_id, $request_log, $log_handle, $type) {
   my $result = eval {
     if ($type eq 'embedding') {
       my $input = $params->{input};
       $engine->simple_embedding($input);
     } else {
       my @chat_messages = map { ref $_ ? $_ : { role => 'user', content => $_ } } @$messages;
-      $engine->simple_chat(@chat_messages);
+      my $engine_messages = \@chat_messages;
+      my $engine_params = $params || {};
+
+      if ($proxy_class->can('prepare_engine_messages')) {
+        my $prepared_messages = $proxy_class->prepare_engine_messages($engine, $engine_messages, $engine_params);
+        if (ref($prepared_messages) eq 'ARRAY') {
+          $engine_messages = $prepared_messages;
+        }
+      }
+
+      if ($proxy_class->can('prepare_engine_params')) {
+        my $prepared_params = $proxy_class->prepare_engine_params($engine, $engine_params, $engine_messages);
+        if (ref($prepared_params) eq 'HASH') {
+          $engine_params = $prepared_params;
+        }
+      }
+
+      my $request;
+      my $tools = delete $engine_params->{tools};
+      delete $engine_params->{tool_choice} if exists $engine_params->{tool_choice};
+
+      if (
+        ref($tools) eq 'ARRAY'
+        && @$tools
+        && $engine->can('does')
+        && $engine->does('Langertha::Role::HermesTools')
+        && $engine->can('build_tool_chat_request')
+      ) {
+        my $hermes_tools = _normalize_tools_for_hermes($tools);
+        my $formatted_tools = $engine->format_tools($hermes_tools);
+        $request = $engine->build_tool_chat_request($engine_messages, $formatted_tools, %{$engine_params});
+      } else {
+        $request = $engine->chat_request(
+          $engine_messages,
+          (ref($tools) eq 'ARRAY' ? (tools => $tools) : ()),
+          %{$engine_params},
+        );
+      }
+
+      my $response = $engine->user_agent->request($request);
+      my $chat_result = $request->response_call->($response);
+      if ($engine->can('has_rate_limit') && $engine->has_rate_limit && ref $chat_result && $chat_result->isa('Langertha::Response')) {
+        $chat_result = $chat_result->clone_with(rate_limit => $engine->rate_limit);
+      }
+      $chat_result;
     }
   };
 
   if ($@) {
     $log->errorf("Engine error: %s", $@);
     $tracing->end_trace($trace_id, error => "$@");
+    $request_log->end_request($log_handle, error => "$@");
     $c->render(json => $proxy_class->format_error("$@", 'server_error'), status => 500);
     return;
   }
 
   my $response_data = $proxy_class->format_response($result, $model);
 
+  my $usage = (ref $result && $result->isa('Langertha::Response') && $result->has_usage)
+    ? { input => $result->prompt_tokens, output => $result->completion_tokens, total => $result->total_tokens }
+    : undef;
+
   $tracing->end_trace($trace_id,
     output => "$result",
     model  => $model,
-    usage  => (ref $result && $result->isa('Langertha::Response') && $result->has_usage)
-      ? { input => $result->prompt_tokens, output => $result->completion_tokens, total => $result->total_tokens }
-      : undef,
+    usage  => $usage,
+  );
+  $request_log->end_request($log_handle,
+    output => "$result",
+    usage  => $usage,
   );
 
   $c->render(json => $response_data);
 }
 
-sub _handle_streaming ($c, $proxy_class, $engine, $messages, $params, $model, $tracing, $trace_id) {
+sub _handle_streaming ($c, $proxy_class, $engine, $messages, $params, $model, $tracing, $trace_id, $request_log, $log_handle) {
   $c->res->headers->content_type($proxy_class->streaming_content_type);
   $c->res->headers->cache_control('no-cache');
   $c->res->headers->header('Connection' => 'keep-alive');
@@ -219,10 +375,15 @@ sub _handle_streaming ($c, $proxy_class, $engine, $messages, $params, $model, $t
   if ($@) {
     $log->errorf("Streaming error: %s", $@);
     $tracing->end_trace($trace_id, error => "$@");
+    $request_log->end_request($log_handle, error => "$@");
   } else {
     $tracing->end_trace($trace_id,
       output => $full_content,
       model  => $model,
+      usage  => $usage,
+    );
+    $request_log->end_request($log_handle,
+      output => $full_content,
       usage  => $usage,
     );
   }
@@ -233,7 +394,7 @@ sub _handle_streaming ($c, $proxy_class, $engine, $messages, $params, $model, $t
   $c->write_chunk('');
 }
 
-sub _handle_passthrough ($c, $proxy_class, $upstream_base, $body, $model_name, $tracing, $trace_id) {
+sub _handle_passthrough ($c, $proxy_class, $upstream_base, $body, $model_name, $tracing, $trace_id, $request_log, $log_handle) {
   my $path  = $c->req->url->path->to_string;
   my $query = $c->req->url->query->to_string;
   my $url   = Mojo::URL->new("$upstream_base$path");
@@ -292,6 +453,7 @@ sub _handle_passthrough ($c, $proxy_class, $upstream_base, $body, $model_name, $
       if (my $err = $tx->error) {
         unless ($headers_sent) {
           $tracing->end_trace($trace_id, error => $err->{message}) if $trace_id;
+          $request_log->end_request($log_handle, error => $err->{message});
           $c->render(json => $proxy_class->format_error(
             "Upstream error: " . ($err->{message} // 'unknown'), 'upstream_error',
           ), status => 502);
@@ -306,6 +468,9 @@ sub _handle_passthrough ($c, $proxy_class, $upstream_base, $body, $model_name, $
           model  => $model_name,
         );
       }
+      $request_log->end_request($log_handle,
+        output => $full_response,
+      );
     });
   } else {
     # Non-streaming passthrough: wait for full response, forward it
@@ -314,6 +479,7 @@ sub _handle_passthrough ($c, $proxy_class, $upstream_base, $body, $model_name, $
 
       if (my $err = $tx->error) {
         $tracing->end_trace($trace_id, error => $err->{message}) if $trace_id;
+        $request_log->end_request($log_handle, error => $err->{message});
         $c->render(json => $proxy_class->format_error(
           "Upstream error: " . ($err->{message} // 'unknown'), 'upstream_error',
         ), status => $err->{code} // 502);
@@ -331,13 +497,16 @@ sub _handle_passthrough ($c, $proxy_class, $upstream_base, $body, $model_name, $
       $c->res->body($res->body);
       $c->rendered;
 
+      my $output = eval { decode_json($res->body) };
       if ($trace_id) {
-        my $output = eval { decode_json($res->body) };
         $tracing->end_trace($trace_id,
           output => $output // $res->body,
           model  => $model_name,
         );
       }
+      $request_log->end_request($log_handle,
+        output => $output // $res->body,
+      );
     });
   }
 }
@@ -346,6 +515,47 @@ sub _handle_models_request ($c, $proxy_class) {
   my $router = $c->knarr_router;
   my $models = $router->list_models;
   $c->render(json => $proxy_class->format_models_response($models));
+}
+
+sub _extract_request_api_key ($c) {
+  my $auth = $c->req->headers->header('Authorization');
+  my $x_api_key = $c->req->headers->header('x-api-key');
+
+  my $raw = defined($auth) ? $auth : (defined($x_api_key) ? $x_api_key : '');
+  my $api_key = $raw // '';
+  $api_key =~ s/^Bearer\s+//i;
+
+  return ($raw, $api_key);
+}
+
+sub _normalize_tools_for_hermes ($tools) {
+  my @normalized;
+  for my $tool (@{$tools || []}) {
+    next unless ref($tool) eq 'HASH';
+
+    # OpenAI-style function tool
+    if (($tool->{type} // '') eq 'function' && ref($tool->{function}) eq 'HASH') {
+      my $f = $tool->{function};
+      next unless defined $f->{name} && length $f->{name};
+      push @normalized, {
+        name        => $f->{name},
+        description => ($f->{description} // ''),
+        inputSchema => ($f->{parameters} || { type => 'object', properties => {} }),
+      };
+      next;
+    }
+
+    # Anthropic-style tool
+    if (defined($tool->{name}) && length $tool->{name}) {
+      push @normalized, {
+        name        => $tool->{name},
+        description => ($tool->{description} // ''),
+        inputSchema => ($tool->{input_schema} || $tool->{inputSchema} || { type => 'object', properties => {} }),
+      };
+    }
+  }
+
+  return \@normalized;
 }
 
 1;
@@ -362,7 +572,7 @@ Langertha::Knarr - LLM Proxy with Langfuse Tracing
 
 =head1 VERSION
 
-version 0.004
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -571,6 +781,33 @@ All three formats support streaming:
 For passthrough requests, the stream is piped byte-for-byte from the upstream
 API to the client with no buffering.
 
+=head2 Tool Calling Bridge
+
+When request format and backend engine format differ, Knarr bridges tool-calling
+payloads between OpenAI and Anthropic shapes.
+
+=over
+
+=item * OpenAI format to Anthropic-compatible engines
+
+Converts request C<tools> and C<tool_choice> to Anthropic shape and maps
+assistant/user tool traffic between C<tool_calls> and C<tool_use>/C<tool_result>.
+
+=item * Anthropic format to OpenAI-compatible engines
+
+Converts Anthropic C<tools>/C<tool_choice> and content blocks to OpenAI
+C<tool_calls> + C<tool> messages.
+
+=item * Hermes XML tool output
+
+If a backend emits C<< <tool_call>{...}</tool_call> >> in text, Knarr parses it
+and exposes native tool call structures in OpenAI/Anthropic responses.
+
+=back
+
+For Hermes-capable engines, OpenAI/Anthropic tool definitions are normalized
+before being passed into the Hermes tool prompt path.
+
 =head2 Configuration File
 
 The config file is YAML. All string values support C<${ENV_VAR}> interpolation.
@@ -610,7 +847,9 @@ Model config keys:
 
 =over
 
-=item * C<engine> (required) — Langertha engine name (e.g. C<OpenAI>, C<Anthropic>, C<OllamaOpenAI>)
+=item * C<engine> (required) — Engine class selector. Resolution order:
+C<Langertha::Engine::E<lt>NameE<gt>>, then
+C<LangerthaX::Engine::E<lt>NameE<gt>>, or a fully-qualified class name
 
 =item * C<model> — Model name to pass to the engine
 
@@ -735,6 +974,39 @@ Options:
 =item * C<config> — A pre-built L<Langertha::Knarr::Config> object
 
 =item * C<config_file> — Path to a YAML config file (used if C<config> not given)
+
+=item * C<before_request> — Optional C<CODEREF> run for every proxy request after JSON/body parsing
+
+    before_request => sub ($c, $ctx) {
+      # $ctx has: proxy_class, type, format, body, model_name, stream, messages, params
+      return { stop => 1, status => 403, message => 'blocked', type => 'authorization_error' }
+        if $ctx->{model_name} eq 'forbidden-model';
+      return; # allow
+    }
+
+Return C<< { stop => 1, ... } >> to block a request. You may also mutate
+C<$ctx> values (e.g., C<model_name>, C<params>) before routing.
+
+=item * C<api_key_validator> — Optional C<CODEREF> for custom key authorization
+
+    api_key_validator => sub ($c, $ctx) {
+      # $ctx has: api_key, raw_auth, path, method, content_type
+      return { allow => 1 } if $ctx->{api_key} eq 'special-key';
+      return { allow => 0, status => 403, message => 'forbidden' };
+    }
+
+Runs for every request except C</health>. If C<proxy_api_key> is configured,
+that static check runs first, then this validator.
+
+The validator may return:
+
+=over
+
+=item * truthy/falsey scalar (allow/deny)
+
+=item * decision hashref C<< { allow => 0|1, status => ..., message => ..., type => ... } >>
+
+=back
 
 =back
 

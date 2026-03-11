@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -193,10 +193,10 @@ sub metadata {
 
 sub has_cover { 0 }
 
-sub cover { undef }
+sub cover { (undef, undef) }
 
 sub image_num { 0 }
 
-sub image { undef }
+sub image { (undef, undef) }
 
 1;

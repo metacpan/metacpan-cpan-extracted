@@ -9,7 +9,7 @@ use Time::Piece;
 
 use EBook::Ishmael::EBook;
 use EBook::Ishmael::EBook::PDF;
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_id);
 
 my $TEST_PDF = $ENV{TEST_PDF} // $EBook::Ishmael::EBook::PDF::CAN_TEST;
 
@@ -39,22 +39,24 @@ SKIP: {
     unless ($Time::Piece::VERSION ge '1.38') {
         skip "Time::Piece $Time::Piece::VERSION cannot parse timezones correctly", 2;
     }
-    is($ebook->metadata->created, 1738943234, 'metadata creation date ok');
-    is($ebook->metadata->modified, 1738943234, 'metadata modification date ok');
+    is($ebook->metadata->created, 1738964834, 'metadata creation date ok');
+    is($ebook->metadata->modified, 1738964834, 'metadata modification date ok');
 }
 
 ok($ebook->html, "html ok");
 
-ok($ebook->has_cover, "has cover");
+subtest 'cover ok' => sub {
+    ok($ebook->has_cover, 'has cover');
+    my ($img, $format) = $ebook->cover;
+    is($format, 'png', 'cover is png');
+    is(image_id($img), 'png', 'cover looks like a png');
+};
 
-is(
-    image_id(\($ebook->cover)),
-    "png",
-    "cover looks like a png"
-);
-
-is($ebook->image_num, 0, "image count ok");
-
-is($ebook->image(0), undef, "image #0 ok");
+subtest 'images ok' => sub {
+    is($ebook->image_num, 0, 'image count ok');
+    my ($img, $format) = $ebook->image(0);
+    is($img, undef, 'no images found');
+    is($format, undef, 'no images found');
+};
 
 done_testing();

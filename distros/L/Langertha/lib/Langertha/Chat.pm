@@ -1,6 +1,6 @@
 package Langertha::Chat;
 # ABSTRACT: Chat abstraction wrapping an engine with optional overrides
-our $VERSION = '0.305';
+our $VERSION = '0.307';
 use Moose;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -352,7 +352,7 @@ Langertha::Chat - Chat abstraction wrapping an engine with optional overrides
 
 =head1 VERSION
 
-version 0.305
+version 0.307
 
 =head1 SYNOPSIS
 

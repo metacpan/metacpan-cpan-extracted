@@ -1,6 +1,6 @@
 package EBook::Ishmael;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -15,7 +15,6 @@ use List::Util qw(max);
 use XML::LibXML;
 
 use EBook::Ishmael::EBook;
-use EBook::Ishmael::ImageID;
 use EBook::Ishmael::TextBrowserDump;
 use EBook::Ishmael::Time qw(format_locale_time format_rfc3339_time);
 
@@ -85,9 +84,8 @@ my %FORMAT_ALTS = (
     'azw3'      => 'kf8',
 );
 
-# TODO: At some point in the future, remove pjson and pxml
 my %META_MODES = map { $_ => 1 } qw(
-    ishmael json pjson xml pxml
+    ishmael json xml
 );
 
 # Replace characters that cannot be encoded with empty strings.
@@ -263,15 +261,11 @@ sub meta {
 
     my $self = shift;
 
-    if ($self->{Meta} eq 'pxml' or $self->{Meta} eq 'pjson') {
-        warn "Using 'pxml' or 'pjson' as a metadata format is deprecated and will be removed in a future release\n";
-    }
-
     if ($self->{Meta} eq 'ishmael') {
         $self->meta_ishmael;
-    } elsif ($self->{Meta} eq 'json' or $self->{Meta} eq 'pjson') {
+    } elsif ($self->{Meta} eq 'json') {
         $self->meta_json;
-    } elsif ($self->{Meta} eq 'xml' or $self->{Meta} eq 'pxml') {
+    } elsif ($self->{Meta} eq 'xml') {
         $self->meta_xml;
     } else {
         die "'$self->{Meta}' is not a valid metadata format\n";
@@ -497,21 +491,17 @@ sub cover {
         return;
     }
 
-    my $cover = $ebook->cover;
-    my $fmt = image_id(\$cover);
-
-    unless (defined $fmt) {
-        die "Could not dump $self->{Ebook} cover; could not identify cover image format\n";
+    my ($cover, $format) = $ebook->cover;
+    if (not defined $cover) {
+        say "$self->{Ebook} does not have a cover";
+        return;
     }
 
-
-    $self->{Output} =~ s/\.-$/.$fmt/;
+    $self->{Output} =~ s/\.-$/.$format/;
 
     my $oh = _get_out($self->{Output});
     binmode $oh;
-
-    print { $oh } $ebook->cover;
-
+    print { $oh } $cover;
     close $oh unless $self->{Output} eq $STDOUT;
 
     1;
@@ -558,22 +548,20 @@ sub image {
 
             my $ii = $i + 1;
 
-            my $img = $ebook->image($i);
-            my $id = image_id($img);
-
-            unless (defined $id) {
-                warn "Could not identify image #$ii\'s format, skipping\n";
+            my ($img, $format) = $ebook->image($i);
+            if (not defined $img) {
+                warn "Error dumping image #$i, skipping\n";
                 next;
             }
 
-            my $b = sprintf "%s-%0*d.%s", $base, $pad, $ii, $id;
+            my $b = sprintf "%s-%0*d.%s", $base, $pad, $ii, $format;
 
             my $p = File::Spec->catfile($self->{Output}, $b);
 
             open my $fh, '>', $p
                 or die "Failed to open $p for writing: $!\n";
             binmode $fh;
-            print { $fh } $$img;
+            print { $fh } $img;
             close $fh;
 
             push @created, $p;

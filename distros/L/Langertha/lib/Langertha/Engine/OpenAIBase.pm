@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAIBase;
 # ABSTRACT: Base class for OpenAI-compatible engines
-our $VERSION = '0.305';
+our $VERSION = '0.307';
 use Moose;
 use Carp qw( croak );
 
@@ -38,7 +38,7 @@ Langertha::Engine::OpenAIBase - Base class for OpenAI-compatible engines
 
 =head1 VERSION
 
-version 0.305
+version 0.307
 
 =head1 SYNOPSIS
 
@@ -83,7 +83,8 @@ L<Langertha::Engine::Replicate>, L<Langertha::Engine::HuggingFace>,
 L<Langertha::Engine::Perplexity>, L<Langertha::Engine::AKIOpenAI>
 
 =item * Self-hosted — L<Langertha::Engine::OllamaOpenAI>,
-L<Langertha::Engine::vLLM>, L<Langertha::Engine::LlamaCpp>
+L<Langertha::Engine::vLLM>, L<Langertha::Engine::SGLang>,
+L<Langertha::Engine::LlamaCpp>
 
 =back
 
@@ -123,6 +124,8 @@ string. The base implementation croaks with a descriptive error message.
 =item * L<Langertha::Engine::OllamaOpenAI> - Ollama OpenAI-compatible endpoint
 
 =item * L<Langertha::Engine::vLLM> - vLLM high-throughput inference server
+
+=item * L<Langertha::Engine::SGLang> - SGLang OpenAI-compatible endpoint
 
 =back
 

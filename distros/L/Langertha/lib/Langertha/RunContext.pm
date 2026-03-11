@@ -1,6 +1,6 @@
 package Langertha::RunContext;
 # ABSTRACT: Shared execution context for Raid and Raider runs
-our $VERSION = '0.305';
+our $VERSION = '0.307';
 use Moose;
 use Carp qw( croak );
 use Scalar::Util qw( blessed );
@@ -137,7 +137,7 @@ Langertha::RunContext - Shared execution context for Raid and Raider runs
 
 =head1 VERSION
 
-version 0.305
+version 0.307
 
 =head1 SYNOPSIS
 

@@ -12,6 +12,7 @@
 
 /* includes mpz_mulmod(r, a, b, n, temp) */
 #include "utility.h"
+#include "rootmod.h"
 #include "factor.h"
 #include "primality.h"
 #include "isaac.h"
@@ -110,7 +111,7 @@ void mpz_isaac_urandomb(mpz_t rop, int nbits)
   }
 }
 
-void mpz_isaac_urandomm(mpz_t rop, mpz_t n)
+void mpz_isaac_urandomm(mpz_t rop, const mpz_t n)
 {
   int count = 80;
   unsigned long nbits = mpz_sizeinbase(n,2);
@@ -147,15 +148,85 @@ void mpz_isaac_urandomm(mpz_t rop, mpz_t n)
   }
 }
 
+int mpz_fits_uv_p(const mpz_t n)
+{
+  if (sizeof(UV) == sizeof(unsigned long int))
+    return mpz_fits_ulong_p(n);
+  else
+    return (mpz_sgn(n) >= 0 && mpz_sizeinbase(n,2) <= BITS_PER_WORD);
+}
+int mpz_fits_iv_p(const mpz_t n)
+{
+  if (sizeof(IV) == sizeof(signed long int))
+    return mpz_fits_slong_p(n);
+  else
+    return (mpz_sizeinbase(n,2) <= BITS_PER_WORD-1);
+}
+
+void mpz_set_uv(mpz_t n, UV v)
+{
+#if BITS_PER_WORD == 32
+  mpz_set_ui(n, v);
+#else
+  if (v <= 0xFFFFFFFFUL || sizeof(unsigned long int) >= sizeof(UV)) {
+    mpz_set_ui(n, v);
+  } else {
+    mpz_set_ui(n, (v >> 32));
+    mpz_mul_2exp(n, n, 32);
+    mpz_add_ui(n, n, v & 0xFFFFFFFFUL);
+  }
+#endif
+}
+void mpz_set_iv(mpz_t n, IV v)
+{
+#if BITS_PER_WORD == 32
+    mpz_set_si(n, v);
+#else
+  if ((v <= 0x7FFFFFFFL && v >= -0x80000000L) || sizeof(unsigned long int) >= sizeof(UV)) {
+    mpz_set_si(n, v);
+  } else if (v >= 0) {
+    mpz_set_uv(n, v);
+  } else {
+    mpz_set_uv(n, -v);
+    mpz_neg(n, n);
+  }
+#endif
+}
+UV mpz_get_uv(const mpz_t n)
+{
+#if BITS_PER_WORD == 32
+  return mpz_get_ui(n);
+#else
+  UV v = mpz_getlimbn(n,0);
+  if (GMP_LIMB_BITS < 64 || sizeof(mp_limb_t) < sizeof(UV))
+    v |= ((UV)mpz_getlimbn(n,1)) << 32;
+  return v;
+#endif
+}
+IV mpz_get_iv(const mpz_t n)
+{
+#if BITS_PER_WORD == 32
+  return mpz_get_si(n);
+#else
+  UV ui = mpz_getlimbn(n,0);
+  if (GMP_LIMB_BITS < 64 || sizeof(mp_limb_t) < sizeof(UV))
+    ui |= ((UV)mpz_getlimbn(n,1)) << 32;
+  return mpz_sgn(n) < 0 ? -(IV)ui : ui;
+#endif
+}
+
+
 /* a=0, return power.  a>1, return bool if an a-th power */
-UV is_power(mpz_t n, UV a)
+UV is_power(const mpz_t n, UV a)
 {
   if (mpz_cmp_ui(n,3) <= 0 && a == 0)
     return 0;
-  else if (a == 1)
+  else if (a == 1 || mpz_cmp_ui(n,1) == 0)
     return 1;
   else if (a == 2)
     return mpz_perfect_square_p(n);
+  else if (a >= 2 && mpz_sizeinbase(n,2) < a)
+    return 0;
   else {
     UV result;
     mpz_t t;
@@ -166,7 +237,7 @@ UV is_power(mpz_t n, UV a)
   }
 }
 
-UV prime_power(mpz_t prime, mpz_t n)
+UV prime_power(mpz_t prime, const mpz_t n)
 {
   UV k;
   if (mpz_even_p(n)) {
@@ -187,270 +258,209 @@ UV prime_power(mpz_t prime, mpz_t n)
   return k;
 }
 
-int is_primitive_root(mpz_t ina, mpz_t n, int nprime)
+int is_primitive_root(const mpz_t in_a, const mpz_t in_n, int nprime)
 {
-  mpz_t a, s, r, sreduced, t, *factors;
+  mpz_t n, a, t, phi, phireduced, *factors;
   int ret, i, nfactors, *exponents;
 
-  if (mpz_sgn(n) == 0)
-    return 0;
-  if (mpz_sgn(n) < 0)
-    mpz_neg(n,n);
-  if (mpz_cmp_ui(n,1) == 0)
-    return 1;
-  if (mpz_cmp_ui(n,4) <= 0)
-    return mpz_get_ui(ina) == mpz_get_ui(n)-1;
-  if (mpz_divisible_2exp_p(n,2))
-    return 0;
+  if (mpz_sgn(in_n) == 0) return 0;
+  if (mpz_cmp_ui(in_a,0) == 0) return (mpz_cmpabs_ui(in_n,1) == 0);
+  if (mpz_cmp_ui(in_a,1) == 0) return (mpz_cmpabs_ui(in_n,2) <= 0);
 
+  ret = -1;
+  mpz_init(n);
+  mpz_abs(n, in_n);
   mpz_init(a);
-  mpz_mod(a,ina,n);
-  mpz_init(s);
-  mpz_gcd(s, a, n);
+  mpz_mod(a, in_a, n);
 
-  if (mpz_cmp_ui(s,1) != 0) {
-    mpz_clear(s);
+  if (mpz_cmp_ui(n,1) == 0)
+    ret = 1;
+  else if (mpz_cmp_ui(n,4) <= 0)
+    ret = (mpz_cmp_ui(a,4) <= 0) && (mpz_get_ui(a) == mpz_get_ui(n)-1);
+  else if (mpz_divisible_2exp_p(n,2))
+    ret = 0;
+  else if (mpz_even_p(n) && mpz_even_p(a))
+    ret = 0;
+  else if (mpz_perfect_square_p(a))
+    ret = 0;
+
+  if (ret != -1) {
     mpz_clear(a);
-    return 0;
+    mpz_clear(n);
+    return ret;
   }
 
   mpz_init(t);
-  if (nprime) {
-    mpz_sub_ui(s, n, 1);
-  } else { /* totient(s, n); */   /* Fine, but slow. */
-    UV k;
-    mpz_init(r);
-    if (mpz_odd_p(n)) mpz_set(t, n); else mpz_fdiv_q_2exp(t, n, 1);
-    k = prime_power(r, t);
-    if (!k) {  /* Not of form p^a or 2p^a */
-      mpz_clear(r); mpz_clear(t); mpz_clear(s); mpz_clear(a); return 0;
-    }
-    mpz_divexact(t, t, r);
-    mpz_mul(s, t, r);  mpz_sub(s, s, t);
-    mpz_clear(r);
+  mpz_gcd(t, a, n);
+
+  if (mpz_cmp_ui(t,1) != 0) {
+    mpz_clear(t);
+    mpz_clear(a);
+    mpz_clear(n);
+    return 0;
   }
-  mpz_init_set(sreduced, s);
+
+  /* The given root is odd, so must also be a root of p^k */
+  if (mpz_even_p(n))  mpz_fdiv_q_2exp(n, n, 1);
+
+  mpz_init(phi);
+  if (nprime || _GMP_is_prob_prime(n)) {
+    mpz_sub_ui(phi, n, 1);
+  } else {
+    /* n must be p^k to be valid, and k = 1 was handled above */
+    unsigned long k;
+    k = power_factor(n, t);
+    if (k < 2 || !_GMP_is_prob_prime(t)) {  /* Not power of odd prime */
+      mpz_clear(phi); mpz_clear(t); mpz_clear(a); mpz_clear(n); return 0;
+    }
+    mpz_set(n, t);
+    mpz_sub_ui(phi, n, 1);
+    /* Lower from p^k to p.  Check a^(p-1) == 1 mod p^2 */
+    mpz_pow_ui(t, n, 2);
+    mpz_powm(t, a, phi, t);
+    if (mpz_cmp_ui(t, 1) == 0) {
+      mpz_clear(phi); mpz_clear(t); mpz_clear(a); mpz_clear(n); return 0;
+    }
+  }
+  /* At this point, n is always an odd prime, phi = n-1. */
+
+  mpz_init_set(phireduced, phi);
 
   ret = 0;
-  mpz_sub_ui(t, n, 1);
-  if (mpz_cmp(s,t) == 0 && mpz_kronecker(a,n) != -1)
+  if (mpz_kronecker(a,n) != -1)
     goto DONE_IPR;
+
   /* Unclear if this is worth doing.
   i = is_power(a, 0);
-  if (i > 1 && mpz_gcd_ui(NULL, s, i) != 1)
+  if (i > 1 && mpz_gcd_ui(NULL, phi, i) != 1)
     goto DONE_IPR;
   */
 
-#define IPR_TEST_UI(s, p, a, n, t, ret) \
-  mpz_divexact_ui(t, s, p); \
+#define IPR_TEST_UI(phi, p, a, n, t, ret) \
+  mpz_divexact_ui(t, phi, p); \
   mpz_powm(t, a, t, n); \
   if (mpz_cmp_ui(t, 1) == 0) { ret = 0; }
 
-#define IPR_TEST(s, p, a, n, t, ret) \
-  mpz_divexact(t, s, p); \
+#define IPR_TEST(phi, p, a, n, t, ret) \
+  mpz_divexact(t, phi, p); \
   mpz_powm(t, a, t, n); \
   if (mpz_cmp_ui(t, 1) == 0) { ret = 0; }
+
+#define IPR_TEST_TINY(pred, p, phi, a, n, t, ret) \
+  if (ret && mpz_cmp_ui(pred,(p)*(p)) >= 0 && mpz_divisible_ui_p(pred,p)) { \
+    IPR_TEST_UI(phi, p, a, n, t, ret); \
+    mpz_set_ui(t,p);  (void) mpz_remove(pred, pred, t); \
+  }
 
   ret = 1;
-  { /* Pull out small factors and test */
-    UV p, fromp = 0;
-    while (ret == 1 && (p = _GMP_trial_factor(sreduced, fromp, 60))) {
-      if (mpz_cmp_ui(sreduced,p) == 0) break;
-      IPR_TEST_UI(s, p, a, n, t, ret);
-      mpz_set_ui(t, p);
-      (void) mpz_remove(sreduced, sreduced, t);
-      fromp = p+1;
-    }
-  }
-  if (ret == 0 || mpz_cmp_ui(sreduced,1) == 0)
+
+  /* Remove all factors of 2,3,5 from phireduced and check them. */
+  /* The kronecker test already checked phi/2. */
+  mpz_fdiv_q_2exp(phireduced, phireduced, mpz_scan0(phireduced,0));
+  IPR_TEST_TINY(phireduced, 3, phi, a, n, t, ret);
+  IPR_TEST_TINY(phireduced, 5, phi, a, n, t, ret);
+  if (ret == 0 || mpz_cmp_ui(phireduced,1) == 0)
     goto DONE_IPR;
-  if (_GMP_BPSW(sreduced)) {
-    IPR_TEST(s, sreduced, a, n, t, ret);
+
+  /* Check and remove small-ish factors. */
+  {
+    void *iter = trial_factor_iterator_create(phireduced, 64000);
+    unsigned long f;
+    uint32_t e;
+
+    while (ret && mpz_cmp_ui(phireduced,1) > 0 && trial_factor_iterator_next(&f, &e, iter)) {
+      IPR_TEST_UI(phi, f, a, n, t, ret);
+      while (e-- > 0)
+        mpz_divexact_ui(phireduced,phireduced,f);
+    }
+    trial_factor_iterator_destroy(iter);
+  }
+  if (ret == 0 || mpz_cmp_ui(phireduced,1) == 0)
+    goto DONE_IPR;
+  if (mpz_cmp_ui(phireduced,64007U*64007U) < 0 || _GMP_BPSW(phireduced)) {
+    IPR_TEST(phi, phireduced, a, n, t, ret);
     goto DONE_IPR;
   }
 
-  /* Pull out more factors, noting they can be composites. */
-  while (_GMP_pminus1_factor(sreduced, t, 100000, 100000)) {
-    mpz_divexact(sreduced, sreduced, t);
-    if (_GMP_BPSW(t)) {
-      IPR_TEST(s, t, a, n, t, ret);
-    } else {
-      nfactors = factor(t, &factors, &exponents);
-      for (i = 0; ret == 1 && i < nfactors; i++) {
-        IPR_TEST(s, factors[i], a, n, t, ret);
-      }
-      clear_factors(nfactors, &factors, &exponents);
-    }
-    if (ret == 0 || mpz_cmp_ui(sreduced,1) == 0)
-      goto DONE_IPR;
-    if (_GMP_BPSW(sreduced)) {
-      IPR_TEST(s, sreduced, a, n, t, ret);
-      goto DONE_IPR;
-    }
-  }
-
-  /* We have a composite and so far it could be a primitive root.  Factor. */
-  nfactors = factor(sreduced, &factors, &exponents);
+  /* We have a composite and so far 'a' could be a primitive root.  Factor. */
+  nfactors = factor(phireduced, &factors, &exponents);
   for (i = 0; ret == 1 && i < nfactors; i++) {
-    IPR_TEST(s, factors[i], a, n, t, ret);
+    IPR_TEST(phi, factors[i], a, n, t, ret);
   }
   clear_factors(nfactors, &factors, &exponents);
 
 DONE_IPR:
-  mpz_clear(sreduced);  mpz_clear(t);
-  mpz_clear(s);  mpz_clear(a);
+  mpz_clear(phireduced);  mpz_clear(t);
+  mpz_clear(phi);  mpz_clear(a);  mpz_clear(n);
   return ret;
 }
 
-
-int mpz_divmod(mpz_t r, mpz_t a, mpz_t b, mpz_t n, mpz_t t)
+int  is_qr(const mpz_t a, const mpz_t n)
 {
-  int invertible;
-  invertible = mpz_invert(t, b, n);
-  if (!invertible)
-    return 0;
-  mpz_mulmod(r, t, a, n, t); /* mpz_mul(t,t,a); mpz_mod(r,t,n); */
-  return 1;
+  mpz_t N, A;
+
+  if (mpz_sgn(n) == 0)         return -1;
+  if (mpz_cmpabs_ui(n,2) <= 0) return 1;
+
+  mpz_init(N);
+  mpz_init(A);
+  mpz_abs(N, n);
+  mpz_mod(A, a, N);
+
+  if (mpz_cmp_ui(A,1) <= 0)    { mpz_clear(A); mpz_clear(N); return 1; }
+
+  if (_GMP_is_prime(N)) {
+    int ret = (mpz_kronecker(A,N) == 1);
+    mpz_clear(A); mpz_clear(N);
+    return ret;
+  }
+
+#if 0
+  return sqrtmod(A,A,N);
+#else
+  {
+    mpz_t r, *fac;
+    int ret, i, nfactors, *exp;
+
+    mpz_init(r);
+    nfactors = factor(N, &fac, &exp);
+    for (i = 0, ret = 1; ret && i < nfactors; i++) {
+      int gcd_is_1, fac_is_2;
+      mpz_gcd(r, A, fac[i]);
+      gcd_is_1 = mpz_cmp_ui(r,1) == 0;
+      fac_is_2 = mpz_cmp_ui(fac[i],2) == 0;
+      if      (exp[i] == 1 && (fac_is_2 || !gcd_is_1))
+        ret = 1;
+      else if (exp[i] == 1 || (!fac_is_2 && gcd_is_1))
+        ret = mpz_kronecker(A,fac[i]) == 1;
+      else {
+        mpz_pow_ui(fac[i], fac[i], exp[i]);
+        ret = sqrtmod(r, A, fac[i]);
+      }
+    }
+    clear_factors(nfactors, &fac, &exp);
+    mpz_clear(r);
+    mpz_clear(A);
+    mpz_clear(N);
+    return ret;
+  }
+#endif
 }
 
-/* set x to sqrt(a) mod p.  Returns 0 if a is not a square root mod p
- * See Cohen section 1.5 and http://www.math.vt.edu/people/brown/doc/sqrts.pdf
- */
-int sqrtmod(mpz_t s, mpz_t a, mpz_t p) {
-  int res;
-  mpz_t x, t1, t2, t3, t4;
-  mpz_init(x); mpz_init(t1); mpz_init(t2); mpz_init(t3); mpz_init(t4);
-  res = sqrtmod_t(x, a, p, t1, t2, t3, t4);
-  mpz_set(s, x);
-  mpz_clear(x); mpz_clear(t1); mpz_clear(t2); mpz_clear(t3); mpz_clear(t4);
-  return res;
-}
 
-/* Returns 1 if x^2 = a mod p, otherwise set x to 0 and return 0. */
-static int verify_sqrt(mpz_t x, mpz_t a, mpz_t p, mpz_t t, mpz_t t2) {
-  /* reflect to get the smaller of +/- x */
-  mpz_sub(t, p, x); if (mpz_cmp(t,x) < 0) mpz_set(x,t);
-
-  mpz_mulmod(t, x, x, p, t2);
-  mpz_mod(t2, a, p);
-  if (mpz_cmp(t, t2) == 0) return 1;
-  mpz_set_ui(x, 0);
-  return 0;
-}
-
-/* Internal version that takes temp variables and x cannot overlap args */
-int sqrtmod_t(mpz_t x, mpz_t a, mpz_t p,
-              mpz_t t, mpz_t q, mpz_t b, mpz_t z) /* 4 temp variables */
+int mpz_divmod(mpz_t r, const mpz_t a, const mpz_t b, const mpz_t n, mpz_t t)
 {
-  int r, e, m;
-
-  if (mpz_cmp_ui(p,2) <= 0) {
-    if (mpz_cmp_ui(p,0) <= 0) {
-      mpz_set_ui(x,0);
-      return 0;
-    }
-    mpz_mod(x, a, p);
-    return verify_sqrt(x, a, p, t, q);
+  if (mpz_invert(t, b, n)) {
+    mpz_mulmod(r, t, a, n, t); /* mpz_mul(t,t,a); mpz_mod(r,t,n); */
+    return 1;
   }
-  if (!mpz_cmp_ui(a,0) || !mpz_cmp_ui(a,1)) {
-    mpz_set(x,a);
-    return verify_sqrt(x, a, p, t, q);
-  }
-
-  /* Easy cases from page 31 (or Menezes 3.36, 3.37) */
-  if (mpz_congruent_ui_p(p, 3, 4)) {
-    mpz_add_ui(t, p, 1);
-    mpz_tdiv_q_2exp(t, t, 2);
-    mpz_powm(x, a, t, p);
-    return verify_sqrt(x, a, p, t, q);
-  }
-
-  if (mpz_congruent_ui_p(p, 5, 8)) {
-    mpz_sub_ui(t, p, 1);
-    mpz_tdiv_q_2exp(t, t, 2);
-    mpz_powm(q, a, t, p);
-    if (mpz_cmp_si(q, 1) == 0) {  /* s = a^((p+3)/8) mod p */
-      mpz_add_ui(t, p, 3);
-      mpz_tdiv_q_2exp(t, t, 3);
-      mpz_powm(x, a, t, p);
-    } else {                      /* s = 2a * (4a)^((p-5)/8) mod p */
-      mpz_sub_ui(t, p, 5);
-      mpz_tdiv_q_2exp(t, t, 3);
-      mpz_mul_ui(q, a, 4);
-      mpz_powm(x, q, t, p);
-      mpz_mul_ui(x, x, 2);
-      mpz_mulmod(x, x, a, p, x);
-    }
-    return verify_sqrt(x, a, p, t, q);
-  }
-
-  if (mpz_kronecker(a, p) != 1) {
-    /* Possible no solution exists.  Check Euler criterion. */
-    mpz_sub_ui(t, p, 1);
-    mpz_tdiv_q_2exp(t, t, 1);
-    mpz_powm(x, a, t, p);
-    if (mpz_cmp_si(x, 1) != 0) {
-      mpz_set_ui(x, 0);
-      return 0;
-    }
-  }
-
-  mpz_sub_ui(q, p, 1);
-  e = mpz_scan1(q, 0);                 /* Remove 2^e from q */
-  mpz_tdiv_q_2exp(q, q, e);
-  mpz_set_ui(t, 2);
-  while (mpz_kronecker(t, p) != -1) {  /* choose t "at random" */
-    mpz_add_ui(t, t, 1);
-    if (!mpz_cmp_ui(t,133)) {
-      /* If a root of p exists, then our chances are nearly 1/2 that
-       * (t|p) = -1.  After 133 tries it seems dubious that a root
-       * exists.  It's likely that p is not prime. */
-      if (mpz_even_p(p)) { mpz_set_ui(x,0); return 0; }
-      /* Euler probable prime test with base t.  (t|p) = 1 or t divides p */
-      if (mpz_divisible_p(p, t)) { mpz_set_ui(x,0); return 0; }
-      mpz_sub_ui(z, p, 1);  mpz_fdiv_q_2exp(b,z,1);  mpz_powm(z, t, b, p);
-      if (mpz_cmp_ui(z,1)) { mpz_set_ui(x,0); return 0; }
-      /* Fermat base 2 */
-      mpz_set_ui(b,2);  mpz_sub_ui(z, p, 1);  mpz_powm(z, b, z, p);
-      if (mpz_cmp_ui(z,1)) { mpz_set_ui(x,0); return 0; }
-    }
-    if (!mpz_cmp_ui(t,286)) {
-      /* Another Euler probable prime test, p not even so t can't divide. */
-      mpz_sub_ui(z, p, 1);  mpz_fdiv_q_2exp(b,z,1);  mpz_powm(z, t, b, p);
-      if (mpz_cmp_ui(z,1)) { mpz_set_ui(x,0); return 0; }
-    }
-    if (!mpz_cmp_ui(t,20000)) { mpz_set_ui(x,0); return 0; }
-  }
-  mpz_powm(z, t, q, p);                     /* Step 1 complete */
-  r = e;
-
-  mpz_powm(b, a, q, p);
-  mpz_add_ui(q, q, 1);
-  mpz_divexact_ui(q, q, 2);
-  mpz_powm(x, a, q, p);   /* Done with q, will use it for y now */
-
-  while (mpz_cmp_ui(b, 1)) {
-    /* calculate how many times b^2 mod p == 1 */
-    mpz_set(t, b);
-    m = 0;
-    do {
-      mpz_powm_ui(t, t, 2, p);
-      m++;
-    } while (m < r && mpz_cmp_ui(t, 1));
-    if (m >= r) break;
-    mpz_ui_pow_ui(t, 2, r-m-1);
-    mpz_powm(t, z, t, p);
-    mpz_mulmod(x, x, t, p, x);
-    mpz_powm_ui(z, t, 2, p);
-    mpz_mulmod(b, b, z, p, b);
-    r = m;
-  }
-  return verify_sqrt(x, a, p, t, q);
+  return 0;  /* Cannot invert */
 }
+
 
 /* Smith-Cornacchia: Solve x,y for x^2 + |D|y^2 = p given prime p */
 /* See Cohen 1.5.2 */
-int cornacchia(mpz_t x, mpz_t y, mpz_t D, mpz_t p)
+int cornacchia(mpz_t x, mpz_t y, const mpz_t D, const mpz_t p)
 {
   int result = 0;
   mpz_t a, b, c, d;
@@ -460,7 +470,7 @@ int cornacchia(mpz_t x, mpz_t y, mpz_t D, mpz_t p)
 
   mpz_init(a); mpz_init(b); mpz_init(c); mpz_init(d);
 
-  sqrtmod_t(x, D, p, a, b, c, d);
+  sqrtmodp_t(x, D, p, a, b, c, d);
   mpz_set(a, p);
   mpz_set(b, x);
   mpz_sqrt(c, p);
@@ -491,7 +501,7 @@ int cornacchia(mpz_t x, mpz_t y, mpz_t D, mpz_t p)
 
 /* Modified Cornacchia, Solve x,y for x^2 + |D|y^2 = 4p given prime p */
 /* See Cohen 1.5.3 */
-int modified_cornacchia(mpz_t x, mpz_t y, mpz_t D, mpz_t p)
+int modified_cornacchia(mpz_t x, mpz_t y, const mpz_t D, const mpz_t p)
 {
   int result = 0;
   mpz_t a, b, c, d;
@@ -510,7 +520,8 @@ int modified_cornacchia(mpz_t x, mpz_t y, mpz_t D, mpz_t p)
 
   mpz_init(a); mpz_init(b); mpz_init(c); mpz_init(d);
 
-  sqrtmod_t(x, D, p, a, b, c, d);
+  sqrtmodp_t(x, D, p, a, b, c, d);
+
   if ( (mpz_even_p(D) && mpz_odd_p(x)) || (mpz_odd_p(D) && mpz_even_p(x)) )
     mpz_sub(x, p, x);
 
@@ -543,47 +554,6 @@ int modified_cornacchia(mpz_t x, mpz_t y, mpz_t D, mpz_t p)
   mpz_clear(a); mpz_clear(b); mpz_clear(c); mpz_clear(d);
 
   return result;
-}
-
-
-/* Modular inversion: invert a mod p.
- * This implementation from William Hart, using extended gcd.
- */
-unsigned long modinverse(unsigned long a, unsigned long p)
-{
-  long u1 = 1;
-  long u3 = a;
-  long v1 = 0;
-  long v3 = p;
-  long t1 = 0;
-  long t3 = 0;
-  long quot;
-  while (v3) {
-    quot = u3 - v3;
-    if (u3 < (v3<<2)) {
-      if (quot < v3) {
-        if (quot < 0) {
-          t1 = u1; u1 = v1; v1 = t1;
-          t3 = u3; u3 = v3; v3 = t3;
-        } else {
-          t1 = u1 - v1; u1 = v1; v1 = t1;
-          t3 = u3 - v3; u3 = v3; v3 = t3;
-        }
-      } else if (quot < (v3<<1)) {
-        t1 = u1 - (v1<<1); u1 = v1; v1 = t1;
-        t3 = u3 - (v3<<1); u3 = v3; v3 = t3;
-      } else {
-        t1 = u1 - v1*3; u1 = v1; v1 = t1;
-        t3 = u3 - v3*3; u3 = v3; v3 = t3;
-      }
-    } else {
-      quot = u3 / v3;
-      t1 = u1 - v1*quot; u1 = v1; v1 = t1;
-      t3 = u3 - v3*quot; u3 = v3; v3 = t3;
-    }
- }
- if (u1 < 0) u1 += p;
- return u1;
 }
 
 #if __GNU_MP_VERSION < 5
@@ -630,7 +600,7 @@ extern void gcdext(mpz_t g, mpz_t s, mpz_t t, const mpz_t ia, const mpz_t ib)
 }
 #endif
 
-int chinese(mpz_t ret, mpz_t lcm, mpz_t *a, mpz_t *m, int items)
+int chinese(mpz_t ret, mpz_t lcm, const mpz_t *a, const mpz_t *m, int items)
 {
   mpz_t sum, gcd, u, v, s, t, temp1, temp2;
   int i, rval = 1;
@@ -670,21 +640,23 @@ int chinese(mpz_t ret, mpz_t lcm, mpz_t *a, mpz_t *m, int items)
   }
 #endif
 
-  /* Avoid dividing by zero, which GMP doesn't enjoy. */
-  for (i = 0; i < items; i++)
+  /* Avoid dividing by zero */
+  for (i = 0; i < items; i++) {
     if (mpz_sgn(m[i]) == 0)
       return 0;
+  }
 
   mpz_init(temp1); mpz_init(temp2);
   mpz_init(sum); mpz_init(gcd);
   mpz_init(s); mpz_init(t);
   mpz_init(u); mpz_init(v);
 
-  mpz_set(lcm, m[0]);
-  mpz_mod(sum, a[0], m[0]);
+  mpz_abs(lcm, m[0]);
+  mpz_mod(sum, a[0], lcm);
   for (i = 1; i < items; i++) {
-    mpz_gcdext(gcd, u, v, lcm, m[i]);
-    mpz_divexact(s, m[i], gcd);
+    mpz_abs(t, m[i]);
+    mpz_gcdext(gcd, u, v, lcm, t);
+    mpz_divexact(s, t, gcd);
     mpz_divexact(t, lcm, gcd);
     if (mpz_cmp_ui(gcd,1) != 0) {
       mpz_mod(temp1, sum, gcd);
@@ -715,8 +687,8 @@ int chinese(mpz_t ret, mpz_t lcm, mpz_t *a, mpz_t *m, int items)
 }
 
 
-UV mpz_order_ui(UV r, mpz_t n, UV limit) {
-  UV j;
+UV mpz_order_ui(unsigned long r, const mpz_t n, unsigned long limit) {
+  unsigned long j;
   mpz_t t;
 
   /* If n < limit, set limit to n */
@@ -733,7 +705,7 @@ UV mpz_order_ui(UV r, mpz_t n, UV limit) {
   return j;
 }
 
-void mpz_arctan(mpz_t r, unsigned long base, mpz_t pow, mpz_t t1, mpz_t t2)
+void mpz_arctan(mpz_t r, unsigned long base, const mpz_t pow, mpz_t t1, mpz_t t2)
 {
   unsigned long i = 1;
   mpz_tdiv_q_ui(r, pow, base);
@@ -745,7 +717,7 @@ void mpz_arctan(mpz_t r, unsigned long base, mpz_t pow, mpz_t t1, mpz_t t2)
     if (i++ & 1) mpz_sub(r, r, t2); else mpz_add(r, r, t2);
   } while (mpz_sgn(t2));
 }
-void mpz_arctanh(mpz_t r, unsigned long base, mpz_t pow, mpz_t t1, mpz_t t2)
+void mpz_arctanh(mpz_t r, unsigned long base, const mpz_t pow, mpz_t t1, mpz_t t2)
 {
   unsigned long i = 1;
   mpz_tdiv_q_ui(r, pow, base);
@@ -773,6 +745,17 @@ void mpz_product(mpz_t* A, UV a, UV b) {
     mpz_mul(A[a], A[a], A[c]);
   }
 }
+
+void mpz_product_ui(mpz_t prod, unsigned long *v, unsigned long n) {
+  mpz_set_ui(prod, 1);
+  while (n > 0) {
+    unsigned long p = v[--n];
+    while (n > 0 && v[n-1] < ULONG_MAX/p)
+      p *= v[--n];
+    mpz_mul_ui(prod, prod, p);
+  }
+}
+
 void mpz_veclcm(mpz_t* A, UV a, UV b) {
   if (b <= a) {
     /* nothing */
@@ -789,7 +772,8 @@ void mpz_veclcm(mpz_t* A, UV a, UV b) {
   }
 }
 
-UV logint(mpz_t n, UV base) {
+/* TODO: possible UV / unsigned long mismatch */
+UV logint(const mpz_t n, UV base) {
   mpz_t nt;
   double logn, logbn, coreps;
   UV res, nbits;
@@ -881,7 +865,7 @@ extern void const_pi(mpf_t pi, unsigned long prec);
 extern void const_log2(mpf_t logn, unsigned long prec);
 
 /* Log using Brent's second AGM algorithm (Sasaki and Kanada theta) */
-void mpf_log(mpf_t logn, mpf_t n)
+void mpf_log(mpf_t logn, const mpf_t n)
 {
   mpf_t N, t, q, theta2, theta3, logdn;
   unsigned long k, bits = mpf_get_prec(logn);
@@ -952,7 +936,7 @@ void mpf_log(mpf_t logn, mpf_t n)
 }
 
 /* x should be 0 < x < 1 */
-static void _exp_sinh(mpf_t expx, mpf_t x, unsigned long bits)
+static void _exp_sinh(mpf_t expx, const mpf_t x, unsigned long bits)
 {
   unsigned long k;
   mpf_t t, s, N, D, X;
@@ -1016,7 +1000,7 @@ static void _exp_lift(mpf_t expx, mpf_t x, unsigned long bits)
   mpf_clear(t2); mpf_clear(t1); mpf_clear(s);
 }
 
-void mpf_exp(mpf_t expn, mpf_t x)
+void mpf_exp(mpf_t expn, const mpf_t x)
 {
   mpf_t t;
   unsigned long k, r, rbits, bits = mpf_get_prec(expn);
@@ -1063,34 +1047,36 @@ void mpf_exp(mpf_t expn, mpf_t x)
 /* Negative b with non-int x usually gives a complex result.
  * We try to at least give a consistent result. */
 
-void mpf_pow(mpf_t powx, mpf_t b, mpf_t x)
+void mpf_pow(mpf_t powx, const mpf_t b, const mpf_t x)
 {
   mpf_t t;
-  int neg = 0;
+  int neg = (mpf_sgn(b) < 0);
 
+  if (mpf_sgn(x) == 0) { mpf_set_ui(powx, 1); return; }
   if (mpf_sgn(b) == 0) { mpf_set_ui(powx, 0); return; }
-  if (mpf_sgn(b) <  0) { neg = 1; }
-  if (mpf_cmp_ui(b,1) == 0) { mpf_set_ui(powx, 1-2*neg); return; }
+  if (mpf_cmp_ui(b,1) == 0) { mpf_set_ui(powx, 1); return; }
+  if (mpf_cmp_ui(x,1) == 0) { mpf_set(powx, b); return; }
+  if (mpf_cmp_si(x,-1) == 0) { mpf_ui_div(powx, 1, b); return; }
 
   if (mpf_integer_p(x) && mpf_fits_ulong_p(x)) {
     mpf_pow_ui(powx, b, mpf_get_ui(x));
     return;
   }
 
-  if (neg) mpf_neg(b,b);
   mpf_init2(t, mpf_get_prec(powx));
-  mpf_log(t, b);
+  if (neg) mpf_neg(t,b); else mpf_set(t,b);
+  mpf_log(t, t);
   mpf_mul(t, t, x);
   mpf_exp(powx, t);
   if (neg) mpf_neg(powx,powx);
   mpf_clear(t);
 }
 
-void mpf_root(mpf_t rootx, mpf_t x, mpf_t n)
+void mpf_root(mpf_t rootx, const mpf_t x, const mpf_t n)
 {
   if (mpf_sgn(n) == 0) {
-   mpf_set_ui(rootx, 0);
-  } else if (mpf_cmp_ui(n, 2) == 0) {
+    mpf_set_ui(rootx, 0);
+  } else if (mpf_cmp_ui(n, 2) == 0 && mpf_sgn(x) >= 0) {
     mpf_sqrt(rootx, x);
   } else {
     mpf_t t;
@@ -1125,782 +1111,4 @@ void mpf_agm(mpf_t r, mpf_t a, mpf_t b)
   }
   mpf_set(r, b);
   mpf_clear(t);
-}
-
-/******************************************************************************/
-
-
-#if 0
-/* Simple polynomial multiplication */
-void poly_mod_mul(mpz_t* px, mpz_t* py, mpz_t* ptmp, UV r, mpz_t mod)
-{
-  UV i, j, prindex;
-
-  for (i = 0; i < r; i++)
-    mpz_set_ui(ptmp[i], 0);
-  for (i = 0; i < r; i++) {
-    if (!mpz_sgn(px[i])) continue;
-    for (j = 0; j < r; j++) {
-      if (!mpz_sgn(py[j])) continue;
-      prindex = (i+j) % r;
-      mpz_addmul( ptmp[prindex], px[i], py[j] );
-    }
-  }
-  /* Put ptmp into px and mod n */
-  for (i = 0; i < r; i++)
-    mpz_mod(px[i], ptmp[i], mod);
-}
-void poly_mod_sqr(mpz_t* px, mpz_t* ptmp, UV r, mpz_t mod)
-{
-  UV i, d, s;
-  UV degree = r-1;
-
-  for (i = 0; i < r; i++)
-    mpz_set_ui(ptmp[i], 0);
-  for (d = 0; d <= 2*degree; d++) {
-    UV prindex = d % r;
-    for (s = (d <= degree) ? 0 : d-degree; s <= (d/2); s++) {
-      if (s*2 == d) {
-        mpz_addmul( ptmp[prindex], px[s], px[s] );
-      } else {
-        mpz_addmul( ptmp[prindex], px[s], px[d-s] );
-        mpz_addmul( ptmp[prindex], px[s], px[d-s] );
-      }
-    }
-  }
-  /* Put ptmp into px and mod n */
-  for (i = 0; i < r; i++)
-    mpz_mod(px[i], ptmp[i], mod);
-}
-#endif
-
-#if (__GNU_MP_VERSION < 4) || (__GNU_MP_VERSION == 4 && __GNU_MP_VERSION_MINOR < 1)
-/* Binary segmentation, using simple shift+add method for processing p.
- * Faster than twiddling bits, but not nearly as fast as import/export.
- * mpz_import and mpz_export were added in GMP 4.1 released in 2002.
- */
-void poly_mod_mul(mpz_t* px, mpz_t* py, UV r, mpz_t mod, mpz_t p, mpz_t p2, mpz_t t)
-{
-  UV i, d, bits;
-  UV degree = r-1;
-
-  mpz_mul(t, mod, mod);
-  mpz_mul_ui(t, t, r);
-  bits = mpz_sizeinbase(t, 2);
-
-  mpz_set_ui(p, 0);
-  for (i = 0; i < r; i++) {
-    mpz_mul_2exp(p, p, bits);
-    mpz_add(p, p, px[r-i-1]);
-  }
-
-  if (px == py) {
-    mpz_mul(p, p, p);
-  } else {
-    mpz_set_ui(p2, 0);
-    for (i = 0; i < r; i++) {
-      mpz_mul_2exp(p2, p2, bits);
-      mpz_add(p2, p2, py[r-i-1]);
-    }
-    mpz_mul(p, p, p2);
-  }
-
-  for (d = 0; d <= 2*degree; d++) {
-    mpz_tdiv_r_2exp(t, p, bits);
-    mpz_tdiv_q_2exp(p, p, bits);
-    if (d < r)
-      mpz_set(px[d], t);
-    else
-      mpz_add(px[d-r], px[d-r], t);
-  }
-  for (i = 0; i < r; i++)
-    mpz_mod(px[i], px[i], mod);
-}
-
-#else
-
-/* Binary segmentation, using import/export method for processing p.
- * Thanks to Dan Bernstein's 2007 Quartic paper.
- */
-void poly_mod_mul(mpz_t* px, mpz_t* py, UV r, mpz_t mod, mpz_t p, mpz_t p2, mpz_t t)
-{
-  UV i, bytes;
-  char* s;
-
-  mpz_mul(t, mod, mod);
-  mpz_mul_ui(t, t, r);
-  bytes = mpz_sizeinbase(t, 256);
-  mpz_set_ui(p, 0);
-  mpz_set_ui(p2, 0);
-
-  /* 1. Create big integers from px and py with padding. */
-  {
-    Newz(0, s, r*bytes, char);
-    for (i = 0; i < r; i++)
-      mpz_export(s + i*bytes, NULL, -1, 1, 0, 0, px[i]);
-    mpz_import(p, r*bytes, -1, 1, 0, 0, s);
-    Safefree(s);
-  }
-  if (px != py) {
-    Newz(0, s, r*bytes, char);
-    for (i = 0; i < r; i++)
-      mpz_export(s + i*bytes, NULL, -1, 1, 0, 0, py[i]);
-    mpz_import(p2, r*bytes, -1, 1, 0, 0, s);
-    Safefree(s);
-  }
-
-  /* 2. Multiply using the awesomeness that is GMP. */
-  mpz_mul( p, p, (px == py) ? p : p2 );
-
-  /* 3. Pull out the parts of the result, add+mod, and put in px. */
-  {
-    Newz(0, s, 2*r*bytes, char);
-    /* fill s with data from p */
-    mpz_export(s, NULL, -1, 1, 0, 0, p);
-    for (i = 0; i < r; i++) {
-      /* Set px[i] to the top part, t to the bottom. */
-      mpz_import(px[i], bytes, -1, 1, 0, 0, s + (i+r)*bytes);
-      mpz_import(t,     bytes, -1, 1, 0, 0, s +     i*bytes);
-      /* Add and mod */
-      mpz_add(px[i], px[i], t);
-      mpz_mod(px[i], px[i], mod);
-    }
-    Safefree(s);
-  }
-}
-#endif
-
-void poly_mod_pow(mpz_t *pres, mpz_t *pn, mpz_t power, UV r, mpz_t mod)
-{
-  UV i;
-  mpz_t mpow, t1, t2, t3;
-
-  for (i = 0; i < r; i++)
-    mpz_set_ui(pres[i], 0);
-  mpz_set_ui(pres[0], 1);
-
-  mpz_init_set(mpow, power);
-  mpz_init(t1);  mpz_init(t2);  mpz_init(t3);
-
-  while (mpz_cmp_ui(mpow, 0) > 0) {
-    if (mpz_odd_p(mpow))            poly_mod_mul(pres, pn, r, mod, t1, t2, t3);
-    mpz_tdiv_q_2exp(mpow, mpow, 1);
-    if (mpz_cmp_ui(mpow, 0) > 0)    poly_mod_mul(pn, pn, r, mod, t1, t2, t3);
-  }
-  mpz_clear(t1);  mpz_clear(t2);  mpz_clear(t3);
-  mpz_clear(mpow);
-}
-
-void poly_mod(mpz_t *pres, mpz_t *pn, UV *dn, mpz_t mod)
-{
-  UV i;
-  for (i = 0; i < *dn; i++) {
-    mpz_mod(pres[i], pn[i], mod);
-  }
-  while (*dn > 0 && mpz_sgn(pres[*dn-1]) == 0)
-    *dn -= 1;
-}
-void polyz_mod(mpz_t *pres, mpz_t *pn, long *dn, mpz_t mod)
-{
-  long i;
-  for (i = 0; i <= *dn; i++) {
-    mpz_mod(pres[i], pn[i], mod);
-  }
-  while (*dn > 0 && mpz_sgn(pres[*dn]) == 0)
-    *dn -= 1;
-}
-
-void polyz_set(mpz_t* pr, long* dr, mpz_t* ps, long ds)
-{
-  *dr = ds;
-  do {
-    mpz_set(pr[ds], ps[ds]);
-  } while (ds-- > 0);
-}
-
-void polyz_print(const char* header, mpz_t* pn, long dn)
-{
-  gmp_printf("%s", header);
-  do { gmp_printf("%Zd ", pn[dn]); } while (dn-- > 0);
-  gmp_printf("\n");
-}
-
-/* Multiply polys px and py to create new poly pr, all modulo 'mod' */
-#if 0
-void polyz_mulmod(mpz_t* pr, mpz_t* px, mpz_t *py, long *dr, long dx, long dy, mpz_t mod)
-{
-  long i, j;
-  *dr = dx + dy;
-  for (i = 0; i <= *dr; i++)
-    mpz_set_ui(pr[i], 0);
-  for (i = 0; i <= dx; i++) {
-    if (!mpz_sgn(px[i])) continue;
-    for (j = 0; j <= dy; j++) {
-      if (!mpz_sgn(py[j])) continue;
-      mpz_addmul( pr[i+j], px[i], py[j] );
-    }
-  }
-  for (i = 0; i <= *dr; i++)
-    mpz_mod(pr[i], pr[i], mod);
-  while (*dr > 0 && mpz_sgn(pr[*dr]) == 0)  dr[0]--;
-}
-#endif
-#if 1
-void polyz_mulmod(mpz_t* pr, mpz_t* px, mpz_t *py, long *dr, long dx, long dy, mpz_t mod)
-{
-  UV i, bits, r;
-  mpz_t p, p2, t;
-
-  mpz_init(p); mpz_init(t);
-  *dr = dx+dy;
-  r = *dr+1;
-  mpz_mul(t, mod, mod);
-  mpz_mul_ui(t, t, r);
-  bits = mpz_sizeinbase(t, 2);
-  mpz_set_ui(p, 0);
-
-  /* Create big integers p and p2 from px and py, with padding */
-  {
-    for (i = 0; i <= (UV)dx; i++) {
-      mpz_mul_2exp(p, p, bits);
-      mpz_add(p, p, px[dx-i]);
-    }
-  }
-  if (px == py) {
-    mpz_pow_ui(p, p, 2);
-  } else {
-    mpz_init_set_ui(p2, 0);
-    for (i = 0; i <= (UV)dy; i++) {
-      mpz_mul_2exp(p2, p2, bits);
-      mpz_add(p2, p2, py[dy-i]);
-    }
-    mpz_mul(p, p, p2);
-    mpz_clear(p2);
-  }
-
-  /* Pull out parts of result p to pr */
-  for (i = 0; i < r; i++) {
-    mpz_tdiv_r_2exp(t, p, bits);
-    mpz_tdiv_q_2exp(p, p, bits);
-    mpz_mod(pr[i], t, mod);
-  }
-
-  mpz_clear(p); mpz_clear(t);
-}
-#endif
-#if 0
-void polyz_mulmod(mpz_t* pr, mpz_t* px, mpz_t *py, long *dr, long dx, long dy, mpz_t mod)
-{
-  UV i, bytes, r;
-  char* s;
-  mpz_t p, p2, t;
-
-  mpz_init(p); mpz_init(p2); mpz_init(t);
-  *dr = dx+dy;
-  r = *dr+1;
-  mpz_mul(t, mod, mod);
-  mpz_mul_ui(t, t, r);
-  bytes = mpz_sizeinbase(t, 256);
-  mpz_set_ui(p, 0);
-  mpz_set_ui(p2, 0);
-
-  /* Create big integers p and p2 from px and py, with padding */
-  {
-    Newz(0, s, (dx+1)*bytes, char);
-    for (i = 0; i <= dx; i++)
-      mpz_export(s + i*bytes, NULL, -1, 1, 0, 0, px[i]);
-    mpz_import(p, (dx+1)*bytes, -1, 1, 0, 0, s);
-    Safefree(s);
-  }
-  if (px != py) {
-    Newz(0, s, (dy+1)*bytes, char);
-    for (i = 0; i <= dy; i++)
-      mpz_export(s + i*bytes, NULL, -1, 1, 0, 0, py[i]);
-    mpz_import(p2, (dy+1)*bytes, -1, 1, 0, 0, s);
-    Safefree(s);
-  }
-
-  /* Multiply! */
-  mpz_mul( p ,p, (px == py) ? p : p2 );
-
-  /* Pull out parts of result p to pr */
-  {
-    Newz(0, s, r*bytes, char);
-    /* fill s with data from p */
-    mpz_export(s, NULL, -1, 1, 0, 0, p);
-    for (i = 0; i < r; i++) {
-      mpz_import(t,     bytes, -1, 1, 0, 0, s +     i*bytes);
-      mpz_mod(pr[i], t, mod);
-    }
-    Safefree(s);
-  }
-
-  mpz_clear(p); mpz_clear(p2); mpz_clear(t);
-}
-#endif
-
-/* Polynomial division modulo N.
- * This is Cohen algorithm 3.1.2 "pseudo-division". */
-void polyz_div(mpz_t *pq, mpz_t *pr, mpz_t *pn, mpz_t *pd,
-               long *dq, long *dr, long dn, long dd, mpz_t NMOD)
-{
-  long i, j;
-  mpz_t t;
-
-  /* Ensure n and d are reduced */
-  while (dn > 0 && mpz_sgn(pn[dn]) == 0)   dn--;
-  while (dd > 0 && mpz_sgn(pd[dd]) == 0)   dd--;
-  if (dd == 0 && mpz_sgn(pd[0]) == 0)
-    croak("polyz_divmod: divide by zero\n");
-
-  /* Q = 0 */
-  *dq = 0;
-  mpz_set_ui(pq[0], 0);
-
-  /* R = N */
-  *dr = dn;
-  for (i = 0; i <= dn; i++)
-    mpz_set(pr[i], pn[i]);  /* pn should already be mod */
-
-  if (*dr < dd)
-    return;
-  if (dd == 0) {
-    *dq = 0; *dr = 0;
-    mpz_tdiv_qr( pq[0], pr[0], pn[0], pd[0] );
-    return;
-  }
-
-  *dq = dn - dd;
-  *dr = dd-1;
-
-  if (mpz_cmp_ui(pd[dd], 1) == 0) {
-    for (i = *dq; i >= 0; i--) {
-      long di = dd + i;
-      mpz_set(pq[i], pr[di]);
-      for (j = di-1; j >= i; j--) {
-        mpz_submul(pr[j], pr[di], pd[j-i]);
-        mpz_mod(pr[j], pr[j], NMOD);
-      }
-    }
-  } else {
-    mpz_init(t);
-    for (i = *dq; i >= 0; i--) {
-      long di = dd + i;
-      mpz_powm_ui(t, pd[dd], i, NMOD);
-      mpz_mul(t, t, pr[di]);
-      mpz_mod(pq[i], t, NMOD);
-      for (j = di-1; j >= 0; j--) {
-        mpz_mul(pr[j], pr[j], pd[dd]);   /* j != di so this is safe */
-        if (j >= i)
-          mpz_submul(pr[j], pr[di], pd[j-i]);
-        mpz_mod(pr[j], pr[j], NMOD);
-      }
-    }
-    mpz_clear(t);
-  }
-  /* Reduce R and Q. */
-  while (*dr > 0 && mpz_sgn(pr[*dr]) == 0)  dr[0]--;
-  while (*dq > 0 && mpz_sgn(pq[*dq]) == 0)  dq[0]--;
-}
-
-/* Raise poly pn to the power, modulo poly pmod and coefficient NMOD. */
-void polyz_pow_polymod(mpz_t* pres,  mpz_t* pn,  mpz_t* pmod,
-                              long *dres,   long   dn,  long   dmod,
-                              mpz_t power, mpz_t NMOD)
-{
-  mpz_t mpow;
-  long dProd, dQ, dX, maxd, i;
-  mpz_t *pProd, *pQ, *pX;
-
-  /* Product = res*x.  With a prediv this would be dmod+dmod, but without it
-   * is max(dmod,dn)+dmod. */
-  maxd = (dn > dmod) ? dn+dmod : dmod+dmod;
-  New(0, pProd, maxd+1, mpz_t);
-  New(0, pQ, maxd+1, mpz_t);
-  New(0, pX, maxd+1, mpz_t);
-  for (i = 0; i <= maxd; i++) {
-    mpz_init(pProd[i]);
-    mpz_init(pQ[i]);
-    mpz_init(pX[i]);
-  }
-
-  *dres = 0;
-  mpz_set_ui(pres[0], 1);
-
-  dX = dn;
-  for (i = 0; i <= dX; i++)
-    mpz_set(pX[i], pn[i]);
-
-  mpz_init_set(mpow, power);
-  while (mpz_cmp_ui(mpow, 0) > 0) {
-    if (mpz_odd_p(mpow)) {
-      polyz_mulmod(pProd, pres, pX, &dProd, *dres, dX, NMOD);
-      polyz_div(pQ, pres,  pProd, pmod,  &dQ, dres, dProd, dmod, NMOD);
-    }
-    mpz_tdiv_q_2exp(mpow, mpow, 1);
-    if (mpz_cmp_ui(mpow, 0) > 0) {
-      polyz_mulmod(pProd, pX, pX, &dProd, dX, dX, NMOD);
-      polyz_div(pQ, pX,  pProd, pmod,  &dQ, &dX, dProd, dmod, NMOD);
-    }
-  }
-  mpz_clear(mpow);
-  for (i = 0; i <= maxd; i++) {
-    mpz_clear(pProd[i]);
-    mpz_clear(pQ[i]);
-    mpz_clear(pX[i]);
-  }
-  Safefree(pProd);
-  Safefree(pQ);
-  Safefree(pX);
-}
-
-void polyz_gcd(mpz_t* pres, mpz_t* pa, mpz_t* pb, long* dres, long da, long db, mpz_t MODN)
-{
-  long i;
-  long dr1, dq, dr, maxd;
-  mpz_t *pr1, *pq, *pr;
-
-  /* Early reduction so we're not wasteful with messy input. */
-  while (da > 0 && mpz_sgn(pa[da]) == 0)   da--;
-  while (db > 0 && mpz_sgn(pb[db]) == 0)   db--;
-
-  /* Swap a/b so degree a >= degree b */
-  if (db > da) {
-    mpz_t* mtmp;
-    long ltmp;
-    mtmp = pa; pa = pb; pb = mtmp;
-    ltmp = da; da = db; db = ltmp;
-  }
-  /* TODO: Should set c=pa[da], then after Euclid loop, res = c^-1 * res */
-
-  /* Allocate temporary polys */
-  maxd = da;
-  New(0, pr1, maxd+1, mpz_t);
-  New(0, pq, maxd+1, mpz_t);
-  New(0, pr, maxd+1, mpz_t);
-  for (i = 0; i <= maxd; i++) {
-    mpz_init(pr1[i]);
-    mpz_init(pq[i]);
-    mpz_init(pr[i]);
-  }
-
-  /* R0 = a (we use pres) */
-  *dres = da;
-  for (i = 0; i <= da; i++)
-    mpz_mod(pres[i], pa[i], MODN);
-  while (*dres > 0 && mpz_sgn(pres[*dres]) == 0)   dres[0]--;
-
-  /* R1 = b */
-  dr1 = db;
-  for (i = 0; i <= db; i++)
-    mpz_mod(pr1[i], pb[i], MODN);
-  while (dr1 > 0 && mpz_sgn(pr1[dr1]) == 0)   dr1--;
-
-  while (dr1 > 0 || mpz_sgn(pr1[dr1]) != 0) {
-    polyz_div(pq, pr,  pres, pr1,  &dq, &dr,  *dres, dr1, MODN);
-    if (dr < 0 || dq < 0 || dr > maxd || dq > maxd)
-      croak("division error: dq %ld dr %ld maxd %ld\n", dq, dr, maxd);
-    /* pr0 = pr1.  pr1 = pr */
-    *dres = dr1;
-    for (i = 0; i <= dr1; i++)
-      mpz_set(pres[i], pr1[i]);  /* pr1 is mod MODN already */
-    dr1 = dr;
-    for (i = 0; i <= dr; i++)
-      mpz_set(pr1[i], pr[i]);
-  }
-  /* return pr0 */
-  while (*dres > 0 && mpz_sgn(pres[*dres]) == 0)   dres[0]--;
-
-  for (i = 0; i <= maxd; i++) {
-    mpz_clear(pr1[i]);
-    mpz_clear(pq[i]);
-    mpz_clear(pr[i]);
-  }
-  Safefree(pr1);
-  Safefree(pq);
-  Safefree(pr);
-}
-
-
-
-void polyz_root_deg1(mpz_t root, mpz_t* pn, mpz_t NMOD)
-{
-  mpz_invert(root, pn[1], NMOD);
-  mpz_mul(root, root, pn[0]);
-  mpz_neg(root, root);
-  mpz_mod(root, root, NMOD);
-}
-void polyz_root_deg2(mpz_t root1, mpz_t root2, mpz_t* pn, mpz_t NMOD)
-{
-  mpz_t e, d, t, t2, t3, t4;
-
-  mpz_init(e); mpz_init(d);
-  mpz_init(t); mpz_init(t2); mpz_init(t3); mpz_init(t4);
-
-  mpz_mul(t, pn[0], pn[2]);
-  mpz_mul_ui(t, t, 4);
-  mpz_mul(d, pn[1], pn[1]);
-  mpz_sub(d, d, t);
-  sqrtmod_t(e, d, NMOD, t, t2, t3, t4);
-
-  mpz_neg(t4, pn[1]);                    /* t4 = -a_1      */
-  mpz_mul_ui(t3, pn[2], 2);              /* t3 = 2a_2      */
-  mpz_add(t, t4, e);                     /* t = -a_1 + e   */
-  mpz_divmod( root1, t, t3, NMOD, t2);   /* (-a_1+e)/2a_2  */
-  mpz_sub(t, t4, e);                     /* t = -a_1 - e   */
-  mpz_divmod( root2, t, t3, NMOD, t2);   /* (-a_1-e)/2a_2  */
-  mpz_clear(e); mpz_clear(d);
-  mpz_clear(t); mpz_clear(t2); mpz_clear(t3); mpz_clear(t4);
-}
-
-/* Algorithm 2.3.10 procedure "roots" from Crandall & Pomerance.
- * Step 3/4 of Cohen Algorithm 1.6.1.
- * Uses some hints from Pate Williams (1997-1998) for the poly math */
-static void polyz_roots(mpz_t* roots, long *nroots,
-                        long maxroots, mpz_t* pg, long dg, mpz_t NMOD)
-{
-  long i, ntries, maxtries, maxd, dxa, dt, dh, dq, dup;
-  mpz_t t, power;
-  mpz_t pxa[2];
-  mpz_t *pt, *ph, *pq;
-
-  if (*nroots >= maxroots || dg <= 0)  return;
-
-  mpz_init(t);
-  mpz_init(pxa[0]);  mpz_init(pxa[1]);
-
-  if (dg <= 2) {
-    if (dg == 1) polyz_root_deg1( pxa[0], pg, NMOD );
-    else         polyz_root_deg2( pxa[0], pxa[1], pg, NMOD );
-    for (dt = 0; dt < dg; dt++) {
-      mpz_set(t, pxa[dt]);
-      dup = 0; /* don't add duplicate roots */
-      for (i = 0; i < *nroots; i++)
-        if (mpz_cmp(t, roots[i]) == 0)
-          { dup = 1; break; }
-      if (!dup)
-        mpz_set(roots[ (*nroots)++ ], t);
-    }
-    mpz_clear(t);
-    mpz_clear(pxa[0]);  mpz_clear(pxa[1]);
-    return;
-  }
-
-  /* If not a monic polynomial, divide by leading coefficient */
-  if (mpz_cmp_ui(pg[dg], 1) != 0) {
-    if (!mpz_invert(t, pg[dg], NMOD)) {
-      mpz_clear(t);
-      return;
-    }
-    for (i = 0; i <= dg; i++)
-      mpz_mulmod(pg[i], pg[i], t, NMOD, pg[i]);
-  }
-
-  /* Try hard to find a single root, work less after we got one or two.
-   * In a generic routine we would want to try hard all the time. */
-  ntries = 0;
-  maxtries = (*nroots == 0) ? 200 : (*nroots == 1) ? 50 : 10;
-
-  mpz_init(power);
-  mpz_set_ui(pxa[1], 1);
-  dxa = 1;
-
-  maxd = 2 * dg;
-  New(0, pt, maxd+1, mpz_t);
-  New(0, ph, maxd+1, mpz_t);
-  New(0, pq, maxd+1, mpz_t);
-  for (i = 0; i <= maxd; i++) {
-    mpz_init(pt[i]);
-    mpz_init(ph[i]);
-    mpz_init(pq[i]);
-  }
-
-  mpz_sub_ui(t, NMOD, 1);
-  mpz_tdiv_q_2exp(power, t, 1);
-  /* We'll pick random "a" values from 1 to 1000M */
-  mpz_set_ui(t, 1000000000UL);
-  if (mpz_cmp(t, NMOD) > 0) mpz_set(t, NMOD);
-
-  while (ntries++ < maxtries) {
-    /* pxa = X+a for randomly selected a */
-    if (ntries <= 2)  mpz_set_ui(pxa[0], ntries);  /* Simple small values */
-    else              mpz_isaac_urandomm(pxa[0], t);
-
-    /* Raise pxa to (NMOD-1)/2, all modulo NMOD and g(x) */
-    polyz_pow_polymod(pt, pxa, pg, &dt, dxa, dg, power, NMOD);
-
-    /* Subtract 1 and gcd */
-    mpz_sub_ui(pt[0], pt[0], 1);
-    polyz_gcd(ph, pt, pg, &dh, dt, dg, NMOD);
-
-    if (dh >= 1 && dh < dg)
-      break;
-  }
-
-  if (dh >= 1 && dh < dg) {
-    /* Pick the smaller of the two splits to process first */
-    if (dh <= 2 || dh <= (dg-dh)) {
-      polyz_roots(roots, nroots, maxroots, ph, dh, NMOD);
-      if (*nroots < maxroots) {
-        /* q = g/h, and recurse */
-        polyz_div(pq, pt,  pg, ph,  &dq, &dt, dg, dh, NMOD);
-        polyz_roots(roots, nroots, maxroots, pq, dq, NMOD);
-      }
-    } else {
-      polyz_div(pq, pt,  pg, ph,  &dq, &dt, dg, dh, NMOD);
-      polyz_roots(roots, nroots, maxroots, pq, dq, NMOD);
-      if (*nroots < maxroots) {
-        polyz_roots(roots, nroots, maxroots, ph, dh, NMOD);
-      }
-    }
-  }
-
-  mpz_clear(t);
-  mpz_clear(power);
-  mpz_clear(pxa[0]);  mpz_clear(pxa[1]);
-
-  for (i = 0; i <= maxd; i++) {
-    mpz_clear(pt[i]);
-    mpz_clear(ph[i]);
-    mpz_clear(pq[i]);
-  }
-  Safefree(pt);
-  Safefree(ph);
-  Safefree(pq);
-}
-
-
-/* Algorithm 1.6.1 from Cohen, minus step 1. */
-void polyz_roots_modp(mpz_t** roots, long *nroots, long maxroots,
-                      mpz_t *pP, long dP, mpz_t NMOD)
-{
-  long i;
-
-  *nroots = 0;
-  *roots = 0;
-
-  if (dP == 0)
-    return;
-
-  /* Do degree 1 or 2 explicitly */
-  if (dP == 1) {
-    New(0, *roots, 1, mpz_t);
-    mpz_init((*roots)[0]);
-    polyz_root_deg1( (*roots)[0], pP, NMOD );
-    *nroots = 1;
-    return;
-  }
-  if (dP == 2) {
-    New(0, *roots, 2, mpz_t);
-    mpz_init((*roots)[0]);
-    mpz_init((*roots)[1]);
-    polyz_root_deg2( (*roots)[0], (*roots)[1], pP, NMOD );
-    *nroots = 2;
-    return;
-  }
-
-  /* Allocate space for the maximum number of roots (plus 1 for safety) */
-  New(0, *roots, dP+1, mpz_t);
-  for (i = 0; i <= dP; i++)
-    mpz_init((*roots)[i]);
-
-  if (maxroots > dP || maxroots == 0)
-    maxroots = dP;
-
-  polyz_roots(*roots, nroots, maxroots, pP, dP, NMOD);
-  /* This could be just really bad luck.  Let the caller handle it. */
-  /* if (*nroots == 0) croak("failed to find roots\n"); */
-
-  /* Clear out space for roots we didn't find */
-  for (i = *nroots; i <= dP; i++)
-    mpz_clear((*roots)[i]);
-}
-
-
-#include "class_poly_data.h"
-
-const char* poly_class_type_name(int type)
-{
-  switch (type) {
-    case 1: return "Hilbert";
-    case 2: return "Weber";
-    case 3: return "Ramanujan";
-    default: return "Unknown";
-  }
-}
-
-int* poly_class_nums(void)
-{
-  int* dlist;
-  UV i;
-  int degree_offset[256] = {0};
-
-  for (i = 1; i < NUM_CLASS_POLYS; i++)
-    if (_class_poly_data[i].D < _class_poly_data[i-1].D)
-      croak("Problem with data file, out of order at D=%d\n", (int)_class_poly_data[i].D);
-
-  Newz(0, dlist, NUM_CLASS_POLYS + 1, int);
-  /* init degree_offset to total number of this degree */
-  for (i = 0; i < NUM_CLASS_POLYS; i++)
-    degree_offset[_class_poly_data[i].degree]++;
-  /* set degree_offset to sum of this and all previous degrees. */
-  for (i = 1; i < 256; i++)
-    degree_offset[i] += degree_offset[i-1];
-  /* Fill in dlist, sorted */
-  for (i = 0; i < NUM_CLASS_POLYS; i++) {
-    int position = degree_offset[_class_poly_data[i].degree-1]++;
-    dlist[position] = i+1;
-  }
-  /* Null terminate */
-  dlist[NUM_CLASS_POLYS] = 0;
-  return dlist;
-}
-
-UV poly_class_poly_num(int i, int *D, mpz_t**T, int* type)
-{
-  UV degree, j;
-  int ctype;
-  mpz_t t;
-  const char* s;
-
-  if (i < 1 || i > (int)NUM_CLASS_POLYS) { /* Invalid number */
-     if (D != 0) *D = 0;
-     if (T != 0) *T = 0;
-     return 0;
-  }
-  i--; /* i now is the index into our table */
-
-  degree = _class_poly_data[i].degree;
-  ctype  = _class_poly_data[i].type;
-  s = _class_poly_data[i].coefs;
-
-  if (D != 0)  *D = -_class_poly_data[i].D;
-  if (type != 0)  *type = ctype;
-  if (T == 0) return degree;
-
-  New(0, *T, degree+1, mpz_t);
-  mpz_init(t);
-  for (j = 0; j < degree; j++) {
-    unsigned char signcount = (*s++) & 0xFF;
-    unsigned char sign = signcount >> 7;
-    unsigned long count = signcount & 0x7F;
-    if (count == 127) {
-      do {
-        signcount = (*s++) & 0xFF;
-        count += signcount;
-      } while (signcount == 127);
-    }
-    mpz_set_ui(t, 0);
-    while (count-- > 0) {
-      mpz_mul_2exp(t, t, 8);
-      mpz_add_ui(t, t, (unsigned long) (*s++) & 0xFF);
-    }
-    /* Cube the last coefficient of Hilbert polys */
-    if (j == 0 && ctype == 1) mpz_pow_ui(t, t, 3);
-    if (sign) mpz_neg(t, t);
-    mpz_init_set( (*T)[j], t );
-  }
-  mpz_clear(t);
-  mpz_init_set_ui( (*T)[degree], 1 );
-  return degree;
 }

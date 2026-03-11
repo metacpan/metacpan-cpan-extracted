@@ -38,6 +38,7 @@ my %WriteMakefileArgs = (
     "LWP::Protocol::https" => 0,
     "Log::Any" => 0,
     "MIME::Base64" => 0,
+    "Module::Pluggable" => 0,
     "Module::Runtime" => 0,
     "Moose" => 0,
     "MooseX::NonMoose" => 0,
@@ -54,7 +55,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "0.305",
+  "VERSION" => "0.307",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,6 +73,7 @@ my %FallbackPrereqs = (
   "Log::Any" => 0,
   "MIME::Base64" => 0,
   "Math::Vector::Similarity" => 0,
+  "Module::Pluggable" => 0,
   "Module::Runtime" => 0,
   "Moose" => 0,
   "MooseX::NonMoose" => 0,

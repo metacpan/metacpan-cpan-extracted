@@ -1,0 +1,73 @@
+{
+   "abstract" : "Generate mock test data for DBIx::Class schemas",
+   "author" : [
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-MockData",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBIx::Class" : "0.082841",
+            "File::Spec" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.016"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::Temp" : "0",
+            "IPC::Open3" : "0",
+            "Symbol" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::MockData" : {
+         "file" : "lib/DBIx/Class/MockData.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/DBIx-Class-MockData/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/DBIx-Class-MockData.git",
+         "web" : "https://github.com/manwar/DBIx-Class-MockData"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

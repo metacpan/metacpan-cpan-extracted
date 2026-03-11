@@ -1,5 +1,9 @@
 Revision history for Crypt-HSM
 
+0.028     2026-03-10 19:54:37+01:00 Europe/Brussels
+          - Always set source = DATA_SPECIFIED when doing RSA-OAEP
+          - Make hash function the default MSG in RSA-PSS and RSA-OAEP
+
 0.027     2026-03-06 20:03:39+01:00 Europe/Brussels
           - Fix setting IntArray and MechanismArray attributes
 

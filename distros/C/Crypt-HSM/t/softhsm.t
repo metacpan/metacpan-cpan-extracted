@@ -68,12 +68,23 @@ note $public_key;
 note $private_key;
 
 my $plain_text = 'plain text';
+{
 my $encrypted_text = $session->encrypt('rsa-pkcs', $public_key, $plain_text);
 note unpack('H*', $encrypted_text);
 
 my $decrypted_text = $session->decrypt('rsa-pkcs', $private_key, $encrypted_text);
 
 is $decrypted_text, $plain_text, 'decrypt: "plain text"';
+}
+
+{
+my $encrypted_text = $session->encrypt('rsa-pkcs-oaep', $public_key, $plain_text, 'sha1');
+note unpack('H*', $encrypted_text);
+
+my $decrypted_text = $session->decrypt('rsa-pkcs-oaep', $private_key, $encrypted_text, 'sha1');
+
+is $decrypted_text, $plain_text, 'decrypt: "plain text"';
+}
 
 {
 my $signature = $session->sign('sha256-rsa-pkcs', $private_key, $plain_text);

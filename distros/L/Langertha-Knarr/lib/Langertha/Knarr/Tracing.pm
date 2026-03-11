@@ -1,5 +1,5 @@
 package Langertha::Knarr::Tracing;
-our $VERSION = '0.004';
+our $VERSION = '0.007';
 # ABSTRACT: Automatic Langfuse tracing per proxy request
 use Moo;
 use Time::HiRes qw( gettimeofday );
@@ -257,7 +257,7 @@ Langertha::Knarr::Tracing - Automatic Langfuse tracing per proxy request
 
 =head1 VERSION
 
-version 0.004
+version 0.007
 
 =head1 SYNOPSIS
 

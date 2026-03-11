@@ -4,8 +4,76 @@ use warnings;
 
 use Test::More;
 use Math::Prime::Util::GMP qw/is_provable_prime is_provable_prime_with_cert
+                              is_trial_prime
+                              is_llr_prime is_proth_prime
                               is_aks_prime is_miller_prime is_ecpp_prime
                               is_nminus1_prime is_nplus1_prime is_bls75_prime/;
+
+my @llrs = (
+  [202, 0],
+  [159807057, 0],
+  [10000000019,-1],
+  [10051583, 2],
+  [10072063, 2],
+  [2097151, 0],
+  [2147483647, 2],
+  [805306367, 0],
+  ["26388279066623", 2],
+  [1064959, 0],
+  [1114111, 2],
+  [4349951, 0],
+  [4374527, 2],
+);
+my @prs = (
+  [10072063, -1],
+  [8642561, 0],
+  [8650753, 2],
+  [16785409, 0],  # Perfect square
+  [22560769, 0],
+  [56770561, 2],
+  ["38335150030849", 0],    # Harder to find
+  ["47270099681281", 0],
+  ["302111489261569", 0],
+  ["2372913730682881", 2],
+  ["208987568115548161", 2],
+  ["19578524666953729", 2],
+);
+my @ecpps = (
+  ["340282366920938463463374607431768211507", 1],
+  ["4546500098776576231268807308545439", 1],
+  ["12985198116842947666516311049464592230676113912623", 1],
+  ["52156071497798034055409940782395501364357", 1],
+  ["50117127692312893981391715478615446797663", 1],
+  ["24665048762541973552613860190140203906293", 1],
+  ["43891111165377552467052180838054904286263", 1],
+);
+my @bls75s = (
+  ["1000000000177", 1],
+  ["1000000000000045819", 1],
+  ["57850216533360484368293", 1],
+  ["19568952034128395861091890269105913923337787205640409156470109155604436042237347889151", 1],
+  ["2389755648366934394192070365850201237857", 0],
+  ["32344792936896827502551761860817", 0],
+);
+my @np1s = (
+  [391, 0],
+  ["63699643930293116661668059033734770664712983894089510286262271", 1],
+  ["17113454194771827263776721", 1],
+);
+my @akss = (  # Cover a number of the various tests before the big loop
+  [1, 0],
+  [15, 0],
+  [44165497, 0],
+  [136804519, 0],
+  [31*31*31, 0],
+  [51019, 0],
+  [3, 1],
+  [40841, 1],
+  [74903, 1],   # Small input that actually runs the full test
+);
+
+my @composites = (35, 247, 377, 391, 527, 567, 2627, 5543, 13919, 14299, 23939, 47627, 86519, 92819);
+
 
 plan tests => 0 + 6
                 + 38
@@ -13,7 +81,15 @@ plan tests => 0 + 6
                 + 34
                 + 2
                 + 7   # _with_cert
-                + 8   # AKS, Miller, N-1, ECPP
+                + 4   # Trial, Miller, N-1
+                + scalar(@np1s)   # BLS75 N+1
+                + scalar(@bls75s) # BLS75 hybrid
+                + scalar(@ecpps)  # ecpp
+                + scalar(@llrs)   # llr
+                + scalar(@prs)    # proth
+                + scalar(@akss)   # AKS
+                + scalar(@composites)  # various composites
+                + 2   # _validate_ecpp_curve
                 + 0;
 
 is(is_provable_prime(2) , 2,  '2 is prime');
@@ -179,8 +255,8 @@ if ($cert =~ /\bType BLS5\b/) {
 #####################
 # Individual routines
 
-# AKS
-ok( is_aks_prime(74903), "is_aks_prime(74903)" );
+# Trial
+ok( is_trial_prime(4539892831), "is_trial_prime(4539892831)" );
 
 # Unconditional and conditional Miller test
 ok( is_miller_prime("4835703278458516698824747"), "is_miller_prime(4835703278458516698824747)" );
@@ -189,12 +265,51 @@ ok( is_miller_prime("4835703278458516698824747",1), "is_miller_prime(48357032784
 # BLS75 n-1
 ok( is_nminus1_prime("340282366920938463463374607431768211507"), "is_nminus1_prime(340282366920938463463374607431768211507)" );
 
-# BLS75 n+1
-ok( !is_nplus1_prime(391), "is_nplus1_prime(391) is false" );
-ok( is_nplus1_prime("63699643930293116661668059033734770664712983894089510286262271"), "is_nplus1_prime(63699643930293116661668059033734770664712983894089510286262271)" );
+###### BLS75 (N+1)
+for my $d (@np1s) {
+  my($n,$exp) = @$d;
+  is(is_nplus1_prime($n), $exp, "is_nplus1_prime($n) = $exp");
+}
+###### BLS75 (hybrid methods)
+for my $d (@bls75s) {
+  my($n,$exp) = @$d;
+  is(is_bls75_prime($n), $exp, "is_bls75_prime($n) = $exp");
+}
+###### ECPP
+for my $d (@ecpps) {
+  my($n,$exp) = @$d;
+  is(is_ecpp_prime($n), $exp, "is_ecpp_prime($n) = $exp");
+}
+###### llr
+for my $d (@llrs) {
+  my($n,$exp) = @$d;
+  is(is_llr_prime($n), $exp, "is_llr_prime($n) = $exp");
+}
+###### proth
+for my $d (@prs) {
+  my($n,$exp) = @$d;
+  is(is_proth_prime($n), $exp, "is_proth_prime($n) = $exp");
+}
+###### AKS
+for my $d (@akss) {
+  my($n,$exp) = @$d;
+  is(is_aks_prime($n), $exp, "is_aks_prime($n) = $exp");
+}
 
-# BLS75 combined method
-ok( is_bls75_prime("19568952034128395861091890269105913923337787205640409156470109155604436042237347889151"), "is_bls75_prime(19568952034128395861091890269105913923337787205640409156470109155604436042237347889151)" );
+###### Test small composites
+for my $n (@composites) {
+  is_deeply(
+    [is_provable_prime($n), is_trial_prime($n),
+     is_miller_prime($n), is_ecpp_prime($n),
+     is_nminus1_prime($n), is_nplus1_prime($n), is_bls75_prime($n)],
+    [0,0,0,0,0,0,0],
+    "No method says $n is prime" );
+}
 
-# ECPP
-ok( is_ecpp_prime("340282366920938463463374607431768211507"), "is_ecpp_prime(340282366920938463463374607431768211507)" );
+###### _validate_ecpp_curve (used by validator)
+{
+  my($a, $b, $n, $px, $py, $m, $q) = (qw/11974582979013017040544030800350811348567083551553 3745895188306636099862491686263587139808164603839 31502364452480398675892757951692134470845712114091 1130825859 12488879584249846189936346549055924440813808564924 31502364452480398675892768464573175914770636828425 166158920647084013166402856268513699557/);
+  ok( Math::Prime::Util::GMP::_validate_ecpp_curve($a,$b,$n,$px,$py,$m,$q), "_validate_ecpp_curve ok" );
+  $px = "1130825861";
+  ok( !Math::Prime::Util::GMP::_validate_ecpp_curve($a,$b,$n,$px,$py,$m,$q), "_validate_ecpp_curve with different values fails" );
+}

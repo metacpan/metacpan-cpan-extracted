@@ -165,4 +165,64 @@ YAML
     ->status_is(404);
 }
 
+SKIP: {
+  skip 'Test::Mojo not available', 1 unless $has_test_mojo;
+
+  # Test: dynamic api_key_validator + before_request hook
+  my ($fh, $file) = tempfile(SUFFIX => '.yaml', UNLINK => 1);
+  print $fh <<'YAML';
+models:
+  test:
+    engine: OllamaOpenAI
+    url: http://test.invalid:11434/v1
+YAML
+  close $fh;
+
+  require Langertha::Knarr;
+  my $app = Langertha::Knarr->build_app(
+    config_file => $file,
+    api_key_validator => sub {
+      my ($c, $ctx) = @_;
+      return { allow => 1 } if $ctx->{api_key} eq 'allow-key';
+      return { allow => 0, status => 403, message => 'forbidden by validator' };
+    },
+    before_request => sub {
+      my ($c, $ctx) = @_;
+      return unless $ctx->{type} eq 'embedding';
+      return {
+        stop    => 1,
+        status  => 418,
+        message => 'embeddings disabled by policy',
+        type    => 'policy_denied',
+      };
+    },
+  );
+  my $t = Test::Mojo->new($app);
+
+  # Health still open
+  $t->get_ok('/health')
+    ->status_is(200);
+
+  # Validator blocks missing/invalid API key
+  $t->get_ok('/v1/models')
+    ->status_is(403)
+    ->json_is('/error/message' => 'forbidden by validator');
+
+  $t->get_ok('/v1/models' => { Authorization => 'Bearer wrong-key' })
+    ->status_is(403);
+
+  # Validator allows valid API key
+  $t->get_ok('/v1/models' => { Authorization => 'Bearer allow-key' })
+    ->status_is(200)
+    ->json_is('/object' => 'list');
+
+  # before_request can block specific request types
+  $t->post_ok('/v1/embeddings' => { Authorization => 'Bearer allow-key' } => json => {
+    model => 'test',
+    input => 'hello',
+  })
+    ->status_is(418)
+    ->json_is('/error/message' => 'embeddings disabled by policy');
+}
+
 done_testing;

@@ -1,11 +1,12 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
 use Encode qw(decode);
 
+use EBook::Ishmael::CharDet;
 use EBook::Ishmael::Decode qw(palmdoc_decode);
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::PDB;
@@ -61,7 +62,7 @@ sub new {
 
     my $class = shift;
     my $file  = shift;
-    my $enc   = shift // 'UTF-8';
+    my $enc   = shift;
 
     my $self = {
         Source       => undef,
@@ -130,12 +131,7 @@ sub html {
     my $self = shift;
     my $out  = shift;
 
-    my $html = decode(
-        $self->{Encoding},
-        text2html(
-            join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1)
-        ),
-    );
+    my $html = text2html($self->raw);
 
     if (defined $out) {
         open my $fh, '>', $out
@@ -155,10 +151,14 @@ sub raw {
     my $self = shift;
     my $out  = shift;
 
-    my $raw = decode(
-        $self->{Encoding},
-        join('', map { $self->_decode_record($_) } 0 .. $self->{_recnum} - 1)
-    );
+    my $raw = join '',
+              map { $self->_decode_record($_) }
+              (0 .. $self->{_recnum} - 1);
+    if (not defined $self->{Encoding}) {
+        $self->{Encoding} = chardet($raw) // 'ASCII';
+    }
+
+    $raw = decode($self->{Encoding}, $raw);
 
     if (defined $out) {
         open my $fh, '>', $out
@@ -183,10 +183,10 @@ sub metadata {
 
 sub has_cover { 0 }
 
-sub cover { undef }
+sub cover { (undef, undef) }
 
 sub image_num { 0 }
 
-sub image { undef }
+sub image { (undef, undef) }
 
 1;

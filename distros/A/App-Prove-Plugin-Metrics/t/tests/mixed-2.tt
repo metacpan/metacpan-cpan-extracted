@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Test::More tests=>1;
+subtest 'Level1'=>sub {
+	subtest 'Level2A'=>sub {
+		ok(1,'okA');
+	};
+	subtest 'Level2B'=>sub {
+		ok(0,'failB');
+	};
+};

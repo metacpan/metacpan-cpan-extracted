@@ -1,7 +1,11 @@
-[![Actions Status](https://github.com/darviarush/perl-aion-emitter/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-emitter/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-emitter?logo=perl)](https://github.com/darviarush/perl-aion-emitter/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Emitter.svg)](https://metacpan.org/release/Aion-Emitter) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-emitter/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Emitter+0.0.1-prealpha)
+[![Actions Status](https://github.com/darviarush/perl-aion-emitter/actions/workflows/test.yml/badge.svg)](https://github.com/darviarush/perl-aion-emitter/actions) [![GitHub Issues](https://img.shields.io/github/issues/darviarush/perl-aion-emitter?logo=perl)](https://github.com/darviarush/perl-aion-emitter/issues) [![MetaCPAN Release](https://badge.fury.io/pl/Aion-Emitter.svg)](https://metacpan.org/release/Aion-Emitter) [![Coverage](https://raw.githubusercontent.com/darviarush/perl-aion-emitter/master/doc/badges/total.svg)](https://fast2-matrix.cpantesters.org/?dist=Aion-Emitter+0.1.0)
 # NAME
 
 Aion::Emitter - диспетчер событий
+
+# VERSION
+
+0.1.0
 
 # SYNOPSIS
 

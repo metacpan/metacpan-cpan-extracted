@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion
 
+1.7 2026-03-10T07:20:53Z
+
+    - added autoware for eons
+
 1.6 2026-02-12T21:11:30Z
 
     - fix bug: isa => string and eon => 1

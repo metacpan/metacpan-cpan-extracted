@@ -1,6 +1,6 @@
 package EBook::Ishmael::TextBrowserDump;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -15,6 +15,8 @@ use File::Which;
 use EBook::Ishmael::ShellQuote qw(safe_qx);
 
 our $CAN_DUMP = 0;
+
+# TODO: Is there some sort of post-processing we can do to get rid of <img>s?
 
 # From links
 my $WIDTH_MAX = 512;
@@ -134,7 +136,7 @@ HERE
 
     my $dump = safe_qx(
         $Browsers{ $browser }->{Bin},
-        sprintf($Browsers{ $browser }->{Width}, $width),
+        split(/\s+/, sprintf($Browsers{ $browser }->{Width}, $width)),
         @{ $Browsers{ $browser }->{Opts} },
         ($xhtml ? join(" ", @{ $Browsers{ $browser }->{Xhtml} }) : ()),
         $file

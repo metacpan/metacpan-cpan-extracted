@@ -4,8 +4,9 @@
 #include <math.h>
 
 #include "ptypes.h"
-#define FUNC_isqrt 1
 #include "utility.h"
+#define FUNC_isqrt 1
+#include "misc_ui.h"
 #include "prime_iterator.h"
 
 
@@ -324,7 +325,6 @@ void prime_iterator_global_shutdown(void)
   small_primes = 0;
 }
 
-#if 0
 void prime_iterator_init(prime_iterator *iter)
 {
   iter->p = 2;
@@ -333,6 +333,7 @@ void prime_iterator_init(prime_iterator *iter)
   iter->segment_mem = 0;
 }
 
+#if 0
 prime_iterator prime_iterator_default(void)
 {
   prime_iterator iter = {2, 0, 0, 0};
@@ -561,4 +562,25 @@ UV* sieve_to_n(UV n, UV* count)
   if (sieve != primary_sieve) Safefree(sieve);
   if (count != 0) *count = pi;
   return primes;
+}
+
+unsigned long* sieve_to_n_ui(unsigned long n, unsigned long* count)
+{
+  UV nprimesuv, *parruv;
+  unsigned long i, *parr;
+
+  if (sizeof(unsigned long int) == sizeof(UV))
+    return (unsigned long*) sieve_to_n(n, (UV*)count);
+
+  /* If UV is smaller than n then we have a problem. */
+  if (n > (unsigned long) UV_MAX)
+    croak("UV is smaller than unsigned long, too many primes");
+
+  parruv = sieve_to_n(n, &nprimesuv);
+  *count = nprimesuv;
+  New(0, parr, nprimesuv, unsigned long);
+  for (i = 0; i < *count; i++)
+    parr[i] = parruv[i];
+  Safefree(parruv);
+  return parr;
 }

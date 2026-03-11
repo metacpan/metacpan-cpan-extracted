@@ -47,7 +47,7 @@ system:
 * Xpdf's `pdftopng` or ImageMagick's `convert`: (optional; for PDF cover dumping)
 * `unrar` (optional; for CBR support)
 * `7z` (optional; for CB7 support)
-* `extract_chmLib` (optional; for CHM support)
+* `extract_chmLib` or `hh.exe` (optional; for CHM support)
 
 The following programs can be installed for **ishmael** to use for
 formatting HTML. If none are installed, **ishmael** will use its own HTML
@@ -101,6 +101,8 @@ PalmDoc reader.
 * [KindleUnpack](https://github.com/kevinhendricks/KindleUnpack) - Mobi
 reader, Mobi Huff/CDIC decoder, KF8 reader.
 * [web2help](https://www.skeed.it/web2help) - CHM test file.
+* [chardet](https://chardet.readthedocs.io/en/latest/) - Character encoding
+detection algorithm.
 
 ## History
 

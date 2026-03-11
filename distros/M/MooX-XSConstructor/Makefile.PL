@@ -38,7 +38,7 @@ my $meta = {
                                        },
                         },
   "provides"         => {
-                          "MooX::XSConstructor" => { file => "lib/MooX/XSConstructor.pm", version => 0.003002 },
+                          "MooX::XSConstructor" => { file => "lib/MooX/XSConstructor.pm", version => 0.003003 },
                         },
   "release_status"   => "stable",
   "resources"        => {
@@ -54,7 +54,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooX-XSConstructor/project",
                         },
-  "version"          => 0.003002,
+  "version"          => 0.003003,
   "x_static_install" => 1,
 };
 

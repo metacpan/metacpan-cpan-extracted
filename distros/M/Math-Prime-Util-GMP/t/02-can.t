@@ -11,6 +11,7 @@ my @functions = qw(
                      is_bpsw_prime
                      is_provable_prime
                      is_provable_prime_with_cert
+                     is_trial_prime
                      is_aks_prime
                      is_nminus1_prime
                      is_nplus1_prime
@@ -33,7 +34,9 @@ my @functions = qw(
                      is_proth_prime
                      is_miller_prime
                      miller_rabin_random
-                     lucas_sequence  lucasu  lucasv
+                     is_gaussian_prime
+                     lucas_sequence  lucasuv  lucasu  lucasv
+                     lucasuvmod  lucasumod  lucasvmod
                      primes
                      sieve_primes
                      sieve_twin_primes
@@ -42,11 +45,13 @@ my @functions = qw(
                      next_prime
                      prev_prime
                      surround_primes
+                     next_twin_prime
                      trial_factor
                      prho_factor
                      pbrent_factor
                      pminus1_factor
                      pplus1_factor
+                     cheb_factor
                      holf_factor
                      squfof_factor
                      ecm_factor
@@ -54,37 +59,56 @@ my @functions = qw(
                      factor
                      divisors
                      sigma
-                     chinese
+                     chinese chinese2
                      moebius
                      prime_count prime_count_lower prime_count_upper
                      primorial
                      pn_primorial
                      factorial subfactorial multifactorial factorial_sum
-                     factorialmod
+                     falling_factorial rising_factorial
+                     factorialmod binomialmod
                      consecutive_integer_lcm
                      partitions bernfrac bernreal harmfrac harmreal stirling
+                     bernvec powersum faulhaber_sum
                      zeta li ei riemannr lambertw
                      addreal subreal mulreal divreal
                      logreal expreal powreal rootreal agmreal
                      gcd lcm kronecker valuation binomial gcdext hammingweight
-                     invmod sqrtmod addmod mulmod divmod powmod
+                     negmod invmod sqrtmod addmod submod mulmod divmod powmod
+                     is_qr
+                     muladdmod mulsubmod
                      vecsum vecprod
                      exp_mangoldt
                      liouville
                      totient
                      jordan_totient
                      carmichael_lambda
-                     sqrtint rootint logint powint mulint addint
-                     divint modint divrem tdivrem
-                     is_power is_prime_power is_semiprime is_square
+                     prime_omega prime_bigomega
+                     sqrtint rootint logint powint mulint addint subint
+                     divint modint cdivint divrem tdivrem fdivrem cdivrem
+                     add1int sub1int
+                     negint absint signint cmpint cmpabsint
+                     lshiftint rshiftint rashiftint
+                     setbit clrbit tstbit notbit
+                     bitand bitor bitxor bitnot
+                     is_divisible is_congruent
+                     is_power is_prime_power is_semiprime is_almost_prime
+                     is_square is_smooth is_rough is_powerful is_practical
                      is_carmichael is_fundamental is_totient
                      is_primitive_root
                      is_polygonal polygonal_nth
+                     powerful_count
+                     prime_power_count
+                     is_perfect_power next_perfect_power prev_perfect_power
+                     nth_perfect_power nth_perfect_power_approx
+                     perfect_power_count
+                     is_square_free is_powerfree next_powerfree prev_powerfree
+                     powerfree_count nth_powerfree
                      znorder
                      znprimroot
                      ramanujan_tau
                      Pi Euler
-                     todigits
+                     todigits fromdigits
                      random_prime random_nbit_prime random_ndigit_prime
                      random_safe_prime random_strong_prime
                      random_maurer_prime random_shawe_taylor_prime

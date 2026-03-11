@@ -74,9 +74,15 @@ lib/Langertha/Engine/OpenRouter.pm
 lib/Langertha/Engine/Perplexity.pm
 lib/Langertha/Engine/Remote.pm
 lib/Langertha/Engine/Replicate.pm
+lib/Langertha/Engine/SGLang.pm
 lib/Langertha/Engine/Whisper.pm
 lib/Langertha/Engine/vLLM.pm
 lib/Langertha/ImageGen.pm
+lib/Langertha/Input.pm
+lib/Langertha/Input/Tools.pm
+lib/Langertha/Metrics.pm
+lib/Langertha/Output.pm
+lib/Langertha/Output/Tools.pm
 lib/Langertha/Plugin.pm
 lib/Langertha/Plugin/Langfuse.pm
 lib/Langertha/Raid.pm
@@ -172,6 +178,9 @@ t/93_chat.t
 t/94_plugin_langfuse.t
 t/95_imagegen.t
 t/96_raid_orchestration.t
+t/97_input_output.t
+t/98_metrics.t
+t/99-engine-resolution.t
 t/author-pod-syntax.t
 t/data/anthropic_models.json
 t/data/deepseek_models.json
@@ -183,4 +192,5 @@ t/data/ollama_tool_call_response.json
 t/data/ollama_tool_result_response.json
 t/data/openai_models.json
 t/data/testfile
+t/lib/LangerthaX/Engine/TestEngine.pm
 t/lib/Test/MockAsyncHTTP.pm

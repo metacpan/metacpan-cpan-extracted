@@ -7,6 +7,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-03-10
+
+### Fixed
+
+- We now need WebServer::DirIndex v0.1.0 or greater.
+
 ## [0.2.0] - 2026-02-24
 
 ### Added

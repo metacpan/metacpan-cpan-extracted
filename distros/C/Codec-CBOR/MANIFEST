@@ -1,0 +1,12 @@
+Build.PL
+Changes.md
+LICENSE
+MANIFEST
+META.json
+META.yml
+README.md
+cpanfile
+lib/Codec/CBOR.pm
+lib/Codec/CBOR.pod
+t/01_basic.t
+t/02_fixtures.t

@@ -7,11 +7,11 @@ use Math::Prime::Util::GMP qw/is_carmichael is_fundamental is_totient is_gaussia
                               is_polygonal polygonal_nth/;
 
 plan tests => 0
-            + 3 # is_carmichael
+            + 6 # is_carmichael
             + 4 # is_fundamental
             + 8 # is_gaussian_prime
             + 9 # is_totient
-            + 4 # is_polygonal
+            + 6 # is_polygonal
             + 0;
 
 ###### is_carmichael
@@ -20,6 +20,9 @@ is_deeply( [grep { is_carmichael($_) } 1 .. 20000],
            "Carmichael numbers to 20000" );
 ok( is_carmichael("1298392318741906953539071949881"), "Large Carmichael" );
 ok( is_carmichael("341627175004511735787409078802107169251"), "Larger Carmichael" );
+ok( is_carmichael("1296000000000001999446840000001028237568411600176260833069969529"), "64-digit Carmichael U_3(10^20+51426)" );
+ok( is_carmichael("2059832906607460252767290568443059994787898033540634712711845135488141590979778401392385"), "88-digit highly composite n" );
+ok( !is_carmichael("85474748242379385366094816268973624888150242213226622180749138318386315935863212081942773317297904345474600957207428590062778602152519956800727219132027890643383467070099011582284945709124001108514764722966245494493169941622314836646386558535398146857006553207552461902964756053556805850282748662504578139090961477044287402823322355055911488039369571766331538282989461368172866093039969460784972736481613017667409050543252201255683285242294097740381698721"), "Large non-Carmichael number");
 
 ###### is_fundamental
 is_deeply( [grep { is_fundamental($_) } -50 .. 0],
@@ -62,3 +65,5 @@ is_deeply( [grep { is_polygonal($_,3) } 1..55], [1,3,6,10,15,21,28,36,45,55], "f
 is_deeply( [grep { is_polygonal($_,23) } 1..955], [1,23,66,130,215,321,448,596,765,955], "first 10 23-gonal numbers" );
 is( polygonal_nth("140737496743936",3), 16777216, "140737496743936 is the 16777216-th triangular number");
 is( polygonal_nth("228623681298582551246684960361911294205",5), "12345678901234567890", "identified the 12345678901234567890-th pentagonal number");
+is(polygonal_nth(9801,4), 99, "polygonal_nth(9801,4) = 99");
+is(polygonal_nth(9999,4), 0, "polygonal_nth(9999,4) = 0");

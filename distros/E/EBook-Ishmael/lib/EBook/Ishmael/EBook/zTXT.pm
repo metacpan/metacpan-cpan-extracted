@@ -1,11 +1,12 @@
 package EBook::Ishmael::EBook::zTXT;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
 use Encode qw(decode);
 
+use EBook::Ishmael::CharDet;
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::PDB;
 use EBook::Ishmael::TextToHtml;
@@ -81,7 +82,7 @@ sub new {
 
     my $class = shift;
     my $file  = shift;
-    my $enc   = shift // 'UTF-8';
+    my $enc   = shift;
 
     my $self = {
         Source       => undef,
@@ -161,7 +162,7 @@ sub html {
     my $self = shift;
     my $out  = shift;
 
-    my $html = decode($self->{Encoding}, text2html($self->_text));
+    my $html = text2html($self->raw);
 
     if (defined $out) {
         open my $fh, '>', $out
@@ -181,7 +182,11 @@ sub raw {
     my $self = shift;
     my $out  = shift;
 
-    my $raw = decode($self->{Encoding}, $self->_text);
+    my $raw = $self->_text;
+    if (not defined $self->{Encoding}) {
+        $self->{Encoding} = chardet($raw) // 'ASCII';
+    }
+    $raw = decode($self->{Encoding}, $raw);
 
     if (defined $out) {
         open my $fh, '>', $out
@@ -206,10 +211,10 @@ sub metadata {
 
 sub has_cover { 0 }
 
-sub cover { undef }
+sub cover { (undef, undef) }
 
 sub image_num { 0 }
 
-sub image { undef }
+sub image { (undef, undef) }
 
 1;

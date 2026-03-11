@@ -3,7 +3,7 @@ NAME
     perform actions on them
 
 VERSION
-    This document describes version 0.003 of Git::Grouper (from Perl
+    This document describes version 0.004 of Git::Grouper (from Perl
     distribution Git-Grouper), released on 2025-11-11.
 
 SYNOPSIS

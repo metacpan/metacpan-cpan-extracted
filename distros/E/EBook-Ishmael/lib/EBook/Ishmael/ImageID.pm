@@ -1,19 +1,17 @@
 package EBook::Ishmael::ImageID;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
 use Exporter 'import';
-our @EXPORT = qw(image_id image_size is_image_path);
+our @EXPORT_OK = qw(
+    image_id image_size is_image_path mimetype_id image_path_id
+);
 
 use List::Util qw(max);
 
 use XML::LibXML;
-
-my $IMGRX = sprintf "(%s)", join '|', qw(
-    png jpg jpeg tif tiff gif bmp webp svg jxl avif
-);
 
 # This function may not support many image formats as it was designed for
 # getting image sizes for CHM files to determine the cover image. CHMs
@@ -24,9 +22,9 @@ my %SIZE = (
     # size stored as two BE ushorts in the SOF0 marker, at offset 5.
     'jpg' => sub {
 
-        my $ref = shift;
+        my $img = shift;
 
-        my $len = length $$ref;
+        my $len = length $$img;
 
         my $p = 2;
 
@@ -34,16 +32,16 @@ my %SIZE = (
 
         while ($p < $len) {
 
-            my $id = join ' ', unpack "CC", substr $$ref, $p, 2;
+            my $id = join ' ', unpack "CC", substr $$img, $p, 2;
             $p += 2;
-            my $mlen = unpack "n", substr $$ref, $p, 2;
+            my $mlen = unpack "n", substr $$img, $p, 2;
 
             unless ($id eq $sof) {
                 $p += $mlen;
                 next;
             }
 
-            my ($y, $x) = unpack "nn", substr $$ref, $p + 3, 4;
+            my ($y, $x) = unpack "nn", substr $$img, $p + 3, 4;
 
             return [ $x, $y ];
 
@@ -55,11 +53,11 @@ my %SIZE = (
     # size stored as two BE ulongs at offset 16
     'png' => sub {
 
-        my $ref = shift;
+        my $img = shift;
 
-        return undef unless length $$ref > 24;
+        return undef unless length $$img > 24;
 
-        my ($x, $y) = unpack "N N", substr $$ref, 16, 8;
+        my ($x, $y) = unpack "N N", substr $$img, 16, 8;
 
         return [ $x, $y ];
 
@@ -67,11 +65,11 @@ my %SIZE = (
     # size stored as two LE ushorts at offset 6
     'gif' => sub {
 
-        my $ref = shift;
+        my $img = shift;
 
-        return undef unless length $$ref > 10;
+        return undef unless length $$img > 10;
 
-        my ($x, $y) = unpack "v v", substr $$ref, 6, 4;
+        my ($x, $y) = unpack "v v", substr $$img, 6, 4;
 
         return [ $x, $y ];
 
@@ -80,20 +78,20 @@ my %SIZE = (
     # offset 18. For Windows, two LE signed longs at offset 18.
     'bmp' => sub {
 
-        my $ref = shift;
+        my $img = shift;
 
-        return undef unless length $$ref > 24;
+        return undef unless length $$img > 24;
 
-        my $dbisize = unpack "V", substr $$ref, 14, 4;
+        my $dbisize = unpack "V", substr $$img, 14, 4;
 
         my ($x, $y);
 
         # OS
         if ($dbisize == 16) {
-            ($x, $y) = unpack "v v", substr $$ref, 18, 4;
+            ($x, $y) = unpack "v v", substr $$img, 18, 4;
         # Win
         } else {
-            ($x, $y) = unpack "(ll)<", substr $$ref, 18, 8;
+            ($x, $y) = unpack "(ll)<", substr $$img, 18, 8;
             return undef if $x < 0 or $y < 0;
         }
 
@@ -103,9 +101,9 @@ my %SIZE = (
     # Get width and height attributes of root node.
     'svg' => sub {
 
-        my $ref = shift;
+        my $img = shift;
 
-        my $dom = eval { XML::LibXML->load_xml(string => $ref) }
+        my $dom = eval { XML::LibXML->load_xml(string => $img) }
             or return undef;
 
         my $svg = $dom->documentElement;
@@ -118,27 +116,59 @@ my %SIZE = (
     },
 );
 
+my %MIME_TYPES = (
+    'image/png'     => 'png',
+    'image/jpeg'    => 'jpg',
+    'image/tiff'    => 'tiff',
+    'image/tiff-fx' => 'tiff',
+    'image/gif'     => 'gif',
+    'image/bmp'     => 'bmp',
+    'image/x-bmp'   => 'bmp',
+    'image/webp'    => 'webp',
+    'image/svg+xml' => 'svg',
+    'image/jxl'     => 'jxl',
+    'image/avif'    => 'avif',
+);
+
+my %IMAGE_SUFFIXES = (
+    'png'  => 'png',
+    'jpg'  => 'jpg',
+    'jpeg' => 'jpeg',
+    'tif'  => 'tiff',
+    'tiff' => 'tiff',
+    'gif'  => 'gif',
+    'bmp'  => 'bmp',
+    'webp' => 'webp',
+    'svg'  => 'jxl',
+    'avif' => 'avif',
+);
+
+my $IMGRX = do {
+    my $s = sprintf "(%s)", join '|', keys %IMAGE_SUFFIXES;
+    qr/$s/;
+};
+
 sub image_id {
 
-    my $ref = shift;
+    my $img = shift;
 
-    if ($$ref =~ /^\xff\xd8\xff/) {
+    if ($img =~ /^\xff\xd8\xff/) {
         return 'jpg';
-    } elsif ($$ref =~ /^\x89\x50\x4e\x47\x0d\x0a\x1a\x0a/) {
+    } elsif ($img =~ /^\x89\x50\x4e\x47\x0d\x0a\x1a\x0a/) {
         return 'png';
-    } elsif ($$ref =~ /^GIF8[79]a/) {
+    } elsif ($img =~ /^GIF8[79]a/) {
         return 'gif';
-    } elsif ($$ref =~ /^\x52\x49\x46\x46....\x57\x45\x42\x50\x56\x50\x38/) {
+    } elsif ($img =~ /^\x52\x49\x46\x46....\x57\x45\x42\x50\x56\x50\x38/) {
         return 'webp';
-    } elsif ($$ref =~ /^BM/) {
+    } elsif ($img =~ /^BM/) {
         return 'bmp';
-    } elsif ($$ref =~ /^(\x49\x49\x2a\x00|\x4d\x4d\x00\x2a)/) {
+    } elsif ($img =~ /^(\x49\x49\x2a\x00|\x4d\x4d\x00\x2a)/) {
         return 'tif';
-    } elsif ($$ref =~ /\A....ftypavif/s) {
+    } elsif ($img =~ /\A....ftypavif/s) {
         return 'avif';
-    } elsif ($$ref =~ /^(\xff\x0a|\x00{3}\x0c\x4a\x58\x4c\x20\x0d\x0a\x87\x0a)/) {
+    } elsif ($img =~ /^(\xff\x0a|\x00{3}\x0c\x4a\x58\x4c\x20\x0d\x0a\x87\x0a)/) {
         return 'jxl';
-    } elsif (substr($$ref, 0, 1024) =~ /<\s*svg[^<>]*>/) {
+    } elsif (substr($img, 0, 1024) =~ /<\s*svg[^<>]*>/) {
         return 'svg';
     } else {
         return undef;
@@ -148,8 +178,8 @@ sub image_id {
 
 sub image_size {
 
-    my $ref = shift;
-    my $fmt = shift // image_id($ref);
+    my $img = shift;
+    my $fmt = shift // image_id($img);
 
     unless (defined $fmt) {
         die "Could not determine image data format\n";
@@ -159,7 +189,7 @@ sub image_size {
         return undef;
     }
 
-    return $SIZE{ $fmt }->($ref);
+    return $SIZE{ $fmt }->(\$img);
 
 }
 
@@ -168,6 +198,23 @@ sub is_image_path {
     my $path = shift;
 
     return $path =~ /\.$IMGRX$/;
+
+}
+
+sub mimetype_id {
+
+    my ($mime) = @_;
+
+    return $MIME_TYPES{ $mime };
+
+}
+
+sub image_path_id {
+
+    my ($path) = @_;
+
+    $path =~ /\.([^.]+)$/ or return undef;
+    return $IMAGE_SUFFIXES{ lc $1 };
 
 }
 
@@ -181,7 +228,7 @@ EBook::Ishmael::ImageID - Identify image data format
 
   use EBook::Ishmael::ImageID;
 
-  my $format = image_id($dataref);
+  my $format = image_id($img);
 
 =head1 DESCRIPTION
 
@@ -218,13 +265,13 @@ Currently, the following formats are supported:
 
 =over 4
 
-=item $f = image_id($dataref)
+=item $f = image_id($img)
 
-Returns a string of the image format of the given image buffer. C<$dataref>
-must be a scalar ref. Returns C<undef> if the image's format could not be
+Returns a string of the image format of the given image buffer.
+Returns C<undef> if the image's format could not be
 identified.
 
-=item [$x, $y] = image_size($dataref, [$fmt])
+=item [$x, $y] = image_size($img, [$fmt])
 
 Returns an C<$x>/C<$y> pair representing the image data's size. C<$fmt> is an
 optional argument specifying the format to use for the image data. If not
@@ -248,6 +295,16 @@ This subroutine does not support the following formats (yet):
 =item $bool = is_image_path($path)
 
 Returns true if C<$path> looks like an image path name.
+
+=item $f = mimetype_id(($mime)
+
+Identifies the image format based on the given mimetype. Returns C<undef> if
+C<$mime> is not recognized.
+
+=item $f = image_path_id($path)
+
+Identifies the image format based on the given file path based on its suffix.
+Returns C<undef> if the file's format cannot be recognized.
 
 =back
 

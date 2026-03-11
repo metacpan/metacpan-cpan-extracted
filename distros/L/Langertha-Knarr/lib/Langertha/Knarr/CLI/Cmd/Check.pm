@@ -1,5 +1,5 @@
 package Langertha::Knarr::CLI::Cmd::Check;
-our $VERSION = '0.004';
+our $VERSION = '0.007';
 # ABSTRACT: Validate Knarr configuration file
 use Moo;
 use MooX::Cmd;
@@ -65,7 +65,7 @@ Langertha::Knarr::CLI::Cmd::Check - Validate Knarr configuration file
 
 =head1 VERSION
 
-version 0.004
+version 0.007
 
 =head1 DESCRIPTION
 

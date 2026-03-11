@@ -123,8 +123,8 @@ to C<RootDirectory> however mounts a file system hierarchy from a block device n
 or loopback file instead of a directory. The device node or file system image file needs to contain a
 file system without a partition table, or a file system within an MBR/MS-DOS or GPT partition table
 with only a single Linux-compatible partition, or a set of file systems within a GPT partition table
-that follows the
-L<Discoverable Partitions
+that follows the L<UAPI.2
+Discoverable Partitions
 Specification|https://uapi-group.org/specifications/specs/discoverable_partitions_specification>.
 
 When C<DevicePolicy> is set to C<closed> or
@@ -156,8 +156,7 @@ in case the service is configured to survive it.',
 C<RootImage>. Optionally a partition name can be prefixed, followed by colon, in
 case the image has multiple partitions, otherwise partition name C<root> is implied.
 Options for multiple partitions can be specified in a single line with space separators. Assigning an empty
-string removes previous assignments. Duplicated options are ignored. For a list of valid mount options, please
-refer to
+string removes previous assignments. For a list of valid mount options, please refer to
 L<mount(8)>.
 
 Valid partition names follow the
@@ -318,6 +317,20 @@ The default policy for C<ExtensionImagePolicy> is:
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'RootMStack',
+      {
+        'description' => 'Takes a path to a
+L<systemd.mstack(7)>
+directory encapsulating a mount stack consisting of layers and bind mounts. Similar to
+C<RootDirectory> and C<RootImage> this runs the service off a
+distinct root file system, in this case set up via C<overlayfs>.
+
+Since C<.mstack/> directories may reference disk images (DDIs) similar device
+policy extensions and dependencies are in effect when C<RootMStack> is used as are
+if C<RootImage> is used.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'MountAPIVFS',
       {
         'description' => 'Takes a boolean argument. If on, a private mount namespace for the unit\'s processes is created
@@ -425,16 +438,16 @@ C<procfs>.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Configures unit-specific bind mounts. A bind mount makes a particular file or directory
-available at an additional place in the unit\'s view of the file system. Any bind mounts created with this
-option are specific to the unit, and are not visible in the host\'s mount table. This option expects a
-whitespace separated list of bind mount definitions. Each definition consists of a colon-separated triple of
-source path, destination path and option string, where the latter two are optional. If only a source path is
-specified the source and destination is taken to be the same. The option string may be either
-C<rbind> or C<norbind> for configuring a recursive or non-recursive bind
-mount. If the destination path is omitted, the option string must be omitted too.
-Each bind mount definition may be prefixed with C<->, in which case it will be ignored
-when its source path does not exist.
+        'description' => 'Configures unit-specific bind mounts. A bind mount makes a particular file or
+directory available at an additional place in the unit\'s view of the file system. Any bind mounts
+created with this option are specific to the unit, and are not visible in the host\'s mount
+table. This option expects a whitespace separated list of bind mount definitions. Each definition
+consists of a colon-separated triple of source path, destination path and option string, where the
+latter two are optional. If only a source path is specified the source and destination is taken to be
+the same. The option string may be either C<rbind> or C<norbind> for
+configuring a recursive or non-recursive bind mount. If the destination path is omitted, the option
+string must be omitted too.  Each bind mount definition may be prefixed with C<->, in
+which case it will be ignored when its source path does not exist or is not accessible.
 
 C<BindPaths> creates regular writable bind mounts (unless the source file system mount
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
@@ -464,16 +477,16 @@ C<ProtectHome=tmpfs> should be used instead.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Configures unit-specific bind mounts. A bind mount makes a particular file or directory
-available at an additional place in the unit\'s view of the file system. Any bind mounts created with this
-option are specific to the unit, and are not visible in the host\'s mount table. This option expects a
-whitespace separated list of bind mount definitions. Each definition consists of a colon-separated triple of
-source path, destination path and option string, where the latter two are optional. If only a source path is
-specified the source and destination is taken to be the same. The option string may be either
-C<rbind> or C<norbind> for configuring a recursive or non-recursive bind
-mount. If the destination path is omitted, the option string must be omitted too.
-Each bind mount definition may be prefixed with C<->, in which case it will be ignored
-when its source path does not exist.
+        'description' => 'Configures unit-specific bind mounts. A bind mount makes a particular file or
+directory available at an additional place in the unit\'s view of the file system. Any bind mounts
+created with this option are specific to the unit, and are not visible in the host\'s mount
+table. This option expects a whitespace separated list of bind mount definitions. Each definition
+consists of a colon-separated triple of source path, destination path and option string, where the
+latter two are optional. If only a source path is specified the source and destination is taken to be
+the same. The option string may be either C<rbind> or C<norbind> for
+configuring a recursive or non-recursive bind mount. If the destination path is omitted, the option
+string must be omitted too.  Each bind mount definition may be prefixed with C<->, in
+which case it will be ignored when its source path does not exist or is not accessible.
 
 C<BindPaths> creates regular writable bind mounts (unless the source file system mount
 is already marked read-only), while C<BindReadOnlyPaths> creates read-only bind mounts. These
@@ -583,14 +596,13 @@ L<os-release(5)>.
 To disable the safety check that the extension-release file name matches the image file name, the
 C<x-systemd.relax-extension-release-check> mount option may be appended.
 
-This option can be used together with a C<notify-reload> service type and
-L<systemd.v(7)>
-to manage configuration updates. When such a service carrying confext images is reloaded via
-systemctl reload foo.service or equivalent D-Bus method, the confext itself will
-be reloaded to pick up any changes. This only applies to confext extensions. Note that in case a
-service has this configuration enabled at first, and then it is subsequently removed in an update
-followed by a daemon-reload operation, reloading the confexts will be a no-op, and a full service
-restart is required instead. See
+If a service employs this option with
+L<systemd.v(7)>,
+and has C<RefreshOnReload=extensions> enabled (the default), the confexts will
+be refreshed to pick up any changes on service reload. This only applies to confext extensions.
+Note that in case a service has this configuration enabled at first, and then it is subsequently
+removed in an update followed by a daemon-reload operation, reloading the confexts will be a no-op,
+and a full service restart is required instead. See
 L<systemd.service(5)>
 also for details.
 
@@ -635,14 +647,13 @@ file, with the appropriate metadata which matches C<RootImage>/C<RootDirectory>
 or the host. See:
 L<os-release(5)>.
 
-This option can be used together with a C<notify-reload> service type and
-L<systemd.v(7)>
-to manage configuration updates. When such a service carrying confext directories is reloaded via
-systemctl reload foo.service or equivalent D-Bus method, the confext itself will
-be reloaded to pick up any changes. This only applies to confext extensions. Note that in case a
-service has this configuration enabled at first, and then it is subsequently removed in an update
-followed by a daemon-reload operation, reloading the confexts will be a no-op, and a full service
-restart is required instead. See
+If a service employs this option with
+L<systemd.v(7)>,
+and has C<RefreshOnReload=extensions> enabled (the default), the confexts will
+be refreshed to pick up any changes on service reload. This only applies to confext extensions.
+Note that in case a service has this configuration enabled at first, and then it is subsequently
+removed in an update followed by a daemon-reload operation, reloading the confexts will be a no-op,
+and a full service restart is required instead. See
 L<systemd.service(5)>
 also for details.
 
@@ -2042,13 +2053,14 @@ details.',
       {
         'choice' => [
           'batch',
+          'ext',
           'fifo',
           'idle',
           'other',
           'rr'
         ],
         'description' => 'Sets the CPU scheduling policy for executed processes. Takes one of C<other>,
-C<batch>, C<idle>, C<fifo> or C<rr>. See
+C<batch>, C<idle>, C<fifo>, C<rr> or C<ext>. See
 L<sched_setscheduler(2)> for
 details.',
         'type' => 'leaf',
@@ -3542,6 +3554,18 @@ services.',
           'yes'
         ]
       },
+      'UserNamespacePath',
+      {
+        'description' => 'Takes an absolute file system path referring to a Linux user namespace
+pseudo-file (i.e. a file like C</proc/$PID/ns/user> or a bind mount or symlink to
+one). When set the invoked processes are added to the user namespace referenced by that path. The
+path has to point to a valid namespace file at the moment the processes are forked off. If this
+option is used C<PrivateUsers> has no effect.
+
+This option is only available for system services.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'NetworkNamespacePath',
       {
         'description' => 'Takes an absolute file system path referring to a Linux network namespace
@@ -3630,6 +3654,38 @@ L<prctl(2)>.',
           'yes'
         ]
       },
+      'MemoryTHP',
+      {
+        'description' => 'Transparent Hugepages (THPs) is a Linux kernel feature that manages memory
+using larger pages (2MB on x86, compared to the default 4KB). The main goal is to improve memory management
+efficiency and system performance, especially for memory-intensive applications.
+However, it can cause drawbacks in some scenarios, such as memory regression and latency spikes.
+THP policy is governed for the entire system via C</sys/kernel/mm/transparent_hugepage/enabled>.
+However, it can be overridden for individual workloads via
+L<prctl(2)>.
+C<MemoryTHP> may be used to disable THPs at process invocation time to stop providing
+THPs for workloads where the drawbacks outweigh the advantages.
+When C<MemoryTHP> is set to C<inherit> or not set at all, systemd
+inherits THP settings from the process that starts it and no
+L<prctl(2)>C<PR_SET_THP_DISABLE> call is made.
+When set to C<disable>, C<MemoryTHP> disables THPs completely for the process,
+irrespecitive of global THP controls.
+When set to C<madvise>, C<MemoryTHP> disables THPs for the process except when
+specifically requested via L<madvise(2)>
+by the process with C<MADV_HUGEPAGE> or C<MADV_COLLAPSE>.
+When set to C<system>, C<MemoryTHP> resets the THP policy to system wide policy.
+This can be used when the process that starts systemd has already disabled THPs via
+C<PR_SET_THP_DISABLE>, and we want to restore the system default THP setting at
+process invocation time. For details, see
+L<Transparent Hugepage Support|https://docs.kernel.org/admin-guide/mm/transhuge.html>
+in the kernel documentation.
+
+Note that this functionality might not be available, for example if THP is disabled in the
+kernel, or the kernel does not support controlling THP at the process level through
+L<prctl(2)>.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'PrivatePIDs',
       {
         'description' => 'Takes a boolean argument. Defaults to false. If enabled, sets up a new PID namespace
@@ -3662,20 +3718,22 @@ instance of C</proc/>.',
         'choice' => [
           'full',
           'identity',
+          'managed',
           'no',
           'self',
           'yes'
         ],
-        'description' => 'Takes a boolean argument or one of C<self>, C<identity>,
-or C<full>. Defaults to false. If enabled, sets up a new user namespace for the
-executed processes and configures a user and group mapping. If set to a true value or
-C<self>, a minimal user and group mapping is configured that maps the
-C<root> user and group as well as the unit\'s own user and group to themselves and
-everything else to the C<nobody> user and group. This is useful to securely detach
-the user and group databases used by the unit from the rest of the system, and thus to create an
-effective sandbox environment. All files, directories, processes, IPC objects and other resources
-owned by users/groups not equaling C<root> or the unit\'s own will stay visible from
-within the unit but appear owned by the C<nobody> user and group.
+        'description' => 'Takes a boolean argument or one of C<self>,
+C<identity>, C<full> or C<managed>. Defaults to
+false. If enabled, sets up a new user namespace for the executed processes and configures a user and
+group mapping. If set to a true value or C<self>, a minimal user and group mapping is
+configured that maps the C<root> user and group as well as the unit\'s own user and
+group to themselves and everything else to the C<nobody> user and group. This is
+useful to securely detach the user and group databases used by the unit from the rest of the system,
+and thus to create an effective sandbox environment. All files, directories, processes, IPC objects
+and other resources owned by users/groups not equaling C<root> or the unit\'s own will
+stay visible from within the unit but appear owned by the C<nobody> user and
+group.
 
 If the parameter is C<identity>, user namespacing is set up with an identity
 mapping for the first 65536 UIDs/GIDs. Any UIDs/GIDs above 65536 will be mapped to the
@@ -3688,14 +3746,21 @@ mapping for all UIDs/GIDs. In addition, for system services, C<full> allows the 
 to call setgroups() system calls (by setting
 C</proc/pid/setgroups> to C<allow>).
 Similar to C<identity>, this does not provide UID/GID isolation, but it does provide
-process capability isolation.
+process capability isolation. If this mode is enabled, all unit processes are run without privileges
+in the host user namespace (regardless of whether the unit\'s own user/group is
+C<root> or not). Specifically this means that the process will have zero process
+capabilities on the host\'s user namespace, but full capabilities within the service\'s user
+namespace. Settings such as C<CapabilityBoundingSet> will affect only the latter,
+and there\'s no way to acquire additional capabilities in the host\'s user namespace.
 
-If this mode is enabled, all unit processes are run without privileges in the host user
-namespace (regardless of whether the unit\'s own user/group is C<root> or not). Specifically
-this means that the process will have zero process capabilities on the host\'s user namespace, but
-full capabilities within the service\'s user namespace. Settings such as
-C<CapabilityBoundingSet> will affect only the latter, and there\'s no way to acquire
-additional capabilities in the host\'s user namespace.
+If the parameter is C<managed> a transient, dynamically allocated range of
+65536 UIDs/GIDs is allocated for the unit, and a UID/GID mapping is assigned to the unit\'s process
+so the UID/GID 0 from inside the unit maps to the first UID/GID of the allocated mapping. Note that
+in this mode the UID/GID the service process will run as is different depending if looking from the
+host side (where it will be a high, dynamically assigned UID) or from inside the unit (where it will
+be 0). Also note that this mode will enable file system UID mapping for the file systems this service
+accesses, mapping the "foreign" UID range on disk to the selected dynamic UID range at
+runtime.
 
 When this setting is set up by a per-user instance of the service manager, the mapping of the
 C<root> user and group to itself is omitted (unless the user manager is root).
@@ -4554,10 +4619,11 @@ continuation, and the newline itself is discarded. A backslash followed by any o
 ignored; both the backslash and the following character are preserved verbatim. Leading and trailing
 whitespace outside of the double quotes is discarded.
 
-The argument passed should be an absolute filename or wildcard expression, optionally prefixed with
-C<->, which indicates that if the file does not exist, it will not be read and no error or
-warning message is logged. This option may be specified more than once in which case all specified files are
-read. If the empty string is assigned to this option, the list of file to read is reset, all prior assignments
+The argument passed should be an absolute filename or wildcard expression. If the file does not
+exist, cannot be read, or contains invalid content, the service will fail to start. To make the file
+optional, prefix the path with C<->, which causes all errors related to the file to be
+silently ignored. This option may be specified more than once in which case all specified files are read.
+If the empty string is assigned to this option, the list of files to read is reset, all prior assignments
 have no effect.
 
 The files listed with this directive will be read shortly before the process is executed (more
@@ -5579,7 +5645,7 @@ leader. Defaults to C<init>.',
         'value_type' => 'enum'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 258 doc',
+    'generated_by' => 'parse-man.pl from systemd 260 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Exec'
   }

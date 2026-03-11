@@ -1,6 +1,6 @@
 package App::xlate;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 1;
 =encoding utf-8
@@ -68,7 +68,7 @@ xlate [ options ] -t LANG FILE [ greple options ]
 
 =head1 VERSION
 
-    Version 1.00
+    Version 1.01
 
 =cut
 =head1 DESCRIPTION

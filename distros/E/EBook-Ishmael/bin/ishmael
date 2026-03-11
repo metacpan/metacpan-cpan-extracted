@@ -134,8 +134,8 @@ B<ishmael> to determine the text character encoding.
 For a list of supported encodings, please consult the Perl documentation for
 L<Encode::Supported>.
 
-The default character encoding can vary depending on the ebook format, but is
-usually C<UTF-8>.
+By default, B<ishmael> attempts to heuristically guess the character encoding
+of an ebook, which may sometimes be inaccurate.
 
 =item B<-f>|B<--format>=I<format>
 

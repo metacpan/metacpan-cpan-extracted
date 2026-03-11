@@ -7,7 +7,7 @@ use Test::More;
 use File::Spec;
 
 use EBook::Ishmael::EBook;
-use EBook::Ishmael::ImageID;
+use EBook::Ishmael::ImageID qw(image_id);
 
 my $FB = File::Spec->catfile(qw/t data gpl3.fb2/);
 
@@ -34,20 +34,18 @@ is_deeply(
 
 ok($ebook->html, "html ok");
 
-ok($ebook->has_cover, "has cover");
+subtest 'cover ok' => sub {
+    ok($ebook->has_cover, "has cover");
+    my ($cover, $format) = $ebook->cover;
+    is($format, 'jpg', 'cover is jpeg');
+    is(image_id($cover), 'jpg', 'cover looks like jpeg');
+};
 
-is(
-    image_id(\($ebook->cover)),
-    "jpg",
-    "cover looks like a jpeg"
-);
-
-is($ebook->image_num, 1, "image count ok");
-
-is(
-    image_id($ebook->image(0)),
-    "jpg",
-    "image #0 ok"
-);
+subtest 'images ok' => sub {
+    is($ebook->image_num, 1, 'image count ok');
+    my ($img, $format) = $ebook->image(0);
+    is($format, 'jpg', 'image #0 is jpeg');
+    is(image_id($img), 'jpg', 'image #0 looks like jpeg');
+};
 
 done_testing();

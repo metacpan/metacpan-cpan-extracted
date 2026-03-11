@@ -16,7 +16,7 @@ App::Greple::xlate - greple için çeviri destek modülü
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ Bazen, çevrilmesini istemediğiniz metin bölümleri vardır. Örneğin, markdo
 
     --xlate-setopt maskfile=MASKPATTERN
 
-Bu, dosya `MASKPATTERN`ın her satırını bir düzenli ifade olarak yorumlar, ona uyan dizeleri çevirir ve işlemden sonra geri alır. C<#> ile başlayan satırlar yok sayılır.
+Bu, dosyanın her bir satırını C<MASKPATTERN> olarak yorumlayacak, onunla eşleşen dizeleri çevirecek ve işleme bittikten sonra geri alacaktır. C<#> ile başlayan satırlar yok sayılır.
 
 Karmaşık desen, ters eğik çizgi ile kaçışlı satır sonları kullanılarak birden çok satıra yazılabilir.
 

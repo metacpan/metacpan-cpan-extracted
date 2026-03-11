@@ -83,7 +83,7 @@ traditional L<inetd(8)>-style
 socket passing (i.e. sockets passed in via standard input and output, using
 C<StandardInput=socket> in the service file).
 
-All network sockets allocated through C<.socket> units are allocated in the host\'s network
+By default, network sockets allocated through C<.socket> units are allocated in the host\'s network
 namespace (see L<network_namespaces(7)>). This
 does not mean however that the service activated by a configured socket unit has to be part of the host\'s network
 namespace as well.  It is supported and even good practice to run services in their own network namespace (for
@@ -93,6 +93,11 @@ the sockets configured through socket-activation from the host\'s namespace. In 
 the host\'s network namespace is only permitted through the activation sockets passed in while all sockets allocated
 from the service code itself will be associated with the service\'s own namespace, and thus possibly subject to a
 restrictive configuration.
+
+Alternatively, it is possible to run a C<.socket> unit in another network namespace
+by setting C<PrivateNetwork=yes> in combination with C<JoinsNamespaceOf>, see
+L<systemd.exec(5)> and
+L<systemd.unit(5)> for details.
 This configuration class was generated from systemd documentation.
 by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>
 ',
@@ -1325,7 +1330,7 @@ C<ExecStartPre> command cannot access socket file descriptors.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 258 doc',
+    'generated_by' => 'parse-man.pl from systemd 260 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

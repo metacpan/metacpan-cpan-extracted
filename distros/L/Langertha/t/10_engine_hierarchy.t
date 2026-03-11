@@ -520,6 +520,25 @@ ok(Langertha::Engine::vLLM->does('Langertha::Role::Tools'), 'vLLM does Tools');
   like($req->uri, qr{/chat/completions$}, 'vLLM uses /chat/completions');
 }
 
+# --- SGLang ---
+
+use Langertha::Engine::SGLang;
+
+ok(Langertha::Engine::SGLang->isa('Langertha::Engine::OpenAIBase'), 'SGLang isa OpenAIBase');
+ok(Langertha::Engine::SGLang->does('Langertha::Role::Tools'), 'SGLang does Tools');
+{
+  # url required (local server)
+  eval { Langertha::Engine::SGLang->new() };
+  like($@, qr/url/, 'SGLang requires url');
+
+  my $s = Langertha::Engine::SGLang->new(url => 'http://test.invalid:30000/v1');
+  is($s->model, 'default', 'SGLang model defaults to default');
+  is($s->api_key, undef, 'SGLang api_key is undef (local)');
+  my $req = $s->chat('hello');
+  is($req->header('Authorization'), undef, 'SGLang no Authorization header');
+  like($req->uri, qr{/chat/completions$}, 'SGLang uses /chat/completions');
+}
+
 # ======================================================================
 # Part 5: Whisper (extends OpenAI, not OpenAIBase)
 # ======================================================================
@@ -674,6 +693,7 @@ for my $class (qw(
   Langertha::Engine::NousResearch
   Langertha::Engine::AKIOpenAI
   Langertha::Engine::OllamaOpenAI
+  Langertha::Engine::SGLang
   Langertha::Engine::vLLM
   Langertha::Engine::Whisper
   Langertha::Engine::Cerebras

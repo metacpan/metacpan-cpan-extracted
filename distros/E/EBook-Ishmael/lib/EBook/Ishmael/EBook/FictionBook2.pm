@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '2.01';
+our $VERSION = '2.03';
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use MIME::Base64;
 
 use XML::LibXML;
 
+use EBook::Ishmael::ImageID qw(mimetype_id);
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::Time qw(guess_time);
 
@@ -106,26 +107,29 @@ sub _read_metadata {
         }
     }
 
-    @{ $self->{_images} } = grep {
-        ($_->getAttribute('content-type') // '') =~ /^image\//
-    } $xpc->findnodes('/FictionBook:FictionBook/FictionBook:binary');
+    for my $n ($xpc->findnodes('/FictionBook:FictionBook/FictionBook:binary')) {
+        my $mime = $n->getAttribute('content-type');
+        next if not defined $mime;
+        my $format = mimetype_id($mime);
+        next if not defined $format;
+        push @{ $self->{_images} }, [ $n, $format ];
+    }
 
     my ($covmeta) = $xpc->findnodes('./FictionBook:coverpage', $title);
-
     # Put if code inside own block so we can easily last out of it.
     if (defined $covmeta) {{
-
         my ($img) = $xpc->findnodes('./FictionBook:image', $covmeta)
             or last;
         my $href = $img->getAttribute('l:href') or last;
         $href =~ s/^#//;
-
         my ($binary) = $xpc->findnodes(
             "/FictionBook:FictionBook/FictionBook:binary[\@id=\"$href\"]"
         ) or last;
-
-        $self->{_cover} = $binary;
-
+        my $mime = $binary->getAttribute('content-type');
+        last if not defined $mime;
+        my $format = mimetype_id($mime);
+        last if not defined $format;
+        $self->{_cover} = [ $binary, $format ];
     }}
 
     return 1;
@@ -249,22 +253,10 @@ sub has_cover {
 sub cover {
 
     my $self = shift;
-    my $out  = shift;
 
-    return undef unless $self->has_cover;
-
-    my $bin = decode_base64($self->{_cover}->textContent);
-
-    if (defined $out) {
-        open my $fh, '>', $out
-            or die "Failed to open $out for writing: $!\n";
-        binmode $fh;
-        print { $fh } $bin;
-        close $fh;
-        return $out;
-    } else {
-        return $bin;
-    }
+    return (undef, undef) unless $self->has_cover;
+    my $bin = decode_base64($self->{_cover}[0]->textContent);
+    return ($bin, $self->{_cover}[1]);
 
 }
 
@@ -282,12 +274,11 @@ sub image {
     my $n    = shift;
 
     if ($n >= $self->image_num) {
-        return undef;
+        return (undef, undef);
     }
 
-    my $img = decode_base64($self->{_images}[$n]->textContent);
-
-    return \$img;
+    my $img = decode_base64($self->{_images}[$n][0]->textContent);
+    return ($img, $self->{_images}[$n][1]);
 
 }
 

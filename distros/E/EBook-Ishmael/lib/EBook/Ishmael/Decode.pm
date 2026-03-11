@@ -14,7 +14,7 @@ my $CAN_XS = 0;
 my $decode_sub;
 
 BEGIN {
-    $VERSION = '2.01';
+    $VERSION = '2.03';
     $CAN_XS = eval { XSLoader::load('EBook::Ishmael', $VERSION) };
     $decode_sub = $CAN_XS ? \&xs_palmdoc_decode : \&pp_palmdoc_decode;
 }

@@ -802,7 +802,7 @@ static CK_UTF8CHAR* S_get_text(pTHX_ SV* buffer, CK_ULONG* length) {
 }
 #define get_text(buffer, length) S_get_text(aTHX_ buffer, length)
 
-static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** array, size_t array_len) {
+static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** array, ssize_t array_len) {
 	CK_MECHANISM result = { type, NULL, 0 };
 
 	switch (type) {
@@ -879,10 +879,11 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 		}
 
 		case CKM_RSA_PKCS_PSS: {
-			if (array_len < 2)
+			if (array_len < 1)
 				croak("No hash given for rsa-pkcs-pss");
 			CK_MECHANISM_TYPE hash = get_mechanism_type(array[0]);
-			CK_RSA_PKCS_MGF_TYPE generator = map_get(generators, array[1], "generator");
+			SV* mgf_argument = array_len > 1 ? array[1] : array[0];
+			CK_RSA_PKCS_MGF_TYPE generator = map_get(generators, mgf_argument, "generator");
 			specialize_pss(&result, hash, generator, array + 2, array_len - 2);
 			break;
 		}
@@ -981,18 +982,18 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 		}
 
 		case CKM_RSA_PKCS_OAEP: {
-			if (array_len < 2)
+			if (array_len < 1)
 				croak("Insufficient parameters for rsa-pkcs-oaep");
 
 			INIT_PARAMS(CK_RSA_PKCS_OAEP_PARAMS);
+			params->source = CKZ_DATA_SPECIFIED;
 
 			params->hashAlg = get_mechanism_type(array[0]);
-			params->mgf = map_get(generators, array[1], "generator");
+			SV* mgf_argument = array_len > 1 ? array[1] : array[0];
+			params->mgf = map_get(generators, mgf_argument, "generator");
 
-			if (array_len > 2) {
+			if (array_len > 2)
 				params->pSourceData = get_buffer(array[2], &params->ulSourceDataLen);
-				params->source = 1;
-			}
 
 			break;
 		}

@@ -14,7 +14,7 @@ App::Greple::xlate - Übersetzungsunterstützungsmodul für greple
 
 # VERSION
 
-Version 1.00
+Version 1.01
 
 # DESCRIPTION
 
@@ -77,7 +77,7 @@ Gelegentlich gibt es Textteile, die nicht übersetzt werden sollen. Zum Beispiel
 
     --xlate-setopt maskfile=MASKPATTERN
 
-Dabei wird jede Zeile der Datei \`MASKPATTERN\` als regulärer Ausdruck interpretiert, passende Zeichenketten werden übersetzt und nach der Verarbeitung wieder zurückgesetzt. Zeilen, die mit `#` beginnen, werden ignoriert.
+Dies interpretiert jede Zeile der Datei `MASKPATTERN` als regulären Ausdruck, übersetzt Zeichenfolgen, die damit übereinstimmen, und stellt nach der Verarbeitung den ursprünglichen Zustand wieder her. Zeilen, die mit `#` beginnen, werden ignoriert.
 
 Komplexe Muster können mit einem durch Backslash maskierten Zeilenumbruch über mehrere Zeilen geschrieben werden.
 

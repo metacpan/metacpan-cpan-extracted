@@ -1,0 +1,19 @@
+Changes
+lib/DBIx/Class/MockData.pm
+Makefile.PL
+LICENSE
+MANIFEST
+README.md
+script/dbic-mockdata
+t/00-load.t
+t/01-basic.t
+t/02-schema.t
+t/03-cli.t
+t/lib/TestSchema.pm
+t/lib/TestSchema/Result/Author.pm
+t/lib/TestSchema/Result/Book.pm
+t/lib/TestSchema/Result/Review.pm
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

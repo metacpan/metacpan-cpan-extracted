@@ -1,0 +1,119 @@
+NAME
+    File::Path::Redirect - Poor Man's Symbolic Link Path Redirection
+
+SYNOPSIS
+      use File::Path::Redirect;
+
+      # Run this example in 'examples' dir
+      # Create  a test file to link to
+      #
+      my $source_path="path_to_file.txt";
+      my $contents="Probably a large file";
+
+      open my $fh, ">", $source_path or die $!;
+      print $fh $contents;
+      close $fh;
+  
+  
+
+      # 'Link' or redirect a file to another
+      #
+      my $link_path="my_link.txt";
+
+      make_redirect($source_path, $link_path);
+
+  
+      # Elsewhere in the application normal and redirect files are tested
+      my $path=follow_redirect($link_path);
+
+      # open/process $path as normal
+      open my $f,"<", $path or die $!;
+      while(<$f>){
+        print $_;
+      }
+
+DESCRIPTION
+    This module implements a handful of functions implementing 'user space'
+    file path redirection, similar to a symbolic link on your file system.
+
+    It supports chained redirect files, with recursion limit.
+
+WHY SHOULD I USE THIS?
+    Not all File Systems support Sumbolic links
+        For example FAT and exFAT variants do not support symbolic links.
+
+    Symbolic links only work withing the same volume
+        If you wanted to symbolic link to a file on a different volume, you
+        can't
+
+    Copying files my night be feasable
+        Slow and size constrained external media means extra copies of large
+        files might not fit. Also slow devices would take too long to
+        physically copy
+
+HOW IT WORKS
+    The redirect ( or link ) file is just a basic text file. It contains a
+    single line of the format:
+
+      !<symlink>PATH
+
+    !<symlink> is a magic header PATH is the relative path to a file it
+    links to. It can be a link to another link file.
+
+    Before using a path in an "open" function, the path can be passed to
+    "follow_redirect". The return value is the path of the first non link
+    file found. This is path can be used in the "open" call instead.
+
+API
+  Creating Redirects
+   make_redirect
+      my $path = make_redirect $existing_file, $link_file, $force;
+
+    Creates a new redirect file at $link_file containing a link to the file
+    located at $existing_file.
+
+    $existing_file can be a relative or absolute path.
+
+    The file is only created if $link_file doesn't already exist, or $force
+    is a true value.
+
+    Returns the relative path between the two files if possible, otherwise a
+    absolute path. Dies on any IO related errors in creating / opening /
+    writing / closing the link file.
+
+  Using Redirects
+   follow_redirect
+      my $path = follow_redirect $file_path, $limit;
+
+    Given a file path $path, it attempts to open the file, check it is a
+    redirect file. If so it parses and follows the link path. The process is
+    recursive until the file does not look like a link path, or until the
+    total number of redirects is equal to or greater than $limit.
+
+    $limit is an optional parameter and by default is 10.
+
+    Returns the final redirect path. The path could be relative or absolute.
+
+    Dies on any IO errors when processing a redirect chain.
+
+PERFORMANCE CONSIDERATIONS
+    Each redirect file encountered is opened and read. For repeated access
+    to the same file, it is best to store the results of the
+    "follow_redirect" function.
+
+    For more comprehensive solution, File::Meta::Cache (which uses this
+    module) might suit your needs
+
+REPOSITORY and BUG REPORTING
+    Please report any bugs and feature requests on the repo page: GitHub
+    <https://github.com/drclaw1394/perl-file-path-redirect>
+
+AUTHOR
+    Ruben Westerberg, <drclaw@mac.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2026 by Ruben Westerberg
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, or under the MIT license
+

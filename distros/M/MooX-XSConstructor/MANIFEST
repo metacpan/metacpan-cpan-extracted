@@ -18,6 +18,8 @@ t/02strict-early.t
 t/02strict.t
 t/03foreigndetection.t
 t/gh-2.t
+t/gh-3.t
 t/lib/Container.pm
+t/lib/GH3.pm
 t/lib/MyTest.pm
 t/lib/TestBase.pm

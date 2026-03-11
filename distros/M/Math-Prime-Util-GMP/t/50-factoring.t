@@ -3,10 +3,13 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util::GMP qw/factor is_prime sigma divisors is_semiprime/;
+use Math::Prime::Util::GMP qw/factor is_prime sigma divisors is_semiprime
+                              prime_bigomega prime_omega/;
+my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
+
 
 my %sigmas = (
-  0 => [2,1,1,1],
+  0 => [0,0,0,0],
   1 => [1,1,1,1],
   2 => [2,3,5,9],
   3 => [2,4,10,28],
@@ -21,15 +24,22 @@ my %sigmas = (
   2394823486 => [8,"3918802104","7228222133779519700","15463194466651766947470799224"],
 );
 
+my @omegai = (qw/0 1 2 36 102 392 8593952 18505662216305663679/);
+my @omegao = (qw/1 0 1 2  3   2   3       5/);
+my @omegab = (qw/1 0 1 4  3   5   7       7/);
+
 plan tests => 0 + 57
                 + 24
                 + 2
-                + 6    # individual tets for factoring methods
+                + 2
+                + 11  # individual tets for factoring methods
+                + 1*$extra # SQUFOF fail case
                 + 7*7  # factor extra tests
                 + 8    # factor in scalar context
                 + scalar(keys %sigmas)
-                + 3    # divisors
+                + 9    # divisors
                 + 2    # is_semiprime
+                + 4    # omega and bigomega
                 + 0;
 
 # On a 64-bit machine, put all 32-bit nums in /tmp/foo, 64-bit in /tmp/foo2
@@ -127,6 +137,9 @@ is_deeply( [ factor('3369738766071892021') ], [204518747,'16476429743'], "factor
 is_deeply( [ factor('10023859281455311421') ], ['1308520867','7660450463'], "factor(10023859281455311421)" );
 is_deeply( [ factor('18446744073709551611') ], [11,59,'98818999','287630261'], "factor(18446744073709551611)" );
 
+is_deeply( [ factor('22436743170696946255920') ], [2,2,2,2,3,5,7,208067,'64187037196057'], "factor(22436743170696946255920)" );
+is_deeply( [ factor('43455102778396761657787') ], ['175595514959','247472737493'], "factor(43455102778396761657787)" );
+
 # Check perfect squares that make it past early testing
 is_deeply( [ factor('1524157875323973084894790521049') ], ['1234567890123493','1234567890123493'], "factor(1234567890123493^2)" );
 is_deeply( [ factor('823543') ], [qw/7 7 7 7 7 7 7/], "factor 7^7" );
@@ -148,8 +161,20 @@ is_deeply( [ sort {$a<=>$b} Math::Prime::Util::GMP::qs_factor('22095311209999409
 #diag "factor 736-bit number with HOLF";
 is_deeply( [ sort {$a<=>$b} Math::Prime::Util::GMP::holf_factor('185486767418172501041516225455805768237366368964328490571098416064672288855543059138404131637447372942151236559829709849969346650897776687202384767704706338162219624578777915220190863619885201763980069247978050169295918863') ], ['192606732705880508138303165129171270891951231683030125996296974238495711578947569589234612013165893468683239489', '963033663529402540691515825645856354459756158415150629981484871192478557894737847946173060065829467343416197967'], "HOLF factors poorly formed 222-digit semiprime" );
 
+is_deeply( [Math::Prime::Util::GMP::trial_factor(0)], [0], "trial_factor(0) returns 0" );
+is_deeply( [Math::Prime::Util::GMP::trial_factor(1)], [], "trial_factor(1) returns empty list" );
+is_deeply( [Math::Prime::Util::GMP::trial_factor('2114957314229414940')], [2,2,3,3,3,5,'3916587618943361'], "Trial factor finds small factors" );
+is_deeply( [Math::Prime::Util::GMP::trial_factor('205195554871714694891298619')], [28631,'7166901431026324434749'], "Trial factor finds small factor" );
+
+is_deeply( [Math::Prime::Util::GMP::pbrent_factor('2114957314229414940')], [2,2,3,3,3,5,'3916587618943361'], "Pollard-Brent factor finds small factors" );
+
 # Test stage 2 of pminus1
 is_deeply( [ sort {$a<=>$b} Math::Prime::Util::GMP::pminus1_factor('23113042053749572861737011', 100, 100000) ], ['694059980329', '33301217054459'], "p-1 factors 23113042053749572861737011 in stage 2");
+
+# A SQUFOF side case, trying to cover code
+if ($extra) {
+  is_deeply( [Math::Prime::Util::GMP::squfof_factor('805442358011025089239226417069959')], ['805442358011025089239226417069959'], "SQUFOF factor can fail with standard parameters" );
+}
 
 #diag "extra tests for each method";
 extra_factor_test("prho_factor",   sub {Math::Prime::Util::GMP::prho_factor(shift)});
@@ -165,7 +190,7 @@ sub extra_factor_test {
   my $fsub = shift;
 
   is_deeply( [ sort {$a<=>$b} $fsub->(0)   ], [0],       "$fname(0)" );
-  is_deeply( [ sort {$a<=>$b} $fsub->(1)   ], [1],       "$fname(1)" );
+  is_deeply( [ sort {$a<=>$b} $fsub->(1)   ], [],        "$fname(1)" );
   is_deeply( [ sort {$a<=>$b} $fsub->(2)   ], [2],       "$fname(2)" );
   is_deeply( [ sort {$a<=>$b} $fsub->(13)  ], [13],      "$fname(13)" );
   is_deeply( [ sort {$a<=>$b} $fsub->(403) ], [13, 31],  "$fname(403)" );
@@ -194,15 +219,41 @@ is_deeply( [divisors(1)], [1], "divisors(1) in list context" );
 is_deeply( [divisors(9283540924)], [qw/1 2 4 7 14 28 331555033 663110066 1326220132 2320885231 4641770462 9283540924/], "divisors(9283540924)" );
 is( scalar(divisors(9283540924)), 12, "scalar divisors(9283540924) = 12" );
 
+is_deeply( [divisors(5040, 120)],
+           [1,2,3,4,5,6,7,8,9,10,12,14,15,16,18,20,21,24,28,30,35,36,40,42,45,48,56,60,63,70,72,80,84,90,105,112,120],
+           "divisors(5040, 120)" );
+is_deeply( [divisors("340282366920938463463374607431768211455", 5040)],
+           [1,3,5,15,17,51,85,255,257,641,771,1285,1923,3205,3855,4369],
+           "divisors(2^128-1, 5040)" );
+is( scalar divisors( 0), 0, "scalar divisors(0) should be 0" );
+is( scalar divisors( 1), 1, "scalar divisors(1) should be 1" );
+is( scalar divisors(12), 6, "scalar divisors(12) should be 6" );
+is_deeply( [ [divisors( 0,0)], [divisors( 0,1)],
+             [divisors( 1,0)], [divisors( 1,1)], [divisors( 1,2)],
+             [divisors(12,0)], [divisors(12,1)], [divisors(12,4)] ],
+           [ [], [],   [], [1], [1],  [], [1], [1,2,3,4] ],
+           "divisors for n 0,1,12 and k 0,1,x" );
+
 {
   my @non = map { is_semiprime($_) }
-            (qw/ 1477624760980458764344489
+            (qw/ 8612893
+                 3332168225341
+                 62986951449451
+                 1477624760980458764344489
                  31065569722765023059646508128204165
                  345642381828009706799087047071899024928076219 /);
-  is_deeply( \@non, [0,0,0], "is_semiprime for non-semiprimes" );
+  is_deeply( \@non, [0,0,0,0,0,0], "is_semiprime for non-semiprimes" );
   my @oui = map { is_semiprime($_) }
-            (qw/ 5205293630375513276567563
+            (qw/ 55214581
+                 361411559141
+                 5205293630375513276567563
                  76608197698048867638852299050055161
                  659828949060872109888044299185869580687593499 /);
-  is_deeply( \@oui, [1,1,1], "is_semiprime for semiprimes" );
+  is_deeply( \@oui, [1,1,1,1,1], "is_semiprime for semiprimes" );
 }
+
+######
+is_deeply([map { prime_omega($_)     } @omegai],\@omegao,"prime_omega(n)");
+is_deeply([map { prime_bigomega($_)  } @omegai],\@omegab,"prime_bigomega(n)");
+is_deeply([map {prime_omega('-'.$_)  } @omegai],\@omegao,"prime_omega(-n)");
+is_deeply([map {prime_bigomega('-'.$_)}@omegai],\@omegab,"prime_bigomega(-n)");

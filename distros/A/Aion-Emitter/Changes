@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion-Emitter
 
+0.1.0 2026-03-10T13:27:07Z
+
+    - fix: if not file with annotations, then not die
+
 0.0.1 2026-03-02T07:35:32Z
 
     - original version

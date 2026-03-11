@@ -3,7 +3,7 @@ use warnings;
 use Feature::Compat::Class;
 use WebServer::DirIndex::HTML;
 
-class WebServer::DirIndex::File v0.1.0 {
+class WebServer::DirIndex::File v0.1.1 {
 
   use HTML::Escape qw(escape_html);
 

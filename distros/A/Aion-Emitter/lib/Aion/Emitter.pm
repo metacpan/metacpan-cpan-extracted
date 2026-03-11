@@ -3,14 +3,16 @@ package Aion::Emitter;
 
 use common::sense;
 
-our $VERSION = "0.0.1-prealpha";
+our $VERSION = "0.1.0";
 
 use Aion::Pleroma;
 
 use Aion;
 
-use config INI => 'etc/annotation/listen.ann';
-use config EVENT => {};
+use config {
+	INI => 'etc/annotation/listen.ann',
+	EVENT => {},
+};
 
 # Путь к собранным из аннотаций методам
 has ini => (is => 'ro', isa => Str, default => INI);
@@ -19,20 +21,23 @@ has ini => (is => 'ro', isa => Str, default => INI);
 has event => (is => 'ro', isa => HashRef[ArrayRef[Dict[pkg => Str, sub => Str, line => Nat, nice => Option[Num], remark => Option[Str]]]], default => sub {
 	my ($self) = @_;
 	my %event = %{EVENT()};
-	open my $f, "<:utf8", $self->ini or die "Not open ${\$self->ini}";
-	while(<$f>) {
-		close($f), die "${\$self->ini}:$. corrupt!" unless /^([\w:]+)#(\w*),(\d+)=(?:(-?\d+(?:\.\d+)?)\s+)?([a-z][\w:]*(?:#[\w.:-]+)?)(?:\s+(.*?))??\s*$/i;
-		my ($pkg, $sub, $line, $nice, $evt, $remark) = ($1, $2, $3, $4, $5, $6);
-		push @{$event{$evt}}, {
-			pkg => $pkg,
-			sub => $sub,
-			line => $line,
-			$nice? (nice => $nice): (),
-			$remark ne ''? (remark => $remark): (),
-		};
-	}
-	close $f;
 	
+	if(defined $self->ini and -e $self->ini) {
+		open my $f, "<:utf8", $self->ini or die "Not open ${\$self->ini}";
+		while(<$f>) {
+			close($f), die "${\$self->ini}:$. corrupt!" unless /^([\w:]+)#(\w*),(\d+)=(?:(-?\d+(?:\.\d+)?)\s+)?([a-z][\w:]*(?:#[\w.:-]+)?)(?:\s+(.*?))??\s*$/i;
+			my ($pkg, $sub, $line, $nice, $evt, $remark) = ($1, $2, $3, $4, $5, $6);
+			push @{$event{$evt}}, {
+				pkg => $pkg,
+				sub => $sub,
+				line => $line,
+				$nice? (nice => $nice): (),
+				$remark ne ''? (remark => $remark): (),
+			};
+		}
+		close $f;
+	}
+
 	for my $listens (values %event) {
 		@$listens = sort {
 			$a->{nice} <=> $b->{nice}
@@ -72,6 +77,10 @@ __END__
 =head1 NAME
 
 Aion::Emitter - event dispatcher
+
+=head1 VERSION
+
+0.1.0
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,12 @@
 package Langertha::Knarr::Proxy::Anthropic;
-our $VERSION = '0.004';
+our $VERSION = '0.007';
 # ABSTRACT: Anthropic Messages API format proxy handler
 use strict;
 use warnings;
-use JSON::MaybeXS qw( encode_json );
+use JSON::MaybeXS qw( encode_json decode_json );
 use Time::HiRes qw( time );
+use Langertha::Knarr::Input;
+use Langertha::Knarr::Output;
 
 
 sub format_name { 'anthropic' }
@@ -40,7 +42,115 @@ sub extract_params {
   $params{temperature}  = $body->{temperature}  if defined $body->{temperature};
   $params{top_p}        = $body->{top_p}        if defined $body->{top_p};
   $params{stream}       = $body->{stream}       if defined $body->{stream};
+  $params{tools}        = $body->{tools}        if defined $body->{tools};
+  $params{tool_choice}  = $body->{tool_choice}  if defined $body->{tool_choice};
   return \%params;
+}
+
+sub prepare_engine_messages {
+  my ($class, $engine, $messages, $params) = @_;
+  return $messages unless $engine && $engine->isa('Langertha::Engine::OpenAIBase');
+
+  my @out;
+  for my $msg (@{$messages // []}) {
+    next unless ref($msg) eq 'HASH';
+    my $role = $msg->{role} // '';
+    my $content = $msg->{content};
+
+    if ($role eq 'system' || $role eq 'assistant' || $role eq 'user') {
+      if (!ref($content)) {
+        push @out, { role => $role, content => ($content // '') };
+        next;
+      }
+    }
+
+    if ($role eq 'assistant' && ref($content) eq 'ARRAY') {
+      my @text;
+      my @tool_calls;
+      for my $block (@$content) {
+        next unless ref($block) eq 'HASH';
+        my $type = $block->{type} // '';
+        if ($type eq 'text') {
+          push @text, $block->{text} // '';
+          next;
+        }
+        if ($type eq 'tool_use') {
+          my $arguments = eval { encode_json($block->{input} // {}) };
+          $arguments = '{}' if $@;
+          push @tool_calls, {
+            id       => ($block->{id} // ('call_' . int(rand(1000000)))),
+            type     => 'function',
+            function => {
+              name      => ($block->{name} // 'tool'),
+              arguments => $arguments,
+            },
+          };
+        }
+      }
+      my %assistant = (
+        role    => 'assistant',
+        content => join('', @text),
+      );
+      $assistant{tool_calls} = \@tool_calls if @tool_calls;
+      push @out, \%assistant;
+      next;
+    }
+
+    if ($role eq 'user' && ref($content) eq 'ARRAY') {
+      my @text;
+      my @tool_msgs;
+      for my $block (@$content) {
+        next unless ref($block) eq 'HASH';
+        my $type = $block->{type} // '';
+        if ($type eq 'text') {
+          push @text, $block->{text} // '';
+          next;
+        }
+        if ($type eq 'tool_result') {
+          my $tool_text = _anthropic_content_to_text($block->{content});
+          push @tool_msgs, {
+            role         => 'tool',
+            tool_call_id => ($block->{tool_use_id} // ''),
+            content      => $tool_text,
+          };
+        }
+      }
+      push @out, { role => 'user', content => join('', @text) } if @text;
+      push @out, @tool_msgs if @tool_msgs;
+      next;
+    }
+
+    # Fallback: keep message shape and stringify content if needed.
+    push @out, {
+      role    => $role || 'user',
+      content => ref($content) ? _anthropic_content_to_text($content) : ($content // ''),
+    };
+  }
+
+  return \@out;
+}
+
+sub prepare_engine_params {
+  my ($class, $engine, $params, $messages) = @_;
+  return $params unless $engine && $engine->isa('Langertha::Engine::OpenAIBase');
+  my %p = %{$params || {}};
+
+  if (ref($p{tools}) eq 'ARRAY') {
+    my $canonical = Langertha::Knarr::Input->normalize_tools($p{tools});
+    $p{tools} = Langertha::Knarr::Input->to_openai_tools($canonical);
+  }
+
+  if (defined $p{tool_choice}) {
+    my $canonical_tc = Langertha::Knarr::Input->normalize_tool_choice($p{tool_choice});
+    if ($canonical_tc) {
+      $p{tool_choice} = Langertha::Knarr::Input->to_openai_tool_choice($canonical_tc);
+    }
+    if (!defined $p{tool_choice}) {
+      delete $p{tool_choice};
+    }
+  }
+
+  return \%p;
 }
 
 sub format_response {
@@ -60,12 +170,62 @@ sub format_response {
     stop_reason => 'end_turn',
   );
 
-  if (ref $result && $result->isa('Langertha::Response') && $result->has_usage) {
-    $response{usage} = {
-      input_tokens  => $result->prompt_tokens,
-      output_tokens => $result->completion_tokens,
-    };
+  if (ref $result && $result->isa('Langertha::Response')) {
+    if ($result->has_usage) {
+      $response{usage} = {
+        input_tokens  => $result->prompt_tokens,
+        output_tokens => $result->completion_tokens,
+      };
+    }
     $response{model} = $result->model if $result->has_model;
+
+    if ($result->has_raw) {
+      my $raw = $result->raw;
+      if (ref($raw) eq 'HASH') {
+        my $msg = $raw->{choices}[0]{message};
+        if (ref($msg) eq 'HASH' && ref($msg->{tool_calls}) eq 'ARRAY') {
+          my $meta = Langertha::Knarr::Output->extract_from_raw($raw);
+          my @blocks;
+          push @blocks, { type => 'text', text => $meta->{text} }
+            if defined($meta->{text}) && $meta->{text} ne '';
+          push @blocks, @{Langertha::Knarr::Output->to_anthropic_tool_use_blocks($meta->{tool_calls})}
+            if ref($meta->{tool_calls}) eq 'ARRAY' && @{$meta->{tool_calls}};
+
+          if (@blocks) {
+            $response{content} = \@blocks;
+            $response{stop_reason} = (@blocks > 0 && grep { ($_->{type} // '') eq 'tool_use' } @blocks)
+              ? 'tool_use'
+              : 'end_turn';
+          }
+        } elsif (ref($raw->{content}) eq 'ARRAY' && @{$raw->{content}}) {
+          $response{content} = $raw->{content};
+          $response{stop_reason} = $raw->{stop_reason} if defined $raw->{stop_reason};
+        }
+      }
+    }
+  }
+
+  if (ref($response{content}) eq 'ARRAY') {
+    my @existing_tool_use = grep { ref($_) eq 'HASH' && (($_->{type} // '') eq 'tool_use') } @{$response{content}};
+    if (!@existing_tool_use) {
+      my @new_blocks;
+      my @calls;
+      for my $block (@{$response{content}}) {
+        if (ref($block) eq 'HASH' && (($block->{type} // '') eq 'text')) {
+          my ($clean, $extracted) = Langertha::Knarr::Output->parse_hermes_calls_from_text($block->{text} // '');
+          push @calls, @$extracted if @$extracted;
+          push @new_blocks, { type => 'text', text => $clean } if defined($clean) && length($clean);
+        } else {
+          push @new_blocks, $block;
+        }
+      }
+
+      if (@calls) {
+        push @new_blocks, @{Langertha::Knarr::Output->to_anthropic_tool_use_blocks(\@calls)};
+        $response{content} = \@new_blocks;
+        $response{stop_reason} = 'tool_use';
+      }
+    }
   }
 
   return \%response;
@@ -133,6 +293,38 @@ sub format_models_response {
   };
 }
 
+sub _anthropic_content_to_text {
+  my ($content) = @_;
+  return '' unless defined $content;
+  return $content unless ref($content);
+  return '' unless ref($content) eq 'ARRAY';
+
+  my @parts;
+  for my $item (@$content) {
+    next unless ref($item) eq 'HASH';
+    my $type = $item->{type} // '';
+    if ($type eq 'text') {
+      push @parts, ($item->{text} // '');
+      next;
+    }
+    if ($type eq 'tool_result') {
+      my $inner = $item->{content};
+      if (!ref($inner)) {
+        push @parts, ($inner // '');
+        next;
+      }
+      if (ref($inner) eq 'ARRAY') {
+        for my $part (@$inner) {
+          next unless ref($part) eq 'HASH';
+          push @parts, ($part->{text} // '');
+        }
+      }
+    }
+  }
+
+  return join('', @parts);
+}
+
 1;
 
 __END__
@@ -147,7 +339,7 @@ Langertha::Knarr::Proxy::Anthropic - Anthropic Messages API format proxy handler
 
 =head1 VERSION
 
-version 0.004
+version 0.007
 
 =head1 DESCRIPTION
 
