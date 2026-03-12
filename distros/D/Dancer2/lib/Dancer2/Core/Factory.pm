@@ -1,6 +1,6 @@
 package Dancer2::Core::Factory;
 # ABSTRACT: Instantiate components by type and name
-$Dancer2::Core::Factory::VERSION = '2.0.1';
+$Dancer2::Core::Factory::VERSION = '2.1.0';
 use Moo;
 use Dancer2::Core;
 use Module::Runtime 'use_module';
@@ -11,7 +11,8 @@ sub create {
 
     $type = Dancer2::Core::camelize($type);
     $name = Dancer2::Core::camelize($name);
-    my $component_class = "Dancer2::${type}::${name}";
+    my $was_fully_qualified = ( $name =~ s/^\+// );  # strip any leading '+'
+    my $component_class = ( $was_fully_qualified ) ? $name : "Dancer2::${type}::${name}";
 
     eval { use_module($component_class); 1; }
         or croak "Unable to load class for $type component $name: $@";
@@ -33,7 +34,7 @@ Dancer2::Core::Factory - Instantiate components by type and name
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 AUTHOR
 
@@ -41,7 +42,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

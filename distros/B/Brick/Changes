@@ -1,5 +1,8 @@
 Revision history for Perl module Brick
 
+0.905 2026-03-11T19:44:35Z
+	* remove MIME::Types, which jumped to v5.16
+
 0.904 2025-04-14T19:00:24Z
 	* require a newer version.pm for v5.10.1 tests
 

@@ -7,21 +7,26 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-11'; # DATE
+our $DATE = '2025-11-12'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 Perinci::CmdLine::Any->new(
     url => '/Git/Grouper/',
     subcommands => {
-        "ls-groups" => { url => '/Git/Grouper/ls_groups' },
-        "get-repo-group" => { url => '/Git/Grouper/get_repo_group' },
+        "ls-all-groups" => { url => '/Git/Grouper/ls_all_groups' },
+        "ls-all-remotes" => { url => '/Git/Grouper/ls_all_remotes' },
+
+        "ls-repo-groups" => { url => '/Git/Grouper/ls_repo_groups' },
+        "ls-repo-remotes" => { url => '/Git/Grouper/ls_repo_remotes' },
+
         "filter-repo-has-group" => { url => '/Git/Grouper/filter_repo_has_group' },
         "filter-repo-lacks-group" => { url => '/Git/Grouper/filter_repo_lacks_group' },
         "filter-repo-orphan" => { url => '/Git/Grouper/filter_repo_orphan' },
         "filter-repo-not-orphan" => { url => '/Git/Grouper/filter_repo_not_orphan' },
         "filter-repo-multiple-group" => { url => '/Git/Grouper/filter_repo_multiple_group' },
         "filter-repo-single-group" => { url => '/Git/Grouper/filter_repo_single_group' },
+
         "configure-repo" => { url => '/Git/Grouper/configure_repo' },
     },
     #default_subcommand => 'get-repo-group',
@@ -46,7 +51,7 @@ git-grouper - Categorize git repositories into one/more groups and perform actio
 
 =head1 VERSION
 
-This document describes version 0.004 of git-grouper (from Perl distribution Git-Grouper), released on 2025-11-11.
+This document describes version 0.005 of git-grouper (from Perl distribution Git-Grouper), released on 2025-11-12.
 
 =head1 SYNOPSIS
 
@@ -54,12 +59,18 @@ This document describes version 0.004 of git-grouper (from Perl distribution Git
 
 List all defined groups:
 
- % git-grouper ls-groups      ; # just list the names
- % git-grouper ls-groups -l   ; # list names & summaries
+ % git-grouper ls-all-groups      ; # just list the names
+ % git-grouper ls-all-groups -l   ; # list detailed records
 
-Check which group(s) do repositories belong to:
+List all defined remotes:
 
- % git-grouper get-repo-group REPO1 REPO2 ...
+ % git-grouper ls-all-remotes      ; # just list the names
+ % git-grouper ls-all-remotes -l   ; # list detailed records
+
+List which group(s) repositories belong to:
+
+ % git-grouper ls-repo-groups ; # list current working repo's group(s)
+ % git-grouper ls-repo-group REPO1 REPO2 ...
 
 List repositories that belong to specified group(s):
 
@@ -89,12 +100,14 @@ List repositories that belong to just one (instead of multiple) group:
 
  % git-grouper filter-repo-single-group REPO1 REPO2 ...
 
-=head2 Listing remotes
+=head2 Listing repo's remotes according to group's configuration
 
- TODO
+ % git-grouper ls-repo-remotes ; # remotes of current working repo
+ % git-grouper ls-repo-remotes REPO1 REPO2 ...
 
 =head2 Configuring repositories based on group's attributes
 
+ % git-grouper configure-repo ; # configure current working repo
  % git-grouper configure-repo REPO1 REPO2 ...
 
 =head1 DESCRIPTION
@@ -148,13 +161,21 @@ Only list repos that do not belong to any group(s).
 
 Only list repos that belong to just a single group.
 
-=head2 B<get-repo-group>
+=head2 B<ls-all-groups>
 
-Determine the group(s) of specified repos.
+List all defined groups.
 
-=head2 B<ls-groups>
+=head2 B<ls-all-remotes>
 
-List defined groups.
+List all defined remotes.
+
+=head2 B<ls-repo-groups>
+
+List the group(s) of specified repos.
+
+=head2 B<ls-repo-remotes>
+
+List remotes of specified repos based on group configuration.
 
 =head1 OPTIONS
 
@@ -528,42 +549,7 @@ Can be specified multiple times.
 
 =back
 
-=head2 Options for subcommand get-repo-group
-
-=over
-
-=item B<--config-file>=I<s>
-
-(No description)
-
-
-=item B<--config-json>=I<s>
-
-See C<--config>.
-
-=item B<--config>=I<s>
-
-(No description)
-
-
-=item B<--repo-json>=I<s>
-
-See C<--repo>.
-
-Can also be specified as the 1st command-line argument and onwards.
-
-=item B<--repo>=I<s@>
-
-(No description)
-
-
-Can also be specified as the 1st command-line argument and onwards.
-
-Can be specified multiple times.
-
-=back
-
-=head2 Options for subcommand ls-groups
+=head2 Options for subcommand ls-all-groups
 
 =over
 
@@ -585,6 +571,129 @@ See C<--config>.
 
 (No description)
 
+
+=back
+
+=head2 Options for subcommand ls-all-remotes
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--detail>, B<-l>
+
+(No description)
+
+
+=back
+
+=head2 Options for subcommand ls-repo-groups
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--groups-array>=I<s>
+
+How to return groups.
+
+Default value:
+
+ "never"
+
+Valid values:
+
+ ["never","auto","always"]
+
+When set to 'never', will always return a string where multiple groups are
+written as comma-separated list ('', 'group1', 'group1,group2'). When set to
+'auto', will return either an empty string when there is no group, or string for
+a single group, or array for multiple groups. When set to 'always', will always
+return an array for the groups result.
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--result-array>=I<s>
+
+How to return result.
+
+Default value:
+
+ "auto"
+
+Valid values:
+
+ ["auto","always"]
+
+If set to 'auto', then when there is only one repo, will not return an array but
+the groups directly. When set to 'always', will always return an array of
+records.
+
+
+=back
+
+=head2 Options for subcommand ls-repo-remotes
+
+=over
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--result-array>=I<s>
+
+Valid values:
+
+ ["auto","always"]
 
 =back
 
@@ -632,15 +741,12 @@ configuration.
 
  [remote "github"]
  url_template = git@github.com:[% github_username %]/[% repo_name %].git
- fetch = +refs/heads/*:refs/remotes/origin/*
 
  [remote "github_company1"]
  url_template = git@github.com+company1:company1/[% repo_name %].git
- fetch = +refs/heads/*:refs/remotes/origin/*
 
  [remote "privbak"]
  url_template = ssh://u1@hostname:/path/to/[% repo_name %].git
- fetch = +refs/heads/*:refs/remotes/gitbak/*
 
  [group "company1"]
  repo_name_pattern = /^company1-/

@@ -208,7 +208,9 @@ static bool sb_console_state_set_line_input(sb_console_state *state, bool enable
 static bool sb_console_state_restore(sb_console_state *state) {
    if (SetConsoleMode(state->hdl, state->orig_mode)) {
       state->mode= state->orig_mode;
+      return true;
    }
+   return false;
 }
 
 static void sb_console_state_destroy(pTHX_ sb_console_state *state) {

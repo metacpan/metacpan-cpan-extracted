@@ -1,6 +1,6 @@
 package Dancer2::Plugin;
 # ABSTRACT: base class for Dancer2 plugins
-$Dancer2::Plugin::VERSION = '2.0.1';
+$Dancer2::Plugin::VERSION = '2.1.0';
 use strict;
 use warnings;
 
@@ -461,17 +461,14 @@ END
 
     die $@ if $@;
 
-    my $app_dsl_cb = _find_consumer();
-
-    if ( $app_dsl_cb ) {
-        my $dsl = $app_dsl_cb->();
-
-        {
-            ## no critic qw(TestingAndDebugging::ProhibitNoWarnings)
-            no strict 'refs';
-            no warnings 'redefine';
-            *{"${caller}::dsl"} = sub {$dsl};
-        }
+    {
+        ## no critic qw(TestingAndDebugging::ProhibitNoWarnings)
+        no strict 'refs';
+        no warnings 'redefine';
+        *{"${caller}::dsl"} = sub {
+            my $app_dsl_cb = _find_consumer($caller);
+            return $app_dsl_cb ? $app_dsl_cb->() : undef;
+        };
     }
 
     return map { [ $_ => { class => $caller } ] }
@@ -479,10 +476,13 @@ END
 }
 
 sub _find_consumer {
+    my %skip = map +( $_ => 1 ), @_;
     my $class;
 
     ## no critic qw(ControlStructures::ProhibitCStyleForLoops)
     for ( my $i = 1; my $caller = caller($i); $i++ ) {
+        next if $skip{$caller};
+        next if eval { $caller->isa('Dancer2::Plugin') };
         $class = $caller->can('dsl')
             and last;
     }
@@ -511,7 +511,7 @@ sub register_plugin {
 
     my $_DANCER2_IMPORT_TIME_SUBS = $plugin_module->_DANCER2_IMPORT_TIME_SUBS;
     unshift(@$_DANCER2_IMPORT_TIME_SUBS, sub {
-                my $app_dsl_cb = _find_consumer();
+                my $app_dsl_cb = _find_consumer($plugin_module);
 
                 # Here we want to verify that "register_plugin" compat keyword
                 # was in fact only called from an app.
@@ -632,7 +632,7 @@ Dancer2::Plugin - base class for Dancer2 plugins
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 
@@ -1112,7 +1112,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

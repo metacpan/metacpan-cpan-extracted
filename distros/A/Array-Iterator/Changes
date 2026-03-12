@@ -1,3 +1,6 @@
+0.136	Wed Mar 11 08:15:13 EDT 2026
+	Correctly handle single element arrays (Fixes GitHub#4)
+
 0.135	Fri Feb 21 21:06:54 EST 2025
 	Added t/30-basics.t
 	Fixed RT#126034	- note that this is a change in the way Bidirectional works, and will break old code

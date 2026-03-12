@@ -24,3 +24,7 @@ t/06-skip-existing.t
 t/data3/in/test/index.html.md
 t/data3/layouts/page
 t/data3/site.yml
+t/07-encoding.t
+t/data4/in/index.html.md
+t/data4/layouts/page
+t/data4/site.yml

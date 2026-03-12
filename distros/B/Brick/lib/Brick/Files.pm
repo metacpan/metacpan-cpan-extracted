@@ -4,7 +4,7 @@ use strict;
 use base qw(Exporter);
 use vars qw($VERSION);
 
-$VERSION = '0.904';
+$VERSION = '0.905';
 
 package Brick::Bucket;
 use strict;
@@ -63,16 +63,6 @@ sub _file_magic_type {
 		}
 
 	return $format;
-	}
-
-sub _get_file_extensions_by_mime_type {
-	my( $bucket, $type ) = @_;
-
-	require MIME::Types;
-
-	my $mime_types = MIME::Types->new;
-	my $t          = $mime_types->type( $type || '' );
-	my @extensions = $t ? $t->extensions : ();
 	}
 
 =item is_mime_type( HASH_REF )
@@ -328,7 +318,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT
 
-Copyright © 2007-2025, brian d foy <briandfoy@pobox.com>. All rights reserved.
+Copyright © 2007-2026, brian d foy <briandfoy@pobox.com>. All rights reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

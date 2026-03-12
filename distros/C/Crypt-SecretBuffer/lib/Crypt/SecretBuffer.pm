@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.020';
+$Crypt::SecretBuffer::VERSION = '0.021';
 
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.020';
+$Crypt::SecretBuffer::Exports::VERSION = '0.021';
    use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
       secret_buffer secret span unmask_secrets_to memcmp
@@ -53,38 +53,86 @@ sub stringify_mask {
 
 
 sub append_console_line {
-   my ($self, $handle, %options)= @_;
+   my $self= shift;
+   my ($input_fh, %options);
+   # First argument can be input_fh, or just straight key/value list.
+   if (@_ && ref($_[0]) && (ref $_[0] eq 'GLOB' || ref($_[0])->can('getc'))) {
+      croak "Expected even-length list of options" unless @_ & 1;
+      ($input_fh, %options)= @_;
+   } else {
+      croak "Expected even-length list of options" if @_ & 1;
+      %options= @_;
+      $input_fh= delete $options{input_fh};
+   }
    my ($prompt, $prompt_fh, $char_mask, $char_count, $char_max, $char_class)
       = delete @options{qw( prompt prompt_fh char_mask char_count char_max char_class )};
    warn "unknown option: ".join(', ', keys %options)
       if keys %options;
-   if (!$prompt_fh && (defined $prompt || defined $char_mask)) {
-      my $fd= fileno($handle);
-      if (defined $fd && $fd >= 0) {
-         $prompt_fh= IO::Handle->new_from_fd($fd, 'w');
-      } elsif ($handle == \*STDIN) {
-         $prompt_fh= \*STDOUT;
+   my ($reading_from, $writing_to)= ('supplied handle', 'supplied handle');
+   if (!defined $input_fh) {
+      # user is requesting a read from the controlling terminal
+      if ($^O eq 'MSWin32') {
+         open $input_fh, '+<', 'CONIN$' or croak 'open(CONIN$): '.$!;
+         open $prompt_fh, '>', 'CONOUT$' or croak 'open(CONOUT$): '.$!
+            unless defined $prompt_fh;
+         $reading_from= 'CONIN$';
+         $writing_to= 'CONOUT$';
       } else {
-         $prompt_fh= $handle;
+         open $input_fh, '+<', '/dev/tty' or croak "open(/dev/tty): $!";
+         $prompt_fh= $input_fh unless defined $prompt_fh;
+         $reading_from= $writing_to= '/dev/tty';
       }
    }
-   # If the user wants control over the keypresses, need to disable line-editing mode
+   if (!defined $prompt_fh && (defined $prompt || defined $char_mask)) {
+      # Determine default prompt_fh
+      # For terminals, if it was STDIN then the underlying descriptors or libc FILE handle
+      # are probably read-only, so open a new writeable handle.  Also MSWin32 only has one
+      # console, so do this even if it isn't currently set as STDIN.
+      my $fd= fileno($input_fh);
+      if (-t $input_fh && ((defined $fd && $fd == 0) || \*STDIN == $input_fh || $^O eq 'MSWin32')) {
+         if ($^O eq 'MSWin32') {
+            open $prompt_fh, '>', 'CONOUT$' or croak 'open(CONOUT$): '.$!;
+            $writing_to= 'CONOUT$';
+         } else {
+            open $prompt_fh, '+<', '/dev/tty' or croak "open(/dev/tty): $!";
+            $writing_to= '/dev/tty';
+         }
+      }
+      # For sockets or tty, default to the same file descriptor as input_fh.
+      # If the descriptor is read-only, things will fail, and it's the caller's
+      # job to fix the bug.
+      elsif (-S $input_fh || -t $input_fh) {
+         $prompt_fh= $input_fh;
+         $writing_to= 'input handle';
+      }
+      # Suppress prompt unless the handle looks like a TTY or Socket.  e.g. input from file
+      # or pipe can't usefully be prompted.  It could be that the parent process created a
+      # return pipe on STDOUT and wants to see the prompt there, but it would be too bold to
+      # take a guess at that.  The caller can supply prompt_fh => \*STDOUT if they want to.
+      else {
+         $prompt= $char_mask= undef;
+      }
+   }
+   # If the user wants control over the keypresses, need to disable line-editing mode.
+   # ConsoleState obj with auto_restore restores the console state when it goes out of scope.
    my $input_by_chars= defined $char_mask || defined $char_count || defined $char_class;
    my $ttystate= Crypt::SecretBuffer::ConsoleState->maybe_new(
-      handle => $handle,
+      handle => $input_fh,
       echo => 0,
       (line_input => 0)x!!$input_by_chars,
       auto_restore => 1
    );
+   # Write the initial prompt
    if (defined $prompt) {
-      $prompt_fh->print($prompt);
-      $prompt_fh->flush;
+      $prompt_fh->print($prompt) && $prompt_fh->flush
+         or croak "Failed to write $writing_to: $!";
    }
    my $start_len= $self->length;
+   my $ret;
    if ($input_by_chars) {
       while (1) {
-         $self->append_read($handle, 1)
-            or return undef;
+         $ret= $self->append_read($input_fh, 1)
+            or last;
          # Handle control characters
          my $end_pos= $self->length - 1;
          if ($self->index(qr/[\0-\x1F\x7F]/, $end_pos) == $end_pos) {
@@ -93,7 +141,7 @@ sub append_console_line {
             # return false.
             if ($self->index(qr/[\r\n]/, $end_pos) == $end_pos) {
                $self->length($end_pos); # remove CR or LF
-               return !$char_count;
+               last;
             }
             # handle backspace
             elsif ($self->index(qr/[\b\x7F]/, $end_pos) == $end_pos) {
@@ -105,8 +153,9 @@ sub append_console_line {
                      $prompt_fh->print(
                         ("\b" x length $char_mask)
                        .(" "  x length $char_mask)
-                       .("\b" x length $char_mask));
-                     $prompt_fh->flush;
+                       .("\b" x length $char_mask))
+                     && $prompt_fh->flush
+                        or croak "Failed to write $writing_to: $!";
                   }
                }
             }
@@ -126,23 +175,29 @@ sub append_console_line {
          else {
             # char added
             if (length $char_mask) {
-               $prompt_fh->print($char_mask);
-               $prompt_fh->flush;
+               $prompt_fh->print($char_mask) && $prompt_fh->flush
+                  or croak "Failed to write $writing_to: $!";
             }
             # If reached the char_count, return success
-            return 1
-               if $char_count && $self->length - $start_len >= $char_count;
+            last if $char_count && $self->length - $start_len == $char_count;
          }
       }
    }
    else {
-      my $ret= $self->_append_console_line($handle);
+      $ret= $self->_append_console_line($input_fh);
       if ($char_max && $self->length - $start_len > $char_max) {
          # truncate the input if char_max requested
          $self->length($start_len + $char_max);
       }
-      return $ret;
    }
+   # If we're responsible for the prompt, also echo the newline to the user so that the caller
+   # doesn't need to figure out what to use for $prompt_fh.
+   $prompt_fh->print("\n") && $prompt_fh->flush
+      if defined $prompt;
+
+   return !$ret? $ret
+      : $char_count? $self->length - $start_len == $char_count
+      : 1;
 }
 
 
@@ -186,7 +241,8 @@ sub save_file {
       require File::Temp;
       require File::Spec;
       my ($vol, $dir, $file)= File::Spec->splitpath($path);
-      $fh= File::Temp->new(DIR => File::Spec->catpath($vol, $dir, ''));
+      my $dest_dir= File::Spec->catpath($vol, $dir, '');
+      $fh= File::Temp->new(DIR => (length($dest_dir)? $dest_dir : File::Spec->curdir));
       $cur_path= "$fh";
    } else {
       open $fh, '>', $path or croak "open($path): $!";
@@ -580,14 +636,17 @@ of bytes and never blocks.
 
 =head2 append_console_line
 
-  $bool= $buf->append_console_line($handle);
-  $bool= $buf->append_console_line($handle,
-    prompt     => "Enter Password: ", # print prompt after disable echo
-    prompt_fh  => $alternate_handle,  # optional, handle for writing prompt
-    char_mask  => "*",                # show each char typed as '*'
-    char_count => $n,                 # stop after N characters (or newline)
-    char_class => qr/[...]/,          # limit to members of character class
-  );
+  $bool= $buf->append_console_line($input_fh);
+  $bool= $buf->append_console_line($input_fh, %options);
+  $bool= $buf->append_console_line(%options);
+  # Options:
+  # prompt     => "Enter Password: "    print prompt after disabling echo
+  # input_fh   => $readable_handle      handle for reading chars
+  # prompt_fh  => $writeable_handle     handle for writing prompt
+  # char_mask  => "*"                   show each char typed as '*'
+  # char_count => $n                    return success only at exactly N characters
+  # char_max   => $n                    stop adding characters after $n added
+  # char_class => qr/[...]/             limit to members of character class
 
 This turns off TTY echo (if the handle is a Unix TTY or Windows Console) and reads and appends
 characters until newline or EOF (and does not store the \r or \n characters).
@@ -607,14 +666,24 @@ Options:
 
 This message is printed and flushed after disabling TTY echo.  This helps prevent a race
 condition where a scripted interaction could start typing a password in response to the prompt
-before the echo was disabled.
+before the echo was disabled.  A defined value for this setting also echoes back a C<"\n">
+to the user on completion.
+
+=item input_fh
+
+The file handle from which this function reads characters.  The default is C<< /dev/tty >> on
+Unix and C<CONIN$> on MSWin32.  If this file handle is not writeable (such as C<< \*STDIN >>) and
+you requested a prompt, you should probably also specify C<prompt_fh>.
 
 =item prompt_fh
 
-If C<$handle> is STDIN (the most common scenario) perl will not be able to write to it because
-libc opened it with 'r' mode, even though the TTY is always writeable.  The automatic workaround
-is to get the file descriptor and open a second handle to it with 'w' mode.  If the automatic
-behavior is wrong for your use case, you can provide the write-handle with this option.
+The file handle for writing the prompt and/or C<char_mask>.  If C<$input_fh> defaulted to
+C</dev/tty> this defaults to the same (or C<CONOUT$> on MSWin32).  If C<$input_fh> is exactly
+C<< \*STDIN >>, the default is to try opening C<< /dev/tty >> or C<CONOUT$> for writing.
+Else the default for a terminal or socket is to write to C<$input_fh>, and if none of these
+cases is true then the default is to suppress all prompting.  These defaults should allow you
+to pass C<< input_fh => \*STDIN >> for the behavior of simply allowing the password to be piped
+into the command when it isn't a terminal without having to test those conditions yourself.
 
 =item char_mask
 
@@ -623,15 +692,18 @@ be C<'*'> or C<'* '>.
 
 =item char_count
 
-Stop after N characters have been added to the buffer.  Note that unicode is not supported yet,
-so this really means N bytes.  Reaching N bytes is considered a success and causes
-append_console_line to return true.  If the user presses newline before N bytes,
-append_console_line will return false.
+Change the completion condition to having added exactly C<$n> characters to the buffer.
+The method returns true as soon as this count is reached.  Pressing C<Enter> before the
+required count is treated as an incomplete read and returns false, even though input was
+successfully read.
+
+Note that unicode is not supported yet, so this really means C<$n> bytes.
 
 =item char_max
 
-Stop appending characters when N have been added to the buffer, but don't return until the user
-presses newline.
+Stop appending characters when C<$n> have been added to the buffer, but don't return until the
+user presses newline.  This should only be used with C<char_mask> so that the user can see that
+additional keys are not being accepted.
 
 =item char_class
 
@@ -925,7 +997,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 AUTHOR
 

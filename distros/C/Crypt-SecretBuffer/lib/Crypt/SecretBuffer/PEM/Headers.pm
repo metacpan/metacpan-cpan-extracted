@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::PEM::Headers;
 # VERSION
 # ABSTRACT: Inspect or alter arrayref of PEM headers as if it was a hashref
-$Crypt::SecretBuffer::PEM::Headers::VERSION = '0.020';
+$Crypt::SecretBuffer::PEM::Headers::VERSION = '0.021';
 use strict;
 use warnings;
 use Scalar::Util 'blessed';
@@ -363,7 +363,7 @@ Delete all headers matching C<$name>, and return the values deleted.
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 AUTHOR
 

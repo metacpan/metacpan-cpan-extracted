@@ -6,7 +6,7 @@ no warnings 'experimental::class', 'experimental::builtin', 'experimental::for_l
 #~ |------3-33-----------------------------|
 #~ |-5-55------4-44-5-55----353--3-33-/1~--|
 #~ |---------------------335---33----------|
-class At 1.5 {
+class At 1.6 {
     use Carp qw[];
     use experimental 'try';
     use File::ShareDir::Tiny qw[dist_dir];
@@ -275,10 +275,14 @@ class At 1.5 {
 
     # XRPC & Lexicons
     method _locate_lexicon($fqdn) {
+        $fqdn // return undef;
+        $fqdn =~ s/^#//;    # Strip leading hash
         unless ( defined $lexicons{$fqdn} ) {
             my $base_fqdn = $fqdn =~ s[#(.+)$][]r;
+            return undef unless $base_fqdn;
             my @namespace = split /\./, $base_fqdn;
-            my @search    = (
+            return undef unless @namespace;
+            my @search = (
                 @lexicon_paths,
                 $share->child('lexicons'),
                 defined $ENV{HOME} ? path( $ENV{HOME}, '.cache', 'atproto', 'lexicons' ) : (),
@@ -419,9 +423,9 @@ class At 1.5 {
     }
 
     method _resolve_namespace ( $l, $r ) {
-        return $r      if $r =~ m[.+#];
-        return $` . $r if $l =~ m[#.+];
-        $l . $r;
+        return $r if $r =~ m[\.];    # Absolute (has dots)
+        my $base = $l =~ s[#(.+)$][]r;
+        return $base . '#' . $r;     # Relative to base of current FQDN
     }
 
     # Identity & Helpers
@@ -816,7 +820,7 @@ posts, likes, handle changes, deletions, and more.
 
     $fh->start();
 
-B<Note:> The Firehose requires L<CBOR::Free> and an async event loop to keep the connection alive. Currently, At.pm
+B<Note:> The Firehose requires L<Codec::CBOR> and an async event loop to keep the connection alive. Currently, At.pm
 supports L<Mojo::UserAgent> so you should usually use L<Mojo::IOLoop>:
 
     use Mojo::IOLoop;
@@ -1044,3 +1048,4 @@ atproto Bluesky auth authed login
 =end stopwords
 
 =cut
+

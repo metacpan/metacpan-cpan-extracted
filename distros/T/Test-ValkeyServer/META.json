@@ -1,0 +1,92 @@
+{
+   "abstract" : "valkey-server runner for tests.",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org> (original L<Test::RedisServer> author)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.29",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-ValkeyServer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Markdown::Github" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mouse" : "0",
+            "Redis" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::ValkeyServer" : {
+         "file" : "lib/Test/ValkeyServer.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plainbanana/Test-ValkeyServer/issues"
+      },
+      "homepage" : "https://github.com/plainbanana/Test-ValkeyServer",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/plainbanana/Test-ValkeyServer.git",
+         "web" : "https://github.com/plainbanana/Test-ValkeyServer"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:PLAIN",
+   "x_contributors" : [
+      "Daisuke Murase <typester@gmail.com>",
+      "David Cantrell <david.cantrell@broadbean.com>",
+      "Devendranath Thadi <devendranath.thadi3@gmail.com>",
+      "Ivan Baidakou <dmol@gmx.com>",
+      "Jeremy Zawodny <jzawodn@craigslist.org>",
+      "Robin Smidsrød <robin@smidsrod.no>",
+      "Sean Smith <ssmith@localhost.localdomain>",
+      "Songmu <y.songmu@gmail.com>",
+      "gregor herrmann <gregoa@debian.org>",
+      "plainbanana <plainbanana@mustardon.tokyo>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

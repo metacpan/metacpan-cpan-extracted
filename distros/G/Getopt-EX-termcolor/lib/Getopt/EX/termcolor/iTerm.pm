@@ -24,7 +24,6 @@ use Data::Dumper;
 
 {
     no warnings 'once';
-    use Getopt::EX::Colormap;
     $Getopt::EX::Colormap::RGB24 = 1;
 }
 

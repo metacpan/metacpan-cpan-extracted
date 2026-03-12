@@ -1,7 +1,7 @@
 use v5.42;
 use experimental 'class';
 #
-package Algorithm::Kademlia v1.0.1 {
+package Algorithm::Kademlia v1.1.0 {
     use parent 'Exporter';
     our @EXPORT_OK = qw[xor_distance xor_bucket_index];
     #
@@ -22,7 +22,7 @@ package Algorithm::Kademlia v1.0.1 {
         }
         return undef;    # Same ID
     }
-    class Algorithm::Kademlia::RoutingTable v1.0.1 {
+    class Algorithm::Kademlia::RoutingTable v1.1.0 {
         field $local_id_bin : param : writer : reader;
         field $k : param //= 20;
         field @buckets : reader;
@@ -89,7 +89,7 @@ package Algorithm::Kademlia v1.0.1 {
             }
         }
     };
-    class Algorithm::Kademlia::Storage v1.0.1 {
+    class Algorithm::Kademlia::Storage v1.1.0 {
         field %store : reader(entries);
         field $ttl : reader : param //= 86400;    # 24 hours
 
@@ -113,7 +113,7 @@ package Algorithm::Kademlia v1.0.1 {
             $entry;    # Return the full entry now
         }
     };
-    class Algorithm::Kademlia::Storage::Entry v1.0.1 {
+    class Algorithm::Kademlia::Storage::Entry v1.1.0 {
         field $key       : param : reader;
         field $leechers  : param : reader : writer;
         field $seeds     : param : reader : writer;
@@ -121,7 +121,7 @@ package Algorithm::Kademlia v1.0.1 {
         field $value     : param : reader : writer;
         field $publisher : param : reader;
     };
-    class Algorithm::Kademlia::Search v1.0.1 {
+    class Algorithm::Kademlia::Search v1.1.0 {
         field $target_id_bin : param;
         field $k     : param //= 20;
         field $alpha : param //= 3;

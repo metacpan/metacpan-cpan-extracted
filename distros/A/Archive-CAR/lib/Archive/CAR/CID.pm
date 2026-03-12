@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Archive::CAR::CID v0.0.3 {
+class Archive::CAR::CID v0.0.4 {
     use Archive::CAR::Utils qw[systell];
     #
     field $version : param : reader;

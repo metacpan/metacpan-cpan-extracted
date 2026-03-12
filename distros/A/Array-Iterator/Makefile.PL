@@ -22,20 +22,25 @@ WriteMakefile(
 	PREREQ_PM => {
 		'Carp' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
-	},
-	META_MERGE => {
+	}, META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
+		'meta-spec' => { version => 2 },
 		resources => {
+			homepage => 'https://metacpan.org/pod/Array::Iterator',
 			repository => {
+				repository => 'https://github.com/nigelhorne/Array-Iterator',
 				type => 'git',
-				url => 'https://github.com/nigelhorne/Array-Iterator.git',
+				url => 'git://github.com/nigelhorne/Array-Iterator.git',
 				web => 'https://github.com/nigelhorne/Array-Iterator',
-			},
-			bugtracker => {
-				web => 'https://github.com/nigelhorne/Array-Iterator/issues',
-			},
+				# license => 'http://dev.perl.org/licenses/',
+			}, bugtracker => {
+				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator',
+				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator',
+				# web => 'https://github.com/nigelhorne/Array-Iterator/issues',
+				# url => 'https://github.com/nigelhorne/Array-Iterator/issues',
+				mailto => 'bug-Array-Iterator@rt.cpan.org'
+			}
 		},
-	},
-	TEST_REQUIRES => {
+	}, TEST_REQUIRES => {
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,

@@ -4,7 +4,7 @@ Array::Iterator - A simple class for iterating over Perl arrays
 
 # VERSION
 
-Version 0.135
+Version 0.136
 
 # SYNOPSIS
 
@@ -186,7 +186,8 @@ Reset index to allow iteration from the start
 
 ## get\_length
 
-This is a basic accessor for getting the length of the array being iterated over.
+This is a basic accessor for getting the length of the array being iterated over,
+returns the number of elements in the array.
 
 ## getLength
 
@@ -283,6 +284,12 @@ you don't happen to like the way I do it.
 - Thanks to Hugo Cornelis for pointing out a bug in `peek()`
 - Thanks to Phillip Moore for providing the patch to allow single element iteration
 through the hash-ref constructor parameter.
+
+# MAINTAINER
+
+Nigel Horne, `<njh at nigelhorne.com>`
+
+2025-2026
 
 # ORIGINAL AUTHOR
 

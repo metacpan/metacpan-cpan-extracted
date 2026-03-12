@@ -4,7 +4,7 @@
       "Ruben Westerberg <drclaw@mac.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -32,10 +32,10 @@
       },
       "runtime" : {
          "requires" : {
-            "Log::OK" : "v0.2.1",
-            "Log::ger" : "0",
+            "File::Path::Redirect" : "0",
             "Object::Pad" : "0.808",
-            "constant::more" : "v0.3.0"
+            "constant::more" : "v0.3.0",
+            "perl" : "5.024000"
          }
       }
    },
@@ -47,6 +47,6 @@
          "web" : "https://github.com/drclaw1394/perl-file-meta-cache"
       }
    },
-   "version" : "v0.3.0",
+   "version" : "v0.4.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

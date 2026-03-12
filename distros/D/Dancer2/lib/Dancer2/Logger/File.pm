@@ -1,15 +1,14 @@
 package Dancer2::Logger::File;
 # ABSTRACT: file-based logging engine for Dancer2
-$Dancer2::Logger::File::VERSION = '2.0.1';
+$Dancer2::Logger::File::VERSION = '2.1.0';
 use Carp 'carp';
 use Moo;
 use Dancer2::Core::Types;
 
 with 'Dancer2::Core::Role::Logger';
 
-use File::Spec;
 use Fcntl qw(:flock SEEK_END);
-use Dancer2::FileUtils qw(open_file);
+use Path::Tiny ();
 use IO::File;
 
 has environment => (
@@ -38,6 +37,13 @@ has log_dir => (
     builder => '_build_log_dir',
 );
 
+has _log_dir_path => (
+    is       => 'ro',
+    lazy     => 1,
+    builder  => '_build_log_dir_path',
+    init_arg => undef,
+);
+
 has file_name => (
     is      => 'ro',
     isa     => Str,
@@ -52,30 +58,50 @@ has log_file => (
     builder => '_build_log_file',
 );
 
+has _log_file_path => (
+    is       => 'ro',
+    lazy     => 1,
+    builder  => '_build_log_file_path',
+    init_arg => undef,
+);
+
 has fh => (
     is      => 'ro',
     lazy    => 1,
     builder => '_build_fh',
 );
 
-sub _build_log_dir { File::Spec->catdir( $_[0]->location, 'logs' ) }
+sub _build_log_dir { Path::Tiny::path( $_[0]->location, 'logs' )->stringify }
+
+sub _build_log_dir_path {
+    my $self = shift;
+    return Path::Tiny::path( $self->log_dir );
+}
 
 sub _build_file_name {$_[0]->environment . ".log"}
 
 sub _build_log_file {
     my $self = shift;
-    return File::Spec->catfile( $self->log_dir, $self->file_name );
+    return $self->_log_dir_path->child( $self->file_name )->stringify;
+}
+
+sub _build_log_file_path {
+    my $self = shift;
+    return Path::Tiny::path( $self->log_file );
 }
 
 sub _build_fh {
     my $self    = shift;
-    my $logfile = $self->log_file;
+    my $logfile = $self->_log_file_path->stringify;
 
-    my $fh;
-    unless ( $fh = open_file( '>>', $logfile ) ) {
-        carp "unable to create or append to $logfile";
+    my $fh = eval {
+        $self->_log_file_path->filehandle(
+            '>>', ':encoding(UTF-8)',
+        );
+    } or do {
+        Carp::carp("unable to create or append to $logfile");
         return;
-    }
+    };
 
     $fh->autoflush;
 
@@ -111,7 +137,7 @@ Dancer2::Logger::File - file-based logging engine for Dancer2
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
 
@@ -165,7 +191,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

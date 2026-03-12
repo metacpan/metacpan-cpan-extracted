@@ -1,56 +1,53 @@
 package Dancer2::FileUtils;
 # ABSTRACT: File utility helpers
-$Dancer2::FileUtils::VERSION = '2.0.1';
+$Dancer2::FileUtils::VERSION = '2.1.0';
 use strict;
 use warnings;
 
-use File::Basename ();
-use File::Spec;
+use Path::Tiny ();
 use Carp;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
   dirname open_file path read_file_content read_glob_content
-  path_or_empty set_file_mode normalize_path escape_filename
+  path_or_empty set_file_mode escape_filename
 );
 
 
 sub path {
     my @parts = @_;
-    my $path  = File::Spec->catfile(@parts);
-
-    return normalize_path($path);
+    return Path::Tiny::path(@parts)->stringify;
 }
 
 sub path_or_empty {
     my @parts = @_;
-    my $path  = path(@parts);
+    my $path  = Path::Tiny::path(@parts);
 
     # return empty if it doesn't exist
-    return -e $path ? $path : '';
+    return $path->exists ? $path->stringify : '';
 }
 
-sub dirname { File::Basename::dirname(@_) }
+sub dirname { return Path::Tiny::path(@_)->parent->stringify; }
 
 sub set_file_mode {
     my $fh      = shift;
-    my $charset = 'utf-8';
+    my $charset = 'UTF-8';
     binmode $fh, ":encoding($charset)";
     return $fh;
 }
 
 sub open_file {
-    my ( $mode, $filename ) = @_;
+    my ( $mode, $filename, $charset ) = @_;
 
-    open my $fh, $mode, $filename
-      or croak "Can't open '$filename' using mode '$mode': $!";
-
-    return set_file_mode($fh);
+    return Path::Tiny::path($filename)->filehandle(
+        $mode, ':encoding(UTF-8)',
+    );
 }
 
 sub read_file_content {
-    my $file = shift or return;
-    my $fh = open_file( '<', $file );
+    my ( $file, $charset ) = @_;
+    $file or return;
+    my $fh = open_file( '<', $file, $charset );
 
     return wantarray
       ? read_glob_content($fh)
@@ -64,25 +61,6 @@ sub read_glob_content {
     close $fh;
 
     return wantarray ? @content : join '', @content;
-}
-
-sub normalize_path {
-
-    # this is a revised version of what is described in
-    # http://www.linuxjournal.com/content/normalizing-path-names-bash
-    # by Mitch Frazier
-    my $path = shift or return;
-    my $seqregex = qr{
-        [^/]*       # anything without a slash
-        /\.\.(/|\z) # that is accompanied by two dots as such
-    }x;
-
-    $path =~ s{/\./}{/}g;
-    while ( $path =~ s{$seqregex}{} ) {}
-
-    #see https://rt.cpan.org/Public/Bug/Display.html?id=80077
-    $path =~ s{^//}{/};
-    return $path;
 }
 
 sub escape_filename {
@@ -109,7 +87,7 @@ Dancer2::FileUtils - File utility helpers
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 
@@ -154,8 +132,12 @@ file reading subroutines or using additional modules.
 
 =head2 my $path = path( 'folder', 'folder', 'filename');
 
-Provides comfortable path resolution, internally using L<File::Spec>. 'path'
-does not verify paths, it just normalizes the path.
+Calls L<Path::Tiny>'s C<< path(...)->stringify >> path parts.
+Better if you use C<Path::Tiny::path(@parts)> directly instead.
+
+If you want to normalize the path (for existing path), use:
+
+    Path::Tiny::path(@parts)->realpath->stringify;
 
 =head2 my $path = path_or_empty('folder, 'folder','filename');
 
@@ -164,32 +146,36 @@ Like path, but returns '' if path doesn't exist.
 =head2 dirname
 
     use Dancer2::FileUtils 'dirname';
-
     my $dir = dirname($path);
 
-Exposes L<File::Basename>'s I<dirname>, to allow fetching a directory name from
-a path. On most OS, returns all but last level of file path. See
-L<File::Basename> for details.
+    # Same thing:
+    use Path::Tiny qw< path >;
+    my $dir       = path($path)->parent;
+    my $as_string = $dir->stringify;
 
-=head2 set_file_mode($fh);
+Fetches the directory name of a path
+On most OS, returns all but last level of file path. See
+L<Path::Tiny> for details.
+
+=head2 set_file_mode($fh, $charset);
 
     use Dancer2::FileUtils 'set_file_mode';
 
     set_file_mode($fh);
 
-Applies charset setting from Dancer2's configuration. Defaults to utf-8 if no
-charset setting.
+Applies the specified charset. Defaults to utf-8 if no charset is provided.
+An empty charset disables encoding layers.
 
-=head2 my $fh = open_file('<', $file) or die $message;
+=head2 my $fh = open_file('<', $file, $charset) or die $message;
 
     use Dancer2::FileUtils 'open_file';
     my $fh = open_file('<', $file) or die $message;
 
-Calls open and returns a filehandle. Takes in account the 'charset' setting
-from Dancer2's configuration to open the file in the proper encoding (or
-defaults to utf-8 if setting not present).
+Calls open and returns a filehandle. If a charset is provided, opens the file
+in that encoding; otherwise defaults to utf-8. An empty charset disables
+encoding layers.
 
-=head2 my $content = read_file_content($file);
+=head2 my $content = read_file_content($file, $charset);
 
     use Dancer2::FileUtils 'read_file_content';
 
@@ -215,8 +201,6 @@ Similar to I<read_file_content>, only it accepts a file handle. It is
 assumed that the appropriate PerlIO layers are applied to the file handle.
 Returns the content and B<closes the file handle>.
 
-=head2 my $norm_path=normalize_path ($path);
-
 =head2 my $escaped_filename = escape_filename( $filename );
 
 Escapes characters in a filename that may alter a path when concatenated.
@@ -235,7 +219,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

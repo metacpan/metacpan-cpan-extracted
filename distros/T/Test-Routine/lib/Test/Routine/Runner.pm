@@ -1,5 +1,5 @@
 use v5.12.0;
-package Test::Routine::Runner 0.031;
+package Test::Routine::Runner 0.032;
 # ABSTRACT: tools for running Test::Routine tests
 
 use Moose;
@@ -51,10 +51,8 @@ has description => (
   required => 1,
 );
 
-sub run {
-  my ($self) = @_;
-
-  my $test_instance = $self->build_test_instance;
+sub _get_tests {
+  my ($self, $test_instance) = @_;
 
   my @tests = grep { Moose::Util::does_role($_, 'Test::Routine::Test::Role') }
               $test_instance->meta->get_all_methods;
@@ -74,17 +72,33 @@ sub run {
       || $a->_origin->{nth}  <=> $b->_origin->{nth}
   } @tests;
 
-  Test2::API::run_subtest($self->description, sub {
-    TEST: for my $test (@ordered_tests) {
-      my $ctx = Test2::API::context;
-      if (my $reason = $test->skip_reason($test_instance)) {
-        $ctx->skip($test->name, $reason);
-      } else {
-        $test_instance->run_test( $test );
-      }
+  return \@ordered_tests;
+}
 
-      $ctx->release;
+sub _run_tests {
+  my ($self, $test_instance, $ordered_tests) = @_;
+
+  TEST: for my $test (@$ordered_tests) {
+    my $ctx = Test2::API::context;
+    if (my $reason = $test->skip_reason($test_instance)) {
+      $ctx->skip($test->name, $reason);
+    } else {
+      $test_instance->run_test( $test );
     }
+
+    $ctx->release;
+  }
+}
+
+sub run {
+  my ($self) = @_;
+
+  my $test_instance = $self->build_test_instance;
+
+  my $ordered_tests = $self->_get_tests($test_instance);
+
+  Test2::API::run_subtest($self->description, sub {
+    $self->_run_tests($test_instance, $ordered_tests);
   });
 }
 
@@ -102,7 +116,7 @@ Test::Routine::Runner - tools for running Test::Routine tests
 
 =head1 VERSION
 
-version 0.031
+version 0.032
 
 =head1 OVERVIEW
 
@@ -116,14 +130,15 @@ interface breakage.
 =head1 PERL VERSION
 
 This module should work on any version of perl still receiving updates from
-the Perl 5 Porters.  This means it should work on any version of perl released
-in the last two to three years.  (That is, if the most recently released
-version is v5.40, then this module should work on both v5.40 and v5.38.)
+the Perl 5 Porters.  This means it should work on any version of perl
+released in the last two to three years.  (That is, if the most recently
+released version is v5.40, then this module should work on both v5.40 and
+v5.38.)
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 AUTHOR
 

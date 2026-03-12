@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.2.9] - 2026-03-11
+
+### Fixed
+
+- Documentation of "source" option
+- Double-encoding bug
+
 ## [0.2.8] - 2026-01-14
 
 ### Fixed

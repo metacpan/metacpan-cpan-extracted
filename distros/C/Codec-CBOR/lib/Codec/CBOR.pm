@@ -8,7 +8,7 @@ package    # Simple boolean wrapper
     sub new ( $class, $val ) { my $v = $val ? 1 : 0; bless \$v, $class }
 }
 #
-class Codec::CBOR v0.0.1 {
+class Codec::CBOR v1.0.1 {
     field %class_handlers;
     field %tag_handlers = (
         42 => sub ($data) {    # Default Tag 42 handler (generic)
@@ -41,14 +41,19 @@ class Codec::CBOR v0.0.1 {
             $fh = $input;
         }
         my @items;
-        while (1) {
+        my $safety   = 0;
+        my $last_pos = tell($fh);
+        while ( !eof($fh) ) {
             my $item;
-            try { $item = $self->_decode_item($fh); } catch ($e) {
-                last
-            };
-            last if !defined $item && eof($fh);
-            push @items, $item;
-            last if eof($fh);
+            try { $item = $self->_decode_item($fh); }
+            catch ($e) {
+                last;
+            }
+            my $curr_pos = tell($fh);
+            last if $curr_pos <= $last_pos && !eof($fh);    # Failed to advance but not at EOF? Stop to avoid infinite loop.
+            $last_pos = $curr_pos;
+            push @items, $item if defined $item || !eof($fh);
+            last if ++$safety > 10000;
         }
         wantarray ? @items : \@items;
     }
@@ -136,10 +141,8 @@ class Codec::CBOR v0.0.1 {
             my $decoded = $buf;
             return $decoded if utf8::decode($decoded);
 
-            # Fallback for invalid UTF-8: sanitize and hope for the best...
-            $decoded = $buf;
-            $decoded =~ s/[^\x00-\x7F]/?/g;
-            return $decoded;
+            # Fallback for invalid UTF-8: return raw bytes
+            return $buf;
         }
         if ( $major == 4 ) {    # Array
             my $len = $self->_decode_value( $info, $fh );
@@ -153,7 +156,7 @@ class Codec::CBOR v0.0.1 {
             for ( 1 .. $len ) {
                 my $k = $self->_decode_item($fh);
                 my $v = $self->_decode_item($fh);
-                $hash{$k} = $v;
+                $hash{$k} = $v if defined $k;
             }
             return \%hash;
         }
@@ -167,9 +170,9 @@ class Codec::CBOR v0.0.1 {
             return Codec::CBOR::Boolean->new(0) if $info == 20;
             return Codec::CBOR::Boolean->new(1) if $info == 21;
             return undef                        if $info == 22;
-            if ( $info == 25 ) { read( $fh, my $b, 2 ); return unpack( "f>", $b ); }
-            if ( $info == 26 ) { read( $fh, my $b, 4 ); return unpack( "f>", $b ); }
-            if ( $info == 27 ) { read( $fh, my $b, 8 ); return unpack( "d>", $b ); }
+            if ( $info == 25 ) { read( $fh, my $b, 2 ); return unpack( 'f>', $b ); }
+            if ( $info == 26 ) { read( $fh, my $b, 4 ); return unpack( 'f>', $b ); }
+            if ( $info == 27 ) { read( $fh, my $b, 8 ); return unpack( 'd>', $b ); }
             return $self->_decode_value( $info, $fh );
         }
         die 'Codec::CBOR: Unsupported major type ' . $major;
@@ -177,10 +180,10 @@ class Codec::CBOR v0.0.1 {
 
     method _decode_value ( $info, $fh ) {
         return $info if $info < 24;
-        if ( $info == 24 ) { read( $fh, my $b, 1 ); return unpack( "C",  $b ); }
-        if ( $info == 25 ) { read( $fh, my $b, 2 ); return unpack( "n",  $b ); }
-        if ( $info == 26 ) { read( $fh, my $b, 4 ); return unpack( "N",  $b ); }
-        if ( $info == 27 ) { read( $fh, my $b, 8 ); return unpack( "Q>", $b ); }
+        if ( $info == 24 ) { read( $fh, my $b, 1 ); return unpack( 'C',  $b ); }
+        if ( $info == 25 ) { read( $fh, my $b, 2 ); return unpack( 'n',  $b ); }
+        if ( $info == 26 ) { read( $fh, my $b, 4 ); return unpack( 'N',  $b ); }
+        if ( $info == 27 ) { read( $fh, my $b, 8 ); return unpack( 'Q>', $b ); }
         die 'Codec::CBOR: Indefinite length or invalid info ' . $info;
     }
 };

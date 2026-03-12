@@ -3,7 +3,7 @@ lib/File/Meta/Cache.pm
 lib/File/Meta/Cache.pod
 LICENSE
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 README.md

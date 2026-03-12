@@ -2,15 +2,33 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Archive::CAR::v1 v0.0.3 {
+class Archive::CAR::v1 v0.0.4 {
     use Archive::CAR::Utils qw[systell];
-    use CBOR::Free;
-    use CBOR::Free::Decoder;
+    use Codec::CBOR;
+    use Archive::CAR::CID;
     #
     field $header : reader;
     field $roots  : reader;
     field $blocks : reader;
+    field $codec;
     #
+    ADJUST {
+        $codec = Codec::CBOR->new();
+        $codec->add_tag_handler(
+            42 => sub ($data) {
+
+                # Codec::CBOR returns raw bytes for Major Type 2
+                return Archive::CAR::CID->from_raw( substr( $data, 1 ) ) if substr( $data, 0, 1 ) eq "\x00";
+                return Archive::CAR::CID->from_raw($data);
+            }
+        );
+        $codec->add_class_handler(
+            'Archive::CAR::CID' => sub ( $codec_obj, $item ) {
+                my $cid_raw = $item->raw;
+                return pack( 'C', 0xd8 ) . pack( 'C', 42 ) . $codec_obj->_encode_bytes( "\x00" . $cid_raw );
+            }
+        );
+    }
     method version ()          {1}
     method to_file ($filename) { Archive::CAR->write( $filename, $self->roots, $self->blocks, 1 ) }
 
@@ -22,35 +40,21 @@ class Archive::CAR::v1 v0.0.3 {
         return undef unless defined $header_len;
         my $header_raw;
         read( $fh, $header_raw, $header_len );
-        $header = do {
-            local $SIG{__WARN__} = sub {
-                warn @_ unless $_[0] =~ /Ignoring unrecognized CBOR tag #42/;
-            };
-            CBOR::Free::decode($header_raw);
-        };
-        if ( $header->{roots} ) {
-            my @roots_list;
-            for my $root_data ( @{ $header->{roots} } ) {
-                my $raw_cid = $root_data;
-                open my $rfh, '<', \$raw_cid;
-                push @roots_list, Archive::CAR::Utils::decode_cid($rfh);
-            }
-            $roots = \@roots_list;
-        }
+        $header = $codec->decode($header_raw);
+
+        # Ensure roots are CID objects.
+        # If they were decoded as Tag 42 with our handler, they already are.
+        $roots = $header->{roots} if $header->{roots};
         my @blocks_list;
         while ( !defined $limit || systell($fh) < $data_start + $limit ) {
             my $record_start = systell($fh);
             my ( $block_len, $varint_len ) = Archive::CAR::Utils::decode_varint($fh);
             last unless defined $block_len;
             my $cid = Archive::CAR::Utils::decode_cid($fh);
-            if ( !defined $cid ) {
-                last;
-            }
+            last unless defined $cid;
             my $cid_len  = length( $cid->raw );
             my $data_len = $block_len - $cid_len;
-            if ( $data_len < 0 ) {
-                last;
-            }
+            last if $data_len < 0;
             my $data;
             read( $fh, $data, $data_len );
             push @blocks_list,
@@ -60,7 +64,7 @@ class Archive::CAR::v1 v0.0.3 {
                 offset      => $record_start,
                 length      => $block_len + $varint_len,
                 blockOffset => systell($fh) - $data_len,
-                blockLength => $data_len,
+                blockLength => $data_len
                 };
         }
         $blocks = \@blocks_list;
@@ -69,15 +73,14 @@ class Archive::CAR::v1 v0.0.3 {
 
     method write ( $fh, $roots, $blocks ) {
 
-        # Write Header
-        # Transform CID objects to CBOR tags for the header
-        my @cbor_roots     = map { CBOR::Free::tag( 42, $_->raw ) } @$roots;
-        my $header_data    = { version => 1, roots => \@cbor_roots, };
-        my $header_encoded = CBOR::Free::encode($header_data);
+        # Write header
+        # Transform CID objects to Tag 42 for the header via class handler
+        my $header_data    = { version => 1, roots => $roots, };
+        my $header_encoded = $codec->encode($header_data);
         print {$fh} Archive::CAR::Utils::encode_varint( length($header_encoded) );
         print {$fh} $header_encoded;
 
-        # Write Blocks
+        # Write blocks
         for my $block (@$blocks) {
             my $cid_raw   = $block->{cid}->raw;
             my $data      = $block->{data};

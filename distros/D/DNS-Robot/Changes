@@ -1,0 +1,9 @@
+Revision history for DNS::Robot
+
+0.01  2026-03-12
+    - Initial release
+    - 11 API methods: dns_lookup, whois_lookup, ssl_check, spf_check,
+      dkim_check, dmarc_check, mx_lookup, ns_lookup, ip_lookup,
+      http_headers, port_check
+    - Zero external dependencies (HTTP::Tiny, JSON::PP, Carp — all core)
+    - Full POD documentation with examples

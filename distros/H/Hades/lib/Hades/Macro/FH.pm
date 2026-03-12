@@ -2,7 +2,7 @@ package Hades::Macro::FH;
 use strict;
 use warnings;
 use base qw/Hades::Macro/;
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -200,7 +200,7 @@ Hades::Macro::FH - Hades macro helpers for FH
 
 =head1 VERSION
 
-Version 0.26
+Version 0.27
 
 =cut
 

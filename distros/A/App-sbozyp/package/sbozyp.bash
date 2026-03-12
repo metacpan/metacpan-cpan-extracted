@@ -69,7 +69,7 @@ _sbozyp_complete() {
 
     case $command in
         install|in)
-            local opts="--help -b -f -k -r -y -z"
+            local opts="--help -b -f -k -n -r -y -z"
             if [[ $cur == in ]]; then
                 COMPREPLY=( "install" )
             elif [[ $cur == -* ]]; then
@@ -82,7 +82,7 @@ _sbozyp_complete() {
             fi
             ;;
         build|bu)
-            local opts="--help -f -y -z"
+            local opts="--help -f -n -y -z"
             if [[ $cur == bu ]]; then
                 COMPREPLY=( "build" )
             elif [[ $cur == -* ]]; then

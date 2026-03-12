@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -45,7 +45,20 @@
       }
    },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.135",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Array-Iterator@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Iterator"
+      },
+      "homepage" : "https://metacpan.org/pod/Array::Iterator",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Array-Iterator.git",
+         "web" : "https://github.com/nigelhorne/Array-Iterator",
+         "x_repository" : "https://github.com/nigelhorne/Array-Iterator"
+      }
+   },
+   "version" : "0.136",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -81,3 +81,5 @@ dropbox
 
 \.gitattributes\b
 .circleci/
+
+.downstream.json

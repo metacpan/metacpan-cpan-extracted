@@ -1,0 +1,90 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Noise::CipherState - Symmetric encryption layer for the Noise Protocol
+
+=head1 SYNOPSIS
+
+    use Noise::CipherState;
+
+    my $state = Noise::CipherState->new( cipher => 'ChaChaPoly' );
+    $state->set_key($key);
+
+    my $ciphertext = $state->encrypt_with_ad( $ad, $plaintext );
+    my $original   = $state->decrypt_with_ad( $ad, $ciphertext );
+
+=head1 DESCRIPTION
+
+Noise::CipherState manages a symmetric key and a nonce. it provides authenticated encryption and decryption,
+automatically incrementing the nonce after each operation.
+
+=head1 METHODS
+
+=head2 C<new( %params )>
+
+Constructor.
+
+Expected parameter:
+
+=over
+
+=item C<cipher>: Either 'ChaChaPoly' (default) or 'AESGCM'.
+
+=back
+
+=head2 C<set_key( $key )>
+
+Sets the 32-byte symmetric key and resets the nonce to 0.
+
+=head2 C<set_nonce( $nonce )>
+
+Manually sets the 64bit integer nonce.
+
+=head2 C<encrypt_with_ad( $ad, $plaintext )>
+
+Encrypts C<$plaintext> with associated data C<$ad>. The nonce is incremented after encryption. Returns ciphertext +
+16-byte MAC tag.
+
+=head2 C<decrypt_with_ad($ad, $ciphertext)>
+
+Decrypts C<$ciphertext> (including tag) with associated data C<$ad>. The nonce is incremented after decryption. Dies on
+MAC mismatch.
+
+=head2 C<rekey( )>
+
+Updates the internal key C<k> using the C<Rekey> function defined in Section 11.3 of the Noise specification.
+
+=head2 C<k( )>
+
+Returns the 32 byte symmetric key currently stored in the CipherState. This key is used for all encryption and
+decryption operations. If no key is set (like at the beginning of a handshake), this returns C<undef>.
+
+=head2 C<n( )>
+
+Returns the current 64bit integer nonce. The nonce is a counter that ensures the same key is never used with the same
+initialization vector twice. In Noise, the nonce is incremented after every successful encryption or decryption and is
+reset to 0 whenever a new key is set via C<set_key( )>.
+
+=head2 C<has_key( )>
+
+Returns a boolean indicating whether a symmetric key is currently initialized. Encryption and decryption methods will
+pass through data unchanged if C<has_key( )> is false.
+
+=head1 SEE ALSO
+
+L<Noise::SymmetricState>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

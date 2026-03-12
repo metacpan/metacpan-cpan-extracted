@@ -62,16 +62,9 @@ my @testcases = (
         },
     },
     {
-        description => 'single violation in sort block',
+        description => '`return` in sort block is OK',
         filename    => 't/data/sort-single.pl',
-        expected    => array {
-            item object {
-                call description   => '"return" statement in "sort" block';
-                call line_number   => 8;
-                call column_number => 9;
-            };
-            end;
-        },
+        expected    => [],
     },
     {
         description => 'anonymous subroutine call is OK',

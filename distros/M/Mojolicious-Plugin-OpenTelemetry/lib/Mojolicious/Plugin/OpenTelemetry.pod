@@ -41,6 +41,17 @@ Mojolicious::Plugin::OpenTelemetry - Use OpenTelemetry in your Mojolicious app
         die 'oops';
     };
 
+    # Nested routes should also be captured
+    under '/private' => sub ($c) {
+        $c->render(status => 401, json => {});
+        return 0;
+    };
+
+    # Under '/private', so this is '/private/admin'
+    get '/admin' => sub( $c ) {
+        $c->render( status => 200, json => {} );
+    };
+
     app->start;
 
 =head1 DESCRIPTION
@@ -85,13 +96,16 @@ L<"OTEL_SERVICE_NAME"|OpenTelemetry::SDK/OTEL_SERVICE_NAME> environment
 variable, or from the app's L<moniker|Mojolicious/moniker>, will be used as
 the default name, but all other values will be left unspecified.
 
-The name of the generated span will be derived from the current request
-method, and the stringified L<endpoint|Mojolicious::Routes::Match/endpoint>
-of the matching route, as in C<GET /foo/:bar>, to reduce the span cardinality.
+Due to constraints in the L<Mojolicious> dispatch logic, the span will be created
+with a generic name made up of only the method of the request. This name will
+later be extended to include the stringified
+L<endpoint|Mojolicious::Routes::Match/endpoint> of the matching route, as in
+C<GET /foo/:bar>, to reduce the span cardinality. Note that this means that
+any L<sampling decisions|OpenTelemetry::SDK::Trace::Sampler> I<will only see this
+temporary generic name>.
 
-The span will be created with the following attributes, which will therefore
-be available for any
-L<sampling decision|OpenTelemetry::SDK::Trace::Sampler>.
+Samplers will also have access to the following attributes, which will be set
+at the time of span creation:
 
 =over
 
@@ -112,12 +126,6 @@ any placeholders. It will not include the query string.
 =item C<url.scheme>
 
 Set to the scheme of the request URL.
-
-=item C<http.route>
-
-Set to the L<stringified endpoint|Mojolicious::Routes::Match/endpoint> of
-the matching route. This will use placeholders, and will be the same value
-that was concatenated to the method in the span's name.
 
 =item C<client.address>
 
@@ -167,7 +175,7 @@ had no query parameters, this attribute will not be present.
 
 =back
 
-The attributes described below will be set in the span once the action is
+The attributes described below will be set in the span once the transaction is
 completed, but will not be available for the sampler.
 
 =over
@@ -186,6 +194,12 @@ If there were no errors, this attribute will not be present.
 Set to the L<status code of the response|Mojo::Message::Response/code>. If an
 error was encountered during the execution of the action, this will be set to
 C<500>.
+
+=item C<http.route>
+
+Set to the L<stringified endpoint|Mojolicious::Routes::Match/endpoint> of
+the matching route. This will use placeholders, and will be the same value
+that will be concatenated to the method in the span's name.
 
 =back
 
@@ -211,13 +225,10 @@ downstream.
 
 =item *
 
-Routes generated with L<under|Mojolicious::Guides::Tutorial/Under> are B<NOT>
-currently instrumented. The code in the generated route will in effect run
-before the span is created, when no valid span is present in the context
-(unless one has been added by you).
-
-That said, the final routes that execute (ie. the ones that are I<under> the
-generated one) will correctly execute in a context with a span.
+The span will be created with a temporary generic name that will only contain
+the method of the request. This name will later be extended to include the
+matching route, but this will happen I<after> any samplers have had a chance
+to make a sampling decision.
 
 =back
 

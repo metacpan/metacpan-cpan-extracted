@@ -1,6 +1,6 @@
 package Dancer2::ConfigUtils;
 # ABSTRACT: Config utility helpers
-$Dancer2::ConfigUtils::VERSION = '2.0.1';
+$Dancer2::ConfigUtils::VERSION = '2.1.0';
 use strict;
 use warnings;
 
@@ -52,7 +52,7 @@ Dancer2::ConfigUtils - Config utility helpers
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 AUTHOR
 
@@ -60,7 +60,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

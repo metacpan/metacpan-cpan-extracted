@@ -2,17 +2,16 @@
 
 use strict;
 use warnings;
-use File::Spec;
-use File::Basename qw/dirname/;
 use Ref::Util qw<is_arrayref>;
+use Path::Tiny ();
 
 BEGIN {
     # Disable route handlers so we can actually test route_exists
     # and route_doesnt_exist. Use config that disables default route handlers.
-    $ENV{DANCER_CONFDIR} = File::Spec->catdir(dirname(__FILE__), 'dancer-test');
+    $ENV{DANCER_CONFDIR} = Path::Tiny::path( __FILE__ )->parent->child('dancer-test')->stringify;
 }
 
-use Test::More tests => 50;
+use Test::More tests => 46;
 
 use Dancer2;
 use Dancer2::Test;
@@ -70,9 +69,6 @@ response_content_unlike $_ => qr/ought/ for @routes;
 response_status_is $_   => 200 for @routes;
 response_status_isnt $_ => 203 for @routes;
 
-response_headers_include $_ => [ Server => "Perl Dancer2 " . Dancer2->VERSION ]
-  for @routes;
-
 ## Check parameters get through ok
 get '/param' => sub { param('test') };
 my $param_response =
@@ -120,7 +116,7 @@ my $russian_test =
 $param_response =
   dancer_response( GET => '/multi',
     { params => { test => [ 'test/', $russian_test ] } } );
-is $param_response->content, 'test/' . encode( 'UTF-8', $russian_test ),
+is decode( 'UTF-8', $param_response->content ), 'test/' . $russian_test,
   'multi utf8 value properly merge';
 
 get '/headers' => sub {

@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISBN
 
+3.013 2026-03-11T18:28:36Z
+	* be more careful about guarding ->png in png_barcode (#6)
+
 3.012 2025-04-14T18:53:47Z
 	* require a newer version.pm for v5.10.1 tests
 

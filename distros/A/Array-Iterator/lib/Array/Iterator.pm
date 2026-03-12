@@ -9,11 +9,11 @@ Array::Iterator - A simple class for iterating over Perl arrays
 
 =head1 VERSION
 
-Version 0.135
+Version 0.136
 
 =cut
 
-our $VERSION = '0.135';
+our $VERSION = '0.136';
 
 =head1 SYNOPSIS
 
@@ -92,16 +92,18 @@ sub new {
 	my $_array;
 	if (scalar @array == 1) {
 		if (ref $array[0] eq 'ARRAY') {
-		    $_array = $array[0];
+			$_array = $array[0];
 		} elsif (ref $array[0] eq 'HASH') {
 		    die 'Incorrect type: HASH reference must contain the key __array__'
 		        unless exists $array[0]->{__array__};
 		    die 'Incorrect type: __array__ value must be an ARRAY reference'
 		        unless ref $array[0]->{__array__} eq 'ARRAY';
 		    $_array = $array[0]->{__array__};
+		} else {
+			# One element array
+			$_array = \@array;
 		}
-	}
-	else {
+	} else {
 		$_array = \@array;
 	}
 	my $iterator = {
@@ -111,20 +113,21 @@ sub new {
 		_iterated => 0,	# -1 when going backwards, +1 when going forwards
         };
 	bless($iterator, $class);
-	$iterator->_init(scalar(@{$_array}), $_array);
-	return $iterator;
+	return $iterator->_init(scalar(@{$_array}), $_array);
 }
 
 sub _init {
 	my ($self, $length, $iteratee) = @_;
-	(defined($length) && defined($iteratee))
-		|| die 'Insufficient Arguments: you must provide an length and an iteratee';
+
+	(defined($length) && defined($iteratee)) || die 'Insufficient Arguments: you must provide an length and an iteratee';
 	$self->{_current_index} = 0;
 	$self->{_length} = $length;
 	# $self->{_iteratee} = $iteratee;
 
 	# Store a private copy to prevent modifications
 	$self->{_iteratee} = [@{$iteratee}];
+
+	return $self;
 }
 
 =head2 _current_index
@@ -188,8 +191,9 @@ Access to the _iterated status, for subclasses
 =cut
 
 sub iterated {
-    my ($self) = @_;
-    return $self->{_iterated};
+	my $self = shift;
+
+	return $self->{_iterated};
 }
 
 =head2 has_next([$n])
@@ -276,10 +280,11 @@ idiom instead.
 =cut
 
 sub get_next {
-    my ($self) = @_;
-    $self->{_iterated} = 1;
-    return undef unless ($self->{_current_index} < $self->{_length}); ## no critic: Subroutines::ProhibitExplicitReturnUndef
-    return $self->_getItem($self->{_iteratee}, $self->{_current_index}++);
+	my $self = shift;
+
+	$self->{_iterated} = 1;
+	return undef unless ($self->{_current_index} < $self->{_length}); ## no critic: Subroutines::ProhibitExplicitReturnUndef
+	return $self->_getItem($self->{_iteratee}, $self->{_current_index}++);
 }
 
 =head2 getNext
@@ -335,7 +340,7 @@ last value dispensed by C<next> or C<get_next>.
 =cut
 
 sub current {
-	my ($self) = @_;
+	my $self = shift;
 	return $self->_getItem($self->{_iteratee}, $self->currentIndex());
 }
 
@@ -348,7 +353,7 @@ of the last value dispensed by C<next> or C<get_next>.
 =cut
 
 sub current_index {
-	my ($self) = @_;
+	my $self = shift;
 	return ($self->{_current_index} != 0) ? $self->{_current_index} - 1 : 0;
 }
 
@@ -374,7 +379,8 @@ sub reset
 
 =head2 get_length
 
-This is a basic accessor for getting the length of the array being iterated over.
+This is a basic accessor for getting the length of the array being iterated over,
+returns the number of elements in the array.
 
 =cut
 
@@ -502,6 +508,12 @@ the more advanced features of this module.
 through the hash-ref constructor parameter.
 
 =back
+
+=head1 MAINTAINER
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+2025-2026
 
 =head1 ORIGINAL AUTHOR
 

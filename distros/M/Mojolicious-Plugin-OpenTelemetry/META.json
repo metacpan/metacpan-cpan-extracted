@@ -4,7 +4,7 @@
       "Jos\u00e9 Joaqu\u00edn Atria <jjatria@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -65,7 +65,7 @@
    "provides" : {
       "Mojolicious::Plugin::OpenTelemetry" : {
          "file" : "lib/Mojolicious/Plugin/OpenTelemetry.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -79,13 +79,14 @@
          "web" : "https://github.com/jjatria/mojolicious-plugin-opentelemetry"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_contributors" : [
+      "Doug Bell <doug@preaction.me>",
       "K. Andrew Parker <kparker@citytech.cuny.edu>",
       "Lars Thegler <lars@thegler.dk>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

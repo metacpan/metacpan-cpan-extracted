@@ -1,6 +1,6 @@
 package Dancer2::Core::Role::Serializer;
 # ABSTRACT: Role for Serializer engines
-$Dancer2::Core::Role::Serializer::VERSION = '2.0.1';
+$Dancer2::Core::Role::Serializer::VERSION = '2.1.0';
 use Moo::Role;
 use Dancer2::Core::Types;
 use Scalar::Util 'blessed';
@@ -49,6 +49,9 @@ around serialize => sub {
         1;
     } or do {
         my $error = $@ || 'Zombie Error';
+        if ( blessed($self) && $self->config->{strict_utf8} ) {
+            die $error;
+        }
         blessed $self
             and $self->log_cb->( core => "Failed to serialize content: $error" );
     };
@@ -88,7 +91,7 @@ Dancer2::Core::Role::Serializer - Role for Serializer engines
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
 
@@ -157,7 +160,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

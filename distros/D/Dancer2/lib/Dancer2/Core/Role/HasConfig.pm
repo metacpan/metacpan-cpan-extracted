@@ -1,9 +1,8 @@
 # ABSTRACT: Role that represents the config of Dancer2 App
 package Dancer2::Core::Role::HasConfig;
-$Dancer2::Core::Role::HasConfig::VERSION = '2.0.1';
+$Dancer2::Core::Role::HasConfig::VERSION = '2.1.0';
 use Moo::Role;
 
-use File::Spec;
 use Config::Any;
 use Hash::Merge::Simple;
 use Carp 'croak';
@@ -12,13 +11,12 @@ use Module::Runtime qw{ require_module use_module };
 use Dancer2::Core::Factory;
 use Dancer2::Core;
 use Dancer2::Core::Types;
-use Dancer2::FileUtils 'path';
 use Dancer2::ConfigUtils 'normalize_config_entry';
 
 has config => (
     is      => 'ro',
     isa     => HashRef,
-    lazy    => 0,
+    lazy    => 1,
     builder => '_build_config',
 );
 
@@ -121,7 +119,7 @@ Dancer2::Core::Role::HasConfig - Role that represents the config of Dancer2 App
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
 
@@ -163,7 +161,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

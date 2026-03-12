@@ -1,5 +1,8 @@
 Revision history for Perl module Data::Alias
 
+1.30  2026-03-11  XMATH
+    - Use isGV_with_GP_on when available. (RT 173582)
+
 1.29  2026-02-02  XMATH
     - Fix compatibility with perl 5.43.8  (contributed by mauke)
 

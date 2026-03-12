@@ -1,0 +1,7 @@
+Revision history for Perl extension Test::ValkeyServer
+
+0.01 2026-03-11T18:23:39Z
+    - Fork from Test::RedisServer 0.24 for Valkey compatibility
+    - Rename package to Test::ValkeyServer
+    - Replace redis-server with valkey-server
+    - Add single-node cluster mode support (cluster => 1, requires Valkey 8.1+)

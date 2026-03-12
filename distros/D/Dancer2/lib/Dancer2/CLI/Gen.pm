@@ -1,6 +1,6 @@
 package Dancer2::CLI::Gen;
 # ABSTRACT: Create new Dancer2 application
-$Dancer2::CLI::Gen::VERSION = '2.0.1';
+$Dancer2::CLI::Gen::VERSION = '2.1.0';
 use Moo;
 use URI;
 use HTTP::Tiny;
@@ -179,9 +179,8 @@ sub run {
     my $vars = {
         appname          => $app_name,
         appfile          => $app_file->stringify,
-        apppath          => $app_path,
-        appdir           => File::Spec->rel2abs( $app_path ),
-        apppath          => $app_path,
+        apppath          => $app_path->stringify,
+        appdir           => $app_path->absolute->stringify,
         perl_interpreter => $self->parent_command->_get_perl_interpreter,
         cleanfiles       => $self->parent_command->_get_dashed_name( $app_name ),
         dancer_version   => $self->parent_command->_dancer2_version,
@@ -225,7 +224,8 @@ commands:
         my $gitignore = path( $self->parent_command->_dist_dir, '.gitignore' );
         path( $gitignore )->copy( $app_path );
 
-        chdir File::Spec->rel2abs( $app_path ) or die "Can't cd to $app_path: $!";
+        chdir $app_path->absolute->stringify
+          or die "Can't cd to $app_path: $!";
         if( _run_shell_cmd( 'git', 'init') != 0 or
             _run_shell_cmd( 'git', 'add', '.') != 0 or
             _run_shell_cmd( 'git', 'commit', "-m 'Initial commit of $app_name by Dancer2'" ) != 0 ) {
@@ -469,7 +469,7 @@ Dancer2::CLI::Gen - Create new Dancer2 application
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 AUTHOR
 
@@ -477,7 +477,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

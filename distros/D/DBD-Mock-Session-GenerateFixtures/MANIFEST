@@ -27,6 +27,7 @@ t/16_test_support_for_rose_db.t
 t/17_test_rose_db_with_mysql.t
 t/18_test_transactions_with_mysql.t
 t/19_use_test_data__for_transactions_with_mysql.t
+t/20_mock_pl_sql_proc.t
 t/DB.pm
 t/MyDatabase.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

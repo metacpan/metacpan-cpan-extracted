@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/Array/Iterator.pm
 lib/Array/Iterator/BiDirectional.pm
 lib/Array/Iterator/Circular.pm

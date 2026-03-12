@@ -3,8 +3,8 @@ NAME
     perform actions on them
 
 VERSION
-    This document describes version 0.004 of Git::Grouper (from Perl
-    distribution Git-Grouper), released on 2025-11-11.
+    This document describes version 0.005 of Git::Grouper (from Perl
+    distribution Git-Grouper), released on 2025-11-12.
 
 SYNOPSIS
     See the included script git-grouper.
@@ -282,12 +282,12 @@ FUNCTIONS
 
     Return value: (any)
 
-  get_repo_group
+  ls_all_groups
     Usage:
 
-     get_repo_group(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     ls_all_groups(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Determine the group(s) of specified repos.
+    List all defined groups.
 
     This function is not exported.
 
@@ -301,7 +301,7 @@ FUNCTIONS
 
         (No description)
 
-    *   repo => *array[str]*
+    *   detail => *bool*
 
         (No description)
 
@@ -319,12 +319,12 @@ FUNCTIONS
 
     Return value: (any)
 
-  ls_groups
+  ls_all_remotes
     Usage:
 
-     ls_groups(%args) -> [$status_code, $reason, $payload, \%result_meta]
+     ls_all_remotes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    List defined groups.
+    List all defined remotes.
 
     This function is not exported.
 
@@ -339,6 +339,95 @@ FUNCTIONS
         (No description)
 
     *   detail => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  ls_repo_groups
+    Usage:
+
+     ls_repo_groups(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List the group(s) of specified repos.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   config => *hash*
+
+        (No description)
+
+    *   config_file => *filename*
+
+        (No description)
+
+    *   groups_array => *str* (default: "never")
+
+        How to return groups.
+
+        When set to 'never', will always return a string where multiple
+        groups are written as comma-separated list ('', 'group1',
+        'group1,group2'). When set to 'auto', will return either an empty
+        string when there is no group, or string for a single group, or
+        array for multiple groups. When set to 'always', will always return
+        an array for the groups result.
+
+    *   repo => *array[str]*
+
+        (No description)
+
+    *   result_array => *str* (default: "auto")
+
+        How to return result.
+
+        If set to 'auto', then when there is only one repo, will not return
+        an array but the groups directly. When set to 'always', will always
+        return an array of records.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  ls_repo_remotes
+    Usage:
+
+     ls_repo_remotes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List remotes of specified repos based on group configuration.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   repo => *array[str]*
+
+        (No description)
+
+    *   result_array => *str*
 
         (No description)
 

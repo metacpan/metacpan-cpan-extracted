@@ -12,9 +12,9 @@ use Proc::ChildError qw(explain_child_error);
 use Perinci::Object qw(envresmulti);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-11'; # DATE
+our $DATE = '2025-11-12'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(git_grouper_group);
 
@@ -202,9 +202,9 @@ sub _parse_group_spec {
     [200, "OK", $group_spec];
 }
 
-$SPEC{ls_groups} = {
+$SPEC{ls_all_groups} = {
     v => 1.1,
-    summary => 'List defined groups',
+    summary => 'List all defined groups',
     args => {
         %argspecs_common,
         %argspecopt_detail,
@@ -213,7 +213,7 @@ $SPEC{ls_groups} = {
         choose_one => [qw/config_file config/],
     },
 };
-sub ls_groups {
+sub ls_all_groups {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
 
@@ -225,20 +225,77 @@ sub ls_groups {
     [200, "OK", \@res];
 }
 
-$SPEC{get_repo_group} = {
+$SPEC{ls_all_remotes} = {
     v => 1.1,
-    summary => 'Determine the group(s) of specified repos',
+    summary => 'List all defined remotes',
+    args => {
+        %argspecs_common,
+        %argspecopt_detail,
+    },
+    args_rels => {
+        choose_one => [qw/config_file config/],
+    },
+};
+sub ls_all_remotes {
+    my %args = @_;
+    my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
+
+    my @res;
+    for my $remotename (sort keys %{ $config->{remotes} }) {
+        my $remote = $config->{remotes}{$remotename};
+        push @res, {
+            name => $remotename,
+            summary => $remote->{summary},
+            url => $remote->{url},
+            url_template => $remote->{url_template},
+        };
+    }
+    @res = map { $_->{name} } @res unless $args{detail};
+    [200, "OK", \@res];
+}
+
+$SPEC{ls_repo_groups} = {
+    v => 1.1,
+    summary => 'List the group(s) of specified repos',
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        result_array => {
+            summary => 'How to return result',
+            schema => ['str*', in=>['auto','always']],
+            default => 'auto',
+            description => <<'MARKDOWN',
+
+If set to 'auto', then when there is only one repo, will not return an array but
+the groups directly. When set to 'always', will always return an array of
+records.
+
+MARKDOWN
+        },
+        groups_array => {
+            summary => 'How to return groups',
+            schema => ['str*', in=>['never', 'auto','always']],
+            default => 'never',
+            description => <<'MARKDOWN',
+
+When set to 'never', will always return a string where multiple groups are
+written as comma-separated list ('', 'group1', 'group1,group2'). When set to
+'auto', will return either an empty string when there is no group, or string for
+a single group, or array for multiple groups. When set to 'always', will always
+return an array for the groups result.
+
+MARKDOWN
+        },
     },
 };
-sub get_repo_group {
+sub ls_repo_groups {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
     my $repos;  { my $res = _get_repos(%args); return $res unless $res->[0] == 200; $repos = $res->[2] }
+    my $result_array = $args{result_array} // 'auto';
+    my $groups_array = $args{groups_array} // 'never';
 
-    my @res;
+    my $payload = [];
   REPO:
     for my $repo0 (@$repos) {
         local $CWD = $repo0;
@@ -328,22 +385,29 @@ sub get_repo_group {
             }
         } # FIND_GROUP
 
-        push @res, $res;
+        push @$payload, $res;
     } # REPO
     #$envres->as_struct;
 
-    for (@res) {
-        if (@{ $_->{groups} } == 0) {
-            $_->{groups} = "";
-        } elsif (@{ $_->{groups} } == 1) {
-            $_->{groups} = $_->{groups}[0];
+    for (@$payload) {
+        if ($groups_array eq 'auto') {
+            if (@{ $_->{groups} } == 0) {
+                $_->{groups} = "";
+            } elsif (@{ $_->{groups} } == 1) {
+                $_->{groups} = $_->{groups}[0];
+            }
+        } elsif ($groups_array eq 'never') {
+            $_->{groups} = join ",", @{ $_->{groups} };
         }
     }
-    unless (@res > 1 || $args{_always_array}) {
-        @res = map { $_->{groups} } @res;
+
+    if ($result_array eq 'auto') {
+        unless (@$payload > 1) {
+            $payload = $payload->[0]{groups};
+        }
     }
 
-    [200, "OK", \@res];
+    [200, "OK", $payload];
 }
 
 $SPEC{filter_repo_has_group} = {
@@ -359,29 +423,27 @@ sub filter_repo_has_group {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
     my $group_spec; { my $res = _parse_group_spec($args{group_spec}); return $res unless $res->[0] == 200; $group_spec = $res->[2] }
-    my $rows; { my $res = get_repo_group(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my @repos;
   REPO:
     for my $row (@$rows) {
-        my @repo_groups = ref($row->{groups}) eq 'ARRAY' ?
-            @{ $row->{groups} } : $row->{groups} eq '' ? () : ($row->{groups});
         #use DD; dd \@repo_groups;
-        #log_trace "Filtering repo %s (groups=%s) ...", $row->{repo0}, \@repo_groups;
+        #log_trace "Filtering repo %s (groups=%s) ...", $row->{repo0}, \@{ $row->{groups} };
 
         my $match;
       GROUP:
         if ($group_spec->{op} eq 'and') {
             for my $group (@{ $group_spec->{groups} }) {
                 if ($group_spec->{op} eq 'and') {
-                    next REPO unless grep { $group eq $_ } @repo_groups;
+                    next REPO unless grep { $group eq $_ } @{ $row->{groups} };
                 }
             }
             $match++;
         } else {
             # or
             for my $group (@{ $group_spec->{groups} }) {
-                do { $match++; last } if grep { $group eq $_ } @repo_groups;
+                do { $match++; last } if grep { $group eq $_ } @{ $row->{groups} };
             }
         }
         next unless $match;
@@ -404,28 +466,26 @@ sub filter_repo_lacks_group {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
     my $group_spec; { my $res = _parse_group_spec($args{group_spec}); return $res unless $res->[0] == 200; $group_spec = $res->[2] }
-    my $rows; { my $res = get_repo_group(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my @repos;
   REPO:
     for my $row (@$rows) {
-        my @repo_groups = ref($row->{groups}) eq 'ARRAY' ?
-            @{ $row->{groups} } : $row->{groups} eq '' ? () : ($row->{groups});
-        log_trace "Filtering repo %s (groups=%s) ...", $row->{repo0}, \@repo_groups;
+        log_trace "Filtering repo %s (groups=%s) ...", $row->{repo0}, $row->{groups};
 
         my $match;
       GROUP:
         if ($group_spec->{op} eq 'and') {
             for my $group (@{ $group_spec->{groups} }) {
                 if ($group_spec->{op} eq 'and') {
-                    next REPO if grep { $group eq $_ } @repo_groups;
+                    next REPO if grep { $group eq $_ } @{ $row->{groups} };
                 }
             }
             $match++;
         } else {
             # or
             for my $group (@{ $group_spec->{groups} }) {
-                do { $match++; last } unless grep { $group eq $_ } @repo_groups;
+                do { $match++; last } unless grep { $group eq $_ } @{ $row->{groups} };
             }
         }
         next unless $match;
@@ -446,12 +506,12 @@ $SPEC{filter_repo_orphan} = {
 sub filter_repo_orphan {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
-    my $rows; { my $res = get_repo_group(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my @repos;
   REPO:
     for my $row (@$rows) {
-        next unless $row->{groups} eq '';
+        next unless @{ $row->{groups} } == 0;
         push @repos, $row->{repo0};
     }
 
@@ -469,12 +529,12 @@ $SPEC{filter_repo_not_orphan} = {
 sub filter_repo_not_orphan {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
-    my $rows; { my $res = get_repo_group(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my @repos;
   REPO:
     for my $row (@$rows) {
-        next if $row->{groups} eq '';
+        next if @{ $row->{groups} } == 0;
         push @repos, $row->{repo0};
     }
 
@@ -492,12 +552,12 @@ $SPEC{filter_repo_multiple_group} = {
 sub filter_repo_multiple_group {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
-    my $rows; { my $res = get_repo_group(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my @repos;
   REPO:
     for my $row (@$rows) {
-        next unless ref($row->{groups}) eq 'ARRAY';
+        next unless @{ $row->{groups} } > 1;
         push @repos, $row->{repo0};
     }
 
@@ -515,13 +575,12 @@ $SPEC{filter_repo_single_group} = {
 sub filter_repo_single_group {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
-    my $rows; { my $res = get_repo_group(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my @repos;
   REPO:
     for my $row (@$rows) {
-        next if ref($row->{groups}) eq 'ARRAY';
-        next if $row->{groups} eq '';
+        next unless @{ $row->{groups} } == 1;
         push @repos, $row->{repo0};
     }
 
@@ -546,9 +605,7 @@ sub _configure_repo_single {
 
     local $CWD = $row->{repo0};
 
-    my @groups = ref($row->{groups}) eq 'ARRAY' ? @{$row->{groups}} :
-        $row->{groups} eq '' ? () : ($row->{groups});
-    for my $groupname (@groups) {
+    for my $groupname (@{ $row->{groups} }) {
         my $group = $config->{groups_by_name}{$groupname};
 
       SET_USERNAME: {
@@ -625,6 +682,47 @@ sub _configure_repo_single {
     [200];
 }
 
+$SPEC{ls_repo_remotes} = {
+    v => 1.1,
+    summary => "List remotes of specified repos based on group configuration",
+    args => {
+        %argspec0plus_repo,
+        result_array => {
+            schema => ['str*', in=>['auto', 'always']],
+        },
+        # TODO: detail
+    },
+};
+sub ls_repo_remotes {
+    my %args = @_;
+    my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $result_array = $args{result_array} // 'auto';
+
+    my $payload = [];
+  REPO:
+    for my $row (@$rows) {
+        my $rowres = {repo0 => $row->{repo0}, repo => $row->{repo}, remotes => []};
+        for my $groupname (@{ $row->{groups} }) {
+            my $group = $config->{groups_by_name}{$groupname};
+            next unless $group->{remotes};
+            for my $remote (@{ $group->{remotes} }) {
+                next if grep { $_ eq $remote } @{ $rowres->{remotes} };
+                push @{ $rowres->{remotes} }, $remote;
+            }
+        }
+        push @$payload, $rowres;
+    }
+
+    if ($result_array eq 'auto') {
+        unless (@$payload > 1) {
+            $payload = $payload->[0]{remotes};
+        }
+    }
+
+    [200, "OK", $payload];
+}
+
 $SPEC{configure_repo} = {
     v => 1.1,
     summary => "Configure repo based on group's attributes",
@@ -640,7 +738,7 @@ $SPEC{configure_repo} = {
 sub configure_repo {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
-    my $rows; { my $res = get_repo_group(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my $envres = envresmulti();
   REPO:
@@ -671,7 +769,7 @@ Git::Grouper - Categorize git repositories into one/more groups and perform acti
 
 =head1 VERSION
 
-This document describes version 0.004 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-11.
+This document describes version 0.005 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-12.
 
 =head1 SYNOPSIS
 
@@ -988,13 +1086,13 @@ Return value:  (any)
 
 
 
-=head2 get_repo_group
+=head2 ls_all_groups
 
 Usage:
 
- get_repo_group(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ ls_all_groups(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Determine the group(s) of specified repos.
+List all defined groups.
 
 This function is not exported.
 
@@ -1010,7 +1108,7 @@ Arguments ('*' denotes required arguments):
 
 (No description)
 
-=item * B<repo> => I<array[str]>
+=item * B<detail> => I<bool>
 
 (No description)
 
@@ -1030,13 +1128,13 @@ Return value:  (any)
 
 
 
-=head2 ls_groups
+=head2 ls_all_remotes
 
 Usage:
 
- ls_groups(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ ls_all_remotes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-List defined groups.
+List all defined remotes.
 
 This function is not exported.
 
@@ -1053,6 +1151,104 @@ Arguments ('*' denotes required arguments):
 (No description)
 
 =item * B<detail> => I<bool>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 ls_repo_groups
+
+Usage:
+
+ ls_repo_groups(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+List the group(s) of specified repos.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<config> => I<hash>
+
+(No description)
+
+=item * B<config_file> => I<filename>
+
+(No description)
+
+=item * B<groups_array> => I<str> (default: "never")
+
+How to return groups.
+
+When set to 'never', will always return a string where multiple groups are
+written as comma-separated list ('', 'group1', 'group1,group2'). When set to
+'auto', will return either an empty string when there is no group, or string for
+a single group, or array for multiple groups. When set to 'always', will always
+return an array for the groups result.
+
+=item * B<repo> => I<array[str]>
+
+(No description)
+
+=item * B<result_array> => I<str> (default: "auto")
+
+How to return result.
+
+If set to 'auto', then when there is only one repo, will not return an array but
+the groups directly. When set to 'always', will always return an array of
+records.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 ls_repo_remotes
+
+Usage:
+
+ ls_repo_remotes(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+List remotes of specified repos based on group configuration.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<repo> => I<array[str]>
+
+(No description)
+
+=item * B<result_array> => I<str>
 
 (No description)
 

@@ -14,7 +14,7 @@ Dancer2::Manual::Extending - A guide to extending Dancer2 via engines and plugin
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 Name
 
@@ -38,6 +38,21 @@ In Dancer2, engines are used to handle various aspects of your
 application, such as templates, sessions, serializers, and loggers. Each
 engine follows a standard interface, making it easy to plug in new
 implementations.
+
+Engines can live in the Dancer2 namespace:
+
+    set serializer => 'JSON';
+    set template => 'Mason';
+
+(these resolve to L<Dancer2::Serializer::JSON> and L<Dancer2::Template::Mason>
+respectively)
+
+Or you can provide the fully qualified namespace using the C<+> indicator:
+
+    set serializer => `+My::Awesome::Serializer`;
+    set template => `+My::Template::DWIM`;
+
+The latter is similar to how L<Plack> handles this.
 
 =head2 Writing a Template Engine
 
@@ -438,7 +453,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

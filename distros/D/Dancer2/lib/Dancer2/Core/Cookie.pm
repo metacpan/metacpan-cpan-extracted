@@ -1,6 +1,6 @@
 package Dancer2::Core::Cookie;
 # ABSTRACT: A cookie representing class
-$Dancer2::Core::Cookie::VERSION = '2.0.1';
+$Dancer2::Core::Cookie::VERSION = '2.1.0';
 use Moo;
 use URI::Escape;
 use Dancer2::Core::Types;
@@ -86,6 +86,11 @@ around value => sub {
     return wantarray ? @$array : $array->[0];
 };
 
+sub values {
+    my $self  = shift;
+    return @{ $self->{'value'} || [] };
+}
+
 # this is only for overloading; need a real sub to refer to, as the Moose
 # attribute accessor won't be available at that point.
 sub _get_value { shift->value }
@@ -152,7 +157,7 @@ Dancer2::Core::Cookie - A cookie representing class
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 
@@ -239,13 +244,18 @@ You can set any attribute described in the I<ATTRIBUTES> section above.
 
 Creates a proper HTTP cookie header from the content.
 
+=head2 values
+
+Returns all values associated with this cookie, always a list. (So in scalar
+context, you will get the count.)
+
 =head1 AUTHOR
 
 Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,11 +1,11 @@
 package Dancer2::Core::Role::HasLocation;
 # ABSTRACT: Role for application location "guessing"
-$Dancer2::Core::Role::HasLocation::VERSION = '2.0.1';
+$Dancer2::Core::Role::HasLocation::VERSION = '2.1.0';
+use Carp ();
 use Moo::Role;
-use Dancer2::Core::Types;
-use Dancer2::FileUtils;
-use File::Spec;
 use Sub::Quote 'quote_sub';
+use Path::Tiny ();
+use Dancer2::Core::Types;
 
 # the path to the caller script/app
 # Note: to remove any ambiguity between the accessor for the
@@ -16,9 +16,9 @@ has caller => (
     is      => 'ro',
     isa     => Str,
     default => quote_sub( q{
+        require Path::Tiny;
         my ( $caller, $script ) = CORE::caller;
-        $script = File::Spec->abs2rel( $script ) if File::Spec->file_name_is_absolute( $script );
-        $script;
+        Path::Tiny::path($script)->relative->stringify;
     } ),
 );
 
@@ -29,13 +29,28 @@ has location => (
     builder => '_build_location',
 );
 
+has _location_path => (
+    is       => 'ro',
+    lazy     => 1,
+    builder  => '_build_location_path',
+    init_arg => undef,
+);
+
+sub _build_location_path {
+    my $self = shift;
+    return Path::Tiny::path( $self->location );
+}
+
 # FIXME: i hate you most of all -- Sawyer X
 sub _build_location {
     my $self   = shift;
     my $script = $self->caller;
 
     # default to the dir that contains the script...
-    my $location = Dancer2::FileUtils::dirname($script);
+    my $location = Path::Tiny::path($script)->parent;
+
+    $location->is_dir
+        or Carp::croak("Caller $script is not an existing file");
 
     #we try to find bin and lib
     my $subdir       = $location;
@@ -45,35 +60,31 @@ sub _build_location {
     for ( 1 .. 10 ) {
 
         #try to find libdir and bindir to determine the root of dancer app
-        my $libdir = Dancer2::FileUtils::path( $subdir, 'lib' );
-        my $bindir = Dancer2::FileUtils::path( $subdir, 'bin' );
+        my $libdir = $subdir->child('lib');
+        my $bindir = $subdir->child('bin');
 
         #try to find .dancer_app file to determine the root of dancer app
-        my $dancerdir = Dancer2::FileUtils::path( $subdir, '.dancer' );
+        my $dancerdir = $subdir->child('.dancer');
 
         # if one of them is found, keep that; but skip ./blib since both lib and bin exist
         # under it, but views and public do not.
         if (
-            ( $subdir !~ m![\\/]blib[\\/]?$! && -d $libdir && -d $bindir ) ||
-            ( -f $dancerdir )
+            ( $subdir !~ m![\\/]blib[\\/]?$! && $libdir->is_dir && $bindir->is_dir ) ||
+            ( $dancerdir->is_file )
         ) {
             $subdir_found = 1;
             last;
         }
 
-        $subdir = Dancer2::FileUtils::path( $subdir, '..' ) || '.';
-        last if File::Spec->rel2abs($subdir) eq File::Spec->rootdir;
+        $subdir = $subdir->parent;
 
+        last if $subdir->realpath->stringify eq Path::Tiny->rootdir->stringify;
     }
 
     my $path = $subdir_found ? $subdir : $location;
 
-    # return if absolute
-    File::Spec->file_name_is_absolute($path)
-        and return $path;
-
     # convert relative to absolute
-    return File::Spec->rel2abs($path);
+    return $path->realpath->stringify;
 }
 
 1;
@@ -90,7 +101,7 @@ Dancer2::Core::Role::HasLocation - Role for application location "guessing"
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 AUTHOR
 
@@ -98,7 +109,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

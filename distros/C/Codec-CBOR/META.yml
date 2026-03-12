@@ -6,19 +6,9 @@ author:
 build_requires:
   Module::Build::Tiny: '0'
   Test2::V0: '0'
+  perl: v5.40.0
 configure_requires:
-  CPAN::Meta: '0'
-  Exporter: '5.57'
-  ExtUtils::Helpers: '0.028'
-  ExtUtils::Install: '0'
-  ExtUtils::InstallPaths: '0.002'
-  File::Basename: '0'
-  File::Find: '0'
-  File::Path: '0'
-  File::Spec::Functions: '0'
-  Getopt::Long: '2.36'
-  JSON::PP: '2'
-  Path::Tiny: '0'
+  Module::Build::Tiny: '0'
   perl: v5.40.0
 dynamic_config: 1
 generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
@@ -36,13 +26,13 @@ no_index:
 provides:
   Codec::CBOR:
     file: lib/Codec/CBOR.pm
-    version: v0.0.1
+    version: v1.0.1
 resources:
   bugtracker: https://github.com/sanko/Codec-CBOR.pm/issues
   homepage: https://github.com/sanko/Codec-CBOR.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/Codec-CBOR.pm.git
-version: v0.0.1
+version: v1.0.1
 x_ignore:
   - .tidyallrc
   - .gitignore

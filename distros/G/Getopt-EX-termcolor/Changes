@@ -1,5 +1,10 @@
 Revision history for Getopt-EX extension Getopt-EX-termcolor
 
+1.09 2026-03-12T02:24:15Z
+
+    - Make Getopt::EX an optional dependency (not required for luminance/bgcolor)
+    - Update CI: actions/checkout v4, add Perl 5.36/5.40 to test matrix
+
 1.08 2022-03-18T02:59:05Z
 
     - Improve XTerm terminal interface.

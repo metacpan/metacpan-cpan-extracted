@@ -1,5 +1,9 @@
 Revision history for Test-Routine
 
+0.032     2026-03-11 22:13:59-04:00 America/New_York
+        - add Test::Routine::Runner::NoSubtest, to run all the tests on an
+          instance without putting them into a subtest
+
 0.031     2023-04-11 21:37:45-04:00 America/New_York
         - The run_test method now returns the pass/fail of the subtest
           represented by a test method.  Since run_test is often around-ed, you

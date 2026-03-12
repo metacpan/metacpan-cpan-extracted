@@ -1,3 +1,42 @@
+## Overview
+
+This project is a perl XS module for the purpose of keeping "secret" data from getting copied
+unintentionally or lingering in memory after it is no longer needed, and preventing those
+secrets from being accidentally dumped into logs or debug output.
+
+## Components
+
+### Crypt::SecretBuffer
+
+This is a blessed object which has a secret_buffer struct attached via perl MAGIC.  It has lots
+of convenient methods for getting data into and out of the buffer, and searching / comparing the
+bytes in the buffer.
+
+### Crypt::SecretBuffer::Span
+
+A Crypt::SecretBuffer:Span object holds a reference to a SecretBuffer along with `pos` and `lim`
+markers and an optional `encoding` for advanced character parsing or transcoding.  It has lots
+of methods for parsing spans of a buffer.
+
+### Crypt::SecretBuffer::AsyncResult
+
+Perhaps overkill, but SecretBuffer has the ability to "pump" a pipe from a background thread.
+This object represents the state of that operation so that the user can wait for it to complete.
+
+### Crypt::SecretBuffer::ConsoleState
+
+This abstracts the ability to turn off terminal echo and enable raw key input handling between
+the POSIX and Win32 APIs.
+
+### Crypt::SecretBuffer::INI
+
+Secret files aren't much use if they can't be parsed, so I wrote Crypt::SecretBuffer::INI as an
+example of how to parse an ini file using the methods of Span.
+
+### Crypt::SecretBuffer::PEM
+
+OpenSSL PEM is a common format for secrets, so I wrote a parser for that, too.
+
 ## CODE STYLE
 
 Please use a 3-space indent throughout.
@@ -75,24 +114,14 @@ is( $actual, $expected )
 You can choose whether to leave those diagnostics in the end result or not based on whether you
 expect them to be useful in the future.
 
-TESTING
--------
+## TESTING
 
-This is an XS module, so it needs to be built before tests can be run.  There is a helper
-script `./dzil-prove` which compiles the module and then runs `prove`.  You can also pass a
-test name to that like `./dzil-prove t/10-substr.t`.
-
-This process is using `dzil build` to create a directory `./Crypt-SecretBuffer-$VERSION` and
-then `perl Makefile.PL` inside that directory to build several source files including
-`SecretBuffer.c`.  It then runs `make` to compile, and then `prove -lvb` to set up the perl
-module path to include the generated .so file.
-
-You can inspect those generated files, but remember that any changes need to be made to the
-files in the root of the project, then regenerate the generated files per the recipe above.
+This is an XS module, so it needs to be built before tests can be run.  While it is normally
+built with Dist::Zilla, the generated Makefile.PL has been added to the repo so that you can
+run `perl Makefile.PL` and `make` and `prove -lvb` without needing all the dependencies of dzil.
 
 Any common functions useful in more than one test can be added to t/lib/Test2AndUtils.pm
 
 Perl doesn't enable C warnings by default.  If you want to look for C compiler warnings, you
-need to `dzil build` to get the `./Crypt-SecretBuffer-(VERSION)` directory, then enter that
-directory and `perl Makefile.PL`, then edit the `Makefile` and add `-Wall` to the `CCFLAGS`
-variable, then compile and observe the warnings.
+need to edit the `Makefile` and add `-Wall` to the `CCFLAGS` variable, then compile and observe
+the warnings.

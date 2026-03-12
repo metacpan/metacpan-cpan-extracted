@@ -61,7 +61,6 @@ t/external/add_validator_packages.t
 t/external/new-external_packages.t
 t/field_labels.t
 t/files/_file_magic_type.t
-t/files/_get_file_extensions_by_mime_type.t
 t/files/files_to_test/excel
 t/files/files_to_test/excel.txt
 t/files/files_to_test/excel.xls

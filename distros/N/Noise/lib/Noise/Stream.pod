@@ -1,0 +1,92 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Noise::Stream - Encrypted transport stream using the Noise Protocol
+
+=head1 SYNOPSIS
+
+    use Noise::Stream;
+
+    my $secure_stream = Noise::Stream->new(
+        socket => $socket,
+        c_send => $cipher_state_1,
+        c_recv => $cipher_state_2
+    );
+
+    # Write an encrypted frame
+    $secure_stream->write_bin( 'Secret data' );
+
+    # Rekey for long-lived streams
+    $secure_stream->rekey_send( );
+
+=head1 DESCRIPTION
+
+Noise::Stream provides a wrapper around a raw socket or filehandle that handles the framing and encryption/decryption
+of data following a successful Noise handshake.
+
+It uses a 2-byte big-endian length prefix for frames and increments nonces automatically via the underlying
+L<Noise::CipherState> objects.
+
+=head1 METHODS
+
+=head2 new(%params)
+
+Constructor.
+
+Expected parameters:
+
+=over
+
+=item C<socket>: The underlying raw handle.
+
+=item C<c_send>: A L<Noise::CipherState> object for encryption.
+
+=item C<c_recv>: A L<Noise::CipherState> object for decryption.
+
+=item C<initial_buffer>: (Optional) Bytes already read from the handle.
+
+=back
+
+=head2 C<write_bin( $data )>
+
+Encrypts C<$data> and writes a Noise-framed message to the socket.
+
+=head2 C<read_bin( $length )>
+
+Reads and decrypts data from the socket. If C<$length> is provided, it returns exactly that many bytes (waiting if
+necessary). Otherwise, it returns all currently available decrypted data.
+
+=head2 C<rekey_send(  )>
+
+Rotates the encryption key used for outgoing messages. This calls the C<rekey()> method on the internal C<c_send>
+L<Noise::CipherState> object. Rekeying is recommended for long-lived streams to limit the amount of data encrypted with
+a single key.
+
+=head2  C<rekey_recv( )>
+
+Rotates the decryption key used for incoming messages. This calls the C<rekey()> method on the internal C<c_recv>
+L<Noise::CipherState> object. This must be called in synchronization with the remote peer's C<rekey_send()> to maintain
+successful communication.
+
+=head2 C<close( )>
+
+Closes the underlying socket.
+
+=head1 SEE ALSO
+
+L<Noise>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

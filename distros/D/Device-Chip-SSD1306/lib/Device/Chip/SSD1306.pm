@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::Chip::SSD1306 0.15;
+package Device::Chip::SSD1306 0.16;
 class Device::Chip::SSD1306
    :isa(Device::Chip)
    :strict(params);

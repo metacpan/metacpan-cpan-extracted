@@ -1,5 +1,5 @@
 package Dancer2;
-$Dancer2::VERSION = '2.0.1';
+$Dancer2::VERSION = '2.1.0';
 # ABSTRACT: Lightweight yet powerful web application framework
 
 use 5.12.0;
@@ -11,7 +11,6 @@ use Import::Into;
 use Dancer2::Core;
 use Dancer2::Core::App;
 use Dancer2::Core::Runner;
-use Dancer2::FileUtils;
 
 our $AUTHORITY = 'SUKRIA';
 
@@ -129,9 +128,12 @@ Dancer2 - Lightweight yet powerful web application framework
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
+
+(If you're looking for the L<dancer2> command documentation via CLI, try
+C<perldoc -F $(which dancer2)>.)
 
 Dancer2 is the new generation of L<Dancer>, the lightweight web framework for
 Perl. Dancer2 is a complete rewrite based on L<Moo>.
@@ -422,6 +424,7 @@ We are also on IRC: #dancer on irc.perl.org.
     Shlomi Fish
     Slava Goltser
     Snigdha
+    Sorin Pop
     Steve Bertrand
     Steve Dondley
     Steven Humphrey
@@ -444,7 +447,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

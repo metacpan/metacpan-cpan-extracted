@@ -1,12 +1,13 @@
 package Dancer2::Core::Error;
 # ABSTRACT: Class representing fatal errors
-$Dancer2::Core::Error::VERSION = '2.0.1';
+$Dancer2::Core::Error::VERSION = '2.1.0';
 use Moo;
 use Carp;
 use Dancer2::Core::Types;
+use Dancer2::Core::MIME;
 use Dancer2::Core::HTTP;
 use Data::Dumper;
-use Dancer2::FileUtils qw/path open_file/;
+use Path::Tiny ();
 use Sub::Quote;
 use Module::Runtime qw/ require_module use_module /;
 use Ref::Util qw< is_hashref >;
@@ -135,13 +136,12 @@ sub _build_static_page {
     my $public_dir = $ENV{DANCER_PUBLIC}
       || ( $self->has_app && $self->app->config->{public_dir} );
 
-    my $filename = sprintf "%s/%d.html", $public_dir, $self->status;
+    return if !$public_dir;
 
-    open my $fh, '<', $filename or return;
+    my $file = Path::Tiny::path($public_dir)->child( $self->status . '.html' );
+    return if !$file->is_file;
 
-    local $/ = undef;    # slurp time
-
-    return <$fh>;
+    return eval { $file->slurp_utf8 };
 }
 
 sub default_error_page {
@@ -158,7 +158,6 @@ sub default_error_page {
         title    => $self->title,
         charset  => $self->charset,
         content  => $show_fullmsg ? $self->full_message : _html_encode($self->message) || 'Wooops, something went wrong',
-        version  => Dancer2->VERSION,
         uri_base => $uri_base,
     };
 
@@ -175,9 +174,6 @@ sub default_error_page {
 <h1>[% title %]</h1>
 <div id="content">
 [% content %]
-</div>
-<div id="footer">
-Powered by <a href="http://perldancer.org/">Dancer2</a> [% version %]
 </div>
 </body>
 </html>
@@ -257,6 +253,7 @@ has response => (
                 ? $ENV{DANCER_NO_SERVER_TOKENS}
                 : 0;
         return Dancer2::Core::Response->new(
+            mime_type     => $self->has_app ? $self->app->mime_type : Dancer2::Core::MIME->new(),
             server_tokens => !$no_server_tokens,
             ( serializer => $serializer )x!! $serializer
         );
@@ -360,6 +357,7 @@ sub throw {
 
     $self->response->status( $self->status );
     $self->response->content_type( $self->content_type );
+    $self->response->charset( $self->charset ) if defined $self->charset;
     $self->response->content($message);
 
     $self->has_app &&
@@ -390,9 +388,11 @@ sub backtrace {
     return $html unless $file and $line;
 
     # file and line are located, let's read the source Luke!
-    my $fh = eval { open_file('<', $file) } or return $html;
-    my @lines = <$fh>;
-    close $fh;
+    my $path = Path::Tiny::path($file);
+    return $html if !$path->is_file;
+
+    my @lines;
+    eval { @lines = $path->lines_utf8; 1; } or return $html;
 
     $html .= qq|<div class="title">$file around line $line</div>|;
 
@@ -498,7 +498,7 @@ Dancer2::Core::Error - Class representing fatal errors
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 
@@ -654,7 +654,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

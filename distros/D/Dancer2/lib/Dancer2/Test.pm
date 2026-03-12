@@ -1,6 +1,6 @@
 package Dancer2::Test;
 # ABSTRACT: Useful routines for testing Dancer2 apps
-$Dancer2::Test::VERSION = '2.0.1';
+$Dancer2::Test::VERSION = '2.1.0';
 use strict;
 use warnings;
 
@@ -41,6 +41,7 @@ our @EXPORT = qw(
 #dancer1 also has read_logs, response_redirect_location_is
 #cf. https://github.com/PerlDancer2/Dancer22/issues/25
 
+use Dancer2::Core::MIME;
 use Dancer2::Core::Dispatcher;
 use Dancer2::Core::Request;
 
@@ -87,6 +88,7 @@ sub dancer_response {
         status  => $psgi_response->[0],
         headers => $psgi_response->[1],
         content => $psgi_response->[2][0],
+        mime_type => Dancer2::Core::MIME->new(),
     );
 }
 
@@ -629,7 +631,7 @@ Dancer2::Test - Useful routines for testing Dancer2 apps
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 
@@ -970,7 +972,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

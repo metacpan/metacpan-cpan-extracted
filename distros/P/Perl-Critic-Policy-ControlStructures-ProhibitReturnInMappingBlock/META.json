@@ -1,5 +1,5 @@
 {
-   "abstract" : "Do not \"return\" in mapping blocks (map, grep, sort)",
+   "abstract" : "Do not \"return\" in mapping blocks (map, grep)",
    "author" : [
       "hogashi"
    ],
@@ -59,7 +59,7 @@
    "provides" : {
       "Perl::Critic::Policy::ControlStructures::ProhibitReturnInMappingBlock" : {
          "file" : "lib/Perl/Critic/Policy/ControlStructures/ProhibitReturnInMappingBlock.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/hogashi/Perl-Critic-Policy-ControlStructures-ProhibitReturnInMappingBlock"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "hogashi <azuma.ginkakuji@gmail.com>",
       "utgwkk <utagawakiki@gmail.com>"

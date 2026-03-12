@@ -1,5 +1,9 @@
 Revision history for Perl extension Perl-Critic-Policy-ControlStructures-ProhibitReturnInMappingBlock
 
+0.02 2026-03-11T11:30:12Z
+
+    - Remove sort block detection; "return" in sort blocks is valid
+
 0.01 2026-03-05T09:37:26Z
 
     - Initial release, forked from Perl-Critic-Policy-ControlStructures-ProhibitReturnInDoBlock by utgwkk

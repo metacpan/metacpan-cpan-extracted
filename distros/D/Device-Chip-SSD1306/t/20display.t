@@ -91,9 +91,12 @@ await $chip->refresh;
 # glyph modes
 {
    # Fake up a glyph
-   use Struct::Dumb qw( readonly_struct );
-   readonly_struct Glyph => [qw( width bitmap )];
-   my $glyph = Glyph( 8,
+   package FakeGlyph {
+      sub new { my $class = shift; bless [ @_ ], $class; }
+      sub width  { return shift->[0]; }
+      sub bitmap { return shift->[1]; }
+   }
+   my $glyph = FakeGlyph->new( 8,
       [ 0b00111100 << 24,
         0b01000010 << 24,
         0b10000001 << 24,

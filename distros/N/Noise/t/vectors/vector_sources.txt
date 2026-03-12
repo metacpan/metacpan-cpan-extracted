@@ -1,0 +1,6 @@
+https://github.com/haskell-cryptography/cacophony/blob/master/vectors/cacophony.txt
+https://github.com/rweather/noise-c/blob/master/tests/vector/noise-c-basic.txt
+https://github.com/rweather/noise-c/blob/master/tests/vector/noise-c-fallback.txt
+https://github.com/rweather/noise-c/blob/master/tests/vector/noise-c-hybrid.txt
+https://github.com/mcginty/snow/blob/main/tests/vectors/snow.txt
+https://github.com/mcginty/snow/blob/main/tests/vectors/snow-extended.txt

@@ -143,7 +143,7 @@ sub process {
     $self->app->template->process($template, {
       page => $front_matter_hashref,
       file => $self,
-    }, $out, binmode => ':utf8')
+    }, $out)
       or croak $self->app->template->error;
 
     $orig_layout and $self->app->template->{SERVICE}{WRAPPER} = $orig_layout;

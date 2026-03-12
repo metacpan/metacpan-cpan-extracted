@@ -49,7 +49,7 @@ The main directory that contains the input files. Any file that is found in
 this directory will be processed and an equivalent output file will be
 created in the B<target> directory. The default value for this option is "in".
 
-    $ aphra --in some/other/directory
+    $ aphra --source some/other/directory
 
 =item B<fragments>
 

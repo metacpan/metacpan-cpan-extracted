@@ -1,13 +1,13 @@
 # ABSTRACT: Dancer2's Domain Specific Language (DSL)
 
 package Dancer2::Core::DSL;
-$Dancer2::Core::DSL::VERSION = '2.0.1';
+$Dancer2::Core::DSL::VERSION = '2.1.0';
 use Moo;
 use Carp;
+use Path::Tiny ();
 use Module::Runtime 'require_module';
 use Ref::Util qw< is_arrayref is_hashref >;
 use Dancer2::Core::Hook;
-use Dancer2::FileUtils;
 use Dancer2::Core::Response::Delayed;
 
 with 'Dancer2::Core::Role::DSL';
@@ -145,8 +145,9 @@ sub error   { shift->app->log( error   => @_ ) }
 sub true  {1}
 sub false {0}
 
-sub dirname { shift and Dancer2::FileUtils::dirname(@_) }
-sub path    { shift and Dancer2::FileUtils::path(@_) }
+sub _path_obj { shift and Path::Tiny::path(@_) }
+sub dirname { shift and _path_obj(@_)->parent->stringify }
+sub path    { shift and _path_obj(@_)->stringify }
 
 sub config { shift->app->settings }
 
@@ -462,7 +463,7 @@ sub mime {
     }
     else {
         my $runner = $self->runner;
-        $runner->mime_type->reset_default;
+        $runner->mime_type->reset_to_default;
         return $runner->mime_type;
     }
 }
@@ -533,7 +534,7 @@ Dancer2::Core::DSL - Dancer2's Domain Specific Language (DSL)
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 FUNCTIONS
 
@@ -564,7 +565,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

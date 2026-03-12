@@ -7,7 +7,7 @@ use v5.26;
 use warnings;
 use Object::Pad 0.800;
 
-package Device::Chip::SSD1306::SPI4 0.15;
+package Device::Chip::SSD1306::SPI4 0.16;
 class Device::Chip::SSD1306::SPI4
    :isa(Device::Chip::SSD1306);
 

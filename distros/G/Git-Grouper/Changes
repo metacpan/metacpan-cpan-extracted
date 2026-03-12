@@ -1,3 +1,18 @@
+0.005   2025-11-12  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [INCOMPATIBLE CHANGES]
+
+        - Rename functions: ls_groups -> ls_all_groups, get_repo_group ->
+          ls_repo_groups.
+
+        [ENHANCEMENTS]
+
+        - Add functions: ls_all_remotes, ls_repo_remotes.
+
+        - [function ls_repo_groups] Add arguments result_array & groups_array
+          replacing the hidden argument _always_array.
+
+
 0.004   2025-11-11  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix checking lacks_any_tags key.

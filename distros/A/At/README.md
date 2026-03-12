@@ -218,7 +218,7 @@ my $fh = $at->firehose(sub ( $header, $body, $err ) {
 $fh->start();
 ```
 
-**Note:** The Firehose requires [CBOR::Free](https://metacpan.org/pod/CBOR%3A%3AFree) and an async event loop to keep the connection alive. Currently, At.pm
+**Note:** The Firehose requires [Codec::CBOR](https://metacpan.org/pod/Codec%3A%3ACBOR) and an async event loop to keep the connection alive. Currently, At.pm
 supports [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) so you should usually use [Mojo::IOLoop](https://metacpan.org/pod/Mojo%3A%3AIOLoop):
 
 ```perl

@@ -134,7 +134,7 @@ subtest 'TTY functionality' => sub {
          is( $buf->memcmp("password123"), 0, 'got password' )
             or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
          $send_msg->('read_pty');
-         is( [ $recv_msg->() ], ['read_pty', "Enter Password: "], 'Saw prompt, and no echo' );
+         is( [ $recv_msg->() ], ['read_pty', "Enter Password: \r\n"], 'Saw prompt, and no echo' );
          # test that echo was restored
          $send_msg->(type => "x\r");
          $send_msg->(sleep => .1);
@@ -149,7 +149,7 @@ subtest 'TTY functionality' => sub {
          is( $buf->memcmp("really-really-long-p"), 0, 'got password' )
             or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
          $send_msg->('read_pty');
-         is( [ $recv_msg->() ], ['read_pty', "Enter Password: "], 'Saw prompt, and no echo' );
+         is( [ $recv_msg->() ], ['read_pty', "Enter Password: \r\n"], 'Saw prompt, and no echo' );
       });
       done_testing;
    };
@@ -167,7 +167,7 @@ subtest 'TTY functionality' => sub {
          is $buf->memcmp("some data already012456"), 0, 'got expected digits'
             or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
          $send_msg->('read_pty');
-         is( [ $recv_msg->() ], ['read_pty', "Enter PIN: * * * * \b\b  \b\b* * * "], 'Saw prompt, and char_mask' );
+         is( [ $recv_msg->() ], ['read_pty', "Enter PIN: * * * * \b\b  \b\b* * * \r\n"], 'Saw prompt, and char_mask' );
          # test that echo was restored
          $send_msg->(type => "x\r");
          $send_msg->(sleep => .1);
@@ -183,7 +183,7 @@ subtest 'TTY functionality' => sub {
          is $buf->memcmp("-123456"), 0, 'got expected digits'
             or note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
          $send_msg->('read_pty');
-         is( [ $recv_msg->() ], ['read_pty', "Enter PIN: ******"], 'Saw prompt, and char_mask' );
+         is( [ $recv_msg->() ], ['read_pty', "Enter PIN: ******\r\n"], 'Saw prompt, and char_mask' );
       });
       done_testing;
    };

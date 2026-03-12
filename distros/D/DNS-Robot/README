@@ -1,0 +1,56 @@
+DNS::Robot - Perl client for the DNS Robot API
+
+DESCRIPTION
+
+DNS::Robot is a Perl client for the free DNS and network tools API at
+https://dnsrobot.net. It provides access to 11 tools including DNS lookups,
+WHOIS queries, SSL certificate checks, email authentication validation
+(SPF, DKIM, DMARC), IP geolocation, HTTP header analysis, and port checking.
+
+No API key required. Zero external dependencies — uses only core Perl
+modules (HTTP::Tiny, JSON::PP, Carp).
+
+SYNOPSIS
+
+    use DNS::Robot;
+    my $dr = DNS::Robot->new();
+
+    my $dns = $dr->dns_lookup(domain => 'example.com');
+    print "IP: $_\n" for @{ $dns->{resolvedIPs} };
+
+    my $whois = $dr->whois_lookup(domain => 'example.com');
+    print "Registrar: $whois->{registrar}{name}\n";
+
+    my $ssl = $dr->ssl_check(domain => 'github.com');
+    print "Days until expiry: $ssl->{leafCertificate}{daysToExpire}\n";
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or via CPAN:
+
+    cpan DNS::Robot
+    cpanm DNS::Robot
+
+DOCUMENTATION
+
+Full documentation is available via perldoc:
+
+    perldoc DNS::Robot
+
+Or online at https://metacpan.org/pod/DNS::Robot
+
+LINKS
+
+    Homepage:   https://dnsrobot.net
+    Repository: https://github.com/dnsrobot/dns-robot-cli
+    Bug reports: https://github.com/dnsrobot/dns-robot-cli/issues
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See perlartistic.

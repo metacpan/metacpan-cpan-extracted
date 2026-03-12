@@ -3,7 +3,7 @@ package Acme::Hospital::Bed;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
 	my ($package, %args) = @_;
@@ -155,7 +155,7 @@ Acme::Hospital::Bed - The great new Acme::Hospital::Bed!
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
@@ -172,7 +172,7 @@ Perhaps a little code snippet.
 	...
 
 	Acme::Hospital::Bed->new(
-		total_num_of_beds => 30,
+		total_num_of_beds => 4,
 		lifes => 5,
 		names => [qw/tom richard joy/],
 		phrases => [
@@ -209,15 +209,17 @@ Perhaps a little code snippet.
 				"I still have my mind",
 			],
 			[
-				"Hello, This is not fine.",
-				"I still have my mind",
+				"Hello, you need to be secluded and watched 24 hours by big men",
+				"I still have my mind, they're just a bit small minded.",
 			],
 			[
-				"Hello, I'm not fine.",
-				"Waiting every 5 minutes...?",
+				"Hello, I'm still fine.",
+				"Waiting every 5 minutes... too easy for me but sorry for the rest?",
 			]
 		]
 	)->start;
+
+Out of my control, trying to prevent mass Khaos via starting laughter on the bbc news.
 
 =head1 DESCRIPTION
 

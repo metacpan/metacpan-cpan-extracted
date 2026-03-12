@@ -46,9 +46,9 @@ general/_value_length_is_equal_to_less_than.t
 general/_value_length_is_between.t
 
 numbers/number_within_range.t
-numbers/_numeric_equal_or_greater_than.t 
-numbers/_numeric_strictly_greater_than.t 
-numbers/_numeric_equal_or_less_than.t 
+numbers/_numeric_equal_or_greater_than.t
+numbers/_numeric_strictly_greater_than.t
+numbers/_numeric_equal_or_less_than.t
 numbers/_numeric_strictly_less_than.t
 
 messages/number_range_error.t
@@ -65,9 +65,8 @@ dates/at_least_N_days_between.t
 dates/at_most_N_days_between.t
 
 
-files/_file_magic_type.t                      
+files/_file_magic_type.t
 files/has_file_extension.t
-files/_get_file_extensions_by_mime_type.t     
 files/is_mime_type.t
 files/is_clamav_clean.t
 

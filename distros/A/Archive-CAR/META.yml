@@ -1,6 +1,6 @@
 ---
 X_No_Archive: Yes
-abstract: 'The CAR format (Content Addressable aRchives) can be used to store content addressable objects in the form of IPLD block data as a sequence of bytes; typically in a file with a .car filename extension.'
+abstract: 'Content Addressable Archive (CAR) reader and writer'
 author:
   - 'Sanko Robinson <sanko@cpan.org>'
 build_requires:
@@ -24,24 +24,24 @@ no_index:
 provides:
   Archive::CAR:
     file: lib/Archive/CAR.pm
-    version: v0.0.3
+    version: v0.0.4
   Archive::CAR::CID:
     file: lib/Archive/CAR/CID.pm
-    version: v0.0.3
+    version: v0.0.4
   Archive::CAR::Indexer:
     file: lib/Archive/CAR/Indexer.pm
-    version: v0.0.3
+    version: v0.0.4
   Archive::CAR::Utils:
     file: lib/Archive/CAR/Utils.pm
-    version: v0.0.3
+    version: v0.0.4
   Archive::CAR::v1:
     file: lib/Archive/CAR/v1.pm
-    version: v0.0.3
+    version: v0.0.4
   Archive::CAR::v2:
     file: lib/Archive/CAR/v2.pm
-    version: v0.0.3
+    version: v0.0.4
 requires:
-  CBOR::Free: '0.32'
+  Codec::CBOR: '0'
   Crypt::PRNG: '0'
   Digest::SHA: '0'
   JSON::PP: '0'
@@ -52,7 +52,7 @@ resources:
   homepage: https://github.com/sanko/Archive-CAR.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Archive-CAR.pm.git
-version: v0.0.3
+version: v0.0.4
 x_ignore:
   - .tidyallrc
   - .gitignore

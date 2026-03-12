@@ -20,13 +20,16 @@ dancer2 - Dancer2 command line interface
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 
 dancer2 <command> [options...]
 
 =head1 DESCRIPTION
+
+(If you're looking for the main L<Dancer2> module documentation via
+CLI, try C<perldoc Dancer2>.)
 
 Dancer2 is the new generation lightweight web-framework for Perl.
 This tool provides nice, easily-extendable CLI interface for it.
@@ -41,7 +44,7 @@ complete outline on where to go for help.
 =item * Dancer2 Tutorial
 
 If you are new to the Dancer approach, you should start by reading
-our L<Dancer2::Tutorial>.
+our L<Dancer2::Manual::Tutorial>.
 
 =item * Dancer2 Manual
 
@@ -126,7 +129,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

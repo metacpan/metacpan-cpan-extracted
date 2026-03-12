@@ -3,11 +3,11 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
   NAME              => 'File::Meta::Cache',
   VERSION_FROM      => 'lib/File/Meta/Cache.pm', 
+	MIN_PERL_VERSION => '5.24.0',
   PREREQ_PM         => {
     "Object::Pad"=>"0.808",
-    "Log::OK"=>"v0.2.1",
-    "Log::ger"=>0,
     "constant::more"=>"v0.3.0",
+    "File::Path::Redirect" => 0,
 
   }, 
   ABSTRACT_FROM     => 'lib/File/Meta/Cache.pod', 

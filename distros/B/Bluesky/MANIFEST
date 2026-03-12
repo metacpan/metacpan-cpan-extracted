@@ -5,9 +5,9 @@ MANIFEST
 META.json
 META.yml
 README.md
-builder/Bluesky/Builder.pm
 cpanfile
 lib/Bluesky.pm
+lib/Bluesky.pod
 t/000_compile.t
 t/001_mock.t
 t/002_chat.t

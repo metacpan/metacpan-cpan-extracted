@@ -226,7 +226,7 @@ my @to_query = $search->next_to_query();
 
 Marks a node as having responded and adds any new peers it returned to the shortlist.
 
-```
+```python
 # After getting a response from a FIND_NODE RPC:
 $search->mark_responded($peer_id, @peers_from_rpc);
 ```

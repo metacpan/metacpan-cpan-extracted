@@ -22,7 +22,7 @@ Getopt::EX::termcolor - Getopt::EX termcolor module
 
 =head1 VERSION
 
-Version 1.08
+Version 1.09
 
 =head1 DESCRIPTION
 
@@ -113,7 +113,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020-2021 Kazumasa Utashiro.
+Copyright 2020-2026 Kazumasa Utashiro.
 
 You can redistribute it and/or modify it under the same terms
 as Perl itself.
@@ -123,7 +123,7 @@ as Perl itself.
 use v5.14;
 package Getopt::EX::termcolor;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use warnings;
 use Carp;

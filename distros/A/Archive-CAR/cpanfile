@@ -1,4 +1,4 @@
-requires 'CBOR::Free', '0.32';
+requires 'Codec::CBOR';
 requires 'Crypt::PRNG';
 requires 'Digest::SHA';
 requires 'JSON::PP';

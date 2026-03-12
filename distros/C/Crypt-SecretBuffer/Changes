@@ -1,3 +1,11 @@
+Version 0.021 - 2026-03-12
+  - Fix ->save_file(x, 'rename') when the path was a bare filename
+  - Enhance append_console_line:
+     - echo "\n" back to console when 'prompt' option is used
+     - better heuristics for default prompt_fh
+     - undefined $input_fh now means "the default terminal"
+     - $input_fh is no longer a required argument
+
 Version 0.020 - 2026-03-08
   - Fix bugs in ::PEM->headers (unicode_values, call methods on tied hash)
 

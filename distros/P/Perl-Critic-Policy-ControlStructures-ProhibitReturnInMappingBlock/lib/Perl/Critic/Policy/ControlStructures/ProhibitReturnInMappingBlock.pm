@@ -7,9 +7,9 @@ use List::Util qw(any);
 use Perl::Critic::Utils qw(:severities);
 use constant EXPL => 'A "return" in a mapping block causes confusing behavior.';
 
-my @MAPPING_BLOCK_KEYWORDS = qw(map grep sort);
+my @MAPPING_BLOCK_KEYWORDS = qw(map grep);
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub supported_parameters { return (); }
 sub default_severity     { return $SEVERITY_HIGHEST; }
@@ -57,7 +57,7 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Policy::ControlStructures::ProhibitReturnInMappingBlock - Do not "return" in mapping blocks (map, grep, sort)
+Perl::Critic::Policy::ControlStructures::ProhibitReturnInMappingBlock - Do not "return" in mapping blocks (map, grep)
 
 =head1 AFFILIATION
 
@@ -65,7 +65,7 @@ This policy is part of the L<Perl::Critic::Policy::ControlStructures::ProhibitRe
 
 =head1 DESCRIPTION
 
-Using C<return> in a mapping block (C<map>, C<grep>, or C<sort>) causes unexpected behavior.
+Using C<return> in a mapping block (C<map> or C<grep>) causes unexpected behavior.
 A C<return> exits the entire enclosing subroutine, not just the block.
 
     sub func {
@@ -88,7 +88,7 @@ If you want to skip an element, use C<next> instead:
         return @result;
     }
 
-This applies equally to C<grep> and C<sort> blocks.
+This applies equally to C<grep> blocks.
 
 =head1 CONFIGURATION
 

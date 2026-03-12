@@ -1,0 +1,25 @@
+Revision history for WWW-VastAI
+
+0.001     2026-03-12 06:05:32Z
+
+    - Simplify live-test gating:
+      - C<VAST_LIVE_TEST=1> enables read-only live coverage
+      - C<VAST_LIVE_ALLOW_COST=1> enables all cost-incurring live tests,
+        including instance and volume lifecycle tests
+    - Add POD for the entity, transport, and IO helper classes
+    - Add direct unit tests for entity accessors and the LWP IO adapter
+    - Refresh README installation and usage examples
+
+0.001     2026-03-12
+    - Initial release
+    - Add WWW::VastAI client with a shared HTTP layer and central operation map
+    - Cover Vast.ai marketplace offers, instances, templates, volumes,
+      SSH keys, API keys, current user, env vars, invoices, endpoints,
+      and workergroups
+    - Provide entity objects for the main resource types
+    - Add mock-driven unit tests for all implemented resource groups
+    - Add opt-in live tests:
+      - no-cost read-only API coverage
+      - autonomous cost test that can pick a cheap offer, run a custom image,
+        probe it over HTTP, stop it, and clean it up
+      - volume lifecycle test with cleanup

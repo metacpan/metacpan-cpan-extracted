@@ -33,7 +33,7 @@
          "prereqs" : {
             "runtime" : {
                "requires" : {
-                  "CBOR::Free" : "0",
+                  "Codec::CBOR" : "0",
                   "Mojo::UserAgent" : "0"
                }
             }
@@ -43,19 +43,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "CPAN::Meta" : "0",
-            "Exporter" : "5.57",
-            "ExtUtils::Helpers" : "0.028",
-            "ExtUtils::Install" : "0",
-            "ExtUtils::InstallPaths" : "0.002",
-            "File::Basename" : "0",
-            "File::Find" : "0",
-            "File::Path" : "0",
-            "File::Spec::Functions" : "0",
-            "Getopt::Long" : "2.36",
-            "JSON::PP" : "2",
-            "Path::Tiny" : "0",
-            "perl" : "v5.40.0"
+            "Module::Build::Tiny" : "0"
          }
       },
       "develop" : {
@@ -107,7 +95,7 @@
    "provides" : {
       "Bluesky" : {
          "file" : "lib/Bluesky.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -125,7 +113,7 @@
          "web" : "https://github.com/sanko/Bluesky.pm"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_ignore" : [
       "github",
       ".gitignore",

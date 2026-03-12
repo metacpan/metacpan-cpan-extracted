@@ -33,26 +33,19 @@ subtest 'preapare and execute' => sub {
     is($got, $expected, 'prepare and execute is ok');
 };
 
-subtest 'bind params with postional bind' => sub {
-
-    my $sth = $dbh->prepare($sql);
-    $sth->bind_param(1, 1, undef);
-    $sth->bind_param(2, 2, undef);
-    $sth->execute();
-    my $got = [];
-    
-    while (my @row = $sth->fetchrow_array()) {
-        push @{$got}, \@row;
-    }
-
-    is($got, $expected, 'postional bind is ok');
-};
-
 subtest 'bind params with named bind' => sub {
     
     my $sth = $dbh->prepare('SELECT * FROM media_types WHERE id IN(:id, :id_2) ORDER BY id DESC');
-    $sth->bind_param(':id' => 2, undef);
-    $sth->bind_param(':id_2' => 1, undef);
+
+    my $hash = {
+        ':id' => 2,
+        ':id_2' => 1
+    };
+
+    while (my ($key, $val) = each %{$hash}) {
+        $sth->bind_param($key => $val);
+    }
+
     $sth->execute();
     my $got = []; 
     while (my @row = $sth->fetchrow_array()) {

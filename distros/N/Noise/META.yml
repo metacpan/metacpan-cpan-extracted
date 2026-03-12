@@ -1,0 +1,65 @@
+---
+abstract: 'Pure Perl Noise Protocol Framework'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  IO::Socket::INET: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0'
+dynamic_config: 1
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+keywords:
+  - crypto
+  - noise
+  - handshake
+  - encryption
+  - security
+  - libp2p
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Noise
+no_index:
+  directory:
+    - t
+    - eg
+provides:
+  Noise:
+    file: lib/Noise.pm
+    version: v0.0.1
+  Noise::CipherState:
+    file: lib/Noise/CipherState.pm
+    version: v0.0.1
+  Noise::HandshakeState:
+    file: lib/Noise/HandshakeState.pm
+    version: v0.0.1
+  Noise::Pattern:
+    file: lib/Noise/Pattern.pm
+    version: v0.0.1
+  Noise::Stream:
+    file: lib/Noise/Stream.pm
+    version: v0.0.1
+  Noise::SymmetricState:
+    file: lib/Noise/SymmetricState.pm
+    version: v0.0.1
+requires:
+  Crypt::AuthEnc::ChaCha20Poly1305: '0'
+  Crypt::AuthEnc::GCM: '0'
+  Crypt::Mac::HMAC: '0'
+  Crypt::PK::X25519: '0'
+  Digest::SHA: '0'
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/sanko/Noise.pm/issues
+  homepage: https://github.com/sanko/Noise.pm
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/sanko/Noise.pm.git
+version: v0.0.1
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/**
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

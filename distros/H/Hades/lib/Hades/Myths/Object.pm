@@ -2,7 +2,7 @@ package Hades::Myths::Object;
 use strict;
 use warnings;
 use POSIX qw/locale_h/;
-our $VERSION = 0.24;
+our $VERSION = 0.27;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -331,7 +331,7 @@ Hades::Myths::Object - display text locally.
 
 =head1 VERSION
 
-Version 0.24
+Version 0.27
 
 =cut
 

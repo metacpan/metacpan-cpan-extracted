@@ -6,7 +6,7 @@ Bluesky - Bluesky Client Library in Perl
 
 ```perl
 use Bluesky;
-my $bsky = Bluesky->new();
+my $bsky = Bluesky->new( );
 
 # Interactive OAuth Authentication (Recommended)
 $bsky->oauth_helper(
@@ -518,6 +518,20 @@ Expected parameters include:
 
     The AT-URI of a moderation list to use with the `list` rule in `reply_gate`.
 
+- `post_gate`
+
+    Arrayref of rules to restrict embedding or quoting of this post.
+
+    Currently supports:
+
+    - `disable` - Disable all quotes and embeds of this post.
+
+    Example:
+
+    ```perl
+    $bsky->createPost( text => 'No quoting allowed', post_gate => ['disable'] );
+    ```
+
 - `embed`
 
     Bluesky allows for posts to contain embedded data.
@@ -999,6 +1013,30 @@ $bsky->unblockModList( 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.graph.lis
 
 Unblocks a moderation list.
 
+## `getProfile( $actor )`
+
+```perl
+my $profile = $bsky->getProfile( 'sankorobinson.com' );
+```
+
+Returns a detailed view of an actor's profile.
+
+## `getProfiles( actors => [ ... ] )`
+
+```perl
+my $profiles = $bsky->getProfiles( actors => [ 'did:plc:...', 'sankorobinson.com' ] );
+```
+
+Returns an arrayref of detailed profile views for the requested actors.
+
+## `getSuggestions( [...] )`
+
+```perl
+my $suggestions = $bsky->getSuggestions();
+```
+
+Returns an arrayref of suggested actors to follow.
+
 # Moderation
 
 ## `mute( ... )`
@@ -1119,10 +1157,10 @@ $bsky->getConvo( $convoId );
 
 Get a detailed view of a conversation.
 
-## `getConvoForMembers( actors => [ ... ] )`
+## `getConvoForMembers( members => [ ... ] )`
 
 ```perl
-$bsky->getConvoForMembers( actors => [ 'did:plc:...' ] );
+$bsky->getConvoForMembers( members => [ 'did:plc:...' ] );
 ```
 
 Get or create a conversation for a list of members.

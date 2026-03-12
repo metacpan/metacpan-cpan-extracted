@@ -1,6 +1,6 @@
 # NAME
 
-Perl::Critic::Policy::ControlStructures::ProhibitReturnInMappingBlock - Do not "return" in mapping blocks (map, grep, sort)
+Perl::Critic::Policy::ControlStructures::ProhibitReturnInMappingBlock - Do not "return" in mapping blocks (map, grep)
 
 # AFFILIATION
 
@@ -8,7 +8,7 @@ This policy is part of the [Perl::Critic::Policy::ControlStructures::ProhibitRet
 
 # DESCRIPTION
 
-Using `return` in a mapping block (`map`, `grep`, or `sort`) causes unexpected behavior.
+Using `return` in a mapping block (`map` or `grep`) causes unexpected behavior.
 A `return` exits the entire enclosing subroutine, not just the block.
 
     sub func {
@@ -31,7 +31,7 @@ If you want to skip an element, use `next` instead:
         return @result;
     }
 
-This applies equally to `grep` and `sort` blocks.
+This applies equally to `grep` blocks.
 
 # CONFIGURATION
 

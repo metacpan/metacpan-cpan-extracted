@@ -99,6 +99,10 @@
 #define GvCV_set(gv, val) (GvCV(gv) = (val))
 #endif
 
+#ifndef isGV_with_GP_on
+#define isGV_with_GP_on(gv) SvSCREAM_on(gv)
+#endif
+
 #if (PERL_COMBI_VERSION >= 5009003)
 #define DA_FEATURE_MULTICALL 1
 #endif
@@ -516,7 +520,7 @@ static void da_unlocalize_gvar(pTHX_ void *gp_v) {
 	} else {
 		SV *gv = newSV(0);
 		sv_upgrade(gv, SVt_PVGV);
-		SvSCREAM_on(gv);
+		isGV_with_GP_on(gv);
 		GvGP_set(gv, gp);
 		sv_free(gv);
 	}

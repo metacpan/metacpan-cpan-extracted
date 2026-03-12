@@ -1,0 +1,96 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Noise::HandshakeState - Pattern-based handshake execution
+
+=head1 SYNOPSIS
+
+    use Noise::HandshakeState;
+
+    my $state = Noise::HandshakeState->new(
+        initiator => 1,
+        pattern   => 'XX',
+        s         => $local_static_key
+    );
+
+    # Msg 1
+    my $msg1 = $state->write_message( 'Hello' );
+
+    # Msg 2
+    my $payload = $state->read_message( $incoming );
+
+=head1 DESCRIPTION
+
+Noise::HandshakeState implements the high-level handshake logic of the Noise Protocol. It parses pattern names,
+processes pre-messages, and executes the sequence of tokens (e, s, ee, es, etc.) required to establish a secure
+channel.
+
+=head1 METHODS
+
+=head2 C<new( %params )>
+
+Constructor.
+
+Expected parameters:
+
+=over
+
+=item C<initiator>: Boolean, true if this node starts the handshake.
+
+=item C<pattern>: String name (e.g., 'XX', 'IK', 'Noise_NN_25519_AESGCM_SHA512').
+
+=item C<s/e>: Local static/ephemeral L<Crypt::PK::X25519> keys.
+
+=item C<rs/re>: Remote static/ephemeral public keys.
+
+=item C<psks>: Array reference of 32-byte pre-shared keys.
+
+=item C<prologue>: Optional initial data.
+
+=back
+
+=head2 C<write_message( $payload )>
+
+Processes the next message in the pattern sequence and returns the raw bytes to be sent to the remote peer.
+
+=head2 C<read_message( $bytes )>
+
+Parses an incoming message, updates the internal state, and returns the decrypted payload.
+
+=head2 C<split( )>
+
+Finalizes the handshake and returns a pair of L<Noise::CipherState> objects for transport.
+
+=head2 C<symmetric_state( )>
+
+Returns the underlying L<Noise::SymmetricState> object. This is useful for advanced use cases where manual mixing of
+additional data into the handshake transcript is required.
+
+=head2 C<rs( )>
+
+Returns the remote static public key (as a L<Crypt::PK::X25519> object) discovered during the handshake. If the pattern
+does not involve static key exchange, or the key has not been received yet, this returns C<undef>.
+
+=head2 C<re( )>
+
+Returns the remote ephemeral public key (as a L<Crypt::PK::X25519> object) received from the peer. This is typically
+available after the first message from the remote party.
+
+=head1 SEE ALSO
+
+L<Noise::Pattern>, L<Noise::SymmetricState>
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2026 by Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the Artistic License 2.0.
+
+=cut

@@ -1,5 +1,18 @@
 Revision history for Mojolicious-Plugin-OpenTelemetry
 
+0.006     2026-03-11 17:33:44 GMT
+
+    * Switch implementation to use `around_dispatch`, which
+      means we can now instrument static responses and nested
+      routes, as well as intermediate actions. This comes at
+      the cost, however, of only having the matching route
+      _after_ span creation, which means samplers will no longer
+      have access to the `$method $route`-style span names.
+    * Fixed an issue where the instrumentation could cause an
+      exception when trying to call `can` on an undefined value
+      by mistakingly assuming actions would always return a
+      Future.
+
 0.005     2025-05-15 13:13:10 BST
 
     * Ensure we convert request URLs to absolute so we are

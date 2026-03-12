@@ -6,8 +6,7 @@ use Dancer2;
 use Dancer2::Core::App;
 use Dancer2::Core::Dispatcher;
 use Dancer2::Core::Hook;
-use Dancer2::FileUtils;
-use File::Spec;
+use Path::Tiny qw< path >;
 
 # our app/dispatcher object
 my $app = Dancer2::Core::App->new( name => 'main', );
@@ -259,9 +258,10 @@ is_deeply(
     'Empty configuration for nonexistent engine',
 );
 
-# TODO: not such an intelligent check, this one...
+# TODO: not such an intelligent check, these ones...
 # set configuration for an engine
 $app->config->{'engines'}{'template'}{'Tiny'}{'hello'} = 'world';
+$app->config->{'engines'}{'template'}{'Some::Other::Template::Namespace'}{'hello'} = 'world';
 
 is_deeply(
     $app->_get_config_for_engine( template => 'Tiny', $app->config ),
@@ -269,9 +269,15 @@ is_deeply(
     '_get_config_for_engine can find the right configuration',
 );
 
+is_deeply(
+    $app->_get_config_for_engine( template => '+Some::Other::Template::Namespace', $app->config ),
+    { hello => 'world' },
+    '_get_config_for_engine can find the right configuration',
+);
+
 is(
-    File::Spec->canonpath( $app->caller ),
-    File::Spec->catfile(t => 'app.t'),
+    path( $app->caller ),
+    path( qw< t app.t > ),
     'Correct caller for app',
 );
 

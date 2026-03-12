@@ -1,6 +1,6 @@
 # ABSTRACT: encapsulation of Dancer2 packages
 package Dancer2::Core::App;
-$Dancer2::Core::App::VERSION = '2.0.1';
+$Dancer2::Core::App::VERSION = '2.1.0';
 use Moo;
 use Carp               qw<croak carp>;
 use Scalar::Util       'blessed';
@@ -8,7 +8,7 @@ use List::Util         ();
 use Module::Runtime    'is_module_name';
 use Safe::Isa;
 use Sub::Quote;
-use File::Spec;
+use Path::Tiny         ();
 use Module::Runtime    qw< require_module use_module >;
 use Ref::Util          qw< is_ref is_arrayref is_globref is_scalarref is_regexpref >;
 use Sub::Util          qw/ set_subname subname /;
@@ -19,18 +19,16 @@ use Plack::Middleware::Head;
 use Plack::Middleware::Conditional;
 use Plack::Middleware::ConditionalGET;
 
-use Dancer2::FileUtils 'path';
 use Dancer2::ConfigReader;
 use Dancer2::Core;
 use Dancer2::Core::Cookie;
+use Dancer2::Core::HTTP;
 use Dancer2::Core::Error;
 use Dancer2::Core::Types;
 use Dancer2::Core::Route;
 use Dancer2::Core::Hook;
 use Dancer2::Core::Request;
 use Dancer2::Core::Factory;
-
-use Dancer2::Handler::File;
 
 our $EVAL_SHIM; $EVAL_SHIM ||= sub {
     my $code = shift;
@@ -139,6 +137,27 @@ has serializer_engine => (
     predicate => 'has_serializer_engine',
 );
 
+has _appdir_path => (
+    is       => 'ro',
+    lazy     => 1,
+    builder  => '_build_appdir_path',
+    init_arg => undef,
+);
+
+has _views_path => (
+    is       => 'ro',
+    lazy     => 1,
+    builder  => '_build_views_path',
+    init_arg => undef,
+);
+
+has _public_dir_path => (
+    is       => 'ro',
+    lazy     => 1,
+    builder  => '_build_public_dir_path',
+    init_arg => undef,
+);
+
 has '+local_triggers' => (
     default => sub {
         my $self     = shift;
@@ -169,6 +188,12 @@ has '+local_triggers' => (
                 # using: set log => warning
                 $self->logger_engine->log_level($value);
             },
+
+            default_mime_type => sub {
+                my $self  = shift;
+                my $value = shift;
+                $self->mime_type->default($value);
+            },
         };
 
         foreach my $engine ( @{ $self->supported_engines } ) {
@@ -185,6 +210,9 @@ has '+local_triggers' => (
 
                 # set the engine with the new value from the builder
                 $self->$setter_method($engine_instance);
+                if ( $engine eq 'serializer' && $self->has_response ) {
+                    $self->response->serializer($engine_instance);
+                }
 
                 return $engine_instance;
             };
@@ -192,6 +220,12 @@ has '+local_triggers' => (
 
         return $triggers;
     },
+);
+
+has 'mime_type' => (
+    'is'      => 'ro',
+    'isa'     => InstanceOf['Dancer2::Core::MIME'],
+    'default' => sub { Dancer2::Core::MIME->new() },
 );
 
 sub _build_logger_engine {
@@ -249,7 +283,7 @@ sub _build_session_engine {
     # Note that engine options will replace the default session_dir (if provided).
     return $self->_factory->create(
         session         => $value,
-        session_dir     => path( $self->config->{appdir}, 'sessions' ),
+        session_dir     => $self->_appdir_path->child('sessions')->stringify,
         %{$engine_options},
         postponed_hooks => $self->postponed_hooks,
 
@@ -275,10 +309,11 @@ sub _build_template_engine {
           $self->_get_config_for_engine( template => $value, $config );
 
     my $engine_attrs = {
-        config => $engine_options,
-        layout => $config->{layout},
+        config     => $engine_options,
+        layout     => $config->{layout},
         layout_dir => ( $config->{layout_dir} || 'layouts' ),
-        views => $config->{views},
+        views      => $config->{views},
+        charset    => $config->{charset},
     };
 
     Scalar::Util::weaken( my $weak_self = $self );
@@ -305,6 +340,7 @@ sub _build_serializer_engine {
 
     my $engine_options =
         $self->_get_config_for_engine( serializer => $value, $config );
+    $engine_options->{strict_utf8} //= $config->{strict_utf8};
 
     Scalar::Util::weaken( my $weak_self = $self );
 
@@ -326,9 +362,15 @@ sub _get_config_for_engine {
     defined $config->{'engines'} && defined $config->{'engines'}{$engine}
         or return {};
 
-    # try both camelized name and regular name
+    # try name, camelized name and fully-qualified name (without plus)
+    my $full_name = $name;
+    my $was_fully_qualified = ( $full_name =~ s/^\+// );  # strip any leading '+'
     my $engine_config = {};
-    foreach my $engine_name ( $name, Dancer2::Core::camelize($name) ) {
+    foreach my $engine_name (
+        $name,
+        Dancer2::Core::camelize($name),
+        ( $was_fully_qualified ? $full_name : () )
+    ) {
         if ( defined $config->{'engines'}{$engine}{$engine_name} ) {
             $engine_config = $config->{'engines'}{$engine}{$engine_name};
             last;
@@ -449,7 +491,14 @@ sub _build_config {
 sub _build_response {
     my $self = shift;
     return Dancer2::Core::Response->new(
+        mime_type     => $self->mime_type,
         server_tokens => !$self->config->{'no_server_tokens'},
+        charset       => $self->config->{charset},
+        strict_utf8   => $self->config->{strict_utf8},
+        do {
+            Scalar::Util::weaken( my $weak_self = $self );
+            log_cb => sub { $weak_self && $weak_self->log(@_) };
+        },
         $self->has_serializer_engine
             ? ( serializer => $self->serializer_engine )
             : (),
@@ -717,23 +766,43 @@ around execute_hook => sub {
 sub _build_default_config {
     my $self = shift;
 
-    my $public = $ENV{DANCER_PUBLIC} || path( $self->location, 'public' );
+    my $public = $ENV{DANCER_PUBLIC} || $self->_location_path->child('public')->stringify;
     return {
         content_type   => ( $ENV{DANCER_CONTENT_TYPE} || 'text/html' ),
-        charset        => ( $ENV{DANCER_CHARSET}      || '' ),
+        charset        => ( $ENV{DANCER_CHARSET}      || 'UTF-8' ),
+        strict_utf8    => ( $ENV{DANCER_STRICT_UTF8}  || 0 ),
         logger         => ( $ENV{DANCER_LOGGER}       || 'console' ),
         views          => ( $ENV{DANCER_VIEWS}
-                            || path( $self->location, 'views' ) ),
+                            || $self->_location_path->child('views')->stringify ),
         environment    => $self->environment,
         appdir         => $self->location,
         public_dir     => $public,
         template       => 'Tiny',
+        strict_config  => 0, # We can look at changing this in a future version
         route_handlers => [
             [
                 AutoPage => 1
             ],
         ],
     };
+}
+
+sub _build_appdir_path {
+    my $self = shift;
+    return Path::Tiny::path( $self->config->{appdir} || $self->location );
+}
+
+sub _build_views_path {
+    my $self = shift;
+    return Path::Tiny::path( $self->config->{views} );
+}
+
+sub _build_public_dir_path {
+    my $self = shift;
+    my $dir = $ENV{DANCER_PUBLIC}
+        || $self->config->{public_dir}
+        || $self->_location_path->child('public')->stringify;
+    return Path::Tiny::path($dir);
 }
 
 sub _init_hooks {
@@ -858,9 +927,6 @@ sub defined_engines {
     ];
 }
 
-# FIXME not needed anymore, I suppose...
-sub api_version {2}
-
 sub register_plugin {
     my $self   = shift;
     my $plugin = shift;
@@ -974,17 +1040,6 @@ sub all_hook_aliases {
     return $aliases;
 }
 
-sub mime_type {
-    my $self   = shift;
-    my $runner = Dancer2::runner();
-
-    exists $self->config->{default_mime_type}
-        ? $runner->mime_type->default( $self->config->{default_mime_type} )
-        : $runner->mime_type->reset_default;
-
-    $runner->mime_type;
-}
-
 sub log {
     my $self  = shift;
     my $level = shift;
@@ -1008,8 +1063,11 @@ sub send_as {
             carp sprintf( "Please use %s as the type for 'send_as', not %s", lc($type), $type );
         }
 
-        $options->{charset} = $self->config->{charset} || 'UTF-8';
-        my $content = Encode::encode( $options->{charset}, $data );
+        $options->{charset} //= $self->config->{charset};
+        my $content = $data;
+        if ( defined $options->{charset} && length $options->{charset} ) {
+            $content = Encode::encode( $options->{charset}, $data );
+        }
         $options->{content_type} ||= join '/', 'text', lc $type;
         # Explicit return needed here, as if we are currently rendering a
         # template then with_return will not longjump
@@ -1031,7 +1089,15 @@ sub send_as {
     # load any serializer engine config
     my $engine_options =
         $self->_get_config_for_engine( serializer => $type, $self->config ) || {};
-    my $serializer = $serializer_class->new( config => $engine_options );
+    $engine_options->{strict_utf8} //= $self->config->{strict_utf8};
+
+    Scalar::Util::weaken( my $weak_self = $self );
+    my $serializer = $self->_factory->create(
+        serializer      => $type,
+        config          => $engine_options,
+        postponed_hooks => $self->postponed_hooks,
+        log_cb          => sub { $weak_self->log(@_) },
+    );
     my $content = $serializer->serialize( $data );
     $options->{content_type} ||= $serializer->content_type;
     $self->send_file( \$content, %$options );
@@ -1044,6 +1110,7 @@ sub send_error {
     my $err = Dancer2::Core::Error->new(
           message    => $message,
           app        => $self,
+          charset    => $self->config->{charset},
         ( status     => $status     )x!! $status,
 
         $self->has_serializer_engine
@@ -1090,12 +1157,9 @@ sub send_file {
         }
         # static file dir - either system root or public_dir
         my $dir = $options{system_path}
-            ? File::Spec->rootdir
-            : $ENV{DANCER_PUBLIC}
-                || $self->config->{public_dir}
-                || path( $self->location, 'public' );
+            ? Path::Tiny->rootdir
+            : $self->_public_dir_path;
 
-        $file_path = Dancer2::Handler::File->merge_paths( $path, $dir );
         my $err_response = sub {
             my $status = shift;
             $self->response->status($status);
@@ -1103,17 +1167,34 @@ sub send_file {
             $self->response->content( Dancer2::Core::HTTP->status_message($status) );
             $self->with_return->( $self->response );
         };
-        $err_response->(403) if !defined $file_path;
-        $err_response->(404) if !-f $file_path;
+
+        # resolve relative paths (with '../') as much as possible
+        # On Windows, absolute paths (e.g., C:/foo) must not be joined with
+        # the rootdir since Path::Tiny would produce an invalid /C:/foo path.
+        my $pt_path = Path::Tiny::path($path);
+        $file_path = ( $pt_path->is_absolute
+            ? $pt_path
+            : Path::Tiny::path( $dir, $path )
+        )->realpath;
+
+        # We need to check whether they are trying to access
+        # a directory outside their scope
+        $err_response->(403) if !$dir->realpath->subsumes($file_path);
+
+        # other error checks
+        $err_response->(403) if !$file_path->exists;
+        $err_response->(404) if !$file_path->is_file;
         $err_response->(403) if !-r $file_path;
 
         # Read file content as bytes
-        $fh = Dancer2::FileUtils::open_file( "<", $file_path );
-        binmode $fh;
-        $content_type = Dancer2::runner()->mime_type->for_file($file_path) || 'text/plain';
+        $fh = $file_path->openr_raw();
+        $content_type = $self->mime_type->for_file($file_path) || 'text/plain';
         if ( $content_type =~ m!^text/! ) {
-            $charset = $self->config->{charset} || "utf-8";
+            $charset = $self->config->{charset};
         }
+
+        # cleanup for other functions not assuming on Path::Tiny
+        $file_path = $file_path->stringify;
     }
 
     # Now we are sure we can render the file...
@@ -1157,7 +1238,14 @@ sub send_file {
         $response = $self->response;
         # direct assignment to hash element, avoids around modifier
         # trying to serialise this this content.
-        $response->{content} = Dancer2::FileUtils::read_glob_content($fh);
+
+        # optimized slurp
+        {
+            ## no critic qw(Variables::RequireInitializationForLocalVars)
+            local $/;
+            $response->{'content'} = <$fh>;
+        }
+
         $response->is_encoded(1);    # bytes are already encoded
     }
 
@@ -1489,14 +1577,21 @@ sub to_app {
     if ( $self->config->{'static_handler'} ) {
         # Use App::File to "serve" the static content
         my $static_app = Plack::App::File->new(
-            root         => $self->config->{public_dir},
+            root         => $self->_public_dir_path->stringify,
             content_type => sub { $self->mime_type->for_file( $_[0] ) },
         )->to_app;
         # Conditionally use the static handler wrapped with ConditionalGET
         # when the file exists. Otherwise the request passes into our app.
         $psgi = Plack::Middleware::Conditional->wrap(
             $psgi,
-            condition => sub { -f path( $self->config->{public_dir}, shift->{PATH_INFO} ) },
+            condition => sub {
+                my $env = shift;
+                $self->_public_dir_path->child(
+                    defined $env->{'PATH_INFO'} && length $env->{'PATH_INFO'}
+                    ? ($env->{'PATH_INFO'})
+                    : (),
+                )->is_file;
+              },
             builder   => sub { Plack::Middleware::ConditionalGET->wrap( $static_app ) },
         );
     }
@@ -1532,6 +1627,7 @@ sub dispatch {
             app     => $app,
             message => $err,
             status  => 400,    # 400 Bad request (dont send again), rather than 500
+            charset => $self->config->{charset},
         )->throw;
     }
 
@@ -1675,6 +1771,7 @@ sub build_request {
           env             => $env,
           is_behind_proxy => $self->settings->{'behind_proxy'} || 0,
           uri_for_route   => sub { shift; $weak_self->uri_for_route(@_) },
+          strict_utf8     => $self->config->{strict_utf8},
 
           $self->has_serializer_engine
               ? ( serializer => $self->serializer_engine )
@@ -1726,6 +1823,8 @@ sub _prep_response {
       and my $ct = $config->{content_type} ) {
         $response->default_content_type($ct);
     }
+    exists $config->{charset}
+        and $response->charset( $config->{charset} );
 
     # if we were passed any content, set it in the response
     defined $content && $response->content($content);
@@ -1745,6 +1844,7 @@ sub response_internal_error {
         app       => $self,
         status    => 500,
         exception => $error,
+        charset   => $self->config->{charset},
     )->throw;
 }
 
@@ -1757,9 +1857,10 @@ sub response_not_found {
     local $Dancer2::Core::Route::RESPONSE = $self->response;
 
     my $response = Dancer2::Core::Error->new(
-        app    => $self,
+        app     => $self,
         status  => 404,
         message => $request->path,
+        charset => $self->config->{charset},
     )->throw;
 
     $self->cleanup;
@@ -1838,7 +1939,7 @@ Dancer2::Core::App - encapsulation of Dancer2 packages
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 DESCRIPTION
 
@@ -2052,7 +2153,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

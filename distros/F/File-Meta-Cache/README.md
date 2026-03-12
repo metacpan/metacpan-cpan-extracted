@@ -51,7 +51,7 @@ else {
 # DESCRIPTION
 
 Implements a caching mechanism to reuse a open handle/descriptor and meta data
-when 'opening' a file multiple times. 
+when 'opening' a file multiple times and resolving redirected paths.
 
 This is especially useful in a programs such as web servers which typically
 access the same static file multiple times in response to requests. Not having
@@ -59,26 +59,35 @@ to open the file repeatedly can significantly reduce processing time. It also
 reduces the number of open file descriptors required, which allows more files
 to be accessed without adjusting process/user resource limits. 
 
-Files are 'opened' and 'closed' via the cache in order to track how many
+Note this module is tuned for performance rather than nice programming style.
+Thus fields within a cache entry are accessible by their position in an array
+instead of a nice hash name or accessors methods.  
+
+# HOW IT WORKS
+
+Files are 'opened' and 'closed' via the cache to track how many
 references to an entry are active (not Perl reference counting BTW). When an
 entry has no references, it is eligible to be removed by 'sweeping' the cache.
-This should be done a regular interval to keep the meta data fresh, but long
-enough to make the cache useful.  To make this module event system agnostic it
-is up to the user to implement a timer that calls the `sweep` API.
+
+Links on the file system are treaded as normal in the opening process. Since
+**v0.4.0** the concept of redirected files is also supported. It give an
+'application' layer emulation of linked file, but works on file systems that
+don't support links. This is implemented using [File::Path::Redirect](https://metacpan.org/pod/File%3A%3APath%3A%3ARedirect).
 
 Importantly, a entry only uses a single file descriptor per file. Multiple
 users of the same entry must track their own file positions. When doing IO on
 the file, appropriate calls to `seek` (or `pread`/`pwrite` via `IO::FD`)
 will need to be performed to set the position for correct IO operation.
 
-Each cached entry contains a `USER` field, which allows the user to store
+Sweeping the cache should be done a regular interval to keep the meta data
+fresh, but long enough to make the cache useful.  To make this module event
+system agnostic it is up to the user to implement a timer that calls the
+`sweep` API.
+
+A cached entry contains a `USER` field, which allows the user to store
 associated meta data with the entry. For example this could be used to store
 pre rendered HTTP headers (content-type, content-length, etag, modification
 headers, etc), which only need to be computed when the file was opened.
-
-Note this module is tuned for performance rather than nice programming style.
-Thus fields within a cache entry are accessible by their position in an array
-instead of a nice hash name or accessors methods.  
 
 # API
 
@@ -89,44 +98,45 @@ functional API for best performance for high frequency access.
 
 A cache entry is an anonymous array with the following fields:
 
-```perl
-New constant name:         KEY  FD  FH   STAT  VALID   USER
-Depricated constant name:  key_ fd_ fh_  stat_ valid_  user_
-                   values: 0    1   2    3     4       5
+```
+Constant name:     KEY  PATH FD  FH   STAT  VALID  USER
+       values:     0    1    2   3    4     5      6
 ```
 
 This are constants defined in the `File::Meta::Cache` package, which can be
 used as indexes into the array.
-
-**NOTE:** from v0.3.0, the field index contants have been renamed. The old names
-are depricated and will be removed in a later version. Please use the new names.
 
 ### KEY (=0) 
 
 The key to the cache table, which is the file path used when calling the
 `open` method.
 
-### FD (=1)
+### PATH (=1) 
+
+The path to the actual file opened. This could be different to `KEY` if redirection is
+enabled.
+
+### FD (=2)
 
 The file descriptor of the opened file.  This can be used directly with
 [POSIX](https://metacpan.org/pod/POSIX) or `IO::FD` module for IO operations.
 
-### FH (=2)
+### FH (=3)
 
-The file handle of the opened file. This will undefined if the cache was
+The file handle of the opened file. This will be undefined if the cache was
 initialised with `no_fh` parameter.
 
-### STAT (=3)
+### STAT (=4)
 
 This is the reference to an array of stat information from the `stat` call.
 
-### VALID (=4)
+### VALID (=5)
 
 A value indicating if the cache entry is current or has been invalidated. If it
 is greater than 0, the entry is still considered fresh and valid.  If it is 0,
 the cache entry has be removed from the cache and the file has been closed.
 
-### USER (=5)
+### USER (=6)
 
 A general purpose field for storing user associated data with the cache entry.
 This could pre computed/rendered data based on the stat information.
@@ -145,7 +155,7 @@ does not share entries with other cache objects.
 ### open
 
 ```perl
-my $entry=$fmc->open($file_path, [$mode, $force]);
+my $entry=$fmc->open($file_path, [$mode, $force, $enable_redirect]);
 ```
 
 Attempts to find the file path in the cache and return the existing entry. If
@@ -169,6 +179,19 @@ currently used for the file. This will force another `stat` on the file and
 updates the cache entry accordingly. The cache entry is still considered valid
 and file the file descriptor and file handle are unchanged.
 
+`enable_redirect` will test files for redirection using
+[File::Path::Redirect](https://metacpan.org/pod/File%3A%3APath%3A%3ARedirect). The cache entry will still be keyed with the
+`$file_path`, but the actual path opened will be stored in entry as `PATH` 
+
+### info
+
+```
+$fmc->info($path)
+```
+
+Returns the entitiy in the cache for a path key. This can be useful in looking
+up a path that my have been the result of a redirect.
+
 ### close
 
 ```
@@ -181,23 +204,6 @@ the cache.
 
 If the `$force` parameter is specified and true, a explicit invalidation of
 the entry is performed and the file descriptor is closed.
-
-### enable
-
-```
-$fmc->enable;
-```
-
-Enables the caching of file handles and stat meta data.
-
-### disable
-
-```
-$fmc->disable;
-```
-
-Disables the caching of file descriptors and stat meta data. Any entries in the
-cache are removed and closed.
 
 ### sweep
 
@@ -218,6 +224,23 @@ $fmc->update($entry)
 Attempts to perform a stat on the file referenced in the cache entry. Updates
 the entry state information but does not reopen the file. If it fails, it
 invalidates the cache entry.
+
+### enable
+
+```
+$fmc->enable;
+```
+
+Enables the caching of file handles and stat meta data.
+
+### disable
+
+```
+$fmc->disable;
+```
+
+Disables the caching of file descriptors and stat meta data. Any entries in the
+cache are removed and closed.
 
 ## High Performance API
 
@@ -287,12 +310,12 @@ eg $updater_sub->($entry);
 
 # PERFORMANCE
 
-Once a file is open, subsequent opens are only a hash lookup. No open or stat
-call is issued. 
+Once a file is open, subsequent opens are only a hash lookup. No `open` or
+`stat` call is issued. 
 
-Note that unless the rest of your application is written to
-handle high frequency access to the files of interest, this module will give
-only modest performance improvements.
+Note that unless the rest of your application is written to handle high
+frequency access to the files of interest, this module will give only modest
+performance improvements.
 
 TODO - more details and an actual benchmark.
 
@@ -301,12 +324,12 @@ TODO - more details and an actual benchmark.
 There is a PSGI specific module [Plack::Middleware::Static::OpenFileCache](https://metacpan.org/pod/Plack%3A%3AMiddleware%3A%3AStatic%3A%3AOpenFileCache)
 which provides similar functionality. The invalidating of an entry in the cache
 if significantly different. Also this module allows for both read and write
-access to an open file.
+access to an open file and path redirection support.
 
 # REPOSITORY and BUG REPORTING
 
 Please report any bugs and feature requests on the repo page:
-[GitHub](http://github.com/drclaw1394/perl-file-meta-cache)
+[GitHub](https://github.com/drclaw1394/perl-file-meta-cache)
 
 # AUTHOR
 
@@ -314,7 +337,7 @@ Ruben Westerberg, <drclaw@mac.com>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2023 by Ruben Westerberg
+Copyright (C) 2025 by Ruben Westerberg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, or under the MIT license

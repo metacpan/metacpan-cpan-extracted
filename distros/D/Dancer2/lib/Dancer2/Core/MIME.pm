@@ -1,8 +1,9 @@
 # ABSTRACT: Class to ease manipulation of MIME types
 
 package Dancer2::Core::MIME;
-$Dancer2::Core::MIME::VERSION = '2.0.1';
+$Dancer2::Core::MIME::VERSION = '2.1.0';
 use Moo;
+use Carp ();
 
 use Plack::MIME;
 use Dancer2::Core::Types;
@@ -24,6 +25,8 @@ BEGIN {
     }
 }
 
+use constant { 'DEFAULT_MIME_TYPE' => 'application/data' };
+
 has custom_types => (
     is      => 'ro',
     isa     => HashRef,
@@ -33,12 +36,18 @@ has custom_types => (
 has default => (
     is      => 'rw',
     isa     => Str,
-    builder => "reset_default",
+    default => sub { DEFAULT_MIME_TYPE() },
 );
+
+sub reset_to_default {
+    my ($self) = @_;
+    $self->default( DEFAULT_MIME_TYPE() );
+}
 
 sub reset_default {
     my ($self) = @_;
-    $self->default("application/data");
+    Carp::carp 'DEPRECATED: reset_default internal method, replaced by reset_to_default';
+    goto &reset_to_default;
 }
 
 sub add_type {
@@ -91,7 +100,7 @@ Dancer2::Core::MIME - Class to ease manipulation of MIME types
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 SYNOPSIS
 
@@ -140,6 +149,10 @@ Default MIME type defined by MIME::Types, set to: B<application/data>.
 
 =head2 reset_default
 
+Deprecated, use C<reset_to_default>.
+
+=head2 reset_to_default
+
 This method resets C<mime_type> to the default type.
 
 =head2 add_type
@@ -169,7 +182,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

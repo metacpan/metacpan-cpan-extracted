@@ -3,7 +3,7 @@ use feature 'class';
 no warnings 'experimental::class';
 use Archive::CAR::v1;
 #
-class Archive::CAR::v2 v0.0.3 : isa(Archive::CAR::v1) {
+class Archive::CAR::v2 v0.0.4 : isa(Archive::CAR::v1) {
     use Archive::CAR::Utils qw[systell];
     #
     field $v2_header : reader;

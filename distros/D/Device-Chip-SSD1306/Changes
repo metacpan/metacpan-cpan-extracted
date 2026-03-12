@@ -1,5 +1,9 @@
 Revision history for Device-Chip-SSD1306
 
+0.16    2026-03-11
+        [BUGFIXES]
+         * Avoid using `Struct::Dumb` for one quick unit test (RT173717)
+
 0.15    2026-02-11
         [CHANGES]
          * Added ->draw_glyph and ->draw_rect methods

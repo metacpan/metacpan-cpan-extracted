@@ -7,20 +7,7 @@ build_requires:
   Module::Build::Tiny: '0'
   Test2::V0: '0'
 configure_requires:
-  CPAN::Meta: '2.150012'
-  Exporter: '5.57'
-  ExtUtils::Helpers: '0.028'
-  ExtUtils::Install: '0'
-  ExtUtils::InstallPaths: '0.002'
-  File::Basename: '0'
-  File::Find: '0'
-  File::Path: '0'
-  File::Spec::Functions: '0'
-  Getopt::Long: '2.36'
-  JSON::PP: '2'
-  Path::Tiny: '0'
-  Test2::V1: '0'
-  perl: v5.42.0
+  Module::Build::Tiny: '0'
 dynamic_config: 0
 generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
 keywords: []
@@ -42,12 +29,12 @@ optional_features:
   websockets:
     description: 'Websocket based streaming services'
     requires:
-      CBOR::Free: '0'
+      Codec::CBOR: '0'
       Mojo::UserAgent: '0'
 provides:
   At:
     file: lib/At.pm
-    version: '1.5'
+    version: '1.6'
   At::Error:
     file: lib/At/Error.pm
     version: '1.1'
@@ -71,12 +58,12 @@ provides:
     version: '1.0'
   At::UserAgent:
     file: lib/At/UserAgent.pm
-    version: '1.3'
+    version: '1.6'
 recommends:
-  Archive::CAR: '0'
-  CBOR::Free: '0'
   Mojo::UserAgent: '0'
 requires:
+  Archive::CAR: '0'
+  Codec::CBOR: '0'
   Crypt::JWT: '0'
   Crypt::PK::ECC: '0'
   File::ShareDir::Tiny: '0'
@@ -93,7 +80,7 @@ resources:
   homepage: https://github.com/sanko/At.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/At.pm.git
-version: '1.5'
+version: '1.6'
 x_contributors:
   - 'Akiomi Kamakura <akiomik@gmail.com>'
   - 'Alberto Roura <mail@albertoroura.com>'

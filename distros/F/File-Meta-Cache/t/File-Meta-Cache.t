@@ -39,7 +39,7 @@ ok $entry2==$entry, "Same entry";
 
 # Refernce count should be  now (2 external 1 internal)
 #
-ok $entry->[File::Meta::Cache::valid_]==3, "Reference count";
+ok $entry->[File::Meta::Cache::VALID]==3, "Reference count";
 
 #Close the entry
 $cache->close($entry);
@@ -47,12 +47,16 @@ $cache->close($entry);
 $cache->close($entry2);
 
 # Ref count should now be 1.
-ok $entry->[File::Meta::Cache::valid_]==1, "Reference count";
+ok $entry->[File::Meta::Cache::VALID]==1, "Reference count";
+
+# But entry should still exist int table
+ok defined $cache->info($file[0]), "Invalidated fds, but info exists";
 
 # This should remove the entry
 $cache->sweep;
+ok ! defined $cache->info($file[0]), "Item swept from  cache";
 
-ok $entry->[File::Meta::Cache::valid_]==0, "Entry invalidated";
+ok $entry->[File::Meta::Cache::VALID]==0, "Entry invalidated";
 
 
 # So when reopening it, whe shoul have a different array ref
@@ -67,7 +71,7 @@ ok $entry!=$entry2, "Different entry";
 
 
 $entry=$cache->open($file[0],O_RDWR, 1);
-ok $entry->[File::Meta::Cache::fd_]==$entry2->[File::Meta::Cache::fd_], "Reopend to same fd";
+ok $entry->[File::Meta::Cache::FD]==$entry2->[File::Meta::Cache::FD], "Reopend to same fd";
 
 
 
@@ -75,7 +79,7 @@ ok $entry->[File::Meta::Cache::fd_]==$entry2->[File::Meta::Cache::fd_], "Reopend
 # Test filehandle
 # Writing to cached entry
 my $ret;
-syswrite $entry->[File::Meta::Cache::fh_], "hello";
+syswrite $entry->[File::Meta::Cache::FH], "hello";
 
 # Forcing a reopen on the cache entry
 # and appending to the file
@@ -83,16 +87,16 @@ $entry=$cache->open($file[0], O_RDWR, 1);
 
 # File size should be updated with a force open
 #
-ok $entry->[File::Meta::Cache::stat_][7]== 5, "File size";
+ok $entry->[File::Meta::Cache::STAT][7]== 5, "File size";
 
-sysseek $entry->[File::Meta::Cache::fh_], 0, 2;
-syswrite $entry->[File::Meta::Cache::fh_], "hello";
+sysseek $entry->[File::Meta::Cache::FH], 0, 2;
+syswrite $entry->[File::Meta::Cache::FH], "hello";
 
 
 # Reading the file from the begining
 #
-sysseek $entry->[File::Meta::Cache::fh_], 0, 0;
-my $ret=sysread $entry->[File::Meta::Cache::fh_], my $data, 4096;
+sysseek $entry->[File::Meta::Cache::FH], 0, 0;
+my $ret=sysread $entry->[File::Meta::Cache::FH], my $data, 4096;
 
 
 
@@ -103,7 +107,7 @@ ok $data eq "hellohello", "Reopened file content ok";
 $cache->update($entry);
 # File size should be updated with an update
 #
-ok $entry->[File::Meta::Cache::stat_][7]== 10, "File size";
+ok $entry->[File::Meta::Cache::STAT][7]== 10, "File size";
 
 # Very basic code coverage of disable and enable
 
@@ -112,9 +116,9 @@ ok defined $cache->disable, "Disable ok";
 # Attempt to open now when disabled, should give multiple fds
 my $dis_entry1=$cache->open($file[0],0);
 my $dis_entry2=$cache->open($file[0],0);
-ok $dis_entry1->[File::Meta::Cache::fd_] != $dis_entry2->[File::Meta::Cache::fd_], "Opened new fd when disabled";
-ok $dis_entry1->[File::Meta::Cache::valid_] ==1 , "Disabled ref count ok";
-ok $dis_entry2->[File::Meta::Cache::valid_] ==1 , "Disabled ref count ok";
+ok $dis_entry1->[File::Meta::Cache::FD] != $dis_entry2->[File::Meta::Cache::FD], "Opened new fd when disabled";
+ok $dis_entry1->[File::Meta::Cache::VALID] ==1 , "Disabled ref count ok";
+ok $dis_entry2->[File::Meta::Cache::VALID] ==1 , "Disabled ref count ok";
 
 
 

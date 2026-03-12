@@ -7,7 +7,10 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Encode' => '0',
-                                      'Test::More' => '0',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0.94',
                                       'Test::Pod' => '1.41'
                                     }
                     },

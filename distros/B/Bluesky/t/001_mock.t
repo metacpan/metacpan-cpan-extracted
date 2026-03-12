@@ -82,6 +82,14 @@ subtest 'Threadgate Support' => sub {
     is( $last->{record}{allow}[0]{'$type'}, 'app.bsky.feed.threadgate#followingRule', 'Following rule added' );
     is( $last->{record}{allow}[1]{'$type'}, 'app.bsky.feed.threadgate#mentionRule',   'Mention rule added' );
 };
+subtest 'Postgate Support' => sub {
+    $bsky->createPost( text => 'No quotes please', post_gate => ['disable'] );
+    my $last = $mock->last_post();
+    is( $last->{collection},                         'app.bsky.feed.postgate',             'Postgate record created' );
+    is( scalar @{ $last->{record}{embeddingRules} }, 1,                                    'One rule added' );
+    is( $last->{record}{embeddingRules}[0]{'$type'}, 'app.bsky.feed.postgate#disableRule', 'Disable rule added' );
+    ok( defined $last->{rkey}, 'rkey provided for postgate' );
+};
 subtest 'Known Followers' => sub {
     my $res = $bsky->getKnownFollowers('target.bsky.social');
     is( ref $res,          'ARRAY',              'Returns arrayref' );

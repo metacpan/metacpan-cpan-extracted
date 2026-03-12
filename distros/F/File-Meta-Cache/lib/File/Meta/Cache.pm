@@ -2,40 +2,49 @@ use strict;
 use warnings;
 package File::Meta::Cache;
 
-our $VERSION="v0.3.0";
+our $VERSION="v0.4.0";
 
 # Default Opening Mode
-use Fcntl qw(O_RDONLY);
+#
 
-# NOTE: This contants will be depricated in a later version
-use constant::more key_=>0, fd_=>1, fh_=>2, stat_=>3, valid_=>4, user_=>5;
+use Fcntl qw(O_RDONLY);
+use File::Path::Redirect qw<follow_redirect>;
 
 # Use these keys instead
-use constant::more qw<KEY=0 FD FH STAT VALID USER>;
+use constant::more qw<KEY=0 PATH FD FH STAT VALID USER>;
 
 use Object::Pad;
 
 class File::Meta::Cache;
 use feature qw<say state>;
 
-use Log::ger;   # Logger
-use Log::OK;    # Logger enabler
+#use uSAC::Log;   # Logger
+#use Log::OK;    # Logger enabler
 
 
 
 my ($_open, $_close, $_dup2);
 
-if(eval "require IO::FD"){
-  $_open=\&IO::FD::open;
-  $_close=\&IO::FD::close;
-  $_dup2=\&IO::FD::dup2;
-}
-else {
-  require POSIX;
-  $_open=\&POSIX::open;
-  $_close=\&POSIX::close;
-  $_dup2=\&POSIX::dup2;
-}
+##############################
+# if(eval "require IO::FD"){ #
+#   $_open=\&IO::FD::open;   #
+#   $_close=\&IO::FD::close; #
+#   $_dup2=\&IO::FD::dup2;   #
+# }                          #
+# else {                     #
+#   require POSIX;           #
+#   $_open=\&POSIX::open;    #
+#   $_close=\&POSIX::close;  #
+#   $_dup2=\&POSIX::dup2;    #
+# }                          #
+##############################
+require POSIX;
+$_open=\&POSIX::open;
+$_close=\&POSIX::close;
+$_dup2=\&POSIX::dup2;
+
+
+
 
 
 
@@ -81,7 +90,7 @@ method sweeper {
 method opener{
   $_opener//=
   sub {
-    my ( $KEYpath, $mode, $force)=@_;
+    my ( $KEYpath, $mode, $force, $enable_redirect)=@_;
     my $in_fd;
 
     # Entry is identified by the path, however, the actual data can come from another file
@@ -89,9 +98,23 @@ method opener{
     my $existing_entry=$_cache{$KEYpath};
     $mode//=O_RDONLY;
     if(!$existing_entry or $force){
-        Log::OK::TRACE and log_trace __PACKAGE__.": Searching for: $KEYpath";
+      #Log::OK::TRACE and log_trace __PACKAGE__.": Searching for: $KEYpath";
 
-        my @stat=stat $KEYpath;
+        my @entry;
+        my $path;
+        if($enable_redirect){
+          # Attempt to redirect file if appropriate
+          $path=follow_redirect $KEYpath;
+          $entry[PATH]=$path;
+
+        }
+        else {
+          $path=$KEYpath;
+
+        }
+
+        $entry[PATH]=$path;
+        my @stat=stat $path;  #$KEYpath;
         
         # If the stat fail or is not a file return undef.
         # If this is a reopen(force), the force close the file to invalidate the cache
@@ -101,10 +124,8 @@ method opener{
           return undef;
         };
 
-        my @entry;
-        #$in_fd=POSIX::open($KEYpath, $mode);
-        $in_fd=$_open->($KEYpath, $mode);
-
+        $in_fd=$_open->($path, $mode);
+        
 
 
         if(defined $in_fd){
@@ -136,7 +157,7 @@ method opener{
           }
         }
         else {
-          Log::OK::ERROR and log_error __PACKAGE__." Error opening file $KEYpath: $!";
+          #Log::OK::ERROR and log_error __PACKAGE__." Error opening file $KEYpath: $!";
         }
     }
     else {
@@ -168,8 +189,10 @@ method disable{
 #
 method closer {
   $_closer//=sub {
+    #Log::OK::TRACE and log_trace ("FMC closer called");
       my $entry=$_[0];
       if(--$entry->[VALID] <=0 or $_[1]){
+        #Log::OK::TRACE and log_trace ("FMC closer valid 0 or lesss, or maybe force flag");
         # Delete from cache
         delete $_cache{$entry->[KEY]};
         # Attempt to close only if the entry exists
@@ -214,6 +237,10 @@ method sweep {
 }
 
 method enable{ $_enabled=1; $self }
+
+method info {
+  $_cache{$_[0]}
+}
 
 1;
 

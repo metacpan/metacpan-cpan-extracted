@@ -32,7 +32,6 @@
       "runtime" : {
          "requires" : {
             "File::MMagic" : "0",
-            "MIME::Types" : "0",
             "Storable" : "0",
             "Time::Moment" : "0.38",
             "perl" : "5.008"
@@ -42,8 +41,7 @@
          "requires" : {
             "Test::Data" : "0",
             "Test::More" : "1",
-            "Test::Output" : "0",
-            "version" : "0.86"
+            "Test::Output" : "0"
          }
       }
    },
@@ -59,6 +57,6 @@
          "web" : "https://github.com/briandfoy/brick"
       }
    },
-   "version" : "0.904",
+   "version" : "0.905",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

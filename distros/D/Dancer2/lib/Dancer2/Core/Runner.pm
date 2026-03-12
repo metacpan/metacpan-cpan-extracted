@@ -1,6 +1,6 @@
 package Dancer2::Core::Runner;
 # ABSTRACT: Top-layer class to start a dancer app
-$Dancer2::Core::Runner::VERSION = '2.0.1';
+$Dancer2::Core::Runner::VERSION = '2.1.0';
 use Moo;
 use Carp 'croak';
 use Module::Runtime 'require_module';
@@ -20,7 +20,6 @@ has config => (
     builder => '_build_config',
 );
 
-# FIXME: i hate this
 has mime_type => (
     is      => 'ro',
     isa     => InstanceOf ['Dancer2::Core::MIME'],
@@ -78,12 +77,17 @@ sub _build_server {
     my $self = shift;
 
     require_module('HTTP::Server::PSGI');
-    HTTP::Server::PSGI->new(
+    my %args = (
         host            => $self->host,
         port            => $self->port,
         timeout         => $self->timeout,
-        server_software => "Perl Dancer2 " . Dancer2->VERSION,
     );
+
+    if ( !$self->config->{'no_server_tokens'} ) {
+        $args{'server_software'} = "Perl Dancer2 " . Dancer2->VERSION;
+    }
+
+    return HTTP::Server::PSGI->new(%args);
 }
 
 sub _build_config {
@@ -154,8 +158,6 @@ sub start {
     $self->config->{'apphandler'} eq 'PSGI'
         and return $app;
 
-    # FIXME: this should not include the server tokens
-    # since those are already added to the server itself
     $self->start_server($app);
 }
 
@@ -171,31 +173,27 @@ sub start_server {
 sub psgi_app {
     my ($self, $apps) = @_;
 
-    if ( $apps && @{$apps} ) {
-        my @found_apps = ();
-
-        foreach my $app_req ( @{$apps} ) {
-            if ( is_regexpref($app_req) ) {
-                # find it in the apps registry
-                push @found_apps,
-                    grep +( $_->name =~ $app_req ), @{ $self->apps };
-            } elsif ( ref $app_req eq 'Dancer2::Core::App' ) {
-                # use it directly
-                push @found_apps, $app_req;
-            } elsif ( !is_ref($app_req) ) {
-                # find it in the apps registry
-                push @found_apps,
-                    grep +( $_->name eq $app_req ), @{ $self->apps };
-            } else {
-                croak "Invalid input to psgi_app: $app_req";
-            }
+    my @found_apps;
+    foreach my $app_req ( @{ $apps || [] } ) {
+        if ( is_regexpref($app_req) ) {
+            # Asked to find app via regex pattern on its name
+            push @found_apps,
+                grep +( $_->name =~ $app_req ), @{ $self->apps };
+        } elsif ( ref $app_req eq 'Dancer2::Core::App' ) {
+            # Given Dancer2 App instance
+            push @found_apps, $app_req;
+        } elsif ( !is_ref($app_req) ) {
+            # Strings of the app names
+            push @found_apps,
+                grep +( $_->name eq $app_req ), @{ $self->apps };
+        } else {
+            croak "Invalid input to psgi_app: $app_req";
         }
-
-        $apps = \@found_apps;
-    } else {
-        # dispatch over all apps by default
-        $apps = $self->apps;
     }
+
+    # if specific apps, dispatch to them
+    # otherwise, dispatch over all apps by default
+    $apps = @found_apps ? \@found_apps : $self->apps;
 
     my $dispatcher = Dancer2::Core::Dispatcher->new( apps => $apps );
 
@@ -261,7 +259,7 @@ Dancer2::Core::Runner - Top-layer class to start a dancer app
 
 =head1 VERSION
 
-version 2.0.1
+version 2.1.0
 
 =head1 AUTHOR
 
@@ -269,7 +267,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexis Sukrieh.
+This software is copyright (c) 2026 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

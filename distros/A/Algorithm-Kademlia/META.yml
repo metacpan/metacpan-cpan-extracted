@@ -1,0 +1,64 @@
+---
+X_No_Archive: Yes
+abstract: 'Pure Perl implementation of the Kademlia DHT Algorithm'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Module::Build::Tiny: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0'
+  perl: v5.42.0
+dynamic_config: 0
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+keywords:
+  - dht
+  - kademlia
+  - bittorrent
+  - interplanetary
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Algorithm-Kademlia
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+provides:
+  Algorithm::Kademlia:
+    file: lib/Algorithm/Kademlia.pm
+    version: v1.1.0
+  Algorithm::Kademlia::RoutingTable:
+    file: lib/Algorithm/Kademlia.pm
+    version: v1.1.0
+  Algorithm::Kademlia::Search:
+    file: lib/Algorithm/Kademlia.pm
+    version: v1.1.0
+  Algorithm::Kademlia::Storage:
+    file: lib/Algorithm/Kademlia.pm
+    version: v1.1.0
+  Algorithm::Kademlia::Storage::Entry:
+    file: lib/Algorithm/Kademlia.pm
+    version: v1.1.0
+requires:
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/sanko/Algorithm-Kademlia.pm/issues
+  homepage: https://github.com/sanko/Algorithm-Kademlia.pm
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/sanko/Algorithm-Kademlia.pm.git
+version: v1.1.0
+x_help_wanted:
+  - Tester
+  - Documenter
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .github/
+  - .github/*
+  - .github/**
+  - .clang-format
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0
