@@ -32,22 +32,22 @@
          "requires" : {
             "Test2::V0" : "0",
             "Test::ExpectAndCheck" : "0.06",
-            "Test::Future::IO::Impl" : "0.20"
+            "Test::Future::IO::Impl" : "0.21"
          }
       }
    },
    "provides" : {
       "Future::IO" : {
          "file" : "lib/Future/IO.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "Future::IO::ImplBase" : {
          "file" : "lib/Future/IO/ImplBase.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       },
       "Future::IO::System" : {
          "file" : "lib/Future/IO/System.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.22",
+   "version" : "0.23",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

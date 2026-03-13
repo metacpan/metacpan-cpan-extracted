@@ -1,5 +1,12 @@
 Revision history for Future-IO-Impl-Tickit
 
+0.05    2026-03-12
+        [BUGFIXES]
+         * Avoid a continual accumulation of IO watches in libtickit by making
+           sure to cancel IO watches once they're finished
+         * Handle the `->cancel` method on `->poll` futures by cancelling them
+           at the libtickit level as well
+
 0.04    2026-02-27
         [BUGFIXES]
          * Improved logic for handling multiple `->poll` event flags

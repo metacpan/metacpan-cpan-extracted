@@ -18,7 +18,7 @@ use PerlX::Maybe;
 
 with 'MooX::Role::EventEmitter';
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 our @CARP_NOT;
 
 =head1 NAME
@@ -334,6 +334,16 @@ sub connect( $self, %args ) {
         $self->tab($tab);
         $done = $done->then(sub {
             $s->attach( $s->tab->{targetId});
+        });
+
+    } elsif( defined $args{ tab } and $args{ tab } eq 'current' ) {
+        $done = $done->then(sub {
+            $s->getTargets()
+        })->then(sub( @tabs ) {
+            (my $tab) = grep { $_->{type} eq 'page' && $_->{targetId} && $_->{attached} } @tabs;
+            ($tab) ||= grep { $_->{type} eq 'page' && $_->{targetId} } @tabs;
+            $s->tab($tab);
+            $s->attach( $tab->{targetId} )
         });
 
     } elsif( defined $args{ tab } and $args{ tab } =~ /^\d{1,5}$/ ) {
@@ -731,8 +741,10 @@ Brings the tab to the foreground of the application
 
 =cut
 
-sub activate_tab( $self, $tab ) {
-    croak "Won't activate tabs, even though I could";
+sub activate_tab( $self, $tab=undef ) {
+    my $id = ref $tab ? $tab->{targetId} : $tab;
+    $id ||= $self->targetId;
+    $self->transport->send_message('Target.activateTarget', targetId => $id );
 };
 
 =head2 C<< $target->getTargetInfo >>
@@ -836,7 +848,7 @@ sub attach( $self, $targetId=$self->targetId ) {
 
 =head1 SEE ALSO
 
-The inofficial Chrome debugger API documentation at
+The unofficial Chrome debugger API documentation at
 L<https://github.com/buggerjs/bugger-daemon/blob/master/README.md#api>
 
 Chrome DevTools at L<https://chromedevtools.github.io/devtools-protocol/1-2>

@@ -71,6 +71,7 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "Data::Dump" : "0",
             "Data::Dumper" : "0",
             "Image::Info" : "0",
@@ -97,7 +98,7 @@
          "web" : "https://github.com/Corion/WWW-Mechanize-Chrome"
       }
    },
-   "version" : "0.75",
+   "version" : "0.76",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

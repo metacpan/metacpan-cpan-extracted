@@ -2,28 +2,30 @@
 use strict;
 use warnings;
 use Math::Prime::Util qw/prime_precalc prime_memfree prime_get_config/;
+use Math::Prime::Util::MemFree;
 
 use Test::More  tests => 3 + 3 + 3 + 6;
 
-
-my $bigsize = 10_000_000;
 
 # This is still a slightly dubious assumption, that the precalc size _must_
 # go up when we request it.
 
 can_ok( 'Math::Prime::Util', 'prime_get_config' );
 
-my $diag = "Using " .
-  ((Math::Prime::Util::prime_get_config->{xs})
-    ? "XS"
-    : "PP") .
+{ my $x = Math::Prime::Util::_to_bigint(0); }
+my $biclass = Math::Prime::Util::prime_get_config->{bigintclass};
+
+my $diag = "" .
+  ((Math::Prime::Util::prime_get_config->{xs}) ? "XS" : "PP") .
   ((Math::Prime::Util::prime_get_config->{gmp})
-    ? " with MPU::GMP version $Math::Prime::Util::GMP::VERSION."
-    : ".") .
-  "\n";
+    ? ", MPU::GMP $Math::Prime::Util::GMP::VERSION"
+    : "") .
+  ($biclass ? ", BI $biclass" : "") .
+  ".\n";
 diag $diag;
 
 my $init_size = prime_get_config->{'precalc_to'};
+my $bigsize = $init_size + 50_000;
 
 prime_precalc($bigsize);
 

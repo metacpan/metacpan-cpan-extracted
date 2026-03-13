@@ -95,7 +95,7 @@ sub encode
 
     while( $n = $reader->( $buff, ENCODE_BUFFER_SIZE ) )
     {
-        # MIME::Base64::encode_base64 appends its own newline — strip it, then
+        # MIME::Base64::encode_base64 appends its own newline - strip it, then
         # insert our configured eol every 76 characters.
         my $encoded = MIME::Base64::encode_base64( $buff, '' );
         if( $has_eol )

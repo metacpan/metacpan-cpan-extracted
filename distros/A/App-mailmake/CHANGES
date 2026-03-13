@@ -1,0 +1,19 @@
+Revision history for Perl module App::mailmake
+
+v0.1.2 2026-03-13T01:19:24+0900
+    - Minor documentation improvements
+
+v0.1.1 2026-03-07T16:55:45+0900
+    - Fixed attach() and attach_inline() calls to use the correct Mail::Make
+      API: path => $file is now passed explicitly as required by Mail::Make
+    - Fixed plain_file and html_file option checks: replaced defined() guard
+      with a plain boolean check, since a Getopt::Class file object can be
+      defined but empty when the option was not supplied
+    - Added error propagation to all Mail::Make method calls: every call now
+      checks the return value and calls _die() with the error on failure
+    - Test suite (t/010_app_mailmake.t): replaced qx() with IPC::Open3 +
+      IO::Select to capture stdout and stderr separately without pipe buffer
+      deadlock risk; stderr is now shown in diagnostics on failure
+
+v0.1.0 2026-03-06T00:00:00+0900
+    - Initial release

@@ -1034,7 +1034,7 @@ sub new {
     $has_X = TRUE if (defined($ENV{'DISPLAY'}) && $self->{'IGNORE_X_WINDOWS'} == FALSE);
     if ((!$has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                          # We have to be in binary mode first
-		$| = 1;
+        $| = 1;
         if ($self->{'ACCELERATED'}) {                                                                                                    # Pull in the C structure for the Framebuffer
             (                                                                                                                            # These need to be accurate to give accurate output
                 $self->{'fscreeninfo'}->{'id'},
@@ -1405,7 +1405,6 @@ sub _fix_mapping {    # File::Map SHOULD make this obsolete
 } ## end sub _fix_mapping
 
 sub _color_order {
-
     # Determine the color order the video card uses
     my $self = shift;
 
@@ -1870,7 +1869,6 @@ You can add an optional parameter to turn the console cursor on or off too.
 =cut
 
 sub clear_screen {
-
     # Fills the entire screen with the background color fast #
     my ($self, $cursor) = @_;
     $cursor ||= '';
@@ -2243,7 +2241,7 @@ sub plot {
     } ## end else [ if ($self->{'ACCELERATED'...})]
     $self->{'X'} = $x;
     $self->{'Y'} = $y;
-	$| = 1;
+    $| = 1;
 } ## end sub plot
 
 =head2 setpixel
@@ -2522,7 +2520,7 @@ sub drawto {
 
     if ($self->{'ACCELERATED'}) {
         c_line($self->{'SCREEN'}, $start_x, $start_y, $x_end, $y_end, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $self->{'COLOR_ALPHA'}, $self->{'DRAW_MODE'}, $self->{'BYTES'}, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $antialiased,);
-		$| = 1;
+        $| = 1;
     } else {
         my $width;
         my $height;
@@ -2661,7 +2659,7 @@ sub _flush_screen {
         select(STDERR);
         $| = 1;
     }
-	select($self->{'FB'}) if (defined($self->{'FB'}));
+    select($self->{'FB'}) if (defined($self->{'FB'}));
     $| = 1;
 } ## end sub _flush_screen
 
@@ -2840,7 +2838,6 @@ Draws an arc/pie/poly arc of a circle at point x,y.
 =cut
 
 sub draw_arc {
-
     # This isn't exactly the fastest routine out there, hence the "granularity" parameter, but it is pretty neat.  Drawing lines between points smooths and compensates for high granularity settings.
     my ($self, $params) = @_;
 
@@ -3269,7 +3266,6 @@ Draw an ellipse at center position x,y with XRadius, YRadius.  Either a filled e
 =cut
 
 sub ellipse {
-
     # The routine even works properly for XOR mode when filled ellipses are drawn as well.  This was solved by drawing only if the X or Y position changed.
     my ($self, $params) = @_;
 
@@ -3830,7 +3826,6 @@ sub polygon {
 } ## end sub polygon
 
 sub _point_in_polygon {
-
     # Does point x,y fall inside the polygon described in coordinates?  Not yet used.
     my ($self, $params) = @_;
 
@@ -4600,7 +4595,7 @@ sub fill {
             $self->blit_write($saved);
         } else {
             c_fill($self->{'SCREEN'}, $x, $y, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $color_alpha, $self->{'DRAW_MODE'}, $bytes, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'},);
-			$| = 1;
+            $| = 1;
         }
     } ## end else
 } ## end sub fill
@@ -4842,15 +4837,15 @@ sub play_animation {
     my ($self, $image, $rate) = @_;
     $rate ||= 1;
 
-	foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
-		my $begin = time;
-		$self->blit_write($image->[$frame]);
+    foreach my $frame (0 .. (scalar(@{$image}) - 1)) {
+        my $begin = time;
+        $self->blit_write($image->[$frame]);
 
-		my $delay = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01) * $rate) - (time - $begin);
-		if ($delay > 0) {
-			sleep $delay;
-		}
-	} ## end foreach my $frame (0 .. (scalar...))
+        my $delay = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01) * $rate) - (time - $begin);
+        if ($delay > 0) {
+            sleep $delay;
+        }
+    } ## end foreach my $frame (0 .. (scalar...))
 } ## end sub play_animation
 
 =head2 acceleration
@@ -5000,7 +4995,7 @@ sub blit_read {
             $scrn .= substr($fb,  $idx, $W);
         }
     } ## end else [ if ($h > 1 && $self->{...})]
-	$| = 1;
+    $| = 1;
     return ({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h, 'image' => $scrn });
 } ## end sub blit_read
 
@@ -5175,7 +5170,7 @@ sub blit_write {
             $self->_fix_mapping();
         }
     } ## end else [ if ($self->{'ACCELERATED'...})]
-	$| = 1;
+    $| = 1;
 } ## end sub blit_write
 
 sub _blit_adjust_for_clipping {
@@ -5402,7 +5397,7 @@ sub blit_transform {
         warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
 
         $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
-		$| = 1;
+        $| = 1;
         return (
             {
                 'x'      => $params->{'merge'}->{'dest_blit_data'}->{'x'},
@@ -5440,7 +5435,7 @@ sub blit_transform {
                 $new = "$image";
             }
         } ## end else [ if ($self->{'ACCELERATED'...})]
-		$| = 1;
+        $| = 1;
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -5480,7 +5475,7 @@ sub blit_transform {
                 $data = $self->{'RAW_BACKGROUND_COLOR'} x (($wh**2) * $bytes);
 
                 c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes, $bits);
-				$| = 1;
+                $| = 1;
                 return (
                     {
                         'x'      => $params->{'blit_data'}->{'x'},
@@ -5524,7 +5519,7 @@ sub blit_transform {
             };
             warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         } ## end else
-		$| = 1;
+        $| = 1;
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -5569,7 +5564,7 @@ sub blit_transform {
         };
         warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         $data = $self->_convert_24_to_16($data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
-		$| = 1;
+        $| = 1;
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -5591,7 +5586,7 @@ sub blit_transform {
         if ($params->{'center'} == CENTER_Y || $params->{'center'} == CENTER_XY) {
             $y = $self->{'Y_CLIP'} + int(($YY - $height) / 2);
         }
-		$| = 1;
+        $| = 1;
         return (
             {
                 'x'      => $x,
@@ -5618,7 +5613,6 @@ Turns off clipping, and resets the clipping values to the full size of the scree
 =cut
 
 sub clip_reset {
-
     # Clipping is not really turned off.  It's just set to the screen borders.  To turn off clipping for real is asking for crashes.
     my $self = shift;
 
@@ -5768,7 +5762,7 @@ sub monochrome {
     }
     if ($self->{'ACCELERATED'}) {
         c_monochrome($params->{'image'}, $size, $color_order, $inc, $params->{'bits'});
-		$| = 1;
+        $| = 1;
         return ($params->{'image'});
     } else {
         for (my $byte = 0; $byte < length($params->{'image'}); $byte += $inc) {
@@ -5804,7 +5798,7 @@ sub monochrome {
             } ## end else [ if ($inc == 2) ]
         } ## end for (my $byte = 0; $byte...)
     } ## end else [ if ($self->{'ACCELERATED'...})]
-	$| = 1;
+    $| = 1;
     return ($params->{'image'});
 } ## end sub monochrome
 
@@ -6184,7 +6178,6 @@ sub ttf_paragraph {
 } ## end sub ttf_paragraph
 
 sub _gather_fonts {
-
     # Gather in and find all the fonts
     my ($self, $path) = @_;
 
@@ -6711,7 +6704,6 @@ sub screen_dump {
 ### Bitmap conversion routines ###
 
 sub _convert_16_to_24 {
-
     # Convert 16 bit bitmap to 24 bit bitmap
     my ($self, $img, $color_order) = @_;
 
@@ -6745,7 +6737,6 @@ sub _convert_16_to_24 {
 } ## end sub _convert_16_to_24
 
 sub _convert_8_to_32 {
-
     # Convert 8 bit bitmap to 32 bit bitmap
     my ($self, $img, $color_order, $pallette) = @_;
 
@@ -6761,7 +6752,6 @@ sub _convert_8_to_32 {
 } ## end sub _convert_8_to_32
 
 sub _convert_8_to_24 {
-
     # Convert 8 bit bitmap to 24 bit bitmap
     my ($self, $img, $color_order, $pallette) = @_;
 
@@ -6777,7 +6767,6 @@ sub _convert_8_to_24 {
 } ## end sub _convert_8_to_24
 
 sub _convert_8_to_16 {
-
     # Convert 8 bit bitmap to 16 bit bitmap
     my ($self, $img, $color_order, $pallette) = @_;
 
@@ -6793,7 +6782,6 @@ sub _convert_8_to_16 {
 } ## end sub _convert_8_to_16
 
 sub _convert_16_to_32 {
-
     # Convert 16 bit bitmap to 32 bit bitmap
     my ($self, $img, $color_order) = @_;
 
@@ -6827,7 +6815,6 @@ sub _convert_16_to_32 {
 } ## end sub _convert_16_to_32
 
 sub _convert_24_to_16 {
-
     # Convert 24 bit bitmap to 16 bit bitmap
     my ($self, $img, $color_order) = @_;
 
@@ -6862,7 +6849,6 @@ sub _convert_24_to_16 {
 } ## end sub _convert_24_to_16
 
 sub _convert_32_to_16 {
-
     # Convert 32 bit bitmap to a 16 bit bitmap
     my ($self, $img, $color_order) = @_;
 
@@ -6897,7 +6883,6 @@ sub _convert_32_to_16 {
 } ## end sub _convert_32_to_16
 
 sub _convert_32_to_24 {
-
     # Convert a 32 bit bitmap to a 24 bit bitmap.
     my ($self, $img, $color_order) = @_;
 
@@ -6932,7 +6917,6 @@ sub _convert_32_to_24 {
 } ## end sub _convert_32_to_24
 
 sub _convert_24_to_32 {
-
     # Convert a 24 bit bitmap to a 32 bit bipmap
     my ($self, $img, $color_order) = @_;
 

@@ -3,8 +3,8 @@ NAME
     perform actions on them
 
 VERSION
-    This document describes version 0.005 of Git::Grouper (from Perl
-    distribution Git-Grouper), released on 2025-11-12.
+    This document describes version 0.006 of Git::Grouper (from Perl
+    distribution Git-Grouper), released on 2025-11-13.
 
 SYNOPSIS
     See the included script git-grouper.
@@ -31,6 +31,10 @@ FUNCTIONS
         (No description)
 
     *   config_file => *filename*
+
+        (No description)
+
+    *   ignore_nondirs => *bool*
 
         (No description)
 
@@ -75,6 +79,10 @@ FUNCTIONS
 
         (No description)
 
+    *   ignore_nondirs => *bool*
+
+        (No description)
+
     *   repo => *array[str]*
 
         (No description)
@@ -116,6 +124,10 @@ FUNCTIONS
 
         (No description)
 
+    *   ignore_nondirs => *bool*
+
+        (No description)
+
     *   repo => *array[str]*
 
         (No description)
@@ -150,6 +162,10 @@ FUNCTIONS
         (No description)
 
     *   config_file => *filename*
+
+        (No description)
+
+    *   ignore_nondirs => *bool*
 
         (No description)
 
@@ -190,6 +206,10 @@ FUNCTIONS
 
         (No description)
 
+    *   ignore_nondirs => *bool*
+
+        (No description)
+
     *   repo => *array[str]*
 
         (No description)
@@ -227,6 +247,10 @@ FUNCTIONS
 
         (No description)
 
+    *   ignore_nondirs => *bool*
+
+        (No description)
+
     *   repo => *array[str]*
 
         (No description)
@@ -261,6 +285,10 @@ FUNCTIONS
         (No description)
 
     *   config_file => *filename*
+
+        (No description)
+
+    *   ignore_nondirs => *bool*
 
         (No description)
 
@@ -386,6 +414,10 @@ FUNCTIONS
         array for multiple groups. When set to 'always', will always return
         an array for the groups result.
 
+    *   ignore_nondirs => *bool*
+
+        (No description)
+
     *   repo => *array[str]*
 
         (No description)
@@ -422,6 +454,10 @@ FUNCTIONS
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
+
+    *   ignore_nondirs => *bool*
+
+        (No description)
 
     *   repo => *array[str]*
 

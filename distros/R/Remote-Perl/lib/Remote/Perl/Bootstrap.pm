@@ -1,6 +1,6 @@
 use v5.36;
 package Remote::Perl::Bootstrap;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use autodie qw(open close);
 use File::Spec;

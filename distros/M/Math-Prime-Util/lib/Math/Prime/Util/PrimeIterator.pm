@@ -4,7 +4,7 @@ use warnings;
 
 BEGIN {
   $Math::Prime::Util::PrimeIterator::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::PrimeIterator::VERSION = '0.73';
+  $Math::Prime::Util::PrimeIterator::VERSION = '0.74';
 }
 
 use base qw( Exporter );
@@ -56,8 +56,7 @@ sub rewind {
   my ($self, $start) = @_;
   $$self = 2;
   if (defined $start && $start ne '2') {
-    Math::Prime::Util::_validate_num($start)
-      || Math::Prime::Util::_validate_positive_integer($start);
+    Math::Prime::Util::_validate_integer_nonneg($start);
     $$self = next_prime($start-1) if $start > 2;
   }
   return $self;
@@ -129,7 +128,7 @@ Math::Prime::Util::PrimeIterator - An object iterator for primes
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 
 =head1 SYNOPSIS

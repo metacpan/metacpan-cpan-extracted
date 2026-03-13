@@ -1,15 +1,1028 @@
-pod2text Mail::Make.pm > README
+NAME
+    Mail::Make - Strict, Fluent MIME Email Builder
 
-If this is still here it means the programmer was too lazy to create the readme file.
+SYNOPSIS
+        use Mail::Make;
 
-You can create it now by using the command shown above from this directory.
+        # Fluent API
+        my $mail = Mail::Make->new
+            ->from( 'hello@example.com' )
+            ->to( 'jack@example.jp' )
+            ->subject( "Q4 Report - Yamato, Inc." )
+            ->plain( "Please find the report attached." )
+            ->html( '<p>Please find the report <b>attached</b>.</p>' )
+            ->attach_inline(
+                path => '/var/www/images/Yamato,Inc-Logo.png',
+                type => 'image/png',
+                cid  => 'logo@yamato-inc',
+            )
+            ->attach(
+                path     => '/tmp/Q4-Report.pdf',
+                type     => 'application/pdf',
+                filename => 'Q4 Report 2025.pdf',
+            );
 
-At the very least you should be able to use this set of instructions
-to install the module...
+        my $raw = $mail->as_string || die( $mail->error );
+        print $raw;
 
-perl Makefile.PL
-make
-make test
-make install
+        # Scalar-ref form - no string copy, useful for large messages
+        my $raw_ref = $mail->as_string_ref || die( $mail->error );
+        print $$raw_ref;
 
-If you are on a windows box you should use 'nmake' rather than 'make'.
+        # Write directly to a filehandle - no in-memory buffering
+        open( my $fh, '>', '/tmp/message.eml' ) or die $!;
+        $mail->print( $fh ) || die( $mail->error );
+
+        # Send directly
+        $mail->smtpsend( Host => 'smtp.example.com' )
+            || die( $mail->error );
+
+        # Direct access to the envelope headers object
+        my $h = $mail->headers;
+        $h->set( 'X-Priority' => '1' );
+
+        # Hash-based alternative constructor
+        my $mail2 = Mail::Make->build(
+            from    => 'hello@example.com',
+            to      => [ 'jack@example.jp' ],
+            subject => 'Hello',
+            plain   => "Hi there.\n",
+            html    => '<p>Hi there.</p>',
+        ) || die( Mail::Make->error );
+
+VERSION
+        v0.21.1
+
+DESCRIPTION
+    "Mail::Make" is a strict, validating MIME email builder with a fluent
+    interface.
+
+    All RFC 2822 envelope fields ("From", "To", "Cc", "Bcc", "Subject",
+    "Date", "Message-ID", "In-Reply-To", "References", "Reply-To", "Sender")
+    are stored in a Mail::Make::Headers instance accessible via "headers",
+    eliminating any duplication between "Mail::Make"'s own fields and the
+    final entity's headers.
+
+    The MIME structure is assembled lazily when "as_entity", "as_string", or
+    "print" is called. Structure selection is automatic:
+
+    *   plain only → "text/plain"
+
+    *   html only → "text/html"
+
+    *   plain + html → "multipart/alternative"
+
+    *   above + inline parts → wrapped in "multipart/related"
+
+    *   above + attachments → wrapped in "multipart/mixed"
+
+    Non-ASCII display names in address fields and non-ASCII subjects are RFC
+    2047 encoded automatically.
+
+    "as_string" returns a plain string, consistent with
+    "MIME::Entity::stringify".
+
+    "as_string_ref" returns a scalar reference to avoid a string copy,
+    useful for large messages. "print" writes directly to a filehandle
+    without buffering the message in memory at all, and is the recommended
+    approach for very large messages.
+
+    When "use_temp_file" is set, or the assembled message size would exceed
+    "max_body_in_memory_size", "as_string_ref" spools to a temporary file
+    during serialisation and reads it back, keeping peak memory use to a
+    single copy rather than two overlapping buffers.
+
+CONSTRUCTOR
+  new( [%opts] )
+    Creates a new "Mail::Make" object. Takes an hash or hash reference of
+    options. Supported options are:
+
+    *   "max_body_in_memory_size"
+
+        Sets the byte threshold above which "as_string_ref" spools to a
+        temporary file rather than building the message in RAM. Set to 0 or
+        "undef" to disable the threshold entirely. Default:
+        $Mail::Make::MAX_BODY_IN_MEMORY_SIZE (1 MiB).
+
+    *   "use_temp_file"
+
+        When true, "as_string_ref" always spools to a temporary file
+        regardless of message size. Useful when you know the message will be
+        large, or when you want to bound peak memory use unconditionally.
+        Default: false.
+
+  build( %params )
+    An alternate hash-based constructor.
+
+    Takes an hash or hash reference of options.
+
+    Recognised parameters are: from, to, cc, bcc, date, reply_to, sender,
+    subject, in_reply_to, message_id, references, plain, html, "plain_opts",
+    "html_opts", "headers".
+
+    When using the standard mail envelop headers, "build" will call each
+    respective method, such as from, to, etc.
+
+    When passing the "plain" parameter, it will call plain, and passing it
+    the optional hash reference of parameters provided with "plain_opts"
+
+    Likewise when passing the "html" parameter, it will call html, and
+    passing it the optional hash reference of parameters provided with
+    "html_opts"
+
+    You can also provide additional mail envelop headers by providing the
+    parameter "headers" as an hash reference.
+
+    For each element of that hash reference, it will call "header" in header
+
+    Returns the populated "Mail::Make" object, or upon error, set an error
+    object, and returns "undef" in scalar context or an empty list in list
+    context.
+
+FLUENT METHODS
+    All setter methods return $self to allow chaining. Called without
+    arguments, they act as getters and return the stored value (delegating
+    to the internal Mail::Make::Headers object).
+
+  attach( %opts )
+        $mail->attach(
+            path     => $pdf_path,
+            type     => 'application/pdf',
+            filename => 'report.pdf',
+        ); # returns $mail
+
+    Adds a downloadable attachment, and returns the current instance for
+    chaining.
+
+    Takes an hash or hash reference of parameters.
+
+    Requires either "path" or "data".
+
+    Options are:
+
+    *   "charset"
+
+        The optional charset of the attachment.
+
+    *   "description"
+
+        A short description.
+
+    *   "encoding"
+
+        The encoding of the attachment, such as "zip", "gzip", "bzip2",
+        etc..
+
+    *   "filename"
+
+        The attachment filename as displayed to the reader.
+
+    *   "type"
+
+        The attachment mime-type.
+
+    All parameters are forwarded to "build" in Mail::Make::Entity.
+
+  attach_inline( %opts )
+        $mail->attach_inline(
+            path     => $img_path,
+            type     => 'image/png',
+            filename => 'Yamato,Inc-Logo.png',
+            cid      => 'logo@yamato-inc',
+        ); # returns $mail
+
+    Adds an inline part (e.g. an embedded image referenced via "cid:" in
+    HTML), and returns the current instance for chaining.
+
+    Takes an hash or hash reference of parameters.
+
+    Requires either <path> or "data" and either "id" or "cid".
+
+    Supported parameters are:
+
+    *   "boundary"
+
+        The boundary used.
+
+    *   "charset"
+
+        The optional charset of the attachment.
+
+    *   "cid" or "id"
+
+        The attachment ID ("Content-ID")
+
+    *   "data"
+
+        The attachement raw data.
+
+    *   "debug"
+
+        An unsigned integer to enable debugging.
+
+    *   "description"
+
+        A short description.
+
+        See also "path" for an alternative.
+
+    *   "disposition"
+
+        Can be either "attachment" or "inline"
+
+    *   "encoding"
+
+        The encoding of the attachment, such as "zip", "gzip", "bzip2",
+        etc..
+
+    *   "filename"
+
+        The attachment filename as displayed to the reader.
+
+    *   "path"
+
+        The attachment file path.
+
+        See also "data" for an alternative.
+
+    *   "type"
+
+        The attachment mime-type.
+
+  bcc( @addresses )
+        $mail->bcc( qw( hello@example.com john@example.jp ) );
+
+        $mail->bcc( [qw( hello@example.com john@example.jp )] );
+
+    Accumulates one or more BCC addresses. May be called multiple times.
+
+    This takes either an array reference or a list of e-mail addresses,
+    encode them if necessary, and add them to the "Bcc" mail envelop header
+    as a comma-separated value using "push_header" in Mail::Make::Headers
+
+    When called as a mutator, it returns the current instance of
+    Mail::Make::Headers, otherwise, as an accessor, it returns the current
+    value of the mail envelop header.
+
+  cc( @addresses )
+        $mail->cc( qw( hello@example.com john@example.jp ) );
+
+        $mail->cc( [qw( hello@example.com john@example.jp )] );
+
+    Accumulates one or more CC addresses.
+
+    This takes either an array reference or a list of e-mail addresses,
+    encode them if necessary, and add them to the "Cc" mail envelop header
+    as a comma-separated value using "push_header" in Mail::Make::Headers
+
+    When called as a mutator, it returns the current instance of
+    Mail::Make::Headers, otherwise, as an accessor, it returns the current
+    value of the mail envelop header.
+
+  date( [$date_string_or_epoch] )
+    Gets or sets the "Date" header.
+
+    Accepts a Unix epoch integer (converted to RFC 5322 format
+    automatically) or a pre-formatted RFC 5322 string.
+
+    Delegates to "date" in Mail::Make::Headers. If not set explicitly, the
+    current date and time are used when "as_entity" is first called.
+
+    When called as a mutator, it returns the current instance of
+    Mail::Make::Headers, otherwise, as an accessor, it returns the current
+    value of the mail envelop header.
+
+  from( [$address] )
+        $mail->from( 'hello@example.com' );
+
+    Gets or sets the "From" header by calling "set" in Mail::Make::Headers.
+
+    Non-ASCII display names are RFC 2047 encoded automatically.
+
+    When called as a mutator, it returns the current instance of Mail::Make,
+    otherwise, as an accessor, it returns the current value of the mail
+    envelop header.
+
+  header( $name [, $value] )
+        $mail->header( 'X-Mailer' => 'MySoft/v1.0.0' ); # returns $mail
+        # or
+        $mail->header( X_Mailer => 'MySoft/v1.0.0' ); # returns $mail
+
+        my $software = $mail->header( 'X-Mailer' );
+
+    With two arguments: appends an arbitrary header to the envelope using
+    push_header semantics (does not replace an existing field of the same
+    name).
+
+    Returns the current instance of "Mail::Make"
+
+    With one argument: returns the current value of the named header.
+
+  headers()
+        my $headers = $mail->headers; # Mail::Make::Headers
+
+    Returns the internal Mail::Make::Headers object. Use this for operations
+    not covered by the fluent methods, such as setting "X-*" headers or
+    reading back any field.
+
+  html( $content [, %opts] )
+        $mail->html( '<p>Hello world</p>', {
+            charset     => 'utf-8',
+            encoding    => 'quoted-printable',
+        }); # returns $mail
+
+    Adds a "text/html" body part, and returns the current instance for
+    chaining.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+    This takes an optional hash or hash reference of the following
+    parameters:
+
+    *   "charset"
+
+        The character set used for thise HTML data.
+
+        Defaults to "utf-8"
+
+    *   "data"
+
+        The HTML data.
+
+    *   "encoding"
+
+        Can be "quoted-printable" or "base64"
+
+        Defaults to "quoted-printable"
+
+  in_reply_to( [$mid] )
+        $mail->in_reply_to( 'dave.null@example.com' ); # Returns $mail
+        my $email = $mail->in_reply_to;
+
+    Gets or sets the "In-Reply-To" header.
+
+    In mutator mode, this sets the "In-Reply-To" mail envelop header using
+    "set" in Mail::Make::Headers, and returns the current instance of
+    "Mail::Make", and in accessor mode, this returns the current value for
+    the mail envelop header "In-Reply-To"
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  message_id( [$mid | \%opts] )
+        $mail->message_id( '2adefb89-a26a-4cf1-91c7-1413b13cfd0f@local' ); # Returns $mail
+        $mail->message_id( '2adefb89-a26a-4cf1-91c7-1413b13cfd0f@local', { strict => 1 } ); # Returns $mail
+        $mail->message_id({ generate => 1, domain => 'example.com' });
+        $mail->message_id( undef ); # remove the message ID
+        my $msgid = $mail->message_id;
+
+    Gets or sets the "Message-ID". Auto-generated when "as_entity" is called
+    if not explicitly set.
+
+    Delegates to "message_id" in Mail::Make::Headers.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+    This takes an optional hash reference of the following parameters:
+
+    *   "domain"
+
+        The domain name to use when generating the message ID.
+
+    *   "generate"
+
+        If set to true, then "message_id" in Mail::Make::Headers will
+        generate the message ID.
+
+        If the option "domain" is not provided, it will use "hostname" in
+        Sys::Hostname to guess the domain name.
+
+    *   "strict"
+
+        A boolean value (1 or 0).
+
+        When this is set to true, message_id|Mail::Make::Headers/message_id>
+        will call "_validate_message_id_value" in Mail::Make::Headers to
+        thoroughly validate the value provided. This means, it will reject
+        the value if:
+
+        1. It contains any non-ASCII or spaces/control characters.
+        2. It is not wrapped in angle brackets: "<" and ">"
+        3. Does not have exactly one at-mark "@"
+        4. The local part (the part on the left of the at-mark) contains
+        characters other than:
+                    [A-Za-z0-9.!#\$%&'\*\+\/=\?\^_`\{\|\}~\-]+
+
+        5. The domain part (the part of the right of the at-mark) contains
+        characters other than:
+                    [A-Za-z0-9](?:[A-Za-z0-9\-\.]*[A-Za-z0-9])?
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  plain( $content [, %opts] )
+        $mail->plain( 'Hello world', {
+            charset     => 'utf-8',
+            encoding    => 'quoted-printable',
+        }); # returns $mail
+
+    Adds a "text/plain" body part, and returns the current instance for
+    chaining.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+    This takes an optional hash or hash reference of the following
+    parameters:
+
+    *   "charset"
+
+        The character set used for thise HTML data.
+
+        Defaults to "utf-8"
+
+    *   "data"
+
+        The HTML data.
+
+    *   "encoding"
+
+        Can be "quoted-printable" or "base64"
+
+        Defaults to "quoted-printable"
+
+  references( @mids )
+        $mail->references( [ $msg_id1, $msg_id2 ] ); # Returns $mail
+        $mail->references( $msg_id1, $msg_id2 );     # Returns $mail
+        # Removes the header
+        $mail->references( undef );                  # Returns $mail
+        my @message_ids = $mail->references;
+        my $comma_list  = $mail->references;
+
+    Accumulates one or more Message-IDs in the "References" header.
+
+    In mutator mode, this returns the current instance of Mail::Make
+
+    In accessor mode, this returns a list of message IDs, and in scalar
+    mode, this returns a comma-separate list of message IDs.s
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  reply_to( [$address] )
+        $mail->reply_to( 'hello@example.com' );
+
+    Gets or sets the "Reply-To" header by calling "set" in
+    Mail::Make::Headers.
+
+    Non-ASCII display names are RFC 2047 encoded automatically.
+
+    When called as a mutator, it returns the current instance of Mail::Make,
+    otherwise, as an accessor, it returns the current value of the mail
+    envelop header.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  return_path( [$address] )
+        $mail->return_path( 'dave.null@example.com' );
+
+    Gets or sets the "Return-Path" header by calling "set" in
+    Mail::Make::Headers.
+
+    Non-ASCII display names are RFC 2047 encoded automatically.
+
+    When called as a mutator, it returns the current instance of Mail::Make,
+    otherwise, as an accessor, it returns the current value of the mail
+    envelop header.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  sender( [$address] )
+        $mail->sender( 'hello@example.com' );
+
+    Gets or sets the "Sender" header by calling "set" in
+    Mail::Make::Headers.
+
+    When called as a mutator, it returns the current instance of Mail::Make,
+    otherwise, as an accessor, it returns the current value of the mail
+    envelop header.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  subject( [$string] )
+        $mail->subject( '会議議事録' );  # Returns $mail
+        $mail->subject;
+
+    Gets or sets the "Subject" by calling "set" in Mail::Make::Headers.
+
+    When called as a mutator, it returns the current instance of Mail::Make,
+    otherwise, as an accessor, it returns the current value of the mail
+    envelop header.
+
+    Non-ASCII subjects are RFC 2047 encoded before being stored.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  to( @addresses )
+        $mail->to( 'hello@example.com' );
+
+    Accumulates one or more To addresses. Multiple calls are merged into a
+    single "To:" field per RFC 5322 §3.6.3 by calling "set" in
+    Mail::Make::Headers.
+
+    Non-ASCII display names are RFC 2047 encoded automatically.
+
+    Note that it is up to you to ensure there are no duplicates.
+
+    When called as a mutator, it returns the current instance of Mail::Make,
+    otherwise, as an accessor, it returns the current value of the mail
+    envelop header.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+OUTPUT METHODS
+  as_entity
+        my $entity = $mail->as_entity; # Returns a Mail::Make::Entity object
+
+    Assembles and returns the top-level Mail::Make::Entity based on the
+    various content that has been specified, such as plain text, html mail,
+    attachments, or inline attachments.
+
+    The MIME structure is selected automatically (see "DESCRIPTION").
+    Envelope headers are merged into the entity using "init_header"
+    semantics: fields already set on the entity ("Content-Type",
+    "MIME-Version", etc.) are never overwritten.
+
+    If no "Message-ID" is set yet, it will compute one.
+
+    "MIME-Version" will be set to 1.0 no matter what value may have been set
+    previously.
+
+    The computed value is cached, so repetitive calls will return the cached
+    value.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  as_string
+        my $string = $mail->as_string;
+
+    Assembles the message and returns it as a plain string, consistent with
+    "MIME::Entity::stringify". This is the form suitable for direct
+    printing, string interpolation, and most downstream consumers.
+
+    For large messages, prefer "print" (no buffering) or "as_string_ref" (no
+    copy on return).
+
+    This method calls "as_entity", and returns the value returned by
+    "as_string" in Mail::Make::Entity, passing it whatever value was
+    provided.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  as_string_ref
+        my $scalar_ref = $mail->as_string_ref;
+
+    Assembles the message and returns it as a scalar reference (or a
+    Module::Generic::Scalar object, which stringifies as needed). No extra
+    string copy is made during the fast path.
+
+    When "use_temp_file" is true, or the serialised entity size returned by
+    "length" in Mail::Make::Entity exceeds "max_body_in_memory_size", the
+    message is written to a "Module::Generic::Scalar" buffer via its
+    in-memory filehandle. This keeps peak RAM use to a single copy of the
+    assembled message.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  max_body_in_memory_size( [$bytes] )
+    Gets or sets the byte threshold above which "as_string_ref" spools to a
+    temporary file rather than building the message in RAM. Set to 0 or
+    "undef" to disable the threshold entirely. Default:
+    $Mail::Make::MAX_BODY_IN_MEMORY_SIZE (1 MiB).
+
+  print( $fh )
+        $mail->print( $fh ) || die( $mail->error );
+
+    Writes the fully assembled message to a filehandle without buffering it
+    in memory. This is the recommended approach for very large messages: the
+    MIME tree is serialised part by part directly to $fh, keeping memory use
+    proportional to the largest single part rather than the total message
+    size.
+
+    This returns the current instance of Mail::Make for chaining.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  smtpsend( %opts )
+        my @recipients = $mail->smtpsend( Host => $smtp );
+
+        my $rv = $mail->smtpsend(
+            Host  => '127.0.0.1',
+            Port  => $port,
+            Hello => 'test.local',
+        );
+
+        my $recipients_array_ref = $mail->smtpsend(
+            Host     => '127.0.0.1',
+            Port     => $port,
+            Hello    => 'test.local',
+            MailFrom => 'bounce@example.com',
+        );
+
+    Assembles the message and submits it to an SMTP server via Net::SMTP,
+    which is a core perl module, and loaded only when this method is called.
+
+    This takes a hash or hash reference of options.
+
+    Credential and recipient validation is performed before any network
+    connection is attempted, so configuration errors are reported
+    immediately without consuming network resources.
+
+    Recognised options:
+
+    "AuthMechanisms"
+        Space-separated list of SASL mechanism names in preference order.
+
+        Defaults to "PLAIN LOGIN", which are safe and universally supported
+        over an encrypted channel (STARTTLS or SSL).
+
+        The actual mechanism used is the intersection of this list and what
+        the server advertises. If no intersection exists, deprecated
+        challenge-response mechanisms ("DIGEST-MD5", "CRAM-MD5", "GSSAPI")
+        are excluded and the remainder of the server's list is tried.
+
+    "Debug"
+        Boolean. Enables Net::SMTP debug output.
+
+    "Hello"
+        The FQDN sent in the EHLO/HELO greeting.
+
+    "Host"
+        Hostname, IP address, or an already-connected Net::SMTP object. If
+        an existing object is passed, it is used as-is and not quit on
+        completion (the caller retains ownership of the connection).
+
+        If omitted, the colon-separated list in $ENV{SMTPHOSTS} is tried
+        first, then "mailhost" and "localhost" in that order.
+
+    "MailFrom"
+        The envelope sender address ("MAIL FROM"). Defaults to the bare
+        addr-spec extracted from the "From:" header.
+
+    "Password"
+        Password for SMTP authentication. May be:
+
+        *   A plain string.
+
+        *   A "CODE" reference called with no arguments at authentication
+            time.
+
+            Useful for reading credentials from a keyring or secrets manager
+            without storing them in memory until needed:
+
+                Password => sub { MyKeyring::get('smtp') }
+
+    "Port"
+        SMTP port number. Common values:
+
+        *   25 - plain SMTP (default when "SSL" is false)
+
+        *   465 - SMTPS, direct SSL/TLS (use with "SSL => 1")
+
+        *   587 - submission, usually STARTTLS (use with "StartTLS => 1")
+
+    "SSL"
+        Boolean. When true, the connection is wrapped in SSL/TLS from the
+        start (SMTPS, typically port 465).
+
+        Requires IO::Socket::SSL.
+
+    "StartTLS"
+        Boolean. When true, a plain connection is established first and then
+        upgraded to TLS via the SMTP "STARTTLS" extension (typically port
+        587).
+
+        Requires IO::Socket::SSL. Ignored when "Host" is a pre-built
+        Net::SMTP object.
+
+    "SSL_opts"
+        Hash reference of additional options passed to IO::Socket::SSL
+        during the SSL/TLS handshake. For example:
+
+            SSL_opts => { SSL_verify_mode => 0 }           # disable peer cert check
+            SSL_opts => { SSL_ca_file => '/etc/ssl/ca.pem' }
+
+    "Timeout"
+        Connection and command timeout in seconds, passed directly to
+        Net::SMTP.
+
+    "To", "Cc", "Bcc"
+        Override the RCPT TO list. Each may be a string or an array
+        reference of addresses. When omitted, the corresponding message
+        headers are used.
+
+        "Bcc:" is always stripped from the outgoing message headers before
+        transmission, per RFC 2822 §3.6.3.
+
+    "Username"
+        Login name for SMTP authentication (SASL). Requires Authen::SASL.
+
+        Must be combined with "Password". Validated before any connection is
+        made.
+
+    Typical usage examples:
+
+        # Plain SMTP, no auth (LAN relay)
+        $mail->smtpsend( Host => 'mail.example.com' );
+
+        # SMTPS (direct TLS, port 465)
+        $mail->smtpsend(
+            Host     => 'smtp.example.com',
+            Port     => 465,
+            SSL      => 1,
+            Username => 'jack@example.com',
+            Password => 'secret',
+        );
+
+        # Submission with STARTTLS (port 587) and password callback
+        $mail->smtpsend(
+            Host     => 'smtp.example.com',
+            Port     => 587,
+            StartTLS => 1,
+            Username => 'jack@example.com',
+            Password => sub { MyKeyring::get('smtp_pass') },
+        );
+
+    Returns the list of accepted recipient addresses in list context, or a
+    reference to that list in scalar context.
+
+    If an error occurs, it sets an exception object, and returns "undef" in
+    scalar context, or an empty list in list context.
+
+  use_temp_file( [$bool] )
+    When true, "as_string_ref" always spools to a temporary file regardless
+    of message size. Useful when you know the message will be large, or when
+    you want to bound peak memory use unconditionally. Default: false.
+
+GPG METHODS
+    These methods delegate to Mail::Make::GPG, which requires IPC::Run and a
+    working "gpg" (or "gpg2") installation. All three methods produce RFC
+    3156-compliant messages and return a new Mail::Make object suitable for
+    passing directly to "smtpsend()".
+
+  gpg_encrypt( %opts )
+    Encrypts this message for one or more recipients and returns a new
+    Mail::Make object whose entity is an RFC 3156 "multipart/encrypted;
+    protocol="application/pgp-encrypted"" message.
+
+    Required options:
+
+    Recipients => \@addrs_or_key_ids
+        Array reference of recipient e-mail addresses or key fingerprints.
+        Each recipient's public key must already be present in the local
+        GnuPG keyring, unless "AutoFetch" is enabled.
+
+    Optional options:
+
+    "AutoFetch => $bool"
+        When true and "KeyServer" is set, calls "gpg --locate-keys" for each
+        recipient before encryption. Default: 0.
+
+    "Digest => $algorithm"
+        Hash algorithm for the signature embedded in the encrypted payload.
+        Default: "SHA256".
+
+    "GpgBin => $path"
+        Full path to the "gpg" executable. Defaults to searching "gpg2" then
+        "gpg" in "PATH".
+
+    "KeyServer => $url"
+        Keyserver URL for auto-fetching recipient public keys (e.g.
+        'keys.openpgp.org'). Only consulted when "AutoFetch" is true.
+
+  gpg_sign( %opts )
+    Signs this message and returns a new Mail::Make object whose entity is
+    an RFC 3156 "multipart/signed; protocol="application/pgp-signature""
+    message with a detached, ASCII-armoured signature.
+
+    Required options:
+
+    "KeyId => $fingerprint_or_id"
+        Signing key fingerprint or short ID (e.g.
+        '35ADBC3AF8355E845139D8965F3C0261CDB2E752').
+
+    Optional options:
+
+    "Digest => $algorithm"
+        Hash algorithm. Default: "SHA256".
+
+        Valid values: "SHA256", "SHA384", "SHA512", "SHA1".
+
+    "GpgBin => $path"
+        Full path to the "gpg" executable.
+
+    "Passphrase => $string_or_coderef"
+        Passphrase to unlock the secret key. May be a plain string or a
+        "CODE" reference called with no arguments at signing time. When
+        omitted, GnuPG's agent handles passphrase prompting.
+
+  gpg_sign_encrypt( %opts )
+    Signs then encrypts this message. Returns a new Mail::Make object whose
+    entity is an RFC 3156 "multipart/encrypted" message containing a signed
+    and encrypted OpenPGP payload.
+
+    Accepts all options from both "gpg_sign" and "gpg_encrypt".
+
+    Note: "KeyId" and "Recipients" are both required.
+
+    Typical usage:
+
+        # Sign only
+        my $signed = $mail->gpg_sign(
+            KeyId      => '35ADBC3AF8355E845139D8965F3C0261CDB2E752',
+            Passphrase => 'my-passphrase',   # or: sub { MyKeyring::get('gpg') }
+        ) || die $mail->error;
+        $signed->smtpsend( Host => 'smtp.example.com' );
+
+        # Encrypt only
+        my $encrypted = $mail->gpg_encrypt(
+            Recipients => [ 'alice@example.com' ],
+        ) || die $mail->error;
+
+        # Sign then encrypt
+        my $protected = $mail->gpg_sign_encrypt(
+            KeyId      => '35ADBC3AF8355E845139D8965F3C0261CDB2E752',
+            Passphrase => sub { MyKeyring::get_passphrase() },
+            Recipients => [ 'alice@example.com', 'bob@example.com' ],
+        ) || die $mail->error;
+
+S/MIME METHODS
+    These methods delegate to Mail::Make::SMIME, which requires Crypt::SMIME
+    (an XS module wrapping OpenSSL "libcrypto"). All certificates and keys
+    must be supplied in PEM format, either as file paths or as PEM strings.
+
+  Memory usage
+    All three methods load the complete serialised message into memory
+    before performing any cryptographic operation. This is a fundamental
+    constraint imposed by two factors: the Crypt::SMIME API accepts only
+    Perl strings (no filehandle or streaming interface), and the underlying
+    protocols themselves require the entire content to be available before
+    the result can be emitted, thus signing requires a complete hash before
+    the signature can be appended, and PKCS#7 encryption requires the total
+    payload length to be declared in the ASN.1 DER header before any
+    ciphertext is written.
+
+    For typical email messages this is not a concern. If you anticipate very
+    large attachments, consider Mail::Make::GPG instead, which delegates to
+    the "gpg" command-line tool via IPC::Run and can handle arbitrary
+    message sizes through temporary files. A future "v0.2.0" of
+    Mail::Make::SMIME may add a similar "openssl smime" backend.
+
+    See "MEMORY USAGE AND LIMITATIONS" in Mail::Make::SMIME for a full
+    discussion.
+
+  smime_encrypt( %opts )
+        $encrypted = $mail->smime_encrypt(
+            RecipientCert => $smime_rec_cert,
+        );
+
+    Encrypts this message for one or more recipients and returns a new
+    "Mail::Make" object whose entity is an RFC 5751 "application/pkcs7-mime;
+    smime-type=enveloped-data" message.
+
+    Takes an hash or hash reference of options.
+
+    Required options:
+
+    "RecipientCert => $pem_string_or_path"
+        Recipient certificate in PEM format (for encryption). May also be an
+        array reference of PEM strings or file paths for multi-recipient
+        encryption.
+
+    Optional options:
+
+    "CACert => $pem_string_or_path"
+        CA certificate to include for chain verification.
+
+  smime_sign( %opts )
+        my $signed = $mail->smime_sign(
+            Cert   => $smime_cert,
+            Key    => $smime_key,
+            CACert => $smime_ca, # optional
+        );
+
+    Signs this message with a detached S/MIME signature and returns a new
+    "Mail::Make" object whose entity is an RFC 5751 "multipart/signed"
+    message.
+
+    The signature is always detached, which allows non-S/MIME-aware clients
+    to read the message body.
+
+    Required options:
+
+    "Cert => $pem_string_or_path"
+        Signer certificate in PEM format.
+
+    "Key => $pem_string_or_path"
+        Private key in PEM format.
+
+    Optional options:
+
+    "KeyPassword => $string_or_coderef"
+        Passphrase for an encrypted private key, or a CODE ref that returns
+        one.
+
+    "CACert => $pem_string_or_path"
+        CA certificate to include in the signature for chain verification.
+
+  smime_sign_encrypt( %opts )
+        my $result = $mail->smime_sign_encrypt(
+            Cert          => $smime_cert,
+            Key           => $smime_key,
+            RecipientCert => $smime_rec_cert,
+            CACert        => $smime_ca, # optional
+        );
+
+    Signs this message then encrypts the signed result. Returns a new
+    "Mail::Make" object whose entity is an RFC 5751 enveloped message
+    containing a signed payload.
+
+    Accepts all options from both "smime_sign" and "smime_encrypt".
+
+    Note: "Cert", "Key", and "RecipientCert" are all required.
+
+    Typical usage:
+
+        # Sign only
+        my $signed = $mail->smime_sign(
+            Cert   => '/path/to/my.cert.pem',
+            Key    => '/path/to/my.key.pem',
+            CACert => '/path/to/ca.crt',
+        ) || die $mail->error;
+        $signed->smtpsend( Host => 'smtp.example.com' );
+
+        # Encrypt only
+        my $encrypted = $mail->smime_encrypt(
+            RecipientCert => '/path/to/recipient.cert.pem',
+        ) || die $mail->error;
+
+        # Sign then encrypt
+        my $protected = $mail->smime_sign_encrypt(
+            Cert          => '/path/to/my.cert.pem',
+            Key           => '/path/to/my.key.pem',
+            RecipientCert => '/path/to/recipient.cert.pem',
+        ) || die $mail->error;
+
+PRIVATE METHODS
+  _default_domain
+    Returns a FQDN for auto-generated "Message-ID" values. Uses
+    Sys::Hostname and appends ".local" when the hostname contains no dot.
+
+    Falls back to "mail.make.local".
+
+  _encode_address( $addr_string )
+    Encodes the display-name portion of an RFC 2822 address using RFC 2047
+    when the display name contains non-ASCII characters. The addr-spec is
+    never modified.
+
+  _encode_header( $string )
+    Encodes an arbitrary header string for the wire using RFC 2047
+    encoded-words.
+
+    Delegates to Mail::Make::Headers::Subject.
+
+  _format_date
+    Returns the current local date and time as an RFC 2822 string.
+
+AUTHOR
+    Jacques Deguest <jack@deguest.jp>
+
+SEE ALSO
+    RFC 2045, RFC 2046, RFC 2047, RFC 2183, RFC 2231, RFC 2822
+
+    Mail::Make::Entity, Mail::Make::Headers,
+    Mail::Make::Headers::ContentType,
+    Mail::Make::Headers::ContentDisposition,
+    Mail::Make::Headers::ContentTransferEncoding, Mail::Make::Body::InCore,
+    Mail::Make::Body::File, Mail::Make::Stream::Base64,
+    Mail::Make::Stream::QuotedPrint, Mail::Make::Exception, Net::SMTP
+
+COPYRIGHT & LICENSE
+    Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

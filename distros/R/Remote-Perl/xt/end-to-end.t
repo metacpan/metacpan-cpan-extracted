@@ -1,3 +1,4 @@
+# End-to-end tests: full workflow with module serving, __DATA__, and tmpfile modes.
 use v5.36;
 use Test::More;
 use File::Temp qw(tempfile);
@@ -137,6 +138,16 @@ my $mod_script = script('use Remote::Perl::Test::Greeter;'
     is($rc,  0,                'serve on: exit 0');
     is($out, "Hello, World!\n", 'serve on: module loaded and used');
     is($err, '',               'serve on: no stderr');
+}
+
+# serve on with path restriction: module is in local @INC but not in the
+# allowed set, so the local side denies it and the remote cannot load it.
+{
+    my ($out, $err, $rc) = run_remperl(undef,
+        '--pipe-cmd', $target, '--serve-modules', '--serve-restrict-paths',
+        $mod_script);
+    isnt($rc, 0,                 'serve restricted: non-zero exit');
+    like($err, qr/Can't locate/, 'serve restricted: module denied by path restriction');
 }
 
 # The remote must run under $target, not under the local $^X.

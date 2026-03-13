@@ -1,11 +1,10 @@
 use strict;
 use warnings;
 use Feature::Compat::Class;
-use WebServer::DirIndex::HTML;
-
-our $VERSION = '0.1.2';
 
 class WebServer::DirIndex {
+
+  our $VERSION = '0.1.3';
 
   use Path::Tiny;
   use HTTP::Date;
@@ -14,6 +13,7 @@ class WebServer::DirIndex {
   use URI::Escape;
   use WebServer::DirIndex::CSS;
   use WebServer::DirIndex::File;
+  use WebServer::DirIndex::HTML;
 
   my $mime_types = MIME::Types->new;
 

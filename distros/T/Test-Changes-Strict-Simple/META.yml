@@ -1,0 +1,52 @@
+---
+abstract: 'Strict semantic validation for CPAN Changes files'
+author:
+  - 'Klaus Rindfrey <klausrin@cpan.org.eu>'
+build_requires:
+  Exporter: '1.6'
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::Builder::Tester: '0'
+  Test::More: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  autodie: '0'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Changes-Strict-Simple
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Test::Changes::Strict::Simple:
+    file: lib/Test/Changes/Strict/Simple.pm
+    version: '0.01'
+requires:
+  Carp: '0'
+  Exporter: '1.6'
+  Test::Builder: '0'
+  Time::Local: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/klaus-rindfrey/perl-test-changes-strict-simple.git
+version: '0.01'
+x_bugtracker:
+  web: https://github.com/klaus-rindfrey/perl-test-changes-strict-simple/issues
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

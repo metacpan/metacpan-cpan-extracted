@@ -202,7 +202,7 @@ sub clone
     return( $c );
 }
 
-# content_disposition — convenience typed accessor
+# content_disposition - convenience typed accessor
 sub content_disposition
 {
     my $self = shift( @_ );
@@ -216,7 +216,7 @@ sub content_disposition
     return( $self->new_field( 'Content-Disposition' ) );
 }
 
-# content_id — convenience accessor for Content-ID
+# content_id - convenience accessor for Content-ID
 sub content_id
 {
     my $self = shift( @_ );
@@ -236,7 +236,7 @@ sub content_id
     return( $self->get( 'Content-ID' ) );
 }
 
-# content_transfer_encoding — convenience accessor
+# content_transfer_encoding - convenience accessor
 sub content_transfer_encoding
 {
     my $self = shift( @_ );
@@ -253,7 +253,7 @@ sub content_transfer_encoding
     return( $self->get( 'Content-Transfer-Encoding' ) );
 }
 
-# content_type — convenience typed accessor
+# content_type - convenience typed accessor
 sub content_type
 {
     my $self = shift( @_ );
@@ -336,7 +336,7 @@ sub exists
     return( defined( $v ) ? 1 : 0 );
 }
 
-# get( $name ) — returns the raw string value of the first matching header
+# get( $name ) - returns the raw string value of the first matching header
 sub get
 {
     my $self = shift( @_ );
@@ -349,7 +349,7 @@ sub get
     return( $self->header( $_[0] ) );
 }
 
-# has( $name ) — boolean existence check
+# has( $name ) - boolean existence check
 {
     no warnings 'once';
     # NOTE: sub has aliased to 'has'
@@ -568,7 +568,7 @@ sub message_id
     return( $self );
 }
 
-# new_field( $name, $value ) — factory returning a typed object or Generic
+# new_field( $name, $value ) - factory returning a typed object or Generic
 # e.g. $headers->new_field( 'Content-Type' )
 sub new_field
 {
@@ -585,7 +585,7 @@ sub new_field
     return( $class->new || $self->pass_error( $class->error ) );
 }
 
-# print( $fh ) — writes all headers + blank line to filehandle
+# print( $fh ) - writes all headers + blank line to filehandle
 sub print
 {
     my $self = shift( @_ );
@@ -629,7 +629,7 @@ sub push_header
     return( $self );
 }
 
-# remove( $name ) — removes all headers with the given name
+# remove( $name ) - removes all headers with the given name
 {
     no warnings 'once';
     # NOTE: sub remove is aliased to remove_header()
@@ -746,7 +746,7 @@ sub scan
 # instead of aliasing it, we redirect so it shows up in a stack trace.
 sub set { return( shift->replace_header( @_ ) ); }
 
-# replace( $name, $value ) — alias for set(). Provided for API compatibility.
+# replace( $name, $value ) - alias for set(). Provided for API compatibility.
 # sub replace { return( shift->set( @_ ) ); }
 
 sub _canon_name
@@ -997,7 +997,7 @@ sub _sanitize_value
     $v =~ s/\r/\n/g;
     # Unwrap legal folding: LF + WSP -> single space
     $v =~ s/\n[ \t]+/ /g;
-    # Any remaining LF is injection — replace with space
+    # Any remaining LF is injection - replace with space
     $v =~ s/\n/ /g;
 
     # Remove ASCII control chars except tab
@@ -1465,7 +1465,7 @@ If C<$value> is C<undef>, the field is removed.
 
 =head2 exists
 
-    if ( $h->exists( $field ) ) { ... }
+    if( $h->exists( $field ) ) { ... }
 
 Return true if at least one value is present for the given field.
 

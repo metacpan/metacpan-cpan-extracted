@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::ImplBase 0.22;
+package Future::IO::ImplBase 0.23;
 
 use v5.14;
 use warnings;
@@ -355,12 +355,17 @@ that have now expired.
 
 readonly_struct Alarm => [qw( time f )];
 my @alarms;
+my $cancelled_alarms;
 
 sub _timeout
 {
    shift;
 
    my $timeout;
+
+   ( shift @alarms, $cancelled_alarms-- )
+      while @alarms and $alarms[0]->f->is_cancelled;
+
    if( @alarms ) {
       # These are sorted by time order, so head is soonest
       $timeout = $alarms[0]->time - time();
@@ -375,9 +380,20 @@ sub _manage_timers
    shift;
    my $now = time();
 
-   while( @alarms and $alarms[0]->time <= $now ) {
-      ( shift @alarms )->f->done;
+   while( @alarms ) {
+      last if $alarms[0]->time > $now;
+
+      my $f = ( shift @alarms )->f;
+
+      $cancelled_alarms--, next if $f->is_cancelled;
+      $f->done;
    }
+}
+
+sub _compact_alarms
+{
+   @alarms = grep { !$_->f->is_cancelled } @alarms;
+   $cancelled_alarms = 0;
 }
 
 sub sleep
@@ -388,19 +404,30 @@ sub sleep
    my $time = time() + $secs;
 
    my $f = $class->_new_future;
+   my $alarm = Alarm( $time, $f );
 
-   # TODO: Binary search
-   my $idx = 0;
-   $idx++ while $idx < @alarms and $alarms[$idx]->time < $time;
+   if( !@alarms or $time >= $alarms[-1]->time ) {
+      # Quick path, just push it on the end
+      push @alarms, $alarm;
+   }
+   else {
+      # Need to find the right point to splice() it into. It's more likely
+      # that the new alarm goes at the end of the queue so start our search
+      # there.
+      # This isn't a full binary search but a good compromise between fast
+      # performance and simple to write.
+      my $idx = $#alarms;
+      $idx = int( $idx/2 ) while $idx > 0 and $alarms[$idx]->time > $time;
+      $idx++ while $idx < @alarms and $alarms[$idx]->time < $time;
 
-   splice @alarms, $idx, 0, Alarm( $time, $f );
+      splice @alarms, $idx, 0, $alarm;
+   }
 
    $f->on_cancel( sub {
-      my $self = shift;
-      my $idx = 0;
-      $idx++ while $idx < @alarms and $alarms[$idx]->f != $self;
+      $cancelled_alarms++;
 
-      splice @alarms, $idx, 1, ();
+       _compact_alarms
+         if $cancelled_alarms >= 5 and $cancelled_alarms > @alarms/2;
    } );
 
    return $f;

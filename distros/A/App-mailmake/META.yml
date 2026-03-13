@@ -1,0 +1,43 @@
+---
+abstract: 'App harness for the mailmake CLI'
+author:
+  - 'Jacques Deguest (jack@deguest.jp)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IO::Select: '0'
+  IPC::Open3: '0'
+  Test::More: '1.302162'
+  Test::Pod: '1.52'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-mailmake
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '3.21'
+  Getopt::Class: v1.1.4
+  Mail::Make: v0.21.0
+  Module::Generic: v1.2.1
+  Pod::Usage: '2.01'
+  Term::ANSIColor::Simple: '0.10'
+  open: '0'
+  parent: '0'
+  perl: '5.028000'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://gitlab.com/jackdeguest/App-mailmake/issues
+  repository: https://gitlab.com/jackdeguest/App-mailmake
+version: v0.1.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

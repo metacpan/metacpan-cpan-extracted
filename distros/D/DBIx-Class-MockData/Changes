@@ -1,4 +1,38 @@
-Revision history for DBIx::Class::MockData
+Revision history for DBIx-Class-MockData
+
+0.03  2026-03-12
+
+      New features:
+      - generate() now accepts an 'only' argument (arrayref of source names) to
+        restrict data generation to a specific subset of tables.
+      - generate() now accepts an 'exclude' argument (arrayref of source names)
+        to skip selected tables while populating the rest.
+      - Both filters preserve FK-safe insertion order within the active set.
+      - Both filters are respected by dry_run() as well as generate().
+      - Passing both 'only' and 'exclude' to new() croaks immediately with a
+        clear error message.
+      - Passing an unknown source name in either argument croaks with a
+        descriptive error identifying the offending name(s).
+
+      CLI tool:
+      - Added --only <Table,...> (comma-separated) to the dbic-mockdata script.
+      - Added --exclude <Table,...> (comma-separated) to the dbic-mockdata script.
+      - CLI validates mutual exclusion of --only and --exclude before invoking
+        the module.
+
+      Test suite:
+      - t/04-filter.t -- 16 unit subtests covering only/exclude behaviour,
+        FK ordering within filtered sets, dry_run filtering, invalid input
+        validation, and mutual-exclusion enforcement.
+      - t/03-cli.t    -- extended with 7 new subtests for --only and --exclude
+        including single table, comma-separated lists, unknown source names,
+        and the --only + --exclude conflict check.
+
+      Bug fixes:
+      - _active_sources() previously called $schema->source() to validate names,
+        which caused DBIx::Class to throw its own exception before our error
+        message could be raised. Validation now uses a pre-built lookup hash
+        from the known source list, giving callers a clean, actionable error.
 
 0.02  2026-03-11
 
@@ -6,6 +40,7 @@ Revision history for DBIx::Class::MockData
         indexes DBIx::Class::MockData with its version.
       - README.md: corrected SYNOPSIS to use new() with a pre-connected schema
         instead of the removed schema() entry point.
+      - Bumped version to 0.02 in MockData.pm and script/dbic-mockdata.
 
 
 0.01  2026-03-11

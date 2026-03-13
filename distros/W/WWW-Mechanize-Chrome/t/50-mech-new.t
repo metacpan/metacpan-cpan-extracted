@@ -10,6 +10,7 @@ use lib '.';
 
 use t::helper;
 
+use Time::HiRes qw(ualarm sleep time);
 Log::Log4perl->easy_init($ERROR);
 
 # What instances of Chrome will we try?
@@ -37,6 +38,13 @@ sub new_mech {
 
 t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     my( $file, $mech ) = splice @_; # so we move references
+    
+    # KILL THE SUBTEST if it takes more than 2 seconds total for this instance
+    local $SIG{ALRM} = sub { 
+        diag "Instance test run timed out after 2s! KILLING.";
+        CORE::exit(1);
+    };
+    ualarm(2000000);
     if( $ENV{WWW_MECHANIZE_CHROME_TRANSPORT}
         and $ENV{WWW_MECHANIZE_CHROME_TRANSPORT} eq 'Chrome::DevToolsProtocol::Transport::Mojo'
     ) {
@@ -133,9 +141,10 @@ HTML
     # This is ugly for a user currently using that Chrome instance,
     # but hey, they should be watching in amazement instead of surfing
     # while we test
-    #$app->activate_tab($mech->tab)->get;
-    undef $mech,
-    #sleep 2; # to make the socket available again
+    $app->activate_tab($mech->tab)->get;
+    undef $mech;
+    Time::HiRes::sleep(0.1); # to make the socket available again
+
 
     $mech = WWW::Mechanize::Chrome->new(
         autodie   => 0,
@@ -153,6 +162,7 @@ HTML
     $mech->autoclose_tab(1);
 
     undef $mech; # and close that tab
+    Time::HiRes::sleep(0.1);
 
     # Now try to connect to "our" now closed tab
     my $lived = eval {

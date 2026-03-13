@@ -24,6 +24,7 @@ LICENSE
 Makefile.PL
 MANIFEST
 README
+README.md
 t/00_load.t
 t/01_headers_content_type.t
 t/02_headers_content_disposition.t

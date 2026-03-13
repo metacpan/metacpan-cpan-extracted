@@ -1,18 +1,22 @@
 use v5.36;
 package Remote::Perl::ModuleServer;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use autodie qw(open close);
 use File::Spec;
 
 # Searches a list of directories for a module file and returns its source.
 #
-# new(inc => \@dirs)   -- @dirs defaults to \@INC if omitted
-# find($filename)      -- returns source string, or undef if not found
+# new(inc => \@dirs, serve_filter => sub($path){...})
+#   inc           -- dirs to search; defaults to \@INC if omitted
+#   serve_filter  -- optional callback: receives the resolved file path,
+#                    returns true to allow serving, false to deny
+# find($filename) -- returns source string, or undef if not found/denied
 
 sub new($class, %args) {
     return bless {
-        inc => $args{inc} // \@INC,
+        inc          => $args{inc} // \@INC,
+        serve_filter => $args{serve_filter},
     }, $class;
 }
 
@@ -30,6 +34,7 @@ sub find($self, $filename) {
         next unless defined $dir && !ref($dir) && -d $dir;
         my $path = File::Spec->catfile($dir, @parts);
         if (-f $path) {
+            next if $self->{serve_filter} && !$self->{serve_filter}->($path);
             open(my $fh, '<', $path);
             local $/;
             return scalar <$fh>;

@@ -1,6 +1,6 @@
 use v5.36;
 package Remote::Perl::Protocol;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Exporter 'import';
 
@@ -11,7 +11,8 @@ our @EXPORT_OK = qw(
     MSG_SIGNAL MSG_SIGNAL_ACK
     MSG_ERROR MSG_BYE
     STREAM_CONTROL STREAM_STDIN STREAM_STDOUT STREAM_STDERR
-    TMPFILE_NONE TMPFILE_AUTO TMPFILE_LINUX TMPFILE_PERL TMPFILE_NAMED
+    TMPFILE_MASK TMPFILE_NONE TMPFILE_AUTO TMPFILE_LINUX TMPFILE_PERL TMPFILE_NAMED
+    FLAGS_WARNINGS
     encode_message
     encode_hello decode_hello
     encode_credit decode_credit
@@ -23,12 +24,18 @@ use constant {
     PROTOCOL_VERSION => 2,
     HEADER_LEN       => 6,   # type(1) + stream(1) + length(4)
 
-    # Tmpfile strategies (carried in the flags byte of RUN messages)
+    # Flags byte layout: bits 0-2 = tmpfile strategy (0-4), bit 3+ = flags
+    TMPFILE_MASK  => 0x07,  # bits 0-2
+
+    # Tmpfile strategies (carried in bits 0-2 of the flags byte)
     TMPFILE_NONE  => 0,   # default: eval $source directly
     TMPFILE_AUTO  => 1,   # try linux, fall back to perl
     TMPFILE_LINUX => 2,   # O_TMPFILE (anonymous inode, no directory entry)
     TMPFILE_PERL  => 3,   # open('+>', undef) -- anon fd, unlinked on creation
     TMPFILE_NAMED => 4,   # File::Temp -- named file, kept until executor exits
+
+    # Flag bits (bit 3+)
+    FLAGS_WARNINGS => 0x08,  # bit 3
 
     # Message types
     MSG_HELLO        => 0x00,
@@ -227,8 +234,9 @@ in flight at once) without threads or external concurrency dependencies.
 
 =head1 RUN FLAGS
 
-The C<flags> byte in a C<RUN> message controls how the executor runs the
-source on the remote side:
+The C<flags> byte in a C<RUN> message is split into two fields:
+
+B<Bits 0-2> (masked with C<0x07>): tmpfile strategy.
 
   Value  Name    Meaning
   -----  ----    -------
@@ -240,6 +248,11 @@ source on the remote side:
 
 Strategies 1-4 all use C<do "/proc/self/fd/N"> (or C<do $path> for NAMED),
 which causes Perl's tokeniser to handle C<__DATA__> and C<__END__> natively.
+
+B<Bit 3> (C<0x08>): warnings.  When set, the executor enables C<$^W = 1>
+before running user code, equivalent to C<perl -w>.
+
+B<Bits 4-7>: reserved.
 
 =head1 CONNECTION SEQUENCE
 

@@ -57,9 +57,11 @@ t/16-ia.t
 t/17-sa.t
 t/18-i32a.t
 t/19-i16a.t
-t/20-new-features.t
 t/10-lru.t
 t/11-ttl.t
+t/20-new-features.t
+t/21-leak.t
 typemap
+xxhash.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

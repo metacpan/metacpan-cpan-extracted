@@ -6,15 +6,26 @@
 #include "util.h"
 
 extern unsigned char* sieve_erat30(UV end);
-extern int sieve_segment_partial(unsigned char* mem, UV startd, UV endd, UV depth);
-extern int sieve_segment(unsigned char* mem, UV startd, UV endd);
+extern bool sieve_segment_partial(unsigned char* mem, UV startd, UV endd, UV depth);
+extern bool sieve_segment(unsigned char* mem, UV startd, UV endd);
 extern void* start_segment_primes(UV low, UV high, unsigned char** segmentmem);
-extern int next_segment_primes(void* vctx, UV* base, UV* low, UV* high);
+extern bool next_segment_primes(void* vctx, UV* base, UV* low, UV* high);
 extern void end_segment_primes(void* vctx);
 
-extern void* array_of_primes_in_range(UV* count, UV beg, UV end);
+/* Generate primes P[0] = 2, P[1] = 3, P[2] = 5, .... */
+extern UV range_prime_sieve(UV** list, UV lo, UV hi);
 
-static const UV wheel30[] = {1, 7, 11, 13, 17, 19, 23, 29};
+/* Generate 32-bit primes up to n.
+ * The first <offset> entries will be zero, followed by 2, 3, 5, 7, 11, ...
+ * Returns the count of primes created, irrespective of the offset.
+ * Hence, the last prime will be in P[offset+count-1].
+ */
+extern uint32_t range_prime_sieve_32(uint32_t** list, uint32_t n, uint32_t offset);
+
+
+
+
+static const unsigned char wheel30[] = {1, 7, 11, 13, 17, 19, 23, 29};
 /* Used for moving between primes */
 static const unsigned char nextwheel30[30] = {
     1,  7,  7,  7,  7,  7,  7, 11, 11, 11, 11, 13, 13, 17, 17,
@@ -57,7 +68,7 @@ static const unsigned char clearprev30[30] =
 
 
 #ifdef FUNC_is_prime_in_sieve
-static int is_prime_in_sieve(const unsigned char* sieve, UV p) {
+static bool is_prime_in_sieve(const unsigned char* sieve, UV p) {
   UV d = p/30;
   UV m = p - d*30;
   /* If m isn't part of the wheel, we return 0 */
@@ -142,7 +153,7 @@ static const unsigned char wheel240[] = {1,7,11,13,17,19,23,29,31,37,41,43,47,49
     UV b_ = a;                       /* begin value n */     \
     UV f_ = b;                       /* final value n */     \
     UV begw_ = (b_-base_)/nperw_;    /* first word */        \
-    UV endw_ = (f_-base_)/nperw_;    /* first word */        \
+    UV endw_ = (f_-base_)/nperw_;    /* last word */         \
     UV sw_, tz_, p; \
     base_ += begw_*nperw_; \
     while (begw_ <= endw_) { \
@@ -172,7 +183,7 @@ static const unsigned char wheel240[] = {1,7,11,13,17,19,23,29,31,37,41,43,47,49
     UV lastd_ = l_/30; \
     unsigned char s_, bit_; \
     get_prime_cache(l_, &sieve_); \
-    if (p == 2) p = 1; \
+    if (p > 1 && p < 7) p--; \
     s_ = sieve_[d_] | clearprev30[p-d_*30]; \
     while (1) { \
       if (p < 5) { \
@@ -202,5 +213,30 @@ static const unsigned char wheel240[] = {1,7,11,13,17,19,23,29,31,37,41,43,47,49
     } \
     release_prime_cache(sieve_); \
   }
+
+
+#define SIMPLE_FOR_EACH_PRIME(a, b) \
+  { \
+    UV p_ = a; \
+    UV l_ = b; \
+    if (p_ > 0) p_--; \
+    while (1) { \
+      UV p = (p_ = next_prime(p_)); \
+      if (p > l_ || p == 0) break; \
+      { \
+
+#define END_SIMPLE_FOR_EACH_PRIME \
+      } \
+    } \
+  }
+
+/* Mark at <first>, but if that is less than <lo>, then use the first multiple
+ * of <p> at or after lo.
+ *
+ * I.e. the result n is n = p2 + k*p >= lo with the smallest possible k.
+ * TODO: this assumes first is a multiple of p.  Fix. */
+#define P_GT_LO(first,p,lo)  ( ((first)>=(lo)) ? (first) : (lo)+(((p)-((lo)%(p)))%(p)) )
+/* As above, but as an offset from lo, so returns 0+ */
+#define P_GT_LO_0(first,p,lo)  ( ((first)>=(lo)) ? ((first)-(lo)) : (((p)-((lo)%(p)))%(p)) )
 
 #endif

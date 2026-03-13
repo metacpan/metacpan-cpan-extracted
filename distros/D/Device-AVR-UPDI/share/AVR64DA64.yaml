@@ -8,13 +8,13 @@ fusemap:
       - caption: BOD disabled
         name: DISABLE
         value: 0
-      - caption: BOD enabled in continiuous mode
+      - caption: BOD enabled in continuous mode
         name: ENABLE
         value: 4
       - caption: BOD enabled in sampled mode
         name: SAMPLE
         value: 8
-      - caption: BOD enabled in continiuous mode. Execution is halted at wake-up until BOD is running.
+      - caption: BOD enabled in continuous mode. Execution is halted at wake-up until BOD is running.
         name: ENABLEWAIT
         value: 12
   CLKSEL:
@@ -148,7 +148,7 @@ fusemap:
       - caption: BOD disabled
         name: DISABLE
         value: 0
-      - caption: BOD enabled in continiuous mode
+      - caption: BOD enabled in continuous mode
         name: ENABLE
         value: 1
       - caption: BOD enabled in sampled mode
@@ -225,31 +225,27 @@ fusemap:
         name: 8KCLK
         value: 176
 fuses:
-  - ACTIVE
-  - LVL
-  - SAMPFREQ
-  - SLEEP
-  - CLKSEL
-  - CRCSEL
-  - CRCSRC
-  - EESAVE
-  - RSTPINCFG
-  - SUT
   - PERIOD
   - WINDOW
+  - SLEEP
+  - ACTIVE
+  - SAMPFREQ
+  - LVL
+  - CLKSEL
+  - EESAVE
+  - RSTPINCFG
+  - CRCSEL
+  - CRCSRC
+  - SUT
 reginfos:
+  - default: 0
+    mask: 255
+    name: WDTCFG
+    offset: 4176
   - default: 0
     mask: 255
     name: BODCFG
     offset: 4177
-  - default: 0
-    mask: 0
-    name: BOOTSIZE
-    offset: 4184
-  - default: 0
-    mask: 0
-    name: CODESIZE
-    offset: 4183
   - default: 0
     mask: 7
     name: OSCCFG
@@ -263,6 +259,10 @@ reginfos:
     name: SYSCFG1
     offset: 4182
   - default: 0
-    mask: 255
-    name: WDTCFG
-    offset: 4176
+    mask: 0
+    name: CODESIZE
+    offset: 4183
+  - default: 0
+    mask: 0
+    name: BOOTSIZE
+    offset: 4184

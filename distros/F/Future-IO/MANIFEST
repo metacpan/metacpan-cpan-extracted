@@ -25,6 +25,7 @@ t/18recv.t
 t/20sleep+read.t
 t/30impl-override.t
 t/31impl-before-load.t
+t/32impl-timers.t
 t/40system.t
 t/90rt150117.t
 t/99pod.t

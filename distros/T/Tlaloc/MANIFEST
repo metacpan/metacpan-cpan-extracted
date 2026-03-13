@@ -1,0 +1,24 @@
+Changes
+ignore.txt
+lib/Tlaloc.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/00-load.t
+t/01_basic.t
+t/02_references.t
+t/03_edge_cases.t
+t/04_string_ops.t
+t/05_evap_rate.t
+t/06_passive_reads.t
+t/07_arrays_hashes.t
+t/08_coderefs.t
+t/09_tied_wrappers.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Tlaloc.xs
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

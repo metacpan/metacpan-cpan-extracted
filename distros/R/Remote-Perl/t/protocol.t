@@ -1,3 +1,4 @@
+# Tests for binary message encoding/decoding and the incremental protocol parser.
 use v5.36;
 use Test::More;
 

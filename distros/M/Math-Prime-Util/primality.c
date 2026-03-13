@@ -3,16 +3,16 @@
 #include <string.h>
 #include <math.h>
 
+/* Primality related functions */
+
 #include "ptypes.h"
-#define FUNC_is_strong_pseudoprime 1
 #include "primality.h"
+#include "lucas_seq.h"
 #include "mulmod.h"
 #define FUNC_gcd_ui 1
 #define FUNC_is_perfect_square
 #include "util.h"
 #include "montmath.h"  /* Fast Montgomery math */
-
-/* Primality related functions */
 
 /******************************************************************************/
 
@@ -41,7 +41,7 @@ static UV select_extra_strong_parameters(UV n, UV increment) {
   while (1) {
     D = P*P - 4;
     j = jacobi_iu(D, n);
-    if (j == 0) return 0;
+    if (j == 0) { UV g = gcd_ui(D,n);  if (g != 1 && g != n) return 0; }
     if (j == -1) break;
     if (P == (3+20*increment) && is_perfect_square(n)) return 0;
     P += increment;
@@ -53,9 +53,9 @@ static UV select_extra_strong_parameters(UV n, UV increment) {
 }
 
 /* Fermat pseudoprime */
-int is_pseudoprime(UV const n, UV a)
+bool is_pseudoprime(UV const n, UV a)
 {
-  if (n < 4) return (n == 2 || n == 3);
+  if (n < 3) return (n == 2);
   if (!(n&1) && !(a&1)) return 0;
   if (a < 2) croak("Base %"UVuf" is invalid", a);
   if (a >= n) {
@@ -75,9 +75,9 @@ int is_pseudoprime(UV const n, UV a)
 }
 
 /* Euler (aka Euler-Jacobi) pseudoprime:  a^((n-1)/2) = (a|n) mod n */
-int is_euler_pseudoprime(UV const n, UV a)
+bool is_euler_pseudoprime(UV const n, UV a)
 {
-  if (n < 5) return (n == 2 || n == 3);
+  if (n < 3) return (n == 2);
   if (!(n&1)) return 0;
   if (a < 2) croak("Base %"UVuf" is invalid", a);
   if (a > 2) {
@@ -117,7 +117,7 @@ int is_euler_pseudoprime(UV const n, UV a)
  * A tiny bit (~1 percent) faster than base 2 Fermat or M-R.
  * More stringent than base 2 Fermat, but a subset of base 2 M-R.
  */
-int is_euler_plumb_pseudoprime(UV const n)
+bool is_euler_plumb_pseudoprime(UV const n)
 {
   UV ap;
   uint32_t nmod8 = n & 0x7;
@@ -139,76 +139,72 @@ int is_euler_plumb_pseudoprime(UV const n)
   return 0;
 }
 
-/* Miller-Rabin probabilistic primality test
- * Returns 1 if probably prime relative to the bases, 0 if composite.
- * Bases must be between 2 and n-2
- */
-int miller_rabin(UV const n, const UV *bases, int nbases)
+bool is_strong_pseudoprime(UV const n, UV a)
 {
-#if USE_MONTMATH
-  MPUassert(n > 3, "MR called with n <= 3");
-  if ((n & 1) == 0) return 0;
-  {
-    const uint64_t npi = mont_inverse(n),  mont1 = mont_get1(n);
-    uint64_t a, ma, md, u = n-1;
-    int i, j, t = 0;
-
-    while (!(u&1)) {  t++;  u >>= 1;  }
-    for (j = 0; j < nbases; j++) {
-      a = bases[j];
-      if (a < 2)  croak("Base %"UVuf" is invalid", (UV)a);
-      if (a >= n) {
-        a %= n;
-        if (a == 0 || (a == n-1 && a&1)) return 0;
-      }
-      ma = mont_geta(a,n);
-      if (a == 1 || a == n-1 || !ma) continue;
-      md = mont_powmod(ma, u, n);
-      if (md != mont1 && md != n-mont1) {
-        for (i=1; i<t; i++) {
-          md = mont_sqrmod(md, n);
-          if (md == mont1) return 0;
-          if (md == n-mont1) break;
-        }
-        if (i == t)
-          return 0;
-      }
-    }
-  }
-#else
   UV d = n-1;
-  int b, r, s = 0;
-
-  MPUassert(n > 3, "MR called with n <= 3");
-  if ((n & 1) == 0) return 0;
+  int r, s = 0;
+  if (n < 3) return (n == 2);
+  if (!(n&1)) return 0;
+  if (a < 2) croak("Base %"UVuf" is invalid", a);
+  if (a >= n)  a %= n;
+  if (a <= 1 || a == n-1) return 1;
 
   while (!(d&1)) {  s++;  d >>= 1;  }
-  for (b = 0; b < nbases; b++) {
-    UV x, a = bases[b];
-    if (a < 2)  croak("Base %"UVuf" is invalid", a);
-    if (a >= n) {
-      a %= n;
-      if (a == 0 || (a == n-1 && a&1)) return 0;
+
+  /* n is a strong pseudoprime to base a if either:
+   *    a^d = 1 mod n
+   *    a^(d2^r) = -1 mod n for some r: 0 <= r <= s-1
+   */
+  {
+#if USE_MONTMATH
+    const uint64_t npi = mont_inverse(n),  mont1 = mont_get1(n);
+    const uint64_t ma = mont_geta(a,n);
+    uint64_t mx;
+
+    if (!ma) return 1;
+    mx = mont_powmod(ma, d, n);
+    if (mx != mont1 && mx != n-mont1) {
+      for (r = 1; r < s; r++) {
+        mx = mont_sqrmod(mx, n);
+        if (mx == n-mont1) break;
+        if (mx == mont1  ) return 0;
+      }
+      if (r >= s) return 0;
     }
-    if (a == 1 || a == n-1) continue;
-    /* n is a strong pseudoprime to base a if either:
-     *    a^d = 1 mod n
-     *    a^(d2^r) = -1 mod n for some r: 0 <= r <= s-1
-     */
-    x = powmod(a, d, n);
-    if ( (x == 1) || (x == n-1) )  continue;
-    for (r = 1; r < s; r++) {  /* r=0 was just done, test r = 1 to s-1 */
-      x = sqrmod(x, n);
-      if ( x == n-1 )  break;
-      if ( x == 1   )  return 0;
+#else
+    UV x = powmod(a, d, n);
+    if (x != 1 && x != n-1) {
+      for (r = 1; r < s; r++) {  /* r=0 was just done, test r = 1 to s-1 */
+        x = sqrmod(x, n);
+        if ( x == n-1 )  break;
+        if ( x == 1   )  return 0;
+      }
+      if (r >= s)  return 0;
     }
-    if (r >= s)  return 0;
-  }
 #endif
+  }
   return 1;
 }
 
-int BPSW(UV const n)
+/* Miller-Rabin probabilistic primality test for multiple bases at a time.
+ * Returns 1 if probably prime relative to the bases, 0 if composite.
+ * Bases must be between 2 and n-2
+ */
+bool miller_rabin(UV const n, const UV *bases, int nbases)
+{
+  int i;
+  /* For best performance, especially with montmath, we would do as much
+   * as possible up front, then do the per-base loop.  This code used to
+   * do that, but we never actually used it with more than one base. */
+
+  for (i = 0; i < nbases; i++)
+    if (!is_strong_pseudoprime(n, bases[i]))
+      break;
+
+  return i >= nbases;
+}
+
+bool BPSW(UV const n)
 {
   if (n < 7) return (n == 2 || n == 3 || n == 5);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
@@ -276,246 +272,10 @@ int BPSW(UV const n)
 #endif
 }
 
-/* Alternate modular lucas sequence code.
- * A bit slower than the normal one, but works with even valued n. */
-static void alt_lucas_seq(UV* Uret, UV* Vret, UV* Qkret, UV n, UV Pmod, UV Qmod, UV k)
-{
-  UV Uh, Vl, Vh, Ql, Qh;
-  int j, s, m;
 
-  Uh = 1;  Vl = 2;  Vh = Pmod;  Ql = 1;  Qh = 1;
-  s = 0; m = 0;
-  { UV v = k; while (!(v & 1)) { v >>= 1; s++; } }
-  { UV v = k; while (v >>= 1) m++; }
 
-  if (Pmod == 1 && Qmod == (n-1)) {
-    int Sl = Ql, Sh = Qh;
-    for (j = m; j > s; j--) {
-      Sl *= Sh;
-      Ql = (Sl==1) ? 1 : n-1;
-      if ( (k >> j) & UVCONST(1) ) {
-        Sh = -Sl;
-        Uh = mulmod(Uh, Vh, n);
-        Vl = submod(mulmod(Vh, Vl, n), Ql, n);
-        Vh = submod(sqrmod(Vh, n), (Sh==1) ? 2 : n-2, n);
-      } else {
-        Sh = Sl;
-        Uh = submod(mulmod(Uh, Vl, n), Ql, n);
-        Vh = submod(mulmod(Vh, Vl, n), Ql, n);
-        Vl = submod(sqrmod(Vl, n), (Sl==1) ? 2 : n-2, n);
-      }
-    }
-    Sl *= Sh;
-    Ql = (Sl==1) ? 1 : n-1;
-    Uh = submod(mulmod(Uh, Vl, n), Ql, n);
-    Vl = submod(mulmod(Vh, Vl, n), Ql, n);
-    for (j = 0; j < s; j++) {
-      Uh = mulmod(Uh, Vl, n);
-      Vl = submod(sqrmod(Vl, n), (j>0) ? 2 : n-2, n);
-    }
-    *Uret = Uh;
-    *Vret = Vl;
-    *Qkret = (s>0)?1:n-1;
-    return;
-  }
-
-  for (j = m; j > s; j--) {
-    Ql = mulmod(Ql, Qh, n);
-    if ( (k >> j) & UVCONST(1) ) {
-      Qh = mulmod(Ql, Qmod, n);
-      Uh = mulmod(Uh, Vh, n);
-      Vl = submod(mulmod(Vh, Vl, n), mulmod(Pmod, Ql, n), n);
-      Vh = submod(sqrmod(Vh, n), mulmod(2, Qh, n), n);
-    } else {
-      Qh = Ql;
-      Uh = submod(mulmod(Uh, Vl, n), Ql, n);
-      Vh = submod(mulmod(Vh, Vl, n), mulmod(Pmod, Ql, n), n);
-      Vl = submod(sqrmod(Vl, n), mulmod(2, Ql, n), n);
-    }
-  }
-  Ql = mulmod(Ql, Qh, n);
-  Qh = mulmod(Ql, Qmod, n);
-  Uh = submod(mulmod(Uh, Vl, n), Ql, n);
-  Vl = submod(mulmod(Vh, Vl, n), mulmod(Pmod, Ql, n), n);
-  Ql = mulmod(Ql, Qh, n);
-  for (j = 0; j < s; j++) {
-    Uh = mulmod(Uh, Vl, n);
-    Vl = submod(sqrmod(Vl, n), mulmod(2, Ql, n), n);
-    Ql = sqrmod(Ql, n);
-  }
-  *Uret = Uh;
-  *Vret = Vl;
-  *Qkret = Ql;
-}
-
-/* Generic Lucas sequence for any appropriate P and Q */
-void lucas_seq(UV* Uret, UV* Vret, UV* Qkret, UV n, IV P, IV Q, UV k)
-{
-  UV U, V, b, Dmod, Qmod, Pmod, Qk;
-
-  MPUassert(n > 1, "lucas_sequence:  modulus n must be > 1");
-  if (k == 0) {
-    *Uret = 0;
-    *Vret = 2;
-    *Qkret = Q;
-    return;
-  }
-
-  Qmod = (Q < 0)  ?  (UV) (Q + (IV)(((-Q/n)+1)*n))  :  (UV)Q % n;
-  Pmod = (P < 0)  ?  (UV) (P + (IV)(((-P/n)+1)*n))  :  (UV)P % n;
-  Dmod = submod( mulmod(Pmod, Pmod, n), mulmod(4, Qmod, n), n);
-  if (Dmod == 0) {
-    b = Pmod >> 1;
-    *Uret = mulmod(k, powmod(b, k-1, n), n);
-    *Vret = mulmod(2, powmod(b, k, n), n);
-    *Qkret = powmod(Qmod, k, n);
-    return;
-  }
-  if ((n % 2) == 0) {
-    alt_lucas_seq(Uret, Vret, Qkret, n, Pmod, Qmod, k);
-    return;
-  }
-  U = 1;
-  V = Pmod;
-  Qk = Qmod;
-  { UV v = k; b = 0; while (v >>= 1) b++; }
-
-  if (Q == 1) {
-    while (b--) {
-      U = mulmod(U, V, n);
-      V = mulsubmod(V, V, 2, n);
-      if ( (k >> b) & UVCONST(1) ) {
-        UV t2 = mulmod(U, Dmod, n);
-        U = muladdmod(U, Pmod, V, n);
-        if (U & 1) { U = (n>>1) + (U>>1) + 1; } else { U >>= 1; }
-        V = muladdmod(V, Pmod, t2, n);
-        if (V & 1) { V = (n>>1) + (V>>1) + 1; } else { V >>= 1; }
-      }
-    }
-  } else if (P == 1 && Q == -1) {
-    /* This is about 30% faster than the generic code below.  Since 50% of
-     * Lucas and strong Lucas tests come here, I think it's worth doing. */
-    int sign = Q;
-    while (b--) {
-      U = mulmod(U, V, n);
-      if (sign == 1) V = mulsubmod(V, V, 2, n);
-      else           V = muladdmod(V, V, 2, n);
-      sign = 1;   /* Qk *= Qk */
-      if ( (k >> b) & UVCONST(1) ) {
-        UV t2 = mulmod(U, Dmod, n);
-        U = addmod(U, V, n);
-        if (U & 1) { U = (n>>1) + (U>>1) + 1; } else { U >>= 1; }
-        V = addmod(V, t2, n);
-        if (V & 1) { V = (n>>1) + (V>>1) + 1; } else { V >>= 1; }
-        sign = -1;  /* Qk *= Q */
-      }
-    }
-    if (sign == 1) Qk = 1;
-  } else {
-    while (b--) {
-      U = mulmod(U, V, n);
-      V = mulsubmod(V, V, addmod(Qk,Qk,n), n);
-      Qk = sqrmod(Qk, n);
-      if ( (k >> b) & UVCONST(1) ) {
-        UV t2 = mulmod(U, Dmod, n);
-        U = muladdmod(U, Pmod, V, n);
-        if (U & 1) { U = (n>>1) + (U>>1) + 1; } else { U >>= 1; }
-        V = muladdmod(V, Pmod, t2, n);
-        if (V & 1) { V = (n>>1) + (V>>1) + 1; } else { V >>= 1; }
-        Qk = mulmod(Qk, Qmod, n);
-      }
-    }
-  }
-  *Uret = U;
-  *Vret = V;
-  *Qkret = Qk;
-}
-
-#define OVERHALF(v)  ( (UV)((v>=0)?v:-v) > (UVCONST(1) << (BITS_PER_WORD/2-1)) )
-int lucasu(IV* U, IV P, IV Q, UV k)
-{
-  IV Uh, Vl, Vh, Ql, Qh;
-  int j, s, n;
-
-  if (U == 0) return 0;
-  if (k == 0) { *U = 0; return 1; }
-
-  Uh = 1;  Vl = 2;  Vh = P;  Ql = 1;  Qh = 1;
-  s = 0; n = 0;
-  { UV v = k; while (!(v & 1)) { v >>= 1; s++; } }
-  { UV v = k; while (v >>= 1) n++; }
-
-  for (j = n; j > s; j--) {
-    if (OVERHALF(Uh) || OVERHALF(Vh) || OVERHALF(Vl) || OVERHALF(Ql) || OVERHALF(Qh)) return 0;
-    Ql *= Qh;
-    if ( (k >> j) & UVCONST(1) ) {
-      Qh = Ql * Q;
-      Uh = Uh * Vh;
-      Vl = Vh * Vl - P * Ql;
-      Vh = Vh * Vh - 2 * Qh;
-    } else {
-      Qh = Ql;
-      Uh = Uh * Vl - Ql;
-      Vh = Vh * Vl - P * Ql;
-      Vl = Vl * Vl - 2 * Ql;
-    }
-  }
-  if (OVERHALF(Ql) || OVERHALF(Qh)) return 0;
-  Ql = Ql * Qh;
-  Qh = Ql * Q;
-  if (OVERHALF(Uh) || OVERHALF(Vh) || OVERHALF(Vl) || OVERHALF(Ql) || OVERHALF(Qh)) return 0;
-  Uh = Uh * Vl - Ql;
-  Vl = Vh * Vl - P * Ql;
-  Ql = Ql * Qh;
-  for (j = 0; j < s; j++) {
-    if (OVERHALF(Uh) || OVERHALF(Vl) || OVERHALF(Ql)) return 0;
-    Uh *= Vl;
-    Vl = Vl * Vl - 2 * Ql;
-    Ql *= Ql;
-  }
-  *U = Uh;
-  return 1;
-}
-int lucasv(IV* V, IV P, IV Q, UV k)
-{
-  IV Vl, Vh, Ql, Qh;
-  int j, s, n;
-
-  if (V == 0) return 0;
-  if (k == 0) { *V = 2; return 1; }
-
-  Vl = 2;  Vh = P;  Ql = 1;  Qh = 1;
-  s = 0; n = 0;
-  { UV v = k; while (!(v & 1)) { v >>= 1; s++; } }
-  { UV v = k; while (v >>= 1) n++; }
-
-  for (j = n; j > s; j--) {
-    if (OVERHALF(Vh) || OVERHALF(Vl) || OVERHALF(Ql) || OVERHALF(Qh)) return 0;
-    Ql *= Qh;
-    if ( (k >> j) & UVCONST(1) ) {
-      Qh = Ql * Q;
-      Vl = Vh * Vl - P * Ql;
-      Vh = Vh * Vh - 2 * Qh;
-    } else {
-      Qh = Ql;
-      Vh = Vh * Vl - P * Ql;
-      Vl = Vl * Vl - 2 * Ql;
-    }
-  }
-  if (OVERHALF(Ql) || OVERHALF(Qh)) return 0;
-  Ql = Ql * Qh;
-  Qh = Ql * Q;
-  if (OVERHALF(Vh) || OVERHALF(Vl) || OVERHALF(Ql) || OVERHALF(Qh)) return 0;
-  Vl = Vh * Vl - P * Ql;
-  Ql = Ql * Qh;
-  for (j = 0; j < s; j++) {
-    if (OVERHALF(Vl) || OVERHALF(Ql)) return 0;
-    Vl = Vl * Vl - 2 * Ql;
-    Ql *= Ql;
-  }
-  *V = Vl;
-  return 1;
-}
+/******************************************************************************/
+/******************************************************************************/
 
 /* Lucas tests:
  *  0: Standard
@@ -526,10 +286,10 @@ int lucasv(IV* V, IV P, IV Q, UV k)
  * None of them have any false positives for the BPSW test.  Also see the
  * "almost extra strong" test.
  */
-int is_lucas_pseudoprime(UV n, int strength)
+bool is_lucas_pseudoprime(UV n, int strength)
 {
   IV P, Q, D;
-  UV U, V, Qk, d, s;
+  UV U, V, Pu, Qu, Qk, d, s;
 
   if (n < 5) return (n == 2 || n == 3);
   if ((n % 2) == 0 || n == UV_MAX) return 0;
@@ -562,7 +322,7 @@ int is_lucas_pseudoprime(UV n, int strength)
   MPUassert( D == (P*P - 4*Q) , "is_lucas_pseudoprime: incorrect DPQ");
 
 #if 0   /* Condition 2, V_n+1 = 2Q mod n */
-{ UV us, vs, qs; lucas_seq(&us, &vs, &qs, n, P, Q, n+1); return (vs == addmod(Q,Q,n)); }
+{ UV us, vs; lucasuvmod(&us, &vs, P, Q, n+1, n); return (vs == addmod(Q,Q,n)); }
 #endif
 #if 0   /* Condition 3, n is a epsp(Q) */
 return is_euler_pseudoprime(n,Qk);
@@ -677,7 +437,9 @@ return is_euler_pseudoprime(n,Qk);
     return 0;
   }
 #else
-  lucas_seq(&U, &V, &Qk, n, P, Q, d);
+  Pu = ivmod(P,n);
+  Qu = ivmod(Q,n);
+  lucasuvmod(&U, &V, Pu, Qu, d, n);
 
   if (strength == 0) {
     if (U == 0)
@@ -686,6 +448,7 @@ return is_euler_pseudoprime(n,Qk);
     if (U == 0)
       return 1;
     /* Now check to see if V_{d*2^r} == 0 for any 0 <= r < s */
+    Qk = powmod(Qu, d, n);
     while (s--) {
       if (V == 0)
         return 1;
@@ -696,10 +459,10 @@ return is_euler_pseudoprime(n,Qk);
     }
   } else if (strength == 2) {
     UV Ql = 0, Qj = 0;
-    UV Qu = (Q >= 0)  ?  Q % n  :  n-(((UV)(-Q)) % n);
     int qjacobi, is_slpsp = 0;
     if (U == 0)
       is_slpsp = 1;
+    Qk = powmod(Qu, d, n);
     while (s--) {
       if (V == 0)
         is_slpsp = 1;
@@ -710,7 +473,7 @@ return is_euler_pseudoprime(n,Qk);
     if (!is_slpsp)                  return 0; /* slpsp */
     if (V != addmod(Qu,Qu,n))       return 0; /* V_{n+1} != 2Q mod n */
     qjacobi = jacobi_iu(Q,n);
-    Qj = (qjacobi == 0) ? 0 : (qjacobi == 1) ? Qu : n-Qu;
+    Qj = (qjacobi == 0 || Qu == 0) ? 0 : (qjacobi == 1) ? Qu : n-Qu;
     if (Ql != Qj)                   return 0; /* n is epsp base Q */
     return 1;
   } else {
@@ -743,7 +506,7 @@ return is_euler_pseudoprime(n,Qk);
  * With increment = 1, these results will be a subset of the extra-strong
  * Lucas pseudoprimes.  With increment = 2, we produce Pari's results.
  */
-int is_almost_extra_strong_lucas_pseudoprime(UV n, UV increment)
+bool is_almost_extra_strong_lucas_pseudoprime(UV n, UV increment)
 {
   UV P, V, W, d, s, b;
 
@@ -754,7 +517,7 @@ int is_almost_extra_strong_lucas_pseudoprime(UV n, UV increment)
 
   /* Ensure small primes work with large increments. */
   if ( (increment >= 16 && n <= 331) || (increment > 148 && n <= 631) )
-    return !!is_prob_prime(n);
+    return is_prob_prime(n);
 
   P = select_extra_strong_parameters(n, increment);
   if (P == 0) return 0;
@@ -828,7 +591,7 @@ typedef struct {
 #define NPERRINDIV 19
 /* 1112 mask bytes */
 static const uint32_t _perrinmask[] = {22,523,514,65890,8519810,130,4259842,0,526338,2147483904U,1644233728,1,8194,1073774592,1024,134221824,128,512,181250,2048,0,1,134217736,1049600,524545,2147500288U,0,524290,536870912,32768,33554432,2048,0,2,2,256,65536,64,536875010,32768,256,64,0,32,1073741824,0,1048576,1048832,371200000,0,0,536887552,32,2147487744U,2097152,32768,1024,0,1024,536870912,128,512,0,0,512,0,2147483650U,45312,128,0,8388640,0,8388608,8388608,0,2048,4096,92800000,262144,0,65536,4,0,4,4,4194304,8388608,1075838976,536870956,0,134217728,8192,0,8192,8192,0,2,0,268435458,134223392,1073741824,268435968,2097152,67108864,0,8192,1073741840,0,0,128,0,0,512,1450000,8,131136,536870928,0,4,2097152,4096,64,0,32768,0,0,131072,371200000,2048,33570816,4096,32,1024,536870912,1048576,16384,0,8388608,0,0,0,2,512,0,128,0,134217728,2,32,0,0,0,0,8192,0,1073742080,536870912,0,4096,16777216,526336,32,0,65536,33554448,708,67108864,2048,0,0,536870912,0,536870912,33554432,33554432,2147483648U,512,64,0,1074003968,512,0,524288,0,0,0,67108864,524288,1048576,0,131076,0,33554432,131072,0,2,8390656,16384,16777216,134217744,0,131104,0,2,32768,0,0,0,1450000,32768,0,0,0,0,0,16,0,1024,16400,1048576,32,1024,0,260,536870912,269484032,0,16384,0,524290,0,0,512,65536,0,0,0,134217732,0,67108880,536887296,0,0,32,0,65568,0,524288,2147483648U,0,4096,4096,134217984,268500992,0,33554432,131072,0,0,0,16777216,0,0,0,0,0,524288,0,0,67108864,0,0,2,0,2,32,1024,0};
-static _perrin _perrindata[NPERRINDIV] = {
+static const _perrin _perrindata[NPERRINDIV] = {
   {2, 7, 0},
   {3, 13, 1},
   {4, 14, 2},
@@ -915,7 +678,7 @@ static void calc_perrin_sig(UV* S, UV n) {
 #endif
 }
 
-int is_perrin_pseudoprime(UV n, int restricted)
+bool is_perrin_pseudoprime(UV n, uint32_t restricted)
 {
   int jacobi, i;
   UV S[6];
@@ -995,9 +758,9 @@ int is_perrin_pseudoprime(UV n, int restricted)
   return 0;
 }
 
-int is_frobenius_pseudoprime(UV n, IV P, IV Q)
+bool is_frobenius_pseudoprime(UV n, IV P, IV Q)
 {
-  UV U, V, Qk, Vcomp;
+  UV U, V, t, Vcomp;
   int k = 0;
   IV D;
   UV Du, Pu, Qu;
@@ -1026,26 +789,21 @@ int is_frobenius_pseudoprime(UV n, IV P, IV Q)
     if (D != 5 && is_perfect_square(Du))
       croak("Frobenius invalid P,Q: (%"IVdf",%"IVdf")", P, Q);
   }
-  Pu = (P >= 0 ? P : -P) % n;
-  Qu = (Q >= 0 ? Q : -Q) % n;
+  Pu = ivmod(P,n);
+  Qu = ivmod(Q,n);
 
-  Qk = gcd_ui(n, Pu*Qu*Du);
-  if (Qk != 1) {
-    if (Qk == n) return !!is_prob_prime(n);
+  t = gcd_ui(n, Pu*Qu*Du);
+  if (t != 1) {
+    if (t == n) return is_prob_prime(n);
     return 0;
   }
   if (k == 0) {
     k = kronecker_su(D, n);
     if (k == 0) return 0;
-    if (k == 1) {
-      Vcomp = 2;
-    } else {
-      Qu = addmod(Qu,Qu,n);
-      Vcomp = (Q >= 0)  ?  Qu  :  n-Qu;
-    }
+    Vcomp = (k == 1)  ?  2  :  addmod(Qu,Qu,n);
   }
 
-  lucas_seq(&U, &V, &Qk, n, P, Q, n-k);
+  lucasuvmod(&U, &V, Pu, Qu, n-k, n);
   /* MPUverbose(1, "%"UVuf" Frobenius U = %"UVuf" V = %"UVuf"\n", n, U, V); */
   if (U == 0 && V == Vcomp) return 1;
   return 0;
@@ -1065,7 +823,7 @@ int is_frobenius_pseudoprime(UV n, IV P, IV Q)
  *
  * The paper claims there are no 64-bit counterexamples.
  */
-int is_frobenius_khashin_pseudoprime(UV n)
+bool is_frobenius_khashin_pseudoprime(UV n)
 {
   int k = 2;
   UV ea, ra, rb, a, b, d = n-1, c = 1;
@@ -1141,7 +899,7 @@ int is_frobenius_khashin_pseudoprime(UV n)
  * it is mainly useful for numbers larger than 2^64 as an additional
  * non-correlated test.
  */
-int is_frobenius_underwood_pseudoprime(UV n)
+bool is_frobenius_underwood_pseudoprime(UV n)
 {
   int j, bit;
   UV x, result, a, b, np1, len, t1;
@@ -1247,9 +1005,9 @@ int is_frobenius_underwood_pseudoprime(UV n)
  * GMP version.  However, they're just asking if this is a Mersenne prime, and
  * there are millions of CPU years that have gone into enumerating them, so
  * instead we'll use a table. */
-#define NUM_KNOWN_MERSENNE_PRIMES 50
-static const uint32_t _mersenne_primes[NUM_KNOWN_MERSENNE_PRIMES] = {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,9941,11213,19937,21701,23209,44497,86243,110503,132049,216091,756839,859433,1257787,1398269,2976221,3021377,6972593,13466917,20996011,24036583,25964951,30402457,32582657,37156667,42643801,43112609,57885161,74207281,77232917};
-#define LAST_CHECKED_MERSENNE 45313991
+#define NUM_KNOWN_MERSENNE_PRIMES 52
+static const uint32_t _mersenne_primes[NUM_KNOWN_MERSENNE_PRIMES] = {2,3,5,7,13,17,19,31,61,89,107,127,521,607,1279,2203,2281,3217,4253,4423,9689,9941,11213,19937,21701,23209,44497,86243,110503,132049,216091,756839,859433,1257787,1398269,2976221,3021377,6972593,13466917,20996011,24036583,25964951,30402457,32582657,37156667,42643801,43112609,57885161,74207281,77232917,82589933,136279841};
+#define LAST_CHECKED_MERSENNE 79711549
 int is_mersenne_prime(UV p)
 {
   int i;
@@ -1258,7 +1016,7 @@ int is_mersenne_prime(UV p)
       return 1;
   return (p < LAST_CHECKED_MERSENNE) ? 0 : -1;
 }
-int lucas_lehmer(UV p)
+bool lucas_lehmer(UV p)
 {
   UV k, V, mp;
 
@@ -1275,34 +1033,68 @@ int lucas_lehmer(UV p)
 
 /******************************************************************************/
 
-/* Hashing similar to Forišek and Jančina 2015, trial with 2/3/5/7/11. */
-static const uint16_t mr_bases_hash32[256] = {
-446,1150,304,24041,1595,15524,1743,6698,1724,2427,1088,7349,504,995,6399,2013,598,3314,3367,1930,3006,1845,2079,1843,694,2502,6957,1053,585,626,789,2115,1109,1105,3702,783,1324,2239,1553,5609,515,548,1371,2637,8606,532,3556,831,587,862,1355,501,6358,317,2585,12311,6181,145,3839,2976,2674,8124,2147,19598,8051,1178,3159,6184,9867,1954,7857,602,5023,5113,3152,4583,2361,101,464,1860,1862,5185,1368,15885,368,1068,307,12626,18646,26337,569,1690,551,1782,226,3235,1158,24247,8361,1719,56,14647,1687,1920,8109,6090,1725,1248,536,2869,1047,2512,13510,1026,250,1867,3694,2379,5175,2235,5885,5107,1079,290,2121,20729,1329,2168,34,15326,3226,2989,2313,710,4333,7861,166,11650,10876,777,30291,746,1278,6347,7751,179,2351,16695,1615,3575,5772,11790,5203,591,1354,12303,3827,702,7,5607,4246,440,566,1997,7315,1241,1193,2324,1530,1423,1664,16705,2012,6305,2410,39,1361,6440,1507,3065,1807,5486,19498,8599,9338,1522,238,1226,8103,15634,3559,3288,2898,21063,287,1011,4457,563,7654,5738,1621,3907,117,442,1124,12921,16838,164,41,313,1692,1574,1091,2804,1160,1263,4611,8508,3790,20765,3894,1304,1344,7628,10955,1045,7760,973,103,1621,10479,4064,5553,272,2213,1989,2074,2137,5201,1391,924,227,911,22969,3802,212,1391,1213,7517,4931,7789,3303,10669,137,4129,2734
+static const uint16_t mr_bases_hash32[256] = {  /* requires div 2,3,5 */
+   4816, 6332,  958, 6124, 1001, 1431, 9644, 3700, 9251,20069, 7085, 2484,
+   3255,  218, 4660,  732, 1863, 3716, 2480, 2120, 2464,38264, 3070, 2621,
+   1592,17862,15223, 2926, 9119, 2181,24932, 4407,10915,13832, 1965, 3646,
+   2470,   62, 8548,  449, 4440, 7656, 1065,10100, 6497, 1868,33282, 4277,
+    805,  636,11536,   34, 2065,  406, 6435, 1043,27985, 7134, 1357, 3056,
+   6077, 4704, 6174,  865,15190,14419,   38, 6161,18774, 3990,  976, 1267,
+   3251,  233, 7387,  241, 3871, 4331, 8780, 2233,30331, 1656,  462, 5585,
+    194,10300, 1072, 1197, 1573, 1144, 1273,19439,  696, 1477,15858, 2684,
+   6022,   80, 9726, 6731, 1132,  774, 2202, 3668,19479,10837,  183,   71,
+    403, 5245, 1995, 2019, 5209,  174,  503,13830,21013, 3284, 7164, 2607,
+  10769,  473,  119, 8227, 1216, 3550, 1450, 1399,45822,  609,  721,   47,
+   9665, 4242,  767, 4880,16037,  844,  333, 8560, 1907, 2532,13468,  302,
+   2589, 5546,14312, 1548,18013, 8452,12427, 4431,10248, 4022, 5545, 1399,
+  41507, 1160, 1865,  219, 1254, 3330,13627, 1070, 3304, 5537, 6085,26999,
+  10279, 5369, 4992,38919, 2191, 1663,46961, 6570,11876,21689, 2804, 1202,
+   5764,  275, 2862, 2139, 7799, 4646, 1696, 4964,19016,12891, 4282, 4741,
+   7274,  174,  541,26596, 7524, 2777, 1819,  339, 1399, 2636,  668,  291,
+    559, 4992,  520, 7874, 2544, 4618, 4122, 1128,  326,  275,13080,  156,
+    236, 7015, 6349,11673, 2632,  475, 4560, 1543,   78, 3611,   34, 3811,
+    137,  737,31269, 2522,13354, 2033, 8577, 3597, 9269, 3815, 2511, 8088,
+    903,  109,12454, 1985, 8065,17637, 1645, 1404, 6106, 3661,  328, 6160,
+   1602, 6601, 1491, 8657
 };
+/* Correct for any 32-bit input. */
+bool MR32(uint32_t n) {
 
-int MR32(uint32_t n) {
-  uint32_t x = n;
-
-  if (x < 13) return (x == 2 || x == 3 || x == 5 || x == 7 || x == 11);
-  if (!(x&1) || !(x%3) || !(x%5) || !(x%7) || !(x%11) ) return 0;
-
-  x = (((x >> 16) ^ x) * 0x45d9f3b) & 0xFFFFFFFFUL;
-  x = ((x >> 16) ^ x) & 255;
-  return is_strong_pseudoprime(n, mr_bases_hash32[x]);
+  if (n < 11) return 0xAC >> n & 1;   /* equal to 2, 3, 5 or 7 */
+  if (is_divis_2_3_5(n)) return 0;    /* divis by 2, 3, or 5   */
+  return is_strong_pseudoprime(n, mr_bases_hash32[n >> 8 & 255]);
 }
 
 /******************************************************************************/
 
-int is_prob_prime(UV n)
-{
-  if (n < 11) {
-    if (n == 2 || n == 3 || n == 5 || n == 7)     return 2;
-    else                                          return 0;
-  }
+                   /********** PRIMALITY TEST **********/
 
+/******************************************************************************/
+
+/*
+ * For numbers under 3481 (59^2) everything handled by trial division.
+ *
+ * For numbers under 500k when we don't have fast ASM Montgomery math,
+ * do it with trial division.
+ *
+ * If input is 32-bit, use a hashed single base Miller-Rabin test.
+ *
+ * Otherwise (input is bigger than 32-bit), do trial division to 89, then
+ * call BPSW.  This is typically about 25% slower than a big (300k+) hash
+ * table to allow two Miller-Rabin tests, and 20% faster than a reasonable
+ * size table allowing three M-R tests.
+ *
+ * See:
+ *   - https://github.com/flintlib/flint/pull/2487
+ *   - https://github.com/JASory/machine-prime
+ * for examples of using the big table.
+ */
+
+bool is_prob_prime(UV n)
+{
 #if BITS_PER_WORD == 64
   if (n > UVCONST(4294967295)) { /* input is >= 2^32, UV is 64-bit*/
-    if (!(n%2) || !(n%3) || !(n%5) || !(n%7))       return 0;
+    if (is_divis_2_3_5_7(n))                        return 0;
     if (!(n%11) || !(n%13) || !(n%17) || !(n%19) ||
         !(n%23) || !(n%29) || !(n%31) || !(n%37) ||
         !(n%41) || !(n%43) || !(n%47) || !(n%53))   return 0;
@@ -1310,20 +1102,24 @@ int is_prob_prime(UV n)
     if (!(n%73) || !(n%79) || !(n%83) || !(n%89))   return 0;
     /* AESLSP test costs about 1.5 Selfridges, vs. ~2.2 for strong Lucas.
      * This makes the full BPSW test cost about 2.5x M-R tests for a prime. */
-    return 2*BPSW(n);
-  } else {
-#else
-  {
+    return BPSW(n);
+  }
 #endif
+  {
     uint32_t x = n;
-    if (!(x%2) || !(x%3) || !(x%5) || !(x%7))       return 0;
-    if (x <  121) /* 11*11 */                       return 2;
+
+    if (x < 11) return 0xAC >> x & 1;  /* Bits 2, 3, 5 and 7 */
+
+    if (is_divis_2_3_5_7(x))                        return 0;
+    if (x <  121) /* 11*11 */                       return 1;
+
     if (!(x%11) || !(x%13) || !(x%17) || !(x%19) ||
         !(x%23) || !(x%29) || !(x%31) || !(x%37) ||
         !(x%41) || !(x%43) || !(x%47) || !(x%53))   return 0;
-    if (x < 3481) /* 59*59 */                       return 2;
-    /* Trial division crossover point depends on platform */
-    if (!USE_MONTMATH && n < 200000) {
+    if (x < 3481) /* 59*59 */                       return 1;
+
+    /* For tiny inputs, continue trial division. */
+    if (!USE_MONTMATH && n < 500000) {
       uint32_t f = 59;
       uint32_t limit = isqrt(n);
       while (f <= limit) {
@@ -1336,8 +1132,9 @@ int is_prob_prime(UV n)
         { if ((x%f) == 0)  return 0; }  f += 4;
         { if ((x%f) == 0)  return 0; }  f += 6;
       }
-      return 2;
+      return 1;
     }
-    return 2*MR32(x);
+
+    return is_strong_pseudoprime(x, mr_bases_hash32[x >> 8 & 255]);
   }
 }

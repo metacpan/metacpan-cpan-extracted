@@ -18,7 +18,7 @@ use URI;
 
 with 'MooX::Role::EventEmitter';
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 our @CARP_NOT;
 
 =head1 NAME
@@ -942,7 +942,7 @@ use Carp 'croak';
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 
 has 'protocol' => (
     is => 'ro',
@@ -982,7 +982,7 @@ sub DESTROY {
 
 =head1 SEE ALSO
 
-The inofficial Chrome debugger API documentation at
+The unofficial Chrome debugger API documentation at
 L<https://github.com/buggerjs/bugger-daemon/blob/master/README.md#api>
 
 Chrome DevTools at L<https://chromedevtools.github.io/devtools-protocol/1-2>

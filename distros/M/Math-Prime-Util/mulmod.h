@@ -8,7 +8,20 @@
 /* This will be true if we think mulmods are fast */
 #define MULMODS_ARE_FAST 1
 
-#if (BITS_PER_WORD == 32) && HAVE_STD_U64
+/*                x86-64               ARM              RISC-V
+ * umul 64->128   mul  -> rdx:rax      umulh/mul        mulhu/mulu
+ * smul 64->128   imul -> rdx:rax      smulh/mul        mulsu/muls
+ * udiv 128->64   div  -> q:rax r:rdx                   divu (RV128I)
+ * sdiv 128->64   idiv -> q:rax r:rdx                   divs (RV128I)
+ * clmul 64->128  pclmulqdq -> xmm     pmull/pmull2     clmul/clmulh
+ *
+ * __int128 (GCC, clang, CUDA 11.5+)
+ * MSVC std::_Unsigned128 in <__msvc_int128.hpp>
+ * C23 _BitInt(128)  (clang 14+, gcc 14+)
+ */
+
+
+#if (BITS_PER_WORD == 32) && HAVE_UINT64
 
   /* We have 64-bit available, but UV is 32-bit.  Do the math in 64-bit.
    * Even if it is emulated, it should be as fast or faster than us doing it.
@@ -23,7 +36,7 @@
   /* Beware: if (a*b)/c > 2^64, there will be an FP exception */
   static INLINE UV _mulmod(UV a, UV b, UV n) {
     UV d, dummy;                    /* d will get a*b mod c */
-    asm ("mulq %3\n\t"              /* mul a*b -> rdx:rax */
+    __asm__ ("mulq %3\n\t"              /* mul a*b -> rdx:rax */
          "divq %4\n\t"              /* (a*b)/c -> quot in rax remainder in rdx */
          :"=a"(dummy), "=&d"(d)     /* output */
          :"a"(a), "r"(b), "r"(n)    /* input */
@@ -43,7 +56,7 @@
   static INLINE UV _addmod(UV a, UV b, UV n) {
     UV t = a-n;
     a += b;
-    asm ("add %2, %1\n\t"    /* t := t + b */
+    __asm__ ("add %2, %1\n\t"    /* t := t + b */
          "cmovc %1, %0\n\t"  /* if (carry) a := t */
          :"+r" (a), "+&r" (t)
          :"r" (b)
@@ -56,7 +69,8 @@
 #elif BITS_PER_WORD == 64 && HAVE_UINT128
 
   /* We're 64-bit, using a modern gcc, and the target has some 128-bit type.
-   * The actual number of targets that have this implemented are limited. */
+   * The actual number of targets that have this implemented are limited.
+   * However, the late 2020 Apple M1 Macs use this. */
 
   #define mulmod(a,b,n) (UV)( ((uint128_t)(a) * (b)) % (n) )
   #define sqrmod(a,n)   (UV)( ((uint128_t)(a) * (a)) % (n) )
@@ -148,5 +162,10 @@ static INLINE UV submod(UV a, UV b, UV n) {
 
 /* a^k + c mod n */
 #define powaddmod(a, k, c, n)  addmod(powmod(a,k,n),c,n)
+
+static INLINE UV negmod(UV a, UV n) {
+  if (a >= n) a %= n;
+  return  (a) ? (n-a) : 0;
+}
 
 #endif

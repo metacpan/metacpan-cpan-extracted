@@ -4,14 +4,21 @@ use strict;
 use warnings;
 use v5.16;
 use Scalar::Util;
+use Term::ReadKey; # GetTerminalSize()
 
 package Dump::Krumo;
 
+use Carp;
 use Exporter 'import';
-our @EXPORT  = qw(kx kxd);
+
+our @EXPORT    = qw(kx kxd);
+our @EXPORT_OK = qw(k kd);
+
+# If you `use Dump::Krumo (":short");` then you get k() and kd() instead
+our %EXPORT_TAGS = ('short' => [('k', 'kd')]);
 
 # https://blogs.perl.org/users/grinnz/2018/04/a-guide-to-versions-in-perl.html
-our $VERSION = 'v0.1.4';
+our $VERSION = 'v0.1.6';
 
 our $use_color     = 1; # Output in color
 our $return_string = 0; # Return a string instead of printing it
@@ -20,6 +27,7 @@ our $debug         = 0; # Low level developer level debugging
 our $disable       = 0; # Disable Dump::Krumo
 our $indent_spaces = 2; # Number of spaces to use for each level of indent
 our $promote_bool  = 1; # Convert JSON::PP::Boolean to raw true/false
+our $stack_trace   = 0; # kxd() prints a stack trace
 
 # Global var to track how many levels we're indented
 my $current_indent_level = 0;
@@ -27,24 +35,25 @@ my $current_indent_level = 0;
 my $left_pad_width       = 0;
 
 our $COLORS = {
-	'string'       => 230,       # Standard strings
-	'control_char' => 226,       # the `\n`, `\r`, and `\t` inside strings
-	'undef'        => 196,       # undef
-	'hash_key'     => 208,       # hash keys on the left of =>
-	'integer'      => 33,        # integers
-	'float'        => 51,        # things that look like floating point
-	'class'        => 118,       # Classes/Object names
-	'binary'       => 226,       # Strings that contain non-printable chars
-	'scalar_ref'   => 225,       # References to scalar variables
-	'boolean'      => 141,       # Native boolean types
-	'regexp'       => 164,       # qr() style regexp variables
-	'glob'         => 40,        # \*STDOUT variables
-	'coderef'      => 168,       # code references
-	'vstring'      => 153,       # Version strings
-	'empty_braces' => '15_bold', # Either [] or {}
+	'string'        => 230,            # Standard strings
+	'control_char'  => 226,            # the `\n`, `\r`, and `\t` inside strings
+	'undef'         => 196,            # undef
+	'hash_key'      => 208,            # hash keys on the left of =>
+	'integer'       => 33,             # integers
+	'float'         => 51,             # things that look like floating point
+	'class'         => 118,            # Classes/Object names
+	'binary'        => 226,            # \x{12} inside of strings
+	'scalar_ref'    => 225,            # References to scalar variables
+	'boolean_false' => 'white_on_124', # Native boolean false
+	'boolean_true'  => 'white_on_22',  # Native boolean true
+	'regexp'        => 164,            # qr() style regexp variables
+	'glob'          => 40,             # \*STDOUT variables
+	'coderef'       => 168,            # code references
+	'vstring'       => 153,            # Version strings
+	'empty_braces'  => '15_bold',      # Either [] or {} or ''
 };
 
-my $WIDTH = get_terminal_width();
+our $WIDTH = get_terminal_width();
 $WIDTH  ||= 100;
 
 ###############################################################################
@@ -54,6 +63,7 @@ $WIDTH  ||= 100;
 sub kx {
 	my @arr = @_;
 
+	# If we are globally disabled we do nothing
 	if ($disable) { return -1; }
 
 	my @items    = ();
@@ -79,8 +89,8 @@ sub kx {
 
 	# If it's a real array we remove the false [ ] added by __dump()
 	if ($is_array) {
-		my $len = length($str) - 2;
-		$str    = substr($str, 1, $len);
+		my $len = length($str);
+		$str    = substr($str, 1, $len - 2);
 	}
 
 	if ($cnt > 1 || $cnt == 0) {
@@ -88,7 +98,7 @@ sub kx {
 	}
 
 	if ($return_string) {
-		return "$str";
+		return $str;
 	} else {
 		print "$str\n";
 	}
@@ -96,14 +106,20 @@ sub kx {
 
 # Dump the variable and die and output file/line
 sub kxd {
+	# If we are globally disabled we do nothing
+	if ($disable) { return -1; }
+
 	kx(@_);
 
-	my @call = caller();
-	my $file = $call[1];
-	my $line = $call[2];
+	print "\n";
 
-	printf("\nDump::Krumo called from %s line %s\n", color('white', $file), color(194, "#$line"));
-	exit(15);
+	my $str = color('117', "Dump::Krumo") . " died";
+
+	if ($stack_trace) {
+		confess($str);
+	} else {
+		croak($str);
+	}
 }
 
 # Generic dump that handles each type appropriately
@@ -156,9 +172,9 @@ sub __dump_bool {
 	my $ret;
 
 	if ($x) {
-		$ret = color(get_color('boolean'), "true");
+		$ret = color(get_color('boolean_true'), "true");
 	} else {
-		$ret = color(get_color('boolean'), "false");
+		$ret = color(get_color('boolean_false'), "false");
 	}
 
 	return $ret;
@@ -249,16 +265,13 @@ sub __dump_vstring {
 sub __dump_string {
 	my $x = shift();
 
+	# This is the catch all for "" or ''
 	if (length($x) == 0) {
 		return color(get_color('empty_braces'), "''"),
 	}
 
+	# Is the whole string printable
 	my $printable = is_printable($x);
-
-	# Convert all \n to printable version
-	my $slash_n = color(get_color('control_char'), '\\n') . color(get_color('string'));
-	my $slash_r = color(get_color('control_char'), '\\r') . color(get_color('string'));
-	my $slash_t = color(get_color('control_char'), '\\t') . color(get_color('string'));
 
 	my $ret = '';
 
@@ -281,18 +294,21 @@ sub __dump_string {
 	# Longer unprintable stuff we just spit out the raw HEX
 	} elsif (!$printable) {
 		$ret = color(get_color('binary'), 'pack("H*", ' . bin2hex($x) . ")");
-	# If it's a simple string we single quote it
-	} elsif ($x =~ /^[\w .,":;?!#\$%^*&\/=-]*$/g) {
-		$ret = "'" . color(get_color('string'), "$x") . "'";
-	# Otherwise we clean it up and then double quote it
 	} else {
-		# Do some clean up here?
-		$ret = '"' . color(get_color('string'), "$x") . '"';
+		my $quoted = quote_string($x);
+		$ret       = color(get_color('string'), $quoted);
 	}
 
-	$ret =~ s/\n/$slash_n/g;
-	$ret =~ s/\r/$slash_r/g;
-	$ret =~ s/\t/$slash_t/g;
+	# Convert special chars to printable version
+	my $slash_n = color(get_color('control_char'), '\\n') . color(get_color('string'));
+	my $slash_r = color(get_color('control_char'), '\\r') . color(get_color('string'));
+	my $slash_t = color(get_color('control_char'), '\\t') . color(get_color('string'));
+	my $slash_f = color(get_color('control_char'), '\\f') . color(get_color('string'));
+
+	$ret =~ s/\\n/$slash_n/g;
+	$ret =~ s/\\r/$slash_r/g;
+	$ret =~ s/\\t/$slash_t/g;
+	$ret =~ s/\\t/$slash_f/g;
 
 	return $ret;
 }
@@ -306,13 +322,9 @@ sub __dump_undef {
 sub __dump_array {
 	my $x = shift();
 
-	# If it's only a single element we return the stringified version of that
-	if (ref($x) ne 'ARRAY') {
-		return __dump("$x");
-	}
-
 	$current_indent_level++;
 
+	# Catch if it's an empty array
 	my $cnt = scalar(@$x);
 	if ($cnt == 0) {
 		$current_indent_level--;
@@ -322,6 +334,7 @@ sub __dump_array {
 	# See if we need to switch to column mode to output this array
 	my $column_mode = needs_column_mode($x);
 
+	# Loop through each item and dump it approprirately
 	my $ret = '';
 	my @items = ();
 	foreach my $z (@$x) {
@@ -356,14 +369,15 @@ sub __dump_hash {
 	my @vals  = values(%$x);
 	my $cnt   = scalar(@keys);
 
-	# There may be some weird scenario where we do NOT want to sort
-	if ($hash_sort) {
-		@keys = sort(@keys);
-	}
-
+	# Catch an empty hash like: {}
 	if ($cnt == 0) {
 		$current_indent_level--;
 		return color(get_color('empty_braces'), '{}'),
+	}
+
+	# There may be some weird scenario where we do NOT want to sort
+	if ($hash_sort) {
+		@keys = sort(@keys);
 	}
 
 	my $key_len = 0;
@@ -573,6 +587,8 @@ sub bin2hex {
 sub is_printable {
 	my ($str) = @_;
 
+	# If we're just checking a single char, anything out of the ASCII range is
+	# not considered printable
 	if (length($str) == 1 && (ord($str) >= 127)) {
 		return 0;
 	}
@@ -595,7 +611,7 @@ sub is_undef {
 	}
 }
 
-# Veriyf this
+# Verify this
 sub is_nan {
 	my $x   = shift();
 	my $ret = 0;
@@ -607,7 +623,7 @@ sub is_nan {
 	return $ret;
 }
 
-# Veriyf this
+# Verify this
 sub is_infinity {
 	my $x   = shift();
 	my $ret = 0;
@@ -621,17 +637,21 @@ sub is_infinity {
 
 sub is_string {
 	my ($value) = @_;
-	return defined($value) && $value !~ /^-?\d+(?:\.\d+)?$/;
+
+	# For our purposes it's considered a string if it doesn't look like a number
+	return defined($value) && !is_numeric($value);
 }
 
 sub is_integer {
 	my ($value) = @_;
+
 	return defined($value) && $value =~ /^-?\d+$/;
 }
 
 sub is_float {
 	my ($value) = @_;
-	#my $ret     = defined($value) && $value =~ /^-?\d+\.\d+$/;
+
+	# Note 1.2e+100 is considered a float along with the more common types
 	my $ret     = defined($value) && $value =~ /^-?\d+\.\d+(e[+-]\d+)?$/;
 
 	return $ret;
@@ -658,6 +678,18 @@ sub is_numeric {
 
 	return $ret;
 }
+
+# This is a wrapper needed for :short
+sub k {
+	return kx(@_);
+}
+
+# This is a wrapper needed for :short
+sub kd {
+	return kxd(@_);
+}
+
+
 
 ################################################################################
 
@@ -698,20 +730,8 @@ sub color {
 }
 
 sub get_terminal_width {
-	# If there is no $TERM then tput will bail out
-	if (!$ENV{TERM} || -t STDOUT == 0) {
-		return 0;
-	}
-
-	my $tput = `tput cols`;
-
-	my $width = 0;
-	if ($tput) {
-		$width = int($tput);
-	} else {
-		print color('orange', "Warning:") . " `tput cols` did not return numeric input\n";
-		$width = 80;
-	}
+	my @x      = Term::ReadKey::GetTerminalSize();
+	my $width  = $x[0] || 0;
 
 	return $width;
 }
@@ -721,7 +741,7 @@ sub quote_string {
 	my ($s) = @_;
 
 	# Use single quotes if no special chars
-	if ($s !~ /[\'\\\n\r\t\f\b\$@"]/ ) {
+	if ($s !~ /[\'\\\n\r\t\f\$@]/ ) {
 		return "'$s'";
 	}
 
@@ -731,34 +751,17 @@ sub quote_string {
 	$escaped =~ s/\r/\\r/g;
 	$escaped =~ s/\t/\\t/g;
 	$escaped =~ s/\f/\\f/g;
-	$escaped =~ s/\b/\\b/g;
 
 	return "\"$escaped\"";
 }
 
+# This is used to look up the color for each type
 sub get_color {
 	my $str = $_[0] || "";
 
 	my $ret = $COLORS->{$str} // 251;
 
 	return $ret;
-}
-
-# Creates methods k() and kd() to print, and print & die respectively
-BEGIN {
-	if (eval { require Data::Dump::Color }) {
-		*k = sub { Data::Dump::Color::dd(@_) };
-	} else {
-		require Data::Dumper;
-		*k = sub { print Data::Dumper::Dumper(\@_) };
-	}
-
-	sub kd {
-		k(@_);
-
-		printf("Died at %2\$s line #%3\$s\n",caller());
-		exit(15);
-	}
 }
 
 ################################################################################
@@ -790,7 +793,7 @@ focuses on making your data human readable and easily parseable.
 
 # SCREENSHOTS
 
-<img width="1095" height="878" alt="dk-ss" src="https://github.com/user-attachments/assets/b7138f3d-3144-4b1a-a063-9ca445dd34d4" />
+<img width="1072" height="942" alt="image" src="https://github.com/user-attachments/assets/970932a4-21cb-4add-bf9d-f4a007435181" />
 
 =end markdown
 
@@ -832,6 +835,10 @@ debug print statements in your code, and disable them at runtime as needed.
 =item C<$Dump::Krumo::promote_bool = 1>
 
 Convert JSON::PP::Booleans to true/false instead of treating them as objects.
+
+=item C<$Dump::Krumo::stack_trace = 0>
+
+When C<kxd()> is called it will dump a full stack trace.
 
 =item C<$Dump::Krumo::COLORS>
 

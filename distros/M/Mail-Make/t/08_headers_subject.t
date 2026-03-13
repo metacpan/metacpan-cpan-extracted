@@ -38,7 +38,7 @@ sub ew_decode
     return( $str );
 }
 
-# NOTE: 1. Pure ASCII — no encoding applied
+# NOTE: 1. Pure ASCII - no encoding applied
 subtest 'pure ASCII: unchanged' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -62,11 +62,11 @@ subtest 'pure ASCII: printable symbols' => sub
     unlike( $out, qr/=\?/, 'no encoded-word markers present' );
 };
 
-# NOTE: 2. Non-ASCII — encoding applied
+# NOTE: 2. Non-ASCII - encoding applied
 subtest 'non-ASCII: encoded-word markers present' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
-    $s->value( "Angels, Inc. \x{2014} Newsletter" );   # em dash U+2014
+    $s->value( "Yamato, Inc. \x{2014} Newsletter" );   # em dash U+2014
     my $out = $s->as_string;
     like( $out, qr/=\?UTF-8\?B\?/, 'encoded-word header present' );
     like( $out, qr/\?=$/,          'encoded-word properly closed' );
@@ -75,7 +75,7 @@ subtest 'non-ASCII: encoded-word markers present' => sub
 subtest 'non-ASCII: French accents round-trip' => sub
 {
     my $s    = Mail::Make::Headers::Subject->new;
-    my $orig = "Lettre d'information — Résultats du 3\x{e8}me trimestre";
+    my $orig = "Lettre d'information - Résultats du 3\x{e8}me trimestre";
     $s->value( $orig );
     my $wire    = $s->as_string;
     my $decoded = $s->decode( $wire );
@@ -177,7 +177,7 @@ subtest 'decode: handles ?Q? (Quoted-Printable) form' => sub
 subtest 'decode: collapses whitespace between encoded-words (RFC 2047 §6.2)' => sub
 {
     my $s   = Mail::Make::Headers::Subject->new;
-    # Two consecutive encoded-words separated by whitespace — whitespace discarded
+    # Two consecutive encoded-words separated by whitespace - whitespace discarded
     my $w1  = '=?UTF-8?B?' . MIME::Base64::encode_base64( Encode::encode('UTF-8', "\x{3053}\x{3093}"), '' ) . '?=';
     my $w2  = '=?UTF-8?B?' . MIME::Base64::encode_base64( Encode::encode('UTF-8', "\x{306b}\x{3061}\x{306f}"), '' ) . '?=';
     my $enc = "${w1} ${w2}";
@@ -195,7 +195,7 @@ subtest 'decode: pure ASCII passthrough' => sub
 subtest 'value() getter returns Perl string, not encoded form' => sub
 {
     my $s    = Mail::Make::Headers::Subject->new;
-    my $orig = "Angels \x{2014} Inc.";
+    my $orig = "Yamato \x{2014} Inc.";
     $s->value( $orig );
     is( $s->value,   $orig, 'value() returns original Perl string' );
     is( $s->raw,     $orig, 'raw() also returns original Perl string' );
@@ -251,7 +251,7 @@ subtest 'Mail::Make: non-ASCII subject encoded' => sub
 subtest 'Mail::Make: long non-ASCII subject folded' => sub
 {
     use Mail::Make;
-    # 50 CJK chars × 3 bytes = 150 bytes — will require at least 4 encoded-words
+    # 50 CJK chars × 3 bytes = 150 bytes - will require at least 4 encoded-words
     my $long = "\x{4e2d}\x{6587}" x 25;
     my $mail = Mail::Make->new
         ->from(    'a@example.com' )

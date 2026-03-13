@@ -32,8 +32,7 @@ do { my $x = {
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.17',
                                       'Test::Synopsis' => '0',
-                                      'Test::Version' => '2.05',
-                                      'perl' => '5.006'
+                                      'Test::Version' => '2.05'
                                     }
                     },
        'runtime' => {

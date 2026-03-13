@@ -1,6 +1,6 @@
 use v5.36;
 package Remote::Perl::Transport;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use autodie qw(open close);
 use IO::Select;
@@ -102,19 +102,13 @@ sub read_stderr($self, $len = 4096) {
     return $data;
 }
 
-# Return true if child stdout has data ready within $timeout seconds.
-sub stdout_ready($self, $timeout = 0) {
-    return IO::Select->new($self->{out_fh})->can_read($timeout);
-}
-
 # Return true if child stderr has data ready within $timeout seconds.
 sub stderr_ready($self, $timeout = 0) {
     return IO::Select->new($self->{err_fh})->can_read($timeout);
 }
 
-# Expose raw filehandles and pid for callers building their own IO::Select sets.
+# Expose raw filehandle and pid for callers building their own IO::Select sets.
 sub out_fh($self)  { $self->{out_fh} }
-sub err_fh($self)  { $self->{err_fh} }
 sub pid($self)     { $self->{pid} }
 
 # Close stdin (signals EOF to child) and wait for it to exit.
@@ -147,6 +141,10 @@ sub _wait_for_child($self) {
 }
 
 sub DESTROY($self) {
+    if ($self->{in_fh}) {
+        close($self->{in_fh});
+        $self->{in_fh} = undef;
+    }
     $self->_wait_for_child if $self->{pid};
 }
 

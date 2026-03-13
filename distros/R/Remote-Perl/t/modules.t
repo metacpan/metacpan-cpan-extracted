@@ -1,3 +1,4 @@
+# Tests for module serving and path-traversal security.
 use v5.36;
 use Test::More;
 use lib 'lib';
@@ -99,6 +100,45 @@ sub make_r() {
     my ($rc, $msg) = $r->run_code('use Remote::Perl::Test::Greeter;');
     isnt($rc, 0,                 'local enforcement: MOD_REQ refused when serve => 0');
     like($msg, qr/Remote.Perl.Test/, 'local enforcement: error mentions module name');
+    $r->disconnect;
+}
+
+# -- serve_filter: deny all ----------------------------------------------------
+
+{
+    my $r = Remote::Perl->new(
+        cmd          => [$^X],
+        serve        => 1,
+        inc          => ['t/lib'],
+        serve_filter => sub { 0 },
+    );
+    my ($rc, $msg) = $r->run_code('use Remote::Perl::Test::Greeter;');
+    isnt($rc, 0,                         'serve_filter deny: non-zero exit');
+    like($msg, qr/Remote.Perl.Test/,     'serve_filter deny: error mentions module');
+    $r->disconnect;
+}
+
+# -- serve_filter: allow by path -----------------------------------------------
+
+{
+    require Cwd;
+    my $allowed = Cwd::realpath('t/lib');
+    my $r = Remote::Perl->new(
+        cmd          => [$^X],
+        serve        => 1,
+        inc          => ['t/lib'],
+        serve_filter => sub($path) {
+            my $real = Cwd::realpath($path) // return 0;
+            return index($real, "$allowed/") == 0 ? 1 : 0;
+        },
+    );
+    my $out = '';
+    my $rc = $r->run_code(
+        'use Remote::Perl::Test::Greeter; print Remote::Perl::Test::Greeter::greet("filter"), "\n";',
+        on_stdout => sub { $out .= $_[0] },
+    );
+    is($rc,  0,                    'serve_filter allow: exit 0');
+    is($out, "Hello, filter!\n",   'serve_filter allow: module served correctly');
     $r->disconnect;
 }
 

@@ -44,7 +44,6 @@ lib/Module/Generic/Tie.pod
 lib/Module/Generic/TieHash.pm
 Makefile.PL
 MANIFEST
-META.yml
 README
 README.md
 scripts/gen_magic_json.pl
@@ -94,6 +93,8 @@ t/lib/Test/Apache2/MG.pm
 t/server.crt
 t/server.key
 t/TEST.PL
+t/test.zip
+t/test_1x1.png
 t/test_finfo.bat
 t/test_finfo.pl
 t/test_in.csv
@@ -102,4 +103,5 @@ t/test_in_utf-16le.csv
 t/test_in_utf-32be.csv
 t/test_in_utf-32le.csv
 t/test_in_utf16le.csv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

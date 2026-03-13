@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO 0.22;
+package Future::IO 0.23;
 
 use v5.14;
 use warnings;
@@ -687,8 +687,10 @@ my @IMPLS_WRAPPER = (
 );
 
 my %IMPLS_FOR_OS = (
+   darwin  => [qw( KQueue )],
    freebsd => [qw( KQueue )], # TODO and probably other BSDs
    linux   => [qw( Uring )],
+   openbsd => [qw( KQueue )],
    # TODO: other OSes?
 );
 
@@ -878,7 +880,11 @@ sub _await_once
 
    # Perl doesn't have an easy construction for iterating an array possibly
    # splicing as you go...
-   for ( my $idx = 0; $idx < @pollers; ) {
+
+   my $npollers = @pollers;
+   # Need to stop after the current set; ignoring any new that were pushed
+   # while running
+   for ( my $idx = 0; $idx < $npollers; ) {
       my $p = $pollers[$idx];
 
       my $fh = $p->fh;
@@ -893,10 +899,15 @@ sub _await_once
       $revents |= POLLPRI if vec( $evec, $fileno, 1 );
       $revents &= $p->events;
 
-      $revents or $idx++, next;
+      if( $revents ) {
+         splice @pollers, $idx, 1, ();
+         $npollers--;
 
-      splice @pollers, $idx, 1, ();
-      $p->f->done( $revents );
+         $p->f->done( $revents );
+      }
+      else {
+         $idx++;
+      }
 
       $fh->blocking(0) if !$do_select and !$was_blocking;
    }

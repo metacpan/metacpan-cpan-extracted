@@ -1,3 +1,8 @@
+0.006   2025-11-13  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: --ignore-nondirs.
+
+
 0.005   2025-11-12  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         [INCOMPATIBLE CHANGES]

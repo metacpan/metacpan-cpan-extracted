@@ -34,28 +34,33 @@
 
 #include "chacha.h"
 #define SEED_BYTES (32+8)
-#define CSEED(ctx,bytes,data,good)  chacha_seed(ctx,bytes,data,good)
-#define CRBYTES(ctx,bytes,data)     chacha_rand_bytes(ctx,bytes,data)
-#define CIRAND32(ctx)               chacha_irand32(ctx)
-#define CIRAND64(ctx)               chacha_irand64(ctx)
+#define CSEED(ctx,bytes,data,good)  chacha_seed((chacha_context_t*)ctx,bytes,data,good)
+#define CRBYTES(ctx,bytes,data)     chacha_rand_bytes((chacha_context_t*)ctx,bytes,data)
+#define CIRAND32(ctx)               chacha_irand32((chacha_context_t*)ctx)
+#define CIRAND64(ctx)               chacha_irand64((chacha_context_t*)ctx)
 #define CSELFTEST()                 chacha_selftest()
 
 /* Helper macros, similar to ChaCha, so we're consistent. */
+#if !defined(__x86_64__)
+#undef U8TO32_LE
+#undef U32TO8_LE
+#endif
 #ifndef U8TO32_LE
 #define U8TO32_LE(p) \
-  (((uint32_t)((p)[0])      ) | \
-   ((uint32_t)((p)[1]) <<  8) | \
-   ((uint32_t)((p)[2]) << 16) | \
-   ((uint32_t)((p)[3]) << 24))
+  ((uint32_t)(p)[0]       | \
+   (uint32_t)(p)[1] <<  8 | \
+   (uint32_t)(p)[2] << 16 | \
+   (uint32_t)(p)[3] << 24)
 #endif
+#ifndef U32TO8_LE
 #define U32TO8_LE(p, v) \
-  do { \
-    uint32_t _v = v; \
-    (p)[0] = (((_v)      ) & 0xFFU); \
-    (p)[1] = (((_v) >>  8) & 0xFFU); \
-    (p)[2] = (((_v) >> 16) & 0xFFU); \
-    (p)[3] = (((_v) >> 24) & 0xFFU); \
+  do { uint32_t _v = v; \
+       (p)[0] = _v       & 0xFF; \
+       (p)[1] = _v >>  8 & 0xFF; \
+       (p)[2] = _v >> 16 & 0xFF; \
+       (p)[3] = _v >> 24 & 0xFF; \
   } while (0)
+#endif
 
 /*****************************************************************************/
 
@@ -65,7 +70,7 @@
 static INLINE uint32_t rotl(const uint32_t x, int k) {
   return (x << k) | (x >> (32 - k));
 }
-uint32_t prng_next(char* ctx) {
+uint32_t prng_next(void* ctx) {
   uint32_t *s = (uint32_t*) ctx;
   const uint32_t result_starstar = rotl(s[0] * 5, 7) * 9;
   const uint32_t t = s[1] << 9;
@@ -74,37 +79,37 @@ uint32_t prng_next(char* ctx) {
   s[3] = rotl(s[3], 11);
   return result_starstar;
 }
-char* prng_new(uint32_t a, uint32_t b, uint32_t c, uint32_t d) {
+void* prng_new(uint32_t a, uint32_t b, uint32_t c, uint32_t d) {
   uint32_t *state;
   New(0, state, 4, uint32_t);
   state[0] = 1;  state[1] = b;  state[2] = c;  state[3] = d;
-  (void) prng_next((char*)state);
+  (void) prng_next((void*)state);
   state[0] += a;
-  (void) prng_next((char*)state);
-  return (char*) state;
+  (void) prng_next((void*)state);
+  return (void*) state;
 }
 #else
 /* PCG RXS M XS 32.  32-bit output, 32-bit state and types. */
-uint32_t prng_next(char* ctx) {
+uint32_t prng_next(void* ctx) {
   uint32_t *rng = (uint32_t*) ctx;
   uint32_t word, oldstate = rng[0];
   rng[0] = rng[0] * 747796405U + rng[1];
   word = ((oldstate >> ((oldstate >> 28u) + 4u)) ^ oldstate) * 277803737u;
   return (word >> 22u) ^ word;
 }
-char* prng_new(uint32_t a, uint32_t b, uint32_t c, uint32_t d) {
+void* prng_new(uint32_t a, uint32_t b, uint32_t c, uint32_t d) {
   uint32_t *state;
   New(0, state, 2, uint32_t);
   state[0] = 0U;
   state[1] = (b << 1u) | 1u;
-  (void) prng_next((char*)state);
+  (void) prng_next((void*)state);
   state[0] += a;
-  (void) prng_next((char*)state);
+  (void) prng_next((void*)state);
   state[0] ^= c;
-  (void) prng_next((char*)state);
+  (void) prng_next((void*)state);
   state[0] ^= d;
-  (void) prng_next((char*)state);
-  return (char*) state;
+  (void) prng_next((void*)state);
+  return (void*) state;
 }
 #endif
 
@@ -124,14 +129,14 @@ void csprng_seed(void *ctx, uint32_t bytes, const unsigned char* data)
   if (bytes >= SEED_BYTES) {
     memcpy(seed, data, SEED_BYTES);
   } else {
-    char* rng;
+    void* rng;
     uint32_t a, b, c, d, i;
     memcpy(seed, data, bytes);
     memset(seed+bytes, 0, sizeof(seed)-bytes);
-    a = U8TO32_LE((seed +  0));
-    b = U8TO32_LE((seed +  4));
-    c = U8TO32_LE((seed +  8));
-    d = U8TO32_LE((seed + 12));
+    a = U8TO32_LE(seed +  0);
+    b = U8TO32_LE(seed +  4);
+    c = U8TO32_LE(seed +  8);
+    d = U8TO32_LE(seed + 12);
     rng = prng_new(a,b,c,d);
     for (i = 4*((bytes+3)/4); i < SEED_BYTES; i += 4)
       U32TO8_LE(seed + i, prng_next(rng));
@@ -190,16 +195,20 @@ UV irand64(void* ctx)
 
 /*****************************************************************************/
 
-int is_csprng_well_seeded(void *ctx)
+bool is_csprng_well_seeded(void *ctx)
 {
-  chacha_context_t *cs = ctx;
+  chacha_context_t *cs = (chacha_context_t*)ctx;
   return cs->goodseed;
 }
 
 /* There are many ways to get floats from integers.  A few good, many bad.
  *
- * Vigna recommends (x64 >> 11) * (1.0 / (1ULL<<53)).
- * http://xoroshiro.di.unimi.it
+ * Vigna in https://prng.di.unimi.it recommends this C99:
+ *    #include <stdint.h>
+ *    (x64 >> 11) * 0x1.0p-53
+ * Or the older:
+ *    (x64 >> 11) * (1.0 / (1ULL<<53)).
+ *
  * Also see alternatives discussed:
  * http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/VERSIONS/C-LANG/speed-up-real.html
  *
@@ -228,6 +237,8 @@ int is_csprng_well_seeded(void *ctx)
  * and is easiest for ensuring we fill up all the bits.
  * It is similar to what Geoff Kuenning does in MTwist, though he computes
  * the constants at runtime to ensure a dodgy compiler won't munge them.
+ *
+ * As of C99 or MSVC 15.6, we could better write these as e.g. 0x1.0p-64.
  */
 #define TO_NV_32    2.3283064365386962890625000000000000000E-10L
 #define TO_NV_64    5.4210108624275221700372640043497085571E-20L
@@ -253,13 +264,61 @@ NV drand64(void* ctx)
   return r;
 }
 
-/* Return rand 32-bit integer between 0 to n-1 inclusive */
+
+/* Return rand 32-bit/64-bit integer between 0 to n-1 inclusive
+ *
+ * https://www.pcg-random.org/posts/bounded-rands.html
+ * https://arxiv.org/pdf/1805.10941
+ *
+ * I have also tried Stephen Canon's method:
+ *      https://github.com/swiftlang/swift/pull/39143
+ * which is consistently slower for me.
+ *
+ * Here we will select one:
+ *
+ *    OPENBSD = DEBIASED_MODx2
+ *    LEMIRE  = INT_MULT_TOPT_MOPT
+ *
+ * The main issue with LEMIRE is that it *requires* full width multiplies.
+ * We still try to support old systems that may not have 64-bit.
+ * We definitely expect 64-bit systems without uint128_t support.
+ */
+
+/* If this is set, we will try to use Lemire / O'Neill method. */
+#define PREFER_LEMIRE 0
+
+#if PREFER_LEMIRE && HAVE_UINT64
+uint32_t urandomm32(void *ctx, uint32_t n)
+{
+  uint32_t x, l;
+  uint64_t m;
+
+  if (n <= 1) return 0;
+
+  x = CIRAND32(ctx);
+  m = (uint64_t) x * (uint64_t) n;
+  l = (uint32_t) m;
+  if (l < n) {
+    uint32_t t = -n;    /* t = -n % n;  try to skip the mod */
+    if (t >= n) {
+      t -= n;
+      if (t >= n)
+        t %= n;
+    }
+    while (l < t) {
+      x = CIRAND32(ctx);
+      m = (uint64_t) x * (uint64_t) n;
+      l = (uint32_t) m;
+    }
+  }
+  return m >> 32;
+}
+#else
 uint32_t urandomm32(void *ctx, uint32_t n)
 {
   uint32_t r, rmin;
 
-  if (n <= 1)
-    return 0;
+  if (n <= 1) return 0;
 
   rmin = -n % n;
   while (1) {
@@ -269,15 +328,42 @@ uint32_t urandomm32(void *ctx, uint32_t n)
   }
   return r % n;
 }
+#endif
 
+#if PREFER_LEMIRE && HAVE_UINT64 && HAVE_UINT128
+UV urandomm64(void *ctx, UV n)
+{
+  uint64_t x, l;
+  uint128_t m;
+
+  if (n   <= 4294967295UL) return urandomm32(ctx,n);
+  if (n-1 == 4294967295UL) return irand32(ctx);
+
+  x = CIRAND64(ctx);
+  m = (uint128_t) x * (uint128_t) n;
+  l = (uint64_t) m;
+  if (l < n) {
+    uint64_t t = -n;    /* t = -n % n;  try to skip the mod */
+    if (t >= n) {
+      t -= n;
+      if (t >= n)
+        t %= n;
+    }
+    while (l < t) {
+      x = CIRAND64(ctx);
+      m = (uint128_t) x * (uint128_t) n;
+      l = (uint64_t) m;
+    }
+  }
+  return m >> 64;
+}
+#else
 UV urandomm64(void* ctx, UV n)
 {
   UV r, rmin;
 
-  if (n <= 4294967295UL)
-    return urandomm32(ctx,n);
-  if (n-1 == 4294967295UL)
-    return irand32(ctx);
+  if (n   <= 4294967295UL) return urandomm32(ctx,n);
+  if (n-1 == 4294967295UL) return irand32(ctx);
 
   rmin = -n % n;
   while (1) {
@@ -287,6 +373,8 @@ UV urandomm64(void* ctx, UV n)
   }
   return r % n;
 }
+#endif
+
 
 UV urandomb(void* ctx, int nbits)
 {

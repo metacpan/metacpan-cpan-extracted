@@ -65,7 +65,7 @@ subtest 'build: image/png with path' => sub
     like( $h->get( 'Content-Disposition' ), qr/inline/, 'disposition is inline' );
 };
 
-# NOTE: build(): filename handling — the core fix
+# NOTE: build(): filename handling - the core fix
 subtest 'build: plain ASCII filename' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -90,14 +90,14 @@ subtest 'build: filename with comma uses RFC 2231' => sub
     my $e = Mail::Make::Entity->build(
         type        => 'image/png',
         path        => $path,
-        filename    => 'Angels,Inc-Logo.png',
+        filename    => 'Yamato,Inc-Logo.png',
         disposition => 'attachment',
     );
     ok( defined( $e ), 'build with comma filename succeeds' );
     my $cd = $e->headers->get( 'Content-Disposition' );
-    unlike( $cd, qr/filename="Angels,Inc/, 'comma not left bare' );
-    like(   $cd, qr/filename\*=/,           'RFC 2231 filename* used' );
-    like(   $cd, qr/%2C/i,                  'comma percent-encoded' );
+    unlike( $cd, qr/filename="Yamato,Inc/, 'comma not left bare' );
+    like(   $cd, qr/filename\*=/,          'RFC 2231 filename* used' );
+    like(   $cd, qr/%2C/i,                 'comma percent-encoded' );
 };
 
 subtest 'build: filename derived from path' => sub

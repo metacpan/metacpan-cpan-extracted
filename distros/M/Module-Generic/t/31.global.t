@@ -163,7 +163,7 @@ subtest 'Resource limits' => sub
     ok( $repo_b4->set( 'short4' ), 'Set 4 (~59, would ~236 >180, evicts oldest to ~177' );
     my $total = 0; $total += $_->{bytes} for grep { $_->{key} =~ /^$bytes_ns;/ } @{$repo_b1->stat()};  # Per-ns
     cmp_ok( $total, '<=', 180 + 5, 'Total under after evict' );  # Buffer for var
-    # Delta on overwrite (same len—no change, no evict)
+    # Delta on overwrite (same len-no change, no evict)
     my $old_total = $total;
     ok( $repo_b4->set( 'short5' ), 'Overwrite same len no change' );
     $total = 0; $total += $_->{bytes} for grep{ $_->{key} =~ /^$bytes_ns;/ } @{$repo_b1->stat()};
@@ -324,7 +324,7 @@ subtest 'Cleanup register' => sub
         {
             skip( 'mod_perl not available', 4 );
         }
-        # Mock r—assume loaded, or use stub
+        # Mock r-assume loaded, or use stub
         my $mock_r = bless( {}, 'Apache2::RequestRec' );  # Minimal mock; in real, use Apache::Test
         my $repo = $class->new( 'clean' => 'Test::Module' );
         ok( $repo->set( 'to_clean' ), 'Set for cleanup' );

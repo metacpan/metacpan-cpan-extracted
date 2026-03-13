@@ -16,11 +16,11 @@ my $broken64 = (18446744073709550592 == ~0);
 if ($broken64) {
   warn <<EOW;
 
-Your Perl has a broken 64-bit implementation.
-Arithmetic operations on numbers larger than 2^53 are wrong.
+Your Perl, version $], has a broken 64-bit implementation.
+Perl's arithmetic operations on numbers larger than 2^53 are wrong.
 
-Much core functionality will work, but some functions, especially
-random primes, will not work for large inputs.
+Much core functionality will work, and we try to work around this in
+our functions, but there are still exceptions.
 
 I highly recommend upgrading to a newer version of Perl.
 
@@ -34,30 +34,52 @@ WriteMakefile1(
     LICENSE      => 'perl',
     AUTHOR       => 'Dana A Jacobsen <dana@acm.org>',
 
-    OBJECT       => 'cache.o '    .
-                    'factor.o '   .
-                    'primality.o '.
-                    'aks.o '      .
-                    'lehmer.o '   .
-                    'lmo.o '      .
+    OBJECT       => 'cache.o '        .
+                    'factor.o '       .
+                    'primality.o '    .
+                    'lucas_seq.o '    .
+                    'aks.o '          .
+                    'legendre_phi.o ' .
+                    'lehmer.o '       .
+                    'lmo.o '          .
                     'random_prime.o ' .
-                    'sieve.o '    .
-                    'sieve_cluster.o ' .
+                    'sieve.o '        .
+                    'sieve_cluster.o '.
                     'ramanujan_primes.o ' .
-                    'semi_primes.o ' .
-                    'prime_nth_count.o ' .
-                    'util.o '     .
-                    'entropy.o '  .
-                    'csprng.o '   .
-                    'chacha.o '   .
+                    'semi_primes.o '  .
+                    'almost_primes.o '.
+                    'twin_primes.o '  .
+                    'omega_primes.o ' .
+                    'prime_count_cache.o ' .
+                    'prime_counts.o ' .
+                    'prime_sums.o '   .
+                    'prime_powers.o ' .
+                    'lucky_numbers.o '.
+                    'goldbach.o '     .
+                    'perfect_powers.o ' .
+                    'congruent_numbers.o ' .
+                    'powerfree.o '    .
+                    'powerful.o '    .
+                    'rational.o '      .
+                    'real.o '         .
+                    'rootmod.o '      .
+                    'sort.o '         .
+                    'totients.o '     .
+                    'util.o '         .
+                    'inverse_interpolate.o ' .
+                    'entropy.o '      .
+                    'csprng.o '       .
+                    'chacha.o '       .
+                    'ds_iset.o '      .
                     'XS.o',
     LIBS         => ['-lm'],
 
     EXE_FILES    => ['bin/primes.pl', 'bin/factor.pl'],
 
     TEST_REQUIRES=> {
-                      'Test::More'       => '0.45',
-                      'bignum'           => '0.22',   # 'use bigint' in tests
+                      'Test::More'       => '0.96',
+                      # See issue #61 for reasons why we want 0.65 vs 0.22.
+                      'bignum'           => '0.65',
                     },
     PREREQ_PM    => {
                       'Exporter'         => '5.57',
@@ -67,8 +89,8 @@ WriteMakefile1(
                       'base'             => 0,
                       'constant'         => 0,
                       'Config'           => 0,
-                      # 1.99 fixes the FastCalc SvUV bug, we work around it.
-                      'Math::BigInt'     => '1.88',
+                      # Has from_base
+                      'Math::BigInt'     => '1.999814',
                       'Math::BigFloat'   => '1.59',
                       # Add in MPU::GMP if we can
                       %require_mpugmp,
@@ -88,28 +110,28 @@ WriteMakefile1(
                },
                provides => {
                  'ntheory' => {
-                    version => '0.73', file => 'lib/ntheory.pm',
+                    version => '0.74', file => 'lib/ntheory.pm',
                  },
                  'Math::Prime::Util' => {
-                    version => '0.73', file => 'lib/Math/Prime/Util.pm',
+                    version => '0.74', file => 'lib/Math/Prime/Util.pm',
                  },
                  'Math::Prime::Util::MemFree' => {
-                    version => '0.73', file => 'lib/Math/Prime/Util/MemFree.pm',
+                    version => '0.74', file => 'lib/Math/Prime/Util/MemFree.pm',
                  },
                  'Math::Prime::Util::PP' => {
-                    version => '0.73', file => 'lib/Math/Prime/Util/PP.pm',
+                    version => '0.74', file => 'lib/Math/Prime/Util/PP.pm',
                  },
                  'Math::Prime::Util::PrimeArray' => {
-                    version => '0.73', file => 'lib/Math/Prime/Util/PrimeArray.pm',
+                    version => '0.74', file => 'lib/Math/Prime/Util/PrimeArray.pm',
                  },
                  'Math::Prime::Util::PrimeIterator' => {
-                    version => '0.73', file => 'lib/Math/Prime/Util/PrimeIterator.pm',
+                    version => '0.74', file => 'lib/Math/Prime/Util/PrimeIterator.pm',
                  },
                  'Math::Prime::Util::Entropy' => {
-                    version => '0.73', file => 'lib/Math/Prime/Util/Entropy.pm',
+                    version => '0.74', file => 'lib/Math/Prime/Util/Entropy.pm',
                  },
                  'Math::Prime::Util::ChaCha' => {
-                    version => '0.73', file => 'lib/Math/Prime/Util/ChaCha.pm',
+                    version => '0.74', file => 'lib/Math/Prime/Util/ChaCha.pm',
                  },
                  # Skip: PPFE, PrimalityProving, RandomPrimes, ZetaBigFloat,
                  #       ECAffinePoint, ECProjectivePoint
@@ -117,8 +139,9 @@ WriteMakefile1(
                prereqs => {
                  runtime => {
                    recommends => {
-                     'Math::Prime::Util::GMP' => 0.51,
+                     'Math::Prime::Util::GMP' => 0.53,
                      'Math::BigInt::GMP'      => 0,
+                     'Math::GMPz'             => 0.68,
                      'Digest::SHA'            => 5.87,
                    },
                  },

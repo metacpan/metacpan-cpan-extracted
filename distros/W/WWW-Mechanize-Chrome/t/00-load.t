@@ -8,14 +8,14 @@ use Log::Log4perl qw(:easy);
 my $module;
 
 BEGIN {
-   $module  = "WWW::Mechanize::Chrome";
+   $module  = 'WWW::Mechanize::Chrome';
    require_ok( $module );
 }
 
-diag( sprintf "Testing %s %s, Perl %s", $module, $module->VERSION, $] );
+note( sprintf 'Testing %s %s, Perl %s', $module, $module->VERSION, $] );
 
 for (sort grep /\.pm\z/, keys %INC) {
    s/\.pm\z//;
    s!/!::!g;
-   eval { diag(join(' ', $_, $_->VERSION || '<unknown>')) };
+   eval { note(join(' ', $_, $_->VERSION || '<unknown>')) };
 }

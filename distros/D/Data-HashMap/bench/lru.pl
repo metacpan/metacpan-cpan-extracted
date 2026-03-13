@@ -128,13 +128,13 @@ print "-" x 70, "\n";
         'II_lru_kw' => sub {
             my $m = Data::HashMap::II->new($CAP);
             for my $i (1 .. $CAP) { hm_ii_put $m, $i, $i; }
-            for my $i (1 .. $reads)  { my $v = hm_ii_get $m, ($i % $CAP) + 1; }
+            for my $i (1 .. $reads)  { my $v = hm_ii_get $m, (($i % $CAP) + 1); }
             for my $i (1 .. $writes) { hm_ii_put $m, $CAP + $i, $i; }
         },
         'SS_lru_kw' => sub {
             my $m = Data::HashMap::SS->new($CAP);
             for my $i (1 .. $CAP) { hm_ss_put $m, "k$i", "v$i"; }
-            for my $i (1 .. $reads)  { my $v = hm_ss_get $m, "k" . (($i % $CAP) + 1); }
+            for my $i (1 .. $reads)  { my $v = hm_ss_get $m, ("k" . (($i % $CAP) + 1)); }
             for my $i (1 .. $writes) { hm_ss_put $m, "k" . ($CAP + $i), "v$i"; }
         },
         'THL_func' => sub {

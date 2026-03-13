@@ -12,9 +12,9 @@ use Proc::ChildError qw(explain_child_error);
 use Perinci::Object qw(envresmulti);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-12'; # DATE
+our $DATE = '2025-11-13'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our @EXPORT_OK = qw(git_grouper_group);
 
@@ -31,6 +31,12 @@ our %argspecs_common = (
     },
     config => {
         schema => 'hash*',
+    },
+);
+
+our %argspecopt_ignore_nondirs = (
+    ignore_nondirs => {
+        schema => 'bool*',
     },
 );
 
@@ -183,6 +189,11 @@ sub _get_repos {
     } else {
         push @repos, ".";
     }
+
+    if ($args{ignore_nondirs}) {
+        @repos = grep {(-d $_)} @repos;
+    }
+
     [200, "OK", \@repos];
 }
 
@@ -260,6 +271,7 @@ $SPEC{ls_repo_groups} = {
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        %argspecopt_ignore_nondirs,
         result_array => {
             summary => 'How to return result',
             schema => ['str*', in=>['auto','always']],
@@ -417,6 +429,7 @@ $SPEC{filter_repo_has_group} = {
         %argspecs_common,
         %argspec0_group_spec,
         %argspec1plus_repo,
+        %argspecopt_ignore_nondirs,
     },
 };
 sub filter_repo_has_group {
@@ -460,6 +473,7 @@ $SPEC{filter_repo_lacks_group} = {
         %argspecs_common,
         %argspec0_group_spec,
         %argspec1plus_repo,
+        %argspecopt_ignore_nondirs,
     },
 };
 sub filter_repo_lacks_group {
@@ -501,6 +515,7 @@ $SPEC{filter_repo_orphan} = {
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        %argspecopt_ignore_nondirs,
     },
 };
 sub filter_repo_orphan {
@@ -524,6 +539,7 @@ $SPEC{filter_repo_not_orphan} = {
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        %argspecopt_ignore_nondirs,
     },
 };
 sub filter_repo_not_orphan {
@@ -547,6 +563,7 @@ $SPEC{filter_repo_multiple_group} = {
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        %argspecopt_ignore_nondirs,
     },
 };
 sub filter_repo_multiple_group {
@@ -570,6 +587,7 @@ $SPEC{filter_repo_single_group} = {
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        %argspecopt_ignore_nondirs,
     },
 };
 sub filter_repo_single_group {
@@ -687,6 +705,7 @@ $SPEC{ls_repo_remotes} = {
     summary => "List remotes of specified repos based on group configuration",
     args => {
         %argspec0plus_repo,
+        %argspecopt_ignore_nondirs,
         result_array => {
             schema => ['str*', in=>['auto', 'always']],
         },
@@ -729,6 +748,7 @@ $SPEC{configure_repo} = {
     args => {
         %argspecs_common,
         %argspec0plus_repo,
+        %argspecopt_ignore_nondirs,
         clean_remotes => {
             summary => 'Delete all remotes not specified by the group configuration',
             schema => 'bool*',
@@ -769,7 +789,7 @@ Git::Grouper - Categorize git repositories into one/more groups and perform acti
 
 =head1 VERSION
 
-This document describes version 0.005 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-12.
+This document describes version 0.006 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-13.
 
 =head1 SYNOPSIS
 
@@ -803,6 +823,10 @@ Delete all remotes not specified by the group configuration.
 (No description)
 
 =item * B<config_file> => I<filename>
+
+(No description)
+
+=item * B<ignore_nondirs> => I<bool>
 
 (No description)
 
@@ -852,6 +876,10 @@ Arguments ('*' denotes required arguments):
 
 (No description)
 
+=item * B<ignore_nondirs> => I<bool>
+
+(No description)
+
 =item * B<repo> => I<array[str]>
 
 (No description)
@@ -898,6 +926,10 @@ Arguments ('*' denotes required arguments):
 
 (No description)
 
+=item * B<ignore_nondirs> => I<bool>
+
+(No description)
+
 =item * B<repo> => I<array[str]>
 
 (No description)
@@ -937,6 +969,10 @@ Arguments ('*' denotes required arguments):
 (No description)
 
 =item * B<config_file> => I<filename>
+
+(No description)
+
+=item * B<ignore_nondirs> => I<bool>
 
 (No description)
 
@@ -982,6 +1018,10 @@ Arguments ('*' denotes required arguments):
 
 (No description)
 
+=item * B<ignore_nondirs> => I<bool>
+
+(No description)
+
 =item * B<repo> => I<array[str]>
 
 (No description)
@@ -1024,6 +1064,10 @@ Arguments ('*' denotes required arguments):
 
 (No description)
 
+=item * B<ignore_nondirs> => I<bool>
+
+(No description)
+
 =item * B<repo> => I<array[str]>
 
 (No description)
@@ -1063,6 +1107,10 @@ Arguments ('*' denotes required arguments):
 (No description)
 
 =item * B<config_file> => I<filename>
+
+(No description)
+
+=item * B<ignore_nondirs> => I<bool>
 
 (No description)
 
@@ -1202,6 +1250,10 @@ written as comma-separated list ('', 'group1', 'group1,group2'). When set to
 a single group, or array for multiple groups. When set to 'always', will always
 return an array for the groups result.
 
+=item * B<ignore_nondirs> => I<bool>
+
+(No description)
+
 =item * B<repo> => I<array[str]>
 
 (No description)
@@ -1243,6 +1295,10 @@ This function is not exported.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<ignore_nondirs> => I<bool>
+
+(No description)
 
 =item * B<repo> => I<array[str]>
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.5.4
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.5.5
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2026/01/22
+## Modified 2026/03/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,11 +18,8 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $HAS_FILE_MMAGIC_XS );
+    use vars qw( $VERSION );
     use File::Basename ();
-    local $@;
-    eval( "use File::MMagic::XS 0.09008" );
-    our $HAS_FILE_MMAGIC_XS = $@ ? 0 : 1;
     use Module::Generic::Global ':const';
     use Module::Generic::Null;
     use Wanted;
@@ -66,7 +63,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.5.4';
+    our $VERSION = 'v0.5.5';
 };
 
 use v5.26.1;
@@ -244,39 +241,13 @@ sub is_socket { return( shift->filetype == FILETYPE_SOCK ); }
 
 sub mime_type
 {
-    my $self = shift( @_ );
-    my $file = $self->filepath;
-    # try-catch
-    local $@;
-    my $rv = eval
-    {
-        if( $HAS_FILE_MMAGIC_XS )
-        {
-            my $m = File::MMagic::XS->new;
-            return( $self->new_scalar( $m->get_mime( $file ) ) );
-        }
-        else
-        {
-            $self->_load_class( 'File::MMagic' ) || die( $self->pass_error );
-            my $m = File::MMagic->new;
-            # try-catch
-            local $@;
-            my $type = eval
-            {
-                $m->checktype_filename( $file );
-            };
-            if( $@ )
-            {
-                return( $self->error( "Error getting the file $file mime-type using the method 'checktype_filename' from File::MMagic: $@" ) );
-            }
-            return( $self->new_scalar( $type ) );
-        }
-    };
-    if( $@ )
-    {
-        return( $self->error( "An error occurred while trying to get the mime type for file \"", $self->filepath, "\": $@" ) );
-    }
-    return( $rv );
+    my $self  = shift( @_ );
+    my $file  = $self->filepath;
+    $self->_load_class( 'Module::Generic::File::Magic' ) || die( $self->pass_error );
+    my $magic = Module::Generic::File::Magic->new( flags => Module::Generic::File::Magic::MAGIC_MIME_TYPE() );
+    my $type  = $magic->from_file( "$file" ) ||
+        return( $self->error( "Error getting the file $file mime-type: ", $magic->error ) );
+    return( $self->new_scalar( $type ) );
 }
 
 sub mode
@@ -683,7 +654,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.5.4
+    v0.5.5
 
 =head1 DESCRIPTION
 
@@ -820,7 +791,7 @@ Returns true if this is a socket, false otherwise.
 
 This guesses the file mime type and returns it as a L<scalar object|Module::Generic::Scalar>
 
-If L<File::MMagic::XS> is installed, it will use it, otherwise, it will use L<File::MMagic>
+This uses L<Module::Generic::File::Magic>
 
 If an error occurs, it will set an L<exception object|Module::Generic::Exception>, and return an empty list in list context, or C<undef> in scalar context.
 
@@ -987,7 +958,7 @@ File metadata (e.g., L</filepath>, internal C<_data> array) is stored per-object
 
 =item * B<External Libraries>
 
-Methods like L</mime_type> use L<File::MMagic::XS> or L<File::MMagic>, which are thread-safe as they operate on per-object state. L</_datetime> uses L<DateTime> and L<DateTime::Format::Strptime>, both thread-safe when combined with L<Module::Generic::Global>’s locking for C<has_local_tz>.
+Methods like L</mime_type> use L<Module::Generic::File::Magic>, which is thread-safe as they operate on per-object state. L</_datetime> uses L<DateTime> and L<DateTime::Format::Strptime>, both thread-safe when combined with L<Module::Generic::Global>’s locking for C<has_local_tz>.
 
 =item * B<Serialisation>
 

@@ -1,0 +1,895 @@
+#!/usr/bin/env perl
+##----------------------------------------------------------------------------
+## Mail Builder CLI - ~/scripts/mailmake
+## Version v0.1.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2026/03/06
+## Modified 2026/03/07
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
+use v5.16.0;
+use strict;
+use warnings;
+use utf8;
+use open ':std' => ':utf8';
+use vars qw(
+    $VERSION $DEBUG $VERBOSE $LOG_LEVEL $PROG_NAME
+    $opt $opts $out $err
+);
+use Encode ();
+use Getopt::Class;
+use Mail::Make;
+use Module::Generic::File qw( file stdout stderr );
+use Pod::Usage;
+use Term::ANSIColor::Simple;
+our $VERSION = 'v0.1.1';
+
+our $LOG_LEVEL = 0;
+our $DEBUG     = 0;
+our $VERBOSE   = 0;
+our $PROG_NAME = file( __FILE__ )->basename( '.pl' );
+
+$SIG{INT} = $SIG{TERM} = \&_signal_handler;
+
+our $out = stdout( binmode => 'utf-8', autoflush => 1 );
+our $err = stderr( binmode => 'utf-8', autoflush => 1 );
+@ARGV = map( Encode::decode_utf8( $_ ), @ARGV );
+
+# NOTE: options dictionary
+# Tokens use underscores; Getopt::Class automatically exposes them as dashes on the
+# command line. Example: gpg_key_id -> --gpg-key-id
+my $dict =
+{
+    # Envelope / headers
+    from            => { type => 'string',  alias => [qw( f )], required => 1 },
+    to              => { type => 'array',   alias => [qw( t )], required => 1 },
+    cc              => { type => 'array' },
+    bcc             => { type => 'array' },
+    reply_to        => { type => 'string' },
+    sender          => { type => 'string' },
+    subject         => { type => 'string',  alias => [qw( s )] },
+    header          => { type => 'array' },    # repeatable: Name:Value
+
+    # Body
+    plain           => { type => 'string' },   # plain-text body (literal)
+    plain_file      => { type => 'file' },     # plain-text body from file
+    html            => { type => 'string' },   # HTML body (literal)
+    html_file       => { type => 'file' },     # HTML body from file
+    attach          => { type => 'file-array' },         # file attachments
+    attach_inline   => { type => 'file-array' },         # inline (related) parts
+    charset         => { type => 'string',  default => 'UTF-8' },
+
+    # Output - print to stdout instead of sending
+    print           => { type => 'boolean', default => 0 },
+
+    # SMTP delivery
+    smtp_host       => { type => 'string',  alias => [qw( host H )] },
+    smtp_port       => { type => 'integer', alias => [qw( port P )] },
+    smtp_user       => { type => 'string',  alias => [qw( user U )] },
+    smtp_password   => { type => 'string',  alias => [qw( password )] },
+    smtp_tls        => { type => 'boolean', default => 0 },  # SMTPS port 465
+    smtp_starttls   => { type => 'boolean', default => 0 },  # STARTTLS
+    smtp_timeout    => { type => 'integer', default => 30 },
+
+    # OpenPGP (Mail::Make::GPG - requires gpg and IPC::Run)
+    gpg_sign        => { type => 'boolean', default => 0 },
+    gpg_encrypt     => { type => 'boolean', default => 0 },
+    gpg_key_id      => { type => 'string' },
+    gpg_passphrase  => { type => 'string' },
+    gpg_recipients  => { type => 'array' },   # defaults to --to if omitted
+    gpg_digest      => { type => 'string',  default => 'SHA256' },
+    gpg_bin         => { type => 'string' },
+    gpg_keyserver   => { type => 'string' },
+    gpg_autofetch   => { type => 'boolean', default => 0 },
+
+    # S/MIME (Mail::Make::SMIME - requires Crypt::SMIME)
+    smime_sign          => { type => 'boolean', default => 0 },
+    smime_encrypt       => { type => 'boolean', default => 0 },
+    smime_cert          => { type => 'file' },    # signer cert (PEM)
+    smime_key           => { type => 'file' },    # signer private key (PEM)
+    smime_key_password  => { type => 'string' },
+    smime_ca_cert       => { type => 'file' },    # CA cert (PEM)
+    smime_recipient_cert => { type => 'file-array' },  # recipient cert(s) (PEM)
+
+    # Generic options
+    debug       => { type => 'integer', alias => [qw( d )],  default => \$DEBUG },
+    help        => { type => 'code',    alias => [qw( h ? )],
+                     code => sub{ pod2usage( -exitstatus => 1, -verbose => 99,
+                        -sections => [qw( NAME SYNOPSIS DESCRIPTION OPTIONS AUTHOR COPYRIGHT )] ) },
+                     action => 1 },
+    log_level   => { type => 'integer', default => \$LOG_LEVEL },
+    man         => { type => 'code',
+                     code => sub{ pod2usage( -exitstatus => 0, -verbose => 2 ) },
+                     action => 1 },
+    quiet       => { type => 'boolean', default => 0 },
+    verbose     => { type => 'integer', default => \$VERBOSE },
+    v           => { type => 'code',
+                     code => sub{ $out->print( $VERSION, "\n" ); exit(0) },
+                     action => 1 },
+};
+
+our $opt = Getopt::Class->new({ dictionary => $dict }) ||
+    die( "Error instantiating Getopt::Class object: ", Getopt::Class->error, "\n" );
+$opt->usage( sub{ pod2usage(2) } );
+our $opts = $opt->exec || die( "An error occurred executing Getopt::Class: ", $opt->error, "\n" );
+
+my @errors = ();
+my $opt_errors = $opt->configure_errors;
+push( @errors, @$opt_errors ) if( $opt_errors->length );
+
+if( $opts->{quiet} )
+{
+    $DEBUG = $VERBOSE = 0;
+}
+
+# NOTE: SIGDIE
+local $SIG{__DIE__} = sub
+{
+    my $trace = $opt->_get_stack_trace;
+    my $stack_trace = join( "\n    ", split( /\n/, $trace->as_string ) );
+    $err->print( "Error: ", @_, "\n", $stack_trace );
+    &_cleanup_and_exit(1);
+};
+# NOTE: SIGWARN
+local $SIG{__WARN__} = sub
+{
+    $out->print( "Perl warning only: ", @_, "\n" ) if( $LOG_LEVEL >= 5 );
+};
+
+unless( $LOG_LEVEL )
+{
+    $LOG_LEVEL = 1 if( $VERBOSE );
+    $LOG_LEVEL = ( 1 + $DEBUG ) if( $DEBUG );
+}
+
+# NOTE: Validate mutually exclusive crypto options
+if( $opts->{gpg_sign} || $opts->{gpg_encrypt} )
+{
+    if( $opts->{smime_sign} || $opts->{smime_encrypt} )
+    {
+        push( @errors, "Cannot combine --gpg-* and --smime-* options." );
+    }
+}
+
+if( @errors )
+{
+    my $error = join( "\n", map{ "\t* $_" } @errors );
+    substr( $error, 0, 0, "\n\tThe following errors were found.\n" );
+    unless( $opts->{quiet} )
+    {
+        $err->print( <<EOT );
+$error
+Please, use option '-h' or '--help' to get usage information:
+
+$PROG_NAME -h
+EOT
+    }
+    exit(1);
+}
+
+# NOTE: Find out what action to take
+my $action_found = '';
+my @actions = grep{ exists( $dict->{ $_ }->{action} ) } keys( %$opts );
+foreach my $action ( @actions )
+{
+    $action =~ tr/-/_/;
+    next if( ref( $opts->{ $action } ) eq 'CODE' );
+    if( $opts->{ $action } && $action_found && $action_found ne $action )
+    {
+        push( @errors, "You have opted for \"$action\", but \"$action_found\" is already selected." );
+    }
+    elsif( $opts->{ $action } && !length( $action_found ) )
+    {
+        $action_found = $action;
+        die( "Unable to find a subroutine for '$action'" ) if( !main->can( $action ) );
+    }
+}
+
+$action_found = 'compose' unless( length( $action_found ) );
+
+my $coderef = ( exists( $dict->{ $action_found }->{code} ) && ref( $dict->{ $action_found }->{code} ) eq 'CODE' )
+    ? $dict->{ $action_found }->{code}
+    : main->can( $action_found );
+
+if( !defined( $coderef ) )
+{
+    die( "There is no sub for action \"$action_found\"\n" );
+}
+&_cleanup_and_exit( $coderef->() ? 0 : 1 );
+
+# NOTE: send
+sub compose
+{
+    # Build the Mail::Make object
+    my $mail = Mail::Make->new ||
+        _die( "Failed to instantiate Mail::Make: ", Mail::Make->error );
+
+    $mail->from( $opts->{from} ) || _die( $mail->error );
+    $mail->to( ref( $opts->{to} ) ? join( ', ', @{$opts->{to}} ) : $opts->{to} ) || _die( $mail->error );
+
+    if( defined( $opts->{cc} ) && @{$opts->{cc}} )
+    {
+        $mail->cc( join( ', ', @{$opts->{cc}} ) ) || _die( $mail->error );
+    }
+    if( defined( $opts->{bcc} ) && @{$opts->{bcc}} )
+    {
+        $mail->bcc( join( ', ', @{$opts->{bcc}} ) ) || _die( $mail->error );
+    }
+
+    # We need to capture and handle any error returned
+    if( defined( $opts->{reply_to} ) && length( $opts->{reply_to} // '' ) )
+    {
+        $mail->reply_to( $opts->{reply_to} ) || _die( $mail->error );
+    }
+    if( defined( $opts->{sender} ) && length( $opts->{sender} // '' ) )
+    {
+        $mail->sender( $opts->{sender} ) || _die( $mail->error );
+    }
+    if( defined( $opts->{subject} ) && length( $opts->{subject} // '' ) )
+    {
+        $mail->subject( $opts->{subject} ) || _die( $mail->error );
+    }
+
+    # Arbitrary extra headers: Name:Value
+    if( defined( $opts->{header} ) && @{$opts->{header}} )
+    {
+        foreach my $hdr ( @{$opts->{header}} )
+        {
+            if( $hdr =~ /^([\w-]+)\s*:\s*(.*)$/ )
+            {
+                $mail->header( $1 => $2 ) ||
+                    _die( "Error setting header $1 with value $2: ", $mail->error );
+            }
+            else
+            {
+                _message( 1, "Warning: ignoring malformed --header value: <orange>$hdr</>" );
+            }
+        }
+    }
+
+    # Body
+    my $charset = $opts->{charset} // 'UTF-8';
+
+    if( $opts->{plain_file} )
+    {
+        my $f = $opts->{plain_file};
+        _die( "plain-file \"$f\" does not exist." ) unless( $f->exists );
+        my $text = $f->load_utf8 ||
+            _die( "Cannot read plain-file \"$f\": ", $f->error );
+        $mail->plain( $text, charset => $charset ) || _die( $mail->error );
+    }
+    elsif( defined( $opts->{plain} ) && length( $opts->{plain} // '' ) )
+    {
+        _message( 3, "Setting body to '", $opts->{plain}, "'" );
+        $mail->plain( $opts->{plain}, charset => $charset ) ||
+            _die( "Error setting plain body: ", $mail->error );
+    }
+
+    if( $opts->{html_file} )
+    {
+        my $f = $opts->{html_file};
+        _die( "html-file \"$f\" does not exist." ) unless( $f->exists );
+        my $html = $f->load_utf8 ||
+            _die( "Cannot read html-file \"$f\": ", $f->error );
+        $mail->html( $html, charset => $charset ) || _die( $mail->error );
+    }
+    elsif( defined( $opts->{html} ) && length( $opts->{html} // '' ) )
+    {
+        $mail->html( $opts->{html}, charset => $charset ) || _die( $mail->error );
+    }
+
+    if( $opts->{attach} && @{$opts->{attach}} )
+    {
+        _message( 3, "Processing ", scalar( @{$opts->{attach}} ), " attachments." );
+        foreach my $f ( @{$opts->{attach}} )
+        {
+            _message( 3, "Attaching file $f" );
+            _die( "Attachment file \"$f\" does not exist." ) unless( $f->exists );
+            $mail->attach( path => "$f" ) || _die( $mail->error );
+        }
+    }
+
+    if( defined( $opts->{attach_inline} ) && @{$opts->{attach_inline}} )
+    {
+        for my $f ( @{$opts->{attach_inline}} )
+        {
+            _die( "Inline attachment file \"$f\" does not exist." ) unless( $f->exists );
+            $mail->attach_inline( path => "$f" ) || _die( $mail->error );
+        }
+    }
+
+    # Cryptographic operations
+    if( $opts->{gpg_sign} || $opts->{gpg_encrypt} )
+    {
+        $mail = _apply_gpg( $mail ) || return(0);
+    }
+    elsif( $opts->{smime_sign} || $opts->{smime_encrypt} )
+    {
+        $mail = _apply_smime( $mail ) || return(0);
+    }
+
+    # Output or deliver
+    if( $opts->{print} )
+    {
+        my $str = $mail->as_string ||
+            _die( "Failed to serialise message: ", $mail->error );
+        $out->print( $str );
+        return(1);
+    }
+
+    return( _deliver( $mail ) );
+}
+
+# _apply_gpg( $mail ) → $mail (possibly a new object) or undef on error
+sub _apply_gpg
+{
+    my $mail = shift( @_ );
+
+    my %gpg_opts = (
+        Digest  => $opts->{gpg_digest},
+    );
+    $gpg_opts{GpgBin}    = $opts->{gpg_bin}        if( defined( $opts->{gpg_bin} ) );
+    $gpg_opts{KeyServer} = $opts->{gpg_keyserver}  if( defined( $opts->{gpg_keyserver} ) );
+    $gpg_opts{AutoFetch} = 1                       if( $opts->{gpg_autofetch} );
+
+    if( $opts->{gpg_sign} || ( $opts->{gpg_sign} && $opts->{gpg_encrypt} ) )
+    {
+        $gpg_opts{KeyId}      = $opts->{gpg_key_id}     if( defined( $opts->{gpg_key_id} ) );
+        $gpg_opts{Passphrase} = $opts->{gpg_passphrase} if( defined( $opts->{gpg_passphrase} ) );
+    }
+
+    if( $opts->{gpg_encrypt} )
+    {
+        # Default recipients to --to if --gpg-recipients not specified
+        my $rcpts = $opts->{gpg_recipients};
+        if( !defined( $rcpts ) || !@{$rcpts} )
+        {
+            $rcpts = $opts->{to};
+        }
+
+        unless( defined( $rcpts ) && @{$rcpts} )
+        {
+            _die( "GPG encryption requires at least one recipient (--gpg-recipients or --to)." );
+        }
+        $gpg_opts{Recipients} = $rcpts;
+    }
+
+    my $result;
+    if( $opts->{gpg_sign} && $opts->{gpg_encrypt} )
+    {
+        _message( 2, "Applying GPG sign+encrypt." );
+        $result = $mail->gpg_sign_encrypt( %gpg_opts );
+    }
+    elsif( $opts->{gpg_encrypt} )
+    {
+        _message( 2, "Applying GPG encryption." );
+        $result = $mail->gpg_encrypt( %gpg_opts );
+    }
+    else
+    {
+        _message( 2, "Applying GPG signature." );
+        $result = $mail->gpg_sign( %gpg_opts );
+    }
+
+    unless( defined( $result ) )
+    {
+        _message( 1, "<red>GPG operation failed:</> ", $mail->error );
+        return;
+    }
+    return( $result );
+}
+
+# _apply_smime( $mail ) → $mail (possibly a new object) or undef on error
+sub _apply_smime
+{
+    my $mail = shift( @_ );
+
+    my %smime_opts;
+    if( $opts->{smime_sign} )
+    {
+        unless( defined( $opts->{smime_cert} ) )
+        {
+            _die( "--smime-cert is required for S/MIME signing." );
+        }
+        unless( defined( $opts->{smime_key} ) )
+        {
+            _die( "--smime-key is required for S/MIME signing." );
+        }
+        $smime_opts{Cert}        = "$opts->{smime_cert}";
+        $smime_opts{Key}         = "$opts->{smime_key}";
+        if( defined( $opts->{smime_key_password} ) )
+        {
+            $smime_opts{KeyPassword} = $opts->{smime_key_password};
+        }
+        if( defined( $opts->{smime_ca_cert} ) )
+        {
+            $smime_opts{CACert} = "$opts->{smime_ca_cert}";
+        }
+    }
+    if( $opts->{smime_encrypt} )
+    {
+        unless( defined( $opts->{smime_recipient_cert} ) && @{$opts->{smime_recipient_cert}} )
+        {
+            _die( "--smime-recipient-cert is required for S/MIME encryption." );
+        }
+        $smime_opts{RecipientCert} = [ map{ "$_" } @{$opts->{smime_recipient_cert}} ];
+    }
+
+    my $result;
+    if( $opts->{smime_sign} && $opts->{smime_encrypt} )
+    {
+        _message( 2, "Applying S/MIME sign+encrypt." );
+        $result = $mail->smime_sign_encrypt( %smime_opts );
+    }
+    elsif( $opts->{smime_encrypt} )
+    {
+        _message( 2, "Applying S/MIME encryption." );
+        $result = $mail->smime_encrypt( %smime_opts );
+    }
+    else
+    {
+        _message( 2, "Applying S/MIME signature." );
+        $result = $mail->smime_sign( %smime_opts );
+    }
+
+    unless( defined( $result ) )
+    {
+        _message( 1, "<red>S/MIME operation failed:</> ", $mail->error );
+        return;
+    }
+    return( $result );
+}
+
+# _deliver( $mail ) → 1 on success, 0 on failure
+sub _deliver
+{
+    my $mail = shift( @_ );
+
+    unless( defined( $opts->{smtp_host} ) && length( $opts->{smtp_host} ) )
+    {
+        _die( "No SMTP host specified. Use --smtp-host (or --print to output the message instead)." );
+    }
+
+    my %smtp_opts = (
+        Host    => $opts->{smtp_host},
+        Timeout => $opts->{smtp_timeout} // 30,
+    );
+    $smtp_opts{Port}     = $opts->{smtp_port}     if( defined( $opts->{smtp_port} ) );
+    $smtp_opts{SSL}      = 1                      if( $opts->{smtp_tls} );
+    $smtp_opts{StartTLS} = 1                      if( $opts->{smtp_starttls} );
+    $smtp_opts{Username} = $opts->{smtp_user}     if( defined( $opts->{smtp_user} ) );
+    $smtp_opts{Password} = $opts->{smtp_password} if( defined( $opts->{smtp_password} ) );
+    $smtp_opts{Debug}    = 1                      if( $DEBUG >= 3 );
+
+    _message( 2, "Sending via <green>$opts->{smtp_host}</>." );
+    my $rcpts = $mail->smtpsend( %smtp_opts );
+    unless( defined( $rcpts ) )
+    {
+        _message( 1, "<red>Delivery failed:</> ", $mail->error );
+        return(0);
+    }
+    my @addrs = ref( $rcpts ) eq 'ARRAY' ? @{$rcpts} : ( $rcpts );
+    unless( $opts->{quiet} )
+    {
+        _message( 1, "Message accepted for: <green>", join( ', ', @addrs ), "</>" );
+    }
+    return(1);
+}
+
+sub _cleanup_and_exit
+{
+    my $exit = shift( @_ );
+    $exit = 0 if( !length( $exit // '' ) || $exit !~ /^\d+$/ );
+    exit( $exit );
+}
+
+sub _die
+{
+    my $msg = join( '', @_ );
+    _message( "<red>$msg</>" );
+    die( $msg . "\n" );
+}
+
+sub _message
+{
+    my $required_level;
+    if( $_[0] =~ /^\d{1,2}$/ )
+    {
+        $required_level = shift( @_ );
+    }
+    else
+    {
+        $required_level = 0;
+    }
+    return if( !$LOG_LEVEL || $LOG_LEVEL < $required_level );
+    my $msg = join( '', map( ref( $_ ) eq 'CODE' ? $_->() : $_, @_ ) );
+    if( index( $msg, '</>' ) != -1 )
+    {
+        $msg =~ s
+        {
+            <([^\>]+)>(.*?)<\/>
+        }
+        {
+            my $colour = $1;
+            my $txt = $2;
+            my $obj = color( $txt );
+            my $code = $obj->can( $colour ) ||
+                die( "Colour '$colour' is unsupported by Term::ANSIColor::Simple" );
+            $code->( $obj );
+        }gexs;
+    }
+    my $frame = 0;
+    my( $pkg, $file, $line ) = caller( $frame );
+    my $sub = ( caller( $frame + 1 ) )[3] // '';
+    my $sub2;
+    if( length( $sub ) )
+    {
+        $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
+    }
+    else
+    {
+        $sub2 = 'main';
+    }
+    return( $err->print( "${pkg}::${sub2}() [$line]: $msg\n" ) );
+}
+
+sub _signal_handler
+{
+    my( $sig ) = @_;
+    &_message( "Caught a $sig signal, terminating process $$" );
+    if( uc( $sig ) eq 'TERM' )
+    {
+        &_cleanup_and_exit(0);
+    }
+    else
+    {
+        &_cleanup_and_exit(1);
+    }
+}
+
+# NOTE: POD
+__END__
+
+=encoding utf-8
+
+=pod
+
+=head1 NAME
+
+mailmake - Build and send RFC 2822 / MIME email from the command line
+
+=head1 SYNOPSIS
+
+    # Plain-text message
+    mailmake --from alice@example.com --to bob@example.com \
+             --subject "Hello" --plain "Hi Bob." \
+             --smtp-host mail.example.com
+
+    # HTML + plain text (alternative) with attachment
+    mailmake --from alice@example.com --to bob@example.com \
+             --subject "Report" \
+             --plain-file body.txt --html-file body.html \
+             --attach report.pdf \
+             --smtp-host mail.example.com --smtp-port 587 --smtp-starttls \
+             --smtp-user alice@example.com --smtp-password secret
+
+    # Print the raw RFC 2822 message instead of sending
+    mailmake --from alice@example.com --to bob@example.com \
+             --subject "Test" --plain "Test" --print
+
+    # OpenPGP detached signature
+    mailmake --from alice@example.com --to bob@example.com \
+             --subject "Signed" --plain "Signed message." \
+             --gpg-sign --gpg-key-id FINGERPRINT \
+             --smtp-host mail.example.com
+
+    # OpenPGP sign + encrypt
+    mailmake --from alice@example.com --to bob@example.com \
+             --subject "Secret" --plain "Encrypted message." \
+             --gpg-sign --gpg-encrypt \
+             --gpg-key-id FINGERPRINT --gpg-passphrase secret \
+             --smtp-host mail.example.com
+
+    # S/MIME signature
+    mailmake --from alice@example.com --to bob@example.com \
+             --subject "Signed" --plain "Signed message." \
+             --smime-sign \
+             --smime-cert /path/to/my.cert.pem \
+             --smime-key  /path/to/my.key.pem \
+             --smime-ca-cert /path/to/ca.crt \
+             --smtp-host mail.example.com
+
+    # S/MIME sign + encrypt
+    mailmake --from alice@example.com --to bob@example.com \
+             --subject "Secret" --plain "Encrypted." \
+             --smime-sign --smime-encrypt \
+             --smime-cert /path/to/my.cert.pem \
+             --smime-key  /path/to/my.key.pem \
+             --smime-recipient-cert /path/to/recipient.cert.pem \
+             --smtp-host mail.example.com
+
+=head1 DESCRIPTION
+
+C<mailmake> is a CLI powered by L<Mail::Make>. It assembles RFC 2822 / MIME messages, optionally signs and/or encrypts them with OpenPGP or S/MIME, and delivers them via SMTP (plain, STARTTLS, or SMTPS).
+
+Alternatively, pass C<--print> to write the raw RFC 2822 message to STDOUT instead of delivering it - useful for piping or debugging.
+
+=head1 OPTIONS
+
+=head2 Envelope / Headers
+
+=over 4
+
+=item B<--from>, B<-f> ADDRESS
+
+Sender address (required). Example: C<Alice E<lt>alice@example.comE<gt>>
+
+=item B<--to>, B<-t> ADDRESS [ADDRESS ...]
+
+One or more recipient addresses (required, repeatable).
+
+=item B<--cc> ADDRESS [ADDRESS ...]
+
+Carbon-copy addresses (repeatable).
+
+=item B<--bcc> ADDRESS [ADDRESS ...]
+
+Blind carbon-copy addresses (repeatable).
+
+=item B<--reply-to> ADDRESS
+
+C<Reply-To> header value.
+
+=item B<--sender> ADDRESS
+
+C<Sender> header value (when the submitter differs from the author).
+
+=item B<--subject>, B<-s> TEXT
+
+Message subject. Non-ASCII characters are encoded automatically (RFC 2047).
+
+=item B<--header> Name:Value
+
+Add an arbitrary header. Repeatable. Example: C<--header "X-Mailer:mailmake">
+
+=back
+
+=head2 Body
+
+At least one of C<--plain>, C<--plain-file>, C<--html>, or C<--html-file> should be supplied. When both plain and HTML bodies are given, a C<multipart/alternative> structure is built automatically. Adding attachments wraps everything in C<multipart/mixed>.
+
+=over 4
+
+=item B<--plain> TEXT
+
+Plain-text body (literal string).
+
+=item B<--plain-file> FILE
+
+Plain-text body loaded from a file.
+
+=item B<--html> TEXT
+
+HTML body (literal string).
+
+=item B<--html-file> FILE
+
+HTML body loaded from a file.
+
+=item B<--attach> FILE [FILE ...]
+
+File attachment(s), added as C<multipart/mixed> parts (repeatable).
+
+=item B<--attach-inline> FILE [FILE ...]
+
+Inline attachment(s), added as C<multipart/related> parts, intended for embedding images in HTML (repeatable).
+
+=item B<--charset> NAME
+
+Character set for text bodies. Default: C<UTF-8>.
+
+=back
+
+=head2 Output
+
+=over 4
+
+=item B<--print>
+
+Write the assembled RFC 2822 message to STDOUT instead of delivering it.
+
+Useful for piping to C<sendmail>, inspecting the message, or testing.
+
+=back
+
+=head2 SMTP Delivery
+
+=over 4
+
+=item B<--smtp-host>, B<-H> HOST
+
+SMTP server hostname or IP address.
+
+=item B<--smtp-port>, B<-P> PORT
+
+SMTP port. Defaults to 25 (plain), 587 (STARTTLS), or 465 (SMTPS/TLS).
+
+=item B<--smtp-user>, B<-U> USERNAME
+
+Login name for SMTP authentication (SASL PLAIN/LOGIN).
+
+Requires L<Authen::SASL>.
+
+=item B<--smtp-password> PASSWORD
+
+Password for SMTP authentication.
+
+=item B<--smtp-starttls>
+
+Upgrade the connection to TLS using STARTTLS (typically port 587).
+
+=item B<--smtp-tls>
+
+Use direct TLS from the start (SMTPS, typically port 465).
+
+=item B<--smtp-timeout> SECONDS
+
+Connection and command timeout. Default: 30.
+
+=back
+
+=head2 OpenPGP (requires C<gpg> / C<gpg2> and L<IPC::Run>)
+
+OpenPGP options cannot be combined with S/MIME options.
+
+=over 4
+
+=item B<--gpg-sign>
+
+Sign the message (RFC 3156 C<multipart/signed> with detached ASCII signature).
+
+=item B<--gpg-encrypt>
+
+Encrypt the message (RFC 3156 C<multipart/encrypted>).
+
+C<--gpg-sign> and C<--gpg-encrypt> may be combined for sign-then-encrypt.
+
+=item B<--gpg-key-id> FINGERPRINT
+
+Signing key fingerprint or ID (required when C<--gpg-sign> is used).
+
+=item B<--gpg-passphrase> PASSPHRASE
+
+Passphrase to unlock the secret key. When omitted, C<gpg-agent> is expected to handle passphrase prompting.
+
+=item B<--gpg-recipients> ADDRESS [ADDRESS ...]
+
+Recipient key IDs or e-mail addresses for encryption. Defaults to C<--to> when not specified.
+
+=item B<--gpg-digest> ALGORITHM
+
+Hash algorithm for signatures. Default: C<SHA256>.
+
+Valid values: C<SHA256>, C<SHA384>, C<SHA512>, C<SHA1>.
+
+=item B<--gpg-bin> PATH
+
+Full path to the C<gpg> executable. Defaults to searching C<gpg2> then C<gpg> in C<PATH>.
+
+=item B<--gpg-keyserver> URL
+
+Keyserver URL for auto-fetching recipient keys. Only consulted when C<--gpg-autofetch> is set. Example: C<keys.openpgp.org>
+
+=item B<--gpg-autofetch>
+
+Fetch missing recipient public keys from C<--gpg-keyserver> before encrypting.
+
+=back
+
+=head2 S/MIME (requires L<Crypt::SMIME>)
+
+S/MIME options cannot be combined with OpenPGP options.
+
+=over 4
+
+=item B<--smime-sign>
+
+Sign the message (RFC 5751 C<multipart/signed> with detached signature).
+
+=item B<--smime-encrypt>
+
+Encrypt the message (RFC 5751 C<application/pkcs7-mime>).
+
+C<--smime-sign> and C<--smime-encrypt> may be combined for sign-then-encrypt.
+
+=item B<--smime-cert> FILE
+
+Signer certificate in PEM format (required when C<--smime-sign> is used).
+
+=item B<--smime-key> FILE
+
+Signer private key in PEM format (required when C<--smime-sign> is used).
+
+=item B<--smime-key-password> PASSPHRASE
+
+Passphrase for an encrypted private key.
+
+=item B<--smime-ca-cert> FILE
+
+CA certificate in PEM format, included for chain verification.
+
+=item B<--smime-recipient-cert> FILE [FILE ...]
+
+Recipient certificate(s) in PEM format (required when C<--smime-encrypt> is used). Repeatable for multi-recipient encryption.
+
+=back
+
+=head2 General
+
+=over 4
+
+=item B<--quiet>, B<-q>
+
+Suppress informational output.
+
+=item B<--verbose> N, B<-v>
+
+Increase verbosity level (integer).
+
+=item B<--debug> N, B<-d>
+
+Enable debug output (integer level).
+
+=item B<--help>, B<-h>
+
+Print this help and exit.
+
+=item B<--man>
+
+Print the full manual page.
+
+=item B<-v>
+
+Print the version and exit.
+
+=back
+
+=head1 EXIT CODES
+
+=over 4
+
+=item * C<0>
+
+Message delivered (or printed) successfully.
+
+=item * C<1>
+
+Delivery failed or a usage error occurred.
+
+=item * C<2>
+
+Usage error (bad arguments).
+
+=back
+
+=head1 SEE ALSO
+
+L<Mail::Make>, L<Mail::Make::GPG>, L<Mail::Make::SMIME>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT
+
+Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+All rights reserved
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

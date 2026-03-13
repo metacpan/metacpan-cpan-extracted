@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Test::Future::IO::Impl 0.20;
+package Test::Future::IO::Impl 0.21;
 
 use v5.14;
 use warnings;
@@ -11,7 +11,7 @@ use warnings;
 use Test2::V0;
 use Test2::API ();
 
-use Errno qw( EINVAL EPIPE );
+use Errno qw( EAGAIN EINVAL EPIPE );
 use IO::Handle;
 use IO::Poll qw( POLLIN POLLOUT POLLHUP POLLERR );
 use Socket qw(
@@ -244,6 +244,18 @@ sub run_poll_no_hup_test
 
       is( [ scalar $f1->get, scalar $f2->get ], [ POLLIN, POLLIN ],
          'Future::IO->poll(POLLIN) can enqueue two POLLIN tests' );
+
+      my $f4;
+      my $f3 = Future::IO->poll( $rd, POLLIN )
+         ->on_done( sub { $f4 = Future::IO->poll( $rd, POLLIN ); } );
+
+      is( scalar $f3->get, POLLIN,
+         'Another ->poll(POLLIN) yields after' );
+      ok( defined $f4, 'Subsequent future enqueued' );
+      ok( !$f4->is_ready, 'Subsequent future is not yet ready after one IO round' );
+
+      is( scalar $f4->get, POLLIN,
+         'Subsequent future yields after second round' );
    }
 
    # POLLOUT
@@ -259,6 +271,18 @@ sub run_poll_no_hup_test
 
       is( [ scalar $f1->get, scalar $f2->get ], [ POLLOUT, POLLOUT ],
          'Future::IO->poll(POLLOUT) can enqueue two POLLOUT tests' );
+
+      my $f4;
+      my $f3 = Future::IO->poll( $wr, POLLOUT )
+         ->on_done( sub { $f4 = Future::IO->poll( $wr, POLLOUT ); } );
+
+      is( scalar $f3->get, POLLOUT,
+         'Another ->poll(POLLOUT) yields after' );
+      ok( defined $f4, 'Subsequent future enqueued' );
+      ok( !$f4->is_ready, 'Subsequent future is not yet ready after one IO round' );
+
+      is( scalar $f4->get, POLLOUT,
+         'Subsequent future yields after second round' );
    }
 
    # POLLIN+POLLOUT at once
@@ -662,10 +686,22 @@ sub _run_write_test
       $^O eq "MSWin32" and skip "MSWin32 doesn't do EAGAIN properly", 2;
 
       pipe my ( $rd, $wr ) or die "Cannot pipe() - $!";
+      $rd->blocking( 0 );
       $wr->blocking( 0 );
 
       # Attempt to fill the pipe
-      $wr->$method( "X" x 4096 ) for 1..256;
+      my $nblocks;
+      for ( 1 .. 256 ) {
+         defined $wr->$method( "X" x 4096 ) and next;
+         $! == EAGAIN or
+            die "->$method on write pipe yielded $!";
+
+         $nblocks = $_;
+         goto got_EAGAIN;
+      }
+      skip "Didn't get EAGAIN despite 256 writes of 4Ki on pipe", 2;
+got_EAGAIN:
+
       # clear the error on the filehandle to stop perl printing a warning
       $wr->clearerr;
 
@@ -674,7 +710,7 @@ sub _run_write_test
       ok( !$f->is_ready, '$f is still pending' );
 
       # Now make some space
-      $rd->read( my $buf, 4096 );
+      $rd->read( my $buf, 4096 ) for $nblocks;
 
       is( scalar $f->get, 4, "Future::IO->$method yields written count" );
    }

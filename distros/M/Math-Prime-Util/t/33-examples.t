@@ -4,7 +4,6 @@ use warnings;
 use Test::More;
 use Math::Prime::Util qw/:all/;
 use Math::Prime::Util::PrimeArray;
-use List::Util qw/first/;
 
 # Make sure things used as examples in the documentation work.
 
@@ -14,7 +13,9 @@ BEGIN {
   }
 }
 
-plan tests => 99;
+my $have_gmp = prime_get_config->{'gmp'};
+
+plan tests => 100;
 
 {
   my @nums;
@@ -43,8 +44,8 @@ is(nth_prime(10000), 104729, "nth_prime(10000)");
   cmp_ok($approx, '<=', nth_prime_upper($n), "10^17: nth approx <= nth upper");
   cmp_closeto($approx, 29996224275833, 1e-5, "10^12: nth approx within .001%");
 }
-is(euler_phi("801294088771394680000412"), "391329671260448564651280", "euler_phi(801294088771394680000412)");
-is(jordan_totient(5,1234), "2771963542268536", "jordan_totient(5,1234)");
+is("".euler_phi("801294088771394680000412"), "391329671260448564651280", "euler_phi(801294088771394680000412)");
+is("".jordan_totient(5,1234), "2771963542268536", "jordan_totient(5,1234)");
 {
   my $sum = 0;  $sum += moebius($_) for 1..200;
   is($sum, -8, "Mertens(200) via moebius");
@@ -54,15 +55,15 @@ is(exp_mangoldt(49), 7, "exp_mangoldt(49)");
 is(liouville(4292384), -1, "liouville(4292384)");
 cmp_closeto(chebyshev_psi(234984), 235070.385453159, 1e-6, "chebyshev_psi(234984)");
 cmp_closeto(chebyshev_theta(92384234), 92371752.9943251, 1e-6, "chebyshev_theta(92384234)");
-is(partitions(1000), "24061467864032622473692149727991", "partitions(1000)");
+is("".partitions(1000), "24061467864032622473692149727991", "partitions(1000)");
 {
   my($nparts,$nels) = (0,0);
   forpart { do { $nparts++; $nels += scalar @_; } unless scalar grep { !is_prime($_) } @_ } 25;
   is($nparts, 52, "partions of 25 with all prime elements: 52 found");
   is($nels, 333, "partions of 25 with all prime elements: 333 total values");
 }
-is(primorial(47), "614889782588491410", "primorial(47)");
-is(pn_primorial(47), "1645783550795210387735581011435590727981167322669649249414629852197255934130751870910", "pn_primorial(47)");
+is("".primorial(47), "614889782588491410", "primorial(47)");
+is("".pn_primorial(47), "1645783550795210387735581011435590727981167322669649249414629852197255934130751870910", "pn_primorial(47)");
 
 ##############################################################################
 
@@ -177,14 +178,18 @@ ok( is_prime(random_prime(100,10000)), "random_prime(100,10000)" );
 is( length(random_ndigit_prime(4)), 4, "random_ndigit_prime(4) is 4 digits" );
 {
   my $bigprime;
-  $bigprime = random_nbit_prime(512);
-  is( length($bigprime->as_bin), 2+512, "random_nbit_prime(512) is 512 bits" );
-  $bigprime = random_strong_prime(512);
-  is( length($bigprime->as_bin), 2+512, "random_strong_prime(512) is 512 bits" );
-  $bigprime = random_proven_prime(512);
-  is( length($bigprime->as_bin), 2+512, "random_proven_prime(512) is 512 bits" );
+  my $bits = ($have_gmp) ? 512 : 192;
+  $bigprime = random_nbit_prime($bits);
+  is(base2len($bigprime), $bits, "random_nbit_prime($bits) is $bits bits");
+  $bigprime = random_safe_prime($bits);
+  is(base2len($bigprime), $bits, "random_safe_prime($bits) is $bits bits");
+  $bigprime = random_strong_prime($bits);
+  is(base2len($bigprime), $bits, "random_strong_prime($bits) is $bits bits");
+  $bigprime = random_proven_prime($bits);
+  is(base2len($bigprime), $bits, "random_proven_prime($bits) is $bits bits");
 }
 # TODO: More of the random primes and certs
+sub base2len { length(todigitstring($_[0],2)); }
 
 ##############################################################################
 
@@ -197,7 +202,7 @@ is_deeply([divisors(30)], [1, 2, 3, 5, 6, 10, 15, 30], "divisors(30)");
 
 {
   my $sum = 0;
-  forcomposites { $sum += $_ if is_strong_pseudoprime($_,17) } 1000000;
+  foroddcomposites { $sum += $_ if is_strong_pseudoprime($_,17) } 1000000;
   is($sum, 23206520, "forcomposites looking for base-17 strong probable primes");
 }
 {
@@ -262,7 +267,7 @@ is( nth_prime(10001), 104743, "nth_prime(10001)");
   is($sum, 31626, "sum of amicable numbers using pipeline");
 }
 {
-  my $pd = first { /1/&&/2/&&/3/&&/4/&&/5/&&/6/&&/7/} reverse @{primes(1000000,9999999)};
+  my $pd = vecfirst { /1/&&/2/&&/3/&&/4/&&/5/&&/6/&&/7/} reverse @{primes(1000000,9999999)};
   is($pd, 7652413, "largest 7-digit pandigital prime");
 }
 {

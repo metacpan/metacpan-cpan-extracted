@@ -3,9 +3,9 @@ use warnings;
 use Feature::Compat::Class;
 use WebServer::DirIndex::HTML;
 
-our $VERSION = '0.1.2';
-
 class WebServer::DirIndex::File {
+
+  our $VERSION = '0.1.3';
 
   use HTML::Escape qw(escape_html);
 

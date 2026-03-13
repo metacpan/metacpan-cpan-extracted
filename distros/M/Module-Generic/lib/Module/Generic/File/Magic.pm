@@ -1,13 +1,13 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Magic.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
-## Created  2026/03/07
-## Modified 2026/03/08
-## All rights reserved.
-##
-## This program is free software; you can redistribute it and/or modify it
+## Created 2026/03/07
+## Modified 2026/03/10
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Module::Generic::File::Magic;
@@ -22,15 +22,15 @@ BEGIN
     use File::Spec  ();
     use File::Temp  ();
     use Scalar::Util qw( looks_like_number );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 
     # $BACKEND is set by the XS BOOT block at load time:
-    #   "xs"   — libmagic loaded successfully via dlopen
-    #   "json" — libmagic absent; JSON backend + file(1) fallback available
+    #   "xs"   - libmagic loaded successfully via dlopen
+    #   "json" - libmagic absent; JSON backend + file(1) fallback available
     # Pre-set so syntax checks without the compiled .so do not die.
     $BACKEND //= 'json';
 
-    # NOTE: libmagic flag constants — mirrored from <magic.h>
+    # NOTE: libmagic flag constants - mirrored from <magic.h>
     %LIBMAGIC_FLAGS = (
         MAGIC_NONE              => 0x0000000,
         MAGIC_DEBUG             => 0x0000001,
@@ -93,7 +93,7 @@ use warnings;
 # MODULE = Module::Generic in the .xs means the bootstrap symbol is boot_Module__Generic,
 # which XSLoader resolves by loading auto/Module/Generic/Generic.so.
 # PACKAGE = Module::Generic::File::Magic means all XS functions land in our namespace.
-# If the .so is absent, XSLoader croaks — we catch that and stay on the pure-Perl backends.
+# If the .so is absent, XSLoader croaks - we catch that and stay on the pure-Perl backends.
 # When the .so is present, its BOOT block sets $BACKEND to "xs".
 use XSLoader;
 eval
@@ -102,7 +102,7 @@ eval
 };
 if( $@ )
 {
-    # .so absent or failed to load — stay on the pure-Perl backend
+    # .so absent or failed to load - stay on the pure-Perl backend
     $BACKEND //= 'json';
 }
 
@@ -229,7 +229,20 @@ sub from_buffer : method
     {
         my $cookie = $self->_open_cookie || return( $self->pass_error );
         my $result = Module::Generic::File::Magic::magic_buffer( $cookie, $buffer );
-        return( $self->error( sprintf( "magic_buffer failed: %s", $self->_magic_error_str ) ) ) unless( defined( $result ) );
+        return( $self->error( sprintf( "magic_buffer failed: %s", $self->_magic_error_str ) ) )
+            unless( defined( $result ) );
+        # magic_buffer() is unreliable for end-of-file anchored formats (e.g. ZIP)
+        # on some libmagic versions (5.39, 5.46). Fall back to magic_file() via a
+        # temp file when the result is the generic catch-all type.
+        if( $result eq 'application/octet-stream' )
+        {
+            my $tmp = $self->new_tempfile( cleanup => 1 );
+            $tmp->unload( $buffer, { binmode => 'raw', autoflush => 1 }) ||
+                return( $self->pass_error );
+            my $file_result = Module::Generic::File::Magic::magic_file( $cookie, "$tmp" );
+            $result = $file_result
+                if( defined( $file_result ) && $file_result ne 'application/octet-stream' );
+        }
         return( $result );
     }
     else
@@ -620,7 +633,7 @@ sub _match_bytes
         {
             next unless( $chunk eq $want );
         }
-        # Parent matched — now check AND sub-matches
+        # Parent matched - now check AND sub-matches
         if( $m->{and} )
         {
             my $all_ok = 1;
@@ -827,7 +840,7 @@ sub _charset_for_mime
     my $mime = shift( @_ ) // '';
     return( 'binary' ) if( $mime =~ m{^(application|audio|video|image)/} );
     return( 'binary' ) if( $mime =~ m{^application/} );
-    # Text types — return 'binary' too; proper charset detection needs more work
+    # Text types - return 'binary' too; proper charset detection needs more work
     return( 'binary' );
 }
 
@@ -947,7 +960,7 @@ Module::Generic::File::Magic - File type and MIME detection with 3-level backend
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -955,16 +968,16 @@ C<Module::Generic::File::Magic> detects file types and MIME types using a three-
 
 =over 4
 
-=item B<Level 1 — xs> (preferred)
+=item B<Level 1 - xs> (preferred)
 
-C<libmagic.so.1> is loaded at runtime via C<dlopen(3)> — no C<magic.h>, no C<libmagic-dev> package required at build time. Full libmagic accuracy and performance. The C<MAGIC_COMPRESS>, C<MAGIC_SYMLINK>, and all other flags
+C<libmagic.so.1> is loaded at runtime via C<dlopen(3)> - no C<magic.h>, no C<libmagic-dev> package required at build time. Full libmagic accuracy and performance. The C<MAGIC_COMPRESS>, C<MAGIC_SYMLINK>, and all other flags
 are fully supported. C<compile()>, C<check()>, and C<list()> are only available at this level.
 
-=item B<Level 2 — json>
+=item B<Level 2 - json>
 
 C<libmagic> is absent. The module loads C<lib/Module/Generic/File/magic.json> (generated from the freedesktop.org shared-mime-info database, bundled with the distribution) and runs pure-Perl byte-pattern matching. Covers ~500 MIME types with magic signatures.
 
-=item B<Level 3 — file>
+=item B<Level 3 - file>
 
 No pattern matched at level 2. Invokes C<file(1)> in a subprocess as a last resort. C<from_buffer> writes a temporary file via L<File::Temp>.
 
@@ -983,11 +996,11 @@ Note that within the json backend, a text-content heuristic is applied before fa
 
 =over 4
 
-=item * C<flags> — integer bitmask (default: C<MAGIC_NONE>)
+=item * C<flags> - integer bitmask (default: C<MAGIC_NONE>)
 
-=item * C<magic_db> — path to a custom C<.mgc> database (xs backend only)
+=item * C<magic_db> - path to a custom C<.mgc> database (xs backend only)
 
-=item * C<max_read> — maximum bytes read from a file for pure-Perl backends (default: C<512>)
+=item * C<max_read> - maximum bytes read from a file for pure-Perl backends (default: C<512>)
 
 =back
 

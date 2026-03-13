@@ -1,4 +1,7 @@
 use 5.008005;
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker;
 use Config;
 
@@ -26,19 +29,84 @@ elsif ($^O eq 'MSWin32') {
 $lib =~ s/[\r\n]+/ /g;
 $inc =~ s/[\r\n]+/ /g;
 
+# Setting up library directory ordering is complicated.
+#
+# Homebrew, for example, on Intel MacOS places OpenSSL libcrypto into
+# /usr/local/lib. This directory is also one of default library
+# paths. If a non-default library path is set with, for example,
+# OPENSSL_PREFIX, ensure this path is placed before any other library
+# paths. Otherwise /usr/local/lib is picked up before the one set with
+# OPENSSL_PREFIX.
+
+# Use LIBS by default for setting library path and library. Seems to
+# append the LIBS value to the default values.
+my %args = (
+    LIBS => [ $lib ],
+);
+
+# If our lib contains -L flags, check if perl Config module's linking
+# related variables also contain -L flags. If they do, ensure our lib
+# comes first. WriteMakefile accepts them with uppercase names.  If we
+# pass even one of the Config variables with a modified value, we
+# don't pass LIBS to avoid warnings like this:
+#
+# ld: warning: ignoring duplicate libraries: '-lcrypto'
+#
+# In this case '-lcrypto' was passed with LIBS and with at least one
+# of the Config variables.
+if ($lib =~ m/(^|\s)-L/) {
+  foreach my $ld_flag (qw(lddlflags ldflags)) {
+    my $val = $Config{$ld_flag};
+    next unless $val =~ s/(^|\s)-L/$1$lib -L/;
+
+    $args{uc $ld_flag} = $val;
+    delete $args{LIBS};
+  }
+}
+
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-WriteMakefile(
+WriteMakefile1(
     NAME              => 'Crypt::OpenSSL::EC',
     VERSION_FROM      => 'lib/Crypt/OpenSSL/EC.pm',
-    PREREQ_PM         => { 'Crypt::OpenSSL::Bignum' => 0.04,
-                          }, 
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/Crypt/OpenSSL/EC.pm', # retrieve abstract from module
-       AUTHOR         => 'Mike McCauley <mikem@airspayce.com>') : ()),
-    LIBS              => [ $lib ],
-    DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5',
+    MIN_PERL_VERSION  => '5.008005',
+    PREREQ_PM         => { 'Crypt::OpenSSL::Bignum' => '0.04',
+                         },
+    TEST_REQUIRES     => { 'Test::More' => 0,
+                         },
+    ABSTRACT_FROM     => 'lib/Crypt/OpenSSL/EC.pm', # retrieve abstract from module
+    LICENSE           => 'perl_5',
+    AUTHOR            => [ 'Mike McCauley <mikem@airspayce.com>',
+                           'Heikki Vatiainen <hvn@radiatorsoftware.com>',
+    ],
+    # The following is noted by Crypt:OpenSSL::Bignum. Note that
+    # redhat9 is Red Hat Linux from 2003. It's not Red Hat Enterprise
+    # Linux from 2022. Remove these soon since it's already 2026.
+    # perl-5.8/gcc-3.2 needs -DPERL5, and redhat9 likes -DOPENSSL_NO_KRB5
+    DEFINE            => '-DPERL5 -DOPENSSL_NO_KRB5 -DOPENSSL_API_COMPAT=908',
     INC               => $inc,
+
+    META_MERGE => {
+      'meta-spec' => {
+        version => 2,
+        url => 'https://metacpan.org/pod/CPAN::Meta::Spec',
+      },
+      resources => {
+        bugtracker  => {
+          web => 'https://github.com/radiator-software/p5-crypt-openssl-ec/issues',
+        },
+        homepage => 'https://github.com/radiator-software/p5-crypt-openssl-ec',
+        repository => {
+          type => 'git',
+          url => 'git://github.com/radiator-software/p5-crypt-openssl-ec.git',
+          web => 'https://github.com/radiator-software/p5-crypt-openssl-ec',
+        },
+      },
+    },
+
+    dist => { TARFLAGS => '--owner=0 --group=0 -cvf' },
+
+    %args,
 );
 if  (eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,
@@ -160,4 +228,33 @@ else {
     my $fallback = File::Spec->catfile('fallback', $file);
     copy ($fallback, $file) or die "Can't copy $fallback to $file: $!";
   }
+}
+
+# Compatibility code for old versions of EU::MM. Written by Alexandr Ciornii, version 2. Added by eumm-upgrade.
+sub WriteMakefile1 {
+  my %params=@_;
+  my $eumm_version=$ExtUtils::MakeMaker::VERSION;
+  $eumm_version=eval $eumm_version;
+  die "EXTRA_META is deprecated" if exists $params{EXTRA_META};
+  die "License not specified" if not exists $params{LICENSE};
+  if ($params{AUTHOR} and ref($params{AUTHOR}) eq 'ARRAY' and $eumm_version < 6.5705) {
+    $params{META_ADD}->{author}=$params{AUTHOR};
+    $params{AUTHOR}=join(', ',@{$params{AUTHOR}});
+  }
+  if ($params{TEST_REQUIRES} and $eumm_version < 6.64) {
+    $params{BUILD_REQUIRES}={ %{$params{BUILD_REQUIRES} || {}} , %{$params{TEST_REQUIRES}} };
+    delete $params{TEST_REQUIRES};
+  }
+  if ($params{BUILD_REQUIRES} and $eumm_version < 6.5503) {
+    #EUMM 6.5502 has problems with BUILD_REQUIRES
+    $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{BUILD_REQUIRES}} };
+    delete $params{BUILD_REQUIRES};
+  }
+  delete $params{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
+  delete $params{MIN_PERL_VERSION} if $eumm_version < 6.48;
+  delete $params{META_MERGE} if $eumm_version < 6.46;
+  delete $params{META_ADD} if $eumm_version < 6.46;
+  delete $params{LICENSE} if $eumm_version < 6.31;
+
+  WriteMakefile(%params);
 }

@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Feature::Compat::Class;
 
-our $VERSION = '0.1.2';
-
 class WebServer::DirIndex::HTML {
+
+  our $VERSION = '0.1.3';
 
   field $icons :param = 0;
 

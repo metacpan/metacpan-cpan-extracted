@@ -1,5 +1,26 @@
 Revision history for Perl module Module::Generic
 
+v1.2.3 2026-03-12T23:40:42+0900
+    - Release v1.2.3 with minor documentation correction
+
+v1.2.2 2026-03-10T19:06:12+0900
+    - Minor improvement in as_string in Module::Generic::HeaderValue, now accepting
+      an option to force the double quotes on a token name.
+    - Fixed Module::Generic::Global::set() max_size eviction triggering one
+      entry too early when Perl is compiled with useithreads, due to a key
+      being pre-inserted into the repository before the size check
+
+v1.2.1 2026-03-09T21:58:36+0900
+    - Corrected serialisation for Module::Generic::DateTime
+    - Added Module::Generic::File::Magic, a new libmagic-based MIME type detector
+      with a pure-Perl JSON fallback, replacing the use of File::MMagic
+    - Improved Module::Generic::File::Magic::from_buffer() to fall back to a
+      temporary file when magic_buffer() returns a generic type, working around
+      inconsistent behaviour across libmagic versions (5.39, 5.46)
+    - Updated Module::Generic::Finfo::mime_type() to use Module::Generic::File::Magic
+    - Fixed read-only value error in Module::Generic::Global on Perl 5.28
+    - Fixed off-by-one in Module::Generic::Global max_size eviction (>= vs >)
+
 v1.2.0 2026-03-08T22:47:58+0900
     - Added new module Module::Generic::File::Magic providing file type and MIME type detection
       through a three-level backend cascade: an XS binding to libmagic (loaded at runtime via

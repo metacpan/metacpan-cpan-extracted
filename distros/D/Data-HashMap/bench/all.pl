@@ -185,6 +185,12 @@ cmpthese(-3, {
     'SS' => sub {
         for my $i (1 .. $N) { my $v = hm_ss_get $m_ss, "k$i"; }
     },
+    'SS_direct' => sub {
+        for my $i (1 .. $N) { my $v = hm_ss_get_direct $m_ss, "k$i"; }
+    },
+    'IS_direct' => sub {
+        for my $i (1 .. $N) { my $v = hm_is_get_direct $m_is, $i; }
+    },
     'perl_ii' => sub {
         for my $i (1 .. $N) { my $v = $h_ii{$i}; }
     },
@@ -582,5 +588,16 @@ measure_memory('perl_ss', sub {
     for my $i (1 .. $MEM_N) { $h{"k$i"} = "v$i"; }
     \%h;
 });
+
+# perl_ss with fixed-size strings (fair comparison for SS_*B)
+for my $slen (8, 16, 32, 64) {
+    my $key = "k" . ("x" x ($slen - 1));
+    my $val = "v" . ("y" x ($slen - 1));
+    measure_memory("perl_ss_${slen}B", sub {
+        my %h;
+        for my $i (1 .. $MEM_N) { $h{"$key$i"} = "$val$i"; }
+        \%h;
+    });
+}
 
 print "\nDone.\n";

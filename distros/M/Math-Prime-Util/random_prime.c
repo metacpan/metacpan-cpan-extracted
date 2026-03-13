@@ -3,8 +3,7 @@
 #include "csprng.h"
 #include "primality.h"
 #include "util.h"
-#include "prime_nth_count.h"
-#include "lmo.h"
+#include "prime_counts.h"
 #include "mulmod.h"
 #include "constants.h"
 #include "random_prime.h"
@@ -45,9 +44,10 @@ UV random_nbit_prime(void* ctx, UV b)
 UV random_ndigit_prime(void* ctx, UV d)
 {
   UV lo, hi;
-  if ( (d == 0) || (BITS_PER_WORD == 32 && d >= 10) || (BITS_PER_WORD == 64 && d >= 20) ) return 0;
+  if (d == 0) return 0;
   if (d == 1) return nth_prime(1 + urandomm32(ctx,4));
   if (d == 2) return nth_prime(5 + urandomm32(ctx,21));
+  if (d >= (BITS_PER_WORD == 64 ? 20 : 10)) return 0;
   lo = powmod(10,d-1,UV_MAX)+1;
   hi = 10*lo-11;
   while (1) {
@@ -77,14 +77,14 @@ UV random_prime(void* ctx, UV lo, UV hi)
 
 /* Note that 7 chosen bases or the first 12 prime bases are enough
  * to guarantee sucess.  We could choose to limit to those. */
-int is_mr_random(void* ctx, UV n, UV k) {
+bool is_mr_random(void* ctx, UV n, UV k) {
   if (k >= 3*(n/4))
     return is_prob_prime(n);
 
   /* TODO: do 16 at a time */
   while (k--) {
     UV base = 2 + urandomm64(ctx, n-2);
-    if (!miller_rabin(n, &base, 1))
+    if (!is_strong_pseudoprime(n, base))
       return 0;
   }
   return 1;
@@ -142,4 +142,36 @@ UV random_unrestricted_semiprime(void* ctx, UV b) { /* generic semiprime */
     n = min + urandomb(ctx,b-1);
   } while (!is_semiprime(n));
   return n;
+}
+
+UV random_safe_prime(void* ctx, UV bits)
+{
+  static const unsigned char small_safe[] = {5,7,11,23,47,59,83,107};
+  const uint16_t p15mask = 14079;
+  UV p, q, B;
+
+  if (bits < 3 || bits > BITS_PER_WORD)
+    return 0;
+
+  switch (bits) {
+    case 3:  return small_safe[  0 + urandomm32(ctx, 2) ];
+    case 4:  return 11;
+    case 5:  return 23;
+    case 6:  return small_safe[  4 + urandomm32(ctx, 2) ];
+    case 7:  return small_safe[  6 + urandomm32(ctx, 2) ];
+    default: break;
+  }
+
+  /* do { q = 2 * random_nbit_prime(ctx, bits-1) + 1; } while (!is_prob_prime(q)); */
+
+  /* Alternately we could construct p with last 2 bits set, then q = p >> 1. */
+  B = (UVCONST(1) << (bits-2)) + 1;
+  do {
+    p = B + (urandomb(ctx, bits-3) << 1);
+    q = 2*p+1;
+  } while ( (p15mask & (1U << (p%15))) ||
+            (p%7) == 0 || (p%7) == 3 ||
+            !is_prob_prime(p) || !is_prob_prime(q) );
+
+  return q;
 }

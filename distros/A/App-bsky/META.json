@@ -4,14 +4,16 @@
    "author" : [
       "Sanko Robinson <sanko@cpan.org>"
    ],
+   "description" : "Bluesky Client in Perl",
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "App::mii v1.0.0",
+   "keywords" : [],
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
    },
    "name" : "App-bsky",
    "no_index" : {
@@ -28,7 +30,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.035"
+            "Module::Build::Tiny" : "0"
          }
       },
       "develop" : {
@@ -46,7 +48,6 @@
          },
          "requires" : {
             "CPAN::Uploader" : "0",
-            "Minilla" : "0",
             "Pod::Markdown::Github" : "0",
             "Software::License::Artistic_2_0" : "0",
             "Test::CPAN::Meta" : "0",
@@ -58,8 +59,11 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Win32::Console" : "0"
+         },
          "requires" : {
-            "At" : "0.17",
+            "Bluesky" : "1.01",
             "File::HomeDir" : "0",
             "Getopt::Long" : "0",
             "JSON::Tiny" : "0",
@@ -79,10 +83,11 @@
    "provides" : {
       "App::bsky" : {
          "file" : "lib/App/bsky.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "App::bsky::CLI" : {
-         "file" : "lib/App/bsky.pm"
+         "file" : "lib/App/bsky.pm",
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -91,14 +96,28 @@
          "web" : "https://github.com/sanko/App-bsky/issues"
       },
       "homepage" : "https://github.com/sanko/App-bsky",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/sanko/App-bsky.git",
          "web" : "https://github.com/sanko/App-bsky"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_authority" : "cpan:SANKO",
+   "x_ignore" : [
+      ".tidyallrc",
+      ".gitignore",
+      ".clang-format",
+      ".github/",
+      ".github/*",
+      ".gitmodules",
+      "eg/**",
+      ".github/**"
+   ],
+   "x_readme_from" : "script/bsky",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

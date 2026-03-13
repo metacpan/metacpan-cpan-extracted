@@ -29,7 +29,7 @@ BEGIN
     our $EXCEPTION_CLASS = 'Mail::Make::Exception';
     our $VERSION = 'v0.1.1';
     # RFC 2047 §2: an encoded-word must not exceed 75 characters total.
-    # =?UTF-8?B? ... ?=  — the wrapper is 12 chars, leaving 63 for base64 text.
+    # =?UTF-8?B? ... ?=  - the wrapper is 12 chars, leaving 63 for base64 text.
     # 63 base64 chars encode floor(63 * 3/4) = 47 raw bytes.
     # We use 45 bytes per chunk (multiple of 3) to keep base64 clean.
     use constant
@@ -53,7 +53,7 @@ sub init
     return( $self );
 }
 
-# as_string() — returns the RFC 2047 encoded form suitable for the wire.
+# as_string() - returns the RFC 2047 encoded form suitable for the wire.
 # Pure ASCII values are returned unchanged.
 sub as_string
 {
@@ -64,7 +64,7 @@ sub as_string
     return( $self->{_encoded} );
 }
 
-# decode( $encoded_string ) — class or instance method.
+# decode( $encoded_string ) - class or instance method.
 # Decodes an RFC 2047 encoded Subject value back to a Perl string.
 sub decode
 {
@@ -73,13 +73,13 @@ sub decode
     return( _decode_subject( $str ) );
 }
 
-# field_name() — always returns 'Subject'
+# field_name() - always returns 'Subject'
 sub field_name { return( 'Subject' ); }
 
-# raw() — returns the decoded Perl string (the original value before encoding)
+# raw() - returns the decoded Perl string (the original value before encoding)
 sub raw { return( shift->{_raw} ); }
 
-# value( [$text] ) — sets or gets the subject text.
+# value( [$text] ) - sets or gets the subject text.
 # On assignment: stores the raw Perl string; clears the encoded cache.
 # On retrieval: returns the decoded Perl string (i.e. human-readable).
 sub value
@@ -145,7 +145,7 @@ sub _encode_subject
     my $text = shift( @_ );
 
     # Pure printable ASCII + tab/space: no encoding needed.
-    # We also reject bare CRs and LFs here — they are illegal in a header.
+    # We also reject bare CRs and LFs here; they are illegal in a header.
     return( $text ) unless( $text =~ /[^\x09\x20-\x7E]/ );
 
     # Ensure the string carries Perl's UTF-8 flag before encoding to bytes.
@@ -223,7 +223,7 @@ Mail::Make::Headers::Subject - RFC 2047 Aware Subject Header for Mail::Make
     # Quarterly Report
 
     # Non-ASCII: automatically encoded per RFC 2047
-    $s->value( "Yamato, Inc. — Newsletter" );
+    $s->value( "Yamato, Inc. - Newsletter" );
     print $s->as_string;
     # =?UTF-8?B?QW5nZWxzLCBJbmMuIOKAlCBOZXdzbGV0dGVy?=
 
@@ -308,9 +308,9 @@ Sets or gets the subject text as a Perl Unicode string. On assignment, the encod
 
 =over 4
 
-=item RFC 2047 — MIME Part Three: Message Header Extensions for Non-ASCII Text
+=item RFC 2047 - MIME Part Three: Message Header Extensions for Non-ASCII Text
 
-=item RFC 2822 §2.2 — Header Fields
+=item RFC 2822 §2.2 - Header Fields
 
 =back
 

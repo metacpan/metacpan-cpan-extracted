@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
 ## Mail Builder - t/95_smime_live.t
-## Live S/MIME signing and encryption tests — AUTHOR USE ONLY.
+## Live S/MIME signing and encryption tests - AUTHOR USE ONLY.
 ##
 ## Sends real signed and/or encrypted emails via a real SMTP server and
 ## verifies the message is accepted.  Visual inspection in a S/MIME-capable
@@ -133,7 +133,7 @@ sub _send_and_check
 }
 
 # NOTE: Subtest 1: sign only
-subtest 'live: smime_sign — multipart/signed delivered' => sub
+subtest 'live: smime_sign - multipart/signed delivered' => sub
 {
     plan( tests => 2 );
 
@@ -165,7 +165,7 @@ subtest 'live: smime_sign — multipart/signed delivered' => sub
 };
 
 # NOTE: Subtest 2: encrypt only
-subtest 'live: smime_encrypt — enveloped message delivered' => sub
+subtest 'live: smime_encrypt - enveloped message delivered' => sub
 {
     plan( tests => 2 );
 
@@ -195,7 +195,7 @@ subtest 'live: smime_encrypt — enveloped message delivered' => sub
 };
 
 # NOTE: Subtest 3: sign + encrypt
-subtest 'live: smime_sign_encrypt — sign+encrypt delivered' => sub
+subtest 'live: smime_sign_encrypt - sign+encrypt delivered' => sub
 {
     plan( tests => 2 );
 
@@ -227,7 +227,7 @@ subtest 'live: smime_sign_encrypt — sign+encrypt delivered' => sub
     }
 };
 
-# NOTE: Subtest 4: structure — smime_sign produces multipart/signed
+# NOTE: Subtest 4: structure - smime_sign produces multipart/signed
 subtest 'structure: smime_sign produces multipart/signed entity' => sub
 {
     plan( tests => 3 );
@@ -266,7 +266,7 @@ subtest 'structure: smime_sign produces multipart/signed entity' => sub
     }
 };
 
-# NOTE: Subtest 5: structure — smime_encrypt produces pkcs7-mime
+# NOTE: Subtest 5: structure - smime_encrypt produces pkcs7-mime
 subtest 'structure: smime_encrypt produces application/pkcs7-mime' => sub
 {
     plan( tests => 3 );

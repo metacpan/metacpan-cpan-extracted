@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.6.3
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.6.4
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2026/01/22
+## Modified 2026/03/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -59,7 +59,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.6.3';
+    our $VERSION = 'v0.6.4';
 };
 
 BEGIN
@@ -1240,7 +1240,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.6.3
+    v0.6.4
 
 =head1 DESCRIPTION
 

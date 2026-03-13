@@ -12,9 +12,10 @@ my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 #my $usegmp= Math::Prime::Util::prime_get_config->{'gmp'};
 #$use64 = 0 if $use64 && 18446744073709550592 == ~0;
 
-plan tests => 0 + 6 + 3 + 2 + 1  # fromdigits
-                + 6 + 4 + 1      # todigits
-                + 4 + 2*$extra   # sumdigits
+plan tests => 0 + 7 + 3 + 2 + 1    # fromdigits
+                + 6 + 4 + 1 + 1    # todigits
+                + 4 + 2*$extra + 1 # sumdigits
+                + 3 + 2            # todigitstring
                 + 12;
 
 ###### fromdigits
@@ -28,11 +29,12 @@ is(fromdigits([0,1,1,0,2216],16), 6568, "fromdigits base 16 with overflow");
 is(fromdigits([7,999,44],5), 7*5**2 + 999*5 + 44*1, "fromdigits base 5 with carry");
 is(fromdigits([7,999,44],3), 7*3**2 + 999*3 + 44*1, "fromdigits base 3 with carry");
 is(fromdigits([7,999,44],2), 7*2**2 + 999*2 + 44*1, "fromdigits base 2 with carry");
+is("".fromdigits([1..15,1..15,1..15],16), "108977460683796539709587792812439445667270661579197935", "fromdigits base 16 with many digits");
 
 is(fromdigits("1f",16), 31, "fromdigits hex string");
 is(fromdigits("24"), 24, "fromdigits decimal");
 
-is(fromdigits("zzzyzzzyzzzyzzzy",36), "7958656371562241451187966", "fromdigits with Large base 36 number");
+is("".fromdigits("zzzyzzzyzzzyzzzy",36), "7958656371562241451187966", "fromdigits with Large base 36 number");
 
 ###### todigits
 is_deeply([todigits(0)], [], "todigits 0");
@@ -49,6 +51,8 @@ is_deeply([todigits(900,2,32)], [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1
 
 is(vecsum(todigits("293852387239761276234029385230912847923872323")), 201, "vecsum of todigits of bigint");
 
+is_deeply([todigits(-143)], [1,4,3], "todigits ignores negative sign");
+
 ###### sumdigits
 is(sumdigits("-45.36"), 4+5+3+6, "sumdigits(-45.36)");
 {
@@ -62,6 +66,17 @@ if ($extra) {
   is(sumdigits(factorial(1000)), 10539, "sumdigits 1000!");
   is(sumdigits(factorial(10000)), 149346, "sumdigits 10000!");
 }
+
+is(sumdigits(-143), 8, "sumdigits ignores negative sign");
+
+####### some longer todigitstring examples
+is(todigitstring("3" x 21, 3), "10001020211011120202011020201202220201012100", "todigitstring base 3");
+is(todigitstring("7" x 26, 9), "1303055203367717374834745502", "todigitstring base 9");
+is(todigitstring("9" x 27, 11), "92586630a001888a8112250349", "todigitstring base 11");
+
+is(todigitstring(-143,16), "8f", "todigitstring ignores negative sign");
+
+is(todigitstring(12345,8,10), "0000030071", "todigitstring will 0 pad");
 
 ###### examples from Wolfram docs
 is_deeply([todigits(1234135634,16)], [4,9,8,15,6,10,5,2], "todigits 1234135634 base 16");

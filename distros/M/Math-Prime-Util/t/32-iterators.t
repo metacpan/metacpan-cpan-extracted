@@ -2,37 +2,48 @@
 use strict;
 use warnings;
 
+# Performance note for the bigint for... tests
+#
+# On 64-bit, wthout GMP or a good Math::BigInt backend, these are relative slow:
+#    forprimes, forcomposites, foroddcomposites
+
 use Test::More;
 use Math::Prime::Util qw/primes prev_prime next_prime
                          forprimes forcomposites foroddcomposites fordivisors
                          forpart forcomp forcomb forperm forderange formultiperm
-                         forfactored forsquarefree forsemiprimes
+                         forfactored forsquarefree forsquarefreeint
+                         forsemiprimes foralmostprimes
                          forsetproduct
                          lastfor
-                         is_power is_semiprime vecsum sqrtint
+                         is_power is_semiprime is_almost_prime
+                         vecsum sqrtint divisors
                          prime_iterator prime_iterator_object/;
-use Math::BigInt try => "GMP,Pari";
+use Math::BigInt try => "GMP,GMPz,Pari";
 use Math::BigFloat;
 
 my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
 my $broken64 = (18446744073709550592 == ~0);
 
 plan tests => 8        # forprimes errors
-            + 12 + 7   # forprimes simple
+            + 14 + 7   # forprimes simple
             + 3        # forcomposites simple
             + 2        # fordivisors simple
             + 3        # iterator errors
             + 7        # iterator simple
             + 1        # other forprimes
             + 2        # forprimes/iterator nesting
+            + 1        # forprimes nested function
             + 3        # forprimes BigInt/BigFloat
+                       #
             + 3        # oo iterator errors
             + 7        # oo iterator simple
-            + 25       # oo iterator methods
+            + 28       # oo iterator methods
             + 12       # lastfor
-            + 5        # forfactored and forsquarefree
+            + 13       # forfactored and forsquarefree
             + 1        # forsemiprimes
+            + 1+10     # foralmostprimes
             + 9        # forsetproduct
+            + 1        # bigint ranges
             + 0;
 
 ok(!eval { forprimes { 1 } undef; },   "forprimes undef");
@@ -46,6 +57,8 @@ ok(!eval { forprimes { 1 } "abc"; },   "forprimes abc");
 ok(!eval { forprimes { 1 } 2, "abc"; },   "forprimes 2, abc");
 ok(!eval { forprimes { 1 } 5.6; },   "forprimes abc");
 
+{my @t; forprimes {push @t,$_} 0,0; is_deeply( [@t], [], "forprimes 0,0" ); }
+{my @t; forprimes {push @t,$_} 0,1; is_deeply( [@t], [], "forprimes 0,1" ); }
 {my @t; forprimes {push @t,$_} 1; is_deeply( [@t], [], "forprimes 1" ); }
 {my @t; forprimes {push @t,$_} 2; is_deeply( [@t], [2], "forprimes 3" ); }
 {my @t; forprimes {push @t,$_} 3; is_deeply( [@t], [2,3], "forprimes 3" ); }
@@ -100,7 +113,7 @@ ok(!eval { forprimes { 1 } 5.6; },   "forprimes abc");
   # Pari: v=List(); for(n=1, 50, fordiv(n, d, listput(v, d))); Vec(v)
   my @A027750 = (1,1,2,1,3,1,2,4,1,5,1,2,3,6,1,7,1,2,4,8,1,3,9,1,2,5,10,1,11,1,2,3,4,6,12,1,13,1,2,7,14,1,3,5,15,1,2,4,8,16,1,17,1,2,3,6,9,18,1,19,1,2,4,5,10,20,1,3,7,21,1,2,11,22,1,23,1,2,3,4,6,8,12,24,1,5,25,1,2,13,26,1,3,9,27,1,2,4,7,14,28,1,29,1,2,3,5,6,10,15,30,1,31,1,2,4,8,16,32,1,3,11,33,1,2,17,34,1,5,7,35,1,2,3,4,6,9,12,18,36,1,37,1,2,19,38,1,3,13,39,1,2,4,5,8,10,20,40,1,41,1,2,3,6,7,14,21,42,1,43,1,2,4,11,22,44,1,3,5,9,15,45,1,2,23,46,1,47,1,2,3,4,6,8,12,16,24,48,1,7,49,1,2,5,10,25,50);
   my @a;
-  do { fordivisors { push @a, $_ } $_ } for 1..50;
+  for my $n (1..50) {  fordivisors { push @a, $_ } $n;  }
   is_deeply(\@a, \@A027750, "A027750 using fordivisors");
 }
 
@@ -161,6 +174,17 @@ ok(!eval { prime_iterator(4.5); }, "iterator 4.5");
   is_deeply( [@t], [qw/23 29 31 29 31 37 31 37 41 37 41 43 47 53 59 61 59 61 67 71 73 79 73 79 83 79 83 89/], "triple nested iterator" );
 }
 
+# Github 66, nesting a function inside forprimes
+{
+  my $sum = 0;
+  forprimes {
+    my @d = divisors(6486480 * ($_-1));
+    $sum += 1+$#d;
+  } 2,10;
+  is($sum, 2016, "Nested call to large divisors inside forprimes");
+}
+
+
 # With BigInt and BigFloat objects
 { my @t;
   forprimes { push @t, $_ } Math::BigInt->new("5"), Math::BigInt->new("11");
@@ -209,30 +233,38 @@ ok(!eval { prime_iterator_object(4.5); }, "iterator 4.5");
   is( $it->value(), 31, "iterator object moved forward 10 now returns 31");
   $it->prev;
   is( $it->value(), 29, "iterator object moved back now returns 29");
+  is( $it->peek(), 31, "iterator object peek shows 31");
   is( $it->iterate(), 29, "iterator object iterates to 29");
   is( $it->iterate(), 31, "iterator object iterates to 31");
   $it->rewind->next->next->next->prev;
   is( $it->value(), 5, "iterator object rewind and move returns 5");
+  $it->rewind(1);
+  is( $it->value(), 2, "iterator object rewind(1) goes to 2");
+  $it->rewind(0);
+  is( $it->value(), 2, "iterator object rewind(0) goes to 2");
   # Validate that it automatically handles bigint range traversal.
   SKIP: {
     skip "Skipping bigint traversals on a Perl that can't add correctly",5 if $broken64;
     my $top_prime = prev_prime(~0);
     my $big_prime = next_prime(Math::BigInt->new(''.~0));
     ok( $big_prime > ~0, "internal check, next_prime on big int works");
+    # is(x,y) compares the two using eq.
+    # Math::BigInt is fine with this, but Math::GMP and Math::GMPz are not.
+    $big_prime = "$big_prime";
     $it->rewind($top_prime);
     is( $it->value(), $top_prime, "iterator object can rewind to $top_prime");
     $it->next;
-    is( $it->value(), $big_prime, "iterator object next is $big_prime");
+    is( "".$it->value(), $big_prime, "iterator object next is $big_prime");
     $it->rewind(~0);
-    is( $it->value(), $big_prime, "iterator object rewound to ~0 is $big_prime");
+    is( "".$it->value(), $big_prime, "iterator object rewound to ~0 is $big_prime");
     $it->prev;
     is( $it->value(), $top_prime, "iterator object prev goes back to $top_prime");
   }
 
   # Validation for the Math::NumSeq compatiblity stuff
   $it->rewind;
-  do { $it->next } for 1..200;
-  is( $it->tell_i(), 201, "iterator object tell_i");
+  do { $it->next } for 1..100;
+  is( $it->tell_i(), 101, "iterator object tell_i");
   is( $it->i_start, 1, "iterator object i_start = 1");
   like( $it->description, qr/prime numbers/, "iterator object description");
   is( $it->values_min, 2, "iterator object values_min = 2");
@@ -346,11 +378,21 @@ sub a053462 {
 
 {
   my $s;
+  $s=0; forfactored      { $s += 1+$_ } 0,0; is($s, 0, "forfactored {} 0,0");
+  $s=0; forsquarefree    { $s += 1+$_ } 0,0; is($s, 0, "forsquarefree {} 0,0");
+  $s=0; forsquarefreeint { $s += 1+$_ } 0,0; is($s, 0, "forsquarefreeint {} 0,0");
+  $s=0; forfactored      { $s += 1+$_ } 0,1; is($s, 2, "forfactored {} 0,1");
+  $s=0; forsquarefree    { $s += 1+$_ } 0,1; is($s, 2, "forsquarefree {} 0,1");
+  $s=0; forsquarefreeint { $s += 1+$_ } 0,1; is($s, 2, "forsquarefreeint {} 0,1");
+
   $s=0; forfactored { $s += $_ } 1; is($s, 1, "forfactored {} 1");
   $s=0; forfactored { $s += vecsum($_,@_) } 100; is($s, 7330, "forfactored {} 100");
   $s=0; forsquarefree { $s += vecsum($_,@_) } 100; is($s, 4763, "forsquarefree {} 100");
   $s=0; forfactored { $s += vecsum($_,@_) } 1e8,1e8+10; is($s, 1208835222, "forfactored {} 10^8,10^8+10");
   is( a053462(6), 607926, "A053462 using forsquarefree");
+
+  $s = 0; forsquarefree    { $s += $_ } 7193953,7195732; is($s, 7813597636, "forsquarefree {} 7193953,7195732");
+  $s = 0; forsquarefreeint { $s += $_ } 7193953,7195732; is($s, 7813597636, "forsquarefreeint {} 7193953,7195732");
 }
 
 ################### forsemiprimes
@@ -359,6 +401,19 @@ sub a053462 {
   my @got;
   forsemiprimes { push @got, $_; } 1000;
   is_deeply(\@got, [grep { is_semiprime($_) } 0 .. 1000], "forsemiprimes 1000");
+}
+
+################### foralmostprimes
+
+{
+  my $num = 0;
+  foralmostprimes { $num++; } 0,1,1000;
+  is($num, 0, "foralmostprimes 0,1000 is empty");
+}
+for my $k (1 .. 10) {
+  my @got;
+  foralmostprimes { push @got, $_; } $k,1000;
+  is_deeply(\@got, [grep { is_almost_prime($k,$_) } 0 .. 1000], "foralmostprimes $k,1000");
 }
 
 ################### forsetproduct
@@ -391,4 +446,82 @@ sub a053462 {
 
   @set=([1,2],[qw/a b c/]);  @out=();forsetproduct {push @out,"@_"; @_=(1..10); }@set;
   is_deeply(\@out, ['1 a','1 b','1 c','2 a','2 b','2 c'], 'forsetproduct replace @_ in sub');
+}
+
+###### Bigint range
+subtest 'for<...> with bigint ranges', sub {
+  my(@r,$E,%d,$a1,$a2);
+  if ($use64) {
+    $E = 66;
+    $d{primes} = [166,199,169];
+    $d{semi} = [98,99,99];
+    $d{almost} = [30,32,31];
+    $d{comp} = [1506,1508,1506,1508];
+    $d{oddcomp} = [1506,1511,1509,1511];
+    $d{sf} = [26,29,27,[7,13,19,223,2683,16981,4200451],29,[3,31,379,"2093425718354419"]];
+    $d{sfint} = [26,29,27,29];
+    $d{factored} = [29,30,29,[qw/3 31 379 2093425718354419/],30,[qw/2 17 1129 1922236656459079/]];
+  } else {
+    $E = 36;
+    $d{primes} = [11,71,31];
+    $d{semi} = [710,711,711];
+    $d{almost} = [246,248,247];
+    $d{comp} = [2166,2168,2166,2168];
+    $d{oddcomp} = [1800,1805,1803,1805];
+    $d{sf} = [305,308,306,[2,79,3617,120247]];
+    $d{sfint} = [636,639,637];
+    $d{factored} = [170,171,170,[2,3,3,19,89,2257687],171,[17,149,1033,26263]];
+  }
+
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{primes});
+    forprimes { push @r,"$_" } $arg1, $arg2;
+    is_deeply(\@r, \@res, "forprimes {} 2^$E+$a1, 2^$E+$a2");
+  }
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{semi});
+    forsemiprimes { push @r,"$_" } $arg1, $arg2;
+    is_deeply(\@r, \@res, "forsemiprimes {} 2^$E+$a1, 2^$E+$a2");
+  }
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{almost});
+    foralmostprimes { push @r,"$_" } 3, $arg1, $arg2;
+    is_deeply(\@r, \@res, "foralmostprimes {} 3, 2^$E+$a1, 2^$E+$a2");
+  }
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{comp});
+    forcomposites { push @r,"$_" } $arg1, $arg2;
+    is_deeply(\@r, \@res, "forcomposites {} 2^$E+$a1, 2^$E+$a2");
+  }
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{oddcomp});
+    foroddcomposites { push @r,"$_" } $arg1, $arg2;
+    is_deeply(\@r, \@res, "foroddcomposites {} 2^$E+$a1, 2^$E+$a2");
+  }
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{sf});
+    forsquarefree { push @r,"$_",[map{"$_"}@_] } $arg1, $arg2;
+    is_deeply(\@r, \@res, "forsquarefree {} 2^$E+$a1, 2^$E+$a2");
+  }
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{sfint});
+    forsquarefreeint { push @r,"$_" } $arg1, $arg2;
+    is_deeply(\@r, \@res, "forsquarefreeint {} 2^$E+$a1, 2^$E+$a2");
+  }
+  { my @r=();  my($a1,$a2,$arg1,$arg2,@res) = split_d($E,$d{factored});
+    forfactored { push @r,"$_",[map{"$_"}@_] } $arg1, $arg2;
+    is_deeply(\@r, \@res, "forfactored {} 2^$E+$a1, 2^$E+$a2");
+  }
+
+  @r=(); fordivisors { push @r,"$_" } "73786976294838225404";
+  is_deeply(\@r, [qw/1 2 4 137 274 548 134647766961383623 269295533922767246 538591067845534492 18446744073709556351 36893488147419112702 73786976294838225404/], "fordivisors {} 2^66+18940");
+};
+
+sub split_d {
+  my($E,$arr) = @_;
+  my $a1 = $arr->[0];
+  my $a2 = $arr->[1];
+  return ($a1,$a2,map { ref($_) ? $_ : 2**$E + $_    } @$arr) if $E < 48;
+  return ($a1,$a2,map { ref($_) ? $_ : plus_2_66($_) } @$arr) if $E == 66;
+  die "unsupported test exponent $E";
+}
+
+sub plus_2_66 { # add n to 2^66 (73786976294838206464)
+  my $add = shift;
+  my $final = $add + 6464;
+  die "too large" if $final > 99999;
+  return "737869762948382" . sprintf("%05d",$final);
 }

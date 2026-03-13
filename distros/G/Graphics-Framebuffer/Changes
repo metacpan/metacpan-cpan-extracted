@@ -1,5 +1,11 @@
 Change log for Graphics::Framebuffer
 
+6.89   March 12, 2026
+
+       Fixed bugs in the Debian install script.
+	   Code cleanup in the module.
+	   Edited all README files.
+
 6.88   February 14, 2026
 
        Removed the Q to escape for play_animation

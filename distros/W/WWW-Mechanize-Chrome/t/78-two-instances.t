@@ -12,6 +12,7 @@ use Log::Log4perl qw(:easy);
 use WWW::Mechanize::Chrome;
 use lib '.';
 use t::helper;
+use Capture::Tiny 'capture';
 
 Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
 
@@ -53,11 +54,15 @@ sub new_mech {
 t::helper::run_across_instances(\@instances, \&new_mech, 4, sub {
     my ($browser_instance, $mech) = @_;
 
-    memory_cycle_ok( $mech, "A fresh mechanize doesn't have a cycle" );
+    capture {
+        memory_cycle_ok( $mech, "A fresh mechanize doesn't have a cycle" );
+    };
 
     my $mech2 = new_mech( headless => 1 );
     ok $mech2, "We replaced the first with a second Chrome instance";
-    memory_cycle_ok( $mech2, "A fresh mechanize doesn't have a cycle" );
+    capture {
+        memory_cycle_ok( $mech2, "A fresh mechanize doesn't have a cycle" );
+    };
 
     undef $mech;
     $mech = new_mech( headless => 1 );

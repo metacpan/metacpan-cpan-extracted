@@ -1,5 +1,14 @@
 Revision history for Device-AVR-UPDI
 
+0.19    2026-03-12
+        [CHANGES]
+         * Rebuild with current Microchip partinfo files; adds AVR DA(S), DD
+           and DU series chips
+
+        [BUGFIXES]
+         * Drain initial bytes from the UPDI link at startup time, to ignore
+           any spurious pulses
+
 0.18    2025-07-03
         [CHANGES]
          * Expand shell globs in configured serial port paths

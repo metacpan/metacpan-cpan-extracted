@@ -433,7 +433,7 @@ sub _invalidate_tie_cache
     my $st = $self->_state();
     # Drop our own reference to the tied hash. If the caller holds a copy of
     # the \%{} deref, Perl will keep the tie alive until that reference is
-    # released — untie() would warn in that case, so we leave it to Perl's
+    # released - untie() would warn in that case, so we leave it to Perl's
     # normal reference counting and simply clear our cached pointer so that
     # the next %{} deref creates a fresh, correctly-initialised tie.
     $st->{_tied_href} = undef;
@@ -503,7 +503,7 @@ use warnings;
 sub TIEHASH
 {
     my( $class, $table ) = @_;
-    # This is a programming error, not a runtime one — die is appropriate here.
+    # This is a programming error, not a runtime one - die is appropriate here.
     unless( defined( $table ) && ref( $table ) eq 'MM::Table' )
     {
         die( "MM::Table::Tie: expected an MM::Table instance, got '" . ( ref( $table ) || 'undef' ) . "'.\n" );
@@ -689,7 +689,7 @@ C<MM::Table> does not inherit from L<Module::Generic>, but follows the same erro
 
 =back
 
-Because C<MM::Table> is never instantiated by untrusted input and construction cannot fail, there is no class-level C<< MM::Table->error >> — errors are always per-instance.
+Because C<MM::Table> is never instantiated by untrusted input and construction cannot fail, there is no class-level C<< MM::Table->error >> - errors are always per-instance.
 
 =head1 CONSTRUCTOR
 
@@ -720,7 +720,7 @@ Returns a deep copy of the table as a new C<MM::Table> instance.
 
 =head2 do( $callback [, @filter_keys] )
 
-Iterates over all entries in insertion order, calling C<$callback->( $key, $value )> for each. Iteration stops if the callback returns a false value.
+Iterates over all entries in insertion order, calling C<< $callback->( $key, $value ) >> for each. Iteration stops if the callback returns a false value.
 If C<@filter_keys> is provided, only entries whose lowercased key matches one of the filter keys are visited. Returns C<$self>, or C<undef> on error.
 
 =head2 error( [$message] )

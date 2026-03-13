@@ -95,5 +95,7 @@ SKIP: for my $interactive (1,0) {
         my $c = $cookies->get_cookies($target_domain);
         delete $c->{'$Version'};
         is keys %{ $c }, $expected_count, "We have $expected_count cookies";
+
+        undef $mech;
     }
 }

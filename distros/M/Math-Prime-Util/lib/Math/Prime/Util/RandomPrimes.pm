@@ -6,18 +6,25 @@ use Math::Prime::Util qw/ prime_get_config
                           verify_prime
                           is_provable_prime_with_cert
                           primorial prime_count nth_prime
-                          is_prob_prime is_strong_pseudoprime
+                          is_prob_prime is_pseudoprime is_strong_pseudoprime
+                          is_extra_strong_lucas_pseudoprime
                           next_prime prev_prime
                           urandomb urandomm random_bytes
+                          addint subint add1int sub1int logint modint cmpint
+                          mulint divint powint modint lshiftint rshiftint
+                          sqrtint cdivint
+                          powmod invmod
+                          vecsum vecprod gcd is_odd fromdigits
                         /;
 
 BEGIN {
   $Math::Prime::Util::RandomPrimes::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::RandomPrimes::VERSION = '0.73';
+  $Math::Prime::Util::RandomPrimes::VERSION = '0.74';
 }
 
 BEGIN {
-  do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,Pari"); }
+  # TODO: remove this when everything uses tobigint
+  do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,GMPz,LTM,Pari"); }
     unless defined $Math::BigInt::VERSION;
 
   use constant OLD_PERL_VERSION=> $] < 5.008;
@@ -30,6 +37,8 @@ BEGIN {
   use constant MPU_USE_GMP     => prime_get_config->{'gmp'};
 
   *_bigint_to_int = \&Math::Prime::Util::_bigint_to_int;
+  *tobigint = \&Math::Prime::Util::_to_bigint;
+  *maybetobigint = \&Math::Prime::Util::_to_bigint_if_needed;
 }
 
 ################################################################################
@@ -45,19 +54,20 @@ sub _make_big_gcds {
     $_big_gcd_use = 0;
     return;
   }
-  if (Math::BigInt->config()->{lib} !~ /^Math::BigInt::(GMP|Pari)/) {
+  my $biclass = prime_get_config()->{'bigintclass'};
+  if (defined $biclass && $biclass =~ /^Math::GMP/) {
+    $_big_gcd_use = 1;
+  } elsif (Math::BigInt->config()->{lib} !~ /^Math::BigInt::(GMP|Pari)/) {
     $_big_gcd_use = 0;
     return;
   }
   $_big_gcd_use = 1;
-  my $p0 = primorial(Math::BigInt->new( 520));
-  my $p1 = primorial(Math::BigInt->new(2052));
-  my $p2 = primorial(Math::BigInt->new(6028));
-  my $p3 = primorial(Math::BigInt->new($_big_gcd_top));
-  $_big_gcd[0] = $p0->bdiv(223092870)->bfloor->as_int;
-  $_big_gcd[1] = $p1->bdiv($p0)->bfloor->as_int;
-  $_big_gcd[2] = $p2->bdiv($p1)->bfloor->as_int;
-  $_big_gcd[3] = $p3->bdiv($p2)->bfloor->as_int;
+  my($p0,$p1,$p2,$p3) = map { primorial($_) }
+                        (520,2052,6028,$_big_gcd_top);
+  $_big_gcd[0] = divint($p0,223092870);
+  $_big_gcd[1] = divint($p1,$p0);
+  $_big_gcd[2] = divint($p2,$p1);
+  $_big_gcd[3] = divint($p3,$p2);
 }
 
 ################################################################################
@@ -171,8 +181,7 @@ my $_random_prime = sub {
     }
 
     $low-- if $low == 2;  # Low of 2 becomes 1 for our program.
-    # Math::BigInt::GMP's RT 71548 will wreak havoc if we don't do this.
-    $low = Math::BigInt->new("$low") if ref($high) eq 'Math::BigInt';
+    $low = tobigint($low) if ref($high);
     confess "Invalid _random_prime parameters: $low, $high" if ($low % 2) == 0 || ($high % 2) == 0;
 
     # We're going to look at the odd numbers only.
@@ -256,19 +265,11 @@ my $_random_prime = sub {
 
     my($binsize, $nparts);
     my $rand_part_size = 1 << (MPU_64BIT ? 32 : 31);
-    if (ref($oddrange) eq 'Math::BigInt') {
-      # Go to some trouble here because some systems are wonky, such as
-      # giving us +a/+b = -r.  Also note the quotes for the bigint argument.
-      # Without that, Math::BigInt::GMP can return garbage.
-      my($nbins, $rem);
-      ($nbins, $rem) = $oddrange->copy->bdiv( "$rand_part_size" );
-      $nbins++ if $rem > 0;
-      $nbins = $nbins->as_int();
-      ($binsize,$rem) = $oddrange->copy->bdiv($nbins);
-      $binsize++ if $rem > 0;
-      $binsize = $binsize->as_int();
-      $nparts  = $oddrange->copy->bdiv($binsize)->as_int();
-      $low = $high->copy->bzero->badd($low) if ref($low) ne 'Math::BigInt';
+    if (ref($oddrange)) {
+      my $nbins = cdivint($oddrange, $rand_part_size);
+      $binsize = cdivint($oddrange, $nbins);
+      $nparts = divint($oddrange, $binsize);
+      $low = tobigint($low) unless ref($low);
     } else {
       my $nbins = int($oddrange / $rand_part_size);
       $nbins++ if $nbins * $rand_part_size != $oddrange;
@@ -280,10 +281,10 @@ my $_random_prime = sub {
 
     my $rpart = urandomm($nparts+1);
 
-    my $primelow = $low + 2 * $binsize * $rpart;
+    my $primelow = addint($low,vecprod(2,$binsize,$rpart));
     my $partsize = ($rpart < $nparts) ? $binsize
                                       : $oddrange - ($nparts * $binsize);
-    $partsize = _bigint_to_int($partsize) if ref($partsize) eq 'Math::BigInt';
+    $partsize = _bigint_to_int($partsize) if ref($partsize);
     #warn "range $oddrange  = $nparts * $binsize + ", $oddrange - ($nparts * $binsize), "\n";
     #warn "  chose part $rpart size $partsize\n";
     #warn "  primelow is $low + 2 * $binsize * $rpart = $primelow\n";
@@ -293,7 +294,7 @@ my $_random_prime = sub {
     my $loop_limit = 2000 * 1000;  # To protect against broken rand
 
     # Simply things for non-bigints.
-    if (ref($low) ne 'Math::BigInt') {
+    if (!ref($low)) {
       while ($loop_limit-- > 0) {
         my $rand = urandomm($partsize);
         $prime = $primelow + $rand + $rand;
@@ -314,8 +315,7 @@ my $_random_prime = sub {
     # By checking a wheel 30 mod, we can skip anything that would be a multiple
     # of 2, 3, or 5, without even having to create the bigint prime.
     my @w30 = (1,0,5,4,3,2,1,0,3,2,1,0,1,0,3,2,1,0,1,0,3,2,1,0,5,4,3,2,1,0);
-    my $primelow30 = $primelow % 30;
-    $primelow30 = _bigint_to_int($primelow30) if ref($primelow30) eq 'Math::BigInt';
+    my $primelow30 = modint($primelow, 30);
 
     # Big GCD's are hugely fast with GMP or Pari, but super slow with Calc.
     _make_big_gcds() if $_big_gcd_use < 0;
@@ -340,12 +340,12 @@ my $_random_prime = sub {
         return $prime;
       }
       # No MPU:GMP, so primality checking is slow.  Skip some composites here.
-      next unless Math::BigInt::bgcd($prime, 7436429) == 1;
+      next unless gcd($prime,7436429) == 1;
       if ($_big_gcd_use && $prime > $_big_gcd_top) {
-        next unless Math::BigInt::bgcd($prime, $_big_gcd[0]) == 1;
-        next unless Math::BigInt::bgcd($prime, $_big_gcd[1]) == 1;
-        next unless Math::BigInt::bgcd($prime, $_big_gcd[2]) == 1;
-        next unless Math::BigInt::bgcd($prime, $_big_gcd[3]) == 1;
+        next unless gcd($prime, $_big_gcd[0]) == 1;
+        next unless gcd($prime, $_big_gcd[1]) == 1;
+        next unless gcd($prime, $_big_gcd[2]) == 1;
+        next unless gcd($prime, $_big_gcd[3]) == 1;
       }
       # It looks promising.  Check it.
       next unless is_prob_prime($prime);
@@ -354,31 +354,28 @@ my $_random_prime = sub {
     croak "Random function broken?";
 };
 
-# Cache of tight bounds for each digit.  Helps performance a lot.
-my @_random_ndigit_ranges = (undef, [2,7], [11,97] );
+# Cache of tight bounds for each bit.  Not used in current code path.
 my @_random_nbit_ranges   = (undef, undef, [2,3],[5,7] );
-my %_random_cache_small;
 
 # For fixed small ranges with XS, e.g. 6-digit, 18-bit
+# mpu 'say join ",",map {($b,$e)=(next_prime(powint(10,$_-1)),prev_prime(powint(10,$_))); $s=prime_count($b); $c=prime_count($b,$e); "[$s,$c]";} 1..8'
+my $_d_digits = [undef,[1,4],[5,21],[26,143],[169,1061],[1230,8363],[9593,68906],[78499,586081],[664580,5096876]];
+# mpu 'say join ",",map {($b,$e)=(next_prime(powint(2,$_-1)),prev_prime(powint(2,$_))); $s=prime_count($b); $c=prime_count($b,$e); "[$s,$c]";} 2..24'
+my $_d_bits = [undef,undef,[2,1],[3,2],[5,2],[7,5],[12,7],[19,13],[32,23],[55,43],[98,75],[173,137],[310,255],[565,464],[1029,872],[1901,1612],[3513,3030],[6543,5709],[12252,10749],[23001,20390],[43391,38635],[82026,73586],[155612,140336],[295948,268216],[564164,513708]];
 sub _random_xscount_prime {
-  my($low,$high) = @_;
-  my($istart, $irange);
-  my $cachearef = $_random_cache_small{$low,$high};
-  if (defined $cachearef) {
-    ($istart, $irange) = @$cachearef;
-  } else {
-    my $beg = ($low <= 2)  ?  2  :  next_prime($low-1);
-    my $end = ($high < ~0)  ?  prev_prime($high + 1)  :  prev_prime($high);
-    ($istart, $irange) = ( prime_count(2, $beg), prime_count($beg, $end) );
-    $_random_cache_small{$low,$high} = [$istart, $irange];
-  }
-  my $rand = urandomm($irange);
-  return nth_prime($istart + $rand);
+  my($n, $data) = @_;
+  my $dv = $data->[$n];
+  croak "bad xscount data: $n" unless defined $dv;
+  return nth_prime($dv->[0] + urandomm($dv->[1]));
 }
+
+my @_digit_loprime = qw/0 2 11 101 1009 10007 100003 1000003 10000019 100000007 1000000007 10000000019 100000000003 1000000000039 10000000000037 100000000000031 1000000000000037 10000000000000061 100000000000000003 1000000000000000003 10000000000000000051/;
+my @_digit_hiprime = qw/0 7 97 997 9973 99991 999983 9999991 99999989 999999937 9999999967 99999999977 999999999989 9999999999971 99999999999973 999999999999989 9999999999999937 99999999999999997 999999999999999989 9999999999999999961 99999999999999999989/;
+my $_max_native_prime = MPU_32BIT ? 4294967291 : 18446744073709551557;
 
 sub random_prime {
   my($low,$high) = @_;
-  return if $high < 2 || $low > $high;
+  return undef if $high < 2 || $low > $high;
 
   if ($high-$low > 1000000000) {
     # Range is large, just make them odd if needed.
@@ -390,55 +387,52 @@ sub random_prime {
     $low = ($low <= 2)  ?  2  :  next_prime($low-1);
     $high = ($high == ~0) ? prev_prime($high) : prev_prime($high + 1);
     return $low if ($low == $high) && is_prob_prime($low);
-    return if $low >= $high;
+    return undef if $low >= $high;
     # At this point low and high are both primes, and low < high.
   }
 
-  # At this point low and high are both primes, and low < high.
+  # At this point low and high are both odds, and low < high.
   return $_random_prime->($low, $high);
 }
 
 sub random_ndigit_prime {
-  my($digits) = @_;
-  croak "random_ndigit_prime, digits must be >= 1" unless $digits >= 1;
+  my($D) = @_;
+  croak "random_ndigit_prime, digits must be >= 1" unless $D >= 1;
 
-  return _random_xscount_prime( int(10 ** ($digits-1)), int(10 ** $digits) )
-    if $digits <= 6 && MPU_USE_XS;
+  return _random_xscount_prime($D,$_d_digits) if $D <= 6 && MPU_USE_XS;
 
-  my $bigdigits = $digits >= MPU_MAXDIGITS;
-  if ($bigdigits && prime_get_config->{'nobigint'}) {
+  $_digit_loprime[$D] = powint(10,$D-1)+1 unless defined $_digit_loprime[$D];
+  $_digit_hiprime[$D] = powint(10,$D)-1 unless defined $_digit_hiprime[$D];
+  my($lo,$hi) = map { $_ >= ~0 && !ref($_) ? addint($_,0) : $_ }
+                ($_digit_loprime[$D], $_digit_hiprime[$D]);
+
+  if ($D >= MPU_MAXDIGITS && prime_get_config->{'nobigint'}) {
     croak "random_ndigit_prime with -nobigint, digits out of range"
-      if $digits > MPU_MAXDIGITS;
-    # Special case for nobigint and threshold digits
-    if (!defined $_random_ndigit_ranges[$digits]) {
-      my $low  = int(10 ** ($digits-1));
-      my $high = ~0;
-      $_random_ndigit_ranges[$digits] = [next_prime($low),prev_prime($high)];
-    }
+      if $D > MPU_MAXDIGITS;
+    $hi = $_max_native_prime;
   }
-
-  if (!defined $_random_ndigit_ranges[$digits]) {
-    if ($bigdigits) {
-      my $low  = Math::BigInt->new('10')->bpow($digits-1);
-      my $high = Math::BigInt->new('10')->bpow($digits);
-      # Just pull the range in to the nearest odd.
-      $_random_ndigit_ranges[$digits] = [$low+1, $high-1];
-    } else {
-      my $low  = int(10 ** ($digits-1));
-      my $high = int(10 ** $digits);
-      # Note: Perl 5.6.2 cannot represent 10**15 as an integer, so things
-      # will crash all over the place if you try.  We can stringify it, but
-      # will just fail tests later.
-      $_random_ndigit_ranges[$digits] = [next_prime($low),prev_prime($high)];
-    }
-  }
-  my ($low, $high) = @{$_random_ndigit_ranges[$digits]};
-  return $_random_prime->($low, $high);
+  return $_random_prime->($lo, $hi);
 }
 
-my @_random_nbit_m;
-my @_random_nbit_lambda;
-my @_random_nbit_arange;
+sub _set_premod {
+  my($arr, $b, $bits, @plist) = @_;
+  my $mod = vecprod(@plist);
+  croak "Bad mod $mod [@plist]" unless $mod <= ~0 && $mod*$plist[-1] < ~0;
+  my($bpremod,$twopremod) = (modint($b,$mod), powmod(2,$bits,$mod));
+  for my $p (@plist) {
+    # Find the value X where $twopremod * X + $bpremod % $p == 0
+    $arr->[$p] = (invmod($twopremod,$p) * ($p-$bpremod)) % $p;
+  }
+}
+sub _get_premod {
+  my($b, $bits, @plist) = @_;
+  my @premod;
+  my($fn,$fp,$bn) = MPU_32BIT ? (8,23,3) : (14,47,5);
+  # Do one initial mod with first $fn primes, then batches of $bn primes.
+  _set_premod(\@premod, $b, $bits, splice(@plist,0,$fn)) if @plist >= $fn && $plist[$fn-1] <= $fp;
+  _set_premod(\@premod, $b, $bits, splice(@plist,0,$bn)) while @plist;
+  @premod;
+}
 
 sub random_nbit_prime {
   my($bits) = @_;
@@ -446,13 +440,13 @@ sub random_nbit_prime {
   $bits = int("$bits");
 
   # Very small size, use the nth-prime method
-  if ($bits <= 20 && MPU_USE_XS) {
+  if ($bits <= 19 && MPU_USE_XS) {
     if ($bits <= 4) {
       return (2,3)[urandomb(1)] if $bits == 2;
       return (5,7)[urandomb(1)] if $bits == 3;
       return (11,13)[urandomb(1)] if $bits == 4;
     }
-    return _random_xscount_prime( 1 << ($bits-1), 1 << $bits );
+    return _random_xscount_prime($bits,$_d_bits);
   }
 
   croak "Mid-size random primes not supported on broken old Perl"
@@ -475,49 +469,43 @@ sub random_nbit_prime {
   # with the native int trial division.  If the irandf function was very
   # slow, then A2 would look more promising.
   #
-  if (1 && $bits > 64) {
+  if (1 && $bits > MPU_MAXBITS) {
     my $l = (MPU_64BIT && $bits > 79)  ?  63  :  31;
     $l = 49 if $l == 63 && OLD_PERL_VERSION;  # Fix for broken Perl 5.6
     $l = $bits-2 if $bits-2 < $l;
+    my $lbits = $bits - $l - 1;
 
     my $brand = urandomb($bits-$l-2);
-    $brand = Math::BigInt->new("$brand") unless ref($brand) eq 'Math::BigInt';
-    my $b = $brand->blsft(1)->binc();
+    my $b = add1int(lshiftint($brand));
 
     # Precalculate some modulii so we can do trial division on native int
-    # 9699690 = 2*3*5*7*11*13*17*19, so later operations can be native ints
-    my @premod;
-    my $bpremod = _bigint_to_int($b->copy->bmod(9699690));
-    my $twopremod = _bigint_to_int(Math::BigInt->new(2)->bmodpow($bits-$l-1, 9699690));
-    foreach my $zi (0 .. 19-1) {
-      foreach my $pm (3, 5, 7, 11, 13, 17, 19) {
-        next if $zi >= $pm || defined $premod[$pm];
-        $premod[$pm] = $zi if ( ($twopremod*$zi+$bpremod) % $pm) == 0;
-      }
-    }
+    my @PM = _get_premod($b, $lbits, 3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89);
     _make_big_gcds() if $_big_gcd_use < 0;
     if (!MPU_USE_GMP) { require Math::Prime::Util::PP; }
 
     my $loop_limit = 1_000_000;
     while ($loop_limit-- > 0) {
-      my $a = (1 << $l) + urandomb($l);
-      # $a % s == $premod[s]  =>  $p % s == 0  =>  p will be composite
-      next if $a %  3 == $premod[ 3] || $a %  5 == $premod[ 5]
-           || $a %  7 == $premod[ 7] || $a % 11 == $premod[11]
-           || $a % 13 == $premod[13] || $a % 17 == $premod[17]
-           || $a % 19 == $premod[19];
-      my $p = Math::BigInt->new("$a")->blsft($bits-$l-1)->badd($b);
+      my $a = addint((1 << $l),urandomb($l));
+      # $a % s == $PM[s]  =>  $p % s == 0  =>  p will be composite
+      next if $a %  3 == $PM[ 3] || $a %  5 == $PM[ 5] || $a %  7 == $PM[ 7]
+           || $a % 11 == $PM[11] || $a % 13 == $PM[13] || $a % 17 == $PM[17]
+           || $a % 19 == $PM[19] || $a % 23 == $PM[23] || $a % 29 == $PM[29]
+           || $a % 31 == $PM[31] || $a % 37 == $PM[37] || $a % 41 == $PM[41]
+           || $a % 43 == $PM[43] || $a % 47 == $PM[47] || $a % 53 == $PM[53]
+           || $a % 59 == $PM[59] || $a % 61 == $PM[61] || $a % 67 == $PM[67]
+           || $a % 71 == $PM[71] || $a % 73 == $PM[73] || $a % 79 == $PM[79]
+           || $a % 83 == $PM[83] || $a % 89 == $PM[89];
+      my $p = addint(lshiftint($a,$lbits), $b);
       #die " $a $b $p" if $a % 11 == $premod[11] && $p % 11 != 0;
       #die "!$a $b $p" if $a % 11 != $premod[11] && $p % 11 == 0;
       if (MPU_USE_GMP) {
         next unless Math::Prime::Util::GMP::is_prime($p);
       } else {
-        next unless Math::BigInt::bgcd($p, 1348781387) == 1; # 23-43
         if ($_big_gcd_use && $p > $_big_gcd_top) {
-          next unless Math::BigInt::bgcd($p, $_big_gcd[0]) == 1;
-          next unless Math::BigInt::bgcd($p, $_big_gcd[1]) == 1;
-          next unless Math::BigInt::bgcd($p, $_big_gcd[2]) == 1;
-          next unless Math::BigInt::bgcd($p, $_big_gcd[3]) == 1;
+          next unless gcd($p, $_big_gcd[0]) == 1;
+          next unless gcd($p, $_big_gcd[1]) == 1;
+          next unless gcd($p, $_big_gcd[2]) == 1;
+          next unless gcd($p, $_big_gcd[3]) == 1;
         }
         # We know we don't have GMP and are > 2^64, so go directly to this.
         next unless Math::Prime::Util::PP::is_bpsw_prime($p);
@@ -534,9 +522,9 @@ sub random_nbit_prime {
 
     my $loop_limit = 2_000_000;
     if ($bits > MPU_MAXBITS) {
-      my $p = Math::BigInt->bone->blsft($bits-1)->binc();
+      my $p = add1int(lshiftint(1,$bits-1));
       while ($loop_limit-- > 0) {
-        my $n = Math::BigInt->new(''.urandomb($bits-2))->blsft(1)->badd($p);
+        my $n = addint(lshiftint(urandomb($bits-2)), $p);
         return $n if is_prob_prime($n);
       }
     } else {
@@ -554,8 +542,8 @@ sub random_nbit_prime {
     # quite a bit slower than the F&T A1 method above.
     if (!defined $_random_nbit_ranges[$bits]) {
       if ($bits > MPU_MAXBITS) {
-        my $low  = Math::BigInt->new('2')->bpow($bits-1);
-        my $high = Math::BigInt->new('2')->bpow($bits);
+        my $low  = powint(2,$bits-1);
+        my $high = powint(2,$bits);
         # Don't pull the range in to primes, just odds
         $_random_nbit_ranges[$bits] = [$low+1, $high-1];
       } else {
@@ -640,25 +628,22 @@ sub random_maurer_prime_with_cert {
   # We can use +1 because we're using BLS75 theorem 3 later.
   my $smallk = int(($r * $k)->bfloor->bstr) + 1;
   my ($q, $qcert) = random_maurer_prime_with_cert($smallk);
-  $q = Math::BigInt->new("$q") unless ref($q) eq 'Math::BigInt';
-  my $I = Math::BigInt->new(2)->bpow($k-2)->bdiv($q)->bfloor->as_int();
+  my $I = divint(powint(2,$k-2),$q);
   print "r = $r  k = $k  q = $q  I = $I\n" if $verbose && $verbose != 3;
-  $qcert = ($q < Math::BigInt->new("18446744073709551615"))
-           ? "" : _strip_proof_header($qcert);
+  $qcert = cmpint($q,"18446744073709551615") <= 0
+         ?  ""  :  _strip_proof_header($qcert);
 
   # Big GCD's are hugely fast with GMP or Pari, but super slow with Calc.
   _make_big_gcds() if $_big_gcd_use < 0;
-  my $ONE = Math::BigInt->bone;
-  my $TWO = $ONE->copy->binc;
 
   my $loop_limit = 1_000_000 + $k * 1_000;
   while ($loop_limit-- > 0) {
     # R is a random number between $I+1 and 2*$I
     #my $R = $I + 1 + urandomm( $I );
-    my $R = $I->copy->binc->badd( urandomm($I) );
+    my $R = addint($I, add1int(urandomm($I)));
     #my $n = 2 * $R * $q + 1;
-    my $nm1 = $TWO->copy->bmul($R)->bmul($q);
-    my $n = $nm1->copy->binc;
+    my $nm1 = vecprod(2,$R,$q);
+    my $n = add1int($nm1);
     # We constructed a promising looking $n.  Now test it.
     print "." if $verbose > 2;
     if (MPU_USE_GMP) {
@@ -666,12 +651,12 @@ sub random_maurer_prime_with_cert {
       next unless Math::Prime::Util::GMP::is_prob_prime($n);
     } else {
       # No GMP, so first do trial divisions, then a SPSP test.
-      next unless Math::BigInt::bgcd($n, 111546435)->is_one;
+      next unless gcd($n, 111546435) == 1;
       if ($_big_gcd_use && $n > $_big_gcd_top) {
-        next unless Math::BigInt::bgcd($n, $_big_gcd[0])->is_one;
-        next unless Math::BigInt::bgcd($n, $_big_gcd[1])->is_one;
-        next unless Math::BigInt::bgcd($n, $_big_gcd[2])->is_one;
-        next unless Math::BigInt::bgcd($n, $_big_gcd[3])->is_one;
+        next unless gcd($n, $_big_gcd[0]) == 1;
+        next unless gcd($n, $_big_gcd[1]) == 1;
+        next unless gcd($n, $_big_gcd[2]) == 1;
+        next unless gcd($n, $_big_gcd[3]) == 1;
       }
       print "+" if $verbose > 2;
       next unless is_strong_pseudoprime($n, 3);
@@ -692,18 +677,17 @@ sub random_maurer_prime_with_cert {
     # BLS75 theorem 4 (Pocklington) used by Maurer's paper.
 
     # Check conditions -- these should be redundant.
-    my $m = $TWO * $R;
-    if (! ($q->is_odd && $q > 2 && $m > 0 &&
-           $m * $q + $ONE == $n && $TWO*$q+$ONE > $n->copy->bsqrt()) ) {
+    my $m = mulint(2,$R);
+    if (! (is_odd($q) && $q > 2 && $m > 0 &&
+           mulint($m,$q) + 1 == $n && mulint(2,$q)+1 > sqrtint($n)) ) {
       carp "Maurer prime failed BLS75 theorem 3 conditions.  Retry.";
       next;
     }
     # Find a suitable a.  Move on if one isn't found quickly.
-    foreach my $trya (2, 3, 5, 7, 11, 13) {
-      my $a = Math::BigInt->new($trya);
+    foreach my $a (2, 3, 5, 7, 11, 13) {
       # m/2 = R    (n-1)/2 = (2*R*q)/2 = R*q
-      next unless $a->copy->bmodpow($R, $n) != $nm1;
-      next unless $a->copy->bmodpow($R*$q, $n) == $nm1;
+      next unless powmod($a, $R, $n) != $nm1;
+      next unless powmod($a, mulint($R,$q), $n) == $nm1;
       print "($k)" if $verbose > 2;
       croak "Maurer prime $n=2*$R*$q+1 failed BPSW" unless is_prob_prime($n);
       my $cert = "[MPU - Primality Certificate]\nVersion 1.0\n\n" .
@@ -756,7 +740,7 @@ sub _ST_Random_prime {  # From FIPS 186-4
       or do { croak "Must have Digest::SHA 4.00 or later"; };
   }
 
-  my $k2 = Math::BigInt->new(2)->bpow($k-1);
+  my $k2 = tobigint(powint(2,$k-1));    # $k2 is a bigint
 
   if ($k < 33) {
     my $seed = $input_seed;
@@ -781,22 +765,26 @@ sub _ST_Random_prime {  # From FIPS 186-4
   my($status,$c0,$seed,$prime_gen_counter,$cert)
      = _ST_Random_prime( (($k+1)>>1)+1, $input_seed);
   return (0,0,0,0) unless $status;
-  $cert = ($c0 < Math::BigInt->new("18446744073709551615"))
-          ? "" : _strip_proof_header($cert);
+  $cert = cmpint($c0,"18446744073709551615") <= 0
+         ?  ""  :  _strip_proof_header($cert);
   my $iterations = int(($k + 255) / 256) - 1;  # SHA256 generates 256 bits
   my $old_counter = $prime_gen_counter;
+  my $c02 = lshiftint($c0);  # $c02 = 2*$c0
   my $xstr = '';
   for my $i (0 .. $iterations) {
     $xstr = Digest::SHA::sha256_hex($seed) . $xstr;
     $seed = _seed_plus_one($seed);
   }
-  my $x = Math::BigInt->from_hex('0x'.$xstr);
+  my $x = fromdigits($xstr,16);
   $x = $k2 + ($x % $k2);
-  my $t = ($x + 2*$c0 - 1) / (2*$c0);
+  my $t = cdivint($x, $c02);
   _make_big_gcds() if $_big_gcd_use < 0;
   while (1) {
-    if (2*$t*$c0 + 1 > 2*$k2) { $t = ($k2 + 2*$c0 - 1) / (2*$c0); }
-    my $c = 2*$t*$c0 + 1;
+    my $c = add1int(mulint($t,$c02));
+    if ($c > 2*$k2) {
+      $t = cdivint($k2, $c02);
+      $c = add1int(mulint($t,$c02));
+    }
     $prime_gen_counter++;
 
     # Don't do the Pocklington check unless the candidate looks prime
@@ -806,12 +794,12 @@ sub _ST_Random_prime {  # From FIPS 186-4
       $looks_prime = Math::Prime::Util::GMP::is_prob_prime($c);
     } else {
       # No GMP, so first do trial divisions, then a SPSP test.
-      $looks_prime = Math::BigInt::bgcd($c, 111546435)->is_one;
+      $looks_prime = gcd($c, 111546435) == 1;
       if ($looks_prime && $_big_gcd_use && $c > $_big_gcd_top) {
-        $looks_prime = Math::BigInt::bgcd($c, $_big_gcd[0])->is_one &&
-                       Math::BigInt::bgcd($c, $_big_gcd[1])->is_one &&
-                       Math::BigInt::bgcd($c, $_big_gcd[2])->is_one &&
-                       Math::BigInt::bgcd($c, $_big_gcd[3])->is_one;
+        $looks_prime = gcd($c, $_big_gcd[0]) == 1 &&
+                       gcd($c, $_big_gcd[1]) == 1 &&
+                       gcd($c, $_big_gcd[2]) == 1 &&
+                       gcd($c, $_big_gcd[3]) == 1;
       }
       $looks_prime = 0 if $looks_prime && !is_strong_pseudoprime($c, 3);
     }
@@ -823,10 +811,10 @@ sub _ST_Random_prime {  # From FIPS 186-4
         $astr = Digest::SHA::sha256_hex($seed) . $astr;
         $seed = _seed_plus_one($seed);
       }
-      my $a = Math::BigInt->from_hex('0x'.$astr);
-      $a = ($a % ($c-3)) + 2;
-      my $z = $a->copy->bmodpow(2*$t,$c);
-      if (Math::BigInt::bgcd($z-1,$c)->is_one && $z->copy->bmodpow($c0,$c)->is_one) {
+      my $a = fromdigits($astr,16);
+      $a = addint(modint($a,$c-3),2);
+      my $z = powmod($a, lshiftint($t), $c);
+      if (gcd($z-1,$c) == 1 && powmod($z, $c0, $c) == 1) {
         croak "Shawe-Taylor random prime failure at ($k): $c not prime"
           unless is_prob_prime($c);
         $cert = "[MPU - Primality Certificate]\nVersion 1.0\n\n" .
@@ -846,6 +834,108 @@ sub _ST_Random_prime {  # From FIPS 186-4
   }
 }
 
+sub random_safe_prime {
+  my $bits = int("$_[0]");
+  croak "random_safe_prime, bits must be >= 3" unless $bits >= 3;
+  return (5,7)[urandomb(1)] if $bits == 3;
+  return 11 if $bits == 4;
+  return 23 if $bits == 5;
+  return (47,59)[urandomb(1)] if $bits == 6;
+  return (83,107)[urandomb(1)] if $bits == 7;
+
+  # Without GMP (e.g. Calc), this can be significantly faster.
+  # With GMP, they are about the same.
+  return _random_safe_prime_large($bits) if $bits > 35;
+
+  my($p,$q);
+  while (1) {
+    $q = Math::Prime::Util::random_nbit_prime($bits-1);
+    my $qm = modint($q, 1155);  # a nice native int
+    next if ($qm % 3) != 2
+         || ($qm % 5) == 2 || ($qm % 7) == 3 || ($qm % 11) == 5;
+    $p = mulint(2, $q) + 1;
+    # This is sufficient, but we'll do the full test including pre-tests.
+    #last if is_pseudoprime($p,2);  # p is prime if q is prime
+    last if is_prob_prime($p);
+  }
+  return $p;
+}
+
+sub _random_safe_prime_large {
+  my $bits = shift;
+  croak "Not enough bits for large random_safe_prime" if $bits <= 35;
+
+  # Set first and last two bits
+  my $base = addint(lshiftint(1, $bits-1),3);
+  # Fill in lower portion with random bits, leaving 32 upper
+  $base = addint($base, lshiftint(urandomb($bits - 35), 2));
+
+  while (1) {
+    my($p,$q,$qmod,$pmod);
+    # 1. generate random nbit p
+    $p = lshiftint(urandomb(32), $bits-33);
+    $p = addint($base, $p);
+
+    # 2. p = 2q+1  =>  q = p>>1
+    $q = rshiftint($p);
+
+    # 3. Force q mod 6 = 5
+    $qmod = modint(add1int($q),6);
+    if ($qmod > 0) {
+      $q = subint($q,$qmod);
+      $q = addint($q,12) if 1+logint($q,2) != $bits-1;
+      $p = add1int(lshiftint($q));
+    }
+
+    # 4. Fast compositeness pre-tests for q and p
+    $pmod = modint($p, 5*7*11*13*17*19*23*37);
+    next if (($pmod %  5) >> 1) == 0 ||
+            (($pmod %  7) >> 1) == 0 ||
+            (($pmod % 11) >> 1) == 0 ||
+            (($pmod % 13) >> 1) == 0 ||
+            (($pmod % 17) >> 1) == 0 ||
+            (($pmod % 19) >> 1) == 0 ||
+            (($pmod % 23) >> 1) == 0 ||
+            (($pmod % 37) >> 1) == 0;
+    $pmod = modint($p, 29*31*41*43*47*53);
+    next if (($pmod % 29) >> 1) == 0 ||
+            (($pmod % 31) >> 1) == 0 ||
+            (($pmod % 41) >> 1) == 0 ||
+            (($pmod % 43) >> 1) == 0 ||
+            (($pmod % 47) >> 1) == 0 ||
+            (($pmod % 53) >> 1) == 0;
+    $pmod = modint($p, 59*61*67*71*73);
+    next if (($pmod % 59) >> 1) == 0 ||
+            (($pmod % 61) >> 1) == 0 ||
+            (($pmod % 67) >> 1) == 0 ||
+            (($pmod % 71) >> 1) == 0 ||
+            (($pmod % 73) >> 1) == 0;
+
+    # 6. Primality testing on p and q
+
+    # Use Pocklington's theorem for p, BPSW for q.
+    # If we find an 'a' such that
+    #   1. a^(p-1) = 1 mod p   (This is a Fermat test base 'a')
+    #   2. gcd(a^(p-1)/q - 1, p) = 1   =>  gcd(a^2-1, p) = 1
+    # then p is prime if q is prime.
+    # Choose a=2.
+    # Then p is prime if:
+    #   - q is prime
+    #   - p passes a base 2 Fermat test
+    #   - p is not divisible by 3
+
+    next unless is_pseudoprime($p, 2);
+
+    # Now strong testing on q.  Split in two.
+    next unless is_strong_pseudoprime($q, 2);
+    next unless is_extra_strong_lucas_pseudoprime($q);
+    croak "random safe prime internal failure" unless $p == 2*$q+1;
+
+    # q passes BPSW, p passes Fermat base 2.  p is prime if q is prime.
+    return $p;
+  }
+}
+
 
 # Gordon's algorithm for generating a strong prime.
 sub random_strong_prime {
@@ -857,29 +947,26 @@ sub random_strong_prime {
     if OLD_PERL_VERSION && MPU_64BIT && $t < 173;
 
   my $l   = (($t+1) >> 1) - 2;
-  my $lp  = int($t/2) - 20;
+  my $lp  = ($t >> 1) - 20;
   my $lpp = $l - 20;
   while (1) {
     my $qp  = random_nbit_prime($lp);
     my $qpp = random_nbit_prime($lpp);
-    $qp  = Math::BigInt->new("$qp")  unless ref($qp)  eq 'Math::BigInt';
-    $qpp = Math::BigInt->new("$qpp") unless ref($qpp) eq 'Math::BigInt';
-    my ($il, $rem) = Math::BigInt->new(2)->bpow($l-1)->bdec()->bdiv(2*$qpp);
-    $il++ if $rem > 0;
-    $il = $il->as_int();
-    my $iu = Math::BigInt->new(2)->bpow($l)->bsub(2)->bdiv(2*$qpp)->as_int();
-    my $istart = $il + urandomm($iu - $il + 1);
-    for (my $i = $istart; $i <= $iu; $i++) {  # Search for q
-      my $q = 2 * $i * $qpp + 1;
+    my $qp2 = mulint(2,$qp);
+    my $qpp2 = mulint(2,$qpp);
+    my $il = cdivint(sub1int(lshiftint(1,$l-1)),$qpp2);
+    my $iu = divint(subint(lshiftint(2,$l),2),$qpp2);
+    my $istart = addint($il, urandomm($iu - $il + 1));
+    for (my $i = $istart; $i <= $iu; $i=add1int($i)) {  # Search for q
+      my $q = add1int(mulint($i,$qpp2));
       next unless is_prob_prime($q);
-      my $pp = $qp->copy->bmodpow($q-2, $q)->bmul(2)->bmul($qp)->bdec();
-      my ($jl, $rem) = Math::BigInt->new(2)->bpow($t-1)->bsub($pp)->bdiv(2*$q*$qp);
-      $jl++ if $rem > 0;
-      $jl = $jl->as_int();
-      my $ju = Math::BigInt->new(2)->bpow($t)->bdec()->bsub($pp)->bdiv(2*$q*$qp)->as_int();
-      my $jstart = $jl + urandomm($ju - $jl + 1);
-      for (my $j = $jstart; $j <= $ju; $j++) {  # Search for p
-        my $p = $pp + 2 * $j * $q * $qp;
+      my $qqp2 = mulint($q,$qp2);
+      my $pp = sub1int(mulint($qp2, powmod($qp, $q-2, $q)));
+      my $jl = cdivint(subint(lshiftint(1,$t-1),$pp), $qqp2);
+      my $ju = divint(subint(lshiftint(1,$t),$pp+1), $qqp2);
+      my $jstart = addint($jl, urandomm($ju - $jl + 1));
+      for (my $j = $jstart; $j <= $ju; $j=add1int($j)) {  # Search for p
+        my $p = addint($pp, mulint($j,$qqp2));
         return $p if is_prob_prime($p);
       }
     }
@@ -924,7 +1011,7 @@ Math::Prime::Util::RandomPrimes - Generate random primes
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 
 =head1 SYNOPSIS
@@ -972,6 +1059,10 @@ Construct a random provable prime of C<n> bits using Shawe-Taylor's
 algorithm.  C<n> must be at least 2.  Returns a list of two items: the
 prime and the certificate.
 
+=head2 random_safe_prime
+
+Construct a random safe prime of C<n> bits.  C<n> must be at least 3.
+
 =head2 random_strong_prime
 
 Construct a random strong prime of C<n> bits.  C<n> must be at least 128.
@@ -998,7 +1089,7 @@ Dana Jacobsen E<lt>dana@acm.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2012-2013 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
+Copyright 2012-2026 by Dana Jacobsen E<lt>dana@acm.orgE<gt>
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -1,3 +1,4 @@
+# Remote-side compatibility tests with older Perls (5.10+) via perlbrew.
 use v5.36;
 use Test::More;
 use File::Temp qw(tempfile);
@@ -63,6 +64,16 @@ sub run_remperl($stdin_data, @args) {
 
 for my $target (@targets) {
     my ($label, $interp) = @$target;
+
+    # Devel::Cover is not available for perls older than 5.20.  Strip
+    # -MDevel::Cover=... from PERL5OPT so the remote interpreter doesn't try
+    # to load it and die from module loading failure.
+    my ($minor) = ($label =~ /perl-\d+\.(\d+)/);
+    local $ENV{PERL5OPT} = do {
+        my $opt = $ENV{PERL5OPT} // '';
+        $opt =~ s/-MDevel::Cover\S*//g if defined $minor && $minor < 20;
+        $opt;
+    };
 
     # stdout
     {

@@ -57,17 +57,19 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     # First get a clean check without the changed headers
     my ($site,$estatus) = ($server->url,200);
     my $res = $mech->get($site);
-    isa_ok $res, 'HTTP::Response', "Response";
+    isa_ok $res, 'HTTP::Response', 'Response';
 
-    is $mech->uri, $site, "Navigated to $site";
+    is $mech->uri, $site, 'Navigated to ' . $site;
 
-    my $ua = "WWW::Mechanize::Chrome $0 $$";
+    my $ua = 'WWW::Mechanize::Chrome ' . $0 . ' ' . $$;
     my $version = $mech->chrome_version;
     my $ref;
-    if( $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ("$1.$2" eq "64.3275")) {
+    if( $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ("$1.$2" eq '64.3275')) {
         $ref = ''; # Chrome v64 crashes on a referer
     } elsif( $version =~ /\b(\d+)\.\d+\.(\d+)\.(\d+)\b/ and ("$1.$2" >= 63.84)) {
-        $ref = 'https://example.com/';
+        # Use the same protocol as the test server to avoid security blocks
+        $ref = $site;
+        $ref =~ s!/$!/referer-test!;
     } else {
         $ref = 'http://example.com/'; # earlier versions crash on https referrer ...
     };
@@ -83,6 +85,9 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     );
 
     $mech->agent( $ua );
+
+    note "Using Referer: $ref" if $ref;
+    note "Using Host: $host[1]" if @host;
 
     $res = $mech->get($site);
     isa_ok $res, 'HTTP::Response', "Response";

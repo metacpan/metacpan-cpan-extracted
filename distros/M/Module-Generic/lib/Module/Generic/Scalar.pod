@@ -293,7 +293,7 @@ While this design is fully safe in single-threaded use, note the following if yo
 
 =item *
 
-Callbacks may be triggered by assignments to the scalar value — e.g., C<$$scalar = "new value">.
+Callbacks may be triggered by assignments to the scalar value - e.g., C<$$scalar = "new value">.
 
 =item *
 

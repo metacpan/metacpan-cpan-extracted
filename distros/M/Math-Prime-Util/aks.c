@@ -88,6 +88,7 @@ static double log_gamma(double x)
 #if IMPL_BERN41
 static double log_binomial(UV n, UV k)
 {
+  if (n < k) return 0;
   return log_gamma(n+1) - log_gamma(k+1) - log_gamma(n-k+1);
 }
 static double log_bern41_binomial(UV r, UV d, UV i, UV j, UV s)
@@ -280,7 +281,7 @@ static int test_anr(UV a, UV n, UV r)
   int retval = 1;
 
   Newz(0, pn, r, UV);
-  a %= r;
+  if (a >= n) a %= n;
   pn[0] = a;
   pn[1] = 1;
   res = poly_mod_pow(pn, n, r, n);
@@ -302,7 +303,7 @@ static int test_anr(UV a, UV n, UV r)
  *  compete with the earlier primality proving methods like ECPP and
  *  cyclotomy." - conclusion regarding memory consumption
  */
-int is_aks_prime(UV n)
+bool is_aks_prime(UV n)
 {
   UV r, s, a, starta = 1;
 
@@ -311,7 +312,7 @@ int is_aks_prime(UV n)
   if (n == 2)
     return 1;
 
-  if (is_power(n, 0))
+  if (powerof(n) > 1)
     return 0;
 
   if (n > 11 && ( !(n%2) || !(n%3) || !(n%5) || !(n%7) || !(n%11) )) return 0;

@@ -173,7 +173,7 @@ Mail::Make::Headers::ContentDisposition - Content-Disposition Header Field Objec
     print "$cd";
     # inline; filename*=UTF-8''Yamato%2CInc-Logo.png
 
-    # Pure ASCII filename — plain quoting used instead
+    # Pure ASCII filename - plain quoting used instead
     $cd->filename( 'logo.png' );
     print "$cd";
     # inline; filename="logo.png"

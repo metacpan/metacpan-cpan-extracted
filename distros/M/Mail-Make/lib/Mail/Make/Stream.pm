@@ -89,8 +89,8 @@ sub STORABLE_thaw   { CORE::return( CORE::shift->THAW( @_ ) ); }
     #   - A plain string (file path)        → Module::Generic::File opened via new_file()
     #
     # $op is a closure that:
-    #   Read  mode: $op->( $buf, $len )  — returns bytes read (0 at EOF, undef on error)
-    #   Write mode: $op->( $data )       — returns true on success, undef on error
+    #   Read  mode: $op->( $buf, $len )  - returns bytes read (0 at EOF, undef on error)
+    #   Write mode: $op->( $data )       - returns true on success, undef on error
     sub _get_glob_from_arg
     {
         my $self = shift( @_ );
@@ -298,9 +298,9 @@ Its primary method is L</_get_glob_from_arg>, which normalises any of the follow
 
 =item * A native Perl glob or IO object
 
-=item * A scalar reference — opened via L<Module::Generic::Scalar::IO>
+=item * A scalar reference - opened via L<Module::Generic::Scalar::IO>
 
-=item * A plain string — treated as a file path and opened via C<new_file()>
+=item * A plain string - treated as a file path and opened via C<new_file()>
 
 =back
 
@@ -308,9 +308,9 @@ The returned C<$op> closure abstracts over the underlying handle type:
 
 =over 4
 
-=item * Read mode: C<$op-E<gt>( $buf, $len )> — bytes read (0 at EOF, undef on error)
+=item * Read mode: C<$op-E<gt>( $buf, $len )> - bytes read (0 at EOF, undef on error)
 
-=item * Write mode: C<$op-E<gt>( $data )> — true on success, undef on error
+=item * Write mode: C<$op-E<gt>( $data )> - true on success, undef on error
 
 =back
 

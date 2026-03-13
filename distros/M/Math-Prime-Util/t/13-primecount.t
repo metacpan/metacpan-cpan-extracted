@@ -79,12 +79,15 @@ my %intervals = (
   "3 to 15000"  => 1753,
   "7 to 54321"  => 5522,
 
-  "1e14 +2**16" => 1973,
+  "1e12 +85536" => 3089,
   "127976334671 +468" => 2,
   "127976334672 +467" => 1,
   "127976334671 +467" => 1,
   "127976334672 +466" => 0,
 );
+$intervals{"1e13 +85536"} = 2868 if $isxs || $extra;
+$intervals{"1e14 +2**16"} = 1973 if $isxs || $extra;
+
 delete @intervals{ grep { (parse_range($_))[1] > ~0 } keys %intervals };
 
 my %tpcs = (
@@ -124,7 +127,7 @@ plan tests => 0 + 1
                 + $use64 * 3 * scalar(keys %pivals64)
                 + scalar(keys %intervals)
                 + 1
-                + 5 + 2*$extra # prime count specific methods
+                + 9 + 2*$extra # prime count specific methods
                 + 3 + (($isxs && $use64) ? 1+2*scalar(keys %tpcs) : 0) # twin pc
                 + 2 + (($isxs && $use64) ? 2+1*scalar(keys %spcs) : 0) # semi pc
                 + 2 + (($isxs && $use64) ? 2+1*scalar(keys %rpcs) : 0) # ram pc
@@ -197,14 +200,14 @@ sub parse_range {
 
 # Make sure each specific algorithm isn't broken.
 SKIP: {
-  skip "Not XS -- skipping direct primecount tests", 2 unless $isxs;
+  skip "Not XS -- skipping direct primecount tests", 6 unless $isxs;
   # This has to be above SIEVE_LIMIT in lehmer.c and lmo.c or nothing happens.
-  #is(Math::Prime::Util::_lehmer_pi  (66123456),3903023,"XS Lehmer count");
-  #is(Math::Prime::Util::_meissel_pi (66123456),3903023,"XS Meissel count");
-  #is(Math::Prime::Util::_legendre_pi(66123456),3903023,"XS Legendre count");
-  #is(Math::Prime::Util::_LMOS_pi    (66123456),3903023,"XS LMOS count");
-  is(Math::Prime::Util::_LMO_pi     (66123456), 3903023,"XS LMO count");
-  is(Math::Prime::Util::_segment_pi (66123456), 3903023,"XS segment count");
+  is(Math::Prime::Util::_lehmer_pi  (66123456), 3903023, "XS Lehmer count");
+  is(Math::Prime::Util::_meissel_pi (66123456), 3903023, "XS Meissel count");
+  is(Math::Prime::Util::_legendre_pi(66123456), 3903023, "XS Legendre count");
+  is(Math::Prime::Util::_LMOS_pi    (66123456), 3903023, "XS LMOS count");
+  is(Math::Prime::Util::_LMO_pi     (66123456), 3903023, "XS LMO count");
+  is(Math::Prime::Util::_segment_pi (66123456), 3903023, "XS segment count");
 }
 
 require_ok 'Math::Prime::Util::PP';

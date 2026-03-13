@@ -5,11 +5,11 @@ use Carp qw/carp croak confess/;
 
 BEGIN {
   $Math::Prime::Util::ECAffinePoint::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::ECAffinePoint::VERSION = '0.73';
+  $Math::Prime::Util::ECAffinePoint::VERSION = '0.74';
 }
 
 BEGIN {
-  do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,Pari"); }
+  do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,GMPz,Pari"); }
     unless defined $Math::BigInt::VERSION;
 }
 
@@ -202,7 +202,7 @@ Math::Prime::Util::ECAffinePoint - Elliptic curve operations for affine points
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 
 =head1 SYNOPSIS

@@ -27,12 +27,13 @@ plan tests => scalar @modules;
 foreach my $m (@modules) {
   my $param = {
     also_private => [
-                      qr/^(erat|segment|trial|sieve|segment_twin)_primes$/,
-                      'semi_prime_sieve',
+                      qr/^(erat|segment|trial|sieve)_primes$/,
                     ],
   };
-  $param->{trustme} = [mpu_public_regex(), mpu_factor_regex()]
+  $param->{trustme} = [mpu_public_regex(), mpu_factor_regex(), mpu_PPM_regex()]
     if $m eq 'Math::Prime::Util::PP';
+  $param->{trustme} = [qw/maybetobigint tobigint/]
+    if $m eq 'Math::Prime::Util::RandomPrimes';
   $param->{trustme} = [mpu_public_regex(), mpu_factor_regex(), qw/rand srand/]
     if $m eq 'ntheory';
   pod_coverage_ok( $m, $param );
@@ -54,52 +55,103 @@ sub mpu_public_regex {
       is_frobenius_underwood_pseudoprime is_frobenius_khashin_pseudoprime
       is_perrin_pseudoprime is_catalan_pseudoprime
       is_aks_prime is_bpsw_prime is_ramanujan_prime is_mersenne_prime
-      is_power is_prime_power is_pillai is_semiprime is_square is_polygonal
-      is_square_free is_primitive_root is_carmichael is_quasi_carmichael
-      is_fundamental is_totient
-      sqrtint rootint logint
+      is_delicate_prime is_chen_prime
+      is_odd is_even is_divisible is_congruent
+      is_power is_prime_power is_perfect_power is_square
+      is_square_free is_powerfree
+      is_pillai is_polygonal is_congruent_number is_perfect_number
+      is_semiprime is_almost_prime is_omega_prime
+      is_primitive_root is_carmichael is_quasi_carmichael is_cyclic
+      is_fundamental is_totient is_gaussian_prime is_sum_of_squares
+      is_smooth is_rough is_powerful is_practical is_lucky is_happy
+      sqrtint rootint logint lshiftint rshiftint rashiftint absint negint
+      signint cmpint addint subint add1int sub1int mulint powint
+      divint modint cdivint divrem fdivrem cdivrem tdivrem
       miller_rabin_random
-      lucas_sequence lucasu lucasv
-      primes twin_primes semi_primes ramanujan_primes
-      sieve_prime_cluster sieve_range
-      forprimes forcomposites foroddcomposites forsemiprimes fordivisors
+      lucas_sequence
+      lucasu lucasv lucasuv lucasumod lucasvmod lucasuvmod pisano_period
+      primes twin_primes semi_primes almost_primes omega_primes ramanujan_primes
+      sieve_prime_cluster sieve_range prime_powers lucky_numbers
+      forprimes forcomposites foroddcomposites forsemiprimes foralmostprimes
       forpart forcomp forcomb forperm forderange formultiperm forsetproduct
-      forfactored forsquarefree
+      fordivisors forfactored forsquarefree forsquarefreeint
       lastfor
-      numtoperm permtonum randperm shuffle
+      numtoperm permtonum randperm shuffle vecsample
       prime_iterator prime_iterator_object
-      next_prime  prev_prime
-      prime_count
-      prime_count_lower prime_count_upper prime_count_approx
-      nth_prime nth_prime_lower nth_prime_upper nth_prime_approx inverse_li
+      next_prime prev_prime
+      next_prime_power prev_prime_power
+      next_perfect_power prev_perfect_power
+      next_chen_prime
+      prime_count prime_count_lower prime_count_upper prime_count_approx
+      nth_prime nth_prime_lower nth_prime_upper nth_prime_approx
+      inverse_li inverse_li_nv
       twin_prime_count twin_prime_count_approx
       nth_twin_prime nth_twin_prime_approx
       semiprime_count semiprime_count_approx
       nth_semiprime nth_semiprime_approx
+      almost_prime_count almost_prime_count_approx
+      almost_prime_count_lower almost_prime_count_upper
+      nth_almost_prime nth_almost_prime_approx
+      nth_almost_prime_lower nth_almost_prime_upper
+      omega_prime_count nth_omega_prime
       ramanujan_prime_count ramanujan_prime_count_approx
       ramanujan_prime_count_lower ramanujan_prime_count_upper
       nth_ramanujan_prime nth_ramanujan_prime_approx
       nth_ramanujan_prime_lower nth_ramanujan_prime_upper
+      powerful_count nth_powerful sumpowerful powerful_numbers
+      prime_power_count prime_power_count_approx
+      prime_power_count_lower prime_power_count_upper
+      nth_prime_power nth_prime_power_approx
+      nth_prime_power_lower nth_prime_power_upper
+      perfect_power_count perfect_power_count_approx
+      perfect_power_count_lower perfect_power_count_upper
+      nth_perfect_power nth_perfect_power_approx
+      nth_perfect_power_lower nth_perfect_power_upper
+      nth_powerfree powerfree_count powerfree_sum squarefree_kernel
+      powerfree_part powerfree_part_sum
+      smooth_count rough_count powersum
+      lucky_count lucky_count_approx lucky_count_lower lucky_count_upper
+      nth_lucky nth_lucky_approx nth_lucky_lower nth_lucky_upper
+      minimal_goldbach_pair goldbach_pairs goldbach_pair_count
       sum_primes print_primes
-      random_prime random_ndigit_prime random_nbit_prime random_strong_prime
+      random_prime random_ndigit_prime
+      random_nbit_prime random_safe_prime random_strong_prime
       random_proven_prime random_proven_prime_with_cert
       random_maurer_prime random_maurer_prime_with_cert
       random_shawe_taylor_prime random_shawe_taylor_prime_with_cert
       random_semiprime random_unrestricted_semiprime
       random_factored_integer
-      primorial pn_primorial consecutive_integer_lcm gcdext chinese
+      primorial pn_primorial consecutive_integer_lcm gcdext chinese chinese2
       gcd lcm factor factor_exp divisors valuation hammingweight
+      frobenius_number
       todigits fromdigits todigitstring sumdigits
-      invmod sqrtmod addmod mulmod divmod powmod
-      vecsum vecmin vecmax vecprod vecreduce vecextract
-      vecany vecall vecnotall vecnone vecfirst vecfirstidx
-      moebius mertens euler_phi jordan_totient exp_mangoldt liouville
+      tozeckendorf fromzeckendorf
+      sqrtmod allsqrtmod rootmod allrootmod cornacchia
+      negmod invmod addmod submod mulmod divmod powmod muladdmod mulsubmod
+      vecsum vecmin vecmax vecprod vecreduce vecextract vecequal vecuniq
+      vecany vecall vecnotall vecnone vecfirst vecfirstidx vecmex vecpmex
+      vecsort vecsorti vecfreq vecsingleton vecslide
+      setbinop sumset setunion setintersect setminus setdelta toset
+      setcontains setcontainsany setinsert setremove setinvert
+      is_sidon_set is_sumfree_set
+      set_is_disjoint set_is_equal set_is_proper_intersection
+      set_is_subset set_is_proper_subset set_is_superset set_is_proper_superset
+      moebius mertens liouville sumliouville prime_omega prime_bigomega
+      euler_phi jordan_totient exp_mangoldt sumtotient
       partitions bernfrac bernreal harmfrac harmreal
       chebyshev_theta chebyshev_psi
-      divisor_sum carmichael_lambda kronecker hclassno inverse_totient
+      divisor_sum carmichael_lambda hclassno inverse_totient
+      kronecker is_qr qnr
       ramanujan_tau ramanujan_sum
-      binomial stirling znorder znprimroot znlog legendre_phi
-      factorial factorialmod
+      stirling fubini znorder znprimroot znlog legendre_phi
+      factorial factorialmod subfactorial binomial binomialmod
+      falling_factorial rising_factorial
+      contfrac from_contfrac
+      next_calkin_wilf next_stern_brocot
+      calkin_wilf_n stern_brocot_n
+      nth_calkin_wilf nth_stern_brocot
+      nth_stern_diatomic
+      farey next_farey farey_rank
       ExponentialIntegral LogarithmicIntegral RiemannZeta RiemannR LambertW Pi
       irand irand64 drand urandomb urandomm csrand random_bytes entropy_bytes
   );
@@ -108,7 +160,45 @@ sub mpu_public_regex {
 }
 
 sub mpu_factor_regex {
-  my @funcs = (qw/trial_factor fermat_factor holf_factor lehman_factor squfof_factor prho_factor pbrent_factor pminus1_factor pplus1_factor ecm_factor/);
+  my @funcs = (qw/trial_factor fermat_factor holf_factor lehman_factor squfof_factor prho_factor pbrent_factor pminus1_factor pplus1_factor cheb_factor ecm_factor/);
+  my $pattern = '^(' . join('|', @funcs) . ')$';
+  return qr/$pattern/;
+}
+
+sub mpu_PPM_regex {
+  my @funcs = qw(
+      Maddint Msubint Mmulint Mdivint Mcdivint Mpowint Mabsint Mnegint
+      Madd1int Msub1int
+      Mdivrem Mtdivrem
+      Mmodint Mlogint Mrootint Msqrtint Mcmpint
+      Mlshiftint Mrshiftint
+      Maddmod Msubmod Mmulmod Mrootmod Mdivmod Mpowmod Minvmod
+      Mmuladdmod Mmulsubmod
+      Mbinomial Mchinese Mfactor Mfactor_exp Mtrial_factor Mdivisors
+      Mfactorial Mfordivisors Mforprimes Mgcd Mlcm Mgcdext Mznorder
+      Mfalling_factorial
+      Mkronecker Mmoebius Mtotient Mstirling
+      Mnext_prime Mprev_prime Mprime_count Mnth_prime_upper
+      Mprimorial Mpn_primorial Mprime_omega
+      MLi Mpowersum
+      Murandomb Murandomm Mvaluation
+      Mprimes
+      Mis_power Mis_prime Mis_prime_power Mis_odd Mis_even
+      Mdivisor_sum Mis_congruent Mis_divisible
+      Mis_semiprime Mis_square_free Mhclassno
+      Mvecall Mvecany Mvecmin Mvecmax Mvecnone Mvecprod Mvecsum Mvecslide
+      Msetinsert Msetintersect Msetunion
+      Mtoset Msetcontains
+      Mtodigits Mtodigitstring Mfromdigits
+      Mlucasumod Mvecfirst Mvecsort Mvecsorti
+      Saddint Ssubint Smulint Sdivint Spowint
+      Mtoint
+      reftyped
+      validate_integer     validate_integer_nonneg
+      validate_integer_abs validate_integer_positive
+      tobigint maybetobigint maybetobigintall
+      getconfig
+  );
   my $pattern = '^(' . join('|', @funcs) . ')$';
   return qr/$pattern/;
 }

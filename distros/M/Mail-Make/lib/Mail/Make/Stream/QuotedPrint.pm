@@ -58,7 +58,7 @@ sub decode
                 return( $self->pass_error( $io->error ) );
             $from_fh = $io;
         }
-        # else: native in-memory glob — readline() below works as-is
+        # else: native in-memory glob - readline() below works as-is
     }
 
     my $buff;
@@ -117,7 +117,7 @@ sub encode
                 return( $self->pass_error( $io->error ) );
             $from_fh = $io;
         }
-        # else: native in-memory glob — readline() below works as-is
+        # else: native in-memory glob - readline() below works as-is
     }
     my $eol     = ( exists( $opts->{eol} ) && defined( $opts->{eol} ) ) ? $opts->{eol} : "\015\012";
     my $has_eol = length( $eol );

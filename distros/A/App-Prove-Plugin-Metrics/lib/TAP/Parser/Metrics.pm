@@ -4,7 +4,7 @@ use parent qw/TAP::Parser/;
 use strict;
 use warnings;
 
-our $VERSION='0.0.1';
+our $VERSION='0.0.2';
 
 my $METRICS='__METRICS__'.int(1e6+rand(9e6));
 

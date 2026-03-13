@@ -15,12 +15,13 @@ use Remote::Perl::Protocol   qw(
     MSG_ERROR MSG_BYE
     STREAM_CONTROL STREAM_STDIN STREAM_STDOUT STREAM_STDERR
     TMPFILE_NONE TMPFILE_AUTO TMPFILE_LINUX TMPFILE_PERL TMPFILE_NAMED
+    FLAGS_WARNINGS
     encode_message encode_hello encode_credit decode_return
     encode_run
 );
 use Remote::Perl::Transport;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 # -- Tmpfile strategy mapping --------------------------------------------------
 
@@ -50,7 +51,10 @@ sub new($class, %args) {
         tmpfile   => $args{tmpfile}  // 0,
         data_warn => $args{data_warn} // 0,
         _mod_srv  => ($args{serve}
-                        ? Remote::Perl::ModuleServer->new(inc => $args{inc} // \@INC)
+                        ? Remote::Perl::ModuleServer->new(
+                              inc          => $args{inc} // \@INC,
+                              serve_filter => $args{serve_filter},
+                          )
                         : undef),
         # set by _connect:
         _t      => undef,   # Remote::Perl::Transport
@@ -93,7 +97,7 @@ sub _connect($self) {
 
     unless ($self->{_ready}) {
         my $err = '';
-        while ($t->stderr_ready(0.5)) {
+        while ($t->stderr_ready(0.25)) {
             my $chunk = $t->read_stderr(4096);
             last unless defined $chunk && length $chunk;
             $err .= $chunk;
@@ -249,8 +253,9 @@ sub run_code($self, $source, %opts) {
     $self->{_stdin_credits}  = 0;
     $self->{_stdin_eof_sent} = 0;
 
-    my $tmpfile = exists $opts{tmpfile} ? $opts{tmpfile} : $self->{tmpfile};
-    my $flags   = _tmpfile_flag($tmpfile);
+    my $tmpfile  = exists $opts{tmpfile} ? $opts{tmpfile} : $self->{tmpfile};
+    my $warnings = $opts{warnings} // 0;
+    my $flags    = _tmpfile_flag($tmpfile) | ($warnings ? FLAGS_WARNINGS : 0);
 
     if (!$flags && $self->{data_warn} && $source =~ /^__DATA__(?:\r?\n|$)/m) {
         warn "remperl: script contains __DATA__ but --tmpfile is not set;"
@@ -393,6 +398,12 @@ C<'named'> uses L<File::Temp> and keeps the file until the executor
 exits; C<'off'> explicitly disables (same as C<0>).  Default is C<0>
 (disabled).
 
+C<serve_filter> is an optional callback C<sub($path) { ... }> that is
+called with the resolved file path of each module candidate before it is
+served.  Return true to allow, false to deny.  Useful for restricting
+serving to specific directories; see L<remperl/--serve-restrict-paths>
+for the CLI equivalent.
+
 C<data_warn> is used internally by the L<remperl> CLI to warn users when
 a script contains C<__DATA__> but C<tmpfile> is not enabled.  Not intended
 for direct use by library callers.
@@ -434,6 +445,11 @@ Values to place in the remote C<@ARGV> before execution.
 
 Per-run override for the object-level C<tmpfile> setting.  See
 L</new(%args)> for accepted values.
+
+=item warnings => $bool
+
+Enable warnings on the remote side (sets C<$^W = 1> before running user
+code), equivalent to C<perl -w>.  Default: 0.
 
 =back
 

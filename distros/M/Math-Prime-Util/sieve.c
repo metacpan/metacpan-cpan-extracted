@@ -11,10 +11,10 @@
 #include "util.h"
 #include "primality.h"
 #include "montmath.h"
-#include "prime_nth_count.h"
+#include "prime_counts.h"
 
 /* Is it better to do a partial sieve + primality tests vs. full sieve? */
-static int do_partial_sieve(UV startp, UV endp) {
+static bool do_partial_sieve(UV startp, UV endp) {
   UV range = endp - startp;
   if (USE_MONTMATH) range /= 8;  /* Fast primality tests */
 #if BITS_PER_WORD == 64
@@ -275,7 +275,7 @@ static void _sieve_range(unsigned char* mem, const unsigned char* sieve, UV star
   } END_DO_FOR_EACH_SIEVE_PRIME;
 }
 
-int sieve_segment_partial(unsigned char* mem, UV startd, UV endd, UV depth)
+bool sieve_segment_partial(unsigned char* mem, UV startd, UV endd, UV depth)
 {
   const unsigned char* sieve;
   UV startp = 30*startd,  endp = (endd >= (UV_MAX/30)) ? UV_MAX-2 : 30*endd+29;
@@ -292,7 +292,7 @@ int sieve_segment_partial(unsigned char* mem, UV startd, UV endd, UV depth)
 }
 
 /* Segmented mod-30 wheel sieve */
-int sieve_segment(unsigned char* mem, UV startd, UV endd)
+bool sieve_segment(unsigned char* mem, UV startd, UV endd)
 {
   const unsigned char* sieve;
   UV startp = 30*startd,  endp = (endd >= (UV_MAX/30)) ? UV_MAX-2 : 30*endd+29;
@@ -333,7 +333,7 @@ int sieve_segment(unsigned char* mem, UV startd, UV endd)
   return 1;
 }
 
-int sieve_segment_wheel(unsigned char* mem, UV startd, UV endd, wheel_t *warray, uint32_t wsize)
+bool sieve_segment_wheel(unsigned char* mem, UV startd, UV endd, wheel_t *warray, uint32_t wsize)
 {
   uint32_t i = 0, limit, start_base_prime;
   uint32_t segsize = endd - startd + 1;
@@ -365,15 +365,6 @@ int sieve_segment_wheel(unsigned char* mem, UV startd, UV endd, wheel_t *warray,
 }
 
 /**************************************************************************/
-
-static UV simple_prime_count_upper(UV n) {
-  double pc, logn = log(n);
-  if (n < 5)                return 0 + (n>1) + (n>2);
-  if (n < 355991)           pc = n / (logn-1.112);
-  else if (n < 2953652287U) pc = n / logn * (1 + 1/logn + 2.51 / (logn*logn));
-  else                      pc = n / logn * (1 + 1/logn + 2.334 / (logn*logn));
-  return (UV) ceil(pc);
-}
 
 typedef struct {
   UV lod;
@@ -457,7 +448,7 @@ void* start_segment_primes(UV low, UV high, unsigned char** segmentmem)
       /* Bump to one more than needed. */
       limit = next_prime(limit);
       /* We'll make space for this many */
-      nprimes = simple_prime_count_upper(limit);
+      nprimes = max_nprimes(limit);
       MPUverbose(4, "segment sieve %lu - %lu, primes to %lu (max %lu)\n", (unsigned long)low, (unsigned long)high, (unsigned long)limit, (unsigned long)nprimes);
       New(0, warray, nprimes, wheel_t);
       START_DO_FOR_EACH_PRIME(0,limit) {
@@ -474,7 +465,7 @@ void* start_segment_primes(UV low, UV high, unsigned char** segmentmem)
   return (void*) ctx;
 }
 
-int next_segment_primes(void* vctx, UV* base, UV* low, UV* high)
+bool next_segment_primes(void* vctx, UV* base, UV* low, UV* high)
 {
   UV seghigh_d, range_d;
   segment_context_t* ctx = (segment_context_t*) vctx;
@@ -522,18 +513,19 @@ void end_segment_primes(void* vctx)
   Safefree(ctx);
 }
 
-void* array_of_primes_in_range(UV* count, UV beg, UV end)
+UV range_prime_sieve(UV**list, UV lo, UV hi)
 {
-  UV *P, i = 0;
-  UV cntest = prime_count_upper(end) - prime_count_lower(beg) + 1;
-  New(0, P, cntest, UV);
-  if (beg <= 2 && end >= 2) P[i++] = 2;
-  if (beg <= 3 && end >= 3) P[i++] = 3;
-  if (beg <= 5 && end >= 5) P[i++] = 5;
+  UV *P, Psize, i = 0;
+  if (hi < lo) { *list = 0; return 0; }
+  Psize = prime_count_upper(hi) - prime_count_lower(lo) + 1;
+  New(0, P, Psize, UV);
+  if (lo <= 2 && hi >= 2) P[i++] = 2;
+  if (lo <= 3 && hi >= 3) P[i++] = 3;
+  if (lo <= 5 && hi >= 5) P[i++] = 5;
   {
     unsigned char* segment;
     UV seg_base, seg_low, seg_high;
-    void* ctx = start_segment_primes(beg, end, &segment);
+    void* ctx = start_segment_primes(lo, hi, &segment);
     while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
       START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
         P[i++] = p;
@@ -541,6 +533,31 @@ void* array_of_primes_in_range(UV* count, UV beg, UV end)
     }
     end_segment_primes(ctx);
   }
-  *count = i;
-  return P;
+  *list = P;
+  return i;
+}
+
+uint32_t range_prime_sieve_32(uint32_t** list, uint32_t n, uint32_t offset)
+{
+  uint32_t *P, i = offset;
+
+  if (n < 2) { *list = 0; return 0; }
+  New(0, P, max_nprimes(n) + offset + 3, uint32_t);         /* Allocate list */
+  if (offset > 0)  memset(P, 0, offset * sizeof(uint32_t)); /* Zero to offset */
+  P[i++] = 2;  P[i++] = 3;  P[i++] = 5;                     /* Fill in 2/3/5 */
+
+  if (n >= 7) {
+    unsigned char* segment;
+    UV seg_base, seg_low, seg_high;
+    void* ctx = start_segment_primes(7, n, &segment);
+    while (next_segment_primes(ctx, &seg_base, &seg_low, &seg_high)) {
+      START_DO_FOR_EACH_SIEVE_PRIME( segment, seg_base, seg_low, seg_high )
+        P[i++] = p;
+      END_DO_FOR_EACH_SIEVE_PRIME
+    }
+    end_segment_primes(ctx);
+  }
+  while (P[i-1] > n)  i--;  /* Truncate the count if necesssary. */
+  *list = P;
+  return i-offset;          /* Returns number of primes, excluding offset */
 }

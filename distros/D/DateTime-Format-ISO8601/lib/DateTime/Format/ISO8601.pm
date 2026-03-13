@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 use Carp qw( croak );
 use DateTime 1.45;
@@ -1000,8 +1000,14 @@ sub _base_dt {
 sub _fractional_second {
     my %p = @_;
 
-    ## no critic (ValuesAndExpressions::ProhibitMismatchedOperators)
-    $p{parsed}{nanosecond} = int( ".$p{ parsed }{ nanosecond }" * 10**9 );
+    my $len = length( $p{parsed}{nanosecond} );
+    $p{parsed}{nanosecond}
+        = $p{parsed}{nanosecond} . ( '0' x ( $len >= 9 ? 0 : 9 - $len ) );
+
+    # substr knowingly truncates sub-nanosecond values
+    $p{parsed}{nanosecond} = substr( $p{parsed}{nanosecond}, 0, 9 );
+
+    $p{parsed}{nanosecond} = int( $p{parsed}{nanosecond} );
 
     return 1;
 }
@@ -1103,7 +1109,7 @@ DateTime::Format::ISO8601 - Parses ISO8601 formats
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -1282,6 +1288,8 @@ object.
 =item * Fractional time
 
 There is no limit on the expressed precision.
+
+B<Note:> sub-nanosecond times are truncated.
 
 =back
 
@@ -1739,7 +1747,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Doug Bell joe Liam Widdowson Thomas Klausner William Ricker
+=for stopwords Doug Bell joe Liam Widdowson Thomas Klausner Timothy Legge William Ricker
 
 =over 4
 
@@ -1761,13 +1769,17 @@ Thomas Klausner <domm@plix.at>
 
 =item *
 
+Timothy Legge <timlegge@gmail.com>
+
+=item *
+
 William Ricker <bill.n1vux@gmail.com>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Joshua Hoblitt.
+This software is copyright (c) 2026 by Joshua Hoblitt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

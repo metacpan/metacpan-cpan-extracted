@@ -17,9 +17,8 @@ subtest 'commands' => sub {
         cmd_repost  cmd_reposts
         cmd_follow  cmd_unfollow    cmd_follows cmd_followers
         cmd_block   cmd_unblock     cmd_blocks
-        cmd_login
-        cmd_notifications   cmd_notif
-        cmd_invitecodes
+        cmd_login   cmd_oauth
+        cmd_notifications       cmd_notif
         cmd_listapppasswords    cmd_addapppassword  cmd_revokeapppassword
         cmd_config
         cmd_help

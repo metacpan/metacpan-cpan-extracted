@@ -4,7 +4,7 @@ DateTime::Format::ISO8601 - Parses ISO8601 formats
 
 # VERSION
 
-version 0.17
+version 0.19
 
 # SYNOPSIS
 
@@ -177,6 +177,8 @@ date only formats. If you want to match against the time only formats use the
 - Fractional time
 
     There is no limit on the expressed precision.
+
+    **Note:** sub-nanosecond times are truncated.
 
 ## Supported via parse\_datetime
 
@@ -396,11 +398,12 @@ The source code repository for DateTime-Format-ISO8601 can be found at [https://
 - joe <draxil@gmail.com>
 - Liam Widdowson <lbw@telstra.com>
 - Thomas Klausner <domm@plix.at>
+- Timothy Legge <timlegge@gmail.com>
 - William Ricker <bill.n1vux@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Joshua Hoblitt.
+This software is copyright (c) 2026 by Joshua Hoblitt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

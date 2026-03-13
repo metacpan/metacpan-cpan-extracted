@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make.pm
-## Version v0.21.0
+## Version v0.21.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/06
+## Modified 2026/03/07
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -26,7 +27,7 @@ BEGIN
     our $CRLF                    = "\015\012";
     our $MAX_BODY_IN_MEMORY_SIZE = 1_048_576;  # 1 MiB default
     our $EXCEPTION_CLASS         = 'Mail::Make::Exception';
-    our $VERSION                 = 'v0.21.0';
+    our $VERSION                 = 'v0.21.1';
 }
 
 use strict;
@@ -274,7 +275,7 @@ sub bcc
     return( $self->{_headers}->header( 'Bcc' ) );
 }
 
-# build( %params ) — alternate hash-based constructor/factory
+# build( %params ) - alternate hash-based constructor/factory
 # Returns a Mail::Make object with all parameters applied.
 sub build
 {
@@ -283,7 +284,7 @@ sub build
     my $self   = $class->new || return( $class->pass_error );
 
     # Scalar envelope fields
-    foreach my $field ( qw( date from in_reply_to message_id reply_to sender subject ) )
+    foreach my $field ( qw( date from in_reply_to message_id reply_to return_path sender subject ) )
     {
         $self->$field( $params->{ $field } ) || return( $self->pass_error )
             if( exists( $params->{ $field } ) );
@@ -520,6 +521,20 @@ sub reply_to
         return( $self );
     }
     return( $self->{_headers}->header( 'Reply-To' ) );
+}
+
+# return_path( [$address] )
+sub return_path
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $addr = $self->_encode_address( shift( @_ ) );
+        $self->{_headers}->set( 'Return-Path' => $addr ) ||
+            return( $self->pass_error( $self->{_headers}->error ) );
+        return( $self );
+    }
+    return( $self->{_headers}->header( 'Return-Path' ) );
 }
 
 # sender( [$address] )
@@ -1084,7 +1099,7 @@ sub _encode_address
             ? "${enc} <${spec}>"
             : qq{"${name}" <${spec}>} );
     }
-    # Bare addr-spec — nothing to encode
+    # Bare addr-spec - nothing to encode
     return( $addr );
 }
 
@@ -1147,7 +1162,7 @@ Mail::Make - Strict, Fluent MIME Email Builder
     my $mail = Mail::Make->new
         ->from( 'hello@example.com' )
         ->to( 'jack@example.jp' )
-        ->subject( "Q4 Report — Yamato, Inc." )
+        ->subject( "Q4 Report - Yamato, Inc." )
         ->plain( "Please find the report attached." )
         ->html( '<p>Please find the report <b>attached</b>.</p>' )
         ->attach_inline(
@@ -1164,11 +1179,11 @@ Mail::Make - Strict, Fluent MIME Email Builder
     my $raw = $mail->as_string || die( $mail->error );
     print $raw;
 
-    # Scalar-ref form — no string copy, useful for large messages
+    # Scalar-ref form - no string copy, useful for large messages
     my $raw_ref = $mail->as_string_ref || die( $mail->error );
     print $$raw_ref;
 
-    # Write directly to a filehandle — no in-memory buffering
+    # Write directly to a filehandle - no in-memory buffering
     open( my $fh, '>', '/tmp/message.eml' ) or die $!;
     $mail->print( $fh ) || die( $mail->error );
 
@@ -1191,7 +1206,7 @@ Mail::Make - Strict, Fluent MIME Email Builder
 
 =head1 VERSION
 
-    v0.21.0
+    v0.21.1
 
 =head1 DESCRIPTION
 
@@ -1227,13 +1242,39 @@ When L</use_temp_file> is set, or the assembled message size would exceed L</max
 
 =head2 new( [%opts] )
 
-Creates a new C<Mail::Make> object. Optional C<%opts> are passed through to L<Module::Generic/init>.
+Creates a new C<Mail::Make> object. Takes an hash or hash reference of options. Supported options are:
+
+=over 4
+
+=item * C<max_body_in_memory_size>
+
+Sets the byte threshold above which L</as_string_ref> spools to a temporary file rather than building the message in RAM. Set to C<0> or C<undef> to disable the threshold entirely. Default: C<$Mail::Make::MAX_BODY_IN_MEMORY_SIZE> (1 MiB).
+
+=item * C<use_temp_file>
+
+When true, L</as_string_ref> always spools to a temporary file regardless of message size. Useful when you know the message will be large, or when you want to bound peak memory use unconditionally. Default: false.
+
+=back
 
 =head2 build( %params )
 
-An alternate hash-based constructor. Recognised keys: C<from>, C<to>, C<cc>, C<bcc>, C<date>, C<reply_to>, C<sender>, C<subject>, C<in_reply_to>, C<message_id>, C<references>, C<plain>, C<html>, C<plain_opts>, C<html_opts>, C<headers>.
+An alternate hash-based constructor.
 
-Returns the populated C<Mail::Make> object, or C<undef> on error.
+Takes an hash or hash reference of options.
+
+Recognised parameters are: L<from|/from>, L<to|/to>, L<cc|/cc>, L<bcc|/bcc>, L<date|/date>, L<reply_to|/reply_to>, L<sender|/sender>, L<subject|/subject>, L<in_reply_to|/in_reply_to>, L<message_id|/message_id>, L<references|/references>, L<plain|/plain>, L<html|/html>, C<plain_opts>, C<html_opts>, C<headers>.
+
+When using the standard mail envelop headers, C<build> will call each respective method, such as L<from|/from>, L<to|/to>, etc.
+
+When passing the C<plain> parameter, it will call L<plain|/plain>, and passing it the optional hash reference of parameters provided with C<plain_opts>
+
+Likewise when passing the C<html> parameter, it will call L<html|/html>, and passing it the optional hash reference of parameters provided with C<html_opts>
+
+You can also provide additional mail envelop headers by providing the parameter C<headers> as an hash reference.
+
+For each element of that hash reference, it will call L<header/header>
+
+Returns the populated C<Mail::Make> object, or upon error, set an L<error object|Mail::Make::Exception>, and returns C<undef> in scalar context or an empty list in list context.
 
 =head1 FLUENT METHODS
 
@@ -1241,102 +1282,430 @@ All setter methods return C<$self> to allow chaining. Called without arguments, 
 
 =head2 attach( %opts )
 
-Adds a downloadable attachment. Required: C<path> or C<data>. Optional: C<type>, C<filename>, C<charset>, C<encoding>, C<description>. All parameters are forwarded to L<Mail::Make::Entity/build>.
+    $mail->attach(
+        path     => $pdf_path,
+        type     => 'application/pdf',
+        filename => 'report.pdf',
+    ); # returns $mail
+
+Adds a downloadable attachment, and returns the current instance for chaining.
+
+Takes an hash or hash reference of parameters.
+
+Requires either C<path> or C<data>.
+
+Options are:
+
+=over 4
+
+=item * C<charset>
+
+The optional charset of the attachment.
+
+=item * C<description>
+
+A short description.
+
+=item * C<encoding>
+
+The encoding of the attachment, such as C<zip>, C<gzip>, C<bzip2>, etc..
+
+=item * C<filename>
+
+The attachment filename as displayed to the reader.
+
+=item * C<type>
+
+The attachment mime-type.
+
+=back
+
+All parameters are forwarded to L<Mail::Make::Entity/build>.
 
 =head2 attach_inline( %opts )
 
-Adds an inline part (e.g. an embedded image referenced via C<cid:> in HTML).
+    $mail->attach_inline(
+        path     => $img_path,
+        type     => 'image/png',
+        filename => 'Yamato,Inc-Logo.png',
+        cid      => 'logo@yamato-inc',
+    ); # returns $mail
 
-Required: (C<path> or C<data>) and (C<id> or C<cid>).
+Adds an inline part (e.g. an embedded image referenced via C<cid:> in HTML), and returns the current instance for chaining.
+
+Takes an hash or hash reference of parameters.
+
+Requires either <path> or C<data> and either C<id> or C<cid>.
+
+Supported parameters are:
+
+=over 4
+
+=item * C<boundary>
+
+The boundary used.
+
+=item * C<charset>
+
+The optional charset of the attachment.
+
+=item * C<cid> or C<id>
+
+The attachment ID (C<Content-ID>)
+
+=item * C<data>
+
+The attachement raw data.
+
+=item * C<debug>
+
+An unsigned integer to enable debugging.
+
+=item * C<description>
+
+A short description.
+
+See also C<path> for an alternative.
+
+=item * C<disposition>
+
+Can be either C<attachment> or C<inline>
+
+=item * C<encoding>
+
+The encoding of the attachment, such as C<zip>, C<gzip>, C<bzip2>, etc..
+
+=item * C<filename>
+
+The attachment filename as displayed to the reader.
+
+=item * C<path>
+
+The attachment file path.
+
+See also C<data> for an alternative.
+
+=item * C<type>
+
+The attachment mime-type.
+
+=back
 
 =head2 bcc( @addresses )
 
+    $mail->bcc( qw( hello@example.com john@example.jp ) );
+
+    $mail->bcc( [qw( hello@example.com john@example.jp )] );
+
 Accumulates one or more BCC addresses. May be called multiple times.
+
+This takes either an array reference or a list of e-mail addresses, encode them if necessary, and add them to the C<Bcc> mail envelop header as a comma-separated value using L<Mail::Make::Headers/push_header>
+
+When called as a mutator, it returns the current instance of L<Mail::Make::Headers>, otherwise, as an accessor, it returns the current value of the mail envelop header.
 
 =head2 cc( @addresses )
 
+    $mail->cc( qw( hello@example.com john@example.jp ) );
+
+    $mail->cc( [qw( hello@example.com john@example.jp )] );
+
 Accumulates one or more CC addresses.
+
+This takes either an array reference or a list of e-mail addresses, encode them if necessary, and add them to the C<Cc> mail envelop header as a comma-separated value using L<Mail::Make::Headers/push_header>
+
+When called as a mutator, it returns the current instance of L<Mail::Make::Headers>, otherwise, as an accessor, it returns the current value of the mail envelop header.
 
 =head2 date( [$date_string_or_epoch] )
 
-Gets or sets the C<Date> header. Accepts a Unix epoch integer (converted to RFC 5322 format automatically) or a pre-formatted RFC 5322 string.
+Gets or sets the C<Date> header.
+
+Accepts a Unix epoch integer (converted to RFC 5322 format automatically) or a pre-formatted RFC 5322 string.
 
 Delegates to L<Mail::Make::Headers/date>. If not set explicitly, the current date and time are used when L</as_entity> is first called.
 
+When called as a mutator, it returns the current instance of L<Mail::Make::Headers>, otherwise, as an accessor, it returns the current value of the mail envelop header.
+
 =head2 from( [$address] )
 
-Gets or sets the C<From> header. Non-ASCII display names are RFC 2047 encoded automatically.
+    $mail->from( 'hello@example.com' );
+
+Gets or sets the C<From> header by calling L<Mail::Make::Headers/set>.
+
+Non-ASCII display names are RFC 2047 encoded automatically.
+
+When called as a mutator, it returns the current instance of L<Mail::Make>, otherwise, as an accessor, it returns the current value of the mail envelop header.
 
 =head2 header( $name [, $value] )
 
-With two arguments: appends an arbitrary header to the envelope using C<push_header> semantics (does not replace an existing field of the same name). Returns C<$self>.
+    $mail->header( 'X-Mailer' => 'MySoft/v1.0.0' ); # returns $mail
+    # or
+    $mail->header( X_Mailer => 'MySoft/v1.0.0' ); # returns $mail
+
+    my $software = $mail->header( 'X-Mailer' );
+
+With two arguments: appends an arbitrary header to the envelope using L<push_header|Mail::Make::Headers/push_header> semantics (does not replace an existing field of the same name).
+
+Returns the current instance of C<Mail::Make>
 
 With one argument: returns the current value of the named header.
 
 =head2 headers()
 
-Returns the internal L<Mail::Make::Headers> object. Use this for operations not covered by the fluent methods (e.g. setting C<X-*> headers or reading back any field).
+    my $headers = $mail->headers; # Mail::Make::Headers
+
+Returns the internal L<Mail::Make::Headers> object. Use this for operations not covered by the fluent methods, such as setting C<X-*> headers or reading back any field.
 
 =head2 html( $content [, %opts] )
 
-Adds a C<text/html> body part. C<charset> defaults to C<utf-8>, C<encoding> defaults to C<quoted-printable>.
+    $mail->html( '<p>Hello world</p>', {
+        charset     => 'utf-8',
+        encoding    => 'quoted-printable',
+    }); # returns $mail
+
+Adds a C<text/html> body part, and returns the current instance for chaining.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+This takes an optional hash or hash reference of the following parameters:
+
+=over 4
+
+=item * C<charset>
+
+The character set used for thise HTML data.
+
+Defaults to C<utf-8>
+
+=item * C<data>
+
+The HTML data.
+
+=item * C<encoding>
+
+Can be C<quoted-printable> or C<base64>
+
+Defaults to C<quoted-printable>
+
+=back
 
 =head2 in_reply_to( [$mid] )
 
+    $mail->in_reply_to( 'dave.null@example.com' ); # Returns $mail
+    my $email = $mail->in_reply_to;
+
 Gets or sets the C<In-Reply-To> header.
+
+In mutator mode, this sets the C<In-Reply-To> mail envelop header using L<Mail::Make::Headers/set>, and returns the current instance of C<Mail::Make>, and in accessor mode, this returns the current value for the mail envelop header C<In-Reply-To>
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 message_id( [$mid | \%opts] )
 
-Gets or sets the C<Message-ID>. Auto-generated when L</as_entity> is called if not explicitly set. Delegates to L<Mail::Make::Headers/message_id>.
+    $mail->message_id( '2adefb89-a26a-4cf1-91c7-1413b13cfd0f@local' ); # Returns $mail
+    $mail->message_id( '2adefb89-a26a-4cf1-91c7-1413b13cfd0f@local', { strict => 1 } ); # Returns $mail
+    $mail->message_id({ generate => 1, domain => 'example.com' });
+    $mail->message_id( undef ); # remove the message ID
+    my $msgid = $mail->message_id;
+
+Gets or sets the C<Message-ID>. Auto-generated when L</as_entity> is called if not explicitly set.
+
+Delegates to L<Mail::Make::Headers/message_id>.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+This takes an optional hash reference of the following parameters:
+
+=over 4
+
+=item * C<domain>
+
+The domain name to use when generating the message ID.
+
+=item * C<generate>
+
+If set to true, then L<Mail::Make::Headers/message_id> will generate the message ID.
+
+If the option C<domain> is not provided, it will use L<Sys::Hostname/hostname> to guess the domain name.
+
+=item * C<strict>
+
+A boolean value (C<1> or C<0>).
+
+When this is set to true, L<message_id>|Mail::Make::Headers/message_id> will call C<_validate_message_id_value> in L<Mail::Make::Headers> to thoroughly validate the value provided. This means, it will reject the value if:
+
+=over 8
+
+=item 1. It contains any non-ASCII or spaces/control characters.
+
+=item 2. It is not wrapped in angle brackets: C<< < >> and C<< > >>
+
+=item 3. Does not have exactly one at-mark C<@>
+
+=item 4. The local part (the part on the left of the at-mark) contains characters other than:
+
+    [A-Za-z0-9.!#\$%&'\*\+\/=\?\^_`\{\|\}~\-]+
+
+=item 5. The domain part (the part of the right of the at-mark) contains characters other than:
+
+    [A-Za-z0-9](?:[A-Za-z0-9\-\.]*[A-Za-z0-9])?
+
+=back
+
+=back
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 plain( $content [, %opts] )
 
-Adds a C<text/plain> body part. C<charset> defaults to C<utf-8>, C<encoding> defaults to C<quoted-printable>.
+    $mail->plain( 'Hello world', {
+        charset     => 'utf-8',
+        encoding    => 'quoted-printable',
+    }); # returns $mail
+
+Adds a C<text/plain> body part, and returns the current instance for chaining.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+This takes an optional hash or hash reference of the following parameters:
+
+=over 4
+
+=item * C<charset>
+
+The character set used for thise HTML data.
+
+Defaults to C<utf-8>
+
+=item * C<data>
+
+The HTML data.
+
+=item * C<encoding>
+
+Can be C<quoted-printable> or C<base64>
+
+Defaults to C<quoted-printable>
+
+=back
 
 =head2 references( @mids )
 
+    $mail->references( [ $msg_id1, $msg_id2 ] ); # Returns $mail
+    $mail->references( $msg_id1, $msg_id2 );     # Returns $mail
+    # Removes the header
+    $mail->references( undef );                  # Returns $mail
+    my @message_ids = $mail->references;
+    my $comma_list  = $mail->references;
+
 Accumulates one or more Message-IDs in the C<References> header.
+
+In mutator mode, this returns the current instance of L<Mail::Make>
+
+In accessor mode, this returns a list of message IDs, and in scalar mode, this returns a comma-separate list of message IDs.s
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 reply_to( [$address] )
 
-Gets or sets the C<Reply-To> header.
+    $mail->reply_to( 'hello@example.com' );
+
+Gets or sets the C<Reply-To> header by calling L<Mail::Make::Headers/set>.
+
+Non-ASCII display names are RFC 2047 encoded automatically.
+
+When called as a mutator, it returns the current instance of L<Mail::Make>, otherwise, as an accessor, it returns the current value of the mail envelop header.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+=head2 return_path( [$address] )
+
+    $mail->return_path( 'dave.null@example.com' );
+
+Gets or sets the C<Return-Path> header by calling L<Mail::Make::Headers/set>.
+
+Non-ASCII display names are RFC 2047 encoded automatically.
+
+When called as a mutator, it returns the current instance of L<Mail::Make>, otherwise, as an accessor, it returns the current value of the mail envelop header.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 sender( [$address] )
 
-Gets or sets the C<Sender> header.
+    $mail->sender( 'hello@example.com' );
+
+Gets or sets the C<Sender> header by calling L<Mail::Make::Headers/set>.
+
+When called as a mutator, it returns the current instance of L<Mail::Make>, otherwise, as an accessor, it returns the current value of the mail envelop header.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 subject( [$string] )
 
-Gets or sets the C<Subject>. Non-ASCII subjects are RFC 2047 encoded before being stored.
+    $mail->subject( '会議議事録' );  # Returns $mail
+    $mail->subject;
+
+Gets or sets the C<Subject> by calling L<Mail::Make::Headers/set>.
+
+When called as a mutator, it returns the current instance of L<Mail::Make>, otherwise, as an accessor, it returns the current value of the mail envelop header.
+
+Non-ASCII subjects are RFC 2047 encoded before being stored.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 to( @addresses )
 
-Accumulates one or more To addresses. Multiple calls are merged into a single C<To:> field per RFC 5322 §3.6.3.
+    $mail->to( 'hello@example.com' );
+
+Accumulates one or more To addresses. Multiple calls are merged into a single C<To:> field per RFC 5322 §3.6.3 by calling L<Mail::Make::Headers/set>.
+
+Non-ASCII display names are RFC 2047 encoded automatically.
+
+Note that it is up to you to ensure there are no duplicates.
+
+When called as a mutator, it returns the current instance of L<Mail::Make>, otherwise, as an accessor, it returns the current value of the mail envelop header.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head1 OUTPUT METHODS
 
 =head2 as_entity
 
-Assembles and returns the top-level L<Mail::Make::Entity>. The MIME structure is selected automatically (see L</DESCRIPTION>). Envelope headers are merged into the entity using C<init_header> semantics: fields already set on the entity (C<Content-Type>, C<MIME-Version>, etc.) are never overwritten.
+    my $entity = $mail->as_entity; # Returns a Mail::Make::Entity object
 
-Returns C<undef> and sets C<error()> if assembly fails.
+Assembles and returns the top-level L<Mail::Make::Entity> based on the various content that has been specified, such as plain text, html mail, attachments, or inline attachments.
+
+The MIME structure is selected automatically (see L</DESCRIPTION>). Envelope headers are merged into the entity using C<init_header> semantics: fields already set on the entity (C<Content-Type>, C<MIME-Version>, etc.) are never overwritten.
+
+If no C<Message-ID> is set yet, it will compute one.
+
+C<MIME-Version> will be set to C<1.0> no matter what value may have been set previously.
+
+The computed value is cached, so repetitive calls will return the cached value.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 as_string
+
+    my $string = $mail->as_string;
 
 Assembles the message and returns it as a plain string, consistent with C<MIME::Entity::stringify>. This is the form suitable for direct printing, string interpolation, and most downstream consumers.
 
 For large messages, prefer L</print> (no buffering) or L</as_string_ref> (no copy on return).
 
-Returns C<undef> and sets C<error()> on failure.
+This method calls L</as_entity>, and returns the value returned by L<Mail::Make::Entity/as_string>, passing it whatever value was provided.
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 as_string_ref
+
+    my $scalar_ref = $mail->as_string_ref;
 
 Assembles the message and returns it as a B<scalar reference> (or a L<Module::Generic::Scalar> object, which stringifies as needed). No extra string copy is made during the fast path.
 
 When L</use_temp_file> is true, B<or> the serialised entity size returned by L<Mail::Make::Entity/length> exceeds L</max_body_in_memory_size>, the message is written to a C<Module::Generic::Scalar> buffer via its in-memory filehandle.
 This keeps peak RAM use to a single copy of the assembled message.
 
-Returns C<undef> and sets C<error()> on failure.
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 max_body_in_memory_size( [$bytes] )
 
@@ -1344,17 +1713,34 @@ Gets or sets the byte threshold above which L</as_string_ref> spools to a tempor
 
 =head2 print( $fh )
 
+    $mail->print( $fh ) || die( $mail->error );
+
 Writes the fully assembled message to a filehandle without buffering it in memory. This is the recommended approach for very large messages: the MIME tree is serialised part by part directly to C<$fh>, keeping memory use proportional to the largest single part rather than the total message size.
 
-=head2 use_temp_file( [$bool] )
+This returns the current instance of L<Mail::Make> for chaining.
 
-When true, L</as_string_ref> always spools to a temporary file regardless of message size. Useful when you know the message will be large, or when you want to bound peak memory use unconditionally. Default: false.
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 smtpsend( %opts )
 
-Assembles the message and submits it to an SMTP server via L<Net::SMTP>, which is a core perl module.
+    my @recipients = $mail->smtpsend( Host => $smtp );
 
-L<Net::SMTP> is loaded on demand.
+    my $rv = $mail->smtpsend(
+        Host  => '127.0.0.1',
+        Port  => $port,
+        Hello => 'test.local',
+    );
+
+    my $recipients_array_ref = $mail->smtpsend(
+        Host     => '127.0.0.1',
+        Port     => $port,
+        Hello    => 'test.local',
+        MailFrom => 'bounce@example.com',
+    );
+
+Assembles the message and submits it to an SMTP server via L<Net::SMTP>, which is a core perl module, and loaded only when this method is called.
+
+This takes a hash or hash reference of options.
 
 Credential and recipient validation is performed B<before> any network connection is attempted, so configuration errors are reported immediately without consuming network resources.
 
@@ -1362,11 +1748,47 @@ Recognised options:
 
 =over 4
 
+=item C<AuthMechanisms>
+
+Space-separated list of SASL mechanism names in preference order.
+
+Defaults to C<"PLAIN LOGIN">, which are safe and universally supported over an encrypted channel (STARTTLS or SSL).
+
+The actual mechanism used is the intersection of this list and what the server advertises. If no intersection exists, deprecated challenge-response mechanisms (C<DIGEST-MD5>, C<CRAM-MD5>, C<GSSAPI>) are excluded and the remainder of the server's list is tried.
+
+=item C<Debug>
+
+Boolean. Enables L<Net::SMTP> debug output.
+
+=item C<Hello>
+
+The FQDN sent in the EHLO/HELO greeting.
+
 =item C<Host>
 
 Hostname, IP address, or an already-connected L<Net::SMTP> object. If an existing object is passed, it is used as-is and B<not> quit on completion (the caller retains ownership of the connection).
 
 If omitted, the colon-separated list in C<$ENV{SMTPHOSTS}> is tried first, then C<mailhost> and C<localhost> in that order.
+
+=item C<MailFrom>
+
+The envelope sender address (C<MAIL FROM>). Defaults to the bare addr-spec extracted from the C<From:> header.
+
+=item C<Password>
+
+Password for SMTP authentication. May be:
+
+=over 4
+
+=item * A plain string.
+
+=item * A C<CODE> reference called with no arguments at authentication time.
+
+Useful for reading credentials from a keyring or secrets manager without storing them in memory until needed:
+
+    Password => sub { MyKeyring::get('smtp') }
+
+=back
 
 =item C<Port>
 
@@ -1374,11 +1796,11 @@ SMTP port number. Common values:
 
 =over 4
 
-=item * C<25>  — plain SMTP (default when C<SSL> is false)
+=item * C<25>  - plain SMTP (default when C<SSL> is false)
 
-=item * C<465> — SMTPS, direct SSL/TLS (use with C<< SSL => 1 >>)
+=item * C<465> - SMTPS, direct SSL/TLS (use with C<< SSL => 1 >>)
 
-=item * C<587> — submission, usually STARTTLS (use with C<< StartTLS => 1 >>)
+=item * C<587> - submission, usually STARTTLS (use with C<< StartTLS => 1 >>)
 
 =back
 
@@ -1401,39 +1823,9 @@ Hash reference of additional options passed to L<IO::Socket::SSL> during the SSL
     SSL_opts => { SSL_verify_mode => 0 }           # disable peer cert check
     SSL_opts => { SSL_ca_file => '/etc/ssl/ca.pem' }
 
-=item C<Username>
+=item C<Timeout>
 
-Login name for SMTP authentication (SASL). Requires L<Authen::SASL>.
-
-Must be combined with C<Password>. Validated before any connection is made.
-
-=item C<AuthMechanisms>
-
-Space-separated list of SASL mechanism names in preference order.
-
-Defaults to C<"PLAIN LOGIN">, which are safe and universally supported over an encrypted channel (STARTTLS or SSL).
-
-The actual mechanism used is the intersection of this list and what the server advertises. If no intersection exists, deprecated challenge-response mechanisms (C<DIGEST-MD5>, C<CRAM-MD5>, C<GSSAPI>) are excluded and the remainder of the server's list is tried.
-
-=item C<Password>
-
-Password for SMTP authentication. May be:
-
-=over 4
-
-=item * A plain string.
-
-=item * A C<CODE> reference called with no arguments at authentication time.
-
-Useful for reading credentials from a keyring or secrets manager without storing them in memory until needed:
-
-    Password => sub { MyKeyring::get('smtp') }
-
-=back
-
-=item C<MailFrom>
-
-The envelope sender address (C<MAIL FROM>). Defaults to the bare addr-spec extracted from the C<From:> header.
+Connection and command timeout in seconds, passed directly to L<Net::SMTP>.
 
 =item C<To>, C<Cc>, C<Bcc>
 
@@ -1441,17 +1833,11 @@ Override the RCPT TO list. Each may be a string or an array reference of address
 
 C<Bcc:> is always stripped from the outgoing message headers before transmission, per RFC 2822 §3.6.3.
 
-=item C<Hello>
+=item C<Username>
 
-The FQDN sent in the EHLO/HELO greeting.
+Login name for SMTP authentication (SASL). Requires L<Authen::SASL>.
 
-=item C<Timeout>
-
-Connection and command timeout in seconds, passed directly to L<Net::SMTP>.
-
-=item C<Debug>
-
-Boolean. Enables L<Net::SMTP> debug output.
+Must be combined with C<Password>. Validated before any connection is made.
 
 =back
 
@@ -1480,7 +1866,11 @@ B<Typical usage examples:>
 
 Returns the list of accepted recipient addresses in list context, or a reference to that list in scalar context.
 
-Returns C<undef> and sets C<error()> on failure.
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+=head2 use_temp_file( [$bool] )
+
+When true, L</as_string_ref> always spools to a temporary file regardless of message size. Useful when you know the message will be large, or when you want to bound peak memory use unconditionally. Default: false.
 
 =head1 GPG METHODS
 
@@ -1504,22 +1894,22 @@ Optional options:
 
 =over 4
 
-=item C<< GpgBin => $path >>
+=item C<< AutoFetch => $bool >>
 
-Full path to the C<gpg> executable. Defaults to searching C<gpg2> then C<gpg> in C<PATH>.
+When true and C<KeyServer> is set, calls C<gpg --locate-keys> for each recipient before encryption. Default: C<0>.
 
 =item C<< Digest => $algorithm >>
 
 Hash algorithm for the signature embedded in the encrypted payload.
 Default: C<SHA256>.
 
+=item C<< GpgBin => $path >>
+
+Full path to the C<gpg> executable. Defaults to searching C<gpg2> then C<gpg> in C<PATH>.
+
 =item C<< KeyServer => $url >>
 
 Keyserver URL for auto-fetching recipient public keys (e.g. C<'keys.openpgp.org'>). Only consulted when C<AutoFetch> is true.
-
-=item C<< AutoFetch => $bool >>
-
-When true and C<KeyServer> is set, calls C<gpg --locate-keys> for each recipient before encryption. Default: C<0>.
 
 =back
 
@@ -1541,10 +1931,6 @@ Optional options:
 
 =over 4
 
-=item C<< Passphrase => $string_or_coderef >>
-
-Passphrase to unlock the secret key. May be a plain string or a C<CODE> reference called with no arguments at signing time. When omitted, GnuPG's agent handles passphrase prompting.
-
 =item C<< Digest => $algorithm >>
 
 Hash algorithm. Default: C<SHA256>.
@@ -1554,6 +1940,10 @@ Valid values: C<SHA256>, C<SHA384>, C<SHA512>, C<SHA1>.
 =item C<< GpgBin => $path >>
 
 Full path to the C<gpg> executable.
+
+=item C<< Passphrase => $string_or_coderef >>
+
+Passphrase to unlock the secret key. May be a plain string or a C<CODE> reference called with no arguments at signing time. When omitted, GnuPG's agent handles passphrase prompting.
 
 =back
 
@@ -1600,7 +1990,13 @@ See L<Mail::Make::SMIME/"MEMORY USAGE AND LIMITATIONS"> for a full discussion.
 
 =head2 smime_encrypt( %opts )
 
+    $encrypted = $mail->smime_encrypt(
+        RecipientCert => $smime_rec_cert,
+    );
+
 Encrypts this message for one or more recipients and returns a new C<Mail::Make> object whose entity is an RFC 5751 C<application/pkcs7-mime; smime-type=enveloped-data> message.
+
+Takes an hash or hash reference of options.
 
 Required options:
 
@@ -1623,6 +2019,12 @@ CA certificate to include for chain verification.
 =back
 
 =head2 smime_sign( %opts )
+
+    my $signed = $mail->smime_sign(
+        Cert   => $smime_cert,
+        Key    => $smime_key,
+        CACert => $smime_ca, # optional
+    );
 
 Signs this message with a detached S/MIME signature and returns a new C<Mail::Make> object whose entity is an RFC 5751 C<multipart/signed> message.
 
@@ -1657,6 +2059,13 @@ CA certificate to include in the signature for chain verification.
 =back
 
 =head2 smime_sign_encrypt( %opts )
+
+    my $result = $mail->smime_sign_encrypt(
+        Cert          => $smime_cert,
+        Key           => $smime_key,
+        RecipientCert => $smime_rec_cert,
+        CACert        => $smime_ca, # optional
+    );
 
 Signs this message then encrypts the signed result. Returns a new C<Mail::Make> object whose entity is an RFC 5751 enveloped message containing a signed payload.
 

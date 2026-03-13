@@ -3,18 +3,21 @@
 #include <string.h>
 #include <math.h>
 
+#define FUNC_ipow   1
 #define FUNC_isqrt  1
-#define FUNC_icbrt  1
 #define FUNC_gcd_ui 1
 #define FUNC_is_perfect_square 1
 #define FUNC_clz 1
+#define FUNC_log2floor 1
 #include "ptypes.h"
 #include "factor.h"
 #include "sieve.h"
 #include "util.h"
+#include "sort.h"
 #include "mulmod.h"
 #include "cache.h"
 #include "primality.h"
+#include "lucas_seq.h"
 #include "montmath.h"
 static int holf32(uint32_t n, UV *factors, uint32_t rounds);
 
@@ -51,9 +54,61 @@ static const unsigned short primes_small[] =
    1949,1951,1973,1979,1987,1993,1997,1999,2003,2011};
 #define NPRIMES_SMALL (sizeof(primes_small)/sizeof(primes_small[0]))
 
+/* For doing trial division loops over the small primes.
+ * Returns either 1 or the new unfactored n.
+ * Puts any factors in place and increments *nfactors.
+ * Assumes n has no factors smaller than primes_small[sp].
+ * Will check primes_small[sp] .. primes_small[endsp] inclusive.
+ * endsp will be clamped to NPRIMES_SMALL-1.
+ */
+static uint32_t _trial32(uint32_t n, UV *factors, int *nfactors, uint32_t sp, uint32_t endsp) {
+  uint32_t f;
+  if (sp < 1) sp = 1;
+  if (endsp > NPRIMES_SMALL-1) endsp = NPRIMES_SMALL-1;
+  if (sp > endsp || n == 1) return n;
+
+  do {
+    f = primes_small[sp];
+    if (f*f > n) break;
+    while (n % f == 0) {
+      factors[(*nfactors)++] = f;
+      n /= f;
+    }
+  } while (++sp <= endsp);
+
+  if (f*f > n && n != 1) {
+    factors[(*nfactors)++] = n;
+    n = 1;
+  }
+  return n;
+}
+static UV _trialuv(UV n, UV *factors, int *nfactors, uint32_t sp, uint32_t endsp) {
+  uint32_t f;
+  if (sp < 1) sp = 1;
+  if (endsp > NPRIMES_SMALL-1) endsp = NPRIMES_SMALL-1;
+  if (sp > endsp || n == 1) return n;
+
+  do {
+    f = primes_small[sp];
+    if (f*f > n) break;
+    while (n % f == 0) {
+      factors[(*nfactors)++] = f;
+      n /= f;
+    }
+  } while (++sp <= endsp);
+
+  if (f*f > n && n != 1) {
+    factors[(*nfactors)++] = n;
+    n = 1;
+  }
+  return n;
+}
+
 static int _small_trial_factor(UV n, UV *factors, UV *newn, uint32_t *lastf)
 {
   int nfactors = 0;
+  uint32_t const endsp = 82;
+  uint32_t sp = 4;
   uint32_t f = 7;
 
   if (n > 1) {
@@ -62,45 +117,18 @@ static int _small_trial_factor(UV n, UV *factors, UV *newn, uint32_t *lastf)
     while ( (n % 5) == 0 ) { factors[nfactors++] = 5; n /= 5; }
   }
 
-  if (f*f <= n) {
-    uint32_t const lastsp = 83;
-    uint32_t sp = 4;
-    /* Trial division from 7 to 421.  Use 32-bit if possible. */
-    if (n <= 4294967295U) {
-      uint32_t un = n;
-      while (sp < lastsp) {
-        while ( (un%f) == 0 ) {
-          factors[nfactors++] = f;
-          un /= f;
-        }
-        f = primes_small[++sp];
-        if (f*f > un) break;
-      }
-      n = un;
-    } else {
-      while (sp < lastsp) {
-        while ( (n%f) == 0 ) {
-          factors[nfactors++] = f;
-          n /= f;
-        }
-        f = primes_small[++sp];
-        if (f*f > n) break;
-      }
-    }
-    /* If n is small and still composite, finish it here */
-    if (n < 2011*2011 && f*f <= n) {  /* Trial division from 431 to 2003 */
-      uint32_t un = n;
-      while (sp < NPRIMES_SMALL) {
-        while ( (un%f) == 0 ) {
-          factors[nfactors++] = f;
-          un /= f;
-        }
-        f = primes_small[++sp];
-        if (f*f > un) break;
-      }
-      n = un;
-    }
+  /* Trial primes 7 to 421 */
+  n = (n <= 4294967295U) ? _trial32(n, factors, &nfactors, sp, endsp)
+                         : _trialuv(n, factors, &nfactors, sp, endsp);
+  sp = endsp+1; /* 83 */
+  f = primes_small[sp];  /* 431 */
+
+  if (n < 2017*2017 && f*f <= n) {  /* Trial division from 431 to 2011 */
+    uint32_t const lastsp = NPRIMES_SMALL-1;
+    n = _trial32(n, factors, &nfactors, sp, lastsp);
+    f = 2017;
   }
+
   if (f*f > n && n != 1) {
     factors[nfactors++] = n;
     n = 1;
@@ -112,21 +140,21 @@ static int _small_trial_factor(UV n, UV *factors, UV *newn, uint32_t *lastf)
 
 static int _power_factor(UV n, UV *factors)
 {
-  int nfactors, i, j, k = powerof(n);
-  if (k > 1) {
-    UV p = rootof(n, k);
-    nfactors = factor(p, factors);
+  uint32_t root;
+  int nfactors, i, j, k;
+  if (n > 3 && (k = powerof_ret(n, &root))) {
+    nfactors = factor(root, factors);
     for (i = nfactors; i >= 0; i--)
       for (j = 0; j < k; j++)
         factors[k*i+j] = factors[i];
-    return k*nfactors;
+    return k * nfactors;
   }
   factors[0] = n;
   return 1;
 }
 
 /* Find one factor of an input n. */
-int factor_one(UV n, UV *factors, int primality, int trial)
+int factor_one(UV n, UV *factors, bool primality, bool trial)
 {
   int nfactors;
   if (n < 4) {
@@ -154,6 +182,17 @@ int factor_one(UV n, UV *factors, int primality, int trial)
                                 : pbrent_factor(n, factors, 500000, 1);
   if (nfactors < 2) croak("factor_one failed on %lu\n", n);
 #endif
+
+#if BITS_PER_WORD == 64
+    /* For small semiprimes the fastest solution is HOLF under 32, then
+     * Lehman (no trial) under 38.  On random inputs, HOLF is best somewhere
+     * between 28 and 32 bits.  Adding Lehman is always slower. */
+    if (n <= 0xFFFFFFFFU) {
+      nfactors = holf32(n, factors, 10000);  /* 2400 is enough */
+      if (nfactors > 1) return nfactors;
+    }
+#endif
+
   {
     /* Adjust the number of rounds based on the number size and speed */
     UV const nbits = BITS_PER_WORD - clz(n);
@@ -161,21 +200,11 @@ int factor_one(UV n, UV *factors, int primality, int trial)
     UV const br_rounds = 8000 + (9000 * ((nbits <= 45) ? 0 : (nbits-45)));
     UV const sq_rounds = 200000;
 #elif MULMODS_ARE_FAST
-    UV const br_rounds =  500 + ( 200 * ((nbits <= 45) ? 0 : (nbits-45)));
+    UV const br_rounds =  100 + ( 100 * ((nbits <= 45) ? 0 : (nbits-45)));
     UV const sq_rounds = 100000;
 #else
     UV const br_rounds = (nbits >= 63) ? 120000 : (nbits >= 58) ? 500 : 0;
     UV const sq_rounds = 200000;
-#endif
-
-#if BITS_PER_WORD == 64
-    /* For small semiprimes the fastest solution is HOLF under 32, then
-     * Lehman (no trial) under 38.  However on random inputs, HOLF is
-     * best only under 28-30 bits, and adding Lehman is always slower. */
-    if (nbits <= 30) { /* This should always succeed */
-      nfactors = holf32(n, factors, 1000000);
-      if (nfactors > 1) return nfactors;
-    }
 #endif
     /* Almost all inputs are factored here */
     if (br_rounds > 0) {
@@ -201,11 +230,11 @@ int factor_one(UV n, UV *factors, int primality, int trial)
     nfactors = pminus1_factor(n, factors, 8000, 120000);
     if (nfactors > 1) return nfactors;
     /* Get the stragglers */
-    nfactors = prho_factor(n, factors, 120000);
-    if (nfactors > 1) return nfactors;
     nfactors = pbrent_factor(n, factors, 500000, 5);
     if (nfactors > 1) return nfactors;
-    nfactors = prho_factor(n, factors, 120000);
+    nfactors = prho_factor(n, factors, 180000);
+    if (nfactors > 1) return nfactors;
+    nfactors = cheb_factor(n, factors, 1000000, 0);
     if (nfactors > 1) return nfactors;
     croak("factor_one failed on %lu\n", n);
   }
@@ -266,31 +295,107 @@ int factor(UV n, UV *factors)
   return nfactors;
 }
 
-
-int factor_exp(UV n, UV *factors, UV* exponents)
+void factorintp(factored_t *nf, UV n)
 {
-  int i = 1, j = 1, nfactors;
+  UV fac[MPU_MAX_FACTORS], *f = nf->f;
+  uint8_t *e = nf->e;
+  uint32_t nfactors, i, j;
 
-  if (n == 1) return 0;
-  nfactors = factor(n, factors);
+  nf->n = n;
+  if (n < 4) {
+    f[0] = n;
+    e[0] = 1;
+    nf->nfactors = 1 - (n==1);
+    return;
+  }
+  nfactors = factor(n, fac);
+  f[0] = fac[0];
+  e[0] = 1;
+  for (i = 1, j = 0; i < nfactors; i++) {
+    if (fac[i] == fac[i-1])
+      e[j]++;
+    else
+      f[++j] = fac[i], e[j] = 1;
+  }
+  nf->nfactors = (uint16_t)j+1;
+}
 
-  if (exponents == 0) {
-    for (; i < nfactors; i++)
-      if (factors[i] != factors[i-1])
-        factors[j++] = factors[i];
+void factoredp_validate(const factored_t *nf)
+{
+  if (nf->n == 0) {
+    MPUassert(nf->nfactors == 1, "factored_t n=0  =>  nfactors = 0");
+    MPUassert(nf->f[0] == 0 && nf->e[0] == 1, "factored_t n=0  =>  vecprod = n");
+  } else if (nf->n == 1) {
+    MPUassert(nf->nfactors == 0, "factored_t n=1  =>  nfactors = 0");
   } else {
-    exponents[0] = 1;
-    for (; i < nfactors; i++) {
-      if (factors[i] != factors[i-1]) {
-        exponents[j] = 1;
-        factors[j++] = factors[i];
+    UV lf = 0, N = 1, t;
+    uint32_t i;
+    MPUassert(nf->nfactors <= MPU_MAX_DFACTORS, "factored_t n has too many factors");
+    for (i = 0; i < nf->nfactors; i++) {
+      MPUassert(is_prime(nf->f[i]), "factored_t n has non-prime factor");
+      MPUassert(lf < nf->f[i], "factored_t factors not in order");
+      lf = nf->f[i];
+      MPUassert(nf->e[i] < BITS_PER_WORD, "factored_t exponent k too high");
+      MPUassert(nf->e[i] > 0, "factored_t exponent k too low");
+      if (nf->e[i] == 1) {
+        N *= nf->f[i];
       } else {
-        exponents[j-1]++;
+        t = ipowsafe(nf->f[i], nf->e[i]);
+        MPUassert(t != UV_MAX, "factored_t f^e overflows")
+        N *= t;
       }
     }
+    MPUassert(N == nf->n, "factored_t n is not equal to f^e * f^e ...");
   }
-  return j;
 }
+uint32_t factoredp_total_factors(const factored_t *nf) {
+  uint32_t i, nfacs = 0;
+  for (i = 0; i < nf->nfactors; i++)
+    nfacs += nf->e[i];
+  return nfacs;
+}
+bool factoredp_is_square_free(const factored_t *nf) {
+  uint32_t i;
+  for (i = 0; i < nf->nfactors; i++)
+    if (nf->e[i] > 1)
+      break;
+  return i >= nf->nfactors;
+}
+signed char factoredp_moebius(const factored_t *nf) {
+#if 0
+  return !factoredp_is_square_free(nf) ? 0 : nf->nfactors % 2 ? -1 : 1;
+#else
+  uint32_t i;
+  for (i = 0; i < nf->nfactors; i++)
+    if (nf->e[i] > 1)
+      return 0;
+  return nf->nfactors % 2 ? -1 : 1;
+#endif
+}
+uint32_t factoredp_linear_factors(UV fac[], const factored_t *nf) {
+  uint32_t i, nfac = 0;
+  for (i = 0; i < nf->nfactors; i++) {
+    UV f = nf->f[i], e = nf->e[i];
+    while (e--)
+      fac[nfac++] = f;
+  }
+  return nfac;
+}
+
+/******************************************************************************/
+
+
+int prime_bigomega(UV n)
+{
+  UV factors[MPU_MAX_FACTORS+1];
+  return factor(n, factors);
+}
+int prime_omega(UV n)
+{
+  if (n <= 1) return (n==0);
+  return factorint(n).nfactors;
+}
+
 
 int trial_factor(UV n, UV *factors, UV f, UV last)
 {
@@ -344,43 +449,54 @@ int trial_factor(UV n, UV *factors, UV f, UV last)
 }
 
 
-static void _divisors_from_factors(UV nfactors, UV* fp, UV* fe, UV* res) {
-  UV s, count = 1;
+static UV _divisors_from_factors(UV* res, factored_t nf, UV k) {
+  UV count;
+  uint32_t i;
 
-  res[0] = 1;
-  for (s = 0; s < nfactors; s++) {
-    UV i, j, scount = count, p = fp[s], e = fe[s], mult = 1;
+  res[0] = count = 1;
+  for (i = 0; i < nf.nfactors; i++) {
+    UV s, scount = count, p = nf.f[i], mult = 1;
+    uint32_t j, e = nf.e[i];
     for (j = 0; j < e; j++) {
       mult *= p;
-      for (i = 0; i < scount; i++)
-        res[count++] = res[i] * mult;
+      for (s = 0; s < scount; s++) {
+        UV t = res[s] * mult;
+        if (t <= k)
+          res[count++] = t;
+      }
     }
   }
+  return count;
 }
 
-UV* _divisor_list(UV n, UV *num_divisors)
+UV* divisor_list(UV n, UV *num_divisors, UV maxd)
 {
-  UV factors[MPU_MAX_FACTORS+1];
-  UV exponents[MPU_MAX_FACTORS+1];
-  UV* divs;
-  int i, nfactors, ndivisors;
+  factored_t nf;
+  UV ndivisors, *divs;
+  uint32_t i;
 
-  if (n <= 1) {
-    New(0, divs, 2, UV);
-    if (n == 0) {  divs[0] = 0;  divs[1] = 1;  *num_divisors = 2;  }
-    if (n == 1) {  divs[0] = 1;                *num_divisors = 1;  }
+  if (n == 0 || maxd == 0) {
+    *num_divisors = 0;
+    return 0;
+  } else if (n == 1 || maxd == 1) {
+    New(0, divs, 1, UV);
+    divs[0] = 1;
+    *num_divisors = 1;
     return divs;
   }
+
+  if (maxd > n) maxd = n;
+
   /* Factor and convert to factor/exponent pair */
-  nfactors = factor_exp(n, factors, exponents);
+  nf = factorint(n);
   /* Calculate number of divisors, allocate space, fill with divisors */
-  ndivisors = exponents[0] + 1;
-  for (i = 1; i < nfactors; i++)
-    ndivisors *= (exponents[i] + 1);
+  ndivisors = nf.e[0] + 1;
+  for (i = 1; i < nf.nfactors; i++)
+    ndivisors *= (nf.e[i] + 1);
   New(0, divs, ndivisors, UV);
-  _divisors_from_factors(nfactors, factors, exponents, divs);
+  ndivisors = _divisors_from_factors(divs, nf, maxd);
   /* Sort divisors (numeric ascending) */
-  qsort(divs, ndivisors, sizeof(UV), _numcmp);
+  sort_uv_array(divs, ndivisors);
   /* Return number of divisors and list */
   *num_divisors = ndivisors;
   return divs;
@@ -402,42 +518,40 @@ static const UV sigma_overflow[11] =
 #endif
 UV divisor_sum(UV n, UV k)
 {
-  UV factors[MPU_MAX_FACTORS+1];
-  int nfac, i, j;
-  UV product = 1;
+  factored_t nf;
+  UV product;
+  uint32_t i, j;
 
   if (k > 11 || (k > 0 && n >= sigma_overflow[k-1])) return 0;
-  if (n <= 1)                               /* n=0  divisors are [0,1] */
-    return (n == 1) ? 1 : (k == 0) ? 2 : 1; /* n=1  divisors are [1]   */
-  nfac = factor(n,factors);
+  /*   divisors(0) = []   divisors(1) = [1]  */
+  if (n <= 1)  return n;
+  nf = factorint(n);
+  product = 1;
   if (k == 0) {
-    for (i = 0; i < nfac; i++) {
-      UV e = 1,  f = factors[i];
-      while (i+1 < nfac && f == factors[i+1]) { e++; i++; }
-      product *= (e+1);
-    }
+    for (i = 0; i < nf.nfactors; i++)
+      product *= (nf.e[i]+1);
   } else if (k == 1) {
-    for (i = 0; i < nfac; i++) {
-      UV f = factors[i];
+    for (i = 0; i < nf.nfactors; i++) {
+      UV       f = nf.f[i];
+      uint16_t e = nf.e[i];
       UV pke = f, fmult = 1 + f;
-      while (i+1 < nfac && f == factors[i+1]) {
+      while (e-- > 1) {
         pke *= f;
         fmult += pke;
-        i++;
       }
       product *= fmult;
     }
   } else {
-    for (i = 0; i < nfac; i++) {
-      UV f = factors[i];
+    for (i = 0; i < nf.nfactors; i++) {
+      UV       f = nf.f[i];
+      uint16_t e = nf.e[i];
       UV fmult, pke, pk = f;
-      for (j = 1; j < (int)k; j++)  pk *= f;
+      for (j = 1; j < k; j++)  pk *= f;
       fmult = 1 + pk;
       pke = pk;
-      while (i+1 < nfac && f == factors[i+1]) {
+      while (e-- > 1) {
         pke *= pk;
         fmult += pke;
-        i++;
       }
       product *= fmult;
     }
@@ -447,19 +561,27 @@ UV divisor_sum(UV n, UV k)
 
 
 
+/******************************************************************************/
+/******************************************************************************/
+/******************************************************************************/
+
 
 static int found_factor(UV n, UV f, UV* factors)
 {
-  UV f2 = n/f;
-  int i = f > f2;
-  if (f == 1 || f2 == 1) {
+  UV g = n/f;
+  if (f == 1 || f == n) {
     factors[0] = n;
     return 1;
   }
-  factors[i] = f;
-  factors[1-i] = f2;
+  factors[f >= g] = f;
+  factors[f <  g] = g;
   MPUassert( factors[0] * factors[1] == n , "incorrect factoring");
   return 2;
+}
+static int no_factor(UV n, UV* factors)
+{
+  factors[0] = n;
+  return 1;
 }
 
 /* Knuth volume 2, algorithm C.
@@ -475,7 +597,7 @@ int fermat_factor(UV n, UV *factors, UV rounds)
   r = (sqn*sqn) - n;
 
   while (r != 0) {
-    if (rounds-- == 0) { factors[0] = n; return 1; }
+    if (rounds-- == 0) return no_factor(n,factors);
     r += x;
     x += 2;
     do {
@@ -491,13 +613,14 @@ int fermat_factor(UV n, UV *factors, UV rounds)
 int holf_factor(UV n, UV *factors, UV rounds)
 {
   UV i, s, m, f;
+  uint32_t root;
 
   MPUassert( (n >= 3) && ((n%2) != 0) , "bad n in holf_factor");
 
   /* We skip the perfect-square test for s in the loop, so we
    * will never succeed if n is a perfect square.  Test that now. */
-  if (is_perfect_square(n))
-    return found_factor(n, isqrt(n), factors);
+  if (is_perfect_square_ret(n,&root))
+    return found_factor(n, root, factors);
 
   if (n <= (UV_MAX >> 6)) {    /* Try with premultiplier first */
     UV npre = n * ( (n <= (UV_MAX >> 13)) ? 720 :
@@ -505,35 +628,19 @@ int holf_factor(UV n, UV *factors, UV rounds)
                     (n <= (UV_MAX >> 10)) ? 360 :
                     (n <= (UV_MAX >>  8)) ?  60 : 30 );
     UV ni = npre;
-#if 0                              /* Straightforward */
     while (rounds--) {
-      s = isqrt(ni) + 1;
+      s = 1 + (UV)isqrt(ni);
       m = (s*s) - ni;
-      if (is_perfect_square(m)) {
-        f = gcd_ui(n, s - isqrt(m));
+      if (is_perfect_square_ret(m, &root)) {
+        f = gcd_ui(n, s - root);
         if (f > 1 && f < n)
           return found_factor(n, f, factors);
       }
       if (ni >= (ni+npre)) break;
       ni += npre;
     }
-#else                              /* More optimized */
-    while (rounds--) {
-      s = 1 + (UV)sqrt((double)ni);
-      m = (s*s) - ni;
-      f = m & 127;
-      if (!((f*0x8bc40d7d) & (f*0xa1e2f5d1) & 0x14020a)) {
-        f = (UV)sqrt((double)m);
-        if (m == f*f) {
-          f = gcd_ui(n, s - f);
-          if (f > 1 && f < n)
-            return found_factor(n, f, factors);
-        }
-      }
-      if (ni >= (ni+npre)) break;
-      ni += npre;
-    }
-#endif
+    if (rounds == (UV) -1)
+      return no_factor(n,factors);
   }
 
   for (i = 1; i <= rounds; i++) {
@@ -542,42 +649,35 @@ int holf_factor(UV n, UV *factors, UV rounds)
      * so we won't be able to accurately detect it anyway. */
     s++;    /* s = ceil(sqrt(n*i)) */
     m = sqrmod(s, n);
-    if (is_perfect_square(m)) {
-      f = isqrt(m);
-      f = gcd_ui( (s>f) ? s-f : f-s, n);
+    if (is_perfect_square_ret(m, &root)) {
+      f = gcd_ui( (s>root) ? s-root : root-s, n);
       /* This should always succeed, but with overflow concerns.... */
       return found_factor(n, f, factors);
     }
   }
-  factors[0] = n;
-  return 1;
+  return no_factor(n,factors);
 }
 static int holf32(uint32_t n, UV *factors, uint32_t rounds) {
   UV npre, ni;    /* These should be 64-bit */
   uint32_t s, m, f;
 
-  if (n < 3) { factors[0] = n; return 1; }
+  if (n < 3) return no_factor(n,factors);
   if (!(n&1)) { factors[0] = 2; factors[1] = n/2; return 2; }
-  if (is_perfect_square(n)) { factors[0] = factors[1] = isqrt(n); return 2; }
+  if (is_perfect_square_ret(n,&f)) { factors[0] = factors[1] = f; return 2; }
 
   ni = npre = (UV) n * ((BITS_PER_WORD == 64) ? 5040 : 1);
   while (rounds--) {
-    s = 1 + (uint32_t)sqrt((double)ni);
+    s = 1 + isqrt(ni);
     m = ((UV)s*(UV)s) - ni;
-    f = m & 127;
-    if (!((f*0x8bc40d7d) & (f*0xa1e2f5d1) & 0x14020a)) {
-      f = (uint32_t)sqrt((double)m);
-      if (m == f*f) {
-        f = gcd_ui(n, s - f);
-        if (f > 1 && f < n)
-          return found_factor(n, f, factors);
-      }
+    if (is_perfect_square_ret(m, &f)) {
+      f = gcd_ui(n, s - f);
+      if (f > 1 && f < n)
+        return found_factor(n, f, factors);
     }
     if (ni >= (ni+npre)) break; /* We've overflowed */
     ni += npre;
   }
-  factors[0] = n;
-  return 1;
+  return no_factor(n,factors);
 }
 
 
@@ -659,8 +759,7 @@ int pbrent_factor(UV n, UV *factors, UV rounds, UV a)
     }
     return found_factor(n, f, factors);
   }
-  factors[0] = n;
-  return 1;
+  return no_factor(n,factors);
 }
 #else
 /* Pollard Rho with Brent's updates. */
@@ -715,30 +814,21 @@ int pbrent_factor(UV n, UV *factors, UV rounds, UV a)
     }
     return found_factor(n, f, factors);
   }
-  factors[0] = n;
-  return 1;
+  return no_factor(n,factors);
 }
 #endif
 
 /* Pollard's Rho. */
 int prho_factor(UV n, UV *factors, UV rounds)
 {
-  UV a, f, i, m, oldU, oldV;
+  UV f, i, m, oldU, oldV;
   const UV inner = 64;
   UV U = 7;
   UV V = 7;
+  UV a = 1;
   int fails = 3;
 
   MPUassert( (n >= 3) && ((n%2) != 0) , "bad n in prho_factor");
-
-  /* We could just as well say a = 1 */
-  switch (n%8) {
-    case 1:  a = 1; break;
-    case 3:  a = 2; break;
-    case 5:  a = 3; break;
-    case 7:  a = 5; break;
-    default: a = 7; break;
-  }
 
   rounds = (rounds + inner - 1) / inner;
 
@@ -768,13 +858,12 @@ int prho_factor(UV n, UV *factors, UV rounds)
       if (fails-- <= 0) break;
       U = addmod(U,2,n);
       V = U;
-      a++;
+      a += 2;
       continue;
     }
     return found_factor(n, f, factors);
   }
-  factors[0] = n;
-  return 1;
+  return no_factor(n,factors);
 }
 
 /* Pollard's P-1 */
@@ -830,7 +919,7 @@ int pminus1_factor(UV n, UV *factors, UV B1, UV B2)
     } END_DO_FOR_EACH_PRIME
     PMINUS1_RECOVER_A;
   }
-  if (a == 0) { factors[0] = n; return 1; }
+  if (a == 0) return no_factor(n,factors);
   f = gcd_ui(a-1, n);
 
   /* If we found more than one factor in stage 1, backup and single step */
@@ -944,12 +1033,12 @@ int pplus1_factor(UV n, UV *factors, UV B1)
     }
     pp1_pow(&X1, k, n);
     if (X1 != 2) {
-      f = gcd_ui( submod(X1, 2, n) , n);
+      f = gcd_ui( submod(X1, 2, n), n);
       if (f != 1 && f != n) break;
     }
     pp1_pow(&X2, k, n);
     if (X2 != 2) {
-      f = gcd_ui( submod(X2, 2, n) , n);
+      f = gcd_ui( submod(X2, 2, n), n);
       if (f != 1 && f != n) break;
     }
   } END_DO_FOR_EACH_PRIME
@@ -985,6 +1074,7 @@ typedef struct
 static UV squfof_unit(UV n, mult_t* mult_save)
 {
   SQUFOF_TYPE imax,i,Q0,Qn,bn,b0,P,bbn,Ro,S,So,t1,t2;
+  uint32_t root;
 
   P = mult_save->P;
   bn = mult_save->bn;
@@ -1024,17 +1114,13 @@ static UV squfof_unit(UV n, mult_t* mult_save)
       SQUARE_SEARCH_ITERATION;
 
       /* Even iteration.  Check for square: Qn = S*S */
-      t2 = Qn & 127;
-      if (!((t2*0x8bc40d7d) & (t2*0xa1e2f5d1) & 0x14020a)) {
-        t1 = (uint32_t) sqrt(Qn);
-        if (Qn == t1*t1)
-          break;
-      }
+      if (is_perfect_square_ret(Qn,&root))
+        break;
 
       /* Odd iteration. */
       SQUARE_SEARCH_ITERATION;
     }
-    S = t1; /* isqrt(Qn); */
+    S = root; /* isqrt(Qn); */
     mult_save->it = i;
 
     /* Reduce to G0 */
@@ -1095,9 +1181,8 @@ int squfof_factor(UV n, UV *factors, UV rounds)
   MPUassert( (n >= 3) && ((n%2) != 0) , "bad n in squfof_factor");
 
   /* Too big */
-  if (n > SQUFOF_MAX) {
-    factors[0] = n;  return 1;
-  }
+  if (n > SQUFOF_MAX)
+    return no_factor(n,factors);
 
   for (i = 0; i < NSQUFOF_MULT; i++) {
     mult_save[i].valid = -1;
@@ -1150,10 +1235,7 @@ int squfof_factor(UV n, UV *factors, UV rounds)
       rounds_done += mult_save[i].imax;   /* Assume we did all rounds */
     }
   }
-
-  /* No factors found */
-  factors[0] = n;
-  return 1;
+  return no_factor(n,factors);
 }
 
 #define SQR_TAB_SIZE 512
@@ -1168,7 +1250,7 @@ static void make_sqr_tab(void) {
 
 /* Lehman written and tuned by Warren D. Smith.
  * Revised by Ben Buhrow and Dana Jacobsen. */
-int lehman_factor(UV n, UV *factors, int do_trial) {
+int lehman_factor(UV n, UV *factors, bool do_trial) {
   const double Tune = ((n >> 31) >> 5) ? 3.5 : 5.0;
   double x, sqrtn;
   UV a,c,kN,kN4,B2;
@@ -1176,7 +1258,7 @@ int lehman_factor(UV n, UV *factors, int do_trial) {
 
   if (!(n&1)) return found_factor(n, 2, factors);
 
-  B = Tune * (1+rootof(n,3));
+  B = Tune * (1+icbrt(n));
 
   if (do_trial) {
     uint32_t FirstCut = 0.1 * B;
@@ -1191,7 +1273,9 @@ int lehman_factor(UV n, UV *factors, int do_trial) {
     }
   }
 
-  if (n >= UVCONST(8796393022207)) { factors[0] = n; return 1; }
+#if BITS_PER_WORD == 64
+  if (n >= UVCONST(8796393022207)) return no_factor(n,factors);
+#endif
   Bred = B / (Tune * Tune * Tune);
   B2 = B*B;
   kN = 0;
@@ -1203,7 +1287,9 @@ int lehman_factor(UV n, UV *factors, int do_trial) {
     if (k&1) { inc = 4; r = (k+n) % 4; }
     else     { inc = 2; r = 1; }
     kN += n;
-    if (kN >= UVCONST(1152921504606846976)) { factors[0] = n; return 1; }
+#if BITS_PER_WORD == 64
+    if (kN >= UVCONST(1152921504606846976)) return no_factor(n,factors);
+#endif
     kN4 = kN*4;
 
     x = (k < SQR_TAB_SIZE) ? sqrtn * sqr_tab[k] : sqrt((double)kN);
@@ -1218,13 +1304,9 @@ int lehman_factor(UV n, UV *factors, int do_trial) {
     U = x + B2/(2*x);
     for (a = b;  a <= U;  c += inc*(a+a+inc), a += inc) {
       /* Check for perfect square */
-      b = c & 127;
-      if (!((b*0x8bc40d7d) & (b*0xa1e2f5d1) & 0x14020a)) {
-        b = (uint32_t) sqrt(c);
-        if (c == b*b) {
-          B2 = gcd_ui(a+b, n);
-          return found_factor(n, B2, factors);
-        }
+      if (is_perfect_square_ret(c,&b)) {
+        B2 = gcd_ui(a+b, n);
+        return found_factor(n, B2, factors);
       }
     }
   }
@@ -1238,14 +1320,60 @@ int lehman_factor(UV n, UV *factors, int do_trial) {
     if (ip >= NPRIMES_SMALL)  ip = NPRIMES_SMALL-1;
     return trial_factor(n, factors, primes_small[ip], B);
   }
-  factors[0] = n;
-  return 1;
+  return no_factor(n,factors);
 }
 
-static const uint32_t _fr_chunk = 8192;
-static const uint32_t _fr_sieve_crossover = 10000000;  /* About 10^14 */
+/* Chebyshev polynomials of the first kind T_n(x) = V_n(2x,1) / 2. */
+/* Basic algorithm from Daniel "Trizen" Șuteu */
+int cheb_factor(UV n, UV *factors, UV B, UV initx)
+{
+  UV sqrtB, inv, x, f, i;
 
-static void _vec_factor(UV lo, UV hi, UV *nfactors, UV *farray, UV noffset, int square_free)
+  if (B == 0) { B = log2floor(n);  B = 8*B*B; }
+  if (B > isqrt(n)) B = isqrt(n);
+  sqrtB = isqrt(B);
+  inv = modinverse(2,n);   /* multiplying by this will divide by two */
+  x = (initx == 0) ? 72 : initx;
+  f = 1;
+
+  START_DO_FOR_EACH_PRIME(2, B) {
+    if (p <= sqrtB) {
+      UV lgp = logint(B, p);
+      UV plgp = ipowsafe(p, lgp);
+      if (plgp < UV_MAX) {
+        x = mulmod(lucasvmod(addmod(x,x,n), 1, plgp, n), inv, n);
+      } else {
+        for (i = 1; i <= lgp; i++)
+          x = mulmod(lucasvmod(addmod(x,x,n), 1, p, n), inv, n);
+      }
+    } else {
+      x = mulmod(lucasvmod(addmod(x,x,n), 1, p, n), inv, n);
+    }
+    f = gcd_ui(x-1, n);  if (f > 1)  break;
+  } END_DO_FOR_EACH_PRIME
+
+  if (f > 1 && f < n)
+    return found_factor(n, f, factors);
+  return no_factor(n,factors);
+}
+
+
+
+static const uint32_t _fr_chunk = 256*1024;
+
+/* Help performance by doing a cube root sieve for small ranges */
+static bool _fr_full_sieve(UV sqrtn, UV range)  /* range = hi-lo */
+{
+  if (sqrtn <   10000000U) return 1;               /* Below 10^14 */
+  if (sqrtn <   35000000U) return (range >   900); /* Below 10^15 */
+  if (sqrtn <  100000000U) return (range >  1700); /* Below 10^16 */
+  if (sqrtn <  350000000U) return (range >  3400); /* Below 10^17 */
+  if (sqrtn < 1000000000U) return (range >  5500); /* Below 10^18 */
+  if (sqrtn < 3500000000U) return (range > 17000); /* Below 10^19 */
+  return (range > 19000);
+}
+
+static void _vec_factor(UV lo, UV hi, UV *nfactors, UV *farray, UV noffset, bool square_free)
 {
   UV *N, j, n, sqrthi, sievelim;
   sqrthi = isqrt(hi);
@@ -1255,7 +1383,7 @@ static void _vec_factor(UV lo, UV hi, UV *nfactors, UV *farray, UV noffset, int 
     N[j] = 1;
     nfactors[j] = 0;
   }
-  sievelim = (sqrthi < _fr_sieve_crossover) ? sqrthi : icbrt(hi);
+  sievelim = _fr_full_sieve(sqrthi, hi-lo)  ?  sqrthi  :  icbrt(hi);
   START_DO_FOR_EACH_PRIME(2, sievelim) {
     UV q, t, A;
     if (square_free == 0) {
@@ -1313,12 +1441,12 @@ static void _vec_factor(UV lo, UV hi, UV *nfactors, UV *farray, UV noffset, int 
   Safefree(N);
 }
 
-factor_range_context_t factor_range_init(UV lo, UV hi, int square_free) {
+factor_range_context_t factor_range_init(UV lo, UV hi, bool square_free) {
   factor_range_context_t ctx;
   ctx.lo = lo;
   ctx.hi = hi;
   ctx.n = lo-1;
-  ctx.is_square_free = square_free ? 1 : 0;
+  ctx.is_square_free = square_free;
   if (hi-lo+1 > 100) {        /* Sieve in chunks */
     if (square_free) ctx._noffset = (hi <= 42949672965UL) ? 10 : 15;
     else             ctx._noffset = BITS_PER_WORD - clz(hi);
@@ -1327,7 +1455,7 @@ factor_range_context_t factor_range_init(UV lo, UV hi, int square_free) {
     New(0, ctx._farray, _fr_chunk * ctx._noffset, UV);
     { /* Prealloc all the sieving primes now. */
       UV t = isqrt(hi);
-      if (t >= _fr_sieve_crossover) t = icbrt(hi);
+      if (!_fr_full_sieve(t, hi-lo))  t = icbrt(hi);
       get_prime_cache(t, 0);
     }
   } else {                    /* factor each number */
@@ -1349,7 +1477,7 @@ int factor_range_next(factor_range_context_t *ctx) {
     if (ctx->_coffset >= _fr_chunk) {
       UV clo = n;
       UV chi = n + _fr_chunk - 1;
-      if (chi > ctx->hi) chi = ctx->hi;
+      if (chi > ctx->hi || chi < clo) chi = ctx->hi;
       _vec_factor(clo, chi, ctx->_nfactors, ctx->_farray, ctx->_noffset, ctx->is_square_free);
       ctx->_coffset = 0;
     }
@@ -1374,6 +1502,48 @@ void factor_range_destroy(factor_range_context_t *ctx) {
   if (ctx->_farray != 0) Safefree(ctx->_farray);
   if (ctx->_nfactors != 0) Safefree(ctx->_nfactors);
   ctx->_farray = ctx->_nfactors = ctx->factors = 0;
+}
+
+/******************************************************************************/
+/* Find number of factors for all values in a range */
+/******************************************************************************/
+
+unsigned char* range_nfactor_sieve(UV lo, UV hi, bool with_multiplicity) {
+  unsigned char* nf;
+  UV *N, i, range = hi-lo+1, sqrtn = isqrt(hi);
+
+  Newz(0, nf, range, unsigned char);
+  New(0, N, range, UV);
+
+  /* We could set to 1 and sieve from 2, or do this initialization */
+  for (i = lo; i <= hi && i >= lo; i++) {
+    N[i-lo] = 1;
+    if (!(i&1) && i >= 2) {
+      UV k = i >> 1;
+      unsigned char nz = 1;
+      while (!(k&1)) { nz++; k >>= 1; }
+      nf[i-lo] = (with_multiplicity) ? nz : 1;
+      N[i-lo] = UVCONST(1) << nz;
+    }
+  }
+
+  START_DO_FOR_EACH_PRIME(3, sqrtn) {
+    UV pk, maxpk = UV_MAX/p; \
+    for (i = P_GT_LO_0(p,p,lo); i < range; i += p)
+      { N[i] *= p;  nf[i]++; }
+    for (pk = p*p; pk <= hi; pk *= p) {
+      for (i = P_GT_LO_0(pk,pk,lo); i < range; i += pk)
+        { N[i] *= p;  if (with_multiplicity) nf[i]++; }
+      if (pk >= maxpk) break;  /* Overflow protection */
+    }
+  } END_DO_FOR_EACH_PRIME
+
+  for (i = 0; i < range; i++)
+    if (N[i] < (lo+i))
+      nf[i]++;
+  Safefree(N);
+  if (lo == 0) nf[0] = 1;
+  return nf;
 }
 
 
@@ -1600,7 +1770,7 @@ static UV bsgs_hash_put_get(bsgs_page_top_t* pagetop, UV v, UV i) {
   return 0;
 }
 
-static UV dlp_bsgs(UV a, UV g, UV p, UV n, UV maxent, int race_rho) {
+static UV dlp_bsgs(UV a, UV g, UV p, UV n, UV maxent, bool race_rho) {
   bsgs_page_top_t PAGES;
   UV i, m, maxm, hashmap_count;
   UV aa, S, gm, T, gs_i, bs_i;
@@ -1708,7 +1878,7 @@ static UV dlp_bsgs(UV a, UV g, UV p, UV n, UV maxent, int race_rho) {
 
 /* Find smallest k where a = g^k mod p */
 #define DLP_TRIAL_NUM  10000
-static UV znlog_solve(UV a, UV g, UV p, UV n) {
+UV znlog_solve(UV a, UV g, UV p, UV n) {
   UV k, sqrtn;
   const int verbose = _XS_get_verbose();
 
@@ -1736,6 +1906,7 @@ static UV znlog_solve(UV a, UV g, UV p, UV n) {
     if (aorder != 0 && gorder % aorder != 0) return 0;
   }
 
+  /* This is confusing */
   sqrtn = (n == 0) ? 0 : isqrt(n);
   if (n == 0) n = p-1;
 
@@ -1754,26 +1925,23 @@ static UV znlog_solve(UV a, UV g, UV p, UV n) {
 
 /* Silver-Pohlig-Hellman */
 static UV znlog_ph(UV a, UV g, UV p, UV p1) {
-  UV fac[MPU_MAX_FACTORS+1];
-  UV exp[MPU_MAX_FACTORS+1];
-  int i, nfactors;
-  UV x, j;
+  factored_t pf;
+  UV x, sol[MPU_MAX_DFACTORS], mod[MPU_MAX_DFACTORS];
+  uint32_t i;
 
   if (p1 == 0) return 0;   /* TODO: Should we plow on with p1=p-1? */
-  nfactors = factor_exp(p1, fac, exp);
-  if (nfactors == 1)
+  pf = factorint(p1);
+  if (pf.nfactors == 1)
     return znlog_solve(a, g, p, p1);
-  for (i = 0; i < nfactors; i++) {
-    UV pi, delta, gamma;
-    pi = fac[i];   for (j = 1; j < exp[i]; j++)  pi *= fac[i];
-    delta = powmod(a,p1/pi,p);
-    gamma = powmod(g,p1/pi,p);
+  for (i = 0; i < pf.nfactors; i++) {
+    UV pi = ipow(pf.f[i],pf.e[i]);
+    UV delta = powmod(a,p1/pi,p);
+    UV gamma = powmod(g,p1/pi,p);
     /* printf(" solving znlog(%"UVuf",%"UVuf",%"UVuf")\n", delta, gamma, p); */
-    fac[i] = znlog_solve( delta, gamma, p, znorder(gamma,p) );
-    exp[i] = pi;
+    sol[i] = znlog_solve( delta, gamma, p, znorder(gamma,p) );
+    mod[i] = pi;
   }
-  x = chinese(fac, exp, nfactors, &i);
-  if (i == 1 && powmod(g, x, p) == a)
+  if (chinese(&x, 0, sol, mod, pf.nfactors) == 1 && powmod(g, x, p) == a)
     return x;
   return 0;
 }
@@ -1794,6 +1962,7 @@ UV znlog(UV a, UV g, UV p) {
 
   gorder = znorder(g,p);
   if (gorder != 0 && powmod(a, gorder, p) != 1) return 0;
+  /* TODO: Can these tests every fail?  Do we need aorder? */
   aorder = znorder(a,p);
   if (aorder == 0 && gorder != 0) return 0;
   if (aorder != 0 && gorder % aorder != 0) return 0;
@@ -1816,7 +1985,7 @@ UV znlog(UV a, UV g, UV p) {
 
 
 /* Compile with:
- *  gcc -O3 -fomit-frame-pointer -march=native -Wall -DSTANDALONE -DFACTOR_STANDALONE factor.c util.c primality.c cache.c sieve.c chacha.c csprng.c prime_nth_count.c lmo.c -lm
+ *  gcc -O3 -fomit-frame-pointer -march=native -Wall -DSTANDALONE -DFACTOR_STANDALONE factor.c util.c primality.c cache.c sieve.c chacha.c csprng.c prime_counts.c prime_count_cache.c lmo.c legendre_phi.c real.c inverse_interpolate.c rootmod.c lucas_seq.c prime_powers.c sort.c -lm
  */
 #ifdef FACTOR_STANDALONE
 #include <errno.h>

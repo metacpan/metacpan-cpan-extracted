@@ -1,3 +1,4 @@
+# Tests that focus on detecting pollution from the client/bootstrap which would make remperl behave differently than perl.
 use v5.36;
 use Test::More;
 use IPC::Open3 qw(open3);
@@ -9,9 +10,10 @@ use lib 'lib';
 use Remote::Perl;
 
 # Run a snippet with plain perl and return (stdout, stderr, exit_code).
-sub perl_e($code) {
+# Optional @flags are inserted before -e (e.g. '-Mstrict', '-w').
+sub perl_e($code, @flags) {
     my $err_fh = gensym();
-    my $pid    = open3(my $in, my $out_fh, $err_fh, $^X, '-e', $code);
+    my $pid    = open3(my $in, my $out_fh, $err_fh, $^X, @flags, '-e', $code);
     close $in;
     my ($out, $err) = ('', '');
     my $sel = IO::Select->new($out_fh, $err_fh);
@@ -28,30 +30,36 @@ sub perl_e($code) {
 
 # Run a snippet with remperl and return (stdout, stderr, exit_code).
 # method: 'code' (run_code), 'file' (run_file), 'file_tmpfile' (run_file + tmpfile)
-sub remperl_e($code, $method) {
+# %opts: warnings => 1, preamble => "use strict;\n" (prepended to code for run_code)
+sub remperl_e($code, $method, %opts) {
     my ($out, $err) = ('', '');
     my $r = Remote::Perl->new(
         cmd     => [$^X],
         tmpfile => ($method eq 'file_tmpfile' ? 'auto' : 0),
     );
+    my %run_opts = (
+        on_stdout => sub { $out .= $_[0] },
+        on_stderr => sub { $err .= $_[0] },
+        warnings  => $opts{warnings} // 0,
+    );
     my $rc;
     if ($method eq 'code') {
-        $rc = $r->run_code($code,
-            on_stdout => sub { $out .= $_[0] },
-            on_stderr => sub { $err .= $_[0] },
-        );
+        my $source = ($opts{preamble} // '') . $code;
+        $rc = $r->run_code($source, %run_opts);
     } else {
         my ($fh, $filename) = tempfile(SUFFIX => '.pl', UNLINK => 1);
         print $fh $code;
         close $fh;
-        $rc = $r->run_file($filename,
-            on_stdout => sub { $out .= $_[0] },
-            on_stderr => sub { $err .= $_[0] },
-        );
+        $rc = $r->run_file($filename, %run_opts);
     }
     $r->disconnect;
     return ($out, $err, $rc);
 }
+
+# Devel::Cover corrupts uncaught-die exit codes: its END block does file I/O
+# which sets $!, and Perl's die-exit uses $! || ($?>>8) || 255.  Detect this
+# and skip only the exit-code comparisons (not the code-execution itself).
+my $UNDER_COVER = exists $INC{'Devel/Cover.pm'};
 
 my @configs = (
     ['run_code',         'code'        ],
@@ -91,7 +99,10 @@ for my $case (
     for my $cfg (@configs) {
         my ($name, $method) = @$cfg;
         my (undef, undef, $rc) = remperl_e($code, $method);
-        is($rc, $perl_rc, "$label ($name): exit code matches perl");
+        SKIP: {
+            skip 'exit code unreliable under Devel::Cover', 1 if $UNDER_COVER;
+            is($rc, $perl_rc, "$label ($name): exit code matches perl");
+        }
     }
 }
 
@@ -106,7 +117,10 @@ for my $case (
     for my $cfg (@configs) {
         my ($name, $method) = @$cfg;
         my (undef, undef, $rc) = remperl_e($code, $method);
-        is($rc, $perl_rc, "signatures ($name): remperl matches perl (fails without use feature)");
+        SKIP: {
+            skip 'exit code unreliable under Devel::Cover', 1 if $UNDER_COVER;
+            is($rc, $perl_rc, "signatures ($name): remperl matches perl (fails without use feature)");
+        }
     }
 }
 
@@ -117,7 +131,10 @@ for my $case (
     for my $cfg (@configs) {
         my ($name, $method) = @$cfg;
         my (undef, undef, $rc) = remperl_e($code, $method);
-        is($rc, $perl_rc, "say ($name): remperl matches perl (fails without use feature)");
+        SKIP: {
+            skip 'exit code unreliable under Devel::Cover', 1 if $UNDER_COVER;
+            is($rc, $perl_rc, "say ($name): remperl matches perl (fails without use feature)");
+        }
     }
 }
 
@@ -218,6 +235,94 @@ for my $case (
         my ($out, undef, $rc) = remperl_e($code, $method);
         is($rc, 0, "feature not enabled ($name): exit 0");
         unlike($out, qr/\bsay\b/, "feature not enabled ($name): say absent from feature list");
+    }
+}
+
+# -- -Mstrict parity: undeclared variable fails --------------------------------
+
+{
+    my $code = '$x = 1; print "bad\n"';
+    my ($perl_out, $perl_err, $perl_rc) = perl_e($code, '-Mstrict');
+    isnt($perl_rc, 0, '-Mstrict: perl exits non-zero');
+    for my $cfg (@configs) {
+        my ($name, $method) = @$cfg;
+        next if $method ne 'code';   # -M only applies to -e (run_code)
+        my ($out, $err, $rc) = remperl_e($code, $method,
+            preamble => "use strict;\n");
+        SKIP: {
+            skip 'exit code unreliable under Devel::Cover', 1 if $UNDER_COVER;
+            is($rc, $perl_rc, "-Mstrict ($name): exit code matches perl");
+        }
+    }
+}
+
+# -- -mstrict parity: empty import, no enforcement -----------------------------
+
+{
+    my $code = '$x = 1; print "ok\n"';
+    my ($perl_out, $perl_err, $perl_rc) = perl_e($code, '-mstrict');
+    is($perl_rc, 0, '-mstrict: perl exits 0 (empty import, no enforcement)');
+    for my $cfg (@configs) {
+        my ($name, $method) = @$cfg;
+        next if $method ne 'code';
+        my ($out, $err, $rc) = remperl_e($code, $method,
+            preamble => "use strict ();\n");
+        is($rc,  $perl_rc,  "-mstrict ($name): exit code matches perl");
+        is($out, $perl_out, "-mstrict ($name): output matches perl");
+    }
+}
+
+# -- -Mwarnings parity: uninitialized value warning ----------------------------
+
+{
+    my $code = 'my $x; print $x; print "done\n"';
+    my ($perl_out, $perl_err, $perl_rc) = perl_e($code, '-Mwarnings');
+    is($perl_rc, 0, '-Mwarnings: perl exits 0');
+    like($perl_err, qr/uninitialized/, '-Mwarnings: perl warns about uninitialized');
+    for my $cfg (@configs) {
+        my ($name, $method) = @$cfg;
+        next if $method ne 'code';
+        my ($out, $err, $rc) = remperl_e($code, $method,
+            preamble => "use warnings;\n");
+        is($rc,  $perl_rc, "-Mwarnings ($name): exit code matches perl");
+        is($out, $perl_out, "-Mwarnings ($name): output matches perl");
+        like($err, qr/uninitialized/, "-Mwarnings ($name): warns about uninitialized");
+    }
+}
+
+# -- -M-warnings parity: suppresses warnings -----------------------------------
+
+{
+    my $code = 'my $x; print $x; print "ok\n"';
+    my ($perl_out, $perl_err, $perl_rc) = perl_e($code, '-M-warnings');
+    is($perl_rc, 0, '-M-warnings: perl exits 0');
+    is($perl_err, '', '-M-warnings: perl has no warnings');
+    for my $cfg (@configs) {
+        my ($name, $method) = @$cfg;
+        next if $method ne 'code';
+        my ($out, $err, $rc) = remperl_e($code, $method,
+            preamble => "no warnings;\n");
+        is($rc,  $perl_rc,  "-M-warnings ($name): exit code matches perl");
+        is($out, $perl_out, "-M-warnings ($name): output matches perl");
+        is($err, '',        "-M-warnings ($name): no warnings on stderr");
+    }
+}
+
+# -- -Mstrict + -Mwarnings combined parity -------------------------------------
+
+{
+    my $code = 'my $x; print $x; print "done\n"';
+    my ($perl_out, $perl_err, $perl_rc) = perl_e($code, '-Mstrict', '-Mwarnings');
+    is($perl_rc, 0, '-Mstrict -Mwarnings: perl exits 0');
+    like($perl_err, qr/uninitialized/, '-Mstrict -Mwarnings: perl warns');
+    for my $cfg (@configs) {
+        my ($name, $method) = @$cfg;
+        next if $method ne 'code';
+        my ($out, $err, $rc) = remperl_e($code, $method,
+            preamble => "use strict;\nuse warnings;\n");
+        is($rc,  $perl_rc,  "-Mstrict -Mwarnings ($name): exit code matches perl");
+        is($out, $perl_out, "-Mstrict -Mwarnings ($name): output matches perl");
+        like($err, qr/uninitialized/, "-Mstrict -Mwarnings ($name): warns about uninitialized");
     }
 }
 

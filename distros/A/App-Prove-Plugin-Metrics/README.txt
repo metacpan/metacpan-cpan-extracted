@@ -1,10 +1,10 @@
-"App::Prove::Plugin::Metrics" Version 0.0.1
+"App::Prove::Plugin::Metrics" Version 0.0.2
 
 Abstract:
 ---------
 This package provides a mechanism to emit pass-rate metrics from Perl unit tests executed with the `prove` testing tool.
 
-What's new in version 0.0.1:
+What's new in version 0.0.2:
 ----------------------------
 * File output support
 * Module dispatch support

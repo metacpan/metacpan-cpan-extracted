@@ -84,7 +84,7 @@ sub id
     return( $self->{_id} );
 }
 
-# value() — alias for as_string
+# value() - alias for as_string
 sub value { return( shift->as_string ); }
 
 # _generate()

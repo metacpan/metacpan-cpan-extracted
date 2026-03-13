@@ -3,8 +3,8 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/is_power is_prime_power is_square vecsum/;
-#use Math::BigInt try=>"GMP,Pari";
+use Math::Prime::Util qw/is_power is_prime_power is_square is_sum_of_squares
+                         vecsum/;
 
 my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
@@ -48,6 +48,10 @@ my %powers = (
   3 => [8, 27, 125, 343, 17576],
   4 => [16, 38416],
   9 => [19683, 1000000000],
+ 11 => [362797056],
+ 13 => [1594323],
+ 17 => [129140163],
+ 40 => [qw/1099511627776 12157665459056928801/],
 );
 if ($use64) {
   push @{$powers{0}}, 9908918038843197151;
@@ -55,6 +59,10 @@ if ($use64) {
   push @{$powers{3}}, 2250923753991375;
   push @{$powers{4}}, 1150530828529256001;
   push @{$powers{9}}, 118587876497;
+  push @{$powers{11}}, 12200509765705829;
+  push @{$powers{13}}, 9904578032905937;
+  push @{$powers{17}}, 232630513987207;
+  push @{$powers{31}}, 617673396283947;
 }
 my @negpowers = (0,0,0,3,0,5,3,7,0,9,5);
 
@@ -63,9 +71,11 @@ plan tests => 0
             + 2 + 2*$extra
             + scalar(keys(%bpow))
             + scalar(keys(%bppow))
-            + 4
-            + 7 + scalar(keys %powers) + scalar(@negpowers)
+            + 5  # is_power
+            + 2*scalar(keys %powers) + scalar(@negpowers)
+            + 13  # tests for 3,5,7 power
             + 3  # is_square
+            + 7  # is_sum_of_squares
             + 0;
 
 is_deeply( [map { is_power($_) } 0 .. $#pow1],        \@pow1,  "is_power 0 .. $#pow1" );
@@ -81,7 +91,7 @@ if ($extra) {
 
 while (my($n, $expect) = each (%bpow)) {
   my $r;  my $k = is_power($n,0,\$r);
-  is_deeply( $expect, [$r,$k], "ispower  =>  $n = $r^$k (@$expect)" );
+  is_deeply( $expect, [$r,$k], "ispower($n,0,r) = $r^$k.  Expect ".join("^",@$expect) );
 }
 
 while (my($n, $expect) = each (%bppow)) {
@@ -105,8 +115,19 @@ while (my($e, $vals) = each (%powers)) {
   foreach my $val (@$vals) {
     push @fail, $val unless is_power($val) == $e;
   }
-  ok( @fail == 0, "is_power returns $e for " . join(",",@fail) );
+  ok( @fail == 0, (@fail > 0) ? "is_power(n) should return $e for [@fail]" : "is_power(n) returns $e for [@$vals]" );
+
+  my @fail2;
+  my $exp = ($e == 0) ? 0 : 1;
+  foreach my $val (@$vals) {
+    push @fail2, $val unless is_power($val,$e) == $exp;
+  }
+  ok( @fail2 == 0, (@fail2 > 0) ? "is_power(n,$e) should return $exp for [@fail2]" : "is_power(n,$e) returns $exp for [@$vals]" );
 }
+
+is_deeply( [map { is_power($_,1) } -10..10],
+           [map { 1              } -10..10], "Every integer is a first power");
+
 foreach my $e (0 .. $#negpowers) {
   is( is_power(-7 ** $e), $negpowers[$e], "is_power(-7^$e ) = $negpowers[$e]" );
 }
@@ -124,6 +145,13 @@ is( is_power(-1,5), 1, "-1 is a 5th power" );
   is( $root, 6, "...and the root is 6");
 }
 
+is( is_power(56129,3), 0, "56129 is not a 3rd power" );
+is( is_power(50653,3), 1, "50653 is a 3rd power" );
+is( is_power(76840601,5), 0, "76840601 is not a 5th power" );
+is( is_power(69343957,5), 1, "69343957 is a 5th power" );
+is( is_power(4782969,7), 1, "4782969 is a 7th power" );
+is( is_power(4782971,7), 0, "4782971 is not a 7th power" );
+
 ###### is_square
 is_deeply(
   [map { is_square($_) } (-4 .. 16)],
@@ -132,3 +160,42 @@ is_deeply(
 );
 is(is_square(603729), 1, "603729 is a square");
 is(is_square("765413284212226299051111674934086564882382225721"), 1, "is_square(<square of 80-bit prime>) = 1");
+
+###### is_sum_of_squares
+is_deeply(
+  [map { is_sum_of_squares($_,0) } (-10 .. 10)],
+  [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+  "is_sum_of_squares (k=0) for -10 .. 10"
+);
+is_deeply(
+  [map { is_sum_of_squares($_,1) } (-10 .. 10)],
+  [0,1,0,0,0,0,1,0,0,1,1,1,0,0,1,0,0,0,0,1,0],
+  "is_sum_of_squares (k=1) for -10 .. 10"
+);
+is_deeply(
+  [map { is_sum_of_squares($_) } (-10 .. 100)],
+  [1,1,1,0,0,1,1,0,1,1,1,1,1,0,1,1,0,0,1,1,1,0,0,1,0,0,1,1,1,0,1,0,0,0,0,1,1,0,0,1,0,0,1,0,1,0,1,1,0,0,1,1,0,0,0,1,0,0,0,1,1,0,1,1,0,0,0,0,1,0,0,1,0,0,1,1,0,0,1,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,1,0,0,0,1,1,0,0,0,0,0,0,1,1,0,1],
+  "is_sum_of_squares (k=2) for -10 .. 100"
+);
+is_deeply(
+  [map { is_sum_of_squares($_,3) } (-10 .. 100)],
+  [1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,1],
+  "is_sum_of_squares (k=3) for -10 .. 100"
+);
+is_deeply(
+  [map { is_sum_of_squares($_,4) } (-10 .. 10)],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  "is_sum_of_squares (k=4) for -10 .. 10"
+);
+
+is_deeply(
+  [map { is_sum_of_squares($_) } (209, 437, 713, 1333, 2021)],
+  [0,0,0,0,0],
+  "is_sum_of_squares (k=2) for selected non-representable integers"
+);
+
+is_deeply(
+  [map { is_sum_of_squares($_,3) } (qw/0 6 7 8 9 1145141919810 245657627368729 12345678987654321 185724285729475816451975/)],
+  [1,1,0,1,1,1,1,1,0],
+  "is_sum_of_squares (k=3) for selected integers"
+);

@@ -272,9 +272,9 @@ sub _build_from_smime_output
 
     # _RawEntity wraps the complete Crypt::SMIME output string and exposes just enough of
     # the Entity interface for smtpsend() and the test suite:
-    #   headers->get( $name )    — used by structure tests
-    #   headers->remove( $name ) — called by smtpsend() to strip Bcc
-    #   as_string()              — called by smtpsend() for SMTP DATA
+    #   headers->get( $name )    - used by structure tests
+    #   headers->remove( $name ) - called by smtpsend() to strip Bcc
+    #   as_string()              - called by smtpsend() for SMTP DATA
     #
     # We deliberately do NOT subclass Mail::Make::Entity here. Entity::print_body
     # branches on is_multipart() and iterates _parts (which would be empty), producing a
@@ -486,7 +486,7 @@ sub _serialise_for_smime
     return( $full );
 }
 
-# STORABLE_freeze / STORABLE_thaw — satisfy Module::Generic serialisation hooks
+# STORABLE_freeze / STORABLE_thaw - satisfy Module::Generic serialisation hooks
 sub STORABLE_freeze { return( $_[0] ) }
 
 sub STORABLE_thaw   { return( $_[0] ) }
@@ -500,9 +500,9 @@ sub STORABLE_thaw   { return( $_[0] ) }
 ## Exposes just enough of the Mail::Make::Entity interface to satisfy
 ## Mail::Make::smtpsend() and the test suite:
 ##
-##   headers->get( $name )    — returns the header value
-##   headers->remove( $name ) — removes a header (no-op if absent)
-##   as_string()              — returns the complete RFC 2822 message verbatim
+##   headers->get( $name )    - returns the header value
+##   headers->remove( $name ) - removes a header (no-op if absent)
+##   as_string()              - returns the complete RFC 2822 message verbatim
 ##
 ## We deliberately bypass Mail::Make::Entity because Entity::print_body()
 ## branches on is_multipart() and iterates _parts. For a multipart/signed
@@ -643,7 +643,7 @@ L<Crypt::SMIME> accepts and returns plain Perl strings. It does not expose a str
 
 =item 2. Protocol constraints
 
-B<Signing> requires computing a cryptographic hash (e.g. SHA-256) over the entire content to be signed. Although the hash algorithm itself is sequential and could theoretically operate on a stream, the resulting C<multipart/signed> structure must carry the original content I<followed by> the detached signature. The signature cannot be emitted until the complete content has been hashed, which means either buffering the whole message in memory or reading it twice (once to hash, once to emit) — the latter requiring a temporary file.
+B<Signing> requires computing a cryptographic hash (e.g. SHA-256) over the entire content to be signed. Although the hash algorithm itself is sequential and could theoretically operate on a stream, the resulting C<multipart/signed> structure must carry the original content I<followed by> the detached signature. The signature cannot be emitted until the complete content has been hashed, which means either buffering the whole message in memory or reading it twice (once to hash, once to emit) - the latter requiring a temporary file.
 
 B<Encryption> uses a symmetric cipher (AES by default) operating on PKCS#7 C<EnvelopedData>. The ASN.1 DER encoding of C<EnvelopedData> declares the total length of the encrypted payload in the structure header, which must be known before the first byte is emitted. Streaming without a temporary file is therefore not possible with standard PKCS#7.
 

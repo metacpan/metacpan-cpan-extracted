@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 76968c9e9ade289cd066b95f72215b9f48082e61b751d2f4bc7b3033e9560a46 CHANGES
+SHA256 aa748b1916470e49b425a0723c03ab12d22b211173ce423113274e36b03f4069 CONTRIBUTING.md
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 d4bdd03f0f9fa555df6597160470c69dbdd1d357ea5df702bcb4da1387d05dcd MANIFEST
+SHA256 e9cda3d67887d4caa8851bee0b0f1d07069955c2254ba6ef0c0deb82aad59457 META.json
+SHA256 cdb105f21b3c6e4fac5776325b78177f62de22cf5b56d990b6428bcc7240a582 META.yml
+SHA256 336dc59200bf2e79e2462e172be67ffc5bac9416f51b00a876ca8bdae486fa74 Makefile.PL
+SHA256 d4a085d4c3247f62efa991b565fc4ba33848223eaf8780fd2ce6824b42a4dc5b README
+SHA256 8c098fd7b73ab5fcd80430d06b758ee07b304a11d00cf294e269c7415af95380 README.md
+SHA256 1bdea5d9bb93ef0c0bb24d129b6b54dc662842fe9b466ba15a5d6acd1aa891a3 lib/App/mailmake.pm
+SHA256 69aab6ca35781e7bc60d971a43d29a457a38ab8b16bef8972ff1ac00a804cc37 scripts/mailmake
+SHA256 5575c36951a31e37aaf49dc20c88b3fa83f27a8c154a2fa5ebeb63e5de9b015d t/001_load.t
+SHA256 9fdfbf2477e49f8a602cf9db483433c6e1a7f26fdbc8d1669c4ba54198bcefaf t/010_app_mailmake.t
+SHA256 62aa6aa85707f9693e678da55a78a461e292bab447734b35129e8e9c68eb7619 t/900_pod.t
+SHA256 1855f1851cc59711d63c6ce10bb000e24b838e77cc02acd2a314b03bda80cb49 t/910_coverage.t
+SHA256 310a1b527105a8453812d86a4829006f901591218f00e708bdc45ef2f5e8f5f6 t/920_manifest.t
+SHA256 f229776ce2dd7cd0fa3b6b87fc42ddfe50bdb505b736154ebfd4c5bcf5b5129e t/930_signature.t
+SHA256 51e3199e1210ec73cf9bf5acee8de3216cb6002150cad36c10de47fa36c87f55 t/999_kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmmy6HsACgkQXzwCYc2y
+51Kbrw/9HurRp3c+7mObzXFrMj7lWbnAJmToE+I/GkaR+ObVSgPpGKL6FJCqu3CF
+kjQKnfsi0d8HoWdkgj6zs9FIy40fqF4vBzefT9z8/2XWtVLwDGCju0QgEsytQH1b
+vsFejn7CkZxLhUyMzR9Ne6bnE29c7FDMCb2Hfbk79tZN+5Z32A+A7kJ2wL44+XaE
+9cM/iVG4KFnQAok9SKKZUHlPP4wu8u619rjPSMQ7vqa9ENSl4HVY/zDINsQ1RwHl
+PLirwsayw0nRzib31p72MtLHK+4N+lP0yDI0uF7hQOQRLR34pMcSVGLo9K5BbQHe
+NsfGXOm497azucGZ+E3TiJN3S0GjsI7YLB1pBAM+ILX79yev1fRBbukiDPhW41mP
+0XtTPcaOMx2odjsAuptv4dzTv2vnTh2qMOSwQtlJeztQCMTiG65HDkgHq7M10NVP
+iM974OthsTzFcwcis4iOVYnSuHY4MMsSIwGovXnXzwH4uQaGszF4sMbxGdSn+WU1
+B+JYB4USDB31OjwXaCmUUFXtp5gCWEHcqsndI8tGP6tI92MQHiPIjCKM1PdQIyjR
+k899FVA/lMJygIGwmnWQ1C0svoLF1BZILddZzMm+Rq81/Ida4vywFvX/hTc2oxoY
+POtGEy+aRP9DSX1L5mcn+FotT3p01IJTkk6zXEfZtx004yC/iPA=
+=O5CB
+-----END PGP SIGNATURE-----

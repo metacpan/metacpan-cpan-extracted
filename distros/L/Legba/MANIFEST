@@ -1,0 +1,14 @@
+Legba.xs
+lib/Legba.pm
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+t/01_basic.t
+t/02_edge_cases.t
+t/03_custom_ops.t
+t/04_references.t
+t/05_stress.t
+t/06_packages.t
+t/07_utilities.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

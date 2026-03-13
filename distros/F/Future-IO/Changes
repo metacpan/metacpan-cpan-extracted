@@ -1,5 +1,15 @@
 Revision history for Future-IO
 
+0.23    2026-03-12
+        [CHANGES]
+         * Improved performance of ImplBase's timer queue implementation
+         * Also probe for KQueue implementation on OpenBSD and Darwin
+
+        [BUGFIXES]
+         * Fixed handling of `O_NONBLOCK` flag on default impl
+         * Ensure that `->poll` enqueued during another `->poll` in default
+           impl is not immediately invoked
+
 0.22    2026-02-27
         [CHANGES]
          * Document that you should always `poll` for at least one of the

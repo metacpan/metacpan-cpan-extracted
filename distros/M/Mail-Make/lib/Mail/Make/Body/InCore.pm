@@ -1,13 +1,14 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make/Body/InCore.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/02
-## All rights reserved.
-##
-## This program is free software; you can redistribute it and/or modify it
+## Modified 2026/03/07
+## All rights reserved
+## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 # NOTE: Mail::Make::Body::InCore package
@@ -21,7 +22,7 @@ BEGIN
     use parent qw( Mail::Make::Body );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = 'Mail::Make::Exception';
-    our $VERSION         = 'v0.1.0';
+    our $VERSION         = 'v0.1.1';
 }
 
 use strict;
@@ -37,7 +38,7 @@ sub init
     if( defined( $data ) )
     {
         # Accept scalar reference or plain scalar
-        if( ref( $data ) eq 'SCALAR' )
+        if( $self->_is_scalar( $data ) )
         {
             $self->{_data} = $$data;
         }
@@ -74,7 +75,11 @@ sub open
     my $self = shift( @_ );
     # Copy to avoid closing over a reference to internal data
     my $data = $self->{_data};
-    open( my $fh, '<', \$data ) ||
+    # If the scalar has the UTF-8 flag set (wide characters), encode it to a byte string
+    # before opening the in-memory filehandle, otherwise Perl will refuse with
+    # "Strings with code points over 0xFF may not be mapped into in-memory file handles".
+    utf8::encode( $data ) if( utf8::is_utf8( $data ) );
+    CORE::open( my $fh, '<', \$data ) ||
         return( $self->error( "Cannot open in-core body for reading: $!" ) );
     return( $fh );
 }
@@ -91,7 +96,7 @@ sub set
 {
     my $self = shift( @_ );
     my $data = shift( @_ );
-    if( ref( $data ) eq 'SCALAR' )
+    if( $self->_is_scalar( $data ) )
     {
         $self->{_data} = $$data;
     }
@@ -125,7 +130,7 @@ Mail::Make::Body::InCore - In-Memory Body for Mail::Make
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

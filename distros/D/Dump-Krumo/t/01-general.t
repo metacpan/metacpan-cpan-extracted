@@ -16,6 +16,7 @@ is(kx("Doolis")   , "'Doolis'"       );
 is(kx(12345)      , "12345"          );
 is(kx("")         , "''"             );
 is(kx("a'b")      , "\"a'b\""        );
+is(kx('a"b')      , "'a\"b'"         );
 is(kx(0)          , "0"              );
 is(kx('0')        , "0"              );
 is(kx("1\x{0}2")  , '"1\x{00}2"'     ); # Null byte in the middle of a string
@@ -54,10 +55,11 @@ is(kx(\$str)    , "\\'foobar'");
 is(kx(\"scott") , "\\'scott'");
 
 # Hashes
-is(kx("{a => 1, b=>2}") , '"{a => 1, b=>2}"');
-is(kx("{one => 1}")     , '"{one => 1}"');
-is(kx("{'a b' => 1}")   , '"{\'a b\' => 1}"');
-is(kx("{'a\"b' => 1}")  , '"{\'a"b\' => 1}"');
+is(kx({a => 1, b=>2}) , "{ a => 1, b => 2 }");
+is(kx({one => 1})     , "{ one => 1 }");
+is(kx({'a b' => 1})   , '{ \'a b\' => 1 }');
+is(kx({'a"b' => 1})   , '{ \'a"b\' => 1 }');
+is(kx({"a'b" => 1})   , '{ \'a\'b\' => 1 }');
 
 # Code reference
 is(kx(\&done_testing) , 'sub { ... }');

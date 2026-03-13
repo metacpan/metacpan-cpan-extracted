@@ -41,9 +41,9 @@ BEGIN
 #   - captures the raw SMTP conversation into a temp file shared via pipe
 #
 # Returns: ( $port, $pid, $log_fh )
-#   $port   — TCP port the child is listening on
-#   $pid    — child PID (caller must waitpid when done)
-#   $log_fh — readable end of a pipe; child writes captured lines there
+#   $port   - TCP port the child is listening on
+#   $pid    - child PID (caller must waitpid when done)
+#   $log_fh - readable end of a pipe; child writes captured lines there
 # ---------------------------------------------------------------------------
 sub _spawn_mock_smtp
 {
@@ -156,7 +156,7 @@ sub _collect_log
     return( split( /\n/, $raw // '' ) );
 }
 
-# NOTE: Basic plain-text message — happy path
+# NOTE: Basic plain-text message - happy path
 subtest 'smtpsend: basic plain-text message' => sub
 {
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp();
@@ -217,7 +217,7 @@ subtest 'smtpsend: Bcc goes to RCPT TO but not into message headers' => sub
     ok( !$bcc_in_body, 'Bcc header absent from transmitted message body' );
 };
 
-# NOTE: Multiple recipients — To + Cc
+# NOTE: Multiple recipients - To + Cc
 subtest 'smtpsend: multiple recipients via To and Cc' => sub
 {
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp();
@@ -243,8 +243,8 @@ subtest 'smtpsend: multiple recipients via To and Cc' => sub
     ok( grep( /^RCPT TO:.*c\@example\.com/i, @log ), 'Cc recipient in RCPT TO' );
 };
 
-# NOTE: Display name in From — addr-spec extracted correctly for MAIL FROM
-subtest 'smtpsend: display name in From — addr-spec extracted for MAIL FROM' => sub
+# NOTE: Display name in From - addr-spec extracted correctly for MAIL FROM
+subtest 'smtpsend: display name in From - addr-spec extracted for MAIL FROM' => sub
 {
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp();
 
@@ -300,7 +300,7 @@ subtest 'smtpsend: explicit MailFrom overrides From header' => sub
 subtest 'smtpsend: accepts a pre-built Net::SMTP object as Host' => sub
 {
     # Net::SMTP->new() opens the first connection; smtpsend() uses that
-    # same object — no second TCP connection needed. One slot is sufficient.
+    # same object - no second TCP connection needed. One slot is sufficient.
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp( max_connections => 1 );
 
     require Net::SMTP;
@@ -320,7 +320,7 @@ subtest 'smtpsend: accepts a pre-built Net::SMTP object as Host' => sub
 
     my $rv = $mail->smtpsend( Host => $smtp );
 
-    # The caller owns the connection — smtpsend() does not quit it.
+    # The caller owns the connection - smtpsend() does not quit it.
     # We call quit() ourselves so the mock server can finish cleanly.
     $smtp->quit if( defined( $smtp ) );
 
@@ -329,12 +329,12 @@ subtest 'smtpsend: accepts a pre-built Net::SMTP object as Host' => sub
 
     ok( defined( $rv ), 'smtpsend() succeeds with pre-built Net::SMTP object' );
     ok( grep( /^MAIL FROM/i, @log ), 'MAIL FROM issued via pre-built object' );
-    # smtpsend() must not have issued QUIT — our explicit call above did.
+    # smtpsend() must not have issued QUIT - our explicit call above did.
     my @quit_lines = grep( /^QUIT$/i, @log );
     is( scalar( @quit_lines ), 1, 'exactly one QUIT in log (from caller, not smtpsend)' );
 };
 
-# NOTE: Return value — array ref of delivered addresses
+# NOTE: Return value - array ref of delivered addresses
 subtest 'smtpsend: return value is arrayref of delivered addresses' => sub
 {
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp();
@@ -374,7 +374,7 @@ subtest 'smtpsend: error when no recipients' => sub
     local $SIG{__WARN__} = sub{};
     my $rv = $mail->smtpsend(
         Host  => '127.0.0.1',
-        Port  => 19999,   # nothing listening — but error fires before connect
+        Port  => 19999,   # nothing listening - but error fires before connect
         Hello => 'test.local',
         To    => '',
     );
@@ -406,7 +406,7 @@ subtest 'smtpsend: error when SMTP server unreachable' => sub
         'error message mentions connection failure' );
 };
 
-# NOTE: Password as CODE ref — callback invoked at send time
+# NOTE: Password as CODE ref - callback invoked at send time
 subtest 'smtpsend: password CODE ref is called and resolved' => sub
 {
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp();
@@ -438,12 +438,12 @@ subtest 'smtpsend: password CODE ref is called and resolved' => sub
     _collect_log( $pid, $r_fh );
 
     ok( $called, 'password CODE ref was invoked' );
-    # Auth will fail against the plain mock — that is expected here
+    # Auth will fail against the plain mock - that is expected here
     ok( !defined( $rv ) || defined( $rv ),
         'smtpsend() returned without hanging (auth fail or success both acceptable)' );
 };
 
-# NOTE: Username without Password — immediate error, no connection attempted
+# NOTE: Username without Password - immediate error, no connection attempted
 subtest 'smtpsend: Username without Password returns error' => sub
 {
     my $mail = Mail::Make->new
@@ -461,7 +461,7 @@ subtest 'smtpsend: Username without Password returns error' => sub
         Port     => 19998,
         Hello    => 'test.local',
         Username => 'jack@example.com',
-        # No Password — must trigger immediate error
+        # No Password - must trigger immediate error
     );
 
     diag( "error: " . ( $mail->error // '(none)' ) ) if( $DEBUG );
@@ -472,7 +472,7 @@ subtest 'smtpsend: Username without Password returns error' => sub
 };
 
 # NOTE: Timeout option propagated to Net::SMTP
-#       (structural test — verifies no crash, not actual timeout behaviour)
+#       (structural test - verifies no crash, not actual timeout behaviour)
 subtest 'smtpsend: Timeout option accepted without error' => sub
 {
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp();

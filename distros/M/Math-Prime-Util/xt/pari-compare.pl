@@ -96,7 +96,7 @@ foreach my $n (0 .. $small) {
     array_compare( \@a1, \@a2, "fordivisors($n)" );
   }
 
-  { my $m = int(rand($n-1));
+  { my $m = 1+int(rand($n-2));
     my $invmod = invmod($m, $n);
     if (defined $invmod) {
       die "invmod($m, $n)" unless Math::Pari::lift(PARI "Mod(1/$m,$n)") == $invmod;
@@ -126,6 +126,9 @@ foreach my $n (0 .. $small) {
     my $gn = PARI "Mod($g,$n)";
     my $log = znlog($a, $g, $n);
     die "znlog($a, $g, $n) should be defined" unless defined $log;
+    # znlog(1,Mod(1,2)) MPU and Pari 2.12.1 => 0.  Math::Pari 2.030518 => 1
+    if ($a == 1 && $g == 1 && $n == 2)
+      { die "znlog(1, 1, 2)" unless $log == 0; next; }
     die "znlog($a, $g, $n)" unless Math::Pari::znlog($a,$gn) == $log;
   }
 

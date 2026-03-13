@@ -15,6 +15,7 @@ my @incorrect = (
   '+',
   '++4',
   '+-4',
+  '0-0',
   '-0004',
   'a',
   '5.6',
@@ -34,7 +35,7 @@ my %correct = (
   '+0004' => 5,
   5.0     => 7,
   1e8     => 100000007,
-  Math::BigInt->new("10000000000000000000000012") => "10000000000000000000000013",
+  Math::BigInt->new("10000000000000000000000012") => Math::BigInt->new("10000000000000000000000013"),
   Math::BigFloat->new("9") => 11,
 );
 
@@ -44,46 +45,49 @@ plan tests =>   2                      # undefined and empty string
               + 2                      # infinity and nan
               + 1;                     # long invalid string
 
+my $qrnn = qr/ must be a (non-negative|positive) integer/;
+
 eval { next_prime(undef); };
-like($@, qr/^Parameter must be defined/, "next_prime(undef)");
+like($@, qr/^Parameter must be defined/, "Gives Error:  next_prime(undef)");
 
 eval { next_prime(""); };
-like($@, qr/ ('' )?must be a positive integer/, "next_prime('')");
+like($@, $qrnn, "Gives Error:  next_prime('')");
 
 foreach my $v (@incorrect) {
+  $v = "$v" if $] < 5.008 && ref($v) eq 'Math::BigFloat';
   eval { next_prime($v); };
-  like($@, qr/ '\Q$v\E' must be a positive integer/, "next_prime($v)");
+  like($@, $qrnn, "Gives Error:  next_prime($v)");
 }
 
 while (my($v, $expect) = each (%correct)) {
-  is(next_prime($v), $expect, "Correct: next_prime($v)");
+  is("".next_prime($v), $expect, "Correct:      next_prime($v)");
 }
 
 # The next two tests really are not critical, but are nice to check.
 SKIP: {
-  skip "Your machine does not have NaN", 1 unless $Config{d_isinf};
+  skip "Your machine does not have infinity", 1 unless $Config{d_isinf};
   my $infinity = ($^O ne 'MSWin32') ? 0+'inf' : '1.#INF';
   $infinity = Math::BigInt->binf()->numify() if 65535 > $infinity;
   $infinity = +(20**20**20) if 65535 > $infinity;
   skip "Your machine seems to not have infinity", 1 if 65535 > $infinity;
   eval { next_prime($infinity); };
-  like($@, qr/must be a positive integer/, "next_prime( infinity )");
+  like($@, $qrnn, "Gives Error:  next_prime( infinity )");
 }
 
 SKIP: {
-  skip "Your machine does not have NaN" unless $Config{d_isnan};
+  skip "Your machine does not have NaN", 1 unless $Config{d_isnan};
+  no warnings 'numeric';
   my $nan = ($^O ne 'MSWin32') ? 0+'nan' : '1.#IND';
   $nan      = Math::BigInt->bnan()->numify() if $nan >= 0;
   $nan      = -sin('inf') if $nan >= 0;
   skip "Your machine seems to not have NaN", 1 if $nan >= 0 || $nan =~ /^\d*$/;
   eval { next_prime($nan); };
-  like($@, qr/must be a positive integer/, "next_prime( nan ) [nan = '$nan']");
+  like($@, $qrnn, "Gives Error:  next_prime( nan ) [nan = '$nan']");
 }
 
 
 SKIP: {
-  skip "You need to upgrade either Perl or Carp to avoid invalid non-native inputs from causing a segfault.  Makefile.PL should have requested a Carp upgrade.", 1
-    if $] < 5.008 && $Carp::VERSION < 1.17;
+  skip "Perl $], Carp $Carp::VERSION.  We need a minimum of 5.8 or Carp 1.17 to avoid segfaults.", 1 if $] < 5.008 && $Carp::VERSION < 1.17;
   eval { next_prime("11111111111111111111111111111111111111111x"); };
-  like($@, qr/must be a positive integer/, "next_prime('111...111x')");
+  like($@, $qrnn, "Gives Error:  next_prime('111...111x')");
 }

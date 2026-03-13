@@ -125,6 +125,12 @@ my @tests = (
         '2025-02-17T11:14:00',
         { nanosecond => 65_341_560, time_zone => 'UTC', },
     ],
+    [
+        # Truncate nanoseconds for GH #18
+        qw( YYYYMMDDThhmmss.ssZ  2025-02-17T11:14:00.03946212062836Z ),
+        '2025-02-17T11:14:00',
+        { nanosecond => 39_462_120, time_zone => 'UTC', },
+    ],
 );
 
 subtest(

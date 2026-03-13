@@ -1,6 +1,6 @@
 package DBIx::Class::MockData;
 
-$DBIx::Class::MockData::VERSION   = '0.02';
+$DBIx::Class::MockData::VERSION   = '0.03';
 $DBIx::Class::MockData::AUTHORITY = 'cpan:MANWAR';
 
 use strict;
@@ -14,7 +14,7 @@ DBIx::Class::MockData - Generate mock test data for DBIx::Class schemas
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -41,6 +41,26 @@ With options:
             seed       => 42,
         )
         ->wipe
+        ->generate;
+
+Populate only selected tables:
+
+    DBIx::Class::MockData
+        ->new(
+            schema     => $schema,
+            schema_dir => 't/lib',
+            only       => [qw(Author Book)],
+        )
+        ->generate;
+
+Populate all tables except selected ones:
+
+    DBIx::Class::MockData
+        ->new(
+            schema     => $schema,
+            schema_dir => 't/lib',
+            exclude    => [qw(AuditLog SessionToken)],
+        )
         ->generate;
 
 =head1 DESCRIPTION
@@ -102,6 +122,20 @@ Print debug output. Default: C<0>.
 
 Integer seed passed to C<srand> for reproducible output. Optional.
 
+=item only
+
+Array reference of source names to populate. When supplied, only the listed
+tables are processed (in FK-safe order). Cannot be combined with C<exclude>.
+
+    only => [qw(Author Book)]
+
+=item exclude
+
+Array reference of source names to skip. All other tables are populated.
+Cannot be combined with C<only>.
+
+    exclude => [qw(AuditLog SessionToken)]
+
 =back
 
 =cut
@@ -120,11 +154,20 @@ sub new {
     croak "schema_dir '$dir' does not exist" unless -d $dir;
     push @INC, $dir unless grep { $_ eq $dir } @INC;
 
+    croak "only and exclude cannot both be specified"
+        if $args{only} && $args{exclude};
+    croak "only must be an arrayref"
+        if $args{only} && ref($args{only}) ne 'ARRAY';
+    croak "exclude must be an arrayref"
+        if $args{exclude} && ref($args{exclude}) ne 'ARRAY';
+
     my $self = {
-        _schema => $args{schema},
-        rows    => $args{rows}    // 5,
-        verbose => $args{verbose} // 0,
-        _salt   => int(rand(9_000_000)) + 1_000_000,
+        _schema  => $args{schema},
+        rows     => $args{rows}    // 5,
+        verbose  => $args{verbose} // 0,
+        _salt    => int(rand(9_000_000)) + 1_000_000,
+        _only    => $args{only}    ? { map { $_ => 1 } @{ $args{only}    } } : undef,
+        _exclude => $args{exclude} ? { map { $_ => 1 } @{ $args{exclude} } } : undef,
     };
 
     if (defined $args{seed}) {
@@ -215,12 +258,32 @@ types, nullability, and uniqueness constraints. Returns C<$self>.
 
 =cut
 
+sub _active_sources {
+    my ($self, @all) = @_;
+    my %known = map { $_ => 1 } @all;
+
+    if ($self->{_only}) {
+        my @unknown = grep { !$known{$_} } keys %{ $self->{_only} };
+        croak "Unknown source(s) in 'only': " . join(', ', sort @unknown) if @unknown;
+        return grep { $self->{_only}{$_} } @all;
+    }
+    if ($self->{_exclude}) {
+        my @unknown = grep { !$known{$_} } keys %{ $self->{_exclude} };
+        croak "Unknown source(s) in 'exclude': " . join(', ', sort @unknown) if @unknown;
+        return grep { !$self->{_exclude}{$_} } @all;
+    }
+    return @all;
+}
+
 sub generate {
     my ($self) = @_;
     my $schema = $self->{_schema};
 
-    my @sources = $schema->sources;
-    croak "No result sources found in schema" unless @sources;
+    my @all_sources = $schema->sources;
+    croak "No result sources found in schema" unless @all_sources;
+
+    my @sources = $self->_active_sources(@all_sources);
+    croak "No sources to populate after applying only/exclude filters" unless @sources;
 
     $self->_log("Found sources: " . join(', ', sort @sources));
 
@@ -289,7 +352,8 @@ sub dry_run {
     my ($self) = @_;
     my $schema = $self->{_schema};
 
-    for my $name (sort $schema->sources) {
+    my @sources = sort $self->_active_sources($schema->sources);
+    for my $name (@sources) {
         my $source   = $schema->source($name);
         my @cols     = $source->columns;
         my %col_info = map { $_ => $source->column_info($_) } @cols;

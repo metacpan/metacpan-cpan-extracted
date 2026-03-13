@@ -38,7 +38,7 @@
    "provides" : {
       "Future::IO::Impl::Tickit" : {
          "file" : "lib/Future/IO/Impl/Tickit.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -51,6 +51,9 @@ typedef __int8 int8_t;
   #include <stdio.h>
   #include <stdlib.h>
   #include <ctype.h>
+  #include <stdbool.h>
+  #define TRUE true
+  #define FALSE false
   typedef unsigned long UV;
   typedef   signed long IV;
   typedef        double NV;
@@ -80,6 +83,10 @@ typedef __int8 int8_t;
 #endif
 
 #else
+
+#if defined(__clang__) && defined(__clang_major__) && __clang_major__ > 11
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+#endif
 
 #include "EXTERN.h"
 #include "perl.h"
@@ -125,11 +132,11 @@ typedef __int8 int8_t;
 
 /* Try to determine if we have 64-bit available via uint64_t */
 #if defined(UINT64_MAX) || defined(_UINT64_T) || defined(__UINT64_TYPE__)
-  #define HAVE_STD_U64 1
+  #define HAVE_UINT64 1
 #elif defined(_MSC_VER)   /* We set up the types earlier */
-  #define HAVE_STD_U64 1
+  #define HAVE_UINT64 1
 #else
-  #define HAVE_STD_U64 0
+  #define HAVE_UINT64 0
 #endif
 
 #define MAXBIT        (BITS_PER_WORD-1)
@@ -180,20 +187,29 @@ typedef __int8 int8_t;
     #define HAVE_UINT128 1
     typedef unsigned __int128 uint128_t;
   #endif
+#elif defined(__BITINT_MAXWIDTH__) && __BITINT_MAXWIDTH__ >= 128
+  /* Should have included <stdint.h> and <limits.h> already */
+  #define HAVE_UINT128 1
+  typedef unsigned _BitInt(128) uint128_t;
 #else
   #define HAVE_UINT128 0
 #endif
 
 /* Perl 5.23.0 added the very helpful definition.  Without it, guess. */
+/* Perl core standardized on not counting the implicit bit */
 #ifndef NVMANTBITS
   #if NVSIZE <= 8
-    #define NVMANTBITS ((NVSIZE <= 4) ? 24 : 53)
+    #define NVMANTBITS (NVSIZE <= 2 ? 10 : NVSIZE <= 4 ? 23 : 52)
   #elif defined(USE_QUADMATH)
     #define NVMANTBITS 112
   #elif defined(__LDBL_MANT_DIG__)
     #define NVMANTBITS __LDBL_MANT_DIG__
+  #elif NVSIZE == 16
+    #define NVMANTBITS 112
+  #elif NVSIZE == 32
+    #define NVMANTBITS 236
   #else
-    #define NVMANTBITS 64
+    #error Unknown NVSIZE, cannot guess at mantissa bits
   #endif
 #endif
 
@@ -221,12 +237,20 @@ typedef __int8 int8_t;
   #define LNV_IS_QUAD  0
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#if (defined(__GNUC__) || defined(__clang__)) && __STDC_VERSION__ >= 199901L
   #define INLINE inline
 #elif defined(_MSC_VER)
   #define INLINE __inline
 #else
   #define INLINE
+#endif
+
+#if (defined(__GNUC__) || defined(__clang__)) && !defined(__INTEL_COMPILER)
+  #define ISCONSTFUNC __attribute__((const))
+  #define NOINLINE __attribute__((noinline))
+#else
+  #define ISCONSTFUNC
+  #define NOINLINE
 #endif
 
 #if __BIG_ENDIAN__ || (defined(BYTEORDER) && (BYTEORDER == 0x4321 || BYTEORDER == 0x87654321))

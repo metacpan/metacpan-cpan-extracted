@@ -35,6 +35,7 @@ my %mertens = (
 );
 my %big_mertens = (
    100000 =>  -48,
+   444444 =>  -37,
   1000000 =>  212,
  10000000 => 1037,
 );
@@ -67,9 +68,12 @@ if ($extra && $use64) {
       2**23 =>  -10,
 
      10**8  => 1928,
-#     10**9  => -222,
-#  1*10**10 => -33722,  # From Deleglise and Rivat
-#  2*10**10 => -48723,  # Too slow with current method
+     10**9  => -222,
+  1*10**10  => -33722,  # From Deleglise and Rivat
+  2*10**10  =>  48723,
+  3*10**10  =>  42411,
+  4*10**10  => -25295,
+    10**11  => -87856,
   );
 }
 # These are slow with XS, and *really* slow with PP.
@@ -79,7 +83,7 @@ if (!$usexs) {
                  keys %big_mertens;
 }
 
-plan tests => 1 + 5 + 2 + 3 + scalar(keys %big_mertens);
+plan tests => 1 + 5 + 2 + 2 + 3 + scalar(keys %big_mertens);
 
 ok(!eval { moebius(0); }, "moebius(0)");
 
@@ -102,6 +106,23 @@ is_deeply( [moebius(-7,5)],
 
 is( moebius(3*5*7*11*13), -1, "moebius(3*5*7*11*13) = -1" );
 is( moebius("20364840299624512075310661735"), 1, "moebius(73#/2) = 1" );
+
+# near end points
+is_deeply([[moebius(4294967293,4294967295)],
+           [moebius(4294967293,4294967296)],
+           [moebius(4294967295,4294967297)],
+           [moebius(4294967296,4294967298)]],
+          [[1,1,-1],[1,1,-1,0],[-1,0,1],[0,1,-1]],
+          "moebius ranges around 2^32");
+
+SKIP: {
+  skip "ranges around 2^64 only on 64-bit",1 unless $use64;
+  is_deeply([[moebius("18446744073709551613","18446744073709551615")],
+             [moebius("18446744073709551613","18446744073709551616")],
+             [moebius("18446744073709551615","18446744073709551617")]],
+            [[-1,0,-1],[-1,0,-1,0],[-1,0,1]],
+            "moebius ranges around 2^64");
+}
 
 {
   my(@mert_sum1, @mert_sum2, @mertens, @expect, $M);

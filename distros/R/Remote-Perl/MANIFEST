@@ -15,7 +15,9 @@ MANIFEST			This list of files
 README
 t/api.t
 t/bootstrap.t
+t/cli-opts.t
 t/cli.t
+t/flow-control.t
 t/lib/Remote/Perl/Test/Greeter.pm
 t/modules.t
 t/perl-parity.t

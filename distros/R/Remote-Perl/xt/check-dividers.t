@@ -1,3 +1,4 @@
+# Verify that all comment divider lines (-- and ==) are exactly 80 characters.
 use v5.36;
 use Test::More;
 use File::Find;

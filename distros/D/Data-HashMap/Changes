@@ -1,5 +1,16 @@
 Revision history for Data-HashMap
 
+0.02  2026-03-12
+    - Lookup optimizations: cached stash pointer comparison in EXTRACT_MAP
+    - Switch to bundled xxHash v0.8.3 (XXH3_64bits) for all key hashing
+    - Add get_direct keyword for zero-copy string-value lookups (IS, SS, I32S, I16S)
+    - OOM-safe TTL lazy allocation across all put/get_or_set paths
+    - LRU uint32_t index overflow guard in rehash
+    - HM_LIKELY/HM_UNLIKELY portability guard for non-GCC/Clang compilers
+    - Null-value guard in get_or_set for string-value variants
+    - each() iterator reset documentation covers remove/compaction triggers
+    - iter_reset keyword for manual each() iterator reset
+
 0.01  2026-03-07
     - Initial release
     - 14 type-specialized hash map variants: I16, I16A, I16S, I32, I32A, I32S, IA, II, IS, SA, SI16, SI32, SI, SS

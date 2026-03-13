@@ -1,5 +1,5 @@
 package MIDI::Drummer::Tiny::Grooves;
-$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7001';
+$MIDI::Drummer::Tiny::Grooves::VERSION = '0.7002';
 our $AUTHORITY = 'cpan:GENE';
 
 use Moo;
@@ -35,6 +35,7 @@ use namespace::clean;
 #pod   my @nums = keys %$set;
 #pod   for (1 .. 4) {
 #pod     $groove = $set->{ $nums[ rand @nums ] };
+#pod     say $groove->{cat};
 #pod     say $groove->{name};
 #pod     $groove->{groove}->();
 #pod   }
@@ -102,7 +103,7 @@ has duration => (
 );
 sub _build_duration { shift->drummer->sixteenth }
 
-#pod =head2 kick, rimshot, snare, clap, cowbell, shaker, closed, open, cymbals, hi_tom, mid_tom, low_tom
+#pod =head2 kick, rimshot, snare, clap, cowbell, shaker, closed, open, cymbal, hi_tom, mid_tom, low_tom
 #pod
 #pod   $grooves->kick(36);
 #pod   $kick = $grooves->kick;
@@ -125,7 +126,7 @@ for my $patch (qw(
     shaker
     closed
     open
-    cymbals
+    cymbal
     hi_tom
     mid_tom
     low_tom
@@ -143,7 +144,7 @@ sub _build_cowbell { shift->drummer->cowbell }
 sub _build_shaker  { shift->drummer->maracas }
 sub _build_closed  { shift->drummer->closed_hh }
 sub _build_open    { shift->drummer->open_hh }
-sub _build_cymbals { shift->drummer->crash1 }
+sub _build_cymbal  { shift->drummer->crash1 }
 sub _build_hi_tom  { shift->drummer->hi_mid_tom }
 sub _build_mid_tom { shift->drummer->low_mid_tom }
 sub _build_low_tom { shift->drummer->low_tom }
@@ -1339,7 +1340,7 @@ sub _grooves {
                     $self->closed  => ['0000000000000000'],
                     $self->open    => ['0000000000000000'],
                     $self->cowbell => ['0000000000000000'],
-                    $self->cymbals => ['0000000000000000'],
+                    $self->cymbal  => ['0000000000000000'],
                     $self->hi_tom  => ['0000000000000000'],
                     $self->mid_tom => ['0000000000000000'],
                     $self->low_tom => ['0000000000000000'],
@@ -1366,7 +1367,7 @@ MIDI::Drummer::Tiny::Grooves
 
 =head1 VERSION
 
-version 0.7001
+version 0.7002
 
 =head1 SYNOPSIS
 
@@ -1396,6 +1397,7 @@ version 0.7001
   my @nums = keys %$set;
   for (1 .. 4) {
     $groove = $set->{ $nums[ rand @nums ] };
+    say $groove->{cat};
     say $groove->{name};
     $groove->{groove}->();
   }
@@ -1446,7 +1448,7 @@ L<MIDI::Drummer::Tiny/sync_patterns> method.
 This is initialized to the sixteenth duration of the drummer
 L<MIDI::Drummer::Tiny> object.
 
-=head2 kick, rimshot, snare, clap, cowbell, shaker, closed, open, cymbals, hi_tom, mid_tom, low_tom
+=head2 kick, rimshot, snare, clap, cowbell, shaker, closed, open, cymbal, hi_tom, mid_tom, low_tom
 
   $grooves->kick(36);
   $kick = $grooves->kick;

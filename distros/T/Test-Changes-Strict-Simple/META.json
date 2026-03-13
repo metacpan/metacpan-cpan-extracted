@@ -1,0 +1,87 @@
+{
+   "abstract" : "Strict semantic validation for CPAN Changes files",
+   "author" : [
+      "Klaus Rindfrey <klausrin@cpan.org.eu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test-Changes-Strict-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "1.6",
+            "Test::Builder" : "0",
+            "Time::Local" : "0",
+            "constant" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "1.6",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "Test::Builder::Tester" : "0",
+            "Test::More" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Test::Changes::Strict::Simple" : {
+         "file" : "lib/Test/Changes/Strict/Simple.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/klaus-rindfrey/perl-test-changes-strict-simple.git",
+         "web" : "https://github.com/klaus-rindfrey/perl-test-changes-strict-simple.git"
+      }
+   },
+   "version" : "0.01",
+   "x_bugtracker" : {
+      "web" : "https://github.com/klaus-rindfrey/perl-test-changes-strict-simple/issues"
+   },
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

@@ -4,9 +4,10 @@ use warnings;
 
 use Test::More;
 use Math::Prime::Util qw/euler_phi jordan_totient carmichael_lambda
-                         divisor_sum moebius inverse_totient/;
+                         divisor_sum moebius inverse_totient
+                         sumtotient/;
 
-#my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
+my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 #my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 #my $usegmp= Math::Prime::Util::prime_get_config->{'gmp'};
 my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
@@ -24,8 +25,10 @@ my @A000010 = (0,1,1,2,2,4,2,6,4,6,4,10,4,12,6,8,8,16,6,18,8,12,10,22,8,20,12,18
 my @A002322 = (0,1,1,2,2,4,2,6,2,6,4,10,2,12,6,4,4,16,6,18,4,6,10,22,2,20,12,18,6,28,4,30,8,10,16,12,6,36,18,12,4,40,6,42,10,12,22,46,4,42,20,16,12,52,18,20,6,18,28,58,4,60,30,6,16,12,10,66,16,22,12,70,6,72,36,20,18,30,12,78,4,54,40,82,6,16,42,28,10,88,12,12,22,30,46,36,8,96,42,30,20,100,16,102,12,12,52,106,18,108,20,36,12,112,18,44,28,12,58,48,4,110,60,40,30,100,6,126,32,42,12,130,10,18,66,36,16,136,22,138,12,46,70,60,12,28,72,42,36,148,20,150,18,48,30,60,12,156,78,52,8,66,54,162,40,20,82,166,6,156,16,18,42,172,28,60,20,58,88,178,12,180,12,60,22,36,30,80,46,18,36,190,16,192,96,12,42,196,30,198,20);
 
 plan tests => 2 + 10 + scalar(keys %totients)
-                + 1 # Small Carmichael Lambda
-                + 5 # inverse_totient
+                + 2  # euler_phi around 2^32 and 2^64
+                + 1  # Small Carmichael Lambda
+                + 14 # inverse_totient
+                + 3  # sumtotient
                 ;
 
 ###### euler_phi (totient)
@@ -59,6 +62,22 @@ is_deeply( [euler_phi(1513,1537)],
 # negative euler_phi returns zero
 is_deeply( [euler_phi(-5,5)], [0,0,0,0,0,0,1,1,2,2,4], "euler_phi -5 to 5" );
 
+is_deeply([[euler_phi(4294967293,4294967295)],
+           [euler_phi(4294967293,4294967296)],
+           [euler_phi(4294967295,4294967297)],
+           [euler_phi(4294967296,4294967298)]],
+          [[4294493280,2147483646,2147483648],[4294493280,2147483646,2147483648,2147483648],[2147483648,2147483648,4288266240],[2147483648,4288266240,1431655764]],
+          "euler_phi ranges around 2^32");
+
+SKIP: {
+  skip "ranges around 2^64 only on 64-bit",1 unless $use64;
+  is_deeply([euler_phi("18446744073709551613","18446744073709551615"),
+             euler_phi("18446744073709551613","18446744073709551616"),
+             euler_phi("18446744073709551615","18446744073709551617")],
+            [qw/17023385317621506048 7713001620195508224 9208981628670443520 17023385317621506048 7713001620195508224 9208981628670443520 9223372036854775808 9208981628670443520 9223372036854775808 18446676793287966720/],
+            "euler_phi ranges around 2^64");
+}
+
 ###### Carmichael Lambda
 {
   my @lambda = map { carmichael_lambda($_) } (0 .. $#A002322);
@@ -72,6 +91,25 @@ is_deeply( [euler_phi(-5,5)], [0,0,0,0,0,0,1,1,2,2,4], "euler_phi -5 to 5" );
   is($tot, 198, "Totient count 0-100 = 198");
   is(0+inverse_totient(1728), 62, "inverse_totient(1728) = 62");
   is(0+inverse_totient(362880), 1138, "inverse_totient(9!) = 1138");
+  SKIP: {
+    skip "Larger inverse totient with EXTENDED_TESTING",1 unless $extra;
+    is(0+inverse_totient(3978374400), 63600, "inverse_totient(3978374400) = 63600");
+  }
+
+  is_deeply( [inverse_totient(0)], [], "inverse_totient(0)" );
+  is_deeply( [inverse_totient(1)], [1,2], "inverse_totient(1)" );
+  is_deeply( [inverse_totient(2)], [3,4,6], "inverse_totient(2)" );
+  is_deeply( [inverse_totient(3)], [], "inverse_totient(3)" );
+  is_deeply( [inverse_totient(4)], [5,8,10,12], "inverse_totient(4)" );
+  is_deeply( [inverse_totient(2*12135413)], [], "inverse_totient(2*12135413)" );
+  is_deeply( [inverse_totient(2*10754819)], [21509639,43019278], "inverse_totient(2*10754819)" );
+
   is_deeply( [inverse_totient(10000008)], [10555583,15000039,21111166,30000078], "inverse_totient(10000008)" );
+  is_deeply( [inverse_totient(10000)], [10291,12625,13805,18825,20582,20625,22088,25000,25100,25250,27500,27610,33132,37500,37650,41250], "inverse_totient(10000)" );
   ok( scalar(grep { $_ == 123456789} inverse_totient(82260072)) == 1, "inverse_totient(82260072) includes 123456789" );
 }
+
+###### sumtotient
+is_deeply([map { sumtotient($_) } 0..10], [0,1,2,4,6,10,12,18,22,28,32], "sumtotient(0..10)");
+is(sumtotient(12345),46326398,"sumtotient(12345)");
+is("".sumtotient(654321),130137945644,"sumtotient(654321)");

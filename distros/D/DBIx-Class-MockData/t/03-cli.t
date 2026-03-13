@@ -1,17 +1,21 @@
+#!/usr/bin/env perl
+
 use strict;
 use warnings;
+
 use lib 'lib';
 
 use Test::More;
 use Test::Exception;
+
 use IPC::Open3 qw(open3);
 use File::Temp qw(tempfile);
 use File::Spec;
 use Symbol qw(gensym);
 
-# ---------------------------------------------------------------------------
+#
+#
 # Helpers
-# ---------------------------------------------------------------------------
 
 my $PERL       = $^X;
 my $SCRIPT     = File::Spec->catfile('script', 'dbic-mockdata');
@@ -51,9 +55,9 @@ my @base_args = (
     '--namespace',  $NAMESPACE,
 );
 
-# ---------------------------------------------------------------------------
+#
+#
 # 1. Missing required args produce errors and non-zero exit
-# ---------------------------------------------------------------------------
 
 subtest 'missing --schema-dir exits non-zero' => sub {
     my ($out, $err, $exit) = run_cli('--namespace', $NAMESPACE, '--dry-run');
@@ -73,9 +77,9 @@ subtest 'missing --dsn (without --dry-run) exits non-zero' => sub {
     like $err, qr/dsn.*required/i, 'error mentions --dsn';
 };
 
-# ---------------------------------------------------------------------------
+#
+#
 # 2. --dry-run needs no DSN and prints DRY RUN output
-# ---------------------------------------------------------------------------
 
 subtest '--dry-run prints output without a DSN' => sub {
     my ($out, $err, $exit) = run_cli(
@@ -100,9 +104,9 @@ subtest '--dry-run shows expected number of rows' => sub {
     is scalar(@row_lines), 9, '9 Row lines (3 sources x 3 rows)';
 };
 
-# ---------------------------------------------------------------------------
+#
+#
 # 3. --deploy creates tables and inserts rows
-# ---------------------------------------------------------------------------
 
 subtest '--deploy creates tables and inserts rows' => sub {
     my $db   = temp_db();
@@ -128,9 +132,9 @@ subtest '--deploy creates tables and inserts rows' => sub {
     $dbh->disconnect;
 };
 
-# ---------------------------------------------------------------------------
+#
+#
 # 4. --wipe drops and recreates tables, then inserts
-# ---------------------------------------------------------------------------
 
 subtest '--wipe resets then inserts' => sub {
     my $db  = temp_db();
@@ -156,9 +160,9 @@ subtest '--wipe resets then inserts' => sub {
     $dbh->disconnect;
 };
 
-# ---------------------------------------------------------------------------
+#
+#
 # 5. --seed makes output reproducible
-# ---------------------------------------------------------------------------
 
 subtest '--seed produces reproducible rows' => sub {
     my $db1 = temp_db();
@@ -178,9 +182,9 @@ subtest '--seed produces reproducible rows' => sub {
     is_deeply $emails1, $emails2, 'same seed yields identical author emails';
 };
 
-# ---------------------------------------------------------------------------
+#
+#
 # 6. --help exits zero and prints usage
-# ---------------------------------------------------------------------------
 
 subtest '--help exits zero and prints usage' => sub {
     my ($out, $err, $exit) = run_cli('--help');
@@ -188,9 +192,9 @@ subtest '--help exits zero and prints usage' => sub {
     like $out,  qr/SYNOPSIS|OPTIONS|dbic-mockdata/i, 'usage text in stdout';
 };
 
-# ---------------------------------------------------------------------------
+#
+#
 # 7. Bad --dsn exits non-zero with a useful error
-# ---------------------------------------------------------------------------
 
 subtest 'unknown DBI driver exits non-zero' => sub {
     my ($out, $err, $exit) = run_cli(
@@ -200,5 +204,128 @@ subtest 'unknown DBI driver exits non-zero' => sub {
     );
     isnt $exit, 0, 'exits non-zero for unknown DBI driver';
 };
+
+#
+#
+# 8. --only populates only the listed tables
+
+subtest '--only populates only listed tables' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',    $dsn,
+        '--deploy',
+        '--only',   'Author',
+        '--rows',   2,
+    );
+    is $exit, 0, 'exits zero';
+
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+    my ($authors) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my ($books)   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my ($reviews) = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+    is $authors, 2, '2 authors inserted';
+    is $books,   0, 'no books inserted';
+    is $reviews, 0, 'no reviews inserted';
+    $dbh->disconnect;
+};
+
+subtest '--only with multiple tables (comma-separated)' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    run_cli(@base_args, '--dsn', $dsn, '--deploy', '--only', 'Author,Book', '--rows', 2);
+
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+    my ($authors) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my ($books)   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my ($reviews) = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+    is $authors, 2, '2 authors inserted';
+    is $books,   2, '2 books inserted';
+    is $reviews, 0, 'no reviews inserted';
+    $dbh->disconnect;
+};
+
+subtest '--only with unknown table exits non-zero' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',    $dsn,
+        '--deploy',
+        '--only',   'NoSuchTable',
+    );
+    isnt $exit, 0, 'exits non-zero for unknown table in --only';
+    like $err, qr/Unknown source|NoSuchTable/i, 'error mentions unknown source';
+};
+
+#
+#
+# 9. --exclude skips the listed tables
+
+subtest '--exclude skips listed table' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    run_cli(@base_args, '--dsn', $dsn, '--deploy', '--exclude', 'Review', '--rows', 2);
+
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+    my ($authors) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my ($books)   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my ($reviews) = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+    is $authors, 2, '2 authors inserted';
+    is $books,   2, '2 books inserted';
+    is $reviews, 0, 'review skipped';
+    $dbh->disconnect;
+};
+
+subtest '--exclude with multiple tables (comma-separated)' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    run_cli(@base_args, '--dsn', $dsn, '--deploy', '--exclude', 'Book,Review', '--rows', 2);
+
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+    my ($authors) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my ($books)   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my ($reviews) = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+    is $authors, 2, '2 authors inserted';
+    is $books,   0, 'book skipped';
+    is $reviews, 0, 'review skipped';
+    $dbh->disconnect;
+};
+
+subtest '--exclude with unknown table exits non-zero' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',     $dsn,
+        '--deploy',
+        '--exclude', 'GhostTable',
+    );
+    isnt $exit, 0, 'exits non-zero for unknown table in --exclude';
+    like $err, qr/Unknown source|GhostTable/i, 'error mentions unknown source';
+};
+
+subtest '--only and --exclude together exit non-zero' => sub {
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dry-run',
+        '--only',    'Author',
+        '--exclude', 'Review',
+    );
+    isnt $exit, 0, 'exits non-zero when both --only and --exclude supplied';
+    like $err, qr/only.*exclude|exclude.*only/i, 'error mentions the conflict';
+};
+
 
 done_testing;

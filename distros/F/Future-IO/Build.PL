@@ -16,7 +16,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Test::ExpectAndCheck' => '0.06',
-      'Test::Future::IO::Impl' => '0.20', # latest
+      'Test::Future::IO::Impl' => '0.21', # latest
       'Test2::V0' => 0,
    },
    configure_requires => {

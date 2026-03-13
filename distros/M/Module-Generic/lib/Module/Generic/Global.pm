@@ -955,7 +955,7 @@ sub set
         $self->{max_size} =~ /^\d+$/ &&
         $self->{max_size} > 0 &&
         $is_new_key &&
-        scalar( keys( %{$REPO->{ $ns }} ) ) > $self->{max_size} )
+        scalar( grep{ $_ ne $key } keys( %{$REPO->{ $ns }} ) ) >= $self->{max_size} )
     {
         $self->__message( 4, "The size of repository for namespace '$ns' is '", scalar( keys( %{$REPO->{ $ns }} ) ), "', which exceeds the maximum size allowed ($self->{max_size})." );
         my $order_ref = $ORDER->{ $ns };
@@ -1590,7 +1590,8 @@ sub _share_repo
         }
         else
         {
-            $SIZES->{ $ns } = \0;
+            my $sub_size = 0;
+            $SIZES->{ $ns } = \$sub_size;
         }
     }
 
@@ -1603,7 +1604,8 @@ sub _share_repo
         }
         else
         {
-            $NS_LOCKS->{ $ns } = \0;
+            my $ns_lock = 0;
+            $NS_LOCKS->{ $ns } = \$ns_lock;
         }
     }
 
@@ -2320,7 +2322,7 @@ You may override the callback per-call by passing C<on_get> to L</get>.
 
 When the C<refcount> option is provided (boolean C<0>/C<1>/empty string or C<undef>), the repository enables reference counting for automatic cleanup.
 
-C<Module::Generic::Global> will count increment on creation and decrement on destroy—entries remove when hitting C<0>. Implicitly enabled for class-level contexts (string controller, no key) to manage shared lifetime. For keyed or object-level, opt-in via C<< refcount => 1 >>.
+C<Module::Generic::Global> will count increment on creation and decrement on destroy-entries remove when hitting C<0>. Implicitly enabled for class-level contexts (string controller, no key) to manage shared lifetime. For keyed or object-level, opt-in via C<< refcount => 1 >>.
 
 =item * C<serialiser> or C<serializer>
 

@@ -7,9 +7,10 @@ build_requires:
   Capture::Tiny: '0'
   Test2::V0: '0'
 configure_requires:
-  Module::Build::Tiny: '0.035'
+  Module::Build::Tiny: '0'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150012'
+keywords: []
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,11 +28,14 @@ no_index:
 provides:
   App::bsky:
     file: lib/App/bsky.pm
-    version: '0.04'
+    version: '0.05'
   App::bsky::CLI:
     file: lib/App/bsky.pm
+    version: '0.05'
+recommends:
+  Win32::Console: '0'
 requires:
-  At: '0.17'
+  Bluesky: '1.01'
   File::HomeDir: '0'
   Getopt::Long: '0'
   JSON::Tiny: '0'
@@ -42,8 +46,19 @@ requires:
 resources:
   bugtracker: https://github.com/sanko/App-bsky/issues
   homepage: https://github.com/sanko/App-bsky
+  license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/App-bsky.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:SANKO
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_ignore:
+  - .tidyallrc
+  - .gitignore
+  - .clang-format
+  - .github/
+  - .github/*
+  - .gitmodules
+  - eg/**
+  - .github/**
+x_readme_from: script/bsky
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

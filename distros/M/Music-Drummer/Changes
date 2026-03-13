@@ -1,5 +1,8 @@
 Revision history for Music-Drummer
 
+0.7002 2026-03-12 16:16:01
+    - Keep up with the M::D::T version.
+
 0.7000 2026-01-31 17:27:17
     - Bump prereq. to 7!
 

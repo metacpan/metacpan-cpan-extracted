@@ -104,7 +104,7 @@ sub sign
     # RFC 2822 headers onto $self->{_parts}[0].
     $self->_ensure_envelope_headers( $entity ) || return( $self->pass_error );
 
-    # Serialise the MIME body that will be signed — Part 1 of multipart/signed.
+    # Serialise the MIME body that will be signed - Part 1 of multipart/signed.
     # Per RFC 3156 §5.1 this is the entity with CRLF line endings, exactly as it will 
     # appear on the wire.
     my $canonical = $self->_serialise_for_gpg( $entity ) || return( $self->pass_error );
@@ -237,7 +237,7 @@ sub _build_encrypted_mail
 #
 # Structure:
 #   multipart/signed; protocol="application/pgp-signature"; micalg="pgp-sha256"
-#   ├── <original MIME body — the part that was signed>
+#   ├── <original MIME body - the part that was signed>
 #   └── application/pgp-signature   (ASCII-armoured detached signature)
 sub _build_signed_mail
 {
@@ -417,7 +417,7 @@ sub _find_gpg_bin
 
 # _maybe_fetch_keys( \@recipients )
 # When auto_fetch is enabled and a keyserver is configured, attempts to retrieve missing 
-# public keys for each recipient. Failures are silently ignored — the key may already be 
+# public keys for each recipient. Failures are silently ignored - the key may already be 
 # in the local keyring.
 sub _maybe_fetch_keys
 {
@@ -680,13 +680,13 @@ Mail::Make::GPG - OpenPGP signing and encryption for Mail::Make
         ->subject( 'Signed message' )
         ->plain(   "Hello Alice.\n" );
 
-    # Sign only — multipart/signed (RFC 3156 §5)
+    # Sign only - multipart/signed (RFC 3156 §5)
     $mail->gpg_sign(
         KeyId      => '35ADBC3AF8355E845139D8965F3C0261CDB2E752',
         Passphrase => 'my-passphrase',   # or: sub { MyKeyring::get('gpg') }
     )->smtpsend( %smtp_opts );
 
-    # Encrypt only — multipart/encrypted (RFC 3156 §4)
+    # Encrypt only - multipart/encrypted (RFC 3156 §4)
     $mail->gpg_encrypt(
         Recipients => [ 'alice@example.com' ],
     )->smtpsend( %smtp_opts );
@@ -861,9 +861,9 @@ Must be installed and accessible as C<gpg2> or C<gpg> in C<PATH>, or explicitly 
 
 =over 4
 
-=item RFC 3156 — MIME Security with OpenPGP
+=item RFC 3156 - MIME Security with OpenPGP
 
-=item RFC 4880 — OpenPGP Message Format
+=item RFC 4880 - OpenPGP Message Format
 
 =back
 

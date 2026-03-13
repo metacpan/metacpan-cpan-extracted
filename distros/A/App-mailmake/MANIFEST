@@ -1,0 +1,19 @@
+CHANGES
+CONTRIBUTING.md
+lib/App/mailmake.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+scripts/mailmake
+t/001_load.t
+t/010_app_mailmake.t
+t/900_pod.t
+t/910_coverage.t
+t/920_manifest.t
+t/930_signature.t
+t/999_kwalitee.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

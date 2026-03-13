@@ -3,7 +3,7 @@ EC.xs
 Makefile.PL
 MANIFEST
 ppport.h
-README
+README.md
 typemap
 t/Crypt-OpenSSL-EC.t
 t/prime-field.t 

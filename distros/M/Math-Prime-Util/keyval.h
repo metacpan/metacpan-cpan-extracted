@@ -1,6 +1,15 @@
 #ifndef MPU_KEYVAL_H
 #define MPU_KEYVAL_H
 
+/* This includes:
+ *   keyval_t   simple key/val type, both UV
+ *   set        a key value set, with "add" function for new=old+new
+ *   setlist    key (UV) plus dynamic array of UVs.  "append" functionality
+ *
+ * Key=0 is not allowed.
+ */
+
+
 #include "ptypes.h"
 
 typedef struct {
@@ -138,11 +147,11 @@ static void init_setlist(set_list_t *L, UV isize) {
 
 static void free_setlist(set_list_t *L) {
   long i;
-  L->size = L->maxsize = 0;
   for (i = 0; i < L->maxsize; i++)
     if (L->keylist[i].size > 0)
       Safefree(L->keylist[i].vals);
   Safefree(L->keylist);
+  L->size = L->maxsize = 0;
 }
 
 static void _setlist_expand(set_list_t *L) {
@@ -187,16 +196,20 @@ static void setlist_addlist(set_list_t *L, UV key, long nvals, UV* list, UV mult
       L->keylist[h].maxsize = maxsize;
     }
     vptr = L->keylist[h].vals + size;
-    for (j = 0; j < nvals; j++)
+    for (j = 0; j < nvals; j++) {
+      /* if (list[j] > UV_MAX/mult) croak("overflow in addlist mult"); */
       vptr[j] = list[j] * mult;
+    }
     L->keylist[h].size = size + nvals;
   } else {
     long maxsize = (nvals < 5) ? 12 : (nvals+1) * 2;
     New(0, L->keylist[h].vals, maxsize, UV);
     L->keylist[h].maxsize = maxsize;
     vptr = L->keylist[h].vals;
-    for (j = 0; j < nvals; j++)
+    for (j = 0; j < nvals; j++) {
+      /* if (list[j] > UV_MAX/mult) croak("overflow in addlist mult"); */
       vptr[j] = list[j] * mult;
+    }
     L->keylist[h].size = nvals;
     L->keylist[h].key = key;
     if (L->size++ > 0.65 * L->maxsize)
@@ -229,5 +242,16 @@ static void setlist_merge(set_list_t *L, set_list_t T) {
     }
   }
 }
+
+#if 0
+static void setlist_zerolist(set_list_t *L, UV key) {
+  long i = setlist_search(*L, key);
+  if (i != -1) {
+    Safefree(L->keylist[i].vals);
+    L->keylist[i].vals = 0;
+    L->keylist[i].size = L->keylist[i].maxsize = 0;
+  }
+}
+#endif
 
 #endif

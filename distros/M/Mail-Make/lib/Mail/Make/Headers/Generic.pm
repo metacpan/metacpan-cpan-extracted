@@ -95,7 +95,7 @@ sub _filename_encode
         my $encoded = URI::Escape::XS::uri_escape( Encode::encode( 'UTF-8', $fname ) );
         return( sprintf( "UTF-8'%s'%s", $lang, $encoded ) );
     }
-    # Pure safe ASCII — caller should use simple quoting if needed
+    # Pure safe ASCII - caller should use simple quoting if needed
     return( undef );
 }
 

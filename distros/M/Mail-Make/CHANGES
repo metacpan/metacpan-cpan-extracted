@@ -1,5 +1,10 @@
 Revision history for Perl module Mail::Make
 
+v0.21.1 2026-03-12T23:55:40+0900
+    - Improved documentation
+    - Correction in Mail::Make::Body::InCore open method
+    - Added the method return_path in Mail::Make
+
 v0.21.0 2026-03-07T03:04:20+0900
     - Initial public release on CPAN
 

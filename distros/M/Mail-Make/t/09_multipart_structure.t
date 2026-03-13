@@ -303,8 +303,8 @@ subtest 'Serialisation of nested structure' => sub
     # Envelope headers
     like( $str, qr{^From: sender\@example\.com}mi,    'From header present' );
     like( $str, qr{^To: recipient\@example\.com}mi,   'To header present' );
-    like( $str, qr{^Subject: Full MIME test}mi,        'Subject header present' );
-    like( $str, qr{^MIME-Version: 1\.0}mi,             'MIME-Version present' );
+    like( $str, qr{^Subject: Full MIME test}mi,       'Subject header present' );
+    like( $str, qr{^MIME-Version: 1\.0}mi,            'MIME-Version present' );
 
     # MIME structure markers
     like( $str, qr{multipart/mixed}i,       'multipart/mixed in message' );
@@ -453,16 +453,16 @@ subtest 'Comma-in-filename (the original bug)' => sub
     my $img_path = tmp_file( "\x89PNG\r\n" . ( "X" x 100 ) );
 
     my $m = Mail::Make->new
-        ->from(  'hello@angels-inc.com' )
+        ->from(  'hello@yamato-inc.com' )
         ->to(    'client@example.com' )
-        ->subject( 'Hello from Angels, Inc.' )
+        ->subject( 'Hello from Yamato, Inc.' )
         ->plain( "Dear client,\n\nPlease see our logo.\n" )
-        ->html(  '<p>Dear client,</p><p><img src="cid:logo@angels-inc"></p>' )
+        ->html(  '<p>Dear client,</p><p><img src="cid:logo@yamato-inc"></p>' )
         ->attach_inline(
             path     => $img_path,
             type     => 'image/png',
-            filename => 'Angels,Inc-Logo.png',
-            cid      => 'logo@angels-inc',
+            filename => 'Yamato,Inc-Logo.png',
+            cid      => 'logo@yamato-inc',
         );
     my $str = $m->as_string;
     ok( defined( $str ) && length( $str ),
@@ -481,15 +481,15 @@ subtest 'Comma-in-filename (the original bug)' => sub
         'image uses base64' );
 
     # Comma must be percent-encoded in filename*
-    like( $str, qr{filename\*=.*Angels%2CInc}i,
+    like( $str, qr{filename\*=.*Yamato%2CInc}i,
         'comma percent-encoded as %2C in RFC 2231 filename*' );
 
     # No bare comma in filename= value
-    unlike( $str, qr{filename=Angels,Inc}i,
+    unlike( $str, qr{filename=Yamato,Inc}i,
         'no bare comma in filename= parameter' );
 
     # Subject with comma must be ASCII and untouched (comma is ASCII)
-    like( $str, qr{^Subject: Hello from Angels, Inc\.}mi,
+    like( $str, qr{^Subject: Hello from Yamato, Inc\.}mi,
         'ASCII subject with comma preserved unchanged' );
 };
 

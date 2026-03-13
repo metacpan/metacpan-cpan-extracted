@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2026 -- leonerd@leonerd.org.uk
 
-package Future::IO::Impl::Tickit 0.04;
+package Future::IO::Impl::Tickit 0.05;
 
 use v5.20;
 use warnings;
@@ -101,9 +101,25 @@ sub poll ( $, $fh, $events )
 
    my $f = Future::IO::Impl::Tickit::_Future->new;
 
-   push $pollers_by_fileno{$fh->fileno}->@*, Poller( $events, $f );
+   my $pollers = $pollers_by_fileno{$fh->fileno} //= [];
+   push @$pollers, Poller( $events, $f );
 
    _update_io( $fh );
+
+   $f->on_cancel( sub {
+      my $self = shift;
+
+      # Cancelling poll futures is pretty rare so this doesn't have to be that
+      # performant
+      my $idx;
+      $pollers->[$_]->f == $self and
+         $idx = $_, last for 0 .. $#$pollers;
+
+      defined $idx and
+         splice @$pollers, $idx, 1, ();
+
+      _update_io( $fh );
+   });
 
    return $f;
 }
@@ -116,6 +132,11 @@ sub _update_io ( $fh )
    $want_events |= $_->events for ( my $pollers = $pollers_by_fileno{$fileno} )->@*;
 
    return if $watches_by_fileno{$fileno} and $watches_by_fileno{$fileno}[1] == $want_events;
+
+   # First cancel the old one
+   if( $watches_by_fileno{$fileno} ) {
+      $tickit->watch_cancel( $watches_by_fileno{$fileno}[0] );
+   }
 
    my $cond = 0;
    $cond |= Tickit::IO_IN  if $want_events & POLLIN;
@@ -148,7 +169,8 @@ sub _update_io ( $fh )
          }
 
          if( !@$pollers ) {
-            delete $watches_by_fileno{$fileno};
+            my ( $watch ) = ( delete $watches_by_fileno{$fileno} )->@*;
+            $tickit->watch_cancel( $watch );
             return 0;
          }
 

@@ -1,7 +1,7 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
 ## Mail Builder - t/94_gpg_live.t
-## Live GPG signing and encryption tests — AUTHOR USE ONLY.
+## Live GPG signing and encryption tests - AUTHOR USE ONLY.
 ##
 ## Sends real signed and/or encrypted emails via a real SMTP server and
 ## verifies the message is accepted. Visual inspection in a GPG-capable
@@ -99,10 +99,10 @@ unless( defined( $smtp_from ) && length( $smtp_from ) &&
 }
 
 eval{ require IPC::Run }
-    or plan( skip_all => 'IPC::Run not installed — required for GPG operations' );
+    or plan( skip_all => 'IPC::Run not installed - required for GPG operations' );
 
 eval{ require File::Which }
-    or plan( skip_all => 'File::Which not installed — required to locate gpg binary' );
+    or plan( skip_all => 'File::Which not installed - required to locate gpg binary' );
 
 # Locate gpg binary early so we can skip cleanly if absent
 my $gpg_bin_found;
@@ -125,7 +125,7 @@ unless( defined( $gpg_bin_found ) && length( $gpg_bin_found ) )
 }
 unless( defined( $gpg_bin_found ) )
 {
-    plan( skip_all => 'gpg binary not found in PATH — install GnuPG or set MM_GPG_BIN' );
+    plan( skip_all => 'gpg binary not found in PATH - install GnuPG or set MM_GPG_BIN' );
 }
 
 # Signing tests require a key ID
@@ -175,13 +175,13 @@ use_ok( 'Mail::Make::GPG' );
 # NOTE: Plain-signed message (multipart/signed, RFC 3156 §5)
 SKIP:
 {
-    skip( 'MM_GPG_KEY_ID not set — signing tests skipped', 2 ) unless( $can_sign );
+    skip( 'MM_GPG_KEY_ID not set - signing tests skipped', 2 ) unless( $can_sign );
 
-    subtest 'live: gpg_sign — multipart/signed delivered' => sub
+    subtest 'live: gpg_sign - multipart/signed delivered' => sub
     {
         plan( tests => 2 );
         my $mail = _make_base_mail(
-            '[Mail::Make] Live GPG test — sign only',
+            '[Mail::Make] Live GPG test - sign only',
             "This message is signed with a detached OpenPGP signature.\n\n" .
             "Your mail client should show a valid signature indicator.\n",
         );
@@ -203,11 +203,11 @@ SKIP:
     };
 
     # NOTE: SHA-512 digest variant
-    subtest 'live: gpg_sign — SHA-512 digest' => sub
+    subtest 'live: gpg_sign - SHA-512 digest' => sub
     {
         plan( tests => 2 );
         my $mail = _make_base_mail(
-            '[Mail::Make] Live GPG test — sign SHA-512',
+            '[Mail::Make] Live GPG test - sign SHA-512',
             "Signed with SHA-512 digest algorithm.\n",
         );
 
@@ -229,11 +229,11 @@ SKIP:
 }
 
 # NOTE: Encrypted message (multipart/encrypted, RFC 3156 §4)
-subtest 'live: gpg_encrypt — multipart/encrypted delivered' => sub
+subtest 'live: gpg_encrypt - multipart/encrypted delivered' => sub
 {
     plan( tests => 2 );
     my $mail = _make_base_mail(
-        '[Mail::Make] Live GPG test — encrypt only',
+        '[Mail::Make] Live GPG test - encrypt only',
         "This message is encrypted with OpenPGP.\n\n" .
         "Only the holder of the private key for $gpg_recipient can read this.\n",
     );
@@ -260,13 +260,13 @@ subtest 'live: gpg_encrypt — multipart/encrypted delivered' => sub
 # NOTE: Sign then encrypt
 SKIP:
 {
-    skip( 'MM_GPG_KEY_ID not set — sign+encrypt test skipped', 1 ) unless( $can_sign );
+    skip( 'MM_GPG_KEY_ID not set - sign+encrypt test skipped', 1 ) unless( $can_sign );
 
-    subtest 'live: gpg_sign_encrypt — signed and encrypted delivered' => sub
+    subtest 'live: gpg_sign_encrypt - signed and encrypted delivered' => sub
     {
         plan( tests => 2 );
         my $mail = _make_base_mail(
-            '[Mail::Make] Live GPG test — sign + encrypt',
+            '[Mail::Make] Live GPG test - sign + encrypt',
             "This message is signed and encrypted with OpenPGP.\n\n" .
             "Only $gpg_recipient can decrypt it, and the signature proves\n" .
             "it came from the holder of key $gpg_key_id.\n",
@@ -293,7 +293,7 @@ SKIP:
     };
 }
 
-# NOTE: Structure check — no SMTP send, just verify MIME output
+# NOTE: Structure check - no SMTP send, just verify MIME output
 subtest 'structure: gpg_sign produces multipart/signed entity' => sub
 {
     plan( tests => 3 );
@@ -301,7 +301,7 @@ subtest 'structure: gpg_sign produces multipart/signed entity' => sub
     skip( 'MM_GPG_KEY_ID not set', 3 ) unless( $can_sign );
 
     my $mail = _make_base_mail(
-        'Structure check — multipart/signed',
+        'Structure check - multipart/signed',
         "Testing MIME structure without sending.\n",
     );
 
@@ -330,7 +330,7 @@ subtest 'structure: gpg_encrypt produces multipart/encrypted entity' => sub
     plan( tests => 3 );
 
     my $mail = _make_base_mail(
-        'Structure check — multipart/encrypted',
+        'Structure check - multipart/encrypted',
         "Testing MIME structure without sending.\n",
     );
 
@@ -363,7 +363,7 @@ __END__
 
 =head1 NAME
 
-t/94_gpg_live.t — Live OpenPGP signing and encryption tests for Mail::Make
+t/94_gpg_live.t - Live OpenPGP signing and encryption tests for Mail::Make
 
 =head1 SYNOPSIS
 
@@ -396,17 +396,17 @@ Add a C<[gpg]> section to F<~/.mailmakerc>:
 
 =over 4
 
-=item 1. C<gpg_sign()> — multipart/signed, SHA-256
+=item 1. C<gpg_sign()> - multipart/signed, SHA-256
 
-=item 2. C<gpg_sign()> — multipart/signed, SHA-512
+=item 2. C<gpg_sign()> - multipart/signed, SHA-512
 
-=item 3. C<gpg_encrypt()> — multipart/encrypted
+=item 3. C<gpg_encrypt()> - multipart/encrypted
 
-=item 4. C<gpg_sign_encrypt()> — signed + encrypted
+=item 4. C<gpg_sign_encrypt()> - signed + encrypted
 
-=item 5. Structure check — multipart/signed Content-Type (no SMTP)
+=item 5. Structure check - multipart/signed Content-Type (no SMTP)
 
-=item 6. Structure check — multipart/encrypted Content-Type (no SMTP)
+=item 6. Structure check - multipart/encrypted Content-Type (no SMTP)
 
 =back
 

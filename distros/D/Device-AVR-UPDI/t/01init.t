@@ -24,6 +24,9 @@ my $mockfio = Test::Future::IO->controller;
    $mockfh->check_and_clear( "->new" );
    $mockfio->check_and_clear( "->new" );
 
+   # DRAIN
+   $mockfio->expect_sysread_anyfh( 256 )
+      ->remains_pending();
    # BREAK
    $mockfio->expect_sleep( 0.1 )
       ->will_done();

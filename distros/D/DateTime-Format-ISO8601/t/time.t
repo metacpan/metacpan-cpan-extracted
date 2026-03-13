@@ -99,6 +99,13 @@ my %tests = (
                 time_zone   => '-0500',
             }
         ],
+        [
+            qw( hh:mm:ss.ss[+/-]hh:mm 15:27:46.576938173999-05:00 15:27:46 ),
+            {
+                nano_second => 576_938_173,
+                time_zone   => '-0500',
+            }
+        ],
     ],
 
     # These formats are ambiguous and would be parsed as dates by parse_datetime.

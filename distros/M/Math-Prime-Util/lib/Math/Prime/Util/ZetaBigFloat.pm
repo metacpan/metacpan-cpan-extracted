@@ -4,11 +4,11 @@ use warnings;
 
 BEGIN {
   $Math::Prime::Util::ZetaBigFloat::AUTHORITY = 'cpan:DANAJ';
-  $Math::Prime::Util::ZetaBigFloat::VERSION = '0.73';
+  $Math::Prime::Util::ZetaBigFloat::VERSION = '0.74';
 }
 
 BEGIN {
-  do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,Pari"); }
+  do { require Math::BigInt;  Math::BigInt->import(try=>"GMP,GMPz,Pari"); }
     unless defined $Math::BigInt::VERSION;
   use Math::BigFloat;
 }
@@ -513,7 +513,7 @@ Math::Prime::Util::ZetaBigFloat - Perl Big Float versions of Riemann Zeta and R 
 
 =head1 VERSION
 
-Version 0.73
+Version 0.74
 
 
 =head1 SYNOPSIS

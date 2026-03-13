@@ -52,7 +52,7 @@ subtest 'set replaces existing' => sub
     $h->set( 'X-Val', 'first' );
     $h->set( 'X-Val', 'second' );
     is( $h->get( 'X-Val' ), 'second', 'set() replaces existing value' );
-    # Count occurrences in as_string — should be only one
+    # Count occurrences in as_string - should be only one
     my $s = $h->as_string;
     my $count = () = $s =~ /X-Val/gi;
     is( $count, 1, 'header appears exactly once after replacement' );

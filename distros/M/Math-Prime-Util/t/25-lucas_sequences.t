@@ -3,9 +3,12 @@ use strict;
 use warnings;
 
 use Test::More;
-use Math::Prime::Util qw/lucas_sequence lucasu lucasv foroddcomposites/;
+use Math::Prime::Util qw/lucasu    lucasv    lucasuv
+                         lucasumod lucasvmod lucasuvmod
+                         foroddcomposites modint/;
 
 #my $use64 = Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
+my $extra = defined $ENV{EXTENDED_TESTING} && $ENV{EXTENDED_TESTING};
 my $usexs = Math::Prime::Util::prime_get_config->{'xs'};
 my $usegmp = Math::Prime::Util::prime_get_config->{'gmp'};
 
@@ -62,32 +65,115 @@ my @lucas_seqs = (
 );
 
 # 4,4 has D=0.  Old GMP won't handle that.
-if ($usexs || !$usegmp) {
+if ($usexs || !$usegmp || $Math::Prime::Util::GMP::VERSION >= 0.53) {
   push @lucas_seqs,
   [ [4, 4], 0, "U", "n*2^(n-1)",
     [0, 1, 4, 12, 32, 80, 192, 448, 1024, 2304, 5120, 11264, 24576, 53248] ],
 }
 
+my %lucas_sequences = (
+  "323 1 1 324" => [0,2],
+  "323 4 1 324" => [170,308],
+  "323 4 5 324" => [194,156],
+  "323 3 1 324" => [0,2],
+  "323 3 1  81" => [0,287],
+  "323 5 -1 81" => [153,195],
+  "49001 25 117 24501" => [20933,18744],
+  "18971 10001 -1 4743" => [5866,14421],
+  "18971 10001 -1 4743" => [5866,14421],
+  "3613982123 1 -1 3613982124" => [0,3613982121],
+  "3613982121 1 -1 3613982122" => [2586640546,2746447323],
+  "3613982121 1 -1 1806991061" => [3535079342,1187662808],
+  "547968611 1 -1 547968612" => [1,3],
+  "547968611 1 -1 136992153" => [27044236,448467899],
+);
+
+my %lucas_dcheck = ();
+if ($usexs || !$usegmp || $Math::Prime::Util::GMP::VERSION >= 0.53) {
+  %lucas_dcheck = (
+    "7777 -6 9 77"   => [5467,4624],   # D=0
+    "7777 -6 7 77"   => [2521,4663],   # D=8
+    "7777 4 3 77"    => [2732,5466],   # D=4
+    "7777 4 4 77"    => [6237,6889],   # D=0
+    "7777 3 5834 77" => [  30,4509],   # D=4 mod n
+    "7777 3 5835 77" => [4004,2883],   # D=0 mod n
+    "7777 1 5833 77" => [ 385,4449],   # D=0 mod n
+    "7777 2 1 77"    => [  77,   2],   # D=0 mod n
+    "7777 -8882 1 77"=> [6964, 687],   # D=32 mod n
+
+    "7778 7776 1 32" => [7746,   2],   # D=0 mod n and not invertible
+    "7778 7776 1 33" => [  33,7776],   # D=0 mod n and not invertible
+    "7778 1976 5 32" => [7764,1080],   # D=0 mod n and not invertible
+    "7778 1976 5 33" => [6153,1454],   # D=0 mod n and not invertible
+  );
+}
+my %lucas_large = ();
+if (!$usegmp || $Math::Prime::Util::GMP::VERSION >= 0.53) {
+  $lucas_large{"10891238901329801329843210 8823012438914798 7334809241809243190243 37"} = [qw/9793462298071844822738199 7806353955219259067966732/];
+  if ($extra) {
+    $lucas_large{"10891238901329801329801234 9823092438924798 9234809243809243890243 390"} = [qw/6124196139840885691066464 8614669321673340197867400/];
+  }
+}
+
+
 my @oeis_81264 = (323, 377, 1891, 3827, 4181, 5777, 6601, 6721, 8149, 10877, 11663, 13201, 13981, 15251, 17119, 17711, 18407, 19043, 23407, 25877, 27323, 30889, 34561, 34943, 35207, 39203, 40501, 50183, 51841, 51983, 52701, 53663, 60377, 64079, 64681);
 # The PP lucas sequence is really slow.
 $#oeis_81264 = 2 unless $usexs || $usegmp;
 
-plan tests => 0 + 2*scalar(@lucas_seqs) + 1 + 1;
+my @issue47 = (
+  [4,1,-1,951, "2 0"],
+  [4,2,-1,951, "1 2"],
+  [8,1,-1,47, "1 7"],
+  [8,2,-1,47, "1 6"],
+  [5,1,-1,0, "0 2"],
+  [5,2,-1,0, "0 2"],
+  [5,1,-1,66, "3 3"],
+  [5,2,-1,66, "0 3"],
+  [1001,-4,4,50, "173 827"],
+  [1001,-4,7,50, "87 457"],
+  [1001,1,-1,50, "330 486"],
+  [5,1,-1,4, "3 2"],
+  [3,6,9,36, "0 0"],
+  [5,10,25,101, "0 0"],
+  [6,10,25,101, "5 4"],
+  [3,-6,9,0, "0 2"],
+  [1,30,1,15, "0 0"],
+  [3,3,3,1, "1 0"],
+  [3,-30,-30,1, "1 0"],
+  [1,9,5,0, "0 0"],      # Everything mod 1
+  [104,-14,49,0, "0 2"],
+  [104,-14,49,1, "1 90"],
+  [8,2,1,1, "1 2"],
+  [16,0,0,1, "1 0"],
+  [2,11,-27,0, "0 0"],
+  [3,30,-2,1, "1 0"],
+);
+
+plan tests => 0 + 2*scalar(@lucas_seqs) + 1
+                + 3
+                + 3 * scalar(keys %lucas_sequences)
+                + 6 * scalar(keys %lucas_dcheck)
+                + 6 * scalar(keys %lucas_large)
+                + scalar(@issue47)
+                + 3
+                + 3;    # large inputs
 
 foreach my $seqs (@lucas_seqs) {
   my($apq, $isneg, $uorv, $name, $exp) = @$seqs;
+  my($P,$Q) = @$apq;
   my $idx = ($uorv eq 'U') ? 0 : 1;
-  my @seq = map { (lucas_sequence(2**32-1, @$apq, $_))[$idx] } 0 .. $#$exp;
+  my @seq = map { (lucasuvmod($P,$Q,$_,2**32-1))[$idx] } 0 .. $#$exp;
   do { for (@seq) { $_ -= (2**32-1) if $_ > 2**31; } } if $isneg;
   is_deeply( [@seq], $exp, "lucas_sequence ${uorv}_n(@$apq) -- $name" );
 }
 
 foreach my $seqs (@lucas_seqs) {
   my($apq, $isneg, $uorv, $name, $exp) = @$seqs;
+  my($P,$Q) = @$apq;
   if ($uorv eq 'U') {
-    is_deeply([map { lucasu(@$apq,$_) } 0..$#$exp], $exp, "lucasu(@$apq) -- $name");
+    is_deeply([map { lucasu($P,$Q,$_) } 0..$#$exp], $exp, "lucasu(@$apq) -- $name");
   } else {
-    is_deeply([map { lucasv(@$apq,$_) } 0..$#$exp], $exp, "lucasv(@$apq) -- $name");
+    is_deeply([map { lucasv($P,$Q,$_) } 0..$#$exp], $exp, "lucasv(@$apq) -- $name");
   }
 }
 
@@ -95,8 +181,7 @@ foreach my $seqs (@lucas_seqs) {
   my @p;
   foroddcomposites {
     my $t = (($_%5)==2||($_%5)==3) ? $_+1 : $_-1;
-    my($U,$V) = lucas_sequence($_,1,-1,$t);
-    push @p, $_ if $U == 0;
+    push @p, $_ if lucasumod(1,-1,$t,$_) == 0;
   } $oeis_81264[-1];
   is_deeply( \@p, \@oeis_81264, "OEIS 81264: Odd Fibonacci pseudoprimes" );
 }
@@ -104,6 +189,64 @@ foreach my $seqs (@lucas_seqs) {
 {
   my $n = 8539786;
   my $e = (0,-1,1,1,-1)[$n%5];
-  my($U,$V,$Q) = lucas_sequence($n, 1, -1, $n+$e);
-  is_deeply( [$U,$V,$Q], [0,5466722,8539785], "First entry of OEIS A141137: Even Fibonacci pseudoprimes" );
+  my($U,$V) = lucasuvmod(1, -1, $n+$e, $n);
+  is_deeply( [$U,$V], [0,5466722], "First entry of OEIS A141137: Even Fibonacci pseudoprimes" );
+  is(lucasumod(1, -1, $n+$e, $n), 0, "lucasumod agrees");
+  is(lucasvmod(1, -1, $n+$e, $n), 5466722, "lucasvmod agrees");
 }
+
+# Simple Lucas sequences
+while (my($params, $expect) = each (%lucas_sequences)) {
+  my($n,$P,$Q,$k) = split(' ', $params);
+
+  is_deeply( [lucasuvmod($P,$Q,$k,$n)], $expect, "lucasuvmod($P,$Q,$k,$n)" );
+  is( lucasumod($P,$Q,$k,$n), $expect->[0], "lucasumod($P,$Q,$k,$n)" );
+  is( lucasvmod($P,$Q,$k,$n), $expect->[1], "lucasvmod($P,$Q,$k,$n)" );
+
+  # Don't run these through lucasuv, lucasu, lucasv
+}
+
+# Check D values
+my %allcheck = (%lucas_dcheck, %lucas_large);
+while (my($params, $expect) = each %allcheck) {
+  my($n,$P,$Q,$k) = split(' ', $params);
+
+  is_deeply( [map{"$_"}lucasuvmod($P,$Q,$k,$n)], $expect, "lucasuvmod($P,$Q,$k,$n)" );
+  is( "".lucasumod($P,$Q,$k,$n), $expect->[0], "lucasumod($P,$Q,$k,$n)" );
+  is( "".lucasvmod($P,$Q,$k,$n), $expect->[1], "lucasvmod($P,$Q,$k,$n)" );
+
+  is_deeply( [map {"$_"} map { $_ % $n } lucasuv($P,$Q,$k)], $expect, "lucasuv($P,$Q,$k) % $n" );
+  is( "".lucasu($P,$Q,$k) % $n, $expect->[0], "lucasu($P,$Q,$k) % $n" );
+  is( "".lucasv($P,$Q,$k) % $n, $expect->[1], "lucasv($P,$Q,$k) % $n" );
+}
+
+
+for my $i (@issue47) {
+  my($n,$P,$Q,$k,$expstr) = @$i;
+  is( join(" ",lucasuvmod($P,$Q,$k,$n)), $expstr, "lucasuvmod($P,$Q,$k,$n) = $expstr");
+}
+
+{
+  my $n = 257;
+  my @u1 = map { lucasumod(1,-1,$_,$n) } 0 .. 100;
+  my @v1 = map { lucasvmod(1,-1,$_,$n) } 0 .. 100;
+
+  my @u2 = map { modint(lucasu(1,-1,$_),$n) } 0 .. 100;
+  my @v2 = map { modint(lucasv(1,-1,$_),$n) } 0 .. 100;
+
+  my @uv1 = map { [lucasuvmod(1,-1,$_,$n)] } 0 .. 100;
+  my @uv2 = map { [map { modint($_,$n) } lucasuv(1,-1,$_)] } 0 .. 100;
+
+  is_deeply(\@u1, \@u2, "lucasumod comparison with modint lucasu");
+  is_deeply(\@v1, \@v2, "lucasvmod comparison with modint lucasv");
+  is_deeply(\@uv1, \@uv2, "lucasuvmod comparison with modint lucasuv");
+}
+
+# Arbitrary large inputs
+is_deeply([map{"$_"}lucasuvmod("98230984092384092384", "-2938094809238420923423423234", 1777, "398908340943094334094290237")],
+          [qw/281234951900970815965553779 286001090644956921206996074/],
+          "lucasuvmod with all large bigint inputs" );
+is("".lucasumod("98230984092384092384", "-2938094809238420923423423234", 1777, "398908340943094334094290237"),
+   "281234951900970815965553779", "lucasumod with all large bigint inputs" );
+is("".lucasvmod("98230984092384092384", "-2938094809238420923423423234", 1777, "398908340943094334094290237"),
+   "286001090644956921206996074", "lucasvmod with all large bigint inputs" );

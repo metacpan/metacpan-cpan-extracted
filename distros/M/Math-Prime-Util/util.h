@@ -3,244 +3,209 @@
 
 #include "ptypes.h"
 
-extern int _numcmp(const void *a, const void *b); /* qsort numerical sorting */
-
 extern int  _XS_get_verbose(void);
 extern void _XS_set_verbose(int v);
 extern int  _XS_get_callgmp(void);
 extern void _XS_set_callgmp(int v);
 /* Disable all manual seeding */
-extern int  _XS_get_secure(void);
+extern bool  _XS_get_secure(void);
 extern void _XS_set_secure(void);
 
-extern int is_prime(UV x);
-extern UV  next_prime(UV x);
-extern UV  prev_prime(UV x);
+extern unsigned long index_in_sorted_uv_array(UV v, UV* L, unsigned long len);
+extern unsigned long index_in_sorted_iv_array(IV v, IV* L, unsigned long len);
+#define is_in_sorted_uv_array(v,L,len) (index_in_sorted_uv_array(v,L,len) > 0)
+#define is_in_sorted_iv_array(v,L,len) (index_in_sorted_iv_array(v,L,len) > 0)
+
+extern bool do_arrays_intersect_uv(const UV* A, size_t alen, const UV* B, size_t blen);
+extern bool do_arrays_intersect_iv(const IV* A, size_t alen, const IV* B, size_t blen);
+
+extern bool is_prime(UV x);
+extern UV   next_prime(UV x);
+extern UV   prev_prime(UV x);
+
+/* Simple estimate for upper limit:  max_nprimes(n) >= prime_count(n) */
+extern UV   max_nprimes(UV n) ISCONSTFUNC;
 
 extern void print_primes(UV low, UV high, int fd);
 
-extern int powerof(UV n);
-extern int is_power(UV n, UV a);
-extern UV rootof(UV n, UV k);
-extern int primepower(UV n, UV* prime);
-extern UV valuation(UV n, UV k);
-extern UV logint(UV n, UV b);
+/* Returns maximal k for c^k = n for k > 1, n > 1.  0 otherwise. */
+extern uint32_t powerof_ret(UV n, uint32_t *root);
+#define powerof(n) powerof_ret(n,0)
+
+/* Return true if n = r^k for the given k, sets root if given */
+extern bool is_power_ret(UV n, uint32_t k, uint32_t *root);
+#define is_power(n,k) is_power_ret(n,k,0)
+
+extern uint32_t icbrt(UV n) ISCONSTFUNC;
+extern UV rootint(UV n, uint32_t k) ISCONSTFUNC;
+extern UV ipowsafe(UV n, UV k) ISCONSTFUNC;  /* returns UV_MAX if overflows */
+extern UV lcmsafe(UV x, UV u) ISCONSTFUNC;   /* returns 0 if overflows */
+extern UV valuation(UV n, UV k) ISCONSTFUNC;
+extern UV valuation_remainder(UV n, UV k, UV *r);
+extern UV logint(UV n, UV b) ISCONSTFUNC;
 extern UV mpu_popcount_string(const char* ptr, uint32_t len);
 
+extern unsigned char* range_issquarefree(UV lo, UV hi);
+
+extern UV powersum(UV n, UV k) ISCONSTFUNC;
+
 extern signed char* range_moebius(UV low, UV high);
-extern UV*    range_totient(UV low, UV high);
-extern IV     mertens(UV n);
-extern NV chebyshev_psi(UV n);
-extern NV chebyshev_theta(UV n);
+extern signed char* range_liouville(UV low, UV high);
 
-extern NV Ei(NV x);
-extern NV Li(NV x);
-extern long double ld_riemann_zeta(long double x);
-extern long double RiemannR(long double x);
-extern NV lambertw(NV k);
-extern UV inverse_li(UV x);
-extern UV inverse_R(UV x);
+extern int liouville(UV n);
+extern IV  mertens(UV n);
+extern IV  sumliouville(UV n);
 
-extern int kronecker_uu(UV a, UV b);
-extern int kronecker_su(IV a, UV b);
-extern int kronecker_ss(IV a, IV b);
+extern int kronecker_uu(UV a, UV b) ISCONSTFUNC;
+extern int kronecker_su(IV a, UV b) ISCONSTFUNC;
+extern int kronecker_ss(IV a, IV b) ISCONSTFUNC;
 
-extern UV factorial(UV n);
-extern UV binomial(UV n, UV k);
+extern UV pn_primorial(UV n) ISCONSTFUNC;
+extern UV primorial(UV n) ISCONSTFUNC;
+extern UV factorial(UV n) ISCONSTFUNC;
+extern UV subfactorial(UV n) ISCONSTFUNC;
+extern UV fubini(UV n) ISCONSTFUNC;
+extern UV binomial(UV n, UV k) ISCONSTFUNC;
+extern UV falling_factorial(UV n, UV m) ISCONSTFUNC;
+extern UV rising_factorial(UV n, UV m) ISCONSTFUNC;
+extern IV falling_factorial_s(IV n, UV m) ISCONSTFUNC;
+extern IV rising_factorial_s(IV n, UV m) ISCONSTFUNC;
 extern IV gcdext(IV a, IV b, IV* u, IV* v, IV* s, IV* t); /* Ext Euclidean */
-extern UV modinverse(UV a, UV p);              /* Returns 1/a mod p */
-extern UV divmod(UV a, UV b, UV n);            /* Returns a/b mod n */
-extern int sqrtmod(UV* s, UV a, UV p);         /* sqrt(a) mod p */
-extern int sqrtmod_composite(UV* s, UV a,UV n);/* sqrt(a) mod n */
-extern UV chinese(UV* a, UV* n, UV num, int *status); /* Chinese Remainder */
+extern UV modinverse(UV a, UV p) ISCONSTFUNC;  /* Returns 1/a mod p */
+extern UV divmod(UV a, UV b, UV n) ISCONSTFUNC;/* Returns a/b mod n */
+extern UV gcddivmod(UV a, UV b, UV n) ISCONSTFUNC; /* divmod(a/gcd,b/gcd,n) */
 
-extern UV totient(UV n);
-extern int moebius(UV n);
-extern UV exp_mangoldt(UV n);
-extern UV carmichael_lambda(UV n);
-extern UV jordan_totient(UV k, UV n);
-extern UV znprimroot(UV n);
-extern UV znorder(UV a, UV n);
-extern int is_primitive_root(UV a, UV n, int nprime);
-extern UV  factorialmod(UV n, UV m);
-#define is_square_free(n)  (moebius(n) != 0)
-extern int is_fundamental(UV n, int neg);
-extern int is_totient(UV n);
-extern int is_semiprime(UV n);
-extern int is_carmichael(UV n);
-extern UV  is_quasi_carmichael(UV n);  /* Returns number of bases */
-extern UV  pillai_v(UV n);             /* v: v! % n == n-1 && n % v != 1 */
+extern UV pisano_period(UV n);
 
-extern UV inverse_totient_count(UV n);
-extern UV* inverse_totient_list(UV *ntotients, UV n);
+/* 0 overflow, -1 no inverse, 1 ok */
+/* The a/n arrays will be sorted by descending n. */
+extern int chinese(UV *r, UV *lcm, UV* a, UV* n, UV num);/* Chinese Remainder */
 
-extern UV stirling3(UV n, UV m);
-extern IV stirling2(UV n, UV m);
-extern IV stirling1(UV n, UV m);
+/* Do the inverse for a negative modular power / root. a^-k => (1/a)^k mod n */
+extern bool prep_pow_inv(UV *a, UV *k, int kstatus, UV n);
+
+/* Signed division and remainder.  Returns remainder.*/
+extern IV tdivrem(IV *q, IV *r, IV D, IV d);   /* divrem trunc */
+extern IV fdivrem(IV *q, IV *r, IV D, IV d);   /* divrem floor */
+extern IV cdivrem(IV *q, IV *r, IV D, IV d);   /* divrem ceiling */
+extern IV edivrem(IV *q, IV *r, IV D, IV d);   /* divrem Euclidian */
+extern UV ivmod(IV a, UV n) ISCONSTFUNC;       /* Returns a mod n (trunc) */
+
+extern UV   carmichael_lambda(UV n);
+extern int  moebius(UV n);
+extern UV   exp_mangoldt(UV n);
+extern UV   znprimroot(UV n);
+extern UV   znorder(UV a, UV n);
+/* nprime says to assume n = p or n = 2p.  Skips power and primality tests. */
+extern bool is_primitive_root(UV a, UV n, bool nprime);
+extern UV   factorialmod(UV n, UV m);
+extern bool binomialmod(UV *res, UV n, UV k, UV m);
+
+extern bool is_square_free(UV n);
+extern bool is_perfect_number(UV n);
+extern bool is_fundamental(UV n, bool neg);
+extern bool is_semiprime(UV n);
+extern bool is_almost_prime(UV k, UV n);
+extern bool is_cyclic(UV n);
+extern bool is_carmichael(UV n);
+extern UV   is_quasi_carmichael(UV n);  /* Returns number of bases */
+extern UV   pillai_v(UV n) ISCONSTFUNC; /* v: v! % n == n-1 && n % v != 1 */
+extern UV   qnr(UV n);
+extern bool is_qr(UV a, UV n);         /* kronecker that works for composites */
+extern bool is_practical(UV n);
+extern int  is_delicate_prime(UV n, uint32_t b);
+extern int  happy_height(UV n, uint32_t base, uint32_t exponent) ISCONSTFUNC;
+
+extern bool is_smooth(UV n, UV k);
+extern bool is_rough(UV n, UV k);
+
+extern bool is_sum_of_two_squares(UV n);
+extern bool is_sum_of_three_squares(UV n);
+extern bool cornacchia(UV *x, UV *y, UV d, UV p);
+
+extern UV debruijn_psi(UV x, UV y);
+extern UV buchstab_phi(UV x, UV y);
+
+extern UV stirling3(UV n, UV m) ISCONSTFUNC;
+extern IV stirling2(UV n, UV m) ISCONSTFUNC;
+extern IV stirling1(UV n, UV m) ISCONSTFUNC;
+
+extern bool bernfrac(IV *num, UV *den, UV n);
+extern bool harmfrac(UV *num, UV *den, UV n);
 
 extern IV hclassno(UV n);
 extern IV ramanujan_tau(UV n);
 
-extern char* pidigits(int digits);
+extern char* pidigits(uint32_t digits);
 
-extern int strnum_minmax(int min, char* a, STRLEN alen, char* b, STRLEN blen);
+/* min defines if min or max.  Return of 0 means select a, 1 means select b. */
+extern bool strnum_minmax(bool min, const char* a, STRLEN alen, const char* b, STRLEN blen);
+extern int strnum_cmp(const char* a, STRLEN alen, const char* b, STRLEN blen);
 
-extern int from_digit_string(UV* n, const char* s, int base);
-extern int from_digit_to_UV(UV* rn, UV* r, int len, int base);
-extern int from_digit_to_str(char** rstr, UV* r, int len, int base);
-extern int to_digit_array(int* bits, UV n, int base, int length);
-extern int to_digit_string(char *s, UV n, int base, int length);
-extern int to_string_128(char s[40], IV hi, UV lo);
+extern bool from_digit_string(UV* n, const char* s, int base);
+extern bool from_digit_to_UV(UV* rn, const UV* r, int len, int base);
+extern bool from_digit_to_str(char** rstr, const UV* r, int len, int base);
+/* These return length */
+extern int  to_digit_array(int* bits, UV n, int base, int length);
+extern int  to_digit_string(char *s, UV n, int base, int length);
+extern int  to_string_128(char s[40], IV hi, UV lo);
 
-extern int is_catalan_pseudoprime(UV n);
+/* Returns 1 if good, 0 if bad, -1 if non canon, 2 ok but out of range */
+extern int validate_zeckendorf(const char* str);
+extern UV  from_zeckendorf(const char* str);
+extern char* to_zeckendorf(UV n);
 
-extern UV  polygonal_root(UV n, UV k, int* overflow);
+extern bool is_catalan_pseudoprime(UV n);
 
-extern int num_to_perm(UV rank, int n, int *vec);
-extern int perm_to_num(int n, int *vec, UV *rank);
+extern UV  polygonal_root(UV n, UV k, bool* overflow);
+
+extern UV  npartitions(UV n);
+extern UV  consecutive_integer_lcm(UV n);
+
+extern UV  frobenius_number(UV* A, uint32_t alen);
+
+extern bool num_to_perm(UV rank, int n, int *vec);
+extern bool perm_to_num(int n, int *vec, UV *rank);
 extern void randperm(void* ctx, UV n, UV k, UV *S);
 
 extern UV random_factored_integer(void* ctx, UV n, int *nf, UV *factors);
 
-extern UV gcdz(UV x, UV y);
+extern UV gcdz(UV x, UV y) ISCONSTFUNC;
 
-#if defined(FUNC_isqrt) || defined(FUNC_is_perfect_square)
-#include <math.h>
-static UV isqrt(UV n) {
-  UV root;
-#if BITS_PER_WORD == 32
-  if (n >= UVCONST(4294836225)) return UVCONST(65535);
+
+/* Inputs are assumed to be UNSIGNED */
+/* These could use a static table if that turned out better */
+
+#define is_divis_2_3(n)     ( (n)%2 == 0 || (n) % 3 == 0 )
+
+#if defined(__arm64__)
+#define is_divis_2_3_5(n)   ( (n)%2 == 0 || (0x1669>>((n)%15))&1 )
 #else
-  if (n >= UVCONST(18446744065119617025)) return UVCONST(4294967295);
+#define is_divis_2_3_5(n)   ( (n)%2 == 0 || (n) % 3 == 0 || (n) % 5 == 0 )
 #endif
-  root = (UV) sqrt((double)n);
-  while (root*root > n)  root--;
-  while ((root+1)*(root+1) <= n)  root++;
-  return root;
-}
+/* 2,3,5 could use the single test:  (0x1f75d77d >> (n % 30)) & 1  */
+
+#define is_divis_2_3_5_7(n) ( is_divis_2_3_5(n) || (n) % 7 == 0 )
+
+
+/******************************************************************************/
+
+#if defined(FUNC_is_perfect_square) && !defined(FUNC_isqrt)
+  #define FUNC_isqrt 1
+#endif
+#if defined(FUNC_lcm_ui) && !defined(FUNC_gcd_ui)
+  #define FUNC_gcd_ui 1
 #endif
 
-#if defined(FUNC_icbrt) || defined(FUNC_is_perfect_cube)
-static UV icbrt(UV n) {
-  UV b, root = 0;
-#if BITS_PER_WORD == 32
-  int s = 30;
-  if (n >= UVCONST(4291015625)) return UVCONST(1625);
-#else
-  int s = 63;
-  if (n >= UVCONST(18446724184312856125)) return UVCONST(2642245);
-#endif
-  for ( ; s >= 0; s -= 3) {
-    root += root;
-    b = 3*root*(root+1)+1;
-    if ((n >> s) >= b) {
-      n -= b << s;
-      root++;
-    }
-  }
-  return root;
-}
-#endif
+/******************************************************************************/
 
-#if defined(FUNC_ipow)
-static UV ipow(UV n, UV k) {
-  UV p = 1;
-  while (k) {
-    if (k & 1) p *= n;
-    k >>= 1;
-    if (k)     n *= n;
-  }
-  return p;
-}
-#endif
-
-#if defined(FUNC_gcd_ui) || defined(FUNC_lcm_ui)
-/* If we have a very fast ctz, then use the fast FLINT version of gcd */
-#if defined(__GNUC__) && (__GNUC__ >= 4 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
-#define gcd_ui(x,y) gcdz(x,y)
-#else
-static UV gcd_ui(UV x, UV y) {
-  UV t;
-  if (y < x) { t = x; x = y; y = t; }
-  while (y > 0) {
-    t = y;  y = x % y;  x = t;  /* y1 <- x0 % y0 ; x1 <- y0 */
-  }
-  return x;
-}
-#endif
-#endif
-
-#ifdef FUNC_lcm_ui
-static UV lcm_ui(UV x, UV y) {
-  /* Can overflow if lcm(x,y) > 2^64 (e.g. two primes each > 2^32) */
-  return x * (y / gcd_ui(x,y));
-}
-#endif
-
-#ifdef FUNC_is_perfect_square
-/* See:  http://mersenneforum.org/showpost.php?p=110896 */
-static int is_perfect_square(UV n)
-{
-  /* Step 1, reduce to 18% of inputs */
-  uint32_t m = n & 127;
-  if ((m*0x8bc40d7d) & (m*0xa1e2f5d1) & 0x14020a)  return 0;
-  /* Step 2, reduce to 7% of inputs (mod 99 reduces to 4% but slower) */
-  m = n %240; if ((m*0xfa445556) & (m*0x8021feb1) & 0x614aaa0f) return 0;
-  /* m = n % 99; if ((m*0x5411171d) & (m*0xe41dd1c7) & 0x80028a80) return 0; */
-  /* Step 3, do the square root instead of any more rejections */
-  m = isqrt(n);
-  return (UV)m*(UV)m == n;
-}
-#endif
-
-#ifdef FUNC_is_perfect_cube
-static int is_perfect_cube(UV n)
-{
-  UV m;
-  if ((n & 3) == 2) return 0;
-  /* m = n & 511; if ((m*5016427) & (m*95638165) & 438)  return 0; */
-  m = n % 117; if ((m*833230740) & (m*120676722) & 813764715)  return 0;
-  m = n % 133; if ((m*76846229) & (m*305817297) & 306336544)  return 0;
-  m = icbrt(n);
-  return m*m*m == n;
-}
-#endif
-
-#ifdef FUNC_is_perfect_fifth
-static int is_perfect_fifth(UV n)
-{
-  UV m;
-  if ((n & 3) == 2) return 0;
-  m = n %  88; if ((m*85413603) & (m*76260301) & 26476550)  return 0;
-  m = n %  31; if ((m*80682551) & (m*73523539) & 45414528)  return 0;
-  m = n %  41; if ((m*92806493) & (m*130690042) & 35668129)  return 0;
-  /* m = n %  25; if ((m*109794298) & (m*105535723) & 16097553)  return 0; */
-  m = rootof(n, 5);
-  return m*m*m*m*m == n;
-}
-#endif
-
-#ifdef FUNC_is_perfect_seventh
-static int is_perfect_seventh(UV n)
-{
-  UV m;
-  /* if ((n & 3) == 2) return 0; */
-  m = n & 511; if ((m*97259473) & (m*51311663) & 894)  return 0;
-  m = n %  49; if ((m*109645301) & (m*76482737) & 593520192)  return 0;
-  m = n %  71; if ((m*71818386) & (m*38821587) & 35299393)  return 0;
-  /* m = n %  43; if ((m*101368253) & (m*814158665) & 142131408)  return 0; */
-  /* m = n %  29; if ((m*81935611) & (m*84736134) & 37831965)  return 0; */
-  /* m = n % 116; if ((m*348163737) & (m*1539055705) & 2735997248)  return 0; */
-  m = rootof(n, 7);
-  return m*m*m*m*m*m*m == n;
-}
-#endif
+/* I think uint32_t is a better return type, but we follow GCC's prototype. */
 
 #if defined(FUNC_clz) || defined(FUNC_ctz) || defined(FUNC_log2floor)
 /* log2floor(n) gives the location of the first set bit (starting from left)
  * ctz(n)       gives the number of times n is divisible by 2
  * clz(n)       gives the number of zeros on the left                       */
-#if defined(__GNUC__) && (__GNUC__ >= 4 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 4))
+#if defined(__GNUC__) && 100*__GNUC__ + __GNUC_MINOR >= 304
  #if BITS_PER_WORD == 64
   #define ctz(n)        ((n) ?    __builtin_ctzll(n) : 64)
   #define clz(n)        ((n) ?    __builtin_clzll(n) : 64)
@@ -284,12 +249,12 @@ static int is_perfect_seventh(UV n)
      55,30,34,11,43,14,22, 4, 62,57,46,52,38,26,32,41, 50,36,17,19,29,10,13,21,
      56,45,25,31,35,16, 9,12, 44,24,15, 8,23, 7, 6, 5 };
  #ifdef FUNC_ctz
-   static unsigned int ctz(UV n) {
+   static int ctz(UV n) {
      return n ? _debruijn64[((n & -n)*UVCONST(0x07EDD5E59A4E28C2)) >> 58] : 64;
    }
  #endif
  #if defined(FUNC_clz) || defined(FUNC_log2floor)
-   static unsigned int log2floor(UV n) {
+   static int log2floor(UV n) {
      if (n == 0) return 0;
      n |= n >> 1;   n |= n >> 2;   n |= n >> 4;
      n |= n >> 8;   n |= n >> 16;  n |= n >> 32;
@@ -301,7 +266,7 @@ static int is_perfect_seventh(UV n)
    static const unsigned char _trail_debruijn32[32] = {
       0, 1,28, 2,29,14,24, 3,30,22,20,15,25,17, 4, 8,
      31,27,13,23,21,19,16, 7,26,12,18, 6,11, 5,10, 9 };
-   static unsigned int ctz(UV n) {
+   static int ctz(UV n) {
      return n ? _trail_debruijn32[((n & -n) * UVCONST(0x077CB531)) >> 27] : 32;
    }
  #endif
@@ -309,7 +274,7 @@ static int is_perfect_seventh(UV n)
    static const unsigned char _lead_debruijn32[32] = {
       0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30,
       8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31 };
-   static unsigned int log2floor(UV n) {
+   static int log2floor(UV n) {
      if (n == 0) return 0;
      n |= n >> 1;   n |= n >> 2;   n |= n >> 4;   n |= n >> 8;   n |= n >> 16;
      return _lead_debruijn32[(n * UVCONST(0x07C4ACDD)) >> 27];
@@ -327,10 +292,10 @@ static int is_perfect_seventh(UV n)
  * When the asm is present (e.g. compile with -march=native on a platform that
  * has them, like Nahelem+), then it is almost as fast as manually written asm. */
 #if BITS_PER_WORD == 64
- #if defined(__POPCNT__) && defined(__GNUC__) && (__GNUC__> 4 || (__GNUC__== 4 && __GNUC_MINOR__> 1))
+ #if defined(__POPCNT__) && defined(__GNUC__) && 100*__GNUC__ + __GNUC_MINOR >= 402
    #define popcnt(b)  __builtin_popcountll(b)
  #else
-   static UV popcnt(UV b) {
+   static int popcnt(UV b) {
      b -= (b >> 1) & 0x5555555555555555;
      b = (b & 0x3333333333333333) + ((b >> 2) & 0x3333333333333333);
      b = (b + (b >> 4)) & 0x0f0f0f0f0f0f0f0f;
@@ -338,13 +303,85 @@ static int is_perfect_seventh(UV n)
    }
  #endif
 #else
- static UV popcnt(UV b) {
+ static int popcnt(UV b) {
    b -= (b >> 1) & 0x55555555;
    b = (b & 0x33333333) + ((b >> 2) & 0x33333333);
    b = (b + (b >> 4)) & 0x0f0f0f0f;
    return (b * 0x01010101) >> 24;
  }
 #endif
+#endif
+
+
+/******************************************************************************/
+
+
+#if defined(FUNC_ipow)
+static UV ipow(UV n, UV k) {
+  UV p = 1;
+  while (k) {
+    if (k & 1) p *= n;
+    k >>= 1;
+    if (k)     n *= n;
+  }
+  return p;
+}
+#endif
+
+
+#if defined(FUNC_gcd_ui)
+/* If we have a very fast ctz, then use the fast FLINT version of gcd */
+#if defined(__GNUC__) && 100*__GNUC__ + __GNUC_MINOR >= 304
+#define gcd_ui(x,y) gcdz(x,y)
+#else
+static UV gcd_ui(UV x, UV y) {
+  UV t;
+  if (y > x) { t = x; x = y; y = t; }
+  while (y > 0) {
+    t = y;  y = x % y;  x = t;  /* y1 <- x0 % y0 ; x1 <- y0 */
+  }
+  return x;
+}
+#endif
+#endif
+
+#ifdef FUNC_lcm_ui
+static UV lcm_ui(UV x, UV y) {
+  /* Can overflow if lcm(x,y) > 2^64 (e.g. two primes each > 2^32) */
+  return x * (y / gcd_ui(x,y));
+}
+#endif
+
+
+#if defined(FUNC_isqrt)
+/* Correct for all 64-bit inputs and all FP rounding modes. */
+#include <math.h>
+static uint32_t isqrt(UV n) {
+  /* The small addition means we only need to check for fixing downwards. */
+  IV r = sqrt((double)n) + 1e-6f;
+  IV diff = n - (UV)r*r;
+  return r - (diff < 0);
+}
+#endif
+
+#ifdef FUNC_is_perfect_square
+static bool is_perfect_square_ret(UV n, uint32_t *root)
+{
+  uint32_t r;
+  /* Fast filters reject 95.0% of non-squares */
+#if BITS_PER_WORD == 64
+  if ((UVCONST(1) << (n&63)) & UVCONST(0xfdfdfdedfdfcfdec)) return 0;
+  /* if ((UVCONST(1) << (n%45)) & UVCONST(0xfffffeeb7df6f9ec)) return 0; */
+#else
+  /* uint32_t m; */
+  if ((1U << (n&31)) & 0xfdfcfdec) return 0;
+  /* m = n % 105; if ((m*0xd24554cd) & (m*0x0929579a) & 0x38020141) return 0; */
+#endif
+  r = isqrt(n);
+  if (root != 0) *root = r;
+  return ((UV)r*r == n);
+}
+#define is_perfect_square(n)  is_perfect_square_ret(n,0)
 #endif
 
 #endif

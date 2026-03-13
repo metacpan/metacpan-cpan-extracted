@@ -13,6 +13,7 @@ use WWW::Mechanize::Chrome;
 
 use lib '.';
 use t::helper;
+use Capture::Tiny 'capture';
 
 Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
 
@@ -53,7 +54,9 @@ my $have_test_memory_cycle = eval {;
 sub no_memory_cycles_ok {
     my( $mech, $name ) = @_;
     if( $have_test_memory_cycle ) {
-        Test::Memory::Cycle::memory_cycle_ok($mech, "No cycles $name");
+        capture {
+            Test::Memory::Cycle::memory_cycle_ok($mech, "No cycles $name");
+        };
     } else {
         SKIP: {
             skip "Test::Memory::Cycle needed for deeper leak testing", 1;

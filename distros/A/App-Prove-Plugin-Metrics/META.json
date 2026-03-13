@@ -1,5 +1,5 @@
 {
-	"version":"0.0.1",
+	"version":"0.0.2",
 	"name":"App-Prove-Plugin-Metrics",
 	"author":["Brian Blackmore <brian@mediaalpha.com>"],
 	"abstract":"Emit metrics from Perl unit tests",
@@ -14,7 +14,7 @@
 			"requires":{
 				"perl":"5.8.0",
 				"Carp":"1.38",
-				"Fcntl":"5.8.0",
+				"Fcntl":"1.04",
 				"Test::Harness":"3.42"
 			}
 		},
@@ -25,8 +25,8 @@
 		}
 	},
 	"resources":{
-		"bugtracker":{ "web":"https://github.com/MediaAlpha/perl-app-prove-plugin-metrics" },
-		"repository":{ "url":"git://github.com/MediaAlpha/perl-app-prove-plugin-metrics.git" }
+		"bugtracker":{"web":"https://github.com/MediaAlpha/perl-app-prove-plugin-metrics"},
+		"repository":{"url":"git://github.com/MediaAlpha/perl-app-prove-plugin-metrics.git"}
 	},
 	"dynamic_config":1,
 	"generated_by":"Brian Blackmore",

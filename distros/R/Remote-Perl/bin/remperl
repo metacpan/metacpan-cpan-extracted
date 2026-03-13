@@ -4,40 +4,164 @@ use FindBin qw($Bin);
 use lib "$Bin/../lib";
 
 use Getopt::Long qw(GetOptions);
-use Pod::Usage   qw(pod2usage);
 use Remote::Perl;
 
-# -- Option parsing ------------------------------------------------------------
+# Only load Pod::Usage if required because its dependencies load slowly.
+sub pod2usage { require Pod::Usage; Pod::Usage::pod2usage(@_) }
 
-my $rsh           = 'ssh';
-my $pipe_cmd      = 0;
-my $window        = 65_536;
-my $eval_code     = undef;
-my $stdin_file    = undef;
-my $stdin_str     = undef;
-my $serve_modules = 0;
+# -- Option variables ----------------------------------------------------------
+
+my $rsh                = 'ssh';
+my $pipe_cmd           = 0;
+my $window             = 65_536;
+my $stdin_file         = undef;
+my $stdin_str          = undef;
+my $serve_modules      = 0;
 my @inc_local;
-my $tmpfile       = 0;
-my $tmpfile_mode  = undef;
-my $no_data_warn  = 0;
-my $help          = 0;
-my $version       = 0;
+my $tmpfile            = 0;
+my $tmpfile_mode       = undef;
+my $no_data_warn       = 0;
+my $no_system_inc      = 0;
+my $serve_restrict     = 0;
+my @serve_allow;
+my $help               = 0;
+my $version            = 0;
 
-GetOptions(
-    'rsh=s'               => \$rsh,
-    'pipe-cmd'            => \$pipe_cmd,
-    'window-size=i'       => \$window,
-    'e=s'                 => \$eval_code,
-    'stdin-file=s'        => \$stdin_file,
-    'stdin-str=s'         => \$stdin_str,
-    'serve-modules!'      => \$serve_modules,
-    'inc-local=s@'        => \@inc_local,
-    'tmpfile!'            => \$tmpfile,
-    'tmpfile-mode=s'      => \$tmpfile_mode,
-    'no-data-warn'        => \$no_data_warn,
-    'help|h'              => \$help,
-    'version|V'           => \$version,
-) or pod2usage(2);
+# -- GetOptions spec (shared between parse_perl_opts and GetOptions) -----------
+
+my @getopt_spec = (
+    'rsh=s'                  => \$rsh,
+    'pipe-cmd'               => \$pipe_cmd,
+    'window-size=i'          => \$window,
+    'stdin-file=s'           => \$stdin_file,
+    'stdin-str=s'            => \$stdin_str,
+    'serve-modules!'         => \$serve_modules,
+    'inc-local=s@'           => \@inc_local,
+    'no-system-inc'          => \$no_system_inc,
+    'serve-restrict-paths'   => \$serve_restrict,
+    'serve-allow=s@'         => \@serve_allow,
+    'tmpfile!'               => \$tmpfile,
+    'tmpfile-mode=s'         => \$tmpfile_mode,
+    'no-data-warn'           => \$no_data_warn,
+    'help'                   => \$help,
+    'version'                => \$version,
+);
+
+# -- Perl-compatible short option parsing --------------------------------------
+
+# Mirrors Perl's own option parsing rules for -e, -m, -M, -w, -h, -V.
+# Processes @ARGV in-place before GetOptions runs.
+
+sub use_spec_to_line($flag, $spec) {
+    # '=' form: -m and -M are identical; use split like Perl does
+    if ($spec =~ /^([^=]+)=(.+)$/) {
+        return "use $1 split(/,/,q{$2});\n";
+    }
+    if ($flag eq 'm')      { return "use $spec ();\n" }
+    if ($spec =~ /^-(.+)/) { return "no $1;\n" }
+    return "use $spec;\n";
+}
+
+sub parse_perl_opts() {
+    my @eval_code;
+    my @use_specs;
+    my $warnings = 0;
+    my @new_argv;
+    my @trailing;     # args after stop point (not seen by GetOptions)
+    my $positionals = 0;
+
+    # Long options that consume the next argv element as a value.
+    # Derived from @getopt_spec: any key containing = or : takes an argument.
+    my %long_val;
+    for (my $i = 0; $i < @getopt_spec; $i += 2) {
+        if ($getopt_spec[$i] =~ /[=:]/) {
+            (my $name = $getopt_spec[$i]) =~ s/[=:!+].*//;
+            $long_val{"--$name"} = 1;
+        }
+    }
+
+    while (@ARGV) {
+        my $arg = shift @ARGV;
+
+        # -- stops all processing
+        if ($arg eq '--') {
+            push @trailing, @ARGV;
+            last;
+        }
+
+        # Long options: pass through to GetOptions (with value if applicable)
+        if ($arg =~ /^--/) {
+            push @new_argv, $arg;
+            # If --foo=bar, value is already embedded; otherwise consume next
+            if ($arg !~ /=/ && $long_val{$arg} && @ARGV) {
+                push @new_argv, shift @ARGV;
+            }
+            next;
+        }
+
+        # Not an option: positional argument
+        if ($arg !~ /^-/) {
+            push @new_argv, $arg;
+            $positionals++;
+            if ($positionals >= 2) {
+                push @trailing, @ARGV;
+                last;
+            }
+            next;
+        }
+
+        # Short option bundle: strip leading '-' and process char by char
+        my $bundle = substr($arg, 1);
+        while (length $bundle) {
+            my $c = substr($bundle, 0, 1, '');
+
+            if ($c eq 'w') {
+                $warnings = 1;
+            }
+            elsif ($c eq 'h') {
+                pod2usage(-verbose => 1, -exitstatus => 0);
+            }
+            elsif ($c eq 'V') {
+                $version = 1;
+            }
+            elsif ($c eq 'e' || $c eq 'm' || $c eq 'M') {
+                # Value-consuming: rest of bundle, or next argv element
+                my $val;
+                if (length $bundle) {
+                    $val = $bundle;
+                    $bundle = '';
+                }
+                else {
+                    $val = shift @ARGV;
+                    die "remperl: missing argument for -$c\n"
+                        unless defined $val;
+                }
+                if ($c eq 'e') {
+                    push @eval_code, $val;
+                }
+                else {
+                    push @use_specs, [$c, $val];
+                }
+            }
+            else {
+                die "remperl: unrecognized switch: -$c\n";
+            }
+        }
+    }
+
+    @ARGV = @new_argv;
+    return (\@eval_code, \@use_specs, $warnings, \@trailing);
+}
+
+my ($eval_codes, $use_specs, $warnings, $trailing) = parse_perl_opts();
+
+# -- Long option parsing -------------------------------------------------------
+
+GetOptions(@getopt_spec) or pod2usage(2);
+
+# Re-append args that appeared after the stop point (2nd positional or --).
+# These are script arguments and must not be processed by GetOptions.
+push @ARGV, @$trailing;
 
 pod2usage(-verbose => 1, -exitstatus => 0) if $help;
 
@@ -45,6 +169,9 @@ if ($version) {
     print "remperl $Remote::Perl::VERSION\n";
     exit 0;
 }
+
+# No arguments at all: show usage instead of a cryptic "missing host" error.
+pod2usage(-verbose => 99, -sections => 'SYNOPSIS', -exitstatus => 0) unless @ARGV || @$eval_codes;
 
 # -- Build the remote command --------------------------------------------------
 
@@ -62,10 +189,22 @@ else {
 
 # -- Source: file or -e --------------------------------------------------------
 
+my $eval_code = @$eval_codes ? join("\n", @$eval_codes) : undef;
+
+# Build preamble from -m/-M specs
+my $preamble = '';
+for my $spec (@$use_specs) {
+    $preamble .= use_spec_to_line($spec->[0], $spec->[1]);
+}
+
 my $script;
 if (!defined $eval_code) {
+    die "remperl: -m/-M requires -e\n" if length $preamble;
     $script = shift @ARGV
         // die "remperl: missing script argument (or use -e CODE)\n";
+}
+else {
+    $eval_code = $preamble . $eval_code if length $preamble;
 }
 
 # -- stdin ---------------------------------------------------------------------
@@ -91,7 +230,26 @@ else {
 
 STDOUT->autoflush(1);
 
-my @inc = (@inc_local, @INC);
+my @inc = $no_system_inc ? @inc_local : (@inc_local, @INC);
+
+# -- Module serving path restriction -------------------------------------------
+
+# --serve-allow implies --serve-restrict-paths
+$serve_restrict = 1 if @serve_allow;
+
+my $serve_filter;
+if ($serve_restrict) {
+    require Cwd;
+    # Allowed dirs: explicit --serve-allow + implicit --inc-local
+    my @allowed = grep { defined } map { Cwd::realpath($_) } (@serve_allow, @inc_local);
+    $serve_filter = sub($path) {
+        my $real = Cwd::realpath($path) // return 0;
+        for my $dir (@allowed) {
+            return 1 if index($real, "$dir/") == 0;
+        }
+        return 0;
+    };
+}
 
 die "remperl: unknown --tmpfile-mode value '$tmpfile_mode'\n"
     if defined $tmpfile_mode && $tmpfile_mode !~ /^(auto|linux|perl|named|off)$/;
@@ -104,12 +262,13 @@ my $tmpfile_val = !$tmpfile                       ? 0
                 :                                   $tmpfile_mode;
 
 my $r = Remote::Perl->new(
-    cmd       => \@cmd,
-    window    => $window,
-    serve     => $serve_modules,
-    inc       => \@inc,
-    tmpfile   => $tmpfile_val,
-    data_warn => ($no_data_warn ? 0 : 1),
+    cmd          => \@cmd,
+    window       => $window,
+    serve        => $serve_modules,
+    inc          => \@inc,
+    serve_filter => $serve_filter,
+    tmpfile      => $tmpfile_val,
+    data_warn    => ($no_data_warn ? 0 : 1),
 );
 
 # Forward signals through the protocol so the remote executor receives them
@@ -125,6 +284,7 @@ my %run_opts = (
     on_stderr => sub { print STDERR $_[0] },
     stdin     => $stdin,
     args      => \@script_args,
+    warnings  => $warnings,
 );
 
 my ($rc, $msg) = defined($eval_code)
@@ -145,7 +305,7 @@ remperl - run Perl scripts on remote machines over any pipe transport
 =head1 SYNOPSIS
 
   remperl [options] HOST script.pl [script-args...]
-  remperl [options] HOST -e CODE [script-args...]
+  remperl [options] HOST [-mMOD] [-MMOD] -e CODE [script-args...]
   remperl --pipe-cmd [options] COMMAND script.pl [script-args...]
 
 C<HOST> accepts: C<hostname>, C<user@hostname>, C<ssh://[user@]host[:port]>.
@@ -181,6 +341,26 @@ variable assignments work as expected.
 =item B<-e> I<CODE>
 
 Evaluate CODE on the remote side instead of running a script file.
+Multiple B<-e> options are accumulated and joined with newlines, just
+like C<perl -e>.
+
+=item B<-m>I<MODULE>
+
+=item B<-M>I<MODULE>
+
+Load MODULE before running code, following the same rules as C<perl -m>
+and C<perl -M>.  B<-m> imports nothing (C<use MODULE ()>); B<-M>
+imports defaults (C<use MODULE>).  C<-M-MODULE> becomes C<no MODULE>.
+An C<=> suffix works as in Perl: C<-MModule=a,b> becomes
+C<use Module split(/,/,q{a,b})>.
+
+Only valid with B<-e>; using B<-m>/B<-M> with a script file is an error.
+May be specified multiple times.
+
+=item B<-w>
+
+Enable warnings on the remote side (sets C<$^W = 1>), equivalent to
+C<perl -w>.
 
 =item B<--stdin-file>=I<FILE>
 
@@ -204,7 +384,26 @@ explicitly disable.
 =item B<--inc-local>=I<PATH>
 
 Prepend PATH to the local C<@INC> used when serving modules.  May be
-specified multiple times.
+specified multiple times.  When C<--serve-restrict-paths> is active,
+C<--inc-local> paths are automatically added to the set of allowed paths.
+
+=item B<--no-system-inc>
+
+When serving modules, search only C<--inc-local> directories and not the
+system C<@INC>.  Has no effect unless C<--serve-modules> is also set.
+
+=item B<--serve-restrict-paths>
+
+Restrict module serving to a set of allowed directories.  A module found
+in C<@INC> is denied unless its real path falls under one of the allowed
+directories.  The allowed set consists of all C<--serve-allow> paths plus
+all C<--inc-local> paths.  If no allowed directories are configured,
+nothing is served.
+
+=item B<--serve-allow>=I<PATH>
+
+Add PATH to the set of allowed directories for C<--serve-restrict-paths>.
+May be specified multiple times.  Implies C<--serve-restrict-paths>.
 
 =item B<--tmpfile>
 
@@ -301,6 +500,14 @@ machine.  No non-core modules required on either side.
 C<__DATA__> sections require C<--tmpfile>.  Without it, code before
 C<__DATA__> runs correctly but C<< <DATA> >> reads return nothing, and a
 warning is printed.  C<__END__> stops parsing as usual regardless.
+
+=head1 CAVEATS
+
+Scripts that use C<FindBin> will cause module serving to break for their
+dependencies: C<FindBin> sets C<$Bin> to the remote executor's temporary
+script path rather than the original script's directory, so any relative
+C<use lib "$Bin/..."> entries in C<@INC> point at non-existent locations
+and the module server cannot find the modules there.
 
 =head1 SEE ALSO
 

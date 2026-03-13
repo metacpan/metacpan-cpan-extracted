@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/HeaderValue.pm
-## Version v0.4.3
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.4.4
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/03
-## Modified 2026/01/22
+## Modified 2026/03/10
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -66,7 +66,7 @@ BEGIN
     # our $TYPE_REGEXP  = qr/(?:[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+)|$TOKEN_REGEXP/;
     # our $TOKEN_REGEXP = qr/[!#$%&'*+.^_`|~0-9A-Za-z-]+/;
     # our $TEXT_REGEXP  = qr/[\u000b\u0020-\u007e\u0080-\u00ff]+|$COOKIE_DATA_RE/;
-    our $VERSION = 'v0.4.3';
+    our $VERSION = 'v0.4.4';
 };
 
 use strict;
@@ -238,10 +238,11 @@ sub as_string
     my $self = shift( @_ );
     if( !$self->original->defined || !$self->original->length )
     {
-        my $string = $self->value_as_string;
+        my $prime_params  = $self->new_array( ( @_ && $self->_is_array( $_[0] ) ) ? shift( @_ ) : [] );
+        my $opts          = $self->_get_args_as_hash( @_ );
+        my $string        = $self->value_as_string;
         my $token_max_len = $self->token_max;
         my $value_max_len = $self->value_max;
-        my $prime_params  = $self->new_array( ( @_ && $self->_is_array( $_[0] ) ) ? shift( @_ ) : [] );
 
         # Append parameters
         if( $self->params->length )
@@ -284,7 +285,13 @@ sub as_string
                     {
                         return( $self->error( "Parameter \"", $params->[$i], "\" value exceeds the maximum length of $value_max_len" ) );
                     }
-                    my $qstr = $self->qstring( $value );
+                    # If the caller has requested it, we can force the double quotes on this token name, otherwise, by default, it is automatic
+                    my $qstr = $self->qstring( $value, (
+                            ( ref( $opts->{quote} ) eq 'ARRAY' && scalar( grep( $params->[$i], @{$opts->{quote}} ) ) )
+                            ||
+                            ( !ref( $opts->{quote} ) && $opts->{quote} eq $params->[$i] ) 
+                        ) ? ( quote => 1 ) : ()
+                    );
                     if( !defined( $qstr ) )
                     {
                         warn( $self->error );
@@ -326,11 +333,20 @@ sub qstring
 {
     my $self = shift( @_ );
     my $str  = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
 
-    # no need to quote tokens
+    # no need to quote tokens, unless caller explicitly requires it
     if( $str =~ /^$TOKEN_REGEXP$/ || $str =~ /^\"(.*?)\"$/ )
     {
-        return( $str );
+        if( $opts->{quote} )
+        {
+            $str =~ s/$QUOTE_REGEXP/\\$1/g;
+            return( '"' . $str . '"' );
+        }
+        else
+        {
+            return( $str );
+        }
     }
 
     if( length( $str ) > 0 && $str !~ /^$TEXT_REGEXP$/ )
@@ -512,7 +528,7 @@ Module::Generic::HeaderValue - Generic Header Value Parser
 
 =head1 VERSION
 
-    v0.4.3
+    v0.4.4
 
 =head1 DESCRIPTION
 
@@ -638,6 +654,24 @@ An attribute value set to C<undef> will result in the attribute alone:
 would result in:
 
     site_prefs=lang%3Den-GB; secure
+
+Optionally takes an array reference of parameter names to output first, followed by an optional hash or hash reference of options.
+
+Supported options are:
+
+=over 4
+
+=item C<quote>
+
+Boolean. Defaults to false.
+
+If set to true, all parameter values will be wrapped in double quotes, regardless of whether quoting would otherwise be required. This is useful for headers such as C<Content-Disposition> in C<multipart/form-data> contexts, where L<RFC 7578|https://datatracker.ietf.org/doc/html/rfc7578#section-4.2> mandates that the C<name> and C<filename> parameter values be quoted strings.
+
+    # Force quoting for all parameter values
+    my $str = $hv->as_string( [qw( name filename )], { quote => 1 } );
+    # produces: form-data; name="pause99_add_uri_httpupload"; filename="Module-Generic-v1.2.1.tar.gz"
+
+=back
 
 =head2 decode
 

@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-12'; # DATE
+our $DATE = '2025-11-13'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 Perinci::CmdLine::Any->new(
     url => '/Git/Grouper/',
@@ -51,7 +51,7 @@ git-grouper - Categorize git repositories into one/more groups and perform actio
 
 =head1 VERSION
 
-This document describes version 0.005 of git-grouper (from Perl distribution Git-Grouper), released on 2025-11-12.
+This document describes version 0.006 of git-grouper (from Perl distribution Git-Grouper), released on 2025-11-13.
 
 =head1 SYNOPSIS
 
@@ -308,6 +308,11 @@ See C<--config>.
 (No description)
 
 
+=item B<--ignore-nondirs>
+
+(No description)
+
+
 =item B<--repo-json>=I<s>
 
 See C<--repo>.
@@ -349,6 +354,11 @@ See C<--config>.
 
 
 Can also be specified as the 1st command-line argument.
+
+=item B<--ignore-nondirs>
+
+(No description)
+
 
 =item B<--repo-json>=I<s>
 
@@ -392,6 +402,11 @@ See C<--config>.
 
 Can also be specified as the 1st command-line argument.
 
+=item B<--ignore-nondirs>
+
+(No description)
+
+
 =item B<--repo-json>=I<s>
 
 See C<--repo>.
@@ -423,6 +438,11 @@ Can be specified multiple times.
 See C<--config>.
 
 =item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--ignore-nondirs>
 
 (No description)
 
@@ -462,6 +482,11 @@ See C<--config>.
 (No description)
 
 
+=item B<--ignore-nondirs>
+
+(No description)
+
+
 =item B<--repo-json>=I<s>
 
 See C<--repo>.
@@ -497,6 +522,11 @@ See C<--config>.
 (No description)
 
 
+=item B<--ignore-nondirs>
+
+(No description)
+
+
 =item B<--repo-json>=I<s>
 
 See C<--repo>.
@@ -528,6 +558,11 @@ Can be specified multiple times.
 See C<--config>.
 
 =item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--ignore-nondirs>
 
 (No description)
 
@@ -636,6 +671,11 @@ a single group, or array for multiple groups. When set to 'always', will always
 return an array for the groups result.
 
 
+=item B<--ignore-nondirs>
+
+(No description)
+
+
 =item B<--repo-json>=I<s>
 
 See C<--repo>.
@@ -673,6 +713,11 @@ records.
 =head2 Options for subcommand ls-repo-remotes
 
 =over
+
+=item B<--ignore-nondirs>
+
+(No description)
+
 
 =item B<--repo-json>=I<s>
 

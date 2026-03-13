@@ -1,3 +1,13 @@
+/* Silence compound-token-split-by-macro warnings from perl.h when
+ * building for Perl < 5.35.2 with Clang >= 12
+ * See https://github.com/radiator-software/p5-net-ssleay/issues/383
+ */
+#if NET_SSLEAY_PERL_VERSION < 5035002 && defined(__clang__) && defined(__clang_major__) && __clang_major__ >= 12
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wcompound-token-split-by-macro"
+#pragma clang diagnostic warning "-Wunknown-warning-option"
+#endif
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -347,16 +357,6 @@ EC_POINT_cmp(const EC_GROUP *group, const EC_POINT *a, const EC_POINT *b, BN_CTX
 
 int 
 EC_POINT_make_affine(const EC_GROUP *group, EC_POINT *point, BN_CTX *ctx)
-
-#if 0
-
-int 
-EC_POINTs_make_affine(const EC_GROUP *group, size_t num, EC_POINT *p[], BN_CTX *ctx)
-
-int 
-EC_POINTs_mul(const EC_GROUP *group, EC_POINT *r, const BIGNUM *n, size_t num, const EC_POINT *p[], const BIGNUM *m[], BN_CTX *ctx)
-
-#endif
 
 int 
 EC_POINT_mul(const EC_GROUP *group, EC_POINT *r, const BIGNUM *n, const EC_POINT *q, const BIGNUM *m, BN_CTX *ctx)

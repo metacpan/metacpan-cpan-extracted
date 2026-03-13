@@ -18,7 +18,8 @@ my $m = Module::Generic->new(
     debug => $DEBUG,
     colour_open => "\{",
     colour_close => "\}",
-    ( $DEBUG ? ( force_tty => 1 ) : () ),
+    # ( $DEBUG ? ( force_tty => 1 ) : () ),
+    force_tty => 1,
 );
 
 is(
@@ -82,7 +83,7 @@ subtest 'literal braces/angles' => sub
 
 subtest 'nesting mixed delimiters' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}', force_tty => 1 );
     my $out = $m->colour_parse('{bold red}A <underline green>B</> C{/}');
     like( $out, qr/\e\[.*?mA .*?B.*? C\e\[m/s, 'nested < > inside { } works' );
 
@@ -109,7 +110,7 @@ subtest 'non-TTY strips formatting' => sub
 
 subtest 'whitespace and case variants' => sub
 {
-    my $m = Module::Generic->new( debug => 0, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => 0, colour_open => '{', colour_close => '}', force_tty => 1 );
     is(
         $m->colour_parse('{  LIGHT   Red   on  White }X{/}'),
         '{  LIGHT   Red   on  White }X{/}',
@@ -138,6 +139,7 @@ subtest 'rgb/rgba bounds' => sub
         debug => $DEBUG,
         colour_open => '{',
         colour_close => '}',
+        force_tty => 1,
     );
     # Si ton colour_format clippe, adapte l’assertion. Ici on exige le littéral si hors bornes.
     is(
@@ -149,13 +151,13 @@ subtest 'rgb/rgba bounds' => sub
 
 subtest 'custom delimiters only' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '[[', colour_close => ']]' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '[[', colour_close => ']]', force_tty => 1 );
     like( $m->colour_parse('[[bold red]]X[[/]]'), qr/\e\[.*?mX\e\[m/s, 'custom delimiters work' );
 };
 
 subtest 'unicode content' => sub
 {
-    my $m = Module::Generic->new( debug => 0, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => 0, colour_open => '{', colour_close => '}', force_tty => 1 );
     like(
         $m->colour_parse('{bold red}café 😊{/}'),
         qr/\e\[.*?mcafé 😊\e\[m/s,
@@ -165,7 +167,7 @@ subtest 'unicode content' => sub
 
 subtest 'unbalanced nested tags' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}', force_tty => 1 );
     is(
         $m->colour_parse('{bold red}outer {underline green}inner{/'),
         "\e[38;5;224;1m\e[38;2;255;0;0;1mouter \e[38;5;28;4m\e[38;2;0;255;0;4minner{/",
@@ -188,7 +190,7 @@ subtest 'empty parameters' => sub
 
 subtest 'adjacent tags' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}', force_tty => 1 );
     like(
         $m->colour_parse('{bold red}A{/}{underline green}B{/}'),
         qr/\e\[.*?mA\e\[m.*?\e\[.*?mB\e\[m/s,
@@ -198,7 +200,7 @@ subtest 'adjacent tags' => sub
 
 subtest 'malformed tags' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}', force_tty => 1 );
     is(
         $m->colour_parse('{bold red}missing close'),
         "\e[38;5;224;1m\e[38;2;255;0;0;1mmissing close",
@@ -219,7 +221,7 @@ subtest 'malformed tags' => sub
 
 subtest 'deep recursion' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}', force_tty => 1 );
     my $deep = '{bold red}' . ( '{underline green}' x 5 ) . 'deep' . ( '{/}' x 5 ) . '{/}';
     is(
         $m->colour_parse( $deep ),
@@ -237,7 +239,7 @@ subtest 'deep recursion' => sub
 
 subtest 'custom delimiter edge cases' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '[[', colour_close => ']]' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '[[', colour_close => ']]', force_tty => 1 );
     is(
         $m->colour_parse('[[bold red]]text{ x: 1 }[[/]]'),
         "\e[38;5;224;1m\e[38;2;255;0;0;1mtext{ x: 1 }\e[m",
@@ -252,7 +254,7 @@ subtest 'custom delimiter edge cases' => sub
 
 subtest 'curly braces in content' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}', force_tty => 1 );
     is(
         $m->colour_parse('{bold red}code { x: 1 } here{/}'),
         "\e[38;5;224;1m\e[38;2;255;0;0;1mcode { x: 1 } here\e[m",
@@ -272,7 +274,7 @@ subtest 'curly braces in content' => sub
 
 subtest 'complex mixed content' => sub
 {
-    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}' );
+    my $m = Module::Generic->new( debug => $DEBUG, colour_open => '{', colour_close => '}', force_tty => 1 );
     is(
         $m->colour_parse('Start {bold red}red { x: {underline green}green{/} } end{/}'),
         "Start \e[38;5;224;1m\e[38;2;255;0;0;1mred { x: \e[38;5;28;4m\e[38;2;0;255;0;4mgreen\e[m } end\e[m",

@@ -22,10 +22,27 @@
 
 #include "XSParseKeyword.h"
 
+/* ---- Cached stash pointers for fast type checking ---- */
+
+static HV* stash_i16;
+static HV* stash_i16a;
+static HV* stash_i16s;
+static HV* stash_i32;
+static HV* stash_i32a;
+static HV* stash_i32s;
+static HV* stash_ia;
+static HV* stash_ii;
+static HV* stash_is;
+static HV* stash_sa;
+static HV* stash_si16;
+static HV* stash_si32;
+static HV* stash_si;
+static HV* stash_ss;
+
 /* ---- Helper macros ---- */
 
-#define EXTRACT_MAP(type, classname, sv) \
-    if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
+#define EXTRACT_MAP(type, stash_var, classname, sv) \
+    if (!SvROK(sv) || !SvOBJECT(SvRV(sv)) || SvSTASH(SvRV(sv)) != stash_var) \
         croak("Expected a %s object", classname); \
     type* self = INT2PTR(type*, SvIV(SvRV(sv))); \
     if (!self) croak("Attempted to use a destroyed %s object", classname)
@@ -36,6 +53,21 @@
 static void hm_sv_free(void* sv) {
     dTHX;
     SvREFCNT_dec((SV*)sv);
+}
+
+/* Zero-copy SV from internal string buffer (opt-in via get_direct).
+ * Returns a read-only SV pointing directly at the map's internal buffer.
+ * SvLEN=0 tells Perl not to free the buffer; SvREADONLY prevents writes.
+ * Caller must not hold the SV past any map mutation (put/remove/clear). */
+static inline SV* hm_zerocopy_sv(pTHX_ const char* buf, uint32_t len, bool is_utf8) {
+    SV* sv = newSV_type(SVt_PV);
+    SvPV_set(sv, (char*)buf);
+    SvCUR_set(sv, len);
+    SvLEN_set(sv, 0);
+    SvPOK_on(sv);
+    SvREADONLY_on(sv);
+    if (is_utf8) SvUTF8_on(sv);
+    return sv;
 }
 
 #define EXTRACT_STR_KEY(sv) \
@@ -198,6 +230,7 @@ DEFINE_KW_HOOK(i16s, "I16S", clear,      1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", to_hash,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(i16s, "I16S", get_or_set, 3, build_kw_3arg)
+DEFINE_KW_HOOK(i16s, "I16S", get_direct, 2, build_kw_2arg)
 
 /* SI16 keywords (string -> int16) */
 DEFINE_KW_HOOK(si16, "SI16", put,      3, build_kw_3arg)
@@ -279,6 +312,7 @@ DEFINE_KW_HOOK(is, "IS", clear,      1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", to_hash,    1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(is, "IS", get_or_set, 3, build_kw_3arg)
+DEFINE_KW_HOOK(is, "IS", get_direct, 2, build_kw_2arg)
 
 /* SI keywords */
 DEFINE_KW_HOOK(si, "SI", put,      3, build_kw_3arg)
@@ -318,6 +352,7 @@ DEFINE_KW_HOOK(ss, "SS", clear,      1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", to_hash,    1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(ss, "SS", get_or_set, 3, build_kw_3arg)
+DEFINE_KW_HOOK(ss, "SS", get_direct, 2, build_kw_2arg)
 
 /* I32S keywords (int32 -> string) */
 DEFINE_KW_HOOK(i32s, "I32S", put,      3, build_kw_3arg)
@@ -336,6 +371,7 @@ DEFINE_KW_HOOK(i32s, "I32S", clear,      1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", to_hash,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", put_ttl,    4, build_kw_4arg)
 DEFINE_KW_HOOK(i32s, "I32S", get_or_set, 3, build_kw_3arg)
+DEFINE_KW_HOOK(i32s, "I32S", get_direct, 2, build_kw_2arg)
 
 /* SI32 keywords (string -> int32) */
 DEFINE_KW_HOOK(si32, "SI32", put,      3, build_kw_3arg)
@@ -462,6 +498,20 @@ PROTOTYPES: DISABLE
 
 BOOT:
     boot_xs_parse_keyword(0.40);
+    stash_i16  = gv_stashpvn("Data::HashMap::I16",  18, GV_ADD);
+    stash_i16a = gv_stashpvn("Data::HashMap::I16A", 19, GV_ADD);
+    stash_i16s = gv_stashpvn("Data::HashMap::I16S", 19, GV_ADD);
+    stash_i32  = gv_stashpvn("Data::HashMap::I32",  18, GV_ADD);
+    stash_i32a = gv_stashpvn("Data::HashMap::I32A", 19, GV_ADD);
+    stash_i32s = gv_stashpvn("Data::HashMap::I32S", 19, GV_ADD);
+    stash_ia   = gv_stashpvn("Data::HashMap::IA",   17, GV_ADD);
+    stash_ii   = gv_stashpvn("Data::HashMap::II",   17, GV_ADD);
+    stash_is   = gv_stashpvn("Data::HashMap::IS",   17, GV_ADD);
+    stash_sa   = gv_stashpvn("Data::HashMap::SA",   17, GV_ADD);
+    stash_si16 = gv_stashpvn("Data::HashMap::SI16", 19, GV_ADD);
+    stash_si32 = gv_stashpvn("Data::HashMap::SI32", 19, GV_ADD);
+    stash_si   = gv_stashpvn("Data::HashMap::SI",   17, GV_ADD);
+    stash_ss   = gv_stashpvn("Data::HashMap::SS",   17, GV_ADD);
     REGISTER_KW(i16, put,      "Data::HashMap::I16::put");
     REGISTER_KW(i16, get,      "Data::HashMap::I16::get");
     REGISTER_KW(i16, remove,   "Data::HashMap::I16::remove");
@@ -497,6 +547,7 @@ BOOT:
     REGISTER_KW(i16s, to_hash,    "Data::HashMap::I16S::to_hash");
     REGISTER_KW(i16s, put_ttl,    "Data::HashMap::I16S::put_ttl");
     REGISTER_KW(i16s, get_or_set, "Data::HashMap::I16S::get_or_set");
+    REGISTER_KW(i16s, get_direct, "Data::HashMap::I16S::get_direct");
     REGISTER_KW(si16, put,      "Data::HashMap::SI16::put");
     REGISTER_KW(si16, get,      "Data::HashMap::SI16::get");
     REGISTER_KW(si16, remove,   "Data::HashMap::SI16::remove");
@@ -570,6 +621,7 @@ BOOT:
     REGISTER_KW(is, to_hash,    "Data::HashMap::IS::to_hash");
     REGISTER_KW(is, put_ttl,    "Data::HashMap::IS::put_ttl");
     REGISTER_KW(is, get_or_set, "Data::HashMap::IS::get_or_set");
+    REGISTER_KW(is, get_direct, "Data::HashMap::IS::get_direct");
     REGISTER_KW(si, put,      "Data::HashMap::SI::put");
     REGISTER_KW(si, get,      "Data::HashMap::SI::get");
     REGISTER_KW(si, remove,   "Data::HashMap::SI::remove");
@@ -605,6 +657,7 @@ BOOT:
     REGISTER_KW(ss, to_hash,    "Data::HashMap::SS::to_hash");
     REGISTER_KW(ss, put_ttl,    "Data::HashMap::SS::put_ttl");
     REGISTER_KW(ss, get_or_set, "Data::HashMap::SS::get_or_set");
+    REGISTER_KW(ss, get_direct, "Data::HashMap::SS::get_direct");
     REGISTER_KW(i32s, put,      "Data::HashMap::I32S::put");
     REGISTER_KW(i32s, get,      "Data::HashMap::I32S::get");
     REGISTER_KW(i32s, remove,   "Data::HashMap::I32S::remove");
@@ -621,6 +674,7 @@ BOOT:
     REGISTER_KW(i32s, to_hash,    "Data::HashMap::I32S::to_hash");
     REGISTER_KW(i32s, put_ttl,    "Data::HashMap::I32S::put_ttl");
     REGISTER_KW(i32s, get_or_set, "Data::HashMap::I32S::get_or_set");
+    REGISTER_KW(i32s, get_direct, "Data::HashMap::I32S::get_direct");
     REGISTER_KW(si32, put,      "Data::HashMap::SI32::put");
     REGISTER_KW(si32, get,      "Data::HashMap::SI32::get");
     REGISTER_KW(si32, remove,   "Data::HashMap::SI32::remove");
@@ -718,14 +772,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         hashmap_i32_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int32_t key, int32_t value)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         RETVAL = hashmap_i32_put(self, key, value, 0);
     OUTPUT:
         RETVAL
@@ -733,7 +787,7 @@ put(SV* self_sv, int32_t key, int32_t value)
 SV*
 get(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         int32_t value;
         if (!hashmap_i32_get(self, key, &value)) XSRETURN_UNDEF;
         RETVAL = newSViv(value);
@@ -743,7 +797,7 @@ get(SV* self_sv, int32_t key)
 bool
 remove(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         RETVAL = hashmap_i32_remove(self, key);
     OUTPUT:
         RETVAL
@@ -751,7 +805,7 @@ remove(SV* self_sv, int32_t key)
 bool
 exists(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         RETVAL = hashmap_i32_exists(self, key);
     OUTPUT:
         RETVAL
@@ -759,7 +813,7 @@ exists(SV* self_sv, int32_t key)
 SV*
 incr(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         int32_t val;
         if (!hashmap_i32_increment(self, key, &val))
             croak("HashMap::I32: increment failed");
@@ -770,7 +824,7 @@ incr(SV* self_sv, int32_t key)
 SV*
 decr(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         int32_t val;
         if (!hashmap_i32_decrement(self, key, &val))
             croak("HashMap::I32: decrement failed");
@@ -781,7 +835,7 @@ decr(SV* self_sv, int32_t key)
 SV*
 incr_by(SV* self_sv, int32_t key, int32_t delta)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         int32_t val;
         if (!hashmap_i32_increment_by(self, key, delta, &val))
             croak("HashMap::I32: incr_by failed");
@@ -792,7 +846,7 @@ incr_by(SV* self_sv, int32_t key, int32_t delta)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -800,7 +854,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -808,7 +862,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -816,7 +870,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -828,7 +882,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -840,7 +894,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -854,7 +908,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -871,19 +925,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         hashmap_i32_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -902,7 +956,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int32_t key, int32_t value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
         RETVAL = hashmap_i32_put(self, key, value, (uint32_t)ttl);
     OUTPUT:
         RETVAL
@@ -910,15 +964,12 @@ put_ttl(SV* self_sv, int32_t key, int32_t value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int32_t key, int32_t default_value)
     CODE:
-        EXTRACT_MAP(HashMapI32, "Data::HashMap::I32", self_sv);
-        int32_t value;
-        if (hashmap_i32_get(self, key, &value)) {
-            RETVAL = newSViv(value);
-        } else {
-            if (!hashmap_i32_put(self, key, default_value, 0))
-                XSRETURN_UNDEF;
-            RETVAL = newSViv(default_value);
-        }
+        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
+        bool was_found;
+        size_t idx = hashmap_i32_get_or_set(self, key, default_value, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -940,14 +991,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         hashmap_ii_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int64_t key, int64_t value)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         RETVAL = hashmap_ii_put(self, key, value, 0);
     OUTPUT:
         RETVAL
@@ -955,7 +1006,7 @@ put(SV* self_sv, int64_t key, int64_t value)
 SV*
 get(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         int64_t value;
         if (!hashmap_ii_get(self, key, &value)) XSRETURN_UNDEF;
         RETVAL = newSViv(value);
@@ -965,7 +1016,7 @@ get(SV* self_sv, int64_t key)
 bool
 remove(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         RETVAL = hashmap_ii_remove(self, key);
     OUTPUT:
         RETVAL
@@ -973,7 +1024,7 @@ remove(SV* self_sv, int64_t key)
 bool
 exists(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         RETVAL = hashmap_ii_exists(self, key);
     OUTPUT:
         RETVAL
@@ -981,7 +1032,7 @@ exists(SV* self_sv, int64_t key)
 SV*
 incr(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         int64_t val;
         if (!hashmap_ii_increment(self, key, &val))
             croak("HashMap::II: increment failed");
@@ -992,7 +1043,7 @@ incr(SV* self_sv, int64_t key)
 SV*
 decr(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         int64_t val;
         if (!hashmap_ii_decrement(self, key, &val))
             croak("HashMap::II: decrement failed");
@@ -1003,7 +1054,7 @@ decr(SV* self_sv, int64_t key)
 SV*
 incr_by(SV* self_sv, int64_t key, int64_t delta)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         int64_t val;
         if (!hashmap_ii_increment_by(self, key, delta, &val))
             croak("HashMap::II: incr_by failed");
@@ -1014,7 +1065,7 @@ incr_by(SV* self_sv, int64_t key, int64_t delta)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -1022,7 +1073,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -1030,7 +1081,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -1038,7 +1089,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1050,7 +1101,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1062,7 +1113,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -1076,7 +1127,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -1093,19 +1144,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         hashmap_ii_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -1124,7 +1175,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int64_t key, int64_t value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
         RETVAL = hashmap_ii_put(self, key, value, (uint32_t)ttl);
     OUTPUT:
         RETVAL
@@ -1132,15 +1183,12 @@ put_ttl(SV* self_sv, int64_t key, int64_t value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int64_t key, int64_t default_value)
     CODE:
-        EXTRACT_MAP(HashMapII, "Data::HashMap::II", self_sv);
-        int64_t value;
-        if (hashmap_ii_get(self, key, &value)) {
-            RETVAL = newSViv(value);
-        } else {
-            if (!hashmap_ii_put(self, key, default_value, 0))
-                XSRETURN_UNDEF;
-            RETVAL = newSViv(default_value);
-        }
+        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
+        bool was_found;
+        size_t idx = hashmap_ii_get_or_set(self, key, default_value, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -1162,14 +1210,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         hashmap_is_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int64_t key, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_is_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0);
     OUTPUT:
@@ -1178,7 +1226,7 @@ put(SV* self_sv, int64_t key, SV* value)
 SV*
 get(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         const char* val;
         uint32_t val_len;
         bool val_utf8;
@@ -1189,10 +1237,23 @@ get(SV* self_sv, int64_t key)
     OUTPUT:
         RETVAL
 
+SV*
+get_direct(SV* self_sv, int64_t key)
+    CODE:
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
+        const char* val;
+        uint32_t val_len;
+        bool val_utf8;
+        if (!hashmap_is_get(self, key, &val, &val_len, &val_utf8))
+            XSRETURN_UNDEF;
+        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
+    OUTPUT:
+        RETVAL
+
 bool
 remove(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         RETVAL = hashmap_is_remove(self, key);
     OUTPUT:
         RETVAL
@@ -1200,7 +1261,7 @@ remove(SV* self_sv, int64_t key)
 bool
 exists(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         RETVAL = hashmap_is_exists(self, key);
     OUTPUT:
         RETVAL
@@ -1208,7 +1269,7 @@ exists(SV* self_sv, int64_t key)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -1216,7 +1277,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -1224,7 +1285,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -1232,7 +1293,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1244,7 +1305,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1264,7 +1325,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -1285,7 +1346,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -1309,19 +1370,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         hashmap_is_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -1345,7 +1406,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int64_t key, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_is_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
     OUTPUT:
@@ -1354,16 +1415,17 @@ put_ttl(SV* self_sv, int64_t key, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int64_t key, SV* default_sv)
     CODE:
-        EXTRACT_MAP(HashMapIS, "Data::HashMap::IS", self_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (hashmap_is_get(self, key, &val, &val_len, &val_utf8)) {
-            RETVAL = newSVpvn(val, val_len);
-            if (val_utf8) SvUTF8_on(RETVAL);
+        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
+        EXTRACT_STR_VAL(default_sv);
+        bool was_found;
+        size_t idx = hashmap_is_get_or_set(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        if (self->nodes[idx].value) {
+            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
+            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
         } else {
-            EXTRACT_STR_VAL(default_sv);
-            if (!hashmap_is_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0))
-                XSRETURN_UNDEF;
-            RETVAL = SvREFCNT_inc(default_sv);
+            RETVAL = newSV(0);
         }
     OUTPUT:
         RETVAL
@@ -1386,14 +1448,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         hashmap_si_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, SV* key_sv, int64_t value)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, 0);
     OUTPUT:
@@ -1402,7 +1464,7 @@ put(SV* self_sv, SV* key_sv, int64_t value)
 SV*
 get(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t value;
         if (!hashmap_si_get(self, _kstr, (uint32_t)_klen, _khash, &value))
@@ -1414,7 +1476,7 @@ get(SV* self_sv, SV* key_sv)
 bool
 remove(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si_remove(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -1423,7 +1485,7 @@ remove(SV* self_sv, SV* key_sv)
 bool
 exists(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si_exists(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -1432,7 +1494,7 @@ exists(SV* self_sv, SV* key_sv)
 SV*
 incr(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t val;
         if (!hashmap_si_increment(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
@@ -1444,7 +1506,7 @@ incr(SV* self_sv, SV* key_sv)
 SV*
 decr(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t val;
         if (!hashmap_si_decrement(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
@@ -1456,7 +1518,7 @@ decr(SV* self_sv, SV* key_sv)
 SV*
 incr_by(SV* self_sv, SV* key_sv, int64_t delta)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t val;
         if (!hashmap_si_increment_by(self, _kstr, (uint32_t)_klen, _khash, _kutf8, delta, &val))
@@ -1468,7 +1530,7 @@ incr_by(SV* self_sv, SV* key_sv, int64_t delta)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -1476,7 +1538,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -1484,7 +1546,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -1492,7 +1554,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1508,7 +1570,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1520,7 +1582,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -1537,7 +1599,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -1559,19 +1621,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         hashmap_si_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -1590,7 +1652,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, SV* key_sv, int64_t value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, (uint32_t)ttl);
     OUTPUT:
@@ -1599,16 +1661,13 @@ put_ttl(SV* self_sv, SV* key_sv, int64_t value, UV ttl)
 SV*
 get_or_set(SV* self_sv, SV* key_sv, int64_t default_value)
     CODE:
-        EXTRACT_MAP(HashMapSI, "Data::HashMap::SI", self_sv);
+        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        int64_t value;
-        if (hashmap_si_get(self, _kstr, (uint32_t)_klen, _khash, &value)) {
-            RETVAL = newSViv(value);
-        } else {
-            if (!hashmap_si_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0))
-                XSRETURN_UNDEF;
-            RETVAL = newSViv(default_value);
-        }
+        bool was_found;
+        size_t idx = hashmap_si_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -1630,14 +1689,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         hashmap_ss_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, SV* key_sv, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_ss_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
@@ -1648,7 +1707,7 @@ put(SV* self_sv, SV* key_sv, SV* value)
 SV*
 get(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
         const char* val;
         uint32_t val_len;
@@ -1660,10 +1719,24 @@ get(SV* self_sv, SV* key_sv)
     OUTPUT:
         RETVAL
 
+SV*
+get_direct(SV* self_sv, SV* key_sv)
+    CODE:
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        const char* val;
+        uint32_t val_len;
+        bool val_utf8;
+        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, &val, &val_len, &val_utf8))
+            XSRETURN_UNDEF;
+        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
+    OUTPUT:
+        RETVAL
+
 bool
 remove(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_ss_remove(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -1672,7 +1745,7 @@ remove(SV* self_sv, SV* key_sv)
 bool
 exists(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_ss_exists(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -1681,7 +1754,7 @@ exists(SV* self_sv, SV* key_sv)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -1689,7 +1762,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -1697,7 +1770,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -1705,7 +1778,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1721,7 +1794,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1741,7 +1814,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -1765,7 +1838,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -1794,19 +1867,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         hashmap_ss_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -1830,7 +1903,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_ss_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
@@ -1841,18 +1914,19 @@ put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, SV* key_sv, SV* default_sv)
     CODE:
-        EXTRACT_MAP(HashMapSS, "Data::HashMap::SS", self_sv);
+        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, &val, &val_len, &val_utf8)) {
-            RETVAL = newSVpvn(val, val_len);
-            if (val_utf8) SvUTF8_on(RETVAL);
+        EXTRACT_STR_VAL(default_sv);
+        bool was_found;
+        size_t idx = hashmap_ss_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
+                          _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        if (self->nodes[idx].value) {
+            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
+            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
         } else {
-            EXTRACT_STR_VAL(default_sv);
-            if (!hashmap_ss_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
-                          _vstr, (uint32_t)_vlen, _vutf8, 0))
-                XSRETURN_UNDEF;
-            RETVAL = SvREFCNT_inc(default_sv);
+            RETVAL = newSV(0);
         }
     OUTPUT:
         RETVAL
@@ -1875,14 +1949,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         hashmap_i32s_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int32_t key, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_i32s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0);
     OUTPUT:
@@ -1891,7 +1965,7 @@ put(SV* self_sv, int32_t key, SV* value)
 SV*
 get(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         const char* val;
         uint32_t val_len;
         bool val_utf8;
@@ -1902,10 +1976,23 @@ get(SV* self_sv, int32_t key)
     OUTPUT:
         RETVAL
 
+SV*
+get_direct(SV* self_sv, int32_t key)
+    CODE:
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
+        const char* val;
+        uint32_t val_len;
+        bool val_utf8;
+        if (!hashmap_i32s_get(self, key, &val, &val_len, &val_utf8))
+            XSRETURN_UNDEF;
+        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
+    OUTPUT:
+        RETVAL
+
 bool
 remove(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         RETVAL = hashmap_i32s_remove(self, key);
     OUTPUT:
         RETVAL
@@ -1913,7 +2000,7 @@ remove(SV* self_sv, int32_t key)
 bool
 exists(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         RETVAL = hashmap_i32s_exists(self, key);
     OUTPUT:
         RETVAL
@@ -1921,7 +2008,7 @@ exists(SV* self_sv, int32_t key)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -1929,7 +2016,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -1937,7 +2024,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -1945,7 +2032,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1957,7 +2044,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -1977,7 +2064,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -1998,7 +2085,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -2022,19 +2109,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         hashmap_i32s_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -2058,7 +2145,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_i32s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
     OUTPUT:
@@ -2067,16 +2154,17 @@ put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int32_t key, SV* default_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32S, "Data::HashMap::I32S", self_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (hashmap_i32s_get(self, key, &val, &val_len, &val_utf8)) {
-            RETVAL = newSVpvn(val, val_len);
-            if (val_utf8) SvUTF8_on(RETVAL);
+        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
+        EXTRACT_STR_VAL(default_sv);
+        bool was_found;
+        size_t idx = hashmap_i32s_get_or_set(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        if (self->nodes[idx].value) {
+            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
+            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
         } else {
-            EXTRACT_STR_VAL(default_sv);
-            if (!hashmap_i32s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0))
-                XSRETURN_UNDEF;
-            RETVAL = SvREFCNT_inc(default_sv);
+            RETVAL = newSV(0);
         }
     OUTPUT:
         RETVAL
@@ -2099,14 +2187,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         hashmap_si32_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, SV* key_sv, int32_t value)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si32_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, 0);
     OUTPUT:
@@ -2115,7 +2203,7 @@ put(SV* self_sv, SV* key_sv, int32_t value)
 SV*
 get(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t value;
         if (!hashmap_si32_get(self, _kstr, (uint32_t)_klen, _khash, &value))
@@ -2127,7 +2215,7 @@ get(SV* self_sv, SV* key_sv)
 bool
 remove(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si32_remove(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -2136,7 +2224,7 @@ remove(SV* self_sv, SV* key_sv)
 bool
 exists(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si32_exists(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -2145,7 +2233,7 @@ exists(SV* self_sv, SV* key_sv)
 SV*
 incr(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t val;
         if (!hashmap_si32_increment(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
@@ -2157,7 +2245,7 @@ incr(SV* self_sv, SV* key_sv)
 SV*
 decr(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t val;
         if (!hashmap_si32_decrement(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
@@ -2169,7 +2257,7 @@ decr(SV* self_sv, SV* key_sv)
 SV*
 incr_by(SV* self_sv, SV* key_sv, int32_t delta)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t val;
         if (!hashmap_si32_increment_by(self, _kstr, (uint32_t)_klen, _khash, _kutf8, delta, &val))
@@ -2181,7 +2269,7 @@ incr_by(SV* self_sv, SV* key_sv, int32_t delta)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -2189,7 +2277,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -2197,7 +2285,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -2205,7 +2293,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2221,7 +2309,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2233,7 +2321,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -2250,7 +2338,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -2272,19 +2360,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         hashmap_si32_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -2303,7 +2391,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, SV* key_sv, int32_t value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si32_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, (uint32_t)ttl);
     OUTPUT:
@@ -2312,16 +2400,13 @@ put_ttl(SV* self_sv, SV* key_sv, int32_t value, UV ttl)
 SV*
 get_or_set(SV* self_sv, SV* key_sv, int32_t default_value)
     CODE:
-        EXTRACT_MAP(HashMapSI32, "Data::HashMap::SI32", self_sv);
+        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        int32_t value;
-        if (hashmap_si32_get(self, _kstr, (uint32_t)_klen, _khash, &value)) {
-            RETVAL = newSViv(value);
-        } else {
-            if (!hashmap_si32_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0))
-                XSRETURN_UNDEF;
-            RETVAL = newSViv(default_value);
-        }
+        bool was_found;
+        size_t idx = hashmap_si32_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -2343,14 +2428,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         hashmap_i16_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int16_t key, int16_t value)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         RETVAL = hashmap_i16_put(self, key, value, 0);
     OUTPUT:
         RETVAL
@@ -2358,7 +2443,7 @@ put(SV* self_sv, int16_t key, int16_t value)
 SV*
 get(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         int16_t value;
         if (!hashmap_i16_get(self, key, &value)) XSRETURN_UNDEF;
         RETVAL = newSViv(value);
@@ -2368,7 +2453,7 @@ get(SV* self_sv, int16_t key)
 bool
 remove(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         RETVAL = hashmap_i16_remove(self, key);
     OUTPUT:
         RETVAL
@@ -2376,7 +2461,7 @@ remove(SV* self_sv, int16_t key)
 bool
 exists(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         RETVAL = hashmap_i16_exists(self, key);
     OUTPUT:
         RETVAL
@@ -2384,7 +2469,7 @@ exists(SV* self_sv, int16_t key)
 SV*
 incr(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         int16_t val;
         if (!hashmap_i16_increment(self, key, &val))
             croak("HashMap::I16: increment failed");
@@ -2395,7 +2480,7 @@ incr(SV* self_sv, int16_t key)
 SV*
 decr(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         int16_t val;
         if (!hashmap_i16_decrement(self, key, &val))
             croak("HashMap::I16: decrement failed");
@@ -2406,7 +2491,7 @@ decr(SV* self_sv, int16_t key)
 SV*
 incr_by(SV* self_sv, int16_t key, int16_t delta)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         int16_t val;
         if (!hashmap_i16_increment_by(self, key, delta, &val))
             croak("HashMap::I16: incr_by failed");
@@ -2417,7 +2502,7 @@ incr_by(SV* self_sv, int16_t key, int16_t delta)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -2425,7 +2510,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -2433,7 +2518,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -2441,7 +2526,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2453,7 +2538,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2465,7 +2550,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -2479,7 +2564,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -2496,19 +2581,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         hashmap_i16_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -2527,7 +2612,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int16_t key, int16_t value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
         RETVAL = hashmap_i16_put(self, key, value, (uint32_t)ttl);
     OUTPUT:
         RETVAL
@@ -2535,15 +2620,12 @@ put_ttl(SV* self_sv, int16_t key, int16_t value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int16_t key, int16_t default_value)
     CODE:
-        EXTRACT_MAP(HashMapI16, "Data::HashMap::I16", self_sv);
-        int16_t value;
-        if (hashmap_i16_get(self, key, &value)) {
-            RETVAL = newSViv(value);
-        } else {
-            if (!hashmap_i16_put(self, key, default_value, 0))
-                XSRETURN_UNDEF;
-            RETVAL = newSViv(default_value);
-        }
+        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
+        bool was_found;
+        size_t idx = hashmap_i16_get_or_set(self, key, default_value, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -2565,14 +2647,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         hashmap_i16s_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int16_t key, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_i16s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0);
     OUTPUT:
@@ -2581,7 +2663,7 @@ put(SV* self_sv, int16_t key, SV* value)
 SV*
 get(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         const char* val;
         uint32_t val_len;
         bool val_utf8;
@@ -2592,10 +2674,23 @@ get(SV* self_sv, int16_t key)
     OUTPUT:
         RETVAL
 
+SV*
+get_direct(SV* self_sv, int16_t key)
+    CODE:
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
+        const char* val;
+        uint32_t val_len;
+        bool val_utf8;
+        if (!hashmap_i16s_get(self, key, &val, &val_len, &val_utf8))
+            XSRETURN_UNDEF;
+        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
+    OUTPUT:
+        RETVAL
+
 bool
 remove(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         RETVAL = hashmap_i16s_remove(self, key);
     OUTPUT:
         RETVAL
@@ -2603,7 +2698,7 @@ remove(SV* self_sv, int16_t key)
 bool
 exists(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         RETVAL = hashmap_i16s_exists(self, key);
     OUTPUT:
         RETVAL
@@ -2611,7 +2706,7 @@ exists(SV* self_sv, int16_t key)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -2619,7 +2714,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -2627,7 +2722,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -2635,7 +2730,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2647,7 +2742,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2667,7 +2762,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -2688,7 +2783,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -2712,19 +2807,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         hashmap_i16s_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -2748,7 +2843,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
         EXTRACT_STR_VAL(value);
         RETVAL = hashmap_i16s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
     OUTPUT:
@@ -2757,16 +2852,17 @@ put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int16_t key, SV* default_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16S, "Data::HashMap::I16S", self_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (hashmap_i16s_get(self, key, &val, &val_len, &val_utf8)) {
-            RETVAL = newSVpvn(val, val_len);
-            if (val_utf8) SvUTF8_on(RETVAL);
+        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
+        EXTRACT_STR_VAL(default_sv);
+        bool was_found;
+        size_t idx = hashmap_i16s_get_or_set(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        if (self->nodes[idx].value) {
+            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
+            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
         } else {
-            EXTRACT_STR_VAL(default_sv);
-            if (!hashmap_i16s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0))
-                XSRETURN_UNDEF;
-            RETVAL = SvREFCNT_inc(default_sv);
+            RETVAL = newSV(0);
         }
     OUTPUT:
         RETVAL
@@ -2789,14 +2885,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         hashmap_si16_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, SV* key_sv, int16_t value)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si16_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, 0);
     OUTPUT:
@@ -2805,7 +2901,7 @@ put(SV* self_sv, SV* key_sv, int16_t value)
 SV*
 get(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int16_t value;
         if (!hashmap_si16_get(self, _kstr, (uint32_t)_klen, _khash, &value))
@@ -2817,7 +2913,7 @@ get(SV* self_sv, SV* key_sv)
 bool
 remove(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si16_remove(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -2826,7 +2922,7 @@ remove(SV* self_sv, SV* key_sv)
 bool
 exists(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si16_exists(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -2835,7 +2931,7 @@ exists(SV* self_sv, SV* key_sv)
 SV*
 incr(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int16_t val;
         if (!hashmap_si16_increment(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
@@ -2847,7 +2943,7 @@ incr(SV* self_sv, SV* key_sv)
 SV*
 decr(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int16_t val;
         if (!hashmap_si16_decrement(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
@@ -2859,7 +2955,7 @@ decr(SV* self_sv, SV* key_sv)
 SV*
 incr_by(SV* self_sv, SV* key_sv, int16_t delta)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int16_t val;
         if (!hashmap_si16_increment_by(self, _kstr, (uint32_t)_klen, _khash, _kutf8, delta, &val))
@@ -2871,7 +2967,7 @@ incr_by(SV* self_sv, SV* key_sv, int16_t delta)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -2879,7 +2975,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -2887,7 +2983,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -2895,7 +2991,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2911,7 +3007,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -2923,7 +3019,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -2940,7 +3036,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -2962,19 +3058,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         hashmap_si16_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -2993,7 +3089,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, SV* key_sv, int16_t value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_si16_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, (uint32_t)ttl);
     OUTPUT:
@@ -3002,16 +3098,13 @@ put_ttl(SV* self_sv, SV* key_sv, int16_t value, UV ttl)
 SV*
 get_or_set(SV* self_sv, SV* key_sv, int16_t default_value)
     CODE:
-        EXTRACT_MAP(HashMapSI16, "Data::HashMap::SI16", self_sv);
+        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        int16_t value;
-        if (hashmap_si16_get(self, _kstr, (uint32_t)_klen, _khash, &value)) {
-            RETVAL = newSViv(value);
-        } else {
-            if (!hashmap_si16_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0))
-                XSRETURN_UNDEF;
-            RETVAL = newSViv(default_value);
-        }
+        bool was_found;
+        size_t idx = hashmap_si16_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0, &was_found);
+        (void)was_found;
+        if (idx >= self->capacity) XSRETURN_UNDEF;
+        RETVAL = newSViv(self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -3034,14 +3127,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         hashmap_i32a_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int32_t key, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_i32a_put(self, key, (void*)value, 0);
         if (!RETVAL) SvREFCNT_dec(value);
@@ -3051,7 +3144,7 @@ put(SV* self_sv, int32_t key, SV* value)
 SV*
 get(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         void* val;
         if (!hashmap_i32a_get(self, key, &val)) XSRETURN_UNDEF;
         RETVAL = SvREFCNT_inc((SV*)val);
@@ -3061,7 +3154,7 @@ get(SV* self_sv, int32_t key)
 bool
 remove(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         RETVAL = hashmap_i32a_remove(self, key);
     OUTPUT:
         RETVAL
@@ -3069,7 +3162,7 @@ remove(SV* self_sv, int32_t key)
 bool
 exists(SV* self_sv, int32_t key)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         RETVAL = hashmap_i32a_exists(self, key);
     OUTPUT:
         RETVAL
@@ -3077,7 +3170,7 @@ exists(SV* self_sv, int32_t key)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -3085,7 +3178,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -3093,7 +3186,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -3101,7 +3194,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3113,7 +3206,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3127,7 +3220,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -3142,7 +3235,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -3160,19 +3253,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         hashmap_i32a_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -3191,7 +3284,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_i32a_put(self, key, (void*)value, (uint32_t)ttl);
         if (!RETVAL) SvREFCNT_dec(value);
@@ -3201,18 +3294,16 @@ put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int32_t key, SV* default_value)
     CODE:
-        EXTRACT_MAP(HashMapI32A, "Data::HashMap::I32A", self_sv);
-        void* val;
-        if (hashmap_i32a_get(self, key, &val)) {
-            RETVAL = SvREFCNT_inc((SV*)val);
-        } else {
-            SvREFCNT_inc(default_value);
-            if (!hashmap_i32a_put(self, key, (void*)default_value, 0)) {
-                SvREFCNT_dec(default_value);
-                XSRETURN_UNDEF;
-            }
-            RETVAL = SvREFCNT_inc(default_value);
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        bool was_found;
+        SvREFCNT_inc(default_value);
+        size_t idx = hashmap_i32a_get_or_set(self, key, (void*)default_value, 0, &was_found);
+        if (idx >= self->capacity) {
+            SvREFCNT_dec(default_value);
+            XSRETURN_UNDEF;
         }
+        if (was_found) SvREFCNT_dec(default_value);
+        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -3235,14 +3326,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         hashmap_i16a_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int16_t key, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_i16a_put(self, key, (void*)value, 0);
         if (!RETVAL) SvREFCNT_dec(value);
@@ -3252,7 +3343,7 @@ put(SV* self_sv, int16_t key, SV* value)
 SV*
 get(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         void* val;
         if (!hashmap_i16a_get(self, key, &val)) XSRETURN_UNDEF;
         RETVAL = SvREFCNT_inc((SV*)val);
@@ -3262,7 +3353,7 @@ get(SV* self_sv, int16_t key)
 bool
 remove(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         RETVAL = hashmap_i16a_remove(self, key);
     OUTPUT:
         RETVAL
@@ -3270,7 +3361,7 @@ remove(SV* self_sv, int16_t key)
 bool
 exists(SV* self_sv, int16_t key)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         RETVAL = hashmap_i16a_exists(self, key);
     OUTPUT:
         RETVAL
@@ -3278,7 +3369,7 @@ exists(SV* self_sv, int16_t key)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -3286,7 +3377,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -3294,7 +3385,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -3302,7 +3393,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3314,7 +3405,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3328,7 +3419,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -3343,7 +3434,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -3361,19 +3452,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         hashmap_i16a_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -3392,7 +3483,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_i16a_put(self, key, (void*)value, (uint32_t)ttl);
         if (!RETVAL) SvREFCNT_dec(value);
@@ -3402,18 +3493,16 @@ put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int16_t key, SV* default_value)
     CODE:
-        EXTRACT_MAP(HashMapI16A, "Data::HashMap::I16A", self_sv);
-        void* val;
-        if (hashmap_i16a_get(self, key, &val)) {
-            RETVAL = SvREFCNT_inc((SV*)val);
-        } else {
-            SvREFCNT_inc(default_value);
-            if (!hashmap_i16a_put(self, key, (void*)default_value, 0)) {
-                SvREFCNT_dec(default_value);
-                XSRETURN_UNDEF;
-            }
-            RETVAL = SvREFCNT_inc(default_value);
+        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
+        bool was_found;
+        SvREFCNT_inc(default_value);
+        size_t idx = hashmap_i16a_get_or_set(self, key, (void*)default_value, 0, &was_found);
+        if (idx >= self->capacity) {
+            SvREFCNT_dec(default_value);
+            XSRETURN_UNDEF;
         }
+        if (was_found) SvREFCNT_dec(default_value);
+        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -3436,14 +3525,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         hashmap_ia_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, int64_t key, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_ia_put(self, key, (void*)value, 0);
         if (!RETVAL) SvREFCNT_dec(value);
@@ -3453,7 +3542,7 @@ put(SV* self_sv, int64_t key, SV* value)
 SV*
 get(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         void* val;
         if (!hashmap_ia_get(self, key, &val)) XSRETURN_UNDEF;
         RETVAL = SvREFCNT_inc((SV*)val);
@@ -3463,7 +3552,7 @@ get(SV* self_sv, int64_t key)
 bool
 remove(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         RETVAL = hashmap_ia_remove(self, key);
     OUTPUT:
         RETVAL
@@ -3471,7 +3560,7 @@ remove(SV* self_sv, int64_t key)
 bool
 exists(SV* self_sv, int64_t key)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         RETVAL = hashmap_ia_exists(self, key);
     OUTPUT:
         RETVAL
@@ -3479,7 +3568,7 @@ exists(SV* self_sv, int64_t key)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -3487,7 +3576,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -3495,7 +3584,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -3503,7 +3592,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3515,7 +3604,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3529,7 +3618,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -3544,7 +3633,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -3562,19 +3651,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         hashmap_ia_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -3593,7 +3682,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, int64_t key, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_ia_put(self, key, (void*)value, (uint32_t)ttl);
         if (!RETVAL) SvREFCNT_dec(value);
@@ -3603,18 +3692,16 @@ put_ttl(SV* self_sv, int64_t key, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, int64_t key, SV* default_value)
     CODE:
-        EXTRACT_MAP(HashMapIA, "Data::HashMap::IA", self_sv);
-        void* val;
-        if (hashmap_ia_get(self, key, &val)) {
-            RETVAL = SvREFCNT_inc((SV*)val);
-        } else {
-            SvREFCNT_inc(default_value);
-            if (!hashmap_ia_put(self, key, (void*)default_value, 0)) {
-                SvREFCNT_dec(default_value);
-                XSRETURN_UNDEF;
-            }
-            RETVAL = SvREFCNT_inc(default_value);
+        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
+        bool was_found;
+        SvREFCNT_inc(default_value);
+        size_t idx = hashmap_ia_get_or_set(self, key, (void*)default_value, 0, &was_found);
+        if (idx >= self->capacity) {
+            SvREFCNT_dec(default_value);
+            XSRETURN_UNDEF;
         }
+        if (was_found) SvREFCNT_dec(default_value);
+        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
     OUTPUT:
         RETVAL
 
@@ -3637,14 +3724,14 @@ new(char* class, ...)
 void
 DESTROY(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         hashmap_sa_destroy(self);
         sv_setiv(SvRV(self_sv), 0);
 
 bool
 put(SV* self_sv, SV* key_sv, SV* value)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)value, 0);
@@ -3655,7 +3742,7 @@ put(SV* self_sv, SV* key_sv, SV* value)
 SV*
 get(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
         void* val;
         if (!hashmap_sa_get(self, _kstr, (uint32_t)_klen, _khash, &val))
@@ -3667,7 +3754,7 @@ get(SV* self_sv, SV* key_sv)
 bool
 remove(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_sa_remove(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -3676,7 +3763,7 @@ remove(SV* self_sv, SV* key_sv)
 bool
 exists(SV* self_sv, SV* key_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = hashmap_sa_exists(self, _kstr, (uint32_t)_klen, _khash);
     OUTPUT:
@@ -3685,7 +3772,7 @@ exists(SV* self_sv, SV* key_sv)
 size_t
 size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         RETVAL = self->size;
     OUTPUT:
         RETVAL
@@ -3693,7 +3780,7 @@ size(SV* self_sv)
 size_t
 max_size(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         RETVAL = self->max_size;
     OUTPUT:
         RETVAL
@@ -3701,7 +3788,7 @@ max_size(SV* self_sv)
 UV
 ttl(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         RETVAL = (UV)self->default_ttl;
     OUTPUT:
         RETVAL
@@ -3709,7 +3796,7 @@ ttl(SV* self_sv)
 void
 keys(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3725,7 +3812,7 @@ keys(SV* self_sv)
 void
 values(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size);
         size_t i;
@@ -3739,7 +3826,7 @@ values(SV* self_sv)
 void
 items(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         EXTEND(SP, self->size * 2);
         size_t i;
@@ -3757,7 +3844,7 @@ items(SV* self_sv)
 void
 each(SV* self_sv)
     PPCODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         while (self->iter_pos < self->capacity) {
             size_t i = self->iter_pos++;
@@ -3780,19 +3867,19 @@ each(SV* self_sv)
 void
 iter_reset(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         self->iter_pos = 0;
 
 void
 clear(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         hashmap_sa_clear(self);
 
 SV*
 to_hash(SV* self_sv)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         HV* hv = newHV();
         uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
         size_t i;
@@ -3811,7 +3898,7 @@ to_hash(SV* self_sv)
 bool
 put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
         SvREFCNT_inc(value);
         RETVAL = hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)value, (uint32_t)ttl);
@@ -3822,19 +3909,17 @@ put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl)
 SV*
 get_or_set(SV* self_sv, SV* key_sv, SV* default_value)
     CODE:
-        EXTRACT_MAP(HashMapSA, "Data::HashMap::SA", self_sv);
+        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        void* val;
-        if (hashmap_sa_get(self, _kstr, (uint32_t)_klen, _khash, &val)) {
-            RETVAL = SvREFCNT_inc((SV*)val);
-        } else {
-            SvREFCNT_inc(default_value);
-            if (!hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)default_value, 0)) {
-                SvREFCNT_dec(default_value);
-                XSRETURN_UNDEF;
-            }
-            RETVAL = SvREFCNT_inc(default_value);
+        bool was_found;
+        SvREFCNT_inc(default_value);
+        size_t idx = hashmap_sa_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)default_value, 0, &was_found);
+        if (idx >= self->capacity) {
+            SvREFCNT_dec(default_value);
+            XSRETURN_UNDEF;
         }
+        if (was_found) SvREFCNT_dec(default_value);
+        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
     OUTPUT:
         RETVAL
 

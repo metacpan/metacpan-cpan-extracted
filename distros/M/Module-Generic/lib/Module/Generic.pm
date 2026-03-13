@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.2.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.2.3
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/03/08
+## Modified 2026/03/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -100,7 +100,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.2.0';
+    our $VERSION     = 'v1.2.3';
 };
 
 use v5.26.1;
@@ -3185,7 +3185,7 @@ sub _is_number
 
     local $@;
     # SVf_IOK = 0x02000000, SVf_NOK = 0x04000000 on most builds;
-    # we do not hardcode constants—B::SV’s FLAGS is stable to test with these bitmasks.
+    # we do not hardcode constants-B::SV’s FLAGS is stable to test with these bitmasks.
     # Use string eval to avoid importing platform-specific constants.
     my $SVf_IOK = eval{ B::SVf_IOK() } || 0x02000000;
     my $SVf_NOK = eval{ B::SVf_NOK() } || 0x04000000;
@@ -13074,7 +13074,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.2.0
+    v1.2.3
 
 =head1 DESCRIPTION
 
@@ -17106,7 +17106,7 @@ Or use a dynamic delegation pattern via AUTOLOAD:
         return $self->{dynamic_methods}{$method}->(@_);
     }
 
-However, if you truly need to define package-level symbols, this method remains appropriate — just observe the threading caveats above.
+However, if you truly need to define package-level symbols, this method remains appropriate; just observe the threading caveats above.
 
 =head2 _str_val
 

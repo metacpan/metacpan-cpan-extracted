@@ -50,7 +50,7 @@ sub is_on_file  { return(0); }
 # Returns true if the body is stored in memory (Body::InCore), false otherwise.
 sub is_in_core  { return(0); }
 
-# path() — only meaningful for Body::File; returns undef here.
+# path() - only meaningful for Body::File; returns undef here.
 sub path { return; }
 
 # Empties / releases the body content. Subclasses override.

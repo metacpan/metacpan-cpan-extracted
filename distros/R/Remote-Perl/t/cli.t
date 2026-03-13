@@ -1,3 +1,4 @@
+# Tests for CLI basics: -e, --stdin-file, --stdin-str, script args, --help.
 use v5.36;
 use Test::More;
 use File::Temp qw(tempfile);

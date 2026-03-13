@@ -1,19 +1,29 @@
-[![Actions Status](https://github.com/sanko/App-bsky/actions/workflows/ci.yml/badge.svg)](https://github.com/sanko/App-bsky/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-bsky.svg)](https://metacpan.org/release/App-bsky)
 # NAME
 
 bsky - A Command-line Bluesky Client
 
 # SYNOPSIS
 
-```perl
-# create user session
-$ bsky login [handle] [password]
+```
+bsky [global options] command [command options] [arguments...]
 
-# view recent posts
+# Modern OAuth Authentication (Recommended)
+$ bsky oauth user.bsky.social
+
+# Traditional Login
+$ bsky login user.bsky.social password
+
+$ bsky help
+
+# Ciew recent posts
 $ bsky timeline ...
 
-# create a post
+# Create a post
 $ bsky post ...
+
+# Chat & Messaging
+$ bsky chat
+$ bsky dm handle "message"
 ```
 
 # DESCRIPTION
@@ -53,7 +63,7 @@ value       optional
 ```
 bsky show-profile
 
-bsky show-profile --handle sankor.bsky.social
+bsky show-profile --handle sanko.bsky.social
 
 bsky show-profile --json
 ```
@@ -62,7 +72,7 @@ Show profile.
 
 ### Options
 
-```perl
+```
 --handle handle     user handle; defaults to the logged in account
 -H handle           alternative to --handle
 --json              boolean flag; content is printed as JSON objects if given
@@ -89,6 +99,20 @@ Update profile elements.
 --name          optional, display name
 ```
 
+## oauth
+
+```
+bsky oauth user.bsky.social
+```
+
+Initiates an interactive OAuth 2.0 flow. This is the recommended way to authenticate.
+
+### Options
+
+```
+--redirect      optional, redirect URI for OAuth callback
+```
+
 ## show-session
 
 ```
@@ -103,6 +127,31 @@ Show current session.
 
 ```
 --json              boolean flag; content is printed as JSON objects if given
+```
+
+## chat
+
+```
+bsky chat
+```
+
+Lists recent conversations and the last few messages in each.
+
+## dm
+
+```python
+bsky dm --handle user.bsky.social --text "Hello from the CLI!"
+```
+
+Sends a direct message to a user.
+
+### Options
+
+```
+--handle handle     user handle or DID
+-H handle           alternative to --handle
+--text message      message content
+-m message          alternative to --text
 ```
 
 ## timeline
@@ -123,6 +172,14 @@ Display posts from timeline.
 ```
 --json      boolean flag; content is printed as JSON objects if given
 ```
+
+## stream
+
+```
+bsky stream
+```
+
+Stream posts from the firehose. Note that this requires [Mojo::UserAgent](https://metacpan.org/pod/Mojo%3A%3AUserAgent) to be installed.
 
 ## thread
 
@@ -206,7 +263,7 @@ Show reposts of the post.
 ```
 bsky follow [handle]
 
-bsky follow sankor.bsky.social
+bsky follow sanko.bsky.social
 
 bsky follow did:plc:2lk3pbakx2erxgotvzyeuyem
 ```
@@ -215,7 +272,7 @@ Follow the handle
 
 ### Options
 
-```perl
+```
 handle          user handle or DID
 ```
 
@@ -224,7 +281,7 @@ handle          user handle or DID
 ```
 bsky unfollow [handle]
 
-bsky unfollow sankor.bsky.social
+bsky unfollow sanko.bsky.social
 
 bsky unfollow did:plc:2lk3pbakx2erxgotvzyeuyem
 ```
@@ -233,7 +290,7 @@ Unfollow the handle
 
 ### Options
 
-```perl
+```
 handle          user handle or DID
 ```
 
@@ -242,7 +299,7 @@ handle          user handle or DID
 ```
 bsky follows
 
-bsky follows --handle sankor.bsky.social
+bsky follows --handle sanko.bsky.social
 
 bsky follows --json
 ```
@@ -251,7 +308,7 @@ Show follows.
 
 ### Options
 
-```perl
+```
 --handle handle     user handle; defaults to the logged in account
 -H handle           alternative to --handle
 --json              boolean flag; content is printed as JSON objects if given
@@ -262,7 +319,7 @@ Show follows.
 ```
 bsky followers
 
-bsky followers --handle sankor.bsky.social
+bsky followers --handle sanko.bsky.social
 
 bsky followers --json
 ```
@@ -271,7 +328,7 @@ Show followers.
 
 ### Options
 
-```perl
+```
 --handle handle     user handle; defaults to the logged in account
 -H handle           alternative to --handle
 --json              boolean flag; content is printed as JSON objects if given
@@ -282,7 +339,7 @@ Show followers.
 ```
 bsky block [handle]
 
-bsky block sankor.bsky.social
+bsky block sanko.bsky.social
 
 bsky block did:plc:2lk3pbakx2erxgotvzyeuyem
 ```
@@ -291,7 +348,7 @@ Block the handle.
 
 ### Options
 
-```perl
+```
 handle          user handle or DID
 ```
 
@@ -300,7 +357,7 @@ handle          user handle or DID
 ```
 bsky unblock [handle]
 
-bsky unblock sankor.bsky.social
+bsky unblock sanko.bsky.social
 
 bsky unblock did:plc:2lk3pbakx2erxgotvzyeuyem
 ```
@@ -309,7 +366,7 @@ Unblock the handle.
 
 ### Options
 
-```perl
+```
 handle          user handle or DID
 ```
 
@@ -356,24 +413,6 @@ Show notifications.
 
 ```
 --all               boolean flag, show all notifications
---json              boolean flag; content is printed as JSON objects if given
-```
-
-## invite-codes
-
-```
-bsky invite-codes
-
-bsky invite-codes --json
-```
-
-Show invite codes.
-
-Note that you must be logged in with the account password to view invite codes.
-
-### Options
-
-```
 --json              boolean flag; content is printed as JSON objects if given
 ```
 
@@ -457,15 +496,17 @@ Current configuration values include:
 
 [At](https://metacpan.org/pod/At).pm
 
+[Bluesky](https://metacpan.org/pod/Bluesky).pm
+
 [https://github.com/mattn/bsky](https://github.com/mattn/bsky) - Original Golang client
-
-# LICENSE
-
-Copyright (C) Sanko Robinson.
-
-This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
-2\. Other copyrights, terms, and conditions may apply to data transmitted through this module.
 
 # AUTHOR
 
 Sanko Robinson <sanko@cpan.org>
+
+# LICENSE
+
+Copyright (C) 2024-2026 Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under the terms found in the Artistic License
+2\. Other copyrights, terms, and conditions may apply to data transmitted through this module.

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 use parent 'Specio::Exporter';
 
@@ -49,7 +49,7 @@ DateTime::Format::ISO8601::Types - Types used for parameter checking in DateTime
 
 =head1 VERSION
 
-version 0.17
+version 0.19
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Joshua Hoblitt.
+This software is copyright (c) 2026 by Joshua Hoblitt.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
 ## Mail Builder - xt/author/smtpsend_live.t
-## Live SMTP send test — AUTHOR USE ONLY.
+## Live SMTP send test - AUTHOR USE ONLY.
 ##
 ## This test sends a real email via a real SMTP server.
 ## It is intentionally excluded from the public test suite.
 ##
-## Required environment variables (or ~/.mailmakerc — see below):
+## Required environment variables (or ~/.mailmakerc - see below):
 ##
 ##   MM_SMTP_HOST      SMTP server hostname          (default: localhost)
 ##   MM_SMTP_PORT      SMTP server port              (default: 25)
@@ -119,7 +119,7 @@ subtest 'live: plain-text message delivered' => sub
     my $mail = Mail::Make->new
         ->from(    $from )
         ->to(      $to )
-        ->subject( '[Mail::Make] Live test — plain text' )
+        ->subject( '[Mail::Make] Live test - plain text' )
         ->plain(   "This is a live test message sent by Mail::Make.\n\n" .
                    "If you are reading this, smtpsend() works correctly.\n" );
 
@@ -137,7 +137,7 @@ subtest 'live: multipart/alternative message delivered' => sub
     my $mail = Mail::Make->new
         ->from(    $from )
         ->to(      $to )
-        ->subject( '[Mail::Make] Live test — multipart/alternative' )
+        ->subject( '[Mail::Make] Live test - multipart/alternative' )
         ->plain(   "Plain text version of the live test.\n" )
         ->html(    "<p>HTML version of the <strong>live test</strong>.</p>\n" );
 
@@ -162,7 +162,7 @@ subtest 'live: non-ASCII subject encoded and delivered' => sub
     ok( defined( $rv ), 'message with non-ASCII subject accepted by server' );
 };
 
-# NOTE: Bcc — recipient receives copy but header absent from message
+# NOTE: Bcc - recipient receives copy but header absent from message
 subtest 'live: Bcc recipient included in envelope, stripped from headers' => sub
 {
     # We send To and Bcc both to $to so the author can verify reception while confirming
@@ -171,7 +171,7 @@ subtest 'live: Bcc recipient included in envelope, stripped from headers' => sub
         ->from(    $from )
         ->to(      $to )
         ->bcc(     $to )
-        ->subject( '[Mail::Make] Live test — Bcc handling' )
+        ->subject( '[Mail::Make] Live test - Bcc handling' )
         ->plain(   "You should receive this once (via To:) and once (via Bcc:).\n" .
                    "The received copy must NOT show a Bcc: header.\n" );
 
@@ -203,7 +203,7 @@ subtest 'live: explicit MailFrom envelope sender' => sub
     my $mail = Mail::Make->new
         ->from(    $from )
         ->to(      $to )
-        ->subject( '[Mail::Make] Live test — explicit MailFrom' )
+        ->subject( '[Mail::Make] Live test - explicit MailFrom' )
         ->plain(   "This message uses an explicit MailFrom (bounce address).\n" );
 
     my $rv = $mail->smtpsend( %smtp_common, MailFrom => $from );
@@ -218,7 +218,7 @@ __END__
 
 =head1 NAME
 
-xt/author/smtpsend_live.t — Live SMTP send tests for Mail::Make
+xt/author/smtpsend_live.t - Live SMTP send tests for Mail::Make
 
 =head1 SYNOPSIS
 

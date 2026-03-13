@@ -1,3 +1,4 @@
+# Tests for __DATA__ section handling across tmpfile strategies (auto/linux/perl/named).
 use v5.36;
 use Test::More;
 

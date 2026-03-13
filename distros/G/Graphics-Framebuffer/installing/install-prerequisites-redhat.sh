@@ -47,5 +47,5 @@ case $yn in
                          perl-inline-c \
                          perl-sys-cpu \
                          perl-term-readkey \
-                         perl-test-most;;
+                         perl-test-more;;
 esac

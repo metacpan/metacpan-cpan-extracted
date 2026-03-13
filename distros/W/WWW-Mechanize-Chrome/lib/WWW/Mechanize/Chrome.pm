@@ -30,7 +30,7 @@ use Time::HiRes ();
 use Encode 'encode';
 use Text::ParseWords 'shellwords';
 
-our $VERSION = '0.75';
+our $VERSION = '0.76';
 our @CARP_NOT;
 
 # We don't yet inherit from Moo 2, so patch up things manually
@@ -98,7 +98,7 @@ run with with DevTools.
 =head2 A Brief Operational Overview
 
 C<WWW::Mechanize::Chrome> (WMC) leverages developer tools built into Chrome and
-Chrome-like browsers to control a browser instance programatically. You can use
+Chrome-like browsers to control a browser instance programmatically. You can use
 WMC to automate tedious tasks, test web applications, and perform web scraping
 operations.
 
@@ -880,6 +880,10 @@ sub read_devtools_url( $self, $fh, $lines = 50 ) {
     my $devtools_url;
 
     my %pids;
+    for my $pid ($self->{pid}->@*) {
+        $pids{ $pid }++;
+    }
+
     while( $lines-- and ! defined $devtools_url and ! eof($fh)) {
         my $line = <$fh>;
         last unless defined $line;
@@ -957,6 +961,10 @@ sub new_future($class, %options) {
         $options{ autoclose } = 1
     };
 
+    if (! exists $options{ autoclose_tab }) {
+        $options{ autoclose_tab } = $options{ autoclose }
+    };
+
     if( ! exists $options{ frames }) {
         $options{ frames }= 1;
     };
@@ -988,7 +996,7 @@ sub new_future($class, %options) {
     $options{ existing_tab } ||= defined $options{ tab };
 
     if( $options{ tab } and $options{ tab } eq 'current' ) {
-        $options{ tab } = 0; # use tab at index 0
+        # We will let Target.pm handle 'current' by looking for 'attached' or 'focused'
     };
 
     # Find out what connection style we need/the user wants
@@ -1248,7 +1256,10 @@ sub _connect( $self, %options ) {
             # ->get() doesn't have ->get_future() yet
             if( ! (exists $options{ tab } )) {
                 $s->get($options{ start_url }); # Reset to clean state, also initialize our frame id
-            };
+            } elsif( $options{ tab } and $options{ tab } eq 'current' ) {
+                # If we're reusing a tab, wait for it to have content?
+                # Or at least give it a moment to stabilize if it was just activated
+            }
 
             $s->{_fresh_document} = $s->add_listener('DOM.documentUpdated', sub {
                 $s->{_currentNodeGeneration}++;
@@ -2046,12 +2057,12 @@ sub agent( $self, $ua ) {
 
 =head2 C<< ->autoclose_tab >>
 
-Set the C<autoclose> option
+Set the `autoclose_tab` option
 
 =cut
 
-sub autoclose_tab( $self, $autoclose ) {
-    $self->{autoclose} = $autoclose
+sub autoclose_tab( $self, $autoclose_tab ) {
+    $self->{autoclose_tab} = $autoclose_tab
 }
 
 =head2 C<< ->close >>
@@ -2068,13 +2079,21 @@ sub close {
     #if( $_[0]->{autoclose} and $_[0]->tab and my $tab_id = $_[0]->tab->{id} ) {
     #    $_[0]->target->close_tab({ id => $tab_id })->get();
     #};
-    if( $_[0]->{autoclose} and $_[0]->target and $_[0]->tab  ) {
+    if( $_[0]->{autoclose_tab} and $_[0]->target and $_[0]->tab  ) {
         my $c = $_[0]->target->close;
         $c->set_label('close()');
         if( ${^GLOBAL_PHASE} eq 'DESTRUCT' ) {
             $c->retain();
         } else {
-            $c->get; # just to see if there is an error
+            eval {
+                local $SIG{ALRM} = sub { die "Timeout" };
+                alarm(1);
+                $c->get;
+                alarm(0);
+            };
+            if( $@ && $@ =~ /Timeout/ ) {
+                warn "Tab closure timed out";
+            }
         }
     };
 
@@ -3266,7 +3285,7 @@ sub uri( $self ) {
 Loads content into pages that have "infinite scroll" capabilities by scrolling
 to the bottom of the web page and waiting up to the number of seconds, as set by
 the optional C<$wait_time_in_seconds> argument, for the browser to load more
-content. The default is to wait up to 20 seconds. For reasonbly fast sites,
+content. The default is to wait up to 20 seconds. For reasonably fast sites,
 the wait time can be set much lower.
 
 The method returns a boolean C<true> if new content is loaded, C<false>

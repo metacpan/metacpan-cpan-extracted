@@ -520,6 +520,17 @@ use Data::HashMap::I16A;
     is($v, undef, 'II incr did not clobber per-key TTL');
 }
 
+# incr on TTL map refreshes expiry to default_ttl
+{
+    my $m = Data::HashMap::II->new(0, 3);
+    hm_ii_put $m, 1, 10;
+    sleep 2;
+    hm_ii_incr $m, 1;  # refreshes TTL to default_ttl (3s from now)
+    sleep 2;
+    my $v = hm_ii_get $m, 1;
+    is($v, 11, 'II incr refreshes TTL on default_ttl map');
+}
+
 # ============================================================
 # sentinel key rejection for get_or_set
 # ============================================================
@@ -590,6 +601,225 @@ use Data::HashMap::I16A;
     is($v, undef, 'II get_or_set with LRU evicts oldest');
     my $s = hm_ii_size $m;
     is($s, 3, 'II get_or_set LRU size capped');
+}
+
+# ============================================================
+# incr/decr overflow boundaries
+# ============================================================
+
+# II incr at INT64_MAX (croak on overflow)
+{
+    my $m = Data::HashMap::II->new();
+    hm_ii_put $m, 1, 9223372036854775806;  # INT64_MAX - 1
+    my $v = hm_ii_incr $m, 1;
+    is($v, 9223372036854775807, 'II incr to INT64_MAX');
+    eval { hm_ii_incr $m, 1 };
+    like($@, qr/increment failed/, 'II incr past INT64_MAX croaks');
+    $v = hm_ii_get $m, 1;
+    is($v, 9223372036854775807, 'II value unchanged after overflow');
+}
+
+# I32 decr at INT32_MIN (croak on underflow)
+{
+    my $m = Data::HashMap::I32->new();
+    hm_i32_put $m, 1, -2147483647;  # INT32_MIN + 1
+    my $v = hm_i32_decr $m, 1;
+    is($v, -2147483648, 'I32 decr to INT32_MIN');
+    eval { hm_i32_decr $m, 1 };
+    like($@, qr/decrement failed/, 'I32 decr past INT32_MIN croaks');
+}
+
+# I16 incr at INT16_MAX (croak on overflow)
+{
+    my $m = Data::HashMap::I16->new();
+    hm_i16_put $m, 1, 32766;  # INT16_MAX - 1
+    my $v = hm_i16_incr $m, 1;
+    is($v, 32767, 'I16 incr to INT16_MAX');
+    eval { hm_i16_incr $m, 1 };
+    like($@, qr/increment failed/, 'I16 incr past INT16_MAX croaks');
+}
+
+# SI decr at INT64_MIN (croak on underflow)
+{
+    my $m = Data::HashMap::SI->new();
+    hm_si_put $m, "x", -9223372036854775807;  # INT64_MIN + 1
+    my $v = hm_si_decr $m, "x";
+    my $int64_min = -9223372036854775807 - 1;
+    is($v, $int64_min, 'SI decr to INT64_MIN');
+    eval { hm_si_decr $m, "x" };
+    like($@, qr/decrement failed/, 'SI decr past INT64_MIN croaks');
+}
+
+# ============================================================
+# put_ttl for SI16/SI32 variants
+# ============================================================
+
+{
+    my $m = Data::HashMap::SI16->new();
+    hm_si16_put_ttl $m, "k", 42, 1;
+    my $v = hm_si16_get $m, "k";
+    is($v, 42, 'SI16 put_ttl before expiry');
+    sleep 2;
+    $v = hm_si16_get $m, "k";
+    is($v, undef, 'SI16 put_ttl expired');
+}
+
+{
+    my $m = Data::HashMap::SI32->new();
+    hm_si32_put_ttl $m, "k", 100, 1;
+    my $v = hm_si32_get $m, "k";
+    is($v, 100, 'SI32 put_ttl before expiry');
+    sleep 2;
+    $v = hm_si32_get $m, "k";
+    is($v, undef, 'SI32 put_ttl expired');
+}
+
+# ============================================================
+# get_or_set + TTL expiry for SV* variants
+# ============================================================
+
+{
+    my $m = Data::HashMap::IA->new(0, 1);
+    my $v = hm_ia_get_or_set $m, 1, [10];
+    is_deeply($v, [10], 'IA get_or_set on TTL map inserts');
+    sleep 2;
+    my $v2 = hm_ia_get_or_set $m, 1, [20];
+    is_deeply($v2, [20], 'IA get_or_set re-inserts after TTL expiry');
+}
+
+{
+    my $m = Data::HashMap::SA->new(0, 1);
+    my $v = hm_sa_get_or_set $m, "k", {a=>1};
+    is_deeply($v, {a=>1}, 'SA get_or_set on TTL map inserts');
+    sleep 2;
+    my $v2 = hm_sa_get_or_set $m, "k", {b=>2};
+    is_deeply($v2, {b=>2}, 'SA get_or_set re-inserts after TTL expiry');
+}
+
+{
+    my $m = Data::HashMap::I32A->new(0, 1);
+    my $v = hm_i32a_get_or_set $m, 1, "first";
+    is($v, "first", 'I32A get_or_set on TTL map inserts');
+    sleep 2;
+    my $v2 = hm_i32a_get_or_set $m, 1, "second";
+    is($v2, "second", 'I32A get_or_set re-inserts after TTL expiry');
+}
+
+{
+    my $m = Data::HashMap::I16A->new(0, 1);
+    my $v = hm_i16a_get_or_set $m, 1, "first";
+    is($v, "first", 'I16A get_or_set on TTL map inserts');
+    sleep 2;
+    my $v2 = hm_i16a_get_or_set $m, 1, "second";
+    is($v2, "second", 'I16A get_or_set re-inserts after TTL expiry');
+}
+
+# ============================================================
+# size vs keys count after TTL expiry
+# ============================================================
+
+# size includes expired-not-yet-reaped entries, keys skips them
+{
+    my $m = Data::HashMap::II->new(0, 1);
+    hm_ii_put $m, 1, 10;
+    hm_ii_put $m, 2, 20;
+    sleep 2;
+    my $size = hm_ii_size $m;
+    my @keys = hm_ii_keys $m;
+    # size still reports 2 (expired but not reaped)
+    # keys returns 0 (skips expired)
+    is(scalar @keys, 0, 'II keys skips expired entries');
+    # after get, expired entries are reaped
+    hm_ii_get $m, 1;
+    hm_ii_get $m, 2;
+    my $size_after = hm_ii_size $m;
+    is($size_after, 0, 'II size drops after expired entries are reaped');
+}
+
+# ============================================================
+# get_direct (zero-copy get for string-value variants)
+# ============================================================
+
+# SS get_direct - basic
+{
+    my $m = Data::HashMap::SS->new();
+    hm_ss_put $m, "foo", "bar";
+    my $v = hm_ss_get_direct $m, "foo";
+    is($v, "bar", 'SS get_direct returns value');
+}
+
+# SS get_direct - missing key
+{
+    my $m = Data::HashMap::SS->new();
+    my $v = hm_ss_get_direct $m, "nope";
+    is($v, undef, 'SS get_direct returns undef for missing key');
+}
+
+# SS get_direct - UTF-8
+{
+    my $m = Data::HashMap::SS->new();
+    my $val = "\x{263A}";
+    hm_ss_put $m, "k", $val;
+    my $v = hm_ss_get_direct $m, "k";
+    is($v, $val, 'SS get_direct UTF-8 value');
+    ok(utf8::is_utf8($v), 'SS get_direct preserves UTF-8 flag');
+}
+
+# IS get_direct - basic
+{
+    my $m = Data::HashMap::IS->new();
+    hm_is_put $m, 42, "hello";
+    my $v = hm_is_get_direct $m, 42;
+    is($v, "hello", 'IS get_direct returns value');
+}
+
+# IS get_direct - missing key
+{
+    my $m = Data::HashMap::IS->new();
+    my $v = hm_is_get_direct $m, 99;
+    is($v, undef, 'IS get_direct returns undef for missing key');
+}
+
+# I32S get_direct - basic
+{
+    my $m = Data::HashMap::I32S->new();
+    hm_i32s_put $m, 1, "world";
+    my $v = hm_i32s_get_direct $m, 1;
+    is($v, "world", 'I32S get_direct returns value');
+}
+
+# I16S get_direct - basic
+{
+    my $m = Data::HashMap::I16S->new();
+    hm_i16s_put $m, 1, "test";
+    my $v = hm_i16s_get_direct $m, 1;
+    is($v, "test", 'I16S get_direct returns value');
+}
+
+# I16S get_direct - missing key
+{
+    my $m = Data::HashMap::I16S->new();
+    my $v = hm_i16s_get_direct $m, 99;
+    is($v, undef, 'I16S get_direct returns undef for missing key');
+}
+
+# IS get_direct - TTL expiry
+{
+    my $m = Data::HashMap::IS->new(0, 1);
+    hm_is_put $m, 1, "ttl_val";
+    my $v = hm_is_get_direct $m, 1;
+    is($v, "ttl_val", 'IS get_direct before TTL expiry');
+    sleep 2;
+    $v = hm_is_get_direct $m, 1;
+    is($v, undef, 'IS get_direct returns undef after TTL expiry');
+}
+
+# method get_direct
+{
+    my $m = Data::HashMap::SS->new();
+    hm_ss_put $m, "k", "v";
+    my $v = $m->get_direct("k");
+    is($v, "v", 'SS method get_direct');
 }
 
 done_testing;

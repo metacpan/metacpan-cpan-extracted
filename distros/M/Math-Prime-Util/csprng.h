@@ -21,7 +21,7 @@ extern UV       irand64(void *ctx);
 
 /*****************************************************************************/
 
-extern int is_csprng_well_seeded(void *ctx);
+extern bool is_csprng_well_seeded(void *ctx);
 
 extern NV drand64(void *ctx);
 
@@ -32,7 +32,7 @@ extern UV       urandomb(void* ctx, int nbits);      /* integer with n bits */
 /*****************************************************************************/
 
 /* Very simple PRNG for other use. */
-extern char* prng_new(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
-extern uint32_t prng_next(char* rng);
+extern void* prng_new(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+extern uint32_t prng_next(void* rng);
 
 #endif

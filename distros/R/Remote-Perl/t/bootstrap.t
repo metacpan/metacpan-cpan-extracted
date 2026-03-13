@@ -1,3 +1,4 @@
+# Tests for protocol handshake, script execution, error handling, and stdin forwarding.
 use v5.36;
 use Test::More;
 use IPC::Open3 qw(open3);

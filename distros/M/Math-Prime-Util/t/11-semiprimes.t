@@ -50,6 +50,12 @@ my %small_counts = (
    12345 =>  3217,
   123456 => 28589,
 );
+my %range_counts = (
+  "1000000 to 1000100" => 25,
+  "1000000000 to 1000000100" =>     14,   # iterate
+  "1000000000 to 1000010000" =>   1567,   # sieve
+  "1000000000 to 1001000000" => 155612,   # count
+);
 
 my %big_counts = (
              "100000000" =>           "17427258",
@@ -62,8 +68,10 @@ plan tests => 2
             + scalar(keys %small_range)
             + scalar(keys %small_semis)
             + scalar(keys %small_counts)
+            + scalar(keys %range_counts)
             + scalar(keys %big_counts)
-            + scalar(keys %big_semis);
+            + scalar(keys %big_semis)
+            + 1;
 
 is_deeply( semi_primes($small_semis[-1]), \@small_semis, "semi_primes($small_semis[-1])" );
 
@@ -80,9 +88,17 @@ while (my($range, $expect) = each (%small_range)) {
 while (my($n, $spc) = each (%small_counts)) {
   is( semiprime_count($n), $spc, "semiprime_count($n) = $spc");
 }
+while (my($range, $count) = each (%range_counts)) {
+  SKIP: {
+    my($low,$high) = $range =~ /(\d+) to (\d+)/;
+    skip "skip PP semiprime_count($low,$high)", 1 if !$usexs && $low > 1000000 && ($high-$low+1) > 1000;
+    is_deeply( semiprime_count($low, $high), $count, "semiprime_count($low,$high) = $count");
+  }
+}
+
 while (my($n, $nth) = each (%small_semis)) {
   SKIP: {
-    skip "PP nth_semiprime is slow",1 unless $n < 10000 || $usexs || $extra;
+    skip "skip PP nth_semiprime($n)",1 unless $n < 10000 || $usexs || $extra;
     is( nth_semiprime($n), $nth, "nth_semiprime($n) = $nth");
   }
 }
@@ -98,10 +114,18 @@ while (my($n, $nth) = each (%big_semis)) {
   cmp_closeto( nth_semiprime_approx($n), $nth, 0.001 * abs($nth), "nth_semiprime_approx($n) ~ $nth");
 }
 
+SKIP: {
+  skip "skip large PP nth_semiprime",1 unless $extra && $usexs && Math::Prime::Util::prime_get_config->{'maxbits'} > 32;
+  # More than one interpolation needed
+  is( nth_semiprime(12479400000), 89102597117, "nth_semiprime(12479400000) = 89102597117" );
+}
+
 sub cmp_closeto {
   my $got = shift;
   my $expect = shift;
   my $tolerance = shift;
   my $message = shift;
-  cmp_ok( abs($got - $expect), '<=', $tolerance, $message );
+  my $diff = $got > $expect ? $got-$expect : $expect-$got;
+  # $diff might be a bigint and might not compare correctly (!)
+  ok("$diff" <= $tolerance, "$message (got $got)");
 }

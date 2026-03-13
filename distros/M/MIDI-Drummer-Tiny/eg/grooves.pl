@@ -22,7 +22,7 @@ $set = $grooves->search({ cat => $cat }) if $cat;    # boolean AND
 $set = $grooves->search({ name => $name }, $set) if $name; # "
 
 for my $n (sort keys %$set) {
-    my $groove = $grooves->get_groove($n, $set);
+    my $groove = $set->{$n};
     print $groove->{name}, "\n";
     $groove->{groove}->() for 1 .. 4;
 }

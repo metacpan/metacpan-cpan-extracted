@@ -1,5 +1,12 @@
 Revision history for Remote::Perl
 
+0.003  2026-03-13
+  - Fix premature end of input when flow control kicks in.
+  - Added -e, -w, -m, -M short options mirroring Perl.
+  - Multiple -e options now supported, accumulated and joined with newlines.
+  - Added options --serve-restrict-paths, --serve-allow, --no-system-inc and
+    API option serve_filter.
+
 0.002  2026-03-06
   - Added --tmpfile for scripts that use __DATA__/__END__.
   - Clear up pollution of pragmas and imports that would make scripts

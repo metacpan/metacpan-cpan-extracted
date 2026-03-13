@@ -44,6 +44,18 @@
 #define HM_INT_MAX   INT64_MAX
 #endif
 
+/* ---- Branch prediction ---- */
+
+#ifndef HM_LIKELY
+#if defined(__GNUC__) || defined(__clang__)
+#define HM_LIKELY(x)   __builtin_expect(!!(x), 1)
+#define HM_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define HM_LIKELY(x)   (x)
+#define HM_UNLIKELY(x) (x)
+#endif
+#endif
+
 /* ---- Constants ---- */
 
 #ifndef HM_INITIAL_CAPACITY
@@ -74,76 +86,20 @@
 #define HM_LRU_NONE UINT32_MAX
 #endif
 
-/* ---- Hash functions ---- */
+/* ---- Hash functions (xxHash v0.8.3) ---- */
 
 #ifndef HM_HASH_FUNCTIONS_DEFINED
 #define HM_HASH_FUNCTIONS_DEFINED
 
-/* xxHash64-like mix for integer keys */
+#define XXH_INLINE_ALL
+#include "xxhash.h"
+
 static inline size_t hm_hash_int64(int64_t key) {
-    const uint64_t k1 = 0x9E3779B185EBCA87ULL;
-    const uint64_t k2 = 0xC2B2AE3D27D4EB4FULL;
-    uint64_t x = (uint64_t)key;
-    x ^= x >> 27;
-    x *= k1;
-    x ^= x >> 31;
-    x *= k2;
-    x ^= x >> 27;
-    return (size_t)x;
+    return (size_t)XXH3_64bits(&key, sizeof(key));
 }
 
-/* xxHash32-inspired string hash */
 static inline uint32_t hm_hash_string(const char* data, uint32_t len) {
-    const uint32_t prime1 = 0x9E3779B1U;
-    const uint32_t prime2 = 0x85EBCA77U;
-    const uint32_t prime3 = 0xC2B2AE3DU;
-    const uint32_t prime4 = 0x27D4EB2FU;
-    const uint32_t prime5 = 0x165667B1U;
-
-    uint32_t h;
-    const uint8_t* p = (const uint8_t*)data;
-    const uint8_t* end = p + len;
-
-    if (len >= 16) {
-        uint32_t v1 = prime1 + prime2;
-        uint32_t v2 = prime2;
-        uint32_t v3 = 0;
-        uint32_t v4 = 0 - prime1;
-        do {
-            uint32_t k;
-            memcpy(&k, p, 4); v1 += k * prime2; v1 = (v1 << 13) | (v1 >> 19); v1 *= prime1; p += 4;
-            memcpy(&k, p, 4); v2 += k * prime2; v2 = (v2 << 13) | (v2 >> 19); v2 *= prime1; p += 4;
-            memcpy(&k, p, 4); v3 += k * prime2; v3 = (v3 << 13) | (v3 >> 19); v3 *= prime1; p += 4;
-            memcpy(&k, p, 4); v4 += k * prime2; v4 = (v4 << 13) | (v4 >> 19); v4 *= prime1; p += 4;
-        } while (p <= end - 16);
-        h = ((v1 << 1) | (v1 >> 31)) + ((v2 << 7) | (v2 >> 25)) +
-            ((v3 << 12) | (v3 >> 20)) + ((v4 << 18) | (v4 >> 14));
-    } else {
-        h = prime5;
-    }
-
-    h += (uint32_t)len;
-
-    while (p + 4 <= end) {
-        uint32_t k;
-        memcpy(&k, p, 4);
-        h += k * prime3;
-        h = ((h << 17) | (h >> 15)) * prime4;
-        p += 4;
-    }
-    while (p < end) {
-        h += (*p) * prime5;
-        h = ((h << 11) | (h >> 21)) * prime1;
-        p++;
-    }
-
-    h ^= h >> 15;
-    h *= prime2;
-    h ^= h >> 13;
-    h *= prime3;
-    h ^= h >> 16;
-
-    return h;
+    return (uint32_t)XXH3_64bits(data, len);
 }
 
 #endif /* HM_HASH_FUNCTIONS_DEFINED */
@@ -215,15 +171,11 @@ typedef struct {
 /* ---- Init nodes ---- */
 
 static inline void HM_FN(init_nodes)(HM_NODE_TYPE* nodes, size_t capacity) {
+#ifdef HM_KEY_IS_INT
+    /* Integer keys use sentinel values — must init per-element */
     size_t i;
     for (i = 0; i < capacity; i++) {
-#ifdef HM_KEY_IS_INT
         nodes[i].key = HM_EMPTY_KEY;
-#else
-        nodes[i].key = NULL;
-        nodes[i].key_len = 0;
-        nodes[i].key_hash = 0;
-#endif
 #ifdef HM_VALUE_IS_STR
         nodes[i].value = NULL;
         nodes[i].val_len = 0;
@@ -233,6 +185,10 @@ static inline void HM_FN(init_nodes)(HM_NODE_TYPE* nodes, size_t capacity) {
         nodes[i].value = 0;
 #endif
     }
+#else
+    /* String keys: NULL=empty, all-zero works for pointers and lengths */
+    memset(nodes, 0, capacity * sizeof(HM_NODE_TYPE));
+#endif
 }
 
 /* ---- Free resources for a single node ---- */
@@ -319,7 +275,7 @@ static bool HM_FN(compact)(HM_MAP_TYPE* map);
 
 /* Expire a TTL'd entry at a known index, with compact check */
 static void HM_FN(expire_at)(HM_MAP_TYPE* map, size_t index) {
-    if (map->lru_prev) HM_FN(lru_unlink)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_unlink)(map, (uint32_t)index);
     HM_FN(tombstone_at)(map, index);
     if (map->tombstones > map->capacity / 4 ||
         (map->size > 0 && map->tombstones > map->size)) {
@@ -439,6 +395,10 @@ static bool HM_FN(rehash)(HM_MAP_TYPE* map, bool grow) {
     uint32_t* new_lru_next = NULL;
     uint32_t* old_to_new = NULL;
     if (map->lru_prev) {
+        if (new_capacity > (size_t)(uint32_t)-2) {
+            free(new_nodes);
+            return false; /* capacity would overflow uint32_t LRU indices */
+        }
         new_lru_prev = (uint32_t*)malloc(new_capacity * sizeof(uint32_t));
         new_lru_next = (uint32_t*)malloc(new_capacity * sizeof(uint32_t));
         old_to_new   = (uint32_t*)malloc(old_capacity * sizeof(uint32_t));
@@ -554,7 +514,7 @@ static inline size_t HM_FN(find_node)(const HM_MAP_TYPE* map, HM_INT_TYPE key) {
         if (k == key) return index;
         if (k == HM_EMPTY_KEY) return index;
         index = (index + 1) & map->mask;
-    } while (index != original_index);
+    } while (HM_LIKELY(index != original_index));
 
     return map->capacity;
 }
@@ -576,7 +536,7 @@ static inline size_t HM_FN(find_node)(const HM_MAP_TYPE* map,
             return index; /* found */
         }
         index = (index + 1) & map->mask;
-    } while (index != original_index);
+    } while (HM_LIKELY(index != original_index));
 
     return map->capacity;
 }
@@ -680,6 +640,12 @@ static bool HM_FN(put)(HM_MAP_TYPE* map, HM_INT_TYPE key,
         if (index >= map->capacity) return false;
     }
 
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return false;
+    }
+
 #ifdef HM_VALUE_IS_STR
     /* Pre-allocate value before modifying map state */
     char* new_val = NULL;
@@ -720,13 +686,11 @@ static bool HM_FN(put)(HM_MAP_TYPE* map, HM_INT_TYPE key,
 #endif
 
     /* LRU maintenance */
-    if (map->lru_prev) {
+    if (HM_UNLIKELY(map->lru_prev)) {
         if (found) HM_FN(lru_promote)(map, (uint32_t)index);
         else       HM_FN(lru_push_front)(map, (uint32_t)index);
     }
-    /* TTL maintenance — lazy allocation on first per-key TTL */
-    if (entry_ttl > 0 && !map->expires_at)
-        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+    /* TTL maintenance */
     if (map->expires_at) {
         uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
         if (ttl > 0)
@@ -770,6 +734,12 @@ static bool HM_FN(put)(HM_MAP_TYPE* map,
         /* Re-probe after eviction to find optimal insertion slot */
         index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
         if (index >= map->capacity) return false;
+    }
+
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return false;
     }
 
 #ifdef HM_VALUE_IS_STR
@@ -824,13 +794,11 @@ static bool HM_FN(put)(HM_MAP_TYPE* map,
 #endif
 
     /* LRU maintenance */
-    if (map->lru_prev) {
+    if (HM_UNLIKELY(map->lru_prev)) {
         if (found) HM_FN(lru_promote)(map, (uint32_t)index);
         else       HM_FN(lru_push_front)(map, (uint32_t)index);
     }
-    /* TTL maintenance — lazy allocation on first per-key TTL */
-    if (entry_ttl > 0 && !map->expires_at)
-        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+    /* TTL maintenance */
     if (map->expires_at) {
         uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
         if (ttl > 0)
@@ -857,13 +825,13 @@ static bool HM_FN(get)(HM_MAP_TYPE* map, HM_INT_TYPE key,
     if (index >= map->capacity || map->nodes[index].key == HM_EMPTY_KEY) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
 
     *out_value = map->nodes[index].value;
     *out_len = HM_UNPACK_LEN(map->nodes[index].val_len);
@@ -878,13 +846,13 @@ static bool HM_FN(get)(HM_MAP_TYPE* map, HM_INT_TYPE key, void** out_value) {
     if (index >= map->capacity || map->nodes[index].key == HM_EMPTY_KEY) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
 
     *out_value = map->nodes[index].value;
     return true;
@@ -897,13 +865,13 @@ static bool HM_FN(get)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE* out_value
     if (index >= map->capacity || map->nodes[index].key == HM_EMPTY_KEY) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
 
     *out_value = map->nodes[index].value;
     return true;
@@ -922,13 +890,13 @@ static bool HM_FN(get)(HM_MAP_TYPE* map,
     if (index >= map->capacity || map->nodes[index].key == NULL) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
 
     *out_value = map->nodes[index].value;
     *out_len = HM_UNPACK_LEN(map->nodes[index].val_len);
@@ -945,13 +913,13 @@ static bool HM_FN(get)(HM_MAP_TYPE* map,
     if (index >= map->capacity || map->nodes[index].key == NULL) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
 
     *out_value = map->nodes[index].value;
     return true;
@@ -966,13 +934,13 @@ static bool HM_FN(get)(HM_MAP_TYPE* map,
     if (index >= map->capacity || map->nodes[index].key == NULL) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
 
     *out_value = map->nodes[index].value;
     return true;
@@ -991,7 +959,7 @@ static bool HM_FN(exists)(HM_MAP_TYPE* map, HM_INT_TYPE key) {
     if (index >= map->capacity || map->nodes[index].key == HM_EMPTY_KEY) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
@@ -1008,7 +976,7 @@ static bool HM_FN(exists)(HM_MAP_TYPE* map,
     if (index >= map->capacity || map->nodes[index].key == NULL) return false;
 
     /* TTL check */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
@@ -1029,13 +997,13 @@ static bool HM_FN(remove)(HM_MAP_TYPE* map, HM_INT_TYPE key) {
     if (index >= map->capacity || map->nodes[index].key != key) return false;
 
     /* TTL check: treat expired entry as already gone */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_unlink)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_unlink)(map, (uint32_t)index);
     HM_FN(tombstone_at)(map, index);
     if (map->tombstones > map->capacity / 4 ||
         (map->size > 0 && map->tombstones > map->size)) {
@@ -1054,13 +1022,13 @@ static bool HM_FN(remove)(HM_MAP_TYPE* map,
     if (index >= map->capacity || map->nodes[index].key == NULL) return false;
 
     /* TTL check: treat expired entry as already gone */
-    if (map->expires_at && map->expires_at[index] &&
+    if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
         (uint32_t)time(NULL) >= map->expires_at[index]) {
         HM_FN(expire_at)(map, index);
         return false;
     }
 
-    if (map->lru_prev) HM_FN(lru_unlink)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_unlink)(map, (uint32_t)index);
     HM_FN(tombstone_at)(map, index);
     if (map->tombstones > map->capacity / 4 ||
         (map->size > 0 && map->tombstones > map->size)) {
@@ -1116,15 +1084,15 @@ static bool HM_FN(increment)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE* out
     size_t index = HM_FN(find_node)(map, key);
     if (index < map->capacity && map->nodes[index].key == key) {
         /* TTL check */
-        if (map->expires_at && map->expires_at[index] &&
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) >= map->expires_at[index]) {
             HM_FN(expire_at)(map, index);
             goto new_key;
         }
         if (map->nodes[index].value == HM_INT_MAX) return false;
         *out_value = ++map->nodes[index].value;
-        if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
-        if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
         return true;
     }
 
@@ -1143,8 +1111,8 @@ new_key:
     index = HM_FN(find_or_allocate)(map, key);
     if (index >= map->capacity) return false;
     *out_value = ++map->nodes[index].value;
-    if (map->lru_prev) HM_FN(lru_push_front)(map, (uint32_t)index);
-    if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
     return true;
 }
 
@@ -1154,7 +1122,7 @@ static bool HM_FN(increment_by)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE d
     size_t index = HM_FN(find_node)(map, key);
     if (index < map->capacity && map->nodes[index].key == key) {
         /* TTL check */
-        if (map->expires_at && map->expires_at[index] &&
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) >= map->expires_at[index]) {
             HM_FN(expire_at)(map, index);
             goto new_key;
@@ -1167,8 +1135,8 @@ static bool HM_FN(increment_by)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE d
         }
         map->nodes[index].value += delta;
         *out_value = map->nodes[index].value;
-        if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
-        if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
         return true;
     }
 
@@ -1188,8 +1156,8 @@ new_key:
     if (index >= map->capacity) return false;
     map->nodes[index].value = delta;
     *out_value = delta;
-    if (map->lru_prev) HM_FN(lru_push_front)(map, (uint32_t)index);
-    if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
     return true;
 }
 
@@ -1199,15 +1167,15 @@ static bool HM_FN(decrement)(HM_MAP_TYPE* map, HM_INT_TYPE key, HM_INT_TYPE* out
     size_t index = HM_FN(find_node)(map, key);
     if (index < map->capacity && map->nodes[index].key == key) {
         /* TTL check */
-        if (map->expires_at && map->expires_at[index] &&
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) >= map->expires_at[index]) {
             HM_FN(expire_at)(map, index);
             goto new_key;
         }
         if (map->nodes[index].value == HM_INT_MIN) return false;
         *out_value = --map->nodes[index].value;
-        if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
-        if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
         return true;
     }
 
@@ -1226,8 +1194,8 @@ new_key:
     index = HM_FN(find_or_allocate)(map, key);
     if (index >= map->capacity) return false;
     *out_value = --map->nodes[index].value;
-    if (map->lru_prev) HM_FN(lru_push_front)(map, (uint32_t)index);
-    if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
     return true;
 }
 
@@ -1291,15 +1259,15 @@ static bool HM_FN(increment)(HM_MAP_TYPE* map,
     if (index < map->capacity && map->nodes[index].key != NULL &&
         map->nodes[index].key != HM_STR_TOMBSTONE) {
         /* TTL check */
-        if (map->expires_at && map->expires_at[index] &&
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) >= map->expires_at[index]) {
             HM_FN(expire_at)(map, index);
             goto new_key;
         }
         if (map->nodes[index].value == HM_INT_MAX) return false;
         *out_value = ++map->nodes[index].value;
-        if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
-        if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
         return true;
     }
 
@@ -1318,8 +1286,8 @@ new_key:
     index = HM_FN(find_or_allocate)(map, key, key_len, key_hash, key_utf8);
     if (index >= map->capacity) return false;
     *out_value = ++map->nodes[index].value;
-    if (map->lru_prev) HM_FN(lru_push_front)(map, (uint32_t)index);
-    if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
     return true;
 }
 
@@ -1332,7 +1300,7 @@ static bool HM_FN(increment_by)(HM_MAP_TYPE* map,
     if (index < map->capacity && map->nodes[index].key != NULL &&
         map->nodes[index].key != HM_STR_TOMBSTONE) {
         /* TTL check */
-        if (map->expires_at && map->expires_at[index] &&
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) >= map->expires_at[index]) {
             HM_FN(expire_at)(map, index);
             goto new_key;
@@ -1345,8 +1313,8 @@ static bool HM_FN(increment_by)(HM_MAP_TYPE* map,
         }
         map->nodes[index].value += delta;
         *out_value = map->nodes[index].value;
-        if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
-        if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
         return true;
     }
 
@@ -1366,8 +1334,8 @@ new_key:
     if (index >= map->capacity) return false;
     map->nodes[index].value = delta;
     *out_value = delta;
-    if (map->lru_prev) HM_FN(lru_push_front)(map, (uint32_t)index);
-    if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
     return true;
 }
 
@@ -1380,15 +1348,15 @@ static bool HM_FN(decrement)(HM_MAP_TYPE* map,
     if (index < map->capacity && map->nodes[index].key != NULL &&
         map->nodes[index].key != HM_STR_TOMBSTONE) {
         /* TTL check */
-        if (map->expires_at && map->expires_at[index] &&
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
             (uint32_t)time(NULL) >= map->expires_at[index]) {
             HM_FN(expire_at)(map, index);
             goto new_key;
         }
         if (map->nodes[index].value == HM_INT_MIN) return false;
         *out_value = --map->nodes[index].value;
-        if (map->lru_prev) HM_FN(lru_promote)(map, (uint32_t)index);
-        if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
         return true;
     }
 
@@ -1407,14 +1375,442 @@ new_key:
     index = HM_FN(find_or_allocate)(map, key, key_len, key_hash, key_utf8);
     if (index >= map->capacity) return false;
     *out_value = --map->nodes[index].value;
-    if (map->lru_prev) HM_FN(lru_push_front)(map, (uint32_t)index);
-    if (map->expires_at && map->default_ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (HM_UNLIKELY(map->expires_at && map->default_ttl > 0)) map->expires_at[index] = (uint32_t)time(NULL) + map->default_ttl;
     return true;
 }
 
 #endif /* HM_KEY_IS_INT for counters */
 
 #endif /* HM_HAS_COUNTERS */
+
+/* ---- get_or_set: single-probe get with insert on miss ---- */
+
+#ifdef HM_KEY_IS_INT
+
+#ifdef HM_VALUE_IS_STR
+/* get_or_set for int-key, string-value: returns index, sets *was_found */
+static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map, HM_INT_TYPE key,
+                                  const char* def_val, uint32_t def_len, bool def_utf8,
+                                  uint32_t entry_ttl, bool* was_found) {
+    *was_found = false;
+    if (!map || HM_IS_RESERVED_KEY(key)) return map ? map->capacity : 0;
+
+    if ((map->size + map->tombstones) * 4 >= map->capacity * 3) {
+        if (map->max_size > 0 && map->tombstones > 0) {
+            if (!HM_FN(compact)(map)) return map->capacity;
+        } else {
+            if (!HM_FN(resize)(map)) return map->capacity;
+        }
+    }
+
+    bool found;
+    size_t index = HM_FN(find_slot_for_insert)(map, key, &found);
+    if (index >= map->capacity) return map->capacity;
+
+    if (found) {
+        /* TTL check */
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
+            (uint32_t)time(NULL) >= map->expires_at[index]) {
+            HM_FN(expire_at)(map, index);
+            found = false;
+            /* Re-probe after expiry */
+            index = HM_FN(find_slot_for_insert)(map, key, &found);
+            if (index >= map->capacity) return map->capacity;
+        }
+    }
+
+    if (found) {
+        *was_found = true;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        return index;
+    }
+
+    /* LRU eviction */
+    if (map->max_size > 0 && map->size >= map->max_size) {
+        HM_FN(lru_evict_one)(map);
+        index = HM_FN(find_slot_for_insert)(map, key, &found);
+        if (index >= map->capacity) return map->capacity;
+    }
+
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return map->capacity;
+    }
+
+    /* Pre-allocate value */
+    char* new_val = NULL;
+    uint32_t new_val_len = 0;
+    if (def_val && def_len > 0) {
+        new_val = (char*)malloc(def_len);
+        if (!new_val) return map->capacity;
+        memcpy(new_val, def_val, def_len);
+        new_val_len = HM_PACK_LEN(def_len, def_utf8);
+    } else if (def_val) {
+        new_val = (char*)malloc(1);
+        if (!new_val) return map->capacity;
+        new_val[0] = '\0';
+        new_val_len = HM_PACK_LEN(0, def_utf8);
+    }
+
+    if (map->nodes[index].key == HM_TOMBSTONE_KEY) map->tombstones--;
+    map->size++;
+    map->nodes[index].key = key;
+    map->nodes[index].value = new_val;
+    map->nodes[index].val_len = new_val_len;
+
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (map->expires_at) {
+        uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
+        if (ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + ttl;
+    }
+
+    return index;
+}
+#elif defined(HM_VALUE_IS_SV)
+static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map, HM_INT_TYPE key,
+                                  void* def_val, uint32_t entry_ttl, bool* was_found) {
+    *was_found = false;
+    if (!map || HM_IS_RESERVED_KEY(key)) return map ? map->capacity : 0;
+
+    if ((map->size + map->tombstones) * 4 >= map->capacity * 3) {
+        if (map->max_size > 0 && map->tombstones > 0) {
+            if (!HM_FN(compact)(map)) return map->capacity;
+        } else {
+            if (!HM_FN(resize)(map)) return map->capacity;
+        }
+    }
+
+    bool found;
+    size_t index = HM_FN(find_slot_for_insert)(map, key, &found);
+    if (index >= map->capacity) return map->capacity;
+
+    if (found) {
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
+            (uint32_t)time(NULL) >= map->expires_at[index]) {
+            HM_FN(expire_at)(map, index);
+            found = false;
+            index = HM_FN(find_slot_for_insert)(map, key, &found);
+            if (index >= map->capacity) return map->capacity;
+        }
+    }
+
+    if (found) {
+        *was_found = true;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        return index;
+    }
+
+    if (map->max_size > 0 && map->size >= map->max_size) {
+        HM_FN(lru_evict_one)(map);
+        index = HM_FN(find_slot_for_insert)(map, key, &found);
+        if (index >= map->capacity) return map->capacity;
+    }
+
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return map->capacity;
+    }
+
+    if (map->nodes[index].key == HM_TOMBSTONE_KEY) map->tombstones--;
+    map->size++;
+    map->nodes[index].key = key;
+    map->nodes[index].value = def_val;
+
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (map->expires_at) {
+        uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
+        if (ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + ttl;
+    }
+
+    return index;
+}
+#else
+static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map, HM_INT_TYPE key,
+                                  HM_INT_TYPE def_val, uint32_t entry_ttl, bool* was_found) {
+    *was_found = false;
+    if (!map || HM_IS_RESERVED_KEY(key)) return map ? map->capacity : 0;
+
+    if ((map->size + map->tombstones) * 4 >= map->capacity * 3) {
+        if (map->max_size > 0 && map->tombstones > 0) {
+            if (!HM_FN(compact)(map)) return map->capacity;
+        } else {
+            if (!HM_FN(resize)(map)) return map->capacity;
+        }
+    }
+
+    bool found;
+    size_t index = HM_FN(find_slot_for_insert)(map, key, &found);
+    if (index >= map->capacity) return map->capacity;
+
+    if (found) {
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
+            (uint32_t)time(NULL) >= map->expires_at[index]) {
+            HM_FN(expire_at)(map, index);
+            found = false;
+            index = HM_FN(find_slot_for_insert)(map, key, &found);
+            if (index >= map->capacity) return map->capacity;
+        }
+    }
+
+    if (found) {
+        *was_found = true;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        return index;
+    }
+
+    if (map->max_size > 0 && map->size >= map->max_size) {
+        HM_FN(lru_evict_one)(map);
+        index = HM_FN(find_slot_for_insert)(map, key, &found);
+        if (index >= map->capacity) return map->capacity;
+    }
+
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return map->capacity;
+    }
+
+    if (map->nodes[index].key == HM_TOMBSTONE_KEY) map->tombstones--;
+    map->size++;
+    map->nodes[index].key = key;
+    map->nodes[index].value = def_val;
+
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (map->expires_at) {
+        uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
+        if (ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + ttl;
+    }
+
+    return index;
+}
+#endif
+
+#else /* string keys */
+
+#ifdef HM_VALUE_IS_STR
+static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map,
+                                  const char* key, uint32_t key_len, uint32_t key_hash, bool key_utf8,
+                                  const char* def_val, uint32_t def_len, bool def_utf8,
+                                  uint32_t entry_ttl, bool* was_found) {
+    *was_found = false;
+    if (!map || !key) return map ? map->capacity : 0;
+
+    if ((map->size + map->tombstones) * 4 >= map->capacity * 3) {
+        if (map->max_size > 0 && map->tombstones > 0) {
+            if (!HM_FN(compact)(map)) return map->capacity;
+        } else {
+            if (!HM_FN(resize)(map)) return map->capacity;
+        }
+    }
+
+    bool found;
+    size_t index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+    if (index >= map->capacity) return map->capacity;
+
+    if (found) {
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
+            (uint32_t)time(NULL) >= map->expires_at[index]) {
+            HM_FN(expire_at)(map, index);
+            found = false;
+            index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+            if (index >= map->capacity) return map->capacity;
+        }
+    }
+
+    if (found) {
+        *was_found = true;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        return index;
+    }
+
+    if (map->max_size > 0 && map->size >= map->max_size) {
+        HM_FN(lru_evict_one)(map);
+        index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+        if (index >= map->capacity) return map->capacity;
+    }
+
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return map->capacity;
+    }
+
+    /* Allocate key + value */
+    char* new_key = (char*)malloc(key_len + 1);
+    if (!new_key) return map->capacity;
+    memcpy(new_key, key, key_len);
+    new_key[key_len] = '\0';
+
+    char* new_val = NULL;
+    uint32_t new_val_len = 0;
+    if (def_val && def_len > 0) {
+        new_val = (char*)malloc(def_len);
+        if (!new_val) { free(new_key); return map->capacity; }
+        memcpy(new_val, def_val, def_len);
+        new_val_len = HM_PACK_LEN(def_len, def_utf8);
+    } else if (def_val) {
+        new_val = (char*)malloc(1);
+        if (!new_val) { free(new_key); return map->capacity; }
+        new_val[0] = '\0';
+        new_val_len = HM_PACK_LEN(0, def_utf8);
+    }
+
+    if (HM_SLOT_IS_TOMBSTONE(&map->nodes[index])) map->tombstones--;
+    map->size++;
+    map->nodes[index].key = new_key;
+    map->nodes[index].key_len = HM_PACK_LEN(key_len, key_utf8);
+    map->nodes[index].key_hash = key_hash;
+    map->nodes[index].value = new_val;
+    map->nodes[index].val_len = new_val_len;
+
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (map->expires_at) {
+        uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
+        if (ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + ttl;
+    }
+
+    return index;
+}
+#elif defined(HM_VALUE_IS_SV)
+static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map,
+                                  const char* key, uint32_t key_len, uint32_t key_hash, bool key_utf8,
+                                  void* def_val, uint32_t entry_ttl, bool* was_found) {
+    *was_found = false;
+    if (!map || !key) return map ? map->capacity : 0;
+
+    if ((map->size + map->tombstones) * 4 >= map->capacity * 3) {
+        if (map->max_size > 0 && map->tombstones > 0) {
+            if (!HM_FN(compact)(map)) return map->capacity;
+        } else {
+            if (!HM_FN(resize)(map)) return map->capacity;
+        }
+    }
+
+    bool found;
+    size_t index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+    if (index >= map->capacity) return map->capacity;
+
+    if (found) {
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
+            (uint32_t)time(NULL) >= map->expires_at[index]) {
+            HM_FN(expire_at)(map, index);
+            found = false;
+            index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+            if (index >= map->capacity) return map->capacity;
+        }
+    }
+
+    if (found) {
+        *was_found = true;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        return index;
+    }
+
+    if (map->max_size > 0 && map->size >= map->max_size) {
+        HM_FN(lru_evict_one)(map);
+        index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+        if (index >= map->capacity) return map->capacity;
+    }
+
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return map->capacity;
+    }
+
+    char* new_key = (char*)malloc(key_len + 1);
+    if (!new_key) return map->capacity;
+    memcpy(new_key, key, key_len);
+    new_key[key_len] = '\0';
+
+    if (HM_SLOT_IS_TOMBSTONE(&map->nodes[index])) map->tombstones--;
+    map->size++;
+    map->nodes[index].key = new_key;
+    map->nodes[index].key_len = HM_PACK_LEN(key_len, key_utf8);
+    map->nodes[index].key_hash = key_hash;
+    map->nodes[index].value = def_val;
+
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (map->expires_at) {
+        uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
+        if (ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + ttl;
+    }
+
+    return index;
+}
+#else
+static size_t HM_FN(get_or_set)(HM_MAP_TYPE* map,
+                                  const char* key, uint32_t key_len, uint32_t key_hash, bool key_utf8,
+                                  HM_INT_TYPE def_val, uint32_t entry_ttl, bool* was_found) {
+    *was_found = false;
+    if (!map || !key) return map ? map->capacity : 0;
+
+    if ((map->size + map->tombstones) * 4 >= map->capacity * 3) {
+        if (map->max_size > 0 && map->tombstones > 0) {
+            if (!HM_FN(compact)(map)) return map->capacity;
+        } else {
+            if (!HM_FN(resize)(map)) return map->capacity;
+        }
+    }
+
+    bool found;
+    size_t index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+    if (index >= map->capacity) return map->capacity;
+
+    if (found) {
+        if (HM_UNLIKELY(map->expires_at && map->expires_at[index]) &&
+            (uint32_t)time(NULL) >= map->expires_at[index]) {
+            HM_FN(expire_at)(map, index);
+            found = false;
+            index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+            if (index >= map->capacity) return map->capacity;
+        }
+    }
+
+    if (found) {
+        *was_found = true;
+        if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_promote)(map, (uint32_t)index);
+        return index;
+    }
+
+    if (map->max_size > 0 && map->size >= map->max_size) {
+        HM_FN(lru_evict_one)(map);
+        index = HM_FN(find_slot_for_insert)(map, key, key_len, key_hash, &found);
+        if (index >= map->capacity) return map->capacity;
+    }
+
+    /* Pre-allocate expires_at before modifying map state (OOM-safe) */
+    if (HM_UNLIKELY(entry_ttl > 0 && !map->expires_at)) {
+        map->expires_at = (uint32_t*)calloc(map->capacity, sizeof(uint32_t));
+        if (!map->expires_at) return map->capacity;
+    }
+
+    char* new_key = (char*)malloc(key_len + 1);
+    if (!new_key) return map->capacity;
+    memcpy(new_key, key, key_len);
+    new_key[key_len] = '\0';
+
+    if (HM_SLOT_IS_TOMBSTONE(&map->nodes[index])) map->tombstones--;
+    map->size++;
+    map->nodes[index].key = new_key;
+    map->nodes[index].key_len = HM_PACK_LEN(key_len, key_utf8);
+    map->nodes[index].key_hash = key_hash;
+    map->nodes[index].value = def_val;
+
+    if (HM_UNLIKELY(map->lru_prev)) HM_FN(lru_push_front)(map, (uint32_t)index);
+    if (map->expires_at) {
+        uint32_t ttl = entry_ttl > 0 ? entry_ttl : map->default_ttl;
+        if (ttl > 0) map->expires_at[index] = (uint32_t)time(NULL) + ttl;
+    }
+
+    return index;
+}
+#endif
+
+#endif /* HM_KEY_IS_INT for get_or_set */
 
 /* ---- Cleanup macros for next inclusion ---- */
 

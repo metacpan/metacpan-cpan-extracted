@@ -20,11 +20,11 @@ my $test_count = 4;
 my $transport = WWW::Mechanize::Chrome->_preferred_transport({});
 
 if (my $err = t::helper::default_unavailable) {
-    plan skip_all => "Couldn't connect to Chrome: $@";
+    plan skip_all => q{Couldn't connect to Chrome: } . $@;
     exit
 
 } elsif( $transport =~ /::Pipe::/ ) {
-    plan skip_all => "Pipe transport makes no sense for this test";
+    plan skip_all => 'Pipe transport makes no sense for this test';
     exit
 
 } else {
@@ -33,7 +33,7 @@ if (my $err = t::helper::default_unavailable) {
 
 # Launch our Chrome instance separately:
 my ($existing_mech, $instance_host, $instance_port);
-my $expected_location = "data:text/html,Test-$$";
+my $expected_location = 'data:text/html,Test-' . $$;
 
 my $browser_launched = 0;
 my $org = \&WWW::Mechanize::Chrome::_spawn_new_chrome_instance;
@@ -54,6 +54,8 @@ sub new_mech {
         autodie => 1,
         headless => 1,
         connection_style => 'websocket',
+        autoclose => 0, # Manual cleanup
+        autoclose_tab => 0,
     );
 
     $existing_mech->get($expected_location);
@@ -68,6 +70,8 @@ sub new_mech {
         autodie => 1,
         port    => $instance_port,
         host    => $instance_host,
+        autoclose => 0, # Manual cleanup
+        autoclose_tab => 0,
         # tab     => 'current',
         @_,
     );
@@ -81,18 +85,37 @@ t::helper::run_across_instances(\@instances, \&new_mech, $test_count, sub {
     my ($browser_instance, $mech) = splice @_;
 
     pass "We can connect to port $instance_port";
-    is $browser_launched, 1, "We didn't spawn a second process";
-    is $mech->{pid}, undef, "We have no process to kill";
+    is $browser_launched, 1, q{We didn't spawn a second process};
+    is $mech->{pid}, undef, 'We have no process to kill';
 
     note $mech->chrome_version;
     note $existing_mech->chrome_version;
 
     my $location = $mech->uri;
-    is $location, $expected_location, "We connect to the same tab";
+    is $location, $expected_location, 'We connect to the same tab';
     note $mech->title;
-    undef $mech;
 
-    undef $existing_mech;
+    my $pids = $existing_mech->{pid};
+
+    # Explicit cleanup with error handling
+    eval {
+        $mech->close() if $mech;
+        undef $mech;
+    };
+    eval {
+        $existing_mech->close() if $existing_mech;
+        undef $existing_mech;
+    };
+
+    # Hard kill if still alive to release files
+    if ($pids && ref $pids eq 'ARRAY') {
+        for my $pid (@$pids) {
+            if ($pid && kill(0, $pid)) {
+                kill('KILL', $pid);
+                waitpid($pid, 0);
+            }
+        }
+    }
 
     $browser_launched = 0;
 });

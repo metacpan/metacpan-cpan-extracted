@@ -135,7 +135,7 @@ sub body_as_string
 
 # build( %params )
 # Factory / class method: build a single MIME entity from parameters.
-# This is the key method — it performs strict validation and correct encoding.
+# This is the key method - it performs strict validation and correct encoding.
 #
 # Parameters:
 #   type        MIME type string (default: 'text/plain')
@@ -148,7 +148,7 @@ sub body_as_string
 #   path        file path body content
 #   boundary    boundary for multipart/* types (auto-generated if omitted)
 #   description Content-Description value
-#   top         boolean — is this the top-level entity? (default: 1)
+#   top         boolean - is this the top-level entity? (default: 1)
 #   debug       debug level (default: 0)
 sub build
 {
@@ -193,7 +193,7 @@ sub build
         }
         else
         {
-            # Silently discard charset on multipart — do not pass invalid param
+            # Silently discard charset on multipart - do not pass invalid param
             undef( $charset );
         }
     }
@@ -259,7 +259,7 @@ sub build
         }
         elsif( $is_message )
         {
-            # RFC 2045 §6.4 — multipart and message types must not have a CTE
+            # RFC 2045 §6.4 - multipart and message types must not have a CTE
             undef( $encoding );
         }
         elsif( $encoding eq 'suggest' )
@@ -303,7 +303,7 @@ sub build
         }
         else
         {
-            return( $self->error( "build: a body is required for non-multipart type '$type' — provide 'data' or 'path'" ) );
+            return( $self->error( "build: a body is required for non-multipart type '$type' - provide 'data' or 'path'" ) );
         }
     }
 
@@ -372,7 +372,7 @@ sub effective_type
         my $ct = $self->{headers}
             ? ( $self->{headers}->content_type // '' )
             : '';
-        # Strip parameters — just want type/subtype
+        # Strip parameters - just want type/subtype
         ( $self->{effective_type} ) = ( $ct =~ m{^([^;\s]+)} );
     }
     return( $self->{effective_type} );
@@ -521,7 +521,7 @@ sub is_text { return( !shift->is_binary ); }
 # Returns the exact serialised size in bytes of this entity (headers + CRLF separator +
 # encoded body, recursively for multipart).
 #
-# The calculation mirrors print() exactly — no serialisation buffer is accumulated.
+# The calculation mirrors print() exactly - no serialisation buffer is accumulated.
 # For singlepart entities the body is encoded first (if not already done) and the
 # encoded body's length is obtained via Body::File::length (stat on disk) or 
 # Body::InCore::length (in-memory scalar length) without loading the content into a 
@@ -899,7 +899,7 @@ Mail::Make::Entity - MIME Part Builder for Mail::Make
 
 The core MIME part object for L<Mail::Make>. Represents a single MIME entity (either a leaf part with a body, or a multipart container with sub-parts).
 
-The C<build()> class method is the primary factory. It performs strict input validation, automatic RFC 2231 encoding of filenames with special characters, and deterministic Content-Transfer-Encoding selection. It never silently corrupts a message — all invalid inputs produce an explicit error.
+The C<build()> class method is the primary factory. It performs strict input validation, automatic RFC 2231 encoding of filenames with special characters, and deterministic Content-Transfer-Encoding selection. It never silently corrupts a message - all invalid inputs produce an explicit error.
 
 =head1 CLASS METHOD
 
@@ -1015,7 +1015,7 @@ Returns true if the effective MIME type is a text type.
 
 Returns the exact serialised size in bytes of this entity: headers, the blank CRLF separator, and the encoded body (recursively for multipart entities, including all boundary lines, preamble, and epilogue).
 
-The calculation mirrors L</print> exactly without accumulating a serialisation buffer. For singlepart entities the body is encoded first via L</encode_body> (if not already done), then L<Mail::Make::Body::File/length> (a C<stat> call) or L<Mail::Make::Body::InCore/length> (a scalar byte count) is used to obtain the encoded body size — the content is never loaded into a second buffer.
+The calculation mirrors L</print> exactly without accumulating a serialisation buffer. For singlepart entities the body is encoded first via L</encode_body> (if not already done), then L<Mail::Make::Body::File/length> (a C<stat> call) or L<Mail::Make::Body::InCore/length> (a scalar byte count) is used to obtain the encoded body size - the content is never loaded into a second buffer.
 Headers are stringified since they are always held in memory.
 
 Returns C<undef> and sets C<error()> on failure.

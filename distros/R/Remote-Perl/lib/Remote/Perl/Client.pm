@@ -238,6 +238,10 @@ sub _do_run {
 
     my $exec_pid = fork() // die "fork: $!\n";
 
+    # Extract warnings bit before using flags for tmpfile strategy.
+    my $do_warnings = $flags & 0x08;
+    $flags &= 0x07;
+
     if ($exec_pid == 0) {
         # === EXECUTOR (child) =================================================
         close($_) for $stdin_w, $stdout_r, $stderr_r, $result_r, $mod_c;
@@ -253,6 +257,9 @@ sub _do_run {
         # processes spawned by user code.
         fcntl($result_w, F_SETFD, FD_CLOEXEC);
         fcntl($mod_e,    F_SETFD, FD_CLOEXEC);
+
+        # Enable warnings if requested (mirrors perl -w).
+        $^W = 1 if $do_warnings;
 
         # Install the @INC hook if module serving is enabled.
         our $REMOTE_PERL_SERVE //= 0;
@@ -279,7 +286,13 @@ sub _do_run {
             # Strip all pragmas we enable (strict, warnings) and reset to
             # package main so Client.pm's imports are not visible —
             # matching the clean state of `perl -e`.
-            { no strict; no warnings; package main; eval $source }
+            # When $do_warnings is set, omit `no warnings` so $^W takes effect.
+            if ($do_warnings) {
+                { no strict; package main; eval $source }
+            }
+            else {
+                { no strict; no warnings; package main; eval $source }
+            }
             $eval_err = $@;
         }
         else {
@@ -289,9 +302,17 @@ sub _do_run {
             # calling scope, so strict/warnings must be cleared here.
             # Capture $@ inside the block: do FILE sets it for compile errors but
             # does not throw, so eval BLOCK would otherwise clear it on exit.
-            { no strict; no warnings; package main;
-              eval { do $dopath; $eval_err = $@ if $@ };
-              $eval_err //= $@ if $@;
+            if ($do_warnings) {
+                { no strict; package main;
+                  eval { do $dopath; $eval_err = $@ if $@ };
+                  $eval_err //= $@ if $@;
+                }
+            }
+            else {
+                { no strict; no warnings; package main;
+                  eval { do $dopath; $eval_err = $@ if $@ };
+                  $eval_err //= $@ if $@;
+                }
             }
         }
 
@@ -340,7 +361,7 @@ sub _relay {
     # At most one module request in flight at a time: executor blocks until answered.
     my ($mod_stream, %mod_src, %mod_fin, %mod_miss);
 
-    RELAY: until ($stdout_eof && $stderr_eof) {
+    RELAY: until ($stdout_eof && $stderr_eof && !length($stdout_buf) && !length($stderr_buf)) {
         my $rin = '';
         vec($rin, fileno($PIN),      1) = 1;
         vec($rin, fileno($stdout_r), 1) = 1 unless $stdout_eof;
@@ -368,8 +389,12 @@ sub _relay {
                     _flush_buf(S_STDERR, \$stderr_buf) if $stream == S_STDERR;
                 }
                 elsif ($type == MSG_DATA && $stream == S_STDIN && !$stdin_w_closed) {
-                    eval { _write_fh($stdin_w, $body) }
-                        or do { close($stdin_w); $stdin_w_closed = 1 };
+                    my $n = length($body);
+                    eval { _write_fh($stdin_w, $body) };
+                    if ($@) { close($stdin_w); $stdin_w_closed = 1 }
+                    # Re-grant credits for the bytes just delivered so the
+                    # local side can send more stdin beyond the initial window.
+                    else     { _send(MSG_CREDIT, S_STDIN, pack('N', $n)) }
                 }
                 elsif ($type == MSG_EOF && $stream == S_STDIN && !$stdin_w_closed) {
                     close($stdin_w);
@@ -400,11 +425,11 @@ sub _relay {
                     && ($mod_fin{$mod_stream} || $mod_miss{$mod_stream})) {
                 if ($mod_fin{$mod_stream}) {
                     my $src = $mod_src{$mod_stream};
-                    eval { _write_fh($mod_c, pack('CN', 0, length($src)) . $src) }
-                        or do { $mod_c_eof = 1 };
+                    eval { _write_fh($mod_c, pack('CN', 0, length($src)) . $src) };
+                    $mod_c_eof = 1 if $@;
                 } else {
-                    eval { _write_fh($mod_c, pack('C', 1)) }
-                        or do { $mod_c_eof = 1 };
+                    eval { _write_fh($mod_c, pack('C', 1)) };
+                    $mod_c_eof = 1 if $@;
                 }
                 delete $mod_src{$mod_stream};
                 delete $mod_fin{$mod_stream};

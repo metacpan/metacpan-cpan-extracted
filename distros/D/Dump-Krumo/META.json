@@ -50,6 +50,6 @@
          "web" : "https://github.com/scottchiefbaker/perl-Dump-Krumo/"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.1.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

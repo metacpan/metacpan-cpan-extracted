@@ -76,10 +76,10 @@ subtest 'filename: plain ASCII' => sub
 subtest 'filename: comma triggers RFC 2231 encoding' => sub
 {
     my $cd = Mail::Make::Headers::ContentDisposition->new( 'inline' );
-    $cd->filename( 'Angels,Inc-Logo.png' );
+    $cd->filename( 'Yamato,Inc-Logo.png' );
     my $s = "$cd";
     # Must NOT appear as plain filename= with unquoted comma
-    unlike( $s, qr/filename="Angels,Inc/, 'comma not left bare in filename=' );
+    unlike( $s, qr/filename="Yamato,Inc/, 'comma not left bare in filename=' );
     # Must use filename* extended notation
     like( $s, qr/filename\*=/, 'RFC 2231 filename* notation used' );
     like( $s, qr/UTF-8/, 'charset indicated in filename*' );

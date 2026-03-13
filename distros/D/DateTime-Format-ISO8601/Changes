@@ -1,3 +1,18 @@
+0.19     2026-03-12
+
+- Release version 0.18-TRIAL as production release.
+- 0.18-TRIAL Fixed an issue calculating nanoseconds on certain architectures where the precision
+of integers caused the nanoseconds calculation to round incorrectly.  Occurred on
+Raspberry Pi with -Duselongdouble (arm64). Fixed by @timlegge (Timothy Legge).
+Fixes GH #16 via PR #19.
+
+0.18     2026-03-10 (TRIAL RELEASE)
+
+- Fixed an issue calculating nanoseconds on certain architectures where the precision
+of integers caused the nanoseconds calculation to round incorrectly.  Occurred on
+Raspberry Pi with -Duselongdouble (arm64). Fixed by @timlegge (Timothy Legge).
+Fixes GH #16 via PR #19.
+
 0.17     2025-02-22
 
 - Fixed an issue with converting floating point second values to nanoseconds. These could be

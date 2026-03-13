@@ -24,7 +24,7 @@ BEGIN
         '""'  => 'as_string',
         bool  => sub{1},
     );
-    # RFC 2045 section 6.1 — defined encodings
+    # RFC 2045 section 6.1 - defined encodings
     %VALID_ENCODINGS =
     (
         '7bit'              => 1,
@@ -46,7 +46,7 @@ sub init
     $self->{_encoding}        = undef;
     $self->{_exception_class} = $EXCEPTION_CLASS;
     # Module::Generic passes positional args through init() as-is when
-    # _init_strict_use_sub is not set — accept the encoding as first positional arg.
+    # _init_strict_use_sub is not set - accept the encoding as first positional arg.
     my $encoding = shift( @_ );
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     if( defined( $encoding ) && length( $encoding ) )
@@ -93,7 +93,7 @@ sub is_encoded
     return( ( $enc eq 'base64' || $enc eq 'quoted-printable' ) ? 1 : 0 );
 }
 
-# value() — alias for as_string
+# value() - alias for as_string
 sub value { return( shift->as_string ); }
 
 # NOTE: STORABLE support

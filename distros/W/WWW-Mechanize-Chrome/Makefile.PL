@@ -108,6 +108,7 @@ my %module = (
         'Test2::V0'    => 0,
         'Test::Deep'   => 0,
         'Test::Without::Module' => 0,
+        'Capture::Tiny' => 0,
         'Data::Dumper' => 0,
         'Data::Dump'         => 0, # to paper over a bug in Struct::Dumb
                                    # https://rt.cpan.org/Public/Bug/Display.html?id=132378

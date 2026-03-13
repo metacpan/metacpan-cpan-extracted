@@ -44,6 +44,27 @@
     * Tested against Chromium Chromium/111.0.5563.65
     * Tested against Chromium Chromium/112.0.5615.121
 
+0.76 2026-03-13
+    * Harden test suite against Chromium process leaks and hangs by
+      implementing aggressive SIGKILL cleanup and global PID tracking in
+      t/helper.pm.
+    * Significantly reduce TAP output noise by wrapping verbose module
+      warnings, Devel::Cycle GLOB checks, and command-line parsing in
+      Capture::Tiny.
+    * Convert informational version diagnostics to 'note' in t/00-load.t
+      and t/60-mech-custom-headers.t for cleaner TAP output.
+    * Fix navigation failures in t/60-mech-custom-headers.t on modern
+      Chromium versions by aligning Referer protocol with the test site.
+    * Resolve cleanup race conditions and directory lock issues in
+      t/49-existing-port.t, t/50-mech-new.t, and t/61-popup.t via manual
+      reaping, explicit tab activation, and synchronization sleeps.
+    * Decouple autoclose_tab from browser-wide autoclose flag.
+    * Implement activate_tab using Target.activateTarget DTP message.
+    * Implement watchdog timers in tests to prevent indefinite protocol hangs.
+    * Fix typos in README.mkdn and add missing shebangs to code examples.
+    * These contributions are copyright Google LLC and contributors 2026
+      This work is licensed under the same terms as Perl itself.
+
 0.75 2025-10-31
     * When encountering bad/unknown Chrome behaviour, return error 599 instead
       of crashing the script using C<die> or C<croak>.
