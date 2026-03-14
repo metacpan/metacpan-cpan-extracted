@@ -1,7 +1,8 @@
-package Mojo::File::ChangeNotify::WatcherProcess 0.02;
+package Mojo::File::ChangeNotify::WatcherProcess 0.03;
 use 5.020;
 use experimental 'signatures';
 use feature 'postderef';
+use feature 'try';
 use Exporter 'import';
 use File::ChangeNotify;
 our @EXPORT_OK = 'watch';
@@ -29,14 +30,20 @@ Mojo::File::ChangeNotify::WatcherProcess - helper module for the subprocess
 
 sub watch( $subprocess, $args ) {
     my $watcher = File::ChangeNotify->instantiate_watcher( $args->%* );
-    while( my @events = $watcher->wait_for_events ) {
-        for my $list (@events) {
-            $subprocess->progress( [ map {;
-                                       defined $_->path
-                                       ? +{ path => $_->path, type => $_->type }
-                                       : ()
-                                     } $list ]);
-        }
+    RESTART:
+    try {
+      # File::ChangeNotify dies when it gets an empty string back from Inotify :/
+      while( my @events = $watcher->wait_for_events ) {
+          for my $list (@events) {
+              $subprocess->progress( [ map {;
+                                        defined $_->path
+                                        ? +{ path => $_->path, type => $_->type }
+                                        : ()
+                                      } $list ]);
+          }
+      }
+    } catch( $e ) {
+      goto RESTART
     }
 }
 

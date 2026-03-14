@@ -1,0 +1,239 @@
+#!/usr/bin/env perl
+
+use strict ;
+use warnings ;
+
+use Term::ANSIColor ;
+use Getopt::Long ;
+use JSON ;
+
+use Term::ANSIColor::Gradients::Classic ;
+use Term::ANSIColor::Gradients::Extended ;
+use Term::ANSIColor::Gradients::Accessibility ;
+use Term::ANSIColor::Gradients::Artistic ;
+use Term::ANSIColor::Gradients::Diverging ;
+use Term::ANSIColor::Gradients::Scientific ;
+use Term::ANSIColor::Gradients::Sequential ;
+use Term::ANSIColor::Gradients::Utils qw(build_contrast intensity_shift) ;
+
+my %GRADIENTS =
+	(
+	%Term::ANSIColor::Gradients::Classic::GRADIENTS,
+	%Term::ANSIColor::Gradients::Extended::GRADIENTS,
+	%Term::ANSIColor::Gradients::Accessibility::GRADIENTS,
+	%Term::ANSIColor::Gradients::Artistic::GRADIENTS,
+	%Term::ANSIColor::Gradients::Diverging::GRADIENTS,
+	%Term::ANSIColor::Gradients::Scientific::GRADIENTS,
+	%Term::ANSIColor::Gradients::Sequential::GRADIENTS,
+	) ;
+
+my %CONTRAST =
+	(
+	%Term::ANSIColor::Gradients::Classic::CONTRAST,
+	%Term::ANSIColor::Gradients::Extended::CONTRAST,
+	%Term::ANSIColor::Gradients::Accessibility::CONTRAST,
+	%Term::ANSIColor::Gradients::Artistic::CONTRAST,
+	%Term::ANSIColor::Gradients::Diverging::CONTRAST,
+	%Term::ANSIColor::Gradients::Scientific::CONTRAST,
+	%Term::ANSIColor::Gradients::Sequential::CONTRAST,
+	) ;
+
+# ------------------------------------------------------------------------------
+
+sub run_cli
+{
+my %opts ;
+
+GetOptions
+	(
+	'gradient=s'  => \$opts{gradient},
+	'bar=i'       => \$opts{bar},
+	'reverse'     => \$opts{reverse},
+	'fit-width'   => \$opts{fit_width},
+	'char=s'      => \$opts{char},
+	'intensity=i' => \$opts{intensity},
+	'format=s'    => \$opts{format},
+	'load=s'      => \$opts{load},
+	'contrast'    => \$opts{contrast},
+	'help'        => \$opts{help},
+	) ;
+
+if ($opts{help})
+	{
+	print <<'END' ;
+Usage: ansicolors_gradients [OPTIONS]
+
+Display or export ANSI 256-color gradients.
+With no options, lists all available gradient names.
+
+Options:
+  --gradient RE     regexp matched against gradient names (case-insensitive);
+                    use 'all' to display every gradient
+  --bar N           characters per color stop (default: 1)
+  --char CHAR       character for the color bar (default: █)
+  --reverse         reverse the gradient direction
+  --fit-width       scale gradient to fit terminal width
+  --intensity N     shift brightness by N steps (1 unit = 0.05 HSV value);
+                    positive lightens, negative darkens; hue is preserved
+  --contrast        show complementary-hue contrast bar and indices
+  --format FORMAT   text (default), perl, json, markdown, html
+  --load FILE       load additional gradients from a JSON file; contrast
+                    colors are computed automatically for loaded gradients
+  --help            show this help
+
+JSON file format (see examples/custom_gradients.json):
+  {
+      "MY_GRADIENT" : [196, 202, 208, 172, 136],
+      "MY_OTHER"    : [17, 18, 19, 21, 27, 33]
+  }
+  Values are ANSI 256-color indices (integers 0-255).
+  Use 'perl -MUtils -e build_contrast' or load Utils and call
+  build_contrast($idx) to generate contrast arrays for custom gradients.
+
+Examples:
+  ansicolors_gradients
+  ansicolors_gradients --gradient FIRE
+  ansicolors_gradients --gradient '^SCI_'
+  ansicolors_gradients --gradient blue --contrast
+  ansicolors_gradients --gradient all --bar 2 --format text
+  ansicolors_gradients --gradient SCI_VIRIDIS --reverse --intensity -4
+  ansicolors_gradients --gradient OCEAN --fit-width --char ░
+  ansicolors_gradients --load examples/custom_gradients.json --gradient MY_SUNSET --contrast
+END
+
+	return ;
+	}
+
+$opts{bar}    //= 1 ;
+$opts{char}   //= '█' ;
+$opts{format} //= 'text' ;
+
+if ($opts{load})
+	{
+	open my $fh, '<', $opts{load} or die $! ;
+	local $/ ;
+	my $data = <$fh> ;
+	close $fh ;
+
+	my $json = decode_json($data) ;
+
+	for my $name (keys %$json)
+		{
+		$GRADIENTS{$name} = $json->{$name} ;
+		$CONTRAST{$name}  = [map { build_contrast($_) } @{$json->{$name}}] ;
+		}
+	}
+
+unless ($opts{gradient})
+	{
+	print "Available gradient names:\n" ;
+	print " - $_\n" for sort keys %GRADIENTS ;
+
+	return ;
+	}
+
+my @to_print ;
+
+if ($opts{gradient} eq 'all')
+	{
+	@to_print = sort keys %GRADIENTS ;
+	}
+else
+	{
+	my $re = $opts{gradient} ;
+	@to_print = eval { grep { /$re/i } sort keys %GRADIENTS } ;
+
+	if ($@)
+		{
+		print "Invalid regexp '$re'\n" ;
+		return ;
+		}
+
+	unless (@to_print)
+		{
+		print "No gradients match '$re'\n" ;
+		return ;
+		}
+	}
+
+for my $name (@to_print)
+	{
+	my $arr = $GRADIENTS{$name} ;
+	next unless $arr ;
+
+	my @colors = @$arr ;
+	my @cc     = $opts{contrast} ? @{$CONTRAST{$name}} : () ;
+
+	@colors = reverse @colors if $opts{reverse} ;
+	@cc     = reverse @cc     if $opts{contrast} && $opts{reverse} ;
+
+	if (defined $opts{intensity})
+		{
+		@colors = map { intensity_shift($_, $opts{intensity}) } @colors ;
+		@cc     = map { intensity_shift($_, $opts{intensity}) } @cc if $opts{contrast} ;
+		}
+
+	if ($opts{fit_width})
+		{
+		my $width = eval { require Term::ReadKey ; (Term::ReadKey::GetTerminalSize())[0] } || 80 ;
+		my $n     = int($width / $opts{bar}) ;
+		my $step  = @colors > 1 ? @colors / $n : 1 ;
+
+		@colors = map { $colors[int($_ * $step)] } (0 .. $n - 1) ;
+		@cc     = map { $cc[int($_ * $step)] } (0 .. $n - 1) if $opts{contrast} ;
+		}
+
+	if ($opts{format} eq 'text')
+		{
+		print "$name:\n", join(' ', @colors), "\n" ;
+		print colored($opts{char} x $opts{bar}, "ansi$_") for @colors ;
+		print "\n" ;
+
+		if ($opts{contrast})
+			{
+			print colored($opts{char} x $opts{bar}, "ansi$_") for @cc ;
+			print "\n" ;
+			print join(' ', @cc), "\n" ;
+			}
+
+		print "\n" ;
+		}
+	elsif ($opts{format} eq 'perl')
+		{
+		print "\@${name} = (", join(',', @colors), ") ;\n" ;
+		print "\@${name}_CONTRAST = (", join(',', @cc), ") ;\n" if $opts{contrast} ;
+		}
+	elsif ($opts{format} eq 'json')
+		{
+		my %out = ($name => \@colors) ;
+		$out{"${name}_CONTRAST"} = \@cc if $opts{contrast} ;
+		print encode_json(\%out), "\n" ;
+		}
+	elsif ($opts{format} eq 'markdown')
+		{
+		print "### $name\n\n" ;
+		print join('', map { "`$_` " } @colors), "\n\n" ;
+		if ($opts{contrast})
+			{
+			print "### ${name}_CONTRAST\n\n" ;
+			print join('', map { "`$_` " } @cc), "\n\n" ;
+			}
+		}
+	elsif ($opts{format} eq 'html')
+		{
+		print "<p>$name: " ;
+		print join('', map { "<span style='background:#$_;padding:2px'>&nbsp;</span>" } @colors) ;
+		print "</p>\n" ;
+		if ($opts{contrast})
+			{
+			print "<p>${name}_CONTRAST: " ;
+			print join('', map { "<span style='background:#$_;padding:2px'>&nbsp;</span>" } @cc) ;
+			print "</p>\n" ;
+			}
+		}
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+run_cli() ;

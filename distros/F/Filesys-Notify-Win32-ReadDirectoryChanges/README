@@ -42,6 +42,8 @@ L<File::ChangeNotify> - complex cross-platform directory watcher
 
 L<Win32::ChangeNotify> - Win32 directory watcher using the ChangeNotify API
 
+L<Mojo::File::ChangeNotify> - integration with L<Mojolicious>
+
 Currently, no additional information like that available through
 L<https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readdirectorychangesexw|ReadDirectoryChangesExW>
 is collected. But a wrapper/emulation could provide that information whenever
@@ -57,4 +59,4 @@ This module is released under the same terms as Perl itself.
 
 COPYRIGHT (c)
 
-Copyright 2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2022-2026 by Max Maischein C<corion@cpan.org>.

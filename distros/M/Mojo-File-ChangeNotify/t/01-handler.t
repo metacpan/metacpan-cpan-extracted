@@ -2,6 +2,7 @@
 use 5.020;
 use experimental "signatures";
 use Test2::V0 '-no_srand';
+use Test2::IPC; # because we start threads on Win32, and Test2 has weird ideas
 
 use Mojo::File::ChangeNotify;
 
@@ -9,6 +10,7 @@ use File::Temp 'tempdir';
 
 my $tempdir = tempdir(CLEANUP => 1);
 my $testfile = "$tempdir/testfile";
+$testfile =~ s!\\!/!g;
 
 my @events;
 my $w = Mojo::File::ChangeNotify->instantiate_watcher(
@@ -16,6 +18,11 @@ my $w = Mojo::File::ChangeNotify->instantiate_watcher(
     on_change => sub($s,$ev) {
         note "Saw event(s)";
         push @events, $ev;
+        for my $e ($ev->@*) {
+            if( $e->{path}) {
+                $e->{path} =~ s!\\!/!g;
+            }
+        }
         Mojo::IOLoop->stop_gracefully;
     });
 

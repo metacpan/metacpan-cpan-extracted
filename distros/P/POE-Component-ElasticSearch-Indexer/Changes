@@ -1,33 +1,28 @@
 ==================================================
-Changes from 2020-06-01 00:00:00 +0000 to present.
+Changes from 2024-03-14 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.015 at 2022-06-01 02:54:59 +0000
+version 0.016 at 2026-03-14 01:30:22 +0000
 ------------------------------------------
 
-  Change: 6364d6748a4f5451a7724981f26171b74732b070
+  Change: d4808d3f49ec30b5d2793915672cbf60d20a70d8
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-06-01 02:49:23 +0000
+  Date : 2026-03-14 01:28:32 +0000
 
-    Update to Support TLS and Basic Auth
+    Fixes and Logging
 
-    * Adds `Protocol` parameter to support HTTPS * Adds
-    `POE::Component::SSLify` as a dependency * Adds `AuthUsername` for HTTP
-    Basic Auth, defaults to `$ENV{USER}` * Adds `AuthPassword` which, if set,
-    enables HTTP Basic Authorization * Fix argspec in
-    `file-to-elasticsearch.pl` 
+    * Sets the default `Protocol` * Use wire compatibility version, not the
+    application version to allow
 
-  Change: f9e75de3442037557df899c997ab6f2d68228716
+    compatibility with OpenSearch * Improve logging 
+
+  Change: 0be13109a202aa3db0d0b8560c686ca29081bc3c
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-12-17 15:16:34 +0000
+  Date : 2022-05-31 19:55:35 +0000
 
-    Add version check to startup
-
-    As Elastic is deprecating the `_type` element in the `bulk` API, add a
-    version check to the start so we know whether or not to include the `_type`
-    element. 
+    Version 0.015 released 
 
 =================================================
-Plus 13 releases after 2020-06-01 00:00:00 +0000.
+Plus 14 releases after 2024-03-14 00:00:00 +0000.
 =================================================

@@ -5,16 +5,18 @@ use strict;
 use warnings;
 use Log::ger;
 
+#use Benchmark 'timeit', ':hireswallclock';
 use Exporter qw(import);
 use File::chdir;
-use IPC::System::Options -log=>1, qw(system);
+#use IPC::System::Options -log=>1, qw(system);
+use IPC::System::Options qw(system);
 use Proc::ChildError qw(explain_child_error);
 use Perinci::Object qw(envresmulti);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-13'; # DATE
+our $DATE = '2026-02-07'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our @EXPORT_OK = qw(git_grouper_group);
 
@@ -324,11 +326,14 @@ sub ls_repo_groups {
         }
 
         my @repo_groups = map { my $val = $_; $val =~ s/^\.group-//; $val } glob(".group-*");
+        my @repo_exclude_groups = map { my $val = $_; $val =~ s/^\.exclude-group-//; $val } glob(".exclude-group-*");
+        my $exclude_all_other_groups = -f ".exclude-all-other-groups";
 
         my $res = { repo0 => $repo0, repo => $repo, groups => [@repo_groups] };
 
       GROUP:
         for my $group (@{ $config->{groups} }) {
+            next if $exclude_all_other_groups;
             next if grep { $_ eq $group->{group} } @repo_groups;
 
             my $num_filters;
@@ -388,6 +393,13 @@ sub ls_repo_groups {
               SATISFY_FILTER_LACKS_ANY_TAGS:
             }
 
+            # this must be the last filter
+          EXCLUDE_GROUPS:
+            if (grep { $group->{group} eq $_ } @repo_exclude_groups) {
+                log_trace "  Skipped group %s (repo %s has .exclude-group-%s)", $group->{group}, $repo, $group->{group};
+                next GROUP;
+            }
+
           MATCH_GROUP:
             if ($num_filters) {
                 log_trace "  Group $group->{group} matches";
@@ -396,6 +408,14 @@ sub ls_repo_groups {
                 log_trace "  Group $group->{group} does NOT match (no filters satisfied)";
             }
         } # FIND_GROUP
+
+      CHECK_GROUPS: {
+            for my $groupname (@{ $res->{groups} }) {
+                unless ($config->{groups_by_name}{$groupname}) {
+                    return [400, "Repo $repo: Undefined group in configuration: '$groupname"];
+                }
+            }
+        }
 
         push @$payload, $res;
     } # REPO
@@ -569,7 +589,7 @@ $SPEC{filter_repo_multiple_group} = {
 sub filter_repo_multiple_group {
     my %args = @_;
     my $config; { my $res = _read_config(%args); return $res unless $res->[0] == 200; $config = $res->[2] }
-    my $rows; { my $res = ls_repo_groups(%args, config => $config, _always_array=>1); return $res unless $res->[0] == 200; $rows = $res->[2] }
+    my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my @repos;
   REPO:
@@ -761,9 +781,11 @@ sub configure_repo {
     my $rows; { my $res = ls_repo_groups(%args, config => $config, result_array=>'always', groups_array=>'always'); return $res unless $res->[0] == 200; $rows = $res->[2] }
 
     my $envres = envresmulti();
+    my $i = 0;
   REPO:
     for my $row (@$rows) {
-        log_info "Configuring repo %s (group=%s) ...", $row->{repo0}, $row->{groups};
+        $i++;
+        log_info "[%d/%d] Configuring repo %s (group=%s) ...", $i, scalar(@$rows), $row->{repo0}, $row->{groups};
         if ($row->{groups} eq '') {
             log_debug "  Skipping repo because it does not belong to any group";
             next REPO;
@@ -789,7 +811,7 @@ Git::Grouper - Categorize git repositories into one/more groups and perform acti
 
 =head1 VERSION
 
-This document describes version 0.006 of Git::Grouper (from Perl distribution Git-Grouper), released on 2025-11-13.
+This document describes version 0.008 of Git::Grouper (from Perl distribution Git-Grouper), released on 2026-02-07.
 
 =head1 SYNOPSIS
 
@@ -1354,7 +1376,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

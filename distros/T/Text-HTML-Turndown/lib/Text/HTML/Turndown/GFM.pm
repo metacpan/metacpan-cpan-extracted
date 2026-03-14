@@ -1,4 +1,4 @@
-package Text::HTML::Turndown::GFM 0.11;
+package Text::HTML::Turndown::GFM 0.12;
 use 5.020;
 use experimental 'signatures';
 use stable 'postderef';

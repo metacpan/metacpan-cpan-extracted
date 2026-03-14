@@ -1,7 +1,7 @@
 Mojo::File::ChangeNotify - turn file changes into Mojo events
 
 
-This document describes version 0.02.
+This document describes version 0.03.
 
 
 INSTALLATION

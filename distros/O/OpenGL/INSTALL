@@ -118,7 +118,7 @@
 
 
  6. It is recommended (though not required) that you also install the
-    OpenGL::Image and OpenGL::Shader modules to enhance POGL's features.
+    OpenGL::Image module to enhance POGL's features.
 
 
 Read the included README files for additional notes on your particular

@@ -373,7 +373,7 @@ file-to-elasticsearch.pl - A simple utility to tail a file and index each line a
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

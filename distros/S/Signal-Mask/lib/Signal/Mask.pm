@@ -1,5 +1,5 @@
 package Signal::Mask;
-$Signal::Mask::VERSION = '0.008';
+$Signal::Mask::VERSION = '0.009';
 use strict;
 use warnings FATAL => 'all';
 
@@ -19,7 +19,10 @@ use Carp qw/croak/;
 
 my $sig_max = $Config{sig_count} - 1;
 
-tie %Signal::Mask, __PACKAGE__;
+{
+  no warnings 'once';
+  tie %Signal::Mask, __PACKAGE__;
+}
 
 sub TIEHASH {
 	my $class = shift;
@@ -128,7 +131,7 @@ Signal::Mask - Signal masks made easy
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Ricardo Signes <cpan@semiotic.systems>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,7 @@
             "Data::OptList" : "0",
             "File::Basename" : "0",
             "Getopt::Long" : "2.39",
-            "Getopt::Long::Descriptive" : "0.116",
+            "Getopt::Long::Descriptive" : "0.117",
             "IO::TieCombine" : "0",
             "Module::Pluggable::Object" : "0",
             "Pod::Usage" : "1.61",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/rjbs/App-Cmd"
       }
    },
-   "version" : "0.339",
+   "version" : "0.340",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -430,7 +430,7 @@
          {
             "class" : "Dist::Zilla::Plugin::RJBSMisc",
             "name" : "@RJBS/RJBSMisc",
-            "version" : "5.035"
+            "version" : "5.036"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -493,7 +493,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.339",
+                  "tag" : "0.340",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -533,11 +533,12 @@
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
-                  "paths" : []
+                  "paths" : [],
+                  "remove" : "..."
                }
             },
             "name" : "@RJBS/Git::Contributors",
-            "version" : "0.038"
+            "version" : "0.039"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs",

@@ -1,3 +1,8 @@
+0.08 2026-03-13
+    * Fix documentation, `directory` key should always have been `directories`
+      For the time being, we support both in the constructor
+    * Resiliency improvements when disposing of the object
+
 0.07 2023-07-21
     * Various test suite updates, no code changes, no need to upgrade
 

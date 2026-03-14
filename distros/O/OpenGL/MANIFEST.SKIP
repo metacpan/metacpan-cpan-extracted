@@ -31,6 +31,8 @@
 # Avoid Devel::Cover files.
 \bcover_db\b
 
+\.DS_Store$
+
 # Don't include extra DLL and lib files
 ^FreeGLUT/new.*
 ^FreeGLUT/orig.*
@@ -38,7 +40,8 @@
 
 ^.*.tar.gz
 ^.git
-^lib/OpenGL/Config.pm
+^lib/OpenGL/Config\.pm
+^auto-xs\.inc$
 ^Makefile$
 ^MYMETA.json
 ^MYMETA.yml

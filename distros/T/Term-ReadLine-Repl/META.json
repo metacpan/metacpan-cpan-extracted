@@ -1,0 +1,53 @@
+{
+   "abstract" : "A batteries included interactive Term::ReadLine REPL module",
+   "author" : [
+      "John R. <johnlradford23@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Term-ReadLine-Repl",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Test::Exception" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "JSON" : "0",
+            "Term::ANSIColor" : "0",
+            "Term::ReadLine" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Term::ReadLine::Repl" : {
+         "file" : "lib/Term/ReadLine/Repl.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

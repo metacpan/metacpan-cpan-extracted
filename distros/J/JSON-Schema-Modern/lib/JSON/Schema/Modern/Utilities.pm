@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.632';
+our $VERSION = '0.633';
 
 use 5.020;
 use strictures 2;
@@ -18,14 +18,14 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
 use B;
-use Carp 'croak';
+use Carp qw(carp croak);
 use builtin::compat qw(blessed created_as_number);
 use Scalar::Util 'looks_like_number';
 use Storable 'dclone';
 use Feature::Compat::Try;
 use Mojo::JSON ();
 use JSON::PP ();
-use Types::Standard qw(Str InstanceOf);
+use Types::Standard qw(Str InstanceOf Enum);
 use Mojo::File 'path';
 use namespace::clean;
 
@@ -58,6 +58,8 @@ our @EXPORT_OK = qw(
   false
   json_pointer_type
   canonical_uri_type
+  core_types_type
+  core_formats_type
   register_schema
   load_cached_document
 );
@@ -300,13 +302,13 @@ sub is_elements_unique ($array, $state = {}) {
 # the first argument is an already-encoded json pointer; remaining arguments are path segments to be
 # encoded and appended
 sub jsonp {
-  warn q{first argument to jsonp should be '' or start with '/'} if length($_[0]) and substr($_[0],0,1) ne '/';
+  carp q{first argument to jsonp should be '' or start with '/'} if length($_[0]) and substr($_[0],0,1) ne '/';
   return join('/', shift, map s!~!~0!gr =~ s!/!~1!gr, grep defined, @_);
 }
 
 # splits a json pointer apart into its path segments
 sub unjsonp {
-  warn q{argument to unjsonp should be '' or start with '/'} if length($_[0]) and substr($_[0],0,1) ne '/';
+  carp q{argument to unjsonp should be '' or start with '/'} if length($_[0]) and substr($_[0],0,1) ne '/';
   return map s!~0!~!gr =~ s!~1!/!gr, split m!/!, $_[0];
 }
 
@@ -365,6 +367,17 @@ sub json_pointer_type () { Str->where('!length || m{^/} && !m{~(?![01])}'); }
 # a URI without a fragment, or with a json pointer fragment
 sub canonical_uri_type () {
   (InstanceOf['Mojo::URL'])->where(q{!defined($_->fragment) || $_->fragment =~ m{^/} && $_->fragment !~ m{~(?![01])}});
+}
+
+# Validation §7.1-2: "Note that the "type" keyword in this specification defines an "integer" type
+# which is not part of the data model. Therefore a format attribute can be limited to numbers, but
+# not specifically to integers."
+sub core_types_type () {
+  Enum[qw(null object array boolean string number)];
+}
+
+sub core_formats_type () {
+  Enum[qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex)];
 }
 
 # simple runtime-wide cache of $ids to schema document objects that are sourced from disk
@@ -638,7 +651,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.632
+version 0.633
 
 =head1 SYNOPSIS
 
@@ -780,6 +793,14 @@ A L<Type::Tiny> type representing a json pointer string.
 
 A L<Type::Tiny> type representing a canonical URI: a L<Mojo::URL> with either no fragment, or with a
 json pointer fragment.
+
+=head2 core_types_type
+
+A L<Type::Tiny> type representing the core JSON Schema types.
+
+=head2 core_formats_type
+
+A L<Type::Tiny> type representing the core JSON Schema formats (across all supported versions).
 
 =head2 load_cached_document
 

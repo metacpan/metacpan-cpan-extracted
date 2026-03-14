@@ -7,8 +7,9 @@ use EV::Pg;
 my $conninfo = shift || $ENV{TEST_PG_CONNINFO} || 'dbname=postgres';
 
 my $pg; $pg = EV::Pg->new(
-    conninfo => $conninfo,
-    on_error  => sub { die "connection error: $_[0]\n" },
+    conninfo   => $conninfo,
+    keep_alive => 1,
+    on_error   => sub { die "connection error: $_[0]\n" },
     on_notify => sub {
         my ($channel, $payload, $pid) = @_;
         print "notification on '$channel': $payload (from pid $pid)\n";

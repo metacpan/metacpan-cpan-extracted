@@ -15,4 +15,8 @@ use Disk::SmartTools qw(:all);
 my $smart_cmd = get_smart_cmd();
 ok( file_executable($smart_cmd), "get_smart_cmd - smart cmd is executable." );
 
+my $smart_version = get_smart_cmd_version();
+ok( $smart_version =~ m|\d+\.\d+|,
+    "get_smart_cmd_version - version is in the correct format." );
+
 done_testing;

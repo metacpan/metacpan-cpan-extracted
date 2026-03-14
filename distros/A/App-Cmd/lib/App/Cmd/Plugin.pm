@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Cmd::Plugin 0.339;
+package App::Cmd::Plugin 0.340;
 
 # ABSTRACT: a plugin for App::Cmd commands
 
@@ -27,7 +27,7 @@ App::Cmd::Plugin - a plugin for App::Cmd commands
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 PERL VERSION
 

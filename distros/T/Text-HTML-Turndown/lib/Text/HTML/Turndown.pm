@@ -1,4 +1,4 @@
-package Text::HTML::Turndown 0.11;
+package Text::HTML::Turndown 0.12;
 use 5.020;
 use Moo 2;
 use experimental 'signatures';
@@ -321,7 +321,7 @@ our %COMMONMARK_RULES = (
         filter => 'img',
 
         replacement => sub( $content, $node, $options, $context ) {
-          my $alt = cleanAttribute($node->getAttribute('alt'));
+          my $alt = Text::HTML::Turndown::->escape(cleanAttribute($node->getAttribute('alt')));
           my $src = $node->getAttribute('src') || '';
           my $title = cleanAttribute($node->getAttribute('title'));
           my $titlePart = $title ? ' "' . $title . '"' : '';

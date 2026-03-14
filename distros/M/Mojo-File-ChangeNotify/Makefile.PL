@@ -17,6 +17,13 @@ my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
+our $is_win32 //= $^O =~ /mswin/i;
+
+our @win32_prereqs;
+if ( $is_win32 ) {
+    push @win32_prereqs, "Filesys::Notify::Win32::ReadDirectoryChanges" => '0.08';
+};
+
 my %module = (
     NAME                => $module,
     AUTHOR              => q{Max Maischein <corion@cpan.org>},
@@ -55,7 +62,9 @@ my %module = (
         'Mojo::Base'               => '0',
         'Mojo::EventEmitter'       => '0',
         'Mojo::IOLoop::Subprocess' => '0',
-        'Scalar::Util'             => '0'
+        'PerlX::Maybe'             => '0',
+        'Scalar::Util'             => '0',
+        @win32_prereqs,
     },
     TEST_REQUIRES =>     {
         'experimental'  => '0',
@@ -66,6 +75,7 @@ my %module = (
         'Mojo::Promise' => '0',
         'Scalar::Util'  => '0',
         'Test2::V0'     => '0',
+        'Test2::IPC'    => '0',
         'Test::More'    => '0'
     },
 

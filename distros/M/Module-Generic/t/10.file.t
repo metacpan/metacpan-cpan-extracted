@@ -899,7 +899,7 @@ subtest 'Concurrent locking' => sub
                 my $tid = threads->tid();
                 my $f = Module::Generic::File->new( $file->filepath, debug => $DEBUG );
                 diag( "Appending to temporary file $file -> 'Thread $_ ($tid): Test'" ) if( $DEBUG );
-                my $fh = $f->open( '+>>', { lock => 1, exclusive => 1 });
+                my $fh = $f->open( '+>>', { lock => 1, exclusive => 1, timeout => 10 } );
                 if( !$fh )
                 {
                     diag( "Thread $_ ($tid): Failed to open: ", $f->error ) if( $DEBUG );

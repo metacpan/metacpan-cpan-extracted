@@ -748,7 +748,7 @@ sub _pure_perl_detect_buffer
 
     # NOTE: Level 2.5: text heuristic
     # If no binary signature matched, classify the buffer as text/plain or
-    # application/octet-stream based on byte content.  This matches the
+    # application/octet-stream based on byte content. This matches the
     # behaviour of libmagic for unrecognised file types:
     #   - >85% printable ASCII (0x09/0x0A/0x0D/0x20–0x7E) -> text/plain
     #   - otherwise -> application/octet-stream
@@ -1050,17 +1050,41 @@ Getter/setter for the custom magic database path (xs backend only).
 
 Getter/setter for the maximum number of bytes read from a file when using pure-Perl backends. The default is 512 bytes, which covers all signatures in the bundled JSON database. Increase this value for formats whose signatures appear at large offsets (e.g. C<application/x-tar> at offset 257).
 
-=head2 mime_encoding_from_buffer / _from_file / _from_filehandle
+=head2 mime_encoding_from_buffer( $scalar )
 
-Returns the charset (e.g. C<binary>).
+Returns the charset (e.g. C<binary>) for the given buffer.
 
-=head2 mime_from_buffer / _from_file / _from_filehandle
+=head2 mime_encoding_from_file( $path )
 
-Returns e.g. C<application/gzip; charset=binary>.
+Returns the charset (e.g. C<us-ascii>) for the given file.
 
-=head2 mime_type_from_buffer / _from_file / _from_filehandle
+=head2 mime_encoding_from_filehandle( $fh )
 
-Returns e.g. C<application/gzip>.
+Returns the charset for the given filehandle.
+
+=head2 mime_from_buffer( $scalar )
+
+Returns the full MIME string (e.g. C<application/gzip; charset=binary>) for the given buffer.
+
+=head2 mime_from_file( $path )
+
+Returns the full MIME string for the given file.
+
+=head2 mime_from_filehandle( $fh )
+
+Returns the full MIME string for the given filehandle.
+
+=head2 mime_type_from_buffer( $scalar )
+
+Returns the MIME type (e.g. C<application/gzip>) for the given buffer.
+
+=head2 mime_type_from_file( $path )
+
+Returns the MIME type for the given file.
+
+=head2 mime_type_from_filehandle( $fh )
+
+Returns the MIME type for the given filehandle.
 
 =head2 version
 
@@ -1074,28 +1098,129 @@ Returns the libmagic version string (e.g. C<"5.45">), or C<undef> when not using
     magic_mime_type( $path )
     magic_mime_encoding( $path )
 
+=head2 magic_from_buffer( $scalar [, $flags] )
+
+Procedural interface to L</from_buffer>.  C<$flags> defaults to C<MAGIC_MIME_TYPE>.
+
+=head2 magic_from_file( $path [, $flags] )
+
+Procedural interface to L</from_file>.  C<$flags> defaults to C<MAGIC_MIME_TYPE>.
+
+=head2 magic_mime_type( $path )
+
+Returns the MIME type of C<$path>.  Equivalent to C<magic_from_file( $path, MAGIC_MIME_TYPE )>.
+
+=head2 magic_mime_encoding( $path )
+
+Returns the charset of C<$path>.  Equivalent to C<magic_from_file( $path, MAGIC_MIME_ENCODING )>.
+
 =head1 EXPORT TAGS
 
 C<:flags>, C<:functions>, C<:all>
 
 =head1 FLAG CONSTANTS
 
-    MAGIC_NONE              No flags (default)
-    MAGIC_DEBUG             Print debug messages to stderr  [xs only]
-    MAGIC_SYMLINK           Follow symlinks
-    MAGIC_COMPRESS          Examine inside compressed files
-    MAGIC_DEVICES           Look at block/char device content  [xs only]
-    MAGIC_MIME_TYPE         Return MIME type
-    MAGIC_MIME_ENCODING     Return MIME charset
-    MAGIC_MIME              MAGIC_MIME_TYPE | MAGIC_MIME_ENCODING
-    MAGIC_CONTINUE          Return all matches  [xs only]
-    MAGIC_CHECK             Print warnings  [xs only]
-    MAGIC_PRESERVE_ATIME    Restore access time  [xs only]
-    MAGIC_RAW               Do not convert unprintable chars  [xs only]
-    MAGIC_ERROR             Treat ENOENT as real error  [xs only]
-    MAGIC_APPLE             Return Apple creator/type  [xs only]
-    MAGIC_EXTENSION         Return file extensions  [xs only]
-    MAGIC_NO_CHECK_*        Disable specific checks  [xs only]
+=head2 MAGIC_NONE
+
+No flags (default)
+
+=head2 MAGIC_DEBUG
+
+Print debug messages to stderr  [xs only]
+
+=head2 MAGIC_SYMLINK
+
+Follow symlinks
+
+=head2 MAGIC_COMPRESS
+
+Examine inside compressed files
+
+=head2 MAGIC_DEVICES
+
+Look at block/char device content  [xs only]
+
+=head2 MAGIC_MIME_TYPE
+
+Return MIME type
+
+=head2 MAGIC_MIME_ENCODING
+
+Return MIME charset
+
+=head2 MAGIC_MIME
+
+MAGIC_MIME_TYPE | MAGIC_MIME_ENCODING
+
+=head2 MAGIC_CONTINUE
+
+Return all matches  [xs only]
+
+=head2 MAGIC_CHECK
+
+Print warnings  [xs only]
+
+=head2 MAGIC_PRESERVE_ATIME
+
+Restore access time  [xs only]
+
+=head2 MAGIC_RAW
+
+Do not convert unprintable chars  [xs only]
+
+=head2 MAGIC_ERROR
+
+Treat ENOENT as real error  [xs only]
+
+=head2 MAGIC_APPLE
+
+Return Apple creator/type  [xs only]
+
+=head2 MAGIC_EXTENSION
+
+Return file extensions  [xs only]
+
+=head2 MAGIC_COMPRESS_TRANSP
+
+Do not report on the compression type, only the uncompressed content. [xs only]
+
+=head2 MAGIC_NO_CHECK_COMPRESS
+
+Disable compression check. [xs only]
+
+=head2 MAGIC_NO_CHECK_TAR
+
+Disable tar check. [xs only]
+
+=head2 MAGIC_NO_CHECK_SOFT
+
+Disable soft magic check. [xs only]
+
+=head2 MAGIC_NO_CHECK_APPTYPE
+
+Disable Apple creator/type check. [xs only]
+
+=head2 MAGIC_NO_CHECK_ELF
+
+Disable ELF check. [xs only]
+
+=head2 MAGIC_NO_CHECK_TEXT
+
+Disable text check. [xs only]
+
+=head2 MAGIC_NO_CHECK_CDF
+
+Disable CDF check. [xs only]
+
+=head2 MAGIC_NO_CHECK_TOKENS
+
+Disable token check. [xs only]
+
+=head2 MAGIC_NO_CHECK_ENCODING
+
+Disable encoding check. [xs only]
+
+Flags marked C<[xs only]> are silently ignored on non-xs backends.
 
 Flags marked C<[xs only]> are silently ignored on non-xs backends.
 

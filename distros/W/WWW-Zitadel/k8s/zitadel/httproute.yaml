@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: my-zitadel
+  namespace: zitadel
+spec:
+  parentRefs:
+    - name: cilium-gateway
+      namespace: kube-system
+      sectionName: https
+  hostnames:
+    - zitadel.avatar.conflict.industries
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: my-zitadel-zitadel
+          port: 8080

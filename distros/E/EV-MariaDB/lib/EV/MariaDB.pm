@@ -6,7 +6,7 @@ use Carp 'croak';
 use EV;
 
 BEGIN {
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -23,6 +23,8 @@ my @OPTION_KEYS = qw(
     compress multi_statements charset init_command
     ssl_key ssl_cert ssl_ca ssl_cipher ssl_verify_server_cert
 );
+
+sub CLONE_SKIP { 1 }
 
 sub new {
     my ($class, %args) = @_;
@@ -229,11 +231,18 @@ Enable protocol compression.
 
 =item multi_statements => 1
 
-Allow multiple SQL statements per query string.
+Allow multiple SQL statements per query string. B<Note:> only the first
+statement's result set is returned to the callback; secondary result sets
+are consumed and discarded. Errors in secondary statements are delivered
+via the C<on_error> handler.
 
 =item charset => $name
 
-Character set name (e.g., C<utf8mb4>).
+Character set name (e.g., C<utf8mb4>). This controls both result encoding
+and how string parameters are interpreted by the server. If you bind
+Perl Unicode strings (with the UTF-8 flag) to prepared statements, the
+connection charset B<must> be set to C<utf8> or C<utf8mb4> — otherwise
+the raw UTF-8 bytes are sent without transcoding and may be misinterpreted.
 
 =item init_command => $sql
 

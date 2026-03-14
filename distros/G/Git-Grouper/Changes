@@ -1,3 +1,19 @@
+0.008   2026-02-07  Released-By: PERLANCAR; Urgency: high
+
+        - Some bug fixes.
+
+
+0.007   2025-11-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Observe .exclude-group-NAME and .exclude-all-other-groups file.
+
+        - [ux] Add subcommand: groups as shorter alias for ls-repo-groups.
+
+        - Die on undefined group.
+
+        - [doc] Show the use of --ignore-nondirs in Synopsis.
+
+
 0.006   2025-11-13  Released-By: PERLANCAR; Urgency: medium
 
         - Add option: --ignore-nondirs.

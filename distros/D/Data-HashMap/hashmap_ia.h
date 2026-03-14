@@ -1,4 +1,4 @@
-/* hashmap_ia.h — int64_t -> SV* hashmap (16 bytes/node) */
+/* hashmap_ia.h — int64_t -> SV* hashmap */
 #ifndef HASHMAP_IA_H
 #define HASHMAP_IA_H
 

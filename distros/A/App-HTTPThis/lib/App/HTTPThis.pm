@@ -1,5 +1,5 @@
 package App::HTTPThis;
-$App::HTTPThis::VERSION = '0.010';
+
 # ABSTRACT: Export the current directory over HTTP
 
 use strict;
@@ -10,6 +10,16 @@ use Getopt::Long;
 use Pod::Usage;
 use Config::Tiny;
 
+our $VERSION = '0.11.0';
+
+=head1 METHODS
+
+=head2 new
+
+Creates a new App::HTTPThis object, parsing the command line arguments
+into object attribute values.
+
+=cut
 
 sub new {
   my $class = shift;
@@ -17,14 +27,11 @@ sub new {
 
   my $default_config_file = '.http_thisrc';
 
-  GetOptions(
-    $self, "help", "man", "config=s", "host=s", "port=i", "name=s", "autoindex", "pretty"
-  ) || pod2usage(2);
-  pod2usage(1) if $self->{help};
-  pod2usage(-verbose => 2) if $self->{man};
-
   my $config_file = $self->{config} || $ENV{HTTP_THIS_CONFIG};
+
+  # There are apparently OSes where $ENV{HOME} is undefined
   for my $dir ('.', $ENV{HOME}) {
+    next unless defined $dir;
     if (!$config_file && -f "$dir/$default_config_file") {
       $config_file = "$dir/$default_config_file";
       last;
@@ -40,6 +47,12 @@ sub new {
     delete $self->{config};
   }
 
+  GetOptions(
+    $self, "help", "man", "config=s", "host=s", "port=i", "name=s", "autoindex!", "pretty!"
+  ) || pod2usage(2);
+  pod2usage(1) if $self->{help};
+  pod2usage(-verbose => 2) if $self->{man};
+
   if (@ARGV > 1) {
     pod2usage("$0: Too many roots, only single root supported");
   }
@@ -50,6 +63,11 @@ sub new {
   return $self;
 }
 
+=head2 run
+
+Start the HTTP server.
+
+=cut
 
 sub run {
   my ($self) = @_;
@@ -65,8 +83,9 @@ sub run {
   );
 
   my $app_config = {
-    root   => $self->{root},
-    pretty => $self->{pretty},
+    root      => $self->{root},
+    pretty    => $self->{pretty},
+    dir_index => '',
   };
   $app_config->{dir_index} = 'index.html' if $self->{autoindex};
 
@@ -110,21 +129,10 @@ sub _server_ready {
 
 1;
 
-__END__
-
-=pod
-
-=head1 NAME
-
-App::HTTPThis - Export the current directory over HTTP
-
-=head1 VERSION
-
-version 0.010
-
 =head1 SYNOPSIS
 
     # Not to be used directly, see http_this command
+
 
 =head1 DESCRIPTION
 
@@ -133,20 +141,11 @@ This class implements all the logic of the L<http_this> command.
 Actually, this is just a very thin wrapper around
 L<Plack::App::DirectoryIndex>, that is where the magic really is.
 
-=head1 METHODS
-
-=head2 new
-
-Creates a new App::HTTPThis object, parsing the command line arguments
-into object attribute values.
-
-=head2 run
-
-Start the HTTP server.
 
 =head1 SEE ALSO
 
 L<http_this>, L<Plack>, L<Plack::App::DirectoryIndex>, and L<Net::Rendezvous::Publish>.
+
 
 =head1 THANKS
 
@@ -154,16 +153,3 @@ And the Oscar goes to: Tatsuhiko Miyagawa.
 
 For L<Plack>, L<Plack::App::Directory> and many many others.
 
-=head1 AUTHOR
-
-Pedro Melo <melo@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2010 by Pedro Melo.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

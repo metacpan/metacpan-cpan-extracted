@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Cmd::Tester 0.339;
+package App::Cmd::Tester 0.340;
 
 # ABSTRACT: for capturing the result of running an app
 
@@ -138,7 +138,7 @@ sub _run_with_capture {
 }
 
 {
-  package App::Cmd::Tester::Result 0.339;
+  package App::Cmd::Tester::Result 0.340;
 
   sub new {
     my ($class, $arg) = @_;
@@ -154,7 +154,7 @@ sub _run_with_capture {
 }
 
 {
-  package App::Cmd::Tester::Exited 0.339;
+  package App::Cmd::Tester::Exited 0.340;
 
   sub throw {
     my ($class, $code) = @_;
@@ -178,7 +178,7 @@ App::Cmd::Tester - for capturing the result of running an app
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 SYNOPSIS
 

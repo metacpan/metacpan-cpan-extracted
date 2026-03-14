@@ -54,9 +54,6 @@ my %WriteMakefileArgs = (
         # Same as File::Copy, this is a core module
         'File::DosGlob'         => 0,
         'File::Glob'            => 0,
-        # Only load it, if it exists
-        # 'File::MMagic::XS' => '0.09008',
-        'File::MMagic'          => '1.30',
         'File::Spec'            => '3.73',
         'File::Which'           => 0,
         # Core module

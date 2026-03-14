@@ -23,7 +23,7 @@ no_index:
 provides:
   EV::Pg:
     file: lib/EV/Pg.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Alien::libpq: '0'
   EV: '4.11'
@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-pg/issues
   repository: https://github.com/vividsnow/perl5-ev-pg.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

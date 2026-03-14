@@ -1,0 +1,83 @@
+{
+   "abstract" : "Curated ANSI 256-color palette library for terminal display",
+   "author" : [
+      "Nadim Khemir <nadim.khemir@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Term-ANSIColor-Gradients",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2",
+            "Term::ANSIColor" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Term::ANSIColor::Gradients" : {
+         "file" : "lib/Term/ANSIColor/Gradients.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Accessibility" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Accessibility.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Artistic" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Artistic.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Classic" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Classic.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Diverging" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Diverging.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Extended" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Extended.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Scientific" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Scientific.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Sequential" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Sequential.pm",
+         "version" : "0.10"
+      },
+      "Term::ANSIColor::Gradients::Utils" : {
+         "file" : "lib/Term/ANSIColor/Gradients/Utils.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/nkh/P5-Term-ANSIColor-Gradients"
+      }
+   },
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

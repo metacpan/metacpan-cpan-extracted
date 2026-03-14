@@ -110,6 +110,13 @@ subtest 'from_file() - text file' => sub
 my $binary = ( -r( '/bin/ls' ) ) ? '/bin/ls'
            : ( -r( '/usr/bin/ls' ) ) ? '/usr/bin/ls'
            : undef;
+# Resolve symlink if needed — on some systems /bin/ls -> /usr/bin/ls,
+# and libmagic without MAGIC_SYMLINK returns inode/symlink instead of
+# the actual MIME type of the target.
+if( defined( $binary ) && -l( $binary ) )
+{
+    $binary = Cwd::abs_path( $binary );
+}
 
 subtest 'from_file() - binary / executable' => sub
 {

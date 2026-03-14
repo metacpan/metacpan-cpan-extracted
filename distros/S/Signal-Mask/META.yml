@@ -9,9 +9,10 @@ build_requires:
   Test::More: '0'
   perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.30'
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +21,10 @@ name: Signal-Mask
 provides:
   Signal::Mask:
     file: lib/Signal/Mask.pm
-    version: '0.008'
+    version: '0.009'
   Signal::Pending:
     file: lib/Signal/Pending.pm
-    version: '0.008'
+    version: '0.009'
 recommends:
   Thread::SigMask: '0'
 requires:
@@ -34,6 +35,9 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Signal-Mask
+  bugtracker: https://github.com/Leont/signal-mask/issues
   repository: git://github.com/Leont/signal-mask.git
-version: '0.008'
+version: '0.009'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

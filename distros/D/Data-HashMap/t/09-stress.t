@@ -3,11 +3,15 @@ use warnings;
 use Test::More;
 
 use Data::HashMap::I16;
+use Data::HashMap::I16A;
 use Data::HashMap::I16S;
 use Data::HashMap::I32;
+use Data::HashMap::I32A;
 use Data::HashMap::I32S;
+use Data::HashMap::IA;
 use Data::HashMap::II;
 use Data::HashMap::IS;
+use Data::HashMap::SA;
 use Data::HashMap::SI;
 use Data::HashMap::SI16;
 use Data::HashMap::SI32;
@@ -320,6 +324,93 @@ my $N16 = 30_000;  # int16 key range limit
     hm_ss_remove $map, "";
     hm_ss_put $map, "", "second";
     is(hm_ss_get $map, "", "second", 'SS: tombstone reuse with empty-string key');
+}
+
+# IA: insert/verify/delete cycle (SV* values, refcount correctness)
+{
+    my $map = Data::HashMap::IA->new();
+    for my $i (1 .. $N) { hm_ia_put $map, $i, \$i; }
+    is(hm_ia_size $map, $N, "IA: inserted $N");
+
+    my $ok = 1;
+    for my $i (1 .. $N) {
+        if (${hm_ia_get $map, $i} != $i) { $ok = 0; last; }
+    }
+    ok($ok, "IA: all $N verified");
+
+    for my $i (1 .. $N) { hm_ia_remove $map, $i; }
+    is(hm_ia_size $map, 0, 'IA: size 0 after delete');
+}
+
+# SA: insert/verify/delete cycle
+{
+    my $map = Data::HashMap::SA->new();
+    for my $i (1 .. $N) { hm_sa_put $map, "k$i", [$i]; }
+    is(hm_sa_size $map, $N, "SA: inserted $N");
+
+    my $ok = 1;
+    for my $i (1 .. $N) {
+        my $v = hm_sa_get $map, "k$i";
+        if (!$v || $v->[0] != $i) { $ok = 0; last; }
+    }
+    ok($ok, "SA: all $N verified");
+
+    for my $i (1 .. $N) { hm_sa_remove $map, "k$i"; }
+    is(hm_sa_size $map, 0, 'SA: size 0 after delete');
+}
+
+# IA: tombstone compaction stress
+{
+    my $map = Data::HashMap::IA->new();
+    for my $cycle (1 .. 3) {
+        for my $i (1 .. 10_000) { hm_ia_put $map, $i, \$i; }
+        for my $i (1 .. 10_000) { hm_ia_remove $map, $i; }
+    }
+    is(hm_ia_size $map, 0, 'IA: size 0 after 3 insert/delete cycles');
+}
+
+# SA: tombstone compaction stress
+{
+    my $map = Data::HashMap::SA->new();
+    for my $cycle (1 .. 3) {
+        for my $i (1 .. 10_000) { hm_sa_put $map, "k$i", \$i; }
+        for my $i (1 .. 10_000) { hm_sa_remove $map, "k$i"; }
+    }
+    is(hm_sa_size $map, 0, 'SA: size 0 after 3 insert/delete cycles');
+}
+
+# I32A: insert/verify/delete cycle
+{
+    my $map = Data::HashMap::I32A->new();
+    for my $i (1 .. $N) { hm_i32a_put $map, $i, {v => $i}; }
+    is(hm_i32a_size $map, $N, "I32A: inserted $N");
+
+    my $ok = 1;
+    for my $i (1 .. $N) {
+        my $v = hm_i32a_get $map, $i;
+        if (!$v || $v->{v} != $i) { $ok = 0; last; }
+    }
+    ok($ok, "I32A: all $N verified");
+
+    for my $i (1 .. $N) { hm_i32a_remove $map, $i; }
+    is(hm_i32a_size $map, 0, 'I32A: size 0 after delete');
+}
+
+# I16A: insert/verify/delete cycle
+{
+    my $N16A = 30_000;
+    my $map = Data::HashMap::I16A->new();
+    for my $i (1 .. $N16A) { hm_i16a_put $map, $i, "val$i"; }
+    is(hm_i16a_size $map, $N16A, "I16A: inserted $N16A");
+
+    my $ok = 1;
+    for my $i (1 .. $N16A) {
+        if ((hm_i16a_get $map, $i) ne "val$i") { $ok = 0; last; }
+    }
+    ok($ok, "I16A: all $N16A verified");
+
+    for my $i (1 .. $N16A) { hm_i16a_remove $map, $i; }
+    is(hm_i16a_size $map, 0, 'I16A: size 0 after delete');
 }
 
 done_testing;

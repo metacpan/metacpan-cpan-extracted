@@ -1,5 +1,12 @@
 # Changes for App-HTTPThis
 
+0.11.0
+     * Switch to semantic versioning
+     * Command-line args take precedence over config file
+     * Ensure $dir_index is undef if autoindex is turned off
+     * Don't look for config file in $ENV{HOME} if that's undef
+     * Strip out Dist::Zilla :-)
+
 0.010 Thu Dec 04 09:52:00 UTC 2025
      * Add --host option
 

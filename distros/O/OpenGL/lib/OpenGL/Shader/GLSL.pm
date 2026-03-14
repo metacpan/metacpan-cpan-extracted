@@ -8,7 +8,8 @@
 #
 ############################################################
 
-package OpenGL::Shader::GLSL;
+package # hide from PAUSE
+  OpenGL::Shader::GLSL;
 
 use strict;
 use warnings;
@@ -20,8 +21,8 @@ our $SHADER_VER;
 our $DESCRIPTION = qq
 {OpenGL Shader Language};
 
-use OpenGL::Shader::Objects;
-our @ISA = qw(OpenGL::Shader::Objects);
+use OpenGL::Shader::Common;
+our @ISA = qw(OpenGL::Shader::Common);
 
 use OpenGL(':all');
 
@@ -39,11 +40,11 @@ OpenGL::Shader::GLSL - plug-in module for use with OpenGL::Shader
 
 =head1 DESCRIPTION
 
-This is a plug-in module for use with the OpenGL::Shader.
+This is a plug-in module for use with L<OpenGL::Shader>.
 While it may be called directly, it will more often be called
-by the OpenGL::Shader abstraction module.
+by the abstraction module.
 
-This is a subclass of the OpenGL::Shader::Objects module.
+This is a subclass of the L<OpenGL::Shader::Common> module.
 
 =head1 AUTHOR
 
@@ -72,21 +73,7 @@ sub TypeDescription {
   $DESCRIPTION;
 }
 
-# Shader constructor
-sub new {
-  my $this = shift;
-  my $class = ref($this) || $this;
-  # Check for additional required OpenGL extensions
-  my $ver = TypeVersion();
-  return undef if (!$ver);
-  my $self = OpenGL::Shader::Objects->new('GLSL');
-  return undef if (!$self);
-  bless($self,$class);
-  $self->{version} = $ver;
-  $self->{description} = $DESCRIPTION;
-  $self->{fragment_const} = GL_FRAGMENT_SHADER;
-  $self->{vertex_const} = GL_VERTEX_SHADER;
-  return $self;
-}
+sub GetFragmentConstant { GL_FRAGMENT_SHADER }
+sub GetVertexConstant { GL_VERTEX_SHADER }
 
 1;

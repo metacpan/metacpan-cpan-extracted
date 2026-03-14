@@ -102,6 +102,10 @@ CONSTRUCTOR
         flushed during COPY IN. Useful for resuming "put_copy_data" after it
         returns 0.
 
+    keep_alive
+        When true, the connection keeps "EV::run" alive even when no queries
+        are pending. See "keep_alive".
+
     loop
         An EV loop object. Defaults to "EV::default_loop".
 
@@ -233,6 +237,15 @@ QUERY METHODS
         my $n = $pg->pending_count;
 
     Returns the number of callbacks in the queue.
+
+  keep_alive
+        $pg->keep_alive(1);
+        my $bool = $pg->keep_alive;
+
+    When true, the connection's read watcher keeps "EV::run" alive even when
+    no queries are pending. Useful when waiting for server-side "NOTIFY"
+    events via "on_notify" — without this flag the event loop would exit
+    after the "LISTEN" query completes.
 
   skip_pending
         $pg->skip_pending;
@@ -409,8 +422,10 @@ CONNECTION INFO
         my $fields = $pg->error_fields;
 
     Returns a hashref of structured error fields from the most recent
-    "PGRES_FATAL_ERROR" result, or "undef" if no error has occurred. Keys
-    (present only when non-NULL in the server response):
+    "PGRES_FATAL_ERROR" result, or "undef" if no error has occurred. The
+    value persists until the next fatal error; it is not cleared by
+    successful queries. Keys (present only when non-NULL in the server
+    response):
 
         sqlstate    severity    primary     detail
         hint        position    context     schema
@@ -422,7 +437,9 @@ CONNECTION INFO
         my $meta = $pg->result_meta;
 
     Returns a hashref of metadata from the most recent query result, or
-    "undef" if no result has been delivered. Keys:
+    "undef" if no result has been delivered. The value persists until the
+    next result that carries metadata; it is not cleared by errors or
+    commands that produce no columns. Keys:
 
         nfields       number of columns
         cmd_status    command status string (e.g. "SELECT 3", "INSERT 0 1")
@@ -560,4 +577,11 @@ SEE ALSO
 LICENSE
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 461:
+        Non-ASCII character seen before =encoding in '—'. Assuming UTF-8
 

@@ -4,7 +4,7 @@ use 5.010000;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use EV ();
 use base 'Exporter';
@@ -90,8 +90,8 @@ series.
 =back
 
 In unsafe mode, these protections are B<not active>. Double-calls will
-corrupt the internal completion counter, which may cause C<final_cb> to be
-invoked multiple times or trigger use-after-free.
+corrupt the internal completion counter, which may cause premature
+invocation of C<final_cb> (before all tasks have actually completed).
 
 =head1 FUNCTIONS
 

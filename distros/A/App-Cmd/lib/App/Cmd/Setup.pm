@@ -5,7 +5,7 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd::Setup 0.339;
+package App::Cmd::Setup 0.340;
 
 # ABSTRACT: helper for setting up App::Cmd classes
 
@@ -239,7 +239,7 @@ App::Cmd::Setup - helper for setting up App::Cmd classes
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 OVERVIEW
 

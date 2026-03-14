@@ -1,0 +1,3 @@
+# Legacy file kept for reference when using bitnami/postgresql.
+# The default deployment path now uses k8s/zitadel/postgres.yaml
+# with src.ci/srv/postgres:18.

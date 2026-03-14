@@ -1,5 +1,14 @@
 Revision history for Data-HashMap
 
+0.03  2026-03-13
+    - Fix UTF-8 key collision: keys with different UTF-8 flags are now distinct
+    - Fix silent integer truncation: I16/I32 variants croak on out-of-range values
+    - Fix TTL read-path compaction: get/exists no longer trigger compact(),
+      preventing each() iterator reset and get_direct pointer invalidation
+    - Fix each() scalar context: returns key only via method dispatch
+    - Dedicated memory leak tests (Test::LeakTrace) and RSS reclamation tests
+    - Updated benchmarks for all 14 variants
+
 0.02  2026-03-12
     - Lookup optimizations: cached stash pointer comparison in EXTRACT_MAP
     - Switch to bundled xxHash v0.8.3 (XXH3_64bits) for all key hashing

@@ -4,7 +4,7 @@ use Test::More;
 use lib 't/lib';
 use TestMariaDB;
 plan skip_all => 'No MariaDB/MySQL server' unless TestMariaDB::server_available();
-plan tests => 33;
+plan tests => 35;
 use EV;
 use EV::MariaDB;
 
@@ -256,6 +256,27 @@ with_mariadb(cb => sub {
         my ($row, $err) = @_;
         ok($err, 'stream error: got error for bad SQL');
         EV::break;
+    });
+});
+
+# query_stream with DML: should get EOF (undef), not false error
+with_mariadb(cb => sub {
+    $m->q("create temporary table _dml_stream (id int)", sub {
+        die $_[1] if $_[1];
+        my $eof_ok = 0;
+        $m->query_stream("insert into _dml_stream values (1)", sub {
+            my ($row, $err) = @_;
+            if ($err) { fail("DML stream: unexpected error: $err"); EV::break; return }
+            if (!defined $row) {
+                $eof_ok = 1;
+                $m->q("select count(*) from _dml_stream", sub {
+                    my ($r, $e) = @_;
+                    ok(!$e && $r->[0][0] == 1, 'DML stream: row was inserted');
+                    ok($eof_ok, 'DML stream: got EOF not error');
+                    EV::break;
+                });
+            }
+        });
     });
 });
 

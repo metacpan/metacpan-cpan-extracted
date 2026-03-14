@@ -50,6 +50,7 @@ my %module = (
     },
 
     PREREQ_PM => {
+        'experimental'   => '0.036',
         'Moo'            => '2',
         'File::Spec'     => '0',
         'Win32::API'     => '0',

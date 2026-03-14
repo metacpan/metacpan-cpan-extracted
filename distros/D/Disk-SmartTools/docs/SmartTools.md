@@ -4,7 +4,7 @@ Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 # VERSION
 
-Version v3.3.26
+Version v3.4.0
 
 # SYNOPSIS
 
@@ -22,6 +22,7 @@ Provides disk related functions.
     get_disk_prefix
     os_disks
     get_smart_cmd
+    get_smart_cmd_version
     get_raid_cmd
     get_raid_flag
     get_diskutil_cmd
@@ -51,6 +52,12 @@ _Should parse diskutil on macs and lsblk on linux for more accuracy._
 Find the path to smartctl or quit.
 
     my $smart_cmd = get_smart_cmd();
+
+## **get\_smart\_cmd\_version()**
+
+Find the version of smartctl or return undef.
+
+    my $smart_cmd_version = get_smart_cmd_version();
 
 ## **get\_raid\_cmd()**
 

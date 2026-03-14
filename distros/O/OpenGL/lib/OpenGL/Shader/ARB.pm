@@ -8,7 +8,8 @@
 #
 ############################################################
 
-package OpenGL::Shader::ARB;
+package # hide from PAUSE
+  OpenGL::Shader::ARB;
 
 use strict;
 use warnings;
@@ -37,11 +38,11 @@ OpenGL::Shader::ARB - plug-in module for use with OpenGL::Shader
 
 =head1 DESCRIPTION
 
-This is a plug-in module for use with the OpenGL::Shader.
+This is a plug-in module for use with L<OpenGL::Shader>.
 While it may be called directly, it will more often be called
-by the OpenGL::Shader abstraction module.
+by the abstraction module.
 
-This is a subclass of the OpenGL::Shader::Common module.
+This is a subclass of the L<OpenGL::Shader::Common> module.
 
 =head1 AUTHOR
 
@@ -62,46 +63,20 @@ sub TypeVersion {
   return $SHADER_VER;
 }
 
-
 # Get Description
 sub TypeDescription {
   return $DESCRIPTION;
 }
 
-
-# Shader constructor
-sub new {
-  my $this = shift;
-  my $class = ref($this) || $this;
-
-  # Check for required OpenGL extensions
-  my $ver = TypeVersion();
-  return undef if (!$ver);
-
-  my $self = OpenGL::Shader::Objects->new('ARB');
-  return undef if (!$self);
-  bless($self,$class);
-
-  $self->{version} = $ver;
-  $self->{description} = TypeDescription();
-
-  $self->{fragment_const} = GL_FRAGMENT_PROGRAM_ARB;
-  $self->{vertex_const} = GL_VERTEX_PROGRAM_ARB;
-
-  ($self->{fragment_id},$self->{vertex_id}) = glGenProgramsARB_p(2);
-  return undef if (!$self->{fragment_id} || !$self->{vertex_id});
-
-  return $self;
-}
-
+sub GetFragmentConstant { GL_FRAGMENT_PROGRAM_ARB }
+sub GetVertexConstant { GL_VERTEX_PROGRAM_ARB }
 
 # Shader destructor
 # Must be disabled first
 sub DESTROY
 {
   my($self) = @_;
-  glDeleteProgramsARB_p($self->{fragment_id}) if ($self->{fragment_id});
-  glDeleteProgramsARB_p($self->{vertex_id}) if ($self->{vertex_id});
+  glDeleteProgramsARB_p($_) for grep $_, @$self{qw(fragment_id vertex_id)}
 }
 
 
@@ -109,17 +84,15 @@ sub DESTROY
 sub Load
 {
   my($self,$fragment,$vertex) = @_;
-
-  glBindProgramARB($self->{fragment_const}, $self->{fragment_id});
-  glProgramStringARB_p($self->{fragment_const}, $fragment);
-  $self->{fragment_code} = $fragment;
-  $self->{frag_vars} = {};
-
-  glBindProgramARB($self->{vertex_const}, $self->{vertex_id});
-  glProgramStringARB_p($self->{vertex_const}, $vertex);
-  $self->{vertex_code} = $vertex;
-  $self->{vert_vars} = {};
-
+  return "Failed glGenProgramsARB" if grep !$_,
+    @$self{qw(fragment_id vertex_id)} = glGenProgramsARB_p(2);
+  for ([fragment => $fragment], [vertex => $vertex]) {
+    my ($p, $code) = @$_;
+    my ($method, $id, $codemem, $varsmem) = ("Get".ucfirst($p)."Constant", $p."_id", $p."_code", substr($p,0,4)."_vars");
+    glBindProgramARB($self->$method, $self->{$id});
+    glProgramStringARB_p($self->$method, $code);
+    @$self{$codemem, $varsmem} = ($code, {});
+  }
   return '';
 }
 
@@ -129,8 +102,8 @@ sub Enable
 {
   my($self) = @_;
 
-  glEnable($self->{fragment_const});
-  glEnable($self->{vertex_const});
+  glEnable($self->GetFragmentConstant);
+  glEnable($self->GetVertexConstant);
 }
 
 
@@ -139,8 +112,8 @@ sub Disable
 {
   my($self) = @_;
 
-  glDisable($self->{fragment_const});
-  glDisable($self->{vertex_const});
+  glDisable($self->GetFragmentConstant);
+  glDisable($self->GetVertexConstant);
 }
 
 
@@ -195,14 +168,14 @@ sub SetVector
   my $id = $self->Map($var,2);
   if (defined($id))
   {
-    glProgramLocalParameter4fARB($self->{vertex_const},$id,@values);
+    glProgramLocalParameter4fARB($self->GetVertexConstant,$id,@values);
     return '';
   }
 
   $id = $self->Map($var,1);
   return 'Unable to map $var' if (!defined($id));
 
-  glProgramLocalParameter4fARB($self->{fragment_const},$id,@values);
+  glProgramLocalParameter4fARB($self->GetFragmentConstant,$id,@values);
   return '';
 }
 
@@ -216,14 +189,14 @@ sub SetMatrix
   my $id = $self->Map($var,2);
   if (defined($id))
   {
-    $self->set_matrix($self->{vertex_const},$id,$oga);
+    $self->set_matrix($self->GetVertexConstant,$id,$oga);
     return '';
   }
 
   $id = $self->Map($var,1);
   return 'Unable to map $var' if (!defined($id));
 
-  $self->set_matrix($self->{fragment_const},$id,$oga);
+  $self->set_matrix($self->GetFragmentConstant,$id,$oga);
   return '';
 }
 

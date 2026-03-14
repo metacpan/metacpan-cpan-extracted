@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Global.pm
-## Version v1.1.0
+## Version v1.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/05/06
-## Modified 2026/01/31
+## Modified 2026/03/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -201,7 +201,7 @@ BEGIN
     our @EXPORT_OK = qw( CAN_THREADS HAS_THREADS IN_THREAD MOD_PERL MPM HAS_MPM_THREADS );
     our %EXPORT_TAGS = ( 'const' => [@EXPORT_OK] );
     our $DEFAULT_SERIALISER = 'Storable::Improved';
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -1636,6 +1636,15 @@ sub _unlock
 # NOTE: END
 END
 {
+    # On threaded Perls, clearing shared hashes while other threads may still be running
+    # or in their own destruction phase causes a SEGV in threads::shared. We therefore
+    # skip the cleanup when threads are active, and let Perl's own global destruction
+    # handle the memory.
+    if( _NEED_SHARED && $INC{'threads.pm'} )
+    {
+        my @running = grep { $_->is_running } threads->list;
+        return if( @running );
+    }
     %$REPO      = ();
     %$ERRORS    = ();
     %$LOCKS     = ();
@@ -2100,7 +2109,7 @@ Module::Generic::Global - Contextual global storage by namespace, class or objec
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 DESCRIPTION
 
@@ -2383,6 +2392,8 @@ It takes an L<Apache2::RequestRec> as its sole argument.
     Module::Generic::Global->clear_error;
 
 This clear the error for the current object, and the latest recorded error stored as a global variable.
+
+=for Pod::Coverage cleanup
 
 =for Pod::Coverage debug
 

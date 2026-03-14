@@ -1,5 +1,5 @@
 package Signal::Pending;
-$Signal::Pending::VERSION = '0.008';
+$Signal::Pending::VERSION = '0.009';
 use strict;
 use warnings FATAL => 'all';
 
@@ -10,7 +10,10 @@ use Carp qw/croak/;
 
 my $sig_max = $Config{sig_count} - 1;
 
-tie %Signal::Pending, __PACKAGE__;
+{
+  no warnings 'once';
+  tie %Signal::Pending, __PACKAGE__;
+}
 
 sub TIEHASH {
 	my $class = shift;
@@ -96,7 +99,7 @@ Signal::Pending - Signal pending status made easy
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

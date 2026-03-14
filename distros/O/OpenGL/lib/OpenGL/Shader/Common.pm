@@ -8,11 +8,13 @@
 #
 ############################################################
 
-package OpenGL::Shader::Common;
+package # hide from PAUSE
+  OpenGL::Shader::Common;
 
 use strict;
 use warnings;
 use Carp;
+use OpenGL(':all');
 
 our $VERSION = '1.02';
 
@@ -29,63 +31,7 @@ OpenGL::Shader::Common - base class for use with OpenGL::Shader
 =head1 DESCRIPTION
 
 This module provides a base class for OpenGL shader types.
-Example usage:
-
-  use OpenGL::Shader;
-  my $shdr = OpenGL::Shader->new();
-
-  ##########
-  # Methods defined in this module:
-
-  # Get shader type.
-  my $type = $shdr->GetType();
-
-  # Get shader version
-  my $ver = $shdr->GetVersion();
-
-  # Get shader description
-  my $desc = $shdr->GetDescription();
-
-  # Load shader files.
-  my $stat = $shdr->LoadFiles($fragment_file,$vertex_file);
-
-  # Get shader GL constants.
-  my $fragment_const = $shdr->GetFragmentConstant();
-  my $vertex_const = $shdr->GetVertexConstant();
-
-  # Get objects.
-  my $fragment_shader = $shdr->GetFragmentShader();
-  my $vertex_shader = $shdr->GetVertexShader();
-  my $program = $shdr->GetProgram();
-
-
-  ##########
-  # Methods defined in subclasses:
-
-  # Load shader text.
-  $shdr->Load($fragment,$vertex);
-
-  # Enable shader.
-  $shdr->Enable();
-
-  # Set Vertex Attribute
-  my $attr_id = $self->MapAttr($attr_name);
-  glVertexAttrib4fARB($attr_id,$x,$y,$z,$w);
-
-  # Get Global Variable ID (uniform/env)
-  my $var_id = $self->Map($var_name);
-
-  # Set float4 vector variable
-  $stat = $self->SetVector($var_name,$x,$y,$z,$w);
-
-  # Set float4x4 matrix via OGA
-  $stat = $self->SetMatrix($var_name,$oga);
-
-  # Disable shader.
-  $shdr->Disable();
-
-  # Destructor.
-  $shdr->DESTROY();
+See L<OpenGL::Shader> documentation.
 
 =head1 AUTHOR
 
@@ -99,16 +45,33 @@ modify it under the same terms as Perl itself.
 
 
 # Base constructor
-sub new
-{
+sub new {
+  # Check for required OpenGL extensions
+  return undef if OpenGL::glpCheckExtension('GL_ARB_shader_objects');
+  return undef if OpenGL::glpCheckExtension('GL_ARB_fragment_shader');
+  return undef if OpenGL::glpCheckExtension('GL_ARB_vertex_shader');
   my $this = shift;
   my $class = ref($this) || $this;
-  my($type) = @_;
+  my $type = (split /::/, $class)[-1];
   my $self = bless {}, $class;
-  $self->{type} = uc($type) if defined $type;
+  return undef unless $self->{version} = $self->TypeVersion;
+  $self->{type} = uc($type);
+  $self->{description} = $self->TypeDescription;
   $self;
 }
 
+# Shader destructor
+# Must be disabled first
+sub DESTROY {
+  my($self) = @_;
+  if ($self->{program}) {
+    glDetachObjectARB($self->{program},$self->{fragment_id}) if ($self->{fragment_id});
+    glDetachObjectARB($self->{program},$self->{vertex_id}) if ($self->{vertex_id});
+    glDeleteProgramsARB_p($self->{program});
+  }
+  glDeleteProgramsARB_p($self->{fragment_id}) if ($self->{fragment_id});
+  glDeleteProgramsARB_p($self->{vertex_id}) if ($self->{vertex_id});
+}
 
 # Get shader type
 sub GetType
@@ -131,22 +94,6 @@ sub GetDescription
 {
   my($self) = @_;
   return $self->{description};
-}
-
-
-# Get fragment shader constant
-sub GetFragmentConstant
-{
-  my($self) = @_;
-  return $self->{fragment_const};
-}
-
-
-# Get vertex shader constant
-sub GetVertexConstant
-{
-  my($self) = @_;
-  return $self->{vertex_const};
 }
 
 
@@ -173,6 +120,113 @@ sub GetProgram
   return $self->{program};
 }
 
+# Load shader strings
+sub _compile_shader {
+  my ($id, $src, $label) = @_;
+  glShaderSourceARB_p($id, $src);
+  glCompileShaderARB($id);
+  return '' if glGetObjectParameterivARB_p($id, GL_OBJECT_COMPILE_STATUS_ARB) == GL_TRUE;
+  my $stat = glGetInfoLogARB_p($id);
+  return "$label shader: $stat" if $stat;
+  '';
+}
+sub Load {
+  my ($self,$fragment,$vertex) = @_;
+  # Load fragment code
+  if ($fragment) {
+    $self->{fragment_id} = glCreateShaderObjectARB($self->GetFragmentConstant);
+    return undef if !$self->{fragment_id};
+    my $stat = _compile_shader($self->{fragment_id}, $fragment, 'Fragment');
+    return $stat if $stat;
+  }
+  # Load vertex code
+  if ($vertex) {
+    $self->{vertex_id} = glCreateShaderObjectARB($self->GetVertexConstant);
+    return undef if !$self->{vertex_id};
+    my $stat = _compile_shader($self->{vertex_id}, $vertex, 'Vertex');
+    return $stat if $stat;
+  }
+  # Link shaders
+  my $sp = glCreateProgramObjectARB();
+  glAttachObjectARB($sp, $self->{fragment_id}) if $fragment;
+  glAttachObjectARB($sp, $self->{vertex_id}) if $vertex;
+  glLinkProgramARB($sp);
+  my $linked = glGetObjectParameterivARB_p($sp, GL_OBJECT_LINK_STATUS_ARB);
+  if (!$linked) {
+    my $stat = glGetInfoLogARB_p($sp);
+    return "Link shader: $stat" if ($stat);
+    return 'Unable to link shader';
+  }
+  $self->{program} = $sp;
+  return '';
+}
+
+# Enable shader
+sub Enable {
+  my($self) = @_;
+  glUseProgramObjectARB($self->{program}) if ($self->{program});
+}
+
+
+# Disable shader
+sub Disable {
+  my($self) = @_;
+  glUseProgramObjectARB(0) if ($self->{program});
+}
+
+
+# Return shader vertex attribute ID
+sub MapAttr {
+  my($self,$attr) = @_;
+  return undef if (!$self->{program});
+  my $id = glGetAttribLocationARB_p($self->{program},$attr);
+  return undef if ($id < 0);
+  return $id;
+}
+
+# Return shader uniform variable ID
+sub Map {
+  my($self,$var) = @_;
+  return undef if (!$self->{program});
+  my $id = glGetUniformLocationARB_p($self->{program},$var);
+  return undef if ($id < 0);
+  return $id;
+}
+
+# Set shader Uniform integer array
+sub SetArray {
+  my($self,$var,@values) = @_;
+  my $id = $self->Map($var);
+  return 'Unable to map $var' if (!defined($id));
+  my $count = scalar(@values);
+  eval('glUniform'.$count.'iARB($id,@values)');
+  return '';
+}
+
+# Set shader Uniform float array
+sub SetVector {
+  my($self,$var,@values) = @_;
+  my $id = $self->Map($var);
+  return 'Unable to map $var' if (!defined($id));
+  my $count = scalar(@values);
+  eval('glUniform'.$count.'fARB($id,@values)');
+  return '';
+}
+
+# Set shader matrix
+sub SetMatrix {
+  my($self,$var,$oga) = @_;
+  my $id = $self->Map($var);
+  return 'Unable to map $var' if (!defined($id));
+  if ($oga->elements == 16) {
+    glUniformMatrix4fvARB_c($id,1,0,$oga->ptr());
+  } elsif ($oga->elements == 9) {
+    glUniformMatrix3fvARB_c($id,1,0,$oga->ptr());
+  } else {
+    return 'Only supports 3x3 and 4x4 matrices';
+  }
+  return '';
+}
 
 # Load shader files
 sub LoadFiles
@@ -209,5 +263,3 @@ sub read_file
 
 
 1;
-__END__
-

@@ -5,7 +5,7 @@ use 5.020;
 use warnings;
 use experimental qw(postderef postderef_qq);
 
-package App::Cmd 0.339;
+package App::Cmd 0.340;
 
 use parent 'App::Cmd::ArgProcessor';
 # ABSTRACT: write command line apps with less suffering
@@ -751,7 +751,7 @@ App::Cmd - write command line apps with less suffering
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 SYNOPSIS
 

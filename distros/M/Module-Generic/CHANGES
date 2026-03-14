@@ -1,5 +1,17 @@
 Revision history for Perl module Module::Generic
 
+v1.2.4 2026-03-14T08:53:46+0900
+    - Fixed SEGV on exit in threaded Perl by protecting Module::Generic::Global END block
+      and Module::Generic DESTROY against use-after-free on shared data
+    - Fixed pack() format in Module::Generic::File::IO::locked() to use 32-bit integers
+      on 32-bit systems (e.g. NetBSD i386), replacing non-portable 'q'
+    - Fixed concurrent file locking test in t/10.file.t to pass a timeout so threads wait
+      for the lock instead of failing immediately
+    - Fixed t/32.file_magic.t to resolve symlinks on /bin/ls before MIME detection
+    - Added skip in t/31.global.t for Perl compiled with USE_LONG_DOUBLE + useithreads
+      where shared data structures cause unavoidable crashes
+    - Improved documentation for Module::Generic::File::Magic
+
 v1.2.3 2026-03-12T23:40:42+0900
     - Release v1.2.3 with minor documentation correction
 

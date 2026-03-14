@@ -1,5 +1,17 @@
 # typemap file
 TYPEMAP
-int16_t    T_IV
-int32_t    T_IV
+int16_t    T_I16
+int32_t    T_I32
 int64_t    T_IV
+
+INPUT
+T_I16
+	{ IV _tmp = SvIV($arg); if (_tmp < -32768 || _tmp > 32767) croak_i16(_tmp); $var = (int16_t)_tmp; }
+T_I32
+	{ IV _tmp = SvIV($arg); if ((IV)_tmp < (IV)(-2147483647-1) || _tmp > 2147483647) croak_i32(_tmp); $var = (int32_t)_tmp; }
+
+OUTPUT
+T_I16
+	sv_setiv($arg, (IV)$var);
+T_I32
+	sv_setiv($arg, (IV)$var);

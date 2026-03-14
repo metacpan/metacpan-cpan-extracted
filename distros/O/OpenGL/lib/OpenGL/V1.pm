@@ -1,4 +1,5 @@
-package OpenGL::V1;
+package # hide from PAUSE
+  OpenGL::V1;
 
 =head1 NAME
 

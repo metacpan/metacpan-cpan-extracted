@@ -499,7 +499,7 @@ my $tests =
 
 foreach my $type ( sort( keys( %$tests ) ) )
 {
-    if( $type eq 'japan' && !$o->_load_class( 'DateTime::Format::JP' ) )
+    if( $type eq 'japan' && !$o->_load_class( 'DateTime::Format::JP', { no_warning => 1 } ) )
     {
         diag( "Skipping tests for \"${type}\", because module DateTime::Format::JP is not installed." );
         next;

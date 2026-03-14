@@ -3,31 +3,29 @@ abstract: 'Export the current directory over HTTP'
 author:
   - 'Pedro Melo <melo@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-HTTPThis
-recommends:
-  Net::Rendezvous::Publish: '0.04'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Config::Tiny: '0'
   Getopt::Long: '0'
-  Plack::App::DirectoryIndex: '0'
+  Plack::App::DirectoryIndex: v0.2.2
   Plack::Runner: '0'
   Pod::Usage: '0'
-resources:
-  bugtracker: https://github.com/davorg/app-httpthis/issues
-  repository: https://github.com/davorg/app-httpthis.git
-version: '0.010'
-x_generated_by_perl: v5.40.3
-x_serialization_backend: 'YAML::Tiny version 1.74'
-x_spdx_expression: Artistic-2.0
+version: v0.11.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

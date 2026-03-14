@@ -25,7 +25,7 @@ use Term::ANSIColor;
 use Data::Printer;
 
 Readonly my $PROGRAM => 'smart_run_tests.pl';
-Readonly my $VERSION => version->declare("v3.3.26");
+Readonly my $VERSION => version->declare("v3.4.0");
 
 ########################################
 #      Define Global Variables         #

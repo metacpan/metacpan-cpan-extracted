@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use File::Spec::Functions;
 use OpenGL ':all';
+use OpenGL::Modern qw(:glewfunctions GLEW_OK glpSetAutoCheckErrors);
 
 # Get an OpenGL context
 glutInit();
@@ -10,6 +11,7 @@ glutInitDisplayMode(GLUT_RGBA);
 glutInitWindowSize(1,1);
 my $Window_ID = glutCreateWindow( "OpenGL::Shader test" );
 glutHideWindow();
+glpSetAutoCheckErrors(1);
 
 require OpenGL::Shader;
 
@@ -17,27 +19,18 @@ my $types = OpenGL::Shader::GetTypes();
 plan skip_all => "Your installation has no available shader support"
   if !keys %$types;
 
-#3 Get Shader Types
-my $hasARB = 0;
-my $hasGLSL = 0;
-my $hasCG = 0;
+my %known = map +($_=>1), qw(ARB GLSL CG);
 
 my $good = 0;
 foreach my $type (sort keys(%$types))
 {
-  if ($type eq 'ARB') {
-    $hasARB = 1;
-  } elsif ($type eq 'GLSL') {
-    $hasGLSL = 1;
-  } elsif ($type eq 'CG') {
-    $hasCG = 1;
-  } else {
+  if (!$known{$type}) {
     fail '  Unknown shader type - '.$type.': '.$types->{$type}->{version};
     delete($types->{$type});
     next;
   }
-  pass '  '.$type.' v'.$types->{$type}{version}.' - '.
-    $types->{$type}{description};
+  my $desc = $types->{$type};
+  pass "$type v$desc->{version} - $desc->{description}";
   $good++;
 }
 die "No known shader types available" if !$good;
@@ -54,7 +47,7 @@ sub test_shader {
   return if !OpenGL::Shader::HasType($test);
   my $shdr = OpenGL::Shader->new($test);
   die "Unable to instantiate $uctype shader" if !$shdr;
-  my $stat = $shdr->LoadFiles(map catfile("t", $_), "fragment.$lctype","vertex.$lctype");
+  my $stat = $shdr->LoadFiles(map catfile("t", "$_.$lctype"), qw(fragment vertex));
   if ($stat) {
     fail "Unable to load $uctype shader: $stat";
     return;

@@ -4,9 +4,9 @@ This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
-		       The Artistic License 2.0
+                       The Artistic License 2.0
 
-	    Copyright (c) 2000-2006, The Perl Foundation.
+            Copyright (c) 2000-2006, The Perl Foundation.
 
      Everyone is permitted to copy and distribute verbatim copies
       of this license document, but changing it is not allowed.
@@ -69,7 +69,6 @@ Definitions
     or any other form resulting from mechanical transformation or
     translation of the Source form.
 
-
 Permission for Use and Modification Without Distribution
 
 (1)  You are permitted to use the Standard Version and create and use
@@ -114,16 +113,16 @@ you do at least ONE of the following:
     (c)  allow anyone who receives a copy of the Modified Version to
     make the Source form of the Modified Version available to others
     under
-		
-	(i)  the Original License or
+                 
+        (i)  the Original License or
 
-	(ii)  a license that permits the licensee to freely copy,
-	modify and redistribute the Modified Version using the same
-	licensing terms that apply to the copy that the licensee
-	received, and requires that the Source form of the Modified
-	Version, and of any works derived from it, be made freely
-	available in that license fees are prohibited but Distributor
-	Fees are allowed.
+        (ii)  a license that permits the licensee to freely copy,
+        modify and redistribute the Modified Version using the same
+        licensing terms that apply to the copy that the licensee
+        received, and requires that the Source form of the Modified
+        Version, and of any works derived from it, be made freely
+        available in that license fees are prohibited but Distributor
+        Fees are allowed.
 
 
 Distribution of Compiled Forms of the Standard Version 
@@ -197,6 +196,7 @@ infringement, then this Artistic License to you shall terminate on the
 date that such litigation is filed.
 
 (14)  Disclaimer of Warranty:
+
 THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS
 IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
 WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR

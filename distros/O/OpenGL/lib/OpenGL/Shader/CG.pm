@@ -8,7 +8,8 @@
 #
 ############################################################
 
-package OpenGL::Shader::CG;
+package # hide from PAUSE
+  OpenGL::Shader::CG;
 
 use Carp;
 
@@ -20,8 +21,8 @@ our $SHADER_VER = '1.0';
 our $DESCRIPTION = qq
 {nVidia's Cg Shader Language};
 
-use OpenGL::Shader::Objects;
-our @ISA = qw(OpenGL::Shader::Objects);
+use OpenGL::Shader::Common;
+our @ISA = qw(OpenGL::Shader::Common);
 
 use OpenGL(':all');
 
@@ -39,11 +40,11 @@ OpenGL::Shader::CG - plug-in module for use with OpenGL::Shader
 
 =head1 DESCRIPTION
 
-This is a plug-in module for use with the OpenGL::Shader.
+This is a plug-in module for use with L<OpenGL::Shader>.
 While it may be called directly, it will more often be called
-by the OpenGL::Shader abstraction module.
+by the abstraction module.
 
-This is a subclass of the OpenGL::Shader::Objects module.
+This is a subclass of the L<OpenGL::Shader::Common> module.
 
 =head1 AUTHOR
 
@@ -61,17 +62,14 @@ sub TypeVersion
   if (!defined($SHADER_VER))
   {
     return undef if (OpenGL::glpCheckExtension('GL_EXT_Cg_shader'));
-
     # Get GL_SHADING_LANGUAGE_VERSION_ARB
     my $ver = glGetString(0x8B8C);
     $ver =~ m|Cg ([\d\.]+)|i;
-
     # Some drivers do not report Cg version
     $SHADER_VER = $1 || '1.00';
   }
   return $SHADER_VER;
 }
-
 
 # Get Description
 sub TypeDescription
@@ -79,28 +77,7 @@ sub TypeDescription
   return $DESCRIPTION;
 }
 
-
-# Shader constructor
-sub new
-{
-  my $this = shift;
-  my $class = ref($this) || $this;
-
-  # Check for additional required OpenGL extensions
-  my $ver = TypeVersion();
-  return undef if (!$ver);
-
-  my $self = OpenGL::Shader::Objects->new('CG');
-  return undef if (!$self);
-  bless($self,$class);
-
-  $self->{version} = $ver;
-  $self->{description} = $DESCRIPTION;
-
-  $self->{fragment_const} = GL_CG_FRAGMENT_SHADER_EXT;
-  $self->{vertex_const} = GL_CG_VERTEX_SHADER_EXT;
-
-  return $self;
-}
+sub GetFragmentConstant { GL_CG_FRAGMENT_SHADER_EXT }
+sub GetVertexConstant { GL_CG_VERTEX_SHADER_EXT }
 
 1;

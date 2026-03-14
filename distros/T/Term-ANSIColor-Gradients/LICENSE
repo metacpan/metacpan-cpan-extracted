@@ -1,0 +1,15 @@
+This software is copyright (c) 2024 by Nadim Khemir <nadim.khemir@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+Terms of the Perl programming language system itself:
+
+a) the GNU General Public License as published by the Free Software
+   Foundation; either version 3, or (at your option) any later version, or
+
+b) the "Artistic License" version 2.0.
+
+The full text of both licenses is available on CPAN:
+  https://www.perlfoundation.org/artistic_license_2_0
+  https://www.gnu.org/licenses/gpl-3.0.html

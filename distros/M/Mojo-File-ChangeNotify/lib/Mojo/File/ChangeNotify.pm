@@ -1,9 +1,13 @@
-package Mojo::File::ChangeNotify 0.02;
+package Mojo::File::ChangeNotify 0.03;
 use 5.020;
+use lib '../Filesys-Notify-Win32-ReadDirectoryChanges/lib';
 use Mojo::Base 'Mojo::EventEmitter', -signatures;
 use Mojo::File::ChangeNotify::WatcherProcess 'watch';
 use Mojo::IOLoop::Subprocess;
 use Scalar::Util 'weaken';
+use PerlX::Maybe;
+
+our $is_win32 = $^O =~ /mswin32/i;
 
 =head1 NAME
 
@@ -47,7 +51,7 @@ has 'watcher_pid';  # Store the PID so we can access it in DESTROY
 
 our %PIDs;
 
-sub _spawn_watcher( $self, $args ) {
+sub _spawn_watcher_subprocess( $self, $args ) {
     my $subprocess = Mojo::IOLoop::Subprocess->new();
 
     {
@@ -78,6 +82,45 @@ sub _spawn_watcher( $self, $args ) {
     });
 }
 
+our %action_map = (
+    added    => 'create',
+    removed  => 'delete',
+    modified => 'modify',
+);
+
+sub _spawn_watcher_win32( $self, $args) {
+    require Filesys::Notify::Win32::ReadDirectoryChanges;
+    weaken $self;
+
+    # This spawns a thread
+    my $watcher = Filesys::Notify::Win32::ReadDirectoryChanges->new(
+        maybe directories => $args->{directories},
+              subtree => 1,
+    );
+
+    # ... and we poll its queue frequently
+    my $poll;
+    $poll = Mojo::IOLoop->recurring( 0.1, sub($loop) {
+        if(    ! $self
+            || !defined $watcher->queue->pending ) {
+            $watcher->stop;
+            $loop->remove( $poll );
+            return;
+        };
+        my @events = map {
+            my $action = $action_map{ $_->{action} } // $_->{action};
+            +{ type => $action, path => $_->{path}}
+        } grep {
+            defined $_
+        } $self->watcher->queue->dequeue_nb(32);
+        if( @events ) {
+            $self->emit(change => \@events);
+        }
+    });
+
+    return $watcher
+}
+
 sub instantiate_watcher( $class, %args ) {
     my $handler = delete $args{ on_change };
     my $self = $class->new();
@@ -85,10 +128,12 @@ sub instantiate_watcher( $class, %args ) {
         $self->on( 'change' => $handler );
     }
 
-    $self->watcher( $self->_spawn_watcher( \%args ));
+    if( $is_win32 ) {
+        $self->watcher( $self->_spawn_watcher_win32( \%args ));
 
-    # Use weaken to avoid circular reference that prevents DESTROY
-
+    } else {
+        $self->watcher( $self->_spawn_watcher_subprocess( \%args ));
+    }
 
     return $self;
 }
@@ -99,6 +144,10 @@ sub DESTROY( $self ) {
     if( $pid ) {
         delete $PIDs{ $pid };
         kill KILL => $pid;
+        waitpid($pid,0); # gobble up the child exit code
+    }
+    if( $is_win32 and my $w = $self->watcher ) {
+        $w->stop;
     }
 }
 

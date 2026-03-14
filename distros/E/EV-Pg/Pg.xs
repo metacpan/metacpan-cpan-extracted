@@ -45,6 +45,7 @@ struct ev_pg_s {
     SV *on_drain;
 
     int callback_depth;
+    int keep_alive;
 
     HV    *last_error_fields;
     HV    *last_result_meta;
@@ -161,7 +162,7 @@ static void update_idle_ref(ev_pg_t *self) {
     if (NULL == self->loop) return;
     want_unref = self->reading && !self->connecting
                  && self->pending_count == 0 && !self->copy_mode
-                 && !self->draining_single_row;
+                 && !self->draining_single_row && !self->keep_alive;
     if (want_unref && !self->rio_unref) {
         ev_unref(self->loop);
         self->rio_unref = 1;
@@ -1570,6 +1571,8 @@ CODE:
     check_flush(self);
 }
 
+#ifdef LIBPQ_HAS_SEND_PIPELINE_SYNC
+
 void
 send_flush_request(EV::Pg self)
 CODE:
@@ -1580,6 +1583,8 @@ CODE:
     }
     check_flush(self);
 }
+
+#endif
 
 int
 set_single_row_mode(EV::Pg self)
@@ -1837,6 +1842,19 @@ pending_count(EV::Pg self)
 CODE:
 {
     RETVAL = self->pending_count;
+}
+OUTPUT:
+    RETVAL
+
+int
+keep_alive(EV::Pg self, ...)
+CODE:
+{
+    if (items > 1) {
+        self->keep_alive = SvTRUE(ST(1)) ? 1 : 0;
+        update_idle_ref(self);
+    }
+    RETVAL = self->keep_alive;
 }
 OUTPUT:
     RETVAL

@@ -2,7 +2,7 @@
 Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 # VERSION
-Version v3.3.26
+Version v3.4.0
 
 # SYNOPSIS
 
@@ -25,6 +25,7 @@ This module provides the disk related functions.
     use Disk::SmartTools;
 
     my $smart_cmd = get_smart_cmd();
+    my $smart_cmd_version = get_smart_cmd_version();
     my @disks = os_disks();
     my @smart_disks = get_smart_disks(@disks);
     $smart_test_started = smart_test_for($disk);

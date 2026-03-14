@@ -13,6 +13,7 @@ OpenGL::Shader - abstraction for managing OpenGL shaders
   glutInitDisplayMode(GLUT_RGBA);
   glutInitWindowSize($w,$h);
   my $Window_ID = glutCreateWindow( "OpenGL::Shader test" );
+  my $shdr = OpenGL::Shader->new();
 
 =head1 DESCRIPTION
 
@@ -33,12 +34,21 @@ Example usage:
   # Get shader type and version
   my $type = $shdr->GetType();
   my $ver = $shdr->GetVersion();
+  my $desc = $shdr->GetDescription(); # Get shader description
 
-  # Load shader by strings
+  # Load, compile and link shader by strings. False means all OK
   my $stat = $shdr->Load($fragment,$vertex);
 
-  # Load shader by file
+  # or: Load, compile and link shader by files
   my $stat = $shdr->LoadFiles($fragment_file,$vertex_file);
+
+  # Get shader GL constants.
+  my $fragment_const = $shdr->GetFragmentConstant();
+  my $vertex_const = $shdr->GetVertexConstant();
+  # Get objects.
+  my $fragment_shader = $shdr->GetFragmentShader();
+  my $vertex_shader = $shdr->GetVertexShader();
+  my $program = $shdr->GetProgram();
 
   # Enable
   $shdr->Enable();

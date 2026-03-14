@@ -3,12 +3,16 @@ use warnings;
 use Test::More;
 use Data::HashMap::I16;
 use Data::HashMap::I16S;
+use Data::HashMap::I16A;
 use Data::HashMap::II;
 use Data::HashMap::SS;
 use Data::HashMap::SI;
 use Data::HashMap::I32;
+use Data::HashMap::I32A;
 use Data::HashMap::IS;
 use Data::HashMap::I32S;
+use Data::HashMap::IA;
+use Data::HashMap::SA;
 use Data::HashMap::SI16;
 use Data::HashMap::SI32;
 
@@ -358,6 +362,67 @@ use Data::HashMap::SI32;
     is(scalar @k, $cap, 'capacity stability: correct key count');
     is($k[0], $cap * 100 - $cap + 1, 'capacity stability: oldest surviving key');
     is($k[-1], $cap * 100, 'capacity stability: newest key');
+}
+
+# ---- IA variant LRU (SV* values: refcount correctness during eviction) ----
+
+{
+    my $m = Data::HashMap::IA->new(3);
+    my @refs = (\1, \2, \3);
+    hm_ia_put $m, $_, $refs[$_ - 1] for 1..3;
+    is(hm_ia_size $m, 3, 'IA LRU: at capacity');
+
+    hm_ia_put $m, 4, \4;
+    is(hm_ia_size $m, 3, 'IA LRU: stays at capacity');
+    ok(!defined(hm_ia_get $m, 1), 'IA LRU: oldest evicted');
+    is(${hm_ia_get $m, 4}, 4, 'IA LRU: newest present');
+
+    # get promotes
+    hm_ia_get $m, 2;
+    hm_ia_put $m, 5, \5;
+    ok(defined(hm_ia_get $m, 2), 'IA LRU: get promotes');
+    ok(!defined(hm_ia_get $m, 3), 'IA LRU: key 3 evicted');
+}
+
+# ---- SA variant LRU (SV* values with string keys) ----
+
+{
+    my $m = Data::HashMap::SA->new(3);
+    hm_sa_put $m, "a", [1];
+    hm_sa_put $m, "b", [2];
+    hm_sa_put $m, "c", [3];
+    is(hm_sa_size $m, 3, 'SA LRU: at capacity');
+
+    hm_sa_put $m, "d", [4];
+    is(hm_sa_size $m, 3, 'SA LRU: stays at capacity');
+    ok(!defined(hm_sa_get $m, "a"), 'SA LRU: oldest evicted');
+    is_deeply(hm_sa_get $m, "d", [4], 'SA LRU: newest present');
+}
+
+# ---- I32A variant LRU ----
+
+{
+    my $m = Data::HashMap::I32A->new(3);
+    hm_i32a_put $m, 1, {x => 1};
+    hm_i32a_put $m, 2, {x => 2};
+    hm_i32a_put $m, 3, {x => 3};
+    hm_i32a_put $m, 4, {x => 4};
+    is(hm_i32a_size $m, 3, 'I32A LRU: at capacity');
+    ok(!defined(hm_i32a_get $m, 1), 'I32A LRU: oldest evicted');
+    is_deeply(hm_i32a_get $m, 4, {x => 4}, 'I32A LRU: newest present');
+}
+
+# ---- I16A variant LRU ----
+
+{
+    my $m = Data::HashMap::I16A->new(3);
+    hm_i16a_put $m, 1, "str1";
+    hm_i16a_put $m, 2, "str2";
+    hm_i16a_put $m, 3, "str3";
+    hm_i16a_put $m, 4, "str4";
+    is(hm_i16a_size $m, 3, 'I16A LRU: at capacity');
+    ok(!defined(hm_i16a_get $m, 1), 'I16A LRU: oldest evicted');
+    is(hm_i16a_get $m, 4, "str4", 'I16A LRU: newest present');
 }
 
 done_testing;

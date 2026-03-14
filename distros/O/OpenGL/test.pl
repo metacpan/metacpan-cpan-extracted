@@ -4,10 +4,10 @@ use strict;
 our $PERL_VERSION = $^V;
 $PERL_VERSION =~ s|^v||;
 
+use OpenGL::Modern qw(glpSetAutoCheckErrors);
 use OpenGL qw/
   :glconstants
-  glpHasGLUT glpCheckExtension
-  glGetString glGetError
+  glGetString glGetError glpErrorString
   glGenTextures_p glBindTexture glTexParameteri glTexImage2D_c glTexEnvf
     glDeleteTextures_p
   glGenerateMipmapEXT
@@ -16,27 +16,27 @@ use OpenGL qw/
   glGenRenderbuffersEXT_p glBindRenderbufferEXT glRenderbufferStorageEXT
     glDeleteRenderbuffersEXT_p
   glFramebufferRenderbufferEXT
-  glGenBuffersARB_p glBindBufferARB glBufferDataARB_p glBufferSubDataARB_p
+  glGenBuffersARB_p glBindBufferARB
     glMapBufferARB_c glUnmapBufferARB glDeleteBuffersARB_p
-  glVertexPointer_p glNormalPointer_p glColorPointer_p glTexCoordPointer_p
   glEnableClientState glDisableClientState
   glEnable glDisable glBlendFunc glDepthFunc glShadeModel
     glMatrixMode glLoadIdentity glLightfv_p glColorMaterial
     glTranslatef glRotatef
     glColor3f glColor4f
     glPushMatrix glPopMatrix glPushAttrib glPopAttrib
-    glOrtho
+    glOrtho glFrustum
   glRasterPos2i glRasterPos2f
   glPixelZoom glReadPixels_c glDrawPixels_c
   glGetDoublev_c glGetIntegerv_c
   glClearColor glClearDepth glClear glViewport glDrawElements_c
 /;
+use OpenGL qw/
+  glpHasGLUT glpCheckExtension glpFullScreen glpRestoreScreen
+  glBufferDataARB_o glBufferSubDataARB_o
+  glVertexPointer_o glNormalPointer_o glColorPointer_o glTexCoordPointer_o
+/;
 use OpenGL::GLUT qw/
   :constants :functions
-/;
-use OpenGL::GLU qw/
-  gluBuild2DMipmaps_c gluErrorString
-  gluOrtho2D gluProject_p gluUnProject_p gluPerspective
 /;
 use OpenGL::Config;     # for build information
 
@@ -404,7 +404,7 @@ sub ourInitVertexBuffers
       glGenBuffersARB_p(9);
 
     $verts->bind($VertexObjID);
-    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $verts, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ARRAY_BUFFER_ARB, $verts, GL_STATIC_DRAW_ARB);
 
     if (DO_TESTS)
     {
@@ -416,34 +416,34 @@ sub ourInitVertexBuffers
       my $count = $verts->elements();
       print "  Vertex Buffer Size (elements): $count\n";
 
-      my $test = glGetBufferSubDataARB_p(GL_ARRAY_BUFFER_ARB,12,3,GL_FLOAT);
+      my $test = glGetBufferSubDataARB_o(GL_ARRAY_BUFFER_ARB,12,3,GL_FLOAT);
       my @test = $test->retrieve(0,3);
       my $ords = join('/',@test);
-      print "  glGetBufferSubDataARB_p: $ords\n";
+      print "  glGetBufferSubDataARB_o: $ords\n";
     }
 
     $norms->bind($NormalObjID);
-    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $norms, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ARRAY_BUFFER_ARB, $norms, GL_STATIC_DRAW_ARB);
 
     $colors->bind($ColorObjID);
-    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $colors, GL_DYNAMIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ARRAY_BUFFER_ARB, $colors, GL_DYNAMIC_DRAW_ARB);
     $rainbow->assign(0,@rainbow);
-    glBufferSubDataARB_p(GL_ARRAY_BUFFER_ARB, $rainbow_offset, $rainbow);
+    glBufferSubDataARB_o(GL_ARRAY_BUFFER_ARB, $rainbow_offset, $rainbow);
 
     $texcoords->bind($TexCoordObjID);
-    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $texcoords, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ARRAY_BUFFER_ARB, $texcoords, GL_STATIC_DRAW_ARB);
 
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $IndexObjID);
-    glBufferDataARB_p(GL_ELEMENT_ARRAY_BUFFER_ARB, $indices, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ELEMENT_ARRAY_BUFFER_ARB, $indices, GL_STATIC_DRAW_ARB);
 
     $fpsbox_coords->bind($FpsVertObjID);
-    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $fpsbox_coords, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ARRAY_BUFFER_ARB, $fpsbox_coords, GL_STATIC_DRAW_ARB);
     $fpsbox_norms->bind($FpsNormObjID);
-    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $fpsbox_norms, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ARRAY_BUFFER_ARB, $fpsbox_norms, GL_STATIC_DRAW_ARB);
     $fpsbox_colours->bind($FpsColourObjID);
-    glBufferDataARB_p(GL_ARRAY_BUFFER_ARB, $fpsbox_colours, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ARRAY_BUFFER_ARB, $fpsbox_colours, GL_STATIC_DRAW_ARB);
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $FpsIndObjID);
-    glBufferDataARB_p(GL_ELEMENT_ARRAY_BUFFER_ARB, $fpsbox_indices, GL_STATIC_DRAW_ARB);
+    glBufferDataARB_o(GL_ELEMENT_ARRAY_BUFFER_ARB, $fpsbox_indices, GL_STATIC_DRAW_ARB);
   } else {
     print "Using classic Vertex Buffers\n";
   }
@@ -582,19 +582,21 @@ sub ourBuildTextures
   }
   glBindTexture(GL_TEXTURE_2D, $TextureID_image);
 
-  # Use MipMap
-  print "Using Mipmap\n";
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    GL_NEAREST_MIPMAP_LINEAR);
-  # The GLU library helps us build MipMaps for our texture.
-  if (($gluerr = gluBuild2DMipmaps_c(GL_TEXTURE_2D, $Tex_Type,
-    $Tex_Width, $Tex_Height, $Tex_Format, $Tex_Size,
-    $Tex_Pixels->ptr())))
-  {
-    die sprintf "GLULib%s\n", gluErrorString($gluerr);
+  if ($hasFBO) {
+    # Use MipMap
+    print "Using Mipmap\n";
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+      GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      GL_NEAREST_MIPMAP_LINEAR);
+  } else {
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   }
+  glTexImage2D_c(GL_TEXTURE_2D, 0, $Tex_Type,
+    $Tex_Width, $Tex_Height,
+    0, $Tex_Format, $Tex_Size, $Tex_Pixels->ptr);
+  glGenerateMipmapEXT(GL_TEXTURE_2D) if $hasFBO;
 
   # Benchmarks for Image Loading
   if (DO_TESTS && $hasIM)
@@ -679,7 +681,7 @@ sub ourBuildTextures
 
     # Test status
     my $stat = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-    die "FBO Status error: " . gluErrorString(glGetError()) if !$stat;
+    die "FBO Status error: " . glpErrorString(glGetError()) if !$stat;
     die sprintf "FBO Status: %04X", $stat if $stat != GL_FRAMEBUFFER_COMPLETE_EXT;
   }
 
@@ -922,7 +924,7 @@ sub cbRenderScene
   } else {
     $colors->assign($rainbow_offset,@rainbow);
   }
-  glColorPointer_p(4, $colors);
+  glColorPointer_o(4, $colors);
 
   # Render cube
   glViewport(0, 0, $Window_Width, $Window_Height);
@@ -931,9 +933,9 @@ sub cbRenderScene
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-  glVertexPointer_p(3, $verts);
-  glNormalPointer_p($norms);
-  glTexCoordPointer_p(2, $texcoords);
+  glVertexPointer_o(3, $verts);
+  glNormalPointer_o($norms);
+  glTexCoordPointer_o(2, $texcoords);
   if ($hasVBO) {
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $IndexObjID);
   }
@@ -1007,9 +1009,9 @@ sub cbRenderScene
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_NORMAL_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
-  glVertexPointer_p(3, $fpsbox_coords);
-  glNormalPointer_p($fpsbox_norms);
-  glColorPointer_p(4, $fpsbox_colours);
+  glVertexPointer_o(3, $fpsbox_coords);
+  glNormalPointer_o($fpsbox_norms);
+  glColorPointer_o(4, $fpsbox_colours);
   if ($hasVBO) {
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, $FpsIndObjID);
   }
@@ -1065,7 +1067,7 @@ sub Capture
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
   glLoadIdentity();
-  eval { gluOrtho2D( 0, $w, 0, $h ); 1 } or $er++ or warn "Catched: $@";
+  eval { glOrtho( 0, $w, 0, $h, -1, 1 ); 1 } or $er++ or warn "Catched: $@";
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   glLoadIdentity();
@@ -1408,16 +1410,6 @@ sub cbMouseClick
   if ($state == GLUT_UP)
   {
     my ($model, $projection, $viewport) = dumpMatrices();
-    my @point = gluUnProject_p($x,$y,0,	# Cursor point
-      @$model,				# Model Matrix
-      @$projection,			# Projection Matrix
-      @$viewport);			# Viewport
-    print "Model point: $point[0], $point[1], $point[2]\n";
-#      @point = gluProject_p(@point,	# Model point
-#        @model,				# Model Matrix
-#        @projection,			# Projection Matrix
-#        @viewport);			# Viewport
-#      print "Window point: $point[0], $point[1], $point[2]\n";
     print "\n";
   }
 
@@ -1456,26 +1448,26 @@ sub GetKeyModifier
 # ------
 # Callback routine executed whenever our window is resized.  Lets us
 # request the newly appropriate perspective projection matrix for
-# our needs.  Try removing the gluPerspective() call to see what happens.
+# our needs.  Try removing the glFrustum() call to see what happens.
 
-sub cbResizeScene
-{
+use constant PI => 3.1415926535897932384626433832795;
+use constant FOVY => 45.0;
+use constant ANGLE => FOVY / 360 * PI;
+use constant TAN => sin(ANGLE)/cos(ANGLE);
+use constant { zNEAR => 0.1, zFAR => 100.0 };
+use constant fH => TAN * zNEAR;
+sub cbResizeScene {
   my($Width, $Height) = @_;
-
   # Let's not core dump, no matter what.
   $Height = 1 if ($Height == 0);
-
   glViewport(0, 0, $Width, $Height);
-
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45.0,$Width/$Height,0.1,100.0);
-
+  my $fW = fH * $Width/$Height;
+  glFrustum(-$fW, $fW, -fH(), fH, zNEAR, zFAR);
   glMatrixMode(GL_MODELVIEW);
-
   $Window_Width  = $Width;
   $Window_Height = $Height;
-
   $idleTime = $hasHires ? gettimeofday() : time();
 }
 
@@ -1560,6 +1552,7 @@ else
   glutInitWindowSize($Window_Width, $Window_Height);
   $Window_ID = glutCreateWindow( PROGRAM_TITLE );
 }
+glpSetAutoCheckErrors(1) if $^O ne 'MSWin32';
 
 # Get OpenGL Info
 print "\n";
@@ -1648,12 +1641,5 @@ glutMainLoop();
 print "Returned from glutMainLoop\n";
 
 print "Exiting in main thread\n";
-if ($^O ne 'MSWin32') {
-  my $errors = '';
-  while((my $err = glGetError()) != 0) {
-    $errors .= "glError: " . gluErrorString($err) . "\n";
-  }
-  die $errors if $errors;
-}
 
 __END__

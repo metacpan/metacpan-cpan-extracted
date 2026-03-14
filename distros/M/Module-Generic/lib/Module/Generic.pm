@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.2.3
+## Version v1.2.4
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/03/12
+## Modified 2026/03/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -100,7 +100,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.2.3';
+    our $VERSION     = 'v1.2.4';
 };
 
 use v5.26.1;
@@ -3272,6 +3272,7 @@ sub _load_class
     # Load the module with thread safety
     {
         my $has_version = ( CORE::exists( $opts->{version} ) && CORE::length( $opts->{version} // '' ) ) ? 1 : 0;
+        local $SIG{__WARN__} = sub{} if( $opts->{no_warning} );
         local $SIG{__DIE__} = sub{};
         local $@;
         my $pl = "package ${caller_class}; require $class;";
@@ -12759,6 +12760,9 @@ sub DESTROY
     CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
+    # If the Global repository has already been cleared by the END block, there is
+    # nothing to clean up. We just bail out to avoid use-after-free.
+    CORE::return if( !CORE::defined( $Module::Generic::Global::REPO ) );
 
     my $class   = CORE::ref( $self ) || $self;
     my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
@@ -12771,7 +12775,7 @@ sub DESTROY
     my $local_tz_repo = Module::Generic::Global->new( 'globals' => $class, key => 'has_local_tz' );
     $local_tz_repo->cleanup;
 
-    # We cannot cleanup here the 'loaded_classes7, because we need the class that is cached to build the key, and we do not have it at this very moment.
+    # We cannot cleanup here the 'loaded_classes', because we need the class that is cached to build the key, and we do not have it at this very moment.
 };
 
 # NOTE: Works with CBOR and Sereal <https://metacpan.org/pod/Sereal::Encoder#FREEZE/THAW-CALLBACK-MECHANISM>
@@ -13074,7 +13078,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.2.3
+    v1.2.4
 
 =head1 DESCRIPTION
 

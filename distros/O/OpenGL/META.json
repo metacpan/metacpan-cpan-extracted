@@ -3,7 +3,7 @@
    "author" : [
       "Chris Marshall <chm at cpan dot org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.72, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
@@ -27,7 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "OpenGL::Modern" : "0.0403",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -49,6 +55,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pogl"
    },
-   "version" : "0.7006",
+   "version" : "0.7007",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

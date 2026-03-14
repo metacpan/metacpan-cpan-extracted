@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.632';
+our $VERSION = '0.633';
 
 use 5.020;
 use Moo;
@@ -421,7 +421,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.632
+version 0.633
 
 =head1 DESCRIPTION
 

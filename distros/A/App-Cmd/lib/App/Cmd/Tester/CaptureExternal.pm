@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-package App::Cmd::Tester::CaptureExternal 0.339;
+package App::Cmd::Tester::CaptureExternal 0.340;
 
 use parent 'App::Cmd::Tester';
 use Capture::Tiny 0.13 qw/capture/;
@@ -81,7 +81,7 @@ App::Cmd::Tester::CaptureExternal - Extends App::Cmd::Tester to capture from ext
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 SYNOPSIS
 

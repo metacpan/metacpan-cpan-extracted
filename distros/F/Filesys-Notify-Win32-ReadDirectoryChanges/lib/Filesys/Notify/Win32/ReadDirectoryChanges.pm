@@ -2,8 +2,7 @@ package Filesys::Notify::Win32::ReadDirectoryChanges;
 use 5.020;
 
 use Moo 2;
-use feature 'signatures';
-no warnings 'experimental::signatures';
+use experimental "signatures";
 
 use File::Spec;
 use Win32::API;
@@ -12,7 +11,7 @@ use threads; # we launch a thread for each watched tree to keep the logic simple
 use Thread::Queue;
 use Encode 'decode';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our $is_cygwin = $^O eq 'cygwin';
 our $bufsize = 65520;
 
@@ -52,7 +51,8 @@ Creates a new watcher object.
 =cut
 
 sub BUILD($self, $args) {
-    if( my $dirs = delete $args->{directory}) {
+    if( my $dirs =    delete $args->{directories}
+                   // delete $args->{directory}) {
         $dirs = [$dirs] if ! ref $dirs;
         for my $d (@$dirs) {
             $self->watch_directory( path => $d );
@@ -197,9 +197,16 @@ sub _watcher($winpath,$orgpath,$hPath,$subtree,$queue) {
                     };
                 };
             };
-            $queue->enqueue($i);
+            if( defined $queue->pending ) {
+                # queue still open
+                $queue->enqueue($i);
+            } else {
+                # Queue closed, we're done here
+                last;
+            }
         };
     }
+    $queue->end();
 };
 
 sub build_watcher( $self, %options ) {
@@ -254,12 +261,28 @@ sub unwatch_directory( $self, %options ) {
     }
 }
 
-sub DESTROY($self) {
+=head2 C<< ->stop >>
+
+Stops the watcher, releasing all locked resources
+
+You might need to call this if you want to delete or rename one of the
+directories the watcher is watching.
+
+=cut
+
+sub stop( $self ) {
     if( my $w = $self->{watchers}) {
         for my $t (keys %$w) {
             $self->unwatch_directory( path => $t )
         }
     };
+    if( my $q = $self->queue ) {
+        $q->end;
+    }
+}
+
+sub DESTROY($self) {
+    $self->stop;
 }
 
 =head2 C<< ->wait $CB >>
@@ -276,7 +299,7 @@ Synchronously wait for file system events.
 
 sub wait( $self, $cb) {
     while( 1 ) {
-        my @events = $self->queue->dequeue;
+        my @events = $self->queue->dequeue();
         for (@events) {
             if( defined $_ ) {
                 $cb->($_);
@@ -382,6 +405,8 @@ L<File::ChangeNotify> - complex cross-platform directory watcher
 
 L<Win32::ChangeNotify> - Win32 directory watcher using the ChangeNotify API
 
+L<Mojo::File::ChangeNotify> - integration with L<Mojolicious>
+
 Currently, no additional information like that available through
 L<https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readdirectorychangesexw|ReadDirectoryChangesExW>
 is collected. But a wrapper/emulation could provide that information whenever
@@ -403,7 +428,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2022 by Max Maischein C<corion@cpan.org>.
+Copyright 2022-2026 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

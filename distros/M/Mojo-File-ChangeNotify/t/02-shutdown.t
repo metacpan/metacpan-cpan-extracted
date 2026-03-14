@@ -9,6 +9,12 @@ use File::Spec;
 use Mojo::Promise;
 use Scalar::Util 'weaken';
 
+if( $^O =~ /mswin/i ) {
+    SKIP: {
+        skip_all("The tests test a subprocess but Win32 uses threads")
+    }
+}
+
 # Helper to check if a PID is running (not a zombie)
 sub pid_is_running($pid) {
     my $timeout = time +2;
@@ -100,8 +106,8 @@ subtest "Test 1: Scope-based cleanup" => sub {
         };
     });
 
-    ok $status !~ /\btimeout\b/, "Child process $pid was killed when watcher went out of scope";
-    diag $status;
+    ok $status !~ /\btimeout\b/, "Child process $pid was killed when watcher went out of scope"
+        or diag $status;
 };
 
 subtest "Test 2: Explicit undef" => sub {
@@ -195,7 +201,7 @@ END_SCRIPT
     close $fh;
 
     # Run the script - it will die but END block should clean up
-    diag "Launching '$script' in '$tempdir'";
+    note "Launching '$script' in '$tempdir'";
     system($^X, $script, $tempdir);
     my $exit = $? >> 8;
     ok $exit != 0, "Script died as expected";

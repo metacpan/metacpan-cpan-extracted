@@ -156,6 +156,12 @@ after the break</pre>
 after the break</pre>
 </div>
 
+<div class="case" data-name="br within other tags at end" data-todo="Fix pending">
+  <div class="input"><span>abc</span><span> def<br></span><span>ghi</span></div>
+  <pre class="expected">abc def
+ghi</pre>
+</div>
+
 <div class="case" data-name="img with no alt">
   <div class="input"><img src="http://example.com/logo.png" /></div>
   <pre class="expected">![](http://example.com/logo.png)</pre>

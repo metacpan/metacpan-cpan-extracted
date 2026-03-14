@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
-use Pod::Abstract;
+use Pod::Abstract 0.26;
 use Pod::Find qw(pod_where);
 use Readonly;
 
@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(get sections);
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Get content for file or module.
 sub get {
@@ -80,9 +80,10 @@ sub _get_content {
 			} else {
 				next;
 			}
-		} elsif ($child->type eq 'for') {
-			my $body = $child->body;
-			if ($body =~ m/^comment\s*filename=([\w\-\.]+)\s*$/ms) {
+		} elsif ($child->type eq 'for' && $child->body eq 'comment') {
+			my ($node) = $child->tree->children;
+			my $body = $node->body;
+			if ($body =~ m/^filename=([\w\-\.]+)\s*$/ms) {
 				$example_filename = $1;
 			}
 		} else {
@@ -306,12 +307,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2025 Michal Josef Špaček
+© 2011-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

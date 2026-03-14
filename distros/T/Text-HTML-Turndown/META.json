@@ -69,7 +69,7 @@
          "web" : "https://github.com/Corion/Text-HTML-Turndown"
       }
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

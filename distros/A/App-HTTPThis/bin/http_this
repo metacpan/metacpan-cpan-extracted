@@ -12,17 +12,10 @@ use App::HTTPThis;
 
 App::HTTPThis->new->run;
 
+
 __END__
 
-=pod
-
-=head1 NAME
-
-http_this - export the current directory over HTTP
-
-=head1 VERSION
-
-version 0.010
+=encoding utf8
 
 =head1 SYNOPSIS
 
@@ -56,6 +49,7 @@ version 0.010
     ## Show the entire man page
     $ http_this --man
 
+
 =head1 DESCRIPTION
 
 The C<http_this> command exports the current directory via HTTP. You can
@@ -67,12 +61,12 @@ with C<Ctrl-C>.
 All the files and directories will be availble to a browser under the
 URL the script outputs.
 
-=encoding utf8
 
 =head1 ARGUMENTS
 
 The script accepts a single optional argument: the path of the directory
 to export.
+
 
 =head1 OPTIONS
 
@@ -90,7 +84,7 @@ Announces the server over Bonjour.
 
 This feature requires the L<Net::Rendezvous::Publish> module and the
 appropriate backend for your operating system, both available from
-L<CPAN|http://search.cpan.org/>. If one of them cannot be found, a
+L<MetaCPAN|https://metacpan.org/>. If one of them cannot be found, a
 warning message will be displayed.
 
 =item --autoindex
@@ -149,17 +143,3 @@ If set to a true value, the server will use a prettier cascading stylesheet
 for directory listings.
 
 =back
-
-=head1 AUTHOR
-
-Pedro Melo <melo@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2010 by Pedro Melo.
-
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
-
-=cut

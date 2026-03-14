@@ -1,0 +1,31 @@
+---
+abstract: 'A batteries included interactive Term::ReadLine REPL module'
+author:
+  - 'John R. <johnlradford23@gmail.com>'
+build_requires:
+  Module::Build: '0'
+  Test::Exception: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Term-ReadLine-Repl
+provides:
+  Term::ReadLine::Repl:
+    file: lib/Term/ReadLine/Repl.pm
+    version: v0.0.1
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  JSON: '0'
+  Term::ANSIColor: '0'
+  Term::ReadLine: '0'
+  perl: '5.010'
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

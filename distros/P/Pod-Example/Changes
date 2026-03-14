@@ -1,3 +1,7 @@
+0.16 2026-03-13T14:06:18+01:00
+ - Update copyright years.
+ - Update to Pod::Abstract@0.26, there is regression in =for parsing.
+
 0.15 2025-07-04T11:11:09+02:00
  - Fix MANIFEST file.
  - Update copyright years.

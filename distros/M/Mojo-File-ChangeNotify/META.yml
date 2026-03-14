@@ -10,6 +10,7 @@ build_requires:
   File::Temp: '0'
   Mojo::Promise: '0'
   Scalar::Util: '0'
+  Test2::IPC: '0'
   Test2::V0: '0'
   Test::More: '0'
   experimental: '0'
@@ -32,6 +33,7 @@ requires:
   Mojo::Base: '0'
   Mojo::EventEmitter: '0'
   Mojo::IOLoop::Subprocess: '0'
+  PerlX::Maybe: '0'
   Scalar::Util: '0'
   experimental: '0'
   feature: '0'
@@ -40,6 +42,6 @@ resources:
   bugtracker: https://github.com/Corion/Mojo-File-ChangeNotify/issues
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Mojo-File-ChangeNotify.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

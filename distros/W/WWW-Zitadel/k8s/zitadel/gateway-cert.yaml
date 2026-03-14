@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: default-gateway-cert
+  namespace: kube-system
+spec:
+  secretName: default-gateway-cert
+  issuerRef:
+    kind: ClusterIssuer
+    name: selfsigned-issuer
+  commonName: "*.avatar.conflict.industries"
+  dnsNames:
+    - "*.avatar.conflict.industries"
+    - "avatar.conflict.industries"

@@ -9,12 +9,13 @@ use Exporter qw(import);
 use IPC::Cmd qw[can_run run];
 use YAML::PP;
 
-our $VERSION = version->declare("v3.3.26");
+our $VERSION = version->declare("v3.4.0");
 
 our @EXPORT_OK = qw(
     get_disk_prefix
     os_disks
     get_smart_cmd
+    get_smart_cmd_version
     get_raid_cmd
     get_raid_flag
     get_softraidtool_cmd
@@ -70,6 +71,31 @@ sub get_smart_cmd {
         or croak "smartctl command not found.\n";
 
     return $cmd_path;
+}
+
+sub get_smart_cmd_version {
+    my $smart_cmd = get_smart_cmd();
+
+    my $version;
+    $smart_cmd .= ' --version';
+    if ($smart_cmd) {
+        my $buf;
+        if (
+              scalar run(
+                          command => $smart_cmd,
+                          verbose => 0,
+                          buffer  => \$buf,
+                          timeout => 10
+                        )
+           )
+        {
+            if ( $buf =~ m|^smartctl\s+(\d+\.\d+)| ) {
+                $version = $1;
+                return $version;
+            }
+        }
+    }
+    return;
 }
 
 sub get_raid_cmd {
@@ -287,7 +313,7 @@ Disk::SmartTools - Provide tools to work with disks via S.M.A.R.T.
 
 =head1 VERSION
 
-Version v3.3.26
+Version v3.4.0
 
 =head1 SYNOPSIS
 
@@ -305,6 +331,7 @@ Provides disk related functions.
     get_disk_prefix
     os_disks
     get_smart_cmd
+    get_smart_cmd_version
     get_raid_cmd
     get_raid_flag
     get_diskutil_cmd
@@ -334,6 +361,12 @@ I<Should parse diskutil on macs and lsblk on linux for more accuracy.>
 Find the path to smartctl or quit.
 
     my $smart_cmd = get_smart_cmd();
+
+=head2 B<get_smart_cmd_version()>
+
+Find the version of smartctl or return undef.
+
+    my $smart_cmd_version = get_smart_cmd_version();
 
 =head2 B<get_raid_cmd()>
 

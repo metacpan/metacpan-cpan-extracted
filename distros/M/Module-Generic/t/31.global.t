@@ -12,6 +12,11 @@ BEGIN
     use Test::More;
     use Module::Generic;
     use Scalar::Util qw( refaddr );
+    # USE_LONG_DOUBLE changes the internal ABI of perl; this is set for extreme tests under some cpan tests smokers.
+    if( $Config{uselongdouble} && $Config{useithreads} )
+    {
+        plan( skip_all => 'Known crash on Perl compiled with USE_LONG_DOUBLE + useithreads' );
+    }
     eval
     {
         require Module::Generic::Global;
@@ -22,7 +27,7 @@ BEGIN
         BAIL_OUT( "Unable to load $class: $@" );
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
-}
+};
 
 use strict;
 use warnings;

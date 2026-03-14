@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Data::OptList" => 0,
     "File::Basename" => 0,
     "Getopt::Long" => "2.39",
-    "Getopt::Long::Descriptive" => "0.116",
+    "Getopt::Long::Descriptive" => "0.117",
     "IO::TieCombine" => 0,
     "Module::Pluggable::Object" => 0,
     "Pod::Usage" => "1.61",
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "lib" => 0
   },
-  "VERSION" => "0.339",
+  "VERSION" => "0.340",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -64,7 +64,7 @@ my %FallbackPrereqs = (
   "File::Basename" => 0,
   "File::Spec" => 0,
   "Getopt::Long" => "2.39",
-  "Getopt::Long::Descriptive" => "0.116",
+  "Getopt::Long::Descriptive" => "0.117",
   "IO::TieCombine" => 0,
   "IPC::Cmd" => 0,
   "Module::Pluggable::Object" => 0,

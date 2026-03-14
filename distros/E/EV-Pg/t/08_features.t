@@ -8,7 +8,7 @@ use TestHelper;
 
 require_pg;
 use File::Temp 'tmpnam';
-plan tests => 111;
+plan tests => 116;
 
 # notice handler
 with_pg(
@@ -493,7 +493,7 @@ SKIP: {
             $pg->exit_pipeline;
             EV::break;
         });
-        $pg->send_flush_request;
+        $pg->send_flush_request if $pg->can('send_flush_request');
     });
 }
 
@@ -702,4 +702,39 @@ with_pg(cb => sub {
     ok(!defined $pg->hostaddr, 'hostaddr: undef when not connected');
     ok(!defined $pg->ssl_attribute_names, 'ssl_attribute_names: undef when not connected');
     is($pg->protocol_version, 0, 'protocol_version: 0 when not connected');
+}
+
+# --- keep_alive ---
+{
+    my $pg = EV::Pg->new(on_error => sub {});
+    is($pg->keep_alive, 0, 'keep_alive: default off');
+    $pg->keep_alive(1);
+    is($pg->keep_alive, 1, 'keep_alive: set on');
+    $pg->keep_alive(0);
+    is($pg->keep_alive, 0, 'keep_alive: set off');
+}
+
+# keep_alive via constructor
+{
+    my $notified;
+    my $pg;
+    $pg = EV::Pg->new(
+        conninfo   => $conninfo,
+        keep_alive => 1,
+        on_notify  => sub {
+            $notified = 1;
+            EV::break;
+        },
+        on_connect => sub {
+            is($pg->keep_alive, 1, 'keep_alive: set via constructor');
+            $pg->query("listen ka_test", sub {
+                $pg->query("notify ka_test", sub {});
+            });
+        },
+        on_error => sub { diag "Error: $_[0]"; EV::break },
+    );
+    my $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    ok($notified, 'keep_alive: notification received');
+    $pg->finish if $pg && $pg->is_connected;
 }

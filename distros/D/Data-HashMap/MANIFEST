@@ -61,6 +61,7 @@ t/10-lru.t
 t/11-ttl.t
 t/20-new-features.t
 t/21-leak.t
+t/22-bugfixes.t
 typemap
 xxhash.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -6,7 +6,7 @@ use Carp;
 use EV;
 
 BEGIN {
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -116,7 +116,7 @@ $EXPORT_TAGS{trace} = [qw(
 *prep       = \&prepare;
 *reconnect  = \&reset;
 *disconnect = \&finish;
-*flush      = \&send_flush_request;
+*flush      = \&send_flush_request if defined &send_flush_request;
 *sync       = \&pipeline_sync;
 *quote      = \&escape_literal;
 *quote_id   = \&escape_identifier;
@@ -136,6 +136,7 @@ sub new {
     $self->on_notice(delete $args{on_notice})     if exists $args{on_notice};
     $self->on_drain(delete $args{on_drain})       if exists $args{on_drain};
 
+    my $keep_alive      = delete $args{keep_alive};
     my $conninfo        = delete $args{conninfo};
     my $conninfo_params = delete $args{conninfo_params};
     my $expand_dbname   = delete $args{expand_dbname};
@@ -143,6 +144,8 @@ sub new {
     if (my @unknown = sort keys %args) {
         Carp::carp("EV::Pg->new: unknown argument(s): @unknown");
     }
+
+    $self->keep_alive(1) if $keep_alive;
 
     if (defined $conninfo_params) {
         $self->connect_params($conninfo_params, $expand_dbname ? 1 : 0);
@@ -283,6 +286,11 @@ messages.
 Callback invoked (with no arguments) when the send buffer has been
 flushed during COPY IN.  Useful for resuming C<put_copy_data> after
 it returns 0.
+
+=item keep_alive
+
+When true, the connection keeps C<EV::run> alive even when no queries
+are pending.  See L</keep_alive>.
 
 =item loop
 
@@ -442,6 +450,16 @@ without async cancel support (C<LIBPQ_HAS_ASYNC_CANCEL>).
     my $n = $pg->pending_count;
 
 Returns the number of callbacks in the queue.
+
+=head2 keep_alive
+
+    $pg->keep_alive(1);
+    my $bool = $pg->keep_alive;
+
+When true, the connection's read watcher keeps C<EV::run> alive even when
+no queries are pending.  Useful when waiting for server-side C<NOTIFY>
+events via C<on_notify> — without this flag the event loop would exit
+after the C<LISTEN> query completes.
 
 =head2 skip_pending
 
@@ -662,7 +680,9 @@ C<PQSHOW_CONTEXT_ALWAYS>.  Returns the previous setting.
 
 Returns a hashref of structured error fields from the most recent
 C<PGRES_FATAL_ERROR> result, or C<undef> if no error has occurred.
-Keys (present only when non-NULL in the server response):
+The value persists until the next fatal error; it is not cleared by
+successful queries.  Keys (present only when non-NULL in the server
+response):
 
     sqlstate    severity    primary     detail
     hint        position    context     schema
@@ -675,7 +695,9 @@ Keys (present only when non-NULL in the server response):
     my $meta = $pg->result_meta;
 
 Returns a hashref of metadata from the most recent query result,
-or C<undef> if no result has been delivered.  Keys:
+or C<undef> if no result has been delivered.  The value persists until
+the next result that carries metadata; it is not cleared by errors or
+commands that produce no columns.  Keys:
 
     nfields       number of columns
     cmd_status    command status string (e.g. "SELECT 3", "INSERT 0 1")

@@ -19,7 +19,7 @@ readme_from 'Example.pm';
 recursive_author_tests('xt');
 requires 'Error::Pure' => 0.08;
 requires 'Exporter' => 0;
-requires 'Pod::Abstract' => 0;
+requires 'Pod::Abstract' => 0.26;
 requires 'Pod::Find' => 0;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.2';
@@ -31,7 +31,7 @@ test_requires 'File::Object' => 0.16;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.15';
+version '0.16';
 
 # Run.
 WriteAll();

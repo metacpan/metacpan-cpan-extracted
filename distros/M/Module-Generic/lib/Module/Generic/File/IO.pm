@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/IO.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/26
-## Modified 2025/07/27
+## Modified 2026/03/14
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,6 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
+    use Config;
     use Fcntl qw( :DEFAULT :flock :seek ); 
     use IO::File ();
     use parent qw( Module::Generic IO::File );
@@ -27,7 +28,7 @@ BEGIN
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
     our @EXPORT_OK = qw( wraphandle );
     our $THAW_REOPENS_FILE = 1;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -334,7 +335,19 @@ sub locked
     if( $is_posix )
     {
         # Exclusive lock probe
-        my $lock = pack( 'ssqqqq', F_WRLCK, SEEK_SET, 0, 0, 0, 0 );
+        # struct flock layout varies by platform — q (int64) is unavailable on 32-bit Perls
+        # - 64-bit systems: l_type(s), l_whence(s), l_start(q), l_len(q), l_pid(i)
+        # - 32-bit systems: l_type(s), l_whence(s), l_start(l), l_len(l), l_pid(i)
+        # We use Config to determine which pack template to use.
+        my $lock;
+        if( $Config{use64bitint} )
+        {
+            $lock = pack( 'ssqqqi', F_WRLCK, SEEK_SET, 0, 0, 0, 0 );
+        }
+        else
+        {
+            $lock = pack( 'sslli', F_WRLCK, SEEK_SET, 0, 0, 0, 0 );
+        }
         my $rv = eval
         {
             $self->fcntl( F_GETLK, $lock );
@@ -618,7 +631,7 @@ Module::Generic::File::IO - File IO Object Wrapper
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

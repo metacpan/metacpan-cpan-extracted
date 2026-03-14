@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.631-7-g486a9f1e
+package JSON::Schema::Modern; # git description: v0.632-13-gbe930449
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.632';
+our $VERSION = '0.633';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -37,7 +37,7 @@ use Feature::Compat::Try;
 use JSON::Schema::Modern::Error;
 use JSON::Schema::Modern::Result;
 use JSON::Schema::Modern::Document;
-use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations is_schema json_pointer_type canonical_uri_type load_cached_document);
+use JSON::Schema::Modern::Utilities qw(get_type canonical_uri E abort annotate_self jsonp is_type assert_uri local_annotations is_schema json_pointer_type canonical_uri_type core_types_type core_formats_type load_cached_document);
 use namespace::clean;
 
 our @CARP_NOT = qw(
@@ -102,17 +102,12 @@ has [qw(collect_annotations scalarref_booleans stringy_numbers strict with_defau
   isa => Bool,
 );
 
-# Validation §7.1-2: "Note that the "type" keyword in this specification defines an "integer" type
-# which is not part of the data model. Therefore a format attribute can be limited to numbers, but
-# not specifically to integers."
-my $core_types = Enum[qw(null object array boolean string number)];
-my @core_formats = qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex);
 
 # { $format_name => { type => ..., sub => ... }, ... }
 has _format_validations => (
   is => 'bare',
   isa => my $format_type = HashRef[Dict[
-      type => $core_types|ArrayRef[$core_types],
+      type => core_types_type|ArrayRef[core_types_type],
       sub => CodeRef,
     ]],
   init_arg => 'format_validations',
@@ -128,7 +123,7 @@ sub add_format_validation ($self, $format, $definition) {
 
   # all core formats are of type string (so far); changing type of custom format is permitted
   croak "Type for override of format $format does not match original type"
-    if any { $format eq $_ } @core_formats and $definition->{type} ne 'string';
+    if core_formats_type->check($format) and $definition->{type} ne 'string';
 
   use autovivification 'store';
   $self->{_format_validations}{$format} = $definition;
@@ -1296,7 +1291,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords schema subschema metaschema validator evaluator
+=for stopwords schema subschema metaschema validator evaluator OpenAPI
 
 =head1 NAME
 
@@ -1304,7 +1299,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.632
+version 0.633
 
 =head1 SYNOPSIS
 
@@ -1319,7 +1314,7 @@ version 0.632
 
 =head1 DESCRIPTION
 
-This module aims to be a fully-compliant L<JSON Schema|https://json-schema.org/> evaluator and
+This module is a fully-compliant L<JSON Schema|https://json-schema.org/> evaluator and
 validator, targeting the currently-latest
 L<Draft 2020-12|https://json-schema.org/specification-links.html#2020-12>
 version of the specification.
@@ -1381,7 +1376,7 @@ Defaults to true when C<output_format> is C<flag>, and false otherwise.
 
 =head2 max_traversal_depth
 
-The maximum number of levels deep a schema traversal may go, before evaluation is halted. This is to
+The maximum number of levels deep a schema evaluation may go before evaluation is halted. This is to
 protect against accidental infinite recursion, such as from two subschemas that each reference each
 other, or badly-written schemas that could be optimized. Defaults to 50.
 
@@ -1408,7 +1403,7 @@ be specified in the form of C<< { $format_name => { type => $type, sub => $forma
 where the type indicates which of the data model types (null, object, array, boolean, string,
 or number) the instance value must be for the format validation to be considered.
 
-Not available as an accessor.
+Not available as an accessor; see L</add_format_validation>.
 
 =head2 validate_content_schemas
 
@@ -1437,7 +1432,7 @@ Defaults to false.
 
 =head2 scalarref_booleans
 
-When true, any value that is expected to be a boolean B<in the instance data> may also be expressed
+When true, any value that is expected to be a boolean B<in the instance data> may also be provided
 as the scalar references C<\0> or C<\1> (which are serialized as booleans by JSON backends).
 
 Defaults to false.
@@ -1498,7 +1493,9 @@ This allows you to write a schema like this (which validates a string representi
 Such keywords are only applied if the value looks like a number, and do not generate a failure
 otherwise. Values are determined to be numbers via L<perlapi/looks_like_number>.
 This option is only intended to be used for evaluating data from sources that can only be strings,
-such as the extracted value of an HTTP header or query parameter.
+such as the extracted value of an HTTP header or query parameter (but in the OpenAPI context, it is
+preferable to use an explicit C<type> keyword in the schema to indicate the value should be
+deserialized as a number).
 
 Defaults to false.
 
@@ -1620,7 +1617,7 @@ C<initial_schema_uri>: adjusts the recorded absolute keyword location of the sta
 
 =back
 
-The return value is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
+The return value is a L<JSON::Schema::Modern::Result> object.
 
 =head2 evaluate
 
@@ -1670,9 +1667,10 @@ C<callbacks>: see below
 
 =back
 
-You can pass a series of callback subs to this method corresponding to keywords, which is useful for
+You can pass a series of callback subs to this method, with the keys corresponding to keywords,
+which is useful for
 identifying various data that are not exposed by annotations.
-This feature is highly experimental and may change in the future.
+This feature is experimental and may change in the future.
 
 For example, to find the locations where all C<$ref> keywords are applied B<successfully>:
 
@@ -1685,8 +1683,9 @@ For example, to find the locations where all C<$ref> keywords are applied B<succ
     },
   });
 
-The return value is a L<JSON::Schema::Modern::Result> object, which can also be used as a boolean.
-Callbacks are not compatible with L</short_circuit> mode.
+Callbacks are not compatible with L</short_circuit> mode, as some keyword evaluations may be skipped.
+
+The return value of C<evaluate> is a L<JSON::Schema::Modern::Result> object.
 
 =head2 validate_schema
 
@@ -1735,7 +1734,7 @@ C<specification_version>: overrides the specification version to be used
 
 You can pass a series of callback subs to this method corresponding to keywords, which is useful for
 extracting data from within schemas and skipping properties that may look like keywords but actually
-are not (for example C<{"const": {"$ref": "this is not actually a $ref"}}>). This feature is highly
+are not (for example C<{"const": {"$ref": "this is not actually a $ref"}}>). This feature is
 experimental and is highly likely to change in the future.
 
 For example, to find the resolved targets of all C<$ref> keywords in a schema document:
@@ -1813,8 +1812,6 @@ the data type(s) supported by that format may not be changed.
 
 Be careful to not mutate the type of the value while checking it -- for example, if it is a string,
 do not apply arithmetic operators to it -- or subsequent type checks on this value may fail.
-
-=for stopwords OpenAPI
 
 See the official L<OpenAPI Format Registry|https://spec.openapis.org/registry/format>
 for a registry of known and useful formats; for
@@ -1969,7 +1966,7 @@ identifier (uri or uri-reference). C<undef> if the schema with that URI has not 
 cached).
 
 Note: this _does not download a document from the network_. It only fetches the document from the
-internal cache in the C<JSON::Schema::Modern> document.
+internal cache in the C<JSON::Schema::Modern> object.
 
 =head1 CACHING
 
@@ -2204,8 +2201,6 @@ C<https://json-schema.org/draft/2020-12/schema>
 =back
 
 =head1 SEE ALSO
-
-=for stopwords OpenAPI
 
 =over 4
 

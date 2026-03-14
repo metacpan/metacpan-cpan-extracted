@@ -56,11 +56,7 @@ else
   print "\nrun as `perl Makefile.PL help` to show user options\n";
 }
 
-our $verbose = 0;
-# Get debugging flags
-if ( grep { if (m/^verbose/i) { $verbose++; 1; } else { 0; } } @ARGV ) {
-  @ARGV = grep { !m/^verbose/i } @ARGV;
-}
+our $verbose = grep m/^verbose/i, @ARGV; # Get debugging flags
 print "\$verbose set to $verbose" . ($verbose ? "" : " - enable by running as `perl Makefile.PL verbose`");
 print "\n\n";
 
@@ -74,7 +70,7 @@ our $IS_W32API = ($IS_CYGWIN && grep { m/^interface=(W32API|WGL)/i } @ARGV );
 print "Build platform \$IS_W32API==$IS_W32API\n" if $IS_W32API and $verbose;
 
 our $INCS;
-our $NO_LGCC = grep /^NO_LGCC$/, @ARGV; @ARGV = grep !/^NO_LGCC$/, @ARGV;
+our $NO_LGCC = grep /^NO_LGCC$/, @ARGV;
 
 my $prepare_success = eval {
 # Look for available libs
@@ -143,27 +139,31 @@ my $build_config =
   !defined($OPTS) ? () : (OPTIMIZE => $OPTS),
 };
 
-print "MakeMaker configuration:\n DEFINE=$DEFS\n INC=$INCS\n LIBS=$LIBS\n\n" if $verbose;
-
-close(CONF) if (open(CONF,">", "lib/OpenGL/Config.pm")); # empty Config.pm
+WriteConfigPM( $build_config ); # generate final Config.pm
 WriteMakefile(
   NAME	=> 'OpenGL',
   VERSION_FROM=> 'lib/OpenGL.pm',
   CONFIGURE_REQUIRES => {
-    'ExtUtils::MakeMaker' => 0
+    'ExtUtils::MakeMaker' => '7.12', # XSBUILD
+  },
+  PREREQ_PM => {
+    'OpenGL::Modern' => '0.0403', # registry more accurate aliases
   },
   TEST_REQUIRES => { 'Test::More' => '0.88' },
   AUTHOR	=> "Chris Marshall ".'<chm at cpan dot org>',
+  MIN_PERL_VERSION => '5.016', # like OGLM, for visibility
   XSMULTI => 1,
   XSBUILD => {
     xs => {
       map +($_ => {OBJECT => "$_\$(OBJ_EXT) gl_util\$(OBJ_EXT)"}),
-        map "lib/OpenGL/$_", qw(V1 V2 V3 Array Matrix Const GLX GLU GLUT),
+        map "lib/OpenGL/$_", qw(V1 V2 Array Matrix Const GLX GLU GLUT),
     },
   },
   XSPROTOARG	=> '-noprototypes',
+  TYPEMAPS => [qw(lib/OpenGL/Install/typemap)],
   META_MERGE => {
      "meta-spec" => { version => 2 },
+     dynamic_config => 0,
      abstract  => 'Perl bindings to the OpenGL API, GLU, and GLUT/FreeGLUT',
      resources => {
         homepage => 'http://sourceforge.net/projects/pogl/',
@@ -176,18 +176,19 @@ WriteMakefile(
         x_IRC => 'irc://irc.perl.org/#pogl',
      },
   },
-  clean       => {
-    FILES =>
-      "lib/OpenGL/Config.pm ".
-      "gl_exclude.h ".
-      "utils/glversion.txt ".
-      "utils/glversion$Config{exe_ext} ".
+  clean => {
+    FILES => join(' ',
+      qw(lib/OpenGL/Config.pm gl_exclude.h utils/glversion.txt auto-xs.inc),
+      "utils/glversion$Config{exe_ext}",
       "utils/glversion$Config{obj_ext}"
+    ),
+  },
+  depend => {
+    'lib/OpenGL/V2$(OBJ_EXT)' => 'auto-xs.inc',
   },
   %$build_config,
   INC => $INCS . ' -I'.curdir(),
 );       		# Generate the Makefile
-WriteConfigPM( $build_config );			# Regenerate final Config.pm
 
 if ($found_libs->{GLX} && $ENV{TERM} !~ /^xterm/) {
   print "\nThis configuration should be built under an X11 shell\n\n";
@@ -202,6 +203,12 @@ exit 0;
 
 {
 package MY; # so that "SUPER" works right
+sub postamble {
+  <<EOF;
+auto-xs.inc : utils/generate-XS.pl lib/OpenGL/Misc.pm
+\t\$(PERLRUN) -Ilib utils/generate-XS.pl
+EOF
+}
 sub init_PM {
   my ($eumm) = @_;
   $eumm->SUPER::init_PM;
@@ -242,7 +249,7 @@ sub get_libs {
       '-LFreeGLUT -lfreeglut'
     )
       if $IS_W32API || $^O eq 'MSWin32';
-  my $libs = join '', map " $_", sort(values %$found_libs), '-lm';
+  my $libs = join '', map " $_", grep $_, sort(values %$found_libs), '-lm';
   $libs = "@$ldirs $libs";
   return $libs if $NO_LGCC || $Config{cc} eq 'gcc' || $Config{gccversion};
   # Handle obfuscated gcc
@@ -268,7 +275,7 @@ sub get_found_libs {
   # Mac OS X
   if ($^O eq 'darwin' && -d '/System/Library/Frameworks/OpenGL.framework') {
     $found->{GL} = '-framework OpenGL';
-    $found->{GLU} = '-framework AGL';
+    $found->{GLU} = '';
     $found->{GLUT} = '-framework GLUT';
     for (@$ldirs) {
       (my $dir = $_) =~ s/^-L//;
@@ -472,8 +479,6 @@ sub get_interface_lib {
       if @interface_opts > 1;
     ($interface_lib) = @interface_opts;
     print "User set interface to $interface_lib\n" if $verbose && !$fallback;
-    # Strip out interface args
-    @$argv_ref = grep { !m/^interface=/i } @$argv_ref;
     return $interface_lib;
   }
   # Otherwise use available defaults
@@ -616,7 +621,7 @@ sub get_defines {
   $defs .= " -DIS_STRAWBERRY" if $IS_STRAWBERRY;
   print "resulting libs:\n" if $verbose;
   foreach my $key (sort keys %$found_libs) {
-    next if (!$found_libs->{$key});
+    next if !defined $found_libs->{$key}; # defined but empty OK
     $defs .= " -DHAVE_$key";
     print "    $key = '$found_libs->{$key}'\n" if $verbose;
   }
@@ -638,6 +643,7 @@ sub get_defines {
       if $out =~ m|glutMainLoopEvent|;
     $defs .= " -DGL_GLEXT_LEGACY";
   }
+  $defs .= " -Wno-compound-token-split-by-macro" if $^O eq 'darwin';
   $defs;
 }
 
@@ -645,8 +651,8 @@ sub get_defines {
 sub WriteConfigPM
 {
   my($config) = @_;
-  die "Unable to write to Config.pm\n" if (!open(CONFIGPM, ">", "lib/OpenGL/Config.pm"));
-  print CONFIGPM q
+  die "Unable to write to Config.pm\n" if !open my $fh, ">", "lib/OpenGL/Config.pm";
+  print $fh q
 {
 # This is the Perl OpenGL build configuration file.
 # It contains the final OpenGL build arguments from
@@ -659,11 +665,10 @@ sub WriteConfigPM
   require Data::Dumper;
   # Ensure deterministic output
   { no warnings; $Data::Dumper::Sortkeys = 1; }
-  print CONFIGPM Data::Dumper->Dump( [$config], [qw(OpenGL::Config)] );
-  print CONFIGPM qq
+  print $fh Data::Dumper->Dump( [$config], [qw(OpenGL::Config)] );
+  print $fh qq
 {
 1;
 __END__
 };
-  close(CONFIGPM);
 }

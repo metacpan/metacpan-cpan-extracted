@@ -49,6 +49,16 @@ static HV* stash_ss;
 
 #define HM_MAX_STR_LEN 0x7FFFFFFFU
 
+/* Range-check helpers for typemap (called from generated INPUT code) */
+static void croak_i16(IV val) {
+    dTHX;
+    Perl_croak(aTHX_ "%" IVdf " out of int16 range [-32768, 32767]", val);
+}
+static void croak_i32(IV val) {
+    dTHX;
+    Perl_croak(aTHX_ "%" IVdf " out of int32 range [-2147483648, 2147483647]", val);
+}
+
 /* SV* value free callback for IA/SA variants */
 static void hm_sv_free(void* sv) {
     dTHX;
@@ -915,6 +925,7 @@ each(SV* self_sv)
             if (I32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 mXPUSHi(self->nodes[i].value);
                 XSRETURN(2);
             }
@@ -1134,6 +1145,7 @@ each(SV* self_sv)
             if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 mXPUSHi(self->nodes[i].value);
                 XSRETURN(2);
             }
@@ -1353,6 +1365,7 @@ each(SV* self_sv)
             if (IS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 if (self->nodes[i].value) {
                     SV* vsv = newSVpvn(self->nodes[i].value,
                                        HM_UNPACK_LEN(self->nodes[i].val_len));
@@ -1467,7 +1480,7 @@ get(SV* self_sv, SV* key_sv)
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int64_t value;
-        if (!hashmap_si_get(self, _kstr, (uint32_t)_klen, _khash, &value))
+        if (!hashmap_si_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value))
             XSRETURN_UNDEF;
         RETVAL = newSViv(value);
     OUTPUT:
@@ -1478,7 +1491,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_remove(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_si_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -1487,7 +1500,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_exists(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_si_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -1611,6 +1624,7 @@ each(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
                     mXPUSHs(ksv);
                 }
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 mXPUSHi(self->nodes[i].value);
                 XSRETURN(2);
             }
@@ -1712,7 +1726,7 @@ get(SV* self_sv, SV* key_sv)
         const char* val;
         uint32_t val_len;
         bool val_utf8;
-        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, &val, &val_len, &val_utf8))
+        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val, &val_len, &val_utf8))
             XSRETURN_UNDEF;
         RETVAL = newSVpvn(val, val_len);
         if (val_utf8) SvUTF8_on(RETVAL);
@@ -1727,7 +1741,7 @@ get_direct(SV* self_sv, SV* key_sv)
         const char* val;
         uint32_t val_len;
         bool val_utf8;
-        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, &val, &val_len, &val_utf8))
+        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val, &val_len, &val_utf8))
             XSRETURN_UNDEF;
         RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
     OUTPUT:
@@ -1738,7 +1752,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_ss_remove(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_ss_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -1747,7 +1761,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_ss_exists(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_ss_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -1850,6 +1864,7 @@ each(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
                     mXPUSHs(ksv);
                 }
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 if (self->nodes[i].value) {
                     SV* vsv = newSVpvn(self->nodes[i].value,
                                        HM_UNPACK_LEN(self->nodes[i].val_len));
@@ -2092,6 +2107,7 @@ each(SV* self_sv)
             if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 if (self->nodes[i].value) {
                     SV* vsv = newSVpvn(self->nodes[i].value,
                                        HM_UNPACK_LEN(self->nodes[i].val_len));
@@ -2206,7 +2222,7 @@ get(SV* self_sv, SV* key_sv)
         EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int32_t value;
-        if (!hashmap_si32_get(self, _kstr, (uint32_t)_klen, _khash, &value))
+        if (!hashmap_si32_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value))
             XSRETURN_UNDEF;
         RETVAL = newSViv(value);
     OUTPUT:
@@ -2217,7 +2233,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si32_remove(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_si32_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -2226,7 +2242,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si32_exists(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_si32_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -2350,6 +2366,7 @@ each(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
                     mXPUSHs(ksv);
                 }
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 mXPUSHi(self->nodes[i].value);
                 XSRETURN(2);
             }
@@ -2571,6 +2588,7 @@ each(SV* self_sv)
             if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 mXPUSHi(self->nodes[i].value);
                 XSRETURN(2);
             }
@@ -2790,6 +2808,7 @@ each(SV* self_sv)
             if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 if (self->nodes[i].value) {
                     SV* vsv = newSVpvn(self->nodes[i].value,
                                        HM_UNPACK_LEN(self->nodes[i].val_len));
@@ -2904,7 +2923,7 @@ get(SV* self_sv, SV* key_sv)
         EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         int16_t value;
-        if (!hashmap_si16_get(self, _kstr, (uint32_t)_klen, _khash, &value))
+        if (!hashmap_si16_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value))
             XSRETURN_UNDEF;
         RETVAL = newSViv(value);
     OUTPUT:
@@ -2915,7 +2934,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si16_remove(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_si16_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -2924,7 +2943,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si16_exists(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_si16_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -3048,6 +3067,7 @@ each(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
                     mXPUSHs(ksv);
                 }
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 mXPUSHi(self->nodes[i].value);
                 XSRETURN(2);
             }
@@ -3242,6 +3262,7 @@ each(SV* self_sv)
             if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
                 mXPUSHs(sv);
                 XSRETURN(2);
@@ -3441,6 +3462,7 @@ each(SV* self_sv)
             if (I16A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
                 mXPUSHs(sv);
                 XSRETURN(2);
@@ -3640,6 +3662,7 @@ each(SV* self_sv)
             if (IA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
                 EXTEND(SP, 2);
                 mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
                 mXPUSHs(sv);
                 XSRETURN(2);
@@ -3745,7 +3768,7 @@ get(SV* self_sv, SV* key_sv)
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
         void* val;
-        if (!hashmap_sa_get(self, _kstr, (uint32_t)_klen, _khash, &val))
+        if (!hashmap_sa_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
             XSRETURN_UNDEF;
         RETVAL = SvREFCNT_inc((SV*)val);
     OUTPUT:
@@ -3756,7 +3779,7 @@ remove(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_sa_remove(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_sa_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -3765,7 +3788,7 @@ exists(SV* self_sv, SV* key_sv)
     CODE:
         EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
         EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_sa_exists(self, _kstr, (uint32_t)_klen, _khash);
+        RETVAL = hashmap_sa_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
     OUTPUT:
         RETVAL
 
@@ -3856,6 +3879,7 @@ each(SV* self_sv)
                     if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
                     mXPUSHs(ksv);
                 }
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
                 SV* vsv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
                 mXPUSHs(vsv);
                 XSRETURN(2);

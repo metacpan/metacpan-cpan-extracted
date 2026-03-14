@@ -173,7 +173,8 @@ sub encode ($input) {
     ->convert_blessed(1)
     ->utf8(0)
     ->canonical(1)
-    ->pretty(1);
+    ->pretty(1)
+    ->space_before(0);
   $encoder->indent_length(2) if $encoder->can('indent_length');
   $encoder->encode($input);
 }
@@ -190,7 +191,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.632
+version 0.633
 
 =head1 SYNOPSIS
 

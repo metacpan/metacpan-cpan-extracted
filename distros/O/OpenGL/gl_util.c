@@ -1,7 +1,25 @@
-
 #include "gl_util.h"
 
-int gl_texparameter_count(GLenum pname)
+int gl_RenderbufferParameterName_count(int param) {
+#ifdef GL_ARB_framebuffer_object
+  switch (param) {
+    case GL_RENDERBUFFER_SAMPLES:
+    case GL_RENDERBUFFER_WIDTH:
+    case GL_RENDERBUFFER_HEIGHT:
+    case GL_RENDERBUFFER_INTERNAL_FORMAT:
+    case GL_RENDERBUFFER_RED_SIZE:
+    case GL_RENDERBUFFER_GREEN_SIZE:
+    case GL_RENDERBUFFER_BLUE_SIZE:
+    case GL_RENDERBUFFER_ALPHA_SIZE:
+    case GL_RENDERBUFFER_DEPTH_SIZE:
+    case GL_RENDERBUFFER_STENCIL_SIZE:
+      return 1;
+  }
+#endif
+  return -1;
+}
+
+int gl_GetTextureParameter_count(GLenum pname)
 {
 
 #ifdef GL_EXT_texture_object
@@ -39,27 +57,121 @@ int gl_texparameter_count(GLenum pname)
 		return 1;
 	case GL_TEXTURE_BORDER_COLOR:
 		return 4;
-	default:
-		croak("Unknown texparameter parameter");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
+int gl_FramebufferAttachmentParameterName_count(int param) {
+#ifdef GL_ARB_framebuffer_object
+  switch (param) {
+    case GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING:
+    case GL_FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE:
+    case GL_FRAMEBUFFER_ATTACHMENT_RED_SIZE:
+    case GL_FRAMEBUFFER_ATTACHMENT_GREEN_SIZE:
+    case GL_FRAMEBUFFER_ATTACHMENT_BLUE_SIZE:
+    case GL_FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE:
+    case GL_FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE:
+    case GL_FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE:
+    case GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE:
+    case GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME:
+    case GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL:
+    case GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE:
+    case GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER:
+#ifdef GL_FRAMEBUFFER_ATTACHMENT_LAYERED
+    case GL_FRAMEBUFFER_ATTACHMENT_LAYERED:
+#endif
+#ifdef GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_NUM_VIEWS_OVR
+    case GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_NUM_VIEWS_OVR:
+    case GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_BASE_VIEW_INDEX_OVR:
+#endif
+      return 1;
+  }
+#endif
+  return -1;
+}
 
-int gl_texenv_count(GLenum pname)
+int gl_TextureParameterName_count(int param) {
+  switch (param) {
+    case GL_TEXTURE_WIDTH:
+    case GL_TEXTURE_HEIGHT:
+    case GL_TEXTURE_INTERNAL_FORMAT:
+    case GL_TEXTURE_BORDER:
+    case GL_TEXTURE_MAG_FILTER:
+    case GL_TEXTURE_MIN_FILTER:
+    case GL_TEXTURE_WRAP_S:
+    case GL_TEXTURE_WRAP_T:
+    case GL_TEXTURE_RED_SIZE:
+    case GL_TEXTURE_GREEN_SIZE:
+    case GL_TEXTURE_BLUE_SIZE:
+    case GL_TEXTURE_ALPHA_SIZE:
+    case GL_TEXTURE_LUMINANCE_SIZE:
+    case GL_TEXTURE_INTENSITY_SIZE:
+    case GL_TEXTURE_PRIORITY:
+    case GL_TEXTURE_RESIDENT:
+#ifdef GL_TEXTURE_WRAP_R
+    case GL_TEXTURE_WRAP_R:
+#endif
+#ifdef GL_TEXTURE_MAX_LEVEL
+    case GL_TEXTURE_MIN_LOD:
+    case GL_TEXTURE_MAX_LOD:
+    case GL_TEXTURE_BASE_LEVEL:
+    case GL_TEXTURE_MAX_LEVEL:
+#endif
+#ifdef GL_TEXTURE_COMPARE_MODE
+    case GL_GENERATE_MIPMAP:
+    case GL_TEXTURE_LOD_BIAS:
+    case GL_TEXTURE_COMPARE_MODE:
+    case GL_TEXTURE_COMPARE_FUNC:
+#endif
+#ifdef GL_TEXTURE_SWIZZLE_R
+    case GL_TEXTURE_SWIZZLE_R:
+    case GL_TEXTURE_SWIZZLE_G:
+    case GL_TEXTURE_SWIZZLE_B:
+    case GL_TEXTURE_SWIZZLE_A:
+#endif
+#ifdef GL_DEPTH_STENCIL_TEXTURE_MODE
+    case GL_DEPTH_STENCIL_TEXTURE_MODE:
+#endif
+      return 1;
+    case GL_TEXTURE_BORDER_COLOR:
+#ifdef GL_TEXTURE_SWIZZLE_RGBA
+    case GL_TEXTURE_SWIZZLE_RGBA:
+#endif
+      return 4;
+  }
+  return -1;
+}
+
+int gl_BufferPNameARB_count(int param) {
+#ifdef GL_BUFFER_IMMUTABLE_STORAGE
+  switch (param) {
+    case GL_BUFFER_IMMUTABLE_STORAGE:
+    case GL_BUFFER_STORAGE_FLAGS:
+    case GL_BUFFER_SIZE:
+    case GL_BUFFER_USAGE:
+    case GL_BUFFER_ACCESS:
+    case GL_BUFFER_MAPPED:
+    case GL_BUFFER_ACCESS_FLAGS:
+    case GL_BUFFER_MAP_LENGTH:
+    case GL_BUFFER_MAP_OFFSET:
+      return 1;
+  }
+#endif
+  return -1;
+}
+
+int gl_TextureEnvParameter_count(GLenum pname)
 {
 	switch (pname) {
 	case GL_TEXTURE_ENV_MODE:
 		return 1;
 	case GL_TEXTURE_ENV_COLOR:
 		return 4;
-	default:
-		croak("Unknown texenv parameter");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
-int gl_texgen_count(GLenum pname)
+int gl_TextureGenParameter_count(GLenum pname)
 {
 	switch (pname) {
 	case GL_TEXTURE_GEN_MODE:
@@ -67,13 +179,11 @@ int gl_texgen_count(GLenum pname)
 	case GL_OBJECT_PLANE:
 	case GL_EYE_PLANE:
 		return 4;
-	default:
-		croak("Unknown texgen parameter");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
-int gl_material_count(GLenum pname)
+int gl_MaterialParameter_count(GLenum pname)
 {
 	switch (pname) {
 	case GL_AMBIENT:
@@ -86,10 +196,8 @@ int gl_material_count(GLenum pname)
 		return 3;
 	case GL_SHININESS:
 		return 1;
-	default:
-		croak("Unknown material parameter");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
 
@@ -125,7 +233,7 @@ int gl_map_count(GLenum target, GLenum query)
 		case GL_MAP2_TEXTURE_COORD_1:
 			return 1;
 		default:
-			croak("Unknown map target");
+			return -1;
 		}
 	case GL_ORDER:
 		switch (target) {
@@ -150,7 +258,7 @@ int gl_map_count(GLenum target, GLenum query)
 		case GL_MAP2_TEXTURE_COORD_1:
 			return 2;
 		default:
-			croak("Unknown map target");
+			return -1;
 		}
 	case GL_DOMAIN:
 		switch (target) {
@@ -174,16 +282,12 @@ int gl_map_count(GLenum target, GLenum query)
 		case GL_MAP2_INDEX:
 		case GL_MAP2_TEXTURE_COORD_1:
 			return 4;
-		default:
-			croak("Unknown map target");
 		}
-	default:
-		croak("Unknown map query");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
-int gl_light_count(GLenum pname)
+int gl_LightParameter_count(GLenum pname)
 {
 	switch (pname) {
 	case GL_AMBIENT:
@@ -199,13 +303,11 @@ int gl_light_count(GLenum pname)
 	case GL_LINEAR_ATTENUATION:
 	case GL_QUADRATIC_ATTENUATION:
 		return 1;
-	default:
-		croak("Unknown light parameter");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
-int gl_lightmodel_count(GLenum pname)
+int gl_LightModelParameter_count(GLenum pname)
 {
 	switch (pname) {
 	case GL_LIGHT_MODEL_AMBIENT:
@@ -213,13 +315,11 @@ int gl_lightmodel_count(GLenum pname)
 	case GL_LIGHT_MODEL_LOCAL_VIEWER:
 	case GL_LIGHT_MODEL_TWO_SIDE:
 		return 1;
-	default:
-		croak("Unknown light model");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
-int gl_fog_count(GLenum pname)
+int gl_FogParameter_count(GLenum pname)
 {
 	switch (pname) {
 	case GL_FOG_COLOR:
@@ -230,14 +330,11 @@ int gl_fog_count(GLenum pname)
 	case GL_FOG_END:
 	case GL_FOG_INDEX:
 		return 1;
-	default:
-		croak("Unknown fog parameter");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
-int gl_get_count(GLenum param)
-{
+int gl_GetPName_count(int param) {
 
 /* 3 */
 #ifdef GL_EXT_polygon_offset
@@ -605,11 +702,49 @@ int gl_get_count(GLenum param)
 			if ((param > GL_CLIP_PLANE0) && (param <= (GLenum)(GL_CLIP_PLANE0 + max_clip_planes)))
 				return 1;
 		}
-		croak("Unknown param");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
+int gl_ProgramPropertyARB_count(int param) {
+#ifdef GL_COMPUTE_WORK_GROUP_SIZE
+  switch (param) {
+    case GL_COMPUTE_WORK_GROUP_SIZE:
+    case GL_PROGRAM_BINARY_LENGTH:
+    case GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH:
+    case GL_ACTIVE_UNIFORM_BLOCKS:
+    case GL_DELETE_STATUS:
+    case GL_LINK_STATUS:
+    case GL_VALIDATE_STATUS:
+    case GL_INFO_LOG_LENGTH:
+    case GL_ATTACHED_SHADERS:
+    case GL_ACTIVE_UNIFORMS:
+    case GL_ACTIVE_UNIFORM_MAX_LENGTH:
+    case GL_ACTIVE_ATTRIBUTES:
+    case GL_ACTIVE_ATTRIBUTE_MAX_LENGTH:
+    case GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH:
+    case GL_TRANSFORM_FEEDBACK_BUFFER_MODE:
+    case GL_TRANSFORM_FEEDBACK_VARYINGS:
+    case GL_ACTIVE_ATOMIC_COUNTER_BUFFERS:
+      return 1;
+  }
+#endif
+  return -1;
+}
+
+int gl_PointParameterNameARB_count(int param) {
+#ifdef GL_POINT_SIZE_MIN
+  switch (param) {
+    case GL_POINT_SIZE_MIN:
+    case GL_POINT_SIZE_MAX:
+    case GL_POINT_FADE_THRESHOLD_SIZE:
+      return 1;
+    case GL_POINT_DISTANCE_ATTENUATION:
+      return 3;
+  }
+#endif
+  return -1;
+}
 
 int gl_pixelmap_size(GLenum map)
 {
@@ -645,35 +780,124 @@ int gl_pixelmap_size(GLenum map)
 		case GL_PIXEL_MAP_A_TO_A:
 			glGetIntegerv(GL_PIXEL_MAP_A_TO_A_SIZE, &s);
 			return s;
-		default:
-			croak("unknown pixelmap");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
-int gl_state_count(GLenum state) {
-	switch (state) {
-		case GL_CURRENT_COLOR: return 4;
-		case GL_CURRENT_INDEX: return 1;
-	}
-	return 0;
-}
+/* From Mesa */
 
-unsigned long gl_pixelbuffer_size(
+/* Compute ceiling of integer quotient of A divided by B: */
+#define CEILING( A, B )  ( (A) % (B) == 0 ? (A)/(B) : (A)/(B)+1 )
+
+char *gl_pixelbuffer_size(
 	GLenum format,
 	GLsizei	width,
 	GLsizei	height,
 	GLenum	type,
-	int mode);
+	int mode,
+	GLsizei * length)
+{
+	GLint n; /* elements in a group */
+	GLint l; /* number of groups in a row */
+	GLint r; /* pack/unpack row length (overrides l if nonzero) */
+	GLint s; /* size (in bytes) of an element */
+	GLint a; /* alignment */
+	unsigned long k; /* size in bytes of row */
+
+	r = 0;
+	a = 4;
+
+	if (mode == gl_pixelbuffer_pack) {
+		glGetIntegerv(GL_PACK_ROW_LENGTH, &r);
+		glGetIntegerv(GL_PACK_ALIGNMENT, &a);
+	} else if (mode == gl_pixelbuffer_unpack) {
+		glGetIntegerv(GL_UNPACK_ROW_LENGTH, &r);
+		glGetIntegerv(GL_UNPACK_ALIGNMENT, &a);
+	}
+
+	l = r > 0 ? r : width;
+
+	s = gl_type_size(type);
+	if (s < 0) return "unknown type";
+
+	n = gl_component_count(format, type);
+	if (n < 0) return "unknown format";
+
+/* From Mesa, more or less */
+
+	if (type == GL_BITMAP) {
+		k = a * CEILING( n * l, 8 * a);
+	} else {
+		k = l * s * n;
+
+		if ( s < a ) {
+			k = (a / s * CEILING(k, a)) * s;
+		}
+	}
+
+	*length = k * height;
+	return NULL;
+}
+
+/* Compute ceiling of integer quotient of A divided by B: */
+#define CEILING( A, B )  ( (A) % (B) == 0 ? (A)/(B) : (A)/(B)+1 )
+
+char *gl_pixelbuffer_size2(
+	GLsizei	width,
+	GLsizei	height,
+	GLsizei depth,
+	GLenum format,
+	GLenum	type,
+	int mode,
+	GLsizei * length,
+	GLsizei * items)
+{
+	GLint n; /* elements in a group */
+	GLint l; /* number of groups in a row */
+	GLint s; /* size (in bytes) of an element */
+	GLint a; /* alignment */
+	unsigned long k; /* size in bytes of row */
+
+	a = 4;
+	l = width;
+
+	if (mode == gl_pixelbuffer_pack) {
+		glGetIntegerv(GL_PACK_ROW_LENGTH, &l);
+		glGetIntegerv(GL_PACK_ALIGNMENT, &a);
+	} else if (mode == gl_pixelbuffer_unpack) {
+		glGetIntegerv(GL_UNPACK_ROW_LENGTH, &l);
+		glGetIntegerv(GL_UNPACK_ALIGNMENT, &a);
+	}
+
+	s = gl_type_size(type);
+	if (s < 0) return "unknown type";
+
+	n = gl_component_count(format, type);
+	if (n < 0) return "unknown format";
+
+/* From Mesa, more or less */
+
+	if (type == GL_BITMAP) {
+		k = a * CEILING( n * l, 8 * a);
+	} else {
+		k = l * s * n;
+
+		if ( s < a ) {
+			k = (a / s * CEILING(k, a)) * s;
+		}
+	}
+
+	*items = l * n * height * depth;
+	*length = (k * height * depth);
+	return NULL;
+}
 
 GLvoid * EL(SV * sv, int needlen)
 {
 	STRLEN skip = 0;
     SV * svref;
-	
 	if (SvREADONLY(sv))
 		croak("Readonly value for buffer");
-
 	if(SvROK(sv)) {
         svref = SvRV(sv);
         sv = svref;
@@ -684,30 +908,29 @@ GLvoid * EL(SV * sv, int needlen)
         if (SvFAKE(sv) && SvTYPE(sv) == SVt_PVGV)
             sv_unglob(sv);
 #endif
-
         SvUPGRADE(sv, SVt_PV);
         SvGROW(sv, (unsigned int)(needlen + 1));
         SvPOK_on(sv);
         SvCUR_set(sv, needlen);
         *SvEND(sv) = '\0';  /* Why is this here? -chm */
     }
-
 	return SvPV_force(sv, skip);
 }
 
 GLvoid * ELI(SV * sv, GLsizei width, GLsizei height, 
              GLenum format, GLenum type, int mode)
 {
-	int needlen = 0;
-    if (!SvROK(sv)) /* don't calc length if arg is a perl ref */
-        needlen = gl_pixelbuffer_size(format, width, height, type, mode);
+	if (SvROK(sv)) /* don't calc length if arg is a perl ref */
+		return EL(sv, 0);
+	GLsizei needlen;
+	char *ret = gl_pixelbuffer_size(format, width, height, type, mode, &needlen);
+	if (ret) croak("%s", ret);
 	return EL(sv, needlen);
 }
 
 int gl_type_size(GLenum type)
 {
 	switch (type) {
-
 #ifdef GL_VERSION_1_2
 		case GL_UNSIGNED_BYTE_3_3_2:
 		case GL_UNSIGNED_BYTE_2_3_3_REV:
@@ -725,8 +948,6 @@ int gl_type_size(GLenum type)
 		case GL_UNSIGNED_INT_2_10_10_10_REV:
 			return sizeof(GLuint);
 #endif
-
-
 		case GL_UNSIGNED_BYTE: return sizeof(GLubyte); break;
 		case GL_BITMAP: return sizeof(GLubyte); break;
 		case GL_BYTE: return  sizeof(GLbyte); break;
@@ -739,10 +960,8 @@ int gl_type_size(GLenum type)
 		case GL_2_BYTES: return 2;
 		case GL_3_BYTES: return 3;
 		case GL_4_BYTES: return 4;
-	default:
-		croak("unknown type");
 	}
-	return 0;	// Just to make the compiler happy
+	return -1;
 }
 
 int gl_component_count(GLenum format, GLenum type)
@@ -786,7 +1005,7 @@ int gl_component_count(GLenum format, GLenum type)
 		case GL_RGBA:
 			n = 4; break;
 		default:
-			croak("unknown format");
+			return -1;
 	}
 
 #ifdef GL_VERSION_1_2
@@ -807,109 +1026,6 @@ int gl_component_count(GLenum format, GLenum type)
 	}
 #endif
 	return n;
-}
-
-
-/* From Mesa */
-
-/* Compute ceiling of integer quotient of A divided by B: */
-#define CEILING( A, B )  ( (A) % (B) == 0 ? (A)/(B) : (A)/(B)+1 )
-
-unsigned long gl_pixelbuffer_size(
-	GLenum format,
-	GLsizei	width,
-	GLsizei	height,
-	GLenum	type,
-	int mode)
-{
-	GLint n; /* elements in a group */
-	GLint l; /* number of groups in a row */
-	GLint r; /* pack/unpack row length (overrides l if nonzero) */
-	GLint s; /* size (in bytes) of an element */
-	GLint a; /* alignment */
-	unsigned long k; /* size in bytes of row */
-	
-	r = 0;
-	a = 4;
-	
-	if (mode == gl_pixelbuffer_pack) {
-		glGetIntegerv(GL_PACK_ROW_LENGTH, &r);
-		glGetIntegerv(GL_PACK_ALIGNMENT, &a);
-	} else if (mode == gl_pixelbuffer_unpack) {
-		glGetIntegerv(GL_UNPACK_ROW_LENGTH, &r);
-		glGetIntegerv(GL_UNPACK_ALIGNMENT, &a);
-	}
-
-	l = r > 0 ? r : width;
-
-	s = gl_type_size(type);
-	
-	n = gl_component_count(format, type);
-
-/* From Mesa, more or less */
-
-	if (type == GL_BITMAP) {
-		k = a * CEILING( n * l, 8 * a);
-	} else {
-		k = l * s * n;
-
-		if ( s < a ) {
-			k = (a / s * CEILING(k, a)) * s;
-		}
-	}
-
-	return k * height;
-}
-
-/* Compute ceiling of integer quotient of A divided by B: */
-#define CEILING( A, B )  ( (A) % (B) == 0 ? (A)/(B) : (A)/(B)+1 )
-
-void gl_pixelbuffer_size2(
-	GLsizei	width,
-	GLsizei	height,
-	GLsizei depth,
-	GLenum format,
-	GLenum	type,
-	int mode,
-	GLsizei * length,
-	GLsizei * items)
-{
-	GLint n; /* elements in a group */
-	GLint l; /* number of groups in a row */
-	GLint s; /* size (in bytes) of an element */
-	GLint a; /* alignment */
-	unsigned long k; /* size in bytes of row */
-	
-	a = 4;
-	l = width;
-	
-	if (mode == gl_pixelbuffer_pack) {
-		glGetIntegerv(GL_PACK_ROW_LENGTH, &l);
-		glGetIntegerv(GL_PACK_ALIGNMENT, &a);
-	} else if (mode == gl_pixelbuffer_unpack) {
-		glGetIntegerv(GL_UNPACK_ROW_LENGTH, &l);
-		glGetIntegerv(GL_UNPACK_ALIGNMENT, &a);
-	}
-
-	s = gl_type_size(type);
-	
-	n = gl_component_count(format, type);
-
-/* From Mesa, more or less */
-
-	if (type == GL_BITMAP) {
-		k = a * CEILING( n * l, 8 * a);
-	} else {
-		k = l * s * n;
-
-		if ( s < a ) {
-			k = (a / s * CEILING(k, a)) * s;
-		}
-	}
-	
-	*items = l * n * height * depth;
-	*length = (k * height * depth);
-	
 }
 
 void pgl_set_type(SV * sv, GLenum type, void ** ptr)
@@ -1075,7 +1191,7 @@ SV * pgl_get_type(GLenum type, void ** ptr)
 		break;
 	}
 	default:
-		croak("Unable to get data with unknown type");
+		return NULL;
 	}
 	return result;
 #undef RIV
@@ -1087,7 +1203,8 @@ GLvoid * pack_image_ST(SV ** stack, int count, GLsizei width, GLsizei height, GL
 	int i;
 	void * ptr, * optr;
 	GLsizei size, max;
-	gl_pixelbuffer_size2(width, height, depth, format, type, mode, &size, &max);
+	char *ret = gl_pixelbuffer_size2(width, height, depth, format, type, mode, &size, &max);
+	if (ret) croak("%s", ret);
 	optr = ptr = malloc(size);
 
 	for (i=0;i<count;i++) {
@@ -1154,7 +1271,8 @@ GLvoid * allocate_image_ST(GLsizei width, GLsizei height, GLsizei depth, GLenum 
 	void * ptr;
 	GLsizei size, max;
 	
-	gl_pixelbuffer_size2(width, height, depth, format, type, mode, &size, &max);
+	char *ret = gl_pixelbuffer_size2(width, height, depth, format, type, mode, &size, &max);
+	if (ret) croak("%s", ret);
 	ptr = malloc(size);
 
 	return ptr;
@@ -1167,11 +1285,14 @@ GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, int mo
 	int i;
 	GLsizei size, max;
 
-	gl_pixelbuffer_size2(width, height, depth, format, type, mode, &size, &max);
+	char *ret = gl_pixelbuffer_size2(width, height, depth, format, type, mode, &size, &max);
+	if (ret) croak("%s", ret);
 
 	EXTEND(sp, max);
 	for (i=0;i<max;i++) {
-		PUSHs(sv_2mortal(pgl_get_type(type, &data)));
+		SV *t = pgl_get_type(type, &data);
+		if (!t) croak("Unable to get data with unknown type");
+		PUSHs(sv_2mortal(t));
 	}
 	
 	return sp;

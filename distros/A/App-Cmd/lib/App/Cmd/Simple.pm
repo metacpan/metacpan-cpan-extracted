@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::Simple 0.339;
+package App::Cmd::Simple 0.340;
 
 use App::Cmd::Command;
 BEGIN { our @ISA = 'App::Cmd::Command' }
@@ -181,6 +181,16 @@ sub import {
     into => $class,
     as   => 'run',
     code => sub {
+      if ($ENV{GETOPT_LONG_DESCRIPTIVE_COMPLETION}) {
+        require Getopt::Long::Descriptive;
+        Getopt::Long::Descriptive::describe_options(
+          $generated_name->usage_desc,
+          $class->opt_spec,
+        );
+
+        Carp::confess("this code should never be reached: still running after App::Cmd::Simple handled GETOPT_LONG_DESCRIPTIVE_COMPLETION")
+      }
+
       $generated_name->new({
         no_help_plugin     => 0,
         no_version_plugin  => 0,
@@ -233,7 +243,7 @@ App::Cmd::Simple - a helper for building one-command App::Cmd applications
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 SYNOPSIS
 

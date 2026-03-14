@@ -20,12 +20,14 @@ README
 README.mkdn
 scripts/html2markdown.pl
 t/00-load.t
+t/01-turndown-additional.t
 t/01-turndown.t
 t/02-turndown-gfm.t
 t/03-extractinfo.t
 t/04-encode-entities.t
 t/05-html2markdown.t
 t/entities.html
+t/index-additional.html
 t/index-gfm.html
 t/index.html
 t/spam-test.mail

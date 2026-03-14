@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::ArgProcessor 0.339;
+package App::Cmd::ArgProcessor 0.340;
 
 # ABSTRACT: App::Cmd-specific wrapper for Getopt::Long::Descriptive
 
@@ -36,7 +36,7 @@ App::Cmd::ArgProcessor - App::Cmd-specific wrapper for Getopt::Long::Descriptive
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 PERL VERSION
 

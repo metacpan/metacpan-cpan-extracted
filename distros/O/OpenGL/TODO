@@ -1,50 +1,12 @@
-Fix segfault in glutMainLoop() for test.pl on vista
-    * Build debug perl for win32
-    * Get gdb for MinGW
-    * Same with MSVC 6.0 and latest
-    * Does same code with Prima::OpenGL not segfault?
-
-
 Fix current POGL configuration and build process
     * Clean up use of configuration information
     * Make the compile and config results unambiguous
-        * Compile flags have two types
-            * System info flags: HAVE_GLX, HAVE_GLUT, ...
-            * Build flags: BUILD_GLUT, BUILD_FREEGLUT, ...
-        * Exactly what libraries are being used
-	* Library versions and locations/paths
-        * What are the compile and link configuration
-	    * split out compile/link by libraries
-	        * OpenGL
-		* GLU
-		* GLUT
-		* GLX
         * What bindings are actually enabled?
-        * Use the same information to build POGL as glversion
-    * Refactor Makefile.PL to be comprehensible.
-        * strip out unused options
-        * remove include and link directories that do not exist
-        * replace make of glversion by perl based functionality
-        * toolkit option: GLUT and FreeGLUT
-        * interface option: GLX/unix, WGL/win32, [ AGL/CGL? ]
 
 
 Miscellaneous portability improvements
     * Convert malloc() and calloc() calls to Newx(), Newxc(), and Newxz()
     * Convert free() to Safefree() to match.
-
-
-Resolve ASPerl PPM build problems:
-    * win32 fails because of the FreeGLUT install during Makefile.PL
-    * linux fails because FreeGLUT is not found
-    * Mac OS X fails because the GLUT compile env is not right
-    * What does ASPerl do re external packages needed to build?
-
-
-Evaluate local include directory usage
-    * needed for win32 since we install
-    * check we're using the systemwide files
-    * if not, why not
 
 
 Evaluate strategy for legacy POGL going forward:
@@ -56,7 +18,6 @@ Evaluate strategy for legacy POGL going forward:
 
 Enhance CPAN Testers automated testing support
     * Improve diagnostic output for debugging test results
-    * Add a "compile and link only" build of POGL
     * Base on GLEW or GLee implementation
        * Start with GLEW for more cross-platform
        * Can implementation be made wrapper library independent?
@@ -69,8 +30,6 @@ Improve library and headers checks in Makefile.PL
 	* Mac OS X has a non-X11 GLUT library with extensions:
 	    * glutCheckLoop()   -- same as glutMainLoopEvent()
 	    * glutWMCloseFunc() -- same as glutCloseFunc()
-        * what about GLU, GLX, others?
-    * If libraries and headers are not available exit 0
     * Devel::CheckLib to check
 
 
@@ -139,11 +98,6 @@ Make code handle "missing" windows:
     * If win==0, need to handle appropriately and *not* do anything with win
 
 
-Implement safe glutInit
-    * check if done_glutInit before calling glutInit()
-    * carp/croak/quiet error settings
-
-
 Fix OpenGL/GLUT error handling for perl
     * GLUT errors should not kill the interpreter
         * Add carp/croak on no glutInit to glut functions to prevent exit(1)
@@ -169,17 +123,7 @@ Finish perl bindings to remaining FreeGLUT functions:
         * document current function
 
 
-OpenGLUT support for building
-    * OpenGLUT is a dead project, use FreeGLUT.
-    * Add info to docs re *no* OpenGLUT
-
-
 Make POGL GLUT-proof
-    * Make build work with GLUT-only and GLUT+FreeGLUT configurations
-      * GLUT-only: build and run with reduced functionality
-      * GLUT+FreeGLUT: build should correctly select and use FreeGLUT
-    * Nothing should break if you have GLUT rather than FreeGLUT
-        (as long as you are only using the GLUT subset of FreeGLUT)
     * Some functionality may be quietly disabled (glutMainLoop extensions)
     * Some functionality may be emulated (glutBitmapString)
     * make work with readline event loop for perldl shell
@@ -188,28 +132,20 @@ Make POGL GLUT-proof
 
 
 Refactor config/build for portability and simplicity
-    * use Module::Build framework
     * use constant rather than XS constant function
        * Extract GL, GLX, and WGL constants from glew.h, glxew.h and wglew.h
        * Extract GLU constants from glu.h
        * Extract GLUT and FreeGLUT from glut.h and freeglut_*.h
        * Verify that these pre-extracted versions work ok
-    * use GLEW and autogeneration for bindings
-        * why does GLEW require GLX_VERSION_1_2?
 
 
 Move test apps to t/ subdirectory from test.pl
     * Split into interactive and non-interactive tests
     * Skip interactive tests if no OpenGL context
     * need to test for each major functionality
-        * GL
-        * GLU
-        * GLUT/FreeGLUT
         * RPN
-        * Array
         * back compatibility (glp routines)
 	* PDL object support
-    * NOTE: require_ok() and use_ok() don't like $VERSION w git suffix
 
 
 Improve support for non-standard OpenGL configurations
@@ -221,7 +157,6 @@ Improve support for non-standard OpenGL configurations
 
 Implement complete matrix test capability
     * document/implement a test matrix for regression and stability tests
-    * setup virtualized test environment for POGL and PDL
     * factors to include
         * perl vs activeperl vs strawberry
         * GLX vs WGL vs CGL/AGL

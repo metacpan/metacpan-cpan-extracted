@@ -16,11 +16,17 @@ my @tests = $dom->findnodes('//*[@class="case"]');
 
 for my $t (@tests) {
     my $name = $t->getAttribute('data-name');
+    my $todo_reason = $t->getAttribute('data-todo');
     my @input = $t->findnodes('./*[@class="input"]');
     my $input = join "", map { $_->toString } $input[0]->childNodes;
     my $expected = "" . $t->findnodes('./*[@class="expected"]')->to_literal;
     #next if $input !~ /~~~/;
     #next if $name !~ /code block with multiple/;
+
+    my $todo;
+    if( $todo_reason ) {
+        $todo = todo($todo_reason);
+    };
 
     my $options = decode_json( $t->getAttribute('data-options') // '{}' );
     my $turndown = Text::HTML::Turndown->new(%$options);

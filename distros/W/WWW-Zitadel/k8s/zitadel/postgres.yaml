@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: zitadel-postgres-credentials
+  namespace: zitadel
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zitadel-postgres
+  namespace: zitadel
+spec:
+  selector:
+    app: zitadel-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zitadel-postgres
+  namespace: zitadel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zitadel-postgres
+  template:
+    metadata:
+      labels:
+        app: zitadel-postgres
+    spec:
+      initContainers:
+        - name: init-permissions
+          image: busybox:1.36
+          command: ['sh', '-c', 'chown -R 1000:1000 /data']
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: postgres
+          image: src.ci/srv/postgres:18
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+              name: postgres
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_DB
+              value: zitadel
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zitadel-postgres-credentials
+                  key: POSTGRES_PASSWORD
+            - name: ALLOW_IP_RANGE
+              value: 0.0.0.0/0
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command: ['pg_isready', '-U', 'postgres']
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command: ['pg_isready', '-U', 'postgres']
+            initialDelaySeconds: 30
+            periodSeconds: 20
+      volumes:
+        - name: data
+          emptyDir: {}

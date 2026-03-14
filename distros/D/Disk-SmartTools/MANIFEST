@@ -15,6 +15,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README.md
+Roadmap.md
 SECURITY.md
 SIGNATURE
 support/coverage_report.sh

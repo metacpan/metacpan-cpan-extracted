@@ -1,0 +1,10 @@
+^\.git/
+^\.gitignore$
+MYMETA\.json$
+MYMETA\.yml$
+^_build/
+^blib/
+^Build$
+~$
+\.swp$
+\.bak$

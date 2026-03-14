@@ -1,3 +1,7 @@
+0.12 2026-03-13
+    * Escape ALT attribute in images
+      Found via mixmark-io/turndown/issues/513
+
 0.11 2026-03-05
     * Properly handle <br> tags within <pre><code>... blocks
       Pressing enter in such blocks within contentEditable elements in the

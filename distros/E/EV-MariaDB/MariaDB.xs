@@ -79,6 +79,7 @@ struct ev_mariadb_s {
     SV *on_error;
 
     int callback_depth;
+    pid_t connect_pid;      /* PID at connect time, for fork detection */
 
     /* connection options (applied before mysql_real_connect_start) */
     unsigned int connect_timeout;
@@ -125,6 +126,8 @@ struct ev_mariadb_send_s {
     do { \
         if (NULL == (self)->conn || (self)->state == STATE_CONNECTING) \
             croak("not connected"); \
+        if ((self)->connect_pid != getpid()) \
+            croak("connection not valid after fork"); \
         if ((self)->state != STATE_IDLE) \
             croak("another operation is in progress"); \
         if ((self)->send_count > 0) \
@@ -336,6 +339,7 @@ static void emit_error(ev_mariadb_t *self, const char *msg) {
     call_sv(self->on_error, G_DISCARD | G_EVAL);
     if (SvTRUE(ERRSV)) {
         warn("EV::MariaDB: exception in error handler: %s", SvPV_nolen(ERRSV));
+        sv_setpvn(ERRSV, "", 0);
     }
 
     FREETMPS;
@@ -373,6 +377,7 @@ static void invoke_error_cb(SV *cb, const char *errmsg) {
     call_sv(cb, G_DISCARD | G_EVAL);
     if (SvTRUE(ERRSV)) {
         warn("EV::MariaDB: exception in callback: %s", SvPV_nolen(ERRSV));
+        sv_setpvn(ERRSV, "", 0);
     }
     SvREFCNT_dec(cb);
     FREETMPS;
@@ -384,6 +389,7 @@ static void invoke_cb(SV *cb) {
     call_sv(cb, G_DISCARD | G_EVAL);
     if (SvTRUE(ERRSV)) {
         warn("EV::MariaDB: exception in callback: %s", SvPV_nolen(ERRSV));
+        sv_setpvn(ERRSV, "", 0);
     }
     SvREFCNT_dec(cb);
 }
@@ -976,6 +982,7 @@ static void on_connect_done(ev_mariadb_t *self) {
             call_sv(self->on_connect, G_DISCARD | G_EVAL);
             if (SvTRUE(ERRSV)) {
                 warn("EV::MariaDB: exception in connect handler: %s", SvPV_nolen(ERRSV));
+                sv_setpvn(ERRSV, "", 0);
             }
 
             FREETMPS;
@@ -1214,11 +1221,13 @@ static void transition_to_stmt_store(ev_mariadb_t *self) {
 
 static void stream_error(ev_mariadb_t *self) {
     SV *cb = self->stream_cb;
+    char errbuf[512];
+    COPY_ERROR(errbuf, mysql_error(self->conn));
     self->stream_cb = NULL;
     self->state = STATE_IDLE;
     self->pending_count--;
     self->callback_depth++;
-    invoke_error_cb(cb, mysql_error(self->conn));
+    invoke_error_cb(cb, errbuf);
     self->callback_depth--;
 }
 
@@ -1234,8 +1243,36 @@ static void on_real_query_done(ev_mariadb_t *self) {
 
     self->op_result = mysql_use_result(self->conn);
     if (!self->op_result) {
-        stream_error(self);
-        if (check_destroyed(self)) return;
+        const char *err = mysql_error(self->conn);
+        if (err && err[0]) {
+            stream_error(self);
+            if (check_destroyed(self)) return;
+        } else {
+            /* DML or no-result query: deliver EOF to stream callback */
+            SV *cb = self->stream_cb;
+            self->stream_cb = NULL;
+            self->state = STATE_IDLE;
+            self->pending_count--;
+            self->callback_depth++;
+            {
+                dSP;
+                ENTER;
+                SAVETMPS;
+                PUSHMARK(SP);
+                PUSHs(&PL_sv_undef);
+                PUTBACK;
+                call_sv(cb, G_DISCARD | G_EVAL);
+                if (SvTRUE(ERRSV)) {
+                    warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
+                    sv_setpvn(ERRSV, "", 0);
+                }
+                SvREFCNT_dec(cb);
+                FREETMPS;
+                LEAVE;
+            }
+            self->callback_depth--;
+            if (check_destroyed(self)) return;
+        }
         maybe_pipeline(self);
         return;
     }
@@ -1282,6 +1319,7 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
                 call_sv(self->stream_cb, G_DISCARD | G_EVAL);
                 if (SvTRUE(ERRSV)) {
                     warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
+                    sv_setpvn(ERRSV, "", 0);
                 }
                 FREETMPS;
                 LEAVE;
@@ -1331,6 +1369,7 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
             call_sv(cb, G_DISCARD | G_EVAL);
             if (SvTRUE(ERRSV)) {
                 warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
+                sv_setpvn(ERRSV, "", 0);
             }
             SvREFCNT_dec(cb);
             FREETMPS;
@@ -1696,12 +1735,29 @@ static void apply_options(ev_mariadb_t *self) {
     self->client_flags = flags;
 }
 
+static int is_utf8_charset(unsigned int charsetnr) {
+    /* utf8mb3 collations: 33, 83, 192-211 */
+    /* utf8mb4 collations: 45, 46, 224-247, 255, 256-309 */
+    /* MariaDB 10.10+ uca1400: utf8mb3 2048-2303, utf8mb4 2304-2559 */
+    /* (2560+ are ucs2/utf16/utf32 uca1400 — NOT UTF-8) */
+    return charsetnr == 33 || charsetnr == 83
+        || (charsetnr >= 192 && charsetnr <= 211)
+        || charsetnr == 45 || charsetnr == 46
+        || (charsetnr >= 224 && charsetnr <= 247)
+        || charsetnr == 255
+        || (charsetnr >= 256 && charsetnr <= 309)
+        || (charsetnr >= 2048 && charsetnr <= 2559);
+}
+
 static AV* build_field_names(MYSQL_FIELD *fields, unsigned int ncols) {
     AV *fnames = newAV();
     unsigned int i;
     if (ncols > 0) av_extend(fnames, ncols - 1);
     for (i = 0; i < ncols; i++) {
-        av_push(fnames, newSVpvn(fields[i].name, fields[i].name_length));
+        SV *name = newSVpvn(fields[i].name, fields[i].name_length);
+        if (is_utf8_charset(fields[i].charsetnr))
+            SvUTF8_on(name);
+        av_push(fnames, name);
     }
     return fnames;
 }
@@ -1779,6 +1835,7 @@ static void start_connect(ev_mariadb_t *self) {
         croak("mysql_init failed");
     }
 
+    self->connect_pid = getpid();
     mysql_options(self->conn, MYSQL_OPT_NONBLOCK, 0);
     apply_options(self);
 
@@ -1997,6 +2054,9 @@ CODE:
     if (NULL == self->conn) {
         croak("not connected");
     }
+    if (self->connect_pid != getpid()) {
+        croak("connection not valid after fork");
+    }
     if (self->state >= STATE_STMT_PREPARE) {
         croak("cannot queue query: exclusive operation in progress");
     }
@@ -2082,6 +2142,8 @@ CODE:
 {
     if (NULL == self->conn || self->state == STATE_CONNECTING)
         croak("not connected");
+    if (self->connect_pid != getpid())
+        croak("connection not valid after fork");
     if (self->state != STATE_IDLE)
         croak("another operation is in progress");
     if (!SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV)
@@ -2345,7 +2407,7 @@ CODE:
     stmt = INT2PTR(MYSQL_STMT *, stmt_iv);
     {
         const char *src = SvPV(data_sv, data_len);
-        Newx(data, data_len, char);
+        Newx(data, data_len > 0 ? data_len : 1, char);
         Copy(src, data, data_len, char);
     }
     push_cb(self, cb);

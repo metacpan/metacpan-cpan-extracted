@@ -7,9 +7,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-11-13'; # DATE
+our $DATE = '2026-02-07'; # DATE
 our $DIST = 'Git-Grouper'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 Perinci::CmdLine::Any->new(
     url => '/Git/Grouper/',
@@ -17,6 +17,7 @@ Perinci::CmdLine::Any->new(
         "ls-all-groups" => { url => '/Git/Grouper/ls_all_groups' },
         "ls-all-remotes" => { url => '/Git/Grouper/ls_all_remotes' },
 
+        "groups" => { url => '/Git/Grouper/ls_repo_groups', summary => 'Shortcut for ls-repo-groups (you can use just "g")' },
         "ls-repo-groups" => { url => '/Git/Grouper/ls_repo_groups' },
         "ls-repo-remotes" => { url => '/Git/Grouper/ls_repo_remotes' },
 
@@ -51,64 +52,77 @@ git-grouper - Categorize git repositories into one/more groups and perform actio
 
 =head1 VERSION
 
-This document describes version 0.006 of git-grouper (from Perl distribution Git-Grouper), released on 2025-11-13.
+This document describes version 0.008 of git-grouper (from Perl distribution Git-Grouper), released on 2026-02-07.
 
 =head1 SYNOPSIS
 
-=head2 Listing groups and repositories
+=head2 Listing groups
 
 List all defined groups:
 
  % git-grouper ls-all-groups      ; # just list the names
  % git-grouper ls-all-groups -l   ; # list detailed records
 
-List all defined remotes:
-
- % git-grouper ls-all-remotes      ; # just list the names
- % git-grouper ls-all-remotes -l   ; # list detailed records
-
 List which group(s) repositories belong to:
 
  % git-grouper ls-repo-groups ; # list current working repo's group(s)
- % git-grouper ls-repo-group REPO1 REPO2 ...
+ % git-grouper ls-repo-groups REPO1 REPO2 ...
+ % git-grouper ls-repo-groups REPO1 REPO2 ...
+
+=head2 Listing repositories
 
 List repositories that belong to specified group(s):
 
  % git-grouper filter-repo-has-group GROUP REPO1 REPO2 ...
+ % git-grouper filter-repo-has-group --ignore-nondirs *
  % git-grouper filter-repo-has-group 'GROUP1&GROUP2' REPO1 REPO2 ... ; # repos must belong to all of specified groups
  % git-grouper filter-repo-has-group 'GROUP1|GROUP2' REPO1 REPO2 ... ; # repos must belong to any of specified groups
 
 List repositories that do not belong to specified group(s):
 
  % git-grouper filter-repo-lacks-group GROUP REPO1 REPO2 ...
+ % git-grouper filter-repo-lacks-group --ignore-nondirs *
  % git-grouper filter-repo-lacks-group 'GROUP1&GROUP2' REPO1 REPO2 ... ; # repos must not belong to any of specified groups
  % git-grouper filter-repo-lacks-group 'GROUP1|GROUP2' REPO1 REPO2 ... ; # repos must not belong to just one of specified groups
 
 List repositories that do not belong to any group:
 
  % git-grouper filter-repo-orphan REPO1 REPO2 ...
+ % git-grouper filter-repo-orphan --ignore-nondirs *
 
 List repositories that belong to a group or more:
 
  % git-grouper filter-repo-not-orphan REPO1 REPO2 ...
+ % git-grouper filter-repo-not-orphan --ignore-nondirs *
 
 List repositories that belong to multiple (instead of a single) group:
 
  % git-grouper filter-repo-multiple-group REPO1 REPO2 ...
+ % git-grouper filter-repo-multiple-group --ignore-nondirs *
 
 List repositories that belong to just one (instead of multiple) group:
 
  % git-grouper filter-repo-single-group REPO1 REPO2 ...
+ % git-grouper filter-repo-single-group --ignore-nondirs *
 
-=head2 Listing repo's remotes according to group's configuration
+=head2 Listing repositories
+
+List all defined repositories:
+
+ % git-grouper ls-all-remotes      ; # just list the names
+ % git-grouper ls-all-remotes -l   ; # list detailed records
+
+List repo's remotes according to group's configuration:
 
  % git-grouper ls-repo-remotes ; # remotes of current working repo
  % git-grouper ls-repo-remotes REPO1 REPO2 ...
+ % git-grouper ls-repo-remotes --ignore-nondirs *
 
 =head2 Configuring repositories based on group's attributes
 
  % git-grouper configure-repo ; # configure current working repo
  % git-grouper configure-repo REPO1 REPO2 ...
+ % git-grouper configure-repo --ignore-nondirs *
 
 =head1 DESCRIPTION
 
@@ -161,6 +175,10 @@ Only list repos that do not belong to any group(s).
 
 Only list repos that belong to just a single group.
 
+=head2 B<groups>
+
+Shortcut for ls-repo-groups (you can use just "g").
+
 =head2 B<ls-all-groups>
 
 List all defined groups.
@@ -203,7 +221,7 @@ interactive terminal (i.e. whether output is piped). This option specifically
 chooses an output format.
 
 
-=item B<--help>, B<-h>
+=item B<--help>, B<-h>, B<-?>
 
 Display help message and exit.
 
@@ -584,6 +602,82 @@ Can be specified multiple times.
 
 =back
 
+=head2 Options for subcommand groups
+
+=over
+
+=item B<--config-file>=I<s>
+
+(No description)
+
+
+=item B<--config-json>=I<s>
+
+See C<--config>.
+
+=item B<--config>=I<s>
+
+(No description)
+
+
+=item B<--groups-array>=I<s>
+
+How to return groups.
+
+Default value:
+
+ "never"
+
+Valid values:
+
+ ["never","auto","always"]
+
+When set to 'never', will always return a string where multiple groups are
+written as comma-separated list ('', 'group1', 'group1,group2'). When set to
+'auto', will return either an empty string when there is no group, or string for
+a single group, or array for multiple groups. When set to 'always', will always
+return an array for the groups result.
+
+
+=item B<--ignore-nondirs>
+
+(No description)
+
+
+=item B<--repo-json>=I<s>
+
+See C<--repo>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--repo>=I<s@>
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--result-array>=I<s>
+
+How to return result.
+
+Default value:
+
+ "auto"
+
+Valid values:
+
+ ["auto","always"]
+
+If set to 'auto', then when there is only one repo, will not return an array but
+the groups directly. When set to 'always', will always return an array of
+records.
+
+
+=back
+
 =head2 Options for subcommand ls-all-groups
 
 =over
@@ -908,7 +1002,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

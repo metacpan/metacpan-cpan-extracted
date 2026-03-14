@@ -1,3 +1,17 @@
+0.02  2026-03-13
+    - Fix: clear $@ (ERRSV) after G_EVAL callbacks to prevent pollution
+      across async event loop iterations
+    - Fix: query_stream on non-SELECT (DML) now delivers EOF instead of
+      a false error
+    - Fix: copy error string in stream_error before invoking callback
+    - Add fork detection via PID check at all operation entry points
+    - Add CLONE_SKIP to prevent unsafe ithread cloning
+    - Set SvUTF8_on on column name SVs for UTF-8 field charsets,
+      including MariaDB 10.10+ uca1400 collations
+    - Guard zero-length allocation in send_long_data
+    - Document multi_statements result/error behavior and charset
+      requirements for UTF-8 prepared statement parameters
+
 0.01  2026-03-07
     - Async queries via MariaDB non-blocking API
     - Query pipelining via mysql_send_query/mysql_read_query_result

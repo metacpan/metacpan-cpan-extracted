@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-package App::Cmd::Command 0.339;
+package App::Cmd::Command 0.340;
 
 use App::Cmd::ArgProcessor;
 BEGIN { our @ISA = 'App::Cmd::ArgProcessor' };
@@ -287,7 +287,7 @@ App::Cmd::Command - a base class for App::Cmd commands
 
 =head1 VERSION
 
-version 0.339
+version 0.340
 
 =head1 PERL VERSION
 

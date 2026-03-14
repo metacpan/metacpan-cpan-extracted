@@ -51,7 +51,6 @@
             "File::Copy" : "0",
             "File::DosGlob" : "0",
             "File::Glob" : "0",
-            "File::MMagic" : "1.30",
             "File::Spec" : "3.73",
             "File::Which" : "0",
             "I18N::Langinfo" : "0.17",
@@ -111,6 +110,6 @@
          "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v1.2.3",
+   "version" : "v1.2.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -56,6 +56,13 @@ Add a directory to the list of watched directories.
 Remove a directory from the list of watched directories. There still may
 come in some events stored for that directory previously in the queue.
 
+## `->stop`
+
+Stops the watcher, releasing all locked resources
+
+You might need to call this if you want to delete or rename one of the
+directories the watcher is watching.
+
 ## `->wait $CB`
 
     $w->wait(sub {
@@ -150,6 +157,8 @@ with a debugger and familiar with Cygwin, your help is appreciated.
 
 [Win32::ChangeNotify](https://metacpan.org/pod/Win32%3A%3AChangeNotify) - Win32 directory watcher using the ChangeNotify API
 
+[Mojo::File::ChangeNotify](https://metacpan.org/pod/Mojo%3A%3AFile%3A%3AChangeNotify) - integration with [Mojolicious](https://metacpan.org/pod/Mojolicious)
+
 Currently, no additional information like that available through
 [https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readdirectorychangesexw|ReadDirectoryChangesExW](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-readdirectorychangesexw|ReadDirectoryChangesExW)
 is collected. But a wrapper/emulation could provide that information whenever
@@ -171,7 +180,7 @@ Max Maischein `corion@cpan.org`
 
 # COPYRIGHT (c)
 
-Copyright 2022 by Max Maischein `corion@cpan.org`.
+Copyright 2022-2026 by Max Maischein `corion@cpan.org`.
 
 # LICENSE
 
