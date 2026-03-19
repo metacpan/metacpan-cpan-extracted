@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Custom Template System :: %%%page%%%</title>
+		<style type="text/css">
+			body {
+				font-family: Sans-Serif;
+				margin: 2em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Custom Template System :: %%%page%%%</h1>
+		<p>
+			Of course, you would never want to write your own templating system!
+			But this example shows you how to custom-integrate a non-TT template
+			system into PlackX::Framework.
+		</p>
+		<p>
+			Value of "somevar" parameter: "%%%somevar%%%"
+		</p>
+		<hr>
+		<p style="font-size:80%; text-align: right">
+			Page %%%page%%% served by PID %%%pid%%%
+		</p>
+	</body>
+</html>

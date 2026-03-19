@@ -220,6 +220,109 @@ subtest 'build: reply_to and sender' => sub
     like( $str, qr/Sender: sender\@example\.com/,  'Sender present' );
 };
 
+subtest 'build: attach single scalar shorthand' => sub
+{
+    use File::Temp qw( tempfile );
+    my( $fh, $path ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
+    print { $fh } "%PDF-1.4 fake pdf content";
+    close( $fh );
+
+    my $mail = Mail::Make->build(
+        from    => 'a@example.com',
+        to      => 'b@example.com',
+        subject => 'attach scalar test',
+        plain   => "See attached.\n",
+        attach  => $path,
+    );
+    ok( defined( $mail ), 'build() with attach scalar shorthand succeeds' );
+    my $str = $mail->as_string;
+    ok( defined( $str ), 'as_string succeeds' );
+    like( $str, qr/Content-Disposition: attachment/, 'attachment disposition present' );
+    like( $str, qr/multipart\/mixed/, 'multipart/mixed structure assembled' );
+};
+
+subtest 'build: attach arrayref of scalars' => sub
+{
+    use File::Temp qw( tempfile );
+    my( $fh1, $path1 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
+    print { $fh1 } "%PDF-1.4 first";
+    close( $fh1 );
+    my( $fh2, $path2 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
+    print { $fh2 } "%PDF-1.4 second";
+    close( $fh2 );
+
+    my $mail = Mail::Make->build(
+        from    => 'a@example.com',
+        to      => 'b@example.com',
+        subject => 'attach arrayref test',
+        plain   => "See attached.\n",
+        attach  => [ $path1, $path2 ],
+    );
+    ok( defined( $mail ), 'build() with attach arrayref of scalars succeeds' );
+    my $str = $mail->as_string;
+    ok( defined( $str ), 'as_string succeeds' );
+    like( $str, qr/multipart\/mixed/, 'multipart/mixed structure assembled' );
+    my $attachment_count = () = $str =~ /Content-Disposition: attachment/g;
+    is( $attachment_count, 2, 'two attachment parts present' );
+};
+
+subtest 'build: attach arrayref of hashrefs' => sub
+{
+    use File::Temp qw( tempfile );
+    my( $fh1, $path1 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
+    print { $fh1 } "%PDF-1.4 first";
+    close( $fh1 );
+    my( $fh2, $path2 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
+    print { $fh2 } "%PDF-1.4 second";
+    close( $fh2 );
+
+    my $mail = Mail::Make->build(
+        from    => 'a@example.com',
+        to      => 'b@example.com',
+        subject => 'attach arrayref of hashrefs test',
+        plain   => "See attached.\n",
+        attach  => [
+            { path => $path1, filename => 'Q4 Report.pdf' },
+            { path => $path2, filename => 'Access Log.pdf' },
+        ],
+    );
+    ok( defined( $mail ), 'build() with attach arrayref of hashrefs succeeds' );
+    my $str = $mail->as_string;
+    ok( defined( $str ), 'as_string succeeds' );
+    like( $str, qr/Q4 Report\.pdf/,   'first custom filename present' );
+    like( $str, qr/Access Log\.pdf/,  'second custom filename present' );
+    my $attachment_count = () = $str =~ /Content-Disposition: attachment/g;
+    is( $attachment_count, 2, 'two attachment parts present' );
+};
+
+subtest 'build: attach mixed arrayref' => sub
+{
+    use File::Temp qw( tempfile );
+    my( $fh1, $path1 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
+    print { $fh1 } "%PDF-1.4 first";
+    close( $fh1 );
+    my( $fh2, $path2 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
+    print { $fh2 } "%PDF-1.4 second";
+    close( $fh2 );
+
+    my $mail = Mail::Make->build(
+        from    => 'a@example.com',
+        to      => 'b@example.com',
+        subject => 'attach mixed arrayref test',
+        plain   => "See attached.\n",
+        attach  => [
+            $path1,
+            { path => $path2, filename => 'Custom Name.pdf' },
+        ],
+    );
+    ok( defined( $mail ), 'build() with mixed attach arrayref succeeds' );
+    my $str = $mail->as_string;
+    ok( defined( $str ), 'as_string succeeds' );
+    like( $str, qr/Custom Name\.pdf/, 'custom filename from hashref present' );
+    my $attachment_count = () = $str =~ /Content-Disposition: attachment/g;
+    is( $attachment_count, 2, 'two attachment parts present' );
+};
+
 # NOTE: as_entity
 subtest 'as_entity returns Mail::Make::Entity' => sub
 {

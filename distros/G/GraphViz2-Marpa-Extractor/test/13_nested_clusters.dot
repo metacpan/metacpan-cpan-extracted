@@ -1,0 +1,21 @@
+digraph G {
+    subgraph cluster_outer {
+        label="Outer";
+        style=dashed;
+
+        subgraph cluster_inner1 {
+            label="Inner 1";
+            a -> b;
+        }
+
+        subgraph cluster_inner2 {
+            label="Inner 2";
+            c -> d;
+        }
+
+        b -> c;
+    }
+
+    e -> a;
+    d -> e;
+}

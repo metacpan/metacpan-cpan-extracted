@@ -1,4 +1,4 @@
-package EAI::DB 1.920;
+package EAI::DB 1.921;
 
 use strict; use warnings; use feature 'unicode_strings'; use Encode qw(encode);
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger); use Carp qw(confess longmess); use Scalar::Util 'blessed';
@@ -727,7 +727,7 @@ returns the DBI handler and the DSN string to allow direct commands with the han
 
 =head1 COPYRIGHT
 
-Copyright (c) 2025 Roland Kapl
+Copyright (c) 2026 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

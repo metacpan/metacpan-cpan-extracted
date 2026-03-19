@@ -12,7 +12,7 @@ plan tests => 8;
 {
     my $buf;
     DumpInto( \$buf, \42 );
-    is( $buf, "--- !!perl/ref \n=: 42\n" );
+    is( $buf, "--- !!perl/ref\n=: 42\n" );
 }
 
 {
@@ -24,7 +24,7 @@ plan tests => 8;
 {
     my $buf;
     DumpInto( \$buf, { foo => [qw<bar baz>] } );
-    is( $buf, "--- \nfoo: \n  - bar\n  - baz\n" );    # 4
+    is( $buf, "---\nfoo:\n  - bar\n  - baz\n" );    # 4
 }
 
 {

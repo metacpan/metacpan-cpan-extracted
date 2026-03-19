@@ -6,6 +6,7 @@ use Test::Async::Redis ':redis';
 use Test2::V0;
 use Async::Redis;
 use Future::AsyncAwait;
+use Future::IO;
 use Time::HiRes qw(time);
 
 SKIP: {
@@ -42,7 +43,7 @@ SKIP: {
         my $pusher = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
         run { $pusher->connect };
 
-        my $push_f = get_loop()->delay_future(after => 0.3)->then(async sub {
+        my $push_f = Future::IO->sleep(0.3)->then(async sub {
             await $pusher->rpush('blpop:queue', 'delayed_item');
         });
 
@@ -87,28 +88,21 @@ SKIP: {
     };
 
     subtest 'non-blocking verification (CRITICAL)' => sub {
-        run { $redis->del('blpop:nonblock') };
+        my $redis2 = skip_without_redis();
+        run { $redis->del('nb:blpop:list') };
 
-        my @ticks;
-        my $timer = IO::Async::Timer::Periodic->new(
-            interval => 0.01,  # 10ms
-            on_tick => sub { push @ticks, 1 },
-        );
-        get_loop()->add($timer);
-        $timer->start;
+        my $push_f = Future::IO->sleep(0.3)->then(async sub {
+            await $redis2->rpush('nb:blpop:list', 'delayed');
+        });
 
-        my $start = time();
-        my $result = run { $redis->blpop('blpop:nonblock', 1) };
-        my $elapsed = time() - $start;
+        my $start = Time::HiRes::time();
+        my $result = run { $redis->command('BLPOP', 'nb:blpop:list', 2) };
+        my $elapsed = Time::HiRes::time() - $start;
 
-        $timer->stop;
-        get_loop()->remove($timer);
+        ok($elapsed < 1.5, "BLPOP resolved via delayed push (${elapsed}s)");
+        is($result->[1], 'delayed', 'got the delayed value');
 
-        is($result, undef, 'BLPOP timed out');
-        ok($elapsed >= 0.9, "waited ~1s (${elapsed}s)");
-
-        # CRITICAL: Event loop must tick during BLPOP wait
-        ok(@ticks >= 50, "Event loop ticked " . scalar(@ticks) . " times (expected ~100)");
+        run { $redis->del('nb:blpop:list') };
     };
 
     # Cleanup

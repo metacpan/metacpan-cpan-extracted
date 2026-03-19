@@ -6,7 +6,7 @@
 # a connection that is incoming.
 #
 # Right now we know of no ident servers on the internet that serve out. 
-# Patches welcome http://github.com/toddr/Net-Ident
+# Patches welcome https://github.com/cpan-authors/Net-Ident
 127.0.0.1
 #pc.xs4all.nl
 #xs4all.nl

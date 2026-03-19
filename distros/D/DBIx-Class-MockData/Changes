@@ -1,4 +1,27 @@
-Revision history for DBIx-Class-MockData
+Revision history for DBIx::Class::MockData
+
+0.04  2026-03-17
+
+      [NEW FEATURES]
+      - Added rows_per_table parameter to specify different row counts per table
+      - Added generators parameter for custom column value generation
+        Supports static values, row interpolation ({row}), and Perl code references
+
+      [ENHANCEMENTS]
+      - Bulk insert using populate() for up to 10x faster performance
+      - Salt value now randomized even when seed is set (ensures cross-run uniqueness)
+      - Better handling of unique constraints across all column types
+      - Improved error handling with graceful failure recovery
+
+      [DOCUMENTATION]
+      - Added comprehensive examples for rows_per_table and generators
+      - Documented performance improvements and best practices
+
+      [INTERNAL]
+      - Refactored _generate_value to support custom generators
+      - Added rows_per_table support in generate() loop
+      - Updated CLI tool with --rows-per-table and --generators options
+      - Comprehensive test coverage for all new features
 
 0.03  2026-03-12
 

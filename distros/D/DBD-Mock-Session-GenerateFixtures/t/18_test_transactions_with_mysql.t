@@ -33,12 +33,12 @@ my $mysqld = Test::mysqld->new(
 my $dbh = DBI->connect(
     $mysqld->dsn( dbname => 'test' ),
     {
-        RaiseError => 0,            # ← THIS is where it goes
+        RaiseError => 1,            # ← THIS is where it goes
         PrintError => 0,
         AutoCommit => 1,
     }
 );
-
+$dbh->do("SET SESSION sql_mode=''");
 build_mysql_db($dbh);
 populate_test_db($dbh);
 my $obj = DBD::Mock::Session::GenerateFixtures->new( { dbh => $dbh } );
@@ -79,8 +79,8 @@ subtest 'upsert generate mock data' => sub {
     my $ok    = 1;
     my $error = undef;
     try {
-        my $sth_2 = $obj->get_dbh()->prepare('INSERT INTO user_login_history (id) VALUES (?)');
-        $r_3 = $sth_2->execute('aa') or die $obj->get_dbh()->err();
+        my $sth_2 = $obj->get_dbh()->prepare($failed_sql_user_login_history);
+        $r_3 = $sth_2->execute(1) or die 'can not commit' . $obj->get_dbh()->err();
     }
     catch {
         $ok    = 0;

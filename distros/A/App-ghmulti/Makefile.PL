@@ -36,12 +36,10 @@ my %runtime_requires = (
 
 # TEST_REQUIRES
 my %test_requires = (
-                     'strict'                => '0',
-                     'warnings'              => '0',
-                     'Capture::Tiny'         => '0.47',
-                     'File::Basename'        => '0',
-                     'File::Spec::Functions' => '0',
-                     'Test::More'            => '0',
+                     'Capture::Tiny'                 => '0.47',
+                     'File::Basename'                => '0',
+                     'File::Spec::Functions'         => '0',
+                     'Test::More'                    => '0',
                     );
 
 # CONFIGURE_REQUIRES
@@ -53,24 +51,30 @@ my %prereq_build = (
                     'File::Spec::Functions' => '0',
                    );
 
-# Added to %test_requires if needed
-my %authortest_requires = (
-                           'Capture::Tiny'         => '0.47',
-                           'Cwd'                   => '0',
-                           'File::Basename'        => '0',
-                           'File::Spec::Functions' => '0',
-                           'File::Temp'            => '0',
-                           'File::chdir'           => '0.1011',
-                           'Pod::Wordlist'         => '1.27',
-                           'Test::CheckManifest'   => '1.43',
-                           'Test::More'            => '0',
-                           'Test::Pod'             => '1.51',
-                           'Test::Spelling'        => '0.25',
-                          );
+if ($ENV{AUTHOR_TESTING}) {
+  print "Author tests enabled (AUTHOR_TESTING is true)\n";
+  add_mods(\%test_requires, {
+                             'Cwd'                   => '0',
+                             'File::Temp'            => '0',
+                             'File::chdir'           => '0.1011',
+                             'Pod::Wordlist'         => '1.27',
+                             'Test::Kwalitee'        => '1.26',
+                             'Test::More'            => '0',
+                             'Test::Pod'             => '1.51',
+                             'Test::Spelling'        => '0.25',
+                            }
+          );
+}
 
-if ($ENV{TEST_AUTHOR}) {
-  print "Author tests enabled (TEST_AUTHOR=1)\n";
-  %test_requires = (%test_requires,  %authortest_requires);
+if ($ENV{RELEASE_TESTING}) {
+  print "Release tests enabled (RELEASE_TESTING is true)\n";
+  add_mods(\%test_requires, {
+                             'Test::Changes::Strict::Simple' => '0.05',
+                             'Test::CheckManifest'           => '1.43',
+                             'Test::CPAN::Meta'              => '0.25',
+                             'Test::CPAN::Meta::JSON'        => '0.16',
+                            }
+          );
 }
 
 my %WriteMakefileArgs =
@@ -88,9 +92,6 @@ my %WriteMakefileArgs =
    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
    clean => { FILES => join('-', split(/::/, $The_Module)) . '-*' },
   );
-
-
-
 
 if ($meta_merge_supported) {
   $WriteMakefileArgs{META_MERGE} =
@@ -123,11 +124,6 @@ unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {
   @{$WriteMakefileArgs{PREREQ_PM}}{keys %$test_requires} = values %$test_requires;
 }
 
-# unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
-#   my $build_requires = delete $WriteMakefileArgs{BUILD_REQUIRES} || {};
-#   @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
-# }
-
 
 delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
   unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
@@ -135,11 +131,18 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
   unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
 delete $WriteMakefileArgs{META_MERGE}
   unless eval { ExtUtils::MakeMaker->VERSION('6.46'); 1 };
-delete $WriteMakefileArgs{LICENSE}
-  unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
 
+
+
+sub add_mods {
+  my ($a, $b) = @_;
+  while (my ($mod, $ver) = each(%$b)) {
+    warn("Different versions for $mod") if exists($a->{$mod}) && $a->{$mod} ne $ver;
+    $a->{$mod} = $ver if !exists($a->{$mod}) || version->parse($a->{$mod}) < version->parse($ver);
+  }
+}
 
 sub MY::postamble {
   return "
@@ -153,8 +156,6 @@ README: $PM_File
 \tpod2text $PM_File > README
 
 all :: README
-
-#manifest : README
 
 policy-files:
 \tdist-policyfiles -m $The_Module -l klaus-rindfrey -p perl- -u \\

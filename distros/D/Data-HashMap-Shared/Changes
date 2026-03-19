@@ -1,0 +1,17 @@
+Revision history for Data-HashMap-Shared
+
+0.01  2026-03-14
+    - 10 type-specialized shared-memory hash map variants (II, SS, SI, IS,
+      I16, I32, I16S, I32S, SI16, SI32)
+    - File-backed mmap(MAP_SHARED) for cross-process data sharing
+    - Futex-based read-write lock with seqlock for lock-free reads
+    - Lock-free atomic counters (incr/decr under read lock)
+    - Elastic hash table capacity (automatic grow/shrink)
+    - Arena allocator with free-list reclamation for string storage
+    - Keyword API via XS::Parse::Keyword
+    - Opt-in LRU eviction and per-key TTL (zero cost when disabled)
+    - Removal-safe iteration with deferred resize/compact
+    - Cursor API: independent iterators with seek, reset, nesting
+    - Stale lock recovery via PID tracking (auto-recover after 2s timeout)
+    - Diagnostic error messages from constructor
+    - Bundled xxHash 0.8.3 (XXH3_64bits) for hashing

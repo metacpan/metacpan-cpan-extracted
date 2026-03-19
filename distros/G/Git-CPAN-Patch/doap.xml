@@ -64,6 +64,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Michael Schout</foaf:name>
+      <foaf:mbox rdf:resource="mailto:schoutm@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Mike Doherty</foaf:name>
       <foaf:mbox rdf:resource="mailto:doherty@cs.dal.ca" />
     </foaf:Person>
@@ -452,6 +458,18 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.4.0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2021-09-19</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.5.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2022-03-06</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2.5.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2026-03-18</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

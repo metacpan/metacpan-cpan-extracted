@@ -1,5 +1,72 @@
 Revision history for Perl extension XML::Parser.
 
+2.48 2026-03-18 (by Todd Rinaldo)
+
+  Fixes:
+    - GH #39 Fix off-by-one heap buffer overflow in st_serial_stack growth check (CVE-2006-10003)
+    - GH #64 Fix buffer overflow in parse_stream when filehandle has :utf8 layer (CVE-2006-10002)
+    - GH #27 Prevent symbol table auto-vivification in Expat::parse
+    - GH #30 Set UTF-8 flag on sysid in ExternEnt handler and fix Debug style for non-ASCII chars
+    - GH #36 Prevent position overflow for large files in line/column/error paths
+    - GH #41 Fix xml_escape to escape all occurrences of quote characters
+    - GH #44 Fix lexical filehandle handling in ExternEnt handler return values
+    - GH #45 Clean up compiler warnings in Expat.xs
+    - GH #47 Fix routing of character data after root element to Char handler
+    - GH #48 Fix current_byte overflow for large XML files on 32-bit perl
+    - GH #50 Propagate xpcroak errors in Subs style instead of swallowing them
+    - GH #53 Fix parameter entity references in internal DTD subset breaking handler dispatch
+    - GH #65 Support standard LIBS and INC options in Makefile.PL; propagate to Expat/Makefile.PL
+    - GH #69 Auto-detect multiarch library paths for expat
+    - GH #72 Localize $_ in Style::Stream to avoid read-only modification
+    - GH #76 Use system tmpdir for temp files in Devel::CheckLib
+    - GH #83 Use pkg-config to auto-detect expat in non-standard locations
+    - GH #90 Improve "Couldn't find your C compiler" error message
+    - GH #100 Clean up MSVC assertlib .obj files on Windows
+    - GH #103 Skip -rpath on Mac OS X 10.4 and earlier
+    - GH #106 Fix freeing of the content model using XML_FreeContentModel
+    - GH #148 XML-escape attribute values in Stream style default output
+    - GH #149 Restore Base after parsefile() to prevent context pollution on reuse
+    - GH #152 Fix SYNOPSIS handler name Characters -> Text in Stream.pm
+    - GH #153 Fix variable interpolation in xpcarp() and setHandlers() error messages
+    - GH #157 Restore Perl 5.8 and 5.10 test compatibility
+    - GH #160 Initialize st_serial_stacksize after allocation in Expat.xs
+    - GH #162 Replace local $^W=0 with no warnings 'numeric' in Expat.pm
+    - GH #164 Add missing ENTER/SAVETMPS scope to notationDecl callback
+    - GH #165 Replace each() with keys() to avoid iterator side effects
+    - GH #166 Remove no-op study() call in xml_escape
+
+  Improvements:
+    - GH #38 Add G_VOID flag to all void-context perl_call_sv/method/pv calls
+    - GH #46 Add UseForeignDTD option for documents without DOCTYPE
+    - GH #49 Add current_length method to XML::Parser::Expat
+    - GH #54 Add hint about unescaped characters for invalid token errors
+    - GH #67 Add NoLWP to expat capability probes for consistent skip logic
+    - GH #70 Enhance parse exceptions with XML context when ErrorContext is set
+    - GH #71 Move encoding maps from PERL5LIB to File::ShareDir
+    - GH #73 XMLDecl handler now returns "yes"/"no" for standalone attribute
+    - GH #101 Make LWP::UserAgent a recommended dependency, not required
+    - GH #102 Expose expat security APIs: BillionLaughs and ReparseDeferral
+    - GH #167 Modernize Perl pragmas across modules
+
+  Documentation:
+    - GH #55 Add ERROR HANDLING section and improve parse error documentation
+    - GH #56 Clarify Char handler splitting behavior with example and docs
+    - GH #74 Document predefined entity expansion in Tree style
+    - GH #161 Fix Standalone parameter description in README
+
+  Maintenance:
+    - GH #25 Add Debug style multibyte character regression test
+    - GH #28 Add tests for globref and lexical filehandle return values in ExternEnt handler
+    - GH #31 Add encoding tests for windows-1251, koi8-r, windows-1255, and ibm866
+    - GH #51 Skip external DTD tests when expat lacks parameter entity support
+    - GH #150 Replace Artistic-2.0 LICENSE with correct Perl dual license
+    - GH #151 Modernize xpcroak.t from Test.pm to Test::More
+    - GH #155 Modernize CI workflow inspired by YAML-Syck
+    - GH #159 Install libexpat1-dev in perl-tester CI containers
+    - GH #163 Replace defunct Travis CI badge with GitHub Actions
+    - GH #168 Update META_MERGE URLs to cpan-authors organization
+    - Integrate Windows into overall CI test run
+
 2.47 2023-12-28 (by Todd Rinaldo)
     - #84 use $fh instead of $foo
 	- #85 Fix typo in documentation

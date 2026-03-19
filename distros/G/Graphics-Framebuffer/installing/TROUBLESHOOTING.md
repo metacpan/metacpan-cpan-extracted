@@ -1,4 +1,6 @@
-# Troubleshooting Graphics::Framebuffer
+# Graphics::Framebuffer Troubleshooting
+
+[![Graphics::Framebuffer Logo](../GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
 
 ## TROUBLESHOOTING
 
@@ -12,9 +14,9 @@ A console window doesn't count as "the console".  You cannot use this module fro
 
 If you want to run your program within X-Windows, then you have the wrong module.  Use SDL, QT, or GTK or something similar.
 
-You MUST have a framebuffer based video driver for this to work.  The device ("/dev/fb0" for example) must exist.
+You MUST have a framebuffer based video driver for this to work.  The device (```/dev/fb0``` for example) must exist.
 
-If it does exist, but is not "/dev/fb0", then you can define it in the 'new' method with the "FB_DEVICE" parameter, although the module is pretty good at finding it automatically.
+If it does exist, but is not ```/dev/fb0```, then you can define it in the 'new' method with the "FB_DEVICE" parameter, although the module is pretty good at finding it automatically.
 
 * It may be possible to get a framebuffer device with a proprietary driver by forcing Grub to go into a VESA VGA mode for the console (worked for me with NVidia's proprietary drivers).
 
@@ -24,7 +26,7 @@ Ok, segfaults suck.  Believe me, I had plenty in the early days of writing this 
 
 This is almost always caused by the module incorrectly calculating the framebuffer memory size, and it's guessing too large or small a memory footprint, and the system doesn't like it.
 
-Try running the "primitives.pl" in the "examples" directory in the following way (assuming your screen is larger than 640x480):
+Try running the ```primitives.pl``` in the "examples" directory in the following way (assuming your screen is larger than 640x480):
 
 ```
 perl examples/primitives.pl --x=640 --y=480
@@ -46,17 +48,17 @@ This should force a full screen flush, but only use this if you really need it.
 
 ### Where are the fonts?
   
-The default chosen font is "FreeSans" and this is included in the "fonts-freetype-ttf" package.  If this package is not installed, then either install it (recommended) or pick a different font.  The "fonts.pl" example script uses FreeSans.
+The default chosen font is "FreeSans" and this is included in the "fonts-freetype-ttf" package.  If this package is not installed, then either install it (recommended) or pick a different font.  The ```fonts.pl``` example script uses FreeSans.
 
 ### It Just Plain Isn't Working
 
 Well, either your system doesn't have a framebuffer driver, or perhaps the module is getting confusing data back from it and can't properly initialize (see the previous items).
 
-First, make sure your system has a framebuffer by seeing if "/dev/fb0" (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside "/dev" (or "/dev/fb/"), then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with ```modprobe -a drivername``` (replacing "drivername" with the actual driver name).
+First, make sure your system has a framebuffer by seeing if ```/dev/fb0``` (actually "fb" then any number) exists.  If you don't see any "fb0" - "fb31" files inside ```/dev``` (or ```/dev/fb/```), then you don't have a framebuffer driver running.  You need to fix that first.  Sometimes you have to manually load the driver with ```modprobe -a drivername``` (replacing "drivername" with the actual driver name).
 
 Second, you did the above, but still nothing.  You need to check permissions.  The account you are running this under needs to have permission to use the screen.  This typically means being a member of the "video" group.  Let's say the account is called "username", and you want to give it permission.  In a Linux (Debian/Ubuntu/Mint/RedHat/Fedora) environment you would use this to add "username" (your account name) to the "video" group:
 
-```
+```bash
 sudo usermod -a -G video username
 ```
 
@@ -66,7 +68,7 @@ Once that is run (changing "username" to whatever your username is), log out, th
 
 It is?  Well then turn it off.  Use the ```$fb->cls('OFF')``` method to do it.  Use ```$fb->cls('ON')``` to turn it back on.
 
-If your script exits without turning the cursor back on, then it will still be off.  To get your cursor back, just type the command "reset" (and make sure you turn it back on before your code exits, so it doesn't do that).
+If your script exits without turning the cursor back on, then it will still be off.  To get your cursor back, just type the command ```reset``` (and make sure you turn it back on before your code exits, so it doesn't do that).
 
 * UPDATE:  The new default behavior is to do this for you via the "RESET" parameter when creating the object.  See the "new" method documentation for more information.
 
@@ -94,9 +96,9 @@ Plain and simple, your device just may be too slow for some CPU intensive operat
 
 ### Ask For Help
 
-If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the "dump.pl" script inside the "examples" directory inside this module's package:
+If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the ```dump.pl``` script inside the "examples" directory inside this module's package:
 
-```
+```bash
 perl dump.pl
 ```
 

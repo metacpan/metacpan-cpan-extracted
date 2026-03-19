@@ -628,12 +628,9 @@ WriteMakefile(
     VERSION_FROM => 'Ident.pm',                                                       # finds $VERSION
     PREREQ_PM    => {
         Socket     => '0',
-        Fcntl      => '0',
         FileHandle => '0',
         Carp       => '0',
-        Config     => '0',
         Exporter   => '0',
-        vars       => '0',
     },
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean      => { FILES    => "Net-Ident-* t/apache/conf/access.conf t/apache/conf/apache_config.pl t/apache/conf/httpd.conf t/apache/conf/srm.conf t/apache/logs/access_log t/apache/logs/error_log t/apache/perl/inc" },
@@ -642,13 +639,13 @@ WriteMakefile(
 
             #            'Apache' => 0,  # mod_perl is crazy hard to install. It's not a fair thing to require
             #            'Apache::Constants' => 0,  # mod_perl is crazy hard to install. It's not a fair thing to require
-            'Test::More',    # For Testing.
-            'IO::Socket',    # For Testing
+            'Test::More' => 0,    # For Testing.
+            'IO::Socket' => 0,    # For Testing
         },
         resources => {
-            license  => 'http://dev.perl.org/licenses/',
-            bugtracker => 'http://github.com/toddr/Net-Ident/issues',
-            repository => 'http://github.com/toddr/Net-Ident',
+            license    => 'https://dev.perl.org/licenses/',
+            bugtracker => 'https://github.com/cpan-authors/Net-Ident/issues',
+            repository => 'https://github.com/cpan-authors/Net-Ident',
         },
     },
 );

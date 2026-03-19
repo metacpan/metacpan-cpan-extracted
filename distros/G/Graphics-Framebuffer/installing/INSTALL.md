@@ -1,5 +1,7 @@
 # Installing Graphics::Framebuffer Instructions
 
+[![Graphics::Framebuffer Logo](../GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
+
 ## OPERATING SYSTEM REQUIREMENT
 
 Graphics::Framebuffer only works (for the moment) on Linux.  FreeBSD is planned for the future, but is not yet implemented.

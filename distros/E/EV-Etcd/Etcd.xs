@@ -50,8 +50,6 @@ static void process_user_list_response(pTHX_ pending_call_t *pc);
 static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op);
 static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_ops, size_t *dst_n);
 
-static void health_timer_callback(EV_P_ ev_timer *w, int revents);
-
 /* Reconnect to the next endpoint (or same if only one) */
 static void reconnect_channel(ev_etcd_t *client) {
     if (client->endpoint_count > 1)
@@ -137,9 +135,15 @@ static void health_timer_callback(struct ev_loop *loop, ev_timer *w, int revents
             PUSHs(sv_2mortal(newSViv(is_healthy)));
             PUSHs(sv_2mortal(newSVpv(client->endpoints[client->current_endpoint], 0)));
             PUTBACK;
-            call_sv(client->health_callback, G_DISCARD);
+            client->in_callback = 1;
+            CALL_SV_SAFE(client->health_callback, G_DISCARD);
             FREETMPS;
             LEAVE;
+            client->in_callback = 0;
+            if (!client->active) {
+                finish_client_destroy(aTHX_ client);
+                return;
+            }
         }
     }
 }
@@ -197,6 +201,50 @@ static void *cq_thread_func(void *arg) {
 }
 
 /*
+ * Finish deferred client destruction.
+ * Called after in_callback is cleared and client->active is false,
+ * meaning DESTROY ran during a callback but deferred the final cleanup.
+ */
+void finish_client_destroy(pTHX_ ev_etcd_t *client) {
+    /* Free any remaining call structures */
+    while (client->pending_calls) {
+        pending_call_t *pc = client->pending_calls;
+        client->pending_calls = pc->next;
+        grpc_metadata_array_destroy(&pc->initial_metadata);
+        grpc_metadata_array_destroy(&pc->trailing_metadata);
+        if (pc->recv_buffer) grpc_byte_buffer_destroy(pc->recv_buffer);
+        grpc_slice_unref(pc->status_details);
+        if (pc->call) grpc_call_unref(pc->call);
+        SvREFCNT_dec(pc->callback);
+        Safefree(pc);
+    }
+    while (client->watches) {
+        cleanup_watch(aTHX_ client->watches);
+    }
+    while (client->keepalives) {
+        cleanup_keepalive(aTHX_ client->keepalives);
+    }
+    while (client->observes) {
+        cleanup_observe(aTHX_ client->observes);
+    }
+
+    /* Free client-level resources (mirrors free_perl_resources in DESTROY) */
+    if (client->health_callback)
+        SvREFCNT_dec(client->health_callback);
+    if (client->auth_token) {
+        memset(client->auth_token, 0, client->auth_token_len);
+        Safefree(client->auth_token);
+    }
+    if (client->endpoints) {
+        for (int i = 0; i < client->endpoint_count; i++)
+            if (client->endpoints[i]) Safefree(client->endpoints[i]);
+        Safefree(client->endpoints);
+    }
+
+    Safefree(client);
+}
+
+/*
  * ev_async callback - runs in main thread when signaled by gRPC thread.
  * Drains the event queue and processes each event.
  */
@@ -248,9 +296,9 @@ static void cq_async_callback(struct ev_loop *loop, ev_async *w, int revents) {
 
     client->in_callback = 0;
 
-    /* If DESTROY was called during event processing, finish freeing the struct */
+    /* If DESTROY was called during event processing, finish the deferred cleanup */
     if (!client->active) {
-        Safefree(client);
+        finish_client_destroy(aTHX_ client);
     }
 }
 
@@ -266,6 +314,7 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
 
             if (success && wc->active) {
                     process_watch_response(aTHX_ wc);
+                    if (!client->active) return; /* DESTROY called in callback */
                     /* Re-arm receive if still active */
                     if (wc->active) {
                         watch_rearm_recv(aTHX_ wc);
@@ -281,21 +330,8 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         /* Reconnection initiated, don't notify callback yet */
                     } else {
                         /* Reconnection failed or disabled, notify callback and cleanup */
-                        dSP;
-                        ENTER;
-                        SAVETMPS;
-                        PUSHMARK(SP);
-                        EXTEND(SP, 2);
-                        PUSHs(&PL_sv_undef);
-                        PUSHs(sv_2mortal(create_error_hv(aTHX_
-                            GRPC_STATUS_UNAVAILABLE,
-                            "Watch stream ended",
-                            18,
-                            "watch")));
-                        PUTBACK;
-                        call_sv(wc->callback, G_DISCARD);
-                        FREETMPS;
-                        LEAVE;
+                        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_UNAVAILABLE, "Watch stream ended", "watch");
+                        if (!client->active) return; /* DESTROY called in callback */
                         cleanup_watch(aTHX_ wc);
                     }
                 } else {
@@ -309,6 +345,7 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     /* Process the first message that was received in the initial batch */
                     if (wc->recv_buffer && wc->active) {
                         process_watch_response(aTHX_ wc);
+                        if (!client->active) return;
                     }
                     /* Re-arm to receive more messages */
                     if (wc->active) {
@@ -318,18 +355,8 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                     }
                 } else {
                     if (wc->active) {
-                        dSP;
-                        ENTER;
-                        SAVETMPS;
-                        PUSHMARK(SP);
-                        EXTEND(SP, 2);
-                        PUSHs(&PL_sv_undef);
-                        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL,
-                            "Watch setup failed", 18, "watch")));
-                        PUTBACK;
-                        call_sv(wc->callback, G_DISCARD);
-                        FREETMPS;
-                        LEAVE;
+                        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch setup failed", "watch");
+                        if (!client->active) return;
                     }
                     cleanup_watch(aTHX_ wc);
                 }
@@ -339,6 +366,7 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
 
             if (success && kc->active) {
                     process_keepalive_response(aTHX_ kc);
+                    if (!client->active) return;
                     /* Re-arm receive if still active */
                     if (kc->active) {
                         keepalive_rearm_recv(aTHX_ kc);
@@ -354,21 +382,8 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         /* Reconnection initiated, don't notify callback yet */
                     } else {
                         /* Reconnection failed or disabled, notify callback and cleanup */
-                        dSP;
-                        ENTER;
-                        SAVETMPS;
-                        PUSHMARK(SP);
-                        EXTEND(SP, 2);
-                        PUSHs(&PL_sv_undef);
-                        PUSHs(sv_2mortal(create_error_hv(aTHX_
-                            GRPC_STATUS_UNAVAILABLE,
-                            "Keepalive stream ended",
-                            22,
-                            "keepalive")));
-                        PUTBACK;
-                        call_sv(kc->callback, G_DISCARD);
-                        FREETMPS;
-                        LEAVE;
+                        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_UNAVAILABLE, "Keepalive stream ended", "keepalive");
+                        if (!client->active) return;
                         cleanup_keepalive(aTHX_ kc);
                     }
                 } else {
@@ -380,8 +395,9 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
             keepalive_call_t *kc = (keepalive_call_t *)base;
             if (success) {
                     /* Process the first message that was received in the initial batch */
-                    if (kc->recv_buffer) {
+                    if (kc->recv_buffer && kc->active) {
                         process_keepalive_response(aTHX_ kc);
+                        if (!client->active) return;
                     }
                     /* Re-arm to receive more messages */
                     if (kc->active) {
@@ -391,18 +407,10 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         cleanup_keepalive(aTHX_ kc);
                     }
                 } else {
-                    dSP;
-                    ENTER;
-                    SAVETMPS;
-                    PUSHMARK(SP);
-                    EXTEND(SP, 2);
-                    PUSHs(&PL_sv_undef);
-                    PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL,
-                        "Keepalive setup failed", 22, "keepalive")));
-                    PUTBACK;
-                    call_sv(kc->callback, G_DISCARD);
-                    FREETMPS;
-                    LEAVE;
+                    if (kc->active) {
+                        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive setup failed", "keepalive");
+                        if (!client->active) return;
+                    }
                     cleanup_keepalive(aTHX_ kc);
                 }
             } else if (base->type == CALL_TYPE_ELECTION_OBSERVE_RECV) {
@@ -411,6 +419,7 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
 
             if (success && oc->active) {
                     process_observe_response(aTHX_ oc);
+                    if (!client->active) return;
                     /* Re-arm receive if still active */
                     if (oc->active) {
                         observe_rearm_recv(aTHX_ oc);
@@ -426,21 +435,8 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         /* Reconnection initiated, don't notify callback yet */
                     } else {
                         /* Reconnection failed or disabled, notify callback and cleanup */
-                        dSP;
-                        ENTER;
-                        SAVETMPS;
-                        PUSHMARK(SP);
-                        EXTEND(SP, 2);
-                        PUSHs(&PL_sv_undef);
-                        PUSHs(sv_2mortal(create_error_hv(aTHX_
-                            GRPC_STATUS_UNAVAILABLE,
-                            "Observe stream ended",
-                            20,
-                            "observe")));
-                        PUTBACK;
-                        call_sv(oc->callback, G_DISCARD);
-                        FREETMPS;
-                        LEAVE;
+                        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_UNAVAILABLE, "Observe stream ended", "observe");
+                        if (!client->active) return;
                         cleanup_observe(aTHX_ oc);
                     }
                 } else {
@@ -452,8 +448,9 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
             observe_call_t *oc = (observe_call_t *)base;
             if (success) {
                     /* Process the first message that was received in the initial batch */
-                    if (oc->recv_buffer) {
+                    if (oc->recv_buffer && oc->active) {
                         process_observe_response(aTHX_ oc);
+                        if (!client->active) return;
                     }
                     /* Re-arm to receive more messages */
                     if (oc->active) {
@@ -463,23 +460,26 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                         cleanup_observe(aTHX_ oc);
                     }
                 } else {
-                    dSP;
-                    ENTER;
-                    SAVETMPS;
-                    PUSHMARK(SP);
-                    EXTEND(SP, 2);
-                    PUSHs(&PL_sv_undef);
-                    PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL,
-                        "Observe setup failed", 20, "observe")));
-                    PUTBACK;
-                    call_sv(oc->callback, G_DISCARD);
-                    FREETMPS;
-                    LEAVE;
+                    if (oc->active) {
+                        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe setup failed", "observe");
+                        if (!client->active) return;
+                    }
                     cleanup_observe(aTHX_ oc);
                 }
             } else {
             /* Unary RPC completion */
             pending_call_t *pc = (pending_call_t *)base;
+
+            /* Remove from pending list BEFORE calling handler to prevent
+             * use-after-free if the callback triggers DESTROY */
+            pending_call_t **pp = &client->pending_calls;
+            while (*pp) {
+                if (*pp == pc) {
+                    *pp = pc->next;
+                    break;
+                }
+                pp = &(*pp)->next;
+            }
 
             if (success) {
                 switch (pc->base.type) {
@@ -613,26 +613,16 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                             break;
                     }
                 } else {
-                    /* Call failed - use status code if available */
-                    dSP;
-                    ENTER;
-                    SAVETMPS;
-                    PUSHMARK(SP);
-                    EXTEND(SP, 2);
-                    PUSHs(&PL_sv_undef);
-                    /* Create structured error with status info */
-                    PUSHs(sv_2mortal(create_error_hv(aTHX_
-                        pc->status,
-                        (const char *)GRPC_SLICE_START_PTR(pc->status_details),
-                        GRPC_SLICE_LENGTH(pc->status_details),
-                        "grpc_call")));
-                    PUTBACK;
-                    call_sv(pc->callback, G_DISCARD);
-                    FREETMPS;
-                    LEAVE;
+                    /* Call failed - use status code if available.
+                     * If batch failed before status was populated, status remains
+                     * GRPC_STATUS_OK (from Newxz zero-init) which is misleading.
+                     * Use UNAVAILABLE as fallback for network-level failures. */
+                    grpc_status_code effective_status = pc->status == GRPC_STATUS_OK
+                        ? GRPC_STATUS_UNAVAILABLE : pc->status;
+                    CALL_ERROR_CALLBACK(pc->callback, effective_status, pc->status_details, "grpc_call");
                 }
 
-                /* Cleanup unary call */
+                /* Cleanup unary call (already removed from pending list above) */
                 grpc_metadata_array_destroy(&pc->initial_metadata);
                 grpc_metadata_array_destroy(&pc->trailing_metadata);
                 if (pc->recv_buffer) {
@@ -641,16 +631,6 @@ static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) 
                 grpc_slice_unref(pc->status_details);
                 grpc_call_unref(pc->call);
                 SvREFCNT_dec(pc->callback);
-
-                /* Remove from pending list */
-                pending_call_t **pp = &client->pending_calls;
-                while (*pp) {
-                    if (*pp == pc) {
-                        *pp = pc->next;
-                        break;
-                    }
-                    pp = &(*pp)->next;
-                }
                 Safefree(pc);
             }
 }
@@ -745,7 +725,7 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             etcdserverpb__range_request__init(rr);
 
             SV **k = hv_fetch(rh, "key", 3, 0);
-            if (k && SvPOK(*k)) {
+            if (k && SvOK(*k)) {
                 STRLEN len;
                 char *str = SvPV(*k, len);
                 VALIDATE_KEY_SIZE(len);
@@ -753,7 +733,7 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
                 rr->key.len = len;
             }
             SV **re = hv_fetch(rh, "range_end", 9, 0);
-            if (re && SvPOK(*re)) {
+            if (re && SvOK(*re)) {
                 STRLEN len;
                 char *str = SvPV(*re, len);
                 VALIDATE_KEY_SIZE(len);
@@ -775,7 +755,7 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             etcdserverpb__put_request__init(pr);
 
             SV **k = hv_fetch(ph, "key", 3, 0);
-            if (k && SvPOK(*k)) {
+            if (k && SvOK(*k)) {
                 STRLEN len;
                 char *str = SvPV(*k, len);
                 VALIDATE_KEY_SIZE(len);
@@ -783,7 +763,7 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
                 pr->key.len = len;
             }
             SV **v = hv_fetch(ph, "value", 5, 0);
-            if (v && SvPOK(*v)) {
+            if (v && SvOK(*v)) {
                 STRLEN len;
                 char *str = SvPV(*v, len);
                 VALIDATE_VALUE_SIZE(len);
@@ -808,7 +788,7 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             etcdserverpb__delete_range_request__init(dr);
 
             SV **k = hv_fetch(dh, "key", 3, 0);
-            if (k && SvPOK(*k)) {
+            if (k && SvOK(*k)) {
                 STRLEN len;
                 char *str = SvPV(*k, len);
                 VALIDATE_KEY_SIZE(len);
@@ -816,7 +796,7 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
                 dr->key.len = len;
             }
             SV **re = hv_fetch(dh, "range_end", 9, 0);
-            if (re && SvPOK(*re)) {
+            if (re && SvOK(*re)) {
                 STRLEN len;
                 char *str = SvPV(*re, len);
                 VALIDATE_KEY_SIZE(len);
@@ -1141,6 +1121,17 @@ CODE:
         }
     }
 
+    /* Pre-validate endpoint URL sizes before allocating */
+    if (endpoints_av && av_len(endpoints_av) >= 0) {
+        int count = av_len(endpoints_av) + 1;
+        for (i = 0; i < count; i++) {
+            SV **ep = av_fetch(endpoints_av, i, 0);
+            if (ep && SvPOK(*ep)) {
+                VALIDATE_URL_SIZE(SvCUR(*ep));
+            }
+        }
+    }
+
     Newxz(client, 1, ev_etcd_t);
 
     /* Store endpoints */
@@ -1153,7 +1144,6 @@ CODE:
             if (ep && SvPOK(*ep)) {
                 STRLEN len;
                 const char *str = SvPV(*ep, len);
-                VALIDATE_URL_SIZE(len);
                 Newx(client->endpoints[i], len + 1, char);
                 Copy(str, client->endpoints[i], len + 1, char);
             } else {
@@ -1198,6 +1188,10 @@ CODE:
     if (pthread_create(&client->cq_thread, NULL, cq_thread_func, client) != 0) {
         ev_async_stop(EV_DEFAULT, &client->cq_async);
         pthread_mutex_destroy(&client->queue_mutex);
+        grpc_completion_queue_shutdown(client->cq);
+        while (grpc_completion_queue_next(client->cq,
+               gpr_inf_past(GPR_CLOCK_REALTIME), NULL).type != GRPC_QUEUE_SHUTDOWN)
+            ;
         grpc_completion_queue_destroy(client->cq);
         grpc_channel_destroy(client->channel);
         /* Free endpoints */
@@ -1226,12 +1220,12 @@ CODE:
     client->timeout_seconds = timeout_seconds;
     client->active = 1;
     client->in_callback = 0;
+    client->owner_pid = getpid();
 
     /* Retry configuration */
     client->max_retries = max_retries;
 
     /* Health monitoring */
-    client->health_interval = health_interval;
     client->is_healthy = 1;  /* Assume healthy initially */
     if (health_callback) {
         client->health_callback = SvREFCNT_inc(health_callback);
@@ -1280,6 +1274,13 @@ CODE:
     const char *key_str = SvPV(key, key_len);
     VALIDATE_KEY_SIZE(key_len);
 
+    /* Pre-validate option sizes before allocating pending call */
+    if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
+        SV **svp;
+        if ((svp = hv_fetchs((HV *)SvRV(opts), "range_end", 0)) && SvOK(*svp))
+            VALIDATE_KEY_SIZE(SvCUR(*svp));
+    }
+
     /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_RANGE, callback, client);
@@ -1301,7 +1302,7 @@ CODE:
         if ((svp = hv_fetchs(hv, "range_end", 0)) && SvOK(*svp)) {
             STRLEN range_end_len;
             const char *range_end_str = SvPV(*svp, range_end_len);
-            VALIDATE_KEY_SIZE(range_end_len);  /* range_end has same limits as key */
+            /* Already validated above */
             Newx(range_end_copy, range_end_len, char);
             memcpy(range_end_copy, range_end_str, range_end_len);
             req.range_end.data = (uint8_t *)range_end_copy;
@@ -1642,6 +1643,13 @@ CODE:
     const char *key_str = SvPV(key, key_len);
     VALIDATE_KEY_SIZE(key_len);
 
+    /* Pre-validate option sizes before allocating pending call */
+    if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
+        SV **svp;
+        if ((svp = hv_fetchs((HV *)SvRV(opts), "range_end", 0)) && SvOK(*svp))
+            VALIDATE_KEY_SIZE(SvCUR(*svp));
+    }
+
     /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_DELETE, callback, client);
@@ -1663,7 +1671,7 @@ CODE:
         if ((svp = hv_fetchs(hv, "range_end", 0)) && SvOK(*svp)) {
             STRLEN range_end_len;
             const char *range_end_str = SvPV(*svp, range_end_len);
-            VALIDATE_KEY_SIZE(range_end_len);  /* range_end has same limits as key */
+            /* Already validated above */
             Newx(range_end_copy, range_end_len, char);
             memcpy(range_end_copy, range_end_str, range_end_len);
             req.range_end.data = (uint8_t *)range_end_copy;
@@ -1796,10 +1804,20 @@ CODE:
     const char *key_str = SvPV(key, key_len);
     VALIDATE_KEY_SIZE(key_len);
 
+    /* Pre-validate range_end size before allocation to prevent croak leak */
+    if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
+        SV **svp = hv_fetchs((HV *)SvRV(opts), "range_end", 0);
+        if (svp && SvOK(*svp)) {
+            STRLEN re_len;
+            (void)SvPV(*svp, re_len);
+            VALIDATE_KEY_SIZE(re_len);
+        }
+    }
+
     /* Create watch structure */
     watch_call_t *wc;
     Newxz(wc, 1, watch_call_t);
-    init_call_functor(&wc->base, CALL_TYPE_WATCH);
+    init_call_base(&wc->base, CALL_TYPE_WATCH);
     wc->callback = newSVsv(callback);
     wc->client = client;
     wc->active = 1;
@@ -1847,7 +1865,6 @@ CODE:
         if ((svp = hv_fetchs(hv, "range_end", 0)) && SvOK(*svp)) {
             STRLEN range_end_len;
             const char *range_end_str = SvPV(*svp, range_end_len);
-            VALIDATE_KEY_SIZE(range_end_len);  /* range_end has same limits as key */
             Newx(range_end_copy, range_end_len, char);
             memcpy(range_end_copy, range_end_str, range_end_len);
             create_req.range_end.data = (uint8_t *)range_end_copy;
@@ -1898,6 +1915,8 @@ CODE:
         /* watch_id - optional explicit watch ID */
         if ((svp = hv_fetchs(hv, "watch_id", 0)) && SvOK(*svp)) {
             create_req.watch_id = SvIV(*svp);
+            wc->params.watch_id = create_req.watch_id;
+            wc->params.has_watch_id = 1;
         }
     }
 
@@ -2549,24 +2568,46 @@ CODE:
     client->pending_calls = pc;
 }
 
-void
-ev_etcd_lease_keepalive(client, lease_id, callback)
+EV::Etcd::Keepalive
+ev_etcd_lease_keepalive(client, lease_id, ...)
     EV::Etcd client
     IV lease_id
-    SV *callback
 CODE:
 {
+    /* Parse arguments: lease_keepalive(lease_id, [opts,] callback) */
+    SV *opts = NULL;
+    SV *callback;
+
+    if (items == 3) {
+        callback = ST(2);
+    } else if (items == 4) {
+        opts = ST(2);
+        callback = ST(3);
+    } else {
+        croak("Usage: $client->lease_keepalive($lease_id, [\\%%opts,] $callback)");
+    }
+
     VALIDATE_CALLBACK(callback);
 
     /* Create keepalive structure */
     keepalive_call_t *kc;
     Newxz(kc, 1, keepalive_call_t);
-    init_call_functor(&kc->base, CALL_TYPE_LEASE_KEEPALIVE);
+    init_call_base(&kc->base, CALL_TYPE_LEASE_KEEPALIVE);
     kc->callback = newSVsv(callback);
     kc->client = client;
     kc->active = 1;
-    kc->auto_reconnect = 1;  /* Enable by default, like watch */
+    kc->auto_reconnect = 1;  /* Enable by default */
     kc->lease_id = lease_id;
+
+    /* Process options */
+    if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
+        HV *hv = (HV *)SvRV(opts);
+        SV **svp;
+
+        if ((svp = hv_fetchs(hv, "auto_reconnect", 0)) && !SvTRUE(*svp)) {
+            kc->auto_reconnect = 0;
+        }
+    }
     grpc_metadata_array_init(&kc->initial_metadata);
     grpc_metadata_array_init(&kc->trailing_metadata);
     kc->recv_buffer = NULL;
@@ -2642,7 +2683,11 @@ CODE:
 
     kc->next = client->keepalives;
     client->keepalives = kc;
+
+    RETVAL = kc;
 }
+OUTPUT:
+    RETVAL
 
 void
 ev_etcd_txn(client, compare_av, success_av, failure_av, callback)
@@ -2654,6 +2699,26 @@ ev_etcd_txn(client, compare_av, success_av, failure_av, callback)
 CODE:
 {
     VALIDATE_CALLBACK(callback);
+
+    /* Pre-validate compare key/value sizes before allocating pending call */
+    if (SvROK(compare_av) && SvTYPE(SvRV(compare_av)) == SVt_PVAV) {
+        AV *av = (AV *)SvRV(compare_av);
+        size_t n = av_len(av) + 1;
+        for (size_t i = 0; i < n; i++) {
+            SV **elem = av_fetch(av, i, 0);
+            if (elem && SvROK(*elem) && SvTYPE(SvRV(*elem)) == SVt_PVHV) {
+                HV *hv = (HV *)SvRV(*elem);
+                SV **key_sv = hv_fetch(hv, "key", 3, 0);
+                if (key_sv && SvOK(*key_sv)) {
+                    VALIDATE_KEY_SIZE(SvCUR(*key_sv));
+                }
+                SV **value_sv = hv_fetch(hv, "value", 5, 0);
+                if (value_sv && SvOK(*value_sv)) {
+                    VALIDATE_VALUE_SIZE(SvCUR(*value_sv));
+                }
+            }
+        }
+    }
 
     /* Create pending call structure */
     pending_call_t *pc;
@@ -2680,10 +2745,9 @@ CODE:
 
                     /* key */
                     SV **key_sv = hv_fetch(hv, "key", 3, 0);
-                    if (key_sv && SvPOK(*key_sv)) {
+                    if (key_sv && SvOK(*key_sv)) {
                         STRLEN len;
                         char *str = SvPV(*key_sv, len);
-                        VALIDATE_KEY_SIZE(len);
                         compares[i]->key.data = (uint8_t *)str;
                         compares[i]->key.len = len;
                     }
@@ -2744,10 +2808,9 @@ CODE:
                     }
 
                     SV **value_sv = hv_fetch(hv, "value", 5, 0);
-                    if (value_sv && SvPOK(*value_sv)) {
+                    if (value_sv && SvOK(*value_sv)) {
                         STRLEN len;
                         char *str = SvPV(*value_sv, len);
-                        VALIDATE_VALUE_SIZE(len);
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_VALUE;
                         compares[i]->value.data = (uint8_t *)str;
                         compares[i]->value.len = len;
@@ -4217,10 +4280,8 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    gpr_timespec deadline = gpr_time_add(
-        gpr_now(GPR_CLOCK_REALTIME),
-        gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
-    );
+    /* Lock blocks until acquired — use infinite deadline */
+    gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
 
     pc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
@@ -4272,12 +4333,12 @@ CODE:
 {
     VALIDATE_CALLBACK(callback);
 
-    pending_call_t *pc;
-    INIT_PENDING_CALL(pc, CALL_TYPE_UNLOCK, callback, client);
-
     STRLEN key_len;
     const char *key_str = SvPV(key, key_len);
     VALIDATE_KEY_SIZE(key_len);
+
+    pending_call_t *pc;
+    INIT_PENDING_CALL(pc, CALL_TYPE_UNLOCK, callback, client);
 
     V3lockpb__UnlockRequest req = V3LOCKPB__UNLOCK_REQUEST__INIT;
     req.key.data = (uint8_t *)key_str;
@@ -4370,10 +4431,8 @@ CODE:
     grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
     grpc_slice_unref(req_slice);
 
-    gpr_timespec deadline = gpr_time_add(
-        gpr_now(GPR_CLOCK_REALTIME),
-        gpr_time_from_seconds(client->timeout_seconds, GPR_TIMESPAN)
-    );
+    /* Campaign blocks until elected — use infinite deadline */
+    gpr_timespec deadline = gpr_inf_future(GPR_CLOCK_REALTIME);
 
     pc->call = grpc_channel_create_call(
         client->channel, NULL, GRPC_PROPAGATE_DEFAULTS,
@@ -4435,10 +4494,7 @@ CODE:
     }
     HV *leader_hv = (HV *)SvRV(leader);
 
-    pending_call_t *pc;
-    INIT_PENDING_CALL(pc, CALL_TYPE_ELECTION_PROCLAIM, callback, client);
-
-    /* Extract leader key fields */
+    /* Extract and validate leader key fields before allocating */
     SV **sv_name = hv_fetch(leader_hv, "name", 4, 0);
     SV **sv_key = hv_fetch(leader_hv, "key", 3, 0);
     SV **sv_rev = hv_fetch(leader_hv, "rev", 3, 0);
@@ -4449,6 +4505,9 @@ CODE:
     const char *key_str = sv_key && *sv_key ? SvPV(*sv_key, key_len) : "";
     VALIDATE_KEY_SIZE(name_len);
     VALIDATE_KEY_SIZE(key_len);
+
+    pending_call_t *pc;
+    INIT_PENDING_CALL(pc, CALL_TYPE_ELECTION_PROCLAIM, callback, client);
 
     V3electionpb__LeaderKey lk = V3ELECTIONPB__LEADER_KEY__INIT;
     lk.name.data = (uint8_t *)name_str;
@@ -4603,10 +4662,7 @@ CODE:
     }
     HV *leader_hv = (HV *)SvRV(leader);
 
-    pending_call_t *pc;
-    INIT_PENDING_CALL(pc, CALL_TYPE_ELECTION_RESIGN, callback, client);
-
-    /* Extract leader key fields */
+    /* Extract and validate leader key fields before allocating pending call */
     SV **sv_name = hv_fetch(leader_hv, "name", 4, 0);
     SV **sv_key = hv_fetch(leader_hv, "key", 3, 0);
     SV **sv_rev = hv_fetch(leader_hv, "rev", 3, 0);
@@ -4617,6 +4673,9 @@ CODE:
     const char *key_str = sv_key && *sv_key ? SvPV(*sv_key, key_len) : "";
     VALIDATE_KEY_SIZE(name_len);
     VALIDATE_KEY_SIZE(key_len);
+
+    pending_call_t *pc;
+    INIT_PENDING_CALL(pc, CALL_TYPE_ELECTION_RESIGN, callback, client);
 
     V3electionpb__LeaderKey lk = V3ELECTIONPB__LEADER_KEY__INIT;
     lk.name.data = (uint8_t *)name_str;
@@ -4682,7 +4741,7 @@ CODE:
     client->pending_calls = pc;
 }
 
-void
+EV::Etcd::Observe
 ev_etcd_election_observe(client, name, ...)
     EV::Etcd client
     SV *name
@@ -4718,7 +4777,7 @@ CODE:
 
     observe_call_t *oc;
     Newxz(oc, 1, observe_call_t);
-    init_call_functor(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
+    init_call_base(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
     oc->callback = newSVsv(callback);
     oc->client = client;
     oc->active = 1;
@@ -4798,21 +4857,43 @@ CODE:
     /* Add to observes list */
     oc->next = client->observes;
     client->observes = oc;
+
+    RETVAL = oc;
 }
+OUTPUT:
+    RETVAL
 
 void
-ev_etcd_member_list(client, callback)
+ev_etcd_member_list(client, ...)
     EV::Etcd client
-    SV *callback
 CODE:
 {
+    SV *opts = NULL;
+    SV *callback;
+
+    if (items == 2) {
+        callback = ST(1);
+    } else if (items == 3) {
+        opts = ST(1);
+        callback = ST(2);
+    } else {
+        croak("Usage: $client->member_list([\\%%opts,] $callback)");
+    }
+
     VALIDATE_CALLBACK(callback);
 
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_MEMBER_LIST, callback, client);
 
     Etcdserverpb__MemberListRequest req = ETCDSERVERPB__MEMBER_LIST_REQUEST__INIT;
-    req.linearizable = 0;
+
+    if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
+        HV *hv = (HV *)SvRV(opts);
+        SV **svp;
+        if ((svp = hv_fetchs(hv, "linearizable", 0)) && SvTRUE(*svp)) {
+            req.linearizable = 1;
+        }
+    }
 
     grpc_slice req_slice;
     SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
@@ -4905,6 +4986,16 @@ CODE:
         }
     }
 
+    /* Pre-validate URL sizes before allocating pending call */
+    for (size_t i = 0; i < n_urls; i++) {
+        SV **sv = av_fetch(urls_av, i, 0);
+        if (sv && *sv) {
+            STRLEN url_len;
+            (void)SvPV(*sv, url_len);
+            VALIDATE_URL_SIZE(url_len);
+        }
+    }
+
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_MEMBER_ADD, callback, client);
 
@@ -4919,7 +5010,6 @@ CODE:
             if (sv && *sv) {
                 STRLEN url_len;
                 url_ptrs[i] = SvPV(*sv, url_len);
-                VALIDATE_URL_SIZE(url_len);
             } else {
                 url_ptrs[i] = "";
             }
@@ -5068,6 +5158,16 @@ CODE:
     AV *urls_av = (AV *)SvRV(peer_urls);
     size_t n_urls = av_len(urls_av) + 1;
 
+    /* Pre-validate URL sizes before allocating pending call */
+    for (size_t i = 0; i < n_urls; i++) {
+        SV **sv = av_fetch(urls_av, i, 0);
+        if (sv && *sv) {
+            STRLEN url_len;
+            (void)SvPV(*sv, url_len);
+            VALIDATE_URL_SIZE(url_len);
+        }
+    }
+
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_MEMBER_UPDATE, callback, client);
 
@@ -5082,7 +5182,6 @@ CODE:
             if (sv && *sv) {
                 STRLEN url_len;
                 url_ptrs[i] = SvPV(*sv, url_len);
-                VALIDATE_URL_SIZE(url_len);
             } else {
                 url_ptrs[i] = "";
             }
@@ -5238,23 +5337,25 @@ CODE:
 
     VALIDATE_CALLBACK(callback);
 
+    /* Parse action before allocating to prevent croak leak */
+    Etcdserverpb__AlarmRequest__AlarmAction alarm_action;
+    if (strcasecmp(action, "GET") == 0) {
+        alarm_action = ETCDSERVERPB__ALARM_REQUEST__ALARM_ACTION__GET;
+    } else if (strcasecmp(action, "ACTIVATE") == 0) {
+        alarm_action = ETCDSERVERPB__ALARM_REQUEST__ALARM_ACTION__ACTIVATE;
+    } else if (strcasecmp(action, "DEACTIVATE") == 0) {
+        alarm_action = ETCDSERVERPB__ALARM_REQUEST__ALARM_ACTION__DEACTIVATE;
+    } else {
+        croak("Invalid alarm action: %s (expected GET, ACTIVATE, or DEACTIVATE)", action);
+    }
+
     /* Create pending call structure */
     pending_call_t *pc;
     INIT_PENDING_CALL(pc, CALL_TYPE_ALARM, callback, client);
 
     /* Build AlarmRequest */
     Etcdserverpb__AlarmRequest req = ETCDSERVERPB__ALARM_REQUEST__INIT;
-
-    /* Parse action */
-    if (strcasecmp(action, "GET") == 0) {
-        req.action = ETCDSERVERPB__ALARM_REQUEST__ALARM_ACTION__GET;
-    } else if (strcasecmp(action, "ACTIVATE") == 0) {
-        req.action = ETCDSERVERPB__ALARM_REQUEST__ALARM_ACTION__ACTIVATE;
-    } else if (strcasecmp(action, "DEACTIVATE") == 0) {
-        req.action = ETCDSERVERPB__ALARM_REQUEST__ALARM_ACTION__DEACTIVATE;
-    } else {
-        croak("Invalid alarm action: %s (expected GET, ACTIVATE, or DEACTIVATE)", action);
-    }
+    req.action = alarm_action;
 
     /* Parse options if provided */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
@@ -5701,6 +5802,57 @@ ev_etcd_DESTROY(client)
     EV::Etcd client
 CODE:
 {
+    /* Fork safety: in a child process, the gRPC thread and completion queue
+     * are in undefined state. Skip gRPC cleanup, just free Perl-side resources. */
+    if (client->owner_pid != getpid()) {
+        warn("EV::Etcd: client destroyed in forked child (pid %d, created in %d)"
+             " -- skipping gRPC cleanup", (int)getpid(), (int)client->owner_pid);
+
+        /* Free SV callbacks and Safefree'd params only; don't touch gRPC objects */
+        pending_call_t *pc = client->pending_calls;
+        while (pc) {
+            pending_call_t *next = pc->next;
+            SvREFCNT_dec(pc->callback);
+            Safefree(pc);
+            pc = next;
+        }
+        watch_call_t *wc = client->watches;
+        while (wc) {
+            watch_call_t *next = wc->next;
+            if (ev_is_active(&wc->reconnect_timer))
+                ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+            SvREFCNT_dec(wc->callback);
+            if (wc->params.key) Safefree(wc->params.key);
+            if (wc->params.range_end) Safefree(wc->params.range_end);
+            Safefree(wc);
+            wc = next;
+        }
+        keepalive_call_t *kc = client->keepalives;
+        while (kc) {
+            keepalive_call_t *next = kc->next;
+            if (ev_is_active(&kc->reconnect_timer))
+                ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+            SvREFCNT_dec(kc->callback);
+            Safefree(kc);
+            kc = next;
+        }
+        observe_call_t *oc = client->observes;
+        while (oc) {
+            observe_call_t *next = oc->next;
+            if (ev_is_active(&oc->reconnect_timer))
+                ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
+            SvREFCNT_dec(oc->callback);
+            if (oc->params.name) Safefree(oc->params.name);
+            Safefree(oc);
+            oc = next;
+        }
+        if (ev_is_active(&client->health_timer))
+            ev_timer_stop(EV_DEFAULT, &client->health_timer);
+        if (ev_is_active(&client->cq_async))
+            ev_async_stop(EV_DEFAULT, &client->cq_async);
+        goto free_perl_resources;
+    }
+
     /* Mark client as inactive first to prevent callbacks from accessing freed memory */
     client->active = 0;
 
@@ -5717,6 +5869,8 @@ CODE:
     watch_call_t *wc = client->watches;
     while (wc) {
         wc->active = 0;
+        if (ev_is_active(&wc->reconnect_timer))
+            ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
         if (wc->call) {
             grpc_call_cancel(wc->call, NULL);
         }
@@ -5726,6 +5880,8 @@ CODE:
     keepalive_call_t *kc = client->keepalives;
     while (kc) {
         kc->active = 0;
+        if (ev_is_active(&kc->reconnect_timer))
+            ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
         if (kc->call) {
             grpc_call_cancel(kc->call, NULL);
         }
@@ -5735,6 +5891,8 @@ CODE:
     observe_call_t *oc = client->observes;
     while (oc) {
         oc->active = 0;
+        if (ev_is_active(&oc->reconnect_timer))
+            ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
         if (oc->call) {
             grpc_call_cancel(oc->call, NULL);
         }
@@ -5778,97 +5936,107 @@ CODE:
         grpc_completion_queue_destroy(client->cq);
     }
 
-    /* Now cleanup structures - after thread is stopped */
-    pc = client->pending_calls;
-    while (pc) {
-        pending_call_t *next = pc->next;
-        grpc_metadata_array_destroy(&pc->initial_metadata);
-        grpc_metadata_array_destroy(&pc->trailing_metadata);
-        if (pc->recv_buffer) {
-            grpc_byte_buffer_destroy(pc->recv_buffer);
+    /* Cleanup call structures - skip if called during event processing
+     * (the currently-processing call struct would be a use-after-free).
+     * Deferred to cq_async_callback when in_callback is set. */
+    if (!client->in_callback) {
+        pc = client->pending_calls;
+        while (pc) {
+            pending_call_t *next = pc->next;
+            grpc_metadata_array_destroy(&pc->initial_metadata);
+            grpc_metadata_array_destroy(&pc->trailing_metadata);
+            if (pc->recv_buffer) {
+                grpc_byte_buffer_destroy(pc->recv_buffer);
+            }
+            grpc_slice_unref(pc->status_details);
+            if (pc->call) {
+                grpc_call_unref(pc->call);
+            }
+            SvREFCNT_dec(pc->callback);
+            Safefree(pc);
+            pc = next;
         }
-        grpc_slice_unref(pc->status_details);
-        if (pc->call) {
-            grpc_call_unref(pc->call);
-        }
-        SvREFCNT_dec(pc->callback);
-        Safefree(pc);
-        pc = next;
-    }
 
-    wc = client->watches;
-    while (wc) {
-        watch_call_t *next = wc->next;
-        grpc_metadata_array_destroy(&wc->initial_metadata);
-        grpc_metadata_array_destroy(&wc->trailing_metadata);
-        if (wc->recv_buffer) {
-            grpc_byte_buffer_destroy(wc->recv_buffer);
+        wc = client->watches;
+        while (wc) {
+            watch_call_t *next = wc->next;
+            grpc_metadata_array_destroy(&wc->initial_metadata);
+            grpc_metadata_array_destroy(&wc->trailing_metadata);
+            if (wc->recv_buffer) {
+                grpc_byte_buffer_destroy(wc->recv_buffer);
+            }
+            grpc_slice_unref(wc->status_details);
+            if (wc->call) {
+                grpc_call_unref(wc->call);
+            }
+            SvREFCNT_dec(wc->callback);
+            if (wc->params.key) {
+                Safefree(wc->params.key);
+            }
+            if (wc->params.range_end) {
+                Safefree(wc->params.range_end);
+            }
+            Safefree(wc);
+            wc = next;
         }
-        grpc_slice_unref(wc->status_details);
-        if (wc->call) {
-            grpc_call_unref(wc->call);
-        }
-        SvREFCNT_dec(wc->callback);
-        /* Free watch params */
-        if (wc->params.key) {
-            Safefree(wc->params.key);
-        }
-        if (wc->params.range_end) {
-            Safefree(wc->params.range_end);
-        }
-        Safefree(wc);
-        wc = next;
-    }
 
-    kc = client->keepalives;
-    while (kc) {
-        keepalive_call_t *next = kc->next;
-        grpc_metadata_array_destroy(&kc->initial_metadata);
-        grpc_metadata_array_destroy(&kc->trailing_metadata);
-        if (kc->recv_buffer) {
-            grpc_byte_buffer_destroy(kc->recv_buffer);
+        kc = client->keepalives;
+        while (kc) {
+            keepalive_call_t *next = kc->next;
+            grpc_metadata_array_destroy(&kc->initial_metadata);
+            grpc_metadata_array_destroy(&kc->trailing_metadata);
+            if (kc->recv_buffer) {
+                grpc_byte_buffer_destroy(kc->recv_buffer);
+            }
+            grpc_slice_unref(kc->status_details);
+            if (kc->call) {
+                grpc_call_unref(kc->call);
+            }
+            SvREFCNT_dec(kc->callback);
+            Safefree(kc);
+            kc = next;
         }
-        grpc_slice_unref(kc->status_details);
-        if (kc->call) {
-            grpc_call_unref(kc->call);
-        }
-        SvREFCNT_dec(kc->callback);
-        Safefree(kc);
-        kc = next;
-    }
 
-    oc = client->observes;
-    while (oc) {
-        observe_call_t *next = oc->next;
-        grpc_metadata_array_destroy(&oc->initial_metadata);
-        grpc_metadata_array_destroy(&oc->trailing_metadata);
-        if (oc->recv_buffer) {
-            grpc_byte_buffer_destroy(oc->recv_buffer);
+        oc = client->observes;
+        while (oc) {
+            observe_call_t *next = oc->next;
+            grpc_metadata_array_destroy(&oc->initial_metadata);
+            grpc_metadata_array_destroy(&oc->trailing_metadata);
+            if (oc->recv_buffer) {
+                grpc_byte_buffer_destroy(oc->recv_buffer);
+            }
+            grpc_slice_unref(oc->status_details);
+            if (oc->call) {
+                grpc_call_unref(oc->call);
+            }
+            SvREFCNT_dec(oc->callback);
+            if (oc->params.name) {
+                Safefree(oc->params.name);
+            }
+            Safefree(oc);
+            oc = next;
         }
-        grpc_slice_unref(oc->status_details);
-        if (oc->call) {
-            grpc_call_unref(oc->call);
-        }
-        SvREFCNT_dec(oc->callback);
-        if (oc->params.name) {
-            Safefree(oc->params.name);
-        }
-        Safefree(oc);
-        oc = next;
     }
 
     /* Stop health timer */
     ev_timer_stop(EV_DEFAULT, &client->health_timer);
 
+    if (client->channel) {
+        grpc_channel_destroy(client->channel);
+    }
+
+    free_perl_resources:
     /* Free health callback */
     if (client->health_callback) {
         SvREFCNT_dec(client->health_callback);
+        client->health_callback = NULL;
     }
 
     /* Free auth token - securely zero before freeing */
     if (client->auth_token) {
         memset(client->auth_token, 0, client->auth_token_len);
         Safefree(client->auth_token);
+        client->auth_token = NULL;
     }
 
     /* Free endpoints */
@@ -5880,10 +6048,7 @@ CODE:
             }
         }
         Safefree(client->endpoints);
-    }
-
-    if (client->channel) {
-        grpc_channel_destroy(client->channel);
+        client->endpoints = NULL;
     }
 
     /* If called during event processing, defer struct free to cq_async_callback */
@@ -5904,19 +6069,12 @@ CODE:
 
     watch_call_t *wc = watch;
 
+    /* Stop reconnect timer unconditionally — may be pending even when active=0 */
+    if (ev_is_active(&wc->reconnect_timer))
+        ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
+
     if (!wc->active) {
-        /* Watch already cancelled */
-        dSP;
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-        EXTEND(SP, 2);
-        mPUSHs(newRV_noinc((SV*)newHV()));  /* empty response */
-        PUSHs(&PL_sv_undef);                 /* no error */
-        PUTBACK;
-        call_sv(callback, G_DISCARD);
-        FREETMPS;
-        LEAVE;
+        CALL_SUCCESS_CALLBACK(callback, newHV());
         return;
     }
 
@@ -5924,7 +6082,6 @@ CODE:
 
     /* If we have a watch_id, send cancel request */
     if (wc->watch_id >= 0) {
-        /* Build WatchCancelRequest */
         Etcdserverpb__WatchCancelRequest cancel_req = ETCDSERVERPB__WATCH_CANCEL_REQUEST__INIT;
         cancel_req.watch_id = wc->watch_id;
 
@@ -5932,7 +6089,6 @@ CODE:
         req.request_union_case = ETCDSERVERPB__WATCH_REQUEST__REQUEST_UNION_CANCEL_REQUEST;
         req.cancel_request = &cancel_req;
 
-        /* Serialize request */
         grpc_slice req_slice;
         SERIALIZE_PROTOBUF_TO_SLICE(req_slice,
             etcdserverpb__watch_request__get_packed_size,
@@ -5940,30 +6096,20 @@ CODE:
         grpc_byte_buffer *send_buffer = grpc_raw_byte_buffer_create(&req_slice, 1);
         grpc_slice_unref(req_slice);
 
-        /* Send cancel request on the streaming call */
         grpc_op op;
         memset(&op, 0, sizeof(op));
         op.op = GRPC_OP_SEND_MESSAGE;
         op.data.send_message.send_message = send_buffer;
 
-        /* Note: We ignore the return value because the local cancel (wc->active = 0)
-         * is already effective. The server-side cancel request is best-effort. */
         (void)grpc_call_start_batch(wc->call, &op, 1, NULL, NULL);
         grpc_byte_buffer_destroy(send_buffer);
     }
 
-    /* Call callback indicating success */
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    EXTEND(SP, 2);
-    mPUSHs(newRV_noinc((SV*)newHV()));  /* empty response */
-    PUSHs(&PL_sv_undef);                 /* no error */
-    PUTBACK;
-    call_sv(callback, G_DISCARD);
-    FREETMPS;
-    LEAVE;
+    /* Force pending RECV to complete immediately */
+    if (wc->call)
+        grpc_call_cancel(wc->call, NULL);
+
+    CALL_SUCCESS_CALLBACK(callback, newHV());
 }
 
 void
@@ -5978,6 +6124,82 @@ CODE:
      * If the user wants to stop the watch, they should call cancel().
      * The watch will be cleaned up when the client is destroyed. */
     (void)watch;  /* Silence unused parameter warning */
+}
+
+MODULE = EV::Etcd  PACKAGE = EV::Etcd::Keepalive  PREFIX = ev_etcd_keepalive_
+
+void
+ev_etcd_keepalive_cancel(keepalive, callback)
+    EV::Etcd::Keepalive keepalive
+    SV *callback
+CODE:
+{
+    VALIDATE_CALLBACK(callback);
+
+    keepalive_call_t *kc = keepalive;
+
+    /* Stop reconnect timer unconditionally — may be pending even when active=0 */
+    if (ev_is_active(&kc->reconnect_timer))
+        ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
+
+    if (!kc->active) {
+        CALL_SUCCESS_CALLBACK(callback, newHV());
+        return;
+    }
+
+    kc->active = 0;
+
+    /* Force pending RECV to complete immediately */
+    if (kc->call)
+        grpc_call_cancel(kc->call, NULL);
+
+    CALL_SUCCESS_CALLBACK(callback, newHV());
+}
+
+void
+ev_etcd_keepalive_DESTROY(keepalive)
+    EV::Etcd::Keepalive keepalive
+CODE:
+{
+    (void)keepalive;
+}
+
+MODULE = EV::Etcd  PACKAGE = EV::Etcd::Observe  PREFIX = ev_etcd_observe_
+
+void
+ev_etcd_observe_cancel(observe, callback)
+    EV::Etcd::Observe observe
+    SV *callback
+CODE:
+{
+    VALIDATE_CALLBACK(callback);
+
+    observe_call_t *oc = observe;
+
+    /* Stop reconnect timer unconditionally — may be pending even when active=0 */
+    if (ev_is_active(&oc->reconnect_timer))
+        ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
+
+    if (!oc->active) {
+        CALL_SUCCESS_CALLBACK(callback, newHV());
+        return;
+    }
+
+    oc->active = 0;
+
+    /* Force pending RECV to complete immediately */
+    if (oc->call)
+        grpc_call_cancel(oc->call, NULL);
+
+    CALL_SUCCESS_CALLBACK(callback, newHV());
+}
+
+void
+ev_etcd_observe_DESTROY(observe)
+    EV::Etcd::Observe observe
+CODE:
+{
+    (void)observe;
 }
 
 MODULE = EV::Etcd  PACKAGE = EV::Etcd  PREFIX = ev_etcd_

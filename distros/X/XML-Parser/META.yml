@@ -8,8 +8,9 @@ build_requires:
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,10 +21,10 @@ no_index:
     - t
     - inc
 requires:
-  LWP::UserAgent: '0'
+  File::ShareDir: '0'
   perl: '5.004050'
 resources:
-  bugtracker: https://github.com/toddr/XML-Parser/issues
-  repository: http://github.com/toddr/XML-Parser
-version: '2.47'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/cpan-authors/XML-Parser/issues
+  repository: https://github.com/cpan-authors/XML-Parser
+version: '2.48'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

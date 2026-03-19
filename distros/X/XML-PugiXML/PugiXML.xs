@@ -21,22 +21,39 @@ struct PugiXPath {
 
 struct PugiDoc {
     xml_document* doc;
+    unsigned int generation;  /* Incremented on reset/load to detect stale handles */
 };
 
 struct PugiNode {
     xml_node node;
-    SV* doc_sv;  /* Reference to document to keep it alive */
+    SV* doc_sv;              /* Reference to document to keep it alive */
+    unsigned int* gen_ptr;   /* Points to doc->generation */
+    unsigned int gen_snap;   /* Generation at creation time */
 };
 
 struct PugiAttr {
     xml_attribute attr;
-    SV* doc_sv;  /* Reference to document to keep it alive */
+    xml_node parent_node;    /* Element owning this attribute */
+    SV* doc_sv;              /* Reference to document to keep it alive */
+    unsigned int* gen_ptr;   /* Points to doc->generation */
+    unsigned int gen_snap;   /* Generation at creation time */
 };
 
 typedef PugiDoc*   XML__PugiXML;
 typedef PugiNode*  XML__PugiXML__Node;
 typedef PugiAttr*  XML__PugiXML__Attr;
 typedef PugiXPath* XML__PugiXML__XPath;
+
+/* UTF-8 input type — mapped via custom typemap to upgrade before extraction */
+typedef const char* utf8_str;
+
+#define CHECK_NODE_ALIVE(self) \
+    if (self->gen_snap != *self->gen_ptr) \
+        croak("Stale node handle: document has been reset or reloaded")
+
+#define CHECK_ATTR_ALIVE(self) \
+    if (self->gen_snap != *self->gen_ptr) \
+        croak("Stale attribute handle: document has been reset or reloaded")
 
 /* Helper functions */
 
@@ -45,33 +62,48 @@ static SV* wrap_node(pTHX_ xml_node node, SV* doc_sv) {
         return &PL_sv_undef;
     }
 
+    PugiDoc* doc = INT2PTR(PugiDoc*, SvIV(SvRV(doc_sv)));
     PugiNode* wrapper = new (std::nothrow) PugiNode;
     if (!wrapper) {
         croak("Out of memory allocating node wrapper");
     }
     wrapper->node = node;
     wrapper->doc_sv = SvREFCNT_inc(doc_sv);
+    wrapper->gen_ptr = &doc->generation;
+    wrapper->gen_snap = doc->generation;
 
     SV* sv = newSV(0);
     sv_setref_pv(sv, "XML::PugiXML::Node", (void*)wrapper);
     return sv;
 }
 
-static SV* wrap_attr(pTHX_ xml_attribute attr, SV* doc_sv) {
+static SV* wrap_attr(pTHX_ xml_attribute attr, xml_node parent, SV* doc_sv) {
     if (!attr) {
         return &PL_sv_undef;
     }
 
+    PugiDoc* doc = INT2PTR(PugiDoc*, SvIV(SvRV(doc_sv)));
     PugiAttr* wrapper = new (std::nothrow) PugiAttr;
     if (!wrapper) {
         croak("Out of memory allocating attr wrapper");
     }
     wrapper->attr = attr;
+    wrapper->parent_node = parent;
     wrapper->doc_sv = SvREFCNT_inc(doc_sv);
+    wrapper->gen_ptr = &doc->generation;
+    wrapper->gen_snap = doc->generation;
 
     SV* sv = newSV(0);
     sv_setref_pv(sv, "XML::PugiXML::Attr", (void*)wrapper);
     return sv;
+}
+
+/* Wrap an XPath result -- returns Node or Attr depending on what matched */
+static SV* wrap_xpath_result(pTHX_ const xpath_node& xnode, SV* doc_sv) {
+    if (xnode.attribute()) {
+        return wrap_attr(aTHX_ xnode.attribute(), xnode.parent(), doc_sv);
+    }
+    return wrap_node(aTHX_ xnode.node(), doc_sv);
 }
 
 /* Helpers to return UTF-8 strings */
@@ -114,6 +146,7 @@ CODE:
         delete doc;
         croak("Out of memory allocating xml_document");
     }
+    doc->generation = 0;
     RETVAL = doc;
 }
 OUTPUT:
@@ -128,9 +161,10 @@ CODE:
 }
 
 bool
-load_file(XML::PugiXML self, const char* path, unsigned int parse_options = parse_default)
+load_file(XML::PugiXML self, utf8_str path, unsigned int parse_options = parse_default)
 CODE:
 {
+    self->generation++;
     xml_parse_result result = self->doc->load_file(path, parse_options);
     set_parse_result(aTHX_ result);
     RETVAL = (bool)result;
@@ -139,9 +173,10 @@ OUTPUT:
     RETVAL
 
 bool
-load_string(XML::PugiXML self, const char* xml, unsigned int parse_options = parse_default)
+load_string(XML::PugiXML self, utf8_str xml, unsigned int parse_options = parse_default)
 CODE:
 {
+    self->generation++;
     xml_parse_result result = self->doc->load_string(xml, parse_options);
     set_parse_result(aTHX_ result);
     RETVAL = (bool)result;
@@ -153,11 +188,12 @@ void
 reset(XML::PugiXML self)
 CODE:
 {
+    self->generation++;
     self->doc->reset();
 }
 
 bool
-save_file(XML::PugiXML self, const char* path, const char* indent = "\t", unsigned int flags = format_default)
+save_file(XML::PugiXML self, utf8_str path, const char* indent = "\t", unsigned int flags = format_default)
 CODE:
 {
     RETVAL = self->doc->save_file(path, indent, flags);
@@ -193,7 +229,7 @@ OUTPUT:
     RETVAL
 
 SV*
-child(XML::PugiXML self, const char* name)
+child(XML::PugiXML self, utf8_str name)
 CODE:
 {
     xml_node child = self->doc->child(name);
@@ -203,12 +239,12 @@ OUTPUT:
     RETVAL
 
 SV*
-select_node(XML::PugiXML self, const char* xpath)
+select_node(XML::PugiXML self, utf8_str xpath)
 CODE:
 {
     try {
         xpath_node result = self->doc->select_node(xpath);
-        RETVAL = wrap_node(aTHX_ result.node(), ST(0));
+        RETVAL = wrap_xpath_result(aTHX_ result, ST(0));
     } catch (const xpath_exception& e) {
         croak("XPath error: %s", e.what());
     }
@@ -217,14 +253,15 @@ OUTPUT:
     RETVAL
 
 void
-select_nodes(XML::PugiXML self, const char* xpath)
+select_nodes(XML::PugiXML self, utf8_str xpath)
 PPCODE:
 {
     try {
         xpath_node_set nodes = self->doc->select_nodes(xpath);
+        EXTEND(SP, (SSize_t)nodes.size());
         for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
-            SV* node_sv = wrap_node(aTHX_ it->node(), ST(0));
-            XPUSHs(sv_2mortal(node_sv));
+            SV* sv = wrap_xpath_result(aTHX_ *it, ST(0));
+            PUSHs(sv_2mortal(sv));
         }
     } catch (const xpath_exception& e) {
         croak("XPath error: %s", e.what());
@@ -232,7 +269,7 @@ PPCODE:
 }
 
 SV*
-compile_xpath(XML::PugiXML self, const char* xpath)
+compile_xpath(XML::PugiXML self, utf8_str xpath)
 CODE:
 {
     PERL_UNUSED_VAR(self);
@@ -385,6 +422,7 @@ SV*
 name(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = newSVpv_utf8(aTHX_ self->node.name());
 }
 OUTPUT:
@@ -394,6 +432,7 @@ SV*
 value(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = newSVpv_utf8(aTHX_ self->node.value());
 }
 OUTPUT:
@@ -403,6 +442,7 @@ SV*
 text(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = newSVpv_utf8(aTHX_ self->node.text().get());
 }
 OUTPUT:
@@ -412,15 +452,17 @@ SV*
 parent(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = wrap_node(aTHX_ self->node.parent(), self->doc_sv);
 }
 OUTPUT:
     RETVAL
 
 SV*
-child(XML::PugiXML::Node self, const char* name)
+child(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = wrap_node(aTHX_ self->node.child(name), self->doc_sv);
 }
 OUTPUT:
@@ -430,15 +472,17 @@ SV*
 first_child(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = wrap_node(aTHX_ self->node.first_child(), self->doc_sv);
 }
 OUTPUT:
     RETVAL
 
 SV*
-next_sibling(XML::PugiXML::Node self, const char* name = NULL)
+next_sibling(XML::PugiXML::Node self, utf8_str name = NULL)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     if (name) {
         RETVAL = wrap_node(aTHX_ self->node.next_sibling(name), self->doc_sv);
     } else {
@@ -449,9 +493,10 @@ OUTPUT:
     RETVAL
 
 SV*
-previous_sibling(XML::PugiXML::Node self, const char* name = NULL)
+previous_sibling(XML::PugiXML::Node self, utf8_str name = NULL)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     if (name) {
         RETVAL = wrap_node(aTHX_ self->node.previous_sibling(name), self->doc_sv);
     } else {
@@ -465,25 +510,29 @@ SV*
 last_child(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = wrap_node(aTHX_ self->node.last_child(), self->doc_sv);
 }
 OUTPUT:
     RETVAL
 
 void
-children(XML::PugiXML::Node self, const char* name = NULL)
+children(XML::PugiXML::Node self, utf8_str name = NULL)
 PPCODE:
 {
+    CHECK_NODE_ALIVE(self);
+    /* Count first, then extend stack once */
+    SSize_t count = 0;
     if (name) {
-        for (xml_node child = self->node.child(name); child; child = child.next_sibling(name)) {
-            SV* node_sv = wrap_node(aTHX_ child, self->doc_sv);
-            XPUSHs(sv_2mortal(node_sv));
-        }
+        for (xml_node c = self->node.child(name); c; c = c.next_sibling(name)) count++;
+        EXTEND(SP, count);
+        for (xml_node child = self->node.child(name); child; child = child.next_sibling(name))
+            PUSHs(sv_2mortal(wrap_node(aTHX_ child, self->doc_sv)));
     } else {
-        for (xml_node child = self->node.first_child(); child; child = child.next_sibling()) {
-            SV* node_sv = wrap_node(aTHX_ child, self->doc_sv);
-            XPUSHs(sv_2mortal(node_sv));
-        }
+        for (xml_node c = self->node.first_child(); c; c = c.next_sibling()) count++;
+        EXTEND(SP, count);
+        for (xml_node child = self->node.first_child(); child; child = child.next_sibling())
+            PUSHs(sv_2mortal(wrap_node(aTHX_ child, self->doc_sv)));
     }
 }
 
@@ -491,25 +540,29 @@ void
 attrs(XML::PugiXML::Node self)
 PPCODE:
 {
-    for (xml_attribute attr = self->node.first_attribute(); attr; attr = attr.next_attribute()) {
-        SV* attr_sv = wrap_attr(aTHX_ attr, self->doc_sv);
-        XPUSHs(sv_2mortal(attr_sv));
-    }
+    CHECK_NODE_ALIVE(self);
+    SSize_t count = 0;
+    for (xml_attribute a = self->node.first_attribute(); a; a = a.next_attribute()) count++;
+    EXTEND(SP, count);
+    for (xml_attribute attr = self->node.first_attribute(); attr; attr = attr.next_attribute())
+        PUSHs(sv_2mortal(wrap_attr(aTHX_ attr, self->node, self->doc_sv)));
 }
 
 SV*
-attr(XML::PugiXML::Node self, const char* name)
+attr(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
-    RETVAL = wrap_attr(aTHX_ self->node.attribute(name), self->doc_sv);
+    CHECK_NODE_ALIVE(self);
+    RETVAL = wrap_attr(aTHX_ self->node.attribute(name), self->node, self->doc_sv);
 }
 OUTPUT:
     RETVAL
 
 SV*
-append_child(XML::PugiXML::Node self, const char* name)
+append_child(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node child = self->node.append_child(name);
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
@@ -517,9 +570,10 @@ OUTPUT:
     RETVAL
 
 SV*
-prepend_child(XML::PugiXML::Node self, const char* name)
+prepend_child(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node child = self->node.prepend_child(name);
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
@@ -527,9 +581,10 @@ OUTPUT:
     RETVAL
 
 SV*
-insert_child_before(XML::PugiXML::Node self, const char* name, XML::PugiXML::Node ref_node)
+insert_child_before(XML::PugiXML::Node self, utf8_str name, XML::PugiXML::Node ref_node)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node child = self->node.insert_child_before(name, ref_node->node);
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
@@ -537,9 +592,10 @@ OUTPUT:
     RETVAL
 
 SV*
-insert_child_after(XML::PugiXML::Node self, const char* name, XML::PugiXML::Node ref_node)
+insert_child_after(XML::PugiXML::Node self, utf8_str name, XML::PugiXML::Node ref_node)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node child = self->node.insert_child_after(name, ref_node->node);
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
@@ -547,9 +603,10 @@ OUTPUT:
     RETVAL
 
 SV*
-append_cdata(XML::PugiXML::Node self, const char* content)
+append_cdata(XML::PugiXML::Node self, utf8_str content)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node cdata = self->node.append_child(node_cdata);
     if (cdata) {
         cdata.set_value(content);
@@ -560,9 +617,10 @@ OUTPUT:
     RETVAL
 
 SV*
-append_comment(XML::PugiXML::Node self, const char* content)
+append_comment(XML::PugiXML::Node self, utf8_str content)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node comment = self->node.append_child(node_comment);
     if (comment) {
         comment.set_value(content);
@@ -576,6 +634,7 @@ int
 type(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = (int)self->node.type();
 }
 OUTPUT:
@@ -585,6 +644,7 @@ SV*
 path(XML::PugiXML::Node self, char delimiter = '/')
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     std::string p = self->node.path(delimiter);
     RETVAL = new_utf8_svpvn(aTHX_ p.c_str(), p.length());
 }
@@ -592,9 +652,10 @@ OUTPUT:
     RETVAL
 
 SV*
-find_child_by_attribute(XML::PugiXML::Node self, const char* name, const char* attr_name, const char* attr_value)
+find_child_by_attribute(XML::PugiXML::Node self, utf8_str name, utf8_str attr_name, utf8_str attr_value)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node child = self->node.find_child_by_attribute(name, attr_name, attr_value);
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
@@ -605,45 +666,59 @@ SV*
 root(XML::PugiXML::Node self)
 CODE:
 {
-    RETVAL = wrap_node(aTHX_ self->node.root(), self->doc_sv);
+    CHECK_NODE_ALIVE(self);
+    /* Return document element (consistent with $doc->root) */
+    xml_node doc_node = self->node.root();
+    xml_node elem;
+    for (xml_node child = doc_node.first_child(); child; child = child.next_sibling()) {
+        if (child.type() == node_element) {
+            elem = child;
+            break;
+        }
+    }
+    RETVAL = wrap_node(aTHX_ elem, self->doc_sv);
 }
 OUTPUT:
     RETVAL
 
 bool
-set_name(XML::PugiXML::Node self, const char* name)
+set_name(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = self->node.set_name(name);
 }
 OUTPUT:
     RETVAL
 
 bool
-set_value(XML::PugiXML::Node self, const char* value)
+set_value(XML::PugiXML::Node self, utf8_str value)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = self->node.set_value(value);
 }
 OUTPUT:
     RETVAL
 
 bool
-set_text(XML::PugiXML::Node self, const char* text)
+set_text(XML::PugiXML::Node self, utf8_str text)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = self->node.text().set(text);
 }
 OUTPUT:
     RETVAL
 
 SV*
-select_node(XML::PugiXML::Node self, const char* xpath)
+select_node(XML::PugiXML::Node self, utf8_str xpath)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     try {
         xpath_node result = self->node.select_node(xpath);
-        RETVAL = wrap_node(aTHX_ result.node(), self->doc_sv);
+        RETVAL = wrap_xpath_result(aTHX_ result, self->doc_sv);
     } catch (const xpath_exception& e) {
         croak("XPath error: %s", e.what());
     }
@@ -652,14 +727,16 @@ OUTPUT:
     RETVAL
 
 void
-select_nodes(XML::PugiXML::Node self, const char* xpath)
+select_nodes(XML::PugiXML::Node self, utf8_str xpath)
 PPCODE:
 {
+    CHECK_NODE_ALIVE(self);
     try {
         xpath_node_set nodes = self->node.select_nodes(xpath);
+        EXTEND(SP, (SSize_t)nodes.size());
         for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
-            SV* node_sv = wrap_node(aTHX_ it->node(), self->doc_sv);
-            XPUSHs(sv_2mortal(node_sv));
+            SV* sv = wrap_xpath_result(aTHX_ *it, self->doc_sv);
+            PUSHs(sv_2mortal(sv));
         }
     } catch (const xpath_exception& e) {
         croak("XPath error: %s", e.what());
@@ -670,27 +747,30 @@ bool
 valid(XML::PugiXML::Node self)
 CODE:
 {
-    RETVAL = (bool)self->node;
+    /* valid() deliberately skips CHECK_NODE_ALIVE — returns false for stale handles */
+    RETVAL = (self->gen_snap == *self->gen_ptr) && (bool)self->node;
 }
 OUTPUT:
     RETVAL
 
 SV*
-append_attr(XML::PugiXML::Node self, const char* name)
+append_attr(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_attribute attr = self->node.append_attribute(name);
-    RETVAL = wrap_attr(aTHX_ attr, self->doc_sv);
+    RETVAL = wrap_attr(aTHX_ attr, self->node, self->doc_sv);
 }
 OUTPUT:
     RETVAL
 
 SV*
-prepend_attr(XML::PugiXML::Node self, const char* name)
+prepend_attr(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_attribute attr = self->node.prepend_attribute(name);
-    RETVAL = wrap_attr(aTHX_ attr, self->doc_sv);
+    RETVAL = wrap_attr(aTHX_ attr, self->node, self->doc_sv);
 }
 OUTPUT:
     RETVAL
@@ -699,15 +779,17 @@ bool
 remove_child(XML::PugiXML::Node self, XML::PugiXML::Node child)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = self->node.remove_child(child->node);
 }
 OUTPUT:
     RETVAL
 
 bool
-remove_attr(XML::PugiXML::Node self, const char* name)
+remove_attr(XML::PugiXML::Node self, utf8_str name)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_attribute attr = self->node.attribute(name);
     RETVAL = self->node.remove_attribute(attr);
 }
@@ -718,6 +800,7 @@ SV*
 append_copy(XML::PugiXML::Node self, XML::PugiXML::Node source)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node copy = self->node.append_copy(source->node);
     RETVAL = wrap_node(aTHX_ copy, self->doc_sv);
 }
@@ -728,6 +811,7 @@ SV*
 prepend_copy(XML::PugiXML::Node self, XML::PugiXML::Node source)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node copy = self->node.prepend_copy(source->node);
     RETVAL = wrap_node(aTHX_ copy, self->doc_sv);
 }
@@ -738,6 +822,7 @@ SV*
 insert_copy_before(XML::PugiXML::Node self, XML::PugiXML::Node source, XML::PugiXML::Node ref_node)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node copy = self->node.insert_copy_before(source->node, ref_node->node);
     RETVAL = wrap_node(aTHX_ copy, self->doc_sv);
 }
@@ -748,6 +833,7 @@ SV*
 insert_copy_after(XML::PugiXML::Node self, XML::PugiXML::Node source, XML::PugiXML::Node ref_node)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node copy = self->node.insert_copy_after(source->node, ref_node->node);
     RETVAL = wrap_node(aTHX_ copy, self->doc_sv);
 }
@@ -755,9 +841,10 @@ OUTPUT:
     RETVAL
 
 SV*
-set_attr(XML::PugiXML::Node self, const char* name, const char* value)
+set_attr(XML::PugiXML::Node self, utf8_str name, utf8_str value)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_attribute attr = self->node.attribute(name);
     if (!attr) {
         attr = self->node.append_attribute(name);
@@ -765,15 +852,16 @@ CODE:
     if (attr) {
         attr.set_value(value);
     }
-    RETVAL = wrap_attr(aTHX_ attr, self->doc_sv);
+    RETVAL = wrap_attr(aTHX_ attr, self->node, self->doc_sv);
 }
 OUTPUT:
     RETVAL
 
 SV*
-append_pi(XML::PugiXML::Node self, const char* target, const char* data = NULL)
+append_pi(XML::PugiXML::Node self, utf8_str target, utf8_str data = NULL)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     xml_node pi = self->node.append_child(node_pi);
     if (pi) {
         pi.set_name(target);
@@ -790,6 +878,7 @@ size_t
 hash(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = self->node.hash_value();
 }
 OUTPUT:
@@ -799,6 +888,7 @@ IV
 offset_debug(XML::PugiXML::Node self)
 CODE:
 {
+    CHECK_NODE_ALIVE(self);
     RETVAL = (IV)self->node.offset_debug();
 }
 OUTPUT:
@@ -819,6 +909,7 @@ SV*
 name(XML::PugiXML::Attr self)
 CODE:
 {
+    CHECK_ATTR_ALIVE(self);
     RETVAL = newSVpv_utf8(aTHX_ self->attr.name());
 }
 OUTPUT:
@@ -828,6 +919,7 @@ SV*
 value(XML::PugiXML::Attr self)
 CODE:
 {
+    CHECK_ATTR_ALIVE(self);
     RETVAL = newSVpv_utf8(aTHX_ self->attr.value());
 }
 OUTPUT:
@@ -837,6 +929,7 @@ int
 as_int(XML::PugiXML::Attr self)
 CODE:
 {
+    CHECK_ATTR_ALIVE(self);
     RETVAL = self->attr.as_int();
 }
 OUTPUT:
@@ -846,6 +939,7 @@ double
 as_double(XML::PugiXML::Attr self)
 CODE:
 {
+    CHECK_ATTR_ALIVE(self);
     RETVAL = self->attr.as_double();
 }
 OUTPUT:
@@ -855,6 +949,7 @@ bool
 as_bool(XML::PugiXML::Attr self)
 CODE:
 {
+    CHECK_ATTR_ALIVE(self);
     RETVAL = self->attr.as_bool();
 }
 OUTPUT:
@@ -864,34 +959,62 @@ unsigned int
 as_uint(XML::PugiXML::Attr self)
 CODE:
 {
+    CHECK_ATTR_ALIVE(self);
     RETVAL = self->attr.as_uint();
 }
 OUTPUT:
     RETVAL
 
-IV
+SV*
 as_llong(XML::PugiXML::Attr self)
 CODE:
 {
-    RETVAL = (IV)self->attr.as_llong();
+    CHECK_ATTR_ALIVE(self);
+#if IVSIZE >= 8
+    RETVAL = newSViv((IV)self->attr.as_llong());
+#else
+    long long val = self->attr.as_llong();
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%lld", val);
+    RETVAL = newSVpv(buf, 0);
+#endif
 }
 OUTPUT:
     RETVAL
 
-UV
+SV*
 as_ullong(XML::PugiXML::Attr self)
 CODE:
 {
-    RETVAL = (UV)self->attr.as_ullong();
+    CHECK_ATTR_ALIVE(self);
+#if IVSIZE >= 8
+    RETVAL = newSVuv((UV)self->attr.as_ullong());
+#else
+    unsigned long long val = self->attr.as_ullong();
+    char buf[32];
+    snprintf(buf, sizeof(buf), "%llu", val);
+    RETVAL = newSVpv(buf, 0);
+#endif
 }
 OUTPUT:
     RETVAL
 
 bool
-set_value(XML::PugiXML::Attr self, const char* value)
+set_value(XML::PugiXML::Attr self, utf8_str value)
 CODE:
 {
+    CHECK_ATTR_ALIVE(self);
     RETVAL = self->attr.set_value(value);
+}
+OUTPUT:
+    RETVAL
+
+SV*
+element(XML::PugiXML::Attr self)
+CODE:
+{
+    CHECK_ATTR_ALIVE(self);
+    RETVAL = wrap_node(aTHX_ self->parent_node, self->doc_sv);
 }
 OUTPUT:
     RETVAL
@@ -900,7 +1023,8 @@ bool
 valid(XML::PugiXML::Attr self)
 CODE:
 {
-    RETVAL = (bool)self->attr;
+    /* valid() deliberately skips CHECK_ATTR_ALIVE -- returns false for stale handles */
+    RETVAL = (self->gen_snap == *self->gen_ptr) && (bool)self->attr;
 }
 OUTPUT:
     RETVAL
@@ -920,9 +1044,10 @@ SV*
 evaluate_node(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
+    CHECK_NODE_ALIVE(node);
     try {
         xpath_node result = self->query->evaluate_node(node->node);
-        RETVAL = wrap_node(aTHX_ result.node(), node->doc_sv);
+        RETVAL = wrap_xpath_result(aTHX_ result, node->doc_sv);
     } catch (const xpath_exception& e) {
         croak("XPath error: %s", e.what());
     }
@@ -934,11 +1059,13 @@ void
 evaluate_nodes(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 PPCODE:
 {
+    CHECK_NODE_ALIVE(node);
     try {
         xpath_node_set nodes = self->query->evaluate_node_set(node->node);
+        EXTEND(SP, (SSize_t)nodes.size());
         for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
-            SV* node_sv = wrap_node(aTHX_ it->node(), node->doc_sv);
-            XPUSHs(sv_2mortal(node_sv));
+            SV* sv = wrap_xpath_result(aTHX_ *it, node->doc_sv);
+            PUSHs(sv_2mortal(sv));
         }
     } catch (const xpath_exception& e) {
         croak("XPath error: %s", e.what());
@@ -949,6 +1076,7 @@ SV*
 evaluate_string(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
+    CHECK_NODE_ALIVE(node);
     try {
         std::string result = self->query->evaluate_string(node->node);
         RETVAL = new_utf8_svpvn(aTHX_ result.c_str(), result.length());
@@ -963,6 +1091,7 @@ double
 evaluate_number(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
+    CHECK_NODE_ALIVE(node);
     try {
         RETVAL = self->query->evaluate_number(node->node);
     } catch (const xpath_exception& e) {
@@ -976,6 +1105,7 @@ bool
 evaluate_boolean(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
+    CHECK_NODE_ALIVE(node);
     try {
         RETVAL = self->query->evaluate_boolean(node->node);
     } catch (const xpath_exception& e) {

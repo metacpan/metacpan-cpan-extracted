@@ -3,3 +3,9 @@ XML::PugiXML         T_PTROBJ
 XML::PugiXML::Node   T_PTROBJ
 XML::PugiXML::Attr   T_PTROBJ
 XML::PugiXML::XPath  T_PTROBJ
+utf8_str             T_PV_UTF8
+
+INPUT
+T_PV_UTF8
+	sv_utf8_upgrade($arg);
+	$var = (utf8_str)SvPV_nolen($arg)

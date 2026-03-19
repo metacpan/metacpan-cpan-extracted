@@ -1,0 +1,21 @@
+severity = 4
+verbose  = %f:%l:%c: %m (%p; Severity: %s)\n
+
+# We use v5.40 features intentionally
+[-Compatibility::PerlMinimumVersionAndWhy]
+
+# Moo classes don't need strict/warnings with v5.42
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+
+# We export convenience functions by design
+[-Modules::ProhibitAutomaticExportation]
+
+# Container API uses 'state' and 'exec' as method names intentionally
+[-Subroutines::ProhibitBuiltinHomonyms]
+
+# Inner ::Container packages in module files are idiomatic Perl
+[-Modules::ProhibitMultiplePackages]
+
+# use constant is fine for simple defaults
+[-ValuesAndExpressions::ProhibitConstantPragma]

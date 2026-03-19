@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = 'v1.0.5';
+our $VERSION = 'v1.0.7';
 
 sub configure {
 	my $self = shift;
@@ -36,7 +36,7 @@ sub configure {
 	  $self->add_plugins([MetaResources => { x_IRC => $irc }]);
 	}
 	
-	my @from_build = qw(INSTALL LICENSE CONTRIBUTING.md META.json);
+	my @from_build = qw(LICENSE CONTRIBUTING.md META.json);
 	push @from_build, $install_with_makemaker ? 'Makefile.PL' : 'Build.PL';
 	my @ignore_files = qw(Build.PL Makefile.PL);
 	my @dirty_files = qw(dist.ini Changes README.pod);
@@ -69,10 +69,10 @@ sub configure {
 		['Regenerate::AfterReleasers' => { plugins => [$self->name . '/Readme_Github', $self->name . '/CopyFilesFromRelease'] }]);
 	# @Basic, with some modifications
 	$self->add_plugins(qw/PruneCruft ManifestSkip MetaYAML MetaJSON
-		License ReadmeAnyFromPod ExecDir ShareDir/);
+		License Readme::Brief ExecDir ShareDir/);
 	$self->add_plugins([ExecDir => 'ScriptDir' => { dir => 'script' }]);
 	$self->add_plugins($installer);
-	$self->add_plugins(qw/RunExtraTests InstallGuide Manifest TestRelease ConfirmRelease/);
+	$self->add_plugins(qw/RunExtraTests Manifest TestRelease ConfirmRelease/);
 	$self->add_plugins($ENV{FAKE_RELEASE} ? 'FakeRelease' : 'UploadToCPAN');
 }
 
@@ -175,14 +175,13 @@ This is the plugin bundle that DBOOK uses. It is equivalent to:
  [MetaYAML]
  [MetaJSON]
  [License]
- [ReadmeAnyFromPod]
+ [Readme::Brief]
  [ExecDir]
  [ExecDir / ScriptDir]
  dir = script
  [ShareDir]
  [MakeMaker]
  [RunExtraTests]
- [InstallGuide]
  [Manifest]
  [TestRelease]
  [ConfirmRelease]

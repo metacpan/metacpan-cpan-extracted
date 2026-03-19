@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Template One!</title>
+		<style type="text/css">
+			body {
+				font-family: Sans-Serif;
+				margin: 2em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Hello from Template config.phtml!</h1>
+		<p>
+			Below is a dump of the config() data.
+			The config data is not automatically sent to the template,
+			but is done here for illustrative purposes.
+		</p>
+		<pre>
+[% USE dumper() %]
+[% dumper.dump(config) %]
+		</pre>
+	</body>
+</html>

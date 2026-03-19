@@ -86,9 +86,8 @@ PAGI::Server - PAGI Reference Server Implementation
     use PAGI::Server;
 
     # If using Future::IO libraries (Async::Redis, SSE->every, etc.)
-    # configure Future::IO BEFORE loading them:
-    use Future::IO;
-    Future::IO->load_impl('IOAsync');
+    # load the IO::Async implementation BEFORE loading them:
+    use Future::IO::Impl::IOAsync;
 
     my $loop = IO::Async::Loop->new;
 
@@ -1419,19 +1418,21 @@ sub _init {
     # Skip validation if TLS is explicitly disabled
     if (my $ssl = $self->{ssl}) {
         if ($self->{disable_tls}) {
-            die "TLS is disabled via disable_tls option\n";
-        }
-        if (my $cert = $ssl->{cert_file}) {
-            die "SSL certificate file not found: $cert\n" unless -e $cert;
-            die "SSL certificate file not readable: $cert\n" unless -r $cert;
-        }
-        if (my $key = $ssl->{key_file}) {
-            die "SSL key file not found: $key\n" unless -e $key;
-            die "SSL key file not readable: $key\n" unless -r $key;
-        }
-        if (my $ca = $ssl->{ca_file}) {
-            die "SSL CA file not found: $ca\n" unless -e $ca;
-            die "SSL CA file not readable: $ca\n" unless -r $ca;
+            # Skip TLS setup and cert validation — ssl config is stored but not applied
+            warn "PAGI::Server: TLS disabled via disable_tls option, ssl config ignored\n";
+        } else {
+            if (my $cert = $ssl->{cert_file}) {
+                die "SSL certificate file not found: $cert\n" unless -e $cert;
+                die "SSL certificate file not readable: $cert\n" unless -r $cert;
+            }
+            if (my $key = $ssl->{key_file}) {
+                die "SSL key file not found: $key\n" unless -e $key;
+                die "SSL key file not readable: $key\n" unless -r $key;
+            }
+            if (my $ca = $ssl->{ca_file}) {
+                die "SSL CA file not found: $ca\n" unless -e $ca;
+                die "SSL CA file not readable: $ca\n" unless -r $ca;
+            }
         }
     }
 
@@ -1469,6 +1470,10 @@ sub _init {
     $self->{write_high_watermark} = delete $params->{write_high_watermark} // 65536;   # 64KB - pause sending above this
     $self->{write_low_watermark}  = delete $params->{write_low_watermark}  // 16384;   # 16KB - resume sending below this
     $self->{loop_type}           = delete $params->{loop_type};  # Optional loop backend (EPoll, EV, Poll, etc.)
+    if (my $lt = $self->{loop_type}) {
+        die "Invalid loop_type '$lt': must contain only letters, digits, and ::\n"
+            unless $lt =~ /\A[A-Za-z][A-Za-z0-9_]*(?:::[A-Za-z][A-Za-z0-9_]*)*\z/;
+    }
     # Dev-mode event validation: explicit flag, or auto-enable in development mode
     $self->{validate_events}     = delete $params->{validate_events}
         // (($ENV{PAGI_ENV} // '') eq 'development' ? 1 : 0);
@@ -1552,6 +1557,12 @@ sub configure {
     }
     if (exists $params{access_log}) {
         $self->{access_log} = delete $params{access_log};
+    }
+    if (exists $params{access_log_format}) {
+        $self->{access_log_format} = delete $params{access_log_format};
+        $self->{_access_log_formatter} = $self->_compile_access_log_format(
+            $self->{access_log_format}
+        );
     }
     if (exists $params{quiet}) {
         $self->{quiet} = delete $params{quiet};
@@ -1659,9 +1670,9 @@ sub _future_xs_status_string {
 sub _check_tls_available {
     my ($self) = @_;
 
-    # Allow forcing TLS off for testing
+    # Allow forcing TLS off for testing — return false to skip TLS setup
     if ($self->{disable_tls}) {
-        die "TLS is disabled via disable_tls option\n";
+        return 0;
     }
 
     return 1 if $TLS_AVAILABLE;
@@ -1687,13 +1698,14 @@ sub _build_ssl_config {
     my ($self) = @_;
     my $ssl = $self->{ssl} or return;
 
-    $self->_check_tls_available;
+    return unless $self->_check_tls_available;
 
     my %ssl_params;
     $ssl_params{SSL_server}      = 1;
     $ssl_params{SSL_cert_file}   = $ssl->{cert_file} if $ssl->{cert_file};
     $ssl_params{SSL_key_file}    = $ssl->{key_file}  if $ssl->{key_file};
-    $ssl_params{SSL_version}     = $ssl->{min_version} // 'TLSv1_2';
+    # Trailing colon means "this version or higher" — allows TLS 1.3 negotiation
+    $ssl_params{SSL_version}     = ($ssl->{min_version} // 'TLSv1_2') . ':';
     $ssl_params{SSL_cipher_list} = $ssl->{cipher_list}
         // 'ECDHE+AESGCM:DHE+AESGCM:ECDHE+CHACHA20:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA';
 
@@ -1792,8 +1804,11 @@ sub _create_loop {
     my ($self) = @_;
 
     if (my $loop_type = $self->{loop_type}) {
+        die "Invalid loop_type '$loop_type': must contain only letters, digits, and ::\n"
+            unless $loop_type =~ /\A[A-Za-z][A-Za-z0-9_]*(?:::[A-Za-z][A-Za-z0-9_]*)*\z/;
         my $loop_class = "IO::Async::Loop::$loop_type";
-        eval "require $loop_class"
+        (my $loop_file = "$loop_class.pm") =~ s{::}{/}g;
+        eval { require $loop_file }
             or die "Cannot load loop backend '$loop_type': $@\n" .
                    "Install it with: cpanm $loop_class\n";
         return $loop_class->new;
@@ -2590,28 +2605,19 @@ sub _pause_accepting {
     }
 
     # Re-enable after duration
+    weaken(my $weak_self = $self);
     my $timer_id = $self->loop->watch_time(after => $duration, code => sub {
-        return unless $self->{running};
-        $self->{_accept_paused} = 0;
-        delete $self->{_accept_pause_timer};
-        if ($self->{listener} && $self->{listener}->read_handle) {
-            $self->{listener}->want_readready(1);
+        return unless $weak_self && $weak_self->{running};
+        $weak_self->{_accept_paused} = 0;
+        delete $weak_self->{_accept_pause_timer};
+        if ($weak_self->{listener} && $weak_self->{listener}->read_handle) {
+            $weak_self->{listener}->want_readready(1);
         }
-        $self->_log(debug => "Accept resumed after FD exhaustion pause");
+        $weak_self->_log(debug => "Accept resumed after FD exhaustion pause");
     });
 
     # Store the timer ID for cleanup
     $self->{_accept_pause_timer} = $timer_id;
-}
-
-sub _log_connection_stats {
-    my ($self) = @_;
-
-    my $current = $self->connection_count;
-    my $max = $self->effective_max_connections;
-    my $pct = int(($current / $max) * 100);
-
-    $self->_log(info => "Connections: $current/$max ($pct%)");
 }
 
 # Called when a request completes (for max_requests tracking)
@@ -3293,8 +3299,7 @@ yourself before loading any Future::IO-based libraries:
     use PAGI::Server;
 
     # Configure Future::IO BEFORE loading Future::IO-based libraries
-    use Future::IO;
-    Future::IO->load_impl('IOAsync');
+    use Future::IO::Impl::IOAsync;
 
     # Now Future::IO libraries work correctly
     use Async::Redis;

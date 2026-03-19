@@ -5,6 +5,8 @@ use Bit::Vector;
 use Test::More;
 use Test::BinaryData;
 use Thrift::XS;
+use Thrift::MessageType;
+use Thrift::Type;
 
 plan tests => 61;
 
@@ -31,21 +33,21 @@ my $test = sub {
 
 # Write tests
 {
-    $test->('writeMessageBegin' => [ 'login', TMessageType::CALL, 12345 ] => pack('H*', '8221b960056c6f67696e'));
+    $test->('writeMessageBegin' => [ 'login', Thrift::TMessageType::CALL, 12345 ] => pack('H*', '8221b960056c6f67696e'));
     my $utf8 = 'русский';
-    $test->('writeMessageBegin' => [ $utf8, TMessageType::REPLY, 1 ] => pack('H*', '8241010ed180d183d181d181d0bad0b8d0b9'));
+    $test->('writeMessageBegin' => [ $utf8, Thrift::TMessageType::REPLY, 1 ] => pack('H*', '8241010ed180d183d181d181d0bad0b8d0b9'));
     
     # Tests for special field/bool handling
-    $test->('writeFieldBegin' => [ 'key', TType::STRING, 1 ] => pack('H*', '18'));
+    $test->('writeFieldBegin' => [ 'key', Thrift::TType::STRING, 1 ] => pack('H*', '18'));
     $test->('writeString' => [ 'a mildly long string to test varint: ' . ('x' x 100) ]
         => (pack('H*', '890161206d696c646c79206c6f6e6720737472696e6720746f207465737420766172696e743a20') . pack('H*', '78' x 100)));
     $test->('writeFieldEnd' => [] => '');
     
-    $test->('writeFieldBegin' => [ 'bool', TType::BOOL, 2 ] => ''); # No output from bool field begin
+    $test->('writeFieldBegin' => [ 'bool', Thrift::TType::BOOL, 2 ] => ''); # No output from bool field begin
     $test->('writeBool' => [ 1 ] => pack('H*', '11'));
     $test->('writeFieldEnd' => [] => '');
     
-    $test->('writeFieldBegin' => [ 'bool', TType::BOOL, 3 ] => ''); # No output from bool field begin
+    $test->('writeFieldBegin' => [ 'bool', Thrift::TType::BOOL, 3 ] => ''); # No output from bool field begin
     $test->('writeBool' => [ 0 ] => pack('H*', '12'));
     $test->('writeFieldEnd' => [] => '');
     
@@ -54,13 +56,13 @@ my $test = sub {
     $test->('writeStructBegin' => [ 'foo' ] => '');
     $test->('writeStructEnd' => [] => '');
     
-    $test->('writeMapBegin' => [ TType::STRING, TType::LIST, 42 ] => pack('H*', '2a89'));
-    $test->('writeMapBegin' => [ TType::STRING, TType::LIST, 0 ] => pack('H*', 0));
+    $test->('writeMapBegin' => [ Thrift::TType::STRING, Thrift::TType::LIST, 42 ] => pack('H*', '2a89'));
+    $test->('writeMapBegin' => [ Thrift::TType::STRING, Thrift::TType::LIST, 0 ] => pack('H*', 0));
     
-    $test->('writeListBegin' => [ TType::STRUCT, 14 ] => pack('H*', 'ec'));
-    $test->('writeListBegin' => [ TType::STRING, 200 ] => pack('H*', 'f8c801'));
+    $test->('writeListBegin' => [ Thrift::TType::STRUCT, 14 ] => pack('H*', 'ec'));
+    $test->('writeListBegin' => [ Thrift::TType::STRING, 200 ] => pack('H*', 'f8c801'));
     
-    $test->('writeSetBegin' => [ TType::I32, 8 ] => pack('H*', '85'));
+    $test->('writeSetBegin' => [ Thrift::TType::I32, 8 ] => pack('H*', '85'));
     
     $test->('writeByte' => [ 50 ] => pack('H*', '32'));
     
@@ -92,10 +94,10 @@ my $test = sub {
 # Read tests
 {
     my ($name, $type, $seqid);
-    $xsp->writeMessageBegin('login русский', TMessageType::CALL, 12345);
+    $xsp->writeMessageBegin('login русский', Thrift::TMessageType::CALL, 12345);
     $xsp->readMessageBegin(\$name, \$type, \$seqid);
     is($name, 'login русский', "readMessageBegin name ok");
-    is($type, TMessageType::CALL, "readMessageBegin type ok");
+    is($type, Thrift::TMessageType::CALL, "readMessageBegin type ok");
     is($seqid, 12345, "readMessageBegin seqid ok");
 }
 
@@ -108,35 +110,35 @@ my $test = sub {
 
 { 
     my ($name, $type, $id);   
-    $xsp->writeFieldBegin('start', TType::STRING, 2600);
+    $xsp->writeFieldBegin('start', Thrift::TType::STRING, 2600);
     $xsp->readFieldBegin(\$name, \$type, \$id);
     # name is not returned
-    is($type, TType::STRING, "readFieldBegin fieldtype ok");
+    is($type, Thrift::TType::STRING, "readFieldBegin fieldtype ok");
     is($id, 2600, "readFieldBegin fieldid ok");
 }
 
 { 
     my ($keytype, $valtype, $size);
-    $xsp->writeMapBegin(TType::STRING, TType::LIST, 42);
+    $xsp->writeMapBegin(Thrift::TType::STRING, Thrift::TType::LIST, 42);
     $xsp->readMapBegin(\$keytype, \$valtype, \$size);
-    is($keytype, TType::STRING, "readMapBegin keytype ok");
-    is($valtype, TType::LIST, "readMapBegin valtype ok");
+    is($keytype, Thrift::TType::STRING, "readMapBegin keytype ok");
+    is($valtype, Thrift::TType::LIST, "readMapBegin valtype ok");
     is($size, 42, "readMapBegin size ok");
 }
 
 {   
     my ($elemtype, $size);
-    $xsp->writeListBegin(TType::STRUCT, 12345);
+    $xsp->writeListBegin(Thrift::TType::STRUCT, 12345);
     $xsp->readListBegin(\$elemtype, \$size);
-    is($elemtype, TType::STRUCT, "readListBegin elemtype ok");
+    is($elemtype, Thrift::TType::STRUCT, "readListBegin elemtype ok");
     is($size, 12345, "readListBegin size ok");
 }
 
 {   
     my ($elemtype, $size);
-    $xsp->writeSetBegin(TType::I16, 12345);
+    $xsp->writeSetBegin(Thrift::TType::I16, 12345);
     $xsp->readSetBegin(\$elemtype, \$size);
-    is($elemtype, TType::I16, "readSetBegin elemtype ok");
+    is($elemtype, Thrift::TType::I16, "readSetBegin elemtype ok");
     is($size, 12345, "readSetBegin size ok");
 }
 
@@ -199,16 +201,16 @@ my $test = sub {
     $xsp->resetState();
     
     $xsp->writeStructBegin('SliceRange');
-    $xsp->writeFieldBegin('start', TType::STRING, 1);
+    $xsp->writeFieldBegin('start', Thrift::TType::STRING, 1);
     $xsp->writeString(1);
     $xsp->writeFieldEnd();
-    $xsp->writeFieldBegin('finish', TType::STRING, 2);
+    $xsp->writeFieldBegin('finish', Thrift::TType::STRING, 2);
     $xsp->writeString(1000);
     $xsp->writeFieldEnd();
-    $xsp->writeFieldBegin('reversed', TType::BOOL, 3);
+    $xsp->writeFieldBegin('reversed', Thrift::TType::BOOL, 3);
     $xsp->writeBool(0);
     $xsp->writeFieldEnd();
-    $xsp->writeFieldBegin('count', TType::I32, 4);
+    $xsp->writeFieldBegin('count', Thrift::TType::I32, 4);
     $xsp->writeI32(100);
     $xsp->writeFieldEnd();
     $xsp->writeFieldStop();
@@ -222,30 +224,30 @@ my $test = sub {
     while (1) 
     {
       $xsp->readFieldBegin(\$fname, \$ftype, \$fid);
-      if ($ftype == TType::STOP) {
+      if ($ftype == Thrift::TType::STOP) {
         last;
       }
       SWITCH: for($fid)
       {
-        /^1$/ && do{      if ($ftype == TType::STRING) {
+        /^1$/ && do{      if ($ftype == Thrift::TType::STRING) {
           $xsp->readString(\$tmp->{start});
         } else {
           $xsp->skip($ftype);
         }
         last; };
-        /^2$/ && do{      if ($ftype == TType::STRING) {
+        /^2$/ && do{      if ($ftype == Thrift::TType::STRING) {
           $xsp->readString(\$tmp->{finish});
         } else {
           $xsp->skip($ftype);
         }
         last; };
-        /^3$/ && do{      if ($ftype == TType::BOOL) {
+        /^3$/ && do{      if ($ftype == Thrift::TType::BOOL) {
           $xsp->readBool(\$tmp->{reversed});
         } else {
           $xsp->skip($ftype);
         }
         last; };
-        /^4$/ && do{      if ($ftype == TType::I32) {
+        /^4$/ && do{      if ($ftype == Thrift::TType::I32) {
           $xsp->readI32(\$tmp->{count});
         } else {
           $xsp->skip($ftype);
@@ -273,8 +275,8 @@ my $test = sub {
     $xsp->resetState();
     
     $xsp->writeStructBegin('AuthenticationRequest');
-    $xsp->writeFieldBegin('credentials', TType::MAP, 1);
-    $xsp->writeMapBegin(TType::STRING, TType::STRING, scalar(keys %{$credentials}));
+    $xsp->writeFieldBegin('credentials', Thrift::TType::MAP, 1);
+    $xsp->writeMapBegin(Thrift::TType::STRING, Thrift::TType::STRING, scalar(keys %{$credentials}));
     while (my ($k, $v) = each %{$credentials}) {
         $xsp->writeString($k);
         $xsp->writeString($v);
@@ -292,12 +294,12 @@ my $test = sub {
     while (1) 
     {
       $xsp->readFieldBegin(\$fname, \$ftype, \$fid);
-      if ($ftype == TType::STOP) {
+      if ($ftype == Thrift::TType::STOP) {
         last;
       }
       SWITCH: for($fid)
       {
-        /^1$/ && do{      if ($ftype == TType::MAP) {
+        /^1$/ && do{      if ($ftype == Thrift::TType::MAP) {
           {
             my $_size = 0;
             $creds = {};
@@ -338,11 +340,11 @@ my $test = sub {
     $xsp->resetState();
     
     $xsp->writeStructBegin('Cassandra_describe_schema_versions_result');
-    $xsp->writeFieldBegin('success', TType::MAP, 0);
-    $xsp->writeMapBegin(TType::STRING, TType::LIST, scalar(keys %{$data}));
+    $xsp->writeFieldBegin('success', Thrift::TType::MAP, 0);
+    $xsp->writeMapBegin(Thrift::TType::STRING, Thrift::TType::LIST, scalar(keys %{$data}));
     while ( my ($k, $v) = each %{$data} ) {
         $xsp->writeString($k);
-        $xsp->writeListBegin(TType::STRING, scalar(@{$v}));
+        $xsp->writeListBegin(Thrift::TType::STRING, scalar(@{$v}));
         foreach my $s (@{$v}) {
             $xsp->writeString($s);
         }
@@ -361,12 +363,12 @@ my $test = sub {
     while (1) 
     {
       $xsp->readFieldBegin(\$fname, \$ftype, \$fid);
-      if ($ftype == TType::STOP) {
+      if ($ftype == Thrift::TType::STOP) {
         last;
       }
       SWITCH: for($fid)
       {
-        /^0$/ && do{      if ($ftype == TType::MAP) {
+        /^0$/ && do{      if ($ftype == Thrift::TType::MAP) {
             my $size = 0;
             $read = {};
             my $ktype = 0;

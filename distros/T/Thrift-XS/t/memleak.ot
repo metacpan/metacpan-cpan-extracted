@@ -74,25 +74,25 @@ our ( $initial, $final ) = ( 0, 0 );
         my $xsp = Thrift::XS::BinaryProtocol->new($xst);
         
         my ($name, $type, $seqid);
-        $xsp->writeMessageBegin('login', TMessageType::CALL, 12345);
+        $xsp->writeMessageBegin('login', Thrift::TMessageType::CALL, 12345);
         $xsp->readMessageBegin(\$name, \$type, \$seqid);
         
         $xsp->writeStructBegin('foo');
         $xsp->readStructBegin(\$name);
         
         my ($id);   
-        $xsp->writeFieldBegin('start', TType::STRING, 2600);
+        $xsp->writeFieldBegin('start', Thrift::TType::STRING, 2600);
         $xsp->readFieldBegin(\$name, \$type, \$id);
         
         my ($keytype, $valtype, $size);
-        $xsp->writeMapBegin(TType::STRING, TType::LIST, 42);
+        $xsp->writeMapBegin(Thrift::TType::STRING, Thrift::TType::LIST, 42);
         $xsp->readMapBegin(\$keytype, \$valtype, \$size);
         
         my ($elemtype);
-        $xsp->writeListBegin(TType::STRUCT, 12345);
+        $xsp->writeListBegin(Thrift::TType::STRUCT, 12345);
         $xsp->readListBegin(\$elemtype, \$size);
         
-        $xsp->writeSetBegin(TType::I16, 12345);
+        $xsp->writeSetBegin(Thrift::TType::I16, 12345);
         $xsp->readSetBegin(\$elemtype, \$size);
         
         my $value;

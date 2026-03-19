@@ -1,0 +1,44 @@
+NAME
+    Alien::libwebsockets - Find or build libwebsockets C library
+
+SYNOPSIS
+        use Alien::libwebsockets;
+        use ExtUtils::MakeMaker;
+
+        WriteMakefile(
+            ...
+            CONFIGURE_REQUIRES => {
+                'Alien::libwebsockets' => 0,
+            },
+            CCFLAGS => Alien::libwebsockets->cflags,
+            LIBS    => Alien::libwebsockets->libs,
+        );
+
+DESCRIPTION
+    This module provides the libwebsockets C library. It will either use the
+    system library if available, or download and build it from source.
+
+    When built from source, libwebsockets is configured with libev, SSL,
+    zlib, and permessage-deflate extension support.
+
+METHODS
+    Inherits all methods from Alien::Base and implements the following.
+
+  has_extensions
+        my $bool = Alien::libwebsockets->has_extensions;
+
+    Returns true if the installed libwebsockets includes permessage-deflate
+    extension support. Uses "nm" for symbol detection. Only reliable for
+    "share" installs; returns false for "system" installs where the shared
+    library path is not tracked.
+
+SEE ALSO
+    Alien::Base, libwebsockets <https://libwebsockets.org/>
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

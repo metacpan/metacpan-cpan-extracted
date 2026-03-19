@@ -133,6 +133,8 @@ void cleanup_observe(pTHX_ observe_call_t *oc) {
         op = &(*op)->next;
     }
 
+    if (ev_is_active(&oc->reconnect_timer))
+        ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
     grpc_metadata_array_destroy(&oc->initial_metadata);
     grpc_metadata_array_destroy(&oc->trailing_metadata);
     if (oc->recv_buffer) {
@@ -154,12 +156,14 @@ void cleanup_observe(pTHX_ observe_call_t *oc) {
 /* Process LeaderResponse for observe stream */
 void process_observe_response(pTHX_ observe_call_t *oc) {
     if (!oc->recv_buffer) {
+        oc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "No observe response received");
         return;
     }
 
     grpc_byte_buffer_reader reader;
     if (!grpc_byte_buffer_reader_init(&reader, oc->recv_buffer)) {
+        oc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Failed to read observe response buffer");
         return;
     }
@@ -172,6 +176,7 @@ void process_observe_response(pTHX_ observe_call_t *oc) {
     grpc_slice_unref(slice);
 
     if (!resp) {
+        oc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Failed to parse observe response");
         return;
     }
@@ -191,19 +196,19 @@ void process_observe_response(pTHX_ observe_call_t *oc) {
     CALL_SUCCESS_CALLBACK(oc->callback, result);
 }
 
-/* Try to reconnect an observe stream after it ended */
-int try_reconnect_observe(pTHX_ observe_call_t *oc) {
+/* Perform observe reconnection (called from timer callback) */
+static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
+    dTHX;
+    (void)loop;
+    (void)revents;
+
+    observe_call_t *oc = (observe_call_t *)((char *)w - offsetof(observe_call_t, reconnect_timer));
     ev_etcd_t *client = oc->client;
 
-    if (!oc->auto_reconnect || !client->active) {
-        return 0;
+    if (!client->active) {
+        cleanup_observe(aTHX_ oc);
+        return;
     }
-
-    if (oc->reconnect_attempt >= client->max_retries) {
-        return 0;
-    }
-
-    oc->reconnect_attempt++;
 
     /* Cleanup and reinitialize streaming state */
     STREAMING_CALL_CLEANUP(oc);
@@ -230,22 +235,55 @@ int try_reconnect_observe(pTHX_ observe_call_t *oc) {
     if (!oc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         oc->active = 0;
-        return 0;
+        client->in_callback = 1;
+        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Observe reconnect failed");
+        client->in_callback = 0;
+        if (!client->active) {
+            finish_client_destroy(aTHX_ client);
+            return;
+        }
+        cleanup_observe(aTHX_ oc);
+        return;
     }
 
     grpc_op ops[4] = {0};
     grpc_metadata auth_md;
     STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, oc);
 
-    init_call_functor(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
+    init_call_base(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
     grpc_call_error err = grpc_call_start_batch(oc->call, ops, 4, &oc->base, NULL);
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(oc);
+        client->in_callback = 1;
+        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Observe reconnect batch failed");
+        client->in_callback = 0;
+        if (!client->active) {
+            finish_client_destroy(aTHX_ client);
+            return;
+        }
+        cleanup_observe(aTHX_ oc);
+    }
+}
+
+int try_reconnect_observe(pTHX_ observe_call_t *oc) {
+    ev_etcd_t *client = oc->client;
+
+    if (!oc->auto_reconnect || !client->active) {
         return 0;
     }
+
+    if (oc->reconnect_attempt >= client->max_retries) {
+        return 0;
+    }
+
+    oc->reconnect_attempt++;
+
+    ev_tstamp delay = RECONNECT_BACKOFF_SECONDS(oc->reconnect_attempt);
+    ev_timer_init(&oc->reconnect_timer, observe_reconnect_cb, delay, 0.0);
+    ev_timer_start(EV_DEFAULT, &oc->reconnect_timer);
 
     return 1;
 }

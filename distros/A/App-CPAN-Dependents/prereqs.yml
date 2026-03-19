@@ -1,0 +1,12 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Carp: 0
+    Exporter: 0
+    Getopt::Long::Modern: 0
+    MetaCPAN::Client: '2.037000'
+test:
+  requires:
+    HTTP::Tiny: '0.014'
+    Test::More: '0.88'
+    Test::RequiresInternet: 0

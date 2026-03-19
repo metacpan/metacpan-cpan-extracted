@@ -4,3 +4,4 @@
 ^MANIFEST.bak
 ^.gitignore
 ^Makefile$
+/.perltidyrc

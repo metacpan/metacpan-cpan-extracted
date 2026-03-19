@@ -6,6 +6,7 @@ use 5.018;
 
 use Future;
 use Future::IO;
+use Scalar::Util qw(blessed);
 
 sub new {
     my ($class, %args) = @_;
@@ -93,8 +94,8 @@ sub _send_batch {
             my $result = $results->[$i];
             my $future = $futures[$i];
 
-            # Check if result is an error string
-            if (defined $result && "$result" =~ /^Redis error:/) {
+            # Check if result is an error object (from pipeline inline capture)
+            if (blessed($result) && $result->isa('Async::Redis::Error')) {
                 $future->fail($result);
             }
             else {

@@ -22,9 +22,10 @@ use strict;
 use warnings;
 use Test2::V0;
 use Test::Lib;
-use Test::Async::Redis qw(init_loop skip_without_redis run);
+use Test::Async::Redis qw(skip_without_redis run);
 
-my $loop = init_loop();
+# Ignore SIGPIPE — this test deliberately closes sockets while writes are pending
+$SIG{PIPE} = 'IGNORE';
 
 SKIP: {
     my $redis = skip_without_redis();

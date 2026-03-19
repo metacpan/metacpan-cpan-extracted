@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v3.1.0';
+$Getopt::Guided::VERSION = 'v3.1.2';
 
 # Options Delimiter constant
 sub OD () { '-' }
@@ -207,8 +207,6 @@ sub processopts ( \@@ ) {
   TRUE
 }
 
-# https://metacpan.org/pod/Getopt::ArgvFile
-# https://pasdoc.github.io/ConfigFileOption
 sub readopts ( \@ ) {
   my ( $argv ) = @_;
 
@@ -228,7 +226,7 @@ sub readopts ( \@ ) {
     croakf "File '%s' contains the invalid line '%s'", $file, $_
   }
 
-  undef
+  return
 }
 
 1

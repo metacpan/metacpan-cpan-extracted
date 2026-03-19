@@ -5,12 +5,7 @@ use ExtUtils::MM          ();
 use File::Spec::Functions qw( catfile );
 
 my $git_base_url = 'https://codeberg.org/XSven';
-
-my $distname = 'Getopt-Guided';
-# Transitions: unstable => testing => stable
-my $release_status = 'stable';
-# PRE_RELEASE_NUMBER is set by CI/CD pipeline
-my $pre_release_extension = $release_status eq 'stable' ? undef : 'TRIAL' . ( $ENV{ PRE_RELEASE_NUMBER } // 1 );
+my $distname     = 'Getopt-Guided';
 
 my @main_module_namespace = split /-/, $distname;
 my $main_module           = join '::', @main_module_namespace;
@@ -31,13 +26,10 @@ my %att = (
   LICENSE          => 'perl_5',
   MIN_PERL_VERSION => '5.010000',
   DISTNAME         => $distname,
-  DISTVNAME        => join( '-', $distname, $main_module_version, $pre_release_extension // () )
-  ,    # Related to the below release_status metadata field
-  EXE_FILES  => [ glob( join( ' ', map { catfile( $_, '*' ) } qw( bin script ) ) ) ],
-  META_MERGE => {
-    'meta-spec'    => { version => 2 },
-    release_status => $release_status,
-    provides       => {
+  EXE_FILES        => [ glob( join( ' ', map { catfile( $_, '*' ) } qw( bin script ) ) ) ],
+  META_MERGE       => {
+    'meta-spec' => { version => 2 },
+    provides    => {
       $main_module => {
         file    => $main_module_file,
         version => $main_module_version

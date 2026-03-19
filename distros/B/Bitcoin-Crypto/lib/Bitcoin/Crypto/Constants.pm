@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Constants;
-$Bitcoin::Crypto::Constants::VERSION = '4.003';
+$Bitcoin::Crypto::Constants::VERSION = '4.004';
 use v5.14;
 use warnings;
 

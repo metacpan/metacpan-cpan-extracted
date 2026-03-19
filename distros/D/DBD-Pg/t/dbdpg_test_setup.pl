@@ -1,4 +1,3 @@
-
 ## Helper file for the DBD::Pg tests
 
 use strict;
@@ -13,6 +12,10 @@ use 5.008001;
 select(($|=1,select(STDERR),$|=1)[1]);
 
 my $superuser = 1;
+
+my $TEST_PORT_MIN = 5442;
+my $TEST_PORT_MAX = 5542;
+
 
 my $testfh;
 if (exists $ENV{TEST_OUTPUT}) {
@@ -161,13 +164,17 @@ version: $version
         ## If this was created by us, try and restart it
         if (16 == $helpconnect) {
 
+            $debug and Test::More::diag 'Attempting restart of existing test cluster';
+
             ## Bypass if the testdir has been removed
             if (! -e $testdir) {
                 $arg->{nocreate} and return $helpconnect, '', undef;
                 warn "Test directory $testdir has been removed, will create a new one\n";
             }
             else {
-                if (-e "$testdir/data/postmaster.pid") {
+                my $pidfile = "$testdir/data/postmaster.pid";
+                if (-e $pidfile) {
+                    $debug and Test::More::diag "Found $pidfile";
                     ## Assume it's up, and move on
                 }
                 else {
@@ -197,8 +204,8 @@ version: $version
                     eval { $info = qx{$COM}; };
                     my $err = $@;
                     $su and chdir $olddir;
-                    if ($err or $info !~ /\w/) {
-                        $err = "Could not startup new database ($err) ($info)";
+                    if ($info !~ /starting/ and ($err or $info !~ /\w/)) {
+                        $err = "Could not startup THIS new database (err=$err) ($info)";
                         return $helpconnect, $err, undef;
                     }
                     ## Wait for it to startup and verify the connection
@@ -212,6 +219,7 @@ version: $version
                     };
                     if ($@ =~ /starting up/ or $@ =~ /PGSQL\.[0-9]+/) {
                         if ($loop++ < 20) {
+                            $debug and Test::More::diag "Failed to start, sleeping 1 second round $loop/20";
                             sleep 1;
                             redo STARTUP;
                         }
@@ -288,7 +296,6 @@ version: $version
         }
 
       INITDB:
-        my $testport;
         $helpconnect = 16;
 
         ## Let the ENV variables win
@@ -358,7 +365,7 @@ version: $version
         }
 
         ## initdb and pg_ctl seems to be available, let's use them to fire up a cluster
-        warn "Please wait, creating new database (version $version) for testing\n";
+        warn "Please wait, creating new Postgres cluster (version $version) for testing\n";
         $info = '';
         eval {
             my $com = "$initdb --locale=C -E UTF8 -D $testdir/data";
@@ -374,7 +381,7 @@ version: $version
             $su = $testuser = '';
 
             $testdir = exists $ENV{DBDPG_TEMPDIR} ?
-                File::Temp::tempdir("$ENV{DBDPG_TEMPDIR}/dbdpg_testdatabase_XXXXXX", TMPDIR => 1, CLEANUP => 0) :
+                File::Temp::tempdir("$ENV{DBDPG_TEMPDIR}/dbdpg_testdatabase_XXXXXX", CLEANUP => 0) :
                 File::Temp::tempdir('dbdpg_testdatabase_XXXXXX', TMPDIR => 1, CLEANUP => 0);
 
             my $readme = "$testdir/README";
@@ -470,29 +477,24 @@ version: $version
         }
 
         ## Now we need to find an open port to use
-        $testport = 5442;
-        ## If we've got netstat available, we'll trust that
+        my $testport = $TEST_PORT_MIN;
         $info = '';
         my $evalok = 0;
         eval {
-            $info = qx{netstat -na 2>&1};
+            $info = qx{ss -QanO 2>&1};
             $evalok = 1;
         };
         if (!$evalok or ! defined $info) {
-            warn "netstat call failed, trying port $testport\n";
+            warn "ss call to determine open port failed, trying port $testport\n";
         }
         else {
-            ## Start at 5440 and go up until we are free
-            $testport = 5440;
-            my $maxport = 5470;
             {
-                last if $info !~ /PGSQL\.$testport$/m
-                    and $info !~ /\b127\.0\.0\.1:$testport\b/m;
-                last if ++$testport >= $maxport;
+                last if $info !~ /:$testport /m;
+                last if ++$testport > $TEST_PORT_MAX;
                 redo;
             }
-            if ($testport >= $maxport) {
-                $@ = "No free ports found for testing: tried 5440 to $maxport\n";
+            if ($testport > $TEST_PORT_MAX) {
+                $@ = "No free ports found for testing: tried $TEST_PORT_MIN to $TEST_PORT_MAX\n";
                 last GETHANDLE; ## Fail - no free ports
             }
         }
@@ -585,7 +587,7 @@ version: $version
             };
             my $err = $@;
             $su and chdir $olddir;
-            if ($err or $info !~ /\.\.\./) {
+            if ($err) {
                 $@ = "Could not startup new database ($COM) ($err) ($info)";
                 last GETHANDLE; ## Fail - startup failed
             }
@@ -740,13 +742,13 @@ CREATE TABLE dbd_pg_test (
   lii        integer unique not null default nextval('dbd_pg_testsequence'),
   pname      varchar(20) default 'Testing Default' ,
   val        text,
-  score      float CHECK(score IN ('1','2','3')),
-  Fixed      character(5),
+  score      float CHECK(score IN ('1','2','3', '999')),
+  Fixed      character(5) CHECK (lii > -777),
   pdate      timestamp default now(),
   testarray  text[][],
   testarray2 int[],
   testarray3 bool[],
-  "CaseTest" boolean,
+  "CaseTest" boolean CHECK (score < 888),
   expo       numeric(6,2),
   bytetest   bytea,
   bytearray  bytea[]
@@ -826,7 +828,7 @@ sub get_test_settings {
     if (!$testdir) {
         my $dir = getcwd();
         $testdir = exists $ENV{DBDPG_TEMPDIR} ?
-            File::Temp::tempdir("$ENV{DBDPG_TEMPDIR}/dbdpg_testdatabase_XXXXXX", TMPDIR => 1, CLEANUP => 0) :
+            File::Temp::tempdir("$ENV{DBDPG_TEMPDIR}/dbdpg_testdatabase_XXXXXX", CLEANUP => 0) :
             "$dir/dbdpg_test_database";
     }
 

@@ -3,7 +3,7 @@ package App::git_log_ch_usrdata;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 
 1;
@@ -17,7 +17,7 @@ App::git_log_ch_usrdata - Change username and email address in git log
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 
 =head1 DESCRIPTION
@@ -31,10 +31,16 @@ script.
 
 Klaus Rindfrey, C<< <klausrin at cpan.org.eu> >>
 
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-app-git_log_ch_usrdata at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-git_log_ch_usrdata>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-app-git_log_ch_usrdata at
+rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-git_log_ch_usrdata> or
+create a L<GitHub
+Issue|https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata/issues>
+
+.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 

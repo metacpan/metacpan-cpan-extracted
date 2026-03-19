@@ -30,7 +30,7 @@ like(
 my $result = $mcpan->favorite(
     search => {
         q => 'distribution:Moose',
-        fields => "distribution",
+        _source => "distribution",
         size   => 100,
     },
 );

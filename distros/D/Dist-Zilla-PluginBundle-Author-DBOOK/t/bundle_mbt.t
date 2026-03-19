@@ -35,7 +35,6 @@ my @expected_files = sort qw(
   prereqs.yml
   dist.ini
   lib/DZT/Sample.pm
-  INSTALL
   LICENSE
   MANIFEST
   META.json

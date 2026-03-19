@@ -4,7 +4,7 @@
       "Dave Cross <dave@perlhacks.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,7 +34,6 @@
       "runtime" : {
          "requires" : {
             "Feature::Compat::Class" : "0.07",
-            "Object::Pad" : "0",
             "perl" : "5.026000"
          }
       },
@@ -56,6 +55,6 @@
          "web" : "https://github.com/davorg-cpan/amazon-sites"
       }
    },
-   "version" : "v0.1.9",
+   "version" : "v0.1.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,7 +1,7 @@
 ---
 abstract: 'Find or build the nghttp2 HTTP/2 C library'
 author:
-  - 'Your Name <your@email.com>'
+  - 'John Napiorkowski <jjn1056@yahoo.com>'
 build_requires:
   Alien::Build: '2.37'
   Alien::Build::MM: '0.25'
@@ -30,9 +30,9 @@ requires:
   Alien::Build: '0.25'
   perl: '5.016'
 resources:
-  bugtracker: https://github.com/yourname/Alien-nghttp2/issues
-  repository: https://github.com/yourname/Alien-nghttp2.git
-version: '0.001'
+  bugtracker: https://github.com/jjn1056/Alien-nghttp2/issues
+  repository: https://github.com/jjn1056/Alien-nghttp2.git
+version: '0.002'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

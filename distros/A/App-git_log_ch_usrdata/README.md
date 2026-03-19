@@ -4,7 +4,7 @@ App::git\_log\_ch\_usrdata - Change username and email address in git log
 
 # VERSION
 
-Version 0.01
+Version 0.03
 
 # DESCRIPTION
 

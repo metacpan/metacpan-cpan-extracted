@@ -16,7 +16,7 @@ $Getopt::Std::STANDARD_HELP_VERSION = 1;
 
 use Pod::Usage;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 sub run {
@@ -219,7 +219,7 @@ App::ghmulti - Helps when using multiple Github accounts with SSH keys
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 
 =head1 SYNOPSIS
@@ -246,9 +246,12 @@ installed and available via C<PATH>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-app-ghmulti at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-ghmulti>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-app-ghmulti at
+rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-ghmulti> or create a
+L<GitHub Issue|https://github.com/klaus-rindfrey/perl-app-ghmulti/issues> .  I
+will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
 
 
 =head1 SEE ALSO

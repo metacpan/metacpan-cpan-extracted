@@ -1,0 +1,30 @@
+---
+abstract: 'Extracts a simplified AST from GraphViz2::Marpa tree'
+author:
+  - 'Nadim Khemir <nadim.khemir@gmail.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GraphViz2-Marpa-Extractor
+provides:
+  GraphViz2::Marpa::Extractor:
+    file: lib/GraphViz2/Marpa/Extractor.pm
+    version: v0.1.0
+requires:
+  Data::TreeDumper: '0'
+  Getopt::Long: '0'
+  GraphViz2::Marpa: '0'
+  perl: '5.010'
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: https://github.com/nkh/P5-GraphViz2-Marpa-Extractor
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

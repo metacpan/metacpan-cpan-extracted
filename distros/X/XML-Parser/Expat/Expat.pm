@@ -2,29 +2,30 @@ package XML::Parser::Expat;
 
 use strict;
 
-#use warnings; No warnings numeric??
+# warnings not enabled globally: namespace methods use int() on strings
+# that may not be numeric and rely on 'no warnings "numeric"' locally.
 
 use XSLoader;
 use Carp;
 
-our $VERSION = '2.47';
+our $VERSION = '2.48';
 
 our ( %Encoding_Table, @Encoding_Path, $have_File_Spec );
 
 use File::Spec ();
+use File::ShareDir ();
 
 %Encoding_Table = ();
-if ($have_File_Spec) {
-    @Encoding_Path = (
-        grep( -d $_,
-            map( File::Spec->catdir( $_, qw(XML Parser Encodings) ),
-                @INC ) ),
-        File::Spec->curdir
-    );
-}
-else {
-    @Encoding_Path = ( grep( -d $_, map( $_ . '/XML/Parser/Encodings', @INC ) ), '.' );
-}
+
+my $_share_dir;
+eval { $_share_dir = File::ShareDir::dist_dir('XML-Parser') };
+
+@Encoding_Path = (
+    ( defined $_share_dir && -d $_share_dir ? ($_share_dir) : () ),
+    grep( -d $_,
+        map( File::Spec->catdir( $_, qw(XML Parser Encodings) ), @INC ) ),
+    File::Spec->curdir
+);
 
 XSLoader::load( 'XML::Parser::Expat', $VERSION );
 
@@ -67,6 +68,21 @@ sub new {
         $self, $args{ProtocolEncoding},
         $args{Namespaces}
     );
+
+    if ( defined $args{BillionLaughsAttackProtectionMaximumAmplification} ) {
+        $self->billion_laughs_attack_protection_maximum_amplification(
+            $args{BillionLaughsAttackProtectionMaximumAmplification}
+        );
+    }
+    if ( defined $args{BillionLaughsAttackProtectionActivationThreshold} ) {
+        $self->billion_laughs_attack_protection_activation_threshold(
+            $args{BillionLaughsAttackProtectionActivationThreshold}
+        );
+    }
+    if ( defined $args{ReparseDeferralEnabled} ) {
+        $self->reparse_deferral_enabled( $args{ReparseDeferralEnabled} );
+    }
+
     $self;
 }
 
@@ -77,11 +93,7 @@ sub load_encoding {
     $file .= '.enc' unless $file =~ /\.enc$/;
     unless ( $file =~ m!^/! ) {
         foreach (@Encoding_Path) {
-            my $tmp = (
-                $have_File_Spec
-                ? File::Spec->catfile( $_, $file )
-                : "$_/$file"
-            );
+            my $tmp = File::Spec->catfile( $_, $file );
             if ( -e $tmp ) {
                 $file = $tmp;
                 last;
@@ -115,7 +127,7 @@ sub setHandlers {
     while (@handler_pairs) {
         my $type    = shift @handler_pairs;
         my $handler = shift @handler_pairs;
-        croak 'Handler for $type not a Code ref'
+        croak "Handler for $type not a Code ref"
           unless ( !defined($handler) or !$handler or ref($handler) eq 'CODE' );
 
         my $hndl = $self->{_Setters}->{$type};
@@ -148,7 +160,7 @@ sub xpcarp {
 
     my $eclines = $self->{ErrorContext};
     my $line    = GetCurrentLineNumber( $_[0]->{Parser} );
-    $message .= ' at line $line';
+    $message .= " at line $line";
     $message .= ":\n" . $self->position_in_context($eclines)
       if defined($eclines);
     carp $message;
@@ -193,6 +205,13 @@ sub current_byte {
     my $self = shift;
     if ( $self->{_State_} == 1 ) {
         return GetCurrentByteIndex( $self->{Parser} );
+    }
+}
+
+sub current_length {
+    my $self = shift;
+    if ( $self->{_State_} == 1 ) {
+        return GetCurrentByteCount( $self->{Parser} );
     }
 }
 
@@ -248,14 +267,13 @@ sub element_index {
 
 sub namespace {
     my ( $self, $name ) = @_;
-    local ($^W) = 0;
+    no warnings 'numeric';
     $self->{Namespace_List}->[ int($name) ];
 }
 
 sub eq_name {
     my ( $self, $nm1, $nm2 ) = @_;
-    local ($^W) = 0;
-
+    no warnings 'numeric';
     int($nm1) == int($nm2) and $nm1 eq $nm2;
 }
 
@@ -390,7 +408,6 @@ sub xml_escape {
     my $self = shift;
     my $text = shift;
 
-    study $text;
     $text =~ s/\&/\&amp;/g;
     $text =~ s/</\&lt;/g;
     foreach (@_) {
@@ -400,10 +417,10 @@ sub xml_escape {
             $text =~ s/>/\&gt;/g;
         }
         elsif ( $_ eq '"' ) {
-            $text =~ s/\"/\&quot;/;
+            $text =~ s/\"/\&quot;/g;
         }
         elsif ( $_ eq "'" ) {
-            $text =~ s/\'/\&apos;/;
+            $text =~ s/\'/\&apos;/g;
         }
         else {
             my $rep = '&#' . sprintf( 'x%X', ord($_) ) . ';';
@@ -425,6 +442,44 @@ sub skip_until {
         SkipUntil( $self->{Parser}, $_[0] );
     }
 }
+
+################
+# Security API methods (require sufficiently recent libexpat)
+
+sub billion_laughs_attack_protection_maximum_amplification {
+    my ( $self, $factor ) = @_;
+    croak "Usage: \$parser->billion_laughs_attack_protection_maximum_amplification(\$factor)"
+      unless defined $factor;
+    unless ( defined &SetBillionLaughsAttackProtectionMaximumAmplification ) {
+        croak "SetBillionLaughsAttackProtectionMaximumAmplification not available"
+          . " (requires libexpat >= 2.4.0 built with XML_DTD)";
+    }
+    SetBillionLaughsAttackProtectionMaximumAmplification( $self->{Parser}, $factor );
+}
+
+sub billion_laughs_attack_protection_activation_threshold {
+    my ( $self, $threshold ) = @_;
+    croak "Usage: \$parser->billion_laughs_attack_protection_activation_threshold(\$threshold)"
+      unless defined $threshold;
+    unless ( defined &SetBillionLaughsAttackProtectionActivationThreshold ) {
+        croak "SetBillionLaughsAttackProtectionActivationThreshold not available"
+          . " (requires libexpat >= 2.4.0 built with XML_DTD)";
+    }
+    SetBillionLaughsAttackProtectionActivationThreshold( $self->{Parser}, $threshold );
+}
+
+sub reparse_deferral_enabled {
+    my ( $self, $enabled ) = @_;
+    croak "Usage: \$parser->reparse_deferral_enabled(\$enabled)"
+      unless defined $enabled;
+    unless ( defined &SetReparseDeferralEnabled ) {
+        croak "SetReparseDeferralEnabled not available"
+          . " (requires libexpat >= 2.6.0)";
+    }
+    SetReparseDeferralEnabled( $self->{Parser}, $enabled ? 1 : 0 );
+}
+
+################
 
 sub release {
     my $self = shift;
@@ -458,7 +513,19 @@ sub parse {
             require IO::Handle;
             eval {
                 no strict 'refs';
-                $ioref = *{$arg}{IO} if defined *{$arg};
+                if ( ref $arg eq 'GLOB' ) {
+
+                    # Glob reference not recognized as IO::Handle
+                    $ioref = *{$arg}{IO};
+                }
+                elsif ( $arg =~ /\A[^\W\d]\w*(?:::\w+)*\z/
+                    && defined *{$arg} )
+                {
+                    # Bareword filehandle name — only look up if it could be
+                    # a valid Perl identifier, to prevent auto-vivification
+                    # of symbol table entries for XML strings. (GH#27)
+                    $ioref = *{$arg}{IO};
+                }
             };
             if ( ref($ioref) eq 'FileHandle' ) {
 
@@ -477,13 +544,21 @@ sub parse {
         $prev_rs = $ioclass->input_record_separator("\n$delim\n")
           if defined($delim);
 
-        $result = ParseStream( $parser, $ioref, $delim );
+        eval { $result = ParseStream( $parser, $ioref, $delim ) };
 
         $ioclass->input_record_separator($prev_rs)
           if defined($delim);
     }
     else {
-        $result = ParseString( $parser, $arg );
+        eval { $result = ParseString( $parser, $arg ) };
+    }
+
+    if ($@) {
+        # Preserve reference exceptions (e.g. objects thrown by handlers)
+        die $@ if ref $@;
+        # For string exceptions, add XML context when ErrorContext is set
+        $self->xpcroak($@) if defined $self->{ErrorContext};
+        die $@;
     }
 
     $self->{_State_} = 2;
@@ -773,10 +848,51 @@ Unless standalone is set to "yes" in the XML declaration, setting this to
 a true value allows the external DTD to be read, and parameter entities
 to be parsed and expanded.
 
+=item * UseForeignDTD
+
+When set to a true value, this option tells expat to call the ExternEnt
+handler even for documents that do not have a DOCTYPE declaration. This
+allows the application to provide a DTD for validation and entity
+definitions. In this case, the ExternEnt handler will be called with
+both the system ID and public ID set to undef. This option should be
+used together with ParseParamEnt.
+
 =item * Base
 
 The base to use for relative pathnames or URLs. This can also be done by
 using the base method.
+
+=item * BillionLaughsAttackProtectionMaximumAmplification
+
+Sets the maximum amplification factor for the Billion Laughs attack
+protection. This limits how many times larger the output of entity
+expansion can be relative to the input. For example, a value of 100.0
+means the parser will abort if entity expansion would produce output more
+than 100 times the size of the input.
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
+runtime if the underlying C function is not available.
+
+=item * BillionLaughsAttackProtectionActivationThreshold
+
+Sets the activation threshold (in bytes) for the Billion Laughs attack
+protection. The amplification limit only kicks in after the parser has
+processed this many bytes of output from entity expansion. This prevents
+false positives on small documents that happen to have a high
+amplification ratio.
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
+runtime if the underlying C function is not available.
+
+=item * ReparseDeferralEnabled
+
+When set to a true value, enables reparse deferral. When set to a false
+value (e.g. C<0>), disables it. Reparse deferral is a security mechanism
+in expat that defers reparsing of unfinished tokens until more input
+arrives, preventing certain XML-based attacks.
+
+Requires libexpat E<gt>= 2.6.0.  Will C<croak> at runtime if the
+underlying C function is not available.
 
 =back
 
@@ -933,9 +1049,9 @@ including any internal or external DTD declarations.
 
 This handler is called for XML declarations. Version is a string containing
 the version. Encoding is either undefined or contains an encoding string.
-Standalone is either undefined, or true or false. Undefined indicates
-that no standalone parameter was given in the XML declaration. True or
-false indicates "yes" or "no" respectively.
+Standalone is either undefined, or the string C<"yes"> or C<"no">.
+Undefined indicates that no standalone parameter was given in the XML
+declaration.
 
 =back
 
@@ -1026,6 +1142,12 @@ Returns the column number of the current position of the parse.
 
 Returns the current position of the parse.
 
+=item current_length
+
+Returns the byte length of the current event. This is useful in conjunction
+with current_byte to determine the exact byte range of an event in the
+original XML document.
+
 =item base([NEWBASE]);
 
 Returns the current value of the base for resolving relative URIs. If
@@ -1076,6 +1198,37 @@ that has an index number equal to INDEX is seen. If a start handler has
 been set, then this is the first tag that the start handler will see
 after skip_until has been called.
 
+
+=item billion_laughs_attack_protection_maximum_amplification(FACTOR)
+
+Sets the maximum amplification factor for the Billion Laughs attack
+protection.  FACTOR is a floating-point number (e.g. C<100.0>).
+
+  $parser->billion_laughs_attack_protection_maximum_amplification(100.0);
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
+the underlying C API is not available.
+
+=item billion_laughs_attack_protection_activation_threshold(THRESHOLD)
+
+Sets the activation threshold (in bytes) for the Billion Laughs attack
+protection.  THRESHOLD is an unsigned integer.
+
+  $parser->billion_laughs_attack_protection_activation_threshold(1_000_000);
+
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
+the underlying C API is not available.
+
+=item reparse_deferral_enabled(ENABLED)
+
+Enables or disables reparse deferral.  ENABLED is a boolean (true to
+enable, false to disable).
+
+  $parser->reparse_deferral_enabled(0);  # disable
+  $parser->reparse_deferral_enabled(1);  # enable
+
+Requires libexpat E<gt>= 2.6.0.  Will C<croak> if the underlying C API
+is not available.
 
 =item position_in_context(LINES)
 

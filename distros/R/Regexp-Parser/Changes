@@ -1,5 +1,30 @@
 HISTORY
 
+  0.24 -- Todd Rinaldo March 18, 2026
+   Features:
+   - Add support for Perl 5.10+ regex constructs (GH #8):
+     \K (keep), \R (linebreak), \h/\H, \v/\V, named captures
+     (?<name>...), named backrefs \k<name>, possessive quantifiers
+   - Add \g{N} and \g{-N} backreference syntax from Perl 5.10+ (GH #16)
+   - Add /a, /d, /l, /u charset modifier flags from Perl 5.14+ (GH #16)
+   - Add /n no-capture flag from Perl 5.22 (GH #16)
+   - Support Perl 5.14+ (?^:...) caret flag reset syntax (GH #4)
+   - Add optional flags parameter to regex() method (GH #5)
+
+   Bug Fixes:
+   - Treat trailing dash in character class as literal (GH #6)
+   - Compare character values numerically in range validation (GH #3)
+   - Support POSIX character classes with visual method (GH #7)
+
+   Maintenance:
+   - Migrate test suite from deprecated Test.pm to Test::More (GH #15)
+   - Add round-trip and error rejection test suites; tests 200 -> 409 (GH #19)
+   - Modernize CI: consolidate into single testsuite.yml, update
+     actions, use perldocker containers (GH #17)
+   - Set minimum Perl version to 5.16
+   - Add CLAUDE.md for AI-assisted development (GH #19)
+   - Switch to GitHub Actions for CI
+
   0.23 -- Todd Rinaldo Jan 19, 2020
    - Switch to github actions for automated testing.
    - Support POSIX character classes with visual method. Resolves #7

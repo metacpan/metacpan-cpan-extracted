@@ -1,6 +1,10 @@
 # NAME
 
-App::GHGen - Comprehensive GitHub Actions workflow generator, analyzer, and optimizer
+App::GHGen - GitHub Actions workflow generator, analyzer, and optimizer
+
+# VERSION
+
+Version 0.04
 
 # SYNOPSIS
 
@@ -20,10 +24,11 @@ App::GHGen - Comprehensive GitHub Actions workflow generator, analyzer, and opti
 
 # DESCRIPTION
 
-GHGen Workflow Analyzer is the all‑in‑one solution for keeping your GitHub Actions fast, secure, and effortlessly up‑to‑date.
+GHGen Workflow Analyzer is the all-in-one solution for keeping your GitHub Actions fast,
+secure, and effortlessly up-to-date.
 It automatically scans your workflows for performance bottlenecks,
 outdated actions,
-missing security permissions, and wasted CI minutes—then applies safe, intelligent fixes or opens a clean pull request with improvements.
+missing security permissions, and wasted CI minutes-then applies safe, intelligent fixes or opens a clean pull request with improvements.
 Whether you maintain a single project or dozens,
 GHGen saves time, reduces CI costs, and enforces modern best practices without manual effort.
 Developers choose it because it turns workflow maintenance from a chore into a fully automated,
@@ -31,14 +36,14 @@ reliable part of their development pipeline.
 
 ## Key Features
 
-- **🤖 Auto-detect project type** - Intelligently scans your repository to detect language and dependencies
-- **🚀 Generate optimized workflows** - Creates workflows with caching, security, concurrency, and best practices built-in
-- **🔍 Analyze existing workflows** - Comprehensive analysis for performance, security, cost, and maintenance issues
-- **🔧 Auto-fix issues** - Automatically applies fixes for detected problems (adds caching, updates versions, adds permissions, etc.)
-- **🎯 Interactive customization** - Guided workflow creation with smart defaults and multi-select options
-- **💰 Cost estimation** - Estimates current CI minutes usage and calculates potential savings from optimizations
-- **🔄 GitHub Action integration** - Run as a GitHub Action to analyze PRs, comment with suggestions, and create fix PRs
-- **📊 Per-workflow breakdown** - Detailed analysis of each workflow's cost and optimization potential
+- **Auto-detect project type** - Intelligently scans your repository to detect language and dependencies
+- **Generate optimized workflows** - Creates workflows with caching, security, concurrency, and best practices built-in
+- **Analyze existing workflows** - Comprehensive analysis for performance, security, cost, and maintenance issues
+- **Auto-fix issues** - Automatically applies fixes for detected problems (adds caching, updates versions, adds permissions, etc.)
+- **Interactive customization** - Guided workflow creation with smart defaults and multi-select options
+- **Cost estimation** - Estimates current CI minutes usage and calculates potential savings from optimizations
+- **GitHub Action integration** - Run as a GitHub Action to analyze PRs, comment with suggestions, and create fix PRs
+- **Per-workflow breakdown** - Detailed analysis of each workflow's cost and optimization potential
 
 # INSTALLATION
 
@@ -891,7 +896,8 @@ Review the remaining suggestions and apply manually.
 
 # SEE ALSO
 
-- [Test Coverage Report](https://nigelhorne.github.io/App-GHGen/coverage/)
+- [Test Dashboard](https://nigelhorne.github.io/App-GHGen/coverage/)
+- [App::Test::Generator](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator)
 
 ## GitHub Actions Documentation
 
@@ -905,6 +911,10 @@ Review the remaining suggestions and apply manually.
 - [act](https://github.com/nektos/act) - Run GitHub Actions locally
 - [actionlint](https://github.com/rhysd/actionlint) - Linter for GitHub Actions
 - [yamllint](https://github.com/adrienverge/yamllint) - YAML linter
+
+# REPOSITORY
+
+[https://github.com/nigelhorne/App-GHGen](https://github.com/nigelhorne/App-GHGen)
 
 # CONTRIBUTING
 
@@ -921,7 +931,7 @@ Contributions are welcome! GHGen is open source and hosted on GitHub.
 ## Development Setup
 
     # Fork and clone
-    git clone https://github.com/YOUR-USERNAME/ghgen.git
+    git clone https://github.com/nigelhorne/ghgen.git
     cd ghgen
 
     # Install dependencies
@@ -1003,11 +1013,3 @@ Copyright 2025-2026 Nigel Horne.
 Usage is subject to license terms.
 
 The license terms of this software are as follows:
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 40:
-
-    Non-ASCII character seen before =encoding in 'all‑in‑one'. Assuming UTF-8

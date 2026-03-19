@@ -1,3 +1,7 @@
+bench/bench.pl
+bench/bench_500k.pl
+bench/bench_compare.pl
+bench/bench_memory.pl
 Changes
 cpanfile
 eg/basic.pl

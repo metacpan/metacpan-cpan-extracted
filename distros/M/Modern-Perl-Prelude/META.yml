@@ -1,0 +1,32 @@
+---
+abstract: 'Project prelude for modern Perl style on Perl 5.30+'
+author:
+  - 'Sergey Kovalev <skov@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Feature::Compat::Class: '0'
+  Feature::Compat::Defer: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Modern-Perl-Prelude
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Feature::Compat::Try: '0'
+  Import::Into: '0'
+  builtin::compat: '0'
+  perl: '5.030000'
+resources:
+  bugtracker: https://github.com/neo1ite/Modern-Perl-Prelude/issues
+  repository: https://github.com/neo1ite/Modern-Perl-Prelude
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

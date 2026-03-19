@@ -46,7 +46,6 @@ int is_retryable_status(grpc_status_code code) {
         case GRPC_STATUS_UNAVAILABLE:
         case GRPC_STATUS_RESOURCE_EXHAUSTED:
         case GRPC_STATUS_ABORTED:
-        case GRPC_STATUS_INTERNAL:
         case GRPC_STATUS_DEADLINE_EXCEEDED:
             return 1;
         default:

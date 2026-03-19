@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Conf;
-$ExtUtils::Builder::Conf::VERSION = '0.035';
+$ExtUtils::Builder::Conf::VERSION = '0.036';
 use strict;
 use warnings;
 
@@ -32,6 +32,16 @@ sub add_methods {
 			push @{ $self->{$name} }, @args;
 		});
 	}
+
+	$planner->add_delegate(standard => sub {
+		my $self = shift;
+		return $self->{standard};
+	});
+
+	$planner->add_delegate(set_standard => sub {
+		my ($self, $new_value) = @_;
+		$self->{standard} = $new_value;
+	});
 
 	$planner->add_delegate(define => sub {
 		my ($self, $symbol, $value) = @_;
@@ -79,11 +89,13 @@ sub add_methods {
 		my @include_dirs         = (@{ $args{include_dirs} // [] },         @{ $self->{include_dirs} // [] });
 		my @extra_compiler_flags = (@{ $args{extra_compiler_flags} // [] }, @{ $self->{extra_compiler_flags} // [] });
 		my %defines              = (%{ $args{defines} // {} },              %{ $self->{defines} // {} });
+		my $standard             = $args{standard} || $self->{standard};
 
 		my %compile_args = (
 			extra_args   => \@extra_compiler_flags,
 			include_dirs => \@include_dirs,
 			defines      => \%defines,
+			standard     => $standard,
 		);
 
 		my $basename = basename($c_file, '.c');
@@ -138,6 +150,8 @@ sub add_methods {
 					$self->{defines}{$key} = $args{defines}{$key};
 				}
 			}
+
+			$self->{standard} = $args{standard} if $args{standard};
 		}
 
 		if ($args{push_sources}) {
@@ -157,7 +171,7 @@ sub add_methods {
 		$self->try_compile_run(%args) or fail($diag);
 	});
 
-	$planner->add_delegate(try_find_cflags_for => sub {
+	$planner->add_delegate(try_find_compiler_flags_for => sub {
 		my ($self, %args) = @_;
 
 		ref(my $cflags = $args{cflags}) eq "ARRAY" or croak "Expected 'cflags' as ARRAY ref";
@@ -165,7 +179,8 @@ sub add_methods {
 		foreach my $f (@$cflags) {
 			ref $f eq "ARRAY" or croak "Expected 'cflags' element as ARRAY ref";
 
-			$self->try_compile_run(%args, extra_compiler_flags => $f, push_args => 1) or next;
+			$self->try_compile_run(%args, extra_compiler_flags => $f) or next;
+			$self->push_extra_compiler_flags(@$f);
 			return !!1;
 		}
 
@@ -180,7 +195,8 @@ sub add_methods {
 		foreach my $d (@$dirs) {
 			ref $d eq "ARRAY" or croak "Expected 'dirs' element as ARRAY ref";
 
-			$self->try_compile_run(%args, include_dirs => $d, push_args => 1) or next;
+			$self->try_compile_run(%args, include_dirs => $d) or next;
+			$self->push_include_dirs(@$d);
 			return !!1;
 		}
 
@@ -193,7 +209,8 @@ sub add_methods {
 		ref(my $libs = $args{libs}) eq "ARRAY" or croak "Expected 'libs' as ARRAY ref";
 
 		foreach my $libraries (@$libs) {
-			$self->try_compile_run(%args, libraries => $libraries, push_args => 1) or next;
+			$self->try_compile_run(%args, libraries => $libraries) or next;
+			$self->push_libraries(@$libraries);
 			return !!1;
 		}
 
@@ -208,14 +225,30 @@ sub add_methods {
 		foreach my $d (@$dirs) {
 			ref $d eq "ARRAY" or croak "Expected 'dirs' element as ARRAY ref";
 
-			$self->try_compile_run(%args, library_dirs => $d, push_args => 1) or next;
+			$self->try_compile_run(%args, library_dirs => $d) or next;
+			$self->push_library_dirs(@$d);
 			return !!1;
 		}
 
 		return !!0;
 	});
 
-	foreach my $name (qw/find_cflags_for find_libraries_for find_include_dirs_for find_library_dirs_for/) {
+	$planner->add_delegate(try_find_standard_for => sub {
+		my ($self, %args) = @_;
+
+		ref(my $standards = $args{standards}) eq "ARRAY" or croak "Expected 'standards' as ARRAY ref";
+
+		foreach my $standard (@$standards) {
+			$self->try_compile_run(%args, standard => $standard) or next;
+			$self->set_standard($standard);
+			return !!1;
+		}
+
+		return !!0;
+	});
+
+	foreach my $shortname (qw/compiler_flags libraries include_dirs library_dirs standard/) {
+		my $name = "find_${shortname}_for";
 		my $trymethod = "try_$name";
 
 		$planner->add_delegate($name, sub {
@@ -224,7 +257,7 @@ sub add_methods {
 			my $diag = delete $args{diag};
 			$self->$trymethod(%args) or fail($diag);
 		});
-	};
+	}
 }
 
 1;
@@ -243,7 +276,7 @@ ExtUtils::Builder::Conf - Configure-time utilities for using C headers, librarie
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -335,9 +368,9 @@ If present, this string will be appended to the failure message if one is genera
 
 =back
 
-=head2 try_find_cflags_for
+=head2 try_find_compiler_flags_for
 
- $success = try_find_cflags_for(%args);
+ $success = try_find_compiler_flags_for(%args);
 
 Try to compile, link and execute the given source, using extra compiler flags.
 
@@ -447,9 +480,37 @@ Optional. If specified, then the named symbol will be defined if the program ran
 
 =back
 
-=head2 find_cflags_for
+=head2 try_find_standard_for
 
- find_cflags_for(%args);
+ $success = try_find_standard_for(%args)
+
+Try to compile, link and execute the given source, using a given standard.
+
+When a usable standard is found, the standard is stored in the object for use in further compile operations, or returned by C<standard>. The method then returns true.
+
+If no a usable standard is found, it returns false.
+
+Takes the following arguments:
+
+=over 4
+
+=item source => STRING
+
+Source code to compile
+
+=item standards => ARRAY of STRINGs
+
+Gives a list of standards. C<undef> is treated as no explicit standard.
+
+=item define => STRING
+
+Optional. If specified, then the named symbol will be defined if the program ran successfully. This will either on the C compiler commandline (by passing an option C<-DI<SYMBOL>>), in the C<defines> method, or via the C<write_defines> method.
+
+=back
+
+=head2 find_compiler_flags_for
+
+ find_compiler_flags_for(%args);
 
 =head2 find_include_dirs_for
 
@@ -459,7 +520,15 @@ Optional. If specified, then the named symbol will be defined if the program ran
 
  find_libraries_for(%args);
 
-Calls C<try_find_cflags_for>, C<try_find_include_dirs_for> or C<try_find_libraries_for> respectively. If it fails, die with an C<OS unsupported> message.
+=head2 find_library_dirs_for
+
+ find_library_dirs_for(%args);
+
+=head2 find_standard_for
+
+ find_standard_for(%args)
+
+Calls C<try_find_compiler_flags_for>, C<try_find_include_dirs_for>, C<try_find_libraries_for>, C<try_find_library_dirs_for> or C<try_find_standard_for> respectively. If it fails, die with an C<OS unsupported> message.
 
 Each method takes one extra optional argument:
 

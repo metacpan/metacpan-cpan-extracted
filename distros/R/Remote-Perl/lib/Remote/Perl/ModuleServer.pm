@@ -1,6 +1,6 @@
 use v5.36;
 package Remote::Perl::ModuleServer;
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use autodie qw(open close);
 use File::Spec;

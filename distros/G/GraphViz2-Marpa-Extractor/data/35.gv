@@ -1,0 +1,22 @@
+digraph graph_35
+{
+	node_35_1
+	[
+		color = red
+		fontcolor = green
+		label = <<table><tr><td>html-style label for node_35_1</td></tr></table>>
+	];
+	node_35_2
+	[
+		color = green
+		fontcolor = red
+		label = <<table><tr><td>html-style label for node_35_2</td></tr></table>>
+	];
+	node_35_1 -> node_35_2
+	[
+		arrowhead = crow
+		arrowtail = diamond
+		color = blue
+		dir = both
+	];
+}

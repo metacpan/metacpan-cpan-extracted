@@ -4,10 +4,8 @@ use strict;
 use warnings;
 
 use Socket;
-use Fcntl;
 use FileHandle;
 use Carp;
-use Config;
 use Errno;
 require Exporter;
 
@@ -39,9 +37,9 @@ sub _export_hooks () {
 _export_hooks();
 
 # for compatibility mode, uncomment the next line @@ s/^#\s*// @@
-# @EXPORT = qw(_export_hook_fh);
+# our @EXPORT = qw(_export_hook_fh);
 
-our $VERSION = "1.25";
+our $VERSION = "1.26";
 
 our $DEBUG = 0;
 *STDDBG = *STDERR;
@@ -56,9 +54,6 @@ my $tcpproto = ( getprotobyname('tcp') )[2] || 6;
 
 # get identd port (default to 113).
 my $identport = ( getservbyname( 'ident', 'tcp' ) )[2] || 113;
-
-# what to use to make nonblocking sockets
-my $NONBLOCK = eval "&$Config{o_nonblock}";
 
 # turn a filehandle passed as a string, or glob, into a ref
 # private subroutine
@@ -170,7 +165,7 @@ sub newFromInAddr {
         my $identbind = sockaddr_in( $identport, $remoteip );
 
         # create a new FileHandle
-        $self->{fh} = new FileHandle;
+        $self->{fh} = FileHandle->new;
 
         # create a stream socket.
         socket( $self->{fh}, PF_INET, SOCK_STREAM, $tcpproto )
@@ -181,7 +176,7 @@ sub newFromInAddr {
 
         # make it a non-blocking socket
         if ( $^O ne 'MSWin32' ) {
-            fcntl( $self->{fh}, F_SETFL, $NONBLOCK ) or die "= fcntl failed: $!\n";
+            $self->{fh}->blocking(0) or die "= set non-blocking failed: $!\n";
         }
 
         # connect it to the remote identd port, this can return EINPROGRESS.
@@ -214,8 +209,8 @@ sub newFromInAddr {
     # clear errno in case it contains EINPROGRESS
     $! = 0;
 
-    # mark the state of the connection
-    $self->{state} = 'connect';
+    # mark the state of the connection, consistent with new()
+    $self->{state} = $self->{error} ? 'error' : 'connect';
 
     # return a blessed reference
     bless $self, $class;
@@ -307,14 +302,14 @@ sub ready {
 
     print STDDBG "Net::Ident::ready blocking=" . ( $blocking ? "true\n" : "false\n" ) if $DEBUG > 1;
 
+    # exit immediately if ready returned 1 before.
+    if ( $self->{state} eq 'ready' ) {
+        return 1;
+    }
+
     # perform the query if not already done.
     if ( $self->{state} ne 'query' ) {
         $self->query or return undef;
-    }
-
-    # exit immediately if ready returned 1 before.
-    elsif ( $self->{state} eq 'ready' ) {
-        return 1;
     }
 
     # bomb out if no fh
@@ -348,8 +343,11 @@ sub ready {
 
                     # try to read as much data as possible.
                     $answer = '';
-                    defined sysread( $self->{fh}, $answer, 1000 )
+                    my $nread = sysread( $self->{fh}, $answer, 1000 );
+                    defined $nread
                       or die "= read returned error: $!\n";
+                    $nread
+                      or die "= remote end closed connection\n";
 
                     # append incoming data to total received
                     $self->{answer} .= $answer;
@@ -552,7 +550,7 @@ sub export_fail {
         }
     }
     if (@other) {
-        @other = SUPER::export_fail(@other);
+        @other = $pkg->SUPER::export_fail(@other);
     }
     @other;
 }
@@ -727,7 +725,7 @@ S< >
 Some people do not like the way that ``proper'' object design is broken
 by letting one module add methods to another class. This is why, starting
 from version 1.20, you have to explicitly ask for this behaviour to occur.
-Personally, I this it's a compromise: if you want an object-oriented
+Personally, I think it's a compromise: if you want an object-oriented
 interface, then either you make a derived class, like a
 FileHandleThatCanPerformIdentLookups, and make sure all appropriate
 internal functions get wrappers that do the necessary re-blessing. Or,
@@ -797,12 +795,12 @@ waits for a connection on a port, tells you who you are and what time
 it is, and closes the connection again. The majority of the code will
 look very familiar if you just read L<perlipc>.
 
-Excersize this server by telnetting to it, preferably from a machine
+Exercise this server by telnetting to it, preferably from a machine
 that has a suitable ident daemon installed.
 
     #!/usr/bin/perl -w
 
-    use Net::Ident;
+    use Net::Ident ':fh';
     # uncomment the below line if you want lots of debugging info
     # $Net::Ident::DEBUG = 2;
     use Socket;
@@ -858,7 +856,7 @@ away the object when you don't want it anymore.
 The constructor will always succeed. When it detects an error,
 however, it returns an object that "has already failed" internally. In
 this case, all methods will return C<undef> except for the C<geterror>
-method, wich will return the error message.
+method, which will return the error message.
 
 The timeout is I<not> implemented using C<alarm()>. In fact you can
 use C<alarm()> completely independent of this library, they do not
@@ -922,7 +920,7 @@ error. undef when there was no error.
 =back
 
 An asynchronous example implementing the above server in a multi-threaded
-way via select, is left as an excersize for the interested reader.
+way via select, is left as an exercise for the interested reader.
 
 =head1 DISCLAIMER
 

@@ -19,7 +19,9 @@ require Exporter;
 # localising prevents the warningness leaking out of this module
 local $^W = 1;    # use warnings is a 5.6-ism
 
-_findcc(); # bomb out early if there's no compiler
+# _findcc() is called inside assert_lib() when actually needed.
+# Calling it here at load time produces a confusing "Compilation failed
+# in require" error that hides the real problem (GH#90).
 
 =head1 NAME
 
@@ -266,15 +268,30 @@ sub _parsewords {
     map { my $s=$_; $s =~ s/^"(.*)"$/$1/; $s } grep defined && length, quotewords '\s+', 1, @_;
 }
 
+sub _darwin_supports_rpath {
+    return 0 unless $^O eq 'darwin';
+    # -rpath requires Mac OS X 10.5 (Darwin 9) or later.
+    # Check MACOSX_DEPLOYMENT_TARGET first (may target older OS),
+    # then fall back to the system's Darwin kernel version.
+    my $target = $ENV{MACOSX_DEPLOYMENT_TARGET};
+    if (defined $target && $target =~ /^(\d+)\.(\d+)/) {
+        return ($1 > 10 || ($1 == 10 && $2 >= 5));
+    }
+    my ($darwin_major) = ($Config{osvers} || '') =~ /^(\d+)/;
+    return ($darwin_major || 0) >= 9; # Darwin 9 = Mac OS X 10.5
+}
+
 sub _compile_cmd {
     my ($Config_cc, $cc, $cfile, $exefile, $incpaths, $ld, $Config_libs, $lib, $libpaths) = @_;
     my @sys_cmd = @$cc;
     if ( $Config_cc eq 'cl' ) {                 # Microsoft compiler
 	# this is horribly sensitive to the order of arguments
+	(my $ofile = $exefile) =~ s/\Q$Config{_exe}\E$/$Config{_o}/;
 	push @sys_cmd,
 	    $cfile,
 	    (defined $lib ? "${lib}.lib" : ()),
 	    "/Fe$exefile",
+	    "/Fo$ofile",
 	    (map '/I'.$_, @$incpaths),
 	    "/link",
 	    @$ld,
@@ -295,7 +312,7 @@ sub _compile_cmd {
 	    $cfile,
 	    (!defined $lib ? () : (
 	      (map "-L$_", @$libpaths),
-	      ($^O eq 'darwin' ? (map { "-Wl,-rpath,$_" } @$libpaths) : ()),
+	      (_darwin_supports_rpath() ? (map { "-Wl,-rpath,$_" } @$libpaths) : ()),
 	      "-l$lib",
 	    )),
 	    @$ld,
@@ -315,7 +332,8 @@ sub _make_cfile {
 	warn "# Code:\n$c\n";
     }
     my ($ch, $cfile) = File::Temp::tempfile(
-	'assertlibXXXXXXXX', SUFFIX => '.c'
+	'assertlibXXXXXXXX', SUFFIX => '.c',
+	DIR => File::Spec->tmpdir()
     );
     print $ch $code;
     close $ch;
@@ -373,7 +391,7 @@ sub assert_lib {
     for my $header (@headers) {
         push @use_headers, $header;
         my ($cfile, $ofile) = _make_cfile(\@use_headers, '', $args{debug});
-        my $exefile = File::Temp::mktemp( 'assertlibXXXXXXXX' ) . $Config{_exe};
+        my $exefile = File::Temp::mktemp( File::Spec->catfile(File::Spec->tmpdir(), 'assertlibXXXXXXXX') ) . $Config{_exe};
         my @sys_cmd = _compile_cmd($Config{cc}, $cc, $cfile, $exefile, \@incpaths, $ld, $Config{libs});
         warn "# @sys_cmd\n" if $args{debug};
         my $rv = $args{debug} ? system(@sys_cmd) : _quiet_system(@sys_cmd);
@@ -386,7 +404,7 @@ sub assert_lib {
     my ($cfile, $ofile) = _make_cfile(\@use_headers, @args{qw(function debug)});
     for my $lib ( @libs ) {
         last if $Config{cc} eq 'CC/DECC';          # VMS
-        my $exefile = File::Temp::mktemp( 'assertlibXXXXXXXX' ) . $Config{_exe};
+        my $exefile = File::Temp::mktemp( File::Spec->catfile(File::Spec->tmpdir(), 'assertlibXXXXXXXX') ) . $Config{_exe};
         my @sys_cmd = _compile_cmd($Config{cc}, $cc, $cfile, $exefile, \@incpaths, $ld, $Config{libs}, $lib, \@libpaths);
         warn "# @sys_cmd\n" if $args{debug};
         local $ENV{LD_RUN_PATH} = join(":", grep $_, @libpaths, $ENV{LD_RUN_PATH}) unless $^O eq 'MSWin32' or $^O eq 'darwin';
@@ -478,7 +496,7 @@ sub _findcc {
 	    return ([ $compiler, @cc[1 .. $#cc], @ccflags ], \@ldflags)
 	}
     }
-    die("Couldn't find your C compiler.\n");
+    die("Couldn't find your C compiler: tried '$Config{cc}' in PATH ($ENV{PATH}).\nCheck that your C compiler is installed and that \$Config{cc} ('$Config{cc}') is correct.\n");
 }
 
 sub check_compiler

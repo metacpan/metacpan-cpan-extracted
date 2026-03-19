@@ -44,6 +44,14 @@ BEGIN {
         plan skip_all => 'Devel::StackTrace >= 2.00 is required for this test';
         $num_tests = 0;
     }
+    eval {
+        require Storable;
+        Storable->VERSION( 3.06 );
+    };
+    if ( $@ ) {
+        plan skip_all => 'Storable >= 3.06 is required for this test';
+        $num_tests = 0;
+    }
 }
 
 plan tests => $num_tests if $num_tests;
@@ -244,15 +252,15 @@ foreach my $t (
         [],
         {
             "default log" => [
-                qr{^Help! at t/proxy-with-stack-trace\.t line \d+\.},
+                qr{^Help! at t[\/\\]proxy-with-stack-trace\.t line \d+\.},
                 "Mojo::Exception",
             ],
             "proxy log" => [
-                qr{^Help! at t/proxy-with-stack-trace\.t line \d+\.},
+                qr{^Help! at t[\/\\]proxy-with-stack-trace\.t line \d+\.},
                 "Mojo::Exception",
             ],
             "proxy log show args" => [
-                qr{^Help! at t/proxy-with-stack-trace\.t line \d+\.},
+                qr{^Help! at t[\/\\]proxy-with-stack-trace\.t line \d+\.},
                 "Mojo::Exception",
             ],
         },
@@ -263,15 +271,15 @@ foreach my $t (
         [],
         {
             "default log" => [
-                qr{^Help! at t/proxy-with-stack-trace\.t line \d+\n},
+                qr{^Help! at t[\/\\]proxy-with-stack-trace\.t line \d+\n},
                 "Moose::Exception",
             ],
             "proxy log" => [
-                qr{^Help! at t/proxy-with-stack-trace\.t line \d+\n},
+                qr{^Help! at t[\/\\]proxy-with-stack-trace\.t line \d+\n},
                 "Moose::Exception",
             ],
             "proxy log show args" => [
-                qr{^Help! at t/proxy-with-stack-trace\.t line \d+\n},
+                qr{^Help! at t[\/\\]proxy-with-stack-trace\.t line \d+\n},
                 "Moose::Exception",
             ],
         },
@@ -282,15 +290,15 @@ foreach my $t (
         [],
         {
             "default log" => [
-                qr{^Help!\n\nTrace begun at t/proxy-with-stack-trace\.t line \d+\n},
+                qr{^Help!\n\nTrace begun at t[\/\\]proxy-with-stack-trace\.t line \d+\n},
                 "Throwable::Error",
             ],
             "proxy log" => [
-                qr{^Help!\n\nTrace begun at t/proxy-with-stack-trace\.t line \d+\n},
+                qr{^Help!\n\nTrace begun at t[\/\\]proxy-with-stack-trace\.t line \d+\n},
                 "Throwable::Error",
             ],
             "proxy log show args" => [
-                qr{^Help!\n\nTrace begun at t/proxy-with-stack-trace\.t line \d+\n},
+                qr{^Help!\n\nTrace begun at t[\/\\]proxy-with-stack-trace\.t line \d+\n},
                 "Throwable::Error",
             ],
         },

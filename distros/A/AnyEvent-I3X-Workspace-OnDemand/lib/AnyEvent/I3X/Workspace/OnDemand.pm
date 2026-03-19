@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 use v5.26;
 use Object::Pad;
 
@@ -15,6 +15,7 @@ use Data::Compare;
 use Data::Dumper;
 use X11::Protocol;
 use Proc::ProcessTable;
+use IO::Select;
 
 field $i3;
 field $layout_path : param = catfile($ENV{HOME}, qw(.config i3));
@@ -69,9 +70,6 @@ ADJUSTPARAMS {
   @groups   = @{ delete $args->{groups} } if ref $args->{groups} eq 'ARRAY';
   @swallows = @{ delete $args->{swallows} }
     if ref $args->{swallows} eq 'ARRAY';
-
-  $x11 = X11::Protocol->new();
-  $xroot = $x11->root;
 }
 
 method log_event($type, $event) {
@@ -96,20 +94,50 @@ method log_event($type, $event) {
   close($fh);
 }
 
-method _get_property_from_root_window($key) {
-  my $prop = $x11->atom($key);
-  my $utf8 = $x11->atom('UTF8_STRING');
+method x11() {
+
+  unless ($x11) {
+    $x11 = X11::Protocol->new();
+    $xroot = $x11->root;
+    return $x11;
+  }
+
+  my $fh = $x11->connection->fh;
+  my $sel = IO::Select->new($fh);
+
+  if ($sel->can_read(0)) {
+    eval { $x11->handle_input() };
+    $x11 = X11::Protocol->new() if $@;
+  }
+  $xroot = $x11->root;
+  return $x11;
+
+}
+
+method _get_string_property_from_root_window($key, $atom_type) {
+  my $prop      = $self->x11->atom($key);
+  my $prop_type = $self->x11->atom($atom_type);
 
   my ($value, $type, $format, $bytes_after)
-      = $x11->GetProperty($xroot, $prop, $utf8, 0, 1024);
+      = $x11->GetProperty($xroot, $prop, $prop_type, 0, 1024);
 
   return $value if $value;
   return;
 }
 
+method _get_property_from_root_window($key) {
+  my $value = $self->_get_string_property_from_root_window($key, 'UTF8_STRING');
+  return $value if defined $value;
+  # Allow xprop values to be set but also allow
+  $value = $self->_get_string_property_from_root_window($key, 'STRING');
+  return unless defined $value;
+  $self->_set_property_on_root_window($key, $value);
+  return $value;
+}
+
 method _set_property_on_root_window($key, $value) {
-  my $prop = $x11->atom($key);
-  my $utf8 = $x11->atom('UTF8_STRING');
+  my $prop = $self->x11->atom($key);
+  my $utf8 = $self->x11->atom('UTF8_STRING');
 
   $x11->ChangeProperty($xroot, $prop, $utf8, 8, 'Replace', $value);
   $x11->flush;
@@ -140,8 +168,7 @@ method set_workspace_on_root_window($name) {
 method get_workspace_from_root_window() {
   my $ws = $self->_get_property_from_root_window('_I3_WOD_WORKSPACE');
   return $ws if $ws;
-  $self->set_workspace_on_root_window('__EMPTY__');
-  return '__EMPTY__';
+  return;
 }
 
 
@@ -155,6 +182,7 @@ ADJUST {
 
   $current_group = $self->get_group_from_root_window();
   $current_workspace = $self->get_workspace_from_root_window();
+  $self->workspace($starting_workspace) unless $current_workspace;
 
   my $name;
 
@@ -524,7 +552,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

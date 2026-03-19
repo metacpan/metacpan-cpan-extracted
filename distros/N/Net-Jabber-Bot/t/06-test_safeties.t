@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 129;
+use Test::More tests => 127;
 use Net::Jabber::Bot;
 
 # stuff for mock client object
@@ -62,6 +62,7 @@ my $bot = Net::Jabber::Bot->new({
 				 , out_messages_per_second => $out_messages_per_second
 				 , max_message_size => $max_message_size
 				 , max_messages_per_hour => $max_messages_per_hour
+				 , forum_join_grace => 0
 				});
 
 isa_ok($bot, "Net::Jabber::Bot");
@@ -70,9 +71,7 @@ is($bot->max_messages_per_hour, $max_messages_per_hour, "Max messages per hour (
 is($bot->get_safety_mode, 1, "Validate safety mode is on")
     or die("Safety mode is not turning on. Tests will not be valid");
 
-is($bot->forum_join_grace, 10, "Forum Grace is 10 seconds as expected");
-ok(1, "Sleeping 12 seconds to make sure we get past initializtion");
-ok((sleep 12) > 10, "Making sure the bot get's past initialization (sleep 12)");
+is($bot->forum_join_grace, 0, "Forum Grace is 0 seconds as configured");
 process_bot_messages();
 
 start_new_test("Testing Group Message bursting is not possible");
@@ -117,7 +116,7 @@ TODO: { # Need a way to test for historical - up top or in diff code?
 cmp_ok($bot->respond_to_self_messages( ), '==', 1, "no pass to respond_to_self_messages is 1");
 cmp_ok($bot->respond_to_self_messages(0), '==', 0, "Ignore Self Messages");
 cmp_ok($bot->respond_to_self_messages(2), '==', 1, "Respond to Self Messages");
-cmp_ok($bot->ignore_self_messages, '==', 0, "Moose variable is set right for ignore_self_messages");
+cmp_ok($bot->ignore_self_messages, '==', 0, "Moo variable is set right for ignore_self_messages");
 
 
 start_new_test("Test a successful message");
@@ -211,13 +210,12 @@ sub start_new_test {
 
 
 sub process_bot_messages {
-    sleep 2; # Pause a little to make sure message make it to the server and back.
     ok(defined $bot->Process(5), "Processed new messages and didn't lose connection.");
 }
 
 sub InitLog4Perl {
 	use Log::Log4perl qw(:easy);
-    my $config_file .= <<'CONFIG_DATA';
+    my $config_file = <<'CONFIG_DATA';
 # Regular Screen Appender
 log4perl.appender.Screen           = Log::Log4perl::Appender::Screen
 log4perl.appender.Screen.stderr    = 0

@@ -4,7 +4,7 @@
       "Wesley Schwengle <waterkip@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
@@ -60,6 +60,7 @@
             "EV" : "0",
             "File::Spec::Functions" : "0",
             "Getopt::Long" : "0",
+            "IO::Select" : "0",
             "JSON::XS" : "0",
             "List::Util" : "0",
             "Object::Pad" : "0",
@@ -84,7 +85,7 @@
    "provides" : {
       "AnyEvent::I3X::Workspace::OnDemand" : {
          "file" : "lib/AnyEvent/I3X/Workspace/OnDemand.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -95,7 +96,7 @@
          "web" : "https://gitlab.com/waterkip/anyevent-i3x-workspace-ondemand"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_contributors" : [
       "Wesley Schwengle <waterkip@cpan.org>"
    ],

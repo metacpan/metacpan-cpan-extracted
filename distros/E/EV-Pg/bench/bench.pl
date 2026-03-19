@@ -70,7 +70,6 @@ sub pipeline_batched {
         } else {
             $pg->pipeline_sync(sub { $send_batch->() });
         }
-        $pg->send_flush_request;
     };
     $send_batch->();
 }

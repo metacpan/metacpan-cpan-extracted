@@ -11,7 +11,7 @@ unless ( -w $FindBin::RealBin ) {
     exit;
 }
 
-plan tests => 6;
+plan tests => 9;
 
 *::DumpFile = *YAML::Syck::DumpFile;
 
@@ -80,6 +80,22 @@ SKIP: {
     unlink 'dumpfile.yml' or die $!;
 }
 
+# dump to IO::Handle subclass (GH #23)
+{
+    package MyDumpIO;
+    use parent 'IO::Handle';
+    1;
+
+    package main;
+    require IO::File;
+    my $h = IO::File->new('>dumpfile.yml');
+    bless $h, 'MyDumpIO';    # re-bless into custom subclass
+    DumpFile( $h, $scalar );
+    close $h;
+    file_contents_is( 'dumpfile.yml', $expected_yaml, 'DumpFile works with IO::Handle subclass (GH #23)' );
+    unlink 'dumpfile.yml' or die $!;
+}
+
 # dump to "in memory" file
 SKIP: {
     skip "in-memory files require 5.8 or later", 1 unless $] >= 5.00800;
@@ -91,4 +107,28 @@ SKIP: {
     is($s, $expected_yaml, 'DumpFile works with in-memory files');
 
 ];
+}
+
+# dump to tied filehandle (rt.cpan.org #96882)
+{
+    package TiedFH;
+    sub TIEHANDLE { bless { data => '' }, shift }
+    sub WRITE     { $_[0]->{data} .= substr($_[1], $_[3] || 0, $_[2]); return $_[2] }
+    sub PRINT     { my $self = shift; $self->{data} .= join((defined $, ? $, : ''), @_); $self->{data} .= (defined $\ ? $\ : ''); 1 }
+    sub data      { $_[0]->{data} }
+
+    package main;
+    tie *TFH, 'TiedFH';
+    DumpFile(\*TFH, $scalar);
+    is(tied(*TFH)->data, $expected_yaml, 'DumpFile works with tied filehandles (rt#96882)');
+    untie *TFH;
+}
+
+# dump to tied filehandle with hash data
+{
+    tie *TFH2, 'TiedFH';
+    DumpFile(\*TFH2, { a => 1 });
+    my $result = tied(*TFH2)->data;
+    like($result, qr/^---\s*\na: 1\s*$/s, 'DumpFile works with tied filehandle and hash data');
+    untie *TFH2;
 }

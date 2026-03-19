@@ -15,7 +15,9 @@ use Moo;
 
 use File::Slurper 'read_lines';
 
-our $VERSION = '1.11';
+our %seen;
+
+our $VERSION = '1.13';
 
 # -----------------------------------------------
 
@@ -28,8 +30,6 @@ sub export_tree
 
 	my($pad)					= $self -> build_pad;
 	my($header, $body, $footer)	= $self -> build_html($pad); # Returns templates.
-
-	$self -> logger -> info('Exporting the wiki as a JSTree');
 
 	# Populate the body.
 
@@ -168,9 +168,10 @@ sub format_text
 		}
 =cut
 
-		$node_type{acronym}	= $$topic{title} eq 'Acronyms' ? true : false;
-		$node_type{topic}	= $$pad{topic_names}{$token} ? true : false;
-		$node_type{unknown}	= ! ($node_type{acronym} || $node_type{topic});
+		$node_type{acronym}	= $$topic{title} eq 'Acronyms'	? true : false;
+		$node_type{topic}	= $$pad{topic_names}{$token}	? true : false;
+		$node_type{known}	= $$pad{packages}{$token}		? true : false;
+		$node_type{unknown}	= ! ($node_type{acronym} || $node_type{known} || $node_type{topic});
 
 		# Some names might be acronyms & module names & topic names.
 		# Example: RSS.
@@ -183,6 +184,10 @@ sub format_text
 		{
 			# These are counted in Database.build_pad().
 		}
+		elsif ($node_type{known})
+		{
+			$$pad{count}{known}++;
+		}
 		elsif ($node_type{unknown})
 		{
 			$$pad{count}{unknown}++;
@@ -192,10 +197,14 @@ sub format_text
 
 		if ($$topic{title} eq 'FAQ')
 		{
+			$$item{html}	= '';
+			$$item{text}	= $line;
+
+			push @items, $item;
 		}
 		elsif (defined $lines[$index + 1])
 		{
-			$$item{html}	= "<a href = '@{[$lines[$index + 1]]}' target = '_blank'>$token - @{[$lines[$index]]}</a>";
+			$$item{html}	= "<a href = '@{[$lines[$index + 1]]}' target = '_blank'>$token</a>";
 			$$item{text}	= "";
 
 			push @items, $item;
@@ -203,6 +212,13 @@ sub format_text
 		else
 		{
 			$self -> logger -> warn("Undefined token @ $line");
+		}
+
+		if (! $seen{$token})
+		{
+			$self -> insert_hashref('modules', {name => $token});
+
+			$seen{$token} = true;
 		}
 
 =pod

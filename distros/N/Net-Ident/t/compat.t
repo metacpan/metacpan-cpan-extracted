@@ -1,147 +1,127 @@
-# test compatibility-mode FH lookups, if enabled
+# Test compatibility-mode FH lookups, if enabled.
+# Compatibility mode auto-imports ident_lookup into FileHandle.
+# When not in compat mode, the test is skipped entirely.
 
-# $Id: compat.t,v 1.6 1999/08/02 10:45:46 john Exp $
-require 5.004;
+use strict;
+use warnings;
+
+use Test::More;
 use Net::Ident;
 use Socket;
 use FileHandle;
 
-if ( !grep { $_ eq "_export_hook_fh" } @Net::Ident::EXPORT ) {
-
-    # no default _export_hook_fh in @EXPORT, so we're not in compatibility mode
-    print "1..0\n";
-    exit 0;
+# Check if compatibility mode is active (ident_lookup auto-exported).
+if ( !grep { $_ eq '_export_hook_fh' } @Net::Ident::EXPORT ) {
+    plan skip_all => 'not in compatibility mode';
 }
 
-# code below is most of the same as ident.t...
-
-# turn on full debugging, but prepend ``# '' to output to make it disappear in
-# non-verbose tests
-# turn on full debugging, but prepend ``# '' to output to make it disappear in
-# non-verbose tests
-unless ( open( DEBUGFH, "|-" ) ) {
-
-    # child... do the stuff
-    $|++;
-    while (<>) {
-        s/^/# /;
-        print;
+# Pipe-fork to prefix debug output with "# " (skip on Windows).
+if ( $^O ne 'MSWin32' ) {
+    if ( open( my $debugfh, '|-' ) ) {
+        $debugfh->autoflush(1);
+        *Net::Ident::STDDBG = *$debugfh;
+        $Net::Ident::DEBUG  = 2;
     }
-    exit 0;
-}
-DEBUGFH->autoflush(1);
-*Net::Ident::STDDBG = *DEBUGFH;
-$Net::Ident::DEBUG  = 2;
-
-# find hosts file
-my ($hosts) = grep { -r } qw( t/hosts hosts ../t/hosts );
-my @hosts;
-if ( open( HOSTS, $hosts ) ) {
-    @hosts = grep { !/^#/ } <HOSTS>;
-    chomp @hosts;
-    close HOSTS;
-}
-else {
-    @hosts = qw(127.0.0.1);
-}
-
-$SIG{ALRM} = sub { 0 };
-$| = 1;
-
-sub bomb ($) { die "# Aargh: @_\n1..1\nnot ok1\n" }
-
-$tcpproto = ( getprotobyname('tcp') )[2] || 6;
-$identport = ( getservbyname( 'ident', 'tcp' ) )[2] || 113;
-foreach $host (@hosts) {
-    print "# trying to resolve $host...\n";
-    if ( $addr = inet_aton($host) ) {
-        $fh = new FileHandle;
-        socket( $fh, PF_INET, SOCK_STREAM, $tcpproto ) or bomb("socket: $!");
-        print "# connecting to " . inet_ntoa($addr) . ":$identport\n";
-        alarm(10);
-        if ( connect( $fh, sockaddr_in( $identport, $addr ) ) ) {
-            alarm(0);
-            print "# connected\n";
-            $connok     ||= $fh;
-            $connokhost ||= $host;
+    else {
+        $| = 1;
+        while (<STDIN>) {
+            s/^/# /;
+            print;
         }
-        else {
-            $e = $!;
-            alarm(0);
-            if ( $e =~ /connection refused/i ) {
-                print "# connection refused\n";
+        exit 0;
+    }
+}
 
-                # try to make a connection to the telnet port instead,
-                # to give us some connected filehandle to try the
-                # ident lookup on.
-                print "# connecting to " . inet_ntoa($addr) . ":23\n";
-                $fh = new FileHandle;
-                socket( $fh, PF_INET, SOCK_STREAM, $tcpproto )
-                  or bomb("socket: $!");
-                alarm(10);
-                if ( connect( $fh, sockaddr_in( 23, $addr ) ) ) {
-                    alarm(0);
-                    print "# connected\n";
-                    $connrefuse     ||= $fh;
-                    $connrefusehost ||= $host;
-                }
-                else {
-                    print "# connect: $!\n";
-                    alarm(0);
-                }
+# Locate the hosts file.
+my ($hostsfile) = grep { -r } qw( t/hosts hosts ../t/hosts );
+my @hosts;
+if ( $hostsfile && open( my $fh, '<', $hostsfile ) ) {
+    @hosts = grep { !/^#/ && /\S/ } <$fh>;
+    chomp @hosts;
+    close $fh;
+}
+@hosts = ('127.0.0.1') unless @hosts;
+
+# Try connecting to identd / telnet on hosts.
+$SIG{ALRM} = sub { 0 };
+
+my $tcpproto  = ( getprotobyname('tcp') )[2] || 6;
+my $identport = ( getservbyname( 'ident', 'tcp' ) )[2] || 113;
+
+my ( $connok, $connokhost, $connrefuse, $connrefusehost );
+
+for my $host (@hosts) {
+    diag "trying to resolve $host...";
+    my $addr = inet_aton($host) or next;
+
+    my $fh = FileHandle->new;
+    socket( $fh, PF_INET, SOCK_STREAM, $tcpproto )
+      or die "socket: $!";
+
+    diag "connecting to " . inet_ntoa($addr) . ":$identport";
+    alarm(10);
+    if ( connect( $fh, sockaddr_in( $identport, $addr ) ) ) {
+        alarm(0);
+        diag "connected to identd on $host";
+        $connok     ||= $fh;
+        $connokhost ||= $host;
+    }
+    else {
+        my $err = "$!";
+        alarm(0);
+        if ( $err =~ /connection refused/i ) {
+            diag "identd refused on $host, trying telnet port";
+            $fh = FileHandle->new;
+            socket( $fh, PF_INET, SOCK_STREAM, $tcpproto )
+              or die "socket: $!";
+            alarm(10);
+            if ( connect( $fh, sockaddr_in( 23, $addr ) ) ) {
+                alarm(0);
+                $connrefuse     ||= $fh;
+                $connrefusehost ||= $host;
             }
             else {
-                print "# connect: $e\n";
+                alarm(0);
             }
         }
-        last if $connok && $connrefuse;
     }
+    last if $connok && $connrefuse;
 }
 
-$tests = 1;
-if ($connok) {
-    print "# Will run regular ident lookups by connecting to $connokhost\n";
-    $tests++;
-}
-if ($connrefuse) {
-    print "# Will run ``connection refused'' tests by connecting to ", $connrefusehost, "\n";
-    $tests++;
-}
 if ( !$connok && !$connrefuse ) {
-    print "# WARNING: not a lot of testing to do without an identd to use!\n";
-}
-print "1..$tests\n";
-
-$i = 1;
-if ($connok) {
-    print "# standard lookup test that will succeed, using FH->ident_lookup\n";
-    $username = $connok->ident_lookup(30);
-    print "not " unless $username;
-    print "ok $i\n";
-    $i++;
+    diag "WARNING: no identd or telnet host reachable — most tests will be skipped";
 }
 
-if ($connrefuse) {
-    print "# try to get a connection refused error\n";
-    ( $username, $opsys, $error ) = $connrefuse->ident_lookup(30);
+# --- Compat-mode ident lookup (identd available) ---
 
-    print "not "
-      unless !defined $username
-      && !defined $opsys
-      && $error =~ /connection refused/i;
-    print "ok $i\n";
-    $i++;
-    print "# got: $error\n";
+SKIP: {
+    skip "no identd connection available", 1 unless $connok;
+
+    diag "compat-mode FH->ident_lookup via $connokhost";
+    my $username = $connok->ident_lookup(30);
+    ok( $username, "compat FH->ident_lookup returned: $username" );
 }
 
-print "# try to get ident info on a something that's not a socket\n";
-my ( $user, $opsys, $error ) = STDERR->ident_lookup(30);
+# --- Connection-refused test ---
 
-print "not " unless !defined $user && !defined $opsys && $error;
-print "ok $i\n";
-$i++;
+SKIP: {
+    skip "no connection-refused host available", 1 unless $connrefuse;
 
-for ( $user, $opsys, $error ) {
-    $_ = "<undef>" if !defined;
+    my ( $user, $opsys, $error ) = $connrefuse->ident_lookup(30);
+    ok( !defined $user && !defined $opsys && $error =~ /connection refused/i,
+        "compat connection-refused error: $error" );
 }
-print "# got: user=$user opsys=$opsys error=$error\n";
+
+# --- Non-socket handle ---
+
+{
+    my ( $user, $opsys, $error ) = STDERR->ident_lookup(30);
+    ok( !defined $user && !defined $opsys && $error,
+        'compat ident_lookup on non-socket fails gracefully' );
+    diag "got: user="
+      . ( $user  // '<undef>' ) . " opsys="
+      . ( $opsys // '<undef>' ) . " error="
+      . ( $error // '<undef>' );
+}
+
+done_testing;

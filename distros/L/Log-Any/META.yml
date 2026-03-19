@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,65 +34,66 @@ no_index:
 provides:
   Log::Any:
     file: lib/Log/Any.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter:
     file: lib/Log/Any/Adapter.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Base:
     file: lib/Log/Any/Adapter/Base.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Capture:
     file: lib/Log/Any/Adapter/Capture.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::File:
     file: lib/Log/Any/Adapter/File.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Multiplex:
     file: lib/Log/Any/Adapter/Multiplex.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Null:
     file: lib/Log/Any/Adapter/Null.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Stderr:
     file: lib/Log/Any/Adapter/Stderr.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Stdout:
     file: lib/Log/Any/Adapter/Stdout.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Syslog:
     file: lib/Log/Any/Adapter/Syslog.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Test:
     file: lib/Log/Any/Adapter/Test.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Adapter::Util:
     file: lib/Log/Any/Adapter/Util.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Manager:
     file: lib/Log/Any/Manager.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Proxy:
     file: lib/Log/Any/Proxy.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Proxy::Null:
     file: lib/Log/Any/Proxy/Null.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Proxy::Test:
     file: lib/Log/Any/Proxy/Test.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Proxy::WithStackTrace:
     file: lib/Log/Any/Proxy/WithStackTrace.pm
-    version: '1.718'
+    version: '1.719'
   Log::Any::Test:
     file: lib/Log/Any/Test.pm
-    version: '1.718'
+    version: '1.719'
 resources:
   bugtracker: https://github.com/preaction/Log-Any/issues
   homepage: https://github.com/preaction/Log-Any
   repository: https://github.com/preaction/Log-Any.git
-version: '1.718'
+version: '1.719'
 x_authority: cpan:PREACTION
 x_contributors:
+  - 'Akron <nils@diewald-online.de>'
   - 'Andrew Grechkin <andrew.grechkin@gmail.com>'
   - 'Andrew Hewus Fresh <andrew+github@afresh1.com>'
   - 'bj5004 <bartosz.jakubski@hurra.com>'
@@ -107,6 +108,7 @@ x_contributors:
   - 'Maxim Vuets <maxim.vuets@booking.com>'
   - 'mephinet <mephinet@gmx.net>'
   - 'Michael Conrad <mconrad@intellitree.com>'
+  - 'Mikko Koivunalho <mikkoi@cpan.org>'
   - 'Nick Tonkin <1nickt@users.noreply.github.com>'
   - 'Paul Durden <alabamapaul@gmail.com>'
   - 'Philipp Gortan <philipp.gortan@apa.at>'
@@ -114,7 +116,8 @@ x_contributors:
   - 'Samuel Ng <samuel.ng@grantstreet.com>'
   - 'Shlomi Fish <shlomif@shlomifish.org>'
   - 'Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>'
+  - 'Tina Müller <cpan2@tinita.de>'
   - 'XSven <XSven@users.noreply.github.com>'
-x_generated_by_perl: v5.40.2
+x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -36,6 +36,8 @@ em·dee (mdee: Markdown, Easy on the Eyes) is a Markdown viewer command implemen
 
 ## Development
 
+`./script/mdee` automatically adds `../lib` to `PERL5LIB` when `../lib/App/Greple` exists, so the local `lib/App/Greple/md.pm` is used during development without needing `cpanm .`.
+
 ### Testing Colors
 
 ```bash
@@ -71,12 +73,12 @@ md_config+=(hashed.h3=1 hashed.h4=1 hashed.h5=1 hashed.h6=1)
 
 #### Chaining Themes
 
-The `--theme` option is an array (`@` type) with default value `hashed`, supporting comma-separated values and repeated options. Themes accumulate (added to the default); use `--no-theme` to clear. Duplicate themes are removed by `uniq_array`. Themes are applied in order, each modifying `theme_light`/`theme_dark`:
+The `--theme` option is an array (`@` type). The default is `(hashed nomark)`, declared as a Bash array before `OPTS` (the OPTS default is empty; getoptlong.sh preserves pre-declared arrays). Themes support comma-separated values and repeated options. Themes accumulate (added to the default); use `--no-theme` to clear. Duplicate themes are removed by `uniq_array`. Themes are applied in order, each modifying `theme_light`/`theme_dark`:
 
 ```bash
-mdee file.md                        # default: hashed theme applied
-mdee --theme=warm file.md           # hashed (default) + warm
-mdee --no-theme file.md             # no theme
+mdee file.md                        # default: hashed + nomark
+mdee --theme=warm file.md           # hashed,nomark (default) + warm
+mdee --no-theme file.md             # no theme (show all markup)
 mdee --no-theme --theme=warm        # warm only (clear default first)
 ```
 
@@ -158,6 +160,8 @@ done
 ```
 
 Color labels (h1, bold, etc.) go to md_config and are handled by the md module's `Getopt::EX::Config` (pre-declared with `undef` default). Priority: default colors → config params → `--cm`.
+
+Note: `--cm` is passed to the md module (before `--` in greple invocation), so it only works for md module labels (lowercase: `h1`, `bold`, etc.). Theme keys `FILE`/`FILE_FORMAT` are passed to greple's own `--cm` (after `--`), so they can only be set via `--config`, not `--cm`.
 
 ## Implementation Notes
 
@@ -455,7 +459,7 @@ s{(^ {0,3}\|.+\|\n){3,}}{
 ```perl
 sub parse_separator {
     my $blockref = shift;
-    my $SEP = qr/^\h*\|(?:\h*:?-+:?\h*\|)+\h*$/m;
+    my $SEP = qr/^\h*+\|(\h*+:?+-++:?+\h*+\|)++\h*+$/mn;
     my ($sep_line) = $$blockref =~ /($SEP)/;
     return ([], []) unless defined $sep_line;
     my @cells = split /\|/, $sep_line, -1;
@@ -463,16 +467,17 @@ sub parse_separator {
     s/^\h+|\h+$//g for @cells;
     my @right  = grep { $cells[$_-1] =~ /^-+:$/  } 1..@cells;
     my @center = grep { $cells[$_-1] =~ /^:-+:$/ } 1..@cells;
-    $$blockref =~ s{$SEP}{ ${^MATCH} =~ tr/:/-/r }mpe;
+    # Minimize dashes so separator width doesn't inflate column widths
+    $$blockref =~ s{$SEP}{ ${^MATCH} =~ s/:?-+:?/-/gr }mpe;
     (\@right, \@center);
 }
 ```
 
-   - Finds separator line via `$SEP` pattern (each cell requires at least one `-`)
+   - Finds separator line via `$SEP` pattern (each cell requires at least one `-`); all quantifiers are possessive, `/n` for non-capturing `()`
    - Splits cells with `split /\|/, $sep_line, -1` (the `-1` limit preserves trailing empty fields from the final `|`)
    - Detects `:---:` (center) and `---:` (right) patterns; `:---` and `---` are left-aligned (default, no option needed)
    - Returns raw 1-based column numbers as `(\@right, \@center)` — caller applies offset and builds option strings
-   - Strips colons from separator line (`tr/:/-/`) so `fix_separator()` works unchanged
+   - Minimizes dashes and strips colons (`s/:?-+:?/-/gr`) to prevent separator width from inflating column widths
    - Requires App::ansicolumn >= 1.55 (for `--table-right`, `--table-center`, `--table-remove`, `--item-format`, `--padding`)
 
 2. **Column alignment** — `call_ansicolumn()` invokes `App::ansicolumn::ansicolumn()` via `Command::Run` (same pattern as the tee module's `call()` function):

@@ -2,7 +2,7 @@ use v5.42.0;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Noise::HandshakeState v0.0.1 {
+class Noise::HandshakeState v0.0.2 {
     use Noise::SymmetricState;
     use Noise::Pattern;
     use Crypt::PK::X25519;
@@ -15,11 +15,11 @@ class Noise::HandshakeState v0.0.1 {
         P521  => { class => 'Crypt::PK::ECC',    pub_len => 133, params => 'secp521r1' }
     );
     #
-    field $s    : param //= undef;             # Local static key
-    field $e    : param //= undef;             # Local ephemeral key
+    field $s    : reader : param //= undef;    # Local static key
+    field $e    : reader : param //= undef;    # Local ephemeral key
     field $rs   : reader : param //= undef;    # Remote static public key
     field $re   : reader : param //= undef;    # Remote ephemeral public key
-    field $psks : param //= [];                # Array of pre-shared keys
+    field $psks : reader : param //= [];       # Array of pre-shared keys
     field $psk_idx = 0;
     field $initiator       : param;            # Boolean
     field $pattern         : param;            # Pattern name or object

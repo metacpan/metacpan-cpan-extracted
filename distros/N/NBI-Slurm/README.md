@@ -30,6 +30,8 @@ Add `-d` to delete the jobs (you will be prompted for confirmation).
 
 Interactive TUI (terminal user interface) for viewing and managing SLURM jobs with **viewjobs**, similar to VisiData or `less`.
 
+![Screenshot](docs/viewjobs.png)
+
 See [docs](https://metacpan.org/dist/NBI-Slurm/view/bin/viewjobs)
 
 ```bash

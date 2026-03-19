@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Plack" : "0",
-            "WebServer::DirIndex" : "v0.1.3",
+            "WebServer::DirIndex" : "v0.1.4",
             "perl" : "5.038000"
          }
       }
@@ -49,6 +49,6 @@
          "web" : "https://github.com/davorg-cpan/plack-app-directoryindex"
       }
    },
-   "version" : "v0.2.2",
+   "version" : "v0.2.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

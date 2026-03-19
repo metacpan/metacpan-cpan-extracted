@@ -7,6 +7,7 @@
  */
 
 #define PERL_NO_GET_CONTEXT
+#define PERL_REENTR_API 1
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -28,23 +29,11 @@ static SV* S_io_fdopen(pTHX_ int fd) {
 }
 #define io_fdopen(fd) S_io_fdopen(aTHX_ fd)
 
-static void get_sys_error(char* buffer, size_t buffer_size) {
-#ifdef _GNU_SOURCE
-	const char* message = strerror_r(errno, buffer, buffer_size);
-	if (message != buffer) {
-		memcpy(buffer, message, buffer_size -1);
-		buffer[buffer_size] = '\0';
-	}
-#else
-	strerror_r(errno, buffer, buffer_size);
-#endif
-}
-
 #define ERRBUFSIZE 128
 
 MODULE = POSIX::RT::SharedMem				PACKAGE = POSIX::RT::SharedMem
 
-PROTOTYPES: DISABLED
+PROTOTYPES: DISABLE
 
 SV* _shm_open(name, flags, mode)
 	const char* name;
@@ -54,11 +43,8 @@ SV* _shm_open(name, flags, mode)
 		int ret;
 	CODE:
 		ret = shm_open(name, flags, mode);
-		if (ret == -1) {
-			char buffer[ERRBUFSIZE];
-			get_sys_error(buffer, sizeof buffer);
-			Perl_croak(aTHX_ "Can't open shared memory object %s: %s", name, buffer);
-		}
+		if (ret == -1)
+			Perl_croak(aTHX_ "Can't open shared memory object %s: %s", name, strerror(errno));
 		RETVAL = io_fdopen(ret);
 	OUTPUT:
 		RETVAL
@@ -67,8 +53,5 @@ SV* _shm_open(name, flags, mode)
 void shared_unlink(name);
 	const char* name;
 	CODE:
-		if (shm_unlink(name) == -1) {
-			char buffer[ERRBUFSIZE];
-			get_sys_error(buffer, sizeof buffer);
-			Perl_croak(aTHX_ "Can't unlink shared memory '%s': %s", name, buffer);
-		}
+		if (shm_unlink(name) == -1)
+			Perl_croak(aTHX_ "Can't unlink shared memory '%s': %s", name, strerror(errno));

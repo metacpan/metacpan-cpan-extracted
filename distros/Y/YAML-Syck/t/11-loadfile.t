@@ -11,7 +11,7 @@ unless ( -w $FindBin::RealBin ) {
     exit;
 }
 
-plan tests => 12;
+plan tests => 13;
 
 *::LoadFile = *YAML::Syck::LoadFile;
 
@@ -79,6 +79,20 @@ SKIP: {
     open( H, 'loadfile.yml' );
     is( LoadFile( \*H ), "a simple scalar", 'LoadFile works with glob refs' );
     close(H);
+}
+
+# read via IO::Handle subclass (GH #23)
+{
+    package MyIO;
+    use parent 'IO::Handle';
+    1;
+
+    package main;
+    require IO::File;
+    my $h = IO::File->new('loadfile.yml');
+    bless $h, 'MyIO';    # re-bless into custom subclass
+    is( LoadFile($h), "a simple scalar", 'LoadFile works with IO::Handle subclass (GH #23)' );
+    close($h);
 }
 
 # load from "in memory" file

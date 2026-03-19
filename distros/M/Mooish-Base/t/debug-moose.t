@@ -6,6 +6,7 @@ use Test2::V0;
 
 BEGIN {
 	$ENV{MOOISH_BASE_FLAVOUR} = 'Moose';
+	$ENV{MOOISH_BASE_EXTRA_MODULES} = 'MooseX::XSConstructor;MooseX::XSAccessor;Hook::AfterRuntime';
 	my $imported_ok = eval { require Mooish::Base; 1 };
 
 	skip_all 'This test requires Moose and Hook::AfterRuntime'

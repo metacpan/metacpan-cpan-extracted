@@ -28,13 +28,16 @@ use Feature::Compat::Class;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-class Amazon::Site {
-  field $code :param;
-  field $country :param;
-  field $tldn :param;
-  field $currency :param;
-  field $sort :param;
-  field $assoc_code :param = '';
+class Amazon::Site;
+
+our $VERSION = '0.1.10';
+
+field $code :param;
+field $country :param;
+field $tldn :param;
+field $currency :param;
+field $sort :param;
+field $assoc_code :param = '';
 
 =head1 METHODS
 
@@ -135,12 +138,11 @@ If you've defined an associate code for this site, it will be included in the UR
 
 =cut
 
-  method asin_url($asin) {
-    my $url = 'https://' . $self->domain . "/dp/$asin";
-    $url .= "?tag=$assoc_code" if $assoc_code;
+method asin_url($asin) {
+  my $url = 'https://' . $self->domain . "/dp/$asin";
+  $url .= "?tag=$assoc_code" if $assoc_code;
 
-    return $url;
-  }
+  return $url;
 }
 
 =head1 COPYRIGHT

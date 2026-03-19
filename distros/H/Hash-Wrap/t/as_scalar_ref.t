@@ -16,8 +16,8 @@ subtest 'api' => sub {
             Hash::Wrap->import( { -as => \( my $func ), -class => '-caller' } )
         },
         qr{not a plain string at t/as_scalar_ref.t},
-        "can't mix -as => \$scalar and -class => -caller"
-    );
+        q{can't mix -as => $scalar and -class => -caller}
+        );
 };
 
 subtest 'functionality' => sub {

@@ -51,7 +51,7 @@ like(
     use Hash::Wrap;
 }
 
-ref_ok( *My::Import::Default::wrap_hash{CODE}, 'CODE', "default import" );
+ref_ok( *My::Import::Default::wrap_hash{CODE}, 'CODE', 'default import' );
 
 {
     package My::Import::As;
@@ -60,7 +60,7 @@ ref_ok( *My::Import::Default::wrap_hash{CODE}, 'CODE', "default import" );
 
 }
 
-ref_ok( *My::Import::As::foo{CODE}, 'CODE', "rename" );
+ref_ok( *My::Import::As::foo{CODE}, 'CODE', 'rename' );
 
 {
     package My::Import::CloneNoRename;
@@ -68,7 +68,7 @@ ref_ok( *My::Import::As::foo{CODE}, 'CODE', "rename" );
     use Hash::Wrap ( { -clone => 1 } );
 
 }
-ref_ok( *My::Import::CloneNoRename::wrap_hash{CODE}, 'CODE', "clone, no rename" );
+ref_ok( *My::Import::CloneNoRename::wrap_hash{CODE}, 'CODE', 'clone, no rename' );
 
 
 {
@@ -79,7 +79,7 @@ ref_ok( *My::Import::CloneNoRename::wrap_hash{CODE}, 'CODE', "clone, no rename" 
 
 }
 
-is( My::StandAlone::Class->new( {} )->b, undef, "standalone class" );
+is( My::StandAlone::Class->new( {} )->b, undef, 'standalone class' );
 
 {
 
@@ -94,7 +94,7 @@ is( My::StandAlone::Class->new( {} )->b, undef, "standalone class" );
 
 }
 
-is( My::Test::No::Sub::Class->new( {} )->b, undef, "standalone class" );
+is( My::Test::No::Sub::Class->new( {} )->b, undef, 'standalone class' );
 {
     no warnings 'once';
     is( *My::Test::No::Sub::wrap_hash{CODE}, undef, 'stopping import of wrap_hash works' );
@@ -107,14 +107,14 @@ is( My::Test::No::Sub::Class->new( {} )->b, undef, "standalone class" );
 
 }
 
-ref_ok( *My::Test::ClassName::wrapit{CODE}, 'CODE', "standalone class" );
+ref_ok( *My::Test::ClassName::wrapit{CODE}, 'CODE', 'standalone class' );
 isa_ok( My::Test::ClassName::wrapit(), ['My::Test::ClassName::wrapit'], '-class => -caller' );
 
-ref_ok( *My::Test::ClassName::wrapit{CODE}, 'CODE', "standalone class" );
+ref_ok( *My::Test::ClassName::wrapit{CODE}, 'CODE', 'standalone class' );
 isa_ok( My::Test::ClassName::wrapit(), ['My::Test::ClassName::wrapit'], '-class => -target' );
 
 SKIP: {
-    skip( ":lvalue support requires perl 5.16 or later" )
+    skip( ':lvalue support requires perl 5.16 or later' )
       unless $HAS_LVALUE;
 
     {

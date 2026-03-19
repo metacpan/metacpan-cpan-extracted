@@ -31,7 +31,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 22;
+plan tests => 23;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -164,10 +164,10 @@ SKIP: {
     EV::run;
 
     SKIP: {
-        skip "no observe lease id", 5 unless $observe_lease_id;
+        skip "no observe lease id", 6 unless $observe_lease_id;
 
-        # Test 17: Start observing the election
-        $client->election_observe($observe_election, sub {
+        # Test 17-18: Start observing the election
+        my $observe_handle = $client->election_observe($observe_election, sub {
             my ($resp, $err) = @_;
             if ($err) {
                 # Stream ended or error - this is expected after resign
@@ -177,7 +177,8 @@ SKIP: {
                 diag("Observed leader change: " . ($resp->{kv} ? $resp->{kv}{value} : 'no kv'));
             }
         });
-        pass('election_observe started');
+        ok(defined $observe_handle, 'election_observe returns handle');
+        isa_ok($observe_handle, 'EV::Etcd::Observe', 'observe handle');
 
         # Give observe stream time to set up
         my $setup_wait = EV::timer(0.2, 0, sub { EV::break });

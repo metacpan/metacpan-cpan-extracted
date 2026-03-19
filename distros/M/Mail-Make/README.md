@@ -18,6 +18,10 @@ Mail::Make - Strict, Fluent MIME Email Builder
             type => 'image/png',
             cid  => 'logo@yamato-inc',
         )
+        # Positional shorthand - path, type, and filename are auto-detected
+        ->attach( '/path/to/report.pdf' )
+    
+        # Explicit form - override type and filename
         ->attach(
             path     => '/tmp/Q4-Report.pdf',
             type     => 'application/pdf',
@@ -54,7 +58,7 @@ Mail::Make - Strict, Fluent MIME Email Builder
 
 # VERSION
 
-    v0.21.1
+    v0.22.0
 
 # DESCRIPTION
 
@@ -98,13 +102,38 @@ An alternate hash-based constructor.
 
 Takes an hash or hash reference of options.
 
-Recognised parameters are: [from](#from), [to](#to), [cc](#cc), [bcc](#bcc), [date](#date), [reply\_to](#reply_to), [sender](#sender), [subject](#subject), [in\_reply\_to](#in_reply_to), [message\_id](#message_id), [references](#references), [plain](#plain), [html](#html), `plain_opts`, `html_opts`, `headers`.
+Recognised parameters are: [from](#from), [to](#to), [cc](#cc), [bcc](#bcc), [date](#date), [reply\_to](#reply_to), [sender](#sender), [subject](#subject), [in\_reply\_to](#in_reply_to), [message\_id](#message_id), [references](#references), [plain](#plain), [html](#html), `plain_opts`, `html_opts`, `attach`, `headers`.
 
 When using the standard mail envelop headers, `build` will call each respective method, such as [from](#from), [to](#to), etc.
 
 When passing the `plain` parameter, it will call [plain](#plain), and passing it the optional hash reference of parameters provided with `plain_opts`
 
 Likewise when passing the `html` parameter, it will call [html](#html), and passing it the optional hash reference of parameters provided with `html_opts`
+
+The `attach` parameter accepts one of the following forms:
+
+- A plain scalar or stringifiable object resolving to an existing file; `path`, `type`, and `filename` are auto-detected:
+
+        attach => 'report.pdf'
+
+- An array reference of plain scalars for multiple attachments; likewise `path`, `type`, and `filename` are auto-detected:
+
+        attach => [ 'report.pdf', 'log.pdf' ]
+
+- An array reference of hash references for full control over each attachment:
+
+        attach => [
+            { path => 'report.pdf', filename => 'Q4 Report.pdf' },
+            { path => 'log.pdf',    filename => 'Access Log.pdf' },
+        ]
+
+- A mix of both forms is also accepted:
+
+        attach => [ 'report.pdf', { path => 'log.pdf', filename => 'Access Log.pdf' } ]
+
+If `type` is not provided in any of the above forms, it is auto-detected from the file content using [Module::Generic::File::Magic](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AFile%3A%3AMagic).
+
+Each element is forwarded to ["attach"](#attach), so all options supported by ["attach"](#attach) are available in the hash reference form.
 
 You can also provide additional mail envelop headers by providing the parameter `headers` as an hash reference.
 
@@ -118,6 +147,10 @@ All setter methods return `$self` to allow chaining. Called without arguments, t
 
 ## attach( %opts )
 
+    # Positional shorthand: path, type, and filename are auto-detected
+    $mail->attach( '/path/to/report.pdf' );
+
+    # Explicit form
     $mail->attach(
         path     => $pdf_path,
         type     => 'application/pdf',
@@ -126,9 +159,13 @@ All setter methods return `$self` to allow chaining. Called without arguments, t
 
 Adds a downloadable attachment, and returns the current instance for chaining.
 
-Takes an hash or hash reference of parameters.
+Takes either a single positional file path as a shorthand, or an hash or hash reference of parameters.
 
-Requires either `path` or `data`.
+When a single plain scalar or stringifiable object is provided and it resolves to an existing file on disk, `path`, `type`, and `filename` are set automatically. Additional named options may still be passed after the path:
+
+    $mail->attach( '/path/to/report.pdf', encoding => 'base64' );
+
+Requires either `path` or `data` when using the named-parameter form.
 
 Options are:
 

@@ -1,6 +1,18 @@
 Revision History for File-Sticker
 =================================
 
+v4.401 2026-03-18
+-----------------
+
+* 2026-03-18 14:07:47 +1100
+  Fixing a bug with relative paths and derivations
+
+v4.4 2026-02-19
+---------------
+
+* 2026-02-19 17:12:53 +1100
+  Enable more than one topdir for relative paths
+
 v4.301 2025-12-11
 -----------------
 
@@ -40,30 +52,6 @@ v4.0101 2025-03-21
 
 * 2025-03-21 08:22:31 +1100
   fixed bug with field deletion
-
-v4.01 2025-03-17
-----------------
-
-* 2025-03-17 06:46:16 +1100
-  Fixing a bug with Exif
-
-v4.00 2025-03-04
-----------------
-
-* 2025-03-04 16:41:52 +1100
-  More refactoring and sanity checks
-* 2025-03-04 15:34:25 +1100
-  Using user-defined fields for EXIF files
-* 2025-03-04 11:41:20 +1100
-  more readonly fields stuff
-* 2025-03-04 11:14:11 +1100
-  Readonly fields and missing files
-* 2025-03-04 11:13:00 +1100
-  Reconciling differences in readonly_fields behaviour.
-* 2025-03-04 05:23:09 +1100
-  and no longer need Reader modules
-* 2025-03-04 05:21:48 +1100
-  Combining reading and writing
 
 ===================================
 End of changes in the last 365 days

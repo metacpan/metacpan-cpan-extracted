@@ -4,7 +4,7 @@
       "Klaus Rindfrey <klausrin@cpan.org.eu>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -52,16 +52,9 @@
       "test" : {
          "requires" : {
             "Capture::Tiny" : "0.47",
-            "Cwd" : "0",
             "File::Basename" : "0",
             "File::Spec::Functions" : "0",
-            "File::Temp" : "0",
-            "File::chdir" : "0.1011",
-            "Pod::Wordlist" : "1.27",
-            "Test::CheckManifest" : "1.43",
             "Test::More" : "0",
-            "Test::Pod" : "1.51",
-            "Test::Spelling" : "0.25",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -70,7 +63,7 @@
    "provides" : {
       "App::git_log_ch_usrdata" : {
          "file" : "lib/App/git_log_ch_usrdata.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -81,7 +74,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata.git"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-app-git_log_ch_usrdata/issues"
    },

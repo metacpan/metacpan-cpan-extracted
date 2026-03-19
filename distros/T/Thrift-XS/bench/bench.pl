@@ -38,17 +38,17 @@ cmpthese( -5, {
 cmpthese( -5, {
     BP_MessageBegin_xs => sub {
         my ($name, $type, $seqid);
-        $xsp->writeMessageBegin('login русский', TMessageType::CALL, 12345);
+        $xsp->writeMessageBegin('login русский', Thrift::TMessageType::CALL, 12345);
         $xsp->readMessageBegin(\$name, \$type, \$seqid);
     },
     CP_MessageBegin_xs => sub {
         my ($name, $type, $seqid);
-        $xsc->writeMessageBegin('login русский', TMessageType::CALL, 12345);
+        $xsc->writeMessageBegin('login русский', Thrift::TMessageType::CALL, 12345);
         $xsc->readMessageBegin(\$name, \$type, \$seqid);
     },
     BP_MessageBegin_pp => sub {
         my ($name, $type, $seqid);
-        $ppp->writeMessageBegin('login русский', TMessageType::CALL, 12345);
+        $ppp->writeMessageBegin('login русский', Thrift::TMessageType::CALL, 12345);
         $ppp->readMessageBegin(\$name, \$type, \$seqid);
         $ppt->resetBuffer();
     },
@@ -65,16 +65,16 @@ cmpthese( -5, {
 cmpthese( -5, {
     BP_StructBegin_xs => sub {
         $xsp->writeStructBegin('SliceRange');
-        $xsp->writeFieldBegin('start', TType::STRING, 1);
+        $xsp->writeFieldBegin('start', Thrift::TType::STRING, 1);
         $xsp->writeString(1);
         $xsp->writeFieldEnd();
-        $xsp->writeFieldBegin('finish', TType::STRING, 2);
+        $xsp->writeFieldBegin('finish', Thrift::TType::STRING, 2);
         $xsp->writeString(1000);
         $xsp->writeFieldEnd();
-        $xsp->writeFieldBegin('reversed', TType::BOOL, 3);
+        $xsp->writeFieldBegin('reversed', Thrift::TType::BOOL, 3);
         $xsp->writeBool(0);
         $xsp->writeFieldEnd();
-        $xsp->writeFieldBegin('count', TType::I32, 4);
+        $xsp->writeFieldBegin('count', Thrift::TType::I32, 4);
         $xsp->writeI32(100);
         $xsp->writeFieldEnd();
         $xsp->writeFieldStop();
@@ -88,30 +88,30 @@ cmpthese( -5, {
         while (1) 
         {
           $xsp->readFieldBegin(\$fname, \$ftype, \$fid);
-          if ($ftype == TType::STOP) {
+          if ($ftype == Thrift::TType::STOP) {
             last;
           }
           SWITCH: for($fid)
           {
-            /^1$/ && do{      if ($ftype == TType::STRING) {
+            /^1$/ && do{      if ($ftype == Thrift::TType::STRING) {
               $xsp->readString(\$tmp->{start});
             } else {
               $xsp->skip($ftype);
             }
             last; };
-            /^2$/ && do{      if ($ftype == TType::STRING) {
+            /^2$/ && do{      if ($ftype == Thrift::TType::STRING) {
               $xsp->readString(\$tmp->{finish});
             } else {
               $xsp->skip($ftype);
             }
             last; };
-            /^3$/ && do{      if ($ftype == TType::BOOL) {
+            /^3$/ && do{      if ($ftype == Thrift::TType::BOOL) {
               $xsp->readBool(\$tmp->{reversed});
             } else {
               $xsp->skip($ftype);
             }
             last; };
-            /^4$/ && do{      if ($ftype == TType::I32) {
+            /^4$/ && do{      if ($ftype == Thrift::TType::I32) {
               $xsp->readI32(\$tmp->{count});
             } else {
               $xsp->skip($ftype);
@@ -127,16 +127,16 @@ cmpthese( -5, {
         $xsc->resetState();
 
         $xsc->writeStructBegin('SliceRange');
-        $xsc->writeFieldBegin('start', TType::STRING, 1);
+        $xsc->writeFieldBegin('start', Thrift::TType::STRING, 1);
         $xsc->writeString(1);
         $xsc->writeFieldEnd();
-        $xsc->writeFieldBegin('finish', TType::STRING, 2);
+        $xsc->writeFieldBegin('finish', Thrift::TType::STRING, 2);
         $xsc->writeString(1000);
         $xsc->writeFieldEnd();
-        $xsc->writeFieldBegin('reversed', TType::BOOL, 3);
+        $xsc->writeFieldBegin('reversed', Thrift::TType::BOOL, 3);
         $xsc->writeBool(0);
         $xsc->writeFieldEnd();
-        $xsc->writeFieldBegin('count', TType::I32, 4);
+        $xsc->writeFieldBegin('count', Thrift::TType::I32, 4);
         $xsc->writeI32(100);
         $xsc->writeFieldEnd();
         $xsc->writeFieldStop();
@@ -150,30 +150,30 @@ cmpthese( -5, {
         while (1) 
         {
           $xsc->readFieldBegin(\$fname, \$ftype, \$fid);
-          if ($ftype == TType::STOP) {
+          if ($ftype == Thrift::TType::STOP) {
             last;
           }
           SWITCH: for($fid)
           {
-            /^1$/ && do{      if ($ftype == TType::STRING) {
+            /^1$/ && do{      if ($ftype == Thrift::TType::STRING) {
               $xsc->readString(\$tmp->{start});
             } else {
               $xsc->skip($ftype);
             }
             last; };
-            /^2$/ && do{      if ($ftype == TType::STRING) {
+            /^2$/ && do{      if ($ftype == Thrift::TType::STRING) {
               $xsc->readString(\$tmp->{finish});
             } else {
               $xsc->skip($ftype);
             }
             last; };
-            /^3$/ && do{      if ($ftype == TType::BOOL) {
+            /^3$/ && do{      if ($ftype == Thrift::TType::BOOL) {
               $xsc->readBool(\$tmp->{reversed});
             } else {
               $xsc->skip($ftype);
             }
             last; };
-            /^4$/ && do{      if ($ftype == TType::I32) {
+            /^4$/ && do{      if ($ftype == Thrift::TType::I32) {
               $xsc->readI32(\$tmp->{count});
             } else {
               $xsc->skip($ftype);
@@ -187,16 +187,16 @@ cmpthese( -5, {
     },
     BP_StructBegin_pp => sub {
         $ppp->writeStructBegin('SliceRange');
-        $ppp->writeFieldBegin('start', TType::STRING, 1);
+        $ppp->writeFieldBegin('start', Thrift::TType::STRING, 1);
         $ppp->writeString(1);
         $ppp->writeFieldEnd();
-        $ppp->writeFieldBegin('finish', TType::STRING, 2);
+        $ppp->writeFieldBegin('finish', Thrift::TType::STRING, 2);
         $ppp->writeString(1000);
         $ppp->writeFieldEnd();
-        $ppp->writeFieldBegin('reversed', TType::BOOL, 3);
+        $ppp->writeFieldBegin('reversed', Thrift::TType::BOOL, 3);
         $ppp->writeBool(0);
         $ppp->writeFieldEnd();
-        $ppp->writeFieldBegin('count', TType::I32, 4);
+        $ppp->writeFieldBegin('count', Thrift::TType::I32, 4);
         $ppp->writeI32(100);
         $ppp->writeFieldEnd();
         $ppp->writeFieldStop();
@@ -210,30 +210,30 @@ cmpthese( -5, {
         while (1) 
         {
           $ppp->readFieldBegin(\$fname, \$ftype, \$fid);
-          if ($ftype == TType::STOP) {
+          if ($ftype == Thrift::TType::STOP) {
             last;
           }
           SWITCH: for($fid)
           {
-            /^1$/ && do{      if ($ftype == TType::STRING) {
+            /^1$/ && do{      if ($ftype == Thrift::TType::STRING) {
               $ppp->readString(\$tmp->{start});
             } else {
               $ppp->skip($ftype);
             }
             last; };
-            /^2$/ && do{      if ($ftype == TType::STRING) {
+            /^2$/ && do{      if ($ftype == Thrift::TType::STRING) {
               $ppp->readString(\$tmp->{finish});
             } else {
               $ppp->skip($ftype);
             }
             last; };
-            /^3$/ && do{      if ($ftype == TType::BOOL) {
+            /^3$/ && do{      if ($ftype == Thrift::TType::BOOL) {
               $ppp->readBool(\$tmp->{reversed});
             } else {
               $ppp->skip($ftype);
             }
             last; };
-            /^4$/ && do{      if ($ftype == TType::I32) {
+            /^4$/ && do{      if ($ftype == Thrift::TType::I32) {
               $ppp->readI32(\$tmp->{count});
             } else {
               $ppp->skip($ftype);
@@ -255,17 +255,17 @@ cmpthese( -5, {
 cmpthese( -5, {
     BP_MapBegin_xs => sub {
         my ($keytype, $valtype, $size);
-        $xsp->writeMapBegin(TType::STRING, TType::LIST, 42);
+        $xsp->writeMapBegin(Thrift::TType::STRING, Thrift::TType::LIST, 42);
         $xsp->readMapBegin(\$keytype, \$valtype, \$size);
     },
     CP_MapBegin_xs => sub {
         my ($keytype, $valtype, $size);
-        $xsc->writeMapBegin(TType::STRING, TType::LIST, 42);
+        $xsc->writeMapBegin(Thrift::TType::STRING, Thrift::TType::LIST, 42);
         $xsc->readMapBegin(\$keytype, \$valtype, \$size);
     },
     BP_MapBegin_pp => sub {
         my ($keytype, $valtype, $size);
-        $ppp->writeMapBegin(TType::STRING, TType::LIST, 42);
+        $ppp->writeMapBegin(Thrift::TType::STRING, Thrift::TType::LIST, 42);
         $ppp->readMapBegin(\$keytype, \$valtype, \$size);
         $ppt->resetBuffer();
     },
@@ -279,17 +279,17 @@ cmpthese( -5, {
 cmpthese( -5, {
     BP_ListBegin_xs => sub {
         my ($elemtype, $size);
-        $xsp->writeListBegin(TType::STRUCT, 12345);
+        $xsp->writeListBegin(Thrift::TType::STRUCT, 12345);
         $xsp->readListBegin(\$elemtype, \$size);
     },
     CP_ListBegin_xs => sub {
         my ($elemtype, $size);
-        $xsc->writeListBegin(TType::STRUCT, 12345);
+        $xsc->writeListBegin(Thrift::TType::STRUCT, 12345);
         $xsc->readListBegin(\$elemtype, \$size);
     },
     BP_ListBegin_pp => sub {
         my ($elemtype, $size);
-        $ppp->writeListBegin(TType::STRUCT, 12345);
+        $ppp->writeListBegin(Thrift::TType::STRUCT, 12345);
         $ppp->readListBegin(\$elemtype, \$size);
         $ppt->resetBuffer();
     },
@@ -303,17 +303,17 @@ cmpthese( -5, {
 cmpthese( -5, {
     BP_SetBegin_xs => sub {
         my ($elemtype, $size);
-        $xsp->writeSetBegin(TType::I16, 12345);
+        $xsp->writeSetBegin(Thrift::TType::I16, 12345);
         $xsp->readSetBegin(\$elemtype, \$size);
     },
     CP_SetBegin_xs => sub {
         my ($elemtype, $size);
-        $xsc->writeSetBegin(TType::I16, 12345);
+        $xsc->writeSetBegin(Thrift::TType::I16, 12345);
         $xsc->readSetBegin(\$elemtype, \$size);
     },
     BP_SetBegin_pp => sub {
         my ($elemtype, $size);
-        $ppp->writeSetBegin(TType::I16, 12345);
+        $ppp->writeSetBegin(Thrift::TType::I16, 12345);
         $ppp->readSetBegin(\$elemtype, \$size);
         $ppt->resetBuffer();
     },

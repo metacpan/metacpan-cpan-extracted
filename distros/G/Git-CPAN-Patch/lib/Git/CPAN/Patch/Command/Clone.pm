@@ -1,14 +1,14 @@
 package Git::CPAN::Patch::Command::Clone;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: Clone a CPAN module's history into a new git repository
-$Git::CPAN::Patch::Command::Clone::VERSION = '2.5.0';
+$Git::CPAN::Patch::Command::Clone::VERSION = '2.5.2';
 use 5.20.0;
 
 use strict;
 use warnings;
 
 use autodie;
-use Path::Class;
+use Path::Tiny qw(path);
 
 use MooseX::App::Command;
 extends 'Git::CPAN::Patch::Command::Import';
@@ -36,7 +36,7 @@ before [ qw/import_release clone_git_repo /] => sub($self,$release,@) {
 
     say "creating $target";
 
-    dir($target)->mkpath;
+    path($target)->mkdir;
     Git::Repository->run( init => $target );
     $self->set_root($target);
 };
@@ -61,7 +61,7 @@ Git::CPAN::Patch::Command::Clone - Clone a CPAN module's history into a new git 
 
 =head1 VERSION
 
-version 2.5.0
+version 2.5.2
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2026, 2014, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

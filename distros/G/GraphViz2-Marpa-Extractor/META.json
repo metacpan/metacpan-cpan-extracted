@@ -1,0 +1,54 @@
+{
+   "abstract" : "Extracts a simplified AST from GraphViz2::Marpa tree",
+   "author" : [
+      "Nadim Khemir <nadim.khemir@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GraphViz2-Marpa-Extractor",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::TreeDumper" : "0",
+            "Getopt::Long" : "0",
+            "GraphViz2::Marpa" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "GraphViz2::Marpa::Extractor" : {
+         "file" : "lib/GraphViz2/Marpa/Extractor.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/nkh/P5-GraphViz2-Marpa-Extractor"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

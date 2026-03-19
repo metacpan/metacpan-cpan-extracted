@@ -54,7 +54,7 @@
    "provides" : {
       "Algorithm::Kademlia" : {
          "file" : "lib/Algorithm/Kademlia.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.1.1"
       },
       "Algorithm::Kademlia::RoutingTable" : {
          "file" : "lib/Algorithm/Kademlia.pm",
@@ -62,7 +62,7 @@
       },
       "Algorithm::Kademlia::Search" : {
          "file" : "lib/Algorithm/Kademlia.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.1.1"
       },
       "Algorithm::Kademlia::Storage" : {
          "file" : "lib/Algorithm/Kademlia.pm",
@@ -88,7 +88,7 @@
          "web" : "https://github.com/sanko/Algorithm-Kademlia.pm"
       }
    },
-   "version" : "v1.1.0",
+   "version" : "v1.1.1",
    "x_help_wanted" : [
       "Tester",
       "Documenter"

@@ -3,7 +3,7 @@ use warnings
   FATAL    => qw( all ),
   NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
-use Test2::V0 -target => 'Test::Expander';
+use Test2::V1 -i, -target => 'Test::Expander';
 
 use Test::Expander::Constants qw( $FMT_INVALID_SUBTEST_NUMBER );
 

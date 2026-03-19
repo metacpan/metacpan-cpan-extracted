@@ -1,4 +1,26 @@
 #ABSTRACT: NBI Slurm module
+#
+# NBI::Slurm - Main entry-point module for the NBI::Slurm package.
+#
+# DESCRIPTION:
+#   Provides utility functions and constants used across the package:
+#     - %FORMAT_STRINGS : squeue format codes (jobid, user, memory, etc.)
+#     - load_config()   : reads ~/.nbislurm.config key=value settings
+#     - has_squeue()    : checks whether the squeue binary is available
+#     - queues()        : lists available SLURM partitions via sinfo
+#     - valid_queue()   : validates a queue name against the cluster
+#     - execute_command(): runs a shell command and captures stdout/stderr/exit
+#     - timelog()       : returns a formatted timestamp string for logging
+#     - days_since_update(): returns days since a file was last modified
+#
+# RELATIONSHIPS:
+#   - Loads and re-exports NBI::Job and NBI::Opts so callers only need
+#     "use NBI::Slurm".
+#   - NBI::Queue and NBI::QueuedJob both import %FORMAT_STRINGS and
+#     $NBI::Slurm::VERSION from this module.
+#   - NBI::EcoScheduler uses $NBI::Slurm::VERSION and is called by
+#     bin/runjob when eco scheduling is active.
+#
 use strict;
 use warnings;
 
@@ -9,7 +31,7 @@ use base qw(Exporter);
 our @ISA = qw(Exporter);
 our @EXPORT = qw(Job Opts load_config has_squeue timelog execute_command %FORMAT_STRINGS);
 
-$NBI::Slurm::VERSION = '0.16.1';
+$NBI::Slurm::VERSION = '0.17.0';
 
 
 
@@ -207,7 +229,7 @@ NBI::Slurm - NBI Slurm module
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 

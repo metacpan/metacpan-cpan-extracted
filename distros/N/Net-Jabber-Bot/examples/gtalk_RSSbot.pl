@@ -1,7 +1,9 @@
+use strict;
+use warnings;
+use utf8;
+
 use Net::Jabber::Bot;
 use XML::Smart;
-use utf8;
-use strict;
 
 # Simple RSS bot (yjesus@security-projects.com)
 # It works fine with Feedburner
@@ -61,7 +63,7 @@ sub background_checks {
           
         my $status = $bot->GetStatus($tosend);
           
-        if ($status != "unavailable") {
+        if ($status ne "unavailable") {
           
             $bot->SendPersonalMessage($tosend, "$title");
             $bot->SendPersonalMessage($tosend, "$link");

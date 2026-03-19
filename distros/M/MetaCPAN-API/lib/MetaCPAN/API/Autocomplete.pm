@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 package MetaCPAN::API::Autocomplete;
-# ABSTRACT: Autocompletion info for MetaCPAN::API
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Carp;
 use Moo::Role;
@@ -18,7 +17,9 @@ sub autocomplete {
     my $size_error = "The size has to be between 0 and 100";
 
     %opts or croak $error;
-    $opts{search} && ref $opts{search} eq 'HASH' or croak $error;
+
+    croak $error
+        unless $opts{search} && ref $opts{search} eq 'HASH';
 
     my %extra_opts;
 
@@ -47,13 +48,11 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Sawyer X autocompletion autocomplete
+
 =head1 NAME
 
 MetaCPAN::API::Autocomplete - Autocompletion info for MetaCPAN::API
-
-=head1 VERSION
-
-version 0.51
 
 =head1 DESCRIPTION
 
@@ -82,6 +81,15 @@ can also pass C<size>:
 There is a hardcoded limit of 100 results (hardcoded in MetaCPAN).
 
 Searches MetaCPAN for autocompletion info.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/xsawyerx/metacpan-api/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/Perl-GPU/pogl/issues
   homepage: http://sourceforge.net/projects/pogl/
   repository: git://github.com/Perl-GPU/pogl.git
-version: '0.7007'
+version: '0.7009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

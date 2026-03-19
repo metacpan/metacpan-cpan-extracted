@@ -1,0 +1,29 @@
+digraph graph_19
+{
+	size = "6,6"
+
+	node [shape = square]
+	edge [color = red]
+
+	node_19_1 -> node_19_2
+
+	subgraph subgraph_19_3
+	{
+		node [shape = star]
+		edge [color = green]
+
+		node_19_4 -> node_19_5
+
+		subgraph subgraph_19_6
+		{
+			node [shape = circle]
+			edge [color = blue]
+
+			node_19_7 -> node_19_8
+		}
+
+		node_19_9 -> node_19_10
+	}
+
+	node_19_11 -> node_19_12
+}

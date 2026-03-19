@@ -511,7 +511,8 @@ static OP* pp_pathset_dynamic(pTHX)
         if (p < end && *p == '/') p++;
     }
 
-    PUSHs(value_sv);
+    if (GIMME_V != G_VOID)
+        PUSHs(value_sv);
     RETURN;
 }
 

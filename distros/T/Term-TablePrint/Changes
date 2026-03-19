@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.177   2026-03-15
+        - Code refactoring.
+        - Bugfix: undefined value in print_single_row.
+        - Raised required minimum version for Term::Choose::Util.
+
 0.176   2026-02-21
         - Renamed 'min_col_with' and 'max_width_exp'.
         - Reintroduced 'choose_columns'.

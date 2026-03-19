@@ -13,6 +13,8 @@ use Test2::V0;
 use Async::Redis;
 use Time::HiRes qw(time);
 
+$SIG{PIPE} = 'IGNORE';
+
 subtest 'clean disconnect produces no warnings' => sub {
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, @_ };

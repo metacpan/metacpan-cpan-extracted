@@ -71,6 +71,6 @@
          "web" : "https://gitlab.com/jackdeguest/Mail-Make"
       }
    },
-   "version" : "v0.21.1",
+   "version" : "v0.22.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

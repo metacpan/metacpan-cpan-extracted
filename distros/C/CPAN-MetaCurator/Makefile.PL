@@ -34,7 +34,6 @@ my(%params) =
 	{
 		'boolean'					=> 0.46,
 		'Config::Tiny'				=> 2.30,
-		'constant'					=> 1.33,
 		'DBI'						=> 1.645,
 		'DBIx::Admin::CreateTable'	=> 2.11,
 		'DBIx::Simple'				=> 1.37,
@@ -59,6 +58,7 @@ my(%params) =
 		'open'						=> 1.13,
 		'parent'					=> 0.242,
 		'Path::Tiny'				=> 0.146,
+		'perl'						=> 5.36,
 		'Pod::Usage'				=> 2.03,
 		'strict'					=> 1.12,
 		'Text::Balanced'			=> 2.07,
@@ -68,7 +68,9 @@ my(%params) =
 	},
 	TEST_REQUIRES =>
 	{
-		'Test::More' => 1.001002,
+		'Test::CPAN::Changes'			=> 0.500005,
+		'Test::Changes::Strict::Simple'	=> 0.01,
+		'Test::More'					=> 1.001002,
 	},
 	VERSION_FROM => 'lib/CPAN/MetaCurator.pm',
 );

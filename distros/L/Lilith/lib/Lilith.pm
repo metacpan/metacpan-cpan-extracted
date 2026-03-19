@@ -4,14 +4,11 @@ use 5.006;
 use strict;
 use warnings;
 use POE qw(Wheel::FollowTail);
-use JSON;
-use Sys::Hostname;
-use DBI;
+use JSON qw( decode_json );
+use Sys::Hostname qw( hostname );
+use DBI ();
 use Digest::SHA qw(sha256_base64);
-use File::ReadBackwards;
-use Sys::Syslog;
-use YAML::PP;
-use File::Slurp;
+use Sys::Syslog qw( closelog openlog syslog );
 
 =head1 NAME
 
@@ -19,11 +16,11 @@ Lilith - Work with Suricata/Sagan EVE logs and PostgreSQL.
 
 =head1 VERSION
 
-Version 0.6.0
+Version 1.0.0
 
 =cut
 
-our $VERSION = '0.6.0';
+our $VERSION = '1.0.0';
 
 =head1 SYNOPSIS
 
@@ -35,8 +32,6 @@ our $VERSION = '0.6.0';
 
      my $lilith=Lilith->new(
                             dsn=>$toml->{dsn},
-                            sagan=>$toml->{sagan},
-                            suricata=>$toml->{suricata},
                             user=>$toml->{user},
                             pass=>$toml->{pass},
                            );
@@ -44,8 +39,6 @@ our $VERSION = '0.6.0';
 
      $lilith->create_table(
                            dsn=>$toml->{dsn},
-                           sagan=>$toml->{sagan},
-                           suricata=>$toml->{suricata},
                            user=>$toml->{user},
                            pass=>$toml->{pass},
                           );
@@ -70,14 +63,12 @@ our $VERSION = '0.6.0';
 
 =head1 FUNCTIONS
 
-=head1 new
+=head2 new
 
 Initiates it.
 
     my $lilith=Lilith->run(
                            dsn=>$toml->{dsn},
-                           sagan=>$toml->{sagan},
-                           suricata=>$toml->{suricata},
                            user=>$toml->{user},
                            pass=>$toml->{pass},
                           );
@@ -86,14 +77,8 @@ The args taken by this are as below.
 
     - dsn :: The DSN to use for with DBI.
 
-    - sagan :: Name of the table for Sagan alerts.
-      Default :: sagan_alerts
-
     - suricata :: Name of the table for Suricata alerts.
       Default :: suricata_alerts
-
-    - cape :: Name of the table for CAPEv2 alerts.
-      Default :: cape_alerts
 
     - user :: Name for use with DBI for the DB connection.
       Default :: lilith
@@ -138,18 +123,6 @@ sub new {
 		$opts{user} = 'lilith';
 	}
 
-	if ( !defined( $opts{sagan} ) ) {
-		$opts{sagan} = 'sagan_alerts';
-	}
-
-	if ( !defined( $opts{suricata} ) ) {
-		$opts{suricata} = 'suricata_alerts';
-	}
-
-	if ( !defined( $opts{cape} ) ) {
-		$opts{cape} = 'cape_alerts';
-	}
-
 	if ( !defined( $opts{sid_ignore} ) ) {
 		my @empty_array;
 		$opts{sid_ignore} = \@empty_array;
@@ -190,9 +163,6 @@ sub new {
 		dsn                   => $opts{dsn},
 		user                  => $opts{user},
 		pass                  => $opts{pass},
-		sagan                 => $opts{sagan},
-		suricata              => $opts{suricata},
-		cape                  => $opts{cape},
 		debug                 => $opts{debug},
 		class_map             => {
 			'Not Suspicious Traffic'                                      => '!SusT',
@@ -273,6 +243,7 @@ sub new {
 
 	return $self;
 } ## end sub new
+
 
 =head2 run
 
@@ -378,8 +349,7 @@ sub run {
 							# handle if suricata
 							if ( $_[HEAP]{type} eq 'suricata' ) {
 								my $sth
-									= $dbh->prepare( 'insert into '
-										. $self->{suricata}
+									= $dbh->prepare( 'insert into suricata_alerts'
 										. ' ( instance, host, timestamp, flow_id, event_id, in_iface, src_ip, src_port, dest_ip, dest_port, proto, app_proto, flow_pkts_toserver, flow_bytes_toserver, flow_pkts_toclient, flow_bytes_toclient, flow_start, classification, signature, gid, sid, rev, raw ) '
 										. ' VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );'
 									);
@@ -402,8 +372,7 @@ sub run {
 							#handle if sagan
 							elsif ( $_[HEAP]{type} eq 'sagan' ) {
 								my $sth
-									= $dbh->prepare( 'insert into '
-										. $self->{sagan}
+									= $dbh->prepare( 'insert into sagan_alerts'
 										. ' ( instance, instance_host, timestamp, event_id, flow_id, in_iface, src_ip, src_port, dest_ip, dest_port, proto, facility, host, level, priority, program, proto, xff, stream, classification, signature, gid, sid, rev, raw) '
 										. ' VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );'
 									);
@@ -424,8 +393,7 @@ sub run {
 								);
 							} elsif ( $_[HEAP]{type} eq 'cape' ) {
 								my $sth
-									= $dbh->prepare( 'insert into '
-										. $self->{cape}
+									= $dbh->prepare( 'insert into cape_alerts'
 										. ' ( instance, target, instance_host, task, start, stop, malscore, subbed_from_ip, subbed_from_host, pkg, md5, sha1, sha256, slug, url, url_hostname, proto, src_ip, src_port, dest_ip, dest_port, size, raw ) '
 										. ' VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? );'
 									);
@@ -573,6 +541,7 @@ sub run {
 	POE::Kernel->run;
 } ## end sub run
 
+
 =head2 create_tables
 
 Just creates the required tables in the DB.
@@ -587,8 +556,7 @@ sub create_tables {
 	my $dbh = DBI->connect_cached( $self->{dsn}, $self->{user}, $self->{pass} );
 
 	my $sth
-		= $dbh->prepare( 'create table '
-			. $self->{suricata} . ' ('
+	  = $dbh->prepare( 'create table suricata_alerts ('
 			. 'id bigserial NOT NULL, '
 			. 'instance varchar(255) NOT NULL,'
 			. 'host varchar(255) NOT NULL,'
@@ -612,13 +580,18 @@ sub create_tables {
 			. 'gid int, '
 			. 'sid bigint, '
 			. 'rev bigint, '
-			. 'raw json NOT NULL, '
 			. 'PRIMARY KEY(id) );' );
 	$sth->execute();
 
 	$sth
-		= $dbh->prepare( 'create table '
-			. $self->{sagan} . ' ('
+		= $dbh->prepare( 'create table suricata_alerts_raw ('
+			. 'event_id varchar(64) NOT NULL, '
+			. 'raw json NOT NULL, '
+			. 'PRIMARY KEY(event_id) );' );
+	$sth->execute();
+
+	$sth
+		= $dbh->prepare( 'create table sagan_alerts ('
 			. 'id bigserial NOT NULL, '
 			. 'instance varchar(255)  NOT NULL, '
 			. 'instance_host varchar(255)  NOT NULL, '
@@ -648,8 +621,7 @@ sub create_tables {
 	$sth->execute();
 
 	$sth
-		= $dbh->prepare( 'create table '
-			. $self->{cape} . ' ('
+		= $dbh->prepare( 'create table cape_alerts ('
 			. 'id bigserial NOT NULL, '
 			. 'instance varchar(255)  NOT NULL, '
 			. 'target varchar(255)  NOT NULL, '
@@ -678,6 +650,7 @@ sub create_tables {
 	$sth->execute();
 
 } ## end sub create_tables
+
 
 =head2 extend
 
@@ -732,8 +705,7 @@ sub extend {
 		#
 
 		my $sql
-			= 'select * from '
-			. $self->{suricata}
+			= 'select * from suricata_alerts'
 			. " where timestamp >= CURRENT_TIMESTAMP - interval '"
 			. $opts{go_back_minutes}
 			. " minutes' and host ='"
@@ -755,8 +727,7 @@ sub extend {
 		#
 
 		$sql
-			= 'select * from '
-			. $self->{sagan}
+			= 'select * from sagan_alerts'
 			. " where timestamp >= CURRENT_TIMESTAMP - interval '"
 			. $opts{go_back_minutes}
 			. " minutes' and instance_host = '"
@@ -832,126 +803,6 @@ sub extend {
 	return $to_return;
 } ## end sub extend
 
-=head2 generate_baphomet_yamls
-
-Geneartes fastlog parsing YAMLs for baphomet.
-
-One argument is required is required and that is the dir to write out to.
-
-If there are any errors, it will die.
-
-=cut
-
-sub generate_baphomet_yamls {
-	my ( $self, $dir ) = @_;
-
-	# run some basic checks prior to starting trying to write them all
-	if ( !defined($dir) ) {
-		die('No directory specified to write files to');
-	} elsif ( !-d $dir ) {
-		die( '"' . $dir . '" is not a directory' );
-	} elsif ( !-w $dir ) {
-		die( '"' . $dir . '" is not writable' );
-	}
-
-	my $ypp  = YAML::PP->new( schema => [qw/ + Perl /] );
-	my @keys = keys( %{ $self->{class_map} } );
-	foreach my $class ( sort(@keys) ) {
-		my $lc_key    = lc($class);
-		my $snmp_name = $self->{snmp_class_map}{$lc_key};
-
-		my $yaml = $ypp->dump_string(
-			{
-				vars => {
-					'fastlog_class_to_use' => $class,
-				},
-				start_chomp   => 1,
-				start_pattern => '[== fastlog_chomp ==]',
-				includes      => ['common.yaml'],
-				regexp        => ['[== fastlog_chomped_with_class  ==]'],
-				tests         => {
-					found_1 => {
-						line =>
-							'03/26/2023-19:30:50.356934  [**] [1:0123456:123] Rule Description Goes Here [**] [Classification: '
-							. $class
-							. '] [Priority: 2] {TCP} 5.6.7.8:6163 -> 1.2.3.4:443',
-						found => 1,
-						data  => {
-							'group'    => '1',
-							'rule'     => '0123456',
-							'rev'      => '123',
-							'SRC'      => '5.6.7.8',
-							'DEST'     => '1.2.3.4',
-							'pri'      => '2',
-							'proto'    => 'TCP',
-							'dst_port' => '443',
-							'src_port' => '6163',
-						},
-						undefed => [ 'HOST', 'SUBNET', 'IP4', 'IP6', 'ADDR', 'DNS' ],
-					},
-					found_2 => {
-						line =>
-							'03/26/2023-19:30:50.356934  [**] [1:0123456:123] Rule Description Goes Here [**] [Classification: '
-							. $class
-							. '] [Priority: 2] {UDP} 5.6.7.8:26163 -> 1.2.3.4:4',
-						found => 1,
-						data  => {
-							'group'    => '1',
-							'rule'     => '0123456',
-							'rev'      => '123',
-							'SRC'      => '5.6.7.8',
-							'DEST'     => '1.2.3.4',
-							'pri'      => '2',
-							'proto'    => 'UDP',
-							'dst_port' => '4',
-							'src_port' => '26163',
-						},
-						undefed => [ 'HOST', 'SUBNET', 'IP4', 'IP6', 'ADDR', 'DNS' ],
-					},
-					found_3 => {
-						line =>
-							'03/26/2023-19:30:50  [**] [1:0123456:123] Rule Description Goes Here [**] [Classification: '
-							. $class
-							. '] [Priority: 2] {UDP} 5.6.7.8:26163 -> 1.2.3.4:4',
-						found => 1,
-						data  => {
-							'group'    => '1',
-							'rule'     => '0123456',
-							'rev'      => '123',
-							'SRC'      => '5.6.7.8',
-							'DEST'     => '1.2.3.4',
-							'pri'      => '2',
-							'proto'    => 'UDP',
-							'dst_port' => '4',
-							'src_port' => '26163',
-						},
-						undefed => [ 'HOST', 'SUBNET', 'IP4', 'IP6', 'ADDR', 'DNS' ],
-					},
-					notFound_1 => {
-						line =>
-							'03/26/2023-19:30:50.356934  [**] [1:0123456:123] Rule Description Goes Here [**] [Classification: '
-							. reverse($class)
-							. '] [Priority: 2] {UDP} 5.6.7.8:26163 -> 1.2.3.4:4',
-						found   => 0,
-						data    => {},
-						undefed => [
-							'HOST',  'SUBNET',   'IP4',  'IP6', 'ADDR', 'DNS',
-							'DEST',  'SRC',      'rule', 'rev', 'pri',  'group',
-							'proto', 'dst_port', 'src_port'
-						],
-					},
-				}
-			}
-		);
-
-		my $name = 'fastlog_' . $snmp_name;
-		$name =~ s/\ /_/g;
-		write_file( $dir . '/' . $name . '.yaml', $yaml );
-	} ## end foreach my $class ( sort(@keys) )
-
-	return 1;
-} ## end sub generate_baphomet_yamls
-
 =head2 get_short_class
 
 Get SNMP short class name for a class.
@@ -973,6 +824,7 @@ sub get_short_class {
 
 	return ('unknownC');
 } ## end sub get_short_class
+
 
 =head2 get_short_class_snmp
 
@@ -998,6 +850,7 @@ sub get_short_class_snmp {
 	return ('unknownC');
 } ## end sub get_short_class_snmp
 
+
 =head2 get_short_class_snmp_list
 
 Gets a list of short SNMP class names.
@@ -1020,6 +873,7 @@ sub get_short_class_snmp_list {
 
 	return $snmp_classes;
 } ## end sub get_short_class_snmp_list
+
 
 =head2 search
 
@@ -1169,11 +1023,11 @@ sub search {
 		}
 	}
 
-	my $table = $self->{suricata};
+	my $table = 'suricata_alerts';
 	if ( $opts{table} eq 'sagan' ) {
-		$table = $self->{sagan};
+		$table = 'sagan_alerts';
 	} elsif ( $opts{table} eq 'cape' ) {
-		$table = $self->{cape};
+		$table = 'cape_alerts';
 	}
 
 	#
@@ -1381,6 +1235,7 @@ sub search {
 
 	return $found;
 } ## end sub search
+
 
 =head1 AUTHOR
 

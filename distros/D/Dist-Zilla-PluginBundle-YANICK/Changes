@@ -1,5 +1,16 @@
 Revision history for Dist-Zilla-PluginBundle-YANICK
 
+0.32.2 2026-03-18
+ [API CHANGES]
+ [BUG FIXES]
+ - add dependencies to the dist.ini (GH#7, Grinzz)
+
+ [DOCUMENTATION]
+ [ENHANCEMENTS]
+ [NEW FEATURES]
+ [STATISTICS]
+ - code churn: 3 files changed, 18 insertions(+), 3 deletions(-)
+
 0.32.1 2025-08-30
  [DOCUMENTATION]
  - add a SECURITY.md policy.

@@ -25,4 +25,3 @@ ok( $r->root->[0]->data, "r" );
 $r = Regexp::Parser->new('[[:alpha:]]');
 is($r->visual(), '[[:alpha:]]', "[[:alpha:]]");
 
-exit;

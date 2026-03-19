@@ -39,6 +39,7 @@ my %WriteMakefileArgs = (
     "Feature::Compat::Try" => 0,
     "File::ShareDir" => 0,
     "Getopt::Long::Descriptive" => 0,
+    "JSON::PP" => "4.11",
     "List::Util" => "1.55",
     "MIME::Base64" => 0,
     "Math::BigFloat" => 0,
@@ -94,7 +95,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "0.633",
+  "VERSION" => "0.634",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -114,6 +115,7 @@ my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "File::Spec" => 0,
   "Getopt::Long::Descriptive" => 0,
+  "JSON::PP" => "4.11",
   "List::Util" => "1.55",
   "MIME::Base64" => 0,
   "Math::BigFloat" => 0,

@@ -1423,15 +1423,14 @@ sub dumpMatrices
   my @model = $mm->retrieve(0,16);
   glGetDoublev_c(GL_PROJECTION_MATRIX,$pm->ptr());
   my @projection = $pm->retrieve(0,16);
-  glGetDoublev_c(GL_PROJECTION_MATRIX,$tm->ptr());
+  glGetDoublev_c(GL_TEXTURE_MATRIX,$tm->ptr());
   my @texture = $tm->retrieve(0,16);
-  glGetDoublev_c(GL_PROJECTION_MATRIX,$cm->ptr());
-  my @colours = $cm->retrieve(0,16);
-  for (['Model',\@model], ['Projection',\@projection], ['Texture',\@texture], ['Colour',\@colours]) {
-    printf "%-19s$_->[1][0], $_->[1][1], $_->[1][2], $_->[1][3]\n", "$_->[0] Matrix:";
-    print "                   $_->[1][4], $_->[1][5], $_->[1][6], $_->[1][7]\n";
-    print "                   $_->[1][8], $_->[1][9], $_->[1][10], $_->[1][11]\n";
-    print "                   $_->[1][12], $_->[1][13], $_->[1][14], $_->[1][15]\n";
+  for (['Model',\@model], ['Projection',\@projection], ['Texture',\@texture]) {
+    my @r = @{ $_->[1] };
+    printf "%-19s$r[0], $r[4], $r[8], $r[12]\n", "$_->[0] Matrix:";
+    print "                   $r[1], $r[5], $r[9], $r[13]\n";
+    print "                   $r[2], $r[6], $r[10], $r[14]\n";
+    print "                   $r[3], $r[7], $r[11], $r[15]\n";
   }
   glGetIntegerv_c(GL_VIEWPORT,$vp->ptr());
   my @viewport = $vp->retrieve(0,4);

@@ -2,7 +2,7 @@ package Bored;
 
 use 5.008003;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base 'Import::Export';
 
@@ -14,24 +14,28 @@ sub new {
 	bless {}, $_[0];
 }
 
+sub topdown {
+	return 'bottom up';
+}
+
 sub bored_one {
 	return 1;
+}
+
+sub seclusion {
+	return 'bondage';
 }
 
 sub pointless {
 	return 'leadership';
 }
 
-sub tortured {
-	return 'souls';
-}
-
 sub waiting {
 	return 'patiently';
 }
 
-sub topdown {
-	return 'bottom up';
+sub tortured {
+	return 'souls';
 }
 
 1;
@@ -44,7 +48,7 @@ Bored - news!
 
 =head1 VERSION
 
-Version 0.04
+Version 0.06
 
 =cut
 
@@ -59,6 +63,10 @@ Version 0.04
     $you->waiting();
     $you->tortured();
     ...
+
+Lets dance
+
+! < > < > > < < > > > < < > > > < < < < < < <
 
 =head1 AUTHOR
 

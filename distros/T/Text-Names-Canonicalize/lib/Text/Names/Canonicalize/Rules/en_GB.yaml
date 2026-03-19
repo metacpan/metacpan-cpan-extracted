@@ -1,0 +1,31 @@
+---
+# English (United Kingdom) name canonicalization rules
+#
+# UK-specific overrides on top of base Western naming conventions.
+#
+# Notes:
+#   - UK names rarely use particles (unlike French, Dutch, German).
+#   - Hyphenated given names and surnames are common and should be preserved.
+#   - Titles such as "Sir", "Dame", "Lord", "Lady" are culturally significant
+#     and must be stripped before canonicalization.
+#   - Suffixes are uncommon but do appear (e.g., "III", "Jr" in some families).
+
+default:
+
+  include: base
+
+  # UK titles not present in base.
+  strip_titles:
+    - mr
+    - mrs
+    - miss
+    - ms
+    - dr
+    - prof
+    - sir
+    - dame
+    - lord
+    - lady
+
+  # UK has no surname particles.
+  particles: []

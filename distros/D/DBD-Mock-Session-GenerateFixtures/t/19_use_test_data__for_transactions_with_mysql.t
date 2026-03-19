@@ -58,7 +58,7 @@ subtest 'upsert use mock data' => sub {
     my $error = undef;
     try {
         my $sth_2 = $obj->get_dbh()->prepare($failed_sql_user_login_history);
-        $r_3 = $sth_2->execute('aa') or die $obj->get_dbh()->err();
+        $r_3 = $sth_2->execute(1) or die $obj->get_dbh()->err();
     }
     catch {
         $ok    = 0;

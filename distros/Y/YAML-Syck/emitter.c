@@ -80,7 +80,8 @@ syck_base64dec( char *s, long len, long *out_len )
         }
     }
     while (s < send) {
-        while (s[0] == '\r' || s[0] == '\n') { s++; }
+        while (s < send && (s[0] == '\r' || s[0] == '\n')) { s++; }
+        if (s >= send) break;
         if ((a = b64_xtable[(int)s[0]]) == -1) break;
         if ((b = b64_xtable[(int)s[1]]) == -1) break;
         if ((c = b64_xtable[(int)s[2]]) == -1) break;
@@ -109,7 +110,7 @@ syck_base64dec( char *s, long len, long *out_len )
  * Allocate an emitter
  */
 SyckEmitter *
-syck_new_emitter()
+syck_new_emitter(void)
 {
     SyckEmitter *e;
     e = S_ALLOC( SyckEmitter );
@@ -139,14 +140,15 @@ syck_new_emitter()
     e->lvl_capa = ALLOC_CT;
     e->levels = S_ALLOC_N( SyckLevel, e->lvl_capa ); 
     syck_emitter_reset_levels( e );
+    e->json_mode = 0;
     e->bonus = NULL;
     return e;
 }
 
-int
-syck_st_free_anchors( char *key, char *name, char *arg )
+enum st_retval
+syck_st_free_anchors( st_data_t key, st_data_t name, st_data_t arg )
 {
-    S_FREE( name );
+    free( (void *)name );
     return ST_CONTINUE;
 }
 
@@ -506,6 +508,14 @@ void syck_emit_indent( SyckEmitter *e )
     int i;
     SyckLevel *lvl = syck_emitter_current_level( e );
     if ( e->bufpos == 0 && ( e->marker - e->buffer ) == 0 ) return;
+
+    /* Trim trailing spaces before emitting the newline to avoid
+     * trailing whitespace on lines like "--- " or "&anchor " when
+     * the content continues on the next line (GitHub #38). */
+    while ( e->marker > e->buffer && *(e->marker - 1) == ' ' ) {
+        e->marker--;
+    }
+
     if ( lvl->spaces >= 0 ) {
         char *spcs = S_ALLOC_N( char, lvl->spaces + 2 );
 
@@ -589,16 +599,14 @@ syck_scan_scalar( int req_width, char *cursor, long len )
         flags |= SCAN_WHITEEDGE;
     }
 
-    /* opening doc sep */
-    if ( len >= 3 && strncmp( cursor, "---", 3 ) == 0 )
+    /* opening doc sep or doc end */
+    if ( len >= 3 && ( strncmp( cursor, "---", 3 ) == 0 || strncmp( cursor, "...", 3 ) == 0 ) )
         flags |= SCAN_DOCSEP;
 
     /* scan string */
     for ( i = 0; i < len; i++ ) {
 
-        if ( ! ( (unsigned char)cursor[i] == 0x9 ||
-                 (unsigned char)cursor[i] == 0xA ||
-                 (unsigned char)cursor[i] == 0xD ||
+        if ( ! ( (unsigned char)cursor[i] == 0xA ||
                ( (unsigned char)cursor[i] >= 0x20 &&
                  (unsigned char)cursor[i] <= 0x7E ) ||
                  (unsigned char)cursor[i] >= 0x80 )
@@ -607,7 +615,7 @@ syck_scan_scalar( int req_width, char *cursor, long len )
         }
         else if ( cursor[i] == '\n' ) {
             flags |= SCAN_NEWLINE;
-            if ( len - i >= 3 && strncmp( &cursor[i+1], "---", 3 ) == 0 )
+            if ( len - i >= 3 && ( strncmp( &cursor[i+1], "---", 3 ) == 0 || strncmp( &cursor[i+1], "...", 3 ) == 0 ) )
                 flags |= SCAN_DOCSEP;
             if ( cursor[i+1] == ' ' || cursor[i+1] == '\t' ) 
                 flags |= SCAN_INDENTED;
@@ -675,11 +683,19 @@ void syck_emit_scalar( SyckEmitter *e, char *tag, enum scalar_style force_style,
     scan = syck_scan_scalar( force_width, str, len );
     implicit = syck_match_implicit( str, len );
 
-    /* quote strings which default to implicits */
+    /* quote strings which default to implicits so they roundtrip correctly
+     * when ImplicitTyping is enabled.  Besides bool and null, this covers
+     * hex (0x1A), octal (010), base-60 (1:30), and special float values
+     * (.inf, .nan) which all transform on load. */
     if (
             (
-                (strncmp( implicit, "bool", 4 ) == 0) || 
-                (strncmp( implicit, "null", 4 ) == 0)
+                (strncmp( implicit, "bool", 4 ) == 0) ||
+                (strncmp( implicit, "null", 4 ) == 0) ||
+                (strncmp( implicit, "int#", 4 ) == 0) ||
+                (strcmp( implicit, "float#inf" ) == 0) ||
+                (strcmp( implicit, "float#neginf" ) == 0) ||
+                (strcmp( implicit, "float#nan" ) == 0) ||
+                (strcmp( implicit, "float#base60" ) == 0)
             )
             &&
             (force_style != scalar_plain)
@@ -715,7 +731,8 @@ void syck_emit_scalar( SyckEmitter *e, char *tag, enum scalar_style force_style,
 
     /* Determine block style */
     if ( scan & SCAN_NONPRINT ) {
-        force_style = scalar_2quote;
+        if ( force_style != scalar_2quote_1 )
+            force_style = scalar_2quote;
     } else if ( force_style != scalar_1quote && force_style != scalar_2quote_1 && ( scan & SCAN_WHITEEDGE ) ) {
         force_style = scalar_2quote;
     } else if ( force_style != scalar_fold && ( scan & SCAN_INDENTED ) ) {
@@ -728,7 +745,7 @@ void syck_emit_scalar( SyckEmitter *e, char *tag, enum scalar_style force_style,
         force_style = scalar_2quote;
     /* } else if ( force_style == scalar_fold && ( ! ( scan & SCAN_WIDE ) ) ) {
         force_style = scalar_literal; */
-    } else if ( force_style == scalar_plain && ( scan & SCAN_INDIC_S || scan & SCAN_INDIC_C ) ) {
+    } else if ( force_style == scalar_plain && ( scan & SCAN_INDIC_S || scan & SCAN_INDIC_C || scan & SCAN_DOCSEP ) ) {
         if ( scan & SCAN_NEWLINE ) {
             force_style = favor_style;
         } else {
@@ -816,23 +833,35 @@ syck_emitter_escape( SyckEmitter *e, unsigned char *src, long len )
     for( i = 0; i < len; i++ )
     {
         /* XXX - scalar_fold overloaded to mean utf8 from Audrey Tang */
-        if( (e->style == scalar_fold)
-                ? ((src[i] < 0x20) && (0 < src[i]))
-                : ((src[i] < 0x20) || (0x7E < src[i])) )
+        if( e->json_mode
+                ? (src[i] < 0x20)
+                : (e->style == scalar_fold)
+                    ? ((src[i] < 0x20) && (0 < src[i]))
+                    : ((src[i] < 0x20) || (0x7E < src[i])) )
         {
-            syck_emitter_write( e, "\\", 1 );
-            if( '\0' == src[i] )
-                syck_emitter_write( e, "0", 1 );
+            if( e->json_mode )
+            {
+                /* JSON only allows \uXXXX for arbitrary characters */
+                char ubuf[7];
+                sprintf( ubuf, "\\u%04x", src[i] );
+                syck_emitter_write( e, ubuf, 6 );
+            }
             else
             {
-                syck_emitter_write( e, "x", 1 );
-                syck_emitter_write( e, (char *)hex_table + ((src[i] & 0xF0) >> 4), 1 );
-                syck_emitter_write( e, (char *)hex_table + (src[i] & 0x0F), 1 );
+                syck_emitter_write( e, "\\", 1 );
+                if( '\0' == src[i] )
+                    syck_emitter_write( e, "0", 1 );
+                else
+                {
+                    syck_emitter_write( e, "x", 1 );
+                    syck_emitter_write( e, (char *)hex_table + ((src[i] & 0xF0) >> 4), 1 );
+                    syck_emitter_write( e, (char *)hex_table + (src[i] & 0x0F), 1 );
+                }
             }
         }
         else
         {
-            syck_emitter_write( e, src + i, 1 );
+            syck_emitter_write( e, (const char *)src + i, 1 );
             if( '\\' == src[i] )
                 syck_emitter_write( e, "\\", 1 );
         }
@@ -893,15 +922,29 @@ void syck_emit_2quoted_1( SyckEmitter *e, int width, char *str, long len )
             /* Escape sequences allowed within double quotes. */
             case '\'': syck_emitter_write( e, "\\\'", 2 ); break;
             case '\\': syck_emitter_write( e, "\\\\", 2 ); break;
-            case '\0': syck_emitter_write( e, "\\0",  2 ); break;
-            case '\a': syck_emitter_write( e, "\\a",  2 ); break;
             case '\b': syck_emitter_write( e, "\\b",  2 ); break;
             case '\f': syck_emitter_write( e, "\\f",  2 ); break;
             case '\r': syck_emitter_write( e, "\\r",  2 ); break;
             case '\t': syck_emitter_write( e, "\\t",  2 ); break;
-            case '\v': syck_emitter_write( e, "\\v",  2 ); break;
-            case 0x1b: syck_emitter_write( e, "\\e",  2 ); break;
             case '\n': syck_emitter_write( e, "\\n",  2 ); break;
+
+            /* YAML-only escapes: use \uXXXX in JSON mode */
+            case '\0':
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\0",  2 ); }
+                break;
+            case '\a':
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\a",  2 ); }
+                break;
+            case '\v':
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\v",  2 ); }
+                break;
+            case 0x1b:
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\e",  2 ); }
+                break;
 
             /* XXX - Disabled by Audrey Tang for YAML.pm compat
             case '\n':
@@ -956,15 +999,29 @@ void syck_emit_2quoted( SyckEmitter *e, int width, char *str, long len )
             /* Escape sequences allowed within double quotes. */
             case '"':  syck_emitter_write( e, "\\\"", 2 ); break;
             case '\\': syck_emitter_write( e, "\\\\", 2 ); break;
-            case '\0': syck_emitter_write( e, "\\0",  2 ); break;
-            case '\a': syck_emitter_write( e, "\\a",  2 ); break;
             case '\b': syck_emitter_write( e, "\\b",  2 ); break;
             case '\f': syck_emitter_write( e, "\\f",  2 ); break;
             case '\r': syck_emitter_write( e, "\\r",  2 ); break;
             case '\t': syck_emitter_write( e, "\\t",  2 ); break;
-            case '\v': syck_emitter_write( e, "\\v",  2 ); break;
-            case 0x1b: syck_emitter_write( e, "\\e",  2 ); break;
             case '\n': syck_emitter_write( e, "\\n",  2 ); break;
+
+            /* YAML-only escapes: use \uXXXX in JSON mode */
+            case '\0':
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\0",  2 ); }
+                break;
+            case '\a':
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\a",  2 ); }
+                break;
+            case '\v':
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\v",  2 ); }
+                break;
+            case 0x1b:
+                if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
+                else                { syck_emitter_write( e, "\\e",  2 ); }
+                break;
 
             /* XXX - Disabled by Audrey Tang for YAML.pm compat
             case '\n':
@@ -1257,7 +1314,10 @@ void syck_emit_end( SyckEmitter *e )
     {
         case syck_lvl_seq:
             if ( lvl->ncount == 0 ) {
-                syck_emitter_write( e, "[]\n", 3 );
+                syck_emitter_write( e, "[]", 2 );
+                if ( parent->status == syck_lvl_mapx ) {
+                    syck_emitter_write( e, "\n", 1 );
+                }
             } else if ( parent->status == syck_lvl_mapx ) {
                 syck_emitter_write( e, "\n", 1 );
             }
@@ -1272,7 +1332,10 @@ void syck_emit_end( SyckEmitter *e )
 
         case syck_lvl_map:
             if ( lvl->ncount == 0 ) {
-                syck_emitter_write( e, "{}\n", 3 );
+                syck_emitter_write( e, "{}", 2 );
+                if ( parent->status == syck_lvl_mapx ) {
+                    syck_emitter_write( e, "\n", 1 );
+                }
             } else if ( lvl->ncount % 2 == 1 ) {
                 syck_emitter_write( e, ":", 1 );
             } else if ( parent->status == syck_lvl_mapx ) {

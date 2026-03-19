@@ -1,0 +1,54 @@
+[
+  {
+    "Name": "bridge",
+    "Id": "f2de39df4171b0dc801e8002f6c14cc3c20fd116b2f45e85f06f448d97b48f2b",
+    "Created": "2025-01-10T08:00:00.000000000Z",
+    "Scope": "local",
+    "Driver": "bridge",
+    "EnableIPv6": false,
+    "IPAM": {
+      "Driver": "default",
+      "Options": null,
+      "Config": [
+        {
+          "Subnet": "172.17.0.0/16",
+          "Gateway": "172.17.0.1"
+        }
+      ]
+    },
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": false,
+    "Options": {
+      "com.docker.network.bridge.default_bridge": "true",
+      "com.docker.network.bridge.enable_icc": "true",
+      "com.docker.network.bridge.name": "docker0"
+    },
+    "Labels": {}
+  },
+  {
+    "Name": "my-network",
+    "Id": "a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890a1b2c3d4e5f67890",
+    "Created": "2025-01-12T10:00:00.000000000Z",
+    "Scope": "local",
+    "Driver": "bridge",
+    "EnableIPv6": false,
+    "IPAM": {
+      "Driver": "default",
+      "Options": {},
+      "Config": [
+        {
+          "Subnet": "172.18.0.0/16",
+          "Gateway": "172.18.0.1"
+        }
+      ]
+    },
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": false,
+    "Options": {},
+    "Labels": {
+      "project": "test"
+    }
+  }
+]

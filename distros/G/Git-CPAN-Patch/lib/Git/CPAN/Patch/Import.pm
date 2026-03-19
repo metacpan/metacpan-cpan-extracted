@@ -1,6 +1,6 @@
 package Git::CPAN::Patch::Import;
 our $AUTHORITY = 'cpan:YANICK';
-$Git::CPAN::Patch::Import::VERSION = '2.5.0';
+$Git::CPAN::Patch::Import::VERSION = '2.5.2';
 use 5.10.0;
 
 use strict;
@@ -234,7 +234,7 @@ END
         if( $repo->run( "tag", "-l" => $tag ) ) {
             say "Tag $tag already exists, overwriting";
         }
-        print $repo->run( "tag", "-f" => $tag, $commit );
+        print $repo->run( "tag", "-f" => $tag, '--no-sign', $commit );
         say "created tag '$tag' ($commit)";
     }
 }
@@ -516,7 +516,7 @@ END
 
         print $repo->run('update-ref', '-m' => "import $dist", 'refs/remotes/cpan/master', $commit );
 
-        print $repo->run( tag => $version, $commit );
+        print $repo->run( tag => $version, '--no-sign', $commit );
 
         say "created tag '$version' ($commit)";
     }
@@ -535,7 +535,7 @@ Git::CPAN::Patch::Import
 
 =head1 VERSION
 
-version 2.5.0
+version 2.5.2
 
 =head1 DESCRIPTION
 
@@ -552,7 +552,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2026, 2014, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

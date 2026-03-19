@@ -8,10 +8,10 @@ sub run {
   my @argv = @_ ? @_ : @ARGV;
 
   unless ( eval { getopts( '-a:b', my %opts, @argv ) } ) {
-    return ( warn( $@ ), 255 ) if $@;
+    $@ and warn( $@ ), return 255;
     return EXIT_USAGE
   }
   EXIT_SUCCESS
 }
 
-exit( __PACKAGE__->run )
+exit __PACKAGE__->run

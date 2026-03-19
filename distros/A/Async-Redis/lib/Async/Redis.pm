@@ -4,12 +4,13 @@ use strict;
 use warnings;
 use 5.018;
 
-our $VERSION = '0.001004';
+our $VERSION = '0.001006';
 
 use Future;
 use Future::AsyncAwait;
 use Future::IO 0.19;
-use Socket qw(pack_sockaddr_in inet_aton AF_INET SOCK_STREAM);
+use Socket qw(pack_sockaddr_in pack_sockaddr_un inet_aton AF_INET AF_UNIX SOCK_STREAM);
+use IO::Handle ();
 use IO::Socket::INET;
 use Time::HiRes ();
 
@@ -91,8 +92,9 @@ sub new {
     }
 
     my $self = bless {
-        host     => $args{host} // 'localhost',
-        port     => $args{port} // 6379,
+        path     => $args{path},
+        host     => $args{path} ? undef : ($args{host} // 'localhost'),
+        port     => $args{path} ? undef : ($args{port} // 6379),
         socket   => undef,
         parser   => undef,
         connected => 0,
@@ -186,24 +188,37 @@ async sub connect {
 
     return $self if $self->{connected};
 
-    # Create socket
-    my $socket = IO::Socket::INET->new(
-        Proto    => 'tcp',
-        Blocking => 0,
-    ) or die Async::Redis::Error::Connection->new(
-        message => "Cannot create socket: $!",
-        host    => $self->{host},
-        port    => $self->{port},
-    );
+    # Create socket — AF_UNIX for path, AF_INET for host:port
+    my ($socket, $sockaddr);
 
-    # Build sockaddr
-    my $addr = inet_aton($self->{host})
-        or die Async::Redis::Error::Connection->new(
-            message => "Cannot resolve host: $self->{host}",
+    if ($self->{path}) {
+        socket($socket, AF_UNIX, SOCK_STREAM, 0)
+            or die Async::Redis::Error::Connection->new(
+                message => "Cannot create unix socket: $!",
+                host    => $self->{path},
+                port    => 0,
+            );
+        IO::Handle::blocking($socket, 0);
+        $sockaddr = pack_sockaddr_un($self->{path});
+    } else {
+        $socket = IO::Socket::INET->new(
+            Proto    => 'tcp',
+            Blocking => 0,
+        ) or die Async::Redis::Error::Connection->new(
+            message => "Cannot create socket: $!",
             host    => $self->{host},
             port    => $self->{port},
         );
-    my $sockaddr = pack_sockaddr_in($self->{port}, $addr);
+
+        # Build sockaddr
+        my $addr = inet_aton($self->{host})
+            or die Async::Redis::Error::Connection->new(
+                message => "Cannot resolve host: $self->{host}",
+                host    => $self->{host},
+                port    => $self->{port},
+            );
+        $sockaddr = pack_sockaddr_in($self->{port}, $addr);
+    }
 
     # Connect with timeout using Future->wait_any
     my $connect_f = Future::IO->connect($socket, $sockaddr);
@@ -237,8 +252,8 @@ async sub connect {
         }
         die Async::Redis::Error::Connection->new(
             message => "$error",
-            host    => $self->{host},
-            port    => $self->{port},
+            host    => $self->{path} // $self->{host},
+            port    => $self->{port} // 0,
         );
     }
 
@@ -282,7 +297,8 @@ async sub connect {
     # Telemetry: record connection
     if ($self->{_telemetry}) {
         $self->{_telemetry}->record_connection(1);
-        $self->{_telemetry}->log_event('connected', "$self->{host}:$self->{port}");
+        $self->{_telemetry}->log_event('connected',
+            $self->{path} // "$self->{host}:$self->{port}");
     }
 
     return $self;
@@ -748,6 +764,42 @@ async sub _reconnect {
     }
 }
 
+# Reconnect and replay pubsub subscriptions
+async sub _reconnect_pubsub {
+    my ($self) = @_;
+
+    my $sub = $self->{_subscription}
+        or die Async::Redis::Error::Disconnected->new(
+            message => "No subscription to replay",
+        );
+
+    my @replay = $sub->get_replay_commands;
+
+    # Ensure connection state is fully cleaned up before reconnecting.
+    # _reset_connection may have already been called by _read_response,
+    # but if the socket was closed externally, we need to clean up
+    # stale IO watchers and state here. It is safe to call twice —
+    # the on_disconnect callback is guarded by $was_connected.
+    $self->_reset_connection('pubsub_reconnect');
+
+    await $self->_reconnect;
+
+    # Replay all subscription commands
+    for my $cmd (@replay) {
+        my ($command, @args) = @$cmd;
+
+        await $self->_send_command($command, @args);
+
+        # Read and discard subscription confirmations
+        for my $arg (@args) {
+            await $self->_read_pubsub_frame();
+        }
+    }
+
+    # Re-enter pubsub mode
+    $self->{in_pubsub} = 1;
+}
+
 # Execute a Redis command
 async sub command {
     my ($self, $cmd, @args) = @_;
@@ -962,6 +1014,7 @@ sub _reset_connection {
     $self->{connected} = 0;
     $self->{parser} = undef;
     $self->{_reading_responses} = 0;
+    $self->{in_pubsub} = 0;
 
     if ($was_connected && $self->{on_disconnect}) {
         $self->{on_disconnect}->($self, $reason);
@@ -983,7 +1036,7 @@ sub _decode_response {
     }
     # Error (-)
     elsif ($type eq '-') {
-        die "Redis error: $data";
+        die Async::Redis::Error::Redis->from_message($data);
     }
     # Integer (:)
     elsif ($type eq ':') {
@@ -1566,6 +1619,10 @@ async sub ssubscribe {
 async sub _read_pubsub_frame {
     my ($self) = @_;
 
+    die Async::Redis::Error::Disconnected->new(
+        message => "Not connected",
+    ) unless $self->{connected};
+
     my $msg = await $self->_read_response();
     return $self->_decode_response($msg);
 }
@@ -1638,9 +1695,8 @@ async sub _execute_pipeline {
                 $result = $self->_decode_response($msg);
             };
             if ($@) {
-                # Capture the error as a string in the results
+                # Capture the error object inline in the results
                 $result = $@;
-                chomp $result if defined $result;
             }
             push @responses, $result;
         }
@@ -1678,9 +1734,10 @@ Async::Redis - Async Redis client using Future::IO
     use Async::Redis;
     use Future::AsyncAwait;
 
-    # For standalone scripts: configure Future::IO first
-    use Future::IO;
-    Future::IO->load_best_impl;  # Selects UV, IO::Async, etc.
+    # Future::IO 0.23+ has a built-in poll-based impl that works
+    # out of the box. For IO::Async or UV, require the impl directly:
+    # require Future::IO::Impl::IOAsync;  # if using IO::Async
+    # require Future::IO::Impl::UV;       # if using UV
 
     my $redis = Async::Redis->new(
         host => 'localhost',
@@ -1710,8 +1767,8 @@ Async::Redis - Async Redis client using Future::IO
 
 B<Important:> If you're embedding Async::Redis in a larger application
 (web framework, existing event loop, etc.), see L</EVENT LOOP CONFIGURATION>
-for how to properly configure Future::IO. Libraries should never call
-C<load_best_impl> - only your application's entry point should.
+for how to properly configure Future::IO. Libraries should never configure
+the Future::IO backend - only your application's entry point should.
 
 =head1 DESCRIPTION
 
@@ -1733,6 +1790,11 @@ Key features:
 =item * Pipelining and auto-pipelining
 
 =item * PubSub with automatic subscription replay on reconnect
+
+When a connection drops during pub/sub mode and C<reconnect> is enabled,
+all subscriptions are automatically re-established. Use
+C<< $subscription->on_reconnect(sub { ... }) >> to be notified when this
+happens (e.g., to re-poll state that may have changed during the outage).
 
 =item * Transaction support (MULTI/EXEC/WATCH)
 
@@ -2227,86 +2289,51 @@ compatible with IO::Async, UV, AnyEvent, and other event loops. However,
 B<Async::Redis does not choose which event loop to use> - that's the
 application's responsibility.
 
-=head2 The Golden Rule
+=head2 Default (No Configuration Needed)
 
-B<Only executable scripts should configure Future::IO.> Library modules
-(C<.pm> files) should never call C<load_best_impl> or C<load_impl> because
-they don't know what event loop the application wants to use.
-
-When you use Async::Redis inside a larger application, you are a "guest"
-in that application's event loop. The application (the "host") decides
-which Future::IO implementation to use, and all libraries must cooperate.
-
-=head2 For Standalone Scripts
-
-If you're writing a standalone script that uses Async::Redis directly,
-configure Future::IO at the top of your script:
+B<Future::IO 0.23+> includes a built-in poll-based implementation that works
+out of the box. For standalone scripts, you don't need to configure anything:
 
     #!/usr/bin/env perl
     use strict;
     use warnings;
-    use Future::IO;
-    Future::IO->load_best_impl;  # Auto-select best available
-
     use Async::Redis;
-    my $redis = Async::Redis->new(host => 'localhost');
-    # ...
 
-C<load_best_impl> will select the best available backend, typically
-preferring UV if installed, then IO::Async, then others.
+    my $redis = Async::Redis->new(host => 'localhost');
+    # Just works - Future::IO uses its built-in IO::Poll backend
+
+=head2 The Golden Rule
+
+B<Only executable scripts should configure Future::IO.> Library modules
+(C<.pm> files) should never configure the backend because they don't know
+what event loop the application wants to use.
 
 =head2 For IO::Async Applications
 
-If your application uses IO::Async for its event loop:
+If your application already uses IO::Async for its event loop, load the
+implementation directly:
 
     use IO::Async::Loop;
-    use Future::IO;
-    Future::IO->load_impl('IOAsync');  # Explicitly use IO::Async
+    require Future::IO::Impl::IOAsync;
 
     my $loop = IO::Async::Loop->new;
 
     use Async::Redis;
     my $redis = Async::Redis->new(host => 'localhost');
 
+B<Note:> Use C<require> rather than C<Future::IO-E<gt>load_impl('IOAsync')>
+for compatibility with Future::IO 0.22+ which gates C<load_impl> on the
+newer C<poll> API.
+
 =head2 For UV Applications
 
 If your application uses UV (libuv) for its event loop:
 
     use UV;
-    use Future::IO;
-    Future::IO->load_impl('UV');  # Explicitly use UV
+    require Future::IO::Impl::UV;
 
     use Async::Redis;
     my $redis = Async::Redis->new(host => 'localhost');
-
-=head2 When Using Multiple Async Libraries
-
-When combining Async::Redis with other Future::IO-based libraries (like
-web frameworks, database clients, etc.), all libraries will share the
-same Future::IO backend. This is by design - they're all cooperating
-within the same event loop.
-
-The key is that the B<application> configures Future::IO B<once>, before
-loading any libraries that use it:
-
-    # Application startup
-    use Future::IO;
-    Future::IO->load_impl('IOAsync');  # Application's choice
-
-    # Now load libraries - they all use the configured backend
-    use Async::Redis;
-    use Some::Other::Async::Library;
-    use My::Web::Framework;
-
-=head2 What Happens Without Configuration
-
-If nothing explicitly configures Future::IO before the first async
-operation, Future::IO will auto-select an implementation. This can lead
-to unexpected behavior if different parts of your application assume
-different backends.
-
-To avoid surprises, always configure Future::IO explicitly in your
-application's entry point.
 
 =head2 Checking the Current Implementation
 

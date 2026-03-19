@@ -48,7 +48,7 @@ requires:
 resources:
   homepage: https://github.com/rubykat/File-Sticker
   repository: https://github.com/rubykat/File-Sticker.git
-version: '4.301'
+version: '4.401'
 x_generated_by_perl: v5.40.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

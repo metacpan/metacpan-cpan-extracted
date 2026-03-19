@@ -180,7 +180,8 @@ until ($done) {
     @run_args   = ();
     _pump(1) until defined $run_source || $done;
     last if $done;
-    _do_run($run_flags, $run_source, @run_args);
+    eval { _do_run($run_flags, $run_source, @run_args) };
+    if ($@ && !$done) { my $err = $@; eval { _send(MSG_ERROR, S_CTRL, $err) } }
 }
 _send(MSG_BYE, S_CTRL);
 
@@ -224,6 +225,14 @@ sub _make_tmpfile {
 # -- Per-run entry point -------------------------------------------------------
 sub _do_run {
     my ($flags, $source, @args) = @_;
+
+    # Check linux tmpfile strategy availability before forking so the error
+    # propagates cleanly via MSG_ERROR instead of becoming a broken exit code.
+    if (($flags & 0x07) == 2) {
+        my $o = eval { Fcntl::O_TMPFILE() };
+        die "tmpfile strategy 'linux' unavailable on this system\n" unless defined $o;
+    }
+
     pipe(my $stdin_r,  my $stdin_w)  or die "pipe stdin: $!\n";
     pipe(my $stdout_r, my $stdout_w) or die "pipe stdout: $!\n";
     pipe(my $stderr_r, my $stderr_w) or die "pipe stderr: $!\n";

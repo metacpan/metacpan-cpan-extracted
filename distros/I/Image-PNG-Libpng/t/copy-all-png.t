@@ -6,7 +6,7 @@ use lib '../blib/lib';
 use lib '../blib/arch';
 use Image::PNG::Libpng qw/read_png_file copy_png image_data_diff/;
 my $dir = "$Bin/../t/libpng";
-my @files = <$dir/*.png>;
+my @files = do { opendir my $dh, $dir or die "opendir $dir: $!"; grep !/^\.{1,2}$/ && /\.png$/, readdir $dh };
 
 # Switch to a true value for debugging. This was originally related to
 # the problems with the files listed in %broken below.
@@ -16,7 +16,6 @@ my $verbose;
 
 # Files beginning with an x are corrupted.
 # http://www.schaik.com/pngsuite/#corrupted
-@files = map {s!$dir/!!;$_;} @files;
 @files = grep !/^x/, @files;
 
 # These files seem to not match the current version of libpng, even

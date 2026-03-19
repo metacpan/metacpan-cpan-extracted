@@ -31,16 +31,40 @@ my $xroot = $x11->root;
 print scalar <STDIN>;
 print scalar <STDIN>;
 
+sub _get_string_property_from_root_window {
+  my $key = shift;
+  my $atom_type = shift;
+  my $prop      = $x11->atom($key);
+  my $prop_type = $x11->atom($atom_type);
+
+  my ($value, $type, $format, $bytes_after)
+      = $x11->GetProperty($xroot, $prop, $prop_type, 0, 1024);
+
+  return $value if $value;
+  return;
+}
+
+sub _get_property_from_root_window {
+  my $key = shift;
+  my $value = _get_string_property_from_root_window($key, 'UTF8_STRING');
+  return $value if defined $value;
+  # Allow xprop values to be set but also allow
+  $value = _get_string_property_from_root_window($key, 'STRING');
+  return unless defined $value;
+
+  my $prop      = $x11->atom($key);
+  my $utf8 = $x11->atom('UTF8_STRING');
+  $x11->ChangeProperty($xroot, $prop, $utf8, 8, 'Replace', $value);
+  $x11->flush;
+  return $value;
+}
+
 # Read lines forever, ignore a comma at the beginning if it exists.
 while (my ($statusline) = (<STDIN> =~ /^,?(.*)/)) {
   # Decode the JSON-encoded line.
   my @blocks = @{decode_json($statusline)};
 
-  my $prop = $x11->atom('_I3_WOD_GROUP');
-  my $utf8 = $x11->atom('UTF8_STRING');
-
-  my ($value, $type, $format, $bytes_after)
-      = $x11->GetProperty($xroot, $prop, $utf8, 0, 1024);
+  my $value = _get_property_from_root_window('_I3_WOD_GROUP');
 
   @blocks = ({
     full_text => $value,
@@ -63,7 +87,7 @@ i3-status - i3 status - plugin on demand
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

@@ -37,6 +37,7 @@ struct emitter_xtra {
       PerlIO* outio;
     } out;
     char* tag;
+    STRLEN tag_len;
     char dump_code;
     bool implicit_binary;
     int ioerror;

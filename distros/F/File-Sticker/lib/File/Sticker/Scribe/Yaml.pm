@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Yaml;
-$File::Sticker::Scribe::Yaml::VERSION = '4.301';
+$File::Sticker::Scribe::Yaml::VERSION = '4.401';
 =head1 NAME
 
 File::Sticker::Scribe::Yaml - read, write and standardize meta-data from YAML file
 
 =head1 VERSION
 
-version 4.301
+version 4.401
 
 =head1 SYNOPSIS
 

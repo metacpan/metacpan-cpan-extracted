@@ -123,7 +123,7 @@ with_mariadb(cb => sub {
         TestMariaDB::connect_args(),
         on_connect => sub {
             eval { $obj->execute(0, "not_array", sub {}) };
-            like($@, qr/ARRAY reference/, 'croak: execute with non-ARRAY params');
+            like($@, qr/invalid statement handle/, 'croak: execute with invalid stmt handle');
             EV::break;
         },
         on_error => sub { diag("Error: $_[0]"); EV::break },

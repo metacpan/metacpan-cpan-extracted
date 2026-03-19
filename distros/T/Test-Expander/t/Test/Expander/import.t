@@ -9,11 +9,15 @@ BEGIN {
   use File::Temp qw( tempdir tempfile );
   use Path::Tiny qw( cwd path );
   use Test2::Tools::Explain;
-  use Test2::V0;
+  use Test2::V1;
+  use Test::Expander::Constants qw(
+    $FMT_INVALID_DIRECTORY $FMT_INVALID_VALUE $FMT_SET_TO $FMT_REQUIRE_DESCRIPTION $FMT_UNKNOWN_OPTION $NOTE $TRUE
+    @TEST2_V0_EXPORT
+  );
   @functions = (
     @{ Const::Fast::EXPORT },
     @{ Test2::Tools::Explain::EXPORT },
-    @{ Test2::V0::EXPORT },
+    @TEST2_V0_EXPORT,
     qw( tempdir tempfile ),
     qw( cwd path ),
     qw( BAIL_OUT dies_ok is_deeply lives_ok new_ok require_ok use_ok ),
@@ -23,15 +27,11 @@ BEGIN {
 
 use Term::ANSIColor           qw( colored );
 use Scalar::Readonly          qw( readonly_off );
-use Test::Builder::Tester     tests => @functions + @variables + ( exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? 12 : 17 );
-# use Test::Builder::Tester     tests => @functions + @variables + 17;
+use Test::Builder::Tester     tests => @functions + @variables + ( exists( $ENV{ HARNESS_PERL_SWITCHES } ) ? 13 : 18 );
 
 use Test::Expander            -target   => 'Test::Expander',
-                              -tempdir  => { CLEANUP => 1 },
-                              -tempfile => { UNLINK  => 1 };
-use Test::Expander::Constants qw(
-  $FMT_INVALID_DIRECTORY $FMT_INVALID_VALUE $FMT_SET_TO $FMT_REQUIRE_DESCRIPTION $FMT_UNKNOWN_OPTION $NOTE
-);
+                              -tempdir  => { CLEANUP => $TRUE },
+                              -tempfile => { UNLINK  => $TRUE };
 
 foreach my $function ( sort @functions ) {
   my $title = "$CLASS->can('$function')";
@@ -72,6 +72,20 @@ readonly_off( $TEST_FILE );
 test_out( "ok 1 - $title" );
 throws_ok { $CLASS->$METHOD( -builtins => { xxx => 'yyy' } ) } qr/$expected/, $title;
 test_test( $title );
+
+$title = "Test2::V1 options '-srand', '-utf8', '-x'";
+readonly_off( $CLASS );
+readonly_off( $METHOD );
+readonly_off( $METHOD_REF );
+readonly_off( $TEMP_DIR );
+readonly_off( $TEMP_FILE );
+readonly_off( $TEST_FILE );
+test_out( "ok 1 - $title" );
+{
+  local $SIG{ __WARN__ } = sub {};
+  is( $CLASS->$METHOD( -srand => { seed => 'my seed' }, '-utf8', '-x' ), undef, $title );
+}
+test_test( title => $title, skip_out => $TRUE );
 
 $title    = "invalid value type of '-lib'";
 $expected = $FMT_INVALID_VALUE =~ s/%s/.+/gr;
@@ -121,9 +135,9 @@ readonly_off( $TEST_FILE );
 test_out( "ok 1 - $title" );
 {
   my $mock_importer = mock 'Importer'  => ( override => [ import_into     => sub {} ] );
-  my $mock_test2    = mock 'Test2::V0' => ( override => [ import          => sub {} ] );
+  my $mock_test2    = mock 'Test2::V1' => ( override => [ import          => sub {} ] );
   my $mock_this     = mock $CLASS      => ( override => [ _export_symbols => sub {} ] );
-  is( $CLASS->$METHOD( -lib => [ 'path( $TEMP_DIR )->child( qw( my_root ) )->stringify' ], -bail => 1 ), undef, $title );
+  is( $CLASS->$METHOD( -lib => [ 'path( $TEMP_DIR )->child( qw( my_root ) )->stringify' ], -bail => $TRUE ), undef, $title );
 }
 test_test( $title );
 
@@ -153,7 +167,7 @@ readonly_off( $TEMP_DIR );
 readonly_off( $TEMP_FILE );
 readonly_off( $TEST_FILE );
 test_out( "ok 1 - $title" );
-throws_ok { $CLASS->$METHOD( -tempdir => 1 ) } qr/$expected/, $title;
+throws_ok { $CLASS->$METHOD( -tempdir => $TRUE ) } qr/$expected/, $title;
 test_test( $title );
 
 $title    = "invalid value of '-tempfile'";
@@ -165,7 +179,7 @@ readonly_off( $TEMP_DIR );
 readonly_off( $TEMP_FILE );
 readonly_off( $TEST_FILE );
 test_out( "ok 1 - $title" );
-throws_ok { $CLASS->$METHOD( -tempfile => 1 ) } qr/$expected/, $title;
+throws_ok { $CLASS->$METHOD( -tempfile => $TRUE ) } qr/$expected/, $title;
 test_test( $title );
 
 $title    = 'unknown option with some value';
@@ -177,7 +191,7 @@ readonly_off( $TEMP_DIR );
 readonly_off( $TEMP_FILE );
 readonly_off( $TEST_FILE );
 test_out( "ok 1 - $title" );
-throws_ok { $CLASS->$METHOD( unknown => 1 ) } qr/$expected/, $title;
+throws_ok { $CLASS->$METHOD( unknown => $TRUE ) } qr/$expected/, $title;
 test_test( $title );
 
 $title    = 'unknown option without value';
@@ -213,7 +227,7 @@ unless ( exists( $ENV{ HARNESS_PERL_SWITCHES } ) ) {        # this fails during 
   );
   {
     my $mock_importer = mock 'Importer'  => ( override => [ import_into => sub {} ] );
-    my $mock_test2    = mock 'Test2::V0' => ( override => [ import      => sub {} ] );
+    my $mock_test2    = mock 'Test2::V1' => ( override => [ import      => sub {} ] );
     is(
       dies {
         $CLASS->$METHOD( -color => { exported => undef, unexported => undef }, -method => 'dummy', -target => undef )
@@ -248,7 +262,7 @@ unless ( exists( $ENV{ HARNESS_PERL_SWITCHES } ) ) {        # this fails during 
   );
   {
     my $mock_importer = mock 'Importer'  => ( override => [ import_into => sub {} ] );
-    my $mock_test2    = mock 'Test2::V0' => ( override => [ import      => sub {} ] );
+    my $mock_test2    = mock 'Test2::V1' => ( override => [ import      => sub {} ] );
     is(
       dies {
         $CLASS->import( -color => { exported => 'green', unexported => 'red' }, -method => undef, -target => undef )
@@ -276,7 +290,7 @@ unless ( exists( $ENV{ HARNESS_PERL_SWITCHES } ) ) {        # this fails during 
   {
     my $mock_PathTiny = mock 'Path::Tiny'     => ( override => [ exists      => sub {} ] );
     my $mock_importer = mock 'Importer'       => ( override => [ import_into => sub {} ] );
-    my $mock_test2    = mock 'Test2::V0'      => ( override => [ import      => sub {} ] );
+    my $mock_test2    = mock 'Test2::V1'      => ( override => [ import      => sub {} ] );
     my $mock_this     = mock 'Test::Expander' => (
       override => [
         _export_rest_symbols => sub {},

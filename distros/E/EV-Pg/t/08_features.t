@@ -493,7 +493,7 @@ SKIP: {
             $pg->exit_pipeline;
             EV::break;
         });
-        $pg->send_flush_request if $pg->can('send_flush_request');
+        $pg->send_flush_request;
     });
 }
 

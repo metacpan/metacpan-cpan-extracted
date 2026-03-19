@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::ControlBlock;
-$Bitcoin::Crypto::Transaction::ControlBlock::VERSION = '4.003';
+$Bitcoin::Crypto::Transaction::ControlBlock::VERSION = '4.004';
 use v5.14;
 use warnings;
 

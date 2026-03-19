@@ -1,0 +1,40 @@
+# Stage 1: Build Skeid Perl deps
+FROM perl:5.38-slim AS skeid
+
+ARG LANGERTHA_SRC=""
+ARG KNARR_SRC=""
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/skeid
+
+COPY . .
+RUN cpanm --notest App::cpm \
+    && if [ -n "$LANGERTHA_SRC" ]; then cpanm --notest "$LANGERTHA_SRC"; fi \
+    && if [ -n "$KNARR_SRC" ]; then cpanm --notest "$KNARR_SRC"; fi \
+    && if [ -f cpanfile.snapshot ]; then SNAP="--snapshot=./cpanfile.snapshot"; else SNAP=""; fi \
+    && cpm install --cpanfile=./cpanfile $SNAP \
+      --global \
+      --resolver metacpan \
+      --without-recommends \
+      --workers=$(nproc) \
+      --show-build-log-on-failure \
+    && rm -rf /root/.perl-cpm/ /tmp/*
+
+# Stage 2: vLLM + Skeid (no ENTRYPOINT — Vast.ai SSH mode handles boot)
+FROM vllm/vllm-openai:latest
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    perl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=skeid /usr/local/lib/perl5 /usr/local/lib/perl5
+COPY --from=skeid /opt/skeid /opt/skeid
+
+COPY examples/vast-start.sh /opt/skeid/vast-start.sh
+RUN chmod +x /opt/skeid/vast-start.sh
+
+EXPOSE 8000 8090

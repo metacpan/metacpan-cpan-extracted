@@ -1,0 +1,233 @@
+#!/usr/bin/env perl
+
+use strict ;
+use warnings ;
+use Graph::Easy ;
+use Graph::Easy::Parser::Graphviz ;
+use Graph::Easy::Introspect ;
+use Graph::Easy::Introspect::Renderer ;
+
+my %SHAPE_DRAW =
+	(
+	rect      => 'draw_box',
+	rounded   => 'draw_rounded_box',
+	diamond   => 'draw_diamond',
+	circle    => 'draw_circle',
+	ellipse   => 'draw_circle',
+	point     => 'draw_point',
+	invisible => 'draw_invisible',
+	) ;
+
+my $file = shift or die "Usage: $0 file.dot\n" ;
+
+open my $fh, '<', $file or die "Cannot open $file: $!\n" ;
+my $dot = do { local $/ ; <$fh> } ;
+close $fh ;
+
+my $parser = Graph::Easy::Parser::Graphviz->new ;
+my $g      = $parser->from_text($dot) ;
+
+my $ast      = $g->ast ;
+my $renderer = Graph::Easy::Introspect::Renderer->new ;
+
+die "Layout error: $ast->{error}\n" if exists $ast->{error} ;
+
+render_graph($ast, $renderer) ;
+
+# ------------------------------------------------------------------------------
+
+sub render_graph
+{
+my ($ast, $r) = @_ ;
+
+render_graph_label($ast, $r) ;
+render_groups($ast, $r) ;
+render_nodes($ast, $r) ;
+render_edges($ast, $r) ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub render_graph_label
+{
+my ($ast, $r) = @_ ;
+
+return unless defined $ast->{graph}{label} ;
+
+$r->draw_graph_label
+	(
+	0,
+	0,
+	$ast->{graph}{total_width},
+	$ast->{graph}{label},
+	) ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub render_groups
+{
+my ($ast, $r) = @_ ;
+
+for my $grp (@{$ast->{groups}})
+	{
+	$r->draw_group
+		(
+		$grp->{char_x},
+		$grp->{char_y},
+		$grp->{char_width},
+		$grp->{char_height},
+		$grp->{label},
+		) ;
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub render_nodes
+{
+my ($ast, $r) = @_ ;
+
+for my $node (@{$ast->{nodes}})
+	{
+	my $shape  = $node->{attrs}{shape} // 'rect' ;
+	my $method = $SHAPE_DRAW{$shape} // 'draw_box' ;
+
+	if ($method eq 'draw_point')
+		{
+		$r->draw_point($node->{char_x}, $node->{char_y}) ;
+		}
+	elsif ($method eq 'draw_invisible')
+		{
+		$r->draw_invisible
+			(
+			$node->{char_x},
+			$node->{char_y},
+			$node->{char_width},
+			$node->{char_height},
+			) ;
+		}
+	else
+		{
+		$r->$method
+			(
+			$node->{char_x},
+			$node->{char_y},
+			$node->{char_width},
+			$node->{char_height},
+			$node->{label},
+			) ;
+		}
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub render_edges
+{
+my ($ast, $r) = @_ ;
+
+my %node_by_id = map { $_->{id} => $_ } @{$ast->{nodes}} ;
+
+for my $edge (@{$ast->{edges}})
+	{
+	if ($edge->{is_self_loop})
+		{
+		render_self_loop($edge, $r, \%node_by_id) ;
+		}
+	else
+		{
+		render_arrow($edge, $r, $ast->{graph}{is_directed}) ;
+		}
+
+	if (defined $edge->{label})
+		{
+		$r->draw_edge_label
+			(
+			$edge->{label_char_x} // 0,
+			$edge->{label_char_y} // 0,
+			$edge->{label},
+			) ;
+		}
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub render_self_loop
+{
+my ($edge, $r, $node_by_id) = @_ ;
+
+my $node = $node_by_id->{ $edge->{from} } ;
+my $side = $edge->{from_side} // 'right' ;
+
+$r->draw_self_loop
+	(
+	$node->{char_x},
+	$node->{char_y},
+	$node->{char_width},
+	$node->{char_height},
+	$side,
+	) ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub render_arrow
+{
+my ($edge, $r, $is_directed) = @_ ;
+
+my $start_style = 'none' ;
+my $end_style   = 'none' ;
+
+if ($is_directed)
+	{
+	$end_style   = 'arrow' ;
+	$start_style = 'arrow' if $edge->{is_bidirectional} ;
+	}
+
+# Build a proper polyline in char space:
+#   from_port face -> corner midpoints -> to_port face
+# HOR and VER cells are spans; they add no waypoints.
+# Corner cells (N_E, N_W, S_E, S_W, ...) mark direction changes;
+# their center gives the bend coordinate.
+
+my @waypoints ;
+
+push @waypoints,
+	{
+	char_x => $edge->{from_port}{char_x},
+	char_y => $edge->{from_port}{char_y},
+	} if $edge->{from_port} ;
+
+my @waypoints = () ;
+
+push @waypoints, { char_x => $edge->{from_port}{char_x}, char_y => $edge->{from_port}{char_y} }
+	if $edge->{from_port} ;
+
+for my $p (@{ $edge->{path} })
+	{
+	next unless defined $p->{bend_x} ;
+	push @waypoints,
+		{
+		char_x => $p->{bend_x},
+		char_y => $p->{bend_y},
+		type   => $p->{type},
+		} ;
+	}
+
+push @waypoints, { char_x => $edge->{to_port}{char_x}, char_y => $edge->{to_port}{char_y} }
+	if $edge->{to_port} ;
+
+# Fallback: no port data — use line coords of each cell
+if (!@waypoints)
+	{
+	@waypoints = map
+		{
+		{ char_x => $_->{line_x1}, char_y => $_->{line_y1} },
+		{ char_x => $_->{line_x2}, char_y => $_->{line_y2} },
+		} @{ $edge->{path} } ;
+	}
+
+$r->draw_arrow($start_style, $end_style, \@waypoints) ;
+}

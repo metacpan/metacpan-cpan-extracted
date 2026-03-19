@@ -113,7 +113,16 @@ subtest 'pathset - return value' => sub {
     my $data = {};
 
     my $ret = pathset $data, "/a/b", 42;
-    is($ret, 42, 'returns set value');
+    is($ret, 42, 'returns set value (constant path)');
+
+    my $path = "/c/d";
+    my $ret2 = pathset $data, $path, 99;
+    is($ret2, 99, 'returns set value (dynamic path)');
+
+    my $ref = { x => 1 };
+    $path = "/e";
+    my $ret3 = pathset $data, $path, $ref;
+    is($ret3, $ref, 'returns reference value (dynamic path)');
 };
 
 done_testing();

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use v5.36;
-use Test::More;
+use Test::Most;
 use Path::Tiny;
 use File::Temp qw(tempdir);
 

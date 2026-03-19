@@ -2,11 +2,14 @@ NAME
     Test::Changes::Strict::Simple - Strict semantic validation for CPAN
     Changes files
 
+VERSION
+    Version 0.05
+
 SYNOPSIS
         use Test::More;
-        use Test::Changes::Strict::Simple qw(changes_strict_ok);
+        use Test::Changes::Strict::Simple;
 
-        changes_strict_ok('Changes');
+        changes_strict_ok();
 
         done_testing;
 
@@ -54,7 +57,9 @@ DESCRIPTION
 
     *   Dates match "/\d+\.\d+/".
 
-    *   Versions are strictly monotonically increasing.
+    *   Versions are strictly monotonically decreasing (so the most recent
+        one is at the top). You can switch to increasing versions by setting
+        "-reverse_version_order" to *"true"*.
 
     *   Release dates are valid calendar dates. Only dates, no time.
 
@@ -114,7 +119,7 @@ IMPORT OPTIONS
         use Test::Changes::Strict::Simple -empty_line_after_version => 1;
 
   -no_export => *BOOL*
-    If true, no symbols are exported.
+    If *"true"*, no symbols are exported.
 
        use Test::Changes::Strict::Simple -no_export => 1;
 
@@ -125,6 +130,10 @@ IMPORT OPTIONS
     This option is useful in conjunction with other import options. Example:
 
        use Test::Changes::Strict::Simple -empty_line_after_version => 1, -no_export => 1
+
+  -reverse_version_order => *BOOL*
+    If *"true"*, versions must be strictly monotonically increasing (so the
+    most recent one is at the bottom). Default is *"false"*.
 
   -version_re => *REGEXP*
     By default, version numbers must match "qr/\d+\.\d+/". This can be
@@ -138,14 +147,21 @@ FUNCTIONS
 
     Named arguments:
 
-    "changes_file"
+    "changes_file" => *FILENAME*
         Optional. File to be validated. If no file is provided, "Changes" is
         assumed.
 
-    "module_version"
+    "module_version" => *STRING*
         Optional. If specified, the function checks whether the highest
         version is equal to *"module_version"*. This is done by comparing
         strings.
+
+    "release_today" => *BOOL*
+        Optional. If *"true"*, the checks whether the highest version date
+        is equal to today. This only makes sense if you want to release a
+        version on the same day you run the test.
+
+        Default is *"false"*.
 
     The function emits one test event using "Test::Builder" and can output
     diagnostic messages if necessary. It does not plan tests and does not
@@ -166,7 +182,9 @@ BUGS
     "bug-test-changes-strict-simple at rt.cpan.org", or through the web
     interface at
     <https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-Changes-Strict-Sim
-    ple>. I will be notified, and then you'll automatically be notified of
+    ple> or create a GitHub Issue
+    <https://github.com/klaus-rindfrey/perl-test-changes-strict-simple/issue
+    s>. I will be notified, and then you'll automatically be notified of
     progress on your bug as I make changes.
 
 SUPPORT

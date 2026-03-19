@@ -192,7 +192,7 @@ sub _ClassAccessible {
         {read => 1, type => 'int(11)'}, 
         Employee => 
         {read => 1, write => 1, type => 'int(11)', object => 'TestApp::Employee' },
-        Value => 
+        Phone =>
         {read => 1, write => 1, type => 'varchar(18)'},
 
     }

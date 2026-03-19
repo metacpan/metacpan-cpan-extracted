@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Helpers;
-$Bitcoin::Crypto::Helpers::VERSION = '4.003';
+$Bitcoin::Crypto::Helpers::VERSION = '4.004';
 use v5.14;
 use warnings;
 use Exporter qw(import);

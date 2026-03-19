@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.6.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.6.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -15,7 +15,8 @@ use File::Temp          qw( tempdir tempfile );
 use Getopt::Long        qw( GetOptions :config posix_default );
 use Importer;
 use Path::Tiny          qw( cwd path );
-use Scalar::Readonly    qw( readonly_on );
+use Scalar::Readonly    qw( readonly_off readonly_on );
+use Sub::Delete         qw( delete_sub );
 use Term::ANSIColor     qw( color colored );
 use Test::Builder;
 use Test2::API          qw( context );
@@ -34,7 +35,7 @@ use Test::Expander::Constants qw(
   $NOTE
   $REGEX_ANY_EXTENSION $REGEX_CLASS_HIERARCHY_LEVEL $REGEX_TABLE_SEPARATOR $REGEX_TOP_DIR_IN_PATH $REGEX_VERSION_NUMBER
   $TRUE
-  %COLORS %MOST_CONSTANTS_TO_EXPORT %OPTION_PARSER %REST_CONSTANTS_TO_EXPORT
+  @TEST2_V0_EXPORT %COLORS %MOST_CONSTANTS_TO_EXPORT %OPTION_PARSER %REST_CONSTANTS_TO_EXPORT
 );
 
 my $ok_orig = \&Test2::API::Context::ok;
@@ -67,7 +68,7 @@ sub _subtest_selection {
 
 BEGIN { _subtest_selection() }
 
-use Test2::V0 qw();
+use Test2::V1;
 
 readonly_on( $VERSION );
 
@@ -75,7 +76,7 @@ our ( $CLASS, $METHOD, $METHOD_REF, $TEMP_DIR, $TEMP_FILE, $TEST_FILE );
 our @EXPORT = (
   @{ Const::Fast::EXPORT },
   @{ Test2::Tools::Explain::EXPORT },
-  @{ Test2::V0::EXPORT },
+  @TEST2_V0_EXPORT,
   qw( tempdir tempfile ),
   qw( cwd path ),
   qw( BAIL_OUT bail_on_failure dies_ok is_deeply lives_ok new_ok require_ok restore_failure_handler throws_ok use_ok ),
@@ -120,7 +121,10 @@ sub import {
   _set_env( $options->{ -target }, $test_file );
   _mock_builtins( $options ) if defined( $CLASS ) && exists( $options->{ -builtins } );
 
-  Test2::V0->import( %$options );
+  my @options = map { $_, $options->{ $_ } } keys( %$options );
+  delete_sub( 'CLASS' );
+  delete_sub( 'T2' );
+  Test2::V1->import( '-Pi', grep { ref ne 'ARRAY' || @$_ } @options );
 
   _export_rest_symbols();
   Importer->import_into( $class, scalar( caller ), () );
@@ -259,7 +263,9 @@ sub _determine_testee {
     $options->{ -target } = "$testee" =~ s{/}{::}gr if grep { path( $_ )->child( $testee . '.pm' )->is_file } @INC;
   }
   if ( defined( $options->{ -target } ) ) {
+    readonly_off( $CLASS );
     $CLASS = $options->{ -target };
+    readonly_on( $CLASS );
   }
   else {
     delete( $options->{ -target } );
@@ -343,7 +349,7 @@ sub _new_test_message {
 }
 
 sub _parse_bail {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
   _set_failure_handler(
     sub {
@@ -356,8 +362,9 @@ sub _parse_bail {
 }
 
 sub _parse_builtins {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
+  my ( $option_value ) = @option_value;
   $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
   while ( my ( $sub_name, $sub_ref ) = each( %$option_value ) ) {
     $DIE->( $FMT_INVALID_VALUE, $option_name . "->{ $sub_name }", $sub_ref ) if ref( $sub_ref ) ne 'CODE';
@@ -368,8 +375,9 @@ sub _parse_builtins {
 }
 
 sub _parse_color {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
+  my ( $option_value ) = @option_value;
   keys( %colors );
   while ( my ( $color_name, $color_value ) = each( %colors ) ) {
     if ( exists( $option_value->{ $color_name } ) ) {
@@ -389,8 +397,9 @@ sub _parse_color {
 }
 
 sub _parse_lib {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
+  my ( $option_value ) = @option_value;
   $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'ARRAY';
   $options->{ $option_name } = $option_value;
 
@@ -398,8 +407,9 @@ sub _parse_lib {
 }
 
 sub _parse_method {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
+  my ( $option_value ) = @option_value;
   $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value );
   $METHOD = $options->{ $option_name } = $option_value;
 
@@ -411,27 +421,29 @@ sub _parse_options {
 
   my $options = {};
   while ( my $option_name = shift( @$exports ) ) {
-    $DIE->( $FMT_UNKNOWN_OPTION, $option_name, shift( @$exports ) // '' ) if $option_name !~ /^-\w/;
+    $DIE->( $FMT_UNKNOWN_OPTION, $option_name, shift( @$exports ) // '' ) if $option_name !~ /^-[\-\w]/;
 
-    my $option_value = shift( @$exports );
+    my $option_value = $exports->[ 0 ] // '';
+    my @option_value = @$exports && $option_value !~ /^-/ ? shift( @$exports ) : ();
     my $parser       = exists( $OPTION_PARSER{ $option_name } ) ? '_parse_' . substr( $option_name, 1 ) : '_take_over';
-    { no strict qw( refs ); $parser->( $options, $option_name, $option_value ) }
+    { no strict qw( refs ); $parser->( $options, $option_name, @option_value ) }
   }
 
   return _determine_testee( $options, $test_file );
 }
 
 sub _parse_target {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
-  $options->{ $option_name } = $option_value;
+  ( $options->{ $option_name } ) = @option_value;
 
   return;
 }
 
 sub _parse_tempdir {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
+  my ( $option_value ) = @option_value;
   $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
   $TEMP_DIR = tempdir( CLEANUP => 1, %$option_value );
 
@@ -439,11 +451,12 @@ sub _parse_tempdir {
 }
 
 sub _parse_tempfile {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
-    $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
-    my $file_handle;
-    ( $file_handle, $TEMP_FILE ) = tempfile( UNLINK => 1, %$option_value );
+  my ( $option_value ) = @option_value;
+  $DIE->( $FMT_INVALID_VALUE, $option_name, $option_value ) if ref( $option_value ) ne 'HASH';
+  my $file_handle;
+  ( $file_handle, $TEMP_FILE ) = tempfile( UNLINK => 1, %$option_value );
 
   return;
 }
@@ -571,9 +584,9 @@ sub _subtest_conditional {
 }
 
 sub _take_over {
-  my ( $options, $option_name, $option_value ) = @_;
+  my ( $options, $option_name, @option_value ) = @_;
 
-  $options->{ $option_name } = $option_value;
+  $options->{ $option_name } = @option_value ? $option_value[ 0 ] : [];
 
   return;
 }

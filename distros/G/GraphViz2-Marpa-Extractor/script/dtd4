@@ -1,0 +1,435 @@
+#!/bin/env perl
+
+use GraphViz2::Marpa ;
+use Data::TreeDumper ;
+
+
+my $file = shift || 'input.dot';
+
+
+open (my $fh, '<', $file) or die "error reading file: $!" ;
+print while<$fh> ;
+print "\n" ;
+
+my $g2m = GraphViz2::Marpa->new( input_file => $file);
+$g2m->run;
+
+my $root = $g2m->tree;   # Tree::DAG_Node
+
+# package GraphViz2::Marpa::HierExtractor;
+my $all = extract_all_graphs_hierarchical($root) ;
+print DumpTree $all ;
+
+use Data::Dumper ;
+
+# print Dumper $root ;
+
+# package GraphViz2::Marpa::HierExtractor;
+
+use strict;
+use warnings;
+
+# Top-level entry point.
+# $root is the AST root (the blessed Tree::DAG_Node from GraphViz2::Marpa).
+sub extract_all_graphs_hierarchical {
+	my ($root) = @_;
+
+	my @graphs;
+
+	# Find prolog (for kind) and graph nodes under root.
+	my $prolog;
+	my @graph_nodes;
+
+	for my $child (@{ $root->{daughters} || [] }) {
+		my $name = $child->{name} // '';
+		if ($name eq 'prolog') {
+			$prolog = $child;
+		}
+		elsif ($name eq 'graph') {
+			push @graph_nodes, $child;
+		}
+	}
+
+	my $kind = _detect_graph_kind($prolog);
+
+	for my $g (@graph_nodes) {
+		push @graphs, _extract_graph($g, $kind);
+	}
+
+	return \@graphs;
+}
+
+sub _detect_graph_kind {
+	my ($prolog) = @_;
+
+	return 'digraph' unless $prolog; # default
+
+	for my $c (@{ $prolog->{daughters} || [] }) {
+		my $t = $c->{attributes}{type} // '';
+		if ($t eq 'digraph_literal') {
+			return 'digraph';
+		}
+		if ($t eq 'graph_literal') {
+			return 'graph';
+		}
+	}
+
+	return 'digraph';
+}
+
+sub _extract_graph {
+	my ($graph_node, $kind) = @_;
+
+	# graph_id
+	my $id_node = $graph_node->{daughters}[0];
+	my $name    = $id_node->{attributes}{value};
+
+	# '{' literal with body
+	my $brace_lit = $graph_node->{daughters}[1];
+	my @body      = @{ $brace_lit->{daughters} || [] };
+
+	my %attrs;
+	my %node_defaults;
+	my %edge_defaults;
+	my %nodes;
+	my @edges;
+	my @subgraphs;
+
+	# First pass: scan body in order, handle attributes, defaults, nodes, edges, subgraphs.
+	for (my $i = 0; $i < @body; $i++) {
+		my $n  = $body[$i];
+		my $nm = $n->{name} // '';
+		my $t  = $n->{attributes}{type} // '';
+
+		# Graph-level attributes: any attribute directly under the brace.
+		if ($nm eq 'attribute') {
+			my $key = $t || $n->{attributes}{name};
+			my $val = $n->{attributes}{value};
+			$attrs{$key} = $val;
+			next;
+		}
+
+		# Class defaults: node / edge
+		if ($nm eq 'class' && ($n->{attributes}{type} // '') eq 'class') {
+			my $class_name = $n->{attributes}{value}; # 'node' or 'edge'
+			my %def;
+			for my $c (@{ $n->{daughters} || [] }) {
+				next unless ($c->{name} // '') eq 'attribute';
+				my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+				my $val = $c->{attributes}{value};
+				$def{$ct} = $val;
+			}
+			if ($class_name eq 'node') {
+                %node_defaults = (%node_defaults, %def);
+			}
+			elsif ($class_name eq 'edge') {
+                %edge_defaults = (%edge_defaults, %def);
+			}
+			next;
+		}
+
+		# Subgraph: literal 'subgraph', then subgraph_id, then '{' literal
+		if ($nm eq 'literal' && $t eq 'subgraph_literal') {
+			my $id_node       = $body[$i + 1];
+			my $sub_name      = $id_node->{attributes}{value};
+			my $sub_brace_lit = $body[$i + 2];
+
+			my $sub = _extract_subgraph($sub_name, $sub_brace_lit, $kind);
+			push @subgraphs, $sub;
+
+			# Skip id + brace literal; outer loop will move on.
+			next;
+		}
+
+		# Edge: node_id, edge_id, node_id
+		if ($nm eq 'edge_id') {
+			my $edge_type = $t; # directed_edge / undirected_edge
+			my $left      = $body[$i - 1];
+			my $right     = $body[$i + 1];
+
+			my $from = $left->{attributes}{name};
+			my ($from_port, $from_compass) = _parse_port($left->{attributes}{port}, $left->{attributes}{value});
+
+			my $to = $right->{attributes}{name};
+			my ($to_port, $to_compass) = _parse_port($right->{attributes}{port}, $right->{attributes}{value});
+
+			# Edge attributes may be in a bracket list attached to the right node_id.
+			my %edge_attr;
+			if ($right->{daughters} && @{ $right->{daughters} }) {
+				for my $c (@{ $right->{daughters} }) {
+					next unless ($c->{name} // '') eq 'attribute';
+					my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+					my $val = $c->{attributes}{value};
+					$edge_attr{$ct} = $val;
+				}
+			}
+
+			# Merge defaults into edge attrs.
+			my $merged_attr = _merge_attrs(\%edge_defaults, \%edge_attr);
+
+			my $edge = {
+				from        => $from,
+				from_port   => $from_port,
+				from_compass=> $from_compass,
+				to          => $to,
+				to_port     => $to_port,
+				to_compass  => $to_compass,
+				attrs       => $merged_attr,
+			};
+
+			push @edges, $edge;
+
+			# Ensure nodes exist in nodes hash (even if no explicit node block).
+			$nodes{$from} ||= { attrs => {} };
+			$nodes{$to}   ||= { attrs => {} };
+
+			next;
+		}
+
+		# Node declaration: node_id with optional bracketed attributes.
+		if ($nm eq 'node_id' && $t eq 'node_id') {
+			my $node_name = $n->{attributes}{name};
+
+			# If this node_id is part of an edge (immediately before/after edge_id),
+			# we still want its attributes, but we don't treat it as a standalone node block.
+			my $is_edge_endpoint = 0;
+			if ($i + 1 < @body && ($body[$i + 1]{name} // '') eq 'edge_id') {
+				$is_edge_endpoint = 1;
+			}
+			if ($i > 0 && ($body[$i - 1]{name} // '') eq 'edge_id') {
+				$is_edge_endpoint = 1;
+			}
+
+			my %node_attr;
+			if ($n->{daughters} && @{ $n->{daughters} }) {
+				for my $c (@{ $n->{daughters} }) {
+					next unless ($c->{name} // '') eq 'attribute';
+					my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+					my $val = $c->{attributes}{value};
+					$node_attr{$ct} = $val;
+				}
+			}
+
+			# Merge defaults into node attrs.
+			my $merged_attr = _merge_attrs(\%node_defaults, \%node_attr);
+
+			# Merge into existing node entry if present.
+			if (exists $nodes{$node_name}) {
+				$nodes{$node_name}{attrs} = _merge_attrs($nodes{$node_name}{attrs}, $merged_attr);
+			}
+			else {
+				$nodes{$node_name} = { attrs => $merged_attr };
+			}
+
+			next;
+		}
+	}
+
+	# Build adjacency (respecting kind: digraph vs graph).
+	my $adjacency = _build_adjacency(\@edges, $kind);
+
+	my $graph = {
+		name          => $name,
+		kind          => $kind,
+		attrs         => \%attrs,
+		node_defaults => \%node_defaults,
+		edge_defaults => \%edge_defaults,
+		nodes         => \%nodes,
+		edges         => \@edges,
+		subgraphs     => \@subgraphs,
+		adjacency     => $adjacency,
+	};
+
+	return $graph;
+}
+
+sub _extract_subgraph {
+	my ($name, $brace_lit, $kind) = @_;
+
+	my @body = @{ $brace_lit->{daughters} || [] };
+
+	my %attrs;
+	my %node_defaults;
+	my %edge_defaults;
+	my %nodes;
+	my @edges;
+	my @subgraphs;
+
+	for (my $i = 0; $i < @body; $i++) {
+		my $n  = $body[$i];
+		my $nm = $n->{name} // '';
+		my $t  = $n->{attributes}{type} // '';
+
+		# Subgraph-level attributes (e.g. label = "").
+		if ($nm eq 'attribute') {
+			my $key = $t || $n->{attributes}{name};
+			my $val = $n->{attributes}{value};
+			$attrs{$key} = $val;
+			next;
+		}
+
+		# Class defaults inside subgraph.
+		if ($nm eq 'class' && ($n->{attributes}{type} // '') eq 'class') {
+			my $class_name = $n->{attributes}{value};
+			my %def;
+			for my $c (@{ $n->{daughters} || [] }) {
+				next unless ($c->{name} // '') eq 'attribute';
+				my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+				my $val = $c->{attributes}{value};
+				$def{$ct} = $val;
+			}
+			if ($class_name eq 'node') {
+				%node_defaults = (%node_defaults, %def);
+			}
+			elsif ($class_name eq 'edge') {
+				%edge_defaults = (%edge_defaults, %def);
+			}
+			next;
+		}
+
+		# Nested subgraph (if present).
+		if ($nm eq 'literal' && $t eq 'subgraph_literal') {
+			my $id_node       = $body[$i + 1];
+			my $sub_name      = $id_node->{attributes}{value};
+			my $sub_brace_lit = $body[$i + 2];
+
+			my $sub = _extract_subgraph($sub_name, $sub_brace_lit, $kind);
+			push @subgraphs, $sub;
+			next;
+		}
+
+		# Edge inside subgraph.
+		if ($nm eq 'edge_id') {
+			my $edge_type = $t;
+			my $left      = $body[$i - 1];
+			my $right     = $body[$i + 1];
+
+			my $from = $left->{attributes}{name};
+			my ($from_port, $from_compass) = _parse_port($left->{attributes}{port}, $left->{attributes}{value});
+
+			my $to = $right->{attributes}{name};
+			my ($to_port, $to_compass) = _parse_port($right->{attributes}{port}, $right->{attributes}{value});
+
+			my %edge_attr;
+			if ($right->{daughters} && @{ $right->{daughters} }) {
+				for my $c (@{ $right->{daughters} }) {
+					next unless ($c->{name} // '') eq 'attribute';
+					my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+					my $val = $c->{attributes}{value};
+					$edge_attr{$ct} = $val;
+				}
+			}
+
+			my $merged_attr = _merge_attrs(\%edge_defaults, \%edge_attr);
+
+			my $edge = {
+				from        => $from,
+				from_port   => $from_port,
+				from_compass=> $from_compass,
+				to          => $to,
+				to_port     => $to_port,
+				to_compass  => $to_compass,
+				attrs       => $merged_attr,
+			};
+
+			push @edges, $edge;
+
+			$nodes{$from} ||= { attrs => {} };
+			$nodes{$to}   ||= { attrs => {} };
+
+			next;
+		}
+
+		# Node inside subgraph.
+		if ($nm eq 'node_id' && $t eq 'node_id') {
+			my $node_name = $n->{attributes}{name};
+
+			my %node_attr;
+			if ($n->{daughters} && @{ $n->{daughters} }) {
+				for my $c (@{ $n->{daughters} }) {
+					next unless ($c->{name} // '') eq 'attribute';
+					my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+					my $val = $c->{attributes}{value};
+					$node_attr{$ct} = $val;
+				}
+			}
+
+			my $merged_attr = _merge_attrs(\%node_defaults, \%node_attr);
+
+			if (exists $nodes{$node_name}) {
+				$nodes{$node_name}{attrs} = _merge_attrs($nodes{$node_name}{attrs}, $merged_attr);
+			}
+			else {
+				$nodes{$node_name} = { attrs => $merged_attr };
+			}
+
+			next;
+		}
+	}
+
+	my $adjacency = _build_adjacency(\@edges, $kind);
+
+	my $subgraph = {
+		name          => $name,
+		kind          => 'subgraph',
+		attrs         => \%attrs,
+		node_defaults => \%node_defaults,
+		edge_defaults => \%edge_defaults,
+		nodes         => \%nodes,
+		edges         => \@edges,
+		subgraphs     => \@subgraphs,
+		adjacency     => $adjacency,
+	};
+
+	return $subgraph;
+}
+
+sub _parse_port {
+	my ($port_field, $value_field) = @_;
+
+	# GraphViz2::Marpa may store port in attributes{port}, e.g. 'p22:s' or 'p11'.
+	# Fallback to parsing from value if needed.
+	my $raw = $port_field;
+	if (!defined $raw || $raw eq '') {
+		$raw = '';
+		if (defined $value_field && $value_field =~ /:/) {
+			($raw) = $value_field =~ /:(.+)$/;
+		}
+	}
+
+	return ('', '') unless defined $raw && $raw ne '';
+
+	my ($port, $compass) = split /:/, $raw, 2;
+	$compass //= '';
+
+	return ($port, $compass);
+}
+
+sub _merge_attrs {
+	my ($defaults, $specific) = @_;
+
+	my %merged = (%{ $defaults || {} }, %{ $specific || {} });
+	return \%merged;
+}
+
+sub _build_adjacency {
+	my ($edges, $kind) = @_;
+
+	my %adj;
+
+	for my $e (@{ $edges || [] }) {
+		my $from = $e->{from};
+		my $to   = $e->{to};
+
+		push @{ $adj{$from} ||= [] }, $to;
+
+		# For undirected graphs, add reverse edge.
+		if ($kind && $kind eq 'graph') {
+			push @{ $adj{$to} ||= [] }, $from;
+		}
+	}
+
+	return \%adj;
+}
+
+1;

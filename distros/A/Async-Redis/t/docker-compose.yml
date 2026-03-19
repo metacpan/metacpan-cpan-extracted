@@ -89,6 +89,24 @@ services:
       timeout: 3s
       retries: 3
 
+  # Redis with Unix socket for socket tests
+  # NOTE: Unix socket volume mounts do NOT work on Docker Desktop for macOS.
+  # On macOS, run Redis locally instead:
+  #   mkdir -p /tmp/redis-test-unix
+  #   redis-server --unixsocket /tmp/redis-test-unix/redis.sock \
+  #     --unixsocketperm 777 --port 0 --daemonize yes \
+  #     --pidfile /tmp/redis-test-unix/redis.pid
+  redis-unix:
+    image: redis:7-alpine
+    volumes:
+      - /tmp/redis-test-unix:/redis-unix
+    command: redis-server --unixsocket /redis-unix/redis.sock --unixsocketperm 777 --port 0
+    healthcheck:
+      test: ["CMD", "redis-cli", "-s", "/redis-unix/redis.sock", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
 # Networks for isolation testing
 networks:
   default:

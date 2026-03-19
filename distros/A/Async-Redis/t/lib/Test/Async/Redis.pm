@@ -5,31 +5,10 @@ use warnings;
 use parent 'Exporter';
 use Future::AsyncAwait;
 use Test2::V0;
-use IO::Async::Loop;
-use IO::Async::Timer::Periodic;
-use IO::Async::Process;
 use Future::IO;
 use Async::Redis;
 
-# For testing, we use IO::Async as our concrete event loop.
-Future::IO->load_impl('IOAsync');
-
-# Suppress known harmless warnings from IO::Async/Future::IO cleanup
-# These occur because Future::IO::Impl::IOAsync doesn't set up on_cancel
-# handlers for ready_for_read/ready_for_write, so when sockets are closed
-# during disconnect, the cleanup callbacks may access closed handles.
-# See: https://metacpan.org/pod/Future::IO::Impl::IOAsync
-$SIG{__WARN__} = sub {
-    my $msg = shift;
-    # Suppress IO::Async cleanup warnings about closed socket fileno
-    return if $msg =~ /uninitialized value.*fileno/i;
-    return if $msg =~ /uninitialized value in (?:hash element|delete)/;
-    warn $msg;
-};
-
 our @EXPORT_OK = qw(
-    init_loop
-    get_loop
     run
     await_f
     skip_without_redis
@@ -37,9 +16,6 @@ our @EXPORT_OK = qw(
     with_timeout
     fails_with
     delay
-    run_command
-    run_docker
-    measure_ticks
     redis_host
     redis_port
 );
@@ -47,7 +23,7 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (
     # Import with :redis to auto-skip if Redis unavailable
     # Usage: use Test::Async::Redis ':redis';
-    redis => [qw(init_loop get_loop run await_f skip_without_redis cleanup_keys delay redis_host redis_port)],
+    redis => [qw(run await_f skip_without_redis cleanup_keys delay redis_host redis_port)],
 );
 
 sub import {
@@ -70,29 +46,15 @@ sub import {
 
     # Auto-skip if :redis was requested (after exports are done)
     if ($auto_skip) {
-        init_loop();
         _check_redis();
     }
 }
 
-our $loop;
 our $test_redis;  # Shared Redis connection from skip_without_redis
 
 # Get Redis connection details from environment
 sub redis_host { $ENV{REDIS_HOST} // 'localhost' }
 sub redis_port { $ENV{REDIS_PORT} // 6379 }
-
-# Initialize the event loop (call once at test start)
-sub init_loop {
-    $loop = IO::Async::Loop->new;
-    return $loop;
-}
-
-# Get the current loop
-sub get_loop {
-    $loop //= init_loop();
-    return $loop;
-}
 
 # Run an async block and return result - the main test helper
 # Usage: my $result = run { $redis->get('key') };  # returns Future
@@ -102,19 +64,29 @@ sub run (&) {
 
     # If it's a Future, await it
     if (ref($result) && $result->isa('Future')) {
-        get_loop()->await($result);
-        return $result->get;
+        return _pump_until_ready($result);
     }
 
     # Otherwise return as-is
     return $result;
 }
 
-# Await a future directly - backward compatible alias
+# Await a future directly
 # Usage: my $result = await_f($redis->get('key'));
 sub await_f {
     my ($f) = @_;
-    get_loop()->await($f);
+    return _pump_until_ready($f);
+}
+
+# Drive the Future::IO event loop until a future resolves.
+# Handles both Future::IO futures (which have _await_once) and
+# plain Future->new objects (e.g. from AutoPipeline) that need
+# the event loop pumped externally.
+sub _pump_until_ready {
+    my ($f) = @_;
+    until ($f->is_ready) {
+        Future::IO->sleep(0)->get;
+    }
     return $f->get;
 }
 
@@ -188,64 +160,6 @@ async sub delay {
     await Future::IO->sleep($seconds);
 }
 
-# Run external command asynchronously
-async sub run_command {
-    my (@cmd) = @_;
-    my $future = get_loop()->new_future;
-    my $stdout = '';
-    my $stderr = '';
-
-    my $process = IO::Async::Process->new(
-        command => \@cmd,
-        stdout => { into => \$stdout },
-        stderr => { into => \$stderr },
-        on_finish => sub {
-            my ($self, $exitcode) = @_;
-            if ($exitcode == 0) {
-                $future->done($stdout);
-            } else {
-                $future->fail("Command [@cmd] failed (exit $exitcode): $stderr");
-            }
-        },
-    );
-
-    get_loop()->add($process);
-    return await $future;
-}
-
-# Docker-specific helper
-async sub run_docker {
-    my (@args) = @_;
-    return await run_command('docker', @args);
-}
-
-# Measure event loop ticks during an operation
-async sub measure_ticks {
-    my ($future, $interval) = @_;
-    $interval //= 0.01;  # 10ms default
-
-    my @ticks;
-    my $timer = IO::Async::Timer::Periodic->new(
-        interval => $interval,
-        on_tick => sub { push @ticks, time() },
-    );
-    get_loop()->add($timer);
-    $timer->start;
-
-    my @result;
-    my $error;
-    eval {
-        @result = await $future;
-        1;
-    } or $error = $@;
-
-    $timer->stop;
-    get_loop()->remove($timer);
-
-    die $error if $error;
-    return (\@result, scalar(@ticks));
-}
-
 1;
 
 __END__
@@ -278,7 +192,8 @@ Test::Async::Redis - Test utilities for Async::Redis
 
 =head1 DESCRIPTION
 
-Test utilities for Async::Redis using async/await.
+Test utilities for Async::Redis using async/await. Uses Future::IO's
+built-in default implementation (IO::Poll based) for event loop management.
 
 =head1 FUNCTIONS
 
@@ -288,6 +203,10 @@ Test utilities for Async::Redis using async/await.
 
 Execute an async block and return its result. This is the main
 test helper - wrap any async operations in run { }.
+
+=item await_f($future)
+
+Await a future and return its result.
 
 =item skip_without_redis()
 
@@ -310,17 +229,13 @@ Assert that a future fails with the specified error class.
 
 Async function that delays for the specified time.
 
-=item run_command(@cmd)
+=item redis_host()
 
-Async function to run an external command.
+Returns the Redis host from REDIS_HOST env var (default: localhost).
 
-=item run_docker(@args)
+=item redis_port()
 
-Async function to run a docker command.
-
-=item measure_ticks($future, $interval)
-
-Measure event loop ticks during a future's execution.
+Returns the Redis port from REDIS_PORT env var (default: 6379).
 
 =back
 

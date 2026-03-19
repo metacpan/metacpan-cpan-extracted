@@ -7,14 +7,12 @@ use Test::Async::Redis ':redis';
 use Future::AsyncAwait;
 use Test2::V0;
 use Time::HiRes qw(time);
+use Future::IO;
 
 use lib 'lib';
 use Async::Redis;
 
 # Skip if no Redis available
-
-# Load Future::IO implementation
-eval { require Future::IO::Impl::IOAsync };
 
 # ============================================================================
 # Test: Pub/Sub basic flow
@@ -23,14 +21,14 @@ eval { require Future::IO::Impl::IOAsync };
 subtest 'publish and subscribe' => sub {
     # Publisher connection
     my $pub = Async::Redis->new(host => redis_host(), port => redis_port());
-    get_loop()->await($pub->connect);
+    $pub->connect->get;
 
     # Subscriber connection
     my $sub = Async::Redis->new(host => redis_host(), port => redis_port());
-    get_loop()->await($sub->connect);
+    $sub->connect->get;
 
     my @received;
-    my $done = get_loop()->new_future;
+    my $done = Future->new;
 
     # Start subscriber in background
     my $sub_future = (async sub {
@@ -46,18 +44,18 @@ subtest 'publish and subscribe' => sub {
     })->();
 
     # Give subscriber time to subscribe
-    get_loop()->await(Future::IO->sleep(0.1));
+    Future::IO->sleep(0.1)->get;
 
     # Publish messages
     my $listeners;
-    $listeners = get_loop()->await($pub->publish('test:channel', 'message 1'));
+    $listeners = $pub->publish('test:channel', 'message 1')->get;
     ok $listeners >= 1, "publish returned $listeners listeners";
 
-    get_loop()->await($pub->publish('test:channel', 'message 2'));
-    get_loop()->await($pub->publish('test:channel', 'message 3'));
+    $pub->publish('test:channel', 'message 2')->get;
+    $pub->publish('test:channel', 'message 3')->get;
 
     # Wait for subscriber to receive all
-    get_loop()->await($done);
+    $done->get;
 
     is scalar(@received), 3, 'received 3 messages';
     is $received[0]{channel}, 'test:channel', 'correct channel';
@@ -77,10 +75,10 @@ subtest 'multiple channel subscription' => sub {
     my $pub = Async::Redis->new(host => redis_host(), port => redis_port());
     my $sub = Async::Redis->new(host => redis_host(), port => redis_port());
 
-    get_loop()->await(Future->needs_all($pub->connect, $sub->connect));
+    Future->needs_all($pub->connect, $sub->connect)->get;
 
     my @received;
-    my $done = get_loop()->new_future;
+    my $done = Future->new;
 
     # Subscribe to multiple channels
     my $sub_future = (async sub {
@@ -93,14 +91,14 @@ subtest 'multiple channel subscription' => sub {
         $done->done;
     })->();
 
-    get_loop()->await(Future::IO->sleep(0.1));
+    Future::IO->sleep(0.1)->get;
 
     # Publish to different channels
-    get_loop()->await($pub->publish('chan:a', 'msg-a'));
-    get_loop()->await($pub->publish('chan:b', 'msg-b'));
-    get_loop()->await($pub->publish('chan:c', 'msg-c'));
+    $pub->publish('chan:a', 'msg-a')->get;
+    $pub->publish('chan:b', 'msg-b')->get;
+    $pub->publish('chan:c', 'msg-c')->get;
 
-    get_loop()->await($done);
+    $done->get;
 
     is scalar(@received), 3, 'received from all channels';
 
@@ -122,7 +120,7 @@ subtest 'pubsub nonblocking' => sub {
     my $sub = Async::Redis->new(host => redis_host(), port => redis_port());
     my $worker = Async::Redis->new(host => redis_host(), port => redis_port());
 
-    get_loop()->await(Future->needs_all($pub->connect, $sub->connect, $worker->connect));
+    Future->needs_all($pub->connect, $sub->connect, $worker->connect)->get;
 
     my @pubsub_msgs;
     my @worker_results;
@@ -139,7 +137,7 @@ subtest 'pubsub nonblocking' => sub {
         }
     })->();
 
-    get_loop()->await(Future::IO->sleep(0.1));
+    Future::IO->sleep(0.1)->get;
 
     # Worker doing regular Redis operations AND publishing results
     my $worker_future = (async sub {
@@ -156,14 +154,14 @@ subtest 'pubsub nonblocking' => sub {
     })->();
 
     # Wait for both
-    get_loop()->await(Future->needs_all($sub_future, $worker_future));
+    Future->needs_all($sub_future, $worker_future)->get;
 
     is scalar(@pubsub_msgs), 5, 'received 5 pubsub messages';
     is scalar(@worker_results), 5, 'worker completed 5 items';
 
     # Cleanup
-    get_loop()->await($worker->del(map { "work:item:$_" } 1..5));
-    get_loop()->await($worker->del('work:counter'));
+    $worker->del(map { "work:item:$_" } 1..5)->get;
+    $worker->del('work:counter')->get;
 
     $pub->disconnect;
     $sub->disconnect;

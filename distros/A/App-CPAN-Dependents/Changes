@@ -1,3 +1,9 @@
+1.002     2026-03-16 22:46:44 EDT
+  - Require MetaCPAN::Client 2.037000 for ES 8 queries
+
+1.001     2026-03-15 23:38:33 EDT
+  - Fix es_filter in MetaCPAN::Client search for ES 8
+
 1.000     2017-04-26 22:10:40 EDT
   - Use MetaCPAN::Client to query via the new MetaCPAN API v1
   - Added mcpan parameter to find_all_dependents for specifying a

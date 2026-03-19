@@ -6,6 +6,7 @@ use Test::Lib;
 use Test::Async::Redis ':redis';
 use Test2::V0;
 use Time::HiRes qw(time);
+use Future;
 
 # Load Future::IO implementation
 
@@ -101,28 +102,14 @@ subtest 'event loop not blocked' => sub {
     my $redis = Async::Redis->new(host => redis_host(), port => redis_port());
     run { $redis->connect };
 
-    my $timer_ticks = 0;
-    my $timer = IO::Async::Timer::Periodic->new(
-        interval => 0.005,  # 5ms
-        on_tick => sub { $timer_ticks++ },
-    );
-    $timer->start;
-    get_loop()->add($timer);
+    my @futures = map { $redis->set("nb:nonblocking:$_", $_) } (1..50);
+    my $start = Time::HiRes::time();
+    run { Future->needs_all(@futures) };
+    my $elapsed = Time::HiRes::time() - $start;
 
-    # Do Redis operations - locally they're fast but prove loop runs
-    for my $i (1..20) {
-        run { $redis->set("loop_test:$i", "v$i") };
-    }
+    ok($elapsed < 5, "50 concurrent ops completed in ${elapsed}s");
 
-    get_loop()->remove($timer);
-
-    # Even if 0 ticks (fast local Redis), the fact that we completed
-    # without blocking proves non-blocking I/O is working
-    pass "completed without blocking ($timer_ticks timer ticks)";
-
-    for my $i (1..20) {
-        run { $redis->del("loop_test:$i") };
-    }
+    run { $redis->del(map { "nb:nonblocking:$_" } 1..50) };
 
     $redis->disconnect;
 };

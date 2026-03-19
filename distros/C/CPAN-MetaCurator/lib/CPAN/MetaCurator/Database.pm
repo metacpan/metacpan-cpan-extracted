@@ -1,7 +1,6 @@
 package CPAN::MetaCurator::Database;
 
 use 5.36.0;
-use constant html_id_offset => 10000;
 use parent 'CPAN::MetaCurator::Config';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
@@ -16,7 +15,7 @@ use File::Spec;
 
 use Moo;
 
-use Types::Standard qw/Any ArrayRef HashRef Object Str/;
+use Types::Standard qw/Any ArrayRef Bool HashRef Object Str/;
 
 has column_names =>
 (
@@ -57,12 +56,36 @@ has engine =>
 	required	=> 0,
 );
 
+has include_packages =>
+(
+	default		=> sub{return 0},
+	is			=> 'rw',
+	isa			=> Bool,
+	required	=> 0,
+);
+
 has input_path =>
 (
 	default		=> sub{return ''},
 	is			=> 'rw',
 	isa			=> Str,
 	required	=> 1,
+);
+
+has metapackager_db =>
+(
+	default		=> sub{return ''},
+	is			=> 'rw',
+	isa			=> Any,
+	required	=> 0,
+);
+
+has metapackager_dbh =>
+(
+	default		=> sub{return ''},
+	is			=> 'rw',
+	isa			=> Any,
+	required	=> 0,
 );
 
 has output_path =>
@@ -89,7 +112,7 @@ has time_option =>
 	required	=> 0,
 );
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 
 # -----------------------------------------------
 
@@ -105,6 +128,20 @@ sub build_pad
 	# Constants.
 
 	$$pad{$$_{name} } = $$_{value} for (@{$$pad{constants} });
+
+	# MetaPackager.
+
+	if ($self -> include_packages)
+	{
+		my($table_name) = $self -> read_metapackager_table($pad);
+
+		$self -> logger -> info("Including metapackager table 'packages'");
+		$self -> logger -> info("Size of cpan.metapackager.sqlite table '$table_name': $$pad{count}{$table_name}");
+	}
+	else
+	{
+		$self -> logger -> info("Excluding metapackager table 'packages'");
+	}
 
 	# Modules.
 	# There is a db table called modules so we need another name for the hash
@@ -124,7 +161,7 @@ sub build_pad
 	{
 		$$pad{count}{topic}++;
 
-		$$pad{topic_html_ids}{$$_{title} }	= html_id_offset * $$_{id};
+		$$pad{topic_html_ids}{$$_{title} }	= $$pad{html_id_offset} * $$_{id};
 		$$pad{topic_names}{$$_{title} }		= $$_{id};
 	}
 
@@ -170,10 +207,12 @@ sub init_db
 
 	my(%attributes)	=
 	(
-		AutoCommit 			=> $$config{AutoCommit},
-		mysql_enable_utf8	=> $$config{mysql_enable_utf8},	#Ignored if not using MySQL.
-		RaiseError 			=> $$config{RaiseError},
-		sqlite_unicode		=> $$config{sqlite_unicode},	#Ignored if not using SQLite.
+		AutoCommit 				=> $$config{AutoCommit},
+		mysql_enable_utf8		=> $$config{mysql_enable_utf8},		# Ignored if not using MySQL.
+		mysql_enable_utf8mb4	=> $$config{mysql_enable_utf8mb4},	# Ignored if not using MySQL.
+		pg_enable_utf8			=> $$config{pg_enable_utf8},		# Ignored if not using Pg.
+		RaiseError 				=> $$config{RaiseError},
+		sqlite_unicode			=> $$config{sqlite_unicode},		# Ignored if not using SQLite.
 	);
 
 	my(@dsn)	= split('=', $$config{dsn});
@@ -204,6 +243,35 @@ sub insert_hashref
 
 } # End of insert_hashref.
 
+# -----------------------------------------------
+
+sub init_metapackager_db
+{
+	my($self)		= @_;
+	my($config)		= $self -> metapackager_config;
+
+	my(%attributes)	=
+	(
+		AutoCommit 				=> $$config{AutoCommit},
+		mysql_enable_utf8		=> $$config{mysql_enable_utf8},		# Ignored if not using MySQL.
+		mysql_enable_utf8mb4	=> $$config{mysql_enable_utf8mb4},	# Ignored if not using MySQL.
+		pg_enable_utf8			=> $$config{pg_enable_utf8},		# Ignored if not using Pg.
+		RaiseError 				=> $$config{RaiseError},
+		sqlite_unicode			=> $$config{sqlite_unicode},		# Ignored if not using SQLite.
+	);
+
+	my(@dsn)	= split('=', $$config{dsn});
+	$dsn[1]	 	= File::Spec -> catfile($dsn[1]);
+	$dsn[0]		= "$dsn[0]=$dsn[1]";
+
+	$self -> metapackager_dbh(DBI -> connect($dsn[0], $$config{username}, $$config{password}, \%attributes) );
+	$self -> metapackager_dbh -> do('PRAGMA foreign_keys = ON') if ($$config{dsn} =~ /SQLite/i);
+	$self -> metapackager_db(DBIx::Simple -> new($self -> metapackager_dbh) );
+	$self -> logger -> info("Connected to $dsn[0]");
+	$self -> logger -> info($self -> separator);
+
+} # End of init_metapackager_db.
+
 # --------------------------------------------------
 
 sub read_1_record
@@ -231,6 +299,31 @@ sub read_table
 	return [$set -> hashes];
 
 } # End of read_table.
+
+# --------------------------------------------------
+
+sub read_metapackager_table
+{
+	my($self, $pad)	= @_;
+
+	$self -> init_metapackager_config;
+	$self -> init_metapackager_db;
+
+	# Return an arrayref of hashrefs.
+
+	my($table_name)					= 'packages';
+	my($sql)						= "select * from $table_name";
+	my($set)						= $self -> metapackager_db -> query($sql) || die $self -> metapackager_db -> error;
+	$set							= [$set -> hashes];
+	$$pad{count}{$table_name}		= $#$set + 1;
+	$$pad{$table_name}				= {};
+	$$pad{$table_name}{$$_{name} }	= $$_{id} for (@$set);
+
+	$self -> metapackager_dbh -> disconnect;
+
+	return $table_name;
+
+} # End of read_metapackager_table.
 
 # --------------------------------------------------
 

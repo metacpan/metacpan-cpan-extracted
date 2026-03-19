@@ -1,5 +1,5 @@
 package Mooish::Base;
-$Mooish::Base::VERSION = '1.003';
+$Mooish::Base::VERSION = '1.005';
 use v5.10;
 use strict;
 use warnings;
@@ -15,8 +15,6 @@ use constant ROLE_FLAVOUR => $ENV{MOOISH_BASE_ROLE_FLAVOUR} // (FLAVOUR . '::Rol
 use constant EXTRA_MODULES => $ENV{MOOISH_BASE_EXTRA_MODULES} // join ';', qw(
 	Hook::AfterRuntime
 	MooX::TypeTiny
-	MooX::XSConstructor
-	MooseX::XSConstructor
 	MooseX::XSAccessor
 );
 
@@ -196,6 +194,10 @@ I<minimum required version: 0.002002>
 
 This module attempts to use L<Class::XSConstructor> to speed up the constructor.
 
+B<This module is disabled by default>. XSConstructor modules are not stable
+enough to be enabled by default. It can be enabled manually with
+C<MOOISH_BASE_EXTRA_MODULES>.
+
 I<minimum required version: 0.003002>
 
 =back
@@ -207,6 +209,10 @@ I<minimum required version: 0.003002>
 =item * L<MooseX::XSConstructor>
 
 This module attempts to use L<Class::XSConstructor> to speed up the constructor.
+
+B<This module is disabled by default>. XSConstructor modules are not stable
+enough to be enabled by default. It can be enabled manually with
+C<MOOISH_BASE_EXTRA_MODULES>.
 
 I<minimum required version: 0.001002>
 

@@ -25,7 +25,7 @@ requires:
   Scalar::Util: '0'
   Term::Choose: '1.780'
   Term::Choose::LineFold::XS: '0.005'
-  Term::Choose::Util: '0.145'
+  Term::Choose::Util: '0.148'
   Term::Form::ReadLine: '0.561'
   constant: '0'
   perl: '5.016000'
@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/kuerbis/Term-TablePrint/issues
   repository: https://github.com/kuerbis/Term-TablePrint.git
-version: '0.176'
+version: '0.177'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

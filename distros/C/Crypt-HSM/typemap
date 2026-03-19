@@ -1,16 +1,6 @@
 TYPEMAP
 
 INPUT
-T_MAGIC
-	{
-	SV* arg = $arg;
-	MAGIC* magic = SvROK(arg) && SvRMAGICAL(SvRV(arg)) ? mg_findext(SvRV(arg), PERL_MAGIC_ext, NULL) : NULL;
-	if (magic)
-		$var = ($type)magic->mg_ptr;
-	else
-		Perl_croak(aTHX_ \"%s object is lacking magic\", \"$ntype\");
-	}
-
 T_MAGICEXT
 	{
 	SV* arg = $arg;
@@ -54,8 +44,6 @@ T_OPAQUEOBJ_MAYBE
 
 
 OUTPUT
-T_MAGIC
-	sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, NULL, (const char*)$var, 0);
 T_MAGICEXT
 	{
 	MAGIC* magic = sv_magicext(newSVrv($arg, "$ntype"), NULL, PERL_MAGIC_ext, &${type}_magic, (const char*)$var, 0);

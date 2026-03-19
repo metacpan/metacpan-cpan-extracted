@@ -1,5 +1,18 @@
 Change log for Graphics::Framebuffer
 
+6.91   March 17, 2026
+
+       The latest VirtualBox version (7.2.6) has totally messed up its
+	   framebuffer driver.  Improved "_flush_screen" handling to improve
+	   response to VirtualBox weirdness.
+
+	   Added "--flush" option to the "primitive.pl" script for lessening
+	   VirtualBox weirdness.
+
+6.90   March 17, 2026
+
+       Documentation improvements
+
 6.89   March 12, 2026
 
        Fixed bugs in the Debian install script.

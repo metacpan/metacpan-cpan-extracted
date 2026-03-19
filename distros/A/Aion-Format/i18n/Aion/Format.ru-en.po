@@ -145,6 +145,9 @@ msgstr "See also `IO::Capture::Stderr`."
 msgid "Ловушка для **STDOUT**."
 msgstr "Trap for **STDOUT**."
 
+msgid "В случае ошибки в блоке `STDOUT` восстанавливается, а вывод в блоке – теряется."
+msgstr "If there is an error in the block, `STDOUT` is restored, but the output in the block is lost."
+
 msgid "См. также `IO::Capture::Stdout`."
 msgstr "See also `IO::Capture::Stdout`."
 

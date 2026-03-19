@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 package MetaCPAN::API::Module;
-# ABSTRACT: Module information for MetaCPAN::API
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Carp;
 use Moo::Role;
@@ -27,13 +26,11 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Sawyer X
+
 =head1 NAME
 
 MetaCPAN::API::Module - Module information for MetaCPAN::API
-
-=head1 VERSION
-
-version 0.51
 
 =head1 DESCRIPTION
 
@@ -53,6 +50,15 @@ Searches MetaCPAN and returns a module's C<.pm> file.
 
 This used to be a synonym of C<module>, but the functionality has now
 moved to L<MetaCPAN::API::File>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/xsawyerx/metacpan-api/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

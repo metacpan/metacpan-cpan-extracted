@@ -13,7 +13,7 @@ dbic-mockdata - Generate mock test data for a DBIx::Class schema
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -28,20 +28,45 @@ L<DBIx::Class::MockData> to generate and insert mock rows.
 
 =head1 OPTIONS
 
-  --schema-dir   Directory containing the schema classes           (required)
-  --namespace    Top-level schema package name, e.g. MyApp::Schema (required)
-  --dsn          DBI DSN string, e.g. "dbi:Pg:dbname=mydb"         (required)
-  --user         Database username
-  --password     Database password
-  --rows         Rows to insert per table (default: 5)
-  --seed         Random seed for reproducible output
-  --deploy       Create tables that do not yet exist
-  --wipe         Drop and recreate all tables before inserting (destructive)
-  --dry-run      Print generated values without inserting
-  --only         Comma-separated list of tables to populate (e.g. Author,Book)
-  --exclude      Comma-separated list of tables to skip
-  --verbose      Print debug output
-  --help         Show this help
+  --schema-dir      Directory containing the schema classes           (required)
+  --namespace       Top-level schema package name, e.g. MyApp::Schema (required)
+  --dsn             DBI DSN string, e.g. "dbi:Pg:dbname=mydb"         (required)
+  --user            Database username
+  --password        Database password
+  --rows            Rows to insert per table (default: 5)
+  --rows-per-table  JSON string for per-table row counts, e.g. '{"Author":10,"Book":3}'
+  --generators      JSON string for custom generators, e.g. '{"email":"user{row}@example.com","status":"active"}'
+  --seed            Random seed for reproducible output
+  --deploy          Create tables that do not yet exist
+  --wipe            Drop and recreate all tables before inserting (destructive)
+  --dry-run         Print generated values without inserting
+  --only            Comma-separated list of tables to populate (e.g. Author,Book)
+  --exclude         Comma-separated list of tables to skip
+  --verbose         Print debug output
+  --help            Show this help
+
+=head1 ADVANCED OPTIONS
+
+=head2 Rows Per Table
+
+  --rows-per-table '{"Author":10,"Book":3}'
+
+Allows different row counts for specific tables. Tables not specified use the
+global --rows value.
+
+=head2 Custom Generators
+
+  --generators '{"email":"user{row}@example.com","status":"active"}'
+
+Provides custom value generation for specific columns. The syntax supports:
+
+  * Static values: "active", "pending"
+  * Row number interpolation: "user{row}@example.com" becomes user1@example.com
+  * Perl code evaluation: "sub { return 'prefix_' . int(rand(1000)) }"
+
+For complex generators, use Perl code syntax:
+
+  --generators '{"email":"sub { my ($col,$info,$n,$mock)=@_; return \"user$n\@example.com\"; }"}'
 
 =cut
 
@@ -55,6 +80,8 @@ GetOptions(
     'user=s',
     'password=s',
     'rows=i',
+    'rows-per-table=s',
+    'generators=s',
     'seed=i',
     'deploy',
     'wipe',
@@ -71,6 +98,51 @@ die "ERROR: --namespace is required\n"   unless $opt{namespace};
 die "ERROR: --dsn is required\n"         unless $opt{dsn} || $opt{'dry-run'};
 die "ERROR: --only and --exclude cannot both be specified\n"
     if $opt{only} && $opt{exclude};
+
+# Parse JSON options if provided
+my $rows_per_table = {};
+my $generators     = {};
+
+if ($opt{'rows-per-table'}) {
+    require JSON;
+    $rows_per_table = eval { JSON::decode_json($opt{'rows-per-table'}) };
+    die "ERROR: Invalid JSON for --rows-per-table: $@\n" if $@;
+    die "ERROR: --rows-per-table must be a hash reference\n"
+        unless ref($rows_per_table) eq 'HASH';
+}
+
+if ($opt{generators}) {
+    require JSON;
+    my $gen_spec = eval { JSON::decode_json($opt{generators}) };
+    die "ERROR: Invalid JSON for --generators: $@\n" if $@;
+    die "ERROR: --generators must be a hash reference\n"
+        unless ref($gen_spec) eq 'HASH';
+
+    # Convert string specifications to executable code where needed
+    while (my ($col, $spec) = each %$gen_spec) {
+        if ($spec =~ /^sub\s*\{/) {
+            # Perl code - evaluate to get code reference
+            my $code = eval $spec;
+            die "ERROR: Invalid Perl code for column '$col': $@\n" if $@;
+            $generators->{$col} = $code;
+        }
+        elsif ($spec =~ /{row}/) {
+            # Simple template with {row} placeholder
+            my $template = $spec;
+            $generators->{$col} = sub {
+                my ($col, $info, $n, $mock) = @_;
+                my $value = $template;
+                $value =~ s/{row}/$n/g;
+                return $value;
+            };
+        }
+        else {
+            # Static value
+            my $static = $spec;
+            $generators->{$col} = sub { $static };
+        }
+    }
+}
 
 # Connect the schema — this is DBIx::Class's job, not ours
 
@@ -110,10 +182,12 @@ die "Could not connect schema: $@\n" if $@;
 # Hand the connected schema to MockData
 
 my $mock = DBIx::Class::MockData->new(
-    schema     => $schema,
-    schema_dir => $schema_dir,
-    rows       => $opt{rows},
-    verbose    => $opt{verbose} // 0,
+    schema         => $schema,
+    schema_dir     => $schema_dir,
+    rows           => $opt{rows},
+    rows_per_table => $rows_per_table,
+    generators     => $generators,
+    verbose        => $opt{verbose} // 0,
     (defined $opt{seed}    ? (seed    => $opt{seed})                    : ()),
     (defined $opt{only}    ? (only    => [split /,\s*/, $opt{only}   ]) : ()),
     (defined $opt{exclude} ? (exclude => [split /,\s*/, $opt{exclude}]) : ()),

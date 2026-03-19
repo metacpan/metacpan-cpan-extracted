@@ -11,7 +11,7 @@
 \.o$
 \.bs$
 ^MariaDB\.c$
-^bench/
 ^mariadb_tmp/
 ^start_mariadb\.sh$
+^repro_
 ^EV-MariaDB-

@@ -1,7 +1,7 @@
 {
    "abstract" : "Find or build the nghttp2 HTTP/2 C library",
    "author" : [
-      "Your Name <your@email.com>"
+      "John Napiorkowski <jjn1056@yahoo.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
@@ -53,15 +53,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/yourname/Alien-nghttp2/issues"
+         "web" : "https://github.com/jjn1056/Alien-nghttp2/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/yourname/Alien-nghttp2.git",
-         "web" : "https://github.com/yourname/Alien-nghttp2"
+         "url" : "https://github.com/jjn1056/Alien-nghttp2.git",
+         "web" : "https://github.com/jjn1056/Alien-nghttp2"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

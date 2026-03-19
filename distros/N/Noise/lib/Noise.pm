@@ -2,14 +2,14 @@ use v5.42.0;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Noise v0.0.1 {
+class Noise v0.0.2 {
     use Noise::HandshakeState;
     use Noise::CipherState;
     use Noise::SymmetricState;
     use Noise::Pattern;
     use Crypt::PK::X25519;
     #
-    field $handshake_state;
+    field $handshake_state : reader;
     field $prologue : param //= '';
 
     method initialize_handshake (%params) {

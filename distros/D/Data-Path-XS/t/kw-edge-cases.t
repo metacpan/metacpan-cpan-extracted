@@ -286,6 +286,10 @@ subtest 'empty path - dynamic' => sub {
     $path = "/x/y";
     eval { my $d = { x => [1,2,3] }; pathset $d, $path, 'val' };
     like($@, qr/Cannot navigate/, 'pathset type mismatch dynamic path croaks');
+
+    # constant-path pathset type mismatch gives native Perl error
+    eval q{ my $d = { x => [1,2,3] }; pathset $d, "/x/y", 'val' };
+    like($@, qr/Not a HASH reference/, 'pathset type mismatch constant path gives Perl error');
 };
 
 # Empty path handling for constant paths

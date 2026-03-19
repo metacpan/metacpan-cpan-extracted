@@ -1,0 +1,32 @@
+---
+abstract: 'Linter for GitHub Actions workflow files'
+author:
+  - 'Nigel Horne (njh@nigelhorne.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+  Test::Needs: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-Workflow-Lint
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  YAML::PP: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Workflow-Lint
+  homepage: https://metacpan.org/pod/App::Workflow::Lint
+  repository: git://github.com/nigelhorne/App-Workflow-Lint.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

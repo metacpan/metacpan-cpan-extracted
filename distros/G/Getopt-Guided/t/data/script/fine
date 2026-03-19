@@ -9,9 +9,13 @@ sub run {
   shift;
   my @argv = @_ ? @_ : @ARGV;
 
-  return EXIT_USAGE unless my $rv = processopts @argv, V => \&print_version_info, x => sub { };
-  return EXIT_SUCCESS if $rv eq '-V';
+  my $rv = processopts @argv,
+    V => \&print_version_info,
+    x => sub { }
+    or return EXIT_USAGE;
+  $rv eq '-V'
+    and return EXIT_SUCCESS;
   EXIT_FAILURE
 }
 
-exit( __PACKAGE__->run )
+exit __PACKAGE__->run

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Project prelude for modern Perl style on Perl 5.30+",
+   "author" : [
+      "Sergey Kovalev <skov@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Modern-Perl-Prelude",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Feature::Compat::Try" : "0",
+            "Import::Into" : "0",
+            "builtin::compat" : "0",
+            "perl" : "5.030000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Feature::Compat::Class" : "0",
+            "Feature::Compat::Defer" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/neo1ite/Modern-Perl-Prelude/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/neo1ite/Modern-Perl-Prelude"
+      }
+   },
+   "version" : "0.005",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

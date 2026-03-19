@@ -1,4 +1,5 @@
 Changes
+cpanfile
 lib/Perl6/Rule/Parser.pm
 lib/Regexp/Parser.pm
 lib/Regexp/Parser/Diagnostics.pm
@@ -15,6 +16,12 @@ t/04cond.t
 t/05opens.t
 t/06cclass.t
 t/07flags.t
+t/08caret_flags.t
+t/08perl510.t
+t/08regex_flags.t
+t/09backref_flags.t
+t/10roundtrip.t
+t/11errors.t
 t/99misc.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

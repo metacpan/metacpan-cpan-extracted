@@ -21,6 +21,7 @@ if (-e "$RealBin/../dist.ini") {
 } 
 
 use NBI::Slurm;
+use NBI::EcoScheduler;
 use Cwd;
 
 my $user_home_dir = $ENV{HOME};
@@ -44,6 +45,8 @@ my $verbose;
 my $debug;
 my $run;
 my $gpu;
+my $opt_eco;
+my $opt_no_eco;
 my @slurm_options;
 GetOptions(
     'm|memory=s'    => \$memory,
@@ -60,11 +63,18 @@ GetOptions(
     'placeholder=s' => \$opt_placeholder,
     'gpu'           => \$gpu,
     'option=s'      => \@slurm_options,
+    'eco'           => \$opt_eco,
+    'no-eco'        => \$opt_no_eco,
     'verbose'       => \$verbose,
     'version'       => sub { say "runjob v", $NBI::Slurm::VERSION; exit },
     'debug'         => \$debug,
     'help'          => sub { usage(1) },
 ) or usage(1);
+
+if ($opt_eco && $opt_no_eco) {
+    say STDERR RED, BOLD, "ERROR:", RESET, " --eco and --no-eco are mutually exclusive";
+    exit 1;
+}
 
 $debug = 1 if ($ENV{"DEBUG"});
 $verbose = 1 if ($debug);
@@ -165,6 +175,33 @@ my $opts = NBI::Opts->new(
 );
 
 
+# Eco scheduling
+# eco_default from config defaults to 1 (on) if not explicitly set
+my $eco_default = defined $config->{eco_default} ? $config->{eco_default} : $NBI::EcoScheduler::DEFAULTS{eco_default};
+my $use_eco = $opt_no_eco ? 0
+            : $opt_eco    ? 1
+            :               $eco_default;
+
+if ($use_eco) {
+    if (defined $opts->{start_time} || defined $opts->{start_date}) {
+        say STDERR YELLOW, "[eco] --begin already set explicitly, ignoring eco scheduling", RESET;
+    } else {
+        my ($begin_epoch, $tier) = NBI::EcoScheduler::find_eco_begin($opts->hours, $config);
+        if (defined $begin_epoch) {
+            my $begin_str = NBI::EcoScheduler::epoch_to_slurm($begin_epoch);
+            my $delay     = NBI::EcoScheduler::format_delay($begin_epoch);
+            # Store directly since the parsers accept already-normalised YYYY-MM-DD / HH:MM:SS
+            ($opts->{start_date}, $opts->{start_time}) = split /T/, $begin_str;
+            my $tier_warn = $tier == 2 ? " (job may overrun eco window)"
+                          : $tier == 3 ? " (job may overlap peak hours — best available)"
+                          :              "";
+            say STDERR GREEN, "[eco] Job scheduled for $begin_str (in $delay)$tier_warn", RESET;
+        } else {
+            say STDERR YELLOW, "[eco] No eco slot found in lookahead period, submitting immediately", RESET;
+        }
+    }
+}
+
 if ($verbose) {
     say STDERR GREEN, "CONFIG:\n", RESET;
     xdump($config);
@@ -252,6 +289,8 @@ sub usage {
     --placeholder    Placeholder for array input files [default: #FILE#]
     --gpu            Request GPU resources (adds --gres=gpu:1)
     --option VALUE   Additional SLURM options (can be used multiple times)
+    --eco            Schedule job in next low-energy window (overrides eco_default=0)
+    --no-eco         Submit immediately, ignoring eco scheduling (overrides eco_default=1)
     --verbose        Verbose output
     --help           This help message
  ----------------------------------------------------------
@@ -355,7 +394,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 
@@ -445,6 +484,25 @@ Requests GPU resources for the job by adding the SLURM option '--gres=gpu:1'. Th
 
 Specifies additional SLURM options to be passed directly to the job scheduler. This option can be used multiple times to add multiple custom SLURM directives. For example: '--option="--constraint=gpu"' or '--option="--exclusive"'.
 
+=item B<--eco>
+
+Enables eco scheduling: the job is automatically given a C<--begin> time
+corresponding to the next low-energy-price window.  The window is chosen
+based on the job's walltime (C<--time>) so that, when possible, the whole
+job runs during cheap-energy hours.
+
+If C<eco_default=1> is set in the config file (the default), eco scheduling
+is active for every job unless C<--no-eco> is supplied.
+
+Mutually exclusive with C<--no-eco>.
+
+=item B<--no-eco>
+
+Disables eco scheduling for this job, even when C<eco_default=1> is set
+in the config file.
+
+Mutually exclusive with C<--eco>.
+
 =item B<--help>
 
 Displays the help message for the script.
@@ -462,6 +520,13 @@ Example configuration:
   tmpdir=/home/user/slurm
   memory=8000
   time=3h
+
+  # Eco scheduling (see NBI::EcoScheduler)
+  eco_default=1
+  eco_windows_weekday=00:00-06:00
+  eco_windows_weekend=00:00-07:00,11:00-16:00
+  eco_avoid=17:00-20:00
+  eco_lookahead_days=3
 
 =head1 EXAMPLES
 
@@ -493,6 +558,14 @@ Submitting a GPU job:
 Adding custom SLURM options:
 
     runjob --option="--constraint=intel" --option="--exclusive" -r "my_program"
+
+Submitting a job in the next eco window (low-energy hours):
+
+    runjob --eco -t 4h -r "big_analysis.sh"
+
+Overriding eco scheduling for an urgent job:
+
+    runjob --no-eco -r "urgent_task.sh"
 
 =head1 AUTHOR
 

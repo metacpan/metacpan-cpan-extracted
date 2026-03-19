@@ -17,11 +17,11 @@ my @files = (
     'bin/http_this',
     'lib/App/HTTPThis.pm',
     't/00-compile.t',
-    't/author-distmeta.t',
-    't/author-eol.t',
-    't/author-no-tabs.t',
-    't/author-pod-coverage.t',
-    't/author-pod-syntax.t'
+    'xt/author-distmeta.t',
+    'xt/author-eol.t',
+    'xt/author-no-tabs.t',
+    'xt/author-pod-coverage.t',
+    'xt/author-pod-syntax.t'
 );
 
 notabs_ok($_) foreach @files;

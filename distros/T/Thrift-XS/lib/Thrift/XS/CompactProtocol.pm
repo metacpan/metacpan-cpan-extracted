@@ -2,6 +2,7 @@ package Thrift::XS::CompactProtocol;
 
 use strict;
 use base('Thrift::XS::BinaryProtocol');
+use Thrift::MessageType;
 
 use Thrift::XS;
 

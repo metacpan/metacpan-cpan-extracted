@@ -1,5 +1,57 @@
 Revision history for Net-Jabber-Bot
 
+2.1.8 2026-03-19 Todd Rinaldo
+
+  [Fixes]
+  - #12  Fix broken reconnection (called nonexistent InitJabber), fix
+         IsConnected always returning truthy, handle undef jabber_client
+         after disconnect, and plug memory leak in messages_sent_today (PR #18)
+  - #14  Fix GTalk connection failures and from_full operator precedence bug
+         that returned only the username instead of user@server/alias (PR #16)
+  - #9   Update POD docs to match newline-preserving regex behavior and add
+         multiline message tests (PR #19)
+  - #28  Remove legacy developer names from bot_example.pl AUTHOR section
+         (PR #29)
+  - #30  Migrate from Moose to Moo, replace MooseX::Types with
+         Type::Tiny/Types::Standard, remove Config::Std dependency (PR #47)
+  - #37  Remove disproportionate sleep 30 from BUILD legacy parameter
+         handling (PR #43)
+  - #38  Fix MockJabberClient::Disconnect setting is_connected=1 instead
+         of 0 (PR #44)
+  - #39  Add missing RosterDB/RosterRequest/RosterDBJIDs stubs to mock
+         client (PR #45)
+  - #40  Fix uninitialized value warnings from .= on fresh variables in
+         tests (PR #42)
+  - #48  Suppress 'Subroutine redefined' warnings in MockJabberClient
+         (PR #50)
+  - #32  Eliminate unnecessary sleeps from mock test suite, cutting runtime
+         from ~120s to ~60s (PR #51)
+  - Fix four bugs in Bot.pm: broken string interpolation of method call,
+    typo in error message, variable shadowing in SetForumSubject, and crash
+    on reconnect from undefined background_function (PR #20)
+  - Mask plaintext password in DEBUG log output and fix operator precedence
+    bug (PR #26)
+
+  [Improvements]
+  - #13  Add optional $from parameter to SendPersonalMessage,
+         SendGroupMessage, and SendJabberMessage for relay bots (PR #17)
+  - #36  Make auto-subscribe to presence requests configurable via new
+         auto_subscribe attribute (PR #46)
+
+  [Maintenance]
+  - #23  Consolidate three CI workflows into single testsuite.yml, update
+         actions/checkout v1→v4, use perldocker/perl-tester images, add
+         dynamic perl-actions/perl-versions matrix (PR #24)
+  - #33  Extend CI test matrix back to Perl 5.10 (PR #52)
+  - Modernize Makefile.PL: separate TEST_REQUIRES, add CONFIGURE_REQUIRES,
+    MIN_PERL_VERSION, upgrade META_MERGE to meta-spec v2 (PR #21)
+  - Modernize POD: fix typos, update URLs to cpan-authors org, fix command
+    injection in bot_example.pl, fix string comparison bug in
+    gtalk_RSSbot.pl (PR #22)
+  - Add cpanfile for modern CI dependency management (PR #24)
+  - Add CLAUDE.md with project conventions (PR #25)
+  - Move README.md to .github
+
 2.1.7 2020-11-05 Todd Rinaldo
 - #15 Fix _send_individual_message to not strip new lines.
 

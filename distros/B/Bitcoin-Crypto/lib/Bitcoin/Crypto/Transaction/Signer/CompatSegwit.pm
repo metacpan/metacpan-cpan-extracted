@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Signer::CompatSegwit;
-$Bitcoin::Crypto::Transaction::Signer::CompatSegwit::VERSION = '4.003';
+$Bitcoin::Crypto::Transaction::Signer::CompatSegwit::VERSION = '4.004';
 use v5.14;
 use warnings;
 

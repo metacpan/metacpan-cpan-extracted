@@ -1,4 +1,25 @@
 #ABSTRACT: NBI::QueuedJob, to describe a job from the SLURM queue (squeue)
+#
+# NBI::QueuedJob - Represents a single job entry returned by squeue.
+#
+# DESCRIPTION:
+#   A lightweight data object populated from one row of squeue output.
+#   Key responsibilities:
+#     - new()      : accepts -user, -jobid, -queue, -status, -name, and any
+#                    additional valid squeue attribute (validated against
+#                    @VALID_ATTR and @VALID_STATUS lists)
+#     - Lvalue accessors: username, queue, name, jobid, status
+#     - $attrs hash: holds any extra squeue fields passed via -<attr> => value
+#   Validation constants:
+#     - @VALID_ATTR   : list of valid squeue column names (extended with keys
+#                       from %NBI::Slurm::FORMAT_STRINGS)
+#     - @VALID_STATUS : list of valid long-form SLURM job states
+#
+# RELATIONSHIPS:
+#   - Instantiated exclusively by NBI::Queue->_squeue() for each output row.
+#   - Depends on %NBI::Slurm::FORMAT_STRINGS for the extended @VALID_ATTR list.
+#   - $NBI::QueuedJob::VERSION is set from $NBI::Slurm::VERSION.
+#
 use strict;
 use warnings;
 package NBI::QueuedJob;
@@ -130,7 +151,7 @@ NBI::QueuedJob - NBI::QueuedJob, to describe a job from the SLURM queue (squeue)
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 

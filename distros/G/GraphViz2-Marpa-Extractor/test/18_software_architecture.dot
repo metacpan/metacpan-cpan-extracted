@@ -1,0 +1,41 @@
+digraph Architecture {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fillcolor="#f0f0f0"];
+
+    subgraph cluster_frontend {
+        label="Frontend Layer";
+        style=filled;
+        color=lightblue;
+        web [label="Web App"];
+        mobile [label="Mobile App"];
+    }
+
+    subgraph cluster_backend {
+        label="Backend Layer";
+        style=filled;
+        color=lightyellow;
+        api [label="API Gateway"];
+        auth [label="Auth Service"];
+        user [label="User Service"];
+        order [label="Order Service"];
+    }
+
+    subgraph cluster_data {
+        label="Data Layer";
+        style=filled;
+        color=lightgreen;
+        db1 [label="User DB", shape=cylinder];
+        db2 [label="Order DB", shape=cylinder];
+        cache [label="Cache", shape=box3d];
+    }
+
+    web -> api;
+    mobile -> api;
+    api -> auth;
+    api -> user;
+    api -> order;
+    user -> db1;
+    order -> db2;
+    auth -> cache;
+    user -> cache;
+}

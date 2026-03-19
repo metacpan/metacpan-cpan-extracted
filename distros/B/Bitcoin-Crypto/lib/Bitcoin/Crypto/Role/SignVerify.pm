@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::SignVerify;
-$Bitcoin::Crypto::Role::SignVerify::VERSION = '4.003';
+$Bitcoin::Crypto::Role::SignVerify::VERSION = '4.004';
 use v5.14;
 use warnings;
 use Mooish::Base -standard, -role;

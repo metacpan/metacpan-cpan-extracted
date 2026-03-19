@@ -1,14 +1,19 @@
 ---
-abstract: 'Object-oriented handling of deeply nested hash structures'
+abstract: Data::NestedKey
 author:
-  - 'Rob Lauer <rclauer@gmail.com>'
+  - 'Rob Lauer <rlauer@treasurersbriefcase.com>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+  JSON: '0'
+  Storable: '0'
   Test::More: '0'
+  YAML::XS: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,14 +23,18 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  Data::NestedKey:
+    file: lib/Data/NestedKey.pm
+    version: v1.0.8
 requires:
-  Carp: '0'
   JSON: '0'
-  List::Util: '0'
-  Scalar::Util: '0'
-  Storable: '0'
-  YAML: '0'
+  List::Util: '1.32'
+  YAML::XS: '0'
+  perl: '5.010'
 resources:
-  repository: https://github.com/rlauer6/Data-NestedKey
-version: '0.06'
+  bugtracker: http://github.com/rlauer6/data-nestedkey/issues
+  homepage: http://github.com/rlauer6/data-nestedkey.git
+  repository: git://github.com/rlauer6/data-nestedkey.git
+version: v1.0.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

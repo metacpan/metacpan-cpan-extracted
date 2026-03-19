@@ -12,6 +12,7 @@
 ^EV-Pg-
 ^\.claude/
 ^CLAUDE\.md$
+^_Inline/
 ~$
 \.bak$
 \.swp$

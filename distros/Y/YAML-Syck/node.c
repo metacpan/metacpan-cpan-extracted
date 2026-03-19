@@ -45,7 +45,7 @@ syck_free_node( SyckNode *n )
 }
 
 SyckNode *
-syck_alloc_map()
+syck_alloc_map(void)
 {
     SyckNode *n;
     struct SyckMap *m;
@@ -64,7 +64,7 @@ syck_alloc_map()
 }
 
 SyckNode *
-syck_alloc_seq()
+syck_alloc_seq(void)
 {
     SyckNode *n;
     struct SyckSeq *s;
@@ -82,7 +82,7 @@ syck_alloc_seq()
 }
 
 SyckNode *
-syck_alloc_str()
+syck_alloc_str(void)
 {
     SyckNode *n;
     struct SyckStr *s;

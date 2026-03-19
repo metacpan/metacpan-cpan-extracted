@@ -22,6 +22,12 @@
   </helper>
   <helper>
     <foaf:Person>
+      <foaf:name>Grinnz</foaf:name>
+      <foaf:mbox rdf:resource="mailto:grinnz@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
       <foaf:name>Karen Etheridge</foaf:name>
       <foaf:mbox rdf:resource="mailto:ether@cpan.org" />
     </foaf:Person>
@@ -309,6 +315,12 @@
     <Version>
       <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.32.0</revision>
       <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2025-06-25</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.32.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2025-08-30</dc:issued>
     </Version>
   </release>
   <programming-language>Perl</programming-language>

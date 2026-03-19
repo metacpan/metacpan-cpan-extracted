@@ -31,7 +31,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 10;
+plan tests => 11;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -57,10 +57,9 @@ EV::run;
 undef $t1;  # Cancel timer
 
 SKIP: {
-    skip "no lease id", 3 unless $lease_id;
+    skip "no lease id", 4 unless $lease_id;
 
-    # Start keepalive - note: it doesn't return a handle
-    $client->lease_keepalive($lease_id, sub {
+    my $keepalive_handle = $client->lease_keepalive($lease_id, sub {
         my ($resp, $err) = @_;
         if ($err) {
             diag("Keepalive error: " . (ref($err) ? $err->{message} : $err));
@@ -73,7 +72,8 @@ SKIP: {
         }
     });
 
-    pass('lease_keepalive started');
+    ok(defined $keepalive_handle, 'lease_keepalive returns handle');
+    isa_ok($keepalive_handle, 'EV::Etcd::Keepalive', 'keepalive handle');
 
     # Wait for at least one keepalive response
     my $keepalive_timer = EV::timer 5, 0, sub {

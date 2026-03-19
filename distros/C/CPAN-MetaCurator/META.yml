@@ -4,6 +4,8 @@ author:
   - 'Ron Savage (ron@savage.net.au)'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::CPAN::Changes: '0.500005'
+  Test::Changes::Strict::Simple: '0.01'
   Test::More: '1.001002'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -46,15 +48,15 @@ requires:
   Text::CSV::Encoded: '0.25'
   Types::Standard: '2.006'
   boolean: '0.46'
-  constant: '1.33'
   lib: '0.65'
   open: '1.13'
   parent: '0.242'
+  perl: '5.36'
   strict: '1.12'
   warnings: '1.58'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaCurator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/CPAN-MetaCurator.git
-version: '1.11'
+version: '1.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

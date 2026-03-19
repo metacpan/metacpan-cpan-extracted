@@ -1,5 +1,11 @@
 Revision history for MIDI-RtController-Filter-Tonal
 
+0.0501 2026-03-15 19:15:59
+  - The previous change was a brain-fart.
+
+0.0500 2026-03-15 11:56:37
+  - Add the crucial single_tone() filter!
+
 0.0403 2025-04-27 13:46:28
   - Actually use the continue attribute.
 

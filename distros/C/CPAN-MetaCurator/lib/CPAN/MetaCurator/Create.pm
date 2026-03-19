@@ -8,7 +8,7 @@ use Moo;
 
 use Types::Standard qw/Object Str/;
 
-our $VERSION = '1.11';
+our $VERSION = '1.13';
 
 # -----------------------------------------------
 

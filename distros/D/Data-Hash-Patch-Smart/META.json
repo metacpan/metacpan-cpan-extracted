@@ -1,0 +1,68 @@
+{
+   "abstract" : "Apply structural, wildcard, and array-aware patches to Perl data structures",
+   "author" : [
+      "Nigel Horne (njh@nigelhorne.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Hash-Patch-Smart",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "JSON::MaybeXS" : "0",
+            "Scalar::Util" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Hash::Diff::Smart" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-Hash-Patch-Smart@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Hash-Patch-Smart",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Hash-Patch-Smart"
+      },
+      "homepage" : "https://metacpan.org/pod/Data::Hash::Patch::Smart",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Data-Hash-Patch-Smart.git",
+         "web" : "https://github.com/nigelhorne/Data-Hash-Patch-Smart",
+         "x_repository" : "https://github.com/nigelhorne/Data-Hash-Patch-Smart"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

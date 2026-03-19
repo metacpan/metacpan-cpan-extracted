@@ -4,7 +4,7 @@
       "Todd E Rinaldo <toddr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,48 +22,52 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "FindBin" : "0",
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0",
-            "lib" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
-            "FindBin" : "0",
             "Log::Log4perl" : "0",
-            "Moose" : "0.82",
-            "MooseX::Types" : "0.12",
+            "Moo" : "2",
             "Mozilla::CA" : "0",
             "Net::Jabber" : "2",
             "Sys::Hostname" : "0",
+            "Time::HiRes" : "0",
+            "Type::Tiny" : "1",
+            "Types::Standard" : "0",
+            "perl" : "5.008",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
             "Test::More" : "0",
             "Test::NoWarnings" : "0",
-            "Time::HiRes" : "0",
-            "lib" : "0",
-            "version" : "0"
+            "lib" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/perl-net-jabber-bot/issues"
+         "web" : "https://github.com/cpan-authors/perl-net-jabber-bot/issues"
       },
-      "homepage" : "http://wiki.github.com/toddr/perl-net-jabber-bot",
+      "homepage" : "https://metacpan.org/pod/Net::Jabber::Bot",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/toddr/perl-net-jabber-bot/tree/master"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/perl-net-jabber-bot.git",
+         "web" : "https://github.com/cpan-authors/perl-net-jabber-bot"
       }
    },
-   "version" : "v2.1.7",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v2.1.8",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

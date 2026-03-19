@@ -46,7 +46,7 @@ INSTALLATION
 
 DEPENDENCIES
 
-  * Perl 5.14 or later
+  * Perl 5.26 or later
   * XS::Parse::Keyword 0.40 or later
 
 LICENSE

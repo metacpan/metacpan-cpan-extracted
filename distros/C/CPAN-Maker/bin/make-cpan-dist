@@ -47,6 +47,7 @@ Options
 -V                  - version from module
 -x                  - do not cleanup files
 -y                  - name of a file containing PL_FILES entries
+-Y                  - name of the recommends file
 -z                  - dryrun
 -Z                  - resources file
 
@@ -60,6 +61,45 @@ modified under the same terms as Perl itself.
 EOT
     
     exit;
+}
+
+########################################################################
+function build_module_index {
+########################################################################
+    local root="$1"
+    local index_file="$2"
+
+    find -L "$root" -not -path '*/.git/*' -type f -name '*.pm' | \
+        perl -ne '
+            chomp;
+            my $f = $_;
+            open my $fh, "<", $f or next;
+            while (<$fh>) {
+                if (/^package\s+([\w:]+)/) {
+                    print "$1 $f\n";
+                }
+            }
+            close $fh;
+        ' > "$index_file"
+}
+
+########################################################################
+function module2path_indexed {
+########################################################################
+    local module="$1"
+    local index_file="$2"
+    local root="$3"
+
+    local hit
+    hit=$(awk -v m="$module" '$1 == m { print $2; exit }' "$index_file")
+
+    if [[ -n "$hit" ]]; then
+        echo "${hit##$root}"
+        return
+    fi
+
+    # fallback: direct path derivation
+    echo "$module" | perl -npe 's/::/\//g; s/\n//' | sed 's/$/.pm/'
 }
 
 ########################################################################
@@ -125,35 +165,6 @@ function TRACE {
     [ "$LOG_LEVEL" -ge 5 ] && 2>&1 echo "TRACE: $1" && return
 }
 
-########################################################################
-function module2path {
-########################################################################
-    module="$1";
-
-    path="$(echo $1 | perl -npe 's/::/\//g').pm"
-
-    if [[ -e "$path" ]]; then
-        echo $path;
-        return;
-    fi
-
-    root="${PROJECT_HOME}/${perl5libdir}/"
-
-    if ! [[ -d "$root" ]]; then
-      root="$PROJECT_HOME"
-    fi
-
-    for a in $(find $root -name '*.pm'); do
-        if grep -q "^package $module;" $a; then
-            echo "${a##$root}";
-            return;
-        elif [[ $a = "$root$path" ]]; then
-            echo "${a##$root}";
-            return;
-        fi
-    done
-}
-
 # look for project home directory from here back, sets PROJECT_HOME
 ########################################################################
 function find_git_home {
@@ -201,7 +212,6 @@ function cleanup {
             rm -f "${workdir}/$a"
         done
     fi
-
 }
 
 # default dependency finder
@@ -218,6 +228,7 @@ function perl_requires {
         FATAL_ERROR "Install Module::ScanDeps::Static use the -r option to provide your own dependency checker"
     fi
 }
+
 
 # attempts to grab module versions
 ########################################################################
@@ -288,7 +299,7 @@ function executables() {
 
     if [[ -n "$filelist" ]] && [[ -n "$executables" ]]; then
         if [[ -d "${PROJECT_HOME}/$executables" ]]; then
-            find -L ${PROJECT_HOME}/${executables} $maxdepth -type f -executable >> $filelist;
+            find -L ${PROJECT_HOME}/${executables} $maxdepth -not -path '*/.git/*' -type f -executable >> $filelist;
         else
             if [[ -f "$executables" ]]; then
                 cat $executables >> $filelist;
@@ -312,7 +323,7 @@ TREE=$(command -v tree);
 PERL=$(command -v perl);
 MAKE_CPAN_DIST=$(command -v make-cpan-dist.pl)
 
-while getopts "?Aa:b:B:cC:d:D:E:e:f:F:g:hH:kl:L:m:M:no:OpP:r:R:sS:t:T:vV:xy:zZ:" arg "$@"; do
+while getopts "?Aa:b:B:cC:d:D:E:e:f:F:g:hH:kl:L:m:M:no:OpP:r:R:sS:t:T:vV:xY:y:zZ:" arg "$@"; do
 
     case "${arg}" in
 
@@ -456,6 +467,9 @@ while getopts "?Aa:b:B:cC:d:D:E:e:f:F:g:hH:kl:L:m:M:no:OpP:r:R:sS:t:T:vV:xy:zZ:"
         y)
             PL_FILES="$OPTARG";
             ;;
+        Y)
+            recommends_file="$OPTARG";
+            ;;
 
         z)
             DRYRUN="--dryrun";
@@ -465,6 +479,7 @@ while getopts "?Aa:b:B:cC:d:D:E:e:f:F:g:hH:kl:L:m:M:no:OpP:r:R:sS:t:T:vV:xy:zZ:"
             ;;
     esac
 done
+
 
 if [[ -n "$CREATE_BUILDSPEC" ]] && [[ -z "$OVERWRITE" ]]; then
     if [[ -e "$CREATE_BUILDSPEC" ]]; then
@@ -570,6 +585,17 @@ if [[ -n "$build_requires" ]]; then
   fi
 fi
 
+if [[ -n "$recommends_file" ]]; then
+  if [[ "$recommends_file" != /* ]]; then
+      recommends_file="$PROJECT_HOME/$recommends_file"
+  fi
+
+  RECOMMENDS="--recommends $recommends_file"
+  if ! [[ -e "$recommends_file" ]]; then
+     FATAL_ERROR "$recommends_file not found";
+  fi
+fi
+
 if [[ -n "$dependency_file" ]]; then
     if [[ -z "$CORE_MODULES" ]]; then
         CORE_MODULES="--no-core-modules"
@@ -589,6 +615,7 @@ echo "        PROJECT HOME: $PROJECT_HOME"
 echo "     DEPENDENCY FILE: $dependency_file"
 echo "TEST DEPENDENCY FILE: $test_dependency_file"
 echo "      BUILD REQUIRES: $build_requires"
+echo "          RECOMMENDS: $recommends_file"
 
 # typical directory within project tree containing Perl modules
 perl5libdir=${perl5libdir:-src/main/perl/lib}
@@ -648,7 +675,6 @@ if [ ! "$recurse_directories" = "yes" ]; then
 fi
 
 all_files=$(mktemp)
-
 executables $bindir $all_files
 EXEC_PATH=$bindir
 
@@ -686,17 +712,29 @@ fi
 # own set of files to package
 
 if [[ "$recurse_directories" = "yes" ]]; then
-    find -L ${PROJECT_HOME}/${perl5libdir} -type f -name '*.pm' > $package_files;
+    find -L ${PROJECT_HOME}/${perl5libdir} -not -path '*/.git/*' -type f -name '*.pm' > $package_files;
     MODULE_PATH="--module-path ${perl5libdir}"
 else
     if [[ -s "$provides" ]]; then
         echo "$MODULE" >>$provides
-            
+        # build index once
+        _module_index=$(mktemp)
+        root="${PROJECT_HOME}/${perl5libdir}/"
+        build_module_index "$root" "$_module_index"
+        
         for a in $(cat $provides); do
             if [[ -n "$a" ]]; then
-                echo "${PROJECT_HOME}/${perl5libdir}/$(module2path $a)" >> $package_files
+                echo "${PROJECT_HOME}/${perl5libdir}/$(module2path_indexed $a $_module_index $root)" >> $package_files
             fi
         done
+
+        rm "$_module_index"
+
+#        for a in $(cat $provides); do
+#            if [[ -n "$a" ]]; then
+#                echo "${PROJECT_HOME}/${perl5libdir}/$(module2path $a)" >> $package_files
+#            fi
+#        done
     else
         # must package the module at least?
         echo "${PROJECT_HOME}/${perl5libdir}/$module_file" >$package_files
@@ -817,7 +855,7 @@ if [[ -n "$testsdir" ]]; then
 
         testsfile=$(mktemp);
 
-        find -L "${PROJECT_HOME}/$testsdir" -type f -name '*.t' > $testsfile
+        find -L "${PROJECT_HOME}/$testsdir" -not -path '*/.git/*' -type f -name '*.t' > $testsfile
 
         if ! [[ -e "$testsfile" ]]; then
             INFO "no tests found in [$testsdir]...proceeding anyway."
@@ -907,6 +945,7 @@ cmd=(
     "$MAKE_CPAN_DIST"
     $CORE_MODULES
     $BUILD_REQUIRES
+    $RECOMMENDS
     -r "$dependency_file"
     -e $exe_files
     $TEST_REQUIRES
@@ -944,7 +983,7 @@ else
         $TREE
         cat Makefile.PL
     fi
-
+    
     if [[ -n "$PERLTIDY" ]]; then
         if $PERLTIDY Makefile.PL; then
             mv Makefile.PL.tdy Makefile.PL;
@@ -952,7 +991,9 @@ else
     fi
     
     if $PERL Makefile.PL; then
+
         make manifest
+
         make dist
 
         cp *.tar.gz $destdir

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Util;
-$Bitcoin::Crypto::Util::VERSION = '4.003';
+$Bitcoin::Crypto::Util::VERSION = '4.004';
 use v5.14;
 use warnings;
 use Exporter qw(import);

@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 	get_project_indicators
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -93,6 +93,10 @@ sub get_project_indicators($type = undef) {
 		cpp => [
 			'CMakeLists.txt', 'Makefile', 'configure.ac',
 			'*.cpp', '*.hpp', '*.cc', '*.h'
+		],
+		c => [
+			'CMakeLists.txt', 'Makefile', 'configure.ac',
+			'*.c', '*.h',
 		],
 		docker => [
 			'Dockerfile', 'docker-compose.yml', 'docker-compose.yaml',

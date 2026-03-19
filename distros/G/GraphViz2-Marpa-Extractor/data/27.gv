@@ -1,0 +1,14 @@
+digraph graph_27
+{
+	node_27_1
+	[
+		color = red
+		fontcolor = green
+	]
+	node_27_2
+	[
+		color = green
+		fontcolor = red
+	]
+	node_27_1 -> node_27_2
+}

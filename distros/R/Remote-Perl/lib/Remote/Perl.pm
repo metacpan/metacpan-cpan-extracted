@@ -21,7 +21,7 @@ use Remote::Perl::Protocol   qw(
 );
 use Remote::Perl::Transport;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 # -- Tmpfile strategy mapping --------------------------------------------------
 

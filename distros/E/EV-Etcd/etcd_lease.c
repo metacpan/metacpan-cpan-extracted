@@ -7,8 +7,6 @@
 #include "XSUB.h"
 #include "ppport.h"
 
-#include <EV/EVAPI.h>
-
 #include "etcd_common.h"
 #include "etcd_lease.h"
 
@@ -20,12 +18,7 @@ void process_lease_grant_response(pTHX_ pending_call_t *pc) {
     UNPACK_RESPONSE(pc, resp, etcdserverpb__lease_grant_response__unpack);
 
     if (resp->error && strlen(resp->error) > 0) {
-        dSP;
-        ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_INTERNAL,
-            resp->error, strlen(resp->error), "lease_grant")));
-        PUTBACK; call_sv(pc->callback, G_DISCARD); FREETMPS; LEAVE;
+        CALL_STATUS_ERROR_CALLBACK(pc->callback, GRPC_STATUS_INTERNAL, resp->error, "lease_grant");
         etcdserverpb__lease_grant_response__free_unpacked(resp, NULL);
         return;
     }
@@ -146,6 +139,8 @@ void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
         kp = &(*kp)->next;
     }
 
+    if (ev_is_active(&kc->reconnect_timer))
+        ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
     grpc_metadata_array_destroy(&kc->initial_metadata);
     grpc_metadata_array_destroy(&kc->trailing_metadata);
     if (kc->recv_buffer) {
@@ -162,12 +157,14 @@ void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
 /* Process LeaseKeepAliveResponse */
 void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
     if (!kc->recv_buffer) {
+        kc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "No keepalive response received");
         return;
     }
 
     grpc_byte_buffer_reader reader;
     if (!grpc_byte_buffer_reader_init(&reader, kc->recv_buffer)) {
+        kc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Failed to read keepalive response buffer");
         return;
     }
@@ -180,6 +177,7 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
     grpc_slice_unref(slice);
 
     if (!resp) {
+        kc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Failed to parse keepalive response");
         return;
     }
@@ -188,14 +186,7 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
 
     if (resp->ttl == 0) {
         kc->active = 0;
-        {
-            dSP;
-            ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP, 2);
-            PUSHs(&PL_sv_undef);
-            PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_NOT_FOUND,
-                "Lease expired", 13, "keepalive")));
-            PUTBACK; call_sv(kc->callback, G_DISCARD); FREETMPS; LEAVE;
-        }
+        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_NOT_FOUND, "Lease expired", "keepalive");
         etcdserverpb__lease_keep_alive_response__free_unpacked(resp, NULL);
         return;
     }
@@ -209,19 +200,19 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
     CALL_SUCCESS_CALLBACK(kc->callback, result);
 }
 
-/* Try to reconnect a keepalive after stream ended */
-int try_reconnect_keepalive(pTHX_ keepalive_call_t *kc) {
+/* Perform keepalive reconnection (called from timer callback) */
+static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
+    dTHX;
+    (void)loop;
+    (void)revents;
+
+    keepalive_call_t *kc = (keepalive_call_t *)((char *)w - offsetof(keepalive_call_t, reconnect_timer));
     ev_etcd_t *client = kc->client;
 
-    if (!kc->auto_reconnect || !client->active || kc->lease_id <= 0) {
-        return 0;
+    if (!client->active) {
+        cleanup_keepalive(aTHX_ kc);
+        return;
     }
-
-    if (kc->reconnect_attempt >= client->max_retries) {
-        return 0;
-    }
-
-    kc->reconnect_attempt++;
 
     /* Cleanup and reinitialize streaming state */
     STREAMING_CALL_CLEANUP(kc);
@@ -247,22 +238,55 @@ int try_reconnect_keepalive(pTHX_ keepalive_call_t *kc) {
     if (!kc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         kc->active = 0;
-        return 0;
+        client->in_callback = 1;
+        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Keepalive reconnect failed");
+        client->in_callback = 0;
+        if (!client->active) {
+            finish_client_destroy(aTHX_ client);
+            return;
+        }
+        cleanup_keepalive(aTHX_ kc);
+        return;
     }
 
     grpc_op ops[4] = {0};
     grpc_metadata auth_md;
     STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, kc);
 
-    init_call_functor(&kc->base, CALL_TYPE_LEASE_KEEPALIVE);
+    init_call_base(&kc->base, CALL_TYPE_LEASE_KEEPALIVE);
     grpc_call_error err = grpc_call_start_batch(kc->call, ops, 4, &kc->base, NULL);
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(kc);
+        client->in_callback = 1;
+        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Keepalive reconnect batch failed");
+        client->in_callback = 0;
+        if (!client->active) {
+            finish_client_destroy(aTHX_ client);
+            return;
+        }
+        cleanup_keepalive(aTHX_ kc);
+    }
+}
+
+int try_reconnect_keepalive(pTHX_ keepalive_call_t *kc) {
+    ev_etcd_t *client = kc->client;
+
+    if (!kc->auto_reconnect || !client->active || kc->lease_id <= 0) {
         return 0;
     }
+
+    if (kc->reconnect_attempt >= client->max_retries) {
+        return 0;
+    }
+
+    kc->reconnect_attempt++;
+
+    ev_tstamp delay = RECONNECT_BACKOFF_SECONDS(kc->reconnect_attempt);
+    ev_timer_init(&kc->reconnect_timer, keepalive_reconnect_cb, delay, 0.0);
+    ev_timer_start(EV_DEFAULT, &kc->reconnect_timer);
 
     return 1;
 }

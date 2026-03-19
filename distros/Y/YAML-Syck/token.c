@@ -241,7 +241,7 @@ int is_newline( char *ptr );
 int newline_len( char *ptr );
 int sycklex_yaml_utf8( YYSTYPE *, SyckParser * );
 int sycklex_bytecode_utf8( YYSTYPE *, SyckParser * );
-int syckwrap();
+int syckwrap(void);
 
 /*
  * My own re-entrant sycklex() using re2c.
@@ -637,7 +637,12 @@ yy47:
 	case 0x0A:	goto yy86;
 	case 0x0D:	goto yy90;
 	case ' ':	goto yy88;
-	default:	goto yy40;
+	default:
+		/* In flow context, comma is always a separator (GitHub #40) */
+		if (*YYTOKEN == ',' && (lvl->status == syck_lvl_iseq || lvl->status == syck_lvl_imap)) {
+			goto yy87;
+		}
+		goto yy40;
 	}
 yy48:
 	yyaccept = 1;
@@ -1654,7 +1659,13 @@ yy117:
 	case 0x0A:	goto yy130;
 	case 0x0D:	goto yy134;
 	case ' ':	goto yy132;
-	default:	goto yy115;
+	default:
+		/* In flow context, comma is always a separator (GitHub #40) */
+		if (plvl->status == syck_lvl_iseq || plvl->status == syck_lvl_imap) {
+			PLAIN_IS_INL();
+			RETURN_IMPLICIT();
+		}
+		goto yy115;
 	}
 yy118:
 	++YYCURSOR;
@@ -2064,7 +2075,9 @@ yy166:
 	case 'n':
 	case 'r':
 	case 't':
-	case 'v':	goto yy178;
+	case 'v':
+	case '/':	goto yy178;
+	case 'u':	goto yy240;
 	case 'x':	goto yy177;
 	default:	goto yy165;
 	}
@@ -2112,10 +2125,17 @@ yy171:
 	default:	goto yy173;
 	}
 yy173:
+	if(yyaccept == 1){
+		/* backslash-space not followed by newline: emit a space (YAML escape \<space> = U+0020)
+		 * YYMARKER points to the space after the backslash; reposition YYCURSOR
+		 * just past it so any subsequent characters are re-parsed as content. */
+		QUOTECAT(qstr, qcapa, qidx, ' ');
+		YYCURSOR = YYMARKER + 1;
+		goto DoubleQuote2;
+	}
 	YYCURSOR = YYMARKER;
 	switch(yyaccept){
 	case 0:	goto yy163;
-	case 1:	goto yy165;
 	}
 yy174:
 	++YYCURSOR;
@@ -2204,6 +2224,70 @@ yy181:
                         QUOTECAT(qstr, qcapa, qidx, ch);
                         goto DoubleQuote2; 
                     }
+yy240:
+	/* \uXXXX unicode escape handler for JSON (with surrogate pair support) */
+	{   long cp;
+	    char hex[5];
+	    int j;
+	    /* YYCURSOR currently points at 'u'; hex digits start at YYCURSOR+1 */
+	    for (j = 0; j < 4; j++) {
+	        char c = *(YYCURSOR + 1 + j);
+	        if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+	            hex[j] = c;
+	        } else {
+	            goto yy165; /* not a valid \uXXXX, fall back to literal */
+	        }
+	    }
+	    hex[4] = '\0';
+	    YYCURSOR += 5; /* skip past 'u' and 4 hex digits */
+	    cp = strtol(hex, NULL, 16);
+
+	    /* Handle UTF-16 surrogate pairs: \uD800-\uDBFF followed by \uDC00-\uDFFF */
+	    if (cp >= 0xD800 && cp <= 0xDBFF) {
+	        /* High surrogate — look for \uXXXX low surrogate */
+	        if (YYCURSOR[0] == '\\' && YYCURSOR[1] == 'u') {
+	            char hex2[5];
+	            int valid = 1;
+	            for (j = 0; j < 4; j++) {
+	                char c = YYCURSOR[2 + j];
+	                if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+	                    hex2[j] = c;
+	                } else {
+	                    valid = 0;
+	                    break;
+	                }
+	            }
+	            if (valid) {
+	                long low;
+	                hex2[4] = '\0';
+	                low = strtol(hex2, NULL, 16);
+	                if (low >= 0xDC00 && low <= 0xDFFF) {
+	                    /* Valid surrogate pair — combine into codepoint above U+FFFF */
+	                    cp = 0x10000 + ((cp - 0xD800) << 10) + (low - 0xDC00);
+	                    YYCURSOR += 6; /* skip past \uXXXX low surrogate */
+	                }
+	            }
+	        }
+	    }
+
+	    /* Encode codepoint as UTF-8 */
+	    if (cp < 0x80) {
+	        QUOTECAT(qstr, qcapa, qidx, (char)cp);
+	    } else if (cp < 0x800) {
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0xC0 | (cp >> 6)));
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0x80 | (cp & 0x3F)));
+	    } else if (cp < 0x10000) {
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0xE0 | (cp >> 12)));
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0x80 | ((cp >> 6) & 0x3F)));
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0x80 | (cp & 0x3F)));
+	    } else {
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0xF0 | (cp >> 18)));
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0x80 | ((cp >> 12) & 0x3F)));
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0x80 | ((cp >> 6) & 0x3F)));
+	        QUOTECAT(qstr, qcapa, qidx, (char)(0x80 | (cp & 0x3F)));
+	    }
+	    goto DoubleQuote2;
+	}
 #line 2205 "<stdout>"
 yy183:
 	yyaccept = 0;
@@ -2825,7 +2909,7 @@ newline_len( char *ptr )
 }
 
 int 
-syckwrap()
+syckwrap(void)
 {
     return 1;
 }

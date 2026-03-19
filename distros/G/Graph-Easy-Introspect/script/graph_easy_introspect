@@ -1,0 +1,427 @@
+#!/usr/bin/env perl
+
+use strict ;
+use warnings ;
+use Getopt::Long ;
+use JSON::PP ;
+use Graph::Easy::Parser::Graphviz ;
+use Graph::Easy ;
+use Graph::Easy::Introspect ;
+
+my $opt_json      = 0 ;
+my $opt_dtd       = 0 ;
+my $opt_grid      = 0 ;
+my $opt_cell_grid = 0 ;
+my $opt_compact   = 0 ;
+my $opt_help      = 0 ;
+
+GetOptions
+	(
+	'json'      => \$opt_json,
+	'dtd'       => \$opt_dtd,
+	'grid'      => \$opt_grid,
+	'cell-grid' => \$opt_cell_grid,
+	'compact'   => \$opt_compact,
+	'help'      => \$opt_help,
+	) or die "Usage: $0 [options] file.dot\n" ;
+
+if ($opt_help)
+	{
+	print <<'HELP' ;
+Usage: graph_easy_introspect [options] file.dot
+
+Output format:
+  --json        emit the AST as JSON
+  --dtd         emit the AST via Data::TreeDumper
+  --compact     suppress port and path detail; show only edge endpoints
+
+Supplementary data (text mode: printed as sections; json/dtd: included in dump):
+  --grid        include the rendered character grid
+  --cell-grid   include the cell-grid lookup table
+
+  --help        show this message
+HELP
+	exit ;
+	}
+
+my $file = shift or die "Usage: $0 [options] file.dot  (--help for details)\n" ;
+
+open my $fh, '<', $file or die "Cannot open $file: $!\n" ;
+my $dot = do { local $/ ; <$fh> } ;
+close $fh ;
+
+my $parser = Graph::Easy::Parser::Graphviz->new ;
+my $g      = $parser->from_text($dot) ;
+my $ast    = $g->ast ;
+
+die "Layout error: $ast->{error}\n" if exists $ast->{error} ;
+
+my $grid      = $g->ast_grid ;
+my $cell_grid = $g->ast_cell_grid ;
+
+if ($opt_dtd)
+	{
+	eval { require Data::TreeDumper } ;
+	die "--dtd requires Data::TreeDumper: $@\n" if $@ ;
+
+	my %dump = (%$ast) ;
+	$dump{grid}      = $grid      if $opt_grid ;
+	$dump{cell_grid} = $cell_grid if $opt_cell_grid ;
+
+	print Data::TreeDumper::DumpTree(\%dump, 'AST') ;
+	exit ;
+	}
+
+if ($opt_json)
+	{
+	my %dump = (%$ast) ;
+	$dump{grid}      = $grid      if $opt_grid ;
+	$dump{cell_grid} = $cell_grid if $opt_cell_grid ;
+
+	print JSON::PP->new->pretty->canonical->encode(\%dump) ;
+	exit ;
+	}
+
+# Graph::Easy default attribute values — suppressed unless overridden
+my %GRAPH_DEFAULTS =
+	(
+	colorscheme => 'x11',
+	flow        => 'south',
+	title       => 'unnamed',
+	) ;
+
+print_rendered($grid) if $opt_grid ;
+
+print_graph($ast) ;
+print "\n" ;
+print_nodes($ast) ;
+print "\n" ;
+print_edges($ast) ;
+print "\n" ;
+print_groups($ast) ;
+
+if ($opt_cell_grid && $cell_grid)
+	{
+	print "\n" ;
+	print_cell_grid($cell_grid) ;
+	}
+
+exit ;
+
+# ------------------------------------------------------------------------------
+
+sub print_rendered
+{
+my ($grid) = @_ ;
+
+return unless $grid ;
+
+print "Rendered:\n" ;
+
+for my $row (@$grid)
+	{
+	print "\t", join('', @$row), "\n" ;
+	}
+
+print "\n" ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub print_graph
+{
+my ($ast) = @_ ;
+
+my $g   = $ast->{graph} ;
+my $dir = $g->{is_directed} ? 'yes' : 'no' ;
+
+print "Graph:\n" ;
+printf "\tdirected\t%s\n",    $dir ;
+printf "\tsize\t\t%d x %d\n", $g->{total_width}, $g->{total_height} ;
+printf "\tlabel\t\t%s\n",     $g->{label} if defined $g->{label} ;
+
+my %extra_attrs = %{ $g->{attrs} } ;
+delete $extra_attrs{$_} for qw/label directed/ ;
+
+for my $key (sort keys %extra_attrs)
+	{
+	my $val = $extra_attrs{$key} ;
+	next if exists $GRAPH_DEFAULTS{$key} && $GRAPH_DEFAULTS{$key} eq $val ;
+	printf "\t%s\t\t%s\n", $key, $val ;
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub print_nodes
+{
+my ($ast) = @_ ;
+
+my @nodes = @{ $ast->{nodes} } ;
+
+my %comps ;
+$comps{$_->{component}}++ for @nodes ;
+my $multi_comp = keys(%comps) > 1 ;
+
+my $max_id   = max_len(map { $_->{id} } @nodes) ;
+my $max_cell = max_len(map { sprintf '(%d,%d)', $_->{x}, $_->{y} } @nodes) ;
+my $max_char = max_len(map { sprintf '(%d,%d)', $_->{char_x}, $_->{char_y} } @nodes) ;
+my $max_size = max_len(map { sprintf '%dx%d', $_->{char_width}, $_->{char_height} } @nodes) ;
+
+if ($multi_comp)
+	{
+	my %by_comp ;
+	push @{$by_comp{$_->{component}}}, $_ for @nodes ;
+
+	for my $cid (sort { $a <=> $b } keys %by_comp)
+		{
+		printf "Nodes  (component %d):\n", $cid ;
+		print_node_list($by_comp{$cid}, $max_id, $max_cell, $max_char, $max_size) ;
+		print "\n" ;
+		}
+	}
+else
+	{
+	print "Nodes:\n" ;
+	print_node_list(\@nodes, $max_id, $max_cell, $max_char, $max_size) ;
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub print_node_list
+{
+my ($nodes, $max_id, $max_cell, $max_char, $max_size) = @_ ;
+
+for my $n (@$nodes)
+	{
+	my $cell   = sprintf '(%d,%d)', $n->{x},      $n->{y} ;
+	my $char   = sprintf '(%d,%d)', $n->{char_x}, $n->{char_y} ;
+	my $size   = sprintf '%dx%d',   $n->{char_width}, $n->{char_height} ;
+	my $suffix = $n->{is_isolated} ? '  isolated' : '' ;
+
+	printf "\t%-*s  cell=%-*s  char=%-*s  size=%-*s%s\n",
+		$max_id,   $n->{id},
+		$max_cell, $cell,
+		$max_char, $char,
+		$max_size, $size,
+		$suffix ;
+
+	next if $opt_compact ;
+
+	if (@{ $n->{groups} })
+		{
+		printf "\t\tgroups\t%s\n", join(', ', @{ $n->{groups} }) ;
+		}
+
+	for my $side (qw/left right top bottom unknown/)
+		{
+		my @ports = @{ $n->{ports}{$side} } ;
+		my $multi = @ports > 1 ;
+
+		for my $p (@ports)
+			{
+			my $seq_str = $multi ? "  seq=$p->{seq}" : '' ;
+
+			printf "\t\tport  %6s %4s  edge=%-2d char=(%d,%d) %6s\n",
+				$side,
+				side_glyph($side, $p->{role}),
+				$p->{edge_id},
+				$p->{char_x}, $p->{char_y},
+				$seq_str ;
+			}
+		}
+	
+	print "\n" ;
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub print_edges
+{
+my ($ast) = @_ ;
+
+my @edges    = @{ $ast->{edges} } ;
+my $max_from = max_len(map { $_->{from} } @edges) ;
+my $max_to   = max_len(map { $_->{to}   } @edges) ;
+
+print "Edges:\n" ;
+
+for my $e (@edges)
+	{
+	my $flags = '' ;
+	$flags .= '  self-loop'     if $e->{is_self_loop} ;
+	$flags .= '  bidirectional' if $e->{is_bidirectional} ;
+	$flags .= "  x$e->{multiplicity}" if $e->{multiplicity} > 1 ;
+
+	my $label_str = defined $e->{label} ? "  \"$e->{label}\"" : '' ;
+	my $arrow     = $e->{is_bidirectional} ? '<->' : '->' ;
+
+	printf "\t[%d]  %-*s %s %-*s  dir='%s'%s%s\n",
+		$e->{id},
+		$max_from, $e->{from}, $arrow,
+		$max_to,   $e->{to},
+		$e->{arrow_dir} // 'none',
+		$flags, $label_str ;
+
+	if ($opt_compact)
+		{
+		if (!$e->{is_self_loop} && $e->{from_port} && $e->{to_port})
+			{
+			my $fp = $e->{from_port} ;
+			my $tp = $e->{to_port} ;
+			printf "\t\tfrom  char=(%d,%d)  to  char=(%d,%d)\n",
+				$fp->{char_x}, $fp->{char_y},
+				$tp->{char_x}, $tp->{char_y} ;
+			}
+		print "\n" ;
+		next ;
+		}
+
+	if (!$e->{is_self_loop} && $e->{from_port} && $e->{to_port})
+		{
+		my $fp = $e->{from_port} ;
+		my $tp = $e->{to_port} ;
+
+		my $from_side = sprintf '%-7s', $e->{from_side} // 'unknown' ;
+		my $to_side   = sprintf '%-7s', $e->{to_side}   // 'unknown' ;
+
+		printf "\t\tfrom  %-*s  %s %s  char=(%d,%d)  cell=(%d,%d)\n",
+			$max_from, $e->{from}, $from_side,
+			side_glyph($e->{from_side}, 'out'),
+			$fp->{char_x}, $fp->{char_y}, $fp->{x}, $fp->{y} ;
+
+		printf "\t\tto    %-*s  %s %s  char=(%d,%d)  cell=(%d,%d)\n",
+			$max_to, $e->{to}, $to_side,
+			side_glyph($e->{to_side}, 'in'),
+			$tp->{char_x}, $tp->{char_y}, $tp->{x}, $tp->{y} ;
+		}
+
+	if (defined $e->{label})
+		{
+		printf "\t\tlabel char=(%d,%d)\n",
+			$e->{label_char_x}, $e->{label_char_y} ;
+		}
+
+	my @path = @{ $e->{path} } ;
+
+	if (@path)
+		{
+		my $max_char = max_len(map
+			{ sprintf '(%d,%d)->(%d,%d)', $_->{line_x1}, $_->{line_y1}, $_->{line_x2}, $_->{line_y2} }
+			@path) ;
+		my $max_cell = max_len(map { sprintf '(%d,%d)', $_->{x}, $_->{y} } @path) ;
+		my $max_type = max_len(map { $_->{type} } @path) ;
+
+		if (@path == 1)
+			{
+			my $p          = $path[0] ;
+			my $label_mark = ($p->{is_label} && defined $e->{label}) ? '  [edge-label]' : '' ;
+			my $char_str   = sprintf '(%d,%d)->(%d,%d)', $p->{line_x1}, $p->{line_y1}, $p->{line_x2}, $p->{line_y2} ;
+			my $cell_str   = sprintf '(%d,%d)', $p->{x}, $p->{y} ;
+
+			printf "\t\tpath  char=%-*s  cell=%-*s  %-*s%s\n",
+				$max_char, $char_str,
+				$max_cell, $cell_str,
+				$max_type, $p->{type},
+				$label_mark ;
+			}
+		else
+			{
+			print "\t\tpath\n" ;
+
+			for my $p (@path)
+				{
+				my $label_mark = ($p->{is_label} && defined $e->{label}) ? '  [edge-label]' : '' ;
+				my $char_str   = sprintf '(%d,%d)->(%d,%d)', $p->{line_x1}, $p->{line_y1}, $p->{line_x2}, $p->{line_y2} ;
+				my $cell_str   = sprintf '(%d,%d)', $p->{x}, $p->{y} ;
+
+				printf "\t\t\tchar=%-*s  cell=%-*s  %-*s%s\n",
+					$max_char, $char_str,
+					$max_cell, $cell_str,
+					$max_type, $p->{type},
+					$label_mark ;
+				}
+			}
+		}
+
+	print "\n" ;
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub print_groups
+{
+my ($ast) = @_ ;
+
+my @groups = @{ $ast->{groups} } ;
+
+print "Groups:\n" ;
+
+if (!@groups)
+	{
+	print "\t(none)\n" ;
+	return ;
+	}
+
+for my $grp (@groups)
+	{
+	printf "\t%s  char=(%d,%d)  size=%dx%d  nodes=[%s]\n",
+		$grp->{id},
+		$grp->{char_x}, $grp->{char_y},
+		$grp->{char_width}, $grp->{char_height},
+		join(', ', @{ $grp->{nodes} }) ;
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub print_cell_grid
+{
+my ($cell_grid) = @_ ;
+
+print "Cell grid:\n" ;
+
+my @keys     = sort keys %$cell_grid ;
+my $max_key  = max_len(@keys) ;
+my $max_char = max_len(map { sprintf '(%d,%d)', $cell_grid->{$_}{char_x}, $cell_grid->{$_}{char_y} } @keys) ;
+my $max_size = max_len(map { sprintf '%dx%d', $cell_grid->{$_}{render_w}, $cell_grid->{$_}{render_h} } @keys) ;
+
+for my $key (@keys)
+	{
+	my $c    = $cell_grid->{$key} ;
+	my $char = sprintf '(%d,%d)', $c->{char_x}, $c->{char_y} ;
+	my $size = sprintf '%dx%d',   $c->{render_w}, $c->{render_h} ;
+
+	printf "\t%-*s  char=%-*s  %-*s  %-7s  %s\n",
+		$max_key,  $key,
+		$max_char, $char,
+		$max_size, $size,
+		$c->{type}, $c->{name} ;
+	}
+}
+
+# ------------------------------------------------------------------------------
+
+sub side_glyph
+{
+my ($side, $role) = @_ ;
+
+$side //= 'unknown' ;
+
+if ($side eq 'top')    { return $role eq 'out' ? "'^'" : "'v'" }
+if ($side eq 'bottom') { return $role eq 'out' ? "'v'" : "'^'" }
+
+return $role eq 'out' ? "'->'": "'<-'" ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub max_len
+{
+my $m = 0 ;
+$m = length($_) > $m ? length($_) : $m for @_ ;
+return $m ;
+}

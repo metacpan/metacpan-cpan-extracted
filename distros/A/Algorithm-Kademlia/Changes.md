@@ -2,6 +2,11 @@
 
 All notable changes to Algorithm::Kademlia will be documented in this file.
 
+## [v1.1.1] - 2026-03-15
+
+### Changed
+- Expose a reader for `$target_id_bin`.
+
 ## [v1.1.0] - 2026-03-11
 
 ### Changed
@@ -22,7 +27,8 @@ All notable changes to Algorithm::Kademlia will be documented in this file.
 ### Added
 - Pulled out of Net::BitTorrent::DHT for use in other DHTs.
 
-[Unreleased]: https://github.com/sanko/Algorithm-Kademlia.pm/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/sanko/Algorithm-Kademlia.pm/compare/v1.1.1...HEAD
+[v1.1.1]: https://github.com/sanko/Algorithm-Kademlia.pm/compare/v1.1.0...v1.1.1
 [v1.1.0]: https://github.com/sanko/Algorithm-Kademlia.pm/compare/v1.0.1...v1.1.0
 [v1.0.1]: https://github.com/sanko/Algorithm-Kademlia.pm/compare/v1.0.0...v1.0.1
 [v1.0.0]: https://github.com/sanko/Algorithm-Kademlia.pm/releases/tag/v1.0.0

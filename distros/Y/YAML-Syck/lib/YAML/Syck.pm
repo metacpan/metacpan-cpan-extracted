@@ -10,9 +10,9 @@ use 5.006;
 use Exporter;
 use XSLoader ();
 
-our $VERSION   = '1.36';
+our $VERSION   = '1.37';
 our @EXPORT    = qw( Dump Load DumpFile LoadFile );
-our @EXPORT_OK = qw( DumpInto );
+our @EXPORT_OK = qw( DumpInto LoadBytes LoadUTF8 DumpBytes DumpUTF8 );
 our @ISA       = qw( Exporter );
 
 our $SortKeys    = 1;
@@ -40,7 +40,7 @@ use constant QR_MAP => {
 };
 
 sub __qr_helper {
-    if ( $_[0] =~ /\A  \(\?  ([ixsm]*)  (?:-  (?:[ixsm]*))?  : (.*) \)  \z/x ) {
+    if ( $_[0] =~ /\A  \(\?  \^?  ([ixsm]*)  (?:-  (?:[ixsm]*))?  : (.*) \)  \z/x ) {
         my $sub = QR_MAP()->{$1} || QR_MAP()->{''};
         &$sub($2);
     }
@@ -72,6 +72,7 @@ sub _is_glob {
     return 1 if ( ref($h) eq 'GLOB' );
     return 1 if ( ref( \$h ) eq 'GLOB' );
     return 1 if ( index( ref($h), 'IO::' ) == 0 );
+    return 1 if ( ref($h) && UNIVERSAL::isa($h, 'IO::Handle') );
 
     return;
 }
@@ -79,11 +80,21 @@ sub _is_glob {
 sub DumpFile {
     my $file = shift;
     if ( _is_glob($file) ) {
-        for (@_) {
-            my $err = YAML::Syck::DumpYAMLFile( $_, $file );
-            if ($err) {
-                $! = 0 + $err;
-                die "Error writing to filehandle $file: $!\n";
+        if ( tied(*$file) ) {
+            # Tied filehandles (IO::String, IO::Scalar, etc.) don't support
+            # C-level PerlIO_write. Fall back to Perl-level print.
+            for (@_) {
+                print $file YAML::Syck::Dump($_)
+                    or die "Error writing to filehandle $file: $!\n";
+            }
+        }
+        else {
+            for (@_) {
+                my $err = YAML::Syck::DumpYAMLFile( $_, $file );
+                if ($err) {
+                    $! = 0 + $err;
+                    die "Error writing to filehandle $file: $!\n";
+                }
             }
         }
     }
@@ -118,6 +129,41 @@ sub LoadFile {
             do { local $/; <$fh> }
         );
     }
+}
+
+sub LoadBytes {
+    my ($str) = @_;
+    utf8::downgrade($str);
+    if (wantarray) {
+        my ($rv) = YAML::Syck::LoadYAML($str);
+        return @{$rv};
+    }
+    return YAML::Syck::LoadYAML($str);
+}
+
+sub LoadUTF8 {
+    my ($str) = @_;
+    local $YAML::Syck::ImplicitUnicode = 1;
+    if (wantarray) {
+        my ($rv) = YAML::Syck::LoadYAML($str);
+        return @{$rv};
+    }
+    return YAML::Syck::LoadYAML($str);
+}
+
+sub DumpBytes {
+    my $result = $#_
+      ? join( '', map { YAML::Syck::DumpYAML($_) } @_ )
+      : YAML::Syck::DumpYAML( $_[0] );
+    utf8::encode($result) if utf8::is_utf8($result);
+    return $result;
+}
+
+sub DumpUTF8 {
+    local $YAML::Syck::ImplicitUnicode = 1;
+    $#_
+      ? join( '', map { YAML::Syck::DumpYAML($_) } @_ )
+      : YAML::Syck::DumpYAML( $_[0] );
 }
 
 sub DumpInto {
@@ -186,7 +232,7 @@ leading C<---\n> marker.
 
 =head2 $YAML::Syck::SortKeys
 
-Defaults to false.  Setting this to a true value will make C<Dump> sort
+Defaults to true (1).  Setting this to a true value will make C<Dump> sort
 hash keys.
 
 =head2 $YAML::Syck::SingleQuote
@@ -243,11 +289,49 @@ critical part. If the class has a DESTROY method, it will be called once the
 object is deleted. An example with File::Temp removing files can be found at
 L<https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862373|https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862373>
 
+=head1 ENCODING-EXPLICIT FUNCTIONS
+
+The standard C<Load> and C<Dump> functions rely on Perl's internal string
+representation, which can lead to surprising results when a string has been
+C<utf8::upgrade>'d.  The following functions make the encoding explicit:
+
+=head2 LoadBytes($yaml_string)
+
+Treats the input as a byte (octet) string.  If the string has been internally
+upgraded to UTF-8 by Perl, it is downgraded first so the parser sees the
+original bytes.  Croaks if the string contains characters above 0xFF.
+
+    use YAML::Syck qw(LoadBytes);
+    my $data = LoadBytes($yaml_bytes);
+
+=head2 LoadUTF8($yaml_string)
+
+Treats the input as UTF-8.  The parsed values will have Perl's UTF-8 flag
+set (equivalent to C<local $YAML::Syck::ImplicitUnicode = 1>).  Works
+correctly regardless of whether the input string is upgraded or not.
+
+    use YAML::Syck qw(LoadUTF8);
+    my $data = LoadUTF8($yaml_utf8);
+
+=head2 DumpBytes($data, ...)
+
+Dumps data to a YAML byte string.  The return value will never have the
+UTF-8 flag set; any UTF-8 content is encoded to raw bytes.
+
+    use YAML::Syck qw(DumpBytes);
+    my $yaml = DumpBytes($data);
+
+=head2 DumpUTF8($data, ...)
+
+Dumps data to a YAML string with the UTF-8 flag set (equivalent to
+C<local $YAML::Syck::ImplicitUnicode = 1>).
+
+    use YAML::Syck qw(DumpUTF8);
+    my $yaml = DumpUTF8($data);
+
 =head1 BUGS
 
 Dumping Glob/IO values do not work yet.
-
-Dumping of Tied variables is unsupported.
 
 Dumping into tied (or other magic variables) with C<DumpInto> might not work
 properly in all cases.

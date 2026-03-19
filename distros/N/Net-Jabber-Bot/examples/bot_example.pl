@@ -130,7 +130,14 @@ sub bot_nslookup {
 	    return;
 	}
 
-    my $output = `/usr/sbin/nslookup $host 2>&1`;
+    my $output;
+    if (open(my $fh, '-|', '/usr/sbin/nslookup', $host)) {
+        local $/;
+        $output = <$fh>;
+        close $fh;
+    } else {
+        $output = "nslookup failed: $!";
+    }
     $bot_object->SendJabberMessage($reply_to, $output, $bot_message_hash{type});
     
 }
@@ -354,10 +361,9 @@ Bot code to show how to use the bot
 
 =head1 AUTHOR
 
-Todd Rinaldo, Robert Boone, Wade Johnson (perl-net-jabber-bot@googlegroups.com)
+Todd Rinaldo
 
 =head1 BUGS
 
-Send Bug Reports to perl-net-jabber-bot@googlegroups.com
-or submit them yourself at: http://code.google.com/p/perl-net-jabber-bot/issues/list/entry
+Report bugs at L<https://github.com/cpan-authors/perl-net-jabber-bot/issues>
 

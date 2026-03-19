@@ -1,0 +1,30 @@
+Changes
+cpanfile
+lib/Data/Hash/Patch/Smart.pm
+lib/Data/Hash/Patch/Smart/Cookbook.pod
+lib/Data/Hash/Patch/Smart/Engine.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/arrays-index.t
+t/arrays_unordered.t
+t/create_missing.t
+t/eof.t
+t/eol.t
+t/integration_create_missing.t
+t/integration_mixed_nesting.t
+t/integration_roundtrip.t
+t/integration_unordered.t
+t/integration_wildcards.t
+t/kwalitee.t
+t/roundtrip.t
+t/strict.t
+t/wildcard_comprehensive.t
+t/wildcard_cycles.t
+t/wildcards.t
+t/wildcards_structural.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

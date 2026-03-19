@@ -1,26 +1,22 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Regexp-Parser.t'
 
-#########################
+use strict;
+use warnings;
 
-# change 'tests => 1' to 'tests => last_test_to_print';
-
-use Test;
-BEGIN { plan tests => 8 };
-
+use Test::More tests => 7;
 use Regexp::Parser;
-ok( 1 );
 
 my $r = Regexp::Parser->new;
 my $rx = '^(a(bc)+(d?))((f)+)$';
-ok( $r->regex($rx) );
+ok( $r->regex($rx), 'parse regex' );
 
 for (@{ $r->captures }) {
   chomp(my $exp = <DATA>);
-  ok( join("\t", $_->nparen, $_->visual), $exp );
+  is( join("\t", $_->nparen, $_->visual), $exp, "capture: $exp" );
 }
 
-ok( scalar(<DATA>), "DONE\n" );
+is( scalar(<DATA>), "DONE\n", 'all captures checked' );
 
 __DATA__
 1	(a(bc)+(d?))

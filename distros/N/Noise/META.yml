@@ -28,13 +28,13 @@ no_index:
 provides:
   Noise:
     file: lib/Noise.pm
-    version: v0.0.1
+    version: v0.0.2
   Noise::CipherState:
     file: lib/Noise/CipherState.pm
     version: v0.0.1
   Noise::HandshakeState:
     file: lib/Noise/HandshakeState.pm
-    version: v0.0.1
+    version: v0.0.2
   Noise::Pattern:
     file: lib/Noise/Pattern.pm
     version: v0.0.1
@@ -56,7 +56,7 @@ resources:
   homepage: https://github.com/sanko/Noise.pm
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/sanko/Noise.pm.git
-version: v0.0.1
+version: v0.0.2
 x_ignore:
   - .tidyallrc
   - .gitignore

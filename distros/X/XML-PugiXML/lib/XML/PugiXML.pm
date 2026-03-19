@@ -2,7 +2,7 @@ package XML::PugiXML;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('XML::PugiXML', $VERSION);
@@ -50,7 +50,8 @@ XML::PugiXML - Perl binding for pugixml C++ XML parser
 =head1 DESCRIPTION
 
 XML::PugiXML provides a Perl interface to the pugixml C++ XML parsing library.
-It offers fast parsing, XPath support, and a clean API.
+It offers fast parsing, XPath support, and a clean API. All string inputs
+are automatically upgraded to UTF-8, and all outputs are UTF-8 flagged.
 
 =head1 METHODS
 
@@ -85,7 +86,9 @@ Optional $indent (default "\t") and $flags (default FORMAT_DEFAULT).
 =item reset()
 
 Clear the document, removing all nodes. Existing Node and Attr
-handles become invalid after this call.
+handles become stale -- accessing them will croak with
+"Stale node/attribute handle". Use C<valid()> to check without croaking.
+The same applies after C<load_file()> or C<load_string()> replaces content.
 
 =item root()
 
@@ -97,14 +100,13 @@ Get a direct child by name.
 
 =item select_node($xpath)
 
-Execute XPath query, return single node result.
+Execute XPath query, return single result. Returns an
+C<XML::PugiXML::Node> or C<XML::PugiXML::Attr> depending on the query.
 
 =item select_nodes($xpath)
 
-Execute XPath query, return list of nodes.
-
-B<Note:> XPath expressions that select attributes (e.g. C<< //@id >>) are not
-supported and will return undef/empty list. Only element nodes are returned.
+Execute XPath query, return list of results. Returns a mix of
+C<XML::PugiXML::Node> and C<XML::PugiXML::Attr> objects as appropriate.
 
 =item compile_xpath($xpath)
 
@@ -219,9 +221,7 @@ Return true if this is a valid node handle.
 
 =item root()
 
-Return the document node (type=1) from any node. Note: this returns the
-document node, not the document element. Use C<< $node->root->first_child >>
-to get the document element from a node.
+Return the document element from any node (consistent with C<< $doc->root >>).
 
 =back
 
@@ -329,14 +329,11 @@ Modify node properties.
 
 =item select_node($xpath)
 
-Execute XPath relative to this node, return single node.
+Execute XPath relative to this node, return single result (Node or Attr).
 
 =item select_nodes($xpath)
 
-Execute XPath relative to this node, return list of nodes.
-
-B<Note:> XPath expressions that select attributes (e.g. C<< //@id >>) are not
-supported and will return undef/empty list. Only element nodes are returned.
+Execute XPath relative to this node, return list of results (Node and/or Attr).
 
 =back
 
@@ -355,6 +352,7 @@ Get value as 32-bit signed/unsigned integer.
 =item as_llong(), as_ullong()
 
 Get value as 64-bit signed/unsigned integer.
+On 32-bit Perl (IVSIZE < 8), returns a string to avoid truncation.
 
 =item as_double()
 
@@ -363,6 +361,10 @@ Get value as floating-point number.
 =item as_bool()
 
 Get value as boolean (recognizes "true", "1", "yes", "on").
+
+=item element()
+
+Return the parent element node that owns this attribute.
 
 =item set_value($value)
 
@@ -380,14 +382,11 @@ Return true if this is a valid attribute handle.
 
 =item evaluate_node($context_node)
 
-Evaluate XPath and return single node result.
+Evaluate XPath and return single result (Node or Attr).
 
 =item evaluate_nodes($context_node)
 
-Evaluate XPath and return list of nodes.
-
-B<Note:> C<evaluate_node> and C<evaluate_nodes> only return element nodes.
-Attribute-selecting XPath expressions return undef/empty list.
+Evaluate XPath and return list of results (Node and/or Attr).
 
 =item evaluate_string($context_node)
 
@@ -453,8 +452,8 @@ by default, making it safe against XXE attacks.
 
 =head1 THREAD SAFETY
 
-This module is not thread-safe. Each thread should use its own
-document instances.
+Different document instances can be used in different threads safely.
+Concurrent access to the same document from multiple threads is not safe.
 
 =head1 AUTHOR
 

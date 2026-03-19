@@ -1,0 +1,6 @@
+digraph G {
+    a -> a [label="self"];
+    a -> b;
+    a -> b [label="second", color=red];
+    b -> b [label="loop", style=dotted];
+}

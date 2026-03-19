@@ -27,15 +27,15 @@ docs/lsjobs.png
 docs/one-mouse.svg
 docs/runjob.png
 docs/shelf.png
+docs/viewjobs.png
 docs/whojobs.png
-file.pl
+lib/NBI/EcoScheduler.pm
 lib/NBI/Job.pm
 lib/NBI/Opts.pm
 lib/NBI/Queue.pm
 lib/NBI/QueuedJob.pm
 lib/NBI/Slurm.pm
 lib/NBI/Test.pl
-package-lock.json
 s/install.sh
 s/job.pl
 s/opts.pl
@@ -47,6 +47,7 @@ t/02-opts.t
 t/03-job.t
 t/04-queuedjob.t
 t/05-bin-ver.t
+t/06-eco.t
 t/10-hpc.t
 t/11-bins.t
 t/12-array.t

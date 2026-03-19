@@ -30,10 +30,18 @@
 typedef struct { const char* key; size_t length; CK_ULONG value; } entry;
 typedef entry map[];
 
+static bool key_eq(const char* name, const char* key) {
+	for (; *key; ++name, ++key) {
+		if (*name != *key && *name != '_' && *key != '-')
+			return FALSE;
+	}
+	return true;
+}
+
 static const entry* S_map_find(pTHX_ const map table, size_t table_size, const char* name, size_t name_length) {
 	size_t i;
 	for (i = 0; i < table_size; ++i) {
-		if (table[i].length == name_length && strEQ(name, table[i].key))
+		if (table[i].length == name_length && key_eq(name, table[i].key))
 			return &table[i];
 	}
 	return NULL;
@@ -1308,7 +1316,7 @@ static const attribute_map attributes = {
 static const attribute_entry* S_get_attribute_entry(pTHX_ const char* name, size_t name_length) {
 	size_t i;
 	for (i = 0; i < sizeof attributes / sizeof *attributes; ++i) {
-		if (attributes[i].length == name_length && strEQ(name, attributes[i].key))
+		if (attributes[i].length == name_length && key_eq(name, attributes[i].key))
 			return &attributes[i];
 	}
 	return NULL;
@@ -1529,7 +1537,9 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 					die("Could not decode integer");
 			}
 			SPAGAIN;
-			return SvREFCNT_inc(POPs);
+			SV* value = POPs;
+			PUTBACK;
+			return SvREFCNT_inc(value);
 		}
 		case ByteAttr:
 			return newSVpvn(pointer, length);
@@ -1673,20 +1683,34 @@ struct Slot {
 };
 typedef struct Slot* Crypt__HSM__Slot;
 
+#define slot_funcs(slot) ((slot)->provider->funcs)
+
+static struct Slot* S_slot_refcount_increment(pTHX_ struct Slot* slot) {
+	refcount_inc(&slot->refcount);
+	return slot;
+}
+#define slot_refcount_increment(slot) S_slot_refcount_increment(aTHX_ slot)
+
+static void S_slot_refcount_decrement(pTHX_ struct Slot* slot) {
+	if (refcount_dec(&slot->refcount) == 1) {
+		provider_refcount_decrement(slot->provider);
+		refcount_destroy(&slot->refcount);
+		PerlMemShared_free(slot);
+	}
+}
+#define slot_refcount_decrement(slot) S_slot_refcount_decrement(aTHX_ slot)
+
 static int slot_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
 	PERL_UNUSED_VAR(params);
 	struct Slot* slot = (struct Slot*) magic->mg_ptr;
-	refcount_inc(&slot->refcount);
+	slot_refcount_increment(slot);
 	return 0;
 }
 
 static int slot_free(pTHX_ SV* sv, MAGIC* magic) {
 	PERL_UNUSED_VAR(sv);
 	struct Slot* slot = (struct Slot*) magic->mg_ptr;
-	if (refcount_dec(&slot->refcount) == 1) {
-		provider_refcount_decrement(slot->provider);
-		PerlMemShared_free(slot);
-	}
+	slot_refcount_decrement(slot);
 	return 0;
 }
 
@@ -1706,8 +1730,7 @@ static SV* S_new_slot(pTHX_ struct Provider* provider, CK_SLOT_ID slot) {
 
 struct Mechanism {
 	Refcount refcount;
-	struct Provider* provider;
-	CK_SLOT_ID slot;
+	struct Slot* slot;
 	CK_MECHANISM_TYPE mechanism;
 };
 typedef struct Mechanism* Crypt__HSM__Mechanism;
@@ -1725,25 +1748,25 @@ static int mechanism_free(pTHX_ SV* sv, MAGIC* magic) {
 	PERL_UNUSED_VAR(sv);
 	struct Mechanism* mechanism = (struct Mechanism*) magic->mg_ptr;
 	if (refcount_dec(&mechanism->refcount) == 1) {
-		provider_refcount_decrement(mechanism->provider);
+		slot_refcount_decrement(mechanism->slot);
+		refcount_destroy(&mechanism->refcount);
 		PerlMemShared_free(mechanism);
 	}
 	return 0;
 }
 static const MGVTBL Crypt__HSM__Mechanism_magic = { NULL, NULL, NULL, NULL, mechanism_free, NULL, mechanism_dup, NULL };
 
-static SV* S_new_mechanism(pTHX_ struct Provider* provider, CK_SLOT_ID slot, CK_MECHANISM_TYPE mechanism) {
+static SV* S_new_mechanism(pTHX_ struct Slot* slot, CK_MECHANISM_TYPE mechanism) {
 	struct Mechanism* entry = PerlMemShared_calloc(1, sizeof(struct Mechanism));
 	refcount_init(&entry->refcount, 1);
 	entry->mechanism = mechanism;
-	entry->slot = slot;
-	entry->provider = provider_refcount_increment(provider);
+	entry->slot = slot_refcount_increment(slot);
 	SV* object = newSV(0);
 	MAGIC* magic = sv_magicext(newSVrv(object, "Crypt::HSM::Mechanism"), NULL, PERL_MAGIC_ext, &Crypt__HSM__Mechanism_magic, (const char*)entry, 0);
 	magic->mg_flags = MGf_DUP;
 	return object;
 }
-#define new_mechanism(provider, slot, mechanism) S_new_mechanism(aTHX_ provider, slot, mechanism)
+#define new_mechanism(slot, mechanism) S_new_mechanism(aTHX_ slot, mechanism)
 
 static CK_MECHANISM_TYPE S_get_mechanism_type(pTHX_ SV* input) {
 	if (SvROK(input)) {
@@ -1759,11 +1782,12 @@ static CK_MECHANISM_TYPE S_get_mechanism_type(pTHX_ SV* input) {
 
 struct Session {
 	Refcount refcount;
-	CK_SLOT_ID slot;
+	struct Slot* slot;
 	CK_SESSION_HANDLE handle;
-	struct Provider* provider;
 };
 typedef struct Session* Crypt__HSM__Session;
+
+#define session_funcs(session) slot_funcs(session->slot)
 
 static struct Session* S_session_refcount_increment(pTHX_ struct Session* session) {
 	refcount_inc(&session->refcount);
@@ -1773,46 +1797,125 @@ static struct Session* S_session_refcount_increment(pTHX_ struct Session* sessio
 
 static void S_session_refcount_decrement(pTHX_ struct Session* session) {
 	if (refcount_dec(&session->refcount) == 1) {
-		session->provider->funcs->C_CloseSession(session->handle);
-		provider_refcount_decrement(session->provider);
+		session_funcs(session)->C_CloseSession(session->handle);
+		slot_refcount_decrement(session->slot);
 		refcount_destroy(&session->refcount);
-		Safefree(session);
+		PerlMemShared_free(session);
 	}
 }
 #define session_refcount_decrement(session) S_session_refcount_decrement(aTHX_ session)
 
+static int session_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+	PERL_UNUSED_VAR(params);
+	struct Session* session = (struct Session*) magic->mg_ptr;
+	session_refcount_increment(session);
+	return 0;
+}
+
+static int session_free(pTHX_ SV* sv, MAGIC* magic) {
+	PERL_UNUSED_VAR(sv);
+	struct Session* session = (struct Session*) magic->mg_ptr;
+	session_refcount_decrement(session);
+	return 0;
+}
+
+static const MGVTBL Crypt__HSM__Session_magic = { NULL, NULL, NULL, NULL, session_free, NULL, session_dup, NULL };
+
 struct Object {
+	Refcount refcount;
 	struct Session* session;
 	CK_OBJECT_HANDLE handle;
 };
 typedef struct Object* Crypt__HSM__Object;
 
+#define object_funcs(object) session_funcs(object->session)
+
+static int object_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+	PERL_UNUSED_VAR(params);
+	struct Object* object = (struct Object*) magic->mg_ptr;
+	refcount_inc(&object->refcount);
+	return 0;
+}
+
+static int object_free(pTHX_ SV* sv, MAGIC* magic) {
+	PERL_UNUSED_VAR(sv);
+	struct Object* object = (struct Object*) magic->mg_ptr;
+	if (refcount_dec(&object->refcount) == 1) {
+		session_refcount_decrement(object->session);
+		refcount_destroy(&object->refcount);
+		PerlMemShared_free(object);
+	}
+	return 0;
+}
+
+static const MGVTBL Crypt__HSM__Object_magic = { NULL, NULL, NULL, NULL, object_free, NULL, object_dup, NULL };
+
 static SV* S_new_object(pTHX_ struct Session* session, CK_OBJECT_HANDLE handle) {
-	struct Object* entry = PerlMemShared_calloc(1, sizeof(struct Object));
+	struct Object* entry = PerlMem_calloc(1, sizeof(struct Object));
+	refcount_init(&entry->refcount, 1);
 	entry->session = session_refcount_increment(session);
 	entry->handle = handle;
 	SV* object = newSV(0);
-	sv_magicext(newSVrv(object, "Crypt::HSM::Object"), NULL, PERL_MAGIC_ext, NULL, (const char*)entry, 0);
+	sv_magicext(newSVrv(object, "Crypt::HSM::Object"), NULL, PERL_MAGIC_ext, &Crypt__HSM__Object_magic, (const char*)entry, 0);
 	return object;
 }
 #define new_object(session, object) S_new_object(aTHX_ session, object)
 
 struct Stream {
+	Refcount refcount;
 	struct Session* session;
 	CK_OBJECT_HANDLE encrypt_key;
 	CK_OBJECT_HANDLE sign_key;
 };
-
 typedef struct Stream* Crypt__HSM__Stream;
-typedef struct Stream* Crypt__HSM__Encrypt;
-typedef struct Stream* Crypt__HSM__Decrypt;
-typedef struct Stream* Crypt__HSM__Digest;
-typedef struct Stream* Crypt__HSM__Sign;
-typedef struct Stream* Crypt__HSM__Verify;
 
-#define CLONE_SKIP() 1
+#define stream_funcs(stream) session_funcs(stream->session)
+
+static struct Stream* S_open_stream(pTHX_ struct Session* session, CK_OBJECT_HANDLE encrypt_key, CK_OBJECT_HANDLE sign_key) {
+	struct Stream* stream = PerlMemShared_calloc(1, sizeof(struct Stream));
+	refcount_init(&stream->refcount, 1);
+	stream->session = session_refcount_increment(session);
+	stream->encrypt_key = encrypt_key;
+	stream->sign_key = sign_key;
+	return stream;
+}
+#define open_stream(session, encrypt_key, sign_key) S_open_stream(aTHX_ session, encrypt_key, sign_key)
+
+
+static int stream_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+	PERL_UNUSED_VAR(params);
+	struct Stream* stream = (struct Stream*) magic->mg_ptr;
+	refcount_inc(&stream->refcount);
+	return 0;
+}
+
+static int stream_free(pTHX_ SV* sv, MAGIC* magic) {
+	PERL_UNUSED_VAR(sv);
+	struct Stream* stream = (struct Stream*) magic->mg_ptr;
+	if (refcount_dec(&stream->refcount) == 1) {
+		session_refcount_decrement(stream->session);
+		refcount_destroy(&stream->refcount);
+		PerlMemShared_free(stream);
+	}
+	return 0;
+}
+
+static const MGVTBL Crypt__HSM__Stream_magic = { NULL, NULL, NULL, NULL, stream_free, NULL, stream_dup, NULL };
+
+typedef struct Stream* Crypt__HSM__Encrypt;
+#define Crypt__HSM__Encrypt_magic Crypt__HSM__Stream_magic
+typedef struct Stream* Crypt__HSM__Decrypt;
+#define Crypt__HSM__Decrypt_magic Crypt__HSM__Stream_magic
+typedef struct Stream* Crypt__HSM__Digest;
+#define Crypt__HSM__Digest_magic Crypt__HSM__Stream_magic
+typedef struct Stream* Crypt__HSM__Sign;
+#define Crypt__HSM__Sign_magic Crypt__HSM__Stream_magic
+typedef struct Stream* Crypt__HSM__Verify;
+#define Crypt__HSM__Verify_magic Crypt__HSM__Stream_magic
+
 
 MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM
+
 
 PROTOTYPES: DISABLE
 
@@ -1821,14 +1924,14 @@ TYPEMAP: <<END
 	Crypt::HSM::Slot             T_MAGICEXT
 	Crypt::HSM::Mechanism        T_MAGICEXT
 	Crypt::HSM::Mechanism::Info  T_OPAQUEOBJ
-	Crypt::HSM::Session          T_MAGIC
-	Crypt::HSM::Object           T_MAGIC
-	Crypt::HSM::Stream           T_MAGIC
-	Crypt::HSM::Encrypt          T_MAGIC
-	Crypt::HSM::Decrypt          T_MAGIC
-	Crypt::HSM::Digest           T_MAGIC
-	Crypt::HSM::Sign             T_MAGIC
-	Crypt::HSM::Verify           T_MAGIC
+	Crypt::HSM::Session          T_MAGICEXT
+	Crypt::HSM::Object           T_MAGICEXT
+	Crypt::HSM::Stream           T_MAGICEXT
+	Crypt::HSM::Encrypt          T_MAGICEXT
+	Crypt::HSM::Decrypt          T_MAGICEXT
+	Crypt::HSM::Digest           T_MAGICEXT
+	Crypt::HSM::Sign             T_MAGICEXT
+	Crypt::HSM::Verify           T_MAGICEXT
 	CK_BBOOL                     T_BOOL
 	CK_ULONG                     T_U_LONG
 	CK_SLOT_ID                   T_U_LONG
@@ -1881,7 +1984,9 @@ CODE:
 OUTPUT:
 	RETVAL
 
+
 MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM::Provider
+
 
 HV* info(Crypt::HSM::Provider self)
 CODE:
@@ -1908,7 +2013,7 @@ PPCODE:
 	if ( result != CKR_OK )
 		croak_with("Couldn't get slots", result);
 
-		EXTEND(SP, (int)count);
+	EXTEND(SP, (int)count);
 
 	CK_SLOT_ID_PTR slotList;
 	Newxz(slotList, count, CK_SLOT_ID);
@@ -1947,7 +2052,9 @@ CODE:
 OUTPUT:
 	RETVAL
 
+
 MODULE = Crypt::HSM	 PACKAGE = Crypt::HSM::Slot
+
 
 CK_SLOT_ID id(Crypt::HSM::Slot self)
 CODE:
@@ -1958,7 +2065,7 @@ OUTPUT:
 HV* info(Crypt::HSM::Slot self)
 CODE:
 	CK_SLOT_INFO info;
-	CK_RV result = self->provider->funcs->C_GetSlotInfo(self->slot, &info);
+	CK_RV result = slot_funcs(self)->C_GetSlotInfo(self->slot, &info);
 	if (result != CKR_OK)
 		croak_with("Couldn't get slot info", result);
 
@@ -1974,7 +2081,7 @@ OUTPUT:
 HV* token_info(Crypt::HSM::Slot self)
 CODE:
 	CK_TOKEN_INFO info;
-	CK_RV result = self->provider->funcs->C_GetTokenInfo(self->slot, &info);
+	CK_RV result = slot_funcs(self)->C_GetTokenInfo(self->slot, &info);
 	if (result != CKR_OK)
 		croak_with("Couldn't get token info", result);
 
@@ -2015,14 +2122,13 @@ CODE:
 			flags &= ~internal;
 	}
 
-	CK_RV result = self->provider->funcs->C_OpenSession(self->slot, flags | CKF_SERIAL_SESSION, NULL, Notify, &handle);
+	CK_RV result = slot_funcs(self)->C_OpenSession(self->slot, flags | CKF_SERIAL_SESSION, NULL, Notify, &handle);
 	if (result != CKR_OK)
 		croak_with("Could not open session", result);
 
-	Newxz(RETVAL, 1, struct Session);
+	RETVAL = PerlMemShared_calloc(1, sizeof(struct Session));
 	refcount_init(&RETVAL->refcount, 1);
-	RETVAL->provider = provider_refcount_increment(self->provider);
-	RETVAL->slot = self->slot;
+	RETVAL->slot = slot_refcount_increment(self);
 	RETVAL->handle = handle;
 OUTPUT:
 	RETVAL
@@ -2031,28 +2137,28 @@ void mechanisms(Crypt::HSM::Slot self)
 PPCODE:
 	CK_MECHANISM_TYPE* types;
 	CK_ULONG length, i;
-	CK_RV result = self->provider->funcs->C_GetMechanismList(self->slot, NULL, &length);
+	CK_RV result = slot_funcs(self)->C_GetMechanismList(self->slot, NULL, &length);
 	if (result != CKR_OK)
 		croak_with("Couldn't get mechanisms length", result);
 
 	Newxz(types, length, CK_MECHANISM_TYPE);
 	SAVEFREEPV(types);
-	result = self->provider->funcs->C_GetMechanismList(self->slot, types, &length);
+	result = slot_funcs(self)->C_GetMechanismList(self->slot, types, &length);
 	if (result != CKR_OK)
 		croak_with("Couldn't get mechanisms", result);
 
 	for (i = 0; i < length; ++i)
-		mXPUSHs(new_mechanism(self->provider, self->slot, types[i]));
+		mXPUSHs(new_mechanism(self, types[i]));
 
 SV* mechanism(Crypt::HSM::Slot self, CK_MECHANISM_TYPE type)
 CODE:
-	RETVAL = new_mechanism(self->provider, self->slot, type);
+	RETVAL = new_mechanism(self, type);
 OUTPUT:
 	RETVAL
 
 void close_all_sessions(Crypt::HSM::Slot self)
 CODE:
-	CK_RV result = self->provider->funcs->C_CloseAllSessions(self->slot);
+	CK_RV result = slot_funcs(self)->C_CloseAllSessions(self->slot);
 	if (result != CKR_OK)
 		croak_with("Could not open session", result);
 
@@ -2066,7 +2172,7 @@ CODE:
 	memset(label_buffer, ' ', 32);
 	memcpy(label_buffer, labelPV, MIN(label_len, 32));
 
-	CK_RV result = self->provider->funcs->C_InitToken(self->slot, pinPV, pin_len, label_buffer);
+	CK_RV result = slot_funcs(self)->C_InitToken(self->slot, pinPV, pin_len, label_buffer);
 	if (result != CKR_OK)
 		croak_with("Could not initialize token", result);
 
@@ -2085,7 +2191,7 @@ OUTPUT:
 Crypt::HSM::Mechanism::Info info(Crypt::HSM::Mechanism self)
 CODE:
 	RETVAL = safemalloc(sizeof(CK_MECHANISM_INFO));
-	CK_RV result = self->provider->funcs->C_GetMechanismInfo(self->slot, self->mechanism, RETVAL);
+	CK_RV result = slot_funcs(self->slot)->C_GetMechanismInfo(self->slot->slot, self->mechanism, RETVAL);
 	if (result != CKR_OK) {
 		Safefree(RETVAL);
 		croak_with("Couldn't get mechanism info", result);
@@ -2145,14 +2251,10 @@ OUTPUT:
 MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Session PREFIX = session_
 
 
-void DESTROY(Crypt::HSM::Session self)
-CODE:
-	session_refcount_decrement(self);
-
 HV* info(Crypt::HSM::Session self)
 CODE:
 	CK_SESSION_INFO info;
-	CK_RV result = self->provider->funcs->C_GetSessionInfo(self->handle, &info);
+	CK_RV result = session_funcs(self)->C_GetSessionInfo(self->handle, &info);
 	if (result != CKR_OK)
 		croak_with("Couldn't get session info", result);
 
@@ -2167,14 +2269,14 @@ OUTPUT:
 
 Crypt::HSM::Provider provider(Crypt::HSM::Session self)
 CODE:
-	RETVAL = provider_refcount_increment(self->provider);
+	RETVAL = provider_refcount_increment(self->slot->provider);
 OUTPUT:
 	RETVAL
 
 
-SV* slot(Crypt::HSM::Session self)
+Crypt::HSM::Slot slot(Crypt::HSM::Session self)
 CODE:
-	RETVAL = new_slot(self->provider, self->slot);
+	RETVAL = slot_refcount_increment(self->slot);
 OUTPUT:
 	RETVAL
 
@@ -2185,14 +2287,14 @@ CODE:
 	CK_UTF8CHAR* pinPV = NULL;
 	if (SvOK(pin))
 		pinPV = get_text(pin, &pin_len);
-	CK_RV result = self->provider->funcs->C_Login(self->handle, type, pinPV, pin_len);
+	CK_RV result = session_funcs(self)->C_Login(self->handle, type, pinPV, pin_len);
 	if (result != CKR_OK)
 		croak_with("Could not log in", result);
 
 
 void logout(Crypt::HSM::Session self)
 CODE:
-	CK_RV result = self->provider->funcs->C_Logout(self->handle);
+	CK_RV result = session_funcs(self)->C_Logout(self->handle);
 	if (result != CKR_OK)
 		croak_with("Could not log out", result);
 
@@ -2204,7 +2306,7 @@ CODE:
 	if (SvOK(pin))
 		pinPV = get_text(pin, &pin_len);
 
-	CK_RV result = self->provider->funcs->C_InitPIN(self->handle, pinPV, pin_len);
+	CK_RV result = session_funcs(self)->C_InitPIN(self->handle, pinPV, pin_len);
 	if (result != CKR_OK)
 		croak_with("Could not initialize pin", result);
 
@@ -2218,7 +2320,7 @@ CODE:
 	if (SvOK(new_pin))
 		new_pinPV = get_text(new_pin, &new_pin_len);
 
-	CK_RV result = self->provider->funcs->C_SetPIN(self->handle, old_pinPV, old_pin_len, new_pinPV, new_pin_len);
+	CK_RV result = session_funcs(self)->C_SetPIN(self->handle, old_pinPV, old_pin_len, new_pinPV, new_pin_len);
 	if (result != CKR_OK)
 		croak_with("Could not set pin", result);
 
@@ -2226,7 +2328,7 @@ CODE:
 SV* create_object(Crypt::HSM::Session self, Attributes template)
 CODE:
 	CK_OBJECT_HANDLE handle;
-	CK_RV result = self->provider->funcs->C_CreateObject(self->handle, template.member, template.length, &handle);
+	CK_RV result = session_funcs(self)->C_CreateObject(self->handle, template.member, template.length, &handle);
 	if (result != CKR_OK)
 		croak_with("Could not create object", result);
 
@@ -2237,7 +2339,7 @@ OUTPUT:
 
 void find_objects(Crypt::HSM::Session self, Attributes attributes = empty)
 PPCODE:
-	CK_RV result = self->provider->funcs->C_FindObjectsInit(self->handle, attributes.member, attributes.length);
+	CK_RV result = session_funcs(self)->C_FindObjectsInit(self->handle, attributes.member, attributes.length);
 	if (result != CKR_OK)
 		croak_with("Could not find objects", result);
 
@@ -2245,15 +2347,15 @@ PPCODE:
 	do {
 		CK_OBJECT_HANDLE current[16];
 		CK_ULONG iter;
-		CK_RV result = self->provider->funcs->C_FindObjects(self->handle, current, sizeof(current) / sizeof(*current), &actual);
+		CK_RV result = session_funcs(self)->C_FindObjects(self->handle, current, sizeof(current) / sizeof(*current), &actual);
 		if (result != CKR_OK) {
-			self->provider->funcs->C_FindObjectsFinal(self->handle);
+			session_funcs(self)->C_FindObjectsFinal(self->handle);
 			croak_with("Could not find objects", result);
 		}
 		for (iter = 0; iter < actual; ++iter)
 			mXPUSHs(new_object(self, current[iter]));
 	} while (actual > 0);
-	self->provider->funcs->C_FindObjectsFinal(self->handle);
+	session_funcs(self)->C_FindObjectsFinal(self->handle);
 
 
 void generate_keypair(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Attributes publicKeyTemplate, Attributes privateKeyTemplate, ...)
@@ -2262,7 +2364,7 @@ PPCODE:
 	CK_OBJECT_HANDLE privateKey;
 
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
-	CK_RV result = self->provider->funcs->C_GenerateKeyPair(self->handle, &mechanism, publicKeyTemplate.member, publicKeyTemplate.length, privateKeyTemplate.member, privateKeyTemplate.length, &publicKey, &privateKey);
+	CK_RV result = session_funcs(self)->C_GenerateKeyPair(self->handle, &mechanism, publicKeyTemplate.member, publicKeyTemplate.length, privateKeyTemplate.member, privateKeyTemplate.length, &publicKey, &privateKey);
 	if (result != CKR_OK)
 		croak_with("Could not create keypair", result);
 
@@ -2274,7 +2376,7 @@ SV* generate_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Att
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
 	CK_OBJECT_HANDLE handle;
-	CK_RV result = self->provider->funcs->C_GenerateKey(self->handle, &mechanism, keyTemplate.member, keyTemplate.length, &handle);
+	CK_RV result = session_funcs(self)->C_GenerateKey(self->handle, &mechanism, keyTemplate.member, keyTemplate.length, &handle);
 	if (result != CKR_OK)
 		croak_with("Could not create key", result);
 	RETVAL = new_object(self, handle);
@@ -2285,19 +2387,19 @@ OUTPUT:
 SV* encrypt(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* data, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
-	CK_RV result = self->provider->funcs->C_EncryptInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_EncryptInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize encryption", result);
 
 	CK_ULONG dataLen, encryptedDataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	result = self->provider->funcs->C_Encrypt(self->handle, dataPV, dataLen, NULL, &encryptedDataLen);
+	result = session_funcs(self)->C_Encrypt(self->handle, dataPV, dataLen, NULL, &encryptedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute encrypted length", result);
 
 	RETVAL = newSV(encryptedDataLen);
 	SvPOK_only(RETVAL);
-	result = self->provider->funcs->C_Encrypt(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
+	result = session_funcs(self)->C_Encrypt(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
 	SvCUR(RETVAL) = encryptedDataLen;
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
@@ -2310,13 +2412,11 @@ OUTPUT:
 Crypt::HSM::Encrypt open_encrypt(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
-	CK_RV result = self->provider->funcs->C_EncryptInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_EncryptInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize encryption", result);
 
-	Newxz(RETVAL, 1, struct Stream);
-	RETVAL->session = session_refcount_increment(self);
-	RETVAL->encrypt_key = key->handle;
+	RETVAL = open_stream(self, key->handle, CK_INVALID_HANDLE);
 OUTPUT:
 	RETVAL
 
@@ -2324,19 +2424,19 @@ OUTPUT:
 SV* decrypt(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* data, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
-	CK_RV result = self->provider->funcs->C_DecryptInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_DecryptInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize decryption", result);
 
 	CK_ULONG dataLen, decryptedDataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	result = self->provider->funcs->C_Decrypt(self->handle, dataPV, dataLen, NULL, &decryptedDataLen);
+	result = session_funcs(self)->C_Decrypt(self->handle, dataPV, dataLen, NULL, &decryptedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute decrypted length", result);
 
 	RETVAL = newSV(decryptedDataLen);
 	SvPOK_only(RETVAL);
-	result = self->provider->funcs->C_Decrypt(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &decryptedDataLen);
+	result = session_funcs(self)->C_Decrypt(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &decryptedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't decrypt", result);
@@ -2349,13 +2449,11 @@ OUTPUT:
 Crypt::HSM::Decrypt open_decrypt(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
-	CK_RV result = self->provider->funcs->C_DecryptInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_DecryptInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize decryption", result);
 
-	Newxz(RETVAL, 1, struct Stream);
-	RETVAL->session = session_refcount_increment(self);
-	RETVAL->encrypt_key = key->handle;
+	RETVAL = open_stream(self, key->handle, CK_INVALID_HANDLE);
 OUTPUT:
 	RETVAL
 
@@ -2363,19 +2461,19 @@ OUTPUT:
 SV* sign(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* data, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
-	CK_RV result = self->provider->funcs->C_SignInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_SignInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize signing", result);
 
 	CK_ULONG dataLen, signedDataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	result = self->provider->funcs->C_Sign(self->handle, dataPV, dataLen, NULL, &signedDataLen);
+	result = session_funcs(self)->C_Sign(self->handle, dataPV, dataLen, NULL, &signedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute signed length", result);
 
 	RETVAL = newSV(signedDataLen);
 	SvPOK_only(RETVAL);
-	result = self->provider->funcs->C_Sign(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
+	result = session_funcs(self)->C_Sign(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't sign", result);
@@ -2388,13 +2486,11 @@ OUTPUT:
 Crypt::HSM::Sign open_sign(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
-	CK_RV result = self->provider->funcs->C_SignInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_SignInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize signing", result);
 
-	Newxz(RETVAL, 1, struct Stream);
-	RETVAL->session = session_refcount_increment(self);
-	RETVAL->sign_key = key->handle;
+	RETVAL = open_stream(self, CK_INVALID_HANDLE, key->handle);
 OUTPUT:
 	RETVAL
 
@@ -2402,19 +2498,19 @@ OUTPUT:
 SV* sign_recover(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* data, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
-	CK_RV result = self->provider->funcs->C_SignRecoverInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_SignRecoverInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize signing", result);
 
 	CK_ULONG dataLen, signedDataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	result = self->provider->funcs->C_SignRecover(self->handle, dataPV, dataLen, NULL, &signedDataLen);
+	result = session_funcs(self)->C_SignRecover(self->handle, dataPV, dataLen, NULL, &signedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute signed length", result);
 
 	RETVAL = newSV(signedDataLen);
 	SvPOK_only(RETVAL);
-	result = self->provider->funcs->C_SignRecover(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
+	result = session_funcs(self)->C_SignRecover(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't sign", result);
@@ -2427,7 +2523,7 @@ OUTPUT:
 bool verify(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* data, SV* signature, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 5);
-	CK_RV result = self->provider->funcs->C_VerifyInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_VerifyInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize verifying", result);
 
@@ -2435,7 +2531,7 @@ CODE:
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
 	CK_BYTE* signaturePV = get_buffer(signature, &signatureLen);
 
-	result = self->provider->funcs->C_Verify(self->handle, dataPV, dataLen, signaturePV, signatureLen);
+	result = session_funcs(self)->C_Verify(self->handle, dataPV, dataLen, signaturePV, signatureLen);
 
 	if (result == CKR_OK)
 		RETVAL = TRUE;
@@ -2450,13 +2546,11 @@ OUTPUT:
 Crypt::HSM::Verify open_verify(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
-	CK_RV result = self->provider->funcs->C_VerifyInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_VerifyInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize verifying", result);
 
-	Newxz(RETVAL, 1, struct Stream);
-	RETVAL->session = session_refcount_increment(self);
-	RETVAL->sign_key = key->handle;
+	RETVAL = open_stream(self, CK_INVALID_HANDLE, key->handle);
 OUTPUT:
 	RETVAL
 
@@ -2464,17 +2558,17 @@ OUTPUT:
 SV* verify_recover(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::HSM::Object key, SV* signedData, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
-	CK_RV result = self->provider->funcs->C_VerifyRecoverInit(self->handle, &mechanism, key->handle);
+	CK_RV result = session_funcs(self)->C_VerifyRecoverInit(self->handle, &mechanism, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize verifying", result);
 
 	CK_ULONG signedDataLen, dataLen;
 	CK_BYTE* signedDataPV = get_buffer(signedData, &signedDataLen);
-	result = self->provider->funcs->C_VerifyRecover(self->handle, signedDataPV, signedDataLen, NULL, &dataLen);
+	result = session_funcs(self)->C_VerifyRecover(self->handle, signedDataPV, signedDataLen, NULL, &dataLen);
 	if (result == CKR_OK) {
 		RETVAL = newSV(dataLen);
 		SvPOK_only(RETVAL);
-		result = self->provider->funcs->C_VerifyRecover(self->handle, signedDataPV, signedDataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &dataLen);
+		result = session_funcs(self)->C_VerifyRecover(self->handle, signedDataPV, signedDataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &dataLen);
 		if (result != CKR_OK) {
 			SvREFCNT_dec(RETVAL);
 			croak_with("Couldn't verify", result);
@@ -2491,19 +2585,19 @@ OUTPUT:
 SV* digest(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, SV* data, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
-	CK_RV result = self->provider->funcs->C_DigestInit(self->handle, &mechanism);
+	CK_RV result = session_funcs(self)->C_DigestInit(self->handle, &mechanism);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize digestion", result);
 
 	CK_ULONG dataLen, digestedDataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	result = self->provider->funcs->C_Digest(self->handle, dataPV, dataLen, NULL, &digestedDataLen);
+	result = session_funcs(self)->C_Digest(self->handle, dataPV, dataLen, NULL, &digestedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute digested length", result);
 
 	RETVAL = newSV(digestedDataLen);
 	SvPOK_only(RETVAL);
-	result = self->provider->funcs->C_Digest(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &digestedDataLen);
+	result = session_funcs(self)->C_Digest(self->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &digestedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't digest", result);
@@ -2516,12 +2610,11 @@ OUTPUT:
 Crypt::HSM::Digest open_digest(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, ...)
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 3);
-	CK_RV result = self->provider->funcs->C_DigestInit(self->handle, &mechanism);
+	CK_RV result = session_funcs(self)->C_DigestInit(self->handle, &mechanism);
 	if (result != CKR_OK)
 		croak_with("Couldn't initialize digesting", result);
 
-	Newxz(RETVAL, 1, struct Stream);
-	RETVAL->session = session_refcount_increment(self);
+	RETVAL = open_stream(self, CK_INVALID_HANDLE, CK_INVALID_HANDLE);
 OUTPUT:
 	RETVAL
 
@@ -2530,13 +2623,13 @@ SV* wrap_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt::
 CODE:
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
 	CK_ULONG length;
-	CK_RV result = self->provider->funcs->C_WrapKey(self->handle, &mechanism, wrappingKey->handle, key->handle, NULL, &length);
+	CK_RV result = session_funcs(self)->C_WrapKey(self->handle, &mechanism, wrappingKey->handle, key->handle, NULL, &length);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute wraped length", result);
 
 	RETVAL = newSV(length);
 	SvPOK_only(RETVAL);
-	result = self->provider->funcs->C_WrapKey(self->handle, &mechanism, wrappingKey->handle, key->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &length);
+	result = session_funcs(self)->C_WrapKey(self->handle, &mechanism, wrappingKey->handle, key->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &length);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't wrap", result);
@@ -2551,7 +2644,7 @@ CODE:
 	CK_ULONG wrappedLen;
 	CK_OBJECT_HANDLE handle;
 	CK_BYTE* wrappedPV = get_buffer(wrapped, &wrappedLen);
-	CK_RV result = self->provider->funcs->C_UnwrapKey(self->handle, &mechanism, unwrappingKey->handle, wrappedPV, wrappedLen, attributes.member, attributes.length, &handle);
+	CK_RV result = session_funcs(self)->C_UnwrapKey(self->handle, &mechanism, unwrappingKey->handle, wrappedPV, wrappedLen, attributes.member, attributes.length, &handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't unwrap", result);
 	RETVAL = new_object(self, handle);
@@ -2562,7 +2655,7 @@ SV* derive_key(Crypt::HSM::Session self, CK_MECHANISM_TYPE mechanism_type, Crypt
 CODE:
 	CK_OBJECT_HANDLE handle;
 	CK_MECHANISM mechanism = mechanism_from_args(mechanism_type, 4);
-	CK_RV result = self->provider->funcs->C_DeriveKey(self->handle, &mechanism, baseKey->handle, attributes.member, attributes.length, &handle);
+	CK_RV result = session_funcs(self)->C_DeriveKey(self->handle, &mechanism, baseKey->handle, attributes.member, attributes.length, &handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't derive key", result);
 	RETVAL = new_object(self, handle);
@@ -2574,7 +2667,7 @@ void seed_random(Crypt::HSM::Session self, SV* seed)
 CODE:
 	CK_ULONG seedLen;
 	CK_BYTE* seedPV = get_buffer(seed, &seedLen);
-	CK_RV result = self->provider->funcs->C_SeedRandom(self->handle, seedPV, seedLen);
+	CK_RV result = session_funcs(self)->C_SeedRandom(self->handle, seedPV, seedLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't seed entropy pool", result);
 
@@ -2584,27 +2677,27 @@ CODE:
 	RETVAL = newSV(length);
 	SvPOK_only(RETVAL);
 	SvCUR(RETVAL) = length;
-	CK_RV result = self->provider->funcs->C_GenerateRandom(self->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), length);
+	CK_RV result = session_funcs(self)->C_GenerateRandom(self->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), length);
 	if (result != CKR_OK)
 		croak_with("Couldn't generate randomness", result);
 OUTPUT:
 	RETVAL
 
 
-int CLONE_SKIP();
-
-
 MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Object
 
 
-void DESTROY(Crypt::HSM::Object self)
+CK_ULONG id(Crypt::HSM::Object self)
 CODE:
-	session_refcount_decrement(self->session);
+	RETVAL = self->handle;
+OUTPUT:
+	RETVAL
+
 
 SV* copy_object(Crypt::HSM::Object self, Attributes template = empty)
 CODE:
 	CK_OBJECT_HANDLE handle;
-	CK_RV result = self->session->provider->funcs->C_CopyObject(self->session->handle, self->handle, template.member, template.length, &handle);
+	CK_RV result = object_funcs(self)->C_CopyObject(self->session->handle, self->handle, template.member, template.length, &handle);
 	if (result != CKR_OK)
 		croak_with("Could not copy object", result);
 	RETVAL = new_object(self->session, handle);
@@ -2614,13 +2707,13 @@ OUTPUT:
 
 void destroy_object(Crypt::HSM::Object self)
 CODE:
-	CK_RV result = self->session->provider->funcs->C_DestroyObject(self->session->handle, self->handle);
+	CK_RV result = object_funcs(self)->C_DestroyObject(self->session->handle, self->handle);
 	if (result != CKR_OK)
 		croak_with("Could not destroy object", result);
 
 CK_ULONG object_size(Crypt::HSM::Object self)
 CODE:
-	CK_RV result = self->session->provider->funcs->C_GetObjectSize(self->session->handle, self->handle, &RETVAL);
+	CK_RV result = object_funcs(self)->C_GetObjectSize(self->session->handle, self->handle, &RETVAL);
 	if (result != CKR_OK)
 		croak_with("Could not get object size", result);
 OUTPUT:
@@ -2637,7 +2730,7 @@ CODE:
 		croak("No such attribute %s", name);
 	attribute.type = item->value;
 
-	CK_RV result = self->session->provider->funcs->C_GetAttributeValue(self->session->handle, self->handle, &attribute, 1);
+	CK_RV result = object_funcs(self)->C_GetAttributeValue(self->session->handle, self->handle, &attribute, 1);
 	if (result != CKR_OK && result != CKR_ATTRIBUTE_SENSITIVE && result != CKR_ATTRIBUTE_TYPE_INVALID && result !=CKR_BUFFER_TOO_SMALL)
 		croak_with("Could not get attribute", result);
 
@@ -2646,7 +2739,7 @@ CODE:
 		SAVEFREEPV(attribute.pValue);
 	}
 
-	result = self->session->provider->funcs->C_GetAttributeValue(self->session->handle, self->handle, &attribute, 1);
+	result = object_funcs(self)->C_GetAttributeValue(self->session->handle, self->handle, &attribute, 1);
 	if (result != CKR_OK && result != CKR_ATTRIBUTE_SENSITIVE && result != CKR_ATTRIBUTE_TYPE_INVALID && result != CKR_BUFFER_TOO_SMALL)
 		croak_with("Could not get attributes", result);
 
@@ -2671,7 +2764,7 @@ CODE:
 		attributes.member[i].type = item->value;
 	}
 
-	CK_RV result = self->session->provider->funcs->C_GetAttributeValue(self->session->handle, self->handle, attributes.member, attributes.length);
+	CK_RV result = object_funcs(self)->C_GetAttributeValue(self->session->handle, self->handle, attributes.member, attributes.length);
 	if (result != CKR_OK && result != CKR_ATTRIBUTE_SENSITIVE && result != CKR_ATTRIBUTE_TYPE_INVALID && result !=CKR_BUFFER_TOO_SMALL)
 		croak_with("Could not get attributes", result);
 
@@ -2682,7 +2775,7 @@ CODE:
 		}
 	}
 
-	result = self->session->provider->funcs->C_GetAttributeValue(self->session->handle, self->handle, attributes.member, attributes.length);
+	result = object_funcs(self)->C_GetAttributeValue(self->session->handle, self->handle, attributes.member, attributes.length);
 	if (result != CKR_OK && result != CKR_ATTRIBUTE_SENSITIVE && result != CKR_ATTRIBUTE_TYPE_INVALID && result != CKR_BUFFER_TOO_SMALL)
 		croak_with("Could not get attributes", result);
 
@@ -2697,12 +2790,9 @@ OUTPUT:
 
 void set_attributes(Crypt::HSM::Object self, Attributes attributes)
 CODE:
-	CK_RV result = self->session->provider->funcs->C_SetAttributeValue(self->session->handle, self->handle, attributes.member, attributes.length);
+	CK_RV result = object_funcs(self)->C_SetAttributeValue(self->session->handle, self->handle, attributes.member, attributes.length);
 	if (result != CKR_OK)
 		croak_with("Could not set attributes", result);
-
-
-int CLONE_SKIP();
 
 
 MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Stream
@@ -2711,13 +2801,13 @@ MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Stream
 SV* get_state(Crypt::HSM::Stream self)
 CODE:
 	CK_ULONG length;
-	CK_RV result = self->session->provider->funcs->C_GetOperationState(self->session->handle, NULL, &length);
+	CK_RV result = stream_funcs(self)->C_GetOperationState(self->session->handle, NULL, &length);
 	if (result != CKR_OK)
 		croak_with("Couldn't get operation state", result);
 	RETVAL = newSV(length);
 	SvPOK_only(RETVAL);
 	if (length) {
-		result = self->session->provider->funcs->C_GetOperationState(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &length);
+		result = stream_funcs(self)->C_GetOperationState(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &length);
 		if (result != CKR_OK) {
 			SvREFCNT_dec(RETVAL);
 			croak_with("Couldn't get operation state", result);
@@ -2731,18 +2821,9 @@ void set_state(Crypt::HSM::Stream self, SV* state)
 CODE:
 	CK_ULONG stateLen;
 	CK_BYTE* statePV = get_buffer(state, &stateLen);
-	CK_RV result = self->session->provider->funcs->C_SetOperationState(self->session->handle, statePV, stateLen, self->encrypt_key, self->sign_key);
+	CK_RV result = stream_funcs(self)->C_SetOperationState(self->session->handle, statePV, stateLen, self->encrypt_key, self->sign_key);
 	if (result != CKR_OK)
 		croak_with("Couldn't set operation state", result);
-
-
-void DESTROY(Crypt::HSM::Stream self)
-CODE:
-	session_refcount_decrement(self->session);
-	Safefree(self);
-
-
-int CLONE_SKIP()
 
 
 MODULE = Crypt::HSM  PACKAGE = Crypt::HSM::Encrypt
@@ -2752,14 +2833,14 @@ SV* add_data(Crypt::HSM::Encrypt self, SV* data)
 CODE:
 	CK_ULONG dataLen, encryptedDataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	CK_RV result = self->session->provider->funcs->C_EncryptUpdate(self->session->handle, dataPV, dataLen, NULL, &encryptedDataLen);
+	CK_RV result = stream_funcs(self)->C_EncryptUpdate(self->session->handle, dataPV, dataLen, NULL, &encryptedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute encrypted length", result);
 
 	RETVAL = newSV(encryptedDataLen);
 	SvPOK_only(RETVAL);
 	if (encryptedDataLen) {
-		result = self->session->provider->funcs->C_EncryptUpdate(self->session->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
+		result = stream_funcs(self)->C_EncryptUpdate(self->session->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
 		if (result != CKR_OK) {
 			SvREFCNT_dec(RETVAL);
 			croak_with("Couldn't encrypt", result);
@@ -2773,13 +2854,13 @@ OUTPUT:
 SV* finalize(Crypt::HSM::Encrypt self)
 CODE:
 	CK_ULONG encryptedDataLen;
-	CK_RV result = self->session->provider->funcs->C_EncryptFinal(self->session->handle, NULL, &encryptedDataLen);
+	CK_RV result = stream_funcs(self)->C_EncryptFinal(self->session->handle, NULL, &encryptedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute encrypted length", result);
 
 	RETVAL = newSV(encryptedDataLen + 1);
 	SvPOK_only(RETVAL);
-	result = self->session->provider->funcs->C_EncryptFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
+	result = stream_funcs(self)->C_EncryptFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &encryptedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't encrypt", result);
@@ -2796,14 +2877,14 @@ SV* add_data(Crypt::HSM::Decrypt self, SV* data)
 CODE:
 	CK_ULONG dataLen, decryptedDataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	CK_RV result = self->session->provider->funcs->C_DecryptUpdate(self->session->handle, dataPV, dataLen, NULL, &decryptedDataLen);
+	CK_RV result = stream_funcs(self)->C_DecryptUpdate(self->session->handle, dataPV, dataLen, NULL, &decryptedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute decrypted length", result);
 
 	RETVAL = newSV(decryptedDataLen);
 	SvPOK_only(RETVAL);
 	if (decryptedDataLen) {
-		result = self->session->provider->funcs->C_DecryptUpdate(self->session->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &decryptedDataLen);
+		result = stream_funcs(self)->C_DecryptUpdate(self->session->handle, dataPV, dataLen, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &decryptedDataLen);
 		if (result != CKR_OK) {
 			SvREFCNT_dec(RETVAL);
 			croak_with("Couldn't decrypt", result);
@@ -2817,13 +2898,13 @@ OUTPUT:
 SV* finalize(Crypt::HSM::Decrypt self)
 CODE:
 	CK_ULONG decryptedDataLen;
-	CK_RV result = self->session->provider->funcs->C_DecryptFinal(self->session->handle, NULL, &decryptedDataLen);
+	CK_RV result = stream_funcs(self)->C_DecryptFinal(self->session->handle, NULL, &decryptedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute decrypted length", result);
 
 	RETVAL = newSV(decryptedDataLen + 1);
 	SvPOK_only(RETVAL);
-	result = self->session->provider->funcs->C_DecryptFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &decryptedDataLen);
+	result = stream_funcs(self)->C_DecryptFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &decryptedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't decrypt", result);
@@ -2841,14 +2922,14 @@ void add_data(Crypt::HSM::Digest self, SV* data)
 CODE:
 	CK_ULONG dataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	CK_RV result = self->session->provider->funcs->C_DigestUpdate(self->session->handle, dataPV, dataLen);
+	CK_RV result = stream_funcs(self)->C_DigestUpdate(self->session->handle, dataPV, dataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute digested length", result);
 
 
 void add_key(Crypt::HSM::Digest self, Crypt::HSM::Object key)
 CODE:
-	CK_RV result = self->session->provider->funcs->C_DigestKey(self->session->handle, key->handle);
+	CK_RV result = stream_funcs(self)->C_DigestKey(self->session->handle, key->handle);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute digested length", result);
 
@@ -2856,13 +2937,13 @@ CODE:
 SV* finalize(Crypt::HSM::Digest self)
 CODE:
 	CK_ULONG digestedDataLen;
-	CK_RV result = self->session->provider->funcs->C_DigestFinal(self->session->handle, NULL, &digestedDataLen);
+	CK_RV result = stream_funcs(self)->C_DigestFinal(self->session->handle, NULL, &digestedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute digested length", result);
 
 	RETVAL = newSV(digestedDataLen + 1);
 	SvPOK_only(RETVAL);
-	result = self->session->provider->funcs->C_DigestFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &digestedDataLen);
+	result = stream_funcs(self)->C_DigestFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &digestedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't digest", result);
@@ -2879,7 +2960,7 @@ void add_data(Crypt::HSM::Sign self, SV* data)
 CODE:
 	CK_ULONG dataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	CK_RV result = self->session->provider->funcs->C_SignUpdate(self->session->handle, dataPV, dataLen);
+	CK_RV result = stream_funcs(self)->C_SignUpdate(self->session->handle, dataPV, dataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't add date to sign", result);
 
@@ -2887,13 +2968,13 @@ CODE:
 SV* finalize(Crypt::HSM::Sign self)
 CODE:
 	CK_ULONG signedDataLen;
-	CK_RV result = self->session->provider->funcs->C_SignFinal(self->session->handle, NULL, &signedDataLen);
+	CK_RV result = stream_funcs(self)->C_SignFinal(self->session->handle, NULL, &signedDataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't compute signed length", result);
 
 	RETVAL = newSV(signedDataLen + 1);
 	SvPOK_only(RETVAL);
-	result = self->session->provider->funcs->C_SignFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
+	result = stream_funcs(self)->C_SignFinal(self->session->handle, (CK_BYTE*)SvPVbyte_nolen(RETVAL), &signedDataLen);
 	if (result != CKR_OK) {
 		SvREFCNT_dec(RETVAL);
 		croak_with("Couldn't sign", result);
@@ -2910,7 +2991,7 @@ void add_data(Crypt::HSM::Verify self, SV* data)
 CODE:
 	CK_ULONG dataLen;
 	CK_BYTE* dataPV = get_buffer(data, &dataLen);
-	CK_RV result = self->session->provider->funcs->C_VerifyUpdate(self->session->handle, dataPV, dataLen);
+	CK_RV result = stream_funcs(self)->C_VerifyUpdate(self->session->handle, dataPV, dataLen);
 	if (result != CKR_OK)
 		croak_with("Couldn't add data to verify", result);
 
@@ -2920,7 +3001,7 @@ CODE:
 	CK_ULONG signatureLen;
 	CK_BYTE* signaturePV = get_buffer(signature, &signatureLen);
 
-	CK_RV result = self->session->provider->funcs->C_VerifyFinal(self->session->handle, signaturePV, signatureLen);
+	CK_RV result = stream_funcs(self)->C_VerifyFinal(self->session->handle, signaturePV, signatureLen);
 
 	if (result == CKR_OK)
 		RETVAL = TRUE;

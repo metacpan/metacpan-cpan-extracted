@@ -3,10 +3,8 @@
 BEGIN {
     use Test::More;
 
-    # Author tests - requires Config::Std
     plan skip_all => "\$ENV{AUTHOR_TESTING} required for these tests" if(!$ENV{AUTHOR_TESTING});
-    eval "use Config::Std";
-    plan skip_all => "Optional Module Config::Std Required for these tests" if($@);
+    plan skip_all => "t/test_config.cfg required for connectivity tests" if(! -f 't/test_config.cfg');
 }
 
 use Net::Jabber::Bot;
@@ -15,11 +13,23 @@ use Test::NoWarnings;  # This breaks the skips in CPAN.
 # Otherwise it's 7 tests
 plan tests => 7;
 
-# Load config file.
-use Config::Std; # Uses read_config to pull info from a config files. enhanced INI format.
+# Load config file (simple INI parser, replaces Config::Std).
 my $config_file = 't/test_config.cfg';
 my %config_file_hash;
-ok((read_config($config_file => %config_file_hash)), "Load config file")
+if (open my $fh, '<', $config_file) {
+    my $section = '';
+    while (my $line = <$fh>) {
+        chomp $line;
+        $line =~ s/^\s+//; $line =~ s/\s+$//;
+        next if $line eq '' || $line =~ /^[#;]/;
+        if ($line =~ /^\[(.+)\]$/) { $section = $1; next; }
+        if ($line =~ /^([^:=]+?)\s*[:=]\s*(.*)$/) {
+            $config_file_hash{$section}{$1} = $2;
+        }
+    }
+    close $fh;
+}
+ok(scalar keys %config_file_hash, "Load config file")
     or die("Can't test without config file $config_file");
 
 my $alias = 'make_test_bot';

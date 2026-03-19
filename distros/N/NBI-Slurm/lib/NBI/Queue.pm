@@ -1,4 +1,28 @@
 #ABSTRACT: NBI::Queue, to filter jobs in the queue
+#
+# NBI::Queue - Queries the live SLURM queue and returns a filtered job list.
+#
+# DESCRIPTION:
+#   Wraps a call to `squeue` and parses its output into a list of
+#   NBI::QueuedJob objects.  Key responsibilities:
+#     - new()    : accepts -username, -jobid, -queue, -state, -name filters;
+#                  immediately runs squeue and populates $self->{jobs}
+#     - len()    : returns the number of matching jobs
+#     - ids()    : returns an array (or arrayref) of job IDs
+#     - remove() : removes a job by ID from the in-memory list
+#   Internal helpers:
+#     - _squeue()             : builds and runs the squeue command, splits
+#                               fields on a custom separator, applies name
+#                               filtering, and instantiates NBI::QueuedJob objects
+#     - _make_format_string() : substitutes human-readable field names for
+#                               squeue %-format codes using %NBI::Slurm::FORMAT_STRINGS
+#
+# RELATIONSHIPS:
+#   - Uses %NBI::Slurm::FORMAT_STRINGS to translate field names to squeue codes.
+#   - Creates NBI::QueuedJob instances for each row returned by squeue.
+#   - $NBI::Queue::VERSION is set from $NBI::Slurm::VERSION.
+#   - Used by the lsjobs and waitjobs bin scripts.
+#
 use strict;
 use warnings;
 package NBI::Queue;
@@ -160,7 +184,7 @@ NBI::Queue - NBI::Queue, to filter jobs in the queue
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 

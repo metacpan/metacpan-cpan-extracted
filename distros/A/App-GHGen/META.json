@@ -1,10 +1,10 @@
 {
-   "abstract" : "Comprehensive GitHub Actions workflow generator, analyzer, and optimizer",
+   "abstract" : "GitHub Actions workflow generator, analyzer, and optimizer",
    "author" : [
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150011",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -44,7 +44,7 @@
             "IPC::Run3" : "0",
             "Test::DescribeMe" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.98"
+            "Test::Most" : "0"
          }
       }
    },
@@ -63,6 +63,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-GHGen"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Output;
-$Bitcoin::Crypto::Transaction::Output::VERSION = '4.003';
+$Bitcoin::Crypto::Transaction::Output::VERSION = '4.004';
 use v5.14;
 use warnings;
 

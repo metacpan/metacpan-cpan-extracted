@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/toddr/XML-Parser.png?branch=master)](https://travis-ci.org/toddr/XML-Parser)
+[![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml)
 # NAME
 
 XML::Parser - A perl module for parsing XML documents
@@ -222,6 +222,22 @@ characters may generate multiple calls to this handler. Whatever the
 encoding of the string in the original document, this is given to the
 handler in UTF-8.
 
+**Important:** Because the underlying expat library parses in fixed-size
+chunks, character data that spans a buffer boundary will arrive as two or
+more consecutive Char events. This typically occurs with files larger than
+about 32 KiB and is not a bug. To obtain the complete text of an element,
+accumulate the strings delivered between Start and End events:
+
+```perl
+my $current_text;
+sub start_handler { $current_text = ''; }
+sub char_handler  { $current_text .= $_[1]; }
+sub end_handler   { print "complete text: $current_text\n"; }
+```
+
+The Stream style (`XML::Parser::Style::Stream`) already performs this
+accumulation automatically.
+
 ## Proc                (Expat, Target, Data)
 
 This event is generated when a processing instruction is recognized.
@@ -360,8 +376,9 @@ including any internal or external DTD declarations.
 
 This handler is called for xml declarations. Version is a string containing
 the version. Encoding is either undefined or contains an encoding string.
-Standalone will be either true, false, or undefined if the standalone attribute
-is yes, no, or not made respectively.
+Standalone is either undefined, or the string `"yes"` or `"no"`.
+Undefined indicates that no standalone parameter was given in the XML
+declaration.
 
 # STYLES
 

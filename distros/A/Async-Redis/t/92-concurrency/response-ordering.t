@@ -7,11 +7,9 @@ use strict;
 use warnings;
 use Test2::V0;
 use Test::Lib;
-use Test::Async::Redis qw(init_loop skip_without_redis await_f cleanup_keys run);
+use Test::Async::Redis qw(skip_without_redis await_f cleanup_keys run);
 use Async::Redis;
 use Future;
-
-my $loop = init_loop();
 
 SKIP: {
     my $redis = skip_without_redis();

@@ -72,6 +72,6 @@
          "url" : "https://github.com/DragosTrif/DBD-Fixtures"
       }
    },
-   "version" : 1.12,
+   "version" : 1.15,
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

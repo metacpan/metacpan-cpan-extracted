@@ -5,6 +5,7 @@ use Test2::V0;
 ################################################################################
 
 BEGIN {
+	$ENV{MOOISH_BASE_EXTRA_MODULES} = 'MooX::XSConstructor;MooX::TypeTiny';
 	require Mooish::Base;
 	$Mooish::Base::DEBUG = {};
 }

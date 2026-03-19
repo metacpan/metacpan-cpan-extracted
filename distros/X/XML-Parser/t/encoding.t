@@ -1,4 +1,4 @@
-BEGIN { print "1..6\n"; }
+BEGIN { print "1..14\n"; }
 END { print "not ok 1\n" unless $loaded; }
 use XML::Parser;
 $loaded = 1;
@@ -108,4 +108,96 @@ if (   $attr{euro} ne ( $] < 5.006 ? "\xE2\x82\xAC" : chr(0x20AC) )
     print "not ";
 }
 print "ok 6\n";
+
+# Test windows-1251 (Cyrillic)
+# 0xC0 = U+0410 (А), 0xE0 = U+0430 (а), 0xC1 = U+0411 (Б)
+
+$docstring = qq(<?xml version='1.0' encoding='windows-1251' ?>
+<doc a="\xC0" b="\xE0" c="\xC1" />
+);
+
+%attr = ();
+$p = XML::Parser->new( Handlers => { Start => \&get_attr } );
+eval { $p->parse($docstring) };
+
+if ($@) {
+    print "not ";    # couldn't load the map
+}
+print "ok 7\n";
+
+if (   $attr{a} ne chr(0x0410)
+    or $attr{b} ne chr(0x0430)
+    or $attr{c} ne chr(0x0411) ) {
+    print "not ";
+}
+print "ok 8\n";
+
+# Test koi8-r (Cyrillic)
+# 0xC1 = U+0430 (а), 0xE1 = U+0410 (А), 0xC2 = U+0431 (б)
+
+$docstring = qq(<?xml version='1.0' encoding='koi8-r' ?>
+<doc a="\xC1" b="\xE1" c="\xC2" />
+);
+
+%attr = ();
+$p = XML::Parser->new( Handlers => { Start => \&get_attr } );
+eval { $p->parse($docstring) };
+
+if ($@) {
+    print "not ";    # couldn't load the map
+}
+print "ok 9\n";
+
+if (   $attr{a} ne chr(0x0430)
+    or $attr{b} ne chr(0x0410)
+    or $attr{c} ne chr(0x0431) ) {
+    print "not ";
+}
+print "ok 10\n";
+
+# Test windows-1255 (Hebrew)
+# 0xE0 = U+05D0 (alef), 0xE1 = U+05D1 (bet), 0xE2 = U+05D2 (gimel)
+
+$docstring = qq(<?xml version='1.0' encoding='windows-1255' ?>
+<doc a="\xE0" b="\xE1" c="\xE2" />
+);
+
+%attr = ();
+$p = XML::Parser->new( Handlers => { Start => \&get_attr } );
+eval { $p->parse($docstring) };
+
+if ($@) {
+    print "not ";    # couldn't load the map
+}
+print "ok 11\n";
+
+if (   $attr{a} ne chr(0x05D0)
+    or $attr{b} ne chr(0x05D1)
+    or $attr{c} ne chr(0x05D2) ) {
+    print "not ";
+}
+print "ok 12\n";
+
+# Test ibm866 (DOS Cyrillic)
+# 0x80 = U+0410 (А), 0x81 = U+0411 (Б), 0xA0 = U+0430 (а)
+
+$docstring = qq(<?xml version='1.0' encoding='ibm866' ?>
+<doc a="\x80" b="\x81" c="\xA0" />
+);
+
+%attr = ();
+$p = XML::Parser->new( Handlers => { Start => \&get_attr } );
+eval { $p->parse($docstring) };
+
+if ($@) {
+    print "not ";    # couldn't load the map
+}
+print "ok 13\n";
+
+if (   $attr{a} ne chr(0x0410)
+    or $attr{b} ne chr(0x0411)
+    or $attr{c} ne chr(0x0430) ) {
+    print "not ";
+}
+print "ok 14\n";
 

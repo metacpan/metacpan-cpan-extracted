@@ -55,8 +55,10 @@ t/str-type-regression.t
 t/TestYAML.pm
 t/yaml-alias.t
 t/yaml-blessed-ref.t
+t/yaml-bytes-utf8.t
 t/yaml-dumpinto.t
 t/yaml-implicit-warnings.t
+t/yaml-magic-vars.t
 t/yaml-str-colon-first.t
 t/yaml-tie.t
 t/yaml-utf.t

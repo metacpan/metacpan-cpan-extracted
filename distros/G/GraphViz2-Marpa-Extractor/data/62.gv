@@ -1,0 +1,10 @@
+// Use double-quotes around 'reserved' words.
+
+# "digraph" is a graph name and not a graph type.
+
+digraph "digraph"
+{
+	# "node" is a node name and not a class name.
+
+	"node" [color = green style = filled]
+}

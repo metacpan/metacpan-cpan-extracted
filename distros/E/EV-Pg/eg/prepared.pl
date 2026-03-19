@@ -32,7 +32,6 @@ my $pg; $pg = EV::Pg->new(
                 $pg->exit_pipeline;
                 EV::break;
             });
-            $pg->send_flush_request;
         });
     },
 );

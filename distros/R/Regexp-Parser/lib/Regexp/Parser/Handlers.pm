@@ -13,6 +13,16 @@ sub init {
   $self->add_flag('i' => sub { 0x4 });
   $self->add_flag('x' => sub { 0x8 });
 
+  # /a, /d, /l, /u charset flags (Perl 5.14+)
+  # These are mutually exclusive; the last one set wins.
+  $self->add_flag('a' => sub { 0x10 });
+  $self->add_flag('d' => sub { 0x20 });
+  $self->add_flag('l' => sub { 0x40 });
+  $self->add_flag('u' => sub { 0x80 });
+
+  # /n (no-capture) flag (Perl 5.22+)
+  $self->add_flag('n' => sub { 0x100 });
+
   # (useless) /g, /c, /o flags
   $self->add_flag('g' => sub {
     my ($S, $plus) = @_;
@@ -136,6 +146,48 @@ sub init {
     $S->warn($S->RPe_BADESC, "G", " in character class") if $cc;
     return $S->force_object(anyof_char => 'G') if $cc;
     return $S->object(gpos => gpos => '\G');
+  });
+
+  # \g{N}, \g{-N}, \gN backreferences (Perl 5.10+)
+  $self->add_handler('\g' => sub {
+    my ($S, $cc) = @_;
+    if ($cc) {
+      $S->warn($S->RPe_BADESC, "g", " in character class");
+      return $S->force_object(anyof_char => 'g');
+    }
+
+    # \g{...} form
+    if (${&Rx} =~ m{ \G \{ }xgc) {
+      # \g{name} — named backref
+      if (${&Rx} =~ m{ \G ([a-zA-Z_]\w*) \} }xgc) {
+        my $name = $1;
+        return $S->object(gref => $name, "\\g{$name}");
+      }
+      # \g{N} or \g{-N} — numeric (possibly relative)
+      if (${&Rx} =~ m{ \G (-?\d+) \} }xgc) {
+        my $num = $1;
+        my $abs;
+        if ($num < 0) {
+          $abs = (&SIZE_ONLY ? $S->{maxpar} : $S->{nparen}) + $num + 1;
+          $S->error($S->RPe_BGROUP) if !&SIZE_ONLY and $abs < 1;
+        }
+        else {
+          $abs = $num;
+          $S->error($S->RPe_BGROUP) if !&SIZE_ONLY and $abs > $S->{maxpar};
+        }
+        return $S->object(ref => $abs, "\\g{$num}");
+      }
+      $S->error($S->RPe_RBRACE, 'g');
+    }
+
+    # \gN form (no braces, positive only)
+    if (${&Rx} =~ m{ \G (\d+) }xgc) {
+      my $num = $1;
+      $S->error($S->RPe_BGROUP) if !&SIZE_ONLY and $num > $S->{maxpar};
+      return $S->object(ref => $num, "\\g$num");
+    }
+
+    $S->error($S->RPe_BRACES, 'g');
   });
 
   # named (named character)
@@ -388,6 +440,7 @@ sub init {
     my ($S) = @_;
     $S->nextchar;
     return $S->object(minmod =>) if ${&Rx} =~ m{ \G \? }xgc;
+    return $S->object(possessive =>) if ${&Rx} =~ m{ \G \+ }xgc;
     return;
   });
 
@@ -507,7 +560,7 @@ sub init {
       }
 
       if ($ret == \$lhs) {
-        if (${&Rx} =~ m{ \G (?= - ) }xgc) {
+        if (${&Rx} =~ m{ \G (?= - (?! ] | \z ) ) }xgc) {
           if ($lhs->visual =~ /^(?:\[[:.=]|\\[dDsSwWpP])/) {
             $S->warn($S->RPe_FRANGE, $lhs->visual, "");
             $ret = $lhs;
@@ -525,7 +578,7 @@ sub init {
           &RxPOS = $before_range;
           $ret = $lhs;
         }
-        elsif ($lhs->visual gt $rhs->visual) {
+        elsif (ord($lhs->data) > ord($rhs->data)) {
           $S->error($S->RPe_IRANGE, $lhs->visual, $rhs->visual);
         }
         else {
@@ -575,6 +628,12 @@ sub init {
       $S->error($S->RPe_SEQINC);
     }
 
+    # Perl 5.14+ flag reset: (?^...) means default flags
+    my $caret = 0;
+    if (${&Rx} =~ m{ \G \^ }xgc) {
+      $caret = 1;
+    }
+
     # flag assertion or non-capturing group
     ${&Rx} =~ m{ \G ([a-zA-Z]*) (-? [a-zA-Z]*) }xgc;
     my ($on, $off) = ($1, $2);
@@ -595,17 +654,19 @@ sub init {
       $S->error($S->RPe_NOTREC, &RxPOS - $old, $bad);
     }
 
-    &RxPOS++ if $off =~ s/^-//;
+    if (!$caret) {
+      &RxPOS++ if $off =~ s/^-//;
 
-    for (split //, $off) {
-      &RxPOS++;
-      if (my $f = $S->can("FLAG_$_")) {
-        my $v = $S->$f(0) and $r_off .= $_;
-        $f_off |= $v;
-        next;
+      for (split //, $off) {
+        &RxPOS++;
+        if (my $f = $S->can("FLAG_$_")) {
+          my $v = $S->$f(0) and $r_off .= $_;
+          $f_off |= $v;
+          next;
+        }
+        my $bad = substr ${&Rx}, $old;
+        $S->error($S->RPe_NOTREC, &RxPOS - $old, $bad);
       }
-      my $bad = substr ${&Rx}, $old;
-      $S->error($S->RPe_NOTREC, &RxPOS - $old, $bad);
     }
 
     if (${&Rx} =~ m{ \G ([:)]) }xgc) {
@@ -614,9 +675,13 @@ sub init {
         push @{ $S->{flags} }, &Rf;
         push @{ $S->{next} }, qw< c) atom >;
       }
+      if ($caret) {
+        &Rf = 0;  # reset all flags to default
+      }
       &Rf |= $f_on;
       &Rf &= ~$f_off;
-      return $S->object($type => $r_on, $r_off);
+      my $vis_on = $caret ? "^$r_on" : $r_on;
+      return $S->object($type => $vis_on, $r_off);
     }
 
     &RxPOS++;
@@ -829,6 +894,122 @@ sub init {
     }
 
     $S->error($S->RPe_SEQINC);
+  });
+
+  ##
+  ## Perl 5.10+ constructs
+  ##
+
+  # \K (keep, reset match start)
+  $self->add_handler('\K' => sub {
+    my ($S, $cc) = @_;
+    $S->warn($S->RPe_BADESC, "K", " in character class") if $cc;
+    return $S->force_object(anyof_char => 'K') if $cc;
+    return $S->object(keep =>);
+  });
+
+  # \R (generic linebreak)
+  $self->add_handler('\R' => sub {
+    my ($S, $cc) = @_;
+    $S->warn($S->RPe_BADESC, "R", " in character class") if $cc;
+    return $S->force_object(anyof_char => 'R') if $cc;
+    return $S->object(lnbreak =>);
+  });
+
+  # \h (horizontal whitespace)
+  $self->add_handler('\h' => sub {
+    my ($S, $cc) = @_;
+    return $S->force_object(anyof_class => $S->force_object(hspace => 0)) if $cc;
+    return $S->object(hspace => 0);
+  });
+
+  # \H (not horizontal whitespace)
+  $self->add_handler('\H' => sub {
+    my ($S, $cc) = @_;
+    return $S->force_object(anyof_class => $S->force_object(hspace => 1)) if $cc;
+    return $S->object(hspace => 1);
+  });
+
+  # \v (vertical whitespace)
+  $self->add_handler('\v' => sub {
+    my ($S, $cc) = @_;
+    return $S->force_object(anyof_class => $S->force_object(vspace => 0)) if $cc;
+    return $S->object(vspace => 0);
+  });
+
+  # \V (not vertical whitespace)
+  $self->add_handler('\V' => sub {
+    my ($S, $cc) = @_;
+    return $S->force_object(anyof_class => $S->force_object(vspace => 1)) if $cc;
+    return $S->object(vspace => 1);
+  });
+
+  # \k<name> or \k'name' (named backreference)
+  $self->add_handler('\k' => sub {
+    my ($S, $cc) = @_;
+
+    if ($cc) {
+      $S->warn($S->RPe_BADESC, "k", " in character class");
+      return $S->force_object(anyof_char => 'k');
+    }
+
+    if (${&Rx} =~ m{ \G < ([^>]+) > }xgc) {
+      return $S->object(named_ref => $1, "\\k<$1>");
+    }
+    elsif (${&Rx} =~ m{ \G ' ([^']+) ' }xgc) {
+      return $S->object(named_ref => $1, "\\k'$1'");
+    }
+
+    $S->error($S->RPe_BADESC, "k", "");
+  });
+
+  # (?<name>...) named capture group
+  # We override the existing '(?<' handler to also support named captures
+  $self->add_handler('(?<' => sub {
+    my ($S) = @_;
+    my $c = '(?<';
+
+    # Check for lookbehind first: (?<= and (?<!
+    if (${&Rx} =~ m{ \G ([!=]) }xgcs) {
+      my $n = "$c$1";
+      return $S->$n if $S->can($n);
+    }
+
+    # Named capture: (?<name>...)
+    if (${&Rx} =~ m{ \G ([A-Za-z_]\w*) > }xgc) {
+      my $name = $1;
+      push @{ $S->{next} }, qw< c) atom >;
+      &SIZE_ONLY ? ++$S->{maxpar} : ++$S->{nparen};
+      push @{ $S->{flags} }, &Rf;
+      $S->{named_captures}{$name} = $S->{nparen} unless &SIZE_ONLY;
+      return $S->object(named_open => $S->{nparen}, $name);
+    }
+
+    $S->error($S->RPe_NOTREC, 2, substr(${&Rx}, &RxPOS - 2));
+  });
+
+  # (?'name'...) alternate named capture syntax
+  $self->add_handler("(?\'" => sub {
+    my ($S) = @_;
+
+    if (${&Rx} =~ m{ \G ([A-Za-z_]\w*) ' }xgc) {
+      my $name = $1;
+      push @{ $S->{next} }, qw< c) atom >;
+      &SIZE_ONLY ? ++$S->{maxpar} : ++$S->{nparen};
+      push @{ $S->{flags} }, &Rf;
+      $S->{named_captures}{$name} = $S->{nparen} unless &SIZE_ONLY;
+      return $S->object(named_open => $S->{nparen}, $name);
+    }
+
+    $S->error($S->RPe_NOTREC, 1, substr(${&Rx}, &RxPOS - 1));
+  });
+
+  # possessive quantifier modifier (a++, a*+, a?+, a{n,m}+)
+  $self->add_handler('posmod' => sub {
+    my ($S) = @_;
+    $S->nextchar;
+    return $S->object(possessive =>) if ${&Rx} =~ m{ \G \+ }xgc;
+    return;
   });
 }
 

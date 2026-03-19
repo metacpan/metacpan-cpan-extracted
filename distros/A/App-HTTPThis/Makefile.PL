@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Config::Tiny" => 0,
     "Getopt::Long" => 0,
-    "Plack::App::DirectoryIndex" => '0.2.2',
+    "Plack::App::DirectoryIndex" => '0.2.3',
     "Plack::Runner" => 0,
     "Pod::Usage" => 0
   },
@@ -39,7 +39,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Plack::App::DirectoryIndex" => '0.2.2',
+  "Plack::App::DirectoryIndex" => '0.2.3',
   "Plack::Runner" => 0,
   "Pod::Usage" => 0,
   "Test::More" => 0

@@ -1,0 +1,6 @@
+digraph G {
+    node [shape=record];
+    a [label="{<f0> left|<f1> middle|<f2> right}"];
+    b [label="{<f0> one|<f1> two}"];
+    a:f1 -> b:f0;
+}

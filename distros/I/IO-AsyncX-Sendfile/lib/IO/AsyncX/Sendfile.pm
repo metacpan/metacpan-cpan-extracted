@@ -3,7 +3,9 @@ package IO::AsyncX::Sendfile;
 use strict;
 use warnings;
 
-our $VERSION = '0.002';
+no warnings 'once';
+
+our $VERSION = '0.003';
 
 =head1 NAME
 
@@ -11,7 +13,7 @@ IO::AsyncX::Sendfile - adds support for L<Sys::Sendfile> to L<IO::Async::Stream>
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -74,24 +76,20 @@ Example usage:
      on_stream => sub {
          my $stream = shift;
          $stream->configure(
-             on_read => sub {
-                 my ($self, $buffref, $eof) = @_;
-                 $$buffref = '';
-                 return 0;
-             },
+             # IO::Async::Stream needs an on_read callback, so we provide a placeholder
+             on_read => sub { 0 },
          );
-		 if('send one file') {
-             $stream->sendfile(
-                 file => 'test.dat',
-             )->on_done(sub {
-                 warn "File send complete: @_\n";
-                 $stream->close;
-             });
-         } else {
-             $stream->sendfile(file => 'first.dat');
-             $stream->sendfile(file => 'second.dat');
-             $stream->write('EOF', on_flush => sub { shift->close });
-		 }
+         # Single file with completion callback:
+         $stream->sendfile(
+             file => 'test.dat',
+         )->on_done(sub {
+             warn "File send complete: @_\n";
+             $stream->close;
+         });
+         # Send multiple files in succession: (start the next after the first finishes)
+         $stream->sendfile(file => 'first.dat');
+         $stream->sendfile(file => 'second.dat');
+         $stream->write('EOF', on_flush => sub { shift->close });
          $loop->add($stream);
      }
  );
@@ -105,46 +103,49 @@ remaining bytes as the remaining details:
 =cut
 
 *IO::Async::Stream::sendfile = sub {
-	my $self = shift;
-	my %args = @_;
-	die "Stream must be added to loop first" unless $self->loop;
+    my $self = shift;
+    my %args = @_;
+    die "Stream must be added to loop first" unless $self->loop;
 
-	if(defined $args{file}) {
-		open $args{fh}, '<', $args{file} or die "Could not open " . $args{file} . " for input - $!";
-		binmode $args{fh};
-	}
-	die 'No file?' unless my $fh = delete $args{fh};
+    if(defined $args{file}) {
+        open $args{fh}, '<', $args{file} or die "Could not open " . $args{file} . " for input - $!";
+        binmode $args{fh};
+    }
+    die 'No file?' unless my $fh = delete $args{fh};
 
-	# Work out how much we need to write
-	my $total = my $remaining = $args{length};
-	unless(defined $total) {
-		my $pos = tell $fh;
-		seek $fh, 0, SEEK_END or die "Unable to seek - $!";
-		$total = $remaining = tell $fh;
-		seek $fh, $pos, SEEK_SET or die "Unable to seek - $!";
-	}
-	my $f = $self->loop->new_future;
+    # Work out how much we need to write
+    my $total = my $remaining = $args{length};
+    unless(defined $total) {
+        my $pos = tell $fh;
+        seek $fh, 0, SEEK_END or die "Unable to seek - $!";
+        $total = $remaining = tell $fh;
+        seek $fh, $pos, SEEK_SET or die "Unable to seek - $!";
+    }
+    my $f = $self->loop->new_future;
 
-	$self->write(sub {
-		my $stream = shift;
-		return unless $remaining;
+    my $offset = $args{offset} || 0;
+    $self->write(sub {
+            my $stream = shift;
+            return unless $remaining;
 
-		unless($remaining > 0) {
-			$f->fail(EOF => "Attempt to write past EOF, remaining bytes: " . $remaining);
-			return;
-		}
+            unless($remaining > 0) {
+                $f->fail(EOF => "Attempt to write past EOF, remaining bytes: " . $remaining);
+                return;
+            }
 
-		if(my $written = sendfile $stream->write_handle, $fh, $remaining) {
-			$remaining -= $written;
-			return ''; # empty string => call us again please
-		}
+            if(my $written = sendfile $stream->write_handle, $fh, $remaining, $offset) {
+                $offset += $written;
+                $remaining -= $written;
+                return ''; # empty string => call us again please
+            }
 
-		$f->fail("$!", sendfile => 0 + $!, $remaining);
-		return;
-	}, on_flush => sub {
-		$f->done($total) unless $f->is_ready;
-	});
-	return $f;
+            $f->fail("$!", sendfile => 0 + $!, $remaining);
+            return;
+        }, on_flush => sub {
+            $f->done($total) unless $f->is_ready;
+        }
+    );
+    return $f;
 };
 
 
@@ -162,4 +163,4 @@ Tom Molesworth <cpan@perlsite.co.uk>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2013-2015. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2013-2025. Licensed under the same terms as Perl itself.

@@ -36,7 +36,7 @@ is($attr->as_int, 1, 'attr as_int');
 
 # Test as_double
 my $val_attr = $item->attr('val');
-is($val_attr->as_double, 3.14, 'attr as_double');
+cmp_ok(sprintf("%.2f", $val_attr->as_double), '==', 3.14, 'attr as_double');
 
 # Test as_bool
 my $flag_attr = $item->attr('flag');
@@ -545,8 +545,9 @@ ok(!defined $invalid_attr, 'invalid attr returns undef');
     my $child = $doc->root->child('parent')->child('child');
     my $root = $child->root;
     ok($root, 'node root() returns node');
-    # root() returns the document node, not the document element
-    is($root->type, 1, 'root() returns document node');
+    # root() returns the document element (consistent with $doc->root)
+    is($root->type, 2, 'root() returns document element');
+    is($root->name, 'root', 'root() returns correct element');
 }
 
 # Test next_sibling with name filter
@@ -1032,6 +1033,245 @@ ok(!defined $invalid_attr, 'invalid attr returns undef');
     $doc->save_file($tmp);
     is($@, '', 'save_file clears $@ on success');
     unlink $tmp;
+}
+
+#--------------------------------------------------
+# Stale handle detection (generation counter)
+#--------------------------------------------------
+
+# Test stale node after reset()
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item>hello</item></root>');
+    my $node = $doc->root->child('item');
+    is($node->text, 'hello', 'node works before reset');
+
+    $doc->reset;
+
+    eval { $node->text; };
+    like($@, qr/Stale node handle/, 'accessing node after reset() croaks');
+
+    eval { $node->name; };
+    like($@, qr/Stale node handle/, 'accessing name after reset() croaks');
+
+    ok(!$node->valid, 'stale node valid() returns false');
+}
+
+# Test stale attr after reset()
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root id="1"/>');
+    my $attr = $doc->root->attr('id');
+    is($attr->value, '1', 'attr works before reset');
+
+    $doc->reset;
+
+    eval { $attr->value; };
+    like($@, qr/Stale attribute handle/, 'accessing attr after reset() croaks');
+
+    ok(!$attr->valid, 'stale attr valid() returns false');
+}
+
+# Test stale node after load_string()
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><old/></root>');
+    my $old_node = $doc->root;
+
+    $doc->load_string('<newroot/>');
+
+    eval { $old_node->name; };
+    like($@, qr/Stale node handle/, 'accessing node after reload croaks');
+}
+
+# Test stale node after load_file()
+{
+    my ($fh, $tmp) = tempfile(SUFFIX => '.xml', UNLINK => 1);
+    print $fh '<fileroot/>';
+    close $fh;
+
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root/>');
+    my $old_node = $doc->root;
+
+    $doc->load_file($tmp);
+
+    eval { $old_node->name; };
+    like($@, qr/Stale node handle/, 'accessing node after load_file croaks');
+    unlink $tmp;
+}
+
+# Test fresh nodes work after reset + reload
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item/></root>');
+    my $old = $doc->root;
+
+    $doc->reset;
+    $doc->load_string('<newroot><fresh/></newroot>');
+
+    my $new = $doc->root;
+    is($new->name, 'newroot', 'new node works after reset + reload');
+    is($new->child('fresh')->name, 'fresh', 'new child works after reset + reload');
+
+    eval { $old->name; };
+    like($@, qr/Stale/, 'old node still stale after reload');
+}
+
+# Test stale XPath context node
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item/></root>');
+    my $root = $doc->root;
+    my $xpath = $doc->compile_xpath('//item');
+
+    $doc->reset;
+    $doc->load_string('<root><other/></root>');
+
+    eval { $xpath->evaluate_nodes($root); };
+    like($@, qr/Stale/, 'stale node as XPath context croaks');
+}
+
+#--------------------------------------------------
+# UTF-8 input upgrade
+#--------------------------------------------------
+
+# Test Latin-1 input gets upgraded to UTF-8
+{
+    my $doc = XML::PugiXML->new;
+    # Create a Latin-1 byte string (not UTF-8 flagged)
+    my $latin1_xml = "<root>\xC3\xA9</root>";  # UTF-8 bytes for 'é' but no flag
+    utf8::downgrade($latin1_xml);  # ensure no UTF-8 flag
+    ok(!utf8::is_utf8($latin1_xml), 'test string is not UTF-8 flagged');
+
+    ok($doc->load_string($latin1_xml), 'load_string accepts non-flagged UTF-8 bytes');
+    my $text = $doc->root->text;
+    ok(utf8::is_utf8($text), 'output is UTF-8 flagged');
+}
+
+#--------------------------------------------------
+# XPath attribute selection
+#--------------------------------------------------
+
+# select_node returning attribute
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item id="42" name="test"/></root>');
+    my $result = $doc->select_node('//@id');
+    ok(defined $result, 'select_node //@id returns result');
+    isa_ok($result, 'XML::PugiXML::Attr', 'select_node //@id returns Attr');
+    is($result->value, '42', 'select_node //@id value correct');
+}
+
+# select_nodes returning attributes
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><a x="1"/><b x="2"/><c x="3"/></root>');
+    my @attrs = $doc->select_nodes('//@x');
+    is(scalar @attrs, 3, 'select_nodes //@x returns 3 results');
+    isa_ok($attrs[0], 'XML::PugiXML::Attr', 'select_nodes returns Attr objects');
+    is($attrs[0]->value, '1', 'first attr value');
+    is($attrs[2]->value, '3', 'last attr value');
+}
+
+# select_nodes mixed elements and attributes
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item id="1">text</item></root>');
+    my @elems = $doc->select_nodes('//item');
+    isa_ok($elems[0], 'XML::PugiXML::Node', 'element results are Node');
+    my @attrs = $doc->select_nodes('//@id');
+    isa_ok($attrs[0], 'XML::PugiXML::Attr', 'attr results are Attr');
+}
+
+# Node-level select_node for attributes
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item id="99"/></root>');
+    my $attr = $doc->root->select_node('//@id');
+    isa_ok($attr, 'XML::PugiXML::Attr', 'node select_node returns Attr');
+    is($attr->value, '99', 'node select_node attr value');
+}
+
+# Compiled XPath evaluate_node for attributes
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item id="7"/></root>');
+    my $xpath = $doc->compile_xpath('//@id');
+    my $result = $xpath->evaluate_node($doc->root);
+    isa_ok($result, 'XML::PugiXML::Attr', 'evaluate_node returns Attr');
+    is($result->value, '7', 'evaluate_node attr value');
+}
+
+# Compiled XPath evaluate_nodes for attributes
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><a x="1"/><b x="2"/></root>');
+    my $xpath = $doc->compile_xpath('//@x');
+    my @results = $xpath->evaluate_nodes($doc->root);
+    is(scalar @results, 2, 'evaluate_nodes returns 2 attrs');
+    isa_ok($results[0], 'XML::PugiXML::Attr', 'evaluate_nodes returns Attr');
+}
+
+#--------------------------------------------------
+# Attr::element() — navigate to parent element
+#--------------------------------------------------
+
+# element() from regular attr()
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item id="1" name="test"/></root>');
+    my $attr = $doc->root->child('item')->attr('id');
+    my $elem = $attr->element;
+    isa_ok($elem, 'XML::PugiXML::Node', 'element() returns Node');
+    is($elem->name, 'item', 'element() returns owning element');
+}
+
+# element() from XPath-selected attr
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><a x="1"/><b x="2"/></root>');
+    my $attr = $doc->select_node('//@x');
+    isa_ok($attr, 'XML::PugiXML::Attr', 'XPath returns Attr');
+    my $elem = $attr->element;
+    is($elem->name, 'a', 'element() from XPath attr returns correct parent');
+}
+
+# element() from attrs() list
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root foo="1" bar="2"/>');
+    my @attrs = $doc->root->attrs;
+    is($attrs[0]->element->name, 'root', 'element() from attrs() list');
+}
+
+# element() from set_attr
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root/>');
+    my $attr = $doc->root->set_attr('key', 'val');
+    is($attr->element->name, 'root', 'element() from set_attr');
+}
+
+# Test UTF-8 flagged input works normally
+{
+    my $doc = XML::PugiXML->new;
+    my $utf8_xml = "<root>café</root>";
+    utf8::upgrade($utf8_xml);
+    ok(utf8::is_utf8($utf8_xml), 'test string is UTF-8 flagged');
+
+    ok($doc->load_string($utf8_xml), 'load_string accepts UTF-8 flagged string');
+    like($doc->root->text, qr/caf/, 'UTF-8 text preserved');
+}
+
+# Test set_text with non-ASCII
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root/>');
+    my $text = "Ünïcödé";
+    utf8::upgrade($text);
+    $doc->root->set_text($text);
+    like($doc->root->text, qr/n.c/, 'set_text with UTF-8 works');
 }
 
 done_testing;

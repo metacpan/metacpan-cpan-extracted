@@ -2,6 +2,9 @@ use ExtUtils::MakeMaker;
 use Config;
 use English;
 
+my $expat_libpath = $ENV{EXPATLIBPATH} || '';
+my $expat_incpath = $ENV{EXPATINCPATH} || '';
+
 my $libs = "-lexpat";
 my @extras = ();
 

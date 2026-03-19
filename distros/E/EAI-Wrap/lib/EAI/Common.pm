@@ -1,4 +1,4 @@
-package EAI::Common 1.920;
+package EAI::Common 1.921;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number); 
@@ -163,6 +163,7 @@ my %hashCheck = (
 		additionalParamsNew => {}, # additional parameters for Net::SFTP::Foreign new (args passed to Net::SFTP::Foreign).
 		additionalParamsPut => {}, # additional parameters for Net::SFTP::Foreign put.
 		archiveDir => "", # folder for archived files on the FTP server
+		dateOfFetchedFile => 0, # returned date (taken from mtime/mdtm) of file fetched with fetchFiles in format YYYYMMDD, only works for single file
 		dontMoveTempImmediately => 1, # if 0 oder missing: rename/move files immediately after writing to FTP to the final name, otherwise/1: a call to EAI::FTP::moveTempFiles is required for that
 		dontDoSetStat => 1, # for Net::SFTP::Foreign, no setting of time stamp of remote file to that of local file (avoid error messages of FTP Server if it doesn't support this)
 		dontDoUtime => 1, # don't set time stamp of local file to that of remote file
@@ -938,7 +939,7 @@ Example:
 
 =head1 COPYRIGHT
 
-Copyright (c) 2025 Roland Kapl
+Copyright (c) 2026 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

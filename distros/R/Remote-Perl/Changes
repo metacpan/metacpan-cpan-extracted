@@ -1,5 +1,8 @@
 Revision history for Remote::Perl
 
+0.004  2026-03-14
+  - Fix linux tmpfile strategy error propagation when O_TMPFILE is unavailable.
+
 0.003  2026-03-13
   - Fix premature end of input when flow control kicks in.
   - Added -e, -w, -m, -M short options mirroring Perl.

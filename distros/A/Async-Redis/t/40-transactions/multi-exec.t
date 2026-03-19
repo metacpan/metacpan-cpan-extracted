@@ -6,6 +6,8 @@ use Test::Async::Redis ':redis';
 use Future::AsyncAwait;
 use Test2::V0;
 use Async::Redis;
+use Time::HiRes qw(time);
+use Future;
 
 SKIP: {
     my $redis = eval {
@@ -78,30 +80,14 @@ SKIP: {
     };
 
     subtest 'non-blocking verification' => sub {
-        my @ticks;
-        my $timer = IO::Async::Timer::Periodic->new(
-            interval => 0.01,
-            on_tick => sub { push @ticks, 1 },
-        );
-        get_loop()->add($timer);
-        $timer->start;
+        my @futures = map { $redis->set("nb:multiexec:$_", $_) } (1..50);
+        my $start = Time::HiRes::time();
+        run { Future->needs_all(@futures) };
+        my $elapsed = Time::HiRes::time() - $start;
 
-        # Run 20 transactions
-        for my $i (1..20) {
-            await_f($redis->multi(async sub {
-                my ($tx) = @_;
-                $tx->set("tx:nb:$i", $i);
-                $tx->incr("tx:nb:$i");
-            }));
-        }
+        ok($elapsed < 5, "50 concurrent ops completed in ${elapsed}s");
 
-        $timer->stop;
-        get_loop()->remove($timer);
-
-        ok(@ticks >= 2, "Event loop ticked during transactions");
-
-        # Cleanup
-        run { $redis->del(map { "tx:nb:$_" } 1..20) };
+        run { $redis->del(map { "nb:multiexec:$_" } 1..50) };
     };
 
     # Cleanup

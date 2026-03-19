@@ -1,0 +1,14 @@
+[% WRAPPER 'layout.html' %]
+		<div class="main">
+			<h1>PlackX::Framework Example: [% page_name %]</h1>
+			<p>
+				Your feedback has disappeared into the void, but thanks anyway!
+			</p>
+			<p>
+				Your lucky number today is [% user_lucky_number %].
+			</p>
+		</div>
+		<div class="footer">
+			<a href="[% REQUEST.uri_goto('./') %]">Go home</a>
+		</div>
+[% END %]

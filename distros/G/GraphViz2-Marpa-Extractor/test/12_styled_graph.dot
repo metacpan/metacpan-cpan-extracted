@@ -1,0 +1,15 @@
+digraph G {
+    graph [bgcolor=beige, margin=0];
+    node [shape=box, style="rounded,filled", fillcolor=white];
+    edge [color=grey, fontsize=10];
+
+    a [label="Start"];
+    b [label="Process"];
+    c [label="Decision", shape=diamond];
+    d [label="End"];
+
+    a -> b;
+    b -> c;
+    c -> d [label="Yes"];
+    c -> b [label="No", style=dashed];
+}

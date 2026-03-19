@@ -1,6 +1,24 @@
 Revision history for distribution Test-Changes-Strict-Simple
 
-0.01  2026-03-11
+0.05  2026-03-16
+
+    - Added argument release_today.
+    - Completed POD.
+    - Fixed self.t test script.
+
+0.04  2026-03-14
+
+    - Fixed wrong example in POD.
+
+0.03  2026-03-14
+
+    - Added import option -reverse_version_order.
+
+0.02  2026-03-14
+
+    - Corrected POD.
+
+0.01  2026-03-12
 
     - First version, released on an unsuspecting world.
 

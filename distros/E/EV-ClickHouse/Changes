@@ -1,0 +1,45 @@
+0.01  2026-03-15
+    Core:
+    - Async queries via HTTP protocol (port 8123)
+    - Native TCP binary protocol (port 9000, revision 54459)
+    - TLS/SSL support via OpenSSL (both protocols)
+    - LZ4 compression for native protocol (with CityHash checksums)
+    - Gzip compression for HTTP protocol (request and response)
+    - HTTP chunked transfer encoding
+    - Connection URI parsing (clickhouse[+native]://user:pass@host:port/db)
+    - Per-query and connection-level ClickHouse settings
+    - Parameterized queries via params => { name => value }
+    - Keepalive ping timer for idle native connections
+    - Auto-reconnect with exponential backoff (reconnect_delay, reconnect_max_delay)
+    - Graceful drain callback (fires when all pending queries complete)
+    - Query cancellation and skip_pending
+
+    Query features:
+    - TabSeparated format parser for HTTP responses
+    - INSERT with TSV string or arrayref data (both protocols)
+    - Raw query mode for HTTP (return unparsed response body)
+    - on_data streaming callback for native protocol (per-block delivery)
+    - on_progress callback for native protocol progress packets
+    - query_id tracking via last_query_id accessor
+    - query_timeout per-query with automatic cancellation
+
+    Native protocol type support:
+    - Int8/16/32/64/128/256, UInt8/16/32/64/128/256
+    - Float32/Float64, Bool
+    - String, FixedString(N)
+    - Date, Date32, DateTime, DateTime64 (with timezone support)
+    - Decimal32/64/128 (with optional scaling via decode_decimal)
+    - Enum8/16 (with optional label decoding via decode_enum)
+    - UUID, IPv4, IPv6
+    - Nullable(T), Array(T), Tuple(T...), Map(K,V)
+    - LowCardinality(T) with cross-block shared dictionary support
+    - SimpleAggregateFunction(func, T), Nested(...)
+    - Nothing type
+
+    Accessors:
+    - column_names, column_types — schema metadata from last query
+    - last_error_code — ClickHouse error code (both protocols)
+    - last_totals, last_extremes — WITH TOTALS / extremes results
+    - profile_rows, profile_bytes, profile_rows_before_limit
+    - server_info, server_version, server_timezone
+    - is_connected, pending_count

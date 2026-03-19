@@ -3,8 +3,18 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More;
 use XML::Parser;
+
+# Verify expat can handle external DTD processing with parameter entities.
+# Some old/buggy versions of libexpat (e.g. expat 1.95.8 on RHEL5) fail here.
+my $probe = XML::Parser->new(ParseParamEnt => 1, NoLWP => 1, ErrorContext => 2);
+eval { $probe->parse("<?xml version=\"1.0\"?>\n<!DOCTYPE foo SYSTEM \"t/foo.dtd\" []>\n<foo/>\n") };
+if ($@) {
+    plan skip_all => "expat cannot process external DTD with parameter entities: $@";
+}
+
+plan tests => 13;
 
 my $internal_subset = <<'End_of_internal;';
 [

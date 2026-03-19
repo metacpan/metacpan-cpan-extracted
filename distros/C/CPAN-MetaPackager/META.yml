@@ -1,0 +1,48 @@
+---
+abstract: 'Manage a database of Perl packages'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::CPAN::Changes: '0.500005'
+  Test::Changes::Strict::Simple: '0.01'
+  Test::More: '1.001002'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPAN-MetaPackager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config::Tiny: '2.3'
+  DBI: '1.645'
+  DBIx::Admin::CreateTable: '2.11'
+  DBIx::Simple: '1.37'
+  Data::Dumper::Concise: '2.023'
+  DateTime::Tiny: '1.07'
+  ExtUtils::MakeMaker: '7.7'
+  File::Slurper: '0.014'
+  File::Spec: '3.9'
+  Getopt::Long: '2.57'
+  Mojo::Log: '0'
+  Moo: '2.005005'
+  Pod::Usage: '2.03'
+  Types::Standard: '2.006'
+  boolean: '0.46'
+  parent: '0.242'
+  perl: '5.36'
+  strict: '1.12'
+  warnings: '1.58'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaPackager
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/CPAN-MetaPackager.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

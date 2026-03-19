@@ -1,0 +1,36 @@
+---
+# English (United States) name canonicalization rules
+#
+# Notes:
+#   - US names frequently include professional suffixes (MD, PhD, Esq).
+#   - Titles such as "Rev" and "Hon" appear more often than in UK usage.
+#   - No surname particles in standard American naming.
+#   - Hyphens should be preserved.
+#
+# This ruleset inherits from en_GB and overrides only the differences.
+
+default:
+
+  include: en_GB
+
+  particles: []
+
+  suffixes:
+    - jr
+    - sr
+    - ii
+    - iii
+    - iv
+    - esq
+    - md
+    - phd
+
+  strip_titles:
+    - mr
+    - mrs
+    - miss
+    - ms
+    - dr
+    - prof
+    - rev
+    - hon

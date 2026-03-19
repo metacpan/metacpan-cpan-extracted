@@ -2,7 +2,77 @@ Changes for the DBD::Pg module
 
 RT refers to rt.cpan.org
 
-Version 3.18.0 (released December 6, 2023)
+
+Version 3.19.0  (released March 14, 2026)
+
+ - Support for asynchronous connect via PQconnectStart/ PQconnectPoll
+   [Rainer Weikusat]
+   (Github pull request #141)
+
+ - Fix async query ownership and data preservation
+   [Tobias Oetiker]
+   (Github pull request #105)
+    
+ - Use PQsendPrepare instead of PQprepare for async queries
+   [Rainer Weikusat]
+   (Github pull request #142)
+
+ - Many cleanups and improvements to the cancel functions
+   [Rainer Weikusat]
+   (Github pull requests #145 and #152)
+
+ - Prevent pg_error_field() from modifying string
+   [Lukas Mai]
+   (Github issue #157 and pull request #158)
+
+ - Speed up quote_name using binary search
+   Also a new test t/01keywords.t
+   [Michael Conrad]
+   (Github pull request #124)
+
+ - Cleanup and improve the column_info() function.
+   Added a new field, pg_database
+   Split numeric type sizes across COLUMN_SIZE and DECIMAL_DIGITS
+   [Greg Sabino Mullane]
+   (Github pull request #162)
+
+ - Support binding native boolean false on Perl 5.36 and newer
+   [Dagfinn Ilmari Mannsåker]
+
+ - Respect pg_bool_tf when binding native booleans on Perl 5.36 and newer
+   [Dagfinn Ilmari Mannsåker]
+   (Github issue #125 and pull request #129)
+
+ - Clean up and clarify $dbh->data_sources behavior
+   [Greg Sabino Mullane]
+
+ - Require ExtUtils::MakeMaker 7.64
+   [brian d foy]
+   [Rainer Weikusat]
+   (Github issue #69)
+   (Github pull requests #137 #155)
+
+ - C23 compliance for functions taking variable number of arguments
+   [Rainer Weikusat]
+   (Github pull request #148)
+
+ - Separate $username and $password from DSN parameters in POD
+   [Daniel Böhmer]
+   (Github pull request #149)
+
+ - Add example for using RETURNING in "insert into foo (...) returning id"
+   [H.Merijn Brand]
+   (Github pull request #134)
+
+ - Do not use TMPDIR if we are providing a path via DBDPG_TEMDIR environment variable.
+   [Greg Sabino Mullane]
+   (RT ticket #157598)
+
+ - Switch from netstat to ss for finding free ports during testing
+   [Greg Sabino Mullane]
+
+
+Version 3.18.0  (released December 6, 2023)
 
  - Support new PQclosePrepared function, added in Postgres 17
    [Greg Sabino Mullane]

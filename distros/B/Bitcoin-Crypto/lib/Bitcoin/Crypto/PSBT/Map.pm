@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::PSBT::Map;
-$Bitcoin::Crypto::PSBT::Map::VERSION = '4.003';
+$Bitcoin::Crypto::PSBT::Map::VERSION = '4.004';
 use v5.14;
 use warnings;
 

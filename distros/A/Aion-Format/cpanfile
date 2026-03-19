@@ -31,6 +31,7 @@ on 'test' => sub {
 recommends 'Devel::Size';
 
 requires 'DDP';
+requires 'Guard';
 requires 'Encode';
 requires 'Exporter';
 requires 'JSON::XS';

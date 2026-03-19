@@ -1,3 +1,11 @@
+0.7009 2026-03-19
+- MacOS does not support GLX_ARB_create_context_profile
+
+0.7008 2026-03-19
+- add FreeGLUT-compatible requesting of GL >2.1 for Apple GLUT
+- compatibility break: GLX support requires GLX 1.3+ (from before 2005)
+- add glpRequestContext(major, minor, want_core_context) for GLX (not on MacOS)
+
 0.7007 2026-03-13
 - add glpErrorString
 - add _o aliases for all functions taking OpenGL::Array args

@@ -9,12 +9,13 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test2::V1: '0'
   Test::MockObject: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,46 +24,46 @@ name: Git-CPAN-Patch
 provides:
   Git::CPAN::Patch:
     file: lib/Git/CPAN/Patch.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::Clone:
     file: lib/Git/CPAN/Patch/Command/Clone.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::FormatPatch:
     file: lib/Git/CPAN/Patch/Command/FormatPatch.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::Import:
     file: lib/Git/CPAN/Patch/Command/Import.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::SendEmail:
     file: lib/Git/CPAN/Patch/Command/SendEmail.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::SendPatch:
     file: lib/Git/CPAN/Patch/Command/SendPatch.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::Sources:
     file: lib/Git/CPAN/Patch/Command/Sources.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::Squash:
     file: lib/Git/CPAN/Patch/Command/Squash.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::Update:
     file: lib/Git/CPAN/Patch/Command/Update.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Command::Which:
     file: lib/Git/CPAN/Patch/Command/Which.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Import:
     file: lib/Git/CPAN/Patch/Import.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Release:
     file: lib/Git/CPAN/Patch/Release.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Role::Git:
     file: lib/Git/CPAN/Patch/Role/Git.pm
-    version: v2.5.0
+    version: v2.5.2
   Git::CPAN::Patch::Role::Patch:
     file: lib/Git/CPAN/Patch/Role/Patch.pm
-    version: v2.5.0
+    version: v2.5.2
 requires:
   Archive::Any: '0'
   Archive::Extract: '0'
@@ -82,7 +83,7 @@ requires:
   File::chmod: '0'
   Git::Repository: '0'
   Git::Repository::Plugin::AUTOLOAD: '0'
-  LWP::Simple: '0'
+  HTTP::Tiny: '0'
   LWP::UserAgent: '0'
   List::Pairwise: '0'
   MetaCPAN::API: '0'
@@ -106,7 +107,7 @@ resources:
   bugtracker: https://github.com/yanick/git-cpan-patch/issues
   homepage: https://github.com/yanick/git-cpan-patch
   repository: https://github.com/yanick/git-cpan-patch.git
-version: 2.5.0
+version: 2.5.2
 x_author_pledge:
   version: 1
 x_authority: cpan:YANICK
@@ -121,6 +122,7 @@ x_contributors:
   - 'Graham Knop <haarg@haarg.org>'
   - 'Lisa Hare <lhare@inview.co.uk>'
   - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Michael Schout <schoutm@gmail.com>'
   - 'Mike Doherty <doherty@cs.dal.ca>'
   - 'Mike Doherty <mike@mikedoherty.ca>'
   - 'Pedro Melo <melo@simplicidade.org>'
@@ -134,6 +136,6 @@ x_contributors:
   - 'Yanick Champoux <yanick@babyl.ca>'
   - 'Yuval Kogman <nothingmuch@woobling.org>'
   - 'Zakariyya Mughal <zaki.mughal@gmail.com>'
-x_generated_by_perl: v5.30.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

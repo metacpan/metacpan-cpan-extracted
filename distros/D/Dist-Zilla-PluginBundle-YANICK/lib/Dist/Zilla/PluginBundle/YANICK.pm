@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::YANICK;
 our $AUTHORITY = 'cpan:YANICK';
-$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.32.1';
+$Dist::Zilla::PluginBundle::YANICK::VERSION = '0.32.2';
 # ABSTRACT: Be like Yanick when you build your dists
 
 # [TODO] add CONTRIBUTING file
@@ -203,7 +203,7 @@ Dist::Zilla::PluginBundle::YANICK - Be like Yanick when you build your dists
 
 =head1 VERSION
 
-version 0.32.1
+version 0.32.2
 
 =head1 DESCRIPTION
 
@@ -387,7 +387,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Yanick Champoux.
+This software is copyright (c) 2026 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

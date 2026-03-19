@@ -10,6 +10,7 @@
 typedef struct ev_mariadb_s ev_mariadb_t;
 typedef struct ev_mariadb_cb_s ev_mariadb_cb_t;
 typedef struct ev_mariadb_send_s ev_mariadb_send_t;
+typedef struct ev_mariadb_stmt_s ev_mariadb_stmt_t;
 
 typedef ev_mariadb_t* EV__MariaDB;
 typedef struct ev_loop* EV__Loop;
@@ -67,8 +68,8 @@ struct ev_mariadb_s {
     int          op_ret;
     MYSQL_RES   *op_result;
     MYSQL_STMT  *op_stmt;
-    MYSQL_BIND  *bind_params;   /* kept alive until execute completes */
-    int          bind_param_count;
+    ev_mariadb_stmt_t *op_stmt_ctx;  /* per-stmt wrapper for bind_params cleanup */
+    ev_mariadb_stmt_t *stmt_list;    /* all allocated stmt wrappers */
     MYSQL       *op_conn_ret;
     my_bool      op_bool_ret;
     MYSQL_ROW    op_row;        /* for streaming fetch_row result */
@@ -87,13 +88,16 @@ struct ev_mariadb_s {
     unsigned int write_timeout;
     int          compress;
     int          multi_statements;
+    int          found_rows;
     char        *charset;
     char        *init_command;
     char        *ssl_key;
     char        *ssl_cert;
     char        *ssl_ca;
+    char        *ssl_capath;
     char        *ssl_cipher;
     int          ssl_verify_server_cert;
+    int          utf8;  /* auto-flag result strings as UTF-8 */
     unsigned long client_flags;
 };
 
@@ -109,6 +113,14 @@ struct ev_mariadb_send_s {
     ngx_queue_t  queue;
 };
 
+struct ev_mariadb_stmt_s {
+    MYSQL_STMT  *stmt;
+    MYSQL_BIND  *bind_params;
+    int          bind_param_count;
+    int          closed;      /* invalidated by cleanup_connection */
+    ev_mariadb_stmt_t *next;  /* linked list of all stmts on this connection */
+};
+
 #define MAX_PIPELINE_DEPTH 64
 #define MAX_FREELIST_DEPTH 64
 
@@ -122,11 +134,14 @@ struct ev_mariadb_send_s {
     self->field = SvOK(value) ? safe_strdup(SvPV_nolen(value)) : NULL; \
 } while (0)
 
+#define IS_FORKED(self) \
+    ((self)->connect_pid != 0 && (self)->connect_pid != getpid())
+
 #define CHECK_READY(self, cb) \
     do { \
         if (NULL == (self)->conn || (self)->state == STATE_CONNECTING) \
             croak("not connected"); \
-        if ((self)->connect_pid != getpid()) \
+        if (IS_FORKED(self)) \
             croak("connection not valid after fork"); \
         if ((self)->state != STATE_IDLE) \
             croak("another operation is in progress"); \
@@ -134,6 +149,14 @@ struct ev_mariadb_send_s {
             croak("cannot start operation while pipeline results are pending"); \
         if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV)) \
             croak("callback must be a CODE reference"); \
+    } while (0)
+
+#define CHECK_STMT(ctx) \
+    do { \
+        if (!(ctx)) \
+            croak("invalid statement handle"); \
+        if ((ctx)->closed) \
+            croak("statement handle is no longer valid (connection was reset)"); \
     } while (0)
 
 static void io_cb(EV_P_ ev_io *w, int revents);
@@ -145,7 +168,8 @@ static void start_reading(ev_mariadb_t *self);
 static void stop_reading(ev_mariadb_t *self);
 static void start_writing(ev_mariadb_t *self);
 static void stop_writing(ev_mariadb_t *self);
-static void free_bind_params(ev_mariadb_t *self);
+static void free_stmt_bind_params(ev_mariadb_stmt_t *ctx);
+static int  is_utf8_charset(unsigned int charsetnr);
 static void start_timer(ev_mariadb_t *self);
 static void stop_timer(ev_mariadb_t *self);
 static void update_watchers(ev_mariadb_t *self, int status);
@@ -153,7 +177,7 @@ static void emit_error(ev_mariadb_t *self, const char *msg);
 static void cleanup_connection(ev_mariadb_t *self);
 static int  check_destroyed(ev_mariadb_t *self);
 static void drain_multi_result(ev_mariadb_t *self);
-static AV*  build_field_names(MYSQL_FIELD *fields, unsigned int ncols);
+static AV*  build_field_names(MYSQL *conn, MYSQL_FIELD *fields, unsigned int ncols);
 static void on_real_query_done(ev_mariadb_t *self);
 static void on_stream_fetch_done(ev_mariadb_t *self);
 static void on_close_done(ev_mariadb_t *self);
@@ -327,7 +351,9 @@ static int check_destroyed(ev_mariadb_t *self) {
 }
 
 static void emit_error(ev_mariadb_t *self, const char *msg) {
+    SV *cb;
     if (NULL == self->on_error) return;
+    cb = sv_2mortal(SvREFCNT_inc_simple_NN(self->on_error));
 
     dSP;
     ENTER;
@@ -336,7 +362,7 @@ static void emit_error(ev_mariadb_t *self, const char *msg) {
     XPUSHs(sv_2mortal(newSVpv(msg, 0)));
     PUTBACK;
 
-    call_sv(self->on_error, G_DISCARD | G_EVAL);
+    call_sv(cb, G_DISCARD | G_EVAL);
     if (SvTRUE(ERRSV)) {
         warn("EV::MariaDB: exception in error handler: %s", SvPV_nolen(ERRSV));
         sv_setpvn(ERRSV, "", 0);
@@ -384,6 +410,24 @@ static void invoke_error_cb(SV *cb, const char *errmsg) {
     LEAVE;
 }
 
+/* Invoke a callback with (undef) — EOF signal. Decrements cb refcount. */
+static void invoke_eof_cb(SV *cb) {
+    dSP;
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    PUSHs(&PL_sv_undef);
+    PUTBACK;
+    call_sv(cb, G_DISCARD | G_EVAL);
+    if (SvTRUE(ERRSV)) {
+        warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
+        sv_setpvn(ERRSV, "", 0);
+    }
+    SvREFCNT_dec(cb);
+    FREETMPS;
+    LEAVE;
+}
+
 /* Invoke a callback SV with args already on the stack. Decrements refcount. */
 static void invoke_cb(SV *cb) {
     call_sv(cb, G_DISCARD | G_EVAL);
@@ -422,6 +466,7 @@ static int deliver_result(ev_mariadb_t *self) {
         else if (res != NULL) {
             my_ulonglong nrows = mysql_num_rows(res);
             unsigned int ncols = mysql_num_fields(res);
+            MYSQL_FIELD *fields = mysql_fetch_fields(res);
             AV *rows = newAV();
             AV *fnames;
             MYSQL_ROW row;
@@ -437,13 +482,16 @@ static int deliver_result(ev_mariadb_t *self) {
                     if (row[c] == NULL) {
                         av_push(r, newSV(0));
                     } else {
-                        av_push(r, newSVpvn(row[c], lengths[c]));
+                        SV *val = newSVpvn(row[c], lengths[c]);
+                        if (self->utf8 && is_utf8_charset(fields[c].charsetnr))
+                            SvUTF8_on(val);
+                        av_push(r, val);
                     }
                 }
                 av_push(rows, newRV_noinc((SV*)r));
             }
             /* build field names before freeing result */
-            fnames = build_field_names(mysql_fetch_fields(res), ncols);
+            fnames = build_field_names(self->conn, fields, ncols);
             mysql_free_result(res);
             self->op_result = NULL;
             PUSHs(sv_2mortal(newRV_noinc((SV*)rows)));
@@ -506,6 +554,9 @@ static int deliver_value(ev_mariadb_t *self, SV *val) {
 }
 
 static void cleanup_connection(ev_mariadb_t *self) {
+    int saved_fd = self->fd;
+    int is_fork = IS_FORKED(self);
+
     stop_reading(self);
     stop_writing(self);
     stop_timer(self);
@@ -514,28 +565,51 @@ static void cleanup_connection(ev_mariadb_t *self) {
     self->send_count = 0;
     self->draining = 0;
 
-    if (self->op_result) {
-        mysql_free_result(self->op_result);
-        self->op_result = NULL;
-    }
-
-    if (self->bind_params)
-        free_bind_params(self);
-
     if (self->op_data_ptr) {
         Safefree(self->op_data_ptr);
         self->op_data_ptr = NULL;
     }
 
-    if (self->op_stmt) {
-        mysql_stmt_close(self->op_stmt);
-        self->op_stmt = NULL;
+    self->op_stmt_ctx = NULL;
+
+    /* Invalidate all tracked stmt wrappers (don't free — user may hold handles) */
+    {
+        ev_mariadb_stmt_t *ctx = self->stmt_list;
+        while (ctx) {
+            free_stmt_bind_params(ctx);
+            if (!is_fork && ctx->stmt) {
+                if (ctx->stmt == self->op_stmt)
+                    self->op_stmt = NULL;  /* avoid double-close below */
+                mysql_stmt_close(ctx->stmt);
+            }
+            ctx->stmt = NULL;
+            ctx->closed = 1;
+            ctx = ctx->next;
+        }
+        /* keep stmt_list linked for close_stmt to unlink+free later */
     }
 
-    if (self->conn) {
-        MYSQL *conn = self->conn;
+    if (is_fork) {
+        self->op_result = NULL;
+        self->op_stmt = NULL;
         self->conn = NULL;
-        mysql_close(conn);
+    } else {
+        if (self->op_result && saved_fd >= 0)
+            shutdown(saved_fd, SHUT_RDWR);
+        /* Close op_stmt if not tracked in stmt_list (e.g., in-flight prepare) */
+        if (self->op_stmt) {
+            mysql_stmt_close(self->op_stmt);
+        }
+        self->op_stmt = NULL;
+        if (self->op_result) {
+            mysql_free_result(self->op_result);
+            self->op_result = NULL;
+        }
+        if (self->conn) {
+            MYSQL *conn = self->conn;
+            self->conn = NULL;
+            mysql_close(conn);
+        }
     }
 }
 
@@ -970,6 +1044,7 @@ static void on_connect_done(ev_mariadb_t *self) {
     init_io_watchers(self);
 
     if (NULL != self->on_connect) {
+        SV *cb = sv_2mortal(SvREFCNT_inc_simple_NN(self->on_connect));
         self->callback_depth++;
 
         {
@@ -979,7 +1054,7 @@ static void on_connect_done(ev_mariadb_t *self) {
             PUSHMARK(SP);
             PUTBACK;
 
-            call_sv(self->on_connect, G_DISCARD | G_EVAL);
+            call_sv(cb, G_DISCARD | G_EVAL);
             if (SvTRUE(ERRSV)) {
                 warn("EV::MariaDB: exception in connect handler: %s", SvPV_nolen(ERRSV));
                 sv_setpvn(ERRSV, "", 0);
@@ -1013,7 +1088,14 @@ static void on_stmt_prepare_done(ev_mariadb_t *self) {
         return;
     }
 
-    if (deliver_value(self, newSViv(PTR2IV(stmt)))) return;
+    {
+        ev_mariadb_stmt_t *ctx;
+        Newxz(ctx, 1, ev_mariadb_stmt_t);
+        ctx->stmt = stmt;
+        ctx->next = self->stmt_list;
+        self->stmt_list = ctx;
+        if (deliver_value(self, newSViv(PTR2IV(ctx)))) return;
+    }
     maybe_pipeline(self);
 }
 
@@ -1104,7 +1186,10 @@ static void on_stmt_execute_done(ev_mariadb_t *self) {
                         if (is_null[c]) {
                             av_push(row, newSV(0));
                         } else {
-                            av_push(row, newSVpvn(buffers[c], lengths[c]));
+                            SV *val = newSVpvn(buffers[c], lengths[c]);
+                            if (self->utf8 && is_utf8_charset(fields[c].charsetnr))
+                                SvUTF8_on(val);
+                            av_push(row, val);
                         }
                     }
                     av_push(rows, newRV_noinc((SV*)row));
@@ -1121,7 +1206,7 @@ static void on_stmt_execute_done(ev_mariadb_t *self) {
                     else
                         PUSHs(sv_2mortal(newSVpv(mysql_stmt_error(stmt), 0)));
                 } else {
-                    AV *fnames = build_field_names(fields, ncols);
+                    AV *fnames = build_field_names(self->conn, fields, ncols);
                     mysql_free_result(self->op_result);
                     self->op_result = NULL;
                     mysql_stmt_free_result(stmt);
@@ -1155,8 +1240,21 @@ static void on_stmt_store_done(ev_mariadb_t *self) {
     on_stmt_execute_done(self);
 }
 
+static void unlink_stmt(ev_mariadb_t *self, ev_mariadb_stmt_t *ctx) {
+    ev_mariadb_stmt_t **pp = &self->stmt_list;
+    while (*pp) {
+        if (*pp == ctx) { *pp = ctx->next; return; }
+        pp = &(*pp)->next;
+    }
+}
+
 static void on_stmt_close_done(ev_mariadb_t *self) {
     self->op_stmt = NULL;  /* stmt freed by mysql_stmt_close */
+    if (self->op_stmt_ctx) {
+        unlink_stmt(self, self->op_stmt_ctx);
+        Safefree(self->op_stmt_ctx);
+        self->op_stmt_ctx = NULL;
+    }
     self->state = STATE_IDLE;
     if (self->op_bool_ret != 0) {
         if (deliver_error(self, mysql_error(self->conn))) return;
@@ -1190,20 +1288,20 @@ static void on_utility_done(ev_mariadb_t *self, int failed) {
     maybe_pipeline(self);
 }
 
-static void free_bind_params(ev_mariadb_t *self) {
+static void free_stmt_bind_params(ev_mariadb_stmt_t *ctx) {
     int i;
-    for (i = 0; i < self->bind_param_count; i++) {
-        Safefree(self->bind_params[i].buffer);
+    if (!ctx->bind_params) return;
+    for (i = 0; i < ctx->bind_param_count; i++) {
+        Safefree(ctx->bind_params[i].buffer);
     }
-    Safefree(self->bind_params);
-    self->bind_params = NULL;
-    self->bind_param_count = 0;
+    Safefree(ctx->bind_params);
+    ctx->bind_params = NULL;
+    ctx->bind_param_count = 0;
 }
 
 static void transition_to_stmt_store(ev_mariadb_t *self) {
     int status;
-    if (self->bind_params)
-        free_bind_params(self);
+    self->op_stmt_ctx = NULL;  /* bind_params live in wrapper, not freed here */
     if (self->op_ret != 0) {
         on_stmt_execute_done(self);
     } else {
@@ -1254,22 +1352,7 @@ static void on_real_query_done(ev_mariadb_t *self) {
             self->state = STATE_IDLE;
             self->pending_count--;
             self->callback_depth++;
-            {
-                dSP;
-                ENTER;
-                SAVETMPS;
-                PUSHMARK(SP);
-                PUSHs(&PL_sv_undef);
-                PUTBACK;
-                call_sv(cb, G_DISCARD | G_EVAL);
-                if (SvTRUE(ERRSV)) {
-                    warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
-                    sv_setpvn(ERRSV, "", 0);
-                }
-                SvREFCNT_dec(cb);
-                FREETMPS;
-                LEAVE;
-            }
+            invoke_eof_cb(cb);
             self->callback_depth--;
             if (check_destroyed(self)) return;
         }
@@ -1287,6 +1370,9 @@ static void on_real_query_done(ev_mariadb_t *self) {
 }
 
 static void on_stream_fetch_done(ev_mariadb_t *self) {
+    MYSQL_FIELD *fields = (self->utf8 && self->op_result)
+        ? mysql_fetch_fields(self->op_result) : NULL;
+
     for (;;) {
         MYSQL_ROW row = self->op_row;
 
@@ -1304,30 +1390,57 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
                 if (row[c] == NULL) {
                     av_push(r, newSV(0));
                 } else {
-                    av_push(r, newSVpvn(row[c], lengths[c]));
+                    SV *val = newSVpvn(row[c], lengths[c]);
+                    if (fields && is_utf8_charset(fields[c].charsetnr))
+                        SvUTF8_on(val);
+                    av_push(r, val);
                 }
             }
 
-            self->callback_depth++;
+            /* Detach stream_cb before invoking: prevents cancel_pending
+               from double-firing the callback if finish() is called inside */
             {
-                dSP;
-                ENTER;
-                SAVETMPS;
-                PUSHMARK(SP);
-                PUSHs(sv_2mortal(newRV_noinc((SV*)r)));
-                PUTBACK;
-                call_sv(self->stream_cb, G_DISCARD | G_EVAL);
-                if (SvTRUE(ERRSV)) {
-                    warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
-                    sv_setpvn(ERRSV, "", 0);
+                SV *saved_cb = self->stream_cb;
+                self->stream_cb = NULL;
+                self->pending_count--;
+
+                self->callback_depth++;
+                {
+                    SV *cb = sv_2mortal(SvREFCNT_inc_simple_NN(saved_cb));
+                    dSP;
+                    ENTER;
+                    SAVETMPS;
+                    PUSHMARK(SP);
+                    PUSHs(sv_2mortal(newRV_noinc((SV*)r)));
+                    PUTBACK;
+                    call_sv(cb, G_DISCARD | G_EVAL);
+                    if (SvTRUE(ERRSV)) {
+                        warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
+                        sv_setpvn(ERRSV, "", 0);
+                    }
+                    FREETMPS;
+                    LEAVE;
                 }
-                FREETMPS;
-                LEAVE;
+                self->callback_depth--;
+                if (check_destroyed(self)) {
+                    SvREFCNT_dec(saved_cb);
+                    return;
+                }
+
+                /* Was stream cancelled (finish/reset from callback)? */
+                if (self->stream_cb != NULL) {
+                    /* callback started a new stream — don't touch */
+                    SvREFCNT_dec(saved_cb);
+                } else if (self->conn == NULL || self->op_result == NULL) {
+                    /* connection torn down — stream is over */
+                    SvREFCNT_dec(saved_cb);
+                    return;
+                } else {
+                    /* normal: restore for next row */
+                    self->stream_cb = saved_cb;
+                    self->pending_count++;
+                }
             }
-            self->callback_depth--;
-            if (check_destroyed(self)) return;
-            /* callback may have called finish/reset */
-            if (self->stream_cb == NULL) return;
         }
 
         /* fetch next row */
@@ -1359,24 +1472,15 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
         if (has_error) {
             invoke_error_cb(cb, errbuf);
         } else {
-            /* EOF signal: (undef) */
-            dSP;
-            ENTER;
-            SAVETMPS;
-            PUSHMARK(SP);
-            PUSHs(&PL_sv_undef);
-            PUTBACK;
-            call_sv(cb, G_DISCARD | G_EVAL);
-            if (SvTRUE(ERRSV)) {
-                warn("EV::MariaDB: exception in stream callback: %s", SvPV_nolen(ERRSV));
-                sv_setpvn(ERRSV, "", 0);
-            }
-            SvREFCNT_dec(cb);
-            FREETMPS;
-            LEAVE;
+            invoke_eof_cb(cb);
         }
         self->callback_depth--;
         if (check_destroyed(self)) return;
+        /* drain any secondary result sets from multi_statements */
+        if (self->conn && mysql_more_results(self->conn)) {
+            drain_multi_result(self);
+            return;
+        }
         maybe_pipeline(self);
     }
 }
@@ -1704,6 +1808,7 @@ static void free_option_strings(ev_mariadb_t *self) {
     if (self->ssl_key)     { Safefree(self->ssl_key);     self->ssl_key = NULL; }
     if (self->ssl_cert)    { Safefree(self->ssl_cert);    self->ssl_cert = NULL; }
     if (self->ssl_ca)      { Safefree(self->ssl_ca);      self->ssl_ca = NULL; }
+    if (self->ssl_capath)  { Safefree(self->ssl_capath);  self->ssl_capath = NULL; }
     if (self->ssl_cipher)  { Safefree(self->ssl_cipher);  self->ssl_cipher = NULL; }
 }
 
@@ -1723,14 +1828,16 @@ static void apply_options(ev_mariadb_t *self) {
         mysql_options(conn, MYSQL_SET_CHARSET_NAME, self->charset);
     if (self->init_command)
         mysql_options(conn, MYSQL_INIT_COMMAND, self->init_command);
-    if (self->ssl_ca || self->ssl_cert || self->ssl_key || self->ssl_cipher)
-        mysql_ssl_set(conn, self->ssl_key, self->ssl_cert, self->ssl_ca, NULL, self->ssl_cipher);
+    if (self->ssl_ca || self->ssl_capath || self->ssl_cert || self->ssl_key || self->ssl_cipher)
+        mysql_ssl_set(conn, self->ssl_key, self->ssl_cert, self->ssl_ca, self->ssl_capath, self->ssl_cipher);
     if (self->ssl_verify_server_cert) {
         my_bool val = 1;
         mysql_options(conn, MYSQL_OPT_SSL_VERIFY_SERVER_CERT, &val);
     }
     if (self->multi_statements)
         flags |= CLIENT_MULTI_STATEMENTS | CLIENT_MULTI_RESULTS;
+    if (self->found_rows)
+        flags |= CLIENT_FOUND_ROWS;
 
     self->client_flags = flags;
 }
@@ -1749,37 +1856,45 @@ static int is_utf8_charset(unsigned int charsetnr) {
         || (charsetnr >= 2048 && charsetnr <= 2559);
 }
 
-static AV* build_field_names(MYSQL_FIELD *fields, unsigned int ncols) {
+static int conn_charset_is_utf8(MYSQL *conn) {
+    const char *cs;
+    if (!conn) return 0;
+    cs = mysql_character_set_name(conn);
+    return (cs && strncmp(cs, "utf8", 4) == 0);
+}
+
+static AV* build_field_names(MYSQL *conn, MYSQL_FIELD *fields, unsigned int ncols) {
     AV *fnames = newAV();
     unsigned int i;
+    int utf8_names = conn_charset_is_utf8(conn);
     if (ncols > 0) av_extend(fnames, ncols - 1);
     for (i = 0; i < ncols; i++) {
         SV *name = newSVpvn(fields[i].name, fields[i].name_length);
-        if (is_utf8_charset(fields[i].charsetnr))
+        if (utf8_names)
             SvUTF8_on(name);
         av_push(fnames, name);
     }
     return fnames;
 }
 
-static void setup_bind_params(ev_mariadb_t *self, MYSQL_STMT *stmt, AV *params) {
+static void setup_bind_params(ev_mariadb_stmt_t *ctx, AV *params) {
     int nparams = (int)(av_len(params) + 1);
     MYSQL_BIND *bp;
     int i;
 
     {
-        unsigned long expected = mysql_stmt_param_count(stmt);
+        unsigned long expected = mysql_stmt_param_count(ctx->stmt);
         if ((unsigned long)nparams != expected)
             croak("parameter count mismatch: got %d, expected %lu", nparams, expected);
     }
 
     if (nparams == 0) return;
 
-    if (self->bind_params) free_bind_params(self);
+    free_stmt_bind_params(ctx);
 
     Newxz(bp, nparams, MYSQL_BIND);
-    self->bind_params = bp;
-    self->bind_param_count = nparams;
+    ctx->bind_params = bp;
+    ctx->bind_param_count = nparams;
 
     for (i = 0; i < nparams; i++) {
         SV **svp = av_fetch(params, i, 0);
@@ -1819,10 +1934,10 @@ static void setup_bind_params(ev_mariadb_t *self, MYSQL_STMT *stmt, AV *params) 
         }
     }
 
-    if (mysql_stmt_bind_param(stmt, bp)) {
+    if (mysql_stmt_bind_param(ctx->stmt, bp)) {
         char errbuf[512];
-        COPY_ERROR(errbuf, mysql_stmt_error(stmt));
-        free_bind_params(self);
+        COPY_ERROR(errbuf, mysql_stmt_error(ctx->stmt));
+        free_stmt_bind_params(ctx);
         croak("%s", errbuf);
     }
 }
@@ -1903,6 +2018,7 @@ CODE:
     if (PL_dirty) {
         /* global destruction — free C resources only; skip SvREFCNT_dec
            to avoid cascading destructors in torn-down interpreter */
+        int is_fork = IS_FORKED(self);
         while (!ngx_queue_empty(&self->send_queue)) {
             ngx_queue_t *q = ngx_queue_head(&self->send_queue);
             ev_mariadb_send_t *s = ngx_queue_data(q, ev_mariadb_send_t, queue);
@@ -1916,12 +2032,22 @@ CODE:
             ngx_queue_remove(q);
             Safefree(cbt);
         }
-        if (self->bind_params) free_bind_params(self);
         if (self->op_data_ptr) Safefree(self->op_data_ptr);
         self->stream_cb = NULL;
-        if (self->op_result) mysql_free_result(self->op_result);
-        if (self->op_stmt) mysql_stmt_close(self->op_stmt);
-        if (self->conn) mysql_close(self->conn);
+        {
+            ev_mariadb_stmt_t *ctx = self->stmt_list;
+            while (ctx) {
+                ev_mariadb_stmt_t *next = ctx->next;
+                free_stmt_bind_params(ctx);
+                if (!is_fork && ctx->stmt) mysql_stmt_close(ctx->stmt);
+                Safefree(ctx);
+                ctx = next;
+            }
+        }
+        if (!is_fork) {
+            if (self->op_result) mysql_free_result(self->op_result);
+            if (self->conn) mysql_close(self->conn);
+        }
         free_connect_strings(self);
         free_option_strings(self);
         Safefree(self);
@@ -1933,30 +2059,46 @@ CODE:
     /* safety net: callbacks during cancel_pending could re-queue entries */
     drain_queues_silent(self);
 
-    if (self->bind_params)
-        free_bind_params(self);
-
     if (self->op_data_ptr) {
         Safefree(self->op_data_ptr);
         self->op_data_ptr = NULL;
     }
 
-    if (self->op_result) {
-        mysql_free_result(self->op_result);
-        self->op_result = NULL;
-    }
-
-    if (self->op_stmt) {
-        mysql_stmt_close(self->op_stmt);
-        self->op_stmt = NULL;
-    }
-
+    /* Free all tracked stmt wrappers and connection resources */
     {
-        MYSQL *conn = self->conn;
-        self->conn = NULL;
+        int is_fork = IS_FORKED(self);
+        ev_mariadb_stmt_t *ctx = self->stmt_list;
+        while (ctx) {
+            ev_mariadb_stmt_t *next = ctx->next;
+            free_stmt_bind_params(ctx);
+            if (!is_fork && ctx->stmt) mysql_stmt_close(ctx->stmt);
+            Safefree(ctx);
+            ctx = next;
+        }
+        self->stmt_list = NULL;
+        /* Close op_stmt if not tracked in stmt_list (e.g., in-flight prepare) */
+        if (!is_fork && self->op_stmt && !self->op_stmt_ctx) {
+            mysql_stmt_close(self->op_stmt);
+        }
+        self->op_stmt = NULL;
+        self->op_stmt_ctx = NULL;
+
+        if (is_fork) {
+            self->op_result = NULL;
+            self->conn = NULL;
+        } else {
+            if (self->op_result) {
+                mysql_free_result(self->op_result);
+                self->op_result = NULL;
+            }
+            {
+                MYSQL *conn = self->conn;
+                self->conn = NULL;
+                if (conn) mysql_close(conn);
+            }
+        }
         self->loop = NULL;
         self->fd = -1;
-        if (conn) mysql_close(conn);
     }
 
     if (NULL != self->on_connect) {
@@ -2054,7 +2196,7 @@ CODE:
     if (NULL == self->conn) {
         croak("not connected");
     }
-    if (self->connect_pid != getpid()) {
+    if (IS_FORKED(self)) {
         croak("connection not valid after fork");
     }
     if (self->state >= STATE_STMT_PREPARE) {
@@ -2108,25 +2250,27 @@ CODE:
 void
 execute(EV::MariaDB self, IV stmt_iv, SV *params_ref, SV *cb)
 PREINIT:
-    MYSQL_STMT *stmt;
+    ev_mariadb_stmt_t *ctx;
     int status;
 CODE:
 {
     CHECK_READY(self, cb);
 
-    stmt = INT2PTR(MYSQL_STMT *, stmt_iv);
+    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    CHECK_STMT(ctx);
 
     if (SvOK(params_ref)) {
         if (!SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV)
             croak("params must be an ARRAY reference or undef");
-        setup_bind_params(self, stmt, (AV *)SvRV(params_ref));
+        setup_bind_params(ctx, (AV *)SvRV(params_ref));
     }
 
     push_cb(self, cb);
-    self->op_stmt = stmt;
+    self->op_stmt = ctx->stmt;
+    self->op_stmt_ctx = ctx;
 
     self->state = STATE_STMT_EXECUTE;
-    status = mysql_stmt_execute_start(&self->op_ret, stmt);
+    status = mysql_stmt_execute_start(&self->op_ret, ctx->stmt);
     if (status == 0) {
         transition_to_stmt_store(self);
     } else {
@@ -2137,37 +2281,49 @@ CODE:
 void
 bind_params(EV::MariaDB self, IV stmt_iv, SV *params_ref)
 PREINIT:
-    MYSQL_STMT *stmt;
+    ev_mariadb_stmt_t *ctx;
 CODE:
 {
     if (NULL == self->conn || self->state == STATE_CONNECTING)
         croak("not connected");
-    if (self->connect_pid != getpid())
+    if (IS_FORKED(self))
         croak("connection not valid after fork");
     if (self->state != STATE_IDLE)
         croak("another operation is in progress");
     if (!SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV)
         croak("params must be an ARRAY reference");
 
-    stmt = INT2PTR(MYSQL_STMT *, stmt_iv);
-    setup_bind_params(self, stmt, (AV *)SvRV(params_ref));
+    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    CHECK_STMT(ctx);
+    setup_bind_params(ctx, (AV *)SvRV(params_ref));
 }
 
 void
 close_stmt(EV::MariaDB self, IV stmt_iv, SV *cb)
 PREINIT:
-    MYSQL_STMT *stmt;
+    ev_mariadb_stmt_t *ctx;
     int status;
 CODE:
 {
     CHECK_READY(self, cb);
 
-    stmt = INT2PTR(MYSQL_STMT *, stmt_iv);
+    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    if (ctx->closed) {
+        /* already closed by cleanup_connection — just free the wrapper */
+        unlink_stmt(self, ctx);
+        Safefree(ctx);
+        push_cb(self, cb);
+        if (deliver_value(self, newSViv(1))) return;
+        maybe_pipeline(self);
+        return;
+    }
+    free_stmt_bind_params(ctx);
     push_cb(self, cb);
-    self->op_stmt = stmt;
+    self->op_stmt = ctx->stmt;
+    self->op_stmt_ctx = ctx;
 
     self->state = STATE_STMT_CLOSE;
-    status = mysql_stmt_close_start(&self->op_bool_ret, stmt);
+    status = mysql_stmt_close_start(&self->op_bool_ret, ctx->stmt);
     if (status == 0) {
         on_stmt_close_done(self);
     } else {
@@ -2178,18 +2334,19 @@ CODE:
 void
 stmt_reset(EV::MariaDB self, IV stmt_iv, SV *cb)
 PREINIT:
-    MYSQL_STMT *stmt;
+    ev_mariadb_stmt_t *ctx;
     int status;
 CODE:
 {
     CHECK_READY(self, cb);
 
-    stmt = INT2PTR(MYSQL_STMT *, stmt_iv);
+    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    CHECK_STMT(ctx);
     push_cb(self, cb);
-    self->op_stmt = stmt;
+    self->op_stmt = ctx->stmt;
 
     self->state = STATE_STMT_RESET;
-    status = mysql_stmt_reset_start(&self->op_bool_ret, stmt);
+    status = mysql_stmt_reset_start(&self->op_bool_ret, ctx->stmt);
     if (status == 0) {
         on_stmt_reset_done(self);
     } else {
@@ -2226,6 +2383,18 @@ CODE:
     CHECK_READY(self, cb);
 
     db = (SvOK(db_sv)) ? SvPV_nolen(db_sv) : NULL;
+
+    /* Update cached credentials so reset() reconnects with the new ones */
+    if (self->user) Safefree(self->user);
+    self->user = safe_strdup(user);
+    if (self->password) Safefree(self->password);
+    self->password = safe_strdup(password);
+    if (db) {
+        if (self->database) Safefree(self->database);
+        self->database = safe_strdup(db);
+    }
+    /* if db is NULL (undef), keep self->database for reset() */
+
     push_cb(self, cb);
 
     self->state = STATE_CHANGE_USER;
@@ -2244,6 +2413,10 @@ PREINIT:
 CODE:
 {
     CHECK_READY(self, cb);
+
+    /* Update cached database so reset() reconnects to the right one */
+    if (self->database) Safefree(self->database);
+    self->database = safe_strdup(db);
 
     push_cb(self, cb);
 
@@ -2282,6 +2455,10 @@ PREINIT:
 CODE:
 {
     CHECK_READY(self, cb);
+
+    /* Update cached charset so reset() reconnects with the right one */
+    if (self->charset) Safefree(self->charset);
+    self->charset = safe_strdup(charset);
 
     push_cb(self, cb);
 
@@ -2396,7 +2573,7 @@ CODE:
 void
 send_long_data(EV::MariaDB self, IV stmt_iv, unsigned int param_idx, SV *data_sv, SV *cb)
 PREINIT:
-    MYSQL_STMT *stmt;
+    ev_mariadb_stmt_t *ctx;
     STRLEN data_len;
     char *data;
     int status;
@@ -2404,18 +2581,19 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    stmt = INT2PTR(MYSQL_STMT *, stmt_iv);
+    ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    CHECK_STMT(ctx);
     {
         const char *src = SvPV(data_sv, data_len);
         Newx(data, data_len > 0 ? data_len : 1, char);
         Copy(src, data, data_len, char);
     }
     push_cb(self, cb);
-    self->op_stmt = stmt;
+    self->op_stmt = ctx->stmt;
     self->op_data_ptr = data;
 
     self->state = STATE_STMT_SEND_LONG_DATA;
-    status = mysql_stmt_send_long_data_start(&self->op_bool_ret, stmt,
+    status = mysql_stmt_send_long_data_start(&self->op_bool_ret, ctx->stmt,
         param_idx, data, (unsigned long)data_len);
     if (status == 0) {
         on_send_long_data_done(self);
@@ -2438,6 +2616,8 @@ CODE:
         self->compress = SvTRUE(value) ? 1 : 0;
     } else if (strcmp(key, "multi_statements") == 0) {
         self->multi_statements = SvTRUE(value) ? 1 : 0;
+    } else if (strcmp(key, "found_rows") == 0) {
+        self->found_rows = SvTRUE(value) ? 1 : 0;
     } else if (strcmp(key, "charset") == 0) {
         SET_STR_OPTION(charset);
     } else if (strcmp(key, "init_command") == 0) {
@@ -2448,10 +2628,14 @@ CODE:
         SET_STR_OPTION(ssl_cert);
     } else if (strcmp(key, "ssl_ca") == 0) {
         SET_STR_OPTION(ssl_ca);
+    } else if (strcmp(key, "ssl_capath") == 0) {
+        SET_STR_OPTION(ssl_capath);
     } else if (strcmp(key, "ssl_cipher") == 0) {
         SET_STR_OPTION(ssl_cipher);
     } else if (strcmp(key, "ssl_verify_server_cert") == 0) {
         self->ssl_verify_server_cert = SvTRUE(value) ? 1 : 0;
+    } else if (strcmp(key, "utf8") == 0) {
+        self->utf8 = SvTRUE(value) ? 1 : 0;
     } else {
         croak("unknown option: %s", key);
     }
@@ -2617,6 +2801,21 @@ OUTPUT:
     RETVAL
 
 SV*
+affected_rows(EV::MariaDB self)
+CODE:
+{
+    if (NULL != self->conn) {
+        my_ulonglong rows = mysql_affected_rows(self->conn);
+        RETVAL = (rows == (my_ulonglong)-1) ? &PL_sv_undef : newSVuv((UV)rows);
+    }
+    else {
+        RETVAL = &PL_sv_undef;
+    }
+}
+OUTPUT:
+    RETVAL
+
+SV*
 escape(EV::MariaDB self, SV *str)
 PREINIT:
     STRLEN len;
@@ -2625,7 +2824,8 @@ PREINIT:
 CODE:
 {
     if (NULL == self->conn || self->state == STATE_CONNECTING
-        || self->state == STATE_CLOSE) {
+        || self->state == STATE_CLOSE
+        || IS_FORKED(self)) {
         croak("not connected");
     }
     s = SvPV(str, len);
@@ -2638,6 +2838,10 @@ CODE:
     RETVAL = newSV(len * 2 + 1);
     SvPOK_on(RETVAL);
     elen = mysql_real_escape_string(self->conn, SvPVX(RETVAL), s, (unsigned long)len);
+    if (elen == (unsigned long)-1) {
+        SvREFCNT_dec(RETVAL);
+        croak("mysql_real_escape_string failed");
+    }
     SvCUR_set(RETVAL, elen);
     *SvEND(RETVAL) = '\0';
 }

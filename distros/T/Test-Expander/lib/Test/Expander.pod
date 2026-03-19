@@ -25,7 +25,7 @@ B<Test::Expander> - Expansion of test functionalities that appear to be frequent
 
   # Tries to automatically determine, which class / module and method / subroutine are to be tested,
   # creates neither a temporary directory, nor a temporary file,
-  # passes the option '-srand' to Test2::V0 changing the random seed to the current time in seconds:
+  # passes the option '-srand' to Test2::V1 changing the random seed to the current time in seconds:
   use Test::Expander -srand => time;
 
   # Class is supplied explicitly, tries to automatically determine method / subroutine to be tested,
@@ -93,7 +93,7 @@ B<Test::Expander> - Expansion of test functionalities that appear to be frequent
 =head1 DESCRIPTION
 
 The primary objective of B<Test::Expander> is to provide additional convenience while testing based on
-L<Test2::V0|https://metacpan.org/pod/Test2::V0> considering boilerplate aspects that seem to be important
+L<Test2::V1|https://metacpan.org/pod/Test2::V1> considering boilerplate aspects that seem to be important
 (to the author) in notable number of cases.
 These are among other things:
 
@@ -267,6 +267,68 @@ Or both tables can be transferred to the B<DATA> section of the current test fil
 
 =back
 
+The test table consists of the header describing the structure of the result hash and body providing the hash itself.
+
+The header starts with a horizontal ruler, which is a line starting with one of the characters plus, minus, or pipe
+followed by any number of minus characters followed by any other characters.
+The cell contents can have multiple lines, which are merged together.
+
+There are two different types of test tables:
+
+=over 2
+
+=item Those with test case names in a separate column.
+
+In such tables the first header cell is empty and each body row contains the same number of cells as the header.
+The first row cell contains the test case name and the values of other cells are returned as hash values,
+where the hash keys are the values of the corresponding header cells.
+
+For example, the table
+
+  +---------------------------------------------------------+
+  |                              |          | param | param |
+  |                              | expected |   1   |   2   |
+  |------------------------------+----------+-------+-------|
+  | 'param2' omitted             |     0    | 'abc' |       |
+  | both parameters set to true  |     1    |   1   |   1   |
+  | both parameters set to false |     0    |   0   |   0   |
+  +---------------------------------------------------------+
+
+Leads to the following hash:
+
+  (
+    "'param2' omitted"             => { expected => 0, param1 => 'abc', param2 => '' },
+    'both parameters set to true'  => { expected => 1, param1 => 1,     param2 => 1  },
+    'both parameters set to false' => { expected => 0, param1 => 0,     param2 => 0  },
+  )
+
+=item Those with test case names in separate rows.
+
+If some test case names are too long and, hence, the table gets too broad, then each test case can be represented by
+two rows containing the case name in the first row and the values belonging to this name in the second row.
+For the better readability single test cases can be separated by horizontal rulers mentioned above.
+
+In such tables the first header cell is not empty and the number of header cells is equal to the number of cells in
+rows containing test values.
+
+For example, the same table as showed above can also look like
+
+  +------------------------------+
+  |            | param  | param  |
+  |  expected  |   1    |   2    |
+  |------------+--------+--------|
+  | 'param2' omitted             |
+  |      0     | 'abc'  |        |
+  |------------+--------+--------|
+  | both parameters set to true  |
+  |      1     |   1    |   1    |
+  |------------+--------+--------|
+  | both parameters set to false |
+  |      0     |   0    |   0    |
+  +------------------------------+
+
+=back
+
 =item
 
 The frequent necessity of introduction of temporary directory and / or temporary file usually leads to the usage of
@@ -426,14 +488,14 @@ B<my subtest with [> (its number is B<2>), this can easily be done with the foll
 
 =back
 
-B<Test::Expander> combines all advanced possibilities provided by L<Test2::V0|https://metacpan.org/pod/Test2::V0>
+B<Test::Expander> combines all advanced possibilities provided by L<Test2::V1|https://metacpan.org/pod/Test2::V1>
 with some specific functions only available in the older module L<Test::More|https://metacpan.org/pod/Test::More>
 (which allows a smooth migration from L<Test::More|https://metacpan.org/pod/Test::More>-based tests to
-L<Test2::V0|https://metacpan.org/pod/Test2::V0>-based ones) and handy functions from some other modules
+L<Test2::V1|https://metacpan.org/pod/Test2::V1>-based ones) and handy functions from some other modules
 often used in test suites.
 
 Furthermore, this module allows to automatically recognize the class / module to be tested
-(see variable B<$CLASS> below) so that in contrast to L<Test2::V0|https://metacpan.org/pod/Test2::V0>
+(see variable B<$CLASS> below) so that in contrast to L<Test2::V1|https://metacpan.org/pod/Test2::V1>
 you do not need to specify this explicitly if the path to the test file is in accordance with the name
 of class / module to be tested i.e. file B<t/Foo/Bar/baz.t> corresponds to class / module B<Foo::Bar>.
 
@@ -519,9 +581,9 @@ If this value is B<undef>, these variables are not imported.
 
 =item
 
-B<-target> - identical to the same-named option of L<Test2::V0|https://metacpan.org/pod/Test2::V0> and, if contains
+B<-target> - identical to the same-named option of L<Test2::V1|https://metacpan.org/pod/Test2::V1> and, if contains
 a defined value, has the same purpose namely the explicit definition of the class / module to be tested as the value.
-However, if its value is B<undef>, this is not passed through to L<Test2::V0|https://metacpan.org/pod/Test2::V0> so that
+However, if its value is B<undef>, this is not passed through to L<Test2::V1|https://metacpan.org/pod/Test2::V1> so that
 no class / module will be loaded and the variable B<$CLASS> will not be imported at all.
 
 =item
@@ -543,7 +605,7 @@ required, simply pass the empty hash reference as the option value.
 =item
 
 All other valid options (i.e. arguments starting with the dash sign B<->) are forwarded to
-L<Test2::V0|https://metacpan.org/pod/Test2::V0> along with their values.
+L<Test2::V1|https://metacpan.org/pod/Test2::V1> along with their values.
 
 Options without values are not supported; in case of their passing an exception is raised.
 
@@ -729,7 +791,7 @@ The following functions provided by this module are exported by default:
 
 =item
 
-all functions exported by default from L<Test2::V0|https://metacpan.org/pod/Test2::V0>,
+all functions exported by default from L<Test2::V1|https://metacpan.org/pod/Test2::V1>,
 
 =item
 
@@ -738,7 +800,7 @@ all functions exported by default from L<Test2::Tools::Explain|https://metacpan.
 =item
 
 some functions exported by default from L<Test::More|https://metacpan.org/pod/Test::More>
-and often used in older tests but not supported by L<Test2::V0|https://metacpan.org/pod/Test2::V0>:
+and often used in older tests but not supported by L<Test2::V1|https://metacpan.org/pod/Test2::V1>:
 
 =over 2
 
@@ -767,7 +829,7 @@ use_ok.
 =item
 
 some functions exported by default from L<Test::Exception|https://metacpan.org/pod/Test::Exception>
-and often used in older tests but not supported by L<Test2::V0|https://metacpan.org/pod/Test2::V0>:
+and often used in older tests but not supported by L<Test2::V1|https://metacpan.org/pod/Test2::V1>:
 
 =over 2
 

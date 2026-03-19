@@ -2,6 +2,8 @@ TYPEMAP
 int64_t	T_IV
 EV::Etcd	T_PTROBJ
 EV::Etcd::Watch	T_PTROBJ
+EV::Etcd::Keepalive	T_PTROBJ
+EV::Etcd::Observe	T_PTROBJ
 
 INPUT
 T_PTROBJ

@@ -1,0 +1,5 @@
+# typemap file
+TYPEMAP
+int16_t    T_IV
+int32_t    T_IV
+int64_t    T_IV

@@ -85,7 +85,7 @@ else {
 
             1;
         },
-        "Perl < 5.16, lvalue => 1"
+        'Perl < 5.16, lvalue => 1'
     ) or note $@;
 
     like(
@@ -97,7 +97,7 @@ else {
             1;
         },
         qr/lvalue accessors require Perl 5.16 or later.*lvalue.t/,
-        "Perl < 5.16, lvalue => -1"
+        'Perl < 5.16, lvalue => -1'
     );
 
 }

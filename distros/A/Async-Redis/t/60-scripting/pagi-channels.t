@@ -3,12 +3,10 @@
 use strict;
 use warnings;
 use Test::Lib;
-use Test::Async::Redis qw(init_loop skip_without_redis run cleanup_keys);
+use Test::Async::Redis qw(skip_without_redis run cleanup_keys);
 use Test2::V0;
 use Async::Redis;
 use JSON::PP qw(encode_json decode_json);
-
-my $loop = init_loop();
 
 SKIP: {
     my $redis = skip_without_redis();

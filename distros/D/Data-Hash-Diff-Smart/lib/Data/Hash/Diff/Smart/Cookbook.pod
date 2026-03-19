@@ -1,0 +1,98 @@
+=pod
+
+=head1 NAME
+
+Data::Hash::Diff::Smart::Cookbook - Practical examples for Data::Hash::Diff::Smart
+
+=head1 SYNOPSIS
+
+    perldoc Data::Hash::Diff::Smart::Cookbook
+
+=head1 BASIC DIFFING
+
+    use Data::Hash::Diff::Smart qw(diff_text);
+
+    my $old = { name => 'Nigel', age => 40 };
+    my $new = { name => 'N. Horne', age => 40 };
+
+    print diff_text($old, $new);
+
+=head1 IGNORING PATHS
+
+Ignore specific fields:
+
+    diff($old, $new, ignore => ['/timestamp']);
+
+Ignore all debug fields:
+
+    diff($old, $new, ignore => [ qr{^/debug} ]);
+
+Wildcard ignore:
+
+    diff($old, $new, ignore => ['/users/*/password']);
+
+=head1 CUSTOM COMPARATORS
+
+Numeric tolerance:
+
+    diff($old, $new,
+        compare => {
+            '/price' => sub { abs($_[0] - $_[1]) < 0.01 },
+        }
+    );
+
+Case-insensitive string comparison:
+
+    compare => {
+        '/name' => sub { lc($_[0]) eq lc($_[1]) },
+    }
+
+=head1 ARRAY MODES
+
+=head2 Index mode (default)
+
+    diff($old, $new, array_mode => 'index');
+
+=head2 LCS mode (minimal diffs)
+
+    diff($old, $new, array_mode => 'lcs');
+
+=head2 Unordered mode (treat arrays as sets)
+
+    diff($old, $new, array_mode => 'unordered');
+
+=head1 RENDERING OUTPUT
+
+=head2 Text
+
+    print diff_text($old, $new);
+
+=head2 JSON
+
+    my $json = diff_json($old, $new);
+
+=head2 YAML
+
+    my $yaml = diff_yaml($old, $new);
+
+=head2 Test2 diagnostics
+
+    diag diff_test2($old, $new);
+
+=head1 ADVANCED: CYCLE DETECTION
+
+Self-referential structures are handled safely:
+
+    my $a = {};
+    $a->{self} = $a;
+
+    my $b = {};
+    $b->{self} = $b;
+
+    diff($a, $b);   # no infinite recursion
+
+=head1 AUTHOR
+
+Nigel Horne
+
+=cut

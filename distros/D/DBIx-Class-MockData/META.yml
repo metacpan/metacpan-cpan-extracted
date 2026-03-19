@@ -27,7 +27,7 @@ no_index:
 provides:
   DBIx::Class::MockData:
     file: lib/DBIx/Class/MockData.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Carp: '0'
   DBIx::Class: '0.082841'
@@ -37,5 +37,5 @@ requires:
 resources:
   bugtracker: https://github.com/manwar/DBIx-Class-MockData/issues
   repository: https://github.com/manwar/DBIx-Class-MockData.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -18,7 +18,7 @@ sub End {
 sub Char {
     my $expat = shift;
     my $text  = shift;
-    $text =~ s/([\x80-\xff])/sprintf "#x%X;", ord $1/eg;
+    $text =~ s/([^\x00-\x7f])/sprintf "#x%X;", ord $1/eg;
     $text =~ s/([\t\n])/sprintf "#%d;", ord $1/eg;
     print STDERR "@{$expat->{Context}} || $text\n";
 }

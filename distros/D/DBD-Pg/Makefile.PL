@@ -1,11 +1,11 @@
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 7.64;
 use Config;
 use strict;
 use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.18.0';
+my $VERSION = '3.19.0';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -221,7 +221,7 @@ my %opts =
      AUTHOR         => 'Greg Sabino Mullane',
      ABSTRACT       => 'PostgreSQL database driver for the DBI module',
      PREREQ_PM      => {
-                        'ExtUtils::MakeMaker' => '6.58',
+                        'ExtUtils::MakeMaker' => '7.64',
                         'DBI'                 => '1.614',
                         'File::Temp'          => '0',
                         'Test::More'          => '0.88',

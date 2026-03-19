@@ -1,4 +1,4 @@
-package EAI::Wrap 1.920;
+package EAI::Wrap 1.921;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract (); use Carp qw(confess longmess);
@@ -17,7 +17,7 @@ use EAI::Common; use EAI::DateUtil; use EAI::DB; use EAI::File; use EAI::FTP;
 
 # first structures and functions from this module, then from DateUtil, DB, File, FTP, Common; last useful external functions
 our @EXPORT = qw(%common %config %execute @loads @optload %opt removeFilesinFolderOlderX openDBConn openFTPConn redoFiles getLocalFiles getFilesFromFTP getFiles checkFiles extractArchives getAdditionalDBData readFileData dumpDataIntoDB markProcessed writeFileFromDB writeFileFromMemory putFileInLocalDir markUploadForHistoryDelete uploadFileToFTP uploadFileCMD uploadFile processingEnd processingPause processingContinues standardLoop moveFilesToHistory deleteFiles
-monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern
+monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addMonths subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern skipOnDate
 newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn
 readText readExcel readXML writeText writeExcel
 removeFilesOlderX fetchFiles putFile moveTempFile archiveFiles removeFiles login getHandle setHandle
@@ -220,8 +220,8 @@ sub redoFiles ($) {
 			}
 			# check against barename with additional timestamp pattern (e.g. numbers and _) and \.$ext only if defined
 			# anything after barename (and before ".$ext" if extension defined) is regarded as a timestamp
-			my $regexCheck = ($ext ? qr/$barename($redoTimestampPatternPart|$redoDir)*\.$ext/ : qr/$barename($redoTimestampPatternPart|$redoDir)*.*/);
-			$logger->debug("checking candidate against regex ".$regexCheck);
+			my $regexCheck = ($ext ? qr/${barename}.*\.$ext/ : qr/${barename}.*/);
+			$logger->debug("checking candidate against regex $regexCheck");
 			if ($redofile =~ $regexCheck) {
 				$logger->info("file $redofile available for redo, matched regex $barename.*");
 				# only rename if not prohibited and not a glob, else just push into retrievedFiles
@@ -308,7 +308,6 @@ sub getFilesFromFTP ($;$$) {
 					my $timer = 0;
 					$waitTime = 10 if !$waitTime; # wait for 10 sec if not given or 0
 					do {
-						print "trying to fetch files, maxTimeout:$maxTimeout, waitTime: $waitTime\n";
 						unless (EAI::FTP::fetchFiles($FTP,{firstRunSuccess=>$execute{firstRunSuccess},homedir=>$execute{homedir},fileToRetrieve=>$File->{filename},fileToRetrieveOptional=>1,retrievedFiles=>$process->{retrievedFiles}})) {
 							processingPause($waitTime);
 							$timer += $waitTime;
@@ -1984,6 +1983,10 @@ additional parameters for Net::SFTP::Foreign put.
 
 folder for archived files on the FTP server
 
+=item dateOfFetchedFile
+
+returned date (taken from mtime/mdtm) of file fetched with fetchFiles in format YYYYMMDD, only works for single file
+
 =item dontMoveTempImmediately
 
 if 0 oder missing: rename/move files immediately after writing to FTP to the final name, otherwise/1: a call to EAI::FTP::moveTempFiles is required for that
@@ -2238,7 +2241,7 @@ used for "wait with execution for first business date", either this is a calenda
 
 =head1 COPYRIGHT
 
-Copyright (c) 2025 Roland Kapl
+Copyright (c) 2026 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

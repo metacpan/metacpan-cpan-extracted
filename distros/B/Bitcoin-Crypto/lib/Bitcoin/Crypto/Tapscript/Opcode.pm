@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Tapscript::Opcode;
-$Bitcoin::Crypto::Tapscript::Opcode::VERSION = '4.003';
+$Bitcoin::Crypto::Tapscript::Opcode::VERSION = '4.004';
 use v5.14;
 use warnings;
 

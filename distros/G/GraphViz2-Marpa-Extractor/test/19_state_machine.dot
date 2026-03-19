@@ -1,0 +1,20 @@
+digraph StateMachine {
+    rankdir=LR;
+    node [shape=ellipse];
+
+    start [shape=point, width=0.2];
+    idle [label="Idle"];
+    running [label="Running"];
+    paused [label="Paused"];
+    stopped [label="Stopped"];
+    error [label="Error", shape=doublecircle];
+
+    start -> idle;
+    idle -> running [label="start"];
+    running -> paused [label="pause"];
+    paused -> running [label="resume"];
+    running -> stopped [label="stop"];
+    paused -> stopped [label="stop"];
+    running -> error [label="exception", color=red];
+    error -> idle [label="reset", style=dashed];
+}

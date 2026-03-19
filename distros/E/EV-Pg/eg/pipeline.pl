@@ -28,7 +28,6 @@ my $pg; $pg = EV::Pg->new(
             print "1^2=", $results[0], " 100^2=", $results[-1], "\n";
             EV::break;
         });
-        $pg->send_flush_request;
     },
 );
 

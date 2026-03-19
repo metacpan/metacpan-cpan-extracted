@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::Base;
-$Bitcoin::Crypto::Key::Base::VERSION = '4.003';
+$Bitcoin::Crypto::Key::Base::VERSION = '4.004';
 use v5.14;
 use warnings;
 

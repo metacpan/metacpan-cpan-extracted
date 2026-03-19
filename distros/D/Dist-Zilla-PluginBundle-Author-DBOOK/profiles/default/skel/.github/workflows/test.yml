@@ -33,22 +33,22 @@ jobs:
           sudo: false
           args: --sudo --installdeps --with-develop --with-recommends .
       - name: configure with Build.PL
-        if: ${{ hashFiles('/Build.PL') != '' }}
+        if: ${{ hashFiles('Build.PL') != '' }}
         run: perl Build.PL
       - name: build with Build.PL
-        if: ${{ hashFiles('/Build.PL') != '' }}
+        if: ${{ hashFiles('Build.PL') != '' }}
         run: ./Build
       - name: test with Build.PL
-        if: ${{ hashFiles('/Build.PL') != '' }}
+        if: ${{ hashFiles('Build.PL') != '' }}
         run: ./Build test
       - name: configure with Makefile.PL
-        if: ${{ hashFiles('/Build.PL') == '' }}
+        if: ${{ hashFiles('Build.PL') == '' }}
         run: perl Makefile.PL
       - name: build with Makefile.PL
-        if: ${{ hashFiles('/Build.PL') == '' }}
+        if: ${{ hashFiles('Build.PL') == '' }}
         run: make
       - name: test with Makefile.PL
-        if: ${{ hashFiles('/Build.PL') == '' }}
+        if: ${{ hashFiles('Build.PL') == '' }}
         run: make test
 
 ###
@@ -92,26 +92,26 @@ jobs:
           sudo: false
           args: -v --installdeps --with-develop --with-recommends .
       - name: configure with Build.PL
-        if: ${{ hashFiles('/Build.PL') != '' }}
+        if: ${{ hashFiles('Build.PL') != '' }}
         run: perl Build.PL
       - name: build with Build.PL
-        if: ${{ hashFiles('/Build.PL') != '' }}
+        if: ${{ hashFiles('Build.PL') != '' }}
         run: ./Build
       - name: test with Build.PL
-        if: ${{ hashFiles('/Build.PL') != '' }}
+        if: ${{ hashFiles('Build.PL') != '' }}
         run: ./Build test
         env:
           AUTHOR_TESTING: 1
           AUTOMATED_TESTING: 1
           RELEASE_TESTING: 1
       - name: configure with Makefile.PL
-        if: ${{ hashFiles('/Build.PL') == '' }}
+        if: ${{ hashFiles('Build.PL') == '' }}
         run: perl Makefile.PL
       - name: build with Makefile.PL
-        if: ${{ hashFiles('/Build.PL') == '' }}
+        if: ${{ hashFiles('Build.PL') == '' }}
         run: make
       - name: test with Makefile.PL
-        if: ${{ hashFiles('/Build.PL') == '' }}
+        if: ${{ hashFiles('Build.PL') == '' }}
         run: make test
         env:
           AUTHOR_TESTING: 1

@@ -44,7 +44,6 @@ with_pg(cb => sub {
         EV::break;
     });
 
-    $pg->send_flush_request if $pg->can('send_flush_request');
 });
 
 # Pipeline with error
@@ -83,7 +82,6 @@ with_pg(cb => sub {
         EV::break;
     });
 
-    $pg->send_flush_request if $pg->can('send_flush_request');
 });
 
 # query() croaks in pipeline mode
@@ -134,5 +132,4 @@ with_pg(cb => sub {
         });
     });
 
-    $pg->send_flush_request if $pg->can('send_flush_request');
 });

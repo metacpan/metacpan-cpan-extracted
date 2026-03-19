@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 	fix_workflow
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -34,12 +34,12 @@ Check if an issue can be automatically fixed.
 =cut
 
 sub can_auto_fix($issue) {
-    my %fixable = (
-        'performance' => 1,  # Can add caching
-        'security'    => 1,  # Can update action versions and add permissions
-        'cost'        => 1,  # Can add concurrency, filters
-        'maintenance' => 1,  # Can update runners
-    );
+	my %fixable = (
+		'performance' => 1,  # Can add caching
+		'security'    => 1,  # Can update action versions and add permissions
+		'cost'        => 1,  # Can add concurrency, filters
+		'maintenance' => 1,  # Can update runners
+	);
 
 	return $fixable{$issue->{type}} // 0;
 }
@@ -76,10 +76,12 @@ sub apply_fixes($workflow, $issues) {
         }
         elsif ($issue->{type} eq 'maintenance' && $issue->{message} =~ /runner/) {
             $modified += update_runners($workflow);
-        }
+        } elsif ($issue->{type} eq 'performance' && $issue->{message} =~ /missing timeout-minutes/) {
+		$modified += add_missing_timeout($workflow);
+	}
     }
 
-    return $modified;
+	return $modified;
 }
 
 =head2 fix_workflow($file, $issues)
@@ -290,6 +292,24 @@ sub add_trigger_filters($workflow) {
     return $modified;
 }
 
+sub add_missing_timeout($workflow) {
+    my $jobs = $workflow->{jobs} or return 0;
+    my $modified = 0;
+
+    for my $job_name (keys %$jobs) {
+        my $job = $jobs->{$job_name};
+
+        # Skip if timeout already exists
+        next if exists $job->{'timeout-minutes'};
+
+        # Insert default timeout
+        $job->{'timeout-minutes'} = 30;
+        $modified++;
+    }
+
+	return $modified;
+}
+
 sub update_runners($workflow) {
 	my $jobs = $workflow->{jobs} or return 0;
 	my $modified = 0;
@@ -333,10 +353,13 @@ Nigel Horne E<lt>njh@nigelhorne.comE<gt>
 
 L<https://github.com/nigelhorne>
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to license terms.
+
+The license terms of this software are as follows:
 
 =cut
 

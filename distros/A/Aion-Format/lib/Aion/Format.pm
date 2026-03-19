@@ -3,10 +3,11 @@ package Aion::Format;
 
 use common::sense;
 
-our $VERSION = "0.1.1";
+our $VERSION = "0.1.2";
 
 require POSIX;
 require Term::ANSIColor;
+use Guard qw//;
 
 use Exporter qw/import/;
 our @EXPORT = our @EXPORT_OK = grep {
@@ -61,9 +62,9 @@ sub np($;%) {
 sub trapperr(&) {
 	my $sub = shift;
 	local *STDERR;
-	open STDERR, '>:utf8', \my $f;
+	open STDERR, '>:utf8', \my $f; my $guard = Guard::guard { close STDERR };
 	$sub->();
-	close STDERR;
+	undef $guard;
 	utf8::decode($f) unless utf8::is_utf8($f);
 	$f
 }
@@ -72,9 +73,9 @@ sub trapperr(&) {
 sub trappout(&) {
 	my $sub = shift;
 	local *STDOUT;
-	open STDOUT, '>:utf8', \my $f;
+	open STDOUT, '>:utf8', \my $f; my $guard = Guard::guard { close STDOUT };
 	$sub->();
-	close STDOUT;
+	undef $guard;
 	utf8::decode($f) unless utf8::is_utf8($f);
 	$f
 }
@@ -418,7 +419,7 @@ Aion::Format - a Perl extension for formatting numbers, coloring output, etc.
 
 =head1 VERSION
 
-0.1.1
+0.1.2
 
 =head1 SYNOPSIS
 
@@ -723,6 +724,8 @@ Transliterates Russian text.
 
 Trap for B<STDERR>.
 
+If there is an error in the block, C<STDOUT> is restored, but the output in the block is lost.
+
 	trapperr { print STDERR "Stars: ✨" }  # => Stars: ✨
 
 See also C<IO::Capture::Stderr>.
@@ -731,7 +734,10 @@ See also C<IO::Capture::Stderr>.
 
 Trap for B<STDOUT>.
 
+If there is an error in the block, C<STDOUT> is restored, but the output in the block is lost.
+
 	trappout { print "Stars: ✨" }  # => Stars: ✨
+	trappout { print "Stars: ✨"; die "error" }  # @=> error
 
 See also C<IO::Capture::Stdout>.
 

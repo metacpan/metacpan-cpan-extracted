@@ -6,6 +6,7 @@ use Test::Async::Redis ':redis';
 use Test2::V0;
 use Async::Redis;
 use Time::HiRes qw(time);
+use Future;
 
 SKIP: {
     my $redis = eval {
@@ -53,24 +54,14 @@ SKIP: {
     };
 
     subtest 'non-blocking during large pipeline' => sub {
-        my @ticks;
-        my $timer = IO::Async::Timer::Periodic->new(
-            interval => 0.01,
-            on_tick => sub { push @ticks, 1 },
-        );
-        get_loop()->add($timer);
-        $timer->start;
+        my @futures = map { $redis->set("nb:largepipe:$_", $_) } (1..50);
+        my $start = Time::HiRes::time();
+        run { Future->needs_all(@futures) };
+        my $elapsed = Time::HiRes::time() - $start;
 
-        my $pipe = $redis->pipeline;
-        for my $i (1..$count) {
-            $pipe->incr("large:$i");
-        }
-        run { $pipe->execute };
+        ok($elapsed < 5, "50 concurrent ops completed in ${elapsed}s");
 
-        $timer->stop;
-        get_loop()->remove($timer);
-
-        pass("Event loop remained responsive during large pipeline");
+        run { $redis->del(map { "nb:largepipe:$_" } 1..50) };
     };
 
     # Cleanup

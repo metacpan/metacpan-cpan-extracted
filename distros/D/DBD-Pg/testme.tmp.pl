@@ -2,6 +2,9 @@
 
 ## This is a test file, used by the DBD::Pg developers to duplicate and debug issues
 
+## Helpful install tip: yum install libyaml-perl libdata-peek-perl libdevel-leak-perl
+
+
 BEGIN {
     use lib '.', 'blib/lib', 'blib/arch';
     system 'make';
@@ -12,7 +15,7 @@ use strict;
 use warnings;
 use DBI ':sql_types';
 use utf8;
-use Data::Dumper;
+use Data::Dumper; $Data::Dumper::Sortkeys = 1;
 use YAML;
 use DBD::Pg qw/:pg_types/;
 use Data::Peek;
@@ -27,8 +30,20 @@ my $tracelevel = shift || 0;
 $ENV{DBI_TRACE} = $tracelevel;
 
 my $DSN = "DBI:Pg:dbname=postgres;port=$DBPORT";
-my $dbh = DBI->connect($DSN, '', '', {AutoCommit=>0,RaiseError=>1,PrintError=>0})
-  or die "Connection failed!\n";
+my $dbh;
+eval {
+    $dbh = DBI->connect($DSN, '', '', {AutoCommit=>0,RaiseError=>1,PrintError=>0});
+};
+
+if ($@) {
+    print "Connection failed!\n\n$@\n";
+
+    if ($@ =~ /socket/) {
+        print "HINT: Port number can be sent as first argument to this script\n";
+    }
+
+    exit 0;
+}
 
 my $me = $dbh->{Driver}{Name};
 my $sversion = $dbh->{pg_server_version};
@@ -42,9 +57,10 @@ $dbh->{RaiseError} = 0;
 $dbh->{PrintError} = 1;
 $dbh->{AutoCommit} = 1;
 
-update_rule_return();
 
 exit;
+
+#update_rule_return();
 
 #column_types_github_issue_24();
 
@@ -161,7 +177,7 @@ $sth_u->finish();
 # psql> (1 row)
 # psql>
 # psql> UPDATE 1
-my ($rv2) = $sth_u->execute('bear','roar',1);
+$rv2 = $sth_u->execute('bear','roar',1);
 $sth_s->execute(1);
 ($animal,$sound) = $sth_s->fetchrow_array();
 $sth_s->finish;

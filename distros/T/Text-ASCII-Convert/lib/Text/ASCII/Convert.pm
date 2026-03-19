@@ -5,7 +5,7 @@ use Encode qw(decode);
 use base 'Exporter';
 our @EXPORT = qw(convert_to_ascii);
 our @EXPORT_OK = qw(convert_to_ascii);
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 my %char_map;
 
 =encoding utf8
@@ -739,7 +739,7 @@ __DATA__
 03EE 74
 03EF 74
 03F0 6B
-03F1 70
+03F1 65
 03F2 63
 03F3 6A
 03F4 4F

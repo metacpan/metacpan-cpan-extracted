@@ -59,7 +59,7 @@ static enum scalar_style yaml_quote_style = scalar_none;
 #else
 #  define IS_UTF8(x)    (FALSE)
 #endif
-#  define TYPE_IS_NULL(x) (x == NULL)
+#  define TYPE_IS_NULL(x) ((x == NULL) || strEQ( x, "str" ))
 #  define OBJOF(a)        (*tag ? tag : a)
 #  define PERL_SYCK_PARSER_HANDLER yaml_syck_parser_handler
 #  define PERL_SYCK_EMITTER_HANDLER yaml_syck_emitter_handler
@@ -332,7 +332,8 @@ yaml_syck_parser_handler
 
             } else if (strnEQ( n->data.str->ptr, REF_LITERAL, 1+REF_LITERAL_LENGTH)) {
                 /* type tag in a scalar ref */
-                char *lang = strtok(id, "/:");
+                char *id_copy = savepv(id);
+                char *lang = strtok(id_copy, "/:");
                 char *type = strtok(NULL, "");
 
                 if (lang == NULL || (strEQ(lang, "perl"))) {
@@ -341,6 +342,7 @@ yaml_syck_parser_handler
                 else {
                     sv = newSVpv(form((type == NULL) ? "%s" : "%s::%s", lang, type), 0);
                 }
+                Safefree(id_copy);
             } else if ( strEQ( id, "perl/scalar" ) || strnEQ( id, "perl/scalar:", 12 ) ) {
                 char *pkg = id + 12;
 
@@ -362,7 +364,8 @@ yaml_syck_parser_handler
             } else if ( (strEQ(id, "perl/regexp") || strnEQ( id, "perl/regexp:", 12 ) ) ) {
                 dSP;
                 SV *val = newSVpvn(n->data.str->ptr, n->data.str->len);
-                char *lang = strtok(id, "/:");
+                char *id_copy = savepv(id);
+                char *lang = strtok(id_copy, "/:");
                 char *type = strtok(NULL, "");
 
                 ENTER;
@@ -396,6 +399,7 @@ yaml_syck_parser_handler
 						sv_bless(sv, gv_stashpv(form((type == NULL) ? "%s" : "%s::%s", lang, type), TRUE));
 					}
                 }
+                Safefree(id_copy);
 #endif /* PERL_LOADMOD_NOIMPORT */
 #endif /* !YAML_IS_JSON */
             } else {
@@ -427,7 +431,8 @@ yaml_syck_parser_handler
 
             if (id) {
                 /* bless it if necessary */
-                char *lang = strtok(id, "/:");
+                char *id_copy = savepv(id);
+                char *lang = strtok(id_copy, "/:");
                 char *type = strtok(NULL, "");
 
                 if ( type != NULL ) {
@@ -435,7 +440,7 @@ yaml_syck_parser_handler
                         /* !perl/array:Foo::Bar blesses into Foo::Bar */
                         type += 6;
                     }
-                    
+
                     /* FIXME deprecated - here compatibility with @Foo::Bar style blessing */
                     while ( *type == '@' ) { type++; }
                 }
@@ -451,6 +456,7 @@ yaml_syck_parser_handler
                 		sv_bless(sv, gv_stashpv(form((type == NULL) ? "%s" : "%s::%s", lang, type), TRUE));
                 	}
                 }
+                Safefree(id_copy);
             }
 #endif
         break;
@@ -480,7 +486,8 @@ yaml_syck_parser_handler
 					}
 					else {
 						/* bless it if necessary */
-						char *lang = strtok(id, "/:");
+						char *id_copy = savepv(id);
+						char *lang = strtok(id_copy, "/:");
 						char *type = strtok(NULL, "");
 
 						if ( type != NULL && strnEQ(type, "ref:", 4)) {
@@ -496,6 +503,7 @@ yaml_syck_parser_handler
 							else {
 								sv_bless(sv, gv_stashpv(form((type == NULL) ? "%s" : "%s::%s", lang, type), TRUE));
 							}
+						Safefree(id_copy);
 					}
                 }
             }
@@ -527,7 +535,8 @@ yaml_syck_parser_handler
 					}
 					else {
 						/* bless it if necessary */
-						char *lang = strtok(id, "/:");
+						char *id_copy = savepv(id);
+						char *lang = strtok(id_copy, "/:");
 						char *type = strtok(NULL, "");
 
 						if ( type != NULL && strnEQ(type, "regexp:", 7)) {
@@ -544,6 +553,7 @@ yaml_syck_parser_handler
 						else {
 							sv_bless(sv, gv_stashpv(form((type == NULL) ? "%s" : "%s::%s", lang, type), TRUE));
 						}
+						Safefree(id_copy);
 					}
                 }
             }
@@ -579,7 +589,8 @@ yaml_syck_parser_handler
 #ifndef YAML_IS_JSON
                 if (id)  {
                     /* bless it if necessary */
-                    char *lang = strtok(id, "/:");
+                    char *id_copy = savepv(id);
+                    char *lang = strtok(id_copy, "/:");
                     char *type = strtok(NULL, "");
 
                     if ( type != NULL ) {
@@ -602,6 +613,7 @@ yaml_syck_parser_handler
 							sv_bless(sv, gv_stashpv(form((type == NULL) ? "%s" : "%s::%s", lang, type), TRUE));
 						}
                     }
+                    Safefree(id_copy);
                 }
 #endif
             }
@@ -641,7 +653,14 @@ static char* perl_json_preprocess(char *s) {
         *pos++ = ch;
         if (in_quote) {
             in_quote = !in_quote;
-            if (ch == '\'') {
+            if (ch == '\'' && json_quote_char == '\'') {
+                /* JSON single-quote mode: \' is an escaped quote.
+                 * Since we convert delimiters to " for YAML double-quote
+                 * parsing, a literal ' needs no backslash inside "..." */
+                pos -= 2;
+                *pos++ = '\'';
+            }
+            else if (ch == '\'') {
                 *(pos - 2) = '\'';
             }
         }
@@ -653,11 +672,28 @@ static char* perl_json_preprocess(char *s) {
                 case ':':  { *pos++ = ' '; break; }
                 case ',':  { *pos++ = ' '; break; }
                 case '"':  { in_string = '"'; break; }
-                case '\'': { in_string = '\''; break; }
+                case '\'': {
+                    in_string = '\'';
+                    if (json_quote_char == '\'') {
+                        /* Convert ' delimiter to " so YAML double-quote
+                         * parser handles escape sequences (\b, \n, etc.) */
+                        *(pos - 1) = '"';
+                    }
+                    break;
+                }
             }
         }
         else if (ch == in_string) {
             in_string = '\0';
+            if (ch == '\'' && json_quote_char == '\'') {
+                *(pos - 1) = '"';
+            }
+        }
+        else if (ch == '"' && json_quote_char == '\'' && in_string == '\'') {
+            /* Unescaped " inside a single-quoted JSON string needs escaping
+             * because we converted the delimiters to " for YAML parsing */
+            *(pos - 1) = '\\';
+            *pos++ = '"';
         }
     }
 
@@ -847,24 +883,20 @@ yaml_syck_mark_emitter
             break;
         }
         case SVt_PVHV: {
-            I32 len, i;
-#ifdef HAS_RESTRICTED_HASHES
-            len = HvTOTALKEYS((HV*)sv);
-#else
-            len = HvKEYS((HV*)sv);
-#endif
+            HE *he;
             hv_iterinit((HV*)sv);
-            for (i = 0; i < len; i++) {
 #ifdef HV_ITERNEXT_WANTPLACEHOLDERS
-                HE *he = hv_iternext_flags((HV*)sv, HV_ITERNEXT_WANTPLACEHOLDERS);
+            while ((he = hv_iternext_flags((HV*)sv, HV_ITERNEXT_WANTPLACEHOLDERS)) != NULL) {
 #else
-                HE *he = hv_iternext((HV*)sv);
+            while ((he = hv_iternext((HV*)sv)) != NULL) {
 #endif
                 SV *val = hv_iterval((HV*)sv, he);
                 PERL_SYCK_MARK_EMITTER( e, val );
             }
             break;
         }
+        default:
+            break;
     }
 
 #ifdef YAML_IS_JSON
@@ -890,6 +922,7 @@ yaml_syck_emitter_handler
     char dump_code             = bonus->dump_code;
     char implicit_binary       = bonus->implicit_binary;
     char* ref                  = NULL;
+    char* ref_orig             = NULL;
 #endif
 
 #define OBJECT_TAG     "tag:!perl:"
@@ -903,6 +936,7 @@ yaml_syck_emitter_handler
     /* Handle blessing into the right class */
     if (sv_isobject(sv)) {
         ref = savepv(sv_reftype(SvRV(sv), TRUE));
+        ref_orig = ref;
         *tag = '\0';
         strcat(tag, OBJECT_TAG);
 
@@ -959,6 +993,17 @@ yaml_syck_emitter_handler
                 }
 #endif
             }
+            default:
+                break;
+        }
+        {
+            /* Grow tag buffer if ref won't fit (prevents heap overflow) */
+            STRLEN need = strlen(tag) + strlen(ref) + 1;
+            if (need > bonus->tag_len) {
+                Renew(bonus->tag, need, char);
+                bonus->tag_len = need;
+                tag = bonus->tag;
+            }
         }
         strcat(tag, ref);
     }
@@ -988,9 +1033,12 @@ yaml_syck_emitter_handler
             }
 #endif
             default: {
+                SV *ref_sv;
                 syck_emit_map(e, OBJOF("tag:!perl:ref"), MAP_NONE);
                 *tag = '\0';
-                syck_emit_item( e, (st_data_t)newSVpvn_share(REF_LITERAL, REF_LITERAL_LENGTH, 0) );
+                ref_sv = newSVpvn_share(REF_LITERAL, REF_LITERAL_LENGTH, 0);
+                syck_emit_item( e, (st_data_t)ref_sv );
+                SvREFCNT_dec(ref_sv);
                 syck_emit_item( e, (st_data_t)SvRV(sv) );
                 syck_emit_end(e);
             }
@@ -1096,47 +1144,39 @@ yaml_syck_emitter_handler
             }
             case SVt_PVHV: { /* hash */
                 HV *hv = (HV*)sv;
+                HE *he;
                 syck_emit_map(e, OBJOF("hash"), MAP_NONE);
                 e->indent = PERL_SYCK_INDENT_LEVEL;
 
                 *tag = '\0';
-#ifdef HAS_RESTRICTED_HASHES
-                len = HvTOTALKEYS((HV*)sv);
-#else
-                len = HvKEYS((HV*)sv);
-#endif
                 hv_iterinit((HV*)sv);
 
                 if (e->sort_keys) {
                     AV *av = (AV*)sv_2mortal((SV*)newAV());
-                    for (i = 0; i < len; i++) {
-#ifdef HAS_RESTRICTED_HASHES
-                        HE *he = hv_iternext_flags(hv, HV_ITERNEXT_WANTPLACEHOLDERS);
+#ifdef HV_ITERNEXT_WANTPLACEHOLDERS
+                    while ((he = hv_iternext_flags(hv, HV_ITERNEXT_WANTPLACEHOLDERS)) != NULL) {
 #else
-                        HE *he = hv_iternext(hv);
+                    while ((he = hv_iternext(hv)) != NULL) {
 #endif
                         SV *key = hv_iterkeysv(he);
                         av_store(av, AvFILLp(av)+1, key); /* av_push(), really */
                     }
+                    len = av_len(av) + 1;
                     STORE_HASH_SORT;
                     for (i = 0; i < len; i++) {
-#ifdef HAS_RESTRICTED_HASHES
-                        int placeholders = (int)HvPLACEHOLDERS_get(hv);
-#endif
                         SV *key = av_shift(av);
                         HE *he  = hv_fetch_ent(hv, key, 0, 0);
-                        SV *val = HeVAL(he);
+                        SV *val = he ? HeVAL(he) : &PL_sv_undef;
                         if (val == NULL) { val = &PL_sv_undef; }
                         syck_emit_item( e, (st_data_t)key );
                         syck_emit_item( e, (st_data_t)val );
                     }
                 }
                 else {
-                    for (i = 0; i < len; i++) {
 #ifdef HV_ITERNEXT_WANTPLACEHOLDERS
-                        HE *he = hv_iternext_flags(hv, HV_ITERNEXT_WANTPLACEHOLDERS);
+                    while ((he = hv_iternext_flags(hv, HV_ITERNEXT_WANTPLACEHOLDERS)) != NULL) {
 #else
-                        HE *he = hv_iternext(hv);
+                    while ((he = hv_iternext(hv)) != NULL) {
 #endif
                         SV *key = hv_iterkeysv(he);
                         SV *val = hv_iterval(hv, he);
@@ -1237,6 +1277,11 @@ yaml_syck_emitter_handler
     }
 /* cleanup: */
     *tag = '\0';
+#ifndef YAML_IS_JSON
+    if (ref_orig != NULL) {
+        Safefree(ref_orig);
+    }
+#endif
 }
 
 void
@@ -1259,6 +1304,7 @@ DumpYAMLImpl
     json_quote_style     = (SvTRUE(singlequote) ? scalar_2quote_1 : scalar_2quote );
     emitter->indent      = PERL_SYCK_INDENT_LEVEL;
     emitter->max_depth   = SvIOK(max_depth) ? SvIV(max_depth) : json_max_depth;
+    emitter->json_mode   = 1;
 #else
     SV *singlequote      = GvSV(gv_fetchpv(form("%s::SingleQuote", PACKAGE_NAME), TRUE, SVt_PV));
     yaml_quote_style     = (SvTRUE(singlequote) ? scalar_1quote : scalar_none);
@@ -1284,6 +1330,7 @@ DumpYAMLImpl
     emitter->anchor_format = "%d";
 
     New(801, bonus->tag, 512, char);
+    bonus->tag_len = 512;
     *(bonus->tag) = '\0';
     bonus->dump_code = SvTRUE(use_code) || SvTRUE(dump_code);
     bonus->implicit_binary = SvTRUE(implicit_binary);
@@ -1349,8 +1396,25 @@ DumpYAMLFile
     bonus.out.outio = out;
     bonus.ioerror = 0;
 #ifdef YAML_IS_JSON
-    DumpJSONImpl(sv, &bonus, perl_syck_output_handler_io);
-    /* TODO: how do we do perl_json_postprocess? */
+    {
+        /* Buffer into an SV so we can apply perl_json_postprocess(),
+         * then write the postprocessed result to the file handle. */
+        SV *buf = newSVpvn("", 0);
+        STRLEN len;
+        char *s;
+        bonus.out.outsv = buf;
+        DumpJSONImpl(sv, &bonus, perl_syck_output_handler_pv);
+        if (SvCUR(buf) > 0) {
+            perl_json_postprocess(buf);
+        }
+        s = SvPV(buf, len);
+        if (len > 0) {
+            if (PerlIO_write(out, s, len) != (SSize_t)len) {
+                bonus.ioerror = errno;
+            }
+        }
+        SvREFCNT_dec(buf);
+    }
 #else
     DumpYAMLImpl(sv, &bonus, perl_syck_output_handler_io);
 #endif

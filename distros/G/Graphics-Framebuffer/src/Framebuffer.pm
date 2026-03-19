@@ -384,7 +384,7 @@ use Time::HiRes qw(sleep time);                                     # The time a
 use Math::Bezier;                                                   # Bezier curve calculations done here.
 use Math::Gradient qw( gradient array_gradient multi_gradient );    # Awesome gradient calculation module
 use List::Util     qw(min max);                                     # min and max are very handy!
-use File::Map ':map';                                               # Absolutely necessary to map the screen to a string.
+use File::Map qw/:map :extra/;                                               # Absolutely necessary to map the screen to a string.
 use Term::ReadKey;
 use Imager;                                                         # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
@@ -615,13 +615,13 @@ Set to 1 to disable X-Windows/Wayland check. Default is 0.
 
 * B<FONT_PATH>
 
-Overrides the default font path for TrueType/Type1 fonts
+Overrides the default font path (I</usr/share/fonts/truetype/freefont>) for TrueType/Type1 fonts.
 
 If 'ttf_print' is not displaying any text, then this may need to be overridden.
 
 * B<FONT_FACE>
 
-Overrides the default font filename for TrueType/Type 1 fonts.
+Overrides the default font filename (I<FreeSans.ttf>) for TrueType/Type 1 fonts.
 
 If 'ttf_print' is not displaying any text, then this may need to be overridden.
 
@@ -1034,6 +1034,7 @@ sub new {
     $has_X = TRUE if (defined($ENV{'DISPLAY'}) && $self->{'IGNORE_X_WINDOWS'} == FALSE);
     if ((!$has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                          # We have to be in binary mode first
+        select($self->{'FB'});
         $| = 1;
         if ($self->{'ACCELERATED'}) {                                                                                                    # Pull in the C structure for the Framebuffer
             (                                                                                                                            # These need to be accurate to give accurate output
@@ -2457,8 +2458,6 @@ Draws a line, in the global foreground color, from point x,y at an angle of 'ang
 
 =back
 
-* This is not affected by the Acceleration setting
-
 =cut
 
 sub angle_line {
@@ -2661,6 +2660,7 @@ sub _flush_screen {
     }
     select($self->{'FB'}) if (defined($self->{'FB'}));
     $| = 1;
+    sync $self->{'SCREEN'}, TRUE;
 } ## end sub _flush_screen
 
 sub _adj_plot {
@@ -2734,7 +2734,7 @@ Draws a Bezier curve, based on a list of control points.
          'coordinates' => [
              x0,y0,
              x1,y1,
-             ...              # As many as needed
+             ...              # As many as needed, there MUST be an even number of elements
          ],
          'points'     => 100, # Number of total points plotted for curve
                               # The higher the number, the smoother the curve.

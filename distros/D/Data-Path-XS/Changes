@@ -1,5 +1,10 @@
 Revision history for Data-Path-XS
 
+0.02  2026-03-16
+    - Fix keyword pathset void context overhead
+    - Validate XS::Parse::Keyword::Builder in Makefile.PL
+    - Documentation and test coverage improvements
+
 0.01  2026-03-03
     - Initial release
     - String path API: path_get, path_set, path_delete, path_exists

@@ -1,0 +1,94 @@
+{
+   "abstract" : "Find or build libwebsockets C library",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-libwebsockets",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25",
+            "Alien::cmake3" : "0.02",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "2.37",
+            "Alien::Build::MM" : "2.37",
+            "Alien::Build::Plugin::Build::CMake" : "0.99"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "2.37",
+            "Alien::Build" : "2.37",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Alien" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::libwebsockets" : {
+         "file" : "lib/Alien/libwebsockets.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-alien-libwebsockets/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-alien-libwebsockets.git",
+         "web" : "https://github.com/vividsnow/perl5-alien-libwebsockets"
+      }
+   },
+   "version" : "0.01",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.84",
+      "requires" : {
+         "share" : {
+            "Alien::cmake3" : "0.02",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

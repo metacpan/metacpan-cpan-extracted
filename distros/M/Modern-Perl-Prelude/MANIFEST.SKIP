@@ -1,0 +1,12 @@
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^_build/
+^Build$
+^Build\.bak$
+^cover_db/
+^\.prove$
+.*\.swp$
+.*~$

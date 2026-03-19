@@ -1473,4 +1473,111 @@ subtest 'Too many headers returns 431' => sub {
     })->()->get;
 };
 
+subtest 'rejects request with both Transfer-Encoding and Content-Length' => sub {
+    use PAGI::Server::Protocol::HTTP1;
+
+    my $proto = PAGI::Server::Protocol::HTTP1->new;
+
+    my $raw = "POST /test HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: chunked\r\nContent-Length: 10\r\n\r\n";
+    my $buf = $raw;
+    my ($req, $consumed) = $proto->parse_request(\$buf);
+
+    ok defined $req, 'got a response';
+    is $req->{error}, 400, 'returns 400 for CL/TE conflict';
+    like $req->{message}, qr/Transfer-Encoding.*Content-Length|Content-Length.*Transfer-Encoding/i,
+        'error message mentions both headers';
+};
+
+subtest 'Transfer-Encoding validation' => sub {
+    my $proto = PAGI::Server::Protocol::HTTP1->new;
+
+    subtest 'chunked as final encoding is accepted' => sub {
+        my $raw = "POST /test HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: gzip, chunked\r\n\r\n";
+        my $buf = $raw;
+        my ($req, $consumed) = $proto->parse_request(\$buf);
+        ok $req && !$req->{error}, 'request accepted';
+        ok $req->{chunked}, 'chunked flag set';
+    };
+
+    subtest 'chunked not final is rejected' => sub {
+        my $raw = "POST /test HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: chunked, gzip\r\n\r\n";
+        my $buf = $raw;
+        my ($req, $consumed) = $proto->parse_request(\$buf);
+        ok $req, 'got response';
+        is $req->{error}, 400, 'returns 400 when chunked is not final encoding';
+    };
+
+    subtest 'unknown transfer encoding without chunked is rejected' => sub {
+        my $raw = "POST /test HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: gzip\r\n\r\n";
+        my $buf = $raw;
+        my ($req, $consumed) = $proto->parse_request(\$buf);
+        ok $req, 'got response';
+        is $req->{error}, 501, 'returns 501 for unsupported transfer encoding';
+    };
+
+    subtest 'chunked alone is accepted' => sub {
+        my $raw = "POST /test HTTP/1.1\r\nHost: localhost\r\nTransfer-Encoding: chunked\r\n\r\n";
+        my $buf = $raw;
+        my ($req, $consumed) = $proto->parse_request(\$buf);
+        ok $req && !$req->{error}, 'request accepted';
+        ok $req->{chunked}, 'chunked flag set';
+    };
+};
+
+subtest 'rejects invalid loop_type values' => sub {
+    like(
+        dies {
+            PAGI::Server->new(
+                app       => async sub { },
+                loop_type => 'EPoll; system("echo pwned")',
+            )
+        },
+        qr/Invalid loop_type/,
+        'loop_type with semicolon is rejected'
+    );
+
+    like(
+        dies {
+            PAGI::Server->new(
+                app       => async sub { },
+                loop_type => 'Foo"bar',
+            )
+        },
+        qr/Invalid loop_type/,
+        'loop_type with quote is rejected'
+    );
+};
+
+subtest 'disable_tls with ssl config starts without dying' => sub {
+    # Should NOT die — should skip TLS setup
+    my $server = eval {
+        PAGI::Server->new(
+            app         => async sub { },
+            ssl         => { cert_file => '/nonexistent.pem', key_file => '/nonexistent.key' },
+            disable_tls => 1,
+        );
+    };
+
+    # With disable_tls, cert validation AND TLS setup should be skipped
+    ok !$@, 'does not die with disable_tls + ssl' or diag $@;
+    ok defined $server, 'server object created';
+};
+
+subtest 'configure() recompiles access log formatter' => sub {
+    my $server = PAGI::Server->new(
+        app               => async sub { },
+        access_log_format => 'common',
+    );
+
+    my $formatter1 = $server->{_access_log_formatter};
+    ok defined $formatter1, 'initial formatter compiled';
+
+    # Reconfigure with different format
+    $server->configure(access_log_format => 'combined');
+
+    my $formatter2 = $server->{_access_log_formatter};
+    ok defined $formatter2, 'formatter still defined after reconfigure';
+    isnt $formatter2, $formatter1, 'formatter was recompiled (different reference)';
+};
+
 done_testing;

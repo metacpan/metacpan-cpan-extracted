@@ -1,12 +1,17 @@
 Revision history for IO-AsyncX-Sendfile
 
-0.002     2015-02-17 04:38:00+00:00 Europe/London
-	Features:
-	* Provides the string exception as the first parameter to ->fail() on failure,
-	for consistency with other IO::Async components.
+0.003     2026-03-18 13:50:35+08:00 Asia/Singapore
+  [Bugs fixed]
+  - we were not handling repeated sendfile calls correctly, so this would give corrupt data
+  especially on larger files
 
-	Dependencies:
-	* Attempt to prevent installation on windows - test reports contain "Attempt to free unreferenced scalar" errors even on the compilation tests, and I suspect the platform doesn't have the underlying API call anyway
+0.002     2015-02-17 04:38:00+00:00 Europe/London
+  [Features]
+  - Provides the string exception as the first parameter to ->fail() on failure,
+  for consistency with other IO::Async components.
+
+  [Dependencies]
+  - Attempt to prevent installation on windows - test reports contain "Attempt to free unreferenced scalar" errors even on the compilation tests, and I suspect the platform doesn't have the underlying API call anyway
 
 0.001     2015-02-14 21:43:09+00:00 Europe/London
-	Initial CPAN release
+  Initial CPAN release

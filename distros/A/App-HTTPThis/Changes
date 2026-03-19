@@ -1,5 +1,8 @@
 # Changes for App-HTTPThis
 
+0.11.1
+     * Bump required version of Plack::App::DirectoryIndex
+
 0.11.0
      * Switch to semantic versioning
      * Command-line args take precedence over config file

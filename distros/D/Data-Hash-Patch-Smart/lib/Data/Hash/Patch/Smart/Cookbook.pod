@@ -1,0 +1,95 @@
+=head1 COOKBOOK
+
+Practical examples of using C<Data::Hash::Patch::Smart>.
+
+=head2 Changing a deeply nested value
+
+    patch($data, [
+        { op => 'change', path => '/a/b/c', to => 42 },
+    ]);
+
+=head2 Adding to an ordered array
+
+    patch($data, [
+        { op => 'add', path => '/items/2', value => 'X' },
+    ]);
+
+=head2 Removing from an ordered array
+
+    patch($data, [
+        { op => 'remove', path => '/items/1' },
+    ]);
+
+=head2 Unordered array operations
+
+    patch($data, [
+        { op => 'add',    path => '/tags/*', value => 'new' },
+        { op => 'remove', path => '/tags/*', from  => 'old' },
+    ]);
+
+=head2 Structural wildcard: update all users
+
+    patch($data, [
+        { op => 'change', path => '/users/*/role', to => 'admin' },
+    ]);
+
+=head2 Structural wildcard: remove a field everywhere
+
+    patch($data, [
+        { op => 'remove', path => '/**/deprecated' },
+    ]);
+
+=head2 Auto‑creating missing containers
+
+    patch({}, [
+        { op => 'change', path => '/a/b/2', to => 'X' },
+    ], create_missing => 1);
+
+Produces:
+
+    { a => { b => [ undef, undef, 'X' ] } }
+
+=head2 Strict mode: catching mistakes
+
+    patch($data, [
+        { op => 'change', path => '/missing/key', to => 1 },
+    ], strict => 1);
+
+Dies with:
+
+    Strict mode: missing hash key 'missing'
+
+=head2 Wildcard + arrays of hashes
+
+    patch($data, [
+        { op => 'change', path => '/servers/*/host', to => 'localhost' },
+    ]);
+
+=head2 Wildcard + deep nesting
+
+    patch($data, [
+        { op => 'remove', path => '/root/*/*/debug' },
+    ]);
+
+=head2 Round‑trip with Data::Hash::Diff::Smart
+
+    my $changes = diff($old, $new);
+    my $patched = patch($old, $changes);
+
+    is_deeply($patched, $new);
+
+=head2 Migrating configuration structures
+
+Use diff + patch to migrate old config formats to new ones.
+
+=head2 Bulk updates
+
+    patch($data, [
+        { op => 'add', path => '/users/*/tags/*', value => 'active' },
+    ]);
+
+=head2 Removing empty containers
+
+Combine wildcard remove with post‑processing to prune empty hashes.
+
+=cut

@@ -13,21 +13,24 @@ meta-spec:
   version: '1.4'
 name: NBI-Slurm
 provides:
+  NBI::EcoScheduler:
+    file: lib/NBI/EcoScheduler.pm
+    version: v0.17.0
   NBI::Job:
     file: lib/NBI/Job.pm
-    version: v0.16.1
+    version: v0.17.0
   NBI::Opts:
     file: lib/NBI/Opts.pm
-    version: v0.16.1
+    version: v0.17.0
   NBI::Queue:
     file: lib/NBI/Queue.pm
-    version: v0.16.1
+    version: v0.17.0
   NBI::QueuedJob:
     file: lib/NBI/QueuedJob.pm
-    version: v0.16.1
+    version: v0.17.0
   NBI::Slurm:
     file: lib/NBI/Slurm.pm
-    version: v0.16.1
+    version: v0.17.0
 recommends:
   File::Which: '0'
 requires:
@@ -43,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/quadram-institute-bioscience/NBI-Slurm/issues
   repository: https://github.com/quadram-institute-bioscience/NBI-Slurm.git
-version: 0.16.1
+version: 0.17.0
 x_generated_by_perl: v5.38.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: MIT

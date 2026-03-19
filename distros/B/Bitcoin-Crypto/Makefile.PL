@@ -18,20 +18,20 @@ my %WriteMakefileArgs = (
   "NAME" => "Bitcoin::Crypto",
   "PREREQ_PM" => {
     "Bitcoin::BIP39" => "0.002",
-    "Bitcoin::Secp256k1" => "0.008",
+    "Bitcoin::Secp256k1" => "0.011",
     "CryptX" => "0.074",
     "Feature::Compat::Try" => 0,
     "List::Util" => "1.45",
     "Math::BigInt" => "1.999831",
     "Moo" => "2.003004",
-    "Mooish::AttributeBuilder" => "1.002",
-    "Mooish::Base" => "1.001",
-    "Type::Tiny" => 2
+    "Mooish::Base" => "1.005",
+    "Type::Tiny" => 2,
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
     "Test2::V0" => "0.000139"
   },
-  "VERSION" => "4.003",
+  "VERSION" => "4.004",
   "test" => {
     "TESTS" => "t/*.t t/Key/*.t t/PSBT/*.t t/Script/*.t t/Taproot/*.t t/Transaction/*.t t/Transaction/Signer/*.t"
   }
@@ -40,16 +40,16 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Bitcoin::BIP39" => "0.002",
-  "Bitcoin::Secp256k1" => "0.008",
+  "Bitcoin::Secp256k1" => "0.011",
   "CryptX" => "0.074",
   "Feature::Compat::Try" => 0,
   "List::Util" => "1.45",
   "Math::BigInt" => "1.999831",
   "Moo" => "2.003004",
-  "Mooish::AttributeBuilder" => "1.002",
-  "Mooish::Base" => "1.001",
+  "Mooish::Base" => "1.005",
   "Test2::V0" => "0.000139",
-  "Type::Tiny" => 2
+  "Type::Tiny" => 2,
+  "namespace::autoclean" => 0
 );
 
 

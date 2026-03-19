@@ -4,6 +4,7 @@ use warnings
   NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
 use Test::Expander;
+use Test::Expander::Constants qw( $FALSE $TRUE );
 
 my $subtestSkipped;
 my $mock = mock 'Test2::API::Context' => ( override => [ skip => sub { ok( $subtestSkipped, 'subtest skipped' ) } ] );
@@ -14,7 +15,7 @@ subtest 'other subtest choosen' => sub {
   plan( 2 );
   local @ARGV = ( '--subtest_number' => '1/0' );
   Test::Expander::_subtest_selection();
-  $subtestSkipped = 1;
+  $subtestSkipped = $TRUE;
   lives_ok { $METHOD_REF->( sub { ok( !$subtestSkipped, 'subtest entered' ) }, 'name' ) } 'executed';
 };
 
@@ -22,12 +23,12 @@ subtest 'subtest by number' => sub {
   plan( 2 );
   local @ARGV = ( '--subtest_name' => '[A-Z]' );
   Test::Expander::_subtest_selection();
-  $subtestSkipped = 0;
+  $subtestSkipped = $FALSE;
   lives_ok { $METHOD_REF->( sub { ok( !$subtestSkipped, 'original entered' ) }, 'name' ) } 'executed';
 };
 
 subtest 'subtest by name with any capital letter e.g. A' => sub {
   plan( 2 );
-  $subtestSkipped = 0;
+  $subtestSkipped = $FALSE;
   lives_ok { $METHOD_REF->( sub { ok( !$subtestSkipped, 'original entered' ) }, 'NAME' ) } 'executed';
 };

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Object-oriented handling of deeply nested hash structures",
+   "abstract" : "Data::NestedKey",
    "author" : [
-      "Rob Lauer <rclauer@gmail.com>"
+      "Rob Lauer <rlauer@treasurersbriefcase.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,36 +22,52 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : "0",
             "JSON" : "0",
-            "List::Util" : "0",
-            "Scalar::Util" : "0",
-            "Storable" : "0",
-            "YAML" : "0"
+            "List::Util" : "1.32",
+            "YAML::XS" : "0",
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "JSON" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "YAML::XS" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Data::NestedKey" : {
+         "file" : "lib/Data/NestedKey.pm",
+         "version" : "v1.0.8"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "rlauer@treasurersbriefcase.com",
+         "web" : "http://github.com/rlauer6/data-nestedkey/issues"
+      },
+      "homepage" : "http://github.com/rlauer6/data-nestedkey.git",
       "repository" : {
-         "url" : "https://github.com/rlauer6/Data-NestedKey"
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/data-nestedkey.git",
+         "web" : "http://github.com/rlauer6/data-nestedkey.git"
       }
    },
-   "version" : "0.06",
+   "version" : "v1.0.8",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

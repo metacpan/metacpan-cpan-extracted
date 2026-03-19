@@ -12,7 +12,7 @@ our @EXPORT_OK = qw(
 	generate_custom_perl_workflow
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -20,10 +20,10 @@ App::GHGen::PerlCustomizer - Customize Perl workflows based on project requireme
 
 =head1 SYNOPSIS
 
-    use App::GHGen::PerlCustomizer qw(detect_perl_requirements);
+	use App::GHGen::PerlCustomizer qw(detect_perl_requirements);
 
-    my $requirements = detect_perl_requirements();
-    # Returns: { min_version => '5.036', has_cpanfile => 1, ... }
+	my $requirements = detect_perl_requirements();
+	# Returns: { min_version => '5.036', has_cpanfile => 1, ... }
 
 =head1 FUNCTIONS
 
@@ -48,20 +48,20 @@ sub detect_perl_requirements() {
 	$reqs{has_dist_ini} = path('dist.ini')->exists;
 	$reqs{has_build_pl} = path('Build.PL')->exists;
 
-    # Try to detect minimum Perl version
-    if ($reqs{has_cpanfile}) {
-        my $content = path('cpanfile')->slurp_utf8;
-        if ($content =~ /requires\s+['"]perl['"],?\s+['"]([0-9.]+)['"]/) {
-            $reqs{min_version} = $1;
-        }
-    }
+	# Try to detect minimum Perl version
+	if ($reqs{has_cpanfile}) {
+		my $content = path('cpanfile')->slurp_utf8;
+		if ($content =~ /requires\s+['"]perl['"],?\s+['"]([0-9.]+)['"]/) {
+			$reqs{min_version} = $1;
+		}
+	}
 
-    if (!$reqs{min_version} && $reqs{has_makefile_pl}) {
-        my $content = path('Makefile.PL')->slurp_utf8;
-        if ($content =~ /MIN_PERL_VERSION\s*=>\s*['"]([0-9.]+)['"]/) {
-            $reqs{min_version} = $1;
-        }
-    }
+	if (!$reqs{min_version} && $reqs{has_makefile_pl}) {
+		my $content = path('Makefile.PL')->slurp_utf8;
+		if ($content =~ /MIN_PERL_VERSION\s*=>\s*['"]([0-9.]+)['"]/) {
+			$reqs{min_version} = $1;
+		}
+	}
 
 	return \%reqs;
 }
@@ -85,31 +85,32 @@ If perl_versions is provided, it takes precedence over min/max versions.
 sub generate_custom_perl_workflow($opts = {}) {
 	my $min_version = $opts->{min_perl_version} // '5.36';
 	my $max_version = $opts->{max_perl_version} // '5.40';
+	my $timeout = $opts->{timeout} // 30;
 	my @os = @{$opts->{os} // ['ubuntu-latest', 'macos-latest', 'windows-latest']};
 	my $enable_critic = $opts->{enable_critic} // 1;
 	my $enable_coverage = $opts->{enable_coverage} // 1;
 
-    # Generate Perl version list - use explicit list if provided, otherwise min/max
-    my @perl_versions;
-    if ($opts->{perl_versions} && @{$opts->{perl_versions}}) {
-        @perl_versions = @{$opts->{perl_versions}};
-    } else {
-        @perl_versions = _get_perl_versions($min_version, $max_version);
-    }
+	# Generate Perl version list - use explicit list if provided, otherwise min/max
+	my @perl_versions;
+	if ($opts->{perl_versions} && @{$opts->{perl_versions}}) {
+		@perl_versions = @{$opts->{perl_versions}};
+	} else {
+		@perl_versions = _get_perl_versions($min_version, $max_version);
+	}
 
 	my $yaml = "---\n";
 	$yaml .= '# Created by ' . __PACKAGE__ . "\n";
 
-    $yaml .= "name: Perl CI\n\n";
-    $yaml .= "'on':\n";
-    $yaml .= "  push:\n";
-    $yaml .= "    branches:\n";
-    $yaml .= "      - main\n";
-    $yaml .= "      - master\n";
-    $yaml .= "  pull_request:\n";
-    $yaml .= "    branches:\n";
-    $yaml .= "      - main\n";
-    $yaml .= "      - master\n\n";
+	$yaml .= "name: Perl CI\n\n";
+	$yaml .= "'on':\n";
+	$yaml .= "  push:\n";
+	$yaml .= "	branches:\n";
+	$yaml .= "	  - main\n";
+	$yaml .= "	  - master\n";
+	$yaml .= "  pull_request:\n";
+	$yaml .= "	branches:\n";
+	$yaml .= "	  - main\n";
+	$yaml .= "	  - master\n\n";
 
 	$yaml .= "concurrency:\n";
 	$yaml .= "  group: \${{ github.workflow }}-\${{ github.ref }}\n";
@@ -118,112 +119,125 @@ sub generate_custom_perl_workflow($opts = {}) {
 	$yaml .= "permissions:\n";
 	$yaml .= "  contents: read\n\n";
 
-    $yaml .= "jobs:\n";
-    $yaml .= "  test:\n";
-    $yaml .= "    runs-on: \${{ matrix.os }}\n";
-    $yaml .= "    strategy:\n";
-    $yaml .= "      fail-fast: false\n";
-    $yaml .= "      matrix:\n";
-    $yaml .= "        os:\n";
-    for my $os (@os) {
-        $yaml .= "          - $os\n";
-    }
-    $yaml .= "        perl:\n";
-    for my $version (@perl_versions) {
-        $yaml .= "          - '$version'\n";
-    }
-    $yaml .= "    name: Perl \${{ matrix.perl }} on \${{ matrix.os }}\n";
-    $yaml .= "    env:\n";
-    $yaml .= "      AUTOMATED_TESTING: 1\n";
-    $yaml .= "      NO_NETWORK_TESTING: 1\n";
-    $yaml .= "      NONINTERACTIVE_TESTING: 1\n";
-    $yaml .= "    steps:\n";
-    $yaml .= "      - uses: actions/checkout\@v6\n\n";
+	$yaml .= "jobs:\n";
+	$yaml .= "  test:\n";
+	$yaml .= "	runs-on: \${{ matrix.os }}\n";
+	$yaml .= "	timeout-minutes: $timeout\n";
+	$yaml .= "	strategy:\n";
+	$yaml .= "	  fail-fast: false\n";
+	$yaml .= "	  matrix:\n";
+	$yaml .= "		os:\n";
+	for my $os (@os) {
+		$yaml .= "		  - $os\n";
+	}
+	$yaml .= "		perl:\n";
+	for my $version (@perl_versions) {
+		$yaml .= "		  - '$version'\n";
+	}
+	$yaml .= "	name: Perl \${{ matrix.perl }} on \${{ matrix.os }}\n";
+	$yaml .= "	env:\n";
+	$yaml .= "	  AUTOMATED_TESTING: 1\n";
+	$yaml .= "	  NO_NETWORK_TESTING: 1\n";
+	$yaml .= "	  NONINTERACTIVE_TESTING: 1\n";
+	$yaml .= "	steps:\n";
+	$yaml .= "	  - uses: actions/checkout\@v6\n\n";
 
-    $yaml .= "      - name: Setup Perl\n";
-    $yaml .= "        uses: shogo82148/actions-setup-perl\@v1\n";
-    $yaml .= "        with:\n";
-    $yaml .= "          perl-version: \${{ matrix.perl }}\n\n";
+	$yaml .= "	  - name: Setup Perl\n";
+	$yaml .= "		uses: shogo82148/actions-setup-perl\@v1\n";
+	$yaml .= "		with:\n";
+	$yaml .= "		  perl-version: \${{ matrix.perl }}\n\n";
 
-    $yaml .= "      - name: Cache CPAN modules\n";
-    $yaml .= "        uses: actions/cache\@v5\n";
-    $yaml .= "        with:\n";
-    $yaml .= "          path: ~/perl5\n";
-    $yaml .= "          key: \${{ runner.os }}-\${{ matrix.perl }}-\${{ hashFiles('cpanfile') }}\n";
-    $yaml .= "          restore-keys: |\n";
-    $yaml .= "            \${{ runner.os }}-\${{ matrix.perl }}-\n\n";
+	$yaml .= "	  - name: Cache CPAN modules\n";
+	$yaml .= "		uses: actions/cache\@v5\n";
+	$yaml .= "		with:\n";
+	$yaml .= "		  path: ~/perl5\n";
+	$yaml .= "		  key: \${{ runner.os }}-\${{ matrix.perl }}-\${{ hashFiles('cpanfile') }}\n";
+	$yaml .= "		  restore-keys: |\n";
+	$yaml .= "			\${{ runner.os }}-\${{ matrix.perl }}-\n\n";
 
-    $yaml .= "      - name: Install cpanm and local::lib\n";
-    $yaml .= "        if: runner.os != 'Windows'\n";
-    $yaml .= "        run: cpanm --notest --local-lib=~/perl5 local::lib\n\n";
+	$yaml .= "	  - name: Install cpanm and local::lib\n";
+	$yaml .= "		if: runner.os != 'Windows'\n";
+	$yaml .= "		run: cpanm --notest --local-lib=~/perl5 local::lib\n\n";
 
-    $yaml .= "      - name: Install cpanm and local::lib (Windows)\n";
-    $yaml .= "        if: runner.os == 'Windows'\n";
-    $yaml .= "        run: cpanm --notest App::cpanminus local::lib\n\n";
+	$yaml .= "	  - name: Install cpanm and local::lib (Windows)\n";
+	$yaml .= "		if: runner.os == 'Windows'\n";
+	$yaml .= "		run: cpanm --notest App::cpanminus local::lib\n\n";
 
-    $yaml .= "      - name: Install dependencies\n";
-    $yaml .= "        if: runner.os != 'Windows'\n";
-    $yaml .= "        shell: bash\n";
-    $yaml .= "        run: |\n";
-    $yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
-    $yaml .= "          cpanm --notest --installdeps .\n\n";
+	$yaml .= "	  - name: Install dependencies\n";
+	$yaml .= "		if: runner.os != 'Windows'\n";
+	$yaml .= "		shell: bash\n";
+	$yaml .= "		run: |\n";
+	$yaml .= "		  eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+	$yaml .= "		  cpanm --notest --installdeps .\n\n";
 
-    $yaml .= "      - name: Install dependencies (Windows)\n";
-    $yaml .= "        if: runner.os == 'Windows'\n";
-    $yaml .= "        shell: cmd\n";
-    $yaml .= "        run: |\n";
-    $yaml .= "          \@echo off\n";
-    $yaml .= "          set \"PATH=%USERPROFILE%\\perl5\\bin;%PATH%\"\n";
-    $yaml .= "          set \"PERL5LIB=%USERPROFILE%\\perl5\\lib\\perl5\"\n";
-    $yaml .= "          cpanm --notest --installdeps .\n\n";
+	$yaml .= "	  - name: Install dependencies (Windows)\n";
+	$yaml .= "		if: runner.os == 'Windows'\n";
+	$yaml .= "		shell: cmd\n";
+	$yaml .= "		run: |\n";
+	$yaml .= "		  \@echo off\n";
+	$yaml .= "		  set \"PATH=%USERPROFILE%\\perl5\\bin;%PATH%\"\n";
+	$yaml .= "		  set \"PERL5LIB=%USERPROFILE%\\perl5\\lib\\perl5\"\n";
+	$yaml .= "		  cpanm --notest --installdeps .\n\n";
 
-    $yaml .= "      - name: Run tests\n";
-    $yaml .= "        if: runner.os != 'Windows'\n";
-    $yaml .= "        shell: bash\n";
-    $yaml .= "        run: |\n";
-    $yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
-    $yaml .= "          prove -lr t/\n\n";
+	$yaml .= "	  - name: Run tests\n";
+	$yaml .= "		if: runner.os != 'Windows'\n";
+	$yaml .= "		shell: bash\n";
+	$yaml .= "		run: |\n";
+	$yaml .= "		  eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+	$yaml .= "		  prove -lr t/\n\n";
 
-    $yaml .= "      - name: Run tests (Windows)\n";
-    $yaml .= "        if: runner.os == 'Windows'\n";
-    $yaml .= "        shell: cmd\n";
-    $yaml .= "        run: |\n";
-    $yaml .= "          \@echo off\n";
-    $yaml .= "          set \"PATH=%USERPROFILE%\\perl5\\bin;%PATH%\"\n";
-    $yaml .= "          set \"PERL5LIB=%USERPROFILE%\\perl5\\lib\\perl5\"\n";
-    $yaml .= "          prove -lr t/\n\n";
+	$yaml .= "	  - name: Run tests (Windows)\n";
+	$yaml .= "		if: runner.os == 'Windows'\n";
+	$yaml .= "		shell: cmd\n";
+	$yaml .= "		run: |\n";
+	$yaml .= "		  \@echo off\n";
+	$yaml .= "		  set \"PATH=%USERPROFILE%\\perl5\\bin;%PATH%\"\n";
+	$yaml .= "		  set \"PERL5LIB=%USERPROFILE%\\perl5\\lib\\perl5\"\n";
+	$yaml .= "		  prove -lr t/\n\n";
 
-    if ($enable_critic) {
-        my $latest = $perl_versions[-1];
-        $yaml .= "      - name: Run Perl::Critic\n";
-        $yaml .= "        if: matrix.perl == '$latest' && matrix.os == 'ubuntu-latest'\n";
-        $yaml .= "        continue-on-error: true\n";
-        $yaml .= "        run: |\n";
-        $yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
-        $yaml .= "          cpanm --notest Perl::Critic\n";
-        $yaml .= "          perlcritic --severity 3 lib/ || true\n";
-        $yaml .= "        shell: bash\n\n";
-    }
+	if ($enable_critic) {
+		my $latest = $perl_versions[-1];
+		$yaml .= "	  - name: Run Perl::Critic\n";
+		$yaml .= "		if: matrix.perl == '$latest' && matrix.os == 'ubuntu-latest'\n";
+		$yaml .= "		continue-on-error: true\n";
+		$yaml .= "		run: |\n";
+		$yaml .= "		  eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+		$yaml .= "		  cpanm --notest Perl::Critic\n";
+		$yaml .= "		  perlcritic --severity 3 lib/ || true\n";
+		$yaml .= "		shell: bash\n\n";
+	}
 
-    if ($enable_coverage) {
-        my $latest = $perl_versions[-1];
-        $yaml .= "      - name: Test coverage\n";
-        $yaml .= "        if: matrix.perl == '$latest' && matrix.os == 'ubuntu-latest'\n";
-        $yaml .= "        run: |\n";
-        $yaml .= "          eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
-        $yaml .= "          cpanm --notest Devel::Cover\n";
-        $yaml .= "          cover -delete\n";
-        $yaml .= "          HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t/\n";
-        $yaml .= "          cover\n";
-        $yaml .= "        shell: bash\n";
-    }
+	if ($enable_coverage) {
+		my $latest = $perl_versions[-1];
+		$yaml .= "	  - name: Test coverage\n";
+		$yaml .= "		if: matrix.perl == '$latest' && matrix.os == 'ubuntu-latest'\n";
+		$yaml .= "		run: |\n";
+		$yaml .= "		  eval \$(perl -I ~/perl5/lib/perl5 -Mlocal::lib)\n";
+		$yaml .= "		  cpanm --notest Devel::Cover\n";
+		$yaml .= "		  cover -delete\n";
+		$yaml .= "		  HARNESS_PERL_SWITCHES=-MDevel::Cover prove -lr t/\n";
+		$yaml .= "		  cover\n";
+		$yaml .= "		shell: bash\n";
+	}
+
+	$yaml .= <<'YAML';
+
+	  - name: Show cpanm build log on failure (Windows)
+		if: runner.os == 'Windows' && failure()
+		shell: pwsh
+		run: Get-Content "$env:USERPROFILE\.cpanm\work\*\build.log" -Tail 100
+
+	  - name: Show cpanm build log on failure (non-Windows)
+		if: runner.os != 'Windows' && failure()
+		run: tail -100 "$HOME/.cpanm/work/*/build.log"
+YAML
 
 	return $yaml;
 }
 
 sub _get_perl_versions($min, $max) {
 	# All available Perl versions in descending order
-	my @all_versions = qw(5.40 5.38 5.36 5.34 5.32 5.30 5.28 5.26 5.24 5.22);
+	my @all_versions = qw(5.42 5.40 5.38 5.36 5.34 5.32 5.30 5.28 5.26 5.24 5.22);
 
 	# Normalize version strings for comparison
 	my $min_normalized = _normalize_version($min);
@@ -237,7 +251,7 @@ sub _get_perl_versions($min, $max) {
 		}
 	}
 
-	return reverse @selected;  # Return in ascending order
+	return reverse @selected;	# Return in ascending order
 }
 
 sub _normalize_version($version) {

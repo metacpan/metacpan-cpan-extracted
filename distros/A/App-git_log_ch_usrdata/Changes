@@ -1,17 +1,22 @@
-Revision history for App-git_log_ch_usrdata
+Revision history for distribution App-git_log_ch_usrdata
 
-0.03    2025/10/30
+0.04    2026-03-19
+
+      - Added and reorganized author and release tests.
+      - Completed POD.
+
+0.03    2025-10-30
 
       - Corrected POD.
       - Corrected CONTRIBUTING.md and SECURITY.md.
       - Reworked Makefile.PL.
 
-0.02    2025/08/13
+0.02    2025-08-13
 
       - Added CONTRIBUTING.md and SECURITY.md.
       - Corrected POD.
 
-0.01    2025/08/12
+0.01    2025-08-12
 
-        First version, released on an unsuspecting world.
+      - First version, released on an unsuspecting world.
 

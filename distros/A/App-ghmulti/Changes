@@ -1,30 +1,35 @@
-Revision history for App-ghmulti
+Revision history for distribution App-ghmulti
 
-0.06   2025/10/30
+0.07   2026-03-18
+
+      - Added and reorganized author and release tests.
+      - Completed POD.
+
+0.06   2025-10-30
 
       - Corrected policy files.
 
-0.05   2025/10/29
+0.05   2025-10-29
 
       - Reworked Makefile.PL.
       - Improved POD.
 
-0.04   2025/08/08
+0.04   2025-08-08
 
       - Reformatted Makefile.PL.
       - Fixed problem with 01-version-help.t (https://rt.cpan.org/Ticket/Display.html?id=168832).
 
-0.03   2025/08/07
+0.03   2025-08-07
 
       - POD: Fixed typo.
       - Reorganized some test scripts.
-      - Fixed problem in Makefile.PL
+      - Fixed problem in Makefile.PL.
 
-0.02    2025/08/06
+0.02    2025-08-06
 
       - Minor change in POD.
 
-0.01    2025/08/06
+0.01    2025-08-06
 
       - First version, released on an unsuspecting world.
 

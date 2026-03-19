@@ -1,5 +1,10 @@
 Revision history for Perl extension App-mdee
 
+1.07 2026-03-17T02:30:13Z
+
+    - Add nomark to default themes (hashed,nomark) for clean reading
+    - Use --no-paginate instead of --fold for nup, require App::nup 1.07
+
 1.06 2026-02-28T03:37:45Z
 
     - Rename theme keys file/file_format to FILE/FILE_FORMAT

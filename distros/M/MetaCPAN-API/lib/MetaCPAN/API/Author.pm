@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 package MetaCPAN::API::Author;
-# ABSTRACT: Author information for MetaCPAN::API
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Carp;
 use Moo::Role;
@@ -12,7 +11,7 @@ use namespace::autoclean;
 # /author/{author}
 sub author {
     my $self = shift;
-    my ( $pause_id, $url, %extra_opts );
+    my ( $url, %extra_opts );
 
     if ( @_ == 1 ) {
         $url = 'author/' . shift;
@@ -24,8 +23,8 @@ sub author {
         } elsif ( defined $opts{'search'} ) {
             my $search_opts = $opts{'search'};
 
-            ref $search_opts && ref $search_opts eq 'HASH'
-                or croak "'search' key must be hashref";
+            croak "'search' key must be hashref"
+                unless ref $search_opts && ref $search_opts eq 'HASH';
 
             %extra_opts = %{$search_opts};
             $url        = 'author/_search';
@@ -47,13 +46,11 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Sawyer X
+
 =head1 NAME
 
 MetaCPAN::API::Author - Author information for MetaCPAN::API
-
-=head1 VERSION
-
-version 0.51
 
 =head1 DESCRIPTION
 
@@ -77,6 +74,15 @@ You can do complex searches using 'search' parameter:
             size => 1,
         },
     );
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/xsawyerx/metacpan-api/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

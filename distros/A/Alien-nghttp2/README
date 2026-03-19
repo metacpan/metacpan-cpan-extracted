@@ -1,0 +1,22 @@
+Alien-nghttp2
+
+Alien::nghttp2 provides the nghttp2 HTTP/2 C library to Perl
+distributions via Alien::Base. It can either use an existing system
+installation or build nghttp2 from source when needed.
+
+Installation
+
+    cpanm Alien::nghttp2
+
+Or from a checkout:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The module exposes standard Alien::Base methods such as `cflags`,
+`libs`, and `dynamic_libs` for consumers that need to compile or link
+against nghttp2.
+
+See `lib/Alien/nghttp2.pm` for API details and usage examples.

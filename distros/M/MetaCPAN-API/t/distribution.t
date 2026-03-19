@@ -35,7 +35,7 @@ ok( $result, 'Got result' );
 
 $result = $mcpan->distribution(
     search => {
-        filter => { exists => { field => 'bugs.source' } },
+        query => { exists => { field => 'bugs.source' } },
         fields => ['name', 'bugs.source'],
         size   => 5,
     },

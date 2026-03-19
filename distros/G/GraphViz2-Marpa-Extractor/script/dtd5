@@ -1,0 +1,531 @@
+#!/bin/env perl
+
+use GraphViz2::Marpa ;
+use Data::TreeDumper ;
+
+
+my $file = shift || 'input.dot';
+
+
+open (my $fh, '<', $file) or die "error reading file: $!" ;
+print while<$fh> ;
+print "\n" ;
+
+my $g2m = GraphViz2::Marpa->new( input_file => $file);
+$g2m->run;
+
+my $root = $g2m->tree;   # Tree::DAG_Node
+
+# package GraphViz2::Marpa::HierExtractor;
+my $all = extract_all_graphs_hierarchical($root) ;
+print DumpTree $all ;
+
+use Data::Dumper ;
+
+# print Dumper $root ;
+# package GraphViz2::Marpa::HierExtractor;
+
+use strict;
+use warnings;
+
+our $ANON_SUBGRAPH_COUNTER = 0;
+
+# Public entry point.
+sub extract_all_graphs_hierarchical {
+	my ($root) = @_;
+
+	my ($kind, $graph_nodes) = _find_graphs_and_kind($root);
+
+	my @graphs;
+	for my $g (@$graph_nodes) {
+		push @graphs, _extract_graph(
+			$g,
+			$kind,
+			{},    # inherited node defaults
+			{},    # inherited edge defaults
+		);
+	}
+
+	return \@graphs;
+}
+
+sub _find_graphs_and_kind {
+	my ($root) = @_;
+
+	my $kind = 'digraph';
+	my @graphs;
+
+	for my $child (@{ $root->{daughters} || [] }) {
+		my $name = $child->{name} // '';
+
+		if ($name eq 'prolog') {
+			for my $c (@{ $child->{daughters} || [] }) {
+				my $t = $c->{attributes}{type} // '';
+				if ($t eq 'digraph_literal') {
+					$kind = 'digraph';
+				}
+				elsif ($t eq 'graph_literal') {
+					$kind = 'graph';
+				}
+			}
+		}
+		elsif ($name eq 'graph') {
+			push @graphs, $child;
+		}
+	}
+
+	return ($kind, \@graphs);
+}
+
+sub _extract_graph {
+	my ($graph_node, $kind, $inherited_node_defaults, $inherited_edge_defaults) = @_;
+
+	my $id_node = $graph_node->{daughters}[0];
+	my $name    = $id_node->{attributes}{value};
+
+	my $brace_lit = $graph_node->{daughters}[1];
+	my @body      = @{ $brace_lit->{daughters} || [] };
+
+	my %attrs;
+	my %local_node_defaults;
+	my %local_edge_defaults;
+	my %nodes;
+	my @edges;
+	my @subgraphs;
+
+	my %effective_node_defaults = (%$inherited_node_defaults);
+	my %effective_edge_defaults = (%$inherited_edge_defaults);
+
+	for (my $i = 0; $i < @body; $i++) {
+		my $n  = $body[$i];
+		my $nm = $n->{name} // '';
+		my $t  = $n->{attributes}{type} // '';
+
+		# Graph-level attributes and rank constraints.
+		if ($nm eq 'attribute') {
+			my $key = $t || $n->{attributes}{name};
+			my $val = $n->{attributes}{value};
+			$attrs{$key} = $val;
+			next;
+		}
+
+		# Class defaults: node / edge / graph.
+		if ($nm eq 'class' && ($n->{attributes}{type} // '') eq 'class') {
+			my $class_name = $n->{attributes}{value}; # 'node', 'edge', 'graph'
+			my %def;
+			for my $c (@{ $n->{daughters} || [] }) {
+				next unless ($c->{name} // '') eq 'attribute';
+				my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+				my $val = $c->{attributes}{value};
+				$def{$ct} = $val;
+			}
+			if ($class_name eq 'node') {
+				%local_node_defaults = (%local_node_defaults, %def);
+				%effective_node_defaults = (%$inherited_node_defaults, %local_node_defaults);
+			}
+			elsif ($class_name eq 'edge') {
+				%local_edge_defaults = (%local_edge_defaults, %def);
+				%effective_edge_defaults = (%$inherited_edge_defaults, %local_edge_defaults);
+			}
+			elsif ($class_name eq 'graph') {
+				%attrs = (%attrs, %def);
+			}
+			next;
+		}
+
+		# Named subgraph.
+		if ($nm eq 'literal' && $t eq 'subgraph_literal') {
+			my $id_node2       = $body[$i + 1];
+			my $sub_name       = $id_node2->{attributes}{value};
+			my $sub_brace_lit  = $body[$i + 2];
+			my $sub_kind       = ($sub_name =~ /^cluster_/) ? 'cluster' : 'subgraph';
+
+			my $sub = _extract_subgraph(
+				$sub_name,
+				$sub_kind,
+				$sub_brace_lit,
+				$kind,
+				\%effective_node_defaults,
+				\%effective_edge_defaults,
+			);
+			push @subgraphs, $sub;
+			next;
+		}
+
+		# Anonymous subgraph: bare '{ ... }' literal.
+		if ($nm eq 'literal' && $t eq 'brace_literal') {
+			my $sub_name = '_anon_' . (++$ANON_SUBGRAPH_COUNTER);
+			my $sub_kind = 'subgraph';
+
+			my $sub = _extract_subgraph(
+				$sub_name,
+				$sub_kind,
+				$n,
+				$kind,
+				\%effective_node_defaults,
+				\%effective_edge_defaults,
+			);
+			push @subgraphs, $sub;
+			next;
+		}
+
+		# Edge chains and grouped RHS: start at node_id followed by edge_id.
+		if ($nm eq 'node_id' && $t eq 'node_id') {
+			if ($i + 1 < @body && ($body[$i + 1]{name} // '') eq 'edge_id') {
+				my $consumed = _extract_edge_chain(
+					\@body,
+					$i,
+					$kind,
+					\%nodes,
+					\@edges,
+					\%effective_node_defaults,
+					\%effective_edge_defaults,
+				);
+				$i = $consumed;
+				next;
+			}
+
+			# Standalone node declaration.
+			my $node_name = $n->{attributes}{name};
+			my %node_attr = _collect_attributes_from_node($n);
+
+			my $merged_attr = _merge_attrs(\%effective_node_defaults, \%node_attr);
+
+			if (exists $nodes{$node_name}) {
+				$nodes{$node_name}{attrs} = _merge_attrs($nodes{$node_name}{attrs}, $merged_attr);
+			}
+			else {
+				$nodes{$node_name} = { attrs => $merged_attr };
+			}
+
+			next;
+		}
+	}
+
+	my $adjacency = _build_adjacency(\@edges, $kind);
+
+	my $graph = {
+		name          => $name,
+		kind          => $kind,
+		attrs         => \%attrs,
+		node_defaults => \%effective_node_defaults,
+		edge_defaults => \%effective_edge_defaults,
+		nodes         => \%nodes,
+		edges         => \@edges,
+		subgraphs     => \@subgraphs,
+		adjacency     => $adjacency,
+	};
+
+	return $graph;
+}
+
+sub _extract_subgraph {
+	my ($name, $sub_kind, $brace_lit, $graph_kind, $inherited_node_defaults, $inherited_edge_defaults) = @_;
+
+	my @body = @{ $brace_lit->{daughters} || [] };
+
+	my %attrs;
+	my %local_node_defaults;
+	my %local_edge_defaults;
+	my %nodes;
+	my @edges;
+	my @subgraphs;
+
+	my %effective_node_defaults = (%$inherited_node_defaults);
+	my %effective_edge_defaults = (%$inherited_edge_defaults);
+
+	for (my $i = 0; $i < @body; $i++) {
+		my $n  = $body[$i];
+		my $nm = $n->{name} // '';
+		my $t  = $n->{attributes}{type} // '';
+
+		# Subgraph attributes (including rank).
+		if ($nm eq 'attribute') {
+			my $key = $t || $n->{attributes}{name};
+			my $val = $n->{attributes}{value};
+			$attrs{$key} = $val;
+			next;
+		}
+
+		# Class defaults inside subgraph.
+		if ($nm eq 'class' && ($n->{attributes}{type} // '') eq 'class') {
+			my $class_name = $n->{attributes}{value};
+			my %def;
+			for my $c (@{ $n->{daughters} || [] }) {
+				next unless ($c->{name} // '') eq 'attribute';
+				my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+				my $val = $c->{attributes}{value};
+				$def{$ct} = $val;
+			}
+			if ($class_name eq 'node') {
+				%local_node_defaults = (%local_node_defaults, %def);
+				%effective_node_defaults = (%$inherited_node_defaults, %local_node_defaults);
+			}
+			elsif ($class_name eq 'edge') {
+				%local_edge_defaults = (%local_edge_defaults, %def);
+				%effective_edge_defaults = (%$inherited_edge_defaults, %local_edge_defaults);
+			}
+			elsif ($class_name eq 'graph') {
+				%attrs = (%attrs, %def);
+			}
+			next;
+		}
+
+		# Nested named subgraph.
+		if ($nm eq 'literal' && $t eq 'subgraph_literal') {
+			my $id_node2       = $body[$i + 1];
+			my $sub_name       = $id_node2->{attributes}{value};
+			my $sub_brace_lit  = $body[$i + 2];
+			my $nested_kind    = ($sub_name =~ /^cluster_/) ? 'cluster' : 'subgraph';
+
+			my $sub = _extract_subgraph(
+				$sub_name,
+				$nested_kind,
+				$sub_brace_lit,
+				$graph_kind,
+				\%effective_node_defaults,
+				\%effective_edge_defaults,
+			);
+			push @subgraphs, $sub;
+			next;
+		}
+
+		# Nested anonymous subgraph.
+		if ($nm eq 'literal' && $t eq 'brace_literal') {
+			my $sub_name = '_anon_' . (++$ANON_SUBGRAPH_COUNTER);
+			my $nested_kind = 'subgraph';
+
+			my $sub = _extract_subgraph(
+				$sub_name,
+				$nested_kind,
+				$n,
+				$graph_kind,
+				\%effective_node_defaults,
+				\%effective_edge_defaults,
+			);
+			push @subgraphs, $sub;
+			next;
+		}
+
+		# Edge chains and grouped RHS inside subgraph.
+		if ($nm eq 'node_id' && $t eq 'node_id') {
+			if ($i + 1 < @body && ($body[$i + 1]{name} // '') eq 'edge_id') {
+				my $consumed = _extract_edge_chain(
+					\@body,
+					$i,
+					$graph_kind,
+					\%nodes,
+					\@edges,
+					\%effective_node_defaults,
+					\%effective_edge_defaults,
+				);
+				$i = $consumed;
+				next;
+			}
+
+			# Standalone node declaration.
+			my $node_name = $n->{attributes}{name};
+			my %node_attr = _collect_attributes_from_node($n);
+
+			my $merged_attr = _merge_attrs(\%effective_node_defaults, \%node_attr);
+
+			if (exists $nodes{$node_name}) {
+				$nodes{$node_name}{attrs} = _merge_attrs($nodes{$node_name}{attrs}, $merged_attr);
+			}
+			else {
+				$nodes{$node_name} = { attrs => $merged_attr };
+			}
+
+			next;
+		}
+	}
+
+	my $adjacency = _build_adjacency(\@edges, $graph_kind);
+
+	my $subgraph = {
+		name          => $name,
+		kind          => $sub_kind,
+		attrs         => \%attrs,
+		node_defaults => \%effective_node_defaults,
+		edge_defaults => \%effective_edge_defaults,
+		nodes         => \%nodes,
+		edges         => \@edges,
+		subgraphs     => \@subgraphs,
+		adjacency     => $adjacency,
+	};
+
+	return $subgraph;
+}
+
+sub _extract_edge_chain {
+	my ($body, $start_idx, $kind, $nodes, $edges, $node_defaults, $edge_defaults) = @_;
+
+	my $i = $start_idx;
+
+	my $left_node = $body->[$i];
+	my $left_name = $left_node->{attributes}{name};
+	my ($left_port, $left_compass) = _parse_port(
+		$left_node->{attributes}{port},
+		$left_node->{attributes}{value},
+	);
+
+	# Ensure left node exists.
+	$nodes->{$left_name} ||= { attrs => _merge_attrs($node_defaults, {}) };
+
+	$i++; # move to first edge_id
+
+	while ($i < @$body && ($body->[$i]{name} // '') eq 'edge_id') {
+		my $edge_id = $body->[$i];
+
+		# Collect attributes attached to edge_id itself.
+		my %edge_attr = _collect_attributes_from_node($edge_id);
+
+		$i++; # move to right side
+
+		last if $i >= @$body;
+
+		my $right = $body->[$i];
+		my $rname = $right->{name} // '';
+
+		if ($rname eq 'node_id') {
+			my $right_name = $right->{attributes}{name};
+			my ($right_port, $right_compass) = _parse_port(
+				$right->{attributes}{port},
+				$right->{attributes}{value},
+			);
+
+			# Merge attributes from right node's attached attribute lists.
+			my %right_edge_attr = _collect_attributes_from_node($right);
+			%edge_attr = (%edge_attr, %right_edge_attr);
+
+			my $merged_attr = _merge_attrs($edge_defaults, \%edge_attr);
+
+			my $edge = {
+				from         => $left_name,
+				from_port    => $left_port,
+				from_compass => $left_compass,
+				to           => $right_name,
+				to_port      => $right_port,
+				to_compass   => $right_compass,
+				attrs        => $merged_attr,
+			};
+
+			push @$edges, $edge;
+
+			# Ensure nodes exist.
+			$nodes->{$right_name} ||= { attrs => _merge_attrs($node_defaults, {}) };
+
+			# Chain: next segment starts from this right node.
+			$left_name    = $right_name;
+			$left_port    = $right_port;
+			$left_compass = $right_compass;
+
+			$i++;
+			next;
+		}
+		elsif ($rname eq 'literal' && ($right->{attributes}{type} // '') eq 'brace_literal') {
+			# Grouped RHS: A -> { B C D }
+			for my $child (@{ $right->{daughters} || [] }) {
+				next unless ($child->{name} // '') eq 'node_id';
+				my $right_name = $child->{attributes}{name};
+				my ($right_port, $right_compass) = _parse_port(
+					$child->{attributes}{port},
+					$child->{attributes}{value},
+				);
+
+				my %right_edge_attr = _collect_attributes_from_node($child);
+				my %ea = (%edge_attr, %right_edge_attr);
+				my $merged_attr = _merge_attrs($edge_defaults, \%ea);
+
+				my $edge = {
+					from         => $left_name,
+					from_port    => $left_port,
+					from_compass => $left_compass,
+					to           => $right_name,
+					to_port      => $right_port,
+					to_compass   => $right_compass,
+					attrs        => $merged_attr,
+				};
+
+				push @$edges, $edge;
+
+				$nodes->{$right_name} ||= { attrs => _merge_attrs($node_defaults, {}) };
+			}
+
+			$i++;
+			next;
+		}
+		else {
+			last;
+		}
+	}
+
+	return $i - 1;
+}
+
+sub _collect_attributes_from_node {
+	my ($node) = @_;
+
+	my %attr;
+
+	for my $c (@{ $node->{daughters} || [] }) {
+		next unless ($c->{name} // '') eq 'attribute';
+		my $ct  = $c->{attributes}{type} || $c->{attributes}{name};
+		my $val = $c->{attributes}{value};
+		$attr{$ct} = $val;
+	}
+
+	return %attr;
+}
+
+sub _parse_port {
+	my ($port_field, $value_field) = @_;
+
+	my $raw = $port_field;
+
+	if (!defined $raw || $raw eq '') {
+		if (defined $value_field && $value_field =~ /:(.+)$/) {
+			$raw = $1;
+		}
+	}
+
+	return ('', '') unless defined $raw && $raw ne '';
+
+	# Handle compass-only (:n, :s, etc.)
+	if ($raw =~ /^(n|s|e|w|ne|nw|se|sw)$/) {
+		return ('', $raw);
+	}
+
+	my ($port, $compass) = split /:/, $raw, 2;
+	$compass //= '';
+
+	return ($port, $compass);
+}
+
+sub _merge_attrs {
+	my ($defaults, $specific) = @_;
+
+	my %merged = (%{ $defaults || {} }, %{ $specific || {} });
+	return \%merged;
+}
+
+sub _build_adjacency {
+	my ($edges, $kind) = @_;
+
+	my %adj;
+
+	for my $e (@{ $edges || [] }) {
+		my $from = $e->{from};
+		my $to   = $e->{to};
+
+		push @{ $adj{$from} ||= [] }, $to;
+
+		if ($kind && $kind eq 'graph') {
+			push @{ $adj{$to} ||= [] }, $from;
+		}
+	}
+
+	return \%adj;
+}
+
+1;

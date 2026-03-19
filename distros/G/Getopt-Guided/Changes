@@ -1,5 +1,14 @@
 Release history for Getopt-Guided
 
+v3.1.2    2026-03-15T08:36:58Z
+          - Fix readopts() return value
+          - Increase readopts() test coverage
+
+v3.1.1    2026-03-14T09:59:48Z
+          - Avoid postfix controls in example scripts
+          - Remove pre-release logic from Makefile.PL
+          - Improve documentation
+
 v3.1.0    2026-03-03T07:05:56Z
           - Introduce new readopts() function
           - Introduce new program_name() function

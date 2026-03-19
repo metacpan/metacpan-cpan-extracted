@@ -24,9 +24,9 @@ plan tests => 8;
     is( $mb->read(128), $utf8b, "unicode write/read ok" );
     
     eval { $mb->readAll(16) };
-    is( ref $@, "TTransportException", "readAll(16) threw a TTransportException ok" );
-    is( $@->{code}, 0, "TTransportException code is 0 ok" );
-    is( $@->{message}, "Attempt to readAll(16) found only 0 available", "TTransportException message ok" );
+    is( ref $@, "Thrift::TTransportException", "readAll(16) threw a Thrift::TTransportException ok" );
+    is( $@->{code}, 0, "Thrift::TTransportException code is 0 ok" );
+    is( $@->{message}, "Attempt to readAll(16) found only 0 available", "Thrift::TTransportException message ok" );
     
     $mb->write( pack 'N', 12345 );
     is( unpack('N', $mb->readAll(4)), 12345, "write/readAll 32-bit int ok" );

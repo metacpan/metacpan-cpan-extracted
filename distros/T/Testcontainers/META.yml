@@ -1,0 +1,130 @@
+---
+abstract: 'Testcontainers for Perl - Docker containers for testing'
+author:
+  - 'Testcontainers Contributors'
+build_requires:
+  Path::Tiny: '0.100'
+  Test::Exception: '0.43'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Testcontainers
+provides:
+  Testcontainers:
+    file: lib/Testcontainers.pm
+    version: '0.001'
+  Testcontainers::Container:
+    file: lib/Testcontainers/Container.pm
+    version: '0.001'
+  Testcontainers::ContainerRequest:
+    file: lib/Testcontainers/ContainerRequest.pm
+    version: '0.001'
+  Testcontainers::DockerClient:
+    file: lib/Testcontainers/DockerClient.pm
+    version: '0.001'
+  Testcontainers::Labels:
+    file: lib/Testcontainers/Labels.pm
+    version: '0.001'
+  Testcontainers::Module::MySQL:
+    file: lib/Testcontainers/Module/MySQL.pm
+    version: '0.001'
+  Testcontainers::Module::MySQL::Container:
+    file: lib/Testcontainers/Module/MySQL.pm
+  Testcontainers::Module::Nginx:
+    file: lib/Testcontainers/Module/Nginx.pm
+    version: '0.001'
+  Testcontainers::Module::Nginx::Container:
+    file: lib/Testcontainers/Module/Nginx.pm
+  Testcontainers::Module::PostgreSQL:
+    file: lib/Testcontainers/Module/PostgreSQL.pm
+    version: '0.001'
+  Testcontainers::Module::PostgreSQL::Container:
+    file: lib/Testcontainers/Module/PostgreSQL.pm
+  Testcontainers::Module::Redis:
+    file: lib/Testcontainers/Module/Redis.pm
+    version: '0.001'
+  Testcontainers::Module::Redis::Container:
+    file: lib/Testcontainers/Module/Redis.pm
+  Testcontainers::Wait:
+    file: lib/Testcontainers/Wait.pm
+    version: '0.001'
+  Testcontainers::Wait::Base:
+    file: lib/Testcontainers/Wait/Base.pm
+    version: '0.001'
+  Testcontainers::Wait::HTTP:
+    file: lib/Testcontainers/Wait/HTTP.pm
+    version: '0.001'
+  Testcontainers::Wait::HealthCheck:
+    file: lib/Testcontainers/Wait/HealthCheck.pm
+    version: '0.001'
+  Testcontainers::Wait::HostPort:
+    file: lib/Testcontainers/Wait/HostPort.pm
+    version: '0.001'
+  Testcontainers::Wait::Log:
+    file: lib/Testcontainers/Wait/Log.pm
+    version: '0.001'
+  Testcontainers::Wait::Multi:
+    file: lib/Testcontainers/Wait/Multi.pm
+    version: '0.001'
+  WWW::Docker:
+    file: lib/WWW/Docker.pm
+    version: '0.101'
+  WWW::Docker::API::Containers:
+    file: lib/WWW/Docker/API/Containers.pm
+    version: '0.101'
+  WWW::Docker::API::Exec:
+    file: lib/WWW/Docker/API/Exec.pm
+    version: '0.101'
+  WWW::Docker::API::Images:
+    file: lib/WWW/Docker/API/Images.pm
+    version: '0.101'
+  WWW::Docker::API::Networks:
+    file: lib/WWW/Docker/API/Networks.pm
+    version: '0.101'
+  WWW::Docker::API::System:
+    file: lib/WWW/Docker/API/System.pm
+    version: '0.101'
+  WWW::Docker::API::Volumes:
+    file: lib/WWW/Docker/API/Volumes.pm
+    version: '0.101'
+  WWW::Docker::Container:
+    file: lib/WWW/Docker/Container.pm
+    version: '0.101'
+  WWW::Docker::Image:
+    file: lib/WWW/Docker/Image.pm
+    version: '0.101'
+  WWW::Docker::Network:
+    file: lib/WWW/Docker/Network.pm
+    version: '0.101'
+  WWW::Docker::Role::HTTP:
+    file: lib/WWW/Docker/Role/HTTP.pm
+    version: '0.101'
+  WWW::Docker::Volume:
+    file: lib/WWW/Docker/Volume.pm
+    version: '0.101'
+recommends:
+  HTTP::Tiny: '0.076'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::Socket::INET: '0'
+  IO::Socket::UNIX: '0'
+  JSON::MaybeXS: '1.004'
+  Log::Any: '1.710'
+  Moo: '2.005'
+  Time::HiRes: '0'
+  URI: '0'
+  namespace::clean: '0.27'
+  perl: '5.040'
+resources:
+  bugtracker: https://github.com/testcontainers/testcontainers-perl5/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/testcontainers/testcontainers-perl5.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -522,11 +522,11 @@ use Data::HashMap::I16A;
 
 # incr on TTL map refreshes expiry to default_ttl
 {
-    my $m = Data::HashMap::II->new(0, 5);
+    my $m = Data::HashMap::II->new(0, 8);
     hm_ii_put $m, 1, 10;
     sleep 2;
-    hm_ii_incr $m, 1;  # refreshes TTL to default_ttl (5s from now)
-    sleep 3;
+    hm_ii_incr $m, 1;  # refreshes TTL to default_ttl (8s from now)
+    sleep 4;
     my $v = hm_ii_get $m, 1;
     is($v, 11, 'II incr refreshes TTL on default_ttl map');
 }

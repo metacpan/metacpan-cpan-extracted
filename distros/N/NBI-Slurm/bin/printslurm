@@ -5,6 +5,11 @@ use v5.12;
 use warnings;
 use Getopt::Long;
 use Term::ANSIColor;
+use FindBin qw($RealBin);
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib" if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib";
+}
 use NBI::Slurm;
 # Define command line options
 my $help = 0;
@@ -236,7 +241,7 @@ printslurm - Utility to print info from Slurm
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 

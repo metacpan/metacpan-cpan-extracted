@@ -101,25 +101,14 @@ SKIP: {
     };
 
     subtest 'non-blocking verification' => sub {
-        my @ticks;
-        my $timer = IO::Async::Timer::Periodic->new(
-            interval => 0.01,
-            on_tick => sub { push @ticks, 1 },
-        );
-        get_loop()->add($timer);
-        $timer->start;
+        my @futures = map { $redis->set("nb:autopipe:$_", $_) } (1..50);
+        my $start = Time::HiRes::time();
+        run { Future->needs_all(@futures) };
+        my $elapsed = Time::HiRes::time() - $start;
 
-        # Fire 500 commands
-        my @futures = map { $redis->set("ap:nb:$_", $_) } (1..500);
-        await_f(Future->needs_all(@futures));
+        ok($elapsed < 5, "50 concurrent ops completed in ${elapsed}s");
 
-        $timer->stop;
-        get_loop()->remove($timer);
-
-        pass("Event loop remained responsive during 500 concurrent commands");
-
-        # Cleanup
-        run { $redis->del(map { "ap:nb:$_" } 1..500) };
+        run { $redis->del(map { "nb:autopipe:$_" } 1..50) };
     };
 
     subtest 'errors propagate to correct futures' => sub {

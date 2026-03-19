@@ -579,7 +579,7 @@ sub _ClassAccessibleFromSchema {
     my $self = shift;
 
     my $accessible = {};
-    foreach my $key ($self->_PrimaryKeys) {
+    foreach my $key (@{$self->_PrimaryKeys}) {
         $accessible->{$key} = { 'read' => 1 };
     };
 
@@ -710,7 +710,6 @@ sub __Value {
     $field = $self->_Accessible($field, "column") || $field;
 
     return $self->{'values'}{$field} if $self->{'fetched'}{$field};
-    $self->{'fetched'}{$field} = 1;
 
     my %pk = $self->PrimaryKeys;
     return undef if grep !defined, values %pk;
@@ -718,6 +717,8 @@ sub __Value {
     my $query = "SELECT $field FROM ". $self->QuotedTableName
         ." WHERE ". join " AND ", map "$_ = ?", sort keys %pk;
     my $sth = $self->_Handle->SimpleQuery( $query, sorted_values(%pk) ) or return undef;
+
+    $self->{'fetched'}{$field} = 1;
     return $self->{'values'}{$field} = ($sth->fetchrow_array)[0];
 }
 
@@ -1104,6 +1105,21 @@ sub LoadByCol  {
 
 
 
+=head2 SelectAllColumns 1|0
+
+When set to true, disables C<lazy_load> column filtering and always selects
+all columns from the database for this record.
+
+=cut
+
+sub SelectAllColumns {
+    my $self = shift;
+    if (@_) {
+        $self->{'_select_all_columns'} = shift;
+    }
+    return $self->{'_select_all_columns'};
+}
+
 =head2 LoadByCols
 
 Takes a hash of columns and values. Loads the first record that matches all
@@ -1151,7 +1167,22 @@ sub LoadByCols  {
         }
     }
 
-    my $QueryString = "SELECT  * FROM ".$self->QuotedTableName." WHERE ".
+    my $select;
+    if ( $self->{'_select_all_columns'} ) {
+        $select = '*';
+    }
+    else {
+        my $ca = $self->_ClassAccessible;
+        my @cols = sort grep { !$ca->{$_}{'foreign-collection'} && !$ca->{$_}{'record-read'} && !$ca->{$_}{'lazy_load'} } keys %$ca;
+        if (@cols) {
+            # Always include primary key columns so lazy-fetch can work later
+            my %in_cols = map { $_ => 1 } @cols;
+            push @cols, grep { !$in_cols{$_} } @{ $self->_PrimaryKeys };
+        }
+        $select = @cols ? join(', ', @cols) : '*';
+    }
+
+    my $QueryString = "SELECT $select FROM ".$self->QuotedTableName." WHERE ".
     join(' AND ', @phrases) ;
     return ($self->_LoadFromSQL($QueryString, @bind));
 }

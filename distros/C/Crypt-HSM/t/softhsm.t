@@ -21,7 +21,7 @@ my @slots = $provider->slots;
 
 for my $slot ( @slots ) {
 	note 'slotID: ', $slot->id;
-	my $slotInfo = $provider->info;
+	my $slotInfo = $slot->info;
 	note explain $slotInfo;
 
 	my $tokenInfo = $slot->token_info;
@@ -32,88 +32,78 @@ my $session = $slots[0]->open_session('rw-session' => 0);
 
 undef $provider;
 
+$session->login('user', $pin) if length $pin;
+
 my $sessionInfo = $session->info;
 note explain $sessionInfo;
 
-$session->login('user', $pin) if length $pin;
-
 my %public_key_template = (
-	class => 'public-key',
-	'key-type' => 'rsa',
 	token => 0,
 	encrypt => 1,
 	verify => 1,
-	wrap => 1,
-	'modulus-bits' => 2096,
-	'public-exponent' => 65537,
+	modulus_bits => 2048,
+	public_exponent => 65537,
 	label => 'test public key',
-	id => "\1\2\3",
+	id => 'abc',
 );
 
 my %private_key_template = (
-	class => 'private-key',
-	'key-type' => 'rsa',
 	token => 0,
 	sensitive => 1,
 	decrypt => 1,
 	sign => 1,
-	unwrap => 1,
 	label => 'test private key',
-	id => "\1\2\3",
+	id => 'abc',
 );
 
 my ($public_key, $private_key) = $session->generate_keypair('rsa-pkcs-key-pair-gen', \%public_key_template, \%private_key_template);
 
-note $public_key;
-note $private_key;
+note $public_key->id;
+note $private_key->id;
 
 my $plain_text = 'plain text';
 {
-my $encrypted_text = $session->encrypt('rsa-pkcs', $public_key, $plain_text);
-note unpack('H*', $encrypted_text);
+my $encrypted_text = $session->encrypt('rsa_pkcs', $public_key, $plain_text);
 
 my $decrypted_text = $session->decrypt('rsa-pkcs', $private_key, $encrypted_text);
 
-is $decrypted_text, $plain_text, 'decrypt: "plain text"';
+is $decrypted_text, $plain_text, 'rsa-pkcs decrypted';
 }
 
 {
-my $encrypted_text = $session->encrypt('rsa-pkcs-oaep', $public_key, $plain_text, 'sha1');
-note unpack('H*', $encrypted_text);
+my $encrypted_text = $session->encrypt('rsa_pkcs_oaep', $public_key, $plain_text, 'sha1');
 
 my $decrypted_text = $session->decrypt('rsa-pkcs-oaep', $private_key, $encrypted_text, 'sha1');
 
-is $decrypted_text, $plain_text, 'decrypt: "plain text"';
+is $decrypted_text, $plain_text, 'rsa-oaep decrypted';
 }
 
 {
 my $signature = $session->sign('sha256-rsa-pkcs', $private_key, $plain_text);
-note unpack('H*', $signature);
 
-ok $session->verify('sha256-rsa-pkcs', $public_key, $plain_text, $signature);
+ok $session->verify('sha256-rsa-pkcs', $public_key, $plain_text, $signature), 'rsa-pkcs verified';
 }
 
 {
 my $signature = $session->sign('sha256-rsa-pkcs-pss', $private_key, $plain_text);
-note unpack('H*', $signature);
 
-ok $session->verify('sha256-rsa-pkcs-pss', $public_key, $plain_text, $signature);
+ok $session->verify('sha256-rsa-pkcs-pss', $public_key, $plain_text, $signature), 'rsa-pss verified';
 }
 
-my $attributes = $public_key->get_attributes([ 'modulus', 'public-exponent' ]);
+my $attributes = $public_key->get_attributes([ 'modulus', 'public_exponent' ]);
 
-note 'modulus: ', unpack('H*', $attributes->{modulus});
-note 'exponent: ', unpack('H*', $attributes->{'public-exponent'});
+is length($attributes->{modulus}->to_bytes), 256, 'modulus is 2024 bits';
+is $attributes->{public_exponent}, 65537, 'public exponent is 65537';
 
 my $modulus = $public_key->get_attribute('modulus');
-is($modulus, $attributes->{modulus});
+is($modulus, $attributes->{modulus}, 'modulus is modulus');
 
 $public_key->destroy_object;
 $private_key->destroy_object;
 
 my $aes_key = $session->generate_key('aes-key-gen', { 'value-len' => 32, token => 0 });
 
-ok $aes_key;
+ok $aes_key, 'aes key successfully generated';
 
 my $iv = "\0" x 16;
 my $encoder = $session->open_encrypt('aes-cbc-pad', $aes_key, $iv);

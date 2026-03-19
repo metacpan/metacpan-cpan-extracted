@@ -1,5 +1,24 @@
 Revision history for Perl module Mail::Make
 
+v0.22.0 2026-03-18T09:12:20+0900
+    - Mail::Make::build(): added 'attach' parameter supporting a single
+      file path, an arrayref of file paths, an arrayref of hash references,
+      or a mix of both; each element is forwarded to attach()
+
+v0.21.3 2026-03-18T07:32:47+0900
+    - Mail::Make::Entity::build(): added 'attach' shorthand key; a plain
+      scalar or stringifiable object that resolves to an existing file is
+      automatically promoted to path => $f; filename is derived from the
+      basename of the path, and the MIME type is auto-detected via
+      Module::Generic::File::Magic when 'path' or 'attach' is provided
+      and 'type' is not explicitly specified
+
+0.21.2 2026-03-17T07:13:10+0900
+    - attach() and attach_inline(): added positional shorthand support;
+      a leading plain scalar or stringifiable object that resolves to an
+      existing file is now automatically promoted to path => $f, with
+      type and filename detected from the file itself
+
 v0.21.1 2026-03-12T23:55:40+0900
     - Improved documentation
     - Correction in Mail::Make::Body::InCore open method
@@ -51,4 +70,3 @@ v0.21.0 2026-03-07T03:04:20+0900
     - Signature verified correct by Thunderbird (SHA-256 and SHA-512),
       Enigmail, and gpg --verify against all four structural variants:
       sign-only, sign SHA-512, encrypt-only, sign+encrypt
-

@@ -1,4 +1,4 @@
-package EAI::File 1.920;
+package EAI::File 1.921;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use Text::CSV(); use Data::XLSX::Parser(); use Spreadsheet::ParseExcel(); use Spreadsheet::WriteExcel(); use Excel::Writer::XLSX(); use XML::LibXML(); use XML::LibXML::Debugging();
@@ -17,6 +17,7 @@ sub getcommon ($) {
 	my $skip = $File->{format_skip} if $File->{format_skip};
 	my $sep = $File->{format_sep} if $File->{format_sep};
 	$sep = $File->{format_defaultsep} if !$sep; # use default if not given
+	$sep = "" if !$sep; # use empty if not given
 	# for fixed format and non existing separator, header and targetheader strings are parsed/split using tab as separator
 	my @header = split(($sep =~ /^fix/ || !$sep ? "\t" : $sep), $File->{format_header}) if $File->{format_header};
 	my @targetheader = split(($sep =~ /^fix/ || !$sep ? "\t" : $sep), $File->{format_targetheader}) if $File->{format_targetheader};
@@ -109,10 +110,14 @@ sub readText ($$$;$$) {
 				$logger->debug("skipping ".($skip =~ /^\d+$/ ? " $skip lines" : "until line contains $skip (inclusive)"));
 				# skip first $skip rows in file (e.g. report header) if $skip is an integer, if $skip is non-integer, skip until the text $skip appears (inclusive)
 				if ($skip =~ /^\d+$/) {
-					for (1 .. $skip) {$_ = <FILE>};
+					for (1 .. $skip) {
+						$_ = <FILE>;
+						$logger->trace("skipping: $_") if $logger->is_trace;
+					}
 					$lines-=$skip;
 				} else {
 					while (<FILE>) {
+						$logger->trace("skipping: $_") if $logger->is_trace;
 						$lines--;
 						last if /$skip/;
 					}
@@ -864,7 +869,7 @@ returns 0 on error, 1 if OK
 
 =head1 COPYRIGHT
 
-Copyright (c) 2025 Roland Kapl
+Copyright (c) 2026 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

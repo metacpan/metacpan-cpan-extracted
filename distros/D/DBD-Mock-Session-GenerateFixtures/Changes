@@ -14,3 +14,11 @@
     - prevent test to run if mysql is not installed
 0.10   2025-05-26
     - Move the call to _override_dbi_mocked_prepare inside the set_dbh method to ensure that the query is normalized.
+1.13   2026-04-14
+    - Fix missing changelog entry for previous release
+    - Fix Makefile.PL issue for https://rt.cpan.org/Public/Dist/Display.html?Name=DBD-Mock-Session-GenerateFixtures
+    - Add cursor management for mocked session
+    - Mock bind_params_inout
+    - Fix bug in capturing named params
+1.14   2026-04-14
+    - refactor _override_dbi_fecth

@@ -1,0 +1,452 @@
+#!/bin/env perl
+
+use Data::Dumper ;
+use Data::TreeDumper ;
+use GraphViz2::Marpa ;
+
+use strict ;
+use warnings ;
+
+# ------------------------------------------------------------------------------
+
+sub normalize_name
+{
+my ($name) = @_ ;
+
+return $name ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub collect_comments_under
+{
+my ($node) = @_ ;
+
+my @comments ;
+
+$node->walk_down(
+	{
+	callback => sub
+		{
+			my ($n) = @_ ;
+			my $a   = $n->attributes || {} ;
+			my $t   = $a->{type}     || '' ;
+			
+			return 1 unless $t =~ /^comment/ ;
+			
+			push @comments, $a->{value} if defined $a->{value} ;
+			
+			return 1 ;
+		}
+	}) ;
+
+return \@comments ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub collect_node_attributes
+{
+my ($node_id_node) = @_ ;
+
+my %attrs ;
+
+$node_id_node->walk_down(
+	{
+	callback => sub
+		{
+			my ($n) = @_ ;
+			my $a   = $n->attributes || {} ;
+			my $t   = $a->{type}     || '' ;
+
+			return 1 if $t eq 'node_id' ;
+
+			if ($t =~ /^(color|fontcolor|dir|label|shape|style|fillcolor|width|height|fontsize)$/)
+			{
+				$attrs{$t} = $a->{value} if defined $a->{value} ;
+			}
+
+			return 1 ;
+		}
+	}) ;
+
+return \%attrs ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub collect_edge_attributes
+{
+my ($edge_node) = @_ ;
+
+my %attrs ;
+
+$edge_node->walk_down(
+	{
+	callback => sub
+		{
+			my ($n) = @_ ;
+			my $a   = $n->attributes || {} ;
+			my $t   = $a->{type}     || '' ;
+			
+			if ($t =~ /^(color|fontcolor|label|style|dir|arrowhead|arrowtail|weight)$/)
+			{
+				$attrs{$t} = $a->{value} if defined $a->{value} ;
+			}
+			
+			return 1 ;
+		}
+	}
+) ;
+
+return \%attrs ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub parse_port_side
+{
+my ($node) = @_ ;
+
+my $a = $node->attributes || {} ;
+my $t = $a->{type}       || '' ;
+
+if ($t eq 'node_id')
+	{
+	return { node => normalize_name($a->{value}) } ;
+	}
+
+return { node => normalize_name($a->{value}) } ;
+}
+
+# ------------------------------------------------------------------------------
+
+sub extract_all_graphs_hierarchical
+{
+my ($root) = @_ ;
+
+my @top_graphs ;
+
+my $extract_graph ;
+
+$extract_graph = sub
+			{
+			my ($graph_node) = @_ ;
+			
+			my $ga   = $graph_node->attributes || {} ;
+			my $type = $ga->{type}             || '' ;
+			my $gname = $ga->{value} || $ga->{name} || 'anonymous' ;
+			
+			my ($block_root) = grep
+						{
+						    my $a = $_->attributes || {} ;
+						    ($a->{type} || '') eq 'open_brace' ;
+						}
+						$graph_node->daughters ;
+			
+			return undef unless $block_root ;
+			
+			my %graph_attrs ;
+			my %default_node_attrs ;
+			my %default_edge_attrs ;
+			
+			$block_root->walk_down(
+				{
+				callback => sub
+						{
+						my ($n) = @_ ;
+						my $a   = $n->attributes || {} ;
+						my $t   = $a->{type}     || '' ;
+						
+						if ($t eq 'graph_attr')
+							{
+							my $k = $a->{name} ;
+							my $v = $a->{value} ;
+							
+							$graph_attrs{$k} = $v if defined $k ;
+							}
+						elsif ($t eq 'node_default')
+							{
+							my $k = $a->{name} ;
+							my $v = $a->{value} ;
+							
+							$default_node_attrs{$k} = $v if defined $k ;
+							}
+						elsif ($t eq 'edge_default')
+							{
+							my $k = $a->{name} ;
+							my $v = $a->{value} ;
+							
+							$default_edge_attrs{$k} = $v if defined $k ;
+							}
+						
+						return 1 ;
+						}
+				}) ;
+			
+			my %seen_nodes ;
+			my @node_order ;
+			my %nodes ;
+			
+			$block_root->walk_down(
+				{
+				callback => sub
+					{
+					my ($n) = @_ ;
+					my $a   = $n->attributes || {} ;
+					my $t   = $a->{type}     || '' ;
+					
+					return 1 unless $t eq 'node_id' ;
+					
+					my $name = normalize_name($a->{value}) ;
+					
+					if (! $seen_nodes{$name})
+						{
+						$seen_nodes{$name} = 1 ;
+						push @node_order, $name ;
+						
+						$nodes{$name} =
+							{
+							name     => $name,
+							attrs    => {},
+							comments => collect_comments_under($n),
+							} ;
+						}
+						
+					my $local_attrs = collect_node_attributes($n) ;
+					
+					%{ $nodes{$name}{attrs} } =
+						(
+						%default_node_attrs,
+						%{ $nodes{$name}{attrs} },
+						%$local_attrs,
+						) ;
+					
+					return 1 ;
+					}
+				}) ;
+			
+			my %seen_edges ;
+			my @edges ;
+			
+			$block_root->walk_down(
+				{
+				callback => sub
+						{
+						my ($n) = @_ ;
+						my $a   = $n->attributes || {} ;
+						my $t   = $a->{type}     || '' ;
+						
+						return 1 unless $t eq 'directed_edge' || $t eq 'undirected_edge' ;
+						
+						my $parent   = $n->mother ;
+						my @siblings = $parent->daughters ;
+						
+						my $i ;
+						
+						for my $idx (0 .. $#siblings)
+							{
+							if ($siblings[$idx] == $n)
+								{
+								$i = $idx ;
+								last ;
+								}
+							}
+						
+						my $from_side ;
+						my $to_side ;
+						
+						for (my $j = $i - 1 ; $j >= 0 ; $j--)
+							{
+							my $aa = $siblings[$j]->attributes || {} ;
+							
+							if (($aa->{type} || '') eq 'node_id')
+								{
+								$from_side = parse_port_side($siblings[$j]) ;
+								last ;
+								}
+							}
+						
+						for (my $j = $i + 1 ; $j <= $#siblings ; $j++)
+							{
+							my $aa = $siblings[$j]->attributes || {} ;
+							
+							if (($aa->{type} || '') eq 'node_id')
+								{
+								$to_side = parse_port_side($siblings[$j]) ;
+								last ;
+								}
+							}
+						
+						return 1 unless $from_side && $to_side ;
+						
+						my $from = $from_side->{node} ;
+						my $to   = $to_side->{node} ;
+						
+						my $undirected = ($t eq 'undirected_edge') ? 1 : 0 ;
+						
+						my $key = join "\x1E", $from, $to, $undirected ;
+						
+						my $local_attrs = collect_edge_attributes($n) ;
+						
+						if (! exists $seen_edges{$key})
+							{
+							my $edge =
+								{
+								from       => $from_side,
+								to         => $to_side,
+								undirected => $undirected,
+								attrs      => { %default_edge_attrs, %$local_attrs },
+								comments   => collect_comments_under($n),
+								} ;
+							
+							$seen_edges{$key} = $edge ;
+							push @edges, $edge ;
+							}
+						else
+							{
+							my $edge = $seen_edges{$key} ;
+							
+							%{ $edge->{attrs} } =
+								(
+								%{ $edge->{attrs} },
+								%$local_attrs,
+								) ;
+							}
+						
+						return 1 ;
+						}
+				}) ;
+			
+			my @subgraphs ;
+			
+			for my $child ($block_root->daughters)
+				{
+				my $a = $child->attributes || {} ;
+				my $t = $a->{type}       || '' ;
+				
+				next unless $t eq 'subgraph_literal' || $t eq 'cluster_literal' ;
+				
+				my $sg = $extract_graph->($child) ;
+				
+				push @subgraphs, $sg if $sg ;
+				}
+			
+			my %edge_count_by_pair ;
+			my $self_loops = 0 ;
+			
+			for my $e (@edges)
+				{
+				my $from = $e->{from}{node} ;
+				my $to   = $e->{to}{node} ;
+				
+				my $pair_key = join "\x1E", $from, $to, $e->{undirected} || 0 ;
+				
+				$edge_count_by_pair{$pair_key}++ ;
+				
+				$self_loops++ if $from eq $to ;
+				}
+			
+			my %ordered_nodes = map { $_ => $nodes{$_} } @node_order ;
+			
+			my @isolated = grep
+				{
+				my $name = $_ ;
+				
+				my $has_edge = 0 ;
+				
+				for my $e (@edges)
+					{
+					my $from = $e->{from}{node} ;
+					my $to   = $e->{to}{node} ;
+					
+					if ($from eq $name || $to eq $name)
+						{
+						$has_edge = 1 ;
+						last ;
+						}
+					}
+				
+				! $has_edge ;
+				}
+				keys %ordered_nodes ;
+			
+			my $multi_edges = scalar grep { $edge_count_by_pair{$_} > 1 } keys %edge_count_by_pair ;
+			
+			my $stats =
+				{
+				node_count     => scalar keys %ordered_nodes,
+				edge_count     => scalar @edges,
+				isolated_nodes => \@isolated,
+				self_loops     => $self_loops,
+				multi_edges    => $multi_edges,
+				} ;
+			
+			return
+				{
+				name               => $gname,
+				kind               => $type,
+				graph_attrs        => \%graph_attrs,
+				default_node_attrs => \%default_node_attrs,
+				default_edge_attrs => \%default_edge_attrs,
+				nodes              => \%ordered_nodes,
+				edges              => \@edges,
+				subgraphs          => \@subgraphs,
+				stats              => $stats,
+				comments           => collect_comments_under($graph_node),
+				errors             => [],
+				} ;
+			} ;
+
+$root->walk_down(
+	{
+	callback => sub
+		{
+		my ($n) = @_ ;
+		my $a   = $n->attributes || {} ;
+		my $t   = $a->{type}     || '' ;
+		
+		return 1 unless $t eq 'graph_literal' || $t eq 'digraph_literal' ;
+		
+		my $g = $extract_graph->($n) ;
+		
+		push @top_graphs, $g if $g ;
+		
+		return 1 ;
+		}
+	}) ;
+
+return
+	{
+	graphs => \@top_graphs,
+	} ;
+}
+
+# ------------------------------------------------------------------------------
+
+# To restore real tabs:
+# perl -pe 's/\	/	/g' < input.pl > output.pl
+
+my $file = shift || 'input.dot';
+
+
+open (my $fh, '<', $file) or die "error reading file: $!" ;
+print while<$fh> ;
+print "\n" ;
+
+my $g2m = GraphViz2::Marpa->new( input_file => $file);
+$g2m->run;
+
+my $root = $g2m->tree;   # Tree::DAG_Node
+
+# print DumpTree $root ;
+
+# exit ;
+
+# 6. Example usage (assuming you already have $root as Tree::DAG_Node from GraphViz2::Marpa)
+my $all = extract_all_graphs_hierarchical($root) ;
+
+# print Dumper($all);
+
+print DumpTree $all ;
+

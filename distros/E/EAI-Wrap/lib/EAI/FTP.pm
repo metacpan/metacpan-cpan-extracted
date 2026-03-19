@@ -1,9 +1,9 @@
-package EAI::FTP 1.920;
+package EAI::FTP 1.921;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Net::SFTP::Foreign (); use Net::SFTP::Foreign::Constants qw( SFTP_ERR_LOCAL_UTIME_FAILED ); use Net::FTP (); use Text::Glob qw(match_glob);
 use Carp qw(confess longmess); use Log::Log4perl qw(get_logger); use File::Temp qw(tempfile); use Data::Dumper qw(Dumper); use Scalar::Util 'blessed'; use Fcntl ':mode'; # for S_ISREG check in removeFilesOlderX
-use EAI::DateUtil qw(get_curdatetime get_curdate addDatePart parseFromYYYYMMDD);
+use EAI::DateUtil qw(get_curdatetime get_curdate addDatePart parseFromYYYYMMDD convertEpochToYYYYMMDD);
 # for passwords that contain <#|>% we have to use shell quoting on windows (special "use" to make this optional on non-win environments)
 BEGIN {
 	if ($^O =~ /MSWin/) {require Win32::ShellQuote; Win32::ShellQuote->import();}
@@ -222,6 +222,7 @@ sub fetchFiles ($$) {
 			} else {
 				$logger->info("fetching file $remoteFile");
 				my $mod_time = _mtime($remoteFile);
+				$FTP->{dateOfFetchedFile} = convertEpochToYYYYMMDD($mod_time);
 				$logger->debug("get file $remoteFile");
 				@{$param->{retrievedFiles}} = ($param->{fileToRetrieve});
 				_get($remoteFile, $localFile, $queue_size, $FTP->{additionalParamsGet}) or do { 
@@ -750,7 +751,7 @@ returns the net-sftp-foreign/ftp handler and the RemoteHost string to allow dire
 
 =head1 COPYRIGHT
 
-Copyright (c) 2025 Roland Kapl
+Copyright (c) 2026 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

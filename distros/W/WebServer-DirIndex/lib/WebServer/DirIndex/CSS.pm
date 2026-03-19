@@ -1,10 +1,12 @@
+package WebServer::DirIndex::CSS; # For cpanm :-(
+
 use strict;
 use warnings;
 use Feature::Compat::Class;
 
-class WebServer::DirIndex::CSS {
+our $VERSION = '0.1.4';
 
-  our $VERSION = '0.1.3';
+class WebServer::DirIndex::CSS {
 
   field $pretty :param = 0;
 

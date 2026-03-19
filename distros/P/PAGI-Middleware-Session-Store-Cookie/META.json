@@ -1,0 +1,69 @@
+{
+   "abstract" : "Encrypted cookie-based session store for PAGI",
+   "author" : [
+      "John Napiorkowski <jjnapiork@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PAGI-Middleware-Session-Store-Cookie",
+   "no_index" : {
+      "directory" : [
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "6.030",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CryptX" : "0.080",
+            "Future" : "0.50",
+            "JSON::MaybeXS" : "1.004003",
+            "PAGI" : "0.001020",
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Future::AsyncAwait" : "0.66",
+            "Test2::V0" : "0.000159"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jjn1056/PAGI-Middleware-Session-Store-Cookie/issues"
+      },
+      "homepage" : "https://github.com/jjn1056/PAGI-Middleware-Session-Store-Cookie",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jjn1056/PAGI-Middleware-Session-Store-Cookie",
+         "web" : "https://github.com/jjn1056/PAGI-Middleware-Session-Store-Cookie"
+      }
+   },
+   "version" : "0.001003",
+   "x_generated_by_perl" : "v5.40.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

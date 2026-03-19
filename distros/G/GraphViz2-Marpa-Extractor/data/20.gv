@@ -1,0 +1,4 @@
+digraph graph_20
+{
+	node_20_1 -> node_20_2 -> node_20_3 [penwidth = 3]
+}

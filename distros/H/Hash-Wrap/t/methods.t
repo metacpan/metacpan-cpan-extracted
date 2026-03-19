@@ -50,17 +50,17 @@ subtest 'method' => sub {
     ) or note $@;
 
     my $obj;
-    ok( lives { $obj = wh0( { a => 'a' } ) }, "make instance" );
+    ok( lives { $obj = wh0( { a => 'a' } ) }, 'make instance' );
 
     subtest 'override initial attribute' => sub {
-        ok( !!$obj->can( 'a' ), "has method" );
-        is( $obj->a, '!a', "correct return from method" );
+        ok( !!$obj->can( 'a' ), 'has method' );
+        is( $obj->a, '!a', 'correct return from method' );
     };
 
     subtest 'override added attribute' => sub {
         $obj->{b} = 'b';
-        ok( !!$obj->can( 'b' ), "has method" );
-        is( $obj->b, '!b', "correct return from method" );
+        ok( !!$obj->can( 'b' ), 'has method' );
+        is( $obj->b, '!b', 'correct return from method' );
     };
 
 };

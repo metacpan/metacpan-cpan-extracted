@@ -1,0 +1,30 @@
+Revision history for Langertha-Skeid
+
+0.001     2026-03-15 01:22:05Z
+
+    - Make usage storage layer pluggable: `record_usage` delegates to
+      `_store_usage_event` and `usage_report` delegates to `_query_usage_report`
+    - Add `store_usage_event` and `query_usage_report` constructor parameters
+      for callback-based usage backend override (no subclassing required)
+    - Add `jsonlog` usage backend: one JSON file per event in a directory
+      (recommended, no DBI needed) or JSON-lines append to a single file
+    - Make DBI and DBD::SQLite optional (moved to `recommends` in cpanfile);
+      usage tracking is gracefully disabled when no backend is configured
+    - Initial release extracted from Knarr as `Langertha::Skeid`
+    - Add Skeid control-plane + proxy with OpenAI, Anthropic, and Ollama routes
+    - Add weighted node routing with health checks, inflight/max_conns admission,
+      and configurable wait timeout/poll behavior (`429` after timeout)
+    - Add metrics/cost helpers via Knarr Input/Output/Metrics APIs
+    - Add usage store support for SQLite/PostgreSQL, automatic schema setup from
+      `share/sql`, and usage APIs (`usage.record`, `usage.report`)
+    - Add `skeid usage` CLI subcommand for usage/cost reporting
+    - Add admin routes with bearer-token protection (`/skeid/*`), hidden when
+      no admin key is configured
+    - Add engine ID mapping based on Langertha engine registry
+      (`Langertha->available_engine_ids`) and reject legacy aliases
+    - Make proxy request handling non-blocking with Mojolicious async upstream calls
+    - Add Avatar smoke benchmark examples:
+      `examples/avatar-skeid-single.yaml`, `examples/avatar-skeid-2nodes.yaml`,
+      and `examples/skeid-parallel-smoke.pl`
+    - Add one-box flush helper `examples/skeid-onebox-flush.sh` to prepare temp
+      config, start Skeid, run smoke, and cleanup in one command

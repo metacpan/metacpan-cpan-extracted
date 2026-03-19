@@ -10,7 +10,22 @@ use Getopt::Long;
 use Pod::Usage;
 use Config::Tiny;
 
-our $VERSION = '0.11.0';
+our $VERSION = '0.11.1';
+
+=head1 NAME
+
+App::HTTPThis - A simple local web server.
+
+=head1 SYNOPSIS
+
+    # Not to be used directly, see http_this command
+
+=head1 DESCRIPTION
+
+This class implements all the logic of the L<http_this> command.
+
+Actually, this is just a very thin wrapper around
+L<Plack::App::DirectoryIndex>, that is where the magic really is.
 
 =head1 METHODS
 
@@ -129,17 +144,6 @@ sub _server_ready {
 
 1;
 
-=head1 SYNOPSIS
-
-    # Not to be used directly, see http_this command
-
-
-=head1 DESCRIPTION
-
-This class implements all the logic of the L<http_this> command.
-
-Actually, this is just a very thin wrapper around
-L<Plack::App::DirectoryIndex>, that is where the magic really is.
 
 
 =head1 SEE ALSO

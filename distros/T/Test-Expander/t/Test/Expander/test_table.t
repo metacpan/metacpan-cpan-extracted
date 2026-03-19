@@ -4,7 +4,7 @@ use warnings
   NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
 use Test::Expander;
-use Test::Expander::Constants qw( $MSG_NO_TABLE_HEADER );
+use Test::Expander::Constants qw( $FALSE $MSG_NO_TABLE_HEADER $TRUE );
 
 plan( 2 );
 
@@ -16,19 +16,19 @@ subtest success => sub {
   plan( 4 );
 
   $expected = {
-    "'param2' omitted"             => { expected => 0, param1 => 'abc', param2 => undef },
-    'both parameters set to true'  => { expected => 1, param1 => 1,     param2 => 1  },
-    'both parameters set to false' => { expected => 0, param1 => 0,     param2 => 0  },
+    "'param2' omitted"             => { expected => $FALSE, param1 => 'abc',  param2 => undef },
+    'both parameters set to true'  => { expected => $TRUE,  param1 => $TRUE,  param2 => $TRUE },
+    'both parameters set to false' => { expected => $FALSE, param1 => $FALSE, param2 => $FALSE },
   };
   $table = [
-    '+---------------------------------------------------------+',
-    '|                              |          | param | param |',
-    '|                              | expected |   1   |   2   |',
-    '|------------------------------+----------+-------+-------|',
-    "| 'param2' omitted             |     0    | 'abc' |       |",
-    '| both parameters set to true  |     1    |   1   |   1   |',
-    '| both parameters set to false |     0    |   0   |   0   |',
-    '+---------------------------------------------------------+',
+    '+-----------------------------------------------------------+',
+    '|                              |          | param  | param  |',
+    '|                              | expected |   1    |   2    |',
+    '|------------------------------+----------+--------+--------|',
+   q(| 'param2' omitted             |  $FALSE  | 'abc'  |        |),
+    '| both parameters set to true  |  $TRUE   | $TRUE  | $TRUE  |',
+    '| both parameters set to false |  $FALSE  | $FALSE | $FALSE |',
+    '+-----------------------------------------------------------+',
   ];
   is( { $METHOD_REF->( $table ) }, $expected, 'title is in line' );
 
@@ -38,13 +38,13 @@ subtest success => sub {
     '|  expected  |   1    |   2    |',
     '|------------+--------+--------|',
     "|       'param2' omitted       |",
-    "|     0      | 'abc'  |        |",
+   q(|   $FALSE   | 'abc'  |        |),
     '|------------+--------+--------|',
     '| both parameters set to true  |',
-    '|     1      |    1   |    1   |',
+    '|   $TRUE    | $TRUE  | $TRUE  |',
     '|------------+--------+--------|',
     '| both parameters set to false |',
-    '|     0      |    0   |    0   |',
+    '|   $FALSE   | $FALSE | $FALSE |',
     '+------------------------------+',
   ];
   is( { $METHOD_REF->( $table ) }, $expected, 'title is out of line' );
@@ -72,14 +72,14 @@ throws_ok { $METHOD_REF->( $table ) } qr/$expected/, 'failure';
 __DATA__
 {
   'case 1' => [
-    '+---------------------------------------------------------+',
-    '|                              |          | param | param |',
-    '|                              | expected |   1   |   2   |',
-    '|------------------------------+----------+-------+-------|',
-    "| 'param2' omitted             |     0    | 'abc' |       |",
-    '| both parameters set to true  |     1    |   1   |   1   |',
-    '| both parameters set to false |     0    |   0   |   0   |',
-    '+---------------------------------------------------------+',
+    '+-----------------------------------------------------------+',
+    '|                              |          | param  | param  |',
+    '|                              | expected |   1    |   2    |',
+    '|------------------------------+----------+--------+--------|',
+    "| 'param2' omitted             |  $FALSE  | 'abc'  |        |",
+    '| both parameters set to true  |  $TRUE   | $TRUE  | $TRUE  |',
+    '| both parameters set to false |  $FALSE  | $FALSE | $FALSE |',
+    '+-----------------------------------------------------------+',
   ],
   'case 2' => [
     '+------------------------------+',

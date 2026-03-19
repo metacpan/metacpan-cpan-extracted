@@ -125,7 +125,7 @@ runs:
         Run `ghgen analyze --fix` locally to automatically apply these fixes, or enable auto-fix mode in this action:
         
         ```yaml
-        - uses: nigelhorne/App-GHGen@v2
+        - uses: nigelhorne/App-GHGen@v3
           with:
             auto-fix: true
         ```

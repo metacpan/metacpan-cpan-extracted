@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make.pm
-## Version v0.21.1
+## Version v0.22.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/07
+## Modified 2026/03/18
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
     our $CRLF                    = "\015\012";
     our $MAX_BODY_IN_MEMORY_SIZE = 1_048_576;  # 1 MiB default
     our $EXCEPTION_CLASS         = 'Mail::Make::Exception';
-    our $VERSION                 = 'v0.21.1';
+    our $VERSION                 = 'v0.22.0';
 }
 
 use strict;
@@ -224,6 +224,22 @@ sub as_string_ref
 sub attach
 {
     my $self = shift( @_ );
+    # Detect positional shorthand: attach( '/path/to/file.pdf' ) or
+    # attach( '/path/to/file.pdf', encoding => 'base64', ... )
+    # Triggered when argument count is odd and the first argument is a plain scalar
+    # (not a reference), contains no newline, and resolves to an existing file.
+    if( ( scalar( @_ ) % 2 ) &&
+        ( !ref( $_[0] ) || $self->_can_overload( $_[0] => '""' ) ) &&
+        index( "$_[0]", "\n" ) == -1 )
+    {
+        # shift() first to avoid $_[0] being altered by new_file() resolution
+        my $f = $self->new_file( shift( @_ ) ); # Module::Generic::File will trigger stringification
+        if( $f->exists )
+        {
+            # then, we pass it back here:
+            unshift( @_, path => $f );
+        }
+    }
     my $opts = $self->_get_args_as_hash( @_ );
     unless( defined( $opts->{data} ) || defined( $opts->{path} ) )
     {
@@ -316,6 +332,33 @@ sub build
         }
         my %opts = %{$params->{html_opts} // {}};
         $self->html( $params->{html}, %opts ) || return( $self->pass_error );
+    }
+    # Attachments: scalar, arrayref of scalars, or arrayref of hashrefs
+    if( exists( $params->{attach} ) && defined( $params->{attach} ) )
+    {
+        my $attach = $params->{attach};
+        # Accepts vanilla array reference or array objects like Module::Generic::Array
+        my @items  = $self->_is_array( $attach ) ? @$attach : ( $attach );
+        foreach my $item ( @items )
+        {
+            next unless( defined( $item ) );
+            # Such as:
+            # { path => '/some/where/file.pdf', filename => '04 report.pdf', type => 'application/pdf' }
+            # { data => $attachment_data, filename => '04 report.pdf', type => 'application/pdf' }
+            if( ref( $item ) eq 'HASH' )
+            {
+                $self->attach( %$item ) || return( $self->pass_error );
+            }
+            else
+            {
+                # Plain scalar or stringifiable object - delegate to attach() which
+                # already handles the positional shorthand
+                # So, this can be an attachment data, or a file path, or a file object
+                # like Module::Generic::File (as long as it stringifies) and does not
+                # contain a "\n"
+                $self->attach( $item ) || return( $self->pass_error );
+            }
+        }
     }
     # Extra arbitrary headers
     if( exists( $params->{headers} ) && ref( $params->{headers} ) eq 'HASH' )
@@ -1170,6 +1213,10 @@ Mail::Make - Strict, Fluent MIME Email Builder
             type => 'image/png',
             cid  => 'logo@yamato-inc',
         )
+        # Positional shorthand - path, type, and filename are auto-detected
+        ->attach( '/path/to/report.pdf' )
+    
+        # Explicit form - override type and filename
         ->attach(
             path     => '/tmp/Q4-Report.pdf',
             type     => 'application/pdf',
@@ -1206,7 +1253,7 @@ Mail::Make - Strict, Fluent MIME Email Builder
 
 =head1 VERSION
 
-    v0.21.1
+    v0.22.0
 
 =head1 DESCRIPTION
 
@@ -1262,13 +1309,42 @@ An alternate hash-based constructor.
 
 Takes an hash or hash reference of options.
 
-Recognised parameters are: L<from|/from>, L<to|/to>, L<cc|/cc>, L<bcc|/bcc>, L<date|/date>, L<reply_to|/reply_to>, L<sender|/sender>, L<subject|/subject>, L<in_reply_to|/in_reply_to>, L<message_id|/message_id>, L<references|/references>, L<plain|/plain>, L<html|/html>, C<plain_opts>, C<html_opts>, C<headers>.
+Recognised parameters are: L<from|/from>, L<to|/to>, L<cc|/cc>, L<bcc|/bcc>, L<date|/date>, L<reply_to|/reply_to>, L<sender|/sender>, L<subject|/subject>, L<in_reply_to|/in_reply_to>, L<message_id|/message_id>, L<references|/references>, L<plain|/plain>, L<html|/html>, C<plain_opts>, C<html_opts>, C<attach>, C<headers>.
 
 When using the standard mail envelop headers, C<build> will call each respective method, such as L<from|/from>, L<to|/to>, etc.
 
 When passing the C<plain> parameter, it will call L<plain|/plain>, and passing it the optional hash reference of parameters provided with C<plain_opts>
 
 Likewise when passing the C<html> parameter, it will call L<html|/html>, and passing it the optional hash reference of parameters provided with C<html_opts>
+
+The C<attach> parameter accepts one of the following forms:
+
+=over 4
+
+=item * A plain scalar or stringifiable object resolving to an existing file; C<path>, C<type>, and C<filename> are auto-detected:
+
+    attach => 'report.pdf'
+
+=item * An array reference of plain scalars for multiple attachments; likewise C<path>, C<type>, and C<filename> are auto-detected:
+
+    attach => [ 'report.pdf', 'log.pdf' ]
+
+=item * An array reference of hash references for full control over each attachment:
+
+    attach => [
+        { path => 'report.pdf', filename => 'Q4 Report.pdf' },
+        { path => 'log.pdf',    filename => 'Access Log.pdf' },
+    ]
+
+=item * A mix of both forms is also accepted:
+
+    attach => [ 'report.pdf', { path => 'log.pdf', filename => 'Access Log.pdf' } ]
+
+=back
+
+If C<type> is not provided in any of the above forms, it is auto-detected from the file content using L<Module::Generic::File::Magic>.
+
+Each element is forwarded to L</attach>, so all options supported by L</attach> are available in the hash reference form.
 
 You can also provide additional mail envelop headers by providing the parameter C<headers> as an hash reference.
 
@@ -1282,6 +1358,10 @@ All setter methods return C<$self> to allow chaining. Called without arguments, 
 
 =head2 attach( %opts )
 
+    # Positional shorthand: path, type, and filename are auto-detected
+    $mail->attach( '/path/to/report.pdf' );
+
+    # Explicit form
     $mail->attach(
         path     => $pdf_path,
         type     => 'application/pdf',
@@ -1290,9 +1370,13 @@ All setter methods return C<$self> to allow chaining. Called without arguments, 
 
 Adds a downloadable attachment, and returns the current instance for chaining.
 
-Takes an hash or hash reference of parameters.
+Takes either a single positional file path as a shorthand, or an hash or hash reference of parameters.
 
-Requires either C<path> or C<data>.
+When a single plain scalar or stringifiable object is provided and it resolves to an existing file on disk, C<path>, C<type>, and C<filename> are set automatically. Additional named options may still be passed after the path:
+
+    $mail->attach( '/path/to/report.pdf', encoding => 'base64' );
+
+Requires either C<path> or C<data> when using the named-parameter form.
 
 Options are:
 

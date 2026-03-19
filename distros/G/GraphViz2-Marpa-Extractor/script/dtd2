@@ -1,0 +1,263 @@
+#!/bin/env perl
+
+use strict;
+use warnings;
+use Data::Dumper;
+use Data::TreeDumper;
+use GraphViz2::Marpa ;
+
+
+use strict ;
+use warnings ;
+use Data::Dumper ;
+
+sub normalize_name
+{
+my ($name) = @_ ;
+
+return $name ;
+}
+
+# ------------------------------------------------------------------------------
+sub collect_node_attributes
+{
+my ($node_id_node) = @_ ;
+
+my %attrs ;
+
+$node_id_node->walk_down(
+{
+	callback => sub
+	{
+	my ($n) = @_ ;
+
+	my $a    = $n->attributes || {} ;
+	my $type = $a->{type}     || '' ;
+
+	return 1 if $type eq 'node_id' ;
+
+	if ($type =~ /^(color|fontcolor|dir|label|shape|style|fillcolor)$/)
+		{
+		my $key   = $type ;
+		my $value = $a->{value} ;
+
+		$attrs{$key} = $value if defined $value ;
+		}
+
+	return 1 ;
+	},
+}) ;
+
+return \%attrs ;
+}
+
+# ------------------------------------------------------------------------------
+sub extract_from_block
+{
+my ($block_root) = @_ ;
+
+my %nodes ;
+my %node_attrs ;
+my @edges ;
+
+$block_root->walk_down(
+{
+	callback => sub
+	{
+	my ($node) = @_ ;
+
+	my $attr = $node->attributes || {} ;
+	my $type = $attr->{type}     || '' ;
+
+	return 1 if $type ne 'node_id' ;
+
+	my $raw_name = $attr->{value} ;
+	my $name     = normalize_name($raw_name) ;
+
+	$nodes{$name}++ ;
+
+	$node_attrs{$name} = collect_node_attributes($node) ;
+
+	return 1 ;
+	},
+}) ;
+
+$block_root->walk_down(
+{
+	callback => sub
+	{
+	my ($node) = @_ ;
+
+	my $attr = $node->attributes || {} ;
+	my $type = $attr->{type}     || '' ;
+
+	return 1 if $type ne 'directed_edge' ;
+
+	my $parent   = $node->mother ;
+	my @siblings = $parent->daughters ;
+
+	my $i ;
+
+	for my $idx (0 .. $#siblings)
+		{
+		if ($siblings[$idx] == $node)
+			{
+			$i = $idx ;
+
+			last ;
+			}
+		}
+
+	my $from ;
+
+	for (my $j = $i - 1 ; $j >= 0 ; $j--)
+		{
+		my $a = $siblings[$j]->attributes || {} ;
+
+		if (($a->{type} || '') eq 'node_id')
+			{
+			$from = normalize_name($a->{value}) ;
+
+			last ;
+			}
+		}
+
+	my $to ;
+
+	for (my $j = $i + 1 ; $j <= $#siblings ; $j++)
+		{
+		my $a = $siblings[$j]->attributes || {} ;
+
+		if (($a->{type} || '') eq 'node_id')
+			{
+			$to = normalize_name($a->{value}) ;
+
+			last ;
+			}
+		}
+
+	if (defined $from && defined $to)
+		{
+		push @edges,
+			{
+			from  => $from,
+			to    => $to,
+			attrs => {},
+			} ;
+		}
+
+	return 1 ;
+	},
+}) ;
+
+return
+	{
+	nodes      => \%nodes,
+	node_attrs => \%node_attrs,
+	edges      => \@edges,
+	} ;
+}
+
+# ------------------------------------------------------------------------------
+sub build_adjacency
+{
+my ($edges) = @_ ;
+
+my %adj ;
+
+for my $e (@$edges)
+	{
+	my $from = $e->{from} ;
+	my $to   = $e->{to}   ;
+
+	push @{$adj{$from}}, $to ;
+	}
+
+return \%adj ;
+}
+
+# ------------------------------------------------------------------------------
+sub extract_all_graphs
+{
+my ($root) = @_ ;
+
+my %graphs ;
+
+$root->walk_down(
+{
+	callback => sub
+	{
+	my ($node) = @_ ;
+
+	my $attr = $node->attributes || {} ;
+	my $type = $attr->{type}     || '' ;
+
+	return 1 if $type ne 'graph_literal' && $type ne 'digraph_literal' && $type ne 'subgraph_literal' && $type ne 'cluster_literal' ;
+
+	my $name = $attr->{value} || $attr->{name} || 'anonymous' ;
+
+	my @children = $node->daughters ;
+
+	my $block_root ;
+
+	for my $c (@children)
+		{
+		my $a = $c->attributes || {} ;
+
+		if (($a->{type} || '') eq 'open_brace')
+			{
+			$block_root = $c ;
+
+			last ;
+			}
+		}
+
+	return 1 if ! $block_root ;
+
+	my $data = extract_from_block($block_root) ;
+	my $adj  = build_adjacency($data->{edges}) ;
+
+	$graphs{$name} =
+		{
+		name       => $name,
+		nodes      => $data->{nodes},
+		edges      => $data->{edges},
+		adjacency  => $adj,
+		node_attrs => $data->{node_attrs},
+		edge_attrs => [],
+		} ;
+
+	return 1 ;
+	},
+}) ;
+
+return
+	{
+	graphs => \%graphs,
+	} ;
+}
+
+# To restore real tabs:
+# perl -pe 's/\	/	/g' < input.pl > output.pl
+
+my $file = shift || 'input.dot';
+
+
+open (my $fh, '<', $file) or die "error reading file: $!" ;
+print while<$fh> ;
+print "\n" ;
+
+my $g2m = GraphViz2::Marpa->new( input_file => $file);
+$g2m->run;
+
+my $root = $g2m->tree;   # Tree::DAG_Node
+
+# print DumpTree $root ;
+
+# exit ;
+
+# 6. Example usage (assuming you already have $root as Tree::DAG_Node from GraphViz2::Marpa)
+my $all = extract_all_graphs($root);
+# print Dumper($all);
+print DumpTree $all ;
+

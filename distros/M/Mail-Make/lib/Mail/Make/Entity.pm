@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make/Entity.pm
-## Version v0.4.0
+## Version v0.4.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/05
+## Modified 2026/03/18
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -32,7 +33,7 @@ BEGIN
     our $CRLF              = "\015\012";
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $EXCEPTION_CLASS   = 'Mail::Make::Exception';
-    our $VERSION           = 'v0.4.0';
+    our $VERSION           = 'v0.4.1';
 }
 
 use strict;
@@ -138,18 +139,19 @@ sub body_as_string
 # This is the key method - it performs strict validation and correct encoding.
 #
 # Parameters:
-#   type        MIME type string (default: 'text/plain')
+#   attach      Shorthand for 'path'
+#   boundary    boundary for multipart/* types (auto-generated if omitted)
 #   charset     charset for text/* types
-#   encoding    CTE (default: auto-suggested)
-#   disposition inline | attachment (default: none unless filename provided)
-#   filename    filename for Content-Type name= and Content-Disposition filename=
 #   cid         Content-ID for inline parts (wrapped in <...> automatically if needed)
 #   data        scalar body content
-#   path        file path body content
-#   boundary    boundary for multipart/* types (auto-generated if omitted)
-#   description Content-Description value
-#   top         boolean - is this the top-level entity? (default: 1)
 #   debug       debug level (default: 0)
+#   description Content-Description value
+#   disposition inline | attachment (default: none unless filename provided)
+#   encoding    CTE (default: auto-suggested)
+#   filename    filename for Content-Type name= and Content-Disposition filename=
+#   path        file path body content
+#   top         boolean - is this the top-level entity? (default: 1)
+#   type        MIME type string (default: 'text/plain')
 sub build
 {
     my $class = shift( @_ );
@@ -160,7 +162,8 @@ sub build
     $self->debug( delete( $opts->{debug} ) );
 
     # NOTE: 1. Extract and validate parameters
-    my $type        = lc( delete( $opts->{type} )        // 'text/plain' );
+    my $has_type    = ( exists( $opts->{type} ) && defined( $opts->{type} ) );
+    my $type        = lc( delete( $opts->{type} ) // 'text/plain' );
     my $charset     = delete( $opts->{charset} );
     my $encoding    = defined( $opts->{encoding} )
                       ? lc( delete( $opts->{encoding} ) )
@@ -175,6 +178,33 @@ sub build
     my $boundary    = delete( $opts->{boundary} );
     my $description = delete( $opts->{description} );
     my $top         = exists( $opts->{top} ) ? delete( $opts->{top} ) : 1;
+
+    if( !defined( $path ) &&
+        !defined( $data ) &&
+        exists( $opts->{attach} ) &&
+        defined( $opts->{attach} ) &&
+        ( !ref( $opts->{attach} ) || $self->_can_overload( $opts->{attach} => '""' ) ) &&
+        index( "$opts->{attach}", "\n" ) == -1 )
+    {
+        my $f = $self->new_file( delete( $opts->{attach} ) ); # Module::Generic::File will trigger stringification
+        if( $f->exists )
+        {
+            $path = $f;
+            # Auto-detect the MIME type from the file content if not explicitly provided
+            if( !$has_type )
+            {
+                my $candidate = $f->finfo->mime_type;
+                $type = "$candidate" if( $candidate );
+            }
+        }
+    }
+    # Auto-detect MIME type from path if not explicitly provided
+    elsif( !$has_type && defined( $path ) && CORE::length( $path ) )
+    {
+        my $f         = $self->new_file( $path );
+        my $candidate = $f->finfo->mime_type;
+        $type = "$candidate" if( $candidate );
+    }
 
     my $is_multipart = ( $type =~ m{^multipart/}i );
     my $is_message   = ( $type =~ m{^message/}i );
@@ -893,7 +923,7 @@ Mail::Make::Entity - MIME Part Builder for Mail::Make
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -909,25 +939,23 @@ Builds and returns a new C<Mail::Make::Entity>. Parameters:
 
 =over 4
 
-=item type
+=item attach
 
-MIME C<type/subtype> string. Default: C<text/plain>.
+A positional shorthand for C<path>. Accepts a plain scalar or a stringifiable object. If the value resolves to an existing file on disk, C<path>, and C<filename> are set automatically. C<type> is derived from the file itself, using L<Module::Generic::File::Magic>, as well if not already provided. Ignored if C<path> or C<data> is already provided.
+
+    # Shorthand
+    Mail::Make::Entity->build( attach => 'report.pdf' );
+
+    # Equivalent explicit form
+    Mail::Make::Entity->build( path => 'report.pdf' );
+
+=item boundary
+
+Boundary string for C<multipart/*> types. Validated against RFC 2046 allowed characters. Auto-generated if omitted.
 
 =item charset
 
 Charset for C<text/*> parts. Validated via L<Encode>. Default: C<utf-8> for text/* parts if not specified.
-
-=item encoding
-
-Content-Transfer-Encoding. One of C<7bit>, C<8bit>, C<binary>, C<base64>, C<quoted-printable>. Auto-suggested if omitted. C<binary> is rejected for C<text/*> types.
-
-=item disposition
-
-C<inline> or C<attachment>. Defaults to C<attachment> when a filename is present.
-
-=item filename
-
-Filename for C<Content-Type: name=> and C<Content-Disposition: filename=>. Values containing commas or other RFC 2045 specials are automatically RFC 2231 encoded. If not provided and C<path> is given, the basename is used.
 
 =item cid
 
@@ -937,17 +965,29 @@ Content-ID for inline parts (e.g. embedded images). Angle brackets are added aut
 
 Scalar body content (for in-memory bodies).
 
+=item description
+
+Optional C<Content-Description> value.
+
+=item disposition
+
+C<inline> or C<attachment>. Defaults to C<attachment> when a filename is present.
+
+=item encoding
+
+Content-Transfer-Encoding. One of C<7bit>, C<8bit>, C<binary>, C<base64>, C<quoted-printable>. Auto-suggested if omitted. C<binary> is rejected for C<text/*> types.
+
+=item filename
+
+Filename for C<Content-Type: name=> and C<Content-Disposition: filename=>. Values containing commas or other RFC 2045 specials are automatically RFC 2231 encoded. If not provided and C<path> is given, the basename is used.
+
 =item path
 
 File path (for on-disk bodies). The file must exist and be readable.
 
-=item boundary
+=item type
 
-Boundary string for C<multipart/*> types. Validated against RFC 2046 allowed characters. Auto-generated if omitted.
-
-=item description
-
-Optional C<Content-Description> value.
+MIME C<type/subtype> string. Default: C<text/plain>.
 
 =back
 

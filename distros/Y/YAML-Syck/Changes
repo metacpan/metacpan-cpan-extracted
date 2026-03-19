@@ -1,3 +1,47 @@
+1.37 Mar 18 2026
+
+  [Features]
+  - Add LoadBytes, LoadUTF8, DumpBytes, DumpUTF8 functions (GH #51)
+
+  [Fixes]
+  - Fix heap buffer overflow in the YAML emitter - CVE-2026-4177 (GH #67)
+  - Fix DumpFile with tied filehandles (IO::String, IO::Scalar) (GH #22)
+  - Fix _is_glob to recognize IO::Handle subclasses (GH #23)
+  - Fix memory leak when dumping filehandles (RT#41199, GH #42)
+  - Fix dumping of tied hashes (GH #31)
+  - Fix dumping strings starting with '...' as unquoted plain scalars (GH #34)
+  - Fix dumping strings with tabs and carriage returns as plain scalars (GH #59)
+  - Fix double-dash YAML parsing (RT#34073, GH #35)
+  - Fix extra newline after empty arrays/hashes in YAML output (GH #36)
+  - Remove trailing whitespace from YAML output lines (GH #37, #38, #39)
+  - Fix quoting of \r and \t in YAML output instead of emitting raw bytes (GH #40)
+  - Fix growing !!perl/regexp objects in roundtrips (GH #43)
+  - Fix quoted '=' being transformed into 'str' (GH #45)
+  - Fix backslash-space escape in double-quoted YAML strings (GH #61)
+  - Fix flow sequence comma separator not recognized without trailing space (GH #60)
+  - Fix wide character warning in DumpFile (GH #28)
+  - Fix inline arrays without space after comma (GH #25)
+  - Fix: quote strings matching YAML implicit types to prevent roundtrip failures (GH #26)
+  - Fix JSON::Syck::Dump to use JSON-valid \uXXXX escapes in output (GH #21)
+  - Fix JSON::Syck::Load decoding of \/ and \uXXXX escape sequences (GH #30)
+  - Fix: apply JSON postprocessing to JSON::Syck::DumpFile output (GH #104)
+  - Fix: add tied-filehandle fallback to JSON::Syck::DumpFile (GH #98)
+  - Fix: handle JSON escape sequences in SingleQuote mode Load (GH #99)
+  - Fix: restore Perl 5.8 compatibility in test suite (GH #121)
+  - Fix: correct copy-paste error in Makefile.PL clean target (GH #101)
+  - Fix: correct $SortKeys POD default from false to true (GH #100)
+  - Fix: correct POD documentation errors (GH #103)
+
+  [Maintenance]
+  - Add C23-compatible function prototypes for GCC 15 compatibility (GH #112)
+  - Silence macOS compiler warnings (GH #92)
+  - Guard stdint.h include for portability (HP-UX 11.11) (GH #33)
+  - Guard stdint.h include in syck_st.h for portability (GH #24)
+  - Update ppport.h to 3.68
+  - Add regression tests for magical variable dumping (GH #32)
+  - CI: modernize GitHub Actions workflow (GH #123, #124)
+  - CI: add disttest job to validate MANIFEST completeness
+
 1.36 Oct 10 2025
 
 - Address memory corruption leading to 'str' value being set on empty keys

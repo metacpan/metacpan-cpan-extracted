@@ -1,10 +1,12 @@
+package WebServer::DirIndex::HTML; # For cpanm :-(
+
 use strict;
 use warnings;
 use Feature::Compat::Class;
 
-class WebServer::DirIndex::HTML {
+our $VERSION = '0.1.4';
 
-  our $VERSION = '0.1.3';
+class WebServer::DirIndex::HTML {
 
   field $icons :param = 0;
 

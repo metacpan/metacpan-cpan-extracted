@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.59';
+our $VERSION = '0.60';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -133,11 +133,14 @@ PNG_INFO_acTL
 PNG_INFO_bKGD
 PNG_INFO_cHRM
 PNG_INFO_cICP
+PNG_INFO_cLLI
 PNG_INFO_eXIf
 PNG_INFO_fcTL
+PNG_INFO_fdAT
 PNG_INFO_gAMA
 PNG_INFO_hIST
 PNG_INFO_iCCP
+PNG_INFO_mDCV
 PNG_INFO_oFFs
 PNG_INFO_pCAL
 PNG_INFO_pHYs
@@ -179,6 +182,7 @@ PNG_POWERPC_VSX
 PNG_RESOLUTION_METER
 PNG_RESOLUTION_UNKNOWN
 PNG_RGB_TO_GRAY_DEFAULT
+PNG_RISCV_RVV
 PNG_SCALE_METER
 PNG_SCALE_RADIAN
 PNG_SCALE_UNKNOWN
@@ -347,15 +351,18 @@ use constant {
     PNG_IMAGE_WARNING => 1,
     PNG_INFO_IDAT => 0x8000,
     PNG_INFO_PLTE => 0x0008,
-    PNG_INFO_acTL => 0x40000,
+    PNG_INFO_acTL => 0x100000,
     PNG_INFO_bKGD => 0x0020,
     PNG_INFO_cHRM => 0x0004,
     PNG_INFO_cICP => 0x20000,
+    PNG_INFO_cLLI => 0x40000,
     PNG_INFO_eXIf => 0x10000,
-    PNG_INFO_fcTL => 0x80000,
+    PNG_INFO_fcTL => 0x200000,
+    PNG_INFO_fdAT => 0x400000,
     PNG_INFO_gAMA => 0x0001,
     PNG_INFO_hIST => 0x0040,
     PNG_INFO_iCCP => 0x1000,
+    PNG_INFO_mDCV => 0x80000,
     PNG_INFO_oFFs => 0x0100,
     PNG_INFO_pCAL => 0x0400,
     PNG_INFO_pHYs => 0x0080,
@@ -389,7 +396,7 @@ use constant {
     PNG_OFFSET_MICROMETER => 1,
     PNG_OFFSET_PIXEL => 0,
     PNG_OPTION_INVALID => 1,
-    PNG_OPTION_NEXT => 14,
+    PNG_OPTION_NEXT => 16,
     PNG_OPTION_OFF => 2,
     PNG_OPTION_ON => 3,
     PNG_OPTION_UNSET => 0,
@@ -397,6 +404,7 @@ use constant {
     PNG_RESOLUTION_METER => 1,
     PNG_RESOLUTION_UNKNOWN => 0,
     PNG_RGB_TO_GRAY_DEFAULT => (-1),
+    PNG_RISCV_RVV => 14,
     PNG_SCALE_METER => 1,
     PNG_SCALE_RADIAN => 2,
     PNG_SCALE_UNKNOWN => 0,
@@ -954,7 +962,7 @@ PNG_INFO_PLTE has value 0x0008.
 
 =item PNG_INFO_acTL
 
-PNG_INFO_acTL has value 0x40000.
+PNG_INFO_acTL has value 0x100000.
 
 =item PNG_INFO_bKGD
 
@@ -968,13 +976,21 @@ PNG_INFO_cHRM has value 0x0004.
 
 PNG_INFO_cICP has value 0x20000.
 
+=item PNG_INFO_cLLI
+
+PNG_INFO_cLLI has value 0x40000.
+
 =item PNG_INFO_eXIf
 
 PNG_INFO_eXIf has value 0x10000.
 
 =item PNG_INFO_fcTL
 
-PNG_INFO_fcTL has value 0x80000.
+PNG_INFO_fcTL has value 0x200000.
+
+=item PNG_INFO_fdAT
+
+PNG_INFO_fdAT has value 0x400000.
 
 =item PNG_INFO_gAMA
 
@@ -987,6 +1003,10 @@ PNG_INFO_hIST has value 0x0040.
 =item PNG_INFO_iCCP
 
 PNG_INFO_iCCP has value 0x1000.
+
+=item PNG_INFO_mDCV
+
+PNG_INFO_mDCV has value 0x80000.
 
 =item PNG_INFO_oFFs
 
@@ -1122,7 +1142,7 @@ PNG_OPTION_INVALID has value 1.
 
 =item PNG_OPTION_NEXT
 
-PNG_OPTION_NEXT has value 14.
+PNG_OPTION_NEXT has value 16.
 
 =item PNG_OPTION_OFF
 
@@ -1151,6 +1171,10 @@ PNG_RESOLUTION_UNKNOWN has value 0.
 =item PNG_RGB_TO_GRAY_DEFAULT
 
 PNG_RGB_TO_GRAY_DEFAULT has value (-1).
+
+=item PNG_RISCV_RVV
+
+PNG_RISCV_RVV has value 14.
 
 =item PNG_SCALE_METER
 
@@ -1296,7 +1320,7 @@ Ben Bullock, <benkasminbullock@gmail.com>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2011-2025
+2011-2026
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

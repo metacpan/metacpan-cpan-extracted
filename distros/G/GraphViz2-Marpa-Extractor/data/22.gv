@@ -1,0 +1,7 @@
+digraph graph_22
+{
+	node_22_1
+	[
+		fillcolor = red
+	]
+}

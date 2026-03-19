@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.73.
+signed via the Module::Signature module, version 0.93.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,38 +12,36 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 f578ba3a6fbc6ecc29cbe66bac7de7ee4ea773fe Changes
-SHA1 dfa635f28fdaeffd0653b7db7f0f3683a5b93e03 INSTALL
-SHA1 1d431d36f36b6e6d6caf68e84e78806a6c83e85f LICENSE
-SHA1 0844ab804c83e758f82bb9bdb2f73427de2799bd MANIFEST
-SHA1 ce2089f2341df2c7e73e3f4cda57eb00915ea884 META.json
-SHA1 cd16901d221d55924d1539a9ad0a3d63fbd7f1c2 META.yml
-SHA1 6100fcd54e5bb1de9e7640c9b4f5753c0047c91a Makefile.PL
-SHA1 a8f0915ffb19ae2294446191645952730a478fcb README
-SHA1 968016a901b7973313f7c558ed22dd547b54522a cpanfile
-SHA1 fdc4a7a098dee72ffd775f3f3806354aee947ed2 dist.ini
-SHA1 834f1086bc640d6e63cae621cf81570b8aa39c2b inc/Devel/AssertOS.pm
-SHA1 7e51a16a32d50e21e4603ce1865ad28676c88515 inc/Devel/AssertOS/MSWin32.pm
-SHA1 66351fdd4353b5147e2d42f4500414a489a14d93 inc/Devel/CheckOS.pm
-SHA1 bce0857fa3932702c97b6d173a663b94887b5ebf lib/IO/AsyncX/Sendfile.pm
-SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
-SHA1 2673368263223e3692429dc58a0b32378fb69d6e t/00-compile.t
-SHA1 ded79bcc798d1278863ba07efb21733047677f2b t/000-report-versions-tiny.t
-SHA1 380220577ebcb7448a89f639e1f4481a0a1fbf91 t/parallel.t
-SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
-SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
-SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
-SHA1 1294a6710ea8e2626e43722e50111bf872668316 xt/release/test-version.t
+SHA256 45360f3783f09c8552035c35fc7c7d3f05d124676b412ab436c789d9faf19f6b Changes
+SHA256 e122c12e2339ac850b3730cf06768d1b21f27b74404f8f76115edc8081a66ffe INSTALL
+SHA256 370f91ef7cf2b2a3215e4b60205dad4c05298bbc181872699e0b7603f835698a LICENSE
+SHA256 77bc2e89d7e27572e764ef677a628cbd8244fbbcd1e15ffc4cb26e196646ab5e MANIFEST
+SHA256 15f7580567882d39be212f0d0d26766362dea92df819c37cd5f1b0b891626141 META.json
+SHA256 212c7d9bbf5e11f117773a3f1ae8abebfc49fa13d3c7f66b734c2631beb15ff2 META.yml
+SHA256 54ba35eab6383dd1f8a613b73321ab83151a48ce5145f40de24ff10915f4c32e Makefile.PL
+SHA256 affed5d5cdbab27699730996e703da0a5f5862e23e84fac47db6fe4a779f4045 README
+SHA256 c1088a75b61e41aae971479ce8391d8f206bce344104d76b6ed68023ce1244d4 cpanfile
+SHA256 e0bf0a1dd424664a3c5790d4ca68d52746b958851738bbfb2d531e775a877790 dist.ini
+SHA256 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b empty.txt
+SHA256 747859ae60ea87d4ee326f8d3f33801ed3be5a4e230acc092af0e78caa8dc465 inc/Devel/AssertOS.pm
+SHA256 565f180f52c210a31c89cd8e447c7fee93bfb2e96ea513c7edf55390224f9b6f inc/Devel/AssertOS/Alias/MacOS.pm
+SHA256 2318234a836cd529eea9f9ef6fa97bfca5430d5636029cc046d90933813edf90 inc/Devel/AssertOS/MSWin32.pm
+SHA256 7a14a7a794e4c3482d0e95f1d18f266b4a09a77800d22de46286b6eb2fb97479 inc/Devel/CheckOS.pm
+SHA256 0774361905e58de7918cd50055b51b3587f2a7afda8371f761186409b0cb1d72 lib/IO/AsyncX/Sendfile.pm
+SHA256 8e90f388b41e448885513ca9b71e13844a7795cec2f9837453225a21321797f6 t/00-check-deps.t
+SHA256 a4bbb9c6d9b820635a9151015c1e03d283053c2fe2bcb7bcf8bf6fbf9843c30d t/00-compile.t
+SHA256 b863bb558647ab319b6f0a902d896c8798093c87cb0b022d23e5960302d4856c t/000-report-versions-tiny.t
+SHA256 80be2c6cbcd17e6560d3ba1495c3ad7b69d9126584cd50d8e80239c11ef22edb t/parallel.t
+SHA256 89f6335b90cbedf340afef47053adab386d8b38faded020e58c76beda202e14f xt/author/mojibake.t
+SHA256 dabc23c51e9db740caf6907f8b267f3d65200a47afcfbc7d25d0088ae4583378 xt/author/pod-syntax.t
+SHA256 aa25d3dc3ed499cce2f80e827aa3743b52424ea4f98abe8a389b8dd94b9f3e35 xt/author/test-version.t
+SHA256 55eeb78c3080600e066fb5339cf658093f44a93cac999edcefa179fa8caa0c7a xt/release/common_spelling.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJU4sWwAAoJEFKElMNpjtyDQqoH/1Tfg5fzP76k57jpki8JR/tS
-2SWJ4JA1o7K9FnbXSFGZtlu8NeN2fwRgiQb9t4UMX+U1mpRzHaBbtEX3IK/EiM4R
-V930MAMQiiIahZBtfSiXdix3T/tpeBPYRwr1f+cx7xs0lkz/eTpRo+t8flusny8w
-T7IZYxj7d99zrqF74Fh3Lv6YySJ/ReeGGpvvVLCAaYjGowJ8Bf5LAnxv96pU2iXh
-TkgXIL2MJXrSMOLwLQpsEda4+dcmO0V99Tyqa0CepZe4Y4GGuJ6m6/YCJuM27re4
-yFVWPRQB3J9BzNq5hcoWdJWTaH8L0Gq3u2HsIWH5DSKwNt8ejN62gbVxvMUaTbA=
-=sA/R
+iHUEARYDAB0WIQQL4ALUJWxJA1Mdmq4Y/24Jz0fKPgUCabo9LQAKCRAY/24Jz0fK
+Ph6YAQCHd7RBbm+KZ/Dcyr8MpFibdhjDearQted6GavH0G/khgD+MKQPd/ubkLjh
+wggstxRB+DXuz4Ad6t6wDb6DmdgOZA0=
+=COKP
 -----END PGP SIGNATURE-----

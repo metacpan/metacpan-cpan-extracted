@@ -1,0 +1,37 @@
+---
+abstract: 'Introspection and AST for Graph::Easy layouts'
+author:
+  - 'Nadim Khemir <nadim.khemir@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Graph-Easy-Introspect
+provides:
+  Graph::Easy:
+    file: lib/Graph/Easy/Introspect.pm
+  Graph::Easy::Edge:
+    file: lib/Graph/Easy/Introspect.pm
+  Graph::Easy::Introspect:
+    file: lib/Graph/Easy/Introspect.pm
+    version: '0.01'
+  Graph::Easy::Introspect::Renderer:
+    file: lib/Graph/Easy/Introspect/Renderer.pm
+    version: '0.01'
+requires:
+  Data::TreeDumper: '0'
+  Graph::Easy: '0'
+  Graph::Easy::Edge::Cell: '0'
+  Graph::Easy::Parser::Graphviz: '0'
+  JSON::PP: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/nkh/P5-graph_easy_ast
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,5 @@
 package Dist::Build::XS::Conf;
-$Dist::Build::XS::Conf::VERSION = '0.027';
+$Dist::Build::XS::Conf::VERSION = '0.028';
 use strict;
 use warnings;
 
@@ -18,6 +18,7 @@ sub add_methods {
 		for my $key (qw/include_dirs library_dirs libraries extra_compiler_flags extra_linker_flags extra_sources extra_objects/) {
 			push @{ $args{$key} }, $planner->$key;
 		}
+		$args{standard} //= $planner->standard;
 
 		my %defines = $planner->defines;
 		for my $key (keys %defines) {
@@ -42,14 +43,14 @@ Dist::Build::XS::Conf - Configure-time utilities for Dist::Build for using C hea
 
 =head1 VERSION
 
-version 0.027
+version 0.028
 
 =head1 SYNOPSIS
 
  load_extension("Dist::Build::XS");
  load_extension("Dist::Build::XS::Conf");
  
- find_libs_for(source => <<'EOF', libs => [ ['socket'], ['moonlaser'] ]);
+ find_libraries_for(source => <<'EOF', libs => [ ['socket'], ['moonlaser'] ]);
  #include <stdio.h>
  #include <sys/socket.h>
  int main(int argc, char *argv[]) {

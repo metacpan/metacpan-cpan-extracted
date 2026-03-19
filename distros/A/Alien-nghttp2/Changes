@@ -1,0 +1,9 @@
+Revision history for Alien-nghttp2
+
+0.002  2026-03-17
+    - Update distribution metadata for CPAN release.
+    - Add release documentation and checklist files.
+
+0.001  2026-03-17
+    - Initial release of Alien::nghttp2.
+    - Provides an Alien::Base wrapper for locating or building nghttp2.

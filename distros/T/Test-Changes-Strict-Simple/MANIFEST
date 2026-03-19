@@ -17,6 +17,7 @@ t/06-version_re.t
 t/07-version_re-fail.t
 t/08-check_dots-on.t
 t/09-check_dots-off.t
+t/10_reverse.t
 t/lib/Local/Test/Helper.pm
 xt/author/boilerplate.t
 xt/author/kwalitee.t

@@ -1,3 +1,34 @@
+Tue Mar 17 09:02:03 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.7.1]:
+	* CPAN-Maker-1.7.1-ReleaseNotes.md: new
+	* VERSION: bump
+	* Makefile.am
+	(release-notes): new
+	* src/main/bash/bin/make-cpan-dist.in
+	- use new functions below to optimize build
+	(build_module_index): new
+	(module2path_indexed): new
+	(module2path): removed
+
+Mon Mar 16 21:20:07 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.7.0]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in: add -Y recommends option
+	* src/main/perl/bin/make-cpan-dist.pl.in: add --recommends option
+	* src/main/perl/lib/CPAN/Maker.pm.in: pod update
+	* src/main/perl/lib/README.md: generated
+
+Mon Feb 16 07:57:10 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.6.2]:
+	* VERSION: bump
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- whitespace
+	(write_makefile): add script pod to man pages
+	* src/main/perl/lib/README.md: generated
+
 Mon Oct  6 08:58:58 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[1.6.1]:

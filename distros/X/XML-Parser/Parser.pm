@@ -16,7 +16,7 @@ use Carp;
 
 BEGIN {
     require XML::Parser::Expat;
-    $VERSION = '2.47';
+    $VERSION = '2.48';
     die "Parser.pm and Expat.pm versions don't match"
       unless $VERSION eq $XML::Parser::Expat::VERSION;
 }
@@ -134,9 +134,8 @@ sub parse_start {
     my $self          = shift;
     my @expat_options = ();
 
-    my ( $key, $val );
-    while ( ( $key, $val ) = each %{$self} ) {
-        push( @expat_options, $key, $val )
+    for my $key ( keys %{$self} ) {
+        push( @expat_options, $key, $self->{$key} )
           unless exists $self->{Non_Expat_Options}->{$key};
     }
 
@@ -162,9 +161,8 @@ sub parse {
     my $self          = shift;
     my $arg           = shift;
     my @expat_options = ();
-    my ( $key, $val );
-    while ( ( $key, $val ) = each %{$self} ) {
-        push( @expat_options, $key, $val )
+    for my $key ( keys %{$self} ) {
+        push( @expat_options, $key, $self->{$key} )
           unless exists $self->{Non_Expat_Options}->{$key};
     }
 
@@ -220,6 +218,7 @@ sub parsefile {
     my @ret;
     my $ret;
 
+    my $old_base = $self->{Base};
     $self->{Base} = $file;
 
     if (wantarray) {
@@ -229,6 +228,7 @@ sub parsefile {
         eval { $ret = $self->parse( $fh, @_ ); };
     }
     my $err = $@;
+    $self->{Base} = $old_base;
     close($fh);
     die $err if $err;
 
@@ -242,9 +242,10 @@ sub initial_ext_ent_handler {
     # also loads the URI and LWP modules.
 
     unless ($LWP_load_failed) {
-        local ($^W) = 0;
-
-        my $stat = eval { require('XML/Parser/LWPExternEnt.pl'); };
+        my $stat = do {
+            no warnings;
+            eval { require('XML/Parser/LWPExternEnt.pl'); };
+        };
 
         if ($stat) {
             $_[0]->setHandlers(
@@ -496,6 +497,8 @@ A die call is thrown if a parse error occurs. Otherwise it will return 1
 or whatever is returned from the B<Final> handler, if one is installed.
 In other words, what parse may return depends on the style.
 
+See L<"ERROR HANDLING"> below for how to catch and handle parse errors.
+
 =item parsestring
 
 This is just an alias for parse for backwards compatibility.
@@ -503,7 +506,8 @@ This is just an alias for parse for backwards compatibility.
 =item parsefile(FILE [, OPT => OPT_VALUE [...]])
 
 Open FILE for reading, then call parse with the open handle. The file
-is closed no matter how parse returns. Returns what parse returns.
+is closed no matter how parse returns. A die call is thrown if the file
+cannot be opened or if a parse error occurs. Returns what parse returns.
 
 =item parse_start([ OPT => OPT_VALUE [...]])
 
@@ -556,6 +560,20 @@ sequence of characters is in String. A single non-markup sequence of
 characters may generate multiple calls to this handler. Whatever the
 encoding of the string in the original document, this is given to the
 handler in UTF-8.
+
+B<Important:> Because the underlying expat library parses in fixed-size
+chunks, character data that spans a buffer boundary will arrive as two or
+more consecutive Char events. This typically occurs with files larger than
+about 32 KiB and is not a bug. To obtain the complete text of an element,
+accumulate the strings delivered between Start and End events:
+
+  my $current_text;
+  sub start_handler { $current_text = ''; }
+  sub char_handler  { $current_text .= $_[1]; }
+  sub end_handler   { print "complete text: $current_text\n"; }
+
+The Stream style (C<< XML::Parser::Style::Stream >>) already performs this
+accumulation automatically.
 
 =head2 Proc                (Expat, Target, Data)
 
@@ -695,8 +713,8 @@ including any internal or external DTD declarations.
 
 This handler is called for xml declarations. Version is a string containing
 the version. Encoding is either undefined or contains an encoding string.
-Standalone will be either true, false, or undefined if the standalone attribute
-is yes, no, or not made respectively.
+Standalone will be either the string C<"yes">, C<"no">, or undefined if the
+standalone attribute is yes, no, or not made respectively.
 
 =head1 STYLES
 
@@ -818,6 +836,37 @@ finds, it loads.
 
 If you wish to build your own encoding maps, check out the XML::Encoding
 module from CPAN.
+
+=head1 ERROR HANDLING
+
+XML::Parser throws an exception (dies) when it encounters a parse error.
+This includes malformed XML, encoding errors, and other problems detected
+by the underlying expat library.
+
+The C<parse>, C<parsefile>, and C<parse_done> methods may all throw
+exceptions. To handle parse errors gracefully in your application, wrap
+the parse call in an C<eval> block:
+
+  my $parser = XML::Parser->new(Style => 'Tree');
+
+  my $tree = eval { $parser->parsefile('data.xml') };
+  if ($@) {
+    # Handle the parse error
+    warn "Parse failed: $@";
+  }
+
+The error message (in C<$@>) will include the line number, column number,
+and byte position where the error was detected. For additional context
+around the error location, set the B<ErrorContext> option when constructing
+the parser:
+
+  my $parser = XML::Parser->new(
+    Style        => 'Tree',
+    ErrorContext  => 2,
+  );
+
+This will include 2 lines of context on either side of the error in the
+error message.
 
 =head1 AUTHORS
 

@@ -1,0 +1,9 @@
+Revision history for Text-Names-Canonicalize
+
+0.01	Wed Mar 18 20:31:48 EDT 2026
+    - Initial release.
+    - Added YAML inheritance with circular include detection.
+    - Added base.yaml and locale hierarchy.
+    - Added CLI tool.
+    - Added user override support.
+    - Added multi-word particle tokenizer.

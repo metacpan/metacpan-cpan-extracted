@@ -1,0 +1,10 @@
+graph graph_44
+{
+	node
+	[
+		shape = box
+	]
+	course;
+	institute;
+	student;
+}

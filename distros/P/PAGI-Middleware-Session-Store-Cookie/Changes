@@ -1,0 +1,20 @@
+Revision history for PAGI-Middleware-Session-Store-Cookie
+
+0.001003  2026-03-17
+    - Add a recognized Artistic 2.0 license section to the main module POD
+    - Add an explicit module version matching the distribution version
+    - Add an AUTHORS section to the main module POD
+
+0.001002  2026-03-16
+    - Fix non-ASCII character in POD (em dash before =encoding)
+    - Document new() constructor method and required secret parameter
+
+0.001001  2026-03-16
+    - Initial release
+    - AES-256-GCM encrypted client-side session storage
+    - Implements PAGI::Middleware::Session::Store interface
+    - set() returns encrypted blob as transport value
+    - get() decrypts and verifies, returns undef for tampered/invalid data
+    - No server-side storage needed
+    - Runtime warning when /dev/urandom unavailable (insecure IV fallback)
+    - Counter example app included

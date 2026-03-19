@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base qw(Alien::Base);
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 1;
 
@@ -86,7 +86,7 @@ L<https://nghttp2.org/> - nghttp2 project homepage
 
 =head1 AUTHOR
 
-Your Name <your@email.com>
+John Napiorkowski <jjn1056@yahoo.com>
 
 =head1 LICENSE
 

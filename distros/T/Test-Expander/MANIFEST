@@ -12,8 +12,6 @@ Readme.md
 t/.perlcriticrc
 t/.proverc
 t/.proverc-cover
-t/Test
-t/Test/Expander
 t/Test/Expander/_colorize.t
 t/Test/Expander/_determine_testee.env
 t/Test/Expander/_determine_testee.t
@@ -33,7 +31,6 @@ t/Test/Expander/import.t
 t/Test/Expander/is_deeply.t
 t/Test/Expander/lives_ok.t
 t/Test/Expander/new_ok.t
-t/Test/Expander/NoCLASS
 t/Test/Expander/NoCLASS/mock_builtin.t
 t/Test/Expander/NoCLASS/MyModule.pm
 t/Test/Expander/NoCLASS/NoMETHOD.t

@@ -1,5 +1,16 @@
 Revision history for XML-PugiXML
 
+0.03  2026-03-16
+    - Fix XSUB stack panic on Perl 5.42+ (RC stack)
+    - Fix floating-point test comparison portability
+
+0.02  2026-03-14
+    - Stale handle detection after reset/reload (no more segfaults)
+    - XPath attribute selection support (//@id now works)
+    - Attr::element() for parent navigation
+    - UTF-8 input upgrade for all string parameters
+    - Safe 64-bit integers on 32-bit Perl
+
 0.01  2026-03-04
     - Initial release
     - Fast XML parsing via pugixml (8-12x faster than XML::LibXML)

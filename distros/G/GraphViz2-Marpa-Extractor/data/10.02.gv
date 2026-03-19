@@ -1,0 +1,4 @@
+strict digraph graph_10_02
+{
+	node_10_02_1 [fillcolor = red, style = filled]
+}

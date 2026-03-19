@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.64'
   XS::Parse::Keyword::Builder: '0.40'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,12 +23,12 @@ no_index:
 provides:
   Data::Path::XS:
     file: lib/Data/Path/XS.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   XS::Parse::Keyword: '0.40'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-data-path-xs/issues
   repository: https://github.com/vividsnow/perl5-data-path-xs.git
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

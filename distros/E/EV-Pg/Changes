@@ -1,3 +1,12 @@
+0.03  2026-03-17
+    - fix COPY skip/drain edge cases and idle ref accounting
+    - hardening: skip_pending protocol safety, COPY drain, deferred PQfinish
+    - fix notification memory leak when on_notify is unset
+    - fix get_copy_data callback_depth and copy_mode lifecycle
+    - cancel_async callback fired on teardown
+    - socket migration in connect/cancel poll
+    - Alpine Linux CI
+
 0.02  2026-03-13
     - keep_alive flag for LISTEN/NOTIFY
     - guard send_flush_request for libpq < 17

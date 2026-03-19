@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Flags;
-$Bitcoin::Crypto::Transaction::Flags::VERSION = '4.003';
+$Bitcoin::Crypto::Transaction::Flags::VERSION = '4.004';
 use v5.14;
 use warnings;
 

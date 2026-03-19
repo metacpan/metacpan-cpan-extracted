@@ -11,8 +11,8 @@ use Test::RequiresInternet 'clientinfo.metacpan.org' => 'https';
 
 my $mcpan = MetaCPAN::Client->new(ua => HTTP::Tiny->new(timeout => 5), debug => 1);
 
-my $test_module = 'JSON::Tiny';
-my $test_dist = 'JSON-Tiny';
+my $test_module = 'Redis::Fast';
+my $test_dist = 'Redis-Fast';
 
 my $module_deps = find_all_dependents(module => $test_module, mcpan => $mcpan);
 my $dist_deps = find_all_dependents(dist => $test_dist, mcpan => $mcpan);

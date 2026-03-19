@@ -10,6 +10,8 @@ eg/lease_test.pl
 eg/put_get_test.pl
 eg/sync_and_watch_example.pl
 eg/txn_test.pl
+eg/watch_config_tree.pl
+eg/watch_extract_fields.pl
 eg/watch_test.pl
 election.pb-c.c
 election.pb-c.h

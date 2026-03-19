@@ -1,0 +1,14 @@
+/blib/
+/Makefile
+/Makefile.old
+/MYMETA.json
+/MYMETA.yml
+/pm_to_blib
+/_build/
+/Build
+/Build.bak
+/cover_db/
+/local/
+/.carton/
+/.prove
+Modern-Perl-Prelude-*.tar.gz

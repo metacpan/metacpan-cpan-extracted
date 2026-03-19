@@ -19,12 +19,13 @@ use App::GHGen::PerlCustomizer qw(generate_custom_perl_workflow);
 use App::GHGen::Fixer qw(fix_workflow can_auto_fix);
 use App::GHGen::CostEstimator qw(estimate_current_usage estimate_savings);
 
-our $VERSION = '0.01';
+our $VERSION = '0.04';
 
 my %opts = (
 	help	=> 0,
 	version => 0,
 	list	=> 0,
+	timeout => undef,
 );
 
 GetOptions(
@@ -38,6 +39,7 @@ GetOptions(
 	'customize|c' => \$opts{customize},
 	'fix|f'	   => \$opts{fix},
 	'estimate|e'  => \$opts{estimate},
+	'timeout=i'     => \$opts{timeout},
 ) or pod2usage(2);
 
 pod2usage(1) if $opts{help};
@@ -99,14 +101,16 @@ sub cmd_generate() {
 			os => $config->{os} // ['ubuntu-latest', 'macos-latest', 'windows-latest'],
 			enable_critic => $config->{enable_critic} // 1,
 			enable_coverage => $config->{enable_coverage} // 1,
+			timeout => $opts{timeout},
 		});
+	} elsif ($type eq 'perl') {
+		$yaml = generate_custom_perl_workflow({ timeout => $opts{timeout} });
 	} else {
 		$yaml = generate_workflow($type);
 	}
 
 	unless ($yaml) {
-		die colored(['red'], "Error: ") .
-			"Unknown project type '$type'. Use --list to see options.\n";
+		die colored(['red'], "Error: "),  "Unknown project type '$type'. Use --list to see options.\n";
 	}
 
 	# Determine output file
@@ -120,7 +124,7 @@ sub cmd_generate() {
 	# Write the workflow
 	path($output_file)->spew_utf8($yaml);
 
-	say colored(['green'], "✓ ") . "Generated workflow: " . colored(['bold'], $output_file);
+	say colored(['green'], "✓ ") . 'Generated workflow: ' . colored(['bold'], $output_file);
 	say '';
 	say colored(['cyan'], "Next steps:");
 	say "  1. Review the generated workflow";
@@ -134,7 +138,7 @@ sub cmd_analyze() {
 	my @workflow_files = find_workflows();
 
 	unless (@workflow_files) {
-		die colored(['red'], "Error: ") .
+		die colored(['red'], 'Error: ') .
 			"No .github/workflows directory found\n" .
 			"Run this from the root of a repository with GitHub Actions.\n";
 	}
@@ -361,8 +365,11 @@ sub auto_detect_with_prompt() {
 
 	# Show top detection
 	my $top = $detections[0];
-	say colored(['green'], "✓ ") . "Detected project type: " .
-		colored(['bold'], uc($top->{type}));
+	if(!defined($top->{type})) {
+		die "Cound't autodetect the project type";
+	}
+
+	say colored(['green'], "✓ ") . 'Detected project type: ' . colored(['bold'], uc($top->{type}));
 
 	# Show evidence
 	my $indicators = get_project_indicators($top->{type});
@@ -419,6 +426,7 @@ ghgen - GitHub Actions workflow generator and analyzer
 
   ghgen generate --auto
   ghgen generate --type=perl [--output=FILE]
+  ghgen generate --type=perl --timeout=45
   ghgen generate --type=perl --customize
   ghgen generate --interactive
   ghgen generate --list
@@ -448,12 +456,13 @@ Generate a new GitHub Actions workflow.
 
 Options:
 
-  --auto, -a			Auto-detect project type and prompt for confirmation
-  --type, -t TYPE	   Project type (perl, node, python, rust, go, ruby, docker, static)
-  --customize, -c	   Interactively customize the workflow
-  --output, -o FILE	 Output file (default: .github/workflows/TYPE-ci.yml)
-  --interactive, -i	 Interactive mode to select type
-  --list, -l			List available workflow types
+   --auto, -a          Auto-detect project type and prompt for confirmation
+   --type, -t TYPE     Project type (perl, node, python, rust, go, ruby, docker, static)
+   --customize, -c     Interactively customize the workflow
+   --output, -o FILE   Output file (default: .github/workflows/TYPE-ci.yml)
+   --interactive, -i   Interactive mode to select type
+   --list, -l          List available workflow types
+   --timeout MINUTES   Set job timeout-minutes for Perl workflows (default: 30)
 
 =head2 analyze
 
@@ -467,6 +476,7 @@ Checks for:
 - Overly broad triggers
 - Missing concurrency controls
 - Outdated runner versions
+- Missing or excessive job timeouts (use --timeout to control Perl workflows)
 
 =head1 OPTIONS
 
@@ -509,7 +519,8 @@ L<https://github.com/nigelhorne>
 
 =head1 LICENSE
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to license terms.
 
 =cut

@@ -1,0 +1,7 @@
+Revision history for Alien::libwebsockets
+
+0.01    2026-02-20
+        - Initial release.
+        - Bundles libwebsockets 4.3.3.
+        - Enabled extensions, zlib, and libev support.
+        - Provides has_extensions() for detecting extension support.

@@ -1,6 +1,6 @@
 /*
 
-  Copyright (c) 2000-2023 Greg Sabino Mullane and others: see the Changes file
+  Copyright (c) 2000-2026 Greg Sabino Mullane and others: see the Changes file
   Portions Copyright (c) 1997-2000 Edmund Mergl
   Portions Copyright (c) 1994-1997 Tim Bunce
 
@@ -121,6 +121,8 @@ constant(name=Nullch)
     PG_NUMRANGE                       = 3906
     PG_NUMRANGEARRAY                  = 3907
     PG_OID                            = 26
+    PG_OID8                           = 8256
+    PG_OID8ARRAY                      = 8261
     PG_OIDARRAY                       = 1028
     PG_OIDVECTOR                      = 30
     PG_OIDVECTORARRAY                 = 1013
@@ -159,6 +161,8 @@ constant(name=Nullch)
     PG_REGCOLLATIONARRAY              = 4192
     PG_REGCONFIG                      = 3734
     PG_REGCONFIGARRAY                 = 3735
+    PG_REGDATABASE                    = 8326
+    PG_REGDATABASEARRAY               = 8327
     PG_REGDICTIONARY                  = 3769
     PG_REGDICTIONARYARRAY             = 3770
     PG_REGNAMESPACE                   = 4089
@@ -292,10 +296,10 @@ quote(dbh, to_quote_sv, type_sv=Nullsv)
                     /* Currently the type argument must be a hashref, so throw an exception if not */
                     if (!SvROK(type_sv) || SvTYPE(SvRV(type_sv)) != SVt_PVHV)
                         croak("Second argument to quote must be a hashref");
-                    if ((svp = hv_fetch((HV*)SvRV(type_sv),"pg_type", 7, 0)) != NULL) {
+                    if ((svp = hv_fetchs((HV*)SvRV(type_sv),"pg_type", 0)) != NULL) {
                         type_info = pg_type_data(SvIV(*svp));
                     }
-                    else if ((svp = hv_fetch((HV*)SvRV(type_sv),"type", 4, 0)) != NULL) {
+                    else if ((svp = hv_fetchs((HV*)SvRV(type_sv),"type", 0)) != NULL) {
                         type_info = sql_type_data(SvIV(*svp));
                     }
                     else {
@@ -334,7 +338,14 @@ quote(dbh, to_quote_sv, type_sv=Nullsv)
     }
     OUTPUT:
         RETVAL
-    
+
+# Primarily for unit test...
+bool
+_is_keyword(const char *str)
+	CODE:
+		RETVAL = is_keyword(str);
+	OUTPUT:
+		RETVAL
 
 # ------------------------------------------------------------
 # database level interface PG specific
@@ -376,7 +387,7 @@ void do(dbh, statement_sv, attr=Nullsv, ...)
 
         if (attr && SvROK(attr) && SvTYPE(SvRV(attr)) == SVt_PVHV) {
             SV **svp;
-            if ((svp = hv_fetch((HV*)SvRV(attr),"pg_async", 8, 0)) != NULL) {
+            if ((svp = hv_fetchs((HV*)SvRV(attr),"pg_async", 0)) != NULL) {
                asyncflag = (int)SvIV(*svp);
             }
         }
@@ -435,7 +446,10 @@ pg_error_field(dbh, fieldname)
     SV * dbh
     char * fieldname;
     CODE:
-        ST(0) = pg_db_error_field(dbh, fieldname);
+        /* pg_db_error_field() modifies its argument, so make a copy */
+        char *tmp = savepv(fieldname);
+        SAVEFREEPV(tmp);
+        ST(0) = pg_db_error_field(dbh, tmp);
 
 
 void
@@ -840,6 +854,14 @@ _pg_type_info (type_sv=Nullsv)
         ST(0) = sv_2mortal( newSViv( type_num ) );
     }
 
+int
+pg_continue_connect(dbh)
+		SV* dbh
+	CODE:
+		RETVAL = pg_db_continue_connect(dbh);
+	OUTPUT:
+		RETVAL
+
 void
 pg_result(dbh)
     SV * dbh
@@ -860,6 +882,13 @@ pg_ready(dbh)
     CODE:
         D_imp_dbh(dbh);
         ST(0) = sv_2mortal(newSViv(pg_db_ready(dbh, imp_dbh)));
+
+void
+pg_send_cancel(dbh)
+    SV *dbh
+    CODE:
+    D_imp_dbh(dbh);
+    ST(0) = pg_db_send_cancel(dbh, imp_dbh) ? &PL_sv_yes : &PL_sv_no;
 
 void
 pg_cancel(dbh)

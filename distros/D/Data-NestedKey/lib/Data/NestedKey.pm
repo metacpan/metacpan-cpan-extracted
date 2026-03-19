@@ -1,7 +1,8 @@
 package Data::NestedKey;
 
-# This module provides an object-oriented way to manipulate deeply nested hash
-# structures using dot-separated keys, with flexible serialization options.
+# This module provides an object-oriented way to manipulate deeply
+# nested hash structures using dot-separated keys, with flexible
+# serialization options.
 
 use strict;
 use warnings;
@@ -12,13 +13,13 @@ use JSON;
 use List::Util qw(pairs);
 use Scalar::Util qw(reftype);
 use Storable qw(nfreeze);
-use YAML ();  # Load YAML support
+use YAML::XS ();
 
-our $VERSION = '0.06';
+our $VERSION = '1.0.8';
 
 # Package variables for serialization options
-our $JSON_PRETTY = 1;       # Controls whether JSON output is pretty or compact
-our $FORMAT      = 'JSON';  # Default serialization format
+our $JSON_PRETTY = 1;  # Controls whether JSON output is pretty or compact
+our $FORMAT = 'JSON';  # Default serialization format
 
 use overload '""' => \&as_string;
 
@@ -64,7 +65,9 @@ sub _is_hash { return ref $_[0] && reftype( $_[0] ) eq 'HASH'; }
 sub set {
 ########################################################################
   my ( $self, @kv_list ) = @_;
-  croak 'Must provide key-value pairs' if @kv_list % 2 != 0;
+
+  croak 'Must provide key-value pairs'
+    if @kv_list % 2 != 0;
 
   for my $p ( pairs @kv_list ) {
     my ( $key_path, $value ) = @{$p};
@@ -109,8 +112,7 @@ sub set {
       }
     }
     else {
-      croak sprintf q{Error: Attempting to replace a hash reference at key '%s' with a scalar value.},
-        $final_key
+      croak sprintf q{Error: Attempting to replace a hash reference at key '%s' with a scalar value.}, $final_key
         if _is_hash( $current->{$final_key} ) && !_is_hash($value);
 
       $current->{$final_key} = $value;
@@ -153,7 +155,7 @@ sub as_string {
 
   return JSON->new->pretty->encode( $self->{data} ) if $FORMAT eq 'JSON' && $JSON_PRETTY;
   return JSON->new->encode( $self->{data} )         if $FORMAT eq 'JSON';
-  return YAML::Dump( $self->{data} )                if $FORMAT eq 'YAML';
+  return YAML::XS::Dump( $self->{data} )            if $FORMAT eq 'YAML';
   return Dumper( $self->{data} )                    if $FORMAT eq 'Dumper';
   return nfreeze( $self->{data} )                   if $FORMAT eq 'Storable';
 
@@ -161,12 +163,12 @@ sub as_string {
 }
 
 ########################################################################
-sub delete {
+sub delete { ## no critic
 ########################################################################
   my ( $self, @key_paths ) = @_;
 
   for my $key_path (@key_paths) {
-    my @keys    = split /[.]/, $key_path;
+    my @keys    = split /[.]/xsm, $key_path;
     my $current = $self->{data};
     my @parents;  # Track parent references
 
@@ -178,7 +180,10 @@ sub delete {
     }
 
     my $final_key = $keys[-1];
-    delete $current->{$final_key} if exists $current->{$final_key};
+
+    if ( exists $current->{$final_key} ) {
+      delete $current->{$final_key};
+    }
 
     # Cleanup empty parent hashes
     while (@parents) {
@@ -200,7 +205,7 @@ sub exists_key {
   my @results;
 
   for my $key_path (@key_paths) {
-    my @keys    = split /[.]/, $key_path;
+    my @keys    = split /[.]/xsm, $key_path;
     my $current = $self->{data};
     my $exists  = 1;
 
@@ -357,24 +362,18 @@ Returns a list of boolean values (1 for exists, 0 for does not exist).
 Serializes the nested structure into a string using the specified format.
 
 You can also use the "" to interpolate the object into its serialized
-representation. Set the C<$Data::NestedKey::FORAMAT> variable if you
+representation. Set the C<$Data::NestedKey::FORMAT> variable if you
 want to change the default format from JSON to another format.
 
 Returns a string representation of the data.
 
-=head2 clear()
-
-Clears all stored data in the object.
-
-Returns the object itself.
-
-=head1 AUTHORS
+=head1 AUTHOR
 
 Rob Lauer <rlauer6@comcast.net>
 
 =head1 SEE ALSO
 
-L<Data::Dumper>, L<JSON>, L<YAML>, L<Storable>
+L<Data::Dumper>, L<JSON>, L<YAML::XS>, L<Storable>
 
 =head1 LICENSE
 

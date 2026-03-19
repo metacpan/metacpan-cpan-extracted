@@ -2,7 +2,7 @@ package Data::Path::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw(path_get path_set path_delete path_exists
@@ -172,7 +172,8 @@ Returns value at path, or undef if not found. Empty path returns root.
 
 =head2 path_set($data, $path, $value)
 
-Sets value at path. Creates intermediate hashes/arrays as needed.
+Sets value at path. Creates intermediate hashes/arrays as needed
+(replacing non-reference scalars at intermediate positions).
 Numeric keys create arrays, string keys create hashes.
 Returns the value set.
 
@@ -202,6 +203,8 @@ path components are already parsed or contain special characters.
     patha_get($data, []);  # returns root
 
 =head2 patha_set($data, \@path, $value)
+
+Creates intermediates as needed (replacing non-reference scalars).
 
     patha_set($data, ['foo', 'bar'], 42);
 
@@ -233,6 +236,8 @@ Compiles a path string into a reusable compiled path object.
     }
 
 =head2 pathc_set($data, $compiled, $value)
+
+Creates intermediates as needed (replacing non-reference scalars).
 
     pathc_set($data, $cp, 'new value');
 

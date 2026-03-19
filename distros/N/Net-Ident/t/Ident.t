@@ -1,187 +1,167 @@
 # -*- Perl -*-
-# test the Net::Ident module, which is a bitch, because you really
-# need an ident daemon to test it, and then you usually get a connection
-# from a remote machine, and then ask for the username.
-# so what we do is try to make a connection to an ident daemon, on
-# some machine, and if that succeeds, see if we can do a successful lookup
-# on that.
-# This isn't guaranteed to succeed. If you are not (properly) connected
-# to the internet, and if your localhost doesn't run an ident daemon,
-# then this script won't work. If you do know a machine that you can
-# currently reach, which runs an ident daemon, then put it's name or
-# IPnumber in the 'hosts' file in the t/ directory.
+# Integration tests for Net::Ident — requires a running identd to do
+# meaningful testing.  When no identd is reachable, the network-dependent
+# tests are gracefully skipped.
 #
-# $Id: ident.t,v 1.12 1999/03/09 23:15:11 john Exp $
+# Originally written 1999, modernised to Test::More 2026.
 
-require 5.004;
+use strict;
+use warnings;
 
+use Test::More;
 use Net::Ident qw(:fh ident_lookup);
 use FileHandle;
 use Socket;
 
-# turn on full debugging, but prepend ``# '' to output to make it disappear in
-# non-verbose tests
-unless ( open( DEBUGFH, "|-" ) ) {
-
-    # child... do the stuff
-    $|++;
-    while (<>) {
-        s/^/# /;
-        print;
+# Pipe-fork to prefix debug output with "# " so it disappears in
+# non-verbose TAP runs.  Skip the fork on platforms that lack it.
+my $debug_ok = 0;
+if ( $^O ne 'MSWin32' ) {
+    if ( open( my $debugfh, '|-' ) ) {
+        # parent
+        $debugfh->autoflush(1);
+        *Net::Ident::STDDBG = *$debugfh;
+        $Net::Ident::DEBUG  = 2;
+        $debug_ok = 1;
     }
-    exit 0;
-}
-DEBUGFH->autoflush(1);
-*Net::Ident::STDDBG = *DEBUGFH;
-$Net::Ident::DEBUG  = 2;
-
-# find hosts file
-my ($hosts) = grep { -r } qw( t/hosts hosts ../t/hosts );
-my @hosts;
-if ( open( HOSTS, $hosts ) ) {
-    @hosts = grep { !/^#/ } <HOSTS>;
-    chomp @hosts;
-    close HOSTS;
-}
-else {
-    @hosts = qw(127.0.0.1);
-}
-
-$SIG{ALRM} = sub { 0 };
-$| = 1;
-
-sub bomb ($) { die "# Aargh: @_\n1..1\nnot ok1\n" }
-
-$tcpproto = ( getprotobyname('tcp') )[2] || 6;
-$identport = ( getservbyname( 'ident', 'tcp' ) )[2] || 113;
-foreach $host (@hosts) {
-    print "# trying to resolve $host...\n";
-    if ( $addr = inet_aton($host) ) {
-        $fh = new FileHandle;
-        socket( $fh, PF_INET, SOCK_STREAM, $tcpproto ) or bomb("socket: $!");
-        print "# connecting to " . inet_ntoa($addr) . ":$identport\n";
-        alarm(10);
-        if ( connect( $fh, sockaddr_in( $identport, $addr ) ) ) {
-            alarm(0);
-            print "# connected\n";
-            $connok     ||= $fh;
-            $connokhost ||= $host;
+    else {
+        # child — prefix every line with "# "
+        $| = 1;
+        while (<STDIN>) {
+            s/^/# /;
+            print;
         }
-        else {
-            $e = $!;
-            alarm(0);
-            if ( $e =~ /connection refused/i ) {
-                print "# connection refused\n";
+        exit 0;
+    }
+}
 
-                # try to make a connection to the telnet port instead,
-                # to give us some connected filehandle to try the
-                # ident lookup on.
-                print "# connecting to " . inet_ntoa($addr) . ":23\n";
-                $fh = new FileHandle;
-                socket( $fh, PF_INET, SOCK_STREAM, $tcpproto )
-                  or bomb("socket: $!");
-                alarm(10);
-                if ( connect( $fh, sockaddr_in( 23, $addr ) ) ) {
-                    alarm(0);
-                    print "# connected\n";
-                    $connrefuse     ||= $fh;
-                    $connrefusehost ||= $host;
-                }
-                else {
-                    print "# connect: $!\n";
-                    alarm(0);
-                }
+# Locate the hosts file listing machines to test against.
+my ($hostsfile) = grep { -r } qw( t/hosts hosts ../t/hosts );
+my @hosts;
+if ( $hostsfile && open( my $fh, '<', $hostsfile ) ) {
+    @hosts = grep { !/^#/ && /\S/ } <$fh>;
+    chomp @hosts;
+    close $fh;
+}
+@hosts = ('127.0.0.1') unless @hosts;
+
+# Try connecting to identd (port 113) on each host.  Also try to
+# obtain a "connection refused" handle by connecting to the telnet
+# port on a host whose identd is down.
+$SIG{ALRM} = sub { 0 };
+
+my $tcpproto  = ( getprotobyname('tcp') )[2] || 6;
+my $identport = ( getservbyname( 'ident', 'tcp' ) )[2] || 113;
+
+my ( $connok, $connokhost, $connrefuse, $connrefusehost );
+
+for my $host (@hosts) {
+    diag "trying to resolve $host...";
+    my $addr = inet_aton($host) or next;
+
+    my $fh = FileHandle->new;
+    socket( $fh, PF_INET, SOCK_STREAM, $tcpproto )
+      or die "socket: $!";
+
+    diag "connecting to " . inet_ntoa($addr) . ":$identport";
+    alarm(10);
+    if ( connect( $fh, sockaddr_in( $identport, $addr ) ) ) {
+        alarm(0);
+        diag "connected to identd on $host";
+        $connok     ||= $fh;
+        $connokhost ||= $host;
+    }
+    else {
+        my $err = "$!";
+        alarm(0);
+        if ( $err =~ /connection refused/i ) {
+            diag "identd connection refused on $host, trying telnet port";
+            $fh = FileHandle->new;
+            socket( $fh, PF_INET, SOCK_STREAM, $tcpproto )
+              or die "socket: $!";
+            alarm(10);
+            if ( connect( $fh, sockaddr_in( 23, $addr ) ) ) {
+                alarm(0);
+                diag "connected to telnet on $host";
+                $connrefuse     ||= $fh;
+                $connrefusehost ||= $host;
             }
             else {
-                print "# connect: $e\n";
+                alarm(0);
+                diag "telnet connect failed: $!";
             }
         }
-        last if $connok && $connrefuse;
+        else {
+            diag "connect failed: $err";
+        }
     }
+    last if $connok && $connrefuse;
 }
 
-$tests = 1;
-if ($connok) {
-    print "# Will run regular ident lookups by connecting to $connokhost\n";
-    $tests += 6;
-}
-if ($connrefuse) {
-    print "# Will run ``connection refused'' tests by connecting to ", $connrefusehost, "\n";
-    $tests++;
-}
 if ( !$connok && !$connrefuse ) {
-    print "# WARNING: not a lot of testing to do without an identd to use!\n";
+    diag "WARNING: no identd or telnet host reachable — most tests will be skipped";
 }
-print "1..$tests\n";
 
-$i = 1;
-if ($connok) {
-    print "# standard lookup test that will succeed, using FH->ident_lookup\n";
-    $username = $connok->ident_lookup(30);
-    print "not " unless $username;
-    print "ok $i\n";
-    $i++;
+# --- Identd-available tests ---
 
-    print "# now using Net::Ident::lookup\n";
-    $username2 = Net::Ident::lookup( $connok, 30 );
-    print "not " if !$username2 || $username2 ne $username;
-    print "ok $i\n";
-    $i++;
+SKIP: {
+    skip "no identd connection available", 6 unless $connok;
 
-    print "# now using ident_lookup, and an unqualified FH\n";
-    *FH = $connok;
-    *FH = \1;
+    diag "running ident lookups via $connokhost";
 
-    # prevent warning, sortof
-    $username2 = ident_lookup( 'FH', 30 );
-    print "not " if !$username2 || $username2 ne $username;
-    print "ok $i\n";
-    $i++;
+    # 1. FH->ident_lookup method
+    my $username = $connok->ident_lookup(30);
+    ok( $username, "FH->ident_lookup returned a username ($username)" );
 
-    print "# now make it fail... establish connection to ident\n";
-    $lookup = new Net::Ident $connok, 30;
-    print "not " unless $lookup;
-    print "ok $i\n";
-    $i++;
+    # 2. Net::Ident::lookup function
+    my $username2 = Net::Ident::lookup( $connok, 30 );
+    is( $username2, $username, 'Net::Ident::lookup matches FH method' );
 
-    print "not " unless $lookup->getfh && !$lookup->geterror;
-    print "ok $i\n";
-    $i++;
+    # 3. ident_lookup with an unqualified filehandle
+    {
+        no strict 'refs';
+        *FH = $connok;
+        *FH = \1;    # prevent "used only once" warning
+    }
+    my $username3 = ident_lookup( 'FH', 30 );
+    is( $username3, $username, 'ident_lookup(unqualified FH) matches' );
 
-    print "# now close original connection\n";
+    # 4-5. Asynchronous interface: initiate, then close original socket
+    my $lookup = Net::Ident->new( $connok, 30 );
+    ok( $lookup, 'Net::Ident->new succeeds' );
+    ok( $lookup->getfh && !$lookup->geterror,
+        'new object has fh and no error' );
+
+    # Close the original connection so the remote identd returns ERROR
     shutdown( $connok, 2 );
     close($connok);
-    sleep 1;    # give it a little time...
+    sleep 1;
 
-    print "# try the rest of the lookup, which should fail\n";
-    ( $username, $opsys, $error ) = $lookup->username;
-    print "# remote identd said: $error\n";
-    print "not " unless !defined $username && $opsys eq "ERROR";
-    print "ok $i\n";
-    $i++;
-
+    # 6. The lookup should now fail (remote port gone)
+    my ( $user, $opsys, $error ) = $lookup->username;
+    diag "remote identd said: " . ( $error // '<undef>' );
+    ok( !defined $user && defined $opsys && $opsys eq 'ERROR',
+        'lookup fails with ERROR after closing original socket' );
 }
 
-if ($connrefuse) {
-    print "# try to get a connection refused error\n";
-    ( $username, $opsys, $error ) = $connrefuse->ident_lookup(30);
+# --- Connection-refused tests ---
 
-    print "not "
-      unless !defined $username
-      && !defined $opsys
-      && $error =~ /connection refused/i;
-    print "ok $i\n";
-    $i++;
-    print "# got: $error\n";
+SKIP: {
+    skip "no connection-refused host available", 1 unless $connrefuse;
+
+    diag "testing connection-refused via $connrefusehost";
+    my ( $user, $opsys, $error ) = $connrefuse->ident_lookup(30);
+    ok( !defined $user && !defined $opsys && $error =~ /connection refused/i,
+        "connection refused error: $error" );
 }
 
-print "# try to get ident info on a handle that's not a socket\n";
-$lookup = new Net::Ident STDERR, 30;
+# --- Non-socket handle (always runs) ---
 
-print "not "
-  unless $lookup
-  && !defined $lookup->getfh
-  && $lookup->geterror;
-print "ok $i\n";
-$i++;
-print "# got: " . $lookup->geterror . "\n";
+{
+    my $lookup = Net::Ident->new( \*STDERR, 30 );
+    ok( $lookup, 'new() on non-socket returns an object (never dies)' );
+    is( $lookup->getfh, undef, 'getfh returns undef for non-socket' );
+    ok( $lookup->geterror, 'geterror reports the failure: ' . ( $lookup->geterror // '' ) );
+}
+
+done_testing;

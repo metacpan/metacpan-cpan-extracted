@@ -226,7 +226,6 @@ my $mm = WriteMakefile(
         'Imager'             => '0.80',
         'Inline'             => '0.53',
         'Inline::C'          => '0.53',
-        'Pod::Usage'         => '0',
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'Graphics-Framebuffer* _Inline* examples/_Inline* *.inl *log *bak *old'},
@@ -253,15 +252,6 @@ sub no_framebuffer {
 				}
 			}
 		}
-	} elsif ($os eq 'FreeBSD') {
-		foreach my $device (0 .. 15) {
-			my $prefix = '/dev/ttyv';
-			my $path = $prefix . hex($device);
-			if (-e $path) {
-				$fb_absent = FALSE;
-				print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
-			}
-		}
 	}
     if ($fb_absent) {
         print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_red'],'NOT FOUND'),"\n";
@@ -273,7 +263,7 @@ __END__
 
 =pod
 
-Copyright (C) 2013-2025 Richard Kelsch
+Copyright (C) 2013-2026 Richard Kelsch
 All Rights Reserved
 
 =cut

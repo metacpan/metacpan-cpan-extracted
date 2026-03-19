@@ -12,6 +12,7 @@ dist.ini
 inc/AppendSection.pm
 inc/CheckConflicts.pm
 inc/ExtUtils/HasCompiler.pm
+inc/TestWithoutOptionalModules.pm
 lib/JSON/Schema/Modern.pm
 lib/JSON/Schema/Modern/Annotation.pm
 lib/JSON/Schema/Modern/Document.pm

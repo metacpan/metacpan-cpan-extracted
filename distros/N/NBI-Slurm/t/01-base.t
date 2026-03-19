@@ -11,5 +11,6 @@ use_ok 'NBI::Job';
 use_ok 'NBI::Opts';
 use_ok 'NBI::QueuedJob';
 use_ok 'NBI::Queue';
+use_ok 'NBI::EcoScheduler';
 
 done_testing();

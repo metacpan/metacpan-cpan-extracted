@@ -15,33 +15,35 @@ our $VERSION = '0.001';
 sub new {
     my ($class, %args) = @_;
 
+    # Separate pool-specific args from connection args.
+    # Everything not pool-specific is passed through to Async::Redis->new().
+    my %pool_args;
+    for my $key (qw(min max acquire_timeout idle_timeout cleanup_timeout on_dirty)) {
+        $pool_args{$key} = delete $args{$key} if exists $args{$key};
+    }
+
     my $self = bless {
-        # Connection params (passed to Async::Redis->new)
-        host     => $args{host} // 'localhost',
-        port     => $args{port} // 6379,
-        password => $args{password},
-        database => $args{database},
-        tls      => $args{tls},
-        uri      => $args{uri},
+        # Connection params (passed through to Async::Redis->new)
+        _conn_args => \%args,
 
         # Pool sizing
-        min => $args{min} // 1,
-        max => $args{max} // 10,
+        min => $pool_args{min} // 1,
+        max => $pool_args{max} // 10,
 
         # Timeouts
-        acquire_timeout  => $args{acquire_timeout} // 5,
-        idle_timeout     => $args{idle_timeout} // 60,
-        connect_timeout  => $args{connect_timeout} // 10,
-        cleanup_timeout  => $args{cleanup_timeout} // 5,
+        acquire_timeout  => $pool_args{acquire_timeout} // 5,
+        idle_timeout     => $pool_args{idle_timeout} // 60,
+        cleanup_timeout  => $pool_args{cleanup_timeout} // 5,
 
         # Dirty handling
-        on_dirty => $args{on_dirty} // 'destroy',
+        on_dirty => $pool_args{on_dirty} // 'destroy',
 
         # Pool state
         _idle    => [],   # Available connections
         _active  => {},   # Connections in use (conn => 1)
         _waiters => [],   # Futures waiting for connection
-        _pending => [],   # Background futures (creation, cleanup)
+        _pending         => [],   # Background futures (creation, cleanup)
+        _creating        => 0,    # Connections currently being created
         _total_created   => 0,
         _total_destroyed => 0,
 
@@ -99,8 +101,9 @@ sub _clear_all_connections {
     }
     $self->{_waiters} = [];
 
-    # Clear pending futures
+    # Clear pending futures and creation counter
     $self->{_pending} = [];
+    $self->{_creating} = 0;
 }
 
 # Acquire a connection from the pool
@@ -126,10 +129,24 @@ async sub acquire {
     }
 
     # No idle connections - can we create a new one?
-    my $current_total = (scalar keys %{$self->{_active}}) + (scalar @{$self->{_idle}});
+    # Include _creating count to prevent concurrent acquires from exceeding max
+    my $current_total = (scalar keys %{$self->{_active}})
+                      + (scalar @{$self->{_idle}})
+                      + $self->{_creating};
 
     if ($current_total < $self->{max}) {
-        my $conn = await $self->_create_connection;
+        $self->{_creating}++;
+        my $conn;
+        eval {
+            $conn = await $self->_create_connection;
+        };
+        my $error = $@;
+        $self->{_creating}--;
+
+        if ($error) {
+            die $error;
+        }
+
         $self->{_active}{"$conn"} = $conn;
         return $conn;
     }
@@ -221,18 +238,7 @@ sub _return_to_pool {
 async sub _create_connection {
     my ($self) = @_;
 
-    my %conn_args = (
-        host            => $self->{host},
-        port            => $self->{port},
-        connect_timeout => $self->{connect_timeout},
-    );
-
-    $conn_args{password} = $self->{password} if defined $self->{password};
-    $conn_args{database} = $self->{database} if defined $self->{database};
-    $conn_args{tls}      = $self->{tls}      if $self->{tls};
-    $conn_args{uri}      = $self->{uri}      if $self->{uri};
-
-    my $conn = Async::Redis->new(%conn_args);
+    my $conn = Async::Redis->new(%{$self->{_conn_args}});
     await $conn->connect;
 
     $self->{_total_created}++;
@@ -252,15 +258,20 @@ sub _destroy_connection {
 sub _maybe_create_replacement {
     my ($self) = @_;
 
-    my $current_total = (scalar keys %{$self->{_active}}) + (scalar @{$self->{_idle}});
+    my $current_total = (scalar keys %{$self->{_active}})
+                      + (scalar @{$self->{_idle}})
+                      + $self->{_creating};
 
     if ($current_total < $self->{min}) {
         # Create replacement asynchronously
+        $self->{_creating}++;
         $self->_track_pending(
             $self->_create_connection->on_done(sub {
                 my ($conn) = @_;
+                $self->{_creating}--;
                 $self->_return_to_pool($conn);
             })->on_fail(sub {
+                $self->{_creating}--;
                 # Failed to create replacement - log and continue
                 warn "Failed to create replacement connection: @_";
             })

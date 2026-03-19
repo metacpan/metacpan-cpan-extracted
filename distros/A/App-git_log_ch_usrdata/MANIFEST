@@ -1,3 +1,4 @@
+.github/workflows/ci.yml
 Changes
 CONTRIBUTING.md
 lib/App/git_log_ch_usrdata.pm
@@ -12,7 +13,13 @@ t/00-load.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-xt/boilerplate.t
-xt/pod-spell.t
+xt/author/boilerplate.t
+xt/author/kwalitee.t
+xt/author/pod-spell.t
+xt/author/pod.t
+xt/release/changes.t
+xt/release/cpan-json.t
+xt/release/cpan-yml.t
+xt/release/manifest.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

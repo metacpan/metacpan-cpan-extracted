@@ -4,7 +4,7 @@
       "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -50,7 +50,6 @@
             "Term::ANSIColor" : "0",
             "Text::ANSITable" : "0.608",
             "Time::Piece::Guess" : "0",
-            "YAML::PP" : "0",
             "perl" : "5.006"
          }
       },
@@ -67,6 +66,6 @@
          "web" : "https://github.com/LilithSec/Lilith"
       }
    },
-   "version" : "v0.6.0",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

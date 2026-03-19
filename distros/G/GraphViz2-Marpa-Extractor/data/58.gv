@@ -1,0 +1,8 @@
+digraph graph_58
+{
+	<<table><tr><td>node_58_1</td></tr></table>>
+
+	<<table><tr><td>node_58_2</td></tr></table>> [label = "node_58_2"]
+
+	node_58_3 [label = <<table><tr><td>node_58_3</td></tr></table>>]
+}

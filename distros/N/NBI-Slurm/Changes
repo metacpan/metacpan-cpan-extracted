@@ -1,3 +1,15 @@
+0.17.0  2026-03-16
+
+* Added `NBI::EcoScheduler` module for energy-aware job scheduling
+* Added `--begin` support to `NBI::Opts` via `start_time` and `start_date` attributes
+  (accepts DD/MM[/YYYY] dates and HH:MM[:SS] 24h times, infers missing date/year)
+* Added `--eco` / `--no-eco` flags to `runjob`
+* Eco scheduling is on by default (`eco_default=1`); defers jobs to low-energy windows:
+  Mon–Fri 00:00–06:00, Sat–Sun 00:00–07:00 and 11:00–16:00, avoiding 17:00–20:00
+* Eco windows and avoid windows are fully configurable via `~/.nbislurm.config`
+* `bin/configuration` now generates eco scheduling section in new config files
+* Added file-level description comments to all `lib/NBI/` modules
+
 0.16.1	2026-02-18
 
 * Minor fixes at `shelf`

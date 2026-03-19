@@ -11,6 +11,10 @@ on:
   pull_request:
     branches: [main, master]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -37,11 +41,16 @@ jobs:
           sudo apt-get -y upgrade
         if: runner.os == 'Linux'
 
+      - name: Upgrade Toolchain
+        run: cpanm -iqn ExtUtils::MakeMaker Module::Build
+
       # Install module dependencies (from cpanfile or manually)
       - name: Install dependencies
         run: |
           cpanm --notest --installdeps .
-          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover Devel::Cover::Report::Html POSIX File::Glob File::Slurp File::stat Readonly IPC::System::Simple
+          cpanm -iqn ExtUtils::MakeMaker Test::Most Devel::Cover Devel::Cover::Report::Html POSIX File::Glob File::Slurp File::stat Readonly
+          cpanm -iqn IPC::System::Simple WWW::RT::CPAN IPC::Run3
+        timeout-minutes: 10
 
       # Optional: run Perl::Critic static checks
       # - name: Run Perl::Critic
@@ -53,6 +62,7 @@ jobs:
         env:
           AUTOMATED_TESTING: 1
           NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
         run: |
           prove -l -b -v t
 
@@ -61,13 +71,16 @@ jobs:
         env:
           PERL5LIB: ${{ github.workspace }}/local/lib/perl5
           COVER_VERBOSE: 1
+          AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
         working-directory: ${{ github.workspace }}
         run: |
           perl Makefile.PL
           cover -test
 
       # Generate HTML coverage report
-      - name: Generate HTML report
+      - name: Generate Coverage HTML report
         run: |
           mkdir -p cover_html
           cover -report html -outputdir cover_html
@@ -84,7 +97,30 @@ jobs:
         run: |
           mv cover_html/coverage.html cover_html/index.html
 
-      - name: Generate custom coverage index
+      # Run the mutation tests with App::Test::Generator
+      - name: Install mutation tester
+        run: |
+          cpanm -iqn Data::Random::String::Matches Data::Random::Structure Data::Random Data::Random::String App::Test::Generator
+          echo "$(pwd)/local/bin" >> $GITHUB_PATH
+        env:
+          PERL5LIB: ${{ github.workspace }}/local/lib/perl5
+          COVER_VERBOSE: 1
+          AUTOMATED_TESTING: 1
+          NO_NETWORK_TESTING: 1
+          NONINTERACTIVE_TESTING: 1
+        working-directory: ${{ github.workspace }}
+
+      # Generate HTML mutation report, do this after the coverage report, so you don't get a coverage report for the mutants
+      - name: Generate Mutation HTML report
+        run: |
+          app-test-generator-mutate \
+              --lib lib \
+              --min-score 85 \
+              --json mutation.json \
+              --html cover_html/mutation_html < /dev/null
+      # working-directory: ${{ github.workspace }}
+
+      - name: Generate custom coverage page index
         run: |
           mkdir -p cover_db
           # cover -dump > cover_db/cover.json

@@ -1,0 +1,136 @@
+use strict;
+use warnings;
+use Test::More;
+use SQL::Wizard;
+
+my $q = SQL::Wizard->new;
+
+sub where_sql {
+  my ($where) = @_;
+  $q->select(-from => 'x', -where => $where)->to_sql;
+}
+
+# simple equality
+{
+  my ($sql, @bind) = where_sql({ name => 'alice' });
+  like $sql, qr/WHERE name = \?/, 'simple equality';
+  is_deeply \@bind, ['alice'], 'equality bind';
+}
+
+# multiple keys (AND)
+{
+  my ($sql, @bind) = where_sql({ age => 25, name => 'bob' });
+  like $sql, qr/WHERE age = \? AND name = \?/, 'multi key AND';
+  is_deeply \@bind, [25, 'bob'], 'multi key binds';
+}
+
+# IS NULL
+{
+  my ($sql, @bind) = where_sql({ parent_id => undef });
+  like $sql, qr/WHERE parent_id IS NULL/, 'IS NULL';
+  is_deeply \@bind, [], 'null no binds';
+}
+
+# operator: >
+{
+  my ($sql, @bind) = where_sql({ age => { '>' => 18 } });
+  like $sql, qr/WHERE age > \?/, 'operator >';
+  is_deeply \@bind, [18], 'operator bind';
+}
+
+# operator: >=, <, <=, !=
+{
+  my ($sql, @bind) = where_sql({ age => { '>=' => 18 } });
+  like $sql, qr/WHERE age >= \?/, '>= operator';
+}
+{
+  my ($sql, @bind) = where_sql({ age => { '<' => 65 } });
+  like $sql, qr/WHERE age < \?/, '< operator';
+}
+{
+  my ($sql, @bind) = where_sql({ age => { '!=' => 0 } });
+  like $sql, qr/WHERE age != \?/, '!= operator';
+}
+
+# -in
+{
+  my ($sql, @bind) = where_sql({ country => { -in => ['FR', 'DE', 'IT'] } });
+  like $sql, qr/WHERE country IN \(\?, \?, \?\)/, '-in';
+  is_deeply \@bind, ['FR', 'DE', 'IT'], '-in binds';
+}
+
+# -not_in
+{
+  my ($sql, @bind) = where_sql({ status => { -not_in => ['banned', 'deleted'] } });
+  like $sql, qr/WHERE status NOT IN \(\?, \?\)/, '-not_in';
+  is_deeply \@bind, ['banned', 'deleted'], '-not_in binds';
+}
+
+# -in with subquery
+{
+  my $sub = $q->select(-columns => ['user_id'], -from => 'orders');
+  my ($sql, @bind) = where_sql({ id => { -in => $sub } });
+  like $sql, qr/WHERE id IN \(SELECT user_id FROM orders\)/, '-in subquery';
+}
+
+# array value = IN
+{
+  my ($sql, @bind) = where_sql({ id => [1, 2, 3] });
+  like $sql, qr/WHERE id IN \(\?, \?, \?\)/, 'array value as IN';
+  is_deeply \@bind, [1, 2, 3], 'array value binds';
+}
+
+# -and array
+{
+  my ($sql, @bind) = where_sql([
+    -and => [
+      { status => 'active' },
+      { age => { '>' => 18 } },
+    ],
+  ]);
+  like $sql, qr/WHERE.*status = \?.*AND.*age > \?/, '-and array';
+  is_deeply \@bind, ['active', 18], '-and binds';
+}
+
+# -or array
+{
+  my ($sql, @bind) = where_sql([
+    -or => [
+      { status => 'active' },
+      { status => 'pending' },
+    ],
+  ]);
+  like $sql, qr/WHERE.*status = \?.*OR.*status = \?/, '-or array';
+  is_deeply \@bind, ['active', 'pending'], '-or binds';
+}
+
+# nested -and/-or
+{
+  my ($sql, @bind) = where_sql([
+    -and => [
+      { status => 'active' },
+      [-or => [
+        { role => 'admin' },
+        { role => 'editor' },
+      ]],
+    ],
+  ]);
+  like $sql, qr/status = \?.*AND.*\(role = \? OR role = \?\)/, 'nested and/or';
+  is_deeply \@bind, ['active', 'admin', 'editor'], 'nested binds';
+}
+
+# Expr object as value
+{
+  my ($sql, @bind) = where_sql({ user_id => $q->col('u.id') });
+  like $sql, qr/WHERE user_id = u\.id/, 'expr as value';
+  is_deeply \@bind, [], 'expr no binds';
+}
+
+# plain string where
+{
+  my ($sql, @bind) = where_sql('1 = 1');
+  like $sql, qr/WHERE 1 = 1/, 'string where';
+  is_deeply \@bind, [], 'string where no binds';
+}
+
+done_testing;

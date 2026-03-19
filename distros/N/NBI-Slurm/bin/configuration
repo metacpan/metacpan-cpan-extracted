@@ -19,58 +19,109 @@ GetOptions(
     'help' => sub { pod2usage() },
 );
 
+# ---------------------------------------------------------------------------
+# Master list of all known configuration keys.
+# Used for fresh template generation AND for detecting missing keys in an
+# existing config file (e.g. after a package upgrade).
+#
+# Format: [ key, default_value, comment, active_in_fresh_template ]
+#   active_in_fresh_template=1 → written uncommented in a new file
+#   active_in_fresh_template=0 → written commented out in a new file
+#                                 (and always commented out when appended)
+# ---------------------------------------------------------------------------
+my $system_tmp_dir = $ENV{TMPDIR} || '/tmp';
+my @KNOWN_KEYS = (
+    # --- Job defaults ---
+    [ 'tmpdir',              $system_tmp_dir,                         'Temporary directory for job scripts and logs',          1 ],
+    [ 'email',               'your.email@domain.com',                 'Email address for job notifications',                   1 ],
+    [ 'email_type',          'end,fail',                              'When to notify: none, end, fail, all',                  1 ],
+    [ 'queue',               'nbi-short',                             'Default queue for job submission',                      0 ],
+    [ 'time',                '2h',                                    'Default time limit (e.g. 2h, 1d)',                      0 ],
+    [ 'memory',              '8000',                                  'Default memory in MB (or e.g. 8GB)',                    0 ],
+    [ 'threads',             '1',                                     'Default number of CPU threads',                         0 ],
+    [ 'gpuqueue',            'nbi-gpu',                               'Default queue for GPU jobs',                            0 ],
+    # --- Eco scheduling ---
+    [ 'eco_default',         '1',                                     'Eco scheduling on by default (1=on, 0=off)',            1 ],
+    [ 'eco_windows_weekday', '00:00-06:00',                           'Cheap-energy windows Mon-Fri (HH:MM-HH:MM)',            0 ],
+    [ 'eco_windows_weekend', '00:00-07:00,11:00-16:00',               'Cheap-energy windows Sat-Sun (comma-separated)',        0 ],
+    [ 'eco_avoid',           '17:00-20:00',                           'Peak hours to avoid every day (HH:MM-HH:MM)',           0 ],
+    [ 'eco_lookahead_days',  '3',                                     'Days ahead to search for an eco slot',                  0 ],
+    # --- Interactive sessions ---
+    [ 'session',             '',                                      'Extra parameters for all interactive sessions',         0 ],
+    [ 'special_session',     '--constraint=intel',                    'Extra parameters for --special interactive sessions',   0 ],
+    [ 'session_memory',      '2000',                                  'Default memory (MB) for interactive sessions',          1 ],
+    [ 'session_cpus',        '2',                                     'Default CPUs for interactive sessions',                 1 ],
+    [ 'session_hours',       '12',                                    'Default hours for interactive sessions',                1 ],
+    # --- HPC images ---
+    [ 'default_dest',        '/qib/platforms/Informatics/transfer/outgoing/singularity/core/', 'Default destination for Singularity images', 1 ],
+    [ 'packages_dir',        '/nbi/software/testing/bin/',            'Where to place package binaries',                       1 ],
+    [ 'packages_basepath',   '/nbi/software/testing/',                'Base path for packages',                                1 ],
+);
+
+# ---------------------------------------------------------------------------
 say STDERR BOLD, "CHECKING: $config_file", RESET;
+
 if (-e "$config_file") {
     say STDERR "[OK] Configuration file already exists at $config_file";
+
+    # Find keys present in the master list but absent from the existing file.
+    # Scan the raw file (not just the parsed config) so that previously-appended
+    # commented-out keys are also recognised — ensuring idempotency across runs.
+    my %file_keys;
+    open(my $raw_fh, "<", $config_file)
+        or die "[--] Can't read $config_file: $!";
+    while (<$raw_fh>) {
+        $file_keys{$1} = 1 if /^\s*#?\s*(\w+)\s*=/;
+    }
+    close $raw_fh;
+    my @missing = grep { !exists $file_keys{$_->[0]} } @KNOWN_KEYS;
+
+    if (@missing) {
+        say STDERR YELLOW, "[..] Found ", scalar(@missing),
+            " new key(s) not in your config — appending as comments", RESET;
+        open(my $fh, ">>", "$config_file")
+            or die "[--] Can't open $config_file for appending: $!";
+        say $fh "\n# ---- Keys added by NBI-Slurm v$NBI::Slurm::VERSION ----";
+        say $fh "# Uncomment and edit any lines you want to activate.\n";
+        for my $entry (@missing) {
+            my ($key, $default, $desc) = @{$entry};
+            say $fh "# $desc";
+            say $fh "# $key=$default\n";
+        }
+        close $fh;
+        for my $entry (@missing) {
+            say STDERR GREEN, "  + $entry->[0]", RESET;
+        }
+    } else {
+        say STDERR GREEN, "[OK] All known configuration keys are already present", RESET;
+    }
+
 } else {
-    my $system_tmp_dir = $ENV{TMPDIR} || '/tmp';
     say STDERR "[..] Creating configuration file at $config_file";
-    open(my $fh, ">", "$config_file") or die "[--] Can't open $config_file for writing: $!";
-    say $fh <<"END";
+    open(my $fh, ">", "$config_file")
+        or die "[--] Can't open $config_file for writing: $!";
 
-# Default configuration file for NBI::Slurm tools
-# This file is in key=value format, and can be edited manually.
+    say $fh "# Default configuration file for NBI::Slurm tools";
+    say $fh "# This file is in key=value format, and can be edited manually.";
+    say $fh "# Generated by NBI-Slurm v$NBI::Slurm::VERSION\n";
 
-# Temporary directory 
-tmpdir=$system_tmp_dir
+    my %sections = (
+        tmpdir              => "\n# --- Job defaults ---",
+        eco_default         => "\n# --- Eco scheduling ---",
+        session             => "\n# --- Interactive sessions ---",
+        default_dest        => "\n# --- HPC images ---",
+    );
 
-# Email address to use for job submission
-email=your.email\@domain.com
-
-# When to be notified about job status changes: none, end, fail, all
-email_type=end,fail
-
-# Other custom defaults you can set:
-# queue=
-# time=
-# gpuqueue=
-
-# INTERACTIVE SESSION
-
-# A string of parameters to be used for all interactive sessions
-# session=
-
-# A string of parameters to be used for interactive sessions when --special is specified
-# special_session=--constraint=intel
-
-# Default memory for session
-session_memory=2000
-session_cpus=2
-session_hours=12
-
-# IMAGES FOR HPC
-
-# Default destination when --move an image
-# Should be a place readable by all users in the HPC cluster
-default_dest=/qib/platforms/Informatics/transfer/outgoing/singularity/core/
-
-# Where to place the package
-packages_dir=/nbi/software/testing/bin/
-
-# Where to place the binaries
-packages_basepath=/nbi/software/testing/
-
-END
+    for my $entry (@KNOWN_KEYS) {
+        my ($key, $default, $desc, $active) = @$entry;
+        say $fh $sections{$key} if exists $sections{$key};
+        say $fh "# $desc";
+        if ($active) {
+            say $fh "$key=$default\n";
+        } else {
+            say $fh "# $key=$default\n";
+        }
+    }
 }
 
 my $conf = NBI::Slurm::load_config($config_file);
@@ -91,7 +142,7 @@ configuration_file_info - How to make your configuration file for NBI::Slurm too
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 
@@ -152,6 +203,39 @@ When to send emails, default is 'none'.
 
 =back
 
+=head2 Eco Scheduling
+
+C<runjob> can automatically defer jobs to low-energy-price windows.
+See L<NBI::EcoScheduler> for full details.
+
+=over 4
+
+=item * C<eco_default>
+
+Set to C<1> (default) to enable eco scheduling for every C<runjob> invocation.
+Set to C<0> to disable. Can be overridden per-job with C<--eco> / C<--no-eco>.
+
+=item * C<eco_windows_weekday>
+
+Comma-separated C<HH:MM-HH:MM> windows on Monday–Friday when energy is cheap.
+Default: C<00:00-06:00>.
+
+=item * C<eco_windows_weekend>
+
+Comma-separated C<HH:MM-HH:MM> windows on Saturday–Sunday.
+Default: C<00:00-07:00,11:00-16:00>.
+
+=item * C<eco_avoid>
+
+Comma-separated C<HH:MM-HH:MM> windows to avoid every day (peak hours).
+Default: C<17:00-20:00>.
+
+=item * C<eco_lookahead_days>
+
+How many days ahead to search for a suitable eco slot. Default: C<3>.
+
+=back
+
 =head2 Interactive Sessions
 
 The C<session> script has two additional options that can be set in the configuration file:
@@ -209,6 +293,13 @@ A string of parameters to be used for interactive sessions when C<--special> is 
 
   # Where to place the binaries
   packages_basepath=/nbi/software/testing/
+
+  # ECO SCHEDULING
+  eco_default=1
+  # eco_windows_weekday=00:00-06:00
+  # eco_windows_weekend=00:00-07:00,11:00-16:00
+  # eco_avoid=17:00-20:00
+  # eco_lookahead_days=3
 
 =head1 AUTHOR
 

@@ -6,7 +6,7 @@ use Carp 'croak';
 use EV;
 
 BEGIN {
-    our $VERSION = '0.02';
+    our $VERSION = '0.03';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -21,7 +21,8 @@ BEGIN {
 my @OPTION_KEYS = qw(
     connect_timeout read_timeout write_timeout
     compress multi_statements charset init_command
-    ssl_key ssl_cert ssl_ca ssl_cipher ssl_verify_server_cert
+    ssl_key ssl_cert ssl_ca ssl_capath ssl_cipher ssl_verify_server_cert
+    utf8 found_rows
 );
 
 sub CLONE_SKIP { 1 }
@@ -236,6 +237,12 @@ statement's result set is returned to the callback; secondary result sets
 are consumed and discarded. Errors in secondary statements are delivered
 via the C<on_error> handler.
 
+=item found_rows => 1
+
+Set the C<CLIENT_FOUND_ROWS> flag. Makes C<UPDATE> return the number of
+matched rows instead of changed rows. Useful for upsert patterns where
+you need to know if a row existed regardless of whether it was modified.
+
 =item charset => $name
 
 Character set name (e.g., C<utf8mb4>). This controls both result encoding
@@ -254,11 +261,26 @@ SQL statement executed automatically after connecting.
 
 =item ssl_ca => $path
 
+=item ssl_capath => $path
+
 =item ssl_cipher => $list
 
 =item ssl_verify_server_cert => 1
 
 SSL/TLS connection options.
+
+=item utf8 => 1
+
+When enabled, result strings from columns with a UTF-8 charset are
+automatically flagged with Perl's internal UTF-8 flag (C<SvUTF8_on>).
+This applies to text queries, prepared statements, and streaming results.
+Column names in C<$fields> are UTF-8-flagged when the connection charset
+is C<utf8> or C<utf8mb4>, regardless of this option. Without this option,
+all result values are returned as raw byte
+strings (the default, matching DBD::mysql behavior).
+
+Requires the connection charset to be C<utf8> or C<utf8mb4> for correct
+behavior.
 
 =back
 
@@ -321,9 +343,9 @@ utility operation (C<ping>, C<select_db>, etc.) is active - the query
 is buffered and executed when the operation completes. Dies if
 C<connect> has not been called at all.
 
-B<Note:> Result strings are returned as byte strings without Perl's
-internal UTF-8 flag set, regardless of the connection charset. Use
-C<Encode::decode_utf8> if you need character semantics on UTF-8 data.
+B<Note:> By default, result strings are returned as byte strings without
+Perl's internal UTF-8 flag. Set C<< utf8 => 1 >> in the constructor to
+automatically flag UTF-8 results, or use C<Encode::decode_utf8> manually.
 
 =head2 prepare
 
@@ -350,7 +372,9 @@ previously bound parameters (see C<bind_params> and C<send_long_data>).
 
     $m->close_stmt($stmt, sub { my ($ok, $err) = @_ });
 
-Closes a prepared statement, freeing server resources.
+Closes a prepared statement, freeing server and client resources
+(including bound parameter buffers). B<Must> be called for every
+prepared statement to avoid memory leaks.
 
 =head2 stmt_reset
 
@@ -535,7 +559,12 @@ SQLSTATE code (5-character string) for the last error.
 
 =item insert_id
 
-auto_increment value from the last insert.
+Auto_increment value from the last insert.
+
+=item affected_rows
+
+Number of affected rows from the last DML operation, or C<undef> on
+error. With C<< found_rows => 1 >>, UPDATE returns matched rows instead.
 
 =item warning_count
 
@@ -617,6 +646,44 @@ reading any results. This reduces round-trip overhead and can achieve
 
 The maximum pipeline depth is 64 queries. Additional queries are buffered
 and sent as earlier results are received.
+
+=head1 UNICODE
+
+EV::MariaDB supports full Unicode (including 4-byte characters like emoji)
+when the connection charset is C<utf8mb4>.
+
+=head2 Setup
+
+    my $m = EV::MariaDB->new(
+        charset => 'utf8mb4',
+        utf8    => 1,
+        ...
+    );
+
+The C<charset> option sets the connection character set used by the server.
+The C<utf8> option controls Perl-side string flagging: when enabled, result
+strings from UTF-8 columns are returned with Perl's internal UTF-8 flag
+set, so C<length()>, regex, and other character operations work correctly.
+
+=head2 Reading data
+
+With C<< utf8 => 1 >>, text query results, prepared statement results, and
+streaming results are automatically UTF-8-flagged per column based on the
+column's charset. Binary and non-UTF-8 columns are returned as raw byte
+strings. Column names (the C<$fields> arrayref) are UTF-8-flagged when the
+connection charset is C<utf8> or C<utf8mb4>, regardless of this option.
+
+Without C<< utf8 => 1 >>, all result values are byte strings (the default).
+Use C<Encode::decode_utf8()> to decode them manually.
+
+=head2 Writing data
+
+No special handling is needed for inserting Unicode. Perl strings (whether
+UTF-8-flagged or not) are sent as their underlying byte representation via
+C<SvPV>. As long as the connection charset matches the data encoding
+(i.e., C<< charset => 'utf8mb4' >> for UTF-8 data), the server receives
+and stores the bytes correctly. This applies to both text queries (via
+C<query>/C<escape>) and prepared statement parameters (via C<execute>).
 
 =head1 SEE ALSO
 

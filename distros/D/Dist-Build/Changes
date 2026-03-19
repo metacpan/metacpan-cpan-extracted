@@ -1,5 +1,8 @@
 Revision history for Dist-Build
 
+0.028     2026-03-15 23:28:30+01:00 Europe/Brussels
+          - Support try_find_standard_for in XS::Conf
+
 0.027     2026-03-05 23:31:41+01:00 Europe/Brussels
           - Rewrite to remove s///r construct for 5.10 compatibility
 

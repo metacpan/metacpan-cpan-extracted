@@ -42,7 +42,7 @@ if ($mysqld_check) {
         driver          => 'mysql',                            # keep this unless using DBD::MariaDBq
         dsn             => $mysqld->dsn( dbname => 'test' ),
         connect_options => {
-            RaiseError => 0,
+            RaiseError => 1,
             AutoCommit => 1,
             PrintError => 0,
         }

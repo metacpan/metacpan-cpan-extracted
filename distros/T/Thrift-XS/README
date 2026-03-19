@@ -73,6 +73,9 @@ SPEED
             writeDouble + readDouble:             13.5x
             writeString + readString:              7.4x
 
+THANKS
+    Wang Lam, <wlam@kosmix.com>, for patches and additional tests.
+
 SEE ALSO
     Thrift Home <http://thrift.apache.org/>
 
@@ -83,10 +86,10 @@ SEE ALSO
     yet on CPAN, but will be available soon.
 
 AUTHOR
-    Andy Grundman, <andy@slimdevices.com>
+    Andy Grundman, <andy@hybridized.org>
 
 COPYRIGHT AND LICENSE
-    Copyright 2011 Logitech, Inc.
+    Copyright 2011 Andy Grundman
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may
     not use this file except in compliance with the License. You may obtain

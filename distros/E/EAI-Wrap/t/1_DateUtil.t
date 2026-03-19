@@ -1,6 +1,6 @@
 use strict; use warnings; use Test::More; use utf8;
 use EAI::DateUtil; use Time::Piece;
-use Test::More tests => 199;
+use Test::More tests => 207;
 # for consistent time results set to timezone to UTC and invoke scalar localtime
 $ENV{TZ} = 'UTC';
 scalar localtime;
@@ -209,4 +209,12 @@ is(formatTime(make_time("122003"),"%02d%02d%02d%02d%02d"),undef,'formatTime with
 is(formatTime(make_time("122003",60),"%02d%02d"),"1221",'formatTime with format %02d%02d from make_time("122003",60)');
 like(formatTime(get_curtime_epochs(),"%02d%02d"),qr/\d{2}\d{2}/,'formatTime(get_curtime_epochs(),"%02d%02d")');
 is(convertJulianToYYYYMMDD(45582),"20241017",'convertJulianToYYYYMMDD');
+is(skipOnDate("B","20120101"),"skipping as \$onlyPassIf eq B and is_weekend(20120101)=1 || is_holiday(AT,20120101)=1",'skipOnDate 1a');
+is(skipOnDate("B","20120101","UK"),"skipping as \$onlyPassIf eq B and is_weekend(20120101)=1 || is_holiday(UK,20120101)=1",'skipOnDate 1b');
+is(skipOnDate("M1","20120102"),"skipping as \$onlyPassIf eq M1 and curDate (20120102) !~ /\\d{4}\\d{2}01/",'skipOnDate 2');
+is(skipOnDate("Q","20120103"),"skipping as \$onlyPassIf eq Q and curDate (20120103) !~ /\\d{4}0102/ and curDate !~ /\\d{4}0401/ and curDate !~ /\\d{4}0701/ and curDate !~ /\\d{4}1001/",'skipOnDate 3');
+is(skipOnDate("ML","20120103"),"skipping as \$onlyPassIf eq MLAT and (!is_last_day_of_month(20120103,AT)= or (\$checkCal(=AT) and (is_weekend(20120103)= or is_holiday(AT,20120103)=))))",'skipOnDate 4a');
+is(skipOnDate("MLAT","20120103"),"skipping as \$onlyPassIf eq MLAT and (!is_last_day_of_month(20120103,AT)= or (\$checkCal(=AT) and (is_weekend(20120103)= or is_holiday(AT,20120103)=))))",'skipOnDate 4b');
+is(skipOnDate("W2","20120103"),"skipping as substr(W2,0,1) eq W and !(weekday(20120103) (3) eq substr(W2,1,1))",'skipOnDate 5');
+is(skipOnDate("MW1","20120103"),"skipping as substr(MW1,0,2) eq MW and !(first_weekYYYYMMDD(20120103,substr(MW1,2,1)))",'skipOnDate 6');
 done_testing();

@@ -31,7 +31,7 @@ use Scalar::Util qw( reftype );
 use YAML::Tiny;
 use version;
 
-our $VERSION = '1.6.2'; ## no critic (RequireInterpolationOfMetachars)
+our $VERSION = '1.7.1'; ## no critic (RequireInterpolationOfMetachars)
 
 caller or __PACKAGE__->main();
 
@@ -199,7 +199,7 @@ sub get_provides {
   # for our missing modules.
 
   if (@missing) {
-    warn sprintf "Attempting to find files that belong to these modules.\n", scalar @missing;
+    warn sprintf "Attempting to find %s files that belong to these modules.\n%s", scalar(@missing), join "\n", @missing;
     my $dir = $options{'work-dir'} . '/lib';
 
     my @file_list;
@@ -399,7 +399,7 @@ sub write_makefile {
   local $Data::Dumper::Pad      = $SPACE x $INDENT;
 
   # dependencies = key name taken as file name if not provided
-  foreach my $d (qw(requires test-requires build-requires )) {
+  foreach my $d (qw(requires test-requires build-requires recommends)) {
     $options{$d} = $options{$d} || $d;
   }
 
@@ -407,14 +407,15 @@ sub write_makefile {
     requires       => $options{requires},
     test_requires  => $options{'test-requires'},
     build_requires => $options{'build-requires'},
+    recommends     => $options{recommends},
   };
 
-  foreach (qw(requires test_requires build_requires)) {
+  foreach (qw(requires test_requires build_requires recommends)) {
     my $dependency_file = $buildspec{dependencies}->{$_};
     $dependency_file =~ s/$project_root\/?//xsm;
     next if -s $dependency_file;
 
-    delete $buildspec{depdencies}->{$_};
+    delete $buildspec{dependencies}->{$_};
   }
 
   my $MIN_PERL_VERSION = $options{'min-perl-version'} // $PERL_VERSION;
@@ -524,14 +525,25 @@ sub write_makefile {
     $buildspec{resources} = $resources;
   }
 
+  my $recommends = {};
+
+  if ( $options{recommends} && -s $options{recommends} ) {
+    $recommends = get_requires(
+      requires             => $options{recommends},
+      include_core_modules => $core,
+      include_version      => $options{'require-versions'},
+      min_perl_version     => $MIN_PERL_VERSION,
+    );
+  }
+
   my $META_MERGE = 'META_MERGE ' . $FAT_ARROW;
 
   {
     local $Data::Dumper::Pair = $FAT_ARROW;
-
     $META_MERGE .= Dumper(
       { 'meta-spec' => { version => 2 },
         'provides'  => \%provides,
+        ( keys %{$recommends} ? ( 'prereqs' => { 'runtime' => { 'recommends' => $recommends, } } ) : () ),
         $resources ? ( 'resources' => $resources ) : ()
       }
     );
@@ -937,6 +949,10 @@ sub parse_dependencies {
 
     if ( $dependencies->{build_requires} ) {
       $args{B} = $dependencies->{build_requires};
+    }
+
+    if ( $dependencies->{recommends} ) {
+      $args{Y} = $dependencies->{recommends};
     }
 
     if ( $dependencies->{core_modules} eq 'yes' ) {
@@ -1389,6 +1405,7 @@ sub main {
     pl-files=s
     postamble=s
     project-root|p=s
+    recommends=s
     recurse
     require-versions|R!
     requires|r=s
@@ -1499,7 +1516,7 @@ sub main {
 
 __DATA__
 ---
-version: "1.6.2"
+version: "1.7.1"
 min_perl_version: "type:string"
 min-perl-version: "type:string"
 project:
@@ -1519,6 +1536,7 @@ dependencies:
   build_requires: "type:string"
   core_modules: "type::boolean"
   required_modules: "type:boolean"
+  recommends: "type:string"
 pl_files:
 postamble: "type:string"
 path:
@@ -1552,7 +1570,7 @@ make-cpan-dist.pl - CPAN distribution creation utility
 
 =head1 SYNOPSIS
 
- make-cpand-dist.pl -b buidlspec.yml
+ make-cpan-dist.pl -b buidlspec.yml
 
 =head1 DESCRIPTION
 

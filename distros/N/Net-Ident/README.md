@@ -1,4 +1,4 @@
-[![](https://github.com/toddr/Net-Ident/workflows/linux/badge.svg)](https://github.com/toddr/Net-Ident/actions) [![](https://github.com/toddr/Net-Ident/workflows/macos/badge.svg)](https://github.com/toddr/Net-Ident/actions) [![](https://github.com/toddr/Net-Ident/workflows/windows/badge.svg)](https://github.com/toddr/Net-Ident/actions)
+[![](https://github.com/cpan-authors/Net-Ident/workflows/linux/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions) [![](https://github.com/cpan-authors/Net-Ident/workflows/macos/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions) [![](https://github.com/cpan-authors/Net-Ident/workflows/windows/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions)
 
 # NAME
 

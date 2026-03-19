@@ -1,5 +1,12 @@
 Revision history for Data-HashMap
 
+0.04  2026-03-16
+    - Fix string value NUL-termination for get_direct safety
+    - Fix lexical sub compatibility for Perl 5.22-5.24
+    - Widen TTL test timing margins for slow CPAN smokers
+    - Guard RSS tests against platforms with non-functional /proc
+    - SV* variant stress and LRU test coverage
+
 0.03  2026-03-13
     - Fix UTF-8 key collision: keys with different UTF-8 flags are now distinct
     - Fix silent integer truncation: I16/I32 variants croak on out-of-range values

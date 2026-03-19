@@ -1,0 +1,18 @@
+digraph graph_15
+{
+	edge
+	[
+		"color" = "green",
+	];
+
+	node_15_1 [fillcolor = red shape = square,];
+	node_15_2 ["size"    = "5,8"]
+	node_15_3 [height    = "2"];
+	node_15_4 [label     = <<table><tr><td>HTML table</td></tr></table>>]
+	node_15_5 [label     = <<table><tr><td>'HTML table'</td></tr></table>>];
+	node_15_5 [label     = <<table><tr><td>HTML table: 'X' &amp; "Y" &amp; "Z"</td></tr></table>>]
+	node_15_6 [label     = "Escaped quotes 1: (\")"];
+	node_15_7 [label     = "Escaped quotes 2: \""];
+
+	node_15_1 -> node_15_2;
+}

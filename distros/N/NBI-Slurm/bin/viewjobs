@@ -1326,7 +1326,7 @@ viewjobs - Interactive TUI for viewing and managing SLURM jobs
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 
@@ -1441,7 +1441,7 @@ Launch the interactive viewer and navigate with arrow keys.
 
 =head1 SEE ALSO
 
-L<lsjobs>, L<squeue>, L<scancel>
+L<lsjobs>
 
 =head1 AUTHOR
 

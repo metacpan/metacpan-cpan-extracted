@@ -1,10 +1,12 @@
+package WebServer::DirIndex; # For cpanm :-(
+
 use strict;
 use warnings;
 use Feature::Compat::Class;
 
-class WebServer::DirIndex {
+our $VERSION = '0.1.4';
 
-  our $VERSION = '0.1.3';
+class WebServer::DirIndex {
 
   use Path::Tiny;
   use HTTP::Date;

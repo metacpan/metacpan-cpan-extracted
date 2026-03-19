@@ -14,7 +14,7 @@ note 'use mock data for fetchrow_hashref';
 my $dbh = DBD::Mock::Session::GenerateFixtures->new( { file => 't/db_fixtures/01_fetchrow_hashref.t.json' } )->get_dbh();
 
 my $sql = <<"SQL";
-SELECT * FROM media_types WHERE id IN(?,?)
+SELECT * FROM media_types WHERE id IN(?,?) ORDER BY id DESC
 SQL
 chomp $sql;
 
@@ -52,7 +52,7 @@ subtest 'preapare and execute with data from test' => sub {
     ];
 
     my $dbh2 = DBD::Mock::Session::GenerateFixtures->new( { data => $fixtures } )->get_dbh();
-    my $sth  = $dbh2->prepare($sql);
+    my $sth  = $dbh2->prepare('SELECT * FROM media_types WHERE id IN(?,?)');
     $sth->execute( 2, 1 );
     my $got = [];
 
@@ -65,7 +65,7 @@ subtest 'preapare and execute with data from test' => sub {
 
 subtest 'Use named binds to bind parameters' => sub {
 
-    my $sth = $dbh->prepare('SELECT * FROM media_types WHERE id IN(:id, :id_2)');
+    my $sth = $dbh->prepare('SELECT * FROM media_types WHERE id IN(:id, :id_2) ORDER BY id DESC');
 
     my $hash = {
         ':id'   => 2,

@@ -18,13 +18,20 @@ sub Start {
     no strict 'refs';
     my $expat = shift;
     my $type  = shift;
+    local $_;
 
     doText($expat);
     $_ = "<$type";
 
     %_ = @_;
     while (@_) {
-        $_ .= ' ' . shift() . '="' . shift() . '"';
+        my $attr = shift;
+        my $val  = shift;
+        $val =~ s/&/&amp;/g;
+        $val =~ s/</&lt;/g;
+        $val =~ s/>/&gt;/g;
+        $val =~ s/"/&quot;/g;
+        $_ .= ' ' . $attr . '="' . $val . '"';
     }
     $_ .= '>';
 
@@ -41,6 +48,7 @@ sub End {
     no strict 'refs';
     my $expat = shift;
     my $type  = shift;
+    local $_;
 
     # Set right context for Text handler
     push( @{ $expat->{Context} }, $type );
@@ -68,6 +76,7 @@ sub Proc {
     my $expat  = shift;
     my $target = shift;
     my $text   = shift;
+    local $_;
 
     doText($expat);
 
@@ -93,7 +102,7 @@ sub Final {
 sub doText {
     no strict 'refs';
     my $expat = shift;
-    $_ = $expat->{Text};
+    local $_ = $expat->{Text};
 
     if ( length($_) ) {
         my $sub = $expat->{Pkg} . "::Text";
@@ -134,8 +143,9 @@ XML::Parser::Style::Stream - Stream style for XML::Parser
       # do something with end tags
     }
     
-    sub Characters {
-      my ($e, $data) = @_;
+    sub Text {
+      my ($e) = @_;
+      # $_ contains accumulated text
       # do something with text nodes
     }
   }

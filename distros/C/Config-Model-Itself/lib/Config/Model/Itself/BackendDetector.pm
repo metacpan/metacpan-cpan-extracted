@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself::BackendDetector 2.027;
+package Config::Model::Itself::BackendDetector 2.028;
 
 # since this package is mostly targeted for dev environments
 # let the detector detect models under development
@@ -32,7 +32,9 @@ sub setup_enum_choice ($self, @args) {
 
     # find available backends in all @INC directories
     my $wanted = sub ($path, $) {
-        my $n = $path->basename();
+        # Get the backend file relative to Config/Model/Backend dir
+        my ($n) = ($path =~ s!.*Backend/!!r);
+
         if ($path->is_file and $n =~ s/\.pm$// and $n !~ /Any$/) {
             $n =~ s!/!::!g ;
             $choices{$n} = 1 ;
@@ -104,7 +106,7 @@ Config::Model::Itself::BackendDetector - Detect available read/write backends us
 
 =head1 VERSION
 
-version 2.027
+version 2.028
 
 =head1 SYNOPSIS
 

@@ -1,14 +1,20 @@
 Revision history for Crypt-HSM
 
+0.029     2026-03-18 23:48:02+01:00 Europe/Brussels
+          - Make Mechanism and Session hold a Slot instead of a Provider
+          - Make Session, Object and Stream instances thread-clone safe
+          - Add id method to Crypt::HSM::Object
+          - Allow underscore as alternative to hyphen in identifier names.
+
 0.028     2026-03-10 19:54:37+01:00 Europe/Brussels
           - Always set source = DATA_SPECIFIED when doing RSA-OAEP
-          - Make hash function the default MSG in RSA-PSS and RSA-OAEP
+          - Make hash function the default MGF in RSA-PSS and RSA-OAEP
 
 0.027     2026-03-06 20:03:39+01:00 Europe/Brussels
           - Fix setting IntArray and MechanismArray attributes
 
 0.026     2026-03-03 20:49:09+01:00 Europe/Brussels
-          - Define mXPUSHp on perl <5.38
+          - Define mXPUSHpvs on perl <5.38
 
 0.025     2025-11-24 23:29:47+01:00 Europe/Brussels
           - Inflate/deflate big integers to Math::BigInt
@@ -34,7 +40,7 @@ Revision history for Crypt-HSM
 0.021     2025-07-22 22:30:38+02:00 Europe/Brussels
           - Split Mechanism::Info object out of Mechanism
           - Fix off-by-one in PSS argument handling
-          - Add missing elipses to generate_key and generate_keypair
+          - Add missing ellipses to generate_key and generate_keypair
           - Speed up mechanism type lookup for mechanism
 
 0.020     2025-05-12 19:49:20+02:00 Europe/Brussels

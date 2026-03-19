@@ -22,6 +22,7 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
+SECURITY.md
 t/000-load.t
 t/001-schema.t
 t/002-direct-async.t

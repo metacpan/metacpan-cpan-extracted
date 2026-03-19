@@ -1,5 +1,9 @@
 Revision history for JSON-Schema-Modern
 
+0.634     2026-03-15 19:19:16Z
+          - fix "hostname" test failure when Data::Validate::Domain is not
+            installed
+
 0.633     2026-03-13 22:40:42Z
           - fix "hostname" format to reject IP addresses
           - fix "duration" format to disallow fractional units (only added in

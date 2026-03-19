@@ -1585,24 +1585,23 @@ glutInitContextVersion(majorVersion, minorVersion)
 #//# glutInitContextFlags($flags);
 void
 glutInitContextFlags(flags)
-	int flags
-	CODE:
-	{
+  int flags
+CODE:
 #if defined HAVE_FREEGLUT
-		glutInitContextFlags(flags);
+  glutInitContextFlags(flags);
 #endif
-	}
 
 #//# glutInitContextProfile($profile);
 void
 glutInitContextProfile(profile)
-	int profile
-	CODE:
-	{
+  int profile
+CODE:
 #if defined HAVE_FREEGLUT
-		glutInitContextProfile(profile);
+  glutInitContextProfile(profile);
+#elif defined HAVE_AGL_GLUT
+  if (profile & 0x0001) /* GLUT_CORE_PROFILE */
+    glutInitDisplayMode(glutGet(GLUT_INIT_DISPLAY_MODE) | GLUT_3_2_CORE_PROFILE);
 #endif
-	}
 
 BOOT:
 {

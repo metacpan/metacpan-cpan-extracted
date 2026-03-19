@@ -1,33 +1,28 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl Regexp-Parser.t'
 
-#########################
+use strict;
+use warnings;
 
-# change 'tests => 1' to 'tests => last_test_to_print';
-
-use Test;
-BEGIN { plan tests => 52 };
+use Test::More tests => 51;
 use Regexp::Parser;
-ok(1); # If we made it this far, we're ok.
-
-#########################
-
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
 
 my $r = Regexp::Parser->new;
 my $rx = '^a+b*?c{5,}d{3}$';
 
-ok( $r->regex($rx) );
+ok( $r->regex($rx), 'parse regex' );
 
 for my $arg (-1, 0, 1, 2) {
-  ok( my $w = $r->walker($arg) and 1 );
-  ok( $w->(-depth) == $arg );
+  ok( my $w = $r->walker($arg), "walker($arg) created" );
+  is( $w->(-depth), $arg, "walker depth is $arg" );
   while (my ($n, $d) = $w->()) {
     chomp(my $exp = <DATA>);
-    ok( join("\t", $d, $n->family, $n->type, $n->visual), $exp );
+    my $got = join("\t", $d, $n->family, $n->type);
+    my $vis = $n->visual;
+    $got .= "\t$vis" if length $vis;
+    is( $got, $exp, "node: $exp" );
   }
-  ok( scalar(<DATA>), "DONE\n" );
+  is( scalar(<DATA>), "DONE\n", "walker($arg) done" );
 }
 
 __DATA__
@@ -73,4 +68,3 @@ DONE
 1	exact	exact	d
 0	anchor	eol	$
 DONE
-

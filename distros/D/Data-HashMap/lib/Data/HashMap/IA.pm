@@ -2,7 +2,7 @@ package Data::HashMap::IA;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub import {
     $^H{"Data::HashMap::IA/hm_ia_put"}        = 1;

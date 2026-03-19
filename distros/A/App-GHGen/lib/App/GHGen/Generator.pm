@@ -5,17 +5,15 @@ use v5.36;
 use strict;
 use warnings;
 
-use Path::Tiny;
 use App::GHGen::PerlCustomizer qw(detect_perl_requirements generate_custom_perl_workflow);
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
 	generate_workflow
 	list_workflow_types
-	get_workflow_description
 );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -24,6 +22,7 @@ App::GHGen::Generator - Generate GitHub Actions workflows
 =head1 SYNOPSIS
 
     use App::GHGen::Generator qw(generate_workflow);
+    use Path::Tiny;
 
     my $yaml = generate_workflow('perl');
     path('.github/workflows/ci.yml')->spew_utf8($yaml);
@@ -75,17 +74,6 @@ sub list_workflow_types() {
         docker => 'Docker image build and push workflow',
         static => 'Static site deployment to GitHub Pages',
     );
-}
-
-=head2 get_workflow_description($type)
-
-Get the description for a specific workflow type.
-
-=cut
-
-sub get_workflow_description($type) {
-	my %types = list_workflow_types();
-	return $types{$type};
 }
 
 # Private workflow generators

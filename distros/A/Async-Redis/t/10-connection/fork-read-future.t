@@ -10,10 +10,8 @@
 use strict;
 use warnings;
 use Test::Lib;
-use Test::Async::Redis qw(init_loop skip_without_redis run);
+use Test::Async::Redis qw(skip_without_redis run);
 use Test2::V0;
-
-my $loop = init_loop();
 
 subtest '_check_fork clears _current_read_future' => sub {
     my $redis = skip_without_redis();

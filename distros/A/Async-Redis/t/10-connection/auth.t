@@ -162,9 +162,7 @@ SKIP: {
         );
 
         my $error;
-        my $f = $redis->connect;
-        get_loop()->await($f);
-        eval { $f->get };
+        eval { $redis->connect->get };
         $error = $@;
 
         ok($error, 'connection failed');

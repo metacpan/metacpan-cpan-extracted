@@ -1,0 +1,60 @@
+STRICT digraph graph_17_02
+{
+	fontsize = 16.0
+	label    = "\"Standard\"\rSyntax\lTest"
+	size     = "5,6"
+
+	node
+	[
+		shape = "record",
+	];
+
+	edge
+	[
+		color = "red"
+		penwidth = 3,
+	];
+
+	node_17_02_1
+	[
+		label    = "<p11> left|<p12> middle|<p13> right"
+		pencolor = blue
+	]
+
+	node_17_02_2
+	[
+		pencolor = green
+		label    = "<p21> one|<p22> two"
+	]
+
+	node_17_02_1:p11 -> node_17_02_2:p22:s
+	[
+		arrowhead = "odiamond";
+		arrowtail = "odot",
+		color     = red
+		dir       = both;
+	];
+
+	subgraph subgraph_17_02_3
+	{
+		node [shape = square]
+
+		label = ""
+
+		node_17_02_4 -> { node [shape = circle] node_17_02_5 }
+		[
+			arrowhead = "empty",
+			arrowtail = "halfopen"
+			color     = green
+			dir       = "both",
+		]
+
+		node_17_02_6 -> node_17_02_7
+		[
+			arrowhead = "halfopen",
+			arrowtail = "empty"
+			color     = blue
+			dir       = "both",
+		]
+	}
+}

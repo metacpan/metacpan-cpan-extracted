@@ -2,6 +2,7 @@ package DBIx::SearchBuilder::Handle;
 
 use strict;
 use warnings;
+use feature 'state';
 
 use Carp qw(croak cluck);
 use DBI;
@@ -1885,75 +1886,75 @@ sub DequoteName {
     return $name;
 }
 
+=head2 $MAX_BIND_PARAMS
+
+Maximum number of bind parameters allowed when converting a query from
+literal values to placeholders. Defaults to 65,535 (the MySQL limit).
+If a query would require more placeholders than this value, the query is
+left as-is with literal values and no bind parameters are extracted.
+
+You can override this in driver subclasses or in tests to accommodate
+databases with different limits:
+
+    local $DBIx::SearchBuilder::Handle::MAX_BIND_PARAMS = 32_767;
+
+=cut
+
+our $MAX_BIND_PARAMS = 65_535;
+
 sub _ExtractBindValues {
-    my $self                = shift;
-    my $string              = shift;
-    my $default_escape_char = shift || q{'};
-    return $string unless defined $string;
+    my ( $self, $string, $default_escape_char ) = @_;
+    return unless defined $$string;
 
-    my $placeholder = '';
+    # A single regex used both for pre-counting and for substitution,
+    # so that both passes always match the same tokens.
+    state $token_re = qr{
+        (?: e? ' (?: \\. | '' | [^'] )* ' ) # quoted string
+        |
+        (?: \b \d* \.? \d+ \b )             # number, but not the one in Groups_1.Name
+    }isx;
+    state %special_chars = (
+        'b' => "\b",
+        'f' => "\f",
+        'n' => "\n",
+        'r' => "\r",
+        't' => "\t",
+    );
 
-    my @chars       = split //, $string;
-    my $value       = '';
-    my $escape_char = $default_escape_char;
+    my $count = 0;
+    while ( $$string =~ m!$token_re!g ) {
+        # If the query has too many literals, leave it as-is. The caller
+        # will still set _bind_values to [] (an empty-but-truthy arrayref),
+        # so ApplyLimits can still bind its own LIMIT/OFFSET placeholders
+        # against the unmodified query string.
+        return if ++$count > $MAX_BIND_PARAMS;
+    }
+
+    $default_escape_char ||= q{'};
 
     my @values;
-    my $in = 0;    # keep state in the loop: is it in a quote?
-    while ( defined( my $c = shift @chars ) ) {
-        my $escaped;
-        if ( $c eq $escape_char && $in ) {
-            if ( $escape_char eq q{'} ) {
-                if ( ( $chars[0] || '' ) eq q{'} ) {
-                    $c       = shift @chars;
-                    $escaped = 1;
-                }
-            }
-            else {
-                $c       = shift @chars;
-                $escaped = 1;
-            }
-        }
 
-        if ($in) {
-            if ( $c eq q{'} ) {
-                if ( !$escaped ) {
-                    push @values, $value;
-                    $in          = 0;
-                    $value       = '';
-                    $escape_char = $default_escape_char;
-                    $placeholder .= '?';
-                    next;
-                }
+    $$string =~ s{($token_re)}{
+        my $match = $1;
+        if ( $match =~ /^(e?)'(.*)'$/si ) {
+            my $e_notion = $1;
+            my $value    = $2;
+            if ( $e_notion || $default_escape_char eq '\\' ) {
+                # For unrecognised escapes (e.g. \q), strip the backslash
+                # and keep the literal character — the correct behaviour
+                # for SQL E-notation strings.
+                $value =~ s!\\(.)!$special_chars{$1} || $1!sgei;
             }
-            $value .= $c;
+            $value =~ s!''!'!g;
+            push @values, $value;
         }
         else {
-            if ( $c eq q{'} ) {
-                $in = 1;
-            }
-
-            # Handle quoted string like e'foo\\bar'
-            elsif ( lc $c eq 'e' && ( $chars[0] // '' ) eq q{'} ) {
-                $escape_char = '\\';
-            }
-
-            # Handle numbers
-            elsif ( $c =~ /[\d.]/ && $placeholder !~ /\w$/ ) {    # Do not catch Groups_1.Name
-                $value .= $c;
-                while ( ( $chars[0] // '' ) =~ /[\d.]/ ) {
-                    $value .= shift @chars;
-                }
-
-                push @values, $value;
-                $placeholder .= '?';
-                $value = '';
-            }
-            else {
-                $placeholder .= $c;
-            }
+            push @values, $match;
         }
-    }
-    return ( $placeholder, @values );
+        '?';
+    }eg;
+
+    return @values;
 }
 
 sub _RequireQuotedTables { return 0 };

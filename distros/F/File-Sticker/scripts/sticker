@@ -6,7 +6,7 @@ sticker - sticks tags onto files, populates a database with file meta-data
 
 =head1 VERSION
 
-version 4.301
+version 4.401
 
 =head1 SYNOPSIS
 
@@ -179,6 +179,8 @@ If the files you are using are all in the same directory tree,
 this option is for designating what is the top directory in that tree.
 This is used for deriving a number of values related to the file name.
 
+If more than one topdir value is given, they are all checked.
+
 =item wanted_fields I<name>=I<type>
 
 Defines the non-derived fields you want. This includes filetype-specific
@@ -342,7 +344,7 @@ sub process_args () {
 	       'verbose+',
 	       'manpage',
 	       'dbname=s',
-	       'topdir=s',
+	       'topdir=s@',
                'primary_table|table=s',
                'tagfield=s',
 	       'wanted_fields=s%',

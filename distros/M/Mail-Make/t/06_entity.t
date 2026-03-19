@@ -254,6 +254,71 @@ subtest 'as_string: quoted-printable for text/html' => sub
 };
 
 # NOTE: make_multipart
+# NOTE: build(): 'attach' shorthand key
+subtest 'build: attach shorthand promotes path' => sub
+{
+    my $path = tempfile( cleanup => 1, open => 1 );
+    $path->print( "%PDF-1.4 fake pdf content" );
+    $path->close;
+
+    my $e = Mail::Make::Entity->build( attach => "$path" );
+    ok( defined( $e ), 'build() with attach shorthand returns entity' );
+    my $h = $e->headers;
+    like( $h->get( 'Content-Disposition' ), qr/attachment/, 'disposition is attachment' );
+    like( $h->get( 'Content-Disposition' ), qr/filename=/, 'filename set from basename' );
+};
+
+subtest 'build: attach shorthand with extra options' => sub
+{
+    my $path = tempfile( cleanup => 1, open => 1 );
+    $path->print( "data" );
+    $path->close;
+
+    my $e = Mail::Make::Entity->build(
+        attach   => "$path",
+        filename => 'custom-name.bin',
+    );
+    ok( defined( $e ), 'build() with attach + filename succeeds' );
+    my $h = $e->headers;
+    like( $h->get( 'Content-Disposition' ), qr/custom-name\.bin/, 'explicit filename takes precedence' );
+};
+
+subtest 'build: attach ignored when path already provided' => sub
+{
+    my $path = tempfile( cleanup => 1, open => 1 );
+    $path->print( "data" );
+    $path->close;
+
+    # When path is already provided, attach shorthand is ignored
+    my $e = Mail::Make::Entity->build(
+        type => 'text/plain',
+        path => "$path",
+        data => undef,
+    );
+    ok( defined( $e ), 'build() with explicit path succeeds' );
+};
+
+subtest 'build: attach with non-existent file falls through to error' => sub
+{
+    local $SIG{__WARN__} = sub{};
+    my $e = Mail::Make::Entity->build( attach => '/no/such/file/exists.pdf' );
+    ok( !defined( $e ), 'build() with non-existent attach path returns error' );
+};
+
+# NOTE: build(): auto-detect MIME type from path
+subtest 'build: type auto-detected from path when not provided' => sub
+{
+    my $path = tempfile( cleanup => 1, open => 1, suffix => '.pdf' );
+    $path->print( "%PDF-1.4 fake pdf" );
+    $path->close;
+
+    my $e = Mail::Make::Entity->build( path => "$path" );
+    ok( defined( $e ), 'build() with path and no type succeeds' );
+    # Type should not be text/plain (the default) since we have a real file
+    my $h = $e->headers;
+    ok( defined( $h->get( 'Content-Type' ) ), 'Content-Type is set' );
+};
+
 subtest 'make_multipart promotes single-part' => sub
 {
     my $e = Mail::Make::Entity->build(

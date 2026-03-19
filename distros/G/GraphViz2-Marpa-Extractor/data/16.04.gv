@@ -1,0 +1,14 @@
+strict digraph graph_16_04
+{
+	node_16_04_1
+	->
+	{
+		node_16_04_2
+	}
+
+	node_16_04_3 -> node_16_04_4
+	[
+		color = blue
+		dir   = "both",
+	]
+}

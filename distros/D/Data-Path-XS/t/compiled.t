@@ -53,6 +53,12 @@ subtest 'pathc_set' => sub {
     my $cp_arr = path_compile('/items/0/name');
     pathc_set($data, $cp_arr, 'first');
     is_deeply($data, { items => [{ name => 'first' }] }, 'set creates array for numeric key');
+
+    # Autovivify over non-ref scalar intermediate
+    $data = { a => 'string' };
+    pathc_set($data, path_compile('/a/b'), 99);
+    is(ref($data->{a}), 'HASH', 'pathc_set replaces scalar with hash');
+    is($data->{a}{b}, 99, 'value stored through replaced intermediate');
 };
 
 subtest 'pathc_exists' => sub {

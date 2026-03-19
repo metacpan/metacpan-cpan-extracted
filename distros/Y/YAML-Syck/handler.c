@@ -40,6 +40,7 @@ syck_hdlr_add_anchor( SyckParser *p, char *a, SyckNode *n )
          * Happens if you have two anchors after each other or an anchor
          * before an alias
          * */
+        S_FREE(a);
         return n;
     }
     n->anchor = a;

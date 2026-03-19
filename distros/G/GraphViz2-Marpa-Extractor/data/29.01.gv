@@ -1,0 +1,14 @@
+digraph graph_29_01
+{
+	# 'one' is a node name, not a subgraph name.
+
+	one { two -> three }
+
+	# 'cluster_four' is a node name, not a subgraph name.
+
+	cluster_four { five -> six }
+
+	# 'cluster_seven' is a subgraph name, not a node name.
+
+	subgraph cluster_seven { label = "\G" eight -> nine }
+}

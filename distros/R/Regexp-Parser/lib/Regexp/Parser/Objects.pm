@@ -789,6 +789,9 @@ use NEXT;
 
   sub raw {
     my $self = shift;
+    if ($self->{on} =~ /^\^/) {
+      return join "", "(?", $self->{on}, ":";
+    }
     join "", "(?", $self->{on},
       (length $self->{off} ? "-" : ""), $self->{off}, ":";
   }
@@ -1044,12 +1047,13 @@ use NEXT;
   our @ISA = qw( Regexp::Parser::__object__ );
 
   sub new {
-    my ($class, $rx, $nparen) = @_;
+    my ($class, $rx, $nparen, $vis) = @_;
     my $self = bless {
       rx => $rx,
       flags => $rx->{flags}[-1],
       family => 'ref',
       nparen => $nparen,
+      ($vis ? (vis => $vis) : ()),
     }, $class;
     return $self;
   }
@@ -1066,7 +1070,48 @@ use NEXT;
 
   sub visual {
     my $self = shift;
+    exists $self->{vis} ? $self->{vis} : "\\$self->{nparen}";
+  }
+
+  sub qr {
+    my $self = shift;
+    # Always emit \N format for qr() regardless of visual form
     "\\$self->{nparen}";
+  }
+}
+
+
+{
+  # \g{name} named backreference (Perl 5.10+)
+  package Regexp::Parser::gref;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $name, $vis) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'ref',
+      type => 'gref',
+      name => $name,
+      vis => $vis,
+    }, $class;
+    return $self;
+  }
+
+  sub name {
+    my $self = shift;
+    $self->{name};
+  }
+
+  sub visual {
+    my $self = shift;
+    $self->{vis};
+  }
+
+  sub qr {
+    my $self = shift;
+    "\\g{$self->{name}}";
   }
 }
 
@@ -1383,6 +1428,9 @@ use NEXT;
 
   sub visual {
     my $self = shift;
+    if ($self->{on} =~ /^\^/) {
+      return join "", "(?", $self->{on}, ")";
+    }
     join "", "(?", $self->{on},
       (length $self->{off} ? "-" : ""), $self->{off}, ")";
   }
@@ -1427,6 +1475,272 @@ use NEXT;
     $tree->[-1] = $self;
   }
 }
+
+
+{
+  # \K (keep, zero-width assertion added in Perl 5.10)
+  package Regexp::Parser::keep;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'anchor',
+      type => 'keep',
+      vis => '\K',
+      zerolen => 1,
+    }, $class;
+    return $self;
+  }
+}
+
+
+{
+  # \h \H (horizontal whitespace, added in Perl 5.10)
+  package Regexp::Parser::hspace;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $neg) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      neg => $neg,
+    }, $class;
+    return $self;
+  }
+
+  sub neg {
+    my $self = shift;
+    $self->{neg} = shift if @_;
+    $self->{neg};
+  }
+
+  sub type {
+    my $self = shift;
+    ($self->{neg} ? 'n' : '') . $self->family;
+  }
+
+  sub family { 'hspace' }
+
+  sub visual {
+    my $self = shift;
+    $self->{neg} ? '\H' : '\h';
+  }
+}
+
+
+{
+  # \v \V (vertical whitespace, added in Perl 5.10)
+  package Regexp::Parser::vspace;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $neg) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      neg => $neg,
+    }, $class;
+    return $self;
+  }
+
+  sub neg {
+    my $self = shift;
+    $self->{neg} = shift if @_;
+    $self->{neg};
+  }
+
+  sub type {
+    my $self = shift;
+    ($self->{neg} ? 'n' : '') . $self->family;
+  }
+
+  sub family { 'vspace' }
+
+  sub visual {
+    my $self = shift;
+    $self->{neg} ? '\V' : '\v';
+  }
+}
+
+
+{
+  # \R (generic linebreak, added in Perl 5.10)
+  package Regexp::Parser::lnbreak;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'lnbreak',
+      type => 'lnbreak',
+      vis => '\R',
+    }, $class;
+    return $self;
+  }
+}
+
+
+{
+  # (?<name>...) named capture group (added in Perl 5.10)
+  package Regexp::Parser::named_open;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $nparen, $name, @data) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'open',
+      nparen => $nparen,
+      name => $name,
+      data => \@data,
+      raw => "(?<$name>",
+      down => 1,
+    }, $class;
+    $self->{rx}{captures}[$nparen - 1] = $self;
+    return $self;
+  }
+
+  sub type {
+    my $self = shift;
+    'open' . $self->nparen;
+  }
+
+  sub nparen {
+    my $self = shift;
+    $self->{nparen};
+  }
+
+  sub name {
+    my $self = shift;
+    $self->{name};
+  }
+
+  sub qr {
+    my $self = shift;
+    join "", $self->raw, map($_->qr, @{ $self->{data} }), ")";
+  }
+
+  sub visual {
+    my $self = shift;
+    join "", $self->raw, map($_->visual, @{ $self->{data} }), ")";
+  }
+
+  sub ender {
+    my $self = shift;
+    [ close => $self->nparen ];
+  }
+
+  sub data {
+    my $self = shift;
+    if (@_) {
+      my $how = shift;
+      if ($how eq '=') { $self->{data} = \@_ }
+      elsif ($how eq '+') { push @{ $self->{data} }, @_ }
+      else {
+        my $t = $self->type;
+        Carp::croak("\$$t->data([+=], \@data)");
+      }
+    }
+    $self->{data};
+  }
+
+  sub walk {
+    my ($self, $ws, $d) = @_;
+    unshift @$ws, $self->{rx}->object(@{ $self->ender });
+    unshift @$ws, sub { -1 }, @{ $self->{data} }, sub { +1 } if $d;
+  }
+
+  sub insert {
+    my ($self, $tree) = @_;
+    my $rx = $self->{rx};
+    push @$tree, $self;
+    push @{ $rx->{stack} }, $tree;
+    $rx->{tree} = $self->{data};
+  }
+}
+
+
+{
+  # \k<name> named backreference (added in Perl 5.10)
+  package Regexp::Parser::named_ref;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $name, $vis) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'ref',
+      name => $name,
+      vis => $vis,
+    }, $class;
+    return $self;
+  }
+
+  sub type {
+    my $self = shift;
+    ($self->{flags} & $self->{rx}->FLAG_i ? 'named_reff' : 'named_ref');
+  }
+
+  sub name {
+    my $self = shift;
+    $self->{name};
+  }
+
+  sub visual {
+    my $self = shift;
+    $self->{vis};
+  }
+}
+
+
+{
+  # possessive quantifier modifier (added in Perl 5.10)
+  package Regexp::Parser::possessive;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $data) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'possessive',
+      type => 'possessive',
+      raw => '+',
+      data => $data,
+    }, $class;
+    return $self;
+  }
+
+  sub qr {
+    my $self = shift;
+    join "", $self->{data}->qr, $self->raw;
+  }
+
+  sub visual {
+    my $self = shift;
+    join "", $self->{data}->visual, $self->raw;
+  }
+
+  sub walk {
+    my ($self, $ws, $d) = @_;
+    unshift @$ws, sub { -1 }, $self->{data}, sub { +1 } if $d;
+  }
+
+  sub insert {
+    my ($self, $tree) = @_;
+    $self->{data} = $tree->[-1];
+    $tree->[-1] = $self;
+  }
+}
+
 
 1;
 

@@ -10,6 +10,8 @@ README-build-from-git.md
 README.md
 SIGNATURE
 contrib/bash_completion.cme_meta
+data/Backend/Master/Other.pm
+data/Backend/MasterModel.pm
 data/application.d/goner
 data/application.d/master
 data/models/MasterModel.pl

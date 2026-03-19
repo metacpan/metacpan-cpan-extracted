@@ -1,0 +1,13 @@
+.build/
+Langertha-Skeid-*
+*.tar.gz
+*.sqlite
+*.db
+
+# Track Claude config (but not session/telemetry data)
+!.claude/
+.claude/*
+!.claude/settings.json
+!.claude/agents/
+!.claude/skills/
+!.claude/hooks/

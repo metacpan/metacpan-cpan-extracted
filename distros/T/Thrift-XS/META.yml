@@ -3,25 +3,36 @@ abstract: 'Faster Thrift binary protocol encoding and decoding'
 author:
   - 'Andy Grundman <andy@hybridized.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::BinaryData: '0'
+  Test::More: '0'
+  Test::Perl::Critic: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
-license: unknown
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
+license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Thrift-XS
-no_index:
-  directory:
-    - t
-    - inc
 requires:
   Bit::Vector: '0'
-  Test::BinaryData: '0'
+  Encode: '0'
+  HTTP::Request: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  IO::String: '0'
+  LWP::UserAgent: '0'
+  Thrift: v0.22.0
+  perl: '5.010'
 resources:
-  license: http://www.apache.org/licenses/LICENSE-2.0
-  repository: https://github.com/andygrundman/thrift-xs
-version: '1.08'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+  bugtracker: https://github.com/andygrundman/thrift-xs
+  repository: git://github.com/andygrundman/thrift-xs.git
+version: '1.10'
+x_generated_by_perl: v5.42.0
+x_maintainers:
+  - 'Timothy Legge <timlegge@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Apache-2.0

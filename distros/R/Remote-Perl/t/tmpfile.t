@@ -23,19 +23,24 @@ PERL
 # -- __DATA__ with each strategy -----------------------------------------------
 
 for my $strategy (qw(auto linux perl named)) {
-    my $r   = make_r(tmpfile => $strategy);
-    my $out = '';
-    my $rc;
-    eval { $rc = $r->run_code($DATA_SCRIPT, on_stdout => sub { $out .= $_[0] }) };
-    if ($@ =~ /unavailable/) {
+    SKIP: {
+        skip("linux tmpfile strategy requires Linux", 2)
+            if $strategy eq 'linux' && $^O ne 'linux';
+
+        my $r   = make_r(tmpfile => $strategy);
+        my $out = '';
+        my $rc;
+        eval { $rc = $r->run_code($DATA_SCRIPT, on_stdout => sub { $out .= $_[0] }) };
+        if ($@ =~ /unavailable/) {
+            $r->disconnect;
+            pass("$strategy: skipped (not available on this system)");
+            pass("$strategy: skipped");
+            next;
+        }
+        is($rc,  0,                       "$strategy: exit 0");
+        is($out, "data:hello from data\n", "$strategy: __DATA__ readable");
         $r->disconnect;
-        pass("$strategy: skipped (not available on this system)");
-        pass("$strategy: skipped");
-        next;
     }
-    is($rc,  0,                       "$strategy: exit 0");
-    is($out, "data:hello from data\n", "$strategy: __DATA__ readable");
-    $r->disconnect;
 }
 
 # -- Per-run tmpfile override --------------------------------------------------

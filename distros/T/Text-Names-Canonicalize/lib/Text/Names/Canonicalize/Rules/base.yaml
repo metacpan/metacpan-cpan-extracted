@@ -1,0 +1,42 @@
+---
+# Base rules for Western-style personal names
+#
+# These rules define the common defaults shared across English, French,
+# German, and related naming conventions. Locale-specific YAML files
+# inherit from this base and override only what differs culturally.
+#
+# This file intentionally contains:
+#   - No particles (locale-specific)
+#   - Minimal suffix list
+#   - Generic English titles
+#   - Standard hyphen policy
+#   - Standard surname strategy
+
+default:
+
+  # No particles by default; locales add their own.
+  particles: []
+
+  # Minimal generational suffixes.
+  suffixes:
+    - jr
+    - sr
+    - ii
+    - iii
+    - iv
+
+  # Generic titles to strip.
+  strip_titles:
+    - mr
+    - mrs
+    - miss
+    - ms
+    - dr
+    - prof
+
+  # Preserve hyphens in given names and surnames.
+  hyphen_policy: preserve
+
+  # Most Western naming conventions use the last token as surname,
+  # optionally preceded by particles.
+  surname_strategy: last_token_with_particles

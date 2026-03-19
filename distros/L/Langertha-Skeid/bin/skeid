@@ -1,0 +1,229 @@
+#!/usr/bin/env perl
+# PODNAME: skeid
+# ABSTRACT: Skeid control-plane CLI and proxy launcher
+use strict;
+use warnings;
+use Getopt::Long qw(GetOptions GetOptionsFromArray);
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Mojo::Server::Daemon;
+use JSON::MaybeXS;
+use Langertha::Skeid;
+use Langertha::Skeid::Proxy;
+
+my $cmd = 'serve';
+if (@ARGV && defined($ARGV[0]) && $ARGV[0] !~ /^-/) {
+  $cmd = shift @ARGV;
+}
+
+if ($cmd eq 'usage') {
+  exit _run_usage(@ARGV);
+}
+if ($cmd ne 'serve') {
+  die _usage_text();
+}
+
+my $listen = '127.0.0.1:8090';
+my $config = 'skeid.yaml';
+my $admin_api_key = '';
+
+GetOptions(
+  'listen|l=s' => \$listen,
+  'config|c=s' => \$config,
+  'admin-api-key=s' => \$admin_api_key,
+) or die _usage_text();
+
+my %opts;
+$opts{config_file} = $config if defined($config) && -f $config;
+$opts{admin_api_key} = $admin_api_key if defined($admin_api_key) && length($admin_api_key);
+
+my $app = Langertha::Skeid::Proxy->build_app(%opts);
+
+print "Starting Skeid proxy on http://$listen\n";
+print "Config: ", ($opts{config_file} // '(none)'), "\n";
+
+my $daemon = Mojo::Server::Daemon->new(
+  app    => $app,
+  listen => ["http://$listen"],
+);
+$daemon->run;
+
+sub _run_usage {
+  my (@argv) = @_;
+
+  my $config = 'skeid.yaml';
+  my $since  = '';
+  my $limit  = 20;
+  my $as_json = 0;
+  my $backend = '';
+  my $db_path = '';
+  my $dsn = '';
+  my $db_user = '';
+  my $db_pass = '';
+  my $db_pass_env = '';
+  my $api_key_id = '';
+  my $model = '';
+
+  GetOptionsFromArray(
+    \@argv,
+    'config|c=s'    => \$config,
+    'since=s'       => \$since,
+    'limit=i'       => \$limit,
+    'json!'         => \$as_json,
+    'backend=s'     => \$backend,
+    'db|sqlite=s'   => \$db_path,
+    'dsn=s'         => \$dsn,
+    'db-user=s'     => \$db_user,
+    'db-pass=s'     => \$db_pass,
+    'db-pass-env=s' => \$db_pass_env,
+    'api-key-id=s'  => \$api_key_id,
+    'model=s'       => \$model,
+  ) or die _usage_text();
+
+  my %skeid_opts;
+  $skeid_opts{config_file} = $config if defined($config) && -f $config;
+
+  my $skeid = Langertha::Skeid->new(%skeid_opts);
+
+  my %usage_store;
+  if (defined $backend && length $backend) {
+    $usage_store{backend} = $backend;
+  }
+  if (defined $db_path && length $db_path) {
+    $usage_store{backend} ||= 'sqlite';
+    $usage_store{sqlite_path} = $db_path;
+  }
+  if (defined $dsn && length $dsn) {
+    $usage_store{backend} ||= 'postgresql';
+    $usage_store{dsn} = $dsn;
+  }
+  $usage_store{user} = $db_user if defined($db_user) && length($db_user);
+  $usage_store{password} = $db_pass if defined($db_pass) && length($db_pass);
+  $usage_store{password_env} = $db_pass_env if defined($db_pass_env) && length($db_pass_env);
+
+  if (%usage_store) {
+    $skeid->configure_usage_store(\%usage_store);
+  }
+
+  my $report = $skeid->call_function('usage.report', {
+    limit => $limit,
+    (defined($since) && length($since) ? (since => $since) : ()),
+    (defined($api_key_id) && length($api_key_id) ? (api_key_id => $api_key_id) : ()),
+    (defined($model) && length($model) ? (model => $model) : ()),
+  });
+
+  unless ($report->{ok}) {
+    my $err = $report->{error} // 'unknown usage report error';
+    print "ERROR: $err\n";
+    return 2;
+  }
+
+  if ($as_json) {
+    my $json = JSON::MaybeXS->new(utf8 => 1, canonical => 1, pretty => 1);
+    print $json->encode($report);
+    return 0;
+  }
+
+  my $backend_name = $report->{backend} // '';
+  my $db_label = $backend_name eq 'sqlite'
+    ? ($report->{db_path} // '')
+    : ($backend_name eq 'postgresql' ? 'configured DSN' : '(none)');
+  print "Usage backend: $backend_name\n";
+  print "Store: $db_label\n";
+  print "Since: ", ($report->{since} && length($report->{since}) ? $report->{since} : '(all)'), "\n";
+  print "\n";
+
+  my $tot = $report->{totals} || {};
+  printf "Totals: requests=%d input=%d output=%d total=%d tools=%d cost=\$%.8f\n",
+    ($tot->{requests} // 0),
+    ($tot->{input_tokens} // 0),
+    ($tot->{output_tokens} // 0),
+    ($tot->{total_tokens} // 0),
+    ($tot->{tool_calls} // 0),
+    ($tot->{total_cost_usd} // 0);
+
+  print "\nBy API key:\n";
+  print "  (none)\n" unless @{$report->{by_key} || []};
+  for my $row (@{$report->{by_key} || []}) {
+    printf "  %-16s requests=%d tokens=%d cost=\$%.8f\n",
+      ($row->{api_key_id} || '(none)'),
+      ($row->{requests} // 0),
+      ($row->{total_tokens} // 0),
+      ($row->{total_cost_usd} // 0);
+  }
+
+  print "\nBy model:\n";
+  print "  (none)\n" unless @{$report->{by_model} || []};
+  for my $row (@{$report->{by_model} || []}) {
+    printf "  %-24s requests=%d tokens=%d cost=\$%.8f\n",
+      ($row->{model} || '(none)'),
+      ($row->{requests} // 0),
+      ($row->{total_tokens} // 0),
+      ($row->{total_cost_usd} // 0);
+  }
+
+  print "\nRecent:\n";
+  print "  (none)\n" unless @{$report->{recent} || []};
+  for my $row (@{$report->{recent} || []}) {
+    printf "  #%d %s %-9s %-20s model=%s status=%d tokens=%d cost=\$%.8f\n",
+      ($row->{id} // 0),
+      ($row->{created_at} || ''),
+      ($row->{api_format} || ''),
+      ($row->{api_key_id} || 'anonymous'),
+      ($row->{model} || ''),
+      ($row->{status_code} // 0),
+      ($row->{total_tokens} // 0),
+      ($row->{cost_total_usd} // 0);
+  }
+
+  return 0;
+}
+
+sub _usage_text {
+  return <<'USAGE';
+Usage:
+  skeid serve [--listen host:port] [--config skeid.yaml] [--admin-api-key KEY]
+  skeid usage [--config skeid.yaml] [--since ISO8601] [--limit N] [--json]
+              [--backend sqlite|postgresql] [--db /path/to.sqlite]
+              [--dsn dbi:Pg:...] [--db-user USER] [--db-pass PASS|--db-pass-env ENV]
+              [--api-key-id ID] [--model NAME]
+USAGE
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+skeid - Skeid control-plane CLI and proxy launcher
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/langertha-skeid/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

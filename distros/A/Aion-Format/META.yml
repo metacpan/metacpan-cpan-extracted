@@ -37,7 +37,7 @@ no_index:
 provides:
   Aion::Format:
     file: lib/Aion/Format.pm
-    version: v0.1.1
+    version: v0.1.2
   Aion::Format::Html:
     file: lib/Aion/Format/Html.pm
   Aion::Format::Json:
@@ -52,6 +52,7 @@ requires:
   DDP: '0'
   Encode: '0'
   Exporter: '0'
+  Guard: '0'
   JSON::XS: '0'
   List::Util: '0'
   POSIX: '0'
@@ -67,7 +68,7 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-format/issues
   homepage: https://github.com/darviarush/perl-aion-format
   repository: https://github.com/darviarush/perl-aion-format.git
-version: 0.1.1
+version: 0.1.2
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'

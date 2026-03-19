@@ -88,7 +88,7 @@ CODE:
   int avail = buffer_len(mbuf->buffer);
   
   if (avail < len) {
-    THROW_SV("TTransportException", newSVpvf("Attempt to readAll(%d) found only %d available", len, avail));
+    THROW_SV("Thrift::TTransportException", newSVpvf("Attempt to readAll(%d) found only %d available", len, avail));
   }
   
   DEBUG_TRACE("readAll(%d)\n", len);

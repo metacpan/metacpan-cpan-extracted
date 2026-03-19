@@ -4,8 +4,8 @@ use Test::More;
 use Test::LeakTrace;
 
 use Data::Path::XS qw(path_get path_set path_delete path_exists
-                      patha_get patha_set patha_delete patha_exists
-                      :keywords);
+                      patha_get patha_set patha_delete patha_exists);
+use Data::Path::XS ':keywords';
 
 # Basic leak tests for string API
 subtest 'path_get leaks' => sub {

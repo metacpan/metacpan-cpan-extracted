@@ -1,5 +1,25 @@
 Revision history for Perl extension Net::Ident.
 
+1.26 2026-03-18
+    [Bug Fixes]
+    - GH #2 - Fix compat mode
+    - GH #12 - Fix sysread EOF in ready() to prevent infinite loop
+    - GH #9 - Fix unreachable elsif in ready() that broke repeated calls
+    - GH #10 - Fix SUPER::export_fail to use method call so class is passed correctly
+    - GH #11 - Fix newFromInAddr state inconsistency
+
+    [Improvements]
+    - GH #14 - Replace string eval with blocking(0) for non-blocking sockets
+    - GH #8 - Add unit tests for RFC1413 response parsing
+    - GH #13 - Add comprehensive async interface tests
+    - GH #10 - Modernize tests from hand-rolled TAP to Test::More
+
+    [Maintenance]
+    - GH #3 - Fix Makefile.PL bugs, fix pod typos
+    - GH #11 - Fix POD example and typos
+    - GH #7 - Modernize CI: consolidate workflows, fix deprecated Docker images
+    - GH #4 - Update repository URLs to reflect new cpan-authors location
+
 1.25 Sat Jan 18 2020
     - Enable github actions testing
     - Switch to README.md and point to testing status

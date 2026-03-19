@@ -20,6 +20,7 @@ my @files = (
     't/exists.t',
     't/immutable.t',
     't/import.t',
+    't/lexical.t',
     't/lockkeys.t',
     't/lvalue.t',
     't/lvalue_undef.t',

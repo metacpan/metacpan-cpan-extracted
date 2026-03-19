@@ -9,7 +9,7 @@ use warnings;
 
 use Scalar::Util;
 use Digest::MD5;
-our $VERSION = '1.07';
+our $VERSION = '1.09';
 
 our @EXPORT = qw[ wrap_hash ];
 
@@ -18,6 +18,11 @@ our $DEBUG    = 0;
 
 # copied from Damian Conway's PPR: PerlIdentifier
 use constant PerlIdentifier => qr/\A([^\W\d]\w*+)\z/;
+
+# use builtin::export_lexically if available
+use constant HAS_LEXICAL_SUBS => $] >= 5.038;
+use if HAS_LEXICAL_SUBS, 'experimental', 'builtin';
+use if HAS_LEXICAL_SUBS, 'builtin';
 
 our %REGISTRY;
 
@@ -199,14 +204,21 @@ sub import {    ## no critic(ExcessComplexity)
             _build_class( $target, $name, $args );
             if ( defined $name ) {
                 my $sub = _build_constructor( $target, $name, $args );
-                push @return, $sub if $args->{-as_return};
+                if ( $args->{-as_return} ) {
+                    push @return, $sub;
+                }
+                elsif ( $args->{-lexical} ) {
+                    _croak( "Perl >= v5.38 is required for -lexical; current perl is $^V" )
+                      unless HAS_LEXICAL_SUBS;
+                    builtin::export_lexically( $name, $sub );
+                }
             }
         }
 
         # clean out known attributes
         delete @{$args}{
             qw[ -as -as_return -as_scalar_ref -base -class -clone
-              -copy -defined -exists -immutable -lockkeys -lvalue
+              -copy -defined -exists -immutable -lexical -lockkeys -lvalue
               -methods -new -predicate -recurse -undef ]
         };
 
@@ -505,15 +517,10 @@ sub _build_constructor {    ## no critic (ExcessComplexity)
         package_return_value => '1;',
     );
 
-    $dict{class} = do {
-        if ( $args->{-as_method} ) {
-            'shift;';
-        }
-        else {
-
-            'q[' . $args->{-class} . '];';
-        }
-    };
+    $dict{class}
+      = $args->{-as_method}
+      ? 'shift;'
+      : 'q[' . $args->{-class} . '];';
 
     my @copy = (
         'Hash::Wrap::_croak(q{the argument to <<PACKAGE>>::<<CONSTRUCTOR_NAME>> must not be an object})',
@@ -586,7 +593,7 @@ sub _build_constructor {    ## no critic (ExcessComplexity)
 
     # return the constructor sub from the factory and don't insert the
     # name into the package namespace
-    if ( $args->{-as_scalar_ref} || $args->{-as_return} ) {
+    if ( $args->{-as_scalar_ref} || $args->{-as_return} || $args->{-lexical} ) {
         $dict{package_return_value} = q{};
         $dict{constructor_name}     = q{};
     }
@@ -656,7 +663,7 @@ sub _compile_from_tpl {
     if ( $DEBUG ) {
         my $lcode = $$code;
         _line_number_code( \$lcode );
-        print STDERR $lcode;    ## no critic (CheckedSyscalls)
+        print STDERR $lcode;
     }
 
     _clean_eval( $code, exists $dict->{closures} ? $closures : () );
@@ -731,7 +738,7 @@ Hash::Wrap - create on-the-fly objects from hashes
 
 =head1 VERSION
 
-version 1.07
+version 1.09
 
 =head1 SYNOPSIS
 
@@ -1061,6 +1068,13 @@ L<Storable/dclone> is used. If a coderef, it will be called as
 C<$coderef> must return a plain hashref.
 
 By default, the object uses the hash directly.
+
+=item C<-lexical> => I<boolean>
+
+On Perl v5.38 or higher, this will cause the constructor subroutine to
+be installed lexically in the target package.
+
+On Perls prior to v5.38 this causes an exception.
 
 =item C<-immutable> => I<boolean> | I<arrayref>
 
@@ -1592,11 +1606,11 @@ Please report any bugs or feature requests to bug-hash-wrap@rt.cpan.org  or thro
 
 Source is available at
 
-  https://gitlab.com/djerius/hash-wrap
+  https://codeberg.org/djerius/p5-Hash-Wrap
 
 and may be cloned from
 
-  https://gitlab.com/djerius/hash-wrap.git
+  https://codeberg.org/djerius/p5-Hash-Wrap.git
 
 =head1 AUTHOR
 

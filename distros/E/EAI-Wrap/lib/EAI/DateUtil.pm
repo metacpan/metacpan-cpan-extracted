@@ -1,9 +1,9 @@
-package EAI::DateUtil 1.920;
+package EAI::DateUtil 1.921;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime); use Carp qw(cluck);
 
-our @EXPORT = qw(monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addDatePart subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern);
+our @EXPORT = qw(monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addDatePart subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD convertJulianToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern skipOnDate);
 
 my %monthsToInt = (
 	"en" => {"jan" => "01","feb" => "02","mar" => "03","apr" => "04","may" => "05","jun" => "06","jul" => "07","aug" => "08","sep" => "09","oct" => "10","nov" => "11","dec" => "12"},
@@ -567,9 +567,40 @@ sub convertJulianToYYYYMMDD ($) {
 	my ($arg) = @_;
 	# excel calculates 0 as being 00.01.1900 which would be an invalid time object, so take 31.12.1899 instead
 	my $date = localtime(timelocal_modern(0,0,0,31,11,1899) + $arg * 60 * 60 * 24 - 1);
-	# why subtract 1 here ? excel wrongly assumes 1900 is a leap year: https://learn.microsoft.com/en-us/office/troubleshoot/excel/wrongly-assumes-1900-is-leap-year
+	# why subtract 1 before getting localtime for $date ? excel wrongly assumes 1900 is a leap year: https://learn.microsoft.com/en-us/office/troubleshoot/excel/wrongly-assumes-1900-is-leap-year
 	return sprintf("%04d%02d%02d",$date->year()+1900,$date->mon()+1,$date->mday());
 }
+
+sub skipOnDate ($$;$) {
+	my ($onlyPassIf,$checkDate,$checkHoliday) = @_;
+	$checkHoliday = "AT" if !$checkHoliday;
+	my $is_weekend = is_weekend($checkDate); $is_weekend = "" if !$is_weekend;
+	my ($onlyPassIfCal, $checkCal) = ($onlyPassIf =~ /(..)(..)*/); $onlyPassIfCal = "" if !$onlyPassIfCal; $checkCal = "AT" if !$checkCal;
+	my $is_holiday = is_holiday($checkCal,$checkDate); $is_holiday = "" if !$is_holiday;
+	my $is_last_day_of_month = is_last_day_of_month($checkDate,$checkCal); $is_last_day_of_month = "" if !$is_last_day_of_month;
+
+	if ($onlyPassIf eq "B" and ($is_weekend || $is_holiday)) {
+		return "skipping as \$onlyPassIf eq B and is_weekend($checkDate)=".$is_weekend." || is_holiday(".$checkHoliday.",$checkDate)=".$is_holiday;
+	}
+	if ($onlyPassIf eq "M1" and $checkDate !~ /\d{4}\d{2}01/) {
+		return "skipping as \$onlyPassIf eq M1 and curDate ($checkDate) !~ /\\d{4}\\d{2}01/";
+	}
+	if ($onlyPassIf eq "Q" and $checkDate !~ /\d{4}010[12]/ and $checkDate !~ /\d{4}0401/ and $checkDate !~ /\d{4}0701/ and $checkDate !~ /\d{4}1001/) {
+		return "skipping as \$onlyPassIf eq Q and curDate ($checkDate) !~ /\\d{4}0102/ and curDate !~ /\\d{4}0401/ and curDate !~ /\\d{4}0701/ and curDate !~ /\\d{4}1001/";
+	}
+	# skip if checkDate is not on the last day of month, or in case a calendar is given, on the last day of month regarding the calendar (in this case, skip also on weekends and holidays!)
+	if ($onlyPassIfCal eq "ML" and (!$is_last_day_of_month or ($checkCal and ($is_weekend or $is_holiday)))) {
+		return "skipping as \$onlyPassIf eq ML".($checkCal ? $checkCal : "")." and (!is_last_day_of_month($checkDate".($checkCal ? ",$checkCal" : "").")=".$is_last_day_of_month." or (\$checkCal(=".($checkCal ? $checkCal : "").") and (is_weekend($checkDate)=".$is_weekend." or is_holiday($checkCal,$checkDate)=".$is_holiday."))))";
+	}
+	if (substr($onlyPassIf,0,1) eq "W" and !(weekday($checkDate) eq substr($onlyPassIf,1,1))) {
+		return "skipping as substr($onlyPassIf,0,1) eq W and !(weekday($checkDate) (".weekday($checkDate).") eq substr($onlyPassIf,1,1))";
+	}
+	if (substr($onlyPassIf,0,2) eq "MW" and !(first_weekYYYYMMDD($checkDate,substr($onlyPassIf,2,1)))) {
+		return "skipping as substr($onlyPassIf,0,2) eq MW and !(first_weekYYYYMMDD($checkDate,substr($onlyPassIf,2,1)))";
+	}
+	return "";
+}
+
 1;
 __END__
 
@@ -626,6 +657,7 @@ EAI::DateUtil - Date and Time helper functions for L<EAI::Wrap>
  parseFromDDMMYYYY ($dateStr)
  parseFromYYYYMMDD ($dateStr)
  convertEpochToYYYYMMDD ($epoch)
+ skipOnDate ($onlyPassIf, $checkDate, [$checkHoliday])
 
 =head1 DESCRIPTION
 
@@ -973,11 +1005,20 @@ returns datestring (yyyymmdd) from julian date (excel representation of dates)
 
  $arg .. date as a julian date (integer/float, counting days from 0.1.1900)
 
+=item skipOnDate ($$;$)
+
+ $onlyPassIf .. only pass if $checkDate is: ML..on months end (incl. optional holiday calender, eg MLAT for Austria), B.. on businessdays (optional calender: $checkHoliday, if not given: Austria), D..daily, M1..NOT at beginning of month, W{n}..on weekday (n:1=sunday,2=monday,..7=saturday), MW{n].. on first weekday in month (n:0=sunday..6=saturday), Q..at beginning of quarter
+ $checkDate .. the date to check
+ $checkHoliday .. optional calendar for businessdays in $onlyPassIf (eg AT for Austria)
+
+returns explanation why $checkDate should be skipped based on $onlyPassIf (optionally $checkHoliday for $onlyPassIf=B), blank otherwise.
+This can be used to skip further execution based on rules given above (e.g. exit 0 if skipOnDate("B", $curDate);).
+
 =back
 
 =head1 COPYRIGHT
 
-Copyright (c) 2025 Roland Kapl
+Copyright (c) 2026 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

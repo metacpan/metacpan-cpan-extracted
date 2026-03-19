@@ -1,0 +1,26 @@
+#!/bin/env perl
+
+use GraphViz2::Marpa ;
+use Data::TreeDumper ;
+use GraphViz2::Marpa::Extractor;
+
+
+my $file = shift || 'input.dot';
+
+
+open (my $fh, '<', $file) or die "error reading file: $!" ;
+print while<$fh> ;
+print "\n" ;
+
+my $g2m = GraphViz2::Marpa->new( input_file => $file);
+$g2m->run;
+
+my $root = $g2m->tree;   # Tree::DAG_Node
+
+# package GraphViz2::Marpa::HierExtractor;
+my $all = GraphViz2::Marpa::Extractor::extract_all_graphs_hierarchical($root) ;
+print DumpTree $all ;
+
+use Data::Dumper ;
+# print Dumper $root ;
+

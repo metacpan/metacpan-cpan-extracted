@@ -4,7 +4,7 @@ use strict;
 use Exporter;
 use YAML::Syck ();
 
-our $VERSION   = '1.36';
+our $VERSION   = '1.37';
 our @EXPORT_OK = qw( Load Dump LoadFile DumpFile DumpInto );
 our @ISA       = qw/Exporter/;
 
@@ -14,10 +14,18 @@ our @ISA       = qw/Exporter/;
 sub DumpFile {
     my $file = shift;
     if ( YAML::Syck::_is_glob($file) ) {
-        my $err = YAML::Syck::DumpJSONFile( $_[0], $file );
-        if ($err) {
-            $! = 0 + $err;
-            die "Error writing to filehandle $file: $!\n";
+        if ( tied(*$file) ) {
+            # Tied filehandles (IO::String, IO::Scalar, etc.) don't support
+            # C-level PerlIO_write. Fall back to Perl-level print.
+            print $file YAML::Syck::DumpJSON( $_[0] )
+                or die "Error writing to filehandle $file: $!\n";
+        }
+        else {
+            my $err = YAML::Syck::DumpJSONFile( $_[0], $file );
+            if ($err) {
+                $! = 0 + $err;
+                die "Error writing to filehandle $file: $!\n";
+            }
         }
     }
     else {
@@ -146,7 +154,7 @@ By default, JSON::Syck::Dump will only transverse up to 512 levels of
 a datastructure in order to avoid an infinite loop when it is
 presented with an circular reference.
 
-However, you set C<$JSON::Syck::MaxLevels> to a larger value if you
+However, you can set C<$JSON::Syck::MaxDepth> to a larger value if you
 have very complex structures.
 
 Unfortunately, there's no implicit way to dump Perl UTF-8 flagged data
@@ -180,8 +188,9 @@ single-quoted string literals.
 Dumping into tied (or other magic variables) with C<DumpInto> might not work
 properly in all cases.
 
-When dumping with C<DumpFile>, some spacing might be wrong and
-C<$JSON::Syck::SingleQuote> might be handled incorrectly.
+When dumping with C<DumpFile>, spacing differs from C<Dump> (extra spaces
+after colons and a trailing newline) because C<DumpFile> uses the C-level
+serializer directly.
 
 =head1 SEE ALSO
 

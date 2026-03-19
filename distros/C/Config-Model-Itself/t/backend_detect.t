@@ -2,14 +2,26 @@
 
 use ExtUtils::testlib;
 use Test::More ;
+use File::Copy::Recursive qw(fcopy rcopy dircopy);
 use Config::Model;
-use Config::Model::Tester::Setup qw/init_test/;
+use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Test::Memory::Cycle;
 
 use warnings;
 use strict;
 
 my ($model, $trace) = init_test();
+
+# do search for the models created in this test
+use lib "wr_root/backend_detect/lib";
+
+my $wr_test = setup_test_dir ;
+my $wr_lib = $wr_test->child("lib/Config/Model");
+
+$wr_lib->mkpath;
+
+# copy test model
+dircopy('data',$wr_lib->stringify) || die "cannot copy model data:$!" ;
 
 $model ->create_config_class (
    name => "Master",
@@ -38,7 +50,9 @@ my $backend = $root->fetch_element('backend') ;
 
 my @choices = $backend->get_choice ;
 
-ok( (scalar grep { $_ eq 'IniFile'} @choices), "IniFile plugin backend was found") ;
+ok( (scalar grep { $_ eq 'IniFile'} @choices), "IniFile plugin backend from Config::Model was found") ;
+ok( (scalar grep { $_ eq 'MasterModel'} @choices), "MasterModel plugin backend from test files was found") ;
+ok( (scalar grep { $_ eq 'Master::Other'} @choices), "MasterModel::Other plugin backend from test files was found") ;
 
 # test help from backends provided by Config::Model
 SKIP: {

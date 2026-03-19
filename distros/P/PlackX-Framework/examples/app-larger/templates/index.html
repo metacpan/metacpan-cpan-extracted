@@ -1,0 +1,33 @@
+[% WRAPPER 'layout.html' %]
+	<div class="main">
+		<h1>PlackX::Framework Example: [% page_name %]</h1>
+		<p>
+			This is an example PlackX::Framework application.
+			There is an example form at the bottom of the page.
+		</p>
+		<p>
+			<a href="[% REQUEST.uri_for('dump.txt') %]">View a Request object dump here</a>.
+		</p>
+		<p>
+			Here are some URI computation examples:
+		</p>
+<pre>
+# CORRECT USES
+uri_goto     "./another_page"   : [% REQUEST.uri_goto('./another_page') %]
+uri_goto     "../different_app" : [% REQUEST.uri_goto('../different_app') %]
+rel_uri_for  "feedback"         : [% REQUEST.rel_uri_for('feedback') %]
+abs_uri_for  "feedback"         : [% REQUEST.abs_uri_for('feedback') %]
+uri_for      "feedback"         : [% REQUEST.uri_for('feedback')     %] # Alias for abs_uri_for
+
+# INCORRECT USES, DO NOT DO THIS
+uri_goto     "/app/feedback"    : [% REQUEST.uri_goto('/app/feedback') %] # WRONG, MISSING APP-WIDE PREFIX
+rel_uri_for  "../different_app" : [% REQUEST.rel_uri_for('../different_app') %] # WRONG, INAPPROPRIATE DOTS
+rel_uri_for  "./feedback"       : [% REQUEST.rel_uri_for('./feedback') %]
+abs_uri_for  "./feedback"       : [% REQUEST.rel_uri_for('./feedback') %]
+</pre>
+	</div>
+	<div class="footer">
+		What do you think?
+		<a href="[% REQUEST.uri_goto('./feedback') %]">Click here</a> to submit feedback.
+	</div>
+[% END %]

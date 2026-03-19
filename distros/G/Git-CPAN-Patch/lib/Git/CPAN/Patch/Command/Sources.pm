@@ -1,7 +1,7 @@
 package Git::CPAN::Patch::Command::Sources;
 our $AUTHORITY = 'cpan:YANICK';
 #ABSTRACT: lists sources for the module
-$Git::CPAN::Patch::Command::Sources::VERSION = '2.5.0';
+$Git::CPAN::Patch::Command::Sources::VERSION = '2.5.2';
 use 5.10.0;
 
 use strict;
@@ -58,54 +58,51 @@ parameter thingy => (
     isa => 'Str',
 );
 
-has release_meta => (
-    is => 'ro',
-    lazy => 1,
-    default => sub ($self) {
-        require MetaCPAN::API;
-        my $mcpan = MetaCPAN::API->new;
+sub release_meta ($self, $thingy) {
+    require MetaCPAN::Client;
+    my $mcpan = MetaCPAN::Client->new;
 
-        my $thingy = $self->thingy;
-
-        eval { $mcpan->release(
-                distribution => $mcpan->module($thingy)->{distribution}
-        ) }
-        || eval { $mcpan->release( distribution => $thingy ) }
-        || die "could not find release for '$thingy' on metacpan\n";
-    },
-);
-
-has backpan_index => (
-    is => 'ro',
-    lazy => 1,
-    default => sub {
-        require BackPAN::Index;
-        return BackPAN::Index->new;
-    },
-);
+    eval { $mcpan->release( $mcpan->module($thingy)->distribution ) }
+    || eval { $mcpan->release( $thingy ) }
+    || die "could not find release for '$thingy' on metacpan\n";
+}
 
 sub run ($self) {
-    if ( $self->repository and $self->release_meta->{resources}{repository} ) {
-        say "vcs:";
-        mapp { say "  $a: $b" } %{ $self->release_meta->{resources}{repository} };
+    if ( $self->backpan ) {
+        say "backpan:";
+
+        require MetaCPAN::Client;
+        my $mcpan = MetaCPAN::Client->new;
+
+        my $releases = $mcpan->release(
+            { distribution => $self->thingy },
+            { sort => [{ date => { order => 'asc' } }] },
+        );
+
+        if (!$releases->total) {
+            die "could not find releases for '$self->thingy' on metacpan\n";
+        }
+
+        while (my $release = $releases->next) {
+            say "  - ", $release->download_url;
+        }
+
+        return;
     }
 
+    my $meta = $self->release_meta($self->thingy);
+
+    if ( $self->repository and $meta->resources->{repository} ) {
+        say "vcs:";
+        mapp { say "  $a: $b" } %{ $meta->resources->{repository} };
+    }
     if ( $self->cpan ) {
         say "cpan:";
         for ( qw/ download_url / ) {
-            say "  $_: ", $self->release_meta->{$_};
+            say "  $_: ", $meta->$_;
         }
     }
 
-    my $BackPAN_URL = "http://backpan.perl.org/";
-    if ( $self->backpan ) {
-        say "backpan:";
-        my $dist = $self->backpan_index->dist($self->thingy)
-            or die "could not find distribution on BackPAN\n";
-
-        say "  - ", $BackPAN_URL . "/" . $_->prefix
-            for $dist->releases->search( undef, { order_by => "date" } )->all;
-    }
 }
 
 
@@ -123,7 +120,7 @@ Git::CPAN::Patch::Command::Sources - lists sources for the module
 
 =head1 VERSION
 
-version 2.5.0
+version 2.5.2
 
 =head1 SYNOPSIS
 
@@ -135,7 +132,7 @@ Yanick Champoux <yanick@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009 by Yanick Champoux.
+This software is copyright (c) 2026, 2014, 2010, 2009 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

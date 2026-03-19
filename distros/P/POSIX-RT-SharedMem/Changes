@@ -1,5 +1,10 @@
 Revision history for POSIX-RT-SharedMem
 
+0.11      2026-03-15 23:36:47+01:00 Europe/Brussels
+          - Simplify error handling
+          - Fix PROTOTYPES value in XS
+          - Convert to Dist::Build
+
 0.10      2014-08-16 13:44:46+02:00 Europe/Amsterdam
           Set locale to "C" for predictable error messages
           Converted tests to Test::Fatal

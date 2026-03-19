@@ -18,18 +18,18 @@ populate_test_db($dbh);
 $dbh = DBD::Mock::Session::GenerateFixtures->new( { dbh => $dbh } )->get_dbh();
 
 my $sql = <<"SQL";
-SELECT * FROM media_types WHERE id IN(?,?)
+SELECT * FROM media_types WHERE id IN(?,?) ORDER BY id DESC
 SQL
 
 chomp $sql;
 my $expected = [
     {
-        'id'         => 1,
-        'media_type' => 'video'
+        'id'         => 2,
+        'media_type' => 'audio'
     },
     {
-        'media_type' => 'audio',
-        'id'         => 2
+        'media_type' => 'video',
+        'id'         => 1
     }
 ];
 
@@ -49,7 +49,7 @@ subtest 'preapare and execute' => sub {
 
 subtest 'Use named binds to bind parameters' => sub {
 
-    my $sth = $dbh->prepare('SELECT * FROM media_types WHERE id IN(:id, :id_2)');
+    my $sth = $dbh->prepare('SELECT * FROM media_types WHERE id IN(:id, :id_2) ORDER BY id DESC');
     $sth->bind_param(
         ':id' => 2,
         undef

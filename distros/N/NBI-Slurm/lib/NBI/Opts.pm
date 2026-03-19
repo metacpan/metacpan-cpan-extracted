@@ -1,5 +1,35 @@
 package NBI::Opts;
 #ABSTRACT: A class for representing a the SLURM options for NBI::Slurm
+#
+# NBI::Opts - Stores and validates SLURM resource options for a job.
+#
+# DESCRIPTION:
+#   Holds every resource knob that ends up as a #SBATCH directive in the
+#   job script.  Key responsibilities:
+#     - new()           : accepts -queue, -threads, -memory, -time, -tmpdir,
+#                         -email_address, -email_type, -opts (extra directives),
+#                         -files (enables array-job mode), -placeholder
+#     - header()        : generates the full #!/bin/bash + #SBATCH header block
+#                         consumed by NBI::Job->script()
+#     - timestring()    : converts internal hours to SLURM "D-HH:MM:SS" format
+#     - is_array()      : returns true when a -files list is present
+#     - add_option()    : appends a raw #SBATCH option string
+#     - view()          : returns a human-readable summary string
+#   Internal helpers:
+#     - _mem_parse_mb()    : normalises memory values (KB/MB/GB/TB) to MB
+#     - _time_to_hour()    : normalises time strings (e.g. "2h30m", "1d") to hours
+#     - _parse_start_time(): validates/normalises HH:MM[:SS] → "HH:MM:SS"
+#     - _parse_start_date(): validates/normalises DD/MM[/YYYY] → "YYYY-MM-DD",
+#                            inferring year when omitted
+#     - _compute_begin()   : combines start_time + start_date with date-inference
+#                            logic and returns the SLURM "--begin" value string
+#
+# RELATIONSHIPS:
+#   - Composed into NBI::Job via the -opts constructor argument or set_opts().
+#   - NBI::Job calls $self->opts->header() and reads tmpdir, placeholder,
+#     files, and is_array() to build the sbatch script.
+#   - $NBI::Opts::VERSION is set from $NBI::Slurm::VERSION (loaded by caller).
+#
 
 use 5.012;
 use warnings;
@@ -7,6 +37,7 @@ use Carp qw(confess);
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
 use File::Basename;
+use POSIX qw(mktime strftime);
 
 $NBI::Opts::VERSION           = $NBI::Slurm::VERSION;
 
@@ -22,7 +53,7 @@ sub _yell {
 }
 sub new {
     my $class = shift @_;
-    my ($queue, $memory, $threads, $opts_array, $tmpdir, $hours, $email_address, $email_when, $files, $placeholder) = (undef, undef, undef, undef, undef, undef, undef, undef, undef);
+    my ($queue, $memory, $threads, $opts_array, $tmpdir, $hours, $email_address, $email_when, $files, $placeholder, $start_time, $start_date) = (undef) x 12;
     
     # Descriptive instantiation with parameters -param => value
     if (substr($_[0], 0, 1) eq '-') {
@@ -105,6 +136,16 @@ sub new {
                     $files = $data{$i};
                 }
                 
+            # START TIME
+            } elsif ($i =~ /^-start_time/) {
+                next unless defined $data{$i};
+                $start_time = _parse_start_time($data{$i});
+
+            # START DATE
+            } elsif ($i =~ /^-start_date/) {
+                next unless defined $data{$i};
+                $start_date = _parse_start_date($data{$i});
+
             } else {
                 confess "ERROR NBI::Seq: Unknown parameter $i\n";
             }
@@ -125,6 +166,9 @@ sub new {
     $self->placeholder = defined $placeholder ?  $placeholder : "#FILE#";
     # Set options
     $self->opts = defined $$opts_array[0] ? $opts_array : [];
+    # Begin time (optional)
+    $self->{start_time} = $start_time;
+    $self->{start_date} = $start_date;
     
     
     
@@ -184,6 +228,18 @@ sub placeholder : lvalue {
     $self->{placeholder} = $new_val if (defined $new_val);
     return $self->{placeholder};
 }
+sub start_time : lvalue {
+    my ($self, $new_val) = @_;
+    $self->{start_time} = _parse_start_time($new_val) if defined $new_val;
+    return $self->{start_time};
+}
+
+sub start_date : lvalue {
+    my ($self, $new_val) = @_;
+    $self->{start_date} = _parse_start_date($new_val) if defined $new_val;
+    return $self->{start_date};
+}
+
 sub is_array {
     # Check if the job is an array
     my $self = shift @_;
@@ -237,6 +293,8 @@ sub view {
     $str .= " memory MB:\t" . $self->{memory} . "\n";
     $str .= " time (h):\t" . $self->{hours} . "\n";
     $str .= " tmpdir:\t" . $self->{tmpdir} . "\n";
+    my $begin = $self->_compute_begin();
+    $str .= " begin:\t" . $begin . "\n" if defined $begin;
     $str .= " ---------------------------\n";
     for my $o (@{$self->{opts}}) {
         $str .= "#SBATCH $o\n" if defined $o;
@@ -274,7 +332,10 @@ sub header {
     if ($self->is_array()) {
         my $len = scalar @{$self->{files}} - 1;
         $str .= "#SBATCH --array=0-$len\n";
-    }  
+    }
+    # Begin time
+    my $begin = $self->_compute_begin();
+    $str .= "#SBATCH --begin=$begin\n" if defined $begin;
     return $str;
 }
 
@@ -342,6 +403,85 @@ sub _time_to_hour {
 }
 
 
+sub _parse_start_time {
+    # Accept H:MM, HH:MM, H:MM:SS, HH:MM:SS (24h only). Returns "HH:MM:SS".
+    my $time = shift;
+    unless ($time =~ /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/) {
+        confess "ERROR NBI::Opts: Cannot parse start time '$time'. Use HH:MM or HH:MM:SS (24h format)\n";
+    }
+    my ($h, $m, $s) = ($1, $2, $3 // 0);
+    confess "ERROR NBI::Opts: Invalid hour $h in '$time' (must be 0-23)\n"   if $h > 23;
+    confess "ERROR NBI::Opts: Invalid minute $m in '$time' (must be 0-59)\n" if $m > 59;
+    confess "ERROR NBI::Opts: Invalid second $s in '$time' (must be 0-59)\n" if $s > 59;
+    return sprintf("%02d:%02d:%02d", $h, $m, $s);
+}
+
+sub _parse_start_date {
+    # Accept DD/MM or DD/MM/YYYY. Returns "YYYY-MM-DD".
+    # When year is omitted, infers current year; if that date is already past, uses next year.
+    # Also accepts the already-normalised YYYY-MM-DD form (idempotent).
+    my $date = shift;
+
+    # Already normalised by a previous call — pass through unchanged.
+    return $date if $date =~ /^\d{4}-\d{2}-\d{2}$/;
+
+    unless ($date =~ m{^(\d{1,2})/(\d{1,2})(?:/(\d{4}))?$}) {
+        confess "ERROR NBI::Opts: Cannot parse start date '$date'. Use DD/MM or DD/MM/YYYY\n";
+    }
+    my ($day, $mon, $year) = ($1, $2, $3);
+    confess "ERROR NBI::Opts: Invalid month $mon in '$date' (must be 1-12)\n" if $mon < 1 || $mon > 12;
+    confess "ERROR NBI::Opts: Invalid day $day in '$date' (must be 1-31)\n"   if $day < 1 || $day > 31;
+
+    if (!defined $year) {
+        my @now       = localtime(time);
+        my $curr_year = $now[5] + 1900;
+        # midnight today for comparison
+        my $today_midnight = mktime(0, 0, 0, $now[3], $now[4], $now[5]);
+        my $candidate      = mktime(0, 0, 0, $day, $mon - 1, $curr_year - 1900);
+        $year = ($candidate >= $today_midnight) ? $curr_year : $curr_year + 1;
+    }
+
+    # Validate via mktime round-trip (catches e.g. 31/02)
+    my $epoch = mktime(0, 0, 12, $day, $mon - 1, $year - 1900);
+    my @check = localtime($epoch);
+    if ($check[3] != $day || $check[4] + 1 != $mon || $check[5] + 1900 != $year) {
+        confess "ERROR NBI::Opts: Invalid date '$date' (day out of range for that month)\n";
+    }
+
+    return sprintf("%04d-%02d-%02d", $year, $mon, $day);
+}
+
+sub _compute_begin {
+    # Combine start_date and start_time into a SLURM --begin string.
+    # Returns undef when neither is set.
+    # Always normalises through the parsers so lvalue assignment of raw strings works.
+    my $self = shift;
+    return undef unless defined $self->{start_time} || defined $self->{start_date};
+
+    my $time_str = defined $self->{start_time}
+        ? _parse_start_time($self->{start_time})
+        : "00:00:00";
+    my ($h, $m, $s) = split /:/, $time_str;
+
+    my $date_str;
+    if (defined $self->{start_date}) {
+        $date_str = _parse_start_date($self->{start_date});
+    } else {
+        # Only time given: use today if that time is still in the future, else tomorrow.
+        my @now        = localtime(time);
+        my $today_begin = mktime($s, $m, $h, $now[3], $now[4], $now[5]);
+        if ($today_begin > time()) {
+            $date_str = strftime("%Y-%m-%d", @now);
+        } else {
+            # mktime normalises day overflow correctly (e.g. 31 -> 1st of next month)
+            my @tomorrow = localtime(mktime(0, 0, 0, $now[3] + 1, $now[4], $now[5]));
+            $date_str = strftime("%Y-%m-%d", @tomorrow);
+        }
+    }
+
+    return "${date_str}T${time_str}";
+}
+
 1;
 
 __END__
@@ -356,7 +496,7 @@ NBI::Opts - A class for representing a the SLURM options for NBI::Slurm
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 
@@ -510,6 +650,28 @@ Accessor method for the input file placeholder.
 
   $opts->placeholder = "{INPUT}";
   my $placeholder = $opts->placeholder;
+
+=head2 start_time
+
+Accessor for the job start time (24h format). Triggers C<--begin> in the script header.
+
+  $opts->start_time = "22:00";      # 10 pm
+  $opts->start_time = "9:30";       # 9:30 am
+  $opts->start_time = "13:45:00";   # with seconds
+
+Accepted formats: C<H:MM>, C<HH:MM>, C<H:MM:SS>, C<HH:MM:SS>.
+12-hour (am/pm) notation is not accepted.
+
+=head2 start_date
+
+Accessor for the job start date.
+
+  $opts->start_date = "25/12";          # infers year
+  $opts->start_date = "01/06/2026";     # explicit year
+
+Accepted formats: C<DD/MM> or C<DD/MM/YYYY>.
+When the year is omitted it is inferred: the current year is used unless that
+date has already passed, in which case next year is used.
 
 =head2 add_option
 

@@ -21,7 +21,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,7 +34,7 @@ no_index:
 provides:
   Getopt::Guided:
     file: lib/Getopt/Guided.pm
-    version: v3.1.0
+    version: v3.1.2
 requires:
   Carp: '1.32'
   File::Basename: '0'
@@ -45,5 +45,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/XSven/Getopt-Guided/issues
   repository: https://codeberg.org/XSven/Getopt-Guided.git
-version: v3.1.0
-x_serialization_backend: 'CPAN::Meta::YAML version 0.011'
+version: v3.1.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

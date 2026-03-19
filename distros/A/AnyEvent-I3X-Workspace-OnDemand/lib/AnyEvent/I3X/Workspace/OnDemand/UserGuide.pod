@@ -16,7 +16,7 @@ AnyEvent::I3X::Workspace::OnDemand::UserGuide - User document for AnyEvent::I3X:
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head2 Getting Started
 

@@ -2,6 +2,7 @@ BEGIN { push @INC, '.' }
 use inc::Module::Install;
 
 name ('DBIx-SearchBuilder');
+repository 'https://github.com/bestpractical/dbix-searchbuilder';
 all_from('lib/DBIx/SearchBuilder.pm');
 readme_from('lib/DBIx/SearchBuilder.pm');
 perl_version('5.10.1');

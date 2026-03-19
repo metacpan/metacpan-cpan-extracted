@@ -59,16 +59,18 @@
             "Text::CSV::Encoded" : "0.25",
             "Types::Standard" : "2.006",
             "boolean" : "0.46",
-            "constant" : "1.33",
             "lib" : "0.65",
             "open" : "1.13",
             "parent" : "0.242",
+            "perl" : "5.36",
             "strict" : "1.12",
             "warnings" : "1.58"
          }
       },
       "test" : {
          "requires" : {
+            "Test::CPAN::Changes" : "0.500005",
+            "Test::Changes::Strict::Simple" : "0.01",
             "Test::More" : "1.001002"
          }
       }
@@ -87,6 +89,6 @@
          "web" : "https://github.com/ronsavage/CPAN-MetaCurator"
       }
    },
-   "version" : "1.11",
+   "version" : "1.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,5 +1,9 @@
 Revision history for DBIx::Class::Async
 
+0.65 2026-03-15
+     [IMPROVEMENTS]
+     - Added security document SECURITY.md as recommended in the issue #11.
+
 0.64 2026-03-02
      [BUG FIXES]
      - Fix InflateColumn::DateTime inflation on async worker path (PR#138)

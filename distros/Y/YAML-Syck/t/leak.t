@@ -2,11 +2,11 @@
 
 use strict;
 use YAML::Syck;
-use Test::More tests => 11;
+use Test::More tests => 12;
 
 SKIP: {
     eval { require Devel::Leak; require 5.8.9; 1; }
-      or skip( "Devel::Leak not installed or perl too old", 11 );
+      or skip( "Devel::Leak not installed or perl too old", 12 );
 
     # check if arrays leak
 
@@ -139,4 +139,19 @@ result: !perl/code: '{ 42 + + 54ih a; $" }'
     local $TODO = "It looks like evals leak, but we're better than Storable"
       if $diff;
     is( $diff, 0, "No leaks - Dump code" );
+
+    # Check if dumping a filehandle leaks (rt.cpan.org #41199)
+    # Warm up to stabilize SV count
+    foreach ( 1 .. 100 ) {
+        open my $fh, "<", "/dev/null" or die;
+        Dump($fh);
+    }
+
+    $before = Devel::Leak::NoteSV($handle);
+    foreach ( 1 .. 100 ) {
+        open my $fh, "<", "/dev/null" or die;
+        Dump($fh);
+    }
+    $diff = Devel::Leak::NoteSV($handle) - $before;
+    is( $diff, 0, "No leaks - Dump filehandle (rt#41199)" );
 }

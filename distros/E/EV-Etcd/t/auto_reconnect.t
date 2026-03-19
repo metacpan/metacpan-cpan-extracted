@@ -1,31 +1,29 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Test::More;
 use lib 'blib/lib', 'blib/arch';
+use Test::More;
 
 BEGIN {
     eval { require EV };
-    if ($@) {
-        plan skip_all => 'EV module not available';
-        exit;
-    }
+    plan skip_all => 'EV required' if $@;
 }
 
-# Check if etcd is running
-my $etcd_running = 0;
+use EV;
+use EV::Etcd;
+
+# Check if etcd is available
+my $etcd_available = 0;
 eval {
-    my $result = `etcdctl endpoint health 2>&1`;
-    $etcd_running = 1 if $result =~ /is healthy/;
+    my $c = EV::Etcd->new(endpoints => ['127.0.0.1:2379'], timeout => 2);
+    $c->status(sub { $etcd_available = 1 if !$_[1]; EV::break });
+    my $t = EV::timer(3, 0, sub { EV::break });
+    EV::run;
 };
-if (!$etcd_running) {
-    plan skip_all => 'etcd not running';
-    exit;
-}
 
-plan tests => 5;
+plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-use_ok('EV::Etcd');
+plan tests => 4;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],

@@ -18,7 +18,7 @@ use Readonly;
 use Data::Walk;
 use Try::Tiny;
 
-our $VERSION = 1.12;
+our $VERSION = 1.15;
 
 our $override;
 my $JSON_OBJ   = Cpanel::JSON::XS->new()->utf8->pretty();
@@ -143,7 +143,7 @@ sub _override_dbi_methods {
     $self->_override_dbi_selectrow_array( $MOCKED_DBI_METHODS{selectrow_array} );
     $self->_override_dbi_selectrow_arrayref( $MOCKED_DBI_METHODS{selectrow_arrayref} );
     $self->_override_dbi_selectrow_hashref( $MOCKED_DBI_METHODS{selectrow_hashref} );
-    $self->_override_dbi_fecth( $MOCKED_DBI_METHODS{fetch} );
+    $self->_override_dbi_fetch( $MOCKED_DBI_METHODS{fetch} );
     $self->_override_dbi_prepare_cached( $MOCKED_DBI_METHODS{prepare_cached} );
     $self->_override_dbi_prepare( $MOCKED_DBI_METHODS{prepare} );
     $self->_override_dbi_begin_work( $MOCKED_DBI_METHODS{begin_work} );
@@ -670,7 +670,7 @@ sub _override_dbi_selectrow_hashref {
     return $self;
 }
 
-sub _override_dbi_fecth {
+sub _override_dbi_fetch {
     my $self  = shift;
     my $fetch = shift;
 
@@ -684,14 +684,7 @@ sub _override_dbi_fecth {
             my $sql = $sth->{Statement} // $sth->{Database}->{Statement} // '';
             if ( ref $row ) {
                 my @shallow_copy = @{$row};
-                if (   $sql =~ /WHERE/i
-                    && $sql !~ /ORDER BY/i )
-                {
-                    unshift @{ $self->{result}->[-1]->{results} }, \@shallow_copy;
-                }
-                else {
-                    push @{ $self->{result}->[-1]->{results} }, \@shallow_copy;
-                }
+                push @{ $self->{result}->[-1]->{results} }, \@shallow_copy;
                 $self->_write_to_file();
             }
 
@@ -1106,7 +1099,7 @@ Overrides the C<selectrow_arrayref> method of C<DBI::db> in order to capture the
 
 Overrides the C<selectrow_hashref> method of C<DBI::db> in order to capture the rows returned.
 
-=head2 _override_dbi_fecth($sth, @args)
+=head2 _override_dbi_fetch($sth, @args)
 
 Overrides the C<fetch> method of C<DBI::st>
 

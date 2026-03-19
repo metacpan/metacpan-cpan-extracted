@@ -1,0 +1,11 @@
+digraph {
+    subgraph cluster_1 {
+        label="Group 1";
+        A; B;
+        A -> B;
+    }
+
+    C -> A;
+    B -> D;
+    D -> C;
+}

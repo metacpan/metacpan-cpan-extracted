@@ -4,6 +4,14 @@
 
 Getopt::Guided - getopts implementation that follows POSIX utility guidelines
 
+=head1 GENERAL
+
+This module adheres to the L<Semantic
+Versioning|http://semver.org/spec/v2.0.0.html> scheme.  All of its
+public functions (C<getopts()>, C<processopts()>, C<readopts()>,
+C<print_version_info()>) and constants (EOOD, EXIT_SUCCESS, EXIT_FAILURE,
+EXIT_USAGE) are exported on request.
+
 =head1 SYNOPSIS
 
   use Getopt::Guided qw( getopts );
@@ -29,14 +37,6 @@ Getopt::Guided - getopts implementation that follows POSIX utility guidelines
   # $verbosity == 3
   # @inc       == ( 'lib', 'local/lib/perl5' )
   # @argv      == ()
-
-=head1 GENERAL
-
-This module adheres to the L<Semantic
-Versioning|http://semver.org/spec/v2.0.0.html> scheme.  All public functions
-(C<getopts()>, C<processopts()>, C<readopts()>, C<print_version_info()>)
-and public constants (EOOD, EXIT_SUCCESS, EXIT_FAILURE, EXIT_USAGE) provided
-by this module are exported on request.
 
 =head1 DESCRIPTION
 
@@ -192,22 +192,6 @@ The C<processopts()> function returns true (C<!!1>) on success; otherwise the
 function returns false (C<!!0>). If the function stops prematurely, its return
 value for true changes to the option name prefixed by the options delimiter.
 
-=head1 "-V"
-
-The GNU coding standard provides some guideline how a "-V" (version) option
-should behave. This module provides the C<print_version_info()> function. It
-can be used as a "-V" option destination callback function. The function
-implements some recommendations. It prints information about the program name
-(the basename of L<$0|perlvar/$0>), and its version to standard output. As
-a second information line it prints the version of the perl interpreter to
-standard output too. Example output:
-
-  foo v1.2.3
-  perl v5.14.2
-
-The function returns the end of options delimiter, so that the C<processopts()>
-function stops prematurely.
-
 =head1 DEFAULT OPTIONS
 
 The C<readopts( \@ )> function reads default command-line options from a
@@ -231,6 +215,22 @@ Example rcfile content:
   # jobs
   j 9
 
+=head1 PROGRAM VERSION
+
+The GNU coding standard provides some guideline how a "-V" (version) option
+should behave. This module provides the C<print_version_info()> function. It
+can be used as a "-V" option destination callback function. The function
+implements some recommendations. It prints information about the program name
+(the basename of L<$0|perlvar/$0>), and its version to standard output. As
+a second information line it prints the version of the perl interpreter to
+standard output too. Example output:
+
+  foo v1.2.3
+  perl v5.14.2
+
+The function returns the end of options delimiter, so that the C<processopts()>
+function stops prematurely.
+
 =head1 SEE ALSO
 
 =over 2
@@ -246,6 +246,14 @@ L<Tacit list of POSIX short options|https://stackoverflow.com/questions/56131811
 =item *
 
 L<The -W option of GNU getopt()|https://stackoverflow.com/questions/14338223/what-is-the-w-option-of-gnu-getopt-used-for>
+
+=item *
+
+L<Getopt::ArgvFile>
+
+=item *
+
+L<Configuration file for command-line options|https://pasdoc.github.io/ConfigFileOption>
 
 =back
 

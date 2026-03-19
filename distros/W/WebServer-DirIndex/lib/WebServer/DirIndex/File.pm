@@ -1,11 +1,13 @@
+package WebServer::DirIndex::File; # For cpanm
+
+our $VERSION = '0.1.4';
+
 use strict;
 use warnings;
 use Feature::Compat::Class;
 use WebServer::DirIndex::HTML;
 
 class WebServer::DirIndex::File {
-
-  our $VERSION = '0.1.3';
 
   use HTML::Escape qw(escape_html);
 

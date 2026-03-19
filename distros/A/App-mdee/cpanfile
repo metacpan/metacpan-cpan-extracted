@@ -9,7 +9,7 @@ requires 'App::ansifold', '1.35';
 requires 'App::ansicolumn', '1.5702';
 requires 'Term::ANSIColor::Concise', '3.02';
 
-requires 'App::nup', '0.9907';
+requires 'App::nup', '1.07';
 requires 'Getopt::Long::Bash', '0.7.2';
 
 requires 'App::Greple', '10.04';

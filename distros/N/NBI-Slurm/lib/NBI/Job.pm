@@ -1,5 +1,29 @@
 package NBI::Job;
 #ABSTRACT: A class for representing a job for NBI::Slurm
+#
+# NBI::Job - Represents a single SLURM job to be submitted.
+#
+# DESCRIPTION:
+#   Encapsulates a named job consisting of one or more shell commands
+#   together with its resource options (NBI::Opts).  Key responsibilities:
+#     - new()          : accepts -name, -command/-commands, and -opts
+#     - script()       : assembles the bash/sbatch script content
+#     - run()          : writes the script to disk and submits it via sbatch,
+#                        returning the numeric SLURM job ID
+#     - view()         : returns a human-readable summary string
+#     - outputfile / errorfile : lvalue accessors for stdout/stderr paths
+#                        (support %j interpolation after submission)
+#     - append_command / prepend_command : add commands to the job list
+#     - Array-job support: if the attached NBI::Opts has a -files list,
+#       the script uses a SLURM job array and replaces the -placeholder
+#       token with ${selected_file}.
+#
+# RELATIONSHIPS:
+#   - Depends on NBI::Opts (stored in $self->{opts}) for all #SBATCH header
+#     lines, the tmpdir, and array-job configuration.
+#   - $NBI::Job::VERSION is set from $NBI::Slurm::VERSION (loaded by caller).
+#   - Used directly by end-users and by the runjob bin script.
+#
 
 use 5.012;
 use warnings;
@@ -409,7 +433,7 @@ NBI::Job - A class for representing a job for NBI::Slurm
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 DESCRIPTION
 

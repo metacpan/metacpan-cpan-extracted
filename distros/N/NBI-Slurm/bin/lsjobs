@@ -815,7 +815,7 @@ lsjobs - List your jobs (or others), and delete them if you wish
 
 =head1 VERSION
 
-version 0.16.1
+version 0.17.0
 
 =head1 SYNOPSIS
 
@@ -919,6 +919,10 @@ List jobs with a simplified view (hide some columns):
   lsjobs --hide nodelist --hide reason --hide totaltime
 
 =back
+
+=head1 SEE ALSO
+
+L<viewjobs>
 
 =head1 AUTHOR
 

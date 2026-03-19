@@ -39,15 +39,12 @@ sub Process {
     return if(!$self->{is_connected}); # Return undef if we're not connected.
 
     foreach my $message (@{$self->{message_queue}}) {
-        $timeout = 0; # zero out sleep timer;
         next if(!defined $self->{message_callback});
         $self->{message_callback}->($self->{SESSION}->{id}, $message);
     }
-    
-    
+
     @{$self->{message_queue}} = ();
 
-    sleep $timeout;
     return 1; # undef means we lost connection.
 }
 
@@ -110,14 +107,21 @@ sub MUCJoin {; }
 
 sub Disconnect {
     my $self = shift;
-    $self->{is_connected} = 1;
+    $self->{is_connected} = 0;
 }
 
 sub Send {;} # Used for IQ. need to see if we need to put something here.
 
 sub Subscription {;} # Used to process JabberPresenceMessages we don't really use this data at the moment.
 sub RosterGet {;}
+sub RosterDB {;}
+sub RosterRequest {;}
+sub RosterDBJIDs { return (); }
 sub PresenceDB {;}
 sub PresenceDBParse{;}
+
+no warnings 'redefine';
+sub RosterDB {;}
+sub RosterRequest {;}
 
 1;

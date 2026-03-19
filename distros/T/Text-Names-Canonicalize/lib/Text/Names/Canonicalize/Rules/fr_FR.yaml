@@ -1,0 +1,39 @@
+---
+# French (France) name canonicalization rules
+#
+# Notes:
+#   - French surnames frequently include particles:
+#         de, du, des, le, la, d', l'
+#     These must be preserved and treated as part of the surname.
+#
+#   - Examples:
+#         Jean de Gaulle        → ["de", "gaulle"]
+#         Charles de la Tour    → ["de", "la", "tour"]
+#         Jean d'Ormesson       → ["d'", "ormesson"]
+#         Pierre L'Enfant       → ["l'", "enfant"]
+#
+#   - Hyphenated given names (Jean‑Luc, Marie‑Claire) are common.
+#   - Suffixes are rare in French naming; we keep the minimal English list.
+#   - Titles such as "M.", "Mme", "Mlle" should be stripped.
+
+default:
+
+  include: base
+
+  particles:
+    - de
+    - du
+    - des
+    - le
+    - la
+    - "d'"
+    - "l'"
+
+  strip_titles:
+    - mr
+    - mme
+    - mlle
+    - m
+    - me
+    - dr
+    - prof

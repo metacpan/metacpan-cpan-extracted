@@ -110,7 +110,11 @@ sub LoadByCols {
     # get primary cache key
     my $cache_key = $self->_lookup_primary_RecordCache_key($alt_key);
     if ( $cache_key && $self->_fetch( $cache_key ) ) {
-        return ( 1, "Fetched from cache" );
+
+        # When SelectAllColumns is set, only return the cached entry if it
+        # already contains all real columns; otherwise fall through and
+        # re-fetch from the DB so the caller gets a complete record.
+        return ( 1, "Fetched from cache" ) if !$self->SelectAllColumns || $self->_cache_has_all_cols;
     }
 
     # Fetch from the DB!
@@ -122,6 +126,19 @@ sub LoadByCols {
         $self->_KeyCache->set( $alt_key, $self->_primary_RecordCache_key);
     }
     return ( $rvalue, $msg );
+}
+
+# Returns true if every real column in _ClassAccessible has already been
+# fetched into this record (i.e. the cache entry is complete enough to satisfy
+# a SelectAllColumns request).
+sub _cache_has_all_cols {
+    my $self = shift;
+    my $ca   = $self->_ClassAccessible;
+    for my $col ( keys %$ca ) {
+        next if $ca->{$col}{'foreign-collection'} || $ca->{$col}{'record-read'};
+        return 0 unless $self->{'fetched'}{ lc $col };
+    }
+    return 1;
 }
 
 # Function: __Set

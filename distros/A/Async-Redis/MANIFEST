@@ -57,6 +57,7 @@ t/10-connection/reconnect.t
 t/10-connection/socket-cleanup.t
 t/10-connection/timeout.t
 t/10-connection/tls.t
+t/10-connection/unix-socket.t
 t/20-commands/hashes.t
 t/20-commands/keys.t
 t/20-commands/lists.t
@@ -68,6 +69,7 @@ t/30-pipeline/auto-pipeline.t
 t/30-pipeline/basic.t
 t/30-pipeline/chained.t
 t/30-pipeline/depth-limit.t
+t/30-pipeline/error-objects.t
 t/30-pipeline/errors.t
 t/30-pipeline/large.t
 t/40-transactions/discard.t
@@ -77,6 +79,7 @@ t/40-transactions/watch-conflict.t
 t/40-transactions/watch.t
 t/50-pubsub/multiple-channels.t
 t/50-pubsub/psubscribe.t
+t/50-pubsub/reconnect.t
 t/50-pubsub/subscribe.t
 t/50-pubsub/unsubscribe.t
 t/60-scripting/auto-fallback.t
@@ -100,6 +103,8 @@ t/80-scan/sscan.t
 t/80-scan/zscan.t
 t/90-pool/basic.t
 t/90-pool/dirty-detection.t
+t/90-pool/max-connections.t
+t/90-pool/param-forwarding.t
 t/90-pool/with-pattern.t
 t/91-reliability/queue-overflow.t
 t/91-reliability/retry.t

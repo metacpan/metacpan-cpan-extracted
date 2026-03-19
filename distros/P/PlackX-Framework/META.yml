@@ -1,0 +1,72 @@
+---
+abstract: 'A thin framework for PSGI/Plack web apps.'
+author:
+  - 'Dondi Michael Stroma, <dstroma@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PlackX-Framework
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  PXF::Util:
+    file: lib/PXF/Util.pm
+  PlackX::Framework:
+    file: lib/PlackX/Framework.pm
+    version: '0.26'
+  PlackX::Framework::Config:
+    file: lib/PlackX/Framework/Config.pm
+  PlackX::Framework::Handler:
+    file: lib/PlackX/Framework/Handler.pm
+  PlackX::Framework::Request:
+    file: lib/PlackX/Framework/Request.pm
+  PlackX::Framework::Response:
+    file: lib/PlackX/Framework/Response.pm
+  PlackX::Framework::Role::RouterEngine:
+    file: lib/PlackX/Framework/Role/RouterEngine.pm
+  PlackX::Framework::Role::TemplateEngine:
+    file: lib/PlackX/Framework/Role/TemplateEngine.pm
+  PlackX::Framework::Router:
+    file: lib/PlackX/Framework/Router.pm
+  PlackX::Framework::Router::Engine:
+    file: lib/PlackX/Framework/Router/Engine.pm
+  PlackX::Framework::Template:
+    file: lib/PlackX/Framework/Template.pm
+  PlackX::Framework::URIx:
+    file: lib/PlackX/Framework/URIx.pm
+recommends:
+  Config::Any: '0'
+  JSON::MaybeXS: '0'
+  Sub::Util: '1.40'
+  Template: '0'
+  URI::Fast: '0'
+requires:
+  Digest::MD5: '0'
+  List::Util: '0'
+  Plack: '0'
+  Role::Tiny: '0'
+  Router::Boom: '0'
+  Scalar::Util: '0'
+  perl: v5.36.0
+resources:
+  bugtracker: https://github.com/dstroma/PlackX-Framework/issues
+  homepage: https://github.com/dstroma/PlackX-Framework
+  repository: https://github.com/dstroma/PlackX-Framework.git
+version: '0.26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

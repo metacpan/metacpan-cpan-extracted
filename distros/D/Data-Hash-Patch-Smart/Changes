@@ -1,0 +1,7 @@
+Revision history for Data-Hash-Patch-Smart
+
+0.01	Tue Mar 17 19:40:22 EDT 2026
+    - Initial CPAN release.
+    - Supports structural wildcards, unordered arrays, strict mode,
+      create_missing, cycle-safe wildcard traversal.
+    - Full test suite and documentation.

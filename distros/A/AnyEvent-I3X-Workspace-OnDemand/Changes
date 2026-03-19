@@ -1,5 +1,13 @@
 Revision history for AnyEvent-I3X-Workspace-OnDemand
 
+0.009     2026-03-19 07:44:34Z
+
+  * Noticed some weird things with the X11 integration. Suspect a long term
+    connection dropping. So created a low level is_connected like call on
+    X11::Protocol.
+  * Support UTF8_STRING and STRING types for xprop setting. Auto-upgrade to
+    UTF8_STRING.
+
 0.008     2026-02-18 02:06:09Z
 
   * The previous helper script didn't really work. So we used an example found

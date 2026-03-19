@@ -1,0 +1,17 @@
+digraph G {
+    graph [rankdir=TB, bgcolor="transparent", fontname="Helvetica"];
+    node [shape=ellipse, style=filled, fillcolor="#E8E8E8", fontsize=12];
+    edge [fontname="Helvetica", fontsize=10, color="#555555"];
+
+    start [label="Start", shape=box, fillcolor="#90EE90"];
+    process [label="Process Data", fillcolor="#87CEEB"];
+    decision [label="Valid?", shape=diamond, fillcolor="#FFD700"];
+    error [label="Error", fillcolor="#FFA07A"];
+    end [label="End", shape=box, fillcolor="#DDA0DD"];
+
+    start -> process;
+    process -> decision;
+    decision -> error [label="No", color=red, style=bold];
+    decision -> end [label="Yes", color=green];
+    error -> process [label="Retry", style=dashed];
+}

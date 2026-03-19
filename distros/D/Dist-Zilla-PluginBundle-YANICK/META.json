@@ -4,7 +4,7 @@
       "Yanick Champoux <yanick@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,6 +37,7 @@
             "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
             "Dist::Zilla::Plugin::CoalescePod" : "0",
             "Dist::Zilla::Plugin::CoderwallEndorse" : "0",
+            "Dist::Zilla::Plugin::ContributorCovenant" : "0",
             "Dist::Zilla::Plugin::ContributorsFile" : "0",
             "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.170880",
             "Dist::Zilla::Plugin::CopyrightYearFromGit" : "0",
@@ -63,6 +64,7 @@
             "Dist::Zilla::Plugin::ReportVersions::Tiny" : "0",
             "Dist::Zilla::Plugin::RunExtraTests" : "0",
             "Dist::Zilla::Plugin::SchwartzRatio" : "0",
+            "Dist::Zilla::Plugin::SecurityPolicy" : "0",
             "Dist::Zilla::Plugin::Signature" : "0",
             "Dist::Zilla::Plugin::Test::Compile" : "2.033",
             "Dist::Zilla::Plugin::Test::PAUSE::Permissions" : "0",
@@ -76,6 +78,8 @@
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Dist::Zilla::Role::TextTemplate" : "0",
             "Moose" : "0",
+            "Software::Security::Policy::Individual" : "0",
+            "Syntax::Keyword::Junction" : "0.003009",
             "Type::Tiny" : "0",
             "Types::Standard" : "0",
             "experimental" : "0",
@@ -100,15 +104,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::YANICK" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/YANICK.pm",
-         "version" : "v0.32.1"
+         "version" : "v0.32.2"
       },
       "Dist::Zilla::PluginBundle::YANICK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/YANICK.pm",
-         "version" : "v0.32.1"
+         "version" : "v0.32.2"
       },
       "Dist::Zilla::PluginBundle::YANICK::Contributing" : {
          "file" : "lib/Dist/Zilla/PluginBundle/YANICK/Contributing.pm",
-         "version" : "v0.32.1"
+         "version" : "v0.32.2"
       }
    },
    "release_status" : "stable",
@@ -123,7 +127,7 @@
          "web" : "https://github.com/yanick/Dist-Zilla-PluginBundle-YANICK"
       }
    },
-   "version" : "0.32.1",
+   "version" : "0.32.2",
    "x_author_pledge" : {
       "version" : 1
    },
@@ -133,10 +137,11 @@
    },
    "x_contributors" : [
       "Damien Krotkine <dams@zarb.org>",
+      "Grinnz <grinnz@gmail.com>",
       "Karen Etheridge <ether@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.38.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

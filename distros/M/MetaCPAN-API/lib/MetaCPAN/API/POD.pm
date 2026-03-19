@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 package MetaCPAN::API::POD;
-# ABSTRACT: POD information for MetaCPAN::API
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Carp;
 use Moo::Role;
@@ -44,7 +43,7 @@ sub pod {
 
     my $result = $self->ua->get( $url, \%extra );
     $result->{'success'}
-        or croak "Failed to fetch '$url': " . $result->{'reason'};
+        or croak "Failed to fetch '$url': $result->{'reason'} - $result->{'content'}";
 
     return $result->{'content'};
 }
@@ -57,13 +56,11 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Sawyer X
+
 =head1 NAME
 
 MetaCPAN::API::POD - POD information for MetaCPAN::API
-
-=head1 VERSION
-
-version 0.51
 
 =head1 DESCRIPTION
 
@@ -88,6 +85,15 @@ Searches MetaCPAN for a module or a specific release and returns the POD.
 Content type can also be specified, like so:
 
     my $result = $mcpan->pod( module => 'Moose', 'content-type' => 'x-pod' );
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/xsawyerx/metacpan-api/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

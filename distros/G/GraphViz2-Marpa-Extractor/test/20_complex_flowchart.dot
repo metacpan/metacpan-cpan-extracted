@@ -1,0 +1,42 @@
+digraph ComplexFlow {
+    rankdir=TB;
+    node [shape=box, style="rounded,filled", fillcolor=white];
+
+    subgraph cluster_input {
+        label="Input Processing";
+        style=filled;
+        color=lightcyan;
+        in1 [label="Read File"];
+        in2 [label="Validate"];
+        in3 [label="Parse"];
+        in1 -> in2 -> in3;
+    }
+
+    subgraph cluster_transform {
+        label="Transformation";
+        style=filled;
+        color=lightyellow;
+        t1 [label="Clean Data"];
+        t2 [label="Transform"];
+        t3 [label="Enrich"];
+        t1 -> t2 -> t3;
+    }
+
+    subgraph cluster_output {
+        label="Output";
+        style=filled;
+        color=lightpink;
+        out1 [label="Format"];
+        out2 [label="Write"];
+        out1 -> out2;
+    }
+
+    in3 -> t1;
+    t3 -> out1;
+
+    // Error handling
+    error [label="Error Handler", shape=diamond, fillcolor=salmon];
+    in2 -> error [label="invalid", style=dashed, color=red];
+    t2 -> error [label="fail", style=dashed, color=red];
+    error -> in1 [label="retry", style=dashed, color=blue];
+}

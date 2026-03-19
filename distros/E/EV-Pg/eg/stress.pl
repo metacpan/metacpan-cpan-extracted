@@ -78,7 +78,6 @@ sub phase_pipeline {
                     phase_prepared();
                 }
             });
-            $pg->send_flush_request;
         }
     }
 }
@@ -108,7 +107,6 @@ sub phase_prepared {
                         phase_copy();
                     }
                 });
-                $pg->send_flush_request;
             }
         }
     });

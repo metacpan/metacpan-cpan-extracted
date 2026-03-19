@@ -1,0 +1,28 @@
+bin/workflow-lint
+Changes
+cpanfile
+lib/App/Workflow/Lint.pm
+lib/App/Workflow/Lint/Engine.pm
+lib/App/Workflow/Lint/Formatter.pm
+lib/App/Workflow/Lint/Rule.pm
+lib/App/Workflow/Lint/Rule/DeprecatedSetEnv.pm
+lib/App/Workflow/Lint/Rule/MissingConcurrency.pm
+lib/App/Workflow/Lint/Rule/MissingPermissions.pm
+lib/App/Workflow/Lint/Rule/MissingRunsOn.pm
+lib/App/Workflow/Lint/Rule/MissingTimeout.pm
+lib/App/Workflow/Lint/Rule/UnpinnedActions.pm
+lib/App/Workflow/Lint/YAML.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/autofix.t
+t/basic.t
+t/cli.t
+t/dsl.t
+t/eof.t
+t/eol.t
+t/output_formats.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

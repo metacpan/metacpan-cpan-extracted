@@ -6,7 +6,7 @@ WriteMakefile(
   MIN_PERL_VERSION  => '5.38.0',
   PREREQ_PM         => {
     Plack                => 0,
-    'WebServer::DirIndex' => '0.1.3',
+    'WebServer::DirIndex' => '0.1.4',
   },
   BUILD_REQUIRES    => {
     Test::More    => 0,

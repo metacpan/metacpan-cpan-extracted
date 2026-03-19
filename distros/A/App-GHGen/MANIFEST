@@ -26,7 +26,10 @@ t/30-basics.t
 t/detector.t
 t/eof.t
 t/eol.t
+t/kwalitee.t
 t/pod-cm.t
 t/pod-coverage.t
+t/pod-synopsis.t
+t/timeout.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

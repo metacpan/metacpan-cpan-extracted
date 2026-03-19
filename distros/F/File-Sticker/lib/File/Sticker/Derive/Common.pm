@@ -1,12 +1,12 @@
 package File::Sticker::Derive::Common;
-$File::Sticker::Derive::Common::VERSION = '4.301';
+$File::Sticker::Derive::Common::VERSION = '4.401';
 =head1 NAME
 
 File::Sticker::Derive::Common - derive values from existing meta-data
 
 =head1 VERSION
 
-version 4.301
+version 4.401
 
 =head1 SYNOPSIS
 
@@ -87,30 +87,68 @@ sub derive {
         $meta->{ext} = $1;
     }
 
+    # If we have a topdir, we want various path information
+    # relative to that top dir.
     if ($self->{topdir})
     {
-        $meta->{relpath} = $fp->relative($self->{topdir})->stringify;
-        my $rel_parent = $fp->parent->relative($self->{topdir})->stringify;
-        if ($meta->{relpath} =~ /\.\./) # we got a problem
+        # the topdir information may be an array
+        if (ref $self->{topdir} eq 'ARRAY')
         {
-            $meta->{relpath} =~ s!\.\./!!g;
-            $rel_parent =~ s!\.\./!!g;
+            my @topdirs = @{$self->{topdir}};
+            for (my $i=0; $i < @topdirs and !$meta->{relpath}; $i++)
+            {
+                my $td = $topdirs[$i];
+                # first check the given filename against this topdir
+                if ($filename =~ m!^${td}!)
+                {
+                    $meta->{relpath} = $fp->relative($td)->stringify;
+                }
+                # then check the real absolute filename against this topdir
+                elsif ($meta->{file} =~ m!^${td}!)
+                {
+                    $meta->{relpath} = path($meta->{file})->relative($td)->stringify;
+                }
+            }
+        }
+        else
+        {
+            $meta->{relpath} = $fp->relative($self->{topdir})->stringify;
+        }
+        my $rel_parent = '';
+        if ($meta->{relpath}) # we might not have been able to find the relpath
+        {
+            # Find the parent of this relpath
+            my $rpp = path($meta->{relpath})->parent;
+            $rel_parent = $rpp->stringify;
+
+            # Check if the relpath parent makes sense
+            if ($meta->{relpath} =~ /\.\./) # we got a problem
+            {
+                $meta->{relpath} = '';
+                $rel_parent = '';
+            }
         }
 
-        # Check if a thumbnail exists
-        # It could be a jpg or a png
-        # Note that if the file itself is a jpg or png, we can use it as the thumbnail
-        if (-r $fp->parent . '/.thumbnails/' . $meta->{id_name} . '.jpg')
+        # If we still have a relpath, set other things derived from it
+        if ($meta->{relpath})
         {
-            $meta->{thumbnail} = $rel_parent . '/.thumbnails/' . $meta->{id_name} . '.jpg'
-        }
-        elsif (-r $fp->parent . '/.thumbnails/' . $meta->{id_name} . '.png')
-        {
-            $meta->{thumbnail} = $rel_parent . '/.thumbnails/' . $meta->{id_name} . '.png'
-        }
-        elsif ($meta->{ext} =~ /jpg|png|gif/)
-        {
-            $meta->{thumbnail} = $meta->{relpath};
+            # IF we have a relpath, check if a thumbnail exists
+            # It could be a jpg or a png
+            # Note that if the file itself is a jpg or png, we can use it as the thumbnail
+            if ($rel_parent and
+                -r $fp->parent . '/.thumbnails/' . $meta->{id_name} . '.jpg')
+            {
+                $meta->{thumbnail} = $rel_parent . '/.thumbnails/' . $meta->{id_name} . '.jpg'
+            }
+            elsif ($rel_parent
+                    and -r $fp->parent . '/.thumbnails/' . $meta->{id_name} . '.png')
+            {
+                $meta->{thumbnail} = $rel_parent . '/.thumbnails/' . $meta->{id_name} . '.png'
+            }
+            elsif ($meta->{ext} =~ /jpg|png|gif/)
+            {
+                $meta->{thumbnail} = $meta->{relpath};
+            }
         }
 
         # Make this grouping stuff simple:
@@ -118,15 +156,18 @@ sub derive {
         # this is because that's how it is *grouped* together with other files, yes?
         # But use the directory relative to the "top" directory, the first two or three parts of it.
 
-        my @bits = split(/\//, $rel_parent);
-        splice(@bits,3);
-        $meta->{grouping} = join(' ', @bits);
-
-        # also make "section" fields, which are each separate bit of the "grouping"
-        for (my $i=0; $i < @bits; $i++)
+        if ($rel_parent)
         {
-            my $id = $i + 1;
-            $meta->{"section${id}"} = $bits[$i];
+            my @bits = split(/\//, $rel_parent);
+            splice(@bits,3);
+            $meta->{grouping} = join(' ', @bits);
+
+            # also make "section" fields, which are each separate bit of the "grouping"
+            for (my $i=0; $i < @bits; $i++)
+            {
+                my $id = $i + 1;
+                $meta->{"section${id}"} = $bits[$i];
+            }
         }
     }
     if (-r $filename)

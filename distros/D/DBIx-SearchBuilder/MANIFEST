@@ -44,6 +44,7 @@ t/01nocap_api.t
 t/01records.t
 t/01searches.t
 t/02distinct_values.t
+t/02lazy_load.t
 t/02null_order.t
 t/02order.t
 t/02records_cachable.t

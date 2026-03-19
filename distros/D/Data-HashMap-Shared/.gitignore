@@ -1,0 +1,15 @@
+/Makefile
+/Makefile.old
+/MYMETA.*
+/META.*
+/blib/
+/pm_to_blib
+/Shared.c
+/Shared.o
+/Shared.bs
+/*.so
+/ppport.h
+*.swp
+*.bak
+*.tar.gz
+*~

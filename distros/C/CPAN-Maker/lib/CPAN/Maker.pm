@@ -3,7 +3,7 @@ package CPAN::Maker;
 use strict;
 use warnings;
 
-our $VERSION = '1.6.2';
+our $VERSION = '1.7.1';
 
 1;
 
@@ -121,7 +121,7 @@ problems that might arise if you "go off script"
 
 =head1 VERSION
 
-This documentation refers to version 1.6.2
+This documentation refers to version 1.7.1
 
 =head1 USING THE BASH SCRIPT
 
@@ -318,7 +318,7 @@ main module being packaged.
 
 Example:
 
-  version: 1.6.2
+  version: 1.7.1
   project:
     git: https://github.com/rlauer6/perl-Amazon-Credentials
     description: "AWS credentials discoverer"
@@ -458,6 +458,20 @@ bit superior to F<scandeps.pl>.>
 
 =over 15
 
+=item recommends
+
+Fully qualified path to a file listing optional recommended
+dependencies. Modules listed here will appear under
+C<prereqs.runtime.recommends> in the generated META files, and can be
+installed with C<cpanm --with-recommends>.
+
+Example F<recommends> file:
+
+  Apache::ConfigParser 0
+  Apache2::Request 0
+  Apache2::Upload 0
+  mod_perl2 0
+
 =item requires
 
 Fully qualified path to a dependency list for module.
@@ -545,6 +559,17 @@ Examples:
 By default the package will specify the primary module to be packaged
 and any additional modules that were found if the C<recurse> option
 was set to 'yes'.
+
+=item --recommends
+
+Name of a file containing optional recommended dependencies. These are
+modules that enhance functionality but are not required for basic
+operation. When installed with C<cpanm --with-recommends>, these will
+be installed alongside the required dependencies. If not specified,
+defaults to a file named F<recommends> if present.
+
+Example use case: optional Apache/mod_perl dependencies that are only
+needed in a specific deployment environment.
 
 =item resources (optional)
 

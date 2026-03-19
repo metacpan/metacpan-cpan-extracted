@@ -431,18 +431,18 @@ SKIP: {
     skip 'RSS reclamation test requires /proc (Linux)', 8
         unless -r "/proc/$$/status";
 
-    my sub get_rss {
+    my $get_rss = sub {
         open my $fh, '<', "/proc/$$/status" or return 0;
         while (<$fh>) {
             return $1 if /^VmRSS:\s+(\d+)\s+kB/;
         }
         return 0;
-    }
+    };
 
     # Run a single RSS test in an isolated child process.
     # $fill_code populates a map stored in $_[0] (an outer ref slot).
     # Returns ($baseline, $peak, $after) in kB, or () on fork failure.
-    my sub rss_test {
+    my $rss_test = sub {
         my ($fill_code) = @_;
         pipe(my $rd, my $wr) or die "pipe: $!";
         my $pid = fork();
@@ -450,11 +450,11 @@ SKIP: {
         if ($pid == 0) {
             close $rd;
             my $map;
-            my $baseline = get_rss();
+            my $baseline = $get_rss->();
             $fill_code->(\$map);
-            my $peak = get_rss();
+            my $peak = $get_rss->();
             undef $map;  # trigger DESTROY — free all C memory
-            my $after = get_rss();
+            my $after = $get_rss->();
             print $wr "$baseline|$peak|$after\n";
             close $wr;
             POSIX::_exit(0);
@@ -466,7 +466,7 @@ SKIP: {
         return () if $? >> 8;
         chomp $line;
         return split /\|/, $line;
-    }
+    };
 
     # Integer-only variants: the node array is one large calloc (above
     # glibc's mmap threshold), so free() returns it to the OS immediately.
@@ -486,7 +486,7 @@ SKIP: {
 
     for my $t (@tests) {
         my ($variant, $code) = @$t;
-        my ($baseline, $peak, $after) = rss_test($code);
+        my ($baseline, $peak, $after) = $rss_test->($code);
         unless (defined $baseline) {
             fail("$variant RSS: child fork/exec failed");
             fail("$variant RSS: (skipped)");
@@ -495,12 +495,17 @@ SKIP: {
         my $grew = $peak - $baseline;
         my $reclaimed = $peak - $after;
 
+        if ($grew <= 0) {
+            skip("$variant RSS: could not measure RSS growth on this platform", 2);
+            next;
+        }
+
         cmp_ok($grew, '>', 5_000,
             "$variant RSS: map allocation visible (grew ${grew} kB)");
 
         # Node array is a single large allocation — glibc uses mmap for
         # allocations above MMAP_THRESHOLD (~128 KB), returned on free.
-        my $pct = $grew > 0 ? int(100 * $reclaimed / $grew) : 0;
+        my $pct = int(100 * $reclaimed / $grew);
         cmp_ok($pct, '>=', 75,
             "$variant RSS: reclaimed ${pct}% after destroy (${reclaimed}/${grew} kB)");
     }
@@ -510,7 +515,7 @@ SKIP: {
     # Instead, we verify no unbounded growth: run N fill/destroy cycles
     # and assert RSS after cycle N is not significantly larger than after
     # cycle 1 (freed memory is reused by the allocator on subsequent fills).
-    my sub rss_cycle_test {
+    my $rss_cycle_test = sub {
         my ($fill_code, $cycles) = @_;
         $cycles //= 5;
         pipe(my $rd, my $wr) or die "pipe: $!";
@@ -522,7 +527,7 @@ SKIP: {
             my @rss;
             for my $i (1..$cycles) {
                 $fill_code->(\$map);
-                push @rss, get_rss();
+                push @rss, $get_rss->();
                 undef $map;
             }
             print $wr join("|", @rss), "\n";
@@ -536,42 +541,39 @@ SKIP: {
         return () if $? >> 8;
         chomp $line;
         return split /\|/, $line;
-    }
+    };
 
     # SS: 5 cycles of 100K entries with 200-byte values
     {
-        my @rss = rss_cycle_test(sub {
+        my @rss = $rss_cycle_test->(sub {
             my $ref = $_[0];
             $$ref = Data::HashMap::SS->new();
             hm_ss_put $$ref, "key$_", "x" x 200 for 1..100_000;
         }, 5);
-        if (@rss >= 2) {
+        if (@rss >= 2 && $rss[0] > 0) {
             cmp_ok($rss[0], '>', 0, 'SS RSS cycle: first fill uses memory');
-            # If we were leaking, RSS at cycle 5 would be ~5x cycle 1.
-            # With proper free, allocator reuses freed regions and RSS stays flat.
-            # Allow 25% growth for allocator fragmentation.
             my $growth_pct = int(100 * ($rss[-1] - $rss[0]) / $rss[0]);
             cmp_ok($growth_pct, '<', 25,
                 "SS RSS cycle: ${growth_pct}% growth over 5 cycles (expect <25%)");
         } else {
-            fail("SS RSS cycle: fork failed"); fail("SS RSS cycle: (skipped)");
+            skip("SS RSS cycle: could not measure RSS on this platform", 2);
         }
     }
 
     # IA: 5 cycles of 200K SV* entries
     {
-        my @rss = rss_cycle_test(sub {
+        my @rss = $rss_cycle_test->(sub {
             my $ref = $_[0];
             $$ref = Data::HashMap::IA->new();
             hm_ia_put $$ref, $_, [$_, $_ + 1] for 1..200_000;
         }, 5);
-        if (@rss >= 2) {
+        if (@rss >= 2 && $rss[0] > 0) {
             cmp_ok($rss[0], '>', 0, 'IA RSS cycle: first fill uses memory');
             my $growth_pct = int(100 * ($rss[-1] - $rss[0]) / $rss[0]);
             cmp_ok($growth_pct, '<', 25,
                 "IA RSS cycle: ${growth_pct}% growth over 5 cycles (expect <25%)");
         } else {
-            fail("IA RSS cycle: fork failed"); fail("IA RSS cycle: (skipped)");
+            skip("IA RSS cycle: could not measure RSS on this platform", 2);
         }
     }
 }

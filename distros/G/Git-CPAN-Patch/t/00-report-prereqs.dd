@@ -9,6 +9,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Software::Security::Policy::Individual' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Vars' => '0'
                                     }
@@ -33,7 +34,7 @@ do { my $x = {
                                       'File::chmod' => '0',
                                       'Git::Repository' => '0',
                                       'Git::Repository::Plugin::AUTOLOAD' => '0',
-                                      'LWP::Simple' => '0',
+                                      'HTTP::Tiny' => '0',
                                       'LWP::UserAgent' => '0',
                                       'List::Pairwise' => '0',
                                       'MetaCPAN::API' => '0',
@@ -66,6 +67,7 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Test2::V1' => '0',
                                    'Test::MockObject' => '0',
                                    'Test::More' => '0'
                                  }

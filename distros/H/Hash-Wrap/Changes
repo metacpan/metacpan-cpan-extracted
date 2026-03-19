@@ -1,5 +1,22 @@
 Revision history for Hash-Wrap
 
+1.09      2026-03-18 15:56:10 EDT
+
+  [DOCUMENTATION]
+
+    * actually document new flag -lexical
+
+  [MISC]
+
+    * fiducial public repository is now on codeberg.org
+
+1.08      2026-03-18 13:05:08 EDT
+
+  [ENHANCEMENT]
+
+    * new flag -lexical: on Perl >= v5.38, creates lexical subs in
+      importing package
+
 1.07      2025-10-24 10:58:22-04:00 America/New_York
 
   [BUILD]

@@ -1,0 +1,966 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+SQL::Wizard - Composable SQL query builder with expression trees
+
+=head1 SYNOPSIS
+
+    use SQL::Wizard;
+
+    my $q = SQL::Wizard->new;
+
+    # SELECT with WHERE, JOIN, ORDER BY, LIMIT
+    my ($sql, @bind) = $q->select(
+        -columns  => ['u.id', 'u.name', $q->func(COUNT => 'o.id')->as('orders')],
+        -from     => ['users|u', $q->left_join('orders|o', 'u.id = o.user_id')],
+        -where    => { 'u.status' => 'active', 'u.age' => { '>' => 18 } },
+        -group_by => 'u.id',
+        -order_by => [{ -desc => 'orders' }],
+        -limit    => 20,
+    )->to_sql;
+
+    # INSERT
+    my ($sql, @bind) = $q->insert(
+        -into   => 'users',
+        -values => { name => 'Alice', email => 'alice@example.com' },
+    )->to_sql;
+
+    # UPDATE
+    my ($sql, @bind) = $q->update(
+        -table => 'users',
+        -set   => { status => 'inactive' },
+        -where => { last_login => { '<' => '2023-01-01' } },
+    )->to_sql;
+
+    # DELETE
+    my ($sql, @bind) = $q->delete(
+        -from  => 'users',
+        -where => { status => 'deleted' },
+    )->to_sql;
+
+=head1 DESCRIPTION
+
+SQL::Wizard builds SQL queries as composable expression trees. Every API call
+constructs a node in the tree. Nothing is rendered to SQL until C<< ->to_sql >>
+is called, which returns C<($sql, @bind)> — a SQL string with C<?> placeholders
+and a flat list of bind values in the correct order.
+
+Key properties:
+
+=over 4
+
+=item * B<Everything is an expression.> A SELECT is an expression. A CASE is an
+expression. A function call is an expression. Anything can nest inside anything
+else — subqueries in columns, in FROM, in WHERE; arithmetic in SET clauses;
+CASE in ORDER BY.
+
+=item * B<Immutable queries.> Modifier methods (C<add_where>, C<order_by>,
+C<limit>, etc.) return new objects and never modify the original. Build a base
+query once and derive many variants from it.
+
+=item * B<Bind parameters by default.> Plain Perl values always produce C<?>
+placeholders. Only C<< $q->raw() >> injects literal SQL.
+
+=item * B<SQL::Abstract-compatible WHERE syntax.> Hashref and arrayref
+conditions work exactly as Perl developers already expect.
+
+=item * B<Zero non-core dependencies.> No SQL::Abstract, no Moose, nothing
+outside the Perl core (plus Test::More for tests).
+
+=back
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $q = SQL::Wizard->new;
+    my $q = SQL::Wizard->new(dialect => 'mysql');
+
+Creates a new SQL::Wizard instance. The optional C<dialect> parameter is
+reserved for future dialect-specific rendering (quoting styles, LIMIT syntax,
+etc.). Currently all output is standard ANSI SQL.
+
+=head1 EXPRESSION PRIMITIVES
+
+These methods construct leaf nodes in the expression tree. They are the
+building blocks for everything else.
+
+=head2 col
+
+    $q->col('u.name')
+    $q->col('price')
+
+Returns a column reference expression. Use this whenever you need to refer to
+a column unambiguously — particularly in WHERE values, SET clauses, and JOIN
+conditions where a bare string might otherwise be treated as a literal.
+
+    # Explicit column reference in WHERE
+    -where => { user_id => $q->col('u.id') }   # user_id = u.id (no bind)
+
+    # vs plain string value (produces bind param)
+    -where => { user_id => 'u.id' }             # user_id = ?  (binds 'u.id')
+
+=head2 val
+
+    $q->val(42)
+    $q->val('some string')
+    $q->val(undef)
+
+Returns a bound value expression. Always produces a C<?> placeholder. Use this
+when you need to force a value to be treated as a bind parameter in a position
+where it might otherwise be interpreted differently (e.g. in C<-columns>).
+
+    $q->func(COALESCE => 'nickname', $q->val('Anonymous'))
+    # => COALESCE(nickname, ?)  bind: ['Anonymous']
+
+=head2 raw
+
+    $q->raw('NOW()')
+    $q->raw('? + INTERVAL ? DAY', $start, $days)
+
+Injects literal SQL. Use sparingly — only for database-specific constructs that
+the API does not support natively. Any bind values are passed as additional
+arguments after the SQL string.
+
+    -set => { updated_at => $q->raw('NOW()') }
+    -where => { created_at => { '>' => $q->raw("NOW() - INTERVAL '30 days'") } }
+
+=head2 func
+
+    $q->func('COUNT', '*')
+    $q->func('COALESCE', 'nickname', $q->val('Anonymous'))
+    $q->func('ROW_NUMBER')
+    $q->func('DATE_TRUNC', $q->val('month'), 'created_at')
+
+Returns a SQL function call expression: C<NAME(arg1, arg2, ...)>. The function
+name is used as-is (not upcased). Arguments may be column name strings, other
+expressions, or C<val()> nodes. Plain strings in argument position are treated
+as column references.
+
+    $q->func('COUNT', '*')->as('total')        # COUNT(*) AS total
+    $q->func('SUM', 'amount')                  # SUM(amount)
+    $q->func('NOW')                            # NOW()
+
+=head2 coalesce
+
+    $q->coalesce('nickname', $q->val('Anonymous'))
+    # COALESCE(nickname, ?)
+
+Shorthand for C<< $q->func('COALESCE', ...) >>.
+
+=head2 greatest
+
+    $q->greatest('a', 'b', 'c')
+    # GREATEST(a, b, c)
+
+Shorthand for C<< $q->func('GREATEST', ...) >>.
+
+=head2 least
+
+    $q->least('a', 'b')
+    # LEAST(a, b)
+
+Shorthand for C<< $q->func('LEAST', ...) >>.
+
+=head2 cast
+
+    $q->cast('price', 'INTEGER')
+    $q->cast($q->col('amount'), 'DECIMAL(10,2)')
+    # CAST(price AS INTEGER)
+
+Returns a CAST expression. The first argument may be a column name string or
+any expression object.
+
+=head2 exists
+
+    $q->exists($subquery)
+    # EXISTS(SELECT ...)
+
+Returns an EXISTS expression wrapping a subquery. Typically used inside a WHERE
+clause array:
+
+    -where => [$q->exists(
+        $q->select(-columns => [1], -from => 'vip', -where => { user_id => $q->col('u.id') })
+    )]
+
+=head2 not_exists
+
+    $q->not_exists($subquery)
+    # NOT EXISTS(SELECT ...)
+
+Like C<exists> but negated.
+
+=head2 between
+
+    $q->between('age', 18, 65)
+    $q->between($q->col('price'), $q->val(10), $q->val(100))
+    # age BETWEEN ? AND ?
+
+Returns a BETWEEN expression. The column argument may be a string (treated as
+a column reference) or an expression. The low and high bounds may be plain
+values or expression objects.
+
+=head2 not_between
+
+    $q->not_between('age', 0, 17)
+    # age NOT BETWEEN ? AND ?
+
+Like C<between> but negated.
+
+=head2 and
+
+    $q->and(\%cond1, \%cond2, ...)
+    # (cond1 AND cond2)
+
+Combines multiple WHERE conditions with AND. Returns an expression that can be
+used anywhere a condition is accepted.
+
+=head2 or
+
+    $q->or(\%cond1, \%cond2, ...)
+    # (cond1 OR cond2)
+
+Combines multiple WHERE conditions with OR.
+
+=head2 not
+
+    $q->not(\%cond)
+    # NOT (cond)
+
+Negates a condition.
+
+=head1 EXPRESSION METHODS
+
+All expression objects (returned by C<col>, C<val>, C<func>, C<select>, etc.)
+support these methods.
+
+=head2 as
+
+    $expr->as('alias')
+    # expr AS alias
+
+Returns an aliased expression. Works on any expression type.
+
+    $q->func('COUNT', '*')->as('total')        # COUNT(*) AS total
+    $q->col('u.name')->as('user_name')         # u.name AS user_name
+    $q->select(...)->as('subq')                # (SELECT ...) AS subq
+
+=head2 asc
+
+    $expr->asc
+    # expr ASC
+
+Returns an ORDER BY expression with ASC direction.
+
+=head2 desc
+
+    $expr->desc
+    # expr DESC
+
+Returns an ORDER BY expression with DESC direction.
+
+=head2 asc_nulls_first
+
+    $expr->asc_nulls_first
+    # expr ASC NULLS FIRST
+
+=head2 desc_nulls_last
+
+    $expr->desc_nulls_last
+    # expr DESC NULLS LAST
+
+=head2 over
+
+    $func->over('window_name')
+    $func->over(-partition_by => 'dept', -order_by => 'salary')
+
+Converts a function call into a window function expression. See
+L</WINDOW FUNCTIONS> for full documentation.
+
+=head2 to_sql
+
+    my ($sql, @bind) = $expr->to_sql;
+
+Renders the expression (or full query) to a SQL string and a flat list of bind
+values. This is the only method that produces output — all other methods build
+the tree.
+
+The returned C<$sql> contains C<?> placeholders. Pass C<@bind> directly to
+DBI's execute:
+
+    my ($sql, @bind) = $q->select(...)->to_sql;
+    $dbh->prepare($sql)->execute(@bind);
+
+=head1 ARITHMETIC OPERATORS
+
+Expression objects support Perl arithmetic operators via overloading:
+
+    $q->col('price') + $q->col('tax')          # price + tax
+    $q->col('price') * $q->val(0.9)            # price * ?  (bind: 0.9)
+    $q->col('score') - 10                      # score - ?  (bind: 10)
+    $q->col('total') / $q->col('count')        # total / count
+    $q->col('id') % 2                          # id % ?     (bind: 2)
+
+Plain Perl numbers are automatically coerced to bound value nodes. Operators
+can be chained:
+
+    my $subtotal = $q->col('price') * $q->col('qty');
+    my $tax      = $subtotal * $q->val(0.2);
+    my $total    = $subtotal + $tax;
+
+    $q->select(
+        -columns => [
+            $subtotal->as('subtotal'),
+            $tax->as('tax'),
+            $total->as('total'),
+        ],
+        -from => 'line_items',
+    );
+
+B<Note:> Do not try to stringify an expression with C<"$expr"> — it will die.
+Always use C<< ->to_sql >>.
+
+=head1 SELECT
+
+    my ($sql, @bind) = $q->select(
+        -columns  => \@exprs,
+        -from     => $table_or_arrayref,
+        -where    => $condition,
+        -group_by => $col_or_arrayref,
+        -having   => $condition,
+        -order_by => $col_or_arrayref,
+        -window   => \%window_definitions,
+        -limit    => $n,
+        -offset   => $n,
+    )->to_sql;
+
+All keys are optional. Omitting C<-columns> defaults to C<SELECT *>.
+
+=head2 -columns
+
+An arrayref of column expressions. Each element may be:
+
+=over 4
+
+=item * A plain string — used as-is (e.g. C<'u.name'>, C<'*'>)
+
+=item * An expression object — rendered via its renderer
+
+=item * An aliased expression — C<< $expr->as('label') >>
+
+=back
+
+    -columns => [
+        'u.id',
+        'u.name',
+        $q->func('COUNT', 'o.id')->as('order_count'),
+        ($q->col('price') * $q->col('qty'))->as('subtotal'),
+        $q->case(...)->as('status_label'),
+    ]
+
+=head2 -from
+
+A table name string, a C<table|alias> shorthand, an expression, or an arrayref
+mixing tables and join expressions.
+
+The C<table|alias> shorthand expands to C<table alias> in SQL:
+
+    -from => 'users|u'                   # FROM users u
+    -from => ['users|u', $q->join(...)]  # FROM users u JOIN ...
+
+Subqueries in FROM must be aliased with C<< ->as() >>:
+
+    -from => [$q->select(...)->as('sub')]
+
+=head2 -where
+
+See L</WHERE CLAUSE SYNTAX>.
+
+=head2 -group_by
+
+A column name string or arrayref of column names/expressions:
+
+    -group_by => 'department'
+    -group_by => ['department', 'year']
+    -group_by => [$q->func('DATE_TRUNC', $q->val('month'), 'created_at')]
+
+=head2 -having
+
+Same syntax as C<-where>. Applied after grouping.
+
+    -having => { $q->raw('COUNT(*)') => { '>' => 5 } }
+    -having => $q->raw('COUNT(*) > ?', 5)
+
+B<Note:> Because Perl hash keys are always stringified, you cannot use an Expr
+object as a hash key in C<-having>. Use C<$q->raw()> for function-based HAVING
+conditions, or use the arrayref condition syntax.
+
+=head2 -order_by
+
+A single column name, an expression, or an arrayref of either. To specify
+direction, use a hashref with C<-asc> or C<-desc>, or use C<< ->asc >> /
+C<< ->desc >> on an expression:
+
+    -order_by => 'name'
+    -order_by => [$q->col('name')->asc, $q->col('id')->desc]
+    -order_by => [{ -desc => 'created_at' }, 'name']
+
+=head2 -window
+
+A hashref mapping window names to window specifications, for use with named
+windows. See L</WINDOW FUNCTIONS>.
+
+=head2 -limit and -offset
+
+    -limit  => 20
+    -offset => 40
+
+Appended as C<LIMIT 20 OFFSET 40>.
+
+=head1 WHERE CLAUSE SYNTAX
+
+The WHERE clause accepts several forms that can be freely mixed and nested.
+
+=head2 Hashref conditions
+
+    { column => $value }          # column = ?
+    { column => undef }           # column IS NULL
+    { column => \@list }          # column IN (?, ?, ?)
+    { column => $expr }           # column = expr  (no bind if Expr object)
+    { column => { op => $val } }  # column op ?
+
+Supported operators: C<< > >>, C<< >= >>, C<< < >>, C<< <= >>, C<< != >>,
+C<< = >>, C<LIKE>, C<-in>, C<-not_in>, and any other SQL operator string.
+
+Multiple keys in a hashref are combined with AND:
+
+    { status => 'active', age => { '>' => 18 } }
+    # status = ? AND age > ?
+
+=head2 -in and -not_in
+
+    { id => { -in     => [1, 2, 3] } }           # id IN (?, ?, ?)
+    { id => { -not_in => [1, 2, 3] } }           # id NOT IN (?, ?, ?)
+    { id => { -in     => $subquery  } }           # id IN (SELECT ...)
+    { id => { -not_in => $subquery  } }           # id NOT IN (SELECT ...)
+
+=head2 Arrayref with -and / -or
+
+    [-and => [ \%cond1, \%cond2 ]]        # cond1 AND cond2
+    [-or  => [ \%cond1, \%cond2 ]]        # cond1 OR cond2
+
+Nesting:
+
+    [-and => [
+        { status => 'active' },
+        [-or => [
+            { role => 'admin' },
+            { role => 'editor' },
+        ]],
+    ]]
+    # (status = ? AND (role = ? OR role = ?))
+
+=head2 Expression objects in WHERE
+
+Any expression object can appear in a WHERE array:
+
+    -where => [
+        $q->exists($subquery),
+        $q->between('age', 18, 65),
+        $q->raw('ST_DWithin(location, ?, ?)', $point, $radius),
+    ]
+
+=head2 Plain string
+
+    -where => '1 = 1'
+
+Used as a literal SQL fragment. No bind parameters.
+
+=head1 JOINS
+
+    $q->join($table, $on)
+    $q->left_join($table, $on)
+    $q->right_join($table, $on)
+    $q->full_join($table, $on)
+    $q->cross_join($table)
+
+All join methods return a join expression for use in a C<-from> arrayref. The
+C<$table> argument accepts the same forms as C<-from>: a string, a
+C<table|alias> shorthand, or an aliased subquery. The C<$on> argument accepts
+a plain SQL string or a hashref condition.
+
+    # String ON
+    $q->join('orders|o', 'u.id = o.user_id')
+    # => JOIN orders o ON u.id = o.user_id
+
+    # Hashref ON (same syntax as WHERE)
+    $q->left_join('orders|o', {
+        'u.id'     => $q->col('o.user_id'),
+        'o.status' => 'completed',
+    })
+    # => LEFT JOIN orders o ON o.status = ? AND u.id = o.user_id
+
+    # Join on subquery
+    $q->join(
+        $q->select(
+            -columns  => ['user_id', $q->func('MAX', 'login_date')->as('last_login')],
+            -from     => 'logins',
+            -group_by => 'user_id',
+        )->as('ll'),
+        'u.id = ll.user_id',
+    )
+    # => JOIN (SELECT user_id, MAX(login_date) AS last_login FROM logins GROUP BY user_id) AS ll
+    #    ON u.id = ll.user_id
+
+C<full_join> renders as C<FULL OUTER JOIN>. C<cross_join> takes no ON clause.
+
+=head1 CASE EXPRESSIONS
+
+=head2 Searched CASE
+
+    $q->case(
+        [$q->when(\%condition, $then), ...],
+        $q->else($default),      # optional
+    )
+
+Each C<when> takes a WHERE-syntax condition and a result value. The result
+value may be a plain scalar (auto-wrapped as a bind parameter) or any
+expression object.
+
+    $q->case(
+        [$q->when({ total => { '>'  => 10000 } }, 'Platinum')],
+        [$q->when({ total => { '>'  => 5000  } }, 'Gold')],
+        [$q->when({ total => { '>'  => 1000  } }, 'Silver')],
+        $q->else('Bronze'),
+    )->as('tier')
+    # CASE WHEN total > ? THEN ? WHEN total > ? THEN ? WHEN total > ? THEN ? ELSE ? END AS tier
+
+=head2 Simple CASE (CASE ON)
+
+    $q->case_on(
+        $q->col('u.role'),
+        [$q->when($q->val('admin'),  'Full Access')],
+        [$q->when($q->val('editor'), 'Edit Access')],
+        $q->else('Read Only'),
+    )->as('access_level')
+    # CASE u.role WHEN ? THEN ? WHEN ? THEN ? ELSE ? END AS access_level
+
+=head2 when and else
+
+C<when($condition, $then)> and C<else($value)> are helper constructors used
+only inside C<case()> and C<case_on()>. They are not standalone expressions.
+
+=head1 WINDOW FUNCTIONS
+
+Window functions are created by calling C<< ->over(...) >> on a C<func()>
+expression.
+
+=head2 Inline window specification
+
+    $q->func('ROW_NUMBER')->over(
+        -partition_by => 'department',
+        -order_by     => [{ -desc => 'salary' }],
+    )->as('rank')
+    # ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) AS rank
+
+    $q->func('SUM', 'amount')->over(
+        -partition_by => 'account_id',
+        -order_by     => 'transaction_date',
+        -frame        => 'ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW',
+    )->as('running_total')
+
+Options for the inline spec:
+
+=over 4
+
+=item C<-partition_by> — a column name or arrayref of column names
+
+=item C<-order_by> — same syntax as SELECT C<-order_by>
+
+=item C<-frame> — a raw SQL frame clause string
+
+=back
+
+=head2 Named windows
+
+Reference a named window (defined in C<-window>) by passing its name as a
+string to C<over>:
+
+    $q->func('RANK')->over('dept_window')->as('dept_rank')
+
+    $q->select(
+        -columns => [
+            $q->func('RANK')->over('w')->as('r1'),
+            $q->func('DENSE_RANK')->over('w')->as('r2'),
+        ],
+        -from    => 'employees',
+        -window  => {
+            w => {
+                '-partition_by' => 'department',
+                '-order_by'     => [{ -desc => 'salary' }],
+            },
+        },
+    )
+    # ... WINDOW w AS (PARTITION BY department ORDER BY salary DESC)
+
+=head1 UNION / INTERSECT / EXCEPT
+
+Compound queries are built by chaining methods on a SELECT expression:
+
+    my $a = $q->select(-columns => [qw/id name/], -from => 'active_users');
+    my $b = $q->select(-columns => [qw/id name/], -from => 'legacy_users');
+    my $c = $q->select(-columns => [qw/id name/], -from => 'pending_users');
+
+    my ($sql, @bind) = $a->union($b)->union_all($c)->order_by('name')->limit(100)->to_sql;
+    # (SELECT id, name FROM active_users)
+    # UNION
+    # (SELECT id, name FROM legacy_users)
+    # UNION ALL
+    # (SELECT id, name FROM pending_users)
+    # ORDER BY name LIMIT 100
+
+Available methods: C<union>, C<union_all>, C<intersect>, C<except>. All take
+another SELECT (or compound) expression as their argument.
+
+C<order_by>, C<limit>, and C<offset> on a compound apply to the entire result
+set, not to any individual query.
+
+Compound expressions are immutable — each chained call returns a new object.
+
+=head1 CTEs (WITH CLAUSES)
+
+=head2 with
+
+    $q->with(
+        cte_name => $select_expr,
+        ...
+    )->select(-from => 'cte_name', ...)
+
+    my ($sql, @bind) = $q->with(
+        recent_orders => $q->select(
+            -columns => ['*'],
+            -from    => 'orders',
+            -where   => { created_at => { '>' => $q->raw("NOW() - INTERVAL '30 days'") } },
+        ),
+        big_spenders => $q->select(
+            -columns  => ['user_id', $q->func(SUM => 'total')->as('spent')],
+            -from     => 'recent_orders',
+            -group_by => 'user_id',
+            -having   => $q->raw('SUM(total) > ?', 1000),
+        ),
+    )->select(
+        -columns  => ['u.name', 'bs.spent'],
+        -from     => ['users|u', $q->join('big_spenders|bs', 'u.id = bs.user_id')],
+        -order_by => [{ -desc => 'bs.spent' }],
+    )->to_sql;
+    # WITH recent_orders AS (...), big_spenders AS (...)
+    # SELECT u.name, bs.spent FROM users u JOIN big_spenders bs ON u.id = bs.user_id
+    # ORDER BY bs.spent DESC
+
+CTEs are named pairwise: C<(name1 => $query1, name2 => $query2, ...)>.
+
+=head2 with_recursive
+
+    $q->with_recursive(
+        cte_name => {
+            -initial => $base_case_select,
+            -recurse => $recursive_select,
+        },
+    )->select(...)
+
+The hash value for a recursive CTE must have C<-initial> and C<-recurse> keys.
+They are joined with C<UNION ALL>:
+
+    my ($sql, @bind) = $q->with_recursive(
+        org_tree => {
+            -initial => $q->select(
+                -columns => [qw/id name parent_id/],
+                -from    => 'employees',
+                -where   => { parent_id => undef },
+            ),
+            -recurse => $q->select(
+                -columns => ['e.id', 'e.name', 'e.parent_id'],
+                -from    => ['employees|e', $q->join('org_tree|t', 'e.parent_id = t.id')],
+            ),
+        },
+    )->select(
+        -columns  => ['*'],
+        -from     => 'org_tree',
+        -order_by => 'name',
+    )->to_sql;
+    # WITH RECURSIVE org_tree AS (
+    #   SELECT id, name, parent_id FROM employees WHERE parent_id IS NULL
+    #   UNION ALL
+    #   SELECT e.id, e.name, e.parent_id FROM employees e JOIN org_tree t ON e.parent_id = t.id
+    # )
+    # SELECT * FROM org_tree ORDER BY name
+
+=head1 INSERT
+
+    $q->insert(
+        -into         => $table,
+        -values       => \%row_or_arrayref,
+        -columns      => \@col_names,      # for multi-row insert
+        -select       => $select_expr,     # INSERT ... SELECT
+        -on_conflict  => \%spec,           # PostgreSQL ON CONFLICT
+        -on_duplicate => \%set,            # MySQL ON DUPLICATE KEY UPDATE
+        -returning    => \@cols,           # PostgreSQL RETURNING
+    )->to_sql
+
+=head2 Single row
+
+    $q->insert(
+        -into   => 'users',
+        -values => { name => 'Alice', email => 'alice@example.com', status => 'active' },
+    )->to_sql
+    # INSERT INTO users (email, name, status) VALUES (?, ?, ?)
+
+Columns are sorted alphabetically. Values are auto-wrapped as bind parameters.
+Use C<$q->raw()> to inject a literal:
+
+    -values => { name => 'Alice', created_at => $q->raw('NOW()') }
+
+=head2 Multi-row
+
+    $q->insert(
+        -into    => 'users',
+        -columns => [qw/name email/],
+        -values  => [
+            ['Alice', 'alice@example.com'],
+            ['Bob',   'bob@example.com'],
+        ],
+    )->to_sql
+    # INSERT INTO users (name, email) VALUES (?, ?), (?, ?)
+
+=head2 INSERT ... SELECT
+
+    $q->insert(
+        -into    => 'archive_users',
+        -columns => [qw/id name email/],
+        -select  => $q->select(
+            -columns => [qw/id name email/],
+            -from    => 'users',
+            -where   => { status => 'deleted' },
+        ),
+    )->to_sql
+    # INSERT INTO archive_users (id, name, email) SELECT id, name, email FROM users WHERE status = ?
+
+=head2 Upsert — PostgreSQL ON CONFLICT
+
+    $q->insert(
+        -into    => 'counters',
+        -values  => { key => 'hits', value => 1 },
+        -on_conflict => {
+            -target => 'key',
+            -update => { value => $q->raw('counters.value + EXCLUDED.value') },
+        },
+    )->to_sql
+    # INSERT INTO counters (key, value) VALUES (?, ?)
+    # ON CONFLICT (key) DO UPDATE SET value = counters.value + EXCLUDED.value
+
+=head2 Upsert — MySQL ON DUPLICATE KEY
+
+    $q->insert(
+        -into    => 'counters',
+        -values  => { key => 'hits', value => 1 },
+        -on_duplicate => {
+            value => $q->raw('value + VALUES(value)'),
+        },
+    )->to_sql
+    # INSERT INTO counters (key, value) VALUES (?, ?)
+    # ON DUPLICATE KEY UPDATE value = value + VALUES(value)
+
+=head2 RETURNING
+
+    $q->insert(
+        -into      => 'users',
+        -values    => { name => 'Alice' },
+        -returning => ['id', 'created_at'],
+    )->to_sql
+    # INSERT INTO users (name) VALUES (?) RETURNING id, created_at
+
+=head1 UPDATE
+
+    $q->update(
+        -table     => $table,
+        -set       => \%assignments,
+        -where     => $condition,
+        -from      => $table_or_arrayref,  # PostgreSQL FROM
+        -returning => \@cols,
+    )->to_sql
+
+=head2 Simple update
+
+    $q->update(
+        -table => 'users',
+        -set   => { status => 'inactive', updated_at => $q->raw('NOW()') },
+        -where => { last_login => { '<' => '2023-01-01' } },
+    )->to_sql
+    # UPDATE users SET status = ?, updated_at = NOW() WHERE last_login < ?
+
+=head2 Update with JOIN (MySQL style)
+
+    $q->update(
+        -table => ['users|u', $q->join('orders|o', 'u.id = o.user_id')],
+        -set   => { 'u.last_order' => $q->col('o.created_at') },
+        -where => { 'o.status' => 'completed' },
+    )->to_sql
+    # UPDATE users u JOIN orders o ON u.id = o.user_id
+    # SET u.last_order = o.created_at
+    # WHERE o.status = ?
+
+=head2 Update with FROM (PostgreSQL style)
+
+    $q->update(
+        -table => 'users',
+        -set   => { score => $q->col('s.new_score') },
+        -from  => [
+            $q->select(
+                -columns  => ['user_id', $q->func('AVG', 'points')->as('new_score')],
+                -from     => 'scores',
+                -group_by => 'user_id',
+            )->as('s'),
+        ],
+        -where => { 'users.id' => $q->col('s.user_id') },
+    )->to_sql
+
+=head1 DELETE
+
+    $q->delete(
+        -from      => $table,
+        -where     => $condition,
+        -using     => $table,       # PostgreSQL USING
+        -returning => \@cols,
+    )->to_sql
+
+=head2 Simple delete
+
+    $q->delete(
+        -from  => 'users',
+        -where => { status => 'deleted', last_login => { '<' => '2020-01-01' } },
+    )->to_sql
+    # DELETE FROM users WHERE last_login < ? AND status = ?
+
+=head2 Delete with subquery
+
+    $q->delete(
+        -from  => 'users',
+        -where => {
+            id => { -not_in => $q->select(-columns => ['user_id'], -from => 'active_sessions') },
+        },
+    )->to_sql
+    # DELETE FROM users WHERE id NOT IN (SELECT user_id FROM active_sessions)
+
+=head2 Delete with USING (PostgreSQL)
+
+    $q->delete(
+        -from  => 'orders',
+        -using => 'users',
+        -where => {
+            'orders.user_id' => $q->col('users.id'),
+            'users.status'   => 'banned',
+        },
+    )->to_sql
+    # DELETE FROM orders USING users WHERE orders.user_id = users.id AND users.status = ?
+
+=head1 QUERY MODIFICATION
+
+SELECT expressions are immutable. These methods return a modified copy without
+changing the original:
+
+    my $base    = $q->select(-from => 'users', -where => { status => 'active' });
+    my $admins  = $base->add_where({ role => 'admin' });
+    my $sorted  = $admins->order_by('name');
+    my $page2   = $sorted->limit(20)->offset(20);
+    my $counted = $base->columns([$q->func('COUNT', '*')->as('total')]);
+
+    $base->to_sql;     # SELECT * FROM users WHERE status = ?
+    $admins->to_sql;   # SELECT * FROM users WHERE status = ? AND role = ?
+    $page2->to_sql;    # ... ORDER BY name LIMIT 20 OFFSET 20
+    $counted->to_sql;  # SELECT COUNT(*) AS total FROM users WHERE status = ?
+
+=head2 add_where
+
+    $select->add_where(\%extra_condition)
+
+Returns a new SELECT with the extra condition ANDed onto the existing WHERE.
+
+=head2 columns
+
+    $select->columns(\@new_columns)
+
+Returns a new SELECT with a replaced column list.
+
+=head2 order_by
+
+    $select->order_by('name')
+    $select->order_by($q->col('name')->desc, 'id')
+
+Returns a new SELECT with the given ORDER BY clause (replaces any existing one).
+
+=head2 limit
+
+    $select->limit(20)
+
+Returns a new SELECT with the given LIMIT.
+
+=head2 offset
+
+    $select->offset(40)
+
+Returns a new SELECT with the given OFFSET.
+
+Compound queries (UNION etc.) also support C<order_by>, C<limit>, and C<offset>
+as modifiers that apply to the full compound result.
+
+=head1 USAGE WITH DBI
+
+    use DBI;
+    use SQL::Wizard;
+
+    my $dbh = DBI->connect('dbi:Pg:dbname=mydb', 'user', 'pass');
+    my $q   = SQL::Wizard->new;
+
+    my ($sql, @bind) = $q->select(
+        -columns => ['id', 'name', 'email'],
+        -from    => 'users',
+        -where   => { status => 'active' },
+        -limit   => 100,
+    )->to_sql;
+
+    my $sth = $dbh->prepare($sql);
+    $sth->execute(@bind);
+    my $rows = $sth->fetchall_arrayref({});
+
+=head1 AUTHOR
+
+Thomas Busch E<lt>tbusch@cpan.orgE<gt>
+
+=head1 LICENSE
+
+MIT License
+
+Copyright (c) 2026 Thomas Busch
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+=cut

@@ -5,10 +5,11 @@ use warnings
   FATAL    => qw( all ),
   NONFATAL => qw( deprecated exec internal malloc newline once portable redefine recursion uninitialized );
 
-use File::chdir;
-
-use Test::Expander -tempdir => {}, -srand => time;
+# use Test::Expander -tempdir => {}, -srand => time;
+use Test::Expander -tempdir => {};
 use Test::Expander::Constants qw( $FMT_INVALID_ENV_ENTRY );
+
+use File::chdir;
 
 plan( 12 );
 
@@ -23,12 +24,12 @@ my $test_path  = path( $TEMP_DIR )->child( 't' );
 $test_path->child( $class_path )->mkpath;
 
 {
-  local $CWD   = $test_path->parent->stringify;              ## no critic (ProhibitLocalVars)
+  local $CWD    = $test_path->parent->stringify;            ## no critic (ProhibitLocalVars)
 
   my $test_file = path( 't' )->child( $class_path )->child( $METHOD . '.t' )->stringify;
   my $env_file  = path( 't' )->child( $class_path )->child( $METHOD . '.env' );
 
-  is( Test2::Plugin::SRand->from, 'import arg', "random seed is supplied as 'time'" );
+  is( Test2::Plugin::SRand->from, 'local date', "random seed is supplied as 'time'" );
 
   ok( lives { $METHOD_REF->( $CLASS, $test_file ) }, 'no test file detected' );
 

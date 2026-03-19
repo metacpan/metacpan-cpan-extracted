@@ -5,6 +5,8 @@ use Test::Lib;
 use Test::Async::Redis ':redis';
 use Test2::V0;
 use Future;
+use Future::IO;
+use Future::AsyncAwait;
 use Async::Redis;
 use Time::HiRes qw(time);
 
@@ -32,7 +34,7 @@ SKIP: {
         my $f2 = $redis2->blpop('conc:q2', 5);
 
         # Push to both after short delay
-        run { get_loop()->delay_future(after => 0.2) };
+        run { Future::IO->sleep(0.2) };
         run { $pusher->rpush('conc:q1', 'item1') };
         run { $pusher->rpush('conc:q2', 'item2') };
 
@@ -54,7 +56,7 @@ SKIP: {
         my $f2 = $redis2->blpop('conc:shared', 5);
 
         # Small delay to ensure both are waiting
-        run { get_loop()->delay_future(after => 0.1) };
+        run { Future::IO->sleep(0.1) };
 
         # Push two items so both waiters get something
         run { $pusher->rpush('conc:shared', 'item1', 'item2') };
@@ -73,29 +75,28 @@ SKIP: {
         run { $redis1->del('conc:shared') };
     };
 
-    subtest 'non-blocking during concurrent waits' => sub {
-        run { $redis1->del('conc:nb') };
+    subtest 'non-blocking during concurrent waits (CRITICAL)' => sub {
+        run { $redis1->del('conc:nb1', 'conc:nb2') };
 
-        my @ticks;
-        my $timer = IO::Async::Timer::Periodic->new(
-            interval => 0.01,
-            on_tick => sub { push @ticks, 1 },
-        );
-        get_loop()->add($timer);
-        $timer->start;
+        # Schedule delayed pushes to both queues
+        my $push_f = Future::IO->sleep(0.3)->then(async sub {
+            await $pusher->rpush('conc:nb1', 'delayed1');
+            await $pusher->rpush('conc:nb2', 'delayed2');
+        });
 
         # Start concurrent BLPOP operations
-        my $f1 = $redis1->blpop('conc:nb', 1);
-        my $f2 = $redis2->blpop('conc:nb', 1);
+        my $f1 = $redis1->blpop('conc:nb1', 2);
+        my $f2 = $redis2->blpop('conc:nb2', 2);
 
-        # Wait for both to timeout
-        await_f(Future->needs_all($f1, $f2));
+        my $start = Time::HiRes::time();
+        my @results = await_f(Future->needs_all($f1, $f2));
+        my $elapsed = Time::HiRes::time() - $start;
 
-        $timer->stop;
-        get_loop()->remove($timer);
+        ok($elapsed < 1.5, "Concurrent BLPOPs resolved via delayed push (${elapsed}s)");
+        is($results[0]->[1], 'delayed1', 'first BLPOP got delayed value');
+        is($results[1]->[1], 'delayed2', 'second BLPOP got delayed value');
 
-        # Should tick throughout the concurrent waits
-        ok(@ticks >= 50, "Event loop ticked " . scalar(@ticks) . " times during concurrent BLPOPs");
+        run { $redis1->del('conc:nb1', 'conc:nb2') };
     };
 }
 

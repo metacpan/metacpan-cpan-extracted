@@ -42,16 +42,10 @@ SKIP: {
             # Child process
             close $pipe_from_child;
 
-            # Create a new loop for the child
-            my $child_loop = IO::Async::Loop->new;
-
             # The redis connection should detect PID change and reconnect
             my $result;
             eval {
-                $child_loop->await($redis->get('fork:test'))->then(sub {
-                    $result = shift;
-                    Future->done;
-                })->get;
+                $result = $redis->get('fork:test')->get;
             };
 
             if ($@) {

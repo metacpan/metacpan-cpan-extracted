@@ -5,6 +5,7 @@ use Config;
 
 # Get XS::Parse::Keyword include path
 my $xspk_include = `$^X -MXS::Parse::Keyword::Builder -e 'print XS::Parse::Keyword::Builder->extra_compiler_flags'`;
+die "XS::Parse::Keyword::Builder is required to configure this module\n" if $?;
 
 # Extract version from module (avoid hardcoding)
 my $version = MM->parse_version('lib/Data/Path/XS.pm');

@@ -29,14 +29,14 @@ like(
 );
 
 like(
-    exception { $mcpan->_decode_result( { success => 0 }, 'url' ) },
+    exception { $mcpan->_decode_result( { success => 0, content => '' }, 'url' ) },
     qr/^Failed to fetch 'url':/,
     'Fail without reason',
 );
 
 like(
     exception { $mcpan->_decode_result(
-        { success => 0, reason => 'because' },
+        { success => 0, reason => 'because', content => 'error' },
     'url' ) },
     qr/^Failed to fetch 'url': because/,
     'Fail with reason when got no success',

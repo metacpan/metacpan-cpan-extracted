@@ -6,7 +6,7 @@ use Carp 'croak';
 use Exporter 'import';
 use MetaCPAN::Client;
 
-our $VERSION = '1.000';
+our $VERSION = '1.002';
 
 our @EXPORT_OK = ('find_all_dependents');
 
@@ -61,22 +61,22 @@ sub _module_dependents {
 	my @relationships = ('requires');
 	push @relationships, 'recommends' if $options->{recommends};
 	push @relationships, 'suggests' if $options->{suggests};
-	my @dep_filters = (
+	my %dep_filters = (filter => [
 		{ terms => { 'dependency.module' => $modules } },
 		{ terms => { 'dependency.relationship' => \@relationships } },
-	);
-	push @dep_filters, { not => { term => { 'dependency.phase' => 'develop' } } }
+	]);
+	$dep_filters{must_not} = { term => { 'dependency.phase' => 'develop' } }
 		unless $options->{develop};
 	
 	my %filter = (
-		and => [
+		bool => {filter => [
 			{ term => { maturity => 'released' } },
 			{ term => { status => 'latest' } },
 			{ nested => {
 				path => 'dependency',
-				filter => { and => \@dep_filters },
+				query => { bool => \%dep_filters },
 			} },
-		],
+		]},
 	);
 	
 	my $response = $mcpan->all('releases', {

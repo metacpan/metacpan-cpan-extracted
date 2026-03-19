@@ -382,7 +382,7 @@ use Time::HiRes qw(sleep time);                                     # The time a
 use Math::Bezier;                                                   # Bezier curve calculations done here.
 use Math::Gradient qw( gradient array_gradient multi_gradient );    # Awesome gradient calculation module
 use List::Util     qw(min max);                                     # min and max are very handy!
-use File::Map ':map';                                               # Absolutely necessary to map the screen to a string.
+use File::Map qw/:map :extra/;                                               # Absolutely necessary to map the screen to a string.
 use Term::ReadKey;
 use Imager;                                                         # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
@@ -402,7 +402,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.89';
+    our $VERSION   = '6.91';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -489,7 +489,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018-2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.89
+   Version:  6.91
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -2705,13 +2705,13 @@ Set to 1 to disable X-Windows/Wayland check. Default is 0.
 
 * B<FONT_PATH>
 
-Overrides the default font path for TrueType/Type1 fonts
+Overrides the default font path (I</usr/share/fonts/truetype/freefont>) for TrueType/Type1 fonts.
 
 If 'ttf_print' is not displaying any text, then this may need to be overridden.
 
 * B<FONT_FACE>
 
-Overrides the default font filename for TrueType/Type 1 fonts.
+Overrides the default font filename (I<FreeSans.ttf>) for TrueType/Type 1 fonts.
 
 If 'ttf_print' is not displaying any text, then this may need to be overridden.
 
@@ -3124,6 +3124,7 @@ sub new {
     $has_X = TRUE if (defined($ENV{'DISPLAY'}) && $self->{'IGNORE_X_WINDOWS'} == FALSE);
     if ((!$has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                          # We have to be in binary mode first
+        select($self->{'FB'});
         $| = 1;
         if ($self->{'ACCELERATED'}) {                                                                                                    # Pull in the C structure for the Framebuffer
             (                                                                                                                            # These need to be accurate to give accurate output
@@ -4547,8 +4548,6 @@ Draws a line, in the global foreground color, from point x,y at an angle of 'ang
 
 =back
 
-* This is not affected by the Acceleration setting
-
 =cut
 
 sub angle_line {
@@ -4751,6 +4750,7 @@ sub _flush_screen {
     }
     select($self->{'FB'}) if (defined($self->{'FB'}));
     $| = 1;
+    sync $self->{'SCREEN'}, TRUE;
 } ## end sub _flush_screen
 
 sub _adj_plot {
@@ -4824,7 +4824,7 @@ Draws a Bezier curve, based on a list of control points.
          'coordinates' => [
              x0,y0,
              x1,y1,
-             ...              # As many as needed
+             ...              # As many as needed, there MUST be an even number of elements
          ],
          'points'     => 100, # Number of total points plotted for curve
                               # The higher the number, the smoother the curve.
@@ -9756,7 +9756,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.89 (Mar 12, 2026)
+Version 6.91 (Mar 17, 2026)
 
 =head1 THANKS
 

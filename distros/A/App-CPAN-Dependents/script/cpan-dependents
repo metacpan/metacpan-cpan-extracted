@@ -5,7 +5,7 @@ use warnings;
 use App::CPAN::Dependents 'find_all_dependents';
 use Getopt::Long::Modern;
 
-our $VERSION = '1.000';
+our $VERSION = '1.002';
 
 my $usage_msg = "Usage: $0 [options] <distribution|module>";
 

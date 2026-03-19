@@ -47,7 +47,7 @@
             "App::ansicolumn" : "1.5702",
             "App::ansiecho" : "0",
             "App::ansifold" : "1.35",
-            "App::nup" : "0.9907",
+            "App::nup" : "1.07",
             "Command::Run" : "0",
             "File::Share" : "0",
             "Getopt::EX::Config" : "1.0202",
@@ -68,14 +68,14 @@
    "provides" : {
       "App::Greple::md" : {
          "file" : "lib/App/Greple/md.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       },
       "App::Greple::md::Step" : {
          "file" : "lib/App/Greple/md.pm"
       },
       "App::mdee" : {
          "file" : "lib/App/mdee.pm",
-         "version" : "1.06"
+         "version" : "1.07"
       }
    },
    "release_status" : "stable",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/tecolicom/App-mdee"
       }
    },
-   "version" : "1.06",
+   "version" : "1.07",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

@@ -1,0 +1,28 @@
+Changes
+cpanfile
+lib/Data/Hash/Diff/Smart.pm
+lib/Data/Hash/Diff/Smart/Cookbook.pod
+lib/Data/Hash/Diff/Smart/Engine.pm
+lib/Data/Hash/Diff/Smart/Path.pm
+lib/Data/Hash/Diff/Smart/Renderer/JSON.pm
+lib/Data/Hash/Diff/Smart/Renderer/Test2.pm
+lib/Data/Hash/Diff/Smart/Renderer/Text.pm
+lib/Data/Hash/Diff/Smart/Renderer/YAML.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/array-lcs.t
+t/array-unordered.t
+t/basic.t
+t/cycle-detection.t
+t/eof.t
+t/eol.t
+t/ignore-wildcards.t
+t/json-renderer.t
+t/test2-renderer.t
+t/text-renderer.t
+t/yaml-renderer.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

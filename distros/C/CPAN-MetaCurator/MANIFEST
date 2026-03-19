@@ -4,6 +4,7 @@ cpanfile
 data/cpan.metacurator.conf
 data/cpan.metacurator.constants.csv
 data/cpan.metacurator.sqlite
+data/cpan.metapackager.conf
 data/modules.table.csv
 data/one.png
 data/tiddlers.json
@@ -42,5 +43,7 @@ templates/body.html
 templates/footer.html
 templates/header.html
 templates/note.html
+xt/author/cpan.changes.strict.t
+xt/author/cpan.changes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

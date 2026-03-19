@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,10 +32,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::DBOOK:
     file: lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm
-    version: v1.0.5
+    version: v1.0.7
   Dist::Zilla::PluginBundle::Author::DBOOK:
     file: lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm
-    version: v1.0.5
+    version: v1.0.7
 requires:
   Data::Section: '0'
   Dist::Zilla: '0'
@@ -56,7 +56,6 @@ requires:
   Dist::Zilla::Plugin::Git::Push: '0'
   Dist::Zilla::Plugin::Git::Tag: '0'
   Dist::Zilla::Plugin::GithubMeta: '0'
-  Dist::Zilla::Plugin::InstallGuide: '0'
   Dist::Zilla::Plugin::License: '0'
   Dist::Zilla::Plugin::MakeMaker: '0'
   Dist::Zilla::Plugin::MakeMaker::Awesome: '0'
@@ -76,6 +75,7 @@ requires:
   Dist::Zilla::Plugin::Prereqs::FromCPANfile: '0'
   Dist::Zilla::Plugin::PrereqsFile: '0.003'
   Dist::Zilla::Plugin::PruneCruft: '0'
+  Dist::Zilla::Plugin::Readme::Brief: '0'
   Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
   Dist::Zilla::Plugin::Regenerate::AfterReleasers: '0'
   Dist::Zilla::Plugin::RewriteVersion: '0'
@@ -98,10 +98,10 @@ resources:
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK/issues
   homepage: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK.git
-version: v1.0.5
+version: v1.0.7
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'
-x_generated_by_perl: v5.40.2
+x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

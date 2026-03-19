@@ -2,7 +2,7 @@
 requires 'perl', '5.018';
 requires 'Future', '0.49';
 requires 'Future::AsyncAwait', '0.66';
-requires 'Future::IO', '0.19';
+requires 'Future::IO', '0.23';
 requires 'Protocol::Redis';
 requires 'IO::Socket::INET';
 requires 'Socket';
@@ -18,10 +18,6 @@ suggests 'OpenTelemetry::SDK';     # Observability integration
 on 'test' => sub {
     requires 'Test2::V0';
     requires 'Test::Lib';
-    requires 'IO::Async::Loop';
-    requires 'IO::Async::Timer::Periodic';
-    requires 'IO::Async::Process';
-    requires 'Future::IO::Impl::IOAsync';
 };
 
 # Development dependencies

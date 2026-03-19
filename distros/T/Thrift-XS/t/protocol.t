@@ -5,8 +5,8 @@ use Bit::Vector;
 use Test::More;
 use Test::BinaryData;
 use Thrift::XS;
-use Thrift::MemoryBuffer;
 use Thrift::BinaryProtocol;
+use Thrift::MemoryBuffer;
 
 plan tests => 80;
 
@@ -42,14 +42,14 @@ my $test = sub {
 
 # Write tests
 {
-    $test->('writeMessageBegin' => 'login', TMessageType::CALL, 12345);
+    $test->('writeMessageBegin' => 'login', Thrift::TMessageType::CALL, 12345);
     my $utf8 = 'русский';
-    $test->('writeMessageBegin' => $utf8, TMessageType::REPLY, 1);
-    $test->('writeFieldBegin' => 'start', TType::STRING, 1);
+    $test->('writeMessageBegin' => $utf8, Thrift::TMessageType::REPLY, 1);
+    $test->('writeFieldBegin' => 'start', Thrift::TType::STRING, 1);
     $test->('writeFieldStop');
-    $test->('writeMapBegin' => TType::STRING, TType::LIST, 42);
-    $test->('writeListBegin' => TType::STRUCT, 12345678);
-    $test->('writeSetBegin' => TType::I32, 8);
+    $test->('writeMapBegin' => Thrift::TType::STRING, Thrift::TType::LIST, 42);
+    $test->('writeListBegin' => Thrift::TType::STRUCT, 12345678);
+    $test->('writeSetBegin' => Thrift::TType::I32, 8);
     $test->('writeBool' => 1);
     $test->('writeBool' => 0);
     $test->('writeByte' => 50);
@@ -76,10 +76,10 @@ my $test = sub {
 # Read tests
 {
     my ($name, $type, $seqid);
-    my $written = $xsp->writeMessageBegin('login русский', TMessageType::CALL, 12345);
+    my $written = $xsp->writeMessageBegin('login русский', Thrift::TMessageType::CALL, 12345);
     my $read = $xsp->readMessageBegin(\$name, \$type, \$seqid);
     is($name, 'login русский', "readMessageBegin name ok");
-    is($type, TMessageType::CALL, "readMessageBegin type ok");
+    is($type, Thrift::TMessageType::CALL, "readMessageBegin type ok");
     is($seqid, 12345, "readMessageBegin seqid ok");
     is($read, $written, "readMessageBegin read and written byte-count ok");
 }
@@ -94,38 +94,38 @@ my $test = sub {
 
 {
     my ($name, $type, $id);   
-    my $written = $xsp->writeFieldBegin('start', TType::STRING, 2600);
+    my $written = $xsp->writeFieldBegin('start', Thrift::TType::STRING, 2600);
     my $read = $xsp->readFieldBegin(\$name, \$type, \$id);
     # name is not returned
-    is($type, TType::STRING, "readFieldBegin fieldtype ok");
+    is($type, Thrift::TType::STRING, "readFieldBegin fieldtype ok");
     is($id, 2600, "readFieldBegin fieldid ok");
     is($read, $written, "readFieldBegin read and written byte-count ok");
 }
 
 {
     my ($keytype, $valtype, $size);
-    my $written = $xsp->writeMapBegin(TType::STRING, TType::LIST, 42);
+    my $written = $xsp->writeMapBegin(Thrift::TType::STRING, Thrift::TType::LIST, 42);
     my $read = $xsp->readMapBegin(\$keytype, \$valtype, \$size);
-    is($keytype, TType::STRING, "readMapBegin keytype ok");
-    is($valtype, TType::LIST, "readMapBegin valtype ok");
+    is($keytype, Thrift::TType::STRING, "readMapBegin keytype ok");
+    is($valtype, Thrift::TType::LIST, "readMapBegin valtype ok");
     is($size, 42, "readMapBegin size ok");
     is($read, $written, "readMapBegin read and written byte-count ok");
 }
 
 {
     my ($elemtype, $size);
-    my $written = $xsp->writeListBegin(TType::STRUCT, 12345);
+    my $written = $xsp->writeListBegin(Thrift::TType::STRUCT, 12345);
     my $read = $xsp->readListBegin(\$elemtype, \$size);
-    is($elemtype, TType::STRUCT, "readListBegin elemtype ok");
+    is($elemtype, Thrift::TType::STRUCT, "readListBegin elemtype ok");
     is($size, 12345, "readListBegin size ok");
     is($read, $written, "readListBegin read and written byte-count ok");
 }
 
 {
     my ($elemtype, $size);
-    my $written = $xsp->writeSetBegin(TType::I16, 12345);
+    my $written = $xsp->writeSetBegin(Thrift::TType::I16, 12345);
     my $read = $xsp->readSetBegin(\$elemtype, \$size);
-    is($elemtype, TType::I16, "readSetBegin elemtype ok");
+    is($elemtype, Thrift::TType::I16, "readSetBegin elemtype ok");
     is($size, 12345, "readSetBegin size ok");
     is($read, $written, "readSetBegin read and written byte-count ok");
 }

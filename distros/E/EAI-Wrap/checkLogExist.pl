@@ -49,32 +49,14 @@ foreach my $job (keys %{$config{checkLookup}}) {
 		$logFileToCheck = $logRootPath.($execute{envraw} ? '/'.$execute{envraw} : "").'/'.$logFileToCheck;
 	}
 	my $logcheck = $config{checkLookup}{$job}{logcheck}; # Logcheck (regex)
-	
 	$logger->info("preparing logcheck for $job, freqToCheck:$freqToCheck, timeToCheck:$timeToCheck, logFileToCheck:$logFileToCheck, logcheck regex:/$logcheck/");
-	if ($freqToCheck eq "B" and (is_weekend($curDate) || is_holiday($config{logCheckHoliday},$curDate))) {
-		$logger->info("IGNORING logcheck as freqToCheck eq B and is_weekend($curDate)=".is_weekend($curDate)." || is_holiday(".$config{logCheckHoliday}.",$curDate)=".is_holiday($config{logCheckHoliday},$curDate));
+	# skipping check dependent on date
+	my $resultSkip = skipOnDate($freqToCheck,$curDate,$config{logCheckHoliday});
+	if ($resultSkip) {
+		$logger->info($resultSkip);
 		next LOGCHECK;
 	}
-	if ($freqToCheck eq "M1" and $curDate !~ /\d{4}\d{2}01/) {
-		$logger->info("IGNORING logcheck as freqToCheck eq M1 and curDate ($curDate) !~ /\d{4}\d{2}01/");
-		next LOGCHECK;
-	}
-	if ($freqToCheck eq "Q" and $curDate !~ /\d{4}0102/ and $curDate !~ /\d{4}0401/ and $curDate !~ /\d{4}0701/ and $curDate !~ /\d{4}1001/) {
-		$logger->info("IGNORING logcheck as freqToCheck eq Q and curDate ($curDate) !~ /\d{4}0102/ and curDate !~ /\d{4}0401/ and curDate !~ /\d{4}0701/ and curDate !~ /\d{4}1001/");
-		next LOGCHECK;
-	}
-	if ($freqToCheck eq "ML" and !is_last_day_of_month($curDate)) {
-		$logger->info("IGNORING logcheck as freqToCheck eq ML and !is_last_day_of_month($curDate)=".is_last_day_of_month($curDate));
-		next LOGCHECK;
-	}
-	if (substr($freqToCheck,0,1) eq "W" and !(weekday($curDate) eq substr($freqToCheck,1,1))) {
-		$logger->info("IGNORING logcheck as substr($freqToCheck,0,1) eq W and !(weekday($curDate) (".weekday($curDate).") eq substr($freqToCheck,1,1))");
-		next LOGCHECK;
-	}
-	if (substr($freqToCheck,0,2) eq "MW" and !(first_weekYYYYMMDD($curDate,substr($freqToCheck,2,1)))) {
-		$logger->info("IGNORING logcheck as substr($freqToCheck,0,2) eq MW and !(first_weekYYYYMMDD($curDate,substr($freqToCheck,2,1)))");
-		next LOGCHECK;
-	}
+	# skipping check if time not reached
 	my $checkTime = formatTime(make_time($timeToCheck."00",60*$checkLogExistDelay),"%02d%02d%02d%02d");
 	if ($checkTime gt $curTime) {
 		$logger->info("IGNORING logcheck as timeToCheck ($timeToCheck) + checkLogExistDelay ($checkLogExistDelay) minutes (totals to $checkTime) is greater than curTime ($curTime)");
@@ -222,7 +204,7 @@ character being used to separate the log entries of this logfile into columns (d
 
 =head1 COPYRIGHT
 
-Copyright (c) 2023 Roland Kapl
+Copyright (c) 2026 Roland Kapl
 
 All rights reserved.  This program is free software; you can
 redistribute it and/or modify it under the same terms as Perl itself.

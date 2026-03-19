@@ -10,7 +10,7 @@ WriteMakefile($abmm->mm_args(
     DISTNAME           => 'Alien-nghttp2',
     VERSION_FROM       => 'lib/Alien/nghttp2.pm',
     ABSTRACT_FROM      => 'lib/Alien/nghttp2.pm',
-    AUTHOR             => 'Your Name <your@email.com>',
+    AUTHOR             => 'John Napiorkowski <jjn1056@yahoo.com>',
     LICENSE            => 'perl_5',
     MIN_PERL_VERSION   => '5.016',
     CONFIGURE_REQUIRES => {
@@ -34,11 +34,11 @@ WriteMakefile($abmm->mm_args(
         resources => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/yourname/Alien-nghttp2.git',
-                web  => 'https://github.com/yourname/Alien-nghttp2',
+                url  => 'https://github.com/jjn1056/Alien-nghttp2.git',
+                web  => 'https://github.com/jjn1056/Alien-nghttp2',
             },
             bugtracker => {
-                web => 'https://github.com/yourname/Alien-nghttp2/issues',
+                web => 'https://github.com/jjn1056/Alien-nghttp2/issues',
             },
         },
     },

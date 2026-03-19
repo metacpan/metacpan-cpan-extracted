@@ -22,8 +22,7 @@ use Exporter 'import';
 use JSON::MaybeXS;
 use Time::HiRes qw(time);
 use Scalar::Util qw(weaken);
-use IO::Async::Loop;
-use IO::Async::Timer::Periodic;
+use Future::IO;
 
 our @EXPORT_OK = qw(
     init_redis get_redis get_pubsub
@@ -122,18 +121,14 @@ sub _start_selector_runner {
     })->retain;
 }
 
-# Start periodic stats timer using IO::Async
+# Start periodic stats timer using Future::IO (event-loop agnostic)
 sub _start_stats_timer {
-    my $loop = IO::Async::Loop->new;
-
-    $stats_timer = IO::Async::Timer::Periodic->new(
-        interval => 10,  # Send stats every 10 seconds
-        on_tick  => sub {
-            return unless %local_sessions;  # Skip if no clients
-            # Chain async operations: get_stats -> broadcast
-            # Retain the Future to keep it alive
-            get_stats()->then(sub {
-                my ($stats) = @_;
+    $stats_timer = (async sub {
+        while (1) {
+            await Future::IO->sleep(10);
+            next unless %local_sessions;  # Skip if no clients
+            eval {
+                my $stats = await get_stats();
                 my $msg = $JSON->encode({
                     global  => 1,
                     payload => {
@@ -143,16 +138,11 @@ sub _start_stats_timer {
                         uptime       => $stats->{uptime},
                     },
                 });
-                return $redis->publish(BROADCAST_CHANNEL, $msg);
-            })->on_fail(sub {
-                my ($err) = @_;
-                warn "[stats] Timer error: $err";
-            })->retain;
-        },
-    );
-
-    $loop->add($stats_timer);
-    $stats_timer->start;
+                await $redis->publish(BROADCAST_CHANNEL, $msg);
+            };
+            warn "[stats] Timer error: $@" if $@;
+        }
+    })->()->retain;
 }
 
 # Add a fire-and-forget background task to the selector

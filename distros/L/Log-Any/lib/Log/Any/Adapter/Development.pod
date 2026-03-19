@@ -16,7 +16,7 @@ Log::Any::Adapter::Development - Manual for developing new Log::Any adapters
 
 =head1 VERSION
 
-version 1.718
+version 1.719
 
 =head1 SYNOPSIS
 
@@ -89,15 +89,27 @@ L<Log::Any::Adapter::Base>.
 
 Log::Any supports the following log levels:
 
-=for :list * trace
-* debug
-* info
-* notice
-* warning
-* error
-* critical
-* alert
-* emergency
+=over
+
+=item * trace
+
+=item * debug
+
+=item * info
+
+=item * notice
+
+=item * warning
+
+=item * error
+
+=item * critical
+
+=item * alert
+
+=item * emergency
+
+=back
 
 If the logging mechanism used by your adapter supports different levels,
 it's your responsibility to map them appropriately when you implement the
@@ -105,9 +117,15 @@ logging and detection methods described below.  For example, if your
 mechanism only supports "debug", "normal" and "fatal" levels, you might map
 the levels like this:
 
-=for :list * debug: trace, debug
-* normal: info, notice, warning
-* fatal: error, critical, alert, emergency
+=over
+
+=item * debug: trace, debug
+
+=item * normal: info, notice, warning
+
+=item * fatal: error, critical, alert, emergency
+
+=back
 
 =head1 METHODS
 
@@ -116,9 +134,15 @@ the levels like this:
 The constructor (C<new>) is provided by
 L<Log::Any::Adapter::Base|Log::Any::Adapter::Base>. It will:
 
-=for :list * place any adapter arguments into a hash, along with the category
-* bless the hash into your subclass
-* call L</init> which may be optionally provided by your subclass
+=over
+
+=item * place any adapter arguments into a hash, along with the category
+
+=item * bless the hash into your subclass
+
+=item * call L</init> which may be optionally provided by your subclass
+
+=back
 
 At this point, overriding the default constructor is not supported. Hopefully
 it will not be needed.
@@ -147,14 +171,27 @@ function.
 The following methods have no default implementation, and MUST be defined by
 your subclass, unless your adapter supports L</Structured logging>:
 
-=for :list * debug ($msg)
-* info ($msg)
-* notice ($msg)
-* warning ($msg)
-* error ($msg)
-* critical ($msg)
-* alert ($msg)
-* emergency ($msg)
+=over
+
+=item * trace ($msg)
+
+=item * debug ($msg)
+
+=item * info ($msg)
+
+=item * notice ($msg)
+
+=item * warning ($msg)
+
+=item * error ($msg)
+
+=item * critical ($msg)
+
+=item * alert ($msg)
+
+=item * emergency ($msg)
+
+=back
 
 These methods must log a message at the specified level.
 
@@ -168,14 +205,27 @@ function.
 The following methods have no default implementation, and MUST be defined by
 your subclass:
 
-=for :list * is_debug ()
-* is_info ()
-* is_notice ()
-* is_warning ()
-* is_error ()
-* is_critical ()
-* is_alert ()
-* is_emergency ()
+=over
+
+=item * is_trace ()
+
+=item * is_debug ()
+
+=item * is_info ()
+
+=item * is_notice ()
+
+=item * is_warning ()
+
+=item * is_error ()
+
+=item * is_critical ()
+
+=item * is_alert ()
+
+=item * is_emergency ()
+
+=back
 
 These methods must return a boolean indicating whether the specified level is
 active, i.e. whether the adapter is listening for messages of that level.
@@ -237,9 +287,15 @@ The following L<Log::Any::Adapter::Util> functions give you a list of
 methods that you need to implement.  You can get logging methods, detection
 methods or both:
 
-=for :list * L<Log::Any::Adapter::Util::logging_methods|Log::Any::Adapter::Util/logging_methods>
-* L<Log::Any::Adapter::Util::detection_methods|Log::Any::Adapter::Util/detection_methods>
-* L<Log::Any::Adapter::Util::logging_and_detection_methods|Log::Any::Adapter::Util/logging_and_detection_methods>
+=over
+
+=item * L<Log::Any::Adapter::Util::logging_methods|Log::Any::Adapter::Util/logging_methods>
+
+=item * L<Log::Any::Adapter::Util::detection_methods|Log::Any::Adapter::Util/detection_methods>
+
+=item * L<Log::Any::Adapter::Util::logging_and_detection_methods|Log::Any::Adapter::Util/logging_and_detection_methods>
+
+=back
 
 =head1 AUTHORS
 

@@ -11,7 +11,7 @@ BEGIN {
     $HAS_LVALUE = $] ge '5.01600';
 }
 
-skip_all( "lvalue support requires perl 5.16 or later" )
+skip_all( 'lvalue support requires perl 5.16 or later' )
   unless $HAS_LVALUE;
 
 sub test_generator {

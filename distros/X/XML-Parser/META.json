@@ -4,7 +4,7 @@
       "Clark Cooper (coopercc@netheaven.com)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,12 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
          }
       },
       "runtime" : {
          "requires" : {
-            "LWP::UserAgent" : "0",
+            "File::ShareDir" : "0",
             "perl" : "5.004050"
          }
       },
@@ -46,12 +47,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/XML-Parser/issues"
+         "web" : "https://github.com/cpan-authors/XML-Parser/issues"
       },
       "repository" : {
-         "url" : "http://github.com/toddr/XML-Parser"
+         "url" : "https://github.com/cpan-authors/XML-Parser"
       }
    },
-   "version" : "2.47",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "2.48",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

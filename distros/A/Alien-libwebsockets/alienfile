@@ -1,0 +1,39 @@
+use alienfile;
+
+plugin 'PkgConfig' => (
+    pkg_name        => 'libwebsockets',
+    minimum_version => '4.3',
+);
+
+share {
+    plugin 'Download' => (
+        url => 'https://github.com/warmcat/libwebsockets/archive/refs/tags/v4.3.3.tar.gz',
+    );
+
+    plugin 'Extract' => 'tar.gz';
+
+    plugin 'Build::CMake';
+
+    build [
+        ['%{cmake}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            '-DCMAKE_INSTALL_PREFIX:PATH=%{.install.prefix}',
+            '-DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON',
+            '-DCMAKE_BUILD_TYPE=Release',
+            '-DCMAKE_POLICY_VERSION_MINIMUM=3.5',
+            '-DBUILD_SHARED_LIBS:BOOL=ON',
+            '-DLWS_WITH_LIBEV:BOOL=ON',
+            '-DLWS_WITH_EVLIB_PLUGINS:BOOL=ON',
+            '-DLWS_WITHOUT_TESTAPPS:BOOL=ON',
+            '-DLWS_WITH_LIBCAP:BOOL=OFF',
+            '-DLWS_WITH_SSL:BOOL=ON',
+            '-DLWS_WITHOUT_EXTENSIONS:BOOL=OFF',
+            '-DLWS_WITH_LIBUV:BOOL=OFF',
+            '-DLWS_WITH_LIBEVENT:BOOL=OFF',
+            '-DLWS_WITH_ZLIB:BOOL=ON',
+            '.'
+        ],
+        ['%{make}'],
+        ['%{make}', 'install'],
+    ];
+};

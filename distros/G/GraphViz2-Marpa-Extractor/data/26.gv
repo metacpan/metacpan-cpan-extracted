@@ -1,0 +1,8 @@
+digraph graph_26
+{
+	node_26_1
+	[
+		color = red,
+		fontcolor = green
+	]
+}

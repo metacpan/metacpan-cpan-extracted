@@ -153,7 +153,7 @@ syck_parser_set_root_on_error( SyckParser *p, SYMID roer )
  * Allocate the parser
  */
 SyckParser *
-syck_new_parser()
+syck_new_parser(void)
 {
     SyckParser *p;
     p = S_ALLOC( SyckParser );
@@ -195,11 +195,11 @@ syck_lookup_sym( SyckParser *p, SYMID id, char **data )
     return st_lookup( p->syms, id, (st_data_t *)data );
 }
 
-int
-syck_st_free_nodes( char *key, SyckNode *n, char *arg )
+enum st_retval
+syck_st_free_nodes( st_data_t key, st_data_t value, st_data_t arg )
 {
+    SyckNode *n = (SyckNode *)value;
     if ( n != (void *)1 ) syck_free_node( n );
-    n = NULL;
     return ST_CONTINUE;
 }
 
@@ -510,6 +510,7 @@ int syck_str_is_unquotable_integer(char* str, long len) {
     if(len > 9) return 0; /* Ints larger than 9 digits (32bit) might not portable. Force a string. */
 
     if(str[0] == '0' && len == 1) return 1; /* 0 is unquoted. */
+    if(str[0] == '+') return 0; /* +N must be quoted or the '+' is lost on roundtrip. */
     if(str[0] == '-') {str++; len --;} /* supress the leading '-' sign if detected for testing purposes only. */
     if(str[0]  == '0') return 0; /* Octals need to be quoted or you lose data converting them to an integer. This also accidentally blocks -0 which probably needs to be quoted. */
 

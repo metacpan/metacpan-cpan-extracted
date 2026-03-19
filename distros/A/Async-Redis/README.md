@@ -31,10 +31,11 @@ cpanm Protocol::Redis::XS
 ```perl
 use Async::Redis;
 use Future::AsyncAwait;
-use Future::IO;
 
-# Automatically select the best available event loop implementation
-Future::IO->load_best_impl;
+# Future::IO 0.23+ has a built-in poll-based impl that works out of the box.
+# For IO::Async or UV, require the impl directly:
+#   require Future::IO::Impl::IOAsync;
+#   require Future::IO::Impl::UV;
 
 my $redis = Async::Redis->new(
     host => 'localhost',

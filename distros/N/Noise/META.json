@@ -54,7 +54,7 @@
    "provides" : {
       "Noise" : {
          "file" : "lib/Noise.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       },
       "Noise::CipherState" : {
          "file" : "lib/Noise/CipherState.pm",
@@ -62,7 +62,7 @@
       },
       "Noise::HandshakeState" : {
          "file" : "lib/Noise/HandshakeState.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       },
       "Noise::Pattern" : {
          "file" : "lib/Noise/Pattern.pm",
@@ -92,7 +92,7 @@
          "web" : "https://github.com/sanko/Noise.pm"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_ignore" : [
       ".tidyallrc",
       ".gitignore",

@@ -1,5 +1,14 @@
 Revision history for EV-Etcd
 
+0.06  2026-03-17
+    - Add opts to lease_keepalive (auto_reconnect) and member_list (linearizable)
+    - Preserve watch_id across reconnects
+    - Remove GRPC_STATUS_INTERNAL from retryable set
+    - Add Data::Path::XS watch examples
+
+0.05  2026-03-14
+    - Fix edge cases
+
 0.04  2026-03-02
     - Add missing use EV () before XSLoader::load
 

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::BIP44;
-$Bitcoin::Crypto::BIP44::VERSION = '4.003';
+$Bitcoin::Crypto::BIP44::VERSION = '4.004';
 use v5.14;
 use warnings;
 
@@ -24,8 +24,6 @@ sub _get_network_constant
 
 	return $coin_type;
 }
-
-use namespace::clean;
 
 has param 'purpose' => (
 	isa => BIP44Purpose,

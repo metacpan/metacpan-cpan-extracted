@@ -30,6 +30,11 @@ BEGIN {
 my $mdee = File::Spec->rel2abs('script/mdee');
 my $test_md = File::Spec->rel2abs('t/test.md');
 
+# Isolate tests from user's ~/.config/mdee/config.sh
+use File::Temp qw(tempdir);
+my $empty_config = tempdir(CLEANUP => 1);
+$ENV{XDG_CONFIG_HOME} = $empty_config;
+
 # Check if mdee exists
 ok(-x $mdee, 'mdee is executable');
 
@@ -262,24 +267,24 @@ subtest 'show option' => sub {
         return $out =~ /\e\[[0-9;]*m_.*italic text.*_/;
     }
 
-    # Default: bold should be colored
-    my $default = `$mdee -f $test_md 2>&1`;
+    # Default: bold should be colored (--no-theme to test with markers visible)
+    my $default = `$mdee -f --no-theme $test_md 2>&1`;
     ok(has_bold_coloring($default), 'default has bold formatting');
 
     # --show bold=0: bold should NOT be colored
-    my $no_bold = `$mdee -f --show bold=0 $test_md 2>&1`;
+    my $no_bold = `$mdee -f --no-theme --show bold=0 $test_md 2>&1`;
     ok(!has_bold_coloring($no_bold), '--show bold=0 disables bold');
 
     # --show italic=0: italic should NOT be colored
-    my $no_italic = `$mdee -f --show italic=0 $test_md 2>&1`;
+    my $no_italic = `$mdee -f --no-theme --show italic=0 $test_md 2>&1`;
     ok(!has_italic_coloring($no_italic), '--show italic=0 disables italic');
 
     # --show all= disables all formatting
-    my $all_off = `$mdee -f '--show=all=' $test_md 2>&1`;
+    my $all_off = `$mdee -f --no-theme '--show=all=' $test_md 2>&1`;
     ok(!has_bold_coloring($all_off), '--show all= disables bold');
 
     # --show all= --show bold: only bold colored
-    my $only_bold = `$mdee -f '--show=all=' --show=bold $test_md 2>&1`;
+    my $only_bold = `$mdee -f --no-theme '--show=all=' --show=bold $test_md 2>&1`;
     ok(has_bold_coloring($only_bold), '--show all= --show bold enables bold');
     ok(!has_italic_coloring($only_bold), '--show all= --show bold disables italic');
 

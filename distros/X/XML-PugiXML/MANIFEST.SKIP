@@ -18,6 +18,10 @@
 ~$
 \.claude/
 
+# Ad-hoc scripts
+^repro_
+^test_
+
 # Distribution artifacts
 ^XML-PugiXML-
 ^MANIFEST\.bak$

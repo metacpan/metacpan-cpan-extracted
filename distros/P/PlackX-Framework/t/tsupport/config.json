@@ -1,0 +1,10 @@
+{
+	"key1": "value1",
+	"key2": "value2",
+
+	"some_array": [1, 2, 3],
+	"some_hash": {
+		"subkey1": "subvalue1",
+		"subkey2": "subvalue2"
+	}
+}

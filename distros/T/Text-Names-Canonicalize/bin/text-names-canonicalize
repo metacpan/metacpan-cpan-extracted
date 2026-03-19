@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use utf8;
+
+use Getopt::Long qw(GetOptions);
+use Text::Names::Canonicalize qw(canonicalize_name canonicalize_name_struct);
+use Text::Names::Canonicalize::Rules;
+
+my $locale  = 'en_GB';
+my $explain = 0;
+my $show_rules = 0;
+
+GetOptions(
+    'locale=s' => \$locale,
+    'explain'  => \$explain,
+    'rules'    => \$show_rules,
+) or die "Error parsing options\n";
+
+my $name = join ' ', @ARGV;
+if (!length $name) {
+    die <<"USAGE";
+Usage:
+  text-names-canonicalize [options] "Full Name"
+
+Options:
+  --locale LOCALE     Locale to use (default: en_GB)
+  --explain           Show detailed breakdown
+  --rules             Show resolved ruleset for this locale
+USAGE
+}
+
+# Show resolved ruleset
+if ($show_rules) {
+    my $rules = Text::Names::Canonicalize::Rules->get($locale);
+    require YAML::XS;
+    print YAML::XS::Dump($rules);
+    exit 0;
+}
+
+# Canonicalize
+my $struct = canonicalize_name_struct($name, locale => $locale);
+
+if ($explain) {
+    require YAML::XS;
+    print YAML::XS::Dump($struct);
+    exit 0;
+}
+
+# Default: print canonical form
+print canonicalize_name($name, locale => $locale), "\n";

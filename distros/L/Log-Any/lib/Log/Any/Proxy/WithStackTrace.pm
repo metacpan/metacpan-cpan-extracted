@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Proxy::WithStackTrace;
 
 # ABSTRACT: Log::Any proxy to upgrade string errors to objects with stack traces
-our $VERSION = '1.718';
+our $VERSION = '1.719';
 
 use Log::Any::Proxy;
 our @ISA = qw/Log::Any::Proxy/;
@@ -228,7 +228,7 @@ Log::Any::Proxy::WithStackTrace - Log::Any proxy to upgrade string errors to obj
 
 =head1 VERSION
 
-version 1.718
+version 1.719
 
 =head1 SYNOPSIS
 

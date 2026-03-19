@@ -1,7 +1,7 @@
 use v5.42;
 use experimental 'class';
 #
-package Algorithm::Kademlia v1.1.0 {
+package Algorithm::Kademlia v1.1.1 {
     use parent 'Exporter';
     our @EXPORT_OK = qw[xor_distance xor_bucket_index];
     #
@@ -121,8 +121,8 @@ package Algorithm::Kademlia v1.1.0 {
         field $value     : param : reader : writer;
         field $publisher : param : reader;
     };
-    class Algorithm::Kademlia::Search v1.1.0 {
-        field $target_id_bin : param;
+    class Algorithm::Kademlia::Search v1.1.1 {
+        field $target_id_bin : param : reader;
         field $k     : param //= 20;
         field $alpha : param //= 3;
         field %nodes;    # id_bin -> { data => ..., queried => 0, responded => 0, failed => 0 }

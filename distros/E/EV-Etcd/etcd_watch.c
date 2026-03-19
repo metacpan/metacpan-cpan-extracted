@@ -7,8 +7,6 @@
 #include "XSUB.h"
 #include "ppport.h"
 
-#include <EV/EVAPI.h>
-
 #include "etcd_common.h"
 #include "etcd_watch.h"
 
@@ -49,6 +47,8 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
         wp = &(*wp)->next;
     }
 
+    if (ev_is_active(&wc->reconnect_timer))
+        ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
     grpc_metadata_array_destroy(&wc->initial_metadata);
     grpc_metadata_array_destroy(&wc->trailing_metadata);
     if (wc->recv_buffer) {
@@ -73,12 +73,14 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
 /* Process WatchResponse and call Perl callback */
 void process_watch_response(pTHX_ watch_call_t *wc) {
     if (!wc->recv_buffer) {
+        wc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "No watch response received");
         return;
     }
 
     grpc_byte_buffer_reader reader;
     if (!grpc_byte_buffer_reader_init(&reader, wc->recv_buffer)) {
+        wc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Failed to read watch response buffer");
         return;
     }
@@ -91,6 +93,7 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
     grpc_slice_unref(slice);
 
     if (!resp) {
+        wc->active = 0;
         CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Failed to parse watch response");
         return;
     }
@@ -109,13 +112,7 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
         wc->active = 0;
         const char *reason = (resp->cancel_reason && strlen(resp->cancel_reason) > 0)
             ? resp->cancel_reason : "Watch cancelled";
-        size_t reason_len = strlen(reason);
-        dSP;
-        ENTER; SAVETMPS; PUSHMARK(SP); EXTEND(SP, 2);
-        PUSHs(&PL_sv_undef);
-        PUSHs(sv_2mortal(create_error_hv(aTHX_ GRPC_STATUS_CANCELLED,
-            reason, reason_len, "watch")));
-        PUTBACK; call_sv(wc->callback, G_DISCARD); FREETMPS; LEAVE;
+        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_CANCELLED, reason, "watch");
         etcdserverpb__watch_response__free_unpacked(resp, NULL);
         return;
     }
@@ -142,19 +139,19 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
     CALL_SUCCESS_CALLBACK(wc->callback, result);
 }
 
-/* Try to reconnect a watch after stream ended */
-int try_reconnect_watch(pTHX_ watch_call_t *wc) {
+/* Perform the actual watch reconnection (called from timer callback) */
+static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
+    dTHX;
+    (void)loop;
+    (void)revents;
+
+    watch_call_t *wc = (watch_call_t *)((char *)w - offsetof(watch_call_t, reconnect_timer));
     ev_etcd_t *client = wc->client;
 
-    if (!wc->auto_reconnect || !client->active) {
-        return 0;
+    if (!client->active) {
+        cleanup_watch(aTHX_ wc);
+        return;
     }
-
-    if (wc->reconnect_attempt >= client->max_retries) {
-        return 0;
-    }
-
-    wc->reconnect_attempt++;
 
     /* Cleanup and reinitialize streaming state */
     STREAMING_CALL_CLEANUP(wc);
@@ -178,6 +175,8 @@ int try_reconnect_watch(pTHX_ watch_call_t *wc) {
 
     create_req.prev_kv = wc->params.prev_kv;
     create_req.progress_notify = wc->params.progress_notify;
+    if (wc->params.has_watch_id)
+        create_req.watch_id = wc->params.watch_id;
 
     Etcdserverpb__WatchRequest req = ETCDSERVERPB__WATCH_REQUEST__INIT;
     req.request_union_case = ETCDSERVERPB__WATCH_REQUEST__REQUEST_UNION_CREATE_REQUEST;
@@ -199,22 +198,56 @@ int try_reconnect_watch(pTHX_ watch_call_t *wc) {
     if (!wc->call) {
         grpc_byte_buffer_destroy(send_buffer);
         wc->active = 0;
-        return 0;
+        client->in_callback = 1;
+        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Watch reconnect failed");
+        client->in_callback = 0;
+        if (!client->active) {
+            finish_client_destroy(aTHX_ client);
+            return;
+        }
+        cleanup_watch(aTHX_ wc);
+        return;
     }
 
     grpc_op ops[4] = {0};
     grpc_metadata auth_md;
     STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, wc);
 
-    init_call_functor(&wc->base, CALL_TYPE_WATCH);
+    init_call_base(&wc->base, CALL_TYPE_WATCH);
     grpc_call_error err = grpc_call_start_batch(wc->call, ops, 4, &wc->base, NULL);
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(wc);
+        client->in_callback = 1;
+        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Watch reconnect batch failed");
+        client->in_callback = 0;
+        if (!client->active) {
+            finish_client_destroy(aTHX_ client);
+            return;
+        }
+        cleanup_watch(aTHX_ wc);
+    }
+}
+
+/* Try to reconnect a watch after stream ended (with backoff delay) */
+int try_reconnect_watch(pTHX_ watch_call_t *wc) {
+    ev_etcd_t *client = wc->client;
+
+    if (!wc->auto_reconnect || !client->active) {
         return 0;
     }
+
+    if (wc->reconnect_attempt >= client->max_retries) {
+        return 0;
+    }
+
+    wc->reconnect_attempt++;
+
+    ev_tstamp delay = RECONNECT_BACKOFF_SECONDS(wc->reconnect_attempt);
+    ev_timer_init(&wc->reconnect_timer, watch_reconnect_cb, delay, 0.0);
+    ev_timer_start(EV_DEFAULT, &wc->reconnect_timer);
 
     return 1;
 }

@@ -4,7 +4,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 45;
+use constant TESTS_PER_DRIVER => 51;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -21,6 +21,23 @@ SKIP: {
         my $handle = get_handle($d);
         connect_handle($handle);
         isa_ok( $handle->dbh, 'DBI::db' );
+
+        my $query = q{Plants_1 WHERE Location=e'Sam\\'s\\nGarden'};
+        my @variables = $handle->_ExtractBindValues( \$query );
+        is( $query, q{Plants_1 WHERE Location=?}, 'Query was converted' );
+        is_deeply( \@variables, [qq{Sam's\nGarden}], 'Query params were extracted' );
+
+        # When the query has more literals than $MAX_BIND_PARAMS allows,
+        # _ExtractBindValues must leave the query string unmodified and
+        # return an empty list so the caller can fall back to literal execution.
+        {
+            local $DBIx::SearchBuilder::Handle::MAX_BIND_PARAMS = 1;
+            my $over_limit_query = q{t WHERE a='foo' AND b='bar'};
+            my @vars = $handle->_ExtractBindValues( \$over_limit_query );
+            is( $over_limit_query, q{t WHERE a='foo' AND b='bar'},
+                'Query left unmodified when bind limit exceeded' );
+            is_deeply( \@vars, [], 'Empty bind list returned when bind limit exceeded' );
+        }
 
         my $ret = init_schema( 'TestApp', $handle );
         isa_ok( $ret, 'DBI::st', "Inserted the schema. got a statement handle back" );
@@ -139,6 +156,22 @@ SKIP: {
         $DBIx::SearchBuilder::PREFER_BIND = 0;
         ok( $users_obj->BuildSelectQuery      !~ /\?/, 'no placeholder in select query' );
         ok( $users_obj->BuildSelectCountQuery !~ /\?/, 'no placeholder in select count query' );
+
+        # When $MAX_BIND_PARAMS is exceeded, the query falls back to literal
+        # execution. LIMIT/OFFSET are applied by ApplyLimits and must still
+        # work correctly in this mode.
+        {
+            local $DBIx::SearchBuilder::PREFER_BIND = 1;
+            local $DBIx::SearchBuilder::Handle::MAX_BIND_PARAMS = 1;
+            my $limited_obj = TestApp::Users->new($handle);
+            $limited_obj->Limit( FIELD => 'Login', VALUE => "Bilbo\\Baggins" );
+            $limited_obj->Limit( FIELD => 'id',    VALUE => 0, OPERATOR => '>' );
+            $limited_obj->RowsPerPage(1);
+            like( $limited_obj->BuildSelectQuery, qr/Login\W*=\W*e?'/i,
+                'WHERE clause retains literal value when bind limit exceeded' );
+            is( $limited_obj->Count, 1,
+                'query executes correctly when bind limit exceeded and LIMIT/OFFSET in play' );
+        }
 
         cleanup_schema( 'TestApp', $handle );
 

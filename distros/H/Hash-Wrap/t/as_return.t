@@ -15,7 +15,7 @@ ok(
 like(
     dies { wrap_hash( {} ) },
     qr{undefined subroutine.*wrap_hash.* at t/as_return.t}i,
-    "constructor wasn't inserted into our namespace"
+    q{constructor wasn't inserted into our namespace}
 );
 
 ref_ok( $func[0], 'CODE', 'we got a code ref!' );
@@ -37,7 +37,7 @@ for my $test ( [ $func[0], 'A1' ], [ $func[1], 'A2' ] ) {
                     call answer => 42;
                 };
             },
-            "object works!"
+            'object works!'
         );
     };
 }

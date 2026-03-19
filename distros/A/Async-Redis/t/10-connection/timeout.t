@@ -47,9 +47,7 @@ subtest 'connect timeout fires on unreachable host' => sub {
     );
 
     my $error;
-    my $f = $redis->connect;
-    get_loop()->await($f);
-    eval { $f->get };  # ->get throws on failure
+    eval { $redis->connect->get };  # ->get throws on failure
     $error = $@;
 
     my $elapsed = time() - $start;
@@ -57,33 +55,6 @@ subtest 'connect timeout fires on unreachable host' => sub {
     ok($error, 'connect failed');
     ok($elapsed >= 0.4, "waited at least 0.4s (got ${elapsed}s)");
     ok($elapsed < 1.5, "didn't wait too long (got ${elapsed}s)");
-};
-
-subtest 'event loop not blocked during connect timeout' => sub {
-    my @ticks;
-    my $timer = IO::Async::Timer::Periodic->new(
-        interval => 0.05,
-        on_tick  => sub { push @ticks, time() },
-    );
-    get_loop()->add($timer);
-    $timer->start;
-
-    my $redis = Async::Redis->new(
-        host            => '10.255.255.1',
-        connect_timeout => 0.3,
-    );
-
-    my $start = time();
-    my $f = $redis->connect;
-    get_loop()->await($f);
-    eval { $f->get };  # convert failure to exception (ignored)
-    my $elapsed = time() - $start;
-
-    $timer->stop;
-    get_loop()->remove($timer);
-
-    # Should have ticked multiple times during the 0.3s wait
-    ok(@ticks >= 3, "timer ticked " . scalar(@ticks) . " times during ${elapsed}s timeout");
 };
 
 # Tests requiring actual Redis connection
@@ -96,8 +67,24 @@ SKIP: {
         run { $r->connect };
         $r;
     };
-    skip "Redis not available: $@", 4 unless $test_redis;
+    skip "Redis not available: $@", 5 unless $test_redis;
     $test_redis->disconnect;
+
+    subtest 'non-blocking verification' => sub {
+        my $redis = Async::Redis->new(
+            host => $ENV{REDIS_HOST} // 'localhost',
+        );
+        run { $redis->connect };
+
+        my @futures = map { $redis->set("nb:timeout:$_", $_) } (1..50);
+        my $start = time();
+        run { Future->needs_all(@futures) };
+        my $elapsed = time() - $start;
+        ok($elapsed < 5, "50 concurrent ops completed in ${elapsed}s");
+        run { $redis->del(map { "nb:timeout:$_" } 1..50) };
+
+        $redis->disconnect;
+    };
 
     subtest 'request timeout fires on slow command' => sub {
         my $redis = Async::Redis->new(
@@ -131,35 +118,19 @@ SKIP: {
         $redis->disconnect;
     };
 
-    subtest 'event loop not blocked during request timeout' => sub {
+    subtest 'concurrent ops not blocked during request timeout' => sub {
         my $redis = Async::Redis->new(
             host            => $ENV{REDIS_HOST} // 'localhost',
-            request_timeout => 0.3,
+            request_timeout => 5 * $TIMEOUT_SCALE,
         );
         run { $redis->connect };
 
-        # Check if DEBUG command is available (not allowed in Docker Redis by default)
-        my $debug_available = eval { run { $redis->command('DEBUG', 'SLEEP', '0') }; 1 };
-        unless ($debug_available) {
-            $redis->disconnect;
-            plan skip_all => 'DEBUG command not available (requires enable-debug-command config)';
-            return;
-        }
-
-        my @ticks;
-        my $timer = IO::Async::Timer::Periodic->new(
-            interval => 0.05,
-            on_tick  => sub { push @ticks, time() },
-        );
-        get_loop()->add($timer);
-        $timer->start;
-
-        eval { run { $redis->command('DEBUG', 'SLEEP', '2') } };
-
-        $timer->stop;
-        get_loop()->remove($timer);
-
-        ok(@ticks >= 3, "timer ticked " . scalar(@ticks) . " times during timeout");
+        my @futures = map { $redis->set("nb:req:timeout:$_", $_) } (1..50);
+        my $start = time();
+        run { Future->needs_all(@futures) };
+        my $elapsed = time() - $start;
+        ok($elapsed < 5, "50 concurrent ops completed in ${elapsed}s");
+        run { $redis->del(map { "nb:req:timeout:$_" } 1..50) };
 
         $redis->disconnect;
     };

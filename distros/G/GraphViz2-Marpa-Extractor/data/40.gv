@@ -1,0 +1,8 @@
+digraph "graph_40"
+{
+	"node_40_1"
+	[
+		"color" = "red",
+		"fontcolor" = "green"
+	]
+}

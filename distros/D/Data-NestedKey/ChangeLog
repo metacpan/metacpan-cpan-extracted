@@ -1,3 +1,27 @@
+Sun Mar 15 10:56:36 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.8]:
+	* VERSION: bump
+	* test-requires
+	- +YAML::XS, JSON
+	* 01-as_string.t: YAML::XS
+
+Sun Mar 15 08:19:02 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.7]:
+	* VERSION: new
+	* .gitignore: modified
+	* Makefile: new
+	* Makefile.PL: deleted
+	* README.md: generated
+	* buildspec.yml: new
+	* lib/Data/NestedKey.pm.in
+	- renamed
+	- YAML::XS, not YAML
+	* requires: new
+	* test-requires: new
+	* version.mk: new
+
 Sun Feb 23 16:11:01 2025  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.06]:

@@ -39,7 +39,7 @@
          "recommends" : {
             "Cpanel::JSON::XS" : "4.19",
             "Crypt::URandom" : "0.36",
-            "Future::IO" : "0.16",
+            "Future::IO" : "0.23",
             "IO::Async::SSL" : "0.25",
             "IO::Socket::SSL" : "2.074",
             "Net::HTTP2::nghttp2" : "0.007"
@@ -82,7 +82,7 @@
          "web" : "https://github.com/jjn1056/pagi"
       }
    },
-   "version" : "0.001019",
+   "version" : "0.001020",
    "x_generated_by_perl" : "v5.40.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "Artistic-2.0"

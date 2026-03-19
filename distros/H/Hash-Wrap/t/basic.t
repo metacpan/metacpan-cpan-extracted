@@ -14,7 +14,7 @@ subtest 'default' => sub {
 
     my $obj = wrap_hash $hash;
 
-    is( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
+    is( refaddr( $obj ), refaddr( $hash ), 'same hash reference' );
 
     is( $obj->a, 1, 'retrieve value' );
     is( $obj->b, 2, 'retrieve another value' );
@@ -57,7 +57,7 @@ subtest 'copied' => sub {
 
     my $obj = return_copied $hash;
 
-    isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
+    isnt( refaddr( $obj ), refaddr( $hash ), 'same hash reference' );
 
     is( $obj->a, 1,   'retrieve value' );
     is( $obj->b, 2,   'retrieve another value' );
@@ -88,7 +88,7 @@ subtest 'cloned' => sub {
 
     my $obj = return_cloned $hash;
 
-    isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
+    isnt( refaddr( $obj ), refaddr( $hash ), 'same hash reference' );
     is( $obj->a, 1,   'retrieve value' );
     is( $obj->b, 2,   'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );
@@ -122,7 +122,7 @@ subtest 'custom cloned' => sub {
 
     is( $called_custom, T(), 'called our custom clone' );
 
-    isnt( refaddr( $obj ), refaddr( $hash ), "same hash reference" );
+    isnt( refaddr( $obj ), refaddr( $hash ), 'same hash reference' );
     is( $obj->a, 1,   'retrieve value' );
     is( $obj->b, 2,   'retrieve another value' );
     is( $obj->c, [9], 'retrieve another value' );
@@ -151,13 +151,13 @@ subtest 'cache + create class' => sub {
 
     no strict 'refs';
 
-    ok( !defined( *{"${class}::a"}{CODE} ), "no accessor for 'a'" );
+    ok( !defined( *{"${class}::a"}{CODE} ), q{no accessor for 'a'} );
 
-    is( $obj->a, 1, "retrieve 'a'" );
+    is( $obj->a, 1, q{retrieve 'a'} );
 
     my $accessor = *{"${class}::a"}{CODE};
 
-    is( $obj->can( 'a' ), $accessor, "can() returns cached accessor" );
+    is( $obj->can( 'a' ), $accessor, 'can() returns cached accessor' );
 
 };
 

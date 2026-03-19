@@ -79,6 +79,22 @@ does not involve static key exchange, or the key has not been received yet, this
 Returns the remote ephemeral public key (as a L<Crypt::PK::X25519> object) received from the peer. This is typically
 available after the first message from the remote party.
 
+=head2 C<s( )>
+
+Returns the static local keys.
+
+=head2 C<e( )>
+
+Returns the ephemeral local keys.
+
+=head2 C<rs( )>
+
+Returns the static remote keys.
+
+=head2 C<re( )>
+
+Returns the ephemeral remote keys.
+
 =head1 SEE ALSO
 
 L<Noise::Pattern>, L<Noise::SymmetricState>

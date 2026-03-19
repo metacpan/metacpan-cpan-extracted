@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { print "1..27\n"; }
+BEGIN { print "1..31\n"; }
 END { print "not ok 1\n" unless $loaded; }
 use XML::Parser;
 use FileHandle;    # Make 5.10.0 happy.
@@ -39,6 +39,14 @@ open( ZOE, '>zoe.ent' );
 print ZOE "'cute'";
 close(ZOE);
 
+open( PAUL, '>paul.ent' );
+print PAUL "'Paul'";
+close(PAUL);
+
+open( PAULA, '>paula.ent' );
+print PAULA "'Paula'";
+close(PAULA);
+
 # XML string for tests
 
 my $xmlstring = <<"End_of_XML;";
@@ -48,10 +56,13 @@ my $xmlstring = <<"End_of_XML;";
     <!ENTITY zinger PUBLIC "xyz" "abc" NDATA bar>
     <!ENTITY fran SYSTEM "fran-def">
     <!ENTITY zoe  SYSTEM "zoe.ent">
+    <!ENTITY paul  SYSTEM "paul.ent">
+    <!ENTITY paula SYSTEM "paula.ent">
    ]>
 <foo>
   First line in foo
   <boom>Fran is &fran; and Zoe is &zoe;</boom>
+  <boom2>&paul; &amp; &paula;</boom2>
   <bar id="jack" stomp="jill">
   <?line-noise *&*&^&<< ?>
     1st line in bar
@@ -75,6 +86,10 @@ sub ch {
         $tests[17]++ if $str =~ /pretty/;
         $tests[18]++ if $str =~ /cute/;
     }
+    elsif ( $p->in_element('boom2') ) {
+        $tests[30]++ if $str =~ /\bPaul\b/;
+        $tests[31]++ if $str =~ /\bPaula\b/;
+    }
 }
 
 sub st {
@@ -97,7 +112,7 @@ sub eh {
     if ( $el eq 'zap' ) {
         $tests[8]++;
         my @old = $p->setHandlers( 'Char', \&newch );
-        $tests[19]++ if $p->current_line == 17;
+        $tests[19]++ if $p->current_line == 20;
         $tests[20]++ if $p->current_column == 20;
         $tests[23]++ if ( $old[0] eq 'Char' and $old[1] == \&ch );
     }
@@ -160,6 +175,18 @@ sub extent {
         open( FOO, $sys ) or die "Couldn't open $sys";
         return *FOO;
     }
+    elsif ( $sys eq 'paul.ent' ) {
+        $tests[28]++;
+
+        open( FOO, $sys ) or die "Couldn't open $sys";
+        return \*FOO;
+    }
+    elsif ( $sys eq 'paula.ent' ) {
+        $tests[29]++;
+
+        open( my $fh, $sys ) or die "Couldn't open $sys";
+        return $fh;
+    }
 }
 
 eval {
@@ -192,7 +219,9 @@ else {
     $tests[21]++;
 }
 
-unlink('zoe.ent') if ( -f 'zoe.ent' );
+unlink('zoe.ent')  if ( -f 'zoe.ent' );
+unlink('paul.ent') if ( -f 'paul.ent' );
+unlink('paula.ent') if ( -f 'paula.ent' );
 
 for ( 4 .. 23 ) {
     print "not " unless $tests[$_];
@@ -232,8 +261,13 @@ if ( $count != 2 ) {
 }
 print "ok 26\n";
 
-if ( defined( *{$xmlstring} ) ) {
+if ( exists $::{$xmlstring} ) {
     print "not ";
 }
 print "ok 27\n";
+
+for ( 28 .. 31 ) {
+    print "not " unless $tests[$_];
+    print "ok $_\n";
+}
 

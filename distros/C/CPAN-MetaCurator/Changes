@@ -1,54 +1,62 @@
-Revision history for Perl extension CPAN::MetaCurator.
+Revision history for perl module CPAN::MetaCurator
 
-1.11  2026-02-20T12:52:19
-	- Special-case topic FAQ because it is formatted differently than the other topics.
-	- Special-case <pre>...</pre> with a simple message for now.
+1.13  2026-03-11
+    - Clean up counting of nodes
+    - Write module names to the 'modules' table if they appear in Perl.Wiki
 
-1.10  2026-02-17T17:18:19
-	- Cleanup script now include_packages switch is useless. Rerun to test
+1.12  2026-03-09
+    - Add code to optionally read cpan.metapackager.sqlite as shipped with CPAN::MetaPackager.
+    - Default location is /tmp/cpan.metapackager.sqlite.
 
-1.09  2026-02-16T16:36:00
-	- Move all modules in lib/CPAN/MetaCurator/Util up 1 level and fix all references to match.
-	- This just simplifies the dir structure.
+1.11  2026-02-20
+    - Special-case topic FAQ because it is formatted differently than the other topics.
+    - Special-case <pre>...</pre> with a simple message for now.
 
-1.08  2026-02-15T15:15:15
-	- Remove packages data & table because the table takes too long to populate.
-	- A future version or module will ship the packages in a separate SQLite db.
+1.10  2026-02-17
+    - Cleanup script now include_packages switch is useless. Rerun to test.
 
-1.07  2026-02-05T17:11:00
-	- Re-introduce data/02packages.details.txt
-	- Get reformat.02packages.pl working
-	- Re-introduce the packages table
-	- Populate the packages table from CSV not from txt file
+1.09  2026-02-16
+    - Move all modules in lib/CPAN/MetaCurator/Util up 1 level and fix all references to match.
+    - This just simplifies the dir structure.
 
-1.06  2026-02-03T17:09:00
-	- Remove almost all references to the 'packages' table for now
-	- Remove import file data/02packages.details.txt
-	- Remove export file data/modules.table.csv for now
+1.08  2026-02-15
+    - Remove packages data & table because the table takes too long to populate.
+    - A future version or module will ship the packages in a separate SQLite db.
 
-1.05  2026-02-03T09:10:00
-	- Add sub export_modules_table() to Export.pm
-	- Add scripts/export.modules2csv.pl
+1.07  2026-02-05
+    - Re-introduce data/02packages.details.txt.
+    - Get reformat.02packages.pl working.
+    - Re-introduce the packages table.
+    - Populate the packages table from CSV not from txt file.
 
-1.04  2026-02-02T12:20:00
-	- Make each topic's node clickable
+1.06  2026-02-03
+    - Remove almost all references to the 'packages' table for now.
+    - Remove import file data/02packages.details.txt.
+    - Remove export file data/modules.table.csv for now.
 
-1.03  2026-01-25T12:44:00
-	- Update scripts/read.tiddlers.pl to recognize both ChangeLog & MainMenu as special para names
-	- Update details in CPAN::MetaCurator of the process of reading the tiddlers file & gathering statistics
+1.05  2026-02-03
+    - Add sub export_modules_table() to Export.pm.
+    - Add scripts/export.modules2csv.pl.
 
-1.02  2025-10-07T11:01:57
-	- Add LICENSE to Makefile.PL
-	- Start rewriting Export.pm to handle multiples of <pre>...</pre> and See Also and to keep them in situ
-	- Update cpan.metacurator.tiddlers.json
-	- Update the POD to explain how to download and unpack 02packages.details.txt
+1.04  2026-02-02
+    - Make each topic's node clickable.
 
-1.01  2025-07-28T11:41:00
-	- Add Perl's 02packages.details.txt as data/02packages.details.txt
-	- Use it to populate the modules table
-	- Export the modules table manually as data/modules.table.csv
-	- Prefer it to 02packages.details.txt to speed up importing
-	- Modify Export.format_text() to detect text to hover over
+1.03  2026-01-25
+    - Update scripts/read.tiddlers.pl to recognize both ChangeLog & MainMenu as special para names.
+    - Update details in CPAN::MetaCurator of the process of reading the tiddlers file & gathering statistics.
 
-1.00  2025-05-27T12:00:00
-	- Original version
+1.02  2025-10-07
+    - Add LICENSE to Makefile.PL.
+    - Start rewriting Export.pm to handle multiples of <pre>...</pre> and See Also and to keep them in situ.
+    - Update cpan.metacurator.tiddlers.json.
+    - Update the POD to explain how to download and unpack 02packages.details.txt.
+
+1.01  2025-07-28
+    - Add Perl's 02packages.details.txt as data/02packages.details.txt.
+    - Use it to populate the modules table.
+    - Export the modules table manually as data/modules.table.csv.
+    - Prefer it to 02packages.details.txt to speed up importing.
+    - Modify Export.format_text() to detect text to hover over.
+
+1.00  2025-05-27
+    - Original version.

@@ -1,0 +1,46 @@
+package Data::HashMap::Shared::I32;
+use strict;
+use warnings;
+use Data::HashMap::Shared;
+our $VERSION = '0.01';
+
+sub import {
+    $^H{"Data::HashMap::Shared::I32/shm_i32_put"}        = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_get"}        = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_remove"}     = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_exists"}     = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_incr"}       = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_decr"}       = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_incr_by"}    = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_size"}       = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_keys"}       = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_values"}     = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_items"}      = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_each"}       = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_iter_reset"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_clear"}      = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_to_hash"}    = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_max_entries"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_get_or_set"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_put_ttl"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_max_size"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_ttl"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_cursor"}       = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_cursor_next"}  = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_cursor_seek"}  = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_ttl_remaining"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_capacity"}     = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_tombstones"}   = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_cursor_reset"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_take"}           = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_flush_expired"}  = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_flush_expired_partial"} = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_mmap_size"}      = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_touch"}           = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_reserve"}         = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_stat_evictions"}  = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_stat_expired"}    = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_stat_recoveries"}    = 1;
+}
+
+1;

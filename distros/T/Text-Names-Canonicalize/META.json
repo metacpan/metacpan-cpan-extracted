@@ -1,0 +1,67 @@
+{
+   "abstract" : "Locale-aware personal name canonicalization with YAML rules, inheritance, and user overrides",
+   "author" : [
+      "Nigel Horne (njh@nigelhorne.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-Names-Canonicalize",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "JSON::MaybeXS" : "0",
+            "Scalar::Util" : "0",
+            "YAML::XS" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DescribeMe" : "0",
+            "Test::Most" : "0",
+            "Test::Needs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Text-Names-Canonicalize@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Names-Canonicalize",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Names-Canonicalize"
+      },
+      "homepage" : "https://metacpan.org/pod/Text::Names::Canonicalize",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Text-Names-Canonicalize.git",
+         "web" : "https://github.com/nigelhorne/Text-Names-Canonicalize",
+         "x_repository" : "https://github.com/nigelhorne/Text-Names-Canonicalize"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

@@ -1,5 +1,13 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.83 2026-03-18
+ - Document use of BuildSelectQuery for debugging. Inspired by @maettu
+   in PR 4 on github. Thanks!
+ - Add repository link to META. Pointed out by @szabgab. Thanks!
+ - Do not fetch columns marked as lazy_load by default
+ - Refactor _ExtractBindValues for better performance and less memory usage
+ - Fix _ClassAccessibleFromSchema to dereference _PrimaryKeys arrayref
+
 1.82 2024-04-29
 
  - Format reference to other docs as links

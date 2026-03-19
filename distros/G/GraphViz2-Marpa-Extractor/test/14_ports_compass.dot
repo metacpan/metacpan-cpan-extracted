@@ -1,0 +1,12 @@
+digraph G {
+    node [shape=record];
+    struct1 [label="{<f0> one|<f1> two}"];
+    struct2 [label="{<f0> left|<f1> right}"];
+
+    struct1:f0 -> struct2:f0;
+    struct1:f1 -> struct2:f1 [color=red];
+
+    node [shape=box];
+    a:s -> b:n;
+    c:ne -> d:sw;
+}

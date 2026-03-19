@@ -156,6 +156,13 @@ lib/PAGI/Middleware/Runtime.pm
 lib/PAGI/Middleware/SSE/Retry.pm
 lib/PAGI/Middleware/SecurityHeaders.pm
 lib/PAGI/Middleware/Session.pm
+lib/PAGI/Middleware/Session/State.pm
+lib/PAGI/Middleware/Session/State/Bearer.pm
+lib/PAGI/Middleware/Session/State/Callback.pm
+lib/PAGI/Middleware/Session/State/Cookie.pm
+lib/PAGI/Middleware/Session/State/Header.pm
+lib/PAGI/Middleware/Session/Store.pm
+lib/PAGI/Middleware/Session/Store/Memory.pm
 lib/PAGI/Middleware/Static.pm
 lib/PAGI/Middleware/TrustedHosts.pm
 lib/PAGI/Middleware/WebSocket/Compression.pm
@@ -177,6 +184,7 @@ lib/PAGI/Server/ConnectionState.pm
 lib/PAGI/Server/EventValidator.pm
 lib/PAGI/Server/Protocol/HTTP1.pm
 lib/PAGI/Server/Protocol/HTTP2.pm
+lib/PAGI/Session.pm
 lib/PAGI/Spec.pod
 lib/PAGI/Spec/Lifespan.pod
 lib/PAGI/Spec/Tls.pod
@@ -308,6 +316,12 @@ t/middleware/cors-warning.t
 t/middleware/debug-xss.t
 t/middleware/rate-limit.t
 t/middleware/request-id.t
+t/middleware/session/helper.t
+t/middleware/session/middleware-integration.t
+t/middleware/session/state-callback.t
+t/middleware/session/state-cookie.t
+t/middleware/session/state-header.t
+t/middleware/session/store-memory.t
 t/multipart-limits.t
 t/request-body-stream.t
 t/request-negotiate.t

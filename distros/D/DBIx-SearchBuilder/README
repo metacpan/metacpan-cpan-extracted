@@ -39,9 +39,13 @@ SYNOPSIS
           print $record->my_column_name();
       }
 
+      # Show the generated SELECT query, possibly for debugging
+      my $QueryString = $sb->BuildSelectQuery();
+      print "Select query is: $QueryString";
+
 DESCRIPTION
     This module provides an object-oriented mechanism for retrieving and
-    updating data in a DBI-accesible database.
+    updating data in a DBI-accessible database.
 
     In order to use this module, you should create a subclass of
     "DBIx::SearchBuilder" and a subclass of "DBIx::SearchBuilder::Record"
@@ -147,9 +151,26 @@ METHODS
   _isLimited
     If we've limited down this search, return true. Otherwise, return false.
 
+  _ColumnsForQuery
+    Returns the column selection string for use in SELECT statements.
+
+    If explicit columns have been added via "Column", those are returned
+    as-is. If "_select_all_columns" is set on the object, returns "main.*".
+    Otherwise introspects the record class's "_ClassAccessible" metadata and
+    excludes columns marked as "lazy_load", "foreign-collection", or
+    "record-read". Falls back to "main.*" if no metadata is available.
+
+  SelectAllColumns 1|0
+    When set to true, disables "lazy_load" column filtering and always
+    selects all columns from the database. When set to false, restores the
+    default behaviour of excluding "lazy_load" columns.
+
   BuildSelectQuery PreferBind => 1|0
     Builds a query string for a "SELECT rows from Tables" statement for this
-    SearchBuilder object
+    SearchBuilder object. Used internally and can also be handy for
+    debugging. Returns the query as a string.
+
+        my $QueryString = $self->BuildSelectQuery();
 
     If "PreferBind" is true, the generated query will use bind variables
     where possible. If "PreferBind" is not passed, it defaults to package
@@ -619,7 +640,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-SearchBuilder>.
 
 LICENSE AND COPYRIGHT
-    Copyright (C) 2001-2024, Best Practical Solutions LLC.
+    Copyright (C) 2001-2026, Best Practical Solutions LLC.
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

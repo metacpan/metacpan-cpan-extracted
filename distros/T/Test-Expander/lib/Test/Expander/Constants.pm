@@ -1,6 +1,6 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.6.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.6.1';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -57,6 +57,34 @@ const our $REGEX_TOP_DIR_IN_PATH       => qr{^ ( [^/]+ ) }x;
 const our $REGEX_VERSION_NUMBER        => qr/^ \d+ (?: \. \d+ )* $/x;
 
 const our $TRUE                        => 1;
+
+const our @TEST2_V0_EXPORT             => qw{
+  ok pass fail diag note todo skip
+  plan skip_all done_testing bail_out
+  intercept context
+  gen_event
+  def do_def
+  cmp_ok
+  warns warning warnings no_warnings
+  subtest
+  can_ok isa_ok DOES_ok
+  set_encoding
+  imported_ok not_imported_ok
+  ref_ok ref_is ref_is_not
+  mock mocked
+  dies lives try_ok
+  is like isnt unlike
+  match mismatch validator
+  hash array bag object meta meta_check number float rounded within string subset bool check_isa
+  number_lt number_le number_ge number_gt
+  in_set not_in_set check_set
+  item field call call_list call_hash prop check all_items all_keys all_vals all_values
+  etc end filter_items
+  T F D DF E DNE FDNE U L
+  event fail_events
+  exact_ref
+  is_refcount is_oneref refcount
+};
 
 const our %COLORS                      => ( exported => 'cyan', unexported => 'magenta' );
 

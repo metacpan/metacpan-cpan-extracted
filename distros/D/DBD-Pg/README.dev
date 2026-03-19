@@ -40,6 +40,11 @@ blib/arch/auto/DBD/Pg/Pg.so form the core of the module once installed.
 
 The canonical git repo is at git://github.com/bucardo/dbdpg.git
 
+The repo for DBI is: https://github.com/perl5-dbi/dbi
+
+The (mirrored) repo for Postgres is: https://github.com/postgres/postgres
+
+
 ===============
 == File List ==
 ===============
@@ -172,6 +177,8 @@ t/01connect.t - Basic connection tests, outputs pretty, detailed connection info
 
 t/01constants.t - Quick test of pg_types.
 
+t/01keywords.t - Test is_keyword inside of quote.c
+
 t/02attribs.t - Tests all attributes.
 
 t/03dbmethod.t - Tests all database handle methods.
@@ -215,6 +222,11 @@ t/99_spellcheck.t - Checks the spelling of everything it can.
 
 dbdpg_test_database - May be created by the test suite as a place to store 
 a new database cluster.
+
+misc/pg9.1.24.scan.c.gz - Special pre-compiled file to help Postgres 9.1
+get compiled on servers with a newer flex (all of them, at this point).
+Used by dbdpg_test_postgres_versions.pl
+
 
 * Helper files
 
@@ -666,6 +678,8 @@ Download the tarball to a completely different system, unpack and test it.
 
 dbd-pg@perl.org
 pgsql-interfaces@postgresql.org
+
+Possible subject line: Version 3.18.0 of DBD::Pg released (Perl DBI driver for Postgres)
 
 * Upload to CPAN and test.
 

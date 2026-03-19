@@ -1,0 +1,29 @@
+#!/usr/bin/env perl
+
+use strict ;
+use warnings ;
+use Graph::Easy ;
+use Graph::Easy::Parser::Graphviz ;
+use Graph::Easy::Introspect ;
+
+my $file = shift or die "Usage: $0 file.dot\n" ;
+
+open my $fh, '<', $file or die "Cannot open $file: $!\n" ;
+my $dot = do { local $/ ; <$fh> } ;
+close $fh ;
+
+my $parser = Graph::Easy::Parser::Graphviz->new ;
+my $g      = $parser->from_text($dot) ;
+
+my $ast  = $g->ast ;
+my $grid = $g->ast_grid ;
+
+if (exists $ast->{error})
+	{
+	die "Layout error: $ast->{error}\n" ;
+	}
+
+for my $row (@$grid)
+	{
+	print join('', @$row), "\n" ;
+	}

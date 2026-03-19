@@ -68,7 +68,7 @@
    "provides" : {
       "Test::Changes::Strict::Simple" : {
          "file" : "lib/Test/Changes/Strict/Simple.pm",
-         "version" : "0.01"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-test-changes-strict-simple.git"
       }
    },
-   "version" : "0.01",
+   "version" : "0.05",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-test-changes-strict-simple/issues"
    },

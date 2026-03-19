@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: perl-${{ matrix.perl }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl:
+          - '5.30'
+          - '5.32'
+          - '5.34'
+          - '5.36'
+          - '5.38'
+          - '5.40'
+          - '5.42'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          install-modules-with: cpanm
+          install-modules-args: --with-configure --with-develop
+
+      - name: Perl version
+        run: perl -V
+
+      - name: Configure
+        run: perl Makefile.PL
+
+      - name: Build
+        run: make
+
+      - name: Test
+        run: make test
+
+      - name: Author tests
+        if: matrix.perl == '5.42'
+        run: prove -lv xt/author

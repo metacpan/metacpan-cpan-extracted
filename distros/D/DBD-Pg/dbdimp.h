@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2000-2023 Greg Sabino Mullane and others: see the Changes file
+    Copyright (c) 2000-2026 Greg Sabino Mullane and others: see the Changes file
     Portions Copyright (c) 1997-2000 Edmund Mergl
     Portions Copyright (c) 1994-1997 Tim Bunce
     
@@ -144,6 +144,9 @@ extern void dbd_init (dbistate_t *dbistate);
 #define dbd_db_login6 pg_db_login6
 int dbd_db_login6 (SV * dbh, imp_dbh_t * imp_dbh, char * dbname, char * uid, char * pwd, SV *attr);
 
+#define dbd_db_continue_connect pg_db_continue_connect
+int dbd_db_continue_connect(SV *h);
+
 #define dbd_db_ping  pg_db_ping
 int dbd_db_ping(SV *dbh);
 
@@ -278,8 +281,15 @@ long pg_db_result (SV *h, imp_dbh_t *imp_dbh);
 
 int pg_db_ready(SV *h, imp_dbh_t *imp_dbh);
 
+int pg_db_send_cancel (SV *h, imp_dbh_t *imp_dbh);
+
 int pg_db_cancel (SV *h, imp_dbh_t *imp_dbh);
 
 int pg_db_cancel_sth (SV *sth, imp_sth_t *imp_sth);
+
+SV * pg_upgraded_sv(pTHX_ SV *input);
+
+SV * pg_downgraded_sv(pTHX_ SV *input);
+
 
 /* end of dbdimp.h */

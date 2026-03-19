@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-03-16
+
+### Fixed
+
+- It seems that `cpan` fatpacks an outdated Module::Metadata and we need to work around that
+
 ## [0.1.3] - 2026-03-12
 
 ### Fixed

@@ -82,7 +82,7 @@ ansifold
 
 ## Combined Formatting
 
-> **Important:** Use `--theme=nomark` to hide markers.
+> **Important:** Markers are hidden by default. Use `--no-theme` to show them.
 >
 > ***Bold italic*** in a blockquote with [a link](https://example.com).
 

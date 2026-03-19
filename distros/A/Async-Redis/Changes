@@ -1,5 +1,40 @@
 Revision history for Future-IO-Redis
 
+0.001006  2026-03-16
+    - Bug Fix: Pool forwards all connection parameters
+        - Pool now passes prefix, client_name, username, request_timeout,
+          path, and all other Async::Redis options through to connections
+        - Previously these were silently dropped when Pool created connections
+    - Bug Fix: Typed error objects for Redis command errors
+        - _decode_response now dies with Async::Redis::Error::Redis objects
+          instead of plain "Redis error: ..." strings
+        - AutoPipeline uses blessed() check instead of string matching,
+          fixing false positives for values starting with "Redis error:"
+        - Pipeline results contain error objects at failed slot positions
+    - Bug Fix: Pool max connection race condition
+        - Concurrent acquire() calls could exceed max connections
+        - Added _creating counter to track in-flight connection creations
+    - Dependency Change: Future::IO bumped to 0.23 (was 0.19)
+        - Future::IO 0.22+ broke load_impl('IOAsync') by adding a poll
+          method check that IO::Async's impl doesn't satisfy
+        - Removed IO::Async as a test dependency entirely
+        - Tests now use Future::IO's built-in poll-based default impl
+        - Test suite is fully event-loop agnostic
+    - Examples: pagi-chat stats timer uses Future::IO instead of IO::Async
+
+0.001005  2026-03-15
+    - Feature: Unix domain socket connections
+        - Connect via path parameter or redis+unix:// URI scheme
+        - Constructor stores path and skips host/port for unix sockets
+        - Added docker-compose redis-unix service for testing
+    - Feature: PubSub auto-resubscribe on reconnect
+        - Subscriptions automatically re-established after connection drop
+        - on_reconnect callback on Subscription object for notification
+        - _read_pubsub_frame checks connected state to fail fast
+        - _reset_connection now clears in_pubsub flag
+    - Bug Fix: _reset_connection left in_pubsub=1 after disconnect
+        - Prevented reconnection because AUTH/SELECT blocked by pubsub guard
+
 0.001004  2026-02-02
     - Bug Fix: Socket close ordering
         - Fixed Future::IO corruption when disconnect() called with active watchers

@@ -9,9 +9,9 @@ build_requires:
   Test::NoWarnings: '0'
   lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,22 +22,20 @@ no_index:
     - t
     - inc
 requires:
-  FindBin: '0'
   Log::Log4perl: '0'
-  Moose: '0.82'
-  MooseX::Types: '0.12'
+  Moo: '2'
   Mozilla::CA: '0'
   Net::Jabber: '2'
   Sys::Hostname: '0'
-  Test::More: '0'
-  Test::NoWarnings: '0'
   Time::HiRes: '0'
-  lib: '0'
+  Type::Tiny: '1'
+  Types::Standard: '0'
+  perl: '5.008'
   version: '0'
 resources:
-  bugtracker: https://github.com/toddr/perl-net-jabber-bot/issues
-  homepage: http://wiki.github.com/toddr/perl-net-jabber-bot
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/toddr/perl-net-jabber-bot/tree/master
-version: v2.1.7
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/cpan-authors/perl-net-jabber-bot/issues
+  homepage: https://metacpan.org/pod/Net::Jabber::Bot
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/cpan-authors/perl-net-jabber-bot.git
+version: v2.1.8
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

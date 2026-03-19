@@ -2,7 +2,7 @@ package App::GHGen;
 
 # Try this to update GitHub Marketplace released, but bear in mind it tends to not work, marketplace does not detect the update
 # Update the @v1 to @v2 in actions.yml
-# git tag -a v2 -m "Release v0.02"
+# git tag -a v2 -m 'Release v0.02'
 # git push origin v2
 # Go to https://github.com/nigelhorne/App-GHGen/releases
 # Click “Draft a new release”
@@ -13,11 +13,17 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
-
 =head1 NAME
 
-App::GHGen - Comprehensive GitHub Actions workflow generator, analyzer, and optimizer
+App::GHGen - GitHub Actions workflow generator, analyzer, and optimizer
+
+=head1 VERSION
+
+Version 0.04
+
+=cut
+
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -37,10 +43,11 @@ App::GHGen - Comprehensive GitHub Actions workflow generator, analyzer, and opti
 
 =head1 DESCRIPTION
 
-GHGen Workflow Analyzer is the all‑in‑one solution for keeping your GitHub Actions fast, secure, and effortlessly up‑to‑date.
+GHGen Workflow Analyzer is the all-in-one solution for keeping your GitHub Actions fast,
+secure, and effortlessly up-to-date.
 It automatically scans your workflows for performance bottlenecks,
 outdated actions,
-missing security permissions, and wasted CI minutes—then applies safe, intelligent fixes or opens a clean pull request with improvements.
+missing security permissions, and wasted CI minutes-then applies safe, intelligent fixes or opens a clean pull request with improvements.
 Whether you maintain a single project or dozens,
 GHGen saves time, reduces CI costs, and enforces modern best practices without manual effort.
 Developers choose it because it turns workflow maintenance from a chore into a fully automated,
@@ -52,21 +59,21 @@ reliable part of their development pipeline.
 
 =over 4
 
-=item * B<🤖 Auto-detect project type> - Intelligently scans your repository to detect language and dependencies
+=item * B<Auto-detect project type> - Intelligently scans your repository to detect language and dependencies
 
-=item * B<🚀 Generate optimized workflows> - Creates workflows with caching, security, concurrency, and best practices built-in
+=item * B<Generate optimized workflows> - Creates workflows with caching, security, concurrency, and best practices built-in
 
-=item * B<🔍 Analyze existing workflows> - Comprehensive analysis for performance, security, cost, and maintenance issues
+=item * B<Analyze existing workflows> - Comprehensive analysis for performance, security, cost, and maintenance issues
 
-=item * B<🔧 Auto-fix issues> - Automatically applies fixes for detected problems (adds caching, updates versions, adds permissions, etc.)
+=item * B<Auto-fix issues> - Automatically applies fixes for detected problems (adds caching, updates versions, adds permissions, etc.)
 
-=item * B<🎯 Interactive customization> - Guided workflow creation with smart defaults and multi-select options
+=item * B<Interactive customization> - Guided workflow creation with smart defaults and multi-select options
 
-=item * B<💰 Cost estimation> - Estimates current CI minutes usage and calculates potential savings from optimizations
+=item * B<Cost estimation> - Estimates current CI minutes usage and calculates potential savings from optimizations
 
-=item * B<🔄 GitHub Action integration> - Run as a GitHub Action to analyze PRs, comment with suggestions, and create fix PRs
+=item * B<GitHub Action integration> - Run as a GitHub Action to analyze PRs, comment with suggestions, and create fix PRs
 
-=item * B<📊 Per-workflow breakdown> - Detailed analysis of each workflow's cost and optimization potential
+=item * B<Per-workflow breakdown> - Detailed analysis of each workflow's cost and optimization potential
 
 =back
 
@@ -1165,7 +1172,9 @@ B<Solution:>
 
 =over 4
 
-=item * L<Test Coverage Report|https://nigelhorne.github.io/App-GHGen/coverage/>
+=item * L<Test Dashboard|https://nigelhorne.github.io/App-GHGen/coverage/>
+
+=item * L<App::Test::Generator>
 
 =back
 
@@ -1195,6 +1204,10 @@ B<Solution:>
 
 =back
 
+=head1 REPOSITORY
+
+L<https://github.com/nigelhorne/App-GHGen>
+
 =head1 CONTRIBUTING
 
 Contributions are welcome! GHGen is open source and hosted on GitHub.
@@ -1218,7 +1231,7 @@ Contributions are welcome! GHGen is open source and hosted on GitHub.
 =head2 Development Setup
 
     # Fork and clone
-    git clone https://github.com/YOUR-USERNAME/ghgen.git
+    git clone https://github.com/nigelhorne/ghgen.git
     cd ghgen
 
     # Install dependencies

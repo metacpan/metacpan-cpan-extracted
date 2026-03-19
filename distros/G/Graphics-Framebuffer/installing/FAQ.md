@@ -1,10 +1,12 @@
 # Graphics::Framebuffer Module Frequently Asked Questions
 
+[![Graphics::Framebuffer Logo](../GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
+
 ## Does GFB play video?
 
    No, it will only play animated GIFs that fit in memory.
 
-   However, if you install "mplayer", then you can play videos with it.  It will use the "fbdev" display driver.  Keep in mind this is not a GPU accelerated driver.  So your results will vary with your CPU.
+   However, if you install ```mplayer```, then you can play videos with it.  It will use the "fbdev" display driver.  Keep in mind this is not a GPU accelerated driver.  So your results will vary with your CPU.
 
 -----
 
@@ -14,7 +16,7 @@
 
    No, as Windows does not have a memory mappable framebuffer.
 
-   However, it works fine with VirtualBox and Linux installed on Windows.  If you fullscreen the VirtualBox display, then you can use the framebuffer on the Linux running on it.  You may have to adjust the grub variables and the settings in the "/etc/default/console-settings" and "/etc/default/grub" files, as well as configure VirtualBox to set the framebuffer to a large size.
+   However, it works fine with VirtualBox and Linux installed on Windows.  If you fullscreen the VirtualBox display, then you can use the framebuffer on the Linux running on it.  You may have to adjust the grub variables and the settings in the ```/etc/default/console-settings``` and ```/etc/default/grub``` files, as well as configure VirtualBox to set the framebuffer to a large size.
 
    If you install the EFI version of Linux, then no need to modify Grub.
 

@@ -8,11 +8,11 @@ ok( YAML::Syck->VERSION );
 is( Dump("Hello, world"),       "--- Hello, world\n" );
 is( Load("--- Hello, world\n"), "Hello, world" );
 
-TODO: {
-    local $TODO = 'RT 34073 - Parsing YAML without separator';
+# RT 34073 / GH #35 - "--\n" is valid YAML (plain scalar), not a parse error
+{
     my $out = eval { Load("--\n") };
-    isnt( $@, '', "Bad data dies on Load" );
-    is( $out, undef, "Bad data fails load" );
+    is( $@, '', "Load of '--' does not die" );
+    is( $out, '--', "Load of '--' returns plain scalar" );
 }
 
 TODO: {

@@ -8,6 +8,7 @@ MANIFEST			This list of files
 README
 t/api.t
 t/critic.t
+t/data/.config/brokenrc
 t/data/.config/finerc
 t/data/script/broken
 t/data/script/fine

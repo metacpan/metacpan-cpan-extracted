@@ -5,6 +5,8 @@ use Test::Lib;
 use Test::Async::Redis ':redis';
 use Test2::V0;
 use Async::Redis;
+use Time::HiRes qw(time);
+use Future;
 
 SKIP: {
     my $redis = eval {
@@ -112,23 +114,14 @@ LUA
     };
 
     subtest 'non-blocking verification' => sub {
-        my @ticks;
-        my $timer = IO::Async::Timer::Periodic->new(
-            interval => 0.005,
-            on_tick => sub { push @ticks, 1 },
-        );
-        get_loop()->add($timer);
-        $timer->start;
+        my @futures = map { $redis->set("nb:eval:$_", $_) } (1..50);
+        my $start = Time::HiRes::time();
+        run { Future->needs_all(@futures) };
+        my $elapsed = Time::HiRes::time() - $start;
 
-        for my $i (1..50) {
-            run { $redis->eval('return ARGV[1]', 0, $i) };
-        }
+        ok($elapsed < 5, "50 concurrent ops completed in ${elapsed}s");
 
-        $timer->stop;
-        get_loop()->remove($timer);
-
-        # Just verify the loop was able to process - timing-sensitive test
-        pass("Event loop ticked during EVAL calls");
+        run { $redis->del(map { "nb:eval:$_" } 1..50) };
     };
 
     # Cleanup

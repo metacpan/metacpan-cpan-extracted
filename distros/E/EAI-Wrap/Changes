@@ -76,3 +76,5 @@
 	- fixed all ternary operators with and -> &&, standardLoop now doesn't need a getAddtlDBData flag to get additional data, added tests for standardLoop
 1.920  Sat Nov 29 23:30:00 2025
 	- changed parameter passing in all procedures to use @_, fixed task{plannedUntil} and DB{cutoffYr2000} numerical conversion problem when passing as option (remain strings), sendGeneralMail also accepts multiple attachFiles (in array), dumpDataIntoDB now returns 0 for error and 1 for success as all procedures (returned hadDBError before), added encode_keys_utf8 flag to readFromDBHash in DB.pm to avoid odbc driver bug, got rid of several undefined variable warnings, added $maxTimeout and $waitTime to getFilesFromFTP to allow blocking wait for files on FTP Server, completed DB Tests
+1.921  Mon Mar 16 22:00:00 2026
+	- FTP: added dateOfFetchedFile return parameter, DateUtil: added skipOnDate function to encapsulate skipping functionality (extracted from checkLogExist.pl), File: additional traces, Wrap: redoFiles improved pattern recognition

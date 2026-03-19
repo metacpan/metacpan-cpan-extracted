@@ -1,0 +1,13 @@
+Revision history for Testcontainers (Perl)
+
+0.001  2026-03-10
+    - Initial release
+    - Core Testcontainers::run() API for creating containers
+    - Container lifecycle management (start, stop, terminate)
+    - Wait strategies: HostPort, HTTP, Log, HealthCheck, Multi
+    - Pre-built modules: PostgreSQL, MySQL, Redis, Nginx
+    - Port mapping and host resolution
+    - Environment variable and label support
+    - Container exec and log access
+    - Automatic cleanup on object destruction
+    - Built on WWW::Docker for Docker daemon communication

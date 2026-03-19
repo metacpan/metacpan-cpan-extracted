@@ -1,6 +1,6 @@
 package DBIx::Class::Async::SelectNormaliser;
 
-$DBIx::Class::Async::SelectNormaliser::VERSION   = '0.64';
+$DBIx::Class::Async::SelectNormaliser::VERSION   = '0.65';
 $DBIx::Class::Async::SelectNormaliser::AUTHORITY = 'cpan:MANWAR';
 
 use strict;
@@ -12,7 +12,7 @@ DBIx::Class::Async::SelectNormaliser - Normalise C<-ident> clauses in ResultSet 
 
 =head1 VERSION
 
-Version 0.64
+Version 0.65
 
 =head1 SYNOPSIS
 

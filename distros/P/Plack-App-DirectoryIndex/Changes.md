@@ -7,6 +7,12 @@ and this project adheres to
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-03-16
+
+### Fixed
+
+- Require a version of WebServer::DirIndex that cpanm understands
+
 ## [0.2.2] - 2026-03-12
 
 ### Fixed

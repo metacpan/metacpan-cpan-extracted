@@ -1,9 +1,8 @@
 use strict;
 use warnings;
 package MetaCPAN::API;
-# ABSTRACT: A comprehensive, DWIM-featured API to MetaCPAN (DEPRECATED)
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 use Moo;
 use Types::Standard qw<Str ArrayRef InstanceOf>;
@@ -107,7 +106,7 @@ sub _decode_result {
         my $reason = $result->{'reason'} || '';
         $reason .= ( defined $original ? " (request: $original)" : '' );
 
-        $success or croak "Failed to fetch '$url': $reason";
+        $success or croak "Failed to fetch '$url': $reason - $result->{content}";
     } else {
         croak 'Missing success in return value';
     }
@@ -147,13 +146,21 @@ __END__
 
 =encoding UTF-8
 
+=for :stopwords Sawyer X
+
 =head1 NAME
 
-MetaCPAN::API - A comprehensive, DWIM-featured API to MetaCPAN (DEPRECATED)
+MetaCPAN::API - (DEPRECATED) A comprehensive, DWIM-featured API to MetaCPAN
 
-=head1 VERSION
+=head1 DEPRECATED
 
-version 0.51
+B<THIS MODULE IS DEPRECATED, DO NOT USE!>
+
+This module has been completely rewritten to address a multitude
+of problems, and is now available under the new official name:
+L<MetaCPAN::Client>.
+
+Please do not use this module.
 
 =head1 SYNOPSIS
 
@@ -184,19 +191,9 @@ version 0.51
 This was the original hopefully-complete API-compliant interface to MetaCPAN
 (L<https://metacpan.org>).  It has now been superseded by L<MetaCPAN::Client>.
 
-=head1 DEPRECATED
-
-B<THIS MODULE IS DEPRECATED, DO NOT USE!>
-
-This module has been completely rewritten to address a multitude
-of problems, and is now available under the new official name:
-L<MetaCPAN::Client>.
-
-Please do not use this module.
-
 =head1 ATTRIBUTES
 
-=head2 base_url
+=head2 C<base_url>
 
     my $mcpan = MetaCPAN::API->new(
         base_url => 'http://localhost:9999',
@@ -213,7 +210,7 @@ This attribute is read-only (immutable), meaning that once it's set on
 initialize (via C<new()>), you cannot change it. If you need to, create a
 new instance of MetaCPAN::API. Why is it immutable? Because it's better.
 
-=head2 ua
+=head2 C<ua>
 
 This attribute is used to contain the user agent used for running the REST
 request to the server. It is specifically set to L<HTTP::Tiny>, so if you
@@ -225,7 +222,7 @@ This attribute is read-only (immutable), meaning that once it's set on
 initialize (via C<new()>), you cannot change it. If you need to, create a
 new instance of MetaCPAN::API. Why is it immutable? Because it's better.
 
-=head2 ua_args
+=head2 C<ua_args>
 
     my $mcpan = MetaCPAN::API->new(
         ua_args => [ agent => 'MyAgent' ],
@@ -241,7 +238,7 @@ The default is a user agent string: B<MetaCPAN::API/$version>.
 
 =head1 METHODS
 
-=head2 fetch
+=head2 C<fetch>
 
     my $result = $mcpan->fetch('/release/distribution/Moose');
 
@@ -259,7 +256,7 @@ own extension implementation to MetaCPAN::API.
 
 It accepts an additional hash as C<GET> parameters.
 
-=head2 post
+=head2 C<post>
 
     # /release&content={"query":{"match_all":{}},"filter":{"prefix":{"archive":"Cache-Cache-1.06"}}}
     my $result = $mcpan->post(
@@ -272,9 +269,58 @@ It accepts an additional hash as C<GET> parameters.
 
 The POST equivalent of the C<fetch()> method. It gets the path and JSON request.
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/xsawyerx/metacpan-api/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 Sawyer X <xsawyerx@cpan.org>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Christian Walde Graham Knop Karen Etheridge Logan Mickey Olaf Alders reneeb SineSwiper
+
+=over 4
+
+=item *
+
+Christian Walde <walde.christian@googlemail.com>
+
+=item *
+
+Graham Knop <haarg@haarg.org>
+
+=item *
+
+Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Logan <loganbell@gmail.com>
+
+=item *
+
+Mickey <mickey75@gmail.com>
+
+=item *
+
+Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+reneeb <github@renee-baecker.de>
+
+=item *
+
+SineSwiper <BBYRD@CPAN.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

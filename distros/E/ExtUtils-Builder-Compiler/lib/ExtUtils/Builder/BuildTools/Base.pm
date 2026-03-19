@@ -1,5 +1,5 @@
 package ExtUtils::Builder::BuildTools::Base;
-$ExtUtils::Builder::BuildTools::Base::VERSION = '0.035';
+$ExtUtils::Builder::BuildTools::Base::VERSION = '0.036';
 use strict;
 use warnings;
 
@@ -69,7 +69,7 @@ sub add_methods {
 	});
 
 	for my $name (qw/object_file library_file static_library_file loadable_file executable_file/) {
-		my $format = $opts{$name} // croak "No known extension for $name";
+		my $format = delete $opts{$name} // croak "No known extension for $name";
 		$planner->add_delegate($name, sub {
 			my ($planner, $file, $dir) = @_;
 			my $filename = sprintf $format, $file;
@@ -94,7 +94,7 @@ ExtUtils::Builder::BuildTools::Base - A base class for BuildTools implementation
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Key::ExtPublic;
-$Bitcoin::Crypto::Key::ExtPublic::VERSION = '4.003';
+$Bitcoin::Crypto::Key::ExtPublic::VERSION = '4.004';
 use v5.14;
 use warnings;
 

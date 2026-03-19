@@ -1,9 +1,12 @@
 use 5.004005;    #Devel::CheckLib
 use ExtUtils::MakeMaker;
-use lib qw(inc);
+use lib './inc';
 use Devel::CheckLib;
+use File::ShareDir::Install;
+install_share dist => 'share';
 
 use Config;
+use File::Spec;
 
 $expat_libpath = $ENV{EXPATLIBPATH} || '';
 $expat_incpath = $ENV{EXPATINCPATH} || '';
@@ -18,8 +21,22 @@ foreach (@ARGV) {
         else {
             $expat_incpath = $2;
         }
-
-        #push(@replacement_args, "$1=$2");
+    }
+    elsif (/^LIBS=(.+)/) {
+        # Support standard EUMM LIBS option: extract -L paths for expat detection
+        my $libs_val = $1;
+        if ( !$expat_libpath && $libs_val =~ /-L(\S+)/ ) {
+            $expat_libpath = $1;
+        }
+        push( @replacement_args, $_ );
+    }
+    elsif (/^INC=(.+)/) {
+        # Support standard EUMM INC option: extract -I paths for expat detection
+        my $inc_val = $1;
+        if ( !$expat_incpath && $inc_val =~ /-I(\S+)/ ) {
+            $expat_incpath = $1;
+        }
+        push( @replacement_args, $_ );
     }
     else {
         push( @replacement_args, $_ );
@@ -27,6 +44,42 @@ foreach (@ARGV) {
 }
 
 @ARGV = @replacement_args;
+
+# --- Try to auto-detect expat via pkg-config or multiarch (GH#83 & GH#69) ---
+if ( !$expat_libpath && !$expat_incpath ) {
+    my $pkg_config = $ENV{PKG_CONFIG} || 'pkg-config';
+    my $devnull    = File::Spec->devnull;
+
+    # 1. Try comprehensive pkg-config search for headers and libs
+    if ( my $pc_cflags = `$pkg_config --cflags expat 2>$devnull` ) {
+        $expat_incpath = $1 if $pc_cflags =~ /-I(\S+)/;
+    }
+
+    if ( my $pc_libs = `$pkg_config --libs expat 2>$devnull` ) {
+        $expat_libpath = $1 if $pc_libs =~ /-L(\S+)/;
+    }
+
+    # 2. Fallback: If libpath is still empty and not on Windows, try specialized paths
+    if ( !$expat_libpath && $^O ne 'MSWin32' ) {
+        # Check specific libdir variable from pkg-config
+        chomp( my $libdir = `$pkg_config --variable=libdir expat 2>$devnull` || '' );
+
+        if ( $libdir && -d $libdir ) {
+            $expat_libpath = $libdir;
+        }
+        else {
+            # Last resort: Debian/Ubuntu multiarch fallback
+            chomp( my $multiarch = `gcc -print-multiarch 2>$devnull` || '' );
+            my $multiarch_path = "/usr/lib/$multiarch";
+
+            if ( $multiarch && -d $multiarch_path ) {
+                if ( -f "$multiarch_path/libexpat.so" || -f "$multiarch_path/libexpat.a" ) {
+                    $expat_libpath = $multiarch_path;
+                }
+            }
+        }
+    }
+}
 
 unless (
     check_lib(    # fill in what you prompted the user for here
@@ -47,15 +100,25 @@ Or you can download expat from:
 http://sourceforge.net/projects/expat/
 
 If expat is installed, but in a non-standard directory, then use the
-following options to Makefile.PL:
+standard ExtUtils::MakeMaker options to Makefile.PL:
 
-    EXPATLIBPATH=...  To set the directory in which to find libexpat
+    INC=-I/home/me/include    To set the directory in which to find expat.h
 
-    EXPATINCPATH=...  To set the directory in which to find expat.h
+    LIBS="-L/home/me/lib -lexpat"  To set the directory in which to find libexpat
 
 For example:
 
+    perl Makefile.PL INC=-I/home/me/include LIBS="-L/home/me/lib -lexpat"
+
+The legacy EXPATLIBPATH and EXPATINCPATH options are also supported:
+
     perl Makefile.PL EXPATLIBPATH=/home/me/lib EXPATINCPATH=/home/me/include
+
+If expat is installed and pkg-config is available, you can also set:
+
+    export PKG_CONFIG_PATH=/path/to/expat/lib/pkgconfig
+
+and Makefile.PL will use pkg-config to find expat automatically.
 
 Note that if you build against a shareable library in a non-standard location
 you may (on some platforms) also have to set your LD_LIBRARY_PATH environment
@@ -73,6 +136,11 @@ if ( not $expat_libpath and $] >= 5.006001 and $^O ne 'MSWin32' ) {
     ($expat_libpath) = ExtUtils::Liblist->ext('-lexpat');
 }
 
+# Propagate resolved paths to Expat/Makefile.PL via environment
+# (subdirectory Makefile.PLs run as separate processes)
+$ENV{EXPATLIBPATH} = $expat_libpath if $expat_libpath;
+$ENV{EXPATINCPATH} = $expat_incpath if $expat_incpath;
+
 # Don't try to descend into Expat directory for testing
 
 sub MY::test {
@@ -82,6 +150,12 @@ sub MY::test {
     my $ret  = $self->MM::test(@_);
     $self->{DIR} = $hold if defined($hold);
     $ret;
+}
+
+sub MY::postamble {
+    my $self = shift;
+    my @ret  = File::ShareDir::Install::postamble($self);
+    return join "\n", @ret;
 }
 
 my @extras = ();
@@ -101,8 +175,15 @@ WriteMakefile1(
     MIN_PERL_VERSION => '5.00405',
     META_MERGE       => {
         resources => {
-            bugtracker => 'https://github.com/toddr/XML-Parser/issues',
-            repository => 'http://github.com/toddr/XML-Parser',
+            bugtracker => 'https://github.com/cpan-authors/XML-Parser/issues',
+            repository => 'https://github.com/cpan-authors/XML-Parser',
+        },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'LWP::UserAgent' => 0,
+                },
+            },
         },
     },
     TEST_REQUIRES => {
@@ -112,10 +193,15 @@ WriteMakefile1(
 
     NAME         => 'XML::Parser',
     DIR          => [qw(Expat)],
+    clean        => { FILES => 'assertlib*' },
     dist         => { COMPRESS => 'gzip', SUFFIX => '.gz' },
     VERSION_FROM => 'Parser.pm',
-    PREREQ_PM    => {
-        'LWP::UserAgent' => 0,    #for tests
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker'     => 0,
+        'File::ShareDir::Install' => '0.06',
+    },
+    PREREQ_PM => {
+        'File::ShareDir' => 0,
     },
     $^O =~ /win/i
     ? (

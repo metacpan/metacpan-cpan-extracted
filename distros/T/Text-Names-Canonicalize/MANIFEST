@@ -1,0 +1,31 @@
+bin/text-names-canonicalize
+Changes
+cpanfile
+lib/Text/Names/Canonicalize.pm
+lib/Text/Names/Canonicalize/Rules.pm
+lib/Text/Names/Canonicalize/Rules/base.yaml
+lib/Text/Names/Canonicalize/Rules/de_DE.yaml
+lib/Text/Names/Canonicalize/Rules/en_GB.yaml
+lib/Text/Names/Canonicalize/Rules/en_US.yaml
+lib/Text/Names/Canonicalize/Rules/fr_FR.yaml
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/basic-normalization.t
+t/classify.t
+t/cli.t
+t/de_DE.t
+t/en_GB.t
+t/en_US.t
+t/eof.t
+t/eol.t
+t/fr_FR.t
+t/local-aware-parts.t
+t/parts.t
+t/schema-validation.t
+t/tokenizer.t
+t/user-rules.t
+t/yaml-valid.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

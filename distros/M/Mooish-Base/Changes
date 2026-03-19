@@ -1,5 +1,11 @@
 Revision history for Mooish-Base
 
+1.005 - 2026-03-15
+	- Hotfix failing tests
+
+1.004 - 2026-03-15
+	- XSConstructor extra modules are no longer used by default when available
+
 1.003 - 2026-01-22
 	- Added $Mooish::Base::DEBUG variable which allows debugging
 	- Added MOOISH_BASE_EXTRA_MODULES environmental variable to control used extra modules

@@ -1,0 +1,289 @@
+#!/usr/bin/env perl
+# Copyright (c) 2025 SignalWire
+# Licensed under the MIT License.
+#
+# swaig-test - CLI tool for testing SWAIG agent endpoints
+#
+# Usage:
+#   swaig-test --url http://user:pass@host:port/route --dump-swml
+#   swaig-test --url http://user:pass@host:port/route --list-tools
+#   swaig-test --url http://user:pass@host:port/route --exec tool_name --param key=value
+#
+
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON ();
+use HTTP::Tiny;
+use URI;
+use MIME::Base64 qw(encode_base64);
+
+my $VERSION = '1.0.0';
+
+# --- Parse CLI options ---
+my ($url, $dump_swml, $list_tools, $exec_name, @params, $raw, $verbose, $help);
+
+GetOptions(
+    'url=s'       => \$url,
+    'dump-swml'   => \$dump_swml,
+    'list-tools'  => \$list_tools,
+    'exec=s'      => \$exec_name,
+    'param=s@'    => \@params,
+    'raw'         => \$raw,
+    'verbose'     => \$verbose,
+    'help|h'      => \$help,
+) or usage_exit();
+
+if ($help) {
+    usage_exit(0);
+}
+
+unless ($url) {
+    print STDERR "Error: --url is required\n\n";
+    usage_exit(1);
+}
+
+unless ($dump_swml || $list_tools || $exec_name) {
+    print STDERR "Error: one of --dump-swml, --list-tools, or --exec NAME is required\n\n";
+    usage_exit(1);
+}
+
+# --- Parse URL and extract auth ---
+my $uri = URI->new($url);
+my $userinfo = $uri->userinfo // '';
+my ($auth_user, $auth_pass) = split(/:/, $userinfo, 2);
+
+# Build base URL without credentials
+my $clean_uri = $uri->clone;
+$clean_uri->userinfo(undef);
+my $base_url = $clean_uri->as_string;
+
+# Remove trailing slash
+$base_url =~ s{/$}{};
+
+my $http = HTTP::Tiny->new(timeout => 30);
+
+# --- Execute the requested operation ---
+
+if ($dump_swml) {
+    do_dump_swml();
+}
+elsif ($list_tools) {
+    do_list_tools();
+}
+elsif ($exec_name) {
+    do_exec($exec_name);
+}
+
+exit 0;
+
+# ============================================================
+# Operations
+# ============================================================
+
+sub do_dump_swml {
+    my $response = http_get($base_url);
+    if ($raw) {
+        print $response->{content};
+        print "\n" unless $response->{content} =~ /\n$/;
+    } else {
+        my $data = eval { JSON::decode_json($response->{content}) };
+        if ($@) {
+            die "Error: Failed to parse JSON response: $@\n";
+        }
+        print JSON->new->utf8->pretty->canonical->encode($data);
+    }
+}
+
+sub do_list_tools {
+    my $response = http_get($base_url);
+    my $data = eval { JSON::decode_json($response->{content}) };
+    if ($@) {
+        die "Error: Failed to parse JSON response: $@\n";
+    }
+
+    # Extract SWAIG functions from the SWML document
+    my @functions;
+
+    # Navigate the SWML structure to find AI verb functions
+    if (my $sections = $data->{sections}) {
+        for my $section_name (keys %$sections) {
+            my $verbs = $sections->{$section_name};
+            next unless ref $verbs eq 'ARRAY';
+            for my $verb (@$verbs) {
+                if (ref $verb eq 'HASH' && exists $verb->{ai}) {
+                    my $ai = $verb->{ai};
+                    if (my $swaig = $ai->{SWAIG}) {
+                        if (my $funcs = $swaig->{functions}) {
+                            push @functions, @$funcs;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (!@functions) {
+        print "No SWAIG functions found.\n";
+        return;
+    }
+
+    if ($raw) {
+        for my $f (@functions) {
+            printf "%s\t%s\n", $f->{function} // 'unnamed', $f->{description} // '';
+        }
+    } else {
+        printf "Found %d SWAIG function(s):\n\n", scalar @functions;
+        for my $f (@functions) {
+            my $name = $f->{function} // 'unnamed';
+            my $desc = $f->{description} // '(no description)';
+            printf "  %-30s %s\n", $name, $desc;
+
+            # Show parameters if any
+            if (my $params_schema = $f->{parameters}) {
+                if (my $props = $params_schema->{properties}) {
+                    my $required = $params_schema->{required} // [];
+                    my %required_map = map { $_ => 1 } @$required;
+                    for my $pname (sort keys %$props) {
+                        my $ptype = $props->{$pname}{type} // 'any';
+                        my $pdesc = $props->{$pname}{description} // '';
+                        my $req_marker = $required_map{$pname} ? '*' : ' ';
+                        printf "    %s %-20s %-10s %s\n", $req_marker, $pname, "($ptype)", $pdesc;
+                    }
+                }
+            }
+            print "\n";
+        }
+    }
+}
+
+sub do_exec {
+    my ($func_name) = @_;
+
+    # Parse --param key=value pairs
+    my %args;
+    for my $p (@params) {
+        if ($p =~ /^([^=]+)=(.*)$/) {
+            $args{$1} = $2;
+        } else {
+            die "Error: Invalid --param format '$p'. Use key=value\n";
+        }
+    }
+
+    my $swaig_url = $base_url . '/swaig';
+
+    my $payload = {
+        function  => $func_name,
+        argument  => {
+            parsed => [ \%args ],
+        },
+    };
+
+    my $json_body = JSON::encode_json($payload);
+
+    if ($verbose) {
+        print STDERR ">>> POST $swaig_url\n";
+        print STDERR ">>> Body: $json_body\n";
+    }
+
+    my $response = http_post($swaig_url, $json_body);
+
+    if ($verbose) {
+        print STDERR "<<< Status: $response->{status}\n";
+        print STDERR "<<< Body: $response->{content}\n";
+    }
+
+    if ($raw) {
+        print $response->{content};
+        print "\n" unless $response->{content} =~ /\n$/;
+    } else {
+        my $data = eval { JSON::decode_json($response->{content}) };
+        if ($@) {
+            print $response->{content};
+            print "\n" unless $response->{content} =~ /\n$/;
+        } else {
+            print JSON->new->utf8->pretty->canonical->encode($data);
+        }
+    }
+}
+
+# ============================================================
+# HTTP helpers
+# ============================================================
+
+sub _auth_headers {
+    my %headers;
+    if (defined $auth_user && defined $auth_pass) {
+        my $encoded = encode_base64("$auth_user:$auth_pass", '');
+        $headers{Authorization} = "Basic $encoded";
+    }
+    return %headers;
+}
+
+sub http_get {
+    my ($target_url) = @_;
+    my %headers = _auth_headers();
+
+    if ($verbose) {
+        print STDERR ">>> GET $target_url\n";
+    }
+
+    my $response = $http->get($target_url, { headers => \%headers });
+
+    if ($verbose) {
+        print STDERR "<<< Status: $response->{status}\n";
+    }
+
+    unless ($response->{success}) {
+        die sprintf("Error: HTTP %s %s\n%s\n",
+            $response->{status}, $response->{reason}, $response->{content} // '');
+    }
+
+    return $response;
+}
+
+sub http_post {
+    my ($target_url, $body) = @_;
+    my %headers = _auth_headers();
+    $headers{'Content-Type'} = 'application/json';
+
+    my $response = $http->post($target_url, {
+        headers => \%headers,
+        content => $body,
+    });
+
+    unless ($response->{success}) {
+        die sprintf("Error: HTTP %s %s\n%s\n",
+            $response->{status}, $response->{reason}, $response->{content} // '');
+    }
+
+    return $response;
+}
+
+sub usage_exit {
+    my ($code) = @_;
+    $code //= 1;
+    print STDERR <<'USAGE';
+swaig-test - CLI tool for testing SWAIG agent endpoints
+
+Usage:
+  swaig-test --url URL [OPTIONS]
+
+Options:
+  --url URL           Agent URL with embedded auth (http://user:pass@host:port/route)
+  --dump-swml         Fetch and display the SWML document
+  --list-tools        List available SWAIG functions
+  --exec NAME         Execute a SWAIG function by name
+  --param key=value   Parameter for --exec (repeatable)
+  --raw               Output compact JSON (no pretty-printing)
+  --verbose           Show request/response details on stderr
+  --help, -h          Show this help message
+
+Examples:
+  swaig-test --url http://user:pass@localhost:3000/ --dump-swml
+  swaig-test --url http://user:pass@localhost:3000/ --list-tools
+  swaig-test --url http://user:pass@localhost:3000/ --exec get_weather --param location=London
+  swaig-test --url http://user:pass@localhost:3000/ --exec get_weather --param location=London --raw
+USAGE
+    exit $code;
+}
