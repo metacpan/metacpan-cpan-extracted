@@ -1,3 +1,8 @@
+0.56.7 2026-03-19 17:46:23 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - protect $self->controller->runEventActions('changeConfig'); in
+   GuiPlugin/Abstract.pm from missing controller case
+
 0.56.6 2025-11-04 15:41:29 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
   - complete fr.po and it.po files

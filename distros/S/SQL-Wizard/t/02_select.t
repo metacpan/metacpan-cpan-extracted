@@ -129,4 +129,24 @@ my $q = SQL::Wizard->new;
   like $sql, qr/WINDOW w AS \(PARTITION BY department ORDER BY salary DESC\)/, 'window definition';
 }
 
+# empty having clause omitted
+{
+  my ($sql, @bind) = $q->select(
+    -columns  => ['department', $q->func('COUNT', '*')->as('cnt')],
+    -from     => 'employees',
+    -group_by => 'department',
+    -having   => {},
+  )->to_sql;
+  unlike $sql, qr/HAVING/, 'empty having omitted';
+}
+{
+  my ($sql, @bind) = $q->select(
+    -columns  => ['department', $q->func('COUNT', '*')->as('cnt')],
+    -from     => 'employees',
+    -group_by => 'department',
+    -having   => [],
+  )->to_sql;
+  unlike $sql, qr/HAVING/, 'empty arrayref having omitted';
+}
+
 done_testing;

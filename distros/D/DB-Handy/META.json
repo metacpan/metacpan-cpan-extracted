@@ -1,0 +1,99 @@
+{
+    "name" : "DB-Handy",
+    "version" : "1.00",
+    "abstract" : "Pure-Perl flat-file relational database with DBI-like interface",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/DB-Handy/issues"
+        },
+        "repository" : {
+            "url"  : "https://github.com/ina-cpan/DB-Handy",
+            "web"  : "https://github.com/ina-cpan/DB-Handy",
+            "type" : "git"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Fcntl" : "1.03",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "POSIX" : "0",
+                "constant" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "Fcntl" : "1.03",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "POSIX" : "0",
+                "constant" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Fcntl" : "1.03",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "POSIX" : "0",
+                "constant" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Fcntl" : "1.03",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "POSIX" : "0",
+                "constant" : "0",
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        }
+    },
+    "provides" : {
+        "DB::Handy" : {
+            "file" : "lib/DB/Handy.pm",
+            "version" : "1.00"
+        },
+        "DB::Handy::Connection" : {
+            "file" : "lib/DB/Handy.pm",
+            "version" : "1.00"
+        },
+        "DB::Handy::Statement" : {
+            "file" : "lib/DB/Handy.pm",
+            "version" : "1.00"
+        }
+    }
+}

@@ -41,6 +41,12 @@
          }
       }
    },
+   "provides" : {
+      "SQL::Wizard" : {
+         "file" : "lib/SQL/Wizard.pm",
+         "version" : "0.03"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "repository" : {
@@ -49,6 +55,6 @@
          "web" : "https://github.com/thomasbusch/perl-SQL-Wizard"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

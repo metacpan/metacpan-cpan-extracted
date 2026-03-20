@@ -580,7 +580,7 @@ sub setConfigValue {
     my $value = shift;
     # warn "SET $key -> ".Dumper([$value]);
     $self->dbHandle->setConfigValue($key,encode_json([$value]));
-    if ($self->controller->can('runEventActions')){
+    if ($self->controller and $self->controller->can('runEventActions')){
         $self->controller->runEventActions('changeConfig');
     }
     return $value;

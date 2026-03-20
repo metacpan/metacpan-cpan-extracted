@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodResourceClaim;
 # ABSTRACT: PodResourceClaim references exactly one ResourceClaim, either directly or by naming a ResourceClaimTemplate which is then turned into a ResourceClaim for the pod. It adds a name to it that uniquely identifies the ResourceClaim inside the Pod. Containers that need access to the ResourceClaim reference it with this name.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s name => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::PodResourceClaim - PodResourceClaim references exactly o
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 name
 
@@ -73,13 +73,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

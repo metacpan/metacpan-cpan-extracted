@@ -2070,6 +2070,24 @@ XML_ErrorString(code)
 	ST(0) = sv_newmortal();
 	sv_setpv((SV*)ST(0), ret);
 
+void
+XML_ExpatVersion()
+    PPCODE:
+	const XML_LChar *ver = XML_ExpatVersion();
+	XPUSHs(sv_2mortal(newSVpv((const char *)ver, 0)));
+
+void
+XML_ExpatVersionInfo()
+    PPCODE:
+	XML_Expat_Version info = XML_ExpatVersionInfo();
+	EXTEND(SP, 6);
+	PUSHs(sv_2mortal(newSVpv("major", 5)));
+	PUSHs(sv_2mortal(newSViv(info.major)));
+	PUSHs(sv_2mortal(newSVpv("minor", 5)));
+	PUSHs(sv_2mortal(newSViv(info.minor)));
+	PUSHs(sv_2mortal(newSVpv("micro", 5)));
+	PUSHs(sv_2mortal(newSViv(info.micro)));
+
 SV *
 XML_LoadEncoding(data, size)
 	char *				data
@@ -2319,6 +2337,34 @@ XML_SetBillionLaughsAttackProtectionActivationThreshold(parser, threshold)
 	unsigned long			threshold
     CODE:
 	RETVAL = (int) XML_SetBillionLaughsAttackProtectionActivationThreshold(
+	    parser, (unsigned long long) threshold);
+    OUTPUT:
+	RETVAL
+
+#endif
+
+#if defined(XML_MAJOR_VERSION) \
+    && (XML_MAJOR_VERSION > 2 \
+        || (XML_MAJOR_VERSION == 2 \
+            && (XML_MINOR_VERSION > 7 \
+                || (XML_MINOR_VERSION == 7 && XML_MICRO_VERSION >= 2))))
+
+int
+XML_SetAllocTrackerMaximumAmplification(parser, maxamp)
+	XML_Parser			parser
+	float				maxamp
+    CODE:
+	RETVAL = (int) XML_SetAllocTrackerMaximumAmplification(
+	    parser, maxamp);
+    OUTPUT:
+	RETVAL
+
+int
+XML_SetAllocTrackerActivationThreshold(parser, threshold)
+	XML_Parser			parser
+	unsigned long			threshold
+    CODE:
+	RETVAL = (int) XML_SetAllocTrackerActivationThreshold(
 	    parser, (unsigned long long) threshold);
     OUTPUT:
 	RETVAL

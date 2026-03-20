@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.4.0
+## Version v0.4.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2025/11/02
+## Modified 2026/03/19
 ## All rights reserved
 ## 
 ## 
@@ -55,7 +55,7 @@ BEGIN
     use Scalar::Util;
     use URI;
     use URI::Escape;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -80,6 +80,8 @@ my $methods_bit_to_name =
     (Apache2::Const->can('M_LOCK')        ? (Apache2::Const::M_LOCK()        => 'LOCK')        : ()),
     (Apache2::Const->can('M_UNLOCK')      ? (Apache2::Const::M_UNLOCK()      => 'UNLOCK')      : ()),
 };
+
+my $json_ctypes_re = qr{\Aapplication/(?:[a-zA-Z][\w\-]+\+)?json\z}i;
 
 sub init
 {
@@ -138,7 +140,7 @@ sub init
         # An error occurred while reading the payload, because even empty, data would return an empty string.
         return( $self->pass_error ) if( !defined( $payload ) );
         if( defined( $ctype ) && 
-            $ctype eq 'application/json' && 
+            $ctype =~ $json_ctypes_re && 
             CORE::length( $payload ) )
         {
             my $json_data = '';
@@ -241,6 +243,13 @@ sub allow_methods_list
 sub allow_options { return( shift->_try( 'request', 'allow_options', @_ ) ); }
 
 sub allow_overrides { return( shift->_try( 'request', 'allow_overrides', @_ ) ); }
+
+{
+    # A nice alias
+    # NOTE: sub apache
+    no warnings 'once';
+    *apache = \&request;
+}
 
 # APR::Request::Apache2->handle( $r );
 sub apr { return( shift->_set_get_object( { field => 'apr', no_init => 1 }, 'APR::Request', @_ ) ); }
@@ -563,20 +572,20 @@ sub decode
     return( APR::Request::decode( shift( @_ ) ) );
 }
 
+sub discard_request_body { return( shift->_try( 'request', 'discard_request_body' ) ); }
+
 # Do not track: 1 or 0
 sub dnt { return( shift->env( 'HTTP_DNT', @_ ) ); }
+
+sub document_root { return( shift->_try( 'request', 'document_root', @_ ) ); }
+
+sub document_uri { return( shift->env( 'document_uri', @_ ) ); }
 
 sub encode
 {
     my $self = shift( @_ );
     return( APR::Request::encode( shift( @_ ) ) );
 }
-
-sub discard_request_body { return( shift->_try( 'request', 'discard_request_body' ) ); }
-
-sub document_root { return( shift->_try( 'request', 'document_root', @_ ) ); }
-
-sub document_uri { return( shift->env( 'document_uri', @_ ) ); }
 
 sub env
 {
@@ -634,6 +643,22 @@ sub get_status_line { return( shift->_try( 'request', 'get_status_line', @_ ) );
 sub global_request { return( Apache2::RequestUtil->request ); }
 
 sub has_auth { return( shift->_try( 'request', 'some_auth_required' ) ); }
+
+sub header
+{
+    my $self = shift( @_ );
+    return( $self->error( "No header field name was provided to set or retrieve its value." ) ) if( !scalar( @_ ) );
+    my $field = shift( @_ );
+    my $hdrs  = $self->headers || return( $self->pass_error );
+    if( scalar( @_ ) > 1 )
+    {
+        return( $hdrs->set( "$field" => @_ ) );
+    }
+    else
+    {
+        return( $hdrs->get( "$field" ) );
+    }
+}
 
 sub header_only { return( shift->request->header_only ); }
 
@@ -736,7 +761,7 @@ sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_ena
 
 sub is_initial_req { return( shift->_try( 'request', 'is_initial_req', @_ ) ); }
 
-sub is_secure { return( shift->env( 'HTTPS' ) eq 'on' ? 1 : 0 ); }
+sub is_secure { return( ( shift->env( 'HTTPS' ) // '' ) eq 'on' ? 1 : 0 ); }
 
 sub json
 {
@@ -1049,6 +1074,11 @@ sub redirect_status { return( shift->env( 'REDIRECT_STATUS', @_ ) ); }
 sub redirect_url { return( shift->env( 'REDIRECT_URL', @_ ) ); }
 
 sub referer { return( shift->headers->{Referer} ); }
+
+{
+    no warnings 'once';
+    *referrer = \&referer;
+}
 
 # sub remote_addr { return( shift->connection->remote_ip ); }
 sub remote_addr
@@ -1397,11 +1427,14 @@ sub uri
 {
     my $self = shift( @_ );
     my $r = $self->request;
-    my $host = $r->get_server_name;
+    # my $host = $r->get_server_name;
+    my $host = $r->hostname;
     my $port = $r->get_server_port;
     my $proto = ( $port == 443 ) ? 'https' : 'http';
     my $path = $r->unparsed_uri;
-    return( URI->new( "${proto}://${host}:${port}${path}" ) );
+    # The port is superfluous, and even annoying
+    # return( URI->new( "${proto}://${host}:${port}${path}" ) );
+    return( URI->new( "${proto}://${host}${path}" ) );
 }
 
 sub url_decode { return( shift->decode( @_ ) ); }
@@ -1807,7 +1840,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -2045,6 +2078,10 @@ which corresponds to the default value (if not set) for Apache 2.2.
 
 See also L<https://httpd.apache.org/docs/2.4/en/mod/core.html#allowoverride>
 
+=head2 apache
+
+This is an alias for L</request>. It returns an L<RequestRec> object.
+
 =head2 apr
 
 Returns a L<Apache2::API::Request::Param> object used to access Apache mod_perl methods to manipulate request data.
@@ -2180,6 +2217,14 @@ This would be C<Apache2::Const::OK> if the password value is set (and assured a 
 =back
 
 Note that if C<AuthType> is not set, L<Apache2::Access/get_basic_auth_pw> first sets it to C<Basic>.
+
+=head2 basic_auth_pw
+
+This is an alias for L</basic_auth_passwd>
+
+=head2 basic_auth_pwd
+
+This is an alias for L</basic_auth_passwd>
 
 =head2 body
 
@@ -2569,6 +2614,12 @@ Check if any authentication is required for the current request, by calling L<Ap
 It returns a boolean value.
 
 See also L</is_auth_required>, which is an alias of this method.
+
+=head2 header
+
+When provided with just one argument, it will return the value for the given header field.
+
+When provided with 2 arguments, it will set the value for the given header field.
 
 =head2 headers
 
@@ -3303,6 +3354,10 @@ Gets or sets the value for the environment variable C<REQUEST_URI>
 Returns the value of the HTTP C<Referer> header, if any.
 
 See also L</headers>
+
+=head2 referrer
+
+This is an alias for L</referer>
 
 =head2 remote_addr
 

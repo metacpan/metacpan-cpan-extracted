@@ -1,5 +1,41 @@
 Revision history for Perl extension IO::Stty
 
+0.05 Wed Mar 19 2026
+
+  Bug fixes:
+   - Fix broken single-arg baud rate setting. Passing a numeric rate like
+     "9600" as the sole argument now correctly sets both ispeed and ospeed.
+     The single-arg code path had two independent if/else blocks instead of
+     one if/elsif chain, so the baud rate was silently never applied. (PR #11)
+   - Replace unsafe symbolic dereference &{"POSIX::B" . $input} in the
+     ospeed/ispeed handlers with a static %BAUD_RATES hash lookup. The old
+     pattern was dead code in all public releases (use strict prevented it
+     from running) but is now properly fixed. Unknown rates produce a
+     warning instead of dying. (PR #7, PR #11)
+
+  Improvements:
+   - Add modern baud rates B57600, B115200, and B230400 with eval guards
+     for platforms that lack them. (PR #9)
+   - Render control characters in hat notation (e.g. ^C, ^D) in -a
+     output instead of raw numeric values. (PR #8)
+   - Add special character value parsing for stty(): accept hat notation
+     (^C), hexadecimal (0x03), octal (003), decimal, and single literal
+     characters when setting control char values. (PR #6)
+
+  Maintenance:
+   - Add functional pty-based test suite using IO::Pty covering flag
+     toggling, -g/-a roundtrips, raw/cooked/sane modes, baud rate setting,
+     and control character assignment. (PR #10)
+   - Add baud rate regression tests with a decoy-function guard against
+     reintroduction of symbolic dereference. (PR #7)
+   - Modernize CI: replace three separate workflow files with unified
+     testsuite.yml using current GitHub Actions. (GH #12, PR #13)
+   - Update stale GitHub URLs (http to https) and modernize CPAN metadata
+     to META spec v2 with TEST_REQUIRES. (PR #14)
+   - Add cpanfile for CI dependency management.
+   - Re-generate README from Stty.pm.
+   - Apply Perl::Tidy formatting.
+
 0.04 Sat Jan 18 2020
    - Switch to EU::MM
    - Address a few deficiencies in the way how the stty() sub processes its arguments

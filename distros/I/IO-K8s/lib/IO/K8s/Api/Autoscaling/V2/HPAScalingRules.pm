@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::HPAScalingRules;
 # ABSTRACT: HPAScalingRules configures the scaling behavior for one direction. These Rules are applied after calculating DesiredReplicas from metrics for the HPA. They can limit the scaling velocity by specifying scaling policies. They can prevent flapping by specifying the stabilization window, so that the number of replicas is not set instantly, instead, the safest value from the stabilization window is chosen.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s policies => ['Autoscaling::V2::HPAScalingPolicy'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Autoscaling::V2::HPAScalingRules - HPAScalingRules configures the 
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 policies
 
@@ -65,13 +65,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

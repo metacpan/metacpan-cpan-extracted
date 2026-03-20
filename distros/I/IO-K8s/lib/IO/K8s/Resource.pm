@@ -1,6 +1,6 @@
 package IO::K8s::Resource;
 # ABSTRACT: Base class for all Kubernetes resources
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use v5.10;
 use Moo ();
 use Moo::Role ();
@@ -202,7 +202,12 @@ sub _k8s {
 
     # Call Moo's has — use init_arg to map JSON key to Perl-safe attribute name
     my $has = $caller->can('has');
-    $has->($attr_name, is => 'rw', isa => $isa,
+    my @coerce;
+    # Bool attributes: coerce \0/\1 refs and JSON booleans to plain 0/1
+    if ($info{is_bool}) {
+        @coerce = (coerce => sub { ref $_[0] ? (${$_[0]} ? 1 : 0) : ($_[0] ? 1 : 0) });
+    }
+    $has->($attr_name, is => 'rw', isa => $isa, @coerce,
         ($required ? (required => 1) : ()),
         ($attr_name ne $json_key ? (init_arg => $json_key) : ()),
     );
@@ -222,7 +227,7 @@ IO::K8s::Resource - Base class for all Kubernetes resources
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -296,13 +301,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

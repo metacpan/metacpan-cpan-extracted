@@ -2,7 +2,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 2020-2022 Best Practical Solutions, LLC
+# This software is Copyright (c) 2020-2026 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -52,7 +52,7 @@ package App::wsgetmail;
 
 use Moo;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -395,6 +395,29 @@ string in your wsgetmail configuration file.
 
 Set this to the password string for C<username> in your wsgetmail
 configuration file.
+
+=back
+
+=head3 Configuring Microsoft Government Cloud
+
+If you are connecting to a Microsoft Government Cloud tenant (GCC High or
+DoD), the default Microsoft Graph API and OAuth endpoints will not work. Use
+the following options to point wsgetmail at the correct endpoints.
+
+=over 4
+
+=item resource_url
+
+Set this to the Microsoft Graph API base URL for your cloud environment.
+The default is C<https://graph.microsoft.com/>. For GCC High, use
+C<https://graph.microsoft.us/>. For DoD, use
+C<https://dod-graph.microsoft.us/>.
+
+=item login_base_url
+
+Set this to the base URL for OAuth authentication. The default is
+C<https://login.windows.net>. For GCC High and DoD, use
+C<https://login.microsoftonline.us>.
 
 =back
 

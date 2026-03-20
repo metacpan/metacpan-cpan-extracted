@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::StatusDetails;
 # ABSTRACT: StatusDetails is a set of additional properties that MAY be set by the server to provide additional information about a response. The Reason field of a Status object defines what attributes will be set. Clients must ignore fields that do not match the defined type of each attribute, and should assume that any attribute may be empty, invalid, or under defined.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s causes => ['Meta::V1::StatusCause'];
@@ -35,7 +35,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::StatusDetails - StatusDetails is a s
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 causes
 
@@ -86,13 +86,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

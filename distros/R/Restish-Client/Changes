@@ -1,0 +1,16 @@
+Revision history for Restish-Client
+
+1.0     2025-12-04
+        - Initial CPAN release
+        - Basic REST client functionality with Moo-based interface
+        - Support for GET, POST, PUT, DELETE, PATCH, LIST methods
+        - URI templating with Text::Sprintf::Named
+        - Query and body parameter handling
+        - Custom header support with defaults
+        - SSL/TLS options support
+        - Cookie jar support (in-memory and persistent)
+        - Response code, header, and body accessors
+        - Debug mode with token trimming
+        - Raw body upload support for files
+        - Thin request interface for direct LWP access
+        - Comprehensive test suite

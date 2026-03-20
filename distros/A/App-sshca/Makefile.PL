@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.038000;
 
 use ExtUtils::MakeMaker;
 
@@ -17,12 +17,13 @@ my %WriteMakefileArgs = (
     "bin/sshca"
   ],
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.038000",
   "NAME" => "App::sshca",
   "PREREQ_PM" => {
+    "Syntax::Operator::In" => 0,
     "YAML::PP" => 0
   },
-  "VERSION" => "0.0.5",
+  "VERSION" => "0.0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,6 +31,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Syntax::Operator::In" => 0,
   "YAML::PP" => 0
 );
 

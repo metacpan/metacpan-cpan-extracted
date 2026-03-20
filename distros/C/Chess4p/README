@@ -1,0 +1,58 @@
+Chess4p
+
+A chess library inspired by the high quality Python module python-chess.
+
+Features include
+
+* Legal moves
+* Board state handling
+* Perft testing
+* UCI move format
+
+Planned enhancements
+
+* SAN move input/output
+* PGN parsing
+
+Only 64-bit systems are supported, due to heavy use of the 'bitboard' data type.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Chess4p
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Chess4p
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Chess4p
+
+    Search CPAN
+        https://metacpan.org/release/Chess4p
+
+    Codeberg:
+        https://codeberg.org/ejner/chess4p
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by Ejner Borgbjerg.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

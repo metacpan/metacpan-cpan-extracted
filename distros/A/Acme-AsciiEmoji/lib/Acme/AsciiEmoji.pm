@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter::Shiny;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 our %EMOJI;
 
@@ -275,6 +275,32 @@ BEGIN {
             239,   189, 165, 226, 148, 156, 226, 148,
             180,   226, 148, 172, 226, 148, 180
         ],
+	east_smile => [ # from here manipulated vim
+	    41, 41,
+	],
+	west_smile => [
+	    58, 41
+	],
+	bat => [
+	  47, 124, 92, 32, 94, 46, 95, 46,
+	  94, 32, 47, 124, 92
+	],
+	dollarbill => [
+	  91, 204, 178, 204, 133, 36, 204, 178,
+	  204, 133, 40, 204, 178, 204, 133, 206,
+	  185, 206, 191, 204, 178, 204, 133, 204,
+	  133, 41, 204, 178, 204, 133, 36, 204,
+	  178, 204, 133, 93
+	],
+	wizard => [
+	  226, 149, 176, 40, 32, 205, 161,
+	  194, 176, 32, 205, 156, 202, 150,
+	  32, 205, 161, 194, 176, 32, 41,
+	  227, 129, 164, 226, 148, 128,
+	  226, 148, 128, 226, 152, 134,
+	  42, 58, 227, 131, 187, 239, 190, 
+	  159 	  
+	]
     );
 }
 
@@ -287,7 +313,7 @@ Acme::AsciiEmoji - Emoji
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =cut
 
@@ -1177,6 +1203,60 @@ wall
 
 sub wall {
     return ascii_emoji('wall');
+}
+
+=head2 eastern smile
+
+))
+smile
+
+=cut
+
+sub east_smile {
+	return ascii_emoji('east_smile');
+}
+
+=head2 western smile
+
+:)
+smile
+
+=cut
+
+sub west_smile {
+	return ascii_emoji('west_smile');
+}
+
+=head2 bat
+
+/|\ ^._.^ /|\
+bat
+
+=cut
+
+sub bat {
+	return ascii_emoji('bat');
+}
+
+=head2 dollarbill
+
+[̲̅$̲̅(̲̅ιο̲̅̅)̲̅$̲̅]
+dollarbill
+
+=cut
+
+sub dollarbill {
+	return ascii_emoji('dollarbill');
+}
+
+=head2 wizard
+
+╰( ͡° ͜ʖ ͡° )つ──☆*:・ﾟ
+
+=cut
+
+sub wizard {
+	return ascii_emoji('wizard');
 }
 
 =head1 AUTHOR

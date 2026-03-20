@@ -1,39 +1,43 @@
-Revision history for GitHub-Config-SSH-UserData
+Revision history for distribution GitHub-Config-SSH-UserData
 
+0.09    2026-03-20
 
-0.08    2025/10/31
+      - Added and reorganized author and release tests.
+      - Completed POD.
 
-       - Corrected changlog
+0.08    2025-10-31
 
-0.07    2025/10/31
+      - Corrected changlog.
 
-       - Reworked Makefile.PL
-       - Minor fix in pod-spell.t
+0.07    2025-10-31
 
-0.06    2025/09/08
+      - Reworked Makefile.PL.
+      - Minor fix in pod-spell.t.
 
-       - Updated policy files.
+0.06    2025-09-08
 
-0.05    2025/09/03
+      - Updated policy files.
 
-        - Bugfix (wrong results with some versions of perl).
+0.05    2025-09-03
 
-0.04    2025/09/02
+      - Bugfix (wrong results with some versions of perl).
 
-        - allow localizing HOME before calling the function.
+0.04    2025-09-02
 
-0.03    2025/08/09
+      - allow localizing HOME before calling the function.
 
-        - Removed duplicate statement.
-        - Fixed Kwalitee issue prereq_matches_use.
-        - Corrected POD.
+0.03    2025-08-09
 
-0.02    2025/08/08
+      - Removed duplicate statement.
+      - Fixed Kwalitee issue prereq_matches_use.
+      - Corrected POD.
 
-        - Added parameter check.
-        - Completed POD.
+0.02    2025-08-08
 
-0.01    2025/07/24
+      - Added parameter check.
+      - Completed POD.
 
-        - First version, released on an unsuspecting world.
+0.01    2025-07-24
+
+      - First version, released on an unsuspecting world.
 

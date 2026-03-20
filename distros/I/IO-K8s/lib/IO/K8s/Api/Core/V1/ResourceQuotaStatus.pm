@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ResourceQuotaStatus;
 # ABSTRACT: ResourceQuotaStatus defines the enforced hard limits and observed use.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s hard => { Str => 1 };
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ResourceQuotaStatus - ResourceQuotaStatus defines the en
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 hard
 
@@ -58,13 +58,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

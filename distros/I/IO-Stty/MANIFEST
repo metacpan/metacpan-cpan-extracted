@@ -3,10 +3,17 @@ lib/IO/Stty.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-README
+README.md
 scripts/stty.pl
 t/00-load.t
+t/01-baud-rate.t
+t/01-cc-to-hat.t
+t/01-functional.t
+t/01-parse-char-value.t
+t/02-show-me-the-crap.t
+t/02-single-arg.t
 t/99-pod-coverage.t
 t/99-pod.t
+t/baud-rates.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

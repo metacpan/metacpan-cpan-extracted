@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1beta3::PolicyRulesWithSubjects;
 # ABSTRACT: PolicyRulesWithSubjects prescribes a test that applies to a request to an apiserver. The test considers the subject making the request, the verb being requested, and the resource to be acted upon. This PolicyRulesWithSubjects matches a request if and only if both (a) at least one member of subjects matches the request and (b) at least one member of resourceRules or nonResourceRules matches the request.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s nonResourceRules => ['Flowcontrol::V1beta3::NonResourcePolicyRule'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Flowcontrol::V1beta3::PolicyRulesWithSubjects - PolicyRulesWithSub
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 nonResourceRules
 
@@ -65,13 +65,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

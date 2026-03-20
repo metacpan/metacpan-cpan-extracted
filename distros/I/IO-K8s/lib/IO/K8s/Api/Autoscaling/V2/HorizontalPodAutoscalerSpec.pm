@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerSpec;
 # ABSTRACT: HorizontalPodAutoscalerSpec describes the desired functionality of the HorizontalPodAutoscaler.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s behavior => 'Autoscaling::V2::HorizontalPodAutoscalerBehavior';
@@ -32,7 +32,7 @@ IO::K8s::Api::Autoscaling::V2::HorizontalPodAutoscalerSpec - HorizontalPodAutosc
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 behavior
 
@@ -79,13 +79,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

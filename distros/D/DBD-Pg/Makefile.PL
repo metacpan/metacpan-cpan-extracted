@@ -5,7 +5,7 @@ use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.19.0';
+my $VERSION = '3.20.0';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -109,7 +109,7 @@ $POSTGRES_INCLUDE = $ENV{POSTGRES_INCLUDE} || $pg->inc_dir;
 
 if (! defined $POSTGRES_INCLUDE) {
 	if (! defined $ENV{POSTGRES_HOME}) {
-		warn "No POSTGRES_HOME defined, cannot find automatically\n";
+		warn "No POSTGRES_HOME defined, cannot find automatically\nHINT: Refer to REQUIREMENTS section of README\n";
 		exit 0;
 	}
 	$POSTGRES_INCLUDE = "$ENV{POSTGRES_HOME}/include";

@@ -1,5 +1,7 @@
 
-[![Build Status](https://travis-ci.org/Corion/anyevent-impl-prima.svg?branch=master)](https://github.com/Corion/anyevent-impl-prima)
+[![Windows](https://github.com/Corion/AnyEvent-Impl-Prima/workflows/windows/badge.svg)](https://github.com/Corion/AnyEvent-Impl-Prima/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/AnyEvent-Impl-Prima/workflows/macos/badge.svg)](https://github.com/Corion/AnyEvent-Impl-Prima/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/AnyEvent-Impl-Prima/workflows/linux/badge.svg)](https://github.com/Corion/AnyEvent-Impl-Prima/actions?query=workflow%3Alinux)
 
 # NAME
 
@@ -9,16 +11,15 @@ AnyEvent::Impl::Prima - Prima event loop adapter for AnyEvent
 
     use Prima;
     use AnyEvent::Impl::Prima;
-    
+
     my $mw = Prima::MainWindow->new();
-    
+
     my $timer = AnyEvent->timer(
         after => 10,
         cb => sub { $mw->close; },
     );
 
     Prima->run;
-    
 
 # AUTHORS
 

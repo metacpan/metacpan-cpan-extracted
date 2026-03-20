@@ -31,5 +31,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GHGen
   homepage: https://metacpan.org/pod/App::GHGen
   repository: git://github.com/nigelhorne/App-GHGen.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

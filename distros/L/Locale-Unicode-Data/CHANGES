@@ -1,5 +1,8 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.8.0 2026-03-19T17:44:56+0900
+    - Release v1.8.0 for for CLDR 48.2
+
 v1.7.0 2026-03-01T17:26:38+0900
     - Release v1.7.0 for CLDR 48.1
     - Apply patch to CLDR 48 supplemental/supplementalData.xml at xpath '//references/reference[@type="R1227"]' (fix https:// typo, CLDR-19101)

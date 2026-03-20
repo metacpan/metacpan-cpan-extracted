@@ -19,7 +19,7 @@ use App::GHGen::PerlCustomizer qw(generate_custom_perl_workflow);
 use App::GHGen::Fixer qw(fix_workflow can_auto_fix);
 use App::GHGen::CostEstimator qw(estimate_current_usage estimate_savings);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my %opts = (
 	help	=> 0,

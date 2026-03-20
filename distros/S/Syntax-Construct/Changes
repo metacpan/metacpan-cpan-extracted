@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.045   2026-03-19
+        - Fix documentation links
+
 1.044   2026-03-09
         - Adjust to Perl 5.42.1
 

@@ -133,4 +133,56 @@ sub where_sql {
   is_deeply \@bind, [], 'string where no binds';
 }
 
+# all valid operators (lowercase input → uppercase SQL)
+{
+  my %expect = (
+    '='        => 'x = ?',
+    '!='       => 'x != ?',
+    '<>'       => 'x <> ?',
+    '<'        => 'x < ?',
+    '>'        => 'x > ?',
+    '<='       => 'x <= ?',
+    '>='       => 'x >= ?',
+    'like'     => 'x LIKE ?',
+    'LIKE'     => 'x LIKE ?',
+    'not like' => 'x NOT LIKE ?',
+    'NOT LIKE' => 'x NOT LIKE ?',
+    'ilike'    => 'x ILIKE ?',
+    'ILIKE'    => 'x ILIKE ?',
+    'not ilike' => 'x NOT ILIKE ?',
+    'NOT ILIKE' => 'x NOT ILIKE ?',
+  );
+  for my $op (sort keys %expect) {
+    my ($sql, @bind) = where_sql({ x => { $op => 42 } });
+    like $sql, qr/\Q$expect{$op}\E/, "operator '$op' renders as '$expect{$op}'";
+    is_deeply \@bind, [42], "operator '$op' bind";
+  }
+
+  # -in / -not_in (special syntax)
+  {
+    my ($sql, @bind) = where_sql({ x => { -in => [1, 2] } });
+    like $sql, qr/x IN \(\?, \?\)/, 'operator -in';
+    is_deeply \@bind, [1, 2], '-in binds';
+  }
+  {
+    my ($sql, @bind) = where_sql({ x => { -not_in => [3, 4] } });
+    like $sql, qr/x NOT IN \(\?, \?\)/, 'operator -not_in';
+    is_deeply \@bind, [3, 4], '-not_in binds';
+  }
+
+  # unknown operator → confess
+  eval { where_sql({ x => { 'BADOP' => 1 } }) };
+  like $@, qr/Unknown operator 'BADOP'/, 'bad operator rejected';
+}
+
+# empty where clause omitted
+{
+  my ($sql, @bind) = where_sql({});
+  unlike $sql, qr/WHERE/, 'empty hashref where omitted';
+}
+{
+  my ($sql, @bind) = where_sql([]);
+  unlike $sql, qr/WHERE/, 'empty arrayref where omitted';
+}
+
 done_testing;

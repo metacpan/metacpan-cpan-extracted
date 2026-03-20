@@ -2,10 +2,19 @@
 abstract: 'Prima event loop adapter for AnyEvent'
 author:
   - 'Max Maischein <corion@cpan.org>'
-build_requires: {}
+build_requires:
+  AnyEvent: '0'
+  AnyEvent::HTTP: '0'
+  AnyEvent::Util: '0'
+  ExtUtils::MakeMaker: '0'
+  POSIX: '0'
+  Test::HTTP::LocalServer: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
-license: perl
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -14,12 +23,15 @@ no_index:
   directory:
     - t
     - inc
-provides:
-  AnyEvent::Impl::Prima:
-    file: lib/AnyEvent/Impl/Prima.pm
-    version: '0.02'
+requires:
+  AnyEvent: '0'
+  Prima: '1.50'
+  Prima::Application: '0'
+  perl: '5.020'
 resources:
-  repository: git://github.com/Corion/anyevent-impl-prima.git
-version: '0.02'
+  bugtracker: https://github.com/Corion/AnyEvent-Impl-Prima/issues
+  license: https://dev.perl.org/licenses/
+  repository: git://github.com/Corion/AnyEvent-Impl-Prima.git
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

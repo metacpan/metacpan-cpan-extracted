@@ -2,7 +2,7 @@
 abstract: 'Objects representing things found in the Kubernetes API'
 author:
   - 'Torsten Raudssus <torsten@raudssus.de>'
-  - 'Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)'
+  - 'Jose Luis Martinez Torres <jlmartin@cpan.org>'
 build_requires:
   Test::Exception: '0'
   Test::More: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://github.com/pplu/io-k8s-p5/issues
   homepage: https://github.com/pplu/io-k8s-p5
   repository: https://github.com/pplu/io-k8s-p5.git
-version: '1.008'
+version: '1.009'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -286,7 +286,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.008'
+          tag: '1.009'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

@@ -1,0 +1,37 @@
+0.003     2026-03-20 05:01:01Z
+
+    - BREAKING: Git sync stores task data in commit-wrapped refs (pushable/fetchable)
+    - Full board sync via refs/karr/* (fetch/materialize/serialize/push)
+    - Add karr log command for activity trail (per-agent NDJSON refs)
+    - Add --claimed-by filter to list command
+    - Add Task->from_string for ref-based loading
+    - Rewrite Git.pm with safe execution (_git_cmd, no shell injection)
+    - Fix write_ref to create commit-wrapped refs (blob→tree→commit)
+    - Fix is_repo to work from subdirectories (git rev-parse)
+    - Fix push refspec to refs/karr/*:refs/karr/*
+    - Pick command uses Lock for atomic task claiming
+    - Remove .gitignore manipulation from init
+    - Extract sync_before/sync_after into BoardAccess role
+    - Extract _parse_timeout/_claim_expired into ClaimTimeout role
+    - Refactor Lock.pm to accept pre-built Git object
+    - Docker: add default git identity ENV vars
+    - Add karr sync command (--push, --pull)
+    - Add auto-sync to write commands (create, move, edit, delete, pick, handoff, archive)
+    - Add App::karr::Git for Git operations via CLI
+    - Add App::karr::Lock for task locking via refs/karr/tasks/<id>/lock
+    - Add Docker support (raudssus/karr on GHCR)
+    - Initial release
+    - Implemented archive command (soft-delete to archived status)
+    - Implemented handoff command (move to review with claim, note, block/release)
+    - Implemented config command (show/get/set board configuration)
+    - Implemented context command (generate markdown board summary for embedding)
+    - Implemented agent-name command (random two-word name generator)
+    - Implemented skill command (install/check/update/show agent skills)
+    - Added batch operations (comma-separated IDs) to move, edit, delete, archive
+    - Added --json output to all commands (show, move, edit, delete, archive, handoff, board, pick)
+    - Added --compact output to board command
+    - Renamed all Command packages to CamelCase
+    - Moved shared helpers (find_task, load_tasks, parse_ids) into BoardAccess role
+    - Added --claude-skill flag to init for installing Claude Code skill
+    - Ships skill via File::ShareDir (share/claude-skill.md)
+    - Extracted --json and --compact into App::karr::Role::Output

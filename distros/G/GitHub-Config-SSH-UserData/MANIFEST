@@ -4,7 +4,6 @@ lib/GitHub/Config/SSH/UserData.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README
 README.md
 SECURITY.md
 t/00-load.t
@@ -12,11 +11,14 @@ t/01-test-data/.ssh/config
 t/01-test-data/cfg-01
 t/01-test-data/cfg-02
 t/01-user_data.t
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
-xt/boilerplate.t
-xt/pod-spell.t
-xt/with_my_local_ssh_config.t
+xt/author/boilerplate.t
+xt/author/pod-coverage.t
+xt/author/pod-spell.t
+xt/author/pod.t
+xt/author/with_my_local_ssh_config.t
+xt/release/changes.t
+xt/release/cpan-json.t
+xt/release/cpan-yml.t
+xt/release/manifest.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

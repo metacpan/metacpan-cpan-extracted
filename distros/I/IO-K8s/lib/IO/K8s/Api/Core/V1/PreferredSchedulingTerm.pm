@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PreferredSchedulingTerm;
 # ABSTRACT: An empty preferred scheduling term matches all objects with implicit weight 0 (i.e. it's a no-op). A null preferred scheduling term matches no objects (i.e. is also a no-op).
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s preference => 'Core::V1::NodeSelectorTerm', 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::PreferredSchedulingTerm - An empty preferred scheduling 
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 preference
 
@@ -58,13 +58,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

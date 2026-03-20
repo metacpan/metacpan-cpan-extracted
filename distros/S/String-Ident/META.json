@@ -1,10 +1,10 @@
 {
-   "abstract" : "clean-up string to be used as identifier and in URLs",
+   "abstract" : "clean up strings for use as identifiers and in URLs",
    "author" : [
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "string",
       "cleanup",
@@ -16,13 +16,13 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "String-Ident",
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Test::Most" : "0.38"
          }
       },
       "configure" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "String::Ident" : {
          "file" : "lib/String/Ident.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
          "url" : "http://github.com/meon/String-Ident"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

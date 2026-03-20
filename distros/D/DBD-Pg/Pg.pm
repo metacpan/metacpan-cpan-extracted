@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.19.0');
+    use version; our $VERSION = qv('3.20.0');
 
     use DBI 1.614 ();
     use Exporter ();
@@ -137,7 +137,7 @@ use 5.008001;
         $class .= '::dr';
 
         ## Work around for issue found in https://rt.cpan.org/Ticket/Display.html?id=83057
-        my $realversion = qv('3.19.0');
+        my $realversion = qv('3.20.0');
 
         $drh = DBI::_new_drh($class, {
             'Name'        => 'Pg',
@@ -494,57 +494,52 @@ use 5.008001;
             push @args, $column;
         }
 
-        my $whereclause = @search
-          ? ("\n                AND " . join "\n                AND ", @search)
-          : '';
+        my $whereclause = @search ? (' AND ' . join ' AND ', @search) : '';
 
         ## Note: we do not need to check attisdropped because attypid will be 0
         ## for dropped columns and thus fail to join to pg_type
-        my $col_info_sql = qq!
-            SELECT
-                pg_catalog.quote_ident(pg_catalog.current_database()) AS "TABLE_CAT"
-                , pg_catalog.quote_ident(n.nspname) AS "TABLE_SCHEM"
-                , pg_catalog.quote_ident(c.relname) AS "TABLE_NAME"
-                , pg_catalog.quote_ident(a.attname) AS "COLUMN_NAME"
-                , a.atttypid AS "DATA_TYPE"
-                , pg_catalog.format_type(a.atttypid, NULL) AS "TYPE_NAME"
-                , a.attlen AS "COLUMN_SIZE"
-                , NULL::text AS "BUFFER_LENGTH"
-                , NULL::text AS "DECIMAL_DIGITS"
-                , NULL::text AS "NUM_PREC_RADIX"
-                , CASE WHEN a.attnotnull THEN 0 ELSE 1 END AS "NULLABLE"
-                , pg_catalog.col_description(a.attrelid, a.attnum) AS "REMARKS"
-                , pg_catalog.pg_get_expr(af.adbin, af.adrelid) AS "COLUMN_DEF"
-                , NULL::text AS "SQL_DATA_TYPE"
-                , NULL::text AS "SQL_DATETIME_SUB"
-                , NULL::text AS "CHAR_OCTET_LENGTH"
-                , a.attnum AS "ORDINAL_POSITION"
-                , CASE WHEN a.attnotnull THEN 'NO' ELSE 'YES' END AS "IS_NULLABLE"
-                , pg_catalog.format_type(a.atttypid, a.atttypmod) AS "pg_type"
-                , NULL::text AS "pg_constraint"
-                , pg_catalog.current_database() AS "pg_database"
-                , n.nspname AS "pg_schema"
-                , c.relname AS "pg_table"
-                , a.attname AS "pg_column"
-                , NULL::text[] AS "pg_enum_values"
+        my $col_info_sql = <<"EOSQL";
+SELECT
+  pg_catalog.quote_ident(pg_catalog.current_database()) AS "TABLE_CAT",
+  pg_catalog.quote_ident(n.nspname) AS "TABLE_SCHEM",
+  pg_catalog.quote_ident(c.relname) AS "TABLE_NAME",
+  pg_catalog.quote_ident(a.attname) AS "COLUMN_NAME",
+  a.atttypid AS "DATA_TYPE",
+  pg_catalog.format_type(a.atttypid, NULL) AS "TYPE_NAME",
+  a.attlen AS "COLUMN_SIZE",
+  NULL::text AS "BUFFER_LENGTH",
+  NULL::text AS "DECIMAL_DIGITS",
+  NULL::text AS "NUM_PREC_RADIX",
+  CASE WHEN a.attnotnull THEN 0 ELSE 1 END AS "NULLABLE",
+  pg_catalog.col_description(a.attrelid, a.attnum) AS "REMARKS",
+  pg_catalog.pg_get_expr(af.adbin, af.adrelid) AS "COLUMN_DEF",
+  NULL::text AS "SQL_DATA_TYPE",
+  NULL::text AS "SQL_DATETIME_SUB",
+  NULL::text AS "CHAR_OCTET_LENGTH",
+  a.attnum AS "ORDINAL_POSITION",
+  CASE WHEN a.attnotnull THEN 'NO' ELSE 'YES' END AS "IS_NULLABLE",
+  pg_catalog.format_type(a.atttypid, a.atttypmod) AS "pg_type",
+  NULL::text AS "pg_constraint",
+  pg_catalog.current_database() AS "pg_database",
+  n.nspname AS "pg_schema",
+  c.relname AS "pg_table",
+  a.attname AS "pg_column",
+  NULL::text[] AS "pg_enum_values",
+  a.attrelid AS "_pg_attrelid",
+  a.attnum AS "_pg_attnum",
+  a.atttypmod AS "_pg_atttypmod",
+  t.typtype AS "_pg_type_typtype",
+  t.oid AS "_pg_type_oid"
+  FROM pg_catalog.pg_type t
+JOIN pg_catalog.pg_attribute a ON (t.oid = a.atttypid)
+JOIN pg_catalog.pg_class c ON (a.attrelid = c.oid)
+JOIN pg_catalog.pg_namespace n ON (n.oid = c.relnamespace)
+LEFT JOIN pg_catalog.pg_attrdef af ON (a.attnum = af.adnum AND a.attrelid = af.adrelid)
+WHERE a.attnum >= 1 AND c.relkind IN ('r','p','v','m','f')$whereclause
+ORDER BY n.nspname, c.relname, a.attnum
+EOSQL
 
-                , a.attrelid AS "_pg_attrelid"
-                , a.attnum AS "_pg_attnum"
-                , a.atttypmod AS "_pg_atttypmod"
-                , t.typtype AS "_pg_type_typtype"
-                , t.oid AS "_pg_type_oid"
-            FROM
-                pg_catalog.pg_type t
-                JOIN pg_catalog.pg_attribute a ON (t.oid = a.atttypid)
-                JOIN pg_catalog.pg_class c ON (a.attrelid = c.oid)
-                LEFT JOIN pg_catalog.pg_attrdef af ON (a.attnum = af.adnum AND a.attrelid = af.adrelid)
-                JOIN pg_catalog.pg_namespace n ON (n.oid = c.relnamespace)
-            WHERE
-                a.attnum >= 1
-                AND c.relkind IN ('r','p','v','m','f')
-                $whereclause
-            ORDER BY n.nspname, c.relname, a.attnum
-            !;
+        local $dbh->{FetchHashKeyName} = 'NAME';
         my $sth = $dbh->prepare($col_info_sql);
         $sth->execute(@args) or die $sth->errstr;
         ## Immediately grab all the column names in order, but exclude internal ones
@@ -586,6 +581,7 @@ use 5.008001;
               @$data;
         };
         if (@typelist) {
+            ## Postgres version 9.1 added the pg_enum.enumsortorder column
             my $order = $dbh->{private_dbdpg}{version} >= 90100 ? 'enumsortorder' : 'oid';
             my $esql = "SELECT enumtypid, enumlabel FROM pg_catalog.pg_enum WHERE enumtypid = ANY(?) ORDER BY enumtypid, $order";
             my $esth = $dbh->prepare($esql);
@@ -649,132 +645,143 @@ use 5.008001;
 
     sub statistics_info {
 
-        my $dbh = shift;
-        my (undef, $schema, $table, $unique_only) = @_;
+        ## Gather statistics about a table and its columns
+        ## See https://metacpan.org/pod/DBI#statistics_info
 
-        ## Catalog is ignored, but table is mandatory
-        return undef unless defined $table and length $table;
+        my ($dbh, $catalog, $schema, $table, $unique_only, $quick) = @_;
+
+        ## Catalog is ignored, schema is optional, and table is mandatory
+        return undef if ! defined $table or $table eq '';
 
         my $schema_where = '';
         my @exe_args = ($table);
 
-        my $input_schema = (defined $schema and length $schema) ? 1 : 0;
-
-        if ($input_schema) {
+        if (defined $schema and $schema ne '') {
             $schema_where = 'AND n.nspname = ?';
-            push(@exe_args, $schema);
+            push @exe_args, $schema;
         }
 
         my $stats_sql = '';
 
         # Table-level stats
         if (!$unique_only) {
-            $stats_sql .= qq{
-                SELECT
-                    pg_catalog.current_database() AS "TABLE_CAT",
-                    n.nspname                     AS "TABLE_SCHEM",
-                    d.relname                     AS "TABLE_NAME",
-                    NULL                          AS "NON_UNIQUE",
-                    NULL                          AS "INDEX_QUALIFIER",
-                    NULL                          AS "INDEX_NAME",
-                    'table'                       AS "TYPE",
-                    NULL                          AS "ORDINAL_POSITION",
-                    NULL                          AS "COLUMN_NAME",
-                    NULL                          AS "ASC_OR_DESC",
-                    d.reltuples                   AS "CARDINALITY",
-                    d.relpages                    AS "PAGES",
-                    NULL                          AS "FILTER_CONDITION",
-                    NULL                          AS "pg_expression",
-                    NULL                          AS "pg_is_key_column",
-                    NULL                          AS "pg_null_ordering"
-                FROM   pg_catalog.pg_class d
-                JOIN   pg_catalog.pg_namespace n ON n.oid = d.relnamespace
-                WHERE  d.relname = ? $schema_where
-                UNION ALL
-            };
-            push @exe_args, @exe_args;
+            ## DBI requires NULL in most fields if the type is 'table'
+            $stats_sql = <<"EOSQL";
+SELECT pg_catalog.current_database() AS "TABLE_CAT",
+  n.nspname   AS "TABLE_SCHEM",
+  c.relname   AS "TABLE_NAME",
+  NULL        AS "NON_UNIQUE",
+  NULL        AS "INDEX_QUALIFIER",
+  NULL        AS "INDEX_NAME",
+  'table'     AS "TYPE",
+  NULL        AS "ORDINAL_POSITION",
+  NULL        AS "COLUMN_NAME",
+  NULL        AS "ASC_OR_DESC",
+  c.reltuples AS "CARDINALITY",
+  c.relpages  AS "PAGES",
+  NULL        AS "FILTER_CONDITION",
+  NULL        AS "pg_expression",
+  NULL        AS "pg_is_key_column",
+  NULL        AS "pg_null_ordering"
+FROM   pg_catalog.pg_class c
+JOIN   pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+WHERE  c.relname = ? $schema_where
+UNION ALL
+EOSQL
+            push @exe_args, $table;
+            push @exe_args, $schema if $schema_where;
         }
 
-        my $is_key_column = $dbh->{private_dbdpg}{version} >= 110000
-            ? 'col.i <= i.indnkeyatts' : 'true';
+        my $pgversion = $dbh->{private_dbdpg}{version};
+
+        ## Postgres version 11 added the pg_index.indnkeyatts column,
+        ## which tells the number of non-included columns in the index
+        my $is_key_column = $pgversion >= 110000 ? 'col.i <= i.indnkeyatts' : 'true';
 
         my ($asc_or_desc, $null_ordering);
-        if ($dbh->{private_dbdpg}{version} >= 90600) {
-            $asc_or_desc = q{
-                CASE WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'asc') THEN 'A'
-                     WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'desc') THEN 'D'
-                END};
-            $null_ordering = q{
-                CASE WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'nulls_first') THEN 'first'
-                     WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'nulls_last') THEN 'last'
-                END};
+
+        ## Postgres version 9.6 added pg_index_column_has_property(),
+        ## which can tell if the index sorts ascending or descending,
+        ## and if it sorts nulls first or nulls last
+        if ($pgversion >= 90600) {
+            $asc_or_desc = <<'EOSQL';
+CASE WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'asc') THEN 'A'
+     WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'desc') THEN 'D'
+     ELSE NULL END
+EOSQL
+            $null_ordering = <<'EOSQL';
+CASE WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'nulls_first') THEN 'first'
+     WHEN pg_catalog.pg_index_column_has_property(c.oid, col.i, 'nulls_last') THEN 'last'
+     ELSE NULL END
+EOSQL
         }
-        elsif ($dbh->{private_dbdpg}{version} > 80300) {
-            $asc_or_desc = q{
-                CASE WHEN a.amcanorder THEN
-                     CASE WHEN i.indoption[col.i - 1] & 1 = 0 THEN 'A' ELSE 'D' END
-                END};
-            $null_ordering = q{
-                CASE WHEN a.amcanorder THEN
-                     CASE WHEN i.indoption[col.i - 1] & 2 = 0 THEN 'last' ELSE 'first' END
-                END};
+        ## Postgres version 8.3 added the pg_am.amcanorder column,
+        ## which tells if ordering is supported
+        elsif ($pgversion >= 80300) {
+            $asc_or_desc = <<'EOSQL';
+CASE WHEN a.amcanorder THEN
+     CASE WHEN i.indoption[col.i - 1] & 1 = 0 THEN 'A' ELSE 'D' END END
+EOSQL
+            $null_ordering = <<'EOSQL';
+CASE WHEN a.amcanorder THEN
+     CASE WHEN i.indoption[col.i - 1] & 2 = 0 THEN 'last' ELSE 'first' END END
+EOSQL
         }
+        ## Postgres version 8.2 and older is simply ordered or not
         else {
-            $asc_or_desc = q{CASE WHEN a.amorderstrategy <> 0 THEN 'A' END};
-            $null_ordering = q{CASE WHEN a.amorderstrategy <> 0 THEN 'last' END};
+            $asc_or_desc = q{CASE WHEN a.amorderstrategy <> 0 THEN 'A' ELSE NULL END};
+            $null_ordering = q{CASE WHEN a.amorderstrategy <> 0 THEN 'last' ELSE NULL END};
         }
 
-        # Fetch the index definitions
-        $stats_sql .= qq{
-            SELECT
-                pg_catalog.current_database() AS "TABLE_CAT",
-                n.nspname                     AS "TABLE_SCHEM",
-                d.relname                     AS "TABLE_NAME",
-                NOT(i.indisunique)            AS "NON_UNIQUE",
-                NULL                          AS "INDEX_QUALIFIER",
-                c.relname                     AS "INDEX_NAME",
-                CASE WHEN i.indisclustered THEN 'clustered'
-                     WHEN a.amname = 'btree' THEN 'btree'
-                     WHEN a.amname = 'hash' THEN 'hashed'
-                     ELSE 'other'
-                END                           AS "TYPE",
-                col.i                         AS "ORDINAL_POSITION",
-                att.attname                   AS "COLUMN_NAME",
-                $asc_or_desc                  AS "ASC_OR_DESC",
-                c.reltuples                   AS "CARDINALITY",
-                c.relpages                    AS "PAGES",
-                pg_catalog.pg_get_expr(i.indpred,i.indrelid)
-                                              AS "FILTER_CONDITION",
-                pg_catalog.pg_get_indexdef(i.indexrelid, col.i, true)
-                                              AS "pg_expression",
-                $is_key_column                AS "pg_is_key_column",
-                $null_ordering                AS "pg_null_ordering"
-            FROM
-                pg_catalog.pg_index i
-                JOIN pg_catalog.pg_class c ON c.oid = i.indexrelid
-                JOIN pg_catalog.pg_class d ON d.oid = i.indrelid
-                JOIN pg_catalog.pg_am a ON a.oid = c.relam
-                JOIN pg_catalog.pg_namespace n ON n.oid = d.relnamespace
-                JOIN pg_catalog.generate_series(1, pg_catalog.current_setting('max_index_keys')::integer) col(i)
-                     ON col.i <= i.indnatts
-                LEFT JOIN pg_catalog.pg_attribute att
-                     ON att.attrelid = d.oid AND att.attnum = i.indkey[col.i - 1]
-            WHERE
-                d.relname = ? $schema_where
-                AND (i.indisunique OR NOT(?)) -- unique_only
-            ORDER BY
-                "NON_UNIQUE", "TYPE", "INDEX_QUALIFIER", "INDEX_NAME", "ORDINAL_POSITION"
-        };
+        my $unique_where = $unique_only ? 'AND i.indisunique' : '';
 
+        ## Grab column-level statistics
+        $stats_sql .= <<"EOSQL";
+SELECT pg_catalog.current_database() AS "TABLE_CAT",
+  n.nspname              AS "TABLE_SCHEM",
+  d.relname              AS "TABLE_NAME",
+  CASE WHEN i.indisunique THEN 0 ELSE 1 END AS "NON_UNIQUE",
+  NULL                   AS "INDEX_QUALIFIER",
+  c.relname              AS "INDEX_NAME",
+  CASE WHEN a.amname = 'btree' THEN 'btree'
+       WHEN a.amname = 'hash'  THEN 'hashed'
+       ELSE 'other' END AS "TYPE",
+  col.i                  AS "ORDINAL_POSITION",
+  att.attname            AS "COLUMN_NAME",
+  $asc_or_desc AS "ASC_OR_DESC",
+  c.reltuples            AS "CARDINALITY",
+  c.relpages             AS "PAGES",
+  pg_catalog.pg_get_expr(i.indpred,i.indrelid) AS "FILTER_CONDITION",
+  pg_catalog.pg_get_indexdef(i.indexrelid, col.i, true) AS "pg_expression",
+  $is_key_column AS "pg_is_key_column",
+  $null_ordering AS "pg_null_ordering"
+FROM
+  pg_catalog.pg_index i
+  JOIN pg_catalog.pg_class c ON c.oid = i.indexrelid
+  JOIN pg_catalog.pg_class d ON d.oid = i.indrelid
+  JOIN pg_catalog.pg_am a ON a.oid = c.relam
+  JOIN pg_catalog.pg_namespace n ON n.oid = d.relnamespace
+  JOIN pg_catalog.generate_series(1, pg_catalog.current_setting('max_index_keys')::integer) col(i)
+    ON col.i <= i.indnatts
+  LEFT JOIN pg_catalog.pg_attribute att
+    ON att.attrelid = d.oid AND att.attnum = i.indkey[col.i - 1]
+WHERE
+  d.relname = ? $schema_where $unique_where
+ORDER BY "NON_UNIQUE", "TYPE", "INDEX_QUALIFIER", "INDEX_NAME", "ORDINAL_POSITION"
+EOSQL
+
+        local $dbh->{FetchHashKeyName} = 'NAME';
         my $sth = $dbh->prepare($stats_sql);
-        $sth->execute(@exe_args, 0+!!$unique_only);
+        $sth->execute(@exe_args) or die $sth->errstr;
         return $sth;
     }
 
     sub primary_key_info {
 
-        my $dbh = shift;
-        my (undef, $schema, $table, $attr) = @_;
+        ## Return a statement handle with info on the columns of a primary key
+        ## See https://metacpan.org/pod/DBI#primary_key_info
+
+        my ($dbh, $catalog, $schema, $table, $attr) = @_;
 
         my @cols = (qw(TABLE_CAT TABLE_SCHEM TABLE_NAME
                        COLUMN_NAME KEY_SEQ PK_NAME DATA_TYPE
@@ -783,127 +790,129 @@ use 5.008001;
                        )
             );
 
-        ## Catalog is ignored, but table is mandatory
-        if (! defined $table or ! length $table) {
+        ## If no table is given, we return an empty list
+        if (! defined $table || ! length $table) {
             return _prepare_from_data('primary_key_info', [], \@cols);
         }
 
-        my $whereclause = 'AND c.relname = ' . $dbh->quote($table);
+        my $schema_where = '';
+        my @exe_args = ($table);
 
-        if (defined $schema and length $schema) {
-            $whereclause .= "\n\t\t\tAND n.nspname = " . $dbh->quote($schema);
+        if (defined $schema && $schema ne '') {
+            $schema_where = 'AND n.nspname = ?';
+            push @exe_args, $schema;
         }
 
-        my $pri_key_sql = qq{
-            SELECT
-                  c.oid
-                , pg_catalog.quote_ident(n.nspname)
-                , pg_catalog.quote_ident(c.relname)
-                , pg_catalog.quote_ident(c2.relname)
-                , i.indkey
-                , pg_catalog.quote_ident(t.spcname)
-                , pg_catalog.quote_ident(t.spclocation)
-                , n.nspname, c.relname, c2.relname
-                , pg_catalog.quote_ident(pg_catalog.current_database())
-            FROM
-                pg_catalog.pg_class c
-                JOIN pg_catalog.pg_index i ON (i.indrelid = c.oid)
-                JOIN pg_catalog.pg_class c2 ON (c2.oid = i.indexrelid)
-                LEFT JOIN pg_catalog.pg_namespace n ON (n.oid = c.relnamespace)
-                LEFT JOIN pg_catalog.pg_tablespace t ON (t.oid = c.reltablespace)
-            WHERE
-                i.indisprimary IS TRUE
-            $whereclause
-        };
+        my $pri_key_sql = <<"EOSQL";
+SELECT
+  pg_catalog.quote_ident(pg_catalog.current_database()) AS "TABLE_CAT",
+  pg_catalog.quote_ident(n.nspname) AS "TABLE_SCHEM",
+  pg_catalog.quote_ident(c.relname) AS "TABLE_NAME",
+  NULL AS "COLUMN_NAME",
+  NULL AS "KEY_SEQ",
+  pg_catalog.quote_ident(c2.relname) AS "PK_NAME",
+  NULL AS "DATA_TYPE",
+  pg_catalog.quote_ident(t.spcname) AS pg_tablespace_name,
+  pg_catalog.quote_ident(pg_catalog.pg_tablespace_location(t.oid)) AS pg_tablespace_location,
+  n.nspname AS pg_schema,
+  c.relname AS pg_table,
+  NULL AS pg_column,
+  c.oid AS "_pg_reloid",
+  i.indkey AS "_pg_indkey"
+FROM pg_catalog.pg_class c
+JOIN pg_catalog.pg_index i ON (i.indrelid = c.oid)
+JOIN pg_catalog.pg_class c2 ON (c2.oid = i.indexrelid)
+LEFT JOIN pg_catalog.pg_namespace n ON (n.oid = c.relnamespace)
+LEFT JOIN pg_catalog.pg_tablespace t ON (t.oid = c.reltablespace)
+WHERE i.indisprimary IS TRUE AND c.relname = ? $schema_where
+EOSQL
 
-        if ($dbh->{private_dbdpg}{version} >= 90200) {
-            $pri_key_sql =~ s/t.spclocation/pg_catalog.pg_tablespace_location(t.oid)/;
+        ## Postgres version 9.2 added the pg_tablespace_location() function
+        if ($dbh->{private_dbdpg}{version} < 90200) {
+            $pri_key_sql =~ s/\Qpg_catalog.pg_tablespace_location(t.oid)/t.spclocation/;
         }
 
+        local $dbh->{FetchHashKeyName} = 'NAME';
         my $sth = $dbh->prepare($pri_key_sql);
-        $sth->execute();
-        my $info = $sth->fetchall_arrayref()->[0];
+        $sth->execute(@exe_args) or die $sth->errstr;
+        my $info = $sth->fetchall_arrayref({})->[0];
         if (! defined $info) {
             return _prepare_from_data('primary_key_info', [], \@cols);
         }
 
-        # Get the attribute information
-        my $indkey = join ',', split /\s+/, $info->[4];
-        my $sql = qq{
-            SELECT a.attnum, pg_catalog.quote_ident(a.attname) AS colname,
-                pg_catalog.quote_ident(t.typname) AS typename
-            FROM pg_catalog.pg_attribute a, pg_catalog.pg_type t
-            WHERE a.attrelid = '$info->[0]'
-            AND a.atttypid = t.oid
-            AND attnum IN ($indkey);
-        };
+        ## Map pg_index.indkey to name/type for each column
+        my @index_cols = grep { /\d+/ } split /\s+/, delete $info->{_pg_indkey};
+        my $index_cols = join ', ', @index_cols;
+        my $sql = <<"EOSQL";
+SELECT a.attnum,
+  pg_catalog.quote_ident(a.attname) AS colname,
+  a.attname AS raw_colname,
+  pg_catalog.quote_ident(t.typname) AS typename
+FROM pg_catalog.pg_attribute a
+JOIN pg_catalog.pg_type t ON (t.oid = a.atttypid)
+WHERE a.attrelid = ?
+AND attnum IN ($index_cols);
+EOSQL
         $sth = $dbh->prepare($sql);
-        $sth->execute();
+        $sth->execute(delete $info->{_pg_reloid}) or die $sth->errstr;
         my $attribinfo = $sth->fetchall_hashref('attnum');
 
         my $pkinfo = [];
 
         ## Normal way: complete "row" per column in the primary key
-        if (!exists $attr->{'pg_onerow'}) {
-            my $x=0;
-            my @key_seq = split/\s+/, $info->[4];
-            for (@key_seq) {
-                # TABLE_CAT
-                $pkinfo->[$x][0] = $info->[10];
-                # SCHEMA_NAME
-                $pkinfo->[$x][1] = $info->[1];
-                # TABLE_NAME
-                $pkinfo->[$x][2] = $info->[2];
-                # COLUMN_NAME
-                $pkinfo->[$x][3] = $attribinfo->{$_}{colname};
-                # KEY_SEQ
-                $pkinfo->[$x][4] = $_;
-                # PK_NAME
-                $pkinfo->[$x][5] = $info->[3];
-                # DATA_TYPE
-                $pkinfo->[$x][6] = $attribinfo->{$_}{typename};
-                $pkinfo->[$x][7] = $info->[5];
-                $pkinfo->[$x][8] = $info->[6];
-                $pkinfo->[$x][9] = $info->[7];
-                $pkinfo->[$x][10] = $info->[8];
-                $pkinfo->[$x][11] = $info->[9];
-                $x++;
+        if (! defined $attr || ! $attr->{'pg_onerow'}) {
+            for my $colnum (@index_cols) {
+                push @$pkinfo,
+                  [
+                   $info->{TABLE_CAT},
+                   $info->{TABLE_SCHEM},
+                   $info->{TABLE_NAME},
+                   $attribinfo->{$colnum}{colname}, ## COLUMN_NAME
+                   $colnum, ## KEY_SEQ
+                   $info->{PK_NAME},
+                   $attribinfo->{$colnum}{typename}, ## DATA_TYPE
+                   $info->{pg_tablespace_name},
+                   $info->{pg_tablespace_location},
+                   $info->{pg_schema},
+                   $info->{pg_table},
+                   $attribinfo->{$colnum}{raw_colname}, ## pg_column
+                  ];
             }
         }
-        else { ## Nicer way: return only one row
-            $info->[0] = $info->[10];
-            $info->[11] = $info->[9];
-            $info->[10] = $info->[8];
-            $info->[9] = $info->[7];
-            $info->[8] = $info->[6];
-            $info->[7] = $info->[5];
-            $info->[5] = $info->[3];
-            # COLUMN_NAME
-            $info->[3] = 2==$attr->{'pg_onerow'} ?
-                [ map { $attribinfo->{$_}{colname} } split /\s+/, $info->[4] ] :
-                    join ', ', map { $attribinfo->{$_}{colname} } split /\s+/, $info->[4];
-            # DATA_TYPE
-            $info->[6] = 2==$attr->{'pg_onerow'} ?
-                [ map { $attribinfo->{$_}{typename} } split /\s+/, $info->[4] ] :
-                    join ', ', map { $attribinfo->{$_}{typename} } split /\s+/, $info->[4];
-            # KEY_SEQ
-            $info->[4] = 2==$attr->{'pg_onerow'} ?
-                [ split /\s+/, $info->[4] ] :
-                    join ', ', split /\s+/, $info->[4];
+        else { ## Nicer way if pg_onerow is set
 
-            $pkinfo = [$info];
+            $info->{COLUMN_NAME} = 2==$attr->{'pg_onerow'} ?
+                [ map { $attribinfo->{$_}{colname} } @index_cols ] :
+                    join ', ', map { $attribinfo->{$_}{colname} } @index_cols;
+
+            $info->{DATA_TYPE} = 2==$attr->{'pg_onerow'} ?
+                [ map { $attribinfo->{$_}{typename} } @index_cols ] :
+                    join ', ', map { $attribinfo->{$_}{typename} } @index_cols;
+
+            $info->{KEY_SEQ} = 2==$attr->{'pg_onerow'} ? [@index_cols] : $index_cols;
+
+            $info->{pg_column} = 2==$attr->{'pg_onerow'} ?
+                [ map { $attribinfo->{$_}{raw_colname} } @index_cols ] :
+                    join ', ', map { $attribinfo->{$_}{raw_colname} } @index_cols;
+
+            $pkinfo = [[map { $info->{$_} } @cols]];
+
         }
 
         return _prepare_from_data('primary_key_info', $pkinfo, \@cols);
 
-    }
+    } ## end of primary_key_info
 
     sub primary_key {
-        my $sth = primary_key_info(@_[0..3], {pg_onerow => 2});
+
+        ## Simple interface to the primary_key_info() method.
+        ## See https://metacpan.org/pod/DBI#primary_key
+
+        my ($dbh, $catalog, $schema, $table) = @_;
+        my $sth = $dbh->primary_key_info($catalog, $schema, $table, {pg_onerow => 2});
         my $result = $sth->fetchall_arrayref();
         return defined $result->[0] ? @{$result->[0][3]} : ();
     }
-
 
     sub foreign_key_info {
 
@@ -1198,6 +1207,8 @@ use 5.008001;
                 $tbl_sql = qq{SELECT * FROM ($tbl_sql) ti WHERE "TABLE_TYPE" IN ($type_restrict)};
             }
         }
+
+        local $dbh->{FetchHashKeyName} = 'NAME';
         my $sth = $dbh->prepare($tbl_sql);
         $sth->execute();
 
@@ -1689,14 +1700,14 @@ DBD::Pg - PostgreSQL database driver for the DBI module
   # For some advanced uses you may need PostgreSQL type values:
   use DBD::Pg qw(:pg_types);
 
-  $dbh->do('INSERT INTO mytable(a) VALUES (1)');
+  $dbh->do('INSERT INTO mytable(a) VALUES (42)');
 
   $sth = $dbh->prepare('INSERT INTO mytable(a) VALUES (?)');
-  $sth->execute();
+  $sth->execute(42);
 
 =head1 VERSION
 
-This documents version 3.19.0 of the DBD::Pg module
+This documents version 3.20.0 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -2807,7 +2818,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.19.0'>. It returns 0 (false) if the connection is not valid,
+B<'DBD::Pg ping test v3.20.0'>. It returns 0 (false) if the connection is not valid,
 otherwise it returns a positive number (true). It should never throw an exception. 
 The value returned indicates the current state:
 
@@ -3021,7 +3032,7 @@ shows the data type for each of the arguments in the "COLUMN_NAME" field.
 This method will also return tablespace information for servers that support
 tablespaces. See the L</table_info> entry for more information.
 
-The five additional custom fields returned are:
+Five additional fields are returned:
 
 B<pg_tablespace_name>: name of the tablespace, if any
 
@@ -3031,7 +3042,7 @@ B<pg_schema>: the unquoted name of the schema
 
 B<pg_table>: the unquoted name of the table
 
-B<pg_column>: the unquoted name of the column
+B<pg_column>: the unquoted name of the column or columns
 
 In addition to the standard format of returning one row for each column
 found for the primary key, you can pass the C<pg_onerow> attribute to force
@@ -3091,8 +3102,8 @@ In addition, the following Postgres specific columns are returned:
 =item pg_expression
 
 Postgres allows indexes on functions and scalar expressions based on one or more columns. This field 
-will always be populated if an index, but the lack of an entry in the COLUMN_NAME should indicate 
-that this is an index expression.
+will always be populated if this is an index row. The lack of an entry in the COLUMN_NAME should
+indicate that this is an index expression.
 
 =item pg_is_key_column
 

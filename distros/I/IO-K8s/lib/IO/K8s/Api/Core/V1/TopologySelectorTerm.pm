@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::TopologySelectorTerm;
 # ABSTRACT: A topology selector term represents the result of label queries. A null or empty topology selector term matches no objects. The requirements of them are ANDed. It provides a subset of functionality as NodeSelectorTerm. This is an alpha feature and may change in the future.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s matchLabelExpressions => ['Core::V1::TopologySelectorLabelRequirement'];
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::TopologySelectorTerm - A topology selector term represen
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 matchLabelExpressions
 
@@ -51,13 +51,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

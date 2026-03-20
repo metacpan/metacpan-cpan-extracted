@@ -1,4 +1,12 @@
-0.02  2026-03-15 
+0.03  2026-03-19
+    - Require -from in select()
+    - Allow empty -where and -having clauses
+    - Validate WHERE operators and reject unknown ones
+    - Operators are case-insensitive, rendered as uppercase
+    - Deduplicate select arg-parsing into Select->from_args
+    - Replace all inline require with use
+
+0.02  2026-03-15
     - ABSTRACT_FROM and fixed license in Makefile.PL
 
 0.01  2026-03-15 

@@ -1,4 +1,9 @@
 
+0.0.6   2026-03-20
+   [Added]
+     - Add '--issued' option to 'list' command to exclude
+       revoked and renewed certs
+
 0.0.5   2026-01-03
    [Added]
      - Add 'list' command for monitoring certificate expiry

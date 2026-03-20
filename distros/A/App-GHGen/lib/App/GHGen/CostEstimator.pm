@@ -13,7 +13,7 @@ our @EXPORT_OK = qw(
 	estimate_workflow_cost
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 NAME
 

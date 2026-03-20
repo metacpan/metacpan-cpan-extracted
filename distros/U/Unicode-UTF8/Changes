@@ -1,3 +1,10 @@
+0.70 2026-03-19
+ - Use utf8_check_ascii with a 16-byte ASCII fast path
+
+0.69 2026-03-19
+ - Update the c-utf8 library code: Improved GCC code generation, including with -O2, 
+   resulting in higher throughput.
+
 0.68 2026-03-02
  - Include correct version of utf8_valid.h header.
 

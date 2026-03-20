@@ -33,7 +33,7 @@ configure_requires:
   File::ShareDir::Install: '0.10'
   perl: '5.013002'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150012'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 keywords:
   - author
   - bundle
@@ -53,13 +53,13 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::ETHER:
     file: lib/Dist/Zilla/MintingProfile/Author/ETHER.pm
-    version: '0.171'
+    version: '0.172'
   Dist::Zilla::PluginBundle::Author::ETHER:
     file: lib/Dist/Zilla/PluginBundle/Author/ETHER.pm
-    version: '0.171'
+    version: '0.172'
   Pod::Weaver::PluginBundle::Author::ETHER:
     file: lib/Pod/Weaver/PluginBundle/Author/ETHER.pm
-    version: '0.171'
+    version: '0.172'
 recommends:
   Dist::Zilla::Plugin::BlockRelease: '0'
   Dist::Zilla::Plugin::GitHub::Update: '0.40'
@@ -211,10 +211,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-ETHER
   homepage: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER
   repository: https://github.com/karenetheridge/Dist-Zilla-PluginBundle-Author-ETHER.git
-version: '0.171'
+version: '0.172'
 x_Dist_Zilla:
   perl:
-    version: '5.043007'
+    version: '5.043008'
   plugins:
     -
       class: Dist::Zilla::Plugin::Prereqs
@@ -378,6 +378,7 @@ x_Dist_Zilla:
             - CONTRIBUTING
             - INSTALL
             - LICENCE
+            - META.json
             - README.pod
           exclude_match: []
           include_dotfiles: 0
@@ -765,7 +766,7 @@ x_Dist_Zilla:
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.038'
+      version: '0.039'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -826,7 +827,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20260119'
+          Module::CoreList: '5.20260220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.010'
     -
@@ -990,7 +991,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.171
+          tag: v0.172
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -1180,7 +1181,7 @@ x_contributors:
   - 'Randy Stauner <rwstauner@cpan.org>'
   - 'Roy Ivy III <rivy@cpan.org>'
   - 'Сергей Романов <sromanov@cpan.org>'
-x_generated_by_perl: v5.43.7
+x_generated_by_perl: v5.43.8
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 0

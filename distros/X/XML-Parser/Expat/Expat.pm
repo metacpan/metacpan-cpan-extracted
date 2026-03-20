@@ -8,7 +8,7 @@ use strict;
 use XSLoader;
 use Carp;
 
-our $VERSION = '2.48';
+our $VERSION = '2.49';
 
 our ( %Encoding_Table, @Encoding_Path, $have_File_Spec );
 
@@ -77,6 +77,16 @@ sub new {
     if ( defined $args{BillionLaughsAttackProtectionActivationThreshold} ) {
         $self->billion_laughs_attack_protection_activation_threshold(
             $args{BillionLaughsAttackProtectionActivationThreshold}
+        );
+    }
+    if ( defined $args{AllocTrackerMaximumAmplification} ) {
+        $self->alloc_tracker_maximum_amplification(
+            $args{AllocTrackerMaximumAmplification}
+        );
+    }
+    if ( defined $args{AllocTrackerActivationThreshold} ) {
+        $self->alloc_tracker_activation_threshold(
+            $args{AllocTrackerActivationThreshold}
         );
     }
     if ( defined $args{ReparseDeferralEnabled} ) {
@@ -468,6 +478,28 @@ sub billion_laughs_attack_protection_activation_threshold {
     SetBillionLaughsAttackProtectionActivationThreshold( $self->{Parser}, $threshold );
 }
 
+sub alloc_tracker_maximum_amplification {
+    my ( $self, $factor ) = @_;
+    croak "Usage: \$parser->alloc_tracker_maximum_amplification(\$factor)"
+      unless defined $factor;
+    unless ( defined &SetAllocTrackerMaximumAmplification ) {
+        croak "SetAllocTrackerMaximumAmplification not available"
+          . " (requires libexpat >= 2.7.2)";
+    }
+    SetAllocTrackerMaximumAmplification( $self->{Parser}, $factor );
+}
+
+sub alloc_tracker_activation_threshold {
+    my ( $self, $threshold ) = @_;
+    croak "Usage: \$parser->alloc_tracker_activation_threshold(\$threshold)"
+      unless defined $threshold;
+    unless ( defined &SetAllocTrackerActivationThreshold ) {
+        croak "SetAllocTrackerActivationThreshold not available"
+          . " (requires libexpat >= 2.7.2)";
+    }
+    SetAllocTrackerActivationThreshold( $self->{Parser}, $threshold );
+}
+
 sub reparse_deferral_enabled {
     my ( $self, $enabled ) = @_;
     croak "Usage: \$parser->reparse_deferral_enabled(\$enabled)"
@@ -477,6 +509,18 @@ sub reparse_deferral_enabled {
           . " (requires libexpat >= 2.6.0)";
     }
     SetReparseDeferralEnabled( $self->{Parser}, $enabled ? 1 : 0 );
+}
+
+################
+# Expat library version info
+
+sub expat_version {
+    return ExpatVersion();
+}
+
+sub expat_version_info {
+    my %info = ExpatVersionInfo();
+    return %info;
 }
 
 ################
@@ -884,6 +928,24 @@ amplification ratio.
 Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
 runtime if the underlying C function is not available.
 
+=item * AllocTrackerMaximumAmplification
+
+Sets the maximum amplification factor for the allocation tracker.
+This limits how many times larger the output of entity expansion can be
+relative to the input.
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> at runtime if the
+underlying C function is not available.
+
+=item * AllocTrackerActivationThreshold
+
+Sets the activation threshold (in bytes) for the allocation tracker.
+The amplification limit only kicks in after the parser has processed this
+many bytes of output from entity expansion.
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> at runtime if the
+underlying C function is not available.
+
 =item * ReparseDeferralEnabled
 
 When set to a true value, enables reparse deferral. When set to a false
@@ -1219,6 +1281,26 @@ protection.  THRESHOLD is an unsigned integer.
 Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
 the underlying C API is not available.
 
+=item alloc_tracker_maximum_amplification(FACTOR)
+
+Sets the maximum amplification factor for the allocation tracker.
+FACTOR is a floating-point number (e.g. C<100.0>).
+
+  $parser->alloc_tracker_maximum_amplification(100.0);
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> if the underlying C API
+is not available.
+
+=item alloc_tracker_activation_threshold(THRESHOLD)
+
+Sets the activation threshold (in bytes) for the allocation tracker.
+THRESHOLD is an unsigned integer.
+
+  $parser->alloc_tracker_activation_threshold(1_000_000);
+
+Requires libexpat E<gt>= 2.7.2.  Will C<croak> if the underlying C API
+is not available.
+
 =item reparse_deferral_enabled(ENABLED)
 
 Enables or disables reparse deferral.  ENABLED is a boolean (true to
@@ -1291,6 +1373,22 @@ method breaks those references (and makes the instance unusable.)
 
 Normally, higher level calls handle this for you, but if you are using
 XML::Parser::Expat directly, then it's your responsibility to call it.
+
+=item XML::Parser::Expat::expat_version
+
+Returns the version string of the linked expat library (e.g.
+C<"expat_2.5.0">).  This is a class method and can be called without
+a parser instance:
+
+  my $ver = XML::Parser::Expat::expat_version();
+
+=item XML::Parser::Expat::expat_version_info
+
+Returns a hash with the major, minor, and micro version numbers of the
+linked expat library:
+
+  my %v = XML::Parser::Expat::expat_version_info();
+  # %v = (major => 2, minor => 5, micro => 0)
 
 =back
 

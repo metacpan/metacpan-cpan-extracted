@@ -29,7 +29,7 @@ no_index:
 provides:
   Unicode::UTF8:
     file: lib/Unicode/UTF8.pm
-    version: '0.68'
+    version: '0.70'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -39,7 +39,7 @@ resources:
   bugtracker: https://github.com/chansen/p5-unicode-utf8/issues
   homepage: https://github.com/chansen/p5-unicode-utf8
   repository: https://github.com/chansen/p5-unicode-utf8.git
-version: '0.68'
+version: '0.70'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

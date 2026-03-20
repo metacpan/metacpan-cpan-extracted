@@ -41,6 +41,37 @@ like($message_req->uri, qr{graph.microsoft.com/v1.0/me/mailFolders/AAAABBBBCCCCC
 like($message_req->uri, qr{filter=isRead\+eq\+false}, 'filter is correct');
 is($message_req->header( 'Authorization' ) => 'Bearer xxxxxxxxN2tpxxxxxxxxxxxxxxxx', 'Authorisation token used correctly');
 
+# Test government cloud configuration (GCC High)
+{
+    my $gov_config = get_test_config();
+    $gov_config->{resource_url}   = 'https://graph.microsoft.us/';
+    $gov_config->{login_base_url} = 'https://login.microsoftonline.us';
+
+    my $gov_useragent = Test::LWP::UserAgent->new;
+    $gov_useragent->map_response( qr{login\.microsoftonline\.us/} => get_mocked_token_response() );
+    $gov_useragent->map_response(
+        qr{graph\.microsoft\.us/v1\.0/me/mailFolders[^/]} => get_mocked_folders_list_response() );
+    $gov_useragent->map_response( qr{graph\.microsoft\.us/v1\.0/me/mailFolders/} => get_mocked_messages_response() );
+
+    local *App::wsgetmail::MS365::Client::_new_useragent = sub { return $gov_useragent };
+
+    my $gov_getmail = App::wsgetmail->new( { config => $gov_config } );
+    my $gov_client  = $gov_getmail->client->_client;
+
+    is( $gov_client->resource_url,   'https://graph.microsoft.us/',      'government resource_url set correctly' );
+    is( $gov_client->login_base_url, 'https://login.microsoftonline.us', 'government login_base_url set correctly' );
+
+    my $gov_message = $gov_getmail->get_next_message();
+    isa_ok( $gov_message, 'App::wsgetmail::MS365::Message', 'fetched message from government cloud' );
+
+    my $gov_req = $gov_useragent->last_http_request_sent();
+    like(
+        $gov_req->uri,
+        qr{graph\.microsoft\.us/v1\.0/me/mailFolders/},
+        'government Graph API URL used for message fetch'
+    );
+}
+
 done_testing();
 
 #####

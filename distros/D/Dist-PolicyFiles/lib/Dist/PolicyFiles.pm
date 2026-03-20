@@ -6,7 +6,7 @@ use warnings;
 
 use feature ':5.10';
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 
 use Carp;
@@ -160,7 +160,7 @@ Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 =head1 VERSION
 
-Version 0.05
+Version 0.07
 
 =head1 SYNOPSIS
 
@@ -375,23 +375,28 @@ value (I<C<false>>).
 
 =back
 
+
 =head2 CONSTANTS
 
-Constant I<C<INTERNAL_CONTRIB_MD>> containes the internal template used to
+Constant I<C<INTERNAL_CONTRIB_MD>> contains the internal template used to
 create F<CONTRIBUTING.md>. The constant is not exported. If necessary, access
 it as follows: C<Dist::PolicyFiles::INTERNAL_CONTRIB_MD>.
-
 
 
 =head1 AUTHOR
 
 Klaus Rindfrey, C<< <klausrin at cpan.org.eu> >>
 
+
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-dist-policyfiles at rt.cpan.org>, or through
-the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to C<bug-dist-policyfiles at
+rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles> or create
+a L<GitHub
+Issue|https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues>.  I will
+be notified, and then you'll automatically be notified of progress on your bug
+as I make changes.
 
 
 =head1 SEE ALSO

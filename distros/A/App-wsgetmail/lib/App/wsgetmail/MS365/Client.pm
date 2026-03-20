@@ -2,7 +2,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 2020-2022 Best Practical Solutions, LLC
+# This software is Copyright (c) 2020-2026 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -135,13 +135,29 @@ has global_access => (
 
 =head2 resource_url
 
-A string with the URL for the overall API endpoint.
+A string with the URL for the overall API endpoint. Defaults to
+C<https://graph.microsoft.com/>. For Microsoft Government Cloud (GCC High),
+set this to C<https://graph.microsoft.us/>. For DoD, use
+C<https://dod-graph.microsoft.us/>.
 
 =cut
 
 has resource_url => (
     is => 'ro',
     default => sub { return 'https://graph.microsoft.com/' }
+);
+
+=head2 login_base_url
+
+A string with the base URL for OAuth authentication. Defaults to
+C<https://login.windows.net>. For Microsoft Government Cloud
+(GCC High and DoD), set this to C<https://login.microsoftonline.us>.
+
+=cut
+
+has login_base_url => (
+    is => 'ro',
+    default => sub { return 'https://login.windows.net' }
 );
 
 =head2 resource_path
@@ -309,7 +325,7 @@ sub _get_user_access_token {
     my $ua = $self->_new_useragent;
     my $access_token;
     warn "getting user access token" if ($self->debug);
-    my $oauth_login_url = sprintf('https://login.windows.net/%s/oauth2/token', $self->tenant_id);
+    my $oauth_login_url = sprintf('%s/%s/oauth2/token', $self->login_base_url, $self->tenant_id);
     my $response = $ua->post( $oauth_login_url,
                               {
                                   resource=> $self->resource_url,
@@ -340,7 +356,8 @@ sub _build__credentials {
         resource_id => $self->resource_url,
         client_id => $self->client_id,
         secret_id => $self->secret,
-        tenant_id => $self->tenant_id
+        tenant_id => $self->tenant_id,
+        ad_url => $self->login_base_url,
     );
     return $creds;
 }

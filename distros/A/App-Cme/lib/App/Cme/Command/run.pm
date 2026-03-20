@@ -10,13 +10,13 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.044';
+$App::Cme::Command::run::VERSION = '1.046';
 use strict;
 use warnings;
 use v5.20;
 use File::HomeDir;
 use Path::Tiny;
-use Config::Model;
+use Config::Model 2.156; # for delete_instance
 use Config::Model::Lister;
 use Log::Log4perl qw(get_logger :levels);
 use YAML::PP;
@@ -48,7 +48,8 @@ sub opt_spec {
         [ "arg=s@"  => "script argument. run 'cme run <script> -doc' for possible arguments" ],
         [ "backup:s"  => "Create a backup of configuration files before saving." ],
         [ "foreach=s" => "Run script in several directories. The list of directories "
-          . "must be passed as a single argument, i.e. --foreach 'foo bar'" ],
+          . "must be passed as a single argument, i.e. --foreach 'foo bar'. If this "
+          . "argument is '-', the list is taken from STDIN."],
         [ "commit|c:s" => "commit change with passed message" ],
         [ "cat" => "Show the script file" ],
         [ "no-commit|nc!" => "skip commit to git" ],
@@ -318,13 +319,6 @@ sub process_commit_message($self, $root, $values, $msg) {
     return $msg;
 }
 
-sub commit ($self, $msg) {
-    system(qw/git commit -a -m/, $msg) == 0
-        or die "git commit failed: $?\n";
-
-    return;
-}
-
 # returns: script file name, script data if script is *not* Perl code
 sub get_script_data ($self, $script_name, $opt = {}) {
     my $script_file = $self->find_script_file($script_name);
@@ -423,7 +417,8 @@ sub execute {
 sub run_foreach_loop($self, $opt,$app_args, $script_data ) {
     my %user_args = map { split '=',$_,2; } @{ $opt->{arg} };
 
-    my @dirs = map { chomp ; split /\s+/; }
+    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
+    my @dirs = map { chomp; split /\s+/; }
         ($opt->{foreach} eq '-' ? <STDIN> : ($opt->{foreach}));
 
     my $start = path('.')->absolute;
@@ -441,8 +436,7 @@ sub run_foreach_loop($self, $opt,$app_args, $script_data ) {
         chdir $t_dir->stringify;
         $self->run_script ($opt, $app_args, $script_data, {%user_args});
         # once we're done, remove instance from Model to avoid memory leaks
-        # TODO: use delete_instance method provided by Config::Model from version 2.156
-        delete $self->{_model}{instances}{$d};
+        $self->{_model}->delete_instance($d);
     }
 
     chdir $start->stringify;
@@ -453,18 +447,9 @@ sub run_script ($self, $opt, $app_args, $script_data, $user_args){
     my $commit_msg = $script_data->{commit_msg};
     my $stashed;
 
-    # check if workspace and index are clean
+    # stash pending work
     if ($commit_msg and not $opt->{no_commit}) {
-        ## no critic(InputOutput::ProhibitBacktickOperators)
-        my $r = `git status --porcelain --untracked-files=no`;
-        if ($?) {
-            die "git status command failed: $?\n";
-        }
-        if ($r) {
-            system(qw/git stash push --quiet --message/, "cme run auto stash") == 0
-                or die "git stash push failed: $?\n";
-            $stashed = 1;
-        };
+        $stashed = $self->autostash;
     }
 
     # call loads
@@ -503,15 +488,14 @@ sub run_script ($self, $opt, $app_args, $script_data, $user_args){
 
 
     if ($stashed) {
-        system(qw/git stash pop --quiet/) == 0
-            or die "git stash pop failed: $?\n";
+        $self->pop_stash;
     }
 
     return;
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.044';
+$App::Cme::Run::Var::VERSION = '1.046';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -539,7 +523,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.044
+version 1.046
 
 =head1 SYNOPSIS
 

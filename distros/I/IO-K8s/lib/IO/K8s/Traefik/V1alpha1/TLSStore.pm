@@ -1,6 +1,6 @@
 package IO::K8s::Traefik::V1alpha1::TLSStore;
 # ABSTRACT: Traefik TLS certificate store
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::APIObject
     api_version     => 'traefik.io/v1alpha1',
     resource_plural => 'tlsstores';
@@ -23,7 +23,7 @@ IO::K8s::Traefik::V1alpha1::TLSStore - Traefik TLS certificate store
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -64,13 +64,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use v5.16;
 use Scalar::Util;
-use Term::ReadKey; # GetTerminalSize()
 
 package Dump::Krumo;
 
@@ -18,7 +17,7 @@ our @EXPORT_OK = qw(k kd);
 our %EXPORT_TAGS = ('short' => [('k', 'kd')]);
 
 # https://blogs.perl.org/users/grinnz/2018/04/a-guide-to-versions-in-perl.html
-our $VERSION = 'v0.1.6';
+our $VERSION = 'v0.1.8';
 
 our $use_color     = 1; # Output in color
 our $return_string = 0; # Return a string instead of printing it
@@ -730,8 +729,20 @@ sub color {
 }
 
 sub get_terminal_width {
-	my @x      = Term::ReadKey::GetTerminalSize();
-	my $width  = $x[0] || 0;
+	# If there is no $TERM then tput will bail out
+	if (!$ENV{TERM} || -t STDOUT == 0) {
+		return 0;
+	}
+
+	my $tput  = `tput cols`;
+	my $width = 0;
+
+	if ($tput) {
+		$width = int($tput);
+	} else {
+		print color('orange', "Warning:") . " `tput cols` did not return numeric input\n";
+		$width = 80;
+	}
 
 	return $width;
 }

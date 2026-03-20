@@ -7,7 +7,7 @@ Apache2::API - Apache2 API Framework
     use Apache2::API
     # To import in your namespace
     # use Apache2::API qw( :common :http );
-    
+
     # $r is an Apache2::RequestRec object that you can get from within an handler or 
     # with Apache2::RequestUtil->request
     my $api = Apache2::API->new( $r, compression_threshold => 204800 ) ||
@@ -21,7 +21,7 @@ Apache2::API - Apache2 API Framework
     use strict;
     use warnings;
     use Apache2::API;
-    
+
     my $r = shift( @_ );
     my $api = Apache2::API->new( $r );
     # for example:
@@ -35,7 +35,7 @@ Apache2::API - Apache2 API Framework
     }) );
     # or
     return( $api->bailout( @some_reasons ) );
-    
+
     # 100kb
     $api->compression_threshold(102400);
     my $decoded = $api->decode_base64( $b64_string );
@@ -89,7 +89,7 @@ Apache2::API - Apache2 API Framework
 
 # VERSION
 
-    v0.4.0
+    v0.5.1
 
 # DESCRIPTION
 
@@ -217,6 +217,17 @@ This is supposed to be superseded by the package inheriting from [Apache2::API](
 
 Given a [DateTime](https://metacpan.org/pod/DateTime) object, this sets it to GMT time zone and set the proper formatter ([Apache2::API::DateTime](https://metacpan.org/pod/Apache2%3A%3AAPI%3A%3ADateTime)) so that the stringification is compliant with HTTP headers standard.
 
+## htpasswd
+
+    my $ht = $api->htpasswd( $clear_password, create => 1 );
+    my $ht = $api->htpasswd( $clear_password, create => 1, salt => $salt );
+    my $ht = $api->htpasswd( $md5_password );
+    my $bool = $ht->matches( $user_input_password );
+
+This instantiates a new [Apache2::API::Password](https://metacpan.org/pod/Apache2%3A%3AAPI%3A%3APassword) object by providing its constructor whatever arguments was received.
+
+It returns a new [Apache2::API::Password](https://metacpan.org/pod/Apache2%3A%3AAPI%3A%3APassword) object, or, upon error, `undef` in scalar context, or an empty list in list context.
+
 ## is\_perl\_option\_enabled
 
 Checks if perl option is enabled in the Virtual Host and returns a boolean value
@@ -296,6 +307,12 @@ If a `cleanup` hash property is provided with a callback code reference as a val
 
 The [Apache2::API](https://metacpan.org/pod/Apache2%3A%3AAPI) object will be passed as the first and only argument to the callback routine.
 
+## reply\_sse
+
+Special reply for Server-Sent Event that need to close the connection if there was an error.
+
+It takes the same arguments as ["reply"](#reply), call ["reply"](#reply), and if the return code is an HTTP error, it will close the HTTP connection.
+
 ## request()
 
 Returns the [Apache2::API::Request](https://metacpan.org/pod/Apache2%3A%3AAPI%3A%3ARequest) object. This object is set upon instantiation.
@@ -308,13 +325,17 @@ Returns the [Apache2::API::Response](https://metacpan.org/pod/Apache2%3A%3AAPI%3
 
 Returns a [Apache2::Server](https://metacpan.org/pod/Apache2%3A%3AServer) object
 
-## server\_version()
+## server\_version
 
 Tries hard to find out the version number of the Apache server. This returns the value from ["server\_version" in Apache2::API::Request](https://metacpan.org/pod/Apache2%3A%3AAPI%3A%3ARequest#server_version)
 
 ## set\_handlers()
 
 Returns the values from ["set\_handlers" in Apache2::Server](https://metacpan.org/pod/Apache2%3A%3AServer#set_handlers) by passing it whatever arguments were provided.
+
+## use\_rfc\_error
+
+Boolean. When true, this will return rfc9457 style error [https://www.rfc-editor.org/rfc/rfc9457.html](https://www.rfc-editor.org/rfc/rfc9457.html)
 
 ## warn( @list )
 
@@ -325,6 +346,23 @@ Given a list of string, this sends a warning using ["warn" in Apache2::Log](http
 Given an object type, a method name and optional parameters, this attempts to call it, passing it whatever arguments were provided and return its return values.
 
 Apache2 methods are designed to die upon error, whereas our model is based on returning `undef` and setting an exception with [Module::Generic::Exception](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException), because we believe that only the main program should be in control of the flow and decide whether to interrupt abruptly the execution, not some sub routines.
+
+# CLASS FUNCTIONS
+
+## apr1\_md5
+
+    my $md5_password = apr1_md5( $clear_password );
+    my $md5_password = apr1_md5( $clear_password, $salt );
+
+This class function is exported by default.
+
+It takes a clear password, and optionally a salt, and returns an Apache md5 encoded password.
+
+This function merely instantiates a new [Apache2::API::Password](https://metacpan.org/pod/Apache2%3A%3AAPI%3A%3APassword) object, and calls the method [hash](https://metacpan.org/pod/Apache2%3A%3AAPI%3A%3APassword#hash) to return the encoded password.
+
+The password returned is suitable to be used and saved in an Apache password file used in web basic authentication.
+
+Upon error, this will die.
 
 # CONSTANTS
 

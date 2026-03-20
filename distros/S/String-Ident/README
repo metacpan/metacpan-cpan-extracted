@@ -1,74 +1,91 @@
 NAME
-
-    String::Ident - clean-up string to be used as identifier and in URLs
+    String::Ident - clean up strings for use as identifiers and in URLs
 
 SYNOPSIS
+        my $ident = String::Ident->cleanup('Hello wœrlď!');
+        is( $ident, 'Hello-woerld' );
 
-        my $ident = String::Ident->cleanup('Hello wœrlď!')
-        is($ident,'Hello-woerld')
+        my $s_ident = String::Ident->new( min_len => 5, max_len => 10 );
+        is( $s_ident->cleanup('Hěλλo wœřľδ!'), 'Hello-woer' );
 
 DESCRIPTION
-
-    clean-up string to be used as identifier and in URLs
+    This module cleans up strings so they can be used as identifiers and in
+    URLs.
 
 METHODS
+  new()
+    Object constructor. You can set the following options:
 
- cleanup()
+    *   min_len
 
-    cleanup does the following things to convert your messy string into
-    something that you can use as an identifier:
+        Minimum length of the identifier. Default is 4.
 
-        # replace unicode by ascii
+    *   max_len
+
+        Maximum length of the identifier. Default is 30.
+
+  min_len()
+    Accessor for the minimum length. If the cleaned identifier is shorter
+    than this value, it is padded with random lowercase letters. The default
+    is 4.
+
+  max_len()
+    Accessor for the maximum length. The default is 30.
+
+  cleanup()
+    "cleanup" converts a string into something that you can use as an
+    identifier. It can be called as a class method, or as an object method
+    created with "new".
+
+    It performs the following steps:
+
+        # replace Unicode with ASCII
         $text = unidecode($text);
-    
-        # replace anything basides numbers, letters and dash by dash
+
+        # replace anything besides numbers, letters, and dashes with a dash
         $text =~ s/[^-A-Za-z0-9]/-/g;
-    
-        # one dash is enough
+
+        # collapse consecutive dashes
         $text =~ s/--+/-/g;
-    
-        # no need to start or end with a dash
+
+        # remove leading and trailing dashes
         $text =~ s/-$//g;
         $text =~ s/^-//g;
-    
-        # maximum length
+
+        # apply the maximum length
         $text = substr($text,0,30);
-    
-        # min length is set to 4 filled in by random letters
 
-    cleanup per default truncates the text to 30 chars. You can pass in
-    some other limit, or -1 to not truncate:
+        # pad to the minimum length with random lowercase letters
 
-      cleanup("some very long t�xt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", 15);
-      # 'some-very-long-toxt-'
-    
-      cleanup("some very long t�xt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", -1);
-      # 'some-very-long-toxt-Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit'
+    By default, "cleanup" truncates the text to 30 characters. You can pass
+    a different limit as the second argument, or -1 to disable truncation:
+
+        String::Ident->cleanup("some very long töxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", 20);
+        # 'some-very-long-toxt-'
+
+        String::Ident->cleanup("some very long töxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", -1);
+        # 'some-very-long-toxt-Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit'
 
 AUTHOR
-
-    Jozef Kutej, <jkutej at cpan.org>
+    Jozef Kutej, "<jkutej at cpan.org>"
 
 CONTRIBUTORS
+    The following people have contributed to the String::Ident by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advises, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
 
-    The following people have contributed to the String::Ident by
-    committing their code, sending patches, reporting bugs, asking
-    questions, suggesting useful advises, nitpicking, chatting on IRC or
-    commenting on my blog (in no particular order):
+    *   Andrea Pavlovic
 
-      * Andrea Pavlovic
+    *   Syohei YOSHIDA
 
-      * Syohei YOSHIDA
-
-      * Thomas Klausner, <domm@plix.at>
+    *   Thomas Klausner, "<domm@plix.at>"
 
 THANKS
-
-    Thanks to V�V - Verband �sterreichischer Volkshochschulen
+    Thanks to VÖV - Verband Österreichischer Volkshochschulen
     <http://www.vhs.or.at/> for sponsoring development of this module.
 
 LICENSE AND COPYRIGHT
-
     This program is free software; you can redistribute it and/or modify it
     under the terms of either: the GNU General Public License as published
     by the Free Software Foundation; or the Artistic License.

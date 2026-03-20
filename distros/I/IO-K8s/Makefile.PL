@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Objects representing things found in the Kubernetes API",
-  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>, Jose Luis Martinez <jlmartin\@cpan.org> (original author, inactive)",
+  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>, Jose Luis Martinez Torres <jlmartin\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.008",
+  "VERSION" => "1.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

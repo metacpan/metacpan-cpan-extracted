@@ -4,7 +4,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 # VERSION
 
-Version 0.06
+Version 0.08
 
 # SYNOPSIS
 

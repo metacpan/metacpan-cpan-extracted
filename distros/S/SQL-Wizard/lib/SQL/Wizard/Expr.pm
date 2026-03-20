@@ -4,6 +4,11 @@ use strict;
 use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
+use SQL::Wizard::Expr::Alias;
+use SQL::Wizard::Expr::Order;
+use SQL::Wizard::Expr::Window;
+use SQL::Wizard::Expr::BinaryOp;
+use SQL::Wizard::Expr::Value;
 
 use overload
   '+'    => sub { _binop('+',  @_) },
@@ -29,7 +34,6 @@ sub to_sql {
 
 sub as {
   my ($self, $alias) = @_;
-  require SQL::Wizard::Expr::Alias;
   SQL::Wizard::Expr::Alias->new(
     expr      => $self,
     alias     => $alias,
@@ -39,7 +43,6 @@ sub as {
 
 sub asc {
   my ($self) = @_;
-  require SQL::Wizard::Expr::Order;
   SQL::Wizard::Expr::Order->new(
     expr      => $self,
     direction => 'ASC',
@@ -49,7 +52,6 @@ sub asc {
 
 sub desc {
   my ($self) = @_;
-  require SQL::Wizard::Expr::Order;
   SQL::Wizard::Expr::Order->new(
     expr      => $self,
     direction => 'DESC',
@@ -59,7 +61,6 @@ sub desc {
 
 sub asc_nulls_first {
   my ($self) = @_;
-  require SQL::Wizard::Expr::Order;
   SQL::Wizard::Expr::Order->new(
     expr      => $self,
     direction => 'ASC',
@@ -70,7 +71,6 @@ sub asc_nulls_first {
 
 sub desc_nulls_last {
   my ($self) = @_;
-  require SQL::Wizard::Expr::Order;
   SQL::Wizard::Expr::Order->new(
     expr      => $self,
     direction => 'DESC',
@@ -81,7 +81,6 @@ sub desc_nulls_last {
 
 sub over {
   my ($self, @args) = @_;
-  require SQL::Wizard::Expr::Window;
   # over('window_name') or over(-partition_by => ..., -order_by => ...)
   my $spec;
   if (@args == 1 && !ref $args[0]) {
@@ -99,7 +98,6 @@ sub over {
 
 sub _binop {
   my ($op, $left, $right, $swap) = @_;
-  require SQL::Wizard::Expr::BinaryOp;
   # Coerce plain values to Value nodes
   $right = _coerce($right, $left);
   ($left, $right) = ($right, $left) if $swap;
@@ -114,7 +112,6 @@ sub _binop {
 sub _coerce {
   my ($thing, $ref_expr) = @_;
   return $thing if blessed($thing) && $thing->isa('SQL::Wizard::Expr');
-  require SQL::Wizard::Expr::Value;
   SQL::Wizard::Expr::Value->new(
     value     => $thing,
     _renderer => $ref_expr->{_renderer},

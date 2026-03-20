@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::SubjectAccessReviewSpec;
 # ABSTRACT: SubjectAccessReviewSpec is a description of the access request.  Exactly one of ResourceAuthorizationAttributes and NonResourceAuthorizationAttributes must be set
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s extra => { Str => 1 };
@@ -35,7 +35,7 @@ IO::K8s::Api::Authorization::V1::SubjectAccessReviewSpec - SubjectAccessReviewSp
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 extra
 
@@ -86,13 +86,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

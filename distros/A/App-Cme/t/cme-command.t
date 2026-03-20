@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use 5.10.1;
+use v5.20;
 use open ':std', ':encoding(utf8)';
 
 use Encode;
@@ -133,9 +133,7 @@ subtest "minimal modification" => sub {
     is($ok->stdout.'', '', 'modify: no message on stdout' );
 
     file_contents_like $conf_file->stringify,   qr/cme/,       "updated header";
-    # with perl 5.14 5.16, IO::Handle writes an extra \n with print.
-    my $re = $^V lt 5.18.1 ? qr/yes"\n+MY/ : qr/yes"\nMY/;
-    file_contents_like $conf_file->stringify,   $re, "reordered file";
+    file_contents_like $conf_file->stringify, qr/yes"\nMY/, "reordered file";
     file_contents_unlike $conf_file->stringify, qr/removed/,   "double comment is removed";
 
     # check backup

@@ -4,12 +4,41 @@ use warnings;
 use strict;
 use utf8;
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 use Text::Unidecode 'unidecode';
+use Scalar::Util 'blessed';
+
+sub new {
+    my ( $class, %args ) = @_;
+    return bless {
+        min_len => $args{min_len},
+        max_len => $args{max_len},
+    }, $class;
+}
+
+sub min_len {
+    my ( $self, $new ) = @_;
+    $self->{min_len} = $new if @_ > 1;
+    $self->{min_len} = 4
+        unless defined( $self->{min_len} );
+    return $self->{min_len};
+}
+
+sub max_len {
+    my ( $self, $new ) = @_;
+    $self->{max_len} = $new if @_ > 1;
+    $self->{max_len} = 30
+        unless defined( $self->{max_len} );
+    return $self->{max_len};
+}
 
 sub cleanup {
-    my ($self, $text, $maxlength) = @_;
+    my ( $self, $text, $max_len ) = @_;
+
+    $self = $self->new( max_len => $max_len )
+        unless blessed($self);
+    $max_len = ( defined($max_len) ? $max_len : $self->max_len );
 
     $text = '' unless defined($text);
     $text = unidecode($text);
@@ -18,12 +47,11 @@ sub cleanup {
     $text =~ s/-$//g;
     $text =~ s/^-//g;
 
-    if (!$maxlength || $maxlength > 0) {
-        $maxlength ||= 30;
-        $text = substr($text,0,$maxlength);
+    if ( $max_len > 0 ) {
+        $text = substr( $text, 0, $max_len );
     }
-    while (length($text) < 4) {
-        $text .= chr(ord('a') + rand(ord('z') - ord('a') + 1));
+    while ( length($text) < $self->min_len ) {
+        $text .= chr( ord('a') + rand( ord('z') - ord('a') + 1 ) );
     }
 
     return $text;
@@ -31,55 +59,87 @@ sub cleanup {
 
 1;
 
-
 __END__
 
 =encoding utf8
 
 =head1 NAME
 
-String::Ident - clean-up string to be used as identifier and in URLs
+String::Ident - clean up strings for use as identifiers and in URLs
 
 =head1 SYNOPSIS
 
-    my $ident = String::Ident->cleanup('Hello wœrlď!')
-    is($ident,'Hello-woerld')
+    my $ident = String::Ident->cleanup('Hello wœrlď!');
+    is( $ident, 'Hello-woerld' );
+
+    my $s_ident = String::Ident->new( min_len => 5, max_len => 10 );
+    is( $s_ident->cleanup('Hěλλo wœřľδ!'), 'Hello-woer' );
 
 =head1 DESCRIPTION
 
-clean-up string to be used as identifier and in URLs
+This module cleans up strings so they can be used as identifiers and in URLs.
 
 =head1 METHODS
 
+=head2 new()
+
+Object constructor. You can set the following options:
+
+=over
+
+=item * min_len
+
+Minimum length of the identifier. Default is 4.
+
+=item * max_len
+
+Maximum length of the identifier. Default is 30.
+
+=back
+
+=head2 min_len()
+
+Accessor for the minimum length. If the cleaned identifier is shorter than this
+value, it is padded with random lowercase letters. The default is 4.
+
+=head2 max_len()
+
+Accessor for the maximum length. The default is 30.
+
 =head2 cleanup()
 
-C<cleanup> does the following things to convert your messy string into something that you can use as an identifier:
+C<cleanup> converts a string into something that you can use as an identifier.
+It can be called as a class method, or as an object method created with
+C<new>.
 
-    # replace unicode by ascii
+It performs the following steps:
+
+    # replace Unicode with ASCII
     $text = unidecode($text);
 
-    # replace anything basides numbers, letters and dash by dash
+    # replace anything besides numbers, letters, and dashes with a dash
     $text =~ s/[^-A-Za-z0-9]/-/g;
 
-    # one dash is enough
+    # collapse consecutive dashes
     $text =~ s/--+/-/g;
 
-    # no need to start or end with a dash
+    # remove leading and trailing dashes
     $text =~ s/-$//g;
     $text =~ s/^-//g;
 
-    # maximum length
+    # apply the maximum length
     $text = substr($text,0,30);
 
-    # min length is set to 4 filled in by random letters
+    # pad to the minimum length with random lowercase letters
 
-C<cleanup> per default truncates the text to 30 chars. You can pass in some other limit, or C<-1> to not truncate:
+By default, C<cleanup> truncates the text to 30 characters. You can pass a
+different limit as the second argument, or C<-1> to disable truncation:
 
-  cleanup("some very long töxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", 15);
-  # 'some-very-long-toxt-'
+    String::Ident->cleanup("some very long töxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", 20);
+    # 'some-very-long-toxt-'
 
-  cleanup("some very long töxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", -1);
-  # 'some-very-long-toxt-Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit'
+    String::Ident->cleanup("some very long töxt Lorem ipsum dolor sit amet, consectetur adipiscing elit, ", -1);
+    # 'some-very-long-toxt-Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit'
 
 =head1 AUTHOR
 

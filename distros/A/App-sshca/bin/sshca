@@ -1,7 +1,8 @@
 #!/usr/bin/env perl
 
-use v5.20;
+use v5.38;
 use experimental qw(signatures);
+use Syntax::Operator::In;
 
 use Digest;
 use Fcntl;
@@ -154,7 +155,13 @@ sub cert_load($serial) {
     my $path = cert_path($serial);
     open(my $fh, '<:encoding(UTF-8)', $path)
         or die "Unable to open certificate file for serial '$serial': $!";
-    return $json->decode( do { local $/ = undef; <$fh> } );
+
+    my $rv;
+    unless (eval { $rv = $json->decode( do { local $/ = undef; <$fh> } ); 1; }) {
+        die "Failed to load cert data from '$path': $@";
+    }
+
+    return $rv;
 }
 
 sub cert_save($cert) {
@@ -479,10 +486,10 @@ sub _filter_expiry($cb) {
     }
 }
 
-sub _filter_issued($cb) {
-    say STDERR "Filtering ISSUED certs only";
+sub _filter_states($cb, $states) {
+    say STDERR "Filtering certs by states: " . join(', ', $states->@*);
     sub ($cert_data, $cert, @rest) {
-        return unless $cert->{status} eq 'ISSUED';
+        return unless $cert->{status} in:eq $states->@*;
         $cb->($cert_data, $cert, @rest);
     }
 }
@@ -506,6 +513,8 @@ sub cmd_list(@args) {
     };
     $fn = _filter_expiry( $fn )
         if $options{expiry};
+    $fn = _filter_states( $fn, $options{states} )
+        if $options{states};
     $fn = _filter_wrap_parsed_cert( $fn );
     map_certs($fn);
 
@@ -596,6 +605,9 @@ my %cmd_opts = (
     list    => { 'expiry=s'    => sub {
                       $options{expiry} = ($_[1] =~ s/[+]00:00$//r);
                  },
+                 'issued'      => sub {
+                     $options{states} = [ 'ISSUED' ];
+                 },
                  %common_opts },
     cleanup => { 'dry-run' => \$options{"dry-run"},
                  %common_opts },
@@ -625,7 +637,7 @@ sshca - Minimalistic SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 SYNOPSIS
 

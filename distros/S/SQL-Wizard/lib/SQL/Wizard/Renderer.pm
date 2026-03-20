@@ -5,6 +5,11 @@ use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
 
+my %VALID_OPS = map { $_ => 1 }
+  '=', '!=', '<>', '<', '>', '<=', '>=',
+  'LIKE', 'NOT LIKE', 'ILIKE', 'NOT ILIKE',
+  '-IN', '-NOT_IN';
+
 sub new {
   my ($class, %args) = @_;
   bless \%args, $class;
@@ -210,8 +215,10 @@ sub _render_select {
   # WHERE
   if ($node->{where}) {
     my ($wsql, @wbind) = $self->_render_where($node->{where});
-    push @parts, "WHERE $wsql";
-    push @bind, @wbind;
+    if (defined $wsql && $wsql ne '') {
+      push @parts, "WHERE $wsql";
+      push @bind, @wbind;
+    }
   }
 
   # GROUP BY
@@ -229,8 +236,10 @@ sub _render_select {
   # HAVING
   if ($node->{having}) {
     my ($hsql, @hbind) = $self->_render_where($node->{having});
-    push @parts, "HAVING $hsql";
-    push @bind, @hbind;
+    if (defined $hsql && $hsql ne '') {
+      push @parts, "HAVING $hsql";
+      push @bind, @hbind;
+    }
   }
 
   # WINDOW
@@ -595,8 +604,10 @@ sub _render_update {
   # WHERE
   if ($node->{where}) {
     my ($ws, @wb) = $self->_render_where($node->{where});
-    push @parts, "WHERE $ws";
-    push @bind, @wb;
+    if (defined $ws && $ws ne '') {
+      push @parts, "WHERE $ws";
+      push @bind, @wb;
+    }
   }
 
   # LIMIT (MySQL UPDATE ... LIMIT n)
@@ -627,8 +638,10 @@ sub _render_delete {
   # WHERE
   if ($node->{where}) {
     my ($ws, @wb) = $self->_render_where($node->{where});
-    push @parts, "WHERE $ws";
-    push @bind, @wb;
+    if (defined $ws && $ws ne '') {
+      push @parts, "WHERE $ws";
+      push @bind, @wb;
+    }
   }
 
   # RETURNING
@@ -716,6 +729,9 @@ sub _render_where_value {
       my $rhs = $val->{$op};
       my $sql_op = uc($op);
 
+      confess "Unknown operator '$op' in WHERE clause"
+        unless $VALID_OPS{$sql_op};
+
       # -in / -not_in
       if ($sql_op eq '-IN' || $sql_op eq '-NOT_IN') {
         my $neg = $sql_op eq '-NOT_IN' ? 'NOT ' : '';
@@ -740,10 +756,10 @@ sub _render_where_value {
       } elsif (blessed($rhs) && $rhs->isa('SQL::Wizard::Expr')) {
         my ($s, @b) = $self->render($rhs);
         $s = "($s)" if $rhs->isa('SQL::Wizard::Expr::Select');
-        push @parts, "$col $op $s";
+        push @parts, "$col $sql_op $s";
         push @bind, @b;
       } else {
-        push @parts, "$col $op ?";
+        push @parts, "$col $sql_op ?";
         push @bind, $rhs;
       }
     }

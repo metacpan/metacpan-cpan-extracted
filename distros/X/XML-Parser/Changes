@@ -1,5 +1,17 @@
 Revision history for Perl extension XML::Parser.
 
+2.49 2026-03-19 (by Todd Rinaldo)
+
+  Improvements:
+    - PR #171 Expose expat library version at runtime via expat_version()
+      and expat_version_info() class methods on XML::Parser::Expat
+    - PR #169 GH #168 Expose Expat 2.7.2 AllocTracker security APIs
+      (AllocTrackerMaximumAmplification, AllocTrackerActivationThreshold)
+
+  Maintenance:
+    - PR #170 Clean up build configuration: remove dead CAPI code from
+      Makefile.PL and Expat/Makefile.PL, add test dependencies to cpanfile
+
 2.48 2026-03-18 (by Todd Rinaldo)
 
   Fixes:

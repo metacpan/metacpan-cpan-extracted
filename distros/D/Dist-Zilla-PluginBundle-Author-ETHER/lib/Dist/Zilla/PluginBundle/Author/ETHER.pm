@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.170-5-g5c9fcaa
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.171-3-g9cbe6f9
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.171';
+our $VERSION = '0.172';
 
 use Moose;
 with
@@ -681,7 +681,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.171
+version 0.172
 
 =head1 SYNOPSIS
 

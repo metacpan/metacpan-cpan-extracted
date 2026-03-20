@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::DeviceRequest;
 # ABSTRACT: DeviceRequest is a request for devices required for a claim. This is typically a request for a single resource like a device, but can also ask for several identical devices. A DeviceClassName is currently required. Clients must check that it is indeed set. It's absence indicates that something changed in a way that is not supported by the client yet, in which case it must refuse to handle the request.
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s adminAccess => Bool;
@@ -35,7 +35,7 @@ IO::K8s::Api::Resource::V1alpha3::DeviceRequest - DeviceRequest is a request for
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 adminAccess
 
@@ -104,13 +104,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

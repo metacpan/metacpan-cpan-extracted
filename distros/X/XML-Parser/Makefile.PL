@@ -158,16 +158,6 @@ sub MY::postamble {
     return join "\n", @ret;
 }
 
-my @extras = ();
-
-push(
-    @extras,
-    CAPI => 'TRUE'
-  )
-  if (  $PERL_VERSION >= 5.005
-    and $OSNAME eq 'MSWin32'
-    and $Config{archname} =~ /-object\b/i );
-
 WriteMakefile1(
     ABSTRACT_FROM    => 'Parser.pm',
     AUTHOR           => 'Clark Cooper (coopercc@netheaven.com)',
@@ -211,7 +201,6 @@ WriteMakefile1(
         },
       )
     : (),
-    @extras
 );
 
 sub WriteMakefile1 {    #Compatibility code for old versions of EU::MM. Written by Alexandr Ciornii, version 0.23. Added by eumm-upgrade.

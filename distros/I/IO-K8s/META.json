@@ -2,7 +2,7 @@
    "abstract" : "Objects representing things found in the Kubernetes API",
    "author" : [
       "Torsten Raudssus <torsten@raudssus.de>",
-      "Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)"
+      "Jose Luis Martinez Torres <jlmartin@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -64,7 +64,7 @@
       "x_IRC" : "irc://irc.perl.org/#kubernetes",
       "x_IRC_user" : "Getty"
    },
-   "version" : "1.008",
+   "version" : "1.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -391,7 +391,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.008",
+                  "tag" : "1.009",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

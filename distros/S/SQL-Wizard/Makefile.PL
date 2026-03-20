@@ -1,5 +1,7 @@
 use ExtUtils::MakeMaker;
 
+my $version = MM->parse_version('lib/SQL/Wizard.pm');
+
 WriteMakefile(
   NAME          => 'SQL::Wizard',
   VERSION_FROM  => 'lib/SQL/Wizard.pm',
@@ -13,7 +15,13 @@ WriteMakefile(
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },
-    resources   => {
+    provides => {
+      'SQL::Wizard' => {
+        file    => 'lib/SQL/Wizard.pm',
+        version => $version,
+      },
+    },
+    resources => {
       repository => {
         type => 'git',
         url  => 'https://github.com/thomasbusch/perl-SQL-Wizard.git',

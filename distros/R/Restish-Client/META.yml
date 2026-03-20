@@ -1,0 +1,41 @@
+---
+abstract: 'A RESTish client...in perl!'
+author:
+  - 'Tim H <thend20@pair.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::Mock::LWP::Dispatch: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Restish-Client
+provides:
+  Restish::Client:
+    file: lib/Restish/Client.pm
+    version: '1.0'
+requires:
+  Carp: '0'
+  Data::Validate::URI: '0'
+  HTTP::Cookies: '0'
+  HTTP::Headers: '0'
+  HTTP::Request: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moo: '2.000000'
+  Text::Sprintf::Named: '0'
+  URI::Escape: '0'
+  URI::Query: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/thend20/perl-restish-client/issues
+  homepage: https://github.com/thend20/perl-restish-client
+  license: http://apache.org/licenses/LICENSE-2.0
+  repository: https://github.com/thend20/perl-restish-client.git
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

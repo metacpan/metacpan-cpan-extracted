@@ -1,5 +1,5 @@
 package AnyEvent::I3X::Workspace::OnDemand;
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 use v5.26;
 use Object::Pad;
 
@@ -194,7 +194,8 @@ ADJUST {
 
       $current_workspace = $event->{current}{name};
       $name              = $current_workspace;
-      $self->set_workspace_on_root_window($name);
+
+      $self->set_workspace_on_root_window($name) unless $type eq 'empty';
 
       $self->log_event('workspace', $event);
 
@@ -552,7 +553,7 @@ AnyEvent::I3X::Workspace::OnDemand - An I3 workspace loader
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

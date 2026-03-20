@@ -1,5 +1,8 @@
 Revision history for App-GHGen
 
+0.05	Thu Mar 19 10:36:44 EDT 2026
+	- Fix tabs that had crept in
+
 0.04	Wed Mar 18 11:44:12 EDT 2026
 	- Bump maximum Perl version
 	- Show debug on fail

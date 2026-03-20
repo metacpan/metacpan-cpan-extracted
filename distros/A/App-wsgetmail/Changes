@@ -1,5 +1,9 @@
 Revision history for App-wsgetmail
 
+0.11    2026-03-19
+        * Add resource_url and login_base_url options for Microsoft
+          Government Cloud
+
 0.10    2026-01-12
         * Add body_size_limit option to skip messages with big body
         * Add size_limit option to skip big messages

@@ -32,6 +32,7 @@ t/220_magic.t
 t/999_pod.t
 t/Util.pm
 t/quickbrown.txt
+utf8_dfa32.h
 utf8_valid.h
 xt/author/00-compile.t
 xt/author/pod-syntax.t

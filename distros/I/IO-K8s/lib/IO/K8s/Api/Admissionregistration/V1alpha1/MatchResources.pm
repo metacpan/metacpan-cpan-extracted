@@ -1,6 +1,6 @@
 package IO::K8s::Api::Admissionregistration::V1alpha1::MatchResources;
 # ABSTRACT: MatchResources decides whether to run the admission control policy on an object based on whether it meets the match criteria. The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
-our $VERSION = '1.008';
+our $VERSION = '1.009';
 use IO::K8s::Resource;
 
 k8s excludeResourceRules => ['Admissionregistration::V1alpha1::NamedRuleWithOperations'];
@@ -32,7 +32,7 @@ IO::K8s::Api::Admissionregistration::V1alpha1::MatchResources - MatchResources d
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head2 excludeResourceRules
 
@@ -115,13 +115,13 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =item *
 
-Jose Luis Martinez <jlmartin@cpan.org> (original author, inactive)
+Jose Luis Martinez Torres <jlmartin@cpan.org>
 
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Jose Luis Martinez.
+This software is Copyright (c) 2018-2026 by Jose Luis Martinez Torres <jlmartin@cpan.org>.
 
 This is free software, licensed under:
 

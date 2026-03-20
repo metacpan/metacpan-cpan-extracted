@@ -1,6 +1,10 @@
-^.github/
-^.git/.*
+^.git*
 ^MYMETA.*
 ^MANIFEST.bak
-^.gitignore
 ^Makefile$
+^CLAUDE.md$
+^\.perltidyrc$
+^cpanfile$
+\.orig$
+\.rej$
+\.DS_Store

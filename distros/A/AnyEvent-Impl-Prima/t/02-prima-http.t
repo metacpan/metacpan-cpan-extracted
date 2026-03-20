@@ -52,7 +52,7 @@ my $t = AnyEvent->timer(
 Prima->run;
 
 pass "We finished our main loop";
-isn't $answer, undef, "We got an HTTP answer";
+isnt $answer, undef, "We got an HTTP answer";
 is $timer, 1, "Our timer got called";
 is $timeout, undef, "No timeout";
 

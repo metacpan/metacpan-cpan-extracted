@@ -10,7 +10,7 @@ use File::Spec::Functions;
 
 use Exporter 'import';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 our @EXPORT_OK = qw(get_user_data_from_ssh_cfg);
 
@@ -62,7 +62,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,9 @@ Klaus Rindfrey, C<< <klausrin at cpan.org.eu> >>
 
 Please report any bugs or feature requests to C<bug-github-config-ssh-userdata
 at rt.cpan.org>, or through the web interface at
-L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData>.
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData>
+or create a L<GitHub
+Issue|https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 

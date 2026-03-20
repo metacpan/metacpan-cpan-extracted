@@ -2,7 +2,7 @@
 #
 # COPYRIGHT:
 #
-# This software is Copyright (c) 2020-2022 Best Practical Solutions, LLC
+# This software is Copyright (c) 2020-2026 Best Practical Solutions, LLC
 #                                          <sales@bestpractical.com>
 #
 # (Except where explicitly superseded by other copyright notices)
@@ -302,6 +302,33 @@ has response_matrix => (
     default => sub { return {} },
 );
 
+=head2 resource_url
+
+A string with the Microsoft Graph API base URL. Defaults to
+C<https://graph.microsoft.com/>. For Microsoft Government Cloud (GCC High),
+use C<https://graph.microsoft.us/>. For DoD, use
+C<https://dod-graph.microsoft.us/>.
+
+=cut
+
+has resource_url => (
+    is => 'ro',
+    required => 0,
+);
+
+=head2 login_base_url
+
+A string with the base URL for OAuth authentication. Defaults to
+C<https://login.windows.net>. For Microsoft Government Cloud
+(GCC High and DoD), use C<https://login.microsoftonline.us>.
+
+=cut
+
+has login_base_url => (
+    is => 'ro',
+    required => 0,
+);
+
 ###
 
 has _client => (
@@ -342,7 +369,7 @@ around BUILDARGS => sub {
         grep {
             defined $config->{$_}
         }
-        qw(client_id tenant_id username user_password global_access secret folder post_fetch_action stripcr size_limit body_size_limit debug response_matrix)
+        qw(client_id tenant_id username user_password global_access secret folder post_fetch_action stripcr size_limit body_size_limit debug response_matrix resource_url login_base_url)
     };
 
     return $class->$orig($attributes);
@@ -653,10 +680,11 @@ sub _build_client {
         username => $self->username,
         user_password => $self->user_password,
         secret => $self->secret,
-        client_id => $self->client_id,
         tenant_id => $self->tenant_id,
         global_access => $self->global_access,
         debug => $self->debug,
+        ( defined $self->resource_url       ? ( resource_url   => $self->resource_url )   : () ),
+        ( defined $self->login_base_url ? ( login_base_url => $self->login_base_url ) : () ),
     } );
     return $client;
 

@@ -1,4 +1,4 @@
-package App::sshca v0.0.5;
+package App::sshca v0.0.6;
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ sshca - A minimal SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.5
+version 0.0.6
 
 =head1 SYNOPSIS
 
@@ -146,6 +146,10 @@ Available options:
 =item * C<--expiry=YYYY-MM-DDThh:mm:ss>
 
 Exclude certs expiring after C<YYYY-MM-DDThh:mm:ss> (ISO 8601 date format).
+
+=item * C<--issued>
+
+Only list certs in the C<issued> state. This excludes renewed and revoked certs.
 
 =back
 

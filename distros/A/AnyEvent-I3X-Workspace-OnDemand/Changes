@@ -1,5 +1,17 @@
 Revision history for AnyEvent-I3X-Workspace-OnDemand
 
+0.010     2026-03-20 01:32:01Z
+
+  * When switching workspaces a workspace can be empty:
+
+      Processing workspace event focus on area51
+      Processing window with payload focus
+      Processing workspace event empty on com
+
+    This sets the workspace to com and not area51. Causing weird behaviour with
+    scripts that look for the workspace you are in. We now set the workspace on
+    any event that isn't empty.
+
 0.009     2026-03-19 07:44:34Z
 
   * Noticed some weird things with the X11 integration. Suspect a long term

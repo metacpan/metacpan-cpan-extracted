@@ -325,9 +325,9 @@ sub get_status_line { return( shift->_try( '_request', 'status_line', @_ ) ); }
 sub header
 {
     my $self = shift( @_ );
-    return( $self->error( "No header field name was provided to retrieve its value." ) ) if( !scalar( @_ ) );
+    return( $self->error( "No header field name was provided to set or retrieve its value." ) ) if( !scalar( @_ ) );
     my $field = shift( @_ );
-    my $hdrs = $self->headers || return( $self->pass_error );
+    my $hdrs  = $self->headers || return( $self->pass_error );
     if( scalar( @_ ) > 1 )
     {
         return( $hdrs->set( "$field" => @_ ) );

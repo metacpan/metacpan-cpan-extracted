@@ -4,7 +4,7 @@ Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 # VERSION
 
-Version 0.03
+Version 0.06
 
 # SYNOPSIS
 
@@ -21,7 +21,7 @@ This module is used to generate the policy files `CONTRIBUTING.md` and
 
 ## METHODS
 
-### Constructor
+### `new(_NAMED_ARGUMENTS_`
 
 The constructor `new()` accepts the following named arguments, where `login`
 and `module` are mandatory:
@@ -181,7 +181,7 @@ and `module` are mandatory:
 
 ## CONSTANTS
 
-Constant _`INTERNAL_CONTRIB_MD`_ containes the internal template used to
+Constant _`INTERNAL_CONTRIB_MD`_ contains the internal template used to
 create `CONTRIBUTING.md`. The constant is not exported. If necessary, access
 it as follows: `Dist::PolicyFiles::INTERNAL_CONTRIB_MD`.
 

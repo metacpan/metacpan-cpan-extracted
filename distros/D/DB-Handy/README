@@ -1,0 +1,124 @@
+NAME
+
+  DB::Handy - Pure-Perl flat-file relational database with DBI-like interface
+
+SYNOPSIS
+
+  use DB::Handy;
+
+  # DBI-like interface
+  my $dbh = DB::Handy->connect('./mydata', 'mydb', {
+      RaiseError => 1,
+      PrintError => 0,
+  });
+  $dbh->do("CREATE TABLE emp (id INT, name VARCHAR(40), salary INT)");
+
+  my $sth = $dbh->prepare("SELECT name FROM emp WHERE salary >= ?");
+  $sth->execute(70000);
+  while (my $row = $sth->fetchrow_hashref) {
+      print "$row->{name}\n";
+  }
+  $sth->finish;
+  $dbh->disconnect;
+
+  # Low-level interface
+  my $db = DB::Handy->new(base_dir => './mydata');
+  $db->execute("USE mydb");
+  my $res = $db->execute("SELECT * FROM emp");
+
+DESCRIPTION
+
+  DB::Handy is a self-contained, pure-Perl relational database engine that
+  stores data in fixed-length binary flat files.  It requires no external
+  database server and no XS modules -- just Perl 5.005_03 or later.
+
+  It provides both a low-level execute() API and a DBI-like interface
+  (connect/prepare/execute/fetch) without depending on the DBI module.
+
+  DB::Handy provides a DBI-inspired interface but is NOT a DBI driver
+  and does NOT require the DBI module.
+
+  This module is designed for:
+
+  - Lightweight applications
+  - Embedded or standalone environments
+  - A wide range of Perl versions
+  - Educational purposes
+
+  It is not intended to replace full-featured RDBMS systems.
+
+  See "DIFFERENCES FROM DBI" in the module POD for details.
+
+INSTALLATION
+
+  To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  Or using pmake.bat (Windows):
+
+    pmake.bat test
+    pmake.bat install
+
+COMPATIBILITY
+
+  This module works with Perl 5.005_03 and later.
+
+  WHY PERL 5.005_03 SPECIFICATION?
+
+  This module adheres to the Perl 5.005_03 specification--not because we
+  use the old interpreter, but because this specification represents the
+  simple, original Perl programming model that makes programming enjoyable.
+
+  THE STRENGTH OF MODERN TIMES
+
+  Some people think the strength of modern times is the ability to use
+  modern technology. That thinking is insufficient. The strength of modern
+  times is the ability to use ALL technology up to the present day.
+
+  By adhering to the Perl 5.005_03 specification, we gain access to the
+  entire history of Perl--from 5.005_03 to 5.42 and beyond--rather than
+  limiting ourselves to only the latest versions.
+
+  Key reasons:
+
+  - Simplicity: Original Perl approach keeps programming "raku" (easy/fun)
+  - JPerl: Final version of JPerl (Japanese Perl)
+  - Universal: Runs on ALL Perl versions (5.005_03 through 5.42+)
+  - Philosophy: Programming should be enjoyable (Camel Book readers know!)
+
+  Perl 5.6+ introduced character encoding complexity that made programming
+  harder. By following the 5.005_03 specification, we maintain the joy of
+  Perl programming.
+
+TARGET USE CASES
+
+  - Small tools and utilities
+  - Embedded scripting
+  - Prototyping
+  - Educational use
+
+LIMITATIONS
+
+  - Not a full SQL database
+  - No transaction support (AutoCommit always on)
+  - No query optimizer or planner
+  - Limited concurrency support; not suitable for high-write workloads
+  - Column order in array fetches is alphabetical, not declaration order
+  - VARCHAR is always stored as 255 bytes on disk regardless of declared size
+  - Single-column indexes only; range scans always perform a full table scan
+  - No FOREIGN KEY, VIEW, WINDOW functions, INTERSECT, EXCEPT, or BLOB/CLOB
+  - No strict SQL compliance
+
+AUTHOR
+
+  INABA Hitoshi <ina@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+  This software is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+

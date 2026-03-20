@@ -46,13 +46,19 @@ while (<$src>) {
     if (/^=head2 (5\.[0-9]+)/) {
         $current_version = $1;
     }
-    if (my ($link) = /(L<.*perldelta.*>)/) {
+    while (/(L<.*?perldelta.*?>)/g) {
+        my $link = $1;
         if ($current_version ne $doc_version
             || $ci_version !~ /\.0$/
         ) {
             diag "$link";
             $delta_links = 0;
         }
+    }
+    while (/L<.*?(perl5[0-9][0-9][^0]delta).*?>/g) {
+        my $link = $1;
+        diag "$link";
+        $delta_links = 0;
     }
 }
 ok($delta_links, 'Delta links');

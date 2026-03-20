@@ -6,25 +6,22 @@ AnyEvent::Impl::Prima - Prima event loop adapter for AnyEvent
 
   use Prima;
   use AnyEvent::Impl::Prima;
-  
+
   my $mw = Prima::MainWindow->new();
-  
+
   my $timer = AnyEvent->timer(
       after => 10,
       cb => sub { $mw->close; },
   );
 
   Prima->run;
-  
+
 =cut
 
 {
 
-package AnyEvent::Impl::Prima; 
+package AnyEvent::Impl::Prima 0.03;
 use strict;
-
-use vars '$VERSION';
-$VERSION = '0.02';
 
 use AnyEvent;
 require Prima;
@@ -44,21 +41,21 @@ sub io { my ($s,%r) = @_;
         $f->file( $r{fh} )
     };
     $f
-} 
+}
 
 sub AnyEvent::Impl::Prima::Timer::DESTROY { ${$_[0]}->destroy if $_[0] and ${$_[0]} }
 
 sub timer { my ( $s, %r ) = @_;
     my($c,$g) = $r{cb};
-    
+
     my $next = $r{ after } || $r{ interval };
     my $repeat = delete $r{ interval };
 
-    
+
     # Convert to miliseconds for Prima
     $next *= 1000;
     $repeat *= 1000 if $repeat;
-    
+
     my %timer_params = (
         timeout => $next,
     );
@@ -96,7 +93,7 @@ sub AnyEvent::CondVar::Base::_wait {
 }
 }
 
-push @AnyEvent::REGISTRY,["Prima",__PACKAGE__]; 
+push @AnyEvent::REGISTRY,["Prima",__PACKAGE__];
 
 }
 __END__

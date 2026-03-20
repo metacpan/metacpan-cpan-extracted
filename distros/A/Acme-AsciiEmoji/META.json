@@ -4,7 +4,7 @@
       "Robert Acock <email@lnation.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -42,7 +42,7 @@
    "provides" : {
       "Acme::AsciiEmoji" : {
          "file" : "lib/Acme/AsciiEmoji.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/Acme-AsciiEmoji"
       }
    },
-   "version" : "1.02",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

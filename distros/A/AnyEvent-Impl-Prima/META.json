@@ -4,13 +4,13 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AnyEvent-Impl-Prima",
    "no_index" : {
@@ -19,21 +19,51 @@
          "inc"
       ]
    },
-   "provides" : {
-      "AnyEvent::Impl::Prima" : {
-         "file" : "lib/AnyEvent/Impl/Prima.pm",
-         "version" : "0.02"
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Prima" : "1.50",
+            "Prima::Application" : "0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::HTTP" : "0",
+            "AnyEvent::Util" : "0",
+            "POSIX" : "0",
+            "Test::HTTP::LocalServer" : "0",
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Corion/AnyEvent-Impl-Prima/issues"
+      },
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/Corion/anyevent-impl-prima.git",
-         "web" : "https://github.com/Corion/anyevent-impl-prima"
+         "url" : "git://github.com/Corion/AnyEvent-Impl-Prima.git",
+         "web" : "https://github.com/Corion/AnyEvent-Impl-Prima"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.27202",
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

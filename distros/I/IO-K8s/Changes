@@ -1,6 +1,16 @@
 Revision history for IO-K8s
 
+1.009     2026-03-19 21:29:24Z
+  - Fix: coerce \0/\1 refs to plain 0/1 for Bool attributes — Perl's \0 is a
+    truthy reference, so users passing \0 expecting JSON false got wrong results.
+    Bool attributes now dereference scalar refs before coercing.
+  - Updated dist.ini authors and copyright holder
+
 1.008     2026-03-08 23:36:05Z
+  - Fix to_yaml handling for JSON booleans in resource hashes — TO_YAML now uses
+    YAML::PP with JSON schema and JSON::PP boolean mode, so JSON::PP::true/false
+    serialize as true/false instead of 1/0 or refs.
+  - Added test for CRD to_yaml with JSON booleans in passthrough spec hash.
 
 1.007     2026-03-08 15:01:36Z
   - Fix import leak: using an IO::K8s class (e.g. use IO::K8s::Api::Core::V1::Secret)

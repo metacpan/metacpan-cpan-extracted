@@ -1,25 +1,35 @@
-Revision history for Dist-PolicyFiles
+Revision history for distribution Dist-PolicyFiles
 
-0.05    2025/10/29
+0.07    2026-03-19
 
-      - Another fix in POD of dist-policyfiles
+      - Added and reorganized author and release tests.
+      - Completed POD.
 
-0.04    2025/10/28
+0.06    2025-10-30
 
-      - Fixed POD of dist-policyfiles
-      - Improved Makefile.PL and github actions workflow
+      - Fixed spell check test.
+      - Fixed txpo in POD.
 
-0.03    2025/10/27
+0.05    2025-10-29
 
-      - Adapted Makefile.PL
+      - Another fix in POD of dist-policyfiles.
+
+0.04    2025-10-28
+
+      - Fixed POD of dist-policyfiles.
+      - Improved Makefile.PL and github actions workflow.
+
+0.03    2025-10-27
+
+      - Adapted Makefile.PL.
       - Added constant INTERNAL_CONTRIB_MD to Dist::PolicyFiles.
-      - Corrected POD
+      - Corrected POD.
 
-0.02    2025/09/07
+0.02    2025-09-07
 
       - Minor code reformatting.
 
-0.01    2025/09/07
+0.01    2025-09-07
 
       - First version, released on an unsuspecting world.
 

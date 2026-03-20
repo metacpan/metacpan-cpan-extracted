@@ -59,6 +59,39 @@ SKIP: {
     is( $@, '', "parse succeeds with ReparseDeferralEnabled option" );
 }
 
+# AllocTracker APIs (require libexpat >= 2.7.2)
+SKIP: {
+    my $has_at = defined &XML::Parser::Expat::SetAllocTrackerMaximumAmplification;
+    skip "AllocTracker API not available (libexpat < 2.7.2)", 5
+      unless $has_at;
+
+    # Test via Expat object methods
+    ok( $p->alloc_tracker_maximum_amplification(100.0),
+        "set alloc tracker maximum amplification factor" );
+
+    ok( $p->alloc_tracker_activation_threshold(1_000_000),
+        "set alloc tracker activation threshold" );
+
+    # Test via XML::Parser constructor options
+    my $parser = XML::Parser->new(
+        AllocTrackerMaximumAmplification  => 50.0,
+        AllocTrackerActivationThreshold   => 500_000,
+    );
+    isa_ok( $parser, 'XML::Parser' );
+
+    # Parse a simple document to ensure options don't break parsing
+    my $result;
+    eval { $result = $parser->parse('<root><child/></root>'); };
+    is( $@, '', "parse succeeds with AllocTracker options set" );
+
+    # Test via Expat constructor options
+    my $expat = XML::Parser::Expat->new(
+        AllocTrackerMaximumAmplification => 200.0,
+    );
+    isa_ok( $expat, 'XML::Parser::Expat' );
+    $expat->release;
+}
+
 # Error handling: methods croak on missing APIs
 SKIP: {
     my $has_bl = defined &XML::Parser::Expat::SetBillionLaughsAttackProtectionMaximumAmplification;
@@ -67,6 +100,15 @@ SKIP: {
 
     eval { $p->billion_laughs_attack_protection_maximum_amplification(100.0); };
     like( $@, qr/not available/, "croak with helpful message when API unavailable" );
+}
+
+SKIP: {
+    my $has_at = defined &XML::Parser::Expat::SetAllocTrackerMaximumAmplification;
+    skip "AllocTracker API is available, cannot test missing-API error", 1
+      if $has_at;
+
+    eval { $p->alloc_tracker_maximum_amplification(100.0); };
+    like( $@, qr/not available/, "croak with helpful message when AllocTracker API unavailable" );
 }
 
 $p->release;

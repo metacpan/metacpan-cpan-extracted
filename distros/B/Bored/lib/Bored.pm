@@ -2,7 +2,7 @@ package Bored;
 
 use 5.008003;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use base 'Import::Export';
 
@@ -38,6 +38,22 @@ sub tortured {
 	return 'souls';
 }
 
+sub walking {
+	return 'further';
+}
+
+sub evil {
+	return 'patience';
+}
+
+sub freemasons {
+	return 'hidden';
+}
+
+sub namedays {
+	return 'already lost, boring';
+}
+
 1;
 
 __END__
@@ -48,7 +64,7 @@ Bored - news!
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 

@@ -1,0 +1,38 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: DB-Handy
+version: 1.00
+abstract: Pure-Perl flat-file relational database with DBI-like interface
+author:
+  - ina <ina@cpan.org>
+license: perl
+generated_by: pmake.bat
+requires:
+  Fcntl: 1.03
+  File::Path: 1.0401
+  File::Spec: 0
+  POSIX: 0
+  constant: 0
+  perl: 5.005_03
+  strict: 1.01
+  vars: 0
+  warnings: 0
+build_requires:
+  Test: 1.122
+minimum_perl_version: 5.00503
+provides:
+  DB::Handy:
+    file: lib/DB/Handy.pm
+    version: 1.00
+  DB::Handy::Connection:
+    file: lib/DB/Handy.pm
+    version: 1.00
+  DB::Handy::Statement:
+    file: lib/DB/Handy.pm
+    version: 1.00
+resources:
+  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/DB-Handy/issues
+  repository: https://github.com/ina-cpan/DB-Handy

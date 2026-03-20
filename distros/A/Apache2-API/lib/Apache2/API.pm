@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.5.0
+## Version v0.5.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2025/10/08
+## Modified 2026/03/19
 ## All rights reserved
 ## 
 ## 
@@ -41,7 +41,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.5.0';
+    $VERSION = 'v0.5.1';
 };
 
 use strict;
@@ -912,7 +912,7 @@ sub reply
 
     # '$msg' may possibly be a Text::PO::String, whose benefit is that it has the 'locale' method
     my $msg;
-    if( exists( $ref->{success} ) )
+    if( exists( $ref->{success} ) && !exists( $ref->{message} ) )
     {
         $msg = $ref->{success};
     }
@@ -973,6 +973,7 @@ sub reply
             $ref->{success} = \1 unless( exists( $ref->{success} ) );
             $ref->{code} //= $code;
         }
+        $set_payload_locale->( $ref, $msg );
     }
     # Or we just have a code to go on with
     elsif( $is_error )
@@ -1038,6 +1039,7 @@ sub reply
     }
 
     # Choose Content-Type
+    # If we use new modern error, then we set application/problem+json in line with rfc7807
     my $ctype = ( $is_error && $use_rfc_error )
         ? 'application/problem+json; charset=utf-8'
         : 'application/json; charset=utf-8';
@@ -1945,7 +1947,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 
@@ -2185,13 +2187,17 @@ Returns the L<Apache2::API::Response> object. This object is set upon instantiat
 
 Returns a L<Apache2::Server> object
 
-=head2 server_version()
+=head2 server_version
 
 Tries hard to find out the version number of the Apache server. This returns the value from L<Apache2::API::Request/server_version>
 
 =head2 set_handlers()
 
 Returns the values from L<Apache2::Server/set_handlers> by passing it whatever arguments were provided.
+
+=head2 use_rfc_error
+
+Boolean. When true, this will return rfc9457 style error L<https://www.rfc-editor.org/rfc/rfc9457.html>
 
 =head2 warn( @list )
 

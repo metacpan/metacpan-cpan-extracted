@@ -11,17 +11,9 @@ my $eumm_version = $ExtUtils::MakeMaker::VERSION;
 $eumm_version =~ s/_//;
 
 my $module = 'AnyEvent::Impl::Prima';
-# Find out some data about our module
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
-(my $distname = $module) =~ s!::!-!g;
-my $content = do { local(*ARGV,$/)=[$main_file]; <> };
-
-# I should maybe use something like Shipwright...
-regen_README($main_file);
-#regen_EXAMPLES();
-
-(my $main_version)
-    = $content =~ m/ [^\n]* \$VERSION \s* = [^=] '([\d_.]+) [^\n]+ /gxms;
+(my $distbase = $module) =~ s!::!-!g;
+my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';
 
@@ -34,44 +26,43 @@ my %module = (
         "meta-spec" => { version => 2 },
         resources => {
             repository => {
-                web => 'https://github.com/Corion/anyevent-impl-prima',
-                url => 'git://github.com/Corion/anyevent-impl-prima.git',
+                web => "https://github.com/Corion/$distlink",
+                url => "git://github.com/Corion/$distlink.git",
                 type => 'git',
-            }
+            },
+            bugtracker  => {
+              web    => "https://github.com/Corion/$distbase/issues",
+              # mailto => 'meta-bugs@example.com',
+            },
+            license    => "https://dev.perl.org/licenses/",
         },
         dynamic_config   => 0, # we promise to keep META.* up-to-date
         x_static_install => 1, # we are pure Perl and don't do anything fancy
-        provides => {
-            $module => {
-                file    => $main_file,
-                version => $main_version,
-            }
-        },
     },
-    
-    MIN_PERL_VERSION => '5.010',
 
-    ($eumm_version >= 6.3001
-      ? ('LICENSE'=> 'perl')
-      : ()),
+    MIN_PERL_VERSION => '5.020', # I use signatures
+
+    'LICENSE'=> 'artistic_2',
 
     PL_FILES            => {},
-    BUILD_REQUIRES => {
-        'ExtUtils::MakeMaker' => 0,
-    },
+    BUILD_REQUIRES =>     { 'ExtUtils::MakeMaker' => 0 },
 
-    PREREQ_PM => {
+    PREREQ_PM =>     {
+        'AnyEvent'           => '0',
         'Prima'              => '1.50',
-        'AnyEvent'           => 0,
+        'Prima::Application' => '0',
     },
-    TEST_REQUIRES => {
-        'Test::More'              => 0,
-        'AnyEvent::HTTP'          => 0,
-        'Test::HTTP::LocalServer' => 0,
+    TEST_REQUIRES =>     {
+        'AnyEvent'                => '0',
+        'AnyEvent::HTTP'          => '0',
+        'AnyEvent::Util'          => '0',
+        'POSIX'                   => '0',
+        'Test::More'              => '0',
+        'Test::HTTP::LocalServer' => '0',
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'AnyEvent-Impl-Prima-*' },
+    clean               => { FILES => "$distbase-*" },
 
     test            => { TESTS => join( ' ', @tests ) },
 );
@@ -84,9 +75,10 @@ sub get_module_info { %module }
 
 if( ! caller ) {
     # I should maybe use something like Shipwright...
-    regen_README($main_file);
-    #regen_EXAMPLES();
-    WriteMakefile1(get_module_info);
+    my $mm = WriteMakefile1(get_module_info);
+    my $version = $mm->parse_version($main_file);
+    regen_README($main_file, $version);
+    regen_EXAMPLES() if -d 'examples';
 };
 
 1;
@@ -114,18 +106,22 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
     delete $params{AUTHOR} if $] < 5.005;
     delete $params{ABSTRACT_FROM} if $] < 5.005;
     delete $params{BINARY_LOCATION} if $] < 5.005;
-    
+
     WriteMakefile(%params);
 }
 
 sub regen_README {
     # README is the short version that just tells people what this is
     # and how to install it
+    my( $file, $version ) = @_;
     eval {
         # Get description
         my $readme = join "\n",
-            pod_section($_[0], 'NAME', 'no heading' ),
-            pod_section($_[0], 'DESCRIPTION' ),
+            pod_section($file, 'NAME', 'no heading' ),
+            pod_section($file, 'DESCRIPTION' ),
+            <<VERSION,
+This document describes version $version.
+VERSION
             <<INSTALL,
 
 INSTALLATION
@@ -137,7 +133,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL
@@ -146,13 +142,17 @@ Should you wish to install this module manually, the procedure is
   make install
 
 INSTALL
-            pod_section($_[0], 'REPOSITORY'),
-            pod_section($_[0], 'SUPPORT'),
-            pod_section($_[0], 'BUG TRACKER'),
-            pod_section($_[0], 'AUTHOR'),
-            pod_section($_[0], 'LICENSE' ),
-            pod_section($_[0], 'COPYRIGHT' ),
-    ;        
+            pod_section($file, 'REPOSITORY'),
+            pod_section($file, 'SUPPORT'),
+            pod_section($file, 'TALKS'),
+            pod_section($file, 'KNOWN ISSUES'),
+            pod_section($file, 'BUG TRACKER'),
+            pod_section($file, 'CONTRIBUTING'),
+            pod_section($file, 'SEE ALSO'),
+            pod_section($file, 'AUTHOR'),
+            pod_section($file, 'LICENSE' ),
+            pod_section($file, 'COPYRIGHT' ),
+    ;
         update_file( 'README', $readme );
     };
     # README.mkdn is the documentation that will be shown as the main
@@ -167,7 +167,9 @@ INSTALL
         $parser->parse_from_file($_[0]);
         my $readme_mkdn = <<STATUS . $parser->as_markdown;
 
-[![Build Status](https://travis-ci.org/Corion/anyevent-impl-prima.svg?branch=master)](https://github.com/Corion/anyevent-impl-prima)
+[![Windows](https://github.com/Corion/$distbase/workflows/windows/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Awindows)
+[![MacOS](https://github.com/Corion/$distbase/workflows/macos/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Amacos)
+[![Linux](https://github.com/Corion/$distbase/workflows/linux/badge.svg)](https://github.com/Corion/$distbase/actions?query=workflow%3Alinux)
 
 STATUS
         update_file( 'README.mkdn', $readme_mkdn );
@@ -179,37 +181,50 @@ sub pod_section {
     open my $fh, '<', $filename
         or die "Couldn't read '$filename': $!";
 
-    my @section = 
+    my @section =
         grep { /^=head1\s+$section/.../^=/ } <$fh>;
-    pop @section if $section[-1] =~ /^=/;
-    unshift @section if $remove_heading;
 
     # Trim the section
     if( @section ) {
+        pop @section if $section[-1] =~ /^=/;
+        shift @section if $remove_heading;
+
         pop @section
-            while $section[-1] =~ /^\s*$/;
+            while @section and $section[-1] =~ /^\s*$/;
         shift @section
-            while $section[0] =~ /^\s*$/;
+            while @section and $section[0] =~ /^\s*$/;
     };
-    
+
     @section = map { $_ =~ s!^=\w+\s+!!; $_ } @section;
     return join "", @section;
 }
+
+sub regen_EXAMPLES {
+    my $perl = $^X;
+    if ($perl =~/\s/) {
+        $perl = qq{"$perl"};
+    };
+    (my $example_file = $main_file) =~ s!\.pm$!/Examples.pm!;
+    my $examples = `$perl -w examples/gen_examples_pod.pl`;
+    if ($examples) {
+        warn "(Re)Creating $example_file\n";
+        $examples =~ s/\r\n/\n/g;
+        update_file( $example_file, $examples );
+    };
+};
 
 sub update_file {
     my( $filename, $new_content ) = @_;
     my $content;
     if( -f $filename ) {
-        open my $fh, '<', $filename
+        open my $fh, '<:raw:encoding(UTF-8)', $filename
             or die "Couldn't read '$filename': $!";
-        binmode $fh;
         local $/;
         $content = <$fh>;
     };
 
     if( $content ne $new_content ) {
-        if( open my $fh, '>', $filename ) {
-            binmode $fh;
+        if( open my $fh, '>:raw:encoding(UTF-8)', $filename ) {
             print $fh $new_content;
         } else {
             warn "Couldn't (re)write '$filename': $!";

@@ -1,5 +1,18 @@
 Revision history for Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
+0.05	Thu Mar 19 19:05:22 EDT 2026
+	- DeepMock:
+		- Added args_eq and args_deeply expectation types for exact and deep argument matching
+		- Added never expectation type to assert that a spy was not called
+	- Meets PBP level 5
+	- Disallow setting a mock to undef
+	- Add mock_return, mock_exception, and mock_sequence sugar helpers for common mocking patterns.
+	- Add mock_once: a one-shot mock that restores itself after the first call.
+
+0.04	Thu Mar 19 08:36:23 EDT 2026
+	- Refactored unmock() to reliably support both shorthand and longhand targets.
+	- Added DeepMock
+
 0.03	Wed Mar  4 07:29:58 EST 2026
 	Added shorthand syntax
 	Added mock_scoped

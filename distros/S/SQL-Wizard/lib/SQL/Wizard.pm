@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use SQL::Wizard::Renderer;
 use SQL::Wizard::Expr::Column;
@@ -75,20 +75,7 @@ sub func {
 
 sub select {
   my ($self, %args) = @_;
-  my %node;
-  $node{columns}  = $args{'-columns'}  if $args{'-columns'};
-  $node{from}     = $args{'-from'}     if $args{'-from'};
-  $node{where}    = $args{'-where'}    if $args{'-where'};
-  $node{group_by} = $args{'-group_by'} if $args{'-group_by'};
-  $node{having}   = $args{'-having'}   if $args{'-having'};
-  $node{order_by} = $args{'-order_by'} if $args{'-order_by'};
-  $node{limit}    = $args{'-limit'}    if defined $args{'-limit'};
-  $node{offset}   = $args{'-offset'}   if defined $args{'-offset'};
-  $node{window}   = $args{'-window'}   if $args{'-window'};
-  SQL::Wizard::Expr::Select->new(
-    %node,
-    _renderer => $self->{renderer},
-  );
+  SQL::Wizard::Expr::Select->from_args(%args, _renderer => $self->{renderer});
 }
 
 sub insert {

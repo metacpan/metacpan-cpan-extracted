@@ -1,6 +1,5 @@
 use ExtUtils::MakeMaker;
 use Config;
-use English;
 
 my $expat_libpath = $ENV{EXPATLIBPATH} || '';
 my $expat_incpath = $ENV{EXPATINCPATH} || '';
@@ -11,10 +10,6 @@ my @extras = ();
 push(@extras, INC => "-I$expat_incpath") if $expat_incpath;
 
 $libs = "-L$expat_libpath $libs" if $expat_libpath;
-
-push(@extras, CAPI => 'TRUE')
-    if (($PERL_VERSION >= 5.005) and ($OSNAME eq 'MSWin32')
-        and ($Config{archname} =~ /-object\b/i));
 
 push(@extras,
     ABSTRACT => "Lowlevel access to James Clark's expat XML parser",
@@ -29,4 +24,3 @@ WriteMakefile(
     VERSION_FROM => 'Expat.pm',
     @extras
 );
-

@@ -3625,6 +3625,8 @@ sub process
             $def->{description} = trim( $def->{description} );
         }
         $def->{description} = undef unless( length( $def->{description} // '' ) );
+        # A common issue, or so it seems, is for some URL to be missing the first letter 'h', such as: 'ttps://translatorswithoutborders.org/language-data-for-el-salvador'
+        $def->{uri} = 'h' . $def->{uri} if( $def->{uri} && substr( lc( $def->{uri} ), 0, 1 ) ne 'h' );
     
         eval
         {

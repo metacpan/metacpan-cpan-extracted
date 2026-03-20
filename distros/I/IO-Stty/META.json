@@ -4,7 +4,7 @@
       "Austin Schutz <auschutz@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,8 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -31,7 +30,7 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "runtime" : {
+      "test" : {
          "requires" : {
             "Test::More" : "0"
          }
@@ -40,16 +39,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/toddr/IO-Stty/issues"
+         "web" : "https://github.com/cpan-authors/IO-Stty/issues"
       },
-      "homepage" : "http://wiki.github.com/toddr/IO-Stty",
+      "homepage" : "https://github.com/cpan-authors/IO-Stty",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/toddr/IO-Stty"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/IO-Stty.git",
+         "web" : "https://github.com/cpan-authors/IO-Stty"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
