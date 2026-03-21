@@ -16,10 +16,10 @@ SKIP: {
       unless $has_bl;
 
     # Test via Expat object methods
-    ok( $p->billion_laughs_attack_protection_maximum_amplification(100.0),
+    ok( defined $p->billion_laughs_attack_protection_maximum_amplification(100.0),
         "set maximum amplification factor" );
 
-    ok( $p->billion_laughs_attack_protection_activation_threshold(1_000_000),
+    ok( defined $p->billion_laughs_attack_protection_activation_threshold(1_000_000),
         "set activation threshold" );
 
     # Test via XML::Parser constructor options
@@ -66,10 +66,10 @@ SKIP: {
       unless $has_at;
 
     # Test via Expat object methods
-    ok( $p->alloc_tracker_maximum_amplification(100.0),
+    ok( defined $p->alloc_tracker_maximum_amplification(100.0),
         "set alloc tracker maximum amplification factor" );
 
-    ok( $p->alloc_tracker_activation_threshold(1_000_000),
+    ok( defined $p->alloc_tracker_activation_threshold(1_000_000),
         "set alloc tracker activation threshold" );
 
     # Test via XML::Parser constructor options

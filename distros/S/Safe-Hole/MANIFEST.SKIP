@@ -1,0 +1,9 @@
+^cpanfile$
+^Makefile$
+^MYMETA\..+
+^blib/
+^pm_to_blib$
+^\.git
+^MANIFEST.bak$
+^README$
+^\.perltidyrc$

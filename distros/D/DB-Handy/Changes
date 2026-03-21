@@ -1,5 +1,51 @@
 Revision history for DB::Handy
 
+1.04  2026-03-21 JST (Japan Standard Time)
+
+    - New: pure OR expressions where every atom has an index now use
+      index lookups and return the union of matching records, rather
+      than a full table scan.  Mixed OR/AND and OR with any unindexed
+      column still fall back to a full table scan.
+    - Added: t/1013_or_index.t (62 tests) covering OR index acceleration.
+    - Updated: POD and README revised to document the new behaviour.
+
+1.03  2026-03-21 JST (Japan Standard Time)
+
+    - New: col IN (v1, v2, ...) predicates on indexed columns now use
+      index lookups (one equality lookup per value, results unioned)
+      instead of a full table scan.  NOT IN is not optimised.
+    - Added: t/1012_in_index.t (56 tests) covering IN index acceleration.
+    - Updated: POD and README revised to document the new behaviour.
+    - Style: commas in function/method calls are now consistently followed
+      by a space (commas inside regex patterns and string literals exempt).
+    - Style: \@array references rewritten as [ @array ]; \%hash references
+      rewritten as { %hash } where semantically equivalent.
+    - Checks: t/0007-cpan_precheck.t gains Category K (3 tests) that
+      enforce the above coding-style rules on all .pm files.
+
+1.02  2026-03-21 JST (Japan Standard Time)
+
+    - New: Multi-column AND queries now exploit an available index on
+      one of the columns (partial AND index pushdown). Example:
+      WHERE dept = 'Eng' AND salary > 70000 uses the dept or salary
+      index rather than performing a full table scan.
+    - New: INTERSECT, INTERSECT ALL, EXCEPT, and EXCEPT ALL set
+      operations are now supported alongside UNION / UNION ALL.
+    - Added: t/1011_index_and_setop.t (69 tests) covering both features.
+    - Updated: POD and README revised to document the new behaviour.
+
+1.01  2026-03-20 JST (Japan Standard Time)
+
+    - Fixed: CHECK constraints are now enforced on UPDATE as well as INSERT.
+    - Fixed: WHERE col BETWEEN lo AND hi and
+      WHERE col OP lo AND col OP hi (two-sided AND range on one column)
+      now exploit an index when available.
+    - Fixed: fetchrow_arrayref, fetchrow_array, and sth->{NAME} now
+      reflect the SELECT list column order for named column lists.
+      SELECT * and JOIN results still fall back to alphabetical order.
+    - Added: t/1010_fixes.t (60 tests) covering the three fixes above.
+    - Updated: POD and README revised to document the corrected behaviour.
+
 1.00  2026-03-19 JST (Japan Standard Time)
 
     - First release on CPAN.

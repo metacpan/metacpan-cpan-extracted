@@ -10,7 +10,7 @@ my @lang = qw(
     French Spanish Swedish Norwegian
     Danish Dutch Romanian Czech
     Hungarian Finnish Austrian Brazilian
-    Turkish
+    Portuguese Turkish
 );
 
 for my $lang (@lang) {

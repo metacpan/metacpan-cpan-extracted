@@ -1,5 +1,6 @@
 package Net::Ident;
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -39,7 +40,7 @@ _export_hooks();
 # for compatibility mode, uncomment the next line @@ s/^#\s*// @@
 # our @EXPORT = qw(_export_hook_fh);
 
-our $VERSION = "1.26";
+our $VERSION = "1.27";
 
 our $DEBUG = 0;
 *STDDBG = *STDERR;
@@ -220,7 +221,7 @@ sub newFromInAddr {
 # object method
 sub query {
     my ($self) = @_;
-    my ( $wmask, $timeout, $emask, $fileno, $err, $query );
+    my ( $wmask, $timeout, $fileno, $err, $query );
 
     print STDDBG "Net::Ident::query\n" if $DEBUG > 1;
 
@@ -242,11 +243,8 @@ sub query {
         # wait until the socket becomes writable.
         $wmask = '';
         vec( $wmask, $fileno, 1 ) = 1;
-        scalar select( undef, $wmask, $emask = $wmask, $timeout )
+        scalar select( undef, $wmask, undef, $timeout )
           or die "= Connection timed out\n";
-
-        # Check for errors via select (you never know)
-        vec( $emask, $fileno, 1 ) and die "= connection error: $!\n";
 
         # fh must be writable now
         vec( $wmask, $fileno, 1 ) or die "= connection timed out or error: $!\n";
@@ -298,7 +296,7 @@ sub query {
 # object method
 sub ready {
     my ( $self, $blocking ) = @_;
-    my ( $timeout, $rmask, $emask, $answer, $ret, $fileno );
+    my ( $timeout, $rmask, $answer, $ret, $fileno );
 
     print STDDBG "Net::Ident::ready blocking=" . ( $blocking ? "true\n" : "false\n" ) if $DEBUG > 1;
 
@@ -333,10 +331,7 @@ sub ready {
             # wait for something
             $rmask = '';
             vec( $rmask, $fileno, 1 ) = 1;
-            if ( select( $rmask, undef, $emask = $rmask, $timeout ) ) {
-
-                # something came in
-                vec( $emask, $fileno, 1 ) and die "= error while reading: $!\n";
+            if ( select( $rmask, undef, undef, $timeout ) ) {
 
                 # check for incoming data
                 if ( vec( $rmask, $fileno, 1 ) ) {

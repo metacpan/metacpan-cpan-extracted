@@ -1,3 +1,21 @@
+1.38 Mar 20 2026
+
+  [Bug Fixes]
+  - Fix: escape solidus (/) as \/ in JSON::Syck::Dump for XSS safety (GH #125, PR #130)
+  - Fix: anchor tracking for blessed scalar refs in Dump (GH #126, PR #131)
+  - Fix: prevent buffer underflow in base60 (sexagesimal) parsing (PR #133)
+  - Fix: guard against NULL type from strtok in tag parsing (PR #135)
+  - Fix: correct copy-paste bug in syck_seq_assign() ASSERT macros (PR #137)
+
+  [Improvements]
+  - Resolve TODO tests for empty/invalid YAML to match actual behavior (GH #127, PR #129)
+
+  [Maintenance]
+  - Remove dead Perl 5.6 TODOs and convert 5.8 TODO to SKIP (PR #129)
+  - Add comprehensive implicit type resolution test suite (PR #137)
+  - Update MANIFEST to include all unit tests
+  - Clean up test names to remove unnecessary numbering
+
 1.37 Mar 18 2026
 
   [Features]

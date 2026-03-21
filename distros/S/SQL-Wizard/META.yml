@@ -1,5 +1,5 @@
 ---
-abstract: 'Composable SQL query builder with expression trees'
+abstract: 'Composable SQL query builder with expression trees for Perl'
 author:
   - 'Thomas Busch <tbusch@cpan.org>'
 build_requires:
@@ -9,6 +9,34 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - sql
+  - query
+  - builder
+  - composable
+  - expression-tree
+  - select
+  - insert
+  - update
+  - delete
+  - truncate
+  - join
+  - cte
+  - window-function
+  - case
+  - union
+  - intersect
+  - except
+  - subquery
+  - upsert
+  - returning
+  - distinct
+  - postgresql
+  - mysql
+  - sqlite
+  - dbi
+  - bind-parameters
+  - injection-protection
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,10 +49,13 @@ no_index:
 provides:
   SQL::Wizard:
     file: lib/SQL/Wizard.pm
-    version: '0.03'
+    version: '0.08'
 requires:
   perl: '5.010000'
 resources:
+  bugtracker: https://github.com/thomasbusch/perl-SQL-Wizard/issues
+  homepage: https://github.com/thomasbusch/perl-SQL-Wizard
   repository: https://github.com/thomasbusch/perl-SQL-Wizard.git
-version: '0.03'
+version: '0.08'
+x_authority: cpan:TBUSCH
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

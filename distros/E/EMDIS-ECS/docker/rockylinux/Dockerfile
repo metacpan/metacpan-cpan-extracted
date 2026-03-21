@@ -11,12 +11,12 @@
 #
 # 2) Build a "perlecs/rockylinux" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/rockylinux:0.48-1 .
+#    docker build -t perlecs/rockylinux:0.49-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.48-1 /bin/bash
+#    docker run --rm -it --name=perlecs_rockylinux  perlecs/rockylinux:0.49-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -34,7 +34,7 @@
 FROM rockylinux:9
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on Rocky Linux"
-LABEL Version="0.48"
+LABEL Version="0.49"
 
 # update installed packages
 RUN yum -y update
@@ -46,9 +46,15 @@ RUN yum -y install \
  perl-LWP-Protocol-https diffutils less which python3 \
  cyrus-sasl cyrus-sasl-plain libusbx
 
-# add EPEL repository and install Mail::IMAPClient from there
+# add EPEL repository and install additional packages from there
 RUN yum -y install epel-release
-RUN yum -y install gnupg1 pass perl-Mail-IMAPClient python3-qpid-proton
+RUN yum -y install pass perl-Mail-IMAPClient python3-qpid-proton
+# Note:  The gnupg1 package was removed from the EPEL repository in late
+# 2025 (around 2025-11-11, when RHEL 9.7 was released).  However, the EPEL
+# archive contains old versions of the gnupg1 RPM package files:
+# https://dl.fedoraproject.org/pub/archive/epel/9.6-2025-11-11/
+# It is recommended to verify the GPG signature of the RPM package using
+# rpm --checksig to ensure its authenticity.
 
 # create perlecs user
 RUN useradd --comment "Perl ECS user" --create-home perlecs

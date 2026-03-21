@@ -2,6 +2,7 @@
 # getfh(), and the state machine transitions.  Uses socketpair for real I/O
 # without needing a running identd or network access.
 
+use 5.010;
 use strict;
 use warnings;
 use Test::More;

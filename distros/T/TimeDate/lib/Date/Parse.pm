@@ -14,7 +14,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(&strtotime &str2time &strptime);
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Parse date strings into time values
 
 my %month = (
@@ -83,13 +83,18 @@ sub {
 
   # ignore day names
   $dtstr =~ s#([\d\w\s])[\.\,]\s#$1 #sog;
-  $dtstr =~ s/,/ /g;
+  $dtstr =~ s/(?<!\d),|,(?!\d)/ /g;
   $dtstr =~ s#($daypat)\s*(den\s)?\b# #o;
   # Time: 12:00 or 12:00:00 with optional am/pm
 
   return unless $dtstr =~ /\S/;
 
-  if ($dtstr =~ s/\s(\d{4})([-:]?)(\d\d?)\2(\d\d?)(?:[-Tt ](\d\d?)(?:([-:]?)(\d\d?)(?:\6(\d\d?)(?:[.,](\d+))?)?)?)?(?=\D)/ /) {
+  # ISO compact: YYYYMMDD without delimiter (month and day must be exactly 2 digits)
+  if ($dtstr =~ s/\s(\d{4})(\d\d)(\d\d)(?:[-Tt ](\d\d?)(?:([-:]?)(\d\d?)(?:\5(\d\d?)(?:[.,](\d+))?)?)?)?(?=\D)/ /) {
+    ($year,$month,$day,$hh,$mm,$ss,$frac) = ($1,$2-1,$3,$4,$6,$7,$8);
+  }
+  # Date with explicit delimiter: YYYY[-:]MM[-:]DD
+  elsif ($dtstr =~ s/\s(\d{4})([-:])(\d\d?)\2(\d\d?)(?:[-Tt ](\d\d?)(?:([-:]?)(\d\d?)(?:\6(\d\d?)(?:[.,](\d+))?)?)?)?(?=\D)/ /) {
     ($year,$month,$day,$hh,$mm,$ss,$frac) = ($1,$3-1,$4,$5,$7,$8,$9);
   }
 
@@ -143,15 +148,17 @@ sub {
       ($month,$day) = ($month{$3},$1);
     }
     elsif ($dtstr =~ s#($monpat)\s*(\d+)\s*($sufpat)?\s# #o) {
-      ($month,$day) = ($month{$1},$2);
+      $month = $month{$1};
+      if ($2 > 31) { $year = $2 } else { $day = $2 }
     }
     elsif ($dtstr =~ s#($monpat)([\/-])(\d+)[\/-]# #o) {
       ($month,$day) = ($month{$1},$3);
     }
 
-    # Date: 961212
+    # Date: 961212 (YYMMDD — only consume if month is in range 1-12)
 
-    elsif ($dtstr =~ s#\s(\d\d)(\d\d)(\d\d)\s# #o) {
+    elsif ($dtstr =~ /\s(\d\d)(\d\d)(\d\d)\s/o && $2 >= 1 && $2 <= 12) {
+      $dtstr =~ s/\s(\d\d)(\d\d)(\d\d)\s/ /;
       ($year,$month,$day) = ($1,$2-1,$3);
     }
 
@@ -201,13 +208,19 @@ sub {
     }
   }
 
-  if (defined $year && $year > 1900) {
+  if (defined $year && $year >= 100) {
     $century = int($year / 100);
     $year -= 1900;
   }
 
   $zone += 3600 if defined $zone && $dst;
   $ss += "0.$frac" if $frac;
+
+  # Reject inputs that produced only a timezone with no date/time components.
+  # A bare number like '1' or '+0500' gets consumed by the timezone regex,
+  # leaving no meaningful date or time information — these are not valid dates.
+  return unless defined $hh || defined $mm || defined $ss
+             || defined $day || defined $month || defined $year;
 
   return ($ss,$mm,$hh,$day,$month,$year,$zone,$century);
 }
@@ -237,13 +250,14 @@ ESQ
 
 sub str2time
 {
+ my $now = @_ > 2 ? splice(@_, 2, 1) : time;
  my @t = strptime(@_);
 
  return undef
     unless @t;
 
  my($ss,$mm,$hh,$day,$month,$year,$zone, $century) = @t;
- my @lt  = localtime(time);
+ my @lt  = localtime($now);
 
  $hh    ||= 0;
  $mm    ||= 0;
@@ -258,11 +272,21 @@ sub str2time
  $day  = $lt[3]
     unless(defined $day);
 
- $year = ($month > $lt[4]) ? ($lt[5] - 1) : $lt[5]
-    unless(defined $year);
+ unless (defined $year) {
+   my $is_future = $month > $lt[4]
+                || ($month == $lt[4] && $day > $lt[3]);
+   $year = $is_future ? ($lt[5] - 1) : $lt[5];
+ }
 
  # we were given a 4 digit year, so let's keep using those
  $year += 1900 if defined $century;
+
+ # Normalize two-digit years to 4-digit before passing to Time::Local.
+ # Time::Local's own windowing varies across versions, so we do it ourselves.
+ # Convention: 69-99 -> 1969-1999, 0-68 -> 2000-2068 (POSIX strptime behavior).
+ # Note: first-century dates (years 1-99 AD) are not representable through
+ # str2time — same limitation as POSIX strptime.
+ $year += ($year >= 69 ? 1900 : 2000) if $year < 100;
 
  return undef
     unless($month <= 11 && $day >= 1 && $day <= 31
@@ -280,6 +304,8 @@ sub str2time
         or $result == -1
            && join("",$ss,$mm,$hh,$day,$month,$year)
                 ne "595923311169";
+   # Detect integer overflow: post-1970 dates must produce a non-negative epoch
+   return undef if $result < 0 && $year >= 1970;
    $result -= $zone;
  }
  else {
@@ -292,6 +318,9 @@ sub str2time
         or $result == -1
            && join("",$ss,$mm,$hh,$day,$month,$year)
                 ne join("",(localtime(-1))[0..5]);
+   # Detect integer overflow: post-1970 dates must produce a non-negative epoch
+   # Use 1971 to avoid false positives from timezone offsets near epoch 0
+   return undef if $result < 0 && $year >= 1971;
  }
 
  return $result + $frac;
@@ -311,7 +340,7 @@ Date::Parse - Parse date strings into time values
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 SYNOPSIS
 
@@ -328,19 +357,58 @@ C<Date::Parse> provides two routines for parsing date strings into time values.
 
 =over 4
 
-=item str2time(DATE [, ZONE])
+=item str2time(DATE [, ZONE [, EPOCH]])
 
 C<str2time> parses C<DATE> and returns a unix time value, or undef upon failure.
 C<ZONE>, if given, specifies the timezone to assume when parsing if the
 date string does not specify a timezone.
+C<EPOCH>, if given, is a unix epoch value used as the reference time when
+filling in missing date components (month, day, or year).  Defaults to
+C<time()>.  Useful when the current system clock cannot be trusted or when
+parsing dates relative to a known reference point.
 
 =item strptime(DATE [, ZONE])
 
 C<strptime> takes the same arguments as str2time but returns an array of
 values C<($ss,$mm,$hh,$day,$month,$year,$zone,$century)>. Elements are only
-defined if they could be extracted from the date string. The C<$zone> element
-is the timezone offset in seconds from GMT. An empty array is returned upon
-failure.
+defined if they could be extracted from the date string. An empty array is
+returned upon failure.
+
+The return values follow the same conventions as Perl's built-in C<localtime>
+and C<gmtime> functions:
+
+=over 4
+
+=item C<$month>
+
+0-indexed: 0 = January, 1 = February, ..., 11 = December.
+
+=item C<$year>
+
+Years since 1900. For example, the year 2015 is returned as C<115>, and 1995
+is returned as C<95>. To recover the full 4-digit year: C<$year + 1900>.
+
+=item C<$zone>
+
+Timezone offset in seconds from UTC, or C<undef> if no timezone was specified
+in the input string.
+
+=item C<$century>
+
+Defined only when a 4-digit year was present in the input. Its value is
+C<int($full_year / 100)> (e.g. C<20> for the year 2015). When C<$century> is
+defined, C<$year + 1900> gives the original 4-digit year.
+
+=back
+
+For example, C<strptime("2015-01-24T09:08:17")> returns:
+
+    ($ss, $mm, $hh, $day, $month, $year, $zone, $century)
+    ( 17,   8,   9,   24,      0,   115,  undef,     20 )
+    #                          ^--- January (0-indexed)
+    #                               ^--- 2015 - 1900
+    #                                          ^--- not in input
+    #                                                 ^--- int(2015/100)
 
 =back
 
@@ -360,8 +428,7 @@ English, French, German and Italian.
 
 Below is a sample list of dates that are known to be parsable with Date::Parse
 
- 1995:01:24T09:08:17.1823213           ISO-8601
- 1995-01-24T09:08:17.1823213
+ 1995-01-24T09:08:17.1823213           ISO-8601
  Wed, 16 Jun 94 07:29:35 CST           Comma and day name are optional
  Thu, 13 Oct 94 10:13:13 -0700
  Wed, 9 Nov 1994 09:50:32 -0500 (EST)  Text in ()'s will be ignored.

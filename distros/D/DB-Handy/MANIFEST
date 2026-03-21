@@ -22,3 +22,7 @@ t/1006_cpan_api.t
 t/1007_dbi_like.t
 t/1008_constraints.t
 t/1009_dbi_error.t
+t/1010_fixes.t
+t/1011_index_and_setop.t
+t/1012_in_index.t
+t/1013_or_index.t

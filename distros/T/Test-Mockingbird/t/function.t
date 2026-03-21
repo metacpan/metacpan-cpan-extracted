@@ -8,7 +8,6 @@ use Test::Vars;
 use lib 'lib';
 
 use Test::Mockingbird;
-
 use_ok('Test::Mockingbird::DeepMock');
 
 # ----------------------------------------------------------------------
@@ -236,6 +235,41 @@ subtest 'mock_once basic behaviour' => sub {
 
     is Edge::Target::a(), 'once', 'first call uses mock_once';
     is Edge::Target::a(), 'orig', 'second call restored original';
+
+    restore_all();
+};
+
+subtest 'restore basic behaviour' => sub {
+    {
+        package Edge::Restore;
+        sub a { return 'orig' }
+    }
+
+    mock_return 'Edge::Restore::a' => 'mocked';
+
+    is Edge::Restore::a(), 'mocked', 'mock applied';
+
+    restore 'Edge::Restore::a';
+
+    is Edge::Restore::a(), 'orig', 'restore restored original';
+
+    restore_all();
+};
+
+subtest 'diagnose_mocks basic structure' => sub {
+    {
+        package DM::F1;
+        sub a { 1 }
+    }
+
+    mock_return 'DM::F1::a' => 42;
+
+    my $diag = diagnose_mocks();
+
+    ok exists $diag->{'DM::F1::a'}, 'entry exists';
+    is $diag->{'DM::F1::a'}{depth}, 1, 'depth correct';
+
+    is $diag->{'DM::F1::a'}{layers}[0]{type}, 'mock_return', 'type recorded';
 
     restore_all();
 };

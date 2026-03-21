@@ -11,7 +11,7 @@ use warnings;
 use base 'Date::Language';
 use Date::Language::English ();
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Swedish localization for Date::Format
 
 our @MoY  = qw(januari februari mars april maj juni juli augusti september oktober november december);
@@ -51,7 +51,7 @@ Date::Language::Swedish - Swedish localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

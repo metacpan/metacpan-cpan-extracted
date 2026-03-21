@@ -9,7 +9,7 @@ my $q = SQL::Wizard->new;
 {
   my ($sql, @bind) = $q->update(
     -table => 'users',
-    -set   => { status => 'inactive', updated_at => $q->raw('NOW()') },
+    -set   => { status => 'inactive', updated_at => $q->now },
     -where => { last_login => { '<' => '2023-01-01' } },
   )->to_sql;
   like $sql, qr/^UPDATE users SET/, 'update start';
@@ -80,8 +80,8 @@ my $q = SQL::Wizard->new;
     -where => { role => 'guest' },
     -limit => 100,
   )->to_sql;
-  like $sql, qr/LIMIT 100$/, 'update with limit';
-  is_deeply \@bind, ['inactive', 'guest'], 'update limit binds';
+  like $sql, qr/LIMIT \?$/, 'update with limit';
+  is_deeply \@bind, ['inactive', 'guest', 100], 'update limit binds';
 }
 
 done_testing;

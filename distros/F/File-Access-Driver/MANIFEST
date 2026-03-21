@@ -1,0 +1,9 @@
+lib/File/Access/Driver.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/files/testfile.txt
+t/test_file.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

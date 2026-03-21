@@ -1,5 +1,27 @@
 Revision history for Perl extension XML::Parser.
 
+2.51 2026-03-20 (by Todd Rinaldo)
+
+  Fixes:
+    - PR #184 GH #182 Fix compile warnings from Fedora gcc: unhandled enum
+      value in switch and uninitialized variables in parse_stream
+    - PR #186 GH #183 Add explicit case labels for XML_CTYPE_EMPTY and
+      XML_CTYPE_ANY in generate_model switch to fix -Wswitch on BSD/clang
+    - PR #175 GH #174 Add XML_DTD/XML_GE compile-time guards to AllocTracker
+      and BillionLaughs XS bindings to fix warnings when expat lacks these flags
+    - PR #187 GH #185 Require proper declaration in AllocTracker feature
+      detection to prevent implicit function declaration on BSD
+
+  Improvements:
+    - PR #189 GH #188 Add tests for XS functions modified in PR #184 covering
+      XML_ErrorString, XML_GetBase/XML_SetBase, and generate_model
+
+  Maintenance:
+    - PR #181 GH #180 Add Fedora 43 container job to CI test matrix
+    - PR #178 Add BSD testing (FreeBSD, OpenBSD, NetBSD) to CI
+    - PR #179 Add no-lwp CI job to validate test suite without LWP::UserAgent
+    - Update MANIFEST
+
 2.49 2026-03-19 (by Todd Rinaldo)
 
   Improvements:

@@ -5,6 +5,7 @@
 #
 # Originally written 1999, modernised to Test::More 2026.
 
+use 5.010;
 use strict;
 use warnings;
 

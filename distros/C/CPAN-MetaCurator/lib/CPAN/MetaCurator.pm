@@ -2,13 +2,17 @@ package CPAN::MetaCurator;
 
 use 5.36.0;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 #-------------------------------------------------
 
 1;
 
 =pod
+
+=head1 NAME
+
+CPAN::MetaPackager - Manage the cpan.metapackager.sqlite database
 
 =head1 How to convert a Perl.Wiki.html into a jsTree
 

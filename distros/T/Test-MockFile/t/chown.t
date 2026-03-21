@@ -8,6 +8,7 @@ use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 use Test2::Tools::Exception qw< lives dies >;
 use Test::MockFile ();
+use Errno qw/ENOENT/;
 
 my $euid     = $>;
 my $egid     = int $);
@@ -210,6 +211,69 @@ subtest(
         is( $! + 0, 3, '$! is set to 3 for our test' );
         ok( chown( -1, -1, '/foo' ), 'Successfully run chown' );
         is( $! + 0, 3, '$! is still 3 (not reset by chown)' );
+    }
+);
+
+subtest(
+    'chown -1 preserves per-file ownership, not process identity' => sub {
+        # Create a file with non-default ownership
+        my $custom_uid = 12345;
+        my $custom_gid = 67890;
+        my $file = Test::MockFile->file(
+            '/chown_test_preserve' => 'data',
+            { uid => $custom_uid, gid => $custom_gid },
+        );
+
+        # chown(-1, -1) should keep the custom values, not replace with $> / $)
+        ok( chown( -1, -1, '/chown_test_preserve' ), 'chown(-1, -1) succeeds' );
+
+        my @st = stat('/chown_test_preserve');
+        is( $st[4], $custom_uid, 'uid preserved (not replaced with process uid)' );
+        is( $st[5], $custom_gid, 'gid preserved (not replaced with process gid)' );
+
+        # chown($new_uid, -1) should change uid but preserve gid
+        ok( chown( 99, -1, '/chown_test_preserve' ), 'chown(99, -1) succeeds' );
+        @st = stat('/chown_test_preserve');
+        is( $st[4], 99,          'uid changed to 99' );
+        is( $st[5], $custom_gid, 'gid still preserved after uid-only change' );
+
+        # chown(-1, $new_gid) should preserve uid but change gid
+        ok( chown( -1, 42, '/chown_test_preserve' ), 'chown(-1, 42) succeeds' );
+        @st = stat('/chown_test_preserve');
+        is( $st[4], 99, 'uid still preserved after gid-only change' );
+        is( $st[5], 42, 'gid changed to 42' );
+    }
+);
+
+subtest(
+    'chown with broken symlink in multi-file list does not confess' => sub {
+        my $link = Test::MockFile->symlink( '/nonexistent_target', '/chown_broken_link' );
+        my $file = Test::MockFile->file( '/chown_real_file', 'content' );
+
+        # chown on a mix of regular file + broken symlink should NOT die.
+        # The broken symlink should silently fail with ENOENT, and the
+        # regular file should succeed.
+        my ( $result, $errno );
+        ok(
+            lives { $result = chown( $>, int($)), '/chown_broken_link', '/chown_real_file' ); $errno = $! + 0 },
+            'chown with broken symlink + regular file does not confess',
+        );
+        is( $result, 1, 'chown returns 1 (one file changed)' );
+        is( $errno, ENOENT, 'errno set to ENOENT for the broken symlink' );
+    }
+);
+
+subtest(
+    'chown with only broken symlink' => sub {
+        my $link = Test::MockFile->symlink( '/nowhere', '/chown_only_broken' );
+
+        my ( $result, $errno );
+        ok(
+            lives { $result = chown( $>, int($)), '/chown_only_broken' ); $errno = $! + 0 },
+            'chown with only a broken symlink does not confess',
+        );
+        is( $result, 0, 'chown returns 0 (no files changed)' );
+        is( $errno, ENOENT, 'errno set to ENOENT' );
     }
 );
 

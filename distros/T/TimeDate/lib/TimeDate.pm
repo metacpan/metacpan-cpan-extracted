@@ -1,6 +1,6 @@
 package TimeDate;
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Date and time formatting subroutines
 
 1;
@@ -17,7 +17,7 @@ TimeDate - Date and time formatting subroutines
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 SYNOPSIS
 

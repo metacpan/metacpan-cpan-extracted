@@ -12,7 +12,7 @@ Net::API::REST - Framework for RESTful APIs
         use parent qw( Net::API::REST );
         use Net::API::Stripe;
     };
-    
+
     sub init
     {
         my $self = shift( @_ );
@@ -53,7 +53,7 @@ Net::API::REST - Framework for RESTful APIs
         # It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
         $self->{default_methods} = [qw( GET POST )];
         # This is ALL possible supported methods
-        $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS POST PUT )];
+        $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS PATCH POST PUT )];
         $self->{supported_languages} = [qw( en-GB en fr-FR fr ja-JP )];
         $self->{key} = 'kAncmaDajnacSnbGmbXamn';
         # We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
@@ -66,7 +66,7 @@ Net::API::REST - Framework for RESTful APIs
         $self->SUPER::init( @_ );
         return( $self );
     }
-    
+
     sub stripe
     {
         my $self = shift( @_ );
@@ -86,13 +86,13 @@ Net::API::REST - Framework for RESTful APIs
             $self->message( 3, "Unable to initiate a Net::API::Stripe object using the configuration file /home/john_doe/stripe-settings.json" );
             return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
         };
-    
+
         # Do an IP source check to be sure this is Stripe talking to us
         if( !defined( my $ip_check = $stripe->webhook_validate_caller_ip({ ip => $remote_ip, ignore_ip => $ignore_ip }) ) )
         {
             return( $self->reply({ code => $stripe->error->code, message => $stripe->error->message }) );
         }
-    
+
         # Now, we make sure this is Stripe sending this by checking the signature of the payload
         my $check = $stripe->webhook_validate_signature({
             secret => $signing_secret,
@@ -104,7 +104,7 @@ Net::API::REST - Framework for RESTful APIs
         {
             return( $self->reply({code => $stripe->error->code, message => $stripe->error->message }) );
         }
-    
+
         # Ok, if we are here, we passed all checks
         # Don't wait, reply ok back to Stripe so our request does not time out
         $self->response->code( Apache2::Const::HTTP_OK );
@@ -120,7 +120,7 @@ Net::API::REST - Framework for RESTful APIs
 
 # VERSION
 
-    v1.0.0
+    v1.2.5
 
 # DESCRIPTION
 
@@ -405,6 +405,10 @@ This sets the routes for all the endpoints proposed by the RESTful server
 ## supported\_api\_versions( array reference )
 
 Get or set the list of supported api versions
+
+## supported\_content\_types
+
+Get or set an array of supported content types, such as `application/json`, `text/html` or `text/plain`
 
 ## supported\_languages( array reference )
 

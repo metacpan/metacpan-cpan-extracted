@@ -622,30 +622,36 @@ sub MY::post_initialize {
 
 # back to your regular scheduled MakeMaker
 WriteMakefile(
-    NAME         => 'Net::Ident',
-    ABSTRACT     => 'Lookup the username on the remote end of a TCP/IP connection',
-    AUTHOR       => 'Jan-Pieter Cornet <johnpc@xs4all.nl>',
-    VERSION_FROM => 'Ident.pm',                                                       # finds $VERSION
-    PREREQ_PM    => {
+    NAME             => 'Net::Ident',
+    ABSTRACT         => 'Lookup the username on the remote end of a TCP/IP connection',
+    AUTHOR           => 'Jan-Pieter Cornet <johnpc@xs4all.nl>',
+    VERSION_FROM     => 'Ident.pm',                                                       # finds $VERSION
+    LICENSE          => 'perl_5',
+    MIN_PERL_VERSION => '5.010',
+    PREREQ_PM        => {
         Socket     => '0',
         FileHandle => '0',
         Carp       => '0',
         Exporter   => '0',
     },
+    TEST_REQUIRES => {
+        'Test::More' => 0,
+        'IO::Socket' => 0,
+    },
     dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean      => { FILES    => "Net-Ident-* t/apache/conf/access.conf t/apache/conf/apache_config.pl t/apache/conf/httpd.conf t/apache/conf/srm.conf t/apache/logs/access_log t/apache/logs/error_log t/apache/perl/inc" },
     META_MERGE => {
-        build_requires => {
-
-            #            'Apache' => 0,  # mod_perl is crazy hard to install. It's not a fair thing to require
-            #            'Apache::Constants' => 0,  # mod_perl is crazy hard to install. It's not a fair thing to require
-            'Test::More' => 0,    # For Testing.
-            'IO::Socket' => 0,    # For Testing
-        },
-        resources => {
-            license    => 'https://dev.perl.org/licenses/',
-            bugtracker => 'https://github.com/cpan-authors/Net-Ident/issues',
-            repository => 'https://github.com/cpan-authors/Net-Ident',
+        'meta-spec' => { version => 2 },
+        resources   => {
+            license    => ['https://dev.perl.org/licenses/'],
+            bugtracker => {
+                web => 'https://github.com/cpan-authors/Net-Ident/issues',
+            },
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/cpan-authors/Net-Ident.git',
+                web  => 'https://github.com/cpan-authors/Net-Ident',
+            },
         },
     },
 );

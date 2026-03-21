@@ -1,5 +1,99 @@
 Revision history for Test-MockFile
 
+0.038   3/20/2026
+
+  [Improvements]
+  - GH #70 - Auto-update stat timestamps (atime/mtime/ctime) during file
+    operations. PR #288
+  - GH #186 - Auto-update parent directory mtime on content changes. PR #288
+  - GH #3 - Add permission checking via set_user/clear_user. PR #281
+  - GH #44 - Add autodie compatibility with proper exception throwing.
+  - GH #16 - Add symlink() and link() overrides for mocked files.
+  - GH #24 - Add warnstrict mode for non-fatal strict violations.
+  - GH #39 - Override IO::File::open for mocked file compatibility.
+  - GH #135 - Add autovivify option for directory mocks.
+  - GH #139 - Override Cwd::abs_path to resolve mocked symlinks.
+  - GH #112 - Add flock() override for mocked files.
+  - GH #221 - Add truncate() override for mocked files.
+  - GH #111 - Add read(), write(), and append() helper methods.
+  - GH #27 - Support multiple file handles to the same mocked file.
+  - GH #158 - glob() now falls back to real filesystem for unmocked paths.
+  - GH #108 - Resolve . and .. in middle of paths.
+  - Add utime() override for mocked files.
+  - Add rename() override for mocked files.
+  - Implement SEEK whence support (SEEK_SET, SEEK_CUR, SEEK_END).
+  - Rewrite READLINE to support all $/ modes and implement GETC.
+  - Add :trace import tag for logging unmocked file accesses.
+  - Add file_passthrough() for strict-mode-compatible real filesystem
+    access with glob pattern support. PR #280
+
+  [Bug Fixes]
+  - GH #175 - Accept both EINVAL and ENOENT for readlink(undef).
+  - GH #179 - Fix filehandle reference leak. PR #276
+  - PRINT/PRINTF return false when weakened data ref is gone. PR #283
+  - Decrement nlink on unlink and preserve inode/nlink on rename. PR #276
+  - Set realistic nlink and unique inode defaults for mocked files.
+  - chmod/chown/utime/truncate now follow symlinks per POSIX. PR #287
+  - Use & ~umask instead of ^ umask for permission masking (multiple
+    locations).
+  - chown -1 now preserves per-file uid/gid instead of replacing with
+    process identity.
+  - Mask chmod mode with S_IFPERMS to prevent file type corruption.
+  - Use proper S_IFMT mask in is_link() to avoid false positives.
+  - Broken symlink stat sets ENOENT, not ELOOP.
+  - Use Errno constants instead of hardcoded errno values.
+  - PRINT writes at tell position instead of always appending.
+  - PRINT returns boolean 1, not byte count.
+  - Handle output record separator ($\) in PRINT for say() support.
+  - Update tell position after PRINT/WRITE/PRINTF operations.
+  - syswrite/printf must not inherit $\ from PRINT delegation.
+  - 2-arg open no longer dies on filenames with special characters.
+  - 2-arg open +>> mode parsing and opendir symlink following.
+  - readdir returns empty list (not undef) at EOF in list context.
+  - FileHandle CLOSE/DESTROY crash, WRITE negative offset, READ EBADF.
+  - Guard weakened data ref in tied filehandle methods.
+  - readline and getc on write-only handles now warn and return undef.
+  - READ returns EBADF on write-only handles, symlink size() returns
+    target length.
+  - sysopen without O_CREAT returns ENOENT for all modes.
+  - Allow seek past EOF and correct eof() behavior.
+  - seekdir with negative position no longer corrupts readdir.
+  - closedir double-close returns EBADF instead of passing to CORE.
+  - Dir ops on closed mock dirhandle warn instead of dying.
+  - Rename directory now re-keys children in mock registry.
+  - Rename directory over non-empty directory returns ENOTEMPTY.
+  - Rename to self no longer destroys file contents.
+  - Directory size() returns blksize instead of stringified arrayref.
+  - dir() constructor counts non-existent child mocks as content.
+  - rmdir ignores non-existent mock entries in directory.
+  - Set errno in __rmdir for undef path argument.
+  - unlink with no args now uses $_ for mocked files.
+  - Absolutify paths in _files_in_dir and _update_parent_dir_times.
+  - readlink returns ENOENT for non-existent mocks.
+  - lstat on unlinked symlink now returns ENOENT instead of stale stat.
+  - IO::File open on directory mocks returns EISDIR, append mode preserved.
+  - open/sysopen through broken symlink creates target file.
+  - Validate sysread length and return EINVAL on invalid seek whence.
+  - Correct blocks() calculation and remove dead code.
+  - Define S_IFPERMS locally instead of importing from Fcntl.
+  - Capture -s result before passing to is() for Perl < 5.16 compat.
+  - Apply permissions from sysopen O_CREAT 4th argument.
+  - Correct bareword check typo $_[9] -> $_[0] in dir functions.
+  - Pass missing args in chmod/chown passthrough to CORE.
+  - chown/chmod with broken symlinks no longer confess on multi-file lists.
+  - Use return undef in failure paths for correct list context.
+  - Truncate via read-only filehandle returns EINVAL.
+  - Add EISDIR checks, sysopen symlink following, and O_TRUNC dedup.
+
+  [Maintenance]
+  - Modernize CI workflow: upgrade checkout action and add Perl 5.40-5.42.
+  - Fix CI workflow permissions for code scanning. PR #284
+  - Refactor: improve readability and reduce duplication in MockFile.pm.
+    PR #284
+  - Add syswrite/sysread edge case test coverage. PR #282
+  - Correct MIN_PERL_VERSION and stale GitHub org URLs.
+  - Fix typos in error message and POD.
+
 0.037   4/15/2025
 - Fix unit test broken in perl 5.41.4
 

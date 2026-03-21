@@ -51,6 +51,6 @@
          "web" : "https://github.com/cpan-authors/IO-Stty"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

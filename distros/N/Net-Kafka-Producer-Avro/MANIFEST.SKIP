@@ -1,0 +1,10 @@
+.project
+.gitignore
+.git
+.git/*
+.externalToolBuilders
+.externalToolBuilders/*
+resource
+demo.txt
+tmp
+README.md

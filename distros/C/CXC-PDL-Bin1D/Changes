@@ -1,5 +1,10 @@
 Revision history for CXC-PDL-Bin1D
 
+0.28      2026-03-20 12:58:18-04:00 America/New_York
+
+  [BUILD]
+    * Make compatible with PDL v2.096
+
 0.27      2024-09-09 15:38:34-04:00 America/New_York
 
   [BUILD]

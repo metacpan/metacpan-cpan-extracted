@@ -1,21 +1,26 @@
-Revision history for Git-RemoteURL-Parse
+Revision history for distribution Git-RemoteURL-Parse
 
-0.04    2025/10/1
+0.05    2026-03-20
+
+     - Added and reorganized author and release tests.
+     - Completed POD.
+
+0.04    2025-10-31
 
      - Reworked Makefile.PL.
      - Corrected policy files.
 
-0.03    2025/08/08
+0.03    2025-08-08
 
      - Completed POD.
      - Reformatted Makefile.PL.
 
-0.02    2025/07/29
+0.02    2025-07-29
 
      - Removed junk from Makefile.PL.
      - Improved POD.
 
-0.01    2025/07/28
+0.01    2025-07-28
 
      - First version, released on an unsuspecting world.
 

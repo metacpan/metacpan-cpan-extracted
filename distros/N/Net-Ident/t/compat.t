@@ -2,6 +2,7 @@
 # Compatibility mode auto-imports ident_lookup into FileHandle.
 # When not in compat mode, the test is skipped entirely.
 
+use 5.010;
 use strict;
 use warnings;
 

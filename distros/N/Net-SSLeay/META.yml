@@ -47,5 +47,5 @@ requires:
 resources:
   bugtracker: https://github.com/radiator-software/p5-net-ssleay/issues
   repository: git://github.com/radiator-software/p5-net-ssleay.git
-version: '1.94'
+version: '1.96'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

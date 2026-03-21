@@ -10,7 +10,7 @@ use utf8;
 
 use Date::Language ();
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Brazilian localization for Date::Format
 
 use base 'Date::Language';
@@ -50,7 +50,7 @@ Date::Language::Brazilian - Brazilian localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

@@ -349,9 +349,9 @@ syck_seq_assign( SyckNode *seq, long idx, SYMID id )
 {
     struct SyckSeq *s;
 
-    ASSERT( map != NULL );
+    ASSERT( seq != NULL );
     s = seq->data.list;
-    ASSERT( m != NULL );
+    ASSERT( s != NULL );
     s->items[idx] = id;
 }
 

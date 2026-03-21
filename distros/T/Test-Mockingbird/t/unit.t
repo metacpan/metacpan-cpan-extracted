@@ -319,4 +319,42 @@ subtest 'mock_once stacks correctly' => sub {
 	restore_all();
 };
 
+subtest 'restore unwinds stacked mocks' => sub {
+    {
+        package Edge::Restore;
+        sub b { return 'orig' }
+    }
+
+    mock_return 'Edge::Restore::b' => 'layer1';
+    mock_return 'Edge::Restore::b' => 'layer2';
+
+    is Edge::Restore::b(), 'layer2', 'top layer active';
+
+    restore 'Edge::Restore::b';
+
+    is Edge::Restore::b(), 'orig', 'all layers removed';
+
+    restore_all();
+};
+
+subtest 'diagnose_mocks tracks stacked layers' => sub {
+    {
+        package DM::U1;
+        sub b { 1 }
+    }
+
+    mock_return    'DM::U1::b' => 10;
+    mock_exception 'DM::U1::b' => 'boom';
+
+    my $diag = diagnose_mocks();
+
+    is $diag->{'DM::U1::b'}{depth}, 2, 'two layers recorded';
+
+    my @types = map $_->{type}, @{ $diag->{'DM::U1::b'}{layers} };
+    is_deeply \@types, [ 'mock_return', 'mock_exception' ], 'types in order';
+
+    restore_all();
+};
+
+
 done_testing;

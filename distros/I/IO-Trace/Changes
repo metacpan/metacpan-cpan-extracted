@@ -1,5 +1,12 @@
 Revision history for IO::Trace
 
+0.024 2026-03-20 23:00:00
+ - Add -V option to show version
+ - Compatibility fix Perl v5.8.8
+ - And for Getopt::Long 2.35
+ - And for strace 4.5.18
+ - Handle deficient strace signal pass thru behavior
+
 0.023 2025-10-22 20:00:00
  - Allow redirecting to a file
 

@@ -33,11 +33,12 @@ no_index:
 provides:
   Test::Changes::Strict::Simple:
     file: lib/Test/Changes/Strict/Simple.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Carp: '0'
   Exporter: '1.6'
   Test::Builder: '0'
+  Test::Exception: '0.43'
   Time::Local: '0'
   constant: '0'
   perl: '5.010'
@@ -46,7 +47,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/klaus-rindfrey/perl-test-changes-strict-simple.git
-version: '0.05'
+version: '0.06'
 x_bugtracker:
   web: https://github.com/klaus-rindfrey/perl-test-changes-strict-simple/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -65,7 +65,12 @@ is( <$fh>, undef,   '9th read on $fh undef at EOF' );
 }
 
 close $fh;
-ok( !exists $Test::MockFile::files_being_mocked{$filename}->{'fh'}, "file handle clears from files_being_mocked hash when it goes out of scope." );
+{
+    my $fhs = $Test::MockFile::files_being_mocked{$filename}->{'fhs'};
+    my @defined_fhs = $fhs ? grep { defined $_ } @{$fhs} : ();
+    ok( !@defined_fhs, "file handle clears from files_being_mocked hash on close" )
+      or diag( "fhs has " . scalar(@defined_fhs) . " defined entries after close" );
+}
 
 undef $bar;
 is( scalar %Test::MockFile::files_being_mocked, 0, "files_being_mocked empties when \$bar is cleared" );
@@ -122,6 +127,46 @@ sub slurp {
     open( my $fh, '<', $filename );
     my @read = <$fh>;
     is( \@read, [ "abc\n", "def\n", "ghi\r\n", "dhdbhjdb\r" ], "readline reads in an array of stuff." );
+}
+
+note "-------------- readline on write-only handle --------------";
+{
+    my $baz = Test::MockFile->file( '/readline_writeonly', "secret data\n" );
+    open( my $wfh, '>', '/readline_writeonly' ) or die "open: $!";
+
+    # Scalar context
+    {
+        my $warn_msg;
+        local $SIG{__WARN__} = sub { $warn_msg = shift };
+        my $line = readline($wfh);
+        ok( !defined $line, 'readline on write-only handle returns undef' );
+        like( $warn_msg, qr{opened only for output}, 'readline on write-only handle warns' );
+    }
+
+    # List context
+    {
+        my $warn_msg;
+        local $SIG{__WARN__} = sub { $warn_msg = shift };
+        my @lines = <$wfh>;
+        is( scalar @lines, 0, 'readline in list context on write-only handle returns empty list' );
+        like( $warn_msg, qr{opened only for output}, 'readline list context on write-only handle warns' );
+    }
+
+    close $wfh;
+}
+
+note "-------------- getc on write-only handle --------------";
+{
+    my $baz = Test::MockFile->file( '/getc_writeonly', "XY" );
+    open( my $wfh, '>', '/getc_writeonly' ) or die "open: $!";
+
+    my $warn_msg;
+    local $SIG{__WARN__} = sub { $warn_msg = shift };
+    my $ch = getc($wfh);
+    ok( !defined $ch, 'getc on write-only handle returns undef' );
+    like( $warn_msg, qr{opened only for output}, 'getc on write-only handle warns' );
+
+    close $wfh;
 }
 
 done_testing();

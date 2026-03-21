@@ -241,8 +241,9 @@ typedef _Decimal128 D128;
      !(SV_IS_IOK(base) && SvIVX(base) >= 2 && SvIVX(base) <= 62)
 #endif
 
-/* Don't use CHECK_ROUNDING_VALUE macro with Rmpfr_set_NV      *
- * (as this function's "round" arg is "unsigned int", not SV*) */
+/* Don't use CHECK_ROUNDING_VALUE macro with Rmpfr_set_NV or *
+ * Rmpfr_set_IV (as this function's "round" arg is "unsigned *
+ * int", not SV*).                                           */
 
 #if MPFR_VERSION_MAJOR < 4
 #define CHECK_ROUNDING_VALUE \
@@ -406,8 +407,12 @@ typedef _Decimal128 D128;
 #if NVSIZE == 8
 #define MATH_MPFR_MAX_DIG 17
 #define NVSIZE_BITS 53
-#define MATH_MPFR_NV_MAX 0x1.fffffffffffffp+1023 /* 32-bit Windows has a problem with evaluating the    *
-                                                  * decimal form of this value if -std=c99 is specified */
+#  if defined(_MSC_VER)
+#  define MATH_MPFR_NV_MAX 1.7976931348623157e308  /* Old MS compilers do not handle hex constants */
+#  else
+#  define MATH_MPFR_NV_MAX 0x1.fffffffffffffp+1023 /* 32-bit Windows has a problem with evaluating the    *
+                                                    * decimal form of this value if -std=c99 is specified */
+#  endif
 #define MATH_MPFR_NORMAL_MIN 0x1p-1022
 
 # if defined(MPFR_HAVE_BENDIAN)                /* big endian architecture - defined by Makefile.PL */
@@ -494,4 +499,25 @@ typedef _Decimal128 D128;
      ST(0) = sv_2mortal(obj_ref);	\
      ST(1) = sv_2mortal(newSViv(ret));	\
      XSRETURN(2);
+
+#define _overload_callback(_1st_arg,_2nd_arg,_3rd_arg)					\
+  dSP;											\
+  SV * ret;										\
+  int count;										\
+  char buf[32];										\
+  ENTER;										\
+  PUSHMARK(SP);										\
+  XPUSHs(b);										\
+  XPUSHs(a);										\
+  XPUSHs(sv_2mortal(_3rd_arg));								\
+  PUTBACK;										\
+  sprintf(buf, "%s", _1st_arg);								\
+  count = call_pv(buf, G_SCALAR);							\
+  SPAGAIN;										\
+  if (count != 1)									\
+   croak("Error in %s callback to %s\n", _2nd_arg, _1st_arg);				\
+  ret = POPs;										\
+  SvREFCNT_inc(ret);									\
+  LEAVE;										\
+  return ret
 

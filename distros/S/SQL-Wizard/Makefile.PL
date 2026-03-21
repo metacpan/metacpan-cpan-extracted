@@ -21,12 +21,32 @@ WriteMakefile(
         version => $version,
       },
     },
+    x_authority => 'cpan:TBUSCH',
+    keywords => [qw(
+      sql query builder composable expression-tree
+      select insert update delete truncate
+      join cte window-function case union intersect except
+      subquery upsert returning distinct
+      postgresql mysql sqlite
+      dbi bind-parameters injection-protection
+    )],
     resources => {
+      homepage => 'https://github.com/thomasbusch/perl-SQL-Wizard',
       repository => {
         type => 'git',
         url  => 'https://github.com/thomasbusch/perl-SQL-Wizard.git',
         web  => 'https://github.com/thomasbusch/perl-SQL-Wizard',
       },
+      bugtracker => {
+        web => 'https://github.com/thomasbusch/perl-SQL-Wizard/issues',
+      },
     },
   },
 );
+
+sub MY::postamble {
+  return <<'MAKE';
+readme: lib/SQL/Wizard.pod
+	perl tools/pod2readme.pl lib/SQL/Wizard.pod > README.md
+MAKE
+}

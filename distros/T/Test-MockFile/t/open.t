@@ -152,5 +152,17 @@ subtest(
     }
 );
 
+note "-------------- BROKEN SYMLINK OPEN --------------";
+{
+    # Symlink to a path with no mock = broken symlink (target doesn't exist)
+    my $link = Test::MockFile->symlink( '/nonexistent_target', '/broken_link' );
+
+    # Opening a broken symlink should fail with ENOENT, not confess
+    $! = 0;
+    my $ret = open( my $fh, '<', '/broken_link' );
+    ok( !$ret,              'open on broken symlink returns false' );
+    is( $! + 0, ENOENT, 'open on broken symlink sets $! to ENOENT' );
+}
+
 done_testing();
 exit;

@@ -42,7 +42,7 @@ openssl genrsa -aes256 -out ${CERTDIR}/${CA_CERT_NAME}-key.pem -passout pass:${C
 # to view generated key
 # openssl rsa -in ${CERTDIR}/${CA_CERT_NAME}-key.pem -passin pass:${CA_CERT_PASSWORD} -text -noout
 openssl req -new -x509 -key ${CERTDIR}/${CA_CERT_NAME}-key.pem -passin pass:${CA_CERT_PASSWORD} \
- -subj "/O=EMDIS/OU=ECS/CN=${CA_CERT_NAME}/emailAddress=${CA_CERT_NAME}@ecs.emdis.net" -days 365 \
+ -subj "/O=EMDIS/OU=ECS/CN=${CA_CERT_NAME}/emailAddress=${CA_CERT_NAME}@ecs.emdis.net" -days 3650 \
  -out ${CERTDIR}/${CA_CERT_NAME}.pem
  # to view CA certificate:
  # openssl x509 -in ${CERTDIR}/${CA_CERT_NAME}.pem -text -noout
@@ -58,7 +58,7 @@ openssl req -new -key ${CERTDIR}/${SERVER_CERT_NAME}-key.pem -passin pass:${SERV
 # openssl req -in ${CERTDIR}/${SERVER_CERT_NAME}-req.pem -text -noout
 openssl x509 -req -inform PEM -in "${CERTDIR}/${SERVER_CERT_NAME}-req.pem" -set_serial 2025041101 \
  -CA "${CERTDIR}/${CA_CERT_NAME}.pem" -CAkey "${CERTDIR}/${CA_CERT_NAME}-key.pem" \
- -passin pass:${CA_CERT_PASSWORD} -days 365 -outform PEM \
+ -passin pass:${CA_CERT_PASSWORD} -days 3650 -outform PEM \
  -out "${CERTDIR}/${SERVER_CERT_NAME}.pem"
 # to view server certificate:
 # openssl x509 -in ${CERTDIR}/${SERVER_CERT_NAME}.pem -text -noout
@@ -82,7 +82,7 @@ openssl req -new -key ${CERTDIR}/${CLIENT_CERT_NAME}-key.pem -passin pass:${CLIE
 # openssl req -in ${CERTDIR}/${CLIENT_CERT_NAME}-req.pem -text -noout
 openssl x509 -req -inform PEM -in "${CERTDIR}/${CLIENT_CERT_NAME}-req.pem" -set_serial 2025041101 \
  -CA "${CERTDIR}/${CA_CERT_NAME}.pem" -CAkey "${CERTDIR}/${CA_CERT_NAME}-key.pem" \
- -passin pass:${CA_CERT_PASSWORD} -days 365 -outform PEM \
+ -passin pass:${CA_CERT_PASSWORD} -days 3650 -outform PEM \
  -out "${CERTDIR}/${CLIENT_CERT_NAME}.pem"
 # to view client certificate:
 # openssl x509 -in ${CERTDIR}/${CLIENT_CERT_NAME}.pem -text -noout

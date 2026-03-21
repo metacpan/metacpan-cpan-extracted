@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v1.2.4
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## REST API Framework - ~/lib/m
+## Version v1.2.5
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2025/11/06
+## Modified 2026/03/20
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.2.4';
+    $VERSION = 'v1.2.5';
 };
 
 use strict;
@@ -150,12 +150,15 @@ sub handler : method
         $r->log_error( "Error instantiating a new $class object: ", $class->error );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
-    
+
+    $self->request( $req );
+    $self->response( $resp );
+
     if( my $code = $self->log_handler )
     {
         $r->set_handlers( 'PerlPrivateLogHandler' => $code );
     }
-    
+
     # $self->apache_request( $r );
     # $r->log_error( "Received Apache request $r, object debug value is: ", $self->debug );
     # Full uri. $r->uri only returns the path
@@ -165,7 +168,7 @@ sub handler : method
     $r->content_type( 'application/json' );
     my $json = JSON->new->relaxed->utf8;
     $self->{json} = $json;
-    
+
     # No need to go further if the ip address is not allowed to access the REST api.
     # Here you could check for IP ban, or whether there is enough authorisation to access the endpoint
     my $ok_net = $self->is_allowed( 'network' );
@@ -173,7 +176,7 @@ sub handler : method
     {
         # Get a return code, and possibly a hash containing the message property
         my( $rc, $rdef ) = $ok_net->( $req->remote_ip );
-        if( $resp->is_error( "$rc" ) )
+        if( defined( $rc ) && $resp->is_error( "$rc" ) )
         {
             if( $self->_is_a( $rc, 'Net::API::REST::RC' ) )
             {
@@ -190,7 +193,7 @@ sub handler : method
             }
         }
     }
-    
+
     # No need to go further if the requested method is not supported
     my $ok_methods = $self->supported_methods;
     my $http_meth = $req->method;
@@ -199,12 +202,12 @@ sub handler : method
         # Net::API::REST::reply will automatically set a json with an error message based on the user language
         return( $self->reply({ code => Apache2::Const::HTTP_METHOD_NOT_ALLOWED }) );
     }
-    
+
     # Check supported content-type
     # Ref: <https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html>
     my $ok_ct = $self->supported_content_types;
     # Only the content type, ie without the charset. Example: application/json; charset=utf-8
-    my $ct = lc( $req->type );
+    my $ct = lc( $req->type // '' );
     # We check if content type is provided at all since it could be missing, such as in 
     # a OPTIONS, POST or GET request with no content or query
     if( length( $ct ) && scalar( @$ok_ct ) && !scalar( grep( $ct eq $_, @$ok_ct ) ) )
@@ -212,7 +215,7 @@ sub handler : method
         # Net::API::REST::reply will automatically set a json with an error message based on the user language
         return( $self->reply({ code => Apache2::Const::HTTP_NOT_ACCEPTABLE }) );
     }
-    
+
     # Check if there is a required api version and if we support it
     if( $req->client_api_version )
     {
@@ -228,7 +231,7 @@ sub handler : method
         }
         return( $self->reply( Apache2::Const::HTTP_NOT_ACCEPTABLE, { error => "API version requested ($client_version) is not supported." } ) ) unless( $client_api_version_is_ok );
     }
-    
+
     # Protection against DNS rebinding attacks
     # https://www.w3.org/TR/cors/#list-of-headers
     if( my $req_host = $req->headers( 'Host' ) )
@@ -240,17 +243,14 @@ sub handler : method
             return( $self->reply({ code => Apache2::Const::HTTP_UNAUTHORIZED }) );
         }
     }
-    
-    $self->request( $req );
-    $self->response( $resp );
-    
+
     # If there is a init_headers handler, call it to initiate the headers
     my $init_headers = $self->init_headers;
     if( $init_headers && ref( $init_headers ) eq 'CODE' )
     {
         $init_headers->({ request => $req, response => $resp });
     }
-    
+
     if( $http_meth eq 'OPTIONS' )
     {
         return( $self->http_options );
@@ -260,13 +260,13 @@ sub handler : method
         # $r->send_http_header;
         return( Apache2::Const::HTTP_NO_CONTENT );
     }
-    
+
     my $origin = $req->headers( 'Origin' );
     if( $origin )
     {
         $self->http_cors;
     }
-    
+
     my $path = $uri->path;
     if( my $base = $r->dir_config( 'Net_API_REST_Base' ) ) 
     {
@@ -343,11 +343,11 @@ EOT
                 }
             }
         }
-        
+
 #         use B::Deparse;
 #         my $deparse = B::Deparse->new("-p", "-sC");
 #         my $code_body = $deparse->coderef2text( $handler );
-        
+
         # try-catch
         local $@;
         my $rc = eval
@@ -432,7 +432,7 @@ EOT
             $res->headers( 'Access-Control-Allow-Methods' => '*' );
         }
     }
-    
+
     my $origin = $req->headers( 'Origin' ) || $req->headers( 'Access-Control-Request-Origin' );
     if( !$origin )
     {
@@ -489,7 +489,7 @@ EOT
     {
         $res->headers( 'Access-Control-Allow-Headers' => $req_headers );
     }
-    my $cred_required = $req->headers( 'Credentials' );
+    my $cred_required = $req->headers( 'Credentials' ) // '';
     if( lc( $cred_required ) eq 'include' )
     {
         $res->headers( 'Access-Control-Allow-Credentials' => 'true' );
@@ -497,7 +497,7 @@ EOT
     # Check from the most restrictive allowed methods in the context of the endpoint to the broader one for generally all supported methods
     my $ok_methods = scalar( @{$ep->methods} ) ? $ep->methods : $self->supported_methods;
     $res->headers( 'Access-Control-Allow-Methods' => join( ', ', @$ok_methods ) );
-    
+
     # $r->headers_out->add( 'Allow' => join( ',', @$ok_methods ) );
     # $r->rflush;
     return( Apache2::Const::HTTP_NO_CONTENT );
@@ -594,7 +594,7 @@ sub jwt_decode
             $param->{accepted_alg} = qr{^(?:\Q$re\E)$};
         }
     }
-    
+
     # accepted_enc => qr{^(?:A128GCM)$},
     if( $opts->{accepted_enc} )
     {
@@ -605,12 +605,12 @@ sub jwt_decode
             $param->{accepted_enc} = qr{^(?:\Q$re\E)$};
         }
     }
-    
+
     if( ref( $opts->{verify_audience} ) eq 'Regexp' )
     {
         $param->{verify_aud} = $opts->{verify_audience};
     }
-    
+
     my $data;
     # try-catch
     local $@;
@@ -685,7 +685,7 @@ sub jwt_encode
     {
         $params{ $_ } = $opts->{ $_ } if( CORE::exists( $opts->{ $_ } ) && CORE::length( $opts->{ $_ } ) );
     }
-    
+
     # try-catch
     local $@;
     eval
@@ -842,9 +842,10 @@ sub jwt_verify_audience { return( shift->_set_get_object( 'jwt_verify_audience',
 
 sub key { return( shift->_set_get_scalar( 'key', @_ ) ); }
 
-sub request { return( shift->_set_get_object( 'request', 'Net::API::REST::Request', @_ ) ); }
+# The objects for request or response should be instantiated in handler()
+sub request { return( shift->_set_get_object_without_init( 'request', 'Net::API::REST::Request', @_ ) ); }
 
-sub response { return( shift->_set_get_object( 'response', 'Net::API::REST::Response', @_ ) ); }
+sub response { return( shift->_set_get_object_without_init( 'response', 'Net::API::REST::Response', @_ ) ); }
 
 sub route
 {
@@ -898,7 +899,7 @@ sub route
         my( $pos, $subroutes ) = @_;
         my $part = $parts->[ $pos ];
         # reserved words cannot be used in path
-        return( '' ) if( $part =~ /^_(access_control|allowed_methods|handler|name|var|delete|get|head|post|put)$/i );
+        return( '' ) if( $part =~ /^_(access_control|allowed_methods|handler|name|var|delete|get|head|patch|post|put)$/i );
         if( exists( $subroutes->{ lc( $part ) } ) )
         {
             $part = lc( $part );
@@ -935,7 +936,7 @@ sub route
                     return( $self->error({ code => 500, message => "Found an entry for path part \"$part\", which is a hash reference, but could not find a key \"_handler\", \"_delete\", \"_get\", \"_head\", \"_post\", or \"_put\" inside it." }) );
                 }
                 my $methods = {};
-                foreach my $h ( qw( _delete _get _head _post _put ) )
+                foreach my $h ( qw( _delete _get _head _patch _post _put ) )
                 {
                     if( exists( $ref->{ $h } ) )
                     {
@@ -948,13 +949,13 @@ sub route
                 my $handler = $http_meth eq 'options'
                     ? sub{}
                     : exists( $methods->{ uc( $http_meth ) } ) ? $methods->{ uc( $http_meth ) } : $ref->{_handler};
-                
+
                 # We reached the end, return the handler
                 # return( $ref->{_handler} ) if( $pos == $#$parts );
                 # return( $check->( $pos + 1, $ref ) );
                 $access = $ref->{_access_control} if( $ref->{_access_control} );
                 $params = $ref->{_params} if( CORE::exists( $ref->{_params} ) && ref( $ref->{_params} ) eq 'HASH' );
-                
+
                 if( $pos == $#$parts )
                 {
                     if( ref( $handler ) eq 'CODE' )
@@ -1099,14 +1100,15 @@ sub route
                 !exists( $ref->{_delete} ) &&
                 !exists( $ref->{_get} ) && 
                 !exists( $ref->{_head} ) &&
+                !exists( $ref->{_patch} ) &&
                 !exists( $ref->{_post} ) &&
                 !exists( $ref->{_put} ) )
             {
                 return( $self->error({ code => 500, message => "Found a variable with name \"$ref->{_name}\" and was expecting a key _handler to be present in the definition hash reference, but could not find one." }) );
             }
-            
+
             my $methods = {};
-            foreach my $h ( qw( _delete _get _head _post _put ) )
+            foreach my $h ( qw( _delete _get _head _patch _post _put ) )
             {
                 if( exists( $ref->{ $h } ) )
                 {
@@ -1119,7 +1121,7 @@ sub route
             my $handler = $http_meth eq 'options'
                 ? sub{}
                 : exists( $methods->{ uc( $http_meth ) } ) ? $methods->{ uc( $http_meth ) } : $ref->{_handler};
-            
+
             my $var_name = $ref->{_name};
             $params = $ref->{_params} if( CORE::exists( $ref->{_params} ) && ref( $ref->{_params} ) eq 'HASH' );
             # For variable type to be array
@@ -1149,7 +1151,7 @@ sub route
             {
                 $vars->{ $var_name } = $part;
             }
-            
+
             # We reached the end, return the handler
             if( $pos == $#$parts )
             {
@@ -1358,7 +1360,7 @@ sub routes
                 return( $self->error( "API version number '$vers' value is not an hash reference. Its value must be a route to resources as hash reference." ) );
             }
         }
-        
+
         foreach my $version ( sort( @api_versions ) )
         {
             if( my $err = $check->( $hash->{ $version } ) )
@@ -1518,7 +1520,7 @@ Net::API::REST - Framework for RESTful APIs
         use parent qw( Net::API::REST );
         use Net::API::Stripe;
     };
-    
+
     sub init
     {
         my $self = shift( @_ );
@@ -1559,7 +1561,7 @@ Net::API::REST - Framework for RESTful APIs
         # It may be adjusted endpoint by endpoint and if nothing is specified this default is used.
         $self->{default_methods} = [qw( GET POST )];
         # This is ALL possible supported methods
-        $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS POST PUT )];
+        $self->{supported_methods} = [qw( DELETE GET HEAD OPTIONS PATCH POST PUT )];
         $self->{supported_languages} = [qw( en-GB en fr-FR fr ja-JP )];
         $self->{key} = 'kAncmaDajnacSnbGmbXamn';
         # We want JWE (Json Web Token encrypted). This will affect jwt_encode's behaviour
@@ -1572,7 +1574,7 @@ Net::API::REST - Framework for RESTful APIs
         $self->SUPER::init( @_ );
         return( $self );
     }
-    
+
     sub stripe
     {
         my $self = shift( @_ );
@@ -1592,13 +1594,13 @@ Net::API::REST - Framework for RESTful APIs
             $self->message( 3, "Unable to initiate a Net::API::Stripe object using the configuration file /home/john_doe/stripe-settings.json" );
             return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $self->oops }) );
         };
-    
+
         # Do an IP source check to be sure this is Stripe talking to us
         if( !defined( my $ip_check = $stripe->webhook_validate_caller_ip({ ip => $remote_ip, ignore_ip => $ignore_ip }) ) )
         {
             return( $self->reply({ code => $stripe->error->code, message => $stripe->error->message }) );
         }
-    
+
         # Now, we make sure this is Stripe sending this by checking the signature of the payload
         my $check = $stripe->webhook_validate_signature({
             secret => $signing_secret,
@@ -1610,7 +1612,7 @@ Net::API::REST - Framework for RESTful APIs
         {
             return( $self->reply({code => $stripe->error->code, message => $stripe->error->message }) );
         }
-    
+
         # Ok, if we are here, we passed all checks
         # Don't wait, reply ok back to Stripe so our request does not time out
         $self->response->code( Apache2::Const::HTTP_OK );
@@ -1626,7 +1628,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.2.4
+    v1.2.5
 
 =head1 DESCRIPTION
 

@@ -9,7 +9,7 @@ use Test2::Plugin::NoWarnings;
 
 use Test::MockFile qw< nostrict >;
 use Overload::FileCheck qw/:check/;
-use Errno qw/ELOOP/;
+use Errno qw/ELOOP ENOENT/;
 
 use Cwd ();
 
@@ -33,6 +33,25 @@ my @abs_path = (
     [ '/../../..'                    => '/' ],
     [ '/one/two/three/four/../../..' => '/one' ],
     [ '/a.b.c.d'                     => '/a.b.c.d' ],
+
+    # Component-based resolution: /. in middle of path (GH #108)
+    [ '/there/./xyz'                 => '/there/xyz' ],
+    [ '/./foo'                       => '/foo' ],
+    [ '/a/./b/./c'                   => '/a/b/c' ],
+
+    # Component-based resolution: /.. at various positions
+    [ '/there/..'                    => '/' ],
+    [ '/..'                          => '/' ],
+    [ '/../foo'                      => '/foo' ],
+    [ '/there/sub/../file'           => '/there/file' ],
+    [ '/a/b/c/../../d'              => '/a/d' ],
+
+    # Root path preservation
+    [ '/'                            => '/' ],
+
+    # Multiple slashes
+    [ '/foo//bar'                    => '/foo/bar' ],
+    [ '///foo///bar///'              => '/foo/bar' ],
 );
 foreach my $t (@abs_path) {
     my ( $path, $normalized_path ) = @$t;
@@ -82,9 +101,9 @@ is( Test::MockFile::_mock_stat( 'stat',  ' ' ), FALLBACK_TO_REAL_OP(), "A space 
 
 my $basic_stat_return = array {
     item 0;
-    item 0;
+    item match qr/^[1-9][0-9]*$/;    # inode: unique positive integer
     item 0100644;
-    item 0;
+    item 1;                           # nlink: 1 for regular files
     item match qr/^[0-9]+$/;
     item match qr/^[0-9\s]+$/;
     item 0;
@@ -93,25 +112,26 @@ my $basic_stat_return = array {
     item match qr/^[0-9]{3,}$/;
     item match qr/^[0-9]{3,}$/;
     item 4096;
-    item 1;
+    item 0;
 };
 
 is( Test::MockFile::_mock_stat( 'lstat', '/foo/bar' ), $basic_stat_return, "/foo/bar mock stat" );
-is( Test::MockFile::_mock_stat( 'stat',  '/aaa' ),     [],                 "/aaa mock stat when looped." );
+is( Test::MockFile::_mock_stat( 'stat',  '/aaa' ),     0,                  "/aaa mock stat when looped." );
 is( $! + 0, ELOOP, "Throws an ELOOP error" );
 
 push @mocked_files, Test::MockFile->file('/foo/baz');    # Missing file but mocked.
-is( Test::MockFile::_mock_stat( 'lstat', '/foo/baz' ), [], "/foo/baz mock stat when missing." );
+is( Test::MockFile::_mock_stat( 'lstat', '/foo/baz' ), 0, "/foo/baz mock stat when missing." );
+is( $! + 0, ENOENT, "Throws an ENOENT error for missing file" );
 
 my $symlink_lstat_return = array {
     item 0;
-    item 0;
+    item match qr/^[1-9][0-9]*$/;    # inode: unique positive integer
     item 0127777;
-    item 0;
+    item 1;                           # nlink: 1 for symlinks
     item match qr/^[0-9]+$/;
     item match qr/^[0-9\s]+$/;
     item 0;
-    item 1;
+    item 11;    # length('/not/a/file') - symlink size = length of target path
     item match qr/^[0-9]{3,}$/;
     item match qr/^[0-9]{3,}$/;
     item match qr/^[0-9]{3,}$/;
@@ -120,7 +140,7 @@ my $symlink_lstat_return = array {
 };
 
 is( Test::MockFile::_mock_stat( 'lstat', '/broken_link' ), $symlink_lstat_return, "lstat on /broken_link returns the stat on the symlink itself." );
-is( Test::MockFile::_mock_stat( 'stat',  '/broken_link' ), [],                    "stat on /broken_link is an empty array since what it points to doesn't exist." );
+is( Test::MockFile::_mock_stat( 'stat',  '/broken_link' ), 0,                     "stat on /broken_link returns 0 since what it points to doesn't exist." );
 
 {
     my $exe = q[/tmp/custom.exe];
@@ -143,6 +163,46 @@ is( Test::MockFile::_mock_stat( 'stat',  '/broken_link' ), [],                  
     mkdir $dir->path();
     ok( -d ( $dir->path() ),       'Directory /quux exists' );
     ok( -d ( $dir->path() . '/' ), 'Directory /quux/ also exists' );
+}
+
+note "path canonicalization — stat resolves . and .. components (GH #108)";
+{
+    my $dir  = Test::MockFile->dir('/there');
+    my $file = Test::MockFile->file( '/there/xyz', "content" );
+    mkdir '/there';
+
+    # /there/. should resolve to /there
+    ok( -d '/there/.',     '-d "/there/." resolves to mocked /there' );
+
+    # /there/./xyz should resolve to /there/xyz
+    ok( -e '/there/./xyz', '-e "/there/./xyz" resolves to mocked /there/xyz' );
+    ok( -f '/there/./xyz', '-f "/there/./xyz" resolves to mocked /there/xyz' );
+
+    # stat on paths with . component
+    my @st = stat('/there/./xyz');
+    ok( scalar @st, 'stat("/there/./xyz") returns stat data' );
+}
+
+{
+    my $parent = Test::MockFile->dir('/up');
+    my $child  = Test::MockFile->dir('/up/down');
+    mkdir '/up';
+    mkdir '/up/down';
+
+    # /up/down/.. should resolve to /up
+    ok( -d '/up/down/..',  '-d "/up/down/.." resolves to mocked /up' );
+}
+
+note "directory stat size returns blksize, not stringified arrayref length";
+{
+    my $dir = Test::MockFile->new_dir('/stat_dir_size');
+    my $child = Test::MockFile->file( '/stat_dir_size/a', 'data' );
+
+    my @st = stat('/stat_dir_size');
+    is( $st[7], 4096, 'directory stat size is blksize (4096), not stringified ref length' );
+
+    my $s = -s '/stat_dir_size';
+    is( $s, 4096, '-s on directory returns blksize' );
 }
 
 done_testing();

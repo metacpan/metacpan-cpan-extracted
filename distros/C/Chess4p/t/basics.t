@@ -2,7 +2,7 @@
 
 use v5.36;
 
-use Test2::V1 -ipP;
+use Test::More;
 
 use utf8;
 

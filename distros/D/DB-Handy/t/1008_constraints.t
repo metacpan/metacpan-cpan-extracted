@@ -119,14 +119,13 @@ ok($res->{type} eq 'error', "CHECK: INSERT with negative salary fails");
 ok($res->{message} =~ /CHECK/, "CHECK: error message mentions CHECK");
 
 ###############################################################################
-# CHECK: NOT evaluated on UPDATE (documented limitation)
+# CHECK: evaluated on UPDATE (violation)
 ###############################################################################
 $res = $db->execute("UPDATE ck SET salary=-9999 WHERE id=1");
 # ok 17
-ok($res->{type} eq 'ok', "CHECK: UPDATE bypasses CHECK constraint (documented)");
-$res = $db->execute("SELECT salary FROM ck WHERE id=1");
+ok($res->{type} eq 'error', "CHECK: UPDATE with negative salary fails");
 # ok 18
-is($res->{data}[0]{salary}+0, -9999, "CHECK: negative salary stored after UPDATE");
+ok($res->{message} =~ /CHECK/, "CHECK: UPDATE error message mentions CHECK");
 
 ###############################################################################
 # PRIMARY KEY: implies NOT NULL; does NOT auto-create UNIQUE index

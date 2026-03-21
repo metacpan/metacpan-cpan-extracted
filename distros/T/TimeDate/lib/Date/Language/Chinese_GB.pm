@@ -11,7 +11,7 @@ use Date::Language ();
 
 use base 'Date::Language';
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Chinese localization for Date::Format (GB2312)
 
 our (@DoW, @DoWs, @MoY, @MoYs, @AMPM, @Dsuf, %MoY, %DoW);
@@ -78,7 +78,7 @@ Date::Language::Chinese_GB - Chinese localization for Date::Format (GB2312)
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

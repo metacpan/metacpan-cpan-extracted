@@ -41,7 +41,7 @@ use File::Spec;
 use POSIX ();
 
 use vars qw($VERSION $errstr);
-$VERSION = '1.00';
+$VERSION = '1.04';
 $VERSION = $VERSION;
 $errstr  = '';
 
@@ -187,7 +187,7 @@ sub create_table {
     close FH;
 
     local *FH;
-    open(FH, "> ".$self->_file($table,'dat')) or return $self->_err("Cannot create dat: $!");
+    open(FH, "> ".$self->_file($table, 'dat')) or return $self->_err("Cannot create dat: $!");
     close FH;
     return 1;
 }
@@ -311,7 +311,7 @@ sub insert {
         return $self->_err("NOT NULL constraint violated on column '$cn'") unless defined($row->{$cn}) && ($row->{$cn} ne '');
     }
     for my $cn (keys %{$sch->{checks} || {}}) {
-        return $self->_err("CHECK constraint failed on column '$cn'") unless eval_bool($sch->{checks}{$cn},$row);
+        return $self->_err("CHECK constraint failed on column '$cn'") unless eval_bool($sch->{checks}{$cn}, $row);
     }
     my $packed = $self->_pack_record($sch, $row) or return undef;
     my $dat = $self->_file($table, 'dat');
@@ -494,7 +494,7 @@ sub execute {
             $chks{$cn} = $1 if $rest =~ /\bCHECK\s*\((.+)\)/si;
         }
         $nn{$pk} = 1 if defined $pk;
-        $self->create_table($tbl,[ @cols ]) or return { type=>'error', message=>$errstr };
+        $self->create_table($tbl, [ @cols ]) or return { type=>'error', message=>$errstr };
         if (%nn || %defs || %chks || defined $pk) {
             my $sch = $self->_load_schema($tbl) or return { type=>'error', message=>$errstr };
             $sch->{notnull}  = { %nn   };
@@ -517,7 +517,7 @@ sub execute {
             : { type=>'error', message=>$errstr };
     }
     if ($sql =~ /^DROP\s+INDEX\s+(\w+)\s+ON\s+(\w+)$/i) {
-        return $self->drop_index($1,$2)
+        return $self->drop_index($1, $2)
             ? { type=>'ok',    message=>"Index '$1' dropped" }
             : { type=>'error', message=>$errstr };
     }
@@ -533,7 +533,7 @@ sub execute {
         my @v = _parse_values($val_str);
         my %row;
         @row{@c} = @v;
-        return $self->insert($tbl,\%row)
+        return $self->insert($tbl, { %row })
             ? { type=>'ok',    message=>"1 row inserted" }
             : { type=>'error', message=>$errstr };
     }
@@ -580,7 +580,7 @@ sub execute {
             (my $e = $1) =~ s/^\s+|\s+$//g;
             $ws = where_sub($e);
         }
-        my $n = $self->update($tbl,\%se,$ws);
+        my $n = $self->update($tbl, { %se }, $ws);
         return defined($n)
             ? { type=>'ok',    message=>"$n row(s) updated" }
             : { type=>'error', message=>$errstr };
@@ -592,7 +592,7 @@ sub execute {
             (my $e = $1) =~ s/^\s+|\s+$//g;
             $ws = where_sub($e);
         }
-        my $n = $self->delete_rows($tbl,$ws);
+        my $n = $self->delete_rows($tbl, $ws);
         return defined($n)
             ? { type=>'ok',    message=>"$n row(s) deleted" }
             : { type=>'error', message=>$errstr };
@@ -1596,7 +1596,7 @@ sub _rebuild_index {
         close FH;
     }
     @entries = sort { $a->[0] cmp $b->[0] } @entries;
-    return $self->_idx_write_all($table, $ix, \@entries);
+    return $self->_idx_write_all($table, $ix, [ @entries ]);
 }
 
 sub _find_index_for_conds {
@@ -1635,6 +1635,294 @@ sub _find_index_for_conds {
         }
     }
     return undef;
+}
+
+# _try_index_and_range($table, $sch, $where_expr)
+#
+# Attempt to satisfy a two-sided range or BETWEEN predicate using an index.
+# Recognises these WHERE patterns (same column, values numeric or quoted):
+#   col OP1 val1 AND col OP2 val2   (e.g. id > 5 AND id < 10)
+#   col BETWEEN val1 AND val2
+# Returns an arrayref of matching record numbers, or undef if no index
+# can be applied (caller falls through to a full table scan).
+#
+sub _try_index_and_range {
+    my($self, $table, $sch, $where_expr) = @_;
+    return undef unless %{$sch->{indexes}};
+    my %col2ix;
+    for my $ix (values %{$sch->{indexes}}) {
+        $col2ix{$ix->{col}} = $ix;
+    }
+    my $VAL = qr/(?:'([^']*)'|(-?\d+\.?\d*))/;
+    my $OP  = qr/(<=|>=|<|>)/;
+    # BETWEEN col BETWEEN val1 AND val2
+    if ($where_expr =~ /^(\w+)\s+BETWEEN\s+$VAL\s+AND\s+$VAL\s*$/i) {
+        my($col, $lo_s, $lo_n, $hi_s, $hi_n) = ($1, $2, $3, $4, $5);
+        my $lo = defined($lo_s) ? $lo_s : $lo_n;
+        my $hi = defined($hi_s) ? $hi_s : $hi_n;
+        my $ix = $col2ix{$col} or return undef;
+        return $self->_idx_range($table, $ix, $lo, 1, $hi, 1);
+    }
+    # AND: col OP val AND col OP val  (same column)
+    if ($where_expr =~ /^(\w+)\s+$OP\s+$VAL\s+AND\s+\1\s+$OP\s+$VAL\s*$/i) {
+        my($col, $op1, $v1s, $v1n, $op2, $v2s, $v2n) = ($1, $2, $3, $4, $5, $6, $7);
+        my $v1 = defined($v1s) ? $v1s : $v1n;
+        my $v2 = defined($v2s) ? $v2s : $v2n;
+        my $ix = $col2ix{$col} or return undef;
+        # Determine lo (lower bound) and hi (upper bound)
+        my($lo, $lo_inc, $hi, $hi_inc);
+        if ($op1 eq '>' || $op1 eq '>=') {
+            ($lo, $lo_inc) = ($v1, $op1 eq '>=');
+            ($hi, $hi_inc) = ($v2, $op2 eq '<=');
+        }
+        else {
+            ($lo, $lo_inc) = ($v2, $op2 eq '>=');
+            ($hi, $hi_inc) = ($v1, $op1 eq '<=');
+        }
+        return $self->_idx_range($table, $ix, $lo, $lo_inc, $hi, $hi_inc);
+    }
+    return undef;
+}
+
+# _try_index_partial_and($table, $sch, $where_expr)
+#
+# For AND expressions involving multiple columns, pick the single indexed
+# column that yields the smallest candidate set and return its record
+# numbers.  The caller applies the full WHERE predicate as a post-filter,
+# so correctness is guaranteed regardless of which index is chosen.
+#
+# Recognises AND-connected atoms of the form:
+#   col = val   col > val   col >= val   col < val   col <= val
+# (quoted or numeric values; no subexpressions, BETWEEN, IN, OR, NOT)
+#
+# Returns an arrayref of candidate record numbers, or undef when no
+# usable index is found (caller falls through to a full table scan).
+#
+sub _try_index_partial_and {
+    my($self, $table, $sch, $where_expr) = @_;
+    return undef unless %{$sch->{indexes}};
+    # Only handle pure AND expressions (no OR/NOT/BETWEEN/IN/subqueries)
+    return undef if $where_expr =~ /\b(?:OR|NOT|BETWEEN|IN)\b/i;
+    return undef if $where_expr =~ /\(\s*SELECT\b/i;
+    # Split on AND and collect simple  col OP val  atoms
+    my @atoms;
+    my $VAL  = qr/(?:'[^']*'|-?\d+\.?\d*)/;
+    my $OP   = qr/(?:<=|>=|!=|<>|<|>|=)/;
+    for my $part (split /\bAND\b/i, $where_expr) {
+        $part =~ s/^\s+|\s+$//g;
+        if ($part =~ /^(\w+)\s*($OP)\s*($VAL)$/
+            || $part =~ /^($VAL)\s*($OP)\s*(\w+)$/) {
+            # Normalise so col is always on the left
+            my($col, $op, $val);
+            if ($part =~ /^(\w+)\s*($OP)\s*($VAL)$/) {
+                ($col, $op, $val) = ($1, uc($2), $3);
+            }
+            else {
+                # val OP col  -- reverse the operator
+                $part =~ /^($VAL)\s*($OP)\s*(\w+)$/;
+                my %rev = ('>' => '<', '<' => '>', '>=' => '<=',
+                           '<=' => '>=', '=' => '=', '!=' => '!=',
+                           '<>' => '<>');
+                ($col, $op, $val) = ($3, $rev{uc($2)} || uc($2), $1);
+            }
+            $val =~ s/^'|'$//g;   # strip surrounding quotes
+            push @atoms, { col => $col, op => $op, val => $val };
+        }
+        else {
+            return undef;  # complex atom -- cannot use index safely
+        }
+    }
+    return undef unless @atoms >= 2;  # single atom handled by Case 1/2
+    # Build column -> index map
+    my %col2ix;
+    for my $ix (values %{$sch->{indexes}}) {
+        $col2ix{$ix->{col}} = $ix;
+    }
+    # Try each atom in turn; return the first index hit
+    # (equality index preferred over range for a smaller candidate set)
+    my $best_eq  = undef;  # record list from an equality match
+    my $best_rng = undef;  # record list from a range match
+    for my $a (@atoms) {
+        my $ix = $col2ix{$a->{col}} or next;
+        my $op = $a->{op};
+        next if $op eq '!=' || $op eq '<>';  # inequality gives no benefit
+        my $recs;
+        if ($op eq '=') {
+            my $key = _encode_key($ix->{coltype}, $ix->{keysize}, $a->{val});
+            my $entries = $self->_idx_read_all($table, $ix);
+            my $pos = _idx_bisect($entries, $key);
+            my @r;
+            while (($pos < @$entries) && ($entries->[$pos][0] eq $key)) {
+                push @r, $entries->[$pos][1];
+                $pos++;
+            }
+            $recs = [ @r ];
+            # Equality index: take first found and stop
+            $best_eq = $recs and last;
+        }
+        elsif ($op eq '<') {
+            $recs = $self->_idx_range($table, $ix, undef, 0, $a->{val}, 0);
+        }
+        elsif ($op eq '<=') {
+            $recs = $self->_idx_range($table, $ix, undef, 0, $a->{val}, 1);
+        }
+        elsif ($op eq '>') {
+            $recs = $self->_idx_range($table, $ix, $a->{val}, 0, undef, 0);
+        }
+        elsif ($op eq '>=') {
+            $recs = $self->_idx_range($table, $ix, $a->{val}, 1, undef, 0);
+        }
+        $best_rng = $recs if defined $recs && !defined $best_rng;
+    }
+    return $best_eq if defined $best_eq;
+    return $best_rng;
+}
+
+# _try_index_in($table, $sch, $where_expr)
+#
+# Attempt to satisfy a  col IN (v1, v2, ...)  or  col NOT IN (v1, v2, ...)
+# predicate using an index.  For IN, performs one equality lookup per value
+# and returns the union of matching record numbers.  NOT IN is not optimised
+# (returns undef so the caller falls through to a full table scan).
+#
+# The WHERE expression must consist of exactly one IN predicate with a
+# literal value list (no sub-selects, no OR/AND, no NOT IN).
+#
+# Returns an arrayref of candidate record numbers, or undef when no index
+# can be applied.
+#
+sub _try_index_in {
+    my($self, $table, $sch, $where_expr) = @_;
+    return undef unless %{$sch->{indexes}};
+    # Match: col IN (literal-list)   no NOT IN, no sub-select
+    return undef unless $where_expr =~ /^\s*(\w+)\s+IN\s*\(([^)]*)\)\s*$/si;
+    my($col, $list_str) = ($1, $2);
+    # Find index for this column
+    my $ix;
+    for my $candidate (values %{$sch->{indexes}}) {
+        if ($candidate->{col} eq $col) {
+            $ix = $candidate;
+            last;
+        }
+    }
+    return undef unless defined $ix;
+    # Parse the value list
+    my @vals;
+    my $ls = $list_str;
+    while ($ls =~ s/^\s*(?:'((?:[^']|'')*)'|(-?\d+\.?\d*)|(NULL))\s*(?:,|$)//i) {
+        my($sv, $nv, $nl) = ($1, $2, $3);
+        if (defined $nl) {
+            # NULL in IN list: no index lookup possible for NULL
+            return undef;
+        }
+        elsif (defined $sv) {
+            (my $x = $sv) =~ s/''/'/g;
+            push @vals, $x;
+        }
+        else {
+            push @vals, $nv;
+        }
+    }
+    return undef unless @vals;  # empty IN list: caller handles
+    # Perform one equality index lookup per value, union the results
+    my %seen;
+    my @rec_nos;
+    my $entries = $self->_idx_read_all($table, $ix);
+    for my $val (@vals) {
+        my $key = _encode_key($ix->{coltype}, $ix->{keysize}, $val);
+        my $pos = _idx_bisect($entries, $key);
+        while (($pos < @$entries) && ($entries->[$pos][0] eq $key)) {
+            my $rn = $entries->[$pos][1];
+            push @rec_nos, $rn unless $seen{$rn}++;
+            $pos++;
+        }
+    }
+    return [ @rec_nos ];
+}
+
+# _try_index_or($table, $sch, $where_expr)
+#
+# Attempt to satisfy a pure OR expression using indexes.
+#
+# Every atom in the OR chain must be a simple condition that can be served
+# by an index on the relevant column.  If any atom has no usable index the
+# function returns undef and the caller falls through to a full table scan.
+#
+# Recognised atom forms (same column or different columns):
+#   col = val             col != val  (not optimised -- returns undef)
+#   col OP val            (OP: <, <=, >, >=)
+#   col BETWEEN lo AND hi
+#   col IN (v1, v2, ...)
+#
+# Returns an arrayref of deduplicated record numbers, or undef.
+#
+sub _try_index_or {
+    my($self, $table, $sch, $where_expr) = @_;
+    return undef unless %{$sch->{indexes}};
+    # Must be a pure OR expression -- no AND, no NOT, no subqueries
+    return undef if $where_expr =~ /\b(?:AND|NOT)\b/i;
+    return undef if $where_expr =~ /\(\s*SELECT\b/i;
+    # Split on OR
+    my @atoms = DB::Handy::bool_split($where_expr, 'OR');
+    return undef unless @atoms >= 2;
+    # Build column -> index map
+    my %col2ix;
+    for my $ix (values %{$sch->{indexes}}) {
+        $col2ix{$ix->{col}} = $ix;
+    }
+    my $VAL = qr/(?:'(?:[^']|'')*'|-?\d+\.?\d*)/;
+    my $OP  = qr/(?:<=|>=|<|>|=)/;
+    # Collect record numbers for each atom
+    my %seen;
+    my @all_recs;
+    for my $atom (@atoms) {
+        $atom =~ s/^\s+|\s+$//g;
+        my $recs;
+        # col BETWEEN lo AND hi
+        if ($atom =~ /^(\w+)\s+BETWEEN\s+($VAL)\s+AND\s+($VAL)\s*$/i) {
+            my($col, $lo, $hi) = ($1, $2, $3);
+            my $ix = $col2ix{$col} or return undef;
+            $lo =~ s/^'(.*)'$/$1/s; $hi =~ s/^'(.*)'$/$1/s;
+            $recs = $self->_idx_range($table, $ix, $lo, 1, $hi, 1);
+        }
+        # col IN (val, ...)
+        elsif ($atom =~ /^(\w+)\s+IN\s*\(([^)]*)\)\s*$/i) {
+            my($col, $list) = ($1, $2);
+            my $ix = $col2ix{$col} or return undef;
+            $recs = $self->_try_index_in($table, $sch, $atom);
+            return undef unless defined $recs;
+        }
+        # col OP val  (equality or range, not !=/<>)
+        elsif ($atom =~ /^(\w+)\s*($OP)\s*($VAL)$/) {
+            my($col, $op, $val) = ($1, uc($2), $3);
+            return undef if $op eq '!=' || $op eq '<>';
+            my $ix = $col2ix{$col} or return undef;
+            $val =~ s/^'(.*)'$/$1/s;
+            if ($op eq '=') {
+                my $key = _encode_key($ix->{coltype}, $ix->{keysize}, $val);
+                my $entries = $self->_idx_read_all($table, $ix);
+                my $pos = _idx_bisect($entries, $key);
+                my @r;
+                while (($pos < @$entries) && ($entries->[$pos][0] eq $key)) {
+                    push @r, $entries->[$pos][1];
+                    $pos++;
+                }
+                $recs = [ @r ];
+            }
+            elsif ($op eq '<')  { $recs = $self->_idx_range($table, $ix, undef, 0, $val, 0) }
+            elsif ($op eq '<=') { $recs = $self->_idx_range($table, $ix, undef, 0, $val, 1) }
+            elsif ($op eq '>')  { $recs = $self->_idx_range($table, $ix, $val,  0, undef, 0) }
+            elsif ($op eq '>=') { $recs = $self->_idx_range($table, $ix, $val,  1, undef, 0) }
+        }
+        else {
+            return undef;  # complex atom: cannot use index
+        }
+        return undef unless defined $recs;
+        for my $rn (@$recs) {
+            push @all_recs, $rn unless $seen{$rn}++;
+        }
+    }
+    return [ @all_recs ];
 }
 
 ###############################################################################
@@ -2189,8 +2477,8 @@ sub _parse_join_conditions {
                 push @conds, { lhs_alias=>$la, lhs_col=>$lc, op=>$op, val=>$rhs };
             }
             else {
-                my($la,$lc) = _split_qualified($lhs);
-                my($ra,$rc) = _split_qualified($rhs);
+                my($la, $lc) = _split_qualified($lhs);
+                my($ra, $rc) = _split_qualified($rhs);
                 push @conds, { lhs_alias=>$la, lhs_col=>$lc, op=>$op, rhs_alias=>$ra, rhs_col=>$rc };
             }
             # col [NOT] IN (val, val, ...)
@@ -2232,24 +2520,24 @@ sub _err {
 
 sub _db_path {
     my($self, $db) = @_;
-    File::Spec->catdir($self->{base_dir},$db);
+    File::Spec->catdir($self->{base_dir}, $db);
 }
 
 sub _file {
     my($self, $table, $ext) = @_;
-    File::Spec->catfile($self->{base_dir},$self->{db_name},"$table.$ext");
+    File::Spec->catfile($self->{base_dir}, $self->{db_name}, "$table.$ext");
 }
 
 sub _load_schema {
     my($self, $table) = @_;
     return $self->{_tables}{$table} if $self->{_tables}{$table};
-    my $sch_file = $self->_file($table,'sch');
+    my $sch_file = $self->_file($table, 'sch');
     unless (-f $sch_file) {
         $errstr = "Table '$table' does not exist";
         return undef;
     }
     local *FH;
-    open(FH,"< $sch_file") or do { $errstr = "Cannot read schema: $!"; return undef; };
+    open(FH, "< $sch_file") or do { $errstr = "Cannot read schema: $!"; return undef; };
     my(%sch, @cols, %indexes);
     $sch{notnull}  = {};
     $sch{defaults} = {};
@@ -2297,9 +2585,9 @@ sub _load_schema {
 
 sub _rewrite_schema {
     my($self, $table, $sch) = @_;
-    my $sch_file = $self->_file($table,'sch');
+    my $sch_file = $self->_file($table, 'sch');
     local *FH;
-    open(FH,"> $sch_file") or return $self->_err("Cannot rewrite schema: $!");
+    open(FH, "> $sch_file") or return $self->_err("Cannot rewrite schema: $!");
     print FH "VERSION=1\n";
     print FH "RECSIZE=$sch->{recsize}\n";
     for my $c (@{$sch->{cols}}) {
@@ -2612,7 +2900,7 @@ sub eval_expr {
     }
     if ($expr =~ /^CAST\s*\(\s*(.+?)\s+AS\s+(\w+(?:\s*\(\s*\d+\s*\))?)\s*\)$/si) {
         my($ie, $t) = ($1, uc($2));
-        my $v = eval_expr($ie,$row);
+        my $v = eval_expr($ie, $row);
         return undef unless defined $v;
         return int($v) if $t =~ /^INT/i;
         return $v + 0  if $t =~ /^(FLOAT|REAL|DOUBLE|NUMERIC|DECIMAL)/i;
@@ -2620,7 +2908,7 @@ sub eval_expr {
     }
     if ($expr =~ /^(UPPER|LOWER|LENGTH|ABS|SIGN|TRIM|LTRIM|RTRIM)\s*\((.+)\)$/si) {
         my($fn, $arg) = (uc($1), $2);
-        my $v = eval_expr($arg,$row);
+        my $v = eval_expr($arg, $row);
         return undef unless defined $v;
         return uc($v)      if $fn eq 'UPPER';
         return lc($v)      if $fn eq 'LOWER';
@@ -2644,12 +2932,12 @@ sub eval_expr {
         my @a = args($1);
         my $v = eval_expr($a[0], $row);
         return undef unless defined $v;
-        my $d = (@a > 1) ? int(eval_expr($a[1],$row) || 0) : 0;
+        my $d = (@a > 1) ? int(eval_expr($a[1], $row) || 0) : 0;
         return sprintf("%.${d}f", $v+0) + 0;
     }
     if ($expr =~ /^(FLOOR|CEIL(?:ING)?)\s*\((.+)\)$/si) {
         my($fn, $arg) = (uc($1), $2);
-        my $v = eval_expr($arg,$row);
+        my $v = eval_expr($arg, $row);
         return undef unless defined $v;
         return $fn eq 'FLOOR' ? POSIX::floor($v+0) : POSIX::ceil($v+0);
     }
@@ -2689,7 +2977,7 @@ sub eval_expr {
 
     # Binary operator: find rightmost at depth 0 (precedence low->high: || then +/- then */%)
     for my $op ('\\|\\|', '[+\\-]', '[*/%]') {
-        my $p = find_binop($expr,$op);
+        my $p = find_binop($expr, $op);
         if (defined $p) {
             my $opsym = substr($expr, $p->{s}, $p->{l});
             my $lv = eval_expr(substr($expr, 0, $p->{s}), $row);
@@ -2733,7 +3021,7 @@ sub eval_case {
         my($we, $te) = ($1, $2);
         my $m;
         if (defined $base) {
-            my($bv, $wv) = (eval_expr($base, $row),eval_expr($we, $row));
+            my($bv, $wv) = (eval_expr($base, $row), eval_expr($we, $row));
             $m = defined($bv) && defined($wv) && ((($bv =~ /^-?\d+\.?\d*$/) && ($wv =~ /^-?\d+\.?\d*$/)) ? ($bv == $wv) : ($bv eq $wv));
         }
         else {
@@ -2760,7 +3048,7 @@ sub eval_bool {
         return $n ? ($lv >= $rv) : ($lv ge $rv) if $op eq '>=';
     }
     if ($expr =~ /^(.+)\s+IS\s+(NOT\s+)?NULL$/si) {
-        my $v = eval_expr($1,$row);
+        my $v = eval_expr($1, $row);
         return $2 ? (defined($v) && ($v ne '')) : (!defined($v) || ($v eq ''));
     }
     return 0;
@@ -2846,9 +3134,9 @@ sub where_sub {
 sub parse_bool {
     my($expr) = @_;
     $expr =~ s/^\s+|\s+$//g;
-    my @or = bool_split($expr,'OR');
+    my @or = bool_split($expr, 'OR');
     return { op=>'OR', kids=>[map{parse_bool($_)}@or] } if @or > 1;
-    my @and = bool_split($expr,'AND');
+    my @and = bool_split($expr, 'AND');
     return { op=>'AND', kids=>[map{parse_bool($_)}@and] } if @and > 1;
     return { op=>'NOT', kids=>[parse_bool($1)] } if $expr =~ /^NOT\s+(.+)$/si;
     if (($expr =~ /^\((.+)\)$/s) && ($1 !~ /^\s*SELECT\b/i)) {
@@ -3039,7 +3327,7 @@ sub compile_leaf {
     if (($op eq 'LIKE') || ($op eq 'NOT_LIKE')) {
         my($lhs, $re, $neg) = ($c->{lhs}, $c->{re}, $op eq 'NOT_LIKE');
         return sub {
-            my $v = eval_expr($lhs,$_[0]);
+            my $v = eval_expr($lhs, $_[0]);
             $v = '' unless defined $v;
             my $m = ($v =~ /^$re$/si) ? 1 : 0;
             $neg ? !$m : $m;
@@ -3201,9 +3489,10 @@ sub select {
     my $needs_agg = (@$gb || ($having ne '') || grep { $_->[0] =~ /\b(?:COUNT|SUM|AVG|MIN|MAX)\s*\(/si } @$col_specs);
     return $self->exec_groupby($tbl, $col_specs, $where_expr, $gb, $having, $ob, $limit, $offset) if $needs_agg;
     my $sch = $self->_load_schema($tbl) or return { type=>'error', message=>$errstr };
-    my $dat = $self->_file($tbl,'dat');
+    my $dat = $self->_file($tbl, 'dat');
     my $ws;
     if ($where_expr ne '') {
+        # Case 1: single condition  col OP val  (no AND/OR/NOT/BETWEEN/IN)
         if (($where_expr =~ /^(\w+)\s*(=|!=|<>|<=|>=|<|>)\s*(?:'([^']*)'|(-?\d+\.?\d*))$/)
             && ($where_expr !~ /\b(?:OR|AND|NOT|BETWEEN|IN)\b/i)
         ) {
@@ -3214,17 +3503,17 @@ sub select {
                 my $wsub = where_sub($where_expr);
                 my @rows;
                 local *FH;
-                open(FH,"< $dat") or return $self->_err("Cannot open dat: $!");
+                open(FH, "< $dat") or return $self->_err("Cannot open dat: $!");
                 binmode FH;
                 _lock_sh(\*FH);
                 my $rs = $sch->{recsize};
                 for my $rn (sort { $a <=> $b } @$idx) {
-                    seek(FH,$rn*$rs,0);
+                    seek(FH, $rn*$rs, 0);
                     my $raw = '';
                     my $n   = read(FH, $raw, $rs);
                     next unless defined($n) && ($n == $rs);
                     next if substr($raw, 0, 1) eq RECORD_DELETED;
-                    my $row = $self->_unpack_record($sch,$raw);
+                    my $row = $self->_unpack_record($sch, $raw);
                     push @rows, $row if !$wsub || $wsub->($row);
                 }
                 _unlock(\*FH);
@@ -3232,11 +3521,109 @@ sub select {
                 return{ type=>'rows', data=>[$self->project([ @rows ], $col_specs, $distinct, $ob, $limit, $offset)] };
             }
         }
+        # Case 2: AND of two range conditions on the same indexed column
+        #   col OP1 val1 AND col OP2 val2  (e.g. id > 5 AND id < 10)
+        #   also: col BETWEEN val1 AND val2
+        my $idx_range = $self->_try_index_and_range($tbl, $sch, $where_expr);
+        if (defined $idx_range) {
+            my $wsub = where_sub($where_expr);
+            my @rows;
+            local *FH;
+            open(FH, "< $dat") or return $self->_err("Cannot open dat: $!");
+            binmode FH;
+            _lock_sh(\*FH);
+            my $rs = $sch->{recsize};
+            for my $rn (sort { $a <=> $b } @$idx_range) {
+                seek(FH, $rn*$rs, 0);
+                my $raw = '';
+                my $n   = read(FH, $raw, $rs);
+                next unless defined($n) && ($n == $rs);
+                next if substr($raw, 0, 1) eq RECORD_DELETED;
+                my $row = $self->_unpack_record($sch, $raw);
+                push @rows, $row if !$wsub || $wsub->($row);
+            }
+            _unlock(\*FH);
+            close FH;
+            return{ type=>'rows', data=>[$self->project([ @rows ], $col_specs, $distinct, $ob, $limit, $offset)] };
+        }
+        # Case 3: AND across different indexed columns.
+        # Use the best available single-column index to narrow the candidate
+        # record set, then apply the full WHERE predicate as a post-filter.
+        # Example: WHERE dept = 'Eng' AND salary > 70000
+        my $idx_partial = $self->_try_index_partial_and($tbl, $sch, $where_expr);
+        if (defined $idx_partial) {
+            my $wsub = where_sub($where_expr);
+            my @rows;
+            local *FH;
+            open(FH, "< $dat") or return $self->_err("Cannot open dat: $!");
+            binmode FH;
+            _lock_sh(\*FH);
+            my $rs = $sch->{recsize};
+            for my $rn (sort { $a <=> $b } @$idx_partial) {
+                seek(FH, $rn*$rs, 0);
+                my $raw = '';
+                my $n   = read(FH, $raw, $rs);
+                next unless defined($n) && ($n == $rs);
+                next if substr($raw, 0, 1) eq RECORD_DELETED;
+                my $row = $self->_unpack_record($sch, $raw);
+                push @rows, $row if !$wsub || $wsub->($row);
+            }
+            _unlock(\*FH);
+            close FH;
+            return{ type=>'rows', data=>[$self->project([ @rows ], $col_specs, $distinct, $ob, $limit, $offset)] };
+        }
+        # Case 4: col IN (v1, v2, ...)  -- equality index per value, union.
+        my $idx_in = $self->_try_index_in($tbl, $sch, $where_expr);
+        if (defined $idx_in) {
+            my $wsub = where_sub($where_expr);
+            my @rows;
+            local *FH;
+            open(FH, "< $dat") or return $self->_err("Cannot open dat: $!");
+            binmode FH;
+            _lock_sh(\*FH);
+            my $rs = $sch->{recsize};
+            for my $rn (sort { $a <=> $b } @$idx_in) {
+                seek(FH, $rn*$rs, 0);
+                my $raw = '';
+                my $n   = read(FH, $raw, $rs);
+                next unless defined($n) && ($n == $rs);
+                next if substr($raw, 0, 1) eq RECORD_DELETED;
+                my $row = $self->_unpack_record($sch, $raw);
+                push @rows, $row if !$wsub || $wsub->($row);
+            }
+            _unlock(\*FH);
+            close FH;
+            return{ type=>'rows', data=>[$self->project([ @rows ], $col_specs, $distinct, $ob, $limit, $offset)] };
+        }
+        # Case 5: pure OR of simple indexed conditions.
+        # Every atom must have an index; returns union of all matching records.
+        my $idx_or = $self->_try_index_or($tbl, $sch, $where_expr);
+        if (defined $idx_or) {
+            my $wsub = where_sub($where_expr);
+            my @rows;
+            local *FH;
+            open(FH, "< $dat") or return $self->_err("Cannot open dat: $!");
+            binmode FH;
+            _lock_sh(\*FH);
+            my $rs = $sch->{recsize};
+            for my $rn (sort { $a <=> $b } @$idx_or) {
+                seek(FH, $rn*$rs, 0);
+                my $raw = '';
+                my $n   = read(FH, $raw, $rs);
+                next unless defined($n) && ($n == $rs);
+                next if substr($raw, 0, 1) eq RECORD_DELETED;
+                my $row = $self->_unpack_record($sch, $raw);
+                push @rows, $row if !$wsub || $wsub->($row);
+            }
+            _unlock(\*FH);
+            close FH;
+            return{ type=>'rows', data=>[$self->project([ @rows ], $col_specs, $distinct, $ob, $limit, $offset)] };
+        }
         $ws = where_sub($where_expr);
     }
     my @raw;
     local *FH;
-    open(FH,"< $dat") or return $self->_err("Cannot open dat: $!");
+    open(FH, "< $dat") or return $self->_err("Cannot open dat: $!");
     binmode FH;
     _lock_sh(\*FH);
     my $rs = $sch->{recsize};
@@ -3332,7 +3719,7 @@ sub split_at_from {
 sub parse_col_list {
     my($cs) = @_;
     $cs =~ s/^\s+|\s+$//g;
-    return(['*','*']) if $cs eq '*';
+    return([ '*', '*' ]) if $cs eq '*';
     my @specs;
     for my $c (args($cs)) {
         $c =~ s/^\s+|\s+$//g;
@@ -3391,7 +3778,7 @@ sub project {
         else {
             my %p;
             $p{$_->[1]} = eval_expr($_->[0], $row) for @$col_specs;
-            push @out, \%p;
+            push @out, { %p };
         }
     }
 
@@ -3414,11 +3801,11 @@ sub project {
 sub exec_groupby {
     my($self, $tbl, $col_specs, $where_expr, $gb, $having, $ob, $limit, $offset) = @_;
     my $sch = $self->_load_schema($tbl) or return{ type=>'error', message=>$errstr };
-    my $dat = $self->_file($tbl,'dat');
+    my $dat = $self->_file($tbl, 'dat');
     my $ws = ($where_expr ne '') ? where_sub($where_expr) : undef;
     my @raw;
     local *FH;
-    open(FH,"< $dat") or return $self->_err("Cannot open dat: $!");
+    open(FH, "< $dat") or return $self->_err("Cannot open dat: $!");
     binmode FH;
     _lock_sh(\*FH);
     my $rs = $sch->{recsize};
@@ -3551,29 +3938,58 @@ sub split_union {
             $d--;
             $cur .= $ch;
         }
-        elsif (($d == 0)
-            && !$in_q
-            && (uc(substr($sql, $i, 5)) eq 'UNION')
-            && (($i == 0) || (substr($sql, $i-1, 1) =~ /\s/))
-            && ($i+5 < $len) && (substr($sql, $i+5, 1) =~ /[\s(]/)) {
-            push @parts, $cur;
-            $cur = '';
-            $i += 5;
-            while (($i < $len) && (substr($sql, $i, 1) =~ /\s/)) {
-                $i++;
+        elsif ($d == 0 && !$in_q
+            && (($i == 0) || (substr($sql, $i-1, 1) =~ /\s/))) {
+            # Detect UNION / INTERSECT / EXCEPT set operators
+            my $kw   = '';
+            my $klen = 0;
+            if ((uc(substr($sql, $i, 5)) eq 'UNION')
+                && ($i+5 < $len) && (substr($sql, $i+5, 1) =~ /[\s(]/)) {
+                $kw = 'UNION'; $klen = 5;
             }
-            if (($i+3 <= $len) && (uc(substr($sql, $i, 3)) eq 'ALL')
-                && (($i+3 >= $len) || (substr($sql, $i+3, 1) =~ /\s/))) {
-                push @parts, 'ALL';
-                $i += 3;
-                while (($i < $len) && (substr($sql, $i, 1) =~ /\s/)) {
-                    $i++;
+            elsif ((uc(substr($sql, $i, 9)) eq 'INTERSECT')
+                && ($i+9 < $len) && (substr($sql, $i+9, 1) =~ /[\s(]/)) {
+                $kw = 'INTERSECT'; $klen = 9;
+            }
+            elsif ((uc(substr($sql, $i, 6)) eq 'EXCEPT')
+                && ($i+6 < $len) && (substr($sql, $i+6, 1) =~ /[\s(]/)) {
+                $kw = 'EXCEPT'; $klen = 6;
+            }
+            if ($klen) {
+                push @parts, $cur;
+                $cur  = '';
+                $i   += $klen;
+                while (($i < $len) && (substr($sql, $i, 1) =~ /\s/)) { $i++ }
+                # UNION ALL / INTERSECT ALL / EXCEPT ALL
+                if (($kw eq 'UNION')
+                    && ($i+3 <= $len) && (uc(substr($sql, $i, 3)) eq 'ALL')
+                    && (($i+3 >= $len) || (substr($sql, $i+3, 1) =~ /\s/))) {
+                    push @parts, 'UNION_ALL';
+                    $i += 3;
+                    while (($i < $len) && (substr($sql, $i, 1) =~ /\s/)) { $i++ }
                 }
+                elsif (($kw eq 'INTERSECT')
+                    && ($i+3 <= $len) && (uc(substr($sql, $i, 3)) eq 'ALL')
+                    && (($i+3 >= $len) || (substr($sql, $i+3, 1) =~ /\s/))) {
+                    push @parts, 'INTERSECT_ALL';
+                    $i += 3;
+                    while (($i < $len) && (substr($sql, $i, 1) =~ /\s/)) { $i++ }
+                }
+                elsif (($kw eq 'EXCEPT')
+                    && ($i+3 <= $len) && (uc(substr($sql, $i, 3)) eq 'ALL')
+                    && (($i+3 >= $len) || (substr($sql, $i+3, 1) =~ /\s/))) {
+                    push @parts, 'EXCEPT_ALL';
+                    $i += 3;
+                    while (($i < $len) && (substr($sql, $i, 1) =~ /\s/)) { $i++ }
+                }
+                else {
+                    push @parts, $kw;   # bare UNION / INTERSECT / EXCEPT
+                }
+                next;
             }
             else {
-                push @parts, '';
+                $cur .= $ch;
             }
-            next;
         }
         else {
             $cur .= $ch;
@@ -3591,23 +4007,82 @@ sub exec_union {
     my $r0    = $self->execute($first);
     return $r0 if $r0->{type} eq 'error';
     my @rows  = @{$r0->{data}};
-    my $dedup = 0;
     while (@p >= 2) {
         my $sep = shift @p;
         my $q   = shift @p;
-        $dedup  = 1 if $sep ne 'ALL';
         my $r   = $self->execute($q);
         return $r if $r->{type} eq 'error';
-        push @rows, @{$r->{data}};
-    }
-    if ($dedup) {
-        my %s;
-        my @d;
-        for my $r (@rows) {
-            my $k = join("\x00", map { defined($r->{$_}) ? $r->{$_} : "\x01" } sort keys %$r);
-            push @d, $r unless $s{$k}++;
+        my @rhs = @{$r->{data}};
+        # Build a key string for each row for set operations
+        my $_key = sub {
+            my($row) = @_;
+            join("\x00", map { defined($row->{$_}) ? $row->{$_} : "\x01" } sort keys %$row);
+        };
+        if ($sep eq 'UNION' || $sep eq '') {
+            # UNION: combine then deduplicate
+            push @rows, @rhs;
+            my %s; my @d;
+            for my $row (@rows) {
+                push @d, $row unless $s{$_key->($row)}++;
+            }
+            @rows = @d;
         }
-        @rows = @d;
+        elsif ($sep eq 'UNION_ALL') {
+            # UNION ALL: combine without deduplication
+            push @rows, @rhs;
+        }
+        elsif ($sep eq 'INTERSECT') {
+            # INTERSECT: keep only rows present in both (deduplicated)
+            my %in_rhs;
+            for my $row (@rhs) { $in_rhs{$_key->($row)} = 1 }
+            my %seen; my @d;
+            for my $row (@rows) {
+                my $k = $_key->($row);
+                push @d, $row if $in_rhs{$k} && !$seen{$k}++;
+            }
+            @rows = @d;
+        }
+        elsif ($sep eq 'INTERSECT_ALL') {
+            # INTERSECT ALL: keep rows present in both (with multiplicity)
+            my %rhs_cnt;
+            for my $row (@rhs) { $rhs_cnt{$_key->($row)}++ }
+            my %used; my @d;
+            for my $row (@rows) {
+                my $k = $_key->($row);
+                if (($rhs_cnt{$k} || 0) > ($used{$k} || 0)) {
+                    push @d, $row;
+                    $used{$k}++;
+                }
+            }
+            @rows = @d;
+        }
+        elsif ($sep eq 'EXCEPT') {
+            # EXCEPT: remove rows that appear in rhs (deduplicated)
+            my %in_rhs;
+            for my $row (@rhs) { $in_rhs{$_key->($row)} = 1 }
+            my %seen; my @d;
+            for my $row (@rows) {
+                my $k = $_key->($row);
+                push @d, $row if !$in_rhs{$k} && !$seen{$k}++;
+            }
+            @rows = @d;
+        }
+        elsif ($sep eq 'EXCEPT_ALL') {
+            # EXCEPT ALL: remove rows with multiplicity
+            my %rhs_cnt;
+            for my $row (@rhs) { $rhs_cnt{$_key->($row)}++ }
+            my %removed; my @d;
+            for my $row (@rows) {
+                my $k = $_key->($row);
+                if (($rhs_cnt{$k} || 0) > ($removed{$k} || 0)) {
+                    $removed{$k}++;
+                }
+                else {
+                    push @d, $row;
+                }
+            }
+            @rows = @d;
+        }
     }
     return { type=>'rows', data=>[ @rows ] };
 }
@@ -3633,7 +4108,7 @@ sub update {
     my $rs  = $sch->{recsize};
     my $n   = 0;
     local *FH;
-    open(FH,"+< $dat") or return $self->_err("Cannot open dat: $!");
+    open(FH, "+< $dat") or return $self->_err("Cannot open dat: $!");
     binmode FH;
     _lock_ex(\*FH);
     seek(FH, 0, 0);
@@ -3661,7 +4136,7 @@ sub update {
                         my $ef = $self->_idx_file($table, $ix->{name});
                         my $es = $ix->{keysize} + REC_NO_SIZE;
                         local *IF_FH;
-                        open(IF_FH,"< $ef") or next;
+                        open(IF_FH, "< $ef") or next;
                         binmode IF_FH;
                         seek(IF_FH, IDX_MAGIC_LEN + $ep * $es + $ix->{keysize}, 0);
                         my $rn = '';
@@ -3682,6 +4157,15 @@ sub update {
                         _unlock(\*FH);
                         close FH;
                         return $self->_err("NOT NULL constraint violated on column '$cn'");
+                    }
+                }
+                # CHECK constraint check on UPDATE
+                for my $cn (keys %{$sch->{checks} || {}}) {
+                    next unless exists $set_exprs->{$cn};
+                    unless (eval_bool($sch->{checks}{$cn}, $row)) {
+                        _unlock(\*FH);
+                        close FH;
+                        return $self->_err("CHECK constraint failed on column '$cn'");
                     }
                 }
                 my $p = $self->_pack_record($sch, $row);
@@ -3962,16 +4446,11 @@ sub execute {
         $self->{_cursor} = 0;
         my $n            = scalar @$data;
         $self->{rows}    = $n;
-        if ($n > 0) {
-
-            # fix column order by sorting keys of the first row
-            $self->{NAME}          = [ sort keys %{$data->[0]} ];
-            $self->{NUM_OF_FIELDS} = scalar @{$self->{NAME}};
-        }
-        else {
-            $self->{NAME}          = [];
-            $self->{NUM_OF_FIELDS} = 0;
-        }
+        # Determine column order: prefer SELECT list order, fall back to
+        # sorted keys (used for SELECT *, JOIN results, and empty result sets).
+        my @name_order = $self->_col_order_from_sql($sql, $data);
+        $self->{NAME}          = [ @name_order ];
+        $self->{NUM_OF_FIELDS} = scalar @name_order;
         return $n || '0E0';
     }
 
@@ -3996,6 +4475,70 @@ sub execute {
         $self->{rows}    = scalar @{$res->{data}};
     }
     return '0E0';
+}
+
+# _col_order_from_sql($sql, $data)
+#
+# Parse the SELECT column list from $sql and return column names in
+# declaration order.  Falls back to sorted keys of the first data row
+# when the SELECT list contains '*', 'alias.*', aggregate expressions,
+# or cannot be parsed (e.g. JOINs with qualified names).
+#
+sub _col_order_from_sql {
+    my($self, $sql, $data) = @_;
+    # Fallback: alphabetical from first row (or empty)
+    my @fallback = ($data && @$data) ? sort keys %{$data->[0]} : ();
+    return @fallback unless defined $sql;
+    # Strip leading SELECT keyword
+    my $col_str;
+    if ($sql =~ /^SELECT\s+(.*?)\s+FROM\b/si) {
+        $col_str = $1;
+    }
+    else {
+        return @fallback;
+    }
+    $col_str =~ s/^DISTINCT\s+//si;
+    # If SELECT * or alias.* -> fall back
+    return @fallback if $col_str =~ /(?:^|\s)\*(?:\s|$)/;
+    # Split on commas (not inside parentheses)
+    my @parts;
+    my($cur, $depth) = ('', 0);
+    for my $ch (split //, $col_str) {
+        if    ($ch eq '(') { $depth++; $cur .= $ch }
+        elsif ($ch eq ')') { $depth--; $cur .= $ch }
+        elsif ($ch eq ',' && $depth == 0) { push @parts, $cur; $cur = '' }
+        else  { $cur .= $ch }
+    }
+    push @parts, $cur if length $cur;
+    my @names;
+    for my $part (@parts) {
+        $part =~ s/^\s+|\s+$//g;
+        # explicit alias:  expr AS alias
+        if ($part =~ /\bAS\s+(\w+)\s*$/si) {
+            push @names, $1;
+        }
+        # qualified alias.col -> use bare col as key
+        elsif ($part =~ /^(\w+)\.(\w+)$/) {
+            push @names, $2;
+        }
+        # bare column name
+        elsif ($part =~ /^(\w+)$/) {
+            push @names, $1;
+        }
+        # complex expression without alias -> fall back entirely
+        else {
+            return @fallback;
+        }
+    }
+    # Verify that every parsed name exists as a key in the result
+    # (guards against mis-parses; also handles 0-row results)
+    if (@$data) {
+        my %keys = map { $_ => 1 } keys %{$data->[0]};
+        for my $nm (@names) {
+            return @fallback unless $keys{$nm};
+        }
+    }
+    return @names;
 }
 
 # fetchrow_hashref -- return next row as hashref (undef at EOF)
@@ -4264,8 +4807,10 @@ The native engine interface (C<< DB::Handy->new >> and C<< $db->execute($sql) >>
 SQL statements are executed directly, and results are returned as specific
 Perl hash data structures containing execution status and data.
 
-=item * B<SQL support> - SELECT with JOIN, subqueries, UNION, GROUP BY,
-HAVING, ORDER BY, LIMIT/OFFSET, aggregates, CASE expressions, and more.
+=item * B<SQL support> - SELECT with JOIN, subqueries, UNION/INTERSECT/EXCEPT,
+GROUP BY, HAVING, ORDER BY, LIMIT/OFFSET, aggregates, CASE expressions,
+and more.  C<IN (...)> predicates and pure C<OR> expressions on indexed
+columns use index lookups.
 
 =item * B<File locking> - shared/exclusive C<flock> on data files for safe
 concurrent access from multiple processes.
@@ -4333,9 +4878,11 @@ and the package-level variable (C<$DB::Handy::errstr>) work the same way
 as C<$DBI::errstr> / C<$DBI::err>.
 
 =item * B<NAME / NUM_OF_FIELDS> -
-C<< $sth->{NAME} >> (array-ref of column names) and
+C<< $sth->{NAME} >> (array-ref of column names in SELECT list order
+for named columns, alphabetical for C<SELECT *> / JOIN) and
 C<< $sth->{NUM_OF_FIELDS} >> (integer count) are set after C<execute>,
 matching DBI statement-handle attributes.
+C<NAME> is also populated from the SQL for zero-row results.
 
 =item * B<table_info / column_info> -
 Return data in the same key-naming convention as DBI
@@ -4366,11 +4913,12 @@ DBI's C<AutoCommit> connection attribute controls whether statements are
 automatically committed.  DB::Handy has no such attribute; all writes are
 immediately persistent.
 
-=item * B<Column order in array fetches is alphabetical> -
-DBI drivers preserve the column order declared in the SELECT list.
-DB::Handy stores rows internally as hash references and therefore sorts
-column names alphabetically when populating C<< $sth->{NAME} >> and when
-returning rows via C<fetchrow_arrayref> / C<fetchrow_array>.
+=item * B<Column order in SELECT * and JOIN results is alphabetical> -
+DBI drivers always preserve the column order declared in the SELECT list.
+DB::Handy preserves declaration order for named column lists
+(e.g. C<SELECT salary, name, id>), including C<AS> aliases.
+However, C<SELECT *> and JOIN queries fall back to alphabetical order
+because the result rows are stored as Perl hash references internally.
 
 =item * B<RaiseError / PrintError are standalone> -
 In DBI, C<RaiseError> and C<PrintError> are handled by the DBI framework
@@ -4573,9 +5121,10 @@ Compatible with DBI.
 Execute C<$sql>, fetch the first row as an array-ref, then call C<finish>.
 Returns C<undef> if no rows match or on error.
 
-B<Note:> Column order is alphabetical, not declaration order.
-See L</"Column order in array fetches is alphabetical">.
-Compatible with DBI (except for column order).
+B<Note:> Column order matches the SELECT list for named columns;
+alphabetical for C<SELECT *>.
+See L</"Column order in SELECT * and JOIN results is alphabetical">.
+Compatible with DBI.
 
 =head2 quote( $value )
 
@@ -4751,22 +5300,24 @@ Compatible with DBI.
   }
 
 Return the next row as an array-ref with values in the order defined by
-C<< $sth->{NAME} >> (alphabetical by column name).  Returns C<undef> at
-end of result.
+C<< $sth->{NAME} >>.  For named SELECT lists the order matches the SELECT
+list; for C<SELECT *> and JOIN results the order is alphabetical.
+Returns C<undef> at end of result.
 
-B<Note:> Column order is alphabetical.
-See L</"Column order in array fetches is alphabetical">.
-Compatible with DBI (except for column order).
+B<Note:> Column order matches the SELECT list for named columns.
+See L</"Column order in SELECT * and JOIN results is alphabetical">.
+Compatible with DBI.
 
 =head2 fetchrow_array()
 
   my @row = $sth->fetchrow_array;
 
-Return the next row as a plain list in alphabetical column order, or an
-empty list at end of result.
+Return the next row as a plain list in C<< $sth->{NAME} >> order
+(SELECT list order for named columns, alphabetical for C<SELECT *>),
+or an empty list at end of result.
 
-B<Note:> Column order is alphabetical.
-Compatible with DBI (except for column order).
+B<Note:> Column order matches the SELECT list for named columns.
+Compatible with DBI.
 
 =head2 fetch()
 
@@ -4845,11 +5396,17 @@ C<execute>:
 
 =item C<$sth-E<gt>{NAME}>
 
-An array-ref of column names in the result set, in alphabetical order.
-For example, for C<SELECT salary, name FROM emp> the value will be
-C<['name', 'salary']>, not C<['salary', 'name']>.
+An array-ref of column names in the result set.  For named SELECT
+lists the order matches the SELECT list:
 
-Compatible with DBI (except alphabetical order).
+  $sth = $dbh->prepare("SELECT salary, name FROM emp");
+  $sth->execute;
+  # $sth->{NAME} is ['salary', 'name']
+
+For C<SELECT *> and JOIN results the order is alphabetical (fallback).
+The attribute is also set correctly for zero-row results.
+
+Compatible with DBI.
 
 =item C<$sth-E<gt>{NUM_OF_FIELDS}>
 
@@ -5093,10 +5650,24 @@ Nesting depth is limited to 32 levels.
 
 =head2 Set operations
 
-  SELECT ... UNION     SELECT ...
-  SELECT ... UNION ALL SELECT ...
+  SELECT ... UNION         SELECT ...
+  SELECT ... UNION ALL     SELECT ...
+  SELECT ... INTERSECT     SELECT ...
+  SELECT ... INTERSECT ALL SELECT ...
+  SELECT ... EXCEPT        SELECT ...
+  SELECT ... EXCEPT ALL    SELECT ...
 
-INTERSECT and EXCEPT are not supported.
+Set operators can be chained:
+C<SELECT ... UNION SELECT ... INTERSECT SELECT ...>.
+
+B<UNION> combines rows from both queries and removes duplicates.
+B<UNION ALL> combines rows without removing duplicates.
+B<INTERSECT> returns rows common to both queries (deduplicated).
+B<INTERSECT ALL> returns common rows preserving multiplicity
+(min of the two counts).
+B<EXCEPT> returns rows in the left query not present in the right
+(deduplicated).
+B<EXCEPT ALL> returns the multiset difference.
 
 =head2 WHERE predicates
 
@@ -5213,9 +5784,9 @@ Implies both C<NOT NULL> and a UNIQUE index named after the column.
 
   salary INT CHECK (salary >= 0)
 
-A simple expression evaluated on B<INSERT only>.  B<CHECK is not
-evaluated on UPDATE.>  Supported in C<CREATE TABLE> column definitions
-only; table-level CHECK constraints are not supported.
+A simple expression evaluated on both B<INSERT and UPDATE>.
+Supported in C<CREATE TABLE> column definitions only;
+table-level CHECK constraints are not supported.
 
 =back
 
@@ -5241,9 +5812,52 @@ ascending by key.  Each entry is C<[key_bytes][rec_no (4 bytes big-endian)]>.
 
 =item B<When indexes are used>
 
-The query engine uses an index when the WHERE clause contains a simple
-equality condition on an indexed column (e.g., C<WHERE id = 42>).
-Range conditions and multi-column conditions trigger a full table scan.
+The query engine uses an index when the WHERE clause contains:
+
+=over 4
+
+=item *
+
+A simple equality or range condition on an indexed column:
+C<WHERE id = 42>, C<WHERE id E<gt> 10>, C<WHERE id E<lt>= 100>.
+
+=item *
+
+A two-sided AND range on a single indexed column:
+C<WHERE id E<gt> 10 AND id E<lt> 20>.
+
+=item *
+
+A C<BETWEEN> predicate on an indexed column:
+C<WHERE id BETWEEN 10 AND 20>.
+
+=item *
+
+An AND condition spanning B<different> indexed columns.  The engine
+picks the best single-column index to narrow the candidate set, then
+applies the full WHERE predicate as a post-filter:
+C<WHERE dept = 'Eng' AND salary E<gt> 70000>.
+
+=item *
+
+A C<col IN (v1, v2, ...)> predicate on an indexed column.  The engine
+performs one equality index lookup per value and returns the union of
+matching records:
+C<WHERE id IN (10, 20, 30)>.
+
+=item *
+
+A B<pure OR> expression where every atom has an index on its column.
+The engine performs one index lookup per OR atom and returns the union
+of matching records:
+C<WHERE dept = 'Eng' OR dept = 'HR'>,
+C<WHERE id = 1 OR id E<gt> 100>.
+If any atom has no index the engine falls back to a full table scan.
+
+=back
+
+C<NOT IN> and conditions where no column has an index always trigger
+a full table scan.
 
 =item B<Index maintenance>
 
@@ -5433,21 +6047,25 @@ every INSERT, UPDATE, and DELETE is immediately written to disk.  The
 C<AutoCommit>, C<begin_work>, C<commit>, and C<rollback> methods are not
 implemented.
 
-=head2 Column order in array fetches is alphabetical
+=head2 Column order in SELECT * and JOIN results is alphabetical
 
-DBI drivers present columns in the order they appear in the SELECT list.
-DB::Handy stores all rows internally as Perl hash references and loses
-positional metadata.  As a result, C<fetchrow_arrayref>, C<fetchrow_array>,
-and C<$sth-E<gt>{NAME}> always reflect B<alphabetical column order>,
-regardless of the SELECT list order.
+DBI drivers always present columns in the order they appear in the
+SELECT list.  DB::Handy preserves SELECT list order for named column
+lists, including C<AS> aliases:
 
-  # With DBI + real driver:
+  # DB::Handy -- named SELECT list: order preserved
   # "SELECT salary, name FROM emp" -> NAME = ['salary', 'name']
+  # "SELECT salary AS sal, name AS nm FROM emp"
+  #                         -> NAME = ['sal', 'nm']
 
-  # With DB::Handy:
-  # "SELECT salary, name FROM emp" -> NAME = ['name', 'salary']
+However, C<SELECT *> and JOIN queries (which produce qualified names
+such as C<e.name>) fall back to alphabetical order because the
+underlying rows are Perl hash references:
 
-Use C<fetchrow_hashref> to access columns by name and avoid this issue.
+  # DB::Handy -- SELECT *: alphabetical fallback
+  # "SELECT * FROM emp" -> NAME = ['dept', 'id', 'name', 'salary']
+
+Use C<fetchrow_hashref> to access columns by name regardless of order.
 
 =head2 RaiseError / PrintError are standalone
 
@@ -5470,9 +6088,12 @@ DBI's C<table_info> and C<column_info> return a statement handle that
 must be fetched with the usual C<fetch*> methods.  DB::Handy returns a
 plain array-ref directly.
 
-=head2 No INTERSECT / EXCEPT
+=head2 INTERSECT / EXCEPT
 
-UNION and UNION ALL are supported.  INTERSECT and EXCEPT are not.
+C<INTERSECT>, C<INTERSECT ALL>, C<EXCEPT>, and C<EXCEPT ALL> are
+supported in addition to C<UNION> and C<UNION ALL>.
+These follow standard SQL set-operation semantics.
+Compatible with DBI.
 
 =head2 VARCHAR is always 255 bytes on disk
 
@@ -5615,7 +6236,8 @@ save space; the full 255 bytes are always reserved.
 
 =item *
 
-B<Column order in array fetches is alphabetical>, not declaration order.
+B<Column order in SELECT * and JOIN results is alphabetical.>
+Named SELECT lists (e.g. C<SELECT salary, name>) preserve declaration order.
 
 =item *
 
@@ -5634,10 +6256,6 @@ B<No WINDOW functions> (ROW_NUMBER, RANK, LEAD, LAG, etc.).
 
 =item *
 
-B<No INTERSECT or EXCEPT set operations.>
-
-=item *
-
 B<No BLOB/CLOB> large-object types.
 
 =item *
@@ -5647,9 +6265,11 @@ supported.
 
 =item *
 
-B<Range scans do not use indexes.>  Only equality conditions
-(C<col = val>) can exploit an index; C<col E<gt> val> and C<col BETWEEN>
-always perform a full table scan.
+B<NOT IN does not use indexes.>  Single-column equality, single-sided
+range, two-sided AND range on the same column, BETWEEN, AND conditions
+across different indexed columns, C<col IN (v1, v2, ...)>, and pure OR
+expressions where every atom has an index all exploit an index when
+available.  C<NOT IN> always performs a full table scan.
 
 =item *
 

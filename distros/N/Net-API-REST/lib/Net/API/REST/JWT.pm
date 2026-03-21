@@ -851,7 +851,7 @@ sub _verify_jws
     my $sig = decode_b64u( $b64u_sig );
     die( "JWS: invalid sig part" ) if( $b64u_sig && !$sig );
     my $data = "$b64u_header.$b64u_payload";
-    
+
     # no integrity
     if( $alg eq 'none' ) 
     {
@@ -1023,7 +1023,7 @@ sub _decode_jws
 Net::API::REST::JWT - JSON Web Token (JWT, JWS, JWE) as defined by RFC7519, RFC7515, RFC7516
 
 =head1 SYNOPSIS
-    
+
     # encoding
     use Net::API::REST::JWT qw( encode_jwt );
     my $jws_token = encode_jwt( payload => $data, alg => 'HS256', key => 'secret' );

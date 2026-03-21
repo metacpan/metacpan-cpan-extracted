@@ -158,6 +158,11 @@ DATA
 
 ok(!defined(str2time("")), "empty string returns undef");
 
+# NOTE: the "2000 10:02:18 GMT" entry above uses a leap year (2000) deliberately.
+# When only a year is given, str2time fills in the current month/day.  On Feb 29
+# the year must be a leap year or the date is invalid and the test fails.
+# See: https://github.com/atoomic/perl-TimeDate/issues/28
+
 for my $date (@data) {
     my $pre_1970 = ($date =~ s/^-\s*//);
 

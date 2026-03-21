@@ -433,7 +433,7 @@ NBI::Job - A class for representing a job for NBI::Slurm
 
 =head1 VERSION
 
-version 0.17.0
+version 0.17.2
 
 =head1 DESCRIPTION
 

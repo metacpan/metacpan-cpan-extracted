@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "IO::Socket" : "0",
-            "Test::More" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,7 +35,14 @@
             "Carp" : "0",
             "Exporter" : "0",
             "FileHandle" : "0",
-            "Socket" : "0"
+            "Socket" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Socket" : "0",
+            "Test::More" : "0"
          }
       }
    },
@@ -50,9 +55,11 @@
          "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/cpan-authors/Net-Ident"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/Net-Ident.git",
+         "web" : "https://github.com/cpan-authors/Net-Ident"
       }
    },
-   "version" : "1.26",
+   "version" : "1.27",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

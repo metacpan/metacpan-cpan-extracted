@@ -1,5 +1,19 @@
 Revision history for Perl extension Net::Ident.
 
+1.27 2026-03-20
+    [Bug Fixes]
+    - GH #19, PR #23 - Remove select() exception mask checks that fail on Solaris
+    - GH #20, PR #24 - Remove select() exception mask that fails on Solaris socketpair
+    - GH #18, PR #22 - Add use 5.010 for clean failure on Perl < 5.10
+    - GH #17, PR #21 - Make t/query.t portable to Windows
+
+    [Improvements]
+    - PR #15 - Add comprehensive tests for export hook mechanism
+
+    [Maintenance]
+    - PR #16 - Improve CPAN metadata in Makefile.PL (LICENSE, MIN_PERL_VERSION,
+      TEST_REQUIRES, META spec v2)
+
 1.26 2026-03-18
     [Bug Fixes]
     - GH #2 - Fix compat mode

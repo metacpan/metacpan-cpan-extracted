@@ -13,12 +13,12 @@
 #    directory.
 #
 #    cp ../dist/certfiles.tar.gz .
-#    docker build -t perlecs/qpid-broker-python:0.48-1 .
+#    docker build -t perlecs/qpid-broker-python:0.49-1 .
 #
 # 3) Run a Docker container based on the image.  This automatically starts the
 #    Python AMQP test broker.
 #
-#    docker run --rm -it --name=perlecs_qpid_broker_py  perlecs/qpid-broker-python:0.48-1
+#    docker run --rm -it --name=perlecs_qpid_broker_py  perlecs/qpid-broker-python:0.49-1
 #
 # 4) Optionally, open an interactive shell session in the running container
 #
@@ -29,7 +29,7 @@
 FROM rockylinux:9
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="Apache Qpid Broker - Python"
-LABEL Version="0.48"
+LABEL Version="0.49"
 
 # update installed packages
 RUN yum -y update
@@ -37,7 +37,7 @@ RUN yum -y update
 # install extra Rocky Linux packages
 RUN yum -y install less which python3 cyrus-sasl cyrus-sasl-plain
 
-# add EPEL repository and install Mail::IMAPClient from there
+# add EPEL repository and install additional package(s) from there
 RUN yum -y install epel-release
 RUN yum -y install python3-qpid-proton
 

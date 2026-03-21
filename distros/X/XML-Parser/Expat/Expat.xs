@@ -297,6 +297,10 @@ generate_model(XML_Content *model) {
 	hv_store(hash, "Children", 8, newRV_noinc((SV *) children), 0);
       }
     break;
+
+  case XML_CTYPE_EMPTY:
+  case XML_CTYPE_ANY:
+    break;
   }
 
   return obj;
@@ -306,9 +310,9 @@ static int
 parse_stream(XML_Parser parser, SV * ioref)
 {
   dSP;
-  SV *		tbuff;
-  SV *		tsiz;
-  char *	linebuff;
+  SV *		tbuff = NULL;
+  SV *		tsiz = NULL;
+  char *	linebuff = NULL;
   STRLEN	lblen;
   STRLEN	br = 0;
   int		buffsize;
@@ -316,8 +320,6 @@ parse_stream(XML_Parser parser, SV * ioref)
   int		ret = 1;
   char *	msg = NULL;
   CallbackVector * cbv;
-  char		*buff = (char *) 0;
-
   cbv = (CallbackVector*) XML_GetUserData(parser);
 
   ENTER;
@@ -507,11 +509,8 @@ startElement(void *userData, const char *name, const char **atts)
 {
   dSP;
   CallbackVector* cbv = (CallbackVector*) userData;
-  SV ** pcontext;
   unsigned   do_ns = cbv->ns;
   unsigned   skipping = 0;
-  SV ** pnstab;
-  SV ** pnslst;
   SV *  elname;
 
   cbv->st_serial++;
@@ -1067,7 +1066,7 @@ externalEntityRef(XML_Parser parser,
 	  char *hold;
 	  STRLEN   len;
 
-	  POPs;
+	  (void)POPs;
 	  hold = SvPV(ERRSV, len);
 	  New(326, errmsg, len + 1, char);
 	  if (len)
@@ -1186,7 +1185,6 @@ unknownEncoding(void *unused, const char *name, XML_Encoding *info)
   if (! encinfptr || ! SvOK(*encinfptr)) {
     /* Not found, so try to autoload */
     dSP;
-    int count;
 
     ENTER;
     SAVETMPS;
@@ -1509,7 +1507,6 @@ XML_ParseStream(parser, ioref, delim)
 	SV *				delim
     CODE:
 	{
-	  SV **delimsv;
 	  CallbackVector * cbv;
 
 	  cbv = (CallbackVector *) XML_GetUserData(parser);
@@ -1852,18 +1849,17 @@ XML_SetBase(parser, base)
 	}	
 
 
-SV *
+void
 XML_GetBase(parser)
 	XML_Parser			parser
-    CODE:
+    PPCODE:
 	{
 	  const char *ret = XML_GetBase(parser);
 	  if (ret) {
-	    ST(0) = sv_newmortal();
-	    sv_setpv(ST(0), ret);
+	    XPUSHs(sv_2mortal(newSVpv(ret, 0)));
 	  }
 	  else {
-	    ST(0) = &PL_sv_undef;
+	    XPUSHs(&PL_sv_undef);
 	  }
 	}
 
@@ -2062,13 +2058,14 @@ int
 XML_GetSpecifiedAttributeCount(parser)
 	XML_Parser			parser
 
-char *
+void
 XML_ErrorString(code)
 	int				code
-    CODE:
-	const char *ret = XML_ErrorString(code);
-	ST(0) = sv_newmortal();
-	sv_setpv((SV*)ST(0), ret);
+    PPCODE:
+	{
+	  const char *ret = XML_ErrorString(code);
+	  XPUSHs(sv_2mortal(newSVpv(ret, 0)));
+	}
 
 void
 XML_ExpatVersion()
@@ -2317,7 +2314,8 @@ XML_Do_External_Parse(parser, result)
     OUTPUT:
         RETVAL
 
-#if defined(XML_DTD) && defined(XML_MAJOR_VERSION) \
+#if (defined(XML_DTD) || (defined(XML_GE) && XML_GE == 1)) \
+    && defined(XML_MAJOR_VERSION) \
     && (XML_MAJOR_VERSION > 2 \
         || (XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION >= 4))
 
@@ -2343,11 +2341,7 @@ XML_SetBillionLaughsAttackProtectionActivationThreshold(parser, threshold)
 
 #endif
 
-#if defined(XML_MAJOR_VERSION) \
-    && (XML_MAJOR_VERSION > 2 \
-        || (XML_MAJOR_VERSION == 2 \
-            && (XML_MINOR_VERSION > 7 \
-                || (XML_MINOR_VERSION == 7 && XML_MICRO_VERSION >= 2))))
+#ifdef HAVE_XML_SETALLOCTRACKER
 
 int
 XML_SetAllocTrackerMaximumAmplification(parser, maxamp)

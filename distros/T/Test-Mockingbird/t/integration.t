@@ -312,4 +312,41 @@ subtest 'mock_once with retry logic' => sub {
     restore_all();
 };
 
+subtest 'restore interacts correctly with mock_once and mock_sequence' => sub {
+    {
+        package Edge::Restore;
+        sub c { return 'orig' }
+    }
+
+    mock_sequence 'Edge::Restore::c' => (10, 20);
+    mock_once     'Edge::Restore::c' => sub { 99 };
+
+    is Edge::Restore::c(), 99, 'mock_once fires first';
+
+    restore 'Edge::Restore::c';
+
+    is Edge::Restore::c(), 'orig', 'restore removes all layers';
+
+    restore_all();
+};
+
+subtest 'diagnose_mocks integrates with spy and inject' => sub {
+    {
+        package DM::I1;
+        sub c { 1 }
+        sub dep { 2 }
+    }
+
+    spy 'DM::I1::c';
+    inject 'DM::I1::dep' => sub { 99 };
+
+    my $diag = diagnose_mocks();
+
+    ok exists $diag->{'DM::I1::c'}, 'spy recorded';
+    ok exists $diag->{'DM::I1::dep'}, 'inject recorded';
+
+    restore_all();
+};
+
+
 done_testing();

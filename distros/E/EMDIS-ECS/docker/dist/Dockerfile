@@ -12,17 +12,17 @@
 #
 # 2) Build a "perlecs/dist" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/dist:0.48-1 .
+#    docker build -t perlecs/dist:0.49-1 .
 #
 #    Optionally, use --build-arg to override the TAGGED_VERSION environment
 #    variable at build time.
 #
-#    docker build --build-arg TAGGED_VERSION=0.42 -t perlecs/dist:0.48-1 .
+#    docker build --build-arg TAGGED_VERSION=0.48 -t perlecs/dist:0.49-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -t -i --name=perlecs_dist perlecs/dist:0.48-1 /bin/bash
+#    docker run --rm -t -i --name=perlecs_dist perlecs/dist:0.49-1 /bin/bash
 #
 #    If the container will be used for email and AMQP testing, e.g. in
 #    conjunction with dockerized email server and amqp broker, use docker
@@ -35,7 +35,7 @@
 #    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' perlecs_qpid_broker_py
 #    (optionally, use perlecs_qpid_broker_cpp AMQP broker instead of perlecs_qpid_broker_py)
 #
-#    docker run --rm -t -i --name=perlecs_dist --add-host email-server:172.17.0.2 --add-host amqp-broker:172.17.0.3 perlecs/dist:0.48-1 /bin/bash
+#    docker run --rm -t -i --name=perlecs_dist --add-host email-server:172.17.0.2 --add-host amqp-broker:172.17.0.3 perlecs/dist:0.49-1 /bin/bash
 #
 #    The container includes subdirectories containing test configurations to
 #    facilitate testing of email communications.  The test configurations
@@ -54,8 +54,8 @@
 # 4) Use Docker commands to copy the generated Perl ECS artifacts from the
 #    container to the Docker host (execute these commands on the host).
 #
-#    docker cp perlecs_dist:/home/perlecs/EMDIS-ECS-0.48/EMDIS-ECS-0.48.tar.gz .
-#    docker cp perlecs_dist:/home/perlecs/EMDIS-ECS-0.48/perlecs-0.48.pdf .
+#    docker cp perlecs_dist:/home/perlecs/EMDIS-ECS-0.49/EMDIS-ECS-0.49.tar.gz .
+#    docker cp perlecs_dist:/home/perlecs/EMDIS-ECS-0.49/perlecs-0.49.pdf .
 #
 # 5) If needed, use generate_ca_and_certfiles.sh script to generate new
 #    (self signed) SSL certificates, then copy tarball containing certificate
@@ -74,7 +74,7 @@
 FROM rockylinux:9
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) distribution builder and test setup"
-LABEL Version="0.48"
+LABEL Version="0.49"
 
 # update installed packages
 RUN yum -y update
@@ -100,7 +100,13 @@ RUN yum -y install \
 
 # add EPEL repository and install additional packages from there
 RUN yum -y install epel-release
-RUN yum -y install gnupg1 pass perl-Mail-IMAPClient python3-qpid-proton
+RUN yum -y install pass perl-Mail-IMAPClient python3-qpid-proton
+# Note:  The gnupg1 package was removed from the EPEL repository in late
+# 2025 (around 2025-11-11, when RHEL 9.7 was released).  However, the EPEL
+# archive contains old versions of the gnupg1 RPM package files:
+# https://dl.fedoraproject.org/pub/archive/epel/9.6-2025-11-11/
+# It is recommended to verify the GPG signature of the RPM package using
+# rpm --checksig to ensure its authenticity.
 
 # create perlecs user
 RUN useradd --comment "Perl ECS user" --create-home perlecs
@@ -123,7 +129,7 @@ ENV PATH=${HOME}/perl5lib/bin:${PATH} \
     PERL5LIB=${HOME}/perl5lib/lib/perl5
 
 # overridable at Docker build time, via docker build --build-arg <varname>=<value>
-ARG TAGGED_VERSION=0.48
+ARG TAGGED_VERSION=0.49
 
 # Export tagged version of the Perl ECS code from the Subversion repository.
 RUN svn export https://svn.code.sf.net/p/perlecs/code/tags/EMDIS-ECS-${TAGGED_VERSION}

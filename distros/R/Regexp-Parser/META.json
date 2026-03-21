@@ -55,6 +55,6 @@
          "url" : "http://github.com/toddr/Regexp-Parser/tree/master"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

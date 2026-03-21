@@ -9,10 +9,10 @@ package Test::MockFile::FileHandle;
 
 use strict;
 use warnings;
-use Errno qw/EBADF/;
+use Errno qw/EBADF EINVAL/;
 use Scalar::Util ();
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 my $files_being_mocked;
 {
@@ -27,7 +27,7 @@ tie to on B<open> or B<sysopen>.
 
 =head1 VERSION
 
-Version 0.037
+Version 0.038
 
 =cut
 
@@ -69,11 +69,12 @@ sub TIEHANDLE {
     length $file or die("No file name passed!");
 
     my $self = bless {
-        'file'  => $file,
-        'data'  => $files_being_mocked->{$file},
-        'tell'  => 0,
-        'read'  => $mode =~ m/r/ ? 1 : 0,
-        'write' => $mode =~ m/w/ ? 1 : 0,
+        'file'   => $file,
+        'data'   => $files_being_mocked->{$file},
+        'tell'   => 0,
+        'read'   => $mode =~ m/r/ ? 1 : 0,
+        'write'  => $mode =~ m/w/ ? 1 : 0,
+        'append' => $mode =~ m/a/ ? 1 : 0,
     }, $class;
 
     # This ref count can't hold the object from getting released.
@@ -88,12 +89,48 @@ This method will be triggered every time the tied handle is printed to
 with the print() or say() functions. Beyond its self reference it also
 expects the list that was passed to the print function.
 
-We append to
-C<$Test::MockFile::files_being_mocked{$file}->{'contents'}> with what
-was sent. If the file handle wasn't opened in a read mode, then this
-call with throw EBADF via $!
+In append mode (C<< >> >> or C<< +>> >>), output is always written at
+the end of the file contents. In other write modes, output is written
+at the current tell position, overwriting existing bytes. The tell
+position advances by the number of bytes written.
+
+If the file handle wasn't opened in a write mode, this call will set
+C<$!> to EBADF and return.
 
 =cut
+
+# _write_bytes: raw write of $output at the current tell position.
+# This is the shared engine for both PRINT and WRITE.
+# Returns the number of bytes written.
+sub _write_bytes {
+    my ( $self, $output ) = @_;
+
+    my $data = $self->{'data'} or do {
+        $! = EBADF;
+        return 0;
+    };
+
+    my $tell     = $self->{'tell'};
+    my $contents = \$data->{'contents'};
+
+    if ( $self->{'append'} ) {
+        # Append mode (>> / +>>): always write at end regardless of tell.
+        $$contents .= $output;
+        $self->{'tell'} = length $$contents;
+    }
+    else {
+        # Overwrite at tell position (>, +<, +>).
+        # Pad with null bytes if tell is past end of current contents.
+        my $content_len = length $$contents;
+        if ( $tell > $content_len ) {
+            $$contents .= "\0" x ( $tell - $content_len );
+        }
+        substr( $$contents, $tell, length($output), $output );
+        $self->{'tell'} = $tell + length($output);
+    }
+
+    return length($output);
+}
 
 sub PRINT {
     my ( $self, @list ) = @_;
@@ -101,19 +138,33 @@ sub PRINT {
     if ( !$self->{'write'} ) {
 
         # Filehandle $fh opened only for input at t/readline.t line 27, <$fh> line 2.
-        # https://github.com/CpanelInc/Test-MockFile/issues/1
+        # https://github.com/cpanel/Test-MockFile/issues/1
         CORE::warn("Filehandle ???? opened only for input at ???? line ???, <???> line ???.");
         $! = EBADF;
         return;
     }
 
-    my $starting_bytes = length $self->{'data'}->{'contents'};
-    foreach my $line (@list) {
-        next if !defined $line;
-        $self->{'data'}->{'contents'} .= $line;
+    # Build the output string: join with $, (output field separator) if set.
+    my $output = '';
+    for my $i ( 0 .. $#list ) {
+        $output .= $list[$i] if defined $list[$i];
+        $output .= $, if defined $, && $i < $#list;
     }
 
-    return length( $self->{'data'}->{'contents'} ) - $starting_bytes;
+    # Append output record separator ($\) when set explicitly by the caller.
+    # Note: say() does NOT set $\ for tied handles (Perl handles its newline
+    # at the C level after PRINT returns), so this only covers explicit usage.
+    $output .= $\ if defined $\;
+
+    my $data = $self->{'data'} or do {
+        $! = EBADF;
+        return 0;
+    };
+
+    my $bytes = $self->_write_bytes($output);
+    $self->_update_write_times() if $bytes;
+
+    return 1;
 }
 
 =head2 PRINTF
@@ -122,7 +173,9 @@ This method will be triggered every time the tied handle is printed to
 with the printf() function. Beyond its self reference it also expects
 the format and list that was passed to the printf function.
 
-We use sprintf to format the output and then it is sent to L<PRINT>
+Per L<perlfunc/printf>, C<printf> does B<not> append C<$\> (the output
+record separator), unlike C<print>. We therefore write directly via
+C<_write_bytes> instead of delegating to C<PRINT>.
 
 =cut
 
@@ -130,7 +183,20 @@ sub PRINTF {
     my $self   = shift;
     my $format = shift;
 
-    return $self->PRINT( sprintf( $format, @_ ) );
+    if ( !$self->{'write'} ) {
+        $! = EBADF;
+        return;
+    }
+
+    my $data = $self->{'data'} or do {
+        $! = EBADF;
+        return 0;
+    };
+
+    my $bytes = $self->_write_bytes( sprintf( $format, @_ ) );
+    $self->_update_write_times() if $bytes;
+
+    return 1;
 }
 
 =head2 WRITE
@@ -149,32 +215,44 @@ works reveals there are all sorts of weird corner cases.
 sub WRITE {
     my ( $self, $buf, $len, $offset ) = @_;
 
+    if ( !$self->{'write'} ) {
+        $! = EBADF;
+        return 0;
+    }
+
     unless ( $len =~ m/^-?[0-9.]+$/ ) {
-        $! = qq{Argument "$len" isn't numeric in syswrite at ??};
+        CORE::warn(qq{Argument "$len" isn't numeric in syswrite at @{[ join ' line ', (caller)[1,2] ]}.\n});
+        $! = EINVAL;
         return 0;
     }
 
     $len = int($len);    # Perl seems to do this to floats.
 
     if ( $len < 0 ) {
-        $! = qq{Negative length at ???};
+        CORE::warn(qq{Negative length at @{[ join ' line ', (caller)[1,2] ]}.\n});
+        $! = EINVAL;
         return 0;
     }
 
     my $strlen = length($buf);
     $offset //= 0;
 
-    if ( $strlen - $offset < abs($len) ) {
-        $! = q{Offset outside string at ???.};
-        return 0;
-    }
-
-    $offset //= 0;
     if ( $offset < 0 ) {
         $offset = $strlen + $offset;
     }
 
-    return $self->PRINT( substr( $buf, $offset, $len ) );
+    if ( $offset < 0 || $offset > $strlen ) {
+        CORE::warn(qq{Offset outside string at @{[ join ' line ', (caller)[1,2] ]}.\n});
+        $! = EINVAL;
+        return 0;
+    }
+
+    # Write directly — syswrite must NOT inherit $, or $\ from PRINT.
+    # Per perlapi: if len exceeds available data after offset, writes
+    # only what is available (substr handles this naturally).
+    my $bytes = $self->_write_bytes( substr( $buf, $offset, $len ) );
+    $self->_update_write_times() if $bytes;
+    return $bytes;
 }
 
 =head2 READLINE
@@ -191,23 +269,84 @@ read. undef is returned if tell is already at EOF.
 sub _READLINE_ONE_LINE {
     my ($self) = @_;
 
+    my $data = $self->{'data'} or return undef;
+    my $contents = $data->{'contents'};
+    my $len      = length($contents);
     my $tell     = $self->{'tell'};
-    my $rs       = $/ // '';
-    my $new_tell = index( $self->{'data'}->{'contents'}, $rs, $tell ) + length($rs);
 
-    if ( $new_tell == 0 ) {
-        $new_tell = length( $self->{'data'}->{'contents'} );
+    # Slurp mode: $/ = undef — return everything from tell to end
+    if ( !defined $/ ) {
+        return undef if $tell >= $len;
+        $self->{'tell'} = $len;
+        return substr( $contents, $tell );
     }
-    return undef if ( $new_tell == $tell );    # EOF
 
-    my $str = substr( $self->{'data'}->{'contents'}, $tell, $new_tell - $tell );
+    # Fixed-record mode: $/ = \N — read exactly N bytes
+    if ( ref $/ ) {
+        my $reclen = ${ $/ } + 0;
+        return undef if $tell >= $len;
+        my $remaining = $len - $tell;
+        my $read_len  = $reclen < $remaining ? $reclen : $remaining;
+        $self->{'tell'} = $tell + $read_len;
+        return substr( $contents, $tell, $read_len );
+    }
+
+    # Paragraph mode: $/ = '' — read paragraphs separated by blank lines
+    if ( $/ eq '' ) {
+        my $pos = $tell;
+
+        # Skip leading newlines
+        while ( $pos < $len && substr( $contents, $pos, 1 ) eq "\n" ) {
+            $pos++;
+        }
+        return undef if $pos >= $len;
+
+        my $start    = $pos;
+        my $boundary = index( $contents, "\n\n", $pos );
+
+        if ( $boundary == -1 ) {
+            # No more paragraph boundaries — return rest
+            $self->{'tell'} = $len;
+            return substr( $contents, $start );
+        }
+
+        # Return text up to boundary + 2 newlines (Perl collapses to exactly 2)
+        my $text = substr( $contents, $start, $boundary - $start ) . "\n\n";
+
+        # Advance past all consecutive newlines at the boundary
+        $pos = $boundary;
+        while ( $pos < $len && substr( $contents, $pos, 1 ) eq "\n" ) {
+            $pos++;
+        }
+        $self->{'tell'} = $pos;
+
+        return $text;
+    }
+
+    # Normal mode: read until $/ is found
+    return undef if $tell >= $len;
+
+    my $idx = index( $contents, $/, $tell );
+
+    if ( $idx == -1 ) {
+        # Record separator not found — return rest of string
+        $self->{'tell'} = $len;
+        return substr( $contents, $tell );
+    }
+
+    my $new_tell = $idx + length($/);
     $self->{'tell'} = $new_tell;
-
-    return $str;
+    return substr( $contents, $tell, $new_tell - $tell );
 }
 
 sub READLINE {
     my ($self) = @_;
+
+    if ( !$self->{'read'} ) {
+        my $path = $self->{'file'} // 'unknown';
+        CORE::warn("Filehandle $path opened only for output");
+        return;
+    }
 
     return if $self->EOF;
 
@@ -218,28 +357,40 @@ sub READLINE {
             push @all, $line;
             $line = _READLINE_ONE_LINE($self);
         }
+        $self->_update_read_time() if @all;
         return @all;
     }
 
-    return _READLINE_ONE_LINE($self);
+    my $line = _READLINE_ONE_LINE($self);
+    $self->_update_read_time() if defined $line;
+    return $line;
 }
 
 =head2 GETC
 
-B<UNIMPLEMENTED>: Open a ticket in
-L<github|https://github.com/cpanelinc/Test-MockFile/issues> if you need
-this feature.
-
 This method will be called when the getc function is called. It reads 1
 character out of contents and adds 1 to tell. The character is
-returned.
+returned. Returns undef at EOF.
 
 =cut
 
 sub GETC {
     my ($self) = @_;
 
-    die('Unimplemented');
+    if ( !$self->{'read'} ) {
+        my $path = $self->{'file'} // 'unknown';
+        CORE::warn("Filehandle $path opened only for output");
+        return undef;
+    }
+
+    return undef if $self->EOF;
+
+    my $data = $self->{'data'} or return undef;
+    my $char = substr( $data->{'contents'}, $self->{'tell'}, 1 );
+    $self->{'tell'}++;
+    $self->_update_read_time();
+
+    return $char;
 }
 
 =head2 READ
@@ -255,10 +406,35 @@ end up with some really weird strings with null bytes in them.
 sub READ {
     my ( $self, undef, $len, $offset ) = @_;
 
-    # If the caller's buffer is undef, we need to make it a string of 0 length to start out with.
-    $_[1] = '' if !defined $_[1];    # TODO: test me
+    if ( !$self->{'read'} ) {
+        $! = EBADF;
+        return undef;
+    }
 
-    my $contents_len = length $self->{'data'}->{'contents'};
+    # Validate $len the same way WRITE does — match real sysread behavior.
+    unless ( $len =~ m/^-?[0-9.]+$/ ) {
+        CORE::warn(qq{Argument "$len" isn't numeric in sysread at @{[ join ' line ', (caller)[1,2] ]}.\n});
+        $! = EINVAL;
+        return undef;
+    }
+
+    $len = int($len);
+
+    if ( $len < 0 ) {
+        CORE::warn(qq{Negative length at @{[ join ' line ', (caller)[1,2] ]}.\n});
+        $! = EINVAL;
+        return undef;
+    }
+
+    # If the caller's buffer is undef, we need to make it a string of 0 length to start out with.
+    $_[1] = '' if !defined $_[1];
+
+    my $data = $self->{'data'} or do {
+        $! = EBADF;
+        return 0;
+    };
+
+    my $contents_len = length $data->{'contents'};
     my $buf_len      = length $_[1];
 
     $offset //= 0;
@@ -267,11 +443,15 @@ sub READ {
     }
     my $tell = $self->{'tell'};
 
+    # If tell is at or past the end of contents, nothing to read (EOF)
+    return 0 if $tell >= $contents_len;
+
     my $read_len = ( $contents_len - $tell < $len ) ? $contents_len - $tell : $len;
 
-    substr( $_[1], $offset ) = substr( $self->{'data'}->{'contents'}, $tell, $read_len );
+    substr( $_[1], $offset ) = substr( $data->{'contents'}, $tell, $read_len );
 
     $self->{'tell'} += $read_len;
+    $self->_update_read_time() if $read_len;
 
     return $read_len;
 }
@@ -287,8 +467,19 @@ is removed. Further calls to this object should fail.
 sub CLOSE {
     my ($self) = @_;
 
-    delete $self->{'data'}->{'fh'};
-    untie $self;
+    # Remove this specific handle from the mock's fhs list.
+    # Each handle has its own tied object, so we match by tied identity.
+    # Try through the weak data ref first, then fall back to the global hash.
+    my $mock = $self->{'data'};
+    if ( !$mock && $self->{'file'} ) {
+        $mock = $files_being_mocked->{ $self->{'file'} };
+    }
+
+    if ( $mock && $mock->{'fhs'} ) {
+        @{ $mock->{'fhs'} } = grep {
+            defined $_ && ( !ref $_ || ( tied( *{$_} ) || 0 ) != $self )
+        } @{ $mock->{'fhs'} };
+    }
 
     return 1;
 }
@@ -325,6 +516,9 @@ At the moment, the call is just redirected to CLOSE.
 sub DESTROY {
     my ($self) = @_;
 
+    # During global destruction, our weak ref or even $self may be
+    # partially torn down. Guard before attempting cleanup.
+    return unless $self && $self->{'file'};
     return $self->CLOSE;
 }
 
@@ -338,10 +532,13 @@ C<$self-E<gt>{'tell'}>, we determine if we're at EOF.
 sub EOF {
     my ($self) = @_;
 
+    my $data = $self->{'data'} or return 1;
+
     if ( !$self->{'read'} ) {
-        CORE::warn(q{Filehandle STDOUT opened only for output});
+        my $path = $self->{'file'} // 'unknown';
+        CORE::warn("Filehandle $path opened only for output");
     }
-    return $self->{'tell'} == length $self->{'data'}->{'contents'};
+    return $self->{'tell'} >= length $data->{'contents'};
 }
 
 =head2 BINMODE
@@ -365,7 +562,7 @@ sub BINMODE {
 =head2 OPEN
 
 B<UNIMPLEMENTED>: Open a ticket in
-L<github|https://github.com/cpanelinc/Test-MockFile/issues> if you need
+L<github|https://github.com/cpanel/Test-MockFile/issues> if you need
 this feature.
 
 No L<perldoc
@@ -382,7 +579,7 @@ sub OPEN {
 =head2 FILENO
 
 B<UNIMPLEMENTED>: Open a ticket in
-L<github|https://github.com/cpanelinc/Test-MockFile/issues> if you need
+L<github|https://github.com/cpanel/Test-MockFile/issues> if you need
 this feature.
 
 No L<perldoc
@@ -402,9 +599,17 @@ Arguments passed are:C<( $self, $pos, $whence )>
 
 Moves the location of our current tell location.
 
-B<$whence is UNIMPLEMENTED>: Open a ticket in
-L<github|https://github.com/cpanelinc/Test-MockFile/issues> if you need
-this feature.
+C<$whence> controls the seek origin:
+
+=over 4
+
+=item C<0> (SEEK_SET) - seek to C<$pos> from start of file
+
+=item C<1> (SEEK_CUR) - seek to C<$pos> relative to current position
+
+=item C<2> (SEEK_END) - seek to C<$pos> relative to end of file
+
+=back
 
 No L<perldoc
 documentation|http://perldoc.perl.org/perltie.html#Tying-FileHandles>
@@ -415,15 +620,39 @@ exists on this method.
 sub SEEK {
     my ( $self, $pos, $whence ) = @_;
 
-    if ($whence) {
-        die('Unimplemented');
+    my $data = $self->{'data'} or do {
+        $! = EBADF;
+        return 0;
+    };
+
+    my $file_size = length $data->{'contents'};
+
+    my $new_pos;
+
+    my $SEEK_SET = 0;
+    my $SEEK_CUR = 1;
+    my $SEEK_END = 2;
+
+    if ( $whence == $SEEK_SET ) {
+        $new_pos = $pos;
     }
-    my $file_size = length $self->{'data'}->{'contents'};
-    return if $file_size < $pos;
+    elsif ( $whence == $SEEK_CUR ) {
+        $new_pos = $self->{'tell'} + $pos;
+    }
+    elsif ( $whence == $SEEK_END ) {
+        $new_pos = $file_size + $pos;
+    }
+    else {
+        $! = EINVAL;
+        return 0;
+    }
 
-    $self->{'tell'} = $pos;
+    if ( $new_pos < 0 ) {
+        return 0;
+    }
 
-    return $pos == 0 ? '0 but true' : $pos;
+    $self->{'tell'} = $new_pos;
+    return $new_pos == 0 ? '0 but true' : $new_pos;
 }
 
 =head2 TELL
@@ -440,6 +669,24 @@ exists on this method.
 sub TELL {
     my ($self) = @_;
     return $self->{'tell'};
+}
+
+# Update mtime and ctime after a successful write operation.
+sub _update_write_times {
+    my ($self) = @_;
+    my $data = $self->{'data'} or return;
+    my $now = time;
+    $data->{'mtime'} = $now;
+    $data->{'ctime'} = $now;
+    return;
+}
+
+# Update atime after a successful read operation.
+sub _update_read_time {
+    my ($self) = @_;
+    my $data = $self->{'data'} or return;
+    $data->{'atime'} = time;
+    return;
 }
 
 1;

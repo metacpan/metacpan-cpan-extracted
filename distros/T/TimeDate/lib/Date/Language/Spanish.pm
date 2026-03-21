@@ -11,7 +11,7 @@ use Date::Language ();
 
 use base 'Date::Language';
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Spanish localization for Date::Format
 
 our @DoW = qw(domingo lunes martes miércoles jueves viernes sábado);
@@ -49,7 +49,7 @@ Date::Language::Spanish - Spanish localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

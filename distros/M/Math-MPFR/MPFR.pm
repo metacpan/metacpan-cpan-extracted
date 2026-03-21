@@ -128,8 +128,8 @@ Rmpfr_can_round Rmpfr_cbrt Rmpfr_ceil Rmpfr_check_range
 Rmpfr_clear Rmpfr_clear_divby0 Rmpfr_clear_erangeflag Rmpfr_clear_flags Rmpfr_clear_inexflag
 Rmpfr_clear_nanflag Rmpfr_clear_overflow Rmpfr_clear_underflow Rmpfr_clears
 Rmpfr_cmp Rmpfr_cmp_IV Rmpfr_cmp_NV Rmpfr_cmp_d Rmpfr_cmp_f Rmpfr_cmp_float128 Rmpfr_cmp_ld
-Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_sj Rmpfr_cmp_ui Rmpfr_cmp_ui_2exp
-Rmpfr_cmp_uj Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui
+Rmpfr_cmp_q Rmpfr_cmp_si Rmpfr_cmp_si_2exp Rmpfr_cmp_sj Rmpfr_cmp_str
+Rmpfr_cmp_ui Rmpfr_cmp_ui_2exp Rmpfr_cmp_uj Rmpfr_cmp_z Rmpfr_cmpabs Rmpfr_cmpabs_ui
 Rmpfr_compound Rmpfr_compound_si
 Rmpfr_const_catalan Rmpfr_const_euler Rmpfr_const_log2 Rmpfr_const_pi
 Rmpfr_copysign
@@ -211,7 +211,7 @@ unpack_bfloat16 unpack_float16 unpack_float32
 
     @Math::MPFR::EXPORT_OK = (@tags, 'bytes');
 
-    our $VERSION = '4.46';
+    our $VERSION = '4.47';
     #$VERSION = eval $VERSION;
 
     Math::MPFR->DynaLoader::bootstrap($VERSION);
@@ -470,6 +470,7 @@ sub new {
 }
 
 sub Rmpfr_printf {
+    local $| = 1;
     if(@_ == 3){
       if(_itsa($_[1]) == 2) {wrap_mpfr_printf_rnd(@_)} # $_[1] is rounding argument (IOK).
       else {die "The second (of 3) arguments given to Rmpfr_printf() is not a valid rounding argument"}
@@ -2000,6 +2001,17 @@ sub oct2bin {
    if($octal =~ /^\d/ || $octal =~ s/^\+//)   { return '0b'  . $octal . $exponent }
    if($octal =~ s/^\-//) { return '-0b' . $octal . $exponent }
    die "In oct2bin: failed to parse given argument ($arg)";
+}
+
+sub Rmpfr_fpif_export_mem {
+  # $_[0] is the buffer; $_[1] is the required buffer size; $_[2] is a Math::MPFR object.
+  # $_[0] will be set to the required length when it is not already big enough - which
+  # includes those instances where $_[0] is ininitialized.
+  my $len = length($_[0]);
+  $len = 0 unless defined $len;
+  $_[0] = chr(0) x ($_[1] - 1) if $len < ($_[1] - 1);
+
+  return _Rmpfr_fpif_export_mem($_[0], $_[1], $_[2]);
 }
 
 1;

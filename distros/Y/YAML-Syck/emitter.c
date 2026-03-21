@@ -928,6 +928,12 @@ void syck_emit_2quoted_1( SyckEmitter *e, int width, char *str, long len )
             case '\t': syck_emitter_write( e, "\\t",  2 ); break;
             case '\n': syck_emitter_write( e, "\\n",  2 ); break;
 
+            /* Solidus: escape in JSON mode for XSS safety (RFC 8259 §7) */
+            case '/':
+                if ( e->json_mode ) { syck_emitter_write( e, "\\/",  2 ); }
+                else                { syck_emitter_write( e, "/",    1 ); }
+                break;
+
             /* YAML-only escapes: use \uXXXX in JSON mode */
             case '\0':
                 if ( e->json_mode ) { syck_emitter_escape( e, (unsigned char *)mark, 1 ); }
@@ -1004,6 +1010,12 @@ void syck_emit_2quoted( SyckEmitter *e, int width, char *str, long len )
             case '\r': syck_emitter_write( e, "\\r",  2 ); break;
             case '\t': syck_emitter_write( e, "\\t",  2 ); break;
             case '\n': syck_emitter_write( e, "\\n",  2 ); break;
+
+            /* Solidus: escape in JSON mode for XSS safety (RFC 8259 §7) */
+            case '/':
+                if ( e->json_mode ) { syck_emitter_write( e, "\\/",  2 ); }
+                else                { syck_emitter_write( e, "/",    1 ); }
+                break;
 
             /* YAML-only escapes: use \uXXXX in JSON mode */
             case '\0':

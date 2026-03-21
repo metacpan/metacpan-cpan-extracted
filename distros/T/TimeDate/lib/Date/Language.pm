@@ -7,7 +7,7 @@ use     Carp;
 
 require Date::Format;
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Language specific date formatting and parsing
 
 use base qw(Date::Format::Generic);
@@ -63,6 +63,14 @@ sub AUTOLOAD
  croak "Undefined method &$AUTOLOAD called";
 }
 
+sub format_Z {
+    my $tz = Date::Format::Generic::format_Z(@_);
+    my $pkg = ref($_[0]) || 'Date::Language';
+    no strict 'refs';
+    my $tz_map = \%{"${pkg}::TZ"};
+    return exists $tz_map->{$tz} ? $tz_map->{$tz} : $tz;
+}
+
 sub str2time
 {
  my $me = shift;
@@ -105,7 +113,7 @@ Date::Language - Language specific date formatting and parsing
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 SYNOPSIS
 

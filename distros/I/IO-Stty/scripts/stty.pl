@@ -1,11 +1,15 @@
-#!/usr/local/perl/bin/perl
+#!/usr/bin/perl
 
-require IO::Stty;
+use strict;
+use warnings;
 
-foreach $param (@ARGV) {
+use IO::Stty;
+
+my @params;
+foreach my $param (@ARGV) {
   push (@params,split(/\s/,$param));
 }
-$stty = IO::Stty::stty(\*STDIN,@params);
+my $stty = IO::Stty::stty(\*STDIN,@params);
 if ($stty ne '0 but true') {
   print $stty;
 }

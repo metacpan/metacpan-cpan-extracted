@@ -131,6 +131,42 @@ my $q = SQL::Wizard->new;
   is $sql, 'NOT EXISTS(SELECT 1 FROM vip)', 'not_exists';
 }
 
+# any
+{
+  my $sub = $q->select(-columns => ['salary'], -from => 'managers');
+  my $e = $q->any($sub);
+  my ($sql, @bind) = $e->to_sql;
+  is $sql, 'ANY(SELECT salary FROM managers)', 'any';
+  is_deeply \@bind, [], 'any no binds';
+}
+
+# all
+{
+  my $sub = $q->select(-columns => ['salary'], -from => 'interns');
+  my $e = $q->all($sub);
+  my ($sql, @bind) = $e->to_sql;
+  is $sql, 'ALL(SELECT salary FROM interns)', 'all';
+  is_deeply \@bind, [], 'all no binds';
+}
+
+# any/all in WHERE
+{
+  my $sub = $q->select(-columns => ['salary'], -from => 'managers');
+  my ($sql, @bind) = $q->select(
+    -from  => 'employees',
+    -where => { salary => { '>' => $q->any($sub) } },
+  )->to_sql;
+  like $sql, qr/WHERE salary > ANY\(SELECT salary FROM managers\)/, 'any in where';
+}
+{
+  my $sub = $q->select(-columns => ['salary'], -from => 'interns');
+  my ($sql, @bind) = $q->select(
+    -from  => 'employees',
+    -where => { salary => { '>' => $q->all($sub) } },
+  )->to_sql;
+  like $sql, qr/WHERE salary > ALL\(SELECT salary FROM interns\)/, 'all in where';
+}
+
 # between
 {
   my $b = $q->between('age', 18, 65);

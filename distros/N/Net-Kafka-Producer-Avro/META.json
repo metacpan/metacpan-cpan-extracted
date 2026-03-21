@@ -1,0 +1,68 @@
+{
+   "abstract" : "Apache Kafka message producer based on librdkafka, Avro serialization and Confluent Schema Registry validation.",
+   "author" : [
+      "Alvaro Livraghi"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Kafka-Producer-Avro",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Avro::BinaryEncoder" : "v1.12.1",
+            "Avro::Schema" : "v1.12.1",
+            "Confluent::SchemaRegistry" : "v1.0.0",
+            "JSON::XS" : "v4.30.0",
+            "Memoize" : "0",
+            "Net::Kafka::Producer" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Math::BigInt" : "1.89",
+            "Test::Exception" : "0.43",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alivraghi/Net-Kafka-Producer-Avro/issues"
+      },
+      "homepage" : "https://github.com/alivraghi/Net-Kafka-Producer-Avro",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/alivraghi/Net-Kafka-Producer-Avro.git"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

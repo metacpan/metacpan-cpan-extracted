@@ -61,8 +61,10 @@ t/debug_multibyte.t
 t/decl.t			Test script
 t/deep_nesting.t
 t/defaulted.t			Test script
+t/element_decl.t
 t/encoding.t			Test script
 t/error_hint.t
+t/error_string.t
 t/expat_version.t
 t/ext.ent			External entity for parament.t test
 t/ext2.ent			External entity for parament.t test
@@ -74,6 +76,7 @@ t/finish.t			Test script
 t/foo.dtd			External DTD for parament.t test
 t/foreign_dtd.t
 t/g_void.t
+t/get_base.t
 t/memory_leak_symtab.t
 t/namespaces.t			Test script
 t/nolwp.t

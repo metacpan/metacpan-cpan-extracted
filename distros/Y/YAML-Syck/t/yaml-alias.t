@@ -70,10 +70,7 @@ my $oh = bless { key => 'value' }, 'obj_hash';
 
 $undumped     = [ $os, $oa, $oh, $os, $oa, $oh ];
 $roundtripped = Load( Dump($undumped) );
-TODO: {
-    local $TODO = "Skip this because anchor #1 is going to be truncated. no problem";
-    is( Dump($roundtripped), Dump($undumped), "object" );
-}
+is( Dump($roundtripped), Dump($undumped), "object" );
 
 $undumped->[3]     = 'mod';
 $undumped->[4]     = {};

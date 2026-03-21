@@ -49,20 +49,33 @@ my %prereq_build = (
                     'File::Spec::Functions' => '0',
                    );
 
-# Added to %test_requires if needed
-my %authortest_requires = (
-                           'Pod::Coverage'       => '0.23',
-                           'Pod::Wordlist'       => '1.27',
-                           'Test::Pod::Coverage' => '1.10',
-                           'Test::Spelling'      => '0.25',
-                          );
 
-if ($ENV{TEST_AUTHOR}) {
-  print "Author tests enabled (TEST_AUTHOR=1)\n";
-  %test_requires = (%test_requires,  %authortest_requires);
+if ($ENV{AUTHOR_TESTING}) {
+  print "Author tests enabled (AUTHOR_TESTING is TRUE)\n";
+  add_mods(\%test_requires, {
+                             'Pod::Coverage'       => '0.23',
+                             'Pod::Wordlist'       => '1.27',
+                             'Test::Pod::Coverage' => '1.10',
+                             'Test::Spelling'      => '0.25',
+                             'Test::Kwalitee'      => '1.26',
+                            }
+          );
 }
 
-###########
+
+if ($ENV{RELEASE_TESTING}) {
+  print "Release tests enabled (RELEASE_TESTING is TRUE)\n";
+  add_mods(\%test_requires, {
+                             'Test::Changes::Strict::Simple' => '0.05',
+                             'Test::CheckManifest'           => '1.43',
+                             'Test::CPAN::Meta'              => '0.25',
+                             'Test::CPAN::Meta::JSON'        => '0.16',
+                             'Test::Kwalitee'                => '1.26',
+                            }
+          );
+}
+
+#############################################################################
 my %WriteMakefileArgs =
   (
    NAME             => $The_Module,
@@ -122,6 +135,14 @@ delete $WriteMakefileArgs{MIN_PERL_VERSION}
 
 WriteMakefile(%WriteMakefileArgs);
 
+
+sub add_mods {
+  my ($a, $b) = @_;
+  while (my ($mod, $ver) = each(%$b)) {
+    warn("Different versions for $mod") if exists($a->{$mod}) && $a->{$mod} ne $ver;
+    $a->{$mod} = $ver if !exists($a->{$mod}) || version->parse($a->{$mod}) < version->parse($ver);
+  }
+}
 
 sub MY::postamble {
   return "

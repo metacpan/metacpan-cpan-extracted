@@ -12,20 +12,30 @@ use Date::Language::English ();
 
 use base 'Date::Language';
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: German localization for Date::Format
 
 our @MoY  = qw(Januar Februar März April Mai Juni
        Juli August September Oktober November Dezember);
 our @MoYs = qw(Jan Feb Mär Apr Mai Jun Jul Aug Sep Okt Nov Dez);
 our @DoW  = qw(Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag);
-our @DoWs = qw(Son Mon Die Mit Don Fre Sam);
+our @DoWs = qw(So Mo Di Mi Do Fr Sa);
 
 our @AMPM =   @{Date::Language::English::AMPM};
 our @Dsuf =   @{Date::Language::English::Dsuf};
 
 our ( %MoY, %DoW );
 Date::Language::_build_lookups();
+
+# Timezone abbreviation translations (English → German)
+our %TZ = (
+    'CET'  => 'MEZ',    # Mitteleuropäische Zeit
+    'CEST' => 'MESZ',   # Mitteleuropäische Sommerzeit
+    'WET'  => 'WEZ',    # Westeuropäische Zeit
+    'WEST' => 'WESZ',   # Westeuropäische Sommerzeit
+    'EET'  => 'OEZ',    # Osteuropäische Zeit
+    'EEST' => 'OESZ',   # Osteuropäische Sommerzeit
+);
 
 # Formatting routines
 
@@ -51,7 +61,7 @@ Date::Language::German - German localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

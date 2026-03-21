@@ -35,7 +35,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.48';
+$VERSION = '0.49';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -199,17 +199,25 @@ sub log {
     my $timestamp = localtime;
     my $origin = $0;
 
-    my $setmode = not -e $cfg->LOG_FILE;
-    open LOG, ">>" . $cfg->LOG_FILE or do {
-        warn "Error within ECS library: $! " . $cfg->LOG_FILE;
-        return;
-    };
-    print LOG join("|",$timestamp,$origin,$LOG_LEVEL[$level],$text),"\n";
-    close LOG;
-    chmod $FILEMODE, $cfg->LOG_FILE if $setmode;
+    my $log_msg = join("|",$timestamp,$origin,$LOG_LEVEL[$level],$text);
+    if('__STDOUT__' eq $cfg->LOG_FILE) {
+        print "$log_msg\n";
+    }
+    else {
+        my $setmode = not -e $cfg->LOG_FILE;
+        if(open LOG, ">>" . $cfg->LOG_FILE) {
+            print LOG "$log_msg\n";
+            close LOG;
+            chmod $FILEMODE, $cfg->LOG_FILE if $setmode;
+        }
+        else {
+            warn "Error within ECS library: $! " . $cfg->LOG_FILE;
+            print "$log_msg\n";
+        };
+    }
     if ( $level >= $cfg->MAIL_LEVEL )
     {
-      send_admin_email (join("|",$timestamp,$origin,$LOG_LEVEL[$level],$text));
+        send_admin_email ($log_msg);
     }
     return '';
 }
@@ -1988,7 +1996,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2021, National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2026, National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

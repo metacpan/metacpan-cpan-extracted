@@ -1,5 +1,9 @@
 Revision history for Lilith
 
+2.0.0	2026-03-20/23:00
+		 - use DBIx::Class::Schema
+		 - rework search stuff to use that and update some of the opts for src_bin/lilith
+
 1.0.0	2026-03-15/19:30
 		 - misc cleanups
 		 - remove changable table names

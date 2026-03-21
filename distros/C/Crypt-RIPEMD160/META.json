@@ -4,7 +4,7 @@
       "Christian H. Geuer-Pollmann"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,23 +33,24 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "XSLoader" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/Crypt-RIPEMD160/issues"
+         "web" : "https://github.com/cpan-authors/Crypt-RIPEMD160/issues"
       },
-      "homepage" : "http://wiki.github.com/toddr/Crypt-RIPEMD160",
+      "homepage" : "https://github.com/cpan-authors/Crypt-RIPEMD160",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/toddr/Crypt-RIPEMD160/tree/master"
+         "url" : "https://github.com/cpan-authors/Crypt-RIPEMD160"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

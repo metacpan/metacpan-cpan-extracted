@@ -14,7 +14,7 @@ use Time::Local;
 use Carp;
 use POSIX qw(strftime);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 #
 # The use of global variables is acceptable, as we never check more than one
@@ -97,8 +97,11 @@ sub import {
 sub changes_strict_ok {
   my %args = @_;
   my $changes_file  = delete($args{changes_file}) // "Changes";
-  my $mod_version   = delete($args{module_version});
   my $release_today = delete($args{release_today});
+  my $mod_version;
+  if (exists($args{module_version})) {
+    $mod_version = delete($args{module_version}) // croak("module_version is undef");
+  }
   croak("Unknown arguments(s): " . join(", ", keys %args)) if %args;
 
   my $test_name = "Changes file passed strict checks";
@@ -384,7 +387,7 @@ Test::Changes::Strict::Simple - Strict semantic validation for CPAN Changes file
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 
 =head1 SYNOPSIS

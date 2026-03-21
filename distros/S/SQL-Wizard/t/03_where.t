@@ -31,6 +31,27 @@ sub where_sql {
   is_deeply \@bind, [], 'null no binds';
 }
 
+# IS NOT NULL via != undef
+{
+  my ($sql, @bind) = where_sql({ deleted_at => { '!=' => undef } });
+  like $sql, qr/WHERE deleted_at IS NOT NULL/, 'IS NOT NULL via !=';
+  is_deeply \@bind, [], 'IS NOT NULL no binds';
+}
+
+# IS NOT NULL via <> undef
+{
+  my ($sql, @bind) = where_sql({ deleted_at => { '<>' => undef } });
+  like $sql, qr/WHERE deleted_at IS NOT NULL/, 'IS NOT NULL via <>';
+  is_deeply \@bind, [], 'IS NOT NULL <> no binds';
+}
+
+# IS NULL via = undef in operator form
+{
+  my ($sql, @bind) = where_sql({ deleted_at => { '=' => undef } });
+  like $sql, qr/WHERE deleted_at IS NULL/, 'IS NULL via = undef';
+  is_deeply \@bind, [], 'IS NULL = no binds';
+}
+
 # operator: >
 {
   my ($sql, @bind) = where_sql({ age => { '>' => 18 } });
@@ -64,6 +85,27 @@ sub where_sql {
   my ($sql, @bind) = where_sql({ status => { -not_in => ['banned', 'deleted'] } });
   like $sql, qr/WHERE status NOT IN \(\?, \?\)/, '-not_in';
   is_deeply \@bind, ['banned', 'deleted'], '-not_in binds';
+}
+
+# empty -in list => always false
+{
+  my ($sql, @bind) = where_sql({ id => { -in => [] } });
+  like $sql, qr/WHERE 1 = 0/, 'empty -in is always false';
+  is_deeply \@bind, [], 'empty -in no binds';
+}
+
+# empty -not_in list => always true
+{
+  my ($sql, @bind) = where_sql({ id => { -not_in => [] } });
+  like $sql, qr/WHERE 1 = 1/, 'empty -not_in is always true';
+  is_deeply \@bind, [], 'empty -not_in no binds';
+}
+
+# empty arrayref value => always false
+{
+  my ($sql, @bind) = where_sql({ id => [] });
+  like $sql, qr/WHERE 1 = 0/, 'empty array value is always false';
+  is_deeply \@bind, [], 'empty array value no binds';
 }
 
 # -in with subquery

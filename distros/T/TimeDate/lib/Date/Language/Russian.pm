@@ -12,7 +12,7 @@ use Date::Language ();
 
 use base 'Date::Language';
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Russian localization for Date::Format (KOI8-R)
 
 our (@DoW, @DoWs, @MoY, @MoYs, @MoY2, @DoWs2, @AMPM, @Dsuf, %MoY, %DoW);
@@ -135,7 +135,7 @@ Date::Language::Russian - Russian localization for Date::Format (KOI8-R)
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

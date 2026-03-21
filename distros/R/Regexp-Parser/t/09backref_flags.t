@@ -1,9 +1,8 @@
 # Tests for \g{N} backreferences and /a/d/l/u modifier flags (Perl 5.10+/5.14+)
 
-use Test;
-BEGIN { plan tests => 31 };
+use Test::More tests => 31;
 use Regexp::Parser;
-ok(1); # loaded
+ok(1, 'loaded');
 
 my $r = Regexp::Parser->new;
 
@@ -11,25 +10,25 @@ my $r = Regexp::Parser->new;
 
 # \g{1} — equivalent to \1
 ok( $r->regex('(a)\\g{1}') );
-ok( $r->visual, '(a)\\g{1}' );
+is( $r->visual, '(a)\\g{1}' );
 
 # \g1 — no-braces form
 ok( $r->regex('(a)\\g1') );
-ok( $r->visual, '(a)\\g1' );
+is( $r->visual, '(a)\\g1' );
 
 # \g{2} — reference to second capture group
 ok( $r->regex('(a)(b)\\g{2}') );
-ok( $r->visual, '(a)(b)\\g{2}' );
+is( $r->visual, '(a)(b)\\g{2}' );
 
 # --- \g{-N} relative backreferences ---
 
 # \g{-1} — refer to the most recent capture group
 ok( $r->regex('(a)\\g{-1}') );
-ok( $r->visual, '(a)\\g{-1}' );
+is( $r->visual, '(a)\\g{-1}' );
 
 # \g{-2} with two groups — refer to first group
 ok( $r->regex('(a)(b)\\g{-2}') );
-ok( $r->visual, '(a)(b)\\g{-2}' );
+is( $r->visual, '(a)(b)\\g{-2}' );
 
 # --- qr() for backrefs ---
 
@@ -52,23 +51,23 @@ ok( "ab" !~ $r->qr );
 
 # (?u:...) — unicode flag
 ok( $r->regex('(?u:abc)') );
-ok( $r->visual, '(?u:abc)' );
+is( $r->visual, '(?u:abc)' );
 
 # (?a:...) — ASCII flag
 ok( $r->regex('(?a:abc)') );
-ok( $r->visual, '(?a:abc)' );
+is( $r->visual, '(?a:abc)' );
 
 # (?l:...) — locale flag
 ok( $r->regex('(?l:abc)') );
-ok( $r->visual, '(?l:abc)' );
+is( $r->visual, '(?l:abc)' );
 
 # (?d:...) — default flag
 ok( $r->regex('(?d:abc)') );
-ok( $r->visual, '(?d:abc)' );
+is( $r->visual, '(?d:abc)' );
 
 # combined flags: (?ui:...)
 ok( $r->regex('(?ui:abc)') );
-ok( $r->visual, '(?ui:abc)' );
+is( $r->visual, '(?ui:abc)' );
 
 # flag assertion: (?u) inline
 ok( $r->regex('(?u)abc') );
@@ -78,12 +77,12 @@ ok( $r->regex('(?u)abc') );
 # \g{99} — nonexistent group should error on parse
 $r->regex('(a)\\g{99}');
 eval { $r->visual };
-ok( $@ =~ /nonexistent group/ );
+like( $@, qr/nonexistent group/, '\\g{99} errors' );
 
 # \g{-5} — relative ref too far back should error on parse
 $r->regex('(a)\\g{-5}');
 eval { $r->visual };
-ok( $@ =~ /nonexistent group/ );
+like( $@, qr/nonexistent group/, '\\g{-5} errors' );
 
 # \g without number or braces should fail at regex() time
-ok( !$r->regex('(a)\\g') );
+ok( !$r->regex('(a)\\g'), '\\g alone fails' );

@@ -55,7 +55,8 @@ my $q = SQL::Wizard->new;
   my ($sql, @bind) = $a->union($b)->order_by('name')->limit(100)->to_sql;
   like $sql, qr/UNION/, 'compound has union';
   like $sql, qr/ORDER BY name/, 'compound has order';
-  like $sql, qr/LIMIT 100/, 'compound has limit';
+  like $sql, qr/LIMIT \?/, 'compound has limit';
+  is $bind[-1], 100, 'compound limit bind';
 }
 
 # compound with binds

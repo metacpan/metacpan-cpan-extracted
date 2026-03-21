@@ -35,7 +35,11 @@ subtest 'ospeed sets baud rate on pty' => sub {
 subtest 'ispeed sets baud rate on pty' => sub {
     my ( $pty, $slave ) = fresh_pty();
 
-    IO::Stty::stty( $slave, 'ispeed', '9600' );
+    # Set both speeds in a single stty() call so only one tcsetattr()
+    # fires.  Linux pty drivers normalise ispeed to match ospeed during
+    # setattr(); a single call with matching CBAUD/CIBAUD avoids any
+    # intermediate normalisation that two separate calls would expose.
+    IO::Stty::stty( $slave, 'ispeed', '9600', 'ospeed', '9600' );
     my $t = get_termios($slave);
     is( $t->getispeed, POSIX::B9600(), 'ispeed 9600 takes effect' );
 };
@@ -67,7 +71,7 @@ subtest 'unknown baud rate produces warning, does not die' => sub {
         or diag "died with: $@";
 
     is( scalar @warnings, 1, 'exactly one warning emitted' );
-    like( $warnings[0] // '', qr/unknown baud rate '99999'/,
+    like( ( defined $warnings[0] ? $warnings[0] : '' ), qr/unknown baud rate '99999'/,
         'warning mentions the invalid rate' );
 };
 
@@ -135,7 +139,7 @@ subtest 'crafted baud rate cannot call arbitrary POSIX functions' => sub {
         'ospeed unchanged after rejected rate' );
 
     ok( @warnings >= 1, 'warning emitted for unknown rate' );
-    like( $warnings[0] // '', qr/unknown baud rate 'evil_test_probe'/,
+    like( ( defined $warnings[0] ? $warnings[0] : '' ), qr/unknown baud rate 'evil_test_probe'/,
         'warning names the rejected rate' );
 };
 

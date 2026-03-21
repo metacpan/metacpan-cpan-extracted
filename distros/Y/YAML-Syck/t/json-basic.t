@@ -43,9 +43,9 @@ my @tests = (
     '[null,null]',
     '["",null]',
     '{"foo":""}',
-    '["\"://\""]',
+    '["\":\\/\\/\""]',
     '"~foo"',
-    { TEST => '"\/"',     TODO => "backslashed char not working yet" }, # escaped solidus
+    '"\/"',
     '"\""',
     '"\b"',
     '"\f"',

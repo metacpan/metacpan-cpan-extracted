@@ -12,7 +12,7 @@
 
         return fmt( { name => $name, loop => $loop },
             q<
-             PDL_COMMENT( "initialize Kahan Summation for $name" );
+             /* initialize Kahan Summation for $name */
              loop($loop) %{ $sum   = 0.0; %}
              loop($loop) %{ $error = 0.0; %}
              >
@@ -28,7 +28,7 @@
                 args => $args,
             },
             q<{
-                PDL_COMMENT( "Kahan Summation increment for $name" );
+                /* Kahan Summation increment for $name */
                 double temp = $sum;
                 /* use temporaries to minimize access of piddle arrays */
                 double y = ($expr) + $error;

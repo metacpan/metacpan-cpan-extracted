@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use base 'Date::Language';
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: TigrinyaEritrean localization for Date::Format
 
 our (@DoW, @DoWs, @MoY, @MoYs, @AMPM, @Dsuf, %MoY, %DoW);
@@ -105,7 +105,7 @@ Date::Language::TigrinyaEritrean - TigrinyaEritrean localization for Date::Forma
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

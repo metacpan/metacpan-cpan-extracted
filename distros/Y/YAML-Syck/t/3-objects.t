@@ -1,12 +1,7 @@
 use FindBin;
 BEGIN { push @INC, $FindBin::Bin }
 
-use TestYAML tests => 51,
-  (
-      ( $] < 5.008 )
-    ? ( todo => [ 19 .. 20, 26 .. 29 ] )
-    : ()
-  );
+use TestYAML tests => 51;
 
 ok( YAML::Syck->VERSION );
 
@@ -81,21 +76,19 @@ $YAML::Syck::UseCode = 1;
     is( eval { $hash->{1} }, 2,      "it's a hash" );
 }
 
-TODO: {
+{
     my $sub = eval {
         Load( Dump( bless( sub { 42 }, "foobar" ) ) );
     };
     is( ref($sub), "foobar", "blessed to foobar" );
-    local $TODO = "5.6 can't do code references in Syck right now" if ( $] < 5.007 );
     is( eval { $sub->() }, 42, "it's a CODE" );
 }
 
-TODO: {
+{
     my $sub = eval {
         Load( Dump( bless( sub { 42 }, "code" ) ) );
     };
     is( ref($sub), "code", "blessed to code" );
-    local $TODO = "5.6 can't do code references in Syck right now" if ( $] < 5.007 );
     is( eval { $sub->() }, 42, "it's a CODE" );
 }
 

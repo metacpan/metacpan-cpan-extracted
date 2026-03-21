@@ -11,7 +11,7 @@ our ($epoch, $tzname);
 use Time::Zone;
 use Time::Local;
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Date formatting subroutines
 
 sub ctime
@@ -53,9 +53,9 @@ sub strftime
    $tzname = sprintf("%+05d",$tzname)
     unless($tzname =~ /\D/);
 
-   $epoch = timegm(@{$time}[0..5]);
+   $epoch = timelocal(@{$time}[0..5]);
 
-   @$me = gmtime($epoch + tz_offset($tzname) - tz_offset());
+   @$me = gmtime($epoch + tz_offset($tzname));
   }
  else
   {
@@ -197,12 +197,12 @@ sub format_y { sprintf("%02d",$_[0]->[5] % 100) }
 sub format_Y { sprintf("%04d",$_[0]->[5] + 1900) }
 
 sub format_Z {
- my $o = tz_local_offset(timelocal(@{$_[0]}[0..5]));
+ my $o = tz_local_offset($_[0]->[9]);
  defined $tzname ? $tzname : uc tz_name($o, $_[0]->[8]);
 }
 
 sub format_z {
- my $t = timelocal(@{$_[0]}[0..5]);
+ my $t = $_[0]->[9];
  my $o = defined $tzname ? tz_offset($tzname, $t) : tz_offset(undef,$t);
  sprintf("%+03d%02d", int($o / 3600), int(abs($o) % 3600) / 60);
 }
@@ -248,7 +248,7 @@ Date::Format::Generic - Date formatting subroutines
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

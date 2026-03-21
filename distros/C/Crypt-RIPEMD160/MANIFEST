@@ -5,8 +5,6 @@ lib/Crypt/RIPEMD160/MAC.pm
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
-META.json			Module meta-data (added by MakeMaker)
-META.yml			Module meta-data (added by MakeMaker)
 misc/rfc2104.txt
 misc/rfc2286.txt
 misc/ripemd160_driver.pl
@@ -28,6 +26,9 @@ rmd160/mac/rmd128mc.h
 rmd160/mac/rmd160mc.c
 rmd160/mac/rmd160mc.h
 t/01test.t
+t/02methods.t
 typemap
 wrap_160.c
 wrap_160.h
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

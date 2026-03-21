@@ -22,7 +22,8 @@ Each file must contain subtests grouped by feature or routine.
 - Use `use_ok`, `new_ok`, `lives_ok` where appropriate.
 - Use **Test::Warnings** to ensure no unexpected warnings.
 - Use **Test::Deep** for structural comparisons.
-- Use **Test::Mockingbird::DeepMock** or **Test::Mockingbird** exclusively for mocking/spying.
+- Use **Test::Mockingbird::DeepMock** or **Test::Mockingbird** in white-box tests.
+- Where possible, use **Test::Returns** in white box testing.
 
 ### Coverage Requirements
 - All contributions must maintain or improve **Devel::Cover** metrics.

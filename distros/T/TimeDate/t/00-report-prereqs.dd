@@ -17,6 +17,11 @@ do { my $x = {
                                       'Test::Synopsis' => '0'
                                     }
                     },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0'
+                                    }
+                    },
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900'

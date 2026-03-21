@@ -2,6 +2,7 @@
 # Tests the ident protocol query phase using socketpair,
 # without needing a running identd or network access.
 
+use 5.010;
 use strict;
 use warnings;
 use Test::More;
@@ -18,6 +19,21 @@ sub make_socketpair {
     $client->autoflush(1);
     $server->autoflush(1);
     return ( $client, $server );
+}
+
+# Read from a socket, waiting for data to arrive first.
+# On Windows, socketpair is emulated via TCP so data may not be
+# immediately available for a non-blocking read after the other end
+# writes.  A brief select() ensures we wait for it.
+sub read_from_peer {
+    my ($fh) = @_;
+    my $rmask = '';
+    vec( $rmask, fileno($fh), 1 ) = 1;
+    select( $rmask, undef, undef, 2 );
+    my $buf = '';
+    $fh->blocking(0);
+    sysread( $fh, $buf, 1000 );
+    return $buf;
 }
 
 # Build a Net::Ident object in 'connect' state with a real filehandle.
@@ -47,9 +63,7 @@ subtest 'query sends correct ident protocol string' => sub {
     is( ref $result, 'Net::Ident', 'query() returns the object itself' );
 
     # Read what was sent to the server end
-    my $sent = '';
-    $server->blocking(0);
-    sysread( $server, $sent, 1000 );
+    my $sent = read_from_peer($server);
     is( $sent, "6191,23\r\n", 'correct ident query sent (remoteport,localport\\r\\n)' );
 
     close $server;
@@ -84,9 +98,7 @@ subtest 'query with high port numbers' => sub {
 
     $obj->query;
 
-    my $sent = '';
-    $server->blocking(0);
-    sysread( $server, $sent, 1000 );
+    my $sent = read_from_peer($server);
     is( $sent, "65535,49152\r\n", 'high port numbers formatted correctly' );
 
     close $server;
@@ -100,9 +112,7 @@ subtest 'query with port 1' => sub {
 
     $obj->query;
 
-    my $sent = '';
-    $server->blocking(0);
-    sysread( $server, $sent, 1000 );
+    my $sent = read_from_peer($server);
     is( $sent, "1,1\r\n", 'low port numbers formatted correctly' );
 
     close $server;
@@ -155,13 +165,14 @@ subtest 'end-to-end: query then ready then username' => sub {
     is( $obj->{state}, 'query', 'state is query' );
 
     # Phase 2: server reads the query and sends a response
-    my $query_str = '';
-    $server->blocking(0);
-    sysread( $server, $query_str, 1000 );
+    my $query_str = read_from_peer($server);
     is( $query_str, "6191,23\r\n", 'server received correct query' );
 
-    # Server sends ident response
+    # Server sends ident response.  Use shutdown() to send FIN before
+    # close — on Windows, close() alone can send RST which destroys
+    # buffered data before the client reads it.
     print $server "6191, 23 : USERID : UNIX : testuser\r\n";
+    shutdown( $server, 1 );
     close $server;
 
     # Phase 3: ready
@@ -186,10 +197,9 @@ subtest 'end-to-end: query then ERROR response' => sub {
     $obj->query;
 
     # Drain query, send ERROR response
-    my $buf = '';
-    $server->blocking(0);
-    sysread( $server, $buf, 1000 );
+    read_from_peer($server);
     print $server "6191, 23 : ERROR : NO-USER\r\n";
+    shutdown( $server, 1 );
     close $server;
 
     my ( $user, $opsys, $error ) = $obj->username;
@@ -221,6 +231,7 @@ subtest 'end-to-end: auto-query from ready' => sub {
         $server->blocking(1);
         sysread( $server, $q, 1000 );
         print $server "6191, 23 : USERID : UNIX : autouser\r\n";
+        shutdown( $server, 1 );
         close $server;
         exit 0;
     }

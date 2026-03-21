@@ -13,6 +13,8 @@ exclude = Freenode
 # pdlpp spits out bare @ISA
 [-ClassHierarchies::ProhibitExplicitISA]
 
+[-Community::Wantarray]
+
 [-Documentation::PodSpelling]
 [-Documentation::RequirePodAtEnd]
 [-Documentation::RequirePodSections]

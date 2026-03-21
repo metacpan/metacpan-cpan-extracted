@@ -61,13 +61,13 @@ for my $rate (@available_standard, @available_modern) {
     my $output = IO::Stty::show_me_the_crap(
         0,      # c_cflag
         0,      # c_iflag
-        $bval,  # ispeed (unused in display)
+        $bval,  # ispeed
         0,      # c_lflag
         0,      # c_oflag
         $bval,  # ospeed
         \%dummy_cc,
     );
-    like($output, qr/^speed $rate baud\n/, "show_me_the_crap displays B$rate as '$rate'");
+    like($output, qr/^speed $rate baud;\n/, "show_me_the_crap displays B$rate as '$rate'");
 }
 
 # Test that an unknown baud rate in stty() produces a warning

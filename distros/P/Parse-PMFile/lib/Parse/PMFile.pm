@@ -10,7 +10,7 @@ use Dumpvalue;
 use version ();
 use File::Spec ();
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 our $VERBOSE = 0;
 our $ALLOW_DEV_VERSION = 0;
 our $FORK = 0;
@@ -396,7 +396,6 @@ sub _packages_per_pmfile {
         }
 
         # some modules also enables class and role
-        # XXX: what to do with MooseX::Declare and a few minor experiments)
         if ($pline =~ /^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
             $package_or_class = 'package|class';
         }
@@ -408,6 +407,7 @@ sub _packages_per_pmfile {
         my $strict_version;
 
         if (
+            # If you change *anything* here, it needs changing in '_parse_version_safely' too
             $pline =~ m{
                       # (.*) # takes too much time if $pline is long
                       #(?<![*\$\\@%&]) # no sigils
@@ -415,7 +415,7 @@ sub _packages_per_pmfile {
                       \b(?:$package_or_class)\s+
                       ([\w\:\']+)
                       \s*
-                      (?: $ | [\}\;] | \{ | \s+($version::STRICT) )
+                      (?: $ | [\}\;\:] | \{ | \s+($version::STRICT) )
                     }x) {
             $pkg = $1;
             $strict_version = $2;
@@ -512,13 +512,29 @@ sub _packages_per_pmfile {
         local $/ = "\n";
         open(FH,$parsefile) or die "Could not open '$parsefile': $!";
         my $inpod = 0;
+        my $package_or_class = 'package';
         while (<FH>) {
             $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
             next if $inpod || /^\s*#/;
             last if /^__(?:END|DATA)__\b/; # fails on quoted __END__ but this is rare -> __END__ in the middle of a line is rarer
             chop;
 
-            if (my ($ver) = /package \s+ \S+ \s+ (\S+) \s* [;{]/x) {
+            # use feature 'class'; enabels class (and role, though not implemented yet)
+            if (/^[\s\{;]*use\s+(?:feature|experimental)\s+[^;]+\b(?:class|all)[^;]*;/) {
+                $package_or_class = 'package|class';
+            }
+
+            # some modules also enables class and role
+            # XXX: what to do with MooseX::Declare and a few minor experiments)
+            if (/^[\s\{;]*use\s+(?:Feature::Compat::Class)[^;]*;/) {
+                $package_or_class = 'package|class';
+            }
+            if (/^[\s\{;]*use\s+(?:Object::Pad)[^;]*;/) {
+                $package_or_class = 'package|class|role';
+            }
+
+            # If you change *anything* here, it needs changing in '_packages_per_pmfile' too
+            if (my ($ver) = /$package_or_class \s+ \S+ \s+ (\S+) \s* [:;{]/x) {
               # XXX: should handle this better if version is bogus -- rjbs,
               # 2014-03-16
               return $ver if version::is_lax($ver);

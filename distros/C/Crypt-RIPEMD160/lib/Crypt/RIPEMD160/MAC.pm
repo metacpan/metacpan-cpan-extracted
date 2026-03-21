@@ -1,11 +1,11 @@
 package Crypt::RIPEMD160::MAC;
 
-use Crypt::RIPEMD160;
+use Crypt::RIPEMD160 0.03;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub new {
     my($pkg, $key) = @_;
@@ -125,25 +125,29 @@ Crypt::RIPEMD160::MAC - Perl extension for RIPEMD-160 MAC function
 
 =head1 DESCRIPTION
 
-The B<Crypt::RIPEMD160> module allows you to use the RIPEMD160
-Message Digest algorithm from within Perl programs.
+The B<Crypt::RIPEMD160::MAC> module implements HMAC-RIPEMD-160 message
+authentication codes as described in RFC 2104. It uses
+L<Crypt::RIPEMD160> as the underlying hash function.
+
+A new MAC context is created with B<new>, passing the secret key as
+argument. Data is fed into the context with B<add> (which accepts a
+list of strings) or B<addfile> (which reads from a file handle).
+The final MAC value is returned by B<mac> as a 20-byte binary string,
+or by B<hexmac> as a human-readable hex string.
+
+Note that both B<mac> and B<hexmac> are destructive operations that
+clear the key material. To compute another MAC, create a new context
+or call B<reset>.
 
 =head1 EXAMPLES
 
-    use Crypt::RIPEMD160;
-    
-    $ripemd160 = Crypt::RIPEMD160->new;
-    $ripemd160->add('foo', 'bar');
-    $ripemd160->add('baz');
-    $digest = $ripemd160->digest();
-    
-    print("Digest is " . unpack("H*", $digest) . "\n");
+    use Crypt::RIPEMD160::MAC;
 
-The above example would print out the message
+    $mac = Crypt::RIPEMD160::MAC->new("secret key");
+    $mac->add("some data");
+    $digest = $mac->mac();
 
-    Digest is f137cb536c05ec2bc97e73327937b6e81d3a4cc9
-
-provided that the implementation is working correctly.
+    print("MAC is " . unpack("H*", $digest) . "\n");
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-SQL::Wizard - Composable SQL query builder with expression trees
+SQL::Wizard - Composable SQL query builder with expression trees for Perl
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,7 @@ Injects literal SQL. Use sparingly — only for database-specific constructs tha
 the API does not support natively. Any bind values are passed as additional
 arguments after the SQL string.
 
-    -set => { updated_at => $q->raw('NOW()') }
+    -set => { updated_at => $q->now }
     -where => { created_at => { '>' => $q->raw("NOW() - INTERVAL '30 days'") } }
 
 =head2 func
@@ -142,7 +142,6 @@ as column references.
 
     $q->func('COUNT', '*')->as('total')        # COUNT(*) AS total
     $q->func('SUM', 'amount')                  # SUM(amount)
-    $q->func('NOW')                            # NOW()
 
 =head2 coalesce
 
@@ -164,6 +163,15 @@ Shorthand for C<< $q->func('GREATEST', ...) >>.
     # LEAST(a, b)
 
 Shorthand for C<< $q->func('LEAST', ...) >>.
+
+=head2 now
+
+    $q->now
+    # NOW()
+
+Shorthand for C<< $q->func('NOW') >>. Useful in SET clauses:
+
+    -set => { updated_at => $q->now }
 
 =head2 cast
 
@@ -192,6 +200,30 @@ clause array:
     # NOT EXISTS(SELECT ...)
 
 Like C<exists> but negated.
+
+=head2 any
+
+    $q->any($subquery)
+    # ANY(SELECT ...)
+
+Returns an ANY subquery expression. Used with comparison operators in WHERE:
+
+    -where => { salary => { '>' => $q->any(
+        $q->select(-columns => ['salary'], -from => 'managers')
+    ) } }
+    # salary > ANY(SELECT salary FROM managers)
+
+=head2 all
+
+    $q->all($subquery)
+    # ALL(SELECT ...)
+
+Returns an ALL subquery expression. The comparison must hold for every row:
+
+    -where => { salary => { '>' => $q->all(
+        $q->select(-columns => ['salary'], -from => 'interns')
+    ) } }
+    # salary > ALL(SELECT salary FROM interns)
 
 =head2 between
 
@@ -326,6 +358,7 @@ Always use C<< ->to_sql >>.
 =head1 SELECT
 
     my ($sql, @bind) = $q->select(
+        -distinct => 1,                   # optional
         -columns  => \@exprs,
         -from     => $table_or_arrayref,
         -where    => $condition,
@@ -337,7 +370,19 @@ Always use C<< ->to_sql >>.
         -offset   => $n,
     )->to_sql;
 
-All keys are optional. Omitting C<-columns> defaults to C<SELECT *>.
+All keys are optional except C<-from>. Omitting C<-columns> defaults to
+C<SELECT *>.
+
+=head2 -distinct
+
+Set to C<1> to produce C<SELECT DISTINCT>:
+
+    $q->select(-distinct => 1, -columns => ['department'], -from => 'employees')
+    # SELECT DISTINCT department FROM employees
+
+Can also be applied as an immutable modifier (see L</QUERY MODIFICATION>):
+
+    $base->distinct->to_sql
 
 =head2 -columns
 
@@ -400,13 +445,20 @@ conditions, or use the arrayref condition syntax.
 
 =head2 -order_by
 
-A single column name, an expression, or an arrayref of either. To specify
-direction, use a hashref with C<-asc> or C<-desc>, or use C<< ->asc >> /
-C<< ->desc >> on an expression:
+A single column name, an expression, or an arrayref of either:
 
-    -order_by => 'name'
-    -order_by => [$q->col('name')->asc, $q->col('id')->desc]
-    -order_by => [{ -desc => 'created_at' }, 'name']
+    -order_by => 'name'                                 # name (ASC)
+    -order_by => '-created_at'                          # shorthand: col DESC
+    -order_by => { -desc => 'created_at' }              # hashref form
+    -order_by => { -asc  => 'name' }                    # hashref form (ASC)
+    -order_by => $q->col('created_at')->desc            # expression method
+    -order_by => $q->col('name')->asc                   # expression method (ASC)
+
+These can be mixed in an arrayref:
+
+    -order_by => ['-created_at', 'name']                # created_at DESC, name
+    -order_by => [{ -desc => 'created_at' }, 'name']    # same result
+    -order_by => [$q->col('created_at')->desc, 'name']  # same result
 
 =head2 -window
 
@@ -721,7 +773,7 @@ They are joined with C<UNION ALL>:
 Columns are sorted alphabetically. Values are auto-wrapped as bind parameters.
 Use C<$q->raw()> to inject a literal:
 
-    -values => { name => 'Alice', created_at => $q->raw('NOW()') }
+    -values => { name => 'Alice', created_at => $q->now }
 
 =head2 Multi-row
 
@@ -796,7 +848,7 @@ Use C<$q->raw()> to inject a literal:
 
     $q->update(
         -table => 'users',
-        -set   => { status => 'inactive', updated_at => $q->raw('NOW()') },
+        -set   => { status => 'inactive', updated_at => $q->now },
         -where => { last_login => { '<' => '2023-01-01' } },
     )->to_sql
     # UPDATE users SET status = ?, updated_at = NOW() WHERE last_login < ?
@@ -882,6 +934,23 @@ changing the original:
     $page2->to_sql;    # ... ORDER BY name LIMIT 20 OFFSET 20
     $counted->to_sql;  # SELECT COUNT(*) AS total FROM users WHERE status = ?
 
+=head2 distinct
+
+    $select->distinct
+
+Returns a new SELECT with the DISTINCT keyword added.
+
+=head2 where
+
+    $select->where(\%condition)
+    $select->where(undef)
+
+Returns a new SELECT with the WHERE clause replaced. Pass C<undef> to remove
+the WHERE clause entirely.
+
+    my $filtered = $base->where({ role => 'admin' });
+    my $all      = $base->where(undef);
+
 =head2 add_where
 
     $select->add_where(\%extra_condition)
@@ -897,9 +966,11 @@ Returns a new SELECT with a replaced column list.
 =head2 order_by
 
     $select->order_by('name')
+    $select->order_by('-name')                    # name DESC
     $select->order_by($q->col('name')->desc, 'id')
 
 Returns a new SELECT with the given ORDER BY clause (replaces any existing one).
+The C<'-col'> shorthand for DESC works here as well.
 
 =head2 limit
 
@@ -934,6 +1005,90 @@ as modifiers that apply to the full compound result.
     my $sth = $dbh->prepare($sql);
     $sth->execute(@bind);
     my $rows = $sth->fetchall_arrayref({});
+
+=head1 SQL INJECTION PROTECTION
+
+SQL::Wizard uses multiple layers of defense against SQL injection:
+
+=head2 Bind parameters by default
+
+All data values are rendered as C<?> placeholders with bind parameters.
+This includes C<-where> values, C<-values> in INSERT, C<-set> values in
+UPDATE, and C<-limit>/C<-offset>. User data never becomes literal SQL.
+
+=head2 Automatic identifier quoting
+
+Identifiers (column names, table names, aliases, etc.) are automatically
+quoted when they are SQL reserved words, contain uppercase characters, or
+contain special characters. ANSI double quotes are used by default;
+MySQL backticks are used with C<< dialect => 'mysql' >>. Embedded quote
+characters are escaped by doubling, making injection through identifiers
+structurally impossible.
+
+=head2 Input validation
+
+On top of quoting, identifiers are validated against strict patterns as
+defense in depth:
+
+=over 4
+
+=item * WHERE operators are checked against a whitelist
+
+=item * Function names must match C<\w+>
+
+=item * Aliases must match C<\w+>
+
+=item * Table names must match C<< (\w+\.)*\w+(\|\w+)? >>
+
+=item * Column and ORDER BY names must match C<< (\w+\.)*\w+ >>
+
+=item * CAST types must match C<< \w[\w\s(),]* >>
+
+=item * Window names must match C<\w+>
+
+=item * LIMIT and OFFSET must be integers
+
+=back
+
+=head2 Injection guard on raw SQL strings
+
+Freeform SQL strings — string ON conditions in joins, plain string WHERE
+clauses, and window frame specifications — are checked against an injection
+guard that rejects C<;> (statement terminators) and C<GO> (SQL Server batch
+separators).
+
+=head2 The raw() escape hatch
+
+C<< $q->raw(...) >> is the only way to inject literal SQL into the query
+tree. B<Never pass untrusted user input to C<raw()>.> It is intended for
+database-specific constructs that the API does not support natively:
+
+    # Safe: hardcoded SQL with bind params
+    $q->raw('NOW() - INTERVAL ? DAY', $days)
+
+    # DANGEROUS: user input in raw SQL
+    $q->raw($user_input)   # DO NOT DO THIS
+
+=head1 INSPIRATION
+
+The closest equivalents in other languages are Ruby's Sequel and Python's
+SQLAlchemy Core. SQL::Wizard brings that level of SQL composability to Perl.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<SQL::Abstract> — hash/arrayref to WHERE clause and basic CRUD
+
+=item L<SQL::Abstract::More> — extends SQL::Abstract with joins, limit, column syntax
+
+=item L<SQL::Abstract::Classic> — the pre-v2 SQL::Abstract API
+
+=item L<SQL::Maker> — alternative hash to SQL generator
+
+=item L<DBIx::Class> — full ORM built on SQL::Abstract
+
+=back
 
 =head1 AUTHOR
 

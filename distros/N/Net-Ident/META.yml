@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -24,9 +24,10 @@ requires:
   Exporter: '0'
   FileHandle: '0'
   Socket: '0'
+  perl: '5.010'
 resources:
   bugtracker: https://github.com/cpan-authors/Net-Ident/issues
   license: https://dev.perl.org/licenses/
-  repository: https://github.com/cpan-authors/Net-Ident
-version: '1.26'
+  repository: https://github.com/cpan-authors/Net-Ident.git
+version: '1.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

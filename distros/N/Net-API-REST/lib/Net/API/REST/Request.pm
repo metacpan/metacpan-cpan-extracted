@@ -88,7 +88,7 @@ sub reply
         $self->error( "An error occurred while encoding data into JSON: $@" );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
-    
+
     # try-catch
     eval
     {

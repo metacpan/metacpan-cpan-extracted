@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2025 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2025-2026 National Marrow Donor Program. All rights reserved.
 #
 # This program illustrates a process for requesting an OAuth 2.0 access token.
 # Its output, the OAuth 2.0 access token, matches the requirements of the
@@ -29,10 +29,19 @@ my $SECSTOR_LOCATION = {
     scope                  => 'emdis/ecs/oauth/scope',
     token_endpoint         => 'emdis/ecs/oauth/token_endpoint',
 };
-my $SECSTOR_TIMELIMIT = 3;
-my $CACHED_TOKEN_EXPIRATION_MARGIN = 600;
 
-# add --nocache option
+my $SECSTOR_TIMELIMIT = 30;
+if(exists $ENV{ECS_TOKEN_SECSTOR_TIMELIMIT} and
+    $ENV{ECS_TOKEN_SECSTOR_TIMELIMIT} =~ m/^\d+$/) {
+    $SECSTOR_TIMELIMIT = $ENV{ECS_TOKEN_SECSTOR_TIMELIMIT};
+}
+
+my $TOKEN_CACHE_EXPIRATION_MARGIN = 600;
+if(exists $ENV{ECS_TOKEN_CACHE_EXPIRATION_MARGIN} and
+    $ENV{ECS_TOKEN_CACHE_EXPIRATION_MARGIN} =~ m/^\d+$/) {
+    $TOKEN_CACHE_EXPIRATION_MARGIN = $ENV{ECS_TOKEN_CACHE_EXPIRATION_MARGIN};
+}
+
 my $USAGE =
     "Usage:$/" .
     "  ecs_token <command> [options]$/" .
@@ -312,7 +321,7 @@ sub get_cached_token {
         my $current_timestamp = time;
         my $parsed_token_response = decode_json($cached_token_response);
         my $expires_in = (exists $parsed_token_response->{expires_in} ? $parsed_token_response->{expires_in} : 0);
-        my $expiration_timestamp = $cached_token_timestamp + $expires_in - $CACHED_TOKEN_EXPIRATION_MARGIN;
+        my $expiration_timestamp = $cached_token_timestamp + $expires_in - $TOKEN_CACHE_EXPIRATION_MARGIN;
         if($cached_token_timestamp < $current_timestamp and $current_timestamp < $expiration_timestamp) {
             $token = $parsed_token_response->{access_token};
         }
@@ -837,7 +846,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2025 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2025-2026 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

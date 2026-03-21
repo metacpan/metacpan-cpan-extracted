@@ -10,18 +10,19 @@ events fetched.
 ### Debian
 
 ```
-apt-get install zlib1g-dev cpanminus libjson-perl libtoml-perl \
- libdbi-perl libfile-readbackwards-perl libdigest-sha-perl libpoe-perl \
- libfile-slurp-perl libdbd-pg-perl
+apt-get install zlib1g-dev cpanminus libdbi-perl libdbix-class-perl \
+ libdata-dumper-perl libdigest-sha-perl libfile-slurp-perl libjson-perl \
+ libnet-server-perl libpoe-perl libtoml-perl
 cpanm Lilith
 ```
 
 ### FreeBSD
 
 ```
-pkg install p5-App-cpanminus p5-JSON p5-TOML p5-DBI \
- p5-File-ReadBackwards p5-Digest-SHA p5-POE \
- p5-MIME-Base64 p5-Gzip-Faster p5-DBD-Pg p5-File-Slurp
+pkg install p5-App-cpanminus p5-DBI p5-DBIx-Class p5-DBD-Pg \
+ p5-Data-Dumper p5-Digest-SHA p5-File-Slurp p5-JSON p5-MIME-Base64 \
+ p5-Net-Server p5-POE p5-Sys-Syslog p5-Term-ANSIColor \
+ p5-Text-ANSITable p5-Time-Piece p5-TOML
 cpanm Lilith
 ```
 
@@ -107,56 +108,57 @@ available for that.
 
 ### SYNOPSIS
 
-lilith \[-c \<config\>\] -a run
+```
+lilith [B<-c> <config>] B<-a> run
 
-lilith -a class_map
+lilith [B<-c> <config>] B<-a> class_map
 
-lilith \[-c \<config\>\] -a create_tables
+lilith [B<-c> <config>] B<-a> create_tables
 
-lilith \[-c \<config\>\] -a dump_self
+lilith [B<-c> <config>] B<-a> dump_self
 
-lilith \[-c \<config>\] -a event \[-t \<table\>\] --id \<row_id\> \[--raw\]
-\[\[--virani \<remote\>\] \[--pcap \<output file\>\] \[--buffer \<buffer secodns\>\]\]
+lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--id> <row_id> [B<--raw>]
+[[B<--pcap> <output file>] [B<--virani> <remote>] [B<--buffer> <buffer secodns>]]
 
-lilith \[-c \<config\>\] -a event \[-t \<table\>\] --event \<event_id\> \[--raw\]
-\[\[--virani \<remote\>\] \[--pcap \<output file\>\] \[--buffer \<buffer secodns\>\]\]
+lilith [B<-c> <config>] B<-a> event [B<-t> <table>] B<--event> <event_id> [B<--raw>]
+[[B<--pcap> <output file>] [B<--virani> <remote>] [B<--buffer> <buffer secodns>]
 
-lilith \[-c \<config\>\] -a extend \[-Z\] \[-m \<minutes\>\]
+lilith [B<-c> <config>] B<-a> extend [B<-Z>] [B<-m> <minutes>]
 
-lilith -a generate_baphomet_yamls --dir \<dir\>
+lilith [B<-c> <config>] B<-a> get_short_class_snmp_list
 
-lilith \[-c \<config\>\] -a get_short_class_snmp_list
-
-lilith \[-c \<config\>\] -a search \[--output \<return\>\] \[-t \<table\>\]
-\[-m \<minutes\>\] \[--order \<clm\>\] \[--limit \<int\>\] \[--offset \<int\>\]
-\[--orderdir \<dir\>\] \[--si \<src_ip\>\] \[--di \<dst_ip\>\] \[--ip \<ip\>\]
-\[--sp \<src_port\>\] \[--dp \<dst_port\>\] \[--port \<port\>\] \[--host \<host\>\]
-\[--hostl\] \[--hosN\] \[--ih \<host\>\] \[--ihl\] \[--ihN\] \[-i \<instance\>\]
-\[-il\] \[-iN\] \[-c \<class\>\] \[--cl\] \[--cN\] \[-s \<sig\>\] \[--sl\]
-\[--sN\] \[--if \<if\>\] \[--ifl\] \[--ifN\] \[--ap \<proto\>\] \[--apl\] \[--apN\]
-\[--gid \<gid\>\] \[--sid \<sid\>\] \[--rev \<rev\>\]
+lilith [B<-c> <config>] B<-a> search [B<--output> <return>] [B<-t> <table>]
+[B<-m> <minutes>] [B<--order> <clm>] [B<--limit> <int>] [B<--offset> <int>]
+[B<--orderdir> <dir>] [B<--si> <src_ip>] [B<--di> <<dst_ip>] [B<--ip> <ip>]
+[B<--sp> <<src_port>] [B<--dp> <<dst_port>] [B<--port> <<port>] [B<--host> <host>]
+[B<--ih> <host>] [B<-i> <instance>] [B<-c> <class>] [B<-s> <sig>] [B<--if> <if>]
+[B<--ap> <proto>] [B<--gid> <gid>] [B<--sid> <sid>] [B<--rev> <rev>]
+[B<--subip> <subip>] [B<--subhost> <subhost>] [B<--slug> <slug>] [B<--pkg> <pkg>]
+[B<--malscore> <malscore>] [B<--size> <size>] [B<--target> <target>]
+[B<--task> <task>]
+```
 
 ### GENERAL SWITCHES
 
-#### -a <action>
+#### -a action
 
 The action to perform.
 
     - Default :: search
 
-#### -c <config>
+#### -c config
 
 The config file to use.
 
     - Default :: /usr/local/etc/lilith.toml
 
-#### -t <table>
+#### -t table
 
 Table to operate on.
 
     - Default :: suricata
 
-### ACTIONS
+=head1 ACTIONS
 
 #### run
 
@@ -178,35 +180,36 @@ Initiate Lilith and then dump it via Data::Dumper.
 
 Fetches a event. The table to use can be specified via -t.
 
-##### --id <row_id>
+##### --id row_id
 
 Fetch event via row ID.
 
-##### --event <event_id>
+##### --event event_id
 
 Fetch the event via the event ID.
 
-##### --raw
+#### --raw
 
 Do not decode the EVE JSON.
 
-##### --pcap <file>
+##### --pcap file
 
 Fetch the remote PCAP via Virani and write it to the file. Only usable for with Suricata tables.
 
 Default :: undef
 
-##### --virani <conf>
+##### --virani conf
 
 Virani setting to pass to -r.
 
 Default :: instance name in alert
 
-##### --buffer <secs>
+##### --buffer secs
 
 How many seconds to pad the start and end time with.
 
 Default :: 60
+
 
 #### extend
 
@@ -216,22 +219,18 @@ Prints a LibreNMS style extend.
 
 Enable Gzip+Base64 LibreNMS style extend compression.
 
-##### -m <minutes>
+##### -m minutes
 
 How far back to search. For the extend action, 5 minutes
 is the default.
 
-#### generate_baphomet_yamls
-
-Generate the YAMLs for Baphomet.
-
-##### -d <dir>
+##### -d dir
 
 The directory to write it out too.
 
 #### get_short_class_snmp_list
 
-Print a list of shorted class names for use wit SNMP.
+Print a list of shorted class names for use with SNMP.
 
 #### search
 
@@ -244,17 +243,18 @@ The common option types for search are as below.
     - String :: A string to check for. May be matched using like or negated via
                 the proper options.
     - Complex :: A item to match.
+    - IP :: An IP.
 
 ##### General Search Options
 
-###### --output <return>
+###### --output return
 
 The output type.
 
     - Values :: table,json
     - Default :: table
 
-###### -m <minute>
+###### -m minute
 
 How far back to to in minutes.
 
@@ -262,13 +262,15 @@ How far back to to in minutes.
 
     - Default, extend :: 5
 
-###### --order <column>
+###### --order column
 
 Column to use for sorting by.
 
     - Default :: timestamp
 
-###### --orderdir <direction>
+    - Cape Default :: stop
+
+###### --orderdir direction
 
 Direction to order in.
 
@@ -277,50 +279,49 @@ Direction to order in.
 
 ##### IP Options
 
-###### --si <src IP>
+###### --si src IP
 
 Source IP.
 
     - Default :: undef
-    - Type :: string
+    - Type :: IP
 
-######  --di <dst IP>
+######  --di dst IP
 
 Destination IP.
 
     - Default :: undef
-    - Type :: string
+    - Type :: IP
 
-######  --ip <IP>
+######  --ip IP
 
 IP, either dst or src.
 
     - Default :: undef
-    - Type :: complex
+    - Type :: complex IP
 
 #####  Port Options
 
-###### --sp <src port>
+###### --sp src port
 
 Source port.
 
     - Default :: undef
     - Type :: integer
 
-######  --dp <dst port>
+######  --dp dst port
 
 Destination port.
 
     - Default :: undef
     - Type :: integer
 
-###### -p <port>
+###### -p port
 
 Port, either dst or src.
 
     - Default :: undef
-    - Type :: complex
-
+    - Type :: complex integer
 ##### Host Options
 
     Sagan :: Host is the sending system and instance host is the host the
@@ -329,173 +330,147 @@ Port, either dst or src.
     Suricata :: Host is the system the instance is running on. There is no
                 instance host.
 
-###### --host <host>
+###### --host host
 
 Host.
 
     - Default :: undef
     - Type :: string
 
-###### --hostl
-
-Use like for matching host.
-
-    - Default :: undef
-
-###### --hostN
-
-Invert host matching.
-
-    - Default :: undef
-
 ##### Instance Options
 
-###### --ih <host>
+###### --ih host
 
 Instance host.
 
     - Default :: undef
     - Type :: string
 
-###### --ihl
-
-Use like for matching instance host.
-
-    - Default :: undef
-
-###### --ihN
-
-Invert instance host matching.
-
-    - Default :: undef
-
 ##### Instance Options
 
-=head4 -i  <instance>
+###### -i  instance
 
 Instance.
 
     - Default :: undef
     - Type :: string
 
-###### --il
-
-Use like for matching instance.
-
-    - Default :: undef
-
-###### --iN
-
-Invert instance matching.
-
-    - Default :: undef
-
 ##### Class Options
 
-###### -c <class>
+###### -c class
 
 Classification.
 
     - Default :: undef
     - Type :: string
 
-###### --cl
-
-Use like for matching classification.
-
-    - Default :: undef
-
-###### --cN
-
-Invert class matching.
-
-    - Default :: undef
-
 ##### Signature Options
 
-###### -s <sig>
+###### -s sig
 
 Signature.
 
     - Default :: undef
     - Type :: string
 
-###### --sl
-
-Use like for matching signature.
-
-    - Default :: undef
-
-###### --sN
-
-Invert signature matching.
-
-    - Default :: undef
-
 ##### In Interface Options
 
-###### --if <if>
+###### --if if
 
 Interface.
 
     - Default :: undef
     - Type :: string
 
-###### --ifl
-
-Use like for matching interface.
-
-    - Default :: undef
-
-###### --ifN
-
-Invert interface matching.
-
-    - Default :: undef
-
 ##### App Proto Options
 
-###### --ap <proto>
+###### --ap proto
 
 App proto.
 
     - Default :: undef
     - Type :: string
 
-###### --apl
-
-Use like for matching app proto.
-
-    - Default :: undef
-
-###### --apN
-
-Invert app proto matching.
-
-    - Default :: undef
-
 ##### Rule Options
 
-###### --gid <gid>
+###### --gid gid
 
 GID.
 
     - Default :: undef
     - Type :: integer
 
-###### --sid <sid>
+###### --sid sid
 
 SID.
 
     - Default :: undef
     - Type :: integer
 
-###### --rev <rev>
+###### --rev rev
 
 Rev.
 
     - Default :: undef
     - Type :: integer
+
+##### CAPEv2 Options
+
+###### --slug slug
+
+The slug it was submitted with.
+
+    - Default :: undef
+    - Type :: string
+
+###### --pkg pkg
+
+The detopnation package used with CAPEv2.
+
+    - Default :: undef
+    - Type :: string
+
+###### --malscore malscore
+
+The malscore of the sample.
+
+    - Default :: undef
+    - Type :: integer
+
+###### --size size
+
+The size of the sample.
+
+    - Default :: undef
+    - Type :: integer
+
+###### --target target
+
+The the detonation target.
+
+    - Default :: undef
+    - Type :: string
+
+###### --task task
+
+The task ID of the run.
+
+    - Default :: undef
+    - Type :: integer
+
+###### --subip subip
+
+The IP the sample was submitted from.
+
+    - Default :: undef
+    - Type :: IP
+
+###### --subhost subhost
+
+The host the sample was submitted from.
+
+    - Default :: undef
+    - Type :: string
 
 ## ENVIROMENTAL VARIABLES
 

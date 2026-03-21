@@ -151,7 +151,7 @@ NBI::QueuedJob - NBI::QueuedJob, to describe a job from the SLURM queue (squeue)
 
 =head1 VERSION
 
-version 0.17.0
+version 0.17.2
 
 =head1 SYNOPSIS
 

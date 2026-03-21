@@ -1,6 +1,6 @@
 # *New Batch Interface* for SLURM
 
-<a href="https://metacpan.org/dist/NBI-Slurm"><img align="right" src="docs/one-mouse.svg"  width="128"></a>
+<a href="https://metacpan.org/dist/NBI-Slurm"><img align="right" src="docs/nbi-slurm.svg"  width="128"></a>
 
 [![.github/workflows/main.yml](https://github.com/quadram-institute-bioscience/NBI-Slurm/actions/workflows/main.yml/badge.svg)](https://github.com/quadram-institute-bioscience/NBI-Slurm/actions/workflows/main.yml)
 [![MetaCpan](https://img.shields.io/cpan/v/NBI-Slurm)](https://metacpan.org/dist/NBI-Slurm)
@@ -195,6 +195,9 @@ my $jobid = $job->run;
 ```
 
 For more detailed information on the available methods and options, please refer to the individual documentation of the NBI::Job and NBI::Opts classes.
+
+Automatic tests check the functionality of the classes and methods even when Slurm is not available. From the cluster where NBI::Slurm
+will be used, it's possible to run `prove -lv xt/hpc-*.t` to test the ability to submit jobs (but some tests might fail for busy partitions, drain, etc).
 
 ## Author
 

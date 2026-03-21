@@ -1,22 +1,60 @@
 Revision history for Perl extension Crypt::RIPEMD160.
 
-0.08 Wed Oct 21 2020
-- Switch to XSLoader
+0.09 2026-03-20
+
+  Bug fixes:
+    - Fix stray semicolon in RMD160_DIGESTSIZE macro that would cause
+      compilation failures if used in expressions. GH #9
+    - Fix CI workflow to use supported Docker images, proper container
+      format, and correct perl-versions action. GH #14, PR #15
+    - Remove debug printf left in wrap_160.c. PR #11
+    - Remove dead preprocessor conditionals and unused variable from
+      wrap_160.c and wrap_160.h. PR #19
+    - Fix rand bug, bareword filehandle, and stale print in t/01test.t.
+      PR #18
+    - Cast unsigned char* to const char* in newSVpv() call to silence
+      -Wpointer-sign compiler warning on macOS/clang. GH #20, PR #21
+
+  Improvements:
+    - Modernize DynaLoader to XSLoader. PR #19
+    - Correct POD examples in MAC.pm and RIPEMD160.pm for modern Perl
+      practices. PR #8, PR #19
+    - Remove unnecessary AutoLoader from MAC.pm @ISA. GH #6, PR #4, PR #7
+    - Add use warnings to modules. PR #19
+    - Add comprehensive method and edge case test suite (t/02methods.t).
+      PR #13
+    - Update META files to correct repository URLs. PR #8
+
+  Maintenance:
+    - Modernize GitHub Actions CI to current versions. PR #10
+    - Remove stale .travis.yml and fix cpanfile. PR #12
+    - Remove META.json and META.yml from git tracking.
+    - Add .perltidyrc and update .gitignore.
 
 0.07 Wed Oct 21 2020
-- Rename the subroutine compress to not conflict with libz's symbol
-- Update manifest and .gitignore
-- Move modules to lib/
-- drop use vars and Exporter
-- Do not provide examples of indirect calls to the module.
+
+  Bug fixes:
+    - Rename internal C subroutine compress() to rmd160_compress() to avoid
+      symbol conflict with libz on CentOS 8.
+
+  Improvements:
+    - Replace indirect object notation (new Crypt::RIPEMD160) with direct
+      method calls (Crypt::RIPEMD160->new) in code and POD examples.
+    - Drop unused Exporter and 'use vars' in favor of 'our' declarations.
+    - Move bug tracking metadata from rt.cpan.org to GitHub Issues.
+
+  Maintenance:
+    - Move modules to standard lib/Crypt/RIPEMD160/ directory layout.
+    - Add MANIFEST.SKIP file and update MANIFEST and .gitignore.
+    - Add CI testing via GitHub Actions and Travis CI.
 
 0.06 Tue June 9 2015
-- Fix for Compiler warnings about printf statement - Thanks flichtenheld
+    - Fix for Compiler warnings about printf statement - Thanks flichtenheld
 
 0.05 Mon April 10 2011
-- Release to CPAN without changes
+    - Release to CPAN without changes
 
 0.04_01 Mon April 4 2011
-- Fix bug in Module for 64 bit systems where dword was undesirably an 8 byte not 4 byte integer.
+    - Fix bug in Module for 64 bit systems where dword was undesirably an 8 byte not 4 byte integer.
 
 --- Change log does not exist for 0.04 and prior

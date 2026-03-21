@@ -1,13 +1,16 @@
-README
 Changes
 Copying
+Hole.xs
 lib/Safe/Hole.pm
-lib/Safe/Hole.xs
-Build.PL
+Makefile.PL
 MANIFEST
-META.yml
+MANIFEST.SKIP
+ppport.h
+README.md
 t/00-load.t
 t/01-hole.t
+t/02-wrap-objects.t
 t/98-pod-coverage.t
 t/99-pod.t
-META.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

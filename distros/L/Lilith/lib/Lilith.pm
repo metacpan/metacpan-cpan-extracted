@@ -3,12 +3,13 @@ package Lilith;
 use 5.006;
 use strict;
 use warnings;
-use POE qw(Wheel::FollowTail);
-use JSON qw( decode_json );
-use Sys::Hostname qw( hostname );
-use DBI ();
-use Digest::SHA qw(sha256_base64);
-use Sys::Syslog qw( closelog openlog syslog );
+use POE            qw(Wheel::FollowTail);
+use JSON           qw( decode_json );
+use Sys::Hostname  qw( hostname );
+use DBI            ();
+use Digest::SHA    qw(sha256_base64);
+use Sys::Syslog    qw( closelog openlog syslog );
+use Lilith::Schema ();
 
 =head1 NAME
 
@@ -16,11 +17,11 @@ Lilith - Work with Suricata/Sagan EVE logs and PostgreSQL.
 
 =head1 VERSION
 
-Version 1.0.0
+Version 2.0.0
 
 =cut
 
-our $VERSION = '1.0.0';
+our $VERSION = '2.0.0';
 
 =head1 SYNOPSIS
 
@@ -243,7 +244,6 @@ sub new {
 
 	return $self;
 } ## end sub new
-
 
 =head2 run
 
@@ -541,7 +541,6 @@ sub run {
 	POE::Kernel->run;
 } ## end sub run
 
-
 =head2 create_tables
 
 Just creates the required tables in the DB.
@@ -556,7 +555,7 @@ sub create_tables {
 	my $dbh = DBI->connect_cached( $self->{dsn}, $self->{user}, $self->{pass} );
 
 	my $sth
-	  = $dbh->prepare( 'create table suricata_alerts ('
+		= $dbh->prepare( 'create table suricata_alerts ('
 			. 'id bigserial NOT NULL, '
 			. 'instance varchar(255) NOT NULL,'
 			. 'host varchar(255) NOT NULL,'
@@ -650,7 +649,6 @@ sub create_tables {
 	$sth->execute();
 
 } ## end sub create_tables
-
 
 =head2 extend
 
@@ -825,7 +823,6 @@ sub get_short_class {
 	return ('unknownC');
 } ## end sub get_short_class
 
-
 =head2 get_short_class_snmp
 
 Get SNMP short class name for a class. This
@@ -850,7 +847,6 @@ sub get_short_class_snmp {
 	return ('unknownC');
 } ## end sub get_short_class_snmp
 
-
 =head2 get_short_class_snmp_list
 
 Gets a list of short SNMP class names.
@@ -874,10 +870,11 @@ sub get_short_class_snmp_list {
 	return $snmp_classes;
 } ## end sub get_short_class_snmp_list
 
-
 =head2 search
 
-Searches the specified table and returns a array of found rows.
+Searches the specified table and returns a array of found rows. This is a wrapper around
+Lilith::Schema. If you are looking for something more complex, read L<DBIx::Class>,
+L<SQL::Abstract::Classic>, and L<Lilith::Schema>.
 
     - table :: 'suricata', 'cape', 'sagan' depending on the desired table to
                use. Will die if something other is specified. The table
@@ -930,8 +927,7 @@ prefixed '!' with add as a and not equal.
     # will become "and src_port = '22' and src_port != ''512'"
     src_port => ['22', '!512'],
 
-Below are a list of string items. On top of these variables,
-any of those with '_like' or '_not' will my modified respectively.
+Below are a list of string items.
 
     - host
     - instance_host
@@ -949,17 +945,13 @@ any of those with '_like' or '_not' will my modified respectively.
     host => 'foo.bar',
 
     # will become "and class != 'foo'"
-    class => 'foo',
-    class_not => 1,
+    class => '!foo',
 
     # will become "and instance like '%foo'"
     instance => '%foo',
-    instance_like => 1,
 
     # will become "and instance not like '%foo'"
-    instance => '%foo',
-    instance_like => 1,
-    instance_not => 1,
+    instance => '!%foo',
 
 Below are complex items.
 
@@ -977,16 +969,22 @@ Below are complex items.
 sub search {
 	my ( $self, %opts ) = @_;
 
-	#
-	# basic requirements sanity checking
-	#
-
-	if ( !defined( $opts{table} ) ) {
-		$opts{table} = 'suricata';
-	} else {
+	if ( defined( $opts{table} ) ) {
 		if ( $opts{table} ne 'suricata' && $opts{table} ne 'sagan' && $opts{table} ne 'cape' ) {
 			die( '"' . $opts{table} . '" is not a known table type' );
 		}
+	}
+	my $table            = 'SuricataAlert';
+	my $default_order_by = 'timestamp';
+	if ( $opts{table} eq 'sagan' ) {
+		$table = 'SaganAlert';
+	} elsif ( $opts{table} eq 'cape' ) {
+		$table            = 'CapeAlert';
+		$default_order_by = 'id';
+	}
+
+	if ( !defined( $opts{order_by} ) ) {
+		$opts{order_by} = $default_order_by;
 	}
 
 	if ( !defined( $opts{go_back_minutes} ) ) {
@@ -996,18 +994,7 @@ sub search {
 			die( '"' . $opts{go_back_minutes} . '" for go_back_minutes is not numeric' );
 		}
 	}
-
-	if ( defined( $opts{limit} ) && $opts{limit} !~ /^[0-9]+$/ ) {
-		die( '"' . $opts{limit} . '" is not numeric and limit needs to be numeric' );
-	}
-
-	if ( defined( $opts{offset} ) && $opts{offset} !~ /^[0-9]+$/ ) {
-		die( '"' . $opts{offset} . '" is not numeric and offset needs to be numeric' );
-	}
-
-	if ( defined( $opts{order_by} ) && $opts{order_by} !~ /^[\_a-zA-Z]+$/ ) {
-		die( '"' . $opts{order_by} . '" is set for order_by and it does not match /^[\_a-zA-Z]+$/' );
-	}
+	my $go_back_time = 'CURRENT_TIMESTAMP - interval \'' . $opts{go_back_minutes} . ' minutes\'';
 
 	if ( defined( $opts{order_dir} ) && $opts{order_dir} ne 'ASC' && $opts{order_dir} ne 'DESC' ) {
 		die( '"' . $opts{order_dir} . '" for order_dir must by either ASC or DESC' );
@@ -1015,91 +1002,14 @@ sub search {
 		$opts{order_dir} = 'ASC';
 	}
 
-	if ( !defined( $opts{order_by} ) ) {
-		if ( $opts{table} ne 'cape' ) {
-			$opts{order_by} = 'timestamp';
-		} else {
-			$opts{order_by} = 'stop';
-		}
+	my $go_back_column = 'timestamp';
+	if ( $opts{table} eq 'cape' ) {
+		$go_back_column = 'stop';
 	}
 
-	my $table = 'suricata_alerts';
-	if ( $opts{table} eq 'sagan' ) {
-		$table = 'sagan_alerts';
-	} elsif ( $opts{table} eq 'cape' ) {
-		$table = 'cape_alerts';
-	}
+	my $schema = Lilith::Schema->connect( $self->{dsn}, $self->{user}, $self->{pass}, );
 
-	#
-	# make sure all the set variables are not dangerous or potentially dangerous
-	#
-
-	my @to_check = (
-		'src_ip', 'src_port',   'dest_ip',       'dest_port',     'ip',        'port',
-		'host',   'host',       'instance_host', 'instance_host', 'instance',  'instance',
-		'class',  'class_like', 'signature',     'signature',     'app_proto', 'app_proto_like',
-		'proto',  'gid',        'sid',           'rev',           'id',        'event_id',
-		'in_iface'
-	);
-
-	foreach my $var_to_check (@to_check) {
-		if ( defined( $opts{$var_to_check} ) && $opts{$var_to_check} =~ /[\\\']/ ) {
-			die( '"' . $opts{$var_to_check} . '" for "' . $var_to_check . '" matched /[\\\']/' );
-		}
-	}
-
-	#
-	# makes sure order_by is sane
-	#
-
-	my @order_by = (
-		'src_ip',    'src_port',  'dest_ip',          'dest_port',
-		'host',      'host_like', 'instance_host',    'instance_host',
-		'instance',  'instance',  'class',            'class',
-		'signature', 'signature', 'app_proto',        'app_proto',
-		'proto',     'gid',       'sid',              'rev',
-		'timestamp', 'id',        'in_iface',         'url_hostname',
-		'url',       'slug',      'sha256',           'sha1',
-		'md5',       'pkg',       'subbed_from_host', 'subbed_from_ip',
-		'malscore',  'task',      'target',           'proto',
-		'size',      'id',        'stop',             'start'
-	);
-
-	my $valid_order_by;
-
-	foreach my $item (@order_by) {
-		if ( $item eq $opts{order_by} ) {
-			$valid_order_by = 1;
-		}
-	}
-
-	if ( !$valid_order_by ) {
-		die( '"' . $opts{order_by} . '" is not a valid column name for order_by' );
-	}
-
-	#
-	# assemble
-	#
-
-	my $host = hostname;
-
-	my $dbh = DBI->connect_cached( $self->{dsn}, $self->{user}, $self->{pass} );
-
-	my $sql = 'select * from ' . $table . ' where';
-	if ( defined( $opts{no_time} ) && $opts{no_time} ) {
-		$sql = $sql . ' id >= 0';
-	} else {
-		my $go_back_column = 'timestamp';
-		if ( $opts{table} eq 'cape' ) {
-			$go_back_column = 'stop';
-		}
-		$sql
-			= $sql . " "
-			. $go_back_column
-			. " >= CURRENT_TIMESTAMP - interval '"
-			. $opts{go_back_minutes}
-			. " minutes'";
-	} ## end else [ if ( defined( $opts{no_time} ) && $opts{no_time...})]
+	my $search = { $go_back_column => { '>=', \$go_back_time } };
 
 	#
 	# add simple items
@@ -1109,7 +1019,7 @@ sub search {
 
 	foreach my $item (@simple) {
 		if ( defined( $opts{$item} ) ) {
-			$sql = $sql . " and " . $item . " = '" . $opts{$item} . "'";
+			$search->{$item} = $opts{$item};
 		}
 	}
 
@@ -1121,32 +1031,37 @@ sub search {
 
 	foreach my $item (@numeric) {
 		if ( defined( $opts{$item} ) ) {
-
-			# remove and tabs or spaces
-			$opts{$item} =~ s/[\ \t]//g;
-			my @arg_split = split( /\,/, $opts{$item} );
-
 			# process each item
-			foreach my $arg (@arg_split) {
+			my @found;
+			foreach my $arg ( @{ $opts{$item} } ) {
+				$arg =~ s/[\ \t]//g;
+
+				my $equality = '=';
+				my $number;
 
 				# match the start of the item
 				if ( $arg =~ /^[0-9]+$/ ) {
-					$sql = $sql . " and " . $item . " = '" . $arg . "'";
+					$number = $arg;
 				} elsif ( $arg =~ /^\<\=[0-9]+$/ ) {
 					$arg =~ s/^\<\=//;
-					$sql = $sql . " and " . $item . " <= '" . $arg . "'";
+					$equality = '<=';
+					$number   = $arg;
 				} elsif ( $arg =~ /^\<[0-9]+$/ ) {
 					$arg =~ s/^\<//;
-					$sql = $sql . " and " . $item . " < '" . $arg . "'";
+					$equality = '<';
+					$number   = $arg;
 				} elsif ( $arg =~ /^\>\=[0-9]+$/ ) {
 					$arg =~ s/^\>\=//;
-					$sql = $sql . " and " . $item . " >= '" . $arg . "'";
+					$equality = '>=';
+					$number   = $arg;
 				} elsif ( $arg =~ /^\>[0-9]+$/ ) {
 					$arg =~ s/^\>\=//;
-					$sql = $sql . " and " . $item . " > '" . $arg . "'";
+					$equality = '>';
+					$number   = $arg;
 				} elsif ( $arg =~ /^\![0-9]+$/ ) {
 					$arg =~ s/^\!//;
-					$sql = $sql . " and " . $item . " != '" . $arg . "'";
+					$equality = '!=';
+					$number   = $arg;
 				} elsif ( $arg =~ /^$/ ) {
 
 					# only exists for skipping when some one has passes something starting
@@ -1155,9 +1070,39 @@ sub search {
 					# if we get here, it means we don't have a valid use case for what ever was passed and should error
 					die( '"' . $arg . '" does not appear to be a valid item for a numeric search for the ' . $item );
 				}
-			} ## end foreach my $arg (@arg_split)
+				if ( defined($number) ) {
+					print "test\n";
+					push( @found, { $equality, $number } );
+				}
+			} ## end foreach my $arg ( @{ $opts{$item} } )
+			if ( defined( $found[0] ) && !defined( $found[1] ) ) {
+				$search->{$item} = $found[0];
+			} elsif ( defined( $found[0] ) && defined( $found[1] ) ) {
+				$search->{$item} = [ '-and' => \@found ];
+			}
 		} ## end if ( defined( $opts{$item} ) )
 	} ## end foreach my $item (@numeric)
+
+	#
+	# more complex items
+	#
+
+	if ( defined( $opts{ip} ) ) {
+		if ( !defined( $search->{'-and'} ) ) {
+			$search->{'-and'} = [];
+		}
+		$search->{'-and'} = [ { '-or' => { src_ip => { '=', $opts{ip} }, dest_ip => { '=', $opts{ip} } } } ];
+	}
+
+	if ( defined( $opts{port} ) ) {
+		if ( !defined( $search->{'-and'} ) ) {
+			$search->{'-and'} = [];
+		}
+		push(
+			@{ $search->{'-and'} },
+			[ { '-or' => { src_port => { '=', $opts{port} }, dest_port => { '=', $opts{port} } } } ]
+		);
+	}
 
 	#
 	# handle string items
@@ -1168,74 +1113,36 @@ sub search {
 		'signature',    'app_proto',     'in_iface', 'url',
 		'url_hostname', 'slug',          'pkg',      'subbed_from_host'
 	);
-
 	foreach my $item (@strings) {
 		if ( defined( $opts{$item} ) ) {
-			if ( defined( $opts{ $item . '_like' } ) && $opts{ $item . '_like' } ) {
-				if ( defined( $opts{$item} . '_not' ) && !$opts{ $item . '_not' } ) {
-					$sql = $sql . " and " . $item . " like '" . $opts{$item} . "'";
+			if ( $opts{$item} =~ /\%/ ) {
+				if ( $opts{$item} =~ /^\!/ ) {
+					$opts{$item} =~ s/^\!//;
+					$search->{$item} = { '-not_like', $opts{$item} };
 				} else {
-					$sql = $sql . " and " . $item . " not like '" . $opts{$item} . "'";
+					$search->{$item} = { 'like', $opts{$item} };
 				}
 			} else {
-				if ( defined( $opts{$item} . '_not' ) && !$opts{ $item . '_not' } ) {
-					$sql = $sql . " and " . $item . " = '" . $opts{$item} . "'";
+				if ( $opts{$item} =~ /^\!/ ) {
+					$opts{$item} =~ s/^\!//;
+					$search->{$item} = { '!=', $opts{$item} };
 				} else {
-					$sql = $sql . " and " . $item . " != '" . $opts{$item} . "'";
+					$search->{$item} = { '=', $opts{$item} };
 				}
 			}
 		} ## end if ( defined( $opts{$item} ) )
 	} ## end foreach my $item (@strings)
 
-	#
-	# more complex items
-	#
+	my @fetch_results = $schema->resultset($table)->search(
+		$search,
+		{
+			order_by     => $opts{order_by} . ' ' . $opts{order_dir},
+			result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+		}
+	)->all;
 
-	if ( defined( $opts{ip} ) ) {
-		$sql = $sql . " and ( src_ip = '" . $opts{ip} . "' or dest_ip = '" . $opts{ip} . "' )";
-	}
-
-	if ( defined( $opts{port} ) ) {
-		$sql = $sql . " and ( src_port = '" . $opts{port} . "'  or dest_port = '" . $opts{port} . "' )";
-	}
-
-	#
-	# finalize the SQL query... ORDER, LIMIT, and OFFSET
-	#
-
-	if ( defined( $opts{order_by} ) ) {
-		$sql = $sql . ' ORDER BY ' . $opts{order_by} . ' ' . $opts{order_dir};
-	}
-
-	if ( defined( $opts{linit} ) ) {
-		$sql = $sql . ' LIMIT ' . $opts{limit};
-	}
-
-	if ( defined( $opts{offset} ) ) {
-		$sql = $sql . ' OFFSET ' . $opts{offset};
-	}
-
-	#
-	# run the query
-	#
-
-	$sql = $sql . ';';
-	if ( $self->{debug} ) {
-		warn( 'SQL search "' . $sql . '"' );
-	}
-	my $sth = $dbh->prepare($sql);
-	$sth->execute();
-
-	my $found = ();
-	while ( my $row = $sth->fetchrow_hashref ) {
-		push( @{$found}, $row );
-	}
-
-	$dbh->disconnect;
-
-	return $found;
+	return \@fetch_results;
 } ## end sub search
-
 
 =head1 AUTHOR
 

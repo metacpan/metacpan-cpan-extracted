@@ -50,7 +50,7 @@ Net::API::REST::Cookies - Cookie Jar and cookie management
     $jar->set( 'my-cookie' => $cookie_object );
     # Remove cookie from jar
     $jar->delete( 'my-cookie' );
-    
+
     return( $jar->make({
         name => 'my-cookie',
         domain => 'example.com',

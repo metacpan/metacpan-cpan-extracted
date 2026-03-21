@@ -52,7 +52,6 @@ rmd160_add(ripemd160, ...)
 	Crypt::RIPEMD160	ripemd160
     CODE:
 	{
-	    SV *svdata;
 	    STRLEN len;
 	    byte *strptr;
 	    int i;
@@ -93,5 +92,5 @@ rmd160_digest(ripemd160)
 	    d_str[18] = (unsigned char) ((ripemd160->MDbuf[4] >> 16) & 0xff);
 	    d_str[19] = (unsigned char) ((ripemd160->MDbuf[4] >> 24) & 0xff);
 
-	    ST(0) = sv_2mortal(newSVpv(d_str, 20));
+	    ST(0) = sv_2mortal(newSVpv((const char *)d_str, 20));
 	}

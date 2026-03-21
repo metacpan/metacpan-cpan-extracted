@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "PDL" => "2.017"
   },
   "DISTNAME" => "CXC-PDL-Bin1D",
-  "LICENSE" => "gpl",
+  "LICENSE" => "open_source",
   "NAME" => "CXC::PDL::Bin1D",
   "PREREQ_PM" => {
     "Hash::Wrap" => "0.13",
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.27",
+  "VERSION" => "0.28",
   "test" => {
     "TESTS" => "t/*.t t/Bin1D/*.t"
   }

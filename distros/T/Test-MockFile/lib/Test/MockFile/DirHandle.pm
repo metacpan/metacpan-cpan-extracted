@@ -10,7 +10,7 @@ package Test::MockFile::DirHandle;
 use strict;
 use warnings;
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ L<Test::MockFile> to give out for opendir calls.
 
 =head1 VERSION
 
-Version 0.037
+Version 0.038
 
 =cut
 
@@ -74,7 +74,7 @@ Todd Rinaldo, C<< <toddr at cpan.org> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-L<https://github.com/CpanelInc/Test-MockFile>.
+L<https://github.com/cpanel/Test-MockFile>.
 
 =head1 SUPPORT
 

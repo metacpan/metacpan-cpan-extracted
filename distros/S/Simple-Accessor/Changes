@@ -1,3 +1,17 @@
+1.14      2026-03-20 21:59:33-06:00 America/Denver
+
+- Support multiple `use Simple::Accessor` in the same package
+- Add opt-in strict constructor mode via _strict_constructor()
+- Make attribute initialization order deterministic
+- Make build() take precedence over initialize() in new()
+- Allow setting attributes to undef
+- Add re-entrancy guard to _after_* hooks
+- Resolve hooks through transitive role composition
+- Skip require for inline-defined Simple::Accessor roles in with()
+- Harden role composition: skip duplicates, validate SA roles
+- Fix 3 core bugs in accessor lifecycle
+- Harden with() validation (reject invalid module names)
+
 1.13      2020-03-31 17:28:13-06:00 America/Denver
 
 - Add basic/naive implementation of roles using 'with'

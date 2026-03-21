@@ -12,7 +12,7 @@ use Date::Language ();
 use base 'Date::Language';
 use Date::Language::English ();
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Norwegian localization for Date::Format
 
 our @MoY  = qw(Januar Februar Mars April Mai Juni
@@ -50,7 +50,7 @@ Date::Language::Norwegian - Norwegian localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

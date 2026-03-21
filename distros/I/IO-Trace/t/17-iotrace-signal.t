@@ -134,9 +134,12 @@ SKIP: for my $prog (@filters) {
         is($died, $pid, t." $prog: SIG$sig: END: PID[$pid] DONE[$died] STATUS[$?]");
         my $exited = $? >> 8;
         ok(!$exited, t." $prog: SIG$sig: END: Clean exit status[$exited]");
-        my $signal = $? & 0xff;
-        is($signal, ($fatal_sig->{$sig} || 0), t." $prog: SIG$sig: END: Exit with expected signal result[$signal]");
-
+        SKIP: {
+            my $signal = $? & 0x7f;
+            skip t." $prog: SIG$sig ptrace ignores this fatal signal [$fatal_sig->{$sig}] passthru", 1 if !$signal and $fatal_sig->{$sig} and $prog eq "strace";
+            skip t." $prog: SIG$sig ptrace wrongly fakes CPU-initiated non-fatal signal [$signal] passthru", 1 if $signal and !$fatal_sig->{$sig} and $sig=~/(FPE)/ and $prog eq "strace";
+            is($signal, ($fatal_sig->{$sig} || 0), t." $prog: SIG$sig: END: Exit with expected signal result[$signal]");
+        }
         alarm 5;
         # Make sure grandkid is dead too
         ok((!kill(0 => $grandkid) or !sleep 1 or

@@ -11,7 +11,7 @@ my ( $CS8, $B9600 );
 eval { $CS8 = POSIX::CS8(); $B9600 = POSIX::B9600(); 1 }
     or plan skip_all => 'POSIX termios constants not available on this platform';
 
-plan tests => 3;
+plan tests => 7;
 
 # Build a minimal set of arguments for show_me_the_crap.
 # Flags are all zero so every flag prints with '-' prefix.
@@ -39,7 +39,7 @@ my $output = IO::Stty::show_me_the_crap(
     $ospeed, \%cc,
 );
 
-like( $output, qr/^speed 9600 baud$/m, 'output contains speed line' );
+like( $output, qr/^speed 9600 baud;$/m, 'output contains speed line' );
 like(
     $output,
     qr/^intr = \^C; quit = \^\\; erase = \^\?; kill = \^U;$/m,
@@ -50,3 +50,45 @@ like(
     qr/^eof = \^D; eol = <undef>; start = \^Q; stop = \^S; susp = \^Z;$/m,
     'control chars line 2 uses hat notation',
 );
+
+# Unknown ospeed falls back to raw numeric value (e.g. OpenBSD ptys)
+{
+    my $bogus_speed = 99999;
+    my $out = IO::Stty::show_me_the_crap(
+        $c_cflag, $c_iflag, $bogus_speed, $c_lflag, $c_oflag,
+        $bogus_speed, \%cc,
+    );
+    like( $out, qr/^speed 99999 baud;$/m, 'unknown ospeed shows raw numeric value' );
+}
+
+# When ispeed differs from ospeed, ispeed is shown separately
+{
+    my $bogus_ispeed = 77777;
+    my $out = IO::Stty::show_me_the_crap(
+        $c_cflag, $c_iflag, $bogus_ispeed, $c_lflag, $c_oflag,
+        $ospeed, \%cc,
+    );
+    like( $out, qr/ispeed 77777 baud;/m, 'unknown ispeed shows raw numeric value' );
+}
+
+# When ispeed differs but is a known baud rate, ispeed shows symbolic value
+{
+    my $B4800 = eval { POSIX::B4800() };
+    SKIP: {
+        skip 'B4800 not available', 1 unless defined $B4800;
+        my $out = IO::Stty::show_me_the_crap(
+            $c_cflag, $c_iflag, $B4800, $c_lflag, $c_oflag,
+            $ospeed, \%cc,
+        );
+        like( $out, qr/ispeed 4800 baud;/m, 'known ispeed shows symbolic baud rate' );
+    }
+}
+
+# When ispeed equals ospeed, no separate ispeed is shown
+{
+    my $out = IO::Stty::show_me_the_crap(
+        $c_cflag, $c_iflag, $ospeed, $c_lflag, $c_oflag,
+        $ospeed, \%cc,
+    );
+    unlike( $out, qr/ispeed/, 'ispeed not shown when equal to ospeed' );
+}

@@ -7,8 +7,9 @@ require 5.006;
 require Exporter;
 use Carp;
 use strict;
+use POSIX qw(tzset tzname);
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: miscellaneous timezone manipulations routines
 our @ISA = qw(Exporter);
 our @EXPORT = qw(tz2zone tz_local_offset tz_offset tz_name);
@@ -35,6 +36,13 @@ sub tz2zone (;$$$)
 
     if (defined $tzn_cache{$TZ}->[$isdst]) {
         return $tzn_cache{$TZ}->[$isdst];
+    }
+
+    # Handle IANA timezone names (e.g., "America/Chicago", "Europe/Paris")
+    if ($TZ =~ m{/}) {
+        my ($std, $dst_name) = _iana_tzname($TZ);
+        $tzn_cache{$TZ} = [ $std, $dst_name ];
+        return $isdst ? $dst_name : $std;
     }
 
     if ($TZ =~ /^
@@ -106,13 +114,42 @@ sub calc_off
     return $off;
 }
 
+# Helper: temporarily set TZ to an IANA name, run a block, restore original TZ.
+sub _with_iana_tz (&$) {
+    my ($code, $tz) = @_;
+    my $had_tz  = exists $ENV{TZ};
+    my $saved   = $ENV{TZ};
+    $ENV{TZ} = $tz;
+    tzset();
+    my @result = $code->();
+    if ($had_tz) { $ENV{TZ} = $saved } else { delete $ENV{TZ} }
+    tzset();
+    return @result;
+}
+
+# Return (std_name, dst_name) for an IANA timezone string.
+sub _iana_tzname {
+    my ($tz) = @_;
+    my ($std, $dst) = _with_iana_tz { tzname() } $tz;
+    $dst = $std unless defined $dst;
+    return ($std, $dst);
+}
+
+# Return the UTC offset in seconds for an IANA timezone string at a given time.
+sub _iana_offset {
+    my ($tz, $time) = @_;
+    $time = time() unless $time;
+    my ($off) = _with_iana_tz { calc_off($time) } $tz;
+    return $off;
+}
+
 # constants
 
 my (%dstZone, %zoneOff, %dstZoneOff, %Zone);
 
 CONFIG: {
     my @dstZone = (
-    #   "ndt"  =>   -2*3600-1800,    # Newfoundland Daylight
+        "ndt"  =>   -2*3600-1800,    # Newfoundland Daylight
         "brst" =>   -2*3600,         # Brazil Summer Time (East Daylight)
         "adt"  =>   -3*3600,     # Atlantic Daylight
         "edt"  =>   -4*3600,     # Eastern Daylight
@@ -123,13 +160,13 @@ CONFIG: {
         "ydt"  =>   -8*3600,     # Yukon Daylight
         "hdt"  =>   -9*3600,     # Hawaii Daylight
         "bst"  =>   +1*3600,     # British Summer
-        "mest" =>   +2*3600,     # Middle European Summer
+        "cest" =>   +2*3600,     # Central European Summer (preferred)
+        "mest" =>   +2*3600,     # Middle European Summer (alias, kept for compat)
         "metdst" => +2*3600,     # Middle European DST
         "sst"  =>   +2*3600,     # Swedish Summer
         "fst"  =>   +2*3600,     # French Summer
-        "cest" =>   +2*3600,     # Central European Daylight
         "eest" =>   +3*3600,     # Eastern European Summer
-        "msd"  =>   +4*3600,     # Moscow Daylight
+        "msd"  =>   +4*3600,     # Moscow Daylight (historical; Russia abolished DST permanently in Oct 2014)
         "wadt" =>   +8*3600,     # West Australian Daylight
         "kdt"  =>  +10*3600,     # Korean Daylight
     #   "cadt" =>  +10*3600+1800,    # Central Australian Daylight
@@ -151,8 +188,8 @@ CONFIG: {
     # For completeness.  BST is also British Summer, and GST is also Guam Standard.
     #   "bst"       =>  -3*3600,     # Brazil Standard
     #   "gst"       =>  -3*3600,     # Greenland Standard
-    #   "nft"       =>  -3*3600-1800,# Newfoundland
-    #   "nst"       =>  -3*3600-1800,# Newfoundland Standard
+        "nft"       =>  -3*3600-1800,# Newfoundland
+        "nst"       =>  -3*3600-1800,# Newfoundland Standard
         "mnt"   =>  -4*3600,     # Brazil Time (West Standard - Manaus)
         "ewt"       =>  -4*3600,     # U.S. Eastern War Time
         "ast"       =>  -4*3600,     # Atlantic Standard
@@ -179,7 +216,7 @@ CONFIG: {
         "eet"   =>  +2*3600,     # Eastern Europe, USSR Zone 1
         "ukr"   =>  +2*3600,     # Ukraine
         "bt"    =>  +3*3600,     # Baghdad, USSR Zone 2
-        "msk"   =>  +3*3600,     # Moscow
+        "msk"   =>  +3*3600,     # Moscow (UTC+3; was UTC+4 in 2011-2014 when Russia used permanent DST, reverted Oct 2014)
     #   "it"    =>  +3*3600+1800,# Iran
         "zp4"   =>  +4*3600,     # USSR Zone 3
         "zp5"   =>  +5*3600,     # USSR Zone 4
@@ -188,9 +225,13 @@ CONFIG: {
     # For completeness.  NST is also Newfoundland Stanard, and SST is also Swedish Summer.
     #   "nst"   =>  +6*3600+1800,# North Sumatra
     #   "sst"   =>  +7*3600,     # South Sumatra, USSR Zone 6
+        "ict"   =>  +7*3600,     # Indochina
     #   "jt"    =>  +7*3600+1800,# Java (3pm in Cronusland!)
+        "ict"   =>  +7*3600,     # Indochina Time
         "wst"   =>  +8*3600,     # West Australian Standard
+        "pht"   =>  +8*3600,     # Philippine
         "hkt"   =>  +8*3600,     # Hong Kong
+        "pht"   =>  +8*3600,     # Philippine Time
         "cct"   =>  +8*3600,     # China Coast, USSR Zone 7
         "jst"   =>  +9*3600,     # Japan Standard, USSR Zone 8
         "kst"   =>  +9*3600,     # Korean Standard
@@ -220,6 +261,11 @@ sub tz_offset (;$$)
     my(@l) = localtime($time);
     my $dst = $l[8];
 
+    # Handle IANA timezone names (e.g., "America/Chicago") before lowercasing
+    if ($zone =~ m{/}) {
+        return _iana_offset($zone, $time);
+    }
+
     $zone = lc $zone;
 
     if($zone =~ /^(([\-\+])\d\d?)(\d\d)$/) {
@@ -248,7 +294,10 @@ sub tz_name (;$$)
     } elsif (exists $zoneOff{$off}) {
         return $zoneOff{$off};
     }
-    sprintf("%+05d", int($off / 60) * 100 + $off % 60);
+    # $off is in seconds; format as +HHMM / -HHMM.
+    # Using abs() for the minutes component handles negative fractional-hour
+    # offsets correctly (e.g. -9000s = -2h30m → "-0230", not "-02-30").
+    sprintf("%+03d%02d", int($off / 3600), abs(int($off / 60)) % 60);
 }
 
 1;
@@ -265,7 +314,7 @@ Time::Zone - miscellaneous timezone manipulations routines
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 SYNOPSIS
 

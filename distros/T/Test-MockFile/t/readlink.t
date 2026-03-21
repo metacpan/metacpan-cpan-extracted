@@ -49,23 +49,15 @@ $! = 0;
 my $got = 'abc';
 like( warning { $got = CORE::readlink(undef) }, qr/^Use of uninitialized value in readlink at /, "Got expected warning for passing no value to readlink" );
 is( $got, undef, "readlink without args is undef." );
-if ( $^O eq 'freebsd' ) {
-    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
-}
-else {
-    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
-}
+# readlink(undef) errno varies by OS and version: FreeBSD 14+ returns EINVAL,
+# FreeBSD 12 and Linux return ENOENT. Accept both. (GH #175)
+ok( $! == EINVAL || $! == ENOENT, "\$! is EINVAL or ENOENT for a readlink(undef) (got: " . ($! + 0) . ")" );
 
 $!   = 0;
 $got = 'abc';
 like( warning { $got = CORE::readlink() }, qr/^Use of uninitialized value \$_ in readlink at /, "Got expected warning for passing no value to readlink" );
 is( $got, undef, "readlink without args is undef." );
-if ( $^O eq 'freebsd' ) {
-    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
-}
-else {
-    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
-}
+ok( $! == EINVAL || $! == ENOENT, "\$! is EINVAL or ENOENT for a readlink() (got: " . ($! + 0) . ")" );
 
 note "Cleaning up...";
 CORE::unlink( $symlink, $bad_symlink, $file );
@@ -77,8 +69,8 @@ $symlink       = "$temp_dir_name/b";
 $bad_symlink   = "$temp_dir_name/c";
 
 my @mocks;
-push @mocks, Test::MockFile->file($file);
-push @mocks, Test::MockFile->dir($temp_dir_name);
+push @mocks, Test::MockFile->file( $file, "abc\n" );
+push @mocks, Test::MockFile->new_dir($temp_dir_name);
 push @mocks, Test::MockFile->symlink( "a",        $symlink );
 push @mocks, Test::MockFile->symlink( "notafile", $bad_symlink );
 
@@ -106,12 +98,7 @@ $!   = 0;
 $got = 'abc';
 like( warning { $got = readlink(undef) }, qr/^Use of uninitialized value in readlink at /, "Got expected warning for passing no value to readlink" );
 is( $got, undef, "readlink without args is undef." );
-if ( $^O eq 'freebsd' ) {
-    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
-}
-else {
-    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
-}
+ok( $! == EINVAL || $! == ENOENT, "\$! is EINVAL or ENOENT for a readlink(undef) (got: " . ($! + 0) . ")" );
 
 $!   = 0;
 $got = 'abc';
@@ -119,11 +106,40 @@ todo "Something's wrong with readlink's prototype and the warning is incorrect n
     like( warning { $got = readlink() }, qr/^Use of uninitialized value \$_ in readlink at /, "Got expected warning for passing no value to readlink" );
 };
 is( $got, undef, "readlink without args is undef." );
-if ( $^O eq 'freebsd' ) {
-    is( $! + 0, EINVAL, '$! is EINVAL for a readlink(undef)' );
+ok( $! == EINVAL || $! == ENOENT, "\$! is EINVAL or ENOENT for a readlink() (got: " . ($! + 0) . ")" );
+
+note "--- readlink on non-existent mocks returns ENOENT ---";
+{
+    my $ne_file = Test::MockFile->file("$temp_dir_name/ne_file");
+    $! = 0;
+    is( readlink("$temp_dir_name/ne_file"), undef,  "readlink on non-existent file mock is undef" );
+    is( $! + 0,                             ENOENT, '$! is ENOENT for readlink on non-existent file mock' );
 }
-else {
-    is( $! + 0, ENOENT, '$! is ENOENT for a readlink(undef)' );
+
+{
+    my $ne_dir = Test::MockFile->dir("$temp_dir_name/ne_dir");
+    $! = 0;
+    is( readlink("$temp_dir_name/ne_dir"), undef,  "readlink on non-existent dir mock is undef" );
+    is( $! + 0,                            ENOENT, '$! is ENOENT for readlink on non-existent dir mock' );
+}
+
+note "--- readlink failure returns undef (not empty list) in list context ---";
+{
+    my $mock_file = Test::MockFile->file("$temp_dir_name/not_a_link", "data");
+
+    # readlink on a regular file — should return (undef) in list context
+    my @ret = readlink("$temp_dir_name/not_a_link");
+    is( scalar @ret, 1,   'readlink on non-link returns one element in list context' );
+    ok( !defined $ret[0], 'readlink failure element is undef' );
+}
+
+{
+    my $mock_file = Test::MockFile->file("$temp_dir_name/nonexist");
+
+    # readlink on a non-existent mock — should return (undef) in list context
+    my @ret = readlink("$temp_dir_name/nonexist");
+    is( scalar @ret, 1,   'readlink on non-existent mock returns one element in list context' );
+    ok( !defined $ret[0], 'readlink non-existent failure element is undef' );
 }
 
 done_testing();

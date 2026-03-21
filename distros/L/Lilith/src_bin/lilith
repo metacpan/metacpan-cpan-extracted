@@ -28,12 +28,11 @@ lilith [B<-c> <config>] B<-a> search [B<--output> <return>] [B<-t> <table>]
 [B<-m> <minutes>] [B<--order> <clm>] [B<--limit> <int>] [B<--offset> <int>]
 [B<--orderdir> <dir>] [B<--si> <src_ip>] [B<--di> <<dst_ip>] [B<--ip> <ip>]
 [B<--sp> <<src_port>] [B<--dp> <<dst_port>] [B<--port> <<port>] [B<--host> <host>]
-[B<--hostl>] [B<--hosN>] [B<--ih> <host>] [B<--ihl>] [B<--ihN>] [B<-i> <instance>]
-[B<-il>] [B<-iN>] [B<-c> <class>] [B<--cl>] [B<--cN>] [B<-s> <sig>] [B<--sl>]
-[B<--sN>] [B<--if> <if>] [B<--ifl>] [B<--ifN>] [B<--ap> <proto>] [B<--apl>] [B<--apN>]
-[B<--gid> <gid>] [B<--sid> <sid>] [B<--rev> <rev>] [B<--subip> <subip>]
-[B<--subhost> <subhost>] [B<--slug> <slug>] [B<--pkg> <pkg>] [B<--malscore> <malscore>]
-[B<--size> <size>] [B<--target> <target>] [B<--task> <task>]
+[B<--ih> <host>] [B<-i> <instance>] [B<-c> <class>] [B<-s> <sig>] [B<--if> <if>]
+[B<--ap> <proto>] [B<--gid> <gid>] [B<--sid> <sid>] [B<--rev> <rev>]
+[B<--subip> <subip>] [B<--subhost> <subhost>] [B<--slug> <slug>] [B<--pkg> <pkg>]
+[B<--malscore> <malscore>] [B<--size> <size>] [B<--target> <target>]
+[B<--task> <task>]
 
 =head1 DESCRIPTION
 
@@ -239,20 +238,6 @@ Host.
     - Default :: undef
     - Type :: string
 
-=head4 --hostl
-
-Use like for matching host.
-
-    - Default :: undef
-    - Type :: string
-
-=head4 --hostN
-
-Invert host matching.
-
-    - Default :: undef
-    - Type :: string
-
 =head3 Instance Options
 
 =head4 --ih <host>
@@ -262,37 +247,11 @@ Instance host.
     - Default :: undef
     - Type :: string
 
-=head4 --ihl
-
-Use like for matching instance host.
-
-    - Default :: undef
-
-=head4 --ihN
-
-Invert instance host matching.
-
-    - Default :: undef
-
 =head3 Instance Options
 
 =head4 -i  <instance>
 
 Instance.
-
-    - Default :: undef
-    - Type :: string
-
-=head4 --il
-
-Use like for matching instance.
-
-    - Default :: undef
-    - Type :: string
-
-=head4 --iN
-
-Invert instance matching.
 
     - Default :: undef
     - Type :: string
@@ -306,39 +265,11 @@ Classification.
     - Default :: undef
     - Type :: string
 
-=head4 --cl
-
-Use like for matching classification.
-
-    - Default :: undef
-    - Type :: string
-
-=head4 --cN
-
-Invert class matching.
-
-    - Default :: undef
-    - Type :: string
-
 =head3 Signature Options
 
 =head4 -s <sig>
 
 Signature.
-
-    - Default :: undef
-    - Type :: string
-
-=head4 --sl
-
-Use like for matching signature.
-
-    - Default :: undef
-    - Type :: string
-
-=head4 --sN
-
-Invert signature matching.
 
     - Default :: undef
     - Type :: string
@@ -352,18 +283,6 @@ Interface.
     - Default :: undef
     - Type :: string
 
-=head4 --ifl
-
-Use like for matching interface.
-
-    - Default :: undef
-
-=head4 --ifN
-
-Invert interface matching.
-
-    - Default :: undef
-
 =head3 App Proto Options
 
 =head4 --ap <proto>
@@ -372,18 +291,6 @@ App proto.
 
     - Default :: undef
     - Type :: string
-
-=head4 --apl
-
-Use like for matching app proto.
-
-    - Default :: undef
-
-=head4 --apN
-
-Invert app proto matching.
-
-    - Default :: undef
 
 =head3 Rule Options
 
@@ -626,38 +533,28 @@ my $config_file = '/usr/local/etc/lilith.toml';
 my $action      = 'search';
 my $src_ip;
 my $dest_ip;
-my $src_port;
-my $dest_port;
+my @src_port;
+my @dest_port;
 my $alert_id;
 my $table = 'suricata';
 my $host;
 my $host_not;
 my $host_like;
 my $instance_host;
-my $instance_host_not;
-my $instance_host_like;
 my $instance;
-my $instance_not;
-my $instance_like;
 my $class;
 my $class_not;
 my $class_like;
 my $signature;
-my $signature_not;
-my $signature_like;
 my $ip;
 my $port;
 my $go_back_minutes;
 my $in_iface;
-my $in_iface_not;
-my $in_iface_like;
 my $proto;
 my $app_proto;
-my $app_proto_not;
-my $app_proto_like;
-my $gid;
-my $sid;
-my $rev;
+my @gid;
+my @sid;
+my @rev;
 my $limit;
 my $order_by;
 my $order_dir;
@@ -669,7 +566,7 @@ my $column_set = 'default';
 my $class_shortern;
 my $debug;
 my $event_id;
-my $id;
+my @id;
 my $decode_raw;
 my $daemonize;
 my $user  = 0;
@@ -684,10 +581,10 @@ my $subip;
 my $subhost;
 my $slug;
 my $pkg;
-my $malscore;
-my $size;
+my @malscore;
+my @size;
 my $target;
-my $task;
+my @task;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -698,39 +595,27 @@ GetOptions(
 	'config=s'    => \$config_file,
 	'a=s'         => \$action,
 	'si=s'        => \$src_ip,
-	'sp=s'        => \$src_port,
+	'sp=s'        => \@src_port,
 	'di=s'        => \$dest_ip,
-	'dp=s'        => \$dest_port,
-	'id=s'        => \$id,
+	'dp=s'        => \@dest_port,
+	'id=s'        => \@id,
 	't=s'         => \$table,
 	'host=s'      => \$host,
-	'hostN=s'     => \$host_not,
-	'hostl'       => \$host_like,
-	'ihl'         => \$instance_host_like,
-	'ihN=s'       => \$instance_host_not,
 	'ih=s'        => \$instance_host,
 	'i=s'         => \$instance,
-	'iN=s'        => \$instance_not,
-	'il'          => \$instance_like,
 	'c=s'         => \$class,
 	'cN=s'        => \$class_not,
 	'cl'          => \$class_like,
 	's=s'         => \$signature,
-	'sN=s'        => \$signature_not,
-	'sl'          => \$signature_like,
 	'ip=s'        => \$ip,
 	'p=s'         => \$port,
 	'm=s'         => \$go_back_minutes,
 	'if=s'        => \$in_iface,
-	'ifN=s'       => \$in_iface_not,
-	'ifl'         => \$in_iface_like,
 	'proto=s'     => \$proto,
 	'ap=s'        => \$app_proto,
-	'apN=s'       => \$app_proto_not,
-	'apl'         => \$app_proto_like,
-	'gid=s'       => \$gid,
-	'sid=s'       => \$sid,
-	'rev=s'       => \$rev,
+	'gid=s'       => \@gid,
+	'sid=s'       => \@sid,
+	'rev=s'       => \@rev,
 	'limit=s'     => \$limit,
 	'offset=s'    => \$offset,
 	'order=s'     => \$order_by,
@@ -754,10 +639,10 @@ GetOptions(
 	'subhost=s',  => \$subhost,
 	'slug=s'      => \$slug,
 	'pkg=s'       => \$pkg,
-	'malscore=s'  => \$malscore,
-	'size=s'      => \$size,
+	'malscore=s'  => \@malscore,
+	'size=s'      => \@size,
 	'target=s'    => \$target,
-	'task=s'      => \$task,
+	'task=s'      => \@task,
 );
 
 # print version or help if requested
@@ -974,51 +859,44 @@ if ( $action eq 'search' ) {
 	# run the search
 	#
 	my $returned = $lilith->search(
-		src_ip             => $src_ip,
-		src_port           => $src_port,
-		dest_ip            => $dest_ip,
-		dest_port          => $dest_port,
-		ip                 => $ip,
-		port               => $port,
-		alert_id           => $alert_id,
-		table              => $table,
-		host               => $host,
-		host_not           => $host_not,
-		host_like          => $host_like,
-		instance_host      => $instance_host,
-		instance_host_not  => $instance_host_not,
-		instance_host_like => $instance_host_like,
-		instance           => $instance,
-		instance_not       => $instance_not,
-		instance_like      => $instance_like,
-		class              => $class,
-		class_not          => $class_not,
-		class_like         => $class_like,
-		signature          => $signature,
-		signature_not      => $signature_not,
-		signature_like     => $signature_like,
-		ip                 => $ip,
-		port               => $port,
-		app_proto          => $app_proto,
-		app_proto_not      => $app_proto_not,
-		app_proto_like     => $app_proto_like,
-		proto              => $proto,
-		gid                => $gid,
-		sid                => $sid,
-		rev                => $rev,
-		order_by           => $order_by,
-		order_dir          => $order_dir,
-		limit              => $limit,
-		offset             => $offset,
-		go_back_minutes    => $go_back_minutes,
-		subbed_from_ip     => $subip,
-		subbed_from_host   => $subhost,
-		slug               => $slug,
-		pkg                => $pkg,
-		malscore           => $malscore,
-		size               => $size,
-		target             => $target,
-		task               => $task,
+		src_ip           => $src_ip,
+		src_port         => \@src_port,
+		dest_ip          => $dest_ip,
+		dest_port        => \@dest_port,
+		ip               => $ip,
+		port             => $port,
+		alert_id         => $alert_id,
+		table            => $table,
+		host             => $host,
+		host_not         => $host_not,
+		host_like        => $host_like,
+		instance_host    => $instance_host,
+		instance         => $instance,
+		class            => $class,
+		class_not        => $class_not,
+		class_like       => $class_like,
+		signature        => $signature,
+		ip               => $ip,
+		port             => $port,
+		app_proto        => $app_proto,
+		proto            => $proto,
+		gid              => \@gid,
+		sid              => \@sid,
+		rev              => \@rev,
+		order_by         => $order_by,
+		order_dir        => $order_dir,
+		limit            => $limit,
+		offset           => $offset,
+		go_back_minutes  => $go_back_minutes,
+		subbed_from_ip   => $subip,
+		subbed_from_host => $subhost,
+		slug             => $slug,
+		pkg              => $pkg,
+		in_iface         => $in_iface,
+		malscore         => \@malscore,
+		size             => \@size,
+		target           => $target,
+		task             => \@task,
 	);
 
 	#
@@ -1239,17 +1117,13 @@ if ( $action eq 'search' ) {
 #
 
 if ( $action eq 'event' ) {
-	if ( defined($id) && defined($event_id) ) {
-		die('Can not search via both --id and --event for fetching a event');
-	}
-
-	if ( !defined($id) && !defined($event_id) ) {
+	if ( !defined( $id[0] ) && !defined($event_id) ) {
 		die('Either --id and --event for fetching a event');
 	}
 
 	my $returned = $lilith->search(
 		table    => $table,
-		id       => $id,
+		id       => @id,
 		event_id => $event_id,
 		debug    => $debug,
 		no_time  => 1,

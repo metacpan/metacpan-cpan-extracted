@@ -1,3 +1,40 @@
+0.08  2026-03-20
+    - SELECT DISTINCT via -distinct => 1 or ->distinct modifier
+    - $q->any($subquery) and $q->all($subquery) operators
+    - Empty IN list handling: -in => [] renders 1 = 0, -not_in => [] renders 1 = 1
+    - TRUNCATE TABLE via $q->truncate(-table => 'name')
+
+0.07  2026-03-20
+    - Add ->where() modifier to replace WHERE clause entirely
+    - Add $q->now shorthand for NOW()
+
+0.06  2026-03-20
+    - Automatic identifier quoting (reserved words, uppercase, special chars)
+    - ANSI double quotes by default, MySQL backticks with dialect => 'mysql'
+    - Combined PostgreSQL + MySQL + ANSI SQL reserved word list
+    - Injection guard on raw SQL strings (ON conditions, plain WHERE, window frames)
+    - Validate CAST type, window names
+    - IS NOT NULL via { col => { '!=' => undef } } or { col => { '<>' => undef } }
+    - IS NULL via { col => { '=' => undef } } in operator form
+
+0.05  2026-03-20
+    - Reject empty string in -from
+    - LIMIT and OFFSET are now bind parameters
+    - Validate LIMIT and OFFSET are integers
+    - SQL injection guard on identifiers (rejects ; and GO)
+    - Guard applied to column names, table names, WHERE keys, CTE names,
+      INSERT INTO, DELETE FROM, USING, and ON CONFLICT target
+    - Validate func() name is a word (\w+)
+    - Validate alias in ->as() is a word (\w+)
+    - Validate table names match schema.table|alias pattern
+    - Validate order_by column names match schema.column pattern
+    - Require -into in insert(), -table and -set in update(), -from in delete()
+
+0.04  2026-03-19
+    - Add '-col' shorthand for ORDER BY col DESC
+    - Add 'provides' to META for MetaCPAN indexing
+    - Documentation updates for -order_by
+
 0.03  2026-03-19
     - Require -from in select()
     - Allow empty -where and -having clauses

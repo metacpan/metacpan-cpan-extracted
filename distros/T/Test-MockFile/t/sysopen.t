@@ -83,6 +83,21 @@ is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" ) or 
     ok( seek( $fh, 0, 0 ), 0, "Seek to start of file returns true" );
     is( sysseek( $fh, 0, 0 ), "0 but true", "sysseek to start of file returns '0 but true' to make it so." );
     ok( sysseek( $fh, 0, 0 ), "sysseek to start of file returns true when checked with ok()" );
+
+    ok( sysseek( $fh, 5,  0 ), "sysseek to position 5 returns true." );
+    ok( sysseek( $fh, 10, 1 ), "Seek 10 bytes forward from the current position." );
+    is( sysseek( $fh, 0,  1 ), 15, "Current position is 15 bytes from start." );
+
+    $buf = "";
+    is( sysread( $fh, $buf, 2, 0 ), 2, "Read 2 bytes from current position (15)." );
+    is( $buf, "PQ", "Line is as expected." );
+
+    ok( sysseek( $fh, -5, 2 ),     "Seek 5 bytes back from end of file." );
+    is( sysseek( $fh, 0,  1 ), 46, "Current position is 46 bytes from start." );
+
+    $buf = "";
+    is( sysread( $fh, $buf, 3, 0 ), 3, "Read 3 bytes from current position (46)." );
+    is( $buf, "vwx", "Line is as expected." );
 }
 
 {
@@ -122,6 +137,29 @@ is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" ) or 
     is( sysseek( $fh, 0, 0 ), "0 but true", "sysseek to start of file returns '0 but true' to make it so." );
     ok( sysseek( $fh, 0, 0 ), "sysseek to start of file returns true when checked with ok()" );
 
+    ok( sysseek( $fh, 5,  0 ), "sysseek to position 5 returns true." );
+    ok( sysseek( $fh, 10, 1 ), "Seek 10 bytes forward from the current position." );
+    is( sysseek( $fh, 0,  1 ), 15, "Current position is 15 bytes from start." );
+
+    $buf = "";
+    is( sysread( $fh, $buf, 2, 0 ), 2, "Read 2 bytes from current position (15)." );
+    is( $buf, "PQ", "Line is as expected." );
+
+    ok( sysseek( $fh, -5, 2 ),     "Seek 5 bytes back from end of file." );
+    is( sysseek( $fh, 0,  1 ), 46, "Current position is 46 bytes from start." );
+
+    $buf = "";
+    is( sysread( $fh, $buf, 3, 0 ), 3, "Read 3 bytes from current position (46)." );
+    is( $buf, "vwx", "Line is as expected." );
+
+    {
+        use Errno qw/EINVAL/;
+        $! = 0;
+        my $ret = sysseek( $fh, 10, 3 );
+        ok( !$ret, "sysseek with invalid whence returns false" );
+        is( $! + 0, EINVAL, "sysseek with invalid whence sets EINVAL" );
+    }
+
     close $fh;
     undef $bar;
 }
@@ -152,6 +190,118 @@ is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" ) or 
 }
 
 is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache" );
+
+{
+    note "-------------- sysopen O_CREAT applies permissions from 4th arg --------------";
+
+    my $mock = Test::MockFile->file($filename);
+    ok( !-e $filename, "Mock file does not exist before sysopen" );
+
+    is( sysopen( my $fh, $filename, O_CREAT | O_WRONLY, 0600 ), 1, "sysopen with O_CREAT and explicit perms" );
+    ok( -e $filename, "Mock file exists after sysopen O_CREAT" );
+
+    my @stat = stat($filename);
+    my $got_perms = $stat[2] & 07777;
+    my $expected  = 0600 & ~umask;
+    is( $got_perms, $expected, sprintf( "File permissions set from sysopen arg: got %04o, expected %04o", $got_perms, $expected ) );
+
+    close $fh;
+    undef $mock;
+}
+is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache after perms test" );
+
+{
+    note "-------------- sysopen O_CREAT without perms arg keeps default --------------";
+
+    my $mock = Test::MockFile->file($filename);
+    is( sysopen( my $fh, $filename, O_CREAT | O_WRONLY ), 1, "sysopen O_CREAT without 4th arg" );
+
+    my @stat = stat($filename);
+    my $got_perms = $stat[2] & 07777;
+    my $default   = 0666 & ~umask;    # constructor default after umask
+    is( $got_perms, $default, sprintf( "File permissions remain default: got %04o, expected %04o", $got_perms, $default ) );
+
+    close $fh;
+    undef $mock;
+}
+is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache after default perms test" );
+
+{
+    note "-------------- sysopen O_CREAT on existing file does not change perms --------------";
+
+    my $mock = Test::MockFile->file( $filename, "existing content" );
+    my @stat_before = stat($filename);
+
+    is( sysopen( my $fh, $filename, O_CREAT | O_WRONLY, 0600 ), 1, "sysopen O_CREAT on existing file" );
+
+    my @stat_after = stat($filename);
+    is( $stat_after[2], $stat_before[2], "Permissions unchanged when O_CREAT on existing file" );
+
+    close $fh;
+    undef $mock;
+}
+is( \%Test::MockFile::files_being_mocked, {}, "No mock files are in cache after existing file test" );
+
+note "O_NOFOLLOW on a symlink returns ELOOP";
+{
+    use Errno qw/ELOOP/;
+
+    my $target = Test::MockFile->file( '/nofollow_target', "data" );
+    my $link   = Test::MockFile->symlink( '/nofollow_target', '/nofollow_link' );
+
+    $! = 0;
+    my $ret = sysopen( my $fh, '/nofollow_link', O_RDONLY | O_NOFOLLOW );
+    ok( !$ret,          'sysopen with O_NOFOLLOW on symlink returns false' );
+    is( $! + 0, ELOOP, 'sysopen with O_NOFOLLOW on symlink sets $! to ELOOP' );
+}
+
+note "sysopen on non-existent file without O_CREAT returns ENOENT for all modes";
+{
+    use Errno qw/ENOENT/;
+
+    my $mock = Test::MockFile->file('/enoent_test');
+    ok( !-e '/enoent_test', 'mock file does not exist' );
+
+    # O_RDONLY without O_CREAT on non-existent file
+    $! = 0;
+    my $ret_ro = sysopen( my $fh_ro, '/enoent_test', O_RDONLY );
+    ok( !$ret_ro,            'sysopen O_RDONLY on non-existent file returns false' );
+    is( $! + 0, ENOENT,     'sysopen O_RDONLY on non-existent file sets ENOENT' );
+
+    # O_WRONLY without O_CREAT on non-existent file
+    $! = 0;
+    my $ret_wo = sysopen( my $fh_wo, '/enoent_test', O_WRONLY );
+    ok( !$ret_wo,            'sysopen O_WRONLY on non-existent file returns false' );
+    is( $! + 0, ENOENT,     'sysopen O_WRONLY on non-existent file sets ENOENT' );
+
+    # O_RDWR without O_CREAT on non-existent file
+    $! = 0;
+    my $ret_rw = sysopen( my $fh_rw, '/enoent_test', O_RDWR );
+    ok( !$ret_rw,            'sysopen O_RDWR on non-existent file returns false' );
+    is( $! + 0, ENOENT,     'sysopen O_RDWR on non-existent file sets ENOENT' );
+}
+
+note "sysopen O_WRONLY|O_CREAT on non-existent file succeeds (O_CREAT creates the file)";
+{
+    my $mock = Test::MockFile->file('/creat_test');
+    ok( !-e '/creat_test', 'mock file does not exist before O_CREAT' );
+
+    is( sysopen( my $fh, '/creat_test', O_WRONLY | O_CREAT ), 1, 'sysopen O_WRONLY|O_CREAT succeeds' );
+    ok( -e '/creat_test', 'file exists after O_CREAT' );
+    close $fh;
+}
+
+note "sysopen failure returns undef in list context (single-element list)";
+{
+    use Errno qw/ENOENT/;
+
+    my $mock = Test::MockFile->file('/list_ctx_test');
+
+    my @ret = sysopen( my $fh, '/list_ctx_test', O_RDONLY );
+    is( scalar @ret, 1,          'sysopen failure returns one element in list context' );
+    ok( !$ret[0],                'sysopen failure element is false' );
+    ok( !defined $ret[0],        'sysopen failure element is undef (not "undef" string)' );
+}
 
 done_testing();
 exit;

@@ -15,8 +15,9 @@ sub new {
 # Accepts extra key/value pairs (e.g. _cte, _renderer) merged in.
 sub from_args {
   my ($class, %args) = @_;
-  Carp::confess("select requires -from") unless defined $args{'-from'};
+  Carp::confess("select requires -from") unless $args{'-from'};
   my %node;
+  $node{distinct} = $args{'-distinct'}  if $args{'-distinct'};
   $node{columns}  = $args{'-columns'}  if $args{'-columns'};
   $node{from}     = $args{'-from'}     if $args{'-from'};
   $node{where}    = $args{'-where'}    if $args{'-where'};
@@ -33,6 +34,20 @@ sub from_args {
 
 # Immutable modifiers — return cloned objects
 
+sub distinct {
+  my ($self) = @_;
+  my $clone = dclone($self);
+  $clone->{distinct} = 1;
+  return $clone;
+}
+
+sub where {
+  my ($self, $where) = @_;
+  my $clone = dclone($self);
+  $clone->{where} = $where;
+  return $clone;
+}
+
 sub add_where {
   my ($self, $extra) = @_;
   my $clone = dclone($self);
@@ -41,35 +56,35 @@ sub add_where {
   } else {
     $clone->{where} = $extra;
   }
-  $clone;
+  return $clone;
 }
 
 sub columns {
   my ($self, $cols) = @_;
   my $clone = dclone($self);
   $clone->{columns} = $cols;
-  $clone;
+  return $clone;
 }
 
 sub order_by {
   my ($self, @order) = @_;
   my $clone = dclone($self);
   $clone->{order_by} = @order == 1 ? $order[0] : \@order;
-  $clone;
+  return $clone;
 }
 
 sub limit {
   my ($self, $limit) = @_;
   my $clone = dclone($self);
   $clone->{limit} = $limit;
-  $clone;
+  return $clone;
 }
 
 sub offset {
   my ($self, $offset) = @_;
   my $clone = dclone($self);
   $clone->{offset} = $offset;
-  $clone;
+  return $clone;
 }
 
 # Compound query methods

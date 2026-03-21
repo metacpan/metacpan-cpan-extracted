@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 33;
+use Test::More tests => 41;
 
 use_ok('Safe::Hole');
 use Safe;
@@ -145,3 +145,69 @@ is( $safe->reval('%INC = ( FOO => "./FOO.pm" ); &get_inc'), 'FOO ./FOO.pm', '%IN
 
 # To do
 
+###################################
+# Test that undefined subs are reported when arg is a wrapped object (GH#1)
+##################################
+{
+
+    package TestObj;
+    sub new  { bless {}, shift }
+    sub hello { "hello" }
+}
+
+my $safe2  = Safe->new;
+my $hole3  = Safe::Hole->new( {} );
+
+# wrap() without $cpt/$name must not warn about uninitialized $typechar
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub { push @warnings, @_ };
+    $hole3->wrap( TestObj->new );
+    is( scalar @warnings, 0, 'wrap() without $cpt/$name produces no warnings (GH#1)' );
+}
+
+# Wrap a sub that returns a wrapped object
+sub make_wrapped_obj {
+    return $hole3->wrap( TestObj->new );
+}
+$hole3->wrap( \&make_wrapped_obj, $safe2, '&make_wrapped_obj' );
+
+# Calling an undefined sub f() with a wrapped object arg must set $@
+$safe2->reval('f(make_wrapped_obj())');
+like( $@, qr/undefined subroutine/i, 'Undefined sub reported when arg is wrapped object (GH#1)' );
+
+# Calling a defined sub with a wrapped object arg should still work
+$hole3->wrap( sub { ref( $_[0] ) ? 1 : 0 }, $safe2, '&check_ref' );
+is( $safe2->reval('check_ref(make_wrapped_obj())'), 1, 'Defined sub with wrapped object arg works' );
+is( $@, '', 'No error when calling defined sub with wrapped object' );
+
+###################################
+# Regression: undefined subroutines must be reported when parameter
+# involves a Safe::Hole wrapped call (GitHub issue #1, rt#122934)
+##################################
+{
+    my $safe_i1 = Safe->new;
+    my $hole_i1 = Safe::Hole->new({});
+
+    package SafeHoleTestObj;
+    sub new { bless {}, shift }
+    package main;
+
+    my $sub_w = sub { return $hole_i1->wrap(SafeHoleTestObj->new) };
+    $hole_i1->wrap($sub_w, $safe_i1, '&w_test');
+
+    $safe_i1->reval(q{sub x_test { return &w_test; } undefined_func(x_test());});
+    like( $@, qr/Undefined subroutine/, 'undefined sub with wrapped-object arg is reported (issue #1)' );
+
+    $@ = '';
+    $safe_i1->reval(q{undefined_func(&w_test);});
+    like( $@, qr/Undefined subroutine/, 'undefined sub with direct wrapped call arg is reported' );
+
+    $@ = '';
+    $safe_i1->reval(q{undefined_func(42);});
+    like( $@, qr/Undefined subroutine/, 'undefined sub with plain arg is reported (baseline)' );
+
+    $@ = '';
+    $safe_i1->reval(q{undefined_func();});
+    like( $@, qr/Undefined subroutine/, 'undefined sub with no args is reported (baseline)' );
+}

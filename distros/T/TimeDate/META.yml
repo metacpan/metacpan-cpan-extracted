@@ -18,131 +18,136 @@ name: TimeDate
 provides:
   Date::Format:
     file: lib/Date/Format.pm
-    version: '2.34'
+    version: '2.35'
   Date::Format::Generic:
     file: lib/Date/Format/Generic.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language:
     file: lib/Date/Language.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Afar:
     file: lib/Date/Language/Afar.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Amharic:
     file: lib/Date/Language/Amharic.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Arabic:
     file: lib/Date/Language/Arabic.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Austrian:
     file: lib/Date/Language/Austrian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Brazilian:
     file: lib/Date/Language/Brazilian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Bulgarian:
     file: lib/Date/Language/Bulgarian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Chinese:
     file: lib/Date/Language/Chinese.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Chinese_GB:
     file: lib/Date/Language/Chinese_GB.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Czech:
     file: lib/Date/Language/Czech.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Danish:
     file: lib/Date/Language/Danish.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Dutch:
     file: lib/Date/Language/Dutch.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::English:
     file: lib/Date/Language/English.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Finnish:
     file: lib/Date/Language/Finnish.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::French:
     file: lib/Date/Language/French.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Gedeo:
     file: lib/Date/Language/Gedeo.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::German:
     file: lib/Date/Language/German.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Greek:
     file: lib/Date/Language/Greek.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Hungarian:
     file: lib/Date/Language/Hungarian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Icelandic:
     file: lib/Date/Language/Icelandic.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Italian:
     file: lib/Date/Language/Italian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Norwegian:
     file: lib/Date/Language/Norwegian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Occitan:
     file: lib/Date/Language/Occitan.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Oromo:
     file: lib/Date/Language/Oromo.pm
-    version: '2.34'
+    version: '2.35'
+  Date::Language::Portuguese:
+    file: lib/Date/Language/Portuguese.pm
+    version: '2.35'
   Date::Language::Romanian:
     file: lib/Date/Language/Romanian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Russian:
     file: lib/Date/Language/Russian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Russian_cp1251:
     file: lib/Date/Language/Russian_cp1251.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Russian_koi8r:
     file: lib/Date/Language/Russian_koi8r.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Sidama:
     file: lib/Date/Language/Sidama.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Somali:
     file: lib/Date/Language/Somali.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Spanish:
     file: lib/Date/Language/Spanish.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Swedish:
     file: lib/Date/Language/Swedish.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Tigrinya:
     file: lib/Date/Language/Tigrinya.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::TigrinyaEritrean:
     file: lib/Date/Language/TigrinyaEritrean.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::TigrinyaEthiopian:
     file: lib/Date/Language/TigrinyaEthiopian.pm
-    version: '2.34'
+    version: '2.35'
   Date::Language::Turkish:
     file: lib/Date/Language/Turkish.pm
-    version: '2.34'
+    version: '2.35'
   Date::Parse:
     file: lib/Date/Parse.pm
-    version: '2.34'
+    version: '2.35'
   Time::Zone:
     file: lib/Time/Zone.pm
-    version: '2.34'
+    version: '2.35'
   TimeDate:
     file: lib/TimeDate.pm
-    version: '2.34'
+    version: '2.35'
+requires:
+  Carp: '0'
 resources:
-  bugtracker: https://github.com/atoomic/perl-TimeDate/issues
-  repository: https://github.com/atoomic/perl-TimeDate.git
-version: '2.34'
+  bugtracker: https://github.com/cpan-authors/TimeDate/issues
+  repository: https://github.com/cpan-authors/TimeDate.git
+version: '2.35'
 x_Dist_Zilla:
   perl:
     version: '5.038004'
@@ -309,6 +314,14 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: RuntimeRequires
+      version: '6.033'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
           phase: test
           type: requires
       name: TestRequires
@@ -372,7 +385,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v2.34
+          tag: v2.35
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -484,6 +497,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
+            - CLAUDE.md
             - Makefile.PL
           exclude_match: []
           follow_symlinks: 0

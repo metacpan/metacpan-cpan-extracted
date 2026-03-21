@@ -9,6 +9,7 @@ use Test2::Plugin::NoWarnings;
 use Test2::Tools::Exception qw< lives dies >;
 use Test2::Tools::Warnings qw< warning >;
 use Test::MockFile qw< nostrict >;
+use Errno qw/ENOENT/;
 
 use File::Temp qw< tempfile >;
 
@@ -23,7 +24,7 @@ subtest(
         ok( -d '/foo',     'Directory /foo exists' );
         ok( -f '/foo/bar', 'File /foo/bar exists' );
 
-        my $dir_def_perm = sprintf '%04o', 0777 - umask;
+        my $dir_def_perm = sprintf '%04o', 0777 & ~umask;
         is(
             sprintf( '%04o', ( stat '/foo' )[2] & 07777 ),
             $dir_def_perm,
@@ -33,10 +34,10 @@ subtest(
         # These variables are for debugging test failures
         my $umask         = sprintf '%04o', umask;
         my $perms_before  = sprintf '%04o', Test::MockFile::S_IFPERMS() & 0666;
-        my $perms_after_1 = sprintf '%04o', ( Test::MockFile::S_IFPERMS() & 0666 ) ^ umask;
-        my $perms_after_2 = sprintf '%04o', ( ( Test::MockFile::S_IFPERMS() & 0666 ) ^ umask ) | Test::MockFile::S_IFREG();
+        my $perms_after_1 = sprintf '%04o', ( Test::MockFile::S_IFPERMS() & 0666 ) & ~umask;
+        my $perms_after_2 = sprintf '%04o', ( ( Test::MockFile::S_IFPERMS() & 0666 ) & ~umask ) | Test::MockFile::S_IFREG();
 
-        my $file_def_perm = sprintf '%04o', 0666 - umask;
+        my $file_def_perm = sprintf '%04o', 0666 & ~umask;
         is(
             sprintf( '%04o', ( stat '/foo/bar' )[2] & 07777 ),
             $file_def_perm,
@@ -178,6 +179,120 @@ subtest(
 
         ok( rmdir('/foo'), 'Successfully deleted real directory' );
         ok( !-d '/foo',    'Directory /foo no longer exist' );
+    }
+);
+
+subtest(
+    'File creation with non-default mode applies umask correctly' => sub {
+        # With umask 0022, creating a file with mode 0644 should stay 0644
+        # (bits already clear). With the old XOR bug, 0644 ^ 0022 = 0666.
+        my $file = Test::MockFile->file( '/umask_test/file', 'data', { mode => 0644 } );
+
+        my $expected = sprintf '%04o', 0644 & ~umask;
+        is(
+            sprintf( '%04o', ( stat '/umask_test/file' )[2] & 07777 ),
+            $expected,
+            "File with explicit mode 0644 gets $expected after umask",
+        );
+    }
+);
+
+subtest(
+    'chmod method ignores umask' => sub {
+        my $file = Test::MockFile->file( '/chmod_umask/file', 'content' );
+
+        # Real chmod(2) ignores umask — setting 0755 should give exactly 0755
+        $file->chmod(0755);
+        is(
+            sprintf( '%04o', ( stat '/chmod_umask/file' )[2] & 07777 ),
+            '0755',
+            'chmod(0755) gives exactly 0755 (umask not applied)',
+        );
+
+        $file->chmod(0644);
+        is(
+            sprintf( '%04o', ( stat '/chmod_umask/file' )[2] & 07777 ),
+            '0644',
+            'chmod(0644) gives exactly 0644 (umask not applied)',
+        );
+    }
+);
+
+subtest(
+    'mkdir with non-default mode applies umask correctly' => sub {
+        # mkdir(path, 0700) with umask 0022 should give 0700 (bits already clear)
+        # With the old XOR bug, 0700 ^ 0022 = 0722
+        my $dir = Test::MockFile->dir('/umask_mkdir');
+
+        my $expected = sprintf '%04o', 0700 & ~umask;
+        ok( mkdir( '/umask_mkdir', 0700 ), 'mkdir with mode 0700' );
+        is(
+            sprintf( '%04o', ( stat '/umask_mkdir' )[2] & 07777 ),
+            $expected,
+            "mkdir(0700) gives $expected after umask",
+        );
+    }
+);
+
+subtest(
+    'chmod masks mode to S_IFPERMS (high bits do not corrupt file type)' => sub {
+        my $file = Test::MockFile->file( '/chmod_mask/file', 'data' );
+        my $dir  = Test::MockFile->dir('/chmod_mask');
+
+        # Passing file type bits (e.g. S_IFREG=0100000) should not corrupt
+        # the stored mode. CORE::chmod silently ignores bits above 07777.
+        chmod 0100755, '/chmod_mask/file';
+        my $got_perms = ( stat '/chmod_mask/file' )[2] & 07777;
+        is(
+            sprintf( '%04o', $got_perms ),
+            '0755',
+            'chmod with S_IFREG bits gives 0755, not corrupted mode',
+        );
+
+        ok( -f '/chmod_mask/file', 'File type preserved after chmod with high bits' );
+
+        # Same test for directory
+        chmod 0100700, '/chmod_mask';
+        my $dir_perms = ( stat '/chmod_mask' )[2] & 07777;
+        is(
+            sprintf( '%04o', $dir_perms ),
+            '0700',
+            'chmod on dir with high bits gives 0700',
+        );
+
+        ok( -d '/chmod_mask', 'Directory type preserved after chmod with high bits' );
+    }
+);
+
+subtest(
+    'chmod with broken symlink in multi-file list does not confess' => sub {
+        my $link = Test::MockFile->symlink( '/nonexistent_target', '/chmod_broken_link' );
+        my $file = Test::MockFile->file( '/chmod_real_file', 'content' );
+
+        # chmod on a mix of regular file + broken symlink should NOT die.
+        # The broken symlink should silently fail with ENOENT, and the
+        # regular file should succeed.
+        my ( $result, $errno );
+        ok(
+            lives { $result = chmod( 0755, '/chmod_broken_link', '/chmod_real_file' ); $errno = $! + 0 },
+            'chmod with broken symlink + regular file does not confess',
+        );
+        is( $result, 1, 'chmod returns 1 (one file changed)' );
+        is( $errno, ENOENT, 'errno set to ENOENT for the broken symlink' );
+    }
+);
+
+subtest(
+    'chmod with only broken symlink' => sub {
+        my $link = Test::MockFile->symlink( '/nowhere', '/chmod_only_broken' );
+
+        my ( $result, $errno );
+        ok(
+            lives { $result = chmod( 0755, '/chmod_only_broken' ); $errno = $! + 0 },
+            'chmod with only a broken symlink does not confess',
+        );
+        is( $result, 0, 'chmod returns 0 (no files changed)' );
+        is( $errno, ENOENT, 'errno set to ENOENT' );
     }
 );
 

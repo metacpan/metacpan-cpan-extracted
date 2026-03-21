@@ -21,16 +21,15 @@ no_index:
 requires:
   DBD::Pg: '0'
   DBI: '1.643'
+  DBIx::Class: '0'
   Data::Dumper: '0'
   Digest::SHA: '0'
-  File::ReadBackwards: '0'
   File::Slurp: '0'
   Gzip::Faster: '0'
   JSON: '0'
   MIME::Base64: '0'
   Net::Server::Daemonize: '0'
   POE: '0'
-  POE::Wheel::FollowTail: '1.368'
   Sys::Hostname: '0'
   Sys::Syslog: '0'
   TOML: '0'
@@ -40,5 +39,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/LilithSec/Lilith
-version: v1.0.0
+version: v2.0.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

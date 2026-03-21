@@ -1,5 +1,5 @@
 package Simple::Accessor;
-$Simple::Accessor::VERSION = '1.13';
+$Simple::Accessor::VERSION = '1.14';
 use strict;
 use warnings;
 
@@ -53,6 +53,18 @@ accessible.
     # that s all what you need ! no more line required
     use Simple::Accessor qw{foo bar cherry apple};
 
+You can also split your attribute declarations across multiple C<use> statements.
+Attributes from all imports are merged and fully supported by the constructor,
+strict constructor mode, and deterministic initialization ordering.
+
+    package MyClass;
+
+    use Simple::Accessor qw{foo bar};
+    use Simple::Accessor qw{cherry apple};
+
+    # all four attributes work in the constructor
+    my $o = MyClass->new(foo => 1, bar => 2, cherry => 3, apple => 4);
+
 You can now call 'new' on your class, and create objects using these attributes
 
     package main;
@@ -103,9 +115,24 @@ You can also provide individual builders / initializers
         'red';
     }
 
+You can enable strict constructor mode to catch typos in attribute names:
+
+    package MyClass;
+    use Simple::Accessor qw{name age};
+
+    sub _strict_constructor { 1 }
+
+    package main;
+    MyClass->new(nmae => 'oops');
+    # dies: "MyClass->new(): unknown attribute(s): nmae"
+
+This is opt-in and off by default for backward compatibility.
+
 You can even use a very basic but useful hook system.
 Any false value return by before or validate, will stop the setting process.
-Be careful with the after method, as there is no protection against infinite loop.
+The after hooks include a re-entrancy guard: if an C<_after_*> hook triggers
+a setter that would re-enter the same attribute, the nested C<_after_*> call
+is skipped to prevent infinite recursion.
 
     sub _before_foo {
         my ($self, $v) = @_;
@@ -144,11 +171,14 @@ sub import {
 
     $INFO = {} unless defined $INFO;
     $INFO->{$from} = {} unless defined $INFO->{$from};
-    $INFO->{$from}->{'attributes'} = [ @attr ];
+    $INFO->{$from}->{'attributes'} ||= [];
 
     _add_with($from);
     _add_new($from);
     _add_accessors( to => $from, attributes => \@attr );
+
+    # append after _add_accessors succeeds (it dies on duplicates)
+    push @{$INFO->{$from}->{'attributes'}}, @attr;
 
     return;
 }
@@ -156,6 +186,7 @@ sub import {
 sub _add_with {
     my $class = shift;
     return unless $class;
+    return if $class->can('with');
 
     my $with  = $class . '::with';
     {
@@ -167,12 +198,25 @@ sub _add_with {
             push @{$INFO->{$class}->{'with'}}, @what;
 
             foreach my $module ( @what ) {
-                eval qq[require $module; 1] or die $@;
-                _add_accessors(
-                    to => $class,
-                    attributes => $INFO->{$module}->{attributes},
-                    from_role => $module
-                );
+                die "Invalid module name: $module" unless $module =~ /\A[A-Za-z_]\w*(?:::\w+)*\z/;
+                # skip require if the role is already registered (e.g. inline package)
+                unless ($INFO->{$module} && $INFO->{$module}->{attributes}) {
+                    eval qq[require $module; 1] or die $@;
+                }
+                die "$module is not a Simple::Accessor role"
+                    unless $INFO->{$module} && $INFO->{$module}->{attributes};
+                # Resolve each attribute's origin role for transitive composition.
+                # If MiddleRole composed OriginRole's attrs, their hooks live
+                # in OriginRole — not MiddleRole.  Pass the correct origin so
+                # the accessor closure can find _build_*, _before_*, etc.
+                my $origins = $INFO->{$module}{attr_origin} || {};
+                foreach my $att (@{$INFO->{$module}->{attributes}}) {
+                    _add_accessors(
+                        to         => $class,
+                        attributes => [$att],
+                        from_role  => $origins->{$att} || $module
+                    );
+                }
             }
 
             return;
@@ -183,6 +227,7 @@ sub _add_with {
 sub _add_new {
     my $class = shift;
     return unless $class;
+    return if $class->can('new');
 
     my $new  = $class . '::new';
     {
@@ -192,18 +237,30 @@ sub _add_new {
 
             my $self = bless {}, $class;
 
-            # set values if attributes exist
-            map {
-                eval { $self->$_( $opts{$_} ) }
-            } keys %opts;
-
             if ( $self->can( '_before_build') ) {
                 $self->_before_build( %opts );
+            }
+
+            # set values for known attributes (in declaration order)
+            my $attrs = $INFO->{$class}{attributes} || [];
+            foreach my $attr ( @{$attrs} ) {
+                $self->$attr( $opts{$attr} ) if exists $opts{$attr};
+            }
+
+            # strict constructor: die on unknown attributes
+            if ( $self->can('_strict_constructor') && $self->_strict_constructor() ) {
+                my %known = map { $_ => 1 } @{$attrs};
+                my @unknown = sort grep { !$known{$_} } keys %opts;
+                if (@unknown) {
+                    die "$class\->new(): unknown attribute(s): "
+                        . join(', ', @unknown) . "\n";
+                }
             }
 
             foreach my $init ( 'build', 'initialize' ) {
                 if ( $self->can( $init ) ) {
                     return unless $self->$init(%opts);
+                    last;  # build takes precedence over initialize
                 }
             }
 
@@ -228,16 +285,34 @@ sub _add_accessors {
     foreach my $att (@attributes) {
         my $accessor = $class . "::" . $att;
 
-        die "$class: attribute '$att' is already defined." if $class->can($att);
+        if ( $class->can($att) ) {
+            # skip silently when composing roles (duplicates are OK)
+            next if $from_role;
+            die "$class: attribute '$att' is already defined.";
+        }
+
+        # track role attributes in the class's attribute list and remember
+        # which role originally defined them (for transitive composition)
+        if ( $from_role ) {
+            push @{$INFO->{$class}{attributes}}, $att;
+            $INFO->{$class}{attr_origin}{$att} = $from_role;
+        }
 
         # allow symbolic refs to typeglob
         no strict 'refs';
         *$accessor = sub {
             my ( $self, $v ) = @_;
-            if ( defined $v ) {
+            if ( @_ > 1 ) {
+                # re-entrancy guard: skip _after_* if we're already setting this attribute
+                my $is_reentrant = $self->{__sa_setting}{$att};
+                local $self->{__sa_setting}{$att} = 1;
+
                 foreach (qw{before validate set after}) {
                     if ( $_ eq 'set' ) {
                         $self->{$att} = $v;
+                        next;
+                    }
+                    if ( $_ eq 'after' && $is_reentrant ) {
                         next;
                     }
                     my $sub = '_' . $_ . '_' . $att;
@@ -250,7 +325,7 @@ sub _add_accessors {
                     }
                 }
             }
-            elsif ( !defined $self->{$att} ) {
+            elsif ( !exists $self->{$att} ) {
                 # try to initialize the value (try first with build)
                 #   initialize is here for backward compatibility with older versions
                 foreach my $builder ( qw{build initialize} ) {
@@ -268,7 +343,6 @@ sub _add_accessors {
             return $self->{$att};
         };
     }
-    @attributes = ();
 }
 
 1;

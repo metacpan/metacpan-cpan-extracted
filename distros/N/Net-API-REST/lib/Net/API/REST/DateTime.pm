@@ -44,9 +44,9 @@ Net::API::REST::DateTime - HTTP DateTime Manipulation and Formatting
 	print( "$dt\n" );
 	## will produce
 	Sun, 15 Dec 2019 15:32:12 GMT
-	
+
 	my( @parts ) = $d->parse_date( $date_string );
-	
+
 	my $datetime_object = $d->str2datetime( $date_string );
 	$datetime_object->set_formatter( $d );
 	my $timestamp_in_seconds = $d->str2time( $date_string );

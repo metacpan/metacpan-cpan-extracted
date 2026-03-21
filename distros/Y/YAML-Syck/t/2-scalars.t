@@ -23,10 +23,7 @@ $YAML::Syck::DumpCode = 0;
 is( Dump( sub { 42 } ), "--- !!perl/code: '{ \"DUMMY\" }'\n" );
 $YAML::Syck::DumpCode = 1;
 
-TODO: {
-    local $TODO = "5.6 can't do code references in Syck right now" if ( $] < 5.007 );
-    Test::More::like( Dump( sub { 42 } ), qr#--- !!perl/code.*?{.*?42.*?}$#s );
-}
+Test::More::like( Dump( sub { 42 } ), qr#--- !!perl/code.*?{.*?42.*?}$#s );
 
 $YAML::Syck::LoadCode = 0;
 {
@@ -67,25 +64,19 @@ $YAML::Syck::LoadCode = $YAML::Syck::DumpCode = 0;
 
 $YAML::Syck::UseCode = $YAML::Syck::UseCode = 1;
 
-TODO: {
-    local $TODO;
-    $TODO = "5.6 can't do code references in Syck right now" if ( $] < 5.007 );
-    is(
-        eval {
-            Load( Dump( sub { "foo" . shift } ) )->("bar");
-        },
-        "foobar"
-    );
-    $TODO = '';
-    is( $@, "", "no error" );
-    $TODO = "5.6 can't do code references in Syck right now" if ( $] < 5.007 );
-    is(
-        eval {
-            Load( Dump( sub { shift()**3 } ) )->(3);
-        },
-        27
-    );
-}
+is(
+    eval {
+        Load( Dump( sub { "foo" . shift } ) )->("bar");
+    },
+    "foobar"
+);
+is( $@, "", "no error" );
+is(
+    eval {
+        Load( Dump( sub { shift()**3 } ) )->(3);
+    },
+    27
+);
 
 is( Dump(undef),      "--- ~\n" );
 is( Dump('~'),        "--- \'~\'\n" );

@@ -8,7 +8,7 @@ use Test::More tests => 26;
 use Crypt::RIPEMD160;
 use Crypt::RIPEMD160::MAC;
 
-my $ripemd160 = new Crypt::RIPEMD160;
+my $ripemd160 = Crypt::RIPEMD160->new;
 isa_ok($ripemd160, 'Crypt::RIPEMD160');
 
 my %data = (''  => '9c1185a5c5e9fc54612808977ee8f548b2258d31',
@@ -73,7 +73,7 @@ foreach my $key (sort(keys(%data)))
 
 # 7: Various flavours of file-handle to addfile
 {
-    open(F, "<$0");
+    open(F, "<", $0) or die "Cannot open $0: $!";
 
     $ripemd160->reset;
     $ripemd160->addfile(*F);
@@ -127,7 +127,7 @@ foreach my $key (sort(keys(%data)))
     seek(F, 0, 0);
     $ripemd160->reset;
     my $hexata;
-    while (read(*F, $hexata, (rand % 128) + 1)) {
+    while (read(*F, $hexata, int(rand(128)) + 1)) {
         $ripemd160->add($hexata);
     }
     my $hex = $ripemd160->hexdigest;
@@ -138,10 +138,9 @@ foreach my $key (sort(keys(%data)))
 {
     seek(F, 0, 0);
     $ripemd160->reset;
-    undef $/;
+    local $/;
     my $data = <F>;
     my $hex = $ripemd160->hexhash($data);
-    print ($hex ne '' ? "" : "not ");
     isnt($hex, '', 'All the data at once');
 
     close(F);
@@ -198,7 +197,7 @@ exit;
 sub test {
     my($digest, $key, @data) = @_;
 
-    my($mac) = new Crypt::RIPEMD160::MAC($key);
+    my($mac) = Crypt::RIPEMD160::MAC->new($key);
     $mac->add(@data);
     is($mac->hexmac(), $digest, 'Crypt::RIPEMD160::MAC std-test-vector from RFC2286');
 }

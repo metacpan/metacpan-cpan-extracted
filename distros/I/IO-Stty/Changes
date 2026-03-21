@@ -1,5 +1,32 @@
 Revision history for Perl extension IO::Stty
 
+0.06 Fri Mar 20 2026
+
+  Bug fixes:
+   - Fix show_me_the_crap() emitting "speed  baud" (empty speed) when
+     getospeed() returns a value not mapped to any standard POSIX B*
+     constant (e.g. on OpenBSD). Now falls back to the raw numeric value.
+     (GH #19, PR #23)
+   - Display ispeed separately in -a output when it differs from ospeed,
+     using the same raw-numeric fallback for unmapped values. (PR #23)
+   - Fix ispeed test failure on Linux ptys where the kernel normalises
+     ispeed to match ospeed during tcsetattr(). Set both speeds in a
+     single stty() call to avoid the normalisation window.
+     (GH #16, PR #17, PR #21)
+   - Replace // (defined-or) operator in tests with ternary equivalent
+     for Perl 5.8 compatibility. (GH #20, PR #24)
+
+  Improvements:
+   - Recognize --version flag in stty.pl; previously only -v and bare
+     "version" were matched despite the POD documenting --version.
+     (PR #15)
+   - Modernize scripts/stty.pl: add strict/warnings, lexical variables,
+     and a portable shebang. (PR #15)
+
+  Maintenance:
+   - Harden ispeed baud rate test against Linux pty kernel normalisation.
+     (GH #16, PR #21)
+
 0.05 Wed Mar 19 2026
 
   Bug fixes:

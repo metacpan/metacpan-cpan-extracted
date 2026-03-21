@@ -1,9 +1,13 @@
-# Test overloading of gmp objects.
+# Test overloading of gmp objects. The caveats mentioned below can be removed by loading
+# the Math::MPFR::OLOADEX module that ships with distro.
+# NOTE: The loading of Math::MPFR::OLOADEX is optional and it is NOT loaded by default.
+#       The test file oloadex_math_gmp.t tests the enhanced overloading  of gmo objects
+#        that Math::MPFR::OLOADEX provides.
 # The only gotcha here is that Math::GMP overloading of Math::MPFR objects does not work.
 # Therefore, while the following DWIMs:
 # $ perl -MMath::MPFR -MMath::GMP -le 'print "ok" if Math::MPFR->new(0) < Math::GMP->new(10);'
 #   ok
-# the converse does not, and will crash in some cases:
+# the converse does not, and might (?) crash in some cases:
 # $ perl -MMath::MPFR -MMath::GMP -le 'print "ok" if Math::GMP->new(10) > Math::MPFR->new(0);'
 #
 # That is, while Math::MPFR evaluates Math::GMP objects as intended, Math::MPFR objects are
@@ -22,8 +26,7 @@ eval { require Math::GMP; };
 
 if($@) {
   warn "\$\@: $@\n";
-  warn "Skipping all tests as Math::GMP could not be loaded\n";
-  is(1, 1);
+  plan skip_all => "Math::GMP could not be loaded\n";
   done_testing();
   exit 0;
 }
@@ -64,9 +67,5 @@ cmp_ok($buf, 'eq', 'bc4ff2', "'%Zx' formatting ok");
 
 Rmpfr_sprintf($buf, "%ZX", $z, 32);
 cmp_ok($buf, 'eq', 'BC4FF2', "'%ZX' formatting ok");
-
-
-
-
 
 done_testing();

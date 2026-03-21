@@ -1,10 +1,39 @@
 {
-   "abstract" : "Composable SQL query builder with expression trees",
+   "abstract" : "Composable SQL query builder with expression trees for Perl",
    "author" : [
       "Thomas Busch <tbusch@cpan.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "sql",
+      "query",
+      "builder",
+      "composable",
+      "expression-tree",
+      "select",
+      "insert",
+      "update",
+      "delete",
+      "truncate",
+      "join",
+      "cte",
+      "window-function",
+      "case",
+      "union",
+      "intersect",
+      "except",
+      "subquery",
+      "upsert",
+      "returning",
+      "distinct",
+      "postgresql",
+      "mysql",
+      "sqlite",
+      "dbi",
+      "bind-parameters",
+      "injection-protection"
+   ],
    "license" : [
       "mit"
    ],
@@ -44,17 +73,22 @@
    "provides" : {
       "SQL::Wizard" : {
          "file" : "lib/SQL/Wizard.pm",
-         "version" : "0.03"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thomasbusch/perl-SQL-Wizard/issues"
+      },
+      "homepage" : "https://github.com/thomasbusch/perl-SQL-Wizard",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/thomasbusch/perl-SQL-Wizard.git",
          "web" : "https://github.com/thomasbusch/perl-SQL-Wizard"
       }
    },
-   "version" : "0.03",
+   "version" : "0.08",
+   "x_authority" : "cpan:TBUSCH",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -15,20 +15,19 @@ is( Load("--- Hello, world\n"), "Hello, world" );
     is( $out, '--', "Load of '--' returns plain scalar" );
 }
 
-TODO: {
+# Syck is a permissive YAML 1.0 parser: empty strings and unstructured
+# text are not errors.  This matches YAML.pm and YAML::XS behavior.
+# See GH #127 for the design discussion.
+{
     my $out = eval { Load("") };
-    is( $out, undef, "Bad data fails load" );
-
-    local $TODO = 'Load fails on empty string';
-    isnt( $@, '', "Bad data dies on Load" );
+    is( $@, '', "Load('') does not die" );
+    is( $out, undef, "Load('') returns undef" );
 }
 
-TODO: {
+{
     my $out = eval { Load("feefifofum\n\n\ndkjdkdk") };
-
-    local $TODO = 'Load fails on empty string';
-    isnt( $@, '', "Bad data dies on Load" );
-    is( $out, undef, "Bad data fails load" );
+    is( $@, '', "Load of unstructured text does not die" );
+    like( $out, qr/^feefifofum/, "unstructured text is a plain scalar" );
 }
 
 TODO: {

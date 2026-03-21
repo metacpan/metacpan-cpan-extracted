@@ -1,0 +1,122 @@
+# NAME
+
+Safe::Hole - make a hole to the original main compartment in the Safe compartment
+
+# SYNOPSIS
+
+    use Safe;
+    use Safe::Hole;
+    $cpt = new Safe;
+    $hole = new Safe::Hole {};
+    sub test { Test->test; }
+    $Testobj = new Test;
+    # $cpt->share('&test');  # alternate as next line
+    $hole->wrap(\&test, $cpt, '&test');
+    # ${$cpt->varglob('Testobj')} = $Testobj;  # alternate as next line
+    $hole->wrap($Testobj, $cpt, '$Testobj');
+    $cpt->reval('test; $Testobj->test;'); 
+    print $@ if $@;
+    package Test;
+    sub new { bless {},shift(); }
+    sub test { my $self = shift; $self->test2; }
+    sub test2 { print "Test->test2 called\n"; }
+
+# DESCRIPTION
+
+    We can call outside defined subroutines from the Safe compartment
+  using share(), or can call methods through the object that is copied
+  into the Safe compartment using varglob(). But that subroutines or
+  methods are executed in the Safe compartment too, so they cannot call
+  another subroutines that are dinamically qualified with the package
+  name such as class methods nor can they compile code that uses opcodes
+  that are forbidden within the compartment.
+
+    Through Safe::Hole, we can execute outside defined subroutines in the 
+  original main compartment from the Safe compartment. 
+
+    Note that if a subroutine called through Safe::Hole::call does a
+  Carp::croak() it will report the error as having occured within
+  Safe::Hole.  This can be avoided by including Safe::Hole::User in the
+  @ISA for the package containing the subroutine.
+
+## Methods
+
+- new \[NAMESPACE\]
+
+    Class method. Backward compatible constructor.
+      NAMESPACE is the alternate root namespace that makes the compartment
+    in which call() method execute the subroutine.  Default of NAMESPACE
+    means the current 'main'. This emulates the behaviour of
+    Safe-Hole-0.08 and earlier.
+
+- new \\%arguments
+
+    Class method. Constructor. 
+      The constructor is called with a hash reference providing the
+    constructor arguments.  The argument ROOT specifies the alternate root
+    namespace for the object.  If the ROOT argument is not specified then
+    Safe::Hole object will attempt restore as much as it can of the
+    environment in which it was constrtucted.  This includes the opcode
+    mask, `%INC` and `@INC`.  If a root namespace is specified then it
+    would not make sense to restore the %INC and @INC from main:: so this
+    is not done.  Also if a root namespace is given the opcode mask is not
+    restored either.
+
+- call $coderef \[,@args\]
+
+    Object method. 
+      Call the subroutine refered by $coderef in the compartment that is
+    specified with constructor new. @args are passed as the arguments to
+    the called $coderef.  Note that the arguments are not currently passed
+    by reference although this may change in a future version.
+
+- wrap $ref \[,$cpt ,$name\]
+
+    Object method. 
+      If $ref is a code reference, this method returns the anonymous 
+    subroutine reference that calls $ref using call() method of Safe::Hole (see 
+    above). 
+      If $ref is a class object, this method makes a wrapper class of that object 
+    and returns a new object of the wrapper class. Through the wrapper class, 
+    all original class methods called using call() method of Safe::Hole.
+      If $cpt as Safe object and $name as subroutine or scalar name specified, 
+    this method works like share() method of Safe. When $ref is a code reference
+    $name must like '&subroutine'. When $ref is a object $name must like '$var'.
+      Name $name may not be same as referent of $ref. For example:
+      $hole->wrap(\\&foo, $cpt, '&bar');
+      $hole->wrap(sub{...}, $cpt, '&foo');
+      $hole->wrap($objfoo, $cpt, '$objbar');
+
+- root
+
+    Object method.
+    Return the namespace that is specified with constructor new().
+    If no namespace was then root() returns 'main'.
+
+## Warning
+
+You MUST NOT share the Safe::Hole object with the Safe compartment. If you do it
+the Safe compartment is NOT safe.
+
+This module provides a means to go from a state where an opcode is
+denied back to a state where it is not.  Reasonable care has been
+taken to ensure that programs cannot simply manipulate the internals
+to the Safe::Hole object to reduce the opmask in effect.  However there
+may still be a way that the authors have not considered.  In
+particular it relies on the fact that a Perl program cannot change
+stuff inside the magic on a Perl variable.  If you install a module
+that allows a Perl program to fiddle inside the magic then this
+assuption breaks down.  One would hope that any system that was
+running un-trusted code would not have such a module installed.
+
+# AUTHORS
+
+Sey Nakajima <nakajima@netstock.co.jp> (Initial version)
+
+Brian McCauley <nobull@cpan.org> (Maintenance)
+
+Todd Rinaldo <toddr@cpan.org> (Maintenance)
+
+# SEE ALSO
+
+Safe(3).

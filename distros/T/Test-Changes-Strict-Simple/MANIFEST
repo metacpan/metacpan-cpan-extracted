@@ -18,15 +18,16 @@ t/07-version_re-fail.t
 t/08-check_dots-on.t
 t/09-check_dots-off.t
 t/10_reverse.t
+t/99_fatal.t
 t/lib/Local/Test/Helper.pm
 xt/author/boilerplate.t
 xt/author/kwalitee.t
 xt/author/pod-coverage.t
 xt/author/pod-spell.t
 xt/author/pod.t
-xt/author/self.t
 xt/release/cpan-json.t
 xt/release/cpan-yml.t
 xt/release/manifest.t
+xt/release/self.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

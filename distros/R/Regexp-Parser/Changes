@@ -1,5 +1,28 @@
 HISTORY
 
+  0.25 -- Todd Rinaldo March 20, 2026
+   Features:
+   - Add recursive pattern support: (?R), (?0), (?1), (?+1), (?-1),
+     (?&name) for named subpattern recursion (PR #22)
+   - Add Python-compatible regex syntax: (?P<name>...) named capture,
+     (?P=name) named backref, (?P>name) named recursion (PR #22)
+   - Add \o{NNN} octal escape support from Perl 5.14+ (PR #20)
+   - Add (*VERB) backtracking control verbs: FAIL, F, ACCEPT, SKIP,
+     PRUNE, COMMIT, THEN, MARK with optional :arg (PR #20)
+   - Add (?|...) branch reset groups from Perl 5.10+ (PR #20)
+   - Add (*positive_lookahead:...) and other alphabetic assertion
+     forms from Perl 5.28+ (PR #20)
+   - Add (*script_run:...), (*sr:...), (*atomic_script_run:...),
+     (*asr:...) script run assertions from Perl 5.28+ (PR #20)
+   - Add /xx flag support via (?xx:...) from Perl 5.26+ (PR #20)
+
+   Maintenance:
+   - Migrate t/08regex_flags.t and t/09backref_flags.t from deprecated
+     Test.pm to Test::More — all test files now use Test::More (PR #21)
+   - Update CLAUDE.md and modernize Parser.pm POD (PR #21)
+   - Add CLAUDE.md and MANIFEST.SKIP to MANIFEST
+   - Tests now 620 across 16 test files
+
   0.24 -- Todd Rinaldo March 18, 2026
    Features:
    - Add support for Perl 5.10+ regex constructs (GH #8):

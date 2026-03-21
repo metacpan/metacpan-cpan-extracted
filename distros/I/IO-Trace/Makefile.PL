@@ -8,7 +8,7 @@ WriteMakefile(
         # Please only use stock core modules:
         'Config'        => 0,
         'Test::More'    => 0,
-        'Getopt::Long'  => 2.36, # For GetOptionsFromArray
+        'Getopt::Long'  => 0,
         'IO::File'      => 0,
         'IO::Handle'    => 0,
         'IO::Select'    => 0,

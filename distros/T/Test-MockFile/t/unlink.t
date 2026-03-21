@@ -79,6 +79,16 @@ subtest 'unlink on an unmocked file' => sub {
 
 };
 
+subtest 'unlink with no args uses $_' => sub {
+    my $mock = Test::MockFile->file( '/unlink_default', "data" );
+
+    ok( -e '/unlink_default', 'file exists before unlink' );
+
+    local $_ = '/unlink_default';
+    is( unlink(), 1, 'unlink() with no args uses $_ and returns 1' );
+    ok( !-e '/unlink_default', 'file no longer exists after unlink()' );
+};
+
 done_testing();
 
 sub on_broken_docker {

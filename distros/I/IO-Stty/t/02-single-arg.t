@@ -89,6 +89,20 @@ subtest '-v returns version' => sub {
     is( $ver, $IO::Stty::VERSION . "\n", '-v returns VERSION' );
 };
 
+subtest '--version returns version' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    my $ver = IO::Stty::stty( $slave, '--version' );
+    is( $ver, $IO::Stty::VERSION . "\n", '--version returns VERSION' );
+};
+
+subtest 'version (bare) returns version' => sub {
+    my ( $pty, $slave ) = fresh_pty();
+
+    my $ver = IO::Stty::stty( $slave, 'version' );
+    is( $ver, $IO::Stty::VERSION . "\n", 'bare version returns VERSION' );
+};
+
 # ── single flag arg works ────────────────────────────────────────────
 
 subtest 'single flag arg (not numeric, not special)' => sub {

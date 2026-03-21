@@ -22,6 +22,8 @@ t/08regex_flags.t
 t/09backref_flags.t
 t/10roundtrip.t
 t/11errors.t
+t/12perl542.t
+t/13recursive.t
 t/99misc.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

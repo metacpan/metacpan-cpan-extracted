@@ -1126,6 +1126,8 @@ use NEXT;
   push @Regexp::Parser::ifthen::ISA, __PACKAGE__;
   push @Regexp::Parser::eval::ISA, __PACKAGE__;
   push @Regexp::Parser::logical::ISA, __PACKAGE__;
+  push @Regexp::Parser::script_run::ISA, __PACKAGE__;
+  push @Regexp::Parser::asr::ISA, __PACKAGE__;
 
   sub qr {
     my $self = shift;
@@ -1742,6 +1744,224 @@ use NEXT;
 }
 
 
+{
+  # (?R) (?0) (?1) (?+1) (?-1) -- recursive subpatterns (Perl 5.10+)
+  package Regexp::Parser::recurse;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $num, $vis) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'recurse',
+      type => 'recurse',
+      num => $num,
+      vis => $vis,
+    }, $class;
+    return $self;
+  }
+
+  sub num {
+    my $self = shift;
+    $self->{num};
+  }
+
+  sub visual {
+    my $self = shift;
+    $self->{vis};
+  }
+
+  sub qr {
+    my $self = shift;
+    $self->{vis};
+  }
+}
+
+
+{
+  # (?&name) -- named recursive subpattern (Perl 5.10+)
+  package Regexp::Parser::named_recurse;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $name, $vis) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'recurse',
+      type => 'named_recurse',
+      name => $name,
+      vis => $vis,
+    }, $class;
+    return $self;
+  }
+
+  sub name {
+    my $self = shift;
+    $self->{name};
+  }
+
+  sub visual {
+    my $self = shift;
+    $self->{vis};
+  }
+
+  sub qr {
+    my $self = shift;
+    "(?&$self->{name})";
+  }
+}
+
+
+{
+  # (*VERB) and (*VERB:arg) backtracking control verbs (Perl 5.10+)
+  package Regexp::Parser::verb;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $name, $arg) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'verb',
+      type => $name,
+      name => $name,
+      arg => $arg,
+    }, $class;
+    return $self;
+  }
+
+  sub name {
+    my $self = shift;
+    $self->{name};
+  }
+
+  sub arg {
+    my $self = shift;
+    $self->{arg};
+  }
+
+  sub visual {
+    my $self = shift;
+    my $v = "(*" . $self->{name};
+    $v .= ":" . $self->{arg} if defined $self->{arg} && length $self->{arg};
+    $v . ")";
+  }
+}
+
+
+{
+  # (?|...) branch reset group (Perl 5.10+)
+  package Regexp::Parser::branch_reset;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, @data) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'group',
+      type => 'branch_reset',
+      data => \@data,
+      down => 1,
+    }, $class;
+    return $self;
+  }
+
+  sub raw {
+    my $self = shift;
+    "(?|";
+  }
+
+  sub qr {
+    my $self = shift;
+    join "", $self->raw, map($_->qr, @{ $self->{data} }), ")";
+  }
+
+  sub visual {
+    my $self = shift;
+    join "", $self->raw, map($_->visual, @{ $self->{data} }), ")";
+  }
+
+  sub data {
+    my $self = shift;
+    if (@_) {
+      my $how = shift;
+      if ($how eq '=') { $self->{data} = \@_ }
+      elsif ($how eq '+') { push @{ $self->{data} }, @_ }
+      else {
+        my $t = $self->type;
+        Carp::croak("\$$t->data([+=], \@data)");
+      }
+    }
+    $self->{data};
+  }
+
+  sub walk {
+    my ($self, $ws, $d) = @_;
+    unshift @$ws, $self->{rx}->object(@{ $self->ender });
+    unshift @$ws, sub { -1 }, @{ $self->{data} }, sub { +1 } if $d;
+  }
+
+  sub insert {
+    my ($self, $tree) = @_;
+    my $rx = $self->{rx};
+    push @$tree, $self;
+    push @{ $rx->{stack} }, $tree;
+    $rx->{tree} = $self->{data};
+  }
+}
+
+
+{
+  # (*script_run:...) Script run (Perl 5.28+)
+  package Regexp::Parser::script_run;
+  our @ISA = qw( Regexp::Parser::assertion );
+
+  sub new {
+    my ($class, $rx, @data) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'assertion',
+      type => 'script_run',
+      data => \@data,
+      down => 1,
+    }, $class;
+    return $self;
+  }
+
+  sub raw {
+    my $self = shift;
+    "(*script_run:";
+  }
+}
+
+
+{
+  # (*atomic_script_run:...) / (*asr:...) Atomic script run (Perl 5.28+)
+  package Regexp::Parser::asr;
+  our @ISA = qw( Regexp::Parser::assertion );
+
+  sub new {
+    my ($class, $rx, @data) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'assertion',
+      type => 'asr',
+      data => \@data,
+      down => 1,
+    }, $class;
+    return $self;
+  }
+
+  sub raw {
+    my $self = shift;
+    "(*asr:";
+  }
+}
 1;
 
 __END__

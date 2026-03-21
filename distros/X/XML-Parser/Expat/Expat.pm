@@ -8,7 +8,7 @@ use strict;
 use XSLoader;
 use Carp;
 
-our $VERSION = '2.49';
+our $VERSION = '2.51';
 
 our ( %Encoding_Table, @Encoding_Path, $have_File_Spec );
 
@@ -914,7 +914,7 @@ expansion can be relative to the input. For example, a value of 100.0
 means the parser will abort if entity expansion would produce output more
 than 100 times the size of the input.
 
-Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD> or C<XML_GE>.  Will C<croak> at
 runtime if the underlying C function is not available.
 
 =item * BillionLaughsAttackProtectionActivationThreshold
@@ -925,7 +925,7 @@ processed this many bytes of output from entity expansion. This prevents
 false positives on small documents that happen to have a high
 amplification ratio.
 
-Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> at
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD> or C<XML_GE>.  Will C<croak> at
 runtime if the underlying C function is not available.
 
 =item * AllocTrackerMaximumAmplification
@@ -934,8 +934,8 @@ Sets the maximum amplification factor for the allocation tracker.
 This limits how many times larger the output of entity expansion can be
 relative to the input.
 
-Requires libexpat E<gt>= 2.7.2.  Will C<croak> at runtime if the
-underlying C function is not available.
+Requires libexpat E<gt>= 2.7.2 built with C<XML_DTD> or C<XML_GE>.
+Will C<croak> at runtime if the underlying C function is not available.
 
 =item * AllocTrackerActivationThreshold
 
@@ -943,8 +943,8 @@ Sets the activation threshold (in bytes) for the allocation tracker.
 The amplification limit only kicks in after the parser has processed this
 many bytes of output from entity expansion.
 
-Requires libexpat E<gt>= 2.7.2.  Will C<croak> at runtime if the
-underlying C function is not available.
+Requires libexpat E<gt>= 2.7.2 built with C<XML_DTD> or C<XML_GE>.
+Will C<croak> at runtime if the underlying C function is not available.
 
 =item * ReparseDeferralEnabled
 
@@ -1268,7 +1268,7 @@ protection.  FACTOR is a floating-point number (e.g. C<100.0>).
 
   $parser->billion_laughs_attack_protection_maximum_amplification(100.0);
 
-Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD> or C<XML_GE>.  Will C<croak> if
 the underlying C API is not available.
 
 =item billion_laughs_attack_protection_activation_threshold(THRESHOLD)
@@ -1278,7 +1278,7 @@ protection.  THRESHOLD is an unsigned integer.
 
   $parser->billion_laughs_attack_protection_activation_threshold(1_000_000);
 
-Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD>.  Will C<croak> if
+Requires libexpat E<gt>= 2.4.0 built with C<XML_DTD> or C<XML_GE>.  Will C<croak> if
 the underlying C API is not available.
 
 =item alloc_tracker_maximum_amplification(FACTOR)
@@ -1288,8 +1288,8 @@ FACTOR is a floating-point number (e.g. C<100.0>).
 
   $parser->alloc_tracker_maximum_amplification(100.0);
 
-Requires libexpat E<gt>= 2.7.2.  Will C<croak> if the underlying C API
-is not available.
+Requires libexpat E<gt>= 2.7.2 built with C<XML_DTD> or C<XML_GE>.
+Will C<croak> if the underlying C API is not available.
 
 =item alloc_tracker_activation_threshold(THRESHOLD)
 
@@ -1298,8 +1298,8 @@ THRESHOLD is an unsigned integer.
 
   $parser->alloc_tracker_activation_threshold(1_000_000);
 
-Requires libexpat E<gt>= 2.7.2.  Will C<croak> if the underlying C API
-is not available.
+Requires libexpat E<gt>= 2.7.2 built with C<XML_DTD> or C<XML_GE>.
+Will C<croak> if the underlying C API is not available.
 
 =item reparse_deferral_enabled(ENABLED)
 

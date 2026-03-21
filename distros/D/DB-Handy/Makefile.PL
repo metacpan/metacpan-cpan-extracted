@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{DB::Handy},
-    'VERSION'   => q{1.00},
+    'VERSION'   => q{1.04},
     'ABSTRACT'  => q{Pure-Perl flat-file relational database with DBI-like interface},
     'PREREQ_PM' => {
         'Fcntl' => '1.03',
@@ -48,15 +48,15 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'DB::Handy' => {
                 'file'    => 'lib/DB/Handy.pm',
-                'version' => '1.00',
+                'version' => '1.04',
             },
             'DB::Handy::Connection' => {
                 'file'    => 'lib/DB/Handy.pm',
-                'version' => '1.00',
+                'version' => '1.04',
             },
             'DB::Handy::Statement' => {
                 'file'    => 'lib/DB/Handy.pm',
-                'version' => '1.00',
+                'version' => '1.04',
             }
         },
     };

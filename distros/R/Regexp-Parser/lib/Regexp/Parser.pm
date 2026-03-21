@@ -3,7 +3,7 @@ package Regexp::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use 5.006;
 use Carp qw( carp croak );
@@ -58,7 +58,12 @@ sub regex {
     for my $ch (split //, $flags) {
       my $method = "FLAG_$ch";
       if ($self->can($method)) {
-        $init_flags |= $self->$method;
+        my $v = $self->$method;
+        # /xx: if x is already on, set the xx bit (Perl 5.26+)
+        if ($ch eq 'x' && ($init_flags & $v)) {
+          $init_flags |= 0x200;
+        }
+        $init_flags |= $v;
       }
     }
   }
@@ -338,26 +343,19 @@ Regexp::Parser - base class for parsing regexes
 
 See examples in L<"USAGE">.
 
-=head1 WARNING
-
-This is version B<0.022b>.  The documentation is (still) incomplete.  It
-may be a little jumbled or hard to understand.  If you find a problem,
-please let L<me|/"AUTHOR"> know.
-
-Documentation has been added and moved around. See
-L<Regexp::Parser::Objects> for documentation about nodes and the objects
-that represent them.  See L<Regexp::Parser::Handlers> for information
-about sub-classing this module.
-
 =head1 DESCRIPTION
 
-This module parses regular expressions (regexes).  Its default "grammar"
-is Perl 5.8.4's regex set.  Grammar is quoted because the module does
-not so much define a grammar as let each matched node state what it
-expects to match next, but there is not currently a way of extracting a
-complete grammar.  This may change in future versions.
+This module parses regular expressions (regexes) into traversable object
+trees for analysis, transformation, or reconstruction.  It supports Perl
+regex syntax through modern Perl, including constructs like named
+captures, possessive quantifiers, backtracking control verbs, and
+Unicode properties.
 
-This module is designed as a replacement (though not drop-in) for my old
+See L<Regexp::Parser::Objects> for documentation about nodes and the
+objects that represent them.  See L<Regexp::Parser::Handlers> for
+information about sub-classing this module.
+
+This module is designed as a replacement (though not drop-in) for the old
 F<YAPE::Regex> modules.
 
 =head1 USAGE
@@ -387,9 +385,10 @@ You can send the regex to be parsed as the argument to the constructor.
 Clears the parser's memory and sets $regex as the regex to be parsed.
 
 If $flags is provided, it should be a string of flag characters (any
-combination of C<m>, C<s>, C<i>, C<x>) that will be pre-set before
-parsing begins.  This is equivalent to wrapping the regex in
-C<(?flags:...)> but without altering the resulting parse tree.
+combination of C<m>, C<s>, C<i>, C<x>, C<a>, C<d>, C<l>, C<u>, C<n>)
+that will be pre-set before parsing begins.  This is equivalent to
+wrapping the regex in C<(?flags:...)> but without altering the resulting
+parse tree.
 
   # parse with /x flag pre-set
   $parser->regex(' foo [ ] bar ', 'x');

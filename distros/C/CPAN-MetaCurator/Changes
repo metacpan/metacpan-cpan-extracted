@@ -1,5 +1,9 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.14  2026-03-20
+	- Add a NAME section to the POD in MetaCurator.pm
+	- Fix Export.pm to add each modules NAME to its entry in cpan.metacurator.tree.html
+
 1.13  2026-03-11
     - Clean up counting of nodes
     - Write module names to the 'modules' table if they appear in Perl.Wiki

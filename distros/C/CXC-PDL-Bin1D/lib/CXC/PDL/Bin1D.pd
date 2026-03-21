@@ -33,6 +33,7 @@ use File::Spec::Functions qw[ catfile ];
 use lib 'lib';
 
 use CXC::PDL::Bin1D::Utils '_bitflags';
+use PDL ();
 use PDL::Bad;
 
 use File::Basename qw[ fileparse ];
@@ -55,7 +56,7 @@ my ( $IndexParsType, $IndexCType ) = do {
     map { typefld( $type, $_ ) } qw( ppforcetype ctype );
 };
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 pp_setversion( $VERSION );
 
 {
@@ -209,7 +210,7 @@ use namespace::clean;
 
 EOD
 
-if ( version->parse( $PDL::VERSION ) < version->parse( '2.030' ) ) {
+if ( version->parse( PDL->VERSION ) < version->parse( '2.030' ) ) {
     pp_addpm( { At => 'Top' }, <<'EOD' );
 our @EXPORT_OK;
 our %EXPORT_TAGS;

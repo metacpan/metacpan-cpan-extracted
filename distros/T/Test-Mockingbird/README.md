@@ -4,7 +4,7 @@ Test::Mockingbird - Advanced mocking library for Perl with support for dependenc
 
 # VERSION
 
-Version 0.04
+Version 0.06
 
 # SYNOPSIS
 
@@ -30,6 +30,153 @@ Version 0.04
 # DESCRIPTION
 
 Test::Mockingbird provides powerful mocking, spying, and dependency injection capabilities to streamline testing in Perl.
+
+# DIAGNOSTICS
+
+Test::Mockingbird provides optional, non-intrusive diagnostic routines
+that allow inspection of the current mocking state during test execution.
+These routines are purely observational. They do not modify any mocking
+behaviour, symbol table entries, or internal state.
+
+Diagnostics are useful when debugging complex test suites, verifying
+mock layering behaviour, or understanding interactions between multiple
+mocking primitives such as mock, spy, inject, and the sugar functions.
+
+## diagnose\_mocks
+
+Return a structured hashref describing all currently active mock layers.
+Each entry includes the fully qualified method name, the number of active
+layers, whether the original method existed, and metadata for each layer
+(type and installation location). See the diagnose\_mocks method for full
+API details.
+
+## diagnose\_mocks\_pretty
+
+Return a human-readable, multi-line string describing all active mock
+layers. This routine is intended for debugging and inspection during test
+development. The output format is stable for human consumption but is not
+guaranteed for machine parsing. See the diagnose\_mocks\_pretty method for
+full API details.
+
+## Diagnostic Metadata
+
+Diagnostic information is recorded automatically whenever a mock layer is
+successfully installed. Each layer records:
+
+    * type          The category of mock layer (for example: mock, spy,
+                    inject, mock_return, mock_exception, mock_sequence,
+                    mock_once, mock_scoped)
+
+    * installed_at  The file and line number where the layer was created
+
+This metadata is maintained in parallel with the internal mock stack and
+is automatically cleared when a method is fully restored via unmock or
+restore\_all.
+
+Diagnostics never alter the behaviour of the mocking engine and may be
+safely invoked at any point during a test run.
+
+# DEBUGGING EXAMPLES
+
+This section provides practical examples of using the diagnostic routines
+to understand and debug complex mocking behaviour.
+All examples are safe to run inside test files and do not modify mocking semantics.
+
+## Example 1: Inspecting a simple mock
+
+    {
+        package Demo::One;
+        sub value { 1 }
+    }
+
+    mock_return 'Demo::One::value' => 42;
+
+    my $diag = diagnose_mocks();
+    print diagnose_mocks_pretty();
+
+The output will resemble:
+
+    Demo::One::value:
+      depth: 1
+      original_existed: 1
+      - type: mock_return   installed_at: t/example.t line 12
+
+This confirms that the method has exactly one active mock layer and shows
+where it was installed.
+
+## Example 2: Stacked mocks
+
+    {
+        package Demo::Two;
+        sub compute { 10 }
+    }
+
+    mock_return    'Demo::Two::compute' => 20;
+    mock_exception 'Demo::Two::compute' => 'fail';
+
+    print diagnose_mocks_pretty();
+
+Possible output:
+
+    Demo::Two::compute:
+      depth: 2
+      original_existed: 1
+      - type: mock_return   installed_at: t/example.t line 8
+      - type: mock_exception installed_at: t/example.t line 9
+
+This shows the order in which layers were applied. The most recent layer
+appears last.
+
+## Example 3: Spies and injected dependencies
+
+    {
+        package Demo::Three;
+        sub action { 1 }
+        sub dep    { 2 }
+    }
+
+    spy 'Demo::Three::action';
+    inject 'Demo::Three::dep' => sub { 99 };
+
+    print diagnose_mocks_pretty();
+
+Example output:
+
+    Demo::Three::action:
+      depth: 1
+      original_existed: 1
+      - type: spy           installed_at: t/example.t line 7
+
+    Demo::Three::dep:
+      depth: 1
+      original_existed: 1
+      - type: inject        installed_at: t/example.t line 8
+
+This confirms that both the spy and the injected dependency are active.
+
+## Example 4: After restore\_all
+
+    mock_return 'Demo::Four::x' => 5;
+    restore_all();
+
+    print diagnose_mocks_pretty();
+
+Output:
+
+    (no output)
+
+After restore\_all, all diagnostic metadata is cleared along with the
+mock layers.
+
+## Example 5: Using diagnostics inside a failing test
+
+When a test fails unexpectedly, adding the following line can help
+identify the active mocks:
+
+    diag diagnose_mocks_pretty();
+
+This prints the current mocking state into the test output without
+affecting the test run.
 
 # METHODS
 
@@ -206,6 +353,93 @@ testing retry logic, fallback behaviour, and state transitions.
 #### Output (Returns::Set schema)
 
 \- `return`: undef
+
+## restore
+
+Restore all mock layers for a single method target. This is similar to
+`restore_all`, but applies only to one method. If the method was never
+mocked, this routine has no effect.
+
+### API specification
+
+#### Input (Params::Validate::Strict schema)
+
+\- `target`: required, scalar, string; method target in shorthand or longhand form
+
+#### Output (Returns::Set schema)
+
+\- `return`: undef
+
+## diagnose\_mocks
+
+Return a structured hashref describing all currently active mock layers.
+This routine is purely observational and does not modify any state.
+
+### API specification
+
+#### Input
+
+Params::Validate::Strict schema:
+
+\- none
+
+#### Output
+
+Returns::Set schema:
+
+\- `return`: hashref; keys are fully qualified method names, values are
+  hashrefs containing:
+  - `depth`: integer; number of active mock layers
+  - `layers`: arrayref of hashrefs; each layer has:
+      - `type`: string
+      - `installed_at`: string
+  - `original_existed`: boolean
+
+## diagnose\_mocks\_pretty
+
+Return a human-readable string describing all currently active mock layers.
+This routine is purely observational and does not modify any state.
+
+### API specification
+
+#### Input
+
+Params::Validate::Strict schema:
+
+\- none
+
+#### Output
+
+Returns::Set schema:
+
+\- `return`: scalar string; formatted multi-line description of all active
+  mock layers, including:
+  - fully qualified method name
+  - depth (number of active layers)
+  - whether the original method existed
+  - each layer's type and installation location
+
+### Behaviour
+
+#### Entry
+
+\- No arguments are accepted.
+
+#### Exit
+
+\- Returns a formatted string describing the current mocking state.
+
+#### Side effects
+
+\- None. This routine does not modify `%mocked`, `%mock_meta`, or any
+  symbol table entries.
+
+#### Notes
+
+\- This routine is intended for debugging and diagnostics. It is safe to
+  call at any point during a test run.
+\- The output format is stable and suitable for human inspection, but not
+  guaranteed to remain fixed for machine parsing.
 
 # SUPPORT
 

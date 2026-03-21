@@ -2,4 +2,6 @@ Revision history for Chess4p
 
 0.01    Date/time
         First version, released on an unsuspecting world.
-
+0.02    Date/time
+        Use Test::More instead of Test2::V1 because some of the CPAN
+        testers systems don't have the latter.

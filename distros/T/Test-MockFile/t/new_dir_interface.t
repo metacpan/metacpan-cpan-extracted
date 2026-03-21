@@ -93,8 +93,8 @@ subtest(
         ok( -d $base_dir->path(), "$dirname exists" );
         ok( -d $dirname,          "$dirname exists" );
 
-        my $def_perms = sprintf '%04o', ( ( stat $base_dir->path() )[2] ^ umask ) & 07777;
-        my $new_perms = sprintf '%04o', ( ( stat $dirname )[2] ^ umask ) & 07777;
+        my $def_perms = sprintf '%04o', ( stat $base_dir->path() )[2] & 07777;
+        my $new_perms = sprintf '%04o', ( stat $dirname )[2] & 07777;
 
         # make sure we're not getting fooled by the default permissions
         isnt( $def_perms, $new_perms, "We picked perms ($new_perms) that are not the default ($def_perms)" );

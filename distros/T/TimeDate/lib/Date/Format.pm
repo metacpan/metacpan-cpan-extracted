@@ -7,7 +7,7 @@ package Date::Format;
 use     strict;
 require Exporter;
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Date formatting subroutines
 
 use Date::Format::Generic;
@@ -15,9 +15,13 @@ use Date::Format::Generic;
 our @ISA     = qw(Exporter);
 our @EXPORT  = qw(time2str strftime ctime asctime);
 
-sub time2str ($;$$)
+sub time2str ($;$$$)
 {
- Date::Format::Generic->time2str(@_);
+ my ($fmt, $time, $zone, $lang) = @_;
+ my $pkg = defined $lang
+    ? do { require Date::Language; Date::Language->new($lang) }
+    : 'Date::Format::Generic';
+ $pkg->time2str($fmt, $time, $zone);
 }
 
 sub strftime ($\@;$)
@@ -51,7 +55,7 @@ Date::Format - Date formatting subroutines
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 SYNOPSIS
 
@@ -81,11 +85,13 @@ correspond to the C library routines C<strftime> and C<ctime>.
 
 =over 4
 
-=item time2str(TEMPLATE, TIME [, ZONE])
+=item time2str(TEMPLATE, TIME [, ZONE [, LANGUAGE]])
 
 C<time2str> converts C<TIME> into an ASCII string using the conversion
 specification given in C<TEMPLATE>. C<ZONE> if given specifies the zone
 which the output is required to be in, C<ZONE> defaults to your current zone.
+C<LANGUAGE> if given specifies the language for day and month names
+(e.g. C<'German'>, C<'French'>); defaults to C<'English'>.
 
 =item strftime(TEMPLATE, TIME [, ZONE])
 
@@ -110,13 +116,17 @@ Date::Format - Date formatting subroutines
 
 =head1 MULTI-LANGUAGE SUPPORT
 
-Date::Format is capable of formatting into several languages by creating
-a language specific object and calling methods, see L<Date::Language>
+Date::Format is capable of formatting into several languages. You can
+pass an optional language name directly to C<time2str>:
+
+	time2str("%a %b %e %T %Y\n", time, undef, 'German');
+	time2str("%a %b %e %T %Y\n", time, 'GMT',  'French');
+
+Alternatively, create a language-specific object and call methods on it,
+see L<Date::Language>:
 
 	my $lang = Date::Language->new('German');
 	$lang->time2str("%a %b %e %T %Y\n", time);
-
-I am open to suggestions on this.
 
 =head1 CONVERSION SPECIFICATION
 

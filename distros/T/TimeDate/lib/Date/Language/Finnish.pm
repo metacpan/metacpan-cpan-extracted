@@ -12,7 +12,7 @@ use utf8;
 
 use base 'Date::Language';
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Finnish localization for Date::Format
 use Date::Language ();
 
@@ -58,7 +58,7 @@ Date::Language::Finnish - Finnish localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

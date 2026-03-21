@@ -128,6 +128,7 @@ t/sign.t
 t/sizes.t
 t/snprintf.t
 t/sprintf.t
+t/string_cmp.t
 t/subnormal_doubles.t
 t/sum.t
 t/test1.t
@@ -143,6 +144,7 @@ t/underflow.t
 t/unpack_floats.t
 t/use64bitint.t
 t/uselongdouble.t
+t/util.t
 t/view_config.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -147,34 +147,66 @@ subtest 'restore_all(): repeated calls are safe' => sub {
 };
 
 subtest 'mock_return croaks without target' => sub {
-    dies_ok { mock_return undef, 1 } 'undef target croaks';
+	dies_ok { mock_return undef, 1 } 'undef target croaks';
 };
 
 subtest 'mock_exception croaks without message' => sub {
-    dies_ok { mock_exception 'Edge::Target::e' } 'missing message croaks';
+	dies_ok { mock_exception 'Edge::Target::e' } 'missing message croaks';
 };
 
 subtest 'mock_sequence croaks without values' => sub {
-    dies_ok { mock_sequence 'Edge::Target::f' } 'no values croaks';
+	dies_ok { mock_sequence 'Edge::Target::f' } 'no values croaks';
 };
 
 subtest 'mock_once croaks on missing coderef' => sub {
-    dies_ok { mock_once 'Edge::Target::x' => undef }
-        'undef coderef rejected';
+	dies_ok { mock_once 'Edge::Target::x' => undef }
+		'undef coderef rejected';
 };
 
 subtest 'mock_once does not recurse' => sub {
-    {
-        package Edge::Target;
-        sub y { return 'orig' }
-    }
+	{
+		package Edge::Target;
+		sub y { return 'orig' }
+	}
 
-    mock_once 'Edge::Target::y' => sub { 'once' };
+	mock_once 'Edge::Target::y' => sub { 'once' };
 
-    is Edge::Target::y(), 'once', 'first call ok';
-    is Edge::Target::y(), 'orig', 'no recursion after restore';
+	is Edge::Target::y(), 'once', 'first call ok';
+	is Edge::Target::y(), 'orig', 'no recursion after restore';
 
-    restore_all();
+	restore_all();
+};
+
+subtest 'restore on never-mocked method is safe' => sub {
+	{
+		package Edge::Restore;
+		sub d { return 'orig' }
+	}
+
+	lives_ok { restore 'Edge::Restore::d' } 'restore on untouched method is safe';
+	is Edge::Restore::d(), 'orig', 'method unchanged';
+};
+
+subtest 'restore on nonexistent method deletes nothing' => sub {
+	lives_ok { restore 'Edge::Restore::nope' } 'restore on nonexistent method is safe';
+};
+
+subtest 'diagnose_mocks on empty state' => sub {
+	my $diag = diagnose_mocks();
+	is_deeply $diag, {}, 'empty diagnostics';
+};
+
+subtest 'diagnose_mocks survives restore_all' => sub {
+	{
+		package DM::E1;
+		sub d { 1 }
+	}
+
+	mock_return 'DM::E1::d' => 5;
+	restore_all();
+
+	my $diag = diagnose_mocks();
+	is_deeply $diag, {}, 'diagnostics cleared after restore_all';
 };
 
 done_testing();

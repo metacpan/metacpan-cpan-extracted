@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2026 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS::Config).
@@ -231,6 +231,9 @@ sub _massage_config
     for my $attr (qw(ERR_FILE GPG_HOMEDIR LOG_FILE NODE_TBL NODE_TBL_LCK
                      PGP_HOMEDIR ECS_TO_DIR ECS_FROM_DIR))
     {
+        # don't prepend to special LOG_FILE value __STDOUT__
+        next if $attr eq 'LOG_FILE' and $this->{$attr} eq '__STDOUT__';
+
         $this->{$attr} = catfile($this->{ECS_DAT_DIR}, $this->{$attr})
             if exists($this->{$attr})
                 and not ($this->{$attr} eq '')
@@ -1105,7 +1108,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2026 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

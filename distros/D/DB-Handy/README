@@ -107,10 +107,12 @@ LIMITATIONS
   - No transaction support (AutoCommit always on)
   - No query optimizer or planner
   - Limited concurrency support; not suitable for high-write workloads
-  - Column order in array fetches is alphabetical, not declaration order
+  - Column order in SELECT * and JOIN results is alphabetical; named SELECT lists preserve declaration order
   - VARCHAR is always stored as 255 bytes on disk regardless of declared size
-  - Single-column indexes only; range scans always perform a full table scan
-  - No FOREIGN KEY, VIEW, WINDOW functions, INTERSECT, EXCEPT, or BLOB/CLOB
+  - Single-column indexes only; NOT IN always performs a full table scan
+  - col IN (v1, v2, ...) and pure OR expressions on indexed columns use index lookups
+  - INSERT...SELECT maps columns by position, not by name
+  - No FOREIGN KEY, VIEW, WINDOW functions, or BLOB/CLOB
   - No strict SQL compliance
 
 AUTHOR

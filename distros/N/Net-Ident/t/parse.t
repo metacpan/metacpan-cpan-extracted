@@ -2,6 +2,7 @@
 # These tests exercise the RFC1413/931 protocol parser without
 # needing a running identd or any network access.
 
+use 5.010;
 use strict;
 use warnings;
 use Test::More;

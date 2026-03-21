@@ -5,6 +5,12 @@ use warnings;
 use Carp;
 use Scalar::Util qw(blessed);
 
+my $INJECTION_GUARD = qr/
+    \;
+      |
+    ^ \s* go \s
+/xmi;
+
 my %VALID_OPS = map { $_ => 1 }
   '=', '!=', '<>', '<', '>', '<=', '>=',
   'LIKE', 'NOT LIKE', 'ILIKE', 'NOT ILIKE',
@@ -13,6 +19,99 @@ my %VALID_OPS = map { $_ => 1 }
 sub new {
   my ($class, %args) = @_;
   bless \%args, $class;
+}
+
+# Combined reserved words (PostgreSQL + MySQL + ANSI SQL)
+my %RESERVED = map { $_ => 1 } qw(
+  ACCESSIBLE ADD ALL ALTER ANALYZE AND ANY ARRAY AS ASC ASENSITIVE ASYMMETRIC
+  BEFORE BETWEEN BIGINT BINARY BLOB BOTH BY
+  CALL CASCADE CASE CAST CHANGE CHAR CHARACTER CHECK COLLATE COLUMN CONCURRENTLY
+  CONDITION CONSTRAINT CONTINUE CONVERT CREATE CROSS CUBE CUME_DIST CURRENT_DATE
+  CURRENT_TIME CURRENT_TIMESTAMP CURRENT_USER CURSOR
+  DATABASE DATABASES DAY_HOUR DAY_MICROSECOND DAY_MINUTE DAY_SECOND DEC DECIMAL
+  DECLARE DEFAULT DEFERRABLE DELAYED DELETE DENSE_RANK DESC DESCRIBE DETERMINISTIC
+  DISTINCT DISTINCTROW DIV DO DOUBLE DROP DUAL
+  EACH ELSE ELSEIF EMPTY ENCLOSED END ESCAPED EXCEPT EXISTS EXIT EXPLAIN
+  FALSE FETCH FIRST_VALUE FLOAT FLOAT4 FLOAT8 FOR FORCE FOREIGN FREEZE FROM
+  FULL FULLTEXT FUNCTION
+  GENERATED GET GRANT GROUP GROUPING GROUPS
+  HAVING HIGH_PRIORITY HOUR_MICROSECOND HOUR_MINUTE HOUR_SECOND
+  IF IGNORE IN INDEX INFILE INITIALLY INNER INOUT INSENSITIVE INSERT INT INT1
+  INT2 INT3 INT4 INT8 INTEGER INTERSECT INTERVAL INTO IO_AFTER_GTIDS
+  IO_BEFORE_GTIDS IS ISNULL ITERATE
+  JOIN JSON_TABLE
+  KEY KEYS KILL
+  LAG LAST_VALUE LATERAL LEAD LEADING LEAVE LEFT LIKE LIMIT LINEAR LINES LOAD
+  LOCALTIME LOCALTIMESTAMP LOCK LONG LONGBLOB LONGTEXT LOOP LOW_PRIORITY
+  MASTER_BIND MASTER_SSL_VERIFY_SERVER_CERT MATCH MAXVALUE MEDIUMBLOB MEDIUMINT
+  MEDIUMTEXT MIDDLEINT MOD MODIFIES
+  NATURAL NOT NOTNULL NO_WRITE_TO_BINLOG NTH_VALUE NTILE NULL NUMERIC
+  OF ON ONLY OPTIMIZE OPTIMIZER_COSTS OPTION OPTIONALLY OR ORDER OUT OUTER
+  OUTFILE OVER OVERLAPS
+  PARTITION PRECISION PRIMARY PROCEDURE PURGE
+  RANGE READ READS READ_WRITE REAL RECURSIVE REFERENCES REGEXP RELEASE RENAME
+  REPEAT REPLACE REQUIRE RESIGNAL RESTRICT RETURN REVOKE RIGHT RLIKE ROW ROWS
+  ROW_NUMBER
+  SCHEMA SCHEMAS SELECT SENSITIVE SEPARATOR SET SHOW SIGNAL SIMILAR SOME SPATIAL
+  SPECIFIC SQL SQLEXCEPTION SQLSTATE SQLWARNING SQL_BIG_RESULT SQL_CALC_FOUND_ROWS
+  SQL_SMALL_RESULT SSL STARTING STORED STRAIGHT_JOIN SYMMETRIC SYSTEM
+  TABLE TABLESAMPLE TERMINATED THEN TINYBLOB TINYINT TINYTEXT TO TRAILING
+  TRIGGER TRUE
+  UNDO UNION UNIQUE UNLOCK UNSIGNED UPDATE USAGE USE USING UTC_DATE UTC_TIME
+  UTC_TIMESTAMP
+  VALUES VARBINARY VARCHAR VARCHARACTER VARIADIC VARYING VERBOSE VIRTUAL
+  WHEN WHERE WHILE WINDOW WITH WRITE
+  XOR YEAR_MONTH ZEROFILL
+);
+
+sub _needs_quoting {
+  my ($self, $part) = @_;
+  return 0 if $part eq '*';
+  return 1 if $RESERVED{uc $part};
+  return 1 if $part =~ /[A-Z]/;
+  return 1 if $part =~ /[^a-z0-9_]/;
+  return 0;
+}
+
+sub _quote_ident {
+  my ($self, $name) = @_;
+  my $q = ($self->{dialect} || 'ansi') eq 'mysql' ? '`' : '"';
+  return join('.', map {
+    $_ eq '*' ? $_ : $q . (s/\Q$q\E/$q$q/gr) . $q
+  } split /\./, $name, -1);
+}
+
+sub _quote_ident_if_needed {
+  my ($self, $name) = @_;
+  my @parts = split /\./, $name, -1;
+  return $name unless grep { $self->_needs_quoting($_) } @parts;
+  return $self->_quote_ident($name);
+}
+
+sub _injection_guard {
+  my ($self, $string) = @_;
+  if ($string =~ $INJECTION_GUARD) {
+    confess "Possible SQL injection attempt '$string'. "
+      . "If this is indeed a part of the desired SQL, use raw()";
+  }
+}
+
+sub _assert_column {
+  my ($self, $col) = @_;
+  confess "Invalid column name '$col'"
+    unless $col =~ /^(\w+\.)*(\w+|\*)$/;
+}
+
+sub _assert_order_column {
+  my ($self, $col) = @_;
+  confess "Invalid order_by column '$col'"
+    unless $col =~ /^(\w+\.)*\w+$/;
+}
+
+sub _assert_integer {
+  my ($self, $name, $value) = @_;
+  confess "$name must be an integer, got '$value'"
+    unless $value =~ /^\d+$/;
 }
 
 # Main dispatch
@@ -52,7 +151,8 @@ sub _render_expr {
     return $self->render($thing);
   }
   # Plain string = column name
-  return ($thing, ());
+  $self->_injection_guard($thing);
+  return ($self->_quote_ident_if_needed($thing), ());
 }
 
 # table|alias => table alias
@@ -61,15 +161,18 @@ sub _expand_table {
   if (blessed($thing) && $thing->isa('SQL::Wizard::Expr')) {
     return $self->render($thing);
   }
+  confess "Invalid table name '$thing'"
+    unless $thing =~ /^(\w+\.)*\w+(\|\w+)?$/;
   my ($table, $alias) = split /\|/, $thing, 2;
-  return $alias ? ("$table $alias", ()) : ($table, ());
+  my $qt = $self->_quote_ident_if_needed($table);
+  return $alias ? ("$qt " . $self->_quote_ident_if_needed($alias), ()) : ($qt, ());
 }
 
 ## Leaf renderers
 
 sub _render_column {
   my ($self, $node) = @_;
-  return ($node->{name}, ());
+  return ($self->_quote_ident_if_needed($node->{name}), ());
 }
 
 sub _render_value {
@@ -79,6 +182,14 @@ sub _render_value {
 
 sub _render_raw {
   my ($self, $node) = @_;
+
+  # TRUNCATE
+  if ($node->{_truncate}) {
+    my $table = $node->{_truncate};
+    confess "Invalid table name '$table'"
+      unless $table =~ /^(\w+\.)*\w+$/;
+    return ("TRUNCATE TABLE " . $self->_quote_ident_if_needed($table), ());
+  }
 
   # EXISTS / NOT EXISTS
   if ($node->{_subquery}) {
@@ -98,8 +209,11 @@ sub _render_raw {
 
   # CAST
   if ($node->{_cast}) {
+    my $type = $node->{_cast}{type};
+    confess "Invalid CAST type '$type'"
+      unless $type =~ /^\w[\w\s(),]*$/;
     my ($es, @eb) = $self->render($node->{_cast}{expr});
-    return ("CAST($es AS $node->{_cast}{type})", @eb);
+    return ("CAST($es AS $type)", @eb);
   }
 
   # AND / OR
@@ -134,7 +248,7 @@ sub _render_alias {
   if ($node->{expr}->isa('SQL::Wizard::Expr::Select')) {
     $sql = "($sql)";
   }
-  return ("$sql AS $node->{alias}", @bind);
+  return ("$sql AS " . $self->_quote_ident_if_needed($node->{alias}), @bind);
 }
 
 sub _render_order {
@@ -186,7 +300,8 @@ sub _render_select {
     push @col_sqls, $s;
     push @bind, @b;
   }
-  push @parts, "SELECT " . join(', ', @col_sqls);
+  my $select_keyword = $node->{distinct} ? "SELECT DISTINCT" : "SELECT";
+  push @parts, "$select_keyword " . join(', ', @col_sqls);
 
   # FROM
   if ($node->{from}) {
@@ -246,9 +361,10 @@ sub _render_select {
   if ($node->{window}) {
     my @wdefs;
     for my $name (sort keys %{$node->{window}}) {
+      confess "Invalid window name '$name'" unless $name =~ /^\w+$/;
       my $spec = $node->{window}{$name};
       my ($s, @b) = $self->_render_window_spec($spec);
-      push @wdefs, "$name AS ($s)";
+      push @wdefs, $self->_quote_ident_if_needed($name) . " AS ($s)";
       push @bind, @b;
     }
     push @parts, "WINDOW " . join(', ', @wdefs);
@@ -264,8 +380,20 @@ sub _render_select {
         my ($dir, $col) = each %$o;
         $dir = uc($dir);
         $dir =~ s/^-//;
+        $self->_assert_order_column($col) unless ref $col;
         my ($s, @b) = $self->_render_expr($col);
         push @osqls, "$s $dir";
+        push @bind, @b;
+      } elsif (!ref $o && $o =~ /^-(.+)/) {
+        # '-col' shorthand for col DESC
+        $self->_assert_order_column($1);
+        my ($s, @b) = $self->_render_expr($1);
+        push @osqls, "$s DESC";
+        push @bind, @b;
+      } elsif (!ref $o) {
+        $self->_assert_order_column($o);
+        my ($s, @b) = $self->_render_expr($o);
+        push @osqls, $s;
         push @bind, @b;
       } else {
         my ($s, @b) = $self->_render_expr($o);
@@ -277,8 +405,16 @@ sub _render_select {
   }
 
   # LIMIT / OFFSET
-  push @parts, "LIMIT $node->{limit}"   if defined $node->{limit};
-  push @parts, "OFFSET $node->{offset}" if defined $node->{offset};
+  if (defined $node->{limit}) {
+    $self->_assert_integer('-limit', $node->{limit});
+    push @parts, "LIMIT ?";
+    push @bind, $node->{limit};
+  }
+  if (defined $node->{offset}) {
+    $self->_assert_integer('-offset', $node->{offset});
+    push @parts, "OFFSET ?";
+    push @bind, $node->{offset};
+  }
 
   return (join(' ', @parts), @bind);
 }
@@ -301,6 +437,7 @@ sub _render_join {
       push @bind, @ob;
     } else {
       # String ON condition
+      $self->_injection_guard($node->{on});
       $sql .= " ON $node->{on}";
     }
   }
@@ -358,7 +495,8 @@ sub _render_window {
 
   my $spec = $node->{spec};
   if ($spec->{name}) {
-    return ("$expr_sql OVER $spec->{name}", @bind);
+    confess "Invalid window name '$spec->{name}'" unless $spec->{name} =~ /^\w+$/;
+    return ("$expr_sql OVER " . $self->_quote_ident_if_needed($spec->{name}), @bind);
   }
 
   my ($spec_sql, @sb) = $self->_render_window_spec($spec);
@@ -392,8 +530,19 @@ sub _render_window_spec {
         my ($dir, $col) = each %$o;
         $dir = uc($dir);
         $dir =~ s/^-//;
+        $self->_assert_order_column($col) unless ref $col;
         my ($s, @b) = $self->_render_expr($col);
         push @sqls, "$s $dir";
+        push @bind, @b;
+      } elsif (!ref $o && $o =~ /^-(.+)/) {
+        $self->_assert_order_column($1);
+        my ($s, @b) = $self->_render_expr($1);
+        push @sqls, "$s DESC";
+        push @bind, @b;
+      } elsif (!ref $o) {
+        $self->_assert_order_column($o);
+        my ($s, @b) = $self->_render_expr($o);
+        push @sqls, $s;
         push @bind, @b;
       } else {
         my ($s, @b) = $self->_render_expr($o);
@@ -405,6 +554,7 @@ sub _render_window_spec {
   }
 
   if ($spec->{'-frame'}) {
+    $self->_injection_guard($spec->{'-frame'});
     push @parts, $spec->{'-frame'};
   }
 
@@ -432,14 +582,42 @@ sub _render_compound {
     my @items = ref $node->{order_by} eq 'ARRAY' ? @{$node->{order_by}} : ($node->{order_by});
     my @osqls;
     for my $o (@items) {
-      my ($s, @b) = $self->_render_expr($o);
-      push @osqls, $s;
-      push @bind, @b;
+      if (ref $o eq 'HASH') {
+        my ($dir, $col) = each %$o;
+        $dir = uc($dir);
+        $dir =~ s/^-//;
+        $self->_assert_order_column($col) unless ref $col;
+        my ($s, @b) = $self->_render_expr($col);
+        push @osqls, "$s $dir";
+        push @bind, @b;
+      } elsif (!ref $o && $o =~ /^-(.+)/) {
+        $self->_assert_order_column($1);
+        my ($s, @b) = $self->_render_expr($1);
+        push @osqls, "$s DESC";
+        push @bind, @b;
+      } elsif (!ref $o) {
+        $self->_assert_order_column($o);
+        my ($s, @b) = $self->_render_expr($o);
+        push @osqls, $s;
+        push @bind, @b;
+      } else {
+        my ($s, @b) = $self->_render_expr($o);
+        push @osqls, $s;
+        push @bind, @b;
+      }
     }
     push @parts, "ORDER BY " . join(', ', @osqls);
   }
-  push @parts, "LIMIT $node->{limit}"   if defined $node->{limit};
-  push @parts, "OFFSET $node->{offset}" if defined $node->{offset};
+  if (defined $node->{limit}) {
+    $self->_assert_integer('-limit', $node->{limit});
+    push @parts, "LIMIT ?";
+    push @bind, $node->{limit};
+  }
+  if (defined $node->{offset}) {
+    $self->_assert_integer('-offset', $node->{offset});
+    push @parts, "OFFSET ?";
+    push @bind, $node->{offset};
+  }
 
   return (join(' ', @parts), @bind);
 }
@@ -456,17 +634,18 @@ sub _render_cte {
   my @cte_sqls;
   for my $cte (@{$node->{ctes}}) {
     my $name = $cte->{name};
+    $self->_injection_guard($name);
     my $query = $cte->{query};
 
     # Recursive CTE with -initial and -recurse
     if (ref $query eq 'HASH' && $query->{'-initial'}) {
       my ($is, @ib) = $self->render($query->{'-initial'});
       my ($rs, @rb) = $self->render($query->{'-recurse'});
-      push @cte_sqls, "$name AS ($is UNION ALL $rs)";
+      push @cte_sqls, $self->_quote_ident_if_needed($name) . " AS ($is UNION ALL $rs)";
       push @bind, @ib, @rb;
     } else {
       my ($s, @b) = $self->render($query);
-      push @cte_sqls, "$name AS ($s)";
+      push @cte_sqls, $self->_quote_ident_if_needed($name) . " AS ($s)";
       push @bind, @b;
     }
   }
@@ -481,12 +660,14 @@ sub _render_insert {
   my @parts;
   my @bind;
 
-  push @parts, "INSERT INTO $node->{into}";
+  $self->_injection_guard($node->{into});
+  push @parts, "INSERT INTO " . $self->_quote_ident_if_needed($node->{into});
 
   if ($node->{select}) {
     # INSERT ... SELECT
     if ($node->{columns}) {
-      push @parts, "(" . join(', ', @{$node->{columns}}) . ")";
+      $self->_assert_column($_) for @{$node->{columns}};
+      push @parts, "(" . join(', ', map { $self->_quote_ident_if_needed($_) } @{$node->{columns}}) . ")";
     }
     my ($s, @b) = $self->render($node->{select});
     push @parts, $s;
@@ -494,6 +675,7 @@ sub _render_insert {
   } elsif (ref $node->{values} eq 'HASH') {
     # Single row insert from hash
     my @cols = sort keys %{$node->{values}};
+    $self->_assert_column($_) for @cols;
     my @vals;
     for my $col (@cols) {
       my $v = $node->{values}{$col};
@@ -501,11 +683,14 @@ sub _render_insert {
       push @vals, $s;
       push @bind, @b;
     }
-    push @parts, "(" . join(', ', @cols) . ")";
+    push @parts, "(" . join(', ', map { $self->_quote_ident_if_needed($_) } @cols) . ")";
     push @parts, "VALUES (" . join(', ', @vals) . ")";
   } elsif (ref $node->{values} eq 'ARRAY') {
     # Multi-row insert
-    push @parts, "(" . join(', ', @{$node->{columns}}) . ")" if $node->{columns};
+    if ($node->{columns}) {
+      $self->_assert_column($_) for @{$node->{columns}};
+      push @parts, "(" . join(', ', map { $self->_quote_ident_if_needed($_) } @{$node->{columns}}) . ")";
+    }
     my @row_sqls;
     for my $row (@{$node->{values}}) {
       my @vals;
@@ -523,22 +708,26 @@ sub _render_insert {
   if ($node->{on_conflict}) {
     my $oc = $node->{on_conflict};
     my $target = $oc->{'-target'};
+    $self->_injection_guard($target);
     my $update = $oc->{'-update'};
     my @set_parts;
     for my $col (sort keys %$update) {
+      $self->_assert_column($col);
       my ($s, @b) = $self->_render_expr($update->{$col});
-      push @set_parts, "$col = $s";
+      push @set_parts, $self->_quote_ident_if_needed($col) . " = $s";
       push @bind, @b;
     }
-    push @parts, "ON CONFLICT ($target) DO UPDATE SET " . join(', ', @set_parts);
+    my $quoted_target = join(', ', map { $self->_quote_ident_if_needed(s/^\s+|\s+$//gr) } split /,/, $target);
+    push @parts, "ON CONFLICT ($quoted_target) DO UPDATE SET " . join(', ', @set_parts);
   }
 
   # ON DUPLICATE KEY (MySQL)
   if ($node->{on_duplicate}) {
     my @set_parts;
     for my $col (sort keys %{$node->{on_duplicate}}) {
+      $self->_assert_column($col);
       my ($s, @b) = $self->_render_expr($node->{on_duplicate}{$col});
-      push @set_parts, "$col = $s";
+      push @set_parts, $self->_quote_ident_if_needed($col) . " = $s";
       push @bind, @b;
     }
     push @parts, "ON DUPLICATE KEY UPDATE " . join(', ', @set_parts);
@@ -546,7 +735,8 @@ sub _render_insert {
 
   # RETURNING
   if ($node->{returning}) {
-    push @parts, "RETURNING " . join(', ', @{$node->{returning}});
+    $self->_assert_column($_) for @{$node->{returning}};
+    push @parts, "RETURNING " . join(', ', map { $self->_quote_ident_if_needed($_) } @{$node->{returning}});
   }
 
   return (join(' ', @parts), @bind);
@@ -583,8 +773,9 @@ sub _render_update {
   # SET
   my @set_parts;
   for my $col (sort keys %{$node->{set}}) {
+    $self->_assert_column($col);
     my ($s, @b) = $self->_render_expr($node->{set}{$col});
-    push @set_parts, "$col = $s";
+    push @set_parts, $self->_quote_ident_if_needed($col) . " = $s";
     push @bind, @b;
   }
   push @parts, "SET " . join(', ', @set_parts);
@@ -611,11 +802,16 @@ sub _render_update {
   }
 
   # LIMIT (MySQL UPDATE ... LIMIT n)
-  push @parts, "LIMIT $node->{limit}" if defined $node->{limit};
+  if (defined $node->{limit}) {
+    $self->_assert_integer('-limit', $node->{limit});
+    push @parts, "LIMIT ?";
+    push @bind, $node->{limit};
+  }
 
   # RETURNING
   if ($node->{returning}) {
-    push @parts, "RETURNING " . join(', ', @{$node->{returning}});
+    $self->_assert_column($_) for @{$node->{returning}};
+    push @parts, "RETURNING " . join(', ', map { $self->_quote_ident_if_needed($_) } @{$node->{returning}});
   }
 
   return (join(' ', @parts), @bind);
@@ -628,11 +824,13 @@ sub _render_delete {
   my @parts;
   my @bind;
 
-  push @parts, "DELETE FROM $node->{from}";
+  $self->_injection_guard($node->{from});
+  push @parts, "DELETE FROM " . $self->_quote_ident_if_needed($node->{from});
 
   # USING (PostgreSQL)
   if ($node->{using}) {
-    push @parts, "USING $node->{using}";
+    $self->_injection_guard($node->{using});
+    push @parts, "USING " . $self->_quote_ident_if_needed($node->{using});
   }
 
   # WHERE
@@ -646,7 +844,8 @@ sub _render_delete {
 
   # RETURNING
   if ($node->{returning}) {
-    push @parts, "RETURNING " . join(', ', @{$node->{returning}});
+    $self->_assert_column($_) for @{$node->{returning}};
+    push @parts, "RETURNING " . join(', ', map { $self->_quote_ident_if_needed($_) } @{$node->{returning}});
   }
 
   return (join(' ', @parts), @bind);
@@ -678,32 +877,39 @@ sub _render_where {
         next;
       }
 
+      $self->_injection_guard($key);
+      my $qkey = $self->_quote_ident_if_needed($key);
+
       if (!defined $val) {
-        push @parts, "$key IS NULL";
+        push @parts, "$qkey IS NULL";
       } elsif (blessed($val) && $val->isa('SQL::Wizard::Expr')) {
         my ($vs, @vb) = $self->render($val);
-        push @parts, "$key = $vs";
+        push @parts, "$qkey = $vs";
         push @bind, @vb;
       } elsif (ref $val eq 'HASH') {
-        my ($s, @b) = $self->_render_where_value($key, $val);
+        my ($s, @b) = $self->_render_where_value($qkey, $val);
         push @parts, $s;
         push @bind, @b;
       } elsif (ref $val eq 'ARRAY') {
         # { col => [1,2,3] } => col IN (?,?,?)
-        my @placeholders;
-        for my $v (@$val) {
-          if (blessed($v) && $v->isa('SQL::Wizard::Expr')) {
-            my ($s, @b) = $self->render($v);
-            push @placeholders, $s;
-            push @bind, @b;
-          } else {
-            push @placeholders, '?';
-            push @bind, $v;
+        if (!@$val) {
+          push @parts, '1 = 0';
+        } else {
+          my @placeholders;
+          for my $v (@$val) {
+            if (blessed($v) && $v->isa('SQL::Wizard::Expr')) {
+              my ($s, @b) = $self->render($v);
+              push @placeholders, $s;
+              push @bind, @b;
+            } else {
+              push @placeholders, '?';
+              push @bind, $v;
+            }
           }
+          push @parts, "$qkey IN (" . join(', ', @placeholders) . ")";
         }
-        push @parts, "$key IN (" . join(', ', @placeholders) . ")";
       } else {
-        push @parts, "$key = ?";
+        push @parts, "$qkey = ?";
         push @bind, $val;
       }
     }
@@ -716,6 +922,7 @@ sub _render_where {
   }
 
   # Plain string
+  $self->_injection_guard($where);
   return ($where, ());
 }
 
@@ -740,18 +947,29 @@ sub _render_where_value {
           push @parts, "$col ${neg}IN ($s)";
           push @bind, @b;
         } elsif (ref $rhs eq 'ARRAY') {
-          my @ph;
-          for my $v (@$rhs) {
-            if (blessed($v) && $v->isa('SQL::Wizard::Expr')) {
-              my ($s, @b) = $self->render($v);
-              push @ph, $s;
-              push @bind, @b;
-            } else {
-              push @ph, '?';
-              push @bind, $v;
+          if (!@$rhs) {
+            # Empty list: -in => always false, -not_in => always true
+            push @parts, $neg ? '1 = 1' : '1 = 0';
+          } else {
+            my @ph;
+            for my $v (@$rhs) {
+              if (blessed($v) && $v->isa('SQL::Wizard::Expr')) {
+                my ($s, @b) = $self->render($v);
+                push @ph, $s;
+                push @bind, @b;
+              } else {
+                push @ph, '?';
+                push @bind, $v;
+              }
             }
+            push @parts, "$col ${neg}IN (" . join(', ', @ph) . ")";
           }
-          push @parts, "$col ${neg}IN (" . join(', ', @ph) . ")";
+        }
+      } elsif (!defined $rhs) {
+        if ($sql_op eq '!=' || $sql_op eq '<>') {
+          push @parts, "$col IS NOT NULL";
+        } else {
+          push @parts, "$col IS NULL";
         }
       } elsif (blessed($rhs) && $rhs->isa('SQL::Wizard::Expr')) {
         my ($s, @b) = $self->render($rhs);

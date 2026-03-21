@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 42;
+plan tests => 43;
 
 my @module_files = (
     'Date/Format.pm',
@@ -35,6 +35,7 @@ my @module_files = (
     'Date/Language/Norwegian.pm',
     'Date/Language/Occitan.pm',
     'Date/Language/Oromo.pm',
+    'Date/Language/Portuguese.pm',
     'Date/Language/Romanian.pm',
     'Date/Language/Russian.pm',
     'Date/Language/Russian_cp1251.pm',

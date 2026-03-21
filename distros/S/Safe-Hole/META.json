@@ -1,56 +1,60 @@
 {
-   "abstract" : "lib/Safe/Hole.pm",
+   "abstract" : "make a hole to the original main compartment in the Safe compartment",
    "author" : [
-      "Sey Nakajima <nakajima@netstock.co.jp> (Initial version)",
-      "Brian McCauley <nobull@cpan.org> (Maintenance)",
-      "Todd Rinaldo <toddr@cpan.org> (Maintenance)"
+      "Sey Nakajima <nakajima@netstock.co.jp>",
+      "Brian McCauley <nobull@cpan.org>",
+      "Todd Rinaldo <toddr@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Safe-Hole",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::CBuilder" : "0",
-            "Module::Build" : "0.35",
-            "Test::More" : "0.40"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Safe::Hole" : {
-         "file" : "lib/Safe/Hole.pm",
-         "version" : "0.14"
       },
-      "Safe::Hole::User" : {
-         "file" : "lib/Safe/Hole.pm"
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.40"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/Safe-Hole/issues"
+         "web" : "https://github.com/cpan-authors/Safe-Hole/issues"
       },
-      "homepage" : "http://github.com/toddr/Safe-Hole",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://github.com/cpan-authors/Safe-Hole",
       "repository" : {
-         "url" : "git://github.com/toddr/Safe-Hole.git"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/Safe-Hole.git",
+         "web" : "https://github.com/cpan-authors/Safe-Hole"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

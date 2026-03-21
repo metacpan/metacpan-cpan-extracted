@@ -15,13 +15,15 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "TimeDate",
   "LICENSE" => "perl",
   "NAME" => "TimeDate",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Carp" => 0
+  },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "2.34",
+  "VERSION" => "2.35",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,6 +31,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
   "Test::More" => 0

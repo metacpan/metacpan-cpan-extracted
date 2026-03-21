@@ -97,7 +97,7 @@ sub bin_adaptive_snr {
     } @pout;
 
 
-    return wantarray ? %results : \%results;    ## no critic(Community::Wantarray)
+    return wantarray ? %results : \%results;
 }
 
 =pod

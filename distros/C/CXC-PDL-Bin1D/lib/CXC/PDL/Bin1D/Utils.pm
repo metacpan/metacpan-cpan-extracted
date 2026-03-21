@@ -6,7 +6,7 @@ use warnings;
 
 use Exporter 'import';
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 our @EXPORT_OK = qw[ _bitflags _flags ];
 
@@ -38,7 +38,7 @@ CXC::PDL::Bin1D::Utils
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 INTERNALS
 

@@ -12,7 +12,7 @@ use base qw(Date::Language);
 
 our (@DoW, @DoWs, @MoY, @MoYs, @AMPM, @Dsuf, %MoY, %DoW);
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Bulgarian localization for Date::Format
 
 @DoW = qw(неделя понеделник вторник сряда четвъртък петък събота);
@@ -52,7 +52,7 @@ Date::Language::Bulgarian - Bulgarian localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 SYNOPSIS
 

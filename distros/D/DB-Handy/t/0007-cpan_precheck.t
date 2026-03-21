@@ -295,8 +295,26 @@ my $count_H = 3;
 # I: 3 checks
 my $count_I = 3;
 
+# J: consistency checks
+#   J1: PREREQ_PM versions are not accidentally overwritten by VERSION bump (1 per dep)
+#   J2: BUGS AND LIMITATIONS contains no removed-feature entries (1)
+#   J3: # ok N comments in each .t file are unique (1 per .t)
+#   J4: plan count in each .t matches # ok N comment count (1 per .t)
+my @t_files = grep { /\.t$/ && -f "$ROOT/$_" } @manifest_files;
+my $count_J = 1                  # J1 strict-version check
+            + 1                  # J2 BUGS stale entries
+            + scalar(@t_files)   # J3 unique ok comments per .t
+            + scalar(@t_files);  # J4 plan vs ok count per .t
+
+# K: coding style checks (per .pm file)
+#   K1: no comma without following space outside strings/regex (1 per .pm)
+#   K2: \@array should be [ @array ] outside special contexts (1 per .pm)
+#   K3: \%hash should be { %hash } outside special contexts (1 per .pm)
+my $count_K = scalar(@sorted_pm) * 3;
+
 my $total = $count_A + $count_B + $count_C + $count_D
-          + $count_E + $count_F + $count_G + $count_H + $count_I;
+          + $count_E + $count_F + $count_G + $count_H + $count_I
+          + $count_J + $count_K;
 
 plan_tests($total);
 
@@ -648,6 +666,184 @@ ok($i2, "I - Makefile.PL contains NAME and VERSION keys");
 my $i3 = $makefile_text =~ /ina\@cpan\.org/;
 ok($i3, 'I - Makefile.PL AUTHOR contains ina@cpan.org');
 
+######################################################################
+# Category J: Post-release consistency checks
+######################################################################
+
+diag('=== Category J: Consistency ===');
+
+# J1: PREREQ_PM dep versions must not equal the module's own VERSION.
+# A bulk s/OLD/NEW/ VERSION bump can accidentally overwrite version
+# numbers of core-module dependencies (e.g. strict => '1.02' when the
+# module version is 1.02).  We check that no dependency that existed in
+# the original pool has a version equal to the module VERSION.
+{
+    my %core_deps = map { $_ => 1 } qw(
+        strict warnings vars constant POSIX Carp Exporter
+        File::Spec File::Path File::Basename File::Copy FindBin
+        Scalar::Util List::Util Socket Storable Data::Dumper
+        ExtUtils::MakeMaker Test Test::More
+    );
+    # Modules whose required version legitimately happens to share digits
+    # with the distribution version (e.g. Fcntl => '1.03') are excluded.
+    my %version_exempt = map { $_ => 1 } qw(
+        Fcntl File::Path
+    );
+    my $pm_ver = _pm_version("$ROOT/$sorted_pm[0]");
+    my $prereq_text = _slurp("$ROOT/Makefile.PL") || '';
+    my @bad;
+    while ($prereq_text =~ /'([^']+)'\s*=>\s*'([^']+)'/g) {
+        my($dep, $ver) = ($1, $2);
+        push @bad, "$dep => $ver"
+            if $core_deps{$dep} && !$version_exempt{$dep}
+            && defined($pm_ver) && $ver eq $pm_ver;
+    }
+    ok(!@bad,
+       'J - PREREQ_PM: no core dep version equals module VERSION'
+       . (@bad ? " (bad: @bad)" : ''));
+}
+
+# J2: BUGS AND LIMITATIONS must not mention removed features.
+# When a limitation is fixed, its entry should be removed from the POD.
+{
+    my $pm_text = _slurp("$ROOT/$sorted_pm[0]") || '';
+    my($bugs_section) = ($pm_text =~ /=head1 BUGS AND LIMITATIONS(.*?)=head1/s);
+    $bugs_section = '' unless defined $bugs_section;
+    # Patterns that indicate a stale entry for a now-implemented feature
+    my @stale_patterns = (
+        'No INTERSECT or EXCEPT set operations',
+        'Range scans do not use indexes',
+        'CHECK.*evaluated on INSERT only',
+    );
+    my @found;
+    for my $pat (@stale_patterns) {
+        push @found, $pat if $bugs_section =~ /\Q$pat\E/;
+    }
+    ok(!@found,
+       'J - BUGS AND LIMITATIONS: no stale removed-feature entries'
+       . (@found ? " (found: " . join('; ', @found) . ")" : ''));
+}
+
+# J3+J4: For each .t file: (J3) # ok N comment numbers are unique,
+#         (J4) the plan count matches the number of # ok N comments.
+# This catches typos like two tests both labelled '# ok 24'.
+for my $tf (sort @t_files) {
+    my $txt = _slurp("$ROOT/$tf") || '';
+    # Collect  # ok N  comment numbers (handle both '# ok N' and '    # ok N')
+    my @ok_nums;
+    while ($txt =~ /^\s*# ok (\d+)\b/mg) { push @ok_nums, $1+0 }
+    my %seen;
+    my @dups = grep { $seen{$_}++ } @ok_nums;
+    my @uniq_dups = do { my %u; grep { !$u{$_}++ } @dups };
+    ok(!@dups,
+       "J - $tf: # ok N comments are unique"
+       . (@uniq_dups ? " (dup: @uniq_dups)" : ''));
+    # Compare plan count with # ok N comment count
+    my($plan) = ($txt =~ /^print\s+"1\.\.(\d+)/m);
+    if (!defined $plan) {
+        ($plan) = ($txt =~ /^plan_tests\s*\((\d+)\)/m);
+    }
+    if (!defined $plan) {
+        ($plan) = ($txt =~ /^plan_skip\b/m) ? (0) : (undef);
+    }
+    my $ok_count = scalar @ok_nums;
+    # J4: # ok N comments must not EXCEED the plan count (catches duplicate
+    # comment numbers).  Fewer comments than plan is acceptable when some
+    # tests use range comments like '# ok 2-3' or have no comment.
+    if (defined $plan && $plan > 0) {
+        ok($ok_count <= $plan,
+           "J - $tf: # ok comment count($ok_count) does not exceed plan($plan)");
+    }
+    else {
+        ok(1, "J - $tf: no plan line (skip/dynamic)");
+    }
+}
+
+######################################################################
+# Category K: Coding style
+######################################################################
+
+diag('=== Category K: Coding style ===');
+
+for my $pm (sort @sorted_pm) {
+    my $pm_text = _slurp("$ROOT/$pm") || '';
+
+    # Strip POD and __END__ section so we only check code
+    $pm_text =~ s/^=[a-z].*?^=cut\n//mgsi;
+    my $end_pos = index($pm_text, "\n__END__");
+    $pm_text = substr($pm_text, 0, $end_pos) if $end_pos >= 0;
+
+    # K1: No comma without a following space outside string literals,
+    # regex patterns (s/.../.../), and split /.../ delimiters.
+    # Exempt: split /,/ patterns, s/.*(,|...).*/ regex alternations.
+    {
+        my @bad_lines;
+        my $lineno = 0;
+        for my $line (split /\n/, $pm_text) {
+            $lineno++;
+            my $s = $line;
+            $s =~ s/^\s*#.*$//;           # strip comment lines
+            next unless $s =~ /\S/;
+            # Remove string literals
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            # Remove regex / pattern / (s///, m//, split //, qr//)
+            $s =~ s{(?:s|m|qr|split\s*/)[^/]*/[^/]*/[gimsex]*}{}g;
+            $s =~ s{/[^/]+/[gimsex]*}{}g;
+            # Remove inline comment
+            $s =~ s/#.*$//;
+            # Check: comma directly followed by non-space
+            # Note: ," and ,' (comma before string literal) are also violations
+            if ($s =~ /,(?=[^\s\n\)\]}\/])/) {
+                push @bad_lines, $lineno;
+            }
+        }
+        ok(!@bad_lines,
+           "K - $pm: comma followed by space outside strings/regex"
+           . (@bad_lines ? " (lines: @{[@bad_lines[0..(@bad_lines<3?$#bad_lines:2)]]})" : ''));
+    }
+
+    # K2: \@array should be written as [ @array ] when passed as an argument
+    # or assigned.  Exempt: POD and comments, and known intentional uses
+    # (e.g. sub signatures in POD like \@col_defs).
+    {
+        my @bad_lines;
+        my $lineno = 0;
+        for my $line (split /\n/, $pm_text) {
+            $lineno++;
+            next if $line =~ /^\s*#/;   # skip comment lines
+            # \@varname in code (not inside a string -- rough check)
+            if ($line =~ /\\\@\w+/) {
+                push @bad_lines, $lineno;
+            }
+        }
+        ok(!@bad_lines,
+           "K - $pm: use [ \@array ] instead of \\\@array"
+           . (@bad_lines ? " (lines: @{[@bad_lines[0..(@bad_lines<3?$#bad_lines:2)]]})" : ''));
+    }
+
+    # K3: \%hash should be written as { %hash } when passed as an argument
+    # or assigned.  Exempt: known intentional uses where a reference to the
+    # original (not a copy) is required, marked with comments.
+    # Recognised exempt variables: %sch (marked 'don't write { %sch }'),
+    # %outer_row, %opts, %attr (common API parameter names).
+    {
+        my @bad_lines;
+        my $lineno = 0;
+        for my $line (split /\n/, $pm_text) {
+            $lineno++;
+            next if $line =~ /^\s*#/;   # skip comment lines
+            # \%varname in code, excluding exempt names
+            if ($line =~ /\\%(?!sch\b|outer_row\b|opts\b|attr\b)\w+/) {
+                push @bad_lines, $lineno;
+            }
+        }
+        ok(!@bad_lines,
+           "K - $pm: use { \%hash } instead of \\\%hash"
+           . (@bad_lines ? " (lines: @{[@bad_lines[0..(@bad_lines<3?$#bad_lines:2)]]})" : ''));
+    }
+}
+
 __END__
 
 =head1 NAME
@@ -765,6 +961,24 @@ contains at least one indented description line.
 Confirms that C<WriteMakefile()> is called, that C<NAME> and
 C<VERSION> keys are present, and that C<ina@cpan.org> appears in
 the C<AUTHOR> field.
+
+
+=item B<J - Consistency>
+
+Post-release cross-checks: (J1) no C<PREREQ_PM> dependency version
+accidentally equals the module C<VERSION>; (J2) C<BUGS AND LIMITATIONS>
+contains no stale entries for already-implemented features; (J3)
+C<# ok N> comment numbers in each C<.t> file are unique; (J4) the
+plan count matches the C<# ok N> comment count in each C<.t> file.
+
+=item B<K - Coding style>
+
+Checks each C<.pm> for house coding-style rules: (K1) every comma in
+code is followed by at least one space (commas inside string literals
+and regex patterns are exempt); (K2) array references use the
+C<[ @array ]> constructor form rather than C<\@array>; (K3) hash
+references use the C<{ %hash }> constructor form rather than
+C<\%hash> (a small set of intentional exceptions is exempt).
 
 =back
 

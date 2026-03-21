@@ -13,7 +13,7 @@ use base 'Date::Language';
 
 use Date::Language::English ();
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Danish localization for Date::Format
 
 our @MoY  = qw(Januar Februar Marts April Maj Juni
@@ -51,7 +51,7 @@ Date::Language::Danish - Danish localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

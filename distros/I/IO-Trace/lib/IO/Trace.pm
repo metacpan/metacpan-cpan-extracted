@@ -4,14 +4,14 @@ use 5.006000;
 use strict;
 use warnings;
 use base qw(Exporter);
-use Getopt::Long qw(GetOptionsFromArray Configure);
+use Getopt::Long qw(GetOptions Configure);
 use IPC::Open3 qw(open3);
 use IO::Select;
 use IO::Handle;
 use IO::File qw(O_WRONLY O_TRUNC O_CREAT SEEK_CUR);
 
 our @EXPORT = qw(iotrace);
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 # Magic Timer Settings
 our $has_hires = eval { require Time::HiRes; 1 };
@@ -33,6 +33,7 @@ sub iotrace {
     my @args = @_ ? @_ : @ARGV or die usage; # No args is Error
     $self->parse_commandline(@args) or die usage; # Broken args parsing is Error
     $self->{help} and print usage and exit; # Showing --help usage is not Error
+    $self->{version} and print "iotrace -- version $VERSION\n" and exit; # Show version
     $self->{child_died} = 0;
     local $SIG{CHLD} = sub { $self->{child_died} = now; };
     $self->run_trace;
@@ -51,10 +52,10 @@ sub new {
 
 sub parse_commandline {
     my $self = shift;
-    Configure("require_order");
-    Configure("bundling");
-    return GetOptionsFromArray
-        $self->{run} = \@_,
+    Configure(qw[require_order bundling]);
+    local @ARGV = @_;
+    my $ret = GetOptions
+        "V"     => \($self->{version} = 0),
         "o=s"   => \($self->{output_log_file}),
         "v+"    => \($self->{verbose} = 0),
         "x+"    => \($self->{heX_ify} = 0),
@@ -64,6 +65,9 @@ sub parse_commandline {
         "s=i"   => \($self->{size_of_strings}), # Ignored
         "e=s"   => \($self->{events}),  # Ignored
         "help|h"=> \($self->{help}),
+        ;
+    $self->{run} = [@ARGV];
+    return $ret;
 }
 
 sub t {
@@ -147,7 +151,7 @@ sub spawn {
     # open3 can't vivify STDERR from undef for some reason
     my @r = @{ $self->{run} };
     $r[0] = $full if $full;
-    $self->{full} = $full // $r[0];
+    $self->{full} = $full || $r[0];
     # Launch target program
     $self->{pid} = open3 $self->{in}, $self->{out}, $self->{err}, @r or die "$r[0]: fork exec failure: $!\n";
     # Map each handle to its corresponding handle
@@ -200,7 +204,7 @@ sub io_loop {
             $patience_idle;
         my @ready = $self->{sel}->count ? $self->{sel}->can_read($maximum_timeout) : do {select undef,undef,undef, $maximum_timeout; ()};
         foreach my $fh (@ready) {
-            my $fn = fileno($fh) // next;
+            defined(my $fn = fileno $fh) || next;
             my $pr = $self->{proxy}->{$fn} or die "Fileno $fn: Impossible Implementation Crash! $!\n";;
             # Find original fileno (STDIN=0, STDOUT=1, STDERR=2):
             my $real_fileno = $fn < 3 ? $fn : fileno($pr);
@@ -297,6 +301,7 @@ sub finish_child {
         my $sig_name = eval { require Config; %Config::Config and [split / /, $Config::Config{sig_name}]->[$signal] } || $signal;
         $self->log("--- GOT SIG$sig_name ($signal) ---");
     }
+    $self->log("exit_group($child_exit_status) = ?");
     $self->log("+++ exited with $child_exit_status +++");
     $self->{log}->close;
     return $child_exit_status;
@@ -375,7 +380,7 @@ Pull requests welcome.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2025 by Rob Brown
+Copyright (C) 2026 by Rob Brown
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of The Artistic License 2.0.

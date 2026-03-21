@@ -148,4 +148,68 @@ subtest(
     }
 );
 
+subtest(
+    'Scenario 5: Non-existent dir placeholders excluded from contents' => sub {
+        my $dirname = $get_dirname->();
+        my $dir     = Test::MockFile->new_dir($dirname);
+
+        # Create a real file and a non-existent dir placeholder as children
+        my $file         = Test::MockFile->file( "$dirname/real_file", 'content' );
+        my $nonexist_dir = Test::MockFile->dir("$dirname/phantom_dir");
+
+        # The non-existent dir placeholder should NOT appear in contents
+        is(
+            $dir->contents(),
+            [qw< . .. real_file >],
+            "Non-existent dir placeholder excluded from contents()",
+        );
+
+        test_content_with_keywords( $dirname, [qw< . .. real_file >] );
+
+        # Once the dir placeholder becomes real, it should appear
+        my $real_subdir = Test::MockFile->new_dir("$dirname/real_subdir");
+        is(
+            $dir->contents(),
+            [qw< . .. real_file real_subdir >],
+            "Existing subdirectory included in contents()",
+        );
+    }
+);
+
+subtest(
+    'Scenario 6: Non-existent file mock before dir() does not make dir exist' => sub {
+        my $dirname = $get_dirname->();
+
+        # Create a non-existent file mock BEFORE the dir mock
+        my $file = Test::MockFile->file("$dirname/phantom");
+
+        # The dir should not appear to exist — the child is just a placeholder
+        my $dir = Test::MockFile->dir($dirname);
+        ok( !-d $dirname, "dir does not exist when only child is a non-existent file mock" );
+
+        # mkdir still works to bring it into existence
+        ok( mkdir($dirname), "mkdir succeeds on the placeholder dir" );
+        ok( -d $dirname,     "dir exists after mkdir" );
+    }
+);
+
+subtest(
+    'Scenario 7: Existing file before dir() makes dir exist (regression)' => sub {
+        my $dirname = $get_dirname->();
+
+        # Create an existing file mock BEFORE the dir mock
+        my $file = Test::MockFile->file( "$dirname/real", 'content' );
+
+        # dir() should detect the existing child and set has_content
+        my $dir = Test::MockFile->dir($dirname);
+        ok( -d $dirname, "dir exists when child file has content" );
+
+        is(
+            $dir->contents(),
+            [qw< . .. real >],
+            "Correct contents with existing child file",
+        );
+    }
+);
+
 done_testing();

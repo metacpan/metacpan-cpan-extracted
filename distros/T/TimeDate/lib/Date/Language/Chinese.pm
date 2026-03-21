@@ -11,7 +11,7 @@ use Date::Language ();
 
 use base qw(Date::Language);
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Chinese localization for Date::Format
 
 our @DoW = qw(星期日 星期一 星期二 星期三 星期四 星期五 星期六);
@@ -51,7 +51,7 @@ Date::Language::Chinese - Chinese localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

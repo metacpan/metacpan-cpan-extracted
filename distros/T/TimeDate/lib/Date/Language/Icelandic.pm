@@ -13,7 +13,7 @@ use base 'Date::Language';
 
 use Date::Language::English ();
 
-our $VERSION = '2.34'; # VERSION: generated
+our $VERSION = '2.35'; # VERSION: generated
 # ABSTRACT: Icelandic localization for Date::Format
 
 our @MoY  = qw(Janúar Febrúar Mars Apríl Maí Júni
@@ -51,7 +51,7 @@ Date::Language::Icelandic - Icelandic localization for Date::Format
 
 =head1 VERSION
 
-version 2.34
+version 2.35
 
 =head1 AUTHOR
 

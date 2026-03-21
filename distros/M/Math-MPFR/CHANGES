@@ -1,5 +1,14 @@
 Revision history for Perl module Math::MPFR
 
+4.47
+  - Accommodate Math::MPC overloading of Math::MPFR objects
+  - Wrap C's strlen (_strlen), API SvCUR (_SvCUR), API SvCUR_set (_Sv_CUR_set),
+    and API SvLEN (_SvLEN) functions. (These wrappers are documented in the POD,
+    but are not exported.)
+  - Fiddle about with the internals of Rmpfr_fpif_export_mem.
+  - Add Rmpfr_cmp_str() which compares the value of a Math::MPFR object with the
+    value of a string at infinite precision.
+
 4.46
   - Add Rmpfr_fpif_import_mem() and Rmpfr_fpif_export_mem(), new in 4.3.0-dev.
   - Allow atonv() to receive octal arguments - via new function oct2bin.
@@ -66,8 +75,7 @@ Revision history for Perl module Math::MPFR
 
 4.35
   - Add Rmpfr_get_float16, Rmpfr_set_float16 and Rmpfr_buildopt_float16_p.
-    All 3 are
- in mpfr-4.3.0.
+    All 3 are new in mpfr-4.3.0.
   - Overload '%' operator to perform fmod().
   - Accommodate overloading of Math::GMP objects.
   - Alter overloading of left shift and right shift operations to be compatible

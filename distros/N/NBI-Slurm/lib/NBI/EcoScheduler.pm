@@ -215,7 +215,7 @@ NBI::EcoScheduler - Find energy-efficient SLURM job start times
 
 =head1 VERSION
 
-version 0.17.0
+version 0.17.2
 
 =head1 SYNOPSIS
 

@@ -20,8 +20,9 @@ use Tie::Hash;
     my $th = tie %h, 'Tie::StdHash';
     %h = ( a => 1, b => '2', c => 3.1415, d => 4 );
 
-  TODO: {
-        local $TODO = "Perl 5.8 seems to sometimes coerce ints into strings." unless ( $] > '5.009888' || $] < '5.007' );
+  SKIP: {
+        skip "Perl 5.8 sometimes coerces ints into strings (Perl bug, not ours)", 1
+            unless ( $] > '5.009888' || $] < '5.007' );
         is( Dump($th), "--- !!perl/hash:Tie::StdHash\na: 1\nb: 2\nc: '3.1415'\nd: 4\n", "tie object dumps with class tag" );
     }
 

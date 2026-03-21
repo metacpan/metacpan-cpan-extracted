@@ -4,7 +4,7 @@
       "Klaus Rindfrey <klausrin@cpan.org.eu>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -57,7 +57,7 @@
    "provides" : {
       "Git::RemoteURL::Parse" : {
          "file" : "lib/Git/RemoteURL/Parse.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-git-remoteurl-parse.git"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-git-remoteurl-parse/issues"
    },

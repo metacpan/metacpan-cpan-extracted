@@ -1,5 +1,4 @@
 Changes
-docker/centos/Dockerfile
 docker/dist/Dockerfile
 docker/dist/README
 docker/dist/README_GPG
@@ -13,7 +12,6 @@ docker/dist/ecs-EE.tar.gz
 docker/dist/generate_ca_and_certfiles.sh
 docker/dist/gnupg.tar.gz
 docker/greenmail/Dockerfile
-docker/qpid-broker-cpp/Dockerfile
 docker/qpid-broker-python/Dockerfile
 docker/qpid-broker-python/pybroker.conf
 docker/qpid-broker-python/pybroker.py

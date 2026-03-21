@@ -7,38 +7,46 @@ use File::Temp;
 my $tmpdir = File::Temp->newdir(CLEANUP => 1);
 plan skip_all => "tmpdir is not ready" unless -e $tmpdir && -w $tmpdir;
 
-test('class '.'Parse::PMFile::Test', <<'TEST');
+test('undef', 'class '.'Parse::PMFile::Test;');
+
+test('undef', 'class '.'Parse::PMFile::Test { }');
+
+test('undef', 'class '.'Parse::PMFile::Test :isa(Foo);');
+
+test('undef', 'class '.'Parse::PMFile::Test :isa(Foo) { }');
+
+test('0.01', 'class '.'Parse::PMFile::Test', <<'TEST');
 {
   $Parse::PMFile::Test::VERSION = "0.01";
 }
 TEST
 
-test('class '.'Parse::PMFile::Test', <<'TEST');
+test('0.01', 'class '.'Parse::PMFile::Test', <<'TEST');
 {
   $VERSION = "0.01";
 }
 TEST
 
-test('class '.'Parse::PMFile::Test {', <<'TEST');
+test('0.01', 'class '.'Parse::PMFile::Test {', <<'TEST');
   $Parse::PMFile::Test::VERSION = "0.01";
 };
 TEST
 
-test('class '.'Parse::PMFile::Test {', <<'TEST');
+test('0.01', 'class '.'Parse::PMFile::Test {', <<'TEST');
   $VERSION = "0.01";
 };
 TEST
 
-test('class '.'Parse::PMFile::Test 0.01 {', <<'TEST');
+test('0.01', 'class '.'Parse::PMFile::Test 0.01 {', <<'TEST');
 };
 TEST
 
-test('class '.'Parse::PMFile::Test 0.01 :isa(Foo) :does(Bar) {', <<'TEST');
+test('0.01', 'class '.'Parse::PMFile::Test 0.01 :isa(Foo) :does(Bar) {', <<'TEST');
 };
 TEST
 
 sub test {
-  my @lines = @_;
+  my ($version, @lines) = @_;
 
   my $pmfile = "$tmpdir/Test.pm";
 
@@ -52,7 +60,10 @@ sub test {
     my $parser = Parse::PMFile->new;
     my $info = $parser->parse($pmfile);
 
-    is $info->{'Parse::PMFile::Test'}{version} => '0.01';
+    is( $info->{'Parse::PMFile::Test'}{version} => $version )
+        or diag join("\n", @lines);
+    is( $parser->{VERSION} => $version )
+        or diag 'VERSION ' . join("\n", @lines);
     # note explain $info;
   }
 }

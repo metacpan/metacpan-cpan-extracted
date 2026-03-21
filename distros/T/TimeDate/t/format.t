@@ -1,4 +1,4 @@
-use Test::More tests => 202;
+use Test::More tests => 292;
 use Date::Format qw(ctime time2str);
 use Date::Language;
 use utf8;
@@ -78,12 +78,12 @@ German
 %y	99
 %Y	1999
 %%	%
-%a	Die
+%a	Di
 %A	Dienstag
 %b	Sep
 %B	September
 %c	09/07/99 13:02:42
-%C	Die Sep  7 13:02:42 GMT 1999
+%C	Di Sep  7 13:02:42 GMT 1999
 %d	07
 %e	 7
 %D	09/07/99
@@ -125,6 +125,49 @@ German
 %Oq	III
 %OY	MCMXCIX
 %Oy	XCIX
+French
+%y	99
+%Y	1999
+%%	%
+%a	mar
+%A	mardi
+%b	sep
+%B	septembre
+%c	09/07/99 13:02:42
+%C	mar sep  7 13:02:42 GMT 1999
+%d	07
+%e	 7
+%D	09/07/99
+%h	sep
+%H	13
+%I	01
+%j	250
+%k	13
+%l	 1
+%L	9
+%m	09
+%M	02
+%o	 7e
+%p	PM
+%q	3
+%r	01:02:42 PM
+%R	13:02
+%s	936709362
+%S	42
+%T	13:02:42
+%U	36
+%w	2
+%W	36
+%x	09/07/99
+%X	13:02:42
+%y	99
+%Y	1999
+%Z	GMT
+%z	+0000
+915192000 # Fri Jan  1 12:00:00 1999 GMT
+%o	 1er
+%A	vendredi
+936709362 # Tue Sep  7 11:22:42 1999 GMT
 Italian
 %y	99
 %Y	1999
@@ -230,3 +273,55 @@ Bulgarian
 %Oq	III
 %OY	MMX
 %Oy	X
+936709362 # Tue Sep  7 13:02:42 1999 GMT
+Portuguese
+%y	99
+%Y	1999
+%%	%
+%a	ter
+%A	terça-feira
+%b	set
+%B	setembro
+%c	09/07/99 13:02:42
+%C	ter set  7 13:02:42 GMT 1999
+%d	07
+%e	 7
+%D	09/07/99
+%h	set
+%H	13
+%I	01
+%j	250
+%k	13
+%l	 1
+%L	9
+%m	09
+%M	02
+%o	 7º
+%p	PM
+%q	3
+%r	01:02:42 PM
+%R	13:02
+%s	936709362
+%S	42
+%T	13:02:42
+%U	36
+%w	2
+%W	36
+%x	09/07/99
+%X	13:02:42
+%y	99
+%Y	1999
+%Z	GMT
+%z	+0000
+%Od	VII
+%Oe	VII
+%OH	XIII
+%OI	I
+%Oj	CCL
+%Ok	XIII
+%Ol	I
+%Om	IX
+%OM	II
+%Oq	III
+%OY	MCMXCIX
+%Oy	XCIX

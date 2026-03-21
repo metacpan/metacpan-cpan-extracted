@@ -28,14 +28,15 @@ my $meta_merge_supported = eval { ExtUtils::MakeMaker->VERSION(6.46) };
 
 # PREREQ_PM
 my %runtime_requires = (
-                        'strict'        => '0',
-                        'warnings'      => '0',
-                        'constant'      => '0',
-                        'version'       => '0',
-                        'Carp'          => '0',
-                        'Exporter'      => '1.6',
-                        'Test::Builder' => '0',
-                        'Time::Local'   => '0',
+                        'strict'          => '0',
+                        'warnings'        => '0',
+                        'constant'        => '0',
+                        'version'         => '0',
+                        'Carp'            => '0',
+                        'Exporter'        => '1.6',
+                        'Test::Builder'   => '0',
+                        'Test::Exception' => '0.43',
+                        'Time::Local'     => '0',
                        );
 
 # TEST_REQUIRES
@@ -73,7 +74,6 @@ if ($ENV{AUTHOR_TESTING}) {
                             }
           );
 }
-
 
 if ($ENV{RELEASE_TESTING}) {
   print "Release tests enabled (RELEASE_TESTING is TRUE)\n";

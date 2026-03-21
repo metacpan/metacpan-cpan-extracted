@@ -18,7 +18,7 @@ require DynaLoader;
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = qw(
 );
-$VERSION = '0.14';
+$VERSION = '0.15';
 
 bootstrap Safe::Hole $VERSION;
 
@@ -61,6 +61,7 @@ sub call {
     package Safe::Hole::User;    # Package name on a different line to keep it from being indexed
 
     my $inner_call = sub {
+        my $prev_error = $@;
         eval {
             @_ = @args;
             if ($wantarray) {
@@ -71,6 +72,9 @@ sub call {
             }
             $did_not_die = 1;
         };
+        # Restore $@ if the eval succeeded, so that a successful eval
+        # during DESTROY doesn't clobber an in-flight exception (GH#1).
+        $@ = $prev_error if $did_not_die;
     };
 
     Safe::Hole::_hole_call_sv( $self->{STASH}, ${ $self->{OPMASK} || \undef }, $inner_call );
@@ -103,7 +107,7 @@ sub wrap {
     }
     elsif ( $type eq 'CODE' ) {
         $result = sub { $self->call( $ref, @_ ); };
-        if ( $typechar eq '&' ) {
+        if ( defined $typechar && $typechar eq '&' ) {
             *{ $cpt->root() . "::$word" } = $result;
         }
         elsif ($typechar) {
@@ -127,7 +131,7 @@ sub wrap {
           }
           unless defined &{ $wrapclass . '::AUTOLOAD' };
         $result = bless { OBJ => $ref }, $wrapclass;
-        if ( $typechar eq '$' ) {
+        if ( defined $typechar && $typechar eq '$' ) {
             ${ $cpt->varglob($word) } = $result;
         }
         elsif ($typechar) {
