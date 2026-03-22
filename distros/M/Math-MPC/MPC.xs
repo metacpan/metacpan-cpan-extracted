@@ -1510,6 +1510,16 @@ SV * Rmpc_add_fr(pTHX_ mpc_t * a, mpc_t * b, mpfr_t * c, SV * round){
      return newSViv(mpc_add_fr(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
 }
 
+SV * Rmpc_sub_fr(pTHX_ mpc_t * a, mpc_t * b, mpfr_t * c, SV * round){
+     CHECK_ROUNDING_VALUE(round);
+     return newSViv(mpc_sub_fr(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
+}
+
+SV * Rmpc_fr_sub(pTHX_ mpc_t * a, mpfr_t * b, mpc_t * c, SV * round){
+     CHECK_ROUNDING_VALUE(round);
+     return newSViv(mpc_fr_sub(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
+}
+
 SV * Rmpc_sub(pTHX_ mpc_t * a, mpc_t * b, mpc_t * c, SV * round) {
      CHECK_ROUNDING_VALUE(round);
      return newSViv(mpc_sub(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
@@ -1578,6 +1588,11 @@ SV * Rmpc_ui_div(pTHX_ mpc_t * a, SV * b, mpc_t * c, SV * round) {
 SV * Rmpc_div_fr(pTHX_ mpc_t * a, mpc_t * b, mpfr_t * c, SV * round){
      CHECK_ROUNDING_VALUE(round);
      return newSViv(mpc_div_fr(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
+}
+
+SV * Rmpc_fr_div(pTHX_ mpc_t * a, mpfr_t * b, mpc_t * c, SV * round){
+     CHECK_ROUNDING_VALUE(round);
+     return newSViv(mpc_fr_div(*a, *b, *c, (mpc_rnd_t)SvUV(round)));
 }
 
 SV * Rmpc_sqrt(pTHX_ mpc_t * a, mpc_t * b, SV * round) {
@@ -1682,6 +1697,26 @@ SV * Rmpc_cmp_si_si(pTHX_ mpc_t * a, SV * b, SV * c) {
 SV * Rmpc_exp(pTHX_ mpc_t * a, mpc_t * b, SV * round) {
      CHECK_ROUNDING_VALUE(round);
      return newSViv(mpc_exp(*a, *b, (mpc_rnd_t)SvUV(round)));
+}
+
+SV * Rmpc_exp10(pTHX_ mpc_t * a, mpc_t * b, SV * round) {
+#if MPC_VERSION >= 66306
+     CHECK_ROUNDING_VALUE(round);
+     return newSViv(mpc_exp10(*a, *b, (mpc_rnd_t)SvUV(round)));
+#else
+     PERL_UNUSED_ARG3(a, b, round);
+     croak("Rmpc_exp10 function requires mpc version 1.3.2. This is only version %s", MPC_VERSION_STRING);
+#endif
+}
+
+SV * Rmpc_exp2(pTHX_ mpc_t * a, mpc_t * b, SV * round) {
+#if MPC_VERSION >= 66306
+     CHECK_ROUNDING_VALUE(round);
+     return newSViv(mpc_exp2(*a, *b, (mpc_rnd_t)SvUV(round)));
+#else
+     PERL_UNUSED_ARG3(a, b, round);
+     croak("Rmpc_exp2 function requires mpc version 1.3.2. This is only version %s", MPC_VERSION_STRING);
+#endif
 }
 
 SV * Rmpc_log(pTHX_ mpc_t * rop, mpc_t * op, SV * round) {
@@ -1940,8 +1975,13 @@ SV * overload_mul(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(strEQ(h, "Math::MPC")) {
          mpc_mul(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
-         }
        }
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpc_mul_fr(*mpc_t_obj, *a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return obj_ref;
+       }
+     }
 
      croak("Invalid argument supplied to Math::MPC::overload_mul");
 }
@@ -2003,14 +2043,14 @@ SV * overload_add(pTHX_ mpc_t* a, SV * b, SV * third) {
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_add");}
 
 #ifdef _WIN32_BIZARRE_INFNAN
-
-       if(_win32_infnanstring(SvPV_nolen(b)) == 2) {
+       int ret = _win32_infnanstring(SvPV_nolen(b));
+       if(ret == 2) {
          mpfr_init(t);
          mpfr_set_nan(t);
          mpc_set_fr(*mpc_t_obj, t, MPC_RNDNN);
          mpfr_clear(t);
        }
-       else if( _win32_infnanstring(SvPV_nolen(b)) ) {
+       else if( ret ) {
          mpfr_init(t);
          mpfr_set_inf(t, ret);
          mpc_set_fr(*mpc_t_obj, t, MPC_RNDNN);
@@ -2055,8 +2095,13 @@ SV * overload_add(pTHX_ mpc_t* a, SV * b, SV * third) {
        if(strEQ(h, "Math::MPC")) {
          mpc_add(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
-         }
        }
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpc_add_fr(*mpc_t_obj, *a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return obj_ref;
+       }
+     }
 
      croak("Invalid argument supplied to Math::MPC::overload_add");
 }
@@ -2133,14 +2178,14 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_sub");}
 
 #ifdef _WIN32_BIZARRE_INFNAN
-
-       if(_win32_infnanstring(SvPV_nolen(b)) == 2) {
+       int ret = _win32_infnanstring(SvPV_nolen(b));
+       if(ret== 2) {
          mpfr_init(t);
          mpfr_set_nan(t);
          mpc_set_fr(*mpc_t_obj, t, MPC_RNDNN);
          mpfr_clear(t);
        }
-       else if( _win32_infnanstring(SvPV_nolen(b)) ) {
+       else if( ret ) {
          mpfr_init(t);
          mpfr_set_inf(t, ret);
          mpc_set_fr(*mpc_t_obj, t, MPC_RNDNN);
@@ -2187,8 +2232,17 @@ SV * overload_sub(pTHX_ mpc_t * a, SV * b, SV * third) {
        if(strEQ(h, "Math::MPC")) {
          mpc_sub(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
-         }
        }
+
+       if(strEQ(h, "Math::MPFR")) {
+         if(SWITCH_ARGS) {
+           mpc_fr_sub(*mpc_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), *a, DEFAULT_ROUNDING_MODE);
+           return obj_ref;
+         }
+         mpc_sub_fr(*mpc_t_obj, *a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return obj_ref;
+       }
+     }
 
      croak("Invalid argument supplied to Math::MPC::overload_sub function");
 }
@@ -2265,14 +2319,14 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
        NOK_POK_DUALVAR_CHECK , "Math::MPC::overload_div");}
 
 #ifdef _WIN32_BIZARRE_INFNAN
-
-       if(_win32_infnanstring(SvPV_nolen(b)) == 2) {
+       int ret = _win32_infnanstring(SvPV_nolen(b));
+       if(ret == 2) {
          mpfr_init(t);
          mpfr_set_nan(t);
          mpc_set_fr(*mpc_t_obj, t, MPC_RNDNN);
          mpfr_clear(t);
        }
-       else if( _win32_infnanstring(SvPV_nolen(b)) ) {
+       else if( ret ) {
          mpfr_init(t);
          mpfr_set_inf(t, ret);
          mpc_set_fr(*mpc_t_obj, t, MPC_RNDNN);
@@ -2318,6 +2372,15 @@ SV * overload_div(pTHX_ mpc_t * a, SV * b, SV * third) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
        if(strEQ(h, "Math::MPC")) {
          mpc_div(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return obj_ref;
+       }
+
+       if(strEQ(h, "Math::MPFR")) {
+         if(SWITCH_ARGS) {
+           mpc_fr_div(*mpc_t_obj, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), *a, DEFAULT_ROUNDING_MODE);
+           return obj_ref;
+         }
+         mpc_div_fr(*mpc_t_obj, *a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
      }
@@ -2437,8 +2500,14 @@ SV * overload_div_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::MPC")) {
          mpc_div(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return a;
+       }
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpc_div_fr(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
        }
      }
@@ -2556,8 +2625,14 @@ SV * overload_sub_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::MPC")) {
          mpc_sub(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return a;
+       }
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpc_sub_fr(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
        }
      }
@@ -2675,8 +2750,14 @@ SV * overload_add_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::MPC")) {
          mpc_add(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return a;
+       }
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpc_add_fr(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
        }
      }
@@ -2792,8 +2873,14 @@ SV * overload_mul_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::MPC")) {
          mpc_mul(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return a;
+       }
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpc_mul_fr(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
        }
      }
@@ -2932,6 +3019,19 @@ SV * overload_pow(pTHX_ mpc_t * a, SV * b, SV * third) {
          mpc_pow(*mpc_t_obj, *a, *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return obj_ref;
        }
+
+       if(strEQ(h, "Math::MPFR")) {
+         if(SWITCH_ARGS) {
+           /* No mpc_fr_pow() function available */
+           mpc_init2( t, mpfr_get_prec( *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))) ) );
+           mpc_set_fr(t, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), MPC_RNDNN);
+           mpc_pow(*mpc_t_obj, t, *a, DEFAULT_ROUNDING_MODE);
+           mpc_clear(t);
+           return obj_ref;
+         }
+         mpc_pow_fr(*mpc_t_obj, *a, *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return obj_ref;
+       }
      }
 
      croak("Invalid argument supplied to Math::MPC::overload_pow");
@@ -3043,8 +3143,14 @@ SV * overload_pow_eq(pTHX_ SV * a, SV * b, SV * third) {
 
      if(sv_isobject(b)) {
        const char *h = HvNAME(SvSTASH(SvRV(b)));
+
        if(strEQ(h, "Math::MPC")) {
          mpc_pow(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
+         return a;
+       }
+
+       if(strEQ(h, "Math::MPFR")) {
+         mpc_pow_fr(*(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpc_t *, SvIVX(SvRV(a)))), *(INT2PTR(mpfr_t *, SvIVX(SvRV(b)))), DEFAULT_ROUNDING_MODE);
          return a;
        }
      }
@@ -3919,29 +4025,42 @@ SV * _wrap_count(pTHX) {
 /* Beginning mpc-1.0, mpc_mul_2si and mpc_div_2si were added */
 
 SV * Rmpc_mul_2si(pTHX_ mpc_t * a, mpc_t * b, SV * c, SV * round) {
-     CHECK_ROUNDING_VALUE(round);
 #if MPC_VERSION >= 65536 /* not less than version 1.0.0 */
+     CHECK_ROUNDING_VALUE(round);
      return newSViv(mpc_mul_2si(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
 # else
-     croak("mpc_mul_2si not implemented until mpc-1.0. We have version %d", MPC_VERSION);
+     PERL_UNUSED_ARG4(a, b, c, round);
+     croak("mpc_mul_2si not implemented until mpc-1.0. We have version %d", MPC_VERSION_STRING);
 #endif
 }
 
 SV * Rmpc_div_2si(pTHX_ mpc_t * a, mpc_t * b, SV * c, SV * round) {
-     CHECK_ROUNDING_VALUE(round);
 #if MPC_VERSION >= 65536 /* not less than version 1.0.0 */
+     CHECK_ROUNDING_VALUE(round);
      return newSViv(mpc_div_2si(*a, *b, SvUV(c), (mpc_rnd_t)SvUV(round)));
 # else
-     croak("mpc_div_2si not implemented until mpc-1.0. We have version %d", MPC_VERSION);
+     PERL_UNUSED_ARG4(a, b, c, round);
+     croak("mpc_div_2si not implemented until mpc-1.0. We have version %d", MPC_VERSION_STRING);
 #endif
 }
 
 SV * Rmpc_log10(pTHX_ mpc_t * rop, mpc_t *op, SV * round) {
-     CHECK_ROUNDING_VALUE(round);
 #if MPC_VERSION >= 65536 /* not less than version 1.0.0 */
+     CHECK_ROUNDING_VALUE(round);
      return newSViv(mpc_log10(*rop, *op, (mpc_rnd_t)SvUV(round)));
 # else
-     croak("mpc_log10 not implemented until mpc-1.0. We have version %d", MPC_VERSION);
+     PERL_UNUSED_ARG3(rop, op, round);
+     croak("mpc_log10 not implemented until mpc-1.0. We have version %d", MPC_VERSION_STRING);
+#endif
+}
+
+SV * Rmpc_log2(pTHX_ mpc_t * a, mpc_t * b, SV * round) {
+#if MPC_VERSION >= 66306
+     CHECK_ROUNDING_VALUE(round);
+     return newSViv(mpc_log2(*a, *b, (mpc_rnd_t)SvUV(round)));
+#else
+     PERL_UNUSED_ARG3(a, b, round);
+     croak("Rmpc_log2 function requires mpc version 1.3.2. This is only version %s", MPC_VERSION_STRING);
 #endif
 }
 
@@ -4208,7 +4327,7 @@ void
 Rmpc_set_prec (p, prec)
 	mpc_t *	p
 	SV *	prec
-        CODE:
+        PPCODE:
         Rmpc_set_prec(aTHX_ p, prec);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4216,7 +4335,7 @@ void
 Rmpc_set_re_prec (p, prec)
 	mpc_t *	p
 	SV *	prec
-        CODE:
+        PPCODE:
         Rmpc_set_re_prec(aTHX_ p, prec);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4224,7 +4343,7 @@ void
 Rmpc_set_im_prec (p, prec)
 	mpc_t *	p
 	SV *	prec
-        CODE:
+        PPCODE:
         Rmpc_set_im_prec(aTHX_ p, prec);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4238,10 +4357,10 @@ OUTPUT:  RETVAL
 void
 Rmpc_get_prec2 (x)
 	mpc_t *	x
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         Rmpc_get_prec2(aTHX_ x);
-        return; /* assume stack size is correct */
+        return;
 
 SV *
 Rmpc_get_im_prec (x)
@@ -4261,7 +4380,7 @@ void
 RMPC_RE (fr, x)
 	mpfr_t *	fr
 	mpc_t *	x
-        CODE:
+        PPCODE:
         RMPC_RE(fr, x);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4269,7 +4388,7 @@ void
 RMPC_IM (fr, x)
 	mpfr_t *	fr
 	mpc_t *	x
-        CODE:
+        PPCODE:
         RMPC_IM(fr, x);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -4290,28 +4409,28 @@ OUTPUT:  RETVAL
 void
 DESTROY (p)
 	mpc_t *	p
-        CODE:
+        PPCODE:
         DESTROY(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpc_clear (p)
 	mpc_t *	p
-        CODE:
+        PPCODE:
         Rmpc_clear(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpc_clear_mpc (p)
 	mpc_t *	p
-        CODE:
+        PPCODE:
         Rmpc_clear_mpc(p);
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 Rmpc_clear_ptr (p)
 	mpc_t *	p
-        CODE:
+        PPCODE:
         Rmpc_clear_ptr(aTHX_ p);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -5394,6 +5513,26 @@ CODE:
 OUTPUT:  RETVAL
 
 SV *
+Rmpc_sub_fr (a, b, c, round)
+	mpc_t *	a
+	mpc_t *	b
+	mpfr_t *	c
+	SV *	round
+CODE:
+  RETVAL = Rmpc_sub_fr (aTHX_ a, b, c, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpc_fr_sub (a, b, c, round)
+	mpc_t *	a
+	mpfr_t *	b
+	mpc_t *	c
+	SV *	round
+CODE:
+  RETVAL = Rmpc_fr_sub (aTHX_ a, b, c, round);
+OUTPUT:  RETVAL
+
+SV *
 Rmpc_sub (a, b, c, round)
 	mpc_t *	a
 	mpc_t *	b
@@ -5531,6 +5670,16 @@ Rmpc_div_fr (a, b, c, round)
 	SV *	round
 CODE:
   RETVAL = Rmpc_div_fr (aTHX_ a, b, c, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpc_fr_div (a, b, c, round)
+	mpc_t *	a
+	mpfr_t *	b
+	mpc_t *	c
+	SV *	round
+CODE:
+  RETVAL = Rmpc_fr_div (aTHX_ a, b, c, round);
 OUTPUT:  RETVAL
 
 SV *
@@ -5700,6 +5849,24 @@ Rmpc_exp (a, b, round)
 	SV *	round
 CODE:
   RETVAL = Rmpc_exp (aTHX_ a, b, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpc_exp10 (a, b, round)
+	mpc_t *	a
+	mpc_t *	b
+	SV *	round
+CODE:
+  RETVAL = Rmpc_exp10 (aTHX_ a, b, round);
+OUTPUT:  RETVAL
+
+SV *
+Rmpc_exp2 (a, b, round)
+	mpc_t *	a
+	mpc_t *	b
+	SV *	round
+CODE:
+  RETVAL = Rmpc_exp2 (aTHX_ a, b, round);
 OUTPUT:  RETVAL
 
 SV *
@@ -6008,10 +6175,10 @@ overload_copy (p, second, third)
 	mpc_t *	p
 	SV *	second
 	SV *	third
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         overload_copy(aTHX_ p, second, third);
-        return; /* assume stack size is correct */
+        return;
 
 SV *
 overload_abs (p, second, third)
@@ -6064,10 +6231,10 @@ _get_r_string (p, base, n_digits, round)
 	SV *	base
 	SV *	n_digits
 	SV *	round
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         _get_r_string(aTHX_ p, base, n_digits, round);
-        return; /* assume stack size is correct */
+        return;
 
 void
 _get_i_string (p, base, n_digits, round)
@@ -6075,10 +6242,10 @@ _get_i_string (p, base, n_digits, round)
 	SV *	base
 	SV *	n_digits
 	SV *	round
-        CODE:
+        PPCODE:
         PL_markstack_ptr++;
         _get_i_string(aTHX_ p, base, n_digits, round);
-        return; /* assume stack size is correct */
+        return;
 
 SV *
 _itsa (a)
@@ -6247,7 +6414,7 @@ OUTPUT:  RETVAL
 void
 Rmpc_set_nan (a)
 	mpc_t *	a
-        CODE:
+        PPCODE:
         Rmpc_set_nan(a);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6255,7 +6422,7 @@ void
 Rmpc_swap (a, b)
 	mpc_t *	a
 	mpc_t *	b
-        CODE:
+        PPCODE:
         Rmpc_swap(a, b);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6284,7 +6451,7 @@ Rmpc_get_dc (crop, op, round)
 	SV *	crop
 	mpc_t *	op
 	SV *	round
-        CODE:
+        PPCODE:
         Rmpc_get_dc(aTHX_ crop, op, round);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6293,7 +6460,7 @@ Rmpc_get_ldc (crop, op, round)
 	SV *	crop
 	mpc_t *	op
 	SV *	round
-        CODE:
+        PPCODE:
         Rmpc_get_ldc(aTHX_ crop, op, round);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6320,7 +6487,7 @@ Rmpc_get_DC (crop, op, round)
 	SV *	crop
 	mpc_t *	op
 	SV *	round
-        CODE:
+        PPCODE:
         Rmpc_get_DC(aTHX_ crop, op, round);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6329,7 +6496,7 @@ Rmpc_get_LDC (crop, op, round)
 	SV *	crop
 	mpc_t *	op
 	SV *	round
-        CODE:
+        PPCODE:
         Rmpc_get_LDC(aTHX_ crop, op, round);
         XSRETURN_EMPTY; /* return empty stack */
 
@@ -6405,6 +6572,15 @@ CODE:
   RETVAL = Rmpc_log10 (aTHX_ rop, op, round);
 OUTPUT:  RETVAL
 
+SV *
+Rmpc_log2 (a, b, round)
+	mpc_t *	a
+	mpc_t *	b
+	SV *	round
+CODE:
+  RETVAL = Rmpc_log2 (aTHX_ a, b, round);
+OUTPUT:  RETVAL
+
 int
 Rmpc_cmp_abs (op1, op2)
 	mpc_t *	op1
@@ -6435,14 +6611,14 @@ nok_pokflag ()
 void
 clear_nok_pok ()
 
-        CODE:
+        PPCODE:
         clear_nok_pok();
         XSRETURN_EMPTY; /* return empty stack */
 
 void
 set_nok_pok (x)
 	int	x
-        CODE:
+        PPCODE:
         set_nok_pok(x);
         XSRETURN_EMPTY; /* return empty stack */
 

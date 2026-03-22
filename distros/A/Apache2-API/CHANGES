@@ -1,5 +1,9 @@
 Revision history for Perl module Apache2::API
 
+v0.5.2 2026-03-22T03:03:45+0900
+    - Upddated method reply to ebsyre status code is JSON encoded as an integer, and not as a string.
+    - Updated status_to_type() in Apache2::API::Status
+
 v0.5.1 2026-03-19T18:11:03+0900
     - Updating Apache2::API::Request to improve acceptance of application/*+json content types
 

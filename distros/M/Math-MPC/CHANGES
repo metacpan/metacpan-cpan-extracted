@@ -1,3 +1,10 @@
+1.40
+ - Accommodate arithmetic overloading of Math::MPFR objects.
+ - Jump straight to version 1.40 now that mpc-1.4.0 is out.
+ - Add new test file (t/new_in_1.3.0_alt.t).
+ - Add new functions Rmpc_exp10, Rmpc_exp2, Rmpc_log2.
+ - Add Rmpf_sub_fr Rmpc_fr_sub Rmpc_fr_div (all previously missed).
+
 1.33
  - Silence pointless compiling warnings generated during compilation of the XS files.
  - Rewrite the XS code in MPC.xs to do away with the "MY_CXT" stuff. (PERL_NO_GET_CONTEXT

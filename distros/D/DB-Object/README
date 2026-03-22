@@ -151,7 +151,7 @@ SYNOPSIS
     "JSON" and "JSONB" fields.
 
 VERSION
-        v1.5.0
+        v1.9.0
 
 DESCRIPTION
     DB::Object is a SQL API much alike "DBI", but with the added benefits
@@ -561,6 +561,13 @@ METHODS
   cache_dir
     Sets or gets the directory on the file system used for caching data.
 
+  cache_query
+    Boolean. When set to a true value, this will enable the caching of the
+    query objects.
+
+    You can specify a particular serialiser with the method "serialiser". By
+    default, the serialiser used is Storable::Improved
+
   cache_query_get
         my $sth;
         unless( $sth = $dbh->cache_query_get( 'some_arbitrary_identifier' ) )
@@ -594,9 +601,15 @@ METHODS
     (DB::Object::Statement), and this will cache it.
 
     What this does simply is store the statement object in a global
-    $QUERIES_CACHE hash reference of identifier-statement object pairs.
+    repository "queries_cache" of identifier-statement object pairs. This is
+    managed using Module::Generic::Global
 
     It returns the statement object cached.
+
+  cache_size
+    The maximum number of serialised objects in the cache.
+
+    This defaults to the class global variable $CACHE_SIZE, which is 10
 
   cache_table
     Sets or gets a boolean value whether to cache the table fields object.
@@ -677,8 +690,13 @@ METHODS
     It instantiate a DB::Object::Cache::Tables object to cache database
     tables and return the current object.
 
+  connect_via
+    Sets or gets the perl module used to connect to DBI. Typically, this
+    would be Apache::DBI. By default, this is empty.
+
   constant_queries_cache
-    Returns the global value for $CONSTANT_QUERIES_CACHE
+    Returns the global repository of constant queries. This uses
+    Module::Generic::Global, and is thread-safe.
 
     This is used by "constant_queries_cache_get" and
     "constant_queries_cache_set"
@@ -687,6 +705,9 @@ METHODS
     Provided with some hash reference with properties "pack", "file" and
     "line" that are together used as a key in the cache and this will use an
     existing entry in the cache if available.
+
+  constant_queries_cache_del
+    Removes a constant query cache.
 
   constant_queries_cache_set
     Provided with some hash reference with properties "pack", "file" and
@@ -1363,7 +1384,7 @@ AUTHOR
     Jacques Deguest <jack@deguest.jp>
 
 COPYRIGHT & LICENSE
-    Copyright (c) 2019-2021 DEGUEST Pte. Ltd.
+    Copyright (c) 2019-2025 DEGUEST Pte. Ltd.
 
     You can use, copy, modify and redistribute this package and associated
     files under the same terms as Perl itself.

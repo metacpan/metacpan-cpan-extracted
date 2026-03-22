@@ -7,5 +7,6 @@ MANIFEST
 product-codes.txt
 README
 t/00-load.t
+t/upstrack.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

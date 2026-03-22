@@ -6,7 +6,7 @@ use warnings;
 my $who = "$ENV{REMOTE_USER}\@$ENV{REMOTE_ADDR}";
 my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
 my $log = {};
-my $conf = `git config --list`;
+my $conf = $0 =~ m{(.*)/} ? `$1/configs` : `git config --list`;
 while ($conf =~ s/^log.(\w+)=(.*)$//m) {
     $log->{$1} = $2;
 }
@@ -31,8 +31,8 @@ if (my $file = $log->{logfile}) {
         $log->{rotate} = 10 if !exists $log->{rotate};
         $log->{weekly} = "true" if !$log->{daily} and !$log->{weekly};
         foreach my $bool (qw[compress daily weekly]) {
-            $log->{$bool} //= "false";
-            $log->{$bool} = $log->{$bool}=~/^($|0|f|und|n)/i ? 0 : 1;
+            $log->{$bool} ||= "false";
+            $log->{$bool} = $log->{$bool}=~/^(0|f|und|n)/i ? 0 : 1;
         }
 
         if ($log->{rotate} =~ /^(\d+)$/) {

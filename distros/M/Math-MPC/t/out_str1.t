@@ -9,9 +9,9 @@ my $tests = 2;
 
 # Because of the way I (sisyphus) build this module with MS
 # Visual Studio, XSubs that take a filehandle as an argument
-# do not work. It therefore suits my purposes to be able to
+# may not work. It therefore suits my purposes to be able to
 # avoid calling (and testing) those particular XSubs
-$tests = 1 if $ENV{SISYPHUS_SKIP};
+ $tests = 1 if $ENV{SISYPHUS_SKIP};
 
 print "1..$tests\n";
 

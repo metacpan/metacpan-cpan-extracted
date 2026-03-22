@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (डेटा प्रकार) ]
+  INT          : पूर्णांक (Integer)
+  FLOAT        : दशमलव संख्या (Floating point)
+  VARCHAR(n)   : परिवर्तनशील लंबाई वाली स्ट्रिंग (अधिकतम n बाइट्स)
+  CHAR(n)      : निश्चित लंबाई वाली स्ट्रिंग (हमेशा n बाइट्स)
+
+[ 1. CREATE / DROP (टेबल बनाना और हटाना) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (डेटा जोड़ना) ]
+  -- कॉलम निर्दिष्ट करके डेटा जोड़ें (अनुशंसित)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- कॉलम निर्दिष्ट किए बिना डेटा जोड़ें
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (डेटा खोजना) ]
+  -- सभी डेटा प्राप्त करें
+  SELECT * FROM student;
+  -- शर्त निर्दिष्ट करें (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- डेटा को क्रमबद्ध करें (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- पंक्तियों की संख्या सीमित करें (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (डेटा अपडेट करना) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (डेटा हटाना) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (ऑपरेटर्स) ]
+  तुलना    : =, <>, !=, >, <, >=, <=
+  सीमा     : BETWEEN 70 AND 90
+  सूची     : IN (1, 2, 3) या NOT IN (1, 2, 3)
+  स्ट्रिंग : LIKE 'A%' (A से शुरू), LIKE '%A' (A पर समाप्त)
+  NULL जांच: IS NULL, IS NOT NULL
+  तार्किक  : AND, OR, NOT
+
+[ Aggregate Functions (एग्रीगेट फ़ंक्शंस) ]
+  COUNT(*) : पंक्तियों (rows) की गिनती करें
+  SUM(col) : कुल योग निकालें
+  AVG(col) : औसत निकालें
+  MAX(col) : अधिकतम मान खोजें
+  MIN(col) : न्यूनतम मान खोजें
+  (उदाहरण) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (इंडेक्स के साथ गति बढ़ाएं) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

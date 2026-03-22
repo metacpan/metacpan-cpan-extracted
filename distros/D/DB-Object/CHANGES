@@ -1,5 +1,15 @@
 Revision history for Perl module DB::Object
 
+v1.9.1 2026-03-22T17:52:55+0900
+    - Correcting wrong version number for DB::Object::Placeholder
+
+v1.9.0 2026-03-22T14:36:24+0900
+    - Updates modules DB::Object::Tables and DB::Object::Query to enable object freeze and thaw.
+    - Improved caching of statement objects
+    - Added Exception class DB::Object::Exception
+    - Implemented serialisation version to ensure compatibility
+    - Improved serialisation/deserialisation handling of cached query objects
+
 v1.8.1 2025-08-29T10:54:16+0900
     - Updated method _cache_table in DB::Object
 
@@ -72,7 +82,7 @@ v1.1.1 2024-01-05T10:36:08+0900
     - Correcting number formatting (Gitlab #1)
 
 v1.1.0 2024-01-03T20:15:26+0900
-    - Updated DB::Object::Fields::Field method _op_overload() to create an oversight
+    - Updated DB::Object::Fields::Field method _op_overload() to correct an oversight
     - Improved DB::Object::Query method format_update() to recognise DB::Object::Placeholder
 
 v1.0.0 2023-12-13T12:53:38+0900

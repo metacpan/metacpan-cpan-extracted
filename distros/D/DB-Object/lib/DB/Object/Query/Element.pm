@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query/Element.pm
-## Version v0.2.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2024/03/22
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -17,9 +17,10 @@ BEGIN
     use strict;
     use common::sense;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION );
+    use vars qw( $VERSION $EXCEPTION_CLASS );
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
     use Wanted;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -38,12 +39,40 @@ sub init
     $self->{type}           = undef;
     $self->{value}          = undef;
     $self->{_init_strict_use_sub} = 1;
-    $self->{_init_params_order} = [qw( query_object field placeholder format type value index )];
+    $self->{_init_params_order}   = [qw( query_object field placeholder format type value index )];
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
+    $self->{_fields} = [qw(
+        as_is field format index is_numbered placeholder type value
+    )];
     return( $self );
 }
 
 sub as_is { return( shift->_set_get_boolean( 'as_is', @_ ) ); }
+
+sub attach
+{
+    my $self  = shift( @_ );
+    my $elems = shift( @_ ) ||
+        return( $self->error( "No DB::Object::Query::Elements object was provided." ) );
+    unless( $self->_is_a( $elems => 'DB::Object::Query::Elements' ) )
+    {
+        return( $self->error( "Value provided is not a DB::Object::Query::Elements object." ) );
+    }
+    $self->elements( $elems ) || return( $self->pass_error );
+    $self->debug( $elems->debug );
+    if( my $qo = $elems->query_object )
+    {
+        $self->query_object( $qo ) || return( $self->pass_error );
+        my $tbl   = $qo->table_object;
+        my $field = $self->fo;
+        if( $field && $tbl )
+        {
+            $field->attach( $tbl ) || return( $self->pass_error( $field->error ) );
+        }
+    }
+    return( $self );
+}
 
 sub elements { return( shift->_set_get_object_without_init( 'elements', 'DB::Object::Query::Elements', @_ ) ); }
 
@@ -143,6 +172,73 @@ sub type { return( shift->_set_get_scalar_as_object( { field => 'type', callback
 # The value to bind, if any at all. So could be undef
 sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
+    # process-local state.
+    my @props = @{$self->{_fields}};
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # Before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) < version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref   = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 1;
 # NOTE: POD
 __END__
@@ -175,7 +271,7 @@ DB::Object::Query::Element - Database Object Interface
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -207,6 +303,12 @@ For example:
 In the example above, when C<NOW()> was specified as a scalar reference, it indicates we want the value to be used I<as-is>. This would translate to something like:
 
     UPDATE some_table SET updated = NOW() WHERE user_id = 'b9c01f91-8094-462c-9f49-a0340dc9fcec'
+
+=head2 attach
+
+This takes a L<DB::Object::Query::Elements> object, and attach it to our current object.
+
+This returns the current object upon success, or upon error, it sets an L<error object|DB::Object::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 elements
 

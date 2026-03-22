@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (දත්ත වර්ග) ]
+  INT          : පූර්ණ සංඛ්‍යා (Integer)
+  FLOAT        : දශම සංඛ්‍යා (Floating point)
+  VARCHAR(n)   : විචල්‍ය දිග අක්ෂර වැල් (උපරිම n බයිට්)
+  CHAR(n)      : නියත දිග අක්ෂර වැල් (සෑම විටම n බයිට්)
+
+[ 1. CREATE / DROP (වගු සෑදීම සහ මැකීම) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (දත්ත ඇතුළත් කිරීම) ]
+  -- තීරු සඳහන් කර දත්ත ඇතුළත් කිරීම (නිර්දේශිතයි)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- තීරු සඳහන් නොකර දත්ත ඇතුළත් කිරීම
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (දත්ත සෙවීම) ]
+  -- සියලුම දත්ත ලබා ගැනීම
+  SELECT * FROM student;
+  -- කොන්දේසි සඳහන් කිරීම (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- දත්ත පෙළගැස්වීම (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- පේළි ගණන සීමා කිරීම (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (දත්ත යාවත්කාලීන කිරීම) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (දත්ත මැකීම) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (ක්‍රියාකරුවන්) ]
+  සැසඳීම්  : =, <>, !=, >, <, >=, <=
+  පරාසය    : BETWEEN 70 AND 90
+  ලැයිස්තුව : IN (1, 2, 3) හෝ NOT IN (1, 2, 3)
+  අක්ෂර වැල්: LIKE 'A%' (A අකුරෙන් පටන්ගන්නා), LIKE '%A' (A අකුරෙන් අවසන් වන)
+  NULL පරීක්ෂාව: IS NULL, IS NOT NULL
+  තාර්කික  : AND, OR, NOT
+
+[ Aggregate Functions (සමස්ත ශ්‍රිත) ]
+  COUNT(*) : පේළි ගණන ගණනය කිරීම
+  SUM(col) : එකතුව සෙවීම
+  AVG(col) : සාමාන්‍යය සෙවීම
+  MAX(col) : උපරිම අගය සෙවීම
+  MIN(col) : අවම අගය සෙවීම
+  (උදාහරණ) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (දර්ශක මගින් වේගවත් කිරීම) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

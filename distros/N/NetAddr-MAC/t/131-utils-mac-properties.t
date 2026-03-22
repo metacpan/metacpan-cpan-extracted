@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 304;
+use Test::More tests => 311;
 use Test::Trap;
 
 BEGIN {
@@ -144,14 +144,21 @@ BEGIN {
       0000.0C07.AC3B
     );
 
+    # Only MACs with the fifth octet >= 0xF0 (240) should match HSRPv2
     my @hsrp2eui48macs = qw(
       0000.0C9F.F001
       0000.0C9F.FC12
       0000.0C9F.F1C3
       0000.0C9F.F12A
-      0000.0C9F.FF2A
+      0000.0C9F.F123
       0000.0C9F.FABC
+      0000.0C9F.FF2A
     );
+
+    # Edge cases for the fifth octet (Cisco style)
+    my $hsrp2_below = '0000.0C9F.EF01'; # 0xEF = 239, should NOT match
+    my $hsrp2_at    = '0000.0C9F.F001'; # 0xF0 = 240, should match
+    my $hsrp2_max   = '0000.0C9F.FFFF'; # 0xFF = 255, should match
 
     my @msnlbeui48macs = qw(
       02bf.0C9F.F001
@@ -187,11 +194,16 @@ BEGIN {
     }
 
     for my $mac ( @hsrp2eui48macs) {
-        ok( mac_is_hsrp2($mac), 'hsrp2 correctly identified from ' . $mac);
-        ok( !mac_is_vrrp($mac), 'vrrp  = false from ' . $mac);
-        ok( !mac_is_hsrp($mac), 'hsrp  = false from ' . $mac);
-        ok( !mac_is_msnlb($mac), 'msnlb  = false from ' . $mac);
+      ok( mac_is_hsrp2($mac), 'hsrp2 correctly identified from ' . $mac);
+      ok( !mac_is_vrrp($mac), 'vrrp  = false from ' . $mac);
+      ok( !mac_is_hsrp($mac), 'hsrp  = false from ' . $mac);
+      ok( !mac_is_msnlb($mac), 'msnlb  = false from ' . $mac);
     }
+
+    # Edge case tests for HSRPv2 fifth octet
+    ok( !mac_is_hsrp2($hsrp2_below), 'hsrp2 not identified for 0xEF (should be false): ' . $hsrp2_below );
+    ok( mac_is_hsrp2($hsrp2_at), 'hsrp2 identified for 0xF0 (should be true): ' . $hsrp2_at );
+    ok( mac_is_hsrp2($hsrp2_max), 'hsrp2 identified for 0xFF (should be true): ' . $hsrp2_max );
 
     for my $mac ( @msnlbeui48macs) {
         ok( mac_is_msnlb($mac), 'msnlb correctly identified from ' . $mac);

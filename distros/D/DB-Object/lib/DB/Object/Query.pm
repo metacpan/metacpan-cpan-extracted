@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Query.pm
-## Version v0.7.3
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Query.pm
+## Version v0.9.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/09
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -18,13 +18,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use DB::Object::Query::Clause;
     use DB::Object::Query::Elements;
     use DB::Object::Query::Element;
     use Wanted;
-    our $DEBUG = 0;
-    our $VERSION = 'v0.7.3';
+    our $DEBUG           = 0;
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.9.0';
 };
 
 use strict;
@@ -36,12 +37,13 @@ sub init
     $self->{alias}          = {} unless( CORE::exists( $self->{alias} ) );
     $self->{avoid}          = [] unless( CORE::exists( $self->{avoid} ) );
     $self->{binded}         = [] unless( CORE::exists( $self->{binded} ) );
-    $self->{binded_group}   = [] unless( CORE::exists( $self->{binded_group} ) );
-    $self->{binded_limit}   = [] unless( CORE::exists( $self->{binded_limit} ) );
-    $self->{binded_order}   = [] unless( CORE::exists( $self->{binded_order} ) );
+    # $self->{binded_group}   = [] unless( CORE::exists( $self->{binded_group} ) );
+    # $self->{binded_limit}   = [] unless( CORE::exists( $self->{binded_limit} ) );
+    # $self->{binded_order}   = [] unless( CORE::exists( $self->{binded_order} ) );
     $self->{binded_types}   = [] unless( CORE::exists( $self->{binded_types} ) );
     $self->{binded_values}  = [] unless( CORE::exists( $self->{binded_values} ) );
     $self->{binded_where}   = [] unless( CORE::exists( $self->{binded_where} ) );
+    $self->{dirty}          = 0;
     $self->{elements}       = undef unless( CORE::exists( $self->{elements} ) );
     $self->{enhance}        = 0 unless( CORE::exists( $self->{enhance} ) );
     $self->{from_table}     = [] unless( CORE::exists( $self->{from_table} ) );
@@ -62,11 +64,18 @@ sub init
     $self->{unix_timestamp} = [] unless( CORE::exists( $self->{unix_timestamp} ) );
     $self->{where}          = '' unless( CORE::exists( $self->{where} ) );
     $self->{_init_strict_use_sub} = 1;
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{constant}       = {};
     $self->{query}          = '';
     $self->{query_reset}    = 0;
-    $self->{query_reset_core_keys} = [qw( alias binded binded_group binded_limit binded_order binded_types binded_values binded_where from_unixtime group_by limit local order_by reverse sorted table_alias unix_timestamp where )];
+    $self->{query_reset_core_keys} = [qw(
+        alias binded binded_group binded_limit binded_order binded_types binded_values
+        binded_where dirty from_unixtime group_by having limit local order_by reverse
+        sorted table_alias unix_timestamp where
+        from_table join_fields join_tables left_join prepare_options query_values constant
+        query selected_fields tie_order
+    )];
     $self->{selected_fields} = '';
     $self->{table_object}   = '';
     $self->{tie_order}      = [];
@@ -80,6 +89,40 @@ sub init
 sub alias { return( shift->_set_get_hash( 'alias', @_ ) ); }
 
 sub as_string { return( shift->{query} ); }
+
+sub attach
+{
+    my $self = shift( @_ );
+    my $this = shift( @_ );
+    if( $self->_is_a( $this => 'DB::Object' ) )
+    {
+        my $base_class = $self->base_class;
+        unless( $self->_is_a( $this => $base_class ) )
+        {
+            return( $self->error( "Value provided is not a ${base_class} object." ) );
+        }
+        $self->database_object( $this ) || return( $self->pass_error );
+    }
+    elsif( $self->_is_a( $this => 'DB::Object::Tables' ) )
+    {
+        my $base_class = $self->base_class;
+        unless( $self->_is_a( $this => "${base_class}::Tables" ) )
+        {
+            return( $self->error( "Value provided is not a ${base_class}::Tables object." ) );
+        }
+        $self->table_object( $this ) || return( $self->pass_error );
+    }
+    else
+    {
+        return( $self->error( "No DB::Object or DB::Object::Tables object was provided." ) );
+    }
+    $self->debug( $this->debug );
+    if( my $elems = $self->elements )
+    {
+        $elems->attach( $self );
+    }
+    return( $self );
+}
 
 sub avoid { return( shift->_set_get_array_as_object( 'avoid', @_ ) ); }
 
@@ -158,6 +201,7 @@ sub constant
 }
 
 # sub database_object { return( shift->table_object->database_object ) }
+# NOTE: we cannot simply use the database object of the table, even if it would make sense, because a query object can be instantiated by a database object (see DB::Object->_query_object_create), and when that happens, this method would set the database object of our query object.
 sub database_object { return( shift->_set_get_object_without_init( 'database_object', 'DB::Object', @_ ) ); }
 
 sub delete
@@ -208,10 +252,22 @@ sub delete
     return( $sth );
 }
 
+sub dirty { return( shift->_set_get_boolean( 'dirty', @_ ) ); }
+
 # sub elements { return( shift->_set_get_hash_as_mix_object( 'elements', @_ ) ); }
 sub elements { return( shift->_set_get_object_without_init( 'elements', 'DB::Object::Query::Elements', @_ ) ); }
 
 sub enhance { return( shift->_set_get_boolean( 'enhance', @_ ) ); }
+
+sub error
+{
+    my $self = shift( @_ );
+
+    # Query object is now in an error state and must not be re-used.
+    $self->{dirty} = 1 if( ref( $self ) );
+
+    return( $self->SUPER::error( @_ ) );
+}
 
 # Used in conjonction with constant(), allows internally to know if the query has reached the end of the chain
 # Such as $tbl->select->join( $tbl_object, $conditions )->join( $other_tbl_object, $other_conditions );
@@ -234,26 +290,28 @@ sub format_statement
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
+    my $dbo   = $tbl_o->database_object ||
+        return( $self->error( "No database object is currently set on this table object for table '", $tbl_o->name, "'" ) );
     # Should we use bind statement?
-    my $bind  = $tbl_o->database_object->use_bind;
+    my $bind  = $dbo->use_bind;
     $opts->{data} = $self->{_default} if( !$opts->{data} );
     $opts->{order} = $self->{_fields} if( !$opts->{order} );
     $opts->{table} = $tbl_o->qualified_name if( !$opts->{table} );
     local $_;
-    my $data  = $opts->{data};
-    my $order = $opts->{order};
-    my $table = $opts->{table};
-    my $prefix = $tbl_o->prefix;
-    my $from_unix = {};
-    my $unixtime  = {};
-    my $args = $self->{_args};
-    my $fields = '';
-    my $values = '';
-    my $base_class = $self->base_class;
-    $from_unix = $self->{_from_unix};
-    my $tmp_ref = $self->from_unixtime();
+    my $data        = $opts->{data};
+    my $order       = $opts->{order};
+    my $table       = $opts->{table};
+    my $prefix      = $tbl_o->prefix;
+    my $from_unix   = {};
+    my $unixtime    = {};
+    my $args        = $self->{_args};
+    my $fields      = '';
+    my $values      = '';
+    my $base_class  = $self->base_class;
+    $from_unix      = $self->{_from_unix};
+    my $tmp_ref     = $self->from_unixtime();
     map{ $from_unix->{ $_ }++ } @$tmp_ref;
-    $tmp_ref = $self->unix_timestamp();
+    $tmp_ref        = $self->unix_timestamp();
     map{ $unixtime->{ $_ }++ } @$tmp_ref;
     my @format_fields = ();
     my @format_values = ();
@@ -262,7 +320,7 @@ sub format_statement
     my $db       = $tbl_o->database;
     my $fields_ref = $tbl_o->fields_as_array;
     my $ok_list  = $fields_ref->join( '|' )->scalar;
-    my $tables   = CORE::join( '|', @{$tbl_o->database_object->tables} );
+    my $tables   = CORE::join( '|', @{$dbo->tables} );
     my $struct   = $tbl_o->structure || return( $self->pass_error( $tbl_o->error ) );
     my $query_type = $self->{query_type};
     my @sorted   = ();
@@ -283,7 +341,7 @@ sub format_statement
     # Used for insert or update so that execute can take a hash of key => value pair and we would bind the values in the right order
     # But or that we need to know the order of the fields.
     $self->{sorted} = \@sorted;
-    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $placeholder_re = $dbo->_placeholder_regexp;
     my $elems = $self->new_elements;
 
     foreach( @sorted )
@@ -369,8 +427,8 @@ sub format_statement
 #             }
             elsif( !$bind )
             {
-                # push( @format_values, sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
-                $elem->format( sprintf( "%s", $tbl_o->database_object->quote( $value ) ) );
+                # push( @format_values, sprintf( "%s", $dbo->quote( $value ) ) );
+                $elem->format( sprintf( "%s", $dbo->quote( $value ) ) );
             }
             # We do this before testing for param binding because DBI puts quotes around SET number :-(
             elsif( $value =~ /^\d+$/ && $struct->{ $_ } =~ /\bSET\(/i )
@@ -398,8 +456,8 @@ sub format_statement
             # In last resort, we handle the formatting ourself
             else
             {
-                # push( @format_values, $tbl_o->database_object->quote( $value ) );
-                $elem->format( $tbl_o->database_object->quote( $value ) );
+                # push( @format_values, $dbo->quote( $value ) );
+                $elem->format( $dbo->quote( $value ) );
             }
         }
 
@@ -468,6 +526,8 @@ sub format_update
     return( $self->error( "Must provide key => value pairs. I received an odd number of arguments" ) ) if( @arg && ( scalar( @arg ) % 2 ) );
     my %arg  = ( @arg );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
+    my $dbo   = $tbl_o->database_object ||
+        return( $self->error( "No database object is currently set on this table object for table '", $tbl_o->name, "'" ) );
     $arg{default} ||= $self->{_default};
     if( $arg{data} && !$data )
     {
@@ -485,7 +545,7 @@ sub format_update
     {
         return( $self->error( "No data to update was provided to format update." ) );
     }
-    my $bind   = $tbl_o->database_object->use_bind;
+    my $bind   = $dbo->use_bind;
     my $def    = $arg{default} || $self->{_default};
     my $fields_ref = $tbl_o->fields;
     my $fields_list = CORE::join( '|', keys( %$fields_ref ) );
@@ -498,7 +558,7 @@ sub format_update
     my @types  = ();
     # Get the constant has definition for each table fields
     my $types_const = $tbl_o->types_const;
-    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $placeholder_re = $dbo->_placeholder_regexp;
     # Before we used to call getdefault supplying it our new values and the
     # format_statement() that would take the default supplied values
     # Now, this works differently since we use update() method and supply 
@@ -555,11 +615,11 @@ sub format_update
             {
                 my $this_json = $self->_encode_json( $value );
                 $const = $fo->datatype->constant;
-                $elem->format( sprintf( "$field=%s", $tbl_o->database_object->quote( $this_json, $const ) ) );
+                $elem->format( sprintf( "$field=%s", $dbo->quote( $this_json, $const ) ) );
             }
-            elsif( $tbl_o->database_object->placeholder->has( $self->_is_scalar( $value ) ? $value : \$value ) )
+            elsif( $dbo->placeholder->has( $self->_is_scalar( $value ) ? $value : \$value ) )
             {
-                $tbl_o->database_object->placeholder->replace( $self->_is_scalar( $value ) ? $value : \$value );
+                $dbo->placeholder->replace( $self->_is_scalar( $value ) ? $value : \$value );
                 $elem->placeholder( '?' );
                 $elem->format( "$field = ${value}" );
                 if( $const = $fo->datatype->constant )
@@ -569,11 +629,11 @@ sub format_update
             }
             elsif( $const = $fo->datatype->constant )
             {
-                $elem->format( sprintf( "$field=%s", $tbl_o->database_object->quote( $value, $const ) ) );
+                $elem->format( sprintf( "$field=%s", $dbo->quote( $value, $const ) ) );
             }
             else
             {
-                $elem->format( sprintf( "$field=%s", $tbl_o->database_object->quote( $value ) ) );
+                $elem->format( sprintf( "$field=%s", $dbo->quote( $value ) ) );
             }
         }
         # if this is a SET field type and value is a number, treat it as a number and not as a string
@@ -598,11 +658,11 @@ sub format_update
             my $const;
             if( $const = $fo->datatype->constant )
             {
-                $elem->format( "$field=" . $tbl_o->database_object->quote( $value, $const ) );
+                $elem->format( "$field=" . $dbo->quote( $value, $const ) );
             }
             else
             {
-                $elem->format( "$field=" . $tbl_o->database_object->quote( $value ) );
+                $elem->format( "$field=" . $dbo->quote( $value ) );
             }
         }
         $elems->push( $elem );
@@ -830,15 +890,15 @@ sub getdefault
     }
 
 
-    $self->{_args} = $arg;
-    $self->{_default} = $default;
-    $self->{_fields} = $fields;
-    $self->{_extra} = \@extra;
+    $self->{_args}      = $arg;
+    $self->{_default}   = $default;
+    $self->{_fields}    = $fields;
+    $self->{_extra}     = \@extra;
     $self->{_structure} = $structure;
     $self->{_from_unix} = \%from_unixtime;
-    $self->{_to_unix} = \%to_unixtime;
+    $self->{_to_unix}   = \%to_unixtime;
     $self->{query_type} = $query_type;
-    $self->{bind} = $tbl_o->database_object->use_bind;
+    $self->{bind}       = $tbl_o->database_object->use_bind;
     return( $self );
 }
 
@@ -1093,6 +1153,16 @@ sub new_elements
 
 sub order { return( shift->_group_order( 'order', 'order_by', @_ ) ); }
 
+sub pass_error
+{
+    my $self = shift( @_ );
+
+    # Propagating an error also taints this query object.
+    $self->{dirty} = 1 if( ref( $self ) );
+
+    return( $self->SUPER::pass_error( @_ ) );
+}
+
 sub prepare_options { return( shift->_set_get_hash_as_mix_object( 'prepare_options', @_ ) ); }
 
 sub query { return( shift->_set_get_scalar( 'query', @_ ) ); }
@@ -1300,17 +1370,17 @@ sub select
     my @query = ( "SELECT $fields FROM ${table}${table_alias}" );
     my $prev_fields = $self->selected_fields;
     my $last_sth    = '';
-    my $queries = $self->_cache_queries;
-    # A simple check to avoid to do this test on each query, but rather only on those who deserve it.
-    if( $fields eq $prev_fields && @$queries )
-    {
-        my @last_query = grep
-        {
-            $_->selected_fields ||= '';
-            $_->selected_fields eq $fields 
-        } @$queries;
-        $last_sth = $last_query[ 0 ] || {};
-    }
+#     my $queries = $self->_cache_queries;
+#     # A simple check to avoid to do this test on each query, but rather only on those who deserve it.
+#     if( $fields eq $prev_fields && @$queries )
+#     {
+#         my @last_query = grep
+#         {
+#             $_->selected_fields ||= '';
+#             $_->selected_fields eq $fields 
+#         } @$queries;
+#         $last_sth = $last_query[ 0 ] || {};
+#     }
     # If the selected fields in the last query performed were the same than those ones and
     # that the last query object has the flag 'as_string' set to true, this would mean that
     # user has made a statement as string and is now really executing it
@@ -1352,7 +1422,7 @@ sub select
     # STOP! No need to go further
     if( !defined( $sth ) )
     {
-        return( $self->error( "Error while preparing query to select on table '", $tbl_o->name, "':\n$query", $self->errstr() ) );
+        return( $self->error( "Error while preparing query to select on table '", $tbl_o->name, "':\n$query\n", $tbl_o->error() ) );
     }
     # Routines such as as_string() expect an array on pupose so we do not have to commit the action
     # but rather get the statement string. At the end, we write:
@@ -1364,7 +1434,7 @@ sub select
     if( !defined( wantarray() ) )
     {
         $sth->execute ||
-            return( $self->error( "Error while executing query to select:\n", $self->as_string(), $sth->errstr() ) );
+            return( $self->error( "Error while executing query to select:\n", $self->as_string(), "\n", $sth->errstr() ) );
     }
     return( $sth );
 }
@@ -1449,8 +1519,8 @@ sub update
     }
     $self->query_values( $values );
     $self->_save_bind();
-    my $sth = $tbl_o->_cache_this( $self ) ||
-    return( $self->error( "Error while preparing query to update table '$table':\n$query" ) );
+    my $sth = $tbl_o->_cache_this( $self ) || return( $self->pass_error( $tbl_o->error ) );
+    # return( $self->error( "Error while preparing query to update table '$table':\n$query" ) );
     # $obj->update() to really delete
     # $obj->update->as_string() to ONLY get the formatted statement
     # wantarray() returns the undefined value in void context, which is typical use of a real update command
@@ -1458,7 +1528,7 @@ sub update
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
-        return( $self->error( "Error while executing query to update table '$table':\n$query" ) );
+            return( $self->error( "Error while executing query to update table '$table':\n$query\n", $sth->error ) );
         # $sth->finish();
     }
     # wantarray returns false but not undefined when $obj->update->as_string();
@@ -1475,10 +1545,12 @@ sub _group_order
     # This is used to store the data in $self such as $self->{ $prop } = $clause;
     my $prop  = shift( @_ ) || return( $self->error( "No object data property name was provided for clause type '$type'." ) );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
+    my $dbo   = $tbl_o->database_object ||
+        return( $self->error( "No database object is currently set on this table object for table '", $tbl_o->name, "'" ) );
     my $bind  = $tbl_o->use_bind;
     my $table = $tbl_o->name;
     # $self->{ $prop } = $self->new_clause if( !CORE::length( $self->{ $prop } ) && !ref( $self->{ $prop } ) );
-    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $placeholder_re = $dbo->_placeholder_regexp;
     my $clause;
     if( @_ )
     {
@@ -1487,7 +1559,7 @@ sub _group_order
         my $fields     = join( '|', keys( %$fields_ref ) );
         my $prefix     = $tbl_o->prefix;
         my $db         = $tbl_o->database;
-        my $tables     = CORE::join( '|', @{$tbl_o->database_object->tables} );
+        my $tables     = CORE::join( '|', @{$dbo->tables} );
         my $multi_db   = $tbl_o->prefix_database;
         my $data   = ( @_ == 1 && ( !$self->_is_object( $_[0] ) || $self->_is_array( $_[0] ) ) && !exists( $fields_ref->{ "$_[0]" } ) )
             ? shift( @_ )
@@ -2011,16 +2083,18 @@ sub _value2bind
     my $str    = shift( @_ );
     my $ref    = shift( @_ );
     my $tbl_o  = $self->{table_object} || return( $self->error( "No table object is set." ) );
+    my $dbo    = $tbl_o->database_object ||
+        return( $self->error( "No database object is currently set on this table object for table '", $tbl_o->name, "'" ) );
     my $table  = $tbl_o->name;
     my $bind   = $tbl_o->use_bind;
     my $db     = $tbl_o->database;
     my $prefix = $tbl_o->prefix;
     my $fields_ref = $tbl_o->fields;
     my $fields = CORE::join( '|', keys( %$fields_ref ) );
-    my $tables = CORE::join( '|', @{$tbl_o->database_object->tables} );
+    my $tables = CORE::join( '|', @{$dbo->tables} );
     my $multi_db = $tbl_o->param( 'multi_db' );
     my @binded = ();
-    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $placeholder_re = $dbo->_placeholder_regexp;
     my $elems = $self->new_elements;
     $$str =~ s
     {
@@ -2086,12 +2160,14 @@ sub _where_having
     # This is used to store the data in $self such as $self->{ $prop } = $clause;
     my $prop  = shift( @_ ) || return( $self->error( "No object data property name was provided for clause type '$type'." ) );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
+    my $dbo   = $tbl_o->database_object ||
+        return( $self->error( "No database object is currently set on this table object for table '", $tbl_o->name, "'" ) );
     my $base_class = $tbl_o->base_class;
     my $bind = $tbl_o->use_bind;
     # $self->{ $prop } = $self->new_clause if( !CORE::length( $self->{ $prop } ) || !$self->_is_object( $self->{ $prop } ) );
     # my $where = $self->{ $prop };
     my $where;
-    my $placeholder_re = $tbl_o->database_object->_placeholder_regexp;
+    my $placeholder_re = $dbo->_placeholder_regexp;
     if( @_ )
     {
         my @params = @_;
@@ -2424,7 +2500,7 @@ sub _where_having
                         {
                             $self->messagec( 5, "[process_where_condition] Field {green}${field}{/} is of type 'bytea'" );
                             $cl = $self->new_clause(
-                                value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value, $const ),
+                                value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $dbo->quote( $value, $const ),
                                 type => 'where',
                             );
                             $el = $self->new_element;
@@ -2433,7 +2509,7 @@ sub _where_having
                         {
                             $self->messagec( 5, "[process_where_condition] Creating a new ", ( $i_am_negative ? 'negative ' : '' ), "clause for field {green}${field}{/}" );
                             $cl = $self->new_clause(
-                                value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $tbl_o->database_object->quote( $value ),
+                                value => "$f" . ( $i_am_negative ? '!=' : '=' ) . $dbo->quote( $value ),
                                 generic => $i_am_negative ? "$f != ?" : "$f = ?",
                                 type => 'where',
                             );
@@ -2462,7 +2538,7 @@ sub _where_having
                 # End while @arg loop
                 if( scalar( @list ) )
                 {
-                    $clause = $self->new_clause->merge( $tbl_o->database_object->$agg_op( @list ) );
+                    $clause = $self->new_clause->merge( $dbo->$agg_op( @list ) );
                 }
             }
             elsif( $data )
@@ -2507,8 +2583,132 @@ sub _where_having
     return( $where );
 }
 
-1;
+# NOTE: For CBOR and Sereal
+sub FREEZE
+{
+    my $self = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class = CORE::ref( $self );
+    my $hash  = {};
+    my @keys  = grep{ !/^binded_/ } @{$self->{query_reset_core_keys}};
+    push( @keys, qw( elements table_object ) );
+    foreach my $prop ( @keys )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            # Because we cannot reliably freeze code reference, and we do not usually need to.
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
 
+    # Return an array reference rather than a list so this works with Sereal and CBOR
+    # Before Sereal version 4.023, Sereal did not support multiple values returned
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+    
+        if( version->parse( Sereal::Encoder->VERSION ) < version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+    # But Storable want a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub STORABLE_thaw_post_processing
+{
+    my $obj   = shift( @_ );
+    my @keys  = %$obj;
+    my $class = ref( $obj );
+    my $hash  = {};
+    @$hash{ @keys } = @$obj{ @keys };
+    my $self = bless( $hash => $class );
+    return( $self );
+}
+
+# NOTE: CBOR will call the THAW method with the stored classname as first argument, the constant string CBOR as second argument, and all values returned by FREEZE as remaining arguments.
+# NOTE: Storable calls it with a blessed object it created followed with $cloning and any other arguments initially provided by STORABLE_freeze
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    # Since this class is inherited, we also need to load from which we depend, if necessary.
+    if( $class ne 'DB::Object::Query' )
+    {
+        require DB::Object::Query;
+
+        # If inheritance is still missing (or incomplete) for any reason, repair it explicitly.
+        no strict 'refs';
+
+        my $stash = \%{"${class}\::"};
+        my $isa_ref;
+        # We check if the 'ISA' symbol exists in the stash and its ARRAY slot is defined
+        if( exists( $stash->{ISA} ) &&
+            defined( *{"${class}\::ISA"}{ARRAY} ) )
+        {
+            $isa_ref = *{"${class}\::ISA"}{ARRAY};
+        }
+        else
+        {
+            # # Force creation of @ISA array slot
+            # @{"${class}::ISA"} = ();
+            # $isa_ref = *{"${class}::ISA"}{ARRAY};
+            # But I want it to die, so this can be dealt with, and not swept under the rug.
+            die( "Unable to find the \@ISA value in $class. The package contains the following stashes:\n", $self->Module::Generic::dump( $stash ) );
+        }
+        my $has_qo  = 0;
+
+        foreach my $p ( @$isa_ref )
+        {
+            $has_qo = 1 if( CORE::defined( $p ) && $p eq 'DB::Object::Query' );
+        }
+
+        if( !$has_qo )
+        {
+            # Same as what we can find in modules DB::Object::(Postgres|SQLite|Mysql)::Query
+            @$isa_ref = ( 'DB::Object::Query' );
+        }
+    }
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            # No, this was a bad idea, because the instance property, such as 'where' bears the same name as the method
+            # So, we would be calling the method 'where', but there is no table object or database object...
+            # if( my $ref = $self->can( $_ ) )
+            # {
+            #     $ref->( $self, CORE::delete( $hash->{ $_ } ) );
+            # }
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = CORE::bless( $self => $class );
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    unless( $new->{elements} )
+    {
+        $new->{elements} = $new->new_elements;
+    }
+    CORE::return( $new );
+}
+
+1;
 # NOTE: POD
 __END__
 
@@ -2524,7 +2724,7 @@ DB::Object::Query - Query Object
 
 =head1 VERSION
 
-    v0.7.3
+    v0.9.0
 
 =head1 DESCRIPTION
 
@@ -2539,6 +2739,14 @@ Sets or gets an hash of column name to alias.
 =head2 as_string
 
 Returns the formatted query as a string.
+
+=head2 attach
+
+    $q->attach( $db_object );
+
+Provided with a L<DB::Object>, or one of its inheriting classes, and this will attach that database object to this query object.
+
+It returns the current query object upon success, or upon error, it set an error an returns an empty list in list context, or C<undef> in scalar context.
 
 =head2 avoid
 
@@ -2596,6 +2804,12 @@ If this method is called in void, this will execute the query.
 
 It returns the newly created statement handler as a L<DB::Object::Statement>
 
+=head2 dirty
+
+Defines whether this query object is dirty or not, and this means whether it has suffered from an error, and is in a stalled state, thus unusable. This state is checked by L<DB::Object> when setting or reetting the query object for a table object.
+
+Return the current boolean value.
+
 =head2 elements
 
 Sets or gets an L<DB::Object::Query::Elements> object. This object serves to contain all the elements used in creating SQL queries, keeping track of their order, value, dta types, placeholders used, etc.
@@ -2603,6 +2817,8 @@ Sets or gets an L<DB::Object::Query::Elements> object. This object serves to con
 =head2 enhance
 
 Enable or disable enhancement mode.
+
+=for Pod::Coverage error
 
 =head2 final
 
@@ -2622,13 +2838,13 @@ Accepted parameters are:
 
 =over 4
 
-=item I<data>
+=item C<data>
 
-=item I<order>
+=item C<order>
 
 If not provided, this will use the default column order for this table.
 
-=item I<table>
+=item C<table>
 
 The table name to use, or, if not specified, this will be set to a value set with L<DB::Object::Tables/qualified_name>
 
@@ -2664,9 +2880,9 @@ Provided with a list of parameters either as a key-value pairs, as an hash refer
 
 =over 4
 
-=item I<data>
+=item C<data>
 
-An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the I<data> element of a hash or a reference to a hash provided.
+An array of key-value pairs to be used in the update query. This array can be provided as the prime argument as a reference to an array, an array, or as the C<data> element of a hash or a reference to a hash provided.
 
 Why an array if eventually we build a list of key-value pair? Because the order of the fields may be important, and if the key-value pair list is provided, B<format_update> honors the order in which the fields are provided.
 
@@ -2724,35 +2940,35 @@ Possible parameters are:
 
 =over 4
 
-=item I<arg>
+=item C<arg>
 
 An array reference of data which should be a key-value pairs.
 
-=item I<as>
+=item C<as>
 
 An hash reference of column to alias pairs. Alternatively, if this is not provided, the value set with L</alias> will be used.
 
-=item I<avoid>
+=item C<avoid>
 
 An array reference of column to avoid using. Alternatively, if this is not provided, the value set with L</avoid> will be used.
 
-=item I<from_unixtime>
+=item C<from_unixtime>
 
 An array reference of columns to be converted from unix timestamp to the database timestamp.
 
-=item I<query_type>
+=item C<query_type>
 
 The type of query, such as C<delete>, C<insert>, C<replace>, C<select>, C<update>
 
-=item I<table>
+=item C<table>
 
 The table name.
 
-=item I<time>
+=item C<time>
 
-A unix timestamp. Alternatively, I<unixtime> can be used.
+A unix timestamp. Alternatively, C<unixtime> can be used.
 
-=item I<unix_timestamp>
+=item C<unix_timestamp>
 
 An array reference of columns to be converted into unix timestamp.
 
@@ -2776,7 +2992,7 @@ set the fields alias based on the information provided with the B<alias> method.
 
 =item 4
 
-if a field last_name and first_name exist, it will also create an alias I<name> based on the concatenation of the 2.
+if a field last_name and first_name exist, it will also create an alias C<name> based on the concatenation of the 2.
 
 =item 5
 
@@ -2788,39 +3004,39 @@ It sets the following properties of the current object:
 
 =over 4
 
-=item I<bind>
+=item C<bind>
 
 A boolean value whether the use of placeholder is enabled.
 
-=item I<query_type>
+=item C<query_type>
 
 The type of query, such as C<select>, C<insert>, etc...
 
-=item I<_args>
+=item C<_args>
 
 The arguments provided as an array reference.
 
-=item I<_default>
+=item C<_default>
 
 The default value as an hash reference.
 
-=item I<_extra>
+=item C<_extra>
 
 Extra parameters as an array reference.
 
-=item I<_fields>
+=item C<_fields>
 
 The columns as an hash reference.
 
-=item I<_from_unix>
+=item C<_from_unix>
 
 An hash reference
 
-=item I<_structure>
+=item C<_structure>
 
 The table structure which is an hash reference of column name to definition pairs.
 
-=item I<_to_unix>
+=item C<_to_unix>
 
 An hash reference
 
@@ -2902,6 +3118,8 @@ Instantiate a new L<DB::Object::Query::Elements> object, passing it whatever arg
 Provided with a list of parameter and this will format the C<order> clause by calling L</_group_order>
 
 It returns a new L<DB::Object::Query::Clause> object.
+
+=for Pod::Coverage pass_error
 
 =head2 prepare_options
 

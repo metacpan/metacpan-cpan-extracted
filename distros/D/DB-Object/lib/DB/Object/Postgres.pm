@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v1.4.0
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Postgres.pm
+## Version v1.5.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/07/30
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -21,9 +21,9 @@ BEGIN
     use parent qw( DB::Object );
     use version;
     use vars qw(
-        $VERSION $CACHE_SIZE $CONNECT_VIA 
+        $VERSION 
         $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE
-        $PLACEHOLDER_REGEXP $DATATYPES_DICT
+        $PLACEHOLDER_REGEXP $DATATYPES_DICT $EXCEPTION_CLASS
     );
     use DBI;
     eval
@@ -460,7 +460,8 @@ BEGIN
         },
     };
     our $PLACEHOLDER_REGEXP = qr/(?:\?|\$(?<index>\d+))/;
-    our $VERSION = 'v1.4.0';
+    our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v1.5.0';
 };
 
 use strict;
@@ -469,14 +470,12 @@ use warnings;
 # require DB::Object::Postgres::Tables;
 # require DB::Object::Postgres::Lo;
 our $DEBUG         = 0;
-our $CACHE_SIZE    = 10;
 our $USE_BIND      = 0;
 our $USE_CACHE     = 0;
 our $MOD_PERL      = 0;
 if( $INC{ 'Apache/DBI.pm' } && 
-    substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
+    substr( $ENV{ 'GATEWAY_INTERFACE' } || '', 0, 8 ) eq 'CGI-Perl' )
 {
-    $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
 }
 foreach my $type ( keys( %$DATATYPES_DICT ) )
@@ -553,6 +552,7 @@ foreach my $c ( @$keys )
 sub init
 {
     my $self = shift( @_ );
+    $self->{_exception_class} = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{driver} = 'Pg';
     return( $self );
@@ -698,15 +698,7 @@ sub commit($;$@)
     return( $self->{dbh}->commit( @_ ) );
 }
 
-# Inherited by DB::Object, however, DB::Object::connect() will call our subroutine 
-# _dbi_connect which format in a particular way the dsn.
-sub connect
-{
-    my $that   = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return( $that->pass_error );
-    $param->{driver} = 'Pg';
-    return( $that->SUPER::connect( $param ) );
-}
+# connect(9 is inherited by DB::Object
 
 # sub copy
 
@@ -1552,10 +1544,10 @@ sub _check_connect_param
     my $self  = shift( @_ );
     my $param = $self->SUPER::_check_connect_param( @_ ) || return( $self->pass_error );
     # This is also what the psql command line tool does
-    $param->{login} = ( getpwuid( $> ) )[0] if( !$param->{login} );
+    $param->{login}    = ( getpwuid( $> ) )[0] if( !$param->{login} );
     $param->{database} = 'postgres' if( !$param->{database} );
     # By default
-    $param->{port} = 5432 if( !length( $param->{port} ) );
+    $param->{port}     = 5432 if( !CORE::exists( $param->{port} ) );
     return( $param );
 }
 
@@ -1582,12 +1574,18 @@ sub _connection_options
     return( $opt );
 }
 
+# NOTE: sub _connection_params2hash_driver is not necessary here. We use our parent's one.
+
 # Called by _check_connect_param
 sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database schema server opt uri debug cache_connections cache_table unknown_field )];
+    my $core = [qw(
+        db login passwd host port driver database schema server opt uri debug
+        cache_connections cache_dir cache_query cache_table connect_via unknown_field
+        use_cache
+    )];
     my @pg_params = grep( /^pg_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -1790,7 +1788,7 @@ DB::Object::Postgres - SQL API
 
 =head1 VERSION
 
-    v1.4.0
+    v1.5.0
 
 =head1 DESCRIPTION
 

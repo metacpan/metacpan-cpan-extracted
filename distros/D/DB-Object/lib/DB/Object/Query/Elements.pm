@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query/Elements.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2023/07/08
+## Modified 2026/03/22
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -16,8 +17,9 @@ BEGIN
     use strict;
     use common::sense;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION );
-    our $VERSION = 'v0.1.0';
+    use vars qw( $VERSION $EXCEPTION_CLASS );
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -29,11 +31,37 @@ sub init
     $self->{elements} = [];
     $self->{query_object} = undef;
     $self->{_init_strict_use_sub} = 1;
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
+    $self->{_fields}        = [qw( elements )];
     $self->{_cache_fields}  = '';
     $self->{_cache_formats} = '';
     $self->{_cache_types}   = '';
     $self->{_cache_values}  = '';
+    return( $self );
+}
+
+# We attach this elements collection to its query object
+sub attach
+{
+    my $self = shift( @_ );
+    # Query object
+    my $qo   = shift( @_ ) ||
+        return( $self->error( "No DB::Object::Query object was provided." ) );
+    unless( $self->_is_a( $qo => 'DB::Object::Query' ) )
+    {
+        return( $self->error( "Value provided is not a DB::Object::Query object." ) );
+    }
+    $self->query_object( $qo ) || return( $self->pass_error );
+    $self->debug( $qo->debug );
+    # We propagate ourself to all the elements in the collection.
+    if( my $elems = $self->elements )
+    {
+        foreach my $elem ( @$elems )
+        {
+            $elem->attach( $self );
+        }
+    }
     return( $self );
 }
 
@@ -265,6 +293,73 @@ sub _sort
     return( $self );
 }
 
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
+    # process-local state.
+    my @props = @{$self->{_fields}};
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # Before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) < version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref   = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 1;
 # NOTE: POD
 __END__
@@ -295,7 +390,7 @@ DB::Object::Query::Elements - Query Elements Manipulation Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -312,6 +407,14 @@ Takes an hash or hash reference of key-value pairs matching any of the methods b
 Returns a newly instantiated object upon success, or sets an L<error|Module::Generic/error> and return C<undef> or an empty list, depending on the caller's context.
 
 =head1 METHODS
+
+=head2 attach
+
+This takes a query object, and attach it to our current object.
+
+In turn, it will also attach it to all the elements, this object holds with the L<elements|/elements> method.
+
+This returns the current object upon success, or upon error, it sets an L<error object|DB::Object::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
 =for Pod::Coverage autoload
 

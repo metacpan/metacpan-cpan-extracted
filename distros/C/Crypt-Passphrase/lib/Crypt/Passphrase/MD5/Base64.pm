@@ -1,5 +1,5 @@
 package Crypt::Passphrase::MD5::Base64;
-$Crypt::Passphrase::MD5::Base64::VERSION = '0.021';
+$Crypt::Passphrase::MD5::Base64::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -40,7 +40,7 @@ Crypt::Passphrase::MD5::Base64 - Validate against base64ed MD5 hashes with Crypt
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 

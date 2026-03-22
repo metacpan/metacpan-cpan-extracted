@@ -82,14 +82,14 @@ subtest 'base60 (sexagesimal) integers' => sub {
 
 # ── Float types ─────────────────────────────────────────────────────
 subtest 'decimal floats' => sub {
-    is( load_val('0.0'),   0,    '0.0' );
-    is( load_val('1.5'),   1.5,  '1.5' );
-    is( load_val('-3.14'), -3.14, '-3.14' );
-    is( load_val('+2.5'),  2.5,  '+2.5' );
+    cmp_ok( load_val('0.0'),   '==', 0,    '0.0' );
+    cmp_ok( load_val('1.5'),   '==', 1.5,  '1.5' );
+    cmp_ok( load_val('-3.14'), '==', -3.14, '-3.14' );
+    cmp_ok( load_val('+2.5'),  '==', 2.5,  '+2.5' );
     # Scientific notation (YAML 1.0 requires explicit sign after exponent)
-    is( load_val('1.0e+3'), 1000,   '1.0e+3' );
-    is( load_val('1.0e-2'), 0.01,   '1.0e-2' );
-    is( load_val('1.0E+3'), 1000,   '1.0E+3' );
+    cmp_ok( load_val('1.0e+3'), '==', 1000,   '1.0e+3' );
+    cmp_ok( load_val('1.0e-2'), '==', 0.01,   '1.0e-2' );
+    cmp_ok( load_val('1.0E+3'), '==', 1000,   '1.0E+3' );
     # Without explicit +/- sign, these are strings in YAML 1.0
     is( load_val('1.0e3'),  '1.0e3', '1.0e3 is string (no explicit sign)' );
     is( load_val('1.0E3'),  '1.0E3', '1.0E3 is string (no explicit sign)' );
@@ -115,7 +115,7 @@ subtest 'special float values' => sub {
 };
 
 subtest 'base60 (sexagesimal) floats' => sub {
-    is( load_val('1:30.5'), 90.5, '1:30.5 = 90.5' );
+    cmp_ok( load_val('1:30.5'), '==', 90.5, '1:30.5 = 90.5' );
 };
 
 # ── Strings (not converted) ────────────────────────────────────────

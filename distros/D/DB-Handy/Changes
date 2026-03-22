@@ -1,5 +1,87 @@
 Revision history for DB::Handy
 
+1.06  2026-03-22 JST (Japan Standard Time)
+
+    - Added: doc/ directory with SQL cheat sheets in 21 languages
+      (BM/BN/EN/FR/HI/ID/JA/KM/KO/MN/MY/NE/SI/TH/TL/TR/TW/UR/UZ/VI/ZH)
+      for use as learning materials for international students.
+    - Fix: col NOT IN (v1, NULL, v2) now returns 0 rows, conforming to
+      SQL standard NULL semantics (result is UNKNOWN for every row when
+      the list contains NULL and the value is not found among non-NULL
+      elements).  Previously, NULL values in the list were silently
+      ignored and rows were returned as if NULL were absent.  Fixed in
+      all four evaluation paths: compile_tree, eval_expr (where_sub
+      closure), join_select, and compile_where_from_conds (subquery).
+    - Fix: col NOT IN (SELECT ... FROM empty_table) now correctly
+      returns all rows.  Previously the empty subquery was substituted
+      as (NULL), which after the NULL-semantics fix would have produced
+      0 rows instead of all rows.
+    - Updated: BUGS AND LIMITATIONS and README revised to document the
+      corrected NOT IN NULL behaviour.
+    - Updated: t/1015_new_features.t ok9 now asserts 0 rows for
+      NOT IN with NULL in the value list.
+    - Added: t/0004-perl5compat.t -- dedicated Perl 5.005_03 compatibility
+      checker with 12 tests per .pm file: no 'our', no say/given/state,
+      no my(undef), no defined-or // (with split// exempt), no //=,
+      no yada-yada, no 'when', no \o{}, no wide \x{}, $VERSION
+      self-assignment, warnings stub, CVE-2016-1238 mitigation.
+    - Changed: test file execution order revised so that source-level
+      checks run before functional tests:
+        0001-load.t        (was 0000)
+        0002-pod.t         (was 0005)
+        0003-usascii.t     (was 0006)
+        0004-perl5compat.t (new: detailed 5.005_03 compat, including //)
+        0005-cpan_precheck.t (was 0007)
+        1001-1016          (unchanged)
+    - Fix: corrected three occurrences of the defined-or // operator
+      (Perl 5.10+) introduced in 1.06 that caused compilation failures
+      on Perl 5.005_03 (Windows pmake reported 'Global symbol requires
+      explicit package name' errors).  Replaced with ternary equivalents.
+    - Fix: WINDOW functions (OVER clause) now return type='error' with a
+      clear message instead of silently returning undef column values.
+    - Fix: FOREIGN KEY table-level constraint syntax (FOREIGN KEY (...)
+      REFERENCES ...) is now recognised and silently skipped in CREATE TABLE
+      rather than causing a parse error.
+    - Fix: begin_work, commit, and rollback now return undef with errstr
+      set rather than crashing with 'method not found'.
+    - Fix: AutoCommit attribute now returns 1 (previously undef).
+    - Fix: VARCHAR and CHAR declared sizes are now enforced on INSERT and
+      UPDATE; values longer than the declared size return type='error'.
+      Backward compatible: old schema files without stored declared sizes
+      default to no restriction (treated as VARCHAR(255)).
+    - Added: t/1016_unsupported.t (56 tests) verifying all of the above.
+    - Updated: POD, README, and DIFFERENCES FROM DBI revised to document
+      the exact behaviour of each unsupported feature.
+    - New: col NOT IN (v1, v2, ...) on an indexed column now uses an
+      index complement lookup instead of a full table scan.  The engine
+      resolves the exclusion set via the index and returns all other
+      records.  NOT IN with NULL in the list falls back to a full scan
+      (SQL semantics: the result is UNKNOWN for every row).
+    - New: last_insert_id() now accepts the four DBI positional arguments
+      ($catalog, $schema, $table, $field) and ignores them, making the
+      call signature compatible with DBI.
+    - New: connect() now accepts a dbi:Handy:key=val;... DSN prefix in
+      addition to a plain directory path or bare key=val string.
+    - New: INSERT INTO dst (...) SELECT ... FROM src now maps columns by
+      name when every destination column name exists in the SELECT result
+      row; falls back to positional order when column names differ.
+    - Added: t/1015_new_features.t (68 tests) covering all four features.
+    - Updated: POD, README, and BUGS AND LIMITATIONS revised to reflect
+      the new behaviour; stale limitations removed.
+
+1.05  2026-03-21 JST (Japan Standard Time)
+
+    - New: SELECT * now presents columns in CREATE TABLE declaration order
+      (previously alphabetical).  For SELECT * with JOIN, columns follow
+      table appearance order (FROM first, then each JOIN), each table's
+      columns in declaration order, as 'alias.col' qualified names.
+      Named SELECT lists (SELECT a, b) continue to follow the SELECT order.
+    - New: INSERT INTO table VALUES (...) without a column list is now
+      supported; values are assigned to columns in CREATE TABLE order.
+      Mismatched value count returns an error.
+    - Added: t/1014_colorder_insert.t (72 tests) covering both features.
+    - Updated: POD and README revised; column-order limitation removed.
+
 1.04  2026-03-21 JST (Japan Standard Time)
 
     - New: pure OR expressions where every atom has an index now use

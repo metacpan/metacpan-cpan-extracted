@@ -245,9 +245,9 @@ sub name
 sub only
 {
     my $self     = shift( @_ );
-    my $table    = $self->{table} ||
-        return( $self->error( "No table provided to perform select statement." ) );
     my $q        = $self->query_object || return( $self->error( "No query formatter object was set" ) );
+    my $table    = $self->{table} || $q->table_object->name ||
+        return( $self->error( "No table provided to perform select statement." ) );
     my $tbl_o    = $q->table_object || $self->{table_object} || return( $self->error( "No table object is set." ) );
     my $db       = $tbl_o->database();
     my $multi_db = $tbl_o->param( 'multi_db' );

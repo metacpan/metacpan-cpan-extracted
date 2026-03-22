@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v1.4.0
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Mysql.pm
+## Version v1.5.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/07/30
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -20,9 +20,9 @@ BEGIN
     use warnings;
     use parent qw( DB::Object );
     use vars qw(
-        $VERSION $CACHE_SIZE $CONNECT_VIA 
+        $VERSION $CACHE_SIZE 
         $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE $PLACEHOLDER_REGEXP
-        $DATATYPES_DICT
+        $DATATYPES_DICT $EXCEPTION_CLASS
     );
     eval{ require DBD::mysql; };
     die( $@ ) if( $@ );
@@ -261,7 +261,8 @@ BEGIN
     };
     # DBI->trace(5);
     our $PLACEHOLDER_REGEXP = qr/\?/;
-    our $VERSION = 'v1.4.0';
+    our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v1.5.0';
 };
 
 use strict;
@@ -271,11 +272,9 @@ our $CACHE_SIZE    = 10;
 our $USE_BIND      = 0;
 our $USE_CACHE     = 0;
 our $MOD_PERL      = 0;
-our $CONNECT_VIA;
 if( $INC{ 'Apache/DBI.pm' } && 
     substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
 {
-    $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
 }
 # Actually the one in DB::Object is used, because DBD::mysql has no datatype constants of its own
@@ -326,7 +325,8 @@ foreach my $c ( @$keys )
 sub init
 {
     my $self = shift( @_ );
-    $self->SUPER::init( @_ );
+    $self->{_exception_class} = $EXCEPTION_CLASS;
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{driver} = 'mysql';
     return( $self );
 }
@@ -410,14 +410,7 @@ sub commit($;$@)
     return( $self );
 }
 
-sub connect
-{
-    my $that   = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return;
-    $param->{driver} = 'mysql';
-    $param->{port} = 3306 if( !length( $param->{port} ) );
-    return( $that->SUPER::connect( $param ) );
-}
+# NOTE: sub connect is inherited
 
 # NOTE: sub constant_to_datatype is inherited
 
@@ -762,11 +755,13 @@ sub _connection_options
     return( $opt );
 }
 
+# NOTE: sub _connection_params2hash_driver is not necessary here. We use our parent's one.
+
 sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_table unknown_field )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_dir cache_query cache_table unknown_field use_cache )];
     my @mysql_params = grep( /^mysql_/, keys( %$param ) );
     # See DBD::mysql for the list of valid parameters
     # E.g.: mysql_client_found_rows, mysql_compression mysql_connect_timeout mysql_write_timeout mysql_read_timeout mysql_init_command mysql_skip_secure_auth mysql_read_default_file mysql_read_default_group mysql_socket mysql_ssl mysql_ssl_client_key mysql_ssl_client_cert mysql_ssl_ca_file mysql_ssl_ca_path mysql_ssl_cipher mysql_local_infile mysql_multi_statements mysql_server_prepare mysql_server_prepare_disable_fallback mysql_embedded_options mysql_embedded_groups mysql_conn_attrs 
@@ -934,7 +929,7 @@ DB::Object::Mysql - Mysql Database Object
 
 =head1 VERSION
 
-    v1.4.0
+    v1.5.0
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,33 @@
 Revision History for Git::Server
 
+0.038  2026-03-21 04:00:00
+ - More consistent messaging and logging.
+ - Fix ref RegExp to allow more valid characters.
+ - Move logging from pre-* to post-* hook.
+ - Only show push-notifications to pusher if DEBUG.
+ - Add {server_git_duration} to webhook hash info.
+ - Show {server_git_duration} in log.logfile.
+ - Show push / pull / deploy branches in log.logfile.
+ - Show git-deploy / git-client version in log.
+ - Handle [git { -v | --version | version }] and
+   report $VERSION if properly overrode via git-client.
+ - And git-deploy --version also reports $VERSION too.
+ - Make git-client honor {-C|--chdir} properly so
+   "git -C <dir> config --descent --list" works now
+   and allows multiple "-C" to behave like real git.
+ - Allow multiple git-deploy running on the same
+   machine if they are pinned to different branches.
+   (Deploying the same branch will kill the first.)
+ - Use consistent {server_git_*} has for webhook info.
+ - Don't use deprecated {git_client_connected} anymore.
+ - Properly log "cloned" for "git clone" command.
+ - Suppress that huge {refs} log for "git clone".
+ - Backward compatibility patches for older versions
+   * Perl 5.8.8
+   * File::Temp 0.16
+   * IO::Trace 0.23
+   * strace 4.5.18
+
 0.037  2026-02-14 19:00:00
  - Add SCP-style support for proxy.url.
  - Add git-verify config sanity checker.

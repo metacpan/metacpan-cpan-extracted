@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.7.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Statement.pm
+## Version v0.8.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/09
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -22,15 +22,24 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object );
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Class::Struct qw( struct );
     use Wanted;
-    our $DEBUG = 0;
-    our $VERSION = 'v0.7.0';
+    our $DEBUG           = 0;
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.8.0';
 };
 
 use strict;
 use warnings;
+
+sub init
+{
+    my $self = shift( @_ );
+    $self->{_exception_class} = $EXCEPTION_CLASS;
+    $self->Module::Generic::init( @_ ) || return( $self->pass_error );
+    return( $self );
+}
 
 sub as_string
 {
@@ -46,6 +55,42 @@ sub as_string
     # Same:
     # return( $q->as_string );
     return( $self->{query} );
+}
+
+sub attach
+{
+    my $self = shift( @_ );
+    my $dbo  = shift( @_ ) ||
+        return( $self->error( "No DB::Object object was provided." ) );
+    my $base_class = $self->base_class;
+    unless( $self->_is_a( $dbo => $base_class ) )
+    {
+        return( $self->error( "Value provided is not a ${base_class} object." ) );
+    }
+    $self->database_object( $dbo ) || return( $self->pass_error );
+    if( my $tbl = $self->table_object )
+    {
+        if( $self->_is_a( $tbl => "${base_class}::Tables" ) )
+        {
+            $self->_load_class( "${base_class}::Tables" ) || return( $self->pass_error );
+            $tbl->attach( $dbo );
+        }
+        else
+        {
+            warn( "Table object found (", $self->_str_val( $tbl ), ") in this statement object is actually not a table object (${base_class}::Tables) !" );
+            $self->table_object( undef );
+        }
+    }
+    if( my $qo = $self->query_object )
+    {
+        unless( $self->_is_a( $qo => "${base_class}::Query" ) )
+        {
+            die( "Query object found (", $self->_str_val( $qo ), ") in this statement object is actually not a query object (${base_class}::Query) !" );
+        }
+        $self->_load_class( "${base_class}::Query" ) || return( $self->pass_error );
+        $qo->attach( $dbo );
+    }
+    return( $self );
 }
 
 sub bind_param
@@ -1145,8 +1190,8 @@ sub priority
     my $prio = shift( @_ );
     my $map  =
     {
-    0    => 'LOW_PRIORITY',
-    1    => 'HIGH_PRIORITY',
+        0    => 'LOW_PRIORITY',
+        1    => 'HIGH_PRIORITY',
     };
     ## Bad argument. Do not bother
     return( $self ) if( !exists( $map->{ $prio } ) );
@@ -1386,6 +1431,160 @@ DESTROY
     # print( STDERR "DESTROY'ing statement $self ($self->{ 'query' })\n" );
 };
 
+# NOTE: Storable hooks
+# We intentionally do NOT freeze DBI handles (dbh/sth) or back-references (dbo/table_object)
+# because they are process-local and cannot be safely restored.
+# NOTE: For CBOR and Sereal
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
+    # process-local state.
+    # 2026-01-29: I removed 'query_object' in an effort to reduce memory consumption. Let's see...
+    my @props = qw(
+        as_string bind cache params query query_object selected_fields
+        table tie tie_order _fields _cache_field_names _cache_field_types
+    );
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+    $hash->{_serial_version} = $DB::Object::SERIALISATION_VERSION;
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # Before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) < version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub STORABLE_thaw_post_processing
+{
+    my $obj   = shift( @_ );
+    my @keys  = %$obj;
+    my $class = ref( $obj );
+    my $hash  = {};
+    @$hash{ @keys } = @$obj{ @keys };
+    my $self = bless( $hash => $class );
+    return( $self );
+}
+
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref   = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+
+    my $sv = CORE::delete( $hash->{_serial_version} ) // 0;
+    if( $sv != $DB::Object::SERIALISATION_VERSION )
+    {
+        require( $EXCEPTION_CLASS );
+        die( $EXCEPTION_CLASS->new({
+            code    => 409, # Conflict
+            message => sprintf(
+                "Serialisation version mismatch in %s: expected %d, got %d. Please purge the cache.",
+                $class,
+                $DB::Object::SERIALISATION_VERSION,
+                $sv,
+            )
+        }) );
+    }
+
+    # Since this class is inherited, we also need to load from which we depend, if necessary.
+    if( $class ne 'DB::Object::Statement' )
+    {
+        require DB::Object;
+        require DB::Object::Statement;
+        my @supported_classes = CORE::values( %$DB::Object::DRIVER2PACK );
+        push( @supported_classes, 'DB::Object' );
+        my $ok_classes = CORE::join( '|', CORE::map{ CORE::quotemeta( $_ ) } @supported_classes );
+        my $base_class = ( $class =~ /^($ok_classes)/ )[0];
+        eval( "require $base_class;" );
+        if( $@ )
+        {
+            require( $EXCEPTION_CLASS );
+            die( $EXCEPTION_CLASS->new( "Failure to load $base_class: $@" ) );
+        }
+
+        # If inheritance is still missing (or incomplete) for any reason, repair it explicitly.
+        no strict 'refs';
+
+        my $stash = \%{"${class}\::"};
+        my $isa_ref;
+        # We check if the 'ISA' symbol exists in the stash and its ARRAY slot is defined
+        if( exists( $stash->{ISA} ) &&
+            defined( *{"${class}\::ISA"}{ARRAY} ) )
+        {
+            $isa_ref = *{"${class}\::ISA"}{ARRAY};
+        }
+        else
+        {
+            # # Force creation of @ISA array slot
+            # @{"${class}::ISA"} = ();
+            # $isa_ref = *{"${class}::ISA"}{ARRAY};
+            # But I want it to die, so this can be dealt with, and not swept under the rug.
+            die( "Unable to find the \@ISA value in $class. The package contains the following stashes:\n", $self->Module::Generic::dump( $stash ) );
+        }
+
+        my $has_stmt = 0;
+        my $has_base = 0;
+
+        foreach my $p ( @$isa_ref )
+        {
+            # Same as what we can find in modules DB::Object::(Postgres|SQLite|Mysql)::Statement
+            $has_stmt = 1 if( CORE::defined( $p ) && $p eq 'DB::Object::Statement' );
+            $has_base = 1 if( CORE::defined( $p ) && $p eq $base_class );
+        }
+
+        if( !$has_stmt || !$has_base )
+        {
+            @$isa_ref = ( 'DB::Object::Statement', $base_class );
+        }
+    }
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 1;
 # NOTE: POD
 __END__
@@ -1433,7 +1632,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.7.0
+v0.8.0
 
 =head1 DESCRIPTION
 
@@ -1444,6 +1643,14 @@ This is the statement object package from which other driver specific packages i
 =head2 as_string
 
 Returns the current statement object as a string.
+
+=head2 attach
+
+    $tbl->attach( $db_object );
+
+Provided with a L<DB::Object>, or one of its inheriting classes, and this will attach that database object to this statement object.
+
+It returns the current statement object upon success, or upon error, it set an error an returns an empty list in list context, or C<undef> in scalar context.
 
 =head2 bind_param
 

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v1.2.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/SQLite.pm
+## Version v1.3.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/07/30
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use vars qw(
         $VERSION $CACHE_SIZE $CONNECT_VIA $ERROR $DEBUG
         $USE_BIND $USE_CACHE $MOD_PERL
-        $PLACEHOLDER_REGEXP $DATATYPES_DICT
+        $PLACEHOLDER_REGEXP $DATATYPES_DICT $EXCEPTION_CLASS
     );
     use DBI qw( :sql_types );
     eval { require DBD::SQLite; };
@@ -80,7 +80,8 @@ BEGIN
         };
     }
     our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
-    our $VERSION = 'v1.2.0';
+    our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v1.3.0';
 };
 
 use strict;
@@ -181,7 +182,8 @@ foreach my $type ( keys( %$DATATYPES_DICT ) )
 sub init
 {
     my $self = shift( @_ );
-    $self->SUPER::init( @_ );
+    $self->{_exception_class} = $EXCEPTION_CLASS;
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{driver} = 'SQLite';
     $self->{_func} = {};
     return( $self );
@@ -347,16 +349,7 @@ sub compile_options
     return( \@options );
 }
 
-# Inherited by DB::Object, however, DB::Object::connect() will call our subroutine 
-# _dbi_connect which format in a particular way the dsn.
-sub connect
-{
-    my $that  = shift( @_ );
-    my $param = $that->_connection_params2hash( @_ ) || return;
-    $param->{driver} = 'SQLite';
-    $param->{sqlite_unicode} = 1;
-    return( $that->SUPER::connect( $param ) );
-}
+# connect() is inherited by DB::Object
 
 # NOTE: sub constant_to_datatype is inherited
 
@@ -513,7 +506,7 @@ sub query_object { return( shift->_set_get_object( 'query_object', 'DB::Object::
 sub replace
 {
     my $self = shift( @_ );
-    my $data = shift( @_ ) if( @_ == 1 && ref( $_[ 0 ] ) );
+    my $data = shift( @_ ) if( @_ == 1 && ref( $_[0] ) );
     my @arg  = @_;
     my %arg  = ();
     my $select = '';
@@ -552,7 +545,7 @@ sub replace
     $self->_save_bind();
     # Query string should lie within the object
     # _cache_this sends back an object no matter what or unde() if an error occurs
-    my $sth = $self->_cache_this();
+    my $sth = $self->_cache_this($query);
     # STOP! No need to go further
     if( !defined( $sth ) )
     {
@@ -769,7 +762,7 @@ sub _check_connect_param
         $param->{database_file} = $self->{database_file} = $db;
     }
     $param->{host} = 'localhost' if( !length( $param->{host} ) );
-    $param->{port} = 0 if( !length( $param->{port} ) );
+    $param->{port} = 0 if( !CORE::exists( $param->{port} ) );
     return( $param );
 }
 
@@ -792,13 +785,21 @@ sub _connection_options
     return( $opt );
 }
 
+sub _connection_params2hash_driver
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{sqlite_unicode} = 1 if( !length( $opts->{sqlite_unicode} ) );
+    return( $opts );
+}
+
 sub _connection_parameters
 {
     my $self  = shift( @_ );
     my $param = shift( @_ );
     # Even though login, password, server, host are not used, I was hesitating, but decided to leave them as ok, and ignore them
     # Or maybe should I issue an error when they are provided?
-    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_table unknown_field )];
+    my $core = [qw( db login passwd host port driver database server opt uri debug cache_connections cache_dir cache_query cache_table unknown_field use_cache )];
     my @sqlite_params = grep( /^sqlite_/, keys( %$param ) );
     # See DBD::SQLite for the list of valid parameters
     # E.g.: sqlite_open_flags sqlite_busy_timeout sqlite_use_immediate_transaction sqlite_see_if_its_a_number sqlite_allow_multiple_statements sqlite_unprepared_statements sqlite_unicode sqlite_allow_multiple_statements sqlite_use_immediate_transaction
@@ -1426,7 +1427,7 @@ DB::Object::SQLite - DB Object SQLite Driver
 
 =head1 VERSION
 
-    v1.2.0
+    v1.3.0
 
 =head1 DESCRIPTION
 

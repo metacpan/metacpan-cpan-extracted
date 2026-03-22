@@ -14,7 +14,7 @@ $SIG{__DIE__} = sub {
     exit 1;
 };
 while (my $push_info = <STDIN>) {
-    my ($old,$new,$ref) = $push_info =~ m{^(\w+) (\w+) ([\w/\.\-]+)} or die localtime().": [$who] git-server: Invalid pre-receive STDIN!\n";
+    my ($old,$new,$ref) = $push_info =~ m{^(\w+) (\w+) ([\w/\-.@]+)} or die localtime().": [$who] git-server: Invalid pre-receive STDIN!\n";
     die localtime().": [$who] git-server: Invalid pre-receive ref!\n" unless $ref;
     my $branch = ($ref =~ m{^refs/(?:heads|tags)/(.+)} || $ref =~ m{.*/([^/]+)}) ? $1 : $ref;
     my $type = ($ref =~ m{^refs/tags/}) ? "tag" : "branch";
@@ -22,7 +22,7 @@ while (my $push_info = <STDIN>) {
     ipclog("  TYPE:$type");
     ipclog("  OLD:$old");
     ipclog("  NEW:$new");
-    my $conf = `git config --list`;
+    my $conf = $0 =~ m{(.*)/} ? `$1/configs` : `git config --list`;
     if ($conf =~ s/^acl.restrictemail=(.+)//m) {
         my $restrictemail = $1;
         my $sniffers = [];
@@ -109,7 +109,7 @@ while (my $push_info = <STDIN>) {
         }
         else {
             if ($type eq "tag") {
-                die localtime().": [$who] git-server: Missing [restrictedbranch.forcers] permission! Unable to remove restricted $type [$branch]. Do not run 'git push --delete origin $branch'. Remaining at $old\n";
+                die localtime().": [$who] git-server: Missing [restrictedbranch.forcers] permission! Unable to remove restricted tag [$branch]. Do not run 'git push --delete origin $branch'. Remaining at $old\n";
             }
             else {
                 die localtime().": [$who] git-server: Missing [restrictedbranch.forcers] permission! Unable to prune git history on restricted $type [$branch]. Do not run 'git push --delete origin $branch'. Remaining at $old\n";
@@ -119,7 +119,7 @@ while (my $push_info = <STDIN>) {
     elsif ($type eq "tag") {
         ipclog("  FORCE:1");
         if ($can_change_history) {
-            warn localtime().": [$who] git-server: FORCE moving existing $type [$branch] from $old to $new\n";
+            warn localtime().": [$who] git-server: FORCE moving existing tag [$branch] from $old to $new\n";
         }
         else {
             die localtime().": [$who] git-server: Missing [restrictedbranch.forcers] permission! You cannot move restricted tag [$branch]. Do not run 'git push --force origin $branch'\n";
@@ -146,8 +146,8 @@ while (my $push_info = <STDIN>) {
                 }
                 if (!keys %$matching) {
                     my (undef,undef,undef,$mday,$mon,$year) = gmtime;
-                    my $suggest = sprintf "%s-BAK_%04d-%02d-%02d", $branch, $year+1900, $mon+1, $mday;
-                    die localtime().": [$who] git-server: Refusing to lose $type $branch history upto $old without a backup branch or tag to hold it. Try 'git tag $suggest $old ; git push origin $suggest' to create a branch on the old tip. If you really wish to lose these changes, then run 'git push --delete origin $suggest' after the branch $branch is rudely '--force' pushed.\n";
+                    my $suggest = sprintf "%04d-%02d-%02d-%s-BAK-%s", $year+1900, $mon+1, $mday, $branch, substr($old,0,6);
+                    die localtime().": [$who] git-server: Refusing to lose $type $branch history upto $old without a backup ref to hold it.\n\n  Hint: Create a tag on the old $type tip:\n    export ANCHOR=$suggest ; git tag \$ANCHOR $old ; git push origin \$ANCHOR ;\n    git push --force\n\n  Hint: And then if you really wish to purge these changes forever, run this:\n    git tag -d \$ANCHOR ; git push --delete origin \$ANCHOR\n";
                 }
             }
             else {
@@ -187,7 +187,7 @@ while (my $push_info = <STDIN>) {
             }
         }
         if (%$files_blocked) {
-            die localtime().": [$who] git-server: Missing [restrictedfile.pushers] permission! You can't modify [".join(" ",keys %$files_blocked)."] Do not 'git push' until changes have been reverted. (Hint: 'git diff origin HEAD ".[keys %$files_blocked]->[0]." ; git rebase -i $old')\n";
+            die localtime().": [$who] git-server: Missing [restrictedfile.pushers] permission! You can't modify [".join(" ",sort keys %$files_blocked)."] Do not 'git push' until changes have been reverted. (Hint: 'git diff origin HEAD ".[sort keys %$files_blocked]->[0]." ; git rebase -i $old')\n";
         }
     }
 }

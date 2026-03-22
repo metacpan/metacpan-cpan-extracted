@@ -4,7 +4,7 @@
       "Justin Wheeler <upsmodule@datademons.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "JSON::PP" : "0",
             "LWP::UserAgent" : "0",
             "Test::More" : "0"
          }
@@ -41,15 +42,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/Business-UPS/issues"
+         "web" : "https://github.com/cpan-authors/Business-UPS/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/toddr/Business-UPS"
+         "url" : "https://github.com/cpan-authors/Business-UPS"
       }
    },
-   "version" : "2.02",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.03",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

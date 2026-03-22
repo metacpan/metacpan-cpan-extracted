@@ -9,10 +9,10 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    This module needs the MPC, MPFR and GMP C libraries. (Install GMP
    first, followed by MPFR, followed by MPC.)
 
-   The GMP library is availble from http://gmplib.org
-   The MPFR library is available from http://www.mpfr.org/
+   The GMP library is availble from L<https://gmplib.org>
+   The MPFR library is available from L<https://www.mpfr.org/>
    The MPC library is available from
-    http://www.multiprecision.org/mpc/
+    L<https://www.multiprecision.org/mpc>
 
 =head1 DESCRIPTION
 
@@ -364,6 +364,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_sub($rop, $op1, $op2, $rnd);
    $si = Rmpc_sub_ui($rop, $op, $ui, $rnd);
    $si = Rmpc_ui_sub($rop, $ui, $op, $rnd);
+   $si = Rmpc_sub_fr($rop, $op, $mpfr, $rnd);
+   $si = Rmpc_fr_sub($rop, $mpfr, $op, $rnd);
     Set $rop to 2nd arg - 3rd arg rounded in the direction $rnd.
 
    $si = Rmpc_ui_ui_sub($rop, $ui_r, $ui_i, $op, $rnd);
@@ -399,6 +401,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    $si = Rmpc_div_ld($rop, $op, $ld, $rnd); # Math::MPC XSub
    $si = Rmpc_ld_div($rop, $ld, $op, $rnd); # Math::MPC XSub
    $si = Rmpc_div_fr($rop, $op, $mpfr, $rnd);
+   $si = Rmpc_fr_div($rop, $mpfr, $op, $rnd);
     Set $rop to 2nd arg / 3rd arg rounded in the direction $rnd.
     The 'sj'/'ld' versions are available only on perls built with
     '64 bit int'/'long double' support.
@@ -527,16 +530,16 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
    SPECIAL
 
    $si = Rmpc_exp($rop, $op, $rnd);
-    Set $rop to the exponential of $op, rounded according to $rnd
-    with the precision of $rop.
+   $si = Rmpc_exp10($rop, $op, $rnd);
+   $si = Rmpc_exp2($rop, $op, $rnd);
+    Set $rop to (respectively) e, 10 and 2 raised to the power
+    of $op, rounded according to $rnd with the precision of $rop.
 
    $si = Rmpc_log($rop, $op, $rnd);
-    Set $rop to the log of $op, rounded according to $rnd with the
-    precision of $rop.
-
    $si = Rmpc_log10($rop, $op, $rnd);
-    Set $rop to the base 10 log of $op, rounded according to $rnd with
-    the precision of $rop.
+   $si = Rmpc_log2($rop, $op, $rnd);
+    Set $rop to (respectively) the base e, base 10 & base 2 log
+    of $op, rounded according to $rnd with the precision of $rop.
 
    $si = Rmpc_arg ($mpfr, $op, $rnd);
      Set $mpfr to the argument of $op, with a branch cut along the
@@ -771,11 +774,19 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
           read it thoroughly, including the documentation regarding
           'copy constructors'.
 
+    The overloading of the arithmetic operators ( +, +=, -, -=,
+    /, /=, **, **= ) will accept a Math::MPFR object as the right
+    hand side operand. However, if the right hand side operand is a
+    Math::MPFR object and the left operand a Math::MPC object, then
+    version 4.47 of Math::MPFR is needed. A Math::MPC object will be
+    returned, irrespective of the order in which the two objects
+    appear.
+
     Attempting to use the overloaded operators with objects that
-    have been blessed into some package other than 'Math::MPC'
-    will not work. The workaround is to convert this "foreign"
-    object to a Math::MPC object - thus allowing it to work with
-    the overloaded operator.
+    have been blessed into some package other than 'Math::MPC' or
+    'Math::MPFR' will not work. The workaround is to convert this
+    "foreign" object to a Math::MPC object - thus allowing it to
+    work with the overloaded operator.
 
     In those situations where the overload subroutine operates on 2
     perl variables, then obviously one of those perl variables is
@@ -802,8 +813,8 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
        value is used. The variable is considered to be an NV if the
        NOK flag is set.
 
-    5. If the variable is a Math::MPC object then the value of that
-       object is used.
+    5. If the variable is a Math::MPC or Math::MPFR object then the
+       value of that object is used.
 
     6. If none of the above is true, then the second variable is
        deemed to be of an invalid type. The subroutine croaks with
@@ -908,7 +919,7 @@ Math::MPC - perl interface to the MPC (multi precision complex) library.
 
     This program is free software; you may redistribute it and/or
     modify it under the same terms as Perl itself.
-    Copyright 2006-2011, 2014, 2016, 2018, 2020, 2022-24 Sisyphus
+    Copyright 2006-2011, 2014, 2016, 2018, 2020, 2022-26 Sisyphus
 
 =head1 AUTHOR
 

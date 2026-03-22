@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Query.pm
-## Version v0.4.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.5.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2025/03/06
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -18,10 +18,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Wanted;
-    our $DEBUG = 0;
-    our $VERSION = 'v0.4.0';
+    our $DEBUG           = 0;
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.5.0';
 };
 
 use strict;
@@ -32,7 +33,8 @@ sub init
     my $self = shift( @_ );
     $self->{having} = '';
     $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{binded_having} = [];
     $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
     return( $self );
@@ -119,7 +121,7 @@ sub on_conflict
     if( @_ )
     {
         my $tbl_o = $self->{table_object} || return( $self->error( "No table object is set." ) );
-        # No version check needed—ON DUPLICATE KEY UPDATE is in MySQL since 4.1.0 (2004)
+        # No version check needed-ON DUPLICATE KEY UPDATE is in MySQL since 4.1.0 (2004)
         my $ver = $tbl_o->database_object->version;
         if( version->parse( $ver ) < version->parse( '4.1.0' ) )
         {
@@ -130,7 +132,7 @@ sub on_conflict
         my $hash = {};
         my @comp = ('ON DUPLICATE KEY UPDATE');
 
-        # Target is optional in MySQL—implicitly uses any duplicate key (primary or unique)
+        # Target is optional in MySQL-implicitly uses any duplicate key (primary or unique)
         if( $opts->{target} )
         {
             $hash->{target} = $opts->{target};
@@ -146,7 +148,7 @@ sub on_conflict
             {
                 $hash->{action} = $opts->{action};
 
-                # No fields provided—defer to callback using INSERT data
+                # No fields provided-defer to callback using INSERT data
                 if( !$opts->{fields} )
                 {
                     $self->{_on_conflict_callback} = sub
@@ -393,7 +395,7 @@ DB::Object::Mysql::Query - Query Object for MySQL
 
 =head1 VERSION
 
-    v0.4.0
+    v0.5.0
 
 =head1 DESCRIPTION
 
@@ -471,7 +473,7 @@ If no C<fields> are provided with C<action => 'update'>, the fields from the ori
 
 =item C<target>
 
-An optional target specification, such as a column name or constraint. However, MySQL’s C<ON DUPLICATE KEY UPDATE> does not allow targeting a specific key constraint or column explicitly—it triggers on any duplicate key violation (primary key or unique index). The C<target> is stored for reference and logged, but it does not alter the query behavior.
+An optional target specification, such as a column name or constraint. However, MySQL’s C<ON DUPLICATE KEY UPDATE> does not allow targeting a specific key constraint or column explicitly, it triggers on any duplicate key violation (primary key or unique index). The C<target> is stored for reference and logged, but it does not alter the query behavior.
 
     $q->on_conflict({
         target => 'id',

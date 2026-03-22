@@ -1,5 +1,5 @@
 package Crypt::Bear::SSL::PrivateCertificate;
-$Crypt::Bear::SSL::PrivateCertificate::VERSION = '0.003';
+$Crypt::Bear::SSL::PrivateCertificate::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Crypt::Bear::SSL::PrivateCertificate - a Certificate Chain and Private key combi
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

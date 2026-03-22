@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (ڈیٹا کی اقسام) ]
+  INT          : مکمل عدد (Integer)
+  FLOAT        : اعشاری عدد (Floating point)
+  VARCHAR(n)   : متغیر لمبائی والی سٹرنگ (زیادہ سے زیادہ n بائٹس)
+  CHAR(n)      : مقررہ لمبائی والی سٹرنگ (ہمیشہ n بائٹس)
+
+[ 1. CREATE / DROP (ٹیبل بنانا اور حذف کرنا) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (ڈیٹا شامل کرنا) ]
+  -- کالمز بتا کر ڈیٹا شامل کریں (تجویز کردہ)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- کالمز بتائے بغیر ڈیٹا شامل کریں
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (ڈیٹا تلاش کرنا) ]
+  -- تمام ڈیٹا حاصل کریں
+  SELECT * FROM student;
+  -- شرائط واضح کریں (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- ڈیٹا کی ترتیب (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- قطاروں کی تعداد محدود کریں (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (ڈیٹا اپ ڈیٹ کرنا) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (ڈیٹا حذف کرنا) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (آپریٹرز) ]
+  موازنہ  : =, <>, !=, >, <, >=, <=
+  حد      : BETWEEN 70 AND 90
+  فہرست   : IN (1, 2, 3) یا NOT IN (1, 2, 3)
+  سٹرنگ   : LIKE 'A%' (A سے شروع), LIKE '%A' (A پر ختم)
+  NULL چیک: IS NULL, IS NOT NULL
+  منطقی   : AND, OR, NOT
+
+[ Aggregate Functions (مجموعی فنکشنز) ]
+  COUNT(*) : قطاروں (rows) کی گنتی کریں
+  SUM(col) : مجموعہ نکالیں
+  AVG(col) : اوسط نکالیں
+  MAX(col) : سب سے بڑی قیمت تلاش کریں
+  MIN(col) : سب سے چھوٹی قیمت تلاش کریں
+  (مثال) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (انڈیکس کے ذریعے رفتار بڑھائیں) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

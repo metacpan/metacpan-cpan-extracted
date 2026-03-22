@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use LWP::UserAgent;
+use JSON::PP qw(decode_json encode_json);
 require 5.008;
 
 require Exporter;
@@ -16,7 +17,7 @@ our @EXPORT = qw/ getUPS UPStrack /;
 #	Copyright 1998 Mark Solomon <msolomon@seva.net> (See GNU GPL)
 #	Started 01/07/1998 Mark Solomon
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 sub getUPS {
 
@@ -68,118 +69,58 @@ sub UPStrack {
     my $tracking_number = shift;
     my %retValue;
 
-    $tracking_number || Error("No number to track in UPStrack()");
+    $tracking_number || Error("No tracking number provided to UPStrack()");
 
-    my $lwp    = LWP::UserAgent->new();
-    my $result = $lwp->get("https://wwwapps.ups.com/tracking/tracking.cgi?tracknum=$tracking_number");
-    Error("Cannot get data from UPS") unless $result->is_success();
+    my $ups_url = 'https://www.ups.com/track/api/Track/GetStatus?loc=en_US';
+    my $payload = encode_json( {
+        Locale         => 'en_US',
+        TrackingNumber => [$tracking_number],
+    } );
 
-    my $tracking_data = $result->content();
-    my %post_data;
-    my ( $url, $data );
+    my $lwp = LWP::UserAgent->new();
+    my $result = $lwp->post(
+        $ups_url,
+        'Content-Type' => 'application/json',
+        Content        => $payload,
+    );
 
-    if ( ( $url, $data ) = $tracking_data =~ /<form action="?(.+?)"? method="?post"?>(.+)<\/form>/ims and $1 =~ /WebTracking\/processRequest/ ) {
-        while ( $data =~ s/<input type="?hidden"? name="?(.+?)"? value="?(.+?)"?>//ims ) {
-            $post_data{$1} = $2;
-        }
+    Error("Cannot get tracking data from UPS") unless $result->is_success();
+
+    my $json;
+    eval { $json = decode_json( $result->content() ) };
+    Error("Cannot parse JSON response from UPS: $@") if $@;
+
+    my $details = $json->{trackDetails};
+    Error("No tracking details returned from UPS") unless $details && ref($details) eq 'ARRAY' && @$details;
+
+    my $track = $details->[0];
+
+    $retValue{'Current Status'} = $track->{packageStatus} if $track->{packageStatus};
+    $retValue{'Service Type'}   = $track->{service}        if $track->{service};
+
+    if ( my $w = $track->{weight} ) {
+        $retValue{'Weight'} = "$w->{weight} $w->{unitOfMeasurement}" if $w->{weight};
     }
-    else {
-        Error("Cannot parse output from UPS!");
+
+    if ( my $addr = $track->{shipToAddress} ) {
+        my @parts = grep { $_ } @{$addr}{qw(city state country)};
+        $retValue{'Shipped To'} = join( ', ', @parts ) if @parts;
     }
 
-    my ($imagename) = $tracking_data =~ /<input type="?image"? .+? name="?(.+?)"?>/;
+    $retValue{'Delivery Date'} = $track->{scheduledDeliveryDate} || $track->{deliveredDate};
+    $retValue{'Signed By'}     = $track->{receivedBy}  if $track->{receivedBy};
+    $retValue{'Location'}      = $track->{leftAt}      if $track->{leftAt};
 
-    $post_data{"${imagename}.x"} = 0;
-    $post_data{"${imagename}.y"} = 0;
-
-    my $result2 = $lwp->post( $url, \%post_data, Referer => "https://wwwaaps.ups.com/tracking/tracking.cgi?tracknum=$tracking_number" );
-
-    Error("Failed fetching tracking data from UPS!") unless $result2->is_success;
-
-    my $raw_data = $result2->content();
-
-    $raw_data =~ tr/\r//d;
-    $raw_data =~ s/<.*?>//gims;
-    $raw_data =~ s/&nbsp;/ /gi;
-    $raw_data =~ s/^\s+//gms;
-    $raw_data =~ s/\s+$//gms;
-    $raw_data =~ s/\s{2,}/ /gms;
-
-    my @raw_data = split( /\n/, $raw_data );
     my %scanning;
-    my $progress;
     my $count = 0;
-    my $reference;
 
-    for ( my $q = 0; $q < @raw_data; $q++ ) {
-
-        # flip thru the text in the page line-by-line
-        if ( $progress == 1 ) {
-
-            # progress will == 1 when we've found the line that says 'package progress'
-            # which means from here on in, we're tracking the package.
-
-            if ( $raw_data[$q] =~ /Tracking results provided by UPS: (.+)/ ) {
-                $progress = 0;
-                $retValue{'Last Updated'} = $1 . ' ' . $raw_data[ $q + 1 ];
-            }
-            elsif ( $raw_data[$q] =~ /\w+\s+\d+,\s+\d+/ ) {
-
-                # would match jun 10, 2003
-                $reference = $raw_data[$q];
-            }
-            elsif ( $raw_data[$q] =~ /\d+:\d+\s+\w\.\w\./ ) {
-
-                # matches 2:10 a.m.
-                $scanning{ ++$count }{'time'} = $raw_data[$q];
-
-                $scanning{$count}{'date'} ||= $reference;
-            }
-            elsif ( $raw_data[$q] =~ /,$/ ) {
-
-                # if it ends in a comma, then it's an unfinished location e.g.:
-                # austin,
-                # tx,
-                # us
-
-                $scanning{$count}{'location'} .= ' ' . $raw_data[$q];
-            }
-            else {
-                # if all else fails, it's either the last line of the
-                # location, or it's the description.  we check that by
-                # seeing if the current location ends in a comma.
-
-                next unless $scanning{$count}{'date'};
-
-                if ( $scanning{$count}{'location'} =~ /,$/ ) {
-                    $scanning{$count}{'location'} .= ' ' . $raw_data[$q];
-                }
-                else {
-                    $scanning{$count}{'activity'} = $raw_data[$q];
-                }
-            }
-        }
-        else {
-            # html tables make life easy. :)
-
-            $retValue{'Current Status'} = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'STATUS:';
-
-            $retValue{'Shipped To'} = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'SHIPPED TO:';
-            $retValue{'Shipped To'} .= ' ' . $raw_data[ $q + 2 ] if $raw_data[ $q + 1 ] =~ /,$/ and uc( $raw_data[$q] ) eq 'SHIPPED TO:';
-            $retValue{'Shipped To'} .= ' ' . $raw_data[ $q + 3 ] if $raw_data[ $q + 2 ] =~ /,$/ and uc( $raw_data[$q] ) eq 'SHIPPED TO:';
-
-            $retValue{'Delivered To'} = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'DELIVERED TO:';
-            $retValue{'Delivered To'} .= ' ' . $raw_data[ $q + 2 ] if $raw_data[ $q + 1 ] =~ /,$/ and uc( $raw_data[$q] ) eq 'DELIVERED TO:';
-            $retValue{'Delivered To'} .= ' ' . $raw_data[ $q + 3 ] if $raw_data[ $q + 2 ] =~ /,$/ and uc( $raw_data[$q] ) eq 'DELIVERED TO:';
-
-            $retValue{'Shipped On'}    = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'SHIPPED OR BILLED ON:';
-            $retValue{'Service Type'}  = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'SERVICE TYPE:';
-            $retValue{'Weight'}        = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'WEIGHT:';
-            $retValue{'Delivery Date'} = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'DELIVERED ON:';
-            $retValue{'Signed By'}     = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'SIGNED BY:';
-            $retValue{'Location'}      = $raw_data[ $q + 1 ] if uc( $raw_data[$q] ) eq 'LOCATION:';
-
-            $progress = 1 if uc( $raw_data[$q] ) eq 'PACKAGE PROGRESS:';
+    if ( my $activities = $track->{shipmentProgressActivities} ) {
+        for my $act (@$activities) {
+            $count++;
+            $scanning{$count}{'date'}     = $act->{date}         if $act->{date};
+            $scanning{$count}{'time'}     = $act->{time}         if $act->{time};
+            $scanning{$count}{'location'} = $act->{location}     if $act->{location};
+            $scanning{$count}{'activity'} = $act->{activityScan} if $act->{activityScan};
         }
     }
 
@@ -192,8 +133,7 @@ sub UPStrack {
 
 sub Error {
     my $error = shift;
-    print STDERR "$error\n";
-    exit(1);
+    die "$error\n";
 }
 
 END { }
@@ -236,7 +176,7 @@ I've tried to keep this package to a minimum, so you'll need:
 
 =item *
 
-Perl 5.003 or higher
+Perl 5.014 or higher
 
 =item *
 

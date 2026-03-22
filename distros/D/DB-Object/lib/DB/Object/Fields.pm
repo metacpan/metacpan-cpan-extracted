@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Fields.pm
-## Version v1.2.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Fields.pm
+## Version v1.3.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2024/09/04
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -18,9 +18,10 @@ BEGIN
     use warnings;
     use common::sense;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION );
+    use vars qw( $VERSION $EXCEPTION_CLASS );
     use DB::Object::Fields::Field;
-    our $VERSION = 'v1.2.1';
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v1.3.0';
 };
 
 use strict;
@@ -34,8 +35,10 @@ sub init
     $self->{table_object} = '';
     # $self->{fatal} = 1;
     $self->{_init_strict_use_sub} = 1;
-    $self->{_init_params_order} = [qw( table_object query_object prefixed )];
+    $self->{_init_params_order}   = [qw( table_object query_object prefixed )];
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ );
+    $self->{_fields} = [qw( prefixed )];
     return( $self->error( "No table object was provided" ) ) if( !$self->{table_object} );
     return( $self );
 }
@@ -206,6 +209,73 @@ AUTOLOAD
     }
 };
 
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
+    # process-local state.
+    my @props = @{$self->{_fields}};
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # Before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) < version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref   = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
+
 1;
 # NOTE: POD
 __END__
@@ -267,7 +337,7 @@ DB::Object::Fields - Tables Fields Object Accessor
 
 =head1 VERSION
 
-    v1.2.1
+    v1.3.0
 
 =head1 DESCRIPTION
 

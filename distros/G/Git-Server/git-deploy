@@ -23,6 +23,7 @@ instantly after a push is triggered.
     [ --fix-nasty ]
     [ --background ]
     [ --max-delay <seconds> ]
+    [ { -v | --version } ]
 
 =head2 --branch <branch>
 
@@ -100,6 +101,10 @@ By default, max-delay is 7200 seconds (or 2 hours).
 
   Example: git deploy --max-delay 10
 
+=head2 --version
+
+Show git-deploy version.
+
 =head1 INSTALL
 
 As super user:
@@ -132,28 +137,37 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.037";
+our $VERSION = "0.038";
 
 my @invoked = ($0, @ARGV);
+my %initial_ENV = %ENV;
 my $cwd = getcwd();
 my $opts = [];
 my $build = undef;
 my $force_branch = undef;
-my $chdir = undef;
+my $chdir = [];
 my $umask = undef;
 my $fix_nasty = undef;
 my $background = undef;
 my $maxpatience = undef;
+my $ver = undef;
+Getopt::Long::Configure("no_ignore_case");
 GetOptions
-    "O|o:s" => \$opts,
-    "build:s" => \$build,
-    "umask:s" => \$umask,
-    "branch:s" => \$force_branch,
-    "chdir|C:s" => \$chdir,
+    "O|o=s@" => $opts,
+    "build=s" => \$build,
+    "umask=s" => \$umask,
+    "branch=s" => \$force_branch,
+    "chdir|C=s" => $chdir,
+    "version|v" => \$ver,
     "fix-nasty" => \$fix_nasty,
     "background" => \$background,
-    "max-delay:i" => \$maxpatience,
+    "max-delay=i" => \$maxpatience,
     or exec perldoc => $0;
+
+if ($ver) {
+    print "[git-deploy v$VERSION] ".`git --version`;
+    exit;
+}
 
 sub run_how_cmd {
     my $stderr = shift;
@@ -196,12 +210,36 @@ sub rebuild {
 
 sub current_branch {
     my $scan = run_output_ignore_err qw(git branch -a);
-    return $1 if $scan =~ m{^\* ([\w/\-]+)}m;
+    return $1 if $scan =~ m{^\* ([\w/\-.@]+)}m;
     if ($scan =~ m{^\* .*detached at (\w+)}m) {
         $scan = run_output_ignore_err("git", "branch", "-a", "--contains", $1).$scan;
     }
-    return $1 if $scan =~ m{^\s+([\w/]+)}m;
+    return $1 if $scan =~ m{^\s+([\w/\-.@]+)}m;
     die localtime().": [$$] Unable to determine which branch to deploy.\n$scan\n";
+}
+
+# checkout_branch()
+# Which branch to checkout and remain on for the pull to update
+sub checkout_branch {
+    return $force_branch || current_branch;
+}
+
+# pull_push_notification()
+# Pull new changes or else block waiting until the next push before updating.
+sub pull_push_notification {
+    my $deploy_branch = checkout_branch();
+    # Generate XMODIFIERS based on checkout_branch and $maxpatience and $opts:
+    $ENV{XMODIFIERS} = join "\n", @$opts,
+        "pull_branch=$deploy_branch",
+        "client=".abs_path($invoked[0])."\@v$VERSION",
+        ($maxpatience ? ("deploy_patience=$maxpatience") : ()),
+        ($initial_ENV{XMODIFIERS} ? ($initial_ENV{XMODIFIERS}) : ()),
+        ;
+    # Generate GIT_SSH_COMMAND to ensure XMODIFIERS is provided to the git server:
+    $ENV{GIT_SSH_COMMAND} = ($initial_ENV{GIT_SSH_COMMAND} || "ssh")." -o SendEnv=XMODIFIERS";
+    $0 = "$Script - $cwd: Waiting for push notification [$deploy_branch]";
+    # Run "fetch" to call "git-upload-pack" causing the git-server to wait for the "push_notification" to release the update:
+    return run_output_include_err(qw[git fetch]);
 }
 
 if ($force_branch and @ARGV) {
@@ -211,11 +249,11 @@ if ($force_branch and @ARGV) {
 }
 $force_branch ||= shift;
 
-if ($chdir) {
-    chdir $chdir or die "chdir: $chdir $!\n";
-    # Relative chdir?
-    if ($chdir =~ /^[^\/]/) {
-        # Clear from args to avoid wrongly double jumping
+# Handle [ -C <dir> ] first
+if (@$chdir) {
+    chdir $_ or die "fatal: cannot change to '$_': $!\n" foreach @$chdir;
+    if (grep {/^[^\/]/} @$chdir) {
+        # Relative chdir may fail if re-invoked, so clear it from @invoked
         for (my $i = 1; $i < @invoked; $i++) {
             splice @invoked, --$i, ($2?1:2) if $invoked[$i-1] =~ /^(-C|--chdir)\b(=?).*$/;
         }
@@ -229,37 +267,36 @@ if ($umask and $umask =~ /^(\d+)$/) {
     umask oct $1;
 }
 
-push @$opts, "deploy_patience=$maxpatience" if $maxpatience;
-if (@$opts) {
-    push @$opts, $ENV{XMODIFIERS} if $ENV{XMODIFIERS};
-    if (@$opts) {
-        $ENV{XMODIFIERS} = join "\n", @$opts;
-        $ENV{GIT_SSH_COMMAND} //= "ssh";
-        $ENV{GIT_SSH_COMMAND} = "$ENV{GIT_SSH_COMMAND} -o SendEnv=XMODIFIERS";
-    }
-}
-
-$0 = "$Script - Initial checkout";
-run_output_ignore_err "git", "checkout", ($force_branch || current_branch);
+$0 = "$Script - $cwd: Initial checkout [".checkout_branch()."]";
+run_output_ignore_err "git", "checkout", checkout_branch;
 sleep 1;
 rebuild;
 if ($background) {
     exit if fork;
     require POSIX;
     POSIX::setsid();
-    close STDIN;
-    close STDOUT;
-    close STDERR;
+    open STDIN,  "<", "/dev/null";
+    open STDOUT, ">", "/dev/null";
+    open STDERR, ">", "/dev/null";
+}
+
+if (!$maxpatience) {
+    $0 = "$Script - $cwd: Searching for other deployers ...";
+    if (getps =~ /(.*\Q$Script - $cwd\E: Waiting.*)/) {
+        my $found = $1;
+        my $stagger = 5+int(rand()*115);
+        $0 = "$Script - $cwd: Waiting $stagger seconds for random stagger ...";
+        warn localtime().": [$$] Waiting random stagger delay $stagger secconds before taking over for other deployer:\n$found\n";
+        print run_output_include_err(sleep => $stagger);
+    }
 }
 
 while (1) {
-    $0 = "$Script - $cwd: Waiting for push notification ...";
-    my $update = "";
-    $update .= run_output_include_err qw(git fetch);
-    my $branch = $force_branch || current_branch;
+    my $update = pull_push_notification;
+    my $branch = checkout_branch;
     $update .= run_output_include_err "git", "checkout", $branch;
     $update .= run_output_include_err "git", "rebase", "origin/$branch";
-    $0 = "$Script - Scanning updates";
+    $0 = "$Script - $cwd: Scanning updates";
     $update .= run_output_include_err "git", "rebase", "--abort" if $update =~ /fix conflicts|git rebase.*--continue|you need to resolve your|stop rebasing/;
     if (-M "$Bin/$Script" < 0) {
         # Myself update detected so need to respawn
@@ -336,7 +373,7 @@ while (1) {
         # Duplicate rebase choking
         warn $update;
         my $choked_rebase = $1;
-        $0 = "$Script - Choking Rebase: $choked_rebase";
+        $0 = "$Script - $cwd: Choking Rebase: $choked_rebase";
         last if 0.0416 > -M $choked_rebase; # Leave rebase progress alone if still too fresh
         my $running = getps;
         last if $running =~ /\Q$Script - $cwd\E: Waiting/;
@@ -356,7 +393,7 @@ while (1) {
         print "Everything was updated perfectly. Sleeping ...\n";
         print run_output_ignore_err sleep => (5 + int(55 * rand()));
     }
-    $0 = "$Script - Update complete";
+    $0 = "$Script - $cwd: Update complete";
     sleep 1;
     rebuild;
 }

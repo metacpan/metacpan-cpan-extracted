@@ -23,7 +23,7 @@ chomp(my @manifest = <FH_MANIFEST>);
 close FH_MANIFEST;
 
 # Keep only files that exist on disk (skip blank lines and comments).
-my @files = grep { defined $_ && $_ ne '' && -f $_ } @manifest;
+my @files = grep { defined $_ && $_ ne '' && !m|^doc/| && -f $_ } @manifest;
 
 plan_skip('no files found in MANIFEST') unless @files;
 plan_tests(scalar @files);

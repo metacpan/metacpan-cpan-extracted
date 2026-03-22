@@ -19,11 +19,11 @@ WriteMakefile(
         resources   => {
             repository => {
                 type => 'git',
-                url  => 'https://github.com/bodo-hugo-barwich/file-access-driver.git',
-                web  => 'https://github.com/bodo-hugo-barwich/file-access-driver',
+                url  => 'https://github.com/bodo-hugo-barwich/file-driver-pl.git',
+                web  => 'https://github.com/bodo-hugo-barwich/file-driver-pl',
             },
             bugtracker => {
-                web => 'https://github.com/bodo-hugo-barwich/file-access-driver/issues'
+                web => 'https://github.com/bodo-hugo-barwich/file-driver-pl/issues'
             },
         },
     },

@@ -1,8 +1,8 @@
 ######################################################################
 #
 # SYNOPSIS
-#   prove -l t/0007-cpan_precheck.t        # from the distribution root
-#   perl t/0007-cpan_precheck.t            # same
+#   prove -l t/0005-cpan_precheck.t        # from the distribution root
+#   perl t/0005-cpan_precheck.t            # same
 #
 # DESCRIPTION
 #   Systematically verifies that a distribution directory is ready
@@ -12,6 +12,8 @@
 #     B  Version consistency ($VERSION vs META.yml/json/Changes/Makefile.PL)
 #     C  Encoding hygiene    (US-ASCII only, no trailing whitespace)
 #     D  Perl 5.005_03 compat (warnings stub, forbidden keywords, CVE fix)
+#        Note: deeper compatibility checks (defined-or //, yada-yada, etc.)
+#        are in t/0004-perl5compat.t which runs earlier.
 #     E  ina@CPAN code style (} else { on same line is a violation)
 #     F  META file integrity (YAML/JSON validity, minimum_perl_version)
 #     G  POD completeness    (NAME / SYNOPSIS / DESCRIPTION / balanced =cut)
@@ -431,6 +433,10 @@ diag('=== Category C: Encoding Hygiene ===');
 
 # C1: All MANIFEST files are US-ASCII only
 for my $f (@manifest_files) {
+    if ($f =~ m|^doc/|) {
+        ok(1, "C - US-ASCII: $f (documents may contain UTF-8 encoding)");
+        next;
+    }
     my $abs = "$ROOT/$f";
     unless (-f $abs) {
         ok(0, "C - US-ASCII: $f (file missing)");

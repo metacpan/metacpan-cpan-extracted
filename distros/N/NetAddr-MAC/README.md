@@ -13,11 +13,6 @@ of mixed hardware. This module can decode just about anything that looks
 reasonably like a mac address, and stringify into every format I have seen
 used...
 
-So sorry, I'm not really interesting in adding a templating function to
-define your own mac address formats. You're welcome to either send in a
-patch, extend this module or quickly write a function that wraps the 'raw'
-output to whatever you want. Match and join are your friends :)
-
 Hopefully this module is useful to you. So far I have been pleased with
 the amount of feedback and patches people have sent in, this has been very
 rewarding as well as providing a number of new features I have been able

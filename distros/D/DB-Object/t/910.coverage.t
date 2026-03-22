@@ -13,5 +13,6 @@ plan( skip_all => "Test::Pod::Coverage 1.04 required for testing POD coverage" )
 my $params =
 {
     coverage_class => 'Pod::Coverage::TrustPod',
-    trustme => [qr/^(new|init|FREEZE|STORABLE_freeze|STORABLE_thaw|THAW|TO_JSON)$/] };
+    trustme => [qr/^(new|init|FREEZE|STORABLE_freeze|STORABLE_thaw|STORABLE_thaw_post_processing|THAW|TO_JSON)$/]
+};
 all_pod_coverage_ok( $params );

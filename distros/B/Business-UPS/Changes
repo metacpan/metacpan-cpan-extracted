@@ -1,5 +1,21 @@
 Revision history for Perl extension Business::UPS
 
+2.03 2026-03-21
+
+ Bug Fixes:
+ - Fix UPStrack() to use UPS JSON tracking API. The old HTML-scraping
+   approach stopped working when UPS redesigned their website. GH #2, PR #3
+ - Fix Error() to die instead of exit(1), which is critical for library
+   code — callers can now catch errors with eval. PR #3
+
+ Maintenance:
+ - Modernize CI workflow: upgrade actions/checkout v2 to v4, use
+   perl-actions/perl-versions for dynamic matrix, switch to
+   perldocker/perl-tester images, add disttest job. PR #4
+ - Fix GitHub URLs in Makefile.PL META_MERGE to point to
+   cpan-authors/Business-UPS. PR #4
+ - Add JSON::PP dependency and bump minimum Perl version to 5.014. PR #3
+
 2.02 Thu Jan 21 2020
  - Github Issues (RT is shutting down)
  - Use https:// URLs

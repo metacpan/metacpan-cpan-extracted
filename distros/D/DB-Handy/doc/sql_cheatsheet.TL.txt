@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (Mga Uri ng Data) ]
+  INT          : Buong numero (Integer)
+  FLOAT        : Numerong may decimal (Floating point)
+  VARCHAR(n)   : Tekstong may nagbabagong haba (hanggang n bytes)
+  CHAR(n)      : Tekstong may nakapirming haba (laging n bytes)
+
+[ 1. CREATE / DROP (Paggawa at Pagbura ng Table) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (Pagdaragdag ng Data) ]
+  -- Magdagdag gamit ang pangalan ng column (Inirerekomenda)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- Magdagdag nang hindi isinusulat ang pangalan ng column
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (Paghanap ng Data) ]
+  -- Kunin ang lahat ng data
+  SELECT * FROM student;
+  -- Maglagay ng kondisyon (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- Ayusin ang pagkakasunod-sunod (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- Limitahan ang bilang ng linya (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (Pag-update ng Data) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (Pagbura ng Data) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (Mga Operator) ]
+  Paghahambing: =, <>, !=, >, <, >=, <=
+  Saklaw      : BETWEEN 70 AND 90
+  Listahan    : IN (1, 2, 3) o NOT IN (1, 2, 3)
+  Teksto      : LIKE 'A%' (Nagsisimula sa A), LIKE '%A' (Nagtatapos sa A)
+  Suriin ang NULL: IS NULL, IS NOT NULL
+  Lohikal     : AND, OR, NOT
+
+[ Aggregate Functions (Mga Aggregate Function) ]
+  COUNT(*) : Bilangin ang mga hilera (rows)
+  SUM(col) : Kunin ang kabuuan
+  AVG(col) : Kunin ang average
+  MAX(col) : Hanapin ang pinakamalaking halaga
+  MIN(col) : Hanapin ang pinakamaliit na halaga
+  (Halimbawa) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (Pabilisin gamit ang Index) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

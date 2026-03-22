@@ -41,14 +41,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/bodo-hugo-barwich/file-access-driver/issues"
+         "web" : "https://github.com/bodo-hugo-barwich/file-driver-pl/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/bodo-hugo-barwich/file-access-driver.git",
-         "web" : "https://github.com/bodo-hugo-barwich/file-access-driver"
+         "url" : "https://github.com/bodo-hugo-barwich/file-driver-pl.git",
+         "web" : "https://github.com/bodo-hugo-barwich/file-driver-pl"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

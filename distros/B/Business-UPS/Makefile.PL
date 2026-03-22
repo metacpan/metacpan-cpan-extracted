@@ -9,6 +9,7 @@ WriteMakefile(
     ($ExtUtils::MakeMaker::VERSION >= 6.3002 ? ('LICENSE'        => 'perl', ) : ()),
     PREREQ_PM => {
         'LWP::UserAgent' => 0,
+        'JSON::PP'       => 0,
 	'Test::More'     => 0,  # For testing
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -19,8 +20,8 @@ WriteMakefile(
         },
         resources => {
             license => 'http://dev.perl.org/licenses/',
-            bugtracker => 'https://github.com/toddr/Business-UPS/issues',
-            repository => 'https://github.com/toddr/Business-UPS',
+            bugtracker => 'https://github.com/cpan-authors/Business-UPS/issues',
+            repository => 'https://github.com/cpan-authors/Business-UPS',
         },
     },
     );

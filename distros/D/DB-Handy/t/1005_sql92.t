@@ -352,7 +352,7 @@ $db->execute("USE t");
     # ok 51
     is($r->[0]{v}, 20, "UPDATE v=v*2: 10->20");
 
-    qry($db,"UPDATE w SET v = v + 1"); #koko Perl5.5hung, Perl5.42 ok
+    qry($db,"UPDATE w SET v = v + 1");
     $r=qry($db,"SELECT v FROM w WHERE id=2");
 
     # ok 52

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query/Clause.pm
-## Version v1.0.1
+## Version v1.1.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2024/09/04
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -17,13 +17,14 @@ BEGIN
     use strict;
     use common::sense;
     use parent qw( DB::Object::Query::Elements );
-    use vars qw( $VERSION );
+    use vars qw( $VERSION $EXCEPTION_CLASS );
     use overload (
         '""'    => 'as_string',
         'bool'  => sub{1},
         fallback => 1,
     );
-    our $VERSION = 'v1.0.1';
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v1.1.0';
 };
 
 use strict;
@@ -38,8 +39,10 @@ sub init
     $self->{value}      = '';
     $self->{_init_strict_use_sub} = 1;
     # $self->{fields} = [];
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{_clause_reset} = '';
+    $self->{_fields} = [qw( generic operator type value )];
     return( $self );
 }
 
@@ -84,6 +87,7 @@ sub generic { return( shift->_set_get_scalar_as_object( 'generic', @_ ) ); }
 sub length { return( shift->value->length ); }
 
 sub metadata { return( shift->_set_get_hash_as_object( 'metadata', @_ ) ); }
+# sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
 # NOTE: sub merge supersedes the one inherited from DB::Object::Query::Elements
 # This takes or or more values and merge its clauses and the binded parameters
@@ -189,6 +193,7 @@ sub merge
 #             $self->fields->push( @{$this->fields} ) if( $this->fields->length );
 #             $self->bind->types->push( @{$this->bind->types} ) if( $this->bind->types->length );
 #             $self->bind->values->push( @{$this->bind->values} ) if( $this->bind->values->length );
+            # $ref returned here is a DB::Object::Query::Clause::Metadata object made from Module::Generic::Hash 
             my $ref = $this->metadata;
             my $hash = $self->metadata;
             foreach my $k ( keys( %$ref ) )
@@ -221,6 +226,73 @@ sub type { return( shift->_set_get_scalar_as_object( 'type', @_ ) ); }
 sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
 
 # NOTE: sub values is inherited from DB::Object::Query::Elements
+
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
+    # process-local state.
+    my @props = @{$self->{_fields}};
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # Before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) < version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref   = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    CORE::return( $new );
+}
 
 1;
 # NOTE: POD
@@ -273,7 +345,7 @@ And the associated values would be automatically bound to the query upon executi
 
 =head1 VERSION
 
-v1.0.1
+v1.1.0
 
 =head1 DESCRIPTION
 

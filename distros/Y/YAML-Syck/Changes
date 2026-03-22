@@ -1,3 +1,8 @@
+1.39 Mar 21 2026
+
+  [Bug Fixes]
+  - Fix t/yaml-implicit-typing.t failure with -Duselongdouble perls (GH #138, PR #139)
+
 1.38 Mar 20 2026
 
   [Bug Fixes]

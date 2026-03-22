@@ -1,5 +1,5 @@
 package Crypt::Bear::SSL::Engine;
-$Crypt::Bear::SSL::Engine::VERSION = '0.003';
+$Crypt::Bear::SSL::Engine::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::Bear::SSL::Engine - A sans-io SSL connection base-class in BearSSL
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

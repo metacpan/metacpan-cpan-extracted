@@ -274,15 +274,15 @@ sub structure
         $self->messagec( 6, "Checking table ${table} field {green}", $ref->{name}, "{/} with type {green}", $ref->{type}, "{/} -> ", sub{ $self->Module::Generic::dump( $ref ) } );
         my $def =
         {
-        name            => $ref->{name},
-        default         => $ref->{dflt_value},
-        is_nullable     => ( $ref->{notnull} ? 0 : 1 ),
-        is_primary      => ( $ref->{is_primary} ? 1 : 0 ),
-        pos             => ++$c,
-        #query_object    => $q,
-        size            => undef,
-        type            => $ref->{type},
-        #table_object    => $self,
+            name            => $ref->{name},
+            default         => $ref->{dflt_value},
+            is_nullable     => ( $ref->{notnull} ? 0 : 1 ),
+            is_primary      => ( $ref->{is_primary} ? 1 : 0 ),
+            pos             => ++$c,
+            #query_object    => $q,
+            size            => undef,
+            type            => $ref->{type},
+            #table_object    => $self,
         };
         if( $def->{type} =~ /^([^\(]+)\(([^\)]+)\)$/ )
         {

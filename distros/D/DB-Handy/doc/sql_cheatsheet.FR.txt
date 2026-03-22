@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (Types de données) ]
+  INT          : Entier
+  FLOAT        : Nombre à virgule flottante
+  VARCHAR(n)   : Chaîne de longueur variable (max n octets)
+  CHAR(n)      : Chaîne de longueur fixe (toujours n octets)
+
+[ 1. CREATE / DROP (Créer et Supprimer des tables) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (Ajouter des données) ]
+  -- Ajouter en spécifiant les colonnes (Recommandé)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- Ajouter sans spécifier les colonnes
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (Rechercher des données) ]
+  -- Récupérer toutes les données
+  SELECT * FROM student;
+  -- Spécifier des conditions (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- Trier les données (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- Limiter le nombre de lignes (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (Mettre à jour des données) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (Supprimer des données) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (Opérateurs) ]
+  Comparaison : =, <>, !=, >, <, >=, <=
+  Plage       : BETWEEN 70 AND 90
+  Liste       : IN (1, 2, 3) ou NOT IN (1, 2, 3)
+  Chaîne      : LIKE 'A%' (Commence par A), LIKE '%A' (Termine par A)
+  Vérif. NULL : IS NULL, IS NOT NULL
+  Logique     : AND, OR, NOT
+
+[ Aggregate Functions (Fonctions d'agrégation) ]
+  COUNT(*) : Compter le nombre de lignes
+  SUM(col) : Calculer la somme
+  AVG(col) : Calculer la moyenne
+  MAX(col) : Trouver la valeur maximale
+  MIN(col) : Trouver la valeur minimale
+  (Exemple) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (Accélérer avec les index) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

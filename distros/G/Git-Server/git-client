@@ -8,9 +8,9 @@ git-client - Git Client Wrapper
 
 =head1 DESCRIPTION
 
-Wrapper around the real git provide additional functionality.
+Wrapper around the real git for augmented functionality.
 
-=head2 GIT_CONFIG Override
+=head2 .gitconfig Override
 
 Allows for .gitconfig descent override files up until the $HOME directory.
 All descent .gitconfig files will be honored, although files closest
@@ -27,6 +27,10 @@ These ENV settings will be available to all the server side
 hooks, including the pre-* hooks.
 Note that for this to work, the git ssh server must have
 "AcceptEnv XMODIFIERS" enabled in its sshd_config.
+
+=head2 -v | --version | version
+
+Shows both git-client version and git version and exits.
 
 =head2 DEBUG
 
@@ -82,13 +86,26 @@ This library is free software; you can redistribute it and/or modify it under th
 use strict;
 use Cwd qw(abs_path);
 
-our $VERSION = "0.037";
+our $VERSION = "0.038";
 
 # Locate the real "git" later in the $PATH (after myself)
 our $real_git = find_real_git();
 
 # By default, silence any error spewages for internal git usage.
 our $HANDLE_STDERR = sub { open STDERR, ">", "/dev/null" };
+
+if ("@ARGV" =~ /^(-v|(?:--|)version)$/ and $real_git =~ m{^(.*/)}) {
+    print "[git-client v$VERSION] $0 => $1".git("--version");
+    exit;
+}
+
+# Handle [ -C <dir> ] first
+if (eval { require Getopt::Long; 1; } and
+    Getopt::Long::Configure(qw[pass_through no_ignore_case bundling]) and
+    Getopt::Long::GetOptions( "chdir|C=s" => (my $chdir=[]) ),
+    ) {
+    foreach (@$chdir) { chdir $_ or die "fatal: cannot change to '$_': $!\n"; }
+}
 
 # Grab special options for XMODIFIERS transport
 pass_options();
@@ -105,36 +122,25 @@ exec $real_git, @ARGV;
 # Provide special options through "SendEnv XMODIFIERS" to make available in pre-hooks prior to running the real git command on the server
 sub pass_options {
     my ($op) = grep { /^(clone|fetch|pull|ls-remote|push)$/ } @ARGV;
-    return if !$op;
-    # Need to search for special "-o" options
+    return if !$op or ($ENV{XMODIFIERS}||"") =~ /\bclient=/;
+    # Need to search for special "-o" options for XMODIFERS transport
     my @options = ();
+    my $pull_branch = "";
     push @options, "DEBUG=$ENV{DEBUG}" if defined $ENV{DEBUG};
-    for (my $i = 1; $i < @ARGV; $i++) {
-        my $pre = $ARGV[$i-1];
-        my $option = $ARGV[$i];
-        if ($option =~ /^(--server-option|--push-option)=(.*)$/i) {
-            # Split up the annoying "=" notation, then scan again.
-            splice @ARGV, $i, 1, $1, $2;
-            next;
-        }
-        next if $op eq "clone" and $pre eq "-o"; # Don't brick the "-o <origin>" param for git clone
-        if ($pre =~ /^(-o|--(server|push)-option)$/i) {
-            push @options, $option;
-            if ($pre eq "-O") {
-                # Special Capital -O means only transport via XMOD
-                # So must strip it from the real commandline.
-                splice @ARGV, $i-1, 2;
-                # Roll back to handle the 2 args that have been wiped.
-                $i-=2;
-            }
+    if (eval { require Getopt::Long; 1; } and
+        Getopt::Long::GetOptions( "O=s" => \@options )) { # Strip stealth -O args from ARGV so the real git doesn't choke on it
+        if (my $rest_opt = ($op ne "clone" && "o|")."server-option|push-option=s") { # Ignore -o<origin> for "git clone"
+            local @ARGV = @ARGV; # Don't monkey anything. Just peek.
+            Getopt::Long::GetOptions( $rest_opt => \@options, "branch|b=s" => \$pull_branch ); # Handle "git clone -b <ref> <repo>"
         }
     }
+    $pull_branch = $1 if $op eq "pull" and git(qw[branch -a]) =~ m{^\* ([\w/\-.@]+)\s*$}m;
+    push @options, "pull_branch=$pull_branch" if $pull_branch;
+    push @options, "client=".abs_path($0)."\@v$VERSION";
     push @options, $ENV{XMODIFIERS} if $ENV{XMODIFIERS};
-    if (@options) {
-        $ENV{XMODIFIERS} = join "\n", @options;
-        $ENV{GIT_SSH_COMMAND} //= "ssh";
-        $ENV{GIT_SSH_COMMAND} = "$ENV{GIT_SSH_COMMAND} -o SendEnv=XMODIFIERS";
-    }
+    $ENV{XMODIFIERS} = join "\n", @options;
+    $ENV{GIT_SSH_COMMAND} ||= "ssh";
+    $ENV{GIT_SSH_COMMAND} = "$ENV{GIT_SSH_COMMAND} -o SendEnv=XMODIFIERS";
 }
 
 sub find_real_git {
@@ -234,33 +240,24 @@ sub scan_descent_override {
 # Special "config" handler to honor new --descent option
 sub handle_config {
     my @args = @_;
+    local @ARGV = @args;
     # Don't try to handle the "--help"-first case.
-    return if join(" ", @args) =~ /config --help\b/;
-    if (grep {$_ eq "config"} @args and
+    return if join(" ", @ARGV) =~ /config --help\b/;
+    if (grep {$_ eq "config"} @ARGV and
         # Smells like special "git config" command
         eval { require Getopt::Long; 1; } and
-        Getopt::Long::Configure("pass_through") and
-        Getopt::Long::Configure("no_ignore_case") and
-        Getopt::Long::Configure("require_order") and
-        Getopt::Long::GetOptionsFromArray(
-            \@args,
-            "c=s"          => (my $c=[]),
-            "C=s"          => (my $chdir=[]), # XXX - Do we need to honor chdir (-C) option to locate the right descent config files?
-        ) and
-        $args[0] eq "config" and
+        Getopt::Long::Configure(qw[pass_through no_ignore_case require_order]) and
+        Getopt::Long::GetOptions( "c=s" => (my $c=[]) ) and # XXX: Is is safe to ignore -c <name>=<value> args?
+        $ARGV[0] eq "config" and
         do {
             # Handle naked "git config" case to make sure the usage can be updated before sending it
-            push @_,"--usage" and push @args,"--usage" if 1 == @args;
-            # Also handle new-fangled git > 2.40.x "git config <command_without_dashes>" syntax:
-            $args[1]=~/^([a-z][a-z\-]+)$/ && ($args[1]="--$1") or
-            # If smells like a normal set or update, then default it to replace-all to count the actions.
-            $args[1]=~/^(\w+)\./ && splice @args, 1, 0, "--replace-all" if @args>1;
+            push @_,"--usage" and push @ARGV,"--usage" if 1 == @ARGV;
+            # Also handle new-fangled git >= 2.46.x "git config <command_without_dashes>" syntax:
+            $ARGV[1]=~/^([a-z][a-z\-]+)$/ && ($ARGV[1]="--$1");
             1;
         } and
-        Getopt::Long::Configure("no_require_order") and
-        Getopt::Long::GetOptionsFromArray(
-            \@args,
-
+        Getopt::Long::Configure(qw[no_bundling no_require_order]) and
+        Getopt::Long::GetOptions(
             # Scope
             "descent"      => \(my $descent),
             "global"       => \(my $global),
@@ -293,7 +290,7 @@ sub handle_config {
         if ($descent) {
             # Swap "--descent" for "--file <DESCENT_CONFIG_FILE>"
             # If more than one descent file, then just use the closest one
-            @_ = map { $_ =~ /^--des/ ? ("--file" => ($descent_config_files->[-1] // "/dev/null")) : ($_) } @_;
+            @_ = map { $_ =~ /^--des/ ? ("--file" => ($descent_config_files->[-1] || "/dev/null")) : ($_) } @_;
         }
         # error: only one action at a time:
         map { ($_ eq "config" and ++$help) ? ($_,"--list","--edit") : ($_) } @_ if 1 < !!$list + !!$edit + !!$get + !!$action_1_arg + !!$action_2_arg + !!$action_1_2_arg + !!$action_2_3_arg;
@@ -307,7 +304,7 @@ sub handle_config {
         local $HANDLE_STDERR = sub { open STDERR, ">", "$tmp" };
         my $out = git @_;
         my $exit_status = $? >> 8;
-        $tmp->seek(0, 0);
+        eval { $tmp->seek(0, 0);1 } or open $tmp, "<", "$tmp";
         my $err = join "", <$tmp>;
         exit $exit_status if !length $out and !length $err;
 

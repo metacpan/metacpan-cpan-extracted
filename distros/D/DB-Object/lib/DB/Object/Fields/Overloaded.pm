@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Overloaded.pm
-## Version v0.1.0
-## Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
+## Version v0.2.0
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2023/07/08
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -17,13 +17,14 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query::Element );
-    use vars qw( $VERSION );
+    use vars qw( $VERSION $EXCEPTION_CLASS );
     use overload (
         '""'    => sub{ return( $_[0]->{expression} ) },
         'bool'  => sub{1},
         fallback => 1,
     );
-    our $VERSION = 'v0.1.1';
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -34,6 +35,7 @@ sub init
     my $self = shift( @_ );
     $self->{expression} = undef;
     $self->{_init_strict_use_sub} = 1;
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );
 }
@@ -68,7 +70,7 @@ DB::Object::Fields::Overloaded - Overloaded Field Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 

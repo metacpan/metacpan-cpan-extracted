@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.3.1
+## Version v0.4.0
 ## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -18,9 +18,10 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Wanted;
-    our $VERSION = 'v0.3.1';
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -31,7 +32,8 @@ sub init
     my $self = shift( @_ );
     $self->{having} = '';
     $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{binded_having} = [];
     $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
     return( $self );
@@ -133,7 +135,7 @@ sub format_statement
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
     # Should we use bind statement?
     my $bind   = $tbl_o->use_bind;
-    $opts->{data} = $self->{_default} if( !$opts->{data} );
+    $opts->{data}  = $self->{_default} if( !$opts->{data} );
     $opts->{order} = $self->{_fields} if( !$opts->{order} );
     $opts->{table} = $tbl_o->name if( !$opts->{table} );
     local $_;
@@ -753,7 +755,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.3.1
+    v0.4.0
 
 =head1 DESCRIPTION
 

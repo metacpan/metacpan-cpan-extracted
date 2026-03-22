@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.159;
+package Config::Model 2.160;
 
 use 5.20.0;
 use strict ;
@@ -1888,7 +1888,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.159
+version 2.160
 
 =head1 SYNOPSIS
 

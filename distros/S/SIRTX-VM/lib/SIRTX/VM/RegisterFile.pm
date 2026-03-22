@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft
+# Copyright (c) 2024-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -17,7 +17,7 @@ use SIRTX::VM::Register;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my @_register_templates = (
     # user:
@@ -96,6 +96,29 @@ sub map {
 }
 
 
+sub unmap {
+    my ($self, @logical) = @_;
+
+    foreach my $logical (@logical) {
+        if ($logical < 0 || $logical >= 8) {
+            croak 'Bad logical register: '.$logical;
+        }
+
+        $self->{logical_registers}[$logical] = undef;
+    }
+}
+
+
+sub forget_register_state {
+    my ($self, @registers) = @_;
+
+    foreach my $register ($self->expand(@registers)) {
+        my $loc = eval { $self->get_logical_by_name($register) };
+        $self->unmap($loc) if defined $loc;
+    }
+}
+
+
 sub get_physical {
     my ($self, $physical) = @_;
     return $physical if ref $physical;
@@ -144,7 +167,7 @@ sub get_logical_by_physical {
     $physical = $self->get_physical($physical);
 
     for (my $i = 0; $i < 8; $i++) {
-        if ($self->{logical_registers}[$i] == $physical) {
+        if (($self->{logical_registers}[$i] // next) == $physical) {
             return $i;
         }
     }
@@ -194,6 +217,8 @@ sub expand {
             push(@res, map {'user'.$_} 0..31);
         } elsif ($reg eq 'system*') {
             push(@res, grep {defined} map {scalar(eval {$self->get_physical($_)->name})} 32..63);
+        } elsif ($reg eq '_all_' || $reg eq '*') {
+            push(@res, $self->expand(qw(r* user* system*)));
         } else {
             push(@res, $reg);
         }
@@ -231,7 +256,12 @@ sub clone {
 
     # clone map:
     for (my $i = 0; $i < scalar(@{$self->{logical_registers}}); $i++) {
-        $clone->map($i => $self->get_logical($i)->physical);
+        my $reg = eval { $self->get_logical($i)->physical };
+        if (defined $reg) {
+            $clone->map($i => $reg);
+        } else {
+            $clone->unmap($i);
+        }
     }
 
     return $clone;
@@ -259,7 +289,7 @@ SIRTX::VM::RegisterFile - module for interacting with SIRTX VM code
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -286,6 +316,24 @@ Resets the mapping between logical and physical registers.
     $rf->map($logical => $physical);
 
 Maps the logical register to a physical register.
+
+=head2 unmap
+
+    $rf->unmap($logical [, $logical [, ... ]]);
+
+(experimental since v0.13)
+
+Marks the logical register to be unmapped (or the mapping being unknown).
+
+=head2 forget_register_state
+
+    $rf->forget_register_state($register [, $register, [, ...] ] );
+
+(experimental since v0.13)
+
+Forgets all state (mapping, statistics, values, ...) about registers but keeps their attributes (temperature, owner, ...).
+
+Arguments are subject to expansion via L</expand>.
 
 =head2 get_physical
 

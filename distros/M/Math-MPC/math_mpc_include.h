@@ -69,13 +69,13 @@ _WIN32_BIZARRE_INFNAN    : Defined (on Windows only) when the perl version
                            These earlier perl versions generally stringified
                            NaNs as (-)1.#IND and (-)1.#INF.
 
-_Complex_I               : Defined by complex.h. Attempts to define _DO_COMPLEX
+_Complex_I               : Defined by complex.h. Attempts to define _DO_COMPLEX_H
                            (see below) will not succeed if _Complex_I is not
                            defined.
 
-_DO_COMPLEX              : Automatically defined if at least one of Math::Complex_C,
+_DO_COMPLEX_H              : Automatically defined if at least one of Math::Complex_C,
                            Math::Complex_C::L and Math::Complex_C::Q is installed.
-                           complex.h will be included iff _DO_COMPLEX is defined.
+                           complex.h will be included iff _DO_COMPLEX_H is defined.
                            Can also be defined in the Makefile.PL by setting
                            $do_complex_h to 1 - though I can't envisage a situation
                            where doing so will be advantageous.

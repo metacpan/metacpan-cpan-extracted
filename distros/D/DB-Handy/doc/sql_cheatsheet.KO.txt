@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (데이터 타입) ]
+  INT          : 정수
+  FLOAT        : 실수 (부동소수점)
+  VARCHAR(n)   : 가변 길이 문자열 (최대 n 바이트)
+  CHAR(n)      : 고정 길이 문자열 (항상 n 바이트)
+
+[ 1. CREATE / DROP (테이블 생성 및 삭제) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (데이터 추가) ]
+  -- 열을 지정하여 데이터 추가 (권장)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- 열 지정을 생략하고 데이터 추가
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (데이터 검색) ]
+  -- 모든 데이터 가져오기
+  SELECT * FROM student;
+  -- 조건 지정 (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- 정렬 (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- 행 개수 제한 (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (데이터 수정) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (데이터 삭제) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (연산자) ]
+  비교 연산자 : =, <>, !=, >, <, >=, <=
+  범위 검색   : BETWEEN 70 AND 90
+  목록 검색   : IN (1, 2, 3) 또는 NOT IN (1, 2, 3)
+  문자열 검색 : LIKE 'A%' (A로 시작), LIKE '%A' (A로 끝남)
+  NULL 확인   : IS NULL, IS NOT NULL
+  논리 연산자 : AND, OR, NOT
+
+[ Aggregate Functions (집계 함수) ]
+  COUNT(*) : 행(데이터)의 개수 세기
+  SUM(col) : 합계 구하기
+  AVG(col) : 평균 구하기
+  MAX(col) : 최댓값 찾기
+  MIN(col) : 최솟값 찾기
+  (예시) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (인덱스로 검색 속도 향상) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

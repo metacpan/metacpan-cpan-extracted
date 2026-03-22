@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (資料型態) ]
+  INT          : 整數
+  FLOAT        : 浮點數
+  VARCHAR(n)   : 可變長度字串 (最大 n 位元組)
+  CHAR(n)      : 固定長度字串 (始終為 n 位元組)
+
+[ 1. CREATE / DROP (建立與刪除資料表) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (新增資料) ]
+  -- 指定欄位新增資料（推薦）
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- 省略欄位名稱新增資料
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (查詢資料) ]
+  -- 取得所有資料
+  SELECT * FROM student;
+  -- 指定條件 (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- 排序 (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- 限制資料筆數 (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (更新資料) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (刪除資料) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (運算子) ]
+  比較運算子 : =, <>, !=, >, <, >=, <=
+  範圍查詢   : BETWEEN 70 AND 90
+  清單查詢   : IN (1, 2, 3) 或 NOT IN (1, 2, 3)
+  字串搜尋   : LIKE 'A%' (以A開頭), LIKE '%A' (以A結尾)
+  空值判斷   : IS NULL, IS NOT NULL
+  邏輯運算子 : AND, OR, NOT
+
+[ Aggregate Functions (聚合函數) ]
+  COUNT(*) : 計算資料筆數
+  SUM(col) : 計算總和
+  AVG(col) : 計算平均值
+  MAX(col) : 找出最大值
+  MIN(col) : 找出最小值
+  (範例) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (使用索引加速查詢) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

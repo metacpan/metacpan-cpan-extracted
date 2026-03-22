@@ -1,5 +1,10 @@
 Revision history for Crypt-Passphrase
 
+0.022     2026-03-21 22:55:35+01:00 Europe/Brussels
+          - Add Crypt::Passphrase::Crypt64
+          - quotemeta all crypt subtypes in accepts_hash
+          - Discourage Crypt::Passphrase::Pepper::Simple
+
 0.021     2025-02-04 20:20:48+01:00 Europe/Brussels
           - Use Crypt::SysRandom as source of randomness
           - Fix skipping of internal packages in error messages

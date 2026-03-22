@@ -1,0 +1,22 @@
+Changes
+cpanfile
+lib/Test/HTTP/Scenario.pm
+lib/Test/HTTP/Scenario/Adapter/LWP.pm
+lib/Test/HTTP/Scenario/Cookbook.pod
+lib/Test/HTTP/Scenario/Serializer/JSON.pm
+lib/Test/HTTP/Scenario/Serializer/YAML.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/adapter-lwp-uninstall.t
+t/critic.t
+t/edge-cases.t
+t/eof.t
+t/eol.t
+t/function.t
+t/integration.t
+t/kwalitee.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

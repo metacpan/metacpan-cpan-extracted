@@ -28,6 +28,7 @@ Jon
 MAC
 Miner
 NetAddr
+OUI
 Oliver
 Sinclair
 dean

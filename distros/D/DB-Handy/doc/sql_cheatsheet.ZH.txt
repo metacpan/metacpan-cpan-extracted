@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (数据类型) ]
+  INT          : 整数
+  FLOAT        : 浮点数
+  VARCHAR(n)   : 可变长度字符串 (最大 n 字节)
+  CHAR(n)      : 固定长度字符串 (始终为 n 字节)
+
+[ 1. CREATE / DROP (创建和删除表) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (插入数据) ]
+  -- 指定列插入数据（推荐）
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- 省略列名插入数据
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (查询数据) ]
+  -- 获取所有数据
+  SELECT * FROM student;
+  -- 指定条件 (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- 排序 (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- 限制行数 (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (更新数据) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (删除数据) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (常用运算符) ]
+  比较运算符: =, <>, !=, >, <, >=, <=
+  范围查询  : BETWEEN 70 AND 90
+  列表查询  : IN (1, 2, 3) 或 NOT IN (1, 2, 3)
+  字符串匹配: LIKE 'A%' (以A开头), LIKE '%A' (以A结尾)
+  空值判断  : IS NULL, IS NOT NULL
+  逻辑运算符: AND, OR, NOT
+
+[ Aggregate Functions (聚合函数) ]
+  COUNT(*) : 计算行数
+  SUM(col) : 求和
+  AVG(col) : 求平均值
+  MAX(col) : 查找最大值
+  MIN(col) : 查找最小值
+  (示例) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (使用索引加速查询) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

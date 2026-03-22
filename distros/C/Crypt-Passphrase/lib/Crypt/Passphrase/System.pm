@@ -1,9 +1,11 @@
 package Crypt::Passphrase::System;
-$Crypt::Passphrase::System::VERSION = '0.021';
+$Crypt::Passphrase::System::VERSION = '0.022';
 use strict;
 use warnings;
 
 use parent 'Crypt::Passphrase::Encoder';
+
+use Crypt::Passphrase::Util::Crypt64 'encode_crypt64';
 
 use Carp 'croak';
 
@@ -65,31 +67,10 @@ sub new {
 	}, $class;
 }
 
-my $base64_digits = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-sub _encode_crypt64 {
-	my $bytes = shift;
-	my $nbytes = length $bytes;
-	my $npadbytes = 2 - ($nbytes + 2) % 3;
-	$bytes .= "\0" x $npadbytes;
-	my $digits = '';
-	for (my $i = 0; $i < $nbytes; $i += 3) {
-		my $v = ord(substr $bytes, $i, 1) |
-			(ord(substr $bytes, $i + 1, 1) << 8) |
-			(ord(substr $bytes, $i + 2, 1) << 16);
-			$digits .= substr($base64_digits, $v & 0x3f, 1) .
-			substr($base64_digits, ($v >> 6) & 0x3f, 1) .
-			substr($base64_digits, ($v >> 12) & 0x3f, 1) .
-			substr($base64_digits, ($v >> 18) & 0x3f, 1);
-	}
-	substr $digits, -$npadbytes, $npadbytes, '';
-	return $digits;
-}
-
-
 sub hash_password {
 	my ($self, $password) = @_;
 	my $salt = $self->random_bytes($self->{salt_size});
-	my $encoded_salt = _encode_crypt64($salt);
+	my $encoded_salt = encode_crypt64($salt);
 	substr $encoded_salt, 2, 1, '' if $self->{salt_size} == 2; # descrypt
 
 	my $settings = sprintf $self->{format}, $self->{settings}, $encoded_salt;
@@ -142,7 +123,7 @@ Crypt::Passphrase::System - An system crypt() encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -154,7 +135,7 @@ This class implements a Crypt::Passphrase encoder around your system's C<crypt()
 
 Note that the supported algorithms depend entirely on your platform. The only option portable among unices (descrypt) is not considered safe at all. It will try to pick a good default among the supported options. Because the different algorithms take different parameters they will have to be passed as a settings string if anything else is desired.
 
-By default it uses the first supported algorithm in this list: C<yescript>, C<scrypt>, C<bcrypt>, C<SHA512crypt>, C<SHA256crypt>, C<SHA1crypt>, C<MD5crypt>, extended C<descrypt>, C<descrypt> and C<NTHASH>.
+By default it uses the first supported algorithm in this list: C<yescrypt>, C<scrypt>, C<bcrypt>, C<SHA512crypt>, C<SHA256crypt>, C<SHA1crypt>, C<MD5crypt>, extended C<descrypt>, C<descrypt> and C<NTHASH>.
 
 =head2 Configuration
 
@@ -170,71 +151,49 @@ The type of hash, this must be one of the values supported by the system. If non
 
 =item * C<'y'> / C<'gy'>
 
-C<yescrypt>
-
-This is known to be supported on linux systems using C<libxcrypt>. C<'y'> is typically the default for system passwords on such systems.
+C<yescrypt> is known to be supported on linux systems using C<libxcrypt>. C<'y'> is typically the default for system passwords on such systems.
 
 =item * C<'7'>
 
-C<scrypt>
-
-This is known to be supported on linux systems using C<libxcrypt>, FreeBSD and Solaris.
+C<scrypt> is known to be supported on linux systems using C<libxcrypt>, FreeBSD and Solaris.
 
 =item * C<'2b'> / C<'2a'> / C<'2y'> / C<'2x'>
 
-C<bcrypt>
-
-This is the traditional default algoritm of BSD systems. Difference between these types is in obscure edge-cases, C<'2b'> should be prefered unless another variant is required. This is also supported on linux systems using C<libxcrypt> and Solaris.
+C<bcrypt> is the traditional default algoritm of BSD systems. Difference between these types is in obscure edge-cases, C<'2b'> should be prefered unless another variant is required. This is also supported on linux systems using C<libxcrypt> and Solaris.
 
 =item * C<'6'>
 
-C<SHA512crypt>
-
-This algorithm originated on Linux but is also supported on some BSDs and Solaris.
+C<SHA512crypt> originated on Linux but is also supported on some BSDs and Solaris.
 
 =item * C<'5'>
 
-C<SHA256crypt>
-
-This algorithm originated on Linux but is also supported on some BSDs and Solaris.
+C<SHA256crypt> originated on Linux but is also supported on some BSDs and Solaris.
 
 =item * C<'sha1'>
 
-C<SHA1crypt>
-
-This algorithm is supported on NetBSD and Linux systems using C<libxcrypt>.
+C<SHA1crypt> is supported on NetBSD and Linux systems using C<libxcrypt>.
 
 =item * C<'1'>
 
-C<MD5crypt>
-
-This is supported on Linux, many BSDs and Solaris.
+C<MD5crypt> is supported on Linux, many BSDs and Solaris.
 
 =item * C<'md5'>
 
-Solaris C<MD5crypt>.
-
-This is supported on Solaris and Linux systems using C<libxcrypt>.
+Solaris C<MD5crypt> is supported on Solaris and Linux systems using C<libxcrypt>.
 
 =item * C<'_'>
 
-Extended C<descrypt>.
-
-This is supported on Linux, BSD and Mac OS.
+Extended C<descrypt> is supported on Linux, BSD and Mac OS.
 
 =item * C<''>
 
-C<descrypt>
-
-This is the only algorithm that is universally supported. Unfortunately it's also incredably unsafe and should not be used in production.
+C<descrypt> is the only algorithm that is universally supported. Unfortunately it's also incredably unsafe and should not be used in production.
 
 Note that unlike all other supported algorithms this lacks a crypt header.
 
-=item * C<'$3$'>
+=item * C<'3'>
 
-C<NTHASH>
-
-This saltless algorithm originates in the Microsoft world. It's supported on FreeBSD and Linux systems using C<libxcrypt>.
+C<NTHASH> is a saltless algorithm originating in the Microsoft world. It's supported on FreeBSD and Linux systems using C<libxcrypt>.
 
 =back
 

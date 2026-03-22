@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::FuseUI 2.159;
+package Config::Model::FuseUI 2.160;
 
 # there's no Singleton with Mouse
 use Mouse;
@@ -320,7 +320,7 @@ Config::Model::FuseUI - Fuse virtual file interface for Config::Model
 
 =head1 VERSION
 
-version 2.159
+version 2.160
 
 =head1 SYNOPSIS
 

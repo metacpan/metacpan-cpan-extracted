@@ -1,3 +1,7 @@
+0.04 2026-03-21T17:01:11+01:00
+ - Update copyright years.
+ - Update to Pod::Abstract@0.26.
+
 0.03 2023-12-04T12:29:09+01:00
  - Add 'debug' parameter with print of text before change.
  - Add support for changing year of in pod item, which is verbatim.
@@ -9,4 +13,4 @@
  - Use String::UpdateYears helper.
 
 0.01 2023-01-05T14:28:49+01:00
- - First version.  
+ - First version.

@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Cache/Tables.pm
-## Version v0.100.5
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.101.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -18,11 +18,12 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION );
+    use vars qw( $VERSION $EXCEPTION_CLASS );
     use JSON;
     use Fcntl qw( :flock );
     use Module::Generic::File qw( sys_tmpdir );
-    our $VERSION = 'v0.100.5';
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.101.0';
 };
 
 use strict;
@@ -31,11 +32,12 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
-    $self->{cache} = {};
-    $self->{cache_dir} = sys_tmpdir();
-    $self->{cache_file} = "$self->{cache_dir}/sql_tables.json";
-    $self->{timeout} = 86400;
-    $self->SUPER::init( @_ );
+    $self->{cache}              = {};
+    $self->{cache_dir}          = sys_tmpdir();
+    $self->{cache_file}         = "$self->{cache_dir}/sql_tables.json";
+    $self->{timeout}            = 86400;
+    $self->{_exception_class}   = $EXCEPTION_CLASS;
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{updated} = '';
     $self->cache_dir( $self->{cache_dir} ) if( $self->{cache_dir} );
     $self->cache_file( $self->{cache_file} ) if( $self->{cache_file} );
@@ -104,25 +106,8 @@ sub read
     my $j = JSON->new->relaxed;
     if( $tables_cache_file->exists && !$tables_cache_file->is_empty )
     {
-        if( my $fh = $tables_cache_file->open_utf8 )
-        {
-            $fh->autoflush(1);
-            # my $data = join( '', $fh->getlines );
-            # $fh->close;
-            my $data = $tables_cache_file->load;
-            eval
-            {
-                $hash = $j->decode( $data );
-            };
-            if( $@ )
-            {
-                warn( "An error occured while decoding json data from the table cache file: $@\n" );
-            }
-        }
-        else
-        {
-            warn( "Warning only: cannot read the tables cache file \"$tables_cache_file\".\n" );
-        }
+        $hash = $tables_cache_file->load_json ||
+            warn( "An error occured while decoding json data from the table cache file: ", $tables_cache_file->error );
     }
     return( $hash );
 }
@@ -166,30 +151,10 @@ sub write
     my $tables_cache_file = shift( @_ ) || $self->cache_file || return( $self->error( "No cache file was set to write data to it." ) );
     $tables_cache_file = $self->new_file( $tables_cache_file );
     return( $self->error( "Tables cache data provided is not an hash reference." ) ) if( ref( $hash ) ne 'HASH' );
-    my $j = JSON->new->allow_nonref;
-    if( my $fh = $tables_cache_file->open_utf8( '>' ) )
-    {
-        $fh->autoflush(1);
-        eval
-        {
-            $tables_cache_file->lock( LOCK_EX );
-        };
-        $fh->print( $j->encode( $hash ) ) || return( $self->error( "Unable to write data to tables cache file \"$tables_cache_file\": ", $tables_cache_file->error ) );
-        eval
-        {
-            $tables_cache_file->unlock;
-        };
-        $self->updated( $tables_cache_file->finfo->mtime );
-        return( -s( $tables_cache_file ) );
-    }
-    elsif( $tables_cache_file->exists && !$tables_cache_file->can_write )
-    {
-        return( $self->error( "Table cache file \"$tables_cache_file\" does not have write permission: ", $tables_cache_file->error ) );
-    }
-    else
-    {
-        return( $self->error( "Although table cache file \"$tables_cache_file\" is writable, I am unable to write to it: ", $tables_cache_file->error ) );
-    }
+    $tables_cache_file->unload_json( $hash ) ||
+        return( $self->pass_error( $tables_cache_file->error ) );
+    $self->updated( $tables_cache_file->finfo->mtime );
+    return( -s( $tables_cache_file ) );
 }
 
 1;
@@ -234,7 +199,7 @@ DB::Object::Cache::Tables - Table Cache
 
 =head1 VERSION
 
-    v0.100.5
+    v0.101.0
 
 =head1 DESCRIPTION
 

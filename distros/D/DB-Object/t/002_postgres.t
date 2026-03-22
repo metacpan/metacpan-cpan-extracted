@@ -235,8 +235,6 @@ SQL
 	    diag( "An error has occurred while trying to create an update query for table customers: " . $cust->error );
 	ok( $cust_sth_upd, "customer update query object" );
 	skip( "Unable to get a statement object to update customer.", 12 ) if( !$cust_sth_upd );
-	# XXX
-	$cust_sth_upd->debug(4);
 	$result = $cust_sth_upd->only->as_string;
 	diag( "Error getting the update only statement: ", $cust_sth_upd->error ) if( !$result );
 	$expected = <<SQL;

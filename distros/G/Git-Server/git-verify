@@ -70,7 +70,7 @@ use strict;
 use warnings;
 use Cwd qw(abs_path);
 
-our $VERSION = "0.037";
+our $VERSION = "0.038";
 
 if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
     s{^ssh://(|[^/:]+\@)\[([a-z0-9\-\.\:]+)\]:(\d+)(?:$|/)}{}i ||
@@ -95,8 +95,8 @@ if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
             1;
         } or $resolvable = 1; # If IPv6 resolvers are unavailable, then assume it's valid, and just blindly run ssh
         if ($resolvable) {
-            length?$ARGV[0]=$_:shift;
-            $ENV{XMODIFIERS}="v=1";
+            length()?$ARGV[0]=$_:shift;
+            $ENV{XMODIFIERS}="client=".abs_path($0)."\@v$VERSION";
             exec qw[ssh
                 -o PubKeyAuthentication=yes
                 -o KbdInteractiveAuthentication=no
@@ -104,7 +104,7 @@ if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
                 -o SendEnv=XMODIFIERS
                 -p], $remoteport,
                 "$userprefix$remotehost",abs_path($0),(
-                !(grep {/[^\w\-.\/]/} @ARGV) ? @ARGV :   # Unable to find any potentionally stank chars so it's safe to pass @ARGV as is.
+                !(grep {m{[^\w/\-.]}} @ARGV) ? @ARGV :   # Unable to find any potentionally stank chars so it's safe to pass @ARGV as is.
                 "--escaperepos",map{unpack"H*",$_}@ARGV  # Otherwise, encode every character for all repos just to be extra safe.
             ) or die "$0: remote verification failed.\n";
         }
@@ -179,7 +179,7 @@ if (my $user = $ENV{REMOTE_USER}) {
     else {
         print "REMOTE_USER: $user: AllowAgentForwarding is not enabled: FINE\n";
     }
-    if ($ENV{XMODIFIERS} && $ENV{XMODIFIERS} eq "v=1") {
+    if ($ENV{XMODIFIERS} && $ENV{XMODIFIERS} =~ /(v|client)=/) {
         print "REMOTE_USER: $user: AcceptEnv is sufficient: OK\n";
     }
     else {

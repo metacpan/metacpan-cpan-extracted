@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Encoder;
-$Crypt::Passphrase::Encoder::VERSION = '0.021';
+$Crypt::Passphrase::Encoder::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -18,7 +18,7 @@ sub accepts_hash {
 	my ($self, $hash) = @_;
 	return !!0 if not defined $hash;
 	$self->{accepts_hash} //= do {
-		my $string = join '|', $self->crypt_subtypes or return;
+		my $string = join '|', map { quotemeta } $self->crypt_subtypes or return;
 		qr/ \A \$ (?: $string ) [\$,] /x;
 	};
 	return scalar $hash =~ $self->{accepts_hash};
@@ -45,7 +45,7 @@ Crypt::Passphrase::Encoder - Base class for Crypt::Passphrase encoders
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 DESCRIPTION
 

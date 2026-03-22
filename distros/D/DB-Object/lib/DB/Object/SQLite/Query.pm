@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite/Query.pm
-## Version v0.3.10
+## Version v0.4.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/06/16
-## Modified 2023/10/20
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -18,10 +18,11 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Query );
-    use vars qw( $VERSION $DEBUG );
+    use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Wanted;
-    our $DEBUG = 0;
-    our $VERSION = 'v0.3.10';
+    our $DEBUG           = 0;
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.4.0';
 };
 
 use strict;
@@ -32,7 +33,8 @@ sub init
     my $self = shift( @_ );
     $self->{having} = '';
     $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
+    $self->SUPER::init( @_ ) || return( $self->pass_error );
     $self->{binded_having} = [];
     $self->{query_reset_keys} = [qw( alias binded binded_values binded_where binded_limit binded_group binded_having binded_order from_unixtime group_by limit local _on_conflict on_conflict order_by reverse sorted unix_timestamp where )];
     return( $self );
@@ -386,7 +388,7 @@ DB::Object::SQLite::Query - SQLite Query Object
 
 =head1 VERSION
 
-    v0.3.10
+    v0.4.0
 
 =head1 DESCRIPTION
 

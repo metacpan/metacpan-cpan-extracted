@@ -1,8 +1,27 @@
 #!/usr/bin/perl
 
+=pod
+
+=head1 NAME
+
+git-shell - Tracer wrapper around the real git-shell
+
+=head1 SYNOPSIS
+
+  hooks/git-shell -c 'git-upload-pack "repo"'
+
+=head1 DESCRIPTION
+
+Runs system git-shell except logs I/O into the $IPC folder.
+This extra info allows for more powerful hooks.
+
+=cut
+
 use warnings;
 use strict;
 use File::Which qw(which);
+
+die localtime().": WARNING: git-shell: Danger PATH illegal recursive abortion\n" if $ENV{GIT_SHELL_TRIED}++;
 
 my @run = ("git-shell", @ARGV);
 if (my $ipc = $ENV{IPC} and
@@ -12,6 +31,6 @@ if (my $ipc = $ENV{IPC} and
     # If strace or iotrace fail to launch, then continue on to @run anyways
 }
 else {
-    warn localtime().": WARNING: git-server: Missing iotrace and strace\n";
+    warn localtime().": WARNING: git-server: Missing IPC and/or iotrace and strace\n";
 }
 exec @run or die "exec: Failed to spawn! $!\n";

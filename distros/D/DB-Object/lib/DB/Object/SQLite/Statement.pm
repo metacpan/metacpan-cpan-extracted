@@ -1,12 +1,16 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-# Database Object Interface - ~/lib/DB/Object/SQLite/Statement.pm
-# Version v0.300.1
-# Copyright(c) 2019 DEGUEST Pte. Ltd.
-# Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
-# Created 2017/07/19
-# Modified 2020/05/22
-# 
+## Database Object Interface - ~/lib/DB/Object/SQLite/Statement.pm
+## Version v0.301.0
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2026/03/22
+## All rights reserved
+## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 # This package's purpose is to automatically terminate the statement object and
 # separate them from the connection object (DB::Object).
@@ -20,7 +24,7 @@ BEGIN
     use parent qw( DB::Object::SQLite DB::Object::Statement );
     use vars qw( $VERSION $DEBUG );
     our $DEBUG = 0;
-    our $VERSION = 'v0.300.1';
+    our $VERSION = 'v0.301.0';
 };
 
 use strict;
@@ -183,7 +187,7 @@ DB::Object::SQLite::Statement - SQLite Statement Object
 
 =head1 VERSION
 
-    v0.300.1
+    v0.301.0
 
 =head1 DESCRIPTION
 

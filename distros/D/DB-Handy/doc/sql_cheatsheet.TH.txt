@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (ชนิดข้อมูล) ]
+  INT          : จำนวนเต็ม
+  FLOAT        : ทศนิยม
+  VARCHAR(n)   : ข้อความความยาวไม่คงที่ (สูงสุด n ไบต์)
+  CHAR(n)      : ข้อความความยาวคงที่ (ต้องเป็น n ไบต์เสมอ)
+
+[ 1. CREATE / DROP (การสร้างและลบตาราง) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (การเพิ่มข้อมูล) ]
+  -- เพิ่มข้อมูลโดยระบุคอลัมน์ (แนะนำ)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- เพิ่มข้อมูลโดยไม่ระบุคอลัมน์
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (การค้นหาข้อมูล) ]
+  -- ดึงข้อมูลทั้งหมด
+  SELECT * FROM student;
+  -- ระบุเงื่อนไข (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- เรียงลำดับ (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- จำกัดจำนวนแถว (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (การอัปเดตข้อมูล) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (การลบข้อมูล) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (ตัวดำเนินการ) ]
+  การเปรียบเทียบ: =, <>, !=, >, <, >=, <=
+  ช่วง         : BETWEEN 70 AND 90
+  รายการ       : IN (1, 2, 3) หรือ NOT IN (1, 2, 3)
+  ข้อความ       : LIKE 'A%' (ขึ้นต้นด้วย A), LIKE '%A' (ลงท้ายด้วย A)
+  ตรวจสอบ NULL : IS NULL, IS NOT NULL
+  ตรรกะ        : AND, OR, NOT
+
+[ Aggregate Functions (ฟังก์ชันผลรวม) ]
+  COUNT(*) : นับจำนวนแถว (Rows)
+  SUM(col) : หาผลรวม
+  AVG(col) : หาค่าเฉลี่ย
+  MAX(col) : หาค่ามากที่สุด
+  MIN(col) : หาค่าน้อยที่สุด
+  (ตัวอย่าง) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (การใช้ดัชนีเพื่อเพิ่มความเร็ว) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

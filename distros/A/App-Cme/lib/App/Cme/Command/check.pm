@@ -10,7 +10,7 @@
 # ABSTRACT: Check the configuration of an application
 
 package App::Cme::Command::check ;
-$App::Cme::Command::check::VERSION = '1.046';
+$App::Cme::Command::check::VERSION = '1.047';
 use strict;
 use warnings;
 use 5.10.1;
@@ -90,7 +90,7 @@ App::Cme::Command::check - Check the configuration of an application
 
 =head1 VERSION
 
-version 1.046
+version 1.047
 
 =head1 SYNOPSIS
 

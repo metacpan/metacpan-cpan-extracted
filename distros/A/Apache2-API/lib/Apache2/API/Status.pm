@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Status.pm
-## Version v0.2.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2025/10/08
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -133,7 +133,7 @@ BEGIN
         all => [@EXPORT_OK], 
         common  => [qw( HTTP_NETWORK_AUTHENTICATION_REQUIRED HTTP_FORBIDDEN HTTP_NOT_FOUND HTTP_OK HTTP_TEMPORARY_REDIRECT HTTP_INTERNAL_SERVER_ERROR )],
     );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -1816,7 +1816,7 @@ sub status_to_type
     {
         return( $STATUS_TO_TYPE->{ $code } );
     }
-    ( my $type = $STATUS_TO_TYPE->{ $code } ) =~ s/_/$sep/;
+    ( my $type = $STATUS_TO_TYPE->{ $code } ) =~ s/_/$sep/g;
     return( $type );
 }
 
@@ -1927,7 +1927,7 @@ But maybe more simply:
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

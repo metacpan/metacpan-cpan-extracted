@@ -188,17 +188,23 @@ $x[19] = 6;
 
 $x[19] /= Math::MPC->new(3);
 
-if(p($x[19]) eq '(2 0)') {print "ok 19\n"}
+# Prior to mpc-1.4.0 (66560) the next 4 tests expected a result of '(2 0)'.
+# The behaviour was fixed in mpc-1.4.0 to yield a result of '(2 -0)'.
+
+my $expect = '(2 0)';
+$expect = '(2 -0)' if Math::MPC::MPC_VERSION >= 66560;
+
+if(p($x[19]) eq $expect) {print "ok 19\n"}
 else {
-  warn "\nExpected (2 0), got $x[19]\n";
+  warn "\nExpected $expect, got $x[19]\n";
   print "not ok 19\n";
 }
 
 $x[20] = 6 / Math::MPC->new(3);
 
-if(p($x[20]) eq '(2 0)') {print "ok 20\n"}
+if(p($x[20]) eq $expect) {print "ok 20\n"}
 else {
-  warn "\nExpected (2 0), got $x[20]\n";
+  warn "\nExpected $expect, got $x[20]\n";
   print "not ok 20\n";
 }
 
@@ -206,17 +212,17 @@ $x[21] = 6.0;
 
 $x[21] /= Math::MPC->new(3);
 
-if(p($x[21]) eq '(2 0)') {print "ok 21\n"}
+if(p($x[21]) eq $expect) {print "ok 21\n"}
 else {
-  warn "\nExpected (2 0), got $x[21]\n";
+  warn "\nExpected $expect, got $x[21]\n";
   print "not ok 21\n";
 }
 
 $x[22] = 6.0 / Math::MPC->new(3);
 
-if(p($x[22]) eq '(2 0)') {print "ok 22\n"}
+if(p($x[22]) eq $expect) {print "ok 22\n"}
 else {
-  warn "\nExpected (2 0), got $x[22]\n";
+  warn "\nExpected $expect, got $x[22]\n";
   print "not ok 22\n";
 }
 

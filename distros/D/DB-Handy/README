@@ -49,6 +49,11 @@ DESCRIPTION
 
   See "DIFFERENCES FROM DBI" in the module POD for details.
 
+INCLUDED DOCUMENTATION
+
+  The doc/ directory contains SQL cheat sheets in 21 languages
+  for use as learning materials.
+
 INSTALLATION
 
   To install this module type the following:
@@ -104,15 +109,17 @@ TARGET USE CASES
 LIMITATIONS
 
   - Not a full SQL database
-  - No transaction support (AutoCommit always on)
+  - No transaction support; begin_work/commit/rollback return undef with
+    errstr set (AutoCommit always on)
   - No query optimizer or planner
   - Limited concurrency support; not suitable for high-write workloads
-  - Column order in SELECT * and JOIN results is alphabetical; named SELECT lists preserve declaration order
-  - VARCHAR is always stored as 255 bytes on disk regardless of declared size
-  - Single-column indexes only; NOT IN always performs a full table scan
-  - col IN (v1, v2, ...) and pure OR expressions on indexed columns use index lookups
-  - INSERT...SELECT maps columns by position, not by name
-  - No FOREIGN KEY, VIEW, WINDOW functions, or BLOB/CLOB
+  - VARCHAR is always stored as 255 bytes on disk; declared size is enforced
+    on INSERT/UPDATE (values longer than declared size are rejected)
+  - Single-column indexes only
+  - NOT IN with NULL in the value list returns no rows (SQL UNKNOWN semantics)
+  - WINDOW functions (OVER clause) return type='error'
+  - FOREIGN KEY syntax accepted but not enforced; CREATE VIEW returns error
+  - No BLOB/CLOB
   - No strict SQL compliance
 
 AUTHOR

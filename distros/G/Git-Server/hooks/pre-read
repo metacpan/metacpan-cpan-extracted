@@ -7,7 +7,7 @@ use FindBin qw($Script);
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
 my $acl = {};
-my $conf = `git config --list`;
+my $conf = $0 =~ m{(.*)/} ? `$1/configs` : `git config --list`;
 while ($conf =~ s/^acl.(\w+)=(.*)$//m) {
     my $param = $1;
     my $keys = $2;
@@ -17,6 +17,11 @@ while ($conf =~ s/^acl.(\w+)=(.*)$//m) {
 }
 
 $SIG{PIPE} = sub { exit 1; };
+$ENV{GIT_SERVER_VERSION} ||= "UNKNOWN";
+
+my $deploy_branch = ($ENV{XMODIFIERS}||"") =~ /\bpull_branch=(\S+)\nclient.*git-deploy/ ? $1 : "";
+my $msg = $deploy_branch ? " [git-deploy --branch $deploy_branch]" : "";
+$0 = "pre-read - $who:$base$msg";
 
 $conf !~ /^proxy/m or 0 == system "hooks/proxy", $Script or die localtime().": [$who] git-server: proxy operation failure: $?\n";
 # Verify IP
@@ -24,7 +29,7 @@ if (my $banned = system "hooks/restrictip") {
     exit ($banned >> 8 || 1);
 }
 if ($acl->{deploy}->{$ENV{REMOTE_USER}}) {
-    warn localtime().": [$who] git-server: PULL waiting for notification ...\n";
+    warn localtime().": [$who] git-server v$ENV{GIT_SERVER_VERSION}: PULL$msg waiting for notification ...\n";
     my $puller = "$who:$base";
     if (my $notification_error = system "hooks/push-notification", $puller or $?) {
         die localtime().": [$who] git-server: Too many other concurrent reads. Try again later. (ERROR: $notification_error-$?)\n";
@@ -32,17 +37,10 @@ if ($acl->{deploy}->{$ENV{REMOTE_USER}}) {
 }
 # If you can write or deploy, then you can also read
 my $allowed = $acl->{readers}->{$ENV{REMOTE_USER}} || $acl->{writers}->{$ENV{REMOTE_USER}} || $acl->{deploy}->{$ENV{REMOTE_USER}};
-warn localtime().": [$who] git-server: RUNNING PULL ...\n" if $allowed;
-
-if (my $pid = open my $fh, "|-", "$base/hooks/logger", "") {
-    if ($allowed) {
-        print $fh localtime().": [$who]: pulled\n";
-    }
-    else {
-        print $fh localtime().": [$who]: Missing [acl.readers] or [acl.deploy] permission. Blocked clone or pull attempt!\n";
-    }
-    close $fh;
-    die localtime().": [$who] git-server: SERVER ERROR! log.logfile failed! $?\n" if $?;
+if ($allowed) {
+    warn localtime().": [$who] git-server v$ENV{GIT_SERVER_VERSION}: PULL$msg Running ...\n";
 }
-
-die localtime().": [$who] git-server: You have been banned from clone or pull!\n" unless $allowed;
+else {
+    warn localtime().": [$who] git-server: You have been banned from clone or pull!\n";
+    exit 4; # Missing [acl.readers] and [acl.deploy]
+}

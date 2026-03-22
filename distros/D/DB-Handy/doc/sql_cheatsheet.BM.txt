@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (Donniya suguya / Types de données) ]
+  INT          : Hakɛ (Entier / Integer)
+  FLOAT        : Hakɛ ni faran (Nombre à virgule)
+  VARCHAR(n)   : Sɛbɛnni janya yɛlɛmali (Maksimum n bytes)
+  CHAR(n)      : Sɛbɛnni janya lɔlen (Tuma bɛɛ n bytes)
+
+[ 1. CREATE / DROP (Tabali da ani ka a tila) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (Donniya fara a kan / Ajouter) ]
+  -- Donniya fara a kan ni tɔgɔw ye (A bɛ ɲini)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- Donniya fara a kan tɔgɔw kɔfɛ
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (Donniya ɲini / Chercher) ]
+  -- Donniya bɛɛ ta
+  SELECT * FROM student;
+  -- Sharti bila (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- A ɲɛbila (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- Hakɛ dan (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (Donniya yɛlɛma / Mettre à jour) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (Donniya tila / Supprimer) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (Waleyaw) ]
+  Sumaya (Comparaison) : =, <>, !=, >, <, >=, <=
+  Cɛla (Plage)         : BETWEEN 70 AND 90
+  Suguya (Liste)       : IN (1, 2, 3) walima NOT IN (1, 2, 3)
+  Sɛbɛnni (Chaîne)     : LIKE 'A%' (A daminɛ), LIKE '%A' (A laban)
+  NULL lajɛ            : IS NULL, IS NOT NULL
+  Hakili (Logique)     : AND, OR, NOT
+
+[ Aggregate Functions (Jate bɛɛ lajɛlen) ]
+  COUNT(*) : Sɛrɛw jate
+  SUM(col) : Bɛɛ faralen ɲɔgɔn kan
+  AVG(col) : Cɛmancɛ (Moyenne)
+  MAX(col) : A bɛɛ la bonba
+  MIN(col) : A bɛɛ la dɔgɔman
+  (Misali) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (Teliya fara a kan ni index ye) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

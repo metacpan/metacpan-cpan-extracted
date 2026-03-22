@@ -23,7 +23,7 @@ use SIRTX::VM::Opcode;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my %_escapes = (
     '\\' => '\\',
@@ -289,6 +289,7 @@ sub new {
             aliases             => {},
             current             => {},
             rf                  => SIRTX::VM::RegisterFile->new,
+            rf_stored           => [],
             regmap_last_used_c  => 0,
             regmap_last_used    => {},
             regmap_mapped       => {},
@@ -306,17 +307,25 @@ sub new {
         }, $pkg);
 
     {
-        my $fh = delete $opts{in};
-        croak 'No input given' unless defined $fh;
+        my $in = delete $opts{in};
+        croak 'No input given' unless defined $in;
 
-        unless (ref $fh) {
-            open(my $x, '<', $fh) or die $!;
-            $fh = $x;
+        if (ref($in) eq 'ARRAY') {
+            $in = [@{$in}]; # shallow copy we have our own array.
+        } else {
+            $in = [$in];
         }
 
-        $fh->binmode;
-        $fh->binmode(':utf8');
-        $self->{in} = $fh;
+        foreach my $fh (@{$in}) {
+            unless (ref $fh) {
+                open(my $x, '<', $fh) or die $!;
+                $fh = $x;
+            }
+
+            $fh->binmode;
+            $fh->binmode(':utf8');
+        }
+        $self->{in} = $in;
     }
 
     {
@@ -354,7 +363,7 @@ sub run {
     croak 'Stray options passed' if scalar @opts;
 
     $self->_save_position('out$');
-    $self->_proc_input($self->{in});
+    $self->_proc_input($_) foreach @{$self->{in}};
 
     eval {
         my $size;
@@ -464,16 +473,16 @@ sub dump {
     say $dumpfh '';
     say $dumpfh '; Register map:';
     foreach my $reg ($rf->expand('r*')) {
-        printf $dumpfh ";   %-32s -> %s\n", $reg, scalar(eval {$rf->get_physical_by_name($reg)->name}) // '<?>';
+        printf $dumpfh ";   %-32s -> %s\n", $reg, scalar(eval {$rf->get_physical_by_name($reg)->name}) // '<none>';
     }
 
     say $dumpfh '';
     say $dumpfh '; Register attributes:';
     foreach my $reg ($rf->expand('r*', 'user*', 'system*')) {
-        my $physical = $rf->get_physical_by_name($reg)->physical;
+        my $physical = eval { $rf->get_physical_by_name($reg)->physical };
         my $temperature = $rf->register_temperature($reg);
         my $owner = $rf->register_owner($reg);
-        printf $dumpfh ";   %-32s -> %2u: %8s %8s %8u\n", $reg, $physical, $temperature, $owner, $self->{regmap_last_used}{$physical} // 0;
+        printf $dumpfh ";   %-32s -> %6s: %8s %8s %8u\n", $reg, $physical // '<none>', $temperature, $owner, $self->{regmap_last_used}{$physical // ''} // 0;
     }
 
     say $dumpfh '';
@@ -575,8 +584,12 @@ sub _reg_map {
     my ($self, $loc, $phy) = @_;
     my $rf = $self->{rf};
     $loc = $rf->get_logical_by_name($loc);
-    $phy = $rf->get_physical_by_name($phy);
-    $rf->map($loc, $phy);
+    if ($phy eq '_unknown_') {
+        $rf->unmap($loc);
+    } else {
+        $phy = $rf->get_physical_by_name($phy);
+        $rf->map($loc, $phy);
+    }
     return ($loc, $phy);
 }
 sub _reg_map_and_write {
@@ -596,13 +609,19 @@ sub _force_mapped {
         if ($self->{settings}{regmap_auto}) {
             # Try to auto-map a register.
             my $regmap_mapped = $self->{regmap_mapped};
-            my ($reg) = sort {($regmap_last_used->{$a} // 0) <=> ($regmap_last_used->{$b} // 0)} map {$_->physical} map {$rf->get_physical_by_name($_)} grep {$rf->register_owner($_) eq SIRTX::VM::Register::OWNER_YOURS()} grep {!$regmap_mapped->{$_}} $rf->expand('r*');
+            my @candidates = grep {$rf->register_owner($_) eq SIRTX::VM::Register::OWNER_YOURS()} grep {!$regmap_mapped->{$_}} $rf->expand('r*');
+            my ($reg) = (grep {!eval {$rf->get_physical_by_name($_)}} @candidates);
+
+            warn $reg if defined $reg;
+
+            $reg //= (map {'r'.$rf->get_logical_by_physical($_)} sort {($regmap_last_used->{$a} // 0) <=> ($regmap_last_used->{$b} // 0)} map {$_->physical} grep {defined} map {eval {$rf->get_physical_by_name($_)}} @candidates)[0];
 
             croak 'No suitable register found for auto mapping, did you set enough registers with .yours?' unless defined $reg;
 
-            $loc = $rf->get_logical_by_physical($reg);
-            $regmap_mapped->{'r'.$loc} = 1;
-            $self->_reg_map_and_write('r'.$loc, $register);
+            $regmap_mapped->{$reg} = 1;
+            $self->_reg_map_and_write($reg, $register);
+
+            $loc = $rf->get_logical_by_name($reg);
         }
 
         croak 'Cannot map register: '.$register unless defined $loc;
@@ -616,6 +635,21 @@ sub _force_mapped {
     return $loc;
 }
 
+sub _reheat_mappings {
+    my ($self, @registers) = @_;
+    my $rf = $self->{rf};
+
+    # Perform a force map for those registers that are already mapped. This will reheat them.
+    foreach my $register (
+        grep {defined eval {$rf->get_logical_by_name($_)}}
+        map {$rf->expand($_)}
+        @registers
+    ) {
+        $self->_force_mapped($register);
+    }
+}
+
+# Note: All places that use this function to allocate new registers should also consider using _reheat_mappings()!
 sub _reg_alloc_phy {
     my ($self, @names) = @_;
     my $regmap_mapped = $self->{regmap_mapped};
@@ -828,6 +862,8 @@ sub _proc_parts {
 
         $self->_reg_alloc_phy('out') if $args[0] ne 'out';
 
+        $self->_reheat_mappings($args[0], $reg, 'out');
+
         $self->_proc_parts(['open', $reg, $args[1] =~ s/^%//r], $opts);
         $self->_proc_parts(['getvalue', 'out', 'context', $reg], $opts);
 
@@ -839,6 +875,8 @@ sub _proc_parts {
     } elsif ($cmd eq 'byte_transfer' && scalar(@args) == 2 && $self->_get_value_type($args[0]) eq 'reg' && $self->_get_value_type($args[1]) eq 'string') {
         my $key = $self->_autostring_allocate($self->_parse_string($args[1]));
         my $reg = $self->_reg_alloc_phy('user*');
+
+        $self->_reheat_mappings($args[0], $reg);
 
         $self->_proc_parts(['substr', $reg, 'program_text', $key, 'end$'.$key], $opts);
         $self->_proc_parts(['byte_transfer', $args[0], $reg, 'size$'.$key], $opts);
@@ -1066,8 +1104,25 @@ sub _proc_parts {
         $self->{settings}{$1} = $self->_parse_bool($args[0]);
     } elsif ($cmd eq '.map' && scalar(@args) == 2) {
         $self->_reg_map(@args);
+    } elsif ($cmd eq '.forget_mapped') {
+        $self->_reg_map($_ => '_unknown_') foreach $self->{rf}->expand(@args);
+    } elsif ($cmd eq '.forget_register_state') {
+        $self->{rf}->forget_register_state(@args);
     } elsif ($cmd eq '.force_mapped') {
         $self->_force_mapped($_) foreach $self->{rf}->expand(@args);
+    } elsif ($cmd eq '.register_file_store' && scalar(@args) == 1) {
+        my $name = 'index$registerfilestore$'.$args[0];
+        push(@{$self->{aliases}{$name} //= []}, scalar(@{$self->{rf_stored}}));
+        push(@{$self->{rf_stored}}, $self->{rf}->clone);
+    } elsif ($cmd eq '.register_file_restore' && scalar(@args) == 1) {
+        my $name = 'index$registerfilestore$'.$args[0];
+        my $index = ($self->{aliases}{$name} // [])->[-1];
+        my $rf;
+        croak 'No such register file store alias: '.$name unless defined $index;
+        $index = $self->_parse_int($index);
+        $rf = $self->{rf_stored}[$index];
+        croak 'No such register file store index: '.$index unless defined $rf;
+        $self->{rf} = $rf->clone;
     } elsif ($cmd eq '.mine' || $cmd eq '.yours' || $cmd eq '.theirs') {
         my $mode = $cmd eq '.mine' ? SIRTX::VM::Register::OWNER_MINE() : $cmd eq '.yours' ? SIRTX::VM::Register::OWNER_YOURS() : SIRTX::VM::Register::OWNER_THEIRS();
         my $rf = $self->{rf};
@@ -1136,6 +1191,7 @@ sub _proc_parts {
                 my @argmap = @{$entry->[$i]};
                 my @requests = @{$entry->[$i+1]};
                 my %updates;
+                my @used_registers;
                 my @allocations;
                 my $reset_autodie;
 
@@ -1159,6 +1215,7 @@ sub _proc_parts {
                         $val = [@args[$j..$#args]];
                     } else {
                         my $t = $self->_get_value_type($val);
+                        push(@used_registers, $val) if $t eq 'reg';
                         if (ref $type) {
                             my $found;
                             inner:
@@ -1189,6 +1246,8 @@ sub _proc_parts {
                     $updates{$dst} = $found;
                     push(@allocations, $found);
                 }
+
+                $self->_reheat_mappings(@used_registers, @allocations);
 
                 # Actually run the parts:
                 foreach my $parts (@{$entry->[$i+2]}) {
@@ -1236,7 +1295,7 @@ sub _get_value_type {
     return 'undef' if $value eq 'undef';
     return 'string' if $value =~ /^(?:"|U\+)/;
     return 'int' if $value =~ /^'?[\+\-]?(?:0|[1-9][0-9]*|0x[0-9a-fA-F]+|0[0-7]+|0b[01]+)$/;
-    return 'port' if $value =~ /^%[a-zA-Z][:a-zA-Z0-9]*$/;
+    return 'port' if $value =~ /^%[a-zA-Z][:a-zA-Z0-9_]*$/;
 
     if ($value =~ /^([a-z]+):(?:0|[1-9][0-9]*)$/) {
         my $type = $1;
@@ -1352,7 +1411,7 @@ SIRTX::VM::Assembler - module for assembling SIRTX VM code
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 
@@ -1388,6 +1447,9 @@ The input data as a filename or handle.
 If a handle the handle must allow seeking.
 Also attributes on the handle might be changed.
 It is best to avoid reusing the handle with other code.
+
+(experimental since v0.13)
+This can also be a arrayref with inputs.
 
 =item C<out>
 

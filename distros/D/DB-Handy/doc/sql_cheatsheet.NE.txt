@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (डाटा प्रकारहरू) ]
+  INT          : पूर्ण संख्या (Integer)
+  FLOAT        : दशमलव संख्या (Floating point)
+  VARCHAR(n)   : परिवर्तनशील लम्बाइको स्ट्रिङ (अधिकतम n बाइट्स)
+  CHAR(n)      : निश्चित लम्बाइको स्ट्रिङ (सधैं n बाइट्स)
+
+[ 1. CREATE / DROP (तालिका बनाउने र मेटाउने) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (डाटा थप्ने) ]
+  -- कलम तोकेर डाटा थप्ने (सिफारिस गरिएको)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- कलम नतोकी डाटा थप्ने
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (डाटा खोज्ने) ]
+  -- सबै डाटा निकाल्ने
+  SELECT * FROM student;
+  -- सर्त तोक्ने (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- डाटा मिलाउने (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- डाटा संख्या सीमित गर्ने (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (डाटा अपडेट गर्ने) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (डाटा मेटाउने) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (सञ्चालकहरू) ]
+  तुलना  : =, <>, !=, >, <, >=, <=
+  दायरा  : BETWEEN 70 AND 90
+  सूची   : IN (1, 2, 3) वा NOT IN (1, 2, 3)
+  स्ट्रिङ: LIKE 'A%' (A बाट सुरु हुने), LIKE '%A' (A मा अन्त्य हुने)
+  NULL जाँच : IS NULL, IS NOT NULL
+  तार्किक: AND, OR, NOT
+
+[ Aggregate Functions (समग्र कार्यहरू) ]
+  COUNT(*) : पङ्क्तिहरू (rows) गन्ने
+  SUM(col) : कुल जोड्ने
+  AVG(col) : औसत निकाल्ने
+  MAX(col) : अधिकतम मान पत्ता लगाउने
+  MIN(col) : न्यूनतम मान पत्ता लगाउने
+  (उदाहरण) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (इन्डेक्सद्वारा गति बढाउने) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

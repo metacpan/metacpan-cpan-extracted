@@ -176,7 +176,6 @@ $obj = Pod::CopyrightYears->new(
 	'pod_file' => $data_dir->file('Ex5.pm')->s,
 );
 $pod = $obj->pod;
-# XXX Added ' ' after =cut
 $expected_pod = <<'END';
 package Ex5;
 
@@ -184,7 +183,7 @@ package Ex5;
 
 =pod
 
-=cut 
+=cut
 
 __DATA__
 4:hmt:Husitské muzeum v Táboře:http\://kramerius.husitskemuzeum.cz/

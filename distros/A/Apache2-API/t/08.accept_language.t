@@ -73,12 +73,16 @@ is_match(
 );
 
 # Wildcard => first supported
-is_match(
-    '*;q=0.2',
-    [ 'ja-JP', 'fr-FR' ],
-    'ja-JP',
-    'Wildcard * selects first supported'
-);
+{
+    # The wildcard is triggering warning about illegal locale string, so we silence it.
+    local $SIG{__WARN__} = sub{};
+    is_match(
+        '*;q=0.2',
+        [ 'ja-JP', 'fr-FR' ],
+        'ja-JP',
+        'Wildcard * selects first supported'
+    );
+}
 
 # Test partial match (language only)
 is_match(

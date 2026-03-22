@@ -3,30 +3,11 @@ TODO
 
 Some features we need or want, plus some neat ideas that may not be too feasible to implement.
 
- - Once "post" method is sure to run, then move logger step from "pre" to "post".
-
  - Make sure ipc-parse can determine if action was actually performed or else the reason of why not.
 
  - Add [log.verbosity] 0 or 1 or 2 feature to control level of messaging spewage to the git client.
 
- - Fix hot-potatoe-grind bug where git-deploy on the same repo coming from the same IP (but running in different local directories) will infinite pummel the client and server, back and forth between the two directories.
-   * For example, running this on a single machine: "git deploy -C /usr/src/prod master & ; git deploy -C /usr/src/beta dev &"
-
  - Investigate converting get_fork_hash common fork sniffer scan to use "git merge-base --fork-point <ref> <commit>" instead of grinding through the logs.
-
- - Right now, the git server can "choke" if there are many git-deploy clients linked to a single repo.
-   * Investigate optimization to stagger git-deploy clients with random delays or even abort, if there is already a sufficient git-deploy running locally. If git-deploy crons on all servers are configured to run at the same time, i.e., every 10 minutes, then everything gets sluggish on the server at that time while everything catches up, and thus client operations will also hang for a while.
-   * Investigate optimization to make push-notify release ONLY relevant deploy clients, i.e., those with activity within past few minutes or those pinned to the specific branch that was pushed. It's difficult to tell which branch the client is pinned to from the server side, especially prior to the pull occurring. So the git-deploy client would probably need to inform the server via ENV which specific branch to be notified about changes on.
-
- - Provide branch, old hash, and new hash (for every branch updated by the git client) to post-read hook args (Requires man-in-the-middle sniffer)
-   * If nothing is updated to the client, then there will be no arguments to post-read.
-   * There will be a multiple of 3 args, each triple being branch, old hash, new hash, (depending on how many branches the client updates).
-   * In order to facilitate the InterProcessCommunication to post-read, information should be stored in $IPC/info.txt until the post-read completes.
-
- - Provide branch, old hash, new hash, and common parent "fork" commit hash to pre-write hook and post-write hook args.
-   * This fork hash can be used for debugging
-   * or for callback webhook.
-   * In order to facilitate the InterProcessCommunication between the pre-write and post-write, information should be stored in $IPC/info.txt until the post-write completes.
 
  - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6.
 

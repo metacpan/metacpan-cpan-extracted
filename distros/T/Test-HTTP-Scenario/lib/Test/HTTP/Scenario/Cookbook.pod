@@ -1,0 +1,339 @@
+=head1 NAME
+
+Test::HTTP::Scenario::Cookbook - Practical recipes for record/replay HTTP testing
+
+=head1 INTRODUCTION
+
+This document provides practical recipes for using
+L<Test::HTTP::Scenario> in real test suites. It focuses on how to:
+
+=over 4
+
+=item * record real HTTP interactions once
+
+=item * replay them deterministically in all future runs
+
+=item * structure fixtures and tests for long-term maintainability
+
+=item * integrate with common HTTP clients
+
+=back
+
+The examples assume basic familiarity with L<Test::More> or
+L<Test::Most> and a working HTTP client (LWP, HTTP::Tiny, Mojo, etc).
+
+=head1 BASIC RECORD AND REPLAY
+
+=head2 Simple GET with LWP
+
+This is the most common pattern: record once, replay forever.
+
+  use Test::Most;
+  use Test::HTTP::Scenario qw(with_http_scenario);
+  use LWP::UserAgent;
+
+  my $MODE = $ENV{SCENARIO_MODE} || 'replay';
+
+  with_http_scenario(
+      name    => 'basic_get',
+      file    => 't/fixtures/basic_get.yaml',
+      mode    => $MODE,
+      adapter => 'LWP',
+      sub {
+          my $ua  = LWP::UserAgent->new;
+          my $res = $ua->get('https://example.com/');
+
+          ok $res->is_success, 'request succeeded';
+          like $res->decoded_content, qr/Example Domain/, 'content looks right';
+      },
+  );
+
+=head3 Recording
+
+Run once in record mode:
+
+  $ SCENARIO_MODE=record prove -l t/basic_get.t
+
+This performs a real HTTP request and writes:
+
+  t/fixtures/basic_get.yaml
+
+=head3 Replaying
+
+Run normally (default replay mode):
+
+  $ prove -l t/basic_get.t
+
+No network access is required. The response is reconstructed from the
+fixture.
+
+=head1 MULTI-STEP API FLOWS
+
+=head2 Create and fetch with a custom client
+
+Suppose you have a client that talks to a JSON API:
+
+  my $api = MyAPI->new(base_url => $url);
+  my $id  = $api->create_user({ name => 'Alice' });
+  my $user = $api->get_user($id);
+
+You can record the entire flow:
+
+  use Test::Most;
+  use Test::HTTP::Scenario qw(with_http_scenario);
+
+  my $MODE = $ENV{SCENARIO_MODE} || 'replay';
+
+  with_http_scenario(
+      name    => 'create_and_fetch_user',
+      file    => 't/fixtures/create_and_fetch_user.yaml',
+      mode    => $MODE,
+      adapter => 'LWP',
+      sub {
+          my $api = MyAPI->new(base_url => $ENV{API_URL});
+
+          my $id = $api->create_user({ name => 'Alice' });
+          ok $id, 'created user id';
+
+          my $user = $api->get_user($id);
+          is $user->{name}, 'Alice', 'fetched user name matches';
+      },
+  );
+
+Record once, then replay in all environments.
+
+=head1 CONTROLLING MODE VIA ENVIRONMENT
+
+A common pattern is to control record vs replay via an environment
+variable:
+
+  my $MODE = $ENV{SCENARIO_MODE} || 'replay';
+
+  with_http_scenario(
+      name    => 'search_flow',
+      file    => 't/fixtures/search_flow.yaml',
+      mode    => $MODE,
+      adapter => 'LWP',
+      sub {
+          ...
+      },
+  );
+
+=head2 Recommended workflow
+
+=over 4
+
+=item * Local development
+
+  SCENARIO_MODE=record prove -l t/search_flow.t
+
+=item * CI and normal runs
+
+  prove -l t
+
+=item * Refresh fixtures
+
+Delete the fixture and re-record:
+
+  rm t/fixtures/search_flow.yaml
+  SCENARIO_MODE=record prove -l t/search_flow.t
+
+=back
+
+=head1 USING STRICT MODE
+
+Strict mode ensures that all recorded interactions are consumed during
+replay. This is useful for catching tests that stop early or skip
+requests.
+
+  with_http_scenario(
+      name    => 'strict_example',
+      file    => 't/fixtures/strict_example.yaml',
+      mode    => $MODE,
+      adapter => 'LWP',
+      strict  => 1,
+      sub {
+          my $api = MyAPI->new;
+
+          # If you recorded two calls but only make one here,
+          # strict mode will croak after the callback returns.
+          my $user = $api->get_user(42);
+          is $user->{id}, 42;
+      },
+  );
+
+If the number of replayed interactions is less than the number
+recorded, C<run()> croaks with a strict-mode error.
+
+=head1 DIFFING AND DEBUGGING MISMATCHES
+
+When a request does not match the recorded interaction, the module
+croaks with a helpful diff (if C<diffing =E<gt> 1>, which is the
+default).
+
+Typical causes:
+
+=over 4
+
+=item * URL changed (query parameters, path, host)
+
+=item * HTTP method changed (GET vs POST)
+
+=item * Different number of requests than recorded
+
+=back
+
+Example failure:
+
+  No matching HTTP interaction found in scenario
+  HTTP interaction mismatch at index 0:
+    Expected method: GET
+         Got method: POST
+    Expected uri:    https://api.example.com/users/42
+         Got uri:    https://api.example.com/users
+
+Use this to adjust your test or re-record the fixture.
+
+=head1 USING HTTP::TINY
+
+You can use the HTTP::Tiny adapter by specifying C<HTTP_Tiny>:
+
+  use Test::Most;
+  use Test::HTTP::Scenario qw(with_http_scenario);
+  use HTTP::Tiny;
+
+  my $MODE = $ENV{SCENARIO_MODE} || 'replay';
+
+  with_http_scenario(
+      name    => 'http_tiny_example',
+      file    => 't/fixtures/http_tiny_example.yaml',
+      mode    => $MODE,
+      adapter => 'HTTP_Tiny',
+      sub {
+          my $http = HTTP::Tiny->new;
+          my $res  = $http->get('https://example.com/');
+
+          ok $res->{success}, 'HTTP::Tiny request succeeded';
+      },
+  );
+
+=head1 USING MOJO
+
+Similarly, for Mojo:
+
+  use Test::Most;
+  use Test::HTTP::Scenario qw(with_http_scenario);
+  use Mojo::UserAgent;
+
+  my $MODE = $ENV{SCENARIO_MODE} || 'replay';
+
+  with_http_scenario(
+      name    => 'mojo_example',
+      file    => 't/fixtures/mojo_example.yaml',
+      mode    => $MODE,
+      adapter => 'Mojo',
+      sub {
+          my $ua  = Mojo::UserAgent->new;
+          my $tx  = $ua->get('https://example.com/');
+          my $res = $tx->result;
+
+          ok $res->is_success, 'Mojo request succeeded';
+      },
+  );
+
+=head1 TESTING ERROR HANDLING
+
+You can record error responses (4xx, 5xx, timeouts) and replay them
+without having to coerce the real API into failing.
+
+Example: record a 404 and test your client:
+
+  with_http_scenario(
+      name    => 'not_found',
+      file    => 't/fixtures/not_found.yaml',
+      mode    => $MODE,
+      adapter => 'LWP',
+      sub {
+          my $api = MyAPI->new;
+          my $res = $api->get_user(999999);
+
+          ok !$res->{success}, 'user not found';
+          is $res->{status}, 404, 'status is 404';
+      },
+  );
+
+=head1 ISOLATING TESTS BY SCENARIO
+
+Each scenario should have its own fixture file. This keeps tests
+independent and makes it easy to re-record only the flows that changed.
+
+Good pattern:
+
+  t/fixtures/
+    get_user_basic.yaml
+    create_and_fetch_user.yaml
+    search_flow.yaml
+    not_found.yaml
+
+Avoid sharing a single large fixture across many unrelated tests.
+
+=head1 WHEN TO USE THIS MODULE
+
+Use C<Test::HTTP::Scenario> when:
+
+=over 4
+
+=item * You have an HTTP client library that you want to test thoroughly.
+
+=item * The real API is slow, flaky, or requires credentials.
+
+=item * You want your tests to run offline and in CI.
+
+=item * You want to capture real API behaviour without hand-writing mocks.
+
+=back
+
+=head1 WHEN NOT TO USE THIS MODULE
+
+You may not need this module if:
+
+=over 4
+
+=item * Your code does not talk to HTTP at all.
+
+=item * You are already using a different record/replay system.
+
+=item * You prefer hand-written mocks for very small or trivial APIs.
+
+=back
+
+=head1 API SPECIFICATION
+
+=head2 Input (Params::Validate::Strict style)
+
+The main entry point is C<with_http_scenario>, which accepts:
+
+  name      => Str (required)
+  file      => Str (required)
+  mode      => 'record' | 'replay' (required)
+  adapter   => Str | Object (required)
+  serializer => Str (optional, default 'YAML')
+  diffing   => Bool (optional, default true)
+  strict    => Bool (optional, default false)
+  CODE      => Coderef (required, last argument)
+
+=head2 Output (Returns::Set style)
+
+C<with_http_scenario> returns:
+
+  any value
+
+Specifically, it returns whatever the supplied coderef returns, in the
+same context (list, scalar, or void).
+
+=head1 SEE ALSO
+
+L<Test::HTTP::Scenario>, L<LWP::UserAgent>, L<HTTP::Tiny>,
+L<Mojo::UserAgent>.
+
+=cut

@@ -32,6 +32,7 @@ BEGIN
     use_ok( 'DB::Object::Constraint::Check' );
     use_ok( 'DB::Object::Constraint::Foreign' );
     use_ok( 'DB::Object::Constraint::Index' );
+    use_ok( 'DB::Object::Exception' );
     use_ok( 'DB::Object::Fields' );
     use_ok( 'DB::Object::Fields::Field' );
     use_ok( 'DB::Object::Fields::Overloaded' );

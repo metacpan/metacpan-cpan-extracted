@@ -1,5 +1,5 @@
 package Crypt::Bear;
-$Crypt::Bear::VERSION = '0.003';
+$Crypt::Bear::VERSION = '0.004';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ Crypt::Bear - BearSSL for Perl
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

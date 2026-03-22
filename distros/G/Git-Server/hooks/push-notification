@@ -1,5 +1,25 @@
 #!/usr/bin/env perl
 
+=pod
+
+=head1 NAME
+
+push-notification - Run this hook before performing the "git pull" for git-deploy clients.
+
+=head1 SYNOPSIS
+
+In hooks/pre-read:
+
+  system "hooks/push-notification";
+
+=head1 DESCRIPTION
+
+Releases other push-notification sleeper coming from the same REMOTE_ADDR, if any.
+If there has already been a "git pull" since the most recent repo change,
+then wait until the next push before proceeding.
+
+=cut
+
 use strict;
 use warnings;
 use Fcntl qw(O_CREAT O_RDWR LOCK_EX LOCK_NB);
@@ -14,13 +34,35 @@ my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
 my $lock_dir = "$base/logs";
 mkdir $lock_dir, 0755 unless -d $lock_dir;
 $SIG{PIPE} = sub { exit 1; };
+my $deploy_branch = "";
+my $client_command = "git-deploy";
 if (my $xmods = $ENV{XMODIFIERS}) {
     if ($xmods =~ /\bdeploy_patience=(\d+)/) {
         $MAX_PATIENCE = $1 || 1;
         warn localtime().": [$who] git-server: Modified Deploy Patience: $MAX_PATIENCE Seconds\n";
     }
+    $deploy_branch = $1 if $xmods =~ /\bpull_branch=(\S+)/;
+    $client_command = $1 if $xmods =~ m{^client=.*/(git-\w+)}m;
 }
-my $lock_file = "$lock_dir/$ENV{REMOTE_ADDR}-$ENV{REMOTE_USER}.lock";
+my $msg = $deploy_branch ? " [git-deploy --branch $deploy_branch]" : "";
+$0 = "push-notification - $who:$base$msg";
+my $lock_file = my $kill_glob = "$lock_dir/$ENV{REMOTE_ADDR}-$ENV{REMOTE_USER}.lock";
+my $safe_branch = $deploy_branch ? "-$deploy_branch" : "";
+$safe_branch =~ s/[^\w\-]+/_/g;
+$safe_branch ? ($lock_file=~s/(\.lock)$/$safe_branch$1/) : ($kill_glob=~s/(\.lock)$/-*$1/);
+# If all clients are using at least v0.038 of git-client or git-deploy, then $kill_glob will always be empty.
+# But for backward compatibility, notify ALL sleeping clients instead of only those matching $deploy_branch:
+foreach my $other_lock (glob $kill_glob) {
+    if (open my $fh, "<", $other_lock) {
+        sleep 1 if 0.0007 > -M $other_lock; # Give time for other process to stash the PIDs.
+        if (defined(my $worker = <$fh>) and defined(my $sleeper = <$fh>)) {
+            chomp $worker; chomp $sleeper;
+            $worker and $sleeper and kill 0, $worker and kill 9, $sleeper and
+            warn localtime().": [$who] git-server: PUSH NOTIFICATION: Releasing worker (pid=$worker) by killing sleeper (pid=$sleeper) ...\n";
+        }
+        close $fh;
+    }
+}
 sysopen my $fh, $lock_file, O_CREAT | O_RDWR;
 my $released_worker = 0;
 if (!flock $fh, LOCK_NB | LOCK_EX) {
@@ -60,13 +102,27 @@ if (!flock $fh, LOCK_NB | LOCK_EX) {
     # Acquired Exclusive Lock!
     # Safe to continue
 }
+
+my $last_branch = "";
 my $last_pushed = "$lock_dir/pushed";
 my $last_pulled = "$lock_dir/$ENV{REMOTE_ADDR}-$ENV{REMOTE_USER}.pulled";
 my $WHEN_last_pulled = (stat $last_pulled)[9] || 0;
 my $WHEN_last_pushed = (stat $last_pushed)[9] || 0;
+
+if ($deploy_branch and open my $last_pull, "<", $last_pulled) {
+    $last_branch = $1 if (<$last_pull> || "") =~ /\[git-deploy --branch (\S+)\]/;
+    close $last_pull;
+}
+
 my $should_wait =
-    # Do NOT wait if this is the first time ever doing a pull
+    # Do NOT wait if this is the first time ever doing a pull (probably clone)
     !-e $last_pulled ? 0 :
+
+    # Do NOT wait if the client is only switching to checkout a different branch than last time
+    $deploy_branch && $last_branch && $deploy_branch ne $last_branch ? 0 :
+
+    # Never wait if called from "git-client" wrapper without going through "git-deploy"
+    $client_command =~ /git-client/ ? 0 :
 
     # Always pause if there's never been any push yet
     !-e $last_pushed ? 1 :
@@ -79,7 +135,7 @@ my $should_wait =
 
 # Update Last Pull Timestamp
 open my $pull, ">", $last_pulled or die "$last_pulled: open: $!";
-print $pull localtime().": [$ENV{REMOTE_ADDR} $ENV{REMOTE_PORT} => $ENV{SERVER_ADDR} $ENV{SERVER_PORT}] Pull initiated\n";
+print $pull localtime().": [$ENV{REMOTE_ADDR} $ENV{REMOTE_PORT} => $ENV{SERVER_ADDR} $ENV{SERVER_PORT}] Pull initiated$msg\n";
 close $pull;
 
 if (my $sleeper = fork()) {
@@ -87,6 +143,7 @@ if (my $sleeper = fork()) {
     $fh->autoflush(1);
     print $fh "$$\n";
     print $fh "$sleeper\n";
+    print $fh "$deploy_branch\n" if $deploy_branch;
     truncate $fh, tell $fh;
     warn localtime().": [$who] git-server: PUSH NOTIFICATION: Starting worker (pid=$$) waiting for sleeper (pid=$sleeper) to finish ...\n";
     waitpid $sleeper, 0;

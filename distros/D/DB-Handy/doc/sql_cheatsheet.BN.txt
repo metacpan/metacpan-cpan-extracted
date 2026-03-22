@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (ডেটা টাইপ) ]
+  INT          : পূর্ণসংখ্যা (Integer)
+  FLOAT        : ভগ্নাংশ (Floating point)
+  VARCHAR(n)   : পরিবর্তনশীল দৈর্ঘ্যের স্ট্রিং (সর্বোচ্চ n বাইট)
+  CHAR(n)      : নির্দিষ্ট দৈর্ঘ্যের স্ট্রিং (সর্বদা n বাইট)
+
+[ 1. CREATE / DROP (টেবিল তৈরি এবং মুছে ফেলা) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (ডেটা যোগ করা) ]
+  -- কলাম উল্লেখ করে ডেটা যোগ করা (প্রস্তাবিত)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- কলাম উল্লেখ না করে ডেটা যোগ করা
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (ডেটা অনুসন্ধান) ]
+  -- সব ডেটা পাওয়া
+  SELECT * FROM student;
+  -- শর্ত দেওয়া (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- সাজানো (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- ডেটার সংখ্যা সীমিত করা (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (ডেটা আপডেট করা) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (ডেটা মুছে ফেলা) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (অপারেটর) ]
+  তুলনা   : =, <>, !=, >, <, >=, <=
+  সীমা    : BETWEEN 70 AND 90
+  তালিকা  : IN (1, 2, 3) অথবা NOT IN (1, 2, 3)
+  স্ট্রিং : LIKE 'A%' (A দিয়ে শুরু), LIKE '%A' (A দিয়ে শেষ)
+  NULL চেক: IS NULL, IS NOT NULL
+  লজিক্যাল: AND, OR, NOT
+
+[ Aggregate Functions (অ্যাগ্রিগেট ফাংশন) ]
+  COUNT(*) : সারি (rows) গণনা করা
+  SUM(col) : যোগফল বের করা
+  AVG(col) : গড় বের করা
+  MAX(col) : সর্বোচ্চ মান বের করা
+  MIN(col) : সর্বনিম্ন মান বের করা
+  (উদাহরণ) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (ইনডেক্স দিয়ে গতি বাড়ানো) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

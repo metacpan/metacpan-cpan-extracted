@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (Kiểu dữ liệu) ]
+  INT          : Số nguyên
+  FLOAT        : Số thực
+  VARCHAR(n)   : Chuỗi ký tự có độ dài thay đổi (tối đa n byte)
+  CHAR(n)      : Chuỗi ký tự có độ dài cố định (luôn là n byte)
+
+[ 1. CREATE / DROP (Tạo và Xóa bảng) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (Thêm dữ liệu) ]
+  -- Thêm dữ liệu bằng cách chỉ định cột (Khuyên dùng)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- Thêm dữ liệu không cần chỉ định cột
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (Tìm kiếm dữ liệu) ]
+  -- Lấy tất cả dữ liệu
+  SELECT * FROM student;
+  -- Chỉ định điều kiện (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- Sắp xếp dữ liệu (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- Giới hạn số lượng bản ghi (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (Cập nhật dữ liệu) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (Xóa dữ liệu) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (Các toán tử) ]
+  So sánh   : =, <>, !=, >, <, >=, <=
+  Khoảng    : BETWEEN 70 AND 90
+  Danh sách : IN (1, 2, 3) hoặc NOT IN (1, 2, 3)
+  Chuỗi     : LIKE 'A%' (Bắt đầu bằng A), LIKE '%A' (Kết thúc bằng A)
+  Kiểm tra NULL: IS NULL, IS NOT NULL
+  Logic     : AND, OR, NOT
+
+[ Aggregate Functions (Hàm tổng hợp) ]
+  COUNT(*) : Đếm số dòng
+  SUM(col) : Tính tổng
+  AVG(col) : Tính trung bình
+  MAX(col) : Tìm giá trị lớn nhất
+  MIN(col) : Tìm giá trị nhỏ nhất
+  (Ví dụ) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (Tăng tốc độ tìm kiếm) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

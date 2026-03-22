@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use Pod::Abstract;
 use String::UpdateYears qw(update_years);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -73,9 +73,9 @@ sub pod {
 	my $pod = $self->{'pod_abstract'}->pod;
 	chomp $pod;
 	my $ret = $pod;
-	# XXX Fix Abstract
+	# XXX Fix Abstract, removing blank line
 	if ($pod =~ m/=cut\s+$/s) {
-		$ret = substr $pod, 0, -2;
+		$ret = substr $pod, 0, -1;
 		$ret .= "\n";
 	} else {
 		$ret .= "\n";
@@ -286,12 +286,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2023 Michal Josef Špaček
+© 2023-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

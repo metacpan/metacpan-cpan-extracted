@@ -7,20 +7,21 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Instance 2.159;
+package Config::Model::Instance 2.160;
 
 use 5.20.0;
 
 use strict;
 use warnings ;
-use feature qw/postderef signatures/;
-no warnings qw/experimental::postderef experimental::signatures/;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
 use MouseX::StrictConstructor;
 with "Config::Model::Role::NodeLoader";
 with "Config::Model::Role::Utils";
+
+use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 use File::Path;
 use Path::Tiny;
@@ -656,7 +657,7 @@ Config::Model::Instance - Instance of configuration tree
 
 =head1 VERSION
 
-version 2.159
+version 2.160
 
 =head1 SYNOPSIS
 
@@ -889,7 +890,7 @@ file, according to the user's configuration model.
 
 The goal of the update method is to update configuration data from
 external data. For instance, update is called on
-C<Config::Model::Dpkg::Copyright> nodes to udpate copyright data from
+C<Config::Model::Dpkg::Copyright> nodes to update copyright data from
 sources files.
 
 =head2 grab

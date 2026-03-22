@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (Veri Tipleri) ]
+  INT          : Tam sayı
+  FLOAT        : Ondalıklı sayı
+  VARCHAR(n)   : Değişken uzunluklu metin (Maksimum n bayt)
+  CHAR(n)      : Sabit uzunluklu metin (Her zaman n bayt)
+
+[ 1. CREATE / DROP (Tablo Oluşturma ve Silme) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (Veri Ekleme) ]
+  -- Sütunları belirterek veri ekleme (Önerilen)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- Sütunları belirtmeden veri ekleme
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (Veri Sorgulama) ]
+  -- Tüm verileri getir
+  SELECT * FROM student;
+  -- Koşul belirleme (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- Sıralama (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- Satır sayısını sınırlama (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (Veri Güncelleme) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (Veri Silme) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (Operatörler) ]
+  Karşılaştırma : =, <>, !=, >, <, >=, <=
+  Aralık        : BETWEEN 70 AND 90
+  Liste         : IN (1, 2, 3) veya NOT IN (1, 2, 3)
+  Metin arama   : LIKE 'A%' (A ile başlayan), LIKE '%A' (A ile biten)
+  NULL kontrolü : IS NULL, IS NOT NULL
+  Mantıksal     : AND, OR, NOT
+
+[ Aggregate Functions (Toplama Fonksiyonları) ]
+  COUNT(*) : Satırları sayar
+  SUM(col) : Toplamı hesaplar
+  AVG(col) : Ortalamayı hesaplar
+  MAX(col) : En büyük değeri bulur
+  MIN(col) : En küçük değeri bulur
+  (Örnek) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (İndekslerle Hızlandırma) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

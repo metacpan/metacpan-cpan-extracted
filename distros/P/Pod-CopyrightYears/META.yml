@@ -28,7 +28,7 @@ no_index:
 requires:
   Class::Utils: 0
   Error::Pure: 0.3
-  Pod::Abstract: 0
+  Pod::Abstract: 0.26
   String::UpdateYears: 0
   perl: 5.6.2
 resources:
@@ -36,4 +36,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Pod-CopyrightYears
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Pod-CopyrightYears
-version: '0.03'
+version: '0.04'

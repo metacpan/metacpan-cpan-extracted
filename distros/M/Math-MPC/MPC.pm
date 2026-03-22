@@ -130,12 +130,13 @@ Rmpc_set_dc Rmpc_set_ldc Rmpc_set_NV Rmpc_set_NV_NV
 Rmpc_set_DC Rmpc_set_LDC Rmpc_set_F128C
 Rmpc_fma Rmpc_dot Rmpc_sum
 Rmpc_add Rmpc_add_ui Rmpc_add_fr
-Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub
+Rmpc_sub Rmpc_sub_ui Rmpc_ui_sub Rmpc_ui_ui_sub Rmpc_sub_fr Rmpc_fr_sub
 Rmpc_mul Rmpc_mul_ui Rmpc_mul_si Rmpc_mul_fr Rmpc_mul_i Rmpc_sqr Rmpc_mul_2exp
 Rmpc_mul_2si Rmpc_mul_2ui
-Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_sqrt Rmpc_div_2exp
+Rmpc_div Rmpc_div_ui Rmpc_ui_div Rmpc_div_fr Rmpc_fr_div Rmpc_sqrt Rmpc_div_2exp
 Rmpc_div_2si Rmpc_div_2ui
-Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm Rmpc_exp Rmpc_log Rmpc_log10
+Rmpc_neg Rmpc_abs Rmpc_conj Rmpc_norm
+Rmpc_exp Rmpc_exp10 Rmpc_exp2 Rmpc_log Rmpc_log10 Rmpc_log2
 Rmpc_cmp Rmpc_cmp_si Rmpc_cmp_si_si Rmpc_cmp_abs
 Rmpc_out_str Rmpc_inp_str c_string r_string i_string
 TRmpc_out_str TRmpc_inp_str
@@ -175,7 +176,7 @@ if(MPC_HEADER_V >= 66304) {
 }
 
     @Math::MPC::EXPORT_OK = (@tagged, @radius, @ball);
-    our $VERSION = '1.33';
+    our $VERSION = '1.40';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);

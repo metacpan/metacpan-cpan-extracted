@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/djzort/NetAddr-MAC/issues
   homepage: https://github.com/djzort/NetAddr-MAC
   repository: https://github.com/djzort/NetAddr-MAC.git
-version: '0.99'
+version: '1.00'
 x_author_pledge:
   version: 1
 x_contributors:

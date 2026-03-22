@@ -11,7 +11,6 @@ META.yml
 Makefile.PL
 README
 README.md
-TODO
 cpanfile
 doap.xml
 examples/example.pl
@@ -22,6 +21,7 @@ t/00-report-prereqs.t
 t/130-utils-mac.t
 t/131-utils-mac-properties.t
 t/132-utils-mac-normals.t
+t/133-random.t
 t/140-new.t
 t/150-misc-bad-formats-via-die.t
 t/author-critic.t

@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.046';
+$App::Cme::Command::run::VERSION = '1.047';
 use strict;
 use warnings;
 use v5.20;
@@ -27,6 +27,7 @@ use App::Cme -command ;
 
 use base qw/App::Cme::Common/;
 use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 my $__test_home = '';
 # used only by tests
@@ -495,7 +496,7 @@ sub run_script ($self, $opt, $app_args, $script_data, $user_args){
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.046';
+$App::Cme::Run::Var::VERSION = '1.047';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -523,7 +524,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.046
+version 1.047
 
 =head1 SYNOPSIS
 

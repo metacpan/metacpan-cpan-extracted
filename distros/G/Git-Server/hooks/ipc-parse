@@ -5,7 +5,7 @@ use strict;
 
 sub crash {
     my $err_message = shift;
-    my $out_message = shift // "{}";
+    my $out_message = shift || "{}";
     $out_message =~ s/\s*$/\n/;
     print $out_message;
     defined($err_message) or exit 1;
@@ -196,7 +196,8 @@ if (my $tracefile = "$ipc/log.trace") {
             }
             $envs = join ", ", @$envs;
             print $fh qq{12:00:00 execve("fake-run", ["git-shell", "-c", "$ENV{SSH_ORIGINAL_COMMAND}"], [$envs]) = 0\n};
-            my $exit_status = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS} // -1;
+            my $exit_status = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS};
+            $exit_status = -1 if !defined $exit_status;
             print $fh "12:00:01.618365 +++ exited with $exit_status +++\n";
             close $fh;
         }
@@ -233,7 +234,7 @@ if (open my $log_fh, "<", \$log) {
         }
         elsif (/.*\+\+\+ exited with (\d+) \+\+\+\s*$/) {
             # Found exit code
-            $ENV{GIT_EXIT_STATUS} //= $1;
+            $ENV{GIT_EXIT_STATUS} = $1 if !defined $ENV{GIT_EXIT_STATUS};
         }
         elsif (/^[\s\d:\.\-]*?(read|write)\(([012]),\s*(.+)/) {
             my $op = $1;
@@ -294,7 +295,7 @@ my $info = {};
 
 $info->{debug} = $ENV{DEBUG} if defined $ENV{DEBUG};
 
-$info->{git_client_connected} = $ENV{GIT_CONNECTED_EPOCH} || time;
+$info->{server_git_connected} = $ENV{GIT_CONNECTED_EPOCH} || time;
 
 if (my $i = $ENV{GIT_OPTION_COUNT}) {
     while (0<=--$i and defined(my $opt = $ENV{"GIT_OPTION_$i"})) {
@@ -334,13 +335,13 @@ if ($operation eq "pull" and @$want and !@$have) {
 $info->{client_git_version} = $1 if $client_to_server =~ m{(?:^|\s|\b)agent=([\w/\.\-\(\)]+)};
 $info->{server_git_version} = $1 if $server_to_client =~ m{(?:^|\s|\b)agent=([\w/\.\-\(\)]+)};
 
-$info->{error_code} = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS} // -1;
+defined ($info->{error_code} = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS}) or $info->{error_code} = -1;
 $info->{SUCCESS} = $info->{error_code} ? 0 : 1;
 $info->{refs} = [];
 
 if ($info->{SUCCESS}) {
     my $refs = $info->{refs};
-    if ($operation eq "push") {
+    if ($info->{operation} eq "push") {
         # Did the client PUSH anything?
         # Sniff out tags and branches from pushinfo.log
         if ($pushinfo and open my $fh, "<", \$pushinfo) {
@@ -432,7 +433,7 @@ if ($info->{SUCCESS}) {
             }
         }
     }
-    else {
+    elsif ($info->{operation} eq "pull") {
         # Did the client PULL anything?
         # Remember all ref tips
         my $tip_of_ref = {};
@@ -513,6 +514,9 @@ if ($info->{SUCCESS}) {
         }
     }
 }
+
+# Include Deprecated OLD info for backwards compatibility:
+$info->{git_client_connected} = $info->{server_git_connected};
 
 if (eval { require JSON }) {
     print JSON->new->canonical->encode($info)."\n";

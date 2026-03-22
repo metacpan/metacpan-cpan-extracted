@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (Tipe Data) ]
+  INT          : Bilangan bulat (Integer)
+  FLOAT        : Bilangan desimal (Floating point)
+  VARCHAR(n)   : String panjang variabel (maksimal n byte)
+  CHAR(n)      : String panjang tetap (selalu n byte)
+
+[ 1. CREATE / DROP (Membuat dan Menghapus Tabel) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (Menambahkan Data) ]
+  -- Menambahkan data dengan menyebutkan kolom (Disarankan)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- Menambahkan data tanpa menyebutkan kolom
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (Mencari Data) ]
+  -- Mengambil semua data
+  SELECT * FROM student;
+  -- Menentukan kondisi (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- Mengurutkan data (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- Membatasi jumlah baris (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (Memperbarui Data) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (Menghapus Data) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (Operator) ]
+  Perbandingan: =, <>, !=, >, <, >=, <=
+  Rentang     : BETWEEN 70 AND 90
+  Daftar      : IN (1, 2, 3) atau NOT IN (1, 2, 3)
+  Teks        : LIKE 'A%' (Diawali huruf A), LIKE '%A' (Diakhiri huruf A)
+  Cek NULL    : IS NULL, IS NOT NULL
+  Logika      : AND, OR, NOT
+
+[ Aggregate Functions (Fungsi Agregat) ]
+  COUNT(*) : Menghitung jumlah baris
+  SUM(col) : Menghitung total (jumlah)
+  AVG(col) : Menghitung nilai rata-rata
+  MAX(col) : Mencari nilai terbesar
+  MIN(col) : Mencari nilai terkecil
+  (Contoh) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (Mempercepat pencarian dengan Indeks) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

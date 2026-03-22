@@ -22,7 +22,7 @@ requires:
   Data::Dump: '0'
   perl: '5.010'
 resources:
-  bugtracker: https://github.com/bodo-hugo-barwich/file-access-driver/issues
-  repository: https://github.com/bodo-hugo-barwich/file-access-driver.git
-version: v1.0.0
+  bugtracker: https://github.com/bodo-hugo-barwich/file-driver-pl/issues
+  repository: https://github.com/bodo-hugo-barwich/file-driver-pl.git
+version: v1.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

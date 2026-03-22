@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types ]
+  INT          : 整数 (Integer)
+  FLOAT        : 浮動小数点数 (Floating point number)
+  VARCHAR(n)   : 可変長文字列 (最大 n バイト)
+  CHAR(n)      : 固定長文字列 (常に n バイト)
+
+[ 1. CREATE / DROP (テーブルの作成と削除) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (データの追加) ]
+  -- 列を指定して追加（推奨）
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- 列の指定を省略して追加
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (データの検索) ]
+  -- 全件取得
+  SELECT * FROM student;
+  -- 条件を指定 (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- 並び替え (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- 件数制限 (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (データの更新) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (データの削除) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (使える演算子) ]
+  比較演算子: =, <>, !=, >, <, >=, <=
+  範囲検索  : BETWEEN 70 AND 90
+  リスト検索: IN (1, 2, 3) または NOT IN (1, 2, 3)
+  文字列検索: LIKE 'A%' (Aで始まる), LIKE '%A' (Aで終わる)
+  NULL判定  : IS NULL, IS NOT NULL
+  論理演算子: AND, OR, NOT
+
+[ Aggregate Functions (集計関数) ]
+  COUNT(*) : 件数を数える
+  SUM(col) : 合計を出す
+  AVG(col) : 平均を出す
+  MAX(col) : 最大値を見つける
+  MIN(col) : 最小値を見つける
+  (例) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (インデックスで高速化) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

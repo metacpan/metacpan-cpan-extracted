@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Lo.pm
-## Version v0.300.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.301.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -19,8 +19,9 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION );
-    our $VERSION = 'v0.300.2';
+    use vars qw( $VERSION $EXCEPTION_CLASS );
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.301.0';
 };
 
 use strict;
@@ -35,6 +36,7 @@ sub new
     my $self  = {};
     $self->{dbh} = $dbh;
     bless( $self, $class );
+    $self->{_exception_class} = $EXCEPTION_CLASS;
     return( $self );
 }
 

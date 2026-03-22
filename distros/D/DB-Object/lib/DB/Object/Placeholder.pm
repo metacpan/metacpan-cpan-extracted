@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Placeholder.pm
-## Version v0.1.0
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.13.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2023/07/08
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -17,14 +17,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
-    use vars qw( $REGISTRY $VERSION );
+    use vars qw( $REGISTRY $VERSION $EXCEPTION_CLASS );
     use Scalar::Util ();
     use overload (
         '""'   => 'as_string',
         'bool' => sub{1},
     );
-    our $REGISTRY = {};
-    our $VERSION = 'v0.12.0';
+    our $REGISTRY        = {};
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v0.13.0';
 };
 
 use strict;
@@ -36,6 +37,7 @@ sub init
     $self->{type}  = undef;
     $self->{value} = undef;
     $self->{_init_strict_use_sub} = 1;
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     my $addr = Scalar::Util::refaddr( $self );
     $REGISTRY->{ $addr } = $self;

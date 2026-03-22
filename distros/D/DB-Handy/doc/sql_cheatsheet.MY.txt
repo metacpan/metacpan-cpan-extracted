@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (ဒေတာအမျိုးအစားများ) ]
+  INT          : ကိန်းပြည့် (Integer)
+  FLOAT        : ဒသမကိန်း (Floating point)
+  VARCHAR(n)   : အလျားပြောင်းလဲနိုင်သော စာသား (အများဆုံး n bytes)
+  CHAR(n)      : အလျားသတ်မှတ်ထားသော စာသား (အမြဲတမ်း n bytes)
+
+[ 1. CREATE / DROP (ဇယားများ ဖန်တီးခြင်းနှင့် ဖျက်ခြင်း) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (ဒေတာ ထည့်သွင်းခြင်း) ]
+  -- ကော်လံများကို သတ်မှတ်၍ ဒေတာထည့်ရန် (အကြံပြုသည်)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- ကော်လံများကို မသတ်မှတ်ဘဲ ဒေတာထည့်ရန်
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (ဒေတာ ရှာဖွေခြင်း) ]
+  -- ဒေတာအားလုံး ရယူရန်
+  SELECT * FROM student;
+  -- အခြေအနေ သတ်မှတ်ရန် (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- အစဉ်လိုက် စီစဉ်ရန် (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- အရေအတွက် ကန့်သတ်ရန် (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (ဒေတာ ပြင်ဆင်ခြင်း) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (ဒေတာ ဖျက်ခြင်း) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (အော်ပရေတာများ) ]
+  နှိုင်းယှဉ်ချက် : =, <>, !=, >, <, >=, <=
+  အကွာအဝေး    : BETWEEN 70 AND 90
+  စာရင်း        : IN (1, 2, 3) သို့မဟုတ် NOT IN (1, 2, 3)
+  စာသားရှာဖွေမှု : LIKE 'A%' (A ဖြင့်စသည်), LIKE '%A' (A ဖြင့်ဆုံးသည်)
+  NULL စစ်ဆေးမှု: IS NULL, IS NOT NULL
+  ယုတ္တိဗေဒ     : AND, OR, NOT
+
+[ Aggregate Functions (စုစုပေါင်းလုပ်ဆောင်ချက်များ) ]
+  COUNT(*) : တန်း (rows) အရေအတွက်ကို ရေတွက်ရန်
+  SUM(col) : စုစုပေါင်းပေါင်းရန်
+  AVG(col) : ပျမ်းမျှရှာရန်
+  MAX(col) : အကြီးဆုံးတန်ဖိုးရှာရန်
+  MIN(col) : အငယ်ဆုံးတန်ဖိုးရှာရန်
+  (ဥပမာ) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (အညွှန်းများဖြင့် အမြန်နှုန်းမြှင့်တင်ရန်) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

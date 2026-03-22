@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-## Version v1.2.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v1.3.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2025/03/06
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     use common::sense;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION );
+    use vars qw( $VERSION $FIELD_NAMES $EXCEPTION_CLASS );
     use DB::Object::Fields::Overloaded;
     use Module::Generic::Array;
     use overload (
@@ -52,7 +52,12 @@ BEGIN
         fallback => 1,
     );
     use Wanted;
-    our $VERSION = 'v1.2.0';
+    our $VERSION = 'v1.3.0';
+    our $FIELD_NAMES = [qw(
+        check_name comment datatype default foreign_name index_name is_array is_check
+        is_foreign is_nullable is_primary is_unique name pos prefixed size type
+    )];
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
 };
 
 use strict;
@@ -82,20 +87,47 @@ sub init
     $self->{type}           = undef;
     $self->{_init_params_order}   = [qw( table_object query_object default pos type prefixed name )];
     $self->{_init_strict_use_sub} = 1;
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    $self->{_fields} = [qw(
-        check_name comment datatype default foreign_name index_name is_array is_check
-        is_foreign is_nullable is_primary is_unique name pos prefixed size type
-    )];
-    return( $self->error( "No table object was provided." ) ) if( !$self->{table_object} );
-    return( $self->error( "Table object provided is not an object." ) ) if( !$self->_is_object( $self->{table_object} ) );
-    return( $self->error( "Table object provided is not a DB::Object::Tables object." ) ) if( !$self->{table_object}->isa( 'DB::Object::Tables' ) );
-    return( $self->error( "No name was provided for this field." ) ) if( !$self->{name} );
+    $self->{_fields} = $FIELD_NAMES;
+#     return( $self->error( "No table object was provided." ) ) if( !$self->{table_object} );
+#     return( $self->error( "Table object provided is not an object." ) ) if( !$self->_is_object( $self->{table_object} ) );
+#     return( $self->error( "Table object provided is not a DB::Object::Tables object." ) ) if( !$self->{table_object}->isa( 'DB::Object::Tables' ) );
+#     return( $self->error( "No name was provided for this field." ) ) if( !$self->{name} );
     $self->{trace} = $self->_get_stack_trace;
     return( $self );
 }
 
 sub as_string { return( shift->name ); }
+
+# We attach this field to its table object
+sub attach
+{
+    my $self = shift( @_ );
+    my $tbl  = shift( @_ ) ||
+        return( $self->error( "No DB::Object::Tables object was provided." ) );
+    my $base_class = $self->base_class( $tbl );
+    unless( $self->_is_a( $tbl => "${base_class}::Tables" ) )
+    {
+        return( $self->error( "Value provided is not a ${base_class}::Tables object." ) );
+    }
+    $self->table_object( $tbl ) || return( $self->pass_error );
+    $self->debug( $tbl->debug );
+    return( $self );
+}
+
+sub base_class
+{
+    my $self  = shift( @_ );
+    my $this  = @_ ? shift( @_ ) : $self;
+    my $class = ref( $this ) ? ref( $this ) : $this;
+    no warnings 'once';
+    my @supported_classes = CORE::values( %$DB::Object::DRIVER2PACK );
+    push( @supported_classes, 'DB::Object' );
+    my $ok_classes = CORE::join( '|', CORE::map{ CORE::quotemeta( $_ ) } @supported_classes );
+    my $base_class = ( $class =~ /^($ok_classes)/ )[0];
+    return( $base_class );
+}
 
 sub clone
 {
@@ -104,6 +136,7 @@ sub clone
     # Likewise, the query object, we do not want to clone either.
     # my $keys = [qw( default is_nullable name pos prefixed size type )];
     my $keys = $self->_fields;
+    $keys    = $self->new_array( $FIELD_NAMES ) if( !scalar( @$keys ) );
     my $hash = {};
     @$hash{ @$keys } = @$self{ @$keys };
     # $hash->{datatype} = {};
@@ -114,17 +147,18 @@ sub clone
     my $dt = $self->datatype;
     $hash->{datatype} = 
     {
-    alias => $dt->alias->clone,
-    constant => $dt->{constant},
-    name => $dt->{name},
-    re => $dt->{re},
-    type => $dt->{type},
+        alias    => $dt->alias->clone,
+        constant => $dt->{constant},
+        name     => $dt->{name},
+        re       => $dt->{re},
+        type     => $dt->{type},
     };
     $self->_load_class( 'Clone' ) || return( $self->pass_error );
     my $copy = Clone::clone( $hash );
     $copy->{query_object} = $self->query_object;
     $copy->{table_object} = $self->table_object;
-    my $new = $self->new( %$copy, debug => $self->debug ) || return( $self->pass_error );
+    $copy->{debug}        = $self->debug;
+    my $new = $self->new( %$copy ) || return( $self->pass_error );
     return( $new );
 }
 
@@ -182,10 +216,14 @@ sub name
     no overloading;
     if( @_ )
     {
-        $self->{name} = shift( @_ );
+        my $name = shift( @_ );
+        if( !defined( $name ) || !CORE::length( $name // '' ) )
+        {
+            return( $self->error( "You can not set the table column name to be undefined or an empty string." ) );
+        }
+        $self->{name} = $name;
     }
-    my $name = $self->{name};
-    my $trace = $self->_get_stack_trace;
+    my $name  = $self->{name};
     my $alias = $self->query_object->table_alias;
     if( $self->{prefixed} )
     {
@@ -239,7 +277,8 @@ sub prev
     return( $self->_find_siblings( $self->pos - 1 ) );
 }
 
-sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
+# sub query_object { return( shift->_set_get_object_without_init( 'query_object', 'DB::Object::Query', @_ ) ); }
+sub query_object { return( shift->table_object->query_object ); }
 
 sub schema { return( shift->table_object->schema ); }
 
@@ -293,18 +332,18 @@ sub _op_overload
     my $field = $self->name;
     my $map =
     {
-    '!=' => '<>',
-    'lt' => '<',
-    'gt' => '>',
-    'le' => '<=',
-    'ge' => '>=',
-    # '=' works for all types, but IS does not work with everything.
-    # For example:
-    # select * from ip_table where ip_addr IS inet '192.168.2.12' OR inet '192.168.2.12' << ip_addr
-    # does not work, but
-    # select * from ip_table where ip_addr = inet '192.168.2.12' OR inet '192.168.2.12' << ip_addr
-    # works better
-    '==' => '=',
+        '!=' => '<>',
+        'lt' => '<',
+        'gt' => '>',
+        'le' => '<=',
+        'ge' => '>=',
+        # '=' works for all types, but IS does not work with everything.
+        # For example:
+        # select * from ip_table where ip_addr IS inet '192.168.2.12' OR inet '192.168.2.12' << ip_addr
+        # does not work, but
+        # select * from ip_table where ip_addr = inet '192.168.2.12' OR inet '192.168.2.12' << ip_addr
+        # works better
+        '==' => '=',
     };
     $op = $map->{ $op } if( exists( $map->{ $op } ) );
     my $dbo = $self->database_object;
@@ -387,6 +426,87 @@ sub _op_overload
     return( $over );
 }
 
+sub FREEZE
+{
+    my $self       = CORE::shift( @_ );
+    my $serialiser = CORE::shift( @_ ) // '';
+    my $class      = CORE::ref( $self );
+
+    # We keep a strict allow-list to avoid accidentally freezing DBI handles or other
+    # process-local state.
+    my @props = grep( $_ ne 'datatype', @{$self->{_fields}} );
+
+    my $hash = {};
+    foreach my $prop ( @props )
+    {
+        if( CORE::exists( $self->{ $prop } ) &&
+            defined( $self->{ $prop } ) &&
+            CORE::ref( $self->{ $prop } ) ne 'CODE' )
+        {
+            $hash->{ $prop } = $self->{ $prop };
+        }
+    }
+
+    my $datatype = $self->datatype;
+    my $dtype_ref = {};
+    if( $datatype )
+    {
+        $dtype_ref->{alias}     = $datatype->alias;
+        $dtype_ref->{constant}  = $datatype->constant;
+        $dtype_ref->{name}      = $datatype->name;
+        $dtype_ref->{re}        = $datatype->re;
+        $dtype_ref->{type}      = $datatype->type;
+    }
+    $hash->{datatype} = $dtype_ref;
+
+    # Return an array reference rather than a list so this works with Sereal and CBOR.
+    # Before Sereal version 4.023, Sereal did not support multiple values returned.
+    if( $serialiser eq 'Sereal' )
+    {
+        require Sereal::Encoder;
+        require version;
+
+        if( version->parse( Sereal::Encoder->VERSION ) < version->parse( '4.023' ) )
+        {
+            CORE::return( [$class, $hash] );
+        }
+    }
+
+    # But Storable wants a list with the first element being the serialised element
+    CORE::return( $class, $hash );
+}
+
+sub STORABLE_freeze { return( shift->FREEZE( @_ ) ); }
+
+sub STORABLE_thaw { return( shift->THAW( @_ ) ); }
+
+sub THAW
+{
+    # STORABLE_thaw would issue $cloning as the 2nd argument, while CBOR would issue
+    # 'CBOR' as the second value.
+    my( $self, undef, @args ) = @_;
+    my $ref   = ( CORE::scalar( @args ) == 1 && CORE::ref( $args[0] ) eq 'ARRAY' ) ? CORE::shift( @args ) : \@args;
+    my $class = ( CORE::defined( $ref ) && CORE::ref( $ref ) eq 'ARRAY' && CORE::scalar( @$ref ) > 1 ) ? CORE::shift( @$ref ) : ( CORE::ref( $self ) || $self );
+    my $hash = CORE::ref( $ref ) eq 'ARRAY' ? CORE::shift( @$ref ) : {};
+    my $dtype = CORE::delete( $hash->{datatype} );
+    my $new;
+    # Storable pattern requires to modify the object it created rather than returning a new one
+    if( CORE::ref( $self ) )
+    {
+        foreach( CORE::keys( %$hash ) )
+        {
+            $self->{ $_ } = CORE::delete( $hash->{ $_ } );
+        }
+        $new = $self;
+    }
+    else
+    {
+        $new = CORE::bless( $hash => $class );
+    }
+    $new->datatype( %$dtype ) if( $dtype );
+    CORE::return( $new );
+}
+
 1;
 # NOTE: POD
 __END__
@@ -465,7 +585,7 @@ This would yield:
 
 =head1 VERSION
 
-    v1.2.0
+    v1.3.0
 
 =head1 DESCRIPTION
 
@@ -576,6 +696,16 @@ This returns the name of the field, possibly prefixed
 This is also called to stringify the object
 
     print( "Field is: $field\n" );
+
+=head2 attach
+
+This takes a table object, and attach it to our current object.
+
+This returns the current object upon success, or upon error, it sets an L<error object|DB::Object::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+=head2 base_class
+
+Returns the base class, such as C<DB::Object::Postgres> or C<DB::Object::SQLite>
 
 =head2 clone
 

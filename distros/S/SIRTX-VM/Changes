@@ -1,3 +1,14 @@
+v0.13  2026-03-21Z
+    - Support multiple inputs via vmv0-asm
+    - Added logicals:
+      exit_status, rampool, memorypool, storagepool, sepport,
+      SIRTX_ACCESS_PATH, SIRTX_ACCESS_RDONLY, SIRTX_ACCESS_WRONLY, SIRTX_ACCESS_RDWR, SIRTX_ACCESS_ONLINE,
+      bb, urandom, dataout, sideout, hrair
+    - Improved logical register allocations, resulting in smaller size and runtime speedups
+    - Added directives:
+      break, .forget_mapped, .forget_register_state,
+      .register_file_store, .register_file_restore
+
 v0.12  2026-01-29Z
     - Added experimental support for open with ports
     - Added ac/accumulator to list of known logicals

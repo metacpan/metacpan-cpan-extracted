@@ -1,5 +1,11 @@
 NetAddr::MAC - A MAC address object
 
+1.00    2025-03-22
+        - Fix broken is_hsrp2 function
+        - Implement random()
+        - Add some additional unit tests
+        - May as well be version 1.0
+
 0.99    2025-12-19
         - Add functions for vrrp4 and vrrp6 thanks to Jon (jon@jjminer.org) via GH#4
         - Use our rather than vars, and just import Exporter. Its time.

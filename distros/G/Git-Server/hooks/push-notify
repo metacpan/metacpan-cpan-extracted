@@ -1,5 +1,27 @@
 #!/usr/bin/env perl
 
+=pod
+
+=head1 NAME
+
+push-notify - Run after "git push" completes, i.e., within post-write.
+
+=head1 SYNOPSIS
+
+  hooks/push-notify <BRANCH> [ <BRANCH> ... ]
+
+=head1 DESCRIPTION
+
+Releases push-notification sleeper after an update has been pushed.
+
+The updated branches are required to be passed via command-line arguments.
+So if you run this hook from post-update, you'd need to store the branches
+from the pre-receive hook and pass them from the post-update hook somehow.
+
+Or if this is run from hooks/post-write then it will provide the branches.
+
+=cut
+
 use strict;
 use warnings;
 
@@ -8,28 +30,40 @@ my $base = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
 my $lock_dir = "$base/logs";
 mkdir $lock_dir, 0755 unless -d $lock_dir;
 
+my @updated_branches = @ARGV or die localtime().": [$who] git-server: Must provide at least one branch to push-notify\n";
+my $deployable = { map { ($_ => 1) } @updated_branches };
 my $last_pushed = "$lock_dir/pushed";
 open my $fh, ">", $last_pushed or die "$last_pushed: open: $!";
-print $fh localtime().": [$ENV{REMOTE_ADDR} $ENV{REMOTE_PORT} => $ENV{SERVER_ADDR} $ENV{SERVER_PORT}] Pushed by: $ENV{REMOTE_USER}\n";
+print $fh localtime().": [$ENV{REMOTE_ADDR} $ENV{REMOTE_PORT} => $ENV{SERVER_ADDR} $ENV{SERVER_PORT}] Pushed: [@updated_branches] By: $ENV{REMOTE_USER}\n";
 close $fh;
 
-# $lock_file = "$lock_dir/$REMOTE_ADDR-$REMOTE_USER.lock"; # Created by push-notification
+# $lock_file = "$lock_dir/$REMOTE_ADDR-$REMOTE_USER-$deploy_branch.lock"; # Created by push-notification
 foreach my $lock_file (glob "$lock_dir/*.lock") {
     if (open my $fh, "<", $lock_file) {
         if (defined (my $worker = <$fh>) and
             defined (my $sleeper = <$fh>)) {
             chomp $worker;
             chomp $sleeper;
-            if (kill 0, $worker and
-                kill 9, $sleeper) {
-                if ($lock_file =~ m{.*/(.+).lock$}) {
-                    warn localtime().": [$who] git-server: Sending push notification to $1 ...\n";
-                }
-                else {
-                    die localtime().": [$who] git-server: Released impossible sleeper (pid=$sleeper) ...\n";
-                }
+            my $lockid = $lock_file =~ m{.*/(.+).lock$} ? $1 : "UNKNOWNCLIENT";
+            if (defined (my $deploy_branch = <$fh>)) {
+                chomp $deploy_branch;
+                next if !$deployable->{$deploy_branch};
+            }
+            else {
+                # Older git-deploy versions < 0.038 did not provide the $deploy_branch to the server,
+                # so notify ALL of these just in case they were waiting on a branch that was updated.
+            }
+            if (kill 0, $worker and kill 9, $sleeper) {
+                warn localtime().": [$who] git-server: Sending push notification to $lockid ...\n";
+            }
+            elsif (!kill 0, $worker and !kill 0, $sleeper and -M $lock_file > 2) {
+                warn localtime().": [$who] git-server: Clearing stale push notification on $lockid from ".(-M $lock_file)." days ago ...\n";
+                unlink $lock_file;
             }
         }
         close $fh;
+    }
+    else {
+        warn localtime().": [$who] git-server: $lock_file is not readable! [$!]\n";
     }
 }

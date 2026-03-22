@@ -39,15 +39,15 @@ my $asm;
     GetOptions(%opts);
 }
 
-if (scalar(@ARGV) != 1) {
-    die "Error: Invalid number of input files. Need exactly one.\n";
+if (scalar(@ARGV) < 1) {
+    die "Error: Invalid number of input files. Need at least one.\n";
 }
 
 if (!defined($config{output}) || !length($config{output})) {
     die "Error: No output file given, use -o\n";
 }
 
-$asm = SIRTX::VM::Assembler->new(in => $ARGV[0], out => $config{output}, profile => $config{profile});
+$asm = SIRTX::VM::Assembler->new(in => \@ARGV, out => $config{output}, profile => $config{profile});
 
 $asm->run;
 

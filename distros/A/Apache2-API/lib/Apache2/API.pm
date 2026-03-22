@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.5.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.5.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2026/03/19
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -41,7 +41,7 @@ BEGIN
     use Scalar::Util ();
     our @EXPORT = qw( apr1_md5 );
     $DEBUG   = 0;
-    $VERSION = 'v0.5.1';
+    $VERSION = 'v0.5.2';
 };
 
 use strict;
@@ -662,6 +662,7 @@ sub reply
         {
             $ref->{status} = $code;
         }
+        $ref->{status} = int( $ref->{status} ) if( $ref->{status} =~ /^\d+$/ );
 
         # Title from caller or from HTTP status table (localized)
         unless( exists( $ref->{title} ) &&
@@ -688,6 +689,11 @@ sub reply
         # Detail/message precedence: explicit detail > message field > HTTP message
         if( !defined( $ref->{detail} ) || $ref->{detail} eq '' )
         {
+            if( exists( $ref->{details} ) && defined( $ref->{details} ) && $ref->{details} )
+            {
+                $r->log->warn( ref( $self ), ": warning only: you seem to have set the property 'details' in your error payload, but to build a rfc9457 error, you need to provide the property 'detail' instead." );
+            }
+
             if( defined( $msg ) && ( !ref( $msg ) || $self->_can_overload( $msg => "''" ) ) )
             {
                 $ref->{detail} = "$msg";
@@ -724,7 +730,7 @@ sub reply
             }
         }
 
-        # Build 'type' URL if not provided
+        # Build 'type' URL if not provided.
         unless( exists( $ref->{type} ) &&
             defined( $ref->{type} ) &&
             length( $ref->{type} // '' ) )
@@ -739,10 +745,10 @@ sub reply
             }
         }
 
-        # Flatten legacy fields that don't belong
-        # The rfc 9457 prefers the property 'detail'
+        # Flatten legacy fields that do not belong.
+        # The rfc 9457 prefers the property 'detail'.
         delete( $ref->{message} ) if( exists( $ref->{message} ) );
-        # The rfc 9457 prefers the property 'status'
+        # The rfc 9457 prefers the property 'status'.
         delete( $ref->{code} ) if( exists( $ref->{code} ) );
     };
 
@@ -763,6 +769,7 @@ sub reply
         {
             $ref->{error}->{code} = $code;
         }
+        $ref->{error}->{code} = int( $ref->{error}->{code} ) if( $ref->{error}->{code} =~ /^\d+$/ );
 
         # We try hard to get the value for the property 'message', but if $locale is undefined, it is impossible to find out the language that was used to formulate the response.
         # So, ultimately, if we cannot find any value for the property 'message', we revert to guessing the HTTP caller's preferred language, which may, or may not be aligned with the content of other parts of the JSON response. Given that, in that scenario, no 'locale' would have been set, we take the risk of having two different languages used: one for 'title', and other parts of the JSON reply, and the fallback 'message' one.
@@ -971,7 +978,8 @@ sub reply
         else
         {
             $ref->{success} = \1 unless( exists( $ref->{success} ) );
-            $ref->{code} //= $code;
+            $ref->{code}  //= $code;
+            $ref->{code}    = int( $ref->{code} ) if( $ref->{code} =~ /^\d+$/ );
         }
         $set_payload_locale->( $ref, $msg );
     }
@@ -992,7 +1000,8 @@ sub reply
     else
     {
         $ref->{success} = \1 unless( exists( $ref->{success} ) );
-        $ref->{code} //= $code;
+        $ref->{code}  //= $code;
+        $ref->{code}    = int( $ref->{code} ) if( $ref->{code} =~ /^\d+$/ );
     }
 
     # Without an Access-Control-Allow-Origin field, this would trigger an error on the web browser
@@ -1049,12 +1058,10 @@ sub reply
     $resp->code( $code );
     if( defined( $msg ) && $ctype !~ m{^application/(?:json|problem\+json)}i )
     {
-        # $r->custom_response( $code, $msg );
         $resp->custom_response( $code, $msg );
     }
     else
     {
-        # $r->custom_response( $code, '' );
         $resp->custom_response( $code, '' );
         #$r->status( $code );
     }
@@ -1066,7 +1073,6 @@ sub reply
         my $cleanup = delete( $ref->{cleanup} );
         # See <https://perl.apache.org/docs/2.0/user/handlers/http.html#PerlCleanupHandler>
         $r->pool->cleanup_register( $cleanup, $self );
-        # $r->push_handlers( PerlCleanupHandler => $cleanup );
     }
 
     # Our print() will possibly change the HTTP headers, so we do not flush now just yet.
@@ -1947,7 +1953,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.5.1
+    v0.5.2
 
 =head1 DESCRIPTION
 

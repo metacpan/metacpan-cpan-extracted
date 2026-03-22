@@ -1,62 +1,69 @@
 #!/usr/bin/perl
 
+=pod
+
+=head1 NAME
+
+restrictip - Restrict read and write access to the IP Address whitelist specified.
+
+=head1 SYNOPSIS
+
+  git config acl.restrictip '127.0.0.1,10.0.0.0/8,192.168.0.0/16'  # Allow Private Networks
+
+    # or --add to allow more IPs (instead of replacing the previous ACL setting)
+
+  git config --add acl.restrictip '2a00:1450:400e/56,96.0.0.0/8'   # Supports both IPv4 and IPv6 CIDR
+
+=head1 DESCRIPTION
+
+The acl.restrictip can be a single IP address or a CIDR network block definition.
+Or a comma-delimited list of all networks you wish to allow.
+Default is no restrictions, meaning any IP will be allowed to push and pull.
+
+This program will exit with non-zero and print message to STDERR if IP is not allowed.
+Or exit with 0 and no STDERR output if there are no problems or if there are no
+acl.restrictip directives configured.
+
+=cut
+
 use strict;
 use warnings;
 
-# Program: restrictip
-# Purpose:
-#   Exits with 0 if there are no problems.
-#   Exits with non-zero and prints message to STDERR if IP is not allowed.
-
 my $restrictip = `git config --get-all acl.restrictip` or exit 0;  # No config
-my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
+my $who = ($ENV{REMOTE_USER} || die localtime().": git-server: Auth required\n")."@".($ENV{REMOTE_ADDR} || die localtime().": git-server: Remote IP required.\n");
+
+require Socket;
+sub AF_INET  { Socket::AF_INET() }
+sub AF_INET6 { Socket::AF_INET6() }
+
+# ($bits,$family,$base,$prefix) = addr_bits( $CIDR );
+sub addr_bits {
+    local $_ = shift;
+    my $family = m{^(\d+\.\d+\.\d+\.\d+)(?:|/(\d+))$} ? AF_INET :
+        m{^([\da-f\:]+)(?:|/(\d+))$} ? AF_INET6 :
+        die localtime().": [$who] git-server: CIDR [$_] Unrecognized!\n";
+    my $base = $1;
+    my $prefix = $2 || "";
+    my $binaryify = Socket->can("inet_pton") || eval { require Socket6; Socket6->can("inet_pton") };
+    my $pton = $binaryify ? $binaryify->($family, $base) : Socket::inet_aton($base) or die localtime().": [$who] git-server: No IPv6 support for restrictip! $@";
+    my $len = AF_INET == $family ? 32 : 128;
+    $prefix ||= $len;
+    die localtime().": [$who] git-server: CIDR [$base/$prefix] Prefix Stank!\n" if $prefix < 8 or $prefix > $len;
+    my $bits = unpack "B$len", $pton;
+    return ($bits, $family, $base, $prefix);
+}
+
+my ($client_bits, $client_fam) = addr_bits $ENV{REMOTE_ADDR};
 $restrictip =~ s/\s+/,/g;
 $restrictip =~ s/,+/,/g;
 $restrictip =~ s/(,$|^,)//g;
 foreach my $cidr (split /,/, $restrictip) {
-    if ($cidr =~ m{^(\d+\.\d+\.\d+\.\d+)(?:|/(\d+))$}) {
-        # IPv4 check
-        my $base = $1;
-        my $prefix = $2 || 32;
-        if ($prefix >= 8 and
-            $prefix <= 32 and
-            $ENV{REMOTE_ADDR} =~ /^(\d+\.\d+\.\d+\.\d+)$/) {
-            require Socket;
-            my $should_bits = unpack "B32", Socket::inet_pton(Socket::AF_INET(), $base);
-            my $actual_bits = unpack "B32", Socket::inet_pton(Socket::AF_INET(), $ENV{REMOTE_ADDR});
-            if (substr($should_bits, 0, $prefix) eq
-                substr($actual_bits, 0, $prefix)) {
-                # Prefix MATCH!
-                exit 0;
-            }
-        }
-        else {
-            warn "restrictip: IPv4 CIDR [$cidr] Prefix Stank!\n";
-        }
-    }
-    elsif ($cidr =~ m{^([\da-f\:]+)(?:|/(\d+))$}) {
-        # IPv6 check
-        my $base = $1;
-        my $prefix = $2 || 128;
-        if ($prefix >= 8 and
-            $prefix <= 128 and
-            $ENV{REMOTE_ADDR} =~ /^([\da-f\:]+)$/) {
-            require Socket6;
-            my $should_bits = unpack "B128", Socket6::inet_pton(Socket6::AF_INET6(), $base);
-            my $actual_bits = unpack "B128", Socket6::inet_pton(Socket6::AF_INET6(), $ENV{REMOTE_ADDR});
-            if (substr($should_bits, 0, $prefix) eq
-                substr($actual_bits, 0, $prefix)) {
-                # Prefix MATCH!
-                exit 0;
-            }
-        }
-        else {
-            warn "restrictip: IPv6 CIDR [$cidr] Prefix Stank!\n";
-        }
-    }
-    else {
-        die "restrictip: CIDR [$cidr] Too Stank!\n";
-    }
+    my ($should_bits, $fam, $base, $prefix) = addr_bits $cidr;
+    next if $fam != $client_fam;
+    # Kick out for the first prefix match
+    exit 0 if substr($should_bits, 0, $prefix) eq substr($client_bits, 0, $prefix);
+    warn localtime().": [$who] git-server: DEBUG: REMOTE_ADDR[$ENV{REMOTE_ADDR}] not part of CIDR[$cidr]\n" if $ENV{DEBUG};
 }
 
-die localtime().": [$who] git-server: Your IP has been blocked.\n";
+warn localtime().": [$who] git-server: Your IP has been blocked.\n";
+exit 3; # Bad Source IP

@@ -19,7 +19,7 @@ use SIRTX::VM::Assembler;
 
 use parent 'Data::Identifier::Interface::Userdata';
 
-our $VERSION = v0.12;
+our $VERSION = v0.13;
 
 my %_die_raen = (code => 0, P => 7, codeX => 0, S => 2, T => 4+1);
 
@@ -52,10 +52,24 @@ our %_logicals_to_sni = (
     oid         => 120,
     wd          => 123,
     logical     => 129,
+    rampool     => 135,
+    memorypool  => 136,
+    storagepool => 137,
+    sepport     => 150,
     false       => 189,
     true        => 190,
+    SIRTX_ACCESS_PATH   => 225,
+    SIRTX_ACCESS_RDONLY => 226,
+    SIRTX_ACCESS_WRONLY => 227,
+    SIRTX_ACCESS_RDWR   => 228,
+    SIRTX_ACCESS_ONLINE => 229,
+    bb          => 294,
+    urandom     => 297,
     ac          => 298,
     accumulator => 298,
+    exit_status => 303,
+    dataout     => 315,
+    sideout     => 317,
 );
 my %_sni_to_logicals = reverse %_logicals_to_sni;
 
@@ -77,6 +91,7 @@ my %_logicals_to_sid = (
     magenta     => 123,
     yellow      => 124,
     orange      => 125,
+    hrair       => 159,
     gtin        => 160,
     left        => 192,
     right       => 193,
@@ -118,6 +133,10 @@ my %_simple_opcodes = (
     magic           => [\@_simple_0 => {first => 0, codeX => 0, S => 0, T => 4+3, extra => "VM\r\n\xc0\n"}],
     autodie         => [\@_simple_0 => {code => 0, P => 7, codeX => 0, S => 2, T => 4+0}],
     data_start_marker   => [\@_simple_0 => {code => 0, P => 6, codeX => 0, S => 0, T => 0}],
+    break           => [\@_simple_0 => {code => 0, P => 6, codeX => 0, S => 1, T => 0+0},
+                        [int => 'extra[]'] => {code => 0, P => 6, codeX => 0, S => 1, T => 0+1},
+                        [int => 'extra[]', int => 'extra[]'] => {code => 0, P => 6, codeX => 0, S => 1, T => 0+2},
+                        [int => 'extra[]', int => 'extra[]', int => 'extra[]'] => {code => 0, P => 6, codeX => 0, S => 1, T => 0+3}],
 
     filesize        => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 0, T => 0+1}],
     section_pointer => [[int_half => 'extra[]'] => {code => 0, P => 1, codeX => 0, S => 1, T => 0+1}],
@@ -239,6 +258,9 @@ sub from_template {
     my ($cmd, @args) = @{$parts};
 
     croak 'Stray options passed' if scalar keys %opts;
+
+    # try to reheat all registers used in this directive:
+    $asm->_reheat_mappings(grep {eval {$asm->_get_value_type($_) eq 'reg'}} @args);
 
     if (defined(my $entry = $_synthetic{$cmd})) {
         outer:
@@ -620,6 +642,7 @@ sub required_size {
     $self->{first}  //= ($self->{code}  << 3) | $self->{P};
     $self->{ST}     //= ($self->{S}     << 3) | $self->{T} unless defined $self->{second};
     $self->{second} //= ($self->{codeX} << 6) | $self->{ST};
+    $self->{code}   //= ($self->{first} & 0xF8 >> 3);
 
     $required = 2;
     if (ref $self->{extra}) {
@@ -940,7 +963,7 @@ SIRTX::VM::Opcode - module for single SIRTX VM opcodes
 
 =head1 VERSION
 
-version v0.12
+version v0.13
 
 =head1 SYNOPSIS
 

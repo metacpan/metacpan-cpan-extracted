@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Pepper::Simple;
-$Crypt::Passphrase::Pepper::Simple::VERSION = '0.021';
+$Crypt::Passphrase::Pepper::Simple::VERSION = '0.022';
 use strict;
 use warnings;
 
@@ -54,7 +54,7 @@ Crypt::Passphrase::Pepper::Simple - A pepper-wrapper for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.021
+version 0.022
 
 =head1 SYNOPSIS
 
@@ -74,6 +74,10 @@ version 0.021
 This module wraps another encoder to pepper the input to the hash. By using identifiers for the peppers, it allows for easy rotation of peppers. Much like password their function relies entirely on their secrecy, and they should be treated similarly.
 
 It will be able to validate both peppered and unpeppered hashes.
+
+=head2 Discouraged.
+
+This module is generally discouraged in favor of better peppering implementations such as L<Crypt::Passphrase::Argon2::AES> and L<Crypt::Passphrase::Bcrypt::AES>. Post-encryption has two advantaged over pre-hashing. Firstly is has actualy cryptographic proof of security, and secondly it allowes for repeppering without needing to know the password.
 
 =head1 CONFIGURATION
 
@@ -101,7 +105,7 @@ This is the algorithm that's used for peppering. Supported values are C<'sha1-hm
 
 =head2 Supported types
 
-The supported peppered types are a the inner encoders types cross joined with the algorithms with C<"-pepper-"> (e.g. C<"argon2id-pepper-sha512-hmac">), as well as the underlaying types themselves (e.g. C<"argon2id">.
+The supported peppered types are a the inner encoders types cross joined with the algorithms with C<"-pepper-"> (e.g. C<"argon2id-pepper-sha512-hmac">), as well as the underlaying types themselves (e.g. C<"argon2id">).
 
 =head1 AUTHOR
 

@@ -1,0 +1,56 @@
+======================================================================
+ DB::Handy SQL Cheat Sheet
+======================================================================
+
+[ Data Types (Өгөгдлийн төрөл) ]
+  INT          : Бүхэл тоо (Integer)
+  FLOAT        : Бутархай тоо (Floating point)
+  VARCHAR(n)   : Хувьсах урттай тэмдэгт мөр (хамгийн ихдээ n байт)
+  CHAR(n)      : Тогтмол урттай тэмдэгт мөр (үргэлж n байт)
+
+[ 1. CREATE / DROP (Хүснэгт үүсгэх болон устгах) ]
+  CREATE TABLE student (id INT PRIMARY KEY, name VARCHAR(20), score INT);
+  DROP TABLE student;
+
+[ 2. INSERT (Өгөгдөл нэмэх) ]
+  -- Баганыг зааж өгөгдөл нэмэх (Зөвлөж байна)
+  INSERT INTO student (id, name, score) VALUES (1, 'Alice', 85);
+  -- Баганыг заахгүйгээр өгөгдөл нэмэх
+  INSERT INTO student VALUES (2, 'Bob', 70);
+
+[ 3. SELECT (Өгөгдөл хайх) ]
+  -- Бүх өгөгдлийг авах
+  SELECT * FROM student;
+  -- Нөхцөл заах (WHERE)
+  SELECT name, score FROM student WHERE score >= 80;
+  -- Эрэмбэлэх (ORDER BY)
+  SELECT * FROM student ORDER BY score DESC;
+  -- Мөрийн тоог хязгаарлах (LIMIT)
+  SELECT * FROM student ORDER BY score DESC LIMIT 3;
+
+[ 4. UPDATE (Өгөгдөл шинэчлэх) ]
+  UPDATE student SET score = 90 WHERE id = 1;
+
+[ 5. DELETE (Өгөгдөл устгах) ]
+  DELETE FROM student WHERE id = 2;
+
+[ Operators (Операторууд) ]
+  Харьцуулалт : =, <>, !=, >, <, >=, <=
+  Хамрах хүрээ: BETWEEN 70 AND 90
+  Жагсаалт    : IN (1, 2, 3) эсвэл NOT IN (1, 2, 3)
+  Текст       : LIKE 'A%' (A-гаар эхэлсэн), LIKE '%A' (A-гаар төгссөн)
+  NULL шалгах : IS NULL, IS NOT NULL
+  Логик       : AND, OR, NOT
+
+[ Aggregate Functions (Нэгтгэх функцууд) ]
+  COUNT(*) : Мөрийн тоог тоолох
+  SUM(col) : Нийлбэрийг олох
+  AVG(col) : Дунджийг олох
+  MAX(col) : Хамгийн их утгыг олох
+  MIN(col) : Хамгийн бага утгыг олох
+  (Жишээ) SELECT COUNT(*), AVG(score) FROM student;
+
+[ Indexes (Индекс ашиглан хурдасгах) ]
+  CREATE INDEX idx_score ON student (score);
+  CREATE UNIQUE INDEX uq_name ON student (name);
+======================================================================

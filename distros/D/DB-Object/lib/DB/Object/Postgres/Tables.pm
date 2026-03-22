@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Tables.pm
-## Version v1.0.1
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.1.0
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2024/09/04
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## 
@@ -22,9 +22,10 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( DB::Object::Tables DB::Object::Postgres );
-    use vars qw( $VERSION $DEBUG );
-    our $DEBUG = 0;
-    our $VERSION = 'v1.0.1';
+    use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
+    our $DEBUG           = 0;
+    our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
+    our $VERSION = 'v1.1.0';
 };
 
 use strict;
@@ -36,6 +37,7 @@ sub init
     my $self = shift( @_ );
     $self->{_init_params_order} = [qw( dbo query_object )];
     $self->{_init_strict_use_sub} = 1;
+    $self->{_exception_class}     = $EXCEPTION_CLASS;
     $self->DB::Object::Tables::init( @_ ) || return( $self->pass_error );
     return( $self );
 }
@@ -57,12 +59,12 @@ sub create
     # Check possible options
     my $allowed = 
     {
-    'inherits'     => qr/^\w+$/i,
-    'with oids'    => qr//,
-    'without oids' => qr//,
-    'on commit'    => qr/^(PRESERVE ROWS|DELETE ROWS|DROP)$/,
-    'comment'      => qr//,
-    'tablespace'   => qr/^\w+$/,
+        'inherits'     => qr/^\w+$/i,
+        'with oids'    => qr//,
+        'without oids' => qr//,
+        'on commit'    => qr/^(PRESERVE ROWS|DELETE ROWS|DROP)$/,
+        'comment'      => qr//,
+        'tablespace'   => qr/^\w+$/,
     };
     my @options = ();
     my @errors  = ();
@@ -356,6 +358,8 @@ sub rename
 
 sub repair { return( shift->error( "repair() is not implemented PostgreSQL." ) ); }
 
+sub reset { return( shift->DB::Object::Tables::reset( @_ ) ); }
+
 sub stat { return( shift->error( "stat() is not implemented PostgreSQL." ) ); }
 
 sub structure
@@ -627,7 +631,8 @@ EOT
         push( @define, "NOT NULL" ) if( !$def->{is_nullable} );
         push( @primary, $def->{name} ) if( $ref->{key} );
         $struct->{ $def->{name} } = CORE::join( ' ', @define );
-        my $field = DB::Object::Fields::Field->new( %$def, debug => $self->debug ) ||
+        $def->{debug} = $self->debug;
+        my $field = DB::Object::Fields::Field->new( %$def ) ||
             return( $self->pass_error( DB::Object::Fields::Field->error ) );
         $fields->{ $def->{name} } = $field;
     }
@@ -691,7 +696,7 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 VERSION
 
-    v1.0.1
+    v1.1.0
 
 =head1 DESCRIPTION
 

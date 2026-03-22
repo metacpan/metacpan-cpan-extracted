@@ -130,10 +130,11 @@ use strict;
 use warnings;
 use FindBin qw($Bin);
 
-our $VERSION = "0.037";
+our $VERSION = "0.038";
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
-$ENV{GIT_CONNECTED_EPOCH} ||= time;
+$ENV{GIT_CONNECTED_EPOCH} ||= eval { require Time::HiRes; Time::HiRes::time() } || time;
+$ENV{GIT_SERVER_VERSION} = $VERSION;
 
 my $git_op_hook = {
     "git-upload-pack" => "read", # i.e., clone, pull, fetch, ls-remote
@@ -218,7 +219,7 @@ if ($xmods) {
     $ENV{GIT_OPTION_COUNT} = scalar @options;
     for (my $i = 0; $i < @options; $i++) {
         $ENV{"GIT_OPTION_$i"} = $options[$i];
-        warn localtime().": [$who] git-server: Transported GIT_OPTION_$i=[$options[$i]]\n";
+        warn localtime().": [$who] git-server: Transported GIT_OPTION_$i=[$options[$i]]\n" if $ENV{DEBUG};
     }
 }
 
@@ -256,7 +257,7 @@ die localtime().": [$who] git-server: Unable to create [$ENV{IPC}] folder! $!\n"
 my $pre_failure = 0;
 if (-x "$dir/hooks/pre-$hook") {
     if ($pre_failure = spawn($dir, "hooks/pre-$hook")) {
-        warn "pre-$hook: failed! $pre_failure\n";
+        warn localtime().": [$who] git-server: pre-$hook failure: $pre_failure\n";
     }
     $ENV{GIT_PRE_EXIT_STATUS} = $pre_failure;
 }
@@ -276,7 +277,7 @@ if (-x "$dir/hooks/post-$hook") {
         $ENV{SSH_ORIGINAL_COMMAND} = $cmd;
     }
     if ($post_failure = spawn($dir, "hooks/post-$hook")) {
-        warn "post-$hook: failed! $post_failure\n";
+        warn localtime().": [$who] git-server: post-$hook failure: $pre_failure\n";
     }
 }
 

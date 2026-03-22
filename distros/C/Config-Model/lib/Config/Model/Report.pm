@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Report 2.159;
+package Config::Model::Report 2.160;
 
 use Carp;
 use strict;
@@ -89,7 +89,7 @@ Config::Model::Report - Reports data from config tree
 
 =head1 VERSION
 
-version 2.159
+version 2.160
 
 =head1 SYNOPSIS
 

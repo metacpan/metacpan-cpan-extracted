@@ -21,7 +21,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "NetAddr-MAC",
-  "dist_version" => "0.99",
+  "dist_version" => "1.00",
   "license" => "mit",
   "module_name" => "NetAddr::MAC",
   "recursive_test_files" => 1,

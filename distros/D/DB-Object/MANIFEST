@@ -8,6 +8,7 @@ lib/DB/Object/Cache/Tables.pm
 lib/DB/Object/Constraint/Check.pm
 lib/DB/Object/Constraint/Foreign.pm
 lib/DB/Object/Constraint/Index.pm
+lib/DB/Object/Exception.pm
 lib/DB/Object/Expression.pod
 lib/DB/Object/Fields.pm
 lib/DB/Object/Fields/Field.pm
