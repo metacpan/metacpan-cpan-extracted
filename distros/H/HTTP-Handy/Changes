@@ -1,24 +1,91 @@
 Revision history for HTTP-Handy
 
+1.01  2026-03-22 JST (Japan Standard Time)
+
+    New features:
+    - _iso_time(): new internal function returns the current local time as
+      YYYY-MM-DDTHH:MM:SS using only localtime and sprintf.  Replaces the
+      earlier use of POSIX::strftime, removing the POSIX dependency entirely.
+    - _init_directories(): called once by run() at server startup.  Creates
+      an Apache-like directory layout (logs/, logs/access/, logs/error/,
+      run/, htdocs/, conf/) under the current working directory if the
+      directories do not already exist.
+    - Access log file rotation: in addition to STDERR, each LTSV access log
+      line is now written to logs/access/YYYYMMDDHHm0.log.ltsv (10-minute
+      rotation).  The filehandle is kept open between requests and reopened
+      automatically when the interval changes.
+    - Error log file: _log_message() now appends each startup/error message
+      to logs/error/error.log in addition to STDERR.
+
+    Robustness fixes:
+    - serve_static(): replaced bareword filehandle (local *FH) with a
+      lexical filehandle via eval q{open($fh,'<',$file)} on Perl 5.6+ and
+      \do{local *_} on 5.005_03.
+    - Response header processing: shift(@h) now falls back to '' (was undef).
+    - Body joining: join('', @$body) is now guarded by "if @$body".
+
+    Coding style aligned with DB-Handy and LTSV-LINQ:
+    - Module header: added Compatible/Platform comment block.
+    - use strict/warnings order unified: use strict -> BEGIN{warnings stub}
+      -> use warnings; local $^W = 1; -> BEGIN { pop @INC } (DB-Handy style).
+    - Section separators changed from # ---...--- (66 chars) to
+      ###...### (79 chars) matching DB-Handy.
+    - pmake.bat: install target now greps lib/**/*.pm only (DB-Handy style).
+
+    Documentation:
+    - REQUIREMENTS: removed POSIX from the module list (no longer used).
+    - SERVER STARTUP: added Directory Initialisation and Error Log sections.
+    - POD: added DIAGNOSTICS, BUGS AND LIMITATIONS, DESIGN PHILOSOPHY,
+      and TABLE OF CONTENTS sections.
+    - LICENSE -> COPYRIGHT AND LICENSE (aligned with DB-Handy).
+    - AUTHOR: corrected to "INABA Hitoshi E<lt>ina@cpan.orgE<gt>".
+    - README: rewritten to DB-Handy structure with COMPATIBILITY (Perl
+      5.005_03 philosophy), TARGET USE CASES, and COPYRIGHT AND LICENSE.
+
+    Test suite improvements (knowledge from DB-Handy and LTSV-LINQ):
+
+    Naming and style (from DB-Handy and LTSV-LINQ):
+    - Renamed test files to 4-digit zero-padded format (0001-, 0002-, ...).
+    - Rewrote functional test harnesses (t/0002-0005) to DB-Handy style:
+      ###### header block, $PASS/$FAIL/$T variables, 1-line ok/is/like,
+      print "1..N\n" plan, exit($FAIL ? 1 : 0) at end.
+    - Added use strict, warnings compatibility stub, CVE-2016-1238
+      mitigation, and use FindBin / use lib to all test files.
+    - Removed shebang line (#!/usr/bin/perl) from all test files.
+
+    New test files:
+    - t/0008-perl5compat.t: Perl 5.005_03 compatibility checks (P1-P12).
+    - t/0009-cpan_precheck.t: comprehensive pre-publication check suite
+      (categories A-K, 198 tests).
+    - t/0010-log.t: 28 tests for _iso_time, _init_directories,
+      _open_access_log, and _log_message.
+      END block now closes ACCESS_LOG_FH and restores STDERR before
+      File::Path::rmtree to avoid "Permission denied" on Windows
+      (open filehandles prevent deletion on Windows NTFS).
+
+    Samples and documentation:
+    - eg/01_hello_world.pl: minimal PSGI app (routing, query string, env dump).
+    - eg/02_static_files.pl: serve_static, cache_max_age, mime_type.
+    - eg/03_form_post.pl: POST body, parse_query, multi-value fields,
+      Post-Redirect-Get pattern.
+    - eg/04_ltsv_viewer.pl: is_htmx, LTSV log parsing, multiple status codes.
+    - doc/psgi_cheatsheet.*.txt: PSGI cheat sheets in 21 languages covering
+      run() options, $env keys, response format, utility methods, routing
+      patterns, and links to the official PSGI specification.
+
+    Additional documentation fixes:
+    - POD DEMO section: corrected run command from
+      "perl HTTP::Handy.pm" to "perl lib/HTTP/Handy.pm" (distribution
+      directory form); added installed form using -MHTTP::Handy.
+    - README: added DEMO section with corrected run command.
+    - doc/psgi_cheatsheet.*.txt: corrected run command in all 21
+      language cheat sheets.
+    - POD: added INCLUDED DOCUMENTATION section listing eg/ and doc/ files.
+    - POD: added DIAGNOSTICS entry for 'max_post_size' must be a number.
+    - POD: TABLE OF CONTENTS now includes SEE ALSO.
+    - README: added INCLUDED DOCUMENTATION section.
+    - $VERSION declared via use vars (aligned with DB-Handy style).
+
 1.00  2026-02-23 JST (Japan Standard Time)
 
     - First release on CPAN.
-    - HTTP/1.0 server with GET and POST support.
-    - PSGI subset compatible interface ($env / response arrayref).
-    - HTTP::Handy::Input: in-memory psgi.input object compatible with
-      Perl 5.5.3 (no open-on-scalar-ref dependency).
-    - serve_static: static file serving with MIME type detection,
-      index.html fallback, path traversal protection, and
-      cache_max_age option for Cache-Control header.
-    - url_decode, parse_query: URL utility functions.
-    - is_htmx: detect htmx requests via HX-Request header.
-    - response_html, response_text, response_json, response_redirect:
-      convenience response builders.
-    - Access log to STDERR in LTSV format (time, method, path, status,
-      size, ua, referer).
-    - max_post_size option to run() for configurable POST body limit
-      (default 10 MB).
-    - App exceptions caught via eval and returned as 500 responses.
-    - Built-in demo application (run directly: perl Handy.pm).
-    - Zero dependencies beyond Perl core modules.
-    - Runs on Perl 5.5.3 and all later versions on all operating systems.

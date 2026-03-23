@@ -21,6 +21,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Errno: '0'
   Exporter: '0'
   FileHandle: '0'
   Socket: '0'
@@ -29,5 +30,5 @@ resources:
   bugtracker: https://github.com/cpan-authors/Net-Ident/issues
   license: https://dev.perl.org/licenses/
   repository: https://github.com/cpan-authors/Net-Ident.git
-version: '1.27'
+version: '1.28'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

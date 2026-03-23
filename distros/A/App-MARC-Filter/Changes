@@ -1,3 +1,14 @@
+0.08 2026-03-22T14:01:22+01:00
+ - Add support for usmarc file in input.
+ - Add test for ascii output.
+ - Simplify code to better cover testing.
+
+0.07 2026-02-21T17:53:50+01:00
+ - Add -i option for invert searching.
+ - Add check of input material_type string.
+ - Fix test message.
+ - Update copyright years.
+
 0.06 2025-05-31T19:20:56+02:00
  - Fix matching for multiple MARC fields.
  - Regen README file.

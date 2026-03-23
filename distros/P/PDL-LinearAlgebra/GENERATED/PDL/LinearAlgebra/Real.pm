@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.433';
+   our $VERSION = '0.434';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Real $VERSION;
@@ -22,7 +22,8 @@ use DynaLoader;
 
 
 
-#line 83 "lib/PDL/LinearAlgebra/Real.pd"
+
+#line 79 "lib/PDL/LinearAlgebra/Real.pd"
 
 use strict;
 
@@ -70,7 +71,7 @@ This module provides an interface to parts of the real lapack library.
 These routines accept either float or double ndarrays.
 
 =cut
-#line 74 "lib/PDL/LinearAlgebra/Real.pm"
+#line 75 "lib/PDL/LinearAlgebra/Real.pm"
 
 
 =head1 FUNCTIONS
@@ -86,7 +87,15 @@ These routines accept either float or double ndarrays.
 
 =for sig
 
-  Signature: ([io]DL(n); [io]D(n); [io]DU(n); [io]B(n,nrhs); int [o]info())
+ Signature: ([io]DL(n); [io]D(n); [io]DU(n); [io]B(n,nrhs); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = gtsv($DL, $D, $DU, $B);
+ gtsv($DL, $D, $DU, $B, $info);  # all arguments given
+ $info = $DL->gtsv($D, $DU, $B); # method call
+ $DL->gtsv($D, $DU, $B, $info);
 
 =for ref
 
@@ -140,9 +149,13 @@ its second element.
  gtsv($dl, $d, $du, $b, ($info=null));
  print "X is:\n$b" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gtsv ignores the bad-value flag of the input ndarrays.
+C<gtsv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -161,7 +174,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info())
+ Signature: ([io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($s, $U, $VT, $info) = gesvd($A, $jobu, $jobvt);
+ gesvd($A, $jobu, $jobvt, $s, $U, $VT, $info);    # all arguments given
+ ($s, $U, $VT, $info) = $A->gesvd($jobu, $jobvt); # method call
+ $A->gesvd($jobu, $jobvt, $s, $U, $VT, $info);
 
 =for ref
 
@@ -243,9 +264,13 @@ Note that the routine returns VT = V', not V.
  $info = pdl(long, 0);
  gesvd($a, 2, 2, $s , $u, $vt, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gesvd ignores the bad-value flag of the input ndarrays.
+C<gesvd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -264,7 +289,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+ Signature: ([io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n)))); [o]U(p,p); [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+ Types: (float double)
+
+=for usage
+
+ ($s, $U, $VT, $info) = gesdd($A, $jobz);
+ gesdd($A, $jobz, $s, $U, $VT, $info);    # all arguments given
+ ($s, $U, $VT, $info) = $A->gesdd($jobz); # method call
+ $A->gesdd($jobz, $s, $U, $VT, $info);
 
 =for ref
 
@@ -331,9 +364,13 @@ It is much faster than the simple driver for large matrices, but uses more works
  $info = long (0);
  gesdd($a, 1, $s , $u, $vt, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gesdd ignores the bad-value flag of the input ndarrays.
+C<gesdd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -352,7 +389,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int jobu(); int jobv(); int jobq(); [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(q,q); [o]V(r,r); [o]Q(s,s); int [o]iwork(n); int [o]info())
+ Signature: ([io]A(m,n); int jobu(); int jobv(); int jobq(); [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n); [o]U(q,q); [o]V(r,r); [o]Q(s,s); int [o]iwork(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info) = ggsvd($A, $jobu, $jobv, $jobq, $B);
+ ggsvd($A, $jobu, $jobv, $jobq, $B, $k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info);    # all arguments given
+ ($k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info) = $A->ggsvd($jobu, $jobv, $jobq, $B); # method call
+ $A->ggsvd($jobu, $jobv, $jobq, $B, $k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info);
 
 =for ref
 
@@ -520,9 +565,13 @@ form by taking the nonsingular matrix X as
  $info = null;
  ggsvd($A,1,1,1,$B,$k,$l,$alpha, $beta,$U, $V, $Q, $iwork,$info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ggsvd ignores the bad-value flag of the input ndarrays.
+C<ggsvd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -541,7 +590,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info())
+ Signature: ([io]A(n,n); int jobvl(); int jobvr(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($wr, $wi, $vl, $vr, $info) = geev($A, $jobvl, $jobvr);
+ geev($A, $jobvl, $jobvr, $wr, $wi, $vl, $vr, $info);    # all arguments given
+ ($wr, $wi, $vl, $vr, $info) = $A->geev($jobvl, $jobvr); # method call
+ $A->geev($jobvl, $jobvr, $wr, $wi, $vl, $vr, $info);
 
 =for ref
 
@@ -614,9 +671,13 @@ equal to 1 and largest component real.
  $info = null;
  geev($a, 1, 1, $wr, $wi, $vl, $vr, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geev ignores the bad-value flag of the input ndarrays.
+C<geev> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -635,7 +696,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); int [t]iwork(iworkn))
+ Signature: ([io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o]wr(n); [o]wi(n); [o]vl(m,m); [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); int [t]iwork(iworkn))
+ Types: (float double)
+
+=for usage
+
+ ($wr, $wi, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info) = geevx($A, $jobvl, $jobvr, $balance, $sense);
+ geevx($A, $jobvl, $jobvr, $balance, $sense, $wr, $wi, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info);    # all arguments given
+ ($wr, $wi, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info) = $A->geevx($jobvl, $jobvr, $balance, $sense); # method call
+ $A->geevx($jobvl, $jobvr, $balance, $sense, $wr, $wi, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info);
 
 =for ref
 
@@ -787,9 +856,13 @@ Users' Guide.
  $info = null;
  geevx($a, 1,1,3,3,$wr, $wi, $vl, $vr, $ilo, $ihi, $scale, $abnrm,$rconde, $rcondv, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geevx ignores the bad-value flag of the input ndarrays.
+C<geevx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -808,7 +881,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int jobvl();int jobvr();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info())
+ Signature: ([io]A(n,n); int jobvl();int jobvr();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($alphar, $alphai, $beta, $VL, $VR, $info) = ggev($A, $jobvl, $jobvr, $B);
+ ggev($A, $jobvl, $jobvr, $B, $alphar, $alphai, $beta, $VL, $VR, $info);    # all arguments given
+ ($alphar, $alphai, $beta, $VL, $VR, $info) = $A->ggev($jobvl, $jobvr, $B); # method call
+ $A->ggev($jobvl, $jobvr, $B, $alphar, $alphai, $beta, $VL, $VR, $info);
 
 =for ref
 
@@ -904,9 +985,13 @@ of (A,B) satisfies
  $vr = zeroes(5,5);
  ggev($a, 1, 1, $b, $alphar, $alphai, $beta, $vl, $vr, ($info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ggev ignores the bad-value flag of the input ndarrays.
+C<ggev> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -925,7 +1010,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn))
+ Signature: ([io]A(n,n);int balanc();int jobvl();int jobvr();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VL(m,m);[o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn))
+ Types: (float double)
+
+=for usage
+
+ ($alphar, $alphai, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info) = ggevx($A, $balanc, $jobvl, $jobvr, $sense, $B);
+ ggevx($A, $balanc, $jobvl, $jobvr, $sense, $B, $alphar, $alphai, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info);    # all arguments given
+ ($alphar, $alphai, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info) = $A->ggevx($balanc, $jobvl, $jobvr, $sense, $B); # method call
+ $A->ggevx($balanc, $jobvl, $jobvr, $sense, $B, $alphar, $alphai, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info);
 
 =for ref
 
@@ -1129,9 +1222,13 @@ and rcondv, see section 4.11 of LAPACK User's Guide.
  ggevx($a, 3, 1, 1, 3, $b, $alphar, $alphai, $beta, $vl, $vr,
  $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde,$rcondv,($info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ggevx ignores the bad-value flag of the input ndarrays.
+C<ggevx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1150,7 +1247,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Signature: ([io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($wr, $wi, $vs, $sdim, $info) = gees($A, $jobvs, $sort, $select_func);
+ gees($A, $jobvs, $sort, $wr, $wi, $vs, $sdim, $info, $select_func);    # all arguments given
+ ($wr, $wi, $vs, $sdim, $info) = $A->gees($jobvs, $sort, $select_func); # method call
+ $A->gees($jobvs, $sort, $wr, $wi, $vs, $sdim, $info, $select_func);
 
 =for ref
 
@@ -1249,9 +1354,13 @@ The eigenvalues of such a block are a +- sqrt(bc).
  $info = null;
  gees($A, 1,1, $wr, $wi, $vs, $sdim, $info,\&select_function);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gees ignores the bad-value flag of the input ndarrays.
+C<gees> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1270,7 +1379,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Signature: ([io]A(n,n);  int jobvs(); int sort(); int sense(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($wr, $wi, $vs, $sdim, $rconde, $rcondv, $info) = geesx($A, $jobvs, $sort, $sense, $select_func);
+ geesx($A, $jobvs, $sort, $sense, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ ($wr, $wi, $vs, $sdim, $rconde, $rcondv, $info) = $A->geesx($jobvs, $sort, $sense, $select_func); # method call
+ $A->geesx($jobvs, $sort, $sense, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info, $select_func);
 
 =for ref
 
@@ -1388,9 +1505,13 @@ the form
  $info = null;
  geesx($A, 1,1, 3, $wr, $wi, $vs, $sdim, $rconde, $rcondv, $info, \&select_function);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geesx ignores the bad-value flag of the input ndarrays.
+C<geesx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1409,7 +1530,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info) = gges($A, $jobvsl, $jobvsr, $sort, $B, $select_func);
+ gges($A, $jobvsl, $jobvsr, $sort, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info, $select_func);    # all arguments given
+ ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info) = $A->gges($jobvsl, $jobvsr, $sort, $B, $select_func); # method call
+ $A->gges($jobvsl, $jobvsr, $sort, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $info, $select_func);
 
 =for ref
 
@@ -1545,9 +1674,13 @@ complex conjugate pair of generalized eigenvalues.
  $vsr = zeroes(5,5);
  gges($a, 1, 1, 1, $b, $alphar, $alphai, $beta, $vsl, $vsr, $sdim,($info=null), \&my_select);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gges ignores the bad-value flag of the input ndarrays.
+C<gges> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1566,7 +1699,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn); SV* select_func)
+ Signature: ([io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); int [t]bwork(bworkn); int [t]iwork(iworkn); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = ggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $select_func);
+ ggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ ($alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = $A->ggesx($jobvsl, $jobvsr, $sort, $sense, $B, $select_func); # method call
+ $A->ggesx($jobvsl, $jobvsr, $sort, $sense, $B, $alphar, $alphai, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);
 
 =for ref
 
@@ -1739,9 +1880,13 @@ See LAPACK User's Guide, section 4.11 for more information.
  $rcondv = zeroes(2);
  ggesx($a, 1, 1, 1, 3,$b, $alphar, $alphai, $beta, $vsl, $vsr, $sdim, $rconde, $rcondv, ($info=null), \&my_select);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ggesx ignores the bad-value flag of the input ndarrays.
+C<ggesx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1760,7 +1905,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
+ Signature: ([io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = syev($A, $jobz, $uplo);
+ syev($A, $jobz, $uplo, $w, $info);    # all arguments given
+ ($w, $info) = $A->syev($jobz, $uplo); # method call
+ $A->syev($jobz, $uplo, $w, $info);
 
 =for ref
 
@@ -1801,9 +1954,13 @@ real symmetric matrix A.
  $a = random (5,5);
  syev($a, 1,1, (my $w = zeroes(5)), (my $info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-syev ignores the bad-value flag of the input ndarrays.
+C<syev> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1822,7 +1979,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
+ Signature: ([io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = syevd($A, $jobz, $uplo);
+ syevd($A, $jobz, $uplo, $w, $info);    # all arguments given
+ ($w, $info) = $A->syevd($jobz, $uplo); # method call
+ $A->syevd($jobz, $uplo, $w, $info);
 
 =for ref
 
@@ -1874,9 +2039,13 @@ workspace than syevx.
  $a = random (5,5);
  syevd($a, 1,1, (my $w = zeroes(5)), (my $info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-syevd ignores the bad-value flag of the input ndarrays.
+C<syevd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1895,7 +2064,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+ Signature: ([io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n); [o]z(p,p);int [o]ifail(n); int [o]info(); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($m, $w, $z, $ifail, $info) = syevx($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol);
+ syevx($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $ifail, $info);    # all arguments given
+ ($m, $w, $z, $ifail, $info) = $A->syevx($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol); # method call
+ $A->syevx($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $ifail, $info);
 
 =for ref
 
@@ -2003,9 +2180,13 @@ for the desired eigenvalues.
  $z = zeroes(5,5);
  syevx($a, 1,0,1,0,0,0,0,$abstol, $m, $w, $z ,$ifail, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-syevx ignores the bad-value flag of the input ndarrays.
+C<syevx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2024,7 +2205,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu();abstol();int [o]m();[o]w(n); [o]z(p,q);int [o]isuppz(r); int [o]info())
+ Signature: ([io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu();abstol();int [o]m();[o]w(n); [o]z(p,q);int [o]isuppz(r); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($m, $w, $z, $isuppz, $info) = syevr($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol);
+ syevr($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $isuppz, $info);    # all arguments given
+ ($m, $w, $z, $isuppz, $info) = $A->syevr($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol); # method call
+ $A->syevr($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $isuppz, $info);
 
 =for ref
 
@@ -2174,9 +2363,13 @@ manner.
  $z = zeroes(5,5);
  syevr($a, 1,0,1,0,0,0,0,$abstol, $m, $w, $z ,$isuppz, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-syevr ignores the bad-value flag of the input ndarrays.
+C<syevr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2195,7 +2388,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info())
+ Signature: ([io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = sygv($A, $itype, $jobz, $uplo, $B);
+ sygv($A, $itype, $jobz, $uplo, $B, $w, $info);    # all arguments given
+ ($w, $info) = $A->sygv($itype, $jobz, $uplo, $B); # method call
+ $A->sygv($itype, $jobz, $uplo, $B, $w, $info);
 
 =for ref
 
@@ -2265,9 +2466,13 @@ positive definite.
  $b = random (5,5);
  sygv($a, 1,1, 0, $b, (my $w = zeroes(5)), (my $info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sygv ignores the bad-value flag of the input ndarrays.
+C<sygv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2286,7 +2491,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info())
+ Signature: ([io]A(n,n);int itype();int jobz(); int uplo();[io]B(n,n);[o]w(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = sygvd($A, $itype, $jobz, $uplo, $B);
+ sygvd($A, $itype, $jobz, $uplo, $B, $w, $info);    # all arguments given
+ ($w, $info) = $A->sygvd($itype, $jobz, $uplo, $B); # method call
+ $A->sygvd($itype, $jobz, $uplo, $B, $w, $info);
 
 =for ref
 
@@ -2363,9 +2576,13 @@ without guard digits, but we know of none.
  $b = random (5,5);
  sygvd($a, 1,1, 0, $b, (my $w = zeroes(5)), (my $info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sygvd ignores the bad-value flag of the input ndarrays.
+C<sygvd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2384,11 +2601,19 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int itype(); int jobz(); int range();
+ Signature: ([io]A(n,n); int itype(); int jobz(); int range();
 	  int uplo(); [io]B(n,n); vl(); vu(); int il(); int iu(); abstol();
 	  int [o]m(); [o]w(n); [o]Z(p,p); int [o]ifail(n); int [o]info();
 	  int [t]iwork(iworkn=CALC(5*$SIZE(n)));
 	)
+ Types: (float double)
+
+=for usage
+
+ ($m, $w, $Z, $ifail, $info) = sygvx($A, $itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol);
+ sygvx($A, $itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol, $m, $w, $Z, $ifail, $info);    # all arguments given
+ ($m, $w, $Z, $ifail, $info) = $A->sygvx($itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol); # method call
+ $A->sygvx($itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol, $m, $w, $Z, $ifail, $info);
 
 =for ref
 
@@ -2521,9 +2746,13 @@ range of values or a range of indices for the desired eigenvalues.
  $ifail = zeroes(5);
  sygvx($a, 1,1, 0,0, $b, 0, 0, 0, 0, $abstol, $m, $w, $z,$ifail,(my $info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sygvx ignores the bad-value flag of the input ndarrays.
+C<sygvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2542,7 +2771,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Signature: ([io]A(n,n);  [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = gesv($A, $B);
+ gesv($A, $B, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->gesv($B); # method call
+ $A->gesv($B, $ipiv, $info);
 
 =for ref
 
@@ -2589,9 +2826,13 @@ system of equations A * X = B.
  gesv($a,$b, (my $ipiv=zeroes(5)),(my $info=null));
  print "The solution matrix X is :". transpose($b)."\n" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gesv ignores the bad-value flag of the input ndarrays.
+C<gesv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2610,7 +2851,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); int [t]iwork(n))
+ Signature: ([io]A(n,n); int trans(); int fact(); [io]B(n,m); [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m);[o]rpvgrw();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); int [t]iwork(n))
+ Types: (float double)
+
+=for usage
+
+ ($r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info) = gesvx($A, $trans, $fact, $B, $af, $ipiv, $equed);
+ gesvx($A, $trans, $fact, $B, $af, $ipiv, $equed, $r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info);    # all arguments given
+ ($r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info) = $A->gesvx($trans, $fact, $B, $af, $ipiv, $equed); # method call
+ $A->gesvx($trans, $fact, $B, $af, $ipiv, $equed, $r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info);
 
 =for ref
 
@@ -2837,9 +3086,13 @@ that it solves the original system before equilibration.
  gesvx($a,0, 2, $b, $af, $ipiv, $equed, $r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info);
  print "The solution matrix X is :". transpose($X)."\n" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gesvx ignores the bad-value flag of the input ndarrays.
+C<gesvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2858,7 +3111,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int uplo(); [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Signature: ([io]A(n,n);  int uplo(); [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = sysv($A, $uplo, $B);
+ sysv($A, $uplo, $B, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->sysv($uplo, $B); # method call
+ $A->sysv($uplo, $B, $ipiv, $info);
 
 =for ref
 
@@ -2927,9 +3188,13 @@ used to solve the system of equations A * X = B.
  sysv($a, 1, $b, (my $ipiv=zeroes(5)),(my $info=null));
  print "The solution matrix X is :". transpose($b)."\n" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sysv ignores the bad-value flag of the input ndarrays.
+C<sysv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2948,7 +3213,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); int fact(); B(n,m); [io]af(n,n); int [io]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n))
+ Signature: (A(n,n); int uplo(); int fact(); B(n,m); [io]af(n,n); int [io]ipiv(n); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n))
+ Types: (float double)
+
+=for usage
+
+ ($X, $rcond, $ferr, $berr, $info) = sysvx($A, $uplo, $fact, $B, $af, $ipiv);
+ sysvx($A, $uplo, $fact, $B, $af, $ipiv, $X, $rcond, $ferr, $berr, $info);    # all arguments given
+ ($X, $rcond, $ferr, $berr, $info) = $A->sysvx($uplo, $fact, $B, $af, $ipiv); # method call
+ $A->sysvx($uplo, $fact, $B, $af, $ipiv, $X, $rcond, $ferr, $berr, $info);
 
 =for ref
 
@@ -3097,9 +3370,13 @@ for it.
  sysvx($a, 0, 0, $b,$af, $ipiv, $X, $rcond, $ferr, $berr,$info);
  print "The solution matrix X is :". transpose($X)."\n";
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sysvx ignores the bad-value flag of the input ndarrays.
+C<sysvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3118,7 +3395,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n);  int uplo(); [io]B(n,m); int [o]info())
+ Signature: ([io]A(n,n);  int uplo(); [io]B(n,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = posv($A, $uplo, $B);
+ posv($A, $uplo, $B, $info);  # all arguments given
+ $info = $A->posv($uplo, $B); # method call
+ $A->posv($uplo, $B, $info);
 
 =for ref
 
@@ -3174,9 +3459,13 @@ equations A * X = B.
  posv($a, 1, $b, (my $info=null));
  print "The solution matrix X is :". transpose($b)."\n" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-posv ignores the bad-value flag of the input ndarrays.
+C<posv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3195,7 +3484,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int fact(); [io]B(n,m); [io]af(n,n); int [io]equed(); [o]s(p); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
+ Signature: ([io]A(n,n); int uplo(); int fact(); [io]B(n,m); [io]af(n,n); int [io]equed(); [o]s(p); [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($s, $X, $rcond, $ferr, $berr, $info) = posvx($A, $uplo, $fact, $B, $af, $equed);
+ posvx($A, $uplo, $fact, $B, $af, $equed, $s, $X, $rcond, $ferr, $berr, $info);    # all arguments given
+ ($s, $X, $rcond, $ferr, $berr, $info) = $A->posvx($uplo, $fact, $B, $af, $equed); # method call
+ $A->posvx($uplo, $fact, $B, $af, $equed, $s, $X, $rcond, $ferr, $berr, $info);
 
 =for ref
 
@@ -3384,9 +3681,13 @@ equilibration.
  posvx($a,0,2,$b,$af, $equed, $s, $X, $rcond, $ferr, $berr,$info);
  print "The solution matrix X is :". transpose($X)."\n" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-posvx ignores the bad-value flag of the input ndarrays.
+C<posvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3405,7 +3706,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int trans(); [io]B(p,q);int [o]info())
+ Signature: ([io]A(m,n); int trans(); [io]B(p,q);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = gels($A, $trans, $B);
+ gels($A, $trans, $B, $info);  # all arguments given
+ $info = $A->gels($trans, $B); # method call
+ $A->gels($trans, $B, $info);
 
 =for ref
 
@@ -3489,9 +3798,13 @@ matrix X.
  $b = random(7,6);
  gels($a, 1, $b, ($info = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gels ignores the bad-value flag of the input ndarrays.
+C<gels> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3510,7 +3823,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info())
+ Signature: ([io]A(m,n); [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($rank, $info) = gelsy($A, $B, $rcond, $jpvt);
+ gelsy($A, $B, $rcond, $jpvt, $rank, $info);    # all arguments given
+ ($rank, $info) = $A->gelsy($B, $rcond, $jpvt); # method call
+ $A->gelsy($B, $rcond, $jpvt, $rank, $info);
 
 =for ref
 
@@ -3590,9 +3911,13 @@ The minimum-norm solution is then
  $rcond = sqrt($eps) - (sqrt($eps) - $eps) / 2;
  gelsy($a, $b, $rcond, $jpvt,($rank=null),($info = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gelsy ignores the bad-value flag of the input ndarrays.
+C<gelsy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3611,7 +3936,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info())
+ Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($s, $rank, $info) = gelss($A, $B, $rcond);
+ gelss($A, $B, $rcond, $s, $rank, $info);    # all arguments given
+ ($s, $rank, $info) = $A->gelss($B, $rcond); # method call
+ $A->gelss($B, $rcond, $s, $rank, $info);
 
 =for ref
 
@@ -3674,9 +4007,13 @@ value.
  $rcond = sqrt($eps) - (sqrt($eps) - $eps) / 2;
  gelss($a, $b, $rcond, $s, ($rank=null),($info = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gelss ignores the bad-value flag of the input ndarrays.
+C<gelss> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3695,7 +4032,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn))
+ Signature: ([io]A(m,n); [io]B(p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn))
+ Types: (float double)
+
+=for usage
+
+ ($s, $rank, $info) = gelsd($A, $B, $rcond);
+ gelsd($A, $B, $rcond, $s, $rank, $info);    # all arguments given
+ ($s, $rank, $info) = $A->gelsd($B, $rcond); # method call
+ $A->gelsd($B, $rcond, $s, $rank, $info);
 
 =for ref
 
@@ -3785,9 +4130,13 @@ without guard digits, but we know of none.
  $rcond = sqrt($eps) - (sqrt($eps) - $eps) / 2;
  gelsd($a, $b, $rcond, $s, ($rank=null),($info = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gelsd ignores the bad-value flag of the input ndarrays.
+C<gelsd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3806,7 +4155,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [io]B(p,n);[io]c(m);[io]d(p);[o]x(n);int [o]info())
+ Signature: ([io]A(m,n); [io]B(p,n);[io]c(m);[io]d(p);[o]x(n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($x, $info) = gglse($A, $B, $c, $d);
+ gglse($A, $B, $c, $d, $x, $info);    # all arguments given
+ ($x, $info) = $A->gglse($B, $c, $d); # method call
+ $A->gglse($B, $c, $d, $x, $info);
 
 =for ref
 
@@ -3858,9 +4215,13 @@ which is obtained using a GRQ factorization of the matrices B and A.
  $x = zeroes(5);
  gglse($a, $b, $c, $d, $x, ($info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gglse ignores the bad-value flag of the input ndarrays.
+C<gglse> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3879,7 +4240,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,m); [io]B(n,p);[io]d(n);[o]x(m);[o]y(p);int [o]info())
+ Signature: ([io]A(n,m); [io]B(n,p);[io]d(n);[o]x(m);[o]y(p);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($x, $y, $info) = ggglm($A, $B, $d);
+ ggglm($A, $B, $d, $x, $y, $info);    # all arguments given
+ ($x, $y, $info) = $A->ggglm($B, $d); # method call
+ $A->ggglm($B, $d, $x, $y, $info);
 
 =for ref
 
@@ -3934,9 +4303,13 @@ problem
  $y = zeroes(4);
  ggglm($a, $b, $d, $x, $y,($info=null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ggglm ignores the bad-value flag of the input ndarrays.
+C<ggglm> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3955,7 +4328,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Signature: ([io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = getrf($A);
+ getrf($A, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->getrf; # method call
+ $A->getrf($ipiv, $info);
 
 =for ref
 
@@ -3996,9 +4377,13 @@ This is the right-looking Level 3 BLAS version of the algorithm.
  $info = null;
  getrf($a, $ipiv, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-getrf ignores the bad-value flag of the input ndarrays.
+C<getrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4017,7 +4402,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Signature: ([io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = getf2($A);
+ getf2($A, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->getf2; # method call
+ $A->getf2($ipiv, $info);
 
 =for ref
 
@@ -4058,9 +4451,13 @@ This is the right-looking Level 2 BLAS version of the algorithm.
  $info = null;
  getf2($a, $ipiv, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-getf2 ignores the bad-value flag of the input ndarrays.
+C<getf2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4079,7 +4476,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Signature: ([io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = sytrf($A, $uplo);
+ sytrf($A, $uplo, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->sytrf($uplo); # method call
+ $A->sytrf($uplo, $ipiv, $info);
 
 =for ref
 
@@ -4172,9 +4577,13 @@ This is the blocked version of the algorithm, calling Level 3 BLAS.
  # Assume $a is symmetric
  sytrf($a, 0, $ipiv, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sytrf ignores the bad-value flag of the input ndarrays.
+C<sytrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4193,7 +4602,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Signature: ([io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = sytf2($A, $uplo);
+ sytf2($A, $uplo, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->sytf2($uplo); # method call
+ $A->sytf2($uplo, $ipiv, $info);
 
 =for ref
 
@@ -4251,9 +4668,13 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
  # Assume $a is symmetric
  sytf2($a, 0, $ipiv, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sytf2 ignores the bad-value flag of the input ndarrays.
+C<sytf2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4272,7 +4693,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int [o]info())
+ Signature: ([io]A(n,n); int uplo(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = potrf($A, $uplo);
+ potrf($A, $uplo, $info);  # all arguments given
+ $info = $A->potrf($uplo); # method call
+ $A->potrf($uplo, $info);
 
 =for ref
 
@@ -4316,9 +4745,13 @@ This is the block version of the algorithm, calling Level 3 BLAS.
  # Assume $a is symmetric positive definite
  potrf($a, 0, ($info = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-potrf ignores the bad-value flag of the input ndarrays.
+C<potrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4337,7 +4770,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int [o]info())
+ Signature: ([io]A(n,n); int uplo(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = potf2($A, $uplo);
+ potf2($A, $uplo, $info);  # all arguments given
+ $info = $A->potf2($uplo); # method call
+ $A->potf2($uplo, $info);
 
 =for ref
 
@@ -4381,9 +4822,13 @@ This is the unblocked version of the algorithm, calling Level 2 BLAS.
  # Assume $a is symmetric positive definite
  potf2($a, 0, ($info = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-potf2 ignores the bad-value flag of the input ndarrays.
+C<potf2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4402,7 +4847,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int ipiv(n); int [o]info())
+ Signature: ([io]A(n,n); int ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = getri($A, $ipiv);
+ getri($A, $ipiv, $info);  # all arguments given
+ $info = $A->getri($ipiv); # method call
+ $A->getri($ipiv, $info);
 
 =for ref
 
@@ -4439,9 +4892,13 @@ This method inverts U and then computes inv(A) by solving the system
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-getri ignores the bad-value flag of the input ndarrays.
+C<getri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4460,7 +4917,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(n))
+ Signature: ([io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(n))
+ Types: (float double)
+
+=for usage
+
+ $info = sytri($A, $uplo, $ipiv);
+ sytri($A, $uplo, $ipiv, $info);  # all arguments given
+ $info = $A->sytri($uplo, $ipiv); # method call
+ $A->sytri($uplo, $ipiv, $info);
 
 =for ref
 
@@ -4505,9 +4970,13 @@ C<sytrf>.
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sytri ignores the bad-value flag of the input ndarrays.
+C<sytri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4526,7 +4995,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int [o]info())
+ Signature: ([io]A(n,n); int uplo(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = potri($A, $uplo);
+ potri($A, $uplo, $info);  # all arguments given
+ $info = $A->potri($uplo); # method call
+ $A->potri($uplo, $info);
 
 =for ref
 
@@ -4561,9 +5038,13 @@ computed by C<potrf>.
  }
  print "Inverse of \$a is :\n $a" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-potri ignores the bad-value flag of the input ndarrays.
+C<potri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4582,7 +5063,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int diag(); int [o]info())
+ Signature: ([io]A(n,n); int uplo(); int diag(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = trtri($A, $uplo, $diag);
+ trtri($A, $uplo, $diag, $info);  # all arguments given
+ $info = $A->trtri($uplo, $diag); # method call
+ $A->trtri($uplo, $diag, $info);
 
 =for ref
 
@@ -4624,9 +5113,13 @@ This is the Level 3 BLAS version of the algorithm.
  trtri($a, 1, ($info=null));
  print "Inverse of \$a is :\n transpose($a)" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-trtri ignores the bad-value flag of the input ndarrays.
+C<trtri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4645,7 +5138,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int uplo(); int diag(); int [o]info())
+ Signature: ([io]A(n,n); int uplo(); int diag(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = trti2($A, $uplo, $diag);
+ trti2($A, $uplo, $diag, $info);  # all arguments given
+ $info = $A->trti2($uplo, $diag); # method call
+ $A->trti2($uplo, $diag, $info);
 
 =for ref
 
@@ -4685,9 +5186,13 @@ This is the Level 2 BLAS version of the algorithm.
  trtri2($a, 1, ($info=null));
  print "Inverse of \$a is :\n transpose($a)" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-trti2 ignores the bad-value flag of the input ndarrays.
+C<trti2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4706,7 +5211,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int trans(); [io]B(n,m); int ipiv(n); int [o]info())
+ Signature: (A(n,n); int trans(); [io]B(n,m); int ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = getrs($A, $trans, $B, $ipiv);
+ getrs($A, $trans, $B, $ipiv, $info);  # all arguments given
+ $info = $A->getrs($trans, $B, $ipiv); # method call
+ $A->getrs($trans, $B, $ipiv, $info);
 
 =for ref
 
@@ -4747,9 +5260,13 @@ by getrf.
  }
  print "X is :\n $b" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-getrs ignores the bad-value flag of the input ndarrays.
+C<getrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4768,7 +5285,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo();[io]B(n,m); int ipiv(n); int [o]info())
+ Signature: (A(n,n); int uplo();[io]B(n,m); int ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = sytrs($A, $uplo, $B, $ipiv);
+ sytrs($A, $uplo, $B, $ipiv, $info);  # all arguments given
+ $info = $A->sytrs($uplo, $B, $ipiv); # method call
+ $A->sytrs($uplo, $B, $ipiv, $info);
 
 =for ref
 
@@ -4809,9 +5334,13 @@ A = L*D*L' computed by C<sytrf>.
  }
  print("X is :\n".transpose($b))unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sytrs ignores the bad-value flag of the input ndarrays.
+C<sytrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4830,7 +5359,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); [io]B(n,m); int [o]info())
+ Signature: (A(n,n); int uplo(); [io]B(n,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = potrs($A, $uplo, $B);
+ potrs($A, $uplo, $B, $info);  # all arguments given
+ $info = $A->potrs($uplo, $B); # method call
+ $A->potrs($uplo, $B, $info);
 
 =for ref
 
@@ -4866,9 +5403,13 @@ A = U'*U or A = L*L' computed by C<potrf>.
  }
  print("X is :\n".transpose($b))unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-potrs ignores the bad-value flag of the input ndarrays.
+C<potrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4887,7 +5428,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); int trans(); int diag();[io]B(n,m); int [o]info())
+ Signature: (A(n,n); int uplo(); int trans(); int diag();[io]B(n,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = trtrs($A, $uplo, $trans, $diag, $B);
+ trtrs($A, $uplo, $trans, $diag, $B, $info);  # all arguments given
+ $info = $A->trtrs($uplo, $trans, $diag, $B); # method call
+ $A->trtrs($uplo, $trans, $diag, $B, $info);
 
 =for ref
 
@@ -4942,9 +5491,13 @@ A check is made to verify that A is nonsingular.
  trtrs($a, 0, 0, 0, $b, $info);
  print("X is :\n".transpose($b))unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-trtrs ignores the bad-value flag of the input ndarrays.
+C<trtrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4963,7 +5516,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); int trans(); int diag(); int normin();[io]x(n); [o]scale();[io]cnorm(n);int [o]info())
+ Signature: (A(n,n); int uplo(); int trans(); int diag(); int normin();[io]x(n); [o]scale();[io]cnorm(n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($scale, $info) = latrs($A, $uplo, $trans, $diag, $normin, $x, $cnorm);
+ latrs($A, $uplo, $trans, $diag, $normin, $x, $scale, $cnorm, $info);    # all arguments given
+ ($scale, $info) = $A->latrs($uplo, $trans, $diag, $normin, $x, $cnorm); # method call
+ $A->latrs($uplo, $trans, $diag, $normin, $x, $scale, $cnorm, $info);
 
 =for ref
 
@@ -5114,9 +5675,13 @@ than max(underflow, 1/overflow).
  $cnorm = zeroes(100);
  latrs($a, 0, 0, 0, 0,$b, $scale, $cnorm,$info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-latrs ignores the bad-value flag of the input ndarrays.
+C<latrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5135,7 +5700,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(4*$SIZE(n))))
+ Signature: (A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(4*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = gecon($A, $norm, $anorm);
+ gecon($A, $norm, $anorm, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->gecon($norm, $anorm); # method call
+ $A->gecon($norm, $anorm, $rcond, $info);
 
 =for ref
 
@@ -5177,9 +5750,13 @@ condition number is computed as
  getrf($a, $ipiv, $info);
  ($rcond, $info) = gecon($a, 1, $anorm) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gecon ignores the bad-value flag of the input ndarrays.
+C<gecon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5198,7 +5775,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n))))
+ Signature: (A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = sycon($A, $uplo, $ipiv, $anorm);
+ sycon($A, $uplo, $ipiv, $anorm, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->sycon($uplo, $ipiv, $anorm); # method call
+ $A->sycon($uplo, $ipiv, $anorm, $rcond, $info);
 
 =for ref
 
@@ -5242,9 +5827,13 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
  sytrf($a, 1,$ipiv, $info);
  ($rcond, $info) = sycon($a, 1, $anorm) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-sycon ignores the bad-value flag of the input ndarrays.
+C<sycon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5263,7 +5852,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
+ Signature: (A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = pocon($A, $uplo, $anorm);
+ pocon($A, $uplo, $anorm, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->pocon($uplo, $anorm); # method call
+ $A->pocon($uplo, $anorm, $rcond, $info);
 
 =for ref
 
@@ -5301,9 +5898,13 @@ condition number is computed as rcond = 1 / (anorm * norm(inv(A))).
  potrf($a,  0, $info);
  ($rcond, $info) = pocon($a, 1, $anorm) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pocon ignores the bad-value flag of the input ndarrays.
+C<pocon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5322,7 +5923,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
+ Signature: (A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); int [t]iwork(n); [t]work(workn=CALC(3*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = trcon($A, $norm, $uplo, $diag);
+ trcon($A, $norm, $uplo, $diag, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->trcon($norm, $uplo, $diag); # method call
+ $A->trcon($norm, $uplo, $diag, $rcond, $info);
 
 =for ref
 
@@ -5371,9 +5980,13 @@ computed as
  $info = null;
  ($rcond, $info) = trcon($a, 1, 1, 0) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-trcon ignores the bad-value flag of the input ndarrays.
+C<trcon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5392,7 +6005,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); int [io]jpvt(n); [o]tau(k); int [o]info())
+ Signature: ([io]A(m,n); int [io]jpvt(n); [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = geqp3($A, $jpvt);
+ geqp3($A, $jpvt, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->geqp3($jpvt); # method call
+ $A->geqp3($jpvt, $tau, $info);
 
 =for ref
 
@@ -5442,9 +6063,13 @@ Each H(i) has the form
  $jpvt = zeroes(long, 50);
  geqp3($a, $jpvt, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geqp3 ignores the bad-value flag of the input ndarrays.
+C<geqp3> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5463,7 +6088,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = geqrf($A);
+ geqrf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->geqrf; # method call
+ $A->geqrf($tau, $info);
 
 =for ref
 
@@ -5505,9 +6138,13 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  geqrf($a, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geqrf ignores the bad-value flag of the input ndarrays.
+C<geqrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5526,7 +6163,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); tau(k); int [o]info())
+ Signature: ([io]A(m,n); tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = orgqr($A, $tau);
+ orgqr($A, $tau, $info);  # all arguments given
+ $info = $A->orgqr($tau); # method call
+ $A->orgqr($tau, $info);
 
 =for ref
 
@@ -5561,9 +6206,13 @@ reflectors of order M
  geqrf($a, $tau, $info);
  orgqr($a, $tau, $info) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-orgqr ignores the bad-value flag of the input ndarrays.
+C<orgqr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5582,7 +6231,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Signature: (A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ormqr($A, $side, $trans, $tau, $C);
+ ormqr($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->ormqr($side, $trans, $tau, $C); # method call
+ $A->ormqr($side, $trans, $tau, $C, $info);
 
 =for ref
 
@@ -5638,9 +6295,13 @@ if C<side> = 1.
  $c = transpose($c);
  ormqr($a, $tau, $c, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ormqr ignores the bad-value flag of the input ndarrays.
+C<ormqr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5659,7 +6320,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = gelqf($A);
+ gelqf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->gelqf; # method call
+ $A->gelqf($tau, $info);
 
 =for ref
 
@@ -5701,9 +6370,13 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  gelqf($a, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gelqf ignores the bad-value flag of the input ndarrays.
+C<gelqf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5722,7 +6395,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); tau(k); int [o]info())
+ Signature: ([io]A(m,n); tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = orglq($A, $tau);
+ orglq($A, $tau, $info);  # all arguments given
+ $info = $A->orglq($tau); # method call
+ $A->orglq($tau, $info);
 
 =for ref
 
@@ -5756,9 +6437,13 @@ reflectors of order N
  gelqf($a, $tau, $info);
  orglq($a, $tau, $info) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-orglq ignores the bad-value flag of the input ndarrays.
+C<orglq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5777,7 +6462,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ormlq($A, $side, $trans, $tau, $C);
+ ormlq($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->ormlq($side, $trans, $tau, $C); # method call
+ $A->ormlq($side, $trans, $tau, $C, $info);
 
 =for ref
 
@@ -5833,9 +6526,13 @@ if C<side> = 1.
  $c = transpose($c);
  ormlq($a, $tau, $c, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ormlq ignores the bad-value flag of the input ndarrays.
+C<ormlq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5854,7 +6551,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = geqlf($A);
+ geqlf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->geqlf; # method call
+ $A->geqlf($tau, $info);
 
 =for ref
 
@@ -5898,9 +6603,13 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  geqlf($a, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geqlf ignores the bad-value flag of the input ndarrays.
+C<geqlf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5919,7 +6628,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); tau(k); int [o]info())
+ Signature: ([io]A(m,n); tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = orgql($A, $tau);
+ orgql($A, $tau, $info);  # all arguments given
+ $info = $A->orgql($tau); # method call
+ $A->orgql($tau, $info);
 
 =for ref
 
@@ -5954,9 +6671,13 @@ reflectors of order M
  geqlf($a, $tau, $info);
  orgql($a, $tau, $info) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-orgql ignores the bad-value flag of the input ndarrays.
+C<orgql> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5975,7 +6696,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Signature: (A(p,k); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ormql($A, $side, $trans, $tau, $C);
+ ormql($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->ormql($side, $trans, $tau, $C); # method call
+ $A->ormql($side, $trans, $tau, $C, $info);
 
 =for ref
 
@@ -6031,9 +6760,13 @@ if C<side> = 1.
  $c = transpose($c);
  ormql($a, $tau, $c, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ormql ignores the bad-value flag of the input ndarrays.
+C<ormql> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6052,7 +6785,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = gerqf($A);
+ gerqf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->gerqf; # method call
+ $A->gerqf($tau, $info);
 
 =for ref
 
@@ -6097,9 +6838,13 @@ Each H(i) has the form
  $tau = zeroes(float, 50);
  gerqf($a, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gerqf ignores the bad-value flag of the input ndarrays.
+C<gerqf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6118,7 +6863,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); tau(k); int [o]info())
+ Signature: ([io]A(m,n); tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = orgrq($A, $tau);
+ orgrq($A, $tau, $info);  # all arguments given
+ $info = $A->orgrq($tau); # method call
+ $A->orgrq($tau, $info);
 
 =for ref
 
@@ -6153,9 +6906,13 @@ reflectors of order N
  gerqf($a, $tau, $info);
  orgrq($a, $tau, $info) unless $info != 0;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-orgrq ignores the bad-value flag of the input ndarrays.
+C<orgrq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6174,7 +6931,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ormrq($A, $side, $trans, $tau, $C);
+ ormrq($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->ormrq($side, $trans, $tau, $C); # method call
+ $A->ormrq($side, $trans, $tau, $C, $info);
 
 =for ref
 
@@ -6230,9 +6995,13 @@ if C<side> = 1.
  $c = transpose($c);
  ormrq($a, $tau, $c, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ormrq ignores the bad-value flag of the input ndarrays.
+C<ormrq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6251,7 +7020,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Signature: ([io]A(m,n); [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = tzrzf($A);
+ tzrzf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->tzrzf; # method call
+ $A->tzrzf($tau, $info);
 
 =for ref
 
@@ -6313,9 +7090,13 @@ Z is given by
  $tau = zeroes(float, 50);
  tzrzf($a, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-tzrzf ignores the bad-value flag of the input ndarrays.
+C<tzrzf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6334,7 +7115,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Signature: (A(k,p); int side(); int trans(); tau(k); [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ormrz($A, $side, $trans, $tau, $C);
+ ormrz($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->ormrz($side, $trans, $tau, $C); # method call
+ $A->ormrz($side, $trans, $tau, $C, $info);
 
 =for ref
 
@@ -6390,9 +7179,13 @@ if C<side> = 1.
  $c = transpose($c);
  ormrz($a, $tau, $c, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ormrz ignores the bad-value flag of the input ndarrays.
+C<ormrz> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6411,7 +7204,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int ilo();int ihi();[o]tau(k); int [o]info())
+ Signature: ([io]A(n,n); int ilo();int ihi();[o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = gehrd($A, $ilo, $ihi);
+ gehrd($A, $ilo, $ihi, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->gehrd($ilo, $ihi); # method call
+ $A->gehrd($ilo, $ihi, $tau, $info);
 
 =for ref
 
@@ -6481,9 +7282,13 @@ n = 7, ilo = 2 and ihi = 6:
  $tau = zeroes(50);
  gehrd($a, 1, 50, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gehrd ignores the bad-value flag of the input ndarrays.
+C<gehrd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6502,7 +7307,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int ilo();int ihi();tau(k); int [o]info())
+ Signature: ([io]A(n,n); int ilo();int ihi();tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = orghr($A, $ilo, $ihi, $tau);
+ orghr($A, $ilo, $ihi, $tau, $info);  # all arguments given
+ $info = $A->orghr($ilo, $ihi, $tau); # method call
+ $A->orghr($ilo, $ihi, $tau, $info);
 
 =for ref
 
@@ -6539,9 +7352,13 @@ C<gehrd>:
  gehrd($a, 1, 50, $tau, $info);
  orghr($a, 1, 50, $tau, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-orghr ignores the bad-value flag of the input ndarrays.
+C<orghr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6560,7 +7377,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]H(n,n); int job();int compz();int ilo();int ihi();[o]wr(n); [o]wi(n);[o]Z(m,m); int [o]info())
+ Signature: ([io]H(n,n); int job();int compz();int ilo();int ihi();[o]wr(n); [o]wi(n);[o]Z(m,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($wr, $wi, $Z, $info) = hseqr($H, $job, $compz, $ilo, $ihi);
+ hseqr($H, $job, $compz, $ilo, $ihi, $wr, $wi, $Z, $info);    # all arguments given
+ ($wr, $wi, $Z, $info) = $H->hseqr($job, $compz, $ilo, $ihi); # method call
+ $H->hseqr($job, $compz, $ilo, $ihi, $wr, $wi, $Z, $info);
 
 =for ref
 
@@ -6639,9 +7464,13 @@ matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-hseqr ignores the bad-value flag of the input ndarrays.
+C<hseqr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6660,7 +7489,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n))))
+ Signature: (T(n,n); int side();int howmny();int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(3*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($VL, $VR, $m, $info) = trevc($T, $side, $howmny, $select);
+ trevc($T, $side, $howmny, $select, $VL, $VR, $m, $info);    # all arguments given
+ ($VL, $VR, $m, $info) = $T->trevc($side, $howmny, $select); # method call
+ $T->trevc($side, $howmny, $select, $VL, $VR, $m, $info);
 
 =for ref
 
@@ -6791,9 +7628,13 @@ magnitude has magnitude 1; here the magnitude of a complex number
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-trevc ignores the bad-value flag of the input ndarrays.
+C<trevc> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6812,7 +7653,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int side();int howmny();B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+ Signature: (A(n,n); int side();int howmny();B(n,n);int select(q);[o]VL(m,m); [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($VL, $VR, $m, $info) = tgevc($A, $side, $howmny, $B, $select);
+ tgevc($A, $side, $howmny, $B, $select, $VL, $VR, $m, $info);    # all arguments given
+ ($VL, $VR, $m, $info) = $A->tgevc($side, $howmny, $B, $select); # method call
+ $A->tgevc($side, $howmny, $B, $select, $VL, $VR, $m, $info);
 
 =for ref
 
@@ -6924,9 +7773,13 @@ to the eigenvalue with positive imaginary part.
  gehrd($a, 1, 50, $tau, $info);
  hseqr($a,0,0,1,50,($wr=null),($wi=null),$z,$info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-tgevc ignores the bad-value flag of the input ndarrays.
+C<tgevc> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6945,7 +7798,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info())
+ Signature: ([io]A(n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ilo, $ihi, $scale, $info) = gebal($A, $job);
+ gebal($A, $job, $ilo, $ihi, $scale, $info);    # all arguments given
+ ($ilo, $ihi, $scale, $info) = $A->gebal($job); # method call
+ $A->gebal($job, $ilo, $ihi, $scale, $info);
 
 =for ref
 
@@ -7026,9 +7887,13 @@ returned in the vector C<scale>.
  $ihi = null;
  gebal($a, $ilo, $ihi, $scale, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gebal ignores the bad-value flag of the input ndarrays.
+C<gebal> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7047,7 +7912,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(n,m); int job(); int side();int ilo();int ihi();scale(n); int [o]info())
+ Signature: ([io]A(n,m); int job(); int side();int ilo();int ihi();scale(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = gebak($A, $job, $side, $ilo, $ihi, $scale);
+ gebak($A, $job, $side, $ilo, $ihi, $scale, $info);  # all arguments given
+ $info = $A->gebak($job, $side, $ilo, $ihi, $scale); # method call
+ $A->gebak($job, $side, $ilo, $ihi, $scale, $info);
 
 =for ref
 
@@ -7095,9 +7968,13 @@ balanced matrix output by gebal.
  # Compute eigenvectors ($ev)
  gebak($ev, $ilo, $ihi, $scale, $info);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gebak ignores the bad-value flag of the input ndarrays.
+C<gebak> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7116,7 +7993,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,m); int norm(); [o]b(); [t]work(workn))
+ Signature: (A(n,m); int norm(); [o]b(); [t]work(workn))
+ Types: (float double)
+
+=for usage
+
+ $b = lange($A, $norm);
+ lange($A, $norm, $b);  # all arguments given
+ $b = $A->lange($norm); # method call
+ $A->lange($norm, $b);
 
 =for ref
 
@@ -7155,9 +8040,13 @@ real matrix A.
  $a = random (float, 100, 100);
  $norm  = $a->lange(1);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-lange ignores the bad-value flag of the input ndarrays.
+C<lange> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7176,7 +8065,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
+ Signature: (A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
+ Types: (float double)
+
+=for usage
+
+ $b = lansy($A, $uplo, $norm);
+ lansy($A, $uplo, $norm, $b);  # all arguments given
+ $b = $A->lansy($uplo, $norm); # method call
+ $A->lansy($uplo, $norm, $b);
 
 =for ref
 
@@ -7224,9 +8121,13 @@ real symmetric matrix A.
  $a = random (float, 100, 100);
  $norm  = $a->lansy(1, 1);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-lansy ignores the bad-value flag of the input ndarrays.
+C<lansy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7245,7 +8146,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(m,n);int uplo();int norm();int diag();[o]b(); [t]work(workn))
+ Signature: (A(m,n);int uplo();int norm();int diag();[o]b(); [t]work(workn))
+ Types: (float double)
+
+=for usage
+
+ $b = lantr($A, $uplo, $norm, $diag);
+ lantr($A, $uplo, $norm, $diag, $b);  # all arguments given
+ $b = $A->lantr($uplo, $norm, $diag); # method call
+ $A->lantr($uplo, $norm, $diag, $b);
 
 =for ref
 
@@ -7299,9 +8208,13 @@ trapezoidal or triangular matrix A.
  $a = random (float, 100, 100);
  $norm  = $a->lantr(1, 1, 0);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-lantr ignores the bad-value flag of the input ndarrays.
+C<lantr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7320,7 +8233,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(m,n); int transa(); int transb(); B(p,q);alpha(); beta(); [io]C(r,s))
+ Signature: (A(m,n); int transa(); int transb(); B(p,q);alpha(); beta(); [io]C(r,s))
+ Types: (float double)
+
+=for usage
+
+ gemm($A, $transa, $transb, $B, $alpha, $beta, $C); # all arguments given
+ $A->gemm($transa, $transb, $B, $alpha, $beta, $C); # method call
 
 =for ref
 
@@ -7373,9 +8292,13 @@ Performs one of the matrix-matrix operations
  $c = zeroes(5,5);
  gemm($a, 0, 1,$b, $alpha, $beta, $c);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gemm ignores the bad-value flag of the input ndarrays.
+C<gemm> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7394,15 +8317,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(m,n); B(p,m); [o]C(p,n))
+ Signature: (A(m,n); B(p,m); [o]C(p,n))
+ Types: (float double)
+
+=for usage
+
+ $C = mmult($A, $B);
+ mmult($A, $B, $C);  # all arguments given
+ $C = $A->mmult($B); # method call
+ $A->mmult($B, $C);
 
 =for ref
 
 Blas matrix multiplication based on gemm
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mmult ignores the bad-value flag of the input ndarrays.
+C<mmult> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7421,15 +8356,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(n,m); B(p,m); [o]C(p,n))
+ Signature: (A(n,m); B(p,m); [o]C(p,n))
+ Types: (float double)
+
+=for usage
+
+ $C = crossprod($A, $B);
+ crossprod($A, $B, $C);  # all arguments given
+ $C = $A->crossprod($B); # method call
+ $A->crossprod($B, $C);
 
 =for ref
 
 Blas matrix cross product based on gemm
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-crossprod ignores the bad-value flag of the input ndarrays.
+C<crossprod> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7448,7 +8395,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(m,n); int uplo(); int trans(); alpha(); beta(); [io]C(p,p))
+ Signature: (A(m,n); int uplo(); int trans(); alpha(); beta(); [io]C(p,p))
+ Types: (float double)
+
+=for usage
+
+ syrk($A, $uplo, $trans, $alpha, $beta, $C); # all arguments given
+ $A->syrk($uplo, $trans, $alpha, $beta, $C); # method call
 
 =for ref
 
@@ -7511,9 +8464,13 @@ or
  $beta = 0;
  syrk ($a, 1,0,$alpha, $beta , $b);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-syrk ignores the bad-value flag of the input ndarrays.
+C<syrk> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7532,7 +8489,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n);b(n);[o]c())
+ Signature: (a(n);b(n);[o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = dot($a, $b);
+ dot($a, $b, $c);  # all arguments given
+ $c = $a->dot($b); # method call
+ $a->dot($b, $c);
 
 =for ref
 
@@ -7544,9 +8509,13 @@ Dot product of two vectors using Blas.
  $b = random(5);
  $c = dot($a, $b)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-dot ignores the bad-value flag of the input ndarrays.
+C<dot> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7565,7 +8534,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); alpha();[io]b(m))
+ Signature: (a(n); alpha();[io]b(m))
+ Types: (float double)
+
+=for usage
+
+ axpy($a, $alpha, $b); # all arguments given
+ $a->axpy($alpha, $b); # method call
 
 =for ref
 
@@ -7578,9 +8553,13 @@ Returns result in b.
  $b = random(5);
  axpy($a, 12, $b)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-axpy ignores the bad-value flag of the input ndarrays.
+C<axpy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7599,7 +8578,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n);[o]b())
+ Signature: (a(n);[o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = nrm2($a);
+ nrm2($a, $b);  # all arguments given
+ $b = $a->nrm2; # method call
+ $a->nrm2($b);
 
 =for ref
 
@@ -7610,9 +8597,13 @@ Euclidean norm of a vector using Blas.
  $a = random(5);
  $norm2 = nrm2($a)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-nrm2 ignores the bad-value flag of the input ndarrays.
+C<nrm2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7631,7 +8622,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n);[o]b())
+ Signature: (a(n);[o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = asum($a);
+ asum($a, $b);  # all arguments given
+ $b = $a->asum; # method call
+ $a->asum($b);
 
 =for ref
 
@@ -7642,9 +8641,13 @@ Sum of absolute values of a vector using Blas.
  $a = random(5);
  $absum = asum($a)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-asum ignores the bad-value flag of the input ndarrays.
+C<asum> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7663,7 +8666,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a(n);scale())
+ Signature: ([io]a(n);scale())
+ Types: (float double)
+
+=for usage
+
+ scal($a, $scale); # all arguments given
+ $a->scal($scale); # method call
 
 =for ref
 
@@ -7674,9 +8683,13 @@ Scale a vector by a constant using Blas.
  $a = random(5);
  $a->scal(0.5)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-scal ignores the bad-value flag of the input ndarrays.
+C<scal> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7695,7 +8708,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a(n);c(); s();[io]b(n))
+ Signature: ([io]a(n);c(); s();[io]b(n))
+ Types: (float double)
+
+=for usage
+
+ rot($a, $c, $s, $b); # all arguments given
+ $a->rot($c, $s, $b); # method call
 
 =for ref
 
@@ -7707,9 +8726,13 @@ Applies plane rotation using Blas.
  $b = random(5);
  rot($a, 0.5, 0.7, $b)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rot ignores the bad-value flag of the input ndarrays.
+C<rot> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7728,7 +8751,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a();[io]b();[o]c(); [o]s())
+ Signature: ([io]a();[io]b();[o]c(); [o]s())
+ Types: (float double)
+
+=for usage
+
+ ($c, $s) = rotg($a, $b);
+ rotg($a, $b, $c, $s);    # all arguments given
+ ($c, $s) = $a->rotg($b); # method call
+ $a->rotg($b, $c, $s);
 
 =for ref
 
@@ -7739,9 +8770,13 @@ Generates plane rotation using Blas.
  $a = sequence(4);
  rotg($a(0), $a(1),$a(2),$a(3))
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rotg ignores the bad-value flag of the input ndarrays.
+C<rotg> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7760,7 +8795,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]d(n); int id();int [o]info())
+ Signature: ([io]d(n); int id();int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = lasrt($d, $id);
+ lasrt($d, $id, $info);  # all arguments given
+ $info = $d->lasrt($id); # method call
+ $d->lasrt($id, $info);
 
 =for ref
 
@@ -7789,9 +8832,13 @@ size <= 20. Dimension of stack limits N to about 2**32.
  $a = random(5);
  lasrt ($a, 0, ($info = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-lasrt ignores the bad-value flag of the input ndarrays.
+C<lasrt> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7810,7 +8857,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(m,n); int uplo(); [o]B(p,n))
+ Signature: (A(m,n); int uplo(); [o]B(p,n))
+ Types: (float double)
+
+=for usage
+
+ $B = lacpy($A, $uplo);
+ lacpy($A, $uplo, $B);  # all arguments given
+ $B = $A->lacpy($uplo); # method call
+ $A->lacpy($uplo, $B);
 
 =for ref
 
@@ -7837,9 +8892,13 @@ matrix B.
  $b = zeroes($a);
  lacpy ($a, 0, $b);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-lacpy ignores the bad-value flag of the input ndarrays.
+C<lacpy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7858,7 +8917,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]A(m,n);int k1();int  k2(); int ipiv(p);int inc())
+ Signature: ([io]A(m,n);int k1();int  k2(); int ipiv(p);int inc())
+ Types: (float double)
+
+=for usage
+
+ laswp($A, $k1, $k2, $ipiv, $inc); # all arguments given
+ $A->laswp($k1, $k2, $ipiv, $inc); # method call
 
 =for ref
 
@@ -7893,9 +8958,13 @@ Doesn't use PDL indices (start = 1).
  $b = pdl([5,4,3,2,1]);
  $a->laswp(1,2,$b,1);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-laswp ignores the bad-value flag of the input ndarrays.
+C<laswp> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7914,7 +8983,17 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (cmach(); [o]precision())
+ Signature: (cmach(); [o]precision())
+ Types: (float double)
+
+=for usage
+
+ $precision = lamch($cmach);
+ lamch($cmach, $precision);  # all arguments given
+ $precision = $cmach->lamch; # method call
+ $cmach->lamch($precision);
+ $cmach->inplace->lamch;     # can be used inplace
+ lamch($cmach->inplace);
 
 =for ref
 
@@ -7954,9 +9033,13 @@ Works inplace.
  $a = lamch (0);
  print "EPS is $a for double\n";
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-lamch ignores the bad-value flag of the input ndarrays.
+C<lamch> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -7975,7 +9058,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]small(); [io]large())
+ Signature: ([io]small(); [io]large())
+ Types: (float double)
+
+=for usage
+
+ labad($small, $large); # all arguments given
+ $small->labad($large); # method call
 
 =for ref
 
@@ -8005,9 +9094,13 @@ the exponent range, as is found on a Cray.
  $overflow = lamch(9);
  labad ($underflow, $overflow);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-labad ignores the bad-value flag of the input ndarrays.
+C<labad> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -8026,7 +9119,16 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (eigreval(n);eigimval(n); eigvec(n,p);int fortran();[o]cplx_val(c=2,n);[o]cplx_vec(c=2,n,p))
+ Signature: (eigreval(n);eigimval(n); eigvec(n,p);int fortran();[o]cplx_val(c=2,n);[o]cplx_vec(c=2,n,p))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($cplx_val, $cplx_vec) = cplx_eigen($eigreval, $eigimval, $eigvec, $fortran);
+ cplx_eigen($eigreval, $eigimval, $eigvec, $fortran, $cplx_val, $cplx_vec);    # all arguments given
+ ($cplx_val, $cplx_vec) = $eigreval->cplx_eigen($eigimval, $eigvec, $fortran); # method call
+ $eigreval->cplx_eigen($eigimval, $eigvec, $fortran, $cplx_val, $cplx_vec);
 
 =for ref
 
@@ -8034,9 +9136,13 @@ Output complex eigen-values/vectors from eigen-values/vectors
 as computed by geev or geevx.
 'fortran' means fortran storage type.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cplx_eigen does not process bad values.
+C<cplx_eigen> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -8065,15 +9171,27 @@ sub PDL::cplx_eigen {
 
 =for sig
 
-  Signature: (A(n,n);[o]Y(n,n);[o]out(p=CALC($SIZE(n)+1)))
+ Signature: (A(n,n);[o]Y(n,n);[o]out(p=CALC($SIZE(n)+1)))
+ Types: (float double)
+
+=for usage
+
+ ($Y, $out) = charpol($A);
+ charpol($A, $Y, $out);    # all arguments given
+ ($Y, $out) = $A->charpol; # method call
+ $A->charpol($Y, $out);
 
 =for ref
 
 Compute adjoint matrix and characteristic polynomial.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-charpol does not process bad values.
+C<charpol> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -8089,18 +9207,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 10599 "lib/PDL/LinearAlgebra/Real.pd"
+#line 10580 "lib/PDL/LinearAlgebra/Real.pd"
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 8104 "lib/PDL/LinearAlgebra/Real.pm"
+#line 9222 "lib/PDL/LinearAlgebra/Real.pm"
 
 # Exit with OK status
 

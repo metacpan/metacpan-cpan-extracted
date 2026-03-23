@@ -60,9 +60,11 @@
          "type" : "git",
          "url" : "https://github.com/Getty/p5-app-karr.git",
          "web" : "https://github.com/Getty/p5-app-karr"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#ai",
+      "x_IRC_user" : "Getty"
    },
-   "version" : "0.003",
+   "version" : "0.101",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -158,8 +160,8 @@
                   "fatal_errors" : 1,
                   "quiet" : 0,
                   "run" : [
-                     "cp ./%n-%v.tar.gz ..",
-                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --build-arg KARR_TGZ=%n-%v.tar.gz -t raudssus/karr:latest .."
+                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-root -t raudssus/karr:latest %d",
+                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-user -t raudssus/karr:user %d"
                   ],
                   "version" : "0.049"
                }
@@ -175,10 +177,12 @@
                   "quiet" : 0,
                   "run" : [
                      "${GH_BIN:-gh} release view %v -R Getty/p5-app-karr >/dev/null 2>&1 || ${GH_BIN:-gh} release create %v -R Getty/p5-app-karr --title %v --notes 'Dist::Zilla release'",
-                     "${GH_BIN:-gh} release upload %v -R Getty/p5-app-karr %n-%v.tar.gz --clobber",
-                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --build-arg KARR_TGZ=%n-%v.tar.gz -t raudssus/karr:%v -t raudssus/karr:$(echo %v | cut -d. -f1) .",
+                     "${GH_BIN:-gh} release upload %v -R Getty/p5-app-karr %a --clobber",
+                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-root -t raudssus/karr:%v -t raudssus/karr:$(echo %v | cut -d. -f1) %d",
+                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-user -t raudssus/karr:user %d",
                      "docker push raudssus/karr:%v",
-                     "docker push raudssus/karr:$(echo %v | cut -d. -f1)"
+                     "docker push raudssus/karr:$(echo %v | cut -d. -f1)",
+                     "docker push raudssus/karr:user"
                   ],
                   "version" : "0.049"
                }
@@ -205,6 +209,11 @@
             "class" : "Dist::Zilla::Plugin::GithubMeta",
             "name" : "@Author::GETTY/GithubMeta",
             "version" : "0.58"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@Author::GETTY/MetaResources",
+            "version" : "6.037"
          },
          {
             "class" : "Dist::Zilla::Plugin::InstallRelease",
@@ -363,21 +372,7 @@
                   "global" : 0,
                   "skip_version_provider" : 0
                },
-               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {
-                  "_fallback_version_provider_args" : {},
-                  "fallback_version_provider" : "Git::NextVersion"
-               },
-               "Git::NextVersion" : {
-                  "Dist::Zilla::Plugin::Git::NextVersion" : {
-                     "first_version" : "0.001",
-                     "version_by_branch" : 0,
-                     "version_regexp" : "(?^:^v(.+)$)"
-                  },
-                  "Dist::Zilla::Role::Git::Repo" : {
-                     "git_version" : "2.39.5",
-                     "repo_root" : "."
-                  }
-               }
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
             },
             "name" : "@Author::GETTY/@Git::VersionManager/RewriteVersion::Transitional",
             "version" : "0.009"
@@ -433,7 +428,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.003",
+                  "tag" : "0.101",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

@@ -39,6 +39,7 @@ my @demo = (
 ]],
 
 [act => q[
+  use PDL::Constants qw(PI);
   # plot data of example 8
   ($XPTS, $YPTS) = (35, 45);
   ($indexxmin, $indexxmax) = (0, $XPTS);

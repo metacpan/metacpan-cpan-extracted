@@ -1,7 +1,12 @@
+# Basic requirements
 requires 'perl' => '5.036000';
 requires 'Plack';
 requires 'Role::Tiny';
 requires 'Router::Boom';
+
+# Should be included by way of Plack
+requires 'HTTP::Status';
+requires 'URI';
 
 # In core but list anyway
 requires 'Digest::MD5';

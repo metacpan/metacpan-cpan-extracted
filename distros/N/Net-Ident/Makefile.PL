@@ -3,6 +3,7 @@
 #
 # $Id: Makefile.PL,v 1.57 1999/08/27 00:00:09 john Exp $
 
+use 5.010;
 use strict;
 use warnings;
 
@@ -632,6 +633,7 @@ WriteMakefile(
         Socket     => '0',
         FileHandle => '0',
         Carp       => '0',
+        Errno      => '0',
         Exporter   => '0',
     },
     TEST_REQUIRES => {

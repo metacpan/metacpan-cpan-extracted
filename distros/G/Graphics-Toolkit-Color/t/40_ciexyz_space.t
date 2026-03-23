@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 70;
+use Test::More tests => 72;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 
@@ -17,6 +17,8 @@ is( $space->is_name('xyz'),                     1, 'color space name NCol is cor
 is( $space->is_name('CIExyZ'),                  1, 'axis initials do not equal space name this time');
 is( $space->is_name('lab'),                     0, 'axis initials do not equal space name this time');
 is( $space->axis_count,                         3, 'color space has 3 axis');
+is( $space->is_euclidean,                       1, 'CIEXYZ is euclidean');
+is( $space->is_cylindrical,                     0, 'CIEXYZ is not cylindrical');
 
 is( ref $space->check_value_shape([0, 0, 0]),          'ARRAY',  'check minimal XYZ values are in bounds');
 is( ref $space->check_value_shape([95.0, 100, 108.8]), 'ARRAY',  'check maximal XYZ values');

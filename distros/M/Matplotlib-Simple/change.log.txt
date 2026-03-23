@@ -1,3 +1,17 @@
+---
+0.25
+---
+re-used error array in scatter_helper
+better warnings for undefined values in multiple-set scatterplots
+fixed bug in scatterplot, where different sets would have the same label
+"logscale" now available with "boxplot, "hist", "plot", "scatter"
+$VERSION now prints with metadata for SVG output files, which required minor changes to testing
+slightly better warnings in plot_helper
+removed duplicate check from hist2d_helper
+better warnings if wrong data types are given to "add"
+Fixed bug in scatterplot, where color key could repeat on axes
+colorbar can now be in logscale for colored_table
+---
 0.24
 ---
 Newlines are now possible in key names for barplot and pie; other characters may be fixed too

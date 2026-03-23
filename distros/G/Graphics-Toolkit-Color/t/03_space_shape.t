@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 183;
+use Test::More tests => 200;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Shape';
@@ -45,22 +45,36 @@ is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, -1), 
 is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, [0,1,-1]), $module, 'full precision def');
 is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, [1,2]), '', 'precision def too short');
 is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, [1,2,3,-1]), '', 'precision def too long');
-is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, '%'), $module, 'accepting fourth constructor arg - a suffix for axis numbers');
-
+my $constraint = {checker => '$_[0][0]+$_[0][1] <= 1',remedy => '[$_[0][0], 1-$_[0][0], $_[0][2]]', error => 'no'};
+my $constraints = {only => $constraint};
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, '%'), '', 'constraints def has to be a hash');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {}), '', 'empty constraints def is not acceptable');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {t => {checker => '$_[0]'}}), '', 'only checker is not enough');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {t => {checker => '$_[0]',remedy => '$_[0]'}}), '', 'only checker and remedy is not enough');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {t => {checker => '$_[0]',remedy => '$_[0]', error => 'no'}}), $module, 'minimal but correct constraint def');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {t => $constraint,  tt =>  $constraint}), $module, 'two constraint def');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {t => {checker => [],remedy => sub{}, error => []}}), '', 'constraint checker is not CODE ref');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {t => {checker => sub{},remedy => {}, error => []}}), '', 'constraint remedy is not CODE ref');
+is( ref Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, undef, undef, {t => {checker => sub{},remedy => sub{}, error => []}}), '', 'error message in constraints def is not a string');
 
 #### arg eval + getter #################################################
 $shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, ['angular','linear','no']);
 is( ref $shape,  $module, 'created shape with all axis types');
-is( $shape->is_linear,          0, 'space has none linear axis');
+is( $shape->is_euclidean,       0, 'space is not euclidean');
+is( $shape->is_cylindrical,     0, 'space is not cylindrical');
 is( $shape->is_int_valued,      0, 'per default space have full precision');
+is( $shape->has_constraints,    0, 'no constraints where given to this space');
 is( $shape->is_axis_numeric(0), 1, 'first dimension is numeric');
 is( $shape->is_axis_numeric(1), 1, 'second dimension is numeric');
 is( $shape->is_axis_numeric(2), 0, 'third dimension is not numeric');
 is( $shape->is_axis_numeric(3), 0, 'there is no fourth dimension ');
+$shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, ['linear','angular','linear']);
+is( $shape->is_cylindrical,     1, 'thi space is cylindrical');
 
 $shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, undef, [[0,1],[-1,1],[1,10]]);
 is( ref $shape,  $module, 'created shape with most complex range definition');
-is( $shape->is_linear,          1, 'per default spaces are linear');
+is( $shape->is_euclidean,       1, 'per default spaces are euclidean');
+is( $shape->is_cylindrical,     0, 'per default spaces are not cylindrical');
 is( $shape->is_int_valued,      0, 'per default space have full precision');
 is( $shape->is_axis_numeric(0), 1, 'default to numeric axis on first dimension');
 is( $shape->is_axis_numeric(1), 1, 'default to numeric axis on second dimension');
@@ -133,10 +147,12 @@ is( $oshape->is_in_linear_bounds({}),           0, "bad format");
 is( $oshape->is_in_linear_bounds([1,2]),        0, "not enough values");
 is( $oshape->is_in_linear_bounds([1,2,3,4]),    0, "too many values");
 is( $oshape->is_in_linear_bounds([0,10,3.111]), 1, "normal in range values");
+is( $oshape->is_in_bounds(       [0,10,3.111]), 1, "values are in bounds");
 is( $oshape->is_in_linear_bounds([-0.1,0,10]),  0, "first value too small");
 is( $oshape->is_in_linear_bounds([0,10.1,10]),  0, "second value too large");
 is( $oshape->is_in_linear_bounds([10,0,-100]),  0, "third value way too large");
 is( $bshape->is_in_linear_bounds([-6,6,1]),     1, "angular dimension can be out out bounds");
+is( $bshape->is_in_bounds([-6,6,1]),            0, "angular dimension has to be in bounds now too");
 is(  $shape->is_in_linear_bounds([2,1,2]),      1, "only linear dimension is in bound");
 is(  $shape->is_in_linear_bounds([2,2,2]),      0, "now linear dimension is out of bound");
 
@@ -220,14 +236,17 @@ is( $r->[0],    -1, 'rounded to int');
 is( $r->[1],  -0.2, 'rounded with precision 1');
 is( $r->[2], 20.33, 'rounded with precision 2');
 
-$bshape = Graphics::Toolkit::Color::Space::Shape->new( $basis, ['angular', 'circular', 0], [[-5,5],[-5,5],[-5,5]], [0,1,-1]);
+$bshape = Graphics::Toolkit::Color::Space::Shape->new( $basis, ['angular', 'circular', 0], [[-5,5],[-5,5],[-5,5]], [0,1,-1],  $constraints);
+is( $bshape->has_constraints,            1, 'got some contraints');
+is( $bshape->is_in_constraints([0,0,0]), 1, 'origin is within constraints');
+is( $bshape->is_in_constraints([1,1,0]), 0, 'point out of constraints');
 $tr = $bshape->clamp( [-.1, 1.123, 2.54], ['normal',2,[-1,4]]);
 is( $bshape->is_int_valued, 0, 'not all axis are int valued');
 
-is( int @$tr,    3, 'clamp kept right amount of values');
-is( $tr->[0],  0.9, 'rotated value to int');
-is( $tr->[1],  1.123, 'left second value untouched');
-is( $tr->[2], 2.54, 'in range value is kept');
+is( int @$tr,    3, ' clamp kept right amount of values');
+is( $tr->[0],  0.9,  'rotated value to int');
+is( $tr->[1],  0.2,  'cut by constrained x 2 due to custom range');
+is( $tr->[2],  2.54, 'in range value is kept');
 
 #### normalize #########################################################
 my $norm = $shape->normalize([-5, 0, 5]);
@@ -274,4 +293,3 @@ is( $norm->[1],    5, 'denormalized second mid delta');
 is( $norm->[2],   10, 'denormalized third max delta');
 
 exit 0;
-

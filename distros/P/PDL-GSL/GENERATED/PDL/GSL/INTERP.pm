@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 6 "lib/PDL/GSL/INTERP.pd"
 
 use strict;
@@ -60,7 +61,7 @@ C<b>. Since good Perl coding practices discourage the use of Perl
 variables C<$a> and C<$b>, here we refer to Parameters C<a> and C<b>
 as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
-#line 64 "lib/PDL/GSL/INTERP.pm"
+#line 65 "lib/PDL/GSL/INTERP.pm"
 
 
 =head1 FUNCTIONS
@@ -76,7 +77,9 @@ integration) as C<$la> and C<$lb>.
 
 =for sig
 
-  Signature: (double x(n); double y(n); gsl_spline *spl)
+ Signature: (double x(n); double y(n); gsl_spline *spl)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -126,9 +129,13 @@ Example:
     # no sorting done on x, user is certain that x is monotonically increasing
     $spl = PDL::GSL::INTERP->init('cspline',$x,$y,{Sort => 0});
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-init does not process bad values.
+C<init> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -170,7 +177,9 @@ sub init {
 
 =for sig
 
-  Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -189,9 +198,13 @@ Example:
 
     my $res = $spl->eval($x)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-eval processes bad values.
+C<eval> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -221,7 +234,9 @@ sub eval {
 
 =for sig
 
-  Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -241,9 +256,13 @@ Example:
 
     my $res = $spl->deriv($x)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-deriv does not process bad values.
+C<deriv> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -272,7 +291,9 @@ sub deriv {
 
 =for sig
 
-  Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Signature: (double x(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -292,9 +313,13 @@ Example:
 
     my $res = $spl->deriv2($x)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-deriv2 does not process bad values.
+C<deriv2> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -323,7 +348,9 @@ sub deriv2 {
 
 =for sig
 
-  Signature: (double a(); double b(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Signature: (double a(); double b(); double [o] out(); gsl_spline *spl;gsl_interp_accel *acc)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -343,9 +370,13 @@ Example:
 
     my $res = $spl->integ($la,$lb)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-integ does not process bad values.
+C<integ> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -395,7 +426,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL interpolation module was written by Gerard Jungman.
 
 =cut
-#line 399 "lib/PDL/GSL/INTERP.pm"
+#line 430 "lib/PDL/GSL/INTERP.pm"
 
 # Exit with OK status
 

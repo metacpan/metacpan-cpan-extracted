@@ -5,7 +5,7 @@ use Crypt::RIPEMD160 0.03;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 sub new {
     my($pkg, $key) = @_;

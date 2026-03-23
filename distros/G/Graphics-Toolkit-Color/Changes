@@ -1,7 +1,32 @@
+2.00    2026-03-23    lichtkind
+-------
+    * = API update release
+    * - removing support for methods: string, rgb, red, green, blue, 
+    * -        rgb_hex, rgb_hash, hsl, hue, set, add, saturation, lightness,
+    * -        hsl_hash, distance_to, blend, blend_with, gradient_to,
+    * -        rgb_gradient_to, hsl_gradient_to, complementary
+    * + cone shaped space constraints for HWB space
+
+1.99    2026-03-22    lichtkind
+-------
+    * = small feature release = 3 small features
+    * + method is_in_gamut checks if values are valid
+    * + cone shaped space constraints for HSV
+    * + added 'sRGB' as alias name of RGB space
+    * \ final test release before 2.0
+
+1.98    2026-03-19    lichtkind
+-------
+    * = small fix release = 2 fixes
+    * ~ when mixing more than 2 color wihtout amounts it will be mixed equally too
+    * ? POD fixed / rewrote for methods "mix"
+    * ? POD fixed in main example
+    * ? document new color space syntax
+    * \ test release before 2.0
 
 1.972    2025-09-31    lichtkind
 -------
-    * = small feature release = 2 fixes
+    * = small fix release = 2 fixes
     * ? POD fixed / rewrote for methods "values", "name", "closest_name", "distance"
     * ! public API cluster method test fix
 
@@ -47,7 +72,7 @@
 1.92    2025-08-20    lichtkind
 -------
     * = mid sized feature release + 1 fix
-    * + methods "name" and "closest_name" work on any scheme from Graphics::ColorNames
+    * * methods "name" and "closest_name" work on any scheme from Graphics::ColorNames
     * ~ extended "CSS_string" format, commas are now optional
     * ~ no space between axis value and suffix allowed
     * ~ color space "CIELCHuv" got alias name "LCHuv"

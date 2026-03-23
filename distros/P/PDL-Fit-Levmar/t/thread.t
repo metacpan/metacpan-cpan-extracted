@@ -120,7 +120,6 @@ sub thread2 {
     check_type($Type, $p,$x,$t);
     my $h = levmar($p, $x, $t, $Gh, @g);
     check_type($Type, $h->{INFO});
-# Disabled for levmar-2.5 , not working 
     ok( tapprox($h->{P}, $correct ), "Thread p, 1 thread dim");
 }
 
@@ -161,7 +160,7 @@ sub thread4 {
     my $h = levmar($p->dummy(1,$nx), $x->dummy(-1,$np), $t, $Gh , @g );
     cpr "# check that output p has correct shape and values";
 
-# Disabled for levmar-2.5 , not working    
+# Disabled for levmar-2.6 , not working (broken in 2.5)
 #    ok( tapprox($h->{P}, $res(1:,:)->dummy(-1,$np)),
 #	"Thread both x and p, 2 thread dims");
 

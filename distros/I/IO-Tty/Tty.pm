@@ -15,8 +15,8 @@ require DynaLoader;
 
 use vars qw(@ISA $VERSION $XS_VERSION $CONFIG $DEBUG);
 
-$VERSION    = '1.20';
-$XS_VERSION = "1.20";
+$VERSION    = '1.21';
+$XS_VERSION = "1.21";
 @ISA        = qw(IO::Handle);
 
 eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
@@ -103,6 +103,10 @@ sub set_raw($) {
     $termios->setiflag(0);
     $termios->setoflag(0);
     $termios->setlflag(0);
+    $termios->setcflag(
+        ( $termios->getcflag() & ~( &POSIX::CSIZE | &POSIX::PARENB ) )
+        | &POSIX::CS8
+    );
     $termios->setcc( &POSIX::VMIN,  1 );
     $termios->setcc( &POSIX::VTIME, 0 );
     unless ( $termios->setattr( $ttyno, &POSIX::TCSANOW ) ) {

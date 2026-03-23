@@ -201,10 +201,10 @@ yaml_syck_parser_handler
                     }
                     if ( *colon == ':' ) {
                         *colon = '\0';
-                        bnum = strtod( colon + 1, NULL );
+                        bnum = Atof( colon + 1 );
                         end = colon;
                     } else {
-                        bnum = strtod( ptr, NULL );
+                        bnum = Atof( ptr );
                         end = ptr;
                     }
                     total += bnum * sixty;
@@ -224,7 +224,7 @@ yaml_syck_parser_handler
             } else if (strnEQ( id, "float", 5 )) {
                 NV f;
                 syck_str_blow_away_commas( n );
-                f = strtod( n->data.str->ptr, NULL );
+                f = Atof( n->data.str->ptr );
                 sv = newSVnv( f );
             } else if (strEQ( id, "int#base60" )) {
                 char *ptr, *end;

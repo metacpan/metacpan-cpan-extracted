@@ -1,7 +1,7 @@
-# ABSTRACT: Install, check, and update Claude Code skills
+# ABSTRACT: Install, check, and update bundled agent skills
 
 package App::karr::Cmd::Skill;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -11,6 +11,7 @@ use App::karr::Role::Output;
 use Path::Tiny;
 
 with 'App::karr::Role::Output';
+
 
 option agent => (
   is => 'ro',
@@ -175,12 +176,13 @@ sub _skill_content {
   my ($self) = @_;
 
   # Try File::ShareDir (installed dist)
-  eval {
+  my $installed = eval {
     require File::ShareDir;
     my $dir = File::ShareDir::dist_dir('App-karr');
     my $file = path($dir)->child('claude-skill.md');
-    return $file->slurp_utf8 if $file->exists;
+    $file->slurp_utf8 if $file->exists;
   };
+  return $installed if defined $installed && length $installed;
 
   # Fallback: relative to module location (development)
   my $module_path = $INC{'App/karr/Cmd/Skill.pm'};
@@ -202,11 +204,60 @@ __END__
 
 =head1 NAME
 
-App::karr::Cmd::Skill - Install, check, and update Claude Code skills
+App::karr::Cmd::Skill - Install, check, and update bundled agent skills
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr skill install
+    karr skill install --agent codex,cursor
+    karr skill check --global
+    karr skill update --force
+    karr skill show
+
+=head1 DESCRIPTION
+
+Installs and maintains the bundled C<karr> skill file for supported agent
+clients. The command can target project-local directories or global skill
+locations in the current user's home directory, which makes it useful both for
+direct Perl installs and Docker-wrapped vendor usage.
+
+=head1 SUPPORTED AGENTS
+
+The built-in agent targets are C<claude-code>, C<codex>, and C<cursor>. When
+C<--agent> is omitted, the command auto-detects available client directories and
+falls back to all known agents if nothing is detected.
+
+=head1 ACTIONS
+
+=over 4
+
+=item * C<install>
+
+Writes the current bundled skill file to the selected target locations.
+
+=item * C<check>
+
+Compares installed skill files with the bundled version and exits non-zero when
+one or more targets are outdated.
+
+=item * C<update>
+
+Refreshes existing installed copies in place.
+
+=item * C<show>
+
+Prints the bundled skill content to standard output.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Init>,
+L<App::karr::Cmd::Context>, L<App::karr::Cmd::Config>
 
 =head1 SUPPORT
 
@@ -214,6 +265,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

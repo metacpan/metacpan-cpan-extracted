@@ -1,0 +1,8 @@
+# CHANGES file for Math::GMP_OLOAD
+
+0.02 - Add missing README.
+     - Adjust the Makefile.PL 'ABSTRACT' and the GMP_OLOAD.pm 'DESCRIPTION'
+       to better represent the purpose of this module.
+
+0.01 - First release
+

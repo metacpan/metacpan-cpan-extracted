@@ -24,8 +24,6 @@ has jabber_client => (
     default => sub { Net::Jabber::Client->new }
 );
 
-#my %connection_hash : ATTR; # Keep track of connection options fed to client.
-
 has 'client_session_id' => ( isa => Str,         is   => 'rw' );
 has 'connect_time'      => ( isa => $PosInt,     is   => 'rw', default => 9_999_999_999 );
 has 'forum_join_grace'  => ( isa => $NonNegNum,  is   => 'rw', default => 10 );
@@ -79,20 +77,8 @@ has 'messages_sent_today' => (
     }
 );
 
-#my %message_function : ATTR; # What is called if we are fed a new message once we are logged in.
-#my %bot_background_function : ATTR; # What is called if we are fed a new message once we are logged in.
-#my %forum_join_time : ATTR;  # Tells us if we've parsed historical messages yet.
-#my %client_start_time :ATTR; # Track when we came online. Also used to determine if we're online.
-#my %process_timeout : ATTR;  # Time to take in process loop if no messages found
-#my %loop_sleep_time : ATTR;  # Time to sleep each time we go through a Start() loop.
-#my %ignore_messages : ATTR;  # Messages to ignore if we recieve them.
-#my %forums_and_responses: ATTR; # List of forums we have joined and who we respond to in each forum
-#my %message_delay: ATTR;    # Allows us to limit Messages per second
-#my %max_message_size: ATTR; # Maximum allowed message size before we chunk them.
-#my %forum_join_grace: ATTR; # Time before we start responding to forum messages.
-#my %messages_sent_today: ATTR;   # Tracks messages sent in 2 dimentional hash by day/hour
-#my %max_messages_per_hour: ATTR; # Limits the number of messages per hour.
-#my %safety_mode: ATTR; # Tracks if we are in safety mode.
+has '_running' => ( isa => Bool, is => 'rw', default => 0 );
+
 
 =head1 NAME
 
@@ -100,11 +86,11 @@ Net::Jabber::Bot - Automated Bot creation with safeties
 
 =head1 VERSION
 
-Version 2.1.7
+Version 2.1.8
 
 =cut
 
-our $VERSION = '2.1.8';
+our $VERSION = '2.1.9';
 
 =head1 SYNOPSIS
 
@@ -300,7 +286,7 @@ Boolean value controlling whether the bot automatically accepts presence subscri
 
 =item B<out_messages_per_second>
 
-Limits the number of messages per second. Number must be <gt> 0
+Limits the number of messages per second. Number must be E<gt> 0
 
 default: 5
 
@@ -472,6 +458,11 @@ sub JoinForum {
     my $self       = shift;
     my $forum_name = shift;
 
+    if ( !$self->IsConnected ) {
+        WARN("Cannot join forum '$forum_name': not connected");
+        return;
+    }
+
     DEBUG( "Joining $forum_name on " . $self->conference_server . " as " . $self->alias );
 
     $self->jabber_client->MUCJoin(
@@ -498,6 +489,8 @@ sub Process {    # Call connection process.
     my $self            = shift;
     my $timeout_seconds = shift;
 
+    return if !$self->IsConnected;
+
     #If not passed explicitly
     $timeout_seconds = $self->process_timeout if ( !defined $timeout_seconds );
 
@@ -507,7 +500,7 @@ sub Process {    # Call connection process.
 
 =item B<Start>
 
-Primary subroutine save new called by the program. Does an endless loop of:
+Primary subroutine save new called by the program. Runs a loop of:
 
 =over
 
@@ -521,6 +514,8 @@ Primary subroutine save new called by the program. Does an endless loop of:
 
 =back
 
+The loop runs until Stop() is called. Returns the loop iteration count.
+
 =cut
 
 sub Start {
@@ -532,11 +527,12 @@ sub Start {
     my $message_delay                    = $self->message_delay;
 
     my $last_background = time - $time_between_background_routines - 1;    # Call background process every so often...
-    my $counter         = 0;                                               # Keep track of how many times we've looped. Not sure if we'll use this long term.
+    my $counter         = 0;                                               # Keep track of how many times we've looped.
 
-    while (1) {                                                            # Loop for ever!
+    $self->_running(1);
+
+    while ( $self->_running ) {
                                                                            # Process and re-connect if you have to.
-        my $reconnect_timeout = 1;
         eval { $self->Process($process_timeout) };
 
         if ($@) {                                                          #Assume the connection is down...
@@ -555,6 +551,25 @@ sub Start {
         }
         Time::HiRes::sleep $message_delay;
     }
+
+    return $counter;
+}
+
+=item B<Stop>
+
+    $bot->Stop();
+
+Signals the Start() loop to exit after the current iteration completes.
+Typically called from within the background_function or message_function callback.
+
+=cut
+
+sub Stop {
+    my $self = shift;
+
+    INFO("Stop requested, will exit Start() loop after current iteration");
+    $self->_running(0);
+    return 1;
 }
 
 =item B<ReconnectToServer>
@@ -580,7 +595,14 @@ sub ReconnectToServer {
         INFO("Sleeping $sleep_time before attempting re-connect");
         sleep $sleep_time;
         $sleep_time *= 2 if ( $sleep_time < 300 );
-        $self->_init_jabber();
+        eval { $self->_init_jabber() };
+        if ($@) {
+            WARN("Reconnection attempt failed: $@");
+            # Clean up partial client state so IsConnected() stays false
+            # and next _init_jabber() creates a fresh client
+            $self->jabber_client(undef);
+            next;
+        }
         if ( defined $background_subroutine ) {
             INFO("Running background routine.");
             &$background_subroutine( $self, 0 );    # call background proc so we can check for errors while down.
@@ -699,8 +721,10 @@ sub _process_jabber_message {
             $bot_address_from = $address_type;
             last;    # do not need to loop any more.
         }
-        DEBUG("Message not relevant to bot");
-        return if ( !defined $request );
+        if ( !defined $request ) {
+            DEBUG("Message not relevant to bot");
+            return;
+        }
         $body = $request;
     }
 
@@ -725,7 +749,7 @@ sub _process_jabber_message {
 
 =item B<get_responses>
 
-    $bot->get_ident($forum_name);
+    $bot->get_responses($forum_name);
 
 Returns the array of messages we are monitoring for in supplied forum or replies with undef.
 
@@ -774,7 +798,6 @@ sub _jabber_in_iq_message {
 
     my $xmlns = $query->GetXMLNS();
     DEBUG("xmlns=$xmlns");
-    my $iqReply;
 
     # Respond to version requests with information about myself.
     if ( $xmlns eq "jabber:iq:version" ) {
@@ -782,7 +805,7 @@ sub _jabber_in_iq_message {
         # convert 5.010000 to 5.10.0
         my $perl_version = $];
         $perl_version =~ s/(\d{3})(?=\d)/$1./g;
-        $perl_version =~ s/\.0+(\d)/.$1/;
+        $perl_version =~ s/\.0+(\d)/.$1/g;
 
         $self->jabber_client->VersionSend(
             to   => $from,
@@ -791,16 +814,6 @@ sub _jabber_in_iq_message {
             os   => "Perl v$perl_version"
         );
     }
-    else {    # Unknown request. Just ignore it.
-        return;
-    }
-
-    if ($iqReply) {
-        DEBUG( "Reply: ", $iqReply->GetXML() );
-        $self->jabber_client->Send($iqReply);
-    }
-
-    #    INFO("IQ from $from ($type). XMLNS: $xmlns");
 }
 
 =item B<_jabber_presence_message> - DO NOT CALL
@@ -997,7 +1010,7 @@ sub SendJabberMessage {
     foreach my $message_chunk (@message_chunks) {
         my $msg_return = $self->_send_individual_message( $recipient, $message_chunk, $message_type, $subject, $from );
         if ( defined $msg_return ) {
-            $return_value .= $msg_return;
+            $return_value = ( $return_value // '' ) . $msg_return;
         }
     }
     return $return_value;
@@ -1029,6 +1042,18 @@ sub _send_individual_message {
         return "No recipient!\n";
     }
 
+    # Check connection first — don't count messages that can't actually be sent.
+    # Otherwise, messages attempted during disconnection inflate the hourly
+    # counter and can exhaust the limit before real messages are sent.
+    if ( !$self->IsConnected ) {
+        $subject       = "" if ( !defined $subject );          # Keep warning messages quiet.
+        $message_chunk = "" if ( !defined $message_chunk );    # Keep warning messages quiet.
+
+        ERROR( "Can't send: Jabber server is down. Tried to send: \n" . "To: $recipient\n" . "Subject: $subject\n" . "Type: $message_type\n" . "Message sent:\n" . "$message_chunk" );
+
+        return "Server is down.\n";
+    }
+
     my $yday = (localtime)[7];
     my $hour = (localtime)[2];
 
@@ -1048,16 +1073,6 @@ sub _send_individual_message {
 
         # Send 1 panic message out to jabber if this is our last message before quieting down.
         return "Too many messages ($messages_this_hour)\n";
-    }
-
-    if ( !$self->IsConnected ) {
-        $subject       = "" if ( !defined $subject );          # Keep warning messages quiet.
-        $message_chunk = "" if ( !defined $message_chunk );    # Keep warning messages quiet.
-
-        ERROR( "Can't send: Jabber server is down. Tried to send: \n" . "To: $recipient\n" . "Subject: $subject\n" . "Type: $message_type\n" . "Message sent:\n" . "$message_chunk" );
-
-        # Send 1 panic message out to jabber if this is our last message before quieting down.
-        return "Server is down.\n";
     }
 
     # Strip out anything that's not a printable character except new line, we want to be able to send multiline message, aren't we?
@@ -1131,6 +1146,11 @@ sub ChangeStatus {
     my $presence_mode = shift;
     my $status_string = shift;    # (optional)
 
+    if ( !$self->IsConnected ) {
+        WARN("Cannot change status: not connected");
+        return 0;
+    }
+
     $self->jabber_client->PresenceSend( show => $presence_mode, status => $status_string );
 
     return 1;
@@ -1148,6 +1168,11 @@ In which case we need another sub for this.
 sub GetRoster {
     my $self = shift;
 
+    if ( !$self->IsConnected ) {
+        WARN("Cannot get roster: not connected");
+        return ();
+    }
+
     my @rosterlist;
     foreach my $jid ( $self->jabber_client->RosterDBJIDs() ) {
         my $username = $jid->GetJID();
@@ -1158,7 +1183,12 @@ sub GetRoster {
 
 =item B<GetStatus>
 
-Need documentation from Yago on this sub.
+    my $status = $bot->GetStatus($jid);
+
+Returns the presence status of the given JID. Possible return values are
+"unavailable" (if not connected or JID not found in the presence database),
+"available" (if present with no specific show value), or the XMPP show value
+(e.g. "away", "xa", "dnd", "chat").
 
 =cut
 
@@ -1166,6 +1196,8 @@ sub GetStatus {
 
     my $self = shift;
     my ($jid) = shift;
+
+    return "unavailable" if !$self->IsConnected;
 
     my $Pres = $self->jabber_client->PresenceDBQuery($jid);
 
@@ -1186,7 +1218,11 @@ sub GetStatus {
 
 =item B<AddUser>
 
-Need documentation from Yago on this sub.
+    $bot->AddUser($jid);
+
+Sends a subscription request to the given JID and auto-approves their
+reciprocal subscription. This adds the user to the bot's roster and allows
+mutual presence visibility.
 
 =cut
 
@@ -1194,19 +1230,32 @@ sub AddUser {
     my $self = shift;
     my $user = shift;
 
+    if ( !$self->IsConnected ) {
+        WARN("Cannot add user '$user': not connected");
+        return;
+    }
+
     $self->jabber_client->Subscription( type => "subscribe",  to => $user );
     $self->jabber_client->Subscription( type => "subscribed", to => $user );
 }
 
 =item B<RmUser>
 
-Need documentation from Yago on this sub.
+    $bot->RmUser($jid);
+
+Sends an unsubscribe request for the given JID and revokes their subscription
+to the bot's presence. This effectively removes the user from the bot's roster.
 
 =cut
 
 sub RmUser {
     my $self = shift;
     my $user = shift;
+
+    if ( !$self->IsConnected ) {
+        WARN("Cannot remove user '$user': not connected");
+        return;
+    }
 
     $self->jabber_client->Subscription( type => "unsubscribe",  to => $user );
     $self->jabber_client->Subscription( type => "unsubscribed", to => $user );

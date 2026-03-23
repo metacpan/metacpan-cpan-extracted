@@ -1,7 +1,7 @@
 # ABSTRACT: Show activity log
 
 package App::karr::Cmd::Log;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,6 +12,7 @@ use App::karr::Role::Output;
 use JSON::MaybeXS qw( decode_json );
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 option agent => (
     is => 'ro',
@@ -108,7 +109,42 @@ App::karr::Cmd::Log - Show activity log
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr log
+    karr log --agent agent-fox
+    karr log --task 12 --last 50 --json
+
+=head1 DESCRIPTION
+
+Reads activity entries stored in C<refs/karr/log/*> and prints a merged view of
+recent actions. The command is only available when the board is inside a Git
+repository because the log lives in Git refs, not in local task files.
+
+=head1 FILTERS
+
+=over 4
+
+=item * C<--agent>
+
+Only show entries recorded for a specific agent.
+
+=item * C<--task>
+
+Only show entries associated with a specific task id.
+
+=item * C<--last>
+
+Limit the output to the most recent C<N> entries after sorting by timestamp.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Handoff>, L<App::karr::Cmd::Show>,
+L<App::karr::Cmd::Board>, L<App::karr::Cmd::AgentName>
 
 =head1 SUPPORT
 
@@ -116,6 +152,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

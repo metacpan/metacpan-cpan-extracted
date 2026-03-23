@@ -23,7 +23,7 @@ my $ok = eval <<'PERL';
             say 'hello';
         }
 
-        my $trimmed = trim("  hello \n");
+        my $trimmed = trim(" hello \n");
         my $folded  = fc("Straße");
 
         my $obj = bless {}, 'Local::Prelude::Smoke::Object';
@@ -72,30 +72,34 @@ PERL
 ok($ok, 'module imports compile and run')
     or diag $@;
 
-is($Local::Prelude::Smoke::RESULT{said},    "hello\n", 'say imported');
-is($Local::Prelude::Smoke::RESULT{trimmed}, 'hello',   'trim imported');
-is($Local::Prelude::Smoke::RESULT{folded},  'strasse', 'fc imported');
+{
+    no warnings 'once';
 
-is(
-    $Local::Prelude::Smoke::RESULT{blessed},
-    'Local::Prelude::Smoke::Object',
-    'blessed imported',
-);
+    is($Local::Prelude::Smoke::RESULT{said},    "hello\n", 'say imported');
+    is($Local::Prelude::Smoke::RESULT{trimmed}, 'hello',   'trim imported');
+    is($Local::Prelude::Smoke::RESULT{folded},  'strasse', 'fc imported');
 
-ok($Local::Prelude::Smoke::RESULT{caught_like}, 'try/catch imported');
-is($Local::Prelude::Smoke::RESULT{true_value},  1, 'true imported');
-is($Local::Prelude::Smoke::RESULT{false_value}, 0, 'false imported');
+    is(
+        $Local::Prelude::Smoke::RESULT{blessed},
+        'Local::Prelude::Smoke::Object',
+        'blessed imported',
+    );
 
-is($Local::Prelude::Smoke::RESULT{ceil_value},  2, 'ceil imported');
-is($Local::Prelude::Smoke::RESULT{floor_value}, 1, 'floor imported');
+    ok($Local::Prelude::Smoke::RESULT{caught_like}, 'try/catch imported');
+    is($Local::Prelude::Smoke::RESULT{true_value},  1, 'true imported');
+    is($Local::Prelude::Smoke::RESULT{false_value}, 0, 'false imported');
 
-ok($Local::Prelude::Smoke::RESULT{refaddr_defined}, 'refaddr imported');
-is($Local::Prelude::Smoke::RESULT{reftype}, 'HASH', 'reftype imported');
+    is($Local::Prelude::Smoke::RESULT{ceil_value},  2, 'ceil imported');
+    is($Local::Prelude::Smoke::RESULT{floor_value}, 1, 'floor imported');
 
-is($Local::Prelude::Smoke::RESULT{state_counter}, 1, 'state feature enabled');
+    ok($Local::Prelude::Smoke::RESULT{refaddr_defined}, 'refaddr imported');
+    is($Local::Prelude::Smoke::RESULT{reftype}, 'HASH', 'reftype imported');
 
-is($Local::Prelude::Smoke::RESULT{weak_before},   0, 'is_weak before weaken');
-is($Local::Prelude::Smoke::RESULT{weak_after},    1, 'weaken/is_weak imported');
-is($Local::Prelude::Smoke::RESULT{weak_restored}, 0, 'unweaken imported');
+    is($Local::Prelude::Smoke::RESULT{state_counter}, 1, 'state feature enabled');
+
+    is($Local::Prelude::Smoke::RESULT{weak_before},   0, 'is_weak before weaken');
+    is($Local::Prelude::Smoke::RESULT{weak_after},    1, 'weaken/is_weak imported');
+    is($Local::Prelude::Smoke::RESULT{weak_restored}, 0, 'unweaken imported');
+}
 
 done_testing;

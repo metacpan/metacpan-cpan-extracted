@@ -208,6 +208,44 @@ subtest 'end-to-end: query then ERROR response' => sub {
     is( $error, 'NO-USER', 'error is NO-USER' );
 };
 
+subtest 'end-to-end: ERROR response with abrupt close' => sub {
+    # On Windows, close() without shutdown() sends TCP RST (ECONNRESET).
+    # Verify ready() treats ECONNRESET as a clean disconnect rather than
+    # a fatal error, so the response that was already received is usable.
+    my ( $obj, $server ) = make_connected(
+        remoteport => 6191,
+        localport  => 23,
+        timeout    => 5,
+    );
+
+    $obj->query;
+
+    # Drain query, send ERROR response, close WITHOUT shutdown
+    read_from_peer($server);
+    print $server "6191, 23 : ERROR : NO-USER\r\n";
+    close $server;
+
+    my ( $user, $opsys, $error ) = $obj->username;
+    # On Unix the response arrives before EOF; on Windows the RST may
+    # race with the data.  Accept either a successful parse or a
+    # graceful "remote end closed connection" error.
+    if ( defined $opsys ) {
+        is( $user,  undef,     'username undef on ERROR (abrupt close)' );
+        is( $opsys, 'ERROR',   'opsys is ERROR (abrupt close)' );
+        is( $error, 'NO-USER', 'error is NO-USER (abrupt close)' );
+    }
+    else {
+        # ECONNRESET arrived before data — ready() should still not die
+        like(
+            $obj->geterror // '',
+            qr/remote end closed connection|read returned error/,
+            'abrupt close handled gracefully'
+        );
+        pass('abrupt close: opsys not available (acceptable on Windows)');
+        pass('abrupt close: error not available (acceptable on Windows)');
+    }
+};
+
 subtest 'end-to-end: auto-query from ready' => sub {
     # ready() should call query() automatically if state is 'connect'
     my ( $obj, $server ) = make_connected(
@@ -236,8 +274,9 @@ subtest 'end-to-end: auto-query from ready' => sub {
         exit 0;
     }
 
-    # parent
-    close $server;    # close server end in parent
+    # parent — do NOT close $server before ready().  On Solaris,
+    # closing one end of a PF_UNIX socketpair can invalidate the
+    # other end even across fork.
     my $ready = $obj->ready(1);
     is( $ready, 1, 'ready auto-queries and succeeds' );
 
@@ -245,6 +284,7 @@ subtest 'end-to-end: auto-query from ready' => sub {
     is( $user, 'autouser', 'username from auto-queried flow' );
 
     waitpid( $pid, 0 );
+    close $server;
 };
 
 done_testing;

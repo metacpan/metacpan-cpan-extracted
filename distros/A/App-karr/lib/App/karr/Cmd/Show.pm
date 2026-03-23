@@ -1,7 +1,7 @@
 # ABSTRACT: Show full details of a task
 
 package App::karr::Cmd::Show;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,6 +12,7 @@ use App::karr::Role::Output;
 use App::karr::Task;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
@@ -58,7 +59,23 @@ App::karr::Cmd::Show - Show full details of a task
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr show 12
+    karr show 12 --json
+
+=head1 DESCRIPTION
+
+Shows the full details of a single task, including optional metadata such as
+tags, due date, estimate, claim state, and the Markdown body. This is the most
+complete human-readable view of an individual card.
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::List>, L<App::karr::Cmd::Edit>,
+L<App::karr::Cmd::Move>, L<App::karr::Cmd::Archive>
 
 =head1 SUPPORT
 
@@ -66,6 +83,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 72 "lib/PDL/GSL/MROOT.pd"
 
 use strict;
@@ -64,7 +65,7 @@ to the algorithms in the GSL library that do not use derivatives.
 
      return $y;
   }
-#line 68 "lib/PDL/GSL/MROOT.pm"
+#line 69 "lib/PDL/GSL/MROOT.pm"
 
 
 =head1 FUNCTIONS
@@ -80,7 +81,9 @@ to the algorithms in the GSL library that do not use derivatives.
 
 =for sig
 
-  Signature: (double [io]xfree(n);   double epsabs(); int method(); SV* function1)
+ Signature: (double [io]xfree(n);   double epsabs(); int method(); SV* function1)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
 
 =for ref
 
@@ -106,9 +109,13 @@ algorithm) and the default for Epsabs is 1e-3.
    $res = gslmroot_fsolver($init, $function_ref,
                            [{Method => $method, Epsabs => $epsabs}]);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslmroot_fsolver does not process bad values.
+C<gslmroot_fsolver> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -157,7 +164,7 @@ COPYING in the PDL distribution. If this file is separated from the
 PDL distribution, the copyright notice should be included in the file.
 
 =cut
-#line 161 "lib/PDL/GSL/MROOT.pm"
+#line 168 "lib/PDL/GSL/MROOT.pm"
 
 # Exit with OK status
 

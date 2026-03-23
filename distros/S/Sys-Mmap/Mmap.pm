@@ -72,7 +72,9 @@ C<OPTIONALFILENAME> is provided, otherwise uses anonymous, shared inheritable
 memory. This memory region is inherited by any C<fork()>ed children.
 C<VARIABLE> will now refer to the contents of that file.  Any change to
 C<VARIABLE> will make an identical change to the file.  If C<LENGTH> is zero
-and a file is specified, the current length of the file will be used.  If
+and a file is specified, the current length of the file will be used.  (Note:
+the tied interface does not support C<OFFSET>, so this always maps the full
+file.)  If
 C<LENGTH> is larger then the file, and C<OPTIONALFILENAME> is provided, the
 file is grown to that length before being mapped.  This is the preferred
 interface, as it requires much less caution in handling the variable.
@@ -92,7 +94,15 @@ Maps C<LENGTH> bytes of (the underlying contents of) C<FILEHANDLE> into your
 address space, starting at offset C<OFFSET> and makes C<VARIABLE> refer to that
 memory. The C<OFFSET> argument can be omitted in which case it defaults to
 zero. The C<LENGTH> argument can be zero in which case a stat is done on
-C<FILEHANDLE> and the size of the underlying file is used instead.
+C<FILEHANDLE> and the file size is used to infer the mapping length.  If
+C<OFFSET> is also specified, the inferred length is C<file_size - OFFSET>
+(i.e. the remainder of the file from C<OFFSET> onward).  An exception is
+thrown if C<OFFSET> is at or beyond the end of the file.
+
+B<Caveat>: the underlying C<mmap()> system call requires the offset to be a
+multiple of the system page size (typically 4096 bytes).  Sys::Mmap handles
+non-page-aligned offsets internally by adjusting the mapping, but very large
+non-aligned offsets may map slightly more memory than the requested region.
 
 The C<PROTECTION> argument should be some ORed combination of the constants
 C<PROT_READ>, C<PROT_WRITE> and C<PROT_EXEC>, or else C<PROT_NONE>. The
@@ -179,7 +189,7 @@ Malcolm Beattie, 21 June 1996.
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 our $AUTOLOAD; # For sub AUTOLOAD
 

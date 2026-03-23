@@ -1,5 +1,28 @@
 Revision history for Test-MockFile
 
+0.039   3/22/2026
+
+  [Bug Fixes]
+  - GH #292 - Return EPERM for unlink on directory on Solaris, matching
+    macOS/BSD behavior. PR #307
+  - GH #292 - Add 'no strict refs' to all dir operation CORE:: fallbacks
+    to fix bareword filehandle failures on Perl < 5.016. PR #307
+  - GH #298 - Don't apply umask to explicitly provided mode in file() and
+    new_dir() constructors. Fixes CPAN smoker failures with restrictive
+    umasks. PR #299
+  - GH #297 - Skip real-file flock test when filesystem lacks flock
+    support (e.g. NFS on FreeBSD). PR #300
+  - Propagate nlink to all same-inode mocks in link() so 3+ hard links
+    get consistent nlink values. PR #290
+  - Fix chown permission check for uid-only and gid-only changes that
+    previously skipped validation entirely. PR #290
+
+  [Maintenance]
+  - Modernize CI workflow with dynamic Perl versions, disttest job, and
+    macOS cross-platform coverage. PR #306
+  - Bump minimum Perl version to 5.16 and remove dead pre-5.16 code
+    paths. PR #305
+
 0.038   3/20/2026
 
   [Improvements]

@@ -1,6 +1,4 @@
-^.github/
-^.git/.*
-^MYMETA.*
-^MANIFEST.bak
-^Makefile
-^.gitignore
+^.git
+^MYMETA\.*
+^MANIFEST\.bak$
+^Makefile$

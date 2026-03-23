@@ -1,3 +1,21 @@
+1.21 2026-03-22 Todd Rinaldo <toddr@cpan.org>
+
+  Bug Fixes:
+    * GH #14, PR #39 - Fix slave fd leak on IO::Pty destruction. The slave
+      pty file descriptor was not closed when the IO::Pty object was
+      destroyed, leaking file descriptors until process exit.
+    * GH #12, PR #40 - Fix set_raw() to modify cflag for proper raw mode
+      on BSD/macOS. set_raw() was not clearing CSIZE|PARENB or setting CS8
+      in cflag, causing incomplete raw mode on macOS, OpenBSD, and NetBSD.
+    * GH #38, PR #41 - Modernize function detection to use proper system
+      headers instead of fragile K&R-style forward declarations. The old
+      approach conflicted with real prototypes on modern compilers
+      (especially FreeBSD/Clang), causing all function checks to fail.
+
+  Improvements:
+    * PR #42 - Add BSD CI testing for FreeBSD, OpenBSD, and NetBSD via
+      cross-platform-actions. Also bumps actions/checkout from v2 to v4.
+
 1.20 2023-12-28 Todd Rinaldo <toddr@cpan.org>
     * #32 - Skip t/pty_get_winsize.t tests on AIX
     * #27 - Fix patchlevel check for util.h

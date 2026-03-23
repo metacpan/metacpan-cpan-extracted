@@ -10,7 +10,7 @@ use App::karr::Config;
 subtest 'default config' => sub {
   my $config = App::karr::Config->default_config(name => 'Test Board');
   is $config->{board}{name}, 'Test Board';
-  is $config->{next_id}, 1;
+  ok !exists $config->{next_id}, 'default config no longer persists next_id';
   ok scalar @{$config->{statuses}}, 'has statuses';
   ok scalar @{$config->{priorities}}, 'has priorities';
 };
@@ -27,28 +27,22 @@ subtest 'statuses parsing' => sub {
   is $statuses[2], 'in-progress';
 };
 
-subtest 'next_id increments' => sub {
-  my $dir = tempdir(CLEANUP => 1);
-  my $file = path($dir)->child('config.yml');
-  DumpFile($file->stringify, App::karr::Config->default_config);
+subtest 'effective config merges sparse overrides with defaults' => sub {
+  my $effective = App::karr::Config->effective_config({
+    version => 1,
+    board => { name => 'Sparse Board' },
+    defaults => { priority => 'high' },
+  });
 
-  my $config = App::karr::Config->new(file => $file);
-  is $config->next_id, 1;
-
-  # Reload to check persistence
-  my $config2 = App::karr::Config->new(file => $file);
-  is $config2->next_id, 2;
+  is $effective->{board}{name}, 'Sparse Board', 'board name override applied';
+  is $effective->{defaults}{priority}, 'high', 'nested override applied';
+  is $effective->{defaults}{status}, 'backlog', 'missing nested value supplied by defaults';
+  is $effective->{claim_timeout}, '1h', 'missing scalar supplied by defaults';
 };
 
-subtest 'wip_limit' => sub {
-  my $dir = tempdir(CLEANUP => 1);
-  my $file = path($dir)->child('config.yml');
-  DumpFile($file->stringify, App::karr::Config->default_config);
-
-  my $config = App::karr::Config->new(file => $file);
-  is $config->wip_limit('in-progress'), 3;
-  is $config->wip_limit('review'), 2;
-  ok !defined $config->wip_limit('backlog');
+subtest 'default config has no wip limits' => sub {
+  my $config = App::karr::Config->default_config;
+  ok !exists $config->{wip_limits}, 'default config no longer defines wip limits';
 };
 
 done_testing;

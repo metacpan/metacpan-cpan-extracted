@@ -1,7 +1,7 @@
 # ABSTRACT: Archive a task (soft-delete)
 
 package App::karr::Cmd::Archive;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,6 +12,7 @@ use App::karr::Role::Output;
 use App::karr::Task;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
@@ -78,7 +79,23 @@ App::karr::Cmd::Archive - Archive a task (soft-delete)
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr archive 4
+    karr archive 4,5,6 --json
+
+=head1 DESCRIPTION
+
+Soft-deletes tasks by moving them to the C<archived> status. The task file
+remains on disk, which keeps history and metadata intact while hiding the task
+from the default C<karr list> output.
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::List>, L<App::karr::Cmd::Show>,
+L<App::karr::Cmd::Delete>, L<App::karr::Cmd::Board>
 
 =head1 SUPPORT
 
@@ -86,6 +103,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

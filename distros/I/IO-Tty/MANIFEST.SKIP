@@ -9,3 +9,4 @@
 ^Makefile$
 ^IO-Tty-\d
 ^IO-Tty\.ppd$
+^cpanfile$

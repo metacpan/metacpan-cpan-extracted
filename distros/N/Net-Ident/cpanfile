@@ -1,8 +1,7 @@
 requires 'Socket';
-requires 'Fcntl';
 requires 'FileHandle';
 requires 'Carp';
-requires 'Config';
+requires 'Errno';
 requires 'Exporter';
 
 on 'test' => sub {

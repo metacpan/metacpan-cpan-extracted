@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 95;
+use Test::More tests => 99;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Instance::RGB';
@@ -10,10 +10,14 @@ my $module = 'Graphics::Toolkit::Color::Space::Instance::RGB';
 my $space = eval "require $module";
 is( not($@), 1, 'could load the module');
 is( ref $space, 'Graphics::Toolkit::Color::Space', 'got right return value by loading module');
-is( $space->name,       'RGB',                     'color space has right name');
-is( $space->is_name('rgb'), 1,                     'asked for right space name');
-is( $space->alias,         '',                     'color space has no alias name');
-is( $space->axis_count,     3,                     'color space has 3 axis');
+is( $space->name,              'RGB',              'color space has right name');
+is( $space->alias,            'SRGB',              'color space has no alias name');
+is( $space->is_name('rgb'),        1,              'asked for right space name');
+is( $space->is_name('srgb'),       1,              'asked for right space name alias');
+is( $space->is_name('lrgb'),       0,              'asked for wrong space name');
+is( $space->axis_count,            3,              'color space has 3 axis');
+is( $space->is_euclidean,          1,              'RGB is is_euclidean');
+is( $space->is_cylindrical,        0,              'RGB is not cylindrical');
 
 is( ref $space->check_value_shape( [0,0,0]),       'ARRAY', 'check RGB values works on lower bound values');
 is( ref $space->check_value_shape( [255,255,255]), 'ARRAY', 'check RGB values works on upper bound values');

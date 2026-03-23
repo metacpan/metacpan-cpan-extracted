@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 6 "lib/PDL/GSL/CDF.pd"
 
 use strict;
@@ -70,7 +71,7 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
     my $t = gsl_cdf_tdist_Pinv( $p, $df );
 
 =cut
-#line 74 "lib/PDL/GSL/CDF.pm"
+#line 75 "lib/PDL/GSL/CDF.pm"
 
 
 =head1 FUNCTIONS
@@ -88,20 +89,32 @@ while C<P(1) = p(1)>, C<Q(1) = 1 - p(1)>.
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the beta distribution with parameters I<a> and I<b>.
 
 =cut
-#line 92 "lib/PDL/GSL/CDF.pm"
+#line 93 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_beta_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_beta_P($x, $a, $b);
+ gsl_cdf_beta_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_beta_P($a, $b); # method call
+ $x->gsl_cdf_beta_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_beta_P processes bad values.
+C<gsl_cdf_beta_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -120,13 +133,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); b(); [o]out())
+ Signature: (p(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_beta_Pinv($p, $a, $b);
+ gsl_cdf_beta_Pinv($p, $a, $b, $out);  # all arguments given
+ $out = $p->gsl_cdf_beta_Pinv($a, $b); # method call
+ $p->gsl_cdf_beta_Pinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_beta_Pinv processes bad values.
+C<gsl_cdf_beta_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -145,13 +170,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_beta_Q($x, $a, $b);
+ gsl_cdf_beta_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_beta_Q($a, $b); # method call
+ $x->gsl_cdf_beta_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_beta_Q processes bad values.
+C<gsl_cdf_beta_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -170,13 +207,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); b(); [o]out())
+ Signature: (q(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_beta_Qinv($q, $a, $b);
+ gsl_cdf_beta_Qinv($q, $a, $b, $out);  # all arguments given
+ $out = $q->gsl_cdf_beta_Qinv($a, $b); # method call
+ $q->gsl_cdf_beta_Qinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_beta_Qinv processes bad values.
+C<gsl_cdf_beta_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -197,20 +246,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the binomial distribution with parameters I<p> and I<n>.
 
 =cut
-#line 201 "lib/PDL/GSL/CDF.pm"
+#line 250 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_binomial_P
 
 =for sig
 
-  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_binomial_P($k, $p, $n);
+ gsl_cdf_binomial_P($k, $p, $n, $out);  # all arguments given
+ $out = $k->gsl_cdf_binomial_P($p, $n); # method call
+ $k->gsl_cdf_binomial_P($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_binomial_P processes bad values.
+C<gsl_cdf_binomial_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -229,13 +290,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_binomial_Q($k, $p, $n);
+ gsl_cdf_binomial_Q($k, $p, $n, $out);  # all arguments given
+ $out = $k->gsl_cdf_binomial_Q($p, $n); # method call
+ $k->gsl_cdf_binomial_Q($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_binomial_Q processes bad values.
+C<gsl_cdf_binomial_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -256,20 +329,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Cauchy distribution with scale parameter I<a>.
 
 =cut
-#line 260 "lib/PDL/GSL/CDF.pm"
+#line 333 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_cauchy_P
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_cauchy_P($x, $a);
+ gsl_cdf_cauchy_P($x, $a, $out);  # all arguments given
+ $out = $x->gsl_cdf_cauchy_P($a); # method call
+ $x->gsl_cdf_cauchy_P($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_cauchy_P processes bad values.
+C<gsl_cdf_cauchy_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -288,13 +373,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); [o]out())
+ Signature: (p(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_cauchy_Pinv($p, $a);
+ gsl_cdf_cauchy_Pinv($p, $a, $out);  # all arguments given
+ $out = $p->gsl_cdf_cauchy_Pinv($a); # method call
+ $p->gsl_cdf_cauchy_Pinv($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_cauchy_Pinv processes bad values.
+C<gsl_cdf_cauchy_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -313,13 +410,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_cauchy_Q($x, $a);
+ gsl_cdf_cauchy_Q($x, $a, $out);  # all arguments given
+ $out = $x->gsl_cdf_cauchy_Q($a); # method call
+ $x->gsl_cdf_cauchy_Q($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_cauchy_Q processes bad values.
+C<gsl_cdf_cauchy_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -338,13 +447,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); [o]out())
+ Signature: (q(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_cauchy_Qinv($q, $a);
+ gsl_cdf_cauchy_Qinv($q, $a, $out);  # all arguments given
+ $out = $q->gsl_cdf_cauchy_Qinv($a); # method call
+ $q->gsl_cdf_cauchy_Qinv($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_cauchy_Qinv processes bad values.
+C<gsl_cdf_cauchy_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -365,20 +486,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the chi-squared distribution with I<nu> degrees of freedom.
 
 =cut
-#line 369 "lib/PDL/GSL/CDF.pm"
+#line 490 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_chisq_P
 
 =for sig
 
-  Signature: (x(); nu(); [o]out())
+ Signature: (x(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_chisq_P($x, $nu);
+ gsl_cdf_chisq_P($x, $nu, $out);  # all arguments given
+ $out = $x->gsl_cdf_chisq_P($nu); # method call
+ $x->gsl_cdf_chisq_P($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_chisq_P processes bad values.
+C<gsl_cdf_chisq_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -397,13 +530,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); nu(); [o]out())
+ Signature: (p(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_chisq_Pinv($p, $nu);
+ gsl_cdf_chisq_Pinv($p, $nu, $out);  # all arguments given
+ $out = $p->gsl_cdf_chisq_Pinv($nu); # method call
+ $p->gsl_cdf_chisq_Pinv($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_chisq_Pinv processes bad values.
+C<gsl_cdf_chisq_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -422,13 +567,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); nu(); [o]out())
+ Signature: (x(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_chisq_Q($x, $nu);
+ gsl_cdf_chisq_Q($x, $nu, $out);  # all arguments given
+ $out = $x->gsl_cdf_chisq_Q($nu); # method call
+ $x->gsl_cdf_chisq_Q($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_chisq_Q processes bad values.
+C<gsl_cdf_chisq_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -447,13 +604,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); nu(); [o]out())
+ Signature: (q(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_chisq_Qinv($q, $nu);
+ gsl_cdf_chisq_Qinv($q, $nu, $out);  # all arguments given
+ $out = $q->gsl_cdf_chisq_Qinv($nu); # method call
+ $q->gsl_cdf_chisq_Qinv($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_chisq_Qinv processes bad values.
+C<gsl_cdf_chisq_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -474,20 +643,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the exponential distribution with mean I<mu>.
 
 =cut
-#line 478 "lib/PDL/GSL/CDF.pm"
+#line 647 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_exponential_P
 
 =for sig
 
-  Signature: (x(); mu(); [o]out())
+ Signature: (x(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_exponential_P($x, $mu);
+ gsl_cdf_exponential_P($x, $mu, $out);  # all arguments given
+ $out = $x->gsl_cdf_exponential_P($mu); # method call
+ $x->gsl_cdf_exponential_P($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_exponential_P processes bad values.
+C<gsl_cdf_exponential_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -506,13 +687,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); mu(); [o]out())
+ Signature: (p(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_exponential_Pinv($p, $mu);
+ gsl_cdf_exponential_Pinv($p, $mu, $out);  # all arguments given
+ $out = $p->gsl_cdf_exponential_Pinv($mu); # method call
+ $p->gsl_cdf_exponential_Pinv($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_exponential_Pinv processes bad values.
+C<gsl_cdf_exponential_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -531,13 +724,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); mu(); [o]out())
+ Signature: (x(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_exponential_Q($x, $mu);
+ gsl_cdf_exponential_Q($x, $mu, $out);  # all arguments given
+ $out = $x->gsl_cdf_exponential_Q($mu); # method call
+ $x->gsl_cdf_exponential_Q($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_exponential_Q processes bad values.
+C<gsl_cdf_exponential_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -556,13 +761,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); mu(); [o]out())
+ Signature: (q(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_exponential_Qinv($q, $mu);
+ gsl_cdf_exponential_Qinv($q, $mu, $out);  # all arguments given
+ $out = $q->gsl_cdf_exponential_Qinv($mu); # method call
+ $q->gsl_cdf_exponential_Qinv($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_exponential_Qinv processes bad values.
+C<gsl_cdf_exponential_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -583,20 +800,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) for the exponential power distribution with parameters I<a> and I<b>.
 
 =cut
-#line 587 "lib/PDL/GSL/CDF.pm"
+#line 804 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_exppow_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_exppow_P($x, $a, $b);
+ gsl_cdf_exppow_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_exppow_P($a, $b); # method call
+ $x->gsl_cdf_exppow_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_exppow_P processes bad values.
+C<gsl_cdf_exppow_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -615,13 +844,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_exppow_Q($x, $a, $b);
+ gsl_cdf_exppow_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_exppow_Q($a, $b); # method call
+ $x->gsl_cdf_exppow_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_exppow_Q processes bad values.
+C<gsl_cdf_exppow_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -642,20 +883,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the F-distribution with I<nu1> and I<nu2> degrees of freedom.
 
 =cut
-#line 646 "lib/PDL/GSL/CDF.pm"
+#line 887 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_fdist_P
 
 =for sig
 
-  Signature: (x(); nu1(); nu2(); [o]out())
+ Signature: (x(); nu1(); nu2(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_fdist_P($x, $nu1, $nu2);
+ gsl_cdf_fdist_P($x, $nu1, $nu2, $out);  # all arguments given
+ $out = $x->gsl_cdf_fdist_P($nu1, $nu2); # method call
+ $x->gsl_cdf_fdist_P($nu1, $nu2, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_fdist_P processes bad values.
+C<gsl_cdf_fdist_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -674,13 +927,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); nu1(); nu2(); [o]out())
+ Signature: (p(); nu1(); nu2(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_fdist_Pinv($p, $nu1, $nu2);
+ gsl_cdf_fdist_Pinv($p, $nu1, $nu2, $out);  # all arguments given
+ $out = $p->gsl_cdf_fdist_Pinv($nu1, $nu2); # method call
+ $p->gsl_cdf_fdist_Pinv($nu1, $nu2, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_fdist_Pinv processes bad values.
+C<gsl_cdf_fdist_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -699,13 +964,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); nu1(); nu2(); [o]out())
+ Signature: (x(); nu1(); nu2(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_fdist_Q($x, $nu1, $nu2);
+ gsl_cdf_fdist_Q($x, $nu1, $nu2, $out);  # all arguments given
+ $out = $x->gsl_cdf_fdist_Q($nu1, $nu2); # method call
+ $x->gsl_cdf_fdist_Q($nu1, $nu2, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_fdist_Q processes bad values.
+C<gsl_cdf_fdist_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -724,13 +1001,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); nu1(); nu2(); [o]out())
+ Signature: (q(); nu1(); nu2(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_fdist_Qinv($q, $nu1, $nu2);
+ gsl_cdf_fdist_Qinv($q, $nu1, $nu2, $out);  # all arguments given
+ $out = $q->gsl_cdf_fdist_Qinv($nu1, $nu2); # method call
+ $q->gsl_cdf_fdist_Qinv($nu1, $nu2, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_fdist_Qinv processes bad values.
+C<gsl_cdf_fdist_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -751,20 +1040,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for a uniform distribution from I<a> to I<b>.
 
 =cut
-#line 755 "lib/PDL/GSL/CDF.pm"
+#line 1044 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_flat_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_flat_P($x, $a, $b);
+ gsl_cdf_flat_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_flat_P($a, $b); # method call
+ $x->gsl_cdf_flat_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_flat_P processes bad values.
+C<gsl_cdf_flat_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -783,13 +1084,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); b(); [o]out())
+ Signature: (p(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_flat_Pinv($p, $a, $b);
+ gsl_cdf_flat_Pinv($p, $a, $b, $out);  # all arguments given
+ $out = $p->gsl_cdf_flat_Pinv($a, $b); # method call
+ $p->gsl_cdf_flat_Pinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_flat_Pinv processes bad values.
+C<gsl_cdf_flat_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -808,13 +1121,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_flat_Q($x, $a, $b);
+ gsl_cdf_flat_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_flat_Q($a, $b); # method call
+ $x->gsl_cdf_flat_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_flat_Q processes bad values.
+C<gsl_cdf_flat_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -833,13 +1158,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); b(); [o]out())
+ Signature: (q(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_flat_Qinv($q, $a, $b);
+ gsl_cdf_flat_Qinv($q, $a, $b, $out);  # all arguments given
+ $out = $q->gsl_cdf_flat_Qinv($a, $b); # method call
+ $q->gsl_cdf_flat_Qinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_flat_Qinv processes bad values.
+C<gsl_cdf_flat_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -860,20 +1197,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the gamma distribution with parameters I<a> and I<b>.
 
 =cut
-#line 864 "lib/PDL/GSL/CDF.pm"
+#line 1201 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_gamma_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gamma_P($x, $a, $b);
+ gsl_cdf_gamma_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_gamma_P($a, $b); # method call
+ $x->gsl_cdf_gamma_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gamma_P processes bad values.
+C<gsl_cdf_gamma_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -892,13 +1241,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); b(); [o]out())
+ Signature: (p(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gamma_Pinv($p, $a, $b);
+ gsl_cdf_gamma_Pinv($p, $a, $b, $out);  # all arguments given
+ $out = $p->gsl_cdf_gamma_Pinv($a, $b); # method call
+ $p->gsl_cdf_gamma_Pinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gamma_Pinv processes bad values.
+C<gsl_cdf_gamma_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -917,13 +1278,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gamma_Q($x, $a, $b);
+ gsl_cdf_gamma_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_gamma_Q($a, $b); # method call
+ $x->gsl_cdf_gamma_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gamma_Q processes bad values.
+C<gsl_cdf_gamma_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -942,13 +1315,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); b(); [o]out())
+ Signature: (q(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gamma_Qinv($q, $a, $b);
+ gsl_cdf_gamma_Qinv($q, $a, $b, $out);  # all arguments given
+ $out = $q->gsl_cdf_gamma_Qinv($a, $b); # method call
+ $q->gsl_cdf_gamma_Qinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gamma_Qinv processes bad values.
+C<gsl_cdf_gamma_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -969,20 +1354,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Gaussian distribution with standard deviation I<sigma>.
 
 =cut
-#line 973 "lib/PDL/GSL/CDF.pm"
+#line 1358 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_gaussian_P
 
 =for sig
 
-  Signature: (x(); sigma(); [o]out())
+ Signature: (x(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gaussian_P($x, $sigma);
+ gsl_cdf_gaussian_P($x, $sigma, $out);  # all arguments given
+ $out = $x->gsl_cdf_gaussian_P($sigma); # method call
+ $x->gsl_cdf_gaussian_P($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gaussian_P processes bad values.
+C<gsl_cdf_gaussian_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1001,13 +1398,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); sigma(); [o]out())
+ Signature: (p(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gaussian_Pinv($p, $sigma);
+ gsl_cdf_gaussian_Pinv($p, $sigma, $out);  # all arguments given
+ $out = $p->gsl_cdf_gaussian_Pinv($sigma); # method call
+ $p->gsl_cdf_gaussian_Pinv($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gaussian_Pinv processes bad values.
+C<gsl_cdf_gaussian_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1026,13 +1435,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); sigma(); [o]out())
+ Signature: (x(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gaussian_Q($x, $sigma);
+ gsl_cdf_gaussian_Q($x, $sigma, $out);  # all arguments given
+ $out = $x->gsl_cdf_gaussian_Q($sigma); # method call
+ $x->gsl_cdf_gaussian_Q($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gaussian_Q processes bad values.
+C<gsl_cdf_gaussian_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1051,13 +1472,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); sigma(); [o]out())
+ Signature: (q(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gaussian_Qinv($q, $sigma);
+ gsl_cdf_gaussian_Qinv($q, $sigma, $out);  # all arguments given
+ $out = $q->gsl_cdf_gaussian_Qinv($sigma); # method call
+ $q->gsl_cdf_gaussian_Qinv($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gaussian_Qinv processes bad values.
+C<gsl_cdf_gaussian_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1078,20 +1511,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the geometric distribution with parameter I<p>.
 
 =cut
-#line 1082 "lib/PDL/GSL/CDF.pm"
+#line 1515 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_geometric_P
 
 =for sig
 
-  Signature: (ulonglong k(); p(); [o]out())
+ Signature: (ulonglong k(); p(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_geometric_P($k, $p);
+ gsl_cdf_geometric_P($k, $p, $out);  # all arguments given
+ $out = $k->gsl_cdf_geometric_P($p); # method call
+ $k->gsl_cdf_geometric_P($p, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_geometric_P processes bad values.
+C<gsl_cdf_geometric_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1110,13 +1555,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ulonglong k(); p(); [o]out())
+ Signature: (ulonglong k(); p(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_geometric_Q($k, $p);
+ gsl_cdf_geometric_Q($k, $p, $out);  # all arguments given
+ $out = $k->gsl_cdf_geometric_Q($p); # method call
+ $k->gsl_cdf_geometric_Q($p, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_geometric_Q processes bad values.
+C<gsl_cdf_geometric_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1137,20 +1594,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Type-1 Gumbel distribution with parameters I<a> and I<b>.
 
 =cut
-#line 1141 "lib/PDL/GSL/CDF.pm"
+#line 1598 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_gumbel1_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel1_P($x, $a, $b);
+ gsl_cdf_gumbel1_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_gumbel1_P($a, $b); # method call
+ $x->gsl_cdf_gumbel1_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel1_P processes bad values.
+C<gsl_cdf_gumbel1_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1169,13 +1638,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); b(); [o]out())
+ Signature: (p(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel1_Pinv($p, $a, $b);
+ gsl_cdf_gumbel1_Pinv($p, $a, $b, $out);  # all arguments given
+ $out = $p->gsl_cdf_gumbel1_Pinv($a, $b); # method call
+ $p->gsl_cdf_gumbel1_Pinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel1_Pinv processes bad values.
+C<gsl_cdf_gumbel1_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1194,13 +1675,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel1_Q($x, $a, $b);
+ gsl_cdf_gumbel1_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_gumbel1_Q($a, $b); # method call
+ $x->gsl_cdf_gumbel1_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel1_Q processes bad values.
+C<gsl_cdf_gumbel1_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1219,13 +1712,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); b(); [o]out())
+ Signature: (q(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel1_Qinv($q, $a, $b);
+ gsl_cdf_gumbel1_Qinv($q, $a, $b, $out);  # all arguments given
+ $out = $q->gsl_cdf_gumbel1_Qinv($a, $b); # method call
+ $q->gsl_cdf_gumbel1_Qinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel1_Qinv processes bad values.
+C<gsl_cdf_gumbel1_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1246,20 +1751,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Type-2 Gumbel distribution with parameters I<a> and I<b>.
 
 =cut
-#line 1250 "lib/PDL/GSL/CDF.pm"
+#line 1755 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_gumbel2_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel2_P($x, $a, $b);
+ gsl_cdf_gumbel2_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_gumbel2_P($a, $b); # method call
+ $x->gsl_cdf_gumbel2_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel2_P processes bad values.
+C<gsl_cdf_gumbel2_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1278,13 +1795,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); b(); [o]out())
+ Signature: (p(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel2_Pinv($p, $a, $b);
+ gsl_cdf_gumbel2_Pinv($p, $a, $b, $out);  # all arguments given
+ $out = $p->gsl_cdf_gumbel2_Pinv($a, $b); # method call
+ $p->gsl_cdf_gumbel2_Pinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel2_Pinv processes bad values.
+C<gsl_cdf_gumbel2_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1303,13 +1832,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel2_Q($x, $a, $b);
+ gsl_cdf_gumbel2_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_gumbel2_Q($a, $b); # method call
+ $x->gsl_cdf_gumbel2_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel2_Q processes bad values.
+C<gsl_cdf_gumbel2_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1328,13 +1869,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); b(); [o]out())
+ Signature: (q(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_gumbel2_Qinv($q, $a, $b);
+ gsl_cdf_gumbel2_Qinv($q, $a, $b, $out);  # all arguments given
+ $out = $q->gsl_cdf_gumbel2_Qinv($a, $b); # method call
+ $q->gsl_cdf_gumbel2_Qinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_gumbel2_Qinv processes bad values.
+C<gsl_cdf_gumbel2_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1355,20 +1908,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the hypergeometric distribution with parameters I<n1>, I<n2> and I<t>.
 
 =cut
-#line 1359 "lib/PDL/GSL/CDF.pm"
+#line 1912 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_hypergeometric_P
 
 =for sig
 
-  Signature: (ulonglong k(); ulonglong n1(); ulonglong n2(); ulonglong t(); [o]out())
+ Signature: (ulonglong k(); ulonglong n1(); ulonglong n2(); ulonglong t(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_hypergeometric_P($k, $n1, $n2, $t);
+ gsl_cdf_hypergeometric_P($k, $n1, $n2, $t, $out);  # all arguments given
+ $out = $k->gsl_cdf_hypergeometric_P($n1, $n2, $t); # method call
+ $k->gsl_cdf_hypergeometric_P($n1, $n2, $t, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_hypergeometric_P processes bad values.
+C<gsl_cdf_hypergeometric_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1387,13 +1952,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ulonglong k(); ulonglong n1(); ulonglong n2(); ulonglong t(); [o]out())
+ Signature: (ulonglong k(); ulonglong n1(); ulonglong n2(); ulonglong t(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_hypergeometric_Q($k, $n1, $n2, $t);
+ gsl_cdf_hypergeometric_Q($k, $n1, $n2, $t, $out);  # all arguments given
+ $out = $k->gsl_cdf_hypergeometric_Q($n1, $n2, $t); # method call
+ $k->gsl_cdf_hypergeometric_Q($n1, $n2, $t, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_hypergeometric_Q processes bad values.
+C<gsl_cdf_hypergeometric_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1414,20 +1991,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Laplace distribution with width I<a>.
 
 =cut
-#line 1418 "lib/PDL/GSL/CDF.pm"
+#line 1995 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_laplace_P
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_laplace_P($x, $a);
+ gsl_cdf_laplace_P($x, $a, $out);  # all arguments given
+ $out = $x->gsl_cdf_laplace_P($a); # method call
+ $x->gsl_cdf_laplace_P($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_laplace_P processes bad values.
+C<gsl_cdf_laplace_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1446,13 +2035,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); [o]out())
+ Signature: (p(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_laplace_Pinv($p, $a);
+ gsl_cdf_laplace_Pinv($p, $a, $out);  # all arguments given
+ $out = $p->gsl_cdf_laplace_Pinv($a); # method call
+ $p->gsl_cdf_laplace_Pinv($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_laplace_Pinv processes bad values.
+C<gsl_cdf_laplace_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1471,13 +2072,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_laplace_Q($x, $a);
+ gsl_cdf_laplace_Q($x, $a, $out);  # all arguments given
+ $out = $x->gsl_cdf_laplace_Q($a); # method call
+ $x->gsl_cdf_laplace_Q($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_laplace_Q processes bad values.
+C<gsl_cdf_laplace_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1496,13 +2109,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); [o]out())
+ Signature: (q(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_laplace_Qinv($q, $a);
+ gsl_cdf_laplace_Qinv($q, $a, $out);  # all arguments given
+ $out = $q->gsl_cdf_laplace_Qinv($a); # method call
+ $q->gsl_cdf_laplace_Qinv($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_laplace_Qinv processes bad values.
+C<gsl_cdf_laplace_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1523,20 +2148,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the logistic distribution with scale parameter I<a>.
 
 =cut
-#line 1527 "lib/PDL/GSL/CDF.pm"
+#line 2152 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_logistic_P
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_logistic_P($x, $a);
+ gsl_cdf_logistic_P($x, $a, $out);  # all arguments given
+ $out = $x->gsl_cdf_logistic_P($a); # method call
+ $x->gsl_cdf_logistic_P($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_logistic_P processes bad values.
+C<gsl_cdf_logistic_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1555,13 +2192,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); [o]out())
+ Signature: (p(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_logistic_Pinv($p, $a);
+ gsl_cdf_logistic_Pinv($p, $a, $out);  # all arguments given
+ $out = $p->gsl_cdf_logistic_Pinv($a); # method call
+ $p->gsl_cdf_logistic_Pinv($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_logistic_Pinv processes bad values.
+C<gsl_cdf_logistic_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1580,13 +2229,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_logistic_Q($x, $a);
+ gsl_cdf_logistic_Q($x, $a, $out);  # all arguments given
+ $out = $x->gsl_cdf_logistic_Q($a); # method call
+ $x->gsl_cdf_logistic_Q($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_logistic_Q processes bad values.
+C<gsl_cdf_logistic_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1605,13 +2266,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); [o]out())
+ Signature: (q(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_logistic_Qinv($q, $a);
+ gsl_cdf_logistic_Qinv($q, $a, $out);  # all arguments given
+ $out = $q->gsl_cdf_logistic_Qinv($a); # method call
+ $q->gsl_cdf_logistic_Qinv($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_logistic_Qinv processes bad values.
+C<gsl_cdf_logistic_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1632,20 +2305,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the lognormal distribution with parameters I<zeta> and I<sigma>.
 
 =cut
-#line 1636 "lib/PDL/GSL/CDF.pm"
+#line 2309 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_lognormal_P
 
 =for sig
 
-  Signature: (x(); zeta(); sigma(); [o]out())
+ Signature: (x(); zeta(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_lognormal_P($x, $zeta, $sigma);
+ gsl_cdf_lognormal_P($x, $zeta, $sigma, $out);  # all arguments given
+ $out = $x->gsl_cdf_lognormal_P($zeta, $sigma); # method call
+ $x->gsl_cdf_lognormal_P($zeta, $sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_lognormal_P processes bad values.
+C<gsl_cdf_lognormal_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1664,13 +2349,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); zeta(); sigma(); [o]out())
+ Signature: (p(); zeta(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_lognormal_Pinv($p, $zeta, $sigma);
+ gsl_cdf_lognormal_Pinv($p, $zeta, $sigma, $out);  # all arguments given
+ $out = $p->gsl_cdf_lognormal_Pinv($zeta, $sigma); # method call
+ $p->gsl_cdf_lognormal_Pinv($zeta, $sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_lognormal_Pinv processes bad values.
+C<gsl_cdf_lognormal_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1689,13 +2386,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); zeta(); sigma(); [o]out())
+ Signature: (x(); zeta(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_lognormal_Q($x, $zeta, $sigma);
+ gsl_cdf_lognormal_Q($x, $zeta, $sigma, $out);  # all arguments given
+ $out = $x->gsl_cdf_lognormal_Q($zeta, $sigma); # method call
+ $x->gsl_cdf_lognormal_Q($zeta, $sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_lognormal_Q processes bad values.
+C<gsl_cdf_lognormal_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1714,13 +2423,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); zeta(); sigma(); [o]out())
+ Signature: (q(); zeta(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_lognormal_Qinv($q, $zeta, $sigma);
+ gsl_cdf_lognormal_Qinv($q, $zeta, $sigma, $out);  # all arguments given
+ $out = $q->gsl_cdf_lognormal_Qinv($zeta, $sigma); # method call
+ $q->gsl_cdf_lognormal_Qinv($zeta, $sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_lognormal_Qinv processes bad values.
+C<gsl_cdf_lognormal_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1739,13 +2460,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ulonglong k(); p(); n(); [o]out())
+ Signature: (ulonglong k(); p(); n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_negative_binomial_P($k, $p, $n);
+ gsl_cdf_negative_binomial_P($k, $p, $n, $out);  # all arguments given
+ $out = $k->gsl_cdf_negative_binomial_P($p, $n); # method call
+ $k->gsl_cdf_negative_binomial_P($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_negative_binomial_P processes bad values.
+C<gsl_cdf_negative_binomial_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1764,13 +2497,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ulonglong k(); p(); n(); [o]out())
+ Signature: (ulonglong k(); p(); n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_negative_binomial_Q($k, $p, $n);
+ gsl_cdf_negative_binomial_Q($k, $p, $n, $out);  # all arguments given
+ $out = $k->gsl_cdf_negative_binomial_Q($p, $n); # method call
+ $k->gsl_cdf_negative_binomial_Q($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_negative_binomial_Q processes bad values.
+C<gsl_cdf_negative_binomial_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1791,20 +2536,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Pareto distribution with exponent I<a> and scale I<b>.
 
 =cut
-#line 1795 "lib/PDL/GSL/CDF.pm"
+#line 2540 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_pareto_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_pareto_P($x, $a, $b);
+ gsl_cdf_pareto_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_pareto_P($a, $b); # method call
+ $x->gsl_cdf_pareto_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_pareto_P processes bad values.
+C<gsl_cdf_pareto_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1823,13 +2580,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); b(); [o]out())
+ Signature: (p(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_pareto_Pinv($p, $a, $b);
+ gsl_cdf_pareto_Pinv($p, $a, $b, $out);  # all arguments given
+ $out = $p->gsl_cdf_pareto_Pinv($a, $b); # method call
+ $p->gsl_cdf_pareto_Pinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_pareto_Pinv processes bad values.
+C<gsl_cdf_pareto_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1848,13 +2617,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_pareto_Q($x, $a, $b);
+ gsl_cdf_pareto_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_pareto_Q($a, $b); # method call
+ $x->gsl_cdf_pareto_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_pareto_Q processes bad values.
+C<gsl_cdf_pareto_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1873,13 +2654,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); b(); [o]out())
+ Signature: (q(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_pareto_Qinv($q, $a, $b);
+ gsl_cdf_pareto_Qinv($q, $a, $b, $out);  # all arguments given
+ $out = $q->gsl_cdf_pareto_Qinv($a, $b); # method call
+ $q->gsl_cdf_pareto_Qinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_pareto_Qinv processes bad values.
+C<gsl_cdf_pareto_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1900,20 +2693,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the Pascal distribution with parameters I<p> and I<n>.
 
 =cut
-#line 1904 "lib/PDL/GSL/CDF.pm"
+#line 2697 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_pascal_P
 
 =for sig
 
-  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_pascal_P($k, $p, $n);
+ gsl_cdf_pascal_P($k, $p, $n, $out);  # all arguments given
+ $out = $k->gsl_cdf_pascal_P($p, $n); # method call
+ $k->gsl_cdf_pascal_P($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_pascal_P processes bad values.
+C<gsl_cdf_pascal_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1932,13 +2737,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Signature: (ulonglong k(); p(); ulonglong n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_pascal_Q($k, $p, $n);
+ gsl_cdf_pascal_Q($k, $p, $n, $out);  # all arguments given
+ $out = $k->gsl_cdf_pascal_Q($p, $n); # method call
+ $k->gsl_cdf_pascal_Q($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_pascal_Q processes bad values.
+C<gsl_cdf_pascal_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1959,20 +2776,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(k), Q(k) for the Poisson distribution with parameter I<mu>.
 
 =cut
-#line 1963 "lib/PDL/GSL/CDF.pm"
+#line 2780 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_poisson_P
 
 =for sig
 
-  Signature: (ulonglong k(); mu(); [o]out())
+ Signature: (ulonglong k(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_poisson_P($k, $mu);
+ gsl_cdf_poisson_P($k, $mu, $out);  # all arguments given
+ $out = $k->gsl_cdf_poisson_P($mu); # method call
+ $k->gsl_cdf_poisson_P($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_poisson_P processes bad values.
+C<gsl_cdf_poisson_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1991,13 +2820,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ulonglong k(); mu(); [o]out())
+ Signature: (ulonglong k(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_poisson_Q($k, $mu);
+ gsl_cdf_poisson_Q($k, $mu, $out);  # all arguments given
+ $out = $k->gsl_cdf_poisson_Q($mu); # method call
+ $k->gsl_cdf_poisson_Q($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_poisson_Q processes bad values.
+C<gsl_cdf_poisson_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2018,20 +2859,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Rayleigh distribution with scale parameter I<sigma>.
 
 =cut
-#line 2022 "lib/PDL/GSL/CDF.pm"
+#line 2863 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_rayleigh_P
 
 =for sig
 
-  Signature: (x(); sigma(); [o]out())
+ Signature: (x(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_rayleigh_P($x, $sigma);
+ gsl_cdf_rayleigh_P($x, $sigma, $out);  # all arguments given
+ $out = $x->gsl_cdf_rayleigh_P($sigma); # method call
+ $x->gsl_cdf_rayleigh_P($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_rayleigh_P processes bad values.
+C<gsl_cdf_rayleigh_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2050,13 +2903,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); sigma(); [o]out())
+ Signature: (p(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_rayleigh_Pinv($p, $sigma);
+ gsl_cdf_rayleigh_Pinv($p, $sigma, $out);  # all arguments given
+ $out = $p->gsl_cdf_rayleigh_Pinv($sigma); # method call
+ $p->gsl_cdf_rayleigh_Pinv($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_rayleigh_Pinv processes bad values.
+C<gsl_cdf_rayleigh_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2075,13 +2940,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); sigma(); [o]out())
+ Signature: (x(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_rayleigh_Q($x, $sigma);
+ gsl_cdf_rayleigh_Q($x, $sigma, $out);  # all arguments given
+ $out = $x->gsl_cdf_rayleigh_Q($sigma); # method call
+ $x->gsl_cdf_rayleigh_Q($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_rayleigh_Q processes bad values.
+C<gsl_cdf_rayleigh_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2100,13 +2977,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); sigma(); [o]out())
+ Signature: (q(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_rayleigh_Qinv($q, $sigma);
+ gsl_cdf_rayleigh_Qinv($q, $sigma, $out);  # all arguments given
+ $out = $q->gsl_cdf_rayleigh_Qinv($sigma); # method call
+ $q->gsl_cdf_rayleigh_Qinv($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_rayleigh_Qinv processes bad values.
+C<gsl_cdf_rayleigh_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2127,20 +3016,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the t-distribution with I<nu> degrees of freedom.
 
 =cut
-#line 2131 "lib/PDL/GSL/CDF.pm"
+#line 3020 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_tdist_P
 
 =for sig
 
-  Signature: (x(); nu(); [o]out())
+ Signature: (x(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_tdist_P($x, $nu);
+ gsl_cdf_tdist_P($x, $nu, $out);  # all arguments given
+ $out = $x->gsl_cdf_tdist_P($nu); # method call
+ $x->gsl_cdf_tdist_P($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_tdist_P processes bad values.
+C<gsl_cdf_tdist_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2159,13 +3060,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); nu(); [o]out())
+ Signature: (p(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_tdist_Pinv($p, $nu);
+ gsl_cdf_tdist_Pinv($p, $nu, $out);  # all arguments given
+ $out = $p->gsl_cdf_tdist_Pinv($nu); # method call
+ $p->gsl_cdf_tdist_Pinv($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_tdist_Pinv processes bad values.
+C<gsl_cdf_tdist_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2184,13 +3097,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); nu(); [o]out())
+ Signature: (x(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_tdist_Q($x, $nu);
+ gsl_cdf_tdist_Q($x, $nu, $out);  # all arguments given
+ $out = $x->gsl_cdf_tdist_Q($nu); # method call
+ $x->gsl_cdf_tdist_Q($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_tdist_Q processes bad values.
+C<gsl_cdf_tdist_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2209,13 +3134,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); nu(); [o]out())
+ Signature: (q(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_tdist_Qinv($q, $nu);
+ gsl_cdf_tdist_Qinv($q, $nu, $out);  # all arguments given
+ $out = $q->gsl_cdf_tdist_Qinv($nu); # method call
+ $q->gsl_cdf_tdist_Qinv($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_tdist_Qinv processes bad values.
+C<gsl_cdf_tdist_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2236,20 +3173,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the unit Gaussian distribution.
 
 =cut
-#line 2240 "lib/PDL/GSL/CDF.pm"
+#line 3177 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_ugaussian_P
 
 =for sig
 
-  Signature: (x(); [o]out())
+ Signature: (x(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_ugaussian_P($x);
+ gsl_cdf_ugaussian_P($x, $out);  # all arguments given
+ $out = $x->gsl_cdf_ugaussian_P; # method call
+ $x->gsl_cdf_ugaussian_P($out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_ugaussian_P processes bad values.
+C<gsl_cdf_ugaussian_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2268,13 +3217,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); [o]out())
+ Signature: (p(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_ugaussian_Pinv($p);
+ gsl_cdf_ugaussian_Pinv($p, $out);  # all arguments given
+ $out = $p->gsl_cdf_ugaussian_Pinv; # method call
+ $p->gsl_cdf_ugaussian_Pinv($out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_ugaussian_Pinv processes bad values.
+C<gsl_cdf_ugaussian_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2293,13 +3254,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); [o]out())
+ Signature: (x(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_ugaussian_Q($x);
+ gsl_cdf_ugaussian_Q($x, $out);  # all arguments given
+ $out = $x->gsl_cdf_ugaussian_Q; # method call
+ $x->gsl_cdf_ugaussian_Q($out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_ugaussian_Q processes bad values.
+C<gsl_cdf_ugaussian_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2318,13 +3291,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); [o]out())
+ Signature: (q(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_ugaussian_Qinv($q);
+ gsl_cdf_ugaussian_Qinv($q, $out);  # all arguments given
+ $out = $q->gsl_cdf_ugaussian_Qinv; # method call
+ $q->gsl_cdf_ugaussian_Qinv($out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_ugaussian_Qinv processes bad values.
+C<gsl_cdf_ugaussian_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2345,20 +3330,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 These functions compute the cumulative distribution functions P(x), Q(x) and their inverses for the Weibull distribution with scale I<a> and exponent I<b>.
 
 =cut
-#line 2349 "lib/PDL/GSL/CDF.pm"
+#line 3334 "lib/PDL/GSL/CDF.pm"
 
 
 =head2 gsl_cdf_weibull_P
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_weibull_P($x, $a, $b);
+ gsl_cdf_weibull_P($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_weibull_P($a, $b); # method call
+ $x->gsl_cdf_weibull_P($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_weibull_P processes bad values.
+C<gsl_cdf_weibull_P> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2377,13 +3374,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(); a(); b(); [o]out())
+ Signature: (p(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_weibull_Pinv($p, $a, $b);
+ gsl_cdf_weibull_Pinv($p, $a, $b, $out);  # all arguments given
+ $out = $p->gsl_cdf_weibull_Pinv($a, $b); # method call
+ $p->gsl_cdf_weibull_Pinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_weibull_Pinv processes bad values.
+C<gsl_cdf_weibull_Pinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2402,13 +3411,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_weibull_Q($x, $a, $b);
+ gsl_cdf_weibull_Q($x, $a, $b, $out);  # all arguments given
+ $out = $x->gsl_cdf_weibull_Q($a, $b); # method call
+ $x->gsl_cdf_weibull_Q($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_weibull_Q processes bad values.
+C<gsl_cdf_weibull_Q> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2427,13 +3448,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (q(); a(); b(); [o]out())
+ Signature: (q(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = gsl_cdf_weibull_Qinv($q, $a, $b);
+ gsl_cdf_weibull_Qinv($q, $a, $b, $out);  # all arguments given
+ $out = $q->gsl_cdf_weibull_Qinv($a, $b); # method call
+ $q->gsl_cdf_weibull_Qinv($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gsl_cdf_weibull_Qinv processes bad values.
+C<gsl_cdf_weibull_Qinv> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2460,7 +3493,7 @@ The GSL CDF module was written by J. Stover.
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 2464 "lib/PDL/GSL/CDF.pm"
+#line 3497 "lib/PDL/GSL/CDF.pm"
 
 # Exit with OK status
 

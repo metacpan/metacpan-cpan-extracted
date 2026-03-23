@@ -1,5 +1,5 @@
 
-# read only store a single color: name + values in default and original space
+# read only store of a single color: name + values in default and original space
 
 package Graphics::Toolkit::Color::Values;
 use v5.12;
@@ -47,6 +47,16 @@ sub _new_from_normal_tuple { #
     $values = $RGB->clamp( $values, 'normal' );
     my $name = Graphics::Toolkit::Color::Name::from_values( $RGB->round( $RGB->denormalize( $values ) ) );
     bless { rgb => $values, source_values => $source_values, source_space_name => $source_space_name, name => $name };
+}
+
+sub is_in_gamut {
+    my ($color_def, $range_def) = @_;
+    my $rgb = Graphics::Toolkit::Color::Name::get_values( $color_def );
+    return 1 if ref $rgb;
+    my ($values, $space_name) = Graphics::Toolkit::Color::Space::Hub::deformat( $color_def );
+    my $color_space = Graphics::Toolkit::Color::Space::Hub::get_space( $space_name );
+    return 0 unless ref $color_space;
+    return $color_space->is_in_bounds( $values ); # , $range_def 
 }
 
 #### getter ############################################################
@@ -115,23 +125,10 @@ sub add { # .values, %newval -- ~space_name --> _
 sub mix { #  @%(+percent, _color)  -- ~space_name --> _
     my ($self, $recipe, $color_space ) = @_;
     return if ref $recipe ne 'ARRAY';
-    my $percentage_sum = 0;
-    for my $ingredient (@{$recipe}){
-        return if ref $ingredient ne 'HASH' or not exists $ingredient->{'percent'};
+    my $result_values = [(0) x $color_space->axis_count];
+    for my $ingredient (@$recipe){
         return if ref $ingredient ne 'HASH' or not exists $ingredient->{'percent'}
                or not exists $ingredient->{'color'} or ref $ingredient->{'color'} ne __PACKAGE__;
-        $percentage_sum += $ingredient->{'percent'};
-    }
-    my $result_values = [(0) x $color_space->axis_count];
-    if ($percentage_sum < 100){
-        my $values = $self->shaped( $color_space->name );
-        my $mix_amount = (100 - $percentage_sum) / 100;
-        $result_values->[$_] +=  $values->[$_] * $mix_amount for 0 .. $#$values;
-    } else {
-        $percentage_sum /= 100;
-        $_->{'percent'} /= $percentage_sum for @{$recipe}; # sum of percentages has to be 100
-    }
-    for my $ingredient (@$recipe){
         my $values = $ingredient->{'color'}->shaped( $color_space->name );
         $result_values->[$_] +=  $values->[$_] * $ingredient->{'percent'} / 100 for 0 .. $#$values;
     }

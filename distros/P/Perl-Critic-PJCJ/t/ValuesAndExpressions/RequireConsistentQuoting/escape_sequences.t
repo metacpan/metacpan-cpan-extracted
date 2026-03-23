@@ -357,17 +357,17 @@ subtest "Incomplete and backslash escape sequences" => sub {
   good $Policy, 'my $incomplete = "\N{}"',
     "Double quotes with empty \\N{} escape should stay double quotes";
 
-  # Backslash at end of string
-  bad $Policy, 'my $trailing = "\\"', "use ''",
-    "Double quotes with only escaped backslash should use single quotes";
-  bad $Policy, 'my $trailing = "text\\"', "use ''",
-    "Double quotes with trailing escaped backslash should use single quotes";
+  # Backslash at end of string - \\\\ in double quotes is fine (Rule 2)
+  good $Policy, 'my $trailing = "\\"',
+    "Double quotes with only escaped backslash should stay double quotes";
+  good $Policy, 'my $trailing = "text\\"',
+    "Double quotes with trailing escaped backslash should stay double quotes";
 
-  # Multiple consecutive backslashes
-  bad $Policy, 'my $multiple = "\\\\"', "use ''",
-    "Double quotes with multiple escaped backslashes should use single quotes";
-  bad $Policy, 'my $multiple = "\\\\\\\\"', "use ''",
-    "Double quotes with many escaped backslashes should use single quotes";
+  # Multiple consecutive backslashes - fine in double quotes (Rule 2)
+  good $Policy, 'my $multiple = "\\\\"',
+    "Double quotes with multiple escaped backslashes should stay double quotes";
+  good $Policy, 'my $multiple = "\\\\\\\\"',
+    "Double quotes with many escaped backslashes should stay double quotes";
 };
 
 subtest "Mixed escape sequences" => sub {

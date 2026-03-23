@@ -35,9 +35,6 @@ subtest 'sysopen mocking works when T::MF loaded before autodie' => sub {
 };
 
 SKIP: {
-    skip "autodie exception detection requires Perl 5.14+", 1
-      if $] < 5.014;
-
     subtest 'autodie still dies on sysopen failure (reverse load order)' => sub {
         my $file = "/autodie_sysopen_rev_fail_$$";
         my $mock = Test::MockFile->file( $file, undef );

@@ -1,7 +1,7 @@
 # ABSTRACT: Delete a task
 
 package App::karr::Cmd::Delete;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,6 +12,7 @@ use App::karr::Role::Output;
 use App::karr::Task;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 option yes => (
   is => 'ro',
@@ -69,7 +70,34 @@ App::karr::Cmd::Delete - Delete a task
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr delete 9
+    karr delete 9,10,11 --yes
+    karr delete 9 --json
+
+=head1 DESCRIPTION
+
+Deletes one or more task files from the board. This is the destructive
+alternative to L<App::karr::Cmd::Archive>, which only changes the status to
+C<archived>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * C<--yes>
+
+Skips the interactive confirmation prompt for each task.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Archive>,
+L<App::karr::Cmd::Backup>, L<App::karr::Cmd::Destroy>
 
 =head1 SUPPORT
 
@@ -77,6 +105,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

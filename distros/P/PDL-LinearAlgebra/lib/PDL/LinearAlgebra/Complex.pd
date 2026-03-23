@@ -32,18 +32,14 @@ typedef PDL_Long logical;
 typedef PDL_Long integer;
 typedef PDL_Long ftnlen;
 
-#ifdef __cplusplus
-typedef logical (*L_fp)(...);
-#else
-typedef logical (*L_fp)();
-#endif
-
-#ifndef min
-#define min(a,b) ((a) <= (b) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b) ((a) >= (b) ? (a) : (b))
-#endif
+#define DEF_SEL_FUNC(letter, letter2, args) \
+  void letter ## letter2 ## select_func_set(SV* func); \
+  logical letter ## letter2 ## select_wrapper args; \
+  typedef logical (*L_ ## letter ## letter2 ## p) args;
+DEF_SEL_FUNC(f, , (complex float *p))
+DEF_SEL_FUNC(d, , (complex double *p))
+DEF_SEL_FUNC(f, g, (complex float *p, complex float *q))
+DEF_SEL_FUNC(d, g, (complex double *p, complex double *q))
 
 extern integer FORTRAN(ilaenv)(integer *ispec, char *name__, char *opts, integer *n1,
 integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
@@ -810,16 +806,9 @@ EOF
 		}
 ');
 
-pp_addhdr('
-void fselect_func_set(SV* func);
-void dselect_func_set(SV* func);
-PDL_Long fselect_wrapper(float *p);
-PDL_Long dselect_wrapper(double *p);
-');
-
 pp_defc("gees",
        _decl => <<'EOF',
-		extern int FORTRAN($TFD(c,z)gees)(char *jobvs, char *sort, L_fp select, integer *n,
+		extern int FORTRAN($TFD(c,z)gees)(char *jobvs, char *sort, L_$TFD(f,d)p select, integer *n,
 		$GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *w,
 		$GENERIC() *vs, integer *ldvs, $GENERIC() *work,
 		integer *lwork, $GENERIC() *rwork, logical *bwork, integer *info);
@@ -906,7 +895,7 @@ Complex version of L<PDL::LinearAlgebra::Real/gees>
 
 pp_defc("geesx",
        _decl => <<'EOF',
-		extern int FORTRAN($TFD(c,z)geesx)(char *jobvs, char *sort, L_fp select, char * sense,
+		extern int FORTRAN($TFD(c,z)geesx)(char *jobvs, char *sort, L_$TFD(f,d)p select, char * sense,
 		integer *n, $GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *w,
 		$GENERIC() *vs, integer *ldvs, $GENERIC() *rconde, $GENERIC() *rcondv,
 		$GENERIC() *work, integer *lwork, $GENERIC() *rwork,
@@ -1007,16 +996,9 @@ Complex version of L<PDL::LinearAlgebra::Real/geesx>
             case info is set to N+2.
 ');
 
-pp_addhdr('
-void fgselect_func_set(SV* func);
-void dgselect_func_set(SV* func);
-PDL_Long fgselect_wrapper(float *p);
-PDL_Long dgselect_wrapper(double *p);
-');
-
 pp_defc("gges",
        _decl => <<'EOF',
-		extern int FORTRAN($TFD(c,z)gges)(char *jobvsl, char *jobvsr, char *sort, L_fp
+		extern int FORTRAN($TFD(c,z)gges)(char *jobvsl, char *jobvsr, char *sort, L_$TFD(f,d)gp
 		delctg, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
 		integer *ldb, integer *sdim, $GENERIC() *alpha,
 		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
@@ -1116,7 +1098,7 @@ Complex version of L<PDL::LinearAlgebra::Real/ggees>
 
 pp_defc("ggesx",
        _decl => <<'EOF',
-		extern int FORTRAN($TFD(c,z)ggesx)(char *jobvsl, char *jobvsr, char *sort, L_fp
+		extern int FORTRAN($TFD(c,z)ggesx)(char *jobvsl, char *jobvsr, char *sort, L_$TFD(f,d)gp
 		delctg, char *sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
 		integer *ldb, integer *sdim, $GENERIC() *alpha,
 		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
@@ -1174,10 +1156,10 @@ EOF
 			integer i__1 = maxwrk;
 			integer i__2 = $SIZE(n) + $SIZE(n) * FORTRAN(ilaenv)(&c__1, "ZUNGQR"
 				, " ", &(integer){$SIZE(n)}, &c__1, &(integer){$SIZE(n)}, &c_n1, (ftnlen)6, (ftnlen)1);
-			maxwrk = max(i__1,i__2);
+			maxwrk = PDLMAX(i__1,i__2);
 			pjobvsl = \'V\';
 		}
-		lwork = max(maxwrk,minwrk);
+		lwork = PDLMAX(maxwrk,minwrk);
 
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc( 2 * lwork *  sizeof($GENERIC()));
@@ -2582,7 +2564,6 @@ EOF
 #		COMPUTATIONAL LEVEL ROUTINES
 #
 ################################################################################
-# TODO IPIV = min(m,n)
 pp_defc("getrf",
        _decl => <<'EOF',
 		extern int FORTRAN($TFD(c,z)getrf)(integer *m, integer *n, $GENERIC() *a, integer *
@@ -4951,7 +4932,7 @@ EOF
 pp_addpm({At=>'Bot'},<<'EOD');
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License as in the file Artistic_2

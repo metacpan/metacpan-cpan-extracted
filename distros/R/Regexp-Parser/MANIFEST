@@ -24,6 +24,8 @@ t/10roundtrip.t
 t/11errors.t
 t/12perl542.t
 t/13recursive.t
+t/14quotemeta.t
+t/15boundary.t
 t/99misc.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

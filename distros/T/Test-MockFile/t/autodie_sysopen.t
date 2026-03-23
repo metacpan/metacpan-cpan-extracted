@@ -70,9 +70,6 @@ subtest 'sysopen O_RDWR on existing file with autodie active' => sub {
 };
 
 SKIP: {
-    skip "autodie exception detection requires Perl 5.14+", 6
-      if $] < 5.014;
-
     subtest 'autodie dies on sysopen O_RDONLY non-existent file' => sub {
         my $file = "/autodie_sysopen_noexist_$$";
         my $mock = Test::MockFile->file( $file, undef );

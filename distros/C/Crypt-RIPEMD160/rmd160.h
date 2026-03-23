@@ -20,12 +20,11 @@
 
 /********************************************************************/
 
-/* typedef 8, 16 and 32 bit types, resp.  */
-/* adapt these, if necessary, 
-   for your operating system and compiler */
-typedef    unsigned char        byte; /* unsigned 8-bit integer */
-typedef    unsigned short       word; /* unsigned 16-bit integer */
-typedef    unsigned int        dword; /* unsigned 32-bit integer */ 
+#include <stdint.h>
+
+/* fixed-width integer types for the hash algorithm */
+typedef    uint8_t              byte; /* unsigned 8-bit integer */
+typedef    uint32_t            dword; /* unsigned 32-bit integer */
 
 /********************************************************************/
 

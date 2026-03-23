@@ -1,4 +1,4 @@
-package Perl::Critic::PJCJ v0.2.4;
+package Perl::Critic::PJCJ v0.2.5;
 
 use v5.26.0;
 use strict;
@@ -20,7 +20,7 @@ Perl::Critic::PJCJ - Perl::Critic policies for code style consistency
 
 =head1 VERSION
 
-version v0.2.4
+version v0.2.5
 
 =head1 SYNOPSIS
 

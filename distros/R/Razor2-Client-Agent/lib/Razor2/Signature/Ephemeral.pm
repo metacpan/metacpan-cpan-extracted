@@ -2,8 +2,12 @@
 
 package Razor2::Signature::Ephemeral;
 use strict;
-use Digest::SHA1;
 use Data::Dumper;
+
+BEGIN {
+  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
+  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
+}
 
 sub new {
 
@@ -88,17 +92,13 @@ sub hexdigest {
     }
 
     my $digest;
-    my $ctx = Digest::SHA1->new;
 
     if ( $seclength > 128 ) {
-        $ctx->add($section1);
-        $ctx->add($section2);
-        $digest = $ctx->hexdigest;
+        $digest = sha1_hex($section1, $section2);
     }
     else {
         debug("Sections too small... reverting back to orginal content.");
-        $ctx->add($content);
-        $digest = $ctx->hexdigest;
+        $digest = sha1_hex($content);
     }
 
     debug("Computed e-hash is $digest");

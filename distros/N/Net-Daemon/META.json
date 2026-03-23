@@ -4,9 +4,9 @@
       "Jochen Wiedmann <joe@ispsoft.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -32,22 +32,30 @@
       },
       "runtime" : {
          "requires" : {
-            "Sys::Syslog" : "0.29"
+            "Sys::Syslog" : "0.29",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/Net-Daemon/issues"
+         "web" : "https://github.com/cpan-authors/Net-Daemon/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/toddr/Net-Daemon"
+         "type" : "git",
+         "url" : "https://github.com/cpan-authors/Net-Daemon.git",
+         "web" : "https://github.com/cpan-authors/Net-Daemon"
       }
    },
-   "version" : "0.49",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.51",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

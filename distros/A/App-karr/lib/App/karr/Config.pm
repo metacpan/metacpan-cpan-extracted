@@ -1,10 +1,11 @@
 # ABSTRACT: Board configuration management
 
 package App::karr::Config;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use YAML::XS qw( LoadFile DumpFile );
 use Path::Tiny;
+
 
 has file => ( is => 'ro', required => 1 );
 has data => ( is => 'lazy' );
@@ -51,14 +52,15 @@ sub next_id {
   return $id;
 }
 
-sub wip_limit {
-  my ($self, $status) = @_;
-  return $self->data->{wip_limits}{$status};
-}
-
 sub claim_timeout {
   my ($self) = @_;
   return $self->data->{claim_timeout} // '1h';
+}
+
+sub effective_config {
+  my ($class, $overrides, %args) = @_;
+  my $defaults = $class->default_config(%args);
+  return _merge_hashes($defaults, $overrides // {});
 }
 
 sub default_config {
@@ -78,10 +80,6 @@ sub default_config {
       'archived',
     ],
     priorities => [qw( low medium high critical )],
-    wip_limits => {
-      'in-progress' => 3,
-      'review' => 2,
-    },
     classes => [
       { name => 'expedite', wip_limit => 1, bypass_column_wip => 1 },
       { name => 'fixed-date' },
@@ -94,8 +92,20 @@ sub default_config {
       priority => 'medium',
       class    => 'standard',
     },
-    next_id => 1,
   };
+}
+
+sub _merge_hashes {
+  my ($left, $right) = @_;
+  my %merged = %{$left // {}};
+  for my $key (keys %{$right // {}}) {
+    if (ref($merged{$key}) eq 'HASH' && ref($right->{$key}) eq 'HASH') {
+      $merged{$key} = _merge_hashes($merged{$key}, $right->{$key});
+    } else {
+      $merged{$key} = $right->{$key};
+    }
+  }
+  return \%merged;
 }
 
 1;
@@ -112,7 +122,29 @@ App::karr::Config - Board configuration management
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    my $config = App::karr::Config->new(
+      file => path('/tmp/karr-materialized/config.yml'),
+    );
+
+    my @statuses = $config->statuses;
+
+=head1 DESCRIPTION
+
+L<App::karr::Config> wraps the board configuration file and centralises access
+to derived values such as status names, priority order, and merged effective
+defaults. It is used by command modules that need a structured view of the
+materialized board config instead of working with raw YAML hashes. In the
+ref-first architecture the canonical config lives in C<refs/karr/config>, while
+this class works with the temporary YAML file generated for a command run.
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::BoardStore>, L<App::karr::Task>,
+L<App::karr::Git>
 
 =head1 SUPPORT
 
@@ -120,6 +152,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

@@ -13,6 +13,7 @@ use warnings;
 
 BEGIN {
     $|  = 1;
+    require File::Temp;    # load before $^W to avoid version-string warnings
     $^W = 1;
     if ( $ENV{PERL_CORE} ) {
         chdir '../lib/IPC/Run' if -d '../lib/IPC/Run';
@@ -38,9 +39,9 @@ sub get_warnings {
 select STDERR;
 select STDOUT;
 
-use Test::More tests => 288;
+use Test::More tests => 308;
 use IPC::Run::Debug qw( _map_fds );
-use IPC::Run qw( :filters :filter_imp start );
+use IPC::Run qw( :filters :filter_imp start harness timeout );
 
 require './t/lib/Test.pm';
 IPC::Run::Test->import();
@@ -136,6 +137,8 @@ sub case_inverting_filter {
 
 sub eok {
     my ( $got, $exp, $name ) = @_;
+    # Normalize CRLF to LF on Win32 — binmode-specific behavior is tested in t/binmode.t
+    $got =~ s/\r\n/\n/g if defined $got && IPC::Run::Win32_MODE();
     $got =~ s/([\000-\037])/sprintf "\\0x%02x", ord $1/ge if defined $exp;
     $exp =~ s/([\000-\037])/sprintf "\\0x%02x", ord $1/ge if defined $exp;
 
@@ -379,7 +382,7 @@ SKIP: {
 ##
 SKIP: {
     if ( IPC::Run::Win32_MODE() ) {
-        skip( "Can't spawn subroutines on $^O", 5 );
+        skip( "Can't spawn subroutines on $^O", 10 );
     }
 
     ok run sub { };
@@ -387,6 +390,25 @@ SKIP: {
     ok !run sub { exit 42 };
     ok $? ;
     is $? >> 8, 42;
+
+    ## GH#122 / GH#97: die inside a coderef must propagate the exception
+    ## back to the parent via the sync pipe, not escape into the parent's
+    ## call stack.  The parent should see the exception in $@.
+    my $lived = eval { run( sub { die "dying inside coderef\n" } ); 1 };
+    ok !$lived, 'run with dying coderef throws in parent';
+    like $@, qr/dying inside coderef/, 'parent sees child exception message';
+
+    ## Verify exception propagation with start()/finish() too.
+    $lived = eval {
+        my $h = start( sub { die "start coderef dies\n" } );
+        finish $h;
+        1;
+    };
+    ok !$lived, 'start with dying coderef throws in parent';
+    like $@, qr/start coderef dies/, 'parent sees child exception from start()';
+
+    ## Normal coderef still works fine.
+    ok run( sub { } ), 'normal coderef still succeeds';
 }
 is( _map_fds, $fd_map );
 $fd_map = _map_fds;
@@ -403,6 +425,28 @@ SKIP: {
     ok(
         !run(
             sub { exit($e) },
+            init => sub { $e = 42 }
+        )
+    );
+    ok($?);
+}
+is( _map_fds, $fd_map );
+$fd_map = _map_fds;
+
+##
+## init after timeout (https://github.com/cpan-authors/IPC-Run/issues/134)
+## A timer must not reset $cur_kid, so init can appear after timeout().
+##
+SKIP: {
+    if ( IPC::Run::Win32_MODE() ) {
+        skip( "Can't spawn subroutines on $^O", 2 );
+    }
+
+    my $e = 0;
+    ok(
+        !run(
+            sub { exit($e) },
+            timeout(10),
             init => sub { $e = 42 }
         )
     );
@@ -492,6 +536,7 @@ $h   = start [ $perl, qw( -pe BEGIN{$|=1}1 ) ], \$in, \$out;
 $in  = "\n";
 $out = "";
 pump $h until length $out;
+$out =~ s/\r\n/\n/g if IPC::Run::Win32_MODE();
 is $out, "\n";
 
 my $long_string = "x" x 20000 . "DOC2\n";
@@ -510,6 +555,7 @@ my $ok_2 = eval {
 $x = $@ if $ok_1 && !$ok_2;
 
 if ( $ok_1 && $ok_2 ) {
+    $out =~ s/\r\n/\n/g if IPC::Run::Win32_MODE();
     is $long_string, $out;
 }
 else {
@@ -614,6 +660,44 @@ is( _map_fds, $fd_map );
 
 eok( $out, $text );
 eok( $err, uc($text) );
+
+##
+## input redirection via caller writing directly to a blocking pipe
+##
+$out    = 'REPLACE ME';
+$err    = 'REPLACE ME';
+$fd_map = _map_fds;
+$h      = start \@perl, '<blocking_pipe', \*IN, '>', \$out, '2>', \$err;
+print IN $emitter_script;
+close IN or warn $!;
+$r = $h->finish;
+ok($r);
+
+ok( !$? );
+is( _map_fds, $fd_map );
+
+eok( $out, $text );
+eok( $err, uc($text) );
+
+##
+## blocking pipe should allow large writes without EAGAIN
+##
+SKIP: {
+    skip "Win32 pipes are always blocking", 2 if IPC::Run::Win32_MODE();
+
+    ## Write enough data to overflow a typical pipe buffer (64KB).
+    ## With a non-blocking pipe this would fail with EAGAIN; with
+    ## <blocking_pipe it must succeed.
+    my $big_data = "x" x 65536;
+    my $got_out   = '';
+    $h = start [ $^X, '-e', 'local $/; $_ = <STDIN>; print length($_)' ],
+      '<blocking_pipe', \*IN2, '>', \$got_out;
+    my $ok = print IN2 $big_data;
+    close IN2 or warn $!;
+    $h->finish;
+    ok( $ok, '<blocking_pipe large write succeeded without EAGAIN' );
+    is( $got_out, length($big_data), '<blocking_pipe child received all data' );
+}
 
 ##
 ## filehandle input redirection, passed via *F{IO}
@@ -874,6 +958,7 @@ $r      = run \@emitter, '>', \$out, '2>', \$err, '2>&1';
 ok($r);
 ok( !$? );
 is( _map_fds, $fd_map );
+$out =~ s/\r\n/\n/g if IPC::Run::Win32_MODE();
 like $out, qr/(?:$text){2}/i;
 eok( $err, '' );
 
@@ -975,6 +1060,7 @@ $r      = run(
 ok($r);
 ok( !$? );
 is( _map_fds, $fd_map );
+$out =~ s/\r\n/\n/g if IPC::Run::Win32_MODE();
 like $out, qr/^(?:HELLO World\n|Hello world\n){2}$/s;
 like $err, qr/^(?:[12]:Hello World.*){2}$/s;
 
@@ -992,6 +1078,7 @@ foreach my $foo (qw( | & < > >& 1>&2 >file <file 2<&1 <&- 3<&- )) {
 $out    = 'REPLACE ME';
 $err    = 'REPLACE ME';
 $fd_map = _map_fds;
+get_warnings();    # clear any prior warnings
 eval {
     $r = run(
         \@emitter, '>', \$out, '2>', \$err,
@@ -1004,6 +1091,7 @@ is( _map_fds, $fd_map );
 
 eok( $out, '' );
 eok( $err, '' );
+is( scalar get_warnings(), 0, 'no warnings when fork fails (rt.cpan.org #57186)' );
 
 $fd_map = _map_fds;
 eval { $r = run \@perl, '<file', _simulate_open_failure => 1; };
@@ -1158,6 +1246,50 @@ is( _map_fds, $fd_map );
 eok( $in,  $text );
 eok( $out, "HeLlO WoRlD\n" );
 eok( $err, uc($text) );
+
+##
+## env option: set environment variables in child without affecting parent
+##
+SKIP: {
+    if ( IPC::Run::Win32_MODE() ) {
+        skip( "env option not supported on $^O", 4 );
+    }
+
+    # env sets a variable in the child process
+    $out = '';
+    run(
+        [ @perl, '-e', 'print defined $ENV{IPC_RUN_TEST_VAR} ? $ENV{IPC_RUN_TEST_VAR} : q{}' ],
+        env => { IPC_RUN_TEST_VAR => 'hello_env' },
+        '>', \$out,
+    );
+    is( $out, 'hello_env', 'env option sets variable in child process' );
+
+    # env does not modify the parent's %ENV
+    delete local $ENV{IPC_RUN_TEST_VAR};
+    $out = '';
+    run(
+        [ @perl, '-e', 'print defined $ENV{IPC_RUN_TEST_VAR} ? $ENV{IPC_RUN_TEST_VAR} : q{}' ],
+        env => { IPC_RUN_TEST_VAR => 'child_only' },
+        '>', \$out,
+    );
+    ok( !exists $ENV{IPC_RUN_TEST_VAR}, 'env option does not affect parent %ENV' );
+
+    # init can override a variable set by env
+    $out = '';
+    run(
+        [ @perl, '-e', 'print defined $ENV{IPC_RUN_TEST_VAR} ? $ENV{IPC_RUN_TEST_VAR} : q{}' ],
+        env  => { IPC_RUN_TEST_VAR => 'from_env' },
+        init => sub { $ENV{IPC_RUN_TEST_VAR} = 'from_init' },
+        '>', \$out,
+    );
+    is( $out, 'from_init', 'init sub can override env option' );
+
+    # invalid env value croaks
+    eval {
+        harness( [ @perl, '-e', '1' ], env => 'not_a_hashref' );
+    };
+    like( $@, qr/requires a hash reference/, 'env option croaks on non-hashref' );
+}
 
 {    # no warnings for an empty path but it does die.
         # Some other OSes might not support find. Windows and UNIX do...

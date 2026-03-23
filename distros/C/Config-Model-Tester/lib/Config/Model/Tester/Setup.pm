@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester::Setup 4.009;
+package Config::Model::Tester::Setup 4.010;
 # ABSTRACT: Common test setup functions for Config::Model
 
 use warnings;
@@ -18,6 +18,7 @@ use v5.20;
 use Carp;
 
 use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 use Test::More;
 use Log::Log4perl 1.11 qw(:easy :levels);
@@ -98,7 +99,7 @@ Config::Model::Tester::Setup - Common test setup functions for Config::Model
 
 =head1 VERSION
 
-version 4.009
+version 4.010
 
 =head1 SYNOPSIS
 

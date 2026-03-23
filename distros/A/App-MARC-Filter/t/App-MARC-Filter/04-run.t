@@ -7,7 +7,7 @@ use Error::Pure::Utils qw(clean);
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Perl6::Slurp qw(slurp);
-use Test::More 'tests' => 16;
+use Test::More 'tests' => 23;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
@@ -139,6 +139,23 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-i',
+	$data_dir->file('ex1.xml')->s,
+	'leader',
+	'     nam a22        450x',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (leader != \'     nam a22        450x\').',
+);
+
+# Test.
+@ARGV = (
 	$data_dir->file('ex1.xml')->s,
 	'001',
 	'ck8300078',
@@ -151,6 +168,23 @@ stdout_is(
 	},
 	$right_ret,
 	'Run filter for MARC XML file with 1 record (001 = \'ck8300078\').',
+);
+
+# Test.
+@ARGV = (
+	'-i',
+	$data_dir->file('ex1.xml')->s,
+	'001',
+	'ck8300077',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (001 != \'ck8300077\').',
 );
 
 # Test.
@@ -171,6 +205,23 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-i',
+	$data_dir->file('ex1.xml')->s,
+	'material_type',
+	'computer_file',
+);
+$right_ret = slurp($data_dir->file('ex1.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (material_type != computer_file).',
+);
+
+# Test.
+@ARGV = (
 	$data_dir->file('ex1.xml')->s,
 	'015',
 	'a',
@@ -182,7 +233,7 @@ stdout_is(
 		return;
 	},
 	'',
-	'Run filter for MARC XML file with 1 record (015a = cnb).',
+	'Run filter for MARC XML file with 0 record (015a = cnb).',
 );
 
 # Test.
@@ -204,6 +255,24 @@ stdout_is(
 
 # Test.
 @ARGV = (
+	'-i',
+	'-r',
+	$data_dir->file('ex1.xml')->s,
+	'015',
+	'a',
+	'cnc',
+);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC XML file with 1 record (015a !~ cnc).',
+);
+
+# Test.
+@ARGV = (
 	'-o',
 	'bad',
 	$data_dir->file('ex1.xml')->s,
@@ -216,6 +285,19 @@ eval {
 };
 is($EVAL_ERROR, "Output format 'bad' doesn't supported.\n",
 	"Output format 'bad' doesn't supported.");
+clean();
+
+# Test.
+@ARGV = (
+	$data_dir->file('ex1.xml')->s,
+	'material_type',
+	'bad_material_type',
+);
+eval {
+	App::MARC::Filter->new->run;
+};
+is($EVAL_ERROR, "Bad material type.\n",
+	"Bad material type (bad_material_type).");
 clean();
 
 # Test.
@@ -234,6 +316,40 @@ stderr_like(
 	'Run filter for MARC XML file with 1 record (with error).',
 );
 
+# Test.
+@ARGV = (
+	$data_dir->file('ex4.mrc')->s,
+	'leader',
+	'01262nam a2200337   4500',
+);
+$right_ret = slurp($data_dir->file('ex4.xml')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC USMARC file with 1 record (leader = \'01262nam a2200337   4500\').',
+);
+
+# Test.
+@ARGV = (
+	'-o',
+	'ascii',
+	$data_dir->file('ex4.mrc')->s,
+	'leader',
+	'01262nam a2200337   4500',
+);
+$right_ret = slurp($data_dir->file('ex4.ascii')->s);
+stdout_is(
+	sub {
+		App::MARC::Filter->new->run;
+		return;
+	},
+	$right_ret,
+	'Run filter for MARC USMARC file with 1 record with ascii output (leader = \'01262nam a2200337   4500\').',
+);
+
 sub help {
 	my $script = abs2rel(File::Object->new->file('04-run.t')->s);
 	# XXX Hack for missing abs2rel on Windows.
@@ -241,14 +357,15 @@ sub help {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file search_item [sub_search_item] value
+Usage: $script [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_file search_item [sub_search_item] value
 	-h		Print help.
+	-i		Invert searching.
 	-n num		Number of records to output (default value is all records).
 	-o format	Output MARC format. Possible formats are ascii, xml.
 	-r		Use value as Perl regexp.
 	-v		Verbose mode.
 	--version	Print version.
-	marc_xml_file	MARC XML file.
+	marc_file	MARC XML or USMARC file.
 	search_item	Search item.
 	sub_search_item	Search sub item (required in case of MARC field).
 	value		Value to filter.

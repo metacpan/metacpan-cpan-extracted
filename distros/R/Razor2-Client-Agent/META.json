@@ -4,7 +4,7 @@
       "Vipul Ved Prakash <mail@vipul.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,14 +32,16 @@
       },
       "runtime" : {
          "requires" : {
-            "Digest::SHA1" : "0",
+            "Digest::SHA" : "0",
             "File::Copy" : "0",
             "File::Spec" : "0",
             "Getopt::Long" : "0",
+            "IO::Socket::IP" : "0",
             "MIME::Base64" : "0",
             "Test::More" : "0",
             "Time::HiRes" : "0",
-            "URI::Escape" : "0"
+            "URI::Escape" : "0",
+            "perl" : "5.010"
          }
       }
    },
@@ -55,6 +57,6 @@
          "url" : "http://github.com/toddr/Razor2-Client-Agent"
       }
    },
-   "version" : "2.86",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "2.87",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

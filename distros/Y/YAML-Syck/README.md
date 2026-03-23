@@ -54,7 +54,7 @@ leading `---\n` marker.
 
 ## $YAML::Syck::SortKeys
 
-Defaults to false.  Setting this to a true value will make `Dump` sort
+Defaults to true (1).  Setting this to a true value will make `Dump` sort
 hash keys.
 
 ## $YAML::Syck::SingleQuote
@@ -111,11 +111,49 @@ critical part. If the class has a DESTROY method, it will be called once the
 object is deleted. An example with File::Temp removing files can be found at
 [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862373](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=862373)
 
+# ENCODING-EXPLICIT FUNCTIONS
+
+The standard `Load` and `Dump` functions rely on Perl's internal string
+representation, which can lead to surprising results when a string has been
+`utf8::upgrade`'d.  The following functions make the encoding explicit:
+
+## LoadBytes($yaml\_string)
+
+Treats the input as a byte (octet) string.  If the string has been internally
+upgraded to UTF-8 by Perl, it is downgraded first so the parser sees the
+original bytes.  Croaks if the string contains characters above 0xFF.
+
+    use YAML::Syck qw(LoadBytes);
+    my $data = LoadBytes($yaml_bytes);
+
+## LoadUTF8($yaml\_string)
+
+Treats the input as UTF-8.  The parsed values will have Perl's UTF-8 flag
+set (equivalent to `local $YAML::Syck::ImplicitUnicode = 1`).  Works
+correctly regardless of whether the input string is upgraded or not.
+
+    use YAML::Syck qw(LoadUTF8);
+    my $data = LoadUTF8($yaml_utf8);
+
+## DumpBytes($data, ...)
+
+Dumps data to a YAML byte string.  The return value will never have the
+UTF-8 flag set; any UTF-8 content is encoded to raw bytes.
+
+    use YAML::Syck qw(DumpBytes);
+    my $yaml = DumpBytes($data);
+
+## DumpUTF8($data, ...)
+
+Dumps data to a YAML string with the UTF-8 flag set (equivalent to
+`local $YAML::Syck::ImplicitUnicode = 1`).
+
+    use YAML::Syck qw(DumpUTF8);
+    my $yaml = DumpUTF8($data);
+
 # BUGS
 
 Dumping Glob/IO values do not work yet.
-
-Dumping of Tied variables is unsupported.
 
 Dumping into tied (or other magic variables) with `DumpInto` might not work
 properly in all cases.
@@ -132,7 +170,7 @@ Tag names such as `!!perl/hash:Foo` is blessed into the package `Foo`, but
 the `!hs/foo` and `!!hs/Foo` tags are blessed into `hs::Foo`.  Note that
 this holds true even if the tag contains non-word characters; for example,
 `!haskell.org/Foo` is blessed into `haskell.org::Foo`.  Please use
-[Class::Rebless](https://metacpan.org/pod/Class::Rebless) to cast it into other user-defined packages. You can also
+[Class::Rebless](https://metacpan.org/pod/Class%3A%3ARebless) to cast it into other user-defined packages. You can also
 set the LoadBlessed flag false to disable all blessing.
 
 This module has [a lot of known
@@ -146,12 +184,12 @@ There are still good reasons to use this module, such as better
 interoperability with other syck wrappers (like Ruby's), or some edge
 case of YAML's syntax that it handles better. It'll probably work
 perfectly for you, but if it doesn't you may want to look at
-[YAML::XS](https://metacpan.org/pod/YAML::XS), or perhaps at looking another serialization format like
+[YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS), or perhaps at looking another serialization format like
 [JSON](https://metacpan.org/pod/JSON).
 
 # SEE ALSO
 
-[YAML](https://metacpan.org/pod/YAML), [JSON::Syck](https://metacpan.org/pod/JSON::Syck)
+[YAML](https://metacpan.org/pod/YAML), [JSON::Syck](https://metacpan.org/pod/JSON%3A%3ASyck)
 
 [http://www.yaml.org/](http://www.yaml.org/)
 

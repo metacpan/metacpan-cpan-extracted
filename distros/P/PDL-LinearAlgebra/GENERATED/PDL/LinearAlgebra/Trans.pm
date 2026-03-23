@@ -18,10 +18,11 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.433';
+   our $VERSION = '0.434';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Trans $VERSION;
+
 
 
 
@@ -62,7 +63,7 @@ acsc, csch, acsch. Beware, importing this module will overwrite the hidden
 PDL routine sec. If you need to call it specify its origin module : PDL::Basic::sec(args)
 
 =cut
-#line 66 "lib/PDL/LinearAlgebra/Trans.pm"
+#line 67 "lib/PDL/LinearAlgebra/Trans.pm"
 
 
 =head1 FUNCTIONS
@@ -78,7 +79,15 @@ PDL routine sec. If you need to call it specify its origin module : PDL::Basic::
 
 =for sig
 
-  Signature: ([io]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n))))
+ Signature: ([io]A(n,n);int deg();scale();[io]trace();int [o]ns();int [o]info(); int [t]ipiv(n); [t]wsp(wspn=CALC(3*$SIZE(n)*$SIZE(n))))
+ Types: (double)
+
+=for usage
+
+ ($ns, $info) = geexp($A, $deg, $scale, $trace);
+ geexp($A, $deg, $scale, $trace, $ns, $info);    # all arguments given
+ ($ns, $info) = $A->geexp($deg, $scale, $trace); # method call
+ $A->geexp($deg, $scale, $trace, $ns, $info);
 
 =for ref
 
@@ -114,9 +123,13 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
   = pdl(1);
  ->t->geexp(6,1,, ( = null), ( = null));
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geexp does not process bad values.
+C<geexp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -135,7 +148,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n))
+ Signature: (complex [io]A(n,n);int deg();scale();int trace();int [o]ns();int [o]info(); int [t] ipiv(n))
+ Types: (double)
+
+=for usage
+
+ ($ns, $info) = cgeexp($A, $deg, $scale, $trace);
+ cgeexp($A, $deg, $scale, $trace, $ns, $info);    # all arguments given
+ ($ns, $info) = $A->cgeexp($deg, $scale, $trace); # method call
+ $A->cgeexp($deg, $scale, $trace, $ns, $info);
 
 =for ref
 
@@ -144,9 +165,13 @@ The algorithm is described in Roger B. Sidje (rbs@maths.uq.edu.au)
 "EXPOKIT: Software Package for Computing Matrix Exponentials".
 ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgeexp does not process bad values.
+C<cgeexp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -165,19 +190,32 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info())
+ Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info())
+ Types: (double)
+
+=for usage
+
+ ($B, $info) = ctrsqrt($A, $uplo);
+ ctrsqrt($A, $uplo, $B, $info);    # all arguments given
+ ($B, $info) = $A->ctrsqrt($uplo); # method call
+ $A->ctrsqrt($uplo, $B, $info);
 
 =for ref
 
-Root square of complex triangular matrix. Uses a recurrence of Björck and Hammarling.
-(See Nicholas J. Higham. A new sqrtm for MATLAB. Numerical Analysis
-Report No. 336, Manchester Centre for Computational Mathematics,
-Manchester, England, January 1999. It's available at http://www.ma.man.ac.uk/~higham/pap-mf.html)
+Root square of complex triangular matrix. Uses a recurrence of BjÃ¶rck and Hammarling.
 If uplo is true, A is lower triangular.
+
+See Nicholas J. Higham, A new sqrtm for MATLAB. Numerical Analysis
+Report No. 336, Manchester Centre for Computational Mathematics,
+Manchester, England, January 1999, available at L<https://web.archive.org/web/20210420221902/https://www.maths.manchester.ac.uk/~higham/papers/narep336.pdf>
+
+=pod
+
+Broadcasts over its inputs.
 
 =for bad
 
-ctrsqrt does not process bad values.
+C<ctrsqrt> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -196,16 +234,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info(); complex [t]diag(n); SV* func)
+ Signature: (complex [io]A(n,n);int uplo();complex [o] B(n,n);int [o]info(); complex [t]diag(n); SV* func)
+ Types: (double)
+
+=for usage
+
+ ($B, $info) = ctrfun($A, $uplo, $func);
+ ctrfun($A, $uplo, $B, $info, $func);    # all arguments given
+ ($B, $info) = $A->ctrfun($uplo, $func); # method call
+ $A->ctrfun($uplo, $B, $info, $func);
 
 =for ref
 
 Apply an arbitrary function to a complex triangular matrix. Uses a recurrence of Parlett.
 If uplo is true, A is lower triangular.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctrfun does not process bad values.
+C<ctrfun> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -219,7 +269,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 810 "lib/PDL/LinearAlgebra/Trans.pd"
+#line 772 "lib/PDL/LinearAlgebra/Trans.pd"
 
 my $pi;
 BEGIN { $pi = pdl(3.1415926535897932384626433832795029) }
@@ -1198,14 +1248,14 @@ Improve (msqrt,mlog) / r2C
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 1209 "lib/PDL/LinearAlgebra/Trans.pm"
+#line 1259 "lib/PDL/LinearAlgebra/Trans.pm"
 
 # Exit with OK status
 

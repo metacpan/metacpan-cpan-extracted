@@ -1,21 +1,27 @@
-ChangeLog		Module history
-MANIFEST		This file
-MANIFEST.SKIP		Files to ignore while generating the dist archive
-Makefile.PL		Makefile generator
-README			Ascii docs
-lib/Net/Daemon.pm	Net::Daemon module
-lib/Net/Daemon/Log.pm	Support class for logging
-lib/Net/Daemon/Test.pm	Support class for writing tests
-t/base.t		Base test
-t/config.t		Test of config file handling and access control
-t/fork.t		Test of a forking server
-t/forkm.t		Test of a forking server with multiple clients
-t/ithread.t		Test of a multithreaded server (ithreads)
-t/ithreadm.t		Test of a multithreaded server with multiple clients
-t/loop.t		Test the loop-timeout option
-t/loop-child.t		Same with loop-child set
-t/server		Script used by the server tests
-t/single.t		Test of a single-mode server
-t/unix.t		Test for Unix sockets
+ChangeLog			Module history
+lib/Net/Daemon.pm		Net::Daemon module
+lib/Net/Daemon/Log.pm		Support class for logging
+lib/Net/Daemon/Test.pm		Support class for writing tests
+Makefile.PL			Makefile generator
+MANIFEST			This file
+MANIFEST.SKIP			Files to ignore while generating the dist archive
+README				Ascii docs
+t/base.t			Base test
+t/clone.t			Test of post_clone() hook for per-connection init
+t/config.t			Test of config file handling and access control
+t/fork.t			Test of a forking server
+t/forkm.t			Test of a forking server with multiple clients
+t/ithread-detach.t		Test that ChildFunc detaches threads
+t/ithread.t			Test of a multithreaded server (ithreads)
+t/ithreadm.t			Test of a multithreaded server with multiple clients
+t/listen.t			Test the --listen option
+t/logfile.t			Test logfile string handling in Net::Daemon::Log
+t/loop-child.t			Same with loop-child set
+t/loop.t			Test the loop-timeout option
+t/reap.t
+t/server			Script used by the server tests
+t/single.t			Test of a single-mode server
+t/unix.t			Test for Unix sockets
+t/unix_clients.t		Test for Unix sockets with clients defined
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

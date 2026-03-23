@@ -20,7 +20,7 @@ sub new {
     my %args = @_;
     my $basis = Graphics::Toolkit::Color::Space::Basis->new( $args{'axis'}, $args{'short'}, $args{'name'}, $args{'alias'});
     return $basis unless ref $basis;
-    my $shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, $args{'type'}, $args{'range'}, $args{'precision'} );
+    my $shape = Graphics::Toolkit::Color::Space::Shape->new( $basis, $args{'type'}, $args{'range'}, $args{'precision'}, $args{'constraint'} );
     return $shape unless ref $shape;
     my $format = Graphics::Toolkit::Color::Space::Format->new( $basis, $args{'value_form'}, $args{'prefix'}, $args{'suffix'} );
     return $format unless ref $format;
@@ -67,9 +67,11 @@ sub select_tuple_value_from_name { shift->basis->select_tuple_value_from_axis_na
 
 ########################################################################
 sub shape              { $_[0]{'shape'} }
-sub is_linear          { shift->shape->is_linear() }          #                                    --> ?
-sub is_in_linear_bounds{ shift->shape->is_in_linear_bounds(@_)}#@+values                           --> ?
+sub is_euclidean       { shift->shape->is_euclidean() }       #                                    --> ?
+sub is_cylindrical     { shift->shape->is_cylindrical }       #                                    --> ?
 sub is_equal           { shift->shape->is_equal( @_ ) }       # @+val_a, @+val_b -- @+precision    --> ?
+sub is_in_linear_bounds{ shift->shape->is_in_linear_bounds(@_)}#@+values -- @+range                --> ?
+sub is_in_bounds       { shift->shape->is_in_bounds(@_)}      # @+values -- @+range                --> ?
 sub round              { shift->shape->round( @_ ) }          # @+values -- @+precision            --> @+rvals       # result values
 sub clamp              { shift->shape->clamp( @_ ) }          # @+values -- @+range                --> @+rvals       # result values
 sub check_value_shape  { shift->shape->check_value_shape( @_)}# @+values -- @+range, @+precision   --> @+values|!~   # errmsg
@@ -145,24 +147,25 @@ the names, shapes and sizes of the axis and all specific algorithms,
 such as converter and (de-) formatter. Because these are all instances
 of the same class, they can be treated the same from the outside.
 
-    use Graphics::Toolkit::Color::Space;
+    use Graphics::Toolkit::Color::Space qw/:all/;
+    use warnings;
 
-    my $def = Graphics::Toolkit::Color::Space->new (
-                        name => 'demo',              # space name, defaults to axis initials
-                       alias => 'alias',             # second space name
-                        axis => [qw/one two three/], # long axis names
-                       short => [qw/1 2 3/],         # short names, defaults to first char of long
-                        type => [qw/linear circular angular/], # axis type
-                       range => [1, [-2, 2], [-3, 3]],         # axis value range
-                   precision => [-1, 0, 1],                    # precision of value output
-                      suffix => ['', '', '%'],                 # suffix of value in output
+    Graphics::Toolkit::Color::Space->new (
+              name => 'demo',               # space name, defaults to concatenated short axis names
+             alias => 'alias',              # second, user set space name, often a shortcut
+              axis => [qw/red green blue/], # long axis names, required !
+             short => [qw/Re Gr Bl/],       # short names, defaults to first char of long
+              type => [qw/linear circular angular/], # axis type
+             range => [1, [-2, 2], [-3, 3]],         # axis value range
+         precision => [-1, 0, 1],                    # precision of value output
+            suffix => ['', '', '%'],                 # suffix of value in in and output
+        value_form => ['\d{3}','\d{1,3}','\d{1,3}'], # special value shape
+            values => {read => \&read_vals, write => \&write_vals }, # translate values to numbers
+           convert => {RGB => [\&to_rgb, \&from_rgb, {..flags..}]},  # converter CODE, required !
+            format => {'hex_string'=> [\&hex_from_tuple,\&tuple_from_hex]}, # custom IO format
+
     );
 
-    $def->add_converter(    'RGB',   \&to_rgb, \&from_rgb );
-    $def->add_formatter(   'name',   sub {...} );
-    $def->add_deformatter( 'name',   sub {...} );
-    $def->add_constraint(  'name', 'error', sub {...}, sub {} );
-    $def->set_value_formatter( sub {...}, sub {...}, )
 
 
 =head1 DESCRIPTION
@@ -173,6 +176,8 @@ These instances are supposed to be loaded by L<Graphics::Toolkit::Color::Space::
 So if you are an author of your own color space, you have to call C<*::Hub::add_space>
 manually at runtime or submit you color space as merge request and I add
 your space into the list of automatically loaded spaces.
+This class has many methods but only one for the color space author,
+since all informations are submitted as constructor arguments.
 
 =head1 METHODS
 
@@ -221,47 +226,26 @@ precision is again -1.
 The argument B<suffix> is only interesting if color values has to have a suffix
 like I<'%'> in '63%'. Its defaults to the empty string.
 
+B<value_form> is for very special cases when axis values are not simply
+numerical. You can pass you own regular expressions and even provide vuiy
+B<values> code that translates them into numeric valus that can be treated
+like the rest. And even if that is not possible and GTC has simply to ignore
+one axis value you can still set the axis I<type> to I<'no'>.
 
-=head2 add_converter
+Most important is the B<convert> argument, which is beside the B<axis> the
+only required one. Here you pass the converter code to one of the already
+accepted color spaces. The name of this space is the first value of the
+passed ARRAY. Two CODE refst have to follow for both directions of
+converter. These cubs take the value tuple as first arg and also return
+the converted tuple (ARRAY ref) as first return value. The first value
+of this ARRAY is a HASH with flags that tell the internals if the converter
+need and return normalized values or not. Using this might improve the
+precision of multiple hop conversions.
 
-Takes three arguments:
+If you want to invent a special format for your color space - with
+B<format> you can! This option was introduced, so that the RGB space
+can have it's  special I<hex_string> and I<array> formats.
 
-1. A name of a space the values will be converter from and to
-(usually just 'RGB').
-
-2. & 3. Two CODE refs of the actual converter methods, which have to take
-the normalized values as a list and return normalized values as a list.
-The first CODE converts to the named (by first argument) space and
-the second from the named into the name space the objects implements.
-
-=head2 add_formatter
-
-Takes two arguments: name of the format and CODE ref that takes the
-denormalized values as a list and returns whatever the formatter wishes
-to provide, which then the GTC method I<values> can provide.
-
-=head2 add_deformatter
-
-Same as I<add_formatter> but the CODE does here the opposite transformation,
-providing a format reading ability for the GTC constructor.
-
-=head2 add_constraint
-
-This method enables you cut off corners from you color space. It has to
-get four arguments. 1 a constraint name. 2. an error message, that gets
-shown if a color has one of these illegal values that are inside the
-normal ranges but outside of this constraint. 3. a CODE ref of a routine
-that gets a tuple and gives a perly true if the constraint was violated.
-4. another routine that can remedy violating values.
-
-=head2 set_value_formatter
-
-This method was introduced for the I<NCol> space, where one value is
-partially represented by letters. When reading a I<NCol> color definition
-from an input, this value has to be translated into a number, so it
-can be then processed as other numerical values. That will be done by
-the first routine, given by this method. The second routine does just
-the translation back, when the values has to become an output.
 
 
 =head1 AUTHOR

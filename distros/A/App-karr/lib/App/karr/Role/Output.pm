@@ -1,9 +1,10 @@
 # ABSTRACT: Role providing common output format options
 
 package App::karr::Role::Output;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo::Role;
 use MooX::Options;
+
 
 option json => (
   is => 'ro',
@@ -35,7 +36,12 @@ App::karr::Role::Output - Role providing common output format options
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 DESCRIPTION
+
+Small role that adds shared output options for commands with alternate
+renderings and provides a JSON printer used throughout the CLI.
 
 =head1 SUPPORT
 
@@ -43,6 +49,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

@@ -10,6 +10,6 @@ foreach my $param (@ARGV) {
   push (@params,split(/\s/,$param));
 }
 my $stty = IO::Stty::stty(\*STDIN,@params);
-if ($stty ne '0 but true') {
+if (defined $stty && $stty ne '0 but true') {
   print $stty;
 }

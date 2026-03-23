@@ -66,7 +66,19 @@ subtest 'flock with sysopen on mocked file succeeds' => sub {
 };
 
 subtest 'flock on real file falls through to CORE::flock' => sub {
+
+    # Some CPAN smoker environments have TMPDIR on a filesystem that does
+    # not support flock (e.g. NFS on FreeBSD).  Detect this before loading
+    # Test::MockFile's overrides into the picture.
     my $path = $real_tempfile->filename;
+
+    # Probe with a handle opened *before* Test::MockFile was loaded so
+    # we're hitting CORE::flock directly via the File::Temp handle.
+    if ( !CORE::flock( $real_tempfile, LOCK_EX | LOCK_NB ) ) {
+        skip_all("flock not supported on this filesystem ($path): $!");
+    }
+    CORE::flock( $real_tempfile, LOCK_UN );
+
     open( my $fh, '>', $path ) or die "Cannot open $path: $!";
 
     ok( flock( $fh, LOCK_EX | LOCK_NB ), 'LOCK_EX|LOCK_NB on real file succeeds' );

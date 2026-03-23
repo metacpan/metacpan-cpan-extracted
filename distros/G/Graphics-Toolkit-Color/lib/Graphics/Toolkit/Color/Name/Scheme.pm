@@ -98,7 +98,7 @@ sub names_in_range {
 #### util ##############################################################
 sub _clean_name {
     my $name = shift;
-    $name =~ tr/_'//d;
+    $name =~ tr/_'\///d;
     lc $name;
 }
 
@@ -111,6 +111,7 @@ __END__
 =head1 NAME
 
 Graphics::Toolkit::Color::Name::Scheme - a name space for color names
+
 
 =head1 SYNOPSIS
 
@@ -126,12 +127,11 @@ Graphics::Toolkit::Color::Name::Scheme - a name space for color names
 =head1 DESCRIPTION
 
 This module is mainly for internal usage to model name spaces for HTML,
-SVG, Pantone ... colors. You may Use it to create your own set color names
-or to give color name constante slightly different values.
+SVG, Pantone ... colors. You may use it to create your own set of color
+names or to give color name constants a slightly different value.
 
 
 =head1 ROUTINES
-
 
 =head2 new
 

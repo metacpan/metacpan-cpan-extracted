@@ -152,6 +152,49 @@ not_there:
 
 static size_t pagesize = 0;
 
+/* Magic structure to track mmap info for proper cleanup */
+typedef struct {
+    void  *base_addr;  /* actual address returned by mmap() */
+    size_t total_len;  /* actual length passed to mmap() (len + slop) */
+} mmap_info_t;
+
+#define MMAP_MAGIC_TYPE PERL_MAGIC_ext
+
+static int mmap_magic_free(pTHX_ SV *sv, MAGIC *mg) {
+    mmap_info_t *info = (mmap_info_t *) mg->mg_ptr;
+    if (info) {
+        if (info->base_addr) {
+            munmap((MMAP_RETTYPE) info->base_addr, info->total_len);
+            info->base_addr = NULL;
+        }
+        Safefree(info);
+        mg->mg_ptr = NULL;
+    }
+    return 0;
+}
+
+static MGVTBL mmap_magic_vtbl = {
+    0,                /* get */
+    0,                /* set */
+    0,                /* len */
+    0,                /* clear */
+    mmap_magic_free,  /* free */
+    0,                /* copy */
+    0,                /* dup */
+    0                 /* local */
+};
+
+/* Find our mmap magic on an SV, or NULL if not present */
+static MAGIC *find_mmap_magic(SV *sv) {
+    MAGIC *mg;
+    if (SvTYPE(sv) >= SVt_PVMG) {
+        for (mg = SvMAGIC(sv); mg; mg = mg->mg_moremagic) {
+            if (mg->mg_type == MMAP_MAGIC_TYPE && mg->mg_virtual == &mmap_magic_vtbl)
+                return mg;
+        }
+    }
+    return NULL;
+}
 
 #if _FILE_OFFSET_BITS > 32
 #define get_off(a) (atoll(a))
@@ -229,7 +272,10 @@ mmap(var, len, prot, flags, fh = 0, off_string)
 	      if (fstat(fd, &st) == -1) {
                   croak("mmap: no len provided, fstat failed, unable to infer length");
               }
-	      len = st.st_size;
+	      if (off >= st.st_size) {
+	          croak("mmap: offset (%"IVdf") is at or beyond end of file (size %"IVdf")", (IV)off, (IV)st.st_size);
+	      }
+	      len = st.st_size - off;
 	  }
         }
 
@@ -257,8 +303,21 @@ mmap(var, len, prot, flags, fh = 0, off_string)
         /* would sv_usepvn() be cleaner/better/different? would still try to realloc... */
 	SvPVX(var) = (char *) addr + slop;
 	SvCUR_set(var, len);
-	SvLEN_set(var, slop);
+	SvLEN_set(var, 0);   /* must be 0 so Perl won't Safefree() the mmap'd pointer */
 	SvPOK_only(var);
+
+        /* Attach magic to handle munmap on cleanup */
+        {
+            mmap_info_t *info;
+            MAGIC *mg;
+            Newxz(info, 1, mmap_info_t);
+            info->base_addr = (void *) addr;
+            info->total_len = len + slop;
+            mg = sv_magicext(var, NULL, MMAP_MAGIC_TYPE, &mmap_magic_vtbl,
+                             (const char *) info, 0);
+            mg->mg_flags |= MGf_LOCAL;
+        }
+
         ST(0) = sv_2mortal(newSVnv((IV) addr));
 
 SV *
@@ -277,9 +336,28 @@ munmap(var)
             return;
         }
 
-        if (munmap((MMAP_RETTYPE) SvPVX(var) - SvLEN(var), SvCUR(var) + SvLEN(var)) == -1) {
-            croak("munmap failed! errno %d %s\n", errno, strerror(errno));
-            return;
+        {
+            MAGIC *mg = find_mmap_magic(var);
+            if (mg) {
+                mmap_info_t *info = (mmap_info_t *) mg->mg_ptr;
+                if (munmap((MMAP_RETTYPE) info->base_addr, info->total_len) == -1) {
+                    croak("munmap failed! errno %d %s\n", errno, strerror(errno));
+                    return;
+                }
+                info->base_addr = NULL;  /* prevent double munmap in magic free */
+            } else {
+                /* fallback for hardwire'd or legacy variables without magic */
+                /* SvLEN > 0 means this is a regular Perl string, not mmap'd */
+                if (SvLEN(var) != 0) {
+                    errno = EINVAL;
+                    croak("munmap failed! errno %d %s\n", errno, strerror(errno));
+                    return;
+                }
+                if (munmap((MMAP_RETTYPE) SvPVX(var), SvCUR(var)) == -1) {
+                    croak("munmap failed! errno %d %s\n", errno, strerror(errno));
+                    return;
+                }
+            }
         }
         SvREADONLY_off(var);
         SvPVX(var) = 0;
@@ -289,14 +367,37 @@ munmap(var)
         ST(0) = &PL_sv_yes;
 
 void
-DESTROY(var) 
+DESTROY(var)
     SV *     var
     PROTOTYPE: $
     CODE:
         /* XXX refrain from dumping core if this var wasnt previously mmap'd*/
-        if (munmap((MMAP_RETTYPE) SvPVX(var), SvCUR(var)) == -1) {
-            croak("munmap failed! errno %d %s\n", errno, strerror(errno));
-            return;
+
+        /* For tied objects: DESTROY receives the blessed reference (\$mmap_sv),
+         * not the mmap'd SV itself.  Dereference to reach the actual mapping. */
+        if (SvROK(var))
+            var = SvRV(var);
+
+        {
+            MAGIC *mg = find_mmap_magic(var);
+            if (mg) {
+                mmap_info_t *info = (mmap_info_t *) mg->mg_ptr;
+                if (info->base_addr) {
+                    if (munmap((MMAP_RETTYPE) info->base_addr, info->total_len) == -1) {
+                        croak("munmap failed! errno %d %s\n", errno, strerror(errno));
+                        return;
+                    }
+                    info->base_addr = NULL;
+                }
+            } else {
+                /* SvLEN > 0 means this is a regular Perl string, not mmap'd */
+                if (SvLEN(var) != 0)
+                    return;
+                if (munmap((MMAP_RETTYPE) SvPVX(var), SvCUR(var)) == -1) {
+                    croak("munmap failed! errno %d %s\n", errno, strerror(errno));
+                    return;
+                }
+            }
         }
         SvREADONLY_off(var);
         SvPVX(var) = 0;

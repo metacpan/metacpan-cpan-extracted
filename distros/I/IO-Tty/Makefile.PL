@@ -37,7 +37,7 @@ $^W=1;
 
 my %define;
 my @libs;
-my $Package_Version = '1.20';  # keep this consistent with Tty.pm
+my $Package_Version = '1.21';  # keep this consistent with Tty.pm
 my $Is_Beta = ($Package_Version =~ m/_/);
 
 open(SUB, ">xssubs.c") or die "open: $!";
@@ -136,24 +136,48 @@ my %funcs = (ttyname      => "",
 foreach my $f (sort keys %funcs) {
   open(TST,">functest_$f.c") or die "open: $!";
   print TST <<"ESQ";
-/* System header to define __stub macros and hopefully few prototypes,
-    which can conflict with char \$ac_func (); below.  */
-#include <assert.h>
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
+/* Enable POSIX and platform extensions so functions like grantpt,
+   ptsname, openpty etc. are declared in standard headers.  */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
 #endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $f ();
-char (*f) ();
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 600
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
+#ifdef __NetBSD__
+#ifndef _NETBSD_SOURCE
+#define _NETBSD_SOURCE
+#endif
+#endif
+#ifdef __APPLE__
+#ifndef _DARWIN_C_SOURCE
+#define _DARWIN_C_SOURCE
+#endif
+#endif
 
-#ifdef F77_DUMMY_MAIN
-#  ifdef __cplusplus
-     extern "C"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <string.h>
+#include <fcntl.h>
+
+/* Try platform-specific headers for openpty and friends */
+#if defined(__has_include)
+#  if __has_include(<pty.h>)
+#    include <pty.h>
 #  endif
-   int F77_DUMMY_MAIN() { return 1; }
+#  if __has_include(<libutil.h>)
+#    include <libutil.h>
+#  endif
+#  if __has_include(<util.h>)
+#    include <util.h>
+#  endif
 #endif
+
 int
 main ()
 {
@@ -163,8 +187,13 @@ main ()
 #if defined (__stub_$f) || defined (__stub___$f)
 choke me
 #else
-f = $f;
-f();
+/* Undef any macro wrapper (e.g. macOS _FORTIFY_SOURCE) so we get
+   the real function symbol for the linker check below.  */
+#undef $f
+/* Cast through void* to avoid incompatible-function-pointer-types
+   errors on newer clang (e.g. strlcpy returns size_t, not void).  */
+void *fptr = (void *) $f;
+(void)fptr;
 #endif
 
   ;

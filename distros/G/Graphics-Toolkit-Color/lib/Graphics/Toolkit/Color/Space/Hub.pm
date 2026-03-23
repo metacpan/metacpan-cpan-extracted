@@ -262,7 +262,8 @@ B<red> (short B<r>) range: 0 .. 255, B<green> (short B<g>) range: 0 .. 255
 and B<blue> (short B<b>) range: 0 .. 255.
 A higher value means a stronger beam of that base color flows into the mix
 above a black background, so that black is (0,0,0), white (255,255,255)
-and a pure red (fully saturated color) is (255, 0, 0).
+and a pure red (fully saturated color) is (255, 0, 0). The space can also
+be addressed under its alias name: B<sRGB>(standard RGB).
 
 =head2 CMY
 

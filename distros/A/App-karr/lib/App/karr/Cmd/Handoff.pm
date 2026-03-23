@@ -1,7 +1,7 @@
 # ABSTRACT: Hand off a task for review
 
 package App::karr::Cmd::Handoff;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -14,6 +14,7 @@ use App::karr::Config;
 use Time::Piece;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output', 'App::karr::Role::ClaimTimeout';
+
 
 option claim => (
   is => 'ro',
@@ -128,7 +129,44 @@ App::karr::Cmd::Handoff - Hand off a task for review
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr handoff 7 --claim agent-fox
+    karr handoff 7 --claim agent-fox --note "Implementation complete" --timestamp
+    karr handoff 7 --claim agent-fox --block "waiting for QA" --release
+
+=head1 DESCRIPTION
+
+Moves a task into C<review> and refreshes its claim so the next stage of work
+can see who handed it off. The command can append a note, add a blocker, and
+optionally release the claim after the handoff.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * C<--claim>
+
+Required. Identifies the agent performing the handoff and is validated against
+the current claim unless that claim has expired.
+
+=item * C<--note>, C<--timestamp>
+
+Append handoff text to the task body, optionally prefixed with the current UTC
+timestamp.
+
+=item * C<--block>, C<--release>
+
+Record a blocking reason and/or clear the claim immediately after the handoff.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Move>,
+L<App::karr::Cmd::Edit>, L<App::karr::Cmd::Log>
 
 =head1 SUPPORT
 
@@ -136,6 +174,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

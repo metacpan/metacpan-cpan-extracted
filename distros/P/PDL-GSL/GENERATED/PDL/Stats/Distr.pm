@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 7 "lib/PDL/Stats/Distr.pd"
 
 use strict;
@@ -29,8 +30,6 @@ use warnings;
 
 use Carp;
 use PDL::LiteF;
-
-my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
 
 =head1 NAME
 
@@ -58,21 +57,17 @@ Parameter estimate is maximum likelihood estimate when there is closed form esti
 
       # fitted normal curve probabilities
     my $p = $xvals->pdf_gaussian($m, $v);
-
-    use PDL::Graphics::PGPLOT::Window;
-    my $win = pgwin( Dev=>"/xs" );
-
-    $win->bin( $hist );
-    $win->hold;
-    $win->line( $p, {COLOR=>2} );
-    $win->close;
+    use PDL::Graphics::Simple;
+    my $win = pgswin();
+    $win->plot( with=>'bins', $hist, with=>'lines', style => 2, $p );
+    undef $win; # to close
 
 Or, play with different distributions with B<plot_distr> :)
 
     $data->plot_distr( 'gaussian', 'lognormal' );
 
 =cut
-#line 76 "lib/PDL/Stats/Distr.pm"
+#line 71 "lib/PDL/Stats/Distr.pm"
 
 
 =head1 FUNCTIONS
@@ -88,7 +83,8 @@ Or, play with different distributions with B<plot_distr> :)
 
 =for sig
 
-  Signature: (a(n); float+ [o]alpha(); float+ [o]beta())
+ Signature: (a(n); float+ [o]alpha(); float+ [o]beta())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -98,9 +94,13 @@ Or, play with different distributions with B<plot_distr> :)
 
 beta distribution. pdf: f(x; a,b) = 1/B(a,b) x^(a-1) (1-x)^(b-1)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mme_beta processes bad values.
+C<mme_beta> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -119,15 +119,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); float+ [o]p())
+ Signature: (x(); a(); b(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pdf_beta($x, $a, $b);
+ pdf_beta($x, $a, $b, $p);  # all arguments given
+ $p = $x->pdf_beta($a, $b); # method call
+ $x->pdf_beta($a, $b, $p);
 
 =for ref
 
 probability density function for beta distribution. x defined on [0,1].
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pdf_beta processes bad values.
+C<pdf_beta> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -146,7 +158,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); int [o]n_(); float+ [o]p())
+ Signature: (a(n); int [o]n_(); float+ [o]p())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -156,9 +169,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 binomial distribution. pmf: f(k; n,p) = (n k) p^k (1-p)^(n-k) for k = 0,1,2..n
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mme_binomial processes bad values.
+C<mme_binomial> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -177,15 +194,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort x(); ushort n(); p(); float+ [o]out())
+ Signature: (ushort x(); ushort n(); p(); float+ [o]out())
+ Types: (float double ldouble)
+
+=for usage
+
+ $out = pmf_binomial($x, $n, $p);
+ pmf_binomial($x, $n, $p, $out);  # all arguments given
+ $out = $x->pmf_binomial($n, $p); # method call
+ $x->pmf_binomial($n, $p, $out);
 
 =for ref
 
 probability mass function for binomial distribution.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pmf_binomial processes bad values.
+C<pmf_binomial> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -204,7 +233,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]l())
+ Signature: (a(n); float+ [o]l())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -214,9 +244,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 exponential distribution. mle same as method of moments estimate.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mle_exp processes bad values.
+C<mle_exp> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -235,15 +269,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); l(); float+ [o]p())
+ Signature: (x(); l(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pdf_exp($x, $l);
+ pdf_exp($x, $l, $p);  # all arguments given
+ $p = $x->pdf_exp($l); # method call
+ $x->pdf_exp($l, $p);
 
 =for ref
 
 probability density function for exponential distribution.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pdf_exp processes bad values.
+C<pdf_exp> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -262,7 +308,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]shape(); float+ [o]scale())
+ Signature: (a(n); float+ [o]shape(); float+ [o]scale())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -272,9 +319,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 two-parameter gamma distribution
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mme_gamma processes bad values.
+C<mme_gamma> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -293,15 +344,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); t(); float+ [o]p())
+ Signature: (x(); a(); t(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pdf_gamma($x, $a, $t);
+ pdf_gamma($x, $a, $t, $p);  # all arguments given
+ $p = $x->pdf_gamma($a, $t); # method call
+ $x->pdf_gamma($a, $t, $p);
 
 =for ref
 
 probability density function for two-parameter gamma distribution.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pdf_gamma processes bad values.
+C<pdf_gamma> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -320,7 +383,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]m(); float+ [o]v())
+ Signature: (a(n); float+ [o]m(); float+ [o]v())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -330,9 +394,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 gaussian aka normal distribution. same results as $data->average and $data->var. mle same as method of moments estimate.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mle_gaussian processes bad values.
+C<mle_gaussian> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -351,15 +419,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); m(); v(); float+ [o]p())
+ Signature: (x(); m(); v(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pdf_gaussian($x, $m, $v);
+ pdf_gaussian($x, $m, $v, $p);  # all arguments given
+ $p = $x->pdf_gaussian($m, $v); # method call
+ $x->pdf_gaussian($m, $v, $p);
 
 =for ref
 
 probability density function for gaussian distribution.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pdf_gaussian processes bad values.
+C<pdf_gaussian> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -378,15 +458,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]p())
+ Signature: (a(n); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = mle_geo($a);
+ mle_geo($a, $p);  # all arguments given
+ $p = $a->mle_geo; # method call
+ $a->mle_geo($p);
 
 =for ref
 
 geometric distribution. mle same as method of moments estimate.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mle_geo processes bad values.
+C<mle_geo> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -405,15 +497,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort x(); p(); float+ [o]out())
+ Signature: (ushort x(); p(); float+ [o]out())
+ Types: (float double ldouble)
+
+=for usage
+
+ $out = pmf_geo($x, $p);
+ pmf_geo($x, $p, $out);  # all arguments given
+ $out = $x->pmf_geo($p); # method call
+ $x->pmf_geo($p, $out);
 
 =for ref
 
 probability mass function for geometric distribution. x >= 0.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pmf_geo processes bad values.
+C<pmf_geo> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -432,15 +536,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]p())
+ Signature: (a(n); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = mle_geosh($a);
+ mle_geosh($a, $p);  # all arguments given
+ $p = $a->mle_geosh; # method call
+ $a->mle_geosh($p);
 
 =for ref
 
 shifted geometric distribution. mle same as method of moments estimate.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mle_geosh processes bad values.
+C<mle_geosh> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -459,15 +575,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort x(); p(); float+ [o]out())
+ Signature: (ushort x(); p(); float+ [o]out())
+ Types: (float double ldouble)
+
+=for usage
+
+ $out = pmf_geosh($x, $p);
+ pmf_geosh($x, $p, $out);  # all arguments given
+ $out = $x->pmf_geosh($p); # method call
+ $x->pmf_geosh($p, $out);
 
 =for ref
 
 probability mass function for shifted geometric distribution. x >= 1.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pmf_geosh processes bad values.
+C<pmf_geosh> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -486,7 +614,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]m(); float+ [o]v())
+ Signature: (a(n); float+ [o]m(); float+ [o]v())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -496,9 +625,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 lognormal distribution. maximum likelihood estimation.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mle_lognormal processes bad values.
+C<mle_lognormal> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -517,7 +650,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]m(); float+ [o]v())
+ Signature: (a(n); float+ [o]m(); float+ [o]v())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -527,9 +661,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 lognormal distribution. method of moments estimation.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mme_lognormal processes bad values.
+C<mme_lognormal> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -548,15 +686,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); m(); v(); float+ [o]p())
+ Signature: (x(); m(); v(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pdf_lognormal($x, $m, $v);
+ pdf_lognormal($x, $m, $v, $p);  # all arguments given
+ $p = $x->pdf_lognormal($m, $v); # method call
+ $x->pdf_lognormal($m, $v, $p);
 
 =for ref
 
 probability density function for lognormal distribution. x > 0. v > 0.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pdf_lognormal processes bad values.
+C<pdf_lognormal> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -575,7 +725,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]r(); float+ [o]p())
+ Signature: (a(n); float+ [o]r(); float+ [o]p())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -585,9 +736,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 negative binomial distribution. pmf: f(x; r,p) = (x+r-1  r-1) p^r (1-p)^x for x=0,1,2...
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mme_nbd processes bad values.
+C<mme_nbd> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -606,15 +761,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort x(); r(); p(); float+ [o]out())
+ Signature: (ushort x(); r(); p(); float+ [o]out())
+ Types: (float double ldouble)
+
+=for usage
+
+ $out = pmf_nbd($x, $r, $p);
+ pmf_nbd($x, $r, $p, $out);  # all arguments given
+ $out = $x->pmf_nbd($r, $p); # method call
+ $x->pmf_nbd($r, $p, $out);
 
 =for ref
 
 probability mass function for negative binomial distribution.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pmf_nbd processes bad values.
+C<pmf_nbd> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -633,7 +800,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]k(); float+ [o]xm())
+ Signature: (a(n); float+ [o]k(); float+ [o]xm())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -643,9 +811,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 pareto distribution. pdf: f(x; k,xm) = k xm^k / x^(k+1) for x >= xm > 0.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mme_pareto processes bad values.
+C<mme_pareto> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -664,15 +836,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); k(); xm(); float+ [o]p())
+ Signature: (x(); k(); xm(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pdf_pareto($x, $k, $xm);
+ pdf_pareto($x, $k, $xm, $p);  # all arguments given
+ $p = $x->pdf_pareto($k, $xm); # method call
+ $x->pdf_pareto($k, $xm, $p);
 
 =for ref
 
 probability density function for pareto distribution. x >= xm > 0.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pdf_pareto processes bad values.
+C<pdf_pareto> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -691,7 +875,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n); float+ [o]l())
+ Signature: (a(n); float+ [o]l())
+ Types: (float double ldouble)
 
 =for usage
 
@@ -701,9 +886,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 poisson distribution. pmf: f(x;l) = e^(-l) * l^x / x!
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-mle_poisson processes bad values.
+C<mle_poisson> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -722,15 +911,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); l(); float+ [o]p())
+ Signature: (x(); l(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pmf_poisson($x, $l);
+ pmf_poisson($x, $l, $p);  # all arguments given
+ $p = $x->pmf_poisson($l); # method call
+ $x->pmf_poisson($l, $p);
 
 =for ref
 
 Probability mass function for poisson distribution. Uses Stirling's formula for x > 85.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pmf_poisson processes bad values.
+C<pmf_poisson> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -749,15 +950,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); l(); [o]p())
+ Signature: (x(); l(); [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pmf_poisson_stirling($x, $l);
+ pmf_poisson_stirling($x, $l, $p);  # all arguments given
+ $p = $x->pmf_poisson_stirling($l); # method call
+ $x->pmf_poisson_stirling($l, $p);
 
 =for ref
 
 Probability mass function for poisson distribution. Uses Stirling's formula for all values of the input. See http://en.wikipedia.org/wiki/Stirling's_approximation for more info.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pmf_poisson_stirling processes bad values.
+C<pmf_poisson_stirling> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -776,15 +989,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (ushort x(); l(); float+ [o]p())
+ Signature: (ushort x(); l(); float+ [o]p())
+ Types: (float double ldouble)
+
+=for usage
+
+ $p = pmf_poisson_factorial($x, $l);
+ pmf_poisson_factorial($x, $l, $p);  # all arguments given
+ $p = $x->pmf_poisson_factorial($l); # method call
+ $x->pmf_poisson_factorial($l, $p);
 
 =for ref
 
 Probability mass function for poisson distribution. Input is limited to x < 170 to avoid gsl_sf_fact() overflow.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pmf_poisson_factorial processes bad values.
+C<pmf_poisson_factorial> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -793,7 +1018,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 652 "lib/PDL/Stats/Distr.pd"
+#line 646 "lib/PDL/Stats/Distr.pd"
 sub PDL::pmf_poisson_factorial {
   my ($x, $l) = @_;
   my $pdlx = PDL->topdl($x);
@@ -802,7 +1027,7 @@ sub PDL::pmf_poisson_factorial {
   PDL::_pmf_poisson_factorial_int($pdlx, $l, my $p = PDL->null);
   $p;
 }
-#line 806 "lib/PDL/Stats/Distr.pm"
+#line 1031 "lib/PDL/Stats/Distr.pm"
 
 *pmf_poisson_factorial = \&PDL::pmf_poisson_factorial;
 
@@ -812,9 +1037,9 @@ sub PDL::pmf_poisson_factorial {
 
 
 
-#line 668 "lib/PDL/Stats/Distr.pd"
+#line 662 "lib/PDL/Stats/Distr.pd"
 
-#line 669 "lib/PDL/Stats/Distr.pd"
+#line 663 "lib/PDL/Stats/Distr.pd"
 
 =head2 plot_distr
 
@@ -827,13 +1052,11 @@ Plots data distribution. When given specific distribution(s) to fit, returns % r
 Default options (case insensitive):
 
     MAXBN => 20,
-      # see PDL::Graphics::PGPLOT::Window for next options
-    WIN   => undef,   # pgwin object. not closed here if passed
+      # see PDL::Graphics::Simple for next options
+    WIN   => undef,   # pgswin object. not closed here if passed
                       # allows comparing multiple distr in same plot
                       # set env before passing WIN
-    DEV   => '/xs' ,  # open and close dev for plotting if no WIN
-                      # defaults to '/png' in Windows
-    COLOR => 1,       # color for data distr
+    COLOR => 1,       # "style" for data distr
 
 =for usage
 
@@ -843,7 +1066,7 @@ Usage:
     my $data = grandom( 500, 3 )->abs;
       # ll on plot is sum across 3 data curves
     my ($ll, $pars)
-      = $data->plot_distr( 'gaussian', 'lognormal', {DEV=>'/png'} );
+      = $data->plot_distr( 'gaussian', 'lognormal' );
 
       # pars are from normalized data (ie data / bin_size)
     print "$_\t@{$pars->{$_}}\n" for (sort keys %$pars);
@@ -853,24 +1076,21 @@ Usage:
 
 *plot_distr = \&PDL::plot_distr;
 sub PDL::plot_distr {
-  require PDL::Graphics::PGPLOT::Window;
+  require PDL::Graphics::Simple;
   my ($self, @distr) = @_;
 
   my %opt = (
     MAXBN => 20,
-    WIN   => undef,     # pgwin object. not closed here if passed
-    DEV   => $DEV,      # open and close default win if no WIN
-    COLOR => 1,         # color for data distr
+    WIN   => undef,     # pgswin object. not closed here if passed
+    COLOR => 1,         # "style" for data distr
   );
-  my $opt = pop @distr
-    if ref $distr[-1] eq 'HASH';
+  my $opt = ref($distr[-1]) eq 'HASH' ? pop @distr : undef;
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
   $self = $self->squeeze;
 
     # use int range, step etc for int xvals--pmf compatible
-  my $INT = 1
-    if grep { /(?:binomial)|(?:geo)|(?:nbd)|(?:poisson)/ } @distr;
+  my $INT = !!grep { /(?:binomial)|(?:geo)|(?:nbd)|(?:poisson)/ } @distr;
 
   my ($range, $step, $step_int);
   $range = $self->max->sclr - $self->min->sclr;
@@ -888,23 +1108,16 @@ sub PDL::plot_distr {
   my $xvals_int
     = PDL::ceil($self->min->sclr) + sequence( $opt{MAXBN} ) * $step_int;
   $xvals_int = $xvals_int->where( $xvals_int <= $xvals->max )->sever;
+  my $win = $opt{WIN} || PDL::Graphics::Simple::pgswin();
+  my $inc = 0; # key only once
+  $win->plot((map +(with=>'lines', style=>$opt{COLOR}, ($inc++?():(key=>"Base")), $xvals, $_), $hist->dog), {
+    xlabel=>'xvals', ylabel=>'probability',
+    legend=>'tc', # top centre
+  });
+  return if !@distr;
 
-  my $win = $opt{WIN};
-  if (!$win) {
-    $win = PDL::Graphics::PGPLOT::Window::pgwin( Dev=>$opt{DEV} );
-    $win->env($xvals->minmax,0,1, {XTitle=>'xvals', YTitle=>'probability'});
-  }
-
-  $win->line( $xvals, $hist, { COLOR=>$opt{COLOR} } );
-
-  if (!@distr) {
-    $win->close
-      unless defined $opt{WIN};
-    return;
-  }
-
-  my (%ll, %pars, @text, $c);
-  $c = $opt{COLOR};        # fitted lines start from ++$c
+  my (%ll, %pars);
+  my $c = $opt{COLOR};        # fitted lines start from ++$c
   for my $distr ( @distr ) {
       # find mle_ or mme_$distr;
     my @funcs = grep { /_$distr$/ } (keys %PDL::Stats::Distr::);
@@ -920,24 +1133,18 @@ sub PDL::plot_distr {
     eval {
       my @paras = $nrmd->$f_para();
       $pars{$distr} = \@paras;
-
       @paras = map { $_->dummy(0) } @paras;
       $ll{$distr} = $nrmd->$f_prob( @paras )->log->sumover;
-      push @text, sprintf "$distr  LL = %.2f", $ll{$distr}->sum;
-
+      my %curve_opts = (style=>++$c, key=>sprintf("$distr  LL = %.2f", $ll{$distr}->sum));
+      my $inc = 0; # curve_opts only once
       if ($f_prob =~ /^pdf/) {
-        $win->line( $xvals, ($xvals/$step)->$f_prob(@paras), {COLOR=>++$c} );
-      }
-      else {
-        $win->points( $xvals_int, ($xvals_int/$step_int)->$f_prob(@paras), {COLOR=>++$c} );
+        $win->oplot( map +(with=>'lines', ($inc++?():%curve_opts), $xvals, $_), ($xvals/$step)->$f_prob(@paras)->dog );
+      } else {
+        $win->oplot( with=>'points', %curve_opts, $xvals_int, ($xvals_int/$step_int)->$f_prob(@paras) );
       }
     };
     carp $@ if $@;
   }
-  $win->legend(\@text, ($xvals->min->sclr + $xvals->max->sclr)/2, .95,
-               {COLOR=>[$opt{COLOR}+1 .. $c], TextFraction=>.75} );
-  $win->close
-    unless defined $opt{WIN};
   return (\%ll, \%pars);
 }
 
@@ -947,9 +1154,9 @@ GSL - GNU Scientific Library
 
 =head1 SEE ALSO
 
-PDL::Graphics::PGPLOT
+L<PDL::Graphics::Simple>
 
-PDL::GSL::CDF
+L<PDL::GSL::CDF>
 
 =head1 AUTHOR
 
@@ -958,7 +1165,7 @@ Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>, David Mert
 All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDL distribution.
 
 =cut
-#line 962 "lib/PDL/Stats/Distr.pm"
+#line 1169 "lib/PDL/Stats/Distr.pm"
 
 # Exit with OK status
 

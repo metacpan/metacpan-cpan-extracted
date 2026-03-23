@@ -7,6 +7,7 @@
 
 package Test::MockFile;
 
+use 5.016;
 use strict;
 use warnings;
 
@@ -48,11 +49,11 @@ files without touching the file system.
 
 =head1 VERSION
 
-Version 0.038
+Version 0.039
 
 =cut
 
-our $VERSION = '0.038';
+our $VERSION = '0.039';
 
 our %files_being_mocked;
 
@@ -976,21 +977,16 @@ sub _throw_autodie {
 # would overwrite our per-package overrides during compilation).
 # Wrapped in BEGIN+eval to avoid "Too late to run CHECK block"
 # warning when the module is loaded at runtime via require.
-# ${^GLOBAL_PHASE} requires Perl 5.14+; on older Perls we skip
-# the CHECK block entirely (import-time installation is sufficient
-# when autodie is loaded before Test::MockFile).
 BEGIN {
-    if ( $] >= 5.014 ) {
-        eval 'CHECK {
-            _install_package_overrides($_) for @_tmf_callers;
-            # If autodie was loaded during compilation (possibly after T::MF),
-            # mark all T::MF callers for the autodie fallback detection.
-            if ($INC{"autodie.pm"} || $INC{"Fatal.pm"}) {
-                $_autodie_callers{$_} = 1 for @_tmf_callers;
-            }
-        }'
-          unless ${^GLOBAL_PHASE} eq 'RUN';
-    }
+    eval 'CHECK {
+        _install_package_overrides($_) for @_tmf_callers;
+        # If autodie was loaded during compilation (possibly after T::MF),
+        # mark all T::MF callers for the autodie fallback detection.
+        if ($INC{"autodie.pm"} || $INC{"Fatal.pm"}) {
+            $_autodie_callers{$_} = 1 for @_tmf_callers;
+        }
+    }'
+      unless ${^GLOBAL_PHASE} eq 'RUN';
 }
 
 =head1 SUBROUTINES/METHODS
@@ -2189,7 +2185,7 @@ sub unlink {
     }
 
     if ( $self->is_dir ) {
-        if ( $] < 5.019 && ( $^O eq 'darwin' or $^O =~ m/bsd/i ) ) {
+        if ( $] < 5.019 && ( $^O eq 'darwin' or $^O =~ m/bsd/i or $^O eq 'solaris' ) ) {
             $! = EPERM;
         }
         else {
@@ -2367,11 +2363,6 @@ sub size {
     # Previously, length($arrayref) stringified the contents() return,
     # producing a nonsensical ~20-byte value.
     return $self->{'blksize'} if $self->is_dir;
-
-    # length undef is 0 not undef in perl 5.10
-    if ( $] < 5.012 ) {
-        return undef unless $self->exists;
-    }
 
     return length $self->contents;
 }
@@ -2660,13 +2651,10 @@ B<opendir>'s related functions.
 
 =cut
 
-# goto doesn't work below 5.16
-#
 # goto messed up refcount between 5.22 and 5.26.
 # Broken in 7bdb4ff0943cf93297712faf504cdd425426e57f
 # Fixed  in https://rt.perl.org/Public/Bug/Display.html?id=115814
 sub _goto_is_available {
-    return 0 if $] < 5.015;
     return 1 if $] < 5.021;
     return 1 if $] > 5.027;
     return 0;
@@ -3294,6 +3282,7 @@ sub __opendir (*$) {
 
         goto \&CORE::opendir if _goto_is_available();
 
+        no strict 'refs';    ## no critic - bareword filehandles need symbolic refs
         return CORE::opendir( $_[0], @_[ 1 .. $#_ ] );
     }
 
@@ -3317,6 +3306,7 @@ sub __opendir (*$) {
     if ( !$mock_dir ) {
         _real_file_access_hook( "opendir", \@_ );
         goto \&CORE::opendir if _goto_is_available();
+        no strict 'refs';    ## no critic - bareword filehandles need symbolic refs
         return CORE::opendir( $_[0], $_[1] );
     }
 
@@ -3366,6 +3356,7 @@ sub __readdir (*) {
     if ( !$mocked_dir ) {
         _real_file_access_hook( 'readdir', \@_ );
         goto \&CORE::readdir if _goto_is_available();
+        no strict 'refs';    ## no critic - bareword filehandles need symbolic refs
         return CORE::readdir( $_[0] );
     }
 
@@ -3411,6 +3402,7 @@ sub __telldir (*) {
     if ( !$mocked_dir ) {
         _real_file_access_hook( 'telldir', \@_ );
         goto \&CORE::telldir if _goto_is_available();
+        no strict 'refs';    ## no critic - bareword filehandles need symbolic refs
         return CORE::telldir($fh);
     }
 
@@ -3443,6 +3435,7 @@ sub __rewinddir (*) {
     if ( !$mocked_dir ) {
         _real_file_access_hook( 'rewinddir', \@_ );
         goto \&CORE::rewinddir if _goto_is_available();
+        no strict 'refs';    ## no critic - bareword filehandles need symbolic refs
         return CORE::rewinddir( $_[0] );
     }
 
@@ -3476,6 +3469,7 @@ sub __seekdir (*$) {
     if ( !$mocked_dir ) {
         _real_file_access_hook( 'seekdir', \@_ );
         goto \&CORE::seekdir if _goto_is_available();
+        no strict 'refs';    ## no critic - bareword filehandles need symbolic refs
         return CORE::seekdir( $fh, $goto );
     }
 
@@ -3512,6 +3506,7 @@ sub __closedir (*) {
     if ( !$mocked_dir ) {
         _real_file_access_hook( 'closedir', \@_ );
         goto \&CORE::closedir if _goto_is_available();
+        no strict 'refs';    ## no critic - bareword filehandles need symbolic refs
         return CORE::closedir($fh);
     }
 
@@ -3718,9 +3713,20 @@ sub __link ($$) {
     $new_mock->{'inode'}       = $source_mock->{'inode'};
     $new_mock->{'dev'}         = $source_mock->{'dev'};
 
-    # Update link counts
+    # Update link counts — propagate to ALL same-inode mocks (mirrors unlink behavior)
     $source_mock->{'nlink'}++;
     $new_mock->{'nlink'} = $source_mock->{'nlink'};
+    my $inode = $source_mock->{'inode'};
+    if ($inode) {
+        for my $path ( keys %files_being_mocked ) {
+            my $m = $files_being_mocked{$path};
+            next if !$m || $m == $source_mock || $m == $new_mock;
+            next if !$m->exists;
+            if ( defined $m->{'inode'} && $m->{'inode'} == $inode ) {
+                $m->{'nlink'} = $source_mock->{'nlink'};
+            }
+        }
+    }
 
     # Update ctime (inode change) on both
     my $now = time;
@@ -4034,8 +4040,14 @@ sub __chown (@) {
 
     # Only check permissions once (before the loop), not per-file.
     # -1 means "keep as is" — no permission needed for unchanged fields.
-    if ( !$is_root && $uid != -1 && $gid != -1 ) {
-        if ( $eff_uid != $target_uid || !$is_in_group ) {
+    # POSIX: non-root cannot change uid; can only change gid to a group they belong to.
+    if ( !$is_root ) {
+        if ( $uid != -1 && $eff_uid != $target_uid ) {
+            $! = EPERM;
+            _maybe_throw_autodie( 'chown', @_ );
+            return 0;
+        }
+        if ( $gid != -1 && !$is_in_group ) {
             $! = EPERM;
             _maybe_throw_autodie( 'chown', @_ );
             return 0;

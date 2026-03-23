@@ -30,6 +30,11 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
       "test" : {
          "requires" : {
             "Test::More" : "0"
@@ -51,6 +56,6 @@
          "web" : "https://github.com/cpan-authors/IO-Stty"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

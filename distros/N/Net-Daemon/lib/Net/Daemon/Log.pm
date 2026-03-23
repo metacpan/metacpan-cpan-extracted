@@ -23,7 +23,7 @@ use warnings;
 
 package Net::Daemon::Log;
 
-our $VERSION = '0.49';
+our $VERSION = '0.02';
 
 use Config;
 
@@ -43,7 +43,27 @@ use Config;
 sub OpenLog($) {
     my $self = shift;
     return 1 unless ref($self);
-    return $self->{'logfile'} if defined( $self->{'logfile'} );
+    if ( defined( $self->{'logfile'} ) ) {
+        my $logfile = $self->{'logfile'};
+        # If logfile is a plain string (not a reference, not 0/1),
+        # treat it as a filename to open or "STDERR" special case.
+        if ( !ref($logfile) && $logfile ne '0' && $logfile ne '1' ) {
+            if ( $logfile =~ /^stderr$/i ) {
+                # 1 is the stderr sentinel used by Log(): truthy + non-ref
+                # triggers the "printf STDERR" branch (see Log() below).
+                $self->{'logfile'} = 1;
+            }
+            else {
+                require Symbol;
+                my $fh = Symbol::gensym();
+                open( $fh, '>>', $logfile )
+                    or die "Cannot open logfile $logfile: $!";
+                select((select($fh), $| = 1)[0]);
+                $self->{'logfile'} = $fh;
+            }
+        }
+        return $self->{'logfile'};
+    }
     if ( $Config::Config{'archname'} =~ /win32/i ) {
         require Win32::EventLog;
         $self->{'eventLog'} = Win32::EventLog->new( ref($self), '' )

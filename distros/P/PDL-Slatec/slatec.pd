@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use PDL::Types;
 
-our $VERSION = '2.097';
+our $VERSION = '2.098';
 pp_setversion($VERSION);
 
 pp_addpm({At=>'Top'},<<'EOD');

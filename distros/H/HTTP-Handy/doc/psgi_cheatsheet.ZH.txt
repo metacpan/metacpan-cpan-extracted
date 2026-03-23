@@ -1,0 +1,115 @@
+======================================================================
+ HTTP::Handy PSGI Su Cha Biao                        [ZH] Zhongwen (Jianti)
+======================================================================
+
+[ 1. qi dong fu wu qi ]
+
+  use HTTP::Handy;
+
+  my $app = sub {
+      my $env = shift;
+      return [200, ['Content-Type', 'text/plain'], ['Hello']];
+  };
+
+  HTTP::Handy->run(
+      app           => $app,       # bi tian: PSGI app code ref
+      host          => '127.0.0.1',# ke xuan: bind address (0.0.0.0)
+      port          => 8080,       # ke xuan: port (mo ren: 8080)
+      log           => 1,          # ke xuan: access log (mo ren: 1)
+      max_post_size => 10485760,   # ke xuan: max POST bytes (mo ren: 10MB)
+  );
+
+  zhi jie zuo wei jiao ben yun xing: perl lib/HTTP/Handy.pm [port]
+
+[ 2. qing qiu huan jing bian liang ($env) ]
+
+  REQUEST_METHOD    "GET" / "POST"
+  PATH_INFO         /index.html
+  QUERY_STRING      key=val&key2=val2
+  SERVER_NAME       hostname
+  SERVER_PORT       8080
+  CONTENT_TYPE      application/x-www-form-urlencoded
+  CONTENT_LENGTH    (bytes)
+  HTTP_USER_AGENT   Mozilla/5.0 ...
+  psgi.input        (du qu POST zheng wen (psgi.inp)
+  psgi.errors       \*STDERR
+  psgi.url_scheme   "http"
+
+[ 3. xiang ying ge shi ]
+
+  [$status, \@headers, \@body]
+
+  [200, ['Content-Type', 'text/plain'], ['OK']]
+  [404, ['Content-Type', 'text/plain'], ['Not Found']]
+  [302, ['Location', '/new'], ['']]
+  [204, ['Content-Length', '0'], []]
+
+[ 4. du qu POST zheng wen (psgi.input) ]
+
+  my $body = '';
+  my $len  = $env->{CONTENT_LENGTH} || 0;
+  $env->{'psgi.input'}->read($body, $len) if $len > 0;
+
+  read($buf,$len)   read($buf,$len,$off)
+  seek($pos,$wh)    tell()
+  getline()         getlines()
+
+[ 5. gong ju fang fa ]
+
+  parse_query($env->{QUERY_STRING})  ->  %hash
+  parse_query($post_body)              ->  %hash
+  url_decode('hello%20world')          ->  "hello world"
+  mime_type('css')                     ->  "text/css"
+  is_htmx($env)                        ->  1 / 0
+
+[ 6. xiang ying gou jian fang fa ]
+
+  response_html($html [,$code])   text/html; charset=utf-8
+  response_text($text [,$code])   text/plain; charset=utf-8
+  response_json($json [,$code])   application/json
+  response_redirect($url [,$code]) Location: $url
+
+[ 7. ti gong jing tai wen jian ]
+
+  serve_static($env, './htdocs')
+  serve_static($env, './htdocs', cache_max_age => 3600)
+
+[ 8. lu you mo shi ]
+
+  $method = $env->{REQUEST_METHOD};
+  $path   = $env->{PATH_INFO};
+
+  if ($method eq 'GET'  && $path eq '/') { ... }
+  if ($method eq 'POST' && $path eq '/x') { ... }
+  if ($path =~ m{^/api/}) { ... }
+  if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
+
+[ 9. cuo wu chu li ]
+
+  die "msg"  ->  500 response (auto)
+  [500, ['Content-Type','text/plain'], ['error']]
+  [403, ['Content-Type','text/plain'], ['forbidden']]
+  [400, ['Content-Type','text/plain'], ['bad request']]
+
+[ 10. run() chuang jian de ri zhi wen jian ]
+
+  logs/access/YYYYMMDDHHm0.log.ltsv  fang wen ri zhi (10 fen zhong lun zhuan, LTSV ge shi)
+  logs/error/error.log                cuo wu/qi dong ri zhi
+
+  LTSV: time  method  path  status  size  ua  referer
+
+[ 11. 官方资料链接 ]
+
+  PSGI specification:
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+  PSGI (MetaCPAN):
+    https://metacpan.org/pod/PSGI
+
+  Plack:
+    https://plackperl.org/
+
+  HTTP::Handy (MetaCPAN):
+    https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

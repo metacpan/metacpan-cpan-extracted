@@ -4,23 +4,15 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{HTTP::Handy},
-    'VERSION'   => q{1.00},
+    'VERSION'   => q{1.01},
     'ABSTRACT'  => q{A tiny HTTP/1.0 server for Perl 5.5.3+},
     'PREREQ_PM' => {
         'Carp' => '0',
-        'Config' => '0',
-        'ExtUtils::MakeMaker' => '5.4302',
-        'File::Basename' => '2.6',
-        'File::Copy' => '2.02',
-        'File::Path' => '1.0401',
-        'File::Spec' => '0',
-        'FindBin' => '1.42',
         'IO::Socket' => '0',
-        'POSIX' => '0',
-        'Socket' => '0',
-        'lib' => '0',
         'perl' => '5.00503',
         'strict' => '1.01',
+        'vars' => '0',
+        'warnings' => '0',
     },
     'AUTHOR'    => q{ina <ina@cpan.org>},
 );
@@ -53,11 +45,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'HTTP::Handy' => {
                 'file'    => 'lib/HTTP/Handy.pm',
-                'version' => '1.00',
+                'version' => '1.01',
             },
             'HTTP::Handy::Input' => {
                 'file'    => 'lib/HTTP/Handy.pm',
-                'version' => '1.00',
+                'version' => '1.01',
             }
         },
     };

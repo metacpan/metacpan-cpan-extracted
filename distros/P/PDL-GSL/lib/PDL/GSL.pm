@@ -3,7 +3,7 @@ package PDL::GSL;
 use strict;
 use warnings;
 
-our $VERSION = '2.101';
+our $VERSION = '2.103';
 
 =head1 NAME
 

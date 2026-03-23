@@ -834,7 +834,9 @@ will be fixed.  Until it is, it's best not to mix-and-match children.
    M>&N                  Dups output fd N to input fd M
    N<&-                  Closes fd N
 
-   <pipe, N<pipe     P   Pipe opens H for caller to read, write, close.
+   <pipe, N<pipe     P   Pipe opens H for caller to read, write, close (non-blocking write).
+   <blocking_pipe,             P   Like '<pipe', but the write end is blocking.
+   N<blocking_pipe
    >pipe, N>pipe     P   Pipe opens H for caller to read, write, close.
                       
 'N' and 'M' are placeholders for integer file descriptor numbers.  The
@@ -851,7 +853,7 @@ The SHNP field indicates what parameters an operator can take:
 
 =over
 
-=item Redirecting input: [n]<, [n]<pipe
+=item Redirecting input: [n]<, [n]<pipe, [n]<blocking_pipe
 
 You can input the child reads on file descriptor number n to come from a
 scalar variable, subroutine, file handle, or a named file.  If stdin
@@ -909,22 +911,44 @@ glob reference it takes as an argument:
 
    $h = start \@cat, '<pipe', \*IN;
    print IN "hello world\n";
-   pump $h;
    close IN;
+   pump $h;
    finish $h;
+
+B<Note>: The pipe must be closed before calling pump() for commands
+that buffer their output until stdin is closed (e.g. C<cat>).  For
+interactive commands that produce output in response to each line of
+input, you may interleave writes and pump() calls without closing
+first.
 
 Unlike the other '<' operators, IPC::Run does nothing further with
 it: you are responsible for it.  The previous example is functionally
 equivalent to:
 
    pipe( \*R, \*IN ) or die $!;
-   $h = start \@cat, '<', \*IN;
+   $h = start \@cat, '<', \*R;
    print IN "hello world\n";
-   pump $h;
    close IN;
+   pump $h;
    finish $h;
 
 This is like the behavior of IPC::Open2 and IPC::Open3.
+
+B<Note>: The write end of the pipe opened by C<< <pipe >> is set to
+B<non-blocking> mode.  This allows IPC::Run to fill the pipe buffer and
+continue to its select() loop without stalling.  However, if you write a
+large amount of data faster than the child process reads it, you may receive
+C<EAGAIN> / C<EWOULDBLOCK> errors from print().  If you need blocking writes
+(for example, when acting as the start of a pipeline where you want to write
+at the child's pace), use C<< <blocking_pipe >> instead:
+
+   $h = start \@wc, '<blocking_pipe', \*IN;
+   print IN "lots of data\n" x 32768;   ## won't get EAGAIN
+   close IN;
+   $h->finish;
+
+C<< <blocking_pipe >> behaves identically to C<< <pipe >>, but does not set
+the write end to non-blocking mode.
 
 B<Win32>: The handle returned is actually a socket handle, so you can
 use select() on it.
@@ -1137,7 +1161,7 @@ use Exporter ();
 use vars qw{$VERSION @ISA @FILTER_IMP @FILTERS @API @EXPORT_OK %EXPORT_TAGS};
 
 BEGIN {
-    $VERSION = '20250809.0';
+    $VERSION = '20260322.0';
     @ISA     = qw{ Exporter };
 
     ## We use @EXPORT for the end user's convenience: there's only one function
@@ -1157,6 +1181,7 @@ BEGIN {
       io timer timeout
       close_terminal
       binary
+      clearcache
     );
     @EXPORT_OK = ( @API, @FILTER_IMP, @FILTERS, qw( Win32_MODE ) );
     %EXPORT_TAGS = (
@@ -1204,8 +1229,8 @@ sub get_more_input();
 
 ##
 ## Error constants, not too locale-dependent
-use vars qw( $_EIO $_EAGAIN );
-use Errno qw(   EIO   EAGAIN );
+use vars qw( $_EIO $_EAGAIN $_EPIPE );
+use Errno qw(   EIO   EAGAIN   EPIPE );
 
 BEGIN {
     local $!;
@@ -1213,6 +1238,8 @@ BEGIN {
     $_EIO    = qr/^$!/;
     $!       = EAGAIN;
     $_EAGAIN = qr/^$!/;
+    $!       = EPIPE;
+    $_EPIPE  = qr/^$!/;
 }
 
 ##
@@ -1244,18 +1271,27 @@ my %fds;
 use vars qw( $cur_self );
 
 sub _debug_fd {
-    return fileno STDERR unless defined $cur_self;
+    ## STDERR may be tied to a handle that doesn't implement FILENO (e.g. a
+    ## tied filehandle without a real underlying fd).  Wrap fileno() in eval
+    ## so we degrade gracefully instead of dying with "Can't locate object
+    ## method FILENO".  Returns undef when no real fd is available, which is
+    ## safe: callers that receive undef simply skip debug-fd setup.
+    my $stderr_fd = eval { fileno STDERR };
+
+    return $stderr_fd unless defined $cur_self;
 
     if ( _debugging && !defined $cur_self->{DEBUG_FD} ) {
-        my $fd = select STDERR;
-        $| = 1;
-        select $fd;
-        $cur_self->{DEBUG_FD} = POSIX::dup fileno STDERR;
-        _debug("debugging fd is $cur_self->{DEBUG_FD}\n")
-          if _debugging_details;
+        if ( defined $stderr_fd ) {
+            my $fd = select STDERR;
+            $| = 1;
+            select $fd;
+            $cur_self->{DEBUG_FD} = POSIX::dup $stderr_fd;
+            _debug("debugging fd is $cur_self->{DEBUG_FD}\n")
+              if _debugging_details;
+        }
     }
 
-    return fileno STDERR unless defined $cur_self->{DEBUG_FD};
+    return $stderr_fd unless defined $cur_self->{DEBUG_FD};
 
     return $cur_self->{DEBUG_FD};
 }
@@ -1279,9 +1315,35 @@ sub DESTROY {
 ## Support routines (NOT METHODS)
 ##
 my %cmd_cache;
+my $_cmd_cache_path = '';    # value of $ENV{PATH} when %cmd_cache was last populated
+
+=item clearcache()
+
+Clears the cache of executable paths that IPC::Run maintains internally.
+IPC::Run caches the full path of each command it resolves via C<$PATH> to
+avoid repeated filesystem searches.  If you change C<$PATH> at runtime (or
+install a new executable into a directory that is already on C<$PATH>), call
+C<clearcache()> to force IPC::Run to search C<$PATH> again on the next run.
+
+    local $ENV{PATH} = "/new/bin:$ENV{PATH}";
+    IPC::Run::clearcache();
+    run ['mycommand'], ...;
+
+The cache is also invalidated automatically whenever C<$ENV{PATH}> changes
+between calls.
+
+=cut
+
+sub clearcache {
+    %cmd_cache        = ();
+    $_cmd_cache_path  = '';
+    return;
+}
 
 sub _search_path {
     my ($cmd_name) = @_;
+    croak "command name is undefined or empty"
+      unless defined $cmd_name && length $cmd_name;
     if ( File::Spec->file_name_is_absolute($cmd_name) && -x $cmd_name ) {
         _debug "'", $cmd_name, "' is absolute"
           if _debugging_details;
@@ -1313,6 +1375,15 @@ sub _search_path {
         croak "not a file: $cmd_name"        unless -f $cmd_name;
         croak "permission denied: $cmd_name" unless -x $cmd_name;
         return $cmd_name;
+    }
+
+    # Invalidate the entire cache when $PATH has changed so that commands are
+    # re-resolved against the new search path (analogous to the shell "rehash").
+    my $current_path = defined $ENV{PATH} ? $ENV{PATH} : '';
+    if ( $current_path ne $_cmd_cache_path ) {
+        _debug "PATH changed, clearing cmd_cache" if _debugging;
+        %cmd_cache       = ();
+        $_cmd_cache_path = $current_path;
     }
 
     if ( exists $cmd_cache{$cmd_name} ) {
@@ -1566,6 +1637,16 @@ sub _spawn {
     _debug "opening sync pipe ", $kid->{PID} if _debugging_details;
     my $sync_reader_fd;
     ( $sync_reader_fd, $self->{SYNC_WRITER_FD} ) = _pipe;
+
+    ## GH#122: For CODE ref children, create a separate pipe to propagate
+    ## exceptions back to the parent.  We can't reuse the sync pipe because
+    ## it must be closed before the CODE ref runs (to unblock the parent),
+    ## but we still need a channel for the child to report die() messages.
+    my $coderef_err_reader_fd;
+    if ( ref $kid->{VAL} eq 'CODE' ) {
+        ( $coderef_err_reader_fd, $self->{CODEREF_ERR_FD} ) = _pipe;
+    }
+
     $kid->{PID} = fork();
     croak "$! during fork" unless defined $kid->{PID};
 
@@ -1577,11 +1658,19 @@ sub _spawn {
             select undef, undef, undef, 0.01;
             kill 'USR1', getppid;
         }
+        ## Close the parent's reader end of the error pipe in the child.
+        POSIX::close $coderef_err_reader_fd if defined $coderef_err_reader_fd;
         ## _do_kid_and_exit closes sync_reader_fd since it closes all unwanted and
         ## unloved fds.
         $self->_do_kid_and_exit($kid);
     }
     _debug "fork() = ", $kid->{PID} if _debugging_details;
+
+    ## Close the child's writer end of the error pipe in the parent.
+    if ( defined $self->{CODEREF_ERR_FD} ) {
+        POSIX::close $self->{CODEREF_ERR_FD};
+        $kid->{CODEREF_ERR_FD} = $coderef_err_reader_fd;
+    }
 
     ## Wait for kid to get to its exec() and see if it fails.
     _close $self->{SYNC_WRITER_FD};
@@ -1612,7 +1701,11 @@ sub _spawn {
 sub _write {
     confess 'undef' unless defined $_[0] && defined $_[1];
     my $r = POSIX::write( $_[0], $_[1], length $_[1] );
-    croak "$!: write( $_[0], '$_[1]' )" unless $r;
+    unless ( defined $r ) {
+        return undef if $! == EPIPE;    ## caller handles broken pipe
+        return 0    if $! == EAGAIN;    ## non-blocking pipe buffer full, retry later
+        croak "$!: write( $_[0], '$_[1]' )";
+    }
     _debug "write( $_[0], '$_[1]' ) = $r" if _debugging_data;
     return $r;
 }
@@ -1764,9 +1857,10 @@ B<NOTE>: The grace period is actually up to 1 second longer than that
 given.  This is because the granularity of C<time> is 1 second.  Let me
 know if you need finer granularity, we can leverage Time::HiRes here.
 
-B<Win32>: Win32 does not know how to send real signals, so C<TERM> is
-a full-force kill on Win32.  Thus all talk of grace periods, etc. do
-not apply to Win32.
+B<Win32>: Win32 does not support signals, so C<KILL> is sent immediately
+instead of C<TERM>.  The return value is C<undef> when the process exits
+after the initial C<KILL>, or C<1> if a second C<KILL> was needed.  Grace
+periods have no meaning on Win32.
 
 =cut
 
@@ -1887,7 +1981,20 @@ sub harness {
         @args = ( [@_] );
     }
     else {
-        @args = map { !defined $_ ? bless(\$_, 'IPC::Run::Undef') : $_ } @_;
+        @args = map {
+            if ( !defined $_ ) {
+                if ( Internals::SvREADONLY($_) ) {
+                    my $undef;
+                    bless \$undef, 'IPC::Run::Undef';
+                }
+                else {
+                    bless \$_, 'IPC::Run::Undef';
+                }
+            }
+            else {
+                $_;
+            }
+        } @_;
     }
 
     my @errs;    # Accum errors, emit them when done.
@@ -1961,8 +2068,13 @@ sub harness {
 
                 elsif ( UNIVERSAL::isa( $_, 'IPC::Run::Timer' ) ) {
                     push @{ $self->{TIMERS} }, $_;
-                    $cur_kid  = undef;
                     $succinct = 1;
+                }
+
+                elsif ( ref $_ eq 'IPC::Run::Undef' ) {
+                    ## Silently ignore undef values passed where a timer or
+                    ## other optional argument would go (e.g. undef timeout).
+                    ## See https://github.com/cpan-authors/IPC-Run/issues/128
                 }
 
                 elsif (/^(\d*)>&(\d+)$/) {
@@ -1995,7 +2107,8 @@ sub harness {
                     $succinct = !$first_parse;
                 }
 
-                elsif (/^(\d*) (<pipe)()            ()  ()  $/x
+                elsif (/^(\d*) (<blocking_pipe)()  ()  ()  $/x
+                    || /^(\d*) (<pipe)()            ()  ()  $/x
                     || /^(\d*) (<pty) ((?:\s+\S+)?) (<) ()  $/x
                     || /^(\d*) (<)    ()            ()  (.*)$/x ) {
                     croak "No command before '$_'" unless $cur_kid;
@@ -2019,12 +2132,12 @@ sub harness {
                     my $source = $5;
 
                     my @filters;
-                    my $binmode;
+                    my $binmode = 1;
 
                     unless ( length $source ) {
                         if ( !$succinct ) {
                             while ( @args > 1
-                                && ( ( ref $args[1] && !UNIVERSAL::isa $args[1], "IPC::Run::Timer" ) || UNIVERSAL::isa $args[0], "IPC::Run::binmode_pseudo_filter" ) ) {
+                                && ( ( ref $args[1] && !UNIVERSAL::isa( $args[1], "IPC::Run::Timer" ) && ref $args[1] ne 'IPC::Run::Undef' ) || UNIVERSAL::isa $args[0], "IPC::Run::binmode_pseudo_filter" ) ) {
                                 if ( UNIVERSAL::isa $args[0], "IPC::Run::binmode_pseudo_filter" ) {
                                     $binmode = shift(@args)->();
                                 }
@@ -2045,9 +2158,19 @@ sub harness {
                     my IPC::Run::IO $pipe = IPC::Run::IO->_new_internal( $type, $kfd, $pty_id, $source, $binmode, @filters );
 
                     if ( ( ref $source eq 'GLOB' || UNIVERSAL::isa $source, 'IO::Handle' )
-                        && $type !~ /^<p(ty<|ipe)$/ ) {
-                        _debug "setting DONT_CLOSE" if _debugging_details;
-                        $pipe->{DONT_CLOSE} = 1;    ## this FD is not closed by us.
+                        && $type !~ /^<p(ty<|ipe)$/ && $type ne '<blocking_pipe' ) {
+                        ## GH#57: For plain input redirects (<) on non-standard
+                        ## fds, do NOT set DONT_CLOSE.  After fork the parent no
+                        ## longer needs the input handle — the child has its own
+                        ## copy via dup2.  Keeping it open prevents EPIPE/SIGPIPE
+                        ## when the child exits early, which can hang the writer.
+                        ## Protect stdin/stdout/stderr (fd 0-2) since closing
+                        ## those in the parent would be destructive.
+                        my $fno = fileno $source;
+                        if ( defined $fno && $fno <= 2 ) {
+                            _debug "setting DONT_CLOSE for std fd" if _debugging_details;
+                            $pipe->{DONT_CLOSE} = 1;
+                        }
                         _dont_inherit($source) if Win32_MODE;
                     }
 
@@ -2090,12 +2213,12 @@ sub harness {
 
                     my $dest = $5;
                     my @filters;
-                    my $binmode = 0;
+                    my $binmode = 1;
                     unless ( length $dest ) {
                         if ( !$succinct ) {
                             ## unshift...shift: '>' filters source...sink left...right
                             while ( @args > 1
-                                && ( ( ref $args[1] && !UNIVERSAL::isa $args[1], "IPC::Run::Timer" ) || UNIVERSAL::isa $args[0], "IPC::Run::binmode_pseudo_filter" ) ) {
+                                && ( ( ref $args[1] && !UNIVERSAL::isa( $args[1], "IPC::Run::Timer" ) && ref $args[1] ne 'IPC::Run::Undef' ) || UNIVERSAL::isa $args[0], "IPC::Run::binmode_pseudo_filter" ) ) {
                                 if ( UNIVERSAL::isa $args[0], "IPC::Run::binmode_pseudo_filter" ) {
                                     $binmode = shift(@args)->();
                                 }
@@ -2172,8 +2295,21 @@ sub harness {
                     };
                 }
 
+                elsif ( $_ eq 'env' ) {
+                    croak "No command before '$_'" unless $cur_kid;
+                    my $env = shift @args;
+                    croak "'env' option requires a hash reference" unless ref $env eq 'HASH';
+                    $cur_kid->{ENV} = $env;
+                }
+
                 elsif ( !ref $_ ) {
                     $self->{$_} = shift @args;
+                }
+
+                elsif ( ref $_ eq 'IPC::Run::Undef' ) {
+                    ## bare undef argument - silently ignore to preserve
+                    ## pre-20180523.0 behavior where undef matched !ref $_ and
+                    ## was absorbed as a no-op.  See GH#124.
                 }
 
                 elsif ( $_ eq 'init' ) {
@@ -2326,14 +2462,14 @@ sub _open_pipes {
                     }
                     $op->_init_filters;
                 }
-                elsif ( $op->{TYPE} eq '<pipe' ) {
+                elsif ( $op->{TYPE} eq '<pipe' || $op->{TYPE} eq '<blocking_pipe' ) {
                     _debug(
                         'kid to read ', $op->{KFD},
                         ' from a pipe IPC::Run opens and returns',
                     ) if _debugging_details;
 
                     my ( $r, $w ) = $op->open_pipe( $self->_debug_fd, $op->{SOURCE} );
-                    _debug "caller will write to ", fileno $op->{SOURCE}
+                    _debug "caller will write to ", fileno( ref $op->{SOURCE} eq 'SCALAR' ? ${ $op->{SOURCE} } : $op->{SOURCE} )
                       if _debugging_details;
 
                     $op->{TFD} = $r;
@@ -2434,7 +2570,7 @@ sub _open_pipes {
                     ) if _debugging_details;
 
                     my ( $r, $w ) = $op->open_pipe( $self->_debug_fd, $op->{DEST} );
-                    _debug "caller will read from ", fileno $op->{DEST}
+                    _debug "caller will read from ", fileno( ref $op->{DEST} eq 'SCALAR' ? ${ $op->{DEST} } : $op->{DEST} )
                       if _debugging_details;
 
                     $op->{TFD} = $w;
@@ -2634,6 +2770,14 @@ sub _open_pipes {
 
                 if ( length $$in_ref && $$in_ref ) {
                     my $c = _write( $pipe->{FD}, $$in_ref );
+                    unless ( defined $c ) {
+                        ## EPIPE: child closed stdin before reading all input.
+                        ## Treat this exactly like EOF on the pipe.
+                        _debug_desc_fd( 'broken pipe writing to', $pipe )
+                          if _debugging_details;
+                        $self->_clobber($pipe);
+                        return undef;
+                    }
                     substr( $$in_ref, 0, $c, '' );
                 }
                 else {
@@ -2712,6 +2856,12 @@ sub _do_kid_and_exit {
     eval {
         local $cur_self = $self;
 
+        ## Suppress "Filehandle STDIN reopened as ... only for output" warnings.
+        ## In the child process, we intentionally reuse fd 0/1/2 after
+        ## close_terminal() frees them. This is expected during pty setup
+        ## and should not warn even when the parent has $^W=1.
+        local $^W = 0;
+
         if (_debugging) {
             _set_child_debug_name(
                 ref $kid->{VAL} eq "CODE"
@@ -2727,6 +2877,7 @@ sub _do_kid_and_exit {
            unless $self->{noinherit};
 
         $fds{$self->{SYNC_WRITER_FD}}{needed} = 1;
+        $fds{$self->{CODEREF_ERR_FD}}{needed} = 1 if defined $self->{CODEREF_ERR_FD};
         $fds{$self->{DEBUG_FD}}{needed} = 1 if defined $self->{DEBUG_FD};
 
         $fds{$_->{TFD}}{needed} = 1
@@ -2776,6 +2927,12 @@ sub _do_kid_and_exit {
 
         _close( $_ ) foreach grep { ! $fds{$_}{needed} } keys %fds;
 
+        if ( $kid->{ENV} ) {
+            foreach my $k ( keys %{ $kid->{ENV} } ) {
+                $ENV{$k} = $kid->{ENV}{$k};
+            }
+        }
+
         for ( @{ $kid->{OPS} } ) {
             if ( defined $_->{TFD} ) {
 
@@ -2787,6 +2944,7 @@ sub _do_kid_and_exit {
                     $fds{$_->{TFD}}{lazy_close} = 1;
                 } else {
                     my $fd = _dup($_->{TFD});
+                    $_->{TFD} = $fd;
                     $self->_dup2_gently( $kid->{OPS}, $fd, $_->{KFD} );
                     _close($fd);
                 }
@@ -2847,13 +3005,34 @@ sub _do_kid_and_exit {
     _debug 'calling fork()ed CODE ref' if _debugging;
     POSIX::close $self->{DEBUG_FD} if defined $self->{DEBUG_FD};
     ## TODO: Overload CORE::GLOBAL::exit...
-    $kid->{VAL}->();
+    ## Wrap the coderef in eval so that a die() inside it does not propagate
+    ## out of _do_kid_and_exit and escape into the parent process's call stack.
+    ## Without this, the exception would unwind past the fork() point and cause
+    ## the child to continue executing parent code (GH#97).
+    eval { $kid->{VAL}->() };
+    my $kid_err = $@;
 
     ## There are bugs in perl closures up to and including 5.6.1
     ## that may keep this next line from having any effect, and it
     ## won't have any effect if our caller has kept a copy of it, but
     ## this may cause the closure to be cleaned up.  Maybe.
     $kid->{VAL} = undef;
+
+    ## GH#122: Propagate the exception back to the parent via a dedicated
+    ## error pipe.  We can't use the sync pipe because it must be closed
+    ## before running the CODE ref to avoid deadlocks (the parent blocks
+    ## on the sync pipe, so the child can't do I/O with the parent until
+    ## the sync pipe is closed).
+    if ($kid_err) {
+        if ( defined $self->{CODEREF_ERR_FD} ) {
+            _write $self->{CODEREF_ERR_FD}, $kid_err;
+            POSIX::close $self->{CODEREF_ERR_FD};
+        }
+        POSIX::_exit(1);
+    }
+
+    POSIX::close $self->{CODEREF_ERR_FD}
+      if defined $self->{CODEREF_ERR_FD};
 
     ## Use POSIX::_exit to avoid global destruction, since this might
     ## cause DESTROY() to be called on objects created in the parent
@@ -2975,8 +3154,10 @@ sub start {
             _debug "child: ", _debugstrings( $kid->{VAL} )
               if _debugging_details;
             eval {
-                croak "simulated failure of fork"
-                  if $self->{_simulate_fork_failure};
+                if ( $self->{_simulate_fork_failure} ) {
+                    $kid->{PID} = undef;    # simulate fork() returning undef
+                    croak "Cannot allocate memory during fork";
+                }
                 unless (Win32_MODE) {
                     $self->_spawn($kid);
                 }
@@ -3035,7 +3216,23 @@ sub start {
             }
             if ( $close_it || $@ ) {
                 eval {
-                    _close( $_->{TFD} );
+                    ## GH#57: For plain '<' redirects with external Perl
+                    ## handles, use close() on the handle so it is properly
+                    ## invalidated (avoids stale-fd / double-close warnings).
+                    ## Only for TYPE '<' — for '<pipe'/'<blocking_pipe', SOURCE
+                    ## is the *write* end that the caller uses; TFD is the
+                    ## internal read end and must be closed via _close().
+                    if (   defined $_->{TYPE}
+                        && $_->{TYPE} eq '<'
+                        && ref $_->{SOURCE}
+                        && ( UNIVERSAL::isa( $_->{SOURCE}, 'GLOB' )
+                            || UNIVERSAL::isa( $_->{SOURCE}, 'IO::Handle' ) ) )
+                    {
+                        close $_->{SOURCE};
+                    }
+                    else {
+                        _close( $_->{TFD} );
+                    }
                     $closed[ $_->{TFD} ] = 1;
                     $_->{TFD} = undef;
                 };
@@ -3132,6 +3329,15 @@ sub _select_loop {
     # when non-IPC::Run code has blocked SIGCHLD, e.g. via POSIX::sigprocmask().
     local $SIG{CHLD} = sub { }
       unless defined $SIG{CHLD};
+
+    # When a child exits before consuming all of its stdin, any subsequent
+    # write to the pipe raises SIGPIPE.  With the default disposition that
+    # kills the parent.  Ignore SIGPIPE here so that POSIX::write() instead
+    # returns -1 with errno EPIPE, which pipe_writer catches and handles by
+    # closing the pipe gracefully.  Honour an existing handler installed by
+    # the caller (same policy as the SIGCHLD handler above).
+    local $SIG{PIPE} = 'IGNORE'
+      unless defined $SIG{PIPE};
 
     my $io_occurred;
 
@@ -3388,8 +3594,9 @@ sub _cleanup {
     $self->_clobber( $self->{PIPES}->[0] ) while @{ $self->{PIPES} };
 
     # reap kids
+    my @coderef_exceptions;
     for my $kid ( @{ $self->{KIDS} } ) {
-        if ( !length $kid->{PID} ) {
+        if ( !defined $kid->{PID} || !length $kid->{PID} ) {
             _debug 'never ran child ', $kid->{NUM}, ", can't reap"
               if _debugging;
             for my $op ( @{ $kid->{OPS} } ) {
@@ -3400,7 +3607,18 @@ sub _cleanup {
         else {
             _waitpid( $kid, 0 );
         }
+
+        ## GH#122: Read exception from CODE ref error pipe after the child
+        ## has exited.  The pipe is guaranteed to have been closed by the
+        ## child's POSIX::_exit(), so _read() will not block.
+        if ( defined $kid->{CODEREF_ERR_FD} ) {
+            my $err = _read $kid->{CODEREF_ERR_FD};
+            POSIX::close $kid->{CODEREF_ERR_FD};
+            delete $kid->{CODEREF_ERR_FD};
+            push @coderef_exceptions, $err if defined $err && length $err;
+        }
     }
+    $self->{CODEREF_EXCEPTIONS} = \@coderef_exceptions if @coderef_exceptions;
 
     # OPS cleanup.  Kids may share an OPS object; search for "also to write".
     # Example harness: run(['echo',1], '&', ['echo',2], '>', \$out).  Hence,
@@ -3527,6 +3745,89 @@ sub pump_nb {
 
 =pod
 
+=item close_stdin
+
+   $h->close_stdin;
+
+Closes the input pipe(s) to the child process(es), signaling EOF on
+the child's STDIN.  Does B<not> wait for the child to finish or drain
+remaining output.  After calling this, the caller can continue to
+C<pump()> to retrieve output incrementally.
+
+This is useful when streaming large amounts of data through a child
+process (e.g., decompression) where you want to signal end-of-input
+but continue draining output without buffering it all in memory:
+
+   my ( $in, $out ) = ( '', '' );
+   my $h = start \@cmd, \$in, \$out, timeout( 30 );
+
+   while ( read_more_input_into( $in ) ) {
+       $h->pump;
+       process_output( $out ) if length $out;
+       $out = '';
+   }
+
+   $h->close_stdin;
+
+   while ( $h->pumpable ) {
+       $h->pump;
+       process_output( $out ) if length $out;
+       $out = '';
+   }
+
+   $h->finish;
+
+B<Note:> Always use a C<timeout()> with this pattern.  Without one, the
+C<pump()> calls can deadlock if the child blocks on writing output while
+you are blocked trying to write input (or vice versa).
+
+Without C<close_stdin()>, calling C<finish()> would accumulate all
+remaining output in C<$out> before returning, potentially exhausting
+memory for children that produce large output (like decompressors).
+
+Returns the harness object for chaining.
+
+=cut
+
+sub close_stdin {
+    my IPC::Run $self = shift;
+
+    local $cur_self = $self;
+
+    croak "harness has not been started" unless $self->{STATE} >= _started;
+
+    _debug "** closing stdin" if _debugging;
+
+    # Match all input pipe types: '<' (plain), '<pipe', '<pty<', etc.
+    # _clobber() handles each type appropriately: for regular pipes it
+    # closes the fd (signaling EOF to the child); for input ptys it
+    # removes them from the select vectors without closing the pty
+    # master (consistent with _clobber's existing pty safety logic).
+    for my $pipe ( @{ $self->{PIPES} } ) {
+        next unless $pipe->{TYPE} =~ /^</;
+        $self->_clobber($pipe);
+    }
+
+    return $self;
+}
+
+=pod
+
+=item started
+
+Returns TRUE if the harness has been started and has not yet finished.
+This is useful when a harness may or may not have been started by the
+caller, and you want to conditionally start it:
+
+    $h->start unless $h->started;
+
+=cut
+
+sub started {
+    my IPC::Run $self = shift;
+    return $self->{STATE} >= _started;
+}
+
 =item pumpable
 
 Returns TRUE if calling pump() won't throw an immediate "process ended
@@ -3535,6 +3836,11 @@ active processes. May yield the parent processes' time slice for 0.01
 second if all pipes are to the child and all are paused.  In this case
 we can't tell if the child is dead, so we yield the processor and
 then attempt to reap the child in a nonblocking way.
+
+To wait for child processes to exit during an event loop, poll
+C<$h->pumpable> until it returns false, then call C<finish>.
+See also L</finished> to test whether the harness has already been
+finished.
 
 =cut
 
@@ -3727,6 +4033,11 @@ sub finish {
     }
     $self->_cleanup;
 
+    ## GH#122: Propagate CODE ref exceptions to the caller.
+    if ( $self->{CODEREF_EXCEPTIONS} && @{ $self->{CODEREF_EXCEPTIONS} } ) {
+        croak $self->{CODEREF_EXCEPTIONS}->[0];
+    }
+
     return !$self->full_result;
 }
 
@@ -3736,7 +4047,7 @@ sub finish {
 
    $h->result;
 
-Returns the first non-zero result code (ie $? >> 8).  See L</full_result> to 
+Returns the first non-zero result code (ie $? >> 8).  See L</full_result> to
 get the $? value for a child process.
 
 To get the result of a particular child, do:
@@ -3751,6 +4062,11 @@ or
 
 Returns undef if no child processes were spawned and no child number was
 specified.  Throws an exception if an out-of-range child number is passed.
+
+Note that C<result> returns C<undef> both when no children have exited and
+when all children exited with a zero exit code.  Use L</finished> to
+determine whether the harness has actually completed, or use L</results> to
+get the exit codes of all children (including zeros).
 
 =cut
 
@@ -3773,18 +4089,27 @@ sub _child_result {
     return $self->{KIDS}->[$which]->{RESULT};
 }
 
+# When $SIG{CHLD} is 'IGNORE', waitpid returns -1 and RESULT is set to
+# the string "unknown result, unknown PID".  Using that string in numeric
+# context (>> 8, 0+, boolean) triggers a warning.  This helper silences it.
+sub _numeric_result {
+    no warnings 'numeric';
+    return 0 + $_[0];
+}
+
 sub result {
     &_assert_finished;
     my IPC::Run $self = shift;
 
     if (@_) {
         my ($which) = @_;
-        return $self->_child_result($which) >> 8;
+        return _numeric_result( $self->_child_result($which) ) >> 8;
     }
     else {
         return undef unless @{ $self->{KIDS} };
         for ( @{ $self->{KIDS} } ) {
-            return $_->{RESULT} >> 8 if $_->{RESULT} >> 8;
+            my $candidate = _numeric_result( $_->{RESULT} ) >> 8;
+            return $candidate if $candidate;
         }
     }
 }
@@ -3804,8 +4129,7 @@ sub results {
     &_assert_finished;
     my IPC::Run $self = shift;
 
-    # we add 0 here to stop warnings associated with "unknown result, unknown PID"
-    return map { ( 0 + $_->{RESULT} ) >> 8 } @{ $self->{KIDS} };
+    return map { _numeric_result( $_->{RESULT} ) >> 8 } @{ $self->{KIDS} };
 }
 
 =pod
@@ -3844,7 +4168,7 @@ sub full_result {
     else {
         return undef unless @{ $self->{KIDS} };
         for ( @{ $self->{KIDS} } ) {
-            return $_->{RESULT} if $_->{RESULT};
+            return $_->{RESULT} if _numeric_result( $_->{RESULT} );
         }
     }
 }
@@ -3868,6 +4192,167 @@ sub full_results {
     croak "Harness not finished running" unless $self->{STATE} == _finished;
 
     return map $_->{RESULT}, @{ $self->{KIDS} };
+}
+
+=pod
+
+=item pid
+
+   $h->pid;
+
+Returns the process ID of the first child process, or undef if no child
+processes have been spawned yet.
+
+To get the PID of a particular child, do:
+
+   $h->pid( 0 );  # first child's PID
+   $h->pid( 1 );  # second child's PID
+
+or
+
+   ($h->pids)[0]
+   ($h->pids)[1]
+
+PIDs are available as soon as the harness has been started with L</start>.
+
+=cut
+
+sub pid {
+    my IPC::Run $self = shift;
+
+    if (@_) {
+        my ($which) = @_;
+        croak(
+            "Only ",
+            scalar( @{ $self->{KIDS} } ),
+            " child processes, no process $which"
+        ) unless $which >= 0 && $which <= $#{ $self->{KIDS} };
+        return $self->{KIDS}->[$which]->{PID} || undef;
+    }
+    else {
+        return undef unless @{ $self->{KIDS} };
+        return $self->{KIDS}->[0]->{PID} || undef;
+    }
+}
+
+=pod
+
+=item pids
+
+Returns a list of child process IDs.  See L</pid> to get the PID of a
+specific child process.
+
+PIDs are available as soon as the harness has been started with L</start>.
+
+=cut
+
+sub pids {
+    my IPC::Run $self = shift;
+
+    return map { $_->{PID} || undef } @{ $self->{KIDS} };
+}
+
+=pod
+
+=item is_running
+
+   $h->is_running;
+
+Returns true if the harness is currently running (i.e. after L</start> and
+before L</finish>), false otherwise.
+
+=cut
+
+sub is_running {
+    my IPC::Run $self = shift;
+
+    return $self->{STATE} == _started;
+}
+
+=pod
+
+=item full_path
+
+   $h->full_path;
+
+Returns the full path to the executable of the first child process, as
+resolved by searching C<PATH> when the harness is started with L</start>.
+Returns undef if the first child is a code reference (not an external
+command), or if the harness has not been started yet.
+
+To get the full path of a particular child, do:
+
+   $h->full_path( 0 );  # first child's executable path
+   $h->full_path( 1 );  # second child's executable path
+
+or
+
+   ($h->full_paths)[0]
+   ($h->full_paths)[1]
+
+=cut
+
+sub full_path {
+    my IPC::Run $self = shift;
+
+    if (@_) {
+        my ($which) = @_;
+        croak(
+            "Only ",
+            scalar( @{ $self->{KIDS} } ),
+            " child processes, no process $which"
+        ) unless $which >= 0 && $which <= $#{ $self->{KIDS} };
+        return $self->{KIDS}->[$which]->{PATH};
+    }
+    else {
+        return undef unless @{ $self->{KIDS} };
+        return $self->{KIDS}->[0]->{PATH};
+    }
+}
+
+=pod
+
+=item full_paths
+
+Returns a list of full paths to the executables of all child processes.
+Children that are code references (not external commands) will have C<undef>
+in the corresponding position.
+
+=cut
+
+sub full_paths {
+    my IPC::Run $self = shift;
+
+    return map { $_->{PATH} } @{ $self->{KIDS} };
+}
+
+=pod
+
+=item finished
+
+   $h->finished;
+
+Returns true if the harness has been started and all child processes have
+finished (i.e. C<finish> has been called or the harness has run to
+completion).  Returns false otherwise, including when the harness has not
+yet been started.
+
+Unlike L</result> and L</full_result>, C<finished> does not throw an
+exception when the harness has not yet run -- it simply returns false.
+This makes it safe to call at any point to test completion status.
+
+   my $h = harness(\@cmd);
+   $h->start;
+   # ... do other work, pump $h as needed ...
+   if ( $h->finished ) {
+       print "Exit code: ", $h->result(0), "\n";
+   }
+
+=cut
+
+sub finished {
+    my IPC::Run $self = $_[0];
+    return $self->{STATE} == _finished;
 }
 
 ##
@@ -4599,7 +5084,22 @@ returns TRUE when the command exits with a 0 result code.
 
 Does not provide shell-like string interpolation.
 
-No support for C<cd>, C<setenv>, or C<export>: do these in an init() sub
+No support for C<cd> or C<export>: do C<cd> in an init() sub.
+
+For setting environment variables in the child process without affecting the
+parent, use the C<env> option (a hash reference of key/value pairs):
+
+   run(
+      \cmd,
+         ...
+         env => { FOO => 'BAR', BAZ => 'QUX' }
+   );
+
+The C<env> variables are applied in the child process before any C<init> subs
+run, so C<init> can still override individual variables if needed.  The parent
+process C<%ENV> is not modified.
+
+Alternatively, use an C<init> sub for more complex setup:
 
    run(
       \cmd,
@@ -4616,11 +5116,11 @@ days, months, etc.
 B<WARNING:> Function coprocesses (C<run \&foo, ...>) suffer from two
 limitations.  The first is that it is difficult to close all filehandles the
 child inherits from the parent, since there is no way to scan all open
-FILEHANDLEs in Perl and it both painful and a bit dangerous to close all open
+FILEHANDLEs in Perl and it is both painful and a bit dangerous to close all open
 file descriptors with C<POSIX::close()>. Painful because we can't tell which
 fds are open at the POSIX level, either, so we'd have to scan all possible fds
 and close any that we don't want open (normally C<exec()> closes any
-non-inheritable but we don't C<exec()> for &sub processes.
+non-inheritable but we don't C<exec()> for &sub processes).
 
 The second problem is that Perl's DESTROY subs and other on-exit cleanup gets
 run in the child process.  If objects are instantiated in the parent before the

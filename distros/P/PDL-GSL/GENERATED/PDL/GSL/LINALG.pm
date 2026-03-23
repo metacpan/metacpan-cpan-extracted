@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 4 "lib/PDL/GSL/LINALG.pd"
 
 use strict;
@@ -56,7 +57,7 @@ initial C<gsl_linalg_> removed. They are provided in both real and
 complex double precision.
 
 Currently only LU decomposition interfaces here. Pull requests welcome!
-#line 60 "lib/PDL/GSL/LINALG.pm"
+#line 61 "lib/PDL/GSL/LINALG.pm"
 
 
 =head1 FUNCTIONS
@@ -72,15 +73,27 @@ Currently only LU decomposition interfaces here. Pull requests welcome!
 
 =for sig
 
-  Signature: ([io,phys]A(n,m); indx [o,phys]ipiv(p=CALC($PDL(A)->ndims > 1 ? PDLMIN($PDL(A)->dims[0], $PDL(A)->dims[1]) : 1)); int [o,phys]signum())
+ Signature: ([io,phys]A(n,m); indx [o,phys]ipiv(p=CALC($PDL(A)->ndims > 1 ? PDLMIN($PDL(A)->dims[0], $PDL(A)->dims[1]) : 1)); int [o,phys]signum())
+ Types: (cdouble double)
+
+=for usage
+
+ ($ipiv, $signum) = LU_decomp($A);
+ LU_decomp($A, $ipiv, $signum);    # all arguments given
+ ($ipiv, $signum) = $A->LU_decomp; # method call
+ $A->LU_decomp($ipiv, $signum);
 
 =for ref
 
 LU decomposition of the given (real or complex) matrix.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-LU_decomp ignores the bad-value flag of the input ndarrays.
+C<LU_decomp> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -99,16 +112,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]LU(n,m); indx [phys]ipiv(p); [phys]B(n); [o,phys]x(n))
+ Signature: ([phys]LU(n,m); indx [phys]ipiv(p); [phys]B(n); [o,phys]x(n))
+ Types: (cdouble double)
+
+=for usage
+
+ $x = LU_solve($LU, $ipiv, $B);
+ LU_solve($LU, $ipiv, $B, $x);  # all arguments given
+ $x = $LU->LU_solve($ipiv, $B); # method call
+ $LU->LU_solve($ipiv, $B, $x);
 
 =for ref
 
 Solve C<A x = B> using the LU and permutation from L</LU_decomp>, real
 or complex.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-LU_solve ignores the bad-value flag of the input ndarrays.
+C<LU_solve> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -127,15 +152,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]LU(n,m); int [phys]signum(); [o]det())
+ Signature: ([phys]LU(n,m); int [phys]signum(); [o]det())
+ Types: (cdouble double)
+
+=for usage
+
+ $det = LU_det($LU, $signum);
+ LU_det($LU, $signum, $det);  # all arguments given
+ $det = $LU->LU_det($signum); # method call
+ $LU->LU_det($signum, $det);
 
 =for ref
 
 Find the determinant from the LU decomp.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-LU_det ignores the bad-value flag of the input ndarrays.
+C<LU_det> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -154,16 +191,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([phys]diag(n); [phys]superdiag(n); [phys]subdiag(n); [phys]B(n); [o,phys]x(n))
+ Signature: ([phys]diag(n); [phys]superdiag(n); [phys]subdiag(n); [phys]B(n); [o,phys]x(n))
+ Types: (double)
+
+=for usage
+
+ $x = solve_tridiag($diag, $superdiag, $subdiag, $B);
+ solve_tridiag($diag, $superdiag, $subdiag, $B, $x);  # all arguments given
+ $x = $diag->solve_tridiag($superdiag, $subdiag, $B); # method call
+ $diag->solve_tridiag($superdiag, $subdiag, $B, $x);
 
 =for ref
 
 Solve C<A x = B> where A is a tridiagonal system. Real only, because
 GSL does not have a complex function.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-solve_tridiag ignores the bad-value flag of the input ndarrays.
+C<solve_tridiag> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -189,7 +238,7 @@ The GSL documentation for linear algebra is online at
 L<https://www.gnu.org/software/gsl/doc/html/linalg.html>
 
 =cut
-#line 193 "lib/PDL/GSL/LINALG.pm"
+#line 242 "lib/PDL/GSL/LINALG.pm"
 
 # Exit with OK status
 

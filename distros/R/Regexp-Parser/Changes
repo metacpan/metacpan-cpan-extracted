@@ -1,5 +1,12 @@
 HISTORY
 
+  0.26 -- Todd Rinaldo March 22, 2026
+   Features:
+   - Add \Q...\E (quotemeta) support for literal quoting in regular
+     expressions (PR #23)
+   - Add \b{type}/\B{type} extended boundary support including \b{gcb},
+     \b{wb}, \b{sb}, and \b{lb} from Perl 5.22+ (PR #24)
+
   0.25 -- Todd Rinaldo March 20, 2026
    Features:
    - Add recursive pattern support: (?R), (?0), (?1), (?+1), (?-1),

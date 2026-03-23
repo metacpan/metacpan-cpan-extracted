@@ -23,7 +23,7 @@ our %EXPORT_TAGS = ('all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.599';
+our $VERSION = '0.701';
 our $DEBUG; $DEBUG = 0 unless defined $DEBUG;
 our @logs;
 our $nlo = 1; # Number Line Output, start of 1
@@ -214,6 +214,7 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 	[...]{...} -- descriptions (properties) of table columns:
 			{ki} -- name (key || index ) of a variable from $data->{ $key }
 			{%} -- NO \par
+			{v} -- to paste by default text (located in template) if variable =~/^\x{001}/
 			{p} -- to paste text on right
 			{head}[...] -- TeX strings before %%%V:
 			{tail}[...] -- TeX strings after %%%V:
@@ -249,7 +250,7 @@ push @logs, "--> Open '$ofile'" if $DEBUG;
 	if( defined $key ) {
 		&_var_output( $fh, $key, $vardata, \@columns, \%op );
 
-		$_ = "~~> l.$. WARNING#1: Missing '%%%ENDx' tag for '$key'";
+		$_ = "~~> l.EOF. WARNING#1: Missing '%%%ENDx' tag for '$key'";
 		$op{silent} or carp $_;
 		push @logs, $_;
 	}
@@ -319,11 +320,12 @@ sub _line_decryption {
 						($#$columns // 0);
 			$j = 0 if $j < 0 or $sclr;
 
-			if( ! $sclr and $$z =~/%%%V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
-				# this V-variable is nested in a VAR-structure
-				my $ki = $1; # name (key or index) of V-variable
-				my $Np = $2; # NO \par
-				my $paste = $3; # on right
+			if( ! $sclr and $$z =~/^(.*?)\s?%%%+V:\s*([^\s:%#]+)(%?)\s?(.*)/) {
+				# the non-SCALAR V-variable is nested in a VAR-structure
+				my $dV = $1; # Value, by default
+				my $ki = $2; # name (key or index) of V-variable
+				my $Np = $3; # NO \par
+				my $paste = $4; # on right
 
 				if( $$chkVAR == 0b0001) { # V-variable is in {HASH|ARRAY}.ARRAY of VAR-structure
 
@@ -348,7 +350,7 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 					}
 
 				}
-				elsif( $$chkVAR == 0b0010) { # V-variable is in {HASH|ARRAY}.HASH of VAR-structure
+				elsif( $$chkVAR == 0b0010) { # V-variable is in ARRAY.HASH of VAR-structure
 
 					for my $d ( @$vk ) {
 						if( exists $d->{$ki} ) {
@@ -378,21 +380,21 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 
 				}
 				elsif( ref $vk eq 'HASH'
-						and ( (ref \$vk->{$ki} eq 'SCALAR' and defined( $vk->{$ki} ) )
-							or ( ref $vk->{$ki} eq 'SCALAR' and defined( ${ $vk->{$ki} } ) )
+						and exists( $vk->{$ki} )
+						and ( ref \$vk->{$ki} eq 'SCALAR'
+							or ref $vk->{$ki} eq 'SCALAR'
 							or ( $ki eq '@'
-								and exists($vk->{$ki})
 								and ref $vk->{$ki} eq 'ARRAY'
 							)
-							)
+						)
 				) {
 					$columns->[$j]{ki} = $ki; # save variable key in j-th element
 				}
 
-				&_set_column( $Np, $paste, $columns->[$j] ) if exists $columns->[$j]{ki};
+				&_set_column( $dV, $Np, $paste, $columns->[$j] ) if exists $columns->[$j]{ki};
 			}
-			elsif( $$z =~/(?<s>.+?)\s?%%%+ADD(?<t>[EX]?):(?<p>%?)/
-				or $$z =~/^\s*%%%+ADD(?<t>[EX]?):(?<p>%?)\s?(?<s>.*?)[\r\n]*$/
+			elsif( $$z =~/(?<s>.+?)\s?%%%+ADD(?<t>[AEX]?):(?<p>%?)/
+				or $$z =~/^\s*%%%+ADD(?<t>[AEX]?):(?<p>%?)\s?(?<s>.*?)[\r\n]*$/
 			) {
 				my $s = $+{s};
 
@@ -403,15 +405,20 @@ push @logs, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". $ki if $D
 					$s .= "\n";
 				}
 
-				if( $+{t} eq 'E') { # %%%ADDE:
-					if( @$columns && exists( $columns->[-1]{ki} ) && (! $columns->[$j] or $sclr) ) {
+				if( $+{t} eq 'A') { # %%%ADDA:
+					push @{ $columns->[$j]{head} }, $s;
+					$columns->[$j]{ki} = '%%%ADDA'; # phantom
+					$columns->[$j]{'%'} = 1;
+				}
+				elsif( $+{t} eq 'E') { # %%%ADDE:
+					if( @$columns && ( $sclr or (exists( $columns->[-1]{ki} ) && ! $columns->[$j]) ) ) {
 						push @{ $columns->[-1]{tail} }, $s;
 					}
 					else {
 						push @{ $columns->[$j]{head} }, $s;
 					}
 				}
-				else {
+				else { # %%%ADD[X]:
 					push @{ $columns->[$j]{head} }, $s;
 					$columns->[$j]{eX}{ $#{ $columns->[$j]{head} } } = undef if ! $sclr and $+{t} eq 'X'; # $$chkVAR && ...  %%%ADDX:
 				}
@@ -492,13 +499,9 @@ push @logs, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR o
 		# key or sub-...sub-key is found
 push @logs, "--> l.$. Found %%%VAR:". $k if $DEBUG;
 
-		my $vk = ref $$vardata eq 'HASH' ? $$vardata->{$k} :
-			(ref $$vardata eq 'ARRAY' ? $$vardata->[$k] : undef);
+		my $vk = ref $$vardata eq 'HASH' ? $$vardata->{$k} : $$vardata->[$k];
 
-		unless( $vk ) {
-push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if $DEBUG && $op->{def};
-			return;
-		}
+push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk) && $DEBUG;
 
 		return if &_chk_var( $fh, $k, $vk, $Np, \$paste, \$before, $chkVAR, $columns, $z, $op );
 
@@ -508,15 +511,16 @@ push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if $DEBUG && $op->{def};
 		return;
 
 	}
-	elsif( $$z =~/%%%V:\s*=(def|esc|ignore|silent|debug)=\s*(\S*)/) { # setting up facultative options
+	elsif( $$z =~/%%%+V:\s*=(def|esc|ignore|silent|debug)=\s*(\S*)/) { # setting up facultative options
 		$op->{$1} = $2 || 0;
+		$DEBUG = $2 || 0 if $1 eq 'debug';
 		return;
 	}
-	elsif( $$z =~/%%%V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
+	elsif( $$z =~/^(?<v>.*?)\s?%%%+V:\s*(?<k>[^\s:%#]+)(?<p>%?)\s?(?<s>.*)/) {
 		my $k = $+{k};
 
 		my %el;
-		&_set_column( $+{p}, $+{s}, \%el );
+		&_set_column( $+{v}, $+{p}, $+{s}, \%el );
 
 		my $inidata = $$data; # save initial environment
 
@@ -532,7 +536,7 @@ push @logs, "~~> l.$. NOT defined key in %%%VAR:". $k if $DEBUG && $op->{def};
 			length( $sk ) or next;
 
 			my $d;
-			if( $sk =~/^\d+$/ && ref $$data eq 'ARRAY' && defined( $$data->[$sk] )) {
+			if( $sk =~/^\d+$/ && ref $$data eq 'ARRAY' && defined( $$data->[$sk] ) ) {
 				$d = $$data->[$sk];
 			}
 			elsif( ref $$data eq 'HASH' && exists( $$data->{$sk} )) {
@@ -590,11 +594,13 @@ push @logs, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of '$sk' in 
 
 
 sub _set_column {
-	my( $Np, $paste, $column ) = @_;
+	my( $dV, $Np, $paste, $column ) = @_;
 
+	$column->{v} = $dV if length $dV;
 	$column->{'%'} = 1 if $Np;
 	$column->{p} = $paste if length $paste;
 }
+
 
 sub _data_redef {
 	my( $sk, $d, $k, $data, $x ) = @_;
@@ -657,7 +663,7 @@ push @logs, "~~> l.$. WARNING#6: mixed types (ARRAY with HASH with SCALAR or oth
 	}
 	elsif( ref \$vk eq 'SCALAR' or ref $vk eq 'SCALAR') {
 		$columns->[0]{ki} = $k;
-		&_set_column( $Np, $$paste, $columns->[0] );
+		&_set_column('', $Np, $$paste, $columns->[0] );
 	}
 
 	if( $$before ) {# Output prefix TeX
@@ -677,25 +683,38 @@ sub _v_print {
 	our @logs;
 	our $nlo;
 
-	if( defined $v ) {
-		tex_escape( $v, $op->{esc} ) if $op->{esc};
+	unless( defined $v ) {
+		if( $op->{def} ) {
+push @logs, "~~> l.$.".' NOT defined %%%V[AR]:'. $k if $DEBUG;
+			return;
+		}
+		$v = '';
+	}
 
-push @logs, "--> l.$.>$nlo".' Insert %%%V[AR]:'. $k .'= '. $v if $DEBUG;
+	if( $v =~/^\x{001}/) { # by default text from template
+		if( exists $el->{v} ) {
+			print { $fh } $el->{v};
 
-		print { $fh } $v;
-		print { $fh } $el->{p} if exists $el->{p};
+push @logs, "--> l.$.>$nlo".' Insert text by default %%%V[AR]:'. $k .'= '. $el->{v} if $DEBUG;
+		}
 
-		++$nlo while $v =~/\n/g;
-
-		return if $el->{'%'};
-
-		print { $fh } "\n"; # NO:YES \par
-		++$nlo;
 	}
 	else {
-push @logs, "~~> l.$.".' NOT defined %%%V[AR]:'. $k if $DEBUG && $op->{def};
+		tex_escape( $v, $op->{esc} ) if $op->{esc};
+
+		if( length $v ) {
+push @logs, "--> l.$.>$nlo".' Insert %%%V[AR]:'. $k .'= '. $v if $DEBUG;
+
+			print { $fh } $v;
+			++$nlo while $v =~/\n/g;
+		}
+		print { $fh } $el->{p} if exists $el->{p};
 	}
 
+	return if $el->{'%'};
+
+	print { $fh } "\n"; # NO:YES \par
+	++$nlo;
 }
 
 # HEAD-TAIL output
@@ -732,8 +751,12 @@ sub _hvt_print {
 	our $nlo;
 
 	if( length($ki) and ! defined $val ) {
-		push @logs, "~~> l.$.".' NOT defined %%%V:'. $ki if $DEBUG && $op->{def};
-		return;
+		if( $op->{def} ) {
+			push @logs, "~~> l.$.".' NOT defined %%%V:'. $ki if $DEBUG;
+			return;
+		}
+
+		$val = '';
 	}
 
 	# output head of variable
@@ -868,7 +891,10 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 
 				my $val;
 				if( defined $ki ) {
-					if( ref \$d eq 'SCALAR' or ref $d eq 'SCALAR') { # (ARRAY.SCALAR or ARRAY.REF->SCALAR) in regular vector
+					if( $ki eq '%%%ADDA') {
+						$val = '';
+					}
+					elsif( ref \$d eq 'SCALAR' or ref $d eq 'SCALAR') { # (ARRAY.SCALAR or ARRAY.REF->SCALAR) in regular vector
 
 						if( $ki =~/^[\d,\-]+$/) {
 						# mixed indices, e.g.: 1-3,6-7-9,-,4,-5,0,7- or 3- (i.e. 3..arr_end) or 0-5 (0..5) or -1- (-1,-2,..arr_start)
@@ -880,10 +906,10 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 						}
 						next;
 					}
-					elsif( ref $d eq 'HASH' and defined( $d->{$ki} ) ) { # ARRAY.HASH
+					elsif( ref $d eq 'HASH') { # ARRAY.HASH
 						$val = $d->{$ki};
 
-						if( ref $val eq 'ARRAY') { # ARRAY.HASH.ARRAY
+						if( defined( $val ) && ref $val eq 'ARRAY') { # ARRAY.HASH.ARRAY
 							for my $vv ( @$val ) {
 								next unless ref \$vv eq 'SCALAR';
 
@@ -892,7 +918,7 @@ push @logs, '--> Table row = '. $row if $DEBUG;
 							}
 							next;
 						}
-						elsif( ref \$val ne 'SCALAR') { # TODO for REF
+						elsif( ref \$val ne 'SCALAR' and ref $val ne 'SCALAR') {
 							next;
 						}
 					}
@@ -938,10 +964,13 @@ push @logs, "~~> l.$. NOT defined %%%V:". $ki if $DEBUG;
 
 			my $val;
 			if( defined $ki ) {
-				if( ref \$values->{$ki} eq 'SCALAR' and defined( $values->{$ki} )) { # HASH.SCALAR
+				if( $ki eq '%%%ADDA') {
+					$val = '';
+				}
+				elsif( ref \$values->{$ki} eq 'SCALAR' and ( !$op->{def} or defined( $values->{$ki} ) ) ) { # HASH.SCALAR
 					$val = $values->{$ki};
 				}
-				elsif( ref $values->{$ki} eq 'SCALAR' and defined( ${ $values->{$ki} } )) { # HASH.REF->SCALAR
+				elsif( ref $values->{$ki} eq 'SCALAR' and ( !$op->{def} or defined( ${ $values->{$ki} } ) ) ) { # HASH.REF->SCALAR
 					$val = ${ $values->{$ki} };
 				}
 				elsif( $ki eq '@' and ref $values->{'@'} eq 'ARRAY') {
@@ -1344,6 +1373,7 @@ the resulting output into a new document.
 Replicase was originally designed for creating programmatically configurable TeX-LaTeX documents.
 
 Unlike other template engines, here conditionals (logic) and loops are completely separated from TeX-LaTeX document
+(they are B<hidden in the properties> of the variable designated I<key> or I<index> for C<%%%V:> and C<%%%VAR:> tags)
 and are moved to your Perl program using this module. It's well suited for this and similar tasks,
 allowing you to dynamically create PDF or PostScript documents that are consistent with each other, yet easily customisable.
 
@@ -1359,20 +1389,47 @@ which replaces the text located to the left of it, in the line where it is locat
   Before blah, blah, \ldots blah. %%%V: myParam
 
 will be replaced by contents of C<myParam> variable.
-However, if there is text after this variable, it will be added to the right of its value:
+However, if there is text after this variable
+(separated by at least one space character, which is "eaten" and will not be in the output stream),
+it will be added to the right of its value:
 
   Before blah, blah, \ldots blah. %%%V: myParam   After blah, \ldots blah.
 
-here 'After blah, \ldots blah.' will remain to the right of C<myParam> value in the line.
+here 'C<  After blah, \ldots blah.>' will remain to the right of C<myParam> value in the line.
 
 This construct can be used as an ON or OFF switch, for example by setting C<myParam>
-to "~" (i.e. " ") or "%" the text 'After blah, \ldots blah.' will be present or absent 
-in the finished PDF or PostScript document.
+to C<"~"> (i.e. C<" ">) or C<"%"> the text 'C<  After blah, \ldots blah.>' will be present or absent 
+in the finished (e.g. compiled by C<pdflatex> or C<latex>) PDF or DVI document.
 
-If a C<variable_name> ends in C<%> (i.e. C<variable_name%>), a newline is suppressed.
+Another trick is to use the magic value C<"\x{001}"> (or C<chr(0x01)>) at the very beginning,
+as a starting sequence for a variable that acts as a trigger,
+i.e., output the value to the left of C<%%%V:> in the template to the finished document.
+Such a trigger can work like this:
+
+  Default value %%%V: myParam
+
+If C<myParam = "some text"> then that template will lead to the creation of such a TeX fragment:
+
+  some text
+
+If C<myParam = "\x{001}some text"> or simply C<myParam = "\x{001}"> then output:
+
+  Default value
+
+This trick can also be performed in a more complex way - without using a magic C<"\x{001}">, 
+but using the C<%%%ADD:> tag and an additional variable C<phantom>,
+the value of which should be adjusted to the value of C<myParam>:
+
+  Default value %%%ADD:%
+  %%%V: phantom%
+  %%%V: myParam
+
+which, you must admit, is extremely inconvenient :(
+
+Besides, if a C<variable_name> ends in C<%> (i.e. C<variable_name%>), a newline is suppressed.
 By default, a newline always occurs after value substitution and 'After blah, \ldots blah.' if it exists.
 
-In C<variable_name> you can use the special character "C</>", which denotes the "path" 
+Also in C<variable_name> you can use the special character "C</>", which denotes the "path" 
 to the variable(s) in the passed dataset (C<$info>) structure, e.g.
 C<%%%V: key/myParam>, C<%%%V: key/index/myParam>, etc.
 
@@ -1439,7 +1496,7 @@ or respectively:
   1234567890
   tail \ldots}
 
-BTW: if C<myParam> is B<undefined> and facultative option (see below) C<def> is set (e.g. 1),
+BTW: if C<myParam = undef> (i.e. B<undefined>) and facultative option (see below) C<def> is set (e.g. 1),
 then these fragments B<will be missing> from the finished TeX.
 
 Usually HASH and ARRAY I<variable_name> are used in the template to create (fill) tables.
@@ -1450,7 +1507,6 @@ It only sets the I<local environment> within the scope of C<%%%VAR:> tag.
 
 Nested C<%%%VAR:> tags will not work and are treated as C<%%%END:> tags,
 i.e. tags for early termination of the scope.
-
 
 =item *
 There are three options for B< C<%%%ENDx> > tags:
@@ -1487,7 +1543,7 @@ It can also be used to disable other tags.
 
 =back
 
-The following tags can be located within the block limited by ARRAY and HASH C<%%%VAR:> and
+The following tags can be located within the block limited by ARRAY and HASH of C<%%%VAR:> and
 any C<%%%ENDx>, C<%%%TDZ:>, or a new C<%%%VAR:> tags:
 
 =over 3
@@ -1514,11 +1570,10 @@ which stores a list (vector) of the keys of this hash in the order
 they are inserted into TeX template.
 
 If a C<key|index> ends in C<%> (e.g. C<keyA%>, C<%%%V:0%>, C<%%%V:@%>, etc. ), a newline is suppressed.
-(By default, a newline always occurs after value substitution and 'After blah, ... blah.' if it exists).
-
+By default, a newline always occurs after value substitution and additional text to the right of C<%%%V:> if it exists.
 
 =item *
-There are three options for B< C<%%%ADDx> > tags:
+There are four (4) options for B< C<%%%ADDx> > tags:
 
 =over 6
 
@@ -1543,7 +1598,23 @@ If the following C<%%%V:> tag is not present, then the text is output B<at the e
 each table (filled area) row.
 
 C<%%%ADD:> can also be used for SCALAR and REF.SCALAR variable,
-but without C<%%%V:> tag because it is redundant and not supported (see above).
+but without C<%%%V:> tag because it is redundant and not supported:
+
+  %%%VAR: myParam
+  \mbox{ %%%ADD:%
+  \rule{0mm}{4.5em} %%%ADD:
+  head \ldots %%%ADD:
+  ... SPECIFY VALUE of myParam!
+  tail \ldots %%%ADDE:%
+  } %%%ADDE:
+  %%%END:
+
+If C<myParam = 1234567890> (it's SCALAR), then that template will lead to the creation of such a TeX fragment:
+
+  \mbox{\rule{0mm}{4.5em}
+  head \ldots
+  1234567890
+  tail \ldots}
 
 BTW: 
 By combining auxiliary parameters and the C<def> facultative option (see below), which specifies discarding (ignoring) 
@@ -1572,8 +1643,8 @@ For example:
    my $msg = replication( $file, $info, def =>1 );
 
 =item 2.
-B< C<%%%ADDE:> > is similar to C<%%%ADD:>, but
-it differs in that text is added B<after> variable specified in C<%%%V:> tag.
+B< C<%%%ADDE:> > is similar to C<%%%ADD:> (means B<Ending> C<%%%ADD>),
+but it differs in that text is added B<after> variable specified in C<%%%V:> tag.
 
 This C<%%%ADDE:> tag must follow immediately after C<%%%V:> tag 
 (i.e. there should not be C<%%%ADD:> tag before it), otherwise it will also become 
@@ -1585,10 +1656,30 @@ Here you must correctly place C<%%%ADD:> and C<%%%ADDE:> tags yourself:
 C<%%%ADD:> denotes what will come before the variable value,
 and C<%%%ADDE:> - after it (see above).
 
-
 =item 3.
 B< C<%%%ADDX:> > is similar to C<%%%ADD:> for all lines (records)
 B<eXcept the first column (0) of first record (0)> or B<after the last column of last record>.
+
+=item 3.
+B< C<%%%ADDA:> > is similar to C<%%%ADD:> (means that C<%%%ADD> is Always present),
+but it is not linked to any C<%%%V:> in the block of C<%%%VAR:>,
+meaning its contents will not depend on the variable's uncertainty of C<%%%V:>,
+and its value will be output in any case and in the appropriate order.
+
+  %%%VAR: myHash
+  \mbox{ %%%ADDA:%
+  \rule{0mm}{4.5em} %%%ADDA:%
+  head \ldots %%%ADD:
+  ... SPECIFY VALUE of myKey! %%%V: myKey
+  tail \ldots %%%ADDE:%
+  } %%%ADDA:
+  ...
+  %%%END:
+
+If C<< myHash = { myKey => undef, ... } >>, then that template will lead to the creation of such a TeX fragment:
+
+  \mbox{  \rule{0mm}{4.5em}  }
+
 
 =back
 
@@ -1597,7 +1688,7 @@ If any C<%%%ADDx:> ends in C<%> (e.g. C<%%%ADD:%>, C<%%%ADDE:%>, or C<%%%ADDX:%>
 
 =back
 
-Only B<ONE tag> can be located on B<ONE line> of input C<$file> (document).
+Only B<ONE tag> can be located on B<ONE line> of input document.
 
 Tag names must be in C<%%%UPPERCASE:>.
 
@@ -1614,15 +1705,16 @@ LaTeX::Replicase provides these subroutines:
 
 =head2 replication( $source, $info [, %facultative_options ] )
 
-Creates a new output file from the specified TeX C<$source>, which is a template.
+Creates a new output file from the specified TeX-document C<$source>, which is a template.
 The TeX-template C<$source> can be either a TeX-file or an array reference,
 each element of which is a TeX-string (with line break C<\n> if necessary).
 
 File name of C<$source> can be absolute,
 i.e. with a full path (include directories and subdirectories).
 File and directory names and paths to them must not contain space characters.
+It is also recommended to use only ASCII characters in the file name.
 
-The output file name is extracted (the same) from C<$source>.
+The output file name is extracted from C<$source>.
 Under no circumstances will C<$source> be overwritten by the new one.
 
 If C<$source> is an array reference and no target file name is specified by C<ofile> option,
@@ -1693,8 +1785,10 @@ i.e. dictates that only C<defined> values be B<into account>.
 
   my $msg = replication( $source, $info, def =>1 );
 
-This option is useful, for example, for creating merged cells in tables (using C<\multicolumn> LaTeX-command)
+This option is useful, for example, to remove blocks of text and for creating merged cells in tables (using C<\multicolumn> LaTeX-command)
 and applies to all incoming data. Also this option can be used as an ON or OFF switch (see above).
+
+If C<def> option is not specified or is 0, then all undefined values are replaced with an empty value, i.e. C<"">.
 
 This option can also be changed dynamically in the template itself using global C<%%%V:=def= 0|1 > tag.
 

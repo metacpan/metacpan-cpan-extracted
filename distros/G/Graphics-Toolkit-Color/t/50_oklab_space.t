@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 95;
+use Test::More tests => 97;
 BEGIN { unshift @INC, 'lib', '../lib', 't/lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 
@@ -16,7 +16,9 @@ is( $space->alias,                             '', 'color space has no alias');
 is( $space->is_name('lab'),                     0, 'can not shorten the name to "LAB"');
 is( $space->is_name('OKlab'),                   1, 'can mix upper and lower case');
 is( $space->is_name('xyz'),                     0, 'axis initials do not equal space name this time');
-is( $space->axis_count,                         3, 'oklab space has 3 axis');
+is( $space->axis_count,                         3, 'OKLAB has 3 axis');
+is( $space->is_euclidean,                       1, 'OKLAB is euclidean');
+is( $space->is_cylindrical,                     0, 'OKLAB is not cylindrical');
 
 is( ref $space->check_value_shape([0, -0.5, -0.5]),'ARRAY', 'check minimal OKLAB values are in bounds');
 is( ref $space->check_value_shape([1, 0.5, 0.5]),  'ARRAY', 'check maximal OKLAB values');

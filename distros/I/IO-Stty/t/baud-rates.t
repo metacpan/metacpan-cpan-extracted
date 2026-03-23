@@ -51,6 +51,8 @@ my %dummy_cc = (
     START => 17,
     STOP  => 19,
     SUSP  => 26,
+    MIN   => 0,
+    TIME  => 0,
 );
 
 for my $rate (@available_standard, @available_modern) {

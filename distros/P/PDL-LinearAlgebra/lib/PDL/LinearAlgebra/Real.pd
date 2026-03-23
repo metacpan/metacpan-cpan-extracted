@@ -46,18 +46,14 @@ typedef PDL_Long logical;
 typedef PDL_Long integer;
 typedef PDL_Long ftnlen;
 
-#ifdef __cplusplus
-typedef logical (*L_fp)(...);
-#else
-typedef logical (*L_fp)();
-#endif
-
-#ifndef min
-#define min(a,b) ((a) <= (b) ? (a) : (b))
-#endif
-#ifndef max
-#define max(a,b) ((a) >= (b) ? (a) : (b))
-#endif
+#define DEF_SEL_FUNC(letter, letter2, args) \
+  void letter ## letter2 ## select_func_set(SV* func); \
+  logical letter ## letter2 ## select_wrapper args; \
+  typedef logical (*L_ ## letter ## letter2 ## p) args;
+DEF_SEL_FUNC(f, , (float *wr, float *wi))
+DEF_SEL_FUNC(d, , (double *wr, double *wi))
+DEF_SEL_FUNC(f, g, (float *zr, float *zi, float *d))
+DEF_SEL_FUNC(d, g, (double *zr, double *zi, double *d))
 
 static integer c_zero = 0;
 static integer c_nine = 9;
@@ -423,8 +419,8 @@ pp_def("gesdd",
 			$GENERIC() *work;
 			if (tra == \'N\'){
 				smlsiz = FORTRAN(ilaenv)(&c_nine, "SGESDD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
-				lwork = max(14*min($SIZE(m),$SIZE(n))+4, 10*min($SIZE(m),
-					$SIZE(n))+2+ smlsiz*(smlsiz+8)) + max($SIZE(m),$SIZE(n));
+				lwork = PDLMAX(14*PDLMIN($SIZE(m),$SIZE(n))+4, 10*PDLMIN($SIZE(m),
+					$SIZE(n))+2+ smlsiz*(smlsiz+8)) + PDLMAX($SIZE(m),$SIZE(n));
 			}
 			work = ($GENERIC() *) malloc(lwork *  sizeof($GENERIC()));
 		FORTRAN($TFD(s,d)gesdd)(
@@ -1664,13 +1660,6 @@ and rcondv, see section 4.11 of LAPACK User\'s Guide.
 
 ');
 
-pp_addhdr('
-void fselect_func_set(SV* func);
-void dselect_func_set(SV* func);
-PDL_Long fselect_wrapper(float *wr, float *wi);
-PDL_Long dselect_wrapper(double *wr, double *wi);
-');
-
 pp_def("gees",
        HandleBad => 0,
 	Pars => '[io]A(n,n);  int jobvs(); int sort(); [o]wr(n); [o]wi(n); [o]vs(p,p); int [o]sdim(); int [o]info(); int [t]bwork(bworkn);',
@@ -1685,7 +1674,7 @@ pp_def("gees",
 		char psort = \'N\';
 		integer lwork = -1;
 
-		extern int FORTRAN($TFD(s,d)gees)(char *jobvs, char *sort, L_fp select, integer *n,
+		extern int FORTRAN($TFD(s,d)gees)(char *jobvs, char *sort, L_$TFD(f,d)p select, integer *n,
 		$GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *wr,
 		$GENERIC() *wi, $GENERIC() *vs, integer *ldvs, $GENERIC() *work,
 		integer *lwork, logical *bwork, integer *info);
@@ -1853,7 +1842,7 @@ pp_def("geesx",
 		integer liwork = 1;
 		integer *iwork;
 		char sens;
-		extern int FORTRAN($TFD(s,d)geesx)(char *jobvs, char *sort, L_fp select, char * sense,
+		extern int FORTRAN($TFD(s,d)geesx)(char *jobvs, char *sort, L_$TFD(f,d)p select, char * sense,
 		integer *n, $GENERIC() *a, integer *lda, integer *sdim, $GENERIC() *wr,
 		$GENERIC() *wi, $GENERIC() *vs, integer *ldvs, $GENERIC() *rconde, $GENERIC() *rcondv,
 		$GENERIC() *work, integer *lwork, integer *iwork, integer *liwork,
@@ -2038,13 +2027,6 @@ the form
 
 ');
 
-pp_addhdr('
-void fgselect_func_set(SV* func);
-void dgselect_func_set(SV* func);
-PDL_Long fgselect_wrapper(float *zr, float *zi, float *d);
-PDL_Long dgselect_wrapper(double *zr, double *zi, double *d);
-');
-
 pp_def("gges",
        HandleBad => 0,
 	Pars => '[io]A(n,n); int jobvsl();int jobvsr();int sort();[io]B(n,n);[o]alphar(n);[o]alphai(n);[o]beta(n);[o]VSL(m,m);[o]VSR(p,p);int [o]sdim();int [o]info(); int [t]bwork(bworkn);',
@@ -2058,7 +2040,7 @@ pp_def("gges",
 	Code => generate_code '
 		integer lwork = -1;
 		char pjobvsl = \'N\', pjobvsr = \'N\', psort = \'N\';
-		extern int FORTRAN($TFD(s,d)gges)(char *jobvsl, char *jobvsr, char *sort, L_fp
+		extern int FORTRAN($TFD(s,d)gges)(char *jobvsl, char *jobvsr, char *sort, L_$TFD(f,d)gp
 		delctg, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
 		integer *ldb, integer *sdim, $GENERIC() *alphar, $GENERIC() *alphai,
 		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
@@ -2286,7 +2268,7 @@ pp_def("ggesx",
 		char psort = \'N\';
 		char psens = \'N\';
 		integer *iwork;
-		extern int FORTRAN($TFD(s,d)ggesx)(char *jobvsl, char *jobvsr, char *sort, L_fp
+		extern int FORTRAN($TFD(s,d)ggesx)(char *jobvsl, char *jobvsr, char *sort, L_$TFD(f,d)gp
 		delctg, char *sense, integer *n, $GENERIC() *a, integer *lda, $GENERIC() *b,
 		integer *ldb, integer *sdim, $GENERIC() *alphar, $GENERIC() *alphai,
 		$GENERIC() *beta, $GENERIC() *vsl, integer *ldvsl, $GENERIC() *vsr,
@@ -2327,10 +2309,10 @@ pp_def("ggesx",
 			integer i__1 = maxwrk;
 			integer i__2 = minwrk + $SIZE(n) * (integer)FORTRAN(ilaenv)(&c__1, "DORGQR"
 				, " ", &(integer){$SIZE(n)}, &c__1, &(integer){$SIZE(n)}, &c_n1, (ftnlen)6, (ftnlen)1);
-			maxwrk = (integer ) max(i__1,i__2);
+			maxwrk = (integer ) PDLMAX(i__1,i__2);
 			pjobvsl = \'V\';
 		}
-		lwork =  (integer ) max(maxwrk,minwrk);
+		lwork =  (integer ) PDLMAX(maxwrk,minwrk);
 
 		{
 		$GENERIC() *work = ($GENERIC() *)malloc(lwork *  sizeof($GENERIC()));
@@ -5492,7 +5474,6 @@ problem
 #		COMPUTATIONAL LEVEL ROUTINES
 #
 ################################################################################
-# TODO IPIV = min(m,n)
 pp_def("getrf",
        HandleBad => 0,
 	Pars => '[io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info()',
@@ -10600,7 +10581,7 @@ pp_addpm({At=>'Bot'},<<'EOD');
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License as in the file Artistic_2

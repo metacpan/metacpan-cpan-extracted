@@ -9,6 +9,7 @@ WriteMakefile(
     VERSION_FROM  => 'lib/IO/Stty.pm',
     ABSTRACT_FROM => 'lib/IO/Stty.pm',
     PL_FILES      => {},
+    ( $ExtUtils::MakeMaker::VERSION >= 6.48 ? ( 'MIN_PERL_VERSION' => '5.008', ) : () ),
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
     ( $ExtUtils::MakeMaker::VERSION >= 6.64 ? (
         TEST_REQUIRES => {

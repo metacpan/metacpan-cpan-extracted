@@ -4,6 +4,7 @@
 # These test the rarely-exercised Exporter extension that makes
 # "use Net::Ident ':fh'" add methods to other packages.
 
+use 5.010;
 use strict;
 use warnings;
 use Test::More;

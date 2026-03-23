@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 93;
+use Test::More tests => 95;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 
@@ -15,7 +15,9 @@ is( $space->name,                         'OKLCH', 'color space name is OKLCH');
 is( $space->alias,                             '', 'color space has no alias name');
 is( $space->is_name('OKlch'),                   1, 'color space name OKlch is correct, lc chars at will!');
 is( $space->is_name('LCH'),                     0, 'color space name LCH is given to CIELCHab');
-is( $space->axis_count,                         3, 'color space has 3 dimensions');
+is( $space->axis_count,                         3, 'OKLCH has 3 dimensions');
+is( $space->is_euclidean,                       0, 'OKLCH is not euclidean');
+is( $space->is_cylindrical,                     1, 'OKLCH is cylindrical');
 
 is( ref $space->check_value_shape([0,0]),              '',   "OKLCH got too few values");
 is( ref $space->check_value_shape([0, 0, 0, 0]),       '',   "OKLCH got too many values");

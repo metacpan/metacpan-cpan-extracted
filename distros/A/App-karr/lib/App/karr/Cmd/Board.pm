@@ -1,7 +1,7 @@
 # ABSTRACT: Show board summary
 
 package App::karr::Cmd::Board;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -15,13 +15,14 @@ use Term::ANSIColor qw( colored );
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
-my %STATUS_COLOR = (
-  backlog       => 'white',
-  todo          => 'cyan',
-  'in-progress' => 'yellow',
-  review        => 'magenta',
-  done          => 'green',
-  archived      => 'bright_black',
+
+my %STATUS_STYLE = (
+  backlog       => 'bold black on_white',
+  todo          => 'bold black on_cyan',
+  'in-progress' => 'bold black on_yellow',
+  review        => 'bold black on_white',
+  done          => 'bold black on_green',
+  archived      => 'bold white on_black',
 );
 
 my %PRIORITY_COLOR = (
@@ -55,13 +56,11 @@ sub execute {
     );
     for my $status (@statuses) {
       my $tasks_in_status = $by_status{$status} // [];
-      my $wip = $config->wip_limit($status);
       my %col = (
         status => $status,
         count  => scalar @$tasks_in_status,
         tasks  => [ map { $_->to_frontmatter } @$tasks_in_status ],
       );
-      $col{wip_limit} = $wip if $wip;
       push @{$board_data{columns}}, \%col;
     }
     $self->print_json(\%board_data);
@@ -79,7 +78,7 @@ sub execute {
   }
 
   my $board_name = $config->data->{board}{name} // 'Kanban Board';
-  my $title = colored(" $board_name ", 'bold white on_blue');
+  my $title = colored(" $board_name ", 'bold white on_black');
   print "\n $title\n\n";
 
   # Skip empty archived unless it has tasks
@@ -90,28 +89,15 @@ sub execute {
   my $has_tasks = 0;
   for my $status (@display_statuses) {
     my $tasks = $by_status{$status} // [];
-    my $wip = $config->wip_limit($status);
     my $count = scalar @$tasks;
-    my $color = $STATUS_COLOR{$status} // 'white';
+    my $style = $STATUS_STYLE{$status} // 'bold white on_black';
 
-    # Status header with count and optional WIP
     my $header = uc($status);
-    my $count_str;
-    if ($wip) {
-      my $over = $count > $wip;
-      $count_str = $over
-        ? colored("$count/$wip", 'bold red')
-        : "$count/$wip";
-    } else {
-      $count_str = "$count";
-    }
-    printf " %s %s\n", colored($header, "bold $color"), "[$count_str]";
+    printf " %s %s\n", colored(" $header ", $style), "[$count]";
 
     if (@$tasks) {
       $has_tasks = 1;
-      # Separator line
-      my $line = colored('─' x 50, $color);
-      print " $line\n";
+      print " " . ('-' x 52) . "\n";
       for my $t (@$tasks) {
         my $id_str = colored(sprintf('#%d', $t->id), 'bold');
         my $pri_color = $PRIORITY_COLOR{$t->priority} // 'white';
@@ -161,7 +147,45 @@ App::karr::Cmd::Board - Show board summary
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr board
+    karr board --compact
+    karr board --json
+
+=head1 DESCRIPTION
+
+Renders a board-oriented summary grouped by status. The default output is a
+human-friendly terminal dashboard with colors and task badges for claims,
+blocked state, and due dates. Compact and JSON modes are available for
+automation and scripting.
+
+=head1 OUTPUT MODES
+
+=over 4
+
+=item * Default output
+
+Shows statuses in board order with task counts and a task summary under each
+populated column.
+
+=item * C<--compact>
+
+Prints one line per status in the form C<status(count): ids>.
+
+=item * C<--json>
+
+Emits the board name, total task count, and a structured C<columns> array with
+per-status task lists.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::List>, L<App::karr::Cmd::Show>,
+L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Context>
 
 =head1 SUPPORT
 
@@ -169,6 +193,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

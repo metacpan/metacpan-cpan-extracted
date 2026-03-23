@@ -609,89 +609,51 @@ ACM - Transactions On Mathematical Software, 24(1):130-156, 1998
 
 pp_defc('trsqrt',
         Pars => '[io]A(2,n,n);int uplo();[o] B(2,n,n);int [o]info()',
-	Doc => '
-
+	Doc => <<'EOF',
 =for ref
 
-Root square of complex triangular matrix. Uses a recurrence of Björck and Hammarling.
-(See Nicholas J. Higham. A new sqrtm for MATLAB. Numerical Analysis
-Report No. 336, Manchester Centre for Computational Mathematics,
-Manchester, England, January 1999. It\'s available at http://www.ma.man.ac.uk/~higham/pap-mf.html)
+Root square of complex triangular matrix. Uses a recurrence of BjÃ¶rck and Hammarling.
 If uplo is true, A is lower triangular.
 
-',
+See Nicholas J. Higham, A new sqrtm for MATLAB. Numerical Analysis
+Report No. 336, Manchester Centre for Computational Mathematics,
+Manchester, England, January 1999, available at L<https://web.archive.org/web/20210420221902/https://www.maths.manchester.ac.uk/~higham/papers/narep336.pdf>
+EOF
 	  GenericTypes => [D],
-          Code => '
-          PDL_CDouble *cb, *ca;
-          PDL_CDouble s, snum, sdenum;
-          double *b;
-          double tt, dn;
-          integer i, j, k, l, ind, ind1, ind2;
+          Code => <<'EOF',
+$info() = 0;
+loop (n1,n0) %{ $B() = 0; %}
+loop(n0)     %{ $B(n1=>n0) = csqrt($A(n1=>n0)); %}
 
-	ca = (PDL_CDouble *) $P(A);
-	b = (void *)$P(B);
-	cb = (PDL_CDouble *) $P(B);
+loop (n1=:-1,n0=:-n1-1) %{
+  integer j = n0 + n1 + 1;
+  PDL_CDouble s = 0;
 
-#define subscr(a_1,a_2)\
-	($uplo()) ? (a_2) * $SIZE(n) + (a_1) : (a_1) * $SIZE(n) + (a_2)
+  if ($uplo())
+    loop (n1=n0+1:j) %{ s += $B()              * $B(n0=>n1,n1=>j); %}
+  else
+    loop (n1=n0+1:j) %{ s += $B(n0=>n1,n1=>n0) * $B(n0=>j); %}
 
-	$info() = 0;
-	ind = $SIZE(n) * $SIZE(n) * 2;
+  PDL_CDouble sdenum = $B(n1=>n0) + $B(n0=>j,n1=>j);
+  PDL_CDouble snum = ($uplo() ? $A(n1=>j) : $A(n0=>j,n1=>n0)) - s;
 
-	for (i = 0; i < ind;i++)
-		b[i] = 0;
-
-  loop(n0) %{
-	ind = subscr(n0,n0);
-	cb[ind] = csqrt(ca[ind]);
-  %}
-
-  for (k = 0; k < $SIZE(n)-1; k++)
-    {
-      for (i = 0; i < $SIZE(n)-(k+1); i++)
-	{
-		j = i + k + 1;
-		ind = subscr(i,j);
-		s = 0;
-
-	  for (l = i+1; l < j; l++)
-	  {
-		ind1 = subscr(i,l);
-		ind2 =  subscr(l,j);
-		s += cb[ind1] * cb[ind2];
-	  }
-
-	  ind1 = subscr(i,i);
-	  ind2 =  subscr(j,j);
-	  sdenum = cb[ind1] + cb[ind2];
-	  snum = ca[ind] - s;
-
-           if (fabs (creal(sdenum)) > fabs (cimag(sdenum)))
-             {
-               if (creal(sdenum) == 0){
-		$info() = -1;
-			goto ENDCTRSQRT;
-		}
-	       tt = cimag(sdenum) / creal(sdenum);
-               dn = creal(sdenum) + tt * cimag(sdenum);
-               cb[ind] = (snum + tt * (-I * snum)) / dn;
-             }
-           else
-             {
-               if (cimag(sdenum) == 0){
-			$info() = -1;
-			goto ENDCTRSQRT;
-		}
-               tt = creal(sdenum) / cimag(sdenum);
-               dn = creal(sdenum) * tt + cimag(sdenum);
-               cb[ind] = (snum * tt + (-I * snum)) / dn;
-             }
-	}
-    }
+  char realbigger = fabs(creal(sdenum)) > fabs(cimag(sdenum));
+  double bigger  = realbigger ? creal(sdenum) : cimag(sdenum);
+  double smaller = realbigger ? cimag(sdenum) : creal(sdenum);
+  if (bigger == 0){
+    $info() = -1;
+    goto ENDCTRSQRT;
+  }
+  double tt = smaller / bigger, dn = bigger + tt * smaller;
+  PDL_CDouble newval = snum * (realbigger ? (1 - tt * I) : (tt - I)) / dn;
+  if ($uplo())
+    $B(n1=>j)        = newval;
+  else
+    $B(n0=>j,n1=>n0) = newval;
+%}
 ENDCTRSQRT:
-    ;
-#undef subscr
-',
+;
+EOF
 );
 
 pp_addhdr('
@@ -1785,7 +1747,7 @@ Improve (msqrt,mlog) / r2C
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License as in the file Artistic_2

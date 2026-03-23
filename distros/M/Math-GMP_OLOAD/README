@@ -1,0 +1,15 @@
+This module enables Math::MPFR/Math::GMPq/Math::GMPz to overload arithmetic
+and comparison operations with Math::GMP objects.
+In such arithmetic operations a Math::MPFR/Math::GMPq/Math::GMPz (respectively)
+object is returned.
+
+REQUIREMENTS:
+We require at least version 4.47 of Math-MPFR, version 0.69 of Math::GMPq and
+version 0.68 of Math::GMPz - otherwise the respective tests are skipped, as at
+least some of them will likelty fail.
+We also require that at least version 2.11 of Math::GMP is installed - otherwise,
+again, the tests are skipped.
+
+Please file any bug reports at https://github.com/sisyphus/math-gmp_oload/Issues .
+Pull Requests to https://github.com/sisyphus/math-gmp_oload/pulls are also welcome.
+

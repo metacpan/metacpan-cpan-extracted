@@ -1,12 +1,13 @@
 # ABSTRACT: Task object representing a single kanban card
 
 package App::karr::Task;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use YAML::XS qw( Load Dump );
 use Path::Tiny;
 use Time::Piece;
 use JSON::MaybeXS qw( encode_json );
+
 
 has id         => ( is => 'ro', required => 1 );
 has title      => ( is => 'rw', required => 1 );
@@ -71,6 +72,7 @@ sub to_frontmatter {
 sub to_markdown {
   my ($self) = @_;
   my $yaml = Dump($self->to_frontmatter);
+  $yaml =~ s/\A---\n//;
   my $md = "---\n${yaml}---\n";
   $md .= "\n" . $self->body . "\n" if $self->body;
   return $md;
@@ -78,7 +80,7 @@ sub to_markdown {
 
 sub _parse_content {
   my ($class, $content) = @_;
-  my ($yaml, $body) = $content =~ m{^---\n(.+?)---\n(.*)$}s
+  my ($yaml, $body) = $content =~ m{\A---\n(.+?)---(?:\n(.*))?\z}s
     or die "Invalid task format\n";
   $body //= '';
   $body =~ s/^\n//;
@@ -122,7 +124,30 @@ App::karr::Task - Task object representing a single kanban card
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    my $task = App::karr::Task->new(
+      id    => 1,
+      title => 'Fix login bug',
+    );
+
+    $task->save('/tmp/karr-materialized/tasks');
+    my $same = App::karr::Task->from_file('/tmp/karr-materialized/tasks/001-fix-login-bug.md');
+
+=head1 DESCRIPTION
+
+L<App::karr::Task> models a single task card and knows how to translate between
+the in-memory object and the Markdown plus YAML frontmatter format used on
+disk and in Git refs. The same Markdown document is stored in
+C<refs/karr/tasks/*/data> and in temporary task files that commands materialize
+while they run.
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::BoardStore>, L<App::karr::Git>,
+L<App::karr::Config>
 
 =head1 SUPPORT
 
@@ -130,6 +155,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

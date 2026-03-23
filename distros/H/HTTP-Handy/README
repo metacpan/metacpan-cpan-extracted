@@ -1,149 +1,133 @@
 NAME
-    HTTP::Handy - A handy HTTP/1.0 server for Perl 5.5.3 and later
 
-VERSION
-    1.00
+  HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
 
 SYNOPSIS
-        use HTTP::Handy;
 
-        my $app = sub {
-            my $env = shift;
-            return [200, ['Content-Type', 'text/plain'], ['Hello, World!']];
-        };
+  use HTTP::Handy;
 
-        HTTP::Handy->run(app => $app, port => 8080);
+  my $app = sub {
+      my $env = shift;
+      return [200, ['Content-Type', 'text/plain'], ['Hello, World!']];
+  };
+
+  HTTP::Handy->run(app => $app, port => 8080);
 
 DESCRIPTION
-    HTTP::Handy is a single-file, zero-dependency HTTP/1.0 server for Perl.
-    It implements a subset of the PSGI specification and is designed for
-    personal use, local tools, and rapid development.
 
-    Not intended for production or internet-facing deployment.
+  HTTP::Handy is a single-file, zero-dependency HTTP/1.0 server for Perl.
+  It implements a subset of the PSGI specification and is designed for
+  personal use, local tools, and rapid development.
 
-    The goals of the project are simplicity and portability. The entire
-    implementation fits in one file with no installation step beyond copying
-    it into your project directory.
+  On startup, run() automatically creates an Apache-like directory layout
+  (logs/, logs/access/, logs/error/, run/, htdocs/, conf/) and begins
+  writing access logs to logs/access/ (10-minute LTSV rotation) and error
+  logs to logs/error/error.log, in addition to STDERR.
 
-REQUIREMENTS
-    Perl     : 5.5.3 or later (all versions, all platforms)
-    OS       : Any (Windows, Unix, macOS, and others)
-    Modules  : Core only -- IO::Socket, POSIX, Carp
-    Model    : Single process, single thread
+  HTTP::Handy is NOT intended for production or internet-facing deployment.
 
-    No CPAN modules are required.
-    No C compiler or external library is needed.
+INCLUDED DOCUMENTATION
+
+  The eg/ directory contains sample programs:
+
+    eg/01_hello_world.pl   Minimal PSGI app (routing, query string)
+    eg/02_static_files.pl  Static file serving with cache control
+    eg/03_form_post.pl     HTML form, POST body, parse_query
+    eg/04_ltsv_viewer.pl   LTSV log viewer, is_htmx, status codes
+
+  The doc/ directory contains PSGI cheat sheets in 21 languages
+  (English, Japanese, Chinese, Korean, French, and 16 more).
+  Each sheet covers the PSGI interface, run() options, $env keys,
+  routing patterns, response builders, and official spec links.
 
 INSTALLATION
-    Manual (no build tools required):
 
-        cp lib/HTTP/Handy.pm /path/to/your/project/
+  Manual (no build tools required):
 
-    Via CPAN:
+    cp lib/HTTP/Handy.pm /path/to/your/project/
 
-        cpan HTTP::Handy
-        cpanm HTTP::Handy
+  Via CPAN:
 
-    Via perl Makefile.PL:
+    cpan HTTP::Handy
+    cpanm HTTP::Handy
 
-        perl Makefile.PL
-        make
-        make test
-        make install
+  Via perl Makefile.PL:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  Via pmake.bat (Windows, no make required):
+
+    pmake.bat test
+    pmake.bat install
 
 DEMO
-    Run directly to start a self-contained demo server:
 
-        perl lib/HTTP/Handy.pm
-        perl lib/HTTP/Handy.pm 9090
+  Run the built-in demo from the distribution directory:
 
-    Then open http://localhost:8080/ in your browser.
+    perl lib/HTTP/Handy.pm           # port 8080 (default)
+    perl lib/HTTP/Handy.pm 9090      # port 9090
 
-    The demo provides three pages:
-      /        Top page with a GET form and a POST form
-      /echo    Echoes parameters back in a table
-      /info    Shows the full PSGI $env hash (useful for debugging)
+  Then open http://localhost:8080/ in your browser.
 
-FEATURES
-    - HTTP/1.0, GET and POST
-    - PSGI subset compatible interface
-    - Static file serving with automatic MIME type detection
-    - Path traversal protection
-    - URL decode and query string parsing
-    - Convenience response builders: response_html, response_text,
-      response_json, response_redirect
-    - Access log to STDERR with timestamp
-    - App exceptions caught and returned as 500 responses
-    - Works as both a module (use HTTP::Handy) and a standalone script
+COMPATIBILITY
 
-PSGI SUBSET
-    Request environment ($env):
+  This module works with Perl 5.005_03 and later.
 
-      REQUEST_METHOD    "GET" or "POST"
-      PATH_INFO         URL path (e.g. "/index.html")
-      QUERY_STRING      Query string, without leading "?"
-      SERVER_NAME       Host name
-      SERVER_PORT       Port number
-      CONTENT_TYPE      Content-Type of POST request
-      CONTENT_LENGTH    Content-Length of POST body
-      HTTP_*            Request headers (uppercased, hyphens to underscores)
-      psgi.input        HTTP::Handy::Input object (read POST body via ->read)
-      psgi.errors       \*STDERR
-      psgi.url_scheme   "http"
+  WHY PERL 5.005_03 SPECIFICATION?
 
-    Response format:
+  This module adheres to the Perl 5.005_03 specification--not because we
+  use the old interpreter, but because this specification represents the
+  simple, original Perl programming model that makes programming enjoyable.
 
-      [$status_code, \@headers, \@body]
+  THE STRENGTH OF MODERN TIMES
 
-      $status_code  integer (e.g. 200, 404)
-      \@headers     flat array: ['Content-Type', 'text/html', ...]
-      \@body        array of strings, joined and sent as response body
+  Some people think the strength of modern times is the ability to use
+  modern technology. That thinking is insufficient. The strength of modern
+  times is the ability to use ALL technology up to the present day.
+
+  By adhering to the Perl 5.005_03 specification, we gain access to the
+  entire history of Perl--from 5.005_03 to 5.42 and beyond--rather than
+  limiting ourselves to only the latest versions.
+
+  Key reasons:
+
+  - Simplicity: Original Perl approach keeps programming "raku" (easy/fun)
+  - JPerl: Final version of JPerl (Japanese Perl)
+  - Universal: Runs on ALL Perl versions (5.005_03 through 5.42+)
+  - Philosophy: Programming should be enjoyable (Camel Book readers know!)
+
+  Perl 5.6+ introduced character encoding complexity that made programming
+  harder. By following the 5.005_03 specification, we maintain the joy of
+  Perl programming.
+
+TARGET USE CASES
+
+  - Local development and rapid prototyping
+  - Personal tools and utilities
+  - Embedded scripting
+  - Educational use
 
 LIMITATIONS
-    - HTTP/1.0 only (no Keep-Alive, no HTTP/1.1, no HTTP/2)
-    - GET and POST only (HEAD, PUT, DELETE etc. return 405)
-    - Single process, single thread (one request at a time)
-    - No HTTPS (use a reverse proxy such as Caddy for TLS)
-    - No chunked transfer encoding
-    - POST body fully buffered in memory (max 10 MB)
-    - No cookie or session management
 
-HTTPS NOTE
-    HTTP::Handy does not support HTTPS. For local use on 127.0.0.1 or
-    localhost, modern browsers do not show HTTPS warnings. For LAN or
-    internet use, place a reverse proxy in front of HTTP::Handy:
-
-        Browser <--HTTPS--> Caddy/nginx/Apache <--HTTP--> HTTP::Handy
-
-TESTING
-    Run the test suite:
-
-        make test
-
-    Or directly with prove:
-
-        prove -l t/
-
-    Network tests (t/03-server.t, t/04-psgi-env.t) start a real HTTP server
-    and connect to it via IO::Socket on the loopback address.
-
-    On Unix the server child is started with fork().
-    On Windows the server is written to a temp file and launched with
-    system(1, ...), which is a Win32 Perl built-in for asynchronous process
-    creation.  Both paths exercise identical test cases.
-
-    All tests pass on CPAN Testers across Windows, Linux, macOS, and BSD.
-
-SEE ALSO
-    PSGI    - The Perl Web Server Gateway Interface specification
-    Plack   - Full-featured PSGI toolkit (requires Perl 5.8+)
-    HTTP::Server::Simple - Another minimal HTTP server for Perl
+  - HTTP/1.0 only (no Keep-Alive, no HTTP/1.1, no HTTP/2)
+  - GET and POST only (HEAD, PUT, DELETE etc. return 405)
+  - Single process, single thread (one request at a time)
+  - No HTTPS (use a reverse proxy such as Caddy for TLS)
+  - No chunked transfer encoding
+  - POST body fully buffered in memory (max 10 MB by default)
+  - No cookie or session management
+  - Log files created relative to the process working directory
 
 AUTHOR
-    ina, CPAN
 
-LICENSE
-    This module is free software. It may be used, redistributed and/or
-    modified under the same terms as Perl itself.
+  INABA Hitoshi <ina@cpan.org>
 
-    See http://www.perl.com/perl/misc/Artistic.html
+COPYRIGHT AND LICENSE
+
+  This software is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+  See http://www.perl.com/perl/misc/Artistic.html

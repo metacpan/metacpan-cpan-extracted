@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 9 "lib/PDL/GSL/RNG.pd"
 
 use strict;
@@ -62,7 +63,7 @@ as C<$pa> and C<$pb>, respectively, and Limits (of domain or
 integration) as C<$la> and C<$lb>.
 
 =cut
-#line 66 "lib/PDL/GSL/RNG.pm"
+#line 67 "lib/PDL/GSL/RNG.pm"
 
 
 =head1 FUNCTIONS
@@ -391,20 +392,32 @@ Example:
    $o = $rng->ran_discrete($discrete_dist_handle,100);
 
 =cut
-#line 395 "lib/PDL/GSL/RNG.pm"
+#line 396 "lib/PDL/GSL/RNG.pm"
 
 
 =head2 ran_bernoulli_pdf
 
 =for sig
 
-  Signature: (uint k(); p(); [o]out())
+ Signature: (uint k(); p(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_bernoulli_pdf($k, $p);
+ ran_bernoulli_pdf($k, $p, $out);  # all arguments given
+ $out = $k->ran_bernoulli_pdf($p); # method call
+ $k->ran_bernoulli_pdf($p, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_bernoulli_pdf processes bad values.
+C<ran_bernoulli_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -423,13 +436,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_beta_pdf($x, $a, $b);
+ ran_beta_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_beta_pdf($a, $b); # method call
+ $x->ran_beta_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_beta_pdf processes bad values.
+C<ran_beta_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -448,13 +473,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (uint k(); p(); uint n(); [o]out())
+ Signature: (uint k(); p(); uint n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_binomial_pdf($k, $p, $n);
+ ran_binomial_pdf($k, $p, $n, $out);  # all arguments given
+ $out = $k->ran_binomial_pdf($p, $n); # method call
+ $k->ran_binomial_pdf($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_binomial_pdf processes bad values.
+C<ran_binomial_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -473,13 +510,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); y(); sigma_x(); sigma_y(); rho(); [o]out())
+ Signature: (x(); y(); sigma_x(); sigma_y(); rho(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_bivariate_gaussian_pdf($x, $y, $sigma_x, $sigma_y, $rho);
+ ran_bivariate_gaussian_pdf($x, $y, $sigma_x, $sigma_y, $rho, $out);  # all arguments given
+ $out = $x->ran_bivariate_gaussian_pdf($y, $sigma_x, $sigma_y, $rho); # method call
+ $x->ran_bivariate_gaussian_pdf($y, $sigma_x, $sigma_y, $rho, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_bivariate_gaussian_pdf processes bad values.
+C<ran_bivariate_gaussian_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -498,13 +547,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_cauchy_pdf($x, $a);
+ ran_cauchy_pdf($x, $a, $out);  # all arguments given
+ $out = $x->ran_cauchy_pdf($a); # method call
+ $x->ran_cauchy_pdf($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_cauchy_pdf processes bad values.
+C<ran_cauchy_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -523,13 +584,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); nu(); [o]out())
+ Signature: (x(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_chisq_pdf($x, $nu);
+ ran_chisq_pdf($x, $nu, $out);  # all arguments given
+ $out = $x->ran_chisq_pdf($nu); # method call
+ $x->ran_chisq_pdf($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_chisq_pdf processes bad values.
+C<ran_chisq_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -548,13 +621,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (alpha(k); theta(k); [o]out())
+ Signature: (alpha(k); theta(k); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_dirichlet_pdf($alpha, $theta);
+ ran_dirichlet_pdf($alpha, $theta, $out);  # all arguments given
+ $out = $alpha->ran_dirichlet_pdf($theta); # method call
+ $alpha->ran_dirichlet_pdf($theta, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_dirichlet_pdf processes bad values.
+C<ran_dirichlet_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -573,13 +658,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); n(); [o]out())
+ Signature: (x(); a(); n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_erlang_pdf($x, $a, $n);
+ ran_erlang_pdf($x, $a, $n, $out);  # all arguments given
+ $out = $x->ran_erlang_pdf($a, $n); # method call
+ $x->ran_erlang_pdf($a, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_erlang_pdf processes bad values.
+C<ran_erlang_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -598,13 +695,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); mu(); [o]out())
+ Signature: (x(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_exponential_pdf($x, $mu);
+ ran_exponential_pdf($x, $mu, $out);  # all arguments given
+ $out = $x->ran_exponential_pdf($mu); # method call
+ $x->ran_exponential_pdf($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_exponential_pdf processes bad values.
+C<ran_exponential_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -623,13 +732,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_exppow_pdf($x, $a, $b);
+ ran_exppow_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_exppow_pdf($a, $b); # method call
+ $x->ran_exppow_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_exppow_pdf processes bad values.
+C<ran_exppow_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -648,13 +769,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); nua(); nub(); [o]out())
+ Signature: (x(); nua(); nub(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_fdist_pdf($x, $nua, $nub);
+ ran_fdist_pdf($x, $nua, $nub, $out);  # all arguments given
+ $out = $x->ran_fdist_pdf($nua, $nub); # method call
+ $x->ran_fdist_pdf($nua, $nub, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_fdist_pdf processes bad values.
+C<ran_fdist_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -673,13 +806,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_flat_pdf($x, $a, $b);
+ ran_flat_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_flat_pdf($a, $b); # method call
+ $x->ran_flat_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_flat_pdf processes bad values.
+C<ran_flat_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -698,13 +843,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_gamma_pdf($x, $a, $b);
+ ran_gamma_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_gamma_pdf($a, $b); # method call
+ $x->ran_gamma_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gamma_pdf processes bad values.
+C<ran_gamma_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -723,13 +880,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); sigma(); [o]out())
+ Signature: (x(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_gaussian_pdf($x, $sigma);
+ ran_gaussian_pdf($x, $sigma, $out);  # all arguments given
+ $out = $x->ran_gaussian_pdf($sigma); # method call
+ $x->ran_gaussian_pdf($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gaussian_pdf processes bad values.
+C<ran_gaussian_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -748,13 +917,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); sigma(); [o]out())
+ Signature: (x(); a(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_gaussian_tail_pdf($x, $a, $sigma);
+ ran_gaussian_tail_pdf($x, $a, $sigma, $out);  # all arguments given
+ $out = $x->ran_gaussian_tail_pdf($a, $sigma); # method call
+ $x->ran_gaussian_tail_pdf($a, $sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gaussian_tail_pdf processes bad values.
+C<ran_gaussian_tail_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -773,13 +954,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (uint k(); p(); [o]out())
+ Signature: (uint k(); p(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_geometric_pdf($k, $p);
+ ran_geometric_pdf($k, $p, $out);  # all arguments given
+ $out = $k->ran_geometric_pdf($p); # method call
+ $k->ran_geometric_pdf($p, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_geometric_pdf processes bad values.
+C<ran_geometric_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -798,13 +991,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_gumbel1_pdf($x, $a, $b);
+ ran_gumbel1_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_gumbel1_pdf($a, $b); # method call
+ $x->ran_gumbel1_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gumbel1_pdf processes bad values.
+C<ran_gumbel1_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -823,13 +1028,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_gumbel2_pdf($x, $a, $b);
+ ran_gumbel2_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_gumbel2_pdf($a, $b); # method call
+ $x->ran_gumbel2_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gumbel2_pdf processes bad values.
+C<ran_gumbel2_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -848,13 +1065,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (uint k(); uint na(); uint nb(); uint t(); [o]out())
+ Signature: (uint k(); uint na(); uint nb(); uint t(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_hypergeometric_pdf($k, $na, $nb, $t);
+ ran_hypergeometric_pdf($k, $na, $nb, $t, $out);  # all arguments given
+ $out = $k->ran_hypergeometric_pdf($na, $nb, $t); # method call
+ $k->ran_hypergeometric_pdf($na, $nb, $t, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_hypergeometric_pdf processes bad values.
+C<ran_hypergeometric_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -873,13 +1102,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); [o]out())
+ Signature: (x(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_landau_pdf($x);
+ ran_landau_pdf($x, $out);  # all arguments given
+ $out = $x->ran_landau_pdf; # method call
+ $x->ran_landau_pdf($out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_landau_pdf processes bad values.
+C<ran_landau_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -898,13 +1139,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_laplace_pdf($x, $a);
+ ran_laplace_pdf($x, $a, $out);  # all arguments given
+ $out = $x->ran_laplace_pdf($a); # method call
+ $x->ran_laplace_pdf($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_laplace_pdf processes bad values.
+C<ran_laplace_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -923,13 +1176,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (uint k(); p(); [o]out())
+ Signature: (uint k(); p(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_logarithmic_pdf($k, $p);
+ ran_logarithmic_pdf($k, $p, $out);  # all arguments given
+ $out = $k->ran_logarithmic_pdf($p); # method call
+ $k->ran_logarithmic_pdf($p, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_logarithmic_pdf processes bad values.
+C<ran_logarithmic_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -948,13 +1213,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_logistic_pdf($x, $a);
+ ran_logistic_pdf($x, $a, $out);  # all arguments given
+ $out = $x->ran_logistic_pdf($a); # method call
+ $x->ran_logistic_pdf($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_logistic_pdf processes bad values.
+C<ran_logistic_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -973,13 +1250,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); zeta(); sigma(); [o]out())
+ Signature: (x(); zeta(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_lognormal_pdf($x, $zeta, $sigma);
+ ran_lognormal_pdf($x, $zeta, $sigma, $out);  # all arguments given
+ $out = $x->ran_lognormal_pdf($zeta, $sigma); # method call
+ $x->ran_lognormal_pdf($zeta, $sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_lognormal_pdf processes bad values.
+C<ran_lognormal_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -998,13 +1287,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (p(k); uint n(k); [o]out())
+ Signature: (p(k); uint n(k); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_multinomial_pdf($p, $n);
+ ran_multinomial_pdf($p, $n, $out);  # all arguments given
+ $out = $p->ran_multinomial_pdf($n); # method call
+ $p->ran_multinomial_pdf($n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_multinomial_pdf processes bad values.
+C<ran_multinomial_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1023,13 +1324,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (uint k(); p(); n(); [o]out())
+ Signature: (uint k(); p(); n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_negative_binomial_pdf($k, $p, $n);
+ ran_negative_binomial_pdf($k, $p, $n, $out);  # all arguments given
+ $out = $k->ran_negative_binomial_pdf($p, $n); # method call
+ $k->ran_negative_binomial_pdf($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_negative_binomial_pdf processes bad values.
+C<ran_negative_binomial_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1048,13 +1361,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_pareto_pdf($x, $a, $b);
+ ran_pareto_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_pareto_pdf($a, $b); # method call
+ $x->ran_pareto_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_pareto_pdf processes bad values.
+C<ran_pareto_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1073,13 +1398,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (uint k(); p(); uint n(); [o]out())
+ Signature: (uint k(); p(); uint n(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_pascal_pdf($k, $p, $n);
+ ran_pascal_pdf($k, $p, $n, $out);  # all arguments given
+ $out = $k->ran_pascal_pdf($p, $n); # method call
+ $k->ran_pascal_pdf($p, $n, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_pascal_pdf processes bad values.
+C<ran_pascal_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1098,13 +1435,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (uint k(); mu(); [o]out())
+ Signature: (uint k(); mu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_poisson_pdf($k, $mu);
+ ran_poisson_pdf($k, $mu, $out);  # all arguments given
+ $out = $k->ran_poisson_pdf($mu); # method call
+ $k->ran_poisson_pdf($mu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_poisson_pdf processes bad values.
+C<ran_poisson_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1123,13 +1472,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); sigma(); [o]out())
+ Signature: (x(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_rayleigh_pdf($x, $sigma);
+ ran_rayleigh_pdf($x, $sigma, $out);  # all arguments given
+ $out = $x->ran_rayleigh_pdf($sigma); # method call
+ $x->ran_rayleigh_pdf($sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_rayleigh_pdf processes bad values.
+C<ran_rayleigh_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1148,13 +1509,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); sigma(); [o]out())
+ Signature: (x(); a(); sigma(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_rayleigh_tail_pdf($x, $a, $sigma);
+ ran_rayleigh_tail_pdf($x, $a, $sigma, $out);  # all arguments given
+ $out = $x->ran_rayleigh_tail_pdf($a, $sigma); # method call
+ $x->ran_rayleigh_tail_pdf($a, $sigma, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_rayleigh_tail_pdf processes bad values.
+C<ran_rayleigh_tail_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1173,13 +1546,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); nu(); [o]out())
+ Signature: (x(); nu(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_tdist_pdf($x, $nu);
+ ran_tdist_pdf($x, $nu, $out);  # all arguments given
+ $out = $x->ran_tdist_pdf($nu); # method call
+ $x->ran_tdist_pdf($nu, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_tdist_pdf processes bad values.
+C<ran_tdist_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1198,13 +1583,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); [o]out())
+ Signature: (x(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_ugaussian_pdf($x);
+ ran_ugaussian_pdf($x, $out);  # all arguments given
+ $out = $x->ran_ugaussian_pdf; # method call
+ $x->ran_ugaussian_pdf($out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_ugaussian_pdf processes bad values.
+C<ran_ugaussian_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1223,13 +1620,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); [o]out())
+ Signature: (x(); a(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_ugaussian_tail_pdf($x, $a);
+ ran_ugaussian_tail_pdf($x, $a, $out);  # all arguments given
+ $out = $x->ran_ugaussian_tail_pdf($a); # method call
+ $x->ran_ugaussian_tail_pdf($a, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_ugaussian_tail_pdf processes bad values.
+C<ran_ugaussian_tail_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1248,13 +1657,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(); a(); b(); [o]out())
+ Signature: (x(); a(); b(); [o]out())
+ Types: (double)
+
+=for usage
+
+ $out = ran_weibull_pdf($x, $a, $b);
+ ran_weibull_pdf($x, $a, $b, $out);  # all arguments given
+ $out = $x->ran_weibull_pdf($a, $b); # method call
+ $x->ran_weibull_pdf($a, $b, $out);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_weibull_pdf processes bad values.
+C<ran_weibull_pdf> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1273,7 +1694,9 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io]a(n); gsl_rng *rng)
+ Signature: ([io]a(n); gsl_rng *rng)
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble cfloat cdouble cldouble)
 
 =for ref
 
@@ -1286,9 +1709,13 @@ Usage:
   $vec2d = sequence(10,10);
   $rng->ran_shuffle_1d($vec2d);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_shuffle_1d does not process bad values.
+C<ran_shuffle_1d> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1311,7 +1738,8 @@ sub ran_shuffle_1d { _ran_shuffle_1d_int(@_[1,0]) }
 
 =for sig
 
-  Signature: ([o]a(); gsl_rng *rng)
+ Signature: ([o]a(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1332,9 +1760,13 @@ Example:
    $x = zeroes 5,6; $max=100;
    $o = $rng->get_uniform(10,10); $rng->get_uniform($x);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-get_uniform does not process bad values.
+C<get_uniform> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1370,7 +1802,8 @@ else {
 
 =for sig
 
-  Signature: ([o]a(); gsl_rng *rng)
+ Signature: ([o]a(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1391,9 +1824,13 @@ Example:
    $x = zeroes 5,6;
    $o = $rng->get_uniform_pos(10,10); $rng->get_uniform_pos($x);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-get_uniform_pos does not process bad values.
+C<get_uniform_pos> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1429,7 +1866,8 @@ else {
 
 =for sig
 
-  Signature: ([o]a(); gsl_rng *rng)
+ Signature: ([o]a(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1451,9 +1889,13 @@ Example:
    $x = zeroes 5,6;
    $o = $rng->get(10,10); $rng->get($x);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-get does not process bad values.
+C<get> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1489,7 +1931,8 @@ else {
 
 =for sig
 
-  Signature: ([o]a(); IV n; gsl_rng *rng)
+ Signature: ([o]a(); IV n; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1511,9 +1954,13 @@ Example:
    $x = zeroes 5,6; $max=100;
    $o = $rng->get(10,10); $rng->get($x);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-get_int does not process bad values.
+C<get_int> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1549,7 +1996,8 @@ else {
 
 =for sig
 
-  Signature: ([o]output(); double sigma; gsl_rng *rng)
+ Signature: ([o]output(); double sigma; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1569,9 +2017,13 @@ Example:
   $o = $rng->ran_gaussian($sigma,10,10);
   $rng->ran_gaussian($sigma,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gaussian does not process bad values.
+C<ran_gaussian> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1607,7 +2059,8 @@ else {
 
 =for sig
 
-  Signature: (sigma();[o]output(); gsl_rng *rng)
+ Signature: (sigma();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1620,9 +2073,13 @@ Usage:
 
    $ndarray = $rng->ran_gaussian_var($sigma_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gaussian_var does not process bad values.
+C<ran_gaussian_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1651,7 +2108,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double tail; gsl_rng *rng)
+ Signature: ([o]output(); double tail; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1671,9 +2129,13 @@ Example:
   $o = $rng->ran_ugaussian_tail($tail,10,10);
   $rng->ran_ugaussian_tail($tail,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_ugaussian_tail does not process bad values.
+C<ran_ugaussian_tail> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1709,7 +2171,8 @@ else {
 
 =for sig
 
-  Signature: (tail();[o]output(); gsl_rng *rng)
+ Signature: (tail();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1722,9 +2185,13 @@ Usage:
 
    $ndarray = $rng->ran_ugaussian_tail_var($tail_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_ugaussian_tail_var does not process bad values.
+C<ran_ugaussian_tail_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1753,7 +2220,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; gsl_rng *rng)
+ Signature: ([o]output(); double mu; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1773,9 +2241,13 @@ Example:
   $o = $rng->ran_exponential($mu,10,10);
   $rng->ran_exponential($mu,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_exponential does not process bad values.
+C<ran_exponential> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1811,7 +2283,8 @@ else {
 
 =for sig
 
-  Signature: (mu();[o]output(); gsl_rng *rng)
+ Signature: (mu();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1824,9 +2297,13 @@ Usage:
 
    $ndarray = $rng->ran_exponential_var($mu_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_exponential_var does not process bad values.
+C<ran_exponential_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1855,7 +2332,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; gsl_rng *rng)
+ Signature: ([o]output(); double pa; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1875,9 +2353,13 @@ Example:
   $o = $rng->ran_laplace($pa,10,10);
   $rng->ran_laplace($pa,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_laplace does not process bad values.
+C<ran_laplace> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1913,7 +2395,8 @@ else {
 
 =for sig
 
-  Signature: (pa();[o]output(); gsl_rng *rng)
+ Signature: (pa();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1926,9 +2409,13 @@ Usage:
 
    $ndarray = $rng->ran_laplace_var($pa_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_laplace_var does not process bad values.
+C<ran_laplace_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1957,7 +2444,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -1977,9 +2465,13 @@ Example:
   $o = $rng->ran_exppow($pa, $pb,10,10);
   $rng->ran_exppow($pa, $pb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_exppow does not process bad values.
+C<ran_exppow> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2015,7 +2507,8 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2028,9 +2521,13 @@ Usage:
 
    $ndarray = $rng->ran_exppow_var($pa_ndarray,$pb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_exppow_var does not process bad values.
+C<ran_exppow_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2059,7 +2556,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; gsl_rng *rng)
+ Signature: ([o]output(); double pa; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2079,9 +2577,13 @@ Example:
   $o = $rng->ran_cauchy($pa,10,10);
   $rng->ran_cauchy($pa,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_cauchy does not process bad values.
+C<ran_cauchy> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2117,7 +2619,8 @@ else {
 
 =for sig
 
-  Signature: (pa();[o]output(); gsl_rng *rng)
+ Signature: (pa();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2130,9 +2633,13 @@ Usage:
 
    $ndarray = $rng->ran_cauchy_var($pa_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_cauchy_var does not process bad values.
+C<ran_cauchy_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2161,7 +2668,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double sigma; gsl_rng *rng)
+ Signature: ([o]output(); double sigma; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2181,9 +2689,13 @@ Example:
   $o = $rng->ran_rayleigh($sigma,10,10);
   $rng->ran_rayleigh($sigma,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_rayleigh does not process bad values.
+C<ran_rayleigh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2219,7 +2731,8 @@ else {
 
 =for sig
 
-  Signature: (sigma();[o]output(); gsl_rng *rng)
+ Signature: (sigma();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2232,9 +2745,13 @@ Usage:
 
    $ndarray = $rng->ran_rayleigh_var($sigma_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_rayleigh_var does not process bad values.
+C<ran_rayleigh_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2263,7 +2780,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double x; double sigma; gsl_rng *rng)
+ Signature: ([o]output(); double x; double sigma; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2284,9 +2802,13 @@ Example:
   $o = $rng->ran_rayleigh_tail($x, $sigma,10,10);
   $rng->ran_rayleigh_tail($x, $sigma,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_rayleigh_tail does not process bad values.
+C<ran_rayleigh_tail> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2322,7 +2844,8 @@ else {
 
 =for sig
 
-  Signature: (x();sigma();[o]output(); gsl_rng *rng)
+ Signature: (x();sigma();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2335,9 +2858,13 @@ Usage:
 
    $ndarray = $rng->ran_rayleigh_tail_var($x_ndarray,$sigma_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_rayleigh_tail_var does not process bad values.
+C<ran_rayleigh_tail_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2366,7 +2893,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; double x; gsl_rng *rng)
+ Signature: ([o]output(); double mu; double x; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2386,9 +2914,13 @@ Example:
   $o = $rng->ran_levy($mu, $x,10,10);
   $rng->ran_levy($mu, $x,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_levy does not process bad values.
+C<ran_levy> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2424,7 +2956,8 @@ else {
 
 =for sig
 
-  Signature: (mu();x();[o]output(); gsl_rng *rng)
+ Signature: (mu();x();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2437,9 +2970,13 @@ Usage:
 
    $ndarray = $rng->ran_levy_var($mu_ndarray,$x_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_levy_var does not process bad values.
+C<ran_levy_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2468,7 +3005,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2488,9 +3026,13 @@ Example:
   $o = $rng->ran_gamma($pa, $pb,10,10);
   $rng->ran_gamma($pa, $pb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gamma does not process bad values.
+C<ran_gamma> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2526,7 +3068,8 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2539,9 +3082,13 @@ Usage:
 
    $ndarray = $rng->ran_gamma_var($pa_ndarray,$pb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gamma_var does not process bad values.
+C<ran_gamma_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2570,7 +3117,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double la; double lb; gsl_rng *rng)
+ Signature: ([o]output(); double la; double lb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2590,9 +3138,13 @@ Example:
   $o = $rng->ran_flat($la, $lb,10,10);
   $rng->ran_flat($la, $lb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_flat does not process bad values.
+C<ran_flat> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2628,7 +3180,8 @@ else {
 
 =for sig
 
-  Signature: (la();lb();[o]output(); gsl_rng *rng)
+ Signature: (la();lb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2641,9 +3194,13 @@ Usage:
 
    $ndarray = $rng->ran_flat_var($la_ndarray,$lb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_flat_var does not process bad values.
+C<ran_flat_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2672,7 +3229,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; double sigma; gsl_rng *rng)
+ Signature: ([o]output(); double mu; double sigma; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2692,9 +3250,13 @@ Example:
   $o = $rng->ran_lognormal($mu, $sigma,10,10);
   $rng->ran_lognormal($mu, $sigma,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_lognormal does not process bad values.
+C<ran_lognormal> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2730,7 +3292,8 @@ else {
 
 =for sig
 
-  Signature: (mu();sigma();[o]output(); gsl_rng *rng)
+ Signature: (mu();sigma();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2743,9 +3306,13 @@ Usage:
 
    $ndarray = $rng->ran_lognormal_var($mu_ndarray,$sigma_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_lognormal_var does not process bad values.
+C<ran_lognormal_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2774,7 +3341,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double nu; gsl_rng *rng)
+ Signature: ([o]output(); double nu; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2794,9 +3362,13 @@ Example:
   $o = $rng->ran_chisq($nu,10,10);
   $rng->ran_chisq($nu,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_chisq does not process bad values.
+C<ran_chisq> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2832,7 +3404,8 @@ else {
 
 =for sig
 
-  Signature: (nu();[o]output(); gsl_rng *rng)
+ Signature: (nu();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2845,9 +3418,13 @@ Usage:
 
    $ndarray = $rng->ran_chisq_var($nu_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_chisq_var does not process bad values.
+C<ran_chisq_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2876,7 +3453,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double nu1; double nu2; gsl_rng *rng)
+ Signature: ([o]output(); double nu1; double nu2; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2896,9 +3474,13 @@ Example:
   $o = $rng->ran_fdist($nu1, $nu2,10,10);
   $rng->ran_fdist($nu1, $nu2,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_fdist does not process bad values.
+C<ran_fdist> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2934,7 +3516,8 @@ else {
 
 =for sig
 
-  Signature: (nu1();nu2();[o]output(); gsl_rng *rng)
+ Signature: (nu1();nu2();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2947,9 +3530,13 @@ Usage:
 
    $ndarray = $rng->ran_fdist_var($nu1_ndarray,$nu2_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_fdist_var does not process bad values.
+C<ran_fdist_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2978,7 +3565,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double nu; gsl_rng *rng)
+ Signature: ([o]output(); double nu; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -2999,9 +3587,13 @@ Example:
   $o = $rng->ran_tdist($nu,10,10);
   $rng->ran_tdist($nu,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_tdist does not process bad values.
+C<ran_tdist> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3037,7 +3629,8 @@ else {
 
 =for sig
 
-  Signature: (nu();[o]output(); gsl_rng *rng)
+ Signature: (nu();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3050,9 +3643,13 @@ Usage:
 
    $ndarray = $rng->ran_tdist_var($nu_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_tdist_var does not process bad values.
+C<ran_tdist_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3081,7 +3678,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3101,9 +3699,13 @@ Example:
   $o = $rng->ran_beta($pa, $pb,10,10);
   $rng->ran_beta($pa, $pb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_beta does not process bad values.
+C<ran_beta> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3139,7 +3741,8 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3152,9 +3755,13 @@ Usage:
 
    $ndarray = $rng->ran_beta_var($pa_ndarray,$pb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_beta_var does not process bad values.
+C<ran_beta_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3183,7 +3790,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double m; gsl_rng *rng)
+ Signature: ([o]output(); double m; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3203,9 +3811,13 @@ Example:
   $o = $rng->ran_logistic($m,10,10);
   $rng->ran_logistic($m,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_logistic does not process bad values.
+C<ran_logistic> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3241,7 +3853,8 @@ else {
 
 =for sig
 
-  Signature: (m();[o]output(); gsl_rng *rng)
+ Signature: (m();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3254,9 +3867,13 @@ Usage:
 
    $ndarray = $rng->ran_logistic_var($m_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_logistic_var does not process bad values.
+C<ran_logistic_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3285,7 +3902,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double lb; gsl_rng *rng)
+ Signature: ([o]output(); double pa; double lb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3305,9 +3923,13 @@ Example:
   $o = $rng->ran_pareto($pa, $lb,10,10);
   $rng->ran_pareto($pa, $lb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_pareto does not process bad values.
+C<ran_pareto> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3343,7 +3965,8 @@ else {
 
 =for sig
 
-  Signature: (pa();lb();[o]output(); gsl_rng *rng)
+ Signature: (pa();lb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3356,9 +3979,13 @@ Usage:
 
    $ndarray = $rng->ran_pareto_var($pa_ndarray,$lb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_pareto_var does not process bad values.
+C<ran_pareto_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3387,7 +4014,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3407,9 +4035,13 @@ Example:
   $o = $rng->ran_weibull($pa, $pb,10,10);
   $rng->ran_weibull($pa, $pb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_weibull does not process bad values.
+C<ran_weibull> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3445,7 +4077,8 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3458,9 +4091,13 @@ Usage:
 
    $ndarray = $rng->ran_weibull_var($pa_ndarray,$pb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_weibull_var does not process bad values.
+C<ran_weibull_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3489,7 +4126,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3509,9 +4147,13 @@ Example:
   $o = $rng->ran_gumbel1($pa, $pb,10,10);
   $rng->ran_gumbel1($pa, $pb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gumbel1 does not process bad values.
+C<ran_gumbel1> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3547,7 +4189,8 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3560,9 +4203,13 @@ Usage:
 
    $ndarray = $rng->ran_gumbel1_var($pa_ndarray,$pb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gumbel1_var does not process bad values.
+C<ran_gumbel1_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3591,7 +4238,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Signature: ([o]output(); double pa; double pb; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3611,9 +4259,13 @@ Example:
   $o = $rng->ran_gumbel2($pa, $pb,10,10);
   $rng->ran_gumbel2($pa, $pb,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gumbel2 does not process bad values.
+C<ran_gumbel2> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3649,7 +4301,8 @@ else {
 
 =for sig
 
-  Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Signature: (pa();pb();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3662,9 +4315,13 @@ Usage:
 
    $ndarray = $rng->ran_gumbel2_var($pa_ndarray,$pb_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_gumbel2_var does not process bad values.
+C<ran_gumbel2_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3693,7 +4350,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double mu; gsl_rng *rng)
+ Signature: ([o]output(); double mu; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3713,9 +4371,13 @@ Example:
   $o = $rng->ran_poisson($mu,10,10);
   $rng->ran_poisson($mu,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_poisson does not process bad values.
+C<ran_poisson> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3751,7 +4413,8 @@ else {
 
 =for sig
 
-  Signature: (mu();[o]output(); gsl_rng *rng)
+ Signature: (mu();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3764,9 +4427,13 @@ Usage:
 
    $ndarray = $rng->ran_poisson_var($mu_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_poisson_var does not process bad values.
+C<ran_poisson_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3795,7 +4462,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; gsl_rng *rng)
+ Signature: ([o]output(); double p; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3815,9 +4483,13 @@ Example:
   $o = $rng->ran_bernoulli($p,10,10);
   $rng->ran_bernoulli($p,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_bernoulli does not process bad values.
+C<ran_bernoulli> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3853,7 +4525,8 @@ else {
 
 =for sig
 
-  Signature: (p();[o]output(); gsl_rng *rng)
+ Signature: (p();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3866,9 +4539,13 @@ Usage:
 
    $ndarray = $rng->ran_bernoulli_var($p_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_bernoulli_var does not process bad values.
+C<ran_bernoulli_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3897,7 +4574,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; double n; gsl_rng *rng)
+ Signature: ([o]output(); double p; double n; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3917,9 +4595,13 @@ Example:
   $o = $rng->ran_binomial($p, $n,10,10);
   $rng->ran_binomial($p, $n,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_binomial does not process bad values.
+C<ran_binomial> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3955,7 +4637,8 @@ else {
 
 =for sig
 
-  Signature: (p();n();[o]output(); gsl_rng *rng)
+ Signature: (p();n();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -3968,9 +4651,13 @@ Usage:
 
    $ndarray = $rng->ran_binomial_var($p_ndarray,$n_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_binomial_var does not process bad values.
+C<ran_binomial_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3999,7 +4686,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; double n; gsl_rng *rng)
+ Signature: ([o]output(); double p; double n; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4022,9 +4710,13 @@ Example:
   $o = $rng->ran_negative_binomial($p, $n,10,10);
   $rng->ran_negative_binomial($p, $n,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_negative_binomial does not process bad values.
+C<ran_negative_binomial> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4060,7 +4752,8 @@ else {
 
 =for sig
 
-  Signature: (p();n();[o]output(); gsl_rng *rng)
+ Signature: (p();n();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4073,9 +4766,13 @@ Usage:
 
    $ndarray = $rng->ran_negative_binomial_var($p_ndarray,$n_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_negative_binomial_var does not process bad values.
+C<ran_negative_binomial_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4104,7 +4801,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; double n; gsl_rng *rng)
+ Signature: ([o]output(); double p; double n; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4126,9 +4824,13 @@ Example:
   $o = $rng->ran_pascal($p, $n,10,10);
   $rng->ran_pascal($p, $n,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_pascal does not process bad values.
+C<ran_pascal> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4164,7 +4866,8 @@ else {
 
 =for sig
 
-  Signature: (p();n();[o]output(); gsl_rng *rng)
+ Signature: (p();n();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4177,9 +4880,13 @@ Usage:
 
    $ndarray = $rng->ran_pascal_var($p_ndarray,$n_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_pascal_var does not process bad values.
+C<ran_pascal_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4208,7 +4915,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; gsl_rng *rng)
+ Signature: ([o]output(); double p; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4228,9 +4936,13 @@ Example:
   $o = $rng->ran_geometric($p,10,10);
   $rng->ran_geometric($p,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_geometric does not process bad values.
+C<ran_geometric> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4266,7 +4978,8 @@ else {
 
 =for sig
 
-  Signature: (p();[o]output(); gsl_rng *rng)
+ Signature: (p();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4279,9 +4992,13 @@ Usage:
 
    $ndarray = $rng->ran_geometric_var($p_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_geometric_var does not process bad values.
+C<ran_geometric_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4310,7 +5027,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double n1; double n2; double t; gsl_rng *rng)
+ Signature: ([o]output(); double n1; double n2; double t; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4333,9 +5051,13 @@ Example:
   $o = $rng->ran_hypergeometric($n1, $n2, $t,10,10);
   $rng->ran_hypergeometric($n1, $n2, $t,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_hypergeometric does not process bad values.
+C<ran_hypergeometric> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4371,7 +5093,8 @@ else {
 
 =for sig
 
-  Signature: (n1();n2();t();[o]output(); gsl_rng *rng)
+ Signature: (n1();n2();t();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4384,9 +5107,13 @@ Usage:
 
    $ndarray = $rng->ran_hypergeometric_var($n1_ndarray,$n2_ndarray,$t_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_hypergeometric_var does not process bad values.
+C<ran_hypergeometric_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4415,7 +5142,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]output(); double p; gsl_rng *rng)
+ Signature: ([o]output(); double p; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4435,9 +5163,13 @@ Example:
   $o = $rng->ran_logarithmic($p,10,10);
   $rng->ran_logarithmic($p,$o);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_logarithmic does not process bad values.
+C<ran_logarithmic> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4473,7 +5205,8 @@ else {
 
 =for sig
 
-  Signature: (p();[o]output(); gsl_rng *rng)
+ Signature: (p();[o]output(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4486,9 +5219,13 @@ Usage:
 
    $ndarray = $rng->ran_logarithmic_var($p_ndarray);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_logarithmic_var does not process bad values.
+C<ran_logarithmic_var> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4517,7 +5254,8 @@ my ($obj,@var) = @_;
 
 =for sig
 
-  Signature: ([o]x(); double sigma; gsl_rng *rng)
+ Signature: ([o]x(); double sigma; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4535,9 +5273,13 @@ Example:
 
    $rng->ran_additive_gaussian(1,$image);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_additive_gaussian does not process bad values.
+C<ran_additive_gaussian> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4567,7 +5309,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(); double sigma; gsl_rng *rng)
+ Signature: ([o]x(); double sigma; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4585,9 +5328,13 @@ Example:
 
    $rng->ran_additive_poisson(1,$image);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_additive_poisson does not process bad values.
+C<ran_additive_poisson> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4617,7 +5364,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(); gsl_rng *rng)
+ Signature: ([o]x(); gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4636,9 +5384,13 @@ Example:
 
    $rng->ran_feed_poisson($image);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_feed_poisson does not process bad values.
+C<ran_feed_poisson> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4668,7 +5420,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(n); double sigma_x; double sigma_y; double rho; gsl_rng *rng)
+ Signature: ([o]x(n); double sigma_x; double sigma_y; double rho; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4686,9 +5439,13 @@ Example:
 
    $o = $rng->ran_bivariate_gaussian(1,2,0.5,1000);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_bivariate_gaussian does not process bad values.
+C<ran_bivariate_gaussian> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4740,14 +5497,15 @@ sub ran_bivariate_gaussian {
 	 return $p;
        }
        
-#line 4744 "lib/PDL/GSL/RNG.pm"
+#line 5501 "lib/PDL/GSL/RNG.pm"
 
 
 =head2 ran_discrete
 
 =for sig
 
-  Signature: ([o]x(); gsl_ran_discrete_t *rng_discrete; gsl_rng *rng)
+ Signature: ([o]x(); gsl_ran_discrete_t *rng_discrete; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4768,9 +5526,13 @@ Example:
    $ddh = $rng->ran_discrete_preproc($prob);
    $o = $rng->ran_discrete($discrete_dist_handle,100);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_discrete does not process bad values.
+C<ran_discrete> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4815,14 +5577,15 @@ my ($obj,$nout,@in) = @_;
 $obj->ran_choose(PDL->sequence(PDL::indx(), 0+@in),my $pout = PDL->zeroes(PDL::indx(), $nout));
 @in[$pout->list];
 }
-#line 4819 "lib/PDL/GSL/RNG.pm"
+#line 5581 "lib/PDL/GSL/RNG.pm"
 
 
 =head2 ran_ver
 
 =for sig
 
-  Signature: ([o]x(n); double x0; double r;IV ns => n; gsl_rng *rng)
+ Signature: ([o]x(n); double x0; double r;IV ns => n; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4835,9 +5598,13 @@ Usage:
 
    $rng->ran_ver($x0, $r, $n);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_ver does not process bad values.
+C<ran_ver> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4867,7 +5634,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o]x(n); double m; IV ns => n; gsl_rng *rng)
+ Signature: ([o]x(n); double m; IV ns => n; gsl_rng *rng)
+ Types: (float double)
 
 =for ref
 
@@ -4880,9 +5648,13 @@ Usage:
 
    $rng->ran_caos($m,$n);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ran_caos does not process bad values.
+C<ran_caos> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4935,7 +5707,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL RNG and randist modules were written by James Theiler.
 
 =cut
-#line 4939 "lib/PDL/GSL/RNG.pm"
+#line 5711 "lib/PDL/GSL/RNG.pm"
 
 # Exit with OK status
 

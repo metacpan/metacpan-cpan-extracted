@@ -1,6 +1,14 @@
 Revision history for Perl module Math::GMPq
 
+0.69
+ - Allow the overloaded comparison operations to accept a Math-GMP object.
+ - Allow the overloaded exponentiation functions (overload_pow & overload_pow_eq)
+   to accept a Math::GMPz or Math::GMP object when and only when the value of
+   that object fits into an unsigned int.
+ - Add Rmpq_fits_uint_p function. (There is no mpq_fits_uint_p library function.)
+
 0.68
+ - Allow the overloaded comparison operations to accept a Math-GMP object.
  - Fix test in t/overload_cross_class.t. Fixes (eg):
    https://www.cpantesters.org/cpan/report/3d47714c-454f-11f0-9a27-d5266e8775ea
  - Ensure that overloaded <=> operations return one of 1, -1, 0, and undef.

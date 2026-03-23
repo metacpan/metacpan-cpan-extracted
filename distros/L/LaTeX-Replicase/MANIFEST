@@ -1,8 +1,12 @@
 Changes
 Makefile.PL
-MANIFEST
 README
 SECURITY.md
+LICENSE
+MANIFEST
+MYMETA.yml
+MYMETA.json
+MANIFEST.SKIP
 lib/LaTeX/Replicase.pm
 t/00-pod.t
 t/01-replication.t
@@ -11,6 +15,7 @@ t/10-pod-coverage.t
 t/11-code_coverage.t
 t/12-kwalitee.t
 t/13-critic.t
+t/14-manifest.t
 t/template_good.tex
 t/template_test.tex
 META.yml                                 Module YAML meta-data (added by MakeMaker)

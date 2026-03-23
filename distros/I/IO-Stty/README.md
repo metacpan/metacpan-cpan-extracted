@@ -175,8 +175,8 @@ turned off by preceding it with a \`-'.
 
     Same as:
 
-        cread -ignbrk brkint -inlcr -igncr icrnl -ixoff opost 
-        isig icanon echo echoe echok -echonl -noflsh -tostop 
+        cread -ignbrk brkint -inlcr -igncr icrnl -ixoff opost
+        isig icanon iexten echo echoe echok -echonl -noflsh -tostop
 
     also sets all special characters to their default
     values.
@@ -269,7 +269,7 @@ character.
 - min N
 
     Set the minimum number of characters that will satisfy a read 
-    until the time value has expired,  when <E>-icanon<E> is set.
+    until the time value has expired, when `-icanon` is set.
 
 - time N
 
@@ -325,7 +325,17 @@ character.
 
 - **show\_me\_the\_crap()**
 
-    Needs documentation
+        my $output = IO::Stty::show_me_the_crap(
+            $c_cflag, $c_iflag, $ispeed, $c_lflag, $c_oflag,
+            $ospeed,  \%control_chars
+        );
+
+    Format terminal settings as a human-readable string, equivalent to
+    `stty -a` output.  Returns a multi-line string showing the current baud
+    rate, special character assignments (in hat notation), and the state of
+    all control, input, output, and local flags.
+
+    This is the back-end for `stty(\*FH, '-a')`.
 
 # AUTHOR
 

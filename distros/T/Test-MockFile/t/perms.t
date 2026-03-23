@@ -10,6 +10,11 @@ use Fcntl qw( O_RDONLY O_WRONLY O_RDWR O_CREAT );
 
 use Test::MockFile qw< nostrict >;
 
+# On systems with restrictive umask (e.g., 077), group/other permission bits
+# are stripped from mock files, causing tests that rely on those bits to fail.
+my $current_umask = umask;
+my $restrictive_umask = ( $current_umask & 077 ) != 0;    # true if group or other bits are masked
+
 # GitHub issue #3: User perms are not checked on file access.
 # When set_user() is active, mock operations check Unix permission bits.
 
@@ -75,6 +80,7 @@ subtest 'open read-write with owner rw permission' => sub {
 };
 
 subtest 'open with group permissions' => sub {
+    skip_all 'umask strips group bits' if $restrictive_umask;
     my $f = Test::MockFile->file( '/perms/grp', 'data', { mode => 0040, uid => 1000, gid => 500 } );
 
     # User in group 500 can read
@@ -85,6 +91,7 @@ subtest 'open with group permissions' => sub {
 };
 
 subtest 'open with other permissions' => sub {
+    skip_all 'umask strips other bits' if $restrictive_umask;
     my $f = Test::MockFile->file( '/perms/other', 'data', { mode => 0004, uid => 1000, gid => 1000 } );
 
     # Random user can read via "other" bits
@@ -154,6 +161,7 @@ subtest 'opendir permission checks' => sub {
 };
 
 subtest 'opendir group read permission' => sub {
+    skip_all 'umask strips group bits' if $restrictive_umask;
     my $dir = Test::MockFile->new_dir( '/perms/grpdir', { mode => 0050, uid => 1000, gid => 500 } );
 
     with_user {
@@ -291,6 +299,7 @@ subtest 'non-existent file returns ENOENT not EACCES' => sub {
 # =========================================================================
 
 subtest 'user with multiple groups' => sub {
+    skip_all 'umask strips group bits' if $restrictive_umask;
     my $f = Test::MockFile->file( '/perms/multigrp', 'data', { mode => 0040, uid => 1000, gid => 500 } );
 
     # User in secondary group 500

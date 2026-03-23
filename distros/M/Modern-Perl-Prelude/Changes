@@ -1,5 +1,37 @@
 Revision history for Modern::Perl::Prelude
 
+0.008  2026-03-22
+    - Add optional -always_true / always_true support via the true module
+    - Allow modules to omit a trailing 1; on Perl 5.30+ when always_true is enabled
+    - Support both flag-style and hash-style always_true imports
+    - Support explicit no Modern::Perl::Prelude -always_true / { always_true => 1 }
+    - Add true as a dependency and use true::VERSION in Makefile metadata
+    - Document always_true in POD and README
+    - Add coverage tests for always_true import and unimport behavior
+    - Preserve 0.007 work on hash-style imports and Test2::Tools::Spec conversion
+
+0.007  2026-03-22
+    - Add documented hash-style import arguments via a single hash reference
+    - Support hash-style keys: utf8, class, defer, corinna
+    - Make -class and -corinna mutually exclusive for both flag-style and hash-style imports
+    - Add tests for hash-style utf8 import and hash-style corinna import
+    - Add tests for unknown hash-style keys and mixed flag/hash argument misuse
+    - Update README and POD to document hash-style imports and class/corinna exclusivity
+    - Keep Object::Pad as the test dependency for corinna support
+    - Convert t/04-class-defer.t to Test2::Tools::Spec
+    - Convert t/05-corinna.t to Test2::Tools::Spec
+    - Replace Test2::Bundle::Extended test dependency with Test2::V0 and Test2::Tools::Spec
+    - Fix CI failures on Perl 5.30 .. 5.38 caused by missing Test2 bundle
+    - Add co-author metadata and documentation
+
+0.006  2026-03-22
+    - Add optional -corinna import via Object::Pad
+    - Make -class and -corinna mutually exclusive
+    - Add t/05-corinna.t with Object::Pad coverage
+    - Add Object::Pad to test dependencies
+    - Refresh README to document -corinna correctly
+    - Add t/05-corinna.t to MANIFEST and author EOL checks
+
 0.005  2026-03-17
     - Add optional -class import via Feature::Compat::Class
     - Add optional -defer import via Feature::Compat::Defer

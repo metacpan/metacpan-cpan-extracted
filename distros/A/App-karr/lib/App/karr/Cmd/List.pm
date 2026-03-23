@@ -1,7 +1,7 @@
 # ABSTRACT: List tasks with filtering and sorting
 
 package App::karr::Cmd::List;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,6 +12,7 @@ use App::karr::Role::Output;
 use App::karr::Task;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 option status => (
   is => 'ro',
@@ -76,19 +77,25 @@ sub execute {
 
   if ($self->compact) {
     for my $t (@tasks) {
-      printf "%3d  %-12s %-8s %s\n", $t->id, $t->status, $t->priority, $t->title;
+      printf "#%-4u %10s %s\n", $t->id, $t->status, $t->title;
     }
     return;
   }
 
-  # Table output
-  printf "%-4s %-12s %-8s %-10s %s\n", 'ID', 'Status', 'Priority', 'Assignee', 'Title';
-  printf "%s\n", '-' x 70;
+  printf "%-5s %10s %s\n", 'ID', 'STATUS', 'TITLE';
+  printf "%s\n", '-' x 72;
   for my $t (@tasks) {
-    printf "%-4d %-12s %-8s %-10s %s\n",
-      $t->id, $t->status, $t->priority,
-      ($t->has_assignee ? $t->assignee : '-'),
-      $t->title;
+    my @meta;
+    push @meta, $t->priority if defined $t->priority && length $t->priority;
+    push @meta, '@' . $t->assignee if $t->has_assignee;
+    push @meta, 'blocked' if $t->has_blocked;
+    my $title = $t->title;
+    $title .= ' [' . join(', ', @meta) . ']' if @meta;
+
+    printf "#%-4u %10s %s\n",
+      $t->id,
+      $t->status,
+      $title;
   }
   printf "\n%d task(s)\n", scalar @tasks;
 }
@@ -169,7 +176,50 @@ App::karr::Cmd::List - List tasks with filtering and sorting
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr list
+    karr list --status todo,in-progress --priority high,critical
+    karr list --claimed-by agent-fox --compact
+    karr list -s docker --json
+
+=head1 DESCRIPTION
+
+Lists tasks from the current board with optional filtering and sorting.
+Archived tasks are excluded by default so the output focuses on active work.
+Use C<--compact> for terse one-line output and C<--json> for machine-readable
+automation.
+
+=head1 FILTERS AND SORTING
+
+=over 4
+
+=item * C<--status>, C<--priority>
+
+Accept comma-separated lists and only return tasks matching one of the
+requested values.
+
+=item * C<--assignee>, C<--tag>, C<--claimed-by>
+
+Limit the result set to a specific assignee, tag, or claim owner.
+
+=item * C<-s>, C<--search>
+
+Performs a case-insensitive substring search across title, body, and tags.
+
+=item * C<--sort>, C<--reverse>
+
+Sort by C<id>, C<status>, C<priority>, C<created>, C<updated>, or C<due>, and
+optionally reverse the result order.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Show>, L<App::karr::Cmd::Board>,
+L<App::karr::Cmd::Create>, L<App::karr::Cmd::Pick>
 
 =head1 SUPPORT
 
@@ -177,6 +227,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

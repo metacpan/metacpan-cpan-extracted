@@ -1,6 +1,6 @@
 package Razor2::Syslog;
 
-use IO::Socket;
+use IO::Socket::IP;
 use IO::File;
 use Data::Dumper;
 
@@ -70,7 +70,7 @@ sub new {
         $self->{$_} = $par{$_};
     }
 
-    my $sock = new IO::Socket::INET(
+    my $sock = new IO::Socket::IP(
         PeerAddr => $$self{SyslogHost},
         PeerPort => $$self{SyslogPort},
         Proto    => 'udp'

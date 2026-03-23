@@ -3,7 +3,7 @@ package Regexp::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 use 5.006;
 use Carp qw( carp croak );
@@ -78,6 +78,7 @@ sub regex {
     named_captures => {},
     flags => [$init_flags],
     next => ['atom'],
+    quotemeta => 0,
   );
 
   # do the initial scan (populates maxpar)
@@ -91,6 +92,7 @@ sub regex {
   $self->{tree} = [];
   $self->{flags} = [$init_flags];
   $self->{next} = ['atom'];
+  $self->{quotemeta} = 0;
 
   return 1;
 }

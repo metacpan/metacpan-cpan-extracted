@@ -8,7 +8,7 @@ use warnings;
 
 my $number_form = '-?(?:\d+|\d+\.\d+|\.\d+)';
 
-#### constructor and name space API ####################################
+#### constructor, building attr data ###################################
 sub new { # -, $:Basis -- ~|@~val_form, , ~|@~suffix --> :_
     my ($pkg, $basis, $value_form, $prefix, $suffix) = @_;
     return 'First argument has to be an Color::Space::Basis reference !'
@@ -21,7 +21,7 @@ sub new { # -, $:Basis -- ~|@~val_form, , ~|@~suffix --> :_
     $value_form = [ map {(defined $_ and $_) ? $_ : $number_form } @$value_form]; # fill missing defs with default
     return 'Need a value form definition for every axis!' unless @$value_form == $count;
 
-    $suffix = create_suffix_list( $basis, $suffix ) ;
+    $suffix = expand_suffix_def( $basis, $suffix ) ;
     return $suffix unless ref $suffix;
 
     # format --> tuple
@@ -44,7 +44,7 @@ sub new { # -, $:Basis -- ~|@~val_form, , ~|@~suffix --> :_
           }
 }
 
-sub create_suffix_list {
+sub expand_suffix_def {
     my ($basis, $suffix) = @_;
     my $count = $basis->axis_count;
     $suffix = [('') x $count] unless defined $suffix;
@@ -52,6 +52,11 @@ sub create_suffix_list {
     return 'need an ARRAY as definition of axis value suffix' unless ref $suffix eq 'ARRAY';
     return 'definition of axis value suffix has to have same lengths as basis' unless @$suffix == $count;
     return $suffix;
+}
+sub get_suffix {
+    my ($self, $suffix) = @_;
+    return $self->{'suffix'} unless defined $suffix;
+    expand_suffix_def( $self->{'basis'}, $suffix );
 }
 
 sub add_formatter   {
@@ -77,11 +82,6 @@ sub set_value_numifier {
 sub basis           { $_[0]{'basis'}}
 sub has_formatter   { (defined $_[1] and exists $_[0]{'formatter'}{ lc $_[1] }) ? 1 : 0 }
 sub has_deformatter { (defined $_[1] and exists $_[0]{'deformatter'}{ lc $_[1] }) ? 1 : 0 }
-sub get_suffix {
-    my ($self, $suffix) = @_;
-    return $self->{'suffix'} unless defined $suffix;
-    create_suffix_list( $self->{'basis'}, $suffix );
-}
 
 sub deformat {
     my ($self, $color, $suffix) = @_;

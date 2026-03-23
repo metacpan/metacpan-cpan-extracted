@@ -1,3 +1,10 @@
+1.41 Mar 22 2026
+
+  [Bug Fixes]
+  - Fix float parsing on -Dusequadmath perls: use Perl's Atof() instead of
+    strtod() so that floats like -3.14 are not corrupted by double-precision
+    rounding artifacts (GH #140, PR #141)
+
 1.39 Mar 21 2026
 
   [Bug Fixes]

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tester 4.009;
+package Config::Model::Tester 4.010;
 # ABSTRACT: Test framework for Config::Model
 
 use warnings;
@@ -17,6 +17,7 @@ use utf8;
 use v5.20;
 
 use feature qw/postderef signatures/;
+no warnings qw/experimental::postderef experimental::signatures/;
 
 use Test::More;
 use Log::Log4perl 1.11 qw(:easy :levels);
@@ -795,7 +796,7 @@ Config::Model::Tester - Test framework for Config::Model
 
 =head1 VERSION
 
-version 4.009
+version 4.010
 
 =head1 SYNOPSIS
 

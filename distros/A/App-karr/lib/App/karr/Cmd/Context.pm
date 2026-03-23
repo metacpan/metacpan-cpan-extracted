@@ -1,7 +1,7 @@
 # ABSTRACT: Generate board context summary for embedding
 
 package App::karr::Cmd::Context;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -14,6 +14,7 @@ use App::karr::Config;
 use Time::Piece;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 option write_to => (
   is => 'ro',
@@ -57,15 +58,6 @@ sub execute {
   my $active = grep { $_->status ne $first_status && !$terminal{$_->status} } @active_tasks;
   my $blocked = grep { $_->has_blocked } @active_tasks;
   my $overdue = $self->_count_overdue(\@active_tasks, \%terminal);
-
-  # WIP warnings
-  my @wip_warnings;
-  for my $status (@statuses) {
-    my $limit = $config->wip_limit($status);
-    next unless $limit;
-    my $count = grep { $_->status eq $status } @active_tasks;
-    push @wip_warnings, "$status ($count/$limit)" if $count >= $limit;
-  }
 
   # Build sections
   my %wanted_sections;
@@ -114,7 +106,6 @@ sub execute {
         active => $active,
         blocked => $blocked,
         overdue => $overdue,
-        (@wip_warnings ? (wip_warning => 'WIP limit reached: ' . join(', ', @wip_warnings)) : ()),
       },
       sections => \@section_data,
     };
@@ -123,7 +114,7 @@ sub execute {
   }
 
   # Render markdown
-  my $md = $self->_render_markdown($board_name, $total, $active, $blocked, $overdue, \@wip_warnings, \@section_data);
+  my $md = $self->_render_markdown($board_name, $total, $active, $blocked, $overdue, \@section_data);
 
   if ($self->write_to) {
     $self->_write_to_file($md);
@@ -133,14 +124,10 @@ sub execute {
 }
 
 sub _render_markdown {
-  my ($self, $board_name, $total, $active, $blocked, $overdue, $wip_warnings, $sections) = @_;
+  my ($self, $board_name, $total, $active, $blocked, $overdue, $sections) = @_;
   my $md = "<!-- BEGIN kanban-md context -->\n";
   $md .= "## Board: $board_name\n\n";
   $md .= "**$total tasks** | $active active | $blocked blocked | $overdue overdue\n\n";
-
-  if (@$wip_warnings) {
-    $md .= "> WIP limit reached: " . join(', ', @$wip_warnings) . "\n\n";
-  }
 
   my %section_title = (
     'in-progress'        => 'In Progress',
@@ -232,7 +219,37 @@ App::karr::Cmd::Context - Generate board context summary for embedding
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr context
+    karr context --sections blocked,overdue
+    karr context --write-to AGENTS.md --days 14
+    karr context --json
+
+=head1 DESCRIPTION
+
+Builds a concise board summary suitable for embedding into agent context files
+such as F<AGENTS.md>. The command can print Markdown directly, emit structured
+JSON, or update an existing file between sentinel comments.
+
+=head1 SECTIONS
+
+The generated context can include C<in-progress>, C<blocked>, C<overdue>, and
+C<recently-completed>. Use C<--sections> with a comma-separated list to limit
+the output to a subset.
+
+=head1 FILE UPDATE MODE
+
+When C<--write-to> is used, the command replaces the content between
+C<BEGIN kanban-md context> and C<END kanban-md context> if those sentinels are
+already present; otherwise it appends the generated block to the file.
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Board>, L<App::karr::Cmd::List>,
+L<App::karr::Cmd::Config>, L<App::karr::Cmd::Skill>
 
 =head1 SUPPORT
 
@@ -240,6 +257,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

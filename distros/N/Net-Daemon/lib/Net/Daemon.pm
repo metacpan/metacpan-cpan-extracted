@@ -32,7 +32,7 @@ use Net::Daemon::Log ();
 use POSIX            ();
 use File::Spec       ();
 
-our $VERSION = '0.49';
+our $VERSION = '0.51';
 our @ISA = qw(Net::Daemon::Log);
 
 our $RegExpLock = 1;
@@ -97,6 +97,10 @@ sub Options ($) {
         'help' => {
             'template'    => 'help',
             'description' => '--help                  ' . 'Print this help message'
+        },
+        'listen' => {
+            'template'    => 'listen=i',
+            'description' => '--listen <num>          ' . 'Size of the listen queue (backlog); defaults to 10'
         },
         'localaddr' => {
             'template'    => 'localaddr=s',
@@ -327,7 +331,14 @@ sub Clone ($$) {
     $self->{'socket'} = $client;
     $self->{'parent'} = $proto;
     bless( $self, ref($proto) );
+    $self->post_clone();
     $self;
+}
+
+sub post_clone ($) {
+    # Override in subclasses to initialize cloned (per-connection) instances.
+    # Called by Clone() after the new object is created. The parent server
+    # object is available as $self->{'parent'}.
 }
 
 ############################################################################
@@ -358,7 +369,7 @@ sub Accept ($) {
         if ( $self->{'proto'} eq 'unix' ) {
             ( $name, $aliases, $addrtype, $length, @addrs ) = (
                 'localhost', '', Socket::AF_INET(),
-                length( Socket::IN_ADDR_ANY() ),
+                length( Socket::INADDR_ANY ),
                 Socket::inet_aton('127.0.0.1')
             );
         }
@@ -489,8 +500,9 @@ sub ChildFunc {
             my $method = shift;
             $self->$method(@_);
         };
-        threads->new( $startfunc, $self, $method, @args )
+        my $thr = threads->new( $startfunc, $self, $method, @args )
           or die "Failed to create a new thread: $!";
+        $thr->detach();
     }
     else {
         my $pid = fork();
@@ -535,7 +547,13 @@ sub HandleChild {
 sub SigChildHandler {
     my $self = shift;
     my $ref  = shift;
-    return 'IGNORE' if $self->{'mode'} eq 'fork' || $self->{'childs'};
+    if ( $self->{'mode'} eq 'fork' || $self->{'childs'} ) {
+        return sub {
+            while ( ( my $pid = waitpid( -1, POSIX::WNOHANG() ) ) > 0 ) {
+                $$ref = $pid if $ref;
+            }
+        };
+    }
     return undef;    # Don't care for childs.
 }
 
@@ -797,6 +815,13 @@ connects. It receives the main server object as input and returns a
 new object. This new object will be passed to the methods that finally
 do the true work of communicating with the client. Communication occurs
 over the socket B<$socket>, B<Clone>'s argument.
+
+Note that B<Clone> does I<not> call B<new>; it creates a shallow copy
+of the server object. If your subclass needs to initialize per-connection
+state, override the B<post_clone> method rather than checking for
+C<$self-E<gt>{'parent'}> inside B<new>. B<post_clone> is called by
+B<Clone> after the new object is created and blessed. The default
+implementation is a no-op.
 
 Possible object attributes and the corresponding command line
 arguments are:
@@ -1199,19 +1224,19 @@ given base.
   sub new ($$;$) {
       my($class, $attr, $args) = @_;
       my($self) = $class->SUPER::new($attr, $args);
-      if ($self->{'parent'}) {
-	  # Called via Clone()
-	  $self->{'base'} = $self->{'parent'}->{'base'};
-      } else {
-	  # Initial call
-	  if ($self->{'options'}  &&  $self->{'options'}->{'base'}) {
-	      $self->{'base'} = $self->{'options'}->{'base'}
-          }
+      if ($self->{'options'}  &&  $self->{'options'}->{'base'}) {
+	  $self->{'base'} = $self->{'options'}->{'base'}
       }
       if (!$self->{'base'}) {
 	  $self->{'base'} = 'dec';
       }
       $self;
+  }
+
+  # Initialize per-connection state after Clone()
+  sub post_clone ($) {
+      my($self) = @_;
+      $self->{'base'} = $self->{'parent'}->{'base'};
   }
 
   sub Run ($) {

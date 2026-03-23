@@ -4,4 +4,6 @@
 ^MANIFEST.bak
 ^.gitignore
 ^Makefile$
-/.perltidyrc
+^\.perltidyrc$
+^CLAUDE\.md$
+^cpanfile$

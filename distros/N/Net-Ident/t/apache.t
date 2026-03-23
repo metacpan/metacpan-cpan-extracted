@@ -1,5 +1,6 @@
 # $Id: apache.t,v 1.28 1999/08/26 23:39:52 john Exp $
 
+use 5.010;
 use strict;
 use warnings;
 

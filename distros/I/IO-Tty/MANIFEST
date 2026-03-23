@@ -4,7 +4,9 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 Pty.pm
 README
+t/pty_destroy.t
 t/pty_get_winsize.t
+t/pty_set_raw.t
 t/test.t
 try
 Tty.pm

@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 143;
+use Test::More tests => 145;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 
@@ -16,7 +16,9 @@ is( $space->alias,                       'CIELUV', 'color space alias is LUV');
 is( $space->is_name('cieLUV'),                  1, 'full space  name recognized');
 is( $space->is_name('Luv'),                     1, 'axis initials do qual space name');
 is( $space->is_name('Lab'),                     0, 'axis initials do not equal space name this time');
-is( $space->axis_count,                         3, 'color space has 3 dimensions');
+is( $space->axis_count,                         3, 'CIELUV has 3 dimensions');
+is( $space->is_euclidean,                       1, 'CIELUV is euclidean');
+is( $space->is_cylindrical,                     0, 'CIELUV is not cylindrical');
 
 is( ref $space->check_value_shape([0, 0, 0]),          'ARRAY', 'check minimal CIELUV values are in bounds');
 is( ref $space->check_value_shape([0.950, 1, 1.088]),  'ARRAY', 'check maximal CIELUV values');

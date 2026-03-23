@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 # names by default without a very good reason. Use EXPORT_OK instead.
 # Do not simply export all your public functions/methods/constants.
 our @EXPORT  = qw();
-our $VERSION = '2.86';
+our $VERSION = '2.87';
 
 XSLoader::load( 'Razor2::Preproc::deHTMLxs', $VERSION );
 

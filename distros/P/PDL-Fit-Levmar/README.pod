@@ -14,9 +14,9 @@ PDL::Fit::Levmar - Levenberg-Marquardt fit/optimization routines
 Levenberg-Marquardt routines for least-squares fit to
 functions non-linear in fit parameters.
 
-This module provides a L<PDL> ( L<PDL::PDL> ) interface to the non-linear fitting
-library levmar 2.5 (written in C). Levmar is
-L<thread|/example--6> aware (in the L<PDL> sense), provides support for analytic
+This module provides a L<PDL> interface to the non-linear fitting
+library levmar 2.6 (written in C). Levmar is
+L<broadcast|/example--6> aware, provides support for analytic
 or finite difference derivatives (in case no analytic
 derivatives are supplied), L<linear|/A> and/or L<box|/UB>
 and/or L<inequality|/C>
@@ -60,9 +60,7 @@ Don't confuse this module with, but see also,  L<PDL::Fit::LM>.
                       x = p0 * exp(-t*t * p1);');
     print levmar_report($result_hash);
 
-
 =head1 EXAMPLES
-
 
 A number of examples of invocations of C<levmar> follow. The test
 directory C<./t> in the module distribution contains many more examples.
@@ -172,7 +170,6 @@ with C<FLOAT> expanded to double and once expanded to float)
 The correct version is used automatically depending on the
 type of pdls you give levmar.
 
-
 =item example--4
 
 We supply an analytic derivative ( analytic jacobian).
@@ -230,7 +227,6 @@ and double code versions would have used type double for them.
 This is ok, because it doesn't cost any storage or cause
 a memory fault because of incorrect pointer arithmetic.
 
-
 =item example--5
 
 Here is an example from the liblevmar demo program that shows
@@ -266,7 +262,7 @@ translated by C<lpp> to d[q+r*m], which is the index into a
 
 =item example--6
 
-Here is an example that uses implicit threading. We create data
+Here is an example that uses implicit broadcasting. We create data
 from a gaussian function with four different sets of parameters
 and fit it all in one function call.
 
@@ -291,7 +287,6 @@ and fit it all in one function call.
   [         3        0.3]
  ]
 
-
 =item example--7
 
 This example shows how to fit a bivariate Gaussian. Here
@@ -307,19 +302,18 @@ is the fit function.
     $x .= $p0 * exp( -$p1*$t1*$t1 - $p2*$t2*$t2);
  }
 
-
 We would prefer a function that maps t(n,n) --> x(n,n) (with
 p viewed as parameters.) But the levmar library expects one
 dimensional x and t. So we design C<gauss2d> to take
-piddles with these dimensions: C<p(3)>, C<xin(n*n)>,
+ndarrays with these dimensions: C<p(3)>, C<xin(n*n)>,
 C<t(n)>. For this example, we assume that both the co-ordinate
 axes run over the same range, so we only need to pass n
-values for t. The piddles t1 and t2 are (virtual) copies of
+values for t. The ndarrays t1 and t2 are (virtual) copies of
 t with dummy dimensions inserted. Each represents
 co-ordinate values along each of the two axes at each point
 in the 2-d space, but independent of the position along the
 other axis.  For instance C<t1(i,j) == t(i)> and C<t1(i,j)
-== t(j)>. We assume that the piddle xin is a flattened
+== t(j)>. We assume that the ndarray xin is a flattened
 version of the ordinate data, so we split the dimensions in
 x. Then the entire bi-variate gaussian is calculated with
 one line that operates on 2-d matrices. Now we create some
@@ -341,7 +335,7 @@ Finally, we fit the data with an incorrect set of initial parameters,
    my $p1 = pdl  [ 1,1,1];  # not the parameters we used to make the data
    my $h = levmar($p1,$xlin,$t,\&gauss2d);
 
-At this point C<$h->{P}> refers to the output parameter piddle C<[0.5, 2, 3]>.
+At this point C<$h->{P}> refers to the output parameter ndarray C<[0.5, 2, 3]>.
 
 =back
 
@@ -365,7 +359,7 @@ levmar() is called like this
  or this:
  levmar($arg1, $arg2, ..., {OPT1=>$val1, OPT2=>$val2, ...});
 
-When calling levmar, the first 3 piddle arguments (or refs
+When calling levmar, the first 3 ndarray arguments (or refs
 to arrays), if present, are taken to be C<$p>,C<$x>, and C<$t>
 (parameters, ordinate data, and co-ordinate data) in that
 order. The first scalar value that can be interpreted as a
@@ -407,7 +401,7 @@ any of the following, which are auto-detected.
 
 If you are fitting a lot of data by doing many iterations over
 a loop of perl code, it is by far most efficient to create a Func
-object from C or lpp code and pass it to levmar. (Implicit threading
+object from C or lpp code and pass it to levmar. (Implicit broadcasting
 does not recompile code in any case.)
 
 You can also pass pure C code via the option CSRC.
@@ -449,7 +443,7 @@ parameters at their input values and letting the free
 parameters vary. This is implemented by using the linear
 constraint option described below. Each element must be
 either one or zero. This option currently cannot be
-threaded. That is, if the array FIX has more than one
+broadcasted. That is, if the array FIX has more than one
 dimension you will not get correct results. Also, PDL will
 not add dimension correctly if you pass additional
 dimensions in other quantities.  Threading will work if you
@@ -494,7 +488,6 @@ box constraints, or both. That is, you may specify A, B, UB, and LB.
 =item LB
 
 See C<UB>.
-
 
 =item WGHTS
 
@@ -549,8 +542,8 @@ some problem. But unless the covariance matrix is very large,
 it probably won't help much. On the other hand it almost certainly
 won't make levmar() less efficient.
 
-Note that levmar returns a piddle representing the covariance in
-the output hash. This will be the the same piddle that you give
+Note that levmar returns an ndarray representing the covariance in
+the output hash. This will be the the same ndarray that you give
 as input via this option. So, if you do the following,
 
   my $covar = PDL->null
@@ -579,7 +572,6 @@ Send a pdl reference for the output hash element C<INFO>.
 
 Send a pdl reference for the output hash element C<RET>.
 (see C<COVAR>)
-
 
 =item MAXITS
 
@@ -611,7 +603,6 @@ at the current estimate for C<p> and the data.
 This is a step size used in computing numeric derivatives. It is
 not used if the analytic jacobian is used.
 
-
 =item MKOBJ
 
 command to compile source into object code. This option is actually set in
@@ -635,7 +626,6 @@ written by Levmar::Func. This can be used to include headers and so forth.
 This option is actually set in the Levmar::Func object. This code is also written
 at the top of c code translated from lpp code.
 
-
 =item FVERBOSE
 
 If true (eg 1) Print the compiling and linking commands to STDERR when compiling fit functions.
@@ -645,7 +635,6 @@ This option is actually passed to Levmar::Func. Default is 0.
 
 Here are the default values
 of some options
-
 
  $Levmar_defaults = {
    FUNC => undef,  # Levmar::Func object, or function def, or ...
@@ -673,7 +662,6 @@ of some options
    };
 
 =back
-
 
 =head1 OUTPUT
 
@@ -715,7 +703,6 @@ find an explanation somewhere here.)
  4  singular matrix. Restart from current p with increased \mu
  5  no further error reduction is possible. Restart with increased \mu
  6  stopped by small ||e||_2
-
 
 =item ERRI, ERR1, ERR2, ERR3, ERR4
 
@@ -805,12 +792,10 @@ untouched.
 
 where q is a sequence of digits.
 
-
 =item xq -> x[q]  
 
 where q is a sequence of digits. This is applied only in the fit function,
 not in the jacobian.
-
 
 =item dq[r] -> d[q+m*r]
 
@@ -823,7 +808,6 @@ small number of data points since this is outside a
 loop. Some provisions should be added to C<lpp>, say C<m=3> to
 hard code the value of C<m>. But m is only explicitly used in
 constructions involving this substitution.
-
 
 =back
 
@@ -839,16 +823,13 @@ i in the fit function and i and j in the jacobian.
 (literal "i")  You can also write t[i] or t[expression involving i] by hand.
 Example: t*t -> t[i]*t[i].
 
-
 =item pq -> p[q]  
 
 where q is a sequence of digits. Example p3 -> p[3].
 
-
 =item x -> x[i]   
 
 only in fit function, not in jacobian.
-
 
 =item (dr or dr[i]) -> d[j++] 
 
@@ -864,10 +845,7 @@ assign the derivative functions.
 
 =back
 
-
 =back
-
-
 
 =item C Code
 
@@ -885,16 +863,15 @@ We should make it possible to pass the function names as a separate option
 rather than parsing the C code. This will allow auxiallary functions to
 be defined in the C code; something that is currently not possible.
 
-
 =item Perl_Subroutines
 
 This is how to use perl subroutines as fit functions... (see
 the examples for now, e.g. L<example 2|/example--2>.)  The
-fit function takes piddles $p,$x, and $t, with dimensions
+fit function takes ndarrays $p,$x, and $t, with dimensions
 m,n, and tn. (often tn ==n ).  These are references with
 storage already allocated (by the user and liblevmar). So
 you must use C<.=> when setting values. The jacobian takes
-piddles $p,$d, and $t, where $d, the piddle of derivatives
+ndarrays $p,$d, and $t, where $d, the ndarray of derivatives
 has dimensions (m,n). For example
 
  $f = sub myexp {
@@ -915,10 +892,7 @@ has dimensions (m,n). For example
     $d((2)) .= 1.0;
  }
 
-
-
 =back
-
 
 =head1 PDL::Fit::Levmar::Func Objects
 
@@ -931,7 +905,6 @@ if you do
 then $outh->{LFUNC} will contain a ref to the function object. The .so
 file, if it exists, will not be deleted until the object is destroyed.
 This will happen, for instance if you do C<$outh = undef>.
-
 
 =head1 IMPLEMENTATION
 
@@ -946,7 +919,6 @@ compiler.  The C compiler options are taken from
 %Config. This is mostly because I had already written those
 parts before I found the modules. I imagine the
 implementation here has less overhead, but is less portable.
-
 
 =item perl subroutine fit functions
 
@@ -1018,7 +990,6 @@ pressed into the service of delivering other parameters to
 the fit routine. (Formally, even if you use t(n), they are
 parameters.) 
 
-
 =head2 levmar_chkjac()
 
 =for ref
@@ -1031,7 +1002,6 @@ the derivatives numerically.
     p(m); t(n); [o] err(n);
     This is the relevant part of the signature of the
     routine that does the work.
-
 
 =for usage
 
@@ -1065,7 +1035,6 @@ number n as a perl scalar in place of t. For example
 
    $err = levmar_chkjac($Gh,$p,5);
 
-
 in the case that f is hardcoded to return five values.
 
 Need to put the description from the C code in here.
@@ -1085,13 +1054,12 @@ by levmar().
 
  print levmar_report($h);
 
-
 =head1 BUGS
 
-With the levmar-2.5 code: Passing workspace currently does not work with
-linear inequality constraint. Some of the PDL threading no long works
+With the levmar-2.6 code: Passing workspace currently does not work with
+linear inequality constraint. Some of the PDL broadcasting no long works
 correctly. These are noted in the tests in t/thread.t. It is not clear
-if it is a threading issue or the fitting has changed.
+if it is a broadcasting issue or the fitting has changed.
 
  
 =cut
@@ -1185,7 +1153,6 @@ OPTIONS:
  CTOP  --   The value of this string will be written at the top of the c code
   written by Levmar::Func. This can be used to include headers and so forth.
   This option is actually set in the Levmar::Func object.
-
 
 =head2 call()
 

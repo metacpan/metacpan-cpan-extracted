@@ -2,16 +2,16 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 92;
+use Test::More tests => 94;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 use Graphics::Toolkit::Color qw/color/;
 
-my $red   = color(255,0,0);
-my $blue  = color({r => 0, g => 0, b=>255});
-my $purple = color({hue => 300, s => 100, l => 25});
-my $black = color([0,0,0]);
-my $white = color('cmy',0,0,0);
+my $red    = color( 255,0,0 );
+my $blue   = color( {r => 0, g => 0, b=>255} );
+my $purple = color( {hue => 300, s => 100, l => 25} );
+my $black  = color( [0,0,0] );
+my $white  = color( 'cmy',0,0,0 );
 my @names;
 
 is( $red->name,          'red', 'color name "red" is correct');
@@ -132,5 +132,8 @@ is( keys %$values,              3, 'HSL has 3 keays');
 is( $values->{'h'},           240, '"hue" value is correct');
 is( $values->{'s'},           100, '"saturation" value is correct');
 is( $values->{'l'},            50, '"lightness" value is correct');
+
+is( $blue->is_in_gamut('hsl: 10,10,10'),    1, 'is_in_gamut method works with normal HSL color');
+is( $blue->is_in_gamut('hsl: -10,10,10'),   0, 'is_in_gamut method works with normal HSL color');
 
 exit 0;

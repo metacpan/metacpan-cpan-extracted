@@ -56,12 +56,12 @@ $hash{clean}{FILES} .= " " . $hash{OBJECT} .
 $hash{OPTIMIZE} = "-O3";  # from levmar src Makefile minus clang-incompat unroll-loops
 
 $hash{PREREQ_PM} = { 
-    'PDL' => '2.074',
+    'PDL' => '2.075',
     'File::Temp' => 0,
 };
 
 $hash{CONFIGURE_REQUIRES} = {
-    'PDL' => '2.074', # definitely got the multi-C changes
+    'PDL' => '2.075', # broadcastloop
     'ExtUtils::MakeMaker' => 0,
 };
 
@@ -109,17 +109,17 @@ sub c_o {
 # purely to generate a README.pod for the github front page
 my $POD_header = <<EOF;
 
-=head1 OVERVIEW
+X=head1 OVERVIEW
 
-This module is available on CPAN
+XThis module is available on CPAN
 
-=cut
+X=cut
 
 EOF
 
-if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
-{
+if ($ARGV[0] && $ARGV[0] eq 'README.pod') {
   open README, '>README.pod'              or die "Couldn't open README.pod";
+  $POD_header =~ s#^X##gm;
   print README $POD_header;
 
   foreach my $mod  ('Levmar.pm', 'Func/Func.pm') {
@@ -133,5 +133,3 @@ if(exists $ARGV[0] && $ARGV[0] eq 'README.pod')
   }
   close(README);
 }
-
-

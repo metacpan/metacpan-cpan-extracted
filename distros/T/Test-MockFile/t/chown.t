@@ -8,7 +8,7 @@ use Test2::Tools::Explain;
 use Test2::Plugin::NoWarnings;
 use Test2::Tools::Exception qw< lives dies >;
 use Test::MockFile ();
-use Errno qw/ENOENT/;
+use Errno qw/ENOENT EPERM/;
 
 my $euid     = $>;
 my $egid     = int $);
@@ -224,6 +224,10 @@ subtest(
             { uid => $custom_uid, gid => $custom_gid },
         );
 
+        # Use root mock user so permission checks don't interfere with
+        # the -1 preservation semantics being tested here.
+        Test::MockFile->set_user( 0, 0 );
+
         # chown(-1, -1) should keep the custom values, not replace with $> / $)
         ok( chown( -1, -1, '/chown_test_preserve' ), 'chown(-1, -1) succeeds' );
 
@@ -242,6 +246,41 @@ subtest(
         @st = stat('/chown_test_preserve');
         is( $st[4], 99, 'uid still preserved after gid-only change' );
         is( $st[5], 42, 'gid changed to 42' );
+
+        Test::MockFile->clear_user;
+    }
+);
+
+subtest(
+    'chown uid-only and gid-only permission checks' => sub {
+        my $file = Test::MockFile->file(
+            '/chown_perm_test' => 'data',
+            { uid => 1000, gid => 1000 },
+        );
+
+        # Non-root user cannot change uid to a different user (uid-only)
+        Test::MockFile->set_user( 1000, 1000 );
+        $! = 0;
+        is( chown( 2000, -1, '/chown_perm_test' ), 0, 'non-root cannot chown uid-only to different user' );
+        is( $! + 0, EPERM, 'errno is EPERM for uid-only chown' );
+
+        # Non-root user cannot change gid to a group they are not in (gid-only)
+        $! = 0;
+        is( chown( -1, 9999, '/chown_perm_test' ), 0, 'non-root cannot chown gid-only to foreign group' );
+        is( $! + 0, EPERM, 'errno is EPERM for gid-only chown' );
+
+        # Non-root user CAN change gid to a group they belong to
+        Test::MockFile->set_user( 1000, 1000, 2000 );
+        $! = 0;
+        is( chown( -1, 2000, '/chown_perm_test' ), 1, 'non-root can chown gid to own group' );
+        is( $! + 0, 0, 'no error for allowed gid change' );
+
+        # Non-root user CAN chown uid to self (no-op)
+        $! = 0;
+        is( chown( 1000, -1, '/chown_perm_test' ), 1, 'non-root can chown uid to self' );
+        is( $! + 0, 0, 'no error for uid self-chown' );
+
+        Test::MockFile->clear_user;
     }
 );
 

@@ -1,7 +1,7 @@
 # ABSTRACT: Create a new task
 
 package App::karr::Cmd::Create;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,6 +12,7 @@ use App::karr::Task;
 use App::karr::Config;
 
 with 'App::karr::Role::BoardAccess';
+
 
 option title => (
   is => 'ro',
@@ -81,7 +82,7 @@ sub execute {
   my $defaults = $config->data->{defaults} // {};
 
   my %task_args = (
-    id       => $config->next_id,
+    id       => $self->allocate_next_id,
     title    => $title,
     status   => $self->status   // $defaults->{status}   // 'backlog',
     priority => $self->priority // $defaults->{priority}  // 'medium',
@@ -116,7 +117,46 @@ App::karr::Cmd::Create - Create a new task
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr create "Fix login bug"
+    karr create --title "Write release notes" --priority high --status todo
+    karr create --title "Review API" --tags docs,review --body "Check CLI help"
+
+=head1 DESCRIPTION
+
+Creates a new task in the ref-backed board. The new task inherits defaults from
+the materialized board config and can be seeded with metadata such as priority,
+class of service, due date, tags, and body text.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * C<--title>
+
+Explicit task title. If omitted, the first positional argument is used.
+
+=item * C<--status>, C<--priority>, C<--class>
+
+Override the configured default lifecycle values for the new task.
+
+=item * C<--assignee>, C<--tags>, C<--due>, C<--estimate>
+
+Populate optional frontmatter fields at creation time.
+
+=item * C<--body>
+
+Adds Markdown body text below the YAML frontmatter.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::List>, L<App::karr::Cmd::Show>,
+L<App::karr::Cmd::Edit>, L<App::karr::Cmd::Move>
 
 =head1 SUPPORT
 
@@ -124,6 +164,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

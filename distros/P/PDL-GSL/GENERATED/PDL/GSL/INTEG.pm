@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 10 "lib/PDL/GSL/INTEG.pd"
 
 use strict;
@@ -123,7 +124,7 @@ integration) as C<$la> and C<$lb>.
      my ($x) = @_;
      return exp(-$x**2);
    }
-#line 127 "lib/PDL/GSL/INTEG.pm"
+#line 128 "lib/PDL/GSL/INTEG.pm"
 
 
 =head1 FUNCTIONS
@@ -139,8 +140,9 @@ integration) as C<$la> and C<$lb>.
 
 =for sig
 
-  Signature: (a(); b(); epsabs(); epsrel(); int gslwarn();
+ Signature: (a(); b(); epsabs(); epsrel(); int gslwarn();
                    [o] result(); [o] abserr(); int [o] neval(); int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -174,9 +176,13 @@ Example:
      return ($x**2.6)*log(1.0/$x);
    }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qng does not process bad values.
+C<gslinteg_qng> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -208,9 +214,10 @@ sub gslinteg_qng{
 
 =for sig
 
-  Signature: (a(); b(); epsabs();epsrel();
+ Signature: (a(); b(); epsabs();epsrel();
 	           int limit(); int key(); int n(); int gslwarn();
                    [o] result(); [o] abserr(); int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -247,9 +254,13 @@ Example:
      return ($x**2.6)*log(1.0/$x);
    }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qag does not process bad values.
+C<gslinteg_qag> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -281,9 +292,10 @@ sub gslinteg_qag {
 
 =for sig
 
-  Signature: (a(); b(); epsabs(); epsrel();
+ Signature: (a(); b(); epsabs(); epsrel();
                    int limit(); int n(); int gslwarn();
                    [o] result(); [o] abserr(); int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -318,9 +330,13 @@ Example:
      return ($x)*log(1.0/$x);
    }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qags does not process bad values.
+C<gslinteg_qags> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -352,8 +368,9 @@ sub gslinteg_qags{
 
 =for sig
 
-  Signature: (pts(l); epsabs(); epsrel();int limit();int n();int gslwarn();
+ Signature: (pts(l); epsabs(); epsrel();int limit();int n();int gslwarn();
 		   [o] result(); [o] abserr();int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -394,9 +411,13 @@ Example:
     return $x3 * log(abs(($x2-1.0)*($x2-2.0)));
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qagp does not process bad values.
+C<gslinteg_qagp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -428,8 +449,9 @@ sub gslinteg_qagp{
 
 =for sig
 
-  Signature: (epsabs(); epsrel(); int limit(); int n();int gslwarn();
+ Signature: (epsabs(); epsrel(); int limit(); int n();int gslwarn();
 		   [o] result(); [o] abserr(); int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -463,9 +485,13 @@ Example:
     return exp(-$x - $x*$x) ;
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qagi does not process bad values.
+C<gslinteg_qagi> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -497,8 +523,9 @@ sub gslinteg_qagi {
 
 =for sig
 
-  Signature: (a(); epsabs(); epsrel();int limit();int n();int gslwarn();
+ Signature: (a(); epsabs(); epsrel();int limit();int n();int gslwarn();
 		   [o] result(); [o] abserr();int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -535,9 +562,13 @@ Example:
     return ($x**($alfa-1))/((1+10*$x)**2);
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qagiu does not process bad values.
+C<gslinteg_qagiu> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -569,8 +600,9 @@ sub gslinteg_qagiu{
 
 =for sig
 
-  Signature: (b(); epsabs(); epsrel();int limit();int n();int gslwarn();
+ Signature: (b(); epsabs(); epsrel();int limit();int n();int gslwarn();
 		   [o] result(); [o] abserr();int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -604,9 +636,13 @@ Example:
     return exp($x);
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qagil does not process bad values.
+C<gslinteg_qagil> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -638,8 +674,9 @@ sub gslinteg_qagil{
 
 =for sig
 
-  Signature: (a(); b(); c(); epsabs(); epsrel();int limit();int n();int gslwarn();
+ Signature: (a(); b(); c(); epsabs(); epsrel();int limit();int n();int gslwarn();
 	           [o] result(); [o] abserr();int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -670,9 +707,13 @@ Example:
     return 1.0 / (5.0 * $x * $x * $x + 6.0) ;
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qawc does not process bad values.
+C<gslinteg_qawc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -704,9 +745,10 @@ sub gslinteg_qawc{
 
 =for sig
 
-  Signature: (a(); b(); epsabs(); epsrel();int limit();
+ Signature: (a(); b(); epsabs(); epsrel();int limit();
 		 int n(); alpha(); beta(); int mu(); int nu(); int gslwarn();
 	         [o] result(); [o] abserr(); int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -747,9 +789,13 @@ Example:
     }
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qaws does not process bad values.
+C<gslinteg_qaws> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -781,9 +827,10 @@ sub gslinteg_qaws{
 
 =for sig
 
-  Signature: (a(); b(); epsabs(); epsrel();int limit();int n();
+ Signature: (a(); b(); epsabs(); epsrel();int limit();int n();
 		 int sincosopt(); omega(); L(); int nlevels();int gslwarn();
 	         [o] result(); [o] abserr();int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -819,9 +866,13 @@ Example:
     else{ return log($x);}
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qawo does not process bad values.
+C<gslinteg_qawo> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -860,9 +911,10 @@ sub gslinteg_qawo{
 
 =for sig
 
-  Signature: (a(); epsabs();int limit();int n();
+ Signature: (a(); epsabs();int limit();int n();
 		 int sincosopt(); omega(); int nlevels();int gslwarn();
 		 [o] result(); [o] abserr();int [o] ierr();; SV* function)
+ Types: (double)
 
 =for ref
 
@@ -898,9 +950,13 @@ Example:
     return 1.0/sqrt($x)
   }
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gslinteg_qawf does not process bad values.
+C<gslinteg_qawf> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -960,7 +1016,7 @@ The GSL integration routines were written by Brian Gough. QUADPACK
 was written by Piessens, Doncker-Kapenga, Uberhuber and Kahaner.
 
 =cut
-#line 964 "lib/PDL/GSL/INTEG.pm"
+#line 1020 "lib/PDL/GSL/INTEG.pm"
 
 # Exit with OK status
 

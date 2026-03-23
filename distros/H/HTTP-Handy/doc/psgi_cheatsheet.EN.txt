@@ -1,0 +1,187 @@
+======================================================================
+ HTTP::Handy PSGI Cheat Sheet                              [EN] English
+======================================================================
+
+[ 1. Starting the server ]
+
+  use HTTP::Handy;
+
+  my $app = sub {
+      my $env = shift;
+      return [200, ['Content-Type', 'text/plain'], ['Hello']];
+  };
+
+  HTTP::Handy->run(
+      app           => $app,       # required: PSGI app code reference
+      host          => '127.0.0.1',# optional: bind address (default: 0.0.0.0)
+      port          => 8080,       # optional: port number  (default: 8080)
+      log           => 1,          # optional: access log   (default: 1)
+      max_post_size => 10485760,   # optional: max POST bytes (default: 10MB)
+  );
+
+  From the distribution directory:
+    perl lib/HTTP/Handy.pm [port]
+
+  After installation:
+    perl -MHTTP::Handy -e 'HTTP::Handy->run(app=>sub{[200,[],["ok"]]})'
+
+[ 2. Request environment ($env) ]
+
+  Key               Type    Description
+  ----------------  ------  ------------------------------------------
+  REQUEST_METHOD    string  "GET" or "POST"
+  PATH_INFO         string  URL path, e.g. "/index.html"
+  QUERY_STRING      string  Query string without "?", e.g. "key=val"
+  SERVER_NAME       string  Host name from Host header
+  SERVER_PORT       integer Port number
+  CONTENT_TYPE      string  Content-Type of POST body
+  CONTENT_LENGTH    integer Byte length of POST body
+  HTTP_*            string  Request headers (uppercased, hyphens->underscores)
+                            e.g. HTTP_USER_AGENT, HTTP_HOST
+  psgi.input        object  Readable object for POST body (see section 4)
+  psgi.errors       glob    \*STDERR
+  psgi.url_scheme   string  Always "http"
+
+[ 3. Response format ]
+
+  Return an arrayref of exactly 3 elements:
+    [$status_code, \@headers, \@body]
+
+  $status_code : integer HTTP status (200, 301, 404, 500, ...)
+  \@headers    : flat array of name/value pairs
+                   ['Content-Type', 'text/html', 'X-Custom', 'value']
+  \@body       : array of strings, joined and sent as the body
+                   ['<h1>Hello</h1>']
+
+  Examples:
+    return [200, ['Content-Type', 'text/plain'], ['OK']];
+    return [404, ['Content-Type', 'text/plain'], ['Not Found']];
+    return [204, ['Content-Length', '0'], []];  # No Content
+
+[ 4. Reading the POST body (psgi.input) ]
+
+  my $body = '';
+  my $len  = $env->{CONTENT_LENGTH} || 0;
+  $env->{'psgi.input'}->read($body, $len) if $len > 0;
+
+  # psgi.input methods:
+  #   read($buf, $length)          read up to $length bytes
+  #   read($buf, $length, $offset) read with byte offset into buffer
+  #   seek($pos, $whence)          reposition (0=SET, 1=CUR, 2=END)
+  #   tell()                       current byte position
+  #   getline()                    read one line (with newline)
+  #   getlines()                   read all remaining lines
+
+[ 5. Utility methods ]
+
+  # Parse query string or POST body
+  my %p = HTTP::Handy->parse_query($env->{QUERY_STRING});
+  my %p = HTTP::Handy->parse_query($body);
+  # Repeated keys become arrayrefs: $p{tag} = ['perl', 'web']
+
+  # URL-decode a percent-encoded string
+  my $str = HTTP::Handy->url_decode('hello%20world');  # "hello world"
+
+  # MIME type from file extension
+  my $mime = HTTP::Handy->mime_type('css');    # "text/css"
+  my $mime = HTTP::Handy->mime_type('.json');  # "application/json"
+
+  # Detect htmx request (HX-Request: true header)
+  if (HTTP::Handy->is_htmx($env)) {
+      return HTTP::Handy->response_html($fragment);   # partial update
+  }
+
+[ 6. Response builder methods ]
+
+  HTTP::Handy->response_html($html [, $status])
+      Content-Type: text/html; charset=utf-8
+      Default status: 200
+
+  HTTP::Handy->response_text($text [, $status])
+      Content-Type: text/plain; charset=utf-8
+      Default status: 200
+
+  HTTP::Handy->response_json($json_string [, $status])
+      Content-Type: application/json
+      Default status: 200
+      (Caller is responsible for encoding the JSON string)
+
+  HTTP::Handy->response_redirect($url [, $status])
+      Adds Location header
+      Default status: 302
+
+[ 7. Serving static files ]
+
+  return HTTP::Handy->serve_static($env, './htdocs');
+
+  # With cache control:
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);   # Cache-Control: public, max-age=3600
+
+  # Behaviour:
+  #   Directory path -> serves index.html
+  #   Unknown extension -> application/octet-stream
+  #   ".." in path -> 403 Forbidden (path traversal blocked)
+  #   File not found -> 404 Not Found
+
+[ 8. Routing pattern ]
+
+  my $app = sub {
+      my $env    = shift;
+      my $method = $env->{REQUEST_METHOD};   # "GET" or "POST"
+      my $path   = $env->{PATH_INFO};        # e.g. "/users"
+
+      if ($method eq 'GET'  && $path eq '/')       { ... }
+      if ($method eq 'GET'  && $path eq '/about')  { ... }
+      if ($method eq 'POST' && $path eq '/submit') { ... }
+      if ($path =~ m{^/api/}) { ... }     # prefix match
+
+      # Dynamic segment: /user/42
+      if ($path =~ m{^/user/(\d+)$}) {
+          my $id = $1;
+          ...
+      }
+
+      return [404, ['Content-Type', 'text/plain'], ['Not Found']];
+  };
+
+[ 9. Error handling ]
+
+  # Application die -> 500 response sent automatically
+  # Error message is printed to STDERR and logs/error/error.log
+
+  # Custom error response:
+  return [500, ['Content-Type', 'text/plain'], ['Internal Error']];
+  return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
+  return [400, ['Content-Type', 'text/plain'], ['Bad Request']];
+
+[ 10. Log files created by run() ]
+
+  logs/access/YYYYMMDDHHm0.log.ltsv  access log (10-min rotation, LTSV)
+  logs/error/error.log                error/startup log
+
+  LTSV access log fields:
+    time    ISO 8601 timestamp (YYYY-MM-DDTHH:MM:SS)
+    method  GET or POST
+    path    PATH_INFO
+    status  HTTP status code
+    size    Response body bytes
+    ua      User-Agent
+    referer Referer
+
+[ 11. Official resources ]
+
+  PSGI specification:
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+  PSGI on MetaCPAN:
+    https://metacpan.org/pod/PSGI
+
+  Plack (full-featured PSGI toolkit):
+    https://plackperl.org/
+    https://metacpan.org/dist/Plack
+
+  HTTP::Handy on MetaCPAN:
+    https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

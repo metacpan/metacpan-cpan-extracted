@@ -1,5 +1,19 @@
 Revision history for Perl extension Net::Ident.
 
+1.28 2026-03-22
+    [Bug Fixes]
+    - GH #26, PR #33 - Handle ECONNRESET from sysread on Windows where
+      socketpair emulation sends TCP RST instead of FIN on close
+    - GH #28, PR #31 - Handle ESPIPE from sysread on Solaris socketpairs
+      where remote close returns "Illegal seek" instead of EOF
+    - GH #29, PR #30 - Add use 5.010 to remaining test files for Perl 5.8.x
+      defense in depth
+
+    [Maintenance]
+    - PR #25 - Add use 5.010 to Makefile.PL for clean failure on old perls
+    - PR #34 - Sync cpanfile and PREREQ_PM with actual dependencies: remove
+      unused Fcntl and Config, add missing Errno
+
 1.27 2026-03-20
     [Bug Fixes]
     - GH #19, PR #23 - Remove select() exception mask checks that fail on Solaris

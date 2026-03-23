@@ -60,11 +60,19 @@ sub SetCallBacks {
     $self->{message_callback}  = $callbacks{'message'};
 }
 
+our $connect_fail_remaining = 0;
+
 sub Connect {
     my $self = shift;
-    
+
     $self->{server} = shift;
-    return 1; # Always confirm we're connected.
+
+    if ($connect_fail_remaining > 0) {
+        $connect_fail_remaining--;
+        return undef; # Simulate connection failure.
+    }
+
+    return 1; # Confirm we're connected.
 }
 
 sub AuthSend {

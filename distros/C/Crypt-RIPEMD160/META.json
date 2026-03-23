@@ -51,6 +51,6 @@
          "url" : "https://github.com/cpan-authors/Crypt-RIPEMD160"
       }
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

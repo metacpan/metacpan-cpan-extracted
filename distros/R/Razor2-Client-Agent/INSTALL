@@ -24,8 +24,9 @@ option, like so:
 2. Instead of installing the razor-agents-sdk package, you can install the
    following Perl modules from CPAN:
 
+            IO::Socket::IP
             Time::HiRes
-            Digest::SHA1
+            Digest::SHA
             MIME::Base64
             Test::Simple
             Test::Harness

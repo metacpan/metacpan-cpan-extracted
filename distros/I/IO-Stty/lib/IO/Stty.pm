@@ -5,7 +5,7 @@ use warnings;
 
 use POSIX;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # Baud rate constants: standard POSIX rates plus modern rates.
 # Modern rates (B57600, B115200, B230400) are not available on all platforms,
@@ -221,8 +221,8 @@ Reset the erase and kill special characters to their default values.
 
 Same as:
 
-    cread -ignbrk brkint -inlcr -igncr icrnl -ixoff opost 
-    isig icanon echo echoe echok -echonl -noflsh -tostop 
+    cread -ignbrk brkint -inlcr -igncr icrnl -ixoff opost
+    isig icanon iexten echo echoe echok -echonl -noflsh -tostop
 
 also sets all special characters to their default
 values.
@@ -323,7 +323,7 @@ Send a terminal stop signal.
 =item min N
 
 Set the minimum number of characters that will satisfy a read 
-until the time value has expired,  when <E>-icanon<E> is set.
+until the time value has expired, when C<-icanon> is set.
 
 =item time N
 
@@ -705,7 +705,17 @@ sub stty {
 
 =item B<show_me_the_crap()>
 
-Needs documentation
+    my $output = IO::Stty::show_me_the_crap(
+        $c_cflag, $c_iflag, $ispeed, $c_lflag, $c_oflag,
+        $ospeed,  \%control_chars
+    );
+
+Format terminal settings as a human-readable string, equivalent to
+C<stty -a> output.  Returns a multi-line string showing the current baud
+rate, special character assignments (in hat notation), and the state of
+all control, input, output, and local flags.
+
+This is the back-end for C<stty(\*FH, '-a')>.
 
 =cut
 
@@ -747,6 +757,7 @@ sub show_me_the_crap {
     $rs .= "\n";
     $rs .= 'intr = ' . _cc_to_hat($cc{'INTR'}) . '; quit = ' . _cc_to_hat($cc{'QUIT'}) . '; erase = ' . _cc_to_hat($cc{'ERASE'}) . '; kill = ' . _cc_to_hat($cc{'KILL'}) . ";\n";
     $rs .= 'eof = ' . _cc_to_hat($cc{'EOF'}) . '; eol = ' . _cc_to_hat($cc{'EOL'}) . '; start = ' . _cc_to_hat($cc{'START'}) . '; stop = ' . _cc_to_hat($cc{'STOP'}) . '; susp = ' . _cc_to_hat($cc{'SUSP'}) . ";\n";
+    $rs .= 'min = ' . ($cc{'MIN'} // 0) . '; time = ' . ($cc{'TIME'} // 0) . ";\n";
 
     # c flags.
     $rs .= ( ( $c_cflag & CLOCAL ) ? '' : '-' ) . 'clocal ';

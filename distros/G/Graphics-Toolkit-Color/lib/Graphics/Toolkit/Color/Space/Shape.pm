@@ -8,13 +8,12 @@ use Graphics::Toolkit::Color::Space::Basis;
 use Graphics::Toolkit::Color::Space::Util qw/round_decimals is_nr/;
 
 #### constructor #######################################################
-
 sub new {
     my $pkg = shift;
-    my ($basis, $type, $range, $precision) = @_;
+    my ($basis, $type, $range, $precision, $constraint) = @_;
     return unless ref $basis eq 'Graphics::Toolkit::Color::Space::Basis';
 
-    # check axis type definition
+    # expand axis type definition
     if (not defined $type){ $type = [ (1) x $basis->axis_count ] } # set all axis as linear per default
     elsif (ref $type eq 'ARRAY' and @$type == $basis->axis_count ) {
         for my $i ($basis->axis_iterator) {
@@ -27,14 +26,38 @@ sub new {
         }
     } else        { return 'invalid axis type definition in color space '.$basis->space_name }
 
-    $range = check_range_definition( $basis, $range );
+    $range = expand_range_definition( $basis, $range );
     return $range unless ref $range;
-    $precision = check_precision_definition( $basis, $precision );
+    $precision = expand_precision_definition( $basis, $precision );
     return $precision unless ref $precision;
 
-    bless { basis => $basis, type => $type, range => $range, precision => $precision, constraint => {} }
+     # check constraint def
+    if (defined $constraint){
+        return 'color space constraint definition has to be a none empty HASH ref' if ref $constraint ne 'HASH' or not %$constraint;
+        for my $constraint_name (keys %$constraint){
+			my $properties = $constraint->{$constraint_name};
+			return 'a color space constraint has to be a HASH ref with three keys' unless ref $properties eq 'HASH' and %$properties == 3;
+            $properties = {%$properties};
+            my $error_msg = 'constraint "$constraint_name" in '.$basis->space_name.' color space';
+            for (qw/checker error remedy/){
+				return $error_msg." needs the string-propertiy '$_'" 
+					unless exists $properties->{$_} and $properties->{$_} and not ref $properties->{$_};
+			}
+ 			$properties->{'checker_code'} = $properties->{'checker'};
+			$properties->{'checker'} = eval 'sub {'.$properties->{'checker_code'}.'}';
+			return 'checker code of '.$error_msg.":'$properties->{checker_code}' does not eval - $@" if $@;
+			$properties->{'remedy_code'} = $properties->{'remedy'};
+			$properties->{'remedy'} = eval 'sub {'.$properties->{'remedy_code'}.'}';
+			return 'remedy code of '.$error_msg.":'$properties->{remedy_code}' does not eval - $@" if $@;
+			$constraint->{ $constraint_name } = $properties;
+       }
+    } else { $constraint = '' }
+
+    bless { basis => $basis, type => $type, range => $range, precision => $precision, constraint => $constraint }
 }
-sub check_range_definition { # check if range def is valid and eval (expand) it
+
+#### object attribute checker ##########################################
+sub expand_range_definition { # check if range def is valid and eval (expand) it
     my ($basis, $range) = @_;
     $basis = $basis->{'basis'} if ref $basis eq __PACKAGE__;
     my $error_msg = 'Bad value range definition!';
@@ -61,7 +84,13 @@ sub check_range_definition { # check if range def is valid and eval (expand) it
     }
     return $range;
 }
-sub check_precision_definition { # check if precision def is valid and eval (exapand) it
+sub try_check_range_definition { # check if range def is valid and eval (expand) it
+    my ($self, $range) = @_;
+    return $self->{'range'} unless defined $range;
+    return expand_range_definition( $self->{'basis'}, $range );
+}
+
+sub expand_precision_definition { # check if precision def is valid and eval (exapand) it
     my ($basis, $precision) = @_;
     $basis = $basis->{'basis'} if ref $basis eq __PACKAGE__;
     $precision = -1 unless defined $precision;
@@ -70,28 +99,15 @@ sub check_precision_definition { # check if precision def is valid and eval (exa
     return 'definition of axis value precision has to have same lengths as basis' unless @$precision == $basis->axis_count;
     return $precision;
 }
-sub add_constraint {
-    my ($self, $name, $error_msg, $checker, $remedy) = @_;
-    return unless defined $name and not exists $self->{'constraint'}{$name}
-              and defined $error_msg and not ref $error_msg and length($error_msg) > 10
-              and ref $checker eq 'CODE' and ref $remedy eq 'CODE';
-    $self->{'constraint'}{$name} = {checker => $checker, remedy => $remedy, error => $error_msg};
+sub try_check_precision_definition { # check if range def is valid and eval (expand) it
+    my ($self, $precision) = @_;
+    return $self->{'precision'} unless defined $precision;
+    return expand_precision_definition( $self->{'basis'}, $precision );
 }
 
-#### getter ############################################################
+#### getter of space object ############################################
 sub basis           { $_[0]{'basis'}}
-sub is_linear {     # overall linear space ?
-    my ($self) = @_;
-    map { return 0 if $self->{'type'}[$_] != 1 } $self->basis->axis_iterator;
-    return 1;
-}
-
-sub is_int_valued { # all ranges int valued ?
-    my ($self) = @_;
-    map { return 0 if $self->{'precision'}[$_] != 0 } $self->basis->axis_iterator;
-    return 1;
-}
-
+# per axis
 sub is_axis_numeric {
     my ($self, $axis_nr) = @_;
     return 0 if not defined $axis_nr or not exists $self->{'type'}[$axis_nr];
@@ -121,18 +137,28 @@ sub axis_value_precision { # --> +precision?
     $precision->[$axis_nr];
 }
 
-#### data checker ######################################################
-sub try_check_range_definition { # check if range def is valid and eval (expand) it
-    my ($self, $range) = @_;
-    return $self->{'range'} unless defined $range;
-    return check_range_definition( $self->{'basis'}, $range );
-}
-sub try_check_precision_definition { # check if range def is valid and eval (expand) it
-    my ($self, $precision) = @_;
-    return $self->{'precision'} unless defined $precision;
-    return check_precision_definition( $self->{'basis'}, $precision );
+# all axis
+sub is_euclidean {     # all axis linear ?
+    my ($self) = @_;
+    map { return 0 if $self->{'type'}[$_] != 1 } $self->basis->axis_iterator;
+    return 1;
 }
 
+sub is_cylindrical {  # one axis angular, rest linear ?
+    my ($self) = @_;
+    my $angular_axis = 0;
+    map { $angular_axis++ if $self->{'type'}[$_] == 0;
+          return 0 if $self->{'type'}[$_] > 1;        } $self->basis->axis_iterator;
+    return ($angular_axis == 1) ? 1 : 0;
+}
+
+sub is_int_valued { # all ranges int valued ?
+    my ($self) = @_;
+    map { return 0 if $self->{'precision'}[$_] != 0 } $self->basis->axis_iterator;
+    return 1;
+}
+
+#### value checker #####################################################
 sub check_value_shape {  # $vals -- $range, $precision --> $@vals | ~!
     my ($self, $values, $range, $precision) = @_;
     return 'color value tuple in '.$self->basis->space_name.' space needs to be ARRAY ref with '.$self->basis->axis_count.' elements'
@@ -152,27 +178,16 @@ sub check_value_shape {  # $vals -- $range, $precision --> $@vals | ~!
             if $precision->[$axis_index] >= 0
            and round_decimals($values->[$axis_index], $precision->[$axis_index]) != $values->[$axis_index];
     }
-    for my $constraint (values %{$self->{'constraint'}}){
-        return $constraint->{'error'} unless $constraint->{'checker'}->( $values );
-    }
+    if ($self->has_constraints){
+		my $values = $self->normalize($values, $range);
+		for my $constraint (values %{$self->{'constraint'}}){
+			return $constraint->{'error'} unless $constraint->{'checker'}->( $values );
+		}
+	}
     return $values;
 }
 
-sub is_in_linear_bounds {  # :values --> ?
-    my ($self, $values) = @_;
-    return 0 unless $self->basis->is_number_tuple( $values );
-    for my $axis_nr ($self->basis->axis_iterator) {
-        return 0 if $self->{'type'}[$axis_nr] == 1
-                and ( $values->[$axis_nr] < $self->{'range'}[$axis_nr][0]
-                   or $values->[$axis_nr] > $self->{'range'}[$axis_nr][1] );
-    }
-    for my $constraint (values %{$self->{'constraint'}}){
-        return 0 unless $constraint->{'checker'}->( $values );
-    }
-    return 1;
-}
-
-sub is_equal {
+sub is_equal {  # @values_a, @values_b -- $precision --> ? 
     my ($self, $values_a, $values_b, $precision) = @_;
     return 0 unless $self->basis->is_value_tuple( $values_a ) and $self->basis->is_value_tuple( $values_b );
     $precision = $self->try_check_precision_definition( $precision );
@@ -183,13 +198,54 @@ sub is_equal {
     return 1;
 }
 
-#### value shape #######################################################
+sub has_constraints {  my ($self) = @_;  return (ref $self->{'constraint'}) ? 1 : 0 } # --> ?
+
+sub is_in_constraints {  # @values --> ?  # normalized values only, so it works on any ranges
+    my ($self, $values) = @_;
+    return 1 unless $self->has_constraints;
+    for my $constraint (values %{$self->{'constraint'}}){
+        return 0 unless $constraint->{'checker'}->( $values );
+    }
+    return 1;
+}
+
+sub is_in_bounds {  # :values --> ?
+    my ($self, $values, $range) = @_;
+    return 0 unless $self->basis->is_number_tuple( $values );
+    $range = $self->try_check_range_definition( $range );
+    for my $axis_nr ($self->basis->axis_iterator) {
+		next if $self->{'type'}[$axis_nr] > 1; # skip none numeric axis
+        return 0 if $values->[$axis_nr] < $range->[$axis_nr][0]
+                 or $values->[$axis_nr] > $range->[$axis_nr][1];
+    }
+    if ($self->has_constraints){
+		return $self->is_in_constraints( $self->normalize( $values, $range) );
+	}
+    return 1;
+}
+
+sub is_in_linear_bounds {  # :values --> ?
+    my ($self, $values, $range) = @_;
+    return 0 unless $self->basis->is_number_tuple( $values );
+    $range = $self->try_check_range_definition( $range );
+    for my $axis_nr ($self->basis->axis_iterator) {
+		next if $self->{'type'}[$axis_nr] != 1; # skip none linear axis
+        return 0 if $values->[$axis_nr] < $range->[$axis_nr][0]
+                 or $values->[$axis_nr] > $range->[$axis_nr][1];
+    }
+    if ($self->has_constraints){
+		return $self->is_in_constraints( $self->normalize( $values, $range) );
+	}
+    return 1;
+}
+
+#### value ops #########################################################
 sub clamp { # change values if outside of range to nearest boundary, angles get rotated into range
     my ($self, $values, $range) = @_;
     $range = $self->try_check_range_definition( $range );
     return $range unless ref $range;
     $values = [] unless ref $values eq 'ARRAY';
-    pop  @$values    while @$values > $self->basis->axis_count;
+    pop  @$values     while @$values > $self->basis->axis_count;
     for my $axis_nr ($self->basis->axis_iterator){
         next unless $self->is_axis_numeric( $axis_nr ); # touch only numeric values
         if (not defined $values->[$axis_nr]){
@@ -209,9 +265,13 @@ sub clamp { # change values if outside of range to nearest boundary, angles get 
             $values->[$axis_nr] = $range->[$axis_nr][0] if $values->[$axis_nr] == $range->[$axis_nr][1];
         }
     }
-    for my $constraint (values %{$self->{'constraint'}}){
-        $values = $constraint->{'remedy'}->( $values ) unless $constraint->{'checker'}->( $values );
-    }
+    if ($self->has_constraints){
+		$values = $self->normalize( $values, $range);
+		for my $constraint (values %{$self->{'constraint'}}){
+			$values = $constraint->{'remedy'}->($values) unless $constraint->{'checker'}->( $values );
+		}
+		$values = $self->denormalize( $values, $range);
+	}    
     return $values;
 }
 
@@ -223,7 +283,7 @@ sub round {
     [ map { ($self->is_axis_numeric( $_ ) and $precision->[$_] >= 0) ? round_decimals ($values->[$_], $precision->[$_]) : $values->[$_] } $self->basis->axis_iterator ];
 }
 
-#### normalisation #####################################################
+# normalisation
 sub normalize {
     my ($self, $values, $range) = @_;
     return unless $self->basis->is_value_tuple( $values );

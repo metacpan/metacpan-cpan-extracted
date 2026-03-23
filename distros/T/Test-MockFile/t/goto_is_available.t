@@ -11,12 +11,6 @@ use Test::MockFile qw< nostrict >;
 
 Internals::SvREADONLY( $], 0 );
 
-$] = '5.006002';
-is( Test::MockFile::_goto_is_available(), 0, "goto isn't available on $]" );
-
-$] = '5.008008';
-is( Test::MockFile::_goto_is_available(), 0, "goto isn't available on $]" );
-
 $] = '5.016000';
 is( Test::MockFile::_goto_is_available(), 1, "goto was first available on $]" );
 

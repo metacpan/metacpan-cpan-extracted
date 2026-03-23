@@ -7,7 +7,10 @@
 
 package Razor2::Signature::Whiplash;
 
-use Digest::SHA1;
+BEGIN {
+  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
+  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
+}
 
 sub new {
 
@@ -682,13 +685,8 @@ sub whiplash {
         # the value of length to the nearest multiple of ``length_error''.
         # Take the first 20 hex chars from SHA1 and call it the signature.
 
-        my $sha1 = Digest::SHA1->new();
-
-        $sha1->add($host);
-        $sig = substr $sha1->hexdigest, 0, 12;
-
-        $sha1->add($corrected_length);
-        $sig .= substr $sha1->hexdigest, 0, 4;
+        $sig = substr sha1_hex($host), 0, 12;
+        $sig .= substr sha1_hex($corrected_length), 0, 4;
 
         push @sigs, $sig;
         $sig_meta{$sig} = [ $host, $corrected_length ];

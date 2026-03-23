@@ -12,8 +12,6 @@ use warnings;
 use Carp;
 use PDL::LiteF;
 
-my $DEV = ($^O =~ /win/i)? '/png' : '/xs';
-
 =head1 NAME
 
 PDL::Stats::Distr -- parameter estimations and probability density functions for distributions.
@@ -40,14 +38,10 @@ Parameter estimate is maximum likelihood estimate when there is closed form esti
 
       # fitted normal curve probabilities
     my $p = $xvals->pdf_gaussian($m, $v);
-
-    use PDL::Graphics::PGPLOT::Window;
-    my $win = pgwin( Dev=>"/xs" );
-
-    $win->bin( $hist );
-    $win->hold;
-    $win->line( $p, {COLOR=>2} );
-    $win->close;
+    use PDL::Graphics::Simple;
+    my $win = pgswin();
+    $win->plot( with=>'bins', $hist, with=>'lines', style => 2, $p );
+    undef $win; # to close
 
 Or, play with different distributions with B<plot_distr> :)
 
@@ -678,13 +672,11 @@ Plots data distribution. When given specific distribution(s) to fit, returns % r
 Default options (case insensitive):
 
     MAXBN => 20,
-      # see PDL::Graphics::PGPLOT::Window for next options
-    WIN   => undef,   # pgwin object. not closed here if passed
+      # see PDL::Graphics::Simple for next options
+    WIN   => undef,   # pgswin object. not closed here if passed
                       # allows comparing multiple distr in same plot
                       # set env before passing WIN
-    DEV   => '/xs' ,  # open and close dev for plotting if no WIN
-                      # defaults to '/png' in Windows
-    COLOR => 1,       # color for data distr
+    COLOR => 1,       # "style" for data distr
 
 =for usage
 
@@ -694,7 +686,7 @@ Usage:
     my $data = grandom( 500, 3 )->abs;
       # ll on plot is sum across 3 data curves
     my ($ll, $pars)
-      = $data->plot_distr( 'gaussian', 'lognormal', {DEV=>'/png'} );
+      = $data->plot_distr( 'gaussian', 'lognormal' );
 
       # pars are from normalized data (ie data / bin_size)
     print "$_\t@{$pars->{$_}}\n" for (sort keys %$pars);
@@ -704,24 +696,21 @@ Usage:
 
 *plot_distr = \&PDL::plot_distr;
 sub PDL::plot_distr {
-  require PDL::Graphics::PGPLOT::Window;
+  require PDL::Graphics::Simple;
   my ($self, @distr) = @_;
 
   my %opt = (
     MAXBN => 20,
-    WIN   => undef,     # pgwin object. not closed here if passed
-    DEV   => $DEV,      # open and close default win if no WIN
-    COLOR => 1,         # color for data distr
+    WIN   => undef,     # pgswin object. not closed here if passed
+    COLOR => 1,         # "style" for data distr
   );
-  my $opt = pop @distr
-    if ref $distr[-1] eq 'HASH';
+  my $opt = ref($distr[-1]) eq 'HASH' ? pop @distr : undef;
   $opt and $opt{uc $_} = $opt->{$_} for (keys %$opt);
 
   $self = $self->squeeze;
 
     # use int range, step etc for int xvals--pmf compatible
-  my $INT = 1
-    if grep { /(?:binomial)|(?:geo)|(?:nbd)|(?:poisson)/ } @distr;
+  my $INT = !!grep { /(?:binomial)|(?:geo)|(?:nbd)|(?:poisson)/ } @distr;
 
   my ($range, $step, $step_int);
   $range = $self->max->sclr - $self->min->sclr;
@@ -739,23 +728,16 @@ sub PDL::plot_distr {
   my $xvals_int
     = PDL::ceil($self->min->sclr) + sequence( $opt{MAXBN} ) * $step_int;
   $xvals_int = $xvals_int->where( $xvals_int <= $xvals->max )->sever;
+  my $win = $opt{WIN} || PDL::Graphics::Simple::pgswin();
+  my $inc = 0; # key only once
+  $win->plot((map +(with=>'lines', style=>$opt{COLOR}, ($inc++?():(key=>"Base")), $xvals, $_), $hist->dog), {
+    xlabel=>'xvals', ylabel=>'probability',
+    legend=>'tc', # top centre
+  });
+  return if !@distr;
 
-  my $win = $opt{WIN};
-  if (!$win) {
-    $win = PDL::Graphics::PGPLOT::Window::pgwin( Dev=>$opt{DEV} );
-    $win->env($xvals->minmax,0,1, {XTitle=>'xvals', YTitle=>'probability'});
-  }
-
-  $win->line( $xvals, $hist, { COLOR=>$opt{COLOR} } );
-
-  if (!@distr) {
-    $win->close
-      unless defined $opt{WIN};
-    return;
-  }
-
-  my (%ll, %pars, @text, $c);
-  $c = $opt{COLOR};        # fitted lines start from ++$c
+  my (%ll, %pars);
+  my $c = $opt{COLOR};        # fitted lines start from ++$c
   for my $distr ( @distr ) {
       # find mle_ or mme_$distr;
     my @funcs = grep { /_$distr$/ } (keys %PDL::Stats::Distr::);
@@ -771,24 +753,18 @@ sub PDL::plot_distr {
     eval {
       my @paras = $nrmd->$f_para();
       $pars{$distr} = \@paras;
-
       @paras = map { $_->dummy(0) } @paras;
       $ll{$distr} = $nrmd->$f_prob( @paras )->log->sumover;
-      push @text, sprintf "$distr  LL = %.2f", $ll{$distr}->sum;
-
+      my %curve_opts = (style=>++$c, key=>sprintf("$distr  LL = %.2f", $ll{$distr}->sum));
+      my $inc = 0; # curve_opts only once
       if ($f_prob =~ /^pdf/) {
-        $win->line( $xvals, ($xvals/$step)->$f_prob(@paras), {COLOR=>++$c} );
-      }
-      else {
-        $win->points( $xvals_int, ($xvals_int/$step_int)->$f_prob(@paras), {COLOR=>++$c} );
+        $win->oplot( map +(with=>'lines', ($inc++?():%curve_opts), $xvals, $_), ($xvals/$step)->$f_prob(@paras)->dog );
+      } else {
+        $win->oplot( with=>'points', %curve_opts, $xvals_int, ($xvals_int/$step_int)->$f_prob(@paras) );
       }
     };
     carp $@ if $@;
   }
-  $win->legend(\@text, ($xvals->min->sclr + $xvals->max->sclr)/2, .95,
-               {COLOR=>[$opt{COLOR}+1 .. $c], TextFraction=>.75} );
-  $win->close
-    unless defined $opt{WIN};
   return (\%ll, \%pars);
 }
 
@@ -798,9 +774,9 @@ GSL - GNU Scientific Library
 
 =head1 SEE ALSO
 
-PDL::Graphics::PGPLOT
+L<PDL::Graphics::Simple>
 
-PDL::GSL::CDF
+L<PDL::GSL::CDF>
 
 =head1 AUTHOR
 

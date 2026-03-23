@@ -1,3 +1,10 @@
+2.103 2026-03-22
+- fix bad use of inplace
+
+2.102 2026-03-22
+- generate pdldoc entries right
+- PDL::Stats::Distr switch to using PGS
+
 2.101 2025-01-06
 - add licence information
 

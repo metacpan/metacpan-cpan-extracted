@@ -21,9 +21,6 @@ use autodie qw(open);
 use Test::MockFile qw(nostrict);
 
 SKIP: {
-    skip "autodie exception detection requires Perl 5.14+ (needs \${^GLOBAL_PHASE} and reliable caller hints)", 4
-      if $] < 5.014;
-
     subtest 'autodie dies on open("<") of directory (EISDIR)' => sub {
         my $dir = Test::MockFile->new_dir("/autodie_eisdir_read_$$");
 

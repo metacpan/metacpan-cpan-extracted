@@ -1,7 +1,6 @@
 package Razor2::Client::Engine;
 
 use strict;
-use Digest::SHA1 qw(sha1_hex);
 use Data::Dumper;
 use Razor2::Signature::Ephemeral;
 use Razor2::Engine::VR8;

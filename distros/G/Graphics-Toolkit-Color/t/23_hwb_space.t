@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 62;
+use Test::More tests => 71;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 
@@ -15,8 +15,14 @@ is( $space->alias,                               '', 'color space has no alias n
 is( $space->is_name('HwB'),                       1, 'recognized name');
 is( $space->is_name('Hsl'),                       0, 'ignored wrong name');
 is( $space->axis_count,                           3, 'color space has 3 axis');
+is( $space->is_euclidean,                         0, 'HWB is not euclidean');
+is( $space->is_cylindrical,                       1, 'HWB is cylindrical');
+is( $space->shape->has_constraints,               1, 'HWB is actually a cone');
+
 is( ref $space->check_value_shape([0, 0, 0]),     'ARRAY', 'check HWB values works on lower bound values');
-is( ref $space->check_value_shape([360,100,100]), 'ARRAY', 'check HWB values works on upper bound values');
+is( ref $space->check_value_shape([360,100,0]),   'ARRAY', 'check HWB values works on upper bound values (max W)');
+is( ref $space->check_value_shape([360,0,100]),   'ARRAY', 'check HWB values works on upper bound values (max B)');
+is( ref $space->check_value_shape([360,60,60]),        '', 'trigger sace contraints');
 is( ref $space->check_value_shape([0,0]),              '', "HWB got too few values");
 is( ref $space->check_value_shape([0, 0, 0, 0]),       '', "HWB got too many values");
 is( ref $space->check_value_shape([-1, 0, 0]),         '', "hue value is too small");
@@ -29,7 +35,13 @@ is( ref $space->check_value_shape([0, 0, -1 ] ),       '', "blackness value is t
 is( ref $space->check_value_shape([0, 0, 1.1] ),       '', "blackness value is not integer");
 is( ref $space->check_value_shape([0, 0, 101] ),       '', "blackness value is too big");
 
-my $val = $space->round([1,22.5, 11.111111]);
+my $val = $space->clamp([-10, 80, 80]);
+is( int @$val,   3,     'clamped three values');
+is( $val->[0], 350,     'rotated value into range');
+is( $val->[1],  50,     'clamped second value proportionally due to special constraint');
+is( $val->[2],  50,     'clamped third value proportionally');;
+
+$val = $space->round([1,22.5, 11.111111]);
 is( ref $val,                'ARRAY', 'rounded value tuple int tuple');
 is( int @$val,                     3, 'right amount of values');
 is( $val->[0],                     1, 'first value kept');

@@ -10,7 +10,7 @@ package Test::MockFile::DirHandle;
 use strict;
 use warnings;
 
-our $VERSION = '0.038';
+our $VERSION = '0.039';
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ L<Test::MockFile> to give out for opendir calls.
 
 =head1 VERSION
 
-Version 0.038
+Version 0.039
 
 =cut
 

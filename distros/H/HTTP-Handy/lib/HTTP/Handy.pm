@@ -7,28 +7,31 @@ package HTTP::Handy;
 #
 # Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
 ######################################################################
+#
+# Compatible : Perl 5.005_03 and later
+# Platform   : Windows and UNIX/Linux
+#
+######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
                 # Perl 5.005_03 compatibility for historical toolchains
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '1.00';
-$VERSION = $VERSION;
-# VERSION policy: avoid `our` for 5.005_03 compatibility.
-# Self-assignment prevents "used only once" warning under `use strict`.
-
-BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
-BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
-# warnings.pm compatibility: stub with import() for Perl < 5.6
+BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
+use warnings; local $^W = 1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use IO::Socket;
-use POSIX qw(strftime);
 use Carp qw(croak);
+use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE);
+$VERSION = '1.01';
+$VERSION = $VERSION;
+# $VERSION self-assignment suppresses "used only once" warning under strict.
 
-# ----------------------------------------------------------------
+###############################################################################
 # Status text map
-# ----------------------------------------------------------------
+###############################################################################
 my %STATUS_TEXT = (
     200 => 'OK',
     201 => 'Created',
@@ -44,9 +47,9 @@ my %STATUS_TEXT = (
     500 => 'Internal Server Error',
 );
 
-# ----------------------------------------------------------------
+###############################################################################
 # MIME type map
-# ----------------------------------------------------------------
+###############################################################################
 my %MIME = (
     'html'  => 'text/html; charset=utf-8',
     'htm'   => 'text/html; charset=utf-8',
@@ -73,9 +76,13 @@ my %MIME = (
 # Default max POST body size: 10MB
 my $DEFAULT_MAX_POST_SIZE = 10 * 1024 * 1024;
 
-# ----------------------------------------------------------------
+# Access log variables (package variables for testability; declared via use vars above)
+$ACCESS_LOG_FH    = undef;
+$CURRENT_LOG_FILE = '';
+
+###############################################################################
 # run - Start the server (blocking)
-# ----------------------------------------------------------------
+###############################################################################
 sub run {
     my ($class, %args) = @_;
 
@@ -99,6 +106,9 @@ sub run {
     unless ($server) {
         croak "HTTP::Handy: Cannot bind to $host:$port - $@";
     }
+
+    # Create Apache-like directories
+    _init_directories();
 
     _log_message("HTTP::Handy $HTTP::Handy::VERSION started on http://$host:$port/") if $log;
     _log_message("Press Ctrl+C to stop.") if $log;
@@ -124,9 +134,9 @@ sub run {
     }
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # _handle_connection - Parse request and dispatch to app
-# ----------------------------------------------------------------
+###############################################################################
 sub _handle_connection {
     my ($client, $app, $log, $max_post_size, $server_port) = @_;
 
@@ -251,8 +261,8 @@ sub _handle_connection {
     if (ref($resp_headers) eq 'ARRAY') {
         my @h = @$resp_headers;
         while (@h) {
-            my $k = shift @h;
-            my $v = shift @h;
+            my $k = shift(@h) || '';
+            my $v = shift(@h) || '';
             push @header_list, "$k: $v";
         }
     }
@@ -262,7 +272,7 @@ sub _handle_connection {
     # Build body
     my $body_str = '';
     if (ref($body) eq 'ARRAY') {
-        $body_str = join('', @$body);
+        $body_str = join('', @$body) if @$body;
     }
 
     my $body_length = length($body_str);
@@ -273,12 +283,12 @@ sub _handle_connection {
     # Access log in LTSV format.
     # Sanitize field values: LTSV forbids tab and newline characters in values.
     if ($log) {
-        my $ts      = strftime('%Y-%m-%dT%H:%M:%S', localtime);
+        my $ts      = _iso_time();
         my $ua      = $headers{'user-agent'} || '';
         my $referer = $headers{'referer'}    || '';
         $ua      =~ s/[\t\n\r]/ /g;
         $referer =~ s/[\t\n\r]/ /g;
-        print STDERR join("\t",
+        my $line = join("\t",
             "time:$ts",
             "method:$method",
             "path:$path",
@@ -287,12 +297,16 @@ sub _handle_connection {
             "ua:$ua",
             "referer:$referer",
         ) . "\n";
+        print STDERR $line;
+
+        _open_access_log();
+        print $ACCESS_LOG_FH $line if $ACCESS_LOG_FH;
     }
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # _read_line - Read one line from socket (CR+LF or LF terminated)
-# ----------------------------------------------------------------
+###############################################################################
 sub _read_line {
     my ($fh) = @_;
     my $line = '';
@@ -306,9 +320,9 @@ sub _read_line {
     return $line eq '' ? undef : $line;
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # _send_error - Send a simple HTTP error response
-# ----------------------------------------------------------------
+###############################################################################
 sub _send_error {
     my ($client, $code, $message) = @_;
     my $text = $STATUS_TEXT{$code} || $message;
@@ -323,18 +337,33 @@ sub _send_error {
     print $client $body;
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # _log_message - Print timestamped log to STDERR
-# ----------------------------------------------------------------
+###############################################################################
 sub _log_message {
     my ($msg) = @_;
-    my $ts = strftime('%Y-%m-%d %H:%M:%S', localtime);
+
+    my $ts = _iso_time();
     print STDERR "[$ts] $msg\n";
+
+    my $fh;
+    if ($] >= 5.006) {
+        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
+        eval q{ open($fh, '>>', 'logs/error/error.log') } or return;
+    }
+    else {
+        $fh = \do { local *_ };
+        open($fh, ">> logs/error/error.log") or return;
+    }
+    binmode $fh;
+
+    print $fh "[$ts] $msg\n";
+    close $fh;
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # serve_static - Serve files from a document root
-# ----------------------------------------------------------------
+###############################################################################
 sub serve_static {
     my ($class, $env, $docroot, %opts) = @_;
 
@@ -374,14 +403,23 @@ sub serve_static {
     my $mime = $MIME{$ext} || 'application/octet-stream';
 
     # Read file
-    local *FH;
-    unless (open FH, "<$file") {
-        return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
+    my $fh;
+    if ($] >= 5.006) {
+        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
+        unless (eval q{ open($fh, '<', $file) }) {
+            return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
+        }
     }
-    binmode FH;
+    else {
+        $fh = \do { local *_ };
+        unless (open($fh, "<$file")) {
+            return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
+        }
+    }
+    binmode $fh;
     local $/;
-    my $content = <FH>;
-    close FH;
+    my $content = <$fh>;
+    close $fh;
 
     # Cache-Control header
     my @cache_headers;
@@ -406,9 +444,9 @@ sub serve_static {
         [$content]];
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # url_decode - Decode percent-encoded string
-# ----------------------------------------------------------------
+###############################################################################
 sub url_decode {
     my ($class, $str) = @_;
     return '' unless defined $str;
@@ -417,9 +455,9 @@ sub url_decode {
     return $str;
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # parse_query - Parse query string into hash
-# ----------------------------------------------------------------
+###############################################################################
 sub parse_query {
     my ($class, $query) = @_;
     return () unless defined $query && $query ne '';
@@ -444,9 +482,9 @@ sub parse_query {
     return %params;
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # mime_type - Return MIME type for a file extension
-# ----------------------------------------------------------------
+###############################################################################
 sub mime_type {
     my ($class, $ext) = @_;
     $ext = lc $ext;
@@ -454,17 +492,17 @@ sub mime_type {
     return $MIME{$ext} || 'application/octet-stream';
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # is_htmx - Return true if the request was made by htmx
-# ----------------------------------------------------------------
+###############################################################################
 sub is_htmx {
     my ($class, $env) = @_;
     return (defined $env->{HTTP_HX_REQUEST} && $env->{HTTP_HX_REQUEST} eq 'true') ? 1 : 0;
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # response_redirect - Build a redirect response
-# ----------------------------------------------------------------
+###############################################################################
 sub response_redirect {
     my ($class, $location, $code) = @_;
     $code ||= 302;
@@ -474,9 +512,9 @@ sub response_redirect {
         ["Redirect to $location"]];
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # response_json - Build a JSON response (no JSON encoding, caller provides)
-# ----------------------------------------------------------------
+###############################################################################
 sub response_json {
     my ($class, $json_str, $code) = @_;
     $code ||= 200;
@@ -486,9 +524,9 @@ sub response_json {
         [$json_str]];
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # response_html - Build an HTML response
-# ----------------------------------------------------------------
+###############################################################################
 sub response_html {
     my ($class, $html, $code) = @_;
     $code ||= 200;
@@ -498,9 +536,9 @@ sub response_html {
         [$html]];
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # response_text - Build a plain text response
-# ----------------------------------------------------------------
+###############################################################################
 sub response_text {
     my ($class, $text, $code) = @_;
     $code ||= 200;
@@ -508,6 +546,79 @@ sub response_text {
         ['Content-Type',   'text/plain; charset=utf-8',
          'Content-Length', length($text)],
         [$text]];
+}
+
+###############################################################################
+# _init_directories - Create Apache-like directories
+###############################################################################
+sub _init_directories {
+    for my $dir (qw(
+        logs
+        logs/access
+        logs/error
+        run
+        htdocs
+        conf
+    )) {
+        mkdir($dir, 0777) unless -d $dir;
+    }
+}
+
+###############################################################################
+# _open_access_log - Opens the access log file (YYYYMMDDHHm0.log.ltsv format)
+###############################################################################
+sub _open_access_log {
+    my ($year, $month, $day, $hour, $min) = (localtime)[5, 4, 3, 2, 1];
+    my $current_log_filename = sprintf("logs/access/%04d%02d%02d%02d%02d.log.ltsv",
+        1900 + $year,
+        $month + 1,
+        $day,
+        $hour,
+        int($min / 10) * 10,
+    );
+
+    return if defined $ACCESS_LOG_FH && $current_log_filename eq $CURRENT_LOG_FILE;
+
+    if ($ACCESS_LOG_FH) {
+        close $ACCESS_LOG_FH;
+    }
+
+    my $fh;
+    if ($] >= 5.006) {
+        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
+        eval q{ open($fh, '>>', $current_log_filename) } or do {
+            warn "Cannot open access log: $current_log_filename: $!";
+            return;
+        };
+    }
+    else {
+        $fh = \do { local *_ };
+        open($fh, ">> $current_log_filename") or do {
+            warn "Cannot open access log: $current_log_filename: $!";
+            return;
+        };
+    }
+    binmode $fh;
+
+    select((select($fh), $| = 1)[0]); # autoflush
+
+    $ACCESS_LOG_FH     = $fh;
+    $CURRENT_LOG_FILE  = $current_log_filename;
+}
+
+###############################################################################
+# _iso_time - Returns localtime as ISO style (YYYY-MM-DDTHH:mm:SS)
+###############################################################################
+sub _iso_time {
+    my ($year, $month, $day, $hour, $min, $sec) = (localtime)[5, 4, 3, 2, 1, 0];
+    return sprintf("%04d-%02d-%02dT%02d:%02d:%02d",
+        1900 + $year,
+        $month + 1,
+        $day,
+        $hour,
+        $min,
+        $sec,
+    );
 }
 
 # ----------------------------------------------------------------
@@ -586,12 +697,12 @@ sub getlines {
     return @lines;
 }
 
-# ----------------------------------------------------------------
+###############################################################################
 # Back to main package -- demo/self-test when run directly
-# ----------------------------------------------------------------
+###############################################################################
 package HTTP::Handy;
 
-# Run as script: perl HTTP::Handy.pm [port]
+# Run as script: perl lib/HTTP/Handy.pm [port]
 unless (caller) {
     my $port = $ARGV[0] || 8080;
 
@@ -724,7 +835,7 @@ HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
 
 =head1 VERSION
 
-1.00
+1.01
 
 =head1 SYNOPSIS
 
@@ -747,11 +858,72 @@ The goals of the project are simplicity and portability. The entire
 implementation fits in one file with no installation step beyond copying
 it into your project directory.
 
+=head2 What is PSGI?
+
+B<PSGI> (Perl Web Server Gateway Interface) is a standard interface between
+Perl web applications and web servers, inspired by Python's WSGI and Ruby's
+Rack.  A PSGI application is a plain code reference:
+
+  my $app = sub {
+      my $env = shift;          # request environment hashref
+      # ... process the request ...
+      return [$status, \@headers, \@body];   # response arrayref
+  };
+
+Because the interface is a simple data structure (hashref in, arrayref out),
+PSGI applications are portable across any PSGI-compatible server -- from the
+minimal HTTP::Handy to the full-featured Plack toolkit.
+
+Official PSGI specification:
+  https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+PSGI on MetaCPAN:
+  https://metacpan.org/pod/PSGI
+
+=head1 INCLUDED DOCUMENTATION
+
+The C<eg/> directory contains sample programs demonstrating PSGI features:
+
+  eg/01_hello_world.pl     Minimal app: routing, query string, env dump
+  eg/02_static_files.pl    serve_static, cache_max_age, mime_type
+  eg/03_form_post.pl       POST body, parse_query, multi-value fields,
+                           Post-Redirect-Get pattern
+  eg/04_ltsv_viewer.pl     is_htmx, LTSV log parsing, multiple status codes
+
+The C<doc/> directory contains PSGI cheat sheets in 21 languages:
+
+  doc/psgi_cheatsheet.EN.txt   English
+  doc/psgi_cheatsheet.JA.txt   Japanese
+  doc/psgi_cheatsheet.ZH.txt   Chinese (Simplified)
+  doc/psgi_cheatsheet.TW.txt   Chinese (Traditional)
+  doc/psgi_cheatsheet.KO.txt   Korean
+  doc/psgi_cheatsheet.FR.txt   French
+  doc/psgi_cheatsheet.ID.txt   Indonesian
+  doc/psgi_cheatsheet.VI.txt   Vietnamese
+  doc/psgi_cheatsheet.TH.txt   Thai
+  doc/psgi_cheatsheet.HI.txt   Hindi
+  doc/psgi_cheatsheet.BN.txt   Bengali
+  doc/psgi_cheatsheet.TR.txt   Turkish
+  doc/psgi_cheatsheet.MY.txt   Malay
+  doc/psgi_cheatsheet.TL.txt   Filipino
+  doc/psgi_cheatsheet.KM.txt   Khmer
+  doc/psgi_cheatsheet.MN.txt   Mongolian
+  doc/psgi_cheatsheet.NE.txt   Nepali
+  doc/psgi_cheatsheet.SI.txt   Sinhala
+  doc/psgi_cheatsheet.UR.txt   Urdu
+  doc/psgi_cheatsheet.UZ.txt   Uzbek
+  doc/psgi_cheatsheet.BM.txt   Burmese
+
+Each cheat sheet covers: starting the server, C<$env> keys, response
+format, reading the POST body, utility methods, response builders,
+static files, routing patterns, error handling, log files, and links
+to the official PSGI specification.
+
 =head1 REQUIREMENTS
 
   Perl     : 5.5.3 or later -- all versions, all platforms
   OS       : Any (Windows, Unix, macOS, and others)
-  Modules  : Core only -- IO::Socket, POSIX, Carp
+  Modules  : Core only -- IO::Socket, Carp
   Model    : Single process, single thread
 
 No CPAN modules are required. No C compiler or external library is needed.
@@ -865,10 +1037,28 @@ Requests exceeding this limit receive a 413 response. The value is in bytes.
   # Accept POST bodies up to 50 MB (e.g. for LTSV log file uploads)
   HTTP::Handy->run(app => $app, port => 8080, max_post_size => 50 * 1024 * 1024);
 
+=head2 Directory Initialisation
+
+C<run()> automatically creates an Apache-like directory structure under the
+current working directory if the directories do not already exist:
+
+  logs/          parent directory for all log files
+  logs/access/   access logs (LTSV format, 10-minute rotation)
+  logs/error/    error log
+  run/           PID files and other runtime files
+  htdocs/        suggested document root for serve_static
+  conf/          configuration files
+
 =head2 Access Log Format (LTSV)
 
-When C<log> is enabled, each request is written to STDERR as a single
-LTSV (Labeled Tab-separated Values) line:
+When C<log> is enabled, each request is written both to STDERR and to a
+rotating LTSV file under C<logs/access/>.
+
+File naming: C<logs/access/YYYYMMDDHHm0.log.ltsv> where C<m0> is the
+10-minute interval (00, 10, 20, 30, 40, or 50). The file is rotated
+automatically when the interval changes.
+
+Each log line is a single LTSV record:
 
   time:2026-01-01T12:00:00\tmethod:GET\tpath:/index.html\tstatus:200\tsize:1234\tua:Mozilla/5.0\treferer:
 
@@ -884,6 +1074,14 @@ Fields:
 
 LTSV can be parsed line by line with C<split /\t/> and each field with
 C<split /:/, $field, 2>. It is directly compatible with L<LTSV::LINQ>.
+
+=head2 Error Log
+
+Server startup messages and application errors are written both to STDERR
+and to C<logs/error/error.log>. Each line is prefixed with an ISO 8601
+timestamp in brackets:
+
+  [2026-01-01T12:00:00] HTTP::Handy 1.01 started on http://0.0.0.0:8080/
 
 =head1 METHODS
 
@@ -1137,8 +1335,8 @@ hardened reverse proxy in front of HTTP::Handy for any LAN or internet use.
 
 Run directly to start a self-contained demo server:
 
-  perl HTTP::Handy.pm           # listens on port 8080 (default)
-  perl HTTP::Handy.pm 9090      # listens on port 9090
+  perl lib/HTTP/Handy.pm           # from the distribution directory
+  perl lib/HTTP/Handy.pm 9090      # on port 9090
 
 Then open C<http://localhost:8080/> (or the port you specified) in your
 browser. The demo provides three built-in pages:
@@ -1161,6 +1359,10 @@ Useful for understanding what HTTP::Handy provides to the application,
 and for debugging routing logic.
 
 =back
+
+To start a minimal server after installation via C<cpan> or C<make install>:
+
+  perl -MHTTP::Handy -e 'HTTP::Handy->run(app=>sub{[200,[],["ok"]]})'
 
 =head1 INTERNALS -- HTTP::Handy::Input
 
@@ -1188,17 +1390,192 @@ Available methods:
   getline()                         read and return one line (with newline)
   getlines()                        read and return all remaining lines
 
+=head1 INTERNALS -- Private Functions
+
+=over 4
+
+=item C<_iso_time()>
+
+Returns the current local time formatted as C<YYYY-MM-DDTHH:MM:SS> using
+only C<localtime> and C<sprintf>. This replaces the earlier dependency on
+C<POSIX::strftime>, making the module free of C<POSIX> entirely.
+
+=item C<_init_directories()>
+
+Called once at server startup by C<run()>. Creates the standard directory
+layout (C<logs/>, C<logs/access/>, C<logs/error/>, C<run/>, C<htdocs/>,
+C<conf/>) under the current working directory if they do not exist.
+
+=item C<_open_access_log()>
+
+Called after each request when logging is enabled. Opens (or rotates to)
+the current 10-minute LTSV access log file under C<logs/access/>.
+The filehandle is kept open between requests for efficiency and is only
+reopened when the 10-minute window rolls over.
+
+=back
+
+=head1 DIAGNOSTICS
+
+=head2 Startup errors
+
+=over 4
+
+=item C<HTTP::Handy-E<gt>run: 'app' is required>
+
+C<run()> was called without an C<app> argument.
+
+=item C<HTTP::Handy-E<gt>run: 'app' must be a code reference>
+
+The value passed to C<app> is not a code reference.
+
+=item C<HTTP::Handy-E<gt>run: 'port' must be a number>
+
+The C<port> argument contains non-digit characters.
+
+=item C<HTTP::Handy-E<gt>run: 'max_post_size' must be a number>
+
+The value passed to C<max_post_size> contains non-digit characters.
+
+=item C<HTTP::Handy: Cannot bind to HOST:PORT>
+
+The server could not bind to the requested address and port.
+The most common cause is that another process is already listening on
+that port.
+
+=back
+
+=head2 Runtime messages (STDERR and logs/error/error.log)
+
+=over 4
+
+=item C<[TIMESTAMP] App error: MESSAGE>
+
+The application code died with MESSAGE. A 500 response was sent to
+the client. The server continues running.
+
+=item C<[TIMESTAMP] Accept failed: MESSAGE>
+
+C<IO::Socket::INET-E<gt>accept> returned an error. The server continues
+to the next request.
+
+=item C<Cannot open access log: FILENAME: MESSAGE>
+
+C<_open_access_log()> could not open or create the rotating access log
+file. Access log entries are still written to STDERR.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests by e-mail to
+E<lt>ina@cpan.orgE<gt>.
+
+When reporting a bug, please include:
+
+=over 4
+
+=item *
+
+A minimal, self-contained test script that reproduces the problem.
+
+=item *
+
+The version of HTTP::Handy:
+
+  perl -MHTTP::Handy -e 'print HTTP::Handy->VERSION, "\n"'
+
+=item *
+
+Your Perl version:
+
+  perl -V
+
+=item *
+
+Your operating system.
+
+=back
+
+Known limitations (see also L</LIMITATIONS>):
+
+=over 4
+
+=item *
+
+B<Single-process, single-thread.> Requests are handled one at a time.
+A slow client blocks all other clients for the duration of that request.
+
+=item *
+
+B<No HTTPS.> See L</HTTPS>.
+
+=item *
+
+B<POST body fully buffered.> The entire POST body is read into memory
+before the application is called.
+
+=item *
+
+B<Log files use the current working directory.> C<logs/>, C<htdocs/>,
+and other directories created by C<_init_directories()> are relative to
+the process working directory at the time C<run()> is called.
+
+=back
+
+=head1 DESIGN PHILOSOPHY
+
+HTTP::Handy adheres to the B<Perl 5.005_03 specification> -- not because
+we target the old interpreter, but because this specification represents
+the simple, original Perl programming model that makes programming
+enjoyable.
+
+=over 4
+
+=item B<Simplicity>
+
+One file, no build step, no installation required beyond copying.
+The entire server fits in a single C<.pm> file.
+
+=item B<Portability>
+
+Runs on every Perl from 5.005_03 through the latest release, on every
+operating system that Perl supports.
+
+=item B<Zero dependencies>
+
+Only core modules (C<IO::Socket>, C<Carp>) are used.  No CPAN
+installation is required.
+
+=item B<US-ASCII source>
+
+All source files contain only US-ASCII characters (0x00-0x7F).
+This avoids encoding issues on any platform or terminal.
+
+=back
+
 =head1 SEE ALSO
 
-L<PSGI> -- the Perl Web Server Gateway Interface specification.
-HTTP::Handy implements a strict subset of PSGI. Applications written for
-HTTP::Handy can be ported to full PSGI servers (such as Plack) with little
-or no modification.
+=head2 PSGI Specification
 
-L<Plack> -- a full-featured PSGI toolkit. Requires Perl 5.8+.
-For production use or more demanding workloads, migrating from HTTP::Handy
-to Plack is straightforward because the C<$env> and response format are
-the same.
+L<PSGI> -- the Perl Web Server Gateway Interface specification (on MetaCPAN).
+
+Official PSGI specification document:
+
+  https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+HTTP::Handy implements a strict subset of PSGI/1.1. Applications written for
+HTTP::Handy can be ported to full PSGI-compatible servers (such as Plack)
+with little or no modification, because the C<$env> hash and response format
+are identical.
+
+=head2 Related Modules
+
+L<Plack> -- a full-featured PSGI toolkit and server collection. Requires
+Perl 5.8+. For production use or more demanding workloads, migrating from
+HTTP::Handy to Plack is straightforward.
+
+  https://plackperl.org/
 
 L<HTTP::Server::Simple> -- another minimal HTTP server for Perl, with a
 different (non-PSGI) interface.
@@ -1207,12 +1584,60 @@ L<LTSV::LINQ> -- LINQ-style queries for LTSV data, by the same author.
 HTTP::Handy was originally developed to serve local tools built on top of
 LTSV::LINQ.
 
-=head1 LICENSE
+=head1 TABLE OF CONTENTS
 
-Same as Perl itself: Artistic License or GPL, at your option.
+=over 4
+
+=item * L</DESCRIPTION>
+
+=item * L</INCLUDED DOCUMENTATION> -- eg/ samples and doc/ cheat sheets
+
+=item * L</REQUIREMENTS>
+
+=item * L</SUPPORTED PROTOCOL>
+
+=item * L</PSGI SUBSET SPECIFICATION> -- C<$env> keys, response format, psgi.input
+
+=item * L</SERVER STARTUP> -- C<run()>, directory init, log files
+
+=item * L</METHODS> -- C<serve_static>, C<url_decode>, C<parse_query>,
+C<mime_type>, C<is_htmx>, response builders
+
+=item * L</ERROR HANDLING>
+
+=item * L</STATIC FILES, CGI, AND HTMX>
+
+=item * L</HTTPS>
+
+=item * L</PSGI COMPATIBILITY NOTES>
+
+=item * L</SECURITY>
+
+=item * L</LIMITATIONS>
+
+=item * L</DEMO>
+
+=item * L</INTERNALS -- HTTP::Handy::Input>
+
+=item * L</INTERNALS -- Private Functions>
+
+=item * L</DIAGNOSTICS> -- error messages and runtime warnings
+
+=item * L</BUGS AND LIMITATIONS>
+
+=item * L</DESIGN PHILOSOPHY>
+
+=item * L</SEE ALSO>
+
+=back
 
 =head1 AUTHOR
 
-ina (CPAN)
+INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut

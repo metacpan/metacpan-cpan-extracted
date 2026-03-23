@@ -1,0 +1,187 @@
+======================================================================
+ HTTP::Handy PSGI Cheat Sheet                          [JA] 日本語
+======================================================================
+
+[ 1. サーバの起動 ]
+
+  use HTTP::Handy;
+
+  my $app = sub {
+      my $env = shift;
+      return [200, ['Content-Type', 'text/plain'], ['Hello']];
+  };
+
+  HTTP::Handy->run(
+      app           => $app,       # 必須: PSGIアプリのコードリファレンス
+      host          => '127.0.0.1',# 省略可: バインドアドレス (省略時: 0.0.0.0)
+      port          => 8080,       # 省略可: ポート番号 (省略時: 8080)
+      log           => 1,          # 省略可: アクセスログ (省略時: 1=有効)
+      max_post_size => 10485760,   # 省略可: POSTボディの最大バイト数 (省略時: 10MB)
+  );
+
+  配布ディレクトリから実行:
+    perl lib/HTTP/Handy.pm [ポート番号]
+
+  インストール後:
+    perl -MHTTP::Handy -e 'HTTP::Handy->run(app=>sub{[200,[],["ok"]]})'
+
+[ 2. リクエスト環境変数 ($env) ]
+
+  キー              型      説明
+  ----------------  ------  ------------------------------------------
+  REQUEST_METHOD    文字列  "GET" または "POST"
+  PATH_INFO         文字列  URLパス (例: "/index.html")
+  QUERY_STRING      文字列  "?"を除いたクエリ文字列 (例: "key=val")
+  SERVER_NAME       文字列  Hostヘッダのホスト名
+  SERVER_PORT       整数    ポート番号
+  CONTENT_TYPE      文字列  POSTボディのContent-Type
+  CONTENT_LENGTH    整数    POSTボディのバイト長
+  HTTP_*            文字列  リクエストヘッダ (大文字化、ハイフン→アンダースコア)
+                            例: HTTP_USER_AGENT, HTTP_HOST
+  psgi.input        オブジェクト  POSTボディを読み取るオブジェクト (セクション4参照)
+  psgi.errors       グロブ  \*STDERR
+  psgi.url_scheme   文字列  常に "http"
+
+[ 3. レスポンスの形式 ]
+
+  3要素のARRAYリファレンスを返す:
+    [$status_code, \@headers, \@body]
+
+  $status_code : 整数のHTTPステータス (200, 301, 404, 500, ...)
+  \@headers    : 名前と値を交互に並べたフラット配列
+                   ['Content-Type', 'text/html', 'X-Custom', 'value']
+  \@body       : 文字列の配列。連結してボディとして送信される
+                   ['<h1>Hello</h1>']
+
+  例:
+    return [200, ['Content-Type', 'text/plain'], ['OK']];
+    return [404, ['Content-Type', 'text/plain'], ['Not Found']];
+    return [204, ['Content-Length', '0'], []];  # No Content
+
+[ 4. POSTボディの読み取り (psgi.input) ]
+
+  my $body = '';
+  my $len  = $env->{CONTENT_LENGTH} || 0;
+  $env->{'psgi.input'}->read($body, $len) if $len > 0;
+
+  # psgi.input のメソッド:
+  #   read($buf, $length)          最大$lengthバイト読み取り
+  #   read($buf, $length, $offset) バッファのオフセット付き読み取り
+  #   seek($pos, $whence)          位置変更 (0=先頭, 1=現在, 2=末尾)
+  #   tell()                       現在のバイト位置
+  #   getline()                    1行読み取り (改行文字含む)
+  #   getlines()                   残り全行を読み取り
+
+[ 5. ユーティリティメソッド ]
+
+  # クエリ文字列またはPOSTボディを解析
+  my %p = HTTP::Handy->parse_query($env->{QUERY_STRING});
+  my %p = HTTP::Handy->parse_query($body);
+  # 同名キーが複数ある場合は配列リファレンス: $p{tag} = ['perl', 'web']
+
+  # パーセントエンコードされた文字列をデコード
+  my $str = HTTP::Handy->url_decode('hello%20world');  # "hello world"
+
+  # ファイル拡張子からMIMEタイプを取得
+  my $mime = HTTP::Handy->mime_type('css');    # "text/css"
+  my $mime = HTTP::Handy->mime_type('.json');  # "application/json"
+
+  # htmxリクエストの検出 (HX-Request: trueヘッダ)
+  if (HTTP::Handy->is_htmx($env)) {
+      return HTTP::Handy->response_html($fragment);   # 部分更新
+  }
+
+[ 6. レスポンスビルダーメソッド ]
+
+  HTTP::Handy->response_html($html [, $status])
+      Content-Type: text/html; charset=utf-8
+      デフォルトステータス: 200
+
+  HTTP::Handy->response_text($text [, $status])
+      Content-Type: text/plain; charset=utf-8
+      デフォルトステータス: 200
+
+  HTTP::Handy->response_json($json_string [, $status])
+      Content-Type: application/json
+      デフォルトステータス: 200
+      (JSON文字列のエンコードは呼び出し側が担当)
+
+  HTTP::Handy->response_redirect($url [, $status])
+      Locationヘッダを追加
+      デフォルトステータス: 302
+
+[ 7. 静的ファイルの配信 ]
+
+  return HTTP::Handy->serve_static($env, './htdocs');
+
+  # キャッシュ制御付き:
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);   # Cache-Control: public, max-age=3600
+
+  # 動作:
+  #   ディレクトリパス -> index.html を配信
+  #   未知の拡張子 -> application/octet-stream
+  #   ".." を含むパス -> 403 Forbidden (パストラバーサル防御)
+  #   ファイルが存在しない -> 404 Not Found
+
+[ 8. ルーティングのパターン ]
+
+  my $app = sub {
+      my $env    = shift;
+      my $method = $env->{REQUEST_METHOD};   # "GET" または "POST"
+      my $path   = $env->{PATH_INFO};        # 例: "/users"
+
+      if ($method eq 'GET'  && $path eq '/')       { ... }
+      if ($method eq 'GET'  && $path eq '/about')  { ... }
+      if ($method eq 'POST' && $path eq '/submit') { ... }
+      if ($path =~ m{^/api/}) { ... }     # プレフィックスマッチ
+
+      # 動的セグメント: /user/42
+      if ($path =~ m{^/user/(\d+)$}) {
+          my $id = $1;
+          ...
+      }
+
+      return [404, ['Content-Type', 'text/plain'], ['Not Found']];
+  };
+
+[ 9. エラーハンドリング ]
+
+  # アプリがdieした場合 -> 自動的に500レスポンスを送信
+  # エラーメッセージはSTDERRとlogs/error/error.logに記録される
+
+  # カスタムエラーレスポンス:
+  return [500, ['Content-Type', 'text/plain'], ['Internal Error']];
+  return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
+  return [400, ['Content-Type', 'text/plain'], ['Bad Request']];
+
+[ 10. run()が作成するログファイル ]
+
+  logs/access/YYYYMMDDHHm0.log.ltsv  アクセスログ (10分ローテーション, LTSV形式)
+  logs/error/error.log                エラー・起動ログ
+
+  LTSVアクセスログのフィールド:
+    time    ISO 8601 タイムスタンプ (YYYY-MM-DDTHH:MM:SS)
+    method  GET または POST
+    path    PATH_INFO
+    status  HTTPステータスコード
+    size    レスポンスボディのバイト数
+    ua      User-Agent
+    referer Referer
+
+[ 11. 公式資料リンク ]
+
+  PSGI 仕様書 (公式):
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+  PSGI (MetaCPAN):
+    https://metacpan.org/pod/PSGI
+
+  Plack (フル機能 PSGI ツールキット):
+    https://plackperl.org/
+    https://metacpan.org/dist/Plack
+
+  HTTP::Handy (MetaCPAN):
+    https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

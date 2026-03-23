@@ -1,4 +1,4 @@
-package Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting v0.2.4;
+package Perl::Critic::Policy::ValuesAndExpressions::RequireConsistentQuoting v0.2.5;
 
 use v5.26.0;
 use strict;
@@ -21,15 +21,14 @@ sub supported_parameters { }
 sub default_severity     { $SEVERITY_MEDIUM }
 sub default_themes       { qw( cosmetic ) }
 
-sub applies_to { qw(
-  PPI::Token::Quote::Single
-  PPI::Token::Quote::Double
-  PPI::Token::Quote::Literal
-  PPI::Token::Quote::Interpolate
-  PPI::Token::QuoteLike::Words
-  PPI::Token::QuoteLike::Command
-  PPI::Statement::Include
-) }
+sub applies_to {
+  qw(
+    PPI::Token::Quote::Single    PPI::Token::Quote::Double
+    PPI::Token::Quote::Literal   PPI::Token::Quote::Interpolate
+    PPI::Token::QuoteLike::Words PPI::Token::QuoteLike::Command
+    PPI::Statement::Include
+  )
+}
 
 sub would_interpolate ($self, $string) {
   # This is the authoritative way to check - let PPI decide
@@ -163,9 +162,9 @@ sub check_delimiter_optimisation ($self, $elem) {
   $operator //= "q" if $start eq "'";
   my ($optimal_delim, $current_is_optimal)
     = $self->find_optimal_delimiter($content, $operator, $start, $end);
-  return $self->violation($Desc,
-    sprintf($Expl_optimal, $optimal_delim->{display}), $elem)
-    unless $current_is_optimal;
+  return $self->violation(
+    $Desc, sprintf($Expl_optimal, $optimal_delim->{display}), $elem
+  ) unless $current_is_optimal;
 
   undef
 }
@@ -221,20 +220,26 @@ sub check_double_quoted ($self, $elem) {
   # Special case: strings with newlines don't follow the rules
   return if $self->_has_newlines($string);
 
+  # Strip delimiters and remove \\ pairs so escaped backslashes before the
+  # closing delimiter aren't mistaken for escaped specials
+  my $inner = substr $content, 1, -1;
+  (my $cleaned = $inner) =~ s/\\\\//g;
+
   # Check for escaped dollar/at signs or double quotes, but only suggest single
   # quotes if no other interpolation exists AND no dangerous escape sequences
   return $self->violation($Desc, $Expl_single, $elem)
-    if $content =~ /\\[\$\@\"]/
+    if $cleaned =~ /\\[\$\@\"]/
     && !$self->_has_quote_sensitive_escapes($string)
     && !$self->would_interpolate($string);
 
   # If has escaped double quotes, suggest qq() — by this point, the ''
   # suggestion was ruled out (escape sequences or interpolation present),
   # so qq() eliminates the quote escaping while preserving both
-  if ($content =~ /\\"/) {
+  if ($cleaned =~ /\\"/) {
     my ($optimal) = $self->find_optimal_delimiter($string, "qq", '"', '"');
-    return $self->violation($Desc, sprintf($Expl_optimal, $optimal->{display}),
-      $elem);
+    return $self->violation(
+      $Desc, sprintf($Expl_optimal, $optimal->{display}), $elem
+    );
   }
 
   return
@@ -317,13 +322,13 @@ sub check_quote_operators ($self, $elem) {
   return unless defined $current_start;
 
   # Don't skip empty content - () is preferred even for empty quotes
-  my ($optimal_delim, $current_is_optimal)
-    = $self->find_optimal_delimiter($content, $operator, $current_start,
-      $current_end);
+  my ($optimal_delim, $current_is_optimal) = $self->find_optimal_delimiter(
+    $content, $operator, $current_start, $current_end
+  );
 
-  return $self->violation($Desc,
-    sprintf($Expl_optimal, $optimal_delim->{display}), $elem)
-    if !$current_is_optimal;
+  return $self->violation(
+    $Desc, sprintf($Expl_optimal, $optimal_delim->{display}), $elem
+  ) if !$current_is_optimal;
 
   return
 }
@@ -488,15 +493,17 @@ sub _summarise_use_arguments ($self, @args) {
   my $qw_uses_parens = 1;
 
   for my $arg (@args) {
-    $self->_count_use_arguments($arg, \$string_count, \$has_qw,
-      \$qw_uses_parens);
+    $self->_count_use_arguments(
+      $arg, \$string_count, \$has_qw, \$qw_uses_parens
+    );
   }
 
   ($string_count, $has_qw, $qw_uses_parens)
 }
 
-sub _count_use_arguments ($self, $elem, $str_count_ref, $qw_ref, $qw_parens_ref)
-{
+sub _count_use_arguments (
+  $self, $elem, $str_count_ref, $qw_ref, $qw_parens_ref
+) {
 
   $$str_count_ref++
     if $elem->isa("PPI::Token::Quote::Single")
@@ -513,8 +520,9 @@ sub _count_use_arguments ($self, $elem, $str_count_ref, $qw_ref, $qw_parens_ref)
   # Recursively check children (for structures like lists)
   if ($elem->can("children")) {
     for my $child ($elem->children) {
-      $self->_count_use_arguments($child, $str_count_ref, $qw_ref,
-        $qw_parens_ref);
+      $self->_count_use_arguments(
+        $child, $str_count_ref, $qw_ref, $qw_parens_ref
+      );
     }
   }
 }
@@ -527,9 +535,10 @@ sub _is_pragma ($self, $elem) {
 sub _is_in_use_statement ($self, $elem) {
   my $current = $elem;
   while ($current) {
-    if ($current->isa("PPI::Statement::Include")
-      && ($current->type =~ /^(use|no)$/))
-    {
+    if (
+      $current->isa("PPI::Statement::Include")
+      && ($current->type =~ /^(use|no)$/)
+    ) {
       my @args = $self->_extract_use_arguments($current);
 
       # Single-arg pragmas follow normal quoting rules
@@ -621,7 +630,7 @@ consistent and optimal quoting
 
 =head1 VERSION
 
-version v0.2.4
+version v0.2.5
 
 =head1 SYNOPSIS
 

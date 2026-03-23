@@ -2,14 +2,14 @@ NAME
     marc-filter - Tool to filter records in MARC dataset.
 
 SYNOPSIS
-     marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_xml_file search_item [sub_search_item] value
+     marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_file search_item [sub_search_item] value
 
 DESCRIPTION
     Tool to filter MARC records in big datasets. Could filter by control
     field or field/subfield or leader or material type. Tool could filter by
     number of output records.
 
-    It supports MARC XML files now.
+    It supports MARC XML and USMARC files now.
 
 ARGUMENTS
     *       "-h"
@@ -36,9 +36,9 @@ ARGUMENTS
 
             Print version of script.
 
-    *       "marc_xml_file"
+    *       "marc_file"
 
-            MARC XML file name.
+            MARC XML or USMARC file name.
 
     *       "search_item"
 
@@ -78,10 +78,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2022-2025 Michal Josef Špaček
+    © 2022-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.08
 

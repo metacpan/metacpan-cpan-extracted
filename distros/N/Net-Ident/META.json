@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Errno" : "0",
             "Exporter" : "0",
             "FileHandle" : "0",
             "Socket" : "0",
@@ -60,6 +61,6 @@
          "web" : "https://github.com/cpan-authors/Net-Ident"
       }
    },
-   "version" : "1.27",
+   "version" : "1.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

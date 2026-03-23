@@ -1,3 +1,6 @@
+2.098 2026-03-22
+- fix bad use of inplace
+
 2.097 2024-12-09
 - PCHIP functions removed as now in PDL 2.096, PDL::Primitive
 - deprecated - use PDL::LinearAlgebra instead

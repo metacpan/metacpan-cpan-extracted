@@ -11,10 +11,11 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '2.097';
+   our $VERSION = '2.098';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Slatec $VERSION;
+
 
 
 
@@ -56,7 +57,7 @@ and fit data using polynomials.
 These routines are now in L<PDL::Primitive> as of PDL 2.096.
 
 =cut
-#line 60 "Slatec.pm"
+#line 61 "Slatec.pm"
 
 
 =head1 FUNCTIONS
@@ -340,22 +341,34 @@ sub PDL::polycoef {
   return $tc;
 
 }
-#line 344 "Slatec.pm"
+#line 345 "Slatec.pm"
 
 
 =head2 svdc
 
 =for sig
 
-  Signature: (x(n,p); [o] s(p); [o] e(p); [o] u(n,p); [o] v(p,p); [t] work(n); longlong job(); longlong [o] info())
+ Signature: (x(n,p); [o] s(p); [o] e(p); [o] u(n,p); [o] v(p,p); [t] work(n); longlong job(); longlong [o] info())
+ Types: (float)
+
+=for usage
+
+ ($s, $e, $u, $v, $info) = svdc($x, $job);
+ svdc($x, $s, $e, $u, $v, $job, $info);    # all arguments given
+ ($s, $e, $u, $v, $info) = $x->svdc($job); # method call
+ $x->svdc($s, $e, $u, $v, $job, $info);
 
 =for ref
 
 singular value decomposition of a matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-svdc does not process bad values.
+C<svdc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -374,14 +387,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] a(n,n); [o] rcond(); [o] z(n); longlong [o] info())
+ Signature: ([io] a(n,n); [o] rcond(); [o] z(n); longlong [o] info())
+ Types: (double float)
+
+=for usage
+
+ ($rcond, $z, $info) = poco($a);
+ poco($a, $rcond, $z, $info);    # all arguments given
+ ($rcond, $z, $info) = $a->poco; # method call
+ $a->poco($rcond, $z, $info);
 
 Factor a real symmetric positive definite matrix
 and estimate the condition number of the matrix.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-poco does not process bad values.
+C<poco> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -400,14 +425,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n); longlong [o] ipvt(n); [o] rcond(); [o] z(n))
+ Signature: (a(n,n); longlong [o] ipvt(n); [o] rcond(); [o] z(n))
+ Types: (double float)
+
+=for usage
+
+ ($ipvt, $rcond, $z) = geco($a);
+ geco($a, $ipvt, $rcond, $z);    # all arguments given
+ ($ipvt, $rcond, $z) = $a->geco; # method call
+ $a->geco($ipvt, $rcond, $z);
 
 Factor a matrix using Gaussian elimination and estimate
 the condition number of the matrix.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-geco does not process bad values.
+C<geco> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -426,15 +463,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] a(n,n); longlong [o] ipvt(n); longlong [o] info())
+ Signature: ([io] a(n,n); longlong [o] ipvt(n); longlong [o] info())
+ Types: (double float)
+
+=for usage
+
+ ($ipvt, $info) = gefa($a);
+ gefa($a, $ipvt, $info);    # all arguments given
+ ($ipvt, $info) = $a->gefa; # method call
+ $a->gefa($ipvt, $info);
 
 =for ref
 
 Factor a matrix using Gaussian elimination.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gefa does not process bad values.
+C<gefa> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -453,15 +502,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] a(n,n); [o] det(two=2); longlong job())
+ Signature: ([io] a(n,n); [o] det(two=2); longlong job())
+ Types: (double float)
+
+=for usage
+
+ $det = podi($a, $job);
+ podi($a, $det, $job);  # all arguments given
+ $det = $a->podi($job); # method call
+ $a->podi($det, $job);
 
 Compute the determinant and inverse of a certain real
 symmetric positive definite matrix using the factors
 computed by L</poco>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-podi does not process bad values.
+C<podi> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -480,14 +541,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([io] a(n,n); longlong ipvt(n); [o] det(two=2); [t] work(n); longlong job())
+ Signature: ([io] a(n,n); longlong ipvt(n); [o] det(two=2); [t] work(n); longlong job())
+ Types: (double float)
+
+=for usage
+
+ $det = gedi($a, $ipvt, $job);
+ gedi($a, $ipvt, $det, $job);  # all arguments given
+ $det = $a->gedi($ipvt, $job); # method call
+ $a->gedi($ipvt, $det, $job);
 
 Compute the determinant and inverse of a matrix using the
 factors computed by L</geco> or L</gefa>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gedi does not process bad values.
+C<gedi> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -506,14 +579,24 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(lda,n); longlong ipvt(n); [io] b(n); longlong job())
+ Signature: (a(lda,n); longlong ipvt(n); [io] b(n); longlong job())
+ Types: (double float)
+
+=for usage
+
+ gesl($a, $ipvt, $b, $job); # all arguments given
+ $a->gesl($ipvt, $b, $job); # method call
 
 Solve the real system C<A*X=B> or C<TRANS(A)*X=B> using the
 factors computed by L</geco> or L</gefa>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-gesl does not process bad values.
+C<gesl> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -532,16 +615,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(n,n); [o] w(n); longlong matz(); [o] z(n,n); [t] fvone(n); [t] fvtwo(n); longlong [o] ierr())
+ Signature: (a(n,n); [o] w(n); longlong matz(); [o] z(n,n); [t] fvone(n); [t] fvtwo(n); longlong [o] ierr())
+ Types: (float)
+
+=for usage
+
+ ($w, $z, $ierr) = rs($a, $matz);
+ rs($a, $w, $matz, $z, $ierr);    # all arguments given
+ ($w, $z, $ierr) = $a->rs($matz); # method call
+ $a->rs($w, $matz, $z, $ierr);
 
 This subroutine calls the recommended sequence of
 subroutines from the eigensystem subroutine package (EISPACK)
 to find the eigenvalues and eigenvectors (if desired)
 of a REAL SYMMETRIC matrix.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-rs does not process bad values.
+C<rs> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -560,7 +655,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (longlong n(); [io] wsave(foo); longlong [o] ifac(ni=15))
+ Signature: (longlong n(); [io] wsave(foo); longlong [o] ifac(ni=15))
+ Types: (float)
+
+=for usage
+
+ $ifac = ezffti($n, $wsave);
+ ezffti($n, $wsave, $ifac);  # all arguments given
+ $ifac = $n->ezffti($wsave); # method call
+ $n->ezffti($wsave, $ifac);
 
 Subroutine ezffti initializes the work array C<wsave(3n or more)>
 and C<ifac()>
@@ -569,9 +672,13 @@ The prime factorization
 of C<n> together with a tabulation of the trigonometric functions
 are computed and stored in C<wsave()>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ezffti does not process bad values.
+C<ezffti> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -590,13 +697,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (r(n); [o] azero(); [o] a(n); [o] b(n); wsave(foo); longlong ifac(ni=15))
+ Signature: (r(n); [o] azero(); [o] a(n); [o] b(n); wsave(foo); longlong ifac(ni=15))
+ Types: (float)
+
+=for usage
+
+ ($azero, $a, $b) = ezfftf($r, $wsave, $ifac);
+ ezfftf($r, $azero, $a, $b, $wsave, $ifac);    # all arguments given
+ ($azero, $a, $b) = $r->ezfftf($wsave, $ifac); # method call
+ $r->ezfftf($azero, $a, $b, $wsave, $ifac);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ezfftf does not process bad values.
+C<ezfftf> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -615,13 +734,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: ([o] r(n); azero(); a(n); b(n); wsave(foo); longlong ifac(ni=15))
+ Signature: ([o] r(n); azero(); a(n); b(n); wsave(foo); longlong ifac(ni=15))
+ Types: (float)
+
+=for usage
+
+ $r = ezfftb($azero, $a, $b, $wsave, $ifac);
+ ezfftb($r, $azero, $a, $b, $wsave, $ifac);  # all arguments given
+ $r = $azero->ezfftb($a, $b, $wsave, $ifac); # method call
+ $r->ezfftb($azero, $a, $b, $wsave, $ifac);
 
 =for ref
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ezfftb does not process bad values.
+C<ezfftb> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -640,14 +771,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (longlong l(); c(); [o] tc(bar); a(foo))
+ Signature: (longlong l(); c(); [o] tc(bar); a(foo))
+ Types: (double float)
+
+=for usage
+
+ $tc = pcoef($l, $c, $a);
+ pcoef($l, $c, $tc, $a);  # all arguments given
+ $tc = $l->pcoef($c, $a); # method call
+ $l->pcoef($c, $tc, $a);
 
 Convert the C<polfit> coefficients to Taylor series form.
 C<c> and C<a()> must be of the same type.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-pcoef does not process bad values.
+C<pcoef> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -666,7 +809,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (longlong l(); x(); [o] yfit(); [o] yp(nder); a(foo); PDL_LongLong nder => nder)
+ Signature: (longlong l(); x(); [o] yfit(); [o] yp(nder); a(foo); PDL_LongLong nder => nder)
+ Types: (double float)
 
 =for ref
 
@@ -679,9 +823,13 @@ Broadcasts correctly over multiple C<x> positions.
 
  ($yfit, $yp) = polyvalue($l, $nder, $x, $c);
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-polyvalue does not process bad values.
+C<polyvalue> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -700,15 +848,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); w(n); longlong maxdeg(); longlong [o]ndeg(); [io]eps(); [o]r(n); longlong [o]ierr(); [o]a(foo=CALC(3*($SIZE(n) + $SIZE(bar)))); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n); IV max_maxdeg_plus1 => bar)
+ Signature: (x(n); y(n); w(n); longlong maxdeg(); longlong [o]ndeg(); [io]eps(); [o]r(n); longlong [o]ierr(); [o]a(foo=CALC(3*($SIZE(n) + $SIZE(bar)))); [o]coeffs(bar);[t]xtmp(n);[t]ytmp(n);[t]wtmp(n);[t]rtmp(n); IV max_maxdeg_plus1 => bar)
+ Types: (float double)
+
+=for usage
+
+ ($ndeg, $r, $ierr, $a, $coeffs) = polfit($x, $y, $w, $maxdeg, $eps, $max_maxdeg_plus1);
+ polfit($x, $y, $w, $maxdeg, $ndeg, $eps, $r, $ierr, $a, $coeffs, $max_maxdeg_plus1);    # all arguments given
+ ($ndeg, $r, $ierr, $a, $coeffs) = $x->polfit($y, $w, $maxdeg, $eps, $max_maxdeg_plus1); # method call
+ $x->polfit($y, $w, $maxdeg, $ndeg, $eps, $r, $ierr, $a, $coeffs, $max_maxdeg_plus1);
 
 Fit discrete data in a least squares sense by polynomials
           in one variable. C<x()>, C<y()> and C<w()> must be of the same type.
 	  This version handles bad values appropriately
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-polfit processes bad values.
+C<polfit> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -735,7 +895,7 @@ distribution. If this file is separated from the PDL distribution,
 the copyright notice should be included in the file.
 
 =cut
-#line 739 "Slatec.pm"
+#line 899 "Slatec.pm"
 
 # Exit with OK status
 

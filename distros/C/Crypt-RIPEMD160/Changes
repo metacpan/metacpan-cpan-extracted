@@ -1,5 +1,19 @@
 Revision history for Perl extension Crypt::RIPEMD160.
 
+0.11 2026-03-22
+
+  Bug fixes:
+    - Replace platform-dependent C typedefs (unsigned char, unsigned int)
+      with C99 fixed-width types (uint8_t, uint32_t) from <stdint.h>.
+      This eliminates the class of portability bug from 0.04_01 where
+      dword was 8 bytes on 64-bit systems by guaranteeing exact widths
+      at the type level. PR #22
+
+  Maintenance:
+    - Remove unused `word` (unsigned short) typedef from rmd160.h. PR #22
+    - Fix cpanfile to reference XSLoader instead of replaced DynaLoader.
+      PR #22
+
 0.09 2026-03-20
 
   Bug fixes:

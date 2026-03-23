@@ -2,66 +2,81 @@ use v5.30;
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
+use Test2::Tools::Spec;
 
-my $ret = eval <<'PERL';
-    package Local::Prelude::Compat::Smoke;
+sub _run_eval {
+    my ($code) = @_;
+    local $@;
+    my $ret = eval $code;
+    my $err = $@;
+    return ($ret, $err);
+}
 
-    use Modern::Perl::Prelude qw(
-        -class
-        -defer
-    );
+describe 'Modern::Perl::Prelude optional -class/-defer imports' => sub {
+    it 'compiles and runs class and defer via flag-style imports' => sub {
+        my ($ret, $err) = _run_eval(<<'PERL');
+package Local::Prelude::Compat::Smoke;
 
-    class Local::Prelude::Compat::Point {
-        field $x :param = 0;
-        field $y :param = 0;
+use Modern::Perl::Prelude qw(
+    -class
+    -defer
+);
 
-        method sum {
-            return $x + $y;
-        }
+class Local::Prelude::Compat::Point {
+    field $x :param = 0;
+    field $y :param = 0;
+
+    method sum {
+        return $x + $y;
     }
+}
 
-    my $sum = Local::Prelude::Compat::Point->new(
-        x => 2,
-        y => 3,
-    )->sum;
+my $sum = Local::Prelude::Compat::Point->new(
+    x => 2,
+    y => 3,
+)->sum;
 
-    my @trace;
-    {
-        push @trace, 'enter';
-        defer { push @trace, 'defer'; }
-        push @trace, 'leave';
-    }
+my @trace;
+{
+    push @trace, 'enter';
+    defer { push @trace, 'defer'; }
+    push @trace, 'leave';
+}
 
-    [
-        $sum,
-        join(',', @trace),
-    ];
+[
+    $sum,
+    join(',', @trace),
+];
 PERL
 
-ok($ret, 'optional -class and -defer imports compile and run')
-    or diag $@;
+        ok($ret, 'optional -class and -defer imports compile and run')
+            or diag $err;
 
-is($ret->[0], 5, 'class syntax works via -class');
-is($ret->[1], 'enter,leave,defer', 'defer syntax works via -defer');
+        is($ret->[0], 5, 'class syntax works via -class');
+        is($ret->[1], 'enter,leave,defer', 'defer syntax works via -defer');
+    };
 
-my $ok_no = eval <<'PERL';
-    package Local::Prelude::Compat::No;
+    it 'accepts no Modern::Perl::Prelude with -class and -defer options' => sub {
+        my ($ok, $err) = _run_eval(<<'PERL');
+package Local::Prelude::Compat::No;
 
-    use Modern::Perl::Prelude qw(
-        -class
-        -defer
-    );
+use Modern::Perl::Prelude qw(
+    -class
+    -defer
+);
 
-    no Modern::Perl::Prelude qw(
-        -class
-        -defer
-    );
+no Modern::Perl::Prelude qw(
+    -class
+    -defer
+);
 
-    1;
+1;
 PERL
 
-ok($ok_no, 'no Modern::Perl::Prelude accepts -class and -defer options')
-    or diag $@;
+        ok($ok, 'no Modern::Perl::Prelude accepts -class and -defer options')
+            or diag $err;
+    };
+};
 
 done_testing;

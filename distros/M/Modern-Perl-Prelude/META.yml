@@ -1,11 +1,14 @@
 ---
 abstract: 'Project prelude for modern Perl style on Perl 5.30+'
 author:
-  - 'Sergey Kovalev <skov@cpan.org>'
+  - 'Sergey Kovalev <skov@cpan.org>, Kirill Dmitriev <zaika.k1007@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Feature::Compat::Class: '0'
   Feature::Compat::Defer: '0'
+  Object::Pad: '0'
+  Test2::Tools::Spec: '0'
+  Test2::V0: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -25,8 +28,9 @@ requires:
   Import::Into: '0'
   builtin::compat: '0'
   perl: '5.030000'
+  true::VERSION: '0'
 resources:
   bugtracker: https://github.com/neo1ite/Modern-Perl-Prelude/issues
   repository: https://github.com/neo1ite/Modern-Perl-Prelude
-version: '0.005'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

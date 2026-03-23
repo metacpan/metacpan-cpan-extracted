@@ -35,6 +35,10 @@ BEGIN {
         plan( skip_all => "android does not support getprotobyname()" );
     }
 
+    unless ( defined getprotobyname('tcp') ) {
+        plan( skip_all => "getprotobyname('tcp') not available on this system" );
+    }
+
     $INC{$_} = 1 for qw(
       Win32.pm Win32/Process.pm Win32/ShellQuote.pm Win32API/File.pm );
 
@@ -98,6 +102,7 @@ BEGIN {
 
 {
     use Socket ();
+    local $^W = 0;
     no warnings 'redefine';
     sub Socket::IPPROTO_TCP() { return }
 }

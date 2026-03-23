@@ -22,6 +22,7 @@ use DynaLoader;
 
 
 
+
 #line 8 "lib/PDL/GSL/DIFF.pd"
 
 use strict;
@@ -83,7 +84,7 @@ sub gsldiff{
   }
   return ($res,$abserr);
 }
-#line 87 "lib/PDL/GSL/DIFF.pm"
+#line 88 "lib/PDL/GSL/DIFF.pm"
 
 *diff_central = \&PDL::diff_central;
 
@@ -169,7 +170,7 @@ PDL distribution, the copyright notice should be included in the file.
 The GSL differentiation routines were written by David Morrison.
 
 =cut
-#line 173 "lib/PDL/GSL/DIFF.pm"
+#line 174 "lib/PDL/GSL/DIFF.pm"
 
 # Exit with OK status
 

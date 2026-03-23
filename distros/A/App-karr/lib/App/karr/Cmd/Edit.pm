@@ -1,7 +1,7 @@
 # ABSTRACT: Modify an existing task
 
 package App::karr::Cmd::Edit;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -12,6 +12,7 @@ use App::karr::Role::Output;
 use App::karr::Task;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 option title => (
   is => 'ro',
@@ -179,7 +180,50 @@ App::karr::Cmd::Edit - Modify an existing task
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr edit 5 --title "Updated title"
+    karr edit 5 --add-tag urgent --remove-tag stale
+    karr edit 5 -a "Waiting for review"
+    karr edit 5 --claim agent-fox --block "waiting on API"
+
+=head1 DESCRIPTION
+
+Updates one or more existing tasks in place. Use it to adjust metadata, append
+notes, manage tags, claim or release ownership, and mark tasks as blocked or
+unblocked without changing the task id.
+
+=head1 COMMON OPERATIONS
+
+=over 4
+
+=item * Metadata updates
+
+C<--title>, C<--status>, C<--priority>, C<--assignee>, and C<--due> replace
+existing values.
+
+=item * Body updates
+
+C<--body> replaces the entire body; C<-a>/C<--append-body> appends a new line
+to the existing body text.
+
+=item * Claims and blocking
+
+C<--claim> refreshes claim ownership and timestamp, C<--release> clears the
+claim, C<--block> records a blocking reason, and C<--unblock> removes it.
+
+=item * Tag management
+
+C<--add-tag> and C<--remove-tag> accept comma-separated lists.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Show>, L<App::karr::Cmd::Move>,
+L<App::karr::Cmd::Handoff>, L<App::karr::Cmd::List>
 
 =head1 SUPPORT
 
@@ -187,6 +231,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

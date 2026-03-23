@@ -58,7 +58,7 @@ is( $values->[1],                      1,  'green value is one (max)');
 is( $values->[2],                      1,  'blue value is one too');
 
 #### mix ###############################################################
-my $grey = $white->mix([{color => $black, percent => 50}], $RGB);
+my $grey = $white->mix([{color => $black, percent => 50}, {color => $white, percent => 50}], $RGB);
 is( ref $grey,                   $module,  'created gray by mixing black and white');
 $values = $grey->shaped();
 is( @$values,                          3,  'get RGB values of grey');
@@ -67,7 +67,7 @@ is( $values->[1],                    128,  'green value of gray');
 is( $values->[2],                    128,  'blue value of gray');
 is( $grey->name(),                'gray',  'created gray by mixing black and white');
 
-my $lgrey = $white->mix([{color => $black, percent => 5}], $RGB);
+my $lgrey = $white->mix([{color => $black, percent => 5}, {color => $white, percent => 95}], $RGB);
 is( ref $lgrey,                   $module,  'created light gray');
 $values = $lgrey->shaped();
 is( @$values,                          3,  'get RGB values of grey');
@@ -76,7 +76,7 @@ is( $values->[1],                    242,  'green value of gray');
 is( $values->[2],                    242,  'blue value of gray');
 is( $lgrey->name(),             'gray95',  'created gray by mixing black and white');
 
-my $darkblue = $white->mix([{color => $blue, percent => 60},{color => $black, percent => 60},], $HSL);
+my $darkblue = $white->mix([{color => $blue, percent => 50},{color => $black, percent => 50},], $HSL);
 is( ref $darkblue,               $module,  'mixed black and blue in HSL, recalculated percentages from sum of 120%');
 $values = $darkblue->shaped('HSL');
 is( @$values,                          3,  'get 3 HSL values');

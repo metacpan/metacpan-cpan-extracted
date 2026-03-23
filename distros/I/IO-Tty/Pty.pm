@@ -10,7 +10,7 @@ require POSIX;
 
 use vars qw(@ISA $VERSION);
 
-$VERSION = '1.20';    # keep same as in Tty.pm
+$VERSION = '1.21';    # keep same as in Tty.pm
 
 @ISA = qw(IO::Handle);
 eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
@@ -141,6 +141,14 @@ sub make_slave_controlling_terminal {
     }
 
     return 1;
+}
+
+sub DESTROY {
+    my $self = shift;
+    if ( exists ${*$self}{'io_pty_slave'} ) {
+        close ${*$self}{'io_pty_slave'};
+        delete ${*$self}{'io_pty_slave'};
+    }
 }
 
 *clone_winsize_from = \&IO::Tty::clone_winsize_from;

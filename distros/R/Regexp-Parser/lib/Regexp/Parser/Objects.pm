@@ -90,7 +90,7 @@ use NEXT;
   push @Regexp::Parser::eol::ISA, __PACKAGE__;
 
   sub new {
-    my ($class, $rx, $type, $vis) = @_;
+    my ($class, $rx, $type, $vis, $boundary_type) = @_;
     Carp::croak("anchor is an abstract class") if $class =~ /::anchor$/;
 
     my $self = bless {
@@ -100,8 +100,14 @@ use NEXT;
       type => $type,
       vis => $vis,
       zerolen => 1,
+      ($boundary_type ? (boundary_type => $boundary_type) : ()),
     }, $class;
     return $self;
+  }
+
+  sub boundary_type {
+    my $self = shift;
+    return $self->{boundary_type};
   }
 }
 
@@ -2202,6 +2208,12 @@ Family: anchor
 Types: bound (C<\b>), nbound (C<\B>)
 
 Neg: 1 if negated
+
+Extended boundary types (Perl 5.22+): C<\b{gcb}>, C<\b{g}>, C<\b{wb}>,
+C<\b{sb}>, C<\b{lb}> and their negations C<\B{gcb}>, etc.
+
+The C<boundary_type()> accessor returns the boundary type string (e.g.
+C<"wb">, C<"gcb">) or undef for plain C<\b>/C<\B>.
 
 =head2 gpos
 

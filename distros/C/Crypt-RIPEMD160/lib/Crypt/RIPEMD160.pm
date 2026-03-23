@@ -3,7 +3,7 @@ package Crypt::RIPEMD160;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 use XSLoader;
 XSLoader::load('Crypt::RIPEMD160', $VERSION);

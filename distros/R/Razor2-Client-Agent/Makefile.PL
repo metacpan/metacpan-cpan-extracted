@@ -8,7 +8,7 @@
 ##
 ## $Id: Makefile.PL,v 1.30 2007/05/08 22:47:53 rsoderberg Exp $
 
-our $VERSION = "2.86";
+our $VERSION = "2.87";
 
 use ExtUtils::MakeMaker;
 
@@ -19,17 +19,19 @@ WriteMakefile(
     AUTHOR       => 'Vipul Ved Prakash <mail@vipul.net>',
     ABSTRACT     => 'Collaborative, content-based spam filtering network agent.',
     VERSION_FROM => 'lib/Razor2/Client/Version.pm',
+    MIN_PERL_VERSION => '5.010',
     ( $ExtUtils::MakeMaker::VERSION >= 6.3002 ? ( 'LICENSE' => 'perl', ) : () ),
     EXE_FILES => [qw( bin/razor-client bin/razor-admin bin/razor-check bin/razor-report bin/razor-revoke )],
     PREREQ_PM => {
-        'Digest::SHA1' => 0,
-        'File::Copy'   => 0,
-        'File::Spec'   => 0,
-        'Getopt::Long' => 0,
-        'MIME::Base64' => 0,
-        'Test::More'   => 0,
-        'Time::HiRes'  => 0,
-        'URI::Escape'  => 0,
+        'IO::Socket::IP' => 0,
+        'Digest::SHA'    => 0,
+        'File::Copy'     => 0,
+        'File::Spec'     => 0,
+        'Getopt::Long'   => 0,
+        'MIME::Base64'   => 0,
+        'Test::More'     => 0,
+        'Time::HiRes'    => 0,
+        'URI::Escape'    => 0,
     },
     MAN1PODS => {
         'docs/razor-check.pod'  => '$(INST_MAN1DIR)/razor-check.1',
@@ -131,7 +133,8 @@ MAKE_FRAG
 # begin razor-agents
 %s
 
-manifypods-razor : docs/razor-agent.conf.pod \
+manifypods-razor : config \
+	docs/razor-agent.conf.pod \
 	docs/razor-agents.pod                \
 	docs/razor-whitelist.pod
 	$(POD2MAN) \

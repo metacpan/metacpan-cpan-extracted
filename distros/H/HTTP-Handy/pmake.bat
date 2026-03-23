@@ -220,7 +220,7 @@ for my $target (@ARGV) {
             perl                 5.005_03
         ));
         my %provides = ();
-        for my $file (grep /\.(pl|pm|t|bat)\z/i, @file) {
+        for my $file (grep m{\Alib/.*\.pm\z}i, @file) {
             if (open FILE, $file) {
                 while (<FILE>) {
                     chomp;

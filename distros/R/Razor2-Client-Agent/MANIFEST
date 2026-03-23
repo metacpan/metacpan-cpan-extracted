@@ -41,11 +41,10 @@ lib/Razor2/Syslog.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 SERVICE_POLICY
 t/basic.t
+t/logger.t
 t/testit/html.1
 t/testit/html.1.deHTMLxs
 t/testit/html.2
@@ -63,3 +62,5 @@ t/testit/html.7.deHTMLxs
 t/testit/html.8
 t/testit/html.8.deHTMLxs
 typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

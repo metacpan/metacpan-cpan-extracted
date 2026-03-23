@@ -11,7 +11,7 @@
 package Razor2::Client::Core;
 
 use strict;
-use IO::Socket;
+use IO::Socket::IP;
 use IO::Select;
 use Errno qw(:POSIX);
 
@@ -1717,7 +1717,7 @@ sub connect {
         $proxy =~ s!:(\d+)/?$!!;
         my $pport = $1 || 80;
         $self->debug("HTTP tunneling through $proxy:$pport.");
-        $sock = IO::Socket::INET->new(
+        $sock = IO::Socket::IP->new(
             PeerAddr => $proxy,
             PeerPort => $pport,
             Proto    => 'tcp',
@@ -1769,7 +1769,7 @@ sub connect {
     }
 
     unless ($sock) {
-        $sock = IO::Socket::INET->new(
+        $sock = IO::Socket::IP->new(
             PeerAddr => $server,
             PeerPort => $port,
             Proto    => 'tcp',

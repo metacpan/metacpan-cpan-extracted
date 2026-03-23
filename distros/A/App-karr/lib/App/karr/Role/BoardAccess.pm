@@ -1,33 +1,68 @@
 # ABSTRACT: Role providing board directory discovery and config access
 
 package App::karr::Role::BoardAccess;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo::Role;
 use Path::Tiny;
 use YAML::XS qw( LoadFile DumpFile );
 use Carp qw( croak );
+use File::Temp qw( tempdir );
+
 
 has board_dir => (
   is => 'lazy',
+  clearer => '_clear_board_dir',
 );
 
 has config => (
+  is => 'lazy',
+  clearer => '_clear_config',
+);
+
+has git_root => (
+  is => 'lazy',
+);
+
+has store => (
   is => 'lazy',
 );
 
 sub _build_board_dir {
   my ($self) = @_;
-  if ($self->can('has_dir') && $self->has_dir) {
-    return path($self->dir);
-  }
-  my $dir = path('.')->absolute;
+  my $store = $self->store;
+  $store->git->pull;
+  croak "No karr board found. Run 'karr init' to create one.\n"
+    unless $store->board_exists;
+
+  my $dir = path( tempdir( CLEANUP => 1 ) );
+  $store->materialize_to($dir);
+  return $dir;
+}
+
+sub _build_git_root {
+  my ($self) = @_;
+  require App::karr::Git;
+
+  my $start = $self->can('has_dir') && $self->has_dir
+    ? path($self->dir)->absolute
+    : path('.')->absolute;
+
   while (1) {
-    my $candidate = $dir->child('karr');
-    return $candidate if $candidate->is_dir && $candidate->child('config.yml')->exists;
-    last if $dir->is_rootdir;
-    $dir = $dir->parent;
+    my $git = App::karr::Git->new( dir => $start->stringify );
+    my $root = $git->repo_root;
+    return $root if $root;
+    last if $start->is_rootdir;
+    $start = $start->parent;
   }
-  croak "No karr board found. Run 'karr init' to create one.";
+  croak "Not a git repository. karr requires Git.\n";
+}
+
+sub _build_store {
+  my ($self) = @_;
+  require App::karr::Git;
+  require App::karr::BoardStore;
+  my $git = App::karr::Git->new( dir => $self->git_root->stringify );
+  return App::karr::BoardStore->new( git => $git );
 }
 
 sub _build_config {
@@ -77,79 +112,34 @@ sub parse_ids {
 
 sub sync_before {
   my ($self) = @_;
-  require App::karr::Git;
-  my $git = App::karr::Git->new(dir => $self->board_dir->parent->stringify);
-  return unless $git->is_repo;
+  my $git = $self->store->git;
   $git->pull;
-  $self->_materialize_from_refs($git);
+  $self->_clear_config;
+  $self->_clear_board_dir;
+  $self->board_dir;
 }
 
 sub sync_after {
   my ($self) = @_;
-  require App::karr::Git;
-  my $git = App::karr::Git->new(dir => $self->board_dir->parent->stringify);
-  return unless $git->is_repo;
+  my $git = $self->store->git;
   $self->_serialize_to_refs($git);
   $git->push;
+  $self->_clear_config;
 }
 
 sub _materialize_from_refs {
   my ($self, $git) = @_;
-  my @ids = $git->list_task_refs;
-  my $tasks_dir = $self->tasks_dir;
-  $tasks_dir->mkpath;
-
-  # Serialize locally-created tasks first
-  if ($tasks_dir->exists) {
-    for my $file ($tasks_dir->children(qr/\.md$/)) {
-      require App::karr::Task;
-      my $task = App::karr::Task->from_file($file);
-      my $ref_content = $git->read_ref("refs/karr/tasks/" . $task->id . "/data");
-      unless ($ref_content) {
-        $git->save_task_ref($task);
-        push @ids, $task->id unless grep { $_ == $task->id } @ids;
-      }
-    }
-    # Clear stale files
-    for my $old_file ($tasks_dir->children(qr/\.md$/)) {
-      $old_file->remove;
-    }
-  }
-
-  # Materialize from refs
-  for my $id (@ids) {
-    my $task = $git->load_task_ref($id);
-    next unless $task;
-    $task->save($tasks_dir);
-  }
-
-  # Materialize config with next_id merge
-  my $config_content = $git->read_ref('refs/karr/config');
-  if ($config_content) {
-    require YAML::XS;
-    my $local_config_file = $self->board_dir->child('config.yml');
-    if ($local_config_file->exists) {
-      my $remote_config = YAML::XS::Load($config_content);
-      my $local_config = YAML::XS::LoadFile($local_config_file->stringify);
-      my $local_nid = $local_config->{next_id} // 1;
-      my $remote_nid = $remote_config->{next_id} // 1;
-      $remote_config->{next_id} = $local_nid > $remote_nid ? $local_nid : $remote_nid;
-      YAML::XS::DumpFile($local_config_file->stringify, $remote_config);
-    } else {
-      $local_config_file->spew_utf8($config_content);
-    }
-  }
+  return $self->store->materialize_to( $self->board_dir );
 }
 
 sub _serialize_to_refs {
   my ($self, $git) = @_;
-  for my $task ($self->load_tasks) {
-    $git->save_task_ref($task);
-  }
-  my $config_file = $self->board_dir->child('config.yml');
-  if ($config_file->exists) {
-    $git->write_ref('refs/karr/config', $config_file->slurp_utf8);
-  }
+  return $self->store->serialize_from( $self->board_dir );
+}
+
+sub allocate_next_id {
+  my ($self) = @_;
+  return $self->store->allocate_next_id;
 }
 
 sub append_log {
@@ -180,7 +170,13 @@ App::karr::Role::BoardAccess - Role providing board directory discovery and conf
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 DESCRIPTION
+
+This role gives command objects a consistent way to find the current board,
+load tasks, read and write configuration, and synchronise temporary board files
+with the Git ref backend. Most command modules in C<karr> compose this role.
 
 =head1 SUPPORT
 
@@ -188,6 +184,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

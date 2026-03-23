@@ -43,6 +43,7 @@ sub new {
                 die $!;
             }
         };
+        binmode( LOGF, ':encoding(UTF-8)' );
         LOGF->autoflush(1);
         $self->{fd} = *LOGF{IO};
     }
@@ -64,14 +65,20 @@ sub new {
     elsif ( $self->{LogTo} eq 'stdout' ) {
         $self->{LogType} = 'file';
         $self->{fd}      = *STDOUT{IO};
+        $self->_ensure_utf8( $self->{fd} );
+        $self->{fd}->autoflush(1);
     }
     elsif ( $self->{LogTo} eq 'stderr' ) {
         $self->{LogType} = 'file';
         $self->{fd}      = *STDERR{IO};
+        $self->_ensure_utf8( $self->{fd} );
+        $self->{fd}->autoflush(1);
     }
     else {
         $self->{LogType} = 'file';
         $self->{fd}      = *STDERR{IO};
+        $self->_ensure_utf8( $self->{fd} );
+        $self->{fd}->autoflush(1);
     }
 
     $self->{LogTimeFormat} ||= "%b %d %H:%M:%S";    # formatting from strftime()
@@ -142,13 +149,21 @@ sub log2file {
     my $len = length($$textref);
     my $fn  = "$self->{Log2FileDir}/razor.$$.$fn_ext";
 
-    if ( open OUT, ">$fn" ) {
+    if ( open OUT, '>:encoding(UTF-8)', $fn ) {
         print OUT $$textref;
         close OUT;
         $self->log( $prio, "log2file: wrote message len=$len to file: $fn" );
     }
     else {
         $self->log( $prio, "log2file: could not write to $fn: $!" );
+    }
+}
+
+sub _ensure_utf8 {
+    my ( $self, $fh ) = @_;
+    my @layers = PerlIO::get_layers($fh);
+    unless ( grep { $_ eq 'utf8' || $_ eq 'encoding' } @layers ) {
+        binmode( $fh, ':encoding(UTF-8)' );
     }
 }
 

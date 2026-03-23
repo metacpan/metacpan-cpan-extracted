@@ -807,7 +807,7 @@ sub rtable {
   my ($idv, $ido) = ($id_r, $id_c);
     # var in columns instead of rows
   $opt{R_VAR} == 0
-    and ($data, $idv, $ido) = ($data->inplace->transpose, $id_c, $id_r);
+    and ($data, $idv, $ido) = ($data->transpose, $id_c, $id_r);
 
   if ($opt{V}) {
     print "OK.\ndata table as PDL dim o x v: " . $data->info . "\n";

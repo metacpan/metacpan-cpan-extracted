@@ -1,7 +1,7 @@
 # ABSTRACT: Change a task's status
 
 package App::karr::Cmd::Move;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -13,6 +13,7 @@ use App::karr::Task;
 use App::karr::Config;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
+
 
 option next => (
   is => 'ro',
@@ -123,7 +124,39 @@ App::karr::Cmd::Move - Change a task's status
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr move 7 done
+    karr move 7 --next
+    karr move 7,8,9 in-progress --claim agent-fox
+
+=head1 DESCRIPTION
+
+Moves one or more tasks to a new status. The command understands explicit
+target statuses and relative movement via C<--next> or C<--prev>, and it
+enforces C<require_claim> when the destination status requires an owner.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * C<--next>, C<--prev>
+
+Advance or rewind relative to the status order defined in the board config.
+
+=item * C<--claim>
+
+Claim the task while moving it. This is commonly used for
+C<in-progress> or C<review> states.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Show>, L<App::karr::Cmd::Edit>,
+L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Handoff>
 
 =head1 SUPPORT
 
@@ -131,6 +164,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

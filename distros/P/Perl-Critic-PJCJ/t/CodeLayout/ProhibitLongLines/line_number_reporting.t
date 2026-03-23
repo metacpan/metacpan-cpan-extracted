@@ -48,8 +48,9 @@ Another short line
 my $other = 2;
 EOCODE
 
-  my @violations = line_numbers($code_with_pod, [8],
-    "POD long line should report correct line number");
+  my @violations = line_numbers(
+    $code_with_pod, [8], "POD long line should report correct line number"
+  );
 
   # Also check the exact message
   is $violations[0]->description, "Line is 73 characters long (exceeds 72)",
@@ -146,8 +147,10 @@ my $var = 1;
 my $other = 2;
 EOCODE
 
-  my @violations = line_numbers($comment_code, [2],
-    "Comment long lines should report correct line numbers");
+  my @violations = line_numbers(
+    $comment_code, [2],
+    "Comment long lines should report correct line numbers"
+  );
 
   is $violations[0]->description, "Line is 73 characters long (exceeds 72)",
     "Comment violation has correct message";
@@ -164,8 +167,10 @@ my $var = 1;
 my $very_long_variable_name_that_exceeds_seventy_two_char_limit_after_pod = "v";
 EOCODE
 
-  my @violations = line_numbers($empty_pod_code, [7],
-    "Code after empty POD should report correct line numbers");
+  my @violations = line_numbers(
+    $empty_pod_code, [7],
+    "Code after empty POD should report correct line numbers"
+  );
 
   is $violations[0]->description, "Line is 80 characters long (exceeds 72)",
     "Line after empty POD has correct violation message";

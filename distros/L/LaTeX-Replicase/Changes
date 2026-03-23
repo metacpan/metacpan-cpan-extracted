@@ -23,7 +23,7 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Index list and ranges (e.g. -1,5,2,6,1,3-9 or -5-,7-,0- etc.) added for '%%%V:' tag of ...ARRAY data.
 	- '%%%V:' tag can now override the global environment for variable lookup or the absolute or relative path of its location in the incoming $info structure.
 	- '%%%VAR:' tag can now specify the local environment for variable lookup or path of its location in the incoming $info structure.
-	- Added a new tags: '%%%ADDE:', '%%%TDZ:', '%%%ENDZ:', and '%%%ENDT:'
+	- Added the new tags: '%%%ADDE:', '%%%TDZ:', '%%%ENDZ:', and '%%%ENDT:'
 	- The behavior of the nested tags '%%%TDZ:', '%%%ENDZ:', and '%%%ENDT:'  have been extended to be similar to '%%%END:' of '%%%VAR:'.
 	- Added '%' semaphore at end of '%%%ADDx:' tags to eliminate line breaks.
 	- Removed '%%%ADDn:' tags.
@@ -72,3 +72,13 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Increased diversity of code test coverage.
 	- The manual has been corrected.
 
+0.701 Sun Mar 22 12:12:12 2026
+	- Added a new tag: '%%%ADDA:' -- means that '%%%ADD' is Always present.
+	- Added magic value 001 (\x{001}) for the %%%V: tag, which acts as a trigger that substitutes the left value from the template.
+	- Fixed behavior of regular scalar ({HASH|ARRAY}.SCALAR, {HASH|ARRAY}.REF->SCALAR) when it is not defined.
+	- Improved handling of undefined values.
+	- Optimized algorithms.
+	- Added new tests.
+	- Fixed old tests.
+	- Increased diversity of code test coverage.
+	- The manual has been corrected and expanded.

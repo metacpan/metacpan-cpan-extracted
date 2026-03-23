@@ -1,7 +1,7 @@
 # ABSTRACT: Atomically find and claim the next available task
 
 package App::karr::Cmd::Pick;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -14,6 +14,7 @@ use App::karr::Config;
 use Time::Piece;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output', 'App::karr::Role::ClaimTimeout';
+
 
 option claim => (
   is => 'ro',
@@ -177,7 +178,48 @@ App::karr::Cmd::Pick - Atomically find and claim the next available task
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr pick --claim agent-fox
+    karr pick --claim agent-fox --status todo --move in-progress
+    karr pick --claim agent-fox --tags backend,urgent --json
+
+=head1 DESCRIPTION
+
+Selects the next available task for an agent, taking class of service,
+priority, blocked state, and claim expiry into account. When the board lives in
+a Git repository, the command also uses lock refs so concurrent agents do not
+pick the same task.
+
+=head1 SELECTION RULES
+
+=over 4
+
+=item * Eligible statuses
+
+If C<--status> is omitted, tasks in C<done> and C<archived> are excluded.
+
+=item * Claim timeout
+
+Already claimed tasks are ignored unless their claim timestamp has expired
+according to C<claim_timeout>.
+
+=item * Ordering
+
+Candidates are sorted by class of service, then by priority, then by task id.
+
+=item * C<--move>
+
+Optionally updates the picked task to a new status such as C<in-progress>.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::List>, L<App::karr::Cmd::Move>,
+L<App::karr::Cmd::Handoff>, L<App::karr::Cmd::AgentName>
 
 =head1 SUPPORT
 
@@ -185,6 +227,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

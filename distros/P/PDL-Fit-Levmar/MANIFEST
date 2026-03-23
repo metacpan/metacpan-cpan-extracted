@@ -82,7 +82,6 @@ newtest.pl
 NOTES
 pdlperlfunc.c
 pdlperlfunc.h
-README
 README.pod
 t/chkjac.t
 t/funcbug.t

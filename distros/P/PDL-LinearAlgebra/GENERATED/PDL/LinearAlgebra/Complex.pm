@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.433';
+   our $VERSION = '0.434';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::LinearAlgebra::Complex $VERSION;
@@ -22,7 +22,8 @@ use DynaLoader;
 
 
 
-#line 85 "lib/PDL/LinearAlgebra/Complex.pd"
+
+#line 81 "lib/PDL/LinearAlgebra/Complex.pd"
 
 use strict;
 use PDL::LinearAlgebra::Real;
@@ -51,7 +52,7 @@ This module provides an interface to parts of the lapack library (complex number
 These routines accept either float or double ndarrays.
 
 =cut
-#line 55 "lib/PDL/LinearAlgebra/Complex.pm"
+#line 56 "lib/PDL/LinearAlgebra/Complex.pm"
 
 
 =head1 FUNCTIONS
@@ -67,7 +68,15 @@ These routines accept either float or double ndarrays.
 
 =for sig
 
-  Signature: (complex [io]DL(n);complex  [io]D(n);complex  [io]DU(n);complex  [io]B(n,nrhs); int [o]info())
+ Signature: (complex [io]DL(n);complex  [io]D(n);complex  [io]DU(n);complex  [io]B(n,nrhs); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cgtsv($DL, $D, $DU, $B);
+ cgtsv($DL, $D, $DU, $B, $info);  # all arguments given
+ $info = $DL->cgtsv($D, $DU, $B); # method call
+ $DL->cgtsv($D, $DU, $B, $info);
 
 =for ref
 
@@ -121,9 +130,13 @@ its second element.
  cgtsv($dl, $d, $du, $b, ($info=null));
  print "X is:\n$b" unless $info;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgtsv ignores the bad-value flag of the input ndarrays.
+C<cgtsv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -142,7 +155,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); [t]rwork(rworkn=CALC(5*$SIZE(minmn))))
+ Signature: (complex [io]A(m,n); int jobu(); int jobvt(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); [t]rwork(rworkn=CALC(5*$SIZE(minmn))))
+ Types: (float double)
+
+=for usage
+
+ ($s, $U, $VT, $info) = cgesvd($A, $jobu, $jobvt);
+ cgesvd($A, $jobu, $jobvt, $s, $U, $VT, $info);    # all arguments given
+ ($s, $U, $VT, $info) = $A->cgesvd($jobu, $jobvt); # method call
+ $A->cgesvd($jobu, $jobvt, $s, $U, $VT, $info);
 
 =for ref
 
@@ -152,9 +173,13 @@ The SVD is written
 
  A = U * SIGMA * ConjugateTranspose(V)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgesvd ignores the bad-value flag of the input ndarrays.
+C<cgesvd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -173,7 +198,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+ Signature: (complex [io]A(m,n); int jobz(); [o]s(minmn=CALC(PDLMIN($SIZE(m),$SIZE(n))));complex  [o]U(p,p);complex  [o]VT(s,s); int [o]info(); int [t]iwork(iworkn))
+ Types: (float double)
+
+=for usage
+
+ ($s, $U, $VT, $info) = cgesdd($A, $jobz);
+ cgesdd($A, $jobz, $s, $U, $VT, $info);    # all arguments given
+ ($s, $U, $VT, $info) = $A->cgesdd($jobz); # method call
+ $A->cgesdd($jobz, $s, $U, $VT, $info);
 
 =for ref
 
@@ -183,9 +216,13 @@ The SVD is written
 
  A = U * SIGMA * ConjugateTranspose(V)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgesdd ignores the bad-value flag of the input ndarrays.
+C<cgesdd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -204,15 +241,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int jobu(); int jobv(); int jobq();complex  [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n);complex  [o]U(q,q);complex  [o]V(r,r);complex  [o]Q(s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(m,n); int jobu(); int jobv(); int jobq();complex  [io]B(p,n); int [o]k(); int [o]l();[o]alpha(n);[o]beta(n);complex  [o]U(q,q);complex  [o]V(r,r);complex  [o]Q(s,s); int [o]iwork(n); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info) = cggsvd($A, $jobu, $jobv, $jobq, $B);
+ cggsvd($A, $jobu, $jobv, $jobq, $B, $k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info);    # all arguments given
+ ($k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info) = $A->cggsvd($jobu, $jobv, $jobq, $B); # method call
+ $A->cggsvd($jobu, $jobv, $jobq, $B, $k, $l, $alpha, $beta, $U, $V, $Q, $iwork, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ggsvd>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cggsvd ignores the bad-value flag of the input ndarrays.
+C<cggsvd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -231,15 +280,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(n,n); int jobvl(); int jobvr();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($w, $vl, $vr, $info) = cgeev($A, $jobvl, $jobvr);
+ cgeev($A, $jobvl, $jobvr, $w, $vl, $vr, $info);    # all arguments given
+ ($w, $vl, $vr, $info) = $A->cgeev($jobvl, $jobvr); # method call
+ $A->cgeev($jobvl, $jobvr, $w, $vl, $vr, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/geev>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgeev ignores the bad-value flag of the input ndarrays.
+C<cgeev> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -258,15 +319,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(n,n);  int jobvl(); int jobvr(); int balance(); int sense();complex  [o]w(n);complex  [o]vl(m,m);complex  [o]vr(p,p); int [o]ilo(); int [o]ihi(); [o]scale(n); [o]abnrm(); [o]rconde(q); [o]rcondv(r); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($w, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info) = cgeevx($A, $jobvl, $jobvr, $balance, $sense);
+ cgeevx($A, $jobvl, $jobvr, $balance, $sense, $w, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info);    # all arguments given
+ ($w, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info) = $A->cgeevx($jobvl, $jobvr, $balance, $sense); # method call
+ $A->cgeevx($jobvl, $jobvr, $balance, $sense, $w, $vl, $vr, $ilo, $ihi, $scale, $abnrm, $rconde, $rcondv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/geevx>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgeevx ignores the bad-value flag of the input ndarrays.
+C<cgeevx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -285,15 +358,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvl();int jobvr();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))))
+ Signature: (complex [io]A(n,n); int jobvl();int jobvr();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($alpha, $beta, $VL, $VR, $info) = cggev($A, $jobvl, $jobvr, $B);
+ cggev($A, $jobvl, $jobvr, $B, $alpha, $beta, $VL, $VR, $info);    # all arguments given
+ ($alpha, $beta, $VL, $VR, $info) = $A->cggev($jobvl, $jobvr, $B); # method call
+ $A->cggev($jobvl, $jobvr, $B, $alpha, $beta, $VL, $VR, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ggev>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cggev ignores the bad-value flag of the input ndarrays.
+C<cggev> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -312,15 +397,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn))
+ Signature: (complex [io]A(n,n);int balanc();int jobvl();int jobvr();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VL(m,m);complex [o]VR(p,p);int [o]ilo();int [o]ihi();[o]lscale(n);[o]rscale(n);[o]abnrm();[o]bbnrm();[o]rconde(r);[o]rcondv(s);int [o]info(); [t]rwork(rworkn=CALC(6*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn))
+ Types: (float double)
+
+=for usage
+
+ ($alpha, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info) = cggevx($A, $balanc, $jobvl, $jobvr, $sense, $B);
+ cggevx($A, $balanc, $jobvl, $jobvr, $sense, $B, $alpha, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info);    # all arguments given
+ ($alpha, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info) = $A->cggevx($balanc, $jobvl, $jobvr, $sense, $B); # method call
+ $A->cggevx($balanc, $jobvl, $jobvr, $sense, $B, $alpha, $beta, $VL, $VR, $ilo, $ihi, $lscale, $rscale, $abnrm, $bbnrm, $rconde, $rcondv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ggevx>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cggevx ignores the bad-value flag of the input ndarrays.
+C<cggevx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -339,7 +436,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobvs(); int sort();complex  [o]w(n);complex  [o]vs(p,p); int [o]sdim(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
+ Signature: (complex [io]A(n,n);  int jobvs(); int sort();complex  [o]w(n);complex  [o]vs(p,p); int [o]sdim(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($w, $vs, $sdim, $info) = cgees($A, $jobvs, $sort, $select_func);
+ cgees($A, $jobvs, $sort, $w, $vs, $sdim, $info, $select_func);    # all arguments given
+ ($w, $vs, $sdim, $info) = $A->cgees($jobvs, $sort, $select_func); # method call
+ $A->cgees($jobvs, $sort, $w, $vs, $sdim, $info, $select_func);
 
 =for ref
 
@@ -357,9 +462,13 @@ Complex version of L<PDL::LinearAlgebra::Real/gees>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgees ignores the bad-value flag of the input ndarrays.
+C<cgees> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -378,7 +487,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobvs(); int sort(); int sense();complex  [o]w(n);complex [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
+ Signature: (complex [io]A(n,n);  int jobvs(); int sort(); int sense();complex  [o]w(n);complex [o]vs(p,p); int [o]sdim(); [o]rconde();[o]rcondv(); int [o]info(); [t]rwork(n); int [t]bwork(bworkn); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($w, $vs, $sdim, $rconde, $rcondv, $info) = cgeesx($A, $jobvs, $sort, $sense, $select_func);
+ cgeesx($A, $jobvs, $sort, $sense, $w, $vs, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ ($w, $vs, $sdim, $rconde, $rcondv, $info) = $A->cgeesx($jobvs, $sort, $sense, $select_func); # method call
+ $A->cgeesx($jobvs, $sort, $sense, $w, $vs, $sdim, $rconde, $rcondv, $info, $select_func);
 
 =for ref
 
@@ -396,9 +513,13 @@ Complex version of L<PDL::LinearAlgebra::Real/geesx>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgeesx ignores the bad-value flag of the input ndarrays.
+C<cgeesx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -417,7 +538,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); SV* select_func)
+ Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($alpha, $beta, $VSL, $VSR, $sdim, $info) = cgges($A, $jobvsl, $jobvsr, $sort, $B, $select_func);
+ cgges($A, $jobvsl, $jobvsr, $sort, $B, $alpha, $beta, $VSL, $VSR, $sdim, $info, $select_func);    # all arguments given
+ ($alpha, $beta, $VSL, $VSR, $sdim, $info) = $A->cgges($jobvsl, $jobvsr, $sort, $B, $select_func); # method call
+ $A->cgges($jobvsl, $jobvsr, $sort, $B, $alpha, $beta, $VSL, $VSR, $sdim, $info, $select_func);
 
 =for ref
 
@@ -435,9 +564,13 @@ Complex version of L<PDL::LinearAlgebra::Real/ggees>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+2.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgges ignores the bad-value flag of the input ndarrays.
+C<cgges> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -456,7 +589,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2)); SV* select_func)
+ Signature: (complex [io]A(n,n); int jobvsl();int jobvsr();int sort();int sense();complex [io]B(n,n);complex [o]alpha(n);complex [o]beta(n);complex [o]VSL(m,m);complex [o]VSR(p,p);int [o]sdim();[o]rconde(q=2);[o]rcondv(q=2);int [o]info(); [t]rwork(rworkn=CALC(8*$SIZE(n))); int [t]bwork(bworkn); int [t]iwork(iworkn=CALC($SIZE(n)+2)); SV* select_func)
+ Types: (float double)
+
+=for usage
+
+ ($alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = cggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $select_func);
+ cggesx($A, $jobvsl, $jobvsr, $sort, $sense, $B, $alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);    # all arguments given
+ ($alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info) = $A->cggesx($jobvsl, $jobvsr, $sort, $sense, $B, $select_func); # method call
+ $A->cggesx($jobvsl, $jobvsr, $sort, $sense, $B, $alpha, $beta, $VSL, $VSR, $sdim, $rconde, $rcondv, $info, $select_func);
 
 =for ref
 
@@ -474,9 +615,13 @@ Complex version of L<PDL::LinearAlgebra::Real/ggeesx>
             (especially if the eigenvalue is ill-conditioned); in this
             case info is set to N+3.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cggesx ignores the bad-value flag of the input ndarrays.
+C<cggesx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -495,15 +640,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int jobz(); int uplo(); [o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2))))
+ Signature: (complex [io]A(n,n); int jobz(); int uplo(); [o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2))))
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = cheev($A, $jobz, $uplo);
+ cheev($A, $jobz, $uplo, $w, $info);    # all arguments given
+ ($w, $info) = $A->cheev($jobz, $uplo); # method call
+ $A->cheev($jobz, $uplo, $w, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/syev> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cheev ignores the bad-value flag of the input ndarrays.
+C<cheev> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -522,15 +679,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
+ Signature: (complex [io]A(n,n);  int jobz(); int uplo(); [o]w(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = cheevd($A, $jobz, $uplo);
+ cheevd($A, $jobz, $uplo, $w, $info);    # all arguments given
+ ($w, $info) = $A->cheevd($jobz, $uplo); # method call
+ $A->cheevd($jobz, $uplo, $w, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/syevd> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cheevd ignores the bad-value flag of the input ndarrays.
+C<cheevd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -549,15 +718,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+ Signature: (complex [io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,p);int [o]ifail(n); int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($m, $w, $z, $ifail, $info) = cheevx($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol);
+ cheevx($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $ifail, $info);    # all arguments given
+ ($m, $w, $z, $ifail, $info) = $A->cheevx($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol); # method call
+ $A->cheevx($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $ifail, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/syevx> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cheevx ignores the bad-value flag of the input ndarrays.
+C<cheevx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -576,15 +757,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,q);int [o]isuppz(r); int [o]info())
+ Signature: (complex [io]A(n,n);  int jobz(); int range(); int uplo(); vl(); vu(); int il(); int iu(); abstol(); int [o]m(); [o]w(n);complex  [o]z(p,q);int [o]isuppz(r); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($m, $w, $z, $isuppz, $info) = cheevr($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol);
+ cheevr($A, $jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $isuppz, $info);    # all arguments given
+ ($m, $w, $z, $isuppz, $info) = $A->cheevr($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol); # method call
+ $A->cheevr($jobz, $range, $uplo, $vl, $vu, $il, $iu, $abstol, $m, $w, $z, $isuppz, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/syevr> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cheevr ignores the bad-value flag of the input ndarrays.
+C<cheevr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -603,15 +796,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int itype();int jobz(); int uplo();complex [io]B(n,n);[o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2))))
+ Signature: (complex [io]A(n,n);int itype();int jobz(); int uplo();complex [io]B(n,n);[o]w(n); int [o]info(); [t]rwork(rworkn=CALC(3*($SIZE(n)-2))))
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = chegv($A, $itype, $jobz, $uplo, $B);
+ chegv($A, $itype, $jobz, $uplo, $B, $w, $info);    # all arguments given
+ ($w, $info) = $A->chegv($itype, $jobz, $uplo, $B); # method call
+ $A->chegv($itype, $jobz, $uplo, $B, $w, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sygv> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chegv ignores the bad-value flag of the input ndarrays.
+C<chegv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -630,15 +835,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int itype();int jobz(); int uplo();complex [io]B(n,n);[o]w(n); int [o]info())
+ Signature: (complex [io]A(n,n);int itype();int jobz(); int uplo();complex [io]B(n,n);[o]w(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($w, $info) = chegvd($A, $itype, $jobz, $uplo, $B);
+ chegvd($A, $itype, $jobz, $uplo, $B, $w, $info);    # all arguments given
+ ($w, $info) = $A->chegvd($itype, $jobz, $uplo, $B); # method call
+ $A->chegvd($itype, $jobz, $uplo, $B, $w, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sygvd> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chegvd ignores the bad-value flag of the input ndarrays.
+C<chegvd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -657,19 +874,31 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);int itype();int jobz();int range();
+ Signature: (complex [io]A(n,n);int itype();int jobz();int range();
 	  int uplo();complex [io]B(n,n);vl();vu();int il();
 	  int iu();abstol();int [o]m();[o]w(n);complex 
 	  [o]Z(p,p);int [o]ifail(n);int [o]info(); [t]rwork(rworkn=CALC(7*$SIZE(n))); int [t]iwork(iworkn=CALC(5*$SIZE(n)));
 	)
+ Types: (float double)
+
+=for usage
+
+ ($m, $w, $Z, $ifail, $info) = chegvx($A, $itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol);
+ chegvx($A, $itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol, $m, $w, $Z, $ifail, $info);    # all arguments given
+ ($m, $w, $Z, $ifail, $info) = $A->chegvx($itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol); # method call
+ $A->chegvx($itype, $jobz, $range, $uplo, $B, $vl, $vu, $il, $iu, $abstol, $m, $w, $Z, $ifail, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sygvx> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chegvx ignores the bad-value flag of the input ndarrays.
+C<chegvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -688,15 +917,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);complex   [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Signature: (complex [io]A(n,n);complex   [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = cgesv($A, $B);
+ cgesv($A, $B, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->cgesv($B); # method call
+ $A->cgesv($B, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gesv>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgesv ignores the bad-value flag of the input ndarrays.
+C<cgesv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -715,7 +956,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int trans(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info(); [t]rwork(rworkn=CALC(4*$SIZE(n))); [t]work(rworkn))
+ Signature: (complex [io]A(n,n); int trans(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]ipiv(n); int [io]equed(); [o]r(p); [o]c(q);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); [o]rpvgrw(); int [o]info(); [t]rwork(rworkn=CALC(4*$SIZE(n))); [t]work(rworkn))
+ Types: (float double)
+
+=for usage
+
+ ($r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info) = cgesvx($A, $trans, $fact, $B, $af, $ipiv, $equed);
+ cgesvx($A, $trans, $fact, $B, $af, $ipiv, $equed, $r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info);    # all arguments given
+ ($r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info) = $A->cgesvx($trans, $fact, $B, $af, $ipiv, $equed); # method call
+ $A->cgesvx($trans, $fact, $B, $af, $ipiv, $equed, $r, $c, $X, $rcond, $ferr, $berr, $rpvgrw, $info);
 
 =for ref
 
@@ -726,9 +975,13 @@ Complex version of L<PDL::LinearAlgebra::Real/gesvx>.
             = 1:  A' * X = B  (Transpose)
             = 2:  A**H * X = B  (Conjugate transpose)
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgesvx ignores the bad-value flag of the input ndarrays.
+C<cgesvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -747,15 +1000,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = csysv($A, $uplo, $B);
+ csysv($A, $uplo, $B, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->csysv($uplo, $B); # method call
+ $A->csysv($uplo, $B, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sysv>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csysv ignores the bad-value flag of the input ndarrays.
+C<csysv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -774,15 +1039,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int fact();complex  B(n,m);complex  [io]af(n,n); int [io]ipiv(n);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n))
+ Signature: (complex A(n,n); int uplo(); int fact();complex  B(n,m);complex  [io]af(n,n); int [io]ipiv(n);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n))
+ Types: (float double)
+
+=for usage
+
+ ($X, $rcond, $ferr, $berr, $info) = csysvx($A, $uplo, $fact, $B, $af, $ipiv);
+ csysvx($A, $uplo, $fact, $B, $af, $ipiv, $X, $rcond, $ferr, $berr, $info);    # all arguments given
+ ($X, $rcond, $ferr, $berr, $info) = $A->csysvx($uplo, $fact, $B, $af, $ipiv); # method call
+ $A->csysvx($uplo, $fact, $B, $af, $ipiv, $X, $rcond, $ferr, $berr, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sysvx>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csysvx ignores the bad-value flag of the input ndarrays.
+C<csysvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -801,15 +1078,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = chesv($A, $uplo, $B);
+ chesv($A, $uplo, $B, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->chesv($uplo, $B); # method call
+ $A->chesv($uplo, $B, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sysv> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chesv ignores the bad-value flag of the input ndarrays.
+C<chesv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -828,15 +1117,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int fact();complex  B(n,m);complex  [io]af(n,n); int [io]ipiv(n);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n))
+ Signature: (complex A(n,n); int uplo(); int fact();complex  B(n,m);complex  [io]af(n,n); int [io]ipiv(n);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(n))
+ Types: (float double)
+
+=for usage
+
+ ($X, $rcond, $ferr, $berr, $info) = chesvx($A, $uplo, $fact, $B, $af, $ipiv);
+ chesvx($A, $uplo, $fact, $B, $af, $ipiv, $X, $rcond, $ferr, $berr, $info);    # all arguments given
+ ($X, $rcond, $ferr, $berr, $info) = $A->chesvx($uplo, $fact, $B, $af, $ipiv); # method call
+ $A->chesvx($uplo, $fact, $B, $af, $ipiv, $X, $rcond, $ferr, $berr, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sysvx> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chesvx ignores the bad-value flag of the input ndarrays.
+C<chesvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -855,15 +1156,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]info())
+ Signature: (complex [io]A(n,n);  int uplo();complex  [io]B(n,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cposv($A, $uplo, $B);
+ cposv($A, $uplo, $B, $info);  # all arguments given
+ $info = $A->cposv($uplo, $B); # method call
+ $A->cposv($uplo, $B, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/posv> for Hermitian positive definite matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cposv ignores the bad-value flag of the input ndarrays.
+C<cposv> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -882,15 +1195,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]equed(); [o]s(p);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n))))
+ Signature: (complex [io]A(n,n); int uplo(); int fact();complex  [io]B(n,m);complex  [io]af(n,n); int [io]equed(); [o]s(p);complex  [o]X(n,m); [o]rcond(); [o]ferr(m); [o]berr(m); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($s, $X, $rcond, $ferr, $berr, $info) = cposvx($A, $uplo, $fact, $B, $af, $equed);
+ cposvx($A, $uplo, $fact, $B, $af, $equed, $s, $X, $rcond, $ferr, $berr, $info);    # all arguments given
+ ($s, $X, $rcond, $ferr, $berr, $info) = $A->cposvx($uplo, $fact, $B, $af, $equed); # method call
+ $A->cposvx($uplo, $fact, $B, $af, $equed, $s, $X, $rcond, $ferr, $berr, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/posvx> for Hermitian positive definite matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cposvx ignores the bad-value flag of the input ndarrays.
+C<cposvx> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -909,7 +1234,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int trans();complex  [io]B(p,q);int [o]info())
+ Signature: (complex [io]A(m,n); int trans();complex  [io]B(p,q);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cgels($A, $trans, $B);
+ cgels($A, $trans, $B, $info);  # all arguments given
+ $info = $A->cgels($trans, $B); # method call
+ $A->cgels($trans, $B, $info);
 
 =for ref
 
@@ -920,9 +1253,13 @@ Complex version of L<PDL::LinearAlgebra::Real/gels>.
     trans:  = 0: the linear system involves A;
             = 1: the linear system involves A**H.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgels ignores the bad-value flag of the input ndarrays.
+C<cgels> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -941,15 +1278,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); int [io]jpvt(n); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rank, $info) = cgelsy($A, $B, $rcond, $jpvt);
+ cgelsy($A, $B, $rcond, $jpvt, $rank, $info);    # all arguments given
+ ($rank, $info) = $A->cgelsy($B, $rcond, $jpvt); # method call
+ $A->cgelsy($B, $rcond, $jpvt, $rank, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gelsy>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgelsy ignores the bad-value flag of the input ndarrays.
+C<cgelsy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -968,15 +1317,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(5*PDLMIN($SIZE(m),$SIZE(n)))))
+ Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(r); int [o]rank();int [o]info(); [t]rwork(rworkn=CALC(5*PDLMIN($SIZE(m),$SIZE(n)))))
+ Types: (float double)
+
+=for usage
+
+ ($s, $rank, $info) = cgelss($A, $B, $rcond);
+ cgelss($A, $B, $rcond, $s, $rank, $info);    # all arguments given
+ ($s, $rank, $info) = $A->cgelss($B, $rcond); # method call
+ $A->cgelss($B, $rcond, $s, $rank, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gelss>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgelss ignores the bad-value flag of the input ndarrays.
+C<cgelss> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -995,15 +1356,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn); [t]rwork(rworkn))
+ Signature: (complex [io]A(m,n);complex  [io]B(p,q); rcond(); [o]s(minmn=CALC(PDLMAX(1,PDLMIN($SIZE(m),$SIZE(n))))); int [o]rank();int [o]info(); int [t]iwork(iworkn); [t]rwork(rworkn))
+ Types: (float double)
+
+=for usage
+
+ ($s, $rank, $info) = cgelsd($A, $B, $rcond);
+ cgelsd($A, $B, $rcond, $s, $rank, $info);    # all arguments given
+ ($s, $rank, $info) = $A->cgelsd($B, $rcond); # method call
+ $A->cgelsd($B, $rcond, $s, $rank, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gelsd>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgelsd ignores the bad-value flag of the input ndarrays.
+C<cgelsd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1022,15 +1395,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [io]B(p,n);complex [io]c(m);complex [io]d(p);complex [o]x(n);int [o]info())
+ Signature: (complex [io]A(m,n);complex  [io]B(p,n);complex [io]c(m);complex [io]d(p);complex [o]x(n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($x, $info) = cgglse($A, $B, $c, $d);
+ cgglse($A, $B, $c, $d, $x, $info);    # all arguments given
+ ($x, $info) = $A->cgglse($B, $c, $d); # method call
+ $A->cgglse($B, $c, $d, $x, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gglse>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgglse ignores the bad-value flag of the input ndarrays.
+C<cgglse> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1049,15 +1434,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,m);complex  [io]B(n,p);complex [io]d(n);complex [o]x(m);complex [o]y(p);int [o]info())
+ Signature: (complex [io]A(n,m);complex  [io]B(n,p);complex [io]d(n);complex [o]x(m);complex [o]y(p);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($x, $y, $info) = cggglm($A, $B, $d);
+ cggglm($A, $B, $d, $x, $y, $info);    # all arguments given
+ ($x, $y, $info) = $A->cggglm($B, $d); # method call
+ $A->cggglm($B, $d, $x, $y, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ggglm>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cggglm ignores the bad-value flag of the input ndarrays.
+C<cggglm> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1076,15 +1473,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Signature: (complex [io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = cgetrf($A);
+ cgetrf($A, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->cgetrf; # method call
+ $A->cgetrf($ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/getrf>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgetrf ignores the bad-value flag of the input ndarrays.
+C<cgetrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1103,15 +1512,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Signature: (complex [io]A(m,n); int [o]ipiv(p=CALC(PDLMIN($SIZE(m),$SIZE(n)))); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = cgetf2($A);
+ cgetf2($A, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->cgetf2; # method call
+ $A->cgetf2($ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/getf2>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgetf2 ignores the bad-value flag of the input ndarrays.
+C<cgetf2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1130,15 +1551,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = csytrf($A, $uplo);
+ csytrf($A, $uplo, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->csytrf($uplo); # method call
+ $A->csytrf($uplo, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrf>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csytrf ignores the bad-value flag of the input ndarrays.
+C<csytrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1157,15 +1590,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = csytf2($A, $uplo);
+ csytf2($A, $uplo, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->csytf2($uplo); # method call
+ $A->csytf2($uplo, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytf2>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csytf2 ignores the bad-value flag of the input ndarrays.
+C<csytf2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1184,15 +1629,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info(); [t]work(workn))
+ Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info(); [t]work(workn))
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = cchetrf($A, $uplo);
+ cchetrf($A, $uplo, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->cchetrf($uplo); # method call
+ $A->cchetrf($uplo, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrf> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cchetrf ignores the bad-value flag of the input ndarrays.
+C<cchetrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1211,15 +1668,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int [o]ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ipiv, $info) = chetf2($A, $uplo);
+ chetf2($A, $uplo, $ipiv, $info);    # all arguments given
+ ($ipiv, $info) = $A->chetf2($uplo); # method call
+ $A->chetf2($uplo, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytf2> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chetf2 ignores the bad-value flag of the input ndarrays.
+C<chetf2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1238,15 +1707,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cpotrf($A, $uplo);
+ cpotrf($A, $uplo, $info);  # all arguments given
+ $info = $A->cpotrf($uplo); # method call
+ $A->cpotrf($uplo, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/potrf> for Hermitian positive definite matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cpotrf ignores the bad-value flag of the input ndarrays.
+C<cpotrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1265,15 +1746,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cpotf2($A, $uplo);
+ cpotf2($A, $uplo, $info);  # all arguments given
+ $info = $A->cpotf2($uplo); # method call
+ $A->cpotf2($uplo, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/potf2> for Hermitian positive definite matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cpotf2 ignores the bad-value flag of the input ndarrays.
+C<cpotf2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1292,15 +1785,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int ipiv(n); int [o]info())
+ Signature: (complex [io]A(n,n); int ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cgetri($A, $ipiv);
+ cgetri($A, $ipiv, $info);  # all arguments given
+ $info = $A->cgetri($ipiv); # method call
+ $A->cgetri($ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/getri>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgetri ignores the bad-value flag of the input ndarrays.
+C<cgetri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1319,15 +1824,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ $info = csytri($A, $uplo, $ipiv);
+ csytri($A, $uplo, $ipiv, $info);  # all arguments given
+ $info = $A->csytri($uplo, $ipiv); # method call
+ $A->csytri($uplo, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytri>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csytri ignores the bad-value flag of the input ndarrays.
+C<csytri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1346,15 +1863,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(n,n); int uplo(); int ipiv(n); int [o]info(); [t]work(workn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ $info = chetri($A, $uplo, $ipiv);
+ chetri($A, $uplo, $ipiv, $info);  # all arguments given
+ $info = $A->chetri($uplo, $ipiv); # method call
+ $A->chetri($uplo, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytri> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chetri ignores the bad-value flag of the input ndarrays.
+C<chetri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1373,15 +1902,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cpotri($A, $uplo);
+ cpotri($A, $uplo, $info);  # all arguments given
+ $info = $A->cpotri($uplo); # method call
+ $A->cpotri($uplo, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/potri>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cpotri ignores the bad-value flag of the input ndarrays.
+C<cpotri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1400,15 +1941,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int diag(); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int diag(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ctrtri($A, $uplo, $diag);
+ ctrtri($A, $uplo, $diag, $info);  # all arguments given
+ $info = $A->ctrtri($uplo, $diag); # method call
+ $A->ctrtri($uplo, $diag, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/trtri>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctrtri ignores the bad-value flag of the input ndarrays.
+C<ctrtri> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1427,15 +1980,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int uplo(); int diag(); int [o]info())
+ Signature: (complex [io]A(n,n); int uplo(); int diag(); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ctrti2($A, $uplo, $diag);
+ ctrti2($A, $uplo, $diag, $info);  # all arguments given
+ $info = $A->ctrti2($uplo, $diag); # method call
+ $A->ctrti2($uplo, $diag, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/trti2>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctrti2 ignores the bad-value flag of the input ndarrays.
+C<ctrti2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1454,7 +2019,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int trans();complex  [io]B(n,m); int ipiv(n); int [o]info())
+ Signature: (complex A(n,n); int trans();complex  [io]B(n,m); int ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cgetrs($A, $trans, $B, $ipiv);
+ cgetrs($A, $trans, $B, $ipiv, $info);  # all arguments given
+ $info = $A->cgetrs($trans, $B, $ipiv); # method call
+ $A->cgetrs($trans, $B, $ipiv, $info);
 
 =for ref
 
@@ -1466,9 +2039,13 @@ Complex version of L<PDL::LinearAlgebra::Real/getrs>
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgetrs ignores the bad-value flag of the input ndarrays.
+C<cgetrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1487,15 +2064,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo();complex [io]B(n,m); int ipiv(n); int [o]info())
+ Signature: (complex A(n,n); int uplo();complex [io]B(n,m); int ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = csytrs($A, $uplo, $B, $ipiv);
+ csytrs($A, $uplo, $B, $ipiv, $info);  # all arguments given
+ $info = $A->csytrs($uplo, $B, $ipiv); # method call
+ $A->csytrs($uplo, $B, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrs>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csytrs ignores the bad-value flag of the input ndarrays.
+C<csytrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1514,15 +2103,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo();complex [io]B(n,m); int ipiv(n); int [o]info())
+ Signature: (complex A(n,n); int uplo();complex [io]B(n,m); int ipiv(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = chetrs($A, $uplo, $B, $ipiv);
+ chetrs($A, $uplo, $B, $ipiv, $info);  # all arguments given
+ $info = $A->chetrs($uplo, $B, $ipiv); # method call
+ $A->chetrs($uplo, $B, $ipiv, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sytrs> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chetrs ignores the bad-value flag of the input ndarrays.
+C<chetrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1541,15 +2142,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo();complex  [io]B(n,m); int [o]info())
+ Signature: (complex A(n,n); int uplo();complex  [io]B(n,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cpotrs($A, $uplo, $B);
+ cpotrs($A, $uplo, $B, $info);  # all arguments given
+ $info = $A->cpotrs($uplo, $B); # method call
+ $A->cpotrs($uplo, $B, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/potrs> for Hermitian positive definite matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cpotrs ignores the bad-value flag of the input ndarrays.
+C<cpotrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1568,7 +2181,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int trans(); int diag();complex [io]B(n,m); int [o]info())
+ Signature: (complex A(n,n); int uplo(); int trans(); int diag();complex [io]B(n,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = ctrtrs($A, $uplo, $trans, $diag, $B);
+ ctrtrs($A, $uplo, $trans, $diag, $B, $info);  # all arguments given
+ $info = $A->ctrtrs($uplo, $trans, $diag, $B); # method call
+ $A->ctrtrs($uplo, $trans, $diag, $B, $info);
 
 =for ref
 
@@ -1580,9 +2201,13 @@ Complex version of L<PDL::LinearAlgebra::Real/trtrs>
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctrtrs ignores the bad-value flag of the input ndarrays.
+C<ctrtrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1601,7 +2226,15 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int trans(); int diag(); int normin();complex [io]x(n); [o]scale();[io]cnorm(n);int [o]info())
+ Signature: (complex A(n,n); int uplo(); int trans(); int diag(); int normin();complex [io]x(n); [o]scale();[io]cnorm(n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($scale, $info) = clatrs($A, $uplo, $trans, $diag, $normin, $x, $cnorm);
+ clatrs($A, $uplo, $trans, $diag, $normin, $x, $scale, $cnorm, $info);    # all arguments given
+ ($scale, $info) = $A->clatrs($uplo, $trans, $diag, $normin, $x, $cnorm); # method call
+ $A->clatrs($uplo, $trans, $diag, $normin, $x, $scale, $cnorm, $info);
 
 =for ref
 
@@ -1613,9 +2246,13 @@ Complex version of L<PDL::LinearAlgebra::Real/latrs>
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-clatrs ignores the bad-value flag of the input ndarrays.
+C<clatrs> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1634,15 +2271,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n))))
+ Signature: (complex A(n,n); int norm(); anorm(); [o]rcond();int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))); [t]work(workn=CALC(4*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = cgecon($A, $norm, $anorm);
+ cgecon($A, $norm, $anorm, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->cgecon($norm, $anorm); # method call
+ $A->cgecon($norm, $anorm, $rcond, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gecon>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgecon ignores the bad-value flag of the input ndarrays.
+C<cgecon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1661,15 +2310,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))))
+ Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = csycon($A, $uplo, $ipiv, $anorm);
+ csycon($A, $uplo, $ipiv, $anorm, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->csycon($uplo, $ipiv, $anorm); # method call
+ $A->csycon($uplo, $ipiv, $anorm, $rcond, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sycon>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csycon ignores the bad-value flag of the input ndarrays.
+C<csycon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1688,15 +2349,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))))
+ Signature: (complex A(n,n); int uplo(); int ipiv(n); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = checon($A, $uplo, $ipiv, $anorm);
+ checon($A, $uplo, $ipiv, $anorm, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->checon($uplo, $ipiv, $anorm); # method call
+ $A->checon($uplo, $ipiv, $anorm, $rcond, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/sycon> for Hermitian matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-checon ignores the bad-value flag of the input ndarrays.
+C<checon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1715,15 +2388,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n))
+ Signature: (complex A(n,n); int uplo(); anorm(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = cpocon($A, $uplo, $anorm);
+ cpocon($A, $uplo, $anorm, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->cpocon($uplo, $anorm); # method call
+ $A->cpocon($uplo, $anorm, $rcond, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/pocon> for Hermitian positive definite matrix
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cpocon ignores the bad-value flag of the input ndarrays.
+C<cpocon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1742,15 +2427,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n))
+ Signature: (complex A(n,n); int norm();int uplo();int diag(); [o]rcond();int [o]info(); [t]work(workn=CALC(4*$SIZE(n))); [t]rwork(n))
+ Types: (float double)
+
+=for usage
+
+ ($rcond, $info) = ctrcon($A, $norm, $uplo, $diag);
+ ctrcon($A, $norm, $uplo, $diag, $rcond, $info);    # all arguments given
+ ($rcond, $info) = $A->ctrcon($norm, $uplo, $diag); # method call
+ $A->ctrcon($norm, $uplo, $diag, $rcond, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/trcon>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctrcon ignores the bad-value flag of the input ndarrays.
+C<ctrcon> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1769,15 +2466,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int [io]jpvt(n);complex  [o]tau(k); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Signature: (complex [io]A(m,n); int [io]jpvt(n);complex  [o]tau(k); int [o]info(); [t]rwork(rworkn=CALC(2*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = cgeqp3($A, $jpvt);
+ cgeqp3($A, $jpvt, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->cgeqp3($jpvt); # method call
+ $A->cgeqp3($jpvt, $tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/geqp3>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgeqp3 ignores the bad-value flag of the input ndarrays.
+C<cgeqp3> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1796,15 +2505,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = cgeqrf($A);
+ cgeqrf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->cgeqrf; # method call
+ $A->cgeqrf($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/geqrf>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgeqrf ignores the bad-value flag of the input ndarrays.
+C<cgeqrf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1823,15 +2544,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cungqr($A, $tau);
+ cungqr($A, $tau, $info);  # all arguments given
+ $info = $A->cungqr($tau); # method call
+ $A->cungqr($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/orgqr>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cungqr ignores the bad-value flag of the input ndarrays.
+C<cungqr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1850,15 +2583,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(p,k); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Signature: (complex A(p,k); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cunmqr($A, $side, $trans, $tau, $C);
+ cunmqr($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->cunmqr($side, $trans, $tau, $C); # method call
+ $A->cunmqr($side, $trans, $tau, $C, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ormqr>. Here trans = 1 means conjugate transpose.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cunmqr ignores the bad-value flag of the input ndarrays.
+C<cunmqr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1877,15 +2622,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = cgelqf($A);
+ cgelqf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->cgelqf; # method call
+ $A->cgelqf($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gelqf>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgelqf ignores the bad-value flag of the input ndarrays.
+C<cgelqf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1904,15 +2661,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cunglq($A, $tau);
+ cunglq($A, $tau, $info);  # all arguments given
+ $info = $A->cunglq($tau); # method call
+ $A->cunglq($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/orglq>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cunglq ignores the bad-value flag of the input ndarrays.
+C<cunglq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1931,15 +2700,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cunmlq($A, $side, $trans, $tau, $C);
+ cunmlq($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->cunmlq($side, $trans, $tau, $C); # method call
+ $A->cunmlq($side, $trans, $tau, $C, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ormlq>. Here trans = 1 means conjugate transpose.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cunmlq ignores the bad-value flag of the input ndarrays.
+C<cunmlq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1958,15 +2739,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = cgeqlf($A);
+ cgeqlf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->cgeqlf; # method call
+ $A->cgeqlf($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/geqlf>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgeqlf ignores the bad-value flag of the input ndarrays.
+C<cgeqlf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -1985,14 +2778,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cungql($A, $tau);
+ cungql($A, $tau, $info);  # all arguments given
+ $info = $A->cungql($tau); # method call
+ $A->cungql($tau, $info);
 
 =for ref
 Complex version of L<PDL::LinearAlgebra::Real/orgql>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cungql ignores the bad-value flag of the input ndarrays.
+C<cungql> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2011,15 +2816,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(p,k); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Signature: (complex A(p,k); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cunmql($A, $side, $trans, $tau, $C);
+ cunmql($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->cunmql($side, $trans, $tau, $C); # method call
+ $A->cunmql($side, $trans, $tau, $C, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ormql>. Here trans = 1 means conjugate transpose.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cunmql ignores the bad-value flag of the input ndarrays.
+C<cunmql> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2038,15 +2855,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = cgerqf($A);
+ cgerqf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->cgerqf; # method call
+ $A->cgerqf($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gerqf>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgerqf ignores the bad-value flag of the input ndarrays.
+C<cgerqf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2065,15 +2894,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cungrq($A, $tau);
+ cungrq($A, $tau, $info);  # all arguments given
+ $info = $A->cungrq($tau); # method call
+ $A->cungrq($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/orgrq>.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cungrq ignores the bad-value flag of the input ndarrays.
+C<cungrq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2092,15 +2933,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cunmrq($A, $side, $trans, $tau, $C);
+ cunmrq($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->cunmrq($side, $trans, $tau, $C); # method call
+ $A->cunmrq($side, $trans, $tau, $C, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ormrq>. Here trans = 1 means conjugate transpose.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cunmrq ignores the bad-value flag of the input ndarrays.
+C<cunmrq> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2119,15 +2972,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Signature: (complex [io]A(m,n);complex  [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = ctzrzf($A);
+ ctzrzf($A, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->ctzrzf; # method call
+ $A->ctzrzf($tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/tzrzf>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctzrzf ignores the bad-value flag of the input ndarrays.
+C<ctzrzf> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2146,15 +3011,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Signature: (complex A(k,p); int side(); int trans();complex  tau(k);complex  [io]C(m,n);int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cunmrz($A, $side, $trans, $tau, $C);
+ cunmrz($A, $side, $trans, $tau, $C, $info);  # all arguments given
+ $info = $A->cunmrz($side, $trans, $tau, $C); # method call
+ $A->cunmrz($side, $trans, $tau, $C, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/ormrz>. Here trans = 1 means conjugate transpose.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cunmrz ignores the bad-value flag of the input ndarrays.
+C<cunmrz> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2173,15 +3050,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int ilo();int ihi();complex [o]tau(k); int [o]info())
+ Signature: (complex [io]A(n,n); int ilo();int ihi();complex [o]tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($tau, $info) = cgehrd($A, $ilo, $ihi);
+ cgehrd($A, $ilo, $ihi, $tau, $info);    # all arguments given
+ ($tau, $info) = $A->cgehrd($ilo, $ihi); # method call
+ $A->cgehrd($ilo, $ihi, $tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gehrd>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgehrd ignores the bad-value flag of the input ndarrays.
+C<cgehrd> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2200,15 +3089,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int ilo();int ihi();complex tau(k); int [o]info())
+ Signature: (complex [io]A(n,n); int ilo();int ihi();complex tau(k); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ $info = cunghr($A, $ilo, $ihi, $tau);
+ cunghr($A, $ilo, $ihi, $tau, $info);  # all arguments given
+ $info = $A->cunghr($ilo, $ihi, $tau); # method call
+ $A->cunghr($ilo, $ihi, $tau, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/orghr>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cunghr ignores the bad-value flag of the input ndarrays.
+C<cunghr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2227,15 +3128,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]H(n,n); int job();int compz();int ilo();int ihi();complex [o]w(n);complex  [o]Z(m,m); int [o]info())
+ Signature: (complex [io]H(n,n); int job();int compz();int ilo();int ihi();complex [o]w(n);complex  [o]Z(m,m); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($w, $Z, $info) = chseqr($H, $job, $compz, $ilo, $ihi);
+ chseqr($H, $job, $compz, $ilo, $ihi, $w, $Z, $info);    # all arguments given
+ ($w, $Z, $info) = $H->chseqr($job, $compz, $ilo, $ihi); # method call
+ $H->chseqr($job, $compz, $ilo, $ihi, $w, $Z, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/hseqr>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-chseqr ignores the bad-value flag of the input ndarrays.
+C<chseqr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2254,15 +3167,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex T(n,n); int side();int howmny();int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n))))
+ Signature: (complex T(n,n); int side();int howmny();int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(5*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($VL, $VR, $m, $info) = ctrevc($T, $side, $howmny, $select);
+ ctrevc($T, $side, $howmny, $select, $VL, $VR, $m, $info);    # all arguments given
+ ($VL, $VR, $m, $info) = $T->ctrevc($side, $howmny, $select); # method call
+ $T->ctrevc($side, $howmny, $select, $VL, $VR, $m, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/trevc>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctrevc ignores the bad-value flag of the input ndarrays.
+C<ctrevc> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2281,15 +3206,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int side();int howmny();complex  B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+ Signature: (complex A(n,n); int side();int howmny();complex  B(n,n);int select(q);complex [o]VL(m,m);complex  [o]VR(p,p);int [o]m(); int [o]info(); [t]work(workn=CALC(6*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($VL, $VR, $m, $info) = ctgevc($A, $side, $howmny, $B, $select);
+ ctgevc($A, $side, $howmny, $B, $select, $VL, $VR, $m, $info);    # all arguments given
+ ($VL, $VR, $m, $info) = $A->ctgevc($side, $howmny, $B, $select); # method call
+ $A->ctgevc($side, $howmny, $B, $select, $VL, $VR, $m, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/tgevc>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ctgevc ignores the bad-value flag of the input ndarrays.
+C<ctgevc> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2308,15 +3245,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info())
+ Signature: (complex [io]A(n,n); int job(); int [o]ilo();int [o]ihi();[o]scale(n); int [o]info())
+ Types: (float double)
+
+=for usage
+
+ ($ilo, $ihi, $scale, $info) = cgebal($A, $job);
+ cgebal($A, $job, $ilo, $ihi, $scale, $info);    # all arguments given
+ ($ilo, $ihi, $scale, $info) = $A->cgebal($job); # method call
+ $A->cgebal($job, $ilo, $ihi, $scale, $info);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/gebal>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgebal ignores the bad-value flag of the input ndarrays.
+C<cgebal> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2335,15 +3284,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,m); int norm(); [o]b(); [t]work(workn))
+ Signature: (complex A(n,m); int norm(); [o]b(); [t]work(workn))
+ Types: (float double)
+
+=for usage
+
+ $b = clange($A, $norm);
+ clange($A, $norm, $b);  # all arguments given
+ $b = $A->clange($norm); # method call
+ $A->clange($norm, $b);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/lange>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-clange ignores the bad-value flag of the input ndarrays.
+C<clange> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2362,15 +3323,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
+ Signature: (complex A(n,n); int uplo(); int norm(); [o]b(); [t]work(workn))
+ Types: (float double)
+
+=for usage
+
+ $b = clansy($A, $uplo, $norm);
+ clansy($A, $uplo, $norm, $b);  # all arguments given
+ $b = $A->clansy($uplo, $norm); # method call
+ $A->clansy($uplo, $norm, $b);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/lansy>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-clansy ignores the bad-value flag of the input ndarrays.
+C<clansy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2389,15 +3362,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(m,n); int uplo(); int norm();int diag(); [o]b(); [t]work(workn))
+ Signature: (complex A(m,n); int uplo(); int norm();int diag(); [o]b(); [t]work(workn))
+ Types: (float double)
+
+=for usage
+
+ $b = clantr($A, $uplo, $norm, $diag);
+ clantr($A, $uplo, $norm, $diag, $b);  # all arguments given
+ $b = $A->clantr($uplo, $norm, $diag); # method call
+ $A->clantr($uplo, $norm, $diag, $b);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/lantr>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-clantr ignores the bad-value flag of the input ndarrays.
+C<clantr> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2416,7 +3401,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(m,n); int transa(); int transb();complex  B(p,q);complex alpha();complex  beta();complex  [io]C(r,s))
+ Signature: (complex A(m,n); int transa(); int transb();complex  B(p,q);complex alpha();complex  beta();complex  [io]C(r,s))
+ Types: (float double)
+
+=for usage
+
+ cgemm($A, $transa, $transb, $B, $alpha, $beta, $C); # all arguments given
+ $A->cgemm($transa, $transb, $B, $alpha, $beta, $C); # method call
 
 =for ref
 
@@ -2432,9 +3423,13 @@ Complex version of L<PDL::LinearAlgebra::Real/gemm>.
 		 = 1:  Transpose;
 		 = 2:  Conjugate transpose;
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cgemm ignores the bad-value flag of the input ndarrays.
+C<cgemm> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2453,15 +3448,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(m,n);complex  B(p,m);complex  [o]C(p,n))
+ Signature: (complex A(m,n);complex  B(p,m);complex  [o]C(p,n))
+ Types: (float double)
+
+=for usage
+
+ $C = cmmult($A, $B);
+ cmmult($A, $B, $C);  # all arguments given
+ $C = $A->cmmult($B); # method call
+ $A->cmmult($B, $C);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/mmult>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cmmult ignores the bad-value flag of the input ndarrays.
+C<cmmult> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2480,15 +3487,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(n,m);complex  B(p,m);complex  [o]C(p,n))
+ Signature: (complex A(n,m);complex  B(p,m);complex  [o]C(p,n))
+ Types: (float double)
+
+=for usage
+
+ $C = ccrossprod($A, $B);
+ ccrossprod($A, $B, $C);  # all arguments given
+ $C = $A->ccrossprod($B); # method call
+ $A->ccrossprod($B, $C);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/crossprod>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ccrossprod ignores the bad-value flag of the input ndarrays.
+C<ccrossprod> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2507,15 +3526,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(m,n); int uplo(); int trans();complex  alpha();complex  beta();complex  [io]C(p,p))
+ Signature: (complex A(m,n); int uplo(); int trans();complex  alpha();complex  beta();complex  [io]C(p,p))
+ Types: (float double)
+
+=for usage
+
+ csyrk($A, $uplo, $trans, $alpha, $beta, $C); # all arguments given
+ $A->csyrk($uplo, $trans, $alpha, $beta, $C); # method call
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/syrk>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csyrk ignores the bad-value flag of the input ndarrays.
+C<csyrk> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2534,15 +3563,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex a(n);complex b(n);complex [o]c())
+ Signature: (complex a(n);complex b(n);complex [o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = cdot($a, $b);
+ cdot($a, $b, $c);  # all arguments given
+ $c = $a->cdot($b); # method call
+ $a->cdot($b, $c);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/dot>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cdot ignores the bad-value flag of the input ndarrays.
+C<cdot> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2561,16 +3602,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex a(n);complex b(n);complex [o]c())
+ Signature: (complex a(n);complex b(n);complex [o]c())
+ Types: (float double)
+
+=for usage
+
+ $c = cdotc($a, $b);
+ cdotc($a, $b, $c);  # all arguments given
+ $c = $a->cdotc($b); # method call
+ $a->cdotc($b, $c);
 
 =for ref
 
 Forms the dot product of two vectors, conjugating the first
 vector.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cdotc ignores the bad-value flag of the input ndarrays.
+C<cdotc> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2589,15 +3642,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex a(n);complex  alpha();complex [io]b(n))
+ Signature: (complex a(n);complex  alpha();complex [io]b(n))
+ Types: (float double)
+
+=for usage
+
+ caxpy($a, $alpha, $b); # all arguments given
+ $a->caxpy($alpha, $b); # method call
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/axpy>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-caxpy ignores the bad-value flag of the input ndarrays.
+C<caxpy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2616,15 +3679,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex a(n);[o]b())
+ Signature: (complex a(n);[o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = cnrm2($a);
+ cnrm2($a, $b);  # all arguments given
+ $b = $a->cnrm2; # method call
+ $a->cnrm2($b);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/nrm2>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cnrm2 ignores the bad-value flag of the input ndarrays.
+C<cnrm2> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2643,15 +3718,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex a(n);[o]b())
+ Signature: (complex a(n);[o]b())
+ Types: (float double)
+
+=for usage
+
+ $b = casum($a);
+ casum($a, $b);  # all arguments given
+ $b = $a->casum; # method call
+ $a->casum($b);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/asum>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-casum ignores the bad-value flag of the input ndarrays.
+C<casum> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2670,15 +3757,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]a(n);complex scale())
+ Signature: (complex [io]a(n);complex scale())
+ Types: (float double)
+
+=for usage
+
+ cscal($a, $scale); # all arguments given
+ $a->cscal($scale); # method call
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/scal>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-cscal ignores the bad-value flag of the input ndarrays.
+C<cscal> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2697,15 +3794,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]a(n);scale())
+ Signature: (complex [io]a(n);scale())
+ Types: (float double)
+
+=for usage
+
+ csscal($a, $scale); # all arguments given
+ $a->csscal($scale); # method call
 
 =for ref
 
 Scales a complex vector by a real constant.
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-csscal ignores the bad-value flag of the input ndarrays.
+C<csscal> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2724,15 +3831,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]a();complex b();[o]c();complex  [o]s())
+ Signature: (complex [io]a();complex b();[o]c();complex  [o]s())
+ Types: (float double)
+
+=for usage
+
+ ($c, $s) = crotg($a, $b);
+ crotg($a, $b, $c, $s);    # all arguments given
+ ($c, $s) = $a->crotg($b); # method call
+ $a->crotg($b, $c, $s);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/rotg>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-crotg ignores the bad-value flag of the input ndarrays.
+C<crotg> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2751,15 +3870,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex A(m,n); int uplo();complex  [o]B(p,n))
+ Signature: (complex A(m,n); int uplo();complex  [o]B(p,n))
+ Types: (float double)
+
+=for usage
+
+ $B = clacpy($A, $uplo);
+ clacpy($A, $uplo, $B);  # all arguments given
+ $B = $A->clacpy($uplo); # method call
+ $A->clacpy($uplo, $B);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/lacpy>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-clacpy ignores the bad-value flag of the input ndarrays.
+C<clacpy> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2778,15 +3909,25 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (complex [io]A(m,n); int k1(); int k2(); int ipiv(p))
+ Signature: (complex [io]A(m,n); int k1(); int k2(); int ipiv(p))
+ Types: (float double)
+
+=for usage
+
+ claswp($A, $k1, $k2, $ipiv); # all arguments given
+ $A->claswp($k1, $k2, $ipiv); # method call
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/laswp>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-claswp ignores the bad-value flag of the input ndarrays.
+C<claswp> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2805,15 +3946,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (A(c=2,n,n);[o]Y(c=2,n,n);[o]out(c=2,p=CALC($SIZE(n)+1)); [t]rwork(rworkn=CALC(2*$SIZE(n)*$SIZE(n))))
+ Signature: (A(c=2,n,n);[o]Y(c=2,n,n);[o]out(c=2,p=CALC($SIZE(n)+1)); [t]rwork(rworkn=CALC(2*$SIZE(n)*$SIZE(n))))
+ Types: (float double)
+
+=for usage
+
+ ($Y, $out) = ccharpol($A);
+ ccharpol($A, $Y, $out);    # all arguments given
+ ($Y, $out) = $A->ccharpol; # method call
+ $A->ccharpol($Y, $out);
 
 =for ref
 
 Complex version of L<PDL::LinearAlgebra::Real/charpol>
 
+=pod
+
+Broadcasts over its inputs.
+
 =for bad
 
-ccharpol does not process bad values.
+C<ccharpol> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2829,18 +3982,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 4951 "lib/PDL/LinearAlgebra/Complex.pd"
+#line 4932 "lib/PDL/LinearAlgebra/Complex.pd"
 
 =head1 AUTHOR
 
-Copyright (C) Grégory Vanuxem 2005-2018.
+Copyright (C) GrÃ©gory Vanuxem 2005-2018.
 
 This library is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License as in the file Artistic_2
 in this distribution.
 
 =cut
-#line 2844 "lib/PDL/LinearAlgebra/Complex.pm"
+#line 3997 "lib/PDL/LinearAlgebra/Complex.pm"
 
 # Exit with OK status
 

@@ -22,7 +22,7 @@ cmp_ok(8 / $two, '==', 4, "IV / Math::GMPq object");
 cmp_ok($two ** 6, '==', 64, "Math::GMPq object ** IV");
 
 eval { my $r = 6 ** $two; };
-like($@, qr/Raising a value to an mpq_t power is not allowed/,
+like($@, qr/^Raising a value to an mpq_t power is not allowed/,
         "IV ** Math::GMPq object");
 
 cmp_ok($two, '>', 1, "Math::GMPq object > IV");

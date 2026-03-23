@@ -76,6 +76,20 @@ sub init {
     return $S->object(exact => "\t", '\t');
   });
 
+  # \Q (quotemeta) — enter literal quoting mode until \E
+  $self->add_handler('\Q' => sub {
+    my ($S, $cc) = @_;
+    $S->{quotemeta} = 1;
+    return;
+  });
+
+  # \E — exit quotemeta mode (no-op if not in quotemeta)
+  $self->add_handler('\E' => sub {
+    my ($S, $cc) = @_;
+    $S->{quotemeta} = 0;
+    return;
+  });
+
   # bol, mbol, sbol
   $self->add_handler('^' => sub {
     my ($S) = @_;
@@ -99,13 +113,23 @@ sub init {
     my ($S, $cc) = @_;
     $S->warn($S->RPe_BADESC, "B", " in character class") if $cc;
     return $S->force_object(anyof_char => 'B') if $cc;
+    # extended boundary types: \B{gcb}, \B{g}, \B{wb}, \B{sb}, \B{lb}
+    if (${&Rx} =~ m{ \G \{ (gcb|g|wb|sb|lb) \} }xgc) {
+      my $btype = $1;
+      return $S->object(bound => nbound => "\\B{$btype}", $btype);
+    }
     return $S->object(bound => nbound => '\B');
   });
 
-  # bound (not a word boundary)
+  # bound (word boundary)
   $self->add_handler('\b' => sub {
     my ($S, $cc) = @_;
     return $S->force_object(anyof_char => "\b", '\b') if $cc;
+    # extended boundary types: \b{gcb}, \b{g}, \b{wb}, \b{sb}, \b{lb}
+    if (${&Rx} =~ m{ \G \{ (gcb|g|wb|sb|lb) \} }xgc) {
+      my $btype = $1;
+      return $S->object(bound => bound => "\\b{$btype}", $btype);
+    }
     return $S->object(bound => bound => '\b');
   });
 
@@ -408,6 +432,28 @@ sub init {
 
   $self->add_handler('atom' => sub {
     my ($S) = @_;
+
+    # \Q quotemeta mode: treat everything as literal until \E
+    if ($S->{quotemeta}) {
+      ${&Rx} =~ m{ \G (.) }xgcs or return;
+      my $c = $1;
+      push @{ $S->{next} }, qw< atom >;
+
+      # \E exits quotemeta mode
+      if ($c eq '\\') {
+        if (${&Rx} =~ m{ \G E }xgc) {
+          $S->{quotemeta} = 0;
+          return;
+        }
+        # literal backslash
+        return $S->object(exact => '\\', '\\\\');
+      }
+
+      # metacharacters get escaped visual, but match literally
+      my $vis = $c =~ /[\.\+\*\?\^\$\|\(\)\{\}\[\]\\]/ ? "\\$c" : $c;
+      return $S->object(exact => $c, $vis);
+    }
+
     $S->nextchar;
 
     ${&Rx} =~ m{ \G (.) }xgcs or return;
@@ -557,9 +603,26 @@ sub init {
     my $ret = \$lhs;
 
     {
-      if (${&Rx} =~ m{ \G ( \\ ) }xgcs) {
+      if ($S->{quotemeta}) {
+        # quotemeta mode: \E exits, everything else is literal
+        if (${&Rx} =~ m{ \G \\ E }xgc) {
+          $S->{quotemeta} = 0;
+          $ret = undef;
+          last;
+        }
+        elsif (${&Rx} =~ m{ \G (.) }xgcs) {
+          # escape char class metacharacters for correct visual
+          my $c = $1;
+          my $vis = $c =~ /[\-\]\\^]/ ? "\\$c" : $c;
+          $$ret = $S->force_object(anyof_char => $c, $vis);
+        }
+      }
+      elsif (${&Rx} =~ m{ \G ( \\ ) }xgcs) {
         my $c = $1;
+        my $qm_before = $S->{quotemeta};
         $$ret = $S->$c(1);
+        # \Q/\E change quotemeta state and return undef — redo to continue
+        if (!defined $$ret && $S->{quotemeta} != $qm_before) { redo }
       }
       elsif (${&Rx} =~ m{ \G \[ ([.=:]) (\^?) (.*?) \1 \] }xgcs) {
         my ($how, $neg, $name) = ($1, $2, $3);
@@ -572,7 +635,7 @@ sub init {
       }
 
       if ($ret == \$lhs) {
-        if (${&Rx} =~ m{ \G (?= - (?! ] | \z ) ) }xgc) {
+        if (!$S->{quotemeta} && ${&Rx} =~ m{ \G (?= - (?! ] | \z ) ) }xgc) {
           if ($lhs->visual =~ /^(?:\[[:.=]|\\[dDsSwWpP])/) {
             $S->warn($S->RPe_FRANGE, $lhs->visual, "");
             $ret = $lhs;

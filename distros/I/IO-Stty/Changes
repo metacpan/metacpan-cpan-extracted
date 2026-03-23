@@ -1,5 +1,28 @@
 Revision history for Perl extension IO::Stty
 
+0.07 Sun Mar 22 2026
+
+  Bug fixes:
+   - Fix "Use of uninitialized value" warning in stty.pl when stdin is
+     not a terminal. stty() returns undef when isatty fails; the script
+     now guards with defined() before comparing. (PR #25)
+   - Fix broken C<-icanon> POD formatting and add missing iexten to sane
+     combination documentation. Replace "Needs documentation" stub with
+     proper docs for show_me_the_crap(). (PR #26)
+
+  Improvements:
+   - Show min and time values in -a output. These are critical for
+     non-canonical (raw/cbreak) mode users and match GNU stty behavior.
+     Also adds functional tests for hat-notation control char assignment,
+     undef/^- char disabling, and min/time setting. (PR #27)
+
+  Maintenance:
+   - Declare MIN_PERL_VERSION 5.008 in Makefile.PL to prevent CPAN from
+     attempting installation on too-old perls. (PR #25)
+   - Add IO::Pty as a test recommends in cpanfile for better test
+     coverage on CPAN testers and CI. (PR #25)
+   - Regenerate README.md from updated POD. (PR #26)
+
 0.06 Fri Mar 20 2026
 
   Bug fixes:

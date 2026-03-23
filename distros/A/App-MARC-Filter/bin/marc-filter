@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Filter;
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 # Run.
 exit App::MARC::Filter->new->run;
@@ -28,14 +28,14 @@ marc-filter - Tool to filter records in MARC dataset.
 
 =head1 SYNOPSIS
 
- marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_xml_file search_item [sub_search_item] value
+ marc-filter [-h] [-n num] [-o format] [-r] [--version] marc_file search_item [sub_search_item] value
 
 =head1 DESCRIPTION
 
 Tool to filter MARC records in big datasets. Could filter by control field or field/subfield or
 leader or material type. Tool could filter by number of output records.
 
-It supports MARC XML files now.
+It supports MARC XML and USMARC files now.
 
 =head1 ARGUMENTS
 
@@ -65,9 +65,9 @@ Use value as Perl regexp.
 
 Print version of script.
 
-=item * C<marc_xml_file>
+=item * C<marc_file>
 
-MARC XML file name.
+MARC XML or USMARC file name.
 
 =item * C<search_item>
 
@@ -116,12 +116,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2025 Michal Josef Špaček
+© 2022-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

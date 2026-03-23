@@ -9,15 +9,16 @@ use Error::Pure qw(err);
 use Getopt::Std;
 use List::Util 1.33 qw(any none);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
+use MARC::File::USMARC;
 use MARC::Leader;
-use MARC::Leader::Utils qw(material_type);
+use MARC::Leader::Utils 0.02 qw(check_material_type  material_type);
 use Readonly;
 use Unicode::UTF8 qw(encode_utf8 decode_utf8);
 
 Readonly::Array our @OUTPUT_FORMATS => qw(ascii xml);
 Readonly::Array our @CONTROL_FIELDS => qw(001 003 005 006 007 008);
 
-our $VERSION = 0.06;
+our $VERSION = 0.08;
 
 $| = 1;
 
@@ -42,19 +43,20 @@ sub run {
 	# Process arguments.
 	$self->{'_opts'} = {
 		'h' => 0,
+		'i' => undef,
 		'n' => undef,
 		'o' => 'xml',
 		'r' => 0,
 		'v' => 0,
 	};
-	if (! getopts('hn:o:rv', $self->{'_opts'})
+	if (! getopts('hin:o:rv', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 3) {
 
 		$self->_usage;
 		return 1;
 	}
-	$self->{'_marc_xml_file'} = shift @ARGV;
+	$self->{'_marc_file'} = shift @ARGV;
 	$self->{'_marc_field'} = shift @ARGV;
 	if ($self->{'_marc_field'} ne 'leader'
 		&& $self->{'_marc_field'} ne 'material_type'
@@ -75,7 +77,21 @@ sub run {
 		err "Output format '$self->{'_opts'}->{'o'}' doesn't supported.";
 	}
 
-	my $marc_file = MARC::File::XML->in($self->{'_marc_xml_file'});
+	# Check material type.
+	if ($self->{'_marc_field'} eq 'material_type'
+		&& ! check_material_type($self->{'_marc_value'})) {
+
+		err 'Bad material type.',
+			'Value', $self->{'_marc_value'},
+		;
+	}
+
+	my $marc_file;
+	if ($self->{'_marc_file'} =~ m/\.xml$/ms) {
+		$marc_file = MARC::File::XML->in($self->{'_marc_file'});
+	} else {
+		$marc_file = MARC::File::USMARC->in($self->{'_marc_file'});
+	}
 	my @ret;
 	my $num = 1;
 	$self->{'_num_found'} = 0;
@@ -130,14 +146,29 @@ sub run {
 			my $record_to_print;
 			foreach my $field (@fields) {
 				my @subfield_values = $field->subfield($self->{'_marc_subfield'});
-				foreach my $subfield_value (@subfield_values) {
-					$record_to_print = $self->_match($record, $subfield_value);
+				if ($self->{'_opts'}->{'i'}) {
+					my $match = 1;
+					foreach my $subfield_value (@subfield_values) {
+						if (! $self->_match_inverse($record, $subfield_value)) {
+							$match = 0;
+							last;
+						}
+					}
+					if ($match) {
+						$self->{'_num_found'}++;
+						$record_to_print = $record;
+						last;
+					}
+				} else {
+					foreach my $subfield_value (@subfield_values) {
+						$record_to_print = $self->_match($record, $subfield_value);
+						if (defined $record_to_print) {
+							last;
+						}
+					}
 					if (defined $record_to_print) {
 						last;
 					}
-				}
-				if (defined $record_to_print) {
-					last;
 				}
 			}
 			$self->_print($record_to_print);
@@ -166,19 +197,53 @@ sub _match {
 		return;
 	}
 
-	if ($self->{'_opts'}->{'r'}) {
-		if ($value =~ m/$self->{'_marc_value'}/ms) {
-			$self->{'_num_found'}++;
-			return $record;
+	if ($self->{'_opts'}->{'i'}) {
+		if ($self->{'_opts'}->{'r'}) {
+			if ($value !~ m/$self->{'_marc_value'}/ms) {
+				$self->{'_num_found'}++;
+				return $record;
+			}
+		} else {
+			if ($value ne $self->{'_marc_value'}) {
+				$self->{'_num_found'}++;
+				return $record;
+			}
 		}
 	} else {
-		if ($value eq $self->{'_marc_value'}) {
-			$self->{'_num_found'}++;
-			return $record;
+		if ($self->{'_opts'}->{'r'}) {
+			if ($value =~ m/$self->{'_marc_value'}/ms) {
+				$self->{'_num_found'}++;
+				return $record;
+			}
+		} else {
+			if ($value eq $self->{'_marc_value'}) {
+				$self->{'_num_found'}++;
+				return $record;
+			}
 		}
 	}
 
 	return;
+}
+
+sub _match_inverse {
+	my ($self, $record, $value) = @_;
+
+	if (! defined $value) {
+		return;
+	}
+
+	if ($self->{'_opts'}->{'r'}) {
+		if ($value !~ m/$self->{'_marc_value'}/ms) {
+			return 1;
+		}
+	} else {
+		if ($value ne $self->{'_marc_value'}) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 sub _print {
@@ -196,7 +261,8 @@ sub _print {
 
 	if ($self->{'_opts'}->{'o'} eq 'xml') {
 		print encode_utf8(MARC::File::XML::record($record))."\n";
-	} elsif ($self->{'_opts'}->{'o'} eq 'ascii') {
+	# 'ascii' output.
+	} else {
 		print encode_utf8($record->as_formatted)."\n";
 	}
 
@@ -208,14 +274,15 @@ sub _print {
 sub _usage {
 	my $self = shift;
 
-	print STDERR "Usage: $0 [-h] [-n num] [-o format] [-r] [-v] [--version] marc_xml_file search_item [sub_search_item] value\n";
+	print STDERR "Usage: $0 [-h] [-i] [-n num] [-o format] [-r] [-v] [--version] marc_file search_item [sub_search_item] value\n";
 	print STDERR "\t-h\t\tPrint help.\n";
+	print STDERR "\t-i\t\tInvert searching.\n";
 	print STDERR "\t-n num\t\tNumber of records to output (default value is all records).\n";
 	print STDERR "\t-o format\tOutput MARC format. Possible formats are ascii, xml.\n";
 	print STDERR "\t-r\t\tUse value as Perl regexp.\n";
 	print STDERR "\t-v\t\tVerbose mode.\n";
 	print STDERR "\t--version\tPrint version.\n";
-	print STDERR "\tmarc_xml_file\tMARC XML file.\n";
+	print STDERR "\tmarc_file\tMARC XML or USMARC file.\n";
 	print STDERR "\tsearch_item\tSearch item.\n";
 	print STDERR "\tsub_search_item\tSearch sub item (required in case of MARC field).\n";
 	print STDERR "\tvalue\t\tValue to filter.\n";
@@ -543,12 +610,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022-2025 Michal Josef Špaček
+© 2022-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.08
 
 =cut

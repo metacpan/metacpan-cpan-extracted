@@ -25,7 +25,7 @@ foreach my $html_fn (
     my $loop_error = 0;
 
     my $fn = "t/testit/$html_fn";
-    open( my $fh, '<', $fn ) or die "cant read $fn";
+    open( my $fh, '<:raw', $fn ) or die "cant read $fn";
     my $html = $hdr . join '', <$fh>;
     close $fh;
 
@@ -44,7 +44,7 @@ foreach my $html_fn (
         #print "NOT " unless $cleaned eq $dehtml;
 
         my $deh_fn = ( $^O eq 'VMS' ) ? "${fn}_deHTMLxs" : "$fn.deHTMLxs";
-        open( my $fh, '<', $deh_fn ) or die("Can't read $deh_fn: $?");
+        open( my $fh, '<:raw', $deh_fn ) or die("Can't read $deh_fn: $?");
 
         my $dehtml = join '', <$fh>;
 

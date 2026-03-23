@@ -12,13 +12,15 @@ sub tuple_from_hex {                                          # translate #00000
     return "hex color definition '$hex' has to start with # followed by 3 or 6 hex characters (0-9,a-f)"
         unless defined $hex and not ref $hex
            and (length($hex) == 4 or length($hex) == 7)
-           and substr($hex, 0, 1) eq '#' and $hex =~ /^#[\da-f]+$/i; # ($_[0] =~ /^#[[:xdigit:]]{3}$/ or $_[0] =~ /^#[[:xdigit:]]{6}$/)
+           and substr($hex, 0, 1) eq '#' and $hex =~ /^#[\da-f]+$/i;
+           # ($_[0] =~ /^#[[:xdigit:]]{3}$/ or $_[0] =~ /^#[[:xdigit:]]{6}$/)
     $hex = substr $hex, 1;
     [(length $hex == 3) ? (map { hex($_.$_) } unpack( "a1 a1 a1", $hex))
                         : (map { hex($_   ) } unpack( "a2 a2 a2", $hex))];
 }
 
 Graphics::Toolkit::Color::Space->new (
+        alias => 'sRGB',              # standard RGB
          axis => [qw/red green blue/],
         range => 255,
     precision => 0,

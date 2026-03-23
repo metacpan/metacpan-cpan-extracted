@@ -105,7 +105,7 @@ sub read_conf {
         ) {
             next unless $conf->{$_};
             next if $conf->{$_} =~ /^\//;
-            next if ( $_ eq 'logfile' && ( $conf->{$_} eq 'syslog' || $conf->{$_} eq 'sys-syslog' || $conf->{$_} eq 'none' ) );
+            next if ( $_ eq 'logfile' && ( $conf->{$_} eq 'syslog' || $conf->{$_} eq 'sys-syslog' || $conf->{$_} eq 'none' || $conf->{$_} eq 'stdout' || $conf->{$_} eq 'stderr' ) );
             $conf->{$_} = "$self->{razorhome}/$conf->{$_}";
         }
     }

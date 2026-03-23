@@ -19,7 +19,7 @@ use constant {
 
 use strict;
 
-our $VERSION = '0.433';
+our $VERSION = '0.434';
 $VERSION =~ tr/_//d;
 
 @PDL::LinearAlgebra::ISA = qw/PDL::Exporter/;
@@ -2798,7 +2798,7 @@ sub PDL::mgeigenx {
 	} elsif ($info) {
 		laerror("mgeigenx: Error from hgeqz or tgevc");
 	}
-	$result{qw(aschur bschur)} = map $_->t, $a, $b if $opt{schur};
+	@result{qw(aschur bschur)} = map $_->t, $a, $b if $opt{schur};
 	$result{balance} = cat $ilo, $ihi if $opt{permute};
 	@result{qw(info anorm bnorm)} = ($info, $abnrm, $bbnrm);
 	@result{qw(lscale rscale)} =  ($lscale, $rscale) if $opt{scale};

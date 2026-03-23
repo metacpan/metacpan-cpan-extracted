@@ -88,23 +88,33 @@ use Test::More;
 }
 
 {
-  # Providing a string (PV) as an argument to overload_pow() is not permitted.
-  #
+
   my $s = '5';
   my $s2 = '3';
   my $q = Math::GMPq->new('2/3');
 
   eval{ my $t = $s ** $q;};
-  like($@, qr/Raising a value to an mpq_t power is not allowed/, "**: Overloading of '**' disallows a PV argument");
+  like($@, qr/^Raising a value to an mpq_t power is not allowed/, "**: Overloading of '**' disallows a PV argument");
 
-  eval{ my $t = $q ** $s;};
-  like($@, qr/Invalid argument supplied to Math::GMPq::overload_pow/, "** (reversed): Overloading of '**' disallows a PV argument");
+  # FAILURE: The following test passes ... but causes the test suite to fail.
+  # I think the failure is triggered by the cleanup when the script exits.
+  eval { my $t = $q ** '3.1'};
+  like($@, qr/Invalid argument supplied to Math::GMPq::overload_pow/, "Non-integer PV disallowed");
+
+  my $t = $q ** $s; # This is now ok when the string equates to a +ve integer value that fits into an unsigned int.
+  cmp_ok(ref($t), 'eq', 'Math::GMPq', "GMPq ** integer PV returns a Math::GMPq object");
+  cmp_ok("$t", 'eq', '32/243',        "GMPq ** integer PV returns correct value");
 
   eval{ $s **= $q;};
-  like($@, qr/Raising a value to an mpq_t power is not allowed/, "**=: Overloading of '**' disallows a PV argument");
+  like($@, qr/^Raising a value to an mpq_t power is not allowed/, "**=: Overloading of '**' disallows a PV argument");
 
-  eval{ $q **= $s;};
-  like($@, qr/Invalid argument supplied to Math::GMPq::overload_pow/, "**= (reversed):Overloading of '**' diallows a PV argument");
+  # $q is 2/3, $s is '5'.
+
+  $q **= $s;
+  cmp_ok(ref($q), 'eq', 'Math::GMPq', "GMPq **= PV returns GMPq object");
+  cmp_ok("$q", 'eq', '32/243', "GMPq **= PV returns correct value");
+
+  Rmpq_set_ui($q, 2, 3); # Reset to 2/3
 
   my $q1 = $q ** ($s + 0);
   cmp_ok("$q1", 'eq', '32/243', "2/3 ** 5 == 32/243");
@@ -385,10 +395,10 @@ for my $prefix('-0x', '-0X', '-0b', '-0B', '-0') {
 }
 
 {
-  cmp_ok(Math::GMPq->new('1.672@3'), '==', Math::GMPq->new('1672'), "new('1.672@3') == new('1672')");
+  cmp_ok(Math::GMPq->new('1.672@3'), '==', Math::GMPq->new('1672'), "new('1.672\@3') == new('1672')");
 
   eval {my $q = Math::GMPq->new('0x1.672@3');};
-  like($@, qr/String supplied to Rmpq_set_str function \(1672\@3\)/, "new('0x1.672@3') throws expected error");
+  like($@, qr/String supplied to Rmpq_set_str function \(1672\@3\)/, "new('0x1.672\@3') throws expected error");
 
   eval { my $q = Math::GMPq->new('0x1.672/3');};
   like($@, qr/String supplied to Rmpq_set_str function \(0x1.672\/3\)/, "new('0x1.672/3') throws expected error");

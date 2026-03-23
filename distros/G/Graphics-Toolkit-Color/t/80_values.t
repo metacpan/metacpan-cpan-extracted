@@ -79,8 +79,8 @@ is( $blue_hsl->{'rgb'}[1],                  0,  'blue has a no green value');
 is( $blue_hsl->{'rgb'}[2],                  1,  'blue has a maximal blue value');
 
 my $blue_hwb = Graphics::Toolkit::Color::Values->new_from_any_input('hwb( 240, 0%, 0% )');
-is( ref   $blue_hwb,                    $module,  'value object from HWB named string');
-is( ref   $blue_hwb->{'source_values'}, 'ARRAY',  'found source values');
+is( ref   $blue_hwb,                    $module,'value object from HWB named string');
+is( ref   $blue_hwb->{'source_values'}, 'ARRAY','found source values');
 is( int @{$blue_hwb->{'source_values'}},    3,  'HSL has 3 axis');
 is( $blue_hwb->{'source_values'}[0],      2/3,  'hue value is right');
 is( $blue_hwb->{'source_values'}[1],        0,  'white value is right');

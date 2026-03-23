@@ -28,10 +28,10 @@ no_index:
 requires:
   Overload::FileCheck: '0.014'
   Text::Glob: '0'
-  perl: '5.010'
+  perl: '5.016'
 resources:
   bugtracker: https://github.com/cpanel/Test-MockFile/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/cpanel/Test-MockFile
-version: '0.038'
+version: '0.039'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

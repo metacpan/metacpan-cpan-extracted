@@ -1,7 +1,7 @@
 # ABSTRACT: View or modify board configuration
 
 package App::karr::Cmd::Config;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -13,6 +13,7 @@ use App::karr::Config;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
+
 my %WRITABLE = map { $_ => 1 } qw(
   board.name board.description
   defaults.status defaults.priority defaults.class
@@ -22,6 +23,8 @@ my %WRITABLE = map { $_ => 1 } qw(
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
   my $action = $args_ref->[0] // 'show';
+
+  $self->sync_before if $action eq 'set';
 
   my $config = App::karr::Config->new(
     file => $self->board_dir->child('config.yml'),
@@ -36,6 +39,7 @@ sub execute {
     my $key = $args_ref->[1] or die "Usage: karr config set KEY VALUE\n";
     my $val = $args_ref->[2] // die "Usage: karr config set KEY VALUE\n";
     $self->_set_key($config, $key, $val);
+    $self->sync_after;
   } else {
     die "Unknown action: $action (use show, get, or set)\n";
   }
@@ -69,10 +73,8 @@ sub _display_keys {
   push @out, ['defaults.status',    $d->{defaults}{status}]   if $d->{defaults}{status};
   push @out, ['defaults.priority',  $d->{defaults}{priority}] if $d->{defaults}{priority};
   push @out, ['defaults.class',     $d->{defaults}{class}]    if $d->{defaults}{class};
-  push @out, ['wip_limits',         $d->{wip_limits}]         if $d->{wip_limits};
   push @out, ['claim_timeout',      $d->{claim_timeout}];
   push @out, ['classes',            [map { $_->{name} } @{$d->{classes} // []}]];
-  push @out, ['next_id',            $d->{next_id}];
   return @out;
 }
 
@@ -163,7 +165,44 @@ App::karr::Cmd::Config - View or modify board configuration
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr config
+    karr config get claim_timeout
+    karr config set board.name "New Board Name"
+    karr config --json
+
+=head1 DESCRIPTION
+
+Reads and updates the board configuration stored canonically in
+C<refs/karr/config>. The command supports whole-config display, individual key
+lookup, and writes to a small set of explicitly writable keys. Internally it
+works on the temporary materialized YAML view generated for the command run.
+
+=head1 WRITABLE KEYS
+
+=over 4
+
+=item * C<board.name>, C<board.description>
+
+Human-facing board metadata.
+
+=item * C<defaults.status>, C<defaults.priority>, C<defaults.class>
+
+Default values applied by L<App::karr::Cmd::Create>.
+
+=item * C<claim_timeout>
+
+Claim expiry duration in C<Nh> or C<Nm> format.
+
+=back
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Init>, L<App::karr::Cmd::Create>,
+L<App::karr::Cmd::Context>, L<App::karr::Config>
 
 =head1 SUPPORT
 
@@ -171,6 +210,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

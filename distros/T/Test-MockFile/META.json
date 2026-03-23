@@ -42,7 +42,7 @@
          "requires" : {
             "Overload::FileCheck" : "0.014",
             "Text::Glob" : "0",
-            "perl" : "5.010"
+            "perl" : "5.016"
          }
       }
    },
@@ -58,6 +58,6 @@
          "url" : "https://github.com/cpanel/Test-MockFile"
       }
    },
-   "version" : "0.038",
+   "version" : "0.039",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

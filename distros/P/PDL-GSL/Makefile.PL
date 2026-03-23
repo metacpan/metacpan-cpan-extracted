@@ -84,7 +84,5 @@ sub MY::init_PM {
   @pd_srcs = ::pdlpp_eumm_update_deep($self);
 }
 sub MY::postamble {
-  my $oneliner = PDL::Core::Dev::_oneliner(qq{exit if \$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(shift); }});
-  pdlpp_postamble_int(@pd_srcs) .
-    qq|\ninstall :: pure_install\n\t$oneliner \$(NAME)\n|;
+  ::pdlpp_postamble(@pd_srcs);
 }

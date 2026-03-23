@@ -43,7 +43,7 @@ $space = Graphics::Toolkit::Color::Space->new(axis => [qw/AAA BBB CCC DDD/], nam
 is( ref $space,     $module, 'created color space just with axis names and space name');
 is( $space->name,    'NAME', 'got given space name back');
 is( $space->alias,       '', 'no space anme alias this time');
-is( $space->is_linear,          1,  'per default spaces are linear');
+is( $space->is_euclidean,       1,  'per default spaces are euclidean');
 is( $space->is_name('name'),    1,  'can ask if given name is right');
 is( $space->is_name('abcd'),    0,  'axis initials are not a space name');
 is( $space->is_name(''),        0,  'empty string can never be a space name');

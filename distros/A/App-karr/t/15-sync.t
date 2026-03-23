@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use Path::Tiny qw( path tempdir );
-use YAML::XS qw( DumpFile LoadFile );
+use YAML::XS qw( DumpFile LoadFile Load );
 
 use_ok('App::karr::Git');
 use_ok('App::karr::Task');
@@ -25,6 +25,19 @@ sub _init_repo {
     system('git', '-C', $tmpdir->stringify, 'config', 'user.email', 'test@test.com');
     system('git', '-C', $tmpdir->stringify, 'config', 'user.name', 'Test User');
     return $tmpdir;
+}
+
+sub _init_remote_pair {
+    my $remote = tempdir(CLEANUP => 1);
+    my $local  = tempdir(CLEANUP => 1);
+
+    system('git', 'init', '--bare', '-q', $remote->stringify);
+    system('git', 'init', '-q', $local->stringify);
+    system('git', '-C', $local->stringify, 'config', 'user.email', 'test@test.com');
+    system('git', '-C', $local->stringify, 'config', 'user.name', 'Test User');
+    system('git', '-C', $local->stringify, 'remote', 'add', 'origin', $remote->stringify);
+
+    return ($local, $remote);
 }
 
 sub _setup_board {
@@ -68,9 +81,9 @@ subtest 'serialize and materialize roundtrip' => sub {
     my @ids = $git->list_task_refs;
     is_deeply(\@ids, [1, 2], 'list_task_refs returns both task IDs after serialize');
 
-    # Verify config ref
-    my $config_ref = $git->read_ref('refs/karr/config');
+    my $config_ref = Load($git->read_ref('refs/karr/config'));
     ok($config_ref, 'config ref exists after serialize');
+    ok(!exists $config_ref->{next_id}, 'config ref does not persist next_id');
 
     # Delete local files
     for my $file ($tasks_dir->children(qr/\.md$/)) {
@@ -95,64 +108,24 @@ subtest 'serialize and materialize roundtrip' => sub {
     my $loaded2 = App::karr::Task->from_file($recreated[1]);
     is($loaded2->id, 2, 'second task id correct');
     is($loaded2->title, 'Second task', 'second task title correct');
+    is($git->read_next_id_ref, 1, 'next-id metadata defaults to 1 when not yet allocated');
 };
 
-subtest 'materialize preserves local-only tasks' => sub {
+subtest 'serialize removes deleted task refs' => sub {
     my $tmpdir = _init_repo();
     my ($board_dir, $tasks_dir) = _setup_board($tmpdir);
 
     my $board = TestBoard->new(dir => $board_dir->stringify);
     my $git = App::karr::Git->new(dir => $tmpdir->stringify);
 
-    # Save only task 1 to refs
-    my $t1 = App::karr::Task->from_file(($tasks_dir->children(qr/^001-/))[0]);
-    $git->save_task_ref($t1);
+    $board->_serialize_to_refs($git);
+    is_deeply([$git->list_task_refs], [1, 2], 'both refs exist before deletion');
 
-    # Task 2 exists only locally — materialize should preserve it
-    $board->_materialize_from_refs($git);
+    my ($task2) = $tasks_dir->children(qr/^002-/);
+    $task2->remove;
 
-    my @ids = $git->list_task_refs;
-    ok((grep { $_ == 2 } @ids), 'local-only task 2 was serialized to refs during materialize');
-
-    my @files = sort $tasks_dir->children(qr/\.md$/);
-    is(scalar @files, 2, 'both tasks present after materialize');
-};
-
-subtest 'config next_id merge takes max' => sub {
-    my $tmpdir = _init_repo();
-    my ($board_dir, $tasks_dir) = _setup_board($tmpdir);
-
-    my $board = TestBoard->new(dir => $board_dir->stringify);
-    my $git = App::karr::Git->new(dir => $tmpdir->stringify);
-
-    # Write a remote config with lower next_id
-    my $remote_config = YAML::XS::Dump({
-        name    => 'Remote Board',
-        next_id => 2,
-        columns => [qw(backlog todo done)],
-    });
-    $git->write_ref('refs/karr/config', $remote_config);
-
-    # Local config has next_id=3, remote has next_id=2
-    $board->_materialize_from_refs($git);
-
-    my $merged = LoadFile($board_dir->child('config.yml')->stringify);
-    is($merged->{next_id}, 3, 'next_id takes max of local (3) vs remote (2)');
-
-    # Now test the reverse: remote higher
-    $remote_config = YAML::XS::Dump({
-        name    => 'Remote Board',
-        next_id => 10,
-        columns => [qw(backlog todo done)],
-    });
-    $git->write_ref('refs/karr/config', $remote_config);
-
-    # Need a fresh board object to avoid cached config
-    my $board2 = TestBoard->new(dir => $board_dir->stringify);
-    $board2->_materialize_from_refs($git);
-
-    my $merged2 = LoadFile($board_dir->child('config.yml')->stringify);
-    is($merged2->{next_id}, 10, 'next_id takes max of local (3) vs remote (10)');
+    $board->_serialize_to_refs($git);
+    is_deeply([$git->list_task_refs], [1], 'deleted local task is removed from refs on serialize');
 };
 
 subtest 'append_log writes NDJSON' => sub {
@@ -178,6 +151,29 @@ subtest 'append_log writes NDJSON' => sub {
 
     my $second = JSON::MaybeXS::decode_json($lines[1]);
     is($second->{action}, 'move', 'second log entry action');
+};
+
+subtest 'push prunes deleted refs on the remote' => sub {
+    my ($local, $remote) = _init_remote_pair();
+    my ($board_dir, $tasks_dir) = _setup_board($local);
+
+    my $board = TestBoard->new(dir => $board_dir->stringify);
+    my $git = App::karr::Git->new(dir => $local->stringify);
+
+    $board->_serialize_to_refs($git);
+    ok( $git->push, 'initial push succeeds' );
+
+    my ($task2) = $tasks_dir->children(qr/^002-/);
+    $task2->remove;
+    $board->_serialize_to_refs($git);
+    ok( $git->push, 'pruning push succeeds after deleting a task ref' );
+
+    my $remote_git = App::karr::Git->new(dir => $remote->stringify);
+    is_deeply(
+        [ $remote_git->list_task_refs ],
+        [1],
+        'remote task refs are pruned to match the local namespace'
+    );
 };
 
 done_testing;

@@ -3,7 +3,7 @@
 #
 package PDL::Fit::Levmar;
 
-our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_lb_ub levmar_der_ levmar_der_ub levmar_der_lb levmar_diff_lb_ub levmar_diff_ levmar_diff_ub levmar_diff_lb _levmar_chkjac _levmar_chkjac_no_t );
+our @EXPORT_OK = qw(levmar levmar_report levmar_chkjac levmar_der_lb_ub levmar_der_ub levmar_der_ levmar_der_lb levmar_diff_lb_ub levmar_diff_ub levmar_diff_ levmar_diff_lb _levmar_chkjac _levmar_chkjac_no_t );
 our %EXPORT_TAGS = (Func=>\@EXPORT_OK);
 
 use PDL::Core;
@@ -11,7 +11,7 @@ use PDL::Exporter;
 use DynaLoader;
 
 
-   our $VERSION = '0.0108';
+   our $VERSION = '0.0109';
    our @ISA = ( 'PDL::Exporter','DynaLoader' );
    push @PDL::Core::PP, __PACKAGE__;
    bootstrap PDL::Fit::Levmar $VERSION;
@@ -36,9 +36,9 @@ PDL::Fit::Levmar - Levenberg-Marquardt fit/optimization routines
 Levenberg-Marquardt routines for least-squares fit to
 functions non-linear in fit parameters.
 
-This module provides a L<PDL> ( L<PDL::PDL> ) interface to the non-linear fitting
-library levmar 2.5 (written in C). Levmar is
-L<thread|/example--6> aware (in the L<PDL> sense), provides support for analytic
+This module provides a L<PDL> interface to the non-linear fitting
+library levmar 2.6 (written in C). Levmar is
+L<broadcast|/example--6> aware, provides support for analytic
 or finite difference derivatives (in case no analytic
 derivatives are supplied), L<linear|/A> and/or L<box|/UB>
 and/or L<inequality|/C>
@@ -284,7 +284,7 @@ translated by C<lpp> to d[q+r*m], which is the index into a
 
 =item example--6
 
-Here is an example that uses implicit threading. We create data
+Here is an example that uses implicit broadcasting. We create data
 from a gaussian function with four different sets of parameters
 and fit it all in one function call.
 
@@ -327,15 +327,15 @@ is the fit function.
 We would prefer a function that maps t(n,n) --> x(n,n) (with
 p viewed as parameters.) But the levmar library expects one
 dimensional x and t. So we design C<gauss2d> to take
-piddles with these dimensions: C<p(3)>, C<xin(n*n)>,
+ndarrays with these dimensions: C<p(3)>, C<xin(n*n)>,
 C<t(n)>. For this example, we assume that both the co-ordinate
 axes run over the same range, so we only need to pass n
-values for t. The piddles t1 and t2 are (virtual) copies of
+values for t. The ndarrays t1 and t2 are (virtual) copies of
 t with dummy dimensions inserted. Each represents
 co-ordinate values along each of the two axes at each point
 in the 2-d space, but independent of the position along the
 other axis.  For instance C<t1(i,j) == t(i)> and C<t1(i,j)
-== t(j)>. We assume that the piddle xin is a flattened
+== t(j)>. We assume that the ndarray xin is a flattened
 version of the ordinate data, so we split the dimensions in
 x. Then the entire bi-variate gaussian is calculated with
 one line that operates on 2-d matrices. Now we create some
@@ -357,7 +357,7 @@ Finally, we fit the data with an incorrect set of initial parameters,
    my $p1 = pdl  [ 1,1,1];  # not the parameters we used to make the data
    my $h = levmar($p1,$xlin,$t,\&gauss2d);
 
-At this point C<$h->{P}> refers to the output parameter piddle C<[0.5, 2, 3]>.
+At this point C<$h->{P}> refers to the output parameter ndarray C<[0.5, 2, 3]>.
 
 =back
 
@@ -381,7 +381,7 @@ levmar() is called like this
  or this:
  levmar($arg1, $arg2, ..., {OPT1=>$val1, OPT2=>$val2, ...});
 
-When calling levmar, the first 3 piddle arguments (or refs
+When calling levmar, the first 3 ndarray arguments (or refs
 to arrays), if present, are taken to be C<$p>,C<$x>, and C<$t>
 (parameters, ordinate data, and co-ordinate data) in that
 order. The first scalar value that can be interpreted as a
@@ -423,7 +423,7 @@ any of the following, which are auto-detected.
 
 If you are fitting a lot of data by doing many iterations over
 a loop of perl code, it is by far most efficient to create a Func
-object from C or lpp code and pass it to levmar. (Implicit threading
+object from C or lpp code and pass it to levmar. (Implicit broadcasting
 does not recompile code in any case.)
 
 You can also pass pure C code via the option CSRC.
@@ -465,7 +465,7 @@ parameters at their input values and letting the free
 parameters vary. This is implemented by using the linear
 constraint option described below. Each element must be
 either one or zero. This option currently cannot be
-threaded. That is, if the array FIX has more than one
+broadcasted. That is, if the array FIX has more than one
 dimension you will not get correct results. Also, PDL will
 not add dimension correctly if you pass additional
 dimensions in other quantities.  Threading will work if you
@@ -564,8 +564,8 @@ some problem. But unless the covariance matrix is very large,
 it probably won't help much. On the other hand it almost certainly
 won't make levmar() less efficient.
 
-Note that levmar returns a piddle representing the covariance in
-the output hash. This will be the the same piddle that you give
+Note that levmar returns an ndarray representing the covariance in
+the output hash. This will be the the same ndarray that you give
 as input via this option. So, if you do the following,
 
   my $covar = PDL->null
@@ -889,11 +889,11 @@ be defined in the C code; something that is currently not possible.
 
 This is how to use perl subroutines as fit functions... (see
 the examples for now, e.g. L<example 2|/example--2>.)  The
-fit function takes piddles $p,$x, and $t, with dimensions
+fit function takes ndarrays $p,$x, and $t, with dimensions
 m,n, and tn. (often tn ==n ).  These are references with
 storage already allocated (by the user and liblevmar). So
 you must use C<.=> when setting values. The jacobian takes
-piddles $p,$d, and $t, where $d, the piddle of derivatives
+ndarrays $p,$d, and $t, where $d, the ndarray of derivatives
 has dimensions (m,n). For example
 
  $f = sub myexp {
@@ -1078,10 +1078,10 @@ by levmar().
 
 =head1 BUGS
 
-With the levmar-2.5 code: Passing workspace currently does not work with
-linear inequality constraint. Some of the PDL threading no long works
+With the levmar-2.6 code: Passing workspace currently does not work with
+linear inequality constraint. Some of the PDL broadcasting no long works
 correctly. These are noted in the tests in t/thread.t. It is not clear
-if it is a threading issue or the fitting has changed.
+if it is a broadcasting issue or the fitting has changed.
 
  
 =cut
@@ -1142,7 +1142,7 @@ sub levmar_report {
 sub make_report {
     my ($p,$covar,$info) = @_;
     my @ninf = list($info);
-#    for(my $i=0;$i<9; $i++) { # Tried to get threading to work, but no!
+#    for(my $i=0;$i<9; $i++) { # Tried to get broadcasting to work, but no!
 #	$ninf[$i] = $info(($i));
 #    } 
     $ninf[6] = 
@@ -1305,7 +1305,7 @@ sub levmar {
     }
 
 #-------------------------------------------------
-# Treat input and output piddles for pp_defs
+# Treat input and output ndarrays for pp_defs
     $x = topdl($x); # in case they are refs to arrays
     $p = topdl($p);
     $t = PDL->zeroes($p->type, 1) unless defined $t; # sometimes $t not needed
@@ -1332,7 +1332,7 @@ sub levmar {
     $wghts = PDL->null unless defined $wghts;
 
 # Careful about $m, it is used in construcing $A below (with fix). But this is
-# not correct when using implicit threading. Except threading may still be working.
+# not correct when using implicit broadcasting. Except broadcasting may still be working.
 # Need to look into that.
     my $m = $p->nelem;
 
@@ -1417,7 +1417,7 @@ sub levmar {
 ########### FIX holds some parameters constant using linear constraints.
 # It is a special case of more general constraints using A and b.
 # Notice that this fails if FIX has more than one dimension (ie, you are
-# threading. FIXB does the same but using box constraints.
+# broadcasting. FIXB does the same but using box constraints.
 
     if (defined $h->{FIX} ) { 
 	my $ip =  topdl( $h->{FIX}); # take array ref or pdl
@@ -1653,12 +1653,12 @@ sub levmar_chkjac {
 
 
 
-*levmar_der_ = \&PDL::levmar_der_;
-
-
-
-
 *levmar_der_ub = \&PDL::levmar_der_ub;
+
+
+
+
+*levmar_der_ = \&PDL::levmar_der_;
 
 
 
@@ -1673,12 +1673,12 @@ sub levmar_chkjac {
 
 
 
-*levmar_diff_ = \&PDL::levmar_diff_;
-
-
-
-
 *levmar_diff_ub = \&PDL::levmar_diff_ub;
+
+
+
+
+*levmar_diff_ = \&PDL::levmar_diff_;
 
 
 

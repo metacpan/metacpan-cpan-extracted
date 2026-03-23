@@ -40,7 +40,7 @@ _export_hooks();
 # for compatibility mode, uncomment the next line @@ s/^#\s*// @@
 # our @EXPORT = qw(_export_hook_fh);
 
-our $VERSION = "1.27";
+our $VERSION = "1.28";
 
 our $DEBUG = 0;
 *STDDBG = *STDERR;
@@ -339,8 +339,15 @@ sub ready {
                     # try to read as much data as possible.
                     $answer = '';
                     my $nread = sysread( $self->{fh}, $answer, 1000 );
-                    defined $nread
-                      or die "= read returned error: $!\n";
+                    if ( !defined $nread ) {
+                        # On Solaris, sysread on a socketpair may
+                        # return ESPIPE instead of 0 for EOF.
+                        # On Windows, close() without shutdown() sends
+                        # TCP RST, causing ECONNRESET on the peer.
+                        die "= remote end closed connection\n"
+                          if $!{ESPIPE} || $!{ECONNRESET};
+                        die "= read returned error: $!\n";
+                    }
                     $nread
                       or die "= remote end closed connection\n";
 

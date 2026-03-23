@@ -7,8 +7,10 @@ MANIFEST.SKIP
 Mmap.pm
 Mmap.xs
 README
+t/comprehensive.t
 t/mmap.t
 t/munmap_errors.t
+t/offset.t
 xt/author/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

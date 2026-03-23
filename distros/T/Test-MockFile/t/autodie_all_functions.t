@@ -22,9 +22,6 @@ use autodie qw(opendir closedir unlink readlink mkdir rmdir
 use Test::MockFile qw(nostrict);
 
 SKIP: {
-    skip "autodie exception detection requires Perl 5.14+", 1
-      if $] < 5.014;
-
     # Helper to verify autodie exception
     my $check_autodie = sub {
         my ($err, $func_name, $test_label) = @_;

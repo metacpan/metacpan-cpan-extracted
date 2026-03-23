@@ -45,7 +45,7 @@ my $eps = pdl(0);
 my $maxdeg = 5;
 
 # Test with a bad value
-$y->inplace->setbadat(3);
+$y->setbadat(3);
 my ($ndeg, $r, $ierr, $a1) = polyfit($x, $y, $w, $maxdeg, $eps);
 
 ok(($ierr == 1));
@@ -63,8 +63,8 @@ $x = pdl ([1,2,3,4,5,6,7,8,9],
           [1,2,3,4,5,6,7,8,9],);
 $w = pdl ([1,1,1,1,1,1,1,0.5,0.3],
           [1,1,1,1,1,1,1,0.5,0.3],);
-$y->inplace->setbadat(3,0);
-$y->inplace->setbadat(4,1);
+$y->setbadat(3,0);
+$y->setbadat(4,1);
 $eps = pdl(0,0);
 
 ($ndeg, $r, $ierr, $a1) = polyfit($x, $y, $w, $maxdeg, $eps);
@@ -132,7 +132,7 @@ $A->slice('2,0') .= 0; # break symmetry to see if need transpose
 my $B = sequence(2, 4);
 gefa(my $lu=$A->copy, my $ipiv=null, my $info=null);
 gesl($lu, $ipiv, $x=$B->transpose->copy, 1); # 1 = do transpose because Fortran
-$x = $x->inplace->transpose;
+$x = $x->transpose;
 my $got = $A x $x;
 is_pdl $got, $B;
 

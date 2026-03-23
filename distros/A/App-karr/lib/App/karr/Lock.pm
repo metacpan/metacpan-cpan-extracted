@@ -1,9 +1,10 @@
 # ABSTRACT: Lock management via Git refs
 
 package App::karr::Lock;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use strict;
 use warnings;
+
 
 sub new {
     my ( $class, %args ) = @_;
@@ -76,7 +77,18 @@ App::karr::Lock - Lock management via Git refs
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    my $lock = App::karr::Lock->new(git => $git);
+    my ($ok, $msg) = $lock->acquire(12, 'agent@example.com');
+
+=head1 DESCRIPTION
+
+L<App::karr::Lock> manages lightweight per-task locks stored in Git refs. It is
+used by commands such as C<karr pick> to avoid concurrent agents selecting the
+same task at the same time.
 
 =head1 SUPPORT
 
@@ -84,6 +96,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

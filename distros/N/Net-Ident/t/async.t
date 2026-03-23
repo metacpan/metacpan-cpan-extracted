@@ -180,14 +180,18 @@ subtest 'ready(1) blocks until complete response' => sub {
         close $obj->{fh};  # child doesn't need the ident end
         select(undef, undef, undef, 0.1);
         print $remote "6191, 23 : USERID : UNIX : delayed\r\n";
+        shutdown($remote, 1);
         close $remote;
         exit 0;
     }
 
-    # parent: ready(1) should block until child sends data
-    close $remote;  # parent doesn't need the remote end
+    # parent: ready(1) should block until child sends data.
+    # Do NOT close $remote here — on Solaris, closing one end of a
+    # PF_UNIX socketpair can immediately invalidate the other end,
+    # even across fork.
     my $result = $obj->ready(1);
     waitpid($pid, 0);
+    close $remote;
 
     is($result, 1, 'ready(1) returns 1 after blocking for data');
     like($obj->{answer}, qr/delayed/, 'got the delayed response');
@@ -213,13 +217,15 @@ subtest 'ready auto-calls query when state is connect' => sub {
         sysread($remote, $buf, 100);
         # Send response
         print $remote "6191, 23 : USERID : UNIX : auto\r\n";
+        shutdown($remote, 1);
         close $remote;
         exit 0;
     }
 
-    close $remote;
+    # Don't close $remote before ready() — see Solaris note above.
     my $result = $obj->ready(1);
     waitpid($pid, 0);
+    close $remote;
 
     is($result, 1, 'ready(1) succeeded after auto-calling query');
     is($obj->{state}, 'ready', 'state is ready');
@@ -247,7 +253,9 @@ subtest 'ready returns 1 when already in ready state' => sub {
 subtest 'ready returns undef on EOF' => sub {
     my ($obj, $remote) = make_query_obj(timeout => 5);
 
-    # Close remote end immediately (EOF with no data)
+    # Close remote end immediately (EOF with no data).
+    # On Solaris, sysread may return ESPIPE instead of 0; the module
+    # treats ESPIPE as EOF so this test passes on both platforms.
     close $remote;
     select(undef, undef, undef, 0.05);
 

@@ -151,24 +151,34 @@ sub do_tests {
 
 
   # use() PlackX::Framework with all optional modules
-  ok(
-    eval q{
-      package My::Test::App2b {
-        use PlackX::Framework qw(:all);
-        use My::Test::App2b::Router;
-        use My::Test::App2b::Config './t/tsupport/config.pl';
-        my $config = config();
-        # TODO: Currently, an app with no routes breaks!
-        # Add a default route or warn if no routes?
-        route '/' => sub ($request, $response) {
-          $response->print('Hello world!');
-          $response;
-        };
-      }
+  # Only URI::Fast missing will cause a fatal error
+  SKIP: {
+    skip 'Skip if URI::Fast not available' unless eval {
+      #require Config::Any;
+      #require JSON::MaybeXS;
+      #require Template;
+      require URI::Fast;
       1;
-    },
-    'Create an app with optional components'
-  );
+    };
+    ok(
+      eval q{
+        package My::Test::App2b {
+          use PlackX::Framework qw(:all);
+          use My::Test::App2b::Router;
+          use My::Test::App2b::Config './t/tsupport/config.pl';
+          my $config = config();
+          # TODO: Currently, an app with no routes breaks!
+          # Add a default route or warn if no routes?
+          route '/' => sub ($request, $response) {
+            $response->print('Hello world!');
+            $response;
+          };
+        }
+        1;
+      },
+      'Create an app with optional components'
+    );
+  } #SKIP {}
 
 }
 

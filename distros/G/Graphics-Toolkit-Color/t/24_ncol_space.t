@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 80;
+use Test::More tests => 82;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color::Space::Util 'round_decimals';
 
@@ -16,11 +16,13 @@ is( $space->alias,                             '', 'color space has no alias nam
 is( $space->is_name('NCol'),                    1, 'color space name NCol is correct');
 is( $space->is_name('hwb'),                     0, 'axis initials do not equal space name this time');
 is( $space->axis_count,                         3, 'color space has 3 axis');
+is( $space->is_euclidean,                       0, 'NCol is not euclidean');
+is( $space->is_cylindrical,                     1, 'NCol is cylindrical');
 is( $space->is_value_tuple([0,0,0]),            1, 'value tuple has 3 elements');
 is( $space->is_partial_hash({whiteness => 1, blackness => 0}), 1, 'found hash with some axis name');
 is( $space->is_partial_hash({what => 1, blackness => 0}), 0, 'found hash with a bad axis name');
-is( $space->can_convert('rgb'), 1,                 'do only convert from and to rgb');
-is( $space->can_convert('ncol'), 0,                'can not convert to itself');
+is( $space->can_convert('rgb'),                 1, 'do only convert from and to rgb');
+is( $space->can_convert('ncol'),                0, 'can not convert to itself');
 
 is( ref $space->check_value_shape([0, 0, 0]),     'ARRAY',   'check HWB values works on lower bound values');
 is( ref $space->check_value_shape([600,100,100]), 'ARRAY',   'check HWB values works on upper bound values');

@@ -26,5 +26,5 @@ resources:
   homepage: https://github.com/cpan-authors/Crypt-RIPEMD160
   license: https://dev.perl.org/licenses/
   repository: https://github.com/cpan-authors/Crypt-RIPEMD160
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

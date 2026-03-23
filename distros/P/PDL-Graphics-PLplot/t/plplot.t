@@ -118,8 +118,8 @@ $pl = PDL::Graphics::PLplot->new (DEV => $dev,
 				  FILE => "test7.$dev");
 $x  = sequence(10);
 $y  = $x**2;
-$x->inplace->setbadat(5); # insert gap
-$y->inplace->setbadat(5); # insert gap
+$x->setbadat(5); # insert gap
+$y->setbadat(5); # insert gap
 $pl->xyplot($x, $y, PLOTTYPE => 'LINE');
 $pl->close;
 ok (-s "test7.$dev" > 0, "Line plot with gaps (plgapline)");

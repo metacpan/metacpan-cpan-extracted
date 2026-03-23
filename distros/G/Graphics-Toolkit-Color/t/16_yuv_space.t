@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 93;
+use Test::More tests => 95;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Instance::YUV';
@@ -12,11 +12,14 @@ use Graphics::Toolkit::Color::Space::Util ':all';
 
 is( not($@), 1, 'could load the module');
 is( ref $space, 'Graphics::Toolkit::Color::Space',  'got tight return value by loading module');
-is( $space->name,      'YUV',                       'color space has initials as name');
-is( $space->alias,   'YPBPR',                       'color space has alias name YCbCr');
-is( $space->is_name('YPbPr'),    1,                 'color space name YCbCr is correct');
-is( $space->is_name('YUV'),      1,                 'color space name YUV is correct');
-is( $space->axis_count,          3,                 'color space has 3 axis');
+is( $space->name,                           'YUV',  'color space has initials as name');
+is( $space->alias,                        'YPBPR',  'color space has alias name YCbCr');
+is( $space->is_name('YPbPr'),                   1,  'color space name YCbCr is correct');
+is( $space->is_name('YUV'),                     1,  'color space name YUV is correct');
+is( $space->axis_count,                         3,  'color space has 3 axis');
+is( $space->is_euclidean,                       1,  'YUV is euclidean');
+is( $space->is_cylindrical,                     0,  'YUV is not cylindrical');
+
 is( ref $space->check_value_shape([0, 0, 0]),  'ARRAY',   'check neutral YUV values are in bounds');
 is( ref $space->check_value_shape([0, -0.5, -0.5]), 'ARRAY',   'check YUV values works on lower bound values');
 is( ref $space->check_value_shape([1, 0.5, 0.5]),   'ARRAY',   'check YUV values works on upper bound values');
@@ -29,7 +32,6 @@ is( ref $space->check_value_shape([0, .51, 0]),        '',   "Cb value is too bi
 is( ref $space->check_value_shape([0, 0, -.51] ),      '',   "Cr value is too small");
 is( ref $space->check_value_shape([0, 0, 0.51] ),      '',   "Cr value is too big");
 
-
 is( $space->is_value_tuple([0,0,0]),            1,  'value vector has 3 elements');
 is( $space->is_partial_hash({y => 1, Pb => 0}), 1,  'found hash with some keys');
 is( $space->is_partial_hash({Y => 1, U => 0, V => 0}), 1,  'found hash with some axis names');
@@ -39,6 +41,7 @@ is( $space->is_partial_hash({a => 1, v => 0, l => 0}), 0, 'found hash with one w
 is( $space->can_convert('rgb'), 1,                  'do only convert from and to rgb');
 is( $space->can_convert('yuv'), 0,                  'can not convert to itself');
 is( $space->format([0,1,2], 'css_string'), 'yuv(0, 1, 2)', 'can format css string');
+
 
 my $val = $space->deformat(['yuv', 1, 0, -0.1]);
 is( int @$val,    3,  'deformated value triplet (vector)');

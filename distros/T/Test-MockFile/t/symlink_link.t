@@ -290,4 +290,27 @@ note "-------------- link() builtin on mocked paths --------------";
     ok( !-e '/mock/ul_single', 'file no longer exists after unlink' );
 }
 
+{
+    note "link() propagates nlink to all same-inode mocks (3+ hard links)";
+    my $inode = 99001;
+    my $a = Test::MockFile->file( '/mock/hl_a', 'shared', { inode => $inode, nlink => 1 } );
+    my $b = Test::MockFile->file('/mock/hl_b');
+    my $c = Test::MockFile->file('/mock/hl_c');
+
+    # First hard link: A → B
+    ok( link( '/mock/hl_a', '/mock/hl_b' ), 'link A to B succeeds' );
+    is( ( stat('/mock/hl_a') )[3], 2, 'A nlink=2 after first link' );
+    is( ( stat('/mock/hl_b') )[3], 2, 'B nlink=2 after first link' );
+
+    # Second hard link: A → C — B should also get nlink=3
+    ok( link( '/mock/hl_a', '/mock/hl_c' ), 'link A to C succeeds' );
+    is( ( stat('/mock/hl_a') )[3], 3, 'A nlink=3 after second link' );
+    is( ( stat('/mock/hl_b') )[3], 3, 'B nlink=3 after second link (propagated)' );
+    is( ( stat('/mock/hl_c') )[3], 3, 'C nlink=3 after second link' );
+
+    # All three share the same inode
+    is( ( stat('/mock/hl_b') )[1], $inode, 'B has same inode as A' );
+    is( ( stat('/mock/hl_c') )[1], $inode, 'C has same inode as A' );
+}
+
 done_testing();

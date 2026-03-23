@@ -27,7 +27,6 @@ use Test::More;
 use IPC::Run 'run';
 
 plan skip_all => 'Skipping when not on Win32' unless $^O eq 'MSWin32';
-local $TODO = 'https://github.com/toddr/IPC-Run/issues/116';
 plan tests => 10;
 
 $ENV{IPC_SUB_PROCESS} = 1;

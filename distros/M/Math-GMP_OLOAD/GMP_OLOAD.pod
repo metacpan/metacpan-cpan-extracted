@@ -1,0 +1,61 @@
+=pod
+
+=head1 NAME
+
+  Math::GMP_OLOAD - assist in the overloading of Math::GMP objects.
+
+=head1 DESCRIPTION
+
+  This module aims at allowing Math-MPFR-4.47, Math-GMPq-0.69,
+  Math::GMPz-0.68 (and later versions) to overload Math::GMP objects wrt
+  all arithmetic and comparison operations.
+  It relies on Math-GMP being available, and will fail to load if Math::GMP
+  fails to load.
+  The lowest version of Math-GMP that will allow Math-GMP_OLOAD to function
+  correctly has not yet been determined.
+  At this stage, version 2.11 seems ok, and all meaningful tests in the
+  test suite are skipped if it's less than 2.11.
+
+=head1 SYNOPSIS
+
+  Either:
+  require Math::GMP_OLOAD;
+  or:
+  use Math::GMP_OLOAD;
+
+  Example:
+    use strict;
+    use warnings;
+    use Math::MPFR;
+    require Math::GMP_OLOAD;
+
+    die "Math::MPFR is too old" if $Math::MPFR::VERSION < 4.47;
+
+    # In actual fact, the low limit (unverified) might be less thn 2.11.
+    die "Math::GMP is untrustworthy"  if $Math::GMP::VERSION  < 2.11;
+
+    my $g = Math::GMP->new(17);
+    my $f = Math::MPFR->new(20.5);
+    print ref($g), "\n";     # prints 'Math::GMP'
+    print "ok\n" if $g < $f; # prints 'ok'
+    $g *= $f;
+    print ref($g), "\n";     # prints 'Math::MPFR'
+    print "$g\n";            # prints 3.485e2
+
+
+=head1 ACKNOWLEDGEMENTS
+
+  Thanks to Choroba for presenting, on the perlmonks website, the method
+  being employed here.
+
+=head1 LICENSE
+
+  This program is free software; you may redistribute it and/or
+  modify it under the same terms as Perl itself.
+  Copyright 2026 Sisyphus.
+
+=head1 AUTHOR
+
+  Sisyphus <sisyphus at(@) cpan dot (.) org>
+
+=cut

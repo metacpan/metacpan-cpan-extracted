@@ -1,12 +1,13 @@
 # ABSTRACT: Generate a random two-word agent name
 
 package App::karr::Cmd::AgentName;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
   usage_string => 'USAGE: karr agentname',
 );
+
 
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
@@ -92,7 +93,23 @@ App::karr::Cmd::AgentName - Generate a random two-word agent name
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr agentname
+    karr pick --claim "$(karr agentname)" --move in-progress
+
+=head1 DESCRIPTION
+
+Generates a random two-word, lowercase agent name joined by a hyphen. The
+command prefers the system dictionary when available and falls back to the
+built-in word list otherwise.
+
+=head1 SEE ALSO
+
+L<karr>, L<App::karr>, L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Handoff>,
+L<App::karr::Cmd::Log>
 
 =head1 SUPPORT
 
@@ -100,6 +117,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

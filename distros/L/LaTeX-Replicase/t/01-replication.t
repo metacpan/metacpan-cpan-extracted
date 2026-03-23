@@ -12,7 +12,7 @@ use warnings;
 use utf8;
 
 # use Test::More 'no_plan';
-use Test::More tests => 53;
+use Test::More tests => 57;
 use Test::More::UTF8;
 # use Test::NoWarnings;
 use Test::Exception;
@@ -578,6 +578,10 @@ $tex = q|
    array 1   %%%V:1%
 , %%%ADD:
 %%%END:
+%%%V: =silent= 0
+%%%VAR: ParamII
+SPECIFY VALUE ParamII again (without END tag)!
+~
 |;
 
 lives_ok { &save_file( $file_s, \$tex ) } "Test #21.1: $file_s save";
@@ -587,11 +591,45 @@ $info = {
 		myArrayArray => [[0,3..5], 1, 2],
 		myArrayHashArray => [ { A=>[0..9],},],
 		myArrayArrayArray => [[undef,[1..9],],[undef,[2..9],],],
+		ParamII => 'QWERTYUIOP',
 	};
 
-$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
-is( @$msg, 0, "Test #21.2: '$file_s' without errors");
+my $tmp_stderr = "$outdir/tmp_stderr";
+my $old_stderr;
+lives_ok {
+		open $old_stderr, '>&', STDERR or die "Can't dup STDERR: $!";
+		open STDERR, '>', $tmp_stderr or die "Can't redirect STDERR: $!";
+} "Test #21.1.1: Redirect STDERR to a temporary file";
+
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // [];
+
+lives_ok {
+		close STDERR;
+		open STDERR, '>&', $old_stderr or die "Can't restore STDERR: $!";
+} "Test #21.1.2: Restore original STDERR";
+
+# Read contents of temporary file without silent option
+my $msg_err;
+lives_ok { $msg_err = read_file( $tmp_stderr ) } "Test #21.1.3: $tmp_stderr read";
+s/ +at +t.*// for @$msg_err;
+
+# Test the content
+is_deeply( $msg_err, ['~~> l.EOF. WARNING#1: Missing \'%%%ENDx\' tag for \'ParamII\''], "Test #21.1.4: STDOUT content was captured correctly");
+
+unlink $tmp_stderr;
+
+
+# is( @$msg, 0, "Test #21.2: '$file_s' without errors");
+is_deeply( $msg, 
+	['~~> l.EOF. WARNING#1: Missing \'%%%ENDx\' tag for \'ParamII\''],
+	"Test #21.2: '$file_s' with silent is ON / OFF"
+);
+
+# open F, ">test.log";
+# print F Dumper($msg);
+# close F;
+# exit;
 
 
 ###Test 22
@@ -615,6 +653,7 @@ $msg_ref_s = [
 '~',
 '123456789,',
 '23456789,',
+	'QWERTYUIOP',
 ];
 
 is_deeply( $msg, $msg_ref_s, "Test #22.2: ARRAY");
@@ -666,7 +705,7 @@ $info = {
 		},
 	};
 
-$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // [];
 
 is( @$msg, 0, "Test #15.2: '$file_s' without errors");
 
@@ -712,7 +751,7 @@ $info = {
 		},
 	};
 
-$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // [];
 
 is( @$msg, 0, "Test #17: '$file_s'");
 
@@ -766,6 +805,11 @@ SPECIFY VALUE ParamII !
 ~
 %%%V: RefSub
 ~
+%%%V: =debug= 1
+%%%VAR: RefSub
+Wrong Sub %%%ADD:
+%%%END:
+%%%V: =debug= 0
 myArray 1st:
 %%%VAR: myArray
 %%%ADD:%
@@ -819,14 +863,24 @@ aa %%%ADD:%
 SPECIFY VALUE %%%V:@
 %%%ENDZ:
 }
+%%%V: =debug= 1
+%%%VAR: paramUndef
+UNDEFINED parameter with DEBUG = ON
+%%%END:
+%%%V: =debug= 0
+%%%VAR: ParamII
+SPECIFY VALUE ParamII again (without END tag)!
+~
 |;
 
 lives_ok { &save_file( $file_s, \$tex ) } "Test #19.1: $file_s save";
+
 
 $info = {
 		ParamI => 12345,
 		ParamII => 67890,
 		RefSub => sub{ print"Ok\n"},
+		paramUndef => undef,
 		ArrRefs => [
 				\$ell[2],
 				\$ell[0],
@@ -846,13 +900,18 @@ $info = {
 		ArrayArray => [[0..3],[10..13]],
 	};
 
-$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // []; # debug => 0
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // []; # debug => 0
 
 my $msg_ref_19_2 = [
 	'~~> l.16 WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of \'RefSub\' in %%%V:RefSub',
-	'~~> l.59 WARNING#6: mixed types (ARRAY with HASH with SCALAR or other) of %%%VAR:Mixed',
-	'~~> l.61 WARNING#3: unknown sub-key \'@\' in %%%V:@',
-	'~~> l.66 WARNING#7: empty ARRAY of %%%VAR:emptyArray'
+          '~~> l.19 WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key \'RefSub\' in %%%VAR:RefSub',
+          '~~> l.64 WARNING#6: mixed types (ARRAY with HASH with SCALAR or other) of %%%VAR:Mixed',
+          '~~> l.66 WARNING#3: unknown sub-key \'@\' in %%%V:@',
+          '~~> l.71 WARNING#7: empty ARRAY of %%%VAR:emptyArray',
+          '--> l.77 Found %%%VAR:paramUndef',
+          '~~> l.77 NOT defined key in %%%VAR:paramUndef',
+          '~~> l.79 NOT defined %%%V:paramUndef',
+	'~~> l.EOF. WARNING#1: Missing \'%%%ENDx\' tag for \'ParamII\'',
 ];
 
 is_deeply( $msg, $msg_ref_19_2, "Test #19.2: '$file_s'");
@@ -869,6 +928,8 @@ $msg_ref_s = [
 '~',
 '%%%V: RefSub',
 '~',
+          '%%%VAR: RefSub',
+          'Wrong Sub %%%ADD:',
 'myArray 1st:',
 '~0',
 '~',
@@ -908,6 +969,7 @@ $msg_ref_s = [
 'aa12',
 'aa13',
 '}',
+'67890',
 ];
 
 is_deeply( $msg, $msg_ref_s, "Test #20.2: '%%%VAR:' nested within another '%%%VAR:'");
@@ -920,7 +982,7 @@ $tex = q|
 SPECIFY Y ELEMENT ! %%%V: /1/Y \$
 ~
 %%%VAR: 1
-~ %%%ADDA:% is wrong tag!
+~ %%%ADDD:% is wrong tag!
 SPECIFY X ELEMENT of HASH ! %%%V: X
 %%%END:
 %%%VAR: subParam
@@ -975,6 +1037,7 @@ is( $msg->[0], '!!! ERROR#2: EMPTY or WRONG data!', 'Test #24.3: SUB %%%VAR:');
 
 unlink $file_s, $ofile_s;
 
+
 ###Test #25
 $msg = replication( undef, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
 
@@ -996,6 +1059,16 @@ my $tex2 = q|
 \begin{document}
 \maketitle
 %%%ENDZ: -- end of The Dead Zone
+%%%VAR: paramUndef
+before %%%ADD:
+~~~
+after  %%%ADDE:
+%%%END:
+%%%VAR: paramUndef
+start %%%ADD:
+~ %%%V:@
+end  %%%ADDE:
+%%%END:
 SPECIFY VALUE of myParam! %%%V: myParam  %-- substitutes Variable
 etc...
 \begin{tcolorbox}
@@ -1036,6 +1109,8 @@ etc...
 \\\\ \hline
 HASH Summary
 %%%VAR: myHash
+ &  %%%ADD:%
+????? %%%V: yearUndef
 & %%%ADD:
 00000 %%%V: year0
 & %%%ADD:
@@ -1044,7 +1119,10 @@ HASH Summary
 22222 %%%V: year2%
  &  %%%ADD:%
 33333 %%%V: year3
-& 44444  &  55555
+this add always %%%ADDA:
+ &  %%%ADD:%
+44444 %%%V: yearUndef
+&  55555
 %%%END:
 %%%VAR: myTable_array
 \\\\ \hline %%%ADD:
@@ -1081,11 +1159,13 @@ VALUE 4 & VALUE 2 & VALUE 1 & VALUE 0
 \end{tabular}
 ...
 %%%ENDZ: -- end of The Dead Zone
+text by default (Trigger ON) %%%V: trigger
 %%%VAR: myRefScalar
 \begin{center} %%%ADD:
 ... SPECIFY VALUE of myRefScalar!
 \end{center} %%%ADDE:
 %%%END:
+%%%V: =debug= 1
 \begin{tabbing}
 %%%VAR: myTable_hash
 %%%ADDX: \\\\
@@ -1094,6 +1174,8 @@ VALUE 4 & VALUE 2 & VALUE 1 & VALUE 0
    SPECIFY VALUE 'B'! %%%V: B%
  \= %%%ADD:%
    SPECIFY VALUE 'C'! %%%V: C
+ \= %%%ADD:
+   SPECIFY VALUE 'D'! %%%V: D
 %%%ENDT: -- end of Template area (and myTable_hash also)
 \end{tabbing}
 etc...
@@ -1108,21 +1190,43 @@ $info = {
 		myParam => 'Blah-blah blah-blah blah-blah',
 		myRefScalar => \$rs,
 		myArray => [2024, 2025, 2026, 2027],
-		myHash => {year0 => 123456, year1 => 789012, year2 => 345678, year3 => 901234},
+		myHash => {year0 => 123456, year1 => 789012, year2 => 345678, year3 => 901234, yearUndef => undef},
 		myTable_array => [ # custom user variable ARRAY-ARRAY
 			['00', '01', '02', '03', '04',], # row 0
 			[10, 11, 12, 13, 14,], # row 1
 			[20, 21, 22, 23, 24,], # row 2
 		],
 		myTable_hash => [ # custom user variable ARRAY-HASH
-			{A=>'00', B=>'01', C=>'02', }, # row 0
-			{A=>10, B=>11, C=>12, }, # row 1
+			{A=>'00', B=>'01', C=>'02', D=>undef }, # row 0
+			{A=>10, B=>11, C=>12, D=>undef }, # row 1
 		],
+		paramUndef => undef,
+		trigger => "\x{001}1234567890",
 	};
 
-$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // []; # debug => 0
+$msg = replication( $file_s, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // []; # debug => 0
 
-is( @$msg, 0, "Test #26.2: '$file_s' of USAGE");
+$msg_ref_s = [
+          '--> l.121 Found %%%VAR:myTable_hash',
+          '--> Table row = 0',
+          '--> l.130>121 Insert %%%V[AR]:A= 00',
+          '-->	l.130>121 Insert head:  \\=',
+          '--> l.130>122 Insert %%%V[AR]:B= 01',
+          '-->	l.130>122 Insert head:  \\=',
+          '--> l.130>123 Insert %%%V[AR]:C= 02',
+          '~~> l.130 NOT defined %%%V:D',
+          '--> Table row = 1',
+          '-->	l.130>124 Insert head: \\\\
+',
+          '--> l.130>125 Insert %%%V[AR]:A= 10',
+          '-->	l.130>125 Insert head:  \\=',
+          '--> l.130>126 Insert %%%V[AR]:B= 11',
+          '-->	l.130>126 Insert head:  \\=',
+          '--> l.130>127 Insert %%%V[AR]:C= 12',
+          '~~> l.130 NOT defined %%%V:D'
+        ];
+
+is_deeply( $msg, $msg_ref_s, "Test #26.2: check to set DEBUG_ON & TRIGGER_ON into template");
 
 
 ###Test 27
@@ -1171,6 +1275,7 @@ $msg_ref_s = [
 '789012',
 '&',
 '345678 & 901234',
+	'this add always',
 '\\\\ \\hline',
 '00',
 '&',
@@ -1211,6 +1316,7 @@ $msg_ref_s = [
 ' &22 &21 &20\\\\',
 '\\end{tabular}',
 '...',
+	'text by default (Trigger ON)',
 '\\begin{center}',
 'Reference to SCALAR',
 '\\end{center}',
@@ -1232,8 +1338,29 @@ unlink $file_s, $ofile_s;
 ###Test 28
 my @tex3 = map{"$_\n"} split /\n/, $tex2;
 
-$msg = replication( \@tex3, $info, ofile => $ofile_s, silent =>1, debug => 0 ) // [];
-is( @$msg, 0, "Test #28.1: ARRAY input of USAGE");
+$msg = replication( \@tex3, $info, ofile => $ofile_s, silent =>1, def =>1, debug => 0 ) // [];
+
+my $msg_warns = [
+          '--> l.130 Found %%%VAR:myTable_hash',
+          '--> Table row = 0',
+          '--> l.130>121 Insert %%%V[AR]:A= 00',
+          '-->	l.130>121 Insert head:  \\=',
+          '--> l.130>122 Insert %%%V[AR]:B= 01',
+          '-->	l.130>122 Insert head:  \\=',
+          '--> l.130>123 Insert %%%V[AR]:C= 02',
+          '~~> l.130 NOT defined %%%V:D',
+          '--> Table row = 1',
+          '-->	l.130>124 Insert head: \\\\
+',
+          '--> l.130>125 Insert %%%V[AR]:A= 10',
+          '-->	l.130>125 Insert head:  \\=',
+          '--> l.130>126 Insert %%%V[AR]:B= 11',
+          '-->	l.130>126 Insert head:  \\=',
+          '--> l.130>127 Insert %%%V[AR]:C= 12',
+          '~~> l.130 NOT defined %%%V:D',
+        ];
+
+is_deeply( $msg, $msg_warns, "Test #28.1: ARRAY input of USAGE");
 
 lives_ok { $msg = read_file( $ofile_s ) } "Test #28.2: $ofile_s filling ARRAY read of USAGE";
 
@@ -1266,7 +1393,7 @@ lives_ok {
 	open STDOUT, '>', $ofile_s or die "Can't redirect STDOUT: $!";
 } "Test #30.1: Redirect STDOUT to a temporary file";
 
-$msg = replication( \@tex3, $info, ofile => *STDOUT, silent =>1, debug => 0 ) // [];
+$msg = replication( \@tex3, $info, ofile => *STDOUT, silent =>1, def =>1, debug => 0 ) // [];
 
 lives_ok {
 	close STDOUT;
@@ -1280,7 +1407,6 @@ lives_ok { $msg = read_file( $ofile_s ) } "Test #30.3: $ofile_s read";
 is_deeply( $msg, $msg_ref_s, "Test #30.4: STDOUT content was captured correctly");
 
 unlink $ofile_s;
-
 
 rmtree('t/tmp');
 

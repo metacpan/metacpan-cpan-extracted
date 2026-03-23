@@ -1,5 +1,5 @@
 #
-# GENERATED WITH PDL::PP! Don't modify!
+# GENERATED WITH PDL::PP from plplot.pd! Don't modify!
 #
 package PDL::Graphics::PLplot;
 
@@ -22,13 +22,14 @@ use DynaLoader;
 
 
 
+
 #line 6 "plplot.pd"
 
 use Carp qw(confess);
 
 our $VERSION;
 BEGIN {
-$VERSION = '0.84';
+$VERSION = '0.841';
 };
 
 =head1 NAME
@@ -2306,7 +2307,7 @@ sub close {
 
   return;
 }
-#line 2310 "PLplot.pm"
+#line 2311 "PLplot.pm"
 
 
 =head1 FUNCTIONS
@@ -2438,22 +2439,33 @@ Some of the API functions implemented in PDL have other specificities in
 comparison with the C API and will be discussed below.
 
 =cut
-#line 2442 "PLplot.pm"
+#line 2443 "PLplot.pm"
 
 
 =head2 pladv
 
 =for sig
 
-  Signature: (int page())
+ Signature: (int page())
+ Types: (double)
+
+=for usage
+
+ pladv($page); # all arguments given
+ $page->pladv; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pladv does not process bad values.
+C<pladv> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2472,15 +2484,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xzero();double yzero();double xtick();int nxsub();double ytick();int nysub(); char *xopt;char *yopt)
+ Signature: (double xzero();double yzero();double xtick();int nxsub();double ytick();int nysub(); char *xopt;char *yopt)
+ Types: (double)
+
+=for usage
+
+ plaxes($xzero, $yzero, $xtick, $nxsub, $ytick, $nysub, $xopt, $yopt); # all arguments given
+ $xzero->plaxes($yzero, $xtick, $nxsub, $ytick, $nysub, $xopt, $yopt); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plaxes does not process bad values.
+C<plaxes> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2503,15 +2526,26 @@ sub PDL::plaxes { _reorder('plaxes', 'PDL::_plaxes_int', $standard_order, @_) }
 
 =for sig
 
-  Signature: (int nbin();double x(dima);double y(dima);int center())
+ Signature: (int nbin();double x(dima);double y(dima);int center())
+ Types: (double)
+
+=for usage
+
+ plbin($nbin, $x, $y, $center); # all arguments given
+ $nbin->plbin($x, $y, $center); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plbin does not process bad values.
+C<plbin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2530,15 +2564,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xtick();int nxsub();double ytick();int nysub(); char *xopt;char *yopt)
+ Signature: (double xtick();int nxsub();double ytick();int nysub(); char *xopt;char *yopt)
+ Types: (double)
+
+=for usage
+
+ plbox($xtick, $nxsub, $ytick, $nysub, $xopt, $yopt); # all arguments given
+ $xtick->plbox($nxsub, $ytick, $nysub, $xopt, $yopt); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plbox does not process bad values.
+C<plbox> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2561,15 +2606,26 @@ sub PDL::plbox { _reorder('plbox', 'PDL::_plbox_int', $standard_order, @_) }
 
 =for sig
 
-  Signature: (double xtick();int nsubx();double ytick();int nsuby();double ztick();int nsubz(); char *xopt;char *xlabel;char *yopt;char *ylabel;char *zopt;char *zlabel)
+ Signature: (double xtick();int nsubx();double ytick();int nsuby();double ztick();int nsubz(); char *xopt;char *xlabel;char *yopt;char *ylabel;char *zopt;char *zlabel)
+ Types: (double)
+
+=for usage
+
+ plbox3($xtick, $nsubx, $ytick, $nsuby, $ztick, $nsubz, $xopt, $xlabel, $yopt, $ylabel, $zopt, $zlabel); # all arguments given
+ $xtick->plbox3($nsubx, $ytick, $nsuby, $ztick, $nsubz, $xopt, $xlabel, $yopt, $ylabel, $zopt, $zlabel); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plbox3 does not process bad values.
+C<plbox3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2592,15 +2648,26 @@ sub PDL::plbox3 { _reorder('plbox3', 'PDL::_plbox3_int', $standard_order, @_) }
 
 =for sig
 
-  Signature: (int icolzero())
+ Signature: (int icolzero())
+ Types: (double)
+
+=for usage
+
+ plcol0($icolzero); # all arguments given
+ $icolzero->plcol0; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plcol0 does not process bad values.
+C<plcol0> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2619,15 +2686,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double colone())
+ Signature: (double colone())
+ Types: (double)
+
+=for usage
+
+ plcol1($colone); # all arguments given
+ $colone->plcol1; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plcol1 does not process bad values.
+C<plcol1> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2646,15 +2724,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int iplsr();int flags())
+ Signature: (int iplsr();int flags())
+ Types: (double)
+
+=for usage
+
+ plcpstrm($iplsr, $flags); # all arguments given
+ $iplsr->plcpstrm($flags); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plcpstrm does not process bad values.
+C<plcpstrm> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2673,15 +2762,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin(dima);double ymin(dima);double xmax(dima);double ymax(dima))
+ Signature: (double xmin(dima);double ymin(dima);double xmax(dima);double ymax(dima))
+ Types: (double)
+
+=for usage
+
+ pldid2pc($xmin, $ymin, $xmax, $ymax); # all arguments given
+ $xmin->pldid2pc($ymin, $xmax, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pldid2pc does not process bad values.
+C<pldid2pc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2700,15 +2800,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin(dima);double ymin(dima);double xmax(dima);double ymax(dima))
+ Signature: (double xmin(dima);double ymin(dima);double xmax(dima);double ymax(dima))
+ Types: (double)
+
+=for usage
+
+ pldip2dc($xmin, $ymin, $xmax, $ymax); # all arguments given
+ $xmin->pldip2dc($ymin, $xmax, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pldip2dc does not process bad values.
+C<pldip2dc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2727,15 +2838,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double xmax();double ymin();double ymax();int just();int axis())
+ Signature: (double xmin();double xmax();double ymin();double ymax();int just();int axis())
+ Types: (double)
+
+=for usage
+
+ plenv($xmin, $xmax, $ymin, $ymax, $just, $axis); # all arguments given
+ $xmin->plenv($xmax, $ymin, $ymax, $just, $axis); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plenv does not process bad values.
+C<plenv> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2754,15 +2876,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double xmax();double ymin();double ymax();int just();int axis())
+ Signature: (double xmin();double xmax();double ymin();double ymax();int just();int axis())
+ Types: (double)
+
+=for usage
+
+ plenv0($xmin, $xmax, $ymin, $ymax, $just, $axis); # all arguments given
+ $xmin->plenv0($xmax, $ymin, $ymax, $just, $axis); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plenv0 does not process bad values.
+C<plenv0> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2781,15 +2914,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int n();double xmin(dima);double xmax(dima);double y(dima))
+ Signature: (int n();double xmin(dima);double xmax(dima);double y(dima))
+ Types: (double)
+
+=for usage
+
+ plerrx($n, $xmin, $xmax, $y); # all arguments given
+ $n->plerrx($xmin, $xmax, $y); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plerrx does not process bad values.
+C<plerrx> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2808,15 +2952,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int n();double x(dima);double ymin(dima);double ymax(dima))
+ Signature: (int n();double x(dima);double ymin(dima);double ymax(dima))
+ Types: (double)
+
+=for usage
+
+ plerry($n, $x, $ymin, $ymax); # all arguments given
+ $n->plerry($x, $ymin, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plerry does not process bad values.
+C<plerry> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2835,15 +2990,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int n();double x(dima);double y(dima);double z(dima))
+ Signature: (int n();double x(dima);double y(dima);double z(dima))
+ Types: (double)
+
+=for usage
+
+ plfill3($n, $x, $y, $z); # all arguments given
+ $n->plfill3($x, $y, $z); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plfill3 does not process bad values.
+C<plfill3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2862,15 +3028,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ifont())
+ Signature: (int ifont())
+ Types: (double)
+
+=for usage
+
+ plfont($ifont); # all arguments given
+ $ifont->plfont; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plfont does not process bad values.
+C<plfont> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2889,15 +3066,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int fnt())
+ Signature: (int fnt())
+ Types: (double)
+
+=for usage
+
+ plfontld($fnt); # all arguments given
+ $fnt->plfontld; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plfontld does not process bad values.
+C<plfontld> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2916,15 +3104,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]p_def();double [o]p_ht())
+ Signature: (double [o]p_def();double [o]p_ht())
+ Types: (double)
+
+=for usage
+
+ ($p_def, $p_ht) = plgchr();
+ plgchr($p_def, $p_ht);      # all arguments given
+ $p_def->plgchr($p_ht);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgchr does not process bad values.
+C<plgchr> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2943,15 +3143,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]compression())
+ Signature: (int [o]compression())
+ Types: (double)
+
+=for usage
+
+ $compression = plgcompression();
+ plgcompression($compression);    # all arguments given
+ $compression->plgcompression;
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgcompression does not process bad values.
+C<plgcompression> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2970,15 +3182,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]p_mar();double [o]p_aspect();double [o]p_jx();double [o]p_jy())
+ Signature: (double [o]p_mar();double [o]p_aspect();double [o]p_jx();double [o]p_jy())
+ Types: (double)
+
+=for usage
+
+ ($p_mar, $p_aspect, $p_jx, $p_jy) = plgdidev();
+ plgdidev($p_mar, $p_aspect, $p_jx, $p_jy);      # all arguments given
+ $p_mar->plgdidev($p_aspect, $p_jx, $p_jy);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgdidev does not process bad values.
+C<plgdidev> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -2997,15 +3221,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]p_rot())
+ Signature: (double [o]p_rot())
+ Types: (double)
+
+=for usage
+
+ $p_rot = plgdiori();
+ plgdiori($p_rot);    # all arguments given
+ $p_rot->plgdiori;
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgdiori does not process bad values.
+C<plgdiori> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3024,15 +3260,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]p_xmin();double [o]p_ymin();double [o]p_xmax();double [o]p_ymax())
+ Signature: (double [o]p_xmin();double [o]p_ymin();double [o]p_xmax();double [o]p_ymax())
+ Types: (double)
+
+=for usage
+
+ ($p_xmin, $p_ymin, $p_xmax, $p_ymax) = plgdiplt();
+ plgdiplt($p_xmin, $p_ymin, $p_xmax, $p_ymax);      # all arguments given
+ $p_xmin->plgdiplt($p_ymin, $p_xmax, $p_ymax);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgdiplt does not process bad values.
+C<plgdiplt> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3051,15 +3299,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]p_fam();int [o]p_num();int [o]p_bmax())
+ Signature: (int [o]p_fam();int [o]p_num();int [o]p_bmax())
+ Types: (double)
+
+=for usage
+
+ ($p_fam, $p_num, $p_bmax) = plgfam();
+ plgfam($p_fam, $p_num, $p_bmax);      # all arguments given
+ $p_fam->plgfam($p_num, $p_bmax);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgfam does not process bad values.
+C<plgfam> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3078,15 +3338,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]p_level())
+ Signature: (int [o]p_level())
+ Types: (double)
+
+=for usage
+
+ $p_level = plglevel();
+ plglevel($p_level);    # all arguments given
+ $p_level->plglevel;
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plglevel does not process bad values.
+C<plglevel> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3105,15 +3377,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]p_xp();double [o]p_yp();int [o]p_xleng();int [o]p_yleng();int [o]p_xoff();int [o]p_yoff())
+ Signature: (double [o]p_xp();double [o]p_yp();int [o]p_xleng();int [o]p_yleng();int [o]p_xoff();int [o]p_yoff())
+ Types: (double)
+
+=for usage
+
+ ($p_xp, $p_yp, $p_xleng, $p_yleng, $p_xoff, $p_yoff) = plgpage();
+ plgpage($p_xp, $p_yp, $p_xleng, $p_yleng, $p_xoff, $p_yoff);      # all arguments given
+ $p_xp->plgpage($p_yp, $p_xleng, $p_yleng, $p_xoff, $p_yoff);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgpage does not process bad values.
+C<plgpage> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3132,15 +3416,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]xmin();double [o]xmax();double [o]ymin();double [o]ymax())
+ Signature: (double [o]xmin();double [o]xmax();double [o]ymin();double [o]ymax())
+ Types: (double)
+
+=for usage
+
+ ($xmin, $xmax, $ymin, $ymax) = plgspa();
+ plgspa($xmin, $xmax, $ymin, $ymax);      # all arguments given
+ $xmin->plgspa($xmax, $ymin, $ymax);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgspa does not process bad values.
+C<plgspa> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3159,15 +3455,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]p_xmin();double [o]p_xmax();double [o]p_ymin();double [o]p_ymax())
+ Signature: (double [o]p_xmin();double [o]p_xmax();double [o]p_ymin();double [o]p_ymax())
+ Types: (double)
+
+=for usage
+
+ ($p_xmin, $p_xmax, $p_ymin, $p_ymax) = plgvpd();
+ plgvpd($p_xmin, $p_xmax, $p_ymin, $p_ymax);      # all arguments given
+ $p_xmin->plgvpd($p_xmax, $p_ymin, $p_ymax);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgvpd does not process bad values.
+C<plgvpd> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3186,15 +3494,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]p_xmin();double [o]p_xmax();double [o]p_ymin();double [o]p_ymax())
+ Signature: (double [o]p_xmin();double [o]p_xmax();double [o]p_ymin();double [o]p_ymax())
+ Types: (double)
+
+=for usage
+
+ ($p_xmin, $p_xmax, $p_ymin, $p_ymax) = plgvpw();
+ plgvpw($p_xmin, $p_xmax, $p_ymin, $p_ymax);      # all arguments given
+ $p_xmin->plgvpw($p_xmax, $p_ymin, $p_ymax);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgvpw does not process bad values.
+C<plgvpw> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3213,15 +3533,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]p_digmax();int [o]p_digits())
+ Signature: (int [o]p_digmax();int [o]p_digits())
+ Types: (double)
+
+=for usage
+
+ ($p_digmax, $p_digits) = plgxax();
+ plgxax($p_digmax, $p_digits);      # all arguments given
+ $p_digmax->plgxax($p_digits);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgxax does not process bad values.
+C<plgxax> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3240,15 +3572,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]p_digmax();int [o]p_digits())
+ Signature: (int [o]p_digmax();int [o]p_digits())
+ Types: (double)
+
+=for usage
+
+ ($p_digmax, $p_digits) = plgyax();
+ plgyax($p_digmax, $p_digits);      # all arguments given
+ $p_digmax->plgyax($p_digits);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgyax does not process bad values.
+C<plgyax> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3267,15 +3611,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]p_digmax();int [o]p_digits())
+ Signature: (int [o]p_digmax();int [o]p_digits())
+ Types: (double)
+
+=for usage
+
+ ($p_digmax, $p_digits) = plgzax();
+ plgzax($p_digmax, $p_digits);      # all arguments given
+ $p_digmax->plgzax($p_digits);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgzax does not process bad values.
+C<plgzax> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3294,15 +3650,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xone();double yone();double xtwo();double ytwo())
+ Signature: (double xone();double yone();double xtwo();double ytwo())
+ Types: (double)
+
+=for usage
+
+ pljoin($xone, $yone, $xtwo, $ytwo); # all arguments given
+ $xone->pljoin($yone, $xtwo, $ytwo); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pljoin does not process bad values.
+C<pljoin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3321,15 +3688,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x();double y();double z())
+ Signature: (double x();double y();double z())
+ Types: (double)
+
+=for usage
+
+ pllightsource($x, $y, $z); # all arguments given
+ $x->pllightsource($y, $z); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pllightsource does not process bad values.
+C<pllightsource> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3348,15 +3726,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int lin())
+ Signature: (int lin())
+ Types: (double)
+
+=for usage
+
+ pllsty($lin); # all arguments given
+ $lin->pllsty; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pllsty does not process bad values.
+C<pllsty> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3375,15 +3764,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double disp();double pos();double just(); char *side;char *text)
+ Signature: (double disp();double pos();double just(); char *side;char *text)
+ Types: (double)
+
+=for usage
+
+ plmtex($disp, $pos, $just, $side, $text); # all arguments given
+ $disp->plmtex($pos, $just, $side, $text); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plmtex does not process bad values.
+C<plmtex> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3406,15 +3806,26 @@ sub PDL::plmtex { _reorder('plmtex', 'PDL::_plmtex_int', $standard_order, @_) }
 
 =for sig
 
-  Signature: (double disp();double pos();double just(); char *side;char *text)
+ Signature: (double disp();double pos();double just(); char *side;char *text)
+ Types: (double)
+
+=for usage
+
+ plmtex3($disp, $pos, $just, $side, $text); # all arguments given
+ $disp->plmtex3($pos, $just, $side, $text); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plmtex3 does not process bad values.
+C<plmtex3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3437,15 +3848,26 @@ sub PDL::plmtex3 { _reorder('plmtex3', 'PDL::_plmtex3_int', $standard_order, @_)
 
 =for sig
 
-  Signature: (int nlin();int inc(dima);int del(dima))
+ Signature: (int nlin();int inc(dima);int del(dima))
+ Types: (double)
+
+=for usage
+
+ plpat($nlin, $inc, $del); # all arguments given
+ $nlin->plpat($inc, $del); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plpat does not process bad values.
+C<plpat> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3464,15 +3886,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int setp();int prec())
+ Signature: (int setp();int prec())
+ Types: (double)
+
+=for usage
+
+ plprec($setp, $prec); # all arguments given
+ $setp->plprec($prec); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plprec does not process bad values.
+C<plprec> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3491,15 +3924,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int patt())
+ Signature: (int patt())
+ Types: (double)
+
+=for usage
+
+ plpsty($patt); # all arguments given
+ $patt->plpsty; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plpsty does not process bad values.
+C<plpsty> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3518,15 +3962,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x();double y();double dx();double dy();double just(); char *text)
+ Signature: (double x();double y();double dx();double dy();double just(); char *text)
+ Types: (double)
+
+=for usage
+
+ plptex($x, $y, $dx, $dy, $just, $text); # all arguments given
+ $x->plptex($y, $dx, $dy, $just, $text); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plptex does not process bad values.
+C<plptex> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3545,15 +4000,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double x();double y();double z();double dx();double dy();double dz();double sx();double sy();double sz();double just(); char *text)
+ Signature: (double x();double y();double z();double dx();double dy();double dz();double sx();double sy();double sz();double just(); char *text)
+ Types: (double)
+
+=for usage
+
+ plptex3($x, $y, $z, $dx, $dy, $dz, $sx, $sy, $sz, $just, $text); # all arguments given
+ $x->plptex3($y, $z, $dx, $dy, $dz, $sx, $sy, $sz, $just, $text); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plptex3 does not process bad values.
+C<plptex3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3572,15 +4038,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double def();double scale())
+ Signature: (double def();double scale())
+ Types: (double)
+
+=for usage
+
+ plschr($def, $scale); # all arguments given
+ $def->plschr($scale); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plschr does not process bad values.
+C<plschr> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3599,15 +4076,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ncolzero())
+ Signature: (int ncolzero())
+ Types: (double)
+
+=for usage
+
+ plscmap0n($ncolzero); # all arguments given
+ $ncolzero->plscmap0n; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap0n does not process bad values.
+C<plscmap0n> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3626,15 +4114,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ncolone())
+ Signature: (int ncolone())
+ Types: (double)
+
+=for usage
+
+ plscmap1n($ncolone); # all arguments given
+ $ncolone->plscmap1n; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap1n does not process bad values.
+C<plscmap1n> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3653,15 +4152,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int icolzero();int r();int g();int b())
+ Signature: (int icolzero();int r();int g();int b())
+ Types: (double)
+
+=for usage
+
+ plscol0($icolzero, $r, $g, $b); # all arguments given
+ $icolzero->plscol0($r, $g, $b); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscol0 does not process bad values.
+C<plscol0> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3680,15 +4190,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int r();int g();int b())
+ Signature: (int r();int g();int b())
+ Types: (double)
+
+=for usage
+
+ plscolbg($r, $g, $b); # all arguments given
+ $r->plscolbg($g, $b); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscolbg does not process bad values.
+C<plscolbg> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3707,15 +4228,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int color())
+ Signature: (int color())
+ Types: (double)
+
+=for usage
+
+ plscolor($color); # all arguments given
+ $color->plscolor; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscolor does not process bad values.
+C<plscolor> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3734,15 +4266,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int compression())
+ Signature: (int compression())
+ Types: (double)
+
+=for usage
+
+ plscompression($compression); # all arguments given
+ $compression->plscompression; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscompression does not process bad values.
+C<plscompression> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3785,22 +4328,33 @@ Returns a HashRef of file-oriented device names (key)
 and their menu strings (value).
 
 =cut
-#line 3789 "PLplot.pm"
+#line 4332 "PLplot.pm"
 
 
 =head2 plsdidev
 
 =for sig
 
-  Signature: (double mar();double aspect();double jx();double jy())
+ Signature: (double mar();double aspect();double jx();double jy())
+ Types: (double)
+
+=for usage
+
+ plsdidev($mar, $aspect, $jx, $jy); # all arguments given
+ $mar->plsdidev($aspect, $jx, $jy); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsdidev does not process bad values.
+C<plsdidev> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3819,15 +4373,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int dimxmin();int dimxmax();int dimymin();int dimymax();double dimxpmm();double dimypmm())
+ Signature: (int dimxmin();int dimxmax();int dimymin();int dimymax();double dimxpmm();double dimypmm())
+ Types: (double)
+
+=for usage
+
+ plsdimap($dimxmin, $dimxmax, $dimymin, $dimymax, $dimxpmm, $dimypmm); # all arguments given
+ $dimxmin->plsdimap($dimxmax, $dimymin, $dimymax, $dimxpmm, $dimypmm); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsdimap does not process bad values.
+C<plsdimap> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3846,15 +4411,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double rot())
+ Signature: (double rot())
+ Types: (double)
+
+=for usage
+
+ plsdiori($rot); # all arguments given
+ $rot->plsdiori; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsdiori does not process bad values.
+C<plsdiori> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3873,15 +4449,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double ymin();double xmax();double ymax())
+ Signature: (double xmin();double ymin();double xmax();double ymax())
+ Types: (double)
+
+=for usage
+
+ plsdiplt($xmin, $ymin, $xmax, $ymax); # all arguments given
+ $xmin->plsdiplt($ymin, $xmax, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsdiplt does not process bad values.
+C<plsdiplt> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3900,15 +4487,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double ymin();double xmax();double ymax())
+ Signature: (double xmin();double ymin();double xmax();double ymax())
+ Types: (double)
+
+=for usage
+
+ plsdiplz($xmin, $ymin, $xmax, $ymax); # all arguments given
+ $xmin->plsdiplz($ymin, $xmax, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsdiplz does not process bad values.
+C<plsdiplz> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3927,15 +4525,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double offset();double size();double spacing();int active())
+ Signature: (double offset();double size();double spacing();int active())
+ Types: (double)
+
+=for usage
+
+ pl_setcontlabelparam($offset, $size, $spacing, $active); # all arguments given
+ $offset->pl_setcontlabelparam($size, $spacing, $active); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pl_setcontlabelparam does not process bad values.
+C<pl_setcontlabelparam> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3954,15 +4563,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int lexp();int sigdig())
+ Signature: (int lexp();int sigdig())
+ Types: (double)
+
+=for usage
+
+ pl_setcontlabelformat($lexp, $sigdig); # all arguments given
+ $lexp->pl_setcontlabelformat($sigdig); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-pl_setcontlabelformat does not process bad values.
+C<pl_setcontlabelformat> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -3981,15 +4601,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int fam();int num();int bmax())
+ Signature: (int fam();int num();int bmax())
+ Types: (double)
+
+=for usage
+
+ plsfam($fam, $num, $bmax); # all arguments given
+ $fam->plsfam($num, $bmax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsfam does not process bad values.
+C<plsfam> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4008,15 +4639,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double def();double scale())
+ Signature: (double def();double scale())
+ Types: (double)
+
+=for usage
+
+ plsmaj($def, $scale); # all arguments given
+ $def->plsmaj($scale); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsmaj does not process bad values.
+C<plsmaj> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4035,15 +4677,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double def();double scale())
+ Signature: (double def();double scale())
+ Types: (double)
+
+=for usage
+
+ plsmin($def, $scale); # all arguments given
+ $def->plsmin($scale); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsmin does not process bad values.
+C<plsmin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4062,15 +4715,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int ori())
+ Signature: (int ori())
+ Types: (double)
+
+=for usage
+
+ plsori($ori); # all arguments given
+ $ori->plsori; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsori does not process bad values.
+C<plsori> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4089,15 +4753,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xp();double yp();int xleng();int yleng();int xoff();int yoff())
+ Signature: (double xp();double yp();int xleng();int yleng();int xoff();int yoff())
+ Types: (double)
+
+=for usage
+
+ plspage($xp, $yp, $xleng, $yleng, $xoff, $yoff); # all arguments given
+ $xp->plspage($yp, $xleng, $yleng, $xoff, $yoff); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plspage does not process bad values.
+C<plspage> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4116,15 +4791,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int pause())
+ Signature: (int pause())
+ Types: (double)
+
+=for usage
+
+ plspause($pause); # all arguments given
+ $pause->plspause; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plspause does not process bad values.
+C<plspause> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4143,15 +4829,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int strm())
+ Signature: (int strm())
+ Types: (double)
+
+=for usage
+
+ plsstrm($strm); # all arguments given
+ $strm->plsstrm; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsstrm does not process bad values.
+C<plsstrm> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4170,15 +4867,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int nx();int ny())
+ Signature: (int nx();int ny())
+ Types: (double)
+
+=for usage
+
+ plssub($nx, $ny); # all arguments given
+ $nx->plssub($ny); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plssub does not process bad values.
+C<plssub> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4197,15 +4905,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double def();double scale())
+ Signature: (double def();double scale())
+ Types: (double)
+
+=for usage
+
+ plssym($def, $scale); # all arguments given
+ $def->plssym($scale); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plssym does not process bad values.
+C<plssym> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4224,15 +4943,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int nx();int ny())
+ Signature: (int nx();int ny())
+ Types: (double)
+
+=for usage
+
+ plstar($nx, $ny); # all arguments given
+ $nx->plstar($ny); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstar does not process bad values.
+C<plstar> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4251,15 +4981,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int nx();int ny(); char *devname)
+ Signature: (int nx();int ny(); char *devname)
+ Types: (double)
+
+=for usage
+
+ plstart($nx, $ny, $devname); # all arguments given
+ $nx->plstart($ny, $devname); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstart does not process bad values.
+C<plstart> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4282,15 +5023,26 @@ sub PDL::plstart { _reorder('plstart', 'PDL::_plstart_int', $standard_order, @_)
 
 =for sig
 
-  Signature: (int id();int pen();double x();double y())
+ Signature: (int id();int pen();double x();double y())
+ Types: (double)
+
+=for usage
+
+ plstripa($id, $pen, $x, $y); # all arguments given
+ $id->plstripa($pen, $x, $y); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstripa does not process bad values.
+C<plstripa> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4309,15 +5061,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int id())
+ Signature: (int id())
+ Types: (double)
+
+=for usage
+
+ plstripd($id); # all arguments given
+ $id->plstripd; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstripd does not process bad values.
+C<plstripd> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4336,15 +5099,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double xmax();double ymin();double ymax())
+ Signature: (double xmin();double xmax();double ymin();double ymax())
+ Types: (double)
+
+=for usage
+
+ plsvpa($xmin, $xmax, $ymin, $ymax); # all arguments given
+ $xmin->plsvpa($xmax, $ymin, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsvpa does not process bad values.
+C<plsvpa> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4363,15 +5137,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int digmax();int digits())
+ Signature: (int digmax();int digits())
+ Types: (double)
+
+=for usage
+
+ plsxax($digmax, $digits); # all arguments given
+ $digmax->plsxax($digits); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsxax does not process bad values.
+C<plsxax> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4390,15 +5175,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int window_id())
+ Signature: (int window_id())
+ Types: (double)
+
+=for usage
+
+ plsxwin($window_id); # all arguments given
+ $window_id->plsxwin; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsxwin does not process bad values.
+C<plsxwin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4417,15 +5213,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int digmax();int digits())
+ Signature: (int digmax();int digits())
+ Types: (double)
+
+=for usage
+
+ plsyax($digmax, $digits); # all arguments given
+ $digmax->plsyax($digits); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsyax does not process bad values.
+C<plsyax> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4444,15 +5251,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int digmax();int digits())
+ Signature: (int digmax();int digits())
+ Types: (double)
+
+=for usage
+
+ plszax($digmax, $digits); # all arguments given
+ $digmax->plszax($digits); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plszax does not process bad values.
+C<plszax> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4471,15 +5289,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double aspect())
+ Signature: (double aspect())
+ Types: (double)
+
+=for usage
+
+ plvasp($aspect); # all arguments given
+ $aspect->plvasp; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plvasp does not process bad values.
+C<plvasp> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4498,15 +5327,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double xmax();double ymin();double ymax();double aspect())
+ Signature: (double xmin();double xmax();double ymin();double ymax();double aspect())
+ Types: (double)
+
+=for usage
+
+ plvpas($xmin, $xmax, $ymin, $ymax, $aspect); # all arguments given
+ $xmin->plvpas($xmax, $ymin, $ymax, $aspect); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plvpas does not process bad values.
+C<plvpas> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4525,15 +5365,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double xmax();double ymin();double ymax())
+ Signature: (double xmin();double xmax();double ymin();double ymax())
+ Types: (double)
+
+=for usage
+
+ plvpor($xmin, $xmax, $ymin, $ymax); # all arguments given
+ $xmin->plvpor($xmax, $ymin, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plvpor does not process bad values.
+C<plvpor> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4552,15 +5403,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double basex();double basey();double height();double xminzero();double xmaxzero();double yminzero();double ymaxzero();double zminzero();double zmaxzero();double alt();double az())
+ Signature: (double basex();double basey();double height();double xminzero();double xmaxzero();double yminzero();double ymaxzero();double zminzero();double zmaxzero();double alt();double az())
+ Types: (double)
+
+=for usage
+
+ plw3d($basex, $basey, $height, $xminzero, $xmaxzero, $yminzero, $ymaxzero, $zminzero, $zmaxzero, $alt, $az); # all arguments given
+ $basex->plw3d($basey, $height, $xminzero, $xmaxzero, $yminzero, $ymaxzero, $zminzero, $zmaxzero, $alt, $az); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plw3d does not process bad values.
+C<plw3d> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4579,15 +5441,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int width())
+ Signature: (int width())
+ Types: (double)
+
+=for usage
+
+ plwidth($width); # all arguments given
+ $width->plwidth; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plwidth does not process bad values.
+C<plwidth> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4606,15 +5479,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xmin();double xmax();double ymin();double ymax())
+ Signature: (double xmin();double xmax();double ymin();double ymax())
+ Types: (double)
+
+=for usage
+
+ plwind($xmin, $xmax, $ymin, $ymax); # all arguments given
+ $xmin->plwind($xmax, $ymin, $ymax); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plwind does not process bad values.
+C<plwind> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4633,15 +5517,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double p_x(dima);double p_y(dima))
+ Signature: (double p_x(dima);double p_y(dima))
+ Types: (double)
+
+=for usage
+
+ plP_gpixmm($p_x, $p_y); # all arguments given
+ $p_x->plP_gpixmm($p_y); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plP_gpixmm does not process bad values.
+C<plP_gpixmm> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4660,15 +5555,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int r();int g();int b();double a())
+ Signature: (int r();int g();int b();double a())
+ Types: (double)
+
+=for usage
+
+ plscolbga($r, $g, $b, $a); # all arguments given
+ $r->plscolbga($g, $b, $a); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscolbga does not process bad values.
+C<plscolbga> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4687,15 +5593,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int icolzero();int r();int g();int b();double a())
+ Signature: (int icolzero();int r();int g();int b();double a())
+ Types: (double)
+
+=for usage
+
+ plscol0a($icolzero, $r, $g, $b, $a); # all arguments given
+ $icolzero->plscol0a($r, $g, $b, $a); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscol0a does not process bad values.
+C<plscol0a> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4714,7 +5631,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n))
+ Signature: (x(n); y(n))
+ Types: (double)
 
 =for ref
 
@@ -4748,9 +5666,14 @@ For example:
  $y->setbadif($y > 3/4);
  plline($x, $y);
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plline processes bad values.
+C<plline> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4769,15 +5692,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int n(); x1(); x2(); y1(); y2())
+ Signature: (int n(); x1(); x2(); y1(); y2())
+ Types: (double)
+
+=for usage
+
+ plpath($n, $x1, $x2, $y1, $y2); # all arguments given
+ $n->plpath($x1, $x2, $y1, $y2); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plpath ignores the bad-value flag of the input ndarrays.
+C<plpath> ignores the bad-value flag of the input ndarrays.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4796,7 +5730,8 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); z(n); int sym(); minz(); maxz())
+ Signature: (x(n); y(n); z(n); int sym(); minz(); maxz())
+ Types: (double)
 
 =for ref
 
@@ -4826,9 +5761,14 @@ For example:
  plcolorpoints($x, $y, $z, $symbols, -5, 20);  # Thread over everything
  plcolorpoints($x, $y, 1, 1, -1, 2);           # same color and symbol for all
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plcolorpoints processes bad values.
+C<plcolorpoints> processes bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4847,15 +5787,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int maxx();int maxy();image(3,x,y))
+ Signature: (int maxx();int maxy();image(3,x,y))
+ Types: (byte)
+
+=for usage
+
+ plsmem($maxx, $maxy, $image); # all arguments given
+ $maxx->plsmem($maxy, $image); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsmem does not process bad values.
+C<plsmem> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4874,15 +5825,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (xo(); yo())
+ Signature: (xo(); yo())
+ Types: (double)
+
+=for usage
+
+ plfbox($xo, $yo); # all arguments given
+ $xo->plfbox($yo); # method call
 
 =for ref
 
 Box drawing primitive, taken from PLPLOT bar graph example
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plfbox does not process bad values.
+C<plfbox> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4901,15 +5863,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (xo(); yo(); bh(); w())
+ Signature: (xo(); yo(); bh(); w())
+ Types: (double)
+
+=for usage
+
+ plfbox1($xo, $yo, $bh, $w); # all arguments given
+ $xo->plfbox1($yo, $bh, $w); # method call
 
 =for ref
 
 Box drawing primitive that allows specifying base height and width in addition to offset and height
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plfbox1 does not process bad values.
+C<plfbox1> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4928,15 +5901,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (xo(); yo())
+ Signature: (xo(); yo())
+ Types: (double)
+
+=for usage
+
+ plunfbox($xo, $yo); # all arguments given
+ $xo->plunfbox($yo); # method call
 
 =for ref
 
 Similar box drawing primitive, but without fill (just draw outline of box)
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plunfbox does not process bad values.
+C<plunfbox> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4955,15 +5939,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (xo(); yo(); bh(); w())
+ Signature: (xo(); yo(); bh(); w())
+ Types: (double)
+
+=for usage
+
+ plunfbox1($xo, $yo, $bh, $w); # all arguments given
+ $xo->plunfbox1($yo, $bh, $w); # method call
 
 =for ref
 
 Box drawing primitive that allows specifying base height and width in addition to offset and height
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plunfbox1 does not process bad values.
+C<plunfbox1> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -4982,15 +5977,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o] retval(); SV* argv; int mode)
+ Signature: (int [o] retval(); SV* argv; int mode)
+ Types: (double)
+
+=for usage
+
+ $retval = plParseOpts($argv, $mode);
+ plParseOpts($retval, $argv, $mode);  # all arguments given
+ $retval = $argv->plParseOpts($mode); # method call
+ $retval->plParseOpts($argv, $mode);
 
 =for ref
 
 Parse PLplot options given in @ARGV-like arrays
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plParseOpts does not process bad values.
+C<plParseOpts> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5009,15 +6017,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); int code())
+ Signature: (x(n); y(n); int code())
+ Types: (double)
+
+=for usage
+
+ plpoin($x, $y, $code); # all arguments given
+ $x->plpoin($y, $code); # method call
 
 =for ref
 
 Plots a character at the specified points
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plpoin does not process bad values.
+C<plpoin> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5036,15 +6055,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); z(n); int code())
+ Signature: (x(n); y(n); z(n); int code())
+ Types: (double)
+
+=for usage
+
+ plpoin3($x, $y, $z, $code); # all arguments given
+ $x->plpoin3($y, $z, $code); # method call
 
 =for ref
 
 Plots a character at the specified points in 3 space
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plpoin3 does not process bad values.
+C<plpoin3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5063,15 +6093,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); z(n))
+ Signature: (x(n); y(n); z(n))
+ Types: (double)
+
+=for usage
+
+ plline3($x, $y, $z); # all arguments given
+ $x->plline3($y, $z); # method call
 
 =for ref
 
 Draw a line in 3 space
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plline3 does not process bad values.
+C<plline3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5090,15 +6131,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); z(n); int draw(m); int ifcc())
+ Signature: (x(n); y(n); z(n); int draw(m); int ifcc())
+ Types: (double)
+
+=for usage
+
+ plpoly3($x, $y, $z, $draw, $ifcc); # all arguments given
+ $x->plpoly3($y, $z, $draw, $ifcc); # method call
 
 =for ref
 
 Draws a polygon in 3 space
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plpoly3 does not process bad values.
+C<plpoly3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5117,15 +6169,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (data(n); datmin(); datmax(); int nbin(); int oldwin())
+ Signature: (data(n); datmin(); datmax(); int nbin(); int oldwin())
+ Types: (double)
+
+=for usage
+
+ plhist($data, $datmin, $datmax, $nbin, $oldwin); # all arguments given
+ $data->plhist($datmin, $datmax, $nbin, $oldwin); # method call
 
 =for ref
 
 Plot a histogram from unbinned data
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plhist does not process bad values.
+C<plhist> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5144,15 +6207,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n))
+ Signature: (x(n); y(n))
+ Types: (double)
+
+=for usage
+
+ plfill($x, $y); # all arguments given
+ $x->plfill($y); # method call
 
 =for ref
 
 Area fill
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plfill does not process bad values.
+C<plfill> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5171,15 +6245,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); angle())
+ Signature: (x(n); y(n); angle())
+ Types: (double)
+
+=for usage
+
+ plgradient($x, $y, $angle); # all arguments given
+ $x->plgradient($y, $angle); # method call
 
 =for ref
 
 Area fill with color gradient
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgradient does not process bad values.
+C<plgradient> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5198,15 +6283,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(n); y(n); int code())
+ Signature: (x(n); y(n); int code())
+ Types: (double)
+
+=for usage
+
+ plsym($x, $y, $code); # all arguments given
+ $x->plsym($y, $code); # method call
 
 =for ref
 
 Plots a symbol at the specified points
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsym does not process bad values.
+C<plsym> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5225,15 +6321,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel))
+ Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel))
+ Types: (double)
+
+=for usage
+
+ plsurf3d($x, $y, $z, $opt, $clevel); # all arguments given
+ $x->plsurf3d($y, $z, $opt, $clevel); # method call
 
 =for ref
 
 Plot shaded 3-d surface plot
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsurf3d does not process bad values.
+C<plsurf3d> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5252,15 +6359,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel); int indexxmin(); int indexxmax(); int indexymin(nx); int indexymax(nx))
+ Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel); int indexxmin(); int indexxmax(); int indexymin(nx); int indexymax(nx))
+ Types: (double)
+
+=for usage
+
+ plsurf3dl($x, $y, $z, $opt, $clevel, $indexxmin, $indexxmax, $indexymin, $indexymax); # all arguments given
+ $x->plsurf3dl($y, $z, $opt, $clevel, $indexxmin, $indexxmax, $indexymin, $indexymax); # method call
 
 =for ref
 
 Plot shaded 3-d surface plot with limits
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsurf3dl does not process bad values.
+C<plsurf3dl> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5279,15 +6397,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int mark(nms); int space(nms))
+ Signature: (int mark(nms); int space(nms))
+ Types: (double)
+
+=for usage
+
+ plstyl($mark, $space); # all arguments given
+ $mark->plstyl($space); # method call
 
 =for ref
 
 Set line style
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstyl does not process bad values.
+C<plstyl> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5306,15 +6435,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int seed())
+ Signature: (int seed())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ plseed($seed); # all arguments given
+ $seed->plseed; # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plseed does not process bad values.
+C<plseed> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5333,15 +6474,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double [o]rand())
+ Signature: (double [o]rand())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ $rand = plrandd();
+ plrandd($rand);    # all arguments given
+ $rand->plrandd;
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plrandd does not process bad values.
+C<plrandd> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5360,15 +6514,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xg(nx); double yg(ny); [o] PLcGridPtr__OUT grid)
+ Signature: (double xg(nx); double yg(ny); [o] PLcGridPtr__OUT grid)
+ Types: (double)
+
+=for usage
+
+ $grid = plAllocGrid($xg, $yg);
+ plAllocGrid($xg, $yg, $grid);  # all arguments given
+ $grid = $xg->plAllocGrid($yg); # method call
+ $xg->plAllocGrid($yg, $grid);
 
 =for ref
 
 Allocates a PLcGrid object for use in pltr1
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plAllocGrid does not process bad values.
+C<plAllocGrid> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5387,15 +6554,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double xg(nx,ny); double yg(nx,ny); [o] PLcGrid2Ptr__OUT grid)
+ Signature: (double xg(nx,ny); double yg(nx,ny); [o] PLcGrid2Ptr__OUT grid)
+ Types: (double)
+
+=for usage
+
+ $grid = plAlloc2dGrid($xg, $yg);
+ plAlloc2dGrid($xg, $yg, $grid);  # all arguments given
+ $grid = $xg->plAlloc2dGrid($yg); # method call
+ $xg->plAlloc2dGrid($yg, $grid);
 
 =for ref
 
 Allocates a PLcGrid2 object for use in pltr2
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plAlloc2dGrid does not process bad values.
+C<plAlloc2dGrid> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5414,7 +6594,13 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (P(); C(); SV* p0; SV* p1; SV* p2)
+ Signature: (; SV* p0; SV* p1; SV* p2)
+ Types: (double)
+
+=for usage
+
+ init_pltr($p0, $p1, $p2); # all arguments given
+ $p0->init_pltr($p1, $p2); # method call
 
 Used internally to set the variables C<pltr{0,1,2}_iv> to the "pointers"
 of the Perl subroutines C<pltr{1,2,3}>.  These variables are later used by
@@ -5422,9 +6608,14 @@ C<get_standard_pltrcb> to provide the pointers to the C function C<pltr{0,1,2}>.
 This accelerates functions like plcont and plshades when those standard
 transformation functions are used.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-init_pltr does not process bad values.
+C<init_pltr> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5438,25 +6629,36 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 3987 "plplot.pd"
+#line 3986 "plplot.pd"
 
 init_pltr (\&pltr0, \&pltr1, \&pltr2);
-#line 5445 "PLplot.pm"
+#line 6636 "PLplot.pm"
 
 
 =head2 plmap
 
 =for sig
 
-  Signature: (minlong(); maxlong(); minlat(); maxlat(); SV* mapform; char* type)
+ Signature: (minlong(); maxlong(); minlat(); maxlat(); SV* mapform; char* type)
+ Types: (double)
+
+=for usage
+
+ plmap($minlong, $maxlong, $minlat, $maxlat, $mapform, $type); # all arguments given
+ $minlong->plmap($maxlong, $minlat, $maxlat, $mapform, $type); # method call
 
 =for ref
 
 plot continental outline in world coordinates
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plmap does not process bad values.
+C<plmap> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5479,15 +6681,26 @@ sub PDL::plmap { _reorder('plmap', 'PDL::_plmap_int', $standard_order, @_) }
 
 =for sig
 
-  Signature: (x(na); y(na); char* string)
+ Signature: (x(na); y(na); char* string)
+ Types: (double)
+
+=for usage
+
+ plstring($x, $y, $string); # all arguments given
+ $x->plstring($y, $string); # method call
 
 =for ref
 
 plot a string along a line
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstring does not process bad values.
+C<plstring> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5506,15 +6719,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(na); y(na); z(na); char* string)
+ Signature: (x(na); y(na); z(na); char* string)
+ Types: (double)
+
+=for usage
+
+ plstring3($x, $y, $z, $string); # all arguments given
+ $x->plstring3($y, $z, $string); # method call
 
 =for ref
 
 plot a string along a 3D line
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstring3 does not process bad values.
+C<plstring3> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5533,15 +6757,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (dlong(); dlat(); minlong(); maxlong(); minlat(); maxlat(); SV* mapform)
+ Signature: (dlong(); dlat(); minlong(); maxlong(); minlat(); maxlat(); SV* mapform)
+ Types: (double)
+
+=for usage
+
+ plmeridians($dlong, $dlat, $minlong, $maxlong, $minlat, $maxlat, $mapform); # all arguments given
+ $dlong->plmeridians($dlat, $minlong, $maxlong, $minlat, $maxlat, $mapform); # method call
 
 =for ref
 
 Plot the latitudes and longitudes on the background
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plmeridians does not process bad values.
+C<plmeridians> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5564,17 +6799,28 @@ sub PDL::plmeridians { _reorder('plmeridians', 'PDL::_plmeridians_int', $standar
 
 =for sig
 
-  Signature: (z(x,y); xmin(); xmax(); ymin(); ymax();
+ Signature: (z(x,y); xmin(); xmax(); ymin(); ymax();
                   clevel(l); int fill_width(); int cont_color();
                   int cont_width(); int rectangular(); SV* defined; SV* pltr; SV* pltr_data)
+ Types: (double)
+
+=for usage
+
+ plshades($z, $xmin, $xmax, $ymin, $ymax, $clevel, $fill_width, $cont_color, $cont_width, $rectangular, $defined, $pltr, $pltr_data); # all arguments given
+ $z->plshades($xmin, $xmax, $ymin, $ymax, $clevel, $fill_width, $cont_color, $cont_width, $rectangular, $defined, $pltr, $pltr_data); # method call
 
 =for ref
 
 Shade regions on the basis of value
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plshades does not process bad values.
+C<plshades> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5597,15 +6843,26 @@ sub PDL::plshades { _reorder('plshades', 'PDL::_plshades_int', $standard_order, 
 
 =for sig
 
-  Signature: (f(nx,ny); int kx(); int lx(); int ky(); int ly(); clevel(nlevel); SV* pltr; SV* pltr_data)
+ Signature: (f(nx,ny); int kx(); int lx(); int ky(); int ly(); clevel(nlevel); SV* pltr; SV* pltr_data)
+ Types: (double)
+
+=for usage
+
+ plcont($f, $kx, $lx, $ky, $ly, $clevel, $pltr, $pltr_data); # all arguments given
+ $f->plcont($kx, $lx, $ky, $ly, $clevel, $pltr, $pltr_data); # method call
 
 =for ref
 
 Plot contours
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plcont does not process bad values.
+C<plcont> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5624,15 +6881,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(nx); y(ny); z(nx,ny); int opt())
+ Signature: (x(nx); y(ny); z(nx,ny); int opt())
+ Types: (double)
+
+=for usage
+
+ plmesh($x, $y, $z, $opt); # all arguments given
+ $x->plmesh($y, $z, $opt); # method call
 
 =for ref
 
 Surface mesh
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plmesh does not process bad values.
+C<plmesh> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5651,15 +6919,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel))
+ Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel))
+ Types: (double)
+
+=for usage
+
+ plmeshc($x, $y, $z, $opt, $clevel); # all arguments given
+ $x->plmeshc($y, $z, $opt, $clevel); # method call
 
 =for ref
 
 Magnitude colored plot surface mesh with contour
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plmeshc does not process bad values.
+C<plmeshc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5678,15 +6957,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(nx); y(ny); z(nx,ny); int opt(); int side())
+ Signature: (x(nx); y(ny); z(nx,ny); int opt(); int side())
+ Types: (double)
+
+=for usage
+
+ plot3d($x, $y, $z, $opt, $side); # all arguments given
+ $x->plot3d($y, $z, $opt, $side); # method call
 
 =for ref
 
 3-d surface plot
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plot3d does not process bad values.
+C<plot3d> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5705,15 +6995,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel))
+ Signature: (x(nx); y(ny); z(nx,ny); int opt(); clevel(nlevel))
+ Types: (double)
+
+=for usage
+
+ plot3dc($x, $y, $z, $opt, $clevel); # all arguments given
+ $x->plot3dc($y, $z, $opt, $clevel); # method call
 
 =for ref
 
 Plots a 3-d representation of the function z[x][y] with contour
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plot3dc does not process bad values.
+C<plot3dc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5732,15 +7033,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int itype(); isty(n); coord1(n); coord2(n); coord3(n); int rev(nrev))
+ Signature: (int itype(); isty(n); coord1(n); coord2(n); coord3(n); int rev(nrev))
+ Types: (double)
+
+=for usage
+
+ plscmap1l($itype, $isty, $coord1, $coord2, $coord3, $rev); # all arguments given
+ $itype->plscmap1l($isty, $coord1, $coord2, $coord3, $rev); # method call
 
 =for ref
 
 Set color map1 colors using a piece-wise linear relationship
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap1l does not process bad values.
+C<plscmap1l> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5759,15 +7071,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (a(nx,ny); left(); right(); bottom(); top(); shade_min();shade_max(); sh_cmap(); sh_color(); sh_width();min_color(); min_width(); max_color(); max_width();rectangular(); SV* defined; SV* pltr; SV* pltr_data)
+ Signature: (a(nx,ny); left(); right(); bottom(); top(); shade_min();shade_max(); sh_cmap(); sh_color(); sh_width();min_color(); min_width(); max_color(); max_width();rectangular(); SV* defined; SV* pltr; SV* pltr_data)
+ Types: (double)
+
+=for usage
+
+ plshade1($a, $left, $right, $bottom, $top, $shade_min, $shade_max, $sh_cmap, $sh_color, $sh_width, $min_color, $min_width, $max_color, $max_width, $rectangular, $defined, $pltr, $pltr_data); # all arguments given
+ $a->plshade1($left, $right, $bottom, $top, $shade_min, $shade_max, $sh_cmap, $sh_color, $sh_width, $min_color, $min_width, $max_color, $max_width, $rectangular, $defined, $pltr, $pltr_data); # method call
 
 =for ref
 
 Shade individual region on the basis of value
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plshade1 does not process bad values.
+C<plshade1> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5790,15 +7113,26 @@ sub PDL::plshade1 { _reorder('plshade1', 'PDL::_plshade1_int', $standard_order, 
 
 =for sig
 
-  Signature: (idata(nx,ny); xmin(); xmax(); ymin(); ymax();zmin(); zmax(); Dxmin(); Dxmax(); Dymin(); Dymax())
+ Signature: (idata(nx,ny); xmin(); xmax(); ymin(); ymax();zmin(); zmax(); Dxmin(); Dxmax(); Dymin(); Dymax())
+ Types: (double)
+
+=for usage
+
+ plimage($idata, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $Dxmin, $Dxmax, $Dymin, $Dymax); # all arguments given
+ $idata->plimage($xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $Dxmin, $Dxmax, $Dymin, $Dymax); # method call
 
 =for ref
 
 Plot gray-level image
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plimage does not process bad values.
+C<plimage> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5817,15 +7151,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (idata(nx,ny); xmin(); xmax(); ymin(); ymax();zmin(); zmax(); valuemin(); valuemax(); SV* pltr; SV* pltr_data)
+ Signature: (idata(nx,ny); xmin(); xmax(); ymin(); ymax();zmin(); zmax(); valuemin(); valuemax(); SV* pltr; SV* pltr_data)
+ Types: (double)
+
+=for usage
+
+ plimagefr($idata, $xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $valuemin, $valuemax, $pltr, $pltr_data); # all arguments given
+ $idata->plimagefr($xmin, $xmax, $ymin, $ymax, $zmin, $zmax, $valuemin, $valuemax, $pltr, $pltr_data); # method call
 
 =for ref
 
 Plot image with transformation
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plimagefr does not process bad values.
+C<plimagefr> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5839,7 +7184,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 4354 "plplot.pd"
+#line 4242 "plplot.pd"
 
 =head2 plxormod
 
@@ -5856,7 +7201,7 @@ See the PLplot manual for reference.
 
 =cut
 
-#line 4385 "plplot.pd"
+#line 4273 "plplot.pd"
 
 =head2 plGetCursor
 
@@ -5883,7 +7228,7 @@ Returns an empty hash if no translation to world coordinates is possible.
 
 =cut
 
-#line 4448 "plplot.pd"
+#line 4336 "plplot.pd"
 
 =head2 plgstrm
 
@@ -5897,7 +7242,7 @@ Returns the number of the current output stream.
 
 =cut
 
-#line 4475 "plplot.pd"
+#line 4363 "plplot.pd"
 
 =head2 plgsdev
 
@@ -5911,7 +7256,7 @@ Returns the current driver name.
 
 =cut
 
-#line 4515 "plplot.pd"
+#line 4403 "plplot.pd"
 
 =head2 plmkstrm
 
@@ -5926,7 +7271,7 @@ the created stream.
 
 =cut
 
-#line 4543 "plplot.pd"
+#line 4431 "plplot.pd"
 
 =head2 plgver
 
@@ -5941,22 +7286,35 @@ Get the current library version number
 See the PLplot manual for reference.
 
 =cut
-#line 5945 "PLplot.pm"
+#line 7290 "PLplot.pm"
 
 
 =head2 plstripc
 
 =for sig
 
-  Signature: (xmin(); xmax(); xjump(); ymin(); ymax();xlpos(); ylpos(); int y_ascl(); int acc();int colbox(); int collab();int colline(n); int styline(n);int [o] id(); char* xspec; char* yspec; SV* legline;char* labx; char* laby; char* labtop)
+ Signature: (xmin(); xmax(); xjump(); ymin(); ymax();xlpos(); ylpos(); int y_ascl(); int acc();int colbox(); int collab();int colline(n); int styline(n);int [o] id(); char* xspec; char* yspec; SV* legline;char* labx; char* laby; char* labtop)
+ Types: (double)
+
+=for usage
+
+ $id = plstripc($xmin, $xmax, $xjump, $ymin, $ymax, $xlpos, $ylpos, $y_ascl, $acc, $colbox, $collab, $colline, $styline, $xspec, $yspec, $legline, $labx, $laby, $labtop);
+ plstripc($xmin, $xmax, $xjump, $ymin, $ymax, $xlpos, $ylpos, $y_ascl, $acc, $colbox, $collab, $colline, $styline, $id, $xspec, $yspec, $legline, $labx, $laby, $labtop);  # all arguments given
+ $id = $xmin->plstripc($xmax, $xjump, $ymin, $ymax, $xlpos, $ylpos, $y_ascl, $acc, $colbox, $collab, $colline, $styline, $xspec, $yspec, $legline, $labx, $laby, $labtop); # method call
+ $xmin->plstripc($xmax, $xjump, $ymin, $ymax, $xlpos, $ylpos, $y_ascl, $acc, $colbox, $collab, $colline, $styline, $id, $xspec, $yspec, $legline, $labx, $laby, $labtop);
 
 =for ref
 
 FIXME: documentation here!
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plstripc does not process bad values.
+C<plstripc> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -5979,15 +7337,28 @@ sub PDL::plstripc { _reorder('plstripc', 'PDL::_plstripc_int', $standard_order, 
 
 =for sig
 
-  Signature: (x(npts); y(npts); z(npts); xg(nptsx); yg(nptsy);int type(); data(); [o] zg(nptsx,nptsy))
+ Signature: (x(npts); y(npts); z(npts); xg(nptsx); yg(nptsy);int type(); data(); [o] zg(nptsx,nptsy))
+ Types: (double)
+
+=for usage
+
+ $zg = plgriddata($x, $y, $z, $xg, $yg, $type, $data);
+ plgriddata($x, $y, $z, $xg, $yg, $type, $data, $zg);  # all arguments given
+ $zg = $x->plgriddata($y, $z, $xg, $yg, $type, $data); # method call
+ $x->plgriddata($y, $z, $xg, $yg, $type, $data, $zg);
 
 =for ref
 
 FIXME: documentation here!
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgriddata does not process bad values.
+C<plgriddata> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6001,7 +7372,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 4650 "plplot.pd"
+#line 4522 "plplot.pd"
 
 =head2 plarc
 
@@ -6016,7 +7387,7 @@ See the PLplot manual for reference.
 
 =cut
 
-#line 4682 "plplot.pd"
+#line 4554 "plplot.pd"
 
 =head2 plstransform
 
@@ -6043,7 +7414,7 @@ See the PLplot manual for more details.
 
 =cut
 
-#line 4723 "plplot.pd"
+#line 4595 "plplot.pd"
 
 =head2 plslabelfunc
 
@@ -6085,7 +7456,7 @@ See the PLplot manual for more details.
 
 =cut
 
-#line 4778 "plplot.pd"
+#line 4650 "plplot.pd"
 
 =head2 pllegend
 
@@ -6104,7 +7475,7 @@ See the PLplot manual for more details.
 
 =cut
 
-#line 4956 "plplot.pd"
+#line 4828 "plplot.pd"
 
 =head2 plspal0
 
@@ -6118,7 +7489,7 @@ Set color palette 0 from the input .pal file.  See the PLplot manual for more de
 
 =cut
 
-#line 4981 "plplot.pd"
+#line 4853 "plplot.pd"
 
 =head2 plspal1
 
@@ -6132,7 +7503,7 @@ Set color palette 1 from the input .pal file.  See the PLplot manual for more de
 
 =cut
 
-#line 5005 "plplot.pd"
+#line 4877 "plplot.pd"
 
 =head2 plbtime
 
@@ -6146,7 +7517,7 @@ Calculate broken-down time from continuous time for current stream.
 
 =cut
 
-#line 5041 "plplot.pd"
+#line 4913 "plplot.pd"
 
 =head2 plconfigtime
 
@@ -6161,7 +7532,7 @@ vice versa) for current stream.
 
 =cut
 
-#line 5077 "plplot.pd"
+#line 4949 "plplot.pd"
 
 =head2 plctime
 
@@ -6175,7 +7546,7 @@ Calculate continuous time from broken-down time for current stream.
 
 =cut
 
-#line 5108 "plplot.pd"
+#line 4980 "plplot.pd"
 
 =head2 pltimefmt
 
@@ -6192,7 +7563,7 @@ for details.
 
 =cut
 
-#line 5134 "plplot.pd"
+#line 5006 "plplot.pd"
 
 =head2 plsesc
 
@@ -6205,22 +7576,33 @@ for details.
 Set the escape character for text strings.  See the PLplot manual for more details.
 
 =cut
-#line 6209 "PLplot.pm"
+#line 7580 "PLplot.pm"
 
 
 =head2 plvect
 
 =for sig
 
-  Signature: (u(nx,ny); v(nx,ny); scale(); SV* pltr; SV* pltr_data)
+ Signature: (u(nx,ny); v(nx,ny); scale(); SV* pltr; SV* pltr_data)
+ Types: (double)
+
+=for usage
+
+ plvect($u, $v, $scale, $pltr, $pltr_data); # all arguments given
+ $u->plvect($v, $scale, $pltr, $pltr_data); # method call
 
 =for ref
 
 Vector field plots
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plvect does not process bad values.
+C<plvect> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6239,15 +7621,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (arrowx(npts); arrowy(npts); int fill())
+ Signature: (arrowx(npts); arrowy(npts); int fill())
+ Types: (double)
+
+=for usage
+
+ plsvect($arrowx, $arrowy, $fill); # all arguments given
+ $arrowx->plsvect($arrowy, $fill); # method call
 
 =for ref
 
 Give zero-length PDLs for arrowx and arrowy to pass NULL to PLplot func.
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsvect does not process bad values.
+C<plsvect> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6266,15 +7659,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double h();double l();double s();double [o]p_r();double [o]p_g();double [o]p_b())
+ Signature: (double h();double l();double s();double [o]p_r();double [o]p_g();double [o]p_b())
+ Types: (double)
+
+=for usage
+
+ ($p_r, $p_g, $p_b) = plhlsrgb($h, $l, $s);
+ plhlsrgb($h, $l, $s, $p_r, $p_g, $p_b);    # all arguments given
+ ($p_r, $p_g, $p_b) = $h->plhlsrgb($l, $s); # method call
+ $h->plhlsrgb($l, $s, $p_r, $p_g, $p_b);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plhlsrgb does not process bad values.
+C<plhlsrgb> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6293,15 +7699,29 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int icolzero(); int [o]r(); int [o]g(); int [o]b())
+ Signature: (int icolzero(); int [o]r(); int [o]g(); int [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($r, $g, $b) = plgcol0($icolzero);
+ plgcol0($icolzero, $r, $g, $b);    # all arguments given
+ ($r, $g, $b) = $icolzero->plgcol0; # method call
+ $icolzero->plgcol0($r, $g, $b);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgcol0 does not process bad values.
+C<plgcol0> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6320,15 +7740,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]r(); int [o]g(); int [o]b())
+ Signature: (int [o]r(); int [o]g(); int [o]b())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($r, $g, $b) = plgcolbg();
+ plgcolbg($r, $g, $b);      # all arguments given
+ $r->plgcolbg($g, $b);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgcolbg does not process bad values.
+C<plgcolbg> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6347,15 +7780,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int r(n); int g(n); int b(n))
+ Signature: (int r(n); int g(n); int b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ plscmap0($r, $g, $b); # all arguments given
+ $r->plscmap0($g, $b); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap0 does not process bad values.
+C<plscmap0> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6374,15 +7819,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int r(n); int g(n); int b(n))
+ Signature: (int r(n); int g(n); int b(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ plscmap1($r, $g, $b); # all arguments given
+ $r->plscmap1($g, $b); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap1 does not process bad values.
+C<plscmap1> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6401,15 +7858,29 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int icolzero(); int [o]r(); int [o]g(); int [o]b(); double [o]a())
+ Signature: (int icolzero(); int [o]r(); int [o]g(); int [o]b(); double [o]a())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($r, $g, $b, $a) = plgcol0a($icolzero);
+ plgcol0a($icolzero, $r, $g, $b, $a);    # all arguments given
+ ($r, $g, $b, $a) = $icolzero->plgcol0a; # method call
+ $icolzero->plgcol0a($r, $g, $b, $a);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgcol0a does not process bad values.
+C<plgcol0a> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6428,15 +7899,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]r(); int [o]g(); int [o]b(); double [o]a())
+ Signature: (int [o]r(); int [o]g(); int [o]b(); double [o]a())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($r, $g, $b, $a) = plgcolbga();
+ plgcolbga($r, $g, $b, $a);      # all arguments given
+ $r->plgcolbga($g, $b, $a);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgcolbga does not process bad values.
+C<plgcolbga> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6455,15 +7939,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int r(n); int g(n); int b(n); double a(n))
+ Signature: (int r(n); int g(n); int b(n); double a(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ plscmap0a($r, $g, $b, $a); # all arguments given
+ $r->plscmap0a($g, $b, $a); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap0a does not process bad values.
+C<plscmap0a> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6482,15 +7978,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int r(n); int g(n); int b(n); double a(n))
+ Signature: (int r(n); int g(n); int b(n); double a(n))
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ plscmap1a($r, $g, $b, $a); # all arguments given
+ $r->plscmap1a($g, $b, $a); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap1a does not process bad values.
+C<plscmap1a> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6509,15 +8017,26 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int itype(); isty(n); coord1(n); coord2(n); coord3(n); coord4(n); int rev(nrev))
+ Signature: (int itype(); isty(n); coord1(n); coord2(n); coord3(n); coord4(n); int rev(nrev))
+ Types: (double)
+
+=for usage
+
+ plscmap1la($itype, $isty, $coord1, $coord2, $coord3, $coord4, $rev); # all arguments given
+ $itype->plscmap1la($isty, $coord1, $coord2, $coord3, $coord4, $rev); # method call
 
 =for ref
 
 Set color map1 colors using a piece-wise linear relationship, include alpha channel
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plscmap1la does not process bad values.
+C<plscmap1la> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6536,15 +8055,28 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int [o]p_family(); int [o]p_style(); int [o]p_weight())
+ Signature: (int [o]p_family(); int [o]p_style(); int [o]p_weight())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($p_family, $p_style, $p_weight) = plgfont();
+ plgfont($p_family, $p_style, $p_weight);      # all arguments given
+ $p_family->plgfont($p_style, $p_weight);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plgfont does not process bad values.
+C<plgfont> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6563,15 +8095,27 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (int family(); int style(); int weight())
+ Signature: (int family(); int style(); int weight())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ plsfont($family, $style, $weight); # all arguments given
+ $family->plsfont($style, $weight); # method call
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plsfont does not process bad values.
+C<plsfont> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6590,15 +8134,29 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =for sig
 
-  Signature: (double rx(); double ry(); double [o]wx(); double [o]wy(); int [o]window())
+ Signature: (double rx(); double ry(); double [o]wx(); double [o]wy(); int [o]window())
+ Types: (sbyte byte short ushort long ulong indx ulonglong longlong
+   float double ldouble)
+
+=for usage
+
+ ($wx, $wy, $window) = plcalc_world($rx, $ry);
+ plcalc_world($rx, $ry, $wx, $wy, $window);    # all arguments given
+ ($wx, $wy, $window) = $rx->plcalc_world($ry); # method call
+ $rx->plcalc_world($ry, $wx, $wy, $window);
 
 =for ref
 
 info not available
 
+=pod
+
+Broadcasts over its inputs.
+Can't use POSIX threads.
+
 =for bad
 
-plcalc_world does not process bad values.
+C<plcalc_world> does not process bad values.
 It will set the bad-value flag of all output ndarrays if the flag is set for any of the input ndarrays.
 
 =cut
@@ -6612,7 +8170,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 5346 "plplot.pd"
+#line 5202 "plplot.pd"
 
 =head2 pl_cmd
 
@@ -6627,7 +8185,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =cut
 
-#line 5371 "plplot.pd"
+#line 5227 "plplot.pd"
 
 =head2 pl_setCairoCtx
 
@@ -6643,7 +8201,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 =cut
 
-#line 5397 "plplot.pd"
+#line 5253 "plplot.pd"
 
 =pod
 
@@ -6681,11 +8239,11 @@ Too many colors used! (max 15)
 
 perl(1), PDL(1), L<http://www.plplot.org/>
 
-The other common graphics packages include L<PDL::PGPLOT>
-and L<PDL::TriD>.
+The other common graphics packages include L<PDL::Graphics::PGPLOT>,
+L<PDL::Graphics::Simple> and L<PDL::Graphics::TriD>.
 
 =cut
-#line 6689 "PLplot.pm"
+#line 8247 "PLplot.pm"
 
 # Exit with OK status
 

@@ -77,9 +77,6 @@ subtest 'append to mocked file succeeds with autodie active' => sub {
 };
 
 SKIP: {
-    skip "autodie exception detection requires Perl 5.14+ (needs \${^GLOBAL_PHASE} and reliable caller hints)", 3
-      if $] < 5.014;
-
     subtest 'autodie dies on non-existent mocked file' => sub {
         my $file = "/autodie_test_noexist_$$";
 

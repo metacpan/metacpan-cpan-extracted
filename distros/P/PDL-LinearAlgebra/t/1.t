@@ -50,7 +50,7 @@ my $B = sequence(2, 4);
 getrf(my $lu=$A->copy, my $ipiv=null, my $info=null);
 # if don't transpose the $B input, get memory crashes
 getrs($lu, 1, my $x=$B->xchg(0,1)->copy, $ipiv, $info=null);
-$x = $x->inplace->xchg(0,1);
+$x = $x->xchg(0,1);
 my $got = $A x $x;
 ok fapprox($got, $B) or diag "got: $got";
 

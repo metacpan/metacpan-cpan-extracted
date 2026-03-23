@@ -1,7 +1,7 @@
 {
    "abstract" : "Project prelude for modern Perl style on Perl 5.30+",
    "author" : [
-      "Sergey Kovalev <skov@cpan.org>"
+      "Sergey Kovalev <skov@cpan.org>, Kirill Dmitriev <zaika.k1007@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -35,13 +35,17 @@
             "Feature::Compat::Try" : "0",
             "Import::Into" : "0",
             "builtin::compat" : "0",
-            "perl" : "5.030000"
+            "perl" : "5.030000",
+            "true::VERSION" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Feature::Compat::Class" : "0",
             "Feature::Compat::Defer" : "0",
+            "Object::Pad" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0"
          }
       }
@@ -56,6 +60,6 @@
          "web" : "https://github.com/neo1ite/Modern-Perl-Prelude"
       }
    },
-   "version" : "0.005",
+   "version" : "0.008",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

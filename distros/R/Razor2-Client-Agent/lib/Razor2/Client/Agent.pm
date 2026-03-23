@@ -130,6 +130,12 @@ sub do_conf {
     elsif ( $self->{conf}->{logfile} eq 'none' ) {
         $logto = 'none';
     }
+    elsif ( $self->{conf}->{logfile} eq 'stdout' ) {
+        $logto = 'stdout';
+    }
+    elsif ( $self->{conf}->{logfile} eq 'stderr' ) {
+        $logto = 'stderr';
+    }
     else {
         $logto = "file:$self->{conf}->{logfile}";
     }

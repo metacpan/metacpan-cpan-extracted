@@ -1,9 +1,10 @@
 # ABSTRACT: Shared claim timeout logic
 
 package App::karr::Role::ClaimTimeout;
-our $VERSION = '0.003';
+our $VERSION = '0.101';
 use Moo::Role;
 use Time::Piece;
+
 
 sub _parse_timeout {
     my ($self, $timeout_str) = @_;
@@ -35,7 +36,12 @@ App::karr::Role::ClaimTimeout - Shared claim timeout logic
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 DESCRIPTION
+
+Shared helper role for commands that need to interpret C<claim_timeout> values
+and determine whether an existing claim should still block other agents.
 
 =head1 SUPPORT
 
@@ -43,6 +49,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 

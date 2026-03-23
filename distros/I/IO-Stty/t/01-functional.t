@@ -290,6 +290,43 @@ subtest 'set control chars by integer' => sub {
     is($t->getcc(VEOF),  10, 'eof set to 10');
 };
 
+subtest 'set control chars by hat notation' => sub {
+    my ($pty, $slave) = fresh_pty();
+    IO::Stty::stty($slave, 'intr', '^C', 'quit', '^\\', 'erase', '^?', 'eof', '^D');
+    my $t = get_termios($slave);
+    is($t->getcc(VINTR),  3,   'intr set to ^C (3)');
+    is($t->getcc(VQUIT),  28,  'quit set to ^\\ (28)');
+    is($t->getcc(VERASE), 127, 'erase set to ^? (127)');
+    is($t->getcc(VEOF),   4,   'eof set to ^D (4)');
+};
+
+subtest 'disable control char with undef' => sub {
+    my ($pty, $slave) = fresh_pty();
+    IO::Stty::stty($slave, 'eol', 'undef');
+    my $t = get_termios($slave);
+    is($t->getcc(VEOL), 0, 'eol disabled via undef');
+
+    IO::Stty::stty($slave, 'eol', '^-');
+    $t = get_termios($slave);
+    is($t->getcc(VEOL), 0, 'eol disabled via ^-');
+};
+
+subtest 'set min and time' => sub {
+    my ($pty, $slave) = fresh_pty();
+    IO::Stty::stty($slave, '-icanon', 'min', 5, 'time', 10);
+    my $t = get_termios($slave);
+    is($t->getcc(VMIN),  5,  'min set to 5');
+    is($t->getcc(VTIME), 10, 'time set to 10');
+};
+
+subtest '-a output shows min and time' => sub {
+    my ($pty, $slave) = fresh_pty();
+    IO::Stty::stty($slave, 'min', 3, 'time', 7);
+    my $output = IO::Stty::stty($slave, '-a');
+    like($output, qr/min = 3/, '-a shows min value');
+    like($output, qr/time = 7/, '-a shows time value');
+};
+
 # ── 6. Invalid parameter warning ─────────────────────────────────────
 
 subtest 'invalid parameter produces warning' => sub {

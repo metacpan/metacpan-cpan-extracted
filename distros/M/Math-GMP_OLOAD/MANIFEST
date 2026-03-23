@@ -1,0 +1,12 @@
+MANIFEST
+CHANGES
+GMP_OLOAD.pm
+GMP_OLOAD.pod
+Makefile.PL
+t/01-load.t
+t/02-mpfr.t
+t/03-mpq.t
+t/04-mpz.t
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

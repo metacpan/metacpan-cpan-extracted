@@ -4,7 +4,7 @@ use strict;
 use Exporter;
 use YAML::Syck ();
 
-our $VERSION   = '1.39';
+our $VERSION   = '1.41';
 our @EXPORT_OK = qw( Load Dump LoadFile DumpFile DumpInto );
 our @ISA       = qw/Exporter/;
 

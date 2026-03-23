@@ -1,10 +1,14 @@
 # $Id: String.pm,v 1.48 2005/06/13 21:09:59 vipul Exp $
 package Razor2::String;
 
-use Digest::SHA1 qw(sha1_hex);
 use URI::Escape;
 use Razor2::Preproc::enBase64;
 use Data::Dumper;
+
+BEGIN {
+  eval  { require Digest::SHA;  import Digest::SHA  qw(sha1_hex); 1 }
+  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
+}
 
 #use MIME::Parser;
 
@@ -65,15 +69,8 @@ sub hmac2_sha1 {
     return unless $text && $iv1 && $iv2;
     die "no ref's allowed" if ref($text);
 
-    my $ctx = Digest::SHA1->new;
-    $ctx->add($iv2);
-    $ctx->add($text);
-    my $digest = $ctx->hexdigest;
-
-    $ctx = Digest::SHA1->new;
-    $ctx->add($iv1);
-    $ctx->add($digest);
-    $digest = $ctx->hexdigest;
+    my $digest = sha1_hex($iv2, $text);
+    $digest = sha1_hex($iv1, $digest);
 
     return ( hextobase64($digest), $digest );
 }

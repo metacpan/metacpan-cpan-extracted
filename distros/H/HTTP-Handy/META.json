@@ -1,6 +1,6 @@
 {
     "name" : "HTTP-Handy",
-    "version" : "1.00",
+    "version" : "1.01",
     "abstract" : "A tiny HTTP/1.0 server for Perl 5.5.3+",
     "author" : [
         "ina <ina@cpan.org>"
@@ -32,84 +32,52 @@
         "build" : {
             "requires" : {
                 "Carp" : "0",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "File::Spec" : "0",
-                "FindBin" : "1.42",
                 "IO::Socket" : "0",
-                "POSIX" : "0",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
             }
         },
         "configure" : {
             "requires" : {
                 "Carp" : "0",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "File::Spec" : "0",
-                "FindBin" : "1.42",
                 "IO::Socket" : "0",
-                "POSIX" : "0",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
             }
         },
         "runtime" : {
             "requires" : {
                 "Carp" : "0",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "File::Spec" : "0",
-                "FindBin" : "1.42",
                 "IO::Socket" : "0",
-                "POSIX" : "0",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
             }
         },
         "test" : {
             "requires" : {
                 "Carp" : "0",
-                "Config" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "File::Spec" : "0",
-                "FindBin" : "1.42",
                 "IO::Socket" : "0",
-                "POSIX" : "0",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
             }
         }
     },
     "provides" : {
         "HTTP::Handy" : {
             "file" : "lib/HTTP/Handy.pm",
-            "version" : "1.00"
+            "version" : "1.01"
         },
         "HTTP::Handy::Input" : {
             "file" : "lib/HTTP/Handy.pm",
-            "version" : "1.00"
+            "version" : "1.01"
         }
     }
 }

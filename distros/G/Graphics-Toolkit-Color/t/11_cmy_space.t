@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 47;
+use Test::More tests => 51;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
 my $module = 'Graphics::Toolkit::Color::Space::Instance::CMY';
@@ -10,9 +10,13 @@ my $module = 'Graphics::Toolkit::Color::Space::Instance::CMY';
 my $space = eval "require $module";
 is( not($@), 1, 'could load the module');
 is( ref $space, 'Graphics::Toolkit::Color::Space', 'got space object by loading module');
-is( $space->name,       'CMY',                     'color space has right name');
-is( $space->alias,         '',                     'color space has no alias name');
-is( $space->axis_count,     3,                     'CMY color space has 3 axis');
+is( $space->name,              'CMY',              'color space has right name');
+is( $space->alias,                '',              'color space has no alias name');
+is( $space->is_name('CMY'),        1,              'asked for right space name');
+is( $space->is_name('CMYK'),       0,              'asked for right space name');
+is( $space->axis_count,            3,              'CMY color space has 3 axis');
+is( $space->is_euclidean,          1,              'CMY is euclidean');
+is( $space->is_cylindrical,        0,              'CMY is not cylindrical');
 
 is( ref $space->check_value_shape( [0,0,0]),    'ARRAY',   'check CMY values works on lower bound values');
 is( ref $space->check_value_shape( [1, 1, 1]),  'ARRAY',   'check CMY values works on upper bound values');

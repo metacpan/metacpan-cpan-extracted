@@ -30,6 +30,7 @@ t/overload.t
 t/overload_cross_class.t
 t/overload_mod.t
 t/overload_op_eq.t
+t/overload_pow_integer.t
 t/overload_str.t
 t/overload_switch.t
 t/use64bitint.t

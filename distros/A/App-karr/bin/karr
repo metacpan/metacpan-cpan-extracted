@@ -6,6 +6,11 @@ use strict;
 use warnings;
 use App::karr;
 
+if (@ARGV) {
+    $ARGV[0] = 'setrefs' if $ARGV[0] eq 'set-refs';
+    $ARGV[0] = 'getrefs' if $ARGV[0] eq 'get-refs';
+}
+
 App::karr->new_with_cmd;
 
 __END__
@@ -20,7 +25,230 @@ karr - Kanban Assignment & Responsibility Registry
 
 =head1 VERSION
 
-version 0.003
+version 0.101
+
+=head1 SYNOPSIS
+
+    karr init --name "My Project"
+    karr create "Fix login bug" --priority high
+    karr move 1 in-progress --claim swift-fox
+    karr board
+    karr backup > karr-backup.yml
+
+=head1 DESCRIPTION
+
+F<karr> is the primary command line interface for L<App::karr>. It manages a
+Git-native kanban board whose canonical state lives in C<refs/karr/*>, plus
+optional helper payloads in non-protected refs outside that namespace.
+
+Run it from inside a Git repository. Commands discover the repository root,
+pull the current board refs, materialize a temporary board view for the command
+run, and then write changes back to Git refs. In normal use this means you can
+interact with shared task state without checking a persistent F<karr/>
+directory into the work tree.
+
+The script is the best starting point when you want to understand the CLI as a
+user. For architecture notes, Docker background, and Perl-facing examples, see
+L<App::karr>.
+
+=head1 CLI WORKFLOW
+
+A typical session looks like this:
+
+=over 4
+
+=item 1.
+
+Create the board once with L<App::karr::Cmd::Init>.
+
+=item 2.
+
+Add and inspect tasks with L<App::karr::Cmd::Create>,
+L<App::karr::Cmd::List>, L<App::karr::Cmd::Show>, and
+L<App::karr::Cmd::Board>.
+
+=item 3.
+
+Progress work with L<App::karr::Cmd::Move>, L<App::karr::Cmd::Edit>,
+L<App::karr::Cmd::Pick>, and L<App::karr::Cmd::Handoff>.
+
+=item 4.
+
+Export, restore, or remove board state with L<App::karr::Cmd::Backup>,
+L<App::karr::Cmd::Restore>, and L<App::karr::Cmd::Destroy>.
+
+=back
+
+=head1 COMMANDS
+
+=head2 Board Setup And Configuration
+
+=over 4
+
+=item * L<App::karr::Cmd::Init>
+
+Creates the initial board in C<refs/karr/*> and can install the bundled
+project skill for Claude Code.
+
+=item * L<App::karr::Cmd::Config>
+
+Shows or updates writable board settings such as the board name, defaults, and
+claim timeout.
+
+=item * L<App::karr::Cmd::Context>
+
+Generates a compact board summary for embedding into files such as F<AGENTS.md>.
+
+=item * L<App::karr::Cmd::Skill>
+
+Installs, checks, updates, or prints the bundled skill file for Claude Code,
+Codex, and Cursor.
+
+=back
+
+=head2 Task Lifecycle
+
+=over 4
+
+=item * L<App::karr::Cmd::Create>
+
+Creates a new task card.
+
+=item * L<App::karr::Cmd::List>
+
+Lists tasks with filters for status, priority, tags, claims, and text search.
+
+=item * L<App::karr::Cmd::Show>
+
+Shows the full task document for one task id.
+
+=item * L<App::karr::Cmd::Edit>
+
+Updates task metadata, body text, claims, and blocked state.
+
+=item * L<App::karr::Cmd::Move>
+
+Moves tasks between statuses, including relative moves with C<--next> and
+C<--prev>.
+
+=item * L<App::karr::Cmd::Delete>
+
+Deletes task refs permanently.
+
+=item * L<App::karr::Cmd::Archive>
+
+Soft-deletes tasks by moving them to the archived status.
+
+=back
+
+=head2 Board Flow And Coordination
+
+=over 4
+
+=item * L<App::karr::Cmd::Board>
+
+Shows the grouped board view.
+
+=item * L<App::karr::Cmd::Pick>
+
+Finds the next suitable task and claims it for an agent.
+
+=item * L<App::karr::Cmd::Handoff>
+
+Moves work into review and optionally appends a timestamped note.
+
+=item * L<App::karr::Cmd::Log>
+
+Prints activity log entries from C<refs/karr/log/*>.
+
+=item * L<App::karr::Cmd::AgentName>
+
+Generates short random agent names for multi-agent workflows.
+
+=item * L<App::karr::Cmd::Sync>
+
+Explicitly pulls or pushes C<refs/karr/*> when you want to inspect or control
+sync separately.
+
+=back
+
+=head2 Snapshot And Recovery
+
+=over 4
+
+=item * L<App::karr::Cmd::Backup>
+
+Exports the entire C<refs/karr/*> namespace as YAML.
+
+=item * L<App::karr::Cmd::Restore>
+
+Replaces the current board refs from a YAML snapshot. This is intentionally
+destructive and requires explicit confirmation flags.
+
+=item * L<App::karr::Cmd::Destroy>
+
+Deletes the whole board namespace from the repository.
+
+=back
+
+=head2 Helper Refs
+
+=over 4
+
+=item * L<App::karr::Cmd::SetRefs>
+
+Stores arbitrary helper payloads in allowed refs outside protected namespaces.
+
+=item * L<App::karr::Cmd::GetRefs>
+
+Fetches one helper ref and prints only its payload to standard output.
+
+=back
+
+=head1 DOCKER USAGE
+
+The CLI works well through the published Docker image. A common alias is:
+
+    alias karr='docker run --rm -it -w /work -e HOME=/home/karr \
+      -v "$(pwd):/work" \
+      -v "$HOME/.gitconfig:/home/karr/.gitconfig:ro" \
+      -v "$HOME/.claude:/home/karr/.claude" \
+      -v "$HOME/.codex:/home/karr/.codex" \
+      raudssus/karr:latest'
+
+That keeps the current repository mounted at F</work> and lets the default
+image adapt its runtime uid and gid to the owner of the mounted workspace. The
+CLI syntax stays the same after that:
+
+    karr board
+    karr skill install --agent codex --global --force
+
+If you prefer a fixed non-root runtime, use C<raudssus/karr:user> instead. That
+image defaults to uid and gid C<1000:1000> and is intended as the predictable
+base for downstream custom images. Custom fixed-user derivatives can override
+C<KARR_UID> and C<KARR_GID> at build time.
+
+=head1 EXAMPLES
+
+Initialize a new board and install the project-local Claude Code skill:
+
+    karr init --name "HandyIntelligence Prototype" --claude-skill
+
+Claim and start the next task for a generated agent:
+
+    NAME=$(karr agentname)
+    karr pick --claim "$NAME" --move in-progress
+
+Export the board before trying a destructive restore:
+
+    karr backup > karr-backup.yml
+    karr restore --yes < karr-backup.yml
+
+=head1 SEE ALSO
+
+L<App::karr>, L<App::karr::Task>, L<App::karr::BoardStore>,
+L<App::karr::Git>, L<App::karr::Cmd::Init>, L<App::karr::Cmd::Skill>,
+L<App::karr::Cmd::Backup>, L<App::karr::Cmd::Restore>
 
 =head1 SUPPORT
 
@@ -28,6 +256,10 @@ version 0.003
 
 Please report bugs and feature requests on GitHub at
 L<https://github.com/Getty/p5-app-karr/issues>.
+
+=head2 IRC
+
+Join C<#ai> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
