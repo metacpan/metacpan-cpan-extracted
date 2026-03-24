@@ -86,7 +86,7 @@ sub _read_fixed {
     while (length($buf) < $n) {
         my $got = sysread($fh, my $chunk, $n - length($buf));
         die "sysread fh: $!\n" unless defined $got;
-        return undef unless $got;
+        return unless $got;
         $buf .= $chunk;
     }
     return $buf;
@@ -191,6 +191,14 @@ _send(MSG_BYE, S_CTRL);
 # $fh must stay alive for the lifetime of the executor (keeps anon inode open;
 # for NAMED, File::Temp destructor removes the file only on global destruction,
 # which runs after END blocks).
+# Resolve an anonymous fd to a filesystem path for do().
+sub _fd_path {
+    my ($fd) = @_;
+    return "/proc/self/fd/$fd" if -r "/proc/self/fd/$fd";
+    return "/dev/fd/$fd"       if -r "/dev/fd/$fd";
+    return;
+}
+
 sub _make_tmpfile {
     my ($source, $strategy) = @_;
     if ($strategy == 1 || $strategy == 2) {
@@ -198,25 +206,37 @@ sub _make_tmpfile {
         my $O_TMPFILE = eval { Fcntl::O_TMPFILE() };
         if (defined $O_TMPFILE) {
             if (sysopen(my $fh, '/tmp', O_RDWR | $O_TMPFILE)) {
-                print $fh $source;
-                seek $fh, 0, 0;
-                return (undef, $fh);
+                my $fdpath = _fd_path(fileno($fh));
+                if (defined $fdpath) {
+                    print $fh $source  or die "print tmpfile: $!\n";
+                    seek $fh, 0, 0     or die "seek tmpfile: $!\n";
+                    return ($fdpath, $fh);
+                }
             }
         }
-        return _make_tmpfile($source, 3) if $strategy == 1;   # auto: try perl
+        if ($strategy == 1) {                                  # auto: try perl, then named
+            my @r = eval { _make_tmpfile($source, 3) };
+            return @r if @r;
+            return _make_tmpfile($source, 4);
+        }
         die "tmpfile strategy 'linux' unavailable on this system\n";
     }
     if ($strategy == 3) {
         open(my $fh, '+>', undef) or die "open anon tmpfile: $!\n";
-        print $fh $source;
-        seek $fh, 0, 0;
-        return (undef, $fh);
+        my $fdpath = _fd_path(fileno($fh));
+        if (defined $fdpath) {
+            print $fh $source  or die "print tmpfile: $!\n";
+            seek $fh, 0, 0     or die "seek tmpfile: $!\n";
+            return ($fdpath, $fh);
+        }
+        close $fh;
+        die "tmpfile strategy 'perl' unavailable: no /proc/self/fd or /dev/fd\n";
     }
     if ($strategy == 4) {
         require File::Temp;
         my $fh = File::Temp->new(UNLINK => 1);
-        print $fh $source;
-        $fh->flush;
+        print $fh $source  or die "print tmpfile: $!\n";
+        $fh->flush         or die "flush tmpfile: $!\n";
         return ($fh->filename, $fh);
     }
     die "unknown tmpfile strategy: $strategy\n";
@@ -305,8 +325,7 @@ sub _do_run {
             $eval_err = $@;
         }
         else {
-            my ($path, $tmpfh) = _make_tmpfile($source, $flags);
-            my $dopath = defined $path ? $path : "/proc/self/fd/" . fileno($tmpfh);
+            my ($dopath, $tmpfh) = _make_tmpfile($source, $flags);
             # Same pragma stripping as eval mode: do FILE inherits %^H from its
             # calling scope, so strict/warnings must be cleared here.
             # Capture $@ inside the block: do FILE sets it for compile errors but
@@ -383,6 +402,7 @@ sub _relay {
         # -- Protocol pipe -----------------------------------------------------
         if (vec($r, fileno($PIN), 1)) {
             my $n = sysread($PIN, my $data, 65536);
+            die "sysread protocol pipe: $!\n" unless defined $n;
             unless ($n) { $done = 1; last RELAY }
             $pbuf .= $data;
 
@@ -450,6 +470,7 @@ sub _relay {
         # -- Executor stdout ---------------------------------------------------
         if (!$stdout_eof && vec($r, fileno($stdout_r), 1)) {
             my $n = sysread($stdout_r, my $data, 65536);
+            die "sysread stdout: $!\n" unless defined $n;
             if ($n) {
                 $stdout_buf .= $data;
                 _flush_buf(S_STDOUT, \$stdout_buf);
@@ -463,6 +484,7 @@ sub _relay {
         # -- Executor stderr ---------------------------------------------------
         if (!$stderr_eof && vec($r, fileno($stderr_r), 1)) {
             my $n = sysread($stderr_r, my $data, 65536);
+            die "sysread stderr: $!\n" unless defined $n;
             if ($n) {
                 $stderr_buf .= $data;
                 _flush_buf(S_STDERR, \$stderr_buf);

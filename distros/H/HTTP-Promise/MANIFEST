@@ -49,6 +49,7 @@ lib/HTTP/Promise/Stream/UU.pm
 LICENSE
 Makefile.PL
 MANIFEST
+pm_to_blib
 README
 README.md
 SIGNATURE			Public-key signature (added by MakeMaker)

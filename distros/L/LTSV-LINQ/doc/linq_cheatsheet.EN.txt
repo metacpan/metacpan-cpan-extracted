@@ -1,0 +1,186 @@
+======================================================================
+ LTSV::LINQ Cheat Sheet                                    [EN] English
+======================================================================
+
+[ 1. Creating a query ]
+
+  use LTSV::LINQ;
+
+  # From an LTSV log file
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+
+  # From an array of hashrefs (or scalars)
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+
+  # Empty sequence
+  my $q = LTSV::LINQ->Empty();
+
+  # Integer range: 1, 2, 3, 4, 5
+  my $q = LTSV::LINQ->Range(1, 5);
+
+  # Repeat a value N times: "x", "x", "x"
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  # Note: each terminal method exhausts the iterator.
+  # Call From() / FromLTSV() again to reuse the data.
+
+[ 2. Filtering ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{ua} && $_[0]{ua} ne '' })
+
+[ 3. Projection ]
+
+  # Select: transform each element
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+
+  # SelectMany: flatten nested arrays (selector must return ARRAY ref)
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+[ 4. Sorting ]
+
+  # Primary sort -- smart comparison (numeric when both keys look numeric)
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+
+  # Primary sort -- force numeric comparison
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+
+  # Primary sort -- force string comparison (cmp)
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+
+  # Secondary sort key (chain after any OrderBy*)
+  ->ThenBy(sub { $_[0]{name} })              # smart
+  ->ThenByDescending(sub { $_[0]{score} })   # smart descending
+  ->ThenByNum(sub { $_[0]{age} })            # numeric
+  ->ThenByNumDescending(sub { $_[0]{age} })  # numeric descending
+  ->ThenByStr(sub { $_[0]{name} })           # string
+  ->ThenByStrDescending(sub { $_[0]{name} }) # string descending
+
+  # Reverse: reverse any sequence
+  ->Reverse()
+
+[ 5. Paging ]
+
+  ->Skip(10)                               # skip first 10 elements
+  ->Take(5)                                # take next 5 elements
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+[ 6. Grouping ]
+
+  # GroupBy: returns array of { Key => '...', Elements => [...] }
+  my @groups = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  for my $g (@groups) {
+      print $g->{Key}, ": ", scalar @{$g->{Elements}}, "\n";
+  }
+
+  # ToLookup: returns hashref of arrayrefs
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Eng} };
+
+  # ToLookup with value selector
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. Set operations ]
+
+  ->Distinct()                         # remove duplicates (by value)
+  ->Distinct(sub { $_[0]{id} })        # remove duplicates by key
+  ->Union($other_q)                    # union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} }) # union by key
+  ->Intersect($other_q)                # elements in both
+  ->Intersect($other_q, sub { ... })   # by key
+  ->Except($other_q)                   # elements not in other
+  ->Except($other_q, sub { ... })      # by key
+  ->SequenceEqual($other_q)            # true if both sequences are equal
+
+[ 8. Joins ]
+
+  # Join (inner join)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },               # outer key selector
+      sub { $_[0]{id} },                    # inner key selector
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }       # result selector
+  )
+
+  # GroupJoin (left outer join)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                    # outer key selector
+      sub { $_[0]{dept_id} },               # inner key selector
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+[ 9. Aggregation (terminal methods) ]
+
+  ->ToArray()                           # collect all into a Perl array
+  ->ToList()                            # same as ToArray() (alias)
+  ->Count()                             # number of elements
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{score} })           # sum of selector values
+  ->Average(sub { $_[0]{score} })       # arithmetic mean (dies if empty)
+  ->AverageOrDefault(sub { $_[0]{score} })  # mean or undef if empty
+  ->Min(sub { $_[0]{score} })           # minimum
+  ->Max(sub { $_[0]{score} })           # maximum
+  ->First()                             # first element (dies if empty)
+  ->First(sub { $_[0] > 5 })            # first matching (dies if none)
+  ->FirstOrDefault()                    # first element or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first matching or undef
+  ->Last()                              # last element (dies if empty)
+  ->Last(sub { $_[0] > 5 })             # last matching (dies if none)
+  ->LastOrDefault()                     # last element or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last matching or undef
+  ->Single()                            # exactly one element (dies otherwise)
+  ->Single(sub { $_[0] > 5 })           # exactly one matching (dies otherwise)
+  ->SingleOrDefault()                   # one element or undef (dies if >1)
+  ->SingleOrDefault(sub { $_[0] > 5 })  # one matching or undef (dies if >1)
+  ->ElementAt($n)                       # element at index $n, 0-based (dies if OOB)
+  ->ElementAtOrDefault($n)              # element at $n or undef if out of range
+  ->Any()                               # true if any element exists
+  ->Any(sub { $_[0] > 5 })              # true if predicate matches any
+  ->All(sub { $_[0] > 0 })              # true if predicate matches all
+  ->Contains($value)                    # true if value is present
+  ->ForEach(sub { print $_[0] })        # execute side-effect for each element
+  ->Aggregate($seed, sub { $_[0] + $_[1] }) # custom fold/reduce
+
+[ 10. Other sequence methods ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # yield $default if sequence is empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine two sequences element-by-element
+
+[ 11. Conversion methods ]
+
+  ->ToArray()                           # returns plain Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')              # write sequence to an LTSV file
+
+[ 12. Official resources ]
+
+  LTSV::LINQ on MetaCPAN:
+    https://metacpan.org/dist/LTSV-LINQ
+
+  LTSV format specification:
+    http://ltsv.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  HTTP::Handy (writes LTSV access logs that LTSV::LINQ can query):
+    https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

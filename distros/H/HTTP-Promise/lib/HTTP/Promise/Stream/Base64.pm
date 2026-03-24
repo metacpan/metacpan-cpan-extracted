@@ -61,7 +61,7 @@ sub decode_b64
     if( !defined( $rv ) )
     {
         $Base64Error = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -104,7 +104,7 @@ sub encode_b64
     if( !defined( $rv ) )
     {
         $Base64Error = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -115,13 +115,23 @@ sub encode_b64
 
 sub is_decoder_installed
 {
-    eval( 'use Crypt::Misc ();' );
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require Crypt::Misc;
+    };
     return( $@ ? 0 : 1 );
 }
 
 sub is_encoder_installed
 {
-    eval( 'use Crypt::Misc ();' );
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require Crypt::Misc;
+    };
     return( $@ ? 0 : 1 );
 }
 

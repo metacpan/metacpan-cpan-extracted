@@ -1,6 +1,6 @@
 {
     "name" : "HTTP-Handy",
-    "version" : "1.01",
+    "version" : "1.02",
     "abstract" : "A tiny HTTP/1.0 server for Perl 5.5.3+",
     "author" : [
         "ina <ina@cpan.org>"
@@ -73,11 +73,11 @@
     "provides" : {
         "HTTP::Handy" : {
             "file" : "lib/HTTP/Handy.pm",
-            "version" : "1.01"
+            "version" : "1.02"
         },
         "HTTP::Handy::Input" : {
             "file" : "lib/HTTP/Handy.pm",
-            "version" : "1.01"
+            "version" : "1.02"
         }
     }
 }

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers.pm
-## Version v0.3.1
+## Version v0.3.2
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2025/10/19
+## Modified 2025/10/25
 ## All rights reserved.
 ## 
 ## 
@@ -25,7 +25,6 @@ BEGIN
     use HTTP::XSHeaders 0.400004;
     use IO::File;
     use Module::Generic::Global qw( :const );
-    # use Nice::Try;
     use Scalar::Util;
     use URI::Escape::XS ();
     use Wanted;
@@ -47,7 +46,7 @@ BEGIN
     use constant CRLF => "\015\012";
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $SUPPORTED = {};
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.2';
 };
 
 use strict;
@@ -418,14 +417,14 @@ sub content_type
         {
             $self->{type} = '';
         }
-        
+
         return( $self->new_scalar( ref( $v ) ? "$v" : \$v ) );
     }
     else
     {
         $v = $self->header( 'Content-Type' );
     }
-    
+
     if( defined( $v ) )
     {
         return( $self->new_scalar( ref( $v ) ? "$v" : \$v ) );
@@ -501,13 +500,13 @@ sub decode_filename
                     $encfile = Crypt::Misc::decode_b64( $encfile );
                 }
             };
-            
+
             if( $@ )
             {
                 # return( $self->error( "Error decoding content disposition file name: $e" ) );
                 warn( "Error decoding content disposition file name: $@" ) if( warnings::enabled( 'HTTP::Promise' ) );
             }
-            
+
             eval
             {
                 $self->_load_class( 'Encode' ) || return( $self->pass_error );
@@ -515,7 +514,7 @@ sub decode_filename
                 Encode::from_to( $encfile, $charset, 'locale_fs' );
                 $fname = $encfile;
             };
-            
+
             if( $@ )
             {
                 # return( $self->error( "Error encoding content disposition file name: $e" ) );
@@ -892,11 +891,11 @@ sub message
                 $stderr_raw->print( "Error trying to get the global Apache2::ApacheRec: $@\n" );
             }
         }
-    
+
         my $ref;
         $ref = $self->message_check( @_ );
         return(1) if( !$ref );
-        
+
         my $opts = {};
         $opts = pop( @$ref ) if( ref( $ref->[-1] ) eq 'HASH' );
 
@@ -956,7 +955,7 @@ sub message
         my $mesg_raw = $opts->{caller_info} ? ( "${pkg}::${sub2}( $self ) [$line]${proc_info}: " . $txt ) : $txt;
         $mesg_raw    =~ s/\n$//gs;
         my $mesg = "${prefix} " . join( "\n${prefix} ", split( /\n/, $mesg_raw ) );
-        
+
         my $info = 
         {
         'formatted' => $mesg,
@@ -968,7 +967,7 @@ sub message
         'level'     => ( $_[0] =~ /^\d+$/ ? $_[0] : CORE::exists( $opts->{level} ) ? $opts->{level} : 0 ),
         };
         $info->{type} = $opts->{type} if( $opts->{type} );
-        
+
         ## If Mod perl is activated AND we are not using a private log
         if( $r && !${ "${class}::LOG_DEBUG" } )
         {
@@ -1432,7 +1431,20 @@ sub replace
 {
     my $self = shift( @_ );
     my( $field, $value ) = @_;
-    $self->header( $field => $value );
+    unless( defined( $field ) && length( $field // '' ) )
+    {
+        return( $self->error( "No header name was provided." ) );
+    }
+    ( my $meth = $field ) =~ tr/-/_/;
+    $meth = lc( $meth );
+    if( my $ref = $self->can( $meth ) )
+    {
+        $ref->( $self, $value );
+    }
+    else
+    {
+        $self->header( $field => $value );
+    }
     return( $self );
 }
 
@@ -1622,32 +1634,32 @@ sub _date_header
         $opts->{time_zone} = 'GMT' if( !defined( $opts->{time_zone} ) || !length( $opts->{time_zone} ) );
         require Module::Generic::DateTime;
         require DateTime::Format::Strptime;
-        if( $this =~ /^\d+$/ )
+        if( ref( $this ) && Scalar::Util::blessed( $this ) && $this->isa( 'Module::Generic::DateTime' ) )
+        {
+            # Ok, pass through
+        }
+        elsif( ref( $this ) && Scalar::Util::blessed( $this ) && $this->isa( 'DateTime' ) )
+        {
+            $this = Module::Generic::DateTime->new( $this );
+        }
+        elsif( $this =~ /^\d+$/ )
         {
             # try-catch
             local $@;
             eval
             {
-                $this = Module::Generic::DateTime->from_epoch( epoch => $this, time_zone => $opts->{time_zone} );
+                $this = Module::Generic::DateTime->from_epoch( epoch => "$this", time_zone => $opts->{time_zone} );
             };
             if( $@ )
             {
                 return( $self->error( "An error occurred while trying to get the DateTime object for epoch value '$this': $@" ) );
             }
         }
-        elsif( Scalar::Util::blessed( $this ) && $this->isa( 'DateTime' ) )
-        {
-            $this = Module::Generic::DateTime->new( $this );
-        }
-        elsif( Scalar::Util::blessed( $this ) && $this->isa( 'Module::Generic::DateTime' ) )
-        {
-            # Ok, pass through
-        }
         else
         {
             return( $self->error( "I was expecting an integer representing a unix time or a DateTime object, but instead got '$this'." ) );
         }
-        
+
         # try-catch
         local $@;
         eval
@@ -1673,15 +1685,10 @@ sub _date_header
         return( $v ) if( !defined( $v ) || !length( "${v}" ) );
         if( !length( "$v" ) || ( ref( $v ) && !overload::Method( $v, '""' ) ) )
         {
-            warn( "I do not know what to do with this supposedly datetime header value '$v'\n" ) if( length( "$v" ) );
-#             if( want( 'OBJECT' ) )
-#             {
-#                 require Module::Generic::Null;
-#                 rreturn( Module::Generic::Null->new );
-#             }
+            warn( "I do not know what to do with this supposedly datetime header $f with value '$v'\n" ) if( length( "$v" ) );
             return( '' );
         }
-        
+
         # try-catch
         local $@;
         eval
@@ -1795,7 +1802,7 @@ sub _header_set
             push( @args, "$f" => $v );
         }
     }
-    
+
     # try-catch
     local $@;
     eval
@@ -2201,7 +2208,7 @@ sub THAW
     my $headers = ( CORE::exists( $hash->{_headers_to_restore} ) && CORE::ref( $hash->{_headers_to_restore} ) eq 'ARRAY' )
         ? CORE::delete( $hash->{_headers_to_restore} )
         : [];
-    
+
     my $new = $class->new( @$headers );
     foreach( CORE::keys( %$hash ) )
     {
@@ -2241,7 +2248,7 @@ HTTP::Promise::Headers - HTTP Headers Class
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 
@@ -2351,11 +2358,11 @@ This takes a file name from the C<Content-Disposition> header value typically an
 For example:
 
     Content-Disposition: form-data; name="fileField"; filename*=UTF-8''%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.txt
- 
+
     my $fname = $h->decode_filename( "UTF-8''%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.txt" );
- 
+
  or
- 
+
     Content-Disposition: form-data; name="fileField"; filename*=UTF-8'ja-JP'%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.txt
 
     my $fname = $h->decode_filename( "UTF-8'ja-JP'%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.txt" );

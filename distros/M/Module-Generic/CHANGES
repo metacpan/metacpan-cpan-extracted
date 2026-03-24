@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Generic
 
+v1.2.5 2026-03-22T22:04:02+0900
+    - Corrected Module::Generic::Number to return a number to JSON
+    - Corrected DESTROY in Module::Generic::Scalar::IO
+
 v1.2.4 2026-03-14T08:53:46+0900
     - Fixed SEGV on exit in threaded Perl by protecting Module::Generic::Global END block
       and Module::Generic DESTROY against use-after-free on shared data

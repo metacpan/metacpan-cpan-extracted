@@ -8,6 +8,7 @@ use Test::Vars;
 use lib 'lib';
 
 use Test::Mockingbird;
+use Test::Mockingbird::TimeTravel;
 use_ok('Test::Mockingbird::DeepMock');
 
 # ----------------------------------------------------------------------
@@ -183,97 +184,288 @@ subtest 'deep_mock basic function-level integration' => sub {
 };
 
 subtest 'mock_return basic behaviour' => sub {
-    {
-        package Edge::Target;
-        sub x { return 'orig' }
-    }
+	{
+		package Edge::Target;
+		sub x { return 'orig' }
+	}
 
-    mock_return 'Edge::Target::x' => 123;
+	mock_return 'Edge::Target::x' => 123;
 
-    is Edge::Target::x(), 123, 'mock_return overrides method';
+	is Edge::Target::x(), 123, 'mock_return overrides method';
 
-    restore_all();
+	restore_all();
 };
 
 subtest 'mock_exception basic behaviour' => sub {
-    {
-        package Edge::Target;
-        sub y { return 'orig' }
-    }
+	{
+		package Edge::Target;
+		sub y { return 'orig' }
+	}
 
-    mock_exception 'Edge::Target::y' => 'boom';
+	mock_exception 'Edge::Target::y' => 'boom';
 
-    dies_ok { Edge::Target::y() } 'mock_exception throws';
-    like $@, qr/boom/, 'exception message matches';
+	dies_ok { Edge::Target::y() } 'mock_exception throws';
+	like $@, qr/boom/, 'exception message matches';
 
-    restore_all();
+	restore_all();
 };
 
 subtest 'mock_sequence basic behaviour' => sub {
-    {
-        package Edge::Target;
-        sub z { return 'orig' }
-    }
+	{
+		package Edge::Target;
+		sub z { return 'orig' }
+	}
 
-    mock_sequence 'Edge::Target::z' => (10, 20, 30);
+	mock_sequence 'Edge::Target::z' => (10, 20, 30);
 
-    is Edge::Target::z(), 10, 'first value';
-    is Edge::Target::z(), 20, 'second value';
-    is Edge::Target::z(), 30, 'third value';
-    is Edge::Target::z(), 30, 'sequence repeats last value';
+	is Edge::Target::z(), 10, 'first value';
+	is Edge::Target::z(), 20, 'second value';
+	is Edge::Target::z(), 30, 'third value';
+	is Edge::Target::z(), 30, 'sequence repeats last value';
 
-    restore_all();
+	restore_all();
 };
 
 subtest 'mock_once basic behaviour' => sub {
-    {
-        package Edge::Target;
-        sub a { return 'orig' }
-    }
+	{
+		package Edge::Target;
+		sub a { return 'orig' }
+	}
 
-    mock_once 'Edge::Target::a' => sub { 'once' };
+	mock_once 'Edge::Target::a' => sub { 'once' };
 
-    is Edge::Target::a(), 'once', 'first call uses mock_once';
-    is Edge::Target::a(), 'orig', 'second call restored original';
+	is Edge::Target::a(), 'once', 'first call uses mock_once';
+	is Edge::Target::a(), 'orig', 'second call restored original';
 
-    restore_all();
+	restore_all();
 };
 
 subtest 'restore basic behaviour' => sub {
-    {
-        package Edge::Restore;
-        sub a { return 'orig' }
-    }
+	{
+		package Edge::Restore;
+		sub a { return 'orig' }
+	}
 
-    mock_return 'Edge::Restore::a' => 'mocked';
+	mock_return 'Edge::Restore::a' => 'mocked';
 
-    is Edge::Restore::a(), 'mocked', 'mock applied';
+	is Edge::Restore::a(), 'mocked', 'mock applied';
 
-    restore 'Edge::Restore::a';
+	restore 'Edge::Restore::a';
 
-    is Edge::Restore::a(), 'orig', 'restore restored original';
+	is Edge::Restore::a(), 'orig', 'restore restored original';
 
-    restore_all();
+	restore_all();
 };
 
 subtest 'diagnose_mocks basic structure' => sub {
-    {
-        package DM::F1;
-        sub a { 1 }
-    }
+	{
+		package DM::F1;
+		sub a { 1 }
+	}
 
-    mock_return 'DM::F1::a' => 42;
+	mock_return 'DM::F1::a' => 42;
 
-    my $diag = diagnose_mocks();
+	my $diag = diagnose_mocks();
 
-    ok exists $diag->{'DM::F1::a'}, 'entry exists';
-    is $diag->{'DM::F1::a'}{depth}, 1, 'depth correct';
+	ok exists $diag->{'DM::F1::a'}, 'entry exists';
+	is $diag->{'DM::F1::a'}{depth}, 1, 'depth correct';
 
-    is $diag->{'DM::F1::a'}{layers}[0]{type}, 'mock_return', 'type recorded';
+	is $diag->{'DM::F1::a'}{layers}[0]{type}, 'mock_return', 'type recorded';
 
-    restore_all();
+	restore_all();
 };
 
+# We will test internal helpers by reaching into the package
+# (white‑box: allowed and intentional)
+{
+	package TT;
+	our $parse = \&Test::Mockingbird::TimeTravel::_parse_datetime;
+	our $ensure = \&Test::Mockingbird::TimeTravel::_ensure_active;
+	our $install = \&Test::Mockingbird::TimeTravel::_install_time_mocks;
+}
 
 # ----------------------------------------------------------------------
+# Internal helper: _parse_datetime
+# ----------------------------------------------------------------------
+
+subtest '_parse_datetime parses valid formats' => sub {
+	my $epoch = $TT::parse->('2025-01-01T00:00:00Z');
+	ok $epoch =~ /^\d+$/, 'epoch returned';
+
+	my $epoch2 = $TT::parse->('2025-01-01 12:34:56');
+	ok $epoch2 > $epoch, 'later timestamp parsed';
+
+	my $epoch3 = $TT::parse->('2025-01-01');
+	ok $epoch3 == $TT::parse->('2025-01-01T00:00:00Z'),
+		'date‑only defaults to midnight UTC';
+};
+
+subtest '_parse_datetime rejects invalid formats' => sub {
+	dies_ok { $TT::parse->('not-a-date') } 'invalid string dies';
+	dies_ok { $TT::parse->('2025/01/01') } 'wrong separator dies';
+	dies_ok { $TT::parse->(undef) }		'undef dies';
+};
+
+# ----------------------------------------------------------------------
+# Internal helper: _ensure_active
+# ----------------------------------------------------------------------
+
+subtest '_ensure_active dies when no freeze_time called' => sub {
+	# Reset state by restoring all mocks
+	restore_all();
+
+	dies_ok { $TT::ensure->() } '_ensure_active dies when inactive';
+};
+
+# ----------------------------------------------------------------------
+# freeze_time
+# ----------------------------------------------------------------------
+
+subtest 'freeze_time sets epoch and installs mocks' => sub {
+	restore_all();
+
+	my $epoch = freeze_time('2025-01-01T00:00:00Z');
+	ok $epoch =~ /^\d+$/, 'freeze_time returns epoch';
+
+	is now(), $epoch, 'now() returns frozen time';
+
+	my @lt = localtime();
+	ok @lt == 9, 'localtime returns list';
+
+	my @gt = gmtime();
+	ok @gt == 9, 'gmtime returns list';
+
+	restore_all();
+};
+
+subtest 'freeze_time accepts raw epoch' => sub {
+	restore_all();
+
+	my $epoch = freeze_time(1234567890);
+	is now(), 1234567890, 'raw epoch accepted';
+
+	restore_all();
+};
+
+# ----------------------------------------------------------------------
+# travel_to
+# ----------------------------------------------------------------------
+
+subtest 'travel_to moves time forward' => sub {
+	restore_all();
+
+	freeze_time('2025-01-01T00:00:00Z');
+	my $t1 = now();
+
+	travel_to('2025-01-01T01:00:00Z');
+	my $t2 = now();
+
+	ok $t2 > $t1, 'travel_to updated epoch';
+
+	restore_all();
+};
+
+subtest 'travel_to dies when inactive' => sub {
+	restore_all();
+	dies_ok { travel_to('2025-01-01T00:00:00Z') } 'travel_to dies when inactive';
+};
+
+# ----------------------------------------------------------------------
+# advance_time / rewind_time
+# ----------------------------------------------------------------------
+
+subtest 'advance_time increments epoch' => sub {
+	restore_all();
+
+	freeze_time('2025-01-01T00:00:00Z');
+	my $t1 = now();
+
+	advance_time(60);
+	is now(), $t1 + 60, 'advance_time +60 seconds';
+
+	advance_time(2 => 'minutes');
+	is now(), $t1 + 60 + 120, 'advance_time +2 minutes';
+
+	restore_all();
+};
+
+subtest 'rewind_time decrements epoch' => sub {
+	restore_all();
+
+	freeze_time('2025-01-01T00:00:00Z');
+	my $t1 = now();
+
+	rewind_time(30);
+	is now(), $t1 - 30, 'rewind_time -30 seconds';
+
+	rewind_time(1 => 'hour');
+	is now(), $t1 - 30 - 3600, 'rewind_time -1 hour';
+
+	restore_all();
+};
+
+subtest 'advance_time dies when inactive' => sub {
+	restore_all();
+	dies_ok { advance_time(10) } 'advance_time dies when inactive';
+};
+
+# ----------------------------------------------------------------------
+# with_frozen_time
+# ----------------------------------------------------------------------
+
+subtest 'with_frozen_time runs code under frozen time' => sub {
+	restore_all();
+
+	my $outer = freeze_time('2025-01-01T00:00:00Z');
+	my $inner;
+
+	with_frozen_time '2025-01-02T00:00:00Z' => sub {
+		$inner = now();
+	};
+
+	is $inner, $TT::parse->('2025-01-02T00:00:00Z'),
+		'inner block sees overridden time';
+
+	is now(), $outer, 'outer time restored after block';
+
+	restore_all();
+};
+
+subtest 'with_frozen_time dies on invalid args' => sub {
+	restore_all();
+
+	dies_ok { with_frozen_time undef => sub {} } 'undef datetime dies';
+	dies_ok { with_frozen_time '2025-01-01' => 'not a coderef' }
+		'non-coderef dies';
+};
+
+# ----------------------------------------------------------------------
+# Interaction with restore_all
+# ----------------------------------------------------------------------
+
+subtest 'restore_all restores real time' => sub {
+	restore_all();
+
+	freeze_time('2025-01-01T00:00:00Z');
+
+	ok now() != CORE::time(), 'mocked time differs from real time';
+
+	restore_all();
+
+	cmp_ok abs(now() - CORE::time()), '<', 3, 'restore_all restored real time';
+};
+
+subtest '_get_protoype' => sub {
+	{
+		package Foo::Bar;
+		sub baz ($$) { }
+	}
+
+	is(Test::Mockingbird::_get_prototype('Foo::Bar::baz'), '$$', 'prototype extracted correctly');
+
+	ok(!defined Test::Mockingbird::_get_prototype('Foo::Bar::nope'), 'undefined for missing sub');
+
+	throws_ok { Test::Mockingbird::_get_prototype('NotAName') } qr/Invalid fully-qualified name/, 'invalid name throws';
+};
+
 done_testing();

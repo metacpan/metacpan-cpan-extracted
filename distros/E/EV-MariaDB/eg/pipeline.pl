@@ -23,7 +23,7 @@ my $t0 = time;
 
 # fire N queries without waiting — they pipeline automatically
 for my $i (1 .. $N) {
-    $m->query("SELECT $i AS n", sub {
+    $m->query("select $i as n", sub {
         my ($rows, $err) = @_;
         die "query $i: $err\n" if $err;
         push @results, $rows->[0][0];

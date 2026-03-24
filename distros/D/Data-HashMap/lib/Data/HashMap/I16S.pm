@@ -2,12 +2,21 @@ package Data::HashMap::I16S;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub import {
     $^H{"Data::HashMap::I16S/hm_i16s_put"}    = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_get"}    = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_remove"} = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_take"}   = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_drain"} = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_pop"}   = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_shift"} = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_reserve"} = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_purge"}   = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_capacity"} = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_persist"}  = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_swap"}    = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_exists"} = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_size"}   = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_keys"}   = 1;
@@ -15,6 +24,7 @@ sub import {
     $^H{"Data::HashMap::I16S/hm_i16s_items"}    = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_max_size"} = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_ttl"}      = 1;
+    $^H{"Data::HashMap::I16S/hm_i16s_lru_skip"} = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_each"}       = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_iter_reset"} = 1;
     $^H{"Data::HashMap::I16S/hm_i16s_clear"}      = 1;

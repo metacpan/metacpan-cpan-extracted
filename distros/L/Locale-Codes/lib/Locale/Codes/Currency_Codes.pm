@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.87';
+$VERSION='3.88';
 
 $Locale::Codes::Data{'currency'}{'id'} = '0176';
 

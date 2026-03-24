@@ -3,7 +3,7 @@ package Data::HashMap;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Data::HashMap', $VERSION);
@@ -116,23 +116,33 @@ variant prefix: C<i16>, C<i16a>, C<i16s>, C<i32>, C<i32a>, C<i32s>, C<ia>, C<ii>
     hm_xx_get $map, $key            # lookup, returns value or undef
     hm_xx_exists $map, $key         # returns bool
     hm_xx_remove $map, $key         # returns bool
-    hm_xx_size $map                 # returns entry count (includes TTL-expired not yet reaped)
-
-    # List-returning:
-    hm_xx_keys $map                 # returns list of keys
-    hm_xx_values $map               # returns list of values
-    hm_xx_items $map                # returns (k1,v1, k2,v2, ...)
+    hm_xx_take $map, $key           # remove and return value, or undef
+    hm_xx_drain $map, $n            # remove up to N entries, returns (k1,v1,...)
+    hm_xx_pop $map                  # remove+return (key,val): LRU tail or next entry
+    hm_xx_shift $map                # remove+return (key,val): LRU head or prev entry
+    hm_xx_reserve $map, $n          # pre-allocate capacity for N entries
+    hm_xx_purge $map                # force-expire all TTL'd entries
+    hm_xx_capacity $map             # current internal table capacity
+    hm_xx_persist $map, $key        # remove TTL from key (make permanent)
+    hm_xx_swap $map, $key, $new     # replace value, return old (undef if missing)
 
 Integer-value variants (I16, I32, II, SI16, SI32, SI) also provide:
 
     hm_xx_incr $map, $key           # +1, returns new value (new keys init to 0)
     hm_xx_decr $map, $key           # -1, returns new value (new keys init to 0)
     hm_xx_incr_by $map, $key, $n    # +N, returns new value (new keys init to 0)
+    hm_xx_cas $map, $key, $expected, $new  # compare-and-swap, returns bool
 
 All variants also provide:
 
+    hm_xx_size $map                 # returns entry count (includes TTL-expired not yet reaped)
+    hm_xx_keys $map                 # returns list of keys
+    hm_xx_values $map               # returns list of values
+    hm_xx_items $map                # returns (k1,v1, k2,v2, ...)
+
     hm_xx_max_size $map             # returns max_size (0 = no LRU)
     hm_xx_ttl $map                  # returns default TTL in seconds (0 = no TTL)
+    hm_xx_lru_skip $map             # returns lru_skip percentage (0 = strict LRU)
     hm_xx_clear $map                # remove all entries
     hm_xx_to_hash $map              # returns a Perl hashref snapshot
     hm_xx_each $map                            # returns (key, value) or empty list
@@ -144,18 +154,39 @@ String-value variants (SS, IS, I32S, I16S) also provide:
 
     hm_xx_get_direct $map, $key   # zero-copy get (read-only, see CAVEATS)
 
+Method-only operations (no keyword form):
+
+    $map->clone                     # deep copy the map
+    $map->from_hash(\%h)            # bulk-insert from a Perl hashref
+    $map->merge($other_map)         # merge entries from another map of same type
+    $map->freeze                    # serialize to binary string (non-SV* variants)
+    MyVariant->thaw($data)          # reconstruct map from freeze data
+
 =head1 CONSTRUCTOR
 
-    my $map  = Data::HashMap::II->new();           # plain (no LRU, no TTL)
-    my $lru  = Data::HashMap::II->new(1000);       # LRU: max 1000 entries
-    my $ttl  = Data::HashMap::II->new(0, 60);      # TTL: 60-second expiry
-    my $both = Data::HashMap::II->new(1000, 60);   # LRU + TTL
+    my $map  = Data::HashMap::II->new();              # plain (no LRU, no TTL)
+    my $lru  = Data::HashMap::II->new(1000);          # LRU: max 1000 entries
+    my $ttl  = Data::HashMap::II->new(0, 60);         # TTL: 60-second expiry
+    my $both = Data::HashMap::II->new(1000, 60);      # LRU + TTL
+    my $fast = Data::HashMap::II->new(1000, 0, 90);   # LRU + 90% skip
 
 =head2 LRU eviction
 
 When C<max_size> is set, the map acts as an LRU cache. Inserting beyond
 capacity evicts the least-recently-used entry. C<get>, C<put> (update),
 and counter operations promote the accessed entry to most-recently-used.
+
+The optional third argument C<lru_skip> (0-99) enables approximate LRU:
+only every Nth access promotes the entry, skipping the linked-list update
+the rest of the time. The tail entry (eviction candidate) is always
+promoted to prevent starvation. This trades eviction precision for speed
+on read-heavy workloads with hot keys (Zipf-like access patterns).
+
+    lru_skip=0    strict LRU (default)
+    lru_skip=90   promote every 10th access --good balance
+    lru_skip=99   promote every 100th access --near-zero overhead
+
+Recommended value for caching workloads: B<90>.
 
 =head2 TTL expiry
 
@@ -357,6 +388,8 @@ measured with 1M entries in fork-isolated processes.
 =item * Requires 64-bit Perl (C<use64bitint>); II/IS/IA/SI variants use int64 keys/values via IV
 
 =item * C<get_direct> returns a B<read-only> SV pointing at the map's internal buffer (zero-copy, no malloc). The returned value must not be held past any map mutation (C<put>, C<remove>, C<clear>, or any operation that may resize). Safe for immediate use: comparisons, printing, passing to functions. Use C<get> (the default) when you need to store the value.
+
+=item * C<freeze>/C<thaw> produces a native-endian binary format; frozen data is not portable between systems with different byte orders
 
 =back
 

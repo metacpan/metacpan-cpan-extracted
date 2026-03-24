@@ -119,6 +119,135 @@ subtest '--deploy creates tables and inserts rows' => sub {
     $dbh->disconnect;
 };
 
+subtest '--truncate empties tables but preserves structure' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    # First pass: deploy + 3 rows
+    run_cli(@base_args, '--dsn', $dsn, '--deploy', '--rows', 3, '--seed', 1);
+
+    # Verify data exists
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+    my ($author_count_before) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    is $author_count_before, 3, '3 authors before truncate';
+
+    # Second pass: truncate only (no generate)
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',     $dsn,
+        '--truncate',
+    );
+    is $exit, 0, 'exits zero after truncate';
+
+    # Verify old data is gone
+    my ($author_count_after_truncate) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    is $author_count_after_truncate, 0, '0 authors after truncate';
+
+    # Third pass: generate new data
+    ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',     $dsn,
+        '--generate',
+        '--rows',    2,
+        '--seed',    2,
+    );
+    is $exit, 0, 'exits zero after generate';
+
+    # Verify new data inserted
+    my ($author_count_after_generate) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    is $author_count_after_generate, 2, '2 authors after generate';
+
+    # Verify table structure still exists
+    my $columns = $dbh->selectcol_arrayref("PRAGMA table_info(author)");
+    ok scalar(@$columns) > 0, 'table structure preserved';
+
+    $dbh->disconnect;
+};
+
+subtest '--truncate vs --wipe cannot be used together' => sub {
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dry-run',
+        '--truncate',
+        '--wipe',
+    );
+    isnt $exit, 0, 'exits non-zero when both --truncate and --wipe supplied';
+    like $err, qr/truncate.*wipe|wipe.*truncate/i, 'error mentions the conflict';
+};
+
+subtest '--truncate with only/exclude filters' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    # Deploy and insert data
+    run_cli(@base_args, '--dsn', $dsn, '--deploy', '--rows', 5, '--seed', 42);
+
+    # Verify data exists
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+    my $authors_before = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my $books_before   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my $reviews_before = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+
+    # Truncate with only filter
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',     $dsn,
+        '--truncate',
+        '--only',    'Author',
+    );
+
+    is $exit, 0, 'truncate with only filter exits zero';
+
+    # Check that ONLY Author was truncated (others unchanged)
+    my $authors_after = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my $books_after   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my $reviews_after = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+
+    is $authors_after, 0, 'authors truncated';
+    is $books_after,   $books_before, 'books preserved';
+    is $reviews_after, $reviews_before, 'reviews preserved';
+
+    $dbh->disconnect;
+};
+
+subtest '--truncate with exclude filters' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    # Deploy and insert data
+    run_cli(@base_args, '--dsn', $dsn, '--deploy', '--rows', 5, '--seed', 43);
+
+    # Verify data exists
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+    my $authors_before = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my $books_before   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my $reviews_before = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+
+    # Truncate with exclude filter
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',     $dsn,
+        '--truncate',
+        '--exclude', 'Book',
+    );
+
+    is $exit, 0, 'truncate with exclude filter exits zero';
+
+    # Check that ALL EXCEPT Book were truncated
+    my $authors_after = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
+    my $books_after   = $dbh->selectrow_array('SELECT COUNT(*) FROM book');
+    my $reviews_after = $dbh->selectrow_array('SELECT COUNT(*) FROM review');
+
+    is $authors_after, 0, 'authors truncated';
+    is $books_after,   $books_before, 'books preserved';
+    is $reviews_after, 0, 'reviews truncated';
+
+    $dbh->disconnect;
+};
+
 subtest '--wipe resets then inserts' => sub {
     my $db  = temp_db();
     my $dsn = "dbi:SQLite:dbname=$db";
@@ -141,6 +270,33 @@ subtest '--wipe resets then inserts' => sub {
     my ($count) = $dbh->selectrow_array('SELECT COUNT(*) FROM author');
     is $count, 2, 'exactly 2 authors after wipe (old 3 rows gone)';
     $dbh->disconnect;
+};
+
+subtest '--quiet suppresses wipe warning' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    # First pass: deploy + 1 row
+    run_cli(@base_args, '--dsn', $dsn, '--deploy', '--rows', 1, '--seed', 1);
+
+    # Wipe without quiet - should warn
+    my ($out1, $err1, $exit1) = run_cli(
+        @base_args,
+        '--dsn',  $dsn,
+        '--wipe',
+        '--rows', 1,
+    );
+    like $err1, qr/wipe\(\) is destructive/, 'wipe warns without --quiet';
+
+    # Wipe with quiet - should not warn
+    my ($out2, $err2, $exit2) = run_cli(
+        @base_args,
+        '--dsn',   $dsn,
+        '--wipe',
+        '--quiet',
+        '--rows',  1,
+    );
+    unlike $err2, qr/wipe\(\) is destructive/, '--quiet suppresses wipe warning';
 };
 
 subtest '--seed produces reproducible rows' => sub {
@@ -451,7 +607,7 @@ subtest '--generators with template approach (recommended)' => sub {
     $dbh->disconnect;
 };
 
-subtest '--generators with non-unique static values should warn but continue' => sub {
+subtest '--generators with non-unique static values should fail with error' => sub {
     my $db  = temp_db();
     my $dsn = "dbi:SQLite:dbname=$db";
 
@@ -463,8 +619,44 @@ subtest '--generators with non-unique static values should warn but continue' =>
         '--generators', '{"email":"static@example.com"}',
     );
 
-    # The script warns but exits 0 (continues with other tables)
-    is $exit, 0, 'exits zero (warns but continues)';
+    # The script should exit with non-zero due to unique constraint violation
+    isnt $exit, 0, 'exits non-zero due to unique constraint';
+    like $err, qr/UNIQUE constraint failed/, 'error mentions unique constraint';
+    like $err, qr/\[WARN\] Bulk insert failed/, 'warning is issued';
+
+    # Verify that other tables were still inserted successfully
+    require DBI;
+    my $dbh = DBI->connect($dsn, '', '', { RaiseError => 1 });
+
+    # Author table should have 0 rows (all inserts failed due to unique constraint)
+    my ($author_count) = $dbh->selectrow_array("SELECT COUNT(*) FROM author");
+    is $author_count, 0, 'author table has 0 rows (all inserts failed)';
+
+    # Book table should have 2 rows (successful)
+    my ($book_count) = $dbh->selectrow_array("SELECT COUNT(*) FROM book");
+    is $book_count, 2, 'books still inserted successfully';
+
+    # Review table should have 2 rows (successful)
+    my ($review_count) = $dbh->selectrow_array("SELECT COUNT(*) FROM review");
+    is $review_count, 2, 'reviews still inserted successfully';
+
+    $dbh->disconnect;
+};
+
+subtest '--generators with non-unique static values should fail with error' => sub {
+    my $db  = temp_db();
+    my $dsn = "dbi:SQLite:dbname=$db";
+
+    my ($out, $err, $exit) = run_cli(
+        @base_args,
+        '--dsn',    $dsn,
+        '--deploy',
+        '--rows',   2,
+        '--generators', '{"email":"static@example.com"}',
+    );
+
+    # The script exits non-zero due to unique constraint violation
+    isnt $exit, 0, 'exits non-zero due to unique constraint';
     like $err, qr/UNIQUE constraint failed/, 'error mentions unique constraint';
     like $err, qr/\[WARN\] Bulk insert failed/, 'warning is issued';
 

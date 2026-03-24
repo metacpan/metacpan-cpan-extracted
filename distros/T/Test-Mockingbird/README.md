@@ -4,7 +4,7 @@ Test::Mockingbird - Advanced mocking library for Perl with support for dependenc
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -464,6 +464,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 # SEE ALSO
 
 - [Test::Mockingbird::DeepMock](https://metacpan.org/pod/Test%3A%3AMockingbird%3A%3ADeepMock)
+- [Test::Mockingbird::TimeTravel](https://metacpan.org/pod/Test%3A%3AMockingbird%3A%3ATimeTravel)
 
 # REPOSITORY
 

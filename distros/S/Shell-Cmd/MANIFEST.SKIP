@@ -1,0 +1,7 @@
+^\.cover
+^\.git
+
+# Makemaker generated files and dirs.
+^MANIFEST\.bak
+^Makefile$
+^MYMETA\.

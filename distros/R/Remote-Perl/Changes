@@ -1,5 +1,9 @@
 Revision history for Remote::Perl
 
+0.005  2026-03-23
+  - Support more BSDs by trying /dev/fd.
+  - --tmpfile[=auto] falls back to named when /dev/fd cannot be used either.
+
 0.004  2026-03-14
   - Fix linux tmpfile strategy error propagation when O_TMPFILE is unavailable.
 

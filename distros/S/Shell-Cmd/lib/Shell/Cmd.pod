@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2021 Sullivan Beck. All rights reserved.
+# Copyright (c) 2013-2026 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -115,8 +115,9 @@ as necessary.
 =back
 
 This module is designed to run multiple commands in a single shell,
-wrapping them in very simple, standard shell commands to automatically
-add all of this functionality.
+wrapping them in very simple, standard shell commands (that will run
+in every bourne shell varient that I'm aware of) to automatically add
+all of this functionality.
 
 =head1 METHODS
 
@@ -224,6 +225,10 @@ the resulting output.
 
 The error codes are described in the L</"ERROR CODES"> section below.
 
+Note that every time this is run, it flushes the output from the previous run,
+so make sure that the output is fully processed before running this a second
+time.
+
 =item B<ssh>
 
 This behaves similar to the C<run> method except it will run the commands on
@@ -247,7 +252,6 @@ hosts the commands are being run on.
 
 =item B<output>
 
-   $ret = $obj->output(%options);
    @ret = $obj->output(%options);
    %ret = $obj->output(%options);
 
@@ -267,8 +271,8 @@ parts of the object.  Any of the following options can be given:
    commands   : clears all commands and their options
    env        : clears the environment
    opts       : clears all options
-   out        : clears the output from running the command
-                in B<script> mode
+
+Output from any previous run is always flushed.
 
 =item B<dire>
 
@@ -715,31 +719,37 @@ Also, shell functions are not currently supported.
 When commands are run in the 'script' mode, the output is stored in the
 object.
 
-To access the output, use the following:
+To access the output, use one of the following:
 
    @out = $obj->output(%options);
+   %out = $obj->output(%options);
 
-Each call to the method will return one part of the output.  To following
+The second form is used only if the output was generated using the B<ssh>
+method and the output from multiple hosts is returned.  Otherwise, the
+first form is used where the output from only a single host (localhost
+if the output was generated using the B<run> method).
+
+Each call to the method will return one part of the output.  The following
 options may be used to determine what is returned.
 
 =over 4
 
 =item B<host=HOST>
 
-If the output was generated using the B<ssh> method, this option is required
-(since it is possible to run the commands both locally and remotely, and the
-output is stored separately).
+If the output was generated using the B<ssh> method, this option is required.
 
 B<HOST> can be any of:
 
    all      The output for all hosts will be returned.  The return value
             will be a hash of the form:
 
-               %ret = ( HOST1 => OUTPUT1, HOST2 => OUTPUT2, ...)
+               %out = ( HOST1 => OUTPUT1, HOST2 => OUTPUT2, ...)
 
    HOST1,HOST2,...
             The output for all of the hosts listed will be returned in a
             hash
+
+               %out = ( HOST1 => OUTPUT1, HOST2 => OUTPUT2, ...)
 
    HOST     If only a single host is specified, the output for only
             that host will be returned.  It will not be returned as a hash.
@@ -811,6 +821,59 @@ some are reserved, there is a limit of 200 commands that can be
 entered if accurate error tracking is needed.
 
 =back
+
+=head1 BUGS AND QUESTIONS
+
+If you find a bug in Shell::Cmd, please let me know.  The best ways to
+contact me are:
+
+=over 4
+
+=item GitHub
+
+You can submit an issue or question on GitHub.  This can be done at
+the following URL:
+
+L<https://github.com/SBECK-github/Shell-Cmd>
+
+This is the preferred method.  Please submit problems requests as GitHub issues
+if at all possible.
+
+=item Direct email
+
+You are welcome to send it directly to me by email.  The email address
+to use is:  sbeck@cpan.org.
+
+There is some discussion of discontinuing CPAN email, so please use
+this as a last resort.  The GitHub method is strongly preferred.
+Also, because cpan.org addresses are published, they are used by a lot
+of spammers and phishers.  Please include the name of the perl module
+in the subject line of ALL messages sent to my cpan.org address or it
+will likely be overlooked.
+
+=back
+
+Please do not use other means to report bugs (such as forums for a specific
+OS or Linux distribution) as it is impossible for me to keep up with all of
+them.  These are the current methods that are guaranteed to notify me.
+
+When filing a bug report, please include the following information:
+
+=over 4
+
+=item B<Shell::Cmd version>
+
+Please include the version of Shell::Cmd you are using.  You can get
+this by using the script:
+
+   use Shell::Cmd;
+   print $Shell::Cmd::VERSION,"\n";
+
+=back
+
+If you find any problems with the documentation (errors, typos, or items
+that are not clear), please send them to me. I welcome any suggestions
+that will allow me to improve the documentation.
 
 =head1 LICENSE
 

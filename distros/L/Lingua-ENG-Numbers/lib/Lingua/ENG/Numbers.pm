@@ -1,13 +1,12 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::ENG::Numbers;
 # ABSTRACT: Number 2 word conversion for ENG.
 
 # {{{ use block
 
-use 5.10.1;
-use strict;
-use warnings;
+use 5.16.0;
+
 use base qw(Exporter);
 use Carp;
 
@@ -34,9 +33,8 @@ use vars qw(
 );
 
 # }}}
-# {{{ variables declaration
-
-our $VERSION = 0.1106;
+# {{{ var block
+our $VERSION = '0.2603230';
 
 BEGIN {
 
@@ -53,157 +51,154 @@ BEGIN {
     $MODE = "American";
 
     # Delimiters
-    %OUTPUT_NUMBER_DELIMITER
-        = (
-           'American'   =>      '-',
-           'British'    =>      '-'
-       );
+    %OUTPUT_NUMBER_DELIMITER = (
+        'American'   =>      ' ',
+        'British'    =>      ' '
+    );
 
-        %OUTPUT_GROUP_DELIMITER = (
-                'American'      =>      ' ',
-                'British'       =>      ' '
-        );
+    %OUTPUT_GROUP_DELIMITER = (
+        'American'      =>      ' ',
+        'British'       =>      ' '
+    );
 
-        %OUTPUT_BLOCK_DELIMITER = (
-                'American'      =>      ', ',
-                'British'       =>      ', '
-        );
+    %OUTPUT_BLOCK_DELIMITER = (
+        'American'      =>      ', ',
+        'British'       =>      ', '
+    );
 
-        %OUTPUT_DECIMAL_DELIMITER = (
-                'American'      =>      'point ',
-                'British'       =>      'point '
-        );
+    %OUTPUT_DECIMAL_DELIMITER = (
+        'American'      =>      'point ',
+        'British'       =>      'point '
+    );
 
+    %INPUT_GROUP_DELIMITER = (
+        'American'      =>      ',',
+        'British'       =>      '.'
+    );
 
-        %INPUT_GROUP_DELIMITER = (
-                'American'      =>      ',',
-                'British'       =>      '.'
-        );
+    %INPUT_DECIMAL_DELIMITER = (
+        'American'      =>      '.',
+        'British'       =>      ','
+    );
 
-        %INPUT_DECIMAL_DELIMITER = (
-                'American'      =>      '.',
-                'British'       =>      ','
-        );
+    # Low-Level Names
+    %SIGN_NAMES = (
+        'American'      =>      {
+            $SIGN_POSITIVE  =>      '',
+            $SIGN_NEGATIVE  =>      'Negative'
+        },
+        'British'       =>      {
+            $SIGN_POSITIVE  =>      '',
+            $SIGN_NEGATIVE  =>      'Negative'
+        }
+    );
 
-
-        # Low-Level Names
-        %SIGN_NAMES = (
-                'American'      =>      {
-                        $SIGN_POSITIVE  =>      '',
-                        $SIGN_NEGATIVE  =>      'Negative'
-                },
-                'British'       =>      {
-                        $SIGN_POSITIVE  =>      '',
-                        $SIGN_NEGATIVE  =>      'Negative'
-                }
-        );
-
-        %NUMBER_NAMES = (
-                'American'      =>      {
-                        0       =>      'Zero',
-                        1       =>      'One',
-                        2       =>      'Two',
-                        3       =>      'Three',
-                        4       =>      'Four',
-                        5       =>      'Five',
-                        6       =>      'Six',
-                        7       =>      'Seven',
-                        8       =>      'Eight',
-                        9       =>      'Nine',
-                        10      =>      'Ten',
-                        11      =>      'Eleven',
-                        12      =>      'Twelve',
-                        13      =>      'Thirteen',
-                        14      =>      'Fourteen',
-                        15      =>      'Fifteen',
-                        16      =>      'Sixteen',
-                        17      =>      'Seventeen',
-                        18      =>      'Eighteen',
-                        19      =>      'Nineteen',
-                        20      =>      'Twenty',
-                        30      =>      'Thirty',
-                        40      =>      'Fourty',
-                        50      =>      'Fifty',
-                        60      =>      'Sixty',
-                        70      =>      'Seventy',
-                        80      =>      'Eighty',
-                        90      =>      'Ninety',
-                        10**2   =>      'Hundred',
-                        10**3   =>      'Thousand',
-                        10**6   =>      'Million',
-                        10**9   =>      'Billion',
-                        10**12  =>      'Trillion',
-                        10**15  =>      'Quadrillion',
-                        10**18  =>      'Quintillion',
-                        10**21  =>      'Sextillion',
-                        10**24  =>      'Septillion',
-                        10**27  =>      'Octillion',
-                        10**30  =>      'Nonillian',
-                        10**33  =>      'Decillion',
-                        10**36  =>      'Undecillion',
-                        10**39  =>      'Duodecillion',
-                        10**42  =>      'Tredecillion',
-                        10**45  =>      'Quattuordecillion',
-                        10**48  =>      'Quindecillion',
-                        10**51  =>      'Sexdecillion',
-                        10**54  =>      'Septendecillion',
-                        10**57  =>      'Octodecillion',
-                        10**60  =>      'Novemdecillion',
-                        10**63  =>      'Vigintillion'
-                },
-                'British'       =>      {
-                        0       =>      'Zero',
-                        1       =>      'One',
-                        2       =>      'Two',
-                        3       =>      'Three',
-                        4       =>      'Four',
-                        5       =>      'Five',
-                        6       =>      'Six',
-                        7       =>      'Seven',
-                        8       =>      'Eight',
-                        9       =>      'Nine',
-                        10      =>      'Ten',
-                        11      =>      'Eleven',
-                        12      =>      'Twelve',
-                        13      =>      'Thirteen',
-                        14      =>      'Fourteen',
-                        15      =>      'Fifteen',
-                        16      =>      'Sixteen',
-                        17      =>      'Seventeen',
-                        18      =>      'Eighteen',
-                        19      =>      'Nineteen',
-                        20      =>      'Twenty',
-                        30      =>      'Thirty',
-                        40      =>      'Fourty',
-                        50      =>      'Fifty',
-                        60      =>      'Sixty',
-                        70      =>      'Seventy',
-                        80      =>      'Eighty',
-                        90      =>      'Ninety',
-                        10**2   =>      'Hundred',
-                        10**3   =>      'Thousand',
-                        10**6   =>      'Million',
-                        10**9   =>      'Milliard',
-                        10**12  =>      'Billion',
-                        10**15  =>      'Billiard',
-                        10**18  =>      'Trillion',
-                        10**21  =>      'Trilliard',
-                        10**24  =>      'Quadrillion',
-                        10**27  =>      'Quadrilliard',
-                        10**30  =>      'Quintillion',
-                        10**33  =>      'Quintilliard',
-                        10**36  =>      'Sextillion',
-                        10**39  =>      'Sextilliard',
-                        10**42  =>      'Septillion',
-                        10**45  =>      'Septilliard',
-                        10**48  =>      'Octillion',
-                        10**51  =>      'Octilliard',
-                        10**54  =>      'Nonillian',
-                        10**57  =>      'Nonilliard',
-                        10**60  =>      'Decillion',
-                        10**63  =>      'Decilliard'
-                }
-        );
+    %NUMBER_NAMES = (
+        'American'      =>      {
+            0       =>      'zero',
+            1       =>      'one',
+            2       =>      'two',
+            3       =>      'three',
+            4       =>      'four',
+            5       =>      'five',
+            6       =>      'six',
+            7       =>      'seven',
+            8       =>      'eight',
+            9       =>      'nine',
+            10      =>      'ten',
+            11      =>      'eleven',
+            12      =>      'twelve',
+            13      =>      'thirteen',
+            14      =>      'fourteen',
+            15      =>      'fifteen',
+            16      =>      'sixteen',
+            17      =>      'seventeen',
+            18      =>      'eighteen',
+            19      =>      'nineteen',
+            20      =>      'twenty',
+            30      =>      'thirty',
+            40      =>      'forty',
+            50      =>      'fifty',
+            60      =>      'sixty',
+            70      =>      'seventy',
+            80      =>      'eighty',
+            90      =>      'ninety',
+            10**2   =>      'hundred',
+            10**3   =>      'thousand',
+            10**6   =>      'million',
+            10**9   =>      'billion',
+            10**12  =>      'trillion',
+            10**15  =>      'quadrillion',
+            10**18  =>      'quintillion',
+            10**21  =>      'sextillion',
+            10**24  =>      'septillion',
+            10**27  =>      'octillion',
+            10**30  =>      'nonillian',
+            10**33  =>      'decillion',
+            10**36  =>      'undecillion',
+            10**39  =>      'duodecillion',
+            10**42  =>      'tredecillion',
+            10**45  =>      'quattuordecillion',
+            10**48  =>      'quindecillion',
+            10**51  =>      'sexdecillion',
+            10**54  =>      'septendecillion',
+            10**57  =>      'octodecillion',
+            10**60  =>      'novemdecillion',
+            10**63  =>      'vigintillion'
+        },
+        'British'       =>      {
+            0       =>      'zero',
+            1       =>      'one',
+            2       =>      'two',
+            3       =>      'three',
+            4       =>      'four',
+            5       =>      'five',
+            6       =>      'six',
+            7       =>      'seven',
+            8       =>      'eight',
+            9       =>      'nine',
+            10      =>      'ten',
+            11      =>      'eleven',
+            12      =>      'twelve',
+            13      =>      'thirteen',
+            14      =>      'fourteen',
+            15      =>      'fifteen',
+            16      =>      'sixteen',
+            17      =>      'seventeen',
+            18      =>      'eighteen',
+            19      =>      'nineteen',
+            20      =>      'twenty',
+            30      =>      'thirty',
+            40      =>      'forty',
+            50      =>      'fifty',
+            60      =>      'sixty',
+            70      =>      'seventy',
+            80      =>      'eighty',
+            90      =>      'ninety',
+            10**2   =>      'hundred',
+            10**3   =>      'thousand',
+            10**6   =>      'million',
+            10**9   =>      'milliard',
+            10**12  =>      'billion',
+            10**15  =>      'billiard',
+            10**18  =>      'trillion',
+            10**21  =>      'trilliard',
+            10**24  =>      'quadrillion',
+            10**27  =>      'quadrilliard',
+            10**30  =>      'quintillion',
+            10**33  =>      'quintilliard',
+            10**36  =>      'sextillion',
+            10**39  =>      'sextilliard',
+            10**42  =>      'septillion',
+            10**45  =>      'septilliard',
+            10**48  =>      'octillion',
+            10**51  =>      'octilliard',
+            10**54  =>      'nonillian',
+            10**57  =>      'nonilliard',
+            10**60  =>      'decillion',
+            10**63  =>      'decilliard'
+        }
+    );
 }
 
 # }}}
@@ -292,7 +287,7 @@ sub string_to_number {
 # {{{ parse_number
 
 sub parse_number {
-    my ($number) = @_;
+    my $number = shift;
 
     if (! defined $number) { # VSM 0.02 - Number zero is not a valid condition
         return { '0' => $NUMBER_NAMES{$MODE}{0} };
@@ -325,8 +320,9 @@ sub parse_number {
 # {{{ parse_number_low
 
 sub parse_number_low {
-    my ($number) = @_;
-    my @names;
+    my $number = shift;
+
+    my @names = ();
 
     if ($number >= 100) {
         my $hundreds = int($number / 10**2);
@@ -353,7 +349,6 @@ sub parse_number_low {
 }
 
 # }}}
-
 
 # Class Methods
 # {{{ new
@@ -403,7 +398,7 @@ sub do_get_string {
     }
 
     my $blockString = join($OUTPUT_BLOCK_DELIMITER{$MODE}, @blockStrings);
-    $blockString =~ s{(?<=.),?\s?Zero}{}xmsg;
+    $blockString =~ s{(?<=.),?\s?Zero}{}xmsig;
 
     return $blockString;
 }
@@ -469,6 +464,7 @@ sub get_string {
     }
 
     $string =~ s/\s+$//;
+
     return $string;
 }
 
@@ -484,7 +480,7 @@ Lingua::ENG::Numbers - Converts numeric values into their English string equival
 
 =head1 VERSION
 
-version 0.1106
+version 0.2603230
 
 =head1 SYNOPSIS
 

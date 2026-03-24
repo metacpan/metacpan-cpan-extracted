@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 15;
+plan tests => 18;
 
 # Basic pipeline test
 with_pg(cb => sub {
@@ -82,6 +82,24 @@ with_pg(cb => sub {
         EV::break;
     });
 
+});
+
+# Pipeline recovery: normal query works after aborted pipeline
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->enter_pipeline;
+    $pg->query_params("invalid sql", [], sub {});
+    $pg->query_params("select 1", [], sub {});
+    $pg->pipeline_sync(sub {
+        $pg->exit_pipeline;
+        $pg->query("select 'recovered' as v", sub {
+            my ($rows, $err) = @_;
+            ok(!$err, 'pipeline recovery: query after abort succeeds');
+            is($rows->[0][0], 'recovered', 'pipeline recovery: correct result');
+            is($pg->pipeline_status, PQ_PIPELINE_OFF, 'pipeline recovery: pipeline off');
+            EV::break;
+        });
+    });
 });
 
 # query() croaks in pipeline mode

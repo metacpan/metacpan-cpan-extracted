@@ -2,12 +2,22 @@ package Data::HashMap::SI16;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub import {
     $^H{"Data::HashMap::SI16/hm_si16_put"}     = 1;
     $^H{"Data::HashMap::SI16/hm_si16_get"}     = 1;
     $^H{"Data::HashMap::SI16/hm_si16_remove"}  = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_take"}   = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_drain"} = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_pop"}   = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_shift"} = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_reserve"} = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_purge"}   = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_capacity"} = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_persist"}  = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_swap"}    = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_cas"}     = 1;
     $^H{"Data::HashMap::SI16/hm_si16_exists"}  = 1;
     $^H{"Data::HashMap::SI16/hm_si16_incr"}    = 1;
     $^H{"Data::HashMap::SI16/hm_si16_decr"}    = 1;
@@ -18,6 +28,7 @@ sub import {
     $^H{"Data::HashMap::SI16/hm_si16_items"}    = 1;
     $^H{"Data::HashMap::SI16/hm_si16_max_size"} = 1;
     $^H{"Data::HashMap::SI16/hm_si16_ttl"}      = 1;
+    $^H{"Data::HashMap::SI16/hm_si16_lru_skip"} = 1;
     $^H{"Data::HashMap::SI16/hm_si16_each"}       = 1;
     $^H{"Data::HashMap::SI16/hm_si16_iter_reset"} = 1;
     $^H{"Data::HashMap::SI16/hm_si16_clear"}      = 1;

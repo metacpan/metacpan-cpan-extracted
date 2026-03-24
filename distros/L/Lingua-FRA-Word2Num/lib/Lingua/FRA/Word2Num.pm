@@ -1,137 +1,96 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::FRA::Word2Num;
 # ABSTRACT: Word 2 number conversion in FRA.
 
 # {{{ use block
 
-use 5.10.1;
-
-use strict;
-use warnings;
+use 5.16.0;
+use utf8;
 
 use base qw(Exporter);
 
 use Parse::RecDescent;
 
 # }}}
-# {{{ variable declarations
-
-our $VERSION = 0.1257;
-our $INFO    = {
-    rev  => '$Rev: 808 $',
-};
-
+# {{{ var block
+our $VERSION = '0.2603230';
 our @EXPORT_OK  = qw(cardinal2num w2n);
-my $parser      = fr_numerals();
+my $parser      = fra_numerals();
 
 # }}}
 
 # {{{ w2n                                         convert number to text
-#
+
 sub w2n {
     my $input = shift // return;
 
-    $input =~ s/quatre-vingt/qvingt/g;   # Grant unique identifiers
-    $input =~ s/dix-sept/dis/g;
-    $input =~ s/dix-huit/dih/g;
-    $input =~ s/dix-neuf/din/g;
-
-    $input =~ s/ et //g;                 # Does not affect the number
-
-    $input =~ s/millions/million/g;      # Million in plural does not affect the number
-
-    $input =~ s/,//g;                    # remove trash
-    $input =~ s/-//g;
 
     return $parser->numeral($input);
 }
+
 # }}}
-# {{{ fr_numerals                                 create parser for numerals
-sub fr_numerals {
+# {{{ fra_numerals                                create parser for numerals
+
+sub fra_numerals {
     return Parse::RecDescent->new(q{
-      numeral: millions  { return $item[1]; }                         # root parse. go from maximum to minimum value
-        |      millenium { return $item[1]; }
-        |      century   { return $item[1]; }
-        |      decade    { return $item[1]; }
-        |                { return undef; }
+      <autoaction: { $item[1] } >
 
-      number: 'zéro'     { $return = 0; }                             # try to find a word from 0 to 19
-       |      'un'       { $return = 1; }
-       |      'deux'     { $return = 2; }
-       |      'trois'    { $return = 3; }
-       |      'quatre'   { $return = 4; }
-       |      'cinq'     { $return = 5; }
-       |      'six'      { $return = 6; }
-       |      'sept'     { $return = 7; }
-       |      'huit'     { $return = 8; }
-       |      'neuf'     { $return = 9; }
-       |      'dix'      { $return = 10; }
-       |      'onze'     { $return = 11; }
-       |      'douze'    { $return = 12; }
-       |      'treize'   { $return = 13; }
-       |      'quatorze' { $return = 14; }
-       |      'quinze'   { $return = 15; }
-       |      'seize'    { $return = 16; }
-       |      'dis'      { $return = 17; }
-       |      'dih'      { $return = 18; }
-       |      'din'      { $return = 19; }
+      numeral:  mega
+             |  kOhOd
+             | 'zéro'       {  0 }
+             |              {    }
 
-      tens:   'vingt'     { $return = 20; }                           # try to find a word that representates
-        |     'trente'    { $return = 30; }                           # values 20,30,..,90
-        |     'quarante'  { $return = 40; }
-        |     'cinquante' { $return = 50; }
-        |     'soixante'  { $return = 60; }
-        |     'qvingt'    { $return = 80; }
+       number:  'un'        {  1 }
+             |  'deux'      {  2 }
+             |  'trois'     {  3 }
+             |  'quatre'    {  4 }
+             |  'cinq'      {  5 }
+             |  'six'       {  6 }
+             |  'sept'      {  7 }
+             |  'huit'      {  8 }
+             |  'neuf'      {  9 }
+             |  'dix-sept'  { 17 }
+             |  'dix-huit'  { 18 }
+             |  'dix-neuf'  { 19 }
+             |  'dix'       { 10 }
+             |  'onze'      { 11 }
+             |  'douze'     { 12 }
+             |  'treize'    { 13 }
+             |  'quatorze'  { 14 }
+             |  'quinze'    { 15 }
+             |  'seize'     { 16 }
 
-      decade: tens(?) number(?)                                       # try to find words that represents values
-              { $return = -1;                                         # from 0 to 99
-                for (@item) {
-                  if (ref $_ && defined $$_[0]) {
-                    $return += $$_[0] if ($return != -1);             # -1 is the non-zero identifier, since
-                    $return  = $$_[0] if ($return == -1);             # the result could be zero
-                  }
-                }
-                $return = undef if($return == -1);
-              }
+         tens:  'vingt'             { 20 }
+             |  'trente'            { 30 }
+             |  'quarante'          { 40 }
+             |  'cinquante'         { 50 }
+             |  'soixante-dix'      { 70 }
+             |  'soixante'          { 60 }
+             |  /quatre-vingts?/    { 80 }
 
-      century: number(?) 'cent' decade(?)                             # try to find words that represents values
-               { $return = 0;                                         # from 100 to 999
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "cent") {
-                     $return = ($return>0) ? $return * 100 : 100;
-                   }
-                 }
-                 $return = undef if(!$return);
-               }
+         deca:  tens /-?/ number    { $item[1] + $item[3] }
+             |  tens 'et' number    { $item[1] + $item[3] }
+             |  tens
+             |  number
 
-    millenium: century(?) decade(?) 'mille' century(?) decade(?)      # try to find words that represents values
-               { $return = 0;                                         # from 1.000 to 999.999
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "mille") {
-                     $return = ($return>0) ? $return * 1000 : 1000;
-                   }
-                 }
-                 $return = undef if(!$return);
-               }
+        hecto:  number /cents?/ deca    {  $item[1] * 100 + $item[3] }
+             |  number /cents?/         {  $item[1] * 100 }
+             |         /cents?/ deca    {  100 + $item[2] }
+             |         'cent'           { 100 }
 
-      millions: millenium(?) century(?) decade(?)                      # try to find words that represents values
-               'million'                                              # from 1.000.000 to 999.999.999.999
-               millenium(?) century(?) decade(?)
-               { $return = 0;
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "million" && $return<1000000 ) {
-                     $return = ($return>0) ? $return * 1000000 : 1000000;
-                   }
-                 }
-                 $return = undef if(!$return);
-               }
+          hOd:  hecto
+             |  deca
+
+         kilo:  hOd  /milles?/ hOd  { $item[1] * 1000 + $item[3] }
+             |  hOd  /milles?/      { $item[1] * 1000 }
+             |       /milles?/ hOd  { 1000 + $item[2] }
+             |       'mille'        { 1000 }
+
+        kOhOd:  kilo
+             |  hOd
+
+         mega:  kOhOd /millions?/ kOhOd { $item[1] * 1_000_000 + $item[3] }
     });
 }
 # }}}
@@ -150,7 +109,7 @@ __END__
 
 =head1 VERSION
 
-version 0.1257
+version 0.2603230
 
 Word 2 number conversion in FRA.
 
@@ -195,7 +154,7 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
-=item B<fr_numerals> (void)
+=item B<fra_numerals> (void)
 
   =>  obj  new parser object
 
@@ -234,7 +193,7 @@ Internal parser.
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

@@ -72,7 +72,7 @@ sub decode_bro
     if( !defined( $rv ) )
     {
         $BrotliError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -122,7 +122,7 @@ sub encode_bro
     if( !defined( $rv ) )
     {
         $BrotliError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -133,13 +133,25 @@ sub encode_bro
 
 sub is_decoder_installed
 {
-    eval( 'use IO::Uncompress::Brotli ();' );
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require IO::Uncompress::Brotli;
+    };
+    # eval( 'use IO::Uncompress::Brotli ();' );
     return( $@ ? 0 : 1 );
 }
 
 sub is_encoder_installed
 {
-    eval( 'use IO::Compress::Brotli ();' );
+    local $@;
+    # eval( 'use IO::Compress::Brotli ();' );
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require IO::Uncompress::Brotli;
+    };
     return( $@ ? 0 : 1 );
 }
 

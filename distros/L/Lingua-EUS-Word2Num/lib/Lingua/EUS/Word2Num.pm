@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::EUS::Word2Num;
 # ABSTRACT: Word 2 number conversion in EUS.
@@ -9,17 +9,12 @@ use 5.10.1;
 use strict;
 use warnings;
 
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 use Parse::RecDescent;
 # }}}
 # {{{ variable declarations
-
-our $VERSION = 0.0682;
-
-our $INFO    = {
-    rev  => '$Rev: 682 $',
-};
+our $VERSION = '0.2603230';
 
 my $parser = eu_numerals();
 
@@ -35,7 +30,9 @@ sub w2n :Export {
     $input =~ s/milioi bat/milioi/g;  # *the same
     $input =~ s/,//g;                 # Remove trick chars
 
-    return $parser->numeral($input);
+    return 0 if $input eq 'zero';
+
+    return $parser->numeral($input) || undef;
 }
 # }}}
 # {{{ eu_numerals                                 create parser for numerals
@@ -153,18 +150,26 @@ __END__
 
 =head1 NAME
 
-Lingua::EUS::Word2Num
+=head2 Lingua::EUS::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for Basque (Euskara).
-Input text must be encoded in utf-8.
+Word 2 number conversion in EUS.
 
-=head2 $Rev: 682 $
+Lingua::EUS::Word2Num is module for converting text containing number
+representation in Basque (Euskara) back into number. Converts whole numbers
+from 0 up to 999 999 999 999.
 
-We use ISO 639-3 namespace.
+Input text must be encoded in UTF-8.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -174,14 +179,6 @@ We use ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
-
-Word 2 number conversion in EUS.
-
-Lingua::EUS::Word2Num is module for converting text containing number
-representation in Basque (Euskara) back into number. Converts whole numbers
-from 0 up to 999 999 999 999.
-
 =cut
 
 # }}}
@@ -189,21 +186,40 @@ from 0 up to 999 999 999 999.
 
 =pod
 
-=head2 Functions Reference
+=head1 Functions Reference
 
-=over
+=over 2
 
-=item w2n (positional)
+=item B<w2n> (positional)
 
-  1   string  string to convert
-  =>  number  converted number
-      undef   if the input string is not known
+  1   str    string to convert
+  =>  num    converted number
+      undef  if the input string is not known
 
 Convert text representation to number.
 
-=item eu_numerals
+=item B<eu_numerals> (void)
+
+
+  =>  obj  new parser object
 
 Internal parser.
+
+=back
+
+=cut
+
+# }}}
+# {{{ EXPORTED FUNCTIONS
+
+=pod
+
+=head1 EXPORT_OK
+
+=over 2
+
+=item w2n
+
 
 =back
 
@@ -214,25 +230,15 @@ Internal parser.
 
 =pod
 
-=head1 EXPORT_OK
-
-w2n
-
-=head1 KNOWN BUGS
-
-None.
-
 =head1 AUTHOR
 
-Vitor Serra Mori <info@petamem.com>
+ coding, maintenance, refactoring, extensions, specifications:
+
+  Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

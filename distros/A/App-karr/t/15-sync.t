@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use TestGit qw( require_git_c );
+require_git_c();
 use Path::Tiny qw( path tempdir );
 use YAML::XS qw( DumpFile LoadFile Load );
 

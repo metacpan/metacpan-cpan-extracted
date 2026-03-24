@@ -16,7 +16,7 @@
 
 name:      perl-Git-Server
 summary:   Git-Server - Secure Git Server with more granular hooks capabilities than default git.
-version:   0.038
+version:   0.039
 release:   1
 vendor:    Rob Brown <bbb@cpan.org>
 packager:  Arix International <cpan2rpm@arix.com>
@@ -132,5 +132,5 @@ find %{buildroot}%{_prefix}             \
 %defattr(-,root,root)
 
 %changelog
-* Sat Mar 21 2026 hookbot@tiny14.threerings.net
+* Mon Mar 23 2026 hookbot@tiny14.threerings.net
 - Initial build.

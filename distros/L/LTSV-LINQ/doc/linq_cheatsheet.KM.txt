@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ Cheat Sheet                               [KM] ភាសាខ្មែរ
+======================================================================
+
+[ 1. បង្កើត Query (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  កំណត់ចំណាំ: method បញ្ចប់នីមួយៗប្រើ iterator អស់។
+    ដើម្បីប្រើទិន្នន័យម្តងទៀត សូមហៅ From() / FromLTSV() ម្តងទៀត។
+
+[ 2. ការច្រោះ (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  ច្រោះធាតុតាមលក្ខខណ្ឌ។
+
+[ 3. ការដាក់ចំណាត់ (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select បំប្លែងធាតុនីមួយៗ; SelectMany ធ្វើ array ដែលស្ទួនឱ្យរាបស្មើ
+    (ตัวเลือกต้องส่งคืนการอ้างอิง ARRAY)។
+
+[ 4. ការតម្រៀប (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: សោរ​តម្រៀប​ចម្បង
+    ThenBy*/ThenByNum*/ThenByStr*: សោរ​តម្រៀប​ទីពីរ (បន្ទាប់ OrderBy*)
+    Reverse: បញ្ច្រាស​លំដាប់​បច្ចុប្បន្ន
+
+[ 5. ការបែងចែកទំព័រ (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: រំលង ឬ​យក​ចំនួន​ធាតុ​ជាក់លាក់
+    SkipWhile/TakeWhile: តាម​លក្ខខណ្ឌ
+
+[ 6. ការដាក់ជាក្រុម (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy ត្រឡប់ array នៃ { Key=>'...', Elements=>[...] }
+    ToLookup ត្រឡប់ hashref { key => [elements] }
+
+[ 7. ប្រតិបត្តិការសំណុំ (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except គាំទ្រ key selector ជាជម្រើស
+    SequenceEqual: ពិត​ ប្រសិន​ sequence ពីរ​ស្មើ​គ្នា
+
+[ 8. ការភ្ជាប់ (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: ការ​ភ្ជាប់​ខាង​ក្នុង; GroupJoin: ការ​ភ្ជាប់​ខាង​ក្រៅ​ឆ្វេង
+    (ក្រុម​ខាង​ក្នុង​ត្រូវ​បាន​ផ្ញើ​ជា LTSV::LINQ object)
+
+[ 9. ការសង្ខេប (method បញ្ចប់) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  វ៉ារ្យ៉ង់ OrDefault ត្រឡប់ undef ជំនួស die សម្រាប់ sequence ទទេ
+    ElementAt: index ផ្អែកលើ 0 (die ប្រសិន​ក្រៅ​ព្រំដែន); ElementAtOrDefault: undef
+
+[ 10. method លំដាប់ផ្សេងទៀត (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: ភ្ចាប់ sequence ពីរ; DefaultIfEmpty: តម្លៃ​លំនាំ​ដើម​ប្រសិន​ទទេ
+    Zip: ផ្សំ sequence ពីរ​ទ្វេ​តាម​ធាតុ
+
+[ 11. method បំប្លែង (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary ត្រឡប់ hashref key=>element
+    ToLookup ត្រឡប់ hashref key=>[elements]
+    ToLTSV សរសេរ sequence ទៅ LTSV file
+
+[ 12. ធនធានផ្លូវការ (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV spec: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

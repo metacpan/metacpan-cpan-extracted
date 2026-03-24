@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::AFR::Numbers;
 # ABSTRACT: Converts numeric values into their Afrikaans equivalents.
@@ -11,12 +11,11 @@ use strict;
 use warnings;
 
 use Carp;
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-
-our $VERSION = 0.1106;
+our $VERSION = '0.2603230';
 
 my $numbers = {
     0   =>      'nul',
@@ -252,7 +251,7 @@ Lingua::AFR::Numbers
 
 =head1 VERSION
 
-version 0.1106
+version 0.2603230
 
 =head1 DESCRIPTION
 

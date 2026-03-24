@@ -8,7 +8,7 @@ use TestHelper;
 
 require_pg;
 use File::Temp 'tmpnam';
-plan tests => 116;
+plan tests => 123;
 
 # notice handler
 with_pg(
@@ -33,7 +33,7 @@ with_pg(
         my ($pg) = @_;
         $pg->query("select pg_sleep(30)", sub {
             my ($data, $err) = @_;
-            ok($err, 'cancel: query received error');
+            like($err, qr/cancel/i, 'cancel: received cancellation error');
             undef $cancel_timer;
             EV::break;
         });
@@ -84,6 +84,18 @@ with_pg(cb => sub {
     my $enc = $pg->client_encoding;
     ok(defined $enc && length($enc) > 0, "client_encoding: $enc");
     EV::break;
+});
+
+# large result set (exercises process_results loop)
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("select n, n * 2 from generate_series(1, 5000) n", sub {
+        my ($rows, $err) = @_;
+        ok(!$err, 'large result: no error');
+        is(scalar @$rows, 5000, 'large result: 5000 rows');
+        is($rows->[4999][1], '10000', 'large result: last row correct');
+        EV::break;
+    });
 });
 
 # single row mode
@@ -313,6 +325,33 @@ SKIP: {
     });
 }
 
+# cancel_async interrupted by finish
+SKIP: {
+    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    my $pg;
+    my $cancel_err;
+    $pg = EV::Pg->new(
+        conninfo => $conninfo,
+        on_connect => sub {
+            $pg->query("select pg_sleep(30)", sub {});
+            my $t; $t = EV::timer(0.3, 0, sub {
+                undef $t;
+                $pg->cancel_async(sub {
+                    my ($err) = @_;
+                    $cancel_err = $err;
+                });
+                $pg->finish;
+                EV::break;
+            });
+        },
+        on_error => sub { diag "Error: $_[0]"; EV::break },
+    );
+    my $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    ok(defined $cancel_err, 'cancel_async+finish: cancel cb received error');
+    like($cancel_err, qr/connection/, 'cancel_async+finish: error mentions connection');
+}
+
 # --- error_fields ---
 with_pg(cb => sub {
     my ($pg) = @_;
@@ -438,6 +477,32 @@ SKIP: {
         });
         $pg->set_chunked_rows_mode(3);
     });
+}
+
+# chunked rows abort via finish
+SKIP: {
+    skip 'requires libpq >= 17', 2 unless EV::Pg->lib_version >= 170000;
+    my $pg;
+    my @chunks;
+    $pg = EV::Pg->new(
+        conninfo => $conninfo,
+        on_connect => sub {
+            $pg->query("select generate_series(1,1000) as n", sub {
+                my ($data, $err) = @_;
+                if (ref $data eq 'ARRAY' && @$data > 0) {
+                    push @chunks, scalar @$data;
+                    $pg->finish;
+                    return;
+                }
+            });
+            $pg->set_chunked_rows_mode(5);
+        },
+        on_error => sub { diag "Error: $_[0]"; EV::break },
+    );
+    my $t = EV::timer(3, 0, sub { EV::break });
+    EV::run;
+    is(scalar @chunks, 1, 'chunked finish: only 1 chunk before abort');
+    ok(!$pg->is_connected, 'chunked finish: disconnected after finish');
 }
 
 # --- close_prepared (libpq >= 17) ---

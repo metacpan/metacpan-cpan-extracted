@@ -85,4 +85,55 @@ my $q = SQL::Wizard->new;
   like $sql, qr/WHERE EXISTS\(SELECT 1 FROM vip WHERE vip\.user_id = u\.id\)/, 'EXISTS in where';
 }
 
+# compare: correlated subquery >= value
+{
+  my $sub = $q->select(
+    -columns => [$q->func('COUNT', '*')],
+    -from    => 'orders|o',
+    -where   => { 'o.user_id' => $q->col('u.id') },
+  );
+  my ($sql, @bind) = $q->select(
+    -columns => [$q->func('COUNT', '*')],
+    -from    => 'users|u',
+    -where   => [$q->compare($sub, '>=', 5)],
+  )->to_sql;
+  like $sql, qr/\(SELECT COUNT\(\*\) FROM orders o WHERE o\.user_id = u\.id\) >= \?/, 'compare subquery >= value';
+  is_deeply \@bind, [5], 'compare subquery binds';
+}
+
+# compare: correlated subquery = value
+{
+  my $sub = $q->select(
+    -columns => [$q->func('COUNT', '*')],
+    -from    => 'books|b',
+    -where   => { 'b.author_id' => $q->col('a.id') },
+  );
+  my ($sql, @bind) = $q->select(
+    -from  => 'authors|a',
+    -where => [$q->compare($sub, '=', 0)],
+  )->to_sql;
+  like $sql, qr/\(SELECT COUNT\(\*\) FROM books b WHERE b\.author_id = a\.id\) = \?/, 'compare subquery = value';
+  is_deeply \@bind, [0], 'compare subquery = binds';
+}
+
+# compare: col vs col
+{
+  my ($sql, @bind) = $q->select(
+    -from  => 'orders',
+    -where => [$q->compare('total', '>', $q->col('min_total'))],
+  )->to_sql;
+  like $sql, qr/WHERE total > min_total/, 'compare col > col';
+  is_deeply \@bind, [], 'compare col vs col no binds';
+}
+
+# compare: col vs value
+{
+  my ($sql, @bind) = $q->select(
+    -from  => 'users',
+    -where => [$q->compare('age', '>=', 18)],
+  )->to_sql;
+  like $sql, qr/WHERE age >= \?/, 'compare col >= value';
+  is_deeply \@bind, [18], 'compare col >= value binds';
+}
+
 done_testing;

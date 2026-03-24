@@ -41,7 +41,7 @@ if ($EU_MM_V < 6.64) {
 
 WriteMakefile(
    NAME             => "Shell::Cmd",
-   VERSION          => "3.04",
+   VERSION          => "3.05",
    ABSTRACT         => "run shell commands with enhanced support",
    LICENSE          => "perl",
    ($EU_MM_V >= 6.48
@@ -62,7 +62,7 @@ WriteMakefile(
           provides     => {
              'Shell::Cmd' => {
                 file    => 'lib/Shell/Cmd.pm',
-                version => '3.04',
+                version => '3.05',
              },
 
           },
@@ -76,6 +76,10 @@ WriteMakefile(
              version   => 2,
           },
           resources    => {
+             bugtracker => {
+                web  => 'https://github.com/SBECK-github/Shell-Cmd/issues',
+             },
+             homepage => 'https://github.com/SBECK-github/Shell-Cmd',
              repository => {
                 type => 'git',
                 web  => 'https://github.com/SBECK-github/Shell-Cmd',

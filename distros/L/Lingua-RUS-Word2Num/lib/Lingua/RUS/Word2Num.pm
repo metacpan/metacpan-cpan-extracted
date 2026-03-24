@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8 -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 
 package Lingua::RUS::Word2Num;
 # ABSTRACT: Word 2 number conversion in RUS.
@@ -11,14 +11,13 @@ use strict;
 use warnings;
 
 use utf8;
-use Perl6::Export::Attrs;
+use Export::Attrs;
 use Carp;
 use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-
-our $VERSION = 0.0682;
+our $VERSION = '0.2603230';
 my  $parser  = ru_numerals();
 
 # }}}
@@ -154,21 +153,30 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
-Lingua::RUS::Word2Num
+=head2 Lingua::RUS::Word2Num  
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-Text to positive number convertor for Russian.
+Word 2 number conversion in RUS.
 
-Input text must be encoded in utf-8.
+Lingua::RUS::Word2Num is module for converting text containing number
+representation in Russian back into number. Converts whole numbers
+from 0 up to 999 999 999.
 
-=head2 $Rev: 682 $
+Input text must be encoded in UTF-8.
 
-ISO 639-3 namespace.
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -178,36 +186,46 @@ ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
+=cut
 
-Word 2 number conversion in RUS.
+# }}}
+# {{{ Functions Reference
 
-Lingua::RUS::Word2Num is module for converting text containing number
-representation in Russian back into number. Converts whole numbers
-from 0 up to 999 999 999.
+=pod
+
+=head1 Functions Reference
+
+=over 2
+
+=item B<w2n> (positional)
+
+  1   str    string to convert
+  =>  num    converted number
+      undef  if input string is not known
+
+Convert text representation to number.
+
+
+=item B<ru_numerals> (void)
+
+  =>  obj  new parser object
+
+Internal parser.
+
+
+=back
 
 =cut
 
 # }}}
-# {{{ Functions reference
+# {{{ EXPORTED FUNCTIONS
 
 =pod
 
-=head2 Functions Reference
+=over 2
 
-=over
+=item w2n
 
-=item w2n (positional)
-
-  1   string  string to convert
-  =>  number  converted number
-      undef   if input string is not known
-
-Convert text representation to number.
-
-=item ru_numerals
-
-Internal parser.
 
 =back
 
@@ -216,20 +234,17 @@ Internal parser.
 # }}}
 # {{{ POD FOOTER
 
+=pod
+
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
+
    Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

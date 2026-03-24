@@ -1,6 +1,6 @@
 use v5.36;
 package Remote::Perl::FlowControl;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 # Credit-based flow control.  Each stream has a budget of bytes the sender
 # is allowed to transmit before the receiver must grant more.

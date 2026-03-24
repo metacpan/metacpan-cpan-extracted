@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::ITA::Numbers;
 # ABSTRACT: Number 2 Word conversion in ITA.
@@ -21,12 +21,11 @@ use overload (
   fallback => 1);
 
 use Carp qw(carp);
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-
-our $VERSION = 0.0682;
+our $VERSION = '0.2603230';
 
 our %SIGN_NAMES           = ('-' => 'meno',
                              '+'  => '');
@@ -337,7 +336,7 @@ Lingua::ITA::Numbers - Converts numeric values into their Italian string equival
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
 =head1 SYNOPSIS
 
@@ -536,7 +535,7 @@ PetaMem <info@petamem.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004 by Leo "TheHobbit" Cacciari
+Copyright (c) 2004 by Leo "TheHobbit" Cacciari
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,

@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::NOR::Num2Word;
 # ABSTRACT: Number 2 word conversion in NOR.
@@ -9,11 +9,11 @@ use 5.10.1;
 
 use strict;
 use warnings;
+use utf8;
 
 # }}}
-# {{{ variables declaration
-
-our $VERSION = 0.0682;
+# {{{ var block
+our $VERSION = '0.2603230';
 
 
 
@@ -53,8 +53,7 @@ sub new
 # }}}
 # {{{ num2no_cardinal
 
-sub num2no_cardinal
-{
+sub num2no_cardinal {
     my $self = shift;
 
     my $result = '';
@@ -69,86 +68,65 @@ sub num2no_cardinal
 
     my $reminder = 0;
 
-    if ( $number < 20 )
-    {
+    if ($number < 20) {
       $result = $group1{$number};
     }
-
-    elsif ( $number < 100 )
-    {
+    elsif ( $number < 100 ) {
       $reminder = $number % 10;
-      if ( $reminder == 0 )
-      {
-        $result = $group2{$number};
+      if ( $reminder == 0 ) {
+          $result = $group2{$number};
       }
-      else
-      {
-        $result = $group2{$number - $reminder} . ' ' . $self->num2no_cardinal( $reminder );
+      else {
+          $result = $group2{$number - $reminder} . ' ' . $self->num2no_cardinal( $reminder );
       }
     }
-
-    elsif ($number < 1000)
-    {
-      $reminder = $number % 100;
-      if ( $reminder == 0 )
-      {
-        $result = $group3{$number};
-      }
-      else
-      {
-        $result = $group3{$number - $reminder} . ' og ' . $self->num2no_cardinal( $reminder );
-      }
+    elsif ($number < 1000) {
+        $reminder = $number % 100;
+        if ( $reminder == 0 ) {
+            $result = $group3{$number};
+        }
+        else {
+            $result = $group3{$number - $reminder} . ' og ' . $self->num2no_cardinal( $reminder );
+        }
     }
+    elsif ( $number < 1000000 ) {
+        $reminder = $number % 1000;
 
-    elsif ( $number < 1000000 )
-    {
-      $reminder = $number % 1000;
+        my $tmp1 = ( $reminder != 0 ) ? ' '.$self->num2no_cardinal($reminder) : '';
+        my $tmp2 = substr( $number, 0, length( $number ) - 3 );
+        my $tmp3 = $tmp2 % 10;
 
-      my $tmp1 = ( $reminder != 0 ) ? ' '.$self->num2no_cardinal($reminder) : '';
-      my $tmp2 = substr( $number, 0, length( $number ) - 3 );
-      my $tmp3 = $tmp2 % 10;
+        my $space = '';
+        $space = ' og' if ( $reminder < 100 && $reminder != 0 );
 
-      my $space = '';
-      $space = ' og' if ( $reminder < 100 && $reminder != 0 );
+        if ( $tmp3 == 1 && $tmp2 == 1 ) {
+            $tmp2 = 'ett tusen';
+        }
+        else {
+            $tmp2 = $self->num2no_cardinal($tmp2) . ' tusen';
+        }
 
-      if ( $tmp3 == 1 && $tmp2 == 1 )
-      {
-          $tmp2 = 'ett tusen';
-      } 
-      else 
-      {
-          $tmp2 = $self->num2no_cardinal($tmp2) . ' tusen';
-      }
-
-      $result = $tmp2 . $space . $tmp1;
+        $result = $tmp2 . $space . $tmp1;
     }
+    elsif ( $number < 1_000_000_000 ) {
+        $reminder = $number % 1000000;
 
-    elsif ( $number < 1000000000 ) 
-    {
-      $reminder = $number % 1000000;
+        my $tmp1 = ( $reminder != 0 ) ? ' ' . $self->num2no_cardinal($reminder) : '';
+        my $tmp2 = substr( $number, 0, length( $number ) - 6 );
+        my $tmp3 = $tmp2 % 10;
 
-      my $tmp1 = ( $reminder != 0 ) ? ' ' . $self->num2no_cardinal($reminder) : '';
-      my $tmp2 = substr( $number, 0, length( $number ) - 6 );
-      my $tmp3 = $tmp2 % 10;
+        my $space = ($reminder && $reminder < 100000) ? ' og' : '';
 
-      my $space = '';
-      $space = ' og' if ( $reminder < 100000 && $reminder != 0 );
-
-      if ( $tmp3 == 1 && $tmp2 == 1 )
-      {
-         $tmp2 = 'en million';
-      }
-      else
-      {
-        $tmp2 = $self->num2no_cardinal( $tmp2 ) . ' millioner';
-      }
-
-      $result = $tmp2 . $space . $tmp1;
-
+        if ( $tmp3 == 1 && $tmp2 == 1 ) {
+            $tmp2 = 'en million';
+        }
+        else {
+            $tmp2 = $self->num2no_cardinal( $tmp2 ) . ' millioner';
+        }
+        $result = $tmp2 . $space . $tmp1;
     }
-    else
-    {
-      # >= 1 000 000 000 unsupported
+    else {
+        # >= 1 000 000 000 unsupported
     }
 
     return $result;
@@ -164,6 +142,10 @@ __END__
 
 Lingua::NOR::Num2Word - convert whole number to norwegian text. Output text is in utf-8 encoding.
 
+=head1 VERSION
+
+version 0.2603230
+
 =head1 SYNOPSIS
 
  use Lingua::NOR::Num2Word;
@@ -178,9 +160,10 @@ Lingua::NOR::Num2Word - convert whole number to norwegian text. Output text is i
 
 Number 2 word conversion in NOR.
 
-This module is based on and inspired by Roman Vasicek module Lingua::CS::Num2Word.
-Lingua::NOR::Num2Word is a module for converting whole numbers into their norwegian
-textual representation. Converts numbers from 0 up to 999 999 999.
+This module is based on and inspired by Roman Vasicek module
+Lingua::CS::Num2Word.  Lingua::NOR::Num2Word is a module for
+converting whole numbers into their norwegian textual
+representation. Converts numbers from 0 up to 999 999 999.
 
 =head1 METHODS
 
@@ -200,29 +183,19 @@ Converts a whole number to norwegian language.
 
   my $text = $no_num2word->num2no_cardinal( 1000000 );
 
-
-
 =back
-
-=head1 HISTORY
-
- * [16.06.2004] Version 0.011 released.
- * [13.06.2004] Version 0.01 released.
-
-=head1 VERSION
-
-This is version 0.011
 
 =head1 AUTHOR
 
-Kjetil Fikkan (kjetil@fikkan.org)
+  Kjetil Fikkan (kjetil@fikkan.org)
 
-Maintenance
-PetaMem <info@petamem.com>
+  Maintenance
+  PetaMem <info@petamem.com>
 
 =head1 COPYRIGHT
 
  Copyright (c) 2004 Kjetil Fikkan
+ Copyright (c) PetaMem, s.r.o. 2010-present
 
  This module is free software. It may be used, redistributed
  and/or modified under the same terms as Perl itself.

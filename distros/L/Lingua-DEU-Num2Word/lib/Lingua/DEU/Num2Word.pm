@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8 -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 
 package Lingua::DEU::Num2Word;
 # ABSTRACT: Number 2 word conversion in DEU.
@@ -12,15 +12,14 @@ use warnings;
 use utf8;
 
 use Carp;
+use Export::Attrs;
 use Readonly;
-use Perl6::Export::Attrs;
 
 # }}}
 # {{{ variable declarations
 
-my Readonly::Scalar $COPY = 'Copyright (C) PetaMem, s.r.o. 2002-present';
-
-our $VERSION = 0.1106;
+my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
+our $VERSION = '0.2603230';
 
 # }}}
 
@@ -98,7 +97,7 @@ __END__
 
 =head1 VERSION
 
-version 0.1106
+version 0.2603230
 
 Number 2 word conversion in DEU.
 
@@ -176,7 +175,7 @@ Only numbers from interval [0, 999_999_999] will be converted.
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2002-present
+Copyright (c) PetaMem, s.r.o. 2002-present
 
 =cut
 

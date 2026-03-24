@@ -21,14 +21,16 @@ use List::Util qw(pairmap);
 use App::sdif;
 my $version = $App::sdif::VERSION;
 
+my $app;
+
 use Getopt::EX::Hashed 'has'; {
 
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
 
     has help     => ' h      ' ;
-    has version  => ' v      ' ;
+    has version  => '        ' ;
     has debug    => ' d      ' ;
-    has unit     => ' by =s  ' , default => '' ;
+    has unit     => ' by :s  ' ;
     has diff     => '    =s  ' ;
     has exec     => ' e  =s@ ' , default => [] ;
     has refresh  => ' r  :1  ' , default => 1 ;
@@ -37,11 +39,12 @@ use Getopt::EX::Hashed 'has'; {
     has clear    => '    !   ' , default => 1 ;
     has silent   => ' s  !   ' , default => 0 ;
     has mark     => ' M  !   ' , default => 0 ;
-    has verbose  => ' V  !   ' , default => 0 ;
+    has verbose  => ' V  !   ' , default => undef ;
     has old      => ' O  !   ' , default => 0 ;
     has date     => ' D  !   ' , default => 1 ;
     has newline  => ' N  !   ' , default => 1 ;
-    has context  => ' C  =i  ' , default => 100 , alias => 'U';
+    has context  => ' C  :2  ' , default => 999, alias => 'U';
+    has scroll   => ' S      ' , default => 1 ;
     has colormap => ' cm =s@ ' , default => [] ;
     has plain    => ' p      ' ,
 	action   => sub {
@@ -55,7 +58,7 @@ use Getopt::EX::Hashed 'has'; {
     };
 
     has '+version' => action  => sub {
-	print "Version: $version\n";
+	print "$version\n";
 	exit;
     };
 
@@ -70,22 +73,28 @@ my %colormap = qw(
     NTEXT	K/554E
     );
 
-use Getopt::EX::Colormap qw(ansi_code);
+use Term::ANSIColor::Concise qw(ansi_code csi_code);
 my %termcap = pairmap { $a => ansi_code($b) }
     qw(
 	  home  {CUP}
 	  clear {CUP}{ED2}
 	  el    {EL}
 	  ed    {ED}
+	  decsc {DECSC}
+	  decrc {DECRC}
      );
 
 sub run {
-    my $opt = shift;
+    $app = my $opt = shift;
     local @ARGV = @_;
 
     use Getopt::EX::Long;
     Getopt::Long::Configure(qw(bundling require_order));
     $opt->getopt or usage({status => 1});
+
+    if ($opt->context and $opt->context < 100) {
+	$opt->verbose //= 1;
+    }
 
     use Getopt::EX::Colormap;
     my $cm = Getopt::EX::Colormap
@@ -98,15 +107,40 @@ sub run {
 	@{$opt->exec} or pod2usage();
     }
 
-    return  $opt->do_loop();
+    setup_terminal();
+    $SIG{INT} = sub { exit };
+    $opt->do_loop();
+}
+
+END {
+    reset_terminal();
+}
+
+sub control_scroll {
+    my $opt = shift;
+    $opt->scroll && $opt->date && $opt->refresh == 1;
+}
+
+sub setup_terminal {
+    if ($app and $app->control_scroll) {
+	STDOUT->printflush(csi_code(STBM => 3, 999));
+    }
+}
+
+sub reset_terminal {
+    if ($app and $app->control_scroll) {
+	STDOUT->printflush($termcap{decsc},
+			   csi_code(STBM =>),
+			   $termcap{decrc});
+    }
 }
 
 sub do_loop {
     my $opt = shift;
 
-    use App::cdif::Command;
-    my $old = App::cdif::Command->new(@{$opt->exec});
-    my $new = App::cdif::Command->new(@{$opt->exec});
+    use Command::Run;
+    my $old = Command::Run->new(@{$opt->exec->[0]});
+    my $new = Command::Run->new(@{$opt->exec->[0]});
 
     my @default_diff = (
 			qw(cdif --no-unknown),
@@ -119,13 +153,13 @@ sub do_loop {
 	    shellwords $opt->diff;
 	} else {
 	    ( @default_diff,
-	      map  { $_->[1] }
+	      map  { ref $_->[1] eq 'CODE' ? $_->[1]->() : $_->[1] }
 	      grep { $_->[0] }
-	      [   $opt->unit => '--unit=' . $opt->unit ],
-	      [ ! $opt->verbose => '--no-command' ],
-	      [ ! $opt->mark => '--no-mark' ],
-	      [ ! $opt->old  => '--no-old' ],
-	      [ defined $opt->context => '-U' . $opt->context ],
+	      [ defined $opt->unit    => sub { '--unit=' . $opt->unit } ],
+	      [ defined $opt->context => sub { '-U' . $opt->context } ],
+	      [ ! $opt->verbose       => '--no-command' ],
+	      [ ! $opt->mark          => '--no-mark' ],
+	      [ ! $opt->old           => '--no-old' ],
 	    );
 	}
     };
@@ -200,7 +234,7 @@ watchdiff - repeat command and watch differences
 
 =head1 VERSION
 
-Version 4.3301
+Version 4.4501
 
 =head1 DESCRIPTION
 

@@ -3,29 +3,61 @@ package Medusa;
 use 5.008003;
 use strict;
 use warnings;
-
+use Time::HiRes;
 use B;
 use Data::Dumper;
 our %LOG;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 BEGIN {
 	%LOG = (
 		LOGGER => 'Medusa::Logger',
 		LOG_LEVEL => 'debug',
 		LOG_FILE  => 'audit.log',
-		LOG => sub {
+		LOG_INIT => sub {
 			(my $module = $LOG{LOGGER}) =~ s/::/\//g;
 			require $module . '.pm';
 			$LOG{LOGGER}->new(
 				file => $LOG{LOG_FILE},
 			);
 		},
+		LOG => undef,
 		LOG_FUNCTIONS => {
 			error => 'error',
 			info  => 'info',
 			debug => 'debug',
+		},
+		QUOTE => '†',
+		FORMAT_MESSAGE => sub {
+			my %params = @_;
+			my $log_message = $params{message};
+			my $log_meth = $params{level} || $LOG{LOG_FUNCTIONS}{$LOG{LOG_LEVEL}};
+			my $message = sprintf("%s %s", scalar gmtime, uc($params{level}));
+			for my $key (sort keys %params) {
+				next if $key =~ m/^prefix|level$/;
+				if (ref $params{$key}) {
+					my $ref = ref $params{$key};
+					my $len = $ref eq 'ARRAY' ? scalar @{$params{$key} || []} - 1 : 1;
+					for my $i (0 .. $len) {
+						my $data = Dumper($ref eq 'HASH' ? $params{$key} : $params{params}->[$i]);
+						$data =~ s/\$VAR1\s=\s//;
+						$data =~ s/(\s+)(['"][^"]+['"])*/defined $2 ? $2 : ""/gem;
+						$data =~ s/;$//;
+						$message = sprintf("%s %s%s=%s%s%s",
+							$message,
+							$params{prefix},
+							$i,
+							$LOG{QUOTE},
+							$data,
+							$LOG{QUOTE},
+						);
+					}
+				} else {
+					$message = sprintf("%s %s=%s%s%s", $message, $key, $LOG{QUOTE}, $params{$key}, $LOG{QUOTE});
+				}
+			}
+			return $message;
 		}
 	);
 }
@@ -49,8 +81,8 @@ sub import {
 sub MODIFY_CODE_ATTRIBUTES {
 	my ($class,$code,@attrs) = @_;
 	
-	if (ref $LOG{LOG} eq 'CODE') {
-		$LOG{LOG} = $LOG{LOG}->();
+	unless (ref $LOG{LOG}) {
+		$LOG{LOG} = $LOG{LOG_INIT}->();
 	}
 	
 	my ($att) = grep { $_ =~ m/Audit/ && $_ } @attrs;
@@ -64,19 +96,24 @@ sub MODIFY_CODE_ATTRIBUTES {
 		no warnings 'redefine';
 		*{"${caller}::$meth"} = sub {
 			log_message(
-				message => sprintf( 
-					"subroutine %s called with params:",
+				message => sprintf(
+					"subroutine %s called with args:",
 					$meth
 				),
-				params => [@_]
+				params => [@_],
+				prefix => 'arg'
 			);
+			my $now = Time::HiRes::time * 1000;
 			my @out = $code->(@_);
+			my $after = Time::HiRes::time * 1000;
 			log_message(
 				message => sprintf(
 					"subroutine %s returned:",
 					$meth
 				),
-				params => [@out]
+				params => [@out],
+				elapsed => $after - $now,
+				prefix => 'return'
 			);
 			return wantarray ? @out : shift @out;
 		};
@@ -87,19 +124,13 @@ sub MODIFY_CODE_ATTRIBUTES {
 
 sub log_message {
 	my (%params) = @_;
-	my $log_message = $params{message};
 	my $log_meth = $params{level} || $LOG{LOG_FUNCTIONS}{$LOG{LOG_LEVEL}};
-	if (@_ > 1) {
-		my $len = scalar @{$params{params} || []} - 1;
-		for my $i (0 .. $len) {
-			my $data = Dumper($params{params}->[$i]);
-			$data =~ s/\$VAR1\s=\s//;
-			$data =~ s/(\s+)(['"][^"]+['"])*/defined $2 ? $2 : ""/gem;
-			$data =~ s/;$/ -/ unless $i == $len;
-			$log_message = sprintf("%s %s", $log_message, $data);
-		}
-	}
-	$LOG{LOG}->$log_meth($log_message);
+	$LOG{LOG}->$log_meth(
+		$LOG{FORMAT_MESSAGE}->(
+			%params,
+			level => $log_meth
+		)
+	);
 }
 
 1;
@@ -112,7 +143,7 @@ Medusa - Subroutine auditing via attributes
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

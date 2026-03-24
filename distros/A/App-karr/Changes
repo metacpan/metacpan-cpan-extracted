@@ -1,6 +1,24 @@
+0.102     2026-03-23 21:55:25Z
+
+    - Fix CPAN smoker failures: skip git tests on old git (< 1.8.5, no -C flag)
+    - Fix skip() without SKIP block in t/11-git-impl.t (Test::More crash)
+    - Skip user.email test gracefully when not configured
+
 0.101     2026-03-23 03:02:05Z
 
+    - Strengthen docs and GitHub landing pages
+    - Add POD to all modules (bin/karr, BoardStore, commands, roles)
+
 0.100     2026-03-23 01:50:27Z
+
+    - Migrate board state to git refs only (refs/karr/*), drop karr/ directory
+    - Add backup and restore commands for refs/karr snapshot export/import
+    - Add destroy command (remove all board refs, local and remote)
+    - Add set-refs / get-refs helper commands for arbitrary ref storage
+    - Add skill command with File::ShareDir-based skill loading
+    - Simplify board output and drop WIP limits from config
+    - Split Docker runtime images (slim + full) with entrypoint script
+    - Expand POD across Git.pm, Lock.pm, commands, and roles
 
 0.003     2026-03-20 05:01:01Z
 

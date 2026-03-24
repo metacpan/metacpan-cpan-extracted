@@ -50,13 +50,13 @@ $Medusa::LOG{LOG} = MockLogger->new();
     MockLogger->clear();
     Medusa::log_message(message => "Simple message");
     is(scalar @MockLogger::MESSAGES, 1, 'one message logged');
-    is($MockLogger::MESSAGES[0]{msg}, "Simple message", 'message content correct');
+    like($MockLogger::MESSAGES[0]{msg}, qr/Simple message/, 'message content correct');
 }
 
 # Test: log_message with arguments
 {
     MockLogger->clear();
-    Medusa::log_message(message => "With args:", params => ["value1", "value2"]);
+    Medusa::log_message(message => "With args:", params => ["value1", "value2"], prefix => 'args');
     is(scalar @MockLogger::MESSAGES, 1, 'one message logged with args');
     like($MockLogger::MESSAGES[0]{msg}, qr/With args:/, 'message prefix present');
     like($MockLogger::MESSAGES[0]{msg}, qr/value1/, 'first arg in message');

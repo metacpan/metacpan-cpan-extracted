@@ -1,5 +1,11 @@
 Revision History for Git::Server
 
+0.039  2026-03-23 02:00:00
+ - Improvements with git-deploy
+   * Always show [git-deploy] for {deploy} users.
+   * Handle NON-Hot-Deplayable repos more gracefully.
+   * Consider a git-client copy NOT as git-deploy.
+
 0.038  2026-03-21 04:00:00
  - More consistent messaging and logging.
  - Fix ref RegExp to allow more valid characters.

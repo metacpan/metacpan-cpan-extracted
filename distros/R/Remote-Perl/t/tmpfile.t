@@ -33,9 +33,7 @@ for my $strategy (qw(auto linux perl named)) {
         eval { $rc = $r->run_code($DATA_SCRIPT, on_stdout => sub { $out .= $_[0] }) };
         if ($@ =~ /unavailable/) {
             $r->disconnect;
-            pass("$strategy: skipped (not available on this system)");
-            pass("$strategy: skipped");
-            next;
+            skip("$strategy: not available on this system", 2);
         }
         is($rc,  0,                       "$strategy: exit 0");
         is($out, "data:hello from data\n", "$strategy: __DATA__ readable");

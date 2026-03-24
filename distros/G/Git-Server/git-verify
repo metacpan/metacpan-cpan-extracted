@@ -70,7 +70,7 @@ use strict;
 use warnings;
 use Cwd qw(abs_path);
 
-our $VERSION = "0.038";
+our $VERSION = "0.039";
 
 if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
     s{^ssh://(|[^/:]+\@)\[([a-z0-9\-\.\:]+)\]:(\d+)(?:$|/)}{}i ||

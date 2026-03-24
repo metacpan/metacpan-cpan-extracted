@@ -63,6 +63,20 @@ t/20-new-features.t
 t/21-leak.t
 t/22-bugfixes.t
 typemap
+xs/i16.xsi
+xs/i16a.xsi
+xs/i16s.xsi
+xs/i32.xsi
+xs/i32a.xsi
+xs/i32s.xsi
+xs/ia.xsi
+xs/ii.xsi
+xs/is.xsi
+xs/sa.xsi
+xs/si.xsi
+xs/si16.xsi
+xs/si32.xsi
+xs/ss.xsi
 xxhash.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

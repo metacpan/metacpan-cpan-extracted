@@ -2,7 +2,7 @@
 # public user level API: docs, help and arg cleaning
 
 package Graphics::Toolkit::Color;
-our $VERSION = '2.0';
+our $VERSION = '2.01';
 
 use v5.12;
 use warnings;
@@ -195,6 +195,16 @@ sub is_in_gamut {
 }
 	
 ## single color creation methods #######################################
+#~ sub apply {
+    #~ my ($self, @args) = @_;
+    #~ my $help = <<EOH;
+    #~ GTC method 'apply' accepts one named argument with a numeric value:
+    #~ apply ( ...
+        #~ gamma => 2.2,          # reverse is with 1 / 2.2
+        #~ in => 'OKlab',         # compute in oklab space
+#~ EOH
+#~ }
+
 sub set_value {
     my ($self, @args) = @_;
     @args = %{$args[0]} if @args == 1 and ref $args[0] eq 'HASH';
@@ -406,15 +416,6 @@ Graphics::Toolkit::Color - calculate color (sets), IO many spaces and formats
     $red->gradient( to => '#0000FF', steps => 10);   # 10 colors from red to blue
     my @base_triadic = $red->complement( 3 );        # get fitting red green and blue
     my @reds = $red->cluster( r => 1.1, min_d => 1 );# 13 shades of red
-
-
-=head1 DEPRECATION WARNING
-
-Methods of the old API ( I<string>, I<rgb>, I<red>,
-I<green>, I<blue>, I<rgb_hex>, I<rgb_hash>, I<hsl>, I<hue>, I<saturation>,
-I<lightness>, I<hsl_hash>, I<add>, I<set>, I<blend>, I<blend_with>,
-I<gradient_to>, I<rgb_gradient_to>, I<hsl_gradient_to>, I<complementary>)
-will be removed with release of version 2.0.
 
 =head1 DESCRIPTION
 
@@ -691,8 +692,8 @@ either the only argument or the named argument L</to>, which is the only
 required one.
 
 The C<distance> is measured in I<RGB> color space unless told otherwise
-by the argument L</in>. Please use the I<OKLAB> or I<CIELUV> space, if
-you are interested in getting a result that matches the human perception.
+by the argument L</in>. Please use the I<OKLAB> (better) or I<CIELUV> space,
+if you are interested in getting a result that matches the human perception.
 
 The third argument is named C<select>. It's useful if you want to regard
 only certain dimensions (axis - long and short axis names are accepted).
@@ -721,7 +722,9 @@ boolean (zero or one). It will tell you if the color is within the gamut,
 of the color space, the color was defined in. Or in simpler terms: 
 are the color values within the accepted ranges? Some spaces exclude
 certain value combinations. This is the way to ensure you got a valid
-color definition.
+color definition. Since the GTC L</CONSTRUCTOR> clamps out of shape values,
+and forces them to be in gamut - this method is only needed to ensure 
+that there is nothing to clamp and the constructor did not change any value.
 
 If it is too clumsy for you to use an existing color object to check if
 another color is valid: use th importable routine with the same name.
@@ -773,11 +776,22 @@ ones. The rest works as described in L</set_value>.
 This method was mainly created to get lighter, darker or more saturated
 colors by using it like:
 
-
     my $blue = Graphics::Toolkit::Color->new('blue');
-    my $darkblue = $blue->add_value( Lightness => -25 );  # get a darker tone
-    my $blue2 = $blue->add_value( blue => 10 );           # bluer than blue ?
-    my $blue3 = $blue->add_value( l => 10, in => 'LAB' ); # lighter color according CIELAB
+    my $darkblue = $blue->add_value( Lightness => -25 );    # get a darker tone
+    my $blue2 = $blue->add_value( blue => 10 );             # bluer than blue ?
+    my $blue3 = $blue->add_value( l => 10, in => 'LAB' );   # lighter color according CIELAB
+
+
+=head2 apply
+
+Creates a new GTC color object with recalculated values. Each calculation
+is triggered by one named argument and currently is only one possible.
+I<gamma> triggers a gamma correction which can be reversed with the inverse argument.
+Use an ARRAY ref to apply each color value with a different gamma. 
+The argument L</in> determines in which space the carlculation takes place:
+
+    my $linear_blue = $blue->apply( gamma => 2.2 );         # is same the as :
+    my $linear_blue = $blue->apply( gamma => [2.2, 2.2, 2.2], in => 'RGB' );
 
 
 =head2 mix

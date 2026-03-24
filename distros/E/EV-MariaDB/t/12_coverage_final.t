@@ -220,7 +220,7 @@ with_mariadb(cb => sub {
         TestMariaDB::connect_args(),
         multi_statements => 1,
         on_connect => sub {
-            $m->q("select 1; DO 1; select 2", sub {
+            $m->q("select 1; do 1; select 2", sub {
                 my ($rows, $err) = @_;
                 $drain_ok = !$err && $rows->[0][0] == 1;
             });

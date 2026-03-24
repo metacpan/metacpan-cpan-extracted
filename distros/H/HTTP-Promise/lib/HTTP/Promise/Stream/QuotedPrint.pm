@@ -70,7 +70,7 @@ sub decode_qp
     if( !defined( $rv ) )
     {
         $QuotedPrintError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -123,7 +123,7 @@ sub encode_qp
     if( !defined( $rv ) )
     {
         $QuotedPrintError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -136,13 +136,23 @@ sub encode_qp_utf8 { return( shift->encode_qp( Encode::encode_utf8( shift( @_ ) 
 
 sub is_decoder_installed
 {
-    eval( 'use MIME::QuotedPrint ();' );
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require MIME::QuotedPrint;
+    };
     return( $@ ? 0 : 1 );
 }
 
 sub is_encoder_installed
 {
-    eval( 'use MIME::QuotedPrint ();' );
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require MIME::QuotedPrint;
+    };
     return( $@ ? 0 : 1 );
 }
 

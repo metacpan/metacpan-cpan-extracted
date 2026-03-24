@@ -112,6 +112,8 @@ sub accept_decodable
     return( $self->header( 'Accept-Encoding', $self->decodable->join( ', ' )->scalar ) );
 }
 
+sub authorization_basic { return( shift->headers->authorization_basic( @_ ) ); }
+
 sub clone
 {
     my $self = shift( @_ );
@@ -134,7 +136,7 @@ sub dump
     return( $self->SUPER::dump( preheader => $start_line ) );
 }
 
-sub headers { return( shift->_set_get_object_without_init( 'headers', 'HTTP::Promise::Headers', @_ ) ); }
+# sub headers { return( shift->_set_get_object_without_init( 'headers', 'HTTP::Promise::Headers', @_ ) ); }
 
 sub host
 {
@@ -203,8 +205,8 @@ sub make_form_data
         {
             $def =
             {
-            filename => $v->basename,
-            type => ( $v->finfo->mime_type || $DEFAULT_MIME_TYPE ),
+                filename => $v->basename,
+                type => ( $v->finfo->mime_type || $DEFAULT_MIME_TYPE ),
             };
         }
         # An hash referenece can be passed as the value to provide granularity.

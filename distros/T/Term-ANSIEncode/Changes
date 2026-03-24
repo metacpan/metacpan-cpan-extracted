@@ -388,3 +388,13 @@
 1.94    Mar 03, 2026
 
         Added the extra tokens to the -t option
+
+1.95    Mar 23, 2026
+
+        Added examples to the POD documentation
+
+1.96    Mar 23, 2026
+
+        MetaCPAN has this weird behavior using the bin/ansi-encode file for
+		the documentation.  Weird I made some changes to help minimize this
+		weirdness.

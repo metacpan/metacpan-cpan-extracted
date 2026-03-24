@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 #
 # (c) 2003-2010 PetaMem, s.r.o.
 #
@@ -13,12 +13,11 @@ use strict;
 use Carp;
 use Exporter;
 use base 'Exporter';
-use vars qw($Charset $VERSION @EXPORT_OK);
+use vars qw($Charset @EXPORT_OK);
 
 # }}}
 # {{{ variables declaration
-
-$Lingua::ZHO::Numbers::VERSION = 0.1192;
+our $VERSION = '0.2603230';
 
 @EXPORT_OK = 'number_to_zh';
 
@@ -208,7 +207,7 @@ Lingua::ZHO::Numbers - Converts numeric values into their Chinese string equival
 
 =head1 VERSION
 
-version 0.1192
+version 0.2603230
 
 =head1 SYNOPSIS
 

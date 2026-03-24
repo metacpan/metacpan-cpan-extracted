@@ -14,11 +14,11 @@ DESCRIPTION
     some portion of the task is common.
 
     In the simplest form, running shell commands can be done very simply
-    using the "system()" call, backticks, or several other ways, but I
-    usually find myself wanting to do a bit (and sometimes a lot) more,
-    especially when I am writing a long-term script that I want to be
-    robust. In these cases, I frequently ended up writing a subroutine to
-    run the shell command(s) for me with added functionality.
+    using the system() call, backticks, or several other ways, but I usually
+    find myself wanting to do a bit (and sometimes a lot) more, especially
+    when I am writing a long-term script that I want to be robust. In these
+    cases, I frequently ended up writing a subroutine to run the shell
+    command(s) for me with added functionality.
 
     This module is designed to take a list of shell commands and
     automatically turn them into a shell script (using only basic shell
@@ -93,8 +93,9 @@ DESCRIPTION
         escaping them as necessary.
 
     This module is designed to run multiple commands in a single shell,
-    wrapping them in very simple, standard shell commands to automatically
-    add all of this functionality.
+    wrapping them in very simple, standard shell commands (that will run in
+    every bourne shell varient that I'm aware of) to automatically add all
+    of this functionality.
 
 METHODS
     new
@@ -176,8 +177,7 @@ METHODS
 
         In this mode, the script is run, and output is sent directly to
         STDOUT and STDERR as appropriate for the options specified. In
-        essence, this generates a script and runs it with the "system()"
-        call.
+        essence, this generates a script and runs it with the system() call.
 
         The error code returned is described below in the "ERROR CODES"
         section.
@@ -200,6 +200,10 @@ METHODS
 
         The error codes are described in the "ERROR CODES" section below.
 
+        Note that every time this is run, it flushes the output from the
+        previous run, so make sure that the output is fully processed before
+        running this a second time.
+
     ssh This behaves similar to the "run" method except it will run the
         commands on each host in @hosts using ssh. The return values for
         each mode are identical to the return methods from the "run" method
@@ -221,7 +225,6 @@ METHODS
         hosts the commands are being run on.
 
     output
-           $ret = $obj->output(%options);
            @ret = $obj->output(%options);
            %ret = $obj->output(%options);
 
@@ -242,8 +245,8 @@ METHODS
            commands   : clears all commands and their options
            env        : clears the environment
            opts       : clears all options
-           out        : clears the output from running the command
-                        in B<script> mode
+
+        Output from any previous run is always flushed.
 
     dire
            $err = $obj->dire($dire);
@@ -658,28 +661,35 @@ OUTPUT OPTIONS
     When commands are run in the 'script' mode, the output is stored in the
     object.
 
-    To access the output, use the following:
+    To access the output, use one of the following:
 
        @out = $obj->output(%options);
+       %out = $obj->output(%options);
 
-    Each call to the method will return one part of the output. To following
-    options may be used to determine what is returned.
+    The second form is used only if the output was generated using the ssh
+    method and the output from multiple hosts is returned. Otherwise, the
+    first form is used where the output from only a single host (localhost
+    if the output was generated using the run method).
+
+    Each call to the method will return one part of the output. The
+    following options may be used to determine what is returned.
 
     host=HOST
         If the output was generated using the ssh method, this option is
-        required (since it is possible to run the commands both locally and
-        remotely, and the output is stored separately).
+        required.
 
         HOST can be any of:
 
            all      The output for all hosts will be returned.  The return value
                     will be a hash of the form:
 
-                       %ret = ( HOST1 => OUTPUT1, HOST2 => OUTPUT2, ...)
+                       %out = ( HOST1 => OUTPUT1, HOST2 => OUTPUT2, ...)
 
            HOST1,HOST2,...
                     The output for all of the hosts listed will be returned in a
                     hash
+
+                       %out = ( HOST1 => OUTPUT1, HOST2 => OUTPUT2, ...)
 
            HOST     If only a single host is specified, the output for only
                     that host will be returned.  It will not be returned as a hash.
@@ -740,6 +750,48 @@ KNOWN PROBLEMS
         assigned to each command. Since exit codes must be between 0-255,
         and some are reserved, there is a limit of 200 commands that can be
         entered if accurate error tracking is needed.
+
+BUGS AND QUESTIONS
+    If you find a bug in Shell::Cmd, please let me know. The best ways to
+    contact me are:
+
+    GitHub
+        You can submit an issue or question on GitHub. This can be done at
+        the following URL:
+
+        <https://github.com/SBECK-github/Shell-Cmd>
+
+        This is the preferred method. Please submit problems requests as
+        GitHub issues if at all possible.
+
+    Direct email
+        You are welcome to send it directly to me by email. The email
+        address to use is: sbeck@cpan.org.
+
+        There is some discussion of discontinuing CPAN email, so please use
+        this as a last resort. The GitHub method is strongly preferred.
+        Also, because cpan.org addresses are published, they are used by a
+        lot of spammers and phishers. Please include the name of the perl
+        module in the subject line of ALL messages sent to my cpan.org
+        address or it will likely be overlooked.
+
+    Please do not use other means to report bugs (such as forums for a
+    specific OS or Linux distribution) as it is impossible for me to keep up
+    with all of them. These are the current methods that are guaranteed to
+    notify me.
+
+    When filing a bug report, please include the following information:
+
+    Shell::Cmd version
+        Please include the version of Shell::Cmd you are using. You can get
+        this by using the script:
+
+           use Shell::Cmd;
+           print $Shell::Cmd::VERSION,"\n";
+
+    If you find any problems with the documentation (errors, typos, or items
+    that are not clear), please send them to me. I welcome any suggestions
+    that will allow me to improve the documentation.
 
 LICENSE
     This script is free software; you can redistribute it and/or modify it

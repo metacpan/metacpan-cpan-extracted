@@ -1,7 +1,7 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::Word2Num;
-# ABSTRACT: A wrapper for Lingua:XXX::word2num modules.
+# ABSTRACT: A wrapper for Lingua:XXX::word2num modules Lingua::Word2Num is a module for converting texts in their spoken language representation into numbers.
 
 # {{{ use block
 
@@ -11,18 +11,16 @@ use strict;
 use warnings;
 
 use Carp;
-use Perl6::Export::Attrs;
+use Export::Attrs;
 use Readonly;
 
 # }}}
+# {{{ var block
 
-# {{{ variables
+my  Readonly::Scalar $COPY    = 'Copyright (c) PetaMem, s.r.o. 2004-present';
+our $VERSION = '0.2603230';
 
-my  Readonly::Scalar $COPY    = 'Copyright (C) PetaMem, s.r.o. 2004-present';
-our Readonly::Scalar $VERSION = 0.0682;
-
-# }}}
-# {{{ templates for functional and object interface
+# templates for functional and object interface
 
 my $template_func = 'use __PACKAGE_WITH_VERSION__ ();'."\n".
                     '$result = __PACKAGE__::__FUNCTION__($word);'."\n";
@@ -30,9 +28,6 @@ my $template_func = 'use __PACKAGE_WITH_VERSION__ ();'."\n".
 my $template_obj  = 'use __PACKAGE_WITH_VERSION__ ();'."\n".
                     'my $tmp_obj = new __PACKAGE__;'."\n".
                     '$result = $tmp_obj->__FUNCTION__("$word");'."\n";
-
-# }}}
-# {{{ %known                    language codes from iso639 mapped to respective interface
 
 our %known = (
     afr => {
@@ -140,6 +135,7 @@ our %known = (
 );
 
 # }}}
+
 # {{{ new                       constructor
 
 sub new {
@@ -206,7 +202,6 @@ return if !defined $known{$lang};
 # }}}
 
 1;
-
 __END__
 
 # {{{ POD HEAD
@@ -215,17 +210,13 @@ __END__
 
 =head1 NAME
 
-Lingua::Word2Num
+=head2 Lingua::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-=head1 DESCRIPTION
-
-A wrapper for Lingua:XXX::word2num modules.
-
-=head2 $Rev: 682 $
+A wrapper for Lingua:XXX::word2num modules
 
 Lingua::Word2Num is a module for converting texts in their spoken
 language representation into numbers. This is wrapper for various
@@ -233,6 +224,13 @@ Lingua::XXX::Word2Num modules. Input text must be in utf8 encoding.
 
 For further information about various limitations see documentation
 for currently used package.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -251,7 +249,7 @@ for currently used package.
 =cut
 
 # }}}
-# {{{ functions reference
+# {{{ Functions Reference
 
 =pod
 
@@ -259,28 +257,107 @@ for currently used package.
 
 =over 2
 
-=item  cardinal (positional)
+=item B<cardinal> (positional)
 
-  1   string  language
-  2   text    text to convert
-  =>  number  converted number
-      undef   if the input string is not known
+  1   str    language code
+  2   str    text to convert
+  =>  num    converted number
+  =>  undef  if the input string is not known
 
 Conversion from a text in the specified language into a number.
 
-=item known_langs
 
-  =>  array ref  list of known languages
+=item B<known_langs> (void)
+
+  =>  lref  list of known languages
 
 List of all currently supported languages.
 
-=item new
+
+=item B<new> (void)
+
+  =>  obj  returns new object
 
 Constructor.
 
-=item preprocess_code
+
+=item B<preprocess_code> (void)
+
+  =>  str  returns a template
 
 Private.
+
+
+=back
+
+=cut
+
+# }}}
+# {{{ EXPORTED FUNCTIONS
+
+=pod
+
+=head1 EXPORT_OK
+
+=over 2
+
+=item cardinal
+
+=item known_langs
+
+=item langs
+
+=back
+
+=cut
+
+# }}}
+# {{{ REQUIRED MODULES
+
+=pod
+
+=head1 Required modules
+
+This module is only wrapper and requires other CPAN modules for requested
+conversions eg. Lingua::AFR::Numbers for Afrikaans.
+
+Currently supported languages/modules are:
+
+=over 2
+
+=item afr - L<Lingua::AFR::Word2Num>
+
+=item ces - L<Lingua::CES::Word2Num>
+
+=item deu - L<Lingua::DEU::Word2Num>
+
+=item eng - L<Lingua::ENG::Word2Num>
+
+=item eus - L<Lingua::EUS::Word2Num>
+
+=item fra - L<Lingua::FRA::Word2Num>
+
+=item ind - L<Lingua::IND::Words2Nums>
+
+=item ita - L<Lingua::ITA::Word2Num>
+
+=item jpn - L<Lingua::JPN::Word2Num>
+
+=item nld - L<Lingua::NLD::Word2Num>
+
+=item nor - L<Lingua::NOR::Word2Num>
+
+=item pol - L<Lingua::POL::Word2Num>
+
+=item por - L<Lingua::POR::Words2Nums>
+
+=item rus - L<Lingua::RUS::Word2Num>
+
+=item spa - L<Lingua::SPA::Word2Num>
+
+=item swe - L<Lingua::SWE::Word2Num>
+
+=item zho - L<Lingua::ZHO::Word2Num>
 
 =back
 
@@ -291,25 +368,15 @@ Private.
 
 =pod
 
-=head1 EXPORT_OK
-
-cardinal
-known_langs
-
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specification by R. Jelinek:
-   Vitor Serra Mori E<info@petamem.com>
+   Richard C. Jelinek E<lt>development@petamem.comE<gt>
+   Vitor Serra Mori E<lt>development@petamem.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

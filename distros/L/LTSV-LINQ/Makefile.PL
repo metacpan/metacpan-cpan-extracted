@@ -4,18 +4,13 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{LTSV::LINQ},
-    'VERSION'   => q{1.05},
+    'VERSION'   => q{1.06},
     'ABSTRACT'  => q{LINQ-style query interface for LTSV files},
     'PREREQ_PM' => {
-        'ExtUtils::MakeMaker' => '5.4302',
-        'File::Basename' => '2.6',
-        'File::Copy' => '2.02',
-        'File::Path' => '1.0401',
-        'File::Spec' => '0',
-        'FindBin' => '1.42',
-        'Socket' => '0',
         'perl' => '5.00503',
         'strict' => '1.01',
+        'vars' => '0',
+        'warnings' => '0',
     },
     'AUTHOR'    => q{ina <ina@cpan.org>},
 );
@@ -48,11 +43,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'LTSV::LINQ' => {
                 'file'    => 'lib/LTSV/LINQ.pm',
-                'version' => '1.05',
+                'version' => '1.06',
             },
             'LTSV::LINQ::Ordered' => {
                 'file'    => 'lib/LTSV/LINQ.pm',
-                'version' => '1.05',
+                'version' => '1.06',
             }
         },
     };

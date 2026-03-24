@@ -1,5 +1,9 @@
 Revision history for distribution Git-RemoteURL-Parse
 
+0.06    2026-03-23
+
+     - Added plain text README.
+
 0.05    2026-03-20
 
      - Added and reorganized author and release tests.

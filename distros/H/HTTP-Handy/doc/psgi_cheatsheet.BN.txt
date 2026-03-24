@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Cheat Sheet                        [BN] Bangla
+ HTTP::Handy PSGI চিট শিট                             [BN] বাংলা
 ======================================================================
 
-[ 1. server chalu kora ]
+[ 1. সার্ভার শুরু করা ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # aboshyik: PSGI app code ref
-      host          => '127.0.0.1',# oichik: bind address (0.0.0.0)
-      port          => 8080,       # oichik: port (default: 8080)
-      log           => 1,          # oichik: access log (default: 1)
-      max_post_size => 10485760,   # oichik: max POST bytes (default: 10MB)
+      app           => $app,       # বাধ্যতামূলক: PSGI app code reference
+      host          => '127.0.0.1',# ঐচ্ছিক: bind address (default: 0.0.0.0)
+      port          => 8080,       # ঐচ্ছিক: port (default: 8080)
+      log           => 1,          # ঐচ্ছিক: access log (default: 1)
+      max_post_size => 10485760,   # ঐচ্ছিক: max POST bytes (default: 10MB)
   );
 
-  script hisebe seedha chalao: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. onurodh poribesh veriable ($env) ]
+[ 2. অনুরোধ পরিবেশ চলক ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (POST body pora (psgi.input))
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    স্ট্রিং  "GET" / "POST"
+  PATH_INFO         স্ট্রিং  /index.html
+  QUERY_STRING      স্ট্রিং  key=val
+  SERVER_NAME       স্ট্রিং  hostname
+  SERVER_PORT       পূর্ণসংখ্যা  8080
+  CONTENT_TYPE      স্ট্রিং  content-type
+  CONTENT_LENGTH    পূর্ণসংখ্যা  (bytes)
+  HTTP_*            স্ট্রিং  HTTP_USER_AGENT ...
+  psgi.input        অবজেক্ট  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   স্ট্রিং  "http"
 
-[ 3. response format ]
+[ 3. প্রতিক্রিয়া ফরম্যাট ]
 
   [$status, \@headers, \@body]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. POST body pora (psgi.input) ]
+[ 4. POST বডি পড়া (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,62 +54,57 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. utility method ]
+[ 5. ইউটিলিটি পদ্ধতি ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. response builder method ]
+[ 6. প্রতিক্রিয়া নির্মাণ পদ্ধতি ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. static fail serve kora ]
+[ 7. স্থির ফাইল পরিবেশন ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. routing pattern ]
+[ 8. রাউটিং প্যাটার্ন ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
   if ($path =~ m{^/api/}) { ... }
   if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
 
-[ 9. error handling ]
+[ 9. ত্রুটি পরিচালনা ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 স্বয়ংক্রিয় 500 প্রতিক্রিয়া
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. run() toiri log fail ]
+[ 10. run() দ্বারা তৈরি লগ ফাইল ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  access log (10 minit rotation, LTSV format)
-  logs/error/error.log                error/startup log
+  logs/access/YYYYMMDDHHm0.log.ltsv  অ্যাক্সেস লগ (10 মিনিট রোটেশন, LTSV)
+  logs/error/error.log                ত্রুটি/স্টার্টআপ লগ
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. অফিসিয়াল রিসোর্স লিংক ]
+[ 11. অফিসিয়াল রিসোর্স ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

@@ -183,6 +183,19 @@ sub _render_value {
 sub _render_raw {
   my ($self, $node) = @_;
 
+  # COMPARE
+  if ($node->{_compare}) {
+    my $c = $node->{_compare};
+    my $sql_op = uc($c->{op});
+    confess "Unknown operator '$c->{op}' in compare()"
+      unless $VALID_OPS{$sql_op};
+    my ($ls, @lb) = $self->render($c->{left});
+    my ($rs, @rb) = $self->render($c->{right});
+    $ls = "($ls)" if $c->{left}->isa('SQL::Wizard::Expr::Select');
+    $rs = "($rs)" if $c->{right}->isa('SQL::Wizard::Expr::Select');
+    return ("$ls $sql_op $rs", @lb, @rb);
+  }
+
   # TRUNCATE
   if ($node->{_truncate}) {
     my $table = $node->{_truncate};

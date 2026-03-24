@@ -56,6 +56,7 @@ sub init
     $self->{previous}   = undef;
     $self->{request}    = undef;
     $self->{status}     = $status;
+    $self->{uri}        = undef;
     $self->{version}    = '';
     $self->{_init_strict_use_sub} = 1;
     $self->{_init_params_order}   = [qw( content headers )];
@@ -352,6 +353,8 @@ sub status_line
     my $status = $self->status || HTTP::Promise::Status->status_message( $code ) || 'Unknown code';
     return( "$code $status" );
 }
+
+sub uri { return( shift->_set_get_uri( { field => 'uri', class => 'URI' }, @_ ) ); }
 
 # NOTE: sub FREEZE is inherited
 

@@ -1,6 +1,6 @@
 package Getopt::EX::Hashed;
 
-our $VERSION = '1.0701';
+our $VERSION = '1.0702';
 
 =encoding utf-8
 
@@ -10,7 +10,7 @@ Getopt::EX::Hashed - Hash object automation for Getopt::Long
 
 =head1 VERSION
 
-Version 1.0701
+Version 1.0702
 
 =head1 SYNOPSIS
 
@@ -383,7 +383,7 @@ sub _opt_dest {
     else {
 	if (ref $obj->{$name} eq 'CODE') {
 	    sub { &{$obj->{$name}} for $obj };
-	} elsif (ref $obj->{$name} eq 'SCALAR') {
+	} elsif (ref $obj->{$name}) {
 	    $obj->{$name};
 	} else {
 	    \$obj->{$name};
@@ -608,9 +608,9 @@ Set default value.  If no default is given, the member is initialized
 as C<undef>.
 
 If the value is a reference to an ARRAY or HASH, a shallow copy is
-created for each C<new> call.  This means the reference itself is
-copied, but the contents are shared.  Modifying the array or hash
-contents will affect all instances.
+created for each C<new> call.  The elements are not deep-copied, so
+if any element is itself a reference, the referenced data is shared
+across instances.
 
 If a code reference is given, it is called at the time of B<new> to
 get default value.  This is effective when you want to evaluate the

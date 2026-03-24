@@ -15,6 +15,8 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+	'File::Temp' => '0',
+	'File::Spec' => '0'
     },
     PREREQ_PM => {
 	'Data::Dumper' => 0,

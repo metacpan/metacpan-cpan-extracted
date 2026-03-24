@@ -17,7 +17,6 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 META.json
 META.yml
-ngx_queue.h
 Pg.xs
 README
 README.md

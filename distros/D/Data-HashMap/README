@@ -85,23 +85,33 @@ KEYWORDS
         hm_xx_get $map, $key            # lookup, returns value or undef
         hm_xx_exists $map, $key         # returns bool
         hm_xx_remove $map, $key         # returns bool
-        hm_xx_size $map                 # returns entry count (includes TTL-expired not yet reaped)
-
-        # List-returning:
-        hm_xx_keys $map                 # returns list of keys
-        hm_xx_values $map               # returns list of values
-        hm_xx_items $map                # returns (k1,v1, k2,v2, ...)
+        hm_xx_take $map, $key           # remove and return value, or undef
+        hm_xx_drain $map, $n            # remove up to N entries, returns (k1,v1,...)
+        hm_xx_pop $map                  # remove+return (key,val): LRU tail or next entry
+        hm_xx_shift $map                # remove+return (key,val): LRU head or prev entry
+        hm_xx_reserve $map, $n          # pre-allocate capacity for N entries
+        hm_xx_purge $map                # force-expire all TTL'd entries
+        hm_xx_capacity $map             # current internal table capacity
+        hm_xx_persist $map, $key        # remove TTL from key (make permanent)
+        hm_xx_swap $map, $key, $new     # replace value, return old (undef if missing)
 
     Integer-value variants (I16, I32, II, SI16, SI32, SI) also provide:
 
         hm_xx_incr $map, $key           # +1, returns new value (new keys init to 0)
         hm_xx_decr $map, $key           # -1, returns new value (new keys init to 0)
         hm_xx_incr_by $map, $key, $n    # +N, returns new value (new keys init to 0)
+        hm_xx_cas $map, $key, $expected, $new  # compare-and-swap, returns bool
 
     All variants also provide:
 
+        hm_xx_size $map                 # returns entry count (includes TTL-expired not yet reaped)
+        hm_xx_keys $map                 # returns list of keys
+        hm_xx_values $map               # returns list of values
+        hm_xx_items $map                # returns (k1,v1, k2,v2, ...)
+
         hm_xx_max_size $map             # returns max_size (0 = no LRU)
         hm_xx_ttl $map                  # returns default TTL in seconds (0 = no TTL)
+        hm_xx_lru_skip $map             # returns lru_skip percentage (0 = strict LRU)
         hm_xx_clear $map                # remove all entries
         hm_xx_to_hash $map              # returns a Perl hashref snapshot
         hm_xx_each $map                            # returns (key, value) or empty list
@@ -113,16 +123,38 @@ KEYWORDS
 
         hm_xx_get_direct $map, $key   # zero-copy get (read-only, see CAVEATS)
 
+    Method-only operations (no keyword form):
+
+        $map->clone                     # deep copy the map
+        $map->from_hash(\%h)            # bulk-insert from a Perl hashref
+        $map->merge($other_map)         # merge entries from another map of same type
+        $map->freeze                    # serialize to binary string (non-SV* variants)
+        MyVariant->thaw($data)          # reconstruct map from freeze data
+
 CONSTRUCTOR
-        my $map  = Data::HashMap::II->new();           # plain (no LRU, no TTL)
-        my $lru  = Data::HashMap::II->new(1000);       # LRU: max 1000 entries
-        my $ttl  = Data::HashMap::II->new(0, 60);      # TTL: 60-second expiry
-        my $both = Data::HashMap::II->new(1000, 60);   # LRU + TTL
+        my $map  = Data::HashMap::II->new();              # plain (no LRU, no TTL)
+        my $lru  = Data::HashMap::II->new(1000);          # LRU: max 1000 entries
+        my $ttl  = Data::HashMap::II->new(0, 60);         # TTL: 60-second expiry
+        my $both = Data::HashMap::II->new(1000, 60);      # LRU + TTL
+        my $fast = Data::HashMap::II->new(1000, 0, 90);   # LRU + 90% skip
 
   LRU eviction
     When "max_size" is set, the map acts as an LRU cache. Inserting beyond
     capacity evicts the least-recently-used entry. "get", "put" (update),
     and counter operations promote the accessed entry to most-recently-used.
+
+    The optional third argument "lru_skip" (0-99) enables approximate LRU:
+    only every Nth access promotes the entry, skipping the linked-list
+    update the rest of the time. The tail entry (eviction candidate) is
+    always promoted to prevent starvation. This trades eviction precision
+    for speed on read-heavy workloads with hot keys (Zipf-like access
+    patterns).
+
+        lru_skip=0    strict LRU (default)
+        lru_skip=90   promote every 10th access --good balance
+        lru_skip=99   promote every 100th access --near-zero overhead
+
+    Recommended value for caching workloads: 90.
 
   TTL expiry
     When "default_ttl" is set (in seconds), entries expire lazily: expired
@@ -330,6 +362,9 @@ IMPLEMENTATION
         that may resize). Safe for immediate use: comparisons, printing,
         passing to functions. Use "get" (the default) when you need to store
         the value.
+
+    *   "freeze"/"thaw" produces a native-endian binary format; frozen data
+        is not portable between systems with different byte orders
 
 DEPENDENCIES
     XS::Parse::Keyword (>= 0.40)

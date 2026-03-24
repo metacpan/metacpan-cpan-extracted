@@ -26,6 +26,7 @@ sub fresh_mock {
         schema     => $schema,
         schema_dir => $SCHEMA_DIR,
         rows       => $ROWS,
+        quiet      => 1,
         %args,
     );
 }

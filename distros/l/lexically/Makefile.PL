@@ -10,7 +10,7 @@ use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "lexically import functions from non-lexical exporters",
-  "AUTHOR" => "Jesse Luehrs <doy\@tozt.net>",
+  "AUTHOR" => "Paul Evans <leonerd\@leonerd.org.uk>",
   "BUILD_REQUIRES" => {},
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => "6.30"
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "0.01",
+  "VERSION_FROM" => "lib/lexically.pm",
   "test" => {
     "TESTS" => "t/*.t"
   }

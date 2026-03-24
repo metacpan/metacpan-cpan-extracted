@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,9 +40,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: '4.3301'
-  App::sdif::Divert:
-    file: lib/App/sdif/Divert.pm
+    version: '4.4501'
   App::sdif::LabelStack:
     file: lib/App/sdif/LabelStack.pm
   App::sdif::Util:
@@ -56,10 +54,13 @@ provides:
   App::watchdiff:
     file: lib/App/watchdiff.pm
 requires:
+  Command::Run: '0'
   Getopt::EX: v1.25.0
-  Getopt::EX::Hashed: '1.0503'
+  Getopt::EX::Hashed: '1.0702'
   Getopt::EX::termcolor: '1.07'
+  IO::Divert: '0'
   List::Util: '1.45'
+  Term::ANSIColor::Concise: '2.07'
   Term::ReadKey: '0'
   Text::ANSI::Fold: '2.1101'
   Text::VisualWidth::PP: '0.05'
@@ -69,10 +70,10 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: https://github.com/kaz-utashiro/sdif-tools.git
-version: '4.3301'
+version: '4.4501'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 0

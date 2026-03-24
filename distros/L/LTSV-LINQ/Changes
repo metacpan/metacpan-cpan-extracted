@@ -1,20 +1,111 @@
 Revision history for LTSV::LINQ
 
+1.06  2026-03-23 JST (Japan Standard Time)
+
+    Coding style aligned with DB-Handy and HTTP-Handy:
+    - Module header: added Compatible/Platform comment block.
+    - use strict/warnings order unified: use strict -> BEGIN{warnings stub}
+      -> use warnings; local $^W = 1; -> BEGIN { pop @INC } (DB-Handy style).
+    - $VERSION declared via use vars (aligned with DB-Handy/HTTP-Handy style).
+    - Section separators changed from # ---...--- (65 chars) to
+      ###...### (79 chars) matching DB-Handy and HTTP-Handy.
+    - pmake.bat: install target now greps lib/**/*.pm only (DB-Handy style).
+
+    Code style fixes (K-category):
+    - K1: comma-space: my($s,$k) -> my($s, $k) in ThenBy* methods.
+    - K2: \@items -> [ @items ] where passed as argument (OrderBy*, Reverse,
+      GroupJoin).
+    - K3: return \%hash exempted; no other \%hash violations in code.
+
+    Test suite improvements (knowledge from DB-Handy and HTTP-Handy):
+
+    Naming and style:
+    - Renamed test files to 4-digit zero-padded hyphen format
+      (001_basic.t -> 0001-basic.t, etc.).
+    - Rewrote all functional test harnesses to DB-Handy/HTTP-Handy style:
+      use strict, BEGIN{warnings stub}, BEGIN{pop @INC}, use FindBin / use lib,
+      ($PASS, $FAIL, $T) variables, 1-line ok/is/like subs,
+      print "1..N\n" plan, exit($FAIL ? 1 : 0) at end.
+    - Removed shebang line (#!/usr/bin/perl) from t/0014-style.t.
+
+    New test files:
+    - t/0010-usascii.t: US-ASCII check for all MANIFEST files (replaces
+      t/010_ascii_only.t which only checked lib/LTSV/LINQ.pm); doc/ files
+      exempt (UTF-8 cheat sheets).
+    - t/0015-perl5compat.t: Perl 5.005_03 compatibility checks (P1-P12)
+      covering forbidden keywords, operators, VERSION self-assignment,
+      warnings stub, and CVE-2016-1238 mitigation.
+    - t/0016-cpan_precheck.t: comprehensive pre-publication check suite
+      (categories A-K, 240 tests) ported from HTTP-Handy; covers file
+      structure, version consistency, encoding, compatibility, style, META
+      integrity, POD completeness, Changes format, and Makefile.PL;
+      eg/*.pl included in C/E style checks.
+
+    Samples and documentation:
+    - eg/01_ltsv_query.pl: LTSV file query with FromLTSV/Where/Select/
+      OrderByNumDescending/Distinct/ToLookup.
+    - eg/02_array_query.pl: in-memory array queries, aggregation,
+      Any/All, Skip/Take paging, Zip.
+    - eg/03_grouping.pl: GroupBy, ToLookup, GroupJoin (left outer join),
+      SelectMany with array-ref selector.
+    - eg/04_sorting.pl: OrderBy/ThenBy multi-key sort, OrderByNum vs
+      OrderByStr, Reverse.
+    - doc/linq_cheatsheet.*.txt: LTSV::LINQ cheat sheets in 21 languages
+      covering query creation, filtering, projection, sorting, grouping,
+      set operations, joins, aggregation, and official spec links.
+    - README: rewritten to DB-Handy/HTTP-Handy structure with NAME,
+      SYNOPSIS, DESCRIPTION, INCLUDED DOCUMENTATION, INSTALLATION,
+      COMPATIBILITY (Perl 5.005_03 philosophy), TARGET USE CASES,
+      LIMITATIONS, AUTHOR, and COPYRIGHT AND LICENSE.
+
+    Documentation fixes:
+    - POD =head1 VERSION: corrected from "Version 1.05" to "Version 1.06".
+    - POD TABLE OF CONTENTS: added missing sections (INCLUDED DOCUMENTATION,
+      DESIGN PHILOSOPHY, LIMITATIONS AND KNOWN ISSUES, BUGS, SUPPORT);
+      removed phantom entry (Data Source Methods is =head2, not =head1)
+      and non-standard entries (AUTHOR, COPYRIGHT AND LICENSE).
+    - POD: added =head1 INCLUDED DOCUMENTATION section listing eg/ and
+      doc/ files (aligned with DB-Handy and HTTP-Handy).
+    - POD DIAGNOSTICS: added four missing die-message entries:
+      "Sequence contains more than one element" (Single),
+      "Index must be non-negative" and "Index out of range" (ElementAt),
+      "Invalid number of arguments for Aggregate" (Aggregate).
+    - POD DIAGNOSTICS: added full =item C<...> entries with description
+      and examples for all four new die messages.
+    - README and eg/01_ltsv_query.pl: corrected method name
+      FromFile -> FromLTSV (FromFile does not exist).
+    - eg/01_ltsv_query.pl: removed shebang (#!/usr/bin/perl); added
+      OrderBy to Demonstrates (used in code but previously unlisted).
+    - eg/02_array_query.pl: added Contains example to match Demonstrates
+      comment; corrected Demonstrates to include OrderByNumDescending;
+      added ToArray to Demonstrates.
+    - eg/03_grouping.pl: removed shebang; added Select, Sum, OrderBy,
+      Distinct, ToArray to Demonstrates (all used in code).
+    - eg/04_sorting.pl: removed shebang; corrected Demonstrates to match
+      actual usage (removed OrderByDescending, ThenBy, ThenByDescending
+      which are not used; added ThenByNumDescending, ThenByStr).
+    - doc/linq_cheatsheet.*.txt: all 21 language cheat sheets rewritten
+      with complete method coverage (60 methods, sections [1..12]);
+      section 11 "Conversion methods" added (ToDictionary, ToLookup,
+      ToLTSV, ToList); corrected Append/Prepend phantom entries removed;
+      non-ASCII native scripts used for KO, ZH, TW, JA, TH, HI, BN,
+      MY, KM, MN, NE, SI, UR (aligned with DB-Handy style).
+
 1.05  2026-02-23 JST (Japan Standard Time)
 
     Perl 5.005_03 compatibility fixes:
     - warnings stub: added "package warnings; sub import {}" to the BEGIN
-          block so that "use warnings" does not fail with
-          "Can't locate object method 'import'" on Perl 5.005_03.
-          Previously only $INC{'warnings.pm'} was set, which suppresses
-          the file-load but not the method call.
+      block so that "use warnings" does not fail with
+      "Can't locate object method 'import'" on Perl 5.005_03.
+      Previously only $INC{'warnings.pm'} was set, which suppresses
+      the file-load but not the method call.
 
     Correctness fix:
     - ToLTSV: sanitize record values before writing.  Values containing
-          tab (\t), carriage return (\r), or newline (\n) are now mapped
-          to a single space, preventing structural corruption of the LTSV
-          output.  FromLTSV round-trips are now safe for any record value.
-          Also handles undef values (written as empty string).
+      tab (\t), carriage return (\r), or newline (\n) are now mapped
+      to a single space, preventing structural corruption of the LTSV
+      output.  FromLTSV round-trips are now safe for any record value.
+      Also handles undef values (written as empty string).
 
     Code quality:
     - Removed trailing whitespace from 24 lines (code and POD).
@@ -205,25 +296,3 @@ Revision history for LTSV::LINQ
 1.00  2026-02-15 JST (Japan Standard Time)
 
     - Initial release
-    - LINQ-style query interface for LTSV files
-    - Inspired by Microsoft's LINQ (Language Integrated Query)
-    - LINQ(R) is a registered trademark of Microsoft Corporation
-    - Lazy evaluation with iterators
-    - DSL syntax for simple filtering (Where(key => value))
-    - Full method chaining support
-    - Compatible with Perl 5.005_03 and later
-    - Pure Perl implementation (no XS required)
-
-    Methods implemented:
-    - Data source: From, FromLTSV, Range
-    - Filtering: Where (with DSL)
-    - Projection: Select, SelectMany
-    - Partitioning: Take, Skip, TakeWhile
-    - Ordering: OrderBy, OrderByDescending, Reverse
-    - Grouping: GroupBy
-    - Set operations: Distinct
-    - Quantifiers: All, Any
-    - Element access: First, FirstOrDefault, Last
-    - Aggregation: Count, Sum, Min, Max, Average, AverageOrDefault
-    - Conversion: ToArray, ToList, ToLTSV
-    - Utility: ForEach

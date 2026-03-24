@@ -6,6 +6,7 @@ use warnings;
 use Exporter 'import';
 use Carp qw(croak);
 use Test::Mockingbird ();
+use Test::Mockingbird::TimeTravel ();
 use Test::More ();
 
 our @EXPORT_OK = qw(deep_mock);
@@ -16,11 +17,11 @@ Test::Mockingbird::DeepMock - Declarative, structured mocking and spying for Per
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -215,6 +216,98 @@ Optional hashref controlling global behavior:
         restore_on_scope_exit => 1,   # default
     }
 
+=head2 C<time>
+
+Optional hashref describing a time-travel plan to apply while the
+C<deep_mock> block is running. This integrates with
+L<Test::Mockingbird::TimeTravel> and allows declarative control of frozen
+time, time jumps, and temporal overrides.
+
+If provided, the time plan is applied:
+
+=over 4
+
+=item 1. before any mocks are installed
+
+=item 2. before the test code block is executed
+
+=item 3. automatically restored after the block completes
+
+=back
+
+A time plan may include any of the following keys:
+
+    time => {
+        freeze  => '2025-01-01T00:00:00Z',
+        travel  => '2025-01-02T12:00:00Z',
+        advance => [ 2 => 'minutes' ],
+        rewind  => [ 1 => 'hour'    ],
+    }
+
+=head3 C<freeze>
+
+Freezes time at the given timestamp. Accepts any format supported by
+C<Test::Mockingbird::TimeTravel>, including:
+
+=over 4
+
+=item * C<YYYY-MM-DD>
+
+=item * C<YYYY-MM-DD HH:MM:SS>
+
+=item * C<YYYY-MM-DDTHH:MM:SSZ>
+
+=item * raw epoch seconds
+
+=back
+
+=head3 C<travel>
+
+Moves the frozen clock to a new timestamp without unfreezing time.
+
+=head3 C<advance>
+
+Advances the frozen clock by a duration. Must be an arrayref:
+
+    advance => [ $amount => $unit ]
+
+Units may be C<seconds>, C<minutes>, C<hours>, or C<days>.
+
+=head3 C<rewind>
+
+Rewinds the frozen clock by a duration. Same format as C<advance>.
+
+=head3 Example
+
+    deep_mock(
+        {
+            time => {
+                freeze  => '2025-01-01T00:00:00Z',
+                advance => [ 2 => 'minutes' ],
+            },
+            mocks => [
+                {
+                    target => 'MyApp::stamp',
+                    type   => 'mock',
+                    with   => sub { now() },   # observes frozen time
+                },
+            ],
+        },
+        sub {
+            is MyApp::stamp(),
+               Test::Mockingbird::TimeTravel::_parse_datetime(
+                   '2025-01-01T00:02:00Z'
+               ),
+               'mock sees advanced frozen time';
+        }
+    );
+
+=head3 Restoration
+
+All time-travel state is automatically restored after the C<deep_mock>
+block completes, regardless of whether the block returns normally or dies.
+This mirrors the automatic restoration of mocks.
+
 =head1 COOKBOOK
 
 =head2 Mocking a method
@@ -267,6 +360,80 @@ Optional hashref controlling global behavior:
             ],
         },
     ]
+
+=head2 Combining mocking with time travel
+
+DeepMock can apply a time-travel plan (via
+L<Test::Mockingbird::TimeTravel>) before installing mocks. This allows
+tests to observe deterministic timestamps inside mocked methods or
+spies.
+
+    {
+        package MyApp;
+        sub stamp { time }   # original behaviour (non-deterministic)
+        sub logit { $_[1] }
+    }
+
+    deep_mock(
+        {
+            time => {
+                freeze  => '2025-01-01T00:00:00Z',
+                advance => [ 2 => 'minutes' ],
+            },
+            mocks => [
+                {
+                    target => 'MyApp::stamp',
+                    type   => 'mock',
+                    with   => sub { now() },   # observe frozen time
+                },
+                {
+                    target => 'MyApp::logit',
+                    type   => 'spy',
+                    tag    => 'log_spy',
+                },
+            ],
+            expectations => [
+                {
+                    tag   => 'log_spy',
+                    calls => 1,
+                    args_like => [
+                        [ qr/^event:/ ],
+                    ],
+                },
+            ],
+        },
+        sub {
+            my $t = MyApp::stamp();     # returns frozen + advanced time
+            MyApp::logit("event:$t");   # spy records call + args
+        }
+    );
+
+In this example:
+
+=over 4
+
+=item *
+
+Time is frozen at C<2025-01-01T00:00:00Z> and advanced by two minutes
+before any mocks are installed.
+
+=item *
+
+C<MyApp::stamp> is mocked to return C<now()>, giving a deterministic
+timestamp inside the test.
+
+=item *
+
+C<MyApp::logit> is spied on, and its arguments are validated against
+regex patterns.
+
+=item *
+
+After the block completes, both the mocking layer and the time-travel
+layer are automatically restored.
+
+=back
+
 
 =head2 Full example
 
@@ -431,6 +598,9 @@ sub deep_mock
 
 	my %handles;
 
+	# Apply time travel plan
+	_apply_time_plan($plan->{time});
+
 	# Install mocks for this scope and capture restore handles
 	my @installed = _install_mocks($plan->{mocks} || [], \%handles);
 
@@ -454,6 +624,9 @@ sub deep_mock
 		|| $plan->{globals}{restore_on_scope_exit};
 
 	Test::Mockingbird::restore_all() if $auto_restore;
+
+	# Restore time travel state
+	Test::Mockingbird::TimeTravel::restore_all();
 
 	croak $err if $err;
 
@@ -704,6 +877,29 @@ sub _normalize_target {
 	return ($arg1, $arg2);
 
 	# EXIT: always returns ($pkg, $method)
+}
+
+sub _apply_time_plan {
+	my $time = $_[0];
+	return unless $time && ref $time eq 'HASH';
+
+	if (exists $time->{freeze}) {
+		Test::Mockingbird::TimeTravel::freeze_time($time->{freeze});
+	}
+
+	if (exists $time->{travel}) {
+		Test::Mockingbird::TimeTravel::travel_to($time->{travel});
+	}
+
+	if (exists $time->{advance}) {
+		my ($amount, $unit) = @{ $time->{advance} };
+		Test::Mockingbird::TimeTravel::advance_time($amount, $unit);
+	}
+
+	if (exists $time->{rewind}) {
+		my ($amount, $unit) = @{ $time->{rewind} };
+		Test::Mockingbird::TimeTravel::rewind_time($amount, $unit);
+	}
 }
 
 =head1 SUPPORT

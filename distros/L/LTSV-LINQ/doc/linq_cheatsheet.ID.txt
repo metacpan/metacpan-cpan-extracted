@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ Lembar Contekan                           [ID] Bahasa Indonesia
+======================================================================
+
+[ 1. Membuat kueri (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  Catatan: setiap metode terminal menghabiskan iterator.
+    Untuk menggunakan kembali data, panggil From() / FromLTSV() lagi.
+
+[ 2. Penyaringan (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  Memfilter elemen berdasarkan kondisi.
+
+[ 3. Proyeksi (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select mengubah setiap elemen; SelectMany meratakan array bersarang
+    (selektor harus mengembalikan referensi ARRAY).
+
+[ 4. Pengurutan (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: kunci pengurutan utama.
+    ThenBy*/ThenByNum*/ThenByStr*: kunci pengurutan kedua (setelah OrderBy*).
+    Reverse: membalik urutan saat ini.
+
+[ 5. Paginasi (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: lewati atau ambil sejumlah elemen.
+    SkipWhile/TakeWhile: berdasarkan kondisi.
+
+[ 6. Pengelompokan (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy mengembalikan array dari { Key=>'...', Elements=>[...] }.
+    ToLookup mengembalikan hashref { key => [elements] }.
+
+[ 7. Operasi himpunan (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except mendukung selektor kunci opsional.
+    SequenceEqual: benar jika dua urutan sama.
+
+[ 8. Gabungan (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: gabungan dalam. GroupJoin: gabungan luar kiri
+    (grup dalam diteruskan sebagai objek LTSV::LINQ).
+
+[ 9. Agregasi (metode terminal) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  Varian OrDefault mengembalikan undef, bukan die, untuk urutan kosong.
+    ElementAt: indeks berbasis 0 (die jika di luar batas). ElementAtOrDefault: undef jika di luar batas.
+
+[ 10. Metode urutan lainnya (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: menggabungkan dua urutan. DefaultIfEmpty: nilai default jika kosong.
+    Zip: menggabungkan dua urutan elemen per elemen.
+
+[ 11. Metode konversi (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary mengembalikan hashref key=>element.
+    ToLookup mengembalikan hashref key=>[elements].
+    ToLTSV menulis urutan ke file LTSV.
+
+[ 12. Sumber daya resmi (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  Spesifikasi LTSV: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

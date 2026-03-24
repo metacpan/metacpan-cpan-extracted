@@ -72,7 +72,7 @@
       },
       "PlackX::Framework" : {
          "file" : "lib/PlackX/Framework.pm",
-         "version" : "0.27"
+         "version" : "0.28"
       },
       "PlackX::Framework::Config" : {
          "file" : "lib/PlackX/Framework/Config.pm"
@@ -117,7 +117,7 @@
          "web" : "https://github.com/dstroma/PlackX-Framework"
       }
    },
-   "version" : "0.27",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

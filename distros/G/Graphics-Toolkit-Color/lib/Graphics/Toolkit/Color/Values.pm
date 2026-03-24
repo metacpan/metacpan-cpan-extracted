@@ -122,6 +122,10 @@ sub add { # .values, %newval -- ~space_name --> _
     $self->new_from_tuple( $values, $color_space->name );
 }
 
+sub apply_gamma {
+    my ($self, $gamma, $color_space) = @_;
+}
+
 sub mix { #  @%(+percent, _color)  -- ~space_name --> _
     my ($self, $recipe, $color_space ) = @_;
     return if ref $recipe ne 'ARRAY';

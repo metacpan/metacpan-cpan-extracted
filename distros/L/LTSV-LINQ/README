@@ -4,115 +4,120 @@ NAME
 
 SYNOPSIS
 
-    use LTSV::LINQ;
-    
-    # Read LTSV file and query
-    my @results = LTSV::LINQ->FromLTSV("access.log")
-        ->Where(sub { $_[0]{status} eq '200' })
-        ->Select(sub { $_[0]{url} })
-        ->Distinct()
-        ->ToArray();
-    
-    # DSL syntax for simple filtering
-    my @errors = LTSV::LINQ->FromLTSV("access.log")
-        ->Where(status => '404')
-        ->ToArray();
+  use LTSV::LINQ;
+
+  # From an LTSV log file
+  my $results = LTSV::LINQ->FromLTSV('access.log.ltsv')
+      ->Where(sub { $_[0]{status} eq '200' })
+      ->Select(sub { { path => $_[0]{path}, ua => $_[0]{ua} } })
+      ->OrderBy(sub { $_[0]{path} })
+      ->ToArray();
+
+  # From an array of hashrefs
+  my @data = ({name=>'Alice',score=>85}, {name=>'Bob',score=>70});
+  my @top = LTSV::LINQ->From(\@data)
+      ->Where(sub { $_[0]{score} >= 80 })
+      ->Select(sub { $_[0]{name} })
+      ->ToArray();
 
 DESCRIPTION
 
-LTSV::LINQ provides a LINQ-style query interface for LTSV
-(Labeled Tab-Separated Values) files.
+  LTSV::LINQ brings LINQ-style (Language Integrated Query) chained
+  query operations to Perl, with native support for LTSV (Labeled
+  Tab-Separated Values) log files.
 
-ABOUT LINQ
+  Operations are lazy: data is not processed until ToArray(), First(),
+  Count(), or another terminal method is called.
 
-LINQ (Language Integrated Query) is a technology developed by
-Microsoft Corporation for the .NET Framework. LINQ(R) is a registered
-trademark of Microsoft Corporation.
+INCLUDED DOCUMENTATION
 
-This module is inspired by LINQ and brings similar query capabilities
-to LTSV data processing in Perl. We are grateful to Microsoft for
-pioneering this elegant programming pattern.
+  The eg/ directory contains sample programs:
 
-This module is not affiliated with, endorsed by, or sponsored by
-Microsoft Corporation.
+    eg/01_ltsv_query.pl     Basic LTSV file query with FromLTSV/Where/Select
+    eg/02_array_query.pl    LINQ queries on in-memory arrays
+    eg/03_grouping.pl       GroupBy, ToLookup, GroupJoin
+    eg/04_sorting.pl        OrderBy, ThenBy, multi-key sorting
 
-LINQ COMPATIBILITY
-
-This module aims for semantic compatibility with .NET LINQ where
-applicable. Key behavioral alignments:
-
-- Single(): Dies with "Sequence contains no elements" if empty
-           Dies with "Sequence contains more than one element" if multiple
-- SingleOrDefault(): Returns undef if empty or multiple elements
-- ElementAt(): Dies with "Index out of range" if index is invalid
-- ElementAtOrDefault(): Returns undef if index is invalid
-- All element access methods use lazy evaluation (iterator-based)
-- Exception messages follow .NET LINQ conventions
-
-WHAT IS LTSV?
-
-LTSV (Labeled Tab-Separated Values) is a format for structured logs.
-Each line contains tab-separated key:value pairs.
-
-Example:
-
-    time:2026-02-13T10:00:00	status:200	url:/index.html	bytes:1024
-
-For more information, see:
-    http://ltsv.org/
+  The doc/ directory contains LTSV::LINQ cheat sheets in 21 languages
+  (English, Japanese, Chinese, Korean, French, and 16 more).
+  Each sheet covers: creating queries, filtering, projection,
+  sorting, grouping, aggregation, and official spec links.
 
 INSTALLATION
 
-To install this module type the following:
+  Manual (no build tools required):
+
+    cp lib/LTSV/LINQ.pm /path/to/your/project/
+
+  Via CPAN:
+
+    cpan LTSV::LINQ
+    cpanm LTSV::LINQ
+
+  Via perl Makefile.PL:
 
     perl Makefile.PL
     make
     make test
     make install
 
-Or using pmake.bat (Windows):
+  Via pmake.bat (Windows, no make required):
 
     pmake.bat test
     pmake.bat install
 
 COMPATIBILITY
 
-This module works with Perl 5.005_03 and later.
+  This module works with Perl 5.005_03 and later.
 
-WHY PERL 5.005_03 SPECIFICATION?
+  WHY PERL 5.005_03 SPECIFICATION?
 
-This module adheres to the Perl 5.005_03 specification--not because we
-use the old interpreter, but because this specification represents the
-simple, original Perl programming model that makes programming enjoyable.
+  This module adheres to the Perl 5.005_03 specification--not because we
+  use the old interpreter, but because this specification represents the
+  simple, original Perl programming model that makes programming enjoyable.
 
-THE STRENGTH OF MODERN TIMES:
+  THE STRENGTH OF MODERN TIMES
 
-Some people think the strength of modern times is the ability to use
-modern technology. That thinking is insufficient. The strength of modern
-times is the ability to use ALL technology up to the present day.
+  Some people think the strength of modern times is the ability to use
+  modern technology. That thinking is insufficient. The strength of modern
+  times is the ability to use ALL technology up to the present day.
 
-By adhering to the Perl 5.005_03 specification, we gain access to the
-entire history of Perl--from 5.005_03 to 5.42 and beyond--rather than
-limiting ourselves to only the latest versions.
+  By adhering to the Perl 5.005_03 specification, we gain access to the
+  entire history of Perl--from 5.005_03 to 5.42 and beyond--rather than
+  limiting ourselves to only the latest versions.
 
-Key reasons:
+  Key reasons:
 
-- Simplicity: Original Perl approach keeps programming "raku" (easy/fun)
-- JPerl: Final version of JPerl (Japanese Perl)
-- Universal: Runs on ALL Perl versions (5.005_03 through 5.42+)
-- Philosophy: Programming should be enjoyable (Camel Book readers know!)
+  - Simplicity: Original Perl approach keeps programming "raku" (easy/fun)
+  - JPerl: Final version of JPerl (Japanese Perl)
+  - Universal: Runs on ALL Perl versions (5.005_03 through 5.42+)
+  - Philosophy: Programming should be enjoyable (Camel Book readers know!)
 
-Perl 5.6+ introduced character encoding complexity that made programming
-harder. By following the 5.005_03 specification, we maintain the joy of
-Perl programming.
+  Perl 5.6+ introduced character encoding complexity that made programming
+  harder. By following the 5.005_03 specification, we maintain the joy of
+  Perl programming.
 
-All ina CPAN modules (mb, Jacode, UTF8-R2, mb-JSON, LTSV-LINQ, etc.)
-follow this principle: Write to 5.005_03 spec, test on all versions,
-keep programming fun.
+TARGET USE CASES
+
+  - Querying LTSV access logs (Apache, nginx, HTTP::Handy, etc.)
+  - Filtering and transforming arrays of hashrefs
+  - Data analysis and aggregation without external dependencies
+  - Educational use: learning LINQ concepts in Perl
+
+LIMITATIONS
+
+  - All data is processed in memory (no streaming)
+  - No SQL support; use DB::Handy for SQL-style queries
+  - LTSV parsing is line-oriented; multi-line values are not supported
+  - Lazy evaluation defers errors until a terminal method is called
+
+AUTHOR
+
+  INABA Hitoshi <ina@cpan.org>
 
 COPYRIGHT AND LICENSE
 
-Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+  This software is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+  See http://www.perl.com/perl/misc/Artistic.html

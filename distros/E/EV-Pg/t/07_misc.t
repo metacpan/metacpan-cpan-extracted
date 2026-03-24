@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 30;
+plan tests => 32;
 
 # escape_literal
 with_pg(cb => sub {
@@ -79,7 +79,7 @@ with_pg(cb => sub {
     $pg->query("select pg_sleep(10)", sub {
         my ($data, $err) = @_;
         $skipped = 1;
-        ok($err, 'skipped query received error');
+        like($err, qr/skipped/, 'skipped query: error says skipped');
     });
     ok($pg->pending_count > 0, 'pending_count > 0 after send');
     $pg->skip_pending;
@@ -148,6 +148,35 @@ with_pg(cb => sub {
     like($got_err, qr/connection finished/, 'finish with pending: correct error message');
     EV::break;
 });
+
+# re-enqueue during finish: pipeline mode allows re-enqueue, second drain catches it
+{
+    my $pg;
+    my ($orig_err, $requeued_err);
+    $pg = EV::Pg->new(
+        conninfo => $conninfo,
+        on_connect => sub {
+            $pg->enter_pipeline;
+            $pg->query_params("select pg_sleep(10)", [], sub {
+                my ($data, $err) = @_;
+                $orig_err = $err;
+                # re-enqueue in pipeline — PQsendQueryParams works here
+                $pg->query_params("select 1", [], sub {
+                    my ($data2, $err2) = @_;
+                    $requeued_err = $err2;
+                });
+            });
+            $pg->pipeline_sync(sub {});
+            $pg->finish;
+            EV::break;
+        },
+        on_error => sub { diag "Error: $_[0]"; EV::break },
+    );
+    my $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    like($orig_err, qr/connection finished/, 're-enqueue finish: orig cb got error');
+    like($requeued_err, qr/connection finished/, 're-enqueue finish: re-enqueued cb got error');
+}
 
 # non-CODE callback croaks
 with_pg(cb => sub {

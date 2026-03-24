@@ -5,24 +5,16 @@ package Lingua::CES::Num2Word;
 
 # {{{ use block
 
-use 5.10.1;
-
-use strict;
+use v5.32;
 use warnings;
 use utf8;
 
 use Carp;
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
-# {{{ BEGIN
-
-our $VERSION  = 0.1106;
-our $REVISION = '$Rev: 1106 $';
-
-# }}}
-# {{{ variables
-
+# {{{ var block
+our $VERSION = '0.2603230';
 my %token1 = qw( 0 nula         1 jedna         2 dva
                  3 tři          4 čtyři         5 pět
                  6 šest         7 sedm          8 osm
@@ -35,7 +27,7 @@ my %token2 = qw( 20 dvacet      30 třicet       40 čtyřicet
                  50 padesát     60 šedesát      70 sedmdesát
                  80 osmdesát    90 devadesát
                );
-my %token3 = (  100, 'sto', 200, 'dvě stě',   300, 'tři sta',
+my %token3 = (  100, 'sto',       200, 'dvě stě',   300, 'tři sta',
                 400, 'čtyři sta', 500, 'pět set',   600, 'šest set',
                 700, 'sedm set',  800, 'osm set',   900, 'devět set'
              );
@@ -150,7 +142,7 @@ __END__
 
 =head1 VERSION
 
-version 0.1106
+version 0.2603230
 
 Number 2 word conversion in CES.
 
@@ -185,7 +177,7 @@ in Czech. It converts whole numbers from 0 up to 999 999 999.
 
 =item B<num2ces_cardinal> (positional)
 
-  1   number  number to convert
+  1   num    number to convert
   =>  str    lexical representation of the input
       undef  if input number is not known
 
@@ -227,7 +219,7 @@ be converted.
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

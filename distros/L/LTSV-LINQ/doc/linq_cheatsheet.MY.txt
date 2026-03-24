@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ Cheat Sheet                               [MY] ဗမာဘာသာ
+======================================================================
+
+[ 1. Query ဖန်တီးခြင်း (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  မှတ်ချက်: terminal မက်သဒ်တိုင်း iterator ကို ကုန်ဆုံးစေသည်။
+    ဒေတာ ပြန်သုံးရန် From() / FromLTSV() ကို ထပ်မံ ခေါ်ပါ။
+
+[ 2. စစ်ထုတ်ခြင်း (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  အခြေအနေတစ်ခုဖြင့် ဒြပ်စင်များကို စစ်ထုတ်သည်။
+
+[ 3. ကာယကံ (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select သည် ဒြပ်စင်တိုင်းကို ပြောင်းလဲသည်; SelectMany သည် ထပ်ဆင့် array များကို ဖြန့်ချသည်
+    (selector သည် ARRAY ကိုးကားချက် ပြန်ပေးရမည်)။
+
+[ 4. စီစစ်ခြင်း (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: ပဓာန စီမံချက် ကီး
+    ThenBy*/ThenByNum*/ThenByStr*: ဒုတိယ စီမံချက် ကီး (OrderBy* နောက်)
+    Reverse: လက်ရှိ အစဉ် ပြောင်းပြန်လှန်သည်
+
+[ 5. စာမျက်နှာ ပိုင်းခြားခြင်း (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: သတ်မှတ် အရေအတွက် ကျော်သော် ယူသည်
+    SkipWhile/TakeWhile: အခြေအနေ အရ
+
+[ 6. အုပ်စုဖွဲ့ခြင်း (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy သည် { Key=>'...', Elements=>[...] } array ပြန်ပေးသည်
+    ToLookup သည် hashref { key => [elements] } ပြန်ပေးသည်
+
+[ 7. အစုအဝေး လုပ်ဆောင်ချက် (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except သည် ရွေးချယ်နိုင်သော ကီး selector ကို ထောက်ပံ့သည်
+    SequenceEqual: sequence နှစ်ခု တူညီလျှင် မှန်သည်
+
+[ 8. ချိတ်ဆက်ခြင်း (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: အတွင်းပိုင်း ချိတ်ဆက်ခြင်း; GroupJoin: ဘယ် ပြင်ပ ချိတ်ဆက်ခြင်း
+    (အတွင်း အုပ်စုကို LTSV::LINQ object အဖြစ် ပေးပို့သည်)
+
+[ 9. စုစည်းမှု (နိဂုံး မက်သဒ်များ) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  OrDefault မျိုးကွဲများသည် ဗလာ sequence အတွက် die အစား undef ပြန်ပေးသည်
+    ElementAt: 0-အခြေ index (နယ်နိမိတ် ကျော်လျှင် die); ElementAtOrDefault: undef
+
+[ 10. အခြား sequence မက်သဒ်များ (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: sequence နှစ်ခု ဆက်သွယ်သည်; DefaultIfEmpty: ဗလာဆိုလျှင် မူရင်း တန်ဖိုး
+    Zip: sequence နှစ်ခု ဒြပ်စင်ချင်း ပေါင်းစပ်သည်
+
+[ 11. ပြောင်းလဲ မက်သဒ်များ (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary သည် hashref key=>element ပြန်ပေးသည်
+    ToLookup သည် hashref key=>[elements] ပြန်ပေးသည်
+    ToLTSV သည် sequence ကို LTSV ဖိုင်သို့ ရေးသည်
+
+[ 12. တရားဝင် ရင်းမြစ်များ (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV spec: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

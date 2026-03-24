@@ -228,6 +228,51 @@ values or expression objects.
 
 Like `between` but negated.
 
+### Compare
+
+    $q->compare($left, $op, $right)
+
+Returns a comparison expression. The left and right sides can be column name
+strings, expression objects (including subqueries), or plain values. Plain
+strings that look like column names are treated as columns; other scalars
+become bind parameters.
+
+    $q->compare('age', '>=', 18)
+    # age >= ?
+
+    $q->compare($q->col('total'), '>', $q->col('min_total'))
+    # total > min_total
+
+Use `compare` instead of the hashref WHERE syntax when:
+
+- **The left side is a subquery.** Perl hash keys are always stringified,
+so you cannot use an expression object as a hash key. `compare` handles this:
+
+        # Correlated subquery: "users with 5+ orders"
+        my $sub = $q->select(
+            -columns => [$q->func('COUNT', '*')],
+            -from    => 'orders|o',
+            -where   => { 'o.user_id' => $q->col('u.id') },
+        );
+
+        $q->select(
+            -from  => 'users|u',
+            -where => [$q->compare($sub, '>=', 5)],
+        );
+        # ... WHERE (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) >= ?
+
+- **The left side is a function call.** Same reason — `$q->func(...)`
+cannot be a hash key without stringifying:
+
+        $q->compare($q->func('LENGTH', 'name'), '>', 10)
+        # LENGTH(name) > ?
+
+- **Both sides are expressions.** Comparing two columns or two computed
+values:
+
+        $q->compare($q->col('end_date'), '>', $q->col('start_date'))
+        # end_date > start_date
+
 ### and
 
     $q->and(\%cond1, \%cond2, ...)

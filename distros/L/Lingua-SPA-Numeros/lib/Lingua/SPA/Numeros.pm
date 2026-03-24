@@ -1,6 +1,7 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 #
-# Jose Luis Rey Barreira (C) 2001-2009
+# Jose Luis Rey Barreira (c) 2001-2009
+# Copyright (c) PetaMem, s.r.o. 2010-present
 #
 
 package Lingua::SPA::Numeros;
@@ -8,17 +9,14 @@ package Lingua::SPA::Numeros;
 
 # {{{ use block
 
-use 5.10.1;
+use 5.16.0;
 use utf8;
-use strict;
-use warnings;
 
 use Carp;
 
 # }}}
-# {{{ variables declarations
-
-our $VERSION = 0.0682;
+# {{{ var block
+our $VERSION = '0.2603230';
 
 
 our @EXPORT_OK = qw( $MALE $FEMALE $NEUTRAL $MALE $FEMALE $NEUTRAL);
@@ -164,8 +162,9 @@ sub ordinal {
 }
 
 # }}}
+# {{{ Build the accessors
 
-{    # Build the accessors
+{
     my @a = @_;
     my %names = ( ( map { $_ => $_ } keys %new_defaults ), %opt_alias );
     while ( my ( $opt, $alias ) = each %names ) {
@@ -289,7 +288,6 @@ sub cardinal_simple {
     return cardinal_generic( $n, $exp, $format, $gen );
 }
 
-
 # }}}
 # {{{ fraccion_mag_prefix
 
@@ -322,6 +320,7 @@ sub fraccion_simple {
     return ( cardinal_simple( $n, 0, $un_mil, $ngen ), fraccion_mag_prefix( $exp, $gen ) );
 }
 
+# }}}
 #####################################################################
 #
 # Soporte para números ORDINALES
@@ -524,7 +523,7 @@ Lingua::SPA::Numeros - Translates numbers to spanish text
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
 =head1 SYNOPSIS
 
@@ -557,7 +556,7 @@ receive as parameters any of the above mentioned fields.
 Examples:
 
       use Lingua::SPA::Numeros;
-      
+
       # Use the fields' default values
       $obj = new Lingua::SPA::Numeros; 
       
@@ -570,43 +569,44 @@ Examples:
 
 =item DECIMAL
 
-Specifies the character string that will be used to separate the integer
-from the fractional part of the number to convert. The default value for
-DECIMAL is '.'
+Specifies the character string that will be used to separate the
+integer from the fractional part of the number to convert. The default
+value for DECIMAL is '.'
 
 =item SEPARADORES
 
 Character string including all of the format characters used when
-representing a number. All of the characters in this string will be ignored
-by the parser when analyzing the number. The default value for SEPARADORES
-is '_'
+representing a number. All of the characters in this string will be
+ignored by the parser when analyzing the number. The default value for
+SEPARADORES is '_'
 
 =item ACENTOS
 
-Affects the way in which the generated string for the translated numbers is
-given; if it is false, the textual representation will not have any
-accented characters. The default value for this field is true (with
-accents).
+Affects the way in which the generated string for the translated
+numbers is given; if it is false, the textual representation will not
+have any accented characters. The default value for this field is true
+(with accents).
 
 =item MAYUSCULAS
 
-If this is a true value, the textual representation of the number will be
-an uppercase character string. The default value for this field is false
-(lowercase).
+If this is a true value, the textual representation of the number will
+be an uppercase character string. The default value for this field is
+false (lowercase).
 
 =item HTML
 
-If this is a true value, the textual representation of the number will be a
-HTML-valid string character (accents will be represented by their
+If this is a true value, the textual representation of the number will
+be a HTML-valid string character (accents will be represented by their
 respective HTML entities). The default value is 0 (text).
 
 =item GENERO
 
-The gender of the numbers can be $MALE, $FEMALE or $NEUTRAL, respectively for
-femenine, masculine or neutral numbers. The default value is $MALE.
+The gender of the numbers can be $MALE, $FEMALE or $NEUTRAL,
+respectively for femenine, masculine or neutral numbers. The default
+value is $MALE.
 
-The following table shows the efect of GENDER on translation of Cardinal
-and Ordinal numbers:
+The following table shows the efect of GENDER on translation of
+Cardinal and Ordinal numbers:
 
  +---+---------------------+-----------------------------+
  | N |     CARDINAL        |          ORDINAL            |
@@ -624,28 +624,30 @@ Deprecated option only for backward compatibility, use GENERO instead.
 
 =item UNMIL
 
-This field affects only the translation of cardinal numbers. When it is a true
-value, the number 1000 is translated to 'un mil' (one thousand), otherwise it
-is translated to the more colloquial 'mil' (thousand). The default value is 1.
+This field affects only the translation of cardinal numbers. When it
+is a true value, the number 1000 is translated to 'un mil' (one
+thousand), otherwise it is translated to the more colloquial 'mil'
+(thousand). The default value is 1.
 
 =item NEGATIVO
 
-Contains the character string with the text to which the negative sign (-) will
-be translated with. Defaults to 'menos'.
+Contains the character string with the text to which the negative sign
+(-) will be translated with. Defaults to 'menos'.
 
 For example: default translation of -5 will yield "menos cinco".
 
 =item POSITIVO
 
-Contains the character string with the text to which the positive sign will be
-translated with. Defaults to ''.
+Contains the character string with the text to which the positive sign
+will be translated with. Defaults to ''.
 
 For example: default translation of 5 will yield "cinco".
 
 =item FORMATO
 
-A character string specifying how the decimals of a real number are to be 
-translated. Its default value is 'con %2d ctms.' (see the B<real> method)
+A character string specifying how the decimals of a real number are to
+be translated. Its default value is 'con %2d ctms.' (see the B<real>
+method)
 
 =back
 
@@ -655,12 +657,12 @@ By popular demand I have added the following aliases for the options:
 
     Alias        Natural Name
     --------------------------
-    ACCENTS       ACENTOS          
-    UPPERCASE     MAYUSCULAS  
-    SEPARATORS    SEPARADORES 
-    GENDER        GENERO      
-    POSITIVE      POSITIVO    
-    NEGATIVE      NEGATIVO    
+    ACCENTS       ACENTOS
+    UPPERCASE     MAYUSCULAS
+    SEPARATORS    SEPARADORES
+    GENDER        GENERO
+    POSITIVE      POSITIVO
+    NEGATIVE      NEGATIVO
     FORMAT        FORMATO
 
 =head2 cardinal
@@ -698,36 +700,36 @@ SYNOPSIS:
 
 Translates the real number ($n) to spanish text.
 
-The optional $genf and $genm parameters are used to specify gender of the
-fraction part and fraction part magnitude in that order.  If $genf is missing
-it will default to the GENDER option, and $genm will default to the $genf's
-value.
+The optional $genf and $genm parameters are used to specify gender of
+the fraction part and fraction part magnitude in that order.  If $genf
+is missing it will default to the GENDER option, and $genm will
+default to the $genf's value.
 
-This translation is affected by the options: DECIMAL, SEPARADORES, GENDER, 
-ACENTOS, MAYUSCULAS, POSITIVO, NEGATIVO and FORMATO.
+This translation is affected by the options: DECIMAL, SEPARADORES,
+GENDER, ACENTOS, MAYUSCULAS, POSITIVO, NEGATIVO and FORMATO.
 
 =head3 Fraction format (FORMATO)
 
-FORMAT option is a formatting string like printf, it is used to format the
-fractional part before appending it to the integer part. It has the following
-format specifiers:
+FORMAT option is a formatting string like printf, it is used to format
+the fractional part before appending it to the integer part. It has
+the following format specifiers:
 
 =over 4
 
 =item %Ns
 
-Formats the fractional part as text with precisión of N digits, for example:
-number '124.345' formated with string 'CON %s.' will yield the text 'ciento
-veinticuatro CON trescientas cuarenta y cinco milE<eacute>simas', and
-formatted with string 'CON %2s.' will yield 'ciento veinticuatro CON treinta
-y cuatro centE<eacute>simas'.
+Formats the fractional part as text with precisión of N digits, for
+example: number '124.345' formated with string 'CON %s.' will yield
+the text 'ciento veinticuatro CON trescientas cuarenta y cinco
+milE<eacute>simas', and formatted with string 'CON %2s.' will yield
+'ciento veinticuatro CON treinta y cuatro centE<eacute>simas'.
 
 =item %Nd
 
-Formats the fractional part as a number (no translation), with precision
-of N digits, veri similar to sprintf's %d format, for example: number 
-'124.045' formated with 'CON %2d ctms.' will yield: 'ciento veinticuatro
-CON 04 ctms.'
+Formats the fractional part as a number (no translation), with
+precision of N digits, veri similar to sprintf's %d format, for
+example: number '124.045' formated with 'CON %2d ctms.' will yield:
+'ciento veinticuatro CON 04 ctms.'
 
 =back
 
@@ -748,10 +750,9 @@ the number.
 
 =head3 Description
 
-Translates an ordinal number ($num) to spanish text, translation
-is performed according to the following object ($obj) settings:
-DECIMAL, SEPARADORES, GENERO, ACENTOS, MAYUSCULAS, POSITIVO and
-NEGATIVO.
+Translates an ordinal number ($num) to spanish text, translation is
+performed according to the following object ($obj) settings: DECIMAL,
+SEPARADORES, GENERO, ACENTOS, MAYUSCULAS, POSITIVO and NEGATIVO.
 
 This method croacks if $num <= 0 and carps if $num has a fractional
 part.
@@ -780,20 +781,20 @@ Sets the option to $value and returns $obj
 =head3 List of accessors
 
   $obj->accents
-  $obj->acentos          
+  $obj->acentos
   $obj->uppercase
-  $obj->mayusculas  
+  $obj->mayusculas
   $obj->unmil
   $obj->html
   $obj->decimal
   $obj->separators
-  $obj->separadores 
+  $obj->separadores
   $obj->gender
-  $obj->genero      
+  $obj->genero
   $obj->positive
-  $obj->positivo    
+  $obj->positivo
   $obj->negative
-  $obj->negativo    
+  $obj->negativo
   $obj->format
   $obj->formato
 
@@ -832,9 +833,9 @@ word stack.
 
 =item DESCRIPTION
 
-This procedure takes $n (an integer in the range [0 .. 99], not verified) and
-adds the numbers text translation to $nn (a word stack), on a word by word basis.
-If $n == 0 nothing is pushed into $nn.
+This procedure takes $n (an integer in the range [0 .. 99], not
+verified) and adds the numbers text translation to $nn (a word stack),
+on a word by word basis.  If $n == 0 nothing is pushed into $nn.
 
 =back
 
@@ -862,9 +863,9 @@ word stack.
 
 =item DESCRIPTION
 
-This procedure takes $n (an integer in the range [0 .. 99], not verified) and
-adds the numbers text translation to $nn (a word stack), on a word by word basis.
-If $n == 0 nothing is pushed into $nn.
+This procedure takes $n (an integer in the range [0 .. 99], not
+verified) and adds the numbers text translation to $nn (a word stack),
+on a word by word basis.  If $n == 0 nothing is pushed into $nn.
 
 =back
 
@@ -905,9 +906,9 @@ order.
 
 =item DESCRIPTION
 
-This procedure takes $n, and pushes the numbers text translation into $nn,
-on a word by word basis, with the proper translated magnitude.  If $n == 0
-nothing is pushed into $nn.
+This procedure takes $n, and pushes the numbers text translation into
+$nn, on a word by word basis, with the proper translated magnitude.
+If $n == 0 nothing is pushed into $nn.
 
 =back
 
@@ -1028,9 +1029,9 @@ magnitude of the number 1 for millionths, 2 for billionths, etc.
 
 =item $gp
 
-gender and plural of the number, is the concatenation of gender and plural
-gender must be one of $FEMALE, $MALE or $NEUTRAL, and plural must be '' for
-singular and 's' for plural.
+gender and plural of the number, is the concatenation of gender and
+plural gender must be one of $FEMALE, $MALE or $NEUTRAL, and plural
+must be '' for singular and 's' for plural.
 
 Note that $NEUTRAL + plural is a nonsense.
 
@@ -1042,8 +1043,8 @@ gender of the number (same values as $gen).
 
 =item DESCRIPTION
 
-This function returns the name of the magnitude of a fraction, $mag 
-is the number of decimal digits. For example 0.001 has $mag == 3 and 
+This function returns the name of the magnitude of a fraction, $mag is
+the number of decimal digits. For example 0.001 has $mag == 3 and
 translates to "milesimos" if $gp is ($MALE . 's').
 
 =item RETURN VALUE
@@ -1131,9 +1132,9 @@ word stack.
 
 =item DESCRIPTION
 
-This procedure takes $n (an integer in the range [0 .. 99], not verified) and
-adds the numbers text translation to $nn (a word stack), on a word by word basis.
-If $n == 0 nothing is pushed into $nn.
+This procedure takes $n (an integer in the range [0 .. 99], not
+verified) and adds the numbers text translation to $nn (a word stack),
+on a word by word basis.  If $n == 0 nothing is pushed into $nn.
 
 =back
 
@@ -1161,9 +1162,9 @@ word stack.
 
 =item DESCRIPTION
 
-This procedure takes $n (an integer in the range [0 .. 999], not verified) and
-adds the numbers text translation to $nn (a word stack), on a word by word basis.
-If $n == 0 nothing is pushed into $nn.
+This procedure takes $n (an integer in the range [0 .. 999], not
+verified) and adds the numbers text translation to $nn (a word stack),
+on a word by word basis.  If $n == 0 nothing is pushed into $nn.
 
 =back
 
@@ -1195,9 +1196,9 @@ magnitude of the number 1 for millions, 2 for billions, etc.
 
 =item DESCRIPTION
 
-This procedure takes $n, and pushes the numbers text translation into $nn,
-on a word by word basis, with the proper translated magnitude.  If $n == 0
-nothing is pushed into $nn.
+This procedure takes $n, and pushes the numbers text translation into
+$nn, on a word by word basis, with the proper translated magnitude.
+If $n == 0 nothing is pushed into $nn.
 
 =back
 
@@ -1236,7 +1237,7 @@ gender of the magnitude (optional defaults to $NEUTRAL):
 
 =item DESCRIPTION
 
-This function translate the fraction $n to spanish words, adding 
+This function translate the fraction $n to spanish words, adding
 gender where needed.
 
 This procedure just builds a closure with format information, to call
@@ -1261,7 +1262,8 @@ Everithing not fitting elsewere
 
   parse_num($num, $dec, $sep)
 
-Decomposes the number in its constitutive parts, and returns them in a list:
+Decomposes the number in its constitutive parts, and returns them in a
+list:
 
    use Lingua::SPA::Numeros;
    ($sgn, $ent, $frc, $exp) = parse_num('123.45e10', '.', '",');
@@ -1280,7 +1282,8 @@ decimal separator (tipically ',' or '.').
 
 =item $sep
 
-separator characters ignored by the parser, usually to mark thousands, millions, etc..
+separator characters ignored by the parser, usually to mark thousands,
+millions, etc..
 
 =back
 
@@ -1323,8 +1326,8 @@ Croaks if there is a syntax error.
 
 =item DESCRIPTION
 
-Utility method to adjust return values, transforms text 
-following the options: ACENTOS, MAYUSCULAS y HTML.
+Utility method to adjust return values, transforms text following the
+options: ACENTOS, MAYUSCULAS y HTML.
 
 Returns the adjusted $value.
 
@@ -1348,7 +1351,7 @@ PetaMem s.r.o., <info@petamem.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2001-2009 by Jose Rey
+Copyright (c) 2001-2009 by Jose Rey
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,

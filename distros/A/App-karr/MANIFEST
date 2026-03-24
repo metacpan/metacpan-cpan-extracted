@@ -91,3 +91,4 @@ t/26-skill-share-dir.t
 t/27-backup-restore.t
 t/28-destroy.t
 t/author-pod-syntax.t
+t/lib/TestGit.pm

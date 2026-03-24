@@ -1,26 +1,22 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8 -*-
-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 package Lingua::DEU::Word2Num;
 # ABSTRACT: Word 2 Number conversion in DEU.
 
 # {{{ use block
 
-use 5.10.1;
+use 5.16.0;
+use utf8;
 
-use strict;
-use warnings;
-
-use Encode                    qw(decode_utf8);
+use Export::Attrs;
 use Parse::RecDescent;
-use Perl6::Export::Attrs;
 
 # }}}
-# {{{ variables
-
-our $VERSION = 0.1106;
+# {{{ var block
+our $VERSION = '0.2603231';
 my $parser   = deu_numerals();
 
 # }}}
+
 # {{{ w2n                       convert number to text
 
 sub w2n :Export {
@@ -33,83 +29,64 @@ sub w2n :Export {
 # {{{ deu_numerals              create parser for german numerals
 
 sub deu_numerals {
-    return Parse::RecDescent->new(decode_utf8(q{
-      numeral:      <rulevar: local $number = 0>
-      numeral:        scrap
-                    { return undef; }
-                  |   millenium
-                    { return $item[1]; }
-                  |  century
-                    { return $item[1]; }
-                  |  decade
-                    { return $item[1]; }
+    return Parse::RecDescent->new(q{
+      <autoaction: { $item[1] } >
 
-      number:       'dreizehn'  { $return = 13; }
-                  | 'vierzehn'  { $return = 14; }
-                  | 'fünfzehn'  { $return = 15; }
-                  | 'sechzehn'  { $return = 16; }
-                  | 'siebzehn'  { $return = 17; }
-                  | 'achtzehn'  { $return = 18; }
-                  | 'neunzehn'  { $return = 19; }
-                  | 'null'      { $return =  0; }
-                  | 'ein'       { $return =  1; }
-                  | 'zwei'      { $return =  2; }
-                  | 'drei'      { $return =  3; }
-                  | 'vier'      { $return =  4; }
-                  | 'fünf'      { $return =  5; }
-                  | 'sechs'     { $return =  6; }
-                  | 'sieben'    { $return =  7; }
-                  | 'acht'      { $return =  8; }
-                  | 'neun'      { $return =  9; }
-                  | 'zehn'      { $return = 10; }
-                  | 'elf'       { $return = 11; }
-                  | 'zwölf'     { $return = 12; }
+      numeral:      mega
+                  | kOhOd
+                  | { }
 
-      tens:       'zwanzig'  { $return = 20; }
-                | 'dreissig' { $return = 30; }
-                | 'vierzig'  { $return = 40; }
-                | 'fünfzig'  { $return = 50; }
-                | 'sechzig'  { $return = 60; }
-                | 'siebzig'  { $return = 70; }
-                | 'achtzig'  { $return = 80; }
-                | 'neunzig'  { $return = 90; }
+      number:       'dreizehn'  { 13 }
+                  | 'vierzehn'  { 14 }
+                  | 'fünfzehn'  { 15 }
+                  | 'sechzehn'  { 16 }
+                  | 'siebzehn'  { 17 }
+                  | 'achtzehn'  { 18 }
+                  | 'neunzehn'  { 19 }
+                  | 'null'      {  0 }
+                  | /eine?/     {  1 }
+                  | 'zwei'      {  2 }
+                  | 'drei'      {  3 }
+                  | 'vier'      {  4 }
+                  | 'fünf'      {  5 }
+                  | 'sechs'     {  6 }
+                  | 'sieben'    {  7 }
+                  | 'acht'      {  8 }
+                  | 'neun'      {  9 }
+                  | 'zehn'      { 10 }
+                  | 'elf'       { 11 }
+                  | 'zwölf'     { 12 }
 
-      decade:      'und' decade
-                   { $return = $item[2]; }
-                 |  number 'und' tens
-                    { $return = $item[1] + $item[3]; }
-                 | tens
-                   { $return = $item[1]; }
-                 | number
-                   { $return = $item[1]; }
+      tens:         'zwanzig'   { 20 }
+                  | 'dreissig'  { 30 }
+                  | 'vierzig'   { 40 }
+                  | 'fünfzig'   { 50 }
+                  | 'sechzig'   { 60 }
+                  | 'siebzig'   { 70 }
+                  | 'achtzig'   { 80 }
+                  | 'neunzig'   { 90 }
 
-      century:  number 'hundert' decade
-                { $return = $item[1] * 100 + $item[3]; }
-                | number 'hundert'
-                { $return = $item[1] * 100; }
-                | 'hundert'
-                { $return = 100; }
+      deca:         'und' deca          { $item[2]            }
+                  | number 'und' tens   { $item[1] + $item[3] }
+                  | tens
+                  | number
 
-    millenium:    century 'tausend' century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | century 'tausend' decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | decade  'tausend' century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | decade  'tausend' decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | decade  'tausend'
-                { $return = $item[1] * 1000; }
-                | century 'tausend'
-                { $return = $item[1] * 1000; }
+      hecto:        number 'hundert' deca    { $item[1] * 100 + $item[3] }
+                  | number 'hundert'         { $item[1] * 100            }
+                  | 'hundert'                { 100                       }
 
-      scrap:    millenium(?) century(?) decade(?)
-                /(.+)/
-                millenium(?) century(?) decade(?)
-                {
-                  carp("unknown numeral '$1' !\n");
-                }
-    }));
+      hOd:        hecto
+                | deca
+
+      kilo:       hOd 'tausend' hOd    { $item[1] * 1000 + $item[3] }
+                | hOd 'tausend'        { $item[1] * 1000            }
+
+      kOhOd:      kilo
+                | hOd
+
+      mega:       hOd /million(en)?/ kOhOd { $item[1] * 1_000_000 + $item[3] }
+                | hOd /million(en)?/       { $item[1] * 1_000_000 }
+    });
 }
 
 # }}}
@@ -128,15 +105,13 @@ __END__
 
 =head1 VERSION
 
-version 0.1106
+version 0.2603231
 
 Word 2 Number conversion in DEU.
 
-Lingua::DEU::Word2Num is module for converting text containing number
-representation in German back into number. Converts whole numbers from 0 up
-to 999 999 999.
-
-Text must be encoded in UTF-8.
+Lingua::DEU::Word2Num is module for converting german numerals into
+numbers. Converts whole numbers from 0 up to 999 999 999. Input is
+expected to be in UTF-8.
 
 =cut
 
@@ -214,7 +189,7 @@ Internal parser.
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

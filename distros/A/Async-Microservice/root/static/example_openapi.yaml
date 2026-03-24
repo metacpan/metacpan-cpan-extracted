@@ -5,13 +5,13 @@ info:
   title: "Example Config"
   termsOfService: "http://toterms/"
   contact:
-    email: "developer@org"
+    email: "developer@example.org"
   license:
-    name: "Your-Licence"
-    url: "http://licence-link/"
+    name: "Your-License"
+    url: "http://license-link/"
 tags:
 - name: "example"
-  description: "some example"
+  description: "Some example"
   externalDocs:
     description: "Find out more"
     url: "http://example"
@@ -21,7 +21,7 @@ servers:
 paths:
   '/hcheck':
     get:
-      description: 'Returns 200 response and Perl package name as text when service available'
+      description: 'Returns a 200 response and Perl package name as text when the service is available'
       responses:
         200:
           description: 'alive'

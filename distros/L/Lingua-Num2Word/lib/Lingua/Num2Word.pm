@@ -1,17 +1,13 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 #
-# Copyright (C) PetaMem, s.r.o. 2002-present
+# Copyright (c) PetaMem, s.r.o. 2002-present
 #
 package Lingua::Num2Word;
 # ABSTRACT: A wrapper for Lingua::XXX::num2word modules.
 
 # {{{ use block
 
-use 5.10.1;
-
-use strict;
-use warnings;
-
+use 5.16.0;
 use utf8;
 
 use Carp;
@@ -19,13 +15,11 @@ use Encode;
 
 # }}}
 # {{{ BEGIN
-
-our $VERSION = 0.0682;
+our $VERSION = '0.2603230';
 
 BEGIN {
     use Exporter ();
-    use vars qw($VERSION $REVISION @ISA @EXPORT_OK %known);
-    ($REVISION) = '$Rev: 682 $' =~ /([\d.]+)/; #'
+    use vars qw(@ISA @EXPORT_OK %known);
     @ISA        = qw(Exporter);
     @EXPORT_OK  = qw(cardinal get_interval known_langs langs preprocess_code);
 }
@@ -92,12 +86,16 @@ my $template_obj  = q{ use __PACKAGE_WITH_VERSION__ ();
         code     => $template_func,
     },
     fra => {
-        package  => 'Nums2Words',
+        package  => 'Numbers',
         version  => '',
         limit_lo => 0,
         limit_hi => 999_999_999_999_999, # < 1e52
-        function => 'num2word',
-        code     => $template_func,
+        function => 'get_string',
+        code     => q{
+        use Lingua::FRA::Numbers;
+        my $tmp_obj = Lingua::FRA::Numbers->new($number);
+        $result = $tmp_obj->get_string;
+        },
     },
     ind => {
         package  => 'Nums2Words',
@@ -125,14 +123,14 @@ my $template_obj  = q{ use __PACKAGE_WITH_VERSION__ ();
                        my @words = __PACKAGE__::__FUNCTION__($number);
                        $result = join ' ', @words;
                      },
-        },
+    },
     nld => {
-        package  => 'Numbers',
+        package  => 'Num2Word',
         version  => '',
         limit_lo => 0,
-        limit_hi => 99_999_999_999,
-        function => 'parse',
-        code     => $template_obj,
+        limit_hi => 999_999_999,
+        function => 'num2nld_cardinal',
+        code     => $template_func,
     },
     nor => {
         package  => 'Num2Word',
@@ -231,15 +229,13 @@ sub known_langs {
 #
 sub get_interval {
     my $self = ref($_[0]) ? shift : Lingua::Num2Word->new();
-    my $lang = shift || return;
-    my @limits;
+    my $lang = shift // return;
 
     return if (!defined $known{$lang});
 
-    @limits = ($known{$lang}{limit_lo}, $known{$lang}{limit_hi});
+    my @limits = ($known{$lang}{limit_lo}, $known{$lang}{limit_hi});
 
-    return @limits if (wantarray);
-    return \@limits;
+    return wantarray ? @limits : \@limits;
 }
 
 # }}}
@@ -248,8 +244,8 @@ sub get_interval {
 sub cardinal {
     my $self   = ref($_[0]) ? shift : Lingua::Num2Word->new();
     my $result = '';
-    my $lang   = defined $_[0] ? shift : return $result;
-    my $number = defined $_[0] ? shift : return $result;
+    my $lang   = shift // return $result;
+    my $number = shift // return $result;
 
     $lang = lc $lang;
 
@@ -294,26 +290,39 @@ sub preprocess_code {
 # }}}
 
 1;
-
 __END__
 
 # {{{ POD HEAD
 
+=pod
+
+=encoding utf-8
+
 =head1 NAME
 
-Lingua::Num2Word
+=head2 Lingua::Num2Word 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-wrapper for number to text conversion modules of
-various languages in the Lingua:: hierarchy.
+A wrapper for Lingua::XXX::num2word modules.
 
-=head2 $Rev: 682 $
+Lingua::Num2Word is a wrapper for modules for converting numbers into
+their equivalent in written representation.
 
-A wrapper for mosules in the Lingua::XXX hierarchy.
-XXX is a code from the ISO 639-3 namespace.
+This is a wrapper for various Lingua::XXX::Num2Word modules that do the
+conversions for specific languages. Output encoding is utf-8.
+
+For further information about various limitations of the specific
+modules see their documentation.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -334,7 +343,8 @@ XXX is a code from the ISO 639-3 namespace.
  my $limit  = $numbers->get_interval('ces');
  if ($limit) {
    if ($number > $$limit[1] || $number < $$limit[0]) {
-     print "Number is outside of supported range - <$$limit[0], $$limit[1]>.";
+     print "Number is outside of supported range
+              - <$$limit[0], $$limit[1]>.";
    }
    else {
      print Lingua::Num2Word::cardinal( 'ces', $number );
@@ -344,84 +354,76 @@ XXX is a code from the ISO 639-3 namespace.
    print "Unsupported language.";
  }
 
-=head1 DESCRIPTION
-
-A wrapper for Lingua::XXX::num2word modules.
-
-Lingua::Num2Word is a wrapper for modules for converting numbers into
-their equivalent in written representation.
-
-This is a wrapper for various Lingua::XXX::Num2Word modules that do the
-conversions for specific languages. Output encoding is utf-8.
-
-For further information about various limitations of the specific
-modules see their documentation.
+=cut
 
 # }}}
-# {{{ Functions reference
+# {{{ Functions Reference
 
-=head2 Functions Reference
+=pod
 
-=over
+=head1 Functions Reference
 
-=item cardinal (positional)
+=over 2
 
-  1   string  target language
-  2   number  number to convert
-  =>  string  converted string
-      undef   if input number is not supported
+=item B<cardinal> (positional)
+
+  1   str    target language
+  2   num    number to convert
+  =>  str    converted string
+  =>  undef  if input number is not supported
 
 Conversion from number to text representation in specified language.
 
-=item get_interval (positional)
+=item B<get_interval> (positional)
 
-  1   string       language specification
-  =>  array|arref  list with min max values
-      undef        if specified language is not known
+  1   str    language specification
+  =>  any    an array/arref - list with min max values
+  =>  undef  if specified language is not known
 
 Returns the minimal and maximal number (inclusive) supported by the
 conversion in a specified language. The returned value is a list of
 two elements (low,high) or reference to this list depending on calling
 context. In case a unsupported language is passed undef is returned.
 
-=item known_langs
+=item B<known_langs> (void)
 
-  =>  array|arref  list of supproted languages
+  =>  any  an array/arref - list of supported languages
 
 List of all currently supported languages. Return value is a list or
 a reference to a list depending on calling context.
 
-=item langs
+=item B<langs> (void)
 
-  =>  array|arref  list of languages known by ISO 639-3 list
+  =>  any  an array/arref - list of languages known by ISO 639-3 list
 
 List of all known language codes from iso639. Return value is list or
 reference to list depending on calling context.
 
-=item new
+=item B<new> (void)
+
+  =>  obj  returns new object
 
 Constructor.
 
-=item preprocess_code
+=item B<preprocess_code> (void)
 
-Private.
+  =>  undef  if lang is not specified
+  =>  str    a template
+
+Private function.
 
 =back
 
 =cut
 
 # }}}
-# {{{ POD FOOTER
+# {{{ EXPORTED FUNCTIONS
 
 =pod
 
-=head2 Language codes and names
-
-Language codes and names from iso639 can be found at L<http://www.triacom.com/archive/iso639.en.html>
-
 =head1 EXPORT_OK
 
-=over
+=over 2
 
 =item cardinal
 
@@ -433,14 +435,21 @@ Language codes and names from iso639 can be found at L<http://www.triacom.com/ar
 
 =back
 
-=head2 Required modules / supported languages
+=cut
+
+# }}}
+# {{{ REQUIRED MODULES
+
+=pod
+
+=head1 Required modules
 
 This module is only wrapper and requires other CPAN modules for requested
 conversions eg. Lingua::AFR::Numbers for Afrikaans.
 
 Currently supported languages/modules are:
 
-=over
+=over 2
 
 =item afr - L<Lingua::AFR::Numbers>
 
@@ -460,7 +469,7 @@ Currently supported languages/modules are:
 
 =item jpn - L<Lingua::JPN::Number>
 
-=item nld - L<Lingua::NLD::Numbers>
+=item nld - L<Lingua::NLD::Num2Word>
 
 =item nor - L<Lingua::NOR::Num2Word>
 
@@ -478,20 +487,22 @@ Currently supported languages/modules are:
 
 =back
 
+=cut
+
+# }}}
+# {{{ POD FOOTER
+
+=pod
+
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
-   Roman Vasicek <info@petamem.com>
+   Richard C. Jelinek E<lt>development@petamem.comE<gt>
+   Roman Vasicek E<lt>development@petamem.comE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2002-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2002-present
 
 =cut
 

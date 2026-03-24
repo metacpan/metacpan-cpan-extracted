@@ -1,7 +1,7 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to Module::Generic, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to Module::Generic::Scalar::IO, including, but not limited to bug reports, feature requests, general comments, and patches.
 
 Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/Module-Generic> and issue a pull request.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-v1.2.3/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-Scalar-IO-v0.2.1/README.md)
 
 ## Author
 

@@ -420,11 +420,13 @@ be one of:
 
 =over 8
 
-=item C<auto>  Try linux, fall back to perl (same as bare C<--tmpfile>).
+=item C<auto>  Try linux, perl, named -- in that order (same as bare C<--tmpfile>).
 
 =item C<linux>  Use C<O_TMPFILE> (Linux 3.11+).
 
-=item C<perl>  Use C<open('+E<gt>', undef)>.
+=item C<perl>  Use C<open('+E<gt>', undef)>.  Requires C</proc/self/fd>
+(Linux) or C</dev/fd> (FreeBSD, macOS) to be available on the remote;
+on FreeBSD this means fdescfs must be mounted.
 
 =item C<named>  Use L<File::Temp>; the file persists until the remote script exits.  Required if the script reopens C<__FILE__> or passes its path to child processes.
 

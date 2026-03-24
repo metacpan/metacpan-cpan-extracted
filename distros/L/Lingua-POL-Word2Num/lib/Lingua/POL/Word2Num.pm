@@ -1,25 +1,21 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::POL::Word2Num;
 # ABSTRACT: Word 2 number conversion in POL.
 
 # {{{ use block
 
-use 5.10.1;
+use 5.16.0;
+use utf8;
 
-use strict;
-use warnings;
-
-use Encode                    qw(decode_utf8);
-use Perl6::Export::Attrs;
+use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-
-our $VERSION = 0.0682;
-my $COPY     = 'Copyright (C) PetaMem, s.r.o. 2003-present';
-my $parser   = pl_numerals();
+our $VERSION = '0.2603230';
+my $COPY     = 'Copyright (c) PetaMem, s.r.o. 2003-present';
+my $parser   = pol_numerals();
 
 # }}}
 
@@ -28,103 +24,85 @@ my $parser   = pl_numerals();
 sub w2n :Export {
   my $input = shift // return;
 
-  $input =~ s/tysišce/tysišc/g;  # Remove trick chars that don't affect the parsing (gender related)
-
-  $input .= " ";                 # Grant end space, since we identify similar words by specifying the space
+#  print "INPUT: '$input'\n";
+  $input =~ s{\s\z}{}xms;
+#  print "INPUT: '$input'\n";
 
   return $parser->numeral($input);
 }
 
 # }}}
-# {{{ pl_numerals                                 create parser for numerals
+# {{{ pol_numerals                                 create parser for numerals
 
-sub pl_numerals {
-    return Parse::RecDescent->new(decode_utf8(q[
-      numeral: <rulevar: local $number = 0>
-      numeral: million   { return $item[1]; }                         # root parse. go from maximum to minimum value
-        |      millenium { return $item[1]; }
-        |      century   { return $item[1]; }
-        |      decade    { return $item[1]; }
-        |                { return undef; }
+sub pol_numerals {
+    return Parse::RecDescent->new(q{
+      <autoaction: { $item[1] } >
 
-      number: "dziewiętnaście " { $return = 19; }               # try to find a word from 0 to 19
-        |     "osiemnaście "    { $return = 18; }
-        |     "siedemnaście "   { $return = 17; }
-        |     "szesnaście "     { $return = 16; }
-        |     "piętnaście "      { $return = 15; }
-        |     "czternaście "    { $return = 14; }
-        |     "trzynaście "     { $return = 13; }
-        |     "dwanaście "      { $return = 12; }
-        |     "jedenaście "     { $return = 11; }
-        |     "dziesięć "       { $return = 10; }
-        |     "dziewięć "       { $return = 9; }
-        |     "osiem "          { $return = 8; }
-        |     "siedem "         { $return = 7; }
-        |     "sześć "          { $return = 6; }
-        |     "pięć "           { $return = 5; }
-        |     "cztery "         { $return = 4; }
-        |     "trzy "           { $return = 3; }
-        |     "dwa "            { $return = 2; }
-        |     "jeden "          { $return = 1; }
-        |     "zero "           { $return = 0; }
+      numeral:  mega
+             |  kOhOd
+             | 'zero'            {  0 }
+             |                   {    }
 
-      tens:   "dwadzieścia"      { $return = 20; }                    # try to find a word that representates
-        |     "trzydzieści"      { $return = 30; }                    # values 20,30,..,90
-        |     "czerdzieści"      { $return = 40; }
-        |     "pięćdziesiąt"     { $return = 50; }
-        |     "sześćdziesiąt"    { $return = 60; }
-        |     "siedemdziesiąt"   { $return = 70; }
-        |     "osiemdziesiąt"    { $return = 80; }
-        |     "dziewięćdziesiąt" { $return = 90; }
+       number:  'dziewiętnaście' { 19 }
+             |  'osiemnaście'    { 18 }
+             |  'siedemnaście'   { 17 }
+             |  'szesnaście'     { 16 }
+             |  'piętnaście'     { 15 }
+             |  'czternaście'    { 14 }
+             |  'trzynaście'     { 13 }
+             |  'dwanaście'      { 12 }
+             |  'jedenaście'     { 11 }
+             |  'dziesięć'       { 10 }
+             |  'dziewięć'       {  9 }
+             |  'osiem'          {  8 }
+             |  'siedem'         {  7 }
+             |  'sześć'          {  6 }
+             |  'pięć'           {  5 }
+             |  'cztery'         {  4 }
+             |  'trzy'           {  3 }
+             |  'dwa'            {  2 }
+             |  'jeden'          {  1 }
 
-    hundreds: "sto"         { $return = 100; }
-        |     "dwieśccie"   { $return = 200; }
-        |     "trzysta"     { $return = 300; }
-        |     "czterysta"   { $return = 400; }
-        |     "pięćset"     { $return = 500; }
-        |     "sześćset"    { $return = 600; }
-        |     "siedemset"   { $return = 700; }
-        |     "osiemset"    { $return = 800; }
-        |     "dziewięćset" { $return = 900; }
+         tens:  'dwadzieścia'      { 20 }
+             |  'trzydzieści'      { 30 }
+             |  'czterdzieści'     { 40 }
+             |  'pięćdziesiąt'     { 50 }
+             |  'sześćdziesiąt'    { 60 }
+             |  'siedemdziesiąt'   { 70 }
+             |  'osiemdziesiąt'    { 80 }
+             |  'dziewięćdziesiąt' { 90 }
 
-      decade: tens(?) number(?)                                       # try to find words that represents values
-              { $return = 0;                                          # from 0 to 99
-                for (@item) {
-                  $return += $$_[0] if (ref $_ && defined $$_[0]);
-                }
-              }
+         deca:  tens number    { $item[1] + $item[2] }
+             |  tens
+             |  number
 
-      century: number(?) hundreds(?) decade(?)                        # try to find words that represents values
-               { $return = 0;                                         # from 100 to 999
-                 for (@item) {
-                  $return += $$_[0] if (ref $_ && defined $$_[0]);
-                 }
-               }
+        hecto:  number /(sta|set)/ deca  { $item[1] * 100 + $item[3] }
+             |  number /(sta|set)/       { $item[1] * 100            }
+             |  'dwieście' deca          { 2 * 100 + $item[2]        }
+             |  'dwieście'               { 200                       }
+             |  'sto' deca               { 100 + $item[2]            }
+             |  'sto'                    { 100                       }
 
-    millenium: century(?) decade(?) 'tysiąc' century(?) decade(?)     # try to find words that represents values
-               { $return = 0;                                         # from 1.000 to 999.999
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "tysiąc") {
-                     $return = ($return>0) ? $return * 1000 : 1000;
-                   }
-                 }
-               }
+          hOd:  hecto
+             |  deca
 
-      million: millenium(?) century(?) decade(?)                      # try to find words that represents values
-               'milion'                                               # from 1.000.000 to 999.999.999
-               millenium(?) century(?) decade(?)
-               { $return = 0;
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "milion") {
-                     $return = ($return>0) ? $return * 1000000 : 1000000;
-                   }
-                 }
-               }
-    ]));
+         kilo:  hOd      /(tysiąc[ae]?|tysięcy)/ hOd   { $item[1] * 1000 + $item[3]       }
+             |  hOd      /(tysiąc[ae]?|tysięcy)/       { $item[1] * 1000                  }
+             |  number   /(tysiąc[ae]?|tysięcy)/ hOd   { $item[1] * 1000 + $item[3]       }
+             |  number   /(tysiąc[ae]?|tysięcy)/       { $item[1] * 1000                  }
+             |  'tysiąc' hOd                           { 1000 + $item[2]                  }
+             |  'tysiąc'                               { 1000                             }
+             |  hOd 'jeden' 'tysiąc' hOd               { ($item[1] + 1) * 1000 + $item[4] }
+             |  hOd 'jeden' 'tysiąc'                   { ($item[1] + 1) * 1000            }
+
+        kOhOd:  kilo
+             |  hOd
+
+         mega:  hOd megas kOhOd             { $item[1] * 1_000_000 + $item[3]       }
+             |  hOd megas                   { $item[1] * 1_000_000                  }
+
+        megas:  /milion(y|ów)?/
+    });
 }
 
 # }}}
@@ -141,18 +119,26 @@ __END__
 
 =head1 NAME
 
-Lingua::POL::Word2Num
+=head2 Lingua::POL::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for Polish.
-Input text must be encoded in utf-8.
+Word 2 number conversion in POL.
 
-=head2 $Rev: 682 $
+Lingua::POL::Word2Num is module for converting text containing number
+representation in polish back into number. Converts whole numbers from 0 up
+to 999 999 999.
 
-ISO 639-3 namespace.
+Input text must be encoded in UTF-8.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -162,34 +148,32 @@ ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
-
-Word 2 number conversion in POL.
-
-Lingua::POL::Word2Num is module for converting text containing number
-representation in polish back into number. Converts whole numbers from 0 up
-to 999 999 999.
-
 =cut
 
 # }}}
-# {{{ Function reference
+# {{{ Functions Reference
 
-=head2 Functions Reference
+=pod
 
-=over
+=head1 Functions Reference
 
-=item  w2n (positional)
+=over 2
 
-  1   string  string to convert
-  =>  number  converted number
-      undef   if input string is not known
+=item  B<w2n> (positional)
+
+  1   str    string to convert
+  =>  num    converted number
+  =>  undef  if input string is not known
 
 Convert text representation to number.
 
-=item pl_numerals
+
+=item B<pol_numerals> (void)
+
+  =>  obj  returns new parser object
 
 Internal parser.
+
 
 =back
 
@@ -203,17 +187,12 @@ Internal parser.
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
+
    Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2003-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2003-present
 
 =cut
 

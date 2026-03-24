@@ -7,6 +7,11 @@ This document is automatically generated from the document:
 and that document should be considered the canonical source of change
 related information.
 
+3.88  2026-03-26  sbeck
+  -  Fixed release problem
+         A problem exists in this release. New release to correct it. GitHub
+         #21.
+
 3.87  2026-03-02  sbeck
   -  NEW CODE(s)
 

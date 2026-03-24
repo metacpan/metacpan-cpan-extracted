@@ -25,7 +25,7 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use IO::Socket;
 use Carp qw(croak);
 use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE);
-$VERSION = '1.01';
+$VERSION = '1.02';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
 
@@ -835,7 +835,7 @@ HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
 
 =head1 VERSION
 
-1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -847,6 +847,54 @@ HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
   };
 
   HTTP::Handy->run(app => $app, port => 8080);
+
+=head1 TABLE OF CONTENTS
+
+=over 4
+
+=item * L</DESCRIPTION>
+
+=item * L</INCLUDED DOCUMENTATION> -- eg/ samples and doc/ cheat sheets
+
+=item * L</REQUIREMENTS>
+
+=item * L</SUPPORTED PROTOCOL>
+
+=item * L</PSGI SUBSET SPECIFICATION> -- C<$env> keys, response format, psgi.input
+
+=item * L</SERVER STARTUP> -- C<run()>, directory init, log files
+
+=item * L</METHODS> -- C<serve_static>, C<url_decode>, C<parse_query>,
+C<mime_type>, C<is_htmx>, response builders
+
+=item * L</ERROR HANDLING>
+
+=item * L</STATIC FILES, CGI, AND HTMX>
+
+=item * L</HTTPS>
+
+=item * L</PSGI COMPATIBILITY NOTES>
+
+=item * L</SECURITY>
+
+=item * L</LIMITATIONS>
+
+=item * L</DEMO>
+
+=item * L</INTERNALS -- HTTP::Handy::Input>
+
+=item * L</INTERNALS -- Private Functions>
+
+=item * L</DIAGNOSTICS> -- error messages and runtime warnings
+
+=item * L</BUGS AND LIMITATIONS>
+
+=item * L</DESIGN PHILOSOPHY>
+
+=item * L</SEE ALSO>
+
+=back
+
 
 =head1 DESCRIPTION
 
@@ -1584,54 +1632,7 @@ L<LTSV::LINQ> -- LINQ-style queries for LTSV data, by the same author.
 HTTP::Handy was originally developed to serve local tools built on top of
 LTSV::LINQ.
 
-=head1 TABLE OF CONTENTS
 
-=over 4
-
-=item * L</DESCRIPTION>
-
-=item * L</INCLUDED DOCUMENTATION> -- eg/ samples and doc/ cheat sheets
-
-=item * L</REQUIREMENTS>
-
-=item * L</SUPPORTED PROTOCOL>
-
-=item * L</PSGI SUBSET SPECIFICATION> -- C<$env> keys, response format, psgi.input
-
-=item * L</SERVER STARTUP> -- C<run()>, directory init, log files
-
-=item * L</METHODS> -- C<serve_static>, C<url_decode>, C<parse_query>,
-C<mime_type>, C<is_htmx>, response builders
-
-=item * L</ERROR HANDLING>
-
-=item * L</STATIC FILES, CGI, AND HTMX>
-
-=item * L</HTTPS>
-
-=item * L</PSGI COMPATIBILITY NOTES>
-
-=item * L</SECURITY>
-
-=item * L</LIMITATIONS>
-
-=item * L</DEMO>
-
-=item * L</INTERNALS -- HTTP::Handy::Input>
-
-=item * L</INTERNALS -- Private Functions>
-
-=item * L</DIAGNOSTICS> -- error messages and runtime warnings
-
-=item * L</BUGS AND LIMITATIONS>
-
-=item * L</DESIGN PHILOSOPHY>
-
-=item * L</SEE ALSO>
-
-=back
-
-=head1 AUTHOR
 
 INABA Hitoshi E<lt>ina@cpan.orgE<gt>
 

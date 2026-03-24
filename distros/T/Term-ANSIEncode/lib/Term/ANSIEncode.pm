@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.94;
+package Term::ANSIEncode 1.96;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -59,7 +59,7 @@ BEGIN {
     our @EXPORT_OK = qw(ansi_colors);
 } ## end BEGIN
 
-our $VERSION = '1.94';
+our $VERSION = '1.96';
 
 # Package-level caches so large tables are built only once per process.
 our $GLOBAL_ANSI_META = _global_ansi_meta();
@@ -595,7 +595,7 @@ sub ansi_decode {
     $text =~ s/\[\%\s*SCROLL\s+UP\s+(\d+)\s*\%\]/     $csi . $1 . 'S'           /eigs;
     $text =~ s/\[\%\s*SCROLL\s+DOWN\s+(\d+)\s*\%\]/   $csi . $1 . 'T'           /eigs;
     $text =~ s/\[\%\s*SPACES\s+(\d+)\s*\%\]/   ' ' x $1           /eigs;
-    $text =~ s/\[\%\s*TABSS\s+(\d+)\s*\%\]/   "\t" x $1           /eigs;
+    $text =~ s/\[\%\s*TABS\s+(\d+)\s*\%\]/   "\t" x $1           /eigs;
     $text =~ s/\[\%\s*CHAR\s+(\S),(\d+)\s*\%\]/   "$1" x $2           /eigs;
 
     # HORIZONTAL RULE expands into a sequence of meta-tokens (resolved later).
@@ -1670,6 +1670,8 @@ sub _global_ansi_meta {    # prefills the hash cache
 
 1;
 
+=encoding UTF-8
+
 =head1 NAME
 
 Term::ANSIEncode
@@ -2008,6 +2010,50 @@ Output "count" number of "character".  Only ONE character is allowed.
 
 =back
 
+=head1 MARKDOWN EXAMPLES
+
+=head2 IBM Logo
+
+   [% B_BLACK           %]                                                                                [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬                 ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬               ▬▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬             ▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬        ▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬           ▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬      ▬▬▬▬▬▬▬▬▬▬▬         ▬▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬  ▬▬▬▬▬   ▬▬▬▬▬  ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬      ▬▬▬▬▬▬▬    ▬▬▬▬▬▬▬▬▬    ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬        ▬▬▬▬▬▬     ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬      ▬▬▬▬▬      ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬       ▬▬▬       ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬        ▬        ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK           %]                                                                                [% RESET %]
+
+=head2 Atari Logo
+
+   [% B_BLACK %][% SPACES 84 %][% RESET %]
+   [% B_BLACK %][% YELLOW  %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]         db    888888888888    db         88888888ba   88  [% RESET %]
+   [% B_BLACK %][% LIME    %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]        d88b        88        d88b        88      "8b  88  [% RESET %]
+   [% B_BLACK %][% GREEN   %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]       d8'`8b       88       d8'`8b       88      ,8P  88  [% RESET %]
+   [% B_BLACK %][% CYAN    %]        ### ### ###      [% RESET %][% B_BLACK %][% RED %]      d8'  `8b      88      d8'  `8b      88    aa8P'  88  [% RESET %]
+   [% B_BLACK %][% BLUE    %]       ###  ###  ###     [% RESET %][% B_BLACK %][% RED %]     d8YaaaaY8b     88     d8YaaaaY8b     88   "88'    88  [% RESET %]
+   [% B_BLACK %][% MAGENTA %]      ###   ###   ###    [% RESET %][% B_BLACK %][% RED %]    d8""""""""8b    88    d8""""""""8b    88    "8b    88  [% RESET %]
+   [% B_BLACK %][% PINK    %]    ####    ###    ####  [% RESET %][% B_BLACK %][% RED %]   d8'        `8b   88   d8'        `8b   88     `8b   88  [% RESET %]
+   [% B_BLACK %][% RED     %]  ####      ###     #### [% RESET %][% B_BLACK %][% RED %]  d8'          `8b  88  d8'          `8b  88      `8b  88  [% RESET %]
+   [% B_BLACK %][% SPACES 84 %][% RESET %]
+
+=head2 Sinclair Research Logo
+
+   [% B_BLACK                   %]                                                                                                           [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]                 ▄▄                               ▄▄                ▄▄                  [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]  [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]                 ▀▀                               ██                ▀▀                 [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]   [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██████████████ ██ ██████████████ ██████████████ ██ ██████████████ ██ ██████████████ [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]    [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██▄▄▄▄▄▄▄▄▄▄▄▄ ██ ██          ██ ██             ██ ▄▄▄▄▄▄▄▄▄▄▄▄██ ██ ██            [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]     [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ▀▀▀▀▀▀▀▀▀▀▀▀██ ██ ██          ██ ██             ██ ███▀▀▀▀▀▀▀▀▀██ ██ ██           [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]      [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██████████████ ██ ██          ██ ██████████████ ██ ██████████████ ██ ██          [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% B_BLACK %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]       [% RESET %]
+   [% B_BLACK %][% ORANGE %]  ZX80 [% WHITE %]/[% BRIGHT RED %] ZX81 [% WHITE %]/[% BRIGHT WHITE %] ZX Spectrum [% WHITE %]/[% BRIGHT WHITE %] QL [% WHITE %]/[% BRIGHT WHITE %] PC200                                                                   [% RESET %]
+   [% B_BLACK                   %]                                                                                                           [% RESET %]
+ 
 =head1 AUTHOR & COPYRIGHT
 
 Richard Kelsch
@@ -2029,3 +2075,4 @@ L<http://www.perlfoundation.org/artistic_license_2_0>
 =back
 
 =cut
+

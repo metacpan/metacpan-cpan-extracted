@@ -42,7 +42,7 @@ if (my $xmods = $ENV{XMODIFIERS}) {
         warn localtime().": [$who] git-server: Modified Deploy Patience: $MAX_PATIENCE Seconds\n";
     }
     $deploy_branch = $1 if $xmods =~ /\bpull_branch=(\S+)/;
-    $client_command = $1 if $xmods =~ m{^client=.*/(git-\w+)}m;
+    $client_command = $1 if $xmods =~ m{^client=.*/(git-?\w*)@}m;
 }
 my $msg = $deploy_branch ? " [git-deploy --branch $deploy_branch]" : "";
 $0 = "push-notification - $who:$base$msg";
@@ -122,7 +122,7 @@ my $should_wait =
     $deploy_branch && $last_branch && $deploy_branch ne $last_branch ? 0 :
 
     # Never wait if called from "git-client" wrapper without going through "git-deploy"
-    $client_command =~ /git-client/ ? 0 :
+    $client_command !~ /git-deploy/ ? 0 :
 
     # Always pause if there's never been any push yet
     !-e $last_pushed ? 1 :

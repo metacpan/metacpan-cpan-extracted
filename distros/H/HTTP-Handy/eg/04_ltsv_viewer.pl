@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 ######################################################################
 # 04_ltsv_viewer.pl - LTSV access log viewer using HTTP::Handy
 #

@@ -1,5 +1,22 @@
 Revision history for HTTP-Handy
 
+1.02  2026-03-24 JST (Japan Standard Time)
+
+    Documentation:
+    - POD =head1 VERSION: corrected from "1.01" to "Version 1.02"
+      (aligned with DB-Handy and LTSV-LINQ style).
+    - POD =head1 TABLE OF CONTENTS: moved to correct position
+      (after SYNOPSIS, before DESCRIPTION); was incorrectly placed
+      after SEE ALSO.
+    - eg/: removed shebang line (#!/usr/bin/perl) from all four
+      eg/*.pl files (consistent with LTSV-LINQ 1.06 style).
+    - doc/psgi_cheatsheet.*.txt: all 21 language cheat sheets
+      rewritten; MN, MY, BN, HI, KM, KO, NE, SI, TH, TW, ZH, UR
+      now use their respective native scripts (Cyrillic, Burmese,
+      Bengali, Devanagari, Khmer, Hangul, Sinhala, Thai,
+      Traditional/Simplified Chinese, Arabic); FR, TR, VI updated
+      with proper diacritics and locale-specific characters.
+
 1.01  2026-03-22 JST (Japan Standard Time)
 
     New features:

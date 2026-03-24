@@ -2,11 +2,11 @@ openapi: 3.0.0
 info:
   version: '1'
   title: 'Perl Async::Microservice::Time'
-  description: 'demo time service for Async::Microservice, supports jsonp with _cb parameter'
+  description: 'Demo time service for Async::Microservice, supports JSONP with the _cb parameter'
   termsOfService: "http://toterms/"
   contact:
     name: Jozef
-    email: some@email
+    email: some@example.com
   license:
     name: Perl Licence
     url: https://perldoc.perl.org/index-licence.html
@@ -19,7 +19,7 @@ paths:
       parameters:
         - name: time_zone
           in: query
-          description: timezone string
+          description: time zone string
           required: false
           schema:
             type: string
@@ -36,7 +36,7 @@ paths:
         500:
           $ref: '#/components/responses/Internal-Server-Error'
     post:
-      description: "get datetime from epoch"
+      description: "Get date-time from epoch"
       requestBody:
         content:
           'application/json':
@@ -63,14 +63,14 @@ paths:
       parameters:
         - name: time_zone_part1
           in: path
-          description: timezone part1 string
+          description: time zone part 1 string
           required: true
           schema:
             type: string
             example: Europe
         - name: time_zone_part2
           in: path
-          description: timezone part2 string
+          description: time zone part 2 string
           required: true
           schema:
             type: string
@@ -108,7 +108,7 @@ paths:
             maximum: 200
         - name: m_income
           in: query
-          description: monthly increase to sum-up
+          description: monthly increase to sum up
           required: false
           schema:
             type: number
@@ -155,7 +155,7 @@ paths:
             exclusiveMinimum: true
       responses:
         200:
-          description: 'return ok after sleep time'
+          description: 'Return OK after sleep time'
           content:
             'application/json':
               schema:
@@ -176,7 +176,7 @@ paths:
           $ref: '#/components/responses/Internal-Server-Error'
   '/hcheck':
     get:
-      description: 'Returns 200 response and Perl package name as text when service available'
+      description: 'Returns a 200 response and Perl package name as text when the service is available'
       responses:
         200:
           description: 'healthy'

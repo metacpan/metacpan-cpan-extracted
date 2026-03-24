@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Moose::Role;
 requires qw(get_routes service_name);
@@ -18,6 +18,7 @@ use Path::Router;
 use FindBin qw($Bin);
 use Async::MicroserviceReq;
 use Log::Any qw($log);
+use Future::AsyncAwait;
 
 has 'api_version' => (
     is      => 'ro',
@@ -57,7 +58,13 @@ sub _build_router {
     my ($self) = @_;
 
     my $router = Path::Router->new;
-    my @routes = $self->get_routes();
+    my @routes = (
+        ''                 => { defaults => { GET => 'GET_root_index', }, },
+        'static/:filename' => { defaults => { GET => 'GET_static', }, },
+        'edit'             => { defaults => { GET => 'GET_root_edit', }, },
+        'hcheck'           => { defaults => { GET => 'GET_hcheck', }, },
+        $self->get_routes()
+    );
     while (@routes) {
         my ($path, $opts) = splice(@routes, 0, 2);
         $router->add_route($path, %$opts);
@@ -99,29 +106,6 @@ sub plack_handler {
         # without version path redirect to the latest version
         return $this_req->redirect('/v' . $self->api_version . '/')
             unless $version;
-
-        # handle static/
-        return $this_req->static($1)
-            if ($sub_path_info =~ qr{^/static(/.+)$});
-
-        # dispatch request
-        if ( $sub_path_info eq '/' ) {
-            return $this_req->static( 'index.html',
-                sub { $self->_update_openapi_html(@_) } );
-        }
-        elsif ( $sub_path_info eq '/edit' ) {
-            return $this_req->static('edit.html', sub {$self->_update_openapi_html(@_)});
-        }
-        elsif ( $sub_path_info eq '/hcheck' ) {
-            return $this_req->text_plain(
-                'Service-Name: ' . $self->service_name,
-                "API-Version: " . $self->api_version,
-                'Uptime: ' . ( time() - $start_time ),
-                'Request-Count: ' . $req_count,
-                'Pending-Requests: '
-                    . Async::MicroserviceReq->get_pending_req,
-            );
-        }
 
         if (my $match = $self->router->match($sub_path_info)) {
             my $func = $match->{mapping}->{$this_req->method};
@@ -166,7 +150,7 @@ sub plack_handler {
                 return;
             }
         }
-        return $this_req->respond(404, [], 'not found');
+        return $this_req->respond(404, [], 'path ' . $sub_path_info . ' not found');
     };
 
     return sub {
@@ -194,6 +178,37 @@ sub _update_openapi_html {
     return $content;
 }
 
+sub GET_root_index {
+    my ( $self, $this_req ) = @_;
+    return $this_req->static_ft( 'index.html',
+        sub { $self->_update_openapi_html(@_) } );
+}
+
+sub GET_static {
+    my ( $self, $this_req ) = @_;
+    my $filename = $this_req->params->{filename};
+    return $this_req->static_ft($filename);
+}
+
+sub GET_root_edit {
+    my ( $self, $this_req ) = @_;
+    return $this_req->static_ft('edit.html', sub {$self->_update_openapi_html(@_)});
+}
+
+sub GET_hcheck {
+    my ( $self, $this_req ) = @_;
+    return $this_req->text_plain(
+        'Service-Name: ' . $self->service_name,
+        "API-Version: " . $self->api_version,
+        'Uptime: ' . ( time() - $start_time ),
+        'Request-Count: ' . $req_count,
+        'Pending-Requests: '
+            . Async::MicroserviceReq->get_pending_req,
+    );
+}
+
+no Moose::Role;
+
 1;
 
 __END__
@@ -202,7 +217,7 @@ __END__
 
 Async::Microservice - Async HTTP Microservice Moose Role
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
     # lib/Async/Microservice/HelloWorld.pm
     package Async::Microservice::HelloWorld;
@@ -228,8 +243,8 @@ Async::Microservice - Async HTTP Microservice Moose Role
 
 =head1 DESCRIPTION
 
-This L<Moose::Role> helps to quicly bootstrap async http service that is
-including OpenAPI documentation.
+This L<Moose::Role> helps quickly bootstrap an async HTTP service that
+includes OpenAPI documentation.
 
 See L<https://time.meon.eu/> and L<Async::Microservice::Time> code.
 
@@ -239,19 +254,20 @@ Create new package for your APIs from current examples
 C<lib/Async/Microservice/*>. Inside set return value of C<service_name>.
 This string will be used to set process name and to read/locate
 OpenAPI yaml definition for the documentation. Any GET/POST processing
-funtions must be defined in C<get_routes> funtion.
+functions must be defined in the C<get_routes> function.
 
-Copy one of the C<bin/*.psgi> update it with your new package name.
+Copy one of the C<bin/*.psgi> scripts and update it with your new package
+name.
 
 Copy one of the C<root/static/*.yaml> to have the same name as
 C<service_name>.
 
-Now you are able to lauch the http service with:
+Now you are able to launch the HTTP service with:
 
     plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOURNAME.psgi
 
 In your browser you can read the OpenAPI documentation: L<http://0.0.0.0:8089/v1/>
-and also use editor to extend it: L<http://0.0.0.0:8089/v1/edit>
+and also use the editor to extend it: L<http://0.0.0.0:8089/v1/edit>
 
 =head1 SEE ALSO
 

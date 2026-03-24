@@ -16,7 +16,7 @@ my $pg; $pg = EV::Pg->new(
         print "notice: $_[0]";
     },
     on_connect => sub {
-        # query-level error: bad SQL
+        # query-level error: table does not exist
         $pg->query("select from nonexistent_table", sub {
             my ($rows, $err) = @_;
             if ($err) {

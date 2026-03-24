@@ -367,7 +367,7 @@ sub help_text {
 ║         Show supported ANSI color modes                                   ║
 ║                                                                           ║
 ║     --[% BRIGHT CYAN %]baud[% RESET %]=speed                                                          ║
-║         "speed" can be any baud rate.                                     ║
+║         "speed" can be any baud rate. Default is full speed.              ║
 ║                                                                           ║
 ║     -[% BRIGHT CYAN %]c[% RESET %] or --[% BRIGHT CYAN %]colors[% RESET %]                                                        ║
 ║         Show available colors                                             ║
@@ -405,7 +405,7 @@ __END__
 
 =pod
 
-=encoding utf8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -418,6 +418,8 @@ A markup language to generate basic ANSI text.  A terminal that supports UTF-8 i
 =head1 USAGE
 
  ansi_encode.pl [options] [file or search]
+
+See the manual page for "Term::ANSIEncode" for markup documentation.
 
 =head1 OPTIONS
 
@@ -463,228 +465,50 @@ Does a raw dump of the symbols.
 
 =back
 
-=over 4
-
-[% RED %]This is written in red[% RESET %]
-
-B<RESET> changes output text to normal.
-
-=back
-
-=head1 TOKENS
-
-=head2 GENERAL
-
-=over 4
-
-=item B<[% RETURN %]>
-
-ASCII RETURN (13)
-
-=item B<[% LINEFEED %]>
-
-ASCII LINEFEED (10)
-
-=item B<[% NEWLINE %]>
-
-RETURN + LINEFEED (13 + 10)
-
-=item B<[% CLS %]>
-
-Places cursor at top left, screen cleared
-
-=item B<[% CLEAR %]>
-
-Clear screen only, cursor remains where it was
-
-=item B<[% CLEAR LINE %]>
-
-Clear to the end of line from current cursor position
-
-=item B<[% CLEAR DOWN %]>
-
-Clear down from current cursor position
-
-=item B<[% CLEAR UP %]>
-
-Clear up from current cursor position
-
-=item B<[% RESET %]>
-
-Reset all colors and attributes to their defaults
-
-=back
-
-=head2 CURSOR
-
-=over 4
-
-=item B<[% HOME %]>
-
-Moves the cursor to the location 1,1 (Top left of screen)
-
-=item B<[% UP %]> (Non-destructive)
-
-Moves cursor up one step
-
-=item B<[% DOWN %]> (Non-destructive)
-
-Moves cursor down one step
-
-=item B<[% RIGHT %]> (Non-destructive)
-
-Moves cursor right one step
-
-=item B<[% LEFT %]> (Non-destructive)
-
-Moves cursor left one step
-
-=item B<[% SAVE %]>
-
-Save current cursor position (overwrites previous save, only one at a time)
-
-=item B<[% RESTORE %]>
-
-Place cursor at saved position
-
-=item B<[% BOLD %]>
-
-Bold text (not all terminals support this)
-
-=item B<[% FAINT %]>
-
-Faded text (not all terminals support this)
-
-=item B<[% ITALIC %]>
-
-Italicized text (not all terminals support this)
-
-=item B<[% UNDERLINE %]>
-
-Underlined text
-
-=item B<[% SLOW BLINK %]>
-
-Slow cursor blink
-
-=item B<[% RAPID BLINK %]>
-
-Rapid cursor blink (Some terminals just do a slow blink)
-
-=item B<[% LOCATE column,row %]>
-
-Set cursor position
-
-=back
-
-=head2 ATTRIBUTES
-
-=over 4
-
-=item B<[% INVERT %]>
-
-Invert text (flip background and foreground attributes)
-
-=item B<[% REVERSE %]>
-
-Invert text (flip background and foreground attributes)
-
-=item B<[% CROSSED OUT %]>
-
-Crossed out.  Text with a line through the middle.
-
-=item B<{% DEFAULT FONT %]>
-
-Default font.  If the font was changed, then restore to the default font.
-
-=back
-
-=head2 FRAMES
-
-=over 4
-
-=item B<[% BOX color,x,y,width,height,type %]> text here B<[% ENDBOX %]>
-
-Draw a frame around text.  There are many types to choose from.
-
-=back
-
-=head2 COLORS
-
-=over 4
-
-=item B<[% NORMAL %]>
-
-Sets colors to default
-
-=back
-
-=head2 FOREGROUND
-
-There are many more foreground colors available than the sixteen below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "RGB" token for access to 16 million colors.
-
-=over 4
-
-=item BLACK          = Black
-=item RED            = Red
-=item GREEN          = Green
-=item YELLOW         = Yellow
-=item BLUE           = Blue
-=item MAGENTA        = Magenta
-=item CYAN           = Cyan
-=item WHITE          = White
-=item DEFAULT        = Default foreground color
-=item BRIGHT BLACK   = Bright black (dim grey)
-=item BRIGHT RED     = Bright red
-=item BRIGHT GREEN   = Lime
-=item BRIGHT YELLOW  = Bright Yellow
-=item BRIGHT BLUE    = Bright blue
-=item BRIGHT MAGENTA = Bright magenta
-=item BRIGHT CYAN    = Bright cyan
-=item BRIGHT WHITE   = Bright white
-
-=back
-
-=head2 BACKGROUND
-
-There are many more background colors available than the sixteen below.  However, the ones below should work on any color terminal.  Other colors may requite 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have "Term256" features.  You can used the "-t" option for all of the color tokens available or use the "B_RGB" token for access to 16 million colors.
-
-=over 4
-
-=item B_BLACK          = Black
-=item B_RED            = Red
-=item B_GREEN          = Green
-=item B_YELLOW         = Yellow
-=item B_BLUE           = Blue
-=item B_MAGENTA        = Magenta
-=item B_CYAN           = Cyan
-=item B_WHITE          = White
-=item B_DEFAULT        = Default background color
-=item BRIGHT B_BLACK   = Bright black (grey)
-=item BRIGHT B_RED     = Bright red
-=item BRIGHT B_GREEN   = Lime
-=item BRIGHT B_YELLOW  = Bright yellow
-=item BRIGHT B_BLUE    = Bright blue
-=item BRIGHT B_MAGENTA = Bright magenta
-=item BRIGHT B_CYAN    = Bright cyan
-=item BRIGHT B_WHITE   = Bright white
-
-=back
-
-=head2 HORIZONAL RULES
-
-Makes a solid blank line, the full width of the screen with the selected color
-
-For example, for a color of blue, use the following
-
-  [% HORIZONTAL RULE BLUE %]
-
-=over 4
-
-=item HORIZONTAL RULE [color]             = A solid line of [color] background
-
-=back
-
+=head1 MARKDOWN EXAMPLES
+
+=head2 IBM Logo
+
+   [% B_BLACK           %]                                                                                [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬                 ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬               ▬▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬             ▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬        ▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬           ▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬      ▬▬▬▬▬▬▬▬▬▬▬         ▬▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬  ▬▬▬▬▬   ▬▬▬▬▬  ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬      ▬▬▬▬▬▬▬    ▬▬▬▬▬▬▬▬▬    ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬        ▬▬▬▬▬▬     ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬      ▬▬▬▬▬      ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬       ▬▬▬       ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬        ▬        ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK           %]                                                                                [% RESET %]
+
+=head2 Atari Logo
+
+   [% B_BLACK %][% SPACES 84 %][% RESET %]
+   [% B_BLACK %][% YELLOW  %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]         db    888888888888    db         88888888ba   88  [% RESET %]
+   [% B_BLACK %][% LIME    %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]        d88b        88        d88b        88      "8b  88  [% RESET %]
+   [% B_BLACK %][% GREEN   %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]       d8'`8b       88       d8'`8b       88      ,8P  88  [% RESET %]
+   [% B_BLACK %][% CYAN    %]        ### ### ###      [% RESET %][% B_BLACK %][% RED %]      d8'  `8b      88      d8'  `8b      88    aa8P'  88  [% RESET %]
+   [% B_BLACK %][% BLUE    %]       ###  ###  ###     [% RESET %][% B_BLACK %][% RED %]     d8YaaaaY8b     88     d8YaaaaY8b     88   "88'    88  [% RESET %]
+   [% B_BLACK %][% MAGENTA %]      ###   ###   ###    [% RESET %][% B_BLACK %][% RED %]    d8""""""""8b    88    d8""""""""8b    88    "8b    88  [% RESET %]
+   [% B_BLACK %][% PINK    %]    ####    ###    ####  [% RESET %][% B_BLACK %][% RED %]   d8'        `8b   88   d8'        `8b   88     `8b   88  [% RESET %]
+   [% B_BLACK %][% RED     %]  ####      ###     #### [% RESET %][% B_BLACK %][% RED %]  d8'          `8b  88  d8'          `8b  88      `8b  88  [% RESET %]
+   [% B_BLACK %][% SPACES 84 %][% RESET %]
+
+=head2 Sinclair Research Logo
+
+   [% B_BLACK                   %]                                                                                                           [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]                 ▄▄                               ▄▄                ▄▄                  [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]  [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]                 ▀▀                               ██                ▀▀                 [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]   [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██████████████ ██ ██████████████ ██████████████ ██ ██████████████ ██ ██████████████ [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]    [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██▄▄▄▄▄▄▄▄▄▄▄▄ ██ ██          ██ ██             ██ ▄▄▄▄▄▄▄▄▄▄▄▄██ ██ ██            [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]     [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ▀▀▀▀▀▀▀▀▀▀▀▀██ ██ ██          ██ ██             ██ ███▀▀▀▀▀▀▀▀▀██ ██ ██           [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]      [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██████████████ ██ ██          ██ ██████████████ ██ ██████████████ ██ ██          [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% B_BLACK %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]       [% RESET %]
+   [% B_BLACK %][% ORANGE %]  ZX80 [% WHITE %]/[% BRIGHT RED %] ZX81 [% WHITE %]/[% BRIGHT WHITE %] ZX Spectrum [% WHITE %]/[% BRIGHT WHITE %] QL [% WHITE %]/[% BRIGHT WHITE %] PC200                                                                   [% RESET %]
+   [% B_BLACK                   %]                                                                                                           [% RESET %]
+ 
 =head1 AUTHOR & COPYRIGHT
 
 Richard Kelsch

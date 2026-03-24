@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ चीट शीट                                   [HI] हिंदी
+======================================================================
+
+[ 1. क्वेरी बनाना (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  नोट: प्रत्येक टर्मिनल मेथड इटेरेटर को समाप्त कर देता है।
+    डेटा पुनः उपयोग करने के लिए From() / FromLTSV() को फिर से कॉल करें।
+
+[ 2. फ़िल्टरिंग (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  शर्त के आधार पर तत्वों को फ़िल्टर करता है।
+
+[ 3. प्रोजेक्शन (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select प्रत्येक तत्व को बदलता है; SelectMany नेस्टेड सरणियों को समतल करता है
+    (चयनकर्ता को ARRAY संदर्भ वापस करना होगा)।
+
+[ 4. क्रमबद्ध करना (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: प्राथमिक सॉर्ट कुंजी।
+    ThenBy*/ThenByNum*/ThenByStr*: द्वितीयक सॉर्ट कुंजी (OrderBy* के बाद)।
+    Reverse: वर्तमान क्रम को उलटता है।
+
+[ 5. पेजिंग (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: निश्चित संख्या में तत्वों को छोड़ें या लें।
+    SkipWhile/TakeWhile: शर्त के अनुसार।
+
+[ 6. समूहीकरण (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy { Key=>'...', Elements=>[...] } का सरणी लौटाता है।
+    ToLookup hashref { key => [elements] } लौटाता है।
+
+[ 7. समुच्चय संक्रियाएँ (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except वैकल्पिक कुंजी चयनकर्ता का समर्थन करते हैं।
+    SequenceEqual: यदि दोनों अनुक्रम समान हों तो सत्य।
+
+[ 8. जॉइन (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: आंतरिक जॉइन। GroupJoin: बाईं बाहरी जॉइन
+    (आंतरिक समूह LTSV::LINQ ऑब्जेक्ट के रूप में पास होता है)।
+
+[ 9. एकत्रीकरण (टर्मिनल मेथड) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  OrDefault वेरिएंट खाली अनुक्रम के लिए die के बजाय undef लौटाते हैं।
+    ElementAt: 0-आधारित इंडेक्स (सीमा से बाहर होने पर die)। ElementAtOrDefault: undef।
+
+[ 10. अन्य अनुक्रम मेथड (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: दो अनुक्रमों को जोड़ता है। DefaultIfEmpty: खाली होने पर डिफ़ॉल्ट मान।
+    Zip: दो अनुक्रमों को तत्व-दर-तत्व मिलाता है।
+
+[ 11. रूपांतरण मेथड (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary hashref key=>element लौटाता है।
+    ToLookup hashref key=>[elements] लौटाता है।
+    ToLTSV अनुक्रम को LTSV फ़ाइल में लिखता है।
+
+[ 12. आधिकारिक संसाधन (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV विशिष्टता: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

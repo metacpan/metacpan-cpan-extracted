@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/kaz-utashiro/sdif-tools/workflows/test/badge.svg)](https://github.com/kaz-utashiro/sdif-tools/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-sdif.svg)](https://metacpan.org/release/App-sdif)
+[![Actions Status](https://github.com/kaz-utashiro/sdif-tools/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/kaz-utashiro/sdif-tools/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-sdif.svg)](https://metacpan.org/release/App-sdif)
 # NAME
 
 App::sdif - sdif and family tools, cdif and watchdiff
@@ -15,7 +15,7 @@ App::sdif - sdif and family tools, cdif and watchdiff
 
 # DESCRIPTION
 
-**sdif-tools** are composed by **sdif** and related tools including
+**sdif-tools** is composed of **sdif** and related tools including
 **cdif** and **watchdiff**.
 
 **sdif** prints diff output in side-by-side format.
@@ -23,7 +23,7 @@ App::sdif - sdif and family tools, cdif and watchdiff
 **cdif** adds visual effect for diff output, comparing lines in
 word-by-word, or character-by-character bases.
 
-**watchdiff** calls specified command repeatedly, and print the output
+**watchdiff** calls specified command repeatedly, and prints the output
 with visual effect to emphasize modified part.
 
 See individual manual of each command for detail.

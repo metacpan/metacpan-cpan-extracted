@@ -1,23 +1,18 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::ENG::Word2Num;
 # ABSTRACT: Word 2 number conversion in ENG.
 
 # {{{ use block
 
-use 5.10.1;
+use 5.16.0;
 
-use strict;
-use warnings;
-
-use Encode                    qw(decode_utf8);
 use Parse::RecDescent;
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
-# {{{ variables
-
-our $VERSION = 0.0682;
+# {{{ var block
+our $VERSION = '0.2603230';
 
 my $parser   = eng_numerals();
 
@@ -36,147 +31,67 @@ sub w2n :Export {
 # {{{ eng_numerals            create parser for numerals
 
 sub eng_numerals {
-    return Parse::RecDescent->new(decode_utf8(q{
-      numeral:      <rulevar: local $number = 0>
-      numeral:       million
-                    { return $item[1]; }
-                  |  thousand
-                    { return $item[1]; }
-                  |  century
-                    { return $item[1]; }
-                  |  decade
-                    { return $item[1]; }
-                  | { return undef; }
+    return Parse::RecDescent->new(q{
+        <autoaction: { $item[1] } >
 
-      number:       'twelve'     { $return = 12; }
-                  | 'thirteen'   { $return = 13; }
-                  | 'fourteen'   { $return = 14; }
-                  | 'fifteen'    { $return = 15; }
-                  | 'sixteen'    { $return = 16; }
-                  | 'seventeen'  { $return = 17; }
-                  | 'eighteen'   { $return = 18; }
-                  | 'nineteen'   { $return = 19; }
-                  | 'zero'       { $return =  0; }
-                  | 'one'        { $return =  1; }
-                  | 'two'        { $return =  2; }
-                  | 'three'      { $return =  3; }
-                  | 'four'       { $return =  4; }
-                  | 'five'       { $return =  5; }
-                  | 'six'        { $return =  6; }
-                  | 'seven'      { $return =  7; }
-                  | 'eight'      { $return =  8; }
-                  | 'nine'       { $return =  9; }
-                  | 'ten'        { $return = 10; }
-                  | 'eleven'     { $return = 11; }
+        numeral:     mega
+                  |  kOhOd
+                  | { }
 
-      tens:       'twenty'       { $return = 20; }
-                | 'thirty'       { $return = 30; }
-                | 'forty'        { $return = 40; }
-                | 'fifty'        { $return = 50; }
-                | 'sixty'        { $return = 60; }
-                | 'seventy'      { $return = 70; }
-                | 'eighty'       { $return = 80; }
-                | 'ninety'       { $return = 90; }
+         number:    'twelve'     { 12 }
+                  | 'thirteen'   { 13 }
+                  | 'fourteen'   { 14 }
+                  | 'fifteen'    { 15 }
+                  | 'sixteen'    { 16 }
+                  | 'seventeen'  { 17 }
+                  | 'eighteen'   { 18 }
+                  | 'nineteen'   { 19 }
+                  | 'zero'       {  0 }
+                  | 'one'        {  1 }
+                  | 'two'        {  2 }
+                  | 'three'      {  3 }
+                  | 'four'       {  4 }
+                  | 'five'       {  5 }
+                  | 'six'        {  6 }
+                  | 'seven'      {  7 }
+                  | 'eight'      {  8 }
+                  | 'nine'       {  9 }
+                  | 'ten'        { 10 }
+                  | 'eleven'     { 11 }
 
-      decade:    tens '-' number  { $return = $item[1] + $item[2]; }
-               | tens number      { $return = $item[1] + $item[2]; }
-               | tens             { $return = $item[1]; }
-               | number           { $return = $item[1]; }
+         tens:      'twenty'     { 20 }
+                  | 'thirty'     { 30 }
+                  | 'forty'      { 40 }
+                  | 'fifty'      { 50 }
+                  | 'sixty'      { 60 }
+                  | 'seventy'    { 70 }
+                  | 'eighty'     { 80 }
+                  | 'ninety'     { 90 }
 
-      century:  number 'hundred' decade
-                { $return = $item[1] * 100  + $item[3]; }
-                | number 'hundred'
-                { $return = $item[1] * 100 }
+         deca:      tens /(-|\s)?/ number  { $item[1] + $item[3] }
+                  | tens
+                  | number
 
-    thousand:     century thousands century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | century thousands decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | century thousands
-                { $return = $item[1] * 1000; }
+        hecto:      number 'hundred' deca  { $item[1] * 100  + $item[3] }
+                  | number 'hundred'       { $item[1] * 100 }
 
-                | decade thousands century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | decade thousands decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | decade thousands
-                { $return = $item[1] * 1000; }
+          hOd:      hecto
+                  | deca
 
-                | number thousands century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | number thousands decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | number thousands
-                { $return = $item[1] * 1000; }
+         kilo:      hOd /thousand,?/ hOd   { $item[1] * 1000 + $item[3] }
+                  | hOd /thousand,?/       { $item[1] * 1000 }
+                  |     /thousand,?/ hOd   { 1000 + $item[2] }
+                  |     /thousand,?/       { 1000 }
 
-                | 'thousand' century
-                { $return = 1000 + $item[2]; }
-                | 'thousand' decade
-                { $return = 1000 + $item[2]; }
-                | 'thousand'
-                { $return = 1000; }
+        kOhOd:      kilo
+                  | hOd
 
-                | century 'one' 'thousand' century
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
-                | century 'one' 'thousand' decade
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
+         mega:      hOd /millions?,?/ kOhOd   { $item[1] * 1_000_000 + $item[3] }
+                  | hOd /millions?,?/         { $item[1] * 1_000_000 }
+                  |     'million'     kOhOd   { 1_000_000 + $item[2] }
+                  |     'million'             { 1_000_000 }
 
-                | decade 'one' 'tisíc' century
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
-                | decade 'one' 'tisíc' decade
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
-
-                | century 'one' 'thousand'
-                { $return = ($item[1] + 1) * 1000; }
-                | decade 'one' 'thousand'
-                { $return = ($item[1] + 1) * 1000; }
-
-    thousands:    'thousand'
-
-    million:      century millions thousand
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                |  century millions century
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | century millions decade
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | century millions
-                { $return = $item[1] * 1_000_000; }
-
-                | decade millions thousand
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | decade millions century
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | decade millions decade
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | decade millions
-                { $return = $item[1] * 1_000_000; }
-
-                | 'million' thousand
-                { $return = 1_000_000 + $item[2]; }
-                | 'million' century
-                { $return = 1_000_000 + $item[2]; }
-                | 'million' decade
-                { $return = 1_000_000 + $item[2]; }
-                | 'million'
-                { $return = 1_000_000; }
-
-                | century 'one' 'million' thousand
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | century 'one' 'million' century
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | century 'one' 'million' decade
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-
-                | decade 'one' 'million' thousand
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | decade 'one' 'million' century
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | decade 'one' 'million' decade
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-
-    millions:     'millions'
-
-    }));
+    });
 }
 
 # }}}
@@ -191,18 +106,26 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::ENG::Word2Num
+=head2 Lingua::ENG::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for english. Input text must be in
-utf-8 encoding.
+Word 2 number conversion in ENG.
 
-=head2 $Rev: 682 $
+Lingua::ENG::Word2Num is module for converting text containing number
+representation in czech back into number. Converts whole numbers from 0 up
+to 999 999 999.
 
-We use ISO 639-3 namespace.
+Text must be encoded in UTF-8.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -212,34 +135,47 @@ We use ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
-
-Word 2 number conversion in ENG.
-
-Lingua::ENG::Word2Num is module for converting text containing number
-representation in czech back into number. Converts whole numbers from 0 up
-to 999 999 999.
-
 =cut
 
 # }}}
-# {{{ functions reference
+# {{{ Functions Reference
 
 =pod
 
-=head2 Functions Reference
+=head1 Functions Reference
 
 =over 2
 
-=item w2n (positional)
+=item B<w2n> (positional)
 
-  1   string  string to convert
-  =>  number  converted number
+  1   str     string to convert
+  =>  num     converted number
       undef   if input string is not known
 
 Convert text representation to number.
 
-=item eng_numerals
+
+=item B<eng_numerals> (void)
+
+  =>  obj  new parser object
+
+Internal fuction.
+
+=back
+
+=cut
+
+# }}}
+# {{{ EXPORTED FUNCTIONS
+
+=pod
+
+=head1 EXPORT_OK
+
+=over 2
+
+=item w2n
+
 
 =back
 
@@ -250,28 +186,15 @@ Convert text representation to number.
 
 =pod
 
-=head1 EXPORT_OK
-
-w2n
-
-=head1 KNOWN BUGS
-
-None.
-
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
+
    Roman Vasicek <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

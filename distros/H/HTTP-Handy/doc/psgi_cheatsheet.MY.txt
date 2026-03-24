@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Helaian Rujukan                    [MY] Bahasa Melayu
+ HTTP::Handy PSGI Cheat Sheet                         [MY] ဗမာဘာသာ
 ======================================================================
 
-[ 1. Memulakan pelayan ]
+[ 1. ဆာဗာ စတင်ခြင်း ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # wajib: PSGI app code ref
-      host          => '127.0.0.1',# pilihan: bind address (0.0.0.0)
-      port          => 8080,       # pilihan: port (lalai: 8080)
-      log           => 1,          # pilihan: access log (lalai: 1)
-      max_post_size => 10485760,   # pilihan: max POST bytes (lalai: 10MB)
+      app           => $app,       # မဖြစ်မနေ: PSGI app code reference
+      host          => '127.0.0.1',# ရွေးချယ်နိုင်: bind address (default: 0.0.0.0)
+      port          => 8080,       # ရွေးချယ်နိုင်: port (default: 8080)
+      log           => 1,          # ရွေးချယ်နိုင်: access log (default: 1)
+      max_post_size => 10485760,   # ရွေးချယ်နိုင်: max POST bytes (default: 10MB)
   );
 
-  Jalankan terus sebagai skrip: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. Pemboleh ubah persekitaran permintaan ($env) ]
+[ 2. တောင်းဆိုမှု ပတ်ဝန်းကျင် ကိန်းရှင်များ ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (Membaca badan POST (psgi.input)
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    string  "GET" / "POST"
+  PATH_INFO         string  /index.html
+  QUERY_STRING      string  key=val
+  SERVER_NAME       string  hostname
+  SERVER_PORT       ကိန်းပြည့်  8080
+  CONTENT_TYPE      string  content-type
+  CONTENT_LENGTH    ကိန်းပြည့်  (bytes)
+  HTTP_*            string  HTTP_USER_AGENT ...
+  psgi.input        object  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   string  "http"
 
-[ 3. Format respons ]
+[ 3. တုံ့ပြန်မှု ဖော်မတ် ]
 
   [$status, \@headers, \@body]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. Membaca badan POST (psgi.input) ]
+[ 4. POST body ဖတ်ခြင်း (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,62 +54,57 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. Kaedah utiliti ]
+[ 5. အထောက်အကူ method များ ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. Kaedah pembina respons ]
+[ 6. တုံ့ပြန်မှု တည်ဆောက်သည့် method များ ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. Melayani fail statik ]
+[ 7. Static ဖိုင် ဆောင်ဆောင်ပေးခြင်း ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. Corak penghalaan ]
+[ 8. လမ်းကြောင်းညွှန် ပုံစံ ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
   if ($path =~ m{^/api/}) { ... }
   if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
 
-[ 9. Pengendalian ralat ]
+[ 9. အမှား စီမံခန့်ခွဲမှု ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 500 တုံ့ပြန်မှု အလိုအလျောက်
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. Fail log yang dibuat oleh run() ]
+[ 10. run() ဖန်တီးသော log ဖိုင်များ ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  log akses (putaran 10 minit, format LTSV)
-  logs/error/error.log                log ralat/permulaan
+  logs/access/YYYYMMDDHHm0.log.ltsv  ဝင်ရောက်မှု log (10 မိနစ် rotation, LTSV)
+  logs/error/error.log                အမှား/စတင်မှု log
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. Pautan sumber rasmi ]
+[ 11. တရားဝင် အရင်းအမြစ် လင့်ခ်များ ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

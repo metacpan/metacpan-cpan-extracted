@@ -147,7 +147,7 @@ subtest 'content-disposition' => sub
     $h->name( 'someField' );
     is( $h->name, 'someField' );
     $h->filename( 'マイファイル.txt', 'ja-JP' );
-    is( "$h", q{form-data; name=someField; filename*=UTF-8'ja-JP'%E3%83%9E%E3%82%A4%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.txt} );
+    is( "$h", q{form-data; name="someField"; filename*=UTF-8'ja-JP'%E3%83%9E%E3%82%A4%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB.txt} );
 };
 
 subtest 'content-range' => sub

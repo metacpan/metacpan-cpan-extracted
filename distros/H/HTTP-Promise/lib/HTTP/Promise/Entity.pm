@@ -596,18 +596,18 @@ sub decode_body
     # Parameters to be passed. Transparent set to 0 allow for failure
     my $enc2params =
     {
-    bzip2   => { Transparent => 0 },
-    deflate => { Transparent => 0 },
-    inflate => { Transparent => 0 },
-    gzip    => { Transparent => 0 },
-    lzf     => { Transparent => 0 },
-    lzip    => { Transparent => 0 },
-    lzma    => { Transparent => 0 },
-    lzop    => { Transparent => 0 },
-    rawdeflate => { Transparent => 0 },
-    rawinflate => { Transparent => 0 },
-    xz      => { Transparent => 0 },
-    zstd    => { Transparent => 0 },
+        bzip2   => { Transparent => 0 },
+        deflate => { Transparent => 0 },
+        inflate => { Transparent => 0 },
+        gzip    => { Transparent => 0 },
+        lzf     => { Transparent => 0 },
+        lzip    => { Transparent => 0 },
+        lzma    => { Transparent => 0 },
+        lzop    => { Transparent => 0 },
+        rawdeflate => { Transparent => 0 },
+        rawinflate => { Transparent => 0 },
+        xz      => { Transparent => 0 },
+        zstd    => { Transparent => 0 },
     };
     
     if( $body->isa( 'HTTP::Promise::Body::File' ) )
@@ -633,7 +633,8 @@ sub decode_body
             $params = $enc2params->{ $enc } if( exists( $enc2params->{ $enc } ) );
             my $s = HTTP::Promise::Stream->new( $f,
                 decoding => $enc,
-                fatal => $opts->{raise_error}
+                fatal => $opts->{raise_error},
+                debug => $self->debug,
             ) || return( $self->pass_error( HTTP::Promise::Stream->error ) );
             my $ext_deb = $s->encoding2suffix( $enc )->first;
             my $ext_enc;

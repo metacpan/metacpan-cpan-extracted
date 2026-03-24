@@ -1,5 +1,20 @@
 Revision history for Data-HashMap
 
+0.06  2026-03-23
+    - Split XS into per-variant xs/*.xsi files
+    - Pre-reserve in from_hash/merge to avoid repeated resizes
+    - Fix clone OOM: null shared LRU/TTL pointers before node copy
+    - Fix from_hash/merge SV* refcount leak on put OOM
+    - Document freeze/thaw native-endian limitation
+    - Extended test coverage (1232 tests)
+
+0.05  2026-03-17
+    - New operations: take, drain, pop, shift, swap, cas, reserve, purge,
+      clone, from_hash, merge, capacity, persist, freeze/thaw
+    - Approximate LRU via lru_skip constructor parameter (0-99%)
+    - Binary serialization (freeze/thaw) for non-SV* variants
+    - Hardened thaw with per-iteration bounds checks against malformed input
+
 0.04  2026-03-16
     - Fix string value NUL-termination for get_direct safety
     - Fix lexical sub compatibility for Perl 5.22-5.24

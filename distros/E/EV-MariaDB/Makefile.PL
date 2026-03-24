@@ -31,12 +31,6 @@ WriteMakefile(
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
-        provides => {
-            'EV::MariaDB' => {
-                file    => 'lib/EV/MariaDB.pm',
-                version => '0.01',
-            },
-        },
         resources => {
             repository => {
                 type => 'git',

@@ -20,10 +20,6 @@ no_index:
   directory:
     - t
     - inc
-provides:
-  EV::MariaDB:
-    file: lib/EV/MariaDB.pm
-    version: '0.01'
 requires:
   Alien::MariaDB: '0'
   EV: '4.11'
@@ -31,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-mariadb/issues
   repository: https://github.com/vividsnow/perl5-ev-mariadb.git
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

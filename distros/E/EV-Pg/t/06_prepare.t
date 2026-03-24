@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 12;
+plan tests => 17;
 
 # prepare + query_prepared
 with_pg(cb => sub {
@@ -15,7 +15,7 @@ with_pg(cb => sub {
     $pg->prepare("test_add", "select \$1::int + \$2::int as sum", sub {
         my ($data, $err) = @_;
         ok(!$err, 'prepare: no error');
-        ok(defined $data, 'prepare: got cmd_tuples');
+        is($data, '', 'prepare: empty cmd_tuples');
 
         $pg->query_prepared("test_add", [10, 20], sub {
             my ($rows, $err2) = @_;
@@ -43,6 +43,28 @@ with_pg(cb => sub {
             is(ref $meta->{paramtypes}, 'ARRAY', 'describe_prepared: paramtypes is array');
             ok($meta->{paramtypes}[0] > 0, 'describe_prepared: param type OID');
             EV::break;
+        });
+    });
+});
+
+# describe_prepared with zero params and zero fields
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("create temp table desc_zero (id int)", sub {
+        my (undef, $err) = @_;
+        die $err if $err;
+        $pg->prepare("zero_stmt", "insert into desc_zero values (1)", sub {
+            my (undef, $err) = @_;
+            die $err if $err;
+            $pg->describe_prepared("zero_stmt", sub {
+                my ($meta, $err) = @_;
+                ok(!$err, 'describe zero-field: no error');
+                is($meta->{nparams}, 0, 'describe zero-field: 0 params');
+                is($meta->{nfields}, 0, 'describe zero-field: 0 fields');
+                ok(!exists $meta->{fields}, 'describe zero-field: no fields key');
+                ok(!exists $meta->{paramtypes}, 'describe zero-field: no paramtypes key');
+                EV::break;
+            });
         });
     });
 });

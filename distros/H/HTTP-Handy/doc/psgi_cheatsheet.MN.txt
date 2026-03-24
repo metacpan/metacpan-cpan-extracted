@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Cheat Sheet                        [MN] Mongol
+ HTTP::Handy PSGI Cheat Sheet                         [MN] Монгол
 ======================================================================
 
-[ 1. Serveriyg ehluureh ]
+[ 1. Серверийг эхлүүлэх ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # zaavl: PSGI app code ref
-      host          => '127.0.0.1',# zaavl bish: bind address (0.0.0.0)
-      port          => 8080,       # zaavl bish: port (ogodmol: 8080)
-      log           => 1,          # zaavl bish: access log (ogodmol: 1)
-      max_post_size => 10485760,   # zaavl bish: max POST bytes (ogodmol: 10MB)
+      app           => $app,       # заавал: PSGI app code reference
+      host          => '127.0.0.1',# сонголтоор: bind address (default: 0.0.0.0)
+      port          => 8080,       # сонголтоор: port (default: 8080)
+      log           => 1,          # сонголтоор: access log (default: 1)
+      max_post_size => 10485760,   # сонголтоор: max POST bytes (default: 10MB)
   );
 
-  Script bolgon shuu ajiulluulakh: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. Huseltiin orchnii huvsgchid ($env) ]
+[ 2. Хүсэлтийн орчны хувьсагчид ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (POST bieiig unshikh (psgi.inpu)
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    мөр  "GET" / "POST"
+  PATH_INFO         мөр  /index.html
+  QUERY_STRING      мөр  key=val
+  SERVER_NAME       мөр  hostname
+  SERVER_PORT       бүхэл тоо  8080
+  CONTENT_TYPE      мөр  content-type
+  CONTENT_LENGTH    бүхэл тоо  (bytes)
+  HTTP_*            мөр  HTTP_USER_AGENT ...
+  psgi.input        объект  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   мөр  "http"
 
-[ 3. Harultiin format ]
+[ 3. Хариултын формат ]
 
   [$status, \@headers, \@body]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. POST bieiig unshikh (psgi.input) ]
+[ 4. POST биеийг унших (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,62 +54,57 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. Tuslaakh arguud ]
+[ 5. Туслах аргууд ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. Harult uusgegch arguud ]
+[ 6. Хариулт үүсгэх аргууд ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. Static fail hadgalakh ]
+[ 7. Статик файл дамжуулах ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. Marshrutlaaltiin zagvar ]
+[ 8. Чиглүүлэлтийн загвар ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
   if ($path =~ m{^/api/}) { ... }
   if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
 
-[ 9. Aldaanii menedzhment ]
+[ 9. Алдааны менежмент ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 500 хариулт автоматаар
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. run()-aar uusgesen log failuud ]
+[ 10. run()-ийн үүсгэсэн лог файлууд ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  Khandaltiin log (10 minutiin ergeltuulelt, LTSV format)
-  logs/error/error.log                aldaa/ehluureh log
+  logs/access/YYYYMMDDHHm0.log.ltsv  хандалтын лог (10 минутын эргэлт, LTSV)
+  logs/error/error.log                алдаа/эхлүүлэх лог
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. Albany survalgiig kholboos ]
+[ 11. Албан ёсны нөөцийн холбоосууд ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

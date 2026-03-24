@@ -2,12 +2,22 @@ package Data::HashMap::I32;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub import {
     $^H{"Data::HashMap::I32/hm_i32_put"}     = 1;
     $^H{"Data::HashMap::I32/hm_i32_get"}     = 1;
     $^H{"Data::HashMap::I32/hm_i32_remove"}  = 1;
+    $^H{"Data::HashMap::I32/hm_i32_take"}   = 1;
+    $^H{"Data::HashMap::I32/hm_i32_drain"} = 1;
+    $^H{"Data::HashMap::I32/hm_i32_pop"}   = 1;
+    $^H{"Data::HashMap::I32/hm_i32_shift"} = 1;
+    $^H{"Data::HashMap::I32/hm_i32_reserve"} = 1;
+    $^H{"Data::HashMap::I32/hm_i32_purge"}   = 1;
+    $^H{"Data::HashMap::I32/hm_i32_capacity"} = 1;
+    $^H{"Data::HashMap::I32/hm_i32_persist"}  = 1;
+    $^H{"Data::HashMap::I32/hm_i32_swap"}    = 1;
+    $^H{"Data::HashMap::I32/hm_i32_cas"}     = 1;
     $^H{"Data::HashMap::I32/hm_i32_exists"}  = 1;
     $^H{"Data::HashMap::I32/hm_i32_incr"}    = 1;
     $^H{"Data::HashMap::I32/hm_i32_decr"}    = 1;
@@ -18,6 +28,7 @@ sub import {
     $^H{"Data::HashMap::I32/hm_i32_items"}    = 1;
     $^H{"Data::HashMap::I32/hm_i32_max_size"} = 1;
     $^H{"Data::HashMap::I32/hm_i32_ttl"}      = 1;
+    $^H{"Data::HashMap::I32/hm_i32_lru_skip"} = 1;
     $^H{"Data::HashMap::I32/hm_i32_each"}       = 1;
     $^H{"Data::HashMap::I32/hm_i32_iter_reset"} = 1;
     $^H{"Data::HashMap::I32/hm_i32_clear"}      = 1;

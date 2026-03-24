@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.3301
+Version 4.4501
 
 =head1 SYNOPSIS
 
@@ -31,52 +31,55 @@ Version 4.3301
     -w, --ignore-all-space
     -B, --ignore-blank-lines
 
-    --[no]number, -n	print line number
-    --digit=#		set the line number digits (default 4)
-    --truncate, -t	truncate long line
+    --[no]number, -n    print line number
+    --digit=#           set the line number digits (default 4)
+    --truncate, -t      truncate long line
     --boundary=#        line folding boundary (default word)
-    --context, -c, -C#	context diff
-    --unified, -u, -U#	unified diff
+    --context, -c, -C#  context diff
+    --unified, -u, -U#  unified diff
 
-    --width=#, -W#	width of output (default 80)
-    --margin=#		margin column number (default 0)
-    --runin=#		run-in column number (default --margin)
-    --runout=#		run-out column number (default --margin)
-    --mark=position	mark position (right, left, center, side) or no
-    --column=order	column order (default ONM)
-    --view, -v		viewer mode
-    --parallel[=#], -V	treat unknown text as common part (default 2)
-    --ambiguous=s	ambiguous character width (detect, wide, narrow)
-    --[no]command	print diff control command (default on)
-    --[no]prefix	process git --graph output (default on)
+    --width=#, -W#      width of output (default 80)
+    --margin=#          margin column number (default 0)
+    --runin=#           run-in column number (default --margin)
+    --runout=#          run-out column number (default --margin)
+    --mark=position     mark position (right, left, center, side) or no
+    --column=order      column order (default ONM)
+    --view, -v          viewer mode
+    --parallel[=#], -V  treat unknown text as common part (default 2)
+    --ambiguous=s       ambiguous character width (detect, wide, narrow)
+    --[no-]command      print diff control command (default on)
+    --[no-]filename     print diff filename (default on)
+    --[no-]prefix       process git --graph output (default on)
     --prefix-pattern    prefix pattern
 
-    --color=when	'always' (default), 'never' or 'auto'
-    --nocolor		--color=never
-    --colormap, --cm	specify color map
-    --colortable[=#]	show color table (optional #: 6, 12, 24)
-    --[no]256		on/off ANSI 256 color mode (default on)
-    --[no]cc            color command line  (default true)
-    --[no]fc                  file name     (default true)
-    --[no]lc                  line number   (default true)
-    --[no]mc                  diff mark     (default true)
-    --[no]tc                  normal text   (default true)
-    --[no]uc                  unknown text  (default true)
+    --color=when        'always' (default), 'never' or 'auto'
+    --nocolor           --color=never
+    --colormap, --cm    specify color map
+    --colortable[=#]    show color table (optional #: 6, 12, 24)
+    --[no-]256          on/off ANSI 256 color mode (default on)
+    --[no-]cc           color command line  (default true)
+    --[no-]fc                 file name     (default true)
+    --[no-]lc                 line number   (default true)
+    --[no-]mc                 diff mark     (default true)
+    --[no-]tc                 normal text   (default true)
+    --[no-]uc                 unknown text  (default true)
 
-    --man		display manual page
-    --diff=s		set diff command
-    --diffopts=s	set diff command options
+    --man               display manual page
+    --version           show version
+    --diff=s            set diff command
+    --diffopts=s        set diff command options
 
-    --[no]lenience	supress unexpected input warning (default on)
-    --visible xx=1	set visible chars
-    --tabhead=char	set tabhead char
-    --tabspace=char	set tabspace char
-    --tabstyle=style	set tabstyle (dot, symbol, shade, bar, dash...)
-    --tabstop=#		set tabstop width (default 8)
+    --[no-]lenience     suppress unexpected input warning (default on)
+    --limit key=val     set limit (line, length)
+    --visible xx=1      set visible chars
+    --tabhead=char      set tabhead char
+    --tabspace=char     set tabspace char
+    --tabstyle=style    set tabstyle (dot, symbol, shade, bar, dash...)
+    --tabstop=#         set tabstop width (default 8)
 
-    --[no]cdif		use ``cdif'' as word context diff backend
-    --unit=s		pass through to cdif (word, char, mecab)
-    --cdifopts=s	set cdif command options
+    --[no-]cdif         use ``cdif'' as word context diff backend
+    --unit=s            pass through to cdif (word, letter, char, mecab)
+    --cdifopts=s        set cdif command options
 
 =cut
 
@@ -98,6 +101,7 @@ use App::sdif;
 my $version = $App::sdif::VERSION;
 
 use App::sdif::Util;
+use IO::Divert;
 
 my $default_cdif = 'cdif';
 my @default_cdifopts = qw(--sdif);
@@ -124,6 +128,7 @@ use Getopt::EX::Hashed; {
     Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
     has help           => ' h   ' ;
+    has version        => '     ' ;
     has man            => '     ' ;
     has debug          => 'd +  ' ;
     has number         => 'n !  ' ;
@@ -142,6 +147,7 @@ use Getopt::EX::Hashed; {
     has view           => 'v !  ' ;
     has parallel       => 'V :2 ' , default => 0 ;
     has ambiguous      => '  =s ' , default => 'narrow' ;
+    has filename       => '  !  ' , default => 1 ;
     has command        => '  !  ' , default => 1 ;
     has diff           => '  =s ' , default => 'diff' ;
     has diffopts       => '  =s@' , default => [] ;
@@ -155,12 +161,13 @@ use Getopt::EX::Hashed; {
     has markcolor      => 'mc!  ' , default => 1 ;
     has textcolor      => 'tc!  ' , default => 1 ;
     has unknowncolor   => 'uc!  ' , default => 1 ;
-    has cdif           => '  :s ' , default => '';
+    has cdif           => '  :s ' , default => '' ;
     has cdifopts       => '  =s ' ;
-    has colortable     => '  :s ' , any => qr/^(|6|12|24)$/;
+    has colortable     => '  :s ' , any => qr/^(|6|12|24)$/ ;
     has lenience       => '  !  ' , default => $default_lenience ;
+    has limit          => '  =s%' , default => { length => 10000 } ;
     has visible        => '  =i%' , default => {} ;
-    has tabstop        => '  =i ' , default => 8;
+    has tabstop        => '  =i ' , default => 8 ;
     has tabhead        => '  =s ' ;
     has tabstyle       => 'ts=s ' ;
     has tabspace       => '  =s ' ;
@@ -207,8 +214,9 @@ use Getopt::EX::Hashed; {
 	}
     } ;
 
-    has '+help' => sub { usage() } ;
-    has '+man'  => sub { pod2usage {-verbose => 2} } ;
+    has '+help'    => sub { usage() } ;
+    has '+version' => sub { print "$version\n"; exit 0 } ;
+    has '+man'     => sub { pod2usage {-verbose => 2} } ;
 
 } no Getopt::EX::Hashed;
 
@@ -252,6 +260,9 @@ sub unicode {
 }
 
 if ($app->margin > 0) {
+    if ($app->runin and $app->margin < $app->runin) {
+	die "margin must be >= runin\n";
+    }
     Text::ANSI::Fold->configure(
 	linebreak => LINEBREAK_ALL,
 	margin    => $app->margin,
@@ -282,6 +293,7 @@ my %colormap = do {
 	NTEXT    =>  [ "K/454"    , "G"   ],
 	MTEXT    =>  [ "K/454"    , "G"   ],
 	UTEXT    =>    ""         ,
+	NOTICE   =>    "R"        ,
     );
 };
 
@@ -480,18 +492,17 @@ if ($readfile) {
 my @boundary = (boundary => $app->boundary);
 my $color_re = qr{ \e \[ [\d;]* [mK] }x;
 
-my $oline = 1;
-my $nline = 1;
-my $mline = 1;
+our $oline = 1;
+our $nline = 1;
+our $mline = 1;
 
 while (<DIFF>) {
-    my @old;
-    my @new;
-    my($left, $ctrl, $right);
     #
     # normal diff
     #
-    if (($left, $ctrl, $right) = /^([\d,]+)([adc])([\d,]+)$/) {
+    if (/^([\d,]+)([adc])([\d,]+)$/) {
+	my(@old, @new);
+	my($left, $ctrl, $right) = ($1, $2, $3);
 	my($l1, $l2) = range($left);
 	my($r1, $r2) = range($right);
 	if ($readfile) {
@@ -527,7 +538,9 @@ while (<DIFF>) {
 	print_command_n({ type => 'FILE' }, $_, $next);
     }
     elsif ($_ eq "***************\n") {
+	my(@old, @new);
 	my $ohead = $_ = <DIFF>;
+	my($left, $right);
 	unless (($left) = /^\*\*\* ([\d,]+) \*\*\*\*$/) {
 	    print;
 	    next;
@@ -592,8 +605,7 @@ while (<DIFF>) {
 	if ($prefix) {
 	    $screen_width -= length $prefix;
 	    $read_opt{prefix} = $prefix;
-	    use App::sdif::Divert;
-	    $divert = App::sdif::Divert->new(FINAL => sub { s/^/$prefix/mg });
+	    $divert = IO::Divert->new(FINAL => sub { s/^/$prefix/mg });
 	}
 
 	print_command_n({ type => 'COMMAND' }, $command, $command);
@@ -625,9 +637,10 @@ while (<DIFF>) {
     #
     # conflict marker
     #
-    elsif (/^<<<<<<<\s+(.*)/) {
+    elsif (/^<<<<<<<\h*+(.*)/) {
       CONFLICT:
 	{
+	    my %name = (o => $_);
 	    my($c1, $c2, $c3, $c4);
 	    $c1 = $_;
 
@@ -637,29 +650,75 @@ while (<DIFF>) {
 		last;
 	    };
 
-	    my @new = read_until { /^>>>>>>>\s+(.*)/ } *DIFF;
+	    my @new = read_until { /^>>>>>>>\h*+(.*)/ } *DIFF;
 	    $c4 = pop @new // do {
 		flush_unknown($c1, @old, $c2, @new);
 		last;
 	    };
+	    $name{n} = $c4;
 
 	    my @mrg;
-	    my $mrg = first { $old[$_] =~ /^\Q|||||||\E/ } keys @old;
+	    my $mrg = first { $old[$_] =~ /^\Q|||||||\E\h*+(.*)/ } keys @old;
 	    if (defined $mrg or $app->parallel > 2) {
 		if (defined $mrg) {
+		    $name{m} = $old[$mrg];
 		    ($c3, @mrg) = splice @old, $mrg;
 		} else {
+		    $name{m} = $name{o};
+		    $name{o} = $name{n};
 		    @mrg = @old;
 		    @old = @new;
 		}
-		s/^/--/ for @old, @new;
-		s/^/++/ for @mrg;
-		flush_buffer_3([], \@old, \@new, \@mrg);
+		s/^/--/ for @old, @mrg;
+		s/^/++/ for @new;
+		print_command_n({ type => 'FILE' }, @name{qw(o m n)});
+		flush_buffer_3([], \@old, \@mrg, \@new);
 	    } else {
 		s/^/-/ for @old;
 		s/^/+/ for @new;
+		print_command_n({ type => 'FILE' }, @name{qw(o n)});
 		flush_buffer([], \@old, \@new);
 	    }
+	}
+    }
+    #
+    # #ifdef            custom container
+    # 
+    #   #ifdef JA         ::::::: ja
+    #   japanese text     japanese text
+    #   #endif            :::::::
+    #   #ifdef EN         ::::::: en
+    #   english text      english text
+    #   #endif            :::::::
+    #
+    elsif (/^(\#ifdef|:{7,})\h++(.*)/) {
+      COLON:
+	{
+	    my($c1, $c2, $c3, $c4) = ($_);
+	    my $start = $1;
+	    my $end = $start eq '#ifdef' ? qr/^#endif$/ : qr/^$start$/;
+	    my($m1, $m2) = ($2);
+
+	    my @old = read_until { /$end/ } *DIFF;
+	    $c2 = pop @old // do {
+		flush_unknown($c1, @old);
+		last;
+	    };
+	    $c3 = <DIFF>;
+	    if ($c3 !~ /^${start}\h++(.*)/) {
+		flush_unknown($c1, @old, $c2, $c3);
+		last;
+	    }
+	    $m2 = $1;
+	    my @new = read_until { /$end/ } *DIFF;
+	    $c4 = pop @new // do {
+		flush_unknown($c1, @old, $c2, $c3, @new);
+		last;
+	    };
+
+	    @old = (" $c1", map(s/^/-/r, @old), " $c2");
+	    @new = (" $c3", map(s/^/+/r, @new), " $c4");
+	    flush_buffer([], \@old, \@new);
 	}
     }
     else {
@@ -757,6 +816,9 @@ sub flush_buffer {
 	    $nline++;
 	}
 
+	my $max = $app->limit->{line};
+	my $one_side = !@$o || !@$n;
+	my $count = 0;
 	while (@$o or @$n) {
 	    my $old = shift @$o;
 	    my $new = shift @$n;
@@ -767,6 +829,29 @@ sub flush_buffer {
 
 	    $oline++ if defined $old;
 	    $nline++ if defined $new;
+
+	    # truncate one-sided (add/delete) section exceeding max lines
+	    if ($max and $one_side and ++$count >= $max and @$o + @$n > 0) {
+		my $rest = @$o + @$n;
+		my $msg = $painter->(
+		    'NOTICE',
+		    sprintf "... %d lines omitted ...\n", $rest,
+		);
+		# show message on the side that has content
+		# suppress line number by localizing $oline/$nline
+		{
+		    local($oline, $nline) = (undef, undef);
+		    if (@$n) {
+			print_column_23(' ', undef, ' ', $msg);
+		    } else {
+			print_column_23(' ', $msg, ' ', undef);
+		    }
+		}
+		# advance line counter past omitted lines
+		$oline += $rest if !@$n;
+		$nline += $rest if !@$o;
+		last;
+	    }
 	}
     }
 }
@@ -843,16 +928,29 @@ sub print_column_23 {
     my($onum, $nnum, $mnum) = ('', '', '');
     my $nspace = $print_number ? ' ' : '';
     if (defined $old) {
-	chomp $old;
+	$old =~ s/\R\z//;
 	$onum = linenum($oline) if $print_number;
     }
     if (defined $new) {
-	chomp $new;
+	$new =~ s/\R\z//;
 	$nnum = linenum($nline) if $print_number;
     }
     if (defined $mrg) {
-	chomp $mrg;
+	$mrg =~ s/\R\z//;
 	$mnum = linenum($mline) if $print_number;
+    }
+
+    # truncate long lines before processing
+    if (my $max = $app->limit->{length}) {
+	for ($old, $new, $mrg) {
+	    defined and length > $max or next;
+	    state $fold = Text::ANSI::Fold->new;
+	    my $orig_len = length;
+	    ($_, undef) = $fold->fold($_, width => $max);
+	    my $truncated = $orig_len - length;
+	    $_ .= $painter->('NOTICE',
+			      sprintf " ... %d characters omitted ...", $truncated);
+	}
     }
 
     my($OTEXT, $OLINE, $OMARK) =
@@ -904,14 +1002,16 @@ sub print_column_23 {
 }
 
 sub print_command_n {
-    $app->command or return;
-
     my $opt = ref $_[0] ? shift : {};
     my $column = @_;
     my $width = column_width $column;
     my @f;
 
     $opt->{type} //= 'COMMAND';
+
+    $app->command  or return if $opt->{type} eq 'COMMAND';
+    $app->filename or return if $opt->{type} eq 'FILE';
+
     my @color = map { $_ . $opt->{type} } "O", "N", "M";
 
     for my $i (keys @_) {
@@ -970,6 +1070,11 @@ unified diff B<-u> output will be handled properly.  Combined diff and
 conflict marker styles are also supported, but currently limited up to
 three files.
 
+The current implementation also supports C<#ifdef> and markdown custom
+container (using seven colons) formats on an experimental basis.  This
+is to support the multilingual format generated by the
+L<App::Greple::xlate> module.
+
 If you want to just show multiple files side-by-side in parallel, and
 do not concern about the difference of them, use L<App::ansicolumn>
 command.
@@ -984,7 +1089,7 @@ this:
     option default -n
 
 Modules under B<App::sdif> can be loaded by B<-M> option without
-prefix.  Next command load B<App::sdif::colors> module.
+prefix.  The next command loads B<App::sdif::colors> module.
 
     $ sdif -Mcolors
 
@@ -993,12 +1098,12 @@ Getopt::EX::Module` for detail.
 
 =head2 COLOR
 
-Each lines are displayed in different colors by default.  Use
+Each line is displayed in different colors by default.  Use
 B<--no-color> option to disable it.  Each text segment has own labels,
 and color for them can be specified by B<--colormap> option.  Read
 `perldoc Getopt::EX::Colormap` for detail.
 
-Standard module B<-Mcolors> is loaded by default, and define several
+Standard module B<-Mcolors> is loaded by default, and defines several
 color maps for light and dark screen.  If you want to use CMY colors in
 dark screen, place next line in your F<~/.sdifrc>.
 
@@ -1014,7 +1119,7 @@ set preferred color in your F<~/.sdifrc> like:
 
 Automatic setting is done by L<Getopt::EX::termcolor> module and it
 works with macOS Terminal.app and iTerm.app, and other XTerm
-compatible terminals.  This module accept environment variable
+compatible terminals.  This module accepts environment variable
 L<TERM_BGCOLOR> as a terminal background color in a form of
 C<#FFFFFF>.
 
@@ -1025,9 +1130,9 @@ to disable.
 
 =head2 WORD DIFFERENCE
 
-While B<sdif> doesn't care about the contents of each modified lines,
-it can read the output from B<cdif> command which show the word
-context differences of each lines.  Use B<cdif> command with option
+While B<sdif> doesn't care about the contents of each modified line,
+it can read the output from B<cdif> command which shows the word
+context differences of each line.  Use B<cdif> command with option
 B<--sdif> to set the appropriate options for B<sdif>.  Set B<--no-cc>,
 B<--no-mc> options at least when invoking B<cdif> manually.  Option
 B<--no-tc> is preferable because text color can be handled by B<sdif>.
@@ -1039,7 +1144,7 @@ specified by B<--cdifopts>.
 
 =head2 EXIT STATUS
 
-B<sdif> always exit with status zero unless error occurred.
+B<sdif> always exits with status zero unless an error occurs.
 
 =head1 OPTIONS
 
@@ -1058,7 +1163,7 @@ if possible.
 =item B<--runout>=I<column>
 
 Set the number of margin column.  Margin columns are left blank at the
-end of each line.  This option implicitly declare line break control,
+end of each line.  This option implicitly declares line break control,
 which allows to run-in and run-out prohibited characters at the
 head-and-end of line.  Margin columns are used for run-in/run-out
 columns unless they are given explicitly.  See `perldoc
@@ -1066,12 +1171,17 @@ Text::ANSI::Fold` for detail.
 
 =item B<-n>, B<-->[B<no->]B<number>
 
-Print line number on each lines.
+Print line number on each line.
 Default false.
 
 =item B<-->[B<no->]B<command>
 
 Print diff command control lines.
+Default true.
+
+=item B<-->[B<no->]B<filename>
+
+Print filename lines.
 Default true.
 
 =item B<--digit>=I<n>
@@ -1179,12 +1289,12 @@ Use ANSI 256 color mode.  Default is true.
 
 Show table of ANSI 216 colors, when used without parameter.
 
-Given the parameters, it displays 6x6, 12x12, and 24,24 color
+Given the parameters, it displays 6x6, 12x12, and 24x24 color
 matrices, respectively.
 
 =item B<-v>, B<--view>
 
-Viewer mode.  Display each files in straightforward order.  Without
+Viewer mode.  Display each file in straightforward order.  Without
 this option, unchanged lines are placed at the same position.
 
 =item B<-V>, B<--parallel>
@@ -1242,6 +1352,31 @@ output.
 
 Suppress warning message for unexpected input from diff command.  True
 by default.
+
+=item B<--limit> I<key>=I<value>
+
+Set resource limits.  Available keys are:
+
+=over 4
+
+=item B<line>=I<#>
+
+Limit the number of lines displayed for add/delete sections.  When a
+diff section contains only additions or only deletions and the number
+of lines exceeds this value, only the first I<#> lines are shown and
+the rest are omitted with a message indicating the number of omitted
+lines.  This is useful for suppressing long diffs caused by large file
+additions or deletions, for example when browsing C<git log -p>
+output.
+
+=item B<length>=I<#>
+
+Truncate lines longer than I<#> characters before display processing.
+Default is 10000.  Extremely long lines, such as SVG data with
+embedded base64 images, can make display processing very slow.  Set to
+0 to disable this limit.
+
+=back
 
 =item B<--visible> I<charname>=[0,1]
 
@@ -1325,11 +1460,11 @@ Also wildcard can be used for field name :
 
 Multiple fields can be specified by repeating options
 
-    --cm FILED1=COLOR1 --cm FIELD2=COLOR2 ...
+    --cm FIELD1=COLOR1 --cm FIELD2=COLOR2 ...
 
 or combined with comma (,) :
 
-    --cm FILED1=COLOR1,FIELD2=COLOR2, ...
+    --cm FIELD1=COLOR1,FIELD2=COLOR2, ...
 
 Color specification is a combination of single uppercase character
 representing 8 colors :
@@ -1359,7 +1494,7 @@ terminal :
 or color names enclosed by angle bracket :
 
     <red> <blue> <green> <cyan> <magenta> <yellow>
-    <aliceblue> <honeydue> <hotpink> <moccasin>
+    <aliceblue> <honeydew> <hotpink> <moccasin>
     <medium_aqua_marine>
 
 with other special effects :
@@ -1468,7 +1603,7 @@ Environment variable B<SDIFOPTS> is used to set default options.
 
 =head1 LICENSE
 
-Copyright 1992-2024 Kazumasa Utashiro
+Copyright 1992-2026 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -1487,6 +1622,8 @@ L<App::sdif::colors>
 L<https://taku910.github.io/mecab/>
 
 L<App::ansicolumn>
+
+L<App::Greple::xlate>
 
 =cut
 

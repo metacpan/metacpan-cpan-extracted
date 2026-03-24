@@ -1,21 +1,18 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::POR::Words2Nums;
 # ABSTRACT: Word 2 number conversion in POR.
 
 # {{{ use block
 
-use 5.10.1;
+use 5.16.0;
+use utf8;
 
-use strict;
-use warnings;
-
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
-# {{{ variables declaration
-
-our $VERSION = 0.0682;
+# {{{ var block
+our $VERSION = '0.2603230';
 
 my (%values,@values,%bigvalues,@bigvalues);
 
@@ -144,7 +141,7 @@ Lingua::POR::Words2Nums - Converts Portuguese words to numbers
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
 =head1 SYNOPSIS
 

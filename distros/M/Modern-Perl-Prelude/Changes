@@ -1,5 +1,12 @@
 Revision history for Modern::Perl::Prelude
 
+0.009  2026-03-23
+    - Explicitly document the Perl license in module metadata and docs
+    - Lower minimum supported Perl version from 5.30 to 5.26
+    - Update module, tests, README and build metadata for Perl 5.26+
+    - Extend CI matrix with Perl 5.26 and 5.28
+    - Preserve full test and documentation coverage for the public API
+
 0.008  2026-03-22
     - Add optional -always_true / always_true support via the true module
     - Allow modules to omit a trailing 1; on Perl 5.30+ when always_true is enabled

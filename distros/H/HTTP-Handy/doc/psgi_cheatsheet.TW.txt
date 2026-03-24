@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Su Cha Biao                        [TW] Zhongwen (Fanti)
+ HTTP::Handy PSGI 速查表                                 [TW] 中文（繁體）
 ======================================================================
 
-[ 1. qi dong fu wu qi ]
+[ 1. 啟動伺服器 ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # bi tian: PSGI app code ref
-      host          => '127.0.0.1',# ke xuan: bind address (0.0.0.0)
-      port          => 8080,       # ke xuan: port (yu she: 8080)
-      log           => 1,          # ke xuan: access log (yu she: 1)
-      max_post_size => 10485760,   # ke xuan: max POST bytes (yu she: 10MB)
+      app           => $app,       # 必填: PSGI app code reference
+      host          => '127.0.0.1',# 選填: bind address (default: 0.0.0.0)
+      port          => 8080,       # 選填: port (default: 8080)
+      log           => 1,          # 選填: access log (default: 1)
+      max_post_size => 10485760,   # 選填: max POST bytes (default: 10MB)
   );
 
-  zhi jie zuo wei jiao ben zhi xing: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. qing qiu huan jing bian shu ($env) ]
+[ 2. 請求環境變數 ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (du qu POST zheng wen (psgi.inp)
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    字串  "GET" / "POST"
+  PATH_INFO         字串  /index.html
+  QUERY_STRING      字串  key=val
+  SERVER_NAME       字串  hostname
+  SERVER_PORT       整數  8080
+  CONTENT_TYPE      字串  content-type
+  CONTENT_LENGTH    整數  (bytes)
+  HTTP_*            字串  HTTP_USER_AGENT ...
+  psgi.input        物件  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   字串  "http"
 
-[ 3. hui ying ge shi ]
+[ 3. 回應格式 ]
 
   [$status, \@headers, \@body]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. du qu POST zheng wen (psgi.input) ]
+[ 4. 讀取 POST 主體 (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,62 +54,57 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. gong ju fang fa ]
+[ 5. 實用方法 ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. hui ying gou jian fang fa ]
+[ 6. 回應建構方法 ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. ti gong jing tai dang an ]
+[ 7. 靜態檔案服務 ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. lu you mo shi ]
+[ 8. 路由模式 ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
   if ($path =~ m{^/api/}) { ... }
   if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
 
-[ 9. cuo wu chu li ]
+[ 9. 錯誤處理 ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 自動回應 500
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. run() jian li de ri zhi dang an ]
+[ 10. run() 建立的日誌檔案 ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  cun qu ri zhi (10 fen zhong lun ti, LTSV ge shi)
-  logs/error/error.log                cuo wu/qi dong ri zhi
+  logs/access/YYYYMMDDHHm0.log.ltsv  存取日誌（10分鐘輪轉，LTSV格式）
+  logs/error/error.log                錯誤/啟動日誌
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. 官方資料連結 ]
+[ 11. 官方資源 ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

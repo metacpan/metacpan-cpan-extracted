@@ -11,7 +11,6 @@ perl -I../lib 00-simple-dire.t 1
 perl -I../lib 00s-errflow_mix1-run.t 1
 perl -I../lib 00s-errflow_mix2-run.t 1
 perl -I../lib 00s-errflow_unclosed-run.t 1
-perl -I../lib 01-simple-fail1.t 1
 perl -I../lib 01-simple-fail2.t 1
 perl -I../lib 01-simple-fail3.t 1
 perl -I../lib 01-simple-run-echo.t 1

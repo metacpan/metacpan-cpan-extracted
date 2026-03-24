@@ -67,7 +67,7 @@
    "provides" : {
       "Dist::PolicyFiles" : {
          "file" : "lib/Dist/PolicyFiles.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -78,7 +78,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-dist-policyfiles.git"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues"
    },

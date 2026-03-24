@@ -1,5 +1,5 @@
 package Shell::Cmd;
-# Copyright (c) 2013-2021 Sullivan Beck. All rights reserved.
+# Copyright (c) 2013-2026 Sullivan Beck. All rights reserved.
 # This program is free software; you can redistribute it and/or modify it
 # under the same terms as Perl itself.
 
@@ -25,7 +25,7 @@ use IO::File;
 use Cwd;
 
 our($VERSION);
-$VERSION = "3.04";
+$VERSION="3.05";
 
 $| = 1;
 $Data::Dumper::Sortkeys = 1;
@@ -78,8 +78,7 @@ sub flush {
    #                                                   alternates
    #           'scr'     => []                         the current script
 
-   $$self{'err'}                = '';
-   $$self{'scr'}                = [];
+   $self->_opt_flush();
 
    if ($all  ||  $opts{'opts'}) {
       $$self{'g'}               =
@@ -208,13 +207,15 @@ sub flush {
 
    $$self{'e'}                  = []   if ($all  ||  $opts{'env'});
 
-   if ($all  ||  $opts{'out'}) {
-      $$self{'o'}               = {};
-      $$self{'s'}               = {};
-      $$self{'curr'}            = 0;
-   }
-
    return;
+}
+sub _opt_flush {
+   my($self)         = @_;
+   $$self{'err'}     = '';
+   $$self{'scr'}     = [];
+   $$self{'o'}       = {};
+   $$self{'s'}       = {};
+   $$self{'curr'}    = 0;
 }
 
 ###############################################################################
@@ -250,6 +251,7 @@ sub env {
 
 sub options {
    my($self,%opts) = @_;
+   $self->_opt_flush();
 
    OPT:
    foreach my $opt (keys %opts) {
@@ -509,6 +511,7 @@ sub _cmd_valid_script {
 
 sub run {
    my($self)   = @_;
+   $self->_opt_flush()  if (! $$self{'teset'});
    if ($self->_cmd_valid_script()) {
       $self->_err($$self{'err'});
       return 252;
@@ -1565,6 +1568,7 @@ sub _script_output {
 
 sub ssh {
    my($self,@hosts) = @_;
+   $self->_opt_flush()  if (! $$self{'teset'});
 
    if (! @hosts) {
       $self->_err("A host or hosts must be supplied with the ssh method");

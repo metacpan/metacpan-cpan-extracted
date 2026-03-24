@@ -19,6 +19,7 @@ use Encode::Guess;
 use Pod::Usage;
 use List::Util qw(first sum pairmap);
 use Text::ParseWords qw(shellwords);
+use IO::Divert;
 use Text::VisualWidth::PP qw(vwidth);
 use Data::Dumper; {
     no warnings 'redefine';
@@ -40,18 +41,26 @@ use App::cdif::Command::Mecab;
 
 use charnames ':full';
 my %visible = (
-    nul => [ 1, "\000" => "\N{SYMBOL FOR NULL}" ],
-    soh => [ 1, "\001" => "\N{SYMBOL FOR START OF HEADING}" ],
-    bel => [ 1, "\007" => "\N{SYMBOL FOR BELL}" ],
-    bs  => [ 1, "\010" => "\N{SYMBOL FOR BACKSPACE}" ],
-    ht  => [ 0, "\011" => "\N{SYMBOL FOR HORIZONTAL TABULATION}" ],
-    nl  => [ 0, "\012" => "\N{SYMBOL FOR NEWLINE}" . "\n" ],
-    vt  => [ 1, "\013" => "\N{SYMBOL FOR VERTICAL TABULATION}" ],
-    np  => [ 1, "\014" => "\N{SYMBOL FOR FORM FEED}" ],
-    cr  => [ 1, "\015" => "\N{SYMBOL FOR CARRIAGE RETURN}" ],
-    esc => [ 1, "\033" => "\N{SYMBOL FOR ESCAPE}" ],
-    sp  => [ 0, "\040" => "\N{SYMBOL FOR SPACE}" ],
-    del => [ 1, "\177" => "\N{SYMBOL FOR DELETE}" ],
+    nul    => [ 1, "\000"      => "\N{SYMBOL FOR NULL}" ],
+    soh    => [ 1, "\001"      => "\N{SYMBOL FOR START OF HEADING}" ],
+    bel    => [ 1, "\007"      => "\N{SYMBOL FOR BELL}" ],
+    bs     => [ 1, "\010"      => "\N{SYMBOL FOR BACKSPACE}" ],
+    ht     => [ 0, "\011"      => "\N{SYMBOL FOR HORIZONTAL TABULATION}" ],
+    nl     => [ 0, "\012"      => "\N{SYMBOL FOR NEWLINE}" . "\n" ],
+    vt     => [ 1, "\013"      => "\N{SYMBOL FOR VERTICAL TABULATION}" ],
+    np     => [ 1, "\014"      => "\N{SYMBOL FOR FORM FEED}" ],
+    cr     => [ 1, "\015"      => "\N{SYMBOL FOR CARRIAGE RETURN}" ],
+    esc    => [ 1, "\033"      => "\N{SYMBOL FOR ESCAPE}" ],
+    sp     => [ 0, "\040"      => "\N{SYMBOL FOR SPACE}" ],
+    del    => [ 1, "\177"      => "\N{SYMBOL FOR DELETE}" ],
+    nbsp   => [ 1, "\x{00A0}"  => "\N{OPEN BOX}" ],
+    nnbsp  => [ 1, "\x{202F}"  => "\N{OPEN BOX}" ],
+    ensp   => [ 1, "\x{2002}"  => "\N{OPEN BOX}" ],
+    emsp   => [ 1, "\x{2003}"  => "\N{OPEN BOX}" ],
+    thinsp => [ 1, "\x{2009}"  => "\N{OPEN BOX}" ],
+    hairsp => [ 1, "\x{200A}"  => "\N{OPEN BOX}" ],
+    zwsp   => [ 1, "\x{200B}"  => "\N{OPEN BOX}" ],
+    idesp  => [ 1, "\x{3000}"  => "\N{OPEN BOX}" ],
     );
 my %opt_visible = do {
     map { $_ => splice @{$visible{$_}}, 0, 1 }
@@ -106,7 +115,9 @@ use Getopt::EX::Hashed; {
     has prefix_pattern => '    =s  ' , default => $prefix_default ;
     has visible        => '    =s@ ' , default => [] ;
     has lenience       => '    !   ' , default => 1 ;
+    has limit           => '   =s% ' , default => { length => 1000 } ;
     has linebyline     => '    :2  ' , alias => 'lxl';
+    has style          => '    =s  ' , default => '' ;
 
     has ignore_case         => 'i' ;
     has ignore_space_change => 'b' ;
@@ -142,7 +153,7 @@ use Getopt::EX::Hashed; {
 	pod2usage -verbose => 2;
     };
     has '+version' => sub {
-	print "Version: $VERSION\n";
+	print "$VERSION\n";
 	exit;
     };
 
@@ -161,7 +172,7 @@ $App::sdif::Util::NO_WARNINGS = $app->lenience;
 $App::cdif::Command::Mecab::debug = 1 if $debug{m};
 
 $app->rcs++ if @rcsopt;
-my $diff = $app->rcs ? 'rcsdiff' : 'diff' unless $app->diff;
+my $diff = $app->diff || ($app->rcs ? 'rcsdiff' : 'diff');
 
 push @diffopts, map { $_->[1] } grep { $_->[0] } (
     [ $app->ignore_case,         "-i" ],
@@ -277,8 +288,8 @@ my $w_pattern = do {
 	    [$w\p{Arabic}]+   |
 	    [$w\p{Thai}]+     |
 	    \d+ |
-	    \p{Punct}+ |
-	    [\ \t\r\f]*\n | \s+ | (.)\g{-1}*
+	#   (\p{Punct})\g{-1}* |
+	    [\h\r\f]*\n | \s+ | (\X)\g{-1}*
 	}x;
     }
 };
@@ -300,6 +311,7 @@ if (my @names = grep $opt_visible{$_}, keys %opt_visible) {
     my $sub2 = sub {
 	my $mark_re = shift;
 	for (@_) {
+	    $_ // next;
 	    s{^$mark_re\K(?=.*$re)(.*\R?)}{
 		$sub1->($1);
 	    }mge;
@@ -320,9 +332,9 @@ if (my @names = grep $opt_visible{$_}, keys %opt_visible) {
 ##
 ## Temporary files
 ##
-use App::cdif::Tmpfile;
-my $T1 = App::cdif::Tmpfile->new;
-my $T2 = App::cdif::Tmpfile->new;
+use Command::Run::Tmpfile;
+my $T1 = Command::Run::Tmpfile->new;
+my $T2 = Command::Run::Tmpfile->new;
 
 ##
 ## Total statistic info
@@ -334,11 +346,19 @@ my %stat;
 open(DIFF, $DIFF) || die "$DIFF: $!\n";
 binmode DIFF, ":encoding(utf8)";
 
-my $stdout = App::sdif::Divert->new;
-sub println { print map { s/(?<=[^\n])\z/\n/r } @_ }
+my $stdout = IO::Divert->new;
+sub sprintln { map { s/(?<=[^\n])\z/\n/r } @_ }
+sub  println { print sprintln @_ }
+sub print_lxl {
+    my($l1, $l2) = (sprintln($_[0]), sprintln($_[1]));
+    if ($app->style eq 'diff') {
+	printf "1c1\n". "< $l1". "---\n". "> $l2",
+    } else {
+	print $l1, $l2;
+    }
+}
 
 while (<DIFF>) {
-    my($left, $cmd, $right);
     #
     # --linebyline, --lxl option
     #
@@ -349,13 +369,14 @@ while (<DIFF>) {
 	    next;
 	};
 	compare(\$old, \$new) if $app->unit;
-	println color("OTEXT", $old);
-	println color("NTEXT", $new);
+	print_lxl(color("OTEXT", $old),
+		  color("NTEXT", $new));
     }
     #
     # normal diff
     #
-    elsif (($left, $cmd, $right) = /^([\d,]+)([adc])([\d,]+)\r?$/) {
+    elsif (/^([\d,]+)([adc])([\d,]+)\r?$/) {
+	my($left, $cmd, $right) = ($1, $2, $3);
 	my $command_line = $_;
 	my($old, $del, $new);
 	eval {
@@ -380,6 +401,10 @@ while (<DIFF>) {
 
 	print_command($command_line);
 
+	if ($converter) {
+	    $converter->(qr/[<>][ \t]/, $old, $new);
+	}
+
 	if ($cmd eq 'c') {
 	    compare(\$old, \$new, qr/<[ \t]/, qr/>[ \t]/) if $app->unit;
 	}
@@ -400,7 +425,8 @@ while (<DIFF>) {
     #
     # diff -c
     #
-    elsif (($left) = /^\*\*\* ([\d,]+) \*\*\*\*\r?$/) {
+    elsif (/^\*\*\* ([\d,]+) \*\*\*\*\r?$/) {
+	my $left = $1;
 	print_command($_);
 	my(@old, @new);
 	my $oline = range($left);
@@ -413,7 +439,8 @@ while (<DIFF>) {
 	    $new = <DIFF>;
 	}
 	my $dline = map { /^-/mg } @old;
-	if (($right) = $new =~ /^--- ([\d,]+) ----$/) {
+	if ($new =~ /^--- ([\d,]+) ----$/) {
+	    my $right = $1;
 	    my $nline = range($right);
 	    if (@old == 1 and $old[0] ne "" and $oline - $dline == $nline) {
 		@new = ("");
@@ -469,8 +496,7 @@ while (<DIFF>) {
 	my($divert, %read_opt);
 	if ($prefix) {
 	    $read_opt{prefix} = $prefix;
-	    use App::sdif::Divert;
-	    $divert = App::sdif::Divert->new(FINAL => sub { s/^/$prefix/mg });
+	    $divert = IO::Divert->new(FINAL => sub { s/^/$prefix/mg });
 	}
 
 	print_command($command);
@@ -523,6 +549,7 @@ while (<DIFF>) {
 
 	    my $old = join '', @old;
 	    my $new = join '', @new;
+	    $converter->('', $old, $new) if $converter;
 	    compare(\$old, \$new) if $app->unit;
 
 	    print $c1 if $app->mark;
@@ -531,6 +558,7 @@ while (<DIFF>) {
 		my $c4 = shift @mrg;
 		print $c4 if $app->mark;
 		my $mrg = join '', @mrg;
+		$converter->('', $mrg) if $converter;
 		print color("MTEXT", $mrg) if $app->show_mrg;
 	    }
 	    println $c2 if $app->mark;
@@ -569,12 +597,12 @@ if ($app->stat) {
     print("TOTAL: ");
     printf("append=%d delete=%d change=%d\n",
 	   $stat{'a'}, $stat{'d'}, $stat{'c'});
-    print("INGORE WHITESPACE: ");
+    print("IGNORE WHITESPACE: ");
     printf("append=%d delete=%d change=%d\n",
 	   $stat{'anl'},
 	   $stat{'dnl'},
 	   $stat{'cnl'});
-    print("INGORE WHITESPACE (bytes): ");
+    print("IGNORE WHITESPACE (bytes): ");
     printf("append=%d delete=%d change=%d\n",
 	   $stat{'anlb'},
 	   $stat{'dnlb'},
@@ -668,6 +696,11 @@ sub print_command {
 sub compare {
     my($old, $new) = splice @_, 0, 2;
     return 0 unless $old && $new && $$old && $$new;
+
+    # skip word comparison for lines exceeding max length
+    if (my $max = $app->limit->{length}) {
+	return 0 if $$old =~ /^.{$max}/m or $$new =~ /^.{$max}/m;
+    }
 
     my $omark_re = shift || undef;
     my $nmark_re = shift || $omark_re;
@@ -913,7 +946,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.3301
+Version 4.4501
 
 =head1 SYNOPSIS
 
@@ -953,7 +986,10 @@ Options:
 	--prefix-pattern    prefix pattern
 	--visible char=?    set visible attributes
 	--[no]lenience      suppress unexpected input warning (default true)
+	--limit length=#    skip word comparison for long lines (default 1000)
 	--lxl               compare input data line-by-line
+	--style=diff        print --lxl output in diff style
+	--version           show version
 
 
 =head1 DESCRIPTION
@@ -969,20 +1005,20 @@ an output from diff command.  In addition to normal diff, context
 diff, and unified (combined) diff, the L<git(1)>-compatible conflict
 marker format is supported as input format.
 
-Lines those don't look like diff output are simply ignored and
+Lines that don't look like diff output are simply ignored and
 printed.
 
 =head2 STARTUP and MODULE
 
 B<cdif> utilizes Perl L<Getopt::EX> module, and reads I<~/.cdifrc>
 file if available when starting up.  You can define original and
-default option there.  Next line enables B<--mecab> option and add
+default option there.  The next line enables B<--mecab> option and adds
 crossed-out effect for deleted words.
 
     option default --mecab --cm DELETE=+X
 
 Modules under B<App::cdif> can be loaded by B<-M> option without
-prefix.  Next command load B<App::cdif::colors> module.
+prefix.  The next command loads B<App::cdif::colors> module.
 
     $ cdif -Mcolors
 
@@ -991,11 +1027,11 @@ Getopt::EX::Module` for detail.
 
 =head2 COLOR
 
-Each lines are displayed in different colors.  Each text segment has
+Each line is displayed in different colors.  Each text segment has
 own labels, and color for them can be specified by B<--colormap>
 option.  Read `perldoc Getopt::EX::Colormap` for detail.
 
-Standard module B<-Mcolors> is loaded by default, and define several
+Standard module B<-Mcolors> is loaded by default, and defines several
 color maps for light and dark screen.  If you want to use CMY colors in
 dark screen, place next line in your F<~/.cdifrc>.
 
@@ -1011,7 +1047,7 @@ set preferred color in your F<~/.cdifrc> like:
 
 Automatic setting is done by L<Getopt::EX::termcolor> module and it
 works with macOS Terminal.app and iTerm.app, and other XTerm
-compatible terminals.  This module accept environment variable
+compatible terminals.  This module accepts environment variable
 L<TERM_BGCOLOR> as a terminal background color.  For example, use
 C<000> or C<#000000> for black and C<555> or C<#FFFFFF> for white.
 
@@ -1022,7 +1058,7 @@ to disable.
 
 =head2 EXIT STATUS
 
-B<cdif> always exit with status zero unless error occurred.
+B<cdif> always exits with status zero unless an error occurs.
 
 =head1 OPTIONS
 
@@ -1041,9 +1077,9 @@ when B<-r>I<rev> is supplied.
 
 =end deprecated
 
-=item B<-->B<unit>=[C<word>,C<letter>,C<char>,C<mecab>,C<>]
+=item B<-->B<unit>=[C<word>,C<letter>,C<char>,C<mecab>,C<0>,C<>]
 
-=item B<-->B<by>=[C<word>,C<letter>,C<char>,C<mecab>,C<>]
+=item B<-->B<by>=[C<word>,C<letter>,C<char>,C<mecab>,C<0>,C<>]
 
 Specify the comparing unit.  Default is I<word> and compare each line
 word-by-word.  Specify C<char> if you want to compare them
@@ -1052,10 +1088,10 @@ does not include underscore.
 
 When C<mecab> is given as an unit, B<mecab> command is called as a
 tokenizer for non-ASCII text.  ASCII text is compared word-by-word.
-External B<mecab> command has to been installed.
+External B<mecab> command has to be installed.
 
-If you give empty string like C<--unit=>, B<cdif> does not compare
-text in any way.  You'll still get colorization effect.
+If you give empty string like C<--unit=>, or C<0>, B<cdif> does not
+compare text in any way.  You'll still get colorization effect.
 
 =item B<--mecab>
 
@@ -1119,11 +1155,11 @@ Also wildcard can be used for field name :
 
 Multiple fields can be specified by repeating options
 
-    --cm FILED1=COLOR1 --cm FIELD2=COLOR2 ...
+    --cm FIELD1=COLOR1 --cm FIELD2=COLOR2 ...
 
 or combined with comma (,) :
 
-    --cm FILED1=COLOR1,FIELD2=COLOR2, ...
+    --cm FIELD1=COLOR1,FIELD2=COLOR2, ...
 
 Color specification is a combination of single uppercase character
 representing 8 colors :
@@ -1232,15 +1268,15 @@ Print or not command lines preceding diff output.
 
 =item B<-->[B<no->]B<unknown>
 
-Print or not lines not look like diff output.
+Print or not lines that do not look like diff output.
 
 =item B<-->[B<no->]B<mark>
 
 Print or not marks at the top of diff output lines.  At this point,
 this option is effective only for unified diff.
 
-Next example produces the output exactly same as I<new> except visual
-effects.
+The next example produces output exactly the same as I<new> except for
+visual effects.
 
     cdif -U100 --no-mark --no-old --no-command --no-unknown old new
 
@@ -1264,26 +1300,38 @@ output.
 
 Set visible attribute for specified characters.  Visible character is
 converted to corresponding Unicode symbol character.  Default visible:
-nul, bel, bs, vt, np, cr, esc, del.  Default invisible: ht, nl, sp.
+nul, bel, bs, vt, np, cr, esc, del, and all non-breaking/special
+spaces.  Default invisible: ht, nl, sp.
 
-    NAME  CODE  Unicode NAME                      DEFAULT
-    ----  ----  --------------------------------  -------
-    nul   \000  SYMBOL FOR NULL                   YES
-    soh   \001  SYMBOL FOR SOH*                   YES
-    bel   \007  SYMBOL FOR BELL                   YES
-    bs    \010  SYMBOL FOR BACKSPACE              YES
-    ht    \011  SYMBOL FOR HORIZONTAL TABULATION  NO
-    nl    \012  SYMBOL FOR NEWLINE                NO
-    vt    \013  SYMBOL FOR VERTICAL TABULATION    YES
-    np    \014  SYMBOL FOR FORM FEED              YES
-    cr    \015  SYMBOL FOR CARRIAGE RETURN        YES
-    esc   \033  SYMBOL FOR ESCAPE                 YES
-    sp    \040  SYMBOL FOR SPACE                  NO
-    del   \177  SYMBOL FOR DELETE                 YES
+    NAME    CODE    Unicode NAME                      DEFAULT
+    ------  ------  --------------------------------  -------
+    nul     \000    SYMBOL FOR NULL                   YES
+    soh     \001    SYMBOL FOR SOH                    YES
+    bel     \007    SYMBOL FOR BELL                   YES
+    bs      \010    SYMBOL FOR BACKSPACE              YES
+    ht      \011    SYMBOL FOR HORIZONTAL TABULATION  NO
+    nl      \012    SYMBOL FOR NEWLINE                NO
+    vt      \013    SYMBOL FOR VERTICAL TABULATION    YES
+    np      \014    SYMBOL FOR FORM FEED              YES
+    cr      \015    SYMBOL FOR CARRIAGE RETURN        YES
+    esc     \033    SYMBOL FOR ESCAPE                 YES
+    sp      \040    SYMBOL FOR SPACE                  NO
+    del     \177    SYMBOL FOR DELETE                 YES
+    nbsp    \240    OPEN BOX (No-Break Space)         YES
+    nnbsp   U+202F  OPEN BOX (Narrow No-Break Space)  YES
+    ensp    U+2002  OPEN BOX (En Space)               YES
+    emsp    U+2003  OPEN BOX (Em Space)               YES
+    thinsp  U+2009  OPEN BOX (Thin Space)             YES
+    hairsp  U+200A  OPEN BOX (Hair Space)             YES
+    zwsp    U+200B  OPEN BOX (Zero Width Space)       YES
+    idesp   U+3000  OPEN BOX (Ideographic Space)      YES
+
+Since there are no dedicated Unicode symbols for nbsp and other
+special space characters, OPEN BOX is used instead.
 
 Multiple characters can be specified at once, by assembling them by
 comma (C<,>) like C<--visible ht=1,sp=1>; or connecting them by equal
-sign (C<=>) like C<--visible ht=sp=1>.  Character name accept
+sign (C<=>) like C<--visible ht=sp=1>.  Character names accept
 wildcard; C<--visible '*=1'>.
 
 =begin comment
@@ -1296,7 +1344,7 @@ L<Getopt::EX::Colormap/~>).
 
 =end comment
 
-B<sdif> command also support B<--visible> option for horizontal tab
+B<sdif> command also supports B<--visible> option for horizontal tab
 with better visibility.
 
 =begin deprecated
@@ -1323,7 +1371,26 @@ number which ignores insert/delete newlines.
 Suppress warning message for unexpected input from diff command.  True
 by default.
 
+=item B<--limit> I<key>=I<value>
+
+Set resource limits.  Available keys are:
+
+=over 4
+
+=item B<length>=I<#>
+
+Skip word comparison for lines longer than I<#> characters.  Default
+is 1000.  Extremely long lines, such as those found in SVG data, can
+make word-level diff processing very slow with no useful result.  When
+this limit is exceeded, the section is still displayed with basic
+colorization but without fine-grained word highlighting.  Set to 0 to
+disable this limit.
+
+=back
+
 =item B<--linebyline>, B<--lxl>
+
+=item B<--style>=I<style>
 
 Compare input data line-by-line.  Consider the inputs as pairs of two
 lines each, and output the result of comparing each two lines.
@@ -1345,6 +1412,15 @@ them by its result.  Consult L<App::Greple::tee> for detail.
 You can use L<teip(1)> command as well.
 
     teip -g '^(OLD|NEW):' -- cdif --lxl
+
+If the C<--style=diff> option is given, the two strings are output in
+B<diff> format and can be used in combination with the C<sdif> command as
+follows.
+
+    cdif --lxl --style=diff ... | sdif --no-cdif
+
+Currently the only valid value for C<--style> is C<diff>, which
+affects only the behavior of C<--lxl> option.
 
 =back
 
@@ -1379,7 +1455,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 1992-2024 Kazumasa Utashiro
+Copyright 1992-2026 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

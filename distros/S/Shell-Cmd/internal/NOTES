@@ -10,5 +10,5 @@ Before every release, spellcheck the documents:
 #########################################################################
 Test coverage with:
 
-   cover -delete; RELEASE_TESTING=1 SSH_TESTING="elf imp" cover -test
+   cover -delete; Shell_Cmd_RELEASE_TESTING=1 SSH_TESTING="elf imp" cover -test
 

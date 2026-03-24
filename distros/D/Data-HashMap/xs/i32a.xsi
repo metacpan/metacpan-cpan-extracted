@@ -1,0 +1,436 @@
+MODULE = Data::HashMap    PACKAGE = Data::HashMap::I32A
+PROTOTYPES: DISABLE
+
+SV*
+new(char* class, ...)
+    CODE:
+        EXTRACT_NEW_ARGS(_max_size, _ttl, _lru_skip);
+        HashMapI32A* map = hashmap_i32a_create(_max_size, _ttl, _lru_skip);
+        if (!map) croak("Failed to create HashMap::I32A");
+        map->free_value_fn = hm_sv_free;
+        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+    OUTPUT:
+        RETVAL
+
+void
+DESTROY(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        hashmap_i32a_destroy(self);
+        sv_setiv(SvRV(self_sv), 0);
+
+bool
+put(SV* self_sv, int32_t key, SV* value)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        SvREFCNT_inc(value);
+        RETVAL = hashmap_i32a_put(self, key, (void*)value, 0);
+        if (!RETVAL) SvREFCNT_dec(value);
+    OUTPUT:
+        RETVAL
+
+SV*
+get(SV* self_sv, int32_t key)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        void* val;
+        if (!hashmap_i32a_get(self, key, &val)) XSRETURN_UNDEF;
+        RETVAL = SvREFCNT_inc((SV*)val);
+    OUTPUT:
+        RETVAL
+
+bool
+remove(SV* self_sv, int32_t key)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = hashmap_i32a_remove(self, key);
+    OUTPUT:
+        RETVAL
+
+SV*
+take(SV* self_sv, int32_t key)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        void* val;
+        if (!hashmap_i32a_take(self, key, &val)) XSRETURN_UNDEF;
+        RETVAL = (SV*)val;
+    OUTPUT:
+        RETVAL
+
+bool
+exists(SV* self_sv, int32_t key)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = hashmap_i32a_exists(self, key);
+    OUTPUT:
+        RETVAL
+
+size_t
+size(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = self->size;
+    OUTPUT:
+        RETVAL
+
+size_t
+max_size(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = self->max_size;
+    OUTPUT:
+        RETVAL
+
+UV
+ttl(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = (UV)self->default_ttl;
+    OUTPUT:
+        RETVAL
+
+UV
+lru_skip(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = (UV)self->lru_skip;
+    OUTPUT:
+        RETVAL
+
+void
+keys(SV* self_sv)
+    PPCODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        EXTEND(SP, self->size);
+        size_t i;
+        for (i = 0; i < self->capacity; i++) {
+            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
+                mXPUSHi(self->nodes[i].key);
+        }
+
+void
+values(SV* self_sv)
+    PPCODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        EXTEND(SP, self->size);
+        size_t i;
+        for (i = 0; i < self->capacity; i++) {
+            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
+                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
+                mXPUSHs(sv);
+            }
+        }
+
+void
+items(SV* self_sv)
+    PPCODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        EXTEND(SP, self->size * 2);
+        size_t i;
+        for (i = 0; i < self->capacity; i++) {
+            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
+                mXPUSHi(self->nodes[i].key);
+                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
+                mXPUSHs(sv);
+            }
+        }
+
+void
+each(SV* self_sv)
+    PPCODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        while (self->iter_pos < self->capacity) {
+            size_t i = self->iter_pos++;
+            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
+                EXTEND(SP, 2);
+                mXPUSHi(self->nodes[i].key);
+                if (GIMME_V == G_SCALAR) XSRETURN(1);
+                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
+                mXPUSHs(sv);
+                XSRETURN(2);
+            }
+        }
+        self->iter_pos = 0;
+        XSRETURN_EMPTY;
+
+void
+iter_reset(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        self->iter_pos = 0;
+
+void
+drain(SV* self_sv, UV count)
+    PPCODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        UV n = 0;
+        EXTEND(SP, (count < self->size ? count : self->size) * 2);
+        while (self->iter_pos < self->capacity && n < count) {
+            size_t i = self->iter_pos++;
+            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
+                mXPUSHi(self->nodes[i].key);
+                if (self->nodes[i].value) {
+                    mXPUSHs((SV*)self->nodes[i].value);
+                } else { XPUSHs(&PL_sv_undef); }
+                self->nodes[i].value = NULL;
+                if (HM_UNLIKELY(self->lru_prev)) hashmap_i32a_lru_unlink(self, (uint32_t)i);
+                hashmap_i32a_tombstone_at(self, i);
+                n++;
+            }
+        }
+        if (self->iter_pos >= self->capacity) self->iter_pos = 0;
+        if (self->tombstones > self->capacity / 4 ||
+            (self->size > 0 && self->tombstones > self->size))
+            hashmap_i32a_compact(self);
+
+void
+pop(SV* self_sv)
+    PPCODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        if (self->lru_prev) {
+            while (self->lru_tail != HM_LRU_NONE) {
+                uint32_t idx = self->lru_tail;
+                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now >= self->expires_at[idx]) {
+                    hashmap_i32a_expire_at(self, idx, true); continue;
+                }
+                EXTEND(SP, 2);
+                mXPUSHi(self->nodes[idx].key);
+                if (self->nodes[idx].value) {
+                    mXPUSHs((SV*)self->nodes[idx].value);
+                } else { XPUSHs(&PL_sv_undef); }
+                self->nodes[idx].value = NULL;
+                hashmap_i32a_lru_unlink(self, idx);
+                hashmap_i32a_tombstone_at(self, idx);
+                if (self->tombstones > self->capacity / 4 ||
+                    (self->size > 0 && self->tombstones > self->size))
+                    hashmap_i32a_compact(self);
+                XSRETURN(2);
+            }
+            XSRETURN_EMPTY;
+        } else {
+            while (self->iter_pos < self->capacity) {
+                size_t i = self->iter_pos++;
+                if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
+                    EXTEND(SP, 2);
+                mXPUSHi(self->nodes[i].key);
+                if (self->nodes[i].value) {
+                    mXPUSHs((SV*)self->nodes[i].value);
+                } else { XPUSHs(&PL_sv_undef); }
+                self->nodes[i].value = NULL;
+                    hashmap_i32a_tombstone_at(self, i);
+                    if (self->tombstones > self->capacity / 4 ||
+                        (self->size > 0 && self->tombstones > self->size))
+                        hashmap_i32a_compact(self);
+                    XSRETURN(2);
+                }
+            }
+            self->iter_pos = 0;
+            XSRETURN_EMPTY;
+        }
+
+void
+shift(SV* self_sv)
+    PPCODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        if (self->lru_prev) {
+            while (self->lru_head != HM_LRU_NONE) {
+                uint32_t idx = self->lru_head;
+                if (HM_UNLIKELY(self->expires_at && self->expires_at[idx]) && now >= self->expires_at[idx]) {
+                    hashmap_i32a_expire_at(self, idx, true); continue;
+                }
+                EXTEND(SP, 2);
+                mXPUSHi(self->nodes[idx].key);
+                if (self->nodes[idx].value) {
+                    mXPUSHs((SV*)self->nodes[idx].value);
+                } else { XPUSHs(&PL_sv_undef); }
+                self->nodes[idx].value = NULL;
+                hashmap_i32a_lru_unlink(self, idx);
+                hashmap_i32a_tombstone_at(self, idx);
+                if (self->tombstones > self->capacity / 4 ||
+                    (self->size > 0 && self->tombstones > self->size))
+                    hashmap_i32a_compact(self);
+                XSRETURN(2);
+            }
+            XSRETURN_EMPTY;
+        } else {
+            if (self->iter_pos == 0) self->iter_pos = self->capacity;
+            while (self->iter_pos > 0) {
+                size_t i = --self->iter_pos;
+                if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
+                    EXTEND(SP, 2);
+                mXPUSHi(self->nodes[i].key);
+                if (self->nodes[i].value) {
+                    mXPUSHs((SV*)self->nodes[i].value);
+                } else { XPUSHs(&PL_sv_undef); }
+                self->nodes[i].value = NULL;
+                    hashmap_i32a_tombstone_at(self, i);
+                    if (self->tombstones > self->capacity / 4 ||
+                        (self->size > 0 && self->tombstones > self->size))
+                        hashmap_i32a_compact(self);
+                    XSRETURN(2);
+                }
+            }
+            XSRETURN_EMPTY;
+        }
+
+
+void
+clear(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        hashmap_i32a_clear(self);
+
+void
+reserve(SV* self_sv, UV count)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        if (!hashmap_i32a_reserve(self, (size_t)count))
+            croak("Failed to reserve capacity");
+
+void
+purge(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        hashmap_i32a_purge(self);
+
+SV*
+freeze(SV* self_sv)
+    CODE:
+        croak("freeze not supported for SV* variants; use to_hash + Storable");
+        RETVAL = &PL_sv_undef;
+    OUTPUT:
+        RETVAL
+
+
+UV
+capacity(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = (UV)self->capacity;
+    OUTPUT:
+        RETVAL
+
+bool
+persist(SV* self_sv, int32_t key)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        RETVAL = hashmap_i32a_persist(self, key);
+    OUTPUT:
+        RETVAL
+
+SV*
+swap(SV* self_sv, int32_t key, SV* new_val)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        void* old;
+        SvREFCNT_inc(new_val);
+        if (!hashmap_i32a_swap(self, key, (void*)new_val, &old)) { SvREFCNT_dec(new_val); XSRETURN_UNDEF; }
+        RETVAL = (SV*)old;
+    OUTPUT:
+        RETVAL
+
+
+SV*
+clone(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        HashMapI32A* clone = hashmap_i32a_clone(self);
+        if (!clone) croak("Failed to clone");
+        { size_t _i; for (_i = 0; _i < clone->capacity; _i++) {
+            if (I32A_NODE_LIVE(clone->nodes[_i]) && clone->nodes[_i].value)
+                SvREFCNT_inc((SV*)clone->nodes[_i].value);
+        } }
+        RETVAL = sv_setref_pv(newSV(0), HvNAME(SvSTASH(SvRV(self_sv))), (void*)clone);
+    OUTPUT:
+        RETVAL
+
+void
+from_hash(SV* self_sv, SV* href)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        if (!SvROK(href) || SvTYPE(SvRV(href)) != SVt_PVHV)
+            croak("from_hash requires a hashref");
+        HV* hv = (HV*)SvRV(href);
+        hashmap_i32a_reserve(self, (size_t)HvUSEDKEYS(hv));
+        hv_iterinit(hv);
+        HE* he;
+        while ((he = hv_iternext(hv))) {
+            SV* ksv = hv_iterkeysv(he);
+            int32_t key = (int32_t)SvIV(ksv);
+            SV* val = HeVAL(he);
+            SvREFCNT_inc(val);
+            if (!hashmap_i32a_put(self, key, (void*)val, 0)) SvREFCNT_dec(val);
+        }
+
+void
+merge(SV* self_sv, SV* other_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        if (!SvROK(other_sv) || !SvOBJECT(SvRV(other_sv)) || SvSTASH(SvRV(other_sv)) != stash_i32a)
+            croak("Expected a Data::HashMap::I32A object");
+        HashMapI32A* other = INT2PTR(HashMapI32A*, SvIV(SvRV(other_sv)));
+        hashmap_i32a_reserve(self, self->size + other->size);
+        uint32_t now = other->expires_at ? (uint32_t)time(NULL) : 0;
+        size_t i;
+        for (i = 0; i < other->capacity; i++) {
+            if (I32A_NODE_LIVE(other->nodes[i]) && !HM_TTL_SKIP_EXPIRED(other, i, now)) {
+                SvREFCNT_inc((SV*)other->nodes[i].value);
+                if (!hashmap_i32a_put(self, other->nodes[i].key, (void*)other->nodes[i].value, 0)) SvREFCNT_dec((SV*)other->nodes[i].value);
+            }
+        }
+
+
+SV*
+to_hash(SV* self_sv)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        HV* hv = newHV();
+        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
+        size_t i;
+        for (i = 0; i < self->capacity; i++) {
+            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
+                SV* val = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
+                char kbuf[24];
+                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
+                (void)hv_store(hv, kbuf, klen, val, 0);
+            }
+        }
+        RETVAL = newRV_noinc((SV*)hv);
+    OUTPUT:
+        RETVAL
+
+bool
+put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        SvREFCNT_inc(value);
+        RETVAL = hashmap_i32a_put(self, key, (void*)value, (uint32_t)ttl);
+        if (!RETVAL) SvREFCNT_dec(value);
+    OUTPUT:
+        RETVAL
+
+SV*
+get_or_set(SV* self_sv, int32_t key, SV* default_value)
+    CODE:
+        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
+        bool was_found;
+        SvREFCNT_inc(default_value);
+        size_t idx = hashmap_i32a_get_or_set(self, key, (void*)default_value, 0, &was_found);
+        if (idx >= self->capacity) {
+            SvREFCNT_dec(default_value);
+            XSRETURN_UNDEF;
+        }
+        if (was_found) SvREFCNT_dec(default_value);
+        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
+    OUTPUT:
+        RETVAL
+
+
+

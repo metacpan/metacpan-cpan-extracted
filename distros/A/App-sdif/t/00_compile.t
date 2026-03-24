@@ -5,6 +5,7 @@ use_ok $_ for qw(
     App::sdif
 
     App::sdif::LabelStack
+    App::sdif::Util
 
     App::cdif::Command
     App::cdif::Tmpfile

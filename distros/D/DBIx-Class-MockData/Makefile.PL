@@ -26,6 +26,7 @@ WriteMakefile(
         'File::Temp'      => 0,
         'IPC::Open3'      => 0,
         'Symbol'          => 0,
+        'UUID::Tiny'      => '1.04',
     },
 
     META_MERGE => {

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 #
-# Copyright (C) PetaMem, s.r.o. 2009-present
+# Copyright (c) PetaMem, s.r.o. 2009-present
 #
 
 # {{{ use block
@@ -42,7 +42,7 @@ my $wn = [
     ],
     [
         'nonexisting',
-        0,
+        undef,
         'nonexisting char -> 0'
     ],
     [

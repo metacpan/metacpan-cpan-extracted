@@ -7,24 +7,29 @@ package LTSV::LINQ;
 #
 # Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
 ######################################################################
+#
+# Compatible : Perl 5.005_03 and later
+# Platform   : Windows and UNIX/Linux
+#
+######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
                 # Perl 5.005_03 compatibility for historical toolchains
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '1.05';
-$VERSION = $VERSION;
-# VERSION policy: avoid `our` for 5.005_03 compatibility.
-# Self-assignment prevents "used only once" warning under `use strict`.
-
-BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
-BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
-# warnings.pm compatibility: stub with import() for Perl < 5.6
+BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
+use warnings; local $^W = 1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 
-#---------------------------------------------------------------------
+use vars qw($VERSION);
+$VERSION = '1.06';
+$VERSION = $VERSION;
+# $VERSION self-assignment suppresses "used only once" warning under strict.
+
+###############################################################################
 # Constructor and Iterator Infrastructure
-#---------------------------------------------------------------------
+###############################################################################
 
 sub new {
     my($class, $iterator) = @_;
@@ -41,9 +46,9 @@ sub iterator {
     return $self->{iterator};
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Data Source Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # From - create query from array
 sub From {
@@ -129,9 +134,9 @@ sub Repeat {
     });
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Filtering Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # Where - filter elements
 sub Where {
@@ -166,9 +171,9 @@ sub Where {
     });
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Projection Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # Select - transform elements
 sub Select {
@@ -251,9 +256,9 @@ sub Zip {
     });
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Partitioning Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # Take - take first N elements
 sub Take {
@@ -335,16 +340,16 @@ sub SkipWhile {
     });
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Ordering Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # OrderBy - sort ascending (smart: numeric when both keys look numeric)
 sub OrderBy {
     my($self, $key_selector) = @_;
     my @items = $self->ToArray();
     return LTSV::LINQ::Ordered->_new_ordered(
-        \@items,
+        [ @items ],
         [{ sel => $key_selector, dir => 1, type => 'smart' }]
     );
 }
@@ -354,7 +359,7 @@ sub OrderByDescending {
     my($self, $key_selector) = @_;
     my @items = $self->ToArray();
     return LTSV::LINQ::Ordered->_new_ordered(
-        \@items,
+        [ @items ],
         [{ sel => $key_selector, dir => -1, type => 'smart' }]
     );
 }
@@ -364,7 +369,7 @@ sub OrderByStr {
     my($self, $key_selector) = @_;
     my @items = $self->ToArray();
     return LTSV::LINQ::Ordered->_new_ordered(
-        \@items,
+        [ @items ],
         [{ sel => $key_selector, dir => 1, type => 'str' }]
     );
 }
@@ -374,7 +379,7 @@ sub OrderByStrDescending {
     my($self, $key_selector) = @_;
     my @items = $self->ToArray();
     return LTSV::LINQ::Ordered->_new_ordered(
-        \@items,
+        [ @items ],
         [{ sel => $key_selector, dir => -1, type => 'str' }]
     );
 }
@@ -384,7 +389,7 @@ sub OrderByNum {
     my($self, $key_selector) = @_;
     my @items = $self->ToArray();
     return LTSV::LINQ::Ordered->_new_ordered(
-        \@items,
+        [ @items ],
         [{ sel => $key_selector, dir => 1, type => 'num' }]
     );
 }
@@ -394,7 +399,7 @@ sub OrderByNumDescending {
     my($self, $key_selector) = @_;
     my @items = $self->ToArray();
     return LTSV::LINQ::Ordered->_new_ordered(
-        \@items,
+        [ @items ],
         [{ sel => $key_selector, dir => -1, type => 'num' }]
     );
 }
@@ -404,12 +409,12 @@ sub Reverse {
     my($self) = @_;
     my @items = reverse $self->ToArray();
     my $class = ref($self);
-    return $class->From(\@items);
+    return $class->From([ @items ]);
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Grouping Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # GroupBy - group elements by key
 sub GroupBy {
@@ -438,12 +443,12 @@ sub GroupBy {
     }
 
     my $class = ref($self);
-    return $class->From(\@result);
+    return $class->From([ @result ]);
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Set Operations
-#---------------------------------------------------------------------
+###############################################################################
 
 # Distinct - remove duplicates
 sub Distinct {
@@ -662,15 +667,15 @@ sub GroupJoin {
         # from a fresh index variable, so the group can be traversed
         # multiple times inside result_selector (e.g. Count() then Sum()).
         my @snapshot = @$matched_inners;
-        my $inner_group = $class->_from_snapshot(\@snapshot);
+        my $inner_group = $class->_from_snapshot([ @snapshot ]);
 
         return $result_selector->($outer_item, $inner_group);
     });
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Quantifier Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # All - test if all elements satisfy condition
 sub All {
@@ -743,9 +748,9 @@ sub SequenceEqual {
     }
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Element Access Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # First - get first element
 sub First {
@@ -910,9 +915,9 @@ sub ElementAtOrDefault {
     return undef;
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Aggregation Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # Count - count elements
 sub Count {
@@ -1037,9 +1042,9 @@ sub Aggregate {
     return $result_selector ? $result_selector->($seed) : $seed;
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Conversion Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # ToArray - convert to array
 sub ToArray {
@@ -1169,9 +1174,9 @@ sub ToLTSV {
     return 1;
 }
 
-#---------------------------------------------------------------------
+###############################################################################
 # Utility Methods
-#---------------------------------------------------------------------
+###############################################################################
 
 # ForEach - execute action for each element
 sub ForEach {
@@ -1248,7 +1253,7 @@ sub _perform_sort {
         my $idx  = $_;
         my $item = $items->[$idx];
         my @keys = map { _extract_key($_->{sel}->($item), $_->{type}) } @{$specs};
-        [$idx, \@keys, $item]
+        [$idx, [ @keys ], $item]
     } 0 .. $#{$items};
 
     # Step 2: sort
@@ -1333,26 +1338,26 @@ sub _compare_keys {
 sub _thenby {
     my($self, $key_selector, $dir, $type) = @_;
     my @new_specs = (@{$self->{_specs}}, { sel => $key_selector, dir => $dir, type => $type });
-    return LTSV::LINQ::Ordered->_new_ordered($self->{_items}, \@new_specs);
+    return LTSV::LINQ::Ordered->_new_ordered($self->{_items}, [ @new_specs ]);
 }
 
 # ThenBy - ascending secondary key, smart comparison
-sub ThenBy            { my($s,$k)=@_; $s->_thenby($k,  1, 'smart') }
+sub ThenBy            { my($s, $k)=@_; $s->_thenby($k, 1, 'smart') }
 
 # ThenByDescending - descending secondary key, smart comparison
-sub ThenByDescending  { my($s,$k)=@_; $s->_thenby($k, -1, 'smart') }
+sub ThenByDescending  { my($s, $k)=@_; $s->_thenby($k, -1, 'smart') }
 
 # ThenByStr - ascending secondary key, string comparison
-sub ThenByStr         { my($s,$k)=@_; $s->_thenby($k,  1, 'str')   }
+sub ThenByStr         { my($s, $k)=@_; $s->_thenby($k, 1, 'str')   }
 
 # ThenByStrDescending - descending secondary key, string comparison
-sub ThenByStrDescending { my($s,$k)=@_; $s->_thenby($k, -1, 'str') }
+sub ThenByStrDescending { my($s, $k)=@_; $s->_thenby($k, -1, 'str') }
 
 # ThenByNum - ascending secondary key, numeric comparison
-sub ThenByNum         { my($s,$k)=@_; $s->_thenby($k,  1, 'num')   }
+sub ThenByNum         { my($s, $k)=@_; $s->_thenby($k, 1, 'num')   }
 
 # ThenByNumDescending - descending secondary key, numeric comparison
-sub ThenByNumDescending { my($s,$k)=@_; $s->_thenby($k, -1, 'num') }
+sub ThenByNumDescending { my($s, $k)=@_; $s->_thenby($k, -1, 'num') }
 
 1;
 
@@ -1364,7 +1369,7 @@ LTSV::LINQ - LINQ-style query interface for LTSV files
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -1401,29 +1406,35 @@ Version 1.05
 
 =item * L</DESCRIPTION>
 
-=item * L</METHODS> - Complete method reference (60 methods)
+=item * L</INCLUDED DOCUMENTATION> -- eg/ samples and doc/ cheat sheets
 
-=item * L</EXAMPLES> - 8 practical examples
+=item * L</METHODS> -- Complete method reference (60 methods)
 
-=item * L</FEATURES> - Lazy evaluation, method chaining, DSL
+=item * L</EXAMPLES> -- 8 practical examples
 
-=item * L</ARCHITECTURE> - Iterator design, execution flow
+=item * L</FEATURES> -- Lazy evaluation, method chaining, DSL
 
-=item * L</PERFORMANCE> - Memory usage, optimization tips
+=item * L</ARCHITECTURE> -- Iterator design, execution flow
 
-=item * L</COMPATIBILITY> - Perl 5.005+ support, pure Perl
+=item * L</PERFORMANCE> -- Memory usage, optimization tips
 
-=item * L</DIAGNOSTICS> - Error messages
+=item * L</COMPATIBILITY> -- Perl 5.005+ support, pure Perl
 
-=item * L</FAQ> - Common questions and answers
+=item * L</DIAGNOSTICS> -- Error messages
 
-=item * L</COOKBOOK> - Common patterns
+=item * L</FAQ> -- Common questions and answers
 
-=item * L</SEE ALSO> - Related resources
+=item * L</COOKBOOK> -- Common patterns
 
-=item * L</AUTHOR>
+=item * L</DESIGN PHILOSOPHY>
 
-=item * L</COPYRIGHT AND LICENSE>
+=item * L</LIMITATIONS AND KNOWN ISSUES>
+
+=item * L</BUGS>
+
+=item * L</SUPPORT>
+
+=item * L</SEE ALSO>
 
 =back
 
@@ -1707,6 +1718,47 @@ data sources. Query logic can be parameterized and reused across scripts.
 
 For the original LINQ documentation, see
 L<https://learn.microsoft.com/en-us/dotnet/csharp/linq/>.
+
+=head1 INCLUDED DOCUMENTATION
+
+The C<eg/> directory contains sample programs demonstrating LTSV::LINQ features:
+
+  eg/01_ltsv_query.pl    LTSV file query: FromLTSV/Where/Select/OrderByNumDescending/
+                         Distinct/ToLookup
+  eg/02_array_query.pl   In-memory array queries, aggregation (Sum/Average/Min/Max),
+                         Any/All, Skip/Take paging, Zip
+  eg/03_grouping.pl      GroupBy, ToLookup, GroupJoin (left outer join),
+                         SelectMany with array-ref selector
+  eg/04_sorting.pl       OrderBy/ThenBy multi-key sort, OrderByNum vs OrderByStr,
+                         Reverse
+
+The C<doc/> directory contains LTSV::LINQ cheat sheets in 21 languages:
+
+  doc/linq_cheatsheet.EN.txt   English
+  doc/linq_cheatsheet.JA.txt   Japanese
+  doc/linq_cheatsheet.ZH.txt   Chinese (Simplified)
+  doc/linq_cheatsheet.TW.txt   Chinese (Traditional)
+  doc/linq_cheatsheet.KO.txt   Korean
+  doc/linq_cheatsheet.FR.txt   French
+  doc/linq_cheatsheet.ID.txt   Indonesian
+  doc/linq_cheatsheet.VI.txt   Vietnamese
+  doc/linq_cheatsheet.TH.txt   Thai
+  doc/linq_cheatsheet.HI.txt   Hindi
+  doc/linq_cheatsheet.BN.txt   Bengali
+  doc/linq_cheatsheet.TR.txt   Turkish
+  doc/linq_cheatsheet.MY.txt   Malay
+  doc/linq_cheatsheet.TL.txt   Filipino
+  doc/linq_cheatsheet.KM.txt   Khmer
+  doc/linq_cheatsheet.MN.txt   Mongolian
+  doc/linq_cheatsheet.NE.txt   Nepali
+  doc/linq_cheatsheet.SI.txt   Sinhala
+  doc/linq_cheatsheet.UR.txt   Urdu
+  doc/linq_cheatsheet.UZ.txt   Uzbek
+  doc/linq_cheatsheet.BM.txt   Burmese
+
+Each cheat sheet covers: creating queries, filtering, projection, sorting,
+paging, grouping, set operations, joins, aggregation, and links to the
+official LTSV and LINQ specifications.
 
 =head1 METHODS
 
@@ -4120,6 +4172,49 @@ Example:
   LTSV::LINQ->From(\@data)->First(sub { $_[0] > 10 });          # Dies
   LTSV::LINQ->From(\@data)->FirstOrDefault(sub { $_[0] > 10 }); # Returns undef
 
+=item C<Sequence contains more than one element>
+
+Thrown by Single() when the sequence (or matching elements) contains
+more than one element.  Use First() if multiple matches are acceptable.
+
+Example:
+
+  my @data = (1, 2, 3);
+  LTSV::LINQ->From(\@data)->Single();               # Dies (3 elements)
+  LTSV::LINQ->From(\@data)->Single(sub { $_[0]>1 });# Dies (2 match)
+  LTSV::LINQ->From(\@data)->Single(sub { $_[0]==1 });# OK (1 match)
+
+=item C<Index must be non-negative>
+
+Thrown by ElementAt() when the supplied index is less than zero.
+
+=item C<Index out of range>
+
+Thrown by ElementAt() when the supplied index is equal to or greater
+than the number of elements in the sequence.  Use ElementAtOrDefault()
+to avoid this error.
+
+Example:
+
+  my @data = (10, 20, 30);
+  LTSV::LINQ->From(\@data)->ElementAt(2);  # OK: returns 30
+  LTSV::LINQ->From(\@data)->ElementAt(5);  # Dies: index out of range
+  LTSV::LINQ->From(\@data)->ElementAt(-1); # Dies: must be non-negative
+  LTSV::LINQ->From(\@data)->ElementAtOrDefault(5); # Returns undef
+
+=item C<Invalid number of arguments for Aggregate>
+
+Thrown by Aggregate() when called with a number of arguments other
+than 2 (seed + function).
+
+Example:
+
+  # Correct usage
+  LTSV::LINQ->From([1,2,3])->Aggregate(0, sub { $_[0] + $_[1] });
+
+  # Incorrect: single argument -- dies
+  LTSV::LINQ->From([1,2,3])->Aggregate(sub { $_[0] + $_[1] });
+
 =item C<Cannot open 'filename': ...>
 
 File I/O error when FromLTSV() cannot open the specified file.
@@ -4175,6 +4270,23 @@ Safe alternative: LastOrDefault()
 Dies if sequence is empty.
 
 Safe alternative: AverageOrDefault()
+
+=item B<Single([$predicate])>
+
+Dies with C<Sequence contains more than one element> if the sequence
+contains more than one matching element.  Also dies with
+C<Sequence contains no elements> if no element matches.
+
+=item B<ElementAt($index)>
+
+Dies with C<Index must be non-negative> if C<$index> is less than 0.
+Dies with C<Index out of range> if C<$index> is beyond the end of
+the sequence.
+
+=item B<Aggregate($seed, $func)>
+
+Dies with C<Invalid number of arguments for Aggregate> if called
+with an argument count other than 2 (seed + function).
 
 =back
 

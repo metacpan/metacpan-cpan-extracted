@@ -4,7 +4,7 @@ Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
@@ -191,9 +191,13 @@ Klaus Rindfrey, `<klausrin at cpan.org.eu>`
 
 # BUGS
 
-Please report any bugs or feature requests to `bug-dist-policyfiles at rt.cpan.org`, or through
-the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles).  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to `bug-dist-policyfiles at
+rt.cpan.org`, or through the web interface at
+[https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles) or create
+a [GitHub
+Issue](https://github.com/klaus-rindfrey/perl-dist-policyfiles/issues).  I will
+be notified, and then you'll automatically be notified of progress on your bug
+as I make changes.
 
 # SEE ALSO
 

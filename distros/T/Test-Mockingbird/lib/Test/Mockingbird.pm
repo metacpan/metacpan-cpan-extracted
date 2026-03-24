@@ -34,11 +34,11 @@ Test::Mockingbird - Advanced mocking library for Perl with support for dependenc
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -230,46 +230,39 @@ or the shorthand:
 =cut
 
 sub mock {
-	my ($arg1, $arg2, $arg3) = @_;
+    my ($arg1, $arg2, $arg3) = @_;
 
-	my ($package, $method, $replacement);
+    my ($package, $method, $replacement);
 
-	# ------------------------------------------------------------
-	# New syntax:
-	#   mock 'My::Module::method' => sub { ... }
-	# ------------------------------------------------------------
-	if (defined $arg1 && !defined $arg3 && $arg1 =~ /^(.*)::([^:]+)$/) {
-		$package = $1;
-		$method = $2;
-		$replacement = $arg2;
-	} else {
-		# ------------------------------------------------------------
-		# Original syntax:
-		#   mock('My::Module', 'method', sub { ... })
-		# ------------------------------------------------------------
-		($package, $method, $replacement) = ($arg1, $arg2, $arg3);
-	}
+    if (defined $arg1 && !defined $arg3 && $arg1 =~ /^(.*)::([^:]+)$/) {
+        $package     = $1;
+        $method      = $2;
+        $replacement = $arg2;
+    } else {
+        ($package, $method, $replacement) = ($arg1, $arg2, $arg3);
+    }
 
-	croak 'Package, method and replacement are required for mocking' unless $package && $method && $replacement;
+    croak 'Package, method and replacement are required for mocking'
+        unless $package && $method && $replacement;
 
-	my $full_method = "${package}::$method";
+    my $full_method = "${package}::$method";
 
-	# Backup original if not already mocked
-	push @{ $mocked{$full_method} }, \&{$full_method};
+    # Backup original if not already mocked
+    push @{ $mocked{$full_method} }, \&{$full_method};
 
-	no warnings 'redefine';
+    no warnings 'redefine';
+    {
+        ## no critic (ProhibitNoStrict)
+        no strict 'refs';
+        *{$full_method} = $replacement;
+    }
 
-	{
-		## no critic (ProhibitNoStrict)  # symbolic reference required for mocking
-		no strict 'refs';
-		*{$full_method} = $replacement;
-	}
-	my $type = $Test::Mockingbird::TYPE // 'mock';
+    my $type = $Test::Mockingbird::TYPE // 'mock';
 
-	push @{ $mock_meta{$full_method} }, {
-		type => $type,   # 'mock', 'spy', 'inject', etc.
-		installed_at => (caller)[1] . ' line ' . (caller)[2],
-	};
+    push @{ $mock_meta{$full_method} }, {
+        type         => $type,
+        installed_at => (caller)[1] . ' line ' . (caller)[2],
+    };
 }
 
 =head2 unmock($package, $method)
@@ -948,6 +941,18 @@ sub _parse_target {
 	return ($arg1, $arg2);
 }
 
+sub _get_prototype {
+	my $full = $_[0];
+
+	croak "Invalid fully-qualified name '$full'" unless $full =~ /^[A-Za-z_]\w*(?:::\w+)+$/;
+
+	my ($pkg, $sub) = $full =~ /^(.*)::([^:]+)$/;
+
+	my $code = $pkg->can($sub) or return;
+
+	return prototype($code);
+}
+
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
@@ -973,6 +978,8 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 =over 4
 
 =item * L<Test::Mockingbird::DeepMock>
+
+=item * L<Test::Mockingbird::TimeTravel>
 
 =back
 

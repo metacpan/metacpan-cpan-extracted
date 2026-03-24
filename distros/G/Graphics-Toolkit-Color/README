@@ -14,13 +14,6 @@ SYNOPSIS
         my @base_triadic = $red->complement( 3 );        # get fitting red green and blue
         my @reds = $red->cluster( r => 1.1, min_d => 1 );# 13 shades of red
 
-DEPRECATION WARNING
-    Methods of the old API ( *string*, *rgb*, *red*, *green*, *blue*,
-    *rgb_hex*, *rgb_hash*, *hsl*, *hue*, *saturation*, *lightness*,
-    *hsl_hash*, *add*, *set*, *blend*, *blend_with*, *gradient_to*,
-    *rgb_gradient_to*, *hsl_gradient_to*, *complementary*) will be removed
-    with release of version 2.0.
-
 DESCRIPTION
     Graphics::Toolkit::Color, for short GTC, is the top level API of this
     release and the only package a regular user should be concerned with.
@@ -259,8 +252,9 @@ GETTER
     required one.
 
     The "distance" is measured in *RGB* color space unless told otherwise by
-    the argument "in". Please use the *OKLAB* or *CIELUV* space, if you are
-    interested in getting a result that matches the human perception.
+    the argument "in". Please use the *OKLAB* (better) or *CIELUV* space, if
+    you are interested in getting a result that matches the human
+    perception.
 
     The third argument is named "select". It's useful if you want to regard
     only certain dimensions (axis - long and short axis names are accepted).
@@ -289,7 +283,10 @@ GETTER
     gamut, of the color space, the color was defined in. Or in simpler
     terms: are the color values within the accepted ranges? Some spaces
     exclude certain value combinations. This is the way to ensure you got a
-    valid color definition.
+    valid color definition. Since the GTC "CONSTRUCTOR" clamps out of shape
+    values, and forces them to be in gamut - this method is only needed to
+    ensure that there is nothing to clamp and the constructor did not change
+    any value.
 
     If it is too clumsy for you to use an existing color object to check if
     another color is valid: use th importable routine with the same name.
@@ -336,9 +333,20 @@ SINGLE COLOR
     colors by using it like:
 
         my $blue = Graphics::Toolkit::Color->new('blue');
-        my $darkblue = $blue->add_value( Lightness => -25 );  # get a darker tone
-        my $blue2 = $blue->add_value( blue => 10 );           # bluer than blue ?
-        my $blue3 = $blue->add_value( l => 10, in => 'LAB' ); # lighter color according CIELAB
+        my $darkblue = $blue->add_value( Lightness => -25 );    # get a darker tone
+        my $blue2 = $blue->add_value( blue => 10 );             # bluer than blue ?
+        my $blue3 = $blue->add_value( l => 10, in => 'LAB' );   # lighter color according CIELAB
+
+  apply
+    Creates a new GTC color object with recalculated values. Each
+    calculation is triggered by one named argument and currently is only one
+    possible. *gamma* triggers a gamma correction which can be reversed with
+    the inverse argument. Use an ARRAY ref to apply each color value with a
+    different gamma. The argument "in" determines in which space the
+    carlculation takes place:
+
+        my $linear_blue = $blue->apply( gamma => 2.2 );         # is same the as :
+        my $linear_blue = $blue->apply( gamma => [2.2, 2.2, 2.2], in => 'RGB' );
 
   mix
     Create a new GTC object, that has the average values between the calling

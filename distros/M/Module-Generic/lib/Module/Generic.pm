@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.2.4
+## Version v1.2.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/03/14
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -100,7 +100,7 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.2.4';
+    our $VERSION     = 'v1.2.5';
 };
 
 use v5.26.1;
@@ -3175,8 +3175,8 @@ sub _is_number
     return(0) if( scalar( @_ < 2 ) );
     my( $self, $v ) = @_;
 
-    return(0) if( ref( $v ) );
     return(0) unless( defined( $v ) );
+    return(0) if( ref( $v ) );
 
     # Accept only scalars that actually carry numeric flags.
     # JSON marks numbers with IOK/NOK; plain strings (even "12") will not have them.
@@ -13078,7 +13078,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.2.4
+    v1.2.5
 
 =head1 DESCRIPTION
 

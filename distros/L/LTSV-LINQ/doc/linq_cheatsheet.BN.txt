@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ চিট শিট                                   [BN] বাংলা
+======================================================================
+
+[ 1. কুয়েরি তৈরি করা (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  নোট: প্রতিটি টার্মিনাল মেথড ইটারেটর শেষ করে দেয়।
+    ডেটা পুনরায় ব্যবহার করতে From() / FromLTSV() আবার কল করুন।
+
+[ 2. ফিল্টারিং (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  শর্তের ভিত্তিতে উপাদান ফিল্টার করে।
+
+[ 3. প্রজেকশন (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select প্রতিটি উপাদান রূপান্তরিত করে; SelectMany নেস্টেড অ্যারে সমতল করে
+    (সিলেক্টর অবশ্যই ARRAY রেফারেন্স রিটার্ন করবে)।
+
+[ 4. বাছাই করা (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: প্রাথমিক সর্ট কী।
+    ThenBy*/ThenByNum*/ThenByStr*: মাধ্যমিক সর্ট কী (OrderBy* এর পরে)।
+    Reverse: বর্তমান ক্রম উল্টায়।
+
+[ 5. পেজিং (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: নির্দিষ্ট সংখ্যক উপাদান এড়িয়ে যান বা নিন।
+    SkipWhile/TakeWhile: শর্ত অনুযায়ী।
+
+[ 6. গ্রুপিং (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy { Key=>'...', Elements=>[...] } এর অ্যারে রিটার্ন করে।
+    ToLookup hashref { key => [elements] } রিটার্ন করে।
+
+[ 7. সেট অপারেশন (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except ঐচ্ছিক কী সিলেক্টর সমর্থন করে।
+    SequenceEqual: উভয় সিকোয়েন্স সমান হলে সত্য।
+
+[ 8. জয়েন (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: অভ্যন্তরীণ জয়েন। GroupJoin: বাম বাইরের জয়েন
+    (অভ্যন্তরীণ গ্রুপ LTSV::LINQ অবজেক্ট হিসেবে পাস হয়)।
+
+[ 9. একত্রীকরণ (টার্মিনাল মেথড) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  OrDefault ভেরিয়েন্ট খালি সিকোয়েন্সের জন্য die এর পরিবর্তে undef রিটার্ন করে।
+    ElementAt: 0-ভিত্তিক সূচক (সীমার বাইরে হলে die)। ElementAtOrDefault: undef।
+
+[ 10. অন্যান্য সিকোয়েন্স মেথড (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: দুটি সিকোয়েন্স সংযুক্ত করে। DefaultIfEmpty: খালি হলে ডিফল্ট মান।
+    Zip: দুটি সিকোয়েন্স উপাদান-দর-উপাদান মিলিত করে।
+
+[ 11. রূপান্তর মেথড (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary hashref key=>element রিটার্ন করে।
+    ToLookup hashref key=>[elements] রিটার্ন করে।
+    ToLTSV সিকোয়েন্স LTSV ফাইলে লেখে।
+
+[ 12. অফিসিয়াল রিসোর্স (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV স্পেসিফিকেশন: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

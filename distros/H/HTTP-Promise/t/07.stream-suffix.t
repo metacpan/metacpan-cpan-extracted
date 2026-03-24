@@ -34,7 +34,7 @@ subtest "suffix" => sub
         [ 'file.uu' => [qw( uu )] ],
         [ 'file.xz' => [qw( xz )] ],
         [ 'file.zip' => [qw( zip )] ],
-        [ 'file.zstd' => [qw( zstd )] ],
+        [ 'file.zst' => [qw( zstd )] ],
         [ 'file.unknown' => [] ],
     );
     my $s = HTTP::Promise::Stream->new( \'', { debug => $DEBUG } );
@@ -61,7 +61,7 @@ subtest "suffix" => sub
         [ [qw( uu )] => [qw( uu )] ],
         [ [qw( xz )] => [qw( xz )] ],
         [ [qw( zip )] => [qw( zip )] ],
-        [ [qw( zstd )] => [qw( zstd )] ],
+        [ [qw( zstd )] => [qw( zst )] ],
         [ [qw( unknown )] => undef ],
     );
     foreach( @e2s_tests )

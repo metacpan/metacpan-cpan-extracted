@@ -2,7 +2,7 @@ NAME
 
     Async::Microservice - Async HTTP Microservice Moose Role
 
-SYNOPSYS
+SYNOPSIS
 
         # lib/Async/Microservice/HelloWorld.pm
         package Async::Microservice::HelloWorld;
@@ -28,8 +28,8 @@ SYNOPSYS
 
 DESCRIPTION
 
-    This Moose::Role helps to quicly bootstrap async http service that is
-    including OpenAPI documentation.
+    This Moose::Role helps quickly bootstrap an async HTTP service that
+    includes OpenAPI documentation.
 
     See https://time.meon.eu/ and Async::Microservice::Time code.
 
@@ -38,20 +38,21 @@ DESCRIPTION
     Create new package for your APIs from current examples
     lib/Async/Microservice/*. Inside set return value of service_name. This
     string will be used to set process name and to read/locate OpenAPI yaml
-    definition for the documentation. Any GET/POST processing funtions must
-    be defined in get_routes funtion.
+    definition for the documentation. Any GET/POST processing functions
+    must be defined in the get_routes function.
 
-    Copy one of the bin/*.psgi update it with your new package name.
+    Copy one of the bin/*.psgi scripts and update it with your new package
+    name.
 
     Copy one of the root/static/*.yaml to have the same name as
     service_name.
 
-    Now you are able to lauch the http service with:
+    Now you are able to launch the HTTP service with:
 
         plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOURNAME.psgi
 
     In your browser you can read the OpenAPI documentation:
-    http://0.0.0.0:8089/v1/ and also use editor to extend it:
+    http://0.0.0.0:8089/v1/ and also use the editor to extend it:
     http://0.0.0.0:8089/v1/edit
 
 SEE ALSO
@@ -101,7 +102,7 @@ NAME
 
     Async::MicroserviceReq - async microservice request class
 
-SYNOPSYS
+SYNOPSIS
 
         my $this_req  = Async::MicroserviceReq->new(
             method     => $plack_req->method,
@@ -123,8 +124,8 @@ DESCRIPTION
 
     This is an object created for each request handled by
     Async::Microservice. It is passed to all request handling functions as
-    first argument and it provides some request info and response helper
-    methods.
+    the first argument and it provides request information and response
+    helper methods.
 
 ATTRIBUTES
 
@@ -153,7 +154,7 @@ METHODS
 
     Send redirect.
 
- static($file_name, $content_cb)
+ static_ft($file_name, $content_cb)
 
     Send static file, can be updated/modified using optional callback.
 
@@ -167,7 +168,7 @@ NAME
 
     Async::Microservice::Time - example time async microservice
 
-SYNOPSYS
+SYNOPSIS
 
         # can be started using:
         plackup --port 8085 -Ilib --access-log /dev/null --server Twiggy bin/async-microservice-time.psgi
@@ -178,8 +179,8 @@ SYNOPSYS
 
 DESCRIPTION
 
-    This is an example asynchronous http micro service using
-    Async::Microservice. View the source code it's minimal.
+    This is an example asynchronous HTTP microservice using
+    Async::Microservice. View the source code; it's minimal.
 
 METHODS
 
@@ -224,12 +225,13 @@ METHODS
 
     https://time.meon.eu/v1/sleep?duration=2.5
 
-    This is the only parallel processed reponse method (the other ones are
-    pure CPU-only bound) that sleep given (or random) number of seconds and
-    only then returns the request response with when it started and how
-    long it took. Normally this the same as what is in duration parameter,
-    but in case the server is overloaded with requests, the event loop may
-    call the timer handler much later than the duration. Try:
+    This is the only response method processed in parallel (the other ones
+    are pure CPU-bound) that sleeps for a given (or random) number of
+    seconds and only then returns the request response with when it started
+    and how long it took. Normally this is the same as what is in the
+    duration parameter, but in case the server is overloaded with requests,
+    the event loop may call the timer handler much later than the duration.
+    Try:
 
         ab -n 1000 -c 500 http://localhost:8085/v1/sleep?duration=3
         Connection Times (ms)

@@ -41,4 +41,4 @@ requires:
 resources:
   bugtracker: https://github.com/jsf116/Test-Expander/issues
   repository: git://github.com/jsf116/Test-Expander.git
-version: v2.6.1
+version: v2.6.2

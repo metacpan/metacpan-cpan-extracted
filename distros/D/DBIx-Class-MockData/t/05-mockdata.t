@@ -22,6 +22,7 @@ sub fresh_mock {
         schema     => $schema,
         schema_dir => $SCHEMA_DIR,
         rows       => 2, # Default low for speed
+        quiet      => 1,
         %args,
     )->deploy->wipe; # Use wipe to clear data between subtests
 }

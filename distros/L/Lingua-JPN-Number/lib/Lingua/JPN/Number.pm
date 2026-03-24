@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 #
 # Mike Schilli, 2001 (m@perlmeister.com)
 #
@@ -13,12 +13,11 @@ use 5.10.1;
 use warnings;
 use strict;
 
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-
-our $VERSION     = 0.0682;
+our $VERSION = '0.2603230';
 
 my %N2J = qw(
   1 ichi 2 ni 3 san 4 yon 5 go 6 roku 7 nana 
@@ -106,7 +105,7 @@ Lingua::JPN::Number - Translate Numbers into Japanese
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
 =head1 SYNOPSIS
 

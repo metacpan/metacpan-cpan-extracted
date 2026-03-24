@@ -425,4 +425,56 @@ use Data::HashMap::SI32;
     is(hm_i16a_get $m, 4, "str4", 'I16A LRU: newest present');
 }
 
+# ---- lru_skip accessor ----
+
+{
+    my $m = Data::HashMap::II->new(100, 0, 80);
+    is(hm_ii_lru_skip $m, 80, 'II lru_skip: accessor returns 80');
+
+    my $m2 = Data::HashMap::II->new(100);
+    is(hm_ii_lru_skip $m2, 0, 'II lru_skip: default is 0');
+
+    # Clamp to 99
+    my $m3 = Data::HashMap::II->new(100, 0, 200);
+    is(hm_ii_lru_skip $m3, 99, 'II lru_skip: clamped to 99');
+}
+
+# ---- lru_skip probabilistic behavior ----
+
+{
+    # With lru_skip=0 (strict), get always promotes to head
+    my $m = Data::HashMap::II->new(100);
+    hm_ii_put $m, 1, 10;
+    hm_ii_put $m, 2, 20;
+    hm_ii_put $m, 3, 30;
+    # Order is now 3,2,1 (3 is head/MRU)
+    hm_ii_get $m, 1;  # promotes 1 to head
+    # Now insert 100 more to fill + evict
+    hm_ii_put $m, $_, $_ for 4..100;
+    # Key 1 was promoted, should survive longer than 2 and 3
+    ok(defined(hm_ii_get $m, 1), 'strict LRU: promoted key 1 survives');
+}
+
+{
+    # With lru_skip=99 (skip 99%), tail entry must still be promotable
+    # to avoid stuck-at-tail eviction
+    my $m = Data::HashMap::II->new(5, 0, 99);
+    hm_ii_put $m, $_, $_ * 10 for 1..5;
+    # Key 1 is tail (LRU). Getting it must promote despite 99% skip.
+    hm_ii_get $m, 1;
+    # Insert ONE more — evicts the new tail (key 2), not key 1
+    hm_ii_put $m, 6, 60;
+    ok(defined(hm_ii_get $m, 1), 'lru_skip=99: tail entry promoted, not evicted');
+    ok(!defined(hm_ii_get $m, 2), 'lru_skip=99: key 2 became tail and was evicted');
+}
+
+{
+    # Verify lru_skip doesn't break basic eviction
+    my $m = Data::HashMap::SS->new(10, 0, 50);
+    hm_ss_put $m, "k$_", "v$_" for 1..20;
+    is(hm_ss_size $m, 10, 'SS lru_skip=50: capacity maintained');
+    # All recent inserts should be present
+    ok(defined(hm_ss_get $m, "k20"), 'SS lru_skip=50: newest key present');
+}
+
 done_testing;

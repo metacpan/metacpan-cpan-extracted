@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.129-5-g0a2e6205
+package OpenAPI::Modern; # git description: v0.130-13-gf11f2ecc
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.130';
+our $VERSION = '0.131';
 
 use 5.020;
 use utf8;
@@ -365,6 +365,12 @@ sub find_path_item ($self, $options, $state = {}) {
       and not ($options->{path_template} and exists $options->{method})
       and not exists $options->{operation_id};
 
+  return E({ %$state, exception => 1, recommended_response => [ 500 ] },
+      'provided path_captures values must be strings')
+    if exists $options->{path_captures}
+      and any { $_ ne 'string' and $_ ne 'number' and $_ ne 'integer' }
+        map get_type($_), values $options->{path_captures}->%*;
+
   # now guaranteed to be a Mojo::Message::Request
   if ($options->{request}) {
     $options->{request} = _convert_request($options->{request});
@@ -642,8 +648,8 @@ sub _match_uri ($self, $method, $uri, $path_template, $state) {
   $uri->path->leading_slash(1); # no effect on stringified URI unless path is empty
 
   # v3.2.0 §4.8.2, "Path Templating": "The value for these path parameters MUST NOT contain any
-  # unescaped “generic syntax” characters described by [RFC3986]: forward slashes (/), question
-  # marks (?), or hashes (#)."
+  # unescaped “generic syntax” characters described by RFC3986 Section 3: forward slashes (/),
+  # question marks (?), or hashes (#)."
   my $path_pattern = join '',
     map +(substr($_, 0, 1) eq '{' ? '([^/?#]*)' : quotemeta($_)), # { for the editor
     split /(\{[^{}]+\})/, $path_template;
@@ -903,8 +909,6 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   # by a comma (",") and optional whitespace (OWS, defined in Section 5.6.3). For consistency, use
   # comma SP."
 
-  # Headers must be UTF-8-encoded, so we decode here first before parsing the string
-  # (style delimiters are all ascii so are unaffected)
   # In order to deserialize from a single string using the "simple" style, we concatenate all header
   # lines together, after removing leading and trailing whitespace and then pct-encoding the result
   # (as it is decoded again after splitting on delimiters). OWS after commas are parsed out later.
@@ -962,8 +966,8 @@ sub _validate_querystring_parameter ($self, $state, $param_obj, $uri) {
 # error)
 # %opt is (:$style, :$explode, :$name, :$schema, $strip_internal_ws)
 sub _deserialize_style ($self, $data, $state, %opt) {
-  # numbers and builtin bools can be treated as strings, but reject references
-  croak 'only strings can be deserialized' if ref $data;
+  # numbers and builtin bools can be treated as strings, but reject undef and references
+  croak 'only strings can be deserialized' if not defined $data or ref $data;
 
   my ($style, $explode, $name, $schema, $strip_internal_ws) =
     @opt{qw(style explode name schema strip_internal_ws)};
@@ -975,10 +979,10 @@ sub _deserialize_style ($self, $data, $state, %opt) {
   if ($style eq 'simple' or $style eq 'matrix' or $style eq 'label') {
     my $state = +{ %$state, data_path => jsonp($state->{data_path}, $name) };
 
-    # RFC6570 §3.2.1: "A variable that is undefined (Section 2.3) has no value and is ignored by the
+    # RFC6570 §3.2.1: "A variable that is undefined (§2.3) has no value and is ignored by the
     # expansion process. If all of the variables in an expression are undefined, then the
     # expression's expansion is the empty string."
-    if (($data//'') eq '') {
+    if ($data eq '' and ($style ne 'simple' or @types != 6)) {
       if (any { $_ eq 'null' } @types) {
         return undef;
       }
@@ -1107,7 +1111,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
     }
 
     $data = uri_decode($data);
-    return $data if coerce_primitive(\$data, \@types);
+    return $data if @types == 6 or coerce_primitive(\$data, \@types);
 
     if (@errors) {
       push $state->{errors}->@*, @errors;
@@ -1276,7 +1280,7 @@ sub _resolve_dynamicRef ($self, $ref, $state) {
 # determines the type(s) expected in a schema: array, object, null, boolean, string, number
 # (integers will be treated as numbers as they are not a distinct core type)
 sub _type_in_schema ($self, $schema, $state) {
-  return (qw(array object boolean string number), $state->{vocabularies}[0] =~ /::OpenAPI_3_0\z/ ? () : 'null')
+  return $schema ? (qw(array object boolean string number), $state->{vocabularies}[0] =~ /::OpenAPI_3_0\z/ ? () : 'null') : ('string')
     if ref $schema ne 'HASH';
 
   my $schema_info = $self->evaluator->_fetch_from_uri(my $uri = canonical_uri($state));
@@ -1678,7 +1682,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.130
+version 0.131
 
 =head1 SYNOPSIS
 
@@ -2150,12 +2154,16 @@ C<number>, C<string>.
 
 =head1 LIMITATIONS
 
-All message validation is done using L<Mojolicious> objects (L<Mojo::Message::Request> and
+=head2 HTTP Support Libraries
+
+All message parsing and manipulation is done using L<Mojolicious> objects (L<Mojo::Message::Request> and
 L<Mojo::Message::Response>). If messages of other types are passed, conversion is done on a
 best-effort basis, but since different implementations have different levels of adherence to the RFC
 specs, some validation errors may occur e.g. if a certain required header is missing on the
 original. For best results in validating real messages from the network, parse them directly into
 Mojolicious messages (see L<Mojo::Message/parse>).
+
+=head2 Use of Parameter Definitions
 
 Parameter deserialization is performed with the assumption that the request URI has been correctly
 percent-encoded. Failing to encode certain characters that are also used as delimiters for the
@@ -2164,7 +2172,7 @@ encoding characters that are not canonically required to be encoded according to
 L<RFC3986 §2.1|https://www.rfc-editor.org/rfc/rfc3986#section-2.1>, may result in the message not
 being correctly deserialized nor parameter values correctly extracted.
 
-Only certain permutations of OpenAPI documents are supported at this time:
+=head2 Unimplemented sections of the specification
 
 =over 4
 
@@ -2178,11 +2186,11 @@ cookie parameters are not checked at all yet
 
 =item *
 
-C<multipart/*> messages are not yet supported
+C<multipart/*> messages
 
 =item *
 
-OpenAPI descriptions must be contained in a single document; while C<$ref>erences to other documents (such as within a C</components> structure) are supported, C</paths> entries in other documents are not considered at this time.
+C<application/x-www-form-urlencoded> messages and the C<encoding> object within media-type objects
 
 =item *
 
@@ -2190,7 +2198,7 @@ The use of C<$ref> within a path-item object is only allowed when not adjacent t
 
 =item *
 
-Security schemes in the OpenAPI description, and the use of any C<Authorization> headers in requests, are not currently supported.
+The C<Authorization> header is not verified against any security schemes specified in the OpenAPI description. This may in future be implemented via plugins for each security scheme implementation.
 
 =back
 

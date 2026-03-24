@@ -1,3 +1,8 @@
+0.09  2026-03-22
+    - $q->compare($left, $op, $right) for arbitrary comparisons
+    - Enables correlated subqueries, function calls, and expressions
+      as the left-hand side of WHERE comparisons
+
 0.08  2026-03-20
     - SELECT DISTINCT via -distinct => 1 or ->distinct modifier
     - $q->any($subquery) and $q->all($subquery) operators

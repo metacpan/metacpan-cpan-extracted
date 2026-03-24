@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Stream.pm
-## Version v0.2.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/28
-## Modified 2023/09/08
+## Modified 2026/03/09
 ## All rights reserved.
 ## 
 ## 
@@ -18,11 +18,14 @@ BEGIN
     use warnings;
     warnings::register_categories( 'HTTP::Promise' );
     use parent qw( Module::Generic );
-    use vars qw( $FILTER_MAP $CLASSES $ENCODING_SUFFIX $SUFFIX_ENCODING );
-    # use Nice::Try;
+    use vars qw(
+        $FILTER_MAP $CLASSES $ENCODING_SUFFIX $SUFFIX_ENCODING $ENCODING_ALIAS
+        $MIME_ENCODING
+    );
+    use HTTP::Promise::Exception;
     use Scalar::Util;
     use constant HAS_BROWSER_SUPPORT => 1;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.3.0';
 };
 
 use strict;
@@ -50,12 +53,15 @@ no warnings 'uninitialized';
         zip     => [qw( IO::Compress::Zip IO::Uncompress::Unzip )],
         zstd    => [qw( IO::Compress::Zstd IO::Uncompress::UnZstd )],
     };
+    $CLASSES->{br} = $CLASSES->{brotli};
     $CLASSES->{inflate} = $CLASSES->{deflate};
-    $CLASSES->{rawinflate} = $CLASSES->{inflate};
+    $CLASSES->{rawinflate} = $CLASSES->{rawdeflate};
     $CLASSES->{compress} = $CLASSES->{lzw};
     $CLASSES->{'quoted-printable'} = $CLASSES->{qp};
+    $CLASSES->{'x-compress'} = $CLASSES->{lzw};
+    $CLASSES->{uuencode} = $CLASSES->{uu};
     # Permit non-standard call with prefix x-
-    for( qw( bzip2 gzip zip ) )
+    for( qw( bzip2 deflate gzip zip ) )
     {
         $CLASSES->{'x-' . $_} = $CLASSES->{ $_ };
     }
@@ -64,6 +70,7 @@ no warnings 'uninitialized';
     {
         encode =>
         {
+            # NOTE: encode -> base64
             base64 => sub
             {
                 # try-catch
@@ -75,11 +82,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
+                # defined( $rv ) or return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::Base64->error );
                 return( $rv );
             },
+            # NOTE: encode -> brotli
             brotli => sub
             {
                 # try-catch
@@ -91,11 +100,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
+                # $rv or return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::Brotli->error );
                 return( $rv );
             },
+            # NOTE: encode -> bzip2
             bzip2 => sub
             {
                 # try-catch
@@ -107,11 +118,12 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Bzip2::Bzip2Error );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Bzip2::Bzip2Error }) );
                 return( $rv );
             },
+            # NOTE: encode -> deflate
             deflate => sub
             {
                 # try-catch
@@ -123,11 +135,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Deflate::DeflateError );
+                # $rv or return( undef, $IO::Compress::Deflate::DeflateError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Deflate::DeflateError }) );
                 return( $rv );
             },
+            # NOTE: encode -> gzip
             gzip => sub
             {
                 # try-catch
@@ -139,11 +153,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Gzip::GzipError );
+                # $rv or return( undef, $IO::Compress::Gzip::GzipError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Gzip::GzipError }) );
                 return( $rv );
             },
+            # NOTE: encode -> lzf
             lzf => sub
             {
                 # try-catch
@@ -151,15 +167,17 @@ no warnings 'uninitialized';
                 my $rv = eval
                 {
                     require IO::Compress::Lzf;
-                    IO::Compress::Lzf::lzip( $_[0] => $_[1], @_[2..$#_] );
+                    IO::Compress::Lzf::lzf( $_[0] => $_[1], @_[2..$#_] );
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Lzf::LzfError );
+                # $rv or return( undef, $IO::Compress::Lzf::LzfError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Lzf::LzfError }) );
                 return( $rv );
             },
+            # NOTE: encode -> lzip
             lzip => sub
             {
                 # try-catch
@@ -171,11 +189,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Lzip::LzipError );
+                # $rv or return( undef, $IO::Compress::Lzip::LzipError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Lzip::LzipError }) );
                 return( $rv );
             },
+            # NOTE: encode -> lzma
             lzma => sub
             {
                 # try-catch
@@ -187,11 +207,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Lzma::LzmaError );
+                # $rv or return( undef, $IO::Compress::Lzma::LzmaError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Lzma::LzmaError }) );
                 return( $rv );
             },
+            # NOTE: encode -> lzop
             lzop => sub
             {
                 # try-catch
@@ -199,15 +221,17 @@ no warnings 'uninitialized';
                 my $rv = eval
                 {
                     require IO::Compress::Lzop;
-                    IO::Compress::Lzip::lzop( $_[0] => $_[1], @_[2..$#_] );
+                    IO::Compress::Lzop::lzop( $_[0] => $_[1], @_[2..$#_] );
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Lzop::LzopError );
+                # $rv or return( undef, $IO::Compress::Lzop::LzopError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Lzop::LzopError }) );
                 return( $rv );
             },
+            # NOTE: encode -> lzw
             lzw => sub
             {
                 # try-catch
@@ -219,11 +243,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Streem::LZW::LZWError );
+                # $rv or return( undef, $HTTP::Promise::Streem::LZW::LZWError );
+                defined( $rv ) or return( undef, HTTP::Promise::Streem::LZW->error );
                 return( $rv );
             },
+            # NOTE: encode -> qp
             qp => sub
             {
                 # try-catch
@@ -235,11 +261,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
+                # $rv or return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::QuotedPrint->error );
                 return( $rv );
             },
+            # NOTE: encode -> rawdeflate
             rawdeflate => sub
             {
                 # try-catch
@@ -251,11 +279,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::RawDeflate::RawDeflateError );
+                # $rv or return( undef, $IO::Compress::RawDeflate::RawDeflateError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::RawDeflate::RawDeflateError }) );
                 return( $rv );
             },
+            # NOTE: encode -> uu
             uu => sub
             {
                 # try-catch
@@ -267,11 +297,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::UU::UUError );
+                # $rv or return( undef, $HTTP::Promise::Stream::UU::UUError );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::UU->error );
                 return( $rv );
             },
+            # NOTE: encode -> xz
             xz => sub
             {
                 # try-catch
@@ -283,11 +315,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Xz::XzError );
+                # $rv or return( undef, $IO::Compress::Xz::XzError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Xz::XzError }) );
                 return( $rv );
             },
+            # NOTE: encode -> zip
             zip => sub
             {
                 # try-catch
@@ -299,11 +333,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Zip::ZipError );
+                # $rv or return( undef, $IO::Compress::Zip::ZipError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Zip::ZipError }) );
                 return( $rv );
             },
+            # NOTE: encode -> zstd
             zstd => sub
             {
                 # try-catch
@@ -315,14 +351,16 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Compress::Zstd::ZstdError );
+                # $rv or return( undef, $IO::Compress::Zstd::ZstdError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Compress::Zstd::ZstdError }) );
                 return( $rv );
             },
         },
         decode =>
         {
+            # NOTE: decode -> base64
             base64 => sub
             {
                 # try-catch
@@ -334,11 +372,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
+                # $rv or return( undef, $HTTP::Promise::Stream::Base64::Base64Error );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::Base64->error );
                 return( $rv );
             },
+            # NOTE: decode -> brotli
             brotli => sub
             {
                 # try-catch
@@ -350,11 +390,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
+                # defined( $rv ) or return( undef, $HTTP::Promise::Stream::Brotli::BrotliError );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::Brotli->error );
                 return( $rv );
             },
+            # NOTE: decode -> bzip2
             bzip2 => sub
             {
                 # try-catch
@@ -366,11 +408,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::Bunzip2::Bunzip2Error );
+                # $rv or return( undef, $IO::Uncompress::Bunzip2::Bunzip2Error );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::Bunzip2::Bunzip2Error }) );
                 return( $rv );
             },
+            # NOTE: decode -> gzip
             gzip => sub
             {
                 # try-catch
@@ -382,11 +426,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::Gunzip::GunzipError );
+                # $rv or return( undef, $IO::Uncompress::Gunzip::GunzipError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::Gunzip::GunzipError }) );
                 return( $rv );
             },
+            # NOTE: decode -> inflate
             inflate => sub
             {
                 # try-catch
@@ -398,11 +444,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::Inflate::InflateError );
+                # $rv or return( undef, $IO::Uncompress::Inflate::InflateError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::Inflate::InflateError }) );
                 return( $rv );
             },
+            # NOTE: decode -> lzf
             lzf => sub
             {
                 # try-catch
@@ -414,11 +462,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::UnLzf::UnLzfError );
+                # $rv or return( undef, $IO::Uncompress::UnLzf::UnLzfError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::UnLzf::UnLzfError }) );
                 return( $rv );
             },
+            # NOTE: decode -> lzip
             lzip => sub
             {
                 # try-catch
@@ -430,11 +480,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::UnLzip::UnLzipError );
+                # $rv or return( undef, $IO::Uncompress::UnLzip::UnLzipError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::UnLzip::UnLzipError }) );
                 return( $rv );
             },
+            # NOTE: decode -> lzma
             lzma => sub
             {
                 # try-catch
@@ -446,11 +498,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::UnLzma::UnLzmaError );
+                # $rv or return( undef, $IO::Uncompress::UnLzma::UnLzmaError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::UnLzma::UnLzmaError }) );
                 return( $rv );
             },
+            # NOTE: decode -> lzop
             lzop => sub
             {
                 # try-catch
@@ -462,11 +516,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::UnLzop::UnLzopError );
+                # $rv or return( undef, $IO::Uncompress::UnLzop::UnLzopError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::UnLzop::UnLzopError }) );
                 return( $rv );
             },
+            # NOTE: decode -> lzw
             lzw => sub
             {
                 # try-catch
@@ -478,11 +534,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Streem::LZW::LZWError );
+                # $rv or return( undef, $HTTP::Promise::Streem::LZW::LZWError );
+                defined( $rv ) or return( undef, HTTP::Promise::Streem::LZW->error );
                 return( $rv );
             },
+            # NOTE: decode -> qp
             qp => sub
             {
                 # try-catch
@@ -494,11 +552,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
+                # $rv or return( undef, $HTTP::Promise::Stream::QuotedPrint::QuotedPrintError );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::QuotedPrint->error );
                 return( $rv );
             },
+            # NOTE: decode -> rawinflate
             rawinflate => sub
             {
                 # try-catch
@@ -510,11 +570,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::RawInflate::RawInflateError );
+                # $rv or return( undef, $IO::Uncompress::RawInflate::RawInflateError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::RawInflate::RawInflateError }) );
                 return( $rv );
             },
+            # NOTE: decode -> uu
             uu => sub
             {
                 # try-catch
@@ -526,11 +588,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $HTTP::Promise::Stream::UU::UUError );
+                # $rv or return( undef, $HTTP::Promise::Stream::UU::UUError );
+                defined( $rv ) or return( undef, HTTP::Promise::Stream::UU->error );
                 return( $rv );
             },
+            # NOTE: decode -> xz
             xz => sub
             {
                 # try-catch
@@ -542,11 +606,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::UnXz::UnXzError );
+                # $rv or return( undef, $IO::Uncompress::UnXz::UnXzError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::UnXz::UnXzError }) );
                 return( $rv );
             },
+            # NOTE: decode -> zip
             zip => sub
             {
                 # try-catch
@@ -558,11 +624,13 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::Unzip::UnzipError );
+                # $rv or return( undef, $IO::Uncompress::Unzip::UnzipError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::Unzip::UnzipError }) );
                 return( $rv );
             },
+            # NOTE: decode -> zstd
             zstd => sub
             {
                 # try-catch
@@ -574,9 +642,10 @@ no warnings 'uninitialized';
                 };
                 if( $@ )
                 {
-                    return( undef, $@ );
+                    return( undef, HTTP::Promise::Exception->new({ message => $@ }) );
                 }
-                $rv or return( undef, $IO::Uncompress::UnZstd::UnZstdError );
+                # $rv or return( undef, $IO::Uncompress::UnZstd::UnZstdError );
+                $rv or return( undef, HTTP::Promise::Exception->new({ message => $IO::Uncompress::UnZstd::UnZstdError }) );
                 return( $rv );
             },
         }
@@ -587,6 +656,14 @@ no warnings 'uninitialized';
     $FILTER_MAP->{decode}->{ 'x-gzip' } = $FILTER_MAP->{decode}->{gzip};
     $FILTER_MAP->{encode}->{ 'x-bzip2' } = $FILTER_MAP->{encode}->{bzip2};
     $FILTER_MAP->{decode}->{ 'x-bzip2' } = $FILTER_MAP->{decode}->{bzip2};
+    $FILTER_MAP->{encode}->{ 'x-compress' } = $FILTER_MAP->{encode}->{lzw};
+    $FILTER_MAP->{decode}->{ 'x-compress' } = $FILTER_MAP->{decode}->{lzw};
+    $FILTER_MAP->{encode}->{br} = $FILTER_MAP->{encode}->{brotli};
+    $FILTER_MAP->{decode}->{br} = $FILTER_MAP->{decode}->{brotli};
+    $FILTER_MAP->{encode}->{compress} = $FILTER_MAP->{encode}->{lzw};
+    $FILTER_MAP->{decode}->{compress} = $FILTER_MAP->{decode}->{lzw};
+    $FILTER_MAP->{encode}->{uuencode} = $FILTER_MAP->{encode}->{uu};
+    $FILTER_MAP->{decode}->{uuencode} = $FILTER_MAP->{decode}->{uu};
     # deflate <-> inflate, make the choice of word irrelevant
     $FILTER_MAP->{decode}->{deflate} = $FILTER_MAP->{decode}->{inflate};
     $FILTER_MAP->{encode}->{inflate} = $FILTER_MAP->{encode}->{deflate};
@@ -620,7 +697,36 @@ no warnings 'uninitialized';
         uu      => 'uu',
         xz      => 'xz',
         zip     => 'zip',
-        zstd    => 'zstd',
+        zstd    => 'zst',
+    };
+
+    $ENCODING_ALIAS =
+    {
+        br                  => 'brotli',
+        'x-gzip'            => 'gzip',
+        'x-bzip2'           => 'bzip2',
+        'x-compress'        => 'lzw',
+        'x-uuencode'        => 'uu',
+        'x-zip'             => 'zip',
+        'compress'          => 'lzw',
+        'inflate'           => 'deflate',
+        'quoted-printable'  => 'qp',
+        'rawinflate'        => 'rawdeflate',
+        'uuencode'          => 'uu',
+    };
+
+    $MIME_ENCODING =
+    {
+        'application/gzip'          => 'gzip',
+        'application/x-gzip'        => 'gzip',
+        'application/x-bzip2'       => 'bzip2',
+        'application/x-xz'          => 'xz',
+        'application/zstd'          => 'zstd',
+        'application/x-compress'    => 'lzw',
+        'application/x-lzma'        => 'lzma',
+        'application/x-lzip'        => 'lzip',
+        'application/x-lzop'        => 'lzop',
+        'application/x-lzf'         => 'lzf',
     };
 }
 
@@ -628,7 +734,8 @@ sub init
 {
     my $self = shift( @_ );
     my $src  = shift( @_ );
-    return( $self->error( "No stream was provided." ) ) if( !defined( $src ) && !length( $src ) );
+    no warnings 'uninitialized';
+    return( $self->error( "No stream was provided." ) ) if( !defined( $src ) || !length( $src ) );
     my $type = ref( $src ) ? lc( Scalar::Util::reftype( $src ) ) : '';
     if( ref( $src ) )
     {
@@ -677,7 +784,7 @@ sub as_string
         my $type = lc( Scalar::Util::reftype( $src ) );
         if( $type eq 'scalar' )
         {
-            return( length( ${$src} ) );
+            return( ${$src} );
         }
         elsif( $type eq 'glob' )
         {
@@ -832,8 +939,10 @@ sub encoding2suffix
     my $ext = $self->new_array;
     foreach( @$encodings )
     {
-        return( $self->error( "Unknown encoding provided \"$_\"." ) ) if( !exists( $ENCODING_SUFFIX->{ $_ } ) );
-        $ext->push( $ENCODING_SUFFIX->{ $_ } );
+        my $enc;
+        $enc = exists( $ENCODING_ALIAS->{ $_ } ) ? $ENCODING_ALIAS->{ $_ } : $_;
+        return( $self->error( "Unknown encoding provided \"${enc}\"." ) ) if( !exists( $ENCODING_SUFFIX->{ $enc } ) );
+        $ext->push( $ENCODING_SUFFIX->{ $enc } );
     }
     return( $ext );
 }
@@ -857,6 +966,16 @@ sub load
     }
     return(1) if( $ok == 2 );
     return(0);
+}
+
+sub mime2encoding
+{
+    my $self = shift( @_ );
+    my $mime = shift( @_ ) || return( $self->error( "No MIME type was provided." ) );
+    $mime = lc( "${mime}" );
+    # Strip parameters like '; charset=binary'
+    $mime =~ s/[[:blank:]]*;.*$// if( index( $mime, ';' ) != -1 );
+    return( $MIME_ENCODING->{ $mime } );
 }
 
 # $stream->read( $buffer, $len, $offset );
@@ -897,6 +1016,7 @@ sub read
             my $params = $self->_io_compress_params( $opts );
             my $filters = $FILTER_MAP->{decode};
             return( $self->error( "Unknown decoding \"$dec\"." ) ) if( !exists( $filters->{ $dec } ) );
+            # $err, if defined, would be a HTTP::Promise::Exception object
             my( $rv, $err ) = $filters->{ $dec }->( $self->_normalise( $src ) => "$tempfile", %$params );
             my $size = $self->_get_size( $src );
             return( $self->error( "Unable to decode $size bytes of data into the stream with $dec and input '", $self->_normalise( $src ), "' and output '", $tempfile, "': $err" ) ) if( !defined( $rv ) );
@@ -1065,6 +1185,7 @@ sub suffix2encoding
         my @vals = @$ENCODING_SUFFIX{ @keys };
         $SUFFIX_ENCODING = {};
         @$SUFFIX_ENCODING{ @vals } = @keys;
+        $SUFFIX_ENCODING->{Z} = 'lzw' unless( CORE::exists( $SUFFIX_ENCODING->{Z} ) );
     }
     my $encs = $self->new_array;
     foreach( @parts )
@@ -1444,8 +1565,15 @@ sub _decodable_encodable
         }
         my $encoder_class = $CLASSES->{ $enc }->[$offset];
         my $is_installed_method = ( $enc_or_dec ? 'is_encoder_installed' : 'is_decoder_installed' );
+        # Load the module if it is one of ours, so we can then use the method 'is_encoder_installed' or 'is_decoder_installed'
+        if( substr( $encoder_class, 0, length( 'HTTP::Promise::Stream' ) ) eq 'HTTP::Promise::Stream' )
+        {
+            $self->_load_class( $encoder_class ) || return( $self->pass_error );
+        }
+
         if( my $coderef = $encoder_class->can( $is_installed_method ) )
         {
+            my $rv = $coderef->();
             $res->push( $enc ) if( $coderef->() );
         }
         elsif( $self->_is_class_loadable( $encoder_class ) )
@@ -1454,6 +1582,18 @@ sub _decodable_encodable
         }
     }
     return( $res );
+}
+
+sub _encoding2suffix_map
+{
+    my $self = shift( @_ );
+    unless( defined( $ENCODING_SUFFIX ) && %$ENCODING_SUFFIX )
+    {
+        # Initialisation défensive - normalement déjà fait dans le bloc BEGIN
+        $ENCODING_SUFFIX = {};
+    }
+    my $copy = { %{$ENCODING_SUFFIX} };
+    return( $copy );
 }
 
 sub _get_size
@@ -1796,7 +1936,7 @@ HTTP::Promise::Stream - Data Stream Encoding and Decoding
 
 =head1 VERSION
 
-    v0.2.0
+    v0.3.0
 
 =head1 DESCRIPTION
 
@@ -2165,7 +2305,7 @@ Requires L<Compress::LZW> for encoding and for decoding.
 
 A.k.a C<compress>, this was used commonly until some corporation purchased the patent and started asking everyone for royalties. The patent expired in 2003. Gzip took over since then.
 
-=item QuptedPrint
+=item QuotedPrint
 
 Requires the XS module L<MIME::QuotedPrint> for encoding and decoding.
 

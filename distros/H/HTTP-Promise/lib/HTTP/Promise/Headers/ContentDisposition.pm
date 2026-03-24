@@ -45,7 +45,7 @@ sub init
     return( $self );
 }
 
-sub as_string { return( shift->_hv_as_string( [qw( name filename )] ) ); }
+sub as_string { return( shift->_hv_as_string( [qw( name filename )], { quote => 'name' } ) ); }
 
 sub disposition
 {

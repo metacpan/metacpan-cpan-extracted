@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use TestGit qw( require_git_c );
+require_git_c();
 use File::Temp qw( tempdir );
 use Cwd qw( abs_path getcwd );
 use IPC::Open3 qw( open3 );

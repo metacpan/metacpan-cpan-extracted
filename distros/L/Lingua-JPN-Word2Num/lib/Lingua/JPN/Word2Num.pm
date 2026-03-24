@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); -*-
 
 package Lingua::JPN::Word2Num;
 # ABSTRACT: Word 2 number conversion in JPN.
@@ -10,17 +10,12 @@ use 5.10.1;
 use strict;
 use warnings;
 
-use Perl6::Export::Attrs;
-
+use Export::Attrs;
 use Parse::RecDescent;
+
 # }}}
 # {{{ variable declarations
-
-our $VERSION = 0.0682;
-our $INFO    = {
-    rev  => '$Rev: 682 $',
-};
-
+our $VERSION = '0.2603230';
 my $parser = ja_numerals();
 
 # }}}
@@ -152,20 +147,30 @@ __END__
 
 # {{{ POD HEAD
 
+=pod
+
 =head1 NAME
 
-Lingua::JPN::Word2Num
+=head2 Lingua::JPN::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for Japanese.
-Input text must be encoded in utf-8.
+Word 2 number conversion in JPN.
 
-=head2 $Rev: 682 $
+Lingua::JPN::Word2Num is module for converting text containing number
+representation in Japanese back into number. Converts whole numbers from 0 up
+to 999 999 999 999.
 
-ISO 639-3 namespace.
+Input text must be encoded in UTF-8.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -175,36 +180,46 @@ ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
+=cut
 
-Word 2 number conversion in JPN.
+# }}}
+# {{{ Functions Reference
 
-Lingua::JPN::Word2Num is module for converting text containing number
-representation in Japanese back into number. Converts whole numbers from 0 up
-to 999 999 999 999.
+=pod
+
+=head1 Functions Reference
+
+=over 2
+
+=item B<w2n> (positional)
+
+  1   str    string to convert
+  =>  num    converted number
+  =>  undef  if input string is not known
+
+Convert text representation to number.
+
+=item B<ja_numerals> (void)
+
+  =>  obj  new parser object
+
+Internal parser.
+
+=back
 
 =cut
 
 # }}}
-# {{{ Functions reference
+# {{{ EXPORTED FUNCTIONS
 
 =pod
 
-=head2 Functions Reference
+=head1 EXPORT_OK
 
-=over
+=over 2
 
-=item w2n (positional)
+=item w2n
 
-  1   string  string to convert
-  =>  number  converted number
-      undef   if input string is not known
-
-Convert text representation to number.
-
-=item ja_numerals
-
-Internal parser.
 
 =back
 
@@ -215,28 +230,15 @@ Internal parser.
 
 =pod
 
-=head1 EXPORT_OK
-
-w2n
-
-=head1 KNOWN BUGS
-
-None.
-
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
+
    Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

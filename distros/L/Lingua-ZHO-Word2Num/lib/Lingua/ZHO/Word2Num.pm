@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::ZHO::Word2Num;
 # ABSTRACT: Word 2 number conversion in ZHO.
@@ -10,13 +10,12 @@ use 5.10.1;
 use strict;
 use warnings;
 
-use Perl6::Export::Attrs;
+use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-
-our $VERSION = 0.0682;
+our $VERSION = '0.2603230';
 my  $parser  = zho_numerals();
 
 # }}}
@@ -26,9 +25,11 @@ my  $parser  = zho_numerals();
 sub w2n :Export {
     my $input = shift // return;
 
+    return 0 if ($input =~ m{\b(nul|ling)\b}xmsi);
+
     $input .= " "; # Grant space at the end
 
-    return $parser->numeral($input);
+    return $parser->numeral($input) || undef;
 }
 
 # }}}
@@ -50,7 +51,8 @@ sub zho_numerals {
         |     'San ' { $return = 3; }
         |     'Si '  { $return = 4; }
         |     'Wu '  { $return = 5; }
-        |     'Liu ' { $return = 6; }        |     'Qi '  { $return = 7; }
+        |     'Liu ' { $return = 6; }
+        |     'Qi '  { $return = 7; }
         |     'Ba '  { $return = 8; }
         |     'Jiu ' { $return = 9; }
         |     'Shi ' { $return = 10; }
@@ -154,18 +156,26 @@ __END__
 
 =head1 NAME
 
-Lingua::ZHO::Word2Num
+=head2 Lingua::ZHO::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for Chinese.
-Input text must be encoded in utf-8.
+Word 2 number conversion in ZHO.
 
-=head2 $Rev: 682 $
+Lingua::ZHO::Word2Num is module for converting text containing number
+representation in Chinese back into number. Converts whole numbers
+from 0 up to 999 999 999 999.
 
-ISO 639-3 namespace.
+Input text must be encoded in UTF-8.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -175,30 +185,46 @@ ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
+=cut
 
-Word 2 number conversion in ZHO.
+# }}}
+# {{{ Functions Reference
 
-Lingua::ZHO::Word2Num is module for converting text containing number
-representation in Chinese back into number. Converts whole numbers
-from 0 up to 999 999 999 999.
+=pod
+
+=head1 Functions Reference
+
+=over 2
+
+=item B<w2n> (positional)
+
+  1   str  string to convert
+  =>  num  converted number
+
+Convert text representation to number.
+
+
+=item B<zho_numerals> (void)
+
+  =>  obj  new parser object
+
+Internal parser.
+
+
+=back
 
 =cut
 
 # }}}
-# {{{ Functions reference
+# {{{ EXPORTED FUNCTIONS
 
-=head2 Functions Reference
+=pod
 
-=over
+=head1 EXPORT_OK
 
-=item w2n (positional)
+=over 2
 
-Convert text representation to number.
-
-=item zho_numerals
-
-Internal parser.
+=item w2n
 
 =back
 
@@ -209,25 +235,15 @@ Internal parser.
 
 =pod
 
-=head1 EXPORT_OK
-
-w2n
-
-=head1 KNOWN BUGS
-
-None.
-
 =head1 AUTHOR
 
-Vitor Serra Mori <info@petamem.com>
+ coding, maintenance, refactoring, extensions, specifications:
+
+   Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2003-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2003-present
 
 =cut
 

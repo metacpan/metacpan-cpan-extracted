@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use SQL::Wizard::Renderer;
 use SQL::Wizard::Expr::Column;
@@ -338,6 +338,19 @@ sub not_between {
     bind         => [],
     _not_between => { col => $col, lo => $lo, hi => $hi },
     _renderer    => $self->{renderer},
+  );
+}
+
+sub compare {
+  my ($self, $left, $op, $right) = @_;
+  $left  = $self->col($left)  if (!ref $left && $left =~ /^[\w.]+$/);
+  $left  = $self->val($left)  if (!ref $left);
+  $right = $self->val($right) if (!ref $right);
+  SQL::Wizard::Expr::Raw->new(
+    sql       => '',
+    bind      => [],
+    _compare  => { left => $left, op => $op, right => $right },
+    _renderer => $self->{renderer},
   );
 }
 

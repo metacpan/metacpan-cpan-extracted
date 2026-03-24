@@ -45,12 +45,6 @@
          }
       }
    },
-   "provides" : {
-      "EV::MariaDB" : {
-         "file" : "lib/EV/MariaDB.pm",
-         "version" : "0.01"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -62,6 +56,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-mariadb"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

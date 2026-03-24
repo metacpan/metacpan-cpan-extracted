@@ -4,7 +4,7 @@ Git::RemoteURL::Parse - Parse and classify Git remote URLs (GitHub, GitLab)
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -79,9 +79,13 @@ Klaus Rindfrey, `<klausrin at cpan.org.eu>`
 
 # BUGS
 
-Please report any bugs or feature requests to `bug-git-remoteurl-parse at rt.cpan.org`, or through
-the web interface at [https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Git-RemoteURL-Parse](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Git-RemoteURL-Parse).  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to `bug-git-remoteurl-parse at
+rt.cpan.org`, or through the web interface at
+[https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Git-RemoteURL-Parse](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Git-RemoteURL-Parse) or
+create a [GitHub
+Issue](https://github.com/klaus-rindfrey/perl-git-remoteurl-parse/issues). I
+will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
 
 # SUPPORT
 

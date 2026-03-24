@@ -1,5 +1,55 @@
 Revision history for Perl module HTTP::Promise
 
+v0.7.3 2026-03-09T13:13:37+0900
+    - HTTP::Promise::Body::Form::Data: When building a multipart/form-data request
+      with a Module::Generic::File object, the MIME type is now properly split into
+      Content-Type (inner format, e.g. application/x-tar) and Content-Encoding
+      (compression layer, e.g. gzip) for compressed archives such as .tar.gz, .tar.bz2,
+      .tar.xz, .tar.zst. Multiple encoding layers are supported.
+    - HTTP::Promise::Stream: Added package variable $MIME_ENCODING and new public method
+      mime2encoding() to map a MIME type (e.g. application/gzip) to its encoding token
+      (e.g. gzip).
+    - HTTP::Promise::Stream: Added $ENCODING_ALIAS table (x-gzip, x-bzip2, x-uuencode,
+      x-compress, compress, x-zip, inflate, quoted-printable, rawinflate, uuencode)
+      and use it in encoding2suffix() to resolve aliases before lookup.
+    - HTTP::Promise::Stream: Added $CLASSES aliases for br, x-compress, and uuencode.
+    - HTTP::Promise::Stream: Added Z => lzw to the $SUFFIX_ENCODING reverse map to
+      support legacy Unix .Z compressed files.
+    - HTTP::Promise::Stream: Fixed rawinflate class alias (was wrongly pointing to
+      inflate instead of rawdeflate).
+    - HTTP::Promise::Stream: Added deflate to the list of encodings checked for browser
+      support.
+    - HTTP::Promise::Stream: Improved error propagation — encoding/decoding errors now
+      return proper HTTP::Promise::Exception objects instead of raw $@ strings.
+    - HTTP::Promise::Stream: Fixed init() condition (!defined || !length replacing && ).
+    - HTTP::Promise::Stream: Added private method _encoding2suffix_map() returning a
+      shallow copy of $ENCODING_SUFFIX for safe cross-package access.
+    - HTTP::Promise::Stream: Fixed typo in POD (QuptedPrint -> QuotedPrint).
+    - HTTP::Promise::Stream: Corrected version to v0.3.0.
+    - HTTP::Promise::Stream::Base64, Brotli, LZW, QuotedPrint: Fixed bare return
+      statements to return pass_error() instead; replaced string eval with block eval
+      using local $SIG{__DIE__} for safer optional module loading.
+    - HTTP::Promise::Stream::UU: Same bare-return and debug message improvements.
+    - HTTP::Promise::Headers: Improved header() setter — validates header name, and
+      dispatches to the dedicated accessor method when one exists for the given field.
+    - HTTP::Promise::Headers: Improved _date_header() to handle Module::Generic::DateTime
+      and DateTime objects explicitly before falling through to the epoch/string path;
+      fixed argument order in warning message.
+    - HTTP::Promise::Headers: Corrected version to v0.3.2.
+    - HTTP::Promise::Message: Improved error message for bad header argument.
+    - HTTP::Promise::Message: Fixed decode_json() to use new_json_safe() and properly
+      dereference the scalar ref returned; improved error reporting.
+    - HTTP::Promise::Message: Fixed missing pass_error() propagation in decode_content().
+    - HTTP::Promise::Message: Corrected version to v0.3.3.
+    - HTTP::Promise::Request: Added convenience method authorization_basic() delegating
+      to the headers object.
+    - HTTP::Promise::Response: Added uri() method and initialised uri property in init().
+    - HTTP::Promise::Entity: Fixed indentation of the codec options hash; added debug
+      option propagation to the stream decoder.
+    - t/07.stream-suffix.t: Corrected zstd test cases to use .zst extension.
+    - Added warning when content data provided is text content and is provided in Perl
+      internal utf8 encoding.
+
 v0.7.2 2025-10-19T16:47:20+0900
     - Improved error() in HTTP::Promise::Headers
 

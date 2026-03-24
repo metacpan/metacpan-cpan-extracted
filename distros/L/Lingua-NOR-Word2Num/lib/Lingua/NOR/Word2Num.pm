@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::NOR::Word2Num;
 # ABSTRACT: Word 2 number conversion in NOR.
@@ -9,18 +9,14 @@ use 5.10.1;
 
 use strict;
 use warnings;
+use utf8;
 
-use Perl6::Export::Attrs;
+use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-
-our $VERSION = 0.0682;
-our $INFO    = {
-    rev  => '$Rev: 682 $',
-};
-
+our $VERSION = '0.2603230';
 my $parser = no_numerals();
 
 # }}}
@@ -36,7 +32,9 @@ sub w2n :Export {
     $input =~ s/,//g;
     $input =~ s/ //g;
 
-    return $parser->numeral($input);
+    return 0 if $input eq 'null';
+
+    return $parser->numeral($input) || undef;
 }
 
 # }}}
@@ -138,18 +136,26 @@ __END__
 
 =head1 NAME
 
-Lingua::NOR::Word2Num
+=head2 Lingua::NOR::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for Norwegian.
-Input text must be encoded in utf-8.
+Word 2 number conversion in NOR.
 
-=head2 $Rev: 682 $
+Lingua::NOR::Word2Num is module for converting text containing number
+representation in Norwegian back into number. Converts whole numbers
+from 0 up to 999 999 999.
 
-ISO 639-3 namespace.
+Input text must be encoded in UTF-8.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -159,34 +165,32 @@ ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
-
-Word 2 number conversion in NOR.
-
-Lingua::NOR::Word2Num is module for converting text containing number
-representation in Norwegian back into number. Converts whole numbers
-from 0 up to 999 999 999.
-
 =cut
 
 # }}}
-# {{{ Functions reference
+# {{{ Functions Reference
 
-=head2 Functions Reference
+=pod
 
-=over
+=head1 Functions Reference
 
-=item w2n (positional)
+=over 2
 
-  1   string  string to convert
-  =>  number  covnerted number
-      undef   if input string is not known
+=item B<w2n> (positional)
+
+  1   str    string to convert
+  =>  num    covnerted number
+      undef  if input string is not known
 
 Convert text representation to number.
 
-=item no_numerals
+
+=item B<no_numerals> (void)
+
+  =>  obj  new parser object
 
 Internal parser.
+
 
 =back
 
@@ -200,17 +204,12 @@ Internal parser.
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
+
    Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

@@ -25,7 +25,7 @@ my $m = EV::MariaDB->new(
 );
 
 # 1. query-level error (bad SQL) — delivered via callback
-$m->query("SELECT * FROM nonexistent_table_xyzzy", sub {
+$m->query("select * from nonexistent_table_xyzzy", sub {
     my ($res, $err) = @_;
     if ($err) {
         print "query error (expected): $err\n";
@@ -34,7 +34,7 @@ $m->query("SELECT * FROM nonexistent_table_xyzzy", sub {
     }
 
     # 2. valid query still works after an error
-    $m->query("SELECT 1 AS ok", sub {
+    $m->query("select 1 as ok", sub {
         my ($rows, $err) = @_;
         die "recovery query failed: $err\n" if $err;
         print "recovery query: ok=", $rows->[0][0], "\n";

@@ -193,17 +193,20 @@ eval {
     # ─── async + EV ─────────────────────────────────────
     print "\nDBD::Pg async + EV:\n";
 
-    my $socket = $dbh->{pg_socket};
+    # fresh connection for async tests (avoids prepared statement conflicts)
+    my $dbh2 = DBI->connect("dbi:Pg:$conninfo", '', '', {
+        RaiseError => 1, PrintError => 0,
+    });
+    my $socket = $dbh2->{pg_socket};
 
     # SELECT async
     {
-        my $sth = $dbh->prepare("select \$1::int", {pg_async => DBD::Pg::PG_ASYNC()});
+        my $sth = $dbh2->prepare("select \$1::int", {pg_async => DBD::Pg::PG_ASYNC()});
         my $i = 0;
         my $t0 = time;
         $sth->execute($i);
         my $w; $w = EV::io($socket, EV::READ, sub {
-            $dbh->pg_result;
-            $sth->fetchrow_arrayref;
+            $dbh2->pg_result;
             if (++$i >= $N) {
                 undef $w;
                 my $elapsed = time - $t0;
@@ -216,19 +219,20 @@ eval {
         });
         EV::run;
         $sth->finish;
+        $dbh2->do("deallocate all");
     }
 
     # INSERT async
     {
-        $dbh->do("create temp table bench_dbd_ins2 (id int, val text)");
-        my $sth = $dbh->prepare(
+        $dbh2->do("create temp table bench_dbd_ins2 (id int, val text)");
+        my $sth = $dbh2->prepare(
             "insert into bench_dbd_ins2 values (\$1, \$2)",
             {pg_async => DBD::Pg::PG_ASYNC()});
         my $i = 0;
         my $t0 = time;
         $sth->execute($i, "row_$i");
         my $w; $w = EV::io($socket, EV::READ, sub {
-            $dbh->pg_result;
+            $dbh2->pg_result;
             if (++$i >= $N) {
                 undef $w;
                 my $elapsed = time - $t0;
@@ -241,19 +245,20 @@ eval {
         });
         EV::run;
         $sth->finish;
+        $dbh2->do("deallocate all");
     }
 
     # UPSERT async
     {
-        $dbh->do("create temp table bench_dbd_ups2 (id int primary key, val text)");
-        my $sth = $dbh->prepare(
+        $dbh2->do("create temp table bench_dbd_ups2 (id int primary key, val text)");
+        my $sth = $dbh2->prepare(
             "insert into bench_dbd_ups2 values (\$1, \$2) on conflict (id) do update set val = excluded.val",
             {pg_async => DBD::Pg::PG_ASYNC()});
         my $i = 0;
         my $t0 = time;
         $sth->execute($i % ($N / 2), "v_$i");
         my $w; $w = EV::io($socket, EV::READ, sub {
-            $dbh->pg_result;
+            $dbh2->pg_result;
             if (++$i >= $N) {
                 undef $w;
                 my $elapsed = time - $t0;
@@ -267,6 +272,8 @@ eval {
         EV::run;
         $sth->finish;
     }
+
+    $dbh2->disconnect;
 
     $dbh->disconnect;
 };

@@ -5,7 +5,7 @@ Getopt::EX::Hashed - Hash object automation for Getopt::Long
 
 # VERSION
 
-Version 1.0701
+Version 1.0702
 
 # SYNOPSIS
 
@@ -170,9 +170,9 @@ Following parameters are available.
     as `undef`.
 
     If the value is a reference to an ARRAY or HASH, a shallow copy is
-    created for each `new` call.  This means the reference itself is
-    copied, but the contents are shared.  Modifying the array or hash
-    contents will affect all instances.
+    created for each `new` call.  The elements are not deep-copied, so
+    if any element is itself a reference, the referenced data is shared
+    across instances.
 
     If a code reference is given, it is called at the time of **new** to
     get default value.  This is effective when you want to evaluate the

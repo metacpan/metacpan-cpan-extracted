@@ -1,5 +1,69 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.4501 2026-03-24T06:56:56Z
+
+    - Require Getopt::EX::Hashed 1.0702 to fix --limit default
+      value preservation when specifying additional keys
+    - Add tests for --limit option
+
+4.45 2026-03-23T06:19:27Z
+
+    - Add --limit option to sdif and cdif
+      sdif: --limit line=# to truncate long add/delete sections
+      sdif: --limit length=# to truncate long lines (default 10000)
+      cdif: --limit length=# to skip word diff for long lines (default 1000)
+    - Add NOTICE colormap entry for truncation messages
+    - Change $oline/$nline/$mline from my to our for local scoping
+
+4.44 2026-02-09T14:46:43Z
+
+    - Replace App::sdif::Divert with independent IO::Divert module
+    - cdif: fix $diff variable bug when --diff option is specified
+    - Fix grammar errors and typos in documentation
+
+4.43 2026-01-28T07:12:14Z
+
+    - cdif: add --visible support for nbsp and special space characters
+    - update copyright years to 2026
+
+4.42 2026-01-19T06:45:24Z
+
+    - Add --version option to sdif, cdif, watchdiff
+    - Use Command::Run module
+
+4.41 2025-02-13T06:15:20Z
+
+    - improve handling CRNL ending text
+
+4.40 2025-01-29T06:52:04Z
+
+    - introduce "cdif --lxl --style=diff" option
+
+4.39 2024-12-30T09:43:31Z
+
+    - correct behavior of printing filename in conflict marker case
+
+4.38 2024-10-30T10:34:35Z
+
+    - print filename from conflict-marker diff input
+    - update --no-command behavior and introduce --no-filename option
+
+4.37 2024-10-19T02:33:20Z
+
+    - cdif does not \p{Punct} sequence as a word
+
+4.36 2024-10-18T05:45:19Z
+
+    - improve mecab algorithm to split non-word sequence
+
+4.35 2024-10-06T07:04:40Z
+
+    - sdif supports #ifdef and custom container format
+
+4.34 2024-09-24T14:09:21Z
+
+    - update watchdiff with scroll region control
+
 4.3301 2024-03-27T06:50:25Z
 
     - fix bug of cdif producing extra empty lines

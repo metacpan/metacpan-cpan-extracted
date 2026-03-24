@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Message.pm
-## Version v0.3.2
+## Version v0.3.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2025/10/19
+## Modified 2026/03/08
 ## All rights reserved.
 ## 
 ## 
@@ -26,7 +26,7 @@ BEGIN
     our $CRLF = "\015\012";
     # HTTP/1.0, HTTP/1.1, HTTP/2
     our $HTTP_VERSION  = qr/(?<http_protocol>HTTP\/(?<http_version>(?<http_vers_major>[0-9])(?:\.(?<http_vers_minor>[0-9]))?))/;
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.3.3';
 };
 
 use strict;
@@ -78,7 +78,7 @@ sub init
     }
     elsif( @_ && ref( $_[0] ) ne 'HASH' )
     {
-        return( $self->error( "Bad header argument: ", $_[0] ) );
+        return( $self->error( "Bad header argument. I was expecting an headers object, or an hash reference, but got: ", $_[0] ) );
     }
     
     if( defined( $headers ) )
@@ -602,6 +602,11 @@ sub decoded_content_utf8
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{binmode} = 'utf-8';
     my $data = $self->decoded_content( $opts );
+    if( !defined( $data ) && $self->error )
+    {
+        return( $self->pass_error );
+    }
+
     if( $self->headers->content_is_xml )
     {
         # Get rid of the XML encoding declaration if present
@@ -621,18 +626,21 @@ sub decoded_json
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{binmode} = 'utf-8';
     my $data = $self->decoded_content_utf8( $opts );
+    return( $self->pass_error ) if( !defined( $data ) && $self->error );
+    return if( !defined( $data ) );
     if( $self->headers->content_is_json )
     {
         local $@;
         # try-catch
-        my $ref = eval
+        my $ref = $self->new_json_safe->relaxed->decode( $$data );
+        if( !defined( $ref ) && $self->error )
         {
-            return( $self->new_json->relaxed->decode( $$data ) );
-        };
-        return( $self->error( "Error decoding JSON payload: $@\nPayload was: $data" ) ) if( $@ );
+            my $err = $self->error->message;
+            return( $self->error( "Error decoding JSON payload: $err\nPayload was: $$data" ) );
+        }
         return( $ref );
     }
-    return( $data );
+    return( $$data );
 }
 
 sub dump
@@ -1154,7 +1162,7 @@ HTTP::Promise::Message - HTTP Message Class
 
 =head1 VERSION
 
-    v0.3.2
+    v0.3.3
 
 =head1 DESCRIPTION
 

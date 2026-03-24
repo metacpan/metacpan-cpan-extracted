@@ -57,10 +57,10 @@ __END__
 
 =head1 NAME
 
-Test::Async::Microservice::Time - init and configure Async-Microservice-Time for testing
+Test::Async::Microservice::HelloWorld - init and configure Async-Microservice-HelloWorld for testing
 
 =head1 DESCRIPTION
 
-See F<t/02_Async-Microservice-Time.t>.
+See F<t/01_Async-Microservice.t>.
 
 =cut

@@ -1,3 +1,4 @@
+audit.log
 Changes
 ignore.txt
 lib/Medusa.pm
@@ -11,6 +12,9 @@ t/02-medusa-import.t
 t/03-audit-attribute.t
 t/04-log-message.t
 t/05-custom-logger.t
+t/06-elapsed.t
+t/07-format-message.t
+t/08-custom-format.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

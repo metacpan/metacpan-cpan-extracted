@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ Cheat Sheet                               [TH] ภาษาไทย
+======================================================================
+
+[ 1. สร้าง Query (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  หมายเหตุ: เมธอดปลายทางแต่ละครั้งจะใช้ iterator จนหมด
+    หากต้องการใช้ข้อมูลซ้ำ ให้เรียก From() / FromLTSV() อีกครั้ง
+
+[ 2. การกรอง (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  กรององค์ประกอบตามเงื่อนไข
+
+[ 3. การฉาย (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select แปลงแต่ละองค์ประกอบ; SelectMany ทำให้อาร์เรย์ที่ซ้อนกันแบน
+    (ตัวเลือกต้องคืนค่าการอ้างอิง ARRAY)
+
+[ 4. การเรียงลำดับ (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: คีย์การเรียงลำดับหลัก
+    ThenBy*/ThenByNum*/ThenByStr*: คีย์การเรียงลำดับรอง (ต่อจาก OrderBy*)
+    Reverse: กลับลำดับปัจจุบัน
+
+[ 5. การแบ่งหน้า (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: ข้ามหรือดึงจำนวนองค์ประกอบที่กำหนด
+    SkipWhile/TakeWhile: ตามเงื่อนไข
+
+[ 6. การจัดกลุ่ม (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy คืนค่าอาร์เรย์ของ { Key=>'...', Elements=>[...] }
+    ToLookup คืนค่า hashref { key => [elements] }
+
+[ 7. การดำเนินการเซต (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except รองรับตัวเลือกคีย์แบบไม่บังคับ
+    SequenceEqual: จริงถ้าสองลำดับเท่ากัน
+
+[ 8. การรวม (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: การรวมภายใน; GroupJoin: การรวมภายนอกซ้าย
+    (กลุ่มภายในส่งผ่านเป็นออบเจ็กต์ LTSV::LINQ)
+
+[ 9. การรวบรวม (เมธอดปลายทาง) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  ตัวแปร OrDefault คืนค่า undef แทน die สำหรับลำดับว่าง
+    ElementAt: ดัชนีที่เริ่มต้นจาก 0 (die ถ้าเกินขอบเขต); ElementAtOrDefault: undef ถ้าเกินขอบเขต
+
+[ 10. เมธอดลำดับอื่นๆ (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: ต่อสองลำดับ; DefaultIfEmpty: ค่าเริ่มต้นถ้าว่าง
+    Zip: รวมสองลำดับทีละองค์ประกอบ
+
+[ 11. เมธอดการแปลง (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary คืนค่า hashref key=>element
+    ToLookup คืนค่า hashref key=>[elements]
+    ToLTSV เขียนลำดับลงไฟล์ LTSV
+
+[ 12. แหล่งข้อมูลอย่างเป็นทางการ (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV spec: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

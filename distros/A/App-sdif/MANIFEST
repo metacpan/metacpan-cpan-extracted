@@ -13,7 +13,6 @@ lib/App/cdif/colors.pm
 lib/App/cdif/debug.pm
 lib/App/cdif/default.pm
 lib/App/sdif.pm
-lib/App/sdif/Divert.pm
 lib/App/sdif/LabelStack.pm
 lib/App/sdif/Util.pm
 lib/App/sdif/colors.pm
@@ -27,6 +26,8 @@ script/watchdiff
 share/cdif.el
 t/00_compile.t
 t/01_run.t
+t/02_watchdiff.t
+t/03_limit.t
 t/10_mecab.t
 t/DIFF-c.out
 t/DIFF-graph.out

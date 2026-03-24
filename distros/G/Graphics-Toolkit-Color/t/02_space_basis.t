@@ -19,7 +19,7 @@ my $s3d = Graphics::Toolkit::Color::Space::Basis->new([qw/Alpha beta gamma/]);
 my $s5d = Graphics::Toolkit::Color::Space::Basis->new([qw/Aleph beth gimel daleth he/], [qw/m n o p q/]);
 
 like( $bad,   qr/first argument/,   'need axis name array as first argument');
-like( $odd,  qr/shortcut names/,   'need same amount axis names and shortcuts');
+like( $odd,  qr/short axis names/,    'need same amount axis names and shortcuts');
 is( ref $s3d,  $module,   'created 3d space');
 is( ref $s5d,  $module,   'created 5d space');
 

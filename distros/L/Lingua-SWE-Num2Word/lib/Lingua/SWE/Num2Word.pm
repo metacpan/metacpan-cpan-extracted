@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); -*-
 
 package Lingua::SWE::Num2Word;
 # ABSTRACT: Number 2 word conversion in SWE.
@@ -10,13 +10,12 @@ use 5.10.1;
 use strict;
 use warnings;
 
-use Perl6::Export::Attrs;
-use encoding 'utf8';
+use Export::Attrs;
+use utf8;
 
 # }}}
 # {{{ variables declaration
-
-our $VERSION = 0.0682;
+our $VERSION = '0.2603230';
 
 # }}}
 # {{{ num2sv_cardinal                 convert number to text
@@ -76,20 +75,29 @@ __END__
 
 # {{{ POD HEAD
 
+=pod
+
 =head1 NAME
 
-Lingua::SWE::Num2Word
+=head2 Lingua::SWE::Num2Word 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-positive number to text convertor for Swedish.
-Output text is encoded in utf-8 encoding.
+Number 2 word conversion in SWE.
 
-=head2 $Rev: 682 $
+Lingua::SWE::Num2Word is module for converting numbers into their representation
+in Swedish. Converts whole numbers from 0 up to 999 999 999.
 
-ISO 639-3 namespace.
+Output text is encoded in UTF-8 encoding.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -99,29 +107,22 @@ ISO 639-3 namespace.
 
  print $text || "sorry, can't convert this number into swedish language.";
 
-=head1 DESCRIPTION
-
-Number 2 word conversion in SWE.
-
-Lingua::SWE::Num2Word is module for converting numbers into their representation
-in Swedish. Converts whole numbers from 0 up to 999 999 999.
-
 =cut
 
 # }}}
-# {{{ Functions reference
+# {{{ Functions Reference
 
 =pod
 
-=head2 Functions Reference
+=head1 Functions Reference
 
-=over
+=over 2
 
-=item num2sv_cardinal (positional)
+=item B<num2sv_cardinal> (positional)
 
-  1   number  number to convert
-  =>  string  converted string
-      undef   if input number is not known
+  1   num    number to convert
+  =>  str    converted string
+  =>  undef  if input number is not known
 
 Convert number to text representation.
 
@@ -130,26 +131,34 @@ Convert number to text representation.
 =cut
 
 # }}}
-# {{{ POD FOOTER
+# {{{ EXPORTED FUNCTIONS
+
+=pod
 
 =head1 EXPORT_OK
 
-num2sv_cardinal
+=over 2
+
+=item num2sv_cardinal
+
+=back
+
+=cut
+
+# }}}
+# {{{ POD FOOTER
+
+=pod
 
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
+
    Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

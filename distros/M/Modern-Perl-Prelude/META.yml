@@ -1,5 +1,5 @@
 ---
-abstract: 'Project prelude for modern Perl style on Perl 5.30+'
+abstract: 'Project prelude for modern Perl style on Perl 5.26+'
 author:
   - 'Sergey Kovalev <skov@cpan.org>, Kirill Dmitriev <zaika.k1007@gmail.com>'
 build_requires:
@@ -27,10 +27,10 @@ requires:
   Feature::Compat::Try: '0'
   Import::Into: '0'
   builtin::compat: '0'
-  perl: '5.030000'
+  perl: '5.026000'
   true::VERSION: '0'
 resources:
   bugtracker: https://github.com/neo1ite/Modern-Perl-Prelude/issues
   repository: https://github.com/neo1ite/Modern-Perl-Prelude
-version: '0.008'
+version: '0.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

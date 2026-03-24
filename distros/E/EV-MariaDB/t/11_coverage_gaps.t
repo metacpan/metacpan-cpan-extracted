@@ -29,7 +29,7 @@ sub with_mariadb {
 
 # --- Test 1-3: NULL values in text query result sets ---
 with_mariadb(cb => sub {
-    $m->q("select NULL, 1, NULL", sub {
+    $m->q("select null, 1, null", sub {
         my ($rows, $err) = @_;
         ok(!$err, 'NULL result: no error');
         ok(!defined $rows->[0][0], 'NULL result: first col is undef');

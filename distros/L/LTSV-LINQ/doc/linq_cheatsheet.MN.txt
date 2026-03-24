@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ Cheat Sheet                               [MN] Монгол
+======================================================================
+
+[ 1. Query үүсгэх (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  Анхаар: Терминал арга бүр iterator-ийг дуусгана.
+    Өгөгдлийг дахин ашиглахын тулд From() / FromLTSV()-г дахин дуудна уу.
+
+[ 2. Шүүлт (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  Нөхцлөөр элементүүдийг шүүнэ.
+
+[ 3. Проекц (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select нь элемент бүрийг хувиргана; SelectMany нь үүрлэсэн массивуудыг тэгшитгэнэ
+    (сонгогч нь ARRAY лавлагаа буцаах ёстой).
+
+[ 4. Эрэмбэлэх (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: гол эрэмбэлэлтийн түлхүүр.
+    ThenBy*/ThenByNum*/ThenByStr*: дэд эрэмбэлэлтийн түлхүүр (OrderBy* дараа).
+    Reverse: одоогийн дарааллыг урвуулна.
+
+[ 5. Хуудаслах (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: тодорхой тооны элементийг алгасах эсвэл авах.
+    SkipWhile/TakeWhile: нөхцлөөр.
+
+[ 6. Бүлэглэх (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy нь { Key=>'...', Elements=>[...] } массив буцаана.
+    ToLookup нь hashref { key => [elements] } буцаана.
+
+[ 7. Олонлогийн үйлдэл (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except нь сонголтын түлхүүр сонгогчийг дэмждэг.
+    SequenceEqual: хоёр дараалал тэнцүү бол үнэн.
+
+[ 8. Нэгтгэл (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: дотоод нэгтгэл. GroupJoin: зүүн гадаад нэгтгэл
+    (дотоод бүлэг LTSV::LINQ объект болон дамжуулагдана).
+
+[ 9. Нэгтгэн боловсруулах (терминал аргууд) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  OrDefault хувилбарууд хоосон дараалалд die оронд undef буцаана.
+    ElementAt: 0-д суурилсан индекс (хязгаараас гарвал die). ElementAtOrDefault: undef.
+
+[ 10. Бусад дарааллын аргууд (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: хоёр дарааллыг нэгтгэнэ. DefaultIfEmpty: хоосон бол өгөгдмөл утга.
+    Zip: хоёр дарааллыг элементийн дагуу нэгтгэнэ.
+
+[ 11. Хөрвүүлэх аргууд (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary нь hashref key=>element буцаана.
+    ToLookup нь hashref key=>[elements] буцаана.
+    ToLTSV нь дарааллыг LTSV файлд бичнэ.
+
+[ 12. Албан ёсны нөөц (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV spec: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

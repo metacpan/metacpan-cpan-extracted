@@ -31,6 +31,7 @@ t/13_fromarray.t
 t/14_accessor.t
 t/15_nolvalue.t
 t/16_remove_accessor.t
+t/17_default_hash_array.t
 t/App/Foo.pm
 META.yml
 MANIFEST

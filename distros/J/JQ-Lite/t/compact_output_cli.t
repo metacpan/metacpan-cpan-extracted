@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use IPC::Open3;
 use Symbol qw(gensym);
+use JSON::PP qw(decode_json);
 
 my $json = <<'JSON';
 {
@@ -29,10 +30,27 @@ my $stderr = do { local $/; <$err> } // '';
 
 waitpid($pid, 0);
 
-is(
+like(
     $stdout,
-    "{\"age\":30,\"name\":\"Alice\",\"profile\":{\"active\":true,\"country\":\"US\"}}\n",
+    qr/\A\{.*\}\n\z/s,
     'compact-output emits single-line JSON with trailing newline'
+);
+unlike(
+    $stdout,
+    qr/\n.+/s,
+    'compact-output does not pretty-print across multiple lines',
+);
+is_deeply(
+    decode_json($stdout),
+    {
+        age     => 30,
+        name    => 'Alice',
+        profile => {
+            active  => JSON::PP::true,
+            country => 'US',
+        },
+    },
+    'compact-output preserves the expected JSON structure',
 );
 like($stderr, qr/^\s*\z/, 'no warnings emitted when using -c');
 

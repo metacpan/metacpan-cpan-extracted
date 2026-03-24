@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Aide-memoire                       [FR] Francais
+ HTTP::Handy PSGI Aide-mémoire                        [FR] Français
 ======================================================================
 
-[ 1. Demarrer le serveur ]
+[ 1. Démarrer le serveur ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # requis: PSGI app code ref
-      host          => '127.0.0.1',# optionnel: bind address (0.0.0.0)
-      port          => 8080,       # optionnel: port (defaut: 8080)
-      log           => 1,          # optionnel: access log (defaut: 1)
-      max_post_size => 10485760,   # optionnel: max POST bytes (defaut: 10MB)
+      app           => $app,       # obligatoire: PSGI app code reference
+      host          => '127.0.0.1',# optionnel: bind address (default: 0.0.0.0)
+      port          => 8080,       # optionnel: port (default: 8080)
+      log           => 1,          # optionnel: access log (default: 1)
+      max_post_size => 10485760,   # optionnel: max POST bytes (default: 10MB)
   );
 
-  Executer directement comme script: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. Variables d'environnement de requete ($env) ]
+[ 2. Variables d'environnement de requête ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (Lire le corps POST (psgi.input)
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    chaîne  "GET" / "POST"
+  PATH_INFO         chaîne  /index.html
+  QUERY_STRING      chaîne  key=val
+  SERVER_NAME       chaîne  hostname
+  SERVER_PORT       entier  8080
+  CONTENT_TYPE      chaîne  content-type
+  CONTENT_LENGTH    entier  (bytes)
+  HTTP_*            chaîne  HTTP_USER_AGENT ...
+  psgi.input        objet  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   chaîne  "http"
 
-[ 3. Format de reponse ]
+[ 3. Format de réponse ]
 
   [$status, \@headers, \@body]
 
@@ -54,30 +54,31 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. Methodes utilitaires ]
+[ 5. Méthodes utilitaires ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. Methodes de construction de reponse ]
+[ 6. Constructeurs de réponse ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. Servir des fichiers statiques ]
+[ 7. Fichiers statiques ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. Modele de routage ]
+[ 8. Modèle de routage ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
@@ -86,15 +87,15 @@
 
 [ 9. Gestion des erreurs ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 réponse 500 automatique
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. Fichiers journaux crees par run() ]
+[ 10. Fichiers journaux créés par run() ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  journal d'acces (rotation 10min, format LTSV)
-  logs/error/error.log                journal d'erreurs/demarrage
+  logs/access/YYYYMMDDHHm0.log.ltsv  journal d'accès (rotation 10 min, LTSV)
+  logs/error/error.log                journal d'erreurs/démarrage
 
   LTSV: time  method  path  status  size  ua  referer
 
@@ -102,14 +103,8 @@
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

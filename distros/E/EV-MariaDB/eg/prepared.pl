@@ -15,10 +15,10 @@ my $m = EV::MariaDB->new(
     on_error   => sub { die "connection error: $_[0]\n" },
 );
 
-$m->query("CREATE TEMPORARY TABLE eg_prep (id INT PRIMARY KEY, val VARCHAR(50))", sub {
+$m->query("create temporary table eg_prep (id int primary key, val varchar(50))", sub {
     die "create: $_[1]\n" if $_[1];
 
-    $m->prepare("INSERT INTO eg_prep (id, val) VALUES (?, ?)", sub {
+    $m->prepare("insert into eg_prep (id, val) values (?, ?)", sub {
         my ($ins, $err) = @_;
         die "prepare insert: $err\n" if $err;
 
@@ -29,7 +29,7 @@ $m->query("CREATE TEMPORARY TABLE eg_prep (id INT PRIMARY KEY, val VARCHAR(50))"
             my $params = shift @data;
             unless ($params) {
                 # all inserts done — now query with a prepared SELECT
-                $m->prepare("SELECT * FROM eg_prep WHERE id >= ?", sub {
+                $m->prepare("select * from eg_prep where id >= ?", sub {
                     my ($sel, $err) = @_;
                     die "prepare select: $err\n" if $err;
 

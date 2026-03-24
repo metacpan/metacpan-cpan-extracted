@@ -5,25 +5,21 @@ package Lingua::CES::Word2Num;
 
 # {{{ use block
 
-use 5.10.1;
-
-use strict;
+use v5.32;
 use warnings;
+use utf8;
 
-use Encode                    qw(decode_utf8);
+use Export::Attrs;
 use Parse::RecDescent;
-use Perl6::Export::Attrs;
 
 # }}}
-# {{{ variables
-
-our $VERSION = 0.0682;
-
+# {{{ var block
+our $VERSION = '0.2603230';
 my $parser   = ces_numerals();
 
 # }}}
 
-# {{{ w2n                       convert number to text
+# {{{ w2n                          convert number to text
 
 sub w2n :Export {
     my $input = shift // return;
@@ -32,166 +28,80 @@ sub w2n :Export {
 }
 
 # }}}
-# {{{ ces_numerals               create parser for numerals
+# {{{ ces_numerals                 create parser for numerals
 
 sub ces_numerals {
-    return Parse::RecDescent->new(decode_utf8(q{
-      numeral:      <rulevar: local $number = 0>
-      numeral:       million
-                    { return $item[1]; }
-                  |  thousand
-                    { return $item[1]; }
-                  |  century
-                    { return $item[1]; }
-                  |  decade
-                    { return $item[1]; }
-                  | { return undef; }
+    return Parse::RecDescent->new(q{
+      <autoaction: { $item[1] } >
 
-      number:       'dvanáct'      { $return = 12; }
-                  | 'třináct'      { $return = 13; }
-                  | 'čtrnáct'      { $return = 14; }
-                  | 'patnáct'      { $return = 15; }
-                  | 'šestnáct'     { $return = 16; }
-                  | 'sedmnáct'     { $return = 17; }
-                  | 'osmnáct'      { $return = 18; }
-                  | 'devatenáct'   { $return = 19; }
-                  | 'nula'         { $return =  0; }
-                  | 'jedna'        { $return =  1; }
-                  | 'dva'          { $return =  2; }
-                  | 'tři'          { $return =  3; }
-                  | 'čtyři'        { $return =  4; }
-                  | 'pět'          { $return =  5; }
-                  | 'šest'         { $return =  6; }
-                  | 'sedm'         { $return =  7; }
-                  | 'osm'          { $return =  8; }
-                  | 'devět'        { $return =  9; }
-                  | 'deset'        { $return = 10; }
-                  | 'jedenáct'     { $return = 11; }
+      numeral:  mega
+             |  kOhOd
+             | 'nula'          {  0 }
+             |                 {    }
 
-      tens:       'dvacet'         { $return = 20; }
-                | 'třicet'         { $return = 30; }
-                | 'čtyřicet'       { $return = 40; }
-                | 'padesát'        { $return = 50; }
-                | 'šedesát'        { $return = 60; }
-                | 'sedmdesát'      { $return = 70; }
-                | 'osmdesát'       { $return = 80; }
-                | 'devadesát'      { $return = 90; }
+       number:  'dvanáct'      { 12 }
+             |  'třináct'      { 13 }
+             |  'čtrnáct'      { 14 }
+             |  'patnáct'      { 15 }
+             |  'šestnáct'     { 16 }
+             |  'sedmnáct'     { 17 }
+             |  'osmnáct'      { 18 }
+             |  'devatenáct'   { 19 }
+             |  'jedna'        {  1 }
+             |  'dva'          {  2 }
+             |  'tři'          {  3 }
+             |  'čtyři'        {  4 }
+             |  'pět'          {  5 }
+             |  'šest'         {  6 }
+             |  'sedm'         {  7 }
+             |  'osm'          {  8 }
+             |  'devět'        {  9 }
+             |  'deset'        { 10 }
+             |  'jedenáct'     { 11 }
 
-      decade:      tens number
-        { $return = $item[1] + $item[2]; }
-        | tens
-        { $return = $item[1]; }
-        | number
-        { $return = $item[1]; }
+         tens:  'dvacet'       { 20 }
+             |  'třicet'       { 30 }
+             |  'čtyřicet'     { 40 }
+             |  'padesát'      { 50 }
+             |  'šedesát'      { 60 }
+             |  'sedmdesát'    { 70 }
+             |  'osmdesát'     { 80 }
+             |  'devadesát'    { 90 }
 
-      century:  number 'sta' decade
-                { $return = $item[1] * 100  + $item[3]; }
-                | number 'sta'
-                { $return = $item[1] * 100 }
-                | number 'set' decade
-                { $return = $item[1] * 100 + $item[3]; }
-                | number 'set'
-                { $return = $item[1] * 100 }
-                | 'dvě' 'stě' decade
-                { $return = 2 * 100 + $item[3]; }
-                | 'dvě' 'stě'
-                { $return = 2 * 100; }
-                | 'sto' decade
-                { $return = 100 + $item[2]; }
-                | 'sto'
-                { $return = 100; }
+         deca:  tens number    { $item[1] + $item[2] }
+             |  tens
+             |  number
 
-    thousand:     century thousands century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | century thousands decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | century thousands
-                { $return = $item[1] * 1000; }
+        hecto:  number /(sta|set)/ deca  { $item[1] * 100 + $item[3] }
+             |  number /(sta|set)/       { $item[1] * 100            }
+             |  'dvě' 'stě' deca         { 2 * 100 + $item[3]        }
+             |  'dvě' 'stě'              { 2 * 100                   }
+             |  'sto' deca               { 100 + $item[2]            }
+             |  'sto'                    { 100                       }
 
-                | decade thousands century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | decade thousands decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | decade thousands
-                { $return = $item[1] * 1000; }
+          hOd:  hecto
+             |  deca
 
-                | number thousands century
-                { $return = $item[1] * 1000 + $item[3]; }
-                | number thousands decade
-                { $return = $item[1] * 1000 + $item[3]; }
-                | number thousands
-                { $return = $item[1] * 1000; }
+         kilo:  hOd /tisíce?/ hOd        { $item[1] * 1000 + $item[3]       }
+             |  hOd /tisíce?/            { $item[1] * 1000                  }
+             |  number /tisíce?/ hOd     { $item[1] * 1000 + $item[3]       }
+             |  number /tisíce?/         { $item[1] * 1000                  }
+             |  'tisíc' hOd              { 1000 + $item[2]                  }
+             |  'tisíc'                  { 1000                             }
+             |  hOd 'jeden' 'tisíc' hOd  { ($item[1] + 1) * 1000 + $item[4] }
+             |  hOd 'jeden' 'tisíc'      { ($item[1] + 1) * 1000            }
 
-                | 'tisíc' century
-                { $return = 1000 + $item[2]; }
-                | 'tisíc' decade
-                { $return = 1000 + $item[2]; }
-                | 'tisíc'
-                { $return = 1000; }
+        kOhOd:  kilo
+             |  hOd
 
-                | century 'jeden' 'tisíc' century
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
-                | century 'jeden' 'tisíc' decade
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
+         mega:  hOd megas kOhOd             { $item[1] * 1_000_000 + $item[3]       }
+             |  hOd megas                   { $item[1] * 1_000_000                  }
+             |  'milion' kOhOd              { 1_000_000 + $item[2]                  }
+             |  'milion'                    { 1_000_000                             }
+             |  hOd 'jeden' 'milion' kOhOd  { ($item[1] + 1) * 1_000_000 + $item[4] }
 
-                | decade 'jeden' 'tisíc' century
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
-                | decade 'jeden' 'tisíc' decade
-                { $return = ($item[1] + 1) * 1000 + $item[4]; }
-
-                | century 'jeden' 'tisíc'
-                { $return = ($item[1] + 1) * 1000; }
-                | decade 'jeden' 'tisíc'
-                { $return = ($item[1] + 1) * 1000; }
-
-    thousands:    'tisíce'
-                | 'tisíc'
-
-    million:      century millions thousand
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                |  century millions century
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | century millions decade
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | century millions
-                { $return = $item[1] * 1_000_000; }
-
-                | decade millions thousand
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | decade millions century
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | decade millions decade
-                { $return = $item[1] * 1_000_000 + $item[3]; }
-                | decade millions
-                { $return = $item[1] * 1_000_000; }
-
-                | 'milion' thousand
-                { $return = 1_000_000 + $item[2]; }
-                | 'milion' century
-                { $return = 1_000_000 + $item[2]; }
-                | 'milion' decade
-                { $return = 1_000_000 + $item[2]; }
-                | 'milion'
-                { $return = 1_000_000; }
-
-                | century 'jeden' 'milion' thousand
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | century 'jeden' 'milion' century
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | century 'jeden' 'milion' decade
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-
-                | decade 'jeden' 'milion' thousand
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | decade 'jeden' 'milion' century
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-                | decade 'jeden' 'milion' decade
-                { $return = ($item[1] + 1) * 1_000_000 + $item[4]; }
-
-    millions:     'miliony'
-                | 'milionů'
-
-    }));
+        megas:  /milion[yů]/
+    });
 }
 
 # }}}
@@ -204,20 +114,28 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
-Lingua::CES::Word2Num
+=head2 Lingua::CES::Word2Num 
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for Czech.
-Input text must be encoded in utf-8.
+Word 2 number conversion in CES.
 
-=head2 $Rev: 682 $
+Lingua::CES::Word2Num is module for converting czech numerals into
+numbers. Converts whole numbers from 0 up to 999 999 999. Input is
+expected to be in UTF-8.
 
-ISO 639-3 namespace.
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -227,13 +145,6 @@ ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
-
-Word 2 number conversion in CES.
-
-Lingua::CES::Word2Num is module for converting text containing number
-representation in czech back into number. Converts whole numbers from 0 up
-to 999 999 999.
 
 =cut
 
@@ -242,21 +153,40 @@ to 999 999 999.
 
 =pod
 
-=head2 Functions Reference
+=head1 Functions Reference
 
 =over 2
 
-=item w2n (positional)
+=item B<w2n> (positional)
 
-  1   string  string to convert
-  =>  number  converted number
-      undef   if input string is not known
+  1   str    string to convert
+  =>  num    converted number
+      undef  if input string is not known
 
 Convert text representation to number.
 
-=item ces_numerals
+
+=item B<ces_numerals> (void)
+
+  =>  obj  object of the parser
 
 Internal parser.
+
+=back
+
+=cut
+
+# }}}
+# {{{ EXPORTED FUNCTIONS
+
+=pod
+
+=head1 EXPORT_OK
+
+=over 2
+
+=item w2n
+
 
 =back
 
@@ -267,28 +197,15 @@ Internal parser.
 
 =pod
 
-=head1 EXPORT_OK
-
-w2n
-
-=head1 KNOWN BUGS
-
-None.
-
 =head1 AUTHOR
 
  coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek <info@petamem.com>
- initial coding after specifications by R. Jelinek:
+
    Roman Vasicek <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

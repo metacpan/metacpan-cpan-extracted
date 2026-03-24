@@ -7,6 +7,8 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - Add [log.verbosity] 0 or 1 or 2 feature to control level of messaging spewage to the git client.
 
+ - Trying to do "git config --descent { --unset <name> | --add <name> <value> }" doesn't work as expected.
+
  - Investigate converting get_fork_hash common fork sniffer scan to use "git merge-base --fork-point <ref> <commit>" instead of grinding through the logs.
 
  - Fix git-deploy to handle split cheese case where git server uses both IPv4 and IPv6.
@@ -32,6 +34,8 @@ Some features we need or want, plus some neat ideas that may not be too feasible
      2. Allow data in $git->stash to persist among all hooks where the $git object is the first argument passed to each custom block hook.
 
  - Monkey the core.hooksPath setting on the git server to point to these hooks provided.
+
+ - Investigate making git-deploy setup alias.deploy hook in case it's not in a cron path.
 
  - [webhook] features for callback:
    * Allow for WhiteList or BlackList filters to trigger webhook or ignore webhooks under certain conditions:

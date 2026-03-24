@@ -1,4 +1,4 @@
-use v5.30;
+use v5.26;
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM     => 'lib/Modern/Perl/Prelude.pm',
     AUTHOR            => 'Sergey Kovalev <skov@cpan.org>, Kirill Dmitriev <zaika.k1007@gmail.com>',
     LICENSE           => 'perl',
-    MIN_PERL_VERSION  => '5.30.0',
+    MIN_PERL_VERSION  => '5.26.0',
 
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,

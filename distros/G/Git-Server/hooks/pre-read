@@ -29,6 +29,7 @@ if (my $banned = system "hooks/restrictip") {
     exit ($banned >> 8 || 1);
 }
 if ($acl->{deploy}->{$ENV{REMOTE_USER}}) {
+    $msg ||= " [git-deploy]";
     warn localtime().": [$who] git-server v$ENV{GIT_SERVER_VERSION}: PULL$msg waiting for notification ...\n";
     my $puller = "$who:$base";
     if (my $notification_error = system "hooks/push-notification", $puller or $?) {

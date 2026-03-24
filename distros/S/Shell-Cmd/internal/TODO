@@ -11,9 +11,6 @@ which returns some/all of the output.
 
 Add a verbatim option to include a string (possibly multiline) verbatim.
 
-Write a method to take the output from the run method (in script mode)
-and easily extract information.
-
 If a command runs, it sets a variable:
   SC_# = 1
 If it fails, set:

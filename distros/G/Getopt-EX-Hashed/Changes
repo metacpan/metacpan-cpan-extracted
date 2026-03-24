@@ -1,5 +1,10 @@
 Revision history for Perl extension Getopt-EX-Hashed
 
+1.0702 2026-03-23T10:06:16Z
+
+    - Fix _opt_dest to return ARRAY/HASH references directly to
+      Getopt::Long, preserving default values when options are added
+
 1.0701 2026-02-27T07:16:20Z
 
     - Fix REMOVE_ACCESSOR to be clone-safe: only objects created by new()

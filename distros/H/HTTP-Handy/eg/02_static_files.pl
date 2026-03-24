@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 ######################################################################
 # 02_static_files.pl - Static file serving with HTTP::Handy
 #

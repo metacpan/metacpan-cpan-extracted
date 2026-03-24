@@ -20,3 +20,4 @@ fix
 build
 t/*.pl
 t/pod.t
+rust-version/

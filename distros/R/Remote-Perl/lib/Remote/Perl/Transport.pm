@@ -1,6 +1,6 @@
 use v5.36;
 package Remote::Perl::Transport;
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use autodie qw(open close);
 use IO::Select;

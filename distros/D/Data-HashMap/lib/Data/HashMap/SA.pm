@@ -2,12 +2,21 @@ package Data::HashMap::SA;
 use strict;
 use warnings;
 use Data::HashMap;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 sub import {
     $^H{"Data::HashMap::SA/hm_sa_put"}        = 1;
     $^H{"Data::HashMap::SA/hm_sa_get"}        = 1;
     $^H{"Data::HashMap::SA/hm_sa_remove"}     = 1;
+    $^H{"Data::HashMap::SA/hm_sa_take"}   = 1;
+    $^H{"Data::HashMap::SA/hm_sa_drain"} = 1;
+    $^H{"Data::HashMap::SA/hm_sa_pop"}   = 1;
+    $^H{"Data::HashMap::SA/hm_sa_shift"} = 1;
+    $^H{"Data::HashMap::SA/hm_sa_reserve"} = 1;
+    $^H{"Data::HashMap::SA/hm_sa_purge"}   = 1;
+    $^H{"Data::HashMap::SA/hm_sa_capacity"} = 1;
+    $^H{"Data::HashMap::SA/hm_sa_persist"}  = 1;
+    $^H{"Data::HashMap::SA/hm_sa_swap"}    = 1;
     $^H{"Data::HashMap::SA/hm_sa_exists"}     = 1;
     $^H{"Data::HashMap::SA/hm_sa_size"}       = 1;
     $^H{"Data::HashMap::SA/hm_sa_keys"}       = 1;
@@ -15,6 +24,7 @@ sub import {
     $^H{"Data::HashMap::SA/hm_sa_items"}      = 1;
     $^H{"Data::HashMap::SA/hm_sa_max_size"}   = 1;
     $^H{"Data::HashMap::SA/hm_sa_ttl"}        = 1;
+    $^H{"Data::HashMap::SA/hm_sa_lru_skip"} = 1;
     $^H{"Data::HashMap::SA/hm_sa_each"}       = 1;
     $^H{"Data::HashMap::SA/hm_sa_iter_reset"} = 1;
     $^H{"Data::HashMap::SA/hm_sa_clear"}      = 1;

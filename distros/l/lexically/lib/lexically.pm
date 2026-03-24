@@ -1,17 +1,29 @@
 package lexically;
-BEGIN {
-  $lexically::AUTHORITY = 'cpan:DOY';
-}
-{
-  $lexically::VERSION = '0.01';
-}
 use strict;
 use warnings;
-# ABSTRACT: lexically import functions from non-lexical exporters
+
+our $VERSION = '0.03';
 
 use Exporter::Lexical 0.02 ();
 use Module::Runtime 'require_module';
 
+=head1 NAME
+
+C<lexically> - lexically import functions from non-lexical exporters
+
+=head1 SYNOPSIS
+
+  package Foo;
+  use Moose;
+  use lexically 'Scalar::Util' => 'reftype';
+
+=head1 DESCRIPTION
+
+This pragma turns normal package-based exporter modules into lexical exporters.
+This can be useful to ensure that your package namespace doesn't get polluted
+(preventing the need for something like L<namespace::clean> entirely).
+
+=cut
 
 our $INDEX = 0;
 
@@ -44,38 +56,11 @@ sub import {
     delete $lexically::{"scratchpad_${index}::"};
 }
 
-
-1;
-
-__END__
-
-=pod
-
-=head1 NAME
-
-lexically - lexically import functions from non-lexical exporters
-
-=head1 VERSION
-
-version 0.01
-
-=head1 SYNOPSIS
-
-  package Foo;
-  use Moose;
-  use lexically 'Scalar::Util' => 'reftype';
-
-=head1 DESCRIPTION
-
-This pragma turns normal package-based exporter modules into lexical exporters.
-This can be useful to ensure that your package namespace doesn't get polluted
-(preventing the need for something like L<namespace::clean> entirely).
-
 =head1 BUGS
 
 No known bugs.
 
-Please report any bugs to GitHub Issues at L<https://github.com/doy/lexically/issues>.
+Please report any bugs to GitHub Issues at L<https://github.com/leonerd/p5-lexically/issues>.
 
 =head1 SEE ALSO
 
@@ -97,7 +82,7 @@ L<https://metacpan.org/release/lexically>
 
 =item * Github
 
-L<https://github.com/doy/lexically>
+L<https://github.com/leonerd/p5-lexically>
 
 =item * RT: CPAN's request tracker
 
@@ -111,14 +96,10 @@ L<http://cpanratings.perl.org/d/lexically>
 
 =head1 AUTHOR
 
-Jesse Luehrs <doy@tozt.net>
+Originally written by Jesse Luehrs <doy@tozt.net>
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is Copyright (c) 2013 by Jesse Luehrs.
-
-This is free software, licensed under:
-
-  The MIT (X11) License
+Currently maintained by Paul Evans <leonerd@leonerd.org.uk>
 
 =cut
+
+1;

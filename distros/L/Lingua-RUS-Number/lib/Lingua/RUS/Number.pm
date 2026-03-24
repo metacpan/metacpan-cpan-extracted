@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8 -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 #
 # (c) 2002-2010 PetaMem, s.r.o.
 #
@@ -14,12 +14,11 @@ use strict;
 use warnings;
 use utf8;
 
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-
-our $VERSION = 0.136;
+our $VERSION = '0.2603230';
 
 # Preloaded methods go here.
 use vars qw(%diw %nom);
@@ -170,7 +169,7 @@ Lingua::RUS::Number - Converts numbers to money sum in words (in Russian roubles
 
 =head1 VERSION
 
-version 0.136
+version 0.2603230
 
 =head1 SYNOPSIS
 

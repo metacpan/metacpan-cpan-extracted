@@ -1,22 +1,19 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::SPA::Word2Num;
 # ABSTRACT: Word 2 number conversion in SPA.
 
 # {{{ use block
 
-use 5.10.1;
-
-use strict;
-use warnings;
+use 5.16.0;
+use utf8;
 
 use Parse::RecDescent;
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
-# {{{ variable declarations
-
-our $VERSION = 0.0682;
+# {{{ var block
+our $VERSION = '0.2603230';
 my $parser   = spa_numerals();
 
 # }}}
@@ -26,10 +23,6 @@ my $parser   = spa_numerals();
 sub w2n :Export {
     my $input = shift // return;
 
-    $input =~ s/,//g;
-    $input =~ s/ //g;
-    $input =~ s/millones/lones/g; # grant unique word identifier
-
     return $parser->numeral($input);
 }
 # }}}
@@ -37,118 +30,80 @@ sub w2n :Export {
 
 sub spa_numerals {
     return Parse::RecDescent->new(q{
-      numeral: million   { return $item[1]; }                         # root parse. go from maximum to minimum value
-        |      millenium { return $item[1]; }
-        |      century   { return $item[1]; }
-        |      decade    { return $item[1]; }
-        |                { return undef; }
+      <autoaction: { $item[1] } >
+      <nocheck>
 
-      number: 'cero'         { $return = 0; }                          # try to find a word from 0 to 29
-        |     'un'           { $return = 1; }
-        |     'dos'          { $return = 2; }
-        |     'tres'         { $return = 3; }
-        |     'cuatro'       { $return = 4; }
-        |     'cinco'        { $return = 5; }
-        |     'seis'         { $return = 6; }
-        |     'siete'        { $return = 7; }
-        |     'ocho'         { $return = 8; }
-        |     'nueve'        { $return = 9; }
-        |     'diez'         { $return = 10; }
-        |     'once'         { $return = 11; }
-        |     'doce'         { $return = 12; }
-        |     'trece'        { $return = 13; }
-        |     'catorce'      { $return = 14; }
-        |     'quince'       { $return = 15; }
-        |     'dieciséis'    { $return = 16; }
-        |     'diecisiete'   { $return = 17; }
-        |     'dieciocho'    { $return = 18; }
-        |     'diecinueve'   { $return = 19; }
-        |     'veinte'       { $return = 20; }
-        |     'veintiun'     { $return = 21; }
-        |     'veintidós'    { $return = 22; }
-        |     'veintitrés'   { $return = 23; }
-        |     'veinticuatro' { $return = 24; }
-        |     'veinticinco'  { $return = 25; }
-        |     'veintiséis'   { $return = 26; }
-        |     'veintisiete'  { $return = 27; }
-        |     'veintiocho'   { $return = 28; }
-        |     'veintinueve'  { $return = 29; }
+      numeral:  mega
+             |  kOhOd
+             |  'cero'   { 0 }
+             |           {   }
 
-      tens: 'treinta'   { $return = 30; }                             # try to find a word that representates
-        |   'cuarenta'  { $return = 40; }                             # values 20,30,..,90
-        |   'cincuenta' { $return = 50; }
-        |   'sesenta'   { $return = 60; }
-        |   'setenta'   { $return = 70; }
-        |   'ochenta'   { $return = 80; }
-        |   'noventa'   { $return = 90; }
-        |   'cien'      { $return = 100; }
+       number:  'un'           {  1 }
+             |  'dos'          {  2 }
+             |  'tres'         {  3 }
+             |  'cuatro'       {  4 }
+             |  'cinco'        {  5 }
+             |  'seis'         {  6 }
+             |  'siete'        {  7 }
+             |  'ocho'         {  8 }
+             |  'nueve'        {  9 }
+             |  'diez'         { 10 }
+             |  'once'         { 11 }
+             |  'doce'         { 12 }
+             |  'trece'        { 13 }
+             |  'catorce'      { 14 }
+             |  'quince'       { 15 }
+             |  'dieciséis'    { 16 }
+             |  'diecisiete'   { 17 }
+             |  'dieciocho'    { 18 }
+             |  'diecinueve'   { 19 }
+             |  'veinte'       { 20 }
+             |  'veintiun'     { 21 }
+             |  'veintidós'    { 22 }
+             |  'veintitrés'   { 23 }
+             |  'veinticuatro' { 24 }
+             |  'veinticinco'  { 25 }
+             |  'veintiséis'   { 26 }
+             |  'veintisiete'  { 27 }
+             |  'veintiocho'   { 28 }
+             |  'veintinueve'  { 29 }
 
-      hundreds: 'ciento'        { $return = 100; }
-        |       'doscientos'    { $return = 200; }
-        |       'trescientos'   { $return = 300; }
-        |       'cuatrocientos' { $return = 400; }
-        |       'quinientos'    { $return = 500; }
-        |       'seiscientos'   { $return = 600; }
-        |       'setecientos'   { $return = 700; }
-        |       'ochocientos'   { $return = 800; }
-        |       'novecientos'   { $return = 900; }
+         tens:  'treinta'      { 30 }
+             |  'cuarenta'     { 40 }
+             |  'cincuenta'    { 50 }
+             |  'sesenta'      { 60 }
+             |  'setenta'      { 70 }
+             |  'ochenta'      { 80 }
+             |  'noventa'      { 90 }
 
-      decade: tens(?) 'y' number(?)                                   # try to find words that represents values
-              { $return = 0;                                          # from 0 to 100
-                for (@item) {
-                  if (ref $_ && defined $$_[0]) {
-                    $return += $$_[0] if ($return != -1);             # -1 if the non-zero identifier, since
-                    $return  = $$_[0] if ($return == -1);             # zero is a valid result
-                  }
-                }
-                $return = undef if ($return == -1);
-              }
-        |     tens(?) number(?)
-              { $return = -1;
-                for (@item) {
-                  if (ref $_ && defined $$_[0]) {
-                    $return += $$_[0] if ($return != -1);             # -1 if the non-zero identifier, since
-                    $return  = $$_[0] if ($return == -1);             # zero is a valid result
-                  }
-                }
-                $return = undef if ($return == -1);
-              }
+     hundreds:  'quinientos'        { 500 }
+             |  'setecientos'       { 700 }
+             |  'novecientos'       { 900 }
+             |  number /cientos?/   { $item[1] * 100 }
+             |  /cien(to)?/         { 100 }
 
-      century: hundreds(?) decade(?)                                  # try to find words that represents values
-               { $return = 0;                                         # from 100 to 999
-                 for (@item) {
-                   next if (!ref $_ || !defined $$_[0]);
+         deca:  tens 'y' number     { $item[1] + $item[3] }
+             |  tens
+             |  number
 
-                   $return += $$_[0];
-                 }
-                 $return = undef if (!$return);
-               }
+        hecto:  hundreds  deca      { $item[1] + $item[2] }
+             |  hundreds
 
-    millenium: century(?) 'mil' century(?)                            # try to find words that represents values
-               { $return = 0;                                         # from 1.000 to 999.999
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "mil") {
-                     $return = ($return>0) ? $return * 1000 : 1000;
-                   }
-                 }
-                 $return = undef if (!$return);
-               }
+          hOd:  hecto
+             |  deca
 
-      million: millenium(?) century(?)                                # try to find words that represents values
-               'lones'                                                # from 1.000.000 to 999.999.999.999
-               millenium(?) century(?)
-               { $return = 0;
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "lones") {
-                     $return = ($return>0) ? $return * 1000000 : 1000000;
-                   }
-                 }
-                 $return = undef if (!$return);
-               }
+         kilo:  hOd  milnotmeg hOd        { $item[1] * 1000 + $item[3] }
+             |  hOd  milnotmeg            { $item[1] * 1000 }
+             |       milnotmeg hOd        { 1000 + $item[2] }
+             |       milnotmeg            { 1000 }
+
+    milnotmeg:   ...!'mill' 'mil'
+
+        kOhOd:  kilo
+             |  hOd
+
+         mega:  hOd /mill(ones|ón)/ kOhOd     { $item[1] * 1_000_000 + $item[3] }
+             |  hOd /mill(ones|ón)/           { $item[1] * 1_000_000 }
     });
 }
 
@@ -160,20 +115,30 @@ __END__
 
 # {{{ POD HEAD
 
+=pod
+
 =head1 NAME
 
-Lingua::SPA::Word2Num
+=head2 Lingua::SPA::Word2Num  
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
-text to positive number convertor for Sspanish.
-Input text must be encoded in utf-8.
+Word 2 number conversion in SPA.
 
-=head2 $Rev: 682 $
+Lingua::SPA::Word2Num is module for converting text containing number
+representation in dutch back into number. Converts whole numbers from 0 up
+to 999 999 999 999.
 
-ISO 639-3 namespace.
+Input text must be encoded in UTF-8.
+
+=cut
+
+# }}}
+# {{{ SYNOPSIS
+
+=pod
 
 =head1 SYNOPSIS
 
@@ -183,32 +148,43 @@ ISO 639-3 namespace.
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
 
-=head1 DESCRIPTION
-
-Word 2 number conversion in SPA.
-
-Lingua::SPA::Word2Num is module for converting text containing number
-representation in dutch back into number. Converts whole numbers from 0 up
-to 999 999 999 999.
+=cut
 
 # }}}
 # {{{ Functions Reference
 
-=head2 Functions Reference
+=pod
 
-=over
+=head1 Functions Reference
 
-=item w2n (positional)
+=over 2
 
-  1   string  string to convert
-  =>  number  converted number
-      undef   if input string is not known
+=item B<w2n> (positional)
+
+  1   str    string to convert
+  =>  numr   converted number
+      undef  if input string is not known
 
 Convert text representation to number.
 
-=item spa_numerals
+=item B<spa_numerals> (void)
+
+  =>  obj  new parser object
 
 Internal parser.
+
+=back
+
+=cut
+
+# }}}
+# {{{ EXPORTED FUNCTIONS
+
+=pod
+
+=over 2
+
+=item w2n
 
 =back
 
@@ -219,25 +195,16 @@ Internal parser.
 
 =pod
 
-=head1 EXPORT_OK
-
-w2n
-
-=head1 KNOWN BUGS
-
-None.
-
 =head1 AUTHOR
 
-Vitor Serra Mori <info@petamem.com>
+ specifications, refactoring & maintenance:
+
+ initial coding:
+   Vitor Serra Mori <info@petamem.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
-
-=head2 LICENSE
-
-Artistic license or BSD license.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

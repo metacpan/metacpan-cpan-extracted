@@ -8,6 +8,15 @@ use lib 'lib';
 use Test::Most;
 use Test::Mockingbird;
 use Test::Mockingbird::DeepMock qw(deep_mock);
+use Test::Mockingbird::TimeTravel qw(
+    now
+    freeze_time
+    travel_to
+    advance_time
+    rewind_time
+    restore_all
+    with_frozen_time
+);
 
 # A simple test package we can safely mutate
 {
@@ -171,7 +180,7 @@ subtest 'unknown mock type throws error' => sub {
 				mocks => [
 					{
 						target => 'DMTest::greet',
-						type   => 'wut',   # invalid
+						type   => 'wut',	# invalid
 					},
 				],
 			},
@@ -260,92 +269,268 @@ subtest 'args_deeply works' => sub {
 
 subtest 'never works' => sub {
 
-    {
-        package DM_NEVER;
-        sub foo { $_[1] }
-    }
+	{
+		package DM_NEVER;
+		sub foo { $_[1] }
+	}
 
-    deep_mock(
-        {
-            mocks => [
-                { target => 'DM_NEVER::foo', type => 'spy', tag => 's' },
-            ],
-            expectations => [
-                { tag => 's', never => 1 },
-            ],
-        },
-        sub {
-            # Intentionally do NOT call DM_NEVER::foo
-        }
-    );
+	deep_mock(
+		{
+			mocks => [
+				{ target => 'DM_NEVER::foo', type => 'spy', tag => 's' },
+			],
+			expectations => [
+				{ tag => 's', never => 1 },
+			],
+		},
+		sub {
+			# Intentionally do NOT call DM_NEVER::foo
+		}
+	);
 };
 
 subtest 'combined mock_return + mock_exception + mock_sequence' => sub {
-    {
-        package Edge::Service;
-        sub status { return 'ok' }
-    }
+	{
+		package Edge::Service;
+		sub status { return 'ok' }
+	}
 
-    mock_return    'Edge::Service::status' => 'warmup';
-    mock_sequence  'Edge::Service::status' => ('retry1', 'retry2', 'steady');
-    mock_exception 'Edge::Service::status' => 'fatal';
+	mock_return	'Edge::Service::status' => 'warmup';
+	mock_sequence  'Edge::Service::status' => ('retry1', 'retry2', 'steady');
+	mock_exception 'Edge::Service::status' => 'fatal';
 
-    dies_ok { Edge::Service::status() } 'topmost mock_exception wins';
-    like $@, qr/fatal/, 'fatal error seen';
+	dies_ok { Edge::Service::status() } 'topmost mock_exception wins';
+	like $@, qr/fatal/, 'fatal error seen';
 
-    restore_all();
+	Test::Mockingbird::restore_all();
 
-    is Edge::Service::status(), 'ok', 'original restored';
+	is Edge::Service::status(), 'ok', 'original restored';
 };
 
 subtest 'mock_once with retry logic' => sub {
-    {
-        package Edge::Service;
-        sub ping { return 'ok' }
-    }
+	{
+		package Edge::Service;
+		sub ping { return 'ok' }
+	}
 
-    mock_once 'Edge::Service::ping' => sub { 'fail' };
+	mock_once 'Edge::Service::ping' => sub { 'fail' };
 
-    is Edge::Service::ping(), 'fail', 'first call fails';
-    is Edge::Service::ping(), 'ok',   'second call succeeds';
+	is Edge::Service::ping(), 'fail', 'first call fails';
+	is Edge::Service::ping(), 'ok', 'second call succeeds';
 
-    restore_all();
+	restore_all();
 };
 
 subtest 'restore interacts correctly with mock_once and mock_sequence' => sub {
-    {
-        package Edge::Restore;
-        sub c { return 'orig' }
-    }
+	{
+		package Edge::Restore;
+		sub c { return 'orig' }
+	}
 
-    mock_sequence 'Edge::Restore::c' => (10, 20);
-    mock_once     'Edge::Restore::c' => sub { 99 };
+	mock_sequence 'Edge::Restore::c' => (10, 20);
+	mock_once	 'Edge::Restore::c' => sub { 99 };
 
-    is Edge::Restore::c(), 99, 'mock_once fires first';
+	is Edge::Restore::c(), 99, 'mock_once fires first';
 
-    restore 'Edge::Restore::c';
+	restore 'Edge::Restore::c';
 
-    is Edge::Restore::c(), 'orig', 'restore removes all layers';
+	is Edge::Restore::c(), 'orig', 'restore removes all layers';
+
+	restore_all();
+};
+
+subtest 'diagnose_mocks integrates with spy and inject' => sub {
+	{
+		package DM::I1;
+		sub c { 1 }
+		sub dep { 2 }
+	}
+
+	spy 'DM::I1::c';
+	inject 'DM::I1::dep' => sub { 99 };
+
+	my $diag = diagnose_mocks();
+
+	ok exists $diag->{'DM::I1::c'}, 'spy recorded';
+	ok exists $diag->{'DM::I1::dep'}, 'inject recorded';
+
+	restore_all();
+};
+
+# Helper for parsing timestamps via the public API
+my $parse = sub {
+    Test::Mockingbird::TimeTravel::_parse_datetime($_[0]);
+};
+
+subtest 'freeze_time + now + restore_all (end-to-end)' => sub {
+    restore_all();
+
+    my $epoch = freeze_time('2025-01-01T00:00:00Z');
+    is now(), $epoch, 'now() returns frozen epoch';
+
+    restore_all();
+    isnt now(), $epoch, 'restore_all() returns real time';
+};
+
+subtest 'advance_time + rewind_time across multiple units' => sub {
+    restore_all();
+    freeze_time('2025-01-01T00:00:00Z');
+
+    my $t0 = now();
+
+    advance_time(30);
+    is now(), $t0 + 30, 'advance_time +30 seconds';
+
+    advance_time(2 => 'minutes');
+    is now(), $t0 + 30 + 120, 'advance_time +2 minutes';
+
+    advance_time(1 => 'hour');
+    is now(), $t0 + 30 + 120 + 3600, 'advance_time +1 hour';
+
+    rewind_time(90);
+    is now(), $t0 + 30 + 120 + 3600 - 90, 'rewind_time -90 seconds';
+
+    rewind_time(1 => 'minute');
+    is now(), $t0 + 30 + 120 + 3600 - 90 - 60, 'rewind_time -1 minute';
 
     restore_all();
 };
 
-subtest 'diagnose_mocks integrates with spy and inject' => sub {
-    {
-        package DM::I1;
-        sub c { 1 }
-        sub dep { 2 }
-    }
+subtest 'travel_to overrides frozen time' => sub {
+    restore_all();
+    freeze_time('2025-01-01T00:00:00Z');
 
-    spy 'DM::I1::c';
-    inject 'DM::I1::dep' => sub { 99 };
-
-    my $diag = diagnose_mocks();
-
-    ok exists $diag->{'DM::I1::c'}, 'spy recorded';
-    ok exists $diag->{'DM::I1::dep'}, 'inject recorded';
+    travel_to('2025-01-03T12:34:56Z');
+    is now(), $parse->('2025-01-03T12:34:56Z'),
+        'travel_to sets new frozen epoch';
 
     restore_all();
+};
+
+subtest 'with_frozen_time temporarily overrides time' => sub {
+    restore_all();
+
+    my $outer = freeze_time('2025-01-01T00:00:00Z');
+    my $inner;
+
+    with_frozen_time '2025-01-02T00:00:00Z' => sub {
+        $inner = now();
+    };
+
+    is $inner, $parse->('2025-01-02T00:00:00Z'),
+        'inner block sees overridden time';
+
+    is now(), $outer, 'outer time restored after block';
+
+    restore_all();
+};
+
+subtest 'nested with_frozen_time blocks restore correctly' => sub {
+    restore_all();
+    freeze_time('2025-01-01T00:00:00Z');
+
+    my ($inner1, $inner2);
+
+    with_frozen_time '2025-01-02T00:00:00Z' => sub {
+        $inner1 = now();
+
+        with_frozen_time '2025-01-03T00:00:00Z' => sub {
+            $inner2 = now();
+        };
+
+        is now(), $parse->('2025-01-02T00:00:00Z'),
+            'after inner block, outer block time restored';
+    };
+
+    is $inner1, $parse->('2025-01-02T00:00:00Z'),
+        'first-level block saw correct time';
+
+    is $inner2, $parse->('2025-01-03T00:00:00Z'),
+        'nested block saw correct time';
+
+    is now(), $parse->('2025-01-01T00:00:00Z'),
+        'after all blocks, original time restored';
+
+    restore_all();
+};
+
+subtest 'with_frozen_time propagates exceptions and restores state' => sub {
+    restore_all();
+    freeze_time('2025-01-01T00:00:00Z');
+
+    eval {
+        with_frozen_time '2025-01-02T00:00:00Z' => sub {
+            die "boom";
+        };
+    };
+
+    like $@, qr/boom/, 'exception propagated from block';
+
+    is now(), $parse->('2025-01-01T00:00:00Z'),
+        'state restored after exception';
+
+    restore_all();
+};
+
+subtest 'timestamp formats accepted end-to-end' => sub {
+    restore_all();
+
+    my @formats = (
+        '2025-01-01T00:00:00Z',
+        '2025-01-01 00:00:00',
+        '2025-01-01',
+        $parse->('2025-01-01T00:00:00Z'),
+    );
+
+    for my $ts (@formats) {
+        freeze_time($ts);
+        is now(), $parse->('2025-01-01T00:00:00Z'),
+            "format '$ts' parsed correctly";
+        restore_all();
+    }
+};
+
+subtest 'deep_mock integrates time plan + mocks end-to-end' => sub {
+    restore_all();
+    Test::Mockingbird::restore_all();
+
+    {
+        package DM_TIME;
+        sub stamp { 0 }   # predictable original behaviour
+    }
+
+    my $seen;
+
+    deep_mock(
+        {
+            time  => {
+                freeze  => '2025-01-01T00:00:00Z',
+                advance => [ 2 => 'minutes' ],
+            },
+            mocks => [
+                {
+                    target => 'DM_TIME::stamp',
+                    type   => 'mock',
+                    with   => sub { Test::Mockingbird::TimeTravel::now() },
+                },
+            ],
+        },
+        sub {
+            $seen = DM_TIME::stamp();
+        }
+    );
+
+    is $seen, $parse->('2025-01-01T00:02:00Z'),
+        'deep_mock time plan applied to mocked method';
+
+    # After deep_mock, both mocks and time must be restored
+    isnt now(), $parse->('2025-01-01T00:02:00Z'),
+        'time restored after deep_mock';
+
+    is DM_TIME::stamp(), 0, 'original DM_TIME::stamp restored';
+
+    restore_all();
+    Test::Mockingbird::restore_all();
 };
 
 

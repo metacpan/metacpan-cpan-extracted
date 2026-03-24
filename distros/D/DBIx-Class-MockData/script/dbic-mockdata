@@ -3,9 +3,9 @@
 use strict;
 use warnings;
 
-use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 use DBIx::Class::MockData;
+use Getopt::Long qw(:config no_ignore_case);
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ dbic-mockdata - Generate mock test data for a DBIx::Class schema
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -35,15 +35,45 @@ L<DBIx::Class::MockData> to generate and insert mock rows.
   --password        Database password
   --rows            Rows to insert per table (default: 5)
   --rows-per-table  JSON string for per-table row counts, e.g. '{"Author":10,"Book":3}'
-  --generators      JSON string for custom generators, e.g. '{"email":"user{row}@example.com","status":"active"}'
+  --generators      JSON string for custom generators, e.g. '{"email":"user{row}@example.com"}'
   --seed            Random seed for reproducible output
   --deploy          Create tables that do not yet exist
-  --wipe            Drop and recreate all tables before inserting (destructive)
+  --truncate        Empty all tables while preserving structure (fast, recommended)
+  --wipe            Drop and recreate all tables before inserting (destructive, slow)
   --dry-run         Print generated values without inserting
   --only            Comma-separated list of tables to populate (e.g. Author,Book)
   --exclude         Comma-separated list of tables to skip
+  --quiet           Suppress non-fatal warnings (e.g., wipe destruction warning)
   --verbose         Print debug output
   --help            Show this help
+
+=head1 DATA MANAGEMENT METHODS
+
+The script provides three ways to prepare your database:
+
+=over 4
+
+=item B<--truncate> (Recommended)
+
+Quickly empties all tables while preserving table structures, indexes,
+foreign keys, and sequences. Ideal for test suites that need fresh data
+between runs without the overhead of schema recreation.
+
+=item B<--wipe> (Use with caution)
+
+Drops and recreates all tables from scratch. This is destructive and
+slower than truncate, but useful when testing schema deployment or
+when you need to guarantee a completely clean state.
+
+=item B<--deploy>
+
+Creates any missing tables without affecting existing data. Safe to
+call multiple times.
+
+=back
+
+For most testing scenarios, C<--truncate> combined with C<--generate>
+provides the best balance of speed and safety.
 
 =head1 ADVANCED OPTIONS
 
@@ -84,10 +114,13 @@ GetOptions(
     'generators=s',
     'seed=i',
     'deploy',
+    'truncate',
     'wipe',
+    'generate',
     'dry-run',
     'only=s',
     'exclude=s',
+    'quiet',
     'verbose',
     'help|h',
 ) or pod2usage(2);
@@ -98,6 +131,8 @@ die "ERROR: --namespace is required\n"   unless $opt{namespace};
 die "ERROR: --dsn is required\n"         unless $opt{dsn} || $opt{'dry-run'};
 die "ERROR: --only and --exclude cannot both be specified\n"
     if $opt{only} && $opt{exclude};
+die "ERROR: --truncate and --wipe cannot both be specified\n"
+    if $opt{truncate} && $opt{wipe};
 
 # Parse JSON options if provided
 my $rows_per_table = {};
@@ -188,15 +223,31 @@ my $mock = DBIx::Class::MockData->new(
     rows_per_table => $rows_per_table,
     generators     => $generators,
     verbose        => $opt{verbose} // 0,
+    quiet          => $opt{quiet}   // 0,
     (defined $opt{seed}    ? (seed    => $opt{seed})                    : ()),
     (defined $opt{only}    ? (only    => [split /,\s*/, $opt{only}   ]) : ()),
     (defined $opt{exclude} ? (exclude => [split /,\s*/, $opt{exclude}]) : ()),
 );
 
+my $insert_failed = 0;
+local $SIG{__WARN__} = sub {
+    my $warning = shift;
+    if ($warning =~ /Bulk insert failed/) {
+        $insert_failed = 1;
+    }
+    print STDERR $warning; # Still print the warning
+};
+
 eval {
     if    ($opt{'dry-run'}) { $mock->dry_run          }
+    elsif ($opt{truncate})  { $mock->truncate         }
     elsif ($opt{wipe})      { $mock->wipe->generate   }
     elsif ($opt{deploy})    { $mock->deploy->generate }
+    elsif ($opt{generate})  { $mock->generate         }
     else                    { $mock->generate         }
 };
+
 die $@ if $@;
+
+# Exit with error if any bulk inserts failed
+exit 1 if $insert_failed;

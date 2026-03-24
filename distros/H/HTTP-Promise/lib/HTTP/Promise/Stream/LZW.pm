@@ -72,7 +72,7 @@ sub decode_lzw
     if( !defined( $rv ) )
     {
         $LZWError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -121,7 +121,7 @@ sub encode_lzw
     if( !defined( $rv ) )
     {
         $LZWError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -132,13 +132,23 @@ sub encode_lzw
 
 sub is_decoder_installed
 {
-    eval( 'use Compress::LZW::Decompressor ();' );
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require Compress::LZW::Decompressor;
+    };
     return( $@ ? 0 : 1 );
 }
 
 sub is_encoder_installed
 {
-    eval( 'use Compress::LZW::Compressor ();' );
+    local $@;
+    eval
+    {
+        local $SIG{__DIE__} = sub{};
+        require Compress::LZW::Compressor;
+    };
     return( $@ ? 0 : 1 );
 }
 

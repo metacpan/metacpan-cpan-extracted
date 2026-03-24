@@ -21,7 +21,7 @@ use Remote::Perl::Protocol   qw(
 );
 use Remote::Perl::Transport;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 # -- Tmpfile strategy mapping --------------------------------------------------
 
@@ -152,11 +152,11 @@ sub _dispatch($self, $msg) {
 
     elsif ($type == MSG_DATA) {
         if ($stream == STREAM_STDOUT) {
-            ($self->{_on_stdout} // sub {})->($body);
+            $self->{_on_stdout}->($body) if $self->{_on_stdout};
             $self->_send(MSG_CREDIT, STREAM_STDOUT, encode_credit(length($body)));
         }
         elsif ($stream == STREAM_STDERR) {
-            ($self->{_on_stderr} // sub {})->($body);
+            $self->{_on_stderr}->($body) if $self->{_on_stderr};
             $self->_send(MSG_CREDIT, STREAM_STDERR, encode_credit(length($body)));
         }
     }

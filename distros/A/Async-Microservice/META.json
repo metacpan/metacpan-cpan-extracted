@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "async",
       "asynchronous",
@@ -63,18 +63,18 @@
    "provides" : {
       "Async::Microservice" : {
          "file" : "lib/Async/Microservice.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Async::Microservice::HelloWorld" : {
          "file" : "lib/Async/Microservice/HelloWorld.pm"
       },
       "Async::Microservice::Time" : {
          "file" : "lib/Async/Microservice/Time.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Async::MicroserviceReq" : {
          "file" : "lib/Async/MicroserviceReq.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -89,6 +89,6 @@
          "url" : "https://github.com/jozef/Async-Microservice.git"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

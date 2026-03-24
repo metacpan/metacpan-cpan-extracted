@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Body/Form/Data.pm
-## Version v0.1.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/06/13
-## Modified 2025/08/30
+## Modified 2026/03/09
 ## All rights reserved.
 ## 
 ## 
@@ -21,8 +21,8 @@ BEGIN
     use vars qw( $VERSION $CRLF $DEBUG );
     use Data::UUID;
     our $CRLF = "\015\012";
-    our $VERSION = 'v0.1.1';
-    our $DEBUG = 4; # REMOVE ME
+    our $VERSION = 'v0.2.1';
+    our $DEBUG = 0; # REMOVE ME
 };
 
 use strict;
@@ -195,6 +195,7 @@ sub make_parts
         return( $self->pass_error( $headers->error ) ) if( !defined( $cd ) );
         $cd->disposition( 'form-data' );
         $cd->name( $n );
+
         if( $self->_is_a( $body => 'HTTP::Promise::Body::File' ) )
         {
             if( !$cd->filename )
@@ -203,9 +204,41 @@ sub make_parts
                 $cd->filename( $basename );
             }
             # Set Content-Type per part when we can
-            my $ctype = $body->finfo->mime_type || 'application/octet-stream';
+            my $raw_mime = $body->finfo->mime_type || 'application/octet-stream';
+            my $filename = $body->basename // '';
+
+            $self->_load_class( 'HTTP::Promise::Stream' ) || return( $self->pass_error );
+            my $stream = HTTP::Promise::Stream->new( \'' ) || return( $self->pass_error( HTTP::Promise::Stream->error ) );
+
+            # Determine encoding layers from file extensions (handles multiple encodings)
+            my $encodings = $stream->suffix2encoding( $filename );
+
+            my $ctype;
+            if( $encodings->length )
+            {
+                my $enc_suffix   = $stream->_encoding2suffix_map;
+                my %enc_suffixes = map{ $enc_suffix->{ $_ } => 1 }
+                                   grep{ exists( $enc_suffix->{ $_ } ) } @$encodings;
+                # Strip the encoding suffixes to find the inner format.
+                # reverse + pop removes the basename, leaving extensions outermost-first.
+                my @parts = reverse( split( /\./, $filename ) );
+                pop( @parts );
+                # Skip the encoding suffixes to reach the inner format extension
+                while( @parts && exists( $enc_suffixes{ $parts[0] } ) )
+                {
+                    shift( @parts );
+                }
+                my $inner_ext = @parts ? lc( $parts[0] ) : '';
+                $ctype = ( $inner_ext eq 'tar' ) ? 'application/x-tar' : "$raw_mime";
+                $headers->header( 'Content-Encoding' => join( ', ', @$encodings ) );
+            }
+            else
+            {
+                $ctype = "$raw_mime";
+            }
+
             my $ctfld = $headers->new_field( 'Content-Type' ) || return( $self->pass_error( $headers->error ) );
-            $ctfld->type( "$ctype" );
+            $ctfld->type( $ctype );
             $headers->content_type( "$ctfld" );
         }
         $headers->content_disposition( "$cd" );
@@ -335,7 +368,7 @@ HTTP::Promise::Body::Form::Data - A multipart/form-data Representation Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.1
 
 =head1 DESCRIPTION
 

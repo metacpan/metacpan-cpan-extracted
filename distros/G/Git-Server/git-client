@@ -86,7 +86,7 @@ This library is free software; you can redistribute it and/or modify it under th
 use strict;
 use Cwd qw(abs_path);
 
-our $VERSION = "0.038";
+our $VERSION = "0.039";
 
 # Locate the real "git" later in the $PATH (after myself)
 our $real_git = find_real_git();
@@ -113,8 +113,9 @@ pass_options();
 # Scan for .gitconfig files in descent directories
 scan_descent_override();
 
-# XXX - Can this be handled using a custom "git-config" program?
-# XXX - Maybe, but isn't it already painful enough getting the dev guy just to install this "git-client" utility?
+# Having a "git-deploy" command in the path works fine to pretend like "git deploy" is a command,
+# but "git-config" will be ignored since /usr/libexec/git-core/git-config will always come first in the PATH.
+# So we must handle all "git config" overrides within this "git" wrapper.
 handle_config(@ARGV);
 
 exec $real_git, @ARGV;

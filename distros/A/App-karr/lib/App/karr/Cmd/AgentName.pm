@@ -1,7 +1,7 @@
 # ABSTRACT: Generate a random two-word agent name
 
 package App::karr::Cmd::AgentName;
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -93,7 +93,7 @@ App::karr::Cmd::AgentName - Generate a random two-word agent name
 
 =head1 VERSION
 
-version 0.101
+version 0.102
 
 =head1 SYNOPSIS
 

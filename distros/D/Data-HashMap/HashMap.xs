@@ -96,11 +96,13 @@ static inline SV* hm_zerocopy_sv(pTHX_ const char* buf, uint32_t len, bool is_ut
 
 /* ---- Extract optional (max_size, default_ttl) from new() args ---- */
 
-#define EXTRACT_NEW_ARGS(max_size_var, ttl_var) \
+#define EXTRACT_NEW_ARGS(max_size_var, ttl_var, lru_skip_var) \
     size_t max_size_var = 0; \
     uint32_t ttl_var = 0; \
+    uint32_t lru_skip_var = 0; \
     if (items > 1) max_size_var = (size_t)SvUV(ST(1)); \
-    if (items > 2) ttl_var = (uint32_t)SvUV(ST(2))
+    if (items > 2) ttl_var = (uint32_t)SvUV(ST(2)); \
+    if (items > 3) lru_skip_var = (uint32_t)SvUV(ST(3))
 
 /* ---- Generic keyword build functions ---- */
 
@@ -206,6 +208,16 @@ static const struct XSParseKeywordPieceType pieces_4expr[] = {
 DEFINE_KW_HOOK(i16, "I16", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i16, "I16", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(i16, "I16", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i16, "I16", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(i16, "I16", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(i16, "I16", swap,    3, build_kw_3arg)
+DEFINE_KW_HOOK(i16, "I16", cas,     4, build_kw_4arg)
 DEFINE_KW_HOOK(i16, "I16", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", incr,     2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", decr,     2, build_kw_2arg)
@@ -216,6 +228,7 @@ DEFINE_KW_HOOK(i16, "I16", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16, "I16", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16, "I16", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16, "I16", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", clear,      1, build_kw_1arg)
@@ -227,6 +240,15 @@ DEFINE_KW_HOOK(i16, "I16", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(i16s, "I16S", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(i16s, "I16S", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i16s, "I16S", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(i16s, "I16S", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i16s, "I16S", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(i16s, "I16S", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(i16s, "I16S", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(i16s, "I16S", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", keys,     1, build_kw_1arg_list)
@@ -234,6 +256,7 @@ DEFINE_KW_HOOK(i16s, "I16S", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16s, "I16S", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16s, "I16S", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16s, "I16S", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", clear,      1, build_kw_1arg)
@@ -246,6 +269,16 @@ DEFINE_KW_HOOK(i16s, "I16S", get_direct, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(si16, "SI16", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(si16, "SI16", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(si16, "SI16", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(si16, "SI16", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(si16, "SI16", swap,    3, build_kw_3arg)
+DEFINE_KW_HOOK(si16, "SI16", cas,     4, build_kw_4arg)
 DEFINE_KW_HOOK(si16, "SI16", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", incr,     2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", decr,     2, build_kw_2arg)
@@ -256,6 +289,7 @@ DEFINE_KW_HOOK(si16, "SI16", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si16, "SI16", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si16, "SI16", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si16, "SI16", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", clear,      1, build_kw_1arg)
@@ -267,6 +301,16 @@ DEFINE_KW_HOOK(si16, "SI16", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i32, "I32", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(i32, "I32", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i32, "I32", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(i32, "I32", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(i32, "I32", swap,    3, build_kw_3arg)
+DEFINE_KW_HOOK(i32, "I32", cas,     4, build_kw_4arg)
 DEFINE_KW_HOOK(i32, "I32", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", incr,     2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", decr,     2, build_kw_2arg)
@@ -277,6 +321,7 @@ DEFINE_KW_HOOK(i32, "I32", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32, "I32", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32, "I32", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32, "I32", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", clear,      1, build_kw_1arg)
@@ -288,6 +333,16 @@ DEFINE_KW_HOOK(i32, "I32", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(ii, "II", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(ii, "II", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(ii, "II", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(ii, "II", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(ii, "II", swap,    3, build_kw_3arg)
+DEFINE_KW_HOOK(ii, "II", cas,     4, build_kw_4arg)
 DEFINE_KW_HOOK(ii, "II", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", incr,     2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", decr,     2, build_kw_2arg)
@@ -298,6 +353,7 @@ DEFINE_KW_HOOK(ii, "II", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ii, "II", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ii, "II", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ii, "II", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", clear,      1, build_kw_1arg)
@@ -309,6 +365,15 @@ DEFINE_KW_HOOK(ii, "II", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(is, "IS", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(is, "IS", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(is, "IS", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(is, "IS", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(is, "IS", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(is, "IS", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(is, "IS", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(is, "IS", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", keys,     1, build_kw_1arg_list)
@@ -316,6 +381,7 @@ DEFINE_KW_HOOK(is, "IS", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(is, "IS", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(is, "IS", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(is, "IS", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", clear,      1, build_kw_1arg)
@@ -328,6 +394,16 @@ DEFINE_KW_HOOK(is, "IS", get_direct, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(si, "SI", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(si, "SI", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(si, "SI", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(si, "SI", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(si, "SI", swap,    3, build_kw_3arg)
+DEFINE_KW_HOOK(si, "SI", cas,     4, build_kw_4arg)
 DEFINE_KW_HOOK(si, "SI", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", incr,     2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", decr,     2, build_kw_2arg)
@@ -338,6 +414,7 @@ DEFINE_KW_HOOK(si, "SI", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si, "SI", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si, "SI", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si, "SI", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", clear,      1, build_kw_1arg)
@@ -349,6 +426,15 @@ DEFINE_KW_HOOK(si, "SI", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(ss, "SS", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(ss, "SS", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(ss, "SS", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(ss, "SS", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(ss, "SS", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(ss, "SS", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(ss, "SS", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(ss, "SS", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", keys,     1, build_kw_1arg_list)
@@ -356,6 +442,7 @@ DEFINE_KW_HOOK(ss, "SS", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ss, "SS", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ss, "SS", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ss, "SS", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", clear,      1, build_kw_1arg)
@@ -368,6 +455,15 @@ DEFINE_KW_HOOK(ss, "SS", get_direct, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(i32s, "I32S", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i32s, "I32S", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(i32s, "I32S", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i32s, "I32S", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(i32s, "I32S", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(i32s, "I32S", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(i32s, "I32S", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", keys,     1, build_kw_1arg_list)
@@ -375,6 +471,7 @@ DEFINE_KW_HOOK(i32s, "I32S", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32s, "I32S", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32s, "I32S", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32s, "I32S", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", clear,      1, build_kw_1arg)
@@ -387,6 +484,16 @@ DEFINE_KW_HOOK(i32s, "I32S", get_direct, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(si32, "SI32", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(si32, "SI32", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(si32, "SI32", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(si32, "SI32", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(si32, "SI32", swap,    3, build_kw_3arg)
+DEFINE_KW_HOOK(si32, "SI32", cas,     4, build_kw_4arg)
 DEFINE_KW_HOOK(si32, "SI32", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", incr,     2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", decr,     2, build_kw_2arg)
@@ -397,6 +504,7 @@ DEFINE_KW_HOOK(si32, "SI32", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si32, "SI32", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si32, "SI32", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si32, "SI32", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", clear,      1, build_kw_1arg)
@@ -408,6 +516,15 @@ DEFINE_KW_HOOK(si32, "SI32", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(i32a, "I32A", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(i32a, "I32A", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i32a, "I32A", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i32a, "I32A", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(i32a, "I32A", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i32a, "I32A", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(i32a, "I32A", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i32a, "I32A", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(i32a, "I32A", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i32a, "I32A", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(i32a, "I32A", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(i32a, "I32A", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(i32a, "I32A", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(i32a, "I32A", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i32a, "I32A", keys,     1, build_kw_1arg_list)
@@ -415,6 +532,7 @@ DEFINE_KW_HOOK(i32a, "I32A", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32a, "I32A", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32a, "I32A", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32a, "I32A", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i32a, "I32A", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32a, "I32A", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32a, "I32A", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32a, "I32A", clear,      1, build_kw_1arg)
@@ -426,6 +544,15 @@ DEFINE_KW_HOOK(i32a, "I32A", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(i16a, "I16A", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(i16a, "I16A", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i16a, "I16A", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i16a, "I16A", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(i16a, "I16A", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(i16a, "I16A", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(i16a, "I16A", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i16a, "I16A", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(i16a, "I16A", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(i16a, "I16A", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(i16a, "I16A", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(i16a, "I16A", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(i16a, "I16A", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(i16a, "I16A", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i16a, "I16A", keys,     1, build_kw_1arg_list)
@@ -433,6 +560,7 @@ DEFINE_KW_HOOK(i16a, "I16A", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16a, "I16A", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16a, "I16A", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16a, "I16A", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(i16a, "I16A", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16a, "I16A", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16a, "I16A", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16a, "I16A", clear,      1, build_kw_1arg)
@@ -444,6 +572,15 @@ DEFINE_KW_HOOK(i16a, "I16A", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(ia, "IA", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(ia, "IA", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(ia, "IA", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(ia, "IA", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(ia, "IA", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(ia, "IA", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(ia, "IA", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(ia, "IA", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(ia, "IA", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(ia, "IA", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(ia, "IA", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(ia, "IA", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(ia, "IA", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(ia, "IA", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(ia, "IA", keys,     1, build_kw_1arg_list)
@@ -451,6 +588,7 @@ DEFINE_KW_HOOK(ia, "IA", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ia, "IA", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ia, "IA", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ia, "IA", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(ia, "IA", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ia, "IA", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ia, "IA", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ia, "IA", clear,      1, build_kw_1arg)
@@ -462,6 +600,15 @@ DEFINE_KW_HOOK(ia, "IA", get_or_set, 3, build_kw_3arg)
 DEFINE_KW_HOOK(sa, "SA", put,      3, build_kw_3arg)
 DEFINE_KW_HOOK(sa, "SA", get,      2, build_kw_2arg)
 DEFINE_KW_HOOK(sa, "SA", remove,   2, build_kw_2arg)
+DEFINE_KW_HOOK(sa, "SA", take,    2, build_kw_2arg)
+DEFINE_KW_HOOK(sa, "SA", drain,   2, build_kw_2arg)
+DEFINE_KW_HOOK(sa, "SA", pop,     1, build_kw_1arg)
+DEFINE_KW_HOOK(sa, "SA", shift,   1, build_kw_1arg)
+DEFINE_KW_HOOK(sa, "SA", reserve, 2, build_kw_2arg)
+DEFINE_KW_HOOK(sa, "SA", purge,   1, build_kw_1arg)
+DEFINE_KW_HOOK(sa, "SA", capacity, 1, build_kw_1arg)
+DEFINE_KW_HOOK(sa, "SA", persist,  2, build_kw_2arg)
+DEFINE_KW_HOOK(sa, "SA", swap,    3, build_kw_3arg)
 DEFINE_KW_HOOK(sa, "SA", exists,   2, build_kw_2arg)
 DEFINE_KW_HOOK(sa, "SA", size,     1, build_kw_1arg)
 DEFINE_KW_HOOK(sa, "SA", keys,     1, build_kw_1arg_list)
@@ -469,6 +616,7 @@ DEFINE_KW_HOOK(sa, "SA", values,   1, build_kw_1arg_list)
 DEFINE_KW_HOOK(sa, "SA", items,    1, build_kw_1arg_list)
 DEFINE_KW_HOOK(sa, "SA", max_size, 1, build_kw_1arg)
 DEFINE_KW_HOOK(sa, "SA", ttl,      1, build_kw_1arg)
+DEFINE_KW_HOOK(sa, "SA", lru_skip, 1, build_kw_1arg)
 DEFINE_KW_HOOK(sa, "SA", each,       1, build_kw_1arg_list)
 DEFINE_KW_HOOK(sa, "SA", iter_reset, 1, build_kw_1arg)
 DEFINE_KW_HOOK(sa, "SA", clear,      1, build_kw_1arg)
@@ -525,6 +673,16 @@ BOOT:
     REGISTER_KW(i16, put,      "Data::HashMap::I16::put");
     REGISTER_KW(i16, get,      "Data::HashMap::I16::get");
     REGISTER_KW(i16, remove,   "Data::HashMap::I16::remove");
+    REGISTER_KW(i16, take,   "Data::HashMap::I16::take");
+    REGISTER_KW(i16, drain,  "Data::HashMap::I16::drain");
+    REGISTER_KW(i16, pop,    "Data::HashMap::I16::pop");
+    REGISTER_KW(i16, shift,  "Data::HashMap::I16::shift");
+    REGISTER_KW(i16, reserve, "Data::HashMap::I16::reserve");
+    REGISTER_KW(i16, purge,   "Data::HashMap::I16::purge");
+    REGISTER_KW(i16, capacity, "Data::HashMap::I16::capacity");
+    REGISTER_KW(i16, persist,  "Data::HashMap::I16::persist");
+    REGISTER_KW(i16, swap,    "Data::HashMap::I16::swap");
+    REGISTER_KW(i16, cas,     "Data::HashMap::I16::cas");
     REGISTER_KW(i16, exists,   "Data::HashMap::I16::exists");
     REGISTER_KW(i16, incr,     "Data::HashMap::I16::incr");
     REGISTER_KW(i16, decr,     "Data::HashMap::I16::decr");
@@ -535,6 +693,7 @@ BOOT:
     REGISTER_KW(i16, items,    "Data::HashMap::I16::items");
     REGISTER_KW(i16, max_size, "Data::HashMap::I16::max_size");
     REGISTER_KW(i16, ttl,      "Data::HashMap::I16::ttl");
+    REGISTER_KW(i16, lru_skip, "Data::HashMap::I16::lru_skip");
     REGISTER_KW(i16, each,       "Data::HashMap::I16::each");
     REGISTER_KW(i16, iter_reset, "Data::HashMap::I16::iter_reset");
     REGISTER_KW(i16, clear,      "Data::HashMap::I16::clear");
@@ -544,6 +703,15 @@ BOOT:
     REGISTER_KW(i16s, put,      "Data::HashMap::I16S::put");
     REGISTER_KW(i16s, get,      "Data::HashMap::I16S::get");
     REGISTER_KW(i16s, remove,   "Data::HashMap::I16S::remove");
+    REGISTER_KW(i16s, take,   "Data::HashMap::I16S::take");
+    REGISTER_KW(i16s, drain,  "Data::HashMap::I16S::drain");
+    REGISTER_KW(i16s, pop,    "Data::HashMap::I16S::pop");
+    REGISTER_KW(i16s, shift,  "Data::HashMap::I16S::shift");
+    REGISTER_KW(i16s, reserve, "Data::HashMap::I16S::reserve");
+    REGISTER_KW(i16s, purge,   "Data::HashMap::I16S::purge");
+    REGISTER_KW(i16s, capacity, "Data::HashMap::I16S::capacity");
+    REGISTER_KW(i16s, persist,  "Data::HashMap::I16S::persist");
+    REGISTER_KW(i16s, swap,    "Data::HashMap::I16S::swap");
     REGISTER_KW(i16s, exists,   "Data::HashMap::I16S::exists");
     REGISTER_KW(i16s, size,     "Data::HashMap::I16S::size");
     REGISTER_KW(i16s, keys,     "Data::HashMap::I16S::keys");
@@ -551,6 +719,7 @@ BOOT:
     REGISTER_KW(i16s, items,    "Data::HashMap::I16S::items");
     REGISTER_KW(i16s, max_size, "Data::HashMap::I16S::max_size");
     REGISTER_KW(i16s, ttl,      "Data::HashMap::I16S::ttl");
+    REGISTER_KW(i16s, lru_skip, "Data::HashMap::I16S::lru_skip");
     REGISTER_KW(i16s, each,       "Data::HashMap::I16S::each");
     REGISTER_KW(i16s, iter_reset, "Data::HashMap::I16S::iter_reset");
     REGISTER_KW(i16s, clear,      "Data::HashMap::I16S::clear");
@@ -561,6 +730,16 @@ BOOT:
     REGISTER_KW(si16, put,      "Data::HashMap::SI16::put");
     REGISTER_KW(si16, get,      "Data::HashMap::SI16::get");
     REGISTER_KW(si16, remove,   "Data::HashMap::SI16::remove");
+    REGISTER_KW(si16, take,   "Data::HashMap::SI16::take");
+    REGISTER_KW(si16, drain,  "Data::HashMap::SI16::drain");
+    REGISTER_KW(si16, pop,    "Data::HashMap::SI16::pop");
+    REGISTER_KW(si16, shift,  "Data::HashMap::SI16::shift");
+    REGISTER_KW(si16, reserve, "Data::HashMap::SI16::reserve");
+    REGISTER_KW(si16, purge,   "Data::HashMap::SI16::purge");
+    REGISTER_KW(si16, capacity, "Data::HashMap::SI16::capacity");
+    REGISTER_KW(si16, persist,  "Data::HashMap::SI16::persist");
+    REGISTER_KW(si16, swap,    "Data::HashMap::SI16::swap");
+    REGISTER_KW(si16, cas,     "Data::HashMap::SI16::cas");
     REGISTER_KW(si16, exists,   "Data::HashMap::SI16::exists");
     REGISTER_KW(si16, incr,     "Data::HashMap::SI16::incr");
     REGISTER_KW(si16, decr,     "Data::HashMap::SI16::decr");
@@ -571,6 +750,7 @@ BOOT:
     REGISTER_KW(si16, items,    "Data::HashMap::SI16::items");
     REGISTER_KW(si16, max_size, "Data::HashMap::SI16::max_size");
     REGISTER_KW(si16, ttl,      "Data::HashMap::SI16::ttl");
+    REGISTER_KW(si16, lru_skip, "Data::HashMap::SI16::lru_skip");
     REGISTER_KW(si16, each,       "Data::HashMap::SI16::each");
     REGISTER_KW(si16, iter_reset, "Data::HashMap::SI16::iter_reset");
     REGISTER_KW(si16, clear,      "Data::HashMap::SI16::clear");
@@ -580,6 +760,16 @@ BOOT:
     REGISTER_KW(i32, put,      "Data::HashMap::I32::put");
     REGISTER_KW(i32, get,      "Data::HashMap::I32::get");
     REGISTER_KW(i32, remove,   "Data::HashMap::I32::remove");
+    REGISTER_KW(i32, take,   "Data::HashMap::I32::take");
+    REGISTER_KW(i32, drain,  "Data::HashMap::I32::drain");
+    REGISTER_KW(i32, pop,    "Data::HashMap::I32::pop");
+    REGISTER_KW(i32, shift,  "Data::HashMap::I32::shift");
+    REGISTER_KW(i32, reserve, "Data::HashMap::I32::reserve");
+    REGISTER_KW(i32, purge,   "Data::HashMap::I32::purge");
+    REGISTER_KW(i32, capacity, "Data::HashMap::I32::capacity");
+    REGISTER_KW(i32, persist,  "Data::HashMap::I32::persist");
+    REGISTER_KW(i32, swap,    "Data::HashMap::I32::swap");
+    REGISTER_KW(i32, cas,     "Data::HashMap::I32::cas");
     REGISTER_KW(i32, exists,   "Data::HashMap::I32::exists");
     REGISTER_KW(i32, incr,     "Data::HashMap::I32::incr");
     REGISTER_KW(i32, decr,     "Data::HashMap::I32::decr");
@@ -590,6 +780,7 @@ BOOT:
     REGISTER_KW(i32, items,    "Data::HashMap::I32::items");
     REGISTER_KW(i32, max_size, "Data::HashMap::I32::max_size");
     REGISTER_KW(i32, ttl,      "Data::HashMap::I32::ttl");
+    REGISTER_KW(i32, lru_skip, "Data::HashMap::I32::lru_skip");
     REGISTER_KW(i32, each,       "Data::HashMap::I32::each");
     REGISTER_KW(i32, iter_reset, "Data::HashMap::I32::iter_reset");
     REGISTER_KW(i32, clear,      "Data::HashMap::I32::clear");
@@ -599,6 +790,16 @@ BOOT:
     REGISTER_KW(ii, put,      "Data::HashMap::II::put");
     REGISTER_KW(ii, get,      "Data::HashMap::II::get");
     REGISTER_KW(ii, remove,   "Data::HashMap::II::remove");
+    REGISTER_KW(ii, take,   "Data::HashMap::II::take");
+    REGISTER_KW(ii, drain,  "Data::HashMap::II::drain");
+    REGISTER_KW(ii, pop,    "Data::HashMap::II::pop");
+    REGISTER_KW(ii, shift,  "Data::HashMap::II::shift");
+    REGISTER_KW(ii, reserve, "Data::HashMap::II::reserve");
+    REGISTER_KW(ii, purge,   "Data::HashMap::II::purge");
+    REGISTER_KW(ii, capacity, "Data::HashMap::II::capacity");
+    REGISTER_KW(ii, persist,  "Data::HashMap::II::persist");
+    REGISTER_KW(ii, swap,    "Data::HashMap::II::swap");
+    REGISTER_KW(ii, cas,     "Data::HashMap::II::cas");
     REGISTER_KW(ii, exists,   "Data::HashMap::II::exists");
     REGISTER_KW(ii, incr,     "Data::HashMap::II::incr");
     REGISTER_KW(ii, decr,     "Data::HashMap::II::decr");
@@ -609,6 +810,7 @@ BOOT:
     REGISTER_KW(ii, items,    "Data::HashMap::II::items");
     REGISTER_KW(ii, max_size, "Data::HashMap::II::max_size");
     REGISTER_KW(ii, ttl,      "Data::HashMap::II::ttl");
+    REGISTER_KW(ii, lru_skip, "Data::HashMap::II::lru_skip");
     REGISTER_KW(ii, each,       "Data::HashMap::II::each");
     REGISTER_KW(ii, iter_reset, "Data::HashMap::II::iter_reset");
     REGISTER_KW(ii, clear,      "Data::HashMap::II::clear");
@@ -618,6 +820,15 @@ BOOT:
     REGISTER_KW(is, put,      "Data::HashMap::IS::put");
     REGISTER_KW(is, get,      "Data::HashMap::IS::get");
     REGISTER_KW(is, remove,   "Data::HashMap::IS::remove");
+    REGISTER_KW(is, take,   "Data::HashMap::IS::take");
+    REGISTER_KW(is, drain,  "Data::HashMap::IS::drain");
+    REGISTER_KW(is, pop,    "Data::HashMap::IS::pop");
+    REGISTER_KW(is, shift,  "Data::HashMap::IS::shift");
+    REGISTER_KW(is, reserve, "Data::HashMap::IS::reserve");
+    REGISTER_KW(is, purge,   "Data::HashMap::IS::purge");
+    REGISTER_KW(is, capacity, "Data::HashMap::IS::capacity");
+    REGISTER_KW(is, persist,  "Data::HashMap::IS::persist");
+    REGISTER_KW(is, swap,    "Data::HashMap::IS::swap");
     REGISTER_KW(is, exists,   "Data::HashMap::IS::exists");
     REGISTER_KW(is, size,     "Data::HashMap::IS::size");
     REGISTER_KW(is, keys,     "Data::HashMap::IS::keys");
@@ -625,6 +836,7 @@ BOOT:
     REGISTER_KW(is, items,    "Data::HashMap::IS::items");
     REGISTER_KW(is, max_size, "Data::HashMap::IS::max_size");
     REGISTER_KW(is, ttl,      "Data::HashMap::IS::ttl");
+    REGISTER_KW(is, lru_skip, "Data::HashMap::IS::lru_skip");
     REGISTER_KW(is, each,       "Data::HashMap::IS::each");
     REGISTER_KW(is, iter_reset, "Data::HashMap::IS::iter_reset");
     REGISTER_KW(is, clear,      "Data::HashMap::IS::clear");
@@ -635,6 +847,16 @@ BOOT:
     REGISTER_KW(si, put,      "Data::HashMap::SI::put");
     REGISTER_KW(si, get,      "Data::HashMap::SI::get");
     REGISTER_KW(si, remove,   "Data::HashMap::SI::remove");
+    REGISTER_KW(si, take,   "Data::HashMap::SI::take");
+    REGISTER_KW(si, drain,  "Data::HashMap::SI::drain");
+    REGISTER_KW(si, pop,    "Data::HashMap::SI::pop");
+    REGISTER_KW(si, shift,  "Data::HashMap::SI::shift");
+    REGISTER_KW(si, reserve, "Data::HashMap::SI::reserve");
+    REGISTER_KW(si, purge,   "Data::HashMap::SI::purge");
+    REGISTER_KW(si, capacity, "Data::HashMap::SI::capacity");
+    REGISTER_KW(si, persist,  "Data::HashMap::SI::persist");
+    REGISTER_KW(si, swap,    "Data::HashMap::SI::swap");
+    REGISTER_KW(si, cas,     "Data::HashMap::SI::cas");
     REGISTER_KW(si, exists,   "Data::HashMap::SI::exists");
     REGISTER_KW(si, incr,     "Data::HashMap::SI::incr");
     REGISTER_KW(si, decr,     "Data::HashMap::SI::decr");
@@ -645,6 +867,7 @@ BOOT:
     REGISTER_KW(si, items,    "Data::HashMap::SI::items");
     REGISTER_KW(si, max_size, "Data::HashMap::SI::max_size");
     REGISTER_KW(si, ttl,      "Data::HashMap::SI::ttl");
+    REGISTER_KW(si, lru_skip, "Data::HashMap::SI::lru_skip");
     REGISTER_KW(si, each,       "Data::HashMap::SI::each");
     REGISTER_KW(si, iter_reset, "Data::HashMap::SI::iter_reset");
     REGISTER_KW(si, clear,      "Data::HashMap::SI::clear");
@@ -654,6 +877,15 @@ BOOT:
     REGISTER_KW(ss, put,      "Data::HashMap::SS::put");
     REGISTER_KW(ss, get,      "Data::HashMap::SS::get");
     REGISTER_KW(ss, remove,   "Data::HashMap::SS::remove");
+    REGISTER_KW(ss, take,   "Data::HashMap::SS::take");
+    REGISTER_KW(ss, drain,  "Data::HashMap::SS::drain");
+    REGISTER_KW(ss, pop,    "Data::HashMap::SS::pop");
+    REGISTER_KW(ss, shift,  "Data::HashMap::SS::shift");
+    REGISTER_KW(ss, reserve, "Data::HashMap::SS::reserve");
+    REGISTER_KW(ss, purge,   "Data::HashMap::SS::purge");
+    REGISTER_KW(ss, capacity, "Data::HashMap::SS::capacity");
+    REGISTER_KW(ss, persist,  "Data::HashMap::SS::persist");
+    REGISTER_KW(ss, swap,    "Data::HashMap::SS::swap");
     REGISTER_KW(ss, exists,   "Data::HashMap::SS::exists");
     REGISTER_KW(ss, size,     "Data::HashMap::SS::size");
     REGISTER_KW(ss, keys,     "Data::HashMap::SS::keys");
@@ -661,6 +893,7 @@ BOOT:
     REGISTER_KW(ss, items,    "Data::HashMap::SS::items");
     REGISTER_KW(ss, max_size, "Data::HashMap::SS::max_size");
     REGISTER_KW(ss, ttl,      "Data::HashMap::SS::ttl");
+    REGISTER_KW(ss, lru_skip, "Data::HashMap::SS::lru_skip");
     REGISTER_KW(ss, each,       "Data::HashMap::SS::each");
     REGISTER_KW(ss, iter_reset, "Data::HashMap::SS::iter_reset");
     REGISTER_KW(ss, clear,      "Data::HashMap::SS::clear");
@@ -671,6 +904,15 @@ BOOT:
     REGISTER_KW(i32s, put,      "Data::HashMap::I32S::put");
     REGISTER_KW(i32s, get,      "Data::HashMap::I32S::get");
     REGISTER_KW(i32s, remove,   "Data::HashMap::I32S::remove");
+    REGISTER_KW(i32s, take,   "Data::HashMap::I32S::take");
+    REGISTER_KW(i32s, drain,  "Data::HashMap::I32S::drain");
+    REGISTER_KW(i32s, pop,    "Data::HashMap::I32S::pop");
+    REGISTER_KW(i32s, shift,  "Data::HashMap::I32S::shift");
+    REGISTER_KW(i32s, reserve, "Data::HashMap::I32S::reserve");
+    REGISTER_KW(i32s, purge,   "Data::HashMap::I32S::purge");
+    REGISTER_KW(i32s, capacity, "Data::HashMap::I32S::capacity");
+    REGISTER_KW(i32s, persist,  "Data::HashMap::I32S::persist");
+    REGISTER_KW(i32s, swap,    "Data::HashMap::I32S::swap");
     REGISTER_KW(i32s, exists,   "Data::HashMap::I32S::exists");
     REGISTER_KW(i32s, size,     "Data::HashMap::I32S::size");
     REGISTER_KW(i32s, keys,     "Data::HashMap::I32S::keys");
@@ -678,6 +920,7 @@ BOOT:
     REGISTER_KW(i32s, items,    "Data::HashMap::I32S::items");
     REGISTER_KW(i32s, max_size, "Data::HashMap::I32S::max_size");
     REGISTER_KW(i32s, ttl,      "Data::HashMap::I32S::ttl");
+    REGISTER_KW(i32s, lru_skip, "Data::HashMap::I32S::lru_skip");
     REGISTER_KW(i32s, each,       "Data::HashMap::I32S::each");
     REGISTER_KW(i32s, iter_reset, "Data::HashMap::I32S::iter_reset");
     REGISTER_KW(i32s, clear,      "Data::HashMap::I32S::clear");
@@ -688,6 +931,16 @@ BOOT:
     REGISTER_KW(si32, put,      "Data::HashMap::SI32::put");
     REGISTER_KW(si32, get,      "Data::HashMap::SI32::get");
     REGISTER_KW(si32, remove,   "Data::HashMap::SI32::remove");
+    REGISTER_KW(si32, take,   "Data::HashMap::SI32::take");
+    REGISTER_KW(si32, drain,  "Data::HashMap::SI32::drain");
+    REGISTER_KW(si32, pop,    "Data::HashMap::SI32::pop");
+    REGISTER_KW(si32, shift,  "Data::HashMap::SI32::shift");
+    REGISTER_KW(si32, reserve, "Data::HashMap::SI32::reserve");
+    REGISTER_KW(si32, purge,   "Data::HashMap::SI32::purge");
+    REGISTER_KW(si32, capacity, "Data::HashMap::SI32::capacity");
+    REGISTER_KW(si32, persist,  "Data::HashMap::SI32::persist");
+    REGISTER_KW(si32, swap,    "Data::HashMap::SI32::swap");
+    REGISTER_KW(si32, cas,     "Data::HashMap::SI32::cas");
     REGISTER_KW(si32, exists,   "Data::HashMap::SI32::exists");
     REGISTER_KW(si32, incr,     "Data::HashMap::SI32::incr");
     REGISTER_KW(si32, decr,     "Data::HashMap::SI32::decr");
@@ -698,6 +951,7 @@ BOOT:
     REGISTER_KW(si32, items,    "Data::HashMap::SI32::items");
     REGISTER_KW(si32, max_size, "Data::HashMap::SI32::max_size");
     REGISTER_KW(si32, ttl,      "Data::HashMap::SI32::ttl");
+    REGISTER_KW(si32, lru_skip, "Data::HashMap::SI32::lru_skip");
     REGISTER_KW(si32, each,       "Data::HashMap::SI32::each");
     REGISTER_KW(si32, iter_reset, "Data::HashMap::SI32::iter_reset");
     REGISTER_KW(si32, clear,      "Data::HashMap::SI32::clear");
@@ -707,6 +961,15 @@ BOOT:
     REGISTER_KW(i32a, put,      "Data::HashMap::I32A::put");
     REGISTER_KW(i32a, get,      "Data::HashMap::I32A::get");
     REGISTER_KW(i32a, remove,   "Data::HashMap::I32A::remove");
+    REGISTER_KW(i32a, take,   "Data::HashMap::I32A::take");
+    REGISTER_KW(i32a, drain,  "Data::HashMap::I32A::drain");
+    REGISTER_KW(i32a, pop,    "Data::HashMap::I32A::pop");
+    REGISTER_KW(i32a, shift,  "Data::HashMap::I32A::shift");
+    REGISTER_KW(i32a, reserve, "Data::HashMap::I32A::reserve");
+    REGISTER_KW(i32a, purge,   "Data::HashMap::I32A::purge");
+    REGISTER_KW(i32a, capacity, "Data::HashMap::I32A::capacity");
+    REGISTER_KW(i32a, persist,  "Data::HashMap::I32A::persist");
+    REGISTER_KW(i32a, swap,    "Data::HashMap::I32A::swap");
     REGISTER_KW(i32a, exists,   "Data::HashMap::I32A::exists");
     REGISTER_KW(i32a, size,     "Data::HashMap::I32A::size");
     REGISTER_KW(i32a, keys,     "Data::HashMap::I32A::keys");
@@ -714,6 +977,7 @@ BOOT:
     REGISTER_KW(i32a, items,    "Data::HashMap::I32A::items");
     REGISTER_KW(i32a, max_size, "Data::HashMap::I32A::max_size");
     REGISTER_KW(i32a, ttl,      "Data::HashMap::I32A::ttl");
+    REGISTER_KW(i32a, lru_skip, "Data::HashMap::I32A::lru_skip");
     REGISTER_KW(i32a, each,       "Data::HashMap::I32A::each");
     REGISTER_KW(i32a, iter_reset, "Data::HashMap::I32A::iter_reset");
     REGISTER_KW(i32a, clear,      "Data::HashMap::I32A::clear");
@@ -723,6 +987,15 @@ BOOT:
     REGISTER_KW(i16a, put,      "Data::HashMap::I16A::put");
     REGISTER_KW(i16a, get,      "Data::HashMap::I16A::get");
     REGISTER_KW(i16a, remove,   "Data::HashMap::I16A::remove");
+    REGISTER_KW(i16a, take,   "Data::HashMap::I16A::take");
+    REGISTER_KW(i16a, drain,  "Data::HashMap::I16A::drain");
+    REGISTER_KW(i16a, pop,    "Data::HashMap::I16A::pop");
+    REGISTER_KW(i16a, shift,  "Data::HashMap::I16A::shift");
+    REGISTER_KW(i16a, reserve, "Data::HashMap::I16A::reserve");
+    REGISTER_KW(i16a, purge,   "Data::HashMap::I16A::purge");
+    REGISTER_KW(i16a, capacity, "Data::HashMap::I16A::capacity");
+    REGISTER_KW(i16a, persist,  "Data::HashMap::I16A::persist");
+    REGISTER_KW(i16a, swap,    "Data::HashMap::I16A::swap");
     REGISTER_KW(i16a, exists,   "Data::HashMap::I16A::exists");
     REGISTER_KW(i16a, size,     "Data::HashMap::I16A::size");
     REGISTER_KW(i16a, keys,     "Data::HashMap::I16A::keys");
@@ -730,6 +1003,7 @@ BOOT:
     REGISTER_KW(i16a, items,    "Data::HashMap::I16A::items");
     REGISTER_KW(i16a, max_size, "Data::HashMap::I16A::max_size");
     REGISTER_KW(i16a, ttl,      "Data::HashMap::I16A::ttl");
+    REGISTER_KW(i16a, lru_skip, "Data::HashMap::I16A::lru_skip");
     REGISTER_KW(i16a, each,       "Data::HashMap::I16A::each");
     REGISTER_KW(i16a, iter_reset, "Data::HashMap::I16A::iter_reset");
     REGISTER_KW(i16a, clear,      "Data::HashMap::I16A::clear");
@@ -739,6 +1013,15 @@ BOOT:
     REGISTER_KW(ia, put,      "Data::HashMap::IA::put");
     REGISTER_KW(ia, get,      "Data::HashMap::IA::get");
     REGISTER_KW(ia, remove,   "Data::HashMap::IA::remove");
+    REGISTER_KW(ia, take,   "Data::HashMap::IA::take");
+    REGISTER_KW(ia, drain,  "Data::HashMap::IA::drain");
+    REGISTER_KW(ia, pop,    "Data::HashMap::IA::pop");
+    REGISTER_KW(ia, shift,  "Data::HashMap::IA::shift");
+    REGISTER_KW(ia, reserve, "Data::HashMap::IA::reserve");
+    REGISTER_KW(ia, purge,   "Data::HashMap::IA::purge");
+    REGISTER_KW(ia, capacity, "Data::HashMap::IA::capacity");
+    REGISTER_KW(ia, persist,  "Data::HashMap::IA::persist");
+    REGISTER_KW(ia, swap,    "Data::HashMap::IA::swap");
     REGISTER_KW(ia, exists,   "Data::HashMap::IA::exists");
     REGISTER_KW(ia, size,     "Data::HashMap::IA::size");
     REGISTER_KW(ia, keys,     "Data::HashMap::IA::keys");
@@ -746,6 +1029,7 @@ BOOT:
     REGISTER_KW(ia, items,    "Data::HashMap::IA::items");
     REGISTER_KW(ia, max_size, "Data::HashMap::IA::max_size");
     REGISTER_KW(ia, ttl,      "Data::HashMap::IA::ttl");
+    REGISTER_KW(ia, lru_skip, "Data::HashMap::IA::lru_skip");
     REGISTER_KW(ia, each,       "Data::HashMap::IA::each");
     REGISTER_KW(ia, iter_reset, "Data::HashMap::IA::iter_reset");
     REGISTER_KW(ia, clear,      "Data::HashMap::IA::clear");
@@ -755,6 +1039,15 @@ BOOT:
     REGISTER_KW(sa, put,      "Data::HashMap::SA::put");
     REGISTER_KW(sa, get,      "Data::HashMap::SA::get");
     REGISTER_KW(sa, remove,   "Data::HashMap::SA::remove");
+    REGISTER_KW(sa, take,   "Data::HashMap::SA::take");
+    REGISTER_KW(sa, drain,  "Data::HashMap::SA::drain");
+    REGISTER_KW(sa, pop,    "Data::HashMap::SA::pop");
+    REGISTER_KW(sa, shift,  "Data::HashMap::SA::shift");
+    REGISTER_KW(sa, reserve, "Data::HashMap::SA::reserve");
+    REGISTER_KW(sa, purge,   "Data::HashMap::SA::purge");
+    REGISTER_KW(sa, capacity, "Data::HashMap::SA::capacity");
+    REGISTER_KW(sa, persist,  "Data::HashMap::SA::persist");
+    REGISTER_KW(sa, swap,    "Data::HashMap::SA::swap");
     REGISTER_KW(sa, exists,   "Data::HashMap::SA::exists");
     REGISTER_KW(sa, size,     "Data::HashMap::SA::size");
     REGISTER_KW(sa, keys,     "Data::HashMap::SA::keys");
@@ -762,6 +1055,7 @@ BOOT:
     REGISTER_KW(sa, items,    "Data::HashMap::SA::items");
     REGISTER_KW(sa, max_size, "Data::HashMap::SA::max_size");
     REGISTER_KW(sa, ttl,      "Data::HashMap::SA::ttl");
+    REGISTER_KW(sa, lru_skip, "Data::HashMap::SA::lru_skip");
     REGISTER_KW(sa, each,       "Data::HashMap::SA::each");
     REGISTER_KW(sa, iter_reset, "Data::HashMap::SA::iter_reset");
     REGISTER_KW(sa, clear,      "Data::HashMap::SA::clear");
@@ -769,3181 +1063,32 @@ BOOT:
     REGISTER_KW(sa, put_ttl,    "Data::HashMap::SA::put_ttl");
     REGISTER_KW(sa, get_or_set, "Data::HashMap::SA::get_or_set");
 
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapI32* map = hashmap_i32_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::I32");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
 
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        hashmap_i32_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
 
-bool
-put(SV* self_sv, int32_t key, int32_t value)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        RETVAL = hashmap_i32_put(self, key, value, 0);
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/i32.xsi
 
-SV*
-get(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        int32_t value;
-        if (!hashmap_i32_get(self, key, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/ii.xsi
 
-bool
-remove(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        RETVAL = hashmap_i32_remove(self, key);
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/is.xsi
 
-bool
-exists(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        RETVAL = hashmap_i32_exists(self, key);
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/si.xsi
 
-SV*
-incr(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        int32_t val;
-        if (!hashmap_i32_increment(self, key, &val))
-            croak("HashMap::I32: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/ss.xsi
 
-SV*
-decr(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        int32_t val;
-        if (!hashmap_i32_decrement(self, key, &val))
-            croak("HashMap::I32: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/i32s.xsi
 
-SV*
-incr_by(SV* self_sv, int32_t key, int32_t delta)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        int32_t val;
-        if (!hashmap_i32_increment_by(self, key, delta, &val))
-            croak("HashMap::I32: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/si32.xsi
 
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/i16.xsi
 
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/i16s.xsi
 
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
+INCLUDE: xs/si16.xsi
 
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
+INCLUDE: xs/i32a.xsi
 
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].value);
-        }
+INCLUDE: xs/i16a.xsi
 
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                mXPUSHi(self->nodes[i].value);
-            }
-        }
+INCLUDE: xs/ia.xsi
 
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (I32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                mXPUSHi(self->nodes[i].value);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        hashmap_i32_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* val = newSViv(self->nodes[i].value);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int32_t key, int32_t value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        RETVAL = hashmap_i32_put(self, key, value, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int32_t key, int32_t default_value)
-    CODE:
-        EXTRACT_MAP(HashMapI32, stash_i32, "Data::HashMap::I32", self_sv);
-        bool was_found;
-        size_t idx = hashmap_i32_get_or_set(self, key, default_value, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        RETVAL = newSViv(self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::II
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapII* map = hashmap_ii_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::II");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        hashmap_ii_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int64_t key, int64_t value)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = hashmap_ii_put(self, key, value, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        int64_t value;
-        if (!hashmap_ii_get(self, key, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = hashmap_ii_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = hashmap_ii_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        int64_t val;
-        if (!hashmap_ii_increment(self, key, &val))
-            croak("HashMap::II: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        int64_t val;
-        if (!hashmap_ii_decrement(self, key, &val))
-            croak("HashMap::II: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, int64_t key, int64_t delta)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        int64_t val;
-        if (!hashmap_ii_increment_by(self, key, delta, &val))
-            croak("HashMap::II: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].value);
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                mXPUSHi(self->nodes[i].value);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                mXPUSHi(self->nodes[i].value);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        hashmap_ii_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (II_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* val = newSViv(self->nodes[i].value);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int64_t key, int64_t value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        RETVAL = hashmap_ii_put(self, key, value, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int64_t key, int64_t default_value)
-    CODE:
-        EXTRACT_MAP(HashMapII, stash_ii, "Data::HashMap::II", self_sv);
-        bool was_found;
-        size_t idx = hashmap_ii_get_or_set(self, key, default_value, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        RETVAL = newSViv(self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::IS
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapIS* map = hashmap_is_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::IS");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        hashmap_is_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int64_t key, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_is_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_is_get(self, key, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_direct(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_is_get(self, key, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        RETVAL = hashmap_is_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        RETVAL = hashmap_is_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                if (self->nodes[i].value) {
-                    SV* sv = newSVpvn(self->nodes[i].value,
-                                      HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
-                    mXPUSHs(sv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                if (self->nodes[i].value) {
-                    SV* sv = newSVpvn(self->nodes[i].value,
-                                      HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
-                    mXPUSHs(sv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (IS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                if (self->nodes[i].value) {
-                    SV* vsv = newSVpvn(self->nodes[i].value,
-                                       HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(vsv);
-                    mXPUSHs(vsv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        hashmap_is_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t vlen = HM_UNPACK_LEN(self->nodes[i].val_len);
-                bool vutf8 = HM_UNPACK_UTF8(self->nodes[i].val_len);
-                SV* val = self->nodes[i].value
-                    ? newSVpvn(self->nodes[i].value, vlen)
-                    : newSV(0);
-                if (self->nodes[i].value && vutf8) SvUTF8_on(val);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int64_t key, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_is_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int64_t key, SV* default_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIS, stash_is, "Data::HashMap::IS", self_sv);
-        EXTRACT_STR_VAL(default_sv);
-        bool was_found;
-        size_t idx = hashmap_is_get_or_set(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        if (self->nodes[idx].value) {
-            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
-            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
-        } else {
-            RETVAL = newSV(0);
-        }
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::SI
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapSI* map = hashmap_si_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::SI");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        hashmap_si_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, int64_t value)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t value;
-        if (!hashmap_si_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value))
-            XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t val;
-        if (!hashmap_si_increment(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
-            croak("HashMap::SI: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t val;
-        if (!hashmap_si_decrement(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
-            croak("HashMap::SI: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, SV* key_sv, int64_t delta)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t val;
-        if (!hashmap_si_increment_by(self, _kstr, (uint32_t)_klen, _khash, _kutf8, delta, &val))
-            croak("HashMap::SI: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].value);
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-                mXPUSHi(self->nodes[i].value);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (SI_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                {
-                    uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                    SV* ksv = newSVpvn(self->nodes[i].key, klen);
-                    if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
-                    mXPUSHs(ksv);
-                }
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                mXPUSHi(self->nodes[i].value);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        hashmap_si_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                bool kutf8 = HM_UNPACK_UTF8(self->nodes[i].key_len);
-                SV* val = newSViv(self->nodes[i].value);
-                (void)hv_store(hv, self->nodes[i].key, kutf8 ? -(I32)klen : (I32)klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, int64_t value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, int64_t default_value)
-    CODE:
-        EXTRACT_MAP(HashMapSI, stash_si, "Data::HashMap::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        bool was_found;
-        size_t idx = hashmap_si_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        RETVAL = newSViv(self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::SS
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapSS* map = hashmap_ss_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::SS");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        hashmap_ss_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_ss_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
-                                _vstr, (uint32_t)_vlen, _vutf8, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_direct(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_ss_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_ss_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_ss_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                if (self->nodes[i].value) {
-                    SV* sv = newSVpvn(self->nodes[i].value,
-                                      HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
-                    mXPUSHs(sv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-                if (self->nodes[i].value) {
-                    SV* vsv = newSVpvn(self->nodes[i].value,
-                                       HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(vsv);
-                    mXPUSHs(vsv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (SS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                {
-                    uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                    SV* ksv = newSVpvn(self->nodes[i].key, klen);
-                    if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
-                    mXPUSHs(ksv);
-                }
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                if (self->nodes[i].value) {
-                    SV* vsv = newSVpvn(self->nodes[i].value,
-                                       HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(vsv);
-                    mXPUSHs(vsv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        hashmap_ss_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SS_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                bool kutf8 = HM_UNPACK_UTF8(self->nodes[i].key_len);
-                uint32_t vlen = HM_UNPACK_LEN(self->nodes[i].val_len);
-                bool vutf8 = HM_UNPACK_UTF8(self->nodes[i].val_len);
-                SV* val = self->nodes[i].value
-                    ? newSVpvn(self->nodes[i].value, vlen)
-                    : newSV(0);
-                if (self->nodes[i].value && vutf8) SvUTF8_on(val);
-                (void)hv_store(hv, self->nodes[i].key, kutf8 ? -(I32)klen : (I32)klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_ss_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
-                                _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, SV* default_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSS, stash_ss, "Data::HashMap::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        EXTRACT_STR_VAL(default_sv);
-        bool was_found;
-        size_t idx = hashmap_ss_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8,
-                          _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        if (self->nodes[idx].value) {
-            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
-            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
-        } else {
-            RETVAL = newSV(0);
-        }
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::I32S
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapI32S* map = hashmap_i32s_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::I32S");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        hashmap_i32s_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int32_t key, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_i32s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_i32s_get(self, key, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_direct(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_i32s_get(self, key, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        RETVAL = hashmap_i32s_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        RETVAL = hashmap_i32s_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                if (self->nodes[i].value) {
-                    SV* sv = newSVpvn(self->nodes[i].value,
-                                      HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
-                    mXPUSHs(sv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                if (self->nodes[i].value) {
-                    SV* sv = newSVpvn(self->nodes[i].value,
-                                      HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
-                    mXPUSHs(sv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                if (self->nodes[i].value) {
-                    SV* vsv = newSVpvn(self->nodes[i].value,
-                                       HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(vsv);
-                    mXPUSHs(vsv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        hashmap_i32s_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t vlen = HM_UNPACK_LEN(self->nodes[i].val_len);
-                bool vutf8 = HM_UNPACK_UTF8(self->nodes[i].val_len);
-                SV* val = self->nodes[i].value
-                    ? newSVpvn(self->nodes[i].value, vlen)
-                    : newSV(0);
-                if (self->nodes[i].value && vutf8) SvUTF8_on(val);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_i32s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int32_t key, SV* default_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32S, stash_i32s, "Data::HashMap::I32S", self_sv);
-        EXTRACT_STR_VAL(default_sv);
-        bool was_found;
-        size_t idx = hashmap_i32s_get_or_set(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        if (self->nodes[idx].value) {
-            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
-            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
-        } else {
-            RETVAL = newSV(0);
-        }
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::SI32
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapSI32* map = hashmap_si32_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::SI32");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        hashmap_si32_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, int32_t value)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si32_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int32_t value;
-        if (!hashmap_si32_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value))
-            XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si32_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si32_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int32_t val;
-        if (!hashmap_si32_increment(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
-            croak("HashMap::SI32: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int32_t val;
-        if (!hashmap_si32_decrement(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
-            croak("HashMap::SI32: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, SV* key_sv, int32_t delta)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int32_t val;
-        if (!hashmap_si32_increment_by(self, _kstr, (uint32_t)_klen, _khash, _kutf8, delta, &val))
-            croak("HashMap::SI32: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].value);
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-                mXPUSHi(self->nodes[i].value);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (SI32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                {
-                    uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                    SV* ksv = newSVpvn(self->nodes[i].key, klen);
-                    if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
-                    mXPUSHs(ksv);
-                }
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                mXPUSHi(self->nodes[i].value);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        hashmap_si32_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI32_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                bool kutf8 = HM_UNPACK_UTF8(self->nodes[i].key_len);
-                SV* val = newSViv(self->nodes[i].value);
-                (void)hv_store(hv, self->nodes[i].key, kutf8 ? -(I32)klen : (I32)klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, int32_t value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si32_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, int32_t default_value)
-    CODE:
-        EXTRACT_MAP(HashMapSI32, stash_si32, "Data::HashMap::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        bool was_found;
-        size_t idx = hashmap_si32_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        RETVAL = newSViv(self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::I16
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapI16* map = hashmap_i16_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::I16");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        hashmap_i16_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int16_t key, int16_t value)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        RETVAL = hashmap_i16_put(self, key, value, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        int16_t value;
-        if (!hashmap_i16_get(self, key, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        RETVAL = hashmap_i16_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        RETVAL = hashmap_i16_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        int16_t val;
-        if (!hashmap_i16_increment(self, key, &val))
-            croak("HashMap::I16: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        int16_t val;
-        if (!hashmap_i16_decrement(self, key, &val))
-            croak("HashMap::I16: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, int16_t key, int16_t delta)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        int16_t val;
-        if (!hashmap_i16_increment_by(self, key, delta, &val))
-            croak("HashMap::I16: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].value);
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                mXPUSHi(self->nodes[i].value);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                mXPUSHi(self->nodes[i].value);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        hashmap_i16_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* val = newSViv(self->nodes[i].value);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int16_t key, int16_t value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        RETVAL = hashmap_i16_put(self, key, value, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int16_t key, int16_t default_value)
-    CODE:
-        EXTRACT_MAP(HashMapI16, stash_i16, "Data::HashMap::I16", self_sv);
-        bool was_found;
-        size_t idx = hashmap_i16_get_or_set(self, key, default_value, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        RETVAL = newSViv(self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::I16S
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapI16S* map = hashmap_i16s_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::I16S");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        hashmap_i16s_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int16_t key, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_i16s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_i16s_get(self, key, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_direct(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        const char* val;
-        uint32_t val_len;
-        bool val_utf8;
-        if (!hashmap_i16s_get(self, key, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = hm_zerocopy_sv(aTHX_ val, val_len, val_utf8);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        RETVAL = hashmap_i16s_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        RETVAL = hashmap_i16s_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                if (self->nodes[i].value) {
-                    SV* sv = newSVpvn(self->nodes[i].value,
-                                      HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
-                    mXPUSHs(sv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                if (self->nodes[i].value) {
-                    SV* sv = newSVpvn(self->nodes[i].value,
-                                      HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(sv);
-                    mXPUSHs(sv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                if (self->nodes[i].value) {
-                    SV* vsv = newSVpvn(self->nodes[i].value,
-                                       HM_UNPACK_LEN(self->nodes[i].val_len));
-                    if (HM_UNPACK_UTF8(self->nodes[i].val_len)) SvUTF8_on(vsv);
-                    mXPUSHs(vsv);
-                } else {
-                    XPUSHs(&PL_sv_undef);
-                }
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        hashmap_i16s_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16S_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t vlen = HM_UNPACK_LEN(self->nodes[i].val_len);
-                bool vutf8 = HM_UNPACK_UTF8(self->nodes[i].val_len);
-                SV* val = self->nodes[i].value
-                    ? newSVpvn(self->nodes[i].value, vlen)
-                    : newSV(0);
-                if (self->nodes[i].value && vutf8) SvUTF8_on(val);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = hashmap_i16s_put(self, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int16_t key, SV* default_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16S, stash_i16s, "Data::HashMap::I16S", self_sv);
-        EXTRACT_STR_VAL(default_sv);
-        bool was_found;
-        size_t idx = hashmap_i16s_get_or_set(self, key, _vstr, (uint32_t)_vlen, _vutf8, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        if (self->nodes[idx].value) {
-            RETVAL = newSVpvn(self->nodes[idx].value, HM_UNPACK_LEN(self->nodes[idx].val_len));
-            if (HM_UNPACK_UTF8(self->nodes[idx].val_len)) SvUTF8_on(RETVAL);
-        } else {
-            RETVAL = newSV(0);
-        }
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::SI16
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapSI16* map = hashmap_si16_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::SI16");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        hashmap_si16_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, int16_t value)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si16_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, 0);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int16_t value;
-        if (!hashmap_si16_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &value))
-            XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si16_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si16_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int16_t val;
-        if (!hashmap_si16_increment(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
-            croak("HashMap::SI16: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int16_t val;
-        if (!hashmap_si16_decrement(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
-            croak("HashMap::SI16: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, SV* key_sv, int16_t delta)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int16_t val;
-        if (!hashmap_si16_increment_by(self, _kstr, (uint32_t)_klen, _khash, _kutf8, delta, &val))
-            croak("HashMap::SI16: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].value);
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-                mXPUSHi(self->nodes[i].value);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (SI16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                {
-                    uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                    SV* ksv = newSVpvn(self->nodes[i].key, klen);
-                    if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
-                    mXPUSHs(ksv);
-                }
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                mXPUSHi(self->nodes[i].value);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        hashmap_si16_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SI16_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                bool kutf8 = HM_UNPACK_UTF8(self->nodes[i].key_len);
-                SV* val = newSViv(self->nodes[i].value);
-                (void)hv_store(hv, self->nodes[i].key, kutf8 ? -(I32)klen : (I32)klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, int16_t value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_si16_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, value, (uint32_t)ttl);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, int16_t default_value)
-    CODE:
-        EXTRACT_MAP(HashMapSI16, stash_si16, "Data::HashMap::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        bool was_found;
-        size_t idx = hashmap_si16_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, default_value, 0, &was_found);
-        (void)was_found;
-        if (idx >= self->capacity) XSRETURN_UNDEF;
-        RETVAL = newSViv(self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::I32A
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapI32A* map = hashmap_i32a_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::I32A");
-        map->free_value_fn = hm_sv_free;
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        hashmap_i32a_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int32_t key, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_i32a_put(self, key, (void*)value, 0);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        void* val;
-        if (!hashmap_i32a_get(self, key, &val)) XSRETURN_UNDEF;
-        RETVAL = SvREFCNT_inc((SV*)val);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        RETVAL = hashmap_i32a_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        RETVAL = hashmap_i32a_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        hashmap_i32a_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I32A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* val = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_i32a_put(self, key, (void*)value, (uint32_t)ttl);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int32_t key, SV* default_value)
-    CODE:
-        EXTRACT_MAP(HashMapI32A, stash_i32a, "Data::HashMap::I32A", self_sv);
-        bool was_found;
-        SvREFCNT_inc(default_value);
-        size_t idx = hashmap_i32a_get_or_set(self, key, (void*)default_value, 0, &was_found);
-        if (idx >= self->capacity) {
-            SvREFCNT_dec(default_value);
-            XSRETURN_UNDEF;
-        }
-        if (was_found) SvREFCNT_dec(default_value);
-        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::I16A
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapI16A* map = hashmap_i16a_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::I16A");
-        map->free_value_fn = hm_sv_free;
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        hashmap_i16a_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int16_t key, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_i16a_put(self, key, (void*)value, 0);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        void* val;
-        if (!hashmap_i16a_get(self, key, &val)) XSRETURN_UNDEF;
-        RETVAL = SvREFCNT_inc((SV*)val);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        RETVAL = hashmap_i16a_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        RETVAL = hashmap_i16a_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (I16A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        hashmap_i16a_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (I16A_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* val = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_i16a_put(self, key, (void*)value, (uint32_t)ttl);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int16_t key, SV* default_value)
-    CODE:
-        EXTRACT_MAP(HashMapI16A, stash_i16a, "Data::HashMap::I16A", self_sv);
-        bool was_found;
-        SvREFCNT_inc(default_value);
-        size_t idx = hashmap_i16a_get_or_set(self, key, (void*)default_value, 0, &was_found);
-        if (idx >= self->capacity) {
-            SvREFCNT_dec(default_value);
-            XSRETURN_UNDEF;
-        }
-        if (was_found) SvREFCNT_dec(default_value);
-        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::IA
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapIA* map = hashmap_ia_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::IA");
-        map->free_value_fn = hm_sv_free;
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        hashmap_ia_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int64_t key, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_ia_put(self, key, (void*)value, 0);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        void* val;
-        if (!hashmap_ia_get(self, key, &val)) XSRETURN_UNDEF;
-        RETVAL = SvREFCNT_inc((SV*)val);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        RETVAL = hashmap_ia_remove(self, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        RETVAL = hashmap_ia_exists(self, key);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now))
-                mXPUSHi(self->nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                mXPUSHi(self->nodes[i].key);
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (IA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                mXPUSHi(self->nodes[i].key);
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        hashmap_ia_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (IA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* val = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)self->nodes[i].key);
-                (void)hv_store(hv, kbuf, klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int64_t key, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_ia_put(self, key, (void*)value, (uint32_t)ttl);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int64_t key, SV* default_value)
-    CODE:
-        EXTRACT_MAP(HashMapIA, stash_ia, "Data::HashMap::IA", self_sv);
-        bool was_found;
-        SvREFCNT_inc(default_value);
-        size_t idx = hashmap_ia_get_or_set(self, key, (void*)default_value, 0, &was_found);
-        if (idx >= self->capacity) {
-            SvREFCNT_dec(default_value);
-            XSRETURN_UNDEF;
-        }
-        if (was_found) SvREFCNT_dec(default_value);
-        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
-
-
-MODULE = Data::HashMap    PACKAGE = Data::HashMap::SA
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, ...)
-    CODE:
-        EXTRACT_NEW_ARGS(_max_size, _ttl);
-        HashMapSA* map = hashmap_sa_create(_max_size, _ttl);
-        if (!map) croak("Failed to create HashMap::SA");
-        map->free_value_fn = hm_sv_free;
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        hashmap_sa_destroy(self);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, SV* value)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)value, 0);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        void* val;
-        if (!hashmap_sa_get(self, _kstr, (uint32_t)_klen, _khash, _kutf8, &val))
-            XSRETURN_UNDEF;
-        RETVAL = SvREFCNT_inc((SV*)val);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_sa_remove(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = hashmap_sa_exists(self, _kstr, (uint32_t)_klen, _khash, _kutf8);
-    OUTPUT:
-        RETVAL
-
-size_t
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        RETVAL = self->size;
-    OUTPUT:
-        RETVAL
-
-size_t
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        RETVAL = self->max_size;
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        RETVAL = (UV)self->default_ttl;
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* sv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                SV* sv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(sv);
-            }
-        }
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        EXTEND(SP, self->size * 2);
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                SV* ksv = newSVpvn(self->nodes[i].key, klen);
-                if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
-                mXPUSHs(ksv);
-                SV* vsv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(vsv);
-            }
-        }
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        while (self->iter_pos < self->capacity) {
-            size_t i = self->iter_pos++;
-            if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                EXTEND(SP, 2);
-                {
-                    uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                    SV* ksv = newSVpvn(self->nodes[i].key, klen);
-                    if (HM_UNPACK_UTF8(self->nodes[i].key_len)) SvUTF8_on(ksv);
-                    mXPUSHs(ksv);
-                }
-                if (GIMME_V == G_SCALAR) XSRETURN(1);
-                SV* vsv = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                mXPUSHs(vsv);
-                XSRETURN(2);
-            }
-        }
-        self->iter_pos = 0;
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        self->iter_pos = 0;
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        hashmap_sa_clear(self);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        HV* hv = newHV();
-        uint32_t now = self->expires_at ? (uint32_t)time(NULL) : 0;
-        size_t i;
-        for (i = 0; i < self->capacity; i++) {
-            if (SA_NODE_LIVE(self->nodes[i]) && !HM_TTL_SKIP_EXPIRED(self, i, now)) {
-                uint32_t klen = HM_UNPACK_LEN(self->nodes[i].key_len);
-                bool kutf8 = HM_UNPACK_UTF8(self->nodes[i].key_len);
-                SV* val = self->nodes[i].value ? SvREFCNT_inc((SV*)self->nodes[i].value) : &PL_sv_undef;
-                (void)hv_store(hv, self->nodes[i].key, kutf8 ? -(I32)klen : (I32)klen, val, 0);
-            }
-        }
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        SvREFCNT_inc(value);
-        RETVAL = hashmap_sa_put(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)value, (uint32_t)ttl);
-        if (!RETVAL) SvREFCNT_dec(value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, SV* default_value)
-    CODE:
-        EXTRACT_MAP(HashMapSA, stash_sa, "Data::HashMap::SA", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        bool was_found;
-        SvREFCNT_inc(default_value);
-        size_t idx = hashmap_sa_get_or_set(self, _kstr, (uint32_t)_klen, _khash, _kutf8, (void*)default_value, 0, &was_found);
-        if (idx >= self->capacity) {
-            SvREFCNT_dec(default_value);
-            XSRETURN_UNDEF;
-        }
-        if (was_found) SvREFCNT_dec(default_value);
-        RETVAL = SvREFCNT_inc((SV*)self->nodes[idx].value);
-    OUTPUT:
-        RETVAL
-
+INCLUDE: xs/sa.xsi

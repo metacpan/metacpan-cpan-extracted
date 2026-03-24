@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::EUS::Numbers;
 # ABSTRACT: Number 2 word conversion in EUS.
@@ -11,7 +11,7 @@ use warnings;
 use strict;
 use Carp;
 use vars qw(
-  @EXPORT_OK @ISA $VERSION
+  @EXPORT_OK @ISA
   %num2alpha
 );
 require Exporter;
@@ -20,8 +20,7 @@ require Exporter;
 # {{{ variables declaration
 
 @ISA     = qw(Exporter);
-
-$VERSION = 0.0682;
+our $VERSION = '0.2603230';
 
 @EXPORT_OK = qw(
   %num2alpha
@@ -271,7 +270,7 @@ Lingua::EUS::Numbers - Converts numbers into Bask (Euskara).
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
 =head1 SYNOPSIS
 

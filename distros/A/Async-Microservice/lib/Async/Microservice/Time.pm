@@ -8,7 +8,7 @@ use Moose;
 
 with qw(Async::Microservice);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 has '+jsonp' => (default => '_cb');
 
@@ -212,6 +212,8 @@ sub _datetime_as_data {
 
 __PACKAGE__->meta->make_immutable;
 
+no Moose;
+
 1;
 
 __END__
@@ -220,7 +222,7 @@ __END__
 
 Async::Microservice::Time - example time async microservice
 
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
     # can be started using:
     plackup --port 8085 -Ilib --access-log /dev/null --server Twiggy bin/async-microservice-time.psgi
@@ -231,8 +233,8 @@ Async::Microservice::Time - example time async microservice
 
 =head1 DESCRIPTION
 
-This is an example asynchronous http micro service using L<Async::Microservice>.
-View the source code it's minimal.
+This is an example asynchronous HTTP microservice using
+L<Async::Microservice>. View the source code; it's minimal.
 
 =head1 METHODS
 
@@ -276,11 +278,11 @@ L<https://time.meon.eu/v1/epoch>
 
 L<https://time.meon.eu/v1/sleep?duration=2.5>
 
-This is the only parallel processed reponse method (the other ones are
-pure CPU-only bound) that sleep given (or random) number of seconds and
+This is the only response method processed in parallel (the other ones are
+pure CPU-bound) that sleeps for a given (or random) number of seconds and
 only then returns the request response with when it started and how long
-it took. Normally this the same as what is in duration parameter, but in
-case the server is overloaded with requests, the event loop may call the
+it took. Normally this is the same as what is in the duration parameter,
+but in case the server is overloaded with requests, the event loop may call the
 timer handler much later than the duration. Try:
 
     ab -n 1000 -c 500 http://localhost:8085/v1/sleep?duration=3

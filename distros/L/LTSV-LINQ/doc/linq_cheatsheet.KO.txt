@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ 치트 시트                                     [KO] 한국어
+======================================================================
+
+[ 1. 쿼리 생성 (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  주의: 종단 메서드를 호출하면 이터레이터가 소진됩니다.
+    데이터를 재사용하려면 From() / FromLTSV()를 다시 호출하세요.
+
+[ 2. 필터링 (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  조건에 맞는 요소를 필터링합니다.
+
+[ 3. 투영 (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Select는 각 요소를 변환합니다. SelectMany는 중첩 배열을 평탄화합니다
+    (선택자는 ARRAY 참조를 반환해야 합니다).
+
+[ 4. 정렬 (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: 첫 번째 정렬 키.
+    ThenBy*/ThenByNum*/ThenByStr*: OrderBy* 뒤에 연결하는 두 번째 정렬 키.
+    Reverse: 현재 순서를 반전합니다.
+
+[ 5. 페이징 (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: 개수로 건너뛰거나 가져옵니다.
+    SkipWhile/TakeWhile: 조건으로 건너뛰거나 가져옵니다.
+
+[ 6. 그룹화 (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  GroupBy는 { Key=>'...', Elements=>[...] } 배열을 반환합니다.
+    ToLookup은 { key => [elements] } 해시 참조를 반환합니다.
+
+[ 7. 집합 연산 (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Distinct/Union/Intersect/Except는 선택적 키 선택자를 지원합니다.
+    SequenceEqual: 두 시퀀스가 같으면 참을 반환합니다.
+
+[ 8. 조인 (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: 내부 조인. GroupJoin: 왼쪽 외부 조인
+    (내부 그룹은 LTSV::LINQ 객체로 전달됩니다).
+
+[ 9. 집계 (종단 메서드) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  OrDefault 변형은 시퀀스가 비어 있을 때 die 대신 undef를 반환합니다.
+    ElementAt: 0-기반 인덱스 (범위 초과 시 die). ElementAtOrDefault: 범위 초과 시 undef.
+
+[ 10. 기타 시퀀스 메서드 (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: 두 시퀀스를 연결합니다. DefaultIfEmpty: 비어 있으면 기본값을 반환합니다.
+    Zip: 두 시퀀스를 요소별로 결합합니다.
+
+[ 11. 변환 메서드 (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  ToDictionary는 key=>element 해시 참조를 반환합니다.
+    ToLookup은 key=>[elements] 해시 참조를 반환합니다.
+    ToLTSV는 시퀀스를 LTSV 파일로 씁니다.
+
+[ 12. 공식 리소스 (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV 명세 : http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

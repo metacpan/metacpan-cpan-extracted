@@ -1,5 +1,9 @@
 Revision history for Perl extension PlackX-Framework
 
+0.28 2026-03-23T20:54:26Z
+
+    - Fix failing test (skip the right way)
+
 0.27 2026-03-22T22:38:25Z
 
     - Fix dependency list

@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 ######################################################################
 # 03_form_post.pl - HTML form handling with HTTP::Handy
 #

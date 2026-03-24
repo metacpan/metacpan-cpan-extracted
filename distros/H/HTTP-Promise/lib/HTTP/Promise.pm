@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.7.2
+## Version v0.7.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2025/10/19
+## Modified 2025/10/25
 ## All rights reserved.
 ## 
 ## 
@@ -60,7 +60,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.7.2';
+    our $VERSION = 'v0.7.3';
 };
 
 use strict;
@@ -167,6 +167,7 @@ sub default_headers { return( shift->_set_get_object_without_init( 'default_head
 
 sub default_protocol { return( shift->_set_get_scalar_as_object( 'default_protocol', @_ ) ); }
 
+# As per rfc7231, a body is allowed for DELETE, but usually discarded by most of the servers.
 sub delete
 {
     my $self = shift( @_ );
@@ -175,8 +176,12 @@ sub delete
         my $prom = Promise::Me->new(sub
         {
             my( $resolve, $reject ) = @$_;
-            my $req = HTTP::Promise::Request->new( 'DELETE' => @_ ) ||
-            return( $reject->( HTTP::Promise::Request->error ) );
+            my $req = $self->_make_request_data( 'DELETE' => @_ ) ||
+                return( $reject->( $self->error ) );
+            unless( $req->headers->host )
+            {
+                $req->headers->host( $req->host );
+            }
             my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
             return( $resolve->( $resp ) );
         },
@@ -190,8 +195,8 @@ sub delete
     }
     else
     {
-        my $req = HTTP::Promise::Request->new( 'DELETE' => @_ ) ||
-            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $req = $self->_make_request_data( 'DELETE' => @_ ) ||
+            return( $self->pass_error );
         unless( $req->headers->host )
         {
             $req->headers->host( $req->host );
@@ -201,6 +206,7 @@ sub delete
         return( $resp );
     }
 }
+
 
 sub dnt { return( shift->_set_get_boolean( 'dnt', @_ ) ); }
 
@@ -249,7 +255,7 @@ sub get
         {
             my( $resolve, $reject ) = @$_;
             my $req = $self->_make_request_query( GET => @_ ) ||
-            return( $reject->( HTTP::Promise::Request->error ) );
+                return( $reject->( $self->error ) );
             my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
             return( $resolve->( $resp ) );
         },
@@ -264,7 +270,7 @@ sub get
     else
     {
         my $req = $self->_make_request_query( GET => @_ ) ||
-            return( $self->pass_error( HTTP::Promise::Request->error ) );
+            return( $self->pass_error );
         my $resp = $self->send( $req ) ||
             return( $self->pass_error );
         return( $resp );
@@ -280,7 +286,7 @@ sub head
         {
             my( $resolve, $reject ) = @$_;
             my $req = $self->_make_request_query( HEAD => @_ ) ||
-            return( $reject->( HTTP::Promise::Request->error ) );
+            return( $reject->( $self->error ) );
             my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
             return( $resolve->( $resp ) );
         },
@@ -295,7 +301,7 @@ sub head
     else
     {
         my $req = $self->_make_request_query( HEAD => @_ ) ||
-            return( $self->pass_error( HTTP::Promise::Request->error ) );
+            return( $self->pass_error );
         my $resp = $self->send( $req ) ||
             return( $self->pass_error );
         return( $resp );
@@ -347,7 +353,6 @@ sub max_size { return( shift->_set_get_number( 'max_size', @_ ) ); }
 # NOTE: medium method for Promise::Me
 sub medium { return( shift->_set_get_scalar( 'medium', @_ ) ); }
 
-# TODO: mirror
 sub mirror
 {
     my $self = shift( @_ );
@@ -558,19 +563,19 @@ sub mirror
                 return( $self->error({
                     code => 500,
                     message => "Unable to open HTTP message entity body: " . $body->error,
-                }) ) if( !$body );
+                }) );
             my $out = $tmpfile->open( '>', { autoflush => 1 } ) ||
                 return( $self->error({
                     code => 500,
                     message => "Unable to open temporary file \"$tmpfile\" in write mode: " . $tmpfile->error,
-                }) ) if( !$body );
+                }) );
             while( $io->read( my $buff, 8192 ) )
             {
                 $out->print( $buff ) ||
-                return( $self->error({
-                    code => 500,
-                    message => "Unable to write to temporary file \"$tmpfile\": " . $out->error,
-                }) ) if( !$body );
+                    return( $self->error({
+                        code => 500,
+                        message => "Unable to write to temporary file \"$tmpfile\": " . $out->error,
+                    }) );
             }
             $io->close;
             $out->close;
@@ -764,7 +769,7 @@ sub prepare
     else
     {
         my $req = HTTP::Promise::Request->new( $meth, @args ) ||
-            return( $self-pass_error( HTTP::Promise::Request->error ) );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
         return( $req );
     }
 }
@@ -805,6 +810,8 @@ sub prepare_headers
     {
         $self->_load_class( 'HTTP::Promise::Stream' ) || return( $self->pass_error );
         my $decodables;
+        no warnings 'once'; # REMOVE ME
+        local $HTTP::Promise::Stream::DEBUG = $self->debug; # REMOVE ME
         if( !$ae->is_empty && $ae ne 'all' && $ae ne 'auto' )
         {
             $decodables = HTTP::Promise::Stream->decodable( [split( /[[:blank:]\h]*\,[[:blank:]\h]*/, "$ae" )] );
@@ -1171,8 +1178,15 @@ sub send
         # set Cookie header
         if( defined( $cookie_jar ) )
         {
-            $cookie_jar->add_request_header( $req ) ||
-                return( $self->pass_error( $cookie_jar->error ) );
+            if( $self->_can( $cookie_jar => 'add_request_header' ) )
+            {
+                $cookie_jar->add_request_header( $req ) ||
+                    return( $self->pass_error( $cookie_jar->error ) );
+            }
+            else
+            {
+                warn( "Cookie Jar object ", $self->_str_val( $cookie_jar ), " does not support the method 'add_request_header'." );
+            }
         }
 
         my $body = $req->entity->body;
@@ -1363,6 +1377,7 @@ sub send
     my $resp = HTTP::Promise::Response->new( @$def{qw( code status headers )}, {
         protocol => $def->{protocol},
         version => $def->{version},
+        uri => $uri,
         debug => $self->debug,
     } ) || return( $self->pass_error( HTTP::Promise::Response->error ) );
     # Mutual assignment for convenience
@@ -1449,8 +1464,15 @@ sub send
     # Process 'Set-Cookie' header before redirect, because Cookies may have been set upon redirection.
     if( defined( $cookie_jar ) )
     {
-        $cookie_jar->add_response_header( $resp ) ||
-            return( $self->pass_error( $cookie_jar->error ) );
+        if( $self->_can( $cookie_jar => 'extract_cookies' ) )
+        {
+            $cookie_jar->extract_cookies( $resp ) ||
+                return( $self->pass_error( $cookie_jar->error ) );
+        }
+        else
+        {
+            warn( "Cookie Jar object ", $self->_str_val( $cookie_jar ), " does not support the method 'extract_cookies'." );
+        }
     }
     
     if( $do_redirect )
@@ -1829,6 +1851,17 @@ sub _make_request_data
     # $content is not a reference and is not empty
     elsif( defined( $content ) && length( $content ) )
     {
+        my $charset = lc( $req->headers->charset // '' );
+        my $ctype   = lc( $type                  // '' );
+        my( $ctype_major, $ctype_minor ) = split( /\//, $ctype, 2 ) if( $ctype );
+        if( ( substr( $charset, 0, 4 ) eq 'utf8' ||
+              substr( $charset, 0, 5 ) eq 'utf-8' ||
+              ( defined( $ctype_major ) && defined( $ctype_minor ) && $ctype_major eq 'application' && substr( $ctype_minor, -4, 4 ) eq 'json' ) ) && 
+            utf8::is_utf8( $content ) )
+        {
+            warn( "Content data provided has the Perl internal UTF-8 flag set. You need to encode it to UTF-8 bytes before passing it to HTTP::Promise, such as by calling Encode::encode_utf8( \$data ) on it beforehand.\n" ) if( $self->_is_warnings_enabled( 'HTTP::Promise' ) );
+        }
+
         my $body = $ent->new_body( string => $content ) ||
             return( $self->pass_error( $ent->error ) );
         $ent->body( $body );
@@ -2343,7 +2376,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.7.2
+    v0.7.3
 
 =head1 DESCRIPTION
 

@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Cheat Sheet                        [VI] Tieng Viet
+ HTTP::Handy PSGI Cheat Sheet                         [VI] Tiếng Việt
 ======================================================================
 
-[ 1. Khoi dong may chu ]
+[ 1. Khởi động máy chủ ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # bat buoc: PSGI app code ref
-      host          => '127.0.0.1',# tuy chon: bind address (0.0.0.0)
-      port          => 8080,       # tuy chon: port (mac dinh: 8080)
-      log           => 1,          # tuy chon: access log (mac dinh: 1)
-      max_post_size => 10485760,   # tuy chon: max POST bytes (mac dinh: 10MB)
+      app           => $app,       # bắt buộc: PSGI app code reference
+      host          => '127.0.0.1',# tuỳ chọn: bind address (default: 0.0.0.0)
+      port          => 8080,       # tuỳ chọn: port (default: 8080)
+      log           => 1,          # tuỳ chọn: access log (default: 1)
+      max_post_size => 10485760,   # tuỳ chọn: max POST bytes (default: 10MB)
   );
 
-  Chay truc tiep nhu script: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. Bien moi truong yeu cau ($env) ]
+[ 2. Biến môi trường yêu cầu ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (Doc than POST (psgi.input))
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    chuỗi  "GET" / "POST"
+  PATH_INFO         chuỗi  /index.html
+  QUERY_STRING      chuỗi  key=val
+  SERVER_NAME       chuỗi  hostname
+  SERVER_PORT       số nguyên  8080
+  CONTENT_TYPE      chuỗi  content-type
+  CONTENT_LENGTH    số nguyên  (bytes)
+  HTTP_*            chuỗi  HTTP_USER_AGENT ...
+  psgi.input        đối tượng  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   chuỗi  "http"
 
-[ 3. Dinh dang phan hoi ]
+[ 3. Định dạng phản hồi ]
 
   [$status, \@headers, \@body]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. Doc than POST (psgi.input) ]
+[ 4. Đọc thân POST (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,62 +54,57 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. Cac phuong thuc tien ich ]
+[ 5. Các phương thức tiện ích ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. Phuong thuc tao phan hoi ]
+[ 6. Các phương thức tạo phản hồi ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. Phuc vu file tinh ]
+[ 7. Phục vụ tệp tĩnh ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. Mau dinh tuyen ]
+[ 8. Mẫu định tuyến ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
   if ($path =~ m{^/api/}) { ... }
   if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
 
-[ 9. Xu ly loi ]
+[ 9. Xử lý lỗi ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 tự động phản hồi 500
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. File log duoc tao boi run() ]
+[ 10. Tệp nhật ký được tạo bởi run() ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  log truy cap (xoay vong 10 phut, dinh dang LTSV)
-  logs/error/error.log                log loi/khoi dong
+  logs/access/YYYYMMDDHHm0.log.ltsv  nhật ký truy cập (xoay vòng 10 phút, LTSV)
+  logs/error/error.log                nhật ký lỗi/khởi động
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. Lien tai nguyen chinh thuc ]
+[ 11. Tài nguyên chính thức ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

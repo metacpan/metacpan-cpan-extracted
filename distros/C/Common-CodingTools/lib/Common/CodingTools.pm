@@ -3,11 +3,37 @@ package Common::CodingTools;
 use strict;
 no strict 'subs';
 
+=encoding utf8
+
 =head1 NAME
 
 Common::CodingTools - Common constants and functions for programmers
 
 =head1 SYNOPSIS
+
+ ## Global Tag
+ # :all
+
+ ## Constants Tags
+ # :contants
+ # :boolean
+ # :toggle
+ # :activity
+ # :health
+ # :expiration
+ # :cleanliness
+ # :emotion
+ # :success
+ # :want
+ # :pi
+
+ ## Functions Tags
+ # :functions
+ # :file
+ # :trim
+ # :schwartz
+ # :weird
+ # :string
 
  use Common::CodingTools qw(:all);
 
@@ -40,8 +66,6 @@ Positive names (equals 1)
 =item HEALTHY
 
 =item ON
-
-=item OFF
 
 =item ACTIVE
 
@@ -223,7 +247,7 @@ use constant {
 };
 
 BEGIN {
-    our $VERSION = 2.01;
+    our $VERSION = 2.04;
 }
 
 require Exporter;
@@ -250,11 +274,12 @@ our @EXPORT_OK = qw(
   trim
   tfirst
   uc_lc
+  leet_speak
   center
   schwartzian_sort
 );
 our %EXPORT_TAGS = (
-	'boolean'     => [qw(TRUE FALSE)],
+    'boolean'     => [qw(TRUE FALSE)],
     'toggle'      => [qw(ON OFF)],
     'want'        => [qw(WANTED UNWANTED)],
     'activity'    => [qw(ACTIVE INACTIVE)],
@@ -267,8 +292,9 @@ our %EXPORT_TAGS = (
     'file'        => [qw(slurp_file)],
     'trim'        => [qw(ltrim rtrim trim)],
     'schwartz'    => [qw(schwartzian_sort)],
-    'weird'       => [qw(uc_lc)],
-    'string'      => [qw(ltrim rtrim trim uc_lc center tfirst)],
+    'weird'       => [qw(uc_lc leet_speak)],
+    'weird-case'  => [qw(uc_lc leet_speak)],
+    'string'      => [qw(ltrim rtrim trim uc_lc leet_speak center tfirst)],
     'constants'   => [
         qw(
           ON OFF
@@ -279,13 +305,13 @@ our %EXPORT_TAGS = (
           HAPPY UNHAPPY SAD ANGRY
           WANTED UNWANTED
           PI
-		  TRUE FALSE
+          TRUE FALSE
         )
     ],
     'functions' => [
         qw(
           slurp_file
-          ltrim rtrim trim uc_lc
+          ltrim rtrim trim uc_lc leet_speak
           schwartzian_sort
           center
           tfirst
@@ -301,9 +327,9 @@ our %EXPORT_TAGS = (
           HAPPY UNHAPPY SAD ANGRY
           WANTED UNWANTED
           PI
-		  TRUE FALSE
+          TRUE FALSE
           slurp_file
-          ltrim rtrim trim uc_lc
+          ltrim rtrim trim uc_lc leet_speak
           schwartzian_sort
           center
           tfirst
@@ -319,6 +345,7 @@ X<rtrim>
 X<trim>
 X<center>
 X<uc_lc>
+X<leet_speak>
 X<schwartzian_sort>
 
 =head2 slurp_file
@@ -440,6 +467,18 @@ sub uc_lc {
     return ($string);
 } ## end sub uc_lc
 
+=head2 leet_speak (same as uc_lc)
+
+This changes text to annoying "leet-speak".
+
+ my $result = leet_speak($string, 1);  # Second parameter determs whether to start with upper or lower-case.  You can leave out that parameter for random pick.
+
+=cut
+
+sub leet_speak {
+    return(uc_lc(@_));
+}
+
 =head2 schwartzian_sort
 
 Sorts a rather large list with the very fast Swartzian sort.  It returns either an array or a reference to an array, depending how it was called.
@@ -454,19 +493,14 @@ or
 
 sub schwartzian_sort {
     my $wa = wantarray;
-
-    my @array = ();
-
-    if ($wa) {
-        @array = @_;
-    } else {
-        my $arr = shift;
-        @array = @{$arr};
+    if (scalar(@_) == 1) {
+        @_ = @{$_[0]};
     }
-    my @sorted = map { $_->[0] } sort { $a->[1] <=> $b->[1] or $a->[0] cmp $b->[0] } map { [$_, -M $_] } @array;
-
-    return (($wa) ? @sorted : \@sorted);
-} ## end sub schwartzian_sort
+    my @sorted = map { $_->[1] }
+        sort { $a->[0] cmp $b->[0] }
+            map { [lc($_), $_] } @_;
+    return(($wa) ? @sorted : \@sorted);
+}
 
 =head2 tfirst
 
@@ -552,7 +586,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 VERSION
 
-Version 2.01 (September 22, 2025)
+Version 2.02 (November 06, 2025)
 
 =head1 BUGS
 
@@ -590,6 +624,10 @@ So, check the reviews AND the version number when that review was written.
 
 http://search.cpan.org/dist/Common-CodingTools/
 
+=item GitHub
+
+https://github.com/richcsst/Common-CodingTools
+
 =back
 
 =head1 COPYRIGHT
@@ -611,7 +649,7 @@ The B<tfirst> subroutine is Copyright (C) 2008 John Gruber as "TitleCase"
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+L<https://perlfoundation.org/artistic-license-20.html>
 
 =back
 

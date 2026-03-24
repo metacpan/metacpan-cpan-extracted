@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Cheat Sheet                        [TH] Thai
+ HTTP::Handy PSGI Cheat Sheet                         [TH] ภาษาไทย
 ======================================================================
 
-[ 1. aekhanaem soewoehk ]
+[ 1. เริ่มต้นเซิร์ฟเวอร์ ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # campen: PSGI app code ref
-      host          => '127.0.0.1',# ruxchak: bind address (0.0.0.0)
-      port          => 8080,       # ruxchak: port (khakhrm: 8080)
-      log           => 1,          # ruxchak: access log (khakhrm: 1)
-      max_post_size => 10485760,   # ruxchak: max POST bytes (khakhrm: 10MB)
+      app           => $app,       # จำเป็น: PSGI app code reference
+      host          => '127.0.0.1',# ไม่บังคับ: bind address (default: 0.0.0.0)
+      port          => 8080,       # ไม่บังคับ: port (default: 8080)
+      log           => 1,          # ไม่บังคับ: access log (default: 1)
+      max_post_size => 10485760,   # ไม่บังคับ: max POST bytes (default: 10MB)
   );
 
-  rndoytrngbpenscript: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. tataeprphlom khorngsaeng ($env) ]
+[ 2. ตัวแปรสภาพแวดล้อมคำขอ ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (arn POST tua (psgi.input))
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    สตริง  "GET" / "POST"
+  PATH_INFO         สตริง  /index.html
+  QUERY_STRING      สตริง  key=val
+  SERVER_NAME       สตริง  hostname
+  SERVER_PORT       จำนวนเต็ม  8080
+  CONTENT_TYPE      สตริง  content-type
+  CONTENT_LENGTH    จำนวนเต็ม  (bytes)
+  HTTP_*            สตริง  HTTP_USER_AGENT ...
+  psgi.input        ออบเจ็กต์  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   สตริง  "http"
 
-[ 3. roupaebkhorngtopkhlon ]
+[ 3. รูปแบบการตอบสนอง ]
 
   [$status, \@headers, \@body]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. arn POST tua (psgi.input) ]
+[ 4. อ่าน POST body (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,62 +54,57 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. wthikrprithibat ]
+[ 5. เมธอดอรรถประโยชน์ ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. wthikrsrngtopkhlon ]
+[ 6. เมธอดสร้างการตอบสนอง ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. borikaarnfailkhngthi ]
+[ 7. ให้บริการไฟล์สแตติก ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. roupaebkarnkamnotnthang ]
+[ 8. รูปแบบเส้นทาง ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
   if ($path =~ m{^/api/}) { ... }
   if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
 
-[ 9. karcatkankhoephit ]
+[ 9. การจัดการข้อผิดพลาด ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 ตอบสนอง 500 อัตโนมัติ
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. faillogthisrngodykrun() ]
+[ 10. ไฟล์บันทึกที่สร้างโดย run() ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  logkarenakha (10 nathibwn, roupaeb LTSV)
-  logs/error/error.log                log khoephit/roem
+  logs/access/YYYYMMDDHHm0.log.ltsv  บันทึกการเข้าถึง (หมุนเวียน 10 นาที, LTSV)
+  logs/error/error.log                บันทึกข้อผิดพลาด/เริ่มต้น
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. ลิงก์ทรัพยากรอย่างเป็นทางการ ]
+[ 11. ทรัพยากรอย่างเป็นทางการ ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

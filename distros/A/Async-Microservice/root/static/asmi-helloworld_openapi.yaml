@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
   version: '1'
-  title: 'Perl Async::Microservice::Helloworld'
-  description: 'synopsis example for Async::Microservice'
+  title: 'Perl Async::Microservice::HelloWorld'
+  description: 'Synopsis example for Async::Microservice'
   termsOfService: "http://toterms/"
   contact:
     name: Jozef
-    email: some@email
+    email: some@example.com
   license:
     name: Perl Licence
     url: https://perldoc.perl.org/index-licence.html
@@ -15,7 +15,7 @@ servers:
 paths:
   '/hello':
     get:
-      description: 'greetings'
+      description: 'Greetings'
       responses:
         200:
           description: 'reply'

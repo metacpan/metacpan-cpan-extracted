@@ -21,18 +21,18 @@ $m = EV::MariaDB->new(
 );
 
 # CREATE TABLE
-$m->query("CREATE TEMPORARY TABLE eg_basic (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50))", sub {
+$m->query("create temporary table eg_basic (id int auto_increment primary key, name varchar(50))", sub {
     my ($res, $err) = @_;
     die "create: $err\n" if $err;
 
     # INSERT
-    $m->query("INSERT INTO eg_basic (name) VALUES ('alice'), ('bob'), ('charlie')", sub {
+    $m->query("insert into eg_basic (name) values ('alice'), ('bob'), ('charlie')", sub {
         my ($affected, $err) = @_;
         die "insert: $err\n" if $err;
         print "inserted $affected rows, last_id=", $m->insert_id, "\n";
 
         # SELECT
-        $m->query("SELECT * FROM eg_basic", sub {
+        $m->query("select * from eg_basic", sub {
             my ($rows, $err) = @_;
             die "select: $err\n" if $err;
             for my $row (@$rows) {

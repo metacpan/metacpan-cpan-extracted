@@ -1,5 +1,13 @@
 Revision history for Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
+0.07	Mon Mar 23 20:15:20 EDT 2026
+	- Added Test::Mockingbird::TimeTravel:
+		* Integration to Test::Mockingbird::DeepMock.
+		* New 'now' plan supporting freeze, travel, advance, rewind.
+		* Automatic restoration of time state after deep_mock block.
+		* Deterministic interaction between mocks, spies, and frozen time.
+		* Added integration test exercising mixed mocking + time travel.
+
 0.06	Fri Mar 20 08:13:40 EDT 2026
 	- Add restore(): restore all mock layers for a single method target.
 	- Added diagnose_mocks() and diagnose_mocks_pretty() for structured and
@@ -19,14 +27,14 @@ Revision history for Test::Mockingbird - Advanced mocking library for Perl with 
 	- Refactored unmock() to reliably support both shorthand and longhand targets.
 	- Added DeepMock
 
-0.03	Wed Mar  4 07:29:58 EST 2026
+0.03	Wed Mar	4 07:29:58 EST 2026
 	Added shorthand syntax
 	Added mock_scoped
 
-0.02	Thu Jan  9 08:05:34 EST 2025
+0.02	Thu Jan	9 08:05:34 EST 2025
 	Updated spy.t to check that the spied routine is called,
 		and spying is stopped after restore
 	More tests
 
-0.01	Wed Jan  8 13:22:13 EST 2025
-        First draft
+0.01	Wed Jan	8 13:22:13 EST 2025
+	First draft

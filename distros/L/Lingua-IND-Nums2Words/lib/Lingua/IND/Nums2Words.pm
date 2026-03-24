@@ -1,4 +1,4 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::IND::Nums2Words;
 # ABSTRACT: Number 2 word conversion in IND.
@@ -9,12 +9,11 @@ use 5.10.1;
 use strict;
 use warnings;
 
-use Perl6::Export::Attrs;
+use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-
-our $VERSION = 0.0708;
+our $VERSION = '0.2603230';
 
 our $Dec_char  = ".";
 our $Neg_word  = "negatif";
@@ -220,7 +219,7 @@ Lingua::IND::Nums2Words - convert number to Indonesian verbage.
 
 =head1 VERSION
 
-version 0.0708
+version 0.2603230
 
 =head1 SYNOPSIS
 

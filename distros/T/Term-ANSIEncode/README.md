@@ -8,6 +8,8 @@ Markup text to ANSI encoder.  Very handy for making server identification screen
 
 GitHub will ALWAYS have the latest version and CPAN is not guaranteed to have the latest.
 
+You will get best results if you use a font with all of the UTF-8 characters.  See the **Fonts** section below.
+
 ## Usage
 
 ### To use the Perl module:
@@ -34,7 +36,7 @@ It is **HIGHLY** encouraged for your terminal be set as **UTF-8** for the advanc
 
 Excellent True-Type fonts for use:  http://github.com/gabrielelana/awesome-terminal-fonts (Listed as "Source Code" fonts)
 
-For Windows, this setting is in your "Region" setting.  Also note, Windows Terminal/Command/PowerShell lacks some capabilities.
+For Windows, this setting is in your "Region" setting.  Also note, Windows Terminal/Command/PowerShell lacks some capabilities.  The third party AI **Warp Terminal** supports all features.
 
 ## Options
 
@@ -42,7 +44,7 @@ For Windows, this setting is in your "Region" setting.  Also note, Windows Termi
 
 ### -**a** or --**ansi-modes**
 
-Show aupported ANSI color modes
+Show aupported ANSI color modes.  Note, this is only for detection.  The other options may depend on the supported color support.  However, the tokens will always send output assuming the mode is supported.
 
 ![Support Color Modes](images/supported.png?raw=true "Term::ANSIEncode Supported Color Modes")
 
@@ -105,6 +107,8 @@ Richard Kelsch
 Some fonts do not support all of the Unicode characters.  The "examples" directory has an install script to install the "Awesome" fonts that look great and have all Unicode symbols.  They look great, are easy to read and have a plethora of support for the graphics and unicode characters.  They are TrueType fonts and can be installed on most systems and terminals.
 
 * http://github.com/gabrielelana/awesome-terminal-fonts
+
+Use the ```font-installer/install-awesome-fonts.sh``` script to install the fonts without having to clone the above repository.
 
 I suggest "**SourceCodePro-Powerline-Awesome**" when selecting a font
 

@@ -4,7 +4,7 @@ GitHub::Config::SSH::UserData - Read user data from comments in ssh config file
 
 # VERSION
 
-Version 0.08
+Version 0.09
 
 # SYNOPSIS
 
@@ -98,7 +98,9 @@ Klaus Rindfrey, `<klausrin at cpan.org.eu>`
 
 Please report any bugs or feature requests to `bug-github-config-ssh-userdata
 at rt.cpan.org`, or through the web interface at
-[https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData).
+[https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData](https://rt.cpan.org/NoAuth/ReportBug.html?Queue=GitHub-Config-SSH-UserData)
+or create a [GitHub
+Issue](https://github.com/klaus-rindfrey/perl-github-config-ssh-userdata/issues).
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 

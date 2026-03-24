@@ -1,5 +1,37 @@
 Revision history for DBIx::Class::MockData
 
+0.05  2026-03-23
+
+      [NEW FEATURES]
+      - Added truncate() method for fast, safe table emptying (preserves structure)
+      - Added quiet flag to suppress non-fatal warnings
+      - Added start_year/end_year parameters for configurable date ranges
+      - Added --truncate and --quiet options to CLI tool
+
+      [ENHANCEMENTS]
+      - Improved dependency graph detection for complex relationships
+      - Better cycle detection with clear error messages
+      - State-based templates in _contextual_string for better performance
+      - Strict argument validation with meaningful error messages
+      - Configurable date ranges (default: 2010-2026)
+
+      [FIXES]
+      - Fixed closure variable capture in template generators
+      - Fixed SQLite sequence reset in truncate()
+      - Fixed email format to keep salt in local part
+      - Fixed only/exclude filter handling in truncate()
+      - Fixed CLI exit codes on bulk insert failures
+
+      [DOCUMENTATION]
+      - Clear comparison of truncate vs wipe vs deploy
+      - Documented date range configuration
+
+      [INTERNAL]
+      - Refactored _generate_value to support pluggable generators
+      - Optimised template matching with state variables
+      - Improved test coverage
+      - Added comprehensive CLI tests for truncate and quiet options
+
 0.04  2026-03-17
 
       [NEW FEATURES]
@@ -9,7 +41,7 @@ Revision history for DBIx::Class::MockData
 
       [ENHANCEMENTS]
       - Bulk insert using populate() for up to 10x faster performance
-      - Salt value now randomized even when seed is set (ensures cross-run uniqueness)
+      - Salt value now randomised even when seed is set (ensures cross-run uniqueness)
       - Better handling of unique constraints across all column types
       - Improved error handling with graceful failure recovery
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8; -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 use Test::More;
 eval "use Test::Pod::Coverage 1.04";

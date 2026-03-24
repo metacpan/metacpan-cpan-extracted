@@ -36,7 +36,7 @@ sub new {
         return 'color space constraint definition has to be a none empty HASH ref' if ref $constraint ne 'HASH' or not %$constraint;
         for my $constraint_name (keys %$constraint){
 			my $properties = $constraint->{$constraint_name};
-			return 'a color space constraint has to be a HASH ref with three keys' unless ref $properties eq 'HASH' and %$properties == 3;
+			return 'a color space constraint has to be a HASH ref with three keys' unless ref $properties eq 'HASH' and keys(%$properties) == 3;
             $properties = {%$properties};
             my $error_msg = 'constraint "$constraint_name" in '.$basis->space_name.' color space';
             for (qw/checker error remedy/){

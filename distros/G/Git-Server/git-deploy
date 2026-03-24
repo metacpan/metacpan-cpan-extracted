@@ -94,10 +94,16 @@ By default, this option is disabled so runs in the foreground.
 
 The --max-delay specifies the maximum number of seconds to wait
 for each push notification.
-This is useful when you want to immediately release a previously
-deploying fetch and force pull updates from commandline without
-hanging the console waiting two hours until the next git push.
-By default, max-delay is 7200 seconds (or 2 hours).
+
+If you have git-client installed, then you can run "git-client pull" to
+immediately release a previously deploying "git fetch" and force all pull
+updates without hanging your commandline for two hours waiting for the
+next push. By default, max-delay is 7200 seconds (or 2 hours).
+
+If the repo is NOT run through git-server, then --max-delay specifies
+the interval in between each "git pull" operation in a loop. If no
+--max-delay is specified for this case, then the default is a random
+interval between 5 and 7 minutes.
 
   Example: git deploy --max-delay 10
 
@@ -137,7 +143,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.038";
+our $VERSION = "0.039";
 
 my @invoked = ($0, @ARGV);
 my %initial_ENV = %ENV;
@@ -291,8 +297,11 @@ if (!$maxpatience) {
     }
 }
 
+my $deploying_version = 0;
 while (1) {
     my $update = pull_push_notification;
+    $deploying_version ||= $update =~ / git-server v([\d.]+):.*waiting for notification/ || /git-server.*waiting for notification/ ? $1 || "OLD" :
+        ($maxpatience ? 0 : !warn localtime().": [$$] git-deploy: Warning: Missing recommended [ --max-delay <INTERVAL_SECONDS> ] for NON-deployable repo.\n");
     my $branch = checkout_branch;
     $update .= run_output_include_err "git", "checkout", $branch;
     $update .= run_output_include_err "git", "rebase", "origin/$branch";
@@ -386,12 +395,15 @@ while (1) {
             print run_output_include_err qw(sleep 60);
         }
     }
+    # If repo isn't via git-server, then we can't rely on the server to regulate any other git-deploy running, so we have to take care of everything ourselves. So either he goes, or I go.
+    warn localtime().": [$$] git-deploy: Aborting other git-deploy process still running on NON-deployable repo:\n$1\n" and kill TERM => $2 or last if !$deploying_version and getps() =~ /^(\w+\s+(\d+).*\Q$Script - $cwd\E: Waiting.*)/m;
     # Get out of here if someone is monkeying a local file "error: cannot rebase: You have unstaged changes."
-    last if $update !~ /rewinding head to replay|fast-forward|but expected|Unpacking objects|Cannot rebase|ecent commit/;
+    warn localtime().": [$$] git-deploy: Deployable git-server v$deploying_version wants me to leave.\n$update" and last if $deploying_version and $update !~ /rewinding head to replay|fast-forward|but expected|Unpacking objects|Cannot rebase|ecent commit/;
     if ($update =~ /Current branch.*is up to date/) {
-        $0 = "$Script - $cwd: Waiting because everything is updated ...";
-        print "Everything was updated perfectly. Sleeping ...\n";
-        print run_output_ignore_err sleep => (5 + int(55 * rand()));
+        my $pause_because_done = $deploying_version ? 5 + int(55 * rand()) : ($maxpatience || (305 + int(115 * rand())));
+        $0 = "$Script - $cwd: Waiting $pause_because_done seconds because everything was updated ...";
+        print "Everything was already updated perfectly. Sleeping $pause_because_done seconds ...\n";
+        print run_output_ignore_err sleep => $pause_because_done;
     }
     $0 = "$Script - $cwd: Update complete";
     sleep 1;

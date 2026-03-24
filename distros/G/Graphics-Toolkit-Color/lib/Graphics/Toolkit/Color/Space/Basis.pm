@@ -9,7 +9,7 @@ use Graphics::Toolkit::Color::Space::Util qw/is_nr/;
 sub new {
     my ($pkg, $axis_long_names, $axis_short_names, $space_name, $alias_name) = @_;
     return 'first argument (axis names) has to be an ARRAY reference' unless ref $axis_long_names eq 'ARRAY';
-    return 'amount of shortcut names have to match that of full names'
+    return 'amount of short axis names have to match the count of long axis names'
         if defined $axis_short_names and (ref $axis_short_names ne 'ARRAY' or @$axis_long_names != @$axis_short_names);
 
     my @axis_long_name = map {lc} @$axis_long_names;

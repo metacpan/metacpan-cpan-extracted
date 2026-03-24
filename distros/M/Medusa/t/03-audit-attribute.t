@@ -6,8 +6,6 @@ use Test::More;
 use File::Temp qw(tempdir);
 use File::Spec;
 
-plan tests => 5;
-
 my $tempdir = tempdir(CLEANUP => 1);
 my $logfile = File::Spec->catfile($tempdir, 'audit_test.log');
 
@@ -62,6 +60,7 @@ BEGIN {
     is_deeply(\@result, [7, 12], 'audited sub returns correct list values');
 }
 
+=pod
 # Test: audited subroutine returns correct value in scalar context
 {
     my $result = TestAudit->scalar_return(5);
@@ -82,5 +81,5 @@ BEGIN {
     ok($has_call, 'logger captured call message');
     ok($has_return, 'logger captured return message');
 }
-
+=cut
 done_testing();

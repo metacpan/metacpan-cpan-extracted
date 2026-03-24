@@ -5,139 +5,143 @@ package Lingua::POL::Numbers;
 
 # {{{ use block
 
+use v5.32;
 use warnings;
-use strict;
-use 5.10.1;
-use vars qw($Idziesiatka);
 use utf8;
 
+use vars qw($Idziesiatka);
+
+use lib $ENV{PMLIB_INC};
+
 use Carp;
-use Perl6::Export::Attrs;
-
-no if $] >= 5.018, 'warnings', "experimental::smartmatch";
+use Export::Attrs;
 
 # }}}
-# {{{ variables declarations
-
-our $VERSION = 0.135;
+# {{{ var block
+our $VERSION = '0.2603230';
 
 # }}}
+
 # {{{ new
 
-sub new
-{
-        my $class = shift;
-        my $number = shift || '';
-        $Idziesiatka=0;
+sub new {
+    my $class = shift;
+    my $number = shift || '';
+    $Idziesiatka=0;
 
-        my $self = {};
-        bless $self, $class;
+    my $self = {};
+    bless $self, $class;
 
-        if( $number =~ /\d+/ ) {
-                return( $self->parse($number) );
-        };
+    if( $number =~ /\d+/ ) {
+        return( $self->parse($number) );
+    }
 
-        return( $self );
-};
+    return( $self );
+}
 
 # }}}
 # {{{ parse
 
-sub parse :Export
-{
-        my $self = shift;
-        my $number = shift;
-        return( SLOWNIE($number,0) );
-};
+sub parse :Export {
+    my $self = shift;
+    my $number = shift;
+
+    return( SLOWNIE($number,0) );
+}
 
 # }}}
 # {{{ currency
 
-sub currency
-{
-        my $self = shift;
-        my $number = shift;
-        return( SLOWNIE($number,1) );
-};
+sub currency {
+    my $self = shift;
+    my $number = shift;
+
+    return( SLOWNIE($number,1) );
+}
 
 # }}}
 # {{{ SLOWNIE
 
 sub SLOWNIE {
-        my $Numer = shift // 0;
-        my $currency = shift;
+    my $Numer = shift // 0;
+    my $currency = shift;
 
-        my ($temps, $tempd, $tempj, $zlote, $grosze, $Licznik, $grd, $grj, $MiejsceDz, $T_S, $SLOWNIE);
+    my ($temps, $tempd, $tempj, $zlote, $grosze, $Licznik, $grd, $grj, $MiejsceDz, $T_S, $SLOWNIE);
 
-        if ($Numer == 0) {
-                if ($currency) {
-                        $SLOWNIE = "zero zl zero gr";
-                } else {
-                        $SLOWNIE = "zero";
-                }
+    if ($Numer == 0) {
+        if ($currency) {
+            $SLOWNIE = "zero zl zero gr";
         } else {
-                if ($Numer > 9999999999999.99 || $Numer < 0) {
-                        #carp "out of range in $Numer";
-                        $SLOWNIE = "out of range";
-                } else {
-                        $Numer = Trim($Numer);
-                        $MiejsceDz = InStr($Numer);
-                        if ($MiejsceDz > 0 && Right($Numer,2) ne "00") {
-                                if ($currency) {
-                                        $grosze = Left(Mid($Numer, $MiejsceDz + 1)."00", 2);
-                                        $grd = Dziesiatki(Right($grosze, 2));
-                                        if ($Idziesiatka!=1) {
-                                                $grj = Jednostki(Right($grosze, 1));
-                                        }
-                                        $grosze = " ".$grd.$grj."gr";
-                                        $Numer = Trim(Left($Numer, $MiejsceDz - 1));
-                                } else {
-                                        carp "no decimals allowed in parse mode in $Numer";
-                                        $zlote = "no decimals allowed in parse mode in $Numer";
-                                }
-                        } elsif ($currency) {
-                                $grosze = " zero gr";
-                        }
-                        if ($Numer>0 && ($currency || !$MiejsceDz)) {
-                                $Licznik = 1;
-                                while ($Numer ne "") {
-                                        $temps = "";
-                                        $tempd = "";
-                                        $tempj = "";
-                                        $temps = Setki(Right("000".$Numer, 3));
-                                        $tempd = Dziesiatki(Right("00".$Numer, 2));
-                                        if ($Idziesiatka!=1) {
-                                                $tempj = Jednostki(Right($Numer, 1));
-                                        }
-                                        if ($Licznik==1) {
-                                                $T_S = $temps.$tempd.$tempj;
-                                        } elsif ($Licznik==2) {
-                                                $T_S = $temps.$tempd.$tempj.KTys($Numer);
-                                        } elsif ($Licznik==3||$Licznik==4||$Licznik==5) {
-                                                $T_S = $temps.$tempd.$tempj.KMil($Numer, $Licznik);
-                                        }
-                                        $zlote = $T_S.($zlote // '');
-
-                                        if (length($Numer) > 3) {
-                                                $Numer = Left($Numer, length($Numer) - 3);
-                                                $Licznik++;
-                                        } else {
-                                                $Numer = "";
-                                        }
-                                }
-                        } elsif ($currency || !$MiejsceDz) {
-                                $zlote = "zero "
-                        }
-                        if ($Numer !~ /^\d+$/ or $Numer > -1) {
-                                if ($currency) {
-                                        $SLOWNIE = $zlote."zl".$grosze;
-                                } else {
-                                        $SLOWNIE = $zlote;
-                                }
-                        }
-                }
+            $SLOWNIE = "zero";
         }
-        return $SLOWNIE;
+    }
+    else {
+        if ($Numer > 9999999999999.99 || $Numer < 0) {
+            #carp "out of range in $Numer";
+            $SLOWNIE = "out of range";
+        }
+        else {
+            $Numer = Trim($Numer);
+            $MiejsceDz = InStr($Numer);
+            if ($MiejsceDz > 0 && Right($Numer,2) ne "00") {
+                if ($currency) {
+                    $grosze = Left(Mid($Numer, $MiejsceDz + 1)."00", 2);
+                    $grd = Dziesiatki(Right($grosze, 2));
+                    if ($Idziesiatka!=1) {
+                        $grj = Jednostki(Right($grosze, 1));
+                    }
+                    $grosze = " ".$grd.$grj."gr";
+                    $Numer = Trim(Left($Numer, $MiejsceDz - 1));
+                }
+                else {
+                    carp "no decimals allowed in parse mode in $Numer";
+                    $zlote = "no decimals allowed in parse mode in $Numer";
+                }
+            }
+            elsif ($currency) {
+                $grosze = " zero gr";
+            }
+            if ($Numer>0 && ($currency || !$MiejsceDz)) {
+                $Licznik = 1;
+                while ($Numer ne "") {
+                    $tempj = "";
+                    $temps = Setki(Right("000".$Numer, 3)) // '';
+                    $tempd = Dziesiatki(Right("00".$Numer, 2)) // '';
+                    if ($Idziesiatka!=1) {
+                        $tempj = Jednostki(Right($Numer, 1)) // '';
+                    }
+                    if ($Licznik==1) {
+                        $T_S = $temps.$tempd.$tempj;
+                    }
+                    elsif ($Licznik==2) {
+                        $T_S = $temps.$tempd.$tempj.KTys($Numer);
+                    } elsif ($Licznik==3||$Licznik==4||$Licznik==5) {
+                        $T_S = $temps.$tempd.$tempj.KMil($Numer, $Licznik);
+                    }
+                    $zlote = $T_S.($zlote // '');
+
+                    if (length($Numer) > 3) {
+                        $Numer = Left($Numer, length($Numer) - 3);
+                        $Licznik++;
+                    }
+                    else {
+                        $Numer = "";
+                    }
+                }
+            } elsif ($currency || !$MiejsceDz) {
+                $zlote = "zero "
+            }
+            if ($Numer !~ /^\d+$/ or $Numer > -1) {
+                if ($currency) {
+                    $SLOWNIE = $zlote."zl".$grosze;
+                } else {
+                    $SLOWNIE = $zlote;
+                }
+            }
+        }
+    }
+
+    return $SLOWNIE;
 }
 
 # }}}
@@ -180,34 +184,38 @@ sub KTys {
 # {{{ KMil
 
 sub KMil {
-        my ($Numer, $L)=@_;
-        my ($KMil,$mil);
-        my @RzadW;
-        $RzadW[3] = "milion";
-        $RzadW[4] = "miliard";
-        $RzadW[5] = "bilion";
-        $mil = Val(Right("000".$Numer, 3));
-        if ($mil == 0) {
-                $KMil = "";
-        } else {
-                $mil = Val(Right($Numer, 2));
-                if ($mil == 1) {
-                        $KMil = " ";
-                } else {
-                        if ($mil == 12 || $mil == 13 || $mil == 14) {
-                                $KMil = "ów ";
-                        } else {
-                                $mil = Val(Right($Numer, 1));
-                                if ($mil == 2 || $mil == 3 || $mil == 4) {
-                                        $KMil = "y ";
-                                } else {
-                                        $KMil = "ów ";
-                                }
-                        }
-                }
-                $KMil = $RzadW[$L].$KMil;
+    my ($Numer, $L)=@_;
+    my ($KMil,$mil);
+    my @RzadW;
+    $RzadW[3] = "milion";
+    $RzadW[4] = "miliard";
+    $RzadW[5] = "bilion";
+    $mil = Val(Right("000".$Numer, 3));
+    if ($mil == 0) {
+        $KMil = "";
+    }
+    else {
+        $mil = Val(Right($Numer, 2));
+        if ($mil == 1) {
+            $KMil = " ";
         }
-        return $KMil;
+        else {
+            if ($mil == 12 || $mil == 13 || $mil == 14) {
+                $KMil = "ów ";
+            }
+            else {
+                $mil = Val(Right($Numer, 1));
+                if ($mil == 2 || $mil == 3 || $mil == 4) {
+                    $KMil = "y ";
+                } else {
+                    $KMil = "ów ";
+                }
+            }
+        }
+        $KMil = $RzadW[$L].$KMil;
+    }
+
+    return $KMil;
 }
 
 # }}}
@@ -251,30 +259,27 @@ sub Dziesiatki {
 
     $Idziesiatka = Val(Left($Number, 1));
     if ($Idziesiatka == 1) {
-        given(Val($Number)) {
-            when (10) { $wynik = 'dziesięćdz '; }
-            when (11) { $wynik = 'jedenaście '; }
-            when (12) { $wynik = 'dwanaście '; }
-            when (13) { $wynik = 'trzynaście '; }
-            when (14) { $wynik = 'czternaście '; }
-            when (15) { $wynik = 'pietnaście '; }
-            when (16) { $wynik = 'szesnaście '; }
-            when (17) { $wynik = 'siedemnaście '; }
-            when (18) { $wynik = 'osiemnaście '; }
-            when (19) { $wynik = 'dziewiętnaście '; }
-        }
+        my $valnum = Val($Number);
+        if ($valnum == 10) { $wynik = 'dziesięć '; }
+        elsif ($valnum == 11) { $wynik = 'jedenaście '; }
+        elsif ($valnum == 12) { $wynik = 'dwanaście '; }
+        elsif ($valnum == 13) { $wynik = 'trzynaście '; }
+        elsif ($valnum == 14) { $wynik = 'czternaście '; }
+        elsif ($valnum == 15) { $wynik = 'piętnaście '; }
+        elsif ($valnum == 16) { $wynik = 'szesnaście '; }
+        elsif ($valnum == 17) { $wynik = 'siedemnaście '; }
+        elsif ($valnum == 18) { $wynik = 'osiemnaście '; }
+        elsif ($valnum == 19) { $wynik = 'dziewiętnaście '; }
     }
     else {
-        given ($Idziesiatka) {
-            when (2) { $wynik = 'dwadzieścia '; }
-            when (3) { $wynik = 'trzydzieści '; }
-            when (4) { $wynik = 'czterdzieści '; }
-            when (5) { $wynik = 'piędzieśąt '; }
-            when (6) { $wynik = 'sześdzieśąt '; }
-            when (7) { $wynik = 'siedemdzieśąt '; }
-            when (8) { $wynik = 'osiemdzieśąt '; }
-            when (9) { $wynik = 'dziewiędzieśąt '; }
-        }
+        if ($Idziesiatka == 2) { $wynik = 'dwadzieścia '; }
+        if ($Idziesiatka == 3) { $wynik = 'trzydzieści '; }
+        if ($Idziesiatka == 4) { $wynik = 'czterdzieści '; }
+        if ($Idziesiatka == 5) { $wynik = 'pięćdziesiąt '; }
+        if ($Idziesiatka == 6) { $wynik = 'sześćdziesiąt '; }
+        if ($Idziesiatka == 7) { $wynik = 'siedemdziesiąt '; }
+        if ($Idziesiatka == 8) { $wynik = 'osiemdziesiąt '; }
+        if ($Idziesiatka == 9) { $wynik = 'dziewięćdziesiąt '; }
     }
 
     return $wynik;
@@ -389,7 +394,7 @@ Lingua::POL::Numbers - Perl module for converting numeric values into their Poli
 
 =head1 VERSION
 
-version 0.135
+version 0.2603230
 
 =head1 DESCRIPTION
 

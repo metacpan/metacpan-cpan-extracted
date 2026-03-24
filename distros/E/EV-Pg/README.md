@@ -74,7 +74,6 @@ for my $i (0 .. 999) {
 $pg->pipeline_sync(sub {
     $pg->exit_pipeline;
 });
-$pg->send_flush_request;
 ```
 
 ## Callback convention
@@ -112,9 +111,9 @@ make install
 
 | Workload | EV::Pg sequential | EV::Pg pipeline | DBD::Pg sync | DBD::Pg async+EV |
 |----------|------------------:|----------------:|-------------:|-----------------:|
-| SELECT   | 73,109 q/s | 124,092 q/s | 56,496 q/s | 48,744 q/s |
-| INSERT   | 58,534 q/s | 84,467 q/s | 39,068 q/s | 41,559 q/s |
-| UPSERT   | 26,342 q/s | 34,223 q/s | 28,134 q/s | 27,155 q/s |
+| SELECT   | 83,998 q/s | 144,939 q/s | 73,195 q/s | 65,966 q/s |
+| INSERT   | 67,053 q/s | 85,701 q/s | 60,127 q/s | 58,329 q/s |
+| UPSERT   | 37,360 q/s | 43,019 q/s | 40,278 q/s | 40,173 q/s |
 
 EV::Pg sequential uses prepared statements (parse once, bind+execute per call).
 Pipeline mode batches queries with `pipeline_sync` every 1000 queries.

@@ -1,35 +1,28 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::AFR::Word2Num;
 # ABSTRACT: Word 2 number conversion in AFR.
 
 # {{{ use block
-#
 
-use 5.10.1;
-
-use strict;
-use warnings;
+use 5.16.0;
+use utf8;
 
 use Carp;
 
-use Perl6::Export::Attrs;
+use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
+our $VERSION = '0.2603230';
 
-our $VERSION = 0.1106;
+my $parser = afr_numerals();
 
-our $INFO = {
-    rev  => '$Rev: 1106 $',
-};
-
-my $parser = af_numerals();
 # }}}
 
 # {{{ w2n                                         convert number to text
-#
+
 sub w2n :Export {
     my $input = shift // return;
 
@@ -39,122 +32,65 @@ sub w2n :Export {
     return $parser->numeral($input);
 }
 # }}}
-# {{{ af_numerals                                 create parser for numerals
+# {{{ afr_numerals                                create parser for numerals
 
-sub af_numerals {
+sub afr_numerals {
     return Parse::RecDescent->new(q{
-      numeral: scrap     { return undef; }                            # root parse. go from maximum to minimum value
-        |      million   { return $item[1]; }                         # scrap is a container rule for cases out of bounds
-        |      millenium { return $item[1]; }
-        |      century   { return $item[1]; }
-        |      decade    { return $item[1]; }
+      <autoaction: { $item[1] } >
 
-      number: 'nul'        { $return = 0; }                           # try to find a word from 0 to 19
-        |     'een'        { $return = 1; }
-        |     'twee'       { $return = 2; }
-        |     'drie'       { $return = 3; }
-        |     'vier'       { $return = 4; }
-        |     'vyf'        { $return = 5; }
-        |     'ses'        { $return = 6; }
-        |     'sewe'       { $return = 7; }
-        |     'agt'        { $return = 8; }
-        |     'nege'       { $return = 9; }
-        |     'tien'       { $return = 10; }
-        |     'elf'        { $return = 11; }
-        |     'twaalf'     { $return = 12; }
-        |     'dertien'    { $return = 13; }
-        |     'viertien'   { $return = 14; }
-        |     'vyftien'    { $return = 15; }
-        |     'sestien'    { $return = 16; }
-        |     'sewentien'  { $return = 17; }
-        |     'agtien'     { $return = 18; }
-        |     'negentien'  { $return = 19; }
+      numeral:   mega
+               | kOhOd
+               | 'nul'   { 0 }
+               | { }
 
-      tens:   'twintig'  { $return = 20; }                            # try to find a word that representates
-        |     'dertig'   { $return = 30; }                            # values 20,30,..,90
-        |     'viertig'  { $return = 40; }
-        |     'vyftig'   { $return = 50; }
-        |     'sestig'   { $return = 60; }
-        |     'sewentig' { $return = 70; }
-        |     'tagtig'   { $return = 80; }
-        |     'negentig' { $return = 90; }
+      number:   'viertien'   { 14 }
+              | 'vyftien'    { 15 }
+              | 'sestien'    { 16 }
+              | 'sewentien'  { 17 }
+              | 'agtien'     { 18 }
+              | 'negentien'  { 19 }
+              | 'een'        { 1  }
+              | 'twee'       { 2  }
+              | 'drie'       { 3  }
+              | 'vier'       { 4  }
+              | 'vyf'        { 5  }
+              | 'ses'        { 6  }
+              | 'sewe'       { 7  }
+              | 'agt'        { 8  }
+              | 'nege'       { 9  }
+              | 'tien'       { 10 }
+              | 'elf'        { 11 }
+              | 'twaalf'     { 12 }
+              | 'dertien'    { 13 }
 
-      decade: number(?) 'en' tens(?)                                  # try to find words that represents values
-              { $return = -1;                                         # from 0 to 99
-                for (@item) {
-                  if (ref $_ && defined $$_[0]) {
-                    $return += $$_[0] if ($return != -1);             # -1 if the non-zero identifier, since
-                    $return  = $$_[0] if ($return == -1);             # zero is a valid result
-                  }
-                }
-                $return = undef if ($return == -1);
-              }
-        |     number(?) tens(?)
-              { $return = -1;
-                for (@item) {
-                  if (ref $_ && defined $$_[0]) {
-                    $return += $$_[0] if ($return != -1);             # -1 if the non-zero identifier, since
-                    $return  = $$_[0] if ($return == -1);             # zero is a valid result
-                  }
-                }
-                $return = undef if ($return == -1);
-              }
-        |     'en' number(?)
-              { $return = -1;
-                for (@item) {
-                  if (ref $_ && defined $$_[0]) {
-                    $return += $$_[0] if ($return != -1);             # -1 if the non-zero identifier, since
-                    $return  = $$_[0] if ($return == -1);             # zero is a valid result
-                  }
-                }
-                $return = undef if ($return == -1);
-              }
+      tens:     'twintig'  { 20 }
+              | 'dertig'   { 30 }
+              | 'viertig'  { 40 }
+              | 'vyftig'   { 50 }
+              | 'sestig'   { 60 }
+              | 'sewentig' { 70 }
+              | 'tagtig'   { 80 }
+              | 'negentig' { 90 }
 
+      deca:
+                number 'en' tens   { $item[1] + $item[3] }
+              | tens
+              | number
 
-      century: number(?) 'honderd' decade(?)                          # try to find words that represents values
-               { $return = 0;                                         # from 100 to 999
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "honderd") {
-                     $return = ($return>0) ? $return * 100 : 100;
-                   }
-                 }
-                 $return = undef if (!$return);
-               }
+      hecto:    number 'honderd' /(en)?/ deca { $item[1] * 100 + $item[4] }
+              | number 'honderd'              { $item[1] * 100 }
 
-    millenium: century(?) decade(?) 'duisend' century(?) decade(?)    # try to find words that represents values
-               { $return = 0;                                         # from 1.000 to 999.999
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "duisend") {
-                     $return = ($return>0) ? $return * 1000 : 1000;
-                   }
-                 }
-                 $return = undef if (!$return);
-               }
+    hOd:          hecto
+                | deca
 
-      million: millenium(?) century(?) decade(?)                      # try to find words that represents values
-               'miljoen'                                              # from 1.000.000 to 999.999.999.999
-               millenium(?) century(?) decade(?)
-               { $return = 0;
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "miljoen") {
-                     $return = ($return>0) ? $return * 1000000 : 1000000;
-                   }
-                 }
-                 $return = undef if (!$return);
-               }
+      kilo:    hOd 'duisend' /(en)?/ hOd   { $item[1] * 1000 + $item[4] }
+             | hOd 'duisend'               { $item[1] * 1000 }
 
-     scrap: million(?) millenium(?) century(?) decade(?)             # if there is something else then the numerals defined above
-            /(.+)/
-            million(?) millenium(?) century(?) decade(?)             # return undef and give a word of warning
-            {
-              carp("unknown numeral '$1' !\n");
-            }
+    kOhOd:   kilo
+           | hOd
+
+      mega:    hOd 'miljoen' /(en)?/ kOhOd { $item[1] * 1_000_000 + $item[4] }
+             | hOd 'miljoen'               { $item[1] * 1_000_000 }
     });
 }
 
@@ -174,7 +110,7 @@ __END__
 
 =head1 VERSION
 
-version 0.1106
+version 0.2603230
 
 Word 2 number conversion in AFR.
 
@@ -218,7 +154,7 @@ Convert text representation to number.
 If the input string is not known, or out of the
 interval, undef is returned.
 
-=item B<af_numerals> (void)
+=item B<afr_numerals> (void)
 
   =>  obj  new parser object
 
@@ -257,7 +193,7 @@ Internal parser.
 
 =head1 COPYRIGHT
 
-Copyright (C) PetaMem, s.r.o. 2004-present
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =cut
 

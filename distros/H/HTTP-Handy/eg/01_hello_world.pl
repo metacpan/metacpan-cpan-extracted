@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 ######################################################################
 # 01_hello_world.pl - Minimal HTTP::Handy application
 #

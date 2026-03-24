@@ -3,6 +3,7 @@ CONTRIBUTIONS.md
 cpanfile
 lib/Test/Mockingbird.pm
 lib/Test/Mockingbird/DeepMock.pm
+lib/Test/Mockingbird/TimeTravel.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

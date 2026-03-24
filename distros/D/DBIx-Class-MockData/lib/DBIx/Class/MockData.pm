@@ -1,6 +1,6 @@
 package DBIx::Class::MockData;
 
-$DBIx::Class::MockData::VERSION   = '0.04';
+$DBIx::Class::MockData::VERSION   = '0.05';
 $DBIx::Class::MockData::AUTHORITY = 'cpan:MANWAR';
 
 use strict;
@@ -14,7 +14,7 @@ DBIx::Class::MockData - Generate mock test data for DBIx::Class schemas
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,17 @@ Version 0.04
         ->deploy
         ->generate;
 
-    # With options
+    # Fast data refresh (recommended for most test scenarios)
+    DBIx::Class::MockData
+        ->new(
+            schema     => $schema,
+            schema_dir => 't/lib',
+            rows       => 10,
+        )
+        ->truncate      # Empties tables quickly, preserves structure
+        ->generate;
+
+    # Complete schema reset (use sparingly)
     DBIx::Class::MockData
         ->new(
             schema     => $schema,
@@ -40,7 +50,7 @@ Version 0.04
             verbose    => 1,
             seed       => 42,
         )
-        ->wipe
+        ->wipe          # Destructive: drops and recreates tables
         ->generate;
 
     # Populate only selected tables
@@ -50,6 +60,7 @@ Version 0.04
             schema_dir => 't/lib',
             only       => [qw(Author Book)],
         )
+        ->truncate
         ->generate;
 
     # Populate all tables except selected ones
@@ -59,6 +70,7 @@ Version 0.04
             schema_dir => 't/lib',
             exclude    => [qw(AuditLog SessionToken)],
         )
+        ->truncate
         ->generate;
 
     # Use custom generators for specific columns
@@ -75,6 +87,7 @@ Version 0.04
                 },
             }
         )
+        ->truncate
         ->generate;
 
     # Set different row counts per table
@@ -88,7 +101,17 @@ Version 0.04
                 Book   => 3,                  # override for Book
             },
         )
+        ->truncate
         ->generate;
+
+    # Preview data without inserting
+    DBIx::Class::MockData
+        ->new(
+            schema     => $schema,
+            schema_dir => 't/lib',
+            rows       => 3,
+        )
+        ->dry_run;      # Prints generated values, no database changes
 
 =head1 DESCRIPTION
 
@@ -112,6 +135,8 @@ All public methods return C<$self>, enabling call chaining.
 use Carp         qw(croak);
 use File::Spec   ();
 use Scalar::Util qw(blessed);
+use UUID::Tiny   qw(:std);
+use feature      qw(state);
 
 =head1 CONSTRUCTOR
 
@@ -188,10 +213,49 @@ sub new {
     croak "exclude must be an arrayref"
         if $args{exclude} && ref($args{exclude}) ne 'ARRAY';
 
+    # Validate numeric arguments
+    if (defined $args{rows}) {
+        croak "rows must be a positive integer"
+            unless $args{rows} =~ /^\d+$/ && $args{rows} > 0;
+    }
+
+    if (defined $args{seed}) {
+        croak "seed must be a positive integer"
+            unless $args{seed} =~ /^\d+$/ && $args{seed} > 0;
+    }
+
+    if (defined $args{verbose}) {
+        croak "verbose must be 0 or 1"
+            unless $args{verbose} =~ /^[01]$/;
+    }
+
+    # Validate rows_per_table if provided
+    if (defined $args{rows_per_table}) {
+        croak "rows_per_table must be a hashref"
+            unless ref($args{rows_per_table}) eq 'HASH';
+
+        while (my ($table, $count) = each %{ $args{rows_per_table} }) {
+            croak "rows_per_table value for '$table' must be a positive integer"
+                unless $count =~ /^\d+$/ && $count > 0;
+        }
+    }
+
+    # Validate generators if provided
+    if (defined $args{generators}) {
+        croak "generators must be a hashref"
+            unless ref($args{generators}) eq 'HASH';
+
+        while (my ($col, $gen) = each %{ $args{generators} }) {
+            croak "generator for '$col' must be a code reference or scalar"
+                unless ref($gen) eq 'CODE' || !ref($gen);
+        }
+    }
+
     my $self = {
         _schema        => $args{schema},
         rows           => $args{rows}    // 5,
         verbose        => $args{verbose} // 0,
+        quiet          => $args{quiet}   // 0,
         rows_per_table => $args{rows_per_table} || {},
         generators     => $args{generators}     || {},
         _salt          => int(rand(9_000_000)) + 1_000_000,
@@ -203,6 +267,19 @@ sub new {
         srand($args{seed});
         $self->{_salt} = int(rand(9_000_000)) + 1_000_000;
     }
+
+    if (defined $args{start_year}) {
+        croak "start_year must be a 4-digit year"
+            unless $args{start_year} =~ /^\d{4}$/;
+        $self->{start_year} = $args{start_year};
+    }
+    if (defined $args{end_year}) {
+        croak "end_year must be a 4-digit year"
+            unless $args{end_year} =~ /^\d{4}$/;
+        $self->{end_year} = $args{end_year};
+    }
+    $self->{start_year} ||= 2010;
+    $self->{end_year}   ||= 2026;
 
     return bless $self, $class;
 }
@@ -246,6 +323,78 @@ sub deploy {
     return $self;
 }
 
+=head2 truncate
+
+    $mock->truncate->generate;   # chainable
+
+Truncates (empties) all tables while preserving table structure.
+Safer than C<wipe> as it doesn't drop and recreate tables.
+Returns C<$self>.
+
+=cut
+
+sub truncate {
+    my ($self) = @_;
+    my $schema = $self->{_schema};
+
+    $self->_log("Truncating all tables...");
+
+    # Get tables in reverse dependency order to avoid FK issues
+    my @all_sources   = $schema->sources;
+    my @sources       = $self->_active_sources(@all_sources);
+    my ($deps, $rsrc) = $self->_build_dep_graph(\@sources);
+    my @ordered       = reverse $self->_topo_sort($deps, \@sources);
+
+    eval {
+        $schema->storage->dbh_do(sub {
+            my (undef, $dbh) = @_;
+            for my $name (@ordered) {
+                my $source = $schema->source($name);
+                my $table = $source->from;
+                $table = $$table if ref($table) eq 'SCALAR';
+
+                $self->_debug("  Truncating: $table");
+
+                # Different DBs have different truncate syntax
+                my $driver = $schema->storage->dbh->{Driver}->{Name};
+                if ($driver eq 'SQLite') {
+                    $dbh->do("DELETE FROM $table");
+
+                    # Reset autoincrement sequences if they exist
+                    # Check if sqlite_sequence table exists and has entry
+                    # for this table
+                    my $seq_exists = $dbh->selectrow_array(
+                        "SELECT name FROM sqlite_master WHERE type='table' AND name='sqlite_sequence'"
+                    );
+
+                    if ($seq_exists) {
+                        my $has_seq = $dbh->selectrow_array(
+                            "SELECT name FROM sqlite_sequence WHERE name=?", {}, $table
+                        );
+                        if ($has_seq) {
+                            $dbh->do("DELETE FROM sqlite_sequence WHERE name='$table'");
+                        }
+                    }
+                }
+                elsif ($driver =~ /mysql|mariadb/i) {
+                    $dbh->do("TRUNCATE TABLE $table");
+                }
+                elsif ($driver =~ /postgres|pg/i) {
+                    $dbh->do("TRUNCATE TABLE $table RESTART IDENTITY CASCADE");
+                }
+                else {
+                    # Fallback
+                    $dbh->do("DELETE FROM $table");
+                }
+            }
+        });
+    };
+    croak "Truncate failed: $@" if $@;
+
+    $self->_log("Truncate complete");
+    return $self;
+}
+
 =head2 wipe
 
     $mock->wipe->generate;   # chainable
@@ -258,6 +407,8 @@ B<Destructive -- for test environments only.> Returns C<$self>.
 sub wipe {
     my ($self) = @_;
     my $schema = $self->{_schema};
+    warn "[WARN] wipe() is destructive and drops tables. Consider using truncate() instead.\n"
+        unless $self->{quiet};
 
     $self->_log("Wiping all tables...");
     eval {
@@ -438,12 +589,38 @@ sub _build_dep_graph {
         $deps{$name} //= [];
 
         for my $rel ($source->relationships) {
-            my $info = $source->relationship_info($rel);
-            next unless $self->_is_belongs_to($info);
+            my $info  = $source->relationship_info($rel);
+            my $attrs = $info->{attrs} || {};
+
+            # Check if this is a foreign key constraint relationship
+            next unless $attrs->{is_foreign_key_constraint};
+
+            # belongs_to, has_one, might_have all create FK dependencies
+            # but in different directions
+            my $accessor = $attrs->{accessor} || '';
+
             my $parent = eval { $source->related_source($rel)->source_name } or next;
             next if $parent eq $name;
-            push @{ $deps{$name} }, $parent
-                unless grep { $_ eq $parent } @{ $deps{$name} };
+
+            if ($accessor eq 'single') {
+                # belongs_to - current table depends on parent
+                push @{ $deps{$name} }, $parent
+                    unless grep { $_ eq $parent } @{ $deps{$name} };
+            }
+            elsif ($accessor eq 'multi') {
+                # has_many - parent depends on current table?
+                # Actually has_many doesn't create FK constraint in current table
+                # So no dependency
+            }
+            else {
+                # might_have, has_one - parent depends on current table?
+                # These create FK in current table pointing to parent
+                # So current table depends on parent
+                if ($attrs->{is_foreign_key_constraint}) {
+                    push @{ $deps{$name} }, $parent
+                        unless grep { $_ eq $parent } @{ $deps{$name} };
+                }
+            }
         }
     }
 
@@ -471,10 +648,50 @@ sub _topo_sort {
         push @queue, $_ for grep { --$in{$_} == 0 } @{ $adj{$n} // [] };
     }
 
-    # Append remaining nodes (cycle members -- best effort)
-    my %seen = map { $_ => 1 } @result;
-    push @result, $_ for grep { !$seen{$_} } @$nodes;
+    # Check for cycles
+    my @remaining = grep { $in{$_} > 0 } @$nodes;
+    if (@remaining) {
+        if ($self->{ignore_cycles}) {
+            # Best effort - append remaining nodes
+            push @result, @remaining;
+        }
+        else {
+            my $cycle = $self->_find_cycle(\%adj, $remaining[0]);
+            croak "Cyclic dependency detected in relationships: " . join(' -> ', @$cycle);
+        }
+    }
+
     return @result;
+}
+
+sub _find_cycle {
+    my ($self, $adj, $start) = @_;
+    my %seen;
+    my @path;
+
+    my $dfs;
+    $dfs = sub {
+        my $node = shift;
+        return if $seen{$node};
+
+        push @path, $node;
+        $seen{$node} = scalar @path;
+
+        for my $next (@{ $adj->{$node} // [] }) {
+            if (my $pos = $seen{$next}) {
+                # Found a cycle
+                return [ @path[$pos-1 .. $#path], $next ];
+            }
+            my $cycle = $dfs->($next);
+            return $cycle if $cycle;
+        }
+
+        pop @path;
+        $seen{$node} = 0;
+        return undef;
+    };
+
+    return $dfs->($start) || [$start];
 }
 
 sub _build_fk_map {
@@ -535,7 +752,7 @@ sub _generate_value {
     if ($dtype =~ /\b(bool|boolean|tinyint\(1\))\b/) {
         return int(rand(2));
     }
-    if ($dtype =~ /\b(datetime|timestamp)\b/) {    # before bare 'date'
+    if ($dtype =~ /\b(datetime|timestamp)\b/) {
         return $self->_rand_datetime;
     }
     if ($dtype =~ /\bdate\b/) {
@@ -545,8 +762,7 @@ sub _generate_value {
         return sprintf '%02d:%02d:%02d', int(rand(24)), int(rand(60)), int(rand(60));
     }
     if ($dtype =~ /\buuid\b/) {
-        return sprintf '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            map { int(rand(0x10000)) } 1 .. 8;
+        return create_uuid_as_string(UUID_V4);
     }
     if ($dtype =~ /\bjsonb?\b/) {
         return qq({"generated":true,"row":$n});
@@ -564,61 +780,174 @@ sub _generate_value {
 sub _contextual_string {
     my ($self, $col, $n, $max, $is_unique) = @_;
     my $salt = $self->{_salt};
-    my $u    = $is_unique ? "_${salt}" : '';
 
-    my @templates = (
+    state $templates = [
         [ qr/\b(first_?name|fname)\b/i,
-            sub { (qw(Alice Bob Carol Dave Eve Frank Grace Hank Iris Jack))[$_[0]%10].$u }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(Alice Bob Carol Dave Eve Frank Grace Hank Iris Jack))[$n%10];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(last_?name|lname|surname)\b/i,
-            sub { (qw(Smith Jones Taylor Brown Wilson Davies Evans Thomas Roberts))[$_[0]%9].$u }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(Smith Jones Taylor Brown Wilson Davies Evans Thomas Roberts))[$n%9];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\bname\b/i,
-            sub { "Name $_[0]$u" }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = "Name $n";
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(username|login)\b/i,
-            sub { "user$_[0]$u" }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = "user$n";
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\bemail\b/i,
-            sub { "user$_[0]${u}\@example.com" }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $local = "user$n";
+                $local .= "_${salt}" if $is_unique;
+                return "${local}\@example.com";
+            } ],
         [ qr/\b(phone|mobile|fax)\b/i,
-            sub { sprintf '+1555%04d%04d', $salt%10000, $_[0] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                return sprintf '+1555%04d%04d', $salt % 10000, $n;
+            } ],
         [ qr/\b(street|address|addr)\b/i,
-            sub { "$_[0]$u Main Street" }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = "$n Main Street";
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(city|town)\b/i,
-            sub { (qw(London Paris Berlin Madrid Rome Amsterdam Brussels Vienna))[$_[0]%8] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(London Paris Berlin Madrid Rome Amsterdam Brussels Vienna))[$n%8];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\bcountry\b/i,
-            sub { (qw(UK US DE FR ES IT NL AT))[$_[0]%8] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(UK US DE FR ES IT NL AT))[$n%8];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(zip|postcode|postal)\b/i,
-            sub { sprintf '%05d', (10000+$_[0]+$salt)%99999 }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                return sprintf '%05d', (10000 + $n + $salt) % 99999;
+            } ],
         [ qr/\b(state|province|region)\b/i,
-            sub { (qw(CA NY TX FL WA IL PA OH))[$_[0]%8] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(CA NY TX FL WA IL PA OH))[$n%8];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(description|desc|summary|notes?|comment|body|content)\b/i,
-            sub { "Sample text for record $_[0] (run $salt)." }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                return "Sample text for record $n (run $salt).";
+            } ],
         [ qr/\b(title|heading|subject)\b/i,
-            sub { "Title $_[0]$u" }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = "Title $n";
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\bslug\b/i,
-            sub { "slug-$_[0]$u" }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = "slug-$n";
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(code|ref|reference)\b/i,
-            sub { sprintf 'CODE%04d%s', $_[0], $u }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = sprintf 'CODE%04d', $n;
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\bsku\b/i,
-            sub { sprintf 'SKU%04d%s',  $_[0], $u }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = sprintf 'SKU%04d', $n;
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(token|secret|key|hash)\b/i,
-            sub { sprintf '%016x%08x', $salt, $_[0] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                return sprintf '%016x%08x', $salt, $n;
+            } ],
         [ qr/\b(url|link|href|website)\b/i,
-            sub { "https://example.com/item/$_[0]$u" }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = "https://example.com/item/$n";
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(status|state)\b/i,
-            sub { (qw(active inactive pending approved rejected))[$_[0]%5] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(active inactive pending approved rejected))[$n%5];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(type|kind|category|cat)\b/i,
-            sub { (qw(typeA typeB typeC typeD))[$_[0]%4] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(typeA typeB typeC typeD))[$n%4];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(colour|color)\b/i,
-            sub { (qw(red green blue yellow purple orange))[$_[0]%6] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(red green blue yellow purple orange))[$n%6];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(lang|language|locale)\b/i,
-            sub { (qw(en fr de es it nl pt))[$_[0]%7] }],
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = (qw(en fr de es it nl pt))[$n%7];
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
         [ qr/\b(version|ver)\b/i,
-            sub { "1.$_[0].0" }],
-    );
+            sub {
+                my ($n, $is_unique, $salt) = @_;
+                my $value = "1.$n.0";
+                $value .= "_${salt}" if $is_unique;
+                return $value;
+            } ],
+    ];
 
-    for my $t (@templates) {
-        return substr($t->[1]->($n), 0, $max) if $col =~ $t->[0];
+    for my $t (@$templates) {
+        if ($col =~ $t->[0]) {
+            my $value = $t->[1]->($n, $is_unique, $salt);
+            return substr($value, 0, $max);
+        }
     }
-    return substr("${col}_${n}${u}", 0, $max);
+
+    # Default case
+    my $value = "${col}_${n}";
+    $value .= "_${salt}" if $is_unique;
+    return substr($value, 0, $max);
 }
 
 sub _insert_rows {
@@ -644,14 +973,16 @@ sub _insert_rows {
 }
 
 sub _rand_date {
-    my @y = (2020..2024);
-    sprintf '%d-%02d-%02d', $y[rand@y], rand(12)+1, rand(28)+1;
+    my ($self) = @_;
+    my $year = $self->{start_year} + int(rand($self->{end_year} - $self->{start_year} + 1));
+    sprintf '%d-%02d-%02d', $year, rand(12)+1, rand(28)+1;
 }
 
 sub _rand_datetime {
-    my @y = (2020..2024);
+    my ($self) = @_;
+    my $year = $self->{start_year} + int(rand($self->{end_year} - $self->{start_year} + 1));
     sprintf '%d-%02d-%02d %02d:%02d:%02d',
-        $y[rand@y], rand(12)+1, rand(28)+1, rand(24), rand(60), rand(60);
+        $year, rand(12)+1, rand(28)+1, rand(24), rand(60), rand(60);
 }
 
 sub _log   { print "[INFO]  $_[1]\n";                    }

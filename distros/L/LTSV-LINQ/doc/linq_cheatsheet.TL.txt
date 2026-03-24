@@ -1,0 +1,154 @@
+======================================================================
+ LTSV::LINQ Cheat Sheet                               [TL] Filipino
+======================================================================
+
+[ 1. Lumikha ng query (Creating a query) ]
+
+  use LTSV::LINQ;
+
+  my $q = LTSV::LINQ->FromLTSV('access.log.ltsv');
+  my $q = LTSV::LINQ->From(\@array);
+  my $q = LTSV::LINQ->From([ @array ]);
+  my $q = LTSV::LINQ->Empty();
+  my $q = LTSV::LINQ->Range(1, 5);
+  my $q = LTSV::LINQ->Repeat("x", 3);
+
+  Tandaan: Ang bawat terminal na paraan ay nagpapauwi ng iterator.
+    Para muling gamitin ang data, tumawag muli ng From() / FromLTSV().
+
+[ 2. Pag-filter (Filtering) ]
+
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+
+  Nag-filter ng mga elemento batay sa kondisyon.
+
+[ 3. Proyeksyon (Projection) ]
+
+  ->Select(sub { { path => $_[0]{path}, size => $_[0]{size} } })
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
+
+  Binabago ng Select ang bawat elemento; pinapantay ng SelectMany ang mga nested na array
+    (ang selector ay dapat magbalik ng ARRAY na sanggunian).
+
+[ 4. Pag-uuri (Sorting) ]
+
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{size} })
+  ->OrderByNumDescending(sub { $_[0]{size} })
+  ->OrderByStr(sub { $_[0]{name} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByDescending(sub { $_[0]{score} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->ThenByNumDescending(sub { $_[0]{age} })
+  ->ThenByStr(sub { $_[0]{name} })
+  ->ThenByStrDescending(sub { $_[0]{name} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: pangunahing susi sa pag-uuri.
+    ThenBy*/ThenByNum*/ThenByStr*: pangalawang susi sa pag-uuri (pagkatapos ng OrderBy*).
+    Reverse: binabaligtad ang kasalukuyang pagkakasunod-sunod.
+
+[ 5. Pahina (Paging) ]
+
+  ->Skip(10)                               # Skip/Take
+  ->Take(5)
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
+
+  Skip/Take: laktawan o kumuha ng tiyak na bilang ng mga elemento.
+    SkipWhile/TakeWhile: batay sa kondisyon.
+
+[ 6. Pangkat (Grouping) ]
+
+  my @g = $q->GroupBy(sub { $_[0]{status} })->ToArray();
+  print $g[0]->{Key}, ": ", scalar @{$g[0]->{Elements}};
+  my %lk = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lk{Eng} };
+  my %nm = %{ $q->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} }) };
+
+  Nagbabalik ang GroupBy ng array ng { Key=>'...', Elements=>[...] }.
+    Nagbabalik ang ToLookup ng hashref { key => [elements] }.
+
+[ 7. Mga operasyon sa set (Set operations) ]
+
+  ->Distinct()          ->Distinct(sub { $_[0]{id} })
+  ->Union($other_q)     ->Union($other_q, sub { $_[0]{id} })
+  ->Intersect($other_q) ->Intersect($other_q, sub { ... })
+  ->Except($other_q)    ->Except($other_q, sub { ... })
+  ->SequenceEqual($other_q)
+
+  Sinusuportahan ng Distinct/Union/Intersect/Except ang opsyonal na key selector.
+    SequenceEqual: totoo kung pantay ang dalawang sequence.
+
+[ 8. Pagsasama (Joins) ]
+
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },    # outer key
+      sub { $_[0]{id} },         # inner key
+      sub { { name=>$_[0]{name}, dept=>$_[1]{name} } })
+
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },
+      sub { $_[0]{dept_id} },
+      sub { my($o,$ig)=@_; { name=>$o->{name}, orders=>[$ig->ToArray()] } })
+
+  Join: panloob na pagsasama. GroupJoin: kaliwang panlabas na pagsasama
+    (ang panloob na grupo ay ipinasa bilang LTSV::LINQ na bagay).
+
+[ 9. Pagsasama-sama (mga terminal na paraan) (Aggregation / Terminal methods) ]
+
+  ->ToArray()                              ->ToList()
+  ->Count()                                ->Count(sub { $_[0] > 5 })
+  ->Sum(sub { $_[0]{score} })
+  ->Average(sub { $_[0]{score} })          ->AverageOrDefault(sub { ... })
+  ->Min(sub { $_[0]{score} })              ->Max(sub { $_[0]{score} })
+  ->First()                                ->FirstOrDefault()
+  ->First(sub { $_[0] > 5 })              ->FirstOrDefault(sub { $_[0] > 5 })
+  ->Last()                                 ->LastOrDefault()
+  ->Last(sub { $_[0] > 5 })               ->LastOrDefault(sub { $_[0] > 5 })
+  ->Single()                               ->SingleOrDefault()
+  ->Single(sub { $_[0] > 5 })             ->SingleOrDefault(sub { $_[0] > 5 })
+  ->ElementAt($n)                          ->ElementAtOrDefault($n)
+  ->Any()                                  ->Any(sub { $_[0] > 5 })
+  ->All(sub { $_[0] > 0 })
+  ->Contains($value)
+  ->ForEach(sub { ... })
+  ->Aggregate($seed, sub { $_[0]+$_[1] })
+
+  Ang mga variant ng OrDefault ay nagbabalik ng undef sa halip na die para sa walang laman na sequence.
+    ElementAt: 0-based na index (die kung labas ng hangganan). ElementAtOrDefault: undef.
+
+[ 10. Iba pang pamamaraan ng pagkakasunod-sunod (Other sequence methods) ]
+
+  ->Concat($other_q)
+  ->DefaultIfEmpty($default)
+  ->Zip($other_q, sub { ... })
+
+  Concat: nagdudugtong ng dalawang sequence. DefaultIfEmpty: default na halaga kung walang laman.
+    Zip: pinagsasama ang dalawang sequence nang element-by-element.
+
+[ 11. Mga paraan ng conversion (Conversion methods) ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub { $_[0]{id} })
+  ->ToDictionary(sub { $_[0]{id} }, sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+  ->ToLTSV('output.ltsv')
+
+  Nagbabalik ang ToDictionary ng hashref key=>element.
+    Nagbabalik ang ToLookup ng hashref key=>[elements].
+    Isinusulat ng ToLTSV ang sequence sa isang LTSV na file.
+
+[ 12. Mga opisyal na mapagkukunan (Official resources) ]
+
+  LTSV::LINQ: https://metacpan.org/dist/LTSV-LINQ
+  LTSV spec: http://ltsv.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+
+======================================================================

@@ -220,9 +220,11 @@ cmpthese(-3, {
 # Pre-fill LRU maps for lookup benchmarks
 my $m_ii_lru = Data::HashMap::II->new($N);
 my $m_ii_lru_ttl = Data::HashMap::II->new($N, 3600);
+my $m_ii_lru_s90 = Data::HashMap::II->new($N, 0, 90);
 for my $i (1 .. $N) {
     hm_ii_put $m_ii_lru, $i, $i;
     hm_ii_put $m_ii_lru_ttl, $i, $i;
+    hm_ii_put $m_ii_lru_s90, $i, $i;
 }
 
 print "\n", "-" x 70, "\n";
@@ -234,6 +236,9 @@ cmpthese(-3, {
     },
     'II_lru' => sub {
         for my $i (1 .. $N) { my $v = hm_ii_get $m_ii_lru, $i; }
+    },
+    'II_lru_s90' => sub {
+        for my $i (1 .. $N) { my $v = hm_ii_get $m_ii_lru_s90, $i; }
     },
     'II_lru_ttl' => sub {
         for my $i (1 .. $N) { my $v = hm_ii_get $m_ii_lru_ttl, $i; }

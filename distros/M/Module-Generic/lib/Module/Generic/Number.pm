@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.3.4
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v2.3.5
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2026/01/22
+## Modified 2026/03/22
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -116,7 +116,7 @@ BEGIN
         threads::shared->import();
         our $LOCALE_LOCK :shared;
     }
-    our( $VERSION ) = 'v2.3.4';
+    our( $VERSION ) = 'v2.3.5';
 };
 
 use v5.26.1;
@@ -520,7 +520,7 @@ sub init
     my $num  = shift( @_ );
     return( $self->error( "Number provided is undefined" ) ) if( !defined( $num ) );
     # Trigger overloading to string operation
-    $num = "$num";
+    $num = "$num" if( ref( $num ) );
     return( $self->error( "Number value provided is empty" ) ) if( !CORE::length( $num ) );
     {
         no warnings;
@@ -1895,7 +1895,7 @@ sub THAW
     CORE::return( $new );
 }
 
-sub TO_JSON { return( shift->as_string ); }
+sub TO_JSON { return( shift->as_number ); }
 
 # NOTE: package Module::Generic::NumberSpecial
 package Module::Generic::NumberSpecial;

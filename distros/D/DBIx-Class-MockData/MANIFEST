@@ -11,6 +11,7 @@ t/02-schema.t
 t/03-cli.t
 t/04-filter.t
 t/05-mockdata.t
+t/06-truncate.t
 t/lib/TestSchema.pm
 t/lib/TestSchema/Result/Author.pm
 t/lib/TestSchema/Result/Book.pm

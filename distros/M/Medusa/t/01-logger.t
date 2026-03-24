@@ -6,7 +6,7 @@ use Test::More;
 use File::Temp qw(tempfile tempdir);
 use File::Spec;
 
-plan tests => 12;
+plan tests => 11;
 
 use_ok('Medusa::Logger');
 
@@ -62,7 +62,6 @@ my $tempdir = tempdir(CLEANUP => 1);
     close $fh;
     
     like($content, qr/Test debug message/, 'debug() writes message to file');
-    like($content, qr/\w{3}\s+\w{3}\s+\d+/, 'debug() includes timestamp');
 }
 
 # Test: logger file handle stored correctly

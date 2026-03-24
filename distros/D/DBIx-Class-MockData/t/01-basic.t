@@ -122,7 +122,7 @@ subtest 'deploy->generate chain' => sub {
 subtest 'full chain: new->wipe->generate' => sub {
     lives_ok {
         DBIx::Class::MockData
-            ->new(schema => $schema, schema_dir => '.', rows => 2, seed => 7)
+            ->new(schema => $schema, schema_dir => '.', rows => 2, seed => 7, quiet => 1,)
             ->wipe
             ->generate;
     } 'chained wipe->generate lives';
@@ -180,10 +180,10 @@ subtest 'unique values include salt' => sub {
         schema => $schema, schema_dir => '.', seed => 42);
     my $salt = $mock->{_salt};
 
-    my $sv = $mock->_generate_value('ref', { data_type => 'varchar', size => 50 }, 1, 1);
+    my $sv = $mock->_generate_value('email', { data_type => 'varchar', size => 50 }, 1, 1);
     like $sv, qr/$salt/, 'unique varchar includes salt';
 
-    my $iv = $mock->_generate_value('eid', { data_type => 'integer' }, 1, 1);
+    my $iv = $mock->_generate_value('id', { data_type => 'integer' }, 1, 1);
     is $iv, $salt + 1, 'unique integer = salt + row_num';
 };
 

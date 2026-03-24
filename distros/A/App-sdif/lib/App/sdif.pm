@@ -7,7 +7,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.3301";
+our $VERSION = "4.4501";
 
 use Pod::Usage;
 
@@ -40,7 +40,7 @@ App::sdif - sdif and family tools, cdif and watchdiff
 
 =head1 DESCRIPTION
 
-B<sdif-tools> are composed by B<sdif> and related tools including
+B<sdif-tools> is composed of B<sdif> and related tools including
 B<cdif> and B<watchdiff>.
 
 B<sdif> prints diff output in side-by-side format.
@@ -48,7 +48,7 @@ B<sdif> prints diff output in side-by-side format.
 B<cdif> adds visual effect for diff output, comparing lines in
 word-by-word, or character-by-character bases.
 
-B<watchdiff> calls specified command repeatedly, and print the output
+B<watchdiff> calls specified command repeatedly, and prints the output
 with visual effect to emphasize modified part.
 
 See individual manual of each command for detail.

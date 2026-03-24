@@ -1,8 +1,8 @@
 ======================================================================
- HTTP::Handy PSGI Chi-teu Si-teu                     [KO] Hangugeo
+ HTTP::Handy PSGI 치트 시트                               [KO] 한국어
 ======================================================================
 
-[ 1. seo-beo si-jak ]
+[ 1. 서버 시작 ]
 
   use HTTP::Handy;
 
@@ -12,30 +12,30 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # pil-su: PSGI app code ref
-      host          => '127.0.0.1',# seon-taeg: bind address (0.0.0.0)
-      port          => 8080,       # seon-taeg: port (gi-bon-gabs: 8080)
-      log           => 1,          # seon-taeg: access log (gi-bon-gabs: 1)
-      max_post_size => 10485760,   # seon-taeg: max POST bytes (gi-bon-gabs: 10MB)
+      app           => $app,       # 필수: PSGI app code reference
+      host          => '127.0.0.1',# 선택: bind address (default: 0.0.0.0)
+      port          => 8080,       # 선택: port (default: 8080)
+      log           => 1,          # 선택: access log (default: 1)
+      max_post_size => 10485760,   # 선택: max POST bytes (default: 10MB)
   );
 
-  seu-keu-rip-teu-ro jig-jeob sil-haeng: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. yo-cheong hwan-gyeong byeon-su ($env) ]
+[ 2. 요청 환경 변수 ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (POST bon-mun ilg-gi (psgi.inpu)
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    문자열  "GET" / "POST"
+  PATH_INFO         문자열  /index.html
+  QUERY_STRING      문자열  key=val
+  SERVER_NAME       문자열  hostname
+  SERVER_PORT       정수  8080
+  CONTENT_TYPE      문자열  content-type
+  CONTENT_LENGTH    정수  (bytes)
+  HTTP_*            문자열  HTTP_USER_AGENT ...
+  psgi.input        객체  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   문자열  "http"
 
-[ 3. eung-dab hyeong-sik ]
+[ 3. 응답 형식 ]
 
   [$status, \@headers, \@body]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. POST bon-mun ilg-gi (psgi.input) ]
+[ 4. POST 본문 읽기 (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,62 +54,57 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. yu-til-li-ti me-seo-deu ]
+[ 5. 유틸리티 메서드 ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. eung-dab bil-deo me-seo-deu ]
+[ 6. 응답 빌더 메서드 ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. jeong-jeog pa-il je-gong ]
+[ 7. 정적 파일 제공 ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. ra-u-ting pae-teon ]
+[ 8. 라우팅 패턴 ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
   if ($path =~ m{^/api/}) { ... }
   if ($path =~ m{^/user/(\d+)$}) { my $id=$1; ... }
 
-[ 9. o-ryu cheo-ri ]
+[ 9. 오류 처리 ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 자동으로 500 응답
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. run() saeng-seong log pa-il ]
+[ 10. run()이 생성하는 로그 파일 ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  jeob-geun log (10 bun sun-hwan, LTSV hyeong-sik)
-  logs/error/error.log                o-ryu/si-jak log
+  logs/access/YYYYMMDDHHm0.log.ltsv  접근 로그 (10분 회전, LTSV 형식)
+  logs/error/error.log                오류/시작 로그
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. 공식 자료 링크 ]
+[ 11. 공식 리소스 ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

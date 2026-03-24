@@ -1,3 +1,10 @@
+2.43  2026-03-23
+
+  - Stabilize compact/ascii CLI regression tests by asserting
+    structural JSON behavior instead of serialized key order.
+  - Fix UTF-8 handling in the ASCII CLI test fixture input stream.
+  - Bump module version to 2.43.
+
 2.42  2026-02-25
 
   - Improve --slurpfile JSON stream handling by preserving all

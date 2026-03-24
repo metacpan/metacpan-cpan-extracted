@@ -116,7 +116,7 @@ HTTP::Promise::Headers::CacheControl - Cache-Control Header Field
 
 The following is an extract from Mozilla documentation.
 
-The C<Cache-Control> HTTP header field holds directives (instructions) — in both requests and responses — that control caching in browsers and shared caches (e.g. Proxies, CDNs).
+The C<Cache-Control> HTTP header field holds directives (instructions) - in both requests and responses - that control caching in browsers and shared caches (e.g. Proxies, CDNs).
 
 =head1 METHODS
 
@@ -287,7 +287,7 @@ The C<public> response directive indicates that the response can be stored in a 
 
 =head2 s_maxage
 
-The C<s-maxage> response directive also indicates how long the response is fresh for (similar to max-age) — but it is specific to shared caches, and they will ignore max-age when it is present.
+The C<s-maxage> response directive also indicates how long the response is fresh for (similar to max-age) - but it is specific to shared caches, and they will ignore max-age when it is present.
 
     Cache-Control: s-maxage=604800
 

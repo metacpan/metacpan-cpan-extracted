@@ -68,7 +68,7 @@ if ($ENV{AUTHOR_TESTING}) {
 if ($ENV{RELEASE_TESTING}) {
   print "Release tests enabled (RELEASE_TESTING is TRUE)\n";
   add_mods(\%test_requires, {
-                             'Test::Changes::Strict::Simple' => '0.05',
+                             'Test::Changes::Strict::Simple' => '0.06',
                              'Test::CheckManifest'           => '1.43',
                              'Test::CPAN::Meta'              => '0.25',
                              'Test::CPAN::Meta::JSON'        => '0.16',

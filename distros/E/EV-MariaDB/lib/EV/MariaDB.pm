@@ -6,7 +6,7 @@ use Carp 'croak';
 use EV;
 
 BEGIN {
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -469,7 +469,7 @@ in chunks. Must be called after C<bind_params> and before C<execute>.
 
 Typical workflow:
 
-    $m->prepare("INSERT INTO t VALUES (?, ?)", sub {
+    $m->prepare("insert into t values (?, ?)", sub {
         my ($stmt) = @_;
         $m->bind_params($stmt, [1, ""]);  # bind all params first
         $m->send_long_data($stmt, 1, $blob_data, sub {

@@ -74,7 +74,7 @@ subtest 'invalid request type, bad conversion to Mojo::Message::Request' => sub 
 
 $::TYPE = 'mojo';
 
-subtest 'mismatched options' => sub {
+subtest 'mismatched or invalid options' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE."\npaths: {}\n"),
@@ -139,6 +139,25 @@ subtest 'mismatched options' => sub {
       ],
     },
     'request uri is not consistent with provided uri',
+  );
+
+  ok(!$openapi->find_path_item($options = { request => $request, path_captures => { foo => true } }),
+    to_str($request).': lookup failed');
+  cmp_result(
+    $options,
+    {
+      request => isa('Mojo::Message::Request'),
+      path_captures => { foo => true },
+      errors => [
+        methods(TO_JSON => {
+          instanceLocation => '',
+          keywordLocation => '',
+          absoluteKeywordLocation => $doc_uri->to_string,
+          error => 'provided path_captures values must be strings',
+        }),
+      ],
+    },
+    'bad path_captures',
   );
 };
 

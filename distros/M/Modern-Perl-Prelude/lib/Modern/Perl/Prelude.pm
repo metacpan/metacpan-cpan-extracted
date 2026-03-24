@@ -1,11 +1,11 @@
 package Modern::Perl::Prelude;
 
-use v5.30;
+use v5.26;
 use strict;
 use warnings;
 
-# ABSTRACT: Project prelude for modern Perl style on Perl 5.30+
-our $VERSION = '0.008';
+# ABSTRACT: Project prelude for modern Perl style on Perl 5.26+
+our $VERSION = '0.009';
 
 use Import::Into ();
 use strict   ();
@@ -191,7 +191,7 @@ __END__
 
 =head1 NAME
 
-Modern::Perl::Prelude - Project prelude for modern Perl style on Perl 5.30+
+Modern::Perl::Prelude - Project prelude for modern Perl style on Perl 5.26+
 
 =head1 SYNOPSIS
 
@@ -213,6 +213,7 @@ Flag-style optional imports:
     use Modern::Perl::Prelude qw/-class -defer/;
     use Modern::Perl::Prelude qw(-corinna -always_true);
 
+
 Hash-style optional imports:
 
     use Modern::Perl::Prelude {
@@ -232,7 +233,7 @@ Disable native pragmata/features lexically again:
 
 This module bundles a small, opinionated set of pragmata, features, and
 compatibility layers for writing Perl in a Perl 5.40+-style while staying
-runnable on Perl 5.30+.
+runnable on Perl 5.26+.
 
 It enables:
 
@@ -398,7 +399,7 @@ managed by this module:
 Compatibility layers such as C<Feature::Compat::Try>,
 C<Feature::Compat::Class>, C<Feature::Compat::Defer>, C<Object::Pad>, and
 C<builtin::compat> are treated as import-only for cross-version use on
-Perl 5.30+ and are not guaranteed to be symmetrically undone by
+Perl 5.26+ and are not guaranteed to be symmetrically undone by
 C<no Modern::Perl::Prelude>.
 
 C<always_true> is an exception: C<no Modern::Perl::Prelude '-always_true'> or
@@ -420,7 +421,7 @@ The C<always_true> option is implemented via C<true> and is file-scoped.
 
 =head1 AUTHOR
 
-Sergey Kovalev E<lt>skov@cpan.orgE<gt>,
+Sergey Kovalev E<lt>skov@cpan.orgE<gt>
 
 =head1 CO-AUTHOR
 

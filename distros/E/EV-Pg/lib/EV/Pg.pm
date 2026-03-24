@@ -6,7 +6,7 @@ use Carp;
 use EV;
 
 BEGIN {
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -284,7 +284,7 @@ messages.
 =item on_drain
 
 Callback invoked (with no arguments) when the send buffer has been
-flushed during COPY IN.  Useful for resuming C<put_copy_data> after
+flushed during a COPY operation.  Useful for resuming C<put_copy_data> after
 it returns 0.
 
 =item keep_alive
@@ -442,8 +442,7 @@ failure.
 
 Sends an asynchronous cancel request using the C<PQcancelConn> API
 (requires libpq E<gt>= 17).  The callback receives no arguments on
-success, or an error string on failure.  Croaks if libpq was built
-without async cancel support (C<LIBPQ_HAS_ASYNC_CANCEL>).
+success, or an error string on failure.
 
 =head2 pending_count
 
@@ -565,7 +564,7 @@ Called as C<< ($message) >> on server notice/warning messages.
 =head2 on_drain
 
 Called with no arguments when the libpq send buffer has been fully
-flushed during a COPY IN operation.  Use this to resume sending data
+flushed during a COPY operation.  Use this to resume sending data
 after C<put_copy_data> returns 0 (buffer full).
 
 =head1 CONNECTION INFO
@@ -695,9 +694,9 @@ response):
     my $meta = $pg->result_meta;
 
 Returns a hashref of metadata from the most recent query result,
-or C<undef> if no result has been delivered.  The value persists until
-the next result that carries metadata; it is not cleared by errors or
-commands that produce no columns.  Keys:
+or C<undef> if no result has been delivered.  Updated after each
+successful result (including commands with no columns); not updated
+by errors, COPY, or pipeline sync results.  Keys:
 
     nfields       number of columns
     cmd_status    command status string (e.g. "SELECT 3", "INSERT 0 1")
@@ -810,7 +809,7 @@ Short aliases for common methods:
     prep        prepare
     reconnect   reset
     disconnect  finish
-    flush       send_flush_request
+    flush       send_flush_request  (libpq >= 17)
     sync        pipeline_sync
     quote       escape_literal
     quote_id    escape_identifier
@@ -834,9 +833,9 @@ Short aliases for common methods:
 500k queries over Unix socket, PostgreSQL 18, libpq 18:
 
     Workload   EV::Pg sequential  EV::Pg pipeline  DBD::Pg sync  DBD::Pg async+EV
-    SELECT          73,109 q/s      124,092 q/s     56,496 q/s      48,744 q/s
-    INSERT          58,534 q/s       84,467 q/s     39,068 q/s      41,559 q/s
-    UPSERT          26,342 q/s       34,223 q/s     28,134 q/s      27,155 q/s
+    SELECT          83,998 q/s      144,939 q/s     73,195 q/s      65,966 q/s
+    INSERT          67,053 q/s       85,701 q/s     60,127 q/s      58,329 q/s
+    UPSERT          37,360 q/s       43,019 q/s     40,278 q/s      40,173 q/s
 
 Sequential mode uses prepared statements (parse once, bind+execute per call).
 Pipeline mode batches queries with C<pipeline_sync> every 1000 queries.

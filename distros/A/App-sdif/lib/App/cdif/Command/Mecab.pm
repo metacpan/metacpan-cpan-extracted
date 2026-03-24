@@ -30,15 +30,26 @@ sub wordlist {
     $eos++ while $text =~ /$eos/;
     my $is_newline = sub { $_ eq $eos };
 
-    my $mecab = [ 'mecab', '--node-format', '%M\\n', '--eos-format', "$eos\\n" ];
-    my $result = $obj->command($mecab)->setstdin($text)->update->data;
+    my @mecab = ('mecab', '--node-format', '%M\\n', '--eos-format', "$eos\\n");
+    my $result = $obj->command(@mecab)->setstdin($text)->update->data;
     warn $result =~ s/^/MECAB: /mgr if $debug;
     do {
 	map  { $is_newline->() ? "\n" : $_ }
 	grep { not $removeme->() }
+	map  { /\A\w/ ? $_ : uniqchar($_) }
 	grep { length }
-	$result =~ /^(\s*)(\S+)\n/amg;
+	$result =~ /^([^\w\n]*+)(.*)\n/mg;
     };
+}
+
+sub uniqchar {
+    my @s;
+    for (@_) {
+	while (/(\X)\g{-1}*/pg) {
+	    push @s, ${^MATCH};
+	}
+    }
+    @s;
 }
 
 1;

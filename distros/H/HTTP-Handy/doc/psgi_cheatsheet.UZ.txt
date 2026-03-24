@@ -1,5 +1,5 @@
 ======================================================================
- HTTP::Handy PSGI Cheat Sheet                        [UZ] Ozbek
+ HTTP::Handy PSGI Cheat Sheet                         [UZ] O'zbek
 ======================================================================
 
 [ 1. Serverni ishga tushirish ]
@@ -12,28 +12,28 @@
   };
 
   HTTP::Handy->run(
-      app           => $app,       # majburiy: PSGI app code ref
-      host          => '127.0.0.1',# ixtiyoriy: bind address (0.0.0.0)
-      port          => 8080,       # ixtiyoriy: port (standart: 8080)
-      log           => 1,          # ixtiyoriy: access log (standart: 1)
-      max_post_size => 10485760,   # ixtiyoriy: max POST bytes (standart: 10MB)
+      app           => $app,       # majburiy: PSGI app code reference
+      host          => '127.0.0.1',# ixtiyoriy: bind address (default: 0.0.0.0)
+      port          => 8080,       # ixtiyoriy: port (default: 8080)
+      log           => 1,          # ixtiyoriy: access log (default: 1)
+      max_post_size => 10485760,   # ixtiyoriy: max POST bytes (default: 10MB)
   );
 
-  Togridam-togri skript sifatida ishga tushirish: perl lib/HTTP/Handy.pm [port]
+  perl lib/HTTP/Handy.pm [port]
 
-[ 2. Sov muhit ozgaruvchilari ($env) ]
+[ 2. So'rov muhit o'zgaruvchilari ($env) ]
 
-  REQUEST_METHOD    "GET" / "POST"
-  PATH_INFO         /index.html
-  QUERY_STRING      key=val&key2=val2
-  SERVER_NAME       hostname
-  SERVER_PORT       8080
-  CONTENT_TYPE      application/x-www-form-urlencoded
-  CONTENT_LENGTH    (bytes)
-  HTTP_USER_AGENT   Mozilla/5.0 ...
-  psgi.input        (POST tanasini oqish (psgi.inpu)
-  psgi.errors       \*STDERR
-  psgi.url_scheme   "http"
+  REQUEST_METHOD    satr  "GET" / "POST"
+  PATH_INFO         satr  /index.html
+  QUERY_STRING      satr  key=val
+  SERVER_NAME       satr  hostname
+  SERVER_PORT       butun son  8080
+  CONTENT_TYPE      satr  content-type
+  CONTENT_LENGTH    butun son  (bytes)
+  HTTP_*            satr  HTTP_USER_AGENT ...
+  psgi.input        ob'ekt  (POST body)
+  psgi.errors       glob  \*STDERR
+  psgi.url_scheme   satr  "http"
 
 [ 3. Javob formati ]
 
@@ -44,7 +44,7 @@
   [302, ['Location', '/new'], ['']]
   [204, ['Content-Length', '0'], []]
 
-[ 4. POST tanasini oqish (psgi.input) ]
+[ 4. POST tanasini o'qish (psgi.input) ]
 
   my $body = '';
   my $len  = $env->{CONTENT_LENGTH} || 0;
@@ -54,30 +54,31 @@
   seek($pos,$wh)    tell()
   getline()         getlines()
 
-[ 5. Yordamchi usullar ]
+[ 5. Yordamchi metodlar ]
 
-  parse_query($env->{QUERY_STRING})  ->  %hash
-  parse_query($post_body)              ->  %hash
-  url_decode('hello%20world')          ->  "hello world"
-  mime_type('css')                     ->  "text/css"
-  is_htmx($env)                        ->  1 / 0
+  HTTP::Handy->parse_query($env->{QUERY_STRING})  ->  %hash
+  HTTP::Handy->parse_query($post_body)             ->  %hash
+  HTTP::Handy->url_decode('hello%20world')         ->  "hello world"
+  HTTP::Handy->mime_type('css')                    ->  "text/css"
+  HTTP::Handy->is_htmx($env)                       ->  1 / 0
 
-[ 6. Javob yaratuvchi usullar ]
+[ 6. Javob yaratuvchi metodlar ]
 
-  response_html($html [,$code])   text/html; charset=utf-8
-  response_text($text [,$code])   text/plain; charset=utf-8
-  response_json($json [,$code])   application/json
+  response_html($html [,$code])    text/html; charset=utf-8
+  response_text($text [,$code])    text/plain; charset=utf-8
+  response_json($json [,$code])    application/json
   response_redirect($url [,$code]) Location: $url
 
-[ 7. Statik fayllarni berish ]
+[ 7. Statik fayllarni ko'rsatish ]
 
-  serve_static($env, './htdocs')
-  serve_static($env, './htdocs', cache_max_age => 3600)
+  return HTTP::Handy->serve_static($env, './htdocs');
+  return HTTP::Handy->serve_static($env, './htdocs',
+      cache_max_age => 3600);
 
-[ 8. Marshrutlash namunasi ]
+[ 8. Yo'naltirish namunasi ]
 
-  $method = $env->{REQUEST_METHOD};
-  $path   = $env->{PATH_INFO};
+  my $method = $env->{REQUEST_METHOD};
+  my $path   = $env->{PATH_INFO};
 
   if ($method eq 'GET'  && $path eq '/') { ... }
   if ($method eq 'POST' && $path eq '/x') { ... }
@@ -86,30 +87,24 @@
 
 [ 9. Xatolarni boshqarish ]
 
-  die "msg"  ->  500 response (auto)
+  die "msg"  ->  500 avtomatik 500 javobi
   [500, ['Content-Type','text/plain'], ['error']]
   [403, ['Content-Type','text/plain'], ['forbidden']]
   [400, ['Content-Type','text/plain'], ['bad request']]
 
-[ 10. run() tomonidan yaratilgan log fayllar ]
+[ 10. run() yaratadigan jurnal fayllari ]
 
-  logs/access/YYYYMMDDHHm0.log.ltsv  kirish logi (10 daqiqalik aylantirish, LTSV formati)
-  logs/error/error.log                xato/ishga tushirish logi
+  logs/access/YYYYMMDDHHm0.log.ltsv  kirish jurnali (10 daqiqa aylanishi, LTSV)
+  logs/error/error.log                xato/ishga tushirish jurnali
 
   LTSV: time  method  path  status  size  ua  referer
 
-[ 11. Rasmiy manbalar havolalari ]
+[ 11. Rasmiy manbalar ]
 
   PSGI specification:
     https://github.com/plack/psgi-specs/blob/master/PSGI.pod
-
-  PSGI (MetaCPAN):
-    https://metacpan.org/pod/PSGI
-
-  Plack:
-    https://plackperl.org/
-
-  HTTP::Handy (MetaCPAN):
-    https://metacpan.org/dist/HTTP-Handy
+  PSGI (MetaCPAN): https://metacpan.org/pod/PSGI
+  Plack: https://plackperl.org/
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
 
 ======================================================================

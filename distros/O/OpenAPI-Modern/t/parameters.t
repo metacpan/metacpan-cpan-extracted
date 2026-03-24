@@ -146,7 +146,7 @@ subtest 'path parameters' => sub {
       [ 'simple', 'red%green', 'red%25green' ],
       [ 'simple', " i have spaces  \t ", " i have spaces  \t " ],
       [ 'simple', ' red,  green ', ' red,  green ' ],
-      [ 'simple', 'red﹠green', "red%EF%B9%A0green" ],
+      [ 'simple', 'red﹠green', 'red%EF%B9%A0green' ],
     ],
     [
       [ qw(style explode content input) ],
@@ -194,6 +194,24 @@ subtest 'path parameters' => sub {
         'blue%E2%88%92black=yes!,blackish%2Cgreen=%C2%BFno%3f,100%F0%9D%91%A5brown=fl%C2%A1p' ],
     ],
 
+    {
+      name => 'with boolean schema, return empty string as string',
+      param_obj => { name => 'color', schema => true },
+      input => '',
+      content => '',
+    },
+    {
+      name => 'with boolean schema, return encoded data as decoded string',
+      param_obj => { name => 'color', schema => true },
+      input => 'red%EF%B9%A0green',
+      content => 'red﹠green',
+    },
+    {
+      name => 'with boolean schema, return numeric data as string',
+      param_obj => { name => 'color', schema => true },
+      input => 20,
+      content => '20',
+    },
     {
       name => 'non-ascii characters in path captures must be percent-encoded',
       param_obj => { name => 'color' },
@@ -430,6 +448,12 @@ subtest 'path parameters' => sub {
         ';blue%E2%88%92black=yes!;blackish%2Cgreen=%C2%BFno%3f;100%F0%9D%91%A5brown=fl%C2%A1p' ],
     ],
 
+    {
+      name => 'with boolean schema, empty string is null',
+      param_obj => { style => 'matrix', name => 'color', schema => true },
+      input => '',
+      content => undef,
+    },
     {
       name => 'any type is permitted, default to string',
       param_obj => { name => 'color', style => 'matrix', schema => {} },
@@ -688,6 +712,12 @@ subtest 'path parameters' => sub {
     ],
 
     {
+      name => 'with boolean schema, empty string is null',
+      param_obj => { style => 'label', name => 'color', schema => true },
+      input => '',
+      content => undef,
+    },
+    {
       name => 'any type is permitted, default to string',
       param_obj => { name => 'color', style => 'label', schema => {} },
       input => '.red,green,blue',
@@ -819,7 +849,7 @@ subtest 'path parameters' => sub {
     },
     {
       name => 'explode=true, prefer object',
-      param_obj => { name => 'color', style => 'label', explode =>true, schema => { type => [qw(array object)] } },
+      param_obj => { name => 'color', style => 'label', explode => true, schema => { type => [qw(array object)] } },
       input => '.R=100.G=200.B=150',
       content => { R => '100', G => '200', B => '150' },
     },
@@ -855,6 +885,9 @@ subtest 'path parameters' => sub {
   ), @tests;
 
   foreach my $test (@tests) {
+    die 'missing test param "param_obj"' if not exists $test->{param_obj};
+    die 'missing test param "input"' if not exists $test->{input};
+
     subtest 'path '
         .($test->{param_obj}{content} ? 'encoded with media-type' : 'style='.($test->{param_obj}{style}//'simple'))
         .(length $test->{name} ? ', '.$test->{name} : '').': '
@@ -882,7 +915,8 @@ subtest 'path parameters' => sub {
 
       my $valid = $openapi->_validate_path_parameter($state, $param_obj,
         { defined $test->{input} ? ($param_obj->{name} => $test->{input}) : () });
-      die 'validity inconsistent with error count' if $valid xor !$state->{errors}->@*;
+      die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
+        $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 
       my $todo;
       $todo = todo $test->{todo} if $test->{todo};
@@ -1264,6 +1298,10 @@ subtest 'header parameters' => sub {
   ), @tests;
 
   foreach my $test (@tests) {
+    die 'missing test param "header_obj"' if not exists $test->{header_obj};
+    die 'missing test param "values"' if not exists $test->{values};
+    die 'bad test param "values"' if defined $test->{values} and ref $test->{values} ne 'ARRAY';
+
     subtest 'header '
         .($test->{header_obj}{content} ? 'encoded with media-type' : 'style=simple')
         .(length $test->{name} ? ', '.$test->{name}.': '
@@ -1304,7 +1342,8 @@ subtest 'header parameters' => sub {
         if defined $test->{values};
 
       my $valid = $openapi->_validate_header_parameter($state, $param_obj->{name}, $header_obj, $headers);
-      die 'validity inconsistent with error count' if $valid xor !$state->{errors}->@*;
+      die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
+        $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
 
       my $todo;
       $todo = todo $test->{todo} if $test->{todo};
@@ -1550,7 +1589,7 @@ YAML
 
   subtest 'type inference of an extracted parameter' => sub {
     foreach my $test (
-      [ [ qw(array object null boolean string number) ], false ],
+      [ [ 'string' ], false ],
       [ [ qw(array object null boolean string number) ], true ],
       [ [ qw(array object boolean string number) ], { '$ref' => 'https://example.com/my_3.0_oad#/components/schemas/true' } ],
       [ [ qw(array object null boolean string number) ], {} ],
@@ -1622,30 +1661,33 @@ YAML
       [ true,     [qw(null boolean number string object array)] ],
 
       # valid coercions
-      [ '',       [qw(null boolean number string object array)], 'null', undef ],
-      [ '',       [qw(boolean number string object array)], 'boolean', false ],
-      [ '0',      [qw(boolean number string object array)], 'boolean', false ],
-      [ '1',      [qw(boolean number string object array)], 'boolean', true ],
-      [ 0,        [qw(boolean number string object array)], 'boolean', false ],
-      [ 1,        [qw(boolean number string object array)], 'boolean', true ],
-      [ 'false',  [qw(boolean number string object array)], 'boolean', false ],
-      [ 'true',   [qw(boolean number string object array)], 'boolean', true ],
-      [ '0',      [qw(null number string object array)], 'number', 0 ],
-      [ '1',      [qw(null number string object array)], 'number', 1 ],
-      [ '-42',    [qw(null boolean number string object array)], 'number', -42 ],
-      [ '4e2',    [qw(null boolean number string object array)], 'number', 400 ],
-      [ 20,       [qw(null boolean string object array)], 'string', '20' ],
+
+      # note this may not be optimal for some usecases, e.g. path parameter
+      [ '',       [qw(null boolean number string object array)], undef ],
+      [ '',       [qw(boolean number string object array)], false ],
+      [ '0',      [qw(boolean number string object array)], false ],
+      [ '1',      [qw(boolean number string object array)], true ],
+      [ 0,        [qw(boolean number string object array)], false ],
+      [ 1,        [qw(boolean number string object array)], true ],
+      [ 'false',  [qw(boolean number string object array)], false ],
+      [ 'true',   [qw(boolean number string object array)], true ],
+      [ '0',      [qw(null number string object array)], 0 ],
+      [ '1',      [qw(null number string object array)], 1 ],
+      [ '-42',    [qw(null boolean number string object array)], -42 ],
+      [ '4e2',    [qw(null boolean number string object array)], 400 ],
+      [ 20,       [qw(null boolean string object array)], '20' ],
 
       # no change
-      [ 20,       ['boolean', 'number'], 'number', 20 ],
-      [ 20,       [qw(null boolean number string object array)], 'number', 20 ],
-      [ '20',     [qw(null boolean string object array)], 'string', '20' ],
-      [ '',       [qw(number string object array)], 'string', '' ],
-      [ 'hi',     ['string'], 'string', 'hi' ],
-      [ 'hi',     [qw(null boolean number string object array)], 'string', 'hi' ],
+      [ 20,       ['boolean', 'number'], 20 ],
+      [ 20,       [qw(null boolean number string object array)], 20 ],
+      [ '20',     [qw(null boolean string object array)], '20' ],
+      [ '',       [qw(number string object array)], '' ],
+      [ 'hi',     ['string'], 'hi' ],
+      [ 'hi',     [qw(null boolean number string object array)], 'hi' ],
 
     ) {
-      my ($data, $types, $expected_type, $expected_data) = @$test;
+      my ($data, $types, $expected_data) = @$test;
+      my $expected_type = @$test > 2 ? get_type($expected_data) : undef;
 
       subtest $expected_type ? 'coerce '.$::dumper->encode($data).' to ' .join(', ', @$types).'; want '.$expected_type
           : 'cannot coerce '.$::dumper->encode($data) => sub {

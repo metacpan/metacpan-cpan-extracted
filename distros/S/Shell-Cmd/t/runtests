@@ -15,9 +15,9 @@ if [ -z "$TI_QUIET" ]; then
    export TI_QUIET
 fi
 
-if [ "$RELEASE_TESTING" != "0" ]; then
-   RELEASE_TESTING=1
-   export RELEASE_TESTING
+if [ "$Shell_Cmd_RELEASE_TESTING" != "0" ]; then
+   Shell_Cmd_RELEASE_TESTING=1
+   export Shell_Cmd_RELEASE_TESTING
 fi
 
 if [ "$1" = "-T" ]; then

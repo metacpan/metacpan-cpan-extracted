@@ -3,122 +3,94 @@ package App::cdif::Command;
 use v5.14;
 use warnings;
 use utf8;
-use Carp;
-use Fcntl;
-use IO::File;
-use IO::Handle;
-use Data::Dumper;
 
-use parent "App::cdif::Tmpfile";
+use parent 'Command::Run';
 
-our $debug;
-sub debug {
-    my $obj = shift;
-    if (@_) {
-	$debug = shift;
-    } else {
-	$debug;
-    }
-}
-
-my %default_option = (
-    read_error => 0,
-);
-
-sub new {
-    my $class = shift;
-    my $obj = $class->SUPER::new;
-    $obj->{OPTION} = { %default_option };
-    $obj->command(@_) if @_;
-    $obj;
-}
-
+# Compatibility: expand array reference in command
 sub command {
     my $obj = shift;
     if (@_) {
-	$obj->{COMMAND} = [ @_ ];
-	$obj;
-    } else {
-	@{$obj->{COMMAND}};
+	my @cmd = map { ref eq 'ARRAY' ? @$_ : $_ } @_;
+	return $obj->SUPER::command(@cmd);
     }
+    $obj->SUPER::command;
 }
 
+# Compatibility wrapper for read_error option
 sub option {
     my $obj = shift;
     if (@_ == 1) {
-	return $obj->{OPTION}->{+shift};
+	my $key = shift;
+	if ($key eq 'read_error') {
+	    my $stderr = $obj->SUPER::option('stderr') // '';
+	    return $stderr eq 'redirect' ? 1 : 0;
+	}
+	return $obj->SUPER::option($key);
     } else {
 	while (my($k, $v) = splice @_, 0, 2) {
-	    $obj->{$k} = $v;
+	    if ($k eq 'read_error') {
+		$obj->SUPER::option(stderr => $v ? 'redirect' : undef);
+	    } else {
+		$obj->SUPER::option($k => $v);
+	    }
 	}
 	return $obj;
     }
 }
 
-sub update {
-    use Time::localtime;
-    my $obj = shift;
-    $obj->data(join "\n", map { $obj->execute($_) } $obj->command);
-    $obj->date(ctime());
-    $obj;
-}
-
-sub execute {
-    my $obj = shift;
-    my $command = shift;
-    my @command = ref $command eq 'ARRAY' ? @$command : ($command);
-    use IO::File;
-    my $pid = (my $fh = IO::File->new)->open('-|') // die "open: $@\n";
-    if ($pid == 0) {
-	if (my $stdin = $obj->{STDIN}) {
-	    open STDIN, "<&=", $stdin->fileno or die "open: $!\n";
-	    binmode STDIN, ':encoding(utf8)';
-	}
-	open STDERR, ">&STDOUT" if $obj->option('read_error');
-	exec @command;
-	die "exec: $@\n";
-    }
-    binmode $fh, ':encoding(utf8)';
-    do { local $/; <$fh> };
-}
-
-sub data {
-    my $obj = shift;
-    if (@_) {
-	$obj->reset->write(shift)->flush->rewind;
-	$obj;
-    } else {
-	$obj->rewind;
-	my $data = do { local $/; $obj->fh->getline } ;
-	$obj->rewind;
-	$data;
-    }
-}
-
-sub date {
-    my $obj = shift;
-    @_ ? $obj->{DATE} = shift : $obj->{DATE};
-}
-
+# Compatibility: return INPUT filehandle
 sub stdin {
     my $obj = shift;
-    $obj->{STDIN};
+    $obj->{INPUT};
 }
 
+# Compatibility: setstdin method
 sub setstdin {
     my $obj = shift;
-    my $data = shift;
-    my $stdin = $obj->{STDIN} //= do {
-	my $fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
-	$fh->fcntl(F_SETFD, 0) or die "fcntl F_SETFD: $!\n";
-	binmode $fh, ':encoding(utf8)';
-	$fh;
-    };
-    $stdin->seek(0, 0)  or die "seek: $!\n";
-    $stdin->truncate(0) or die "truncate: $!\n";
-    $stdin->print($data);
-    $stdin->seek(0, 0)  or die "seek: $!\n";
-    $obj;
+    $obj->with(stdin => shift);
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+App::cdif::Command - Compatibility wrapper for Command::Run
+
+=head1 SYNOPSIS
+
+    use App::cdif::Command;
+
+    my $obj = App::cdif::Command->new('ls', '-l');
+    $obj->update;
+    print $obj->data;
+
+=head1 DESCRIPTION
+
+This module is a thin wrapper around L<Command::Run> for backward
+compatibility.  New code should use L<Command::Run> directly.
+
+=head1 COMPATIBILITY
+
+The following compatibility features are provided:
+
+=over 4
+
+=item * B<command> method accepts array references and expands them
+
+=item * B<read_error> option is mapped to C<stderr =E<gt> 'redirect'>
+
+=item * B<stdin> method returns the internal INPUT filehandle
+
+=item * B<setstdin> method is mapped to C<with(stdin =E<gt> ...)>
+
+=back
+
+=head1 SEE ALSO
+
+L<Command::Run>
+
+=cut

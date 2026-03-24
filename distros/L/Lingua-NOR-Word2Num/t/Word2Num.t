@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 #
-# Copyright (C) PetaMem, s.r.o. 2009-present
+# Copyright (c) PetaMem, s.r.o. 2009-present
 #
 
 # {{{ use block
@@ -41,7 +41,7 @@ my $wn = [
     ],
     [
         'this is not valid number in NLD',
-        0,
+        undef,
         'invalid number -> 0',
     ],
     [

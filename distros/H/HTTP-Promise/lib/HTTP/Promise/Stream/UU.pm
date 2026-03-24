@@ -104,7 +104,7 @@ sub decode_uu
     if( !defined( $rv ) )
     {
         $UUError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {
@@ -144,7 +144,7 @@ sub encode_uu
     if( !defined( $rv ) )
     {
         $UUError = $s->error;
-        return;
+        return( $s->pass_error );
     }
     else
     {

@@ -3,13 +3,12 @@ package Lingua::ENG::Inflect;
 
 use 5.10.1;
 use strict;
-use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS @ISA);
+use vars qw(@EXPORT_OK %EXPORT_TAGS @ISA);
 use Env;
 
 require Exporter;
 @ISA = qw(Exporter);
-
-our $VERSION = 0.0682;
+our $VERSION = '0.2603230';
 
 %EXPORT_TAGS =
 (
@@ -1621,7 +1620,7 @@ Lingua::ENG::Inflect - Convert singular to plural. Select "a" or "an".
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603230
 
 =head1 SYNOPSIS
 

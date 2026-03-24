@@ -7,37 +7,33 @@ sub new {
 	my ($pkg, %args) = (shift, @_ > 1 ? @_ : %{$_[1] || {}});
 	$args{file} ||= 'audit.log';
 	my $self = bless \%args, $pkg;
-	open my $fh, '>', $self->{file} or die $!;
+	open my $fh, '>>', $self->{file} or die $!;
 	$self->{fh} = $fh;
 	return $self;
 }
 
 sub debug {
 	my ($self, $line) = @_;
-	$self->log('DEBUG', $line);
+	$self->log($line);
 }
 
 sub error {
 	my ($self, $line) = @_;
-	$self->log('ERROR', $line);
+	$self->log($line);
 }
 
 sub info {
 	my ($self, $line) = @_;
-	$self->log('INFO', $line);
+	$self->log($line);
 }
 
 sub log {
-	my ($self, $level, $line) = @_;
-	my $time = gmtime;
+	my ($self, $line) = @_;
 	flock($self->{fh}, 1);
 	my $fh = $self->{fh};
-	print $fh sprintf("%s %s %s\n",$time, $level, $line);
+	print $fh $line . "\n";
 	flock($self->{fh}, 0);
-	print $time;
-
 }
-
 
 sub DESTROY {
 	close $_[0]->{fh};
@@ -53,7 +49,7 @@ Medusa::Logger - Simple file-based logger for Medusa audit logging
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 

@@ -33,7 +33,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-app-karr/issues
   homepage: https://github.com/Getty/p5-app-karr
   repository: https://github.com/Getty/p5-app-karr.git
-version: '0.101'
+version: '0.102'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -316,7 +316,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.101'
+          tag: '0.102'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

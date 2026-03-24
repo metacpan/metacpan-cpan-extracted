@@ -1,7 +1,9 @@
-.travis.yml
 Changes
-examples/dry-run-2.pl
+examples/dry-run-2-run.pl
+examples/dry-run-2-script.pl
+examples/dry-run-2-simple.pl
 examples/dry-run.pl
+examples/output.pl
 examples/retry.pl
 examples/run-2.pl
 examples/run-3.pl
@@ -22,6 +24,7 @@ lib/Shell/Cmd.pod
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 t/00-errflow_check-run.t
 t/00-errflow_dire-run.t
@@ -39,8 +42,6 @@ t/00s-errflow_mix1-run.t
 t/00s-errflow_mix2-run.t
 t/00s-errflow_unclosed-run.exp
 t/00s-errflow_unclosed-run.t
-t/01-simple-fail1.exp
-t/01-simple-fail1.t
 t/01-simple-fail2.exp
 t/01-simple-fail2.t
 t/01-simple-fail3.exp

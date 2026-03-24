@@ -57,7 +57,7 @@
    "provides" : {
       "Git::RemoteURL::Parse" : {
          "file" : "lib/Git/RemoteURL/Parse.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -68,7 +68,7 @@
          "web" : "https://github.com/klaus-rindfrey/perl-git-remoteurl-parse.git"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_bugtracker" : {
       "web" : "https://github.com/klaus-rindfrey/perl-git-remoteurl-parse/issues"
    },

@@ -1,4 +1,11 @@
 Revision history for lexically
 
+0.03  2026-03-23
+      - Add required `=head1 NAME` section to Pod to keep the indexers happy
+
+0.02  2026-03-23
+      - Now maintained by Paul Evans
+      - Update author and repository information
+
 0.01  2013-07-10
       - Initial release
