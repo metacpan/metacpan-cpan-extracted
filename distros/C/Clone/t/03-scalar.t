@@ -130,7 +130,7 @@ ok( $$a == $$b, 'int check' );
 my $str = 'abcdefg';
 my $qr = qr/$str/;
 my $qc = clone( $qr );
-ok( $qr eq $qc, 'string check' ) or warn "$qr vs $qc";
+ok( $qr eq $qc, 'string check' );
 ok( $str =~ /$qc/, 'regexp check' );
 
 # test for unicode support

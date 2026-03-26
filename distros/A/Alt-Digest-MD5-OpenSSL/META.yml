@@ -16,7 +16,7 @@ configure_requires:
   Alien::OpenSSL: '0'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,5 +30,7 @@ no_index:
 requires:
   Digest::base: '1.00'
   XSLoader: '0'
-version: 0.04
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+resources:
+  bugtracker: https://github.com/michal-josef-spacek/Alt-Digest-MD5-OpenSSL/issues
+  repository: git://github.com:michal-josef-spacek/Alt-Digest-MD5-OpenSSL.git
+version: 0.06

@@ -1,5 +1,11 @@
 Revision history for Perl extension Radius.
 
+0.35 Mon Mar 23 07:02:56 UTC 2026
+    - No changes from previous version
+
+0.34 Fri Mar 13 11:20:05 2026
+    - Reuse original socket in broadcast mode
+
 0.33 Wed Oct 23 11:35:42 2024
     - Support for Message-Authenticator of type 'octets' (RT 154336)
 

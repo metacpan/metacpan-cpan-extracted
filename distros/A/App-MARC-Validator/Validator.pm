@@ -10,12 +10,13 @@ use DateTime;
 use English;
 use Getopt::Std;
 use IO::Barf qw(barf);
+use List::Util 1.33 qw(none);
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
-use MARC::Validator 0.06;
+use MARC::Validator 0.14;
 use MARC::Validator::Filter;
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -45,9 +46,10 @@ sub run {
 		'o' => undef,
 		'p' => 0,
 		'r' => 0,
+		'u' => undef,
 		'v' => 0,
 	};
-	if (! getopts('dfhi:lo:prv', $self->{'_opts'})
+	if (! getopts('dfhi:lo:pru:v', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}) {
 
 		$self->_usage;
@@ -90,8 +92,14 @@ sub _list_filter_plugins {
 sub _init_plugins {
 	my $self = shift;
 
+	# Get plugins to use.
+	my @use_plugins = $self->_use_plugins;
+
 	$self->{'_plugins'} = [];
 	foreach my $plugin (MARC::Validator::plugins) {
+		if (@use_plugins && none { $plugin eq $_ } @use_plugins) {
+			next;
+		}
 		my $plugin_obj = $plugin->new(
 			'debug' => $self->{'_opts'}->{'d'},
 			'record_id_def' => $self->{'_opts'}->{'i'},
@@ -160,7 +168,7 @@ sub _process_validation {
 
 	my @plugin_reports;
 	foreach my $plugin_obj (@{$self->{'_plugins'}}) {
-		push @plugin_reports, $plugin_obj->struct;
+		push @plugin_reports, $plugin_obj->report;
 	}
 	my $report = Data::MARC::Validator::Report->new(
 		'datetime' => DateTime->now,
@@ -194,7 +202,7 @@ sub _postprocess_plugins {
 sub _usage {
 	my $self = shift;
 
-	print STDERR "Usage: $0 [-d] [-f] [-h] [-i id] [-l] [-o output_file] [-p] [-r] [-v] [--version] marc_xml_file..\n";
+	print STDERR "Usage: $0 [-d] [-f] [-h] [-i id] [-l] [-o output_file] [-p] [-r] [-u use_string] [-v] [--version] marc_xml_file..\n";
 	print STDERR "\t-d\t\tDebug mode.\n";
 	print STDERR "\t-f\t\tList of filter plugins.\n";
 	print STDERR "\t-h\t\tPrint help.\n";
@@ -203,11 +211,31 @@ sub _usage {
 	print STDERR "\t-o output_file\tOutput file (default is STDOUT).\n";
 	print STDERR "\t-p\t\tPretty print JSON output.\n";
 	print STDERR "\t-r\t\tRecommendations.\n";
+	print STDERR "\t-u use_string\tUse string to prefer plugin or filter (default situation is use all).\n";
+	print STDERR "\t\t\te.g. plugin:MARC::Validator::Plugin::Field008\n";
 	print STDERR "\t-v\t\tVerbose mode.\n";
 	print STDERR "\t--version\tPrint version.\n";
 	print STDERR "\tmarc_xml_file..\tMARC XML file(s).\n";
 
 	return;
+}
+
+sub _use_plugins {
+	my $self = shift;
+
+	if (! defined $self->{'_opts'}->{'u'}) {
+		return ();
+	}
+	my @use_options = split m/,/, $self->{'_opts'}->{'u'};
+	my @use_plugins;
+	foreach my $use_option (@use_options) {
+		my ($type, $name) = split m/:/ms, $use_option, 2;
+		if ($type eq 'plugin') {
+			push @use_plugins, $name;
+		}
+	}
+
+	return @use_plugins;
 }
 
 1;

@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Base;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Data::Record::Serialize::Error { errors => [ 'fields', 'types' ] }, -all;
 
@@ -742,7 +742,7 @@ Data::Record::Serialize::Role::Base - Base Role for Data::Record::Serialize
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 
@@ -950,8 +950,6 @@ if the caller needs information about fields.
 
 It is an expensive no-op if called multiple times or called after
 the first record is sent.
-
-=head1 INTERNALS
 
 =begin internals
 

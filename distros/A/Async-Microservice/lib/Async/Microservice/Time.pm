@@ -8,9 +8,9 @@ use Moose;
 
 with qw(Async::Microservice);
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
-has '+jsonp' => (default => '_cb');
+has '+jsonp' => ( default => '_cb' );
 
 use DateTime;
 use Time::HiRes qw(time);
@@ -37,15 +37,16 @@ sub get_routes {
             },
         },
         'datetime/:time_zone_part1/:time_zone_part2' => {
-            defaults    => {GET => 'GET_datetime_capture',},
+            defaults    => { GET => 'GET_datetime_capture', },
             validations => {
                 time_zone_part1 => qr{^\w+$},
                 time_zone_part2 => qr{^\w+$},
             },
         },
-        'datetime/span/:s_date' => {defaults => {GET => 'GET_datetime_span'}},
-        'epoch'                 => {defaults => {GET => 'GET_epoch'}},
-        'sleep'                 => {defaults => {GET => 'GET_sleep'}},
+        'datetime/span/:s_date' =>
+            { defaults => { GET => 'GET_datetime_span' } },
+        'epoch' => { defaults => { GET => 'GET_epoch' } },
+        'sleep' => { defaults => { GET => 'GET_sleep' } },
     );
 }
 
@@ -78,9 +79,9 @@ sub _get_datetime_time_zone {
 }
 
 sub POST_datetime {
-    my ($self, $this_req) = @_;
-    my $epoch = eval {$this_req->json_content->{epoch}};
-    if (!defined($epoch)) {
+    my ( $self, $this_req ) = @_;
+    my $epoch = eval { $this_req->json_content->{epoch} };
+    if ( !defined($epoch) ) {
         return [
             405,
             [],
@@ -89,7 +90,7 @@ sub POST_datetime {
             }
         ];
     }
-    if ($epoch !~ m/^-?[0-9]+$/) {
+    if ( $epoch !~ m/^-?[0-9]+$/ ) {
         return [
             405,
             [],
@@ -98,7 +99,9 @@ sub POST_datetime {
             }
         ];
     }
-    return [200, [], _datetime_as_data(DateTime->from_epoch(epoch => $epoch))];
+    return [
+        200, [], _datetime_as_data( DateTime->from_epoch( epoch => $epoch ) )
+    ];
 }
 
 sub GET_epoch {
@@ -110,7 +113,7 @@ async sub GET_sleep {
     my ( $self, $this_req ) = @_;
     my $start_time = time();
     my $sleep_time = ( $this_req->params->{duration} // rand(10) ) + 0;
-    if ( $sleep_time <= 0 ) {
+    if ( ( $sleep_time <= 0 ) || ( $sleep_time > 60 ) ) {
         return [
             405,
             [],
@@ -135,13 +138,21 @@ async sub GET_sleep {
 async sub GET_datetime_span {
     my ( $self, $this_req ) = @_;
 
-    my $now = DateTime->now(time_zone => 'UTC')->truncate(to => 'day');
+    my $now = DateTime->now( time_zone => 'UTC' )->truncate( to => 'day' );
     my $s_date_dt;
 
     my $s_date = $this_req->params->{s_date} // '';
-    if ($s_date =~ m/^([0-9]{4})-?([0-9]{2})-?([0-9]{2})$/) {
-        $s_date_dt = eval {DateTime->new(time_zone => 'UTC', day => $3, month => $2, year => $1)};
-    } elsif ($s_date eq 'now') {
+    if ( $s_date =~ m/^([0-9]{4})-?([0-9]{2})-?([0-9]{2})$/ ) {
+        $s_date_dt = eval {
+            DateTime->new(
+                time_zone => 'UTC',
+                day       => $3,
+                month     => $2,
+                year      => $1
+            );
+        };
+    }
+    elsif ( $s_date eq 'now' ) {
         $s_date_dt = $now->clone;
     }
     unless ($s_date_dt) {
@@ -149,12 +160,14 @@ async sub GET_datetime_span {
             405,
             [],
             {   err_status => 405,
-                err_msg    => 'invalid date format ' . $s_date . ', use YYYYMMDD or "now"',
+                err_msg    => 'invalid date format '
+                    . $s_date
+                    . ', use YYYYMMDD or "now"',
             }
         ];
     }
-    my $r_age = int($this_req->params->{r_age} // 65);
-    unless ($r_age || ($r_age < 1) || ($r_age > 200)) {
+    my $r_age = int( $this_req->params->{r_age} // 65 );
+    unless ( $r_age >= 1 && $r_age <= 200 ) {
         return [
             405,
             [],
@@ -163,15 +176,15 @@ async sub GET_datetime_span {
             }
         ];
     }
-    my $m_income = int($this_req->params->{m_income} // 0);
+    my $m_income = int( $this_req->params->{m_income} // 0 );
 
-    my $r_age_dt       = $s_date_dt->clone->add(years => $r_age);
+    my $r_age_dt = $s_date_dt->clone->add( years => $r_age );
     $r_age_dt = $now->clone
         if $r_age_dt < $now;
 
     my $counter_dt     = $r_age_dt->subtract_datetime($now);
     my $days_counter   = $r_age_dt->delta_days($now)->in_units('days');
-    my $week_counter   = int($days_counter/7);
+    my $week_counter   = int( $days_counter / 7 );
     my $months_counter = $counter_dt->in_units('months');
     my $years_counter  = $counter_dt->in_units('years');
     my $date_from_str  = $s_date_dt->strftime('%Y-%m-%d');
@@ -188,7 +201,7 @@ async sub GET_datetime_span {
         years     => $years_counter,
         date_from => $date_from_str,
         date_to   => $date_to_str,
-        ($m_income ? (income => $months_counter * $m_income) : ()),
+        ( $m_income ? ( income => $months_counter * $m_income ) : () ),
     };
 }
 

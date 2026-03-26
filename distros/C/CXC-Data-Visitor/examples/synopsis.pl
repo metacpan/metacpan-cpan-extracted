@@ -1,20 +1,25 @@
 #! perl
 
-use v5.20;
+use v5.28;
 use strict;
+use feature 'signatures';
 
-use CXC::Data::Visitor 'visit';
-use DDP;
+# 8<8<8<8<8<8<
 
-my $hoh = { fruit => { berry => 'purple' }, };
+use CXC::Data::Visitor 'visit', 'RESULT_CONTINUE';
 
-visit(
-    $hoh,
-    sub {
-        my ( $key, $vref ) = @_;
-        p $key;
-        $$vref = 'blue' if $key eq 'berry';
+my %root = (
+    fruit => {
+        berry  => 'purple',
+        apples => [ 'fuji', 'macoun' ],
     } );
 
-say $hoh->{fruit}{berry}    # 'blue'
+visit(
+    \%root,
+    sub ( $kydx, $vref, @ ) {
+        $vref->$* = 'blue' if $kydx eq 'berry';
+        return RESULT_CONTINUE;
+    } );
+
+say $root{fruit}{berry}
 

@@ -5,7 +5,7 @@ package Data::Record::Serialize::Sink::stream;
 use v5.10;
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use namespace::clean;
 
@@ -47,7 +47,7 @@ Data::Record::Serialize::Sink::stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -63,8 +63,6 @@ B<Data::Record::Serialize::Sink::stream> outputs encoded data to a
 file handle.
 
 It performs the L<Data::Record::Serialize::Role::Sink> role.
-
-=head1 INTERNALS
 
 =for Pod::Coverage print
  say
@@ -89,6 +87,26 @@ A file handle.
 
 If neither is specified, output is written to the standard output
 stream.
+
+=head1 METHODS
+
+The follow methods are added:
+
+=over
+
+=item say
+
+   $szr->say( @stuff );
+
+Calls the underlying file handle's C<say> method.
+
+=item print
+
+   $szr->print( @stuff );
+
+Calls the underlying file handle's C<print> method.
+
+=back
 
 =head1 SUPPORT
 

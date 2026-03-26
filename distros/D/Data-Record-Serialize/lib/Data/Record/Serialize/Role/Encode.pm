@@ -7,7 +7,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 requires 'encode';
 
@@ -35,14 +35,12 @@ Data::Record::Serialize::Role::Encode - Encode Role
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 
 If a role consumes this, it signals that it provides encoding
 capabilities.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

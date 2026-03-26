@@ -1,5 +1,5 @@
 ======================================================================
- DB::Handy SQL Cheat Sheet
+ DB::Handy SQL Cheat Sheet                       [ID] Bahasa Indonesia
 ======================================================================
 
 [ Data Types (Tipe Data) ]

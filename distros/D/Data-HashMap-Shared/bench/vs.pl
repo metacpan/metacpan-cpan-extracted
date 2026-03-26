@@ -17,7 +17,36 @@ my $have_lmdb      = eval { require LMDB_File; LMDB_File->import(':flags'); 1 };
 my $have_bdb       = eval { require BerkeleyDB; BerkeleyDB->import(); 1 };
 my $have_cfm       = eval { require Cache::FastMmap; 1 };
 
-my $N = $ARGV[0] || 10_000;
+my $N = 10_000;
+my $SECTION;
+for my $arg (@ARGV) {
+    if ($arg =~ /^\d+$/) { $N = $arg }
+    else { $SECTION = lc $arg }
+}
+
+my %SECTIONS = (
+    ii    => 1, int    => 1,
+    is    => 2,
+    ss    => 3, str    => 3, string => 3,
+    si    => 4, incr   => 4,
+    xp    => 5, cross  => 5,
+    lru   => 6, cache  => 6,
+    ttl   => 7,
+    combo => 8, combined => 8,
+);
+
+sub run_section {
+    my ($num) = @_;
+    return 1 unless defined $SECTION;
+    my $want = $SECTIONS{$SECTION};
+    return defined $want && $want == $num;
+}
+
+if (defined $SECTION && !exists $SECTIONS{$SECTION}) {
+    die "Unknown section '$SECTION'. Available: "
+      . join(', ', sort keys %SECTIONS) . "\n";
+}
+
 my $TMPDIR = tempdir(CLEANUP => 1);
 my $LMDB_MAPSIZE = 128 * 1024 * 1024;
 my $seq = 0;
@@ -69,6 +98,9 @@ print "\n", "=" x 70, "\n";
 
 # =====================================================================
 # Section 1: Integer key -> Integer value
+# =====================================================================
+
+if (run_section(1)) {
 # =====================================================================
 
 print "\n", "=" x 70, "\n";
@@ -191,7 +223,12 @@ print "-" x 70, "\n";
 }
 
 # =====================================================================
+} # end section 1
+
 # Section 2: Integer key -> String value
+# =====================================================================
+
+if (run_section(2)) {
 # =====================================================================
 
 print "\n", "=" x 70, "\n";
@@ -279,11 +316,25 @@ print "-" x 70, "\n";
 }
 
 # =====================================================================
+} # end section 2
+
 # Section 3: String key -> String value
 # =====================================================================
 
+if (run_section(3)) {
+# =====================================================================
+
+# Pre-generate short and long key/value arrays
+my (@sk, @sv, @lk, @lv);
+for my $i (1 .. $N) {
+    push @sk, "k$i";                                # 2-6 bytes (inline)
+    push @sv, "v$i";                                # 2-6 bytes (inline)
+    push @lk, sprintf("key_%040d", $i);             # 45 bytes (arena)
+    push @lv, sprintf("val_%040d_%s", $i, "x" x 50); # ~96 bytes (arena)
+}
+
 print "\n", "=" x 70, "\n";
-print "STRING KEY -> STRING VALUE  ($N entries)\n";
+print "STRING KEY -> STRING VALUE — SHORT (inline ≤7B)  ($N entries)\n";
 print "=" x 70, "\n";
 
 print "\n", "-" x 70, "\n";
@@ -294,13 +345,13 @@ print "-" x 70, "\n";
     my $p_ss = tmppath(); my $m_ss = Data::HashMap::Shared::SS->new($p_ss, $N);
     $bench{'Shared::SS'} = sub {
         shm_ss_clear $m_ss;
-        for my $i (1 .. $N) { shm_ss_put $m_ss, "key$i", "val$i"; }
+        for my $i (0 .. $#sk) { shm_ss_put $m_ss, $sk[$i], $sv[$i]; }
     };
     if ($have_sharedmem) {
         $bench{'SharedMem'} = sub {
             my $d = tmppath(); mkdir $d;
             my $sh = shash_open($d, "rwc");
-            for my $i (1 .. $N) { shash_set($sh, "key$i", "val$i"); }
+            for my $i (0 .. $#sk) { shash_set($sh, $sk[$i], $sv[$i]); }
             undef $sh; rmtree $d;
         };
     }
@@ -308,7 +359,7 @@ print "-" x 70, "\n";
         $bench{'LMDB'} = sub {
             my ($d, $env) = mk_lmdb();
             my $txn = $env->BeginTxn; my $db = $txn->OpenDB;
-            for my $i (1 .. $N) { $db->put("key$i", "val$i"); }
+            for my $i (0 .. $#sk) { $db->put($sk[$i], $sv[$i]); }
             $txn->commit;
             undef $env; rmtree $d;
         };
@@ -318,7 +369,7 @@ print "-" x 70, "\n";
             my ($d, $env) = mk_bdb();
             my %h; tie %h, "BerkeleyDB::Hash",
                 -Filename => "b.db", -Flags => BerkeleyDB::DB_CREATE(), -Env => $env;
-            for my $i (1 .. $N) { $h{"key$i"} = "val$i"; }
+            for my $i (0 .. $#sk) { $h{$sk[$i]} = $sv[$i]; }
             untie %h; undef $env; rmtree $d;
         };
     }
@@ -329,7 +380,7 @@ print "-" x 70, "\n";
                 share_file => $p, init_file => 1, raw_values => 1,
                 cache_size => ($N * 32 > 512*1024 ? $N * 32 : 512*1024),
             );
-            for my $i (1 .. $N) { $c->set("key$i", "val$i"); }
+            for my $i (0 .. $#sk) { $c->set($sk[$i], $sv[$i]); }
             undef $c; unlink $p;
         };
     }
@@ -343,20 +394,20 @@ print "-" x 70, "\n";
 {
     my $p = tmppath();
     my $m = Data::HashMap::Shared::SS->new($p, $N);
-    for my $i (1 .. $N) { shm_ss_put $m, "key$i", "val$i"; }
+    for my $i (0 .. $#sk) { shm_ss_put $m, $sk[$i], $sv[$i]; }
 
     my ($hsm, $hsm_dir);
     if ($have_sharedmem) {
         $hsm_dir = tmppath(); mkdir $hsm_dir;
         $hsm = shash_open($hsm_dir, "rwc");
-        for my $i (1 .. $N) { shash_set($hsm, "key$i", "val$i"); }
+        for my $i (0 .. $#sk) { shash_set($hsm, $sk[$i], $sv[$i]); }
     }
 
     my ($ld, $le);
     if ($have_lmdb) {
         ($ld, $le) = mk_lmdb();
         my $txn = $le->BeginTxn; my $db = $txn->OpenDB;
-        for my $i (1 .. $N) { $db->put("key$i", "val$i"); }
+        for my $i (0 .. $#sk) { $db->put($sk[$i], $sv[$i]); }
         $txn->commit;
     }
 
@@ -365,7 +416,7 @@ print "-" x 70, "\n";
         ($bd, $be) = mk_bdb();
         tie %bh, "BerkeleyDB::Hash",
             -Filename => "b.db", -Flags => BerkeleyDB::DB_CREATE(), -Env => $be;
-        for my $i (1 .. $N) { $bh{"key$i"} = "val$i"; }
+        for my $i (0 .. $#sk) { $bh{$sk[$i]} = $sv[$i]; }
     }
 
     my $cfm;
@@ -373,36 +424,36 @@ print "-" x 70, "\n";
         my $cp = tmppath();
         $cfm = Cache::FastMmap->new(
             share_file => $cp, init_file => 1,
-            cache_size => ($N * 32 > 512*1024 ? $N * 32 : 512*1024),
+            cache_size => ($N * 128 > 512*1024 ? $N * 128 : 512*1024),
         );
-        for my $i (1 .. $N) { $cfm->set("key$i", "val$i"); }
+        for my $i (0 .. $#sk) { $cfm->set($sk[$i], $sv[$i]); }
     }
 
     my %bench;
     $bench{'Shared::SS'} = sub {
-        for my $i (1 .. $N) { my $v = shm_ss_get $m, "key$i"; }
+        for my $i (0 .. $#sk) { my $v = shm_ss_get $m, $sk[$i]; }
     };
     if ($have_sharedmem) {
         $bench{'SharedMem'} = sub {
-            for my $i (1 .. $N) { my $v = shash_get($hsm, "key$i"); }
+            for my $i (0 .. $#sk) { my $v = shash_get($hsm, $sk[$i]); }
         };
     }
     if ($have_lmdb) {
         $bench{'LMDB'} = sub {
             my $txn = $le->BeginTxn(LMDB_File::MDB_RDONLY());
             my $db = $txn->OpenDB;
-            for my $i (1 .. $N) { my $v = $db->get("key$i"); }
+            for my $i (0 .. $#sk) { my $v = $db->get($sk[$i]); }
             $txn->abort;
         };
     }
     if ($have_bdb) {
         $bench{'BerkeleyDB'} = sub {
-            for my $i (1 .. $N) { my $v = $bh{"key$i"}; }
+            for my $i (0 .. $#sk) { my $v = $bh{$sk[$i]}; }
         };
     }
     if ($have_cfm) {
         $bench{'FastMmap'} = sub {
-            for my $i (1 .. $N) { my $v = $cfm->get("key$i"); }
+            for my $i (0 .. $#sk) { my $v = $cfm->get($sk[$i]); }
         };
     }
     cmpthese(-3, \%bench);
@@ -422,15 +473,15 @@ print "-" x 70, "\n";
     my $p_ssd = tmppath(); my $m_ssd = Data::HashMap::Shared::SS->new($p_ssd, $N);
     $bench{'Shared::SS'} = sub {
         shm_ss_clear $m_ssd;
-        for my $i (1 .. $N) { shm_ss_put $m_ssd, "key$i", "val$i"; }
-        for my $i (1 .. $N) { shm_ss_remove $m_ssd, "key$i"; }
+        for my $i (0 .. $#sk) { shm_ss_put $m_ssd, $sk[$i], $sv[$i]; }
+        for my $i (0 .. $#sk) { shm_ss_remove $m_ssd, $sk[$i]; }
     };
     if ($have_sharedmem) {
         $bench{'SharedMem'} = sub {
             my $d = tmppath(); mkdir $d;
             my $sh = shash_open($d, "rwc");
-            for my $i (1 .. $N) { shash_set($sh, "key$i", "val$i"); }
-            for my $i (1 .. $N) { shash_set($sh, "key$i", undef); }
+            for my $i (0 .. $#sk) { shash_set($sh, $sk[$i], $sv[$i]); }
+            for my $i (0 .. $#sk) { shash_set($sh, $sk[$i], undef); }
             undef $sh; rmtree $d;
         };
     }
@@ -438,10 +489,10 @@ print "-" x 70, "\n";
         $bench{'LMDB'} = sub {
             my ($d, $env) = mk_lmdb();
             my $txn = $env->BeginTxn; my $db = $txn->OpenDB;
-            for my $i (1 .. $N) { $db->put("key$i", "val$i"); }
+            for my $i (0 .. $#sk) { $db->put($sk[$i], $sv[$i]); }
             $txn->commit;
             $txn = $env->BeginTxn; $db = $txn->OpenDB;
-            for my $i (1 .. $N) { $db->del("key$i"); }
+            for my $i (0 .. $#sk) { $db->del($sk[$i]); }
             $txn->commit;
             undef $env; rmtree $d;
         };
@@ -451,8 +502,8 @@ print "-" x 70, "\n";
             my ($d, $env) = mk_bdb();
             my %h; tie %h, "BerkeleyDB::Hash",
                 -Filename => "b.db", -Flags => BerkeleyDB::DB_CREATE(), -Env => $env;
-            for my $i (1 .. $N) { $h{"key$i"} = "val$i"; }
-            for my $i (1 .. $N) { delete $h{"key$i"}; }
+            for my $i (0 .. $#sk) { $h{$sk[$i]} = $sv[$i]; }
+            for my $i (0 .. $#sk) { delete $h{$sk[$i]}; }
             untie %h; undef $env; rmtree $d;
         };
     }
@@ -460,8 +511,120 @@ print "-" x 70, "\n";
     undef $m_ssd; unlink $p_ssd;
 }
 
+# --- Long strings (arena path, ~45B keys, ~96B values) ---
+
+print "\n", "=" x 70, "\n";
+print "STRING KEY -> STRING VALUE — LONG (arena, ~50-100B)  ($N entries)\n";
+print "=" x 70, "\n";
+
+print "\n", "-" x 70, "\n";
+print "INSERT (long strings)\n";
+print "-" x 70, "\n";
+{
+    my %bench;
+    my $p = tmppath(); my $m = Data::HashMap::Shared::SS->new($p, $N);
+    $bench{'Shared::SS'} = sub {
+        shm_ss_clear $m;
+        for my $i (0 .. $#lk) { shm_ss_put $m, $lk[$i], $lv[$i]; }
+    };
+    if ($have_sharedmem) {
+        $bench{'SharedMem'} = sub {
+            my $d = tmppath(); mkdir $d;
+            my $sh = shash_open($d, "rwc");
+            for my $i (0 .. $#lk) { shash_set($sh, $lk[$i], $lv[$i]); }
+            undef $sh; rmtree $d;
+        };
+    }
+    if ($have_lmdb) {
+        $bench{'LMDB'} = sub {
+            my ($d, $env) = mk_lmdb();
+            my $txn = $env->BeginTxn; my $db = $txn->OpenDB;
+            for my $i (0 .. $#lk) { $db->put($lk[$i], $lv[$i]); }
+            $txn->commit;
+            undef $env; rmtree $d;
+        };
+    }
+    if ($have_bdb) {
+        $bench{'BerkeleyDB'} = sub {
+            my ($d, $env) = mk_bdb();
+            my %h; tie %h, "BerkeleyDB::Hash",
+                -Filename => "b.db", -Flags => BerkeleyDB::DB_CREATE(), -Env => $env;
+            for my $i (0 .. $#lk) { $h{$lk[$i]} = $lv[$i]; }
+            untie %h; undef $env; rmtree $d;
+        };
+    }
+    cmpthese(-3, \%bench);
+    undef $m; unlink $p;
+}
+
+print "\n", "-" x 70, "\n";
+print "LOOKUP (long strings)\n";
+print "-" x 70, "\n";
+{
+    my $p = tmppath();
+    my $m = Data::HashMap::Shared::SS->new($p, $N);
+    for my $i (0 .. $#lk) { shm_ss_put $m, $lk[$i], $lv[$i]; }
+
+    my ($hsm, $hsm_dir);
+    if ($have_sharedmem) {
+        $hsm_dir = tmppath(); mkdir $hsm_dir;
+        $hsm = shash_open($hsm_dir, "rwc");
+        for my $i (0 .. $#lk) { shash_set($hsm, $lk[$i], $lv[$i]); }
+    }
+
+    my ($ld, $le);
+    if ($have_lmdb) {
+        ($ld, $le) = mk_lmdb();
+        my $txn = $le->BeginTxn; my $db = $txn->OpenDB;
+        for my $i (0 .. $#lk) { $db->put($lk[$i], $lv[$i]); }
+        $txn->commit;
+    }
+
+    my (%bh, $bd, $be);
+    if ($have_bdb) {
+        ($bd, $be) = mk_bdb();
+        tie %bh, "BerkeleyDB::Hash",
+            -Filename => "b.db", -Flags => BerkeleyDB::DB_CREATE(), -Env => $be;
+        for my $i (0 .. $#lk) { $bh{$lk[$i]} = $lv[$i]; }
+    }
+
+    my %bench;
+    $bench{'Shared::SS'} = sub {
+        for my $i (0 .. $#lk) { my $v = shm_ss_get $m, $lk[$i]; }
+    };
+    if ($have_sharedmem) {
+        $bench{'SharedMem'} = sub {
+            for my $i (0 .. $#lk) { my $v = shash_get($hsm, $lk[$i]); }
+        };
+    }
+    if ($have_lmdb) {
+        $bench{'LMDB'} = sub {
+            my $txn = $le->BeginTxn(LMDB_File::MDB_RDONLY());
+            my $db = $txn->OpenDB;
+            for my $i (0 .. $#lk) { my $v = $db->get($lk[$i]); }
+            $txn->abort;
+        };
+    }
+    if ($have_bdb) {
+        $bench{'BerkeleyDB'} = sub {
+            for my $i (0 .. $#lk) { my $v = $bh{$lk[$i]}; }
+        };
+    }
+    cmpthese(-3, \%bench);
+
+    undef $m; unlink $p;
+    undef $hsm; rmtree $hsm_dir if defined $hsm_dir;
+    if ($have_bdb) { untie %bh; undef $be; rmtree $bd; }
+    if ($have_lmdb) { undef $le; rmtree $ld; }
+}
+
 # =====================================================================
+} # end section 3
+
 # Section 4: String key -> Integer value  (atomic counters)
+# =====================================================================
+
+if (run_section(4)) {
 # =====================================================================
 
 print "\n", "=" x 70, "\n";
@@ -544,7 +707,12 @@ print "-" x 70, "\n";
 }
 
 # =====================================================================
+} # end section 4
+
 # Section 5: Cross-process read latency
+# =====================================================================
+
+if (run_section(5)) {
 # =====================================================================
 
 print "\n", "=" x 70, "\n";
@@ -833,7 +1001,12 @@ print "=" x 70, "\n\n";
 }
 
 # =====================================================================
+} # end section 5
+
 # Section 6: LRU cache performance
+# =====================================================================
+
+if (run_section(6)) {
 # =====================================================================
 
 print "\n", "=" x 70, "\n";
@@ -963,8 +1136,67 @@ print "-" x 70, "\n";
     undef $em1; unlink $ep1; undef $em2; unlink $ep2;
 }
 
+print "\n", "-" x 70, "\n";
+print "LRU SKIP (multiprocess Zipfian reads, 4 workers, $N entries)\n";
+print "-" x 70, "\n";
+{
+    my $nworkers = 4;
+    my $rounds = 50;
+
+    # Generate Zipfian-like key sequence: 80% of reads go to 20% of keys
+    my $hot = int($N * 0.2) || 1;
+    srand(42);
+    my @keys;
+    for (1 .. $N) {
+        push @keys, (rand() < 0.8) ? int(rand($hot)) + 1 : int(rand($N)) + 1;
+    }
+
+    for my $skip (0, 50, 90) {
+        my $path = tmppath();
+        my $map = Data::HashMap::Shared::II->new($path, $N, $N, 0, $skip);
+        for my $i (1 .. $N) { shm_ii_put $map, $i, $i; }
+
+        my @pipes;
+        for my $w (1 .. $nworkers) {
+            pipe(my $rd, my $wr) or die "pipe: $!";
+            my $pid = fork // die "fork: $!";
+            if ($pid == 0) {
+                close $rd;
+                my $child = Data::HashMap::Shared::II->new($path, $N, $N, 0, $skip);
+                my $t0 = Time::HiRes::time();
+                for my $r (1 .. $rounds) {
+                    for my $k (@keys) { my $v = shm_ii_get $child, $k; }
+                }
+                printf $wr "%.6f\n", Time::HiRes::time() - $t0;
+                close $wr;
+                POSIX::_exit(0);
+            }
+            close $wr;
+            push @pipes, [$rd, $pid];
+        }
+
+        my $max_t = 0;
+        for my $p (@pipes) {
+            my ($rd, $pid) = @$p;
+            my $t = <$rd>; close $rd; waitpid($pid, 0); chomp $t;
+            $max_t = $t if $t > $max_t;
+        }
+
+        my $total_ops = $nworkers * $rounds * scalar(@keys);
+        printf "  skip=%2d%%  %8.3f ms  (%s reads/sec across %d workers)\n",
+            $skip, $max_t * 1000, commify(int($total_ops / $max_t)), $nworkers;
+
+        undef $map; unlink $path;
+    }
+}
+
 # =====================================================================
+} # end section 6
+
 # Section 7: TTL overhead and flush performance
+# =====================================================================
+
+if (run_section(7)) {
 # =====================================================================
 
 print "\n", "=" x 70, "\n";
@@ -1082,7 +1314,12 @@ print "-" x 70, "\n";
 }
 
 # =====================================================================
+} # end section 7
+
 # Section 8: LRU + TTL combined
+# =====================================================================
+
+if (run_section(8)) {
 # =====================================================================
 
 print "\n", "=" x 70, "\n";
@@ -1118,3 +1355,4 @@ print "-" x 70, "\n";
 }
 
 print "\nDone.\n";
+} # end section 8

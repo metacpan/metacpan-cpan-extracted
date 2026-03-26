@@ -1,5 +1,5 @@
 package App::OATH;
-our $VERSION = '1.20171216'; # VERSION
+our $VERSION = '1.20260324'; # VERSION
 
 use strict;
 use warnings;
@@ -190,7 +190,7 @@ sub display_codes {
             my $account_enc = url_encode( $account );
             my $url = 'otpauth://totp/' . $account_enc . '?secret=' . $secret;
             my $qrcode = $self->make_qr( $url );
-            printf( "%s\n%s\n", $account, $qrcode );
+            printf( "%s\n%s\n%s", $account, $qrcode, $url );
         }
         else {
             printf( '%*3$s : %s' . "\n", $account, $self->oath_auth( $secret, $counter ), $max_len );
@@ -330,7 +330,7 @@ sub load_data {
 sub save_data {
     my ( $self ) = @_;
     my $data = $self->get_encrypted();
-    my $json = JSON->new();
+    my $json = JSON->new->canonical->pretty;
     my $content = $json->encode( $data );
     my $filename = $self->get_filename();
     open( my $file, '>', $filename ) || die "cannot open file $!";
@@ -342,8 +342,9 @@ sub save_data {
 
 sub encrypt_data {
     my ( $self ) = @_;
+    my $newpass = $self->{newpass};
     my $data = $self->get_plaintext();
-    $self->drop_password() if $self->{'newpass'};
+    $self->drop_password() if $newpass;
     my $crypt = App::OATH::Crypt->new( $self->get_password() );
     my $edata = {};
     foreach my $k ( keys %$data ) {

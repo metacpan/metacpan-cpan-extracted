@@ -12,7 +12,7 @@ use JSON::PP;    # needed for JSON::PP::true/false
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 BEGIN {
     my $YAML_XS_VERSION = 0.67;
@@ -80,7 +80,7 @@ Data::Record::Serialize::Encode::yaml - encode a record as YAML
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -103,8 +103,6 @@ It performs the L<Data::Record::Serialize::Role::Encode> role.
    $bool = $self->to_bool( $truthy );
 
 Convert a truthy value to something that the YAML encoders will recognize as a boolean.
-
-=head1 INTERNALS
 
 =for Pod::Coverage encode
 

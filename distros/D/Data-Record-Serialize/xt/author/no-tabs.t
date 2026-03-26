@@ -45,6 +45,7 @@ my @files = (
     't/field_types.t',
     't/lib/My/Test/Encode/both.pm',
     't/lib/My/Test/Encode/store.pm',
+    't/lib/My/Test/Encode/tsv.pm',
     't/lib/My/Test/Encode/types_nis.pm',
     't/lib/My/Test/Encode/types_ns.pm',
     't/lib/My/Test/Encode/workflow.pm',
@@ -52,6 +53,7 @@ my @files = (
     't/nullify.t',
     't/numify.t',
     't/stream.t',
+    't/stream/flush.t',
     't/stringify.t',
     't/workflow.t'
 );

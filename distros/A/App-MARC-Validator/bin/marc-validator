@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::Validator;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Run.
 exit App::MARC::Validator->new->run;
@@ -28,7 +28,7 @@ marc-validator - Tool to validate records in MARC file.
 
 =head1 SYNOPSIS
 
- marc-validator [-d] [-h] [-i id] [-l] [-o output_file] [-p] [-r] [-v] [--version] marc_xml_file..
+ marc-validator [-d] [-h] [-i id] [-l] [-o output_file] [-p] [-r] [-u use_string] [-v] [--version] marc_xml_file..
 
 =head1 DESCRIPTION
 
@@ -72,6 +72,13 @@ Pretty print JSON output.
 =item * C<-r>
 
 Reccomendations.
+
+=item * C<-u use_string>
+
+Use string to prefer plugin or filter.
+
+Format of string is type:name,type:name,...
+Type could be 'plugin' or 'filter' and name is full Perl module name of plugin.
 
 =item * C<-v>
 
@@ -126,6 +133,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

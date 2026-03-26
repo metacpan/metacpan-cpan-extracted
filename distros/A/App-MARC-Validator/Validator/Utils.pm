@@ -10,7 +10,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(obj_to_json);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub obj_to_json {
 	my ($self, $report) = @_;

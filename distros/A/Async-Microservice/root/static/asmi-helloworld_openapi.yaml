@@ -22,10 +22,36 @@ paths:
           content:
             'text/plain':
               example: 'Hello world!'
+        405:
+          $ref: '#/components/responses/Method-Not-Allowed'
         500:
           $ref: '#/components/responses/Internal-Server-Error'
 components:
   responses:
+    'Method-Not-Allowed':
+      description: 'Method not allowed for this route.'
+      headers:
+        Allow:
+          description: 'Comma-separated list of allowed HTTP methods for the route.'
+          schema:
+            type: string
+            example: 'GET'
+      content:
+        'text/plain':
+          example: 'method not allowed'
+        'application/json':
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  err_status:
+                    type: integer
+                    example: 405
+                  err_msg:
+                    type: string
+                    example: 'method not allowed'
     'Internal-Server-Error':
       description: 'Internal server error.'
       content:

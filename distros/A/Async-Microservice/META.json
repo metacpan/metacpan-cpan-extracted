@@ -24,7 +24,10 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "HTTP::Headers" : "0",
+            "Log::Any::Test" : "0",
             "Path::Class" : "0",
+            "Plack::Test::Server" : "0",
             "Pod::Simple::Text" : "0",
             "Test::Most" : "0",
             "Test::Time" : "0",
@@ -42,7 +45,9 @@
             "AnyEvent::Future" : "0",
             "AnyEvent::IO" : "0",
             "DateTime" : "0",
+            "Future" : "0",
             "Future::AsyncAwait" : "0",
+            "HTTP::Negotiate" : "0",
             "JSON::XS" : "0",
             "Log::Any" : "0",
             "Moose" : "0",
@@ -63,18 +68,18 @@
    "provides" : {
       "Async::Microservice" : {
          "file" : "lib/Async/Microservice.pm",
-         "version" : "0.05"
+         "version" : "0.08"
       },
       "Async::Microservice::HelloWorld" : {
          "file" : "lib/Async/Microservice/HelloWorld.pm"
       },
       "Async::Microservice::Time" : {
          "file" : "lib/Async/Microservice/Time.pm",
-         "version" : "0.05"
+         "version" : "0.08"
       },
       "Async::MicroserviceReq" : {
          "file" : "lib/Async/MicroserviceReq.pm",
-         "version" : "0.05"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -89,6 +94,6 @@
          "url" : "https://github.com/jozef/Async-Microservice.git"
       }
    },
-   "version" : "0.05",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

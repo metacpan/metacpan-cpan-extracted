@@ -4,13 +4,14 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.83";
+our $VERSION = "1.84";
 
 use Clone qw();
 use Encode qw();
 use Scalar::Util qw(blessed);
 use DBIx::SearchBuilder::Util qw/ sorted_values /;
 our $PREFER_BIND = $ENV{SB_PREFER_BIND};
+our $PREFER_LAZY_LOAD = $ENV{SB_PREFER_LAZY_LOAD};
 
 =head1 NAME
 
@@ -500,10 +501,12 @@ sub _isLimited {
 Returns the column selection string for use in SELECT statements.
 
 If explicit columns have been added via L</Column>, those are returned as-is.
-If C<_select_all_columns> is set on the object, returns C<main.*>. Otherwise
-introspects the record class's C<_ClassAccessible> metadata and excludes
-columns marked as C<lazy_load>, C<foreign-collection>, or C<record-read>.
-Falls back to C<main.*> if no metadata is available.
+If C<_select_all_columns> is set on the object, or if the package variable
+C<$DBIx::SearchBuilder::PREFER_LAZY_LOAD> (controlled by the
+C<SB_PREFER_LAZY_LOAD> environment variable) is false, returns C<main.*>.
+Otherwise introspects the record class's C<_ClassAccessible> metadata and
+excludes columns marked as C<lazy_load>, C<foreign-collection>, or
+C<record-read>. Falls back to C<main.*> if no metadata is available.
 
 =cut
 
@@ -517,6 +520,9 @@ sub _ColumnsForQuery {
 
     # _select_all_columns bypasses lazy_load filtering.
     return 'main.*' if $self->{_select_all_columns};
+
+    # Global flag: opt in to explicit column listing; default is main.*
+    return 'main.*' unless $PREFER_LAZY_LOAD;
 
     return $self->{_columns_for_query} if defined $self->{_columns_for_query};
 
@@ -544,9 +550,11 @@ sub _ColumnsForQuery {
 
 =head2 SelectAllColumns 1|0
 
-When set to true, disables C<lazy_load> column filtering and always selects
-all columns from the database. When set to false, restores the default
-behaviour of excluding C<lazy_load> columns.
+When set to true, forces selection of all columns (C<main.*>), bypassing any
+C<lazy_load> filtering that would otherwise apply when
+C<$DBIx::SearchBuilder::PREFER_LAZY_LOAD> is enabled. When set to false,
+restores normal behaviour (C<main.*> by default, or C<lazy_load> filtering
+if C<PREFER_LAZY_LOAD> is enabled).
 
 =cut
 

@@ -32,9 +32,7 @@
       "develop" : {
          "requires" : {
             "Dist::Zilla" : "5",
-            "Dist::Zilla::Plugin::BumpVersionAfterRelease" : "0",
             "Dist::Zilla::Plugin::CheckMetaResources" : "0",
-            "Dist::Zilla::Plugin::CopyFilesFromRelease" : "0",
             "Dist::Zilla::Plugin::EnsureChangesHasContent" : "0",
             "Dist::Zilla::Plugin::EnsurePrereqsInstalled" : "0",
             "Dist::Zilla::Plugin::FileFinder::Filter" : "0",
@@ -42,22 +40,14 @@
             "Dist::Zilla::Plugin::GatherDir::Template" : "0",
             "Dist::Zilla::Plugin::InsertCopyright" : "0",
             "Dist::Zilla::Plugin::InsertExample" : "0",
-            "Dist::Zilla::Plugin::MetaJSON" : "0",
             "Dist::Zilla::Plugin::MetaNoIndex" : "0",
-            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
             "Dist::Zilla::Plugin::MetaResources" : "0",
-            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
-            "Dist::Zilla::Plugin::NextRelease" : "0",
             "Dist::Zilla::Plugin::PodCoverageTests" : "0",
-            "Dist::Zilla::Plugin::PodSyntaxTests" : "0",
             "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::Prereqs" : "0",
             "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0",
-            "Dist::Zilla::Plugin::Readme::Brief" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
             "Dist::Zilla::Plugin::Regenerate" : "0",
-            "Dist::Zilla::Plugin::RewriteVersion" : "0",
-            "Dist::Zilla::Plugin::RunExtraTests" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
             "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON" : "0",
             "Dist::Zilla::Plugin::Test::CleanNamespaces" : "0",
@@ -70,10 +60,11 @@
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
             "Dist::Zilla::Plugin::Test::TrailingSpace" : "0",
-            "Dist::Zilla::Plugin::Test::UnusedVars" : "0",
             "Dist::Zilla::Plugin::Test::Version" : "0",
-            "Dist::Zilla::PluginBundle::Basic" : "0",
-            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Dist::Zilla::PluginBundle::Starter" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Weaver::Plugin::StopWords" : "0",
             "Pod::Weaver::Section::Contributors" : "0",
@@ -92,7 +83,6 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Spelling" : "0.12",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0.015",
             "Test::Version" : "1"
          }
       },
@@ -151,79 +141,79 @@
    "provides" : {
       "Data::Record::Serialize" : {
          "file" : "lib/Data/Record/Serialize.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Encode::array" : {
          "file" : "lib/Data/Record/Serialize/Encode/array.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Encode::ddump" : {
          "file" : "lib/Data/Record/Serialize/Encode/ddump.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Encode::json" : {
          "file" : "lib/Data/Record/Serialize/Encode/json.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Encode::null" : {
          "file" : "lib/Data/Record/Serialize/Encode/null.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Encode::rdb" : {
          "file" : "lib/Data/Record/Serialize/Encode/rdb.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Encode::yaml" : {
          "file" : "lib/Data/Record/Serialize/Encode/yaml.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Error" : {
          "file" : "lib/Data/Record/Serialize/Error.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Role::Base" : {
          "file" : "lib/Data/Record/Serialize/Role/Base.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Role::Default" : {
          "file" : "lib/Data/Record/Serialize/Role/Default.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Role::Encode" : {
          "file" : "lib/Data/Record/Serialize/Role/Encode.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Role::EncodeAndSink" : {
          "file" : "lib/Data/Record/Serialize/Role/EncodeAndSink.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Role::Sink" : {
          "file" : "lib/Data/Record/Serialize/Role/Sink.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Role::Sink::Stream" : {
          "file" : "lib/Data/Record/Serialize/Role/Sink/Stream.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Sink::array" : {
          "file" : "lib/Data/Record/Serialize/Sink/array.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Sink::null" : {
          "file" : "lib/Data/Record/Serialize/Sink/null.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Sink::stream" : {
          "file" : "lib/Data/Record/Serialize/Sink/stream.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Types" : {
          "file" : "lib/Data/Record/Serialize/Types.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       },
       "Data::Record::Serialize::Util" : {
          "file" : "lib/Data/Record/Serialize/Util.pm",
-         "version" : "2.02"
+         "version" : "2.03"
       }
    },
    "release_status" : "stable",
@@ -238,7 +228,7 @@
          "web" : "https://gitlab.com/djerius/data-record-serialize"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_generated_by_perl" : "v5.38.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
    "x_spdx_expression" : "GPL-3.0-only"

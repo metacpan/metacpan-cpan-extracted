@@ -8,7 +8,7 @@ use Plack::Test::Server;
 use Plack::Builder;
 use Carp qw(croak);
 
-use Async::Microservice::Time;
+use Async::Microservice::HelloWorld;
 
 has '_service' => (
     is        => 'ro',
@@ -23,11 +23,11 @@ sub _build__service {
     my $mise = Async::Microservice::HelloWorld->new();
     my $app = sub { $mise->plack_handler(@_) };
 
-    my $time_service = builder {
+    my $hello_service = builder {
         enable "Plack::Middleware::ContentLength";
         $app;
     };
-    my $t_server = Plack::Test::Server->new($time_service);
+    my $t_server = Plack::Test::Server->new($hello_service);
     $self->{_url} = 'http://127.0.0.1:'.$t_server->port.'/v1/';
     return $t_server;
 }

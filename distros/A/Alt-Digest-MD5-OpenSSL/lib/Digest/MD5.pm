@@ -6,7 +6,7 @@ use warnings;
 use Exporter;
 use XSLoader;
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 our @EXPORT_OK = qw(md5 md5_hex md5_base64);
 
 *import = \&Exporter::import;
@@ -320,7 +320,7 @@ and Hongbo Yu.
 This library is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
- Copyright 2023-2024 Michal Josef Špaček.
+ Copyright 2023-2026 Michal Josef Špaček.
  Copyright 1998-2003 Gisle Aas.
  Copyright 1995-1996 Neil Winton.
  Copyright 1991-1992 RSA Data Security, Inc.

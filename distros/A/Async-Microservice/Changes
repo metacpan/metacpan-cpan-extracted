@@ -1,3 +1,21 @@
+0.08    2026-03-25
+    - fix process name setting
+
+0.07    2026-03-24
+    - add file_placeholder attribute for template files substitution
+    - add static_path attribute for configurable url path
+    - allow predefined paths (/, /static, /edit, /hcheck) to be overridden
+
+0.06    2026-03-24
+    - log error about too long requests
+    - add max sleep duration, prevent DoS
+    - fix static handling
+    - return JSON encoding errors as application/json responses
+    - fix content negotiation
+    - fix redirect via untrusted host header
+    - fix r_age validation
+    - add "method not allowed" response
+
 0.05    2026-03-23
     - fix for AnyEvent::CondVar: recursive blocking wait attempted
     - "/", "/static", "/edit" and "/hcheck" as Path::Router paths

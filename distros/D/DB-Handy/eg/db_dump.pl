@@ -1,11 +1,14 @@
-#!/usr/bin/perl
 ######################################################################
 # db_dump.pl - Educational tool to inspect DB::Handy .dat files
 #
 # Usage: perl db_dump.pl <schema_file> <dat_file>
 ######################################################################
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
+use warnings; local $^W = 1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
 
 my $sch_file = $ARGV[0];
 my $dat_file = $ARGV[1];

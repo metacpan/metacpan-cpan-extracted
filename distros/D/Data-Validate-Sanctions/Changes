@@ -1,6 +1,12 @@
 Revision history for Data-Validate-Sanctions
 
-0.20      2025-12-10 11:23:03+00:00 UTC
+0.21      2026-03-25 09:23:42+00:00 UTC
+        - Support new MOHA xmlResponse XML format alongside legacy TaggedPDF-doc format
+        - Extract multiple DOBs and passport numbers from concatenated fields in new format
+        - Update default MOHA sanctions URL to 2026 version
+        - Fix EU sanctions: auto-append token to eu_url when token param is missing
+
+0.20      2025-12-10 00:00:00 UTC
         - Update MOHA sanction URLs 
         - Update XML Parser for MOHA Sanctions
 

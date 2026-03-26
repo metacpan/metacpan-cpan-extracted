@@ -1,10 +1,10 @@
-#!/usr/bin/perl
 ######################################################################
-# 01_crud_sample.pl - Basic CRUD operations using DB::Handy
+# crud_sample.pl - Basic CRUD operations using DB::Handy
 ######################################################################
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
 use lib "$FindBin::Bin/../lib";
 use DB::Handy;

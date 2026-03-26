@@ -7,7 +7,7 @@ use Moo::Role;
 
 use Data::Record::Serialize::Error { errors => ['::create'] }, -all;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use IO::File;
 
@@ -71,7 +71,7 @@ Data::Record::Serialize::Sink::array - append encoded data to an array.
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -99,8 +99,6 @@ It performs the L<Data::Record::Serialize::Role::Sink> role.
 The array into which the encoded record is stored.  The last record sent is at
 
    $s->output->[-1]
-
-=head1 INTERNALS
 
 =for Pod::Coverage print
  say

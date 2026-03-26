@@ -31,8 +31,12 @@ package DB::Handy;
 #   IDX=<idxname>:<colname>:<unique 0|1>
 ######################################################################
 
+use 5.00503;    # Universal Consensus 1998 for primetools
+                # Perl 5.005_03 compatibility for historical toolchains
+# use 5.008001; # Lancaster Consensus 2013 for toolchains
+
 use strict;
-BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use Fcntl qw(:DEFAULT :flock);
@@ -41,7 +45,7 @@ use File::Spec;
 use POSIX ();
 
 use vars qw($VERSION $errstr);
-$VERSION = '1.06';
+$VERSION = '1.07';
 $VERSION = $VERSION;
 $errstr  = '';
 
@@ -4957,7 +4961,7 @@ DB::Handy - Pure-Perl flat-file relational database with DBI-like interface
 
 =head1 VERSION
 
-Version 1.00
+Version 1.07
 
 =head1 SYNOPSIS
 
@@ -5039,17 +5043,19 @@ Version 1.00
 
 =item * L</DESCRIPTION>
 
-=item * L</DBI COMPATIBILITY> - What is and is not compatible with DBI
+=item * L</INCLUDED DOCUMENTATION> -- eg/ samples and doc/ cheat sheets
+
+=item * L</DBI COMPATIBILITY> -- What is and is not compatible with DBI
 
 =item * L</METHODS - Connection handle (DB::Handy::Connection)>
 
 =item * L</METHODS - Statement handle (DB::Handy::Statement)>
 
+=item * L</ATTRIBUTES> -- Handle attributes such as RaiseError and NAME
+
 =item * L</METHODS - Low-level API>
 
-=item * L</ATTRIBUTES> - Handle attributes such as RaiseError and NAME
-
-=item * L</SUPPORTED SQL> - Full SQL syntax reference
+=item * L</SUPPORTED SQL> -- Full SQL syntax reference
 
 =item * L</DATA TYPES>
 
@@ -5059,19 +5065,15 @@ Version 1.00
 
 =item * L</FILE LAYOUT>
 
-=item * L</EXAMPLES> - Practical usage patterns
+=item * L</EXAMPLES> -- Practical usage patterns
 
-=item * L</DIFFERENCES FROM DBI> - Detailed incompatibility list
+=item * L</DIFFERENCES FROM DBI> -- Detailed incompatibility list
 
-=item * L</DIAGNOSTICS> - Error messages
+=item * L</DIAGNOSTICS> -- Error messages
 
 =item * L</BUGS AND LIMITATIONS>
 
 =item * L</SEE ALSO>
-
-=item * L</AUTHOR>
-
-=item * L</COPYRIGHT AND LICENSE>
 
 =back
 
@@ -6493,6 +6495,55 @@ The C<CREATE TABLE> parser could not interpret a column definition.
 =item C<Unsupported SQL: E<lt>sqlE<gt>>
 
 The SQL string does not match any known pattern.
+
+=item C<Database 'E<lt>nameE<gt>' already exists>
+
+C<create_database> was called for a database directory that already exists.
+
+=item C<Database 'E<lt>nameE<gt>' does not exist>
+
+C<connect> or C<drop_database> was called for a database directory that
+does not exist.
+
+=item C<Cannot open base_dir: E<lt>reasonE<gt>>
+
+The base directory passed to C<new> (or C<connect>) could not be opened.
+Check that the path exists and that the process has read permission.
+
+=item C<Cannot open dat 'E<lt>fileE<gt>': E<lt>reasonE<gt>>
+
+A C<.dat> record file could not be opened for reading or writing.
+Check file permissions and disk space.
+
+=item C<Cannot read schema: E<lt>reasonE<gt>>
+
+A C<.sch> schema file exists but could not be read.
+Check file permissions.
+
+=item C<Cannot create base_dir: E<lt>reasonE<gt>>
+
+C<new> could not create the base directory.
+Check parent-directory write permissions.
+
+=item C<Cannot create database 'E<lt>nameE<gt>': E<lt>reasonE<gt>>
+
+C<create_database> could not create the database subdirectory.
+Check disk space and write permissions on C<base_dir>.
+
+=item C<Cannot drop database 'E<lt>nameE<gt>': E<lt>reasonE<gt>>
+
+C<drop_database> could not remove the database directory tree.
+Check that no files are locked and that write permission is granted.
+
+=item C<DB::Handy connect failed: E<lt>messageE<gt>>
+
+The low-level C<connect> call failed.  C<$DB::Handy::errstr> contains
+the underlying error set by the failing operation.
+
+=item C<DB::Handy: E<lt>messageE<gt>>
+
+A fatal internal error was raised directly via C<die>.
+C<RaiseError> must be enabled (the default) for this message to propagate.
 
 =back
 

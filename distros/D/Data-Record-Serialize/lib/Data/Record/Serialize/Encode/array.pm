@@ -5,7 +5,7 @@ package Data::Record::Serialize::Encode::array;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use namespace::clean;
 
@@ -58,7 +58,7 @@ Data::Record::Serialize::Encode::array - encoded a record as /rdb
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -98,8 +98,6 @@ results in
   )
 
 It performs the L<Data::Record::Serialize::Role::Encode> role.
-
-=head1 INTERNALS
 
 =for Pod::Coverage setup
 

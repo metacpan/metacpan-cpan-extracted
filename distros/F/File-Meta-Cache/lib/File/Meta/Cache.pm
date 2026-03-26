@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package File::Meta::Cache;
 
-our $VERSION="v0.4.0";
+our $VERSION="v0.4.1";
 
 # Default Opening Mode
 #
@@ -104,7 +104,10 @@ method opener{
         my $path;
         if($enable_redirect){
           # Attempt to redirect file if appropriate
-          $path=follow_redirect $KEYpath;
+          local $@;
+          eval {$path=follow_redirect $KEYpath};
+
+          return undef if $@;
           $entry[PATH]=$path;
 
         }

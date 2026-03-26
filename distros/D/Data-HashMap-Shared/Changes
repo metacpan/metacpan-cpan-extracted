@@ -1,5 +1,23 @@
 Revision history for Data-HashMap-Shared
 
+0.02  2026-03-17
+    - New ops: add, update, swap, cas, pop, shift, drain, set_multi,
+      get_multi, persist, set_ttl, touch, reserve, flush_expired_partial,
+      ttl_remaining, stats, arena_used, arena_cap, stat_evictions,
+      stat_expired, stat_recoveries
+    - Clock/second-chance eviction: lock-free LRU reads
+    - Hash-tag probe filtering, prefetch, lru_skip optimization
+    - SSE2-accelerated state scanning for iteration
+    - SSE2-accelerated tag matching in probe loops
+    - Inline small strings (≤7 bytes) stored in node structs, no arena overhead
+    - Batch get_multi with prefetch pipeline under single lock
+    - Fast monotonic clock (CLOCK_MONOTONIC_COARSE) for TTL paths
+    - Pre-sized copy_buf to avoid realloc on first access
+    - C-level sharding: new_sharded($path, $shards, ...) for parallel writes
+    - Cursor chains across shards with correct iterating/flush_deferred
+    - Harden header validation, fix cursor_seek gen tracking
+    - SHM_VERSION 7 (inline strings, monotonic timestamps)
+
 0.01  2026-03-14
     - 10 type-specialized shared-memory hash map variants (II, SS, SI, IS,
       I16, I32, I16S, I32S, SI16, SI32)

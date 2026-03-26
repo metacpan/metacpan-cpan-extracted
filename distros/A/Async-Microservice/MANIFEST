@@ -18,5 +18,6 @@ root/static/example_openapi.yaml
 root/static/index.html
 t/01_Async-Microservice.t
 t/02_Async-Microservice-Time.t
+t/03_Async-MicroserviceReq.t
 t/tlib/Test/Async/Microservice/HelloWorld.pm
 t/tlib/Test/Async/Microservice/Time.pm

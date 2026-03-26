@@ -5,7 +5,7 @@ package Data::Record::Serialize::Encode::ddump;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Scalar::Util;
 use Data::Dumper;
@@ -113,7 +113,7 @@ Data::Record::Serialize::Encode::ddump - encoded a record using Data::Dumper
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -155,8 +155,6 @@ B<Terse> and B<Trailingcomma> are always set.
 
 This role adds two named arguments to the constructor, L</ddump> and
 L</config>, which mirror the added object attributes.
-
-=head1 INTERNALS
 
 =for Pod::Coverage encode
 

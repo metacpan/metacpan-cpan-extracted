@@ -26,6 +26,10 @@ my %WriteMakefile_params = (
         repository => 'https://github.com/garu/Clone',
       },
     },
+    # Prevent macOS extended attributes (com.apple.provenance, etc.) from
+    # being embedded in the distribution tarball. COPYFILE_DISABLE=1 is a
+    # macOS-specific env var; it is a no-op on Linux/Windows.
+    dist => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', TAR => 'COPYFILE_DISABLE=1 tar' },
 );
 
 my $EUMM_VERSION = eval $ExtUtils::MakeMaker::VERSION;

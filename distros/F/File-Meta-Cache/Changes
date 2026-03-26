@@ -1,5 +1,10 @@
 Revision history for Perl extension File::Meta::Cache.
-v0.4.0 2060-03-10
+v0.4.1 2026-03-10
+  [fixes]
+    - Return undef on opening a redirect file that does not exist
+    - Up the version of File::Path::Redirect required
+
+v0.4.0 2026-03-10
   [features]
     - Add redirected file linking support
     - Simplify dependencies

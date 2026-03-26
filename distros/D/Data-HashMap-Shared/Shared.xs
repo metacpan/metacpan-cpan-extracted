@@ -50,7 +50,8 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     bool _vutf8 = SvUTF8(sv) ? true : false
 
 #define REQUIRE_TTL(h) \
-    if (!(h)->expires_at) croak("put_ttl requires a TTL-enabled map (pass ttl > 0 to constructor)")
+    { ShmHandle *_th = (h)->shard_handles ? (h)->shard_handles[0] : (h); \
+      if (!_th->expires_at) croak("put_ttl requires a TTL-enabled map (pass ttl > 0 to constructor)"); }
 
 #define EXTRACT_CURSOR(classname, sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
@@ -179,6 +180,9 @@ DEFINE_KW_HOOK(i16, "I16", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(i16, "I16", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", mmap_size,     1, build_kw_1arg)
@@ -187,6 +191,14 @@ DEFINE_KW_HOOK(i16, "I16", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i16, "I16", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i16, "I16", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(i16, "I16", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(i16, "I16", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(i16, "I16", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(i16, "I16", set_ttl,         3, build_kw_3arg)
 
 /* I32 (int32 -> int32, counters) */
 DEFINE_KW_HOOK(i32, "I32", put,         3, build_kw_3arg)
@@ -217,6 +229,9 @@ DEFINE_KW_HOOK(i32, "I32", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(i32, "I32", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", mmap_size,     1, build_kw_1arg)
@@ -225,6 +240,14 @@ DEFINE_KW_HOOK(i32, "I32", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i32, "I32", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i32, "I32", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(i32, "I32", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(i32, "I32", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(i32, "I32", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(i32, "I32", set_ttl,         3, build_kw_3arg)
 
 /* II (int64 -> int64, counters) */
 DEFINE_KW_HOOK(ii, "II", put,         3, build_kw_3arg)
@@ -255,6 +278,9 @@ DEFINE_KW_HOOK(ii, "II", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(ii, "II", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", mmap_size,     1, build_kw_1arg)
@@ -263,6 +289,14 @@ DEFINE_KW_HOOK(ii, "II", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(ii, "II", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(ii, "II", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(ii, "II", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(ii, "II", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(ii, "II", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(ii, "II", set_ttl,         3, build_kw_3arg)
 
 /* I16S (int16 -> string, no counters) */
 DEFINE_KW_HOOK(i16s, "I16S", put,         3, build_kw_3arg)
@@ -290,6 +324,9 @@ DEFINE_KW_HOOK(i16s, "I16S", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(i16s, "I16S", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", mmap_size,     1, build_kw_1arg)
@@ -298,6 +335,13 @@ DEFINE_KW_HOOK(i16s, "I16S", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i16s, "I16S", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i16s, "I16S", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(i16s, "I16S", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(i16s, "I16S", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(i16s, "I16S", set_ttl,         3, build_kw_3arg)
 
 /* I32S (int32 -> string, no counters) */
 DEFINE_KW_HOOK(i32s, "I32S", put,         3, build_kw_3arg)
@@ -325,6 +369,9 @@ DEFINE_KW_HOOK(i32s, "I32S", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(i32s, "I32S", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", mmap_size,     1, build_kw_1arg)
@@ -333,6 +380,13 @@ DEFINE_KW_HOOK(i32s, "I32S", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(i32s, "I32S", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i32s, "I32S", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(i32s, "I32S", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(i32s, "I32S", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(i32s, "I32S", set_ttl,         3, build_kw_3arg)
 
 /* IS (int64 -> string, no counters) */
 DEFINE_KW_HOOK(is, "IS", put,         3, build_kw_3arg)
@@ -360,6 +414,9 @@ DEFINE_KW_HOOK(is, "IS", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(is, "IS", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", mmap_size,     1, build_kw_1arg)
@@ -368,6 +425,13 @@ DEFINE_KW_HOOK(is, "IS", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(is, "IS", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(is, "IS", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(is, "IS", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(is, "IS", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(is, "IS", set_ttl,         3, build_kw_3arg)
 
 /* SI16 (string -> int16, counters) */
 DEFINE_KW_HOOK(si16, "SI16", put,         3, build_kw_3arg)
@@ -398,6 +462,9 @@ DEFINE_KW_HOOK(si16, "SI16", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(si16, "SI16", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", mmap_size,     1, build_kw_1arg)
@@ -406,6 +473,14 @@ DEFINE_KW_HOOK(si16, "SI16", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(si16, "SI16", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(si16, "SI16", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(si16, "SI16", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(si16, "SI16", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(si16, "SI16", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(si16, "SI16", set_ttl,         3, build_kw_3arg)
 
 /* SI32 (string -> int32, counters) */
 DEFINE_KW_HOOK(si32, "SI32", put,         3, build_kw_3arg)
@@ -436,6 +511,9 @@ DEFINE_KW_HOOK(si32, "SI32", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(si32, "SI32", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", mmap_size,     1, build_kw_1arg)
@@ -444,6 +522,14 @@ DEFINE_KW_HOOK(si32, "SI32", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(si32, "SI32", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(si32, "SI32", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(si32, "SI32", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(si32, "SI32", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(si32, "SI32", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(si32, "SI32", set_ttl,         3, build_kw_3arg)
 
 /* SI (string -> int64, counters) */
 DEFINE_KW_HOOK(si, "SI", put,         3, build_kw_3arg)
@@ -474,6 +560,9 @@ DEFINE_KW_HOOK(si, "SI", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(si, "SI", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", mmap_size,     1, build_kw_1arg)
@@ -482,6 +571,14 @@ DEFINE_KW_HOOK(si, "SI", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(si, "SI", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(si, "SI", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(si, "SI", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(si, "SI", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(si, "SI", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(si, "SI", set_ttl,         3, build_kw_3arg)
 
 /* SS (string -> string, no counters) */
 DEFINE_KW_HOOK(ss, "SS", put,         3, build_kw_3arg)
@@ -509,6 +606,9 @@ DEFINE_KW_HOOK(ss, "SS", ttl_remaining, 2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", capacity,     1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", tombstones,   1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", take,          2, build_kw_2arg)
+DEFINE_KW_HOOK(ss, "SS", pop,            1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", shift,            1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", drain,          2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", flush_expired, 1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", flush_expired_partial, 2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", mmap_size,     1, build_kw_1arg)
@@ -517,6 +617,13 @@ DEFINE_KW_HOOK(ss, "SS", reserve,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", stat_evictions,  1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", stat_expired,    1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", stat_recoveries,    1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", arena_used,       1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", arena_cap,        1, build_kw_1arg)
+DEFINE_KW_HOOK(ss, "SS", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(ss, "SS", update,           3, build_kw_3arg)
+DEFINE_KW_HOOK(ss, "SS", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(ss, "SS", persist,         2, build_kw_2arg)
+DEFINE_KW_HOOK(ss, "SS", set_ttl,         3, build_kw_3arg)
 
 /* ---- Register keyword macro ---- */
 
@@ -528,6 +635,7 @@ DEFINE_KW_HOOK(ss, "SS", stat_recoveries,    1, build_kw_1arg)
 /* ============================================================
  * MODULE/PACKAGE sections
  * ============================================================ */
+
 
 MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I16
 PROTOTYPES: DISABLE
@@ -563,6 +671,9 @@ BOOT:
     REGISTER_KW(i16, capacity,     "Data::HashMap::Shared::I16::capacity");
     REGISTER_KW(i16, tombstones,   "Data::HashMap::Shared::I16::tombstones");
     REGISTER_KW(i16, take,          "Data::HashMap::Shared::I16::take");
+    REGISTER_KW(i16, pop,   "Data::HashMap::Shared::I16::pop");
+    REGISTER_KW(i16, shift, "Data::HashMap::Shared::I16::shift");
+    REGISTER_KW(i16, drain, "Data::HashMap::Shared::I16::drain");
     REGISTER_KW(i16, flush_expired, "Data::HashMap::Shared::I16::flush_expired");
     REGISTER_KW(i16, flush_expired_partial, "Data::HashMap::Shared::I16::flush_expired_partial");
     REGISTER_KW(i16, mmap_size,     "Data::HashMap::Shared::I16::mmap_size");
@@ -571,6 +682,14 @@ BOOT:
     REGISTER_KW(i16, stat_evictions,  "Data::HashMap::Shared::I16::stat_evictions");
     REGISTER_KW(i16, stat_expired,    "Data::HashMap::Shared::I16::stat_expired");
     REGISTER_KW(i16, stat_recoveries, "Data::HashMap::Shared::I16::stat_recoveries");    
+    REGISTER_KW(i16, arena_used,       "Data::HashMap::Shared::I16::arena_used");
+    REGISTER_KW(i16, arena_cap,        "Data::HashMap::Shared::I16::arena_cap");
+    REGISTER_KW(i16, add,              "Data::HashMap::Shared::I16::add");
+    REGISTER_KW(i16, update,           "Data::HashMap::Shared::I16::update");
+    REGISTER_KW(i16, swap,             "Data::HashMap::Shared::I16::swap");
+    REGISTER_KW(i16, cas,             "Data::HashMap::Shared::I16::cas");
+    REGISTER_KW(i16, persist,         "Data::HashMap::Shared::I16::persist");
+    REGISTER_KW(i16, set_ttl,         "Data::HashMap::Shared::I16::set_ttl");
     REGISTER_KW(i32, put,         "Data::HashMap::Shared::I32::put");
     REGISTER_KW(i32, get,         "Data::HashMap::Shared::I32::get");
     REGISTER_KW(i32, remove,      "Data::HashMap::Shared::I32::remove");
@@ -599,6 +718,9 @@ BOOT:
     REGISTER_KW(i32, capacity,     "Data::HashMap::Shared::I32::capacity");
     REGISTER_KW(i32, tombstones,   "Data::HashMap::Shared::I32::tombstones");
     REGISTER_KW(i32, take,          "Data::HashMap::Shared::I32::take");
+    REGISTER_KW(i32, pop,   "Data::HashMap::Shared::I32::pop");
+    REGISTER_KW(i32, shift, "Data::HashMap::Shared::I32::shift");
+    REGISTER_KW(i32, drain, "Data::HashMap::Shared::I32::drain");
     REGISTER_KW(i32, flush_expired, "Data::HashMap::Shared::I32::flush_expired");
     REGISTER_KW(i32, flush_expired_partial, "Data::HashMap::Shared::I32::flush_expired_partial");
     REGISTER_KW(i32, mmap_size,     "Data::HashMap::Shared::I32::mmap_size");
@@ -607,6 +729,14 @@ BOOT:
     REGISTER_KW(i32, stat_evictions,  "Data::HashMap::Shared::I32::stat_evictions");
     REGISTER_KW(i32, stat_expired,    "Data::HashMap::Shared::I32::stat_expired");
     REGISTER_KW(i32, stat_recoveries, "Data::HashMap::Shared::I32::stat_recoveries");    
+    REGISTER_KW(i32, arena_used,       "Data::HashMap::Shared::I32::arena_used");
+    REGISTER_KW(i32, arena_cap,        "Data::HashMap::Shared::I32::arena_cap");
+    REGISTER_KW(i32, add,              "Data::HashMap::Shared::I32::add");
+    REGISTER_KW(i32, update,           "Data::HashMap::Shared::I32::update");
+    REGISTER_KW(i32, swap,             "Data::HashMap::Shared::I32::swap");
+    REGISTER_KW(i32, cas,             "Data::HashMap::Shared::I32::cas");
+    REGISTER_KW(i32, persist,         "Data::HashMap::Shared::I32::persist");
+    REGISTER_KW(i32, set_ttl,         "Data::HashMap::Shared::I32::set_ttl");
     REGISTER_KW(ii, put,         "Data::HashMap::Shared::II::put");
     REGISTER_KW(ii, get,         "Data::HashMap::Shared::II::get");
     REGISTER_KW(ii, remove,      "Data::HashMap::Shared::II::remove");
@@ -635,6 +765,9 @@ BOOT:
     REGISTER_KW(ii, capacity,     "Data::HashMap::Shared::II::capacity");
     REGISTER_KW(ii, tombstones,   "Data::HashMap::Shared::II::tombstones");
     REGISTER_KW(ii, take,          "Data::HashMap::Shared::II::take");
+    REGISTER_KW(ii, pop,   "Data::HashMap::Shared::II::pop");
+    REGISTER_KW(ii, shift, "Data::HashMap::Shared::II::shift");
+    REGISTER_KW(ii, drain, "Data::HashMap::Shared::II::drain");
     REGISTER_KW(ii, flush_expired, "Data::HashMap::Shared::II::flush_expired");
     REGISTER_KW(ii, flush_expired_partial, "Data::HashMap::Shared::II::flush_expired_partial");
     REGISTER_KW(ii, mmap_size,     "Data::HashMap::Shared::II::mmap_size");
@@ -643,6 +776,14 @@ BOOT:
     REGISTER_KW(ii, stat_evictions,  "Data::HashMap::Shared::II::stat_evictions");
     REGISTER_KW(ii, stat_expired,    "Data::HashMap::Shared::II::stat_expired");
     REGISTER_KW(ii, stat_recoveries, "Data::HashMap::Shared::II::stat_recoveries");    
+    REGISTER_KW(ii, arena_used,       "Data::HashMap::Shared::II::arena_used");
+    REGISTER_KW(ii, arena_cap,        "Data::HashMap::Shared::II::arena_cap");
+    REGISTER_KW(ii, add,              "Data::HashMap::Shared::II::add");
+    REGISTER_KW(ii, update,           "Data::HashMap::Shared::II::update");
+    REGISTER_KW(ii, swap,             "Data::HashMap::Shared::II::swap");
+    REGISTER_KW(ii, cas,             "Data::HashMap::Shared::II::cas");
+    REGISTER_KW(ii, persist,         "Data::HashMap::Shared::II::persist");
+    REGISTER_KW(ii, set_ttl,         "Data::HashMap::Shared::II::set_ttl");
     REGISTER_KW(i16s, put,         "Data::HashMap::Shared::I16S::put");
     REGISTER_KW(i16s, get,         "Data::HashMap::Shared::I16S::get");
     REGISTER_KW(i16s, remove,      "Data::HashMap::Shared::I16S::remove");
@@ -668,6 +809,9 @@ BOOT:
     REGISTER_KW(i16s, capacity,     "Data::HashMap::Shared::I16S::capacity");
     REGISTER_KW(i16s, tombstones,   "Data::HashMap::Shared::I16S::tombstones");
     REGISTER_KW(i16s, take,          "Data::HashMap::Shared::I16S::take");
+    REGISTER_KW(i16s, pop,   "Data::HashMap::Shared::I16S::pop");
+    REGISTER_KW(i16s, shift, "Data::HashMap::Shared::I16S::shift");
+    REGISTER_KW(i16s, drain, "Data::HashMap::Shared::I16S::drain");
     REGISTER_KW(i16s, flush_expired, "Data::HashMap::Shared::I16S::flush_expired");
     REGISTER_KW(i16s, flush_expired_partial, "Data::HashMap::Shared::I16S::flush_expired_partial");
     REGISTER_KW(i16s, mmap_size,     "Data::HashMap::Shared::I16S::mmap_size");
@@ -676,6 +820,13 @@ BOOT:
     REGISTER_KW(i16s, stat_evictions,  "Data::HashMap::Shared::I16S::stat_evictions");
     REGISTER_KW(i16s, stat_expired,    "Data::HashMap::Shared::I16S::stat_expired");
     REGISTER_KW(i16s, stat_recoveries, "Data::HashMap::Shared::I16S::stat_recoveries");    
+    REGISTER_KW(i16s, arena_used,       "Data::HashMap::Shared::I16S::arena_used");
+    REGISTER_KW(i16s, arena_cap,        "Data::HashMap::Shared::I16S::arena_cap");
+    REGISTER_KW(i16s, add,              "Data::HashMap::Shared::I16S::add");
+    REGISTER_KW(i16s, update,           "Data::HashMap::Shared::I16S::update");
+    REGISTER_KW(i16s, swap,             "Data::HashMap::Shared::I16S::swap");
+    REGISTER_KW(i16s, persist,         "Data::HashMap::Shared::I16S::persist");
+    REGISTER_KW(i16s, set_ttl,         "Data::HashMap::Shared::I16S::set_ttl");
     REGISTER_KW(i32s, put,         "Data::HashMap::Shared::I32S::put");
     REGISTER_KW(i32s, get,         "Data::HashMap::Shared::I32S::get");
     REGISTER_KW(i32s, remove,      "Data::HashMap::Shared::I32S::remove");
@@ -701,6 +852,9 @@ BOOT:
     REGISTER_KW(i32s, capacity,     "Data::HashMap::Shared::I32S::capacity");
     REGISTER_KW(i32s, tombstones,   "Data::HashMap::Shared::I32S::tombstones");
     REGISTER_KW(i32s, take,          "Data::HashMap::Shared::I32S::take");
+    REGISTER_KW(i32s, pop,   "Data::HashMap::Shared::I32S::pop");
+    REGISTER_KW(i32s, shift, "Data::HashMap::Shared::I32S::shift");
+    REGISTER_KW(i32s, drain, "Data::HashMap::Shared::I32S::drain");
     REGISTER_KW(i32s, flush_expired, "Data::HashMap::Shared::I32S::flush_expired");
     REGISTER_KW(i32s, flush_expired_partial, "Data::HashMap::Shared::I32S::flush_expired_partial");
     REGISTER_KW(i32s, mmap_size,     "Data::HashMap::Shared::I32S::mmap_size");
@@ -709,6 +863,13 @@ BOOT:
     REGISTER_KW(i32s, stat_evictions,  "Data::HashMap::Shared::I32S::stat_evictions");
     REGISTER_KW(i32s, stat_expired,    "Data::HashMap::Shared::I32S::stat_expired");
     REGISTER_KW(i32s, stat_recoveries, "Data::HashMap::Shared::I32S::stat_recoveries");    
+    REGISTER_KW(i32s, arena_used,       "Data::HashMap::Shared::I32S::arena_used");
+    REGISTER_KW(i32s, arena_cap,        "Data::HashMap::Shared::I32S::arena_cap");
+    REGISTER_KW(i32s, add,              "Data::HashMap::Shared::I32S::add");
+    REGISTER_KW(i32s, update,           "Data::HashMap::Shared::I32S::update");
+    REGISTER_KW(i32s, swap,             "Data::HashMap::Shared::I32S::swap");
+    REGISTER_KW(i32s, persist,         "Data::HashMap::Shared::I32S::persist");
+    REGISTER_KW(i32s, set_ttl,         "Data::HashMap::Shared::I32S::set_ttl");
     REGISTER_KW(is, put,         "Data::HashMap::Shared::IS::put");
     REGISTER_KW(is, get,         "Data::HashMap::Shared::IS::get");
     REGISTER_KW(is, remove,      "Data::HashMap::Shared::IS::remove");
@@ -734,6 +895,9 @@ BOOT:
     REGISTER_KW(is, capacity,     "Data::HashMap::Shared::IS::capacity");
     REGISTER_KW(is, tombstones,   "Data::HashMap::Shared::IS::tombstones");
     REGISTER_KW(is, take,          "Data::HashMap::Shared::IS::take");
+    REGISTER_KW(is, pop,   "Data::HashMap::Shared::IS::pop");
+    REGISTER_KW(is, shift, "Data::HashMap::Shared::IS::shift");
+    REGISTER_KW(is, drain, "Data::HashMap::Shared::IS::drain");
     REGISTER_KW(is, flush_expired, "Data::HashMap::Shared::IS::flush_expired");
     REGISTER_KW(is, flush_expired_partial, "Data::HashMap::Shared::IS::flush_expired_partial");
     REGISTER_KW(is, mmap_size,     "Data::HashMap::Shared::IS::mmap_size");
@@ -742,6 +906,13 @@ BOOT:
     REGISTER_KW(is, stat_evictions,  "Data::HashMap::Shared::IS::stat_evictions");
     REGISTER_KW(is, stat_expired,    "Data::HashMap::Shared::IS::stat_expired");
     REGISTER_KW(is, stat_recoveries, "Data::HashMap::Shared::IS::stat_recoveries");    
+    REGISTER_KW(is, arena_used,       "Data::HashMap::Shared::IS::arena_used");
+    REGISTER_KW(is, arena_cap,        "Data::HashMap::Shared::IS::arena_cap");
+    REGISTER_KW(is, add,              "Data::HashMap::Shared::IS::add");
+    REGISTER_KW(is, update,           "Data::HashMap::Shared::IS::update");
+    REGISTER_KW(is, swap,             "Data::HashMap::Shared::IS::swap");
+    REGISTER_KW(is, persist,         "Data::HashMap::Shared::IS::persist");
+    REGISTER_KW(is, set_ttl,         "Data::HashMap::Shared::IS::set_ttl");
     REGISTER_KW(si16, put,         "Data::HashMap::Shared::SI16::put");
     REGISTER_KW(si16, get,         "Data::HashMap::Shared::SI16::get");
     REGISTER_KW(si16, remove,      "Data::HashMap::Shared::SI16::remove");
@@ -770,6 +941,9 @@ BOOT:
     REGISTER_KW(si16, capacity,     "Data::HashMap::Shared::SI16::capacity");
     REGISTER_KW(si16, tombstones,   "Data::HashMap::Shared::SI16::tombstones");
     REGISTER_KW(si16, take,          "Data::HashMap::Shared::SI16::take");
+    REGISTER_KW(si16, pop,   "Data::HashMap::Shared::SI16::pop");
+    REGISTER_KW(si16, shift, "Data::HashMap::Shared::SI16::shift");
+    REGISTER_KW(si16, drain, "Data::HashMap::Shared::SI16::drain");
     REGISTER_KW(si16, flush_expired, "Data::HashMap::Shared::SI16::flush_expired");
     REGISTER_KW(si16, flush_expired_partial, "Data::HashMap::Shared::SI16::flush_expired_partial");
     REGISTER_KW(si16, mmap_size,     "Data::HashMap::Shared::SI16::mmap_size");
@@ -778,6 +952,14 @@ BOOT:
     REGISTER_KW(si16, stat_evictions,  "Data::HashMap::Shared::SI16::stat_evictions");
     REGISTER_KW(si16, stat_expired,    "Data::HashMap::Shared::SI16::stat_expired");
     REGISTER_KW(si16, stat_recoveries, "Data::HashMap::Shared::SI16::stat_recoveries");    
+    REGISTER_KW(si16, arena_used,       "Data::HashMap::Shared::SI16::arena_used");
+    REGISTER_KW(si16, arena_cap,        "Data::HashMap::Shared::SI16::arena_cap");
+    REGISTER_KW(si16, add,              "Data::HashMap::Shared::SI16::add");
+    REGISTER_KW(si16, update,           "Data::HashMap::Shared::SI16::update");
+    REGISTER_KW(si16, swap,             "Data::HashMap::Shared::SI16::swap");
+    REGISTER_KW(si16, cas,             "Data::HashMap::Shared::SI16::cas");
+    REGISTER_KW(si16, persist,         "Data::HashMap::Shared::SI16::persist");
+    REGISTER_KW(si16, set_ttl,         "Data::HashMap::Shared::SI16::set_ttl");
     REGISTER_KW(si32, put,         "Data::HashMap::Shared::SI32::put");
     REGISTER_KW(si32, get,         "Data::HashMap::Shared::SI32::get");
     REGISTER_KW(si32, remove,      "Data::HashMap::Shared::SI32::remove");
@@ -806,6 +988,9 @@ BOOT:
     REGISTER_KW(si32, capacity,     "Data::HashMap::Shared::SI32::capacity");
     REGISTER_KW(si32, tombstones,   "Data::HashMap::Shared::SI32::tombstones");
     REGISTER_KW(si32, take,          "Data::HashMap::Shared::SI32::take");
+    REGISTER_KW(si32, pop,   "Data::HashMap::Shared::SI32::pop");
+    REGISTER_KW(si32, shift, "Data::HashMap::Shared::SI32::shift");
+    REGISTER_KW(si32, drain, "Data::HashMap::Shared::SI32::drain");
     REGISTER_KW(si32, flush_expired, "Data::HashMap::Shared::SI32::flush_expired");
     REGISTER_KW(si32, flush_expired_partial, "Data::HashMap::Shared::SI32::flush_expired_partial");
     REGISTER_KW(si32, mmap_size,     "Data::HashMap::Shared::SI32::mmap_size");
@@ -814,6 +999,14 @@ BOOT:
     REGISTER_KW(si32, stat_evictions,  "Data::HashMap::Shared::SI32::stat_evictions");
     REGISTER_KW(si32, stat_expired,    "Data::HashMap::Shared::SI32::stat_expired");
     REGISTER_KW(si32, stat_recoveries, "Data::HashMap::Shared::SI32::stat_recoveries");    
+    REGISTER_KW(si32, arena_used,       "Data::HashMap::Shared::SI32::arena_used");
+    REGISTER_KW(si32, arena_cap,        "Data::HashMap::Shared::SI32::arena_cap");
+    REGISTER_KW(si32, add,              "Data::HashMap::Shared::SI32::add");
+    REGISTER_KW(si32, update,           "Data::HashMap::Shared::SI32::update");
+    REGISTER_KW(si32, swap,             "Data::HashMap::Shared::SI32::swap");
+    REGISTER_KW(si32, cas,             "Data::HashMap::Shared::SI32::cas");
+    REGISTER_KW(si32, persist,         "Data::HashMap::Shared::SI32::persist");
+    REGISTER_KW(si32, set_ttl,         "Data::HashMap::Shared::SI32::set_ttl");
     REGISTER_KW(si, put,         "Data::HashMap::Shared::SI::put");
     REGISTER_KW(si, get,         "Data::HashMap::Shared::SI::get");
     REGISTER_KW(si, remove,      "Data::HashMap::Shared::SI::remove");
@@ -842,6 +1035,9 @@ BOOT:
     REGISTER_KW(si, capacity,     "Data::HashMap::Shared::SI::capacity");
     REGISTER_KW(si, tombstones,   "Data::HashMap::Shared::SI::tombstones");
     REGISTER_KW(si, take,          "Data::HashMap::Shared::SI::take");
+    REGISTER_KW(si, pop,   "Data::HashMap::Shared::SI::pop");
+    REGISTER_KW(si, shift, "Data::HashMap::Shared::SI::shift");
+    REGISTER_KW(si, drain, "Data::HashMap::Shared::SI::drain");
     REGISTER_KW(si, flush_expired, "Data::HashMap::Shared::SI::flush_expired");
     REGISTER_KW(si, flush_expired_partial, "Data::HashMap::Shared::SI::flush_expired_partial");
     REGISTER_KW(si, mmap_size,     "Data::HashMap::Shared::SI::mmap_size");
@@ -850,6 +1046,14 @@ BOOT:
     REGISTER_KW(si, stat_evictions,  "Data::HashMap::Shared::SI::stat_evictions");
     REGISTER_KW(si, stat_expired,    "Data::HashMap::Shared::SI::stat_expired");
     REGISTER_KW(si, stat_recoveries, "Data::HashMap::Shared::SI::stat_recoveries");    
+    REGISTER_KW(si, arena_used,       "Data::HashMap::Shared::SI::arena_used");
+    REGISTER_KW(si, arena_cap,        "Data::HashMap::Shared::SI::arena_cap");
+    REGISTER_KW(si, add,              "Data::HashMap::Shared::SI::add");
+    REGISTER_KW(si, update,           "Data::HashMap::Shared::SI::update");
+    REGISTER_KW(si, swap,             "Data::HashMap::Shared::SI::swap");
+    REGISTER_KW(si, cas,             "Data::HashMap::Shared::SI::cas");
+    REGISTER_KW(si, persist,         "Data::HashMap::Shared::SI::persist");
+    REGISTER_KW(si, set_ttl,         "Data::HashMap::Shared::SI::set_ttl");
     REGISTER_KW(ss, put,         "Data::HashMap::Shared::SS::put");
     REGISTER_KW(ss, get,         "Data::HashMap::Shared::SS::get");
     REGISTER_KW(ss, remove,      "Data::HashMap::Shared::SS::remove");
@@ -875,6 +1079,9 @@ BOOT:
     REGISTER_KW(ss, capacity,     "Data::HashMap::Shared::SS::capacity");
     REGISTER_KW(ss, tombstones,   "Data::HashMap::Shared::SS::tombstones");
     REGISTER_KW(ss, take,          "Data::HashMap::Shared::SS::take");
+    REGISTER_KW(ss, pop,   "Data::HashMap::Shared::SS::pop");
+    REGISTER_KW(ss, shift, "Data::HashMap::Shared::SS::shift");
+    REGISTER_KW(ss, drain, "Data::HashMap::Shared::SS::drain");
     REGISTER_KW(ss, flush_expired, "Data::HashMap::Shared::SS::flush_expired");
     REGISTER_KW(ss, flush_expired_partial, "Data::HashMap::Shared::SS::flush_expired_partial");
     REGISTER_KW(ss, mmap_size,     "Data::HashMap::Shared::SS::mmap_size");
@@ -883,4268 +1090,22 @@ BOOT:
     REGISTER_KW(ss, stat_evictions,  "Data::HashMap::Shared::SS::stat_evictions");
     REGISTER_KW(ss, stat_expired,    "Data::HashMap::Shared::SS::stat_expired");
     REGISTER_KW(ss, stat_recoveries, "Data::HashMap::Shared::SS::stat_recoveries");
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i16_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::I16: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int16_t key, int16_t value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = shm_i16_put(h, key, value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int16_t value;
-        if (!shm_i16_get(h, key, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = shm_i16_remove(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = shm_i16_exists(h, key);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int ok;
-        int16_t val = shm_i16_incr_by(h, key, 1, &ok);
-        if (!ok) croak("HashMap::Shared::I16: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int ok;
-        int16_t val = shm_i16_incr_by(h, key, -1, &ok);
-        if (!ok) croak("HashMap::Shared::I16: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, int16_t key, int16_t delta)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int ok;
-        int16_t val = shm_i16_incr_by(h, key, delta, &ok);
-        if (!ok) croak("HashMap::Shared::I16: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16 *nodes = (ShmNodeI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].key);
-        }
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16 *nodes = (ShmNodeI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].value);
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16 *nodes = (ShmNodeI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                mXPUSHi(nodes[i].key);
-                mXPUSHi(nodes[i].value);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int16_t out_key, out_value;
-        if (shm_i16_each(h, &out_key, &out_value)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        shm_i16_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        shm_i16_iter_reset(h);
-        shm_i16_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        shm_i16_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16 *nodes = (ShmNodeI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                SV* val = newSViv(nodes[i].value);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)nodes[i].key);
-                if (!hv_store(hv, kbuf, klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int16_t key, int16_t default_value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int16_t out;
-        int rc = shm_i16_get_or_set(h, key, default_value, &out);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSViv(out);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int16_t key, int16_t value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        REQUIRE_TTL(h);
-        RETVAL = shm_i16_put_ttl(h, key, value, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-take(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int16_t out_value;
-        if (!shm_i16_take(h, key, &out_value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(out_value);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_i16_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = shm_i16_touch(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = shm_i16_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::I16 object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::I16->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-SV*
-ttl_remaining(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        int64_t remaining = shm_i16_ttl_remaining(h, key);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        RETVAL = (UV)shm_i16_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::I16::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I16::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_i16_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I16::Cursor", self_sv);
-        int16_t out_key, out_value;
-        if (shm_i16_cursor_next(c, &out_key, &out_value)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I16::Cursor", self_sv);
-        shm_i16_cursor_reset(c);
-
-bool
-seek(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I16::Cursor", self_sv);
-        RETVAL = shm_i16_cursor_seek(c, key);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I32
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i32_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::I32: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int32_t key, int32_t value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = shm_i32_put(h, key, value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int32_t value;
-        if (!shm_i32_get(h, key, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = shm_i32_remove(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = shm_i32_exists(h, key);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int ok;
-        int32_t val = shm_i32_incr_by(h, key, 1, &ok);
-        if (!ok) croak("HashMap::Shared::I32: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int ok;
-        int32_t val = shm_i32_incr_by(h, key, -1, &ok);
-        if (!ok) croak("HashMap::Shared::I32: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, int32_t key, int32_t delta)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int ok;
-        int32_t val = shm_i32_incr_by(h, key, delta, &ok);
-        if (!ok) croak("HashMap::Shared::I32: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32 *nodes = (ShmNodeI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].key);
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32 *nodes = (ShmNodeI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].value);
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32 *nodes = (ShmNodeI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                mXPUSHi(nodes[i].key);
-                mXPUSHi(nodes[i].value);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int32_t out_key, out_value;
-        if (shm_i32_each(h, &out_key, &out_value)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        shm_i32_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        shm_i32_iter_reset(h);
-        shm_i32_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        shm_i32_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32 *nodes = (ShmNodeI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                SV* val = newSViv(nodes[i].value);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)nodes[i].key);
-                if (!hv_store(hv, kbuf, klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int32_t key, int32_t default_value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int32_t out;
-        int rc = shm_i32_get_or_set(h, key, default_value, &out);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSViv(out);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int32_t key, int32_t value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        REQUIRE_TTL(h);
-        RETVAL = shm_i32_put_ttl(h, key, value, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_ttl(h);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-take(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int32_t out_value;
-        if (!shm_i32_take(h, key, &out_value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(out_value);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_i32_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = shm_i32_touch(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = shm_i32_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::I32 object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::I32->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-SV*
-ttl_remaining(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        int64_t remaining = shm_i32_ttl_remaining(h, key);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        RETVAL = (UV)shm_i32_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::I32::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I32::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_i32_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I32::Cursor", self_sv);
-        int32_t out_key; int32_t out_value;
-        if (shm_i32_cursor_next(c, &out_key, &out_value)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I32::Cursor", self_sv);
-        shm_i32_cursor_reset(c);
-
-bool
-seek(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I32::Cursor", self_sv);
-        RETVAL = shm_i32_cursor_seek(c, key);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::II
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_ii_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::II: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int64_t key, int64_t value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = shm_ii_put(h, key, value);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int64_t value;
-        if (!shm_ii_get(h, key, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = shm_ii_remove(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = shm_ii_exists(h, key);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int ok;
-        int64_t val = shm_ii_incr_by(h, key, 1, &ok);
-        if (!ok) croak("HashMap::Shared::II: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int ok;
-        int64_t val = shm_ii_incr_by(h, key, -1, &ok);
-        if (!ok) croak("HashMap::Shared::II: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, int64_t key, int64_t delta)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int ok;
-        int64_t val = shm_ii_incr_by(h, key, delta, &ok);
-        if (!ok) croak("HashMap::Shared::II: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeII *nodes = (ShmNodeII *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].key);
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeII *nodes = (ShmNodeII *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].value);
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeII *nodes = (ShmNodeII *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                mXPUSHi(nodes[i].key);
-                mXPUSHi(nodes[i].value);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int64_t out_key, out_value;
-        if (shm_ii_each(h, &out_key, &out_value)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        shm_ii_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        shm_ii_iter_reset(h);
-        shm_ii_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        shm_ii_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeII *nodes = (ShmNodeII *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                SV* val = newSViv(nodes[i].value);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)nodes[i].key);
-                if (!hv_store(hv, kbuf, klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int64_t key, int64_t default_value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int64_t out;
-        int rc = shm_ii_get_or_set(h, key, default_value, &out);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSViv(out);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int64_t key, int64_t value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        REQUIRE_TTL(h);
-        RETVAL = shm_ii_put_ttl(h, key, value, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_ttl(h);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-take(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int64_t out_value;
-        if (!shm_ii_take(h, key, &out_value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(out_value);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_ii_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = shm_ii_touch(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = shm_ii_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::II object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::II->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-SV*
-ttl_remaining(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        int64_t remaining = shm_ii_ttl_remaining(h, key);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        RETVAL = (UV)shm_ii_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::II", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::II::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::II::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_ii_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::II::Cursor", self_sv);
-        int64_t out_key; int64_t out_value;
-        if (shm_ii_cursor_next(c, &out_key, &out_value)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::II::Cursor", self_sv);
-        shm_ii_cursor_reset(c);
-
-bool
-seek(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::II::Cursor", self_sv);
-        RETVAL = shm_ii_cursor_seek(c, key);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I16S
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i16s_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::I16S: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int16_t key, SV* value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = shm_i16s_put(h, key, _vstr, (uint32_t)_vlen, _vutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int16_t key, SV* value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        EXTRACT_STR_VAL(value);
-        REQUIRE_TTL(h);
-        RETVAL = shm_i16s_put_ttl(h, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (!shm_i16s_get(h, key, &val, &val_len, &val_utf8)) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = shm_i16s_remove(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = shm_i16s_exists(h, key);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16S *nodes = (ShmNodeI16S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].key);
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16S *nodes = (ShmNodeI16S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16S *nodes = (ShmNodeI16S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                mXPUSHi(nodes[i].key);
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        int16_t out_key;
-        const char *out_val; uint32_t out_vlen; bool out_vutf8;
-        if (shm_i16s_each(h, &out_key, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            SV* sv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(sv);
-            mXPUSHs(sv);
-            XSRETURN(2);
-        }
-        shm_i16s_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        shm_i16s_iter_reset(h);
-        shm_i16s_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        shm_i16s_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI16S *nodes = (ShmNodeI16S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                bool vutf8 = SHM_UNPACK_UTF8(nodes[i].val_len);
-                SV* val = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (vutf8) SvUTF8_on(val);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)nodes[i].key);
-                if (!hv_store(hv, kbuf, klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int16_t key, SV* default_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        EXTRACT_STR_VAL(default_sv);
-        int rc = shm_i16s_get_or_set(h, key, _vstr, (uint32_t)_vlen, _vutf8, &out_str, &out_len, &out_utf8);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-ttl_remaining(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        int64_t remaining = shm_i16s_ttl_remaining(h, key);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::I16S::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-SV*
-take(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        if (!shm_i16s_take(h, key, &out_str, &out_len, &out_utf8)) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_i16s_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = shm_i16s_touch(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = shm_i16s_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = (UV)shm_i16s_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I16S", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::I16S object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::I16S->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I16S::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_i16s_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I16S::Cursor", self_sv);
-        int16_t out_key;
-        const char *out_val; uint32_t out_vlen; bool out_vutf8;
-        if (shm_i16s_cursor_next(c, &out_key, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            SV* sv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(sv);
-            mXPUSHs(sv);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I16S::Cursor", self_sv);
-        shm_i16s_cursor_reset(c);
-
-bool
-seek(SV* self_sv, int16_t key)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I16S::Cursor", self_sv);
-        RETVAL = shm_i16s_cursor_seek(c, key);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I32S
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i32s_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::I32S: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int32_t key, SV* value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = shm_i32s_put(h, key, _vstr, (uint32_t)_vlen, _vutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int32_t key, SV* value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        EXTRACT_STR_VAL(value);
-        REQUIRE_TTL(h);
-        RETVAL = shm_i32s_put_ttl(h, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (!shm_i32s_get(h, key, &val, &val_len, &val_utf8)) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = shm_i32s_remove(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = shm_i32s_exists(h, key);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32S *nodes = (ShmNodeI32S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].key);
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32S *nodes = (ShmNodeI32S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32S *nodes = (ShmNodeI32S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                mXPUSHi(nodes[i].key);
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        int32_t out_key;
-        const char *out_val; uint32_t out_vlen; bool out_vutf8;
-        if (shm_i32s_each(h, &out_key, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            SV* sv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(sv);
-            mXPUSHs(sv);
-            XSRETURN(2);
-        }
-        shm_i32s_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        shm_i32s_iter_reset(h);
-        shm_i32s_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        shm_i32s_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeI32S *nodes = (ShmNodeI32S *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                bool vutf8 = SHM_UNPACK_UTF8(nodes[i].val_len);
-                SV* val = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (vutf8) SvUTF8_on(val);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)nodes[i].key);
-                if (!hv_store(hv, kbuf, klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int32_t key, SV* default_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        EXTRACT_STR_VAL(default_sv);
-        int rc = shm_i32s_get_or_set(h, key, _vstr, (uint32_t)_vlen, _vutf8, &out_str, &out_len, &out_utf8);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-ttl_remaining(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        int64_t remaining = shm_i32s_ttl_remaining(h, key);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::I32S::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-SV*
-take(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        if (!shm_i32s_take(h, key, &out_str, &out_len, &out_utf8)) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_i32s_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = shm_i32s_touch(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = shm_i32s_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = (UV)shm_i32s_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::I32S", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::I32S object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::I32S->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::I32S::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_i32s_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I32S::Cursor", self_sv);
-        int32_t out_key;
-        const char *out_val; uint32_t out_vlen; bool out_vutf8;
-        if (shm_i32s_cursor_next(c, &out_key, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            SV* sv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(sv);
-            mXPUSHs(sv);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I32S::Cursor", self_sv);
-        shm_i32s_cursor_reset(c);
-
-bool
-seek(SV* self_sv, int32_t key)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::I32S::Cursor", self_sv);
-        RETVAL = shm_i32s_cursor_seek(c, key);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::IS
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_is_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::IS: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, int64_t key, SV* value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = shm_is_put(h, key, _vstr, (uint32_t)_vlen, _vutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, int64_t key, SV* value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        EXTRACT_STR_VAL(value);
-        REQUIRE_TTL(h);
-        RETVAL = shm_is_put_ttl(h, key, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (!shm_is_get(h, key, &val, &val_len, &val_utf8)) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = shm_is_remove(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = shm_is_exists(h, key);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeIS *nodes = (ShmNodeIS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].key);
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeIS *nodes = (ShmNodeIS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeIS *nodes = (ShmNodeIS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                mXPUSHi(nodes[i].key);
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        int64_t out_key;
-        const char *out_val; uint32_t out_vlen; bool out_vutf8;
-        if (shm_is_each(h, &out_key, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            SV* sv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(sv);
-            mXPUSHs(sv);
-            XSRETURN(2);
-        }
-        shm_is_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        shm_is_iter_reset(h);
-        shm_is_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        shm_is_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeIS *nodes = (ShmNodeIS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                bool vutf8 = SHM_UNPACK_UTF8(nodes[i].val_len);
-                SV* val = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (vutf8) SvUTF8_on(val);
-                char kbuf[24];
-                int klen = my_snprintf(kbuf, sizeof(kbuf), "%" IVdf, (IV)nodes[i].key);
-                if (!hv_store(hv, kbuf, klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, int64_t key, SV* default_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        EXTRACT_STR_VAL(default_sv);
-        int rc = shm_is_get_or_set(h, key, _vstr, (uint32_t)_vlen, _vutf8, &out_str, &out_len, &out_utf8);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-ttl_remaining(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        int64_t remaining = shm_is_ttl_remaining(h, key);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::IS::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-SV*
-take(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        if (!shm_is_take(h, key, &out_str, &out_len, &out_utf8)) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_is_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = shm_is_touch(h, key);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = shm_is_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = (UV)shm_is_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::IS", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::IS object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::IS->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::IS::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_is_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::IS::Cursor", self_sv);
-        int64_t out_key;
-        const char *out_val; uint32_t out_vlen; bool out_vutf8;
-        if (shm_is_cursor_next(c, &out_key, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            mXPUSHi(out_key);
-            SV* sv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(sv);
-            mXPUSHs(sv);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::IS::Cursor", self_sv);
-        shm_is_cursor_reset(c);
-
-bool
-seek(SV* self_sv, int64_t key)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::IS::Cursor", self_sv);
-        RETVAL = shm_is_cursor_seek(c, key);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI16
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si16_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, int16_t value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si16_put(h, _kstr, (uint32_t)_klen, _kutf8, value);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, int16_t value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        REQUIRE_TTL(h);
-        RETVAL = shm_si16_put_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int16_t value;
-        if (!shm_si16_get(h, _kstr, (uint32_t)_klen, _kutf8, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si16_remove(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si16_exists(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int16_t val = shm_si16_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, 1, &ok);
-        if (!ok) croak("HashMap::Shared::SI16: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int16_t val = shm_si16_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, -1, &ok);
-        if (!ok) croak("HashMap::Shared::SI16: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, SV* key_sv, int16_t delta)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int16_t val = shm_si16_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, delta, &ok);
-        if (!ok) croak("HashMap::Shared::SI16: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI16 *nodes = (ShmNodeSI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI16 *nodes = (ShmNodeSI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].value);
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI16 *nodes = (ShmNodeSI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-                mXPUSHi(nodes[i].value);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        const char *out_key; uint32_t out_klen; bool out_kutf8;
-        int16_t out_value;
-        if (shm_si16_each(h, &out_key, &out_klen, &out_kutf8, &out_value)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        shm_si16_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        shm_si16_iter_reset(h);
-        shm_si16_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        shm_si16_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI16 *nodes = (ShmNodeSI16 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                bool kutf8 = SHM_UNPACK_UTF8(nodes[i].key_len);
-                SV* val = newSViv(nodes[i].value);
-                if (!hv_store(hv, h->arena + nodes[i].key_off,
-                               kutf8 ? -(I32)klen : (I32)klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, int16_t default_value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int16_t out;
-        int rc = shm_si16_get_or_set(h, _kstr, (uint32_t)_klen, _kutf8, default_value, &out);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSViv(out);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-take(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int16_t out_value;
-        if (!shm_si16_take(h, _kstr, (uint32_t)_klen, _kutf8, &out_value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(out_value);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_si16_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si16_touch(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = shm_si16_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::SI16 object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::SI16->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-SV*
-ttl_remaining(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t remaining = shm_si16_ttl_remaining(h, _kstr, (uint32_t)_klen, _kutf8);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        RETVAL = (UV)shm_si16_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::SI16::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI16::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_si16_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI16::Cursor", self_sv);
-        const char *out_key; uint32_t out_klen; bool out_kutf8;
-        int16_t out_value;
-        if (shm_si16_cursor_next(c, &out_key, &out_klen, &out_kutf8, &out_value)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI16::Cursor", self_sv);
-        shm_si16_cursor_reset(c);
-
-bool
-seek(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI16::Cursor", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si16_cursor_seek(c, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI32
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si32_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::SI32: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, int32_t value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si32_put(h, _kstr, (uint32_t)_klen, _kutf8, value);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, int32_t value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        REQUIRE_TTL(h);
-        RETVAL = shm_si32_put_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int32_t value;
-        if (!shm_si32_get(h, _kstr, (uint32_t)_klen, _kutf8, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si32_remove(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si32_exists(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int32_t val = shm_si32_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, 1, &ok);
-        if (!ok) croak("HashMap::Shared::SI32: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int32_t val = shm_si32_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, -1, &ok);
-        if (!ok) croak("HashMap::Shared::SI32: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, SV* key_sv, int32_t delta)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int32_t val = shm_si32_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, delta, &ok);
-        if (!ok) croak("HashMap::Shared::SI32: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI32 *nodes = (ShmNodeSI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI32 *nodes = (ShmNodeSI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].value);
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI32 *nodes = (ShmNodeSI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-                mXPUSHi(nodes[i].value);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        const char *out_key; uint32_t out_klen; bool out_kutf8;
-        int32_t out_value;
-        if (shm_si32_each(h, &out_key, &out_klen, &out_kutf8, &out_value)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        shm_si32_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        shm_si32_iter_reset(h);
-        shm_si32_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        shm_si32_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI32 *nodes = (ShmNodeSI32 *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                bool kutf8 = SHM_UNPACK_UTF8(nodes[i].key_len);
-                SV* val = newSViv(nodes[i].value);
-                if (!hv_store(hv, h->arena + nodes[i].key_off,
-                               kutf8 ? -(I32)klen : (I32)klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, int32_t default_value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int32_t out;
-        int rc = shm_si32_get_or_set(h, _kstr, (uint32_t)_klen, _kutf8, default_value, &out);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSViv(out);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-ttl_remaining(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t remaining = shm_si32_ttl_remaining(h, _kstr, (uint32_t)_klen, _kutf8);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::SI32::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-SV*
-take(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int32_t out_value;
-        if (!shm_si32_take(h, _kstr, (uint32_t)_klen, _kutf8, &out_value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(out_value);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_si32_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si32_touch(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = shm_si32_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = (UV)shm_si32_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI32", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::SI32 object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::SI32->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI32::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_si32_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI32::Cursor", self_sv);
-        const char *out_key; uint32_t out_klen; bool out_kutf8;
-        int32_t out_value;
-        if (shm_si32_cursor_next(c, &out_key, &out_klen, &out_kutf8, &out_value)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI32::Cursor", self_sv);
-        shm_si32_cursor_reset(c);
-
-bool
-seek(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI32::Cursor", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si32_cursor_seek(c, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::SI: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, int64_t value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si_put(h, _kstr, (uint32_t)_klen, _kutf8, value);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, int64_t value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        REQUIRE_TTL(h);
-        RETVAL = shm_si_put_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t value;
-        if (!shm_si_get(h, _kstr, (uint32_t)_klen, _kutf8, &value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(value);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si_remove(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si_exists(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int64_t val = shm_si_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, 1, &ok);
-        if (!ok) croak("HashMap::Shared::SI: increment failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-decr(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int64_t val = shm_si_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, -1, &ok);
-        if (!ok) croak("HashMap::Shared::SI: decrement failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-SV*
-incr_by(SV* self_sv, SV* key_sv, int64_t delta)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int ok;
-        int64_t val = shm_si_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, delta, &ok);
-        if (!ok) croak("HashMap::Shared::SI: incr_by failed");
-        RETVAL = newSViv(val);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI *nodes = (ShmNodeSI *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI *nodes = (ShmNodeSI *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now))
-                mXPUSHi(nodes[i].value);
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI *nodes = (ShmNodeSI *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-                mXPUSHi(nodes[i].value);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        const char *out_key; uint32_t out_klen; bool out_kutf8;
-        int64_t out_value;
-        if (shm_si_each(h, &out_key, &out_klen, &out_kutf8, &out_value)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        shm_si_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        shm_si_iter_reset(h);
-        shm_si_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        shm_si_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSI *nodes = (ShmNodeSI *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                bool kutf8 = SHM_UNPACK_UTF8(nodes[i].key_len);
-                SV* val = newSViv(nodes[i].value);
-                if (!hv_store(hv, h->arena + nodes[i].key_off,
-                               kutf8 ? -(I32)klen : (I32)klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, int64_t default_value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t out;
-        int rc = shm_si_get_or_set(h, _kstr, (uint32_t)_klen, _kutf8, default_value, &out);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSViv(out);
-    OUTPUT:
-        RETVAL
-
-
-
-SV*
-ttl_remaining(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t remaining = shm_si_ttl_remaining(h, _kstr, (uint32_t)_klen, _kutf8);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::SI::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-SV*
-take(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t out_value;
-        if (!shm_si_take(h, _kstr, (uint32_t)_klen, _kutf8, &out_value)) XSRETURN_UNDEF;
-        RETVAL = newSViv(out_value);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_si_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si_touch(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = shm_si_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = (UV)shm_si_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SI", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::SI object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::SI->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SI::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_si_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI::Cursor", self_sv);
-        const char *out_key; uint32_t out_klen; bool out_kutf8;
-        int64_t out_value;
-        if (shm_si_cursor_next(c, &out_key, &out_klen, &out_kutf8, &out_value)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            mXPUSHi(out_value);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI::Cursor", self_sv);
-        shm_si_cursor_reset(c);
-
-bool
-seek(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SI::Cursor", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_si_cursor_seek(c, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SS
-PROTOTYPES: DISABLE
-
-SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0)
-    CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_ss_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, errbuf);
-        if (!map) croak("HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
-        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_sv)));
-        if (!h) return;
-        shm_close_map(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-bool
-put(SV* self_sv, SV* key_sv, SV* value)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        EXTRACT_STR_VAL(value);
-        RETVAL = shm_ss_put(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-put_ttl(SV* self_sv, SV* key_sv, SV* value, UV ttl_sec)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        EXTRACT_STR_VAL(value);
-        REQUIRE_TTL(h);
-        RETVAL = shm_ss_put_ttl(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl_sec);
-    OUTPUT:
-        RETVAL
-
-UV
-max_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_max_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-ttl(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_ttl(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-get(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        const char* val; uint32_t val_len; bool val_utf8;
-        if (!shm_ss_get(h, _kstr, (uint32_t)_klen, _kutf8, &val, &val_len, &val_utf8))
-            XSRETURN_UNDEF;
-        RETVAL = newSVpvn(val, val_len);
-        if (val_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-bool
-remove(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_ss_remove(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-exists(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_ss_exists(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-UV
-size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_size(h);
-    OUTPUT:
-        RETVAL
-
-UV
-max_entries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_max_entries(h);
-    OUTPUT:
-        RETVAL
-
-void
-keys(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSS *nodes = (ShmNodeSS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-values(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSS *nodes = (ShmNodeSS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* sv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(sv);
-                mXPUSHs(sv);
-            }
-        }
-        
-
-void
-items(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSS *nodes = (ShmNodeSS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        EXTEND(SP, hdr->size * 2);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                SV* ksv = newSVpvn(h->arena + nodes[i].key_off, klen);
-                if (SHM_UNPACK_UTF8(nodes[i].key_len)) SvUTF8_on(ksv);
-                mXPUSHs(ksv);
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                SV* vsv = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (SHM_UNPACK_UTF8(nodes[i].val_len)) SvUTF8_on(vsv);
-                mXPUSHs(vsv);
-            }
-        }
-        
-
-void
-each(SV* self_sv)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        const char *out_key, *out_val;
-        uint32_t out_klen, out_vlen;
-        bool out_kutf8, out_vutf8;
-        if (shm_ss_each(h, &out_key, &out_klen, &out_kutf8, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            SV* vsv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(vsv);
-            mXPUSHs(vsv);
-            XSRETURN(2);
-        }
-        shm_ss_flush_deferred(h);
-        XSRETURN_EMPTY;
-
-void
-iter_reset(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        shm_ss_iter_reset(h);
-        shm_ss_flush_deferred(h);
-
-void
-clear(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        shm_ss_clear(h);
-
-SV*
-to_hash(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        HV* hv = newHV();
-        ShmHeader *hdr = h->hdr;
-        ShmNodeSS *nodes = (ShmNodeSS *)h->nodes;
-        uint32_t now = h->expires_at ? (uint32_t)time(NULL) : 0;
-        RDLOCK_GUARD(hdr);
-        for (uint32_t i = 0; i < hdr->table_cap; i++) {
-            if (h->states[i] == SHM_LIVE && !SHM_IS_EXPIRED(h, i, now)) {
-                uint32_t klen = SHM_UNPACK_LEN(nodes[i].key_len);
-                bool kutf8 = SHM_UNPACK_UTF8(nodes[i].key_len);
-                uint32_t vlen = SHM_UNPACK_LEN(nodes[i].val_len);
-                bool vutf8 = SHM_UNPACK_UTF8(nodes[i].val_len);
-                SV* val = newSVpvn(h->arena + nodes[i].val_off, vlen);
-                if (vutf8) SvUTF8_on(val);
-                if (!hv_store(hv, h->arena + nodes[i].key_off,
-                               kutf8 ? -(I32)klen : (I32)klen, val, 0)) SvREFCNT_dec(val);
-            }
-        }
-        
-        RETVAL = newRV_noinc((SV*)hv);
-    OUTPUT:
-        RETVAL
-
-SV*
-get_or_set(SV* self_sv, SV* key_sv, SV* default_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        EXTRACT_STR_VAL(default_sv);
-        int rc = shm_ss_get_or_set(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8, &out_str, &out_len, &out_utf8);
-        if (!rc) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-
-SV*
-ttl_remaining(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        int64_t remaining = shm_ss_ttl_remaining(h, _kstr, (uint32_t)_klen, _kutf8);
-        if (remaining < 0) XSRETURN_UNDEF;
-        RETVAL = newSViv(remaining);
-    OUTPUT:
-        RETVAL
-
-UV
-capacity(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_capacity(h);
-    OUTPUT:
-        RETVAL
-
-UV
-tombstones(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_tombstones(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-cursor(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        ShmCursor* c = shm_cursor_create(h);
-        if (!c) croak("Failed to allocate cursor");
-        RETVAL = sv_setref_pv(newSV(0), "Data::HashMap::Shared::SS::Cursor", (void*)c);
-    OUTPUT:
-        RETVAL
-
-SV*
-take(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        const char *out_str; uint32_t out_len; bool out_utf8;
-        if (!shm_ss_take(h, _kstr, (uint32_t)_klen, _kutf8, &out_str, &out_len, &out_utf8)) XSRETURN_UNDEF;
-        RETVAL = newSVpvn(out_str, out_len);
-        if (out_utf8) SvUTF8_on(RETVAL);
-    OUTPUT:
-        RETVAL
-
-UV
-flush_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_flush_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-void
-flush_expired_partial(SV* self_sv, UV limit)
-    PPCODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        int done = 0;
-        uint32_t flushed = shm_ss_flush_expired_partial(h, (uint32_t)limit, &done);
-        EXTEND(SP, 2);
-        mPUSHu(flushed);
-        mPUSHi(done);
-
-UV
-mmap_size(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_mmap_size(h);
-    OUTPUT:
-        RETVAL
-
-
-bool
-touch(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_ss_touch(h, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
-bool
-reserve(SV* self_sv, UV target)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = shm_ss_reserve(h, (uint32_t)target);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_evictions(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_stat_evictions(h);
-    OUTPUT:
-        RETVAL
-
-UV
-stat_expired(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_stat_expired(h);
-    OUTPUT:
-        RETVAL
-
-
-
-UV
-stat_recoveries(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = (UV)shm_ss_stat_recoveries(h);
-    OUTPUT:
-        RETVAL
-
-SV*
-path(SV* self_sv)
-    CODE:
-        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = newSVpv(h->path, 0);
-    OUTPUT:
-        RETVAL
-
-
-bool
-unlink(SV* self_or_class, ...)
-    CODE:
-        const char *p;
-        if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
-            ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
-            if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::SS object");
-            p = h->path;
-        } else {
-            if (items < 2) croak("Usage: Data::HashMap::Shared::SS->unlink($path)");
-            p = SvPV_nolen(ST(1));
-        }
-        RETVAL = shm_unlink_path(p);
-    OUTPUT:
-        RETVAL
-
-MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SS::Cursor
-PROTOTYPES: DISABLE
-
-void
-DESTROY(SV* self_sv)
-    CODE:
-        if (!SvROK(self_sv)) return;
-        ShmCursor* c = INT2PTR(ShmCursor*, SvIV(SvRV(self_sv)));
-        if (!c) return;
-        ShmHandle* h = c->handle;
-        shm_cursor_destroy(c);
-        if (h) shm_ss_flush_deferred(h);
-        sv_setiv(SvRV(self_sv), 0);
-
-void
-next(SV* self_sv)
-    PPCODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SS::Cursor", self_sv);
-        const char *out_key, *out_val;
-        uint32_t out_klen, out_vlen;
-        bool out_kutf8, out_vutf8;
-        if (shm_ss_cursor_next(c, &out_key, &out_klen, &out_kutf8, &out_val, &out_vlen, &out_vutf8)) {
-            EXTEND(SP, 2);
-            SV* ksv = newSVpvn(out_key, out_klen);
-            if (out_kutf8) SvUTF8_on(ksv);
-            mXPUSHs(ksv);
-            SV* vsv = newSVpvn(out_val, out_vlen);
-            if (out_vutf8) SvUTF8_on(vsv);
-            mXPUSHs(vsv);
-            XSRETURN(2);
-        }
-        XSRETURN_EMPTY;
-
-void
-reset(SV* self_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SS::Cursor", self_sv);
-        shm_ss_cursor_reset(c);
-
-bool
-seek(SV* self_sv, SV* key_sv)
-    CODE:
-        EXTRACT_CURSOR("Data::HashMap::Shared::SS::Cursor", self_sv);
-        EXTRACT_STR_KEY(key_sv);
-        RETVAL = shm_ss_cursor_seek(c, _kstr, (uint32_t)_klen, _kutf8);
-    OUTPUT:
-        RETVAL
-
+    REGISTER_KW(ss, arena_used,       "Data::HashMap::Shared::SS::arena_used");
+    REGISTER_KW(ss, arena_cap,        "Data::HashMap::Shared::SS::arena_cap");
+    REGISTER_KW(ss, add,              "Data::HashMap::Shared::SS::add");
+    REGISTER_KW(ss, update,           "Data::HashMap::Shared::SS::update");
+    REGISTER_KW(ss, swap,             "Data::HashMap::Shared::SS::swap");
+    REGISTER_KW(ss, persist,         "Data::HashMap::Shared::SS::persist");
+    REGISTER_KW(ss, set_ttl,         "Data::HashMap::Shared::SS::set_ttl");
+
+
+INCLUDE: xs/i16.xs
+INCLUDE: xs/i32.xs
+INCLUDE: xs/ii.xs
+INCLUDE: xs/i16s.xs
+INCLUDE: xs/i32s.xs
+INCLUDE: xs/is.xs
+INCLUDE: xs/si16.xs
+INCLUDE: xs/si32.xs
+INCLUDE: xs/si.xs
+INCLUDE: xs/ss.xs

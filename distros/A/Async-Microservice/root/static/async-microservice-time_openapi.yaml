@@ -36,7 +36,7 @@ paths:
         500:
           $ref: '#/components/responses/Internal-Server-Error'
     post:
-      description: "Get date-time from epoch"
+      description: "Get date and time from epoch"
       requestBody:
         content:
           'application/json':
@@ -126,7 +126,7 @@ paths:
           $ref: '#/components/responses/Internal-Server-Error'
   '/epoch':
     get:
-      description: 'get number of seconds since 1970-01-01T00:00:00'
+      description: 'Get the number of seconds since 1970-01-01T00:00:00'
       responses:
         200:
           description: 'epoch seconds'
@@ -138,11 +138,13 @@ paths:
                   epoch:
                     type: integer
                     example: 1586355387
+        405:
+          $ref: '#/components/responses/Method-Not-Allowed'
         500:
           $ref: '#/components/responses/Internal-Server-Error'
   '/sleep':
     get:
-      description: 'Sleep request'
+      description: 'Sleep endpoint'
       parameters:
         - name: duration
           in: query
@@ -152,6 +154,7 @@ paths:
             type: number
             default: 'random number < 10 && > 0'
             minimum: 0
+            maximum: 60
             exclusiveMinimum: true
       responses:
         200:
@@ -182,9 +185,11 @@ paths:
           description: 'healthy'
           content:
             'text/plain':
-              example: 'CRS::Somed::Att::Service'
+              example: 'Async::Microservice::Time'
             'application/json':
               example: '{"data": "Service-name: async-microservice-time\nAPI-version: 1\nOK\n"}'
+        405:
+          $ref: '#/components/responses/Method-Not-Allowed'
         503:
           description: 'unhealthy'
           content:
@@ -194,13 +199,27 @@ paths:
               example: '{"data": "shutting down"}'
 components:
   responses:
+    'Method-Not-Allowed':
+      description: 'Method not allowed for this route.'
+      headers:
+        Allow:
+          description: 'Comma-separated list of allowed HTTP methods for the route.'
+          schema:
+            type: string
+            example: 'GET, POST'
+      content:
+        'text/plain':
+          example: 'method not allowed'
+        'application/json':
+          schema:
+            $ref: '#/components/schemas/Error-Response'
     'Internal-Server-Error':
       description: 'Internal server error.'
       content:
         'text/plain':
           example: 'Some exception at lib/Async/Microservice/Time.pm line 42.'
     'Input-Processing-Error':
-      description: 'Input processing error'
+      description: 'Input processing error for a supported HTTP method.'
       content:
         'application/json':
           schema:

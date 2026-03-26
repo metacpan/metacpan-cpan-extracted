@@ -1,5 +1,59 @@
 Revision history for CXC-Data-Visitor
 
+0.12      2026-03-24 11:55:32 EDT
+
+    * No changes from 0.11; promote to production.
+
+0.11      2026-02-19 18:05:46 EST (TRIAL RELEASE)
+
+  [API]
+
+    * RESULT_REVISIT_CONTAINER is deprecated in favor of
+      RESULT_REVISIT_CONTENTS.
+
+  [ENHANCEMENT]
+
+    * the root structure may now be explicitly visited (previously
+      only its contents were visited) by passing VISIT_ROOT as
+      the 'visit' parameter.
+
+    * new traversal directive, RESULT_REVISIT_ROOT, immediately restarts
+      the traversal at the root structure.
+
+  [DOCUMENTATION]
+
+    * lots of changes
+
+0.10      2026-02-18 10:28:32-05:00 America/New_York (TRIAL RELEASE)
+
+  [ENHANCEMENT]
+
+    * traversal directives RESULT_CONTINUE and RESULT_STOP_DESCENT may
+      be combined with RESULT_REVISIT_CONTAINER
+
+    * new metadata fields:
+      * visit: which scan (visit/revisit) of a container is underway
+      * idx: the order of the current element in the container
+
+  [DOCUMENTATION]
+
+    * example traversal paths are automatically generated
+
+0.09      2026-02-09 17:51:04-05:00 America/New_York (TRIAL RELEASE)
+
+  [API]
+
+    * sort_keys is deprecated; use key_sort or idx_sort
+
+  [ENHANCEMENT]
+
+    * new options key_sort & idx_sort for specifiying
+      how to traverse hashes and arrays provides much
+      more efficient alternative ordering.  key sorting
+      can be turned off.
+
+    * improved docs.
+
 0.08      2025-07-07 13:46:35-04:00 America/New_York
 
   [BUILD]

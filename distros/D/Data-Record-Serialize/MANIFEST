@@ -8,6 +8,7 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+README.md
 dist.ini
 hgrc
 lib/Data/Record/Serialize.pm
@@ -29,7 +30,6 @@ lib/Data/Record/Serialize/Sink/null.pm
 lib/Data/Record/Serialize/Sink/stream.pm
 lib/Data/Record/Serialize/Types.pm
 lib/Data/Record/Serialize/Util.pm
-mutagen.yml
 perlcritic.rc
 perltidy.rc
 t/00-compile.t
@@ -52,6 +52,7 @@ t/field_type_selection.t
 t/field_types.t
 t/lib/My/Test/Encode/both.pm
 t/lib/My/Test/Encode/store.pm
+t/lib/My/Test/Encode/tsv.pm
 t/lib/My/Test/Encode/types_nis.pm
 t/lib/My/Test/Encode/types_ns.pm
 t/lib/My/Test/Encode/workflow.pm
@@ -59,11 +60,13 @@ t/lib/My/Test/Util.pm
 t/nullify.t
 t/numify.t
 t/stream.t
+t/stream/flush.t
 t/stringify.t
 t/workflow.t
 templates/CONTRIBUTING.md
 tidyall.ini
 weaver.ini
+xt/author/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/critic.t
 xt/author/no-breakpoints.t
@@ -77,4 +80,3 @@ xt/release/dist-manifest.t
 xt/release/fixme.t
 xt/release/meta-json.t
 xt/release/trailing-space.t
-xt/release/unused-vars.t

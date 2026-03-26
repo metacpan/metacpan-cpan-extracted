@@ -2,7 +2,7 @@ package Data::HashMap::Shared::SI32;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
     $^H{"Data::HashMap::Shared::SI32/shm_si32_put"}        = 1;
@@ -33,6 +33,9 @@ sub import {
     $^H{"Data::HashMap::Shared::SI32/shm_si32_tombstones"}   = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_cursor_reset"} = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_take"}           = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_pop"}           = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_shift"}           = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_drain"}           = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_flush_expired"}  = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_flush_expired_partial"} = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_mmap_size"}      = 1;
@@ -41,6 +44,14 @@ sub import {
     $^H{"Data::HashMap::Shared::SI32/shm_si32_stat_evictions"}  = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_stat_expired"}    = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_stat_recoveries"}    = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_arena_used"}       = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_arena_cap"}        = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_add"}              = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_update"}           = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_swap"}             = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_cas"}             = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_persist"}         = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_set_ttl"}         = 1;
 }
 
 1;

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use POSIX ();
 use Data::HashMap::Shared::II;
 
 my $path = '/tmp/demo_multi.shm';
@@ -18,7 +19,7 @@ for my $n (1 .. $nprocs) {
         for (1 .. $iters) {
             shm_ii_incr $child, 1;
         }
-        exit 0;
+        POSIX::_exit(0);
     }
 }
 

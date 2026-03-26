@@ -1,5 +1,56 @@
 Revision history for DB::Handy
 
+1.07  2026-03-24 JST (Japan Standard Time)
+
+    Code:
+    - lib/DB/Handy.pm: added "use 5.00503" declaration before use strict
+      (aligned with HTTP-Handy 1.02 and LTSV-LINQ 1.06 style).
+
+    Documentation:
+    - lib/DB/Handy.pm: POD =head1 VERSION corrected from "Version 1.00"
+      to "Version 1.07" (was never updated from initial release).
+    - lib/DB/Handy.pm: TABLE OF CONTENTS fixed: added missing
+      INCLUDED DOCUMENTATION entry; removed phantom AUTHOR and
+      COPYRIGHT AND LICENSE entries; corrected section order so
+      ATTRIBUTES appears before METHODS - Low-level API; changed
+      " - " separator to " -- " (aligned with HTTP-Handy style).
+    - lib/DB/Handy.pm: DIAGNOSTICS expanded with ten new =item C<>
+      entries: "Database already exists/does not exist",
+      "Cannot open/create/drop base_dir/database/dat/schema",
+      "DB::Handy connect failed", "DB::Handy: <message>".
+    - eg/crud_sample.pl: removed shebang (#!/usr/bin/perl); corrected
+      header comment filename from "01_crud_sample.pl" to
+      "crud_sample.pl"; added CVE-2016-1238 mitigation
+      (BEGIN { pop @INC }).
+    - eg/db_dump.pl: removed shebang; added CVE-2016-1238 mitigation;
+      added FindBin / use lib boilerplate (aligned with crud_sample.pl
+      and LTSV-LINQ eg/ style).
+    - t/0005-cpan_precheck.t: extended file scan to include eg/*.pl
+      in addition to .pm and .t files (D/E/C checks now cover example
+      scripts, aligned with HTTP-Handy 1.02 and LTSV-LINQ 1.06).
+    - t/0005-cpan_precheck.t: added L check group (L1-L10): use 5.00503
+      presence (L1), header pragma order (L2), TABLE OF CONTENTS
+      completeness/phantom/order (L3), DIAGNOSTICS coverage of all
+      die/croak/$errstr messages (L4), eg/ no shebang (L5), eg/
+      CVE-2016-1238 mitigation (L6), eg/ FindBin (L7), eg/ header
+      comment filename (L8), doc/ native script per language (L9),
+      doc/ consecutive section numbers (L10).
+    - t/0004-perl5compat.t: added P13: prohibit @- / @+ / $-[N] /
+      $+[N] special variables (Perl 5.6+); applied to all .pm, .t,
+      and eg/*.pl files.  These variables caused failures when the test
+      suite was run under Perl 5.005_03 (pmake test).
+    - t/9001-load.t through t/9080-cheatsheets.t (new): second-generation
+      test suite using t/lib/INA_CPAN_Check.pm shared library.
+      9001: library load/export; 9010: encoding; 9020: Perl 5.005_03
+      compat (P1-P14, all .pm/.t/eg); 9030: distribution integrity
+      (MANIFEST/version/META/Changes/Makefile.PL/test consistency);
+      9040: coding style (E/K); 9050: POD structure and content (G1-G10
+      incl. VERSION format, TOC position/completeness, DIAGNOSTICS);
+      9060: README sections; 9070: eg/ quality (E1-E6 incl. Demonstrates
+      vs actual methods); 9080: doc/ cheat sheets (native script, section
+      order, header tag).
+    - MANIFEST: added t/lib/INA_CPAN_Check.pm and t/9001-t/9080.
+
 1.06  2026-03-22 JST (Japan Standard Time)
 
     - Added: doc/ directory with SQL cheat sheets in 21 languages

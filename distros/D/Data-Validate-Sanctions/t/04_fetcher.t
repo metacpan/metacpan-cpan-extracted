@@ -83,7 +83,7 @@ subtest 'EU Sanctions' => sub {
     warnings_like {
         $data = Data::Validate::Sanctions::Fetcher::run(%args, eu_url => undef);
     }
-    [qr/EU Sanctions will fail whithout eu_token or eu_url/], 'Correct warning when the EU sanctions token is missing';
+    [qr/EU Sanctions will fail without eu_token or eu_url/], 'Correct warning when the EU sanctions token is missing';
 
     cmp_deeply $data->{$source_name}, {error => ignore()}, 'There is an error in the result';
     like $data->{$source_name}->{error}, qr/Url is empty for EU-Sanctions/, 'Correct error for missing EU url';
@@ -95,15 +95,34 @@ subtest 'EU Sanctions' => sub {
     );
     like $data->{$source_name}->{error},
         qr(\bUser agent MockObject is hit by the url: https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content\?token=ASDF\b),
-        'Token is added to the URL in error message';
+        'Token is added to the default URL when eu_url is not provided';
 
+    # eu_url without token param — token should be appended
     $data = Data::Validate::Sanctions::Fetcher::run(
         %args,
         eu_url   => 'http://dummy.binary.com',
         eu_token => 'ASDF'
     );
-    like $data->{$source_name}->{error}, qr(\bUser agent MockObject is hit by the url: http://dummy.binary.com\b),
-        'eu_url argument is directly used, without eu_token modification';
+    like $data->{$source_name}->{error}, qr(\bUser agent MockObject is hit by the url: http://dummy.binary.com\?token=ASDF\b),
+        'Token is appended to eu_url when url has no token param';
+
+    # eu_url already containing token — should not duplicate
+    $data = Data::Validate::Sanctions::Fetcher::run(
+        %args,
+        eu_url   => 'http://dummy.binary.com?token=EXISTING',
+        eu_token => 'ASDF'
+    );
+    like $data->{$source_name}->{error}, qr(\bUser agent MockObject is hit by the url: http://dummy.binary.com\?token=EXISTING\b),
+        'Token is not duplicated when eu_url already contains a token';
+
+    # eu_url with existing query params but no token — token appended with &
+    $data = Data::Validate::Sanctions::Fetcher::run(
+        %args,
+        eu_url   => 'http://dummy.binary.com?format=xml',
+        eu_token => 'ASDF'
+    );
+    like $data->{$source_name}->{error}, qr(\bUser agent MockObject is hit by the url: http://dummy.binary.com\?format=xml&token=ASDF\b),
+        'Token is appended with & when eu_url already has query params';
 
     $data = Data::Validate::Sanctions::Fetcher::run(%args);
     ok $data->{$source_name}, 'EU Sanctions are loaded from the sample file';
@@ -472,6 +491,57 @@ subtest 'MOHA Sanctions' => sub {
     $entry = find_entry_by_name($parsed_data, "Mohamad Alsaied Alhmidan");
     cmp_deeply $entry->{dob_text}, ["20.2.1976", "13.2.1975", "15.2.1976", "7.1.1977"], "Multiple Date of birth extracted correctly";
 
+};
+
+subtest 'MOHA Sanctions - new xmlResponse format' => sub {
+
+    my $fetcher = Data::Validate::Sanctions::Fetcher::run(
+        %args,
+        moha_url => "file://t/data/sample_moha_v2.xml",
+    );
+
+    my $source_name = 'MOHA-Sanctions';
+    my $parsed_data = $fetcher->{$source_name};
+
+    ok $parsed_data, 'Sanctions are loaded from the new format sample file';
+
+    # New format uses current time as publish date since there is no document creation date
+    ok $parsed_data->{updated} > 0, "Publish date is set";
+
+    my @data = $parsed_data->{content}->@*;
+    is scalar @data, 6, "Number of entries matches the content of the new format sample file (4 individuals + 2 groups)";
+
+    # Test individual with alias
+    my $entry = find_entry_by_name($parsed_data, "Zahar bin Abdullah");
+    ok $entry, "Found Zahar bin Abdullah";
+    cmp_deeply $entry->{names},       ["Zahar bin Abdullah", "Abu Zahar"], "Multiple names extracted correctly from new format";
+    cmp_deeply $entry->{dob_text},    ["24.4.1981"],                       "Date of birth extracted correctly from new format";
+    cmp_deeply $entry->{passport_no}, ["A32987635"],                       "Passport number extracted correctly from new format";
+    cmp_deeply $entry->{national_id}, ["810424-11-5499"],                  "ID number extracted correctly from new format";
+
+    # Can find by alias
+    cmp_deeply find_entry_by_name($parsed_data, "Abu Zahar") == $entry, 1, "Can find entry by alias name in new format";
+
+    # Test individual with multiple DOBs
+    $entry = find_entry_by_name($parsed_data, "Mohamad Alsaied Alhmidan");
+    ok $entry, "Found Mohamad Alsaied Alhmidan";
+    cmp_deeply $entry->{dob_text},    ["20.2.1976", "13.2.1975", "15.2.1976", "7.1.1977"], "Multiple DOBs extracted correctly from new format";
+    cmp_deeply $entry->{passport_no}, ["N010084435"],                                      "Passport extracted correctly for multi-DOB entry";
+
+    # Test individual with multiple passport numbers (/ separator)
+    $entry = find_entry_by_name($parsed_data, "Al Sagheer Yahya Abdo Mahdi");
+    ok $entry, "Found Al Sagheer Yahya Abdo Mahdi";
+    cmp_deeply $entry->{passport_no}, ["08235375", "06515937"], "Multiple passport numbers split correctly on / separator";
+
+    # Test group entry
+    $entry = find_entry_by_name($parsed_data, "Jemaah Islamiyah");
+    ok $entry,                          "Found group entry Jemaah Islamiyah";
+    ok scalar $entry->{names}->@* >= 1, "Group entry has names";
+
+    # Test group entry with other name
+    $entry = find_entry_by_name($parsed_data, "Tanzim Al-Qaeda Malaysia (TAQM)");
+    ok $entry, "Found group entry TAQM";
+    ok((List::Util::any { $_ eq 'TAQM' } $entry->{names}->@*), "Group other name (TAQM) included in names");
 };
 
 sub find_entry_by_name {

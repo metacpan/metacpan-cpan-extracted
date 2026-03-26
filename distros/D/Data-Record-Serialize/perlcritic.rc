@@ -1,34 +1,51 @@
 severity = brutal
-verbose = 9
+verbose = 1
 
 exclude = Freenode
 
 [-BuiltinFunctions::RequireBlockGrep]
 [-BuiltinFunctions::RequireBlockMap]
+[-BuiltinFunctions::ProhibitUniversalIsa]
+
 [-CodeLayout::ProhibitParensWithBuiltins]
+
+[-Community::LoopOnHash]
+[-Community::Prototypes]
+
 [-ControlStructures::ProhibitPostfixControls]
 [-ControlStructures::ProhibitUnlessBlocks]
+
 [-Documentation::PodSpelling]
 [-Documentation::RequirePodAtEnd]
 [-Documentation::RequirePodSections]
+
 [-ErrorHandling::RequireCarping]
+
 [-InputOutput::RequireBriefOpen]
+[-InputOutput::RequireCheckedSyscalls]
+[-InputOutput::RequireBracedFileHandleWithPrint]
 
+[-Modules::ProhibitMultiplePackages]
 [-Modules::ProhibitExcessMainComplexity]
-
 [-NamingConventions::Capitalization]
+
 [-References::ProhibitDoubleSigils]
+
 [-RegularExpressions::RequireDotMatchAnything]
 [-RegularExpressions::RequireExtendedFormatting]
 [-RegularExpressions::RequireLineBoundaryMatching]
+
 [-Subroutines::ProhibitExplicitReturnUndef]
 [-Subroutines::ProhibitSubroutinePrototypes]
 [-Subroutines::ProhibitUnusedPrivateSubroutines]
 [-Subroutines::RequireArgUnpacking]
 [-Subroutines::RequireFinalReturn]
+
 [-TestingAndDebugging::RequireUseStrict]
 [-TestingAndDebugging::RequireUseWarnings]
+
 [-TryTiny::RequireUse]
+
 [-ValuesAndExpressions::ProhibitAccessOfPrivateData]
 [-ValuesAndExpressions::ProhibitConstantPragma]
 [-ValuesAndExpressions::ProhibitFiletest_f]
@@ -37,8 +54,9 @@ exclude = Freenode
 [-ValuesAndExpressions::ProhibitVersionStrings]
 [-ValuesAndExpressions::RequireInterpolationOfMetachars]
 [-ValuesAndExpressions::RequireNumericVersion]
-[-Variables::ProhibitPunctuationVars]
 
+[-Variables::ProhibitPunctuationVars]
+[-Variables::ProhibitLoopOnHash]
 [CodeLayout::RequireTidyCode]
 perltidyrc = perltidy.rc
 

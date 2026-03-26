@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -76,7 +76,7 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =item * Keyword API via XS::Parse::Keyword for maximum speed
 
-=item * Opt-in LRU eviction and per-key TTL (zero cost when disabled)
+=item * Opt-in LRU eviction and per-key TTL (lock-free reads via clock eviction)
 
 =item * Stale lock recovery (automatic detection of dead lock holders via PID tracking)
 
@@ -113,32 +113,67 @@ B<Linux-only>. Requires 64-bit Perl.
     my $map = Data::HashMap::Shared::II->new($path, $max_entries);
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size);
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl);
+    my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip);
 
 Creates or opens a shared hash map backed by file C<$path>.
-C<$max_entries>, C<$max_size>, and C<$ttl> are used only when creating a new
-file; when opening an existing one, all parameters are read from the stored
-header and the constructor arguments are ignored.
+C<$max_entries>, C<$max_size>, C<$ttl>, and C<$lru_skip> are used only when
+creating a new file; when opening an existing one, all parameters are read
+from the stored header and the constructor arguments are ignored.
 Multiple processes can open the same file simultaneously.
 Dies if the file exists but was created by a different variant or is corrupt.
 
 Optional C<$max_size> enables LRU eviction: when the map reaches C<$max_size>
 entries, the least-recently-used entry is evicted on insert. Set to 0 (default)
-to disable. When LRU is active, C<get> promotes the accessed entry, so reads
-take a write lock instead of the lock-free seqlock path.
+to disable. LRU uses a clock/second-chance algorithm: C<get> sets an accessed
+bit (lock-free, no write lock), and eviction gives a second chance to recently
+accessed entries before evicting.
 
 Optional C<$ttl> sets a default time-to-live in seconds for all entries.
 Expired entries are lazily removed on access. Set to 0 (default) to disable.
 When TTL is active, C<get> and C<exists> check expiry.
 
+Optional C<$lru_skip> (0-99, default 0) sets the probability (as a percentage)
+of skipping LRU promotion on C<get>. This reduces write-lock contention for
+Zipfian (power-law) access patterns where a small set of hot keys dominates
+reads. The LRU tail (eviction victim) is never skipped, preserving eviction
+correctness. Set to 0 for strict LRU ordering.
+
 B<Zero-cost when disabled>: with both C<$max_size=0> and C<$ttl=0>, the fast
 lock-free read path is used. The only overhead is a branch (predicted away).
+
+=head2 Sharding
+
+    my $map = Data::HashMap::Shared::II->new_sharded($path_prefix, $shards, $max_entries, ...);
+
+Creates C<$shards> independent maps (files C<$path_prefix.0>, C<$path_prefix.1>,
+...) behind a single handle. Per-key operations automatically route to the
+correct shard via hash dispatch. Writes to different shards proceed in parallel
+with independent locks.
+
+All operations work transparently on sharded maps: C<put>, C<get>, C<remove>,
+C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<cas>,
+C<get_or_set>, C<put_ttl>, C<touch>, C<persist>, C<set_ttl>, C<keys>,
+C<values>, C<items>, C<to_hash>, C<set_multi> (method only),
+C<get_multi> (method only), C<each>,
+C<pop>, C<shift>, C<drain>, C<clear>, C<flush_expired>,
+C<flush_expired_partial>, C<size>, C<stats> (method only), C<reserve>,
+and all diagnostic keywords.
+
+Cursors chain across shards automatically. C<cursor_seek> routes to the
+correct shard based on key hash. C<$shards> is rounded up to the next
+power of 2.
 
 =head2 API
 
 Replace C<xx> with variant prefix: C<i16>, C<i32>, C<ii>, C<i16s>,
 C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
 
-    my $ok = shm_xx_put $map, $key, $value;   # false if table/arena full
+    my $ok = shm_xx_put $map, $key, $value;   # insert or overwrite
+    my $ok = shm_xx_add $map, $key, $value;   # insert only if key absent
+    my $ok = shm_xx_update $map, $key, $value;# overwrite only if key exists
+    my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new)
+    my $n  = $map->set_multi($k, $v, ...);   # batch put under single lock, returns count
+    my @v  = $map->get_multi($k1, $k2, ...); # batch get under single lock with prefetch pipeline
     my $v  = shm_xx_get $map, $key;           # returns undef if not found
     my $ok = shm_xx_remove $map, $key;        # returns false if not found
     my $ok = shm_xx_exists $map, $key;        # returns boolean
@@ -157,6 +192,7 @@ Integer-value variants also have:
 
     my $n = shm_xx_incr $map, $key;           # returns new value
     my $n = shm_xx_decr $map, $key;           # returns new value
+    my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
     my $n = shm_xx_incr_by $map, $key, $delta;
 
 LRU/TTL operations (require TTL-enabled map for C<put_ttl>):
@@ -165,13 +201,24 @@ LRU/TTL operations (require TTL-enabled map for C<put_ttl>):
     my $ms = shm_xx_max_size $map;            # LRU capacity (0 = disabled)
     my $t  = shm_xx_ttl $map;                 # default TTL in seconds
     my $r  = shm_xx_ttl_remaining $map, $key; # seconds left (0 = permanent, undef if missing/expired/no TTL)
-    my $ok = shm_xx_touch $map, $key;         # reset TTL to default_ttl (no-op on permanent entries), promote LRU
+    my $ok = shm_xx_touch $map, $key;         # reset TTL to default_ttl (LRU promotion still occurs on permanent entries); false if no TTL/LRU
+    my $ok = shm_xx_persist $map, $key;       # remove TTL, make key permanent; false on non-TTL maps
+    my $ok = shm_xx_set_ttl $map, $key, $sec; # change TTL without changing value (0 = permanent); false on non-TTL maps
     my $n  = shm_xx_flush_expired $map;       # proactively expire all stale entries, returns count
     my ($n, $done) = shm_xx_flush_expired_partial $map, $limit;  # gradual: scan $limit slots
 
 Atomic remove-and-return:
 
     my $v = shm_xx_take $map, $key;           # remove key and return value (undef if missing)
+    my ($k, $v) = shm_xx_pop $map;            # remove+return from LRU tail / scan forward
+    my ($k, $v) = shm_xx_shift $map;         # remove+return from LRU head / scan backward
+    my @kv = shm_xx_drain $map, $n;           # remove+return up to N entries as flat (k,v,...) list
+
+C<pop> and C<shift> remove from opposite ends: C<pop> takes the LRU tail
+(oldest / least recently used) while C<shift> takes the LRU head (newest /
+most recently used). On non-LRU maps, C<pop> scans forward and C<shift>
+scans backward. C<drain> removes in C<pop> order (tail-first).
+Useful for work-queue patterns and batch processing.
 
 Cursors (independent iterators, allow nesting and removal during iteration):
 
@@ -188,12 +235,19 @@ Diagnostics:
 
     my $cap = shm_xx_capacity $map;           # current table capacity (slots)
     my $tb  = shm_xx_tombstones $map;         # tombstone count
+    my $au  = shm_xx_arena_used $map;         # arena bytes used (0 for int-only)
+    my $ac  = shm_xx_arena_cap $map;          # arena total capacity (0 for int-only)
     my $sz  = shm_xx_mmap_size $map;          # backing file size in bytes
     my $ok = shm_xx_reserve $map, $n;          # pre-grow (false if exceeds max)
     my $ev  = shm_xx_stat_evictions $map;     # cumulative LRU eviction count
     my $ex  = shm_xx_stat_expired $map;       # cumulative TTL expiration count
     my $rc  = shm_xx_stat_recoveries $map;   # cumulative stale lock recovery count
     my $p   = $map->path;                     # backing file path (method only)
+    my $s   = $map->stats;                   # hashref with all diagnostics in one call
+    # stats keys: size, capacity, max_entries, tombstones, mmap_size,
+    #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
+
+C<set_multi>, C<stats>, C<path>, and C<unlink> are method-only (no keyword form).
 
 File management:
 
@@ -223,20 +277,29 @@ single process, Linux x86_64.  Run C<perl -Mblib bench/vs.pl 25000> to reproduce
 
     INTEGER KEY -> INTEGER VALUE (Shared::II)
                    Rate BerkeleyDB    LMDB Shared::II
-    INSERT       30/s         30      42       172
-    LOOKUP       37/s         37      36       372
-    INCREMENT    15/s         15      17       164
+    INSERT       31/s         31      46       184
+    LOOKUP       35/s         35      40       383
+    INCREMENT    16/s         16      18       165
 
-    STRING KEY -> STRING VALUE (Shared::SS)
+    STRING KEY -> STRING VALUE, SHORT (inline ≤7B, Shared::SS)
                    Rate FastMmap BerkeleyDB  LMDB SharedMem Shared::SS
-    INSERT       10/s       10       26    31       46         81
-    LOOKUP       10/s       10       33    30      102        151
-    DELETE       13/s       13       14    --       27         45
+    INSERT       11/s       11       26    40       62        130
+    LOOKUP       10/s       10       32    34      146        213
+    DELETE       14/s       14       18    --       32         68
+
+    STRING KEY -> STRING VALUE, LONG (~50-100B, Shared::SS)
+                   Rate BerkeleyDB  LMDB SharedMem Shared::SS
+    INSERT       25/s       25      37       61        133
+    LOOKUP       30/s       30      33      125        229
+
+    LRU CACHE LOOKUP (25K entries, lock-free clock eviction)
+    II plain   350/s    II LRU   373/s  (lock-free, ~6% faster via clock)
+    SS plain   159/s    SS LRU   159/s
 
     CROSS-PROCESS (25K SS entries, 2 processes)
-    READS          Shared::SS  2,594,000/s   SharedMem  1,547,000/s   LMDB    625,000/s
-    WRITES         Shared::SS  2,211,000/s   SharedMem    783,000/s   LMDB    102,000/s
-    MIXED 50/50    Shared::SS  3,705,000/s   SharedMem  1,981,000/s   LMDB    226,000/s
+    READS          Shared::SS  3,250,000/s   SharedMem  1,986,000/s   LMDB    728,000/s
+    WRITES         Shared::SS  2,801,000/s   SharedMem    826,000/s   LMDB     95,000/s
+    MIXED 50/50    Shared::SS  3,691,000/s   SharedMem  1,963,000/s   LMDB    211,000/s
 
 LMDB benchmarked with MDB_WRITEMAP|MDB_NOSYNC|MDB_NOMETASYNC|MDB_NORDAHEAD.
 BerkeleyDB with DB_PRIVATE|128MB cache.
@@ -247,11 +310,17 @@ Key takeaways:
 
 =item * B<10x> faster lookups than LMDB for integer keys (lock-free seqlock path)
 
-=item * B<1.5x> faster than Hash::SharedMem for string lookups
+=item * B<1.5x> faster than Hash::SharedMem for short string lookups (inline strings, no arena overhead)
 
-=item * B<4x> faster cross-process reads than LMDB; B<3x> faster writes than SharedMem
+=item * B<1.8x> faster than Hash::SharedMem for long string lookups
 
-=item * Atomic C<incr> is B<10x> faster than get+put on competitors
+=item * B<4.5x> faster cross-process reads than LMDB; B<3.4x> faster writes than SharedMem
+
+=item * LRU reads are lock-free (clock eviction) — no overhead vs plain maps
+
+=item * Atomic C<incr> is B<9x> faster than get+put on competitors
+
+=item * Strings E<le> 7 bytes stored inline in node (zero arena overhead)
 
 =back
 

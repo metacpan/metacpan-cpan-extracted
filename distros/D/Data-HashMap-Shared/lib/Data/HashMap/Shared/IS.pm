@@ -2,7 +2,7 @@ package Data::HashMap::Shared::IS;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
     $^H{"Data::HashMap::Shared::IS/shm_is_put"}        = 1;
@@ -30,6 +30,9 @@ sub import {
     $^H{"Data::HashMap::Shared::IS/shm_is_tombstones"}   = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_cursor_reset"} = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_take"}           = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_pop"}           = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_shift"}           = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_drain"}           = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_flush_expired"}  = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_flush_expired_partial"} = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_mmap_size"}      = 1;
@@ -38,6 +41,13 @@ sub import {
     $^H{"Data::HashMap::Shared::IS/shm_is_stat_evictions"}  = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_stat_expired"}    = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_stat_recoveries"}    = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_arena_used"}       = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_arena_cap"}        = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_add"}              = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_update"}           = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_swap"}             = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_persist"}         = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_set_ttl"}         = 1;
 }
 
 1;

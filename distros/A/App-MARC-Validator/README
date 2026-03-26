@@ -2,7 +2,7 @@ NAME
     marc-validator - Tool to validate records in MARC file.
 
 SYNOPSIS
-     marc-validator [-d] [-h] [-i id] [-l] [-o output_file] [-p] [-r] [-v] [--version] marc_xml_file..
+     marc-validator [-d] [-h] [-i id] [-l] [-o output_file] [-p] [-r] [-u use_string] [-v] [--version] marc_xml_file..
 
 DESCRIPTION
     Tool to validate dataset from MARC record collections.
@@ -42,6 +42,14 @@ ARGUMENTS
     *       "-r"
 
             Reccomendations.
+
+    *       "-u use_string"
+
+            Use string to prefer plugin or filter.
+
+            Format of string is type:name,type:name,... Type could be
+            'plugin' or 'filter' and name is full Perl module name of
+            plugin.
 
     *       "-v"
 
@@ -83,5 +91,5 @@ ACKNOWLEDGEMENTS
     Linked Open Data.
 
 VERSION
-    0.06
+    0.07
 

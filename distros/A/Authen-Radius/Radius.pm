@@ -18,13 +18,16 @@ package Authen::Radius;
 
 use strict;
 use warnings;
+
 use v5.10;
+
 use FileHandle;
 use IO::Socket;
 use IO::Select;
 use Digest::MD5;
 use Data::Dumper;
 use Data::HexDump;
+use English qw($OS_ERROR);
 use Net::IP qw(ip_bintoip ip_compress_address ip_expand_address ip_iptobin);
 use Time::HiRes qw(time);
 
@@ -39,7 +42,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.33';
+$VERSION = '0.35';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0
@@ -172,15 +175,16 @@ sub new {
         $self->{'node_addr_a'} = $ip.':'.$port;
 
         my %io_sock_args = (
-            Type => SOCK_DGRAM,
-            Proto => 'udp',
-            Timeout => $self->{'timeout'},
-            LocalAddr => $self->{'localaddr'},
-            PeerAddr => $host,
-            PeerPort => $port,
+            Type      => SOCK_DGRAM,
+            Proto     => 'udp',
+            Timeout   => $self->{timeout},
+            LocalAddr => $self->{localaddr},
+            PeerAddr  => $host,
+            PeerPort  => $port,
         );
-        $self->{'sock'} = IO::Socket::INET->new(%io_sock_args)
-            or return $self->set_error('ESOCKETFAIL', $@);
+
+        $self->{sock} = IO::Socket::INET->new(%io_sock_args)
+            or return $self->set_error('ESOCKETFAIL', $IO::Socket::errstr);
     }
 
     return $self;
@@ -233,38 +237,56 @@ sub send_packet {
         print STDERR "Sending request:\n";
         print STDERR HexDump($data);
     }
+
     my $res;
-    if (!defined($self->{'node_list_a'})) {
-        if ($debug) { print STDERR 'Sending request to: '.$self->{'node_addr_a'}."\n"; }
-        $res = $self->{'sock'}->send($data) || $self->set_error('ESENDFAIL', $!);
+    if (defined($self->{sock})) {
+        $debug and STDERR->say(
+            sprintf 'Sending request to%s: %s',
+            defined($self->{node_list_a}) ? ' active node' : '',
+            $self->{node_addr_a},
+        );
+        $res = $self->{sock}->send($data) || $self->set_error('ESENDFAIL', $OS_ERROR);
+    } elsif (defined($self->{sock_list}) && @{$self->{sock_list}}) {
+        $debug and STDERR->say('Re-sending request to all cluster nodes.');
+        foreach my $sock (@{$self->{sock_list}}) {
+            $debug and STDERR->say('Re-sending request to: '.$sock->peerhost.':'.$sock->peerport);
+            $res = $sock->send($data) || $self->set_error('ESENDFAIL', $OS_ERROR);
+        }
     } else {
-        if (!$retransmit && defined($self->{'sock'})) {
-            if ($debug) { print STDERR 'Sending request to active node: '.$self->{'node_addr_a'}."\n"; }
-            $res = $self->{'sock'}->send($data) || $self->set_error('ESENDFAIL', $!);
-        } else {
-            if ($debug) { print STDERR "ReSending request to all cluster nodes.\n"; }
-            $self->{'sock'} = undef;
-            $self->{'sock_list'} = [];
-            my %io_sock_args = (
-                        Type => SOCK_DGRAM,
-                        Proto => 'udp',
-                        Timeout => $self->{'timeout'},
-                        LocalAddr => $self->{'localaddr'},
-            );
-            foreach my $node (keys %{$self->{'node_list_a'}}) {
-                if ($debug) { print STDERR 'Sending request to: '.$node."\n"; }
-                $io_sock_args{'PeerAddr'} = $self->{'node_list_a'}->{$node}->[0];
-                $io_sock_args{'PeerPort'} = $self->{'node_list_a'}->{$node}->[1];
-                my $new_sock = IO::Socket::INET->new(%io_sock_args)
-                    or return $self->set_error('ESOCKETFAIL', $@);
-                $res = $new_sock->send($data) || $self->set_error('ESENDFAIL', $!);
-                if ($res) {
-                    push @{$self->{'sock_list'}}, $new_sock;
-                }
-                $res ||= $res;
+        $debug and STDERR->say('Sending request to all cluster nodes.');
+
+        # build a lookup of already-open sockets (active node) to reuse
+        my %open_socks;
+        if (defined($self->{sock})) {
+            $open_socks{$self->{node_addr_a}} = $self->{sock};
+            $self->{sock} = undef;
+        }
+
+        my %io_sock_args = (
+            Type      => SOCK_DGRAM,
+            Proto     => 'udp',
+            Timeout   => $self->{timeout},
+            LocalAddr => $self->{localaddr},
+        );
+
+        my $sock_list = $self->{sock_list} = [];
+        foreach my $node (keys %{$self->{node_list_a}}) {
+            $debug and STDERR->say('Sending request to: '.$node);
+
+            my $sock = $open_socks{$node};
+            if (!defined($sock)) {
+                @io_sock_args{qw(PeerAddr PeerPort)} = @{$self->{node_list_a}->{$node}};
+                $sock = IO::Socket::INET->new(%io_sock_args)
+                    or return $self->set_error('ESOCKETFAIL', $IO::Socket::errstr);
+            }
+
+            $res = $sock->send($data) || $self->set_error('ESENDFAIL', $OS_ERROR);
+            if ($res) {
+                push @{$sock_list}, $sock;
             }
         }
     }
+
     return $res;
 }
 
@@ -306,6 +328,11 @@ sub recv_packet {
         print STDERR HexDump($data);
     }
 
+    ($type, $id, $length, $auth, $resp_attributes ) = unpack('C C n a16 a*', $data);
+    if ($detect_bad_id && defined($id) && ($id != $request_id) ) {
+        return $self->set_error('EBADID');
+    }
+
     if (defined($self->{'sock_list'})) {
         # the sending attempt was 'broadcast' to all cluster nodes
         # switching to single active node
@@ -314,11 +341,6 @@ sub recv_packet {
         my ($node_port, $node_iaddr) = sockaddr_in($from_addr_n);
         $self->{'node_addr_a'} = inet_ntoa($node_iaddr).':'.$node_port;
         if ($debug) {  print STDERR "Registering new active peeer:".$self->{'node_addr_a'}."\n"; }
-    }
-
-    ($type, $id, $length, $auth, $resp_attributes ) = unpack('C C n a16 a*', $data);
-    if ($detect_bad_id && defined($id) && ($id != $request_id) ) {
-        return $self->set_error('EBADID');
     }
 
     if ($auth ne $self->calc_authenticator($type, $id, $length, $resp_attributes)) {

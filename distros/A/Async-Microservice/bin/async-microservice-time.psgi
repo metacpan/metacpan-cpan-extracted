@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Plack::Builder;
-
+use Log::Any::Adapter ('Stdout');
 use Async::Microservice::Time;
 
 my $mise = Async::Microservice::Time->new();

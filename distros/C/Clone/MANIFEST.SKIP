@@ -72,3 +72,5 @@
 \.bs$
 \.c$
 CLAUDE.md
+Clone\-.*\.gz
+^local/

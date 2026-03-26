@@ -2,7 +2,7 @@ package Data::HashMap::Shared::I16;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub import {
     $^H{"Data::HashMap::Shared::I16/shm_i16_put"}        = 1;
@@ -33,6 +33,9 @@ sub import {
     $^H{"Data::HashMap::Shared::I16/shm_i16_tombstones"}   = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_cursor_reset"} = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_take"}           = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_pop"}           = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_shift"}           = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_drain"}           = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_flush_expired"}  = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_flush_expired_partial"} = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_mmap_size"}      = 1;
@@ -41,6 +44,14 @@ sub import {
     $^H{"Data::HashMap::Shared::I16/shm_i16_stat_evictions"}  = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_stat_expired"}    = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_stat_recoveries"}    = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_arena_used"}       = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_arena_cap"}        = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_add"}              = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_update"}           = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_swap"}             = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_cas"}             = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_persist"}         = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_set_ttl"}         = 1;
 }
 
 1;

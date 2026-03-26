@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Exporter::Shiny;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 our %EMOJI;
 
@@ -300,6 +300,24 @@ BEGIN {
 	  226, 148, 128, 226, 152, 134,
 	  42, 58, 227, 131, 187, 239, 190, 
 	  159 	  
+	],
+	terrorist => [
+          224, 173, 167, 224, 188, 188, 224, 
+	  178, 160, 231, 155, 138, 224, 178, 
+	  160, 224, 188, 189, 239, 184, 187, 
+	  226, 149, 166, 226, 149, 164, 226, 
+	  148, 128 
+        ],
+	sword => [
+	  111, 40, 41, 120, 120, 120, 120, 91, 
+	  123, 58, 58, 58, 58, 58, 58, 58, 58,
+	  58, 58, 58, 58, 58, 58, 58, 58, 58, 58, 
+	  62
+	],
+	swag => [ 
+	  40, 204, 191, 226, 150, 128, 204, 191, 
+	  226, 128, 191, 226, 128, 137, 204, 191, 
+	  226, 150, 128, 204, 191, 32, 204, 191, 41
 	]
     );
 }
@@ -313,7 +331,7 @@ Acme::AsciiEmoji - Emoji
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
@@ -1257,6 +1275,36 @@ sub dollarbill {
 
 sub wizard {
 	return ascii_emoji('wizard');
+}
+
+=head2 terrorist
+
+୧༼ಠ益ಠ༽︻╦╤─
+
+=cut
+
+sub terrorist {
+	return ascii_emoji('terrorist');
+}
+
+=head2 sword
+
+o()xxxx[{::::::::::::::::::>
+
+=cut
+
+sub sword {
+	return ascii_emoji('sword');
+}
+
+=head2 swag
+
+(̿▀̿‿ ̿▀̿ ̿)
+
+=cut
+
+sub swag {
+	return ascii_emoji('swag');
 }
 
 =head1 AUTHOR

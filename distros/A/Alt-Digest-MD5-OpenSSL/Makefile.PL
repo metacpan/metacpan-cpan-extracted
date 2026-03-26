@@ -18,8 +18,21 @@ WriteMakefile(
 	},
 	LICENSE => 'perl_5',
 	META_MERGE => {
+		'meta-spec' => {
+			version => 2,
+		},
 		no_index => {
 			directory => [qw(lib/Digest)],
+		},
+		resources => {
+			bugtracker  => {
+				web => 'https://github.com/michal-josef-spacek/Alt-Digest-MD5-OpenSSL/issues',
+			},
+			repository => {
+				url => 'git://github.com:michal-josef-spacek/Alt-Digest-MD5-OpenSSL.git',
+				web => 'https://github.com/michal-josef-spacek/Alt-Digest-MD5-OpenSSL',
+				type => 'git',
+			},
 		},
 	},
 	PREREQ_PM => {

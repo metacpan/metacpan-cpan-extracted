@@ -18,7 +18,7 @@ use Digest::SHA qw(sha256_hex);
 use Encode      qw(encode);
 
 use constant MAX_REDIRECTS => 3;
-our $VERSION = '0.20';    # VERSION
+our $VERSION = '0.21';    # VERSION
 
 =head2 config
 
@@ -57,10 +57,15 @@ sub config {
     my $eu_token = $args{eu_token} // $ENV{EU_SANCTIONS_TOKEN};
     my $eu_url   = $args{eu_url} || $ENV{EU_SANCTIONS_URL};
 
-    warn 'EU Sanctions will fail whithout eu_token or eu_url' unless $eu_token or $eu_url;
+    warn 'EU Sanctions will fail without eu_token or eu_url' unless $eu_token or $eu_url;
 
-    if ($eu_token) {
-        $eu_url ||= "https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content?token=$eu_token";
+    my $default_eu_base_url = 'https://webgate.ec.europa.eu/fsd/fsf/public/files/xmlFullSanctionsList_1_1/content';
+
+    if ($eu_url && $eu_token && $eu_url !~ /[?&]token=/) {
+        my $separator = $eu_url =~ /\?/ ? '&' : '?';
+        $eu_url = "${eu_url}${separator}token=${eu_token}";
+    } elsif (!$eu_url && $eu_token) {
+        $eu_url = "${default_eu_base_url}?token=${eu_token}";
     }
 
     return {
@@ -92,9 +97,8 @@ sub config {
         },
         'MOHA-Sanctions' => {
             description => 'MOHA: Sanction list made by the ministry of home affairs Malaysia',
-            url         => $args{moha_url}
-                || 'https://www.moha.gov.my/utama/images/Perkhidmatan%20KDN/Membanteras%20Pembiayaan%20Keganasan/SENARAI_KDN_2025_UPDATE.xml',
-            parser => \&_moha_xml,
+            url         => $args{moha_url} || 'https://www.moha.gov.my/utama/images/Terkini/SENARAI_KDN_2026_BI_1.xml',
+            parser      => \&_moha_xml,
         },
     };
 }
@@ -564,6 +568,114 @@ sub _moha_xml {
         return;
     }
 
+    # Detect new xmlResponse format vs legacy TaggedPDF-doc format
+    if (exists $data->{'xmlResponse'}) {
+        $data = xml2hash($raw_data, array => ['entry', 'field', 'section']);
+        return _moha_xml_new($data);
+    }
+
+    return _moha_xml_legacy($raw_data, $data);
+}
+
+=head2 _moha_xml_new
+
+Parses the new xmlResponse format from MOHA sanctions list.
+
+=cut
+
+sub _moha_xml_new {
+    my $data    = shift;
+    my $dataset = [];
+
+    my $xml = $data->{'xmlResponse'} or die "Invalid MOHA xmlResponse format\n";
+
+    my $publish_epoch = time();
+    my $sections      = $xml->{'section'} // [];
+
+    for my $section (@$sections) {
+        my $entries = $section->{'entry'} // [];
+
+        for my $entry (@$entries) {
+            my $fields = $entry->{'field'} // [];
+
+            my %f;
+            for my $field (@$fields) {
+                my $name  = $field->{'-name'} // '';
+                my $value = $field->{'#text'} // '';
+                # Normalize whitespace in field names (real XML has &#10; newlines between column number and label)
+                $name =~ s/\s+/ /g;
+                $f{$name} = trim($value);
+            }
+
+            my $is_individual = exists $f{'(6) Date of Birth'};
+            my $name          = $f{'(3) Name'} // '';
+            next unless $name && $name ne '-';
+
+            if ($is_individual) {
+                my $dob_raw         = $f{'(6) Date of Birth'}               // '';
+                my $pob             = $f{'(7) Place of Birth'}              // '';
+                my $other_names_raw = $f{'(8) Other Names'}                 // '';
+                my $nationality     = $f{'(9) Nationality'}                 // '';
+                my $passport_raw    = $f{'(10) Passport Number'}            // '';
+                my $id_number       = $f{'(11) Identification Card Number'} // '';
+
+                my @dob;
+                @dob = ($dob_raw =~ /(\d{1,2}\.\d{1,2}\.\d{4})/g) if $dob_raw && $dob_raw ne '-';
+
+                my @other_names;
+                push @other_names, $other_names_raw if $other_names_raw && $other_names_raw ne '-';
+
+                my @passports;
+                @passports = map { trim($_) } split m{/}, $passport_raw if $passport_raw && $passport_raw ne '-';
+
+                my @ids;
+                push @ids, $id_number if $id_number && $id_number ne '-';
+
+                _process_sanction_entry(
+                    $dataset,
+                    names          => [$name, @other_names],
+                    date_of_birth  => \@dob,
+                    place_of_birth => [$pob],
+                    nationality    => [$nationality],
+                    national_id    => \@ids,
+                    passport_no    => \@passports,
+                );
+            } else {
+                my $alias      = $f{'(4) Alias'}      // '';
+                my $other_name = $f{'(5) Other Name'} // '';
+
+                my @names_list = ($name);
+                push @names_list, $alias      if $alias      && $alias ne '-';
+                push @names_list, $other_name if $other_name && $other_name ne '-';
+
+                _process_sanction_entry(
+                    $dataset,
+                    names          => \@names_list,
+                    date_of_birth  => [],
+                    place_of_birth => [],
+                    nationality    => [],
+                    national_id    => [],
+                    passport_no    => [],
+                );
+            }
+        }
+    }
+
+    return {
+        updated => $publish_epoch,
+        content => $dataset,
+    };
+}
+
+=head2 _moha_xml_legacy
+
+Parses the legacy TaggedPDF-doc XML format from MOHA sanctions list.
+
+=cut
+
+sub _moha_xml_legacy {
+    my ($raw_data, $data) = @_;
+
     # Try to find the creation date
     my $publish_date;
 
@@ -629,7 +741,6 @@ sub _moha_xml {
         # Process all data rows
         foreach my $row (@$rows[$start_index .. $#$rows]) {
             # Get cells from a mix of TD and TH tags
-            my $cells;
             my @all_cells;
 
             # Handle TH cells
@@ -650,7 +761,7 @@ sub _moha_xml {
                 }
             }
 
-            $cells = \@all_cells;
+            my $cells = \@all_cells;
             next unless $cells && @$cells >= 11;    # Need at least 11 cells for the required data
 
             my $name                  = $cells->[2]{'P'};

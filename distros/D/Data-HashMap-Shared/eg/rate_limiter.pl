@@ -11,12 +11,9 @@ my $max_requests = 100;
 
 sub check_rate_limit {
     my ($ip) = @_;
-    my $count = shm_si_get_or_set $limits, $ip, 0;
-    if ($count >= $max_requests) {
-        return 0;  # rate limited
-    }
-    shm_si_incr $limits, $ip;
-    return 1;  # allowed
+    shm_si_get_or_set $limits, $ip, 0;  # ensure key exists
+    my $count = shm_si_incr $limits, $ip;
+    return $count <= $max_requests ? 1 : 0;
 }
 
 # simulate requests

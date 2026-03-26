@@ -125,30 +125,30 @@
    "provides" : {
       "Data::Validate::Sanctions" : {
          "file" : "lib/Data/Validate/Sanctions.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Data::Validate::Sanctions::Fetcher" : {
          "file" : "lib/Data/Validate/Sanctions/Fetcher.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       },
       "Data::Validate::Sanctions::Redis" : {
          "file" : "lib/Data/Validate/Sanctions/Redis.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/deriv-com/perl-Data-Validate-Sanctions/issues"
+         "web" : "https://github.com/gaurav-deriv/perl-Data-Validate-Sanctions/issues"
       },
-      "homepage" : "https://github.com/deriv-com/perl-Data-Validate-Sanctions",
+      "homepage" : "https://github.com/gaurav-deriv/perl-Data-Validate-Sanctions",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/deriv-com/perl-Data-Validate-Sanctions.git",
-         "web" : "https://github.com/deriv-com/perl-Data-Validate-Sanctions"
+         "url" : "https://github.com/gaurav-deriv/perl-Data-Validate-Sanctions.git",
+         "web" : "https://github.com/gaurav-deriv/perl-Data-Validate-Sanctions"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Tazeek <tazeek.rakib@gmail.com>",
@@ -158,11 +158,11 @@
       "Jean-Yves Sireau <jy@binary.com>",
       "Raunak Kathuria <raunakkathuria@gmail.com>",
       "Tom Molesworth <tom@binary.com>",
-      "mat-fs <53427463+mat-fs@users.noreply.github.com>",
+      "gaurav-deriv <gaurav.dhanuka@regentmarkets.com>",
       "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
+      "mat-fs <53427463+mat-fs@users.noreply.github.com>",
       "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
       "chylli-deriv <chylli@deriv.com>",
-      "gaurav-deriv <gaurav.dhanuka@regentmarkets.com>",
       "heshan-deriv <109588077+heshan-deriv@users.noreply.github.com>",
       "Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>",
       "Mahdi Zarei <60599487+mehdi-fs@users.noreply.github.com>",

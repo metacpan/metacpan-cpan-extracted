@@ -4,7 +4,7 @@ algorithm takes as input a message of arbitrary length and produces as
 output a 128-bit "fingerprint" or "message digest" of the input.
 MD5 is described in RFC 1321.
 
-Copyright 2023-2024 Michal Josef Špaček.
+Copyright 2023-2026 Michal Josef Špaček.
 Copyright 1998-2003 Gisle Aas.
 Copyright 1995-1996 Neil Winton.
 Copyright 1990-1992 RSA Data Security, Inc.

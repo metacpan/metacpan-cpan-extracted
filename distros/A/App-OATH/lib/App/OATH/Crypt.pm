@@ -1,5 +1,5 @@
 package App::OATH::Crypt;
-our $VERSION = '1.20171216'; # VERSION
+our $VERSION = '1.20260324'; # VERSION
 
 use strict;
 use warnings;

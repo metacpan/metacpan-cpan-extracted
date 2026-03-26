@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-10-01'; # DATE
+our $DATE = '2026-03-25'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxMultiAccountContainersUtils/open_firefox_container",
@@ -41,7 +41,7 @@ open-firefox-container - CLI to open URL in a new Firefox tab, in a specific mul
 
 =head1 VERSION
 
-This document describes version 0.018 of open-firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2024-10-01.
+This document describes version 0.019 of open-firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2026-03-25.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ B<open-firefox-container> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h
 
 B<open-firefox-container> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<open-firefox-container> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--extra-firefox-options-after|/"--extra-firefox-options-after=s@">>=I<str>)+|B<L<--extra-firefox-options-after-json|/"--extra-firefox-options-after=s@">>=I<json>|(B<L<-a|/"--extra-firefox-options-after=s@">>=I<str>)+] [(B<L<--extra-firefox-options-before|/"--extra-firefox-options-before=s@">>=I<str>)+|B<L<--extra-firefox-options-before-json|/"--extra-firefox-options-before=s@">>=I<json>|(B<L<-b|/"--extra-firefox-options-before=s@">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--profile|/"--profile=s">>=I<L<firefox::local_profile_name::default_first|Sah::Schema::firefox::local_profile_name::default_first>>] [(B<L<--url|/"--urls-json=s">>=I<str>)+|B<L<--urls-json|/"--urls-json=s">>=I<json>] -- E<lt>I<L<container|/"--container=s*">>E<gt> [I<L<url|/"--urls-json=s">>] ...
+B<open-firefox-container> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [(B<L<--extra-firefox-options-after|/"--extra-firefox-options-after=s@">>=I<str>)+|B<L<--extra-firefox-options-after-json|/"--extra-firefox-options-after=s@">>=I<json>|(B<L<-a|/"--extra-firefox-options-after=s@">>=I<str>)+] [(B<L<--extra-firefox-options-before|/"--extra-firefox-options-before=s@">>=I<str>)+|B<L<--extra-firefox-options-before-json|/"--extra-firefox-options-before=s@">>=I<json>|(B<L<-b|/"--extra-firefox-options-before=s@">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--new-window|/"--new-window">>|B<L<--no-new-window|/"--new-window">>|B<L<--nonew-window|/"--new-window">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--profile|/"--profile=s">>=I<L<firefox::local_profile_name::default_first|Sah::Schema::firefox::local_profile_name::default_first>>] [(B<L<--url|/"--urls-json=s">>=I<str>)+|B<L<--urls-json|/"--urls-json=s">>=I<json>] -- E<lt>I<L<container|/"--container=s*">>E<gt> [I<L<url|/"--urls-json=s">>] ...
 
 
 
@@ -122,6 +122,11 @@ See C<--extra-firefox-options-before>.
 Additional options (arguments) to put before the URLs.
 
 Can be specified multiple times.
+
+=item B<--new-window>
+
+(No description)
+
 
 =item B<--profile>=I<s>
 
@@ -344,7 +349,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

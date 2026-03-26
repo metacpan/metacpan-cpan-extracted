@@ -6,7 +6,7 @@ use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Exporter::Shiny qw( error );
 
@@ -103,7 +103,7 @@ Data::Record::Serialize::Error - Error objects
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -193,8 +193,6 @@ Throw an error. C<$error_class> is converted to a fully qualified class
 name; see L</Error Class Names>.  The remaining parameters are passed
 directly to the L<failures> throw method (see L<failures/Throwing
 failures>).
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

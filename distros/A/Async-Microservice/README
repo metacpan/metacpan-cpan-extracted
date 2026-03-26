@@ -31,28 +31,57 @@ DESCRIPTION
     This Moose::Role helps quickly bootstrap an async HTTP service that
     includes OpenAPI documentation.
 
-    See https://time.meon.eu/ and Async::Microservice::Time code.
+    See https://time.meon.eu/ and the code in Async::Microservice::Time.
 
- To bootstrap new async service
+ATTRIBUTES
 
-    Create new package for your APIs from current examples
-    lib/Async/Microservice/*. Inside set return value of service_name. This
-    string will be used to set process name and to read/locate OpenAPI yaml
+ static_path
+
+    URL path prefix for OpenAPI files. Defaults to 'static'. Can be
+    overridden by passing it to the constructor.
+
+ file_placeholder
+
+    Placeholder string used in OpenAPI files (like index.html and
+    edit.html) that gets replaced with the service name. Defaults to
+    'ASYNC-SERVICE-NAME'. Useful for templates that need to display the
+    service name dynamically.
+
+ Overriding Predefined Paths
+
+    The following paths are provided by default:
+
+      * / - Root index (OpenAPI documentation)
+
+      * /static/:filename - OpenAPI files
+
+      * /edit - OpenAPI editor
+
+      * /hcheck - Health check endpoint
+
+    You can override any of these default routes by defining them in your
+    get_routes() method. Your custom routes take precedence over the
+    defaults.
+
+ To bootstrap a new async service
+
+    Create a new package for your APIs using the current examples in
+    lib/Async/Microservice/*. Set the return value of service_name. This
+    string is used to set the process name and to locate the OpenAPI YAML
     definition for the documentation. Any GET/POST processing functions
-    must be defined in the get_routes function.
+    must be defined via get_routes.
 
     Copy one of the bin/*.psgi scripts and update it with your new package
     name.
 
-    Copy one of the root/static/*.yaml to have the same name as
-    service_name.
+    Copy one of root/static/*.yaml and rename it to match service_name.
 
-    Now you are able to launch the HTTP service with:
+    You can now launch the HTTP service with:
 
         plackup -Ilib --port 8089 --server Twiggy bin/async-microservice-YOURNAME.psgi
 
-    In your browser you can read the OpenAPI documentation:
-    http://0.0.0.0:8089/v1/ and also use the editor to extend it:
+    In your browser, you can read the OpenAPI documentation:
+    http://0.0.0.0:8089/v1/ and use the editor to extend it:
     http://0.0.0.0:8089/v1/edit
 
 SEE ALSO
@@ -76,6 +105,7 @@ CONTRIBUTORS & CREDITS
     questions, suggesting useful advice, nitpicking, chatting on IRC or
     commenting on my blog (in no particular order):
 
+        AI
         you?
 
     Also thanks to my current day-job-employer https://www.apa-it.at/.
@@ -148,7 +178,24 @@ METHODS
 
  respond($status, $headers, $payload)
 
-    Send plack response.
+    Send a PSGI/Plack response.
+
+    $headers must be an array reference of header key/value pairs.
+
+    If $payload is not a reference, it is sent as plain text by default.
+    When the request Accept header allows JSON and no explicit Content-Type
+    header is already present, plain scalar payloads are wrapped
+    automatically as JSON:
+
+        { "data": "..." }
+
+    For error statuses ($status >= 400), scalar payloads are wrapped as:
+
+        { "error": { err_status => ..., err_msg => ... } }
+
+    If $payload is a reference, it is serialized as JSON. When JSONP is
+    enabled and a valid callback parameter is present, the response is
+    emitted as application/javascript instead of application/json.
 
  redirect($location_path)
 

@@ -10,7 +10,7 @@ use Data::Record::Serialize::Error { errors => ['json_backend'] }, -all;
 
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 
 BEGIN {
@@ -80,7 +80,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory truthy
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory truthy JSONL
 
 =head1 NAME
 
@@ -88,7 +88,7 @@ Data::Record::Serialize::Encode::json - encoded a record as JSON
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -100,15 +100,15 @@ version 2.02
 
 =head1 DESCRIPTION
 
-B<Data::Record::Serialize::Encode::json> encodes a record as JSON.
+B<Data::Record::Serialize::Encode::json> encodes a record as JSONL.
 
 If a field's type is C<N> or C<I>, it will be properly encoded by JSON
-as a number.  Field's with type C<S> are force to be strings.
+as a number.  Field's with type C<S> are forced to be strings.
 
 Boolean fields (type C<B>) are transformed into values recognized by
 the back-end encoder.
 
-The output consists of I<concatenated> JSON objects, and is mostly easily
+The output consists of one JSON object per line, and is mostly easily
 read by an incremental decoder, e.g.
 
   use JSON::MaybeXS;
@@ -124,8 +124,6 @@ It performs the L<Data::Record::Serialize::Role::Encode> role.
    $bool = $self->to_bool( $truthy );
 
 Convert a truthy value to something that the JSON encoders will recognize as a boolean.
-
-=head1 INTERNALS
 
 =for Pod::Coverage encode
 

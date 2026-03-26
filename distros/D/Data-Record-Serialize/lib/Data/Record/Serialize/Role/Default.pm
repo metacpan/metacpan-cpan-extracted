@@ -5,7 +5,7 @@ package Data::Record::Serialize::Role::Default;
 use v5.12;
 use Moo::Role;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Hash::Util qw[ hv_store ];
 use Ref::Util  qw[ is_coderef ];
@@ -161,7 +161,7 @@ Data::Record::Serialize::Role::Default - Default methods for Data::Record::Seria
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 
@@ -179,8 +179,6 @@ Encode and send the record to the associated sink.
 
 B<WARNING>: the passed hash is modified.  If you need the original
 contents, pass in a copy.
-
-=head1 INTERNALS
 
 =for Pod::Coverage cleanup
  send

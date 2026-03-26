@@ -8,9 +8,9 @@ use Log::ger;
 use Sort::Sub ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-10-01'; # DATE
+our $DATE = '2026-03-25'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 $Sort::Sub::argsopt_sortsub{sort_sub}{cmdline_aliases} = {S=>{}};
 $Sort::Sub::argsopt_sortsub{sort_args}{cmdline_aliases} = {A=>{}};
@@ -20,11 +20,11 @@ our %SPEC;
 $SPEC{':package'} = {
     v => 1.1,
     summary => 'Utilities related to Firefox Multi-Account Containers add-on',
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 About the add-on: <https://addons.mozilla.org/en-US/firefox/addon/multi-account-containers/>.
 
-_
+MARKDOWN
 };
 
 our %argspec0_profile = (
@@ -156,14 +156,14 @@ sub firefox_mua_list_containers {
 $SPEC{firefox_mua_modify_containers} = {
     v => 1.1,
     summary => "Modify (and delete) Firefox Multi-Account Containers add-on's containers with Perl code",
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility lets you modify the identity records in `containers.json` file
 using Perl code. The Perl code is called for every container (record). It is
 given the record hash in `$_` and is supposed to modify and return the modified
 the record. It can also choose to return false to instruct deleting the record.
 
-_
+MARKDOWN
     args => {
         %argspec0_profile,
         code => {
@@ -244,13 +244,13 @@ sub firefox_mua_modify_containers {
 $SPEC{firefox_mua_add_container} = {
     v => 1.1,
     summary => "Add a new Firefox Multi-Account container",
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility will copy the last container record, change the name to the one you
 specify, and add it to the list of containers. You can also set some other
 attributes.
 
-_
+MARKDOWN
     args => {
         %argspec0_profile,
         name => {
@@ -333,7 +333,7 @@ sub firefox_mua_add_container {
 $SPEC{firefox_mua_sort_containers} = {
     v => 1.1,
     summary => "Sort Firefox Multi-Account Containers add-on's containers",
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility was written when the Firefox Multi-Account Containers add-on does
 not provide a way to reorder the containers. Now it does; you can click Manage
@@ -350,7 +350,7 @@ sorting mechanism via using <pm:Sort:Sub> modules. For example:
 will first sort your containers asciibetically, then put specific containers
 that you use often (`foo`, `bar`, `baz`, `qux`) at the top.
 
-_
+MARKDOWN
     args => {
         %argspec0_profile,
         %Sort::Sub::argsopt_sortsub,
@@ -401,9 +401,9 @@ sub firefox_mua_sort_containers {
 $SPEC{firefox_mua_dump_identities_json} = {
     v => 1.1,
     summary => "Dump the content of identities.json",
-    description => <<'_',
+    description => <<'MARKDOWN',
 
-_
+MARKDOWN
     args => {
         %argspec0_profile,
     },
@@ -428,7 +428,7 @@ sub firefox_mua_dump_identities_json {
 $SPEC{open_firefox_container} = {
     v => 1.1,
     summary => "CLI to open URL in a new Firefox tab, in a specific multi-account container",
-    description => <<'_',
+    description => <<'MARKDOWN',
 
 This utility opens a new firefox tab in a specific multi-account container. This
 requires the Firefox Multi-Account Containers add-on, as well as another add-on
@@ -457,7 +457,7 @@ typically `~/.config/google-chrome/` on Unix. You can use the
 <prog:list-chrome-profiles> (with option `-l`) (from <pm:App::ChromeUtils>) to
 list Chrome profiles.
 
-_
+MARKDOWN
     args => {
         %argspecopt_profile,
         container => {
@@ -465,6 +465,9 @@ _
             completion => \&_complete_container,
             req => 1,
             pos => 0,
+        },
+        new_window => {
+            schema => 'bool*',
         },
         urls => {
             'x.name.is_plural' => 1,
@@ -504,11 +507,11 @@ _
             argv => [qw|mycontainer www.example.com -b --new-window|],
             test => 0,
             'x.doc.show_result' => 0,
-            description => <<'_',
+            description => <<'MARKDOWN',
 
 This command passes the `--new-window` option to `firefox`.
 
-_
+MARKDOWN
         },
     ],
     links => [
@@ -532,6 +535,7 @@ sub open_firefox_container {
     my @cmd = (
         "firefox",
         @{$args{extra_firefox_options_before} // []},
+        ($args{new_window} ? ("--new-window") : ()),
         @urls,
         @{$args{extra_firefox_options_after} // []},
     );
@@ -555,7 +559,7 @@ App::FirefoxMultiAccountContainersUtils - Utilities related to Firefox Multi-Acc
 
 =head1 VERSION
 
-This document describes version 0.018 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2024-10-01.
+This document describes version 0.019 of App::FirefoxMultiAccountContainersUtils (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2026-03-25.
 
 =head1 SYNOPSIS
 
@@ -949,6 +953,10 @@ Additional options (arguments) to put after the URLs.
 
 Additional options (arguments) to put before the URLs.
 
+=item * B<new_window> => I<bool>
+
+(No description)
+
 =item * B<profile> => I<firefox::local_profile_name::default_first>
 
 (No description)
@@ -1016,7 +1024,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

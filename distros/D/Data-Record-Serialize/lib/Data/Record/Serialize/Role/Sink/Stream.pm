@@ -9,7 +9,7 @@ use Moo::Role;
 use Data::Record::Serialize::Error { errors => [ '::create', '::parameter', '::internal' ] }, -all;
 use Types::Standard qw[ Bool ];
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use IO::File;
 
@@ -76,11 +76,18 @@ has output => (
 
 
 
+
+
+
+
+
+
 has fh => (
     is        => 'lazy',
     init_arg  => undef,
     clearer   => 1,
     predicate => 1,
+    handles   => ['flush'],
 );
 
 
@@ -205,7 +212,7 @@ Data::Record::Serialize::Role::Sink::Stream - output encoded data to a stream.
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 SYNOPSIS
 
@@ -266,6 +273,10 @@ L</fh>, which mirror the added object attributes.
 
 =head1 METHODS
 
+=head2 flush
+
+Flush any buffered data to the output stream.
+
 =head2 close
 
   $obj->close( ?$in_global_destruction );
@@ -274,8 +285,6 @@ Close the object; useful in destructors.  Only files created by the
 serializer will be closed.  If a filehandle, GLOB, or similar object
 is passed via the constructor's L</output> parameter L</close> method
 is called.
-
-=head1 INTERNALS
 
 =for Pod::Coverage close
  has_fh

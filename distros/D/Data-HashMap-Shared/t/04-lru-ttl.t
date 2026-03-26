@@ -253,10 +253,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is(shm_ii_max_size $map2, 3, 'reopen: max_size preserved');
     is(shm_ii_ttl $map2, 3600, 'reopen: ttl preserved');
 
-    # LRU still works after reopen
+    # LRU still works after reopen (clock eviction — size stays at max)
     shm_ii_put $map2, 3, 30;
-    shm_ii_put $map2, 4, 40;  # should evict key 1
-    ok(!defined(shm_ii_get $map2, 1), 'reopen: LRU eviction works');
+    shm_ii_put $map2, 4, 40;  # triggers eviction
+    my $sz = shm_ii_size $map2;
+    ok($sz <= 3, 'reopen: LRU eviction keeps size at max_size');
     is(shm_ii_get $map2, 4, 40, 'reopen: new entry present');
 
     unlink $path;

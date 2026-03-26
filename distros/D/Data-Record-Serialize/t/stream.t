@@ -50,7 +50,7 @@ sub serialize {
                         %{$config},
                     );
                 },
-                "create serializer",
+                'create serializer',
             ) or do { bail_out( $@ ) };
 
             my ( $stdout, $stderr, $exit ) = eval {
@@ -60,7 +60,7 @@ sub serialize {
                 }
             };
 
-            bail_out( $@ ) if $@ ne '';
+            bail_out( $@ ) if $@ ne q{};
 
             is( $get_output->( $output, $stdout, $stderr, $exit ), EXPECTED, 'correct output' );
             $ctx->release;
@@ -75,11 +75,14 @@ serialize(
 );
 
 # this works with a direct run of this script, or with prove, but not
-# yath or dzil test
+# yath or dzil test. probably because it's fdopening STDOUT. a bere
+# STDOUT (below) works
 
 # serialize(
-#     'IO::Handle' => IO::Handle->new->fdopen(fileno(STDOUT), '>' ),
-#     sub { $_[1] } );
+#     label => 'IO::Handle',
+#     output => IO::Handle->new->fdopen(fileno(STDOUT), '>' ),
+#     get_output => sub { $_[1] },
+# );
 
 serialize(
     label      => 'IO::File',

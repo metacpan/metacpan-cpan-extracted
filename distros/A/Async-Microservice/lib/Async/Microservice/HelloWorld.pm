@@ -1,12 +1,19 @@
 package Async::Microservice::HelloWorld;
 use Moose;
 with qw(Async::Microservice);
-sub service_name {return 'asmi-helloworld';}
-sub get_routes {return ('hello' => {defaults => {GET => 'GET_hello'}});}
+sub service_name { return 'asmi-helloworld'; }
+
+sub get_routes {
+    return ( 'hello' => { defaults => { GET => 'GET_hello' } } );
+}
+
 sub GET_hello {
     my ( $self, $this_req ) = @_;
     return [ 200, [], 'Hello world!' ];
 }
+
+__PACKAGE__->meta->make_immutable;
+no Moose;
 1;
 
 __END__

@@ -1107,8 +1107,11 @@ sub LoadByCol  {
 
 =head2 SelectAllColumns 1|0
 
-When set to true, disables C<lazy_load> column filtering and always selects
-all columns from the database for this record.
+When set to true, forces selection of all columns, bypassing any C<lazy_load>
+filtering that would otherwise apply when
+C<$DBIx::SearchBuilder::PREFER_LAZY_LOAD> is enabled. When set to false,
+restores normal behaviour (all columns by default, or C<lazy_load> filtering
+if C<PREFER_LAZY_LOAD> is enabled).
 
 =cut
 
@@ -1168,7 +1171,7 @@ sub LoadByCols  {
     }
 
     my $select;
-    if ( $self->{'_select_all_columns'} ) {
+    if ( $self->{'_select_all_columns'} || !$DBIx::SearchBuilder::PREFER_LAZY_LOAD ) {
         $select = '*';
     }
     else {

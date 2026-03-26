@@ -1,0 +1,108 @@
+NAME
+    Business::UDC - Class to work with Universal Decimal Classification.
+
+SYNOPSIS
+     use Business::UDC;
+
+     my $obj = Business::UDC->new($udc_string);
+     my $ast_hr = $obj->ast;
+     my $error = $obj->error;
+     my $is_valid = $obj->is_valid;
+     my $source = $obj->source;
+     my $tokens_ar = $obj->tokens;
+
+METHODS
+  "new"
+     my $obj = Business::UDC->new($udc_string);
+
+    Constructor.
+
+    Returns instance of object.
+
+  "ast"
+     my $ast_hr = $obj->ast;
+
+    Get abstract syntax tree.
+
+    Returns reference to hash with structure.
+
+  "error"
+     my $error = $obj->error;
+
+    Get error.
+
+    TODO Errors.
+
+    Returns string or undef.
+
+  "is_valid"
+     my $is_valid = $obj->is_valid;
+
+  "source"
+     my $source = $obj->source;
+
+    Get UDC source which goes to constructor.
+
+    Returns string.
+
+  "tokens"
+     my $tokens_ar = $obj->tokens;
+
+    Get list of tokens defined by tokenization of input UDC string.
+
+    Returns reference to array with tokens.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Business::UDC;
+
+     if (@ARGV < 1) {
+            print STDERR "Usage: $0 udc_string\n";
+            exit 1;
+     }
+     my $udc_string = $ARGV[0];
+
+     # Object.
+     my $obj = Business::UDC->new($udc_string);
+
+     print "UDC string $udc_string ";
+     if ($obj->is_valid) {
+            print "is valid\n";
+     } else {
+            print "is not valid\n";
+     }
+
+     # Output for '821.111(73)-31"19"':
+     # UDC string 821.111(73)-31"19" is valid
+
+     # Output for '821.111(73)-31"19':
+     # UDC string 821.111(73)-31"19 is not valid
+
+DEPENDENCIES
+    Business::UDC::Parser, English, Error::Pure, Error::Pure::Utils.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Business-UDC>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+ACKNOWLEDGEMENTS
+    Development of this software has been made possible by institutional
+    support for the long-term strategic development of the National Library
+    of the Czech Republic as a research organization provided by the
+    Ministry of Culture of the Czech Republic (DKRVO 2024–2028), Area 11:
+    Linked Open Data.
+
+VERSION
+    0.02
+

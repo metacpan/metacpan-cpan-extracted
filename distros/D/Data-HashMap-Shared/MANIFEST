@@ -47,6 +47,16 @@ t/08-take-flush-mmap.t
 t/09-touch-reserve-stats.t
 t/10-edge-cases.t
 typemap
+xs/i16.xs
+xs/i16s.xs
+xs/i32.xs
+xs/i32s.xs
+xs/ii.xs
+xs/is.xs
+xs/si.xs
+xs/si16.xs
+xs/si32.xs
+xs/ss.xs
 xxhash.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -155,15 +155,19 @@ METHODS
     Returns the column selection string for use in SELECT statements.
 
     If explicit columns have been added via "Column", those are returned
-    as-is. If "_select_all_columns" is set on the object, returns "main.*".
+    as-is. If "_select_all_columns" is set on the object, or if the package
+    variable $DBIx::SearchBuilder::PREFER_LAZY_LOAD (controlled by the
+    "SB_PREFER_LAZY_LOAD" environment variable) is false, returns "main.*".
     Otherwise introspects the record class's "_ClassAccessible" metadata and
     excludes columns marked as "lazy_load", "foreign-collection", or
     "record-read". Falls back to "main.*" if no metadata is available.
 
   SelectAllColumns 1|0
-    When set to true, disables "lazy_load" column filtering and always
-    selects all columns from the database. When set to false, restores the
-    default behaviour of excluding "lazy_load" columns.
+    When set to true, forces selection of all columns ("main.*"), bypassing
+    any "lazy_load" filtering that would otherwise apply when
+    $DBIx::SearchBuilder::PREFER_LAZY_LOAD is enabled. When set to false,
+    restores normal behaviour ("main.*" by default, or "lazy_load" filtering
+    if "PREFER_LAZY_LOAD" is enabled).
 
   BuildSelectQuery PreferBind => 1|0
     Builds a query string for a "SELECT rows from Tables" statement for this

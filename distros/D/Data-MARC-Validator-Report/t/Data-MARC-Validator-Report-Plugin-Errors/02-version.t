@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Data::MARC::Validator::Report::Plugin::Errors::VERSION, 0.02, 'Version.');
+is($Data::MARC::Validator::Report::Plugin::Errors::VERSION, 0.03, 'Version.');

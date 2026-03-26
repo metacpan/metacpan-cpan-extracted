@@ -37,4 +37,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/bestpractical/dbix-searchbuilder
-version: '1.83'
+version: '1.84'

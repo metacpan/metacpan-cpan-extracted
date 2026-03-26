@@ -258,4 +258,183 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
+# ====== add/update/swap/cas on integer variants ======
+
+# I16: add/update/swap/cas
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::I16->new($path, 1000);
+    do { my $_r = shm_i16_add $map, 1, 10; ok($_r, 'I16 add: succeeds on new key') };
+    do { my $_r = shm_i16_add $map, 1, 20; ok(!$_r, 'I16 add: fails on existing') };
+    do { my $_r = shm_i16_get $map, 1; is($_r, 10, 'I16 add: value unchanged') };
+    do { my $_r = shm_i16_update $map, 1, 30; ok($_r, 'I16 update: succeeds on existing') };
+    do { my $_r = shm_i16_update $map, 99, 1; ok(!$_r, 'I16 update: fails on missing') };
+    do { my $_r = shm_i16_get $map, 1; is($_r, 30, 'I16 update: value changed') };
+    my $old = $map->swap(1, 40);
+    is($old, 30, 'I16 swap: returns old value');
+    my $new_swap = $map->swap(50, 500);
+    ok(!defined $new_swap, 'I16 swap: undef for new key');
+    do { my $_r = shm_i16_cas $map, 1, 40, 99; ok($_r, 'I16 cas: succeeds') };
+    do { my $_r = shm_i16_cas $map, 1, 40, 100; ok(!$_r, 'I16 cas: fails on mismatch') };
+    do { my $_r = shm_i16_get $map, 1; is($_r, 99, 'I16 cas: value updated') };
+    unlink $path;
+}
+
+# I32: add/update/swap/cas
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::I32->new($path, 1000);
+    do { my $_r = shm_i32_add $map, 1, 100; ok($_r, 'I32 add: succeeds') };
+    do { my $_r = shm_i32_add $map, 1, 200; ok(!$_r, 'I32 add: fails on existing') };
+    do { my $_r = shm_i32_update $map, 1, 300; ok($_r, 'I32 update: succeeds') };
+    do { my $_r = shm_i32_get $map, 1; is($_r, 300, 'I32 update: value changed') };
+    my $old = $map->swap(1, 400);
+    is($old, 300, 'I32 swap: returns old value');
+    do { my $_r = shm_i32_cas $map, 1, 400, 999; ok($_r, 'I32 cas: succeeds') };
+    do { my $_r = shm_i32_get $map, 1; is($_r, 999, 'I32 cas: value correct') };
+    unlink $path;
+}
+
+# SI16: add/update/swap/cas (string key → int16 value)
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SI16->new($path, 1000);
+    do { my $_r = shm_si16_add $map, "a", 10; ok($_r, 'SI16 add: succeeds') };
+    do { my $_r = shm_si16_add $map, "a", 20; ok(!$_r, 'SI16 add: fails on existing') };
+    do { my $_r = shm_si16_update $map, "a", 30; ok($_r, 'SI16 update: succeeds') };
+    do { my $_r = shm_si16_get $map, "a"; is($_r, 30, 'SI16 update: value changed') };
+    my $old = $map->swap("a", 40);
+    is($old, 30, 'SI16 swap: returns old value');
+    do { my $_r = shm_si16_cas $map, "a", 40, 99; ok($_r, 'SI16 cas: succeeds') };
+    do { my $_r = shm_si16_get $map, "a"; is($_r, 99, 'SI16 cas: value correct') };
+    unlink $path;
+}
+
+# SI32: add/update/swap/cas
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SI32->new($path, 1000);
+    do { my $_r = shm_si32_add $map, "key", 100; ok($_r, 'SI32 add: succeeds') };
+    do { my $_r = shm_si32_add $map, "key", 200; ok(!$_r, 'SI32 add: fails on existing') };
+    do { my $_r = shm_si32_update $map, "key", 300; ok($_r, 'SI32 update: succeeds') };
+    my $old = $map->swap("key", 400);
+    is($old, 300, 'SI32 swap: returns old value');
+    do { my $_r = shm_si32_cas $map, "key", 400, 999; ok($_r, 'SI32 cas: succeeds') };
+    do { my $_r = shm_si32_get $map, "key"; is($_r, 999, 'SI32 cas: correct') };
+    unlink $path;
+}
+
+# ====== add/update/swap on string-value variants (no cas) ======
+
+# IS: add/update/swap (int64 → string)
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::IS->new($path, 1000);
+    do { my $_r = shm_is_add $map, 1, "hello"; ok($_r, 'IS add: succeeds') };
+    do { my $_r = shm_is_add $map, 1, "world"; ok(!$_r, 'IS add: fails on existing') };
+    do { my $_r = shm_is_update $map, 1, "updated"; ok($_r, 'IS update: succeeds') };
+    my $got = shm_is_get $map, 1;
+    is($got, "updated", 'IS update: value changed');
+    my $old = $map->swap(1, "swapped");
+    is($old, "updated", 'IS swap: returns old value');
+    my $new_s = $map->swap(99, "new");
+    ok(!defined $new_s, 'IS swap: undef for new key');
+    unlink $path;
+}
+
+# I16S: add/update/swap
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::I16S->new($path, 1000);
+    do { my $_r = shm_i16s_add $map, 1, "val"; ok($_r, 'I16S add: succeeds') };
+    do { my $_r = shm_i16s_add $map, 1, "x"; ok(!$_r, 'I16S add: fails on existing') };
+    do { my $_r = shm_i16s_update $map, 1, "new"; ok($_r, 'I16S update: succeeds') };
+    my $old = $map->swap(1, "swap");
+    is($old, "new", 'I16S swap: returns old');
+    unlink $path;
+}
+
+# I32S: add/update/swap
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::I32S->new($path, 1000);
+    do { my $_r = shm_i32s_add $map, 1, "val"; ok($_r, 'I32S add: succeeds') };
+    do { my $_r = shm_i32s_add $map, 1, "x"; ok(!$_r, 'I32S add: fails on existing') };
+    do { my $_r = shm_i32s_update $map, 1, "new"; ok($_r, 'I32S update: succeeds') };
+    my $old = $map->swap(1, "swap");
+    is($old, "new", 'I32S swap: returns old');
+    unlink $path;
+}
+
+# ====== persist/set_ttl on non-II variants ======
+
+# I16 with TTL: persist/set_ttl
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::I16->new($path, 1000, 0, 30);
+    shm_i16_put $map, 1, 10;
+    my $rem = shm_i16_ttl_remaining $map, 1;
+    ok($rem > 0, 'I16 TTL: entry has TTL');
+    do { my $_r = shm_i16_persist $map, 1; ok($_r, 'I16 persist: succeeds') };
+    my $rem2 = shm_i16_ttl_remaining $map, 1;
+    is($rem2, 0, 'I16 persist: now permanent');
+    shm_i16_put $map, 2, 20;
+    ok($map->set_ttl(2, 120), 'I16 set_ttl: succeeds');
+    my $rem3 = shm_i16_ttl_remaining $map, 2;
+    ok($rem3 > 30 && $rem3 <= 120, 'I16 set_ttl: TTL changed');
+    unlink $path;
+}
+
+# SI16 with TTL: persist/set_ttl
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SI16->new($path, 1000, 0, 30);
+    shm_si16_put $map, "key", 10;
+    do { my $_r = shm_si16_persist $map, "key"; ok($_r, 'SI16 persist: succeeds') };
+    my $rem = shm_si16_ttl_remaining $map, "key";
+    is($rem, 0, 'SI16 persist: permanent');
+    shm_si16_put $map, "k2", 20;
+    ok($map->set_ttl("k2", 90), 'SI16 set_ttl: succeeds');
+    unlink $path;
+}
+
+# IS with TTL: persist/set_ttl
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::IS->new($path, 1000, 0, 30);
+    shm_is_put $map, 1, "hello";
+    do { my $_r = shm_is_persist $map, 1; ok($_r, 'IS persist: succeeds') };
+    my $rem = shm_is_ttl_remaining $map, 1;
+    is($rem, 0, 'IS persist: permanent');
+    shm_is_put $map, 2, "world";
+    ok($map->set_ttl(2, 90), 'IS set_ttl: succeeds');
+    unlink $path;
+}
+
+# I32S with TTL: persist/set_ttl
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::I32S->new($path, 1000, 0, 30);
+    shm_i32s_put $map, 1, "val";
+    do { my $_r = shm_i32s_persist $map, 1; ok($_r, 'I32S persist: succeeds') };
+    my $rem = shm_i32s_ttl_remaining $map, 1;
+    is($rem, 0, 'I32S persist: permanent');
+    unlink $path;
+}
+
+# SI32 with TTL: persist/set_ttl
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SI32->new($path, 1000, 0, 30);
+    shm_si32_put $map, "k", 10;
+    do { my $_r = shm_si32_persist $map, "k"; ok($_r, 'SI32 persist: succeeds') };
+    my $rem = shm_si32_ttl_remaining $map, "k";
+    is($rem, 0, 'SI32 persist: permanent');
+    ok($map->set_ttl("k", 60), 'SI32 set_ttl: wait, key is permanent');
+    # set_ttl on permanent key — changes it back to TTL
+    my $rem2 = shm_si32_ttl_remaining $map, "k";
+    ok($rem2 > 0, 'SI32 set_ttl: permanent→TTL works');
+    unlink $path;
+}
+
 done_testing;

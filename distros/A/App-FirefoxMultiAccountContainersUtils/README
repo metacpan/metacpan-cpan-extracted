@@ -3,9 +3,9 @@ NAME
     Multi-Account Containers add-on
 
 VERSION
-    This document describes version 0.018 of
+    This document describes version 0.019 of
     App::FirefoxMultiAccountContainersUtils (from Perl distribution
-    App-FirefoxMultiAccountContainersUtils), released on 2024-10-01.
+    App-FirefoxMultiAccountContainersUtils), released on 2026-03-25.
 
 SYNOPSIS
 DESCRIPTION
@@ -339,6 +339,10 @@ FUNCTIONS
 
         Additional options (arguments) to put before the URLs.
 
+    *   new_window => *bool*
+
+        (No description)
+
     *   profile => *firefox::local_profile_name::default_first*
 
         (No description)
@@ -402,8 +406,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2024, 2023, 2022, 2020 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

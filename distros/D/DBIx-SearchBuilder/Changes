@@ -1,5 +1,9 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.84 2026-03-24
+ - Disable lazy load feature by default
+ - Update t/00.load.t to handle "blib" too
+
 1.83 2026-03-18
  - Document use of BuildSelectQuery for debugging. Inspired by @maettu
    in PR 4 on github. Thanks!

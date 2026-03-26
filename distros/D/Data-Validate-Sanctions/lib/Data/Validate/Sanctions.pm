@@ -21,7 +21,7 @@ use Locale::Country;
 use Text::Trim qw(trim);
 use Clone      qw(clone);
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 my $sanction_file;
 my $instance;

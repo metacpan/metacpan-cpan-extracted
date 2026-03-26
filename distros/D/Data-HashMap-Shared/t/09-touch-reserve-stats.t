@@ -204,11 +204,11 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     shm_ii_put $map, 2, 20;
     sleep 2;
 
-    # trigger lazy expiry via get
-    shm_ii_get $map, 1;
-    is(shm_ii_stat_expired $map, 1, '1 lazy expiry after get');
+    # get returns undef for expired (clock: no active expiry on read)
+    my $v = shm_ii_get $map, 1;
+    ok(!defined $v, 'get returns undef for expired entry');
 
-    # flush remaining
+    # flush expires all stale entries
     shm_ii_flush_expired $map;
     is(shm_ii_stat_expired $map, 2, '2 total after flush');
 

@@ -1,5 +1,5 @@
 use Test::More tests => 14;
-use Cwd qw(abs_path);
+use Cwd 'abs_path', 'getcwd';
 
 BEGIN { use_ok("DBIx::SearchBuilder"); }
 BEGIN { use_ok("DBIx::SearchBuilder::Handle"); }
@@ -22,9 +22,9 @@ BEGIN { use_ok("DBIx::SearchBuilder::Record"); }
 BEGIN { use_ok("DBIx::SearchBuilder::Record::Cachable"); }
 BEGIN { use_ok("DBIx::SearchBuilder::Handle::MariaDB"); }
 
-my $local_lib = abs_path('lib');
+my $cwd = getcwd();
 like(
     abs_path($INC{'DBIx/SearchBuilder.pm'}),
-    qr/^\Q$local_lib\E/,
+    qr{^\Q$cwd\E[/\\]b?lib},
     "DBIx::SearchBuilder loaded from local lib/, not system install"
 );

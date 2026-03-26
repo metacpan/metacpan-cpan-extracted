@@ -5,6 +5,9 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
+# Enable explicit column listing so lazy_load columns are excluded from SELECT
+local $DBIx::SearchBuilder::PREFER_LAZY_LOAD = 1;
+
 use constant TESTS_PER_DRIVER => 31 + ( $ENV{SB_TEST_CACHABLE} ? 2 : 0 );
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;

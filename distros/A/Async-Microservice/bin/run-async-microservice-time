@@ -2,5 +2,6 @@
 
 BASEDIR=$(dirname "$0")
 cd $BASEDIR/..
+export STATIC_DIR=$(pwd)/root/static
 
 plackup -Ilib --server Twiggy --port 8080 bin/async-microservice-time.psgi

@@ -4,7 +4,7 @@
       "Michal Josef Spacek <michal.josef.spacek@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -52,6 +52,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.04,
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/michal-josef-spacek/Alt-Digest-MD5-OpenSSL/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com:michal-josef-spacek/Alt-Digest-MD5-OpenSSL.git",
+         "web" : "https://github.com/michal-josef-spacek/Alt-Digest-MD5-OpenSSL"
+      }
+   },
+   "version" : 0.06
 }

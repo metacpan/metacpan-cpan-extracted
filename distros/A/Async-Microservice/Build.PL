@@ -39,13 +39,16 @@ my $builder = $mb_subclass->new(
     license            => 'perl',
     dist_author        => 'Jozef Kutej <jkutej@cpan.org>',
     dist_version_from  => 'lib/Async/Microservice.pm',
-    configure_requires => {'Module::Build' => '0.36',},
+    configure_requires => { 'Module::Build' => '0.36', },
     build_requires     => {
         'Test::Most'           => 0,
         'Test::Time'           => 0,
         'Path::Class'          => 0,
         'Pod::Simple::Text'    => 0,
         'Test::WWW::Mechanize' => 0,
+        'Plack::Test::Server'  => 0,
+        'HTTP::Headers'        => 0,
+        'Log::Any::Test'       => 0,
     },
     requires => {
         'perl'                       => 5.010,
@@ -64,19 +67,23 @@ my $builder = $mb_subclass->new(
         'Time::HiRes'                => 0,
         'AnyEvent'                   => 0,
         'namespace::autoclean'       => 0,
+        'Future'                     => 0,
         'AnyEvent::Future'           => 0,
         'Future::AsyncAwait'         => 0,
         'Log::Any'                   => 0,
+        'HTTP::Negotiate'            => 0,
     },
-    script_files   => [qw(
-        bin/async-microservice-time.psgi
-    )],
+    script_files => [ qw(
+            bin/async-microservice-time.psgi
+        )
+    ],
     add_to_cleanup => ['Async-Microservice-*'],
     create_readme  => 1,
     meta_merge     => {
         resources => {
             repository => 'https://github.com/jozef/Async-Microservice.git',
-            bugtracker => 'https://github.com/jozef/Async-Microservice/issues',
+            bugtracker =>
+                'https://github.com/jozef/Async-Microservice/issues',
         },
         keywords => [qw/ async asynchronous micro service http plack /],
     },

@@ -7,7 +7,7 @@ use Moo::Role;
 
 use namespace::clean;
 
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 requires 'print';
 requires 'say';
@@ -52,7 +52,7 @@ Data::Record::Serialize::Role::Sink - Sink Role
 
 =head1 VERSION
 
-version 2.02
+version 2.03
 
 =head1 DESCRIPTION
 
@@ -71,8 +71,6 @@ not destroyed prior to global destruction at the end of the program,
 it is quite possible that it will not be possible to perform this
 cleanly.  In other words, make sure that sinks are closed prior to
 global destruction.
-
-=head1 INTERNALS
 
 =head1 SUPPORT
 

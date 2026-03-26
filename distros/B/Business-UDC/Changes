@@ -1,0 +1,8 @@
+0.02 2026-03-25T13:25:30+01:00
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Fix parsing of '016:[371.035.4:335.55]378(437)'.
+ - Improve error messages.
+ - Regen README file.
+
+0.01 2026-03-25T10:20:10+01:00
+ - First version.

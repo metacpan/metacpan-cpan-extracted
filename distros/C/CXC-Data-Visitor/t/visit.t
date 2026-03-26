@@ -134,7 +134,7 @@ subtest 'revisit container' => sub {
             if ( $kydx eq 'b' && !$visited ) {
                 $visited = 1;
                 $meta->{container}{c} = [ 8, 9, 10 ];
-                return RESULT_REVISIT_CONTAINER;
+                return RESULT_REVISIT_CONTENTS;
             }
             return RESULT_CONTINUE;
         },
@@ -215,7 +215,7 @@ subtest 'cycle' => sub {
 
         ok(
             lives {
-                visit( \%hash, sub { 1 } )
+                visit( \%hash, sub { RESULT_CONTINUE } )
             },
         ) or note $@;
     };
@@ -227,7 +227,7 @@ subtest 'cycle' => sub {
 
         like(
             dies {
-                visit( \%hash, sub { 1; }, )
+                visit( \%hash, sub { RESULT_CONTINUE }, )
             },
             qr/ cycle /,
         );
@@ -240,7 +240,7 @@ subtest 'cycle' => sub {
 
         ok(
             lives {
-                visit( \%hash, sub { 1; }, cycle => CYCLE_TRUNCATE )
+                visit( \%hash, sub { RESULT_CONTINUE }, cycle => CYCLE_TRUNCATE )
             },
         ) or note $@;
     };
@@ -274,7 +274,7 @@ subtest 'visit' => sub {
 
     my sub callback ( $kydx, $vref, $context, $meta ) {
         push $context->{path}->@*, [ $meta->{path}->@* ];
-        1;
+        return RESULT_CONTINUE;
     }
 
     subtest 'all' => sub {
@@ -443,25 +443,306 @@ subtest 'visit' => sub {
 
 };
 
-subtest 'sort' => sub {
+subtest 'stop_descent | revisit_contents' => sub {
 
     my %hash = myhash;
 
-    my @order;
+    my @path;
+    my sub callback ( $kydx, $vref, $context, $meta ) {
+        push @path, [ $meta->{path}->@* ];
 
-    visit(
-        \%hash,
-        sub ( $kydx, $vref, @ ) {
-            push @order, $kydx;
-            return RESULT_CONTINUE;
+        return
+          join( q{,}, $meta->{path}->@* ) eq 'c,d' && $meta->{visit} == 1
+          ? RESULT_STOP_DESCENT | RESULT_REVISIT_CONTENTS
+          : RESULT_CONTINUE;
+    }
+
+    ok(
+        lives {
+            visit( \%hash, \&callback )
         },
-        visit     => VISIT_ALL,
-        sort_keys => sub { $_[1] cmp $_[0] },
-    );
+    ) or note $@;
 
-    is( \@order, [qw( c e d 0 1 2 b 0 1 2 a )] )
-      or diag pp @order;
+    is(
+        \@path,
+        [
+            ['a'],
+            ['b'],
+            [ 'b', 0 ],
+            [ 'b', 1 ],
+            [ 'b', 2 ],
+            ['c'],
+            [ 'c', 'd', ],
+            [ 'c', 'e', ],
+            [ 'c', 'd', ],
+            [ 'c', 'd', 0 ],
+            [ 'c', 'd', 1 ],
+            [ 'c', 'd', 2 ],
+            [ 'c', 'e', ],
+        ],
+    ) or note pp( \@path );
+
 
 };
+
+subtest 'continue | revisit_contents' => sub {
+
+    my %hash = myhash;
+
+    my @path;
+    my sub callback ( $kydx, $vref, $context, $meta ) {
+        push @path, [ $meta->{path}->@* ];
+
+        return join( q{,}, $meta->{path}->@* ) eq 'c,d,2' && $meta->{visit} == 1
+          ? RESULT_REVISIT_CONTENTS
+          : RESULT_CONTINUE;
+    }
+
+    ok(
+        lives {
+            visit( \%hash, \&callback )
+        },
+    ) or note $@;
+
+    is(
+        \@path,
+        [
+            ['a'],
+            ['b'],
+            [ 'b', 0 ],
+            [ 'b', 1 ],
+            [ 'b', 2 ],
+            ['c'],
+            [ 'c', 'd', ],
+            [ 'c', 'd', 0 ],
+            [ 'c', 'd', 1 ],
+            [ 'c', 'd', 2 ],
+            [ 'c', 'd', 0 ],
+            [ 'c', 'd', 1 ],
+            [ 'c', 'd', 2 ],
+            [ 'c', 'e', ],
+        ],
+    ) or note pp( \@path );
+
+
+};
+
+subtest 'revisit root' => sub {
+
+    my %hash = myhash;
+
+    my @path;
+    my $revisit;
+
+    my sub callback ( $kydx, $vref, $context, $meta ) {
+        push @path, [ $meta->{path}->@* ];
+
+        # after this is defined, won't toggle
+        $revisit //= !!1
+          if join( q{,}, $meta->{path}->@* ) eq 'c,d' && $meta->{visit} == 1;
+
+        if ( $revisit ) {
+            $revisit = !!0;    # one shot.
+            return RESULT_REVISIT_ROOT;
+        }
+
+        return RESULT_CONTINUE;
+    }
+
+    ok(
+        lives {
+            visit( \%hash, \&callback )
+        },
+    ) or note $@;
+
+    is(
+        \@path,
+        [
+            ['a'],
+            ['b'],
+            [ 'b', 0 ],
+            [ 'b', 1 ],
+            [ 'b', 2 ],
+            ['c'],
+            [ 'c', 'd', ],
+            ['a'],
+            ['b'],
+            [ 'b', 0 ],
+            [ 'b', 1 ],
+            [ 'b', 2 ],
+            ['c'],
+            [ 'c', 'd', ],
+            [ 'c', 'd', 0 ],
+            [ 'c', 'd', 1 ],
+            [ 'c', 'd', 2 ],
+            [ 'c', 'e', ],
+        ],
+    ) or note pp( \@path );
+
+
+};
+
+subtest 'visit root' => sub {
+
+
+    subtest 'continue' => sub {
+
+        my %hash = myhash;
+
+        my @path;
+        my sub callback ( $kydx, $vref, $context, $meta ) {
+            push @path, defined $kydx ? [ $meta->{path}->@* ] : ['root'];
+            return RESULT_CONTINUE;
+        }
+
+        ok(
+            lives {
+                visit( \%hash, \&callback, visit => VISIT_ROOT )
+            },
+        ) or note $@;
+
+        is(
+            \@path,
+            [
+                ['root'],
+                ['a'],
+                ['b'],
+                [ 'b', 0 ],
+                [ 'b', 1 ],
+                [ 'b', 2 ],
+                ['c'],
+                [ 'c', 'd', ],
+                [ 'c', 'd', 0 ],
+                [ 'c', 'd', 1 ],
+                [ 'c', 'd', 2 ],
+                [ 'c', 'e', ],
+            ],
+        ) or note pp( \@path );
+
+    };
+
+    subtest 'revisit element' => sub {
+
+        my %hash = myhash;
+
+        my @path;
+        my sub callback ( $kydx, $vref, $context, $meta ) {
+            push @path, [ $meta->{pass}, defined $kydx ? $meta->{path}->@* : 'root', ];
+
+            return
+              defined( $kydx )
+              || $meta->{visit} > 1 || $meta->{pass} == PASS_REVISIT_ELEMENT
+              ? RESULT_CONTINUE
+              : RESULT_REVISIT_ELEMENT;
+        }
+
+        my $completed;
+        ok(
+            lives {
+                $completed = visit( \%hash, \&callback, visit => VISIT_ROOT )
+            },
+        ) or note $@;
+
+        is(
+            \@path,
+            [
+                [ PASS_VISIT_ELEMENT,   'root' ],
+                [ PASS_VISIT_ELEMENT,   'a' ],
+                [ PASS_VISIT_ELEMENT,   'b' ],
+                [ PASS_VISIT_ELEMENT,   'b', 0 ],
+                [ PASS_VISIT_ELEMENT,   'b', 1 ],
+                [ PASS_VISIT_ELEMENT,   'b', 2 ],
+                [ PASS_VISIT_ELEMENT,   'c' ],
+                [ PASS_VISIT_ELEMENT,   'c', 'd', ],
+                [ PASS_VISIT_ELEMENT,   'c', 'd', 0 ],
+                [ PASS_VISIT_ELEMENT,   'c', 'd', 1 ],
+                [ PASS_VISIT_ELEMENT,   'c', 'd', 2 ],
+                [ PASS_VISIT_ELEMENT,   'c', 'e', ],
+                [ PASS_REVISIT_ELEMENT, 'root' ],
+            ],
+        ) or note pp( \@path );
+
+    };
+
+    subtest 'revisit root' => sub {
+
+        my %hash = myhash;
+
+        my @path;
+        my sub callback ( $kydx, $vref, $context, $meta ) {
+            push @path, [ $meta->{visit}, defined $kydx ? $meta->{path}->@* : 'root', ];
+
+            return defined( $kydx ) || $meta->{visit} == 2
+              ? RESULT_CONTINUE
+              : RESULT_REVISIT_ROOT;
+        }
+
+        my $completed;
+        ok(
+            lives {
+                $completed = visit( \%hash, \&callback, visit => VISIT_ROOT )
+            },
+        ) or note $@;
+
+        is(
+            \@path,
+            [
+                [ 1, 'root' ],
+                [ 2, 'root' ],
+                [ 1, 'a' ],
+                [ 1, 'b' ],
+                [ 1, 'b', 0 ],
+                [ 1, 'b', 1 ],
+                [ 1, 'b', 2 ],
+                [ 1, 'c' ],
+                [ 1, 'c', 'd', ],
+                [ 1, 'c', 'd', 0 ],
+                [ 1, 'c', 'd', 1 ],
+                [ 1, 'c', 'd', 2 ],
+                [ 1, 'c', 'e', ],
+
+            ],
+        ) or note pp( \@path );
+
+    };
+
+    subtest 'return/abort' => sub {
+
+        my %hash = myhash;
+
+        my @path;
+        my sub callback ( $kydx, $vref, $context, $meta ) {
+            push @path, [ $meta->{pass}, defined $kydx ? $meta->{path}->@* : 'root' ];
+
+            return defined( $kydx )
+              ? RESULT_CONTINUE
+              : $context->{retval};
+        }
+
+        my $subtest = sub ( $retval, $expected ) {
+            @path = ();
+            my $got;
+            ok(
+                lives {
+                    ( $got ) = visit(
+                        \%hash, \&callback,
+                        visit   => VISIT_ROOT,
+                        context => { retval => $retval },
+                    );
+                },
+            ) or note $@;
+
+            is( $got, $expected, 'visit return value' );
+            is( \@path, [ [ PASS_VISIT_ELEMENT, 'root' ] ], ) or note pp( \@path );
+        };
+
+        subtest( 'return',       $subtest, RESULT_RETURN,       !!0 );
+        subtest( 'stop descent', $subtest, RESULT_STOP_DESCENT, !!1 );
+
+    };
+
+
+};
+
 
 done_testing;

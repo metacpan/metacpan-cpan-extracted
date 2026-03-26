@@ -7,7 +7,7 @@ use Mo qw(build default is);
 use Mo::utils 0.08 qw(check_isa check_required);
 use Mo::utils::Array qw(check_array_object);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 has datetime => (
 	is => 'ro',
@@ -122,8 +122,8 @@ Return reference to array with L<Data::MARC::Validator::Report::Plugin> objects.
  use Data::Printer;
  use Data::MARC::Validator::Report;
  use Data::MARC::Validator::Report::Error;
- use Data::MARC::Validator::Report::Errors;
  use Data::MARC::Validator::Report::Plugin;
+ use Data::MARC::Validator::Report::Plugin::Errors;
  use DateTime;
 
  # Create data object for validator report.
@@ -132,7 +132,7 @@ Return reference to array with L<Data::MARC::Validator::Report::Plugin> objects.
          'plugins' => [
                  Data::MARC::Validator::Report::Plugin->new(
                         'errors' => [
-                                Data::MARC::Validator::Report::Errors->new(
+                                Data::MARC::Validator::Report::Plugin::Errors->new(
                                         'errors' => [
                                                 Data::MARC::Validator::Report::Error->new(
                                                         'error' => 'Error #1',
@@ -210,6 +210,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut
