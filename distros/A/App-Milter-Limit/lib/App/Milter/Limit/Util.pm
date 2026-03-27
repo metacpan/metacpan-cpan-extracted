@@ -8,7 +8,7 @@
 #
 
 package App::Milter::Limit::Util;
-$App::Milter::Limit::Util::VERSION = '0.53';
+$App::Milter::Limit::Util::VERSION = '0.54';
 # ABSTRACT: utility functions for App::Milter::Limit
 
 
@@ -97,13 +97,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::Milter::Limit::Util - utility functions for App::Milter::Limit
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 DESCRIPTION
 
@@ -134,12 +136,16 @@ the config file.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/mschout/milter-limit>
-and may be cloned from L<git://github.com/mschout/milter-limit.git>
+and may be cloned from L<https://github.com/mschout/milter-limit.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-app-milter-limit@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/milter-limit/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

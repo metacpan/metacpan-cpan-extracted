@@ -4,7 +4,7 @@
       "Michael Schout <mschout@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -68,20 +68,47 @@
          }
       }
    },
+   "provides" : {
+      "App::Milter::Limit" : {
+         "file" : "lib/App/Milter/Limit.pm",
+         "version" : "0.54"
+      },
+      "App::Milter::Limit::Config" : {
+         "file" : "lib/App/Milter/Limit/Config.pm",
+         "version" : "0.54"
+      },
+      "App::Milter::Limit::Log" : {
+         "file" : "lib/App/Milter/Limit/Log.pm",
+         "version" : "0.54"
+      },
+      "App::Milter::Limit::PidFile" : {
+         "file" : "lib/App/Milter/Limit/PidFile.pm",
+         "version" : "0.54"
+      },
+      "App::Milter::Limit::Plugin" : {
+         "file" : "lib/App/Milter/Limit/Plugin.pm",
+         "version" : "0.54"
+      },
+      "App::Milter::Limit::Util" : {
+         "file" : "lib/App/Milter/Limit/Util.pm",
+         "version" : "0.54"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-app-milter-limit at rt.cpan.org",
-         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit"
+         "web" : "https://github.com/mschout/milter-limit/issues"
       },
-      "homepage" : "http://search.cpan.org/dist/App-Milter-Limit/",
+      "homepage" : "https://github.com/mschout/milter-limit",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mschout/milter-limit.git",
+         "url" : "https://github.com/mschout/milter-limit.git",
          "web" : "https://github.com/mschout/milter-limit"
       }
    },
-   "version" : "0.53",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+   "version" : "0.54",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

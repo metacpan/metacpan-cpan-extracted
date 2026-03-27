@@ -1,0 +1,25 @@
+Changes
+lib/Apophis.pm
+lib/Apophis.xs
+Makefile.PL
+MANIFEST
+PLAN.md
+ppport.h
+README
+t/00-load.t
+t/01-identify.t
+t/02-namespace.t
+t/03-store-fetch.t
+t/04-sharding.t
+t/05-exists-remove.t
+t/06-verify.t
+t/07-streaming.t
+t/08-bulk.t
+t/09-metadata.t
+t/10-edge-cases.t
+t/11-custom-ops.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

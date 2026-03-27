@@ -1,8 +1,14 @@
 Revision history for App::Milter::Limit
 
+0.54  2026-03-26
+    - Add sysv init script to contrib
+    - Add systemd init script
+    - Add config option `message` to send a user-defined defer/reject message
+    - Add config option `ignore` to allow unlimited sending for listed users
+
 0.53  2017-08-04
     - Kwalitee: add META.json, delcare min perl version, use warnings
-    - add "limit_from" configuration value to override the value taht is
+    - add "limit_from" configuration value to override the value that is
       limited.  You can use this to filter based on the authenticated username
       for example by using:
         limit_from = {auth_authen}

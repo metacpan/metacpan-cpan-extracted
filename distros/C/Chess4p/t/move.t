@@ -7,10 +7,10 @@ use Test::More;
 use utf8;
 
 use Config;
-skip_all('Only 64 bit systems are supported.') unless $Config{ptrsize} && $Config{ptrsize} == 8;
+plan skip_all => 'Only 64 bit systems are supported.'  unless $Config{ptrsize} && $Config{ptrsize} == 8;
+
 
 require Chess4p;
-
 
 use Chess4p::Common qw(E2 E4 F4 F7 F8);
 

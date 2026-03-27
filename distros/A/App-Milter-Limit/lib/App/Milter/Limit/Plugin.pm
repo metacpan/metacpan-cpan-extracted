@@ -8,7 +8,7 @@
 #
 
 package App::Milter::Limit::Plugin;
-$App::Milter::Limit::Plugin::VERSION = '0.53';
+$App::Milter::Limit::Plugin::VERSION = '0.54';
 # ABSTRACT: Milter Limit driver plugin base class
 
 use strict;
@@ -63,13 +63,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::Milter::Limit::Plugin - Milter Limit driver plugin base class
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -134,12 +136,16 @@ the configured expire time period.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/mschout/milter-limit>
-and may be cloned from L<git://github.com/mschout/milter-limit.git>
+and may be cloned from L<https://github.com/mschout/milter-limit.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-app-milter-limit@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/milter-limit/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

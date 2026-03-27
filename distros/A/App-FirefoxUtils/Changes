@@ -1,3 +1,15 @@
+0.024   2026-03-26  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli open-firefox-tabs] Add description.
+
+
+0.023   2026-03-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: open-firefox-tabs.
+
+
 0.022   2023-10-28  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

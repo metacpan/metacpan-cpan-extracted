@@ -7,7 +7,9 @@ use Test::More;
 use utf8;
 
 use Config;
-skip_all('Only 64 bit systems are supported.') unless $Config{ptrsize} && $Config{ptrsize} == 8;
+
+plan skip_all => 'Only 64 bit systems are supported.'  unless $Config{ptrsize} && $Config{ptrsize} == 8;
+
 
 require Chess4p;
 
@@ -314,6 +316,14 @@ is(Chess4p::Board::_print_bb(Chess4p::Board::_ray(A1, A1)), $empty_bb, 'Ray from
 
 is(Chess4p::Board::_print_bb(Chess4p::Board::_ray(A1, A8)), $a1_a8_bb, 'Ray from A1 to A8');
 is(Chess4p::Board::_print_bb(Chess4p::Board::_ray(A1, A4)), $a1_a8_bb, 'Ray from A1 to A4');
+
+
+# *** mirroring
+
+$bb = Chess4p::Board::_flip_vertical(Chess4p::Board::_make_bb(A2, H2));
+is(Chess4p::Board::_make_bb(A7, H7), $bb, 'A2, H2 flipped vertically is A7, H7');
+
+
 
 
 

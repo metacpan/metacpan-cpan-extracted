@@ -22,6 +22,9 @@ t/Business-UDC-Grammar/02-version.t
 t/Business-UDC-Parser/01-use.t
 t/Business-UDC-Parser/02-version.t
 t/Business-UDC-Parser/03-parse.t
+t/Business-UDC-Tokenizer/01-use.t
+t/Business-UDC-Tokenizer/02-version.t
+t/Business-UDC-Tokenizer/03-tokenize.t
 t/Business-UDC/01-use.t
 t/Business-UDC/02-version.t
 t/Business-UDC/03-new.t
@@ -31,9 +34,12 @@ t/Business-UDC/06-source.t
 UDC.pm
 UDC/Grammar.pm
 UDC/Parser.pm
+UDC/Tokenizer.pm
 xt/Business-UDC-Grammar/01-pod_coverage.t
 xt/Business-UDC-Grammar/02-pod.t
 xt/Business-UDC-Parser/01-pod_coverage.t
 xt/Business-UDC-Parser/02-pod.t
+xt/Business-UDC-Tokenizer/01-pod_coverage.t
+xt/Business-UDC-Tokenizer/02-pod.t
 xt/Business-UDC/01-pod_coverage.t
 xt/Business-UDC/02-pod.t

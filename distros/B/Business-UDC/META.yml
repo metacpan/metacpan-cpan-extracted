@@ -31,10 +31,10 @@ requires:
   Exporter: 0
   List::Util: 1.33
   Readonly: 0
-  perl: 5.6.2
+  perl: 5.13.1
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Business-UDC/issues
   homepage: https://github.com/michal-josef-spacek/Business-UDC
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Business-UDC
-version: '0.02'
+version: '0.03'

@@ -8,7 +8,7 @@
 #
 
 package App::Milter::Limit;
-$App::Milter::Limit::VERSION = '0.53';
+$App::Milter::Limit::VERSION = '0.54';
 # ABSTRACT: Sendmail Milter that limits message rate by sender
 
 use strict;
@@ -108,8 +108,16 @@ sub register {
     }
     else {
         # figure out the connection from sendmail
-        $milter->auto_setconn($$conf{name})
+        my $path = $milter->auto_getconn($$conf{name});
+        $milter->setconn($path)
             or croak "auto_setconn failed";
+
+        # get the socket's file name without local: or unix:
+        $path = substr($path,index($path, ':')+1);
+
+        # make sure the permissions are correct
+        chown $$conf{user}, $$conf{group}, $path
+            or die "chown($path): $!";
     }
 
     my %callbacks = (
@@ -198,6 +206,13 @@ sub _envfrom_callback {
     }
 
     my $reply = $$conf{reply} || 'reject';
+    my $message = $$conf{message} || 'Message limit exceeded';
+    my $ignore = $$conf{ignore} || '';
+
+    if (index(','.$ignore.',', ','.$from.',') != -1) {
+        info("$from found in ignore list, continuing");
+        return SMFIS_CONTINUE;
+    }
 
     my $count = $self->driver->query($from);
     debug("$from [$count/$$conf{limit}]");
@@ -206,14 +221,14 @@ sub _envfrom_callback {
         if ($reply eq 'defer') {
             info("$from exceeded message limit, deferring");
 
-            $ctx->setreply(450, '4.7.1', 'Message limit exceeded');
+            $ctx->setreply(450, '4.7.1', $message);
 
             return SMFIS_TEMPFAIL;
         }
         else {
             info("$from exceeded message limit, rejecting");
 
-            $ctx->setreply(550, '5.7.1', 'Message limit exceeded');
+            $ctx->setreply(550, '5.7.1', $message);
 
             return SMFIS_REJECT;
         }
@@ -235,13 +250,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 App::Milter::Limit - Sendmail Milter that limits message rate by sender
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 
@@ -293,12 +310,16 @@ L<App::Milter::Limit::Plugin::SQLite>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/mschout/milter-limit>
-and may be cloned from L<git://github.com/mschout/milter-limit.git>
+and may be cloned from L<https://github.com/mschout/milter-limit.git>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to bug-app-milter-limit@rt.cpan.org or through the web interface at:
- http://rt.cpan.org/Public/Dist/Display.html?Name=App-Milter-Limit
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/mschout/milter-limit/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

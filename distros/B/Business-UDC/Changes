@@ -1,3 +1,10 @@
+0.03 2026-03-26T19:43:52+01:00
+ - Add description for LBRACK and RBRACK tokens.
+ - Add some tests for tokenizer.
+ - Create new Tokenize.pm.
+ - Fix minimal Perl version, because Unicode in regexp.
+ - Simplify regexp ([\p{L}] -> \p{L}).
+
 0.02 2026-03-25T13:25:30+01:00
  - Add ACKNOWLEDGEMENTS section to doc.
  - Fix parsing of '016:[371.035.4:335.55]378(437)'.

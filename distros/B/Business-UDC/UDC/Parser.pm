@@ -6,13 +6,14 @@ use warnings;
 
 use Business::UDC::Grammar qw(can_follow_operator can_follow_primary can_precede_number
 	is_operator_token is_primary_token is_valid_operator);
+use Business::UDC::Tokenizer qw(tokenize);
 use Error::Pure qw(err);
 use List::Util 1.33 qw(any);
 use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(parse);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub parse {
 	my $input = shift;
@@ -24,7 +25,7 @@ sub parse {
 		err 'Empty input.';
 	}
 
-	my $tokens = _tokenize($input);
+	my $tokens = tokenize($input);
 	my $state = {
 		'tokens' => $tokens,
 		'pos' => 0,
@@ -387,127 +388,6 @@ sub _split_trailing_apos_aux {
 	}
 
 	return ($base, $last);
-}
-
-sub _tokenize {
-	my ($input) = @_;
-	my @tokens;
-
-	pos($input) = 0;
-
-	while (pos($input) < length($input)) {
-		if ($input =~ /\G\s+/gc) {
-			next;
-		}
-
-		my $start = pos($input);
-
-		if ($input =~ /\G(\d+(?:\.\d+)*)/gc) {
-			push @tokens, {
-				type => 'NUMBER',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G(\.\d+(?:\.\d+)*)/gc) {
-			push @tokens, {
-				type => 'AUX_DOT',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G(\[)/gc) {
-			push @tokens, {
-				type => 'LBRACK',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G(\])/gc) {
-			push @tokens, {
-				type => 'RBRACK',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G([:+\/])/gc) {
-			push @tokens, {
-				type => 'OP',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G(-\d+(?:\.\d+)*)/gc) {
-			push @tokens, {
-				type => 'FORM',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G(\([^)]+\))/gc) {
-			push @tokens, {
-				type => 'AUX_GROUP',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G("[^"]*")/gc) {
-			push @tokens, {
-				type => 'AUX_TIME',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G(=+(?:[A-Za-z]+|\d+(?:\.\d+)*))/gc) {
-			push @tokens, {
-				type => 'AUX_LANG',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G([\p{L}][\p{L}\p{N}._-]*)/gcu) {
-			push @tokens, {
-				type => 'ALPHA_SPEC',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		if ($input =~ /\G(\'\d+(?:\.\d+)*)/gc) {
-			push @tokens, {
-				type => 'APOS_AUX',
-				value => $1,
-				pos => $start,
-			};
-			next;
-		}
-
-		my $bad = substr($input, $start, 20);
-		err "Unrecognized input near '$bad'.",
-			'position' => $start,
-		;
-	}
-
-	return \@tokens;
 }
 
 1;

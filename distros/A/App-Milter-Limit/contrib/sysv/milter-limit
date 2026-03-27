@@ -1,0 +1,37 @@
+#! /bin/sh
+#
+# milter-limit - Rate limiting milter for Sendmail
+#
+### BEGIN INIT INFO
+# Provides:       milter-limit
+# Required-Start:
+# Required-Stop:
+# Default-Start:  3 5
+# Default-Stop:
+# Description:  sendmail milter to reject messages based on the number of sent messages
+
+### END INIT INFO
+
+case "$1" in
+  start)
+    echo -n 'Starting milter-limit...'
+    /usr/local/bin/milter-limit &
+    echo ' done'
+	;;
+
+  stop)
+    echo -n 'Stopping milter-limit...'
+    killall -TERM milter-limit
+    echo ' done'
+	;;
+
+  restart)
+	  $0 stop
+	  echo "Sleeping for 4 seconds..."
+	  sleep 4
+	  $0 start
+	;;
+  *)
+	echo  $"Usage: $0 {start|stop|restart}"
+	exit 1
+esac

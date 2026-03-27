@@ -19,10 +19,12 @@ Readonly::Hash our %DESC => (
 	AUX_LANG => 'language auxiliary',
 	AUX_TIME => 'quoted time auxiliary',
 	FORM => 'special auxiliary subdivision',
+	LBRACK => 'left subgroup bracket',
 	NUMBER => 'main UDC number',
 	OP => 'operator',
 	PARTIAL_FORM => 'partial form for range shorthand',
 	PARTIAL_NUMBER => 'partial number for range shorthand',
+	RBRACK => 'right subgroup bracket',
 );
 Readonly::Hash our %TOKEN_RULES => (
 	ALPHA_SPEC => {
@@ -102,7 +104,7 @@ Readonly::Hash our %OPERATORS => (
 	},
 );
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub can_be_standalone {
 	my $type = shift;

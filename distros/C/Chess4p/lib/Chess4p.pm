@@ -65,7 +65,7 @@ BEGIN {
 
 use lib '.';
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 use Chess4p::Common;
 use Chess4p::Move;

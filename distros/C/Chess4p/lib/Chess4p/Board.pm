@@ -139,6 +139,17 @@ sub _print_bb { ## no critic (Subroutines::RequireArgUnpacking)
     $result;
 }
 
+sub _flip_vertical { ## no critic (Subroutines::RequireArgUnpacking)
+    # https://www.chessprogramming.org/Flipping_Mirroring_and_Rotating#FlipVertically
+    # portable
+    my $bb = $_[0];
+    no warnings "portable";
+    $bb = (($bb >> 8) & 0x00ff_00ff_00ff_00ff) | (($bb & 0x00ff_00ff_00ff_00ff) << 8);
+    $bb = (($bb >> 16) & 0x0000_ffff_0000_ffff) | (($bb & 0x0000_ffff_0000_ffff) << 16);
+    $bb = ($bb >> 32) | (($bb & 0x0000_0000_ffff_ffff) << 32);
+    return $bb
+}
+  
 sub _carry_rippler_iter {
     # iterate over subsets of a bitboard
     my ($mask) = @_;
@@ -375,7 +386,7 @@ sub _valid_ep_square {
 sub _build_bitboards_from_table {
     #  bb goes from a1-h1, a2-h2, ..., a8-h8
     my $pos = shift;
-    # all BBs = 0
+    
     for my $p (WP .. BK) {
         $pos->{bb}{$p} = 0;
     }
@@ -384,6 +395,9 @@ sub _build_bitboards_from_table {
         next if $pc == EMPTY;
         $pos->{bb}{$pc} |= 1 << ($sq);
     }
+    
+    $pos->{bb}{White} = 0;
+    $pos->{bb}{Black} = 0;
     for my $p (WP .. WK) {
         $pos->{bb}{White} |=  $pos->{bb}{$p};
     }
@@ -1002,9 +1016,10 @@ sub errors {
     if (($pos->{bb}{WP()} | $pos->{bb}{BP()}) & ($bb_rank_1 | $bb_rank_8)) {
         return "Pawns on back rank";
     }
+    if ($pos->_was_into_check()) {
+        return "Self in check";
+    }
 
-    # TODO side to move giving check
-    
     my $valid_ep_sqr = $pos->_valid_ep_square();
     if ($pos->{ep_square}) {
         if (! defined $valid_ep_sqr || $valid_ep_sqr != $pos->{ep_square}) {
@@ -1219,6 +1234,27 @@ sub _slider_blockers {
     $blockers;
 }
 
+sub _was_into_check {
+    my ($pos) = @_;
+    my $s = $pos->{to_move};
+    return 0 unless $s;
+    my $king = $s eq 'w' ? $pos->{bb}{BK()} : $pos->{bb}{WK()};
+    $king = _msb($king);
+    return $king && $pos->_get_attackers($s, $king);
+}
+
+sub _push_random_move {
+    # make a legal move chosen at random.
+    # if no legal move exists, do nothing
+    # return 1 if a move was made
+    my ($pos) = @_;
+    my $moves_ref = $pos->legal_moves();
+    return 0 unless @$moves_ref;
+    my $i = rand(@$moves_ref);
+    $pos->push_move($moves_ref->[$i]);
+    return 1;
+}
+
 sub legal_moves_iter {
     # iterate over legal moves from board position
     my ($pos) = @_;
@@ -1396,6 +1432,62 @@ sub pop_move {
     return $move;
 }
 
+sub apply_mirror {
+    my ($pos) = @_;
+    for my $sqr (A1 .. H4) {
+        my $sqr_m = _square_mirror($sqr);
+        ($pos->{table}[$sqr], $pos->{table}[$sqr_m]) = ($pos->{table}[$sqr_m], $pos->{table}[$sqr]);
+    }
+    for my $sqr (A1 .. H8) {
+        if ($pos->{table}[$sqr] == BP) {
+            $pos->{table}[$sqr] = WP;
+        }
+        elsif ($pos->{table}[$sqr] == WP) {
+            $pos->{table}[$sqr] = BP;
+        }
+        elsif ($pos->{table}[$sqr] == WK) {
+            $pos->{table}[$sqr] = BK;
+        }
+        elsif ($pos->{table}[$sqr] == BK) {
+            $pos->{table}[$sqr] = WK;
+        }
+        elsif ($pos->{table}[$sqr] == WQ) {
+            $pos->{table}[$sqr] = BQ;
+        }
+        elsif ($pos->{table}[$sqr] == BQ) {
+            $pos->{table}[$sqr] = WQ;
+        }
+        elsif ($pos->{table}[$sqr] == WN) {
+            $pos->{table}[$sqr] = BN;
+        }
+        elsif ($pos->{table}[$sqr] == BN) {
+            $pos->{table}[$sqr] = WN;
+        }
+        elsif ($pos->{table}[$sqr] == WR) {
+            $pos->{table}[$sqr] = BR;
+        }
+        elsif ($pos->{table}[$sqr] == BR) {
+            $pos->{table}[$sqr] = WR;
+        }
+        elsif ($pos->{table}[$sqr] == WB) {
+            $pos->{table}[$sqr] = BB;
+        }
+        elsif ($pos->{table}[$sqr] == BB) {
+            $pos->{table}[$sqr] = WB;
+        }
+    }
+    $pos->{to_move} = $pos->_opponent();
+    $pos->{castling_rights} = _flip_vertical($pos->{castling_rights});
+    $pos->{ep_square} = _square_mirror($pos->{ep_square}) if $pos->{ep_square};
+
+    # TODO
+    # use _flip_vertical when table is ditched later
+
+    _build_bitboards_from_table($pos);
+
+    # TODO
+    # decide whether to clear move stack and state stack
+}
 
 
 
@@ -1508,6 +1600,10 @@ Black move.
 =head2 halfmove_clock()
 
 Number of ply since last capture or pawn move.
+
+=head2 apply_mirror()
+
+Mirror this board vertically.
 
 
 =head1 AUTHOR

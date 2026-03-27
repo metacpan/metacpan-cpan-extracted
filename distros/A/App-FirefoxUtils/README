@@ -2,8 +2,8 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.022 of App::FirefoxUtils (from Perl
-    distribution App-FirefoxUtils), released on 2023-10-28.
+    This document describes version 0.024 of App::FirefoxUtils (from Perl
+    distribution App-FirefoxUtils), released on 2026-03-26.
 
 SYNOPSIS
 DESCRIPTION
@@ -15,13 +15,14 @@ DESCRIPTION
     4. get-firefox-profile-dir
     5. kill-firefox
     6. list-firefox-profiles
-    7. pause-and-unpause-firefox
-    8. pause-firefox
-    9. ps-firefox
-    10. restart-firefox
-    11. start-firefox
-    12. terminate-firefox
-    13. unpause-firefox
+    7. open-firefox-tabs
+    8. pause-and-unpause-firefox
+    9. pause-firefox
+    10. ps-firefox
+    11. restart-firefox
+    12. start-firefox
+    13. terminate-firefox
+    14. unpause-firefox
 
 FUNCTIONS
   firefox_has_processes
@@ -31,7 +32,7 @@ FUNCTIONS
 
     Check whether Firefox has processes.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -103,7 +104,7 @@ FUNCTIONS
     Firefox is defined as paused if *all* of its processes are in 'stop'
     state.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -177,7 +178,7 @@ FUNCTIONS
     but is currently paused, we do not say that it's running. If you want to
     check if Firefox process exists, you can use "ps_firefox".
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -239,6 +240,108 @@ FUNCTIONS
 
     Return value: (any)
 
+  open_firefox_tabs
+    Usage:
+
+     open_firefox_tabs(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Open a list of Firefox tabs, with options.
+
+    This utility is best used via Perl or curried after you supply the list
+    of items. For example, in script "open-my-tiktok":
+
+     use App::FirefoxUtils ();
+     use Perinci::CmdLine::Any;
+     use Perinci::Sub::Util qw(gen_curried_sub);
+ 
+     my @containers = (
+         'account1',
+         'account2',
+         'account3',
+     );
+ 
+     my @containers_additional = (
+         'account4',
+         'account5',
+     );
+ 
+     gen_curried_sub(
+         'App::FirefoxUtils::open_firefox_tabs',
+         {
+             items => [
+                 (map { +{url=>'https://www.tiktok.com/', container=>$_} } @containers),
+                 (map { +{url=>'https://www.tiktok.com/', container=>$_, include_by_default=>0} } @containers_additional),
+             ],
+         },
+         'open_my_tiktok',
+     );
+ 
+     Perinci::CmdLine::Any->new(
+         url => '/main/open_my_tiktok',
+         log => 1,
+     )->run;
+
+    Later on, you run your script:
+
+     # open all items that are included by default
+     % open-my-tiktok
+ 
+     # only open items that match the queries
+     % open-my-tiktok account2 account3
+ 
+     # only open items that do not contain 'account4'
+     % open-my-tiktok --new-window --shuffle -- -account4
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exclude_all_tags => *array[str]*
+
+        Exclude all items that have ALL tags specified.
+
+    *   exclude_any_tags => *array[str]*
+
+        Exclude all items that have any tags specified.
+
+    *   include_all_tags => *array[str]*
+
+        Include all items that have ALL tags specified.
+
+    *   include_any_tags => *array[str]*
+
+        Include all items that have any tag specified.
+
+    *   items* => *array[hash]*
+
+        (No description)
+
+    *   new_window => *bool*
+
+        (No description)
+
+    *   query => *array[str]*
+
+        (No description)
+
+    *   shuffle => *bool*
+
+        (No description)
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   pause_and_unpause_firefox
     Usage:
 
@@ -270,7 +373,7 @@ FUNCTIONS
 
     You can customize the periods via the "periods" option.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -354,7 +457,7 @@ FUNCTIONS
     little while, e.g. when you are typing on an editor or watching a movie.
     When you want to use your browser again, simply unpause (kill -CONT) it.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -419,7 +522,7 @@ FUNCTIONS
 
     List Firefox processes.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -484,7 +587,7 @@ FUNCTIONS
 
     Restart firefox.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     This function supports dry-run operation.
 
@@ -525,7 +628,7 @@ FUNCTIONS
 
     Start firefox if not already started.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     This function supports dry-run operation.
 
@@ -566,7 +669,7 @@ FUNCTIONS
 
     Terminate Firefox (by default with -KILL signal).
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -635,7 +738,7 @@ FUNCTIONS
 
     Unpause (resume, continue, kill -CONT) Firefox.
 
-    This function is not exported.
+    This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
 
@@ -735,8 +838,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2022, 2021, 2020, 2019 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

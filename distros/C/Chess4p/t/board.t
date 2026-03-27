@@ -7,7 +7,9 @@ use Test::More;
 use utf8;
 
 use Config;
-skip_all('Only 64 bit systems are supported.') unless $Config{ptrsize} && $Config{ptrsize} == 8;
+
+plan skip_all => 'Only 64 bit systems are supported.'  unless $Config{ptrsize} && $Config{ptrsize} == 8;
+
 
 use Chess4p::Common qw(FILE_A FILE_B FILE_C FILE_D
                      FILE_E FILE_F FILE_G FILE_H
@@ -149,9 +151,12 @@ ok(!$board->_attacked_for_king(Chess4p::Board::_make_bb(E4)), 'e4 is not attacke
 ok(!$board->_attacked_for_king(Chess4p::Board::_make_bb(C3)), 'c3 is not attacked for WK');
 ok($board->_attacked_for_king(Chess4p::Board::_make_bb(C6)), 'c6 is attacked for WK');
 
+ok($board->_push_random_move(), 'random move');
 
 
-# *** Default
+
+
+# *** Default FEN
 $board = Chess4p::Board->fromFen();
 
 is($board->errors(), undef, "board is valid");
@@ -165,28 +170,10 @@ ok($board->queenside_castling_right('b'), "black retains kingside castling right
 is($board->fen(), 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1' , "FEN output is correct");
 
 $attackers = $board->_get_attackers('w', F2);
-$expected =
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . 1 . . .";
-is(Chess4p::Board::_print_bb($attackers), $expected, 'Attackers are: Ke1');
+is($attackers, Chess4p::Board::_make_bb(E1), 'Attackers are: Ke1');
 
 $attackers = $board->_get_attackers('w', F3);
-$expected =
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . 1 . 1 .\n".
-  ". . . . . . 1 .";
-is(Chess4p::Board::_print_bb($attackers), $expected, 'Attackers are: Ng1, Pe2, Pg2');
+is($attackers, Chess4p::Board::_make_bb(G1, E2, G2), 'Attackers are: Ng1, Pe2, Pg2');
 
 
 
@@ -328,7 +315,6 @@ is($board->ep_square(), F6, "ep square == f6");
 ok($board->_check_consistency(), "board is consistent");
 is($board->fullmove_number(), 4, "full move number == 4");
 is($board->halfmove_clock(), 0, "halfmove clock == 0");
-#                  rnbqkbnr/ppp3p/43/3Pp2/34/8/PPP2PP/RNBQKBNR w KQkq - 0 1
 is($board->fen(), 'rnbqkbnr/ppp3pp/4p3/3pPp2/3P4/8/PPP2PPP/RNBQKBNR w KQkq f6 0 4', 'FEN output is correct');
 
 $moves = _pseudo_legal_moves($board);
@@ -340,28 +326,10 @@ is((join ' ', @$legal_moves), $mv_str, 'legal move list as expected');
 ok($board->_check_consistency(), "board is consistent");
 
 $attackers = $board->_get_attackers('w', E2);
-$expected_bb =
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . 1 1 1 1 .";
-is(Chess4p::Board::_print_bb($attackers), $expected_bb, 'Attackers: Qd1, Ke1, Bf1, Ng1');
+is($attackers, Chess4p::Board::_make_bb(D1, E1, F1, G1), 'Attackers: Qd1, Ke1, Bf1, Ng1');
 
 $attackers = $board->_get_attackers('b', D7);
-$expected_bb =
-  ". 1 1 1 1 . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .";
-is(Chess4p::Board::_print_bb($attackers), $expected_bb, 'Attackers: Qd8, Ke8, Bc8, Nb8');
+is($attackers,  Chess4p::Board::_make_bb(D8, E8, C8, B8), '');
 
 # Push exf6 e.p.
 my $debug_state = $board->_debug_state();
@@ -635,28 +603,11 @@ is((join ' ', @$legal_moves), $mv_str, 'legal move list as expected');
 # *** Attackers
 
 $attackers = $board->_get_attackers('w', F2);
-$expected =
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . 1 . . .\n".
-  ". . . . . 1 . .\n".
-  ". . . . . . . .\n".
-  ". . . . 1 . . .";
-is(Chess4p::Board::_print_bb($attackers), $expected, 'Attackers are: Ke1, Ne4, Qf3');
+is($attackers, Chess4p::Board::_make_bb(E1, F3, E4), 'Attackers are: Ke1, Ne4, Qf3');
 
 $attackers =  $board->_get_attackers('b', H7);
-$expected =
-  ". . . . . . 1 .\n".
-  ". . . . 1 . . .\n".
-  ". . . . . 1 . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .\n".
-  ". . . . . . . .";
-is(Chess4p::Board::_print_bb($attackers), $expected, 'Attackers are: Kg8, Nf6, Qe7');
+is($attackers, Chess4p::Board::_make_bb(G8, F6, E7), 'Attackers are: Kg8, Nf6, Qe7');
+
 
 
 # *** Castling
@@ -777,7 +728,19 @@ is((join ' ', @$legal_moves), 'b8c6 b8d7 c8d7 d8d7', 'legal move list as expecte
 $fen = "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3";
 $board = Chess4p::Board->fromFen($fen);
 $legal_moves = _legal_moves($board);
-is((join ' ', @$legal_moves), '', 'legal move list as expected');
+is((join ' ', @$legal_moves), '', 'legal move list empty');
+ok(!$board->_push_random_move(), 'no move made');
+is($board->fen(), $fen, 'Position is unchanged');
+
+
+# *** Scholars mate
+
+$fen = "r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4";
+$board = Chess4p::Board->fromFen($fen);
+$legal_moves = _legal_moves($board);
+is((join ' ', @$legal_moves), '', 'legal move list empty');
+ok(!$board->_push_random_move(), 'no move made');
+is($board->fen(), $fen, 'Position is unchanged');
 
 
 # *** Keres 3.Bd2 Qe7
@@ -1043,7 +1006,52 @@ is(@$moves, 52, "52 moves.");
 is((join ' ', @$moves), $mv_str, 'pseudo legal move list as expected');
 
 
-  
+
+# *** Invalid position - king can be captured
+
+$fen = "4k3/8/5N2/8/8/8/8/4K3 w - - 0 4";
+$board = Chess4p::Board->fromFen($fen);
+is($board->errors(), 'Self in check', "board is not valid - side to move gives check");
+
+$fen = "4k3/8/8/8/8/3n4/8/4K3 b - - 0 4";
+$board = Chess4p::Board->fromFen($fen);
+is($board->errors(), 'Self in check', "board is not valid - side to move gives check");
+
+
+
+# *** Apply mirror
+
+$board = Chess4p::Board->fromFen("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8");
+$board->apply_mirror();
+is($board->fen(), "rnbqk2r/ppp1nNpp/8/2b5/8/2P5/PP1pBPPP/RNBQ1K1R b kq - 1 8", 'mirror applied');
+
+
+# kiwipete
+$board = Chess4p::Board->fromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1");
+$legal_moves = _legal_moves($board);
+is(@$legal_moves, 48, "48 legal moves (kiwi before mirroring).");
+$mv_str = 'g2h3 d5e6 a2a3 b2b3 g2g3 d5d6 a2a4 g2g4 a1b1 a1c1 a1d1 e1d1 e1f1 h1f1 h1g1 d2c1 d2e3 d2f4 d2g5 d2h6 e2d1 e2f1 e2d3 e2c4 e2b5 e2a6 c3b1 c3d1 c3a4 c3b5 f3d3 f3e3 f3g3 f3h3 f3f4 f3g4 f3f5 f3h5 f3f6 e5d3 e5c4 e5g4 e5c6 e5g6 e5d7 e5f7 e1g1 e1c1';
+is((join ' ', @$legal_moves), $mv_str, 'legal move list as expected');
+$board->apply_mirror();
+is($board->fen(), "r3k2r/pppbbppp/2n2q1P/1P2p3/3pn3/BN2PNP1/P1PPQPB1/R3K2R b KQkq - 0 1", 'mirror applied (kiwi)');
+$legal_moves = _legal_moves($board);
+is(@$legal_moves, 48, "48 legal moves (kiwi mirrored).");
+is((join ' ', @$legal_moves), 'd4e3 g7h6 d4d3 a7a6 b7b6 g7g6 a7a5 g7g5 h8f8 h8g8 e4d2 e4f2 e4c3 e4g3 e4c5 e4g5 e4d6 c6b4 c6a5 c6b8 c6d8 f6f3 f6f4 f6h4 f6f5 f6g5 f6d6 f6e6 f6g6 f6h6 d7h3 d7g4 d7f5 d7e6 d7c8 e7a3 e7b4 e7c5 e7d6 e7d8 e7f8 a8b8 a8c8 a8d8 e8d8 e8f8 e8c8 e8g8', 'legal move list as expected');
+
+
+# en passant
+$fen = "rnbqkbnr/pp4pp/4p3/3pPp2/2pP4/2P5/PP3PPP/RNBQKBNR w KQkq f6 0 1";
+$board = Chess4p::Board->fromFen($fen);
+$legal_moves = _legal_moves($board);
+is(@$legal_moves, 35, "35 legal moves.");
+is((join ' ', @$legal_moves), 'e5f6 a2a3 b2b3 f2f3 g2g3 h2h3 a2a4 b2b4 f2f4 g2g4 h2h4 b1d2 b1a3 c1d2 c1e3 c1f4 c1g5 c1h6 d1c2 d1d2 d1e2 d1b3 d1d3 d1f3 d1a4 d1g4 d1h5 e1d2 e1e2 f1e2 f1d3 f1c4 g1e2 g1f3 g1h3', 'legal move list as expected');
+$board->apply_mirror();
+is($board->fen(), "rnbqkbnr/pp3ppp/2p5/2Pp4/3PpP2/4P3/PP4PP/RNBQKBNR b KQkq f3 0 1", 'mirror applied');
+$legal_moves = _legal_moves($board);
+is(@$legal_moves, 35, "35 legal moves.");
+is((join ' ', @$legal_moves), 'e4f3 a7a6 b7b6 f7f6 g7g6 h7h6 a7a5 b7b5 f7f5 g7g5 h7h5 b8a6 b8d7 c8h3 c8g4 c8f5 c8e6 c8d7 d8h4 d8a5 d8g5 d8b6 d8d6 d8f6 d8c7 d8d7 d8e7 e8d7 e8e7 f8c5 f8d6 f8e7 g8f6 g8h6 g8e7', 'legal move list as expected');
+
+
 
 
 

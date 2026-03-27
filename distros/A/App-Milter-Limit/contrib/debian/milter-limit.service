@@ -1,0 +1,20 @@
+[Unit]
+Description = Rate limiting milter for Sendmail
+After = syslog.target network.target
+
+[Service]
+#
+# Note, forking expects the executable to create a process to run
+# in the background. simple expects the started process to keep running
+# If running milter-limit in debug may want to change the type to simple
+# 
+# Also, the PID file is copied from the config file in /etc/mail
+#
+Type = forking
+User = root
+ExecStart = /usr/local/bin/milter-limit start
+PIDFile = /run/milter-limit/milter-limit.pid 
+Restart = on-failure
+
+[Install]
+WantedBy = multi-user.target
