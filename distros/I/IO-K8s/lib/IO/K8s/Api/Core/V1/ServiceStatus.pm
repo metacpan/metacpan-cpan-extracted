@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ServiceStatus;
 # ABSTRACT: ServiceStatus represents the current status of a service.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s conditions => ['Meta::V1::Condition'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ServiceStatus - ServiceStatus represents the current sta
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 conditions
 

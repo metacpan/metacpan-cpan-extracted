@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::PodsMetricSource;
 # ABSTRACT: PodsMetricSource indicates how to scale on a metric describing each pod in the current scale target (for example, transactions-processed-per-second). The values will be averaged together before being compared to the target value.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s metric => 'Autoscaling::V2::MetricIdentifier', 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Autoscaling::V2::PodsMetricSource - PodsMetricSource indicates how
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 metric
 

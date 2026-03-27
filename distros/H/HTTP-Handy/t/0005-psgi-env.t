@@ -156,7 +156,7 @@ sub send_and_parse {
     my $raw = '';
     while (my $c = <$s>) { $raw .= $c }
     close $s;
-    my (undef, $body) = split /\r\n\r\n/, $raw, 2;
+    my @_parts = split /\r\n\r\n/, $raw, 2; my $body = $_parts[1];
     $body = defined $body ? $body : '';
     my %h;
     for (split /\n/, $body) { $h{$1} = $2 if /^([^=]+)=(.*)$/ }

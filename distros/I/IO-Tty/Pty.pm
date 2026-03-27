@@ -3,16 +3,14 @@
 package IO::Pty;
 
 use strict;
+use warnings;
 use Carp;
 use IO::Tty qw(TIOCSCTTY TCSETCTTY TIOCNOTTY);
 use IO::File;
 require POSIX;
 
-use vars qw(@ISA $VERSION);
-
-$VERSION = '1.21';    # keep same as in Tty.pm
-
-@ISA = qw(IO::Handle);
+our @ISA     = qw(IO::Handle);
+our $VERSION = '1.23';    # keep same as in Tty.pm
 eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
 push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
@@ -69,7 +67,7 @@ sub slave {
 
     my $tty = ${*$master}{'io_pty_ttyname'};
 
-    my $slave = new IO::Tty;
+    my $slave = IO::Tty->new;
 
     $slave->open( $tty, O_RDWR | O_NOCTTY )
       || croak "Cannot open slave $tty: $!";
@@ -103,7 +101,7 @@ sub make_slave_controlling_terminal {
 
     # now open slave, this should set it as controlling tty on some systems
     my $ttyname = ${*$self}{'io_pty_ttyname'};
-    my $slv     = new IO::Tty;
+    my $slv     = IO::Tty->new;
     $slv->open( $ttyname, O_RDWR )
       or croak "Cannot open slave $ttyname: $!";
 
@@ -166,13 +164,13 @@ IO::Pty - Pseudo TTY object class
 
 =head1 VERSION
 
-1.20
+1.23
 
 =head1 SYNOPSIS
 
     use IO::Pty;
 
-    $pty = new IO::Pty;
+    $pty = IO::Pty->new;
 
     $slave  = $pty->slave;
 

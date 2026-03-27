@@ -6,10 +6,12 @@
 package Lingua::ZHO::Numbers;
 # ABSTRACT: Number 2 word conversion in ZHO.
 
+use 5.16.0;
+use utf8;
+use warnings;
+
 # {{{ use block
 
-use 5.10.1;
-use strict;
 use Carp;
 use Exporter;
 use base 'Exporter';
@@ -17,7 +19,7 @@ use vars qw($Charset @EXPORT_OK);
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 @EXPORT_OK = 'number_to_zh';
 
@@ -27,18 +29,18 @@ our %MAP = (
 ($] >= 5.006) ? eval  ## no critic
   q(
     'traditional'   => {
-        mag => [ '', split(' ', "\x{842c} \x{5104} \x{5146} \x{4eac} \x{5793} \x{79ed} \x{7a70} \x{6e9d} \x{6f97} \x{6b63} \x{8f09} \x{6975} \x{6046}\x{6cb3}\x{6c99} \x{963f}\x{50e7}\x{7947} \x{90a3}\x{7531}\x{4ed6} \x{4e0d}\x{53ef}\x{601d}\x{8b70} \x{7121}\x{91cf}\x{5927}\x{6578}") ],
-        ord => [ '', split(' ', "\x{5341} \x{767e} \x{5343}") ],
-        dig => [ split(' ', "\x{96f6} \x{4e00} \x{4e8c} \x{4e09} \x{56db} \x{4e94} \x{516d} \x{4e03} \x{516b} \x{4e5d} \x{5341}") ],
-        dot => "\x{9ede}",
-        neg => "\x{8ca0}",
+        mag => [ '', split(' ', "萬 億 兆 京 垓 秭 穰 溝 澗 正 載 極 恆河沙 阿僧祇 那由他 不可思議 無量大數") ],
+        ord => [ '', split(' ', "十 百 千") ],
+        dig => [ split(' ', "零 一 二 三 四 五 六 七 八 九 十") ],
+        dot => "點",
+        neg => "負",
     },
     'simplified'    => {
-        mag => [ '', split(' ', "\x{4e07} \x{4ebf} \x{5146} \x{4eac} \x{5793} \x{79ed} \x{7a70} \x{6c9f} \x{6da7} \x{6b63} \x{8f7d} \x{6781} \x{6052}\x{6cb3}\x{6c99} \x{963f}\x{50e7}\x{7957} \x{90a3}\x{7531}\x{4ed6} \x{4e0d}\x{53ef}\x{601d}\x{8bae} \x{65e0}\x{91cf}\x{5927}\x{6570}") ],
-        ord => [ '', split(' ', "\x{5341} \x{767e} \x{5343}") ],
-        dig => [ split(' ', "\x{96f6} \x{4e00} \x{4e8c} \x{4e09} \x{56db} \x{4e94} \x{516d} \x{4e03} \x{516b} \x{4e5d} \x{5341}") ],
-        dot => "\x{70b9}",
-        neg => "\x{8d1f}",
+        mag => [ '', split(' ', "万 亿 兆 京 垓 秭 穰 沟 涧 正 载 极 恒河沙 阿僧祗 那由他 不可思议 无量大数") ],
+        ord => [ '', split(' ', "十 百 千") ],
+        dig => [ split(' ', "零 一 二 三 四 五 六 七 八 九 十") ],
+        dot => "点",
+        neg => "负",
     },
 ) : (),
     'big5'          => {
@@ -140,7 +142,6 @@ sub _convert {
            || $input !~ m{\A[\-\.\d]+\z}xms
            || $input >= 10 ** 15;
 
-
     $input =~ s/[^\d\.\-]//;
 
     my @dig = @{$map->{dig}};
@@ -207,7 +208,7 @@ Lingua::ZHO::Numbers - Converts numeric values into their Chinese string equival
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -270,10 +271,12 @@ Sean Burke for suggesting me to write this module.
 
 =head1 AUTHORS
 
-Autrijus Tang, <autrijus@autrijus.org>
-
-Maintenance
-PetaMem s.r.o., <info@petamem.com>
+ initial coding:
+   Autrijus Tang E<lt>autrijus@autrijus.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
@@ -283,6 +286,12 @@ This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
 
 See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

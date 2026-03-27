@@ -140,12 +140,6 @@ $old_hole->wrap( sub { no strict; my $inc = 'INC'; "@{[%$inc]}" }, $safe, '&get_
 is( $safe->reval('%INC = ( FOO => "./FOO.pm" ); &get_inc'), 'FOO ./FOO.pm', '%INC = ( FOO => "./FOO.pm" );' );
 
 ###################################
-# Test wrapping of objects
-##################################
-
-# To do
-
-###################################
 # Test that undefined subs are reported when arg is a wrapped object (GH#1)
 ##################################
 {

@@ -2,12 +2,12 @@
 package Lingua::FRA::Numbers;
 # ABSTRACT: This module converts a number into a French cardinal or ordinal.
 
-use strict;
+use 5.16.0;
 use utf8;
+use warnings;
 
 use Carp qw(carp);
-use Exporter;
-use vars qw( @ISA @EXPORT_OK );
+use Export::Attrs;
 use vars qw(
   $MODE
   %NUMBER_NAMES
@@ -16,9 +16,7 @@ use vars qw(
   $SIGN_NAMES
 );
 
-our $VERSION = '0.2603230';
-@ISA                      = qw(Exporter);
-@EXPORT_OK                = qw( &number_to_fr &ordinate_to_fr );
+our $VERSION = '0.2603260';
 $SIGN_NAMES               = ('moins');
 $OUTPUT_DECIMAL_DELIMITER = ('virgule');
 %NUMBER_NAMES             = (
@@ -67,7 +65,7 @@ $OUTPUT_DECIMAL_DELIMITER = ('virgule');
     9 => 'neuv',
 );
 
-sub number_to_fr {
+sub number_to_fr :Export {
     my $number    = shift;
     my @fr_string = ();
 
@@ -260,7 +258,7 @@ sub number_to_fr {
     return join ( ' ', @fr_string );
 }
 
-sub ordinate_to_fr {
+sub ordinate_to_fr :Export {
     my $number = shift;
 
     unless ( $number > 0 ) {
@@ -320,7 +318,7 @@ equivalents
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -455,10 +453,24 @@ https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-FR-Numbers
 Copyright 2002, Briac Pilpré. All Rights Reserved. This module can be
 redistributed under the same terms as Perl itself.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Briac Pilpré <briac@cpan.org>
+ initial coding:
+   Briac Pilpré E<lt>briac@cpan.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 SEE ALSO
 
 Lingua::EN::Numbers, Lingua::Word2Num
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
+
+=cut

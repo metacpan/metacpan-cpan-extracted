@@ -35,13 +35,13 @@ subtest 'array element access evaporates' => sub {
     is($tied->wetness, 85, 'element access evaporated');
 };
 
-subtest 'array scalar context evaporates' => sub {
+subtest 'array scalar context does not evaporate' => sub {
     my @arr = (1, 2, 3, 4);
     my $tied = wet_tie(\@arr, 10);
     
-    my $count = scalar @arr;  # FETCHSIZE evaporates
+    my $count = scalar @arr;  # FETCHSIZE does NOT evaporate (metadata only)
     is($count, 4, 'scalar context gives count');
-    ok($tied->wetness < 90, 'scalar context evaporated');
+    is($tied->wetness, 90, 'scalar context did not evaporate (only wetness() call did)');
 };
 
 subtest 'array iteration evaporates' => sub {
@@ -51,11 +51,14 @@ subtest 'array iteration evaporates' => sub {
     # wetness() evaporates: 100-10=90
     is($tied->wetness, 90, 'initial check');
     
-    # for loop: FETCHSIZE + 3 FETCH calls = 4 evaporations (90-40=50)
-    for my $x (@arr) { }
+    # for loop: 3 FETCH calls = 3 evaporations (90-30=60)
+    # (FETCHSIZE no longer evaporates - it's metadata access)
+    # Note: Must USE the variable to trigger FETCH, empty loop bodies are optimized
+    my $sum = 0;
+    for my $x (@arr) { $sum += $x; }
     
-    # wetness() evaporates: 50-10=40
-    is($tied->wetness, 40, 'iteration evaporated (fetchsize + 3 elements)');
+    # wetness() evaporates: 60-10=50
+    is($tied->wetness, 50, 'iteration evaporated (3 element fetches)');
 };
 
 subtest 'array push/pop evaporation' => sub {

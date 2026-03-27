@@ -1,6 +1,6 @@
 package IO::K8s::Api::Coordination::V1::Lease;
 # ABSTRACT: Lease defines a lease concept.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Coordination::V1::Lease - Lease defines a lease concept.
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

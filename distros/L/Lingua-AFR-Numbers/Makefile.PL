@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,20 +14,20 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Lingua-AFR-Numbers",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::AFR::Numbers",
   "PREREQ_PM" => {
     "Carp" => 0,
     "Export::Attrs" => 0,
-    "strict" => 0,
+    "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => 0,
-    "utf8" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }

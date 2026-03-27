@@ -1,0 +1,58 @@
+======================================================================
+ mb::JSON Cheat Sheet                                         [EN] English
+======================================================================
+
+[ Data Types ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "string"   -> scalar string
+  123        -> scalar number
+  3.14       -> scalar number (float)
+  true       -> mb::JSON::Boolean (numifies to 1)
+  false      -> mb::JSON::Boolean (numifies to 0)
+  null       -> undef
+  [...]      -> array reference
+  {...}      -> hash reference
+
+[ 1. Load ]
+  use mb::JSON;
+
+[ 2. decode: JSON -> Perl ]
+  my $data = mb::JSON::decode($json_text);
+  my $data = mb::JSON::decode();    # uses $_
+  my $data = mb::JSON::parse($json_text);  # alias
+
+[ 3. encode: Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. Boolean Values ]
+  mb::JSON::true   -> encodes as: true
+  mb::JSON::false  -> encodes as: false
+  Plain 1 or 0     -> encodes as: 1 or 0 (number)
+
+[ 5. null / undef ]
+  undef            -> null (encode)
+  null             -> undef (decode)
+
+[ 6. Hash keys are sorted ]
+  encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
+
+[ 7. UTF-8 kept as-is ]
+  encode({"name"=>"田中"}) -> '{"name":"田中"}'
+
+[ 8. Examples ]
+  # decode
+  my $h = mb::JSON::decode('{"name":"Alice","age":30}');
+  print $h->{name};   # Alice
+
+  # encode
+  my $j = mb::JSON::encode({
+      name   => 'Alice',
+      active => mb::JSON::true,
+      score  => undef,
+  });
+  # -> {"active":true,"name":"Alice","score":null}
+
+  # roundtrip
+  my $data = mb::JSON::decode($json);
+  my $back = mb::JSON::encode($data);

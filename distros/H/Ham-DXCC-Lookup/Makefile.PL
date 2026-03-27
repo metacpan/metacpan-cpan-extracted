@@ -11,7 +11,7 @@ if(defined($ENV{'GITHUB_ACTION'}) || defined($ENV{'CIRCLECI'}) || defined($ENV{'
 	if(!-d 'data') {
 		mkdir 'data', 0755;
 	}
-	open(my $out, '>', 'data/ctydat_full.csv');
+	open(my $out, '>', 'data/cty.csv');
 	print $out "prefix,dxcc_name,iso,cq_zone,itu_zone,continent,latitude,longitude,gmt_offset,primary_prefix\n";
 }
 
@@ -25,21 +25,35 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-	NAME         => 'Ham::DXCC::Lookup',
+	NAME => 'Ham::DXCC::Lookup',
 	VERSION_FROM => 'lib/Ham/DXCC/Lookup.pm', # finds $VERSION
-	AUTHOR       => 'Nigel Horne <njh@nigelhorne.com',
+	AUTHOR => 'Nigel Horne <njh@nigelhorne.com',
 	ABSTRACT_FROM => 'lib/Ham/DXCC/Lookup.pm',
-	PREREQ_PM    => {
+	PREREQ_PM => {
+		'Carp' => 0,
 		'Database::Abstraction' => 0,
 		'DBD::CSV' => 0,
 		'Exporter' => 0,
 		'FindBin' => 0,
+		'Module::Locate' => 0,
+		'Params::Get' => 0,
+		'Params::Validate::Strict' => 0,
 		'Text::CSV' => 0,
 		'Text::xSV::Slurp' => 0,
 	}, TEST_REQUIRES => {
+		'App::Test::Generator' => 0.27,
+		'Data::Random' => 0,
+		'Data::Random::String' => 0,
+		'Data::Random::String::Matches' => 0,
+		'Data::Random::Structure' => 0,
+		'IPC::Run3' => 0,
+		'IPC::System::Simple' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
+		'Test::Returns' => 0,
+		'Test::Settings' => 0,
+		'Test::Which' => 0,
 	},
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
@@ -50,7 +64,7 @@ WriteMakefile(
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Ham-DXCC-Lookup.git',
 				web => 'https://github.com/nigelhorne/Ham-DXCC-Lookup',
-				# license    => 'http://dev.perl.org/licenses/',
+				# license => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
 				mailto => 'bug-Ham-DXCC-Lookup@rt.cpan.org',
 				url => 'https://github.com/nigelhorne/Ham-DXCC-Lookup/issues',

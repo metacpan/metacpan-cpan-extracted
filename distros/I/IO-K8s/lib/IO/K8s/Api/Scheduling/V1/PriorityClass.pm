@@ -1,6 +1,6 @@
 package IO::K8s::Api::Scheduling::V1::PriorityClass;
 # ABSTRACT: PriorityClass defines mapping from a priority class name to the priority integer value. The value can be any valid integer.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject;
 
 
@@ -29,7 +29,7 @@ IO::K8s::Api::Scheduling::V1::PriorityClass - PriorityClass defines mapping from
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

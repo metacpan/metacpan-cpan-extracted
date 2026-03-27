@@ -3,17 +3,17 @@
 package Lingua::IND::Nums2Words;
 # ABSTRACT: Number 2 word conversion in IND.
 
-# {{{ use block
-
-use 5.10.1;
-use strict;
+use 5.16.0;
+use utf8;
 use warnings;
+
+# {{{ use block
 
 use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 our $Dec_char  = ".";
 our $Neg_word  = "negatif";
@@ -109,7 +109,6 @@ sub n2w2 {
 
         return @words;
 }
-
 
 # }}}
 # {{{ n2w3                    handle digits before decimal
@@ -219,7 +218,7 @@ Lingua::IND::Nums2Words - convert number to Indonesian verbage.
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -263,12 +262,14 @@ Numbers > 10 ** 15 returns 0.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Steven Haryanto E<lt>sh@hhh.indoglobal.comE<gt>
-
-Maintenance
-PetaMem <info@petamem.com>
+ initial coding:
+   Steven Haryanto E<lt>sh@hhh.indoglobal.comE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 SEE ALSO
 
@@ -277,3 +278,12 @@ L<Lingua::IND::Words2Nums>
 =cut
 
 # }}}
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
+
+=cut

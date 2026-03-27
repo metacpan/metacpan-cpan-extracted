@@ -1,6 +1,11 @@
 Revision history for Term::Choose
 
 
+1.781   2026-03-25
+    - Removed deprecated code in line-fold.
+    - Bugfixes available height and available width.
+    - Raised minimum value for max_height and max_height to 2.
+
 1.780   2026-02-04
     - Bugfix bottom_text.
 

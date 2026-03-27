@@ -2,10 +2,11 @@ package IPC::Manager::Base::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
+use Time::HiRes qw/time/;
 use File::Temp qw/tempfile/;
 
 use DBI;
@@ -30,7 +31,11 @@ sub dbh {
     my $this = shift;
     my (%params) = @_;
 
-    return $this->{+DBH} if blessed($this) && $this->{+DBH};
+    if (blessed($this) && $this->{+DBH}) {
+        $this->pid_check;
+        return $this->{+DBH} if $this->{+DBH}->{Active};
+        delete $this->{+DBH};
+    }
 
     my $dsn   = $params{dsn};
     my $user  = $params{user};
@@ -61,6 +66,7 @@ sub init_db {
     my $dbh = $this->dbh(@_);
 
     for my $sql ($this->table_sql) {
+        local $dbh->{PrintWarn} = 0;
         $dbh->do($sql) or die $dbh->errstr;
     }
 }
@@ -90,12 +96,12 @@ sub init {
     my $e   = $self->escape;
 
     if ($row) {
-        my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}active${e} = TRUE, ${e}pid${e} = ? WHERE ${e}id${e} = ?");
-        $sth->execute($self->{+PID}, $self->{+ID}) or die $dbh->errstr;
+        my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}active${e} = ?, ${e}pid${e} = ? WHERE ${e}id${e} = ?");
+        $sth->execute(time, $self->{+PID}, $self->{+ID}) or die $dbh->errstr;
     }
     else {
-        my $sth = $dbh->prepare("INSERT INTO ipcm_peers(${e}id${e}, ${e}pid${e}, ${e}active${e}) VALUES (?, ?, TRUE)") or die $dbh->errstr;
-        $sth->execute($id, $self->{+PID}) or die $dbh->errstr;
+        my $sth = $dbh->prepare("INSERT INTO ipcm_peers(${e}id${e}, ${e}pid${e}, ${e}active${e}) VALUES (?, ?, ?)") or die $dbh->errstr;
+        $sth->execute($id, $self->{+PID}, time) or die $dbh->errstr;
     }
 }
 
@@ -142,7 +148,7 @@ sub peers {
 
     my $dbh = $self->dbh;
     my $e   = $self->escape;
-    my $sth = $dbh->prepare("SELECT ${e}id${e} FROM ipcm_peers WHERE ${e}id${e} != ? AND active = TRUE ORDER BY ${e}id${e} ASC") or die $dbh->errstr;
+    my $sth = $dbh->prepare("SELECT ${e}id${e} FROM ipcm_peers WHERE ${e}id${e} != ? AND active IS NOT NULL ORDER BY ${e}id${e} ASC") or die $dbh->errstr;
     $sth->execute($self->{+ID});
 
     return map { $_->[0] } @{$sth->fetchall_arrayref([0])};
@@ -240,7 +246,7 @@ sub pre_disconnect_hook {
 
     my $dbh = $self->dbh;
     my $e   = $self->escape;
-    my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}pid${e} = NULL, active = FALSE WHERE ${e}id${e} = ?") or die $dbh->errstr;
+    my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}pid${e} = NULL, active = NULL WHERE ${e}id${e} = ?") or die $dbh->errstr;
     $sth->execute($self->{+ID}) or die $dbh->errstr;
 }
 
@@ -324,7 +330,7 @@ Connection username.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

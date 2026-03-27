@@ -3,7 +3,7 @@ package File::Path::Redirect;
 use strict;
 use warnings;
 
-our $VERSION="v0.1.2";
+our $VERSION="v0.1.3";
 
 
 
@@ -166,6 +166,7 @@ my $max_size = $^O eq 'MSWin32' ? 260 : (POSIX::pathconf('/', &POSIX::_PC_PATH_M
 use constant::more qw<OK=0 TOO_MANY ACCESS_ERROR NOT_A_REDIRECT>;
 use Export::These qw<make_redirect follow_redirect is_redirect>;
 
+$max_size+=length $magic;
 
 
 
@@ -177,8 +178,8 @@ sub make_redirect {
   if( $force or ! -e $name ){
     # make relative $name to existing
     my $path;
-    if(file_name_is_absolute $name){
-      $path=$name;
+    if(file_name_is_absolute $existing){
+      $path=$existing;
     }
     else {
       $path=abs2rel($existing, dirname $name);
@@ -210,7 +211,7 @@ sub follow_redirect{
   # Open the file
   #
   my $fd=POSIX::open($path, $mode);
-  defined $fd or die $!;
+  defined $fd or die "Error opening file $path: $!";
   my $buffer="";
   my $count=0;
   # Read the contents up to the max length of path for the current system + magic header size
@@ -219,6 +220,7 @@ sub follow_redirect{
     $count+=$res;
     
     $buffer.=$data;
+    last if $count== $max_size;
   }
   defined $res or die $!;
   POSIX::close $fd;

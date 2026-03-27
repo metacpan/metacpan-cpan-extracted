@@ -29,7 +29,7 @@ diag("TCSETCTTY") if defined TCSETCTTY;
         sleep 0;
         close STDIN;
         close STDOUT;
-        my $master = new IO::Pty;
+        my $master = IO::Pty->new;
         my $slave  = $master->slave();
 
         my $master_fileno = $master->fileno;
@@ -49,7 +49,7 @@ diag("TCSETCTTY") if defined TCSETCTTY;
 {
     diag(" === Checking if child gets pty as controlling terminal");
 
-    my $master = new IO::Pty;
+    my $master = IO::Pty->new;
 
     pipe( FROM_CHILD, TO_PARENT )
       or die "Cannot create pipe: $!";
@@ -123,7 +123,7 @@ diag(
     my $randstring =
       q{fakjdf ijj845jtirg\r8e 4jy8 gfuoyhj\agt8h\0x00 gues98\0xFF 45th guoa\beh gt98hae 45t8u ha8rhg ue4ht 8eh tgo8he4 t8 gfj aoingf9a8hgf uain dgkjadshft+uehgf =usüand9ß87vgh afugh 8*h 98H 978H 7HG zG 86G (&g (O/g &(GF(/EG F78G F87SG F(/G F(/a sldjkf ha\@j<\rksdhf jk>~|ahsd fjkh asdHJKGDSG TRJKSGO  JGDSFJDFHJGSDK1%&FJGSDGFSH\0xADJäDGFljkhf lakjs(dh fkjahs djfk hasjkdh fjklahs dfkjhdjkf haöjksdh fkjah sdjf)\$/§&k hasÄÜÖjkdh fkjhuerhtuwe htui eruth ZI AHD BIZA Di7GH )/g98 9 97 86tr(& TA&(t 6t &T 75r 5\$R%/4r76 5&/% R79 5 )/&};
 
-    my $master = new IO::Pty;
+    my $master = IO::Pty->new;
     diag( "isatty(\$master): ", POSIX::isatty($master) ? "YES" : "NO" );
     if ( POSIX::isatty($master) ) {
         $master->set_raw()

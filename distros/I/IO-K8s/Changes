@@ -1,5 +1,24 @@
 Revision history for IO-K8s
 
+1.100     2026-03-25 19:17:28Z
+  - Added IO::K8s::AgentSandbox with 4 CRD classes for agent-sandbox (v0.2.1):
+    Sandbox (agents.x-k8s.io/v1alpha1), SandboxClaim, SandboxTemplate,
+    SandboxWarmPool (extensions.agents.x-k8s.io/v1alpha1)
+  - Added inline struct support to k8s DSL: hash specs with multiple keys now
+    auto-generate typed inner classes with hashref coercion, supporting nested
+    structs and proper TO_JSON serialization
+  - Upgraded IO::K8s::Cilium from ~v1.17 to v1.19.2: promoted 6 BGP CRDs and
+    CiliumCIDRGroup from v2alpha1 to v2, removed CiliumExternalWorkload and
+    CiliumBGPPeeringPolicy, fixed scope on CiliumEgressGatewayPolicy and
+    CiliumGatewayClassConfig (23 → 21 CRDs)
+  - Upgraded IO::K8s::K3s to v1.35.1+k3s1: added ETCDSnapshotFile
+    (cluster-scoped, k3s.cattle.io/v1) (3 → 4 CRDs)
+  - Added upstream_version() method to all CRD providers for tracking which
+    upstream release each provider is based on
+
+1.010     2026-03-24 13:17:59Z
+  - Added missing Test::Deep test dependency (CPAN Testers failure)
+
 1.009     2026-03-19 21:29:24Z
   - Fix: coerce \0/\1 refs to plain 0/1 for Bool attributes — Perl's \0 is a
     truthy reference, so users passing \0 expecting JSON false got wrong results.

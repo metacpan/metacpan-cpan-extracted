@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.60';
+our $VERSION = '0.61';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -353,14 +353,16 @@ my $hep_sok_list = join '', keys %hepburn_sokuon;
 my %hepburn_youon = qw/シ sh チ ch ジ j ヂ j/;
 my $is_hepburn_youon = join '', keys %hepburn_youon;
 
+# Kunrei variants for the youon case.
+
+my %kunrei_youon = qw/ヂ z/;
+my $is_kunrei_youon = join '', keys %kunrei_youon;
+
 # Kunrei romanization
 
 my %kunrei = qw/ヅ z ヂ z/;
 
 my $kun_list = join '', keys %kunrei;
-
-my %kunrei_youon = qw/ヂ z/;
-my $is_kunrei_youon = join '', keys %kunrei_youon;
 
 # LONG VOWELS
 
@@ -417,6 +419,14 @@ sub kana2romaji
     if ($options->{wapuro}) {
         $wapuro = 1;
     }
+    my $wikipedia;
+    if ($options->{wikipedia}) {
+	$wikipedia = 1;
+    }
+    my $truck;
+    if ($options->{truck}) {
+	$truck = 1;
+    }
     my $use_m = 0;
     if ($hepburn || $passport) {
 	$use_m = 1;
@@ -447,6 +457,7 @@ sub kana2romaji
     if ($options->{wo}) {
 	$wo = 1;
     }
+
     # Start of conversion
 
     # 撥音 (ん)
@@ -466,7 +477,7 @@ sub kana2romaji
     if ($ve_type eq 'none') {
 	$input =~ s/ー//g;
     }
-    # 長音 (ー)
+    # Convert long vowels plus consonants into romaji
     for my $vowel (@aiueo) {
 	my $ve = $chouonhyouki{$ve_type}->{$vowel};
 	my $vowelclass;
@@ -479,11 +490,14 @@ sub kana2romaji
 	    $vowelclass = $vowelclass{$vowel};
 	    $vowel_kana = $dan{$vowel}->[0];
 	}
-	# 長音 (ー) + 拗音 (きょ)
+	# 拗音 (きょ) + 長音 (ー)
 	my $y = $youon{$vowel};
 	if ($y) {
 	    if ($hepburn) {
 		$input =~ s/([$is_hepburn_youon])${y}[ー$vowel_kana]/$hepburn_youon{$1}$ve/g;
+	    }
+	    if ($kunrei) {
+		$input =~ s/([$is_kunrei_youon])${y}[ー$vowel_kana]/$kunrei_youon{$1}y$ve/g;
 	    }
 	    $input =~ s/([$vowelclass{i}])${y}[ー$vowel_kana]/$siin{$1}y$ve/g;
 	}
@@ -525,6 +539,12 @@ sub kana2romaji
 	$input =~ s/([^\Waiueo])$vowel_re[x]($vowel_re)/$1$2/;
 	# Convert u + small kana into w + vowel
 	$input =~ s/($vowel_re|\b)ux([iue])/$1w$2/i;
+    }
+    if ($wikipedia) {
+	$input =~ s/ii/ī/g;
+    }
+    if ($truck) {
+	$input =~ s/j($vowel_re)/jy$1/g;
     }
     return $input;
 }

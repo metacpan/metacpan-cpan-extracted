@@ -64,6 +64,22 @@ for you:
     connect, or reconnect without importing `ipcm_spawn()`, `ipcm_connect()`, or
     `ipcm_reconnect()` into your namespace.
 
+- $protocol = ipcm\_default\_protocol()
+- ipcm\_default\_protocol($protocol)
+
+    Get or set the default protocol. This is undef until set.
+
+- $protocol\_list = ipcm\_default\_protocol\_list()
+- ipcm\_default\_protocol\_list(\\@protocol\_list)
+
+    Default set of protocols to try, in the order they should be tried.
+
+- $serializer = ipcm\_default\_serializer()
+- ipcm\_default\_serializer($serializer)
+
+    Get or set the default serializer. 'JSON' is the default unless this is
+    changed.
+
 - $ipcm = ipcm\_spawn()
 - $ipcm = ipcm\_spawn(protocol => $PROTOCOL)
 - $ipcm = ipcm\_spawn(protocols => \\@PROTOCOLS)
@@ -193,7 +209,7 @@ See [IPC::Manager::Spawn](https://metacpan.org/pod/IPC%3A%3AManager%3A%3ASpawn) 
 # SOURCE
 
 The source code repository for IPC::Manager can be found at
-[https://https://github.com/exodist/IPC-Manager](https://https://github.com/exodist/IPC-Manager).
+[https://github.com/exodist/IPC-Manager](https://github.com/exodist/IPC-Manager).
 
 # MAINTAINERS
 

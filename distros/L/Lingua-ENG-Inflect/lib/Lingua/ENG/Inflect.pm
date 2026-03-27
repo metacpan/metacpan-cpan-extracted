@@ -1,14 +1,16 @@
 package Lingua::ENG::Inflect;
 # ABSTRACT: Plural inflection for ENG.
 
-use 5.10.1;
-use strict;
+use 5.16.0;
+use utf8;
+use warnings;
+
 use vars qw(@EXPORT_OK %EXPORT_TAGS @ISA);
 use Env;
 
 require Exporter;
 @ISA = qw(Exporter);
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 %EXPORT_TAGS =
 (
@@ -106,7 +108,6 @@ sub NUM     # (;$count,$show)
     return '';
 }
 
-
 # 0. PERFORM GENERAL INFLECTIONS IN A STRING
 
 sub enclose { "(?:$_[0])" }
@@ -139,7 +140,6 @@ sub inflect
     $persistent_count = $save_persistent_count;
     return $inflection;
 }
-
 
 # 1. PLURALS
 
@@ -403,7 +403,6 @@ my $PL_sb_U_o_os = enclose join "|",
     @PL_sb_C_o_i,
 );
 
-
 # UNCONDITIONAL "..ch" -> "..chs"
 
 my $PL_sb_U_ch_chs = enclose join "|", map { substr($_,0,-2) }
@@ -520,7 +519,6 @@ my $PL_sb_uninflected = enclose join "|",
 # DISEASES
     ".*pox",
 
-
 # OTHER ODDITIES
     "graffiti", "djinn", 'samuri',
     '.*craft$', 'offspring', 'pence', 'quid', 'hertz',
@@ -578,7 +576,6 @@ my $PL_prep = enclose join '|', qw (
 my $PL_sb_prep_dual_compound = '(.*?)((?:-|\s+)(?:'.$PL_prep.'|d[eua])(?:-|\s+))a(?:-|\s+)(.*)';
 
 my $PL_sb_prep_compound = '(.*?)((-|\s+)('.$PL_prep.'|d[eua])((-|\s+)(.*))?)';
-
 
 my %PL_pron_nom =
 (
@@ -654,7 +651,6 @@ my %PL_v_ambiguous_pres =
 
 my $PL_v_ambiguous_pres = enclose join '|', keys %PL_v_ambiguous_pres;
 
-
 my $PL_v_irregular_non_pres = enclose join '|',
 (
 "did", "had", "ate", "made", "put", 
@@ -702,7 +698,6 @@ my %PL_adj_poss =
 "their" => "their",
 );
 my $PL_adj_poss = enclose join '|', keys %PL_adj_poss;
-
 
 sub checkpat
 {
@@ -910,7 +905,6 @@ return 1 if _PL_reg_plurals($pair, $PL_sb_C_a_ata,   "as","ata")
      || _PL_reg_plurals($pair, '.*tri',       "xes","ces")
      || _PL_reg_plurals($pair, '.{2,}[yia]n', "xes","ges");
 
-
 return 0;
 }
 
@@ -939,7 +933,6 @@ if ($word1b)
                 || _PL_check_plurals_N($word2b, $word1b) );
 }
 
-
 return "";
 }
 
@@ -965,7 +958,6 @@ return $word if $count==1;
 
 return $value if defined($value = ud_match($word, @PL_sb_user_defined));
 
-
 # HANDLE EMPTY WORD, SINGULAR COUNT AND UNINFLECTED PLURALS
 
 $word eq ''         and return $word;
@@ -975,7 +967,6 @@ $word =~ /^($PL_sb_uninflected)$/i
 
 $classical{herd} and $word =~ /^($PL_sb_uninflected_herd)$/i
                 and return $word;
-
 
 # HANDLE COMPOUNDS ("Governor General", "mother-in-law", "aide-de-camp", ETC.)
 
@@ -1061,7 +1052,6 @@ if ($classical{ancient})
     $word =~ /$PL_sb_C_i$/i     and return "${word}i";
 }
 
-
 # HANDLE SINGULAR NOUNS ENDING IN ...s OR OTHER SILIBANTS
 
 $word =~ /^($PL_sb_singular_s)$/i   and return "$1es";
@@ -1089,12 +1079,10 @@ $word =~ /$PL_sb_U_o_os$/i  and return "${word}s";
 $word =~ /[aeiou]o$/i       and return "${word}s";
 $word =~ /o$/i          and return "${word}es";
 
-
 # OTHERWISE JUST ADD ...s
 
 return "${word}s";
 }
-
 
 sub _PL_special_verb
 {
@@ -1190,7 +1178,6 @@ $count = (defined $count and $count=~/^($PL_count_one)$/io or
 
 return $word if $count=~/^($PL_count_one)$/io;
 
-
 # HANDLE USER-DEFINED ADJECTIVES
 
 my $value;
@@ -1215,7 +1202,6 @@ $word =~ /^(.*)'s?$/    and do { my $pl = PL_N($1);
 return;
 
 }
-
 
 # 2. INDEFINITE ARTICLES
 
@@ -1276,7 +1262,6 @@ $word =~ /^($A_explicit_an)/i       and return "an $word";
 $word =~ /^[aefhilmnorsx]$/i        and return "an $word";
 $word =~ /^[bcdgjkpqtuvwyz]$/i      and return "a $word";
 
-
 # HANDLE ABBREVIATIONS
 
 $word =~ /^($A_abbrev)/ox           and return "an $word";
@@ -1326,7 +1311,6 @@ return "$pre$count " . PL($word,$count) . $post
 return "${pre}no ". PL($word,0) . $post ;
 }
 
-
 # PARTICIPLES
 
 sub PART_PRES
@@ -1342,8 +1326,6 @@ sub PART_PRES
         or s/([^aeiou][aeiouy]([bdgmnprst]))$/$1$2/;
         return "${_}ing";
 }
-
-
 
 # NUMERICAL INFLECTIONS
 
@@ -1363,7 +1345,6 @@ my %nth =
     12 => 'th',
     13 => 'th',
 );
-
 
 my %ordinal;
 @ordinal{qw(ty    one   two    three five  eight  nine  twelve )}=
@@ -1385,7 +1366,6 @@ sub ORD($)
     }
 }
 
-
 my %default_args = 
 (
     'group'   => 0,
@@ -1402,7 +1382,6 @@ my @teen = qw(ten eleven twelve thirteen fourteen
 my @ten  = ('','',qw(twenty thirty forty fifty sixty seventy eighty ninety));
 my @mill = map { (my $val=$_) =~ s/_/illion/; " $val" }
        ('',qw(thousand m_ b_ tr_ quadr_ quint_ sext_ sept_ oct_ non_ dec_));
-
 
 sub mill { my $ind = $_[0]||0;
        die "Number out of range\n" if $ind > $#mill;
@@ -1424,7 +1403,6 @@ sub hund
     return ten($_[1],$_[2]) . mill($_[3]) . ', ' if $_[1] || $_[2];
     return '';
 }
-
 
 sub enword
 {
@@ -1608,8 +1586,6 @@ sub WORDLIST {
     return join($sep, @words[0,@words-2]) . "$final_sep$words[-1]";
 }
 
-
-
 1;
 
 __END__
@@ -1620,7 +1596,7 @@ Lingua::ENG::Inflect - Convert singular to plural. Select "a" or "an".
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -1633,33 +1609,27 @@ version 0.2603230
                   inflect classical
                   def_noun def_verb def_adj def_a def_an ); 
 
-
  # UNCONDITIONALLY FORM THE PLURAL
 
       print "The plural of ", $word, " is ", PL($word), "\n";
 
-
  # CONDITIONALLY FORM THE PLURAL
 
       print "I saw $cat_count ", PL("cat",$cat_count), "\n";
-
 
  # FORM PLURALS FOR SPECIFIC PARTS OF SPEECH
 
       print PL_N("I",$N1), PL_V("saw",$N1),
         PL_ADJ("my",$N2), PL_N("saw",$N2), "\n";
 
-
  # DEAL WITH "0/1/N" -> "no/1/N" TRANSLATION:
 
       print "There ", PL_V("was",$errors), NO(" error",$errors), "\n";
-
 
  # USE DEFAULT COUNTS:
 
       print NUM($N1,""), PL("I"), PL_V(" saw"), NUM($N2), PL_N(" saw");
       print "There ", NUM($errors,''), PL_V("was"), NO(" error"), "\n";
-
 
  # COMPARE TWO WORDS "NUMBER-INSENSITIVELY":
 
@@ -1668,11 +1638,9 @@ version 0.2603230
       print "same verb\n" if PL_eq_V($word1, $word2);
       print "same adj.\n" if PL_eq_ADJ($word1, $word2);
 
-
  # ADD CORRECT "a" OR "an" FOR A GIVEN WORD:
 
       print "Did you want ", A($thing), " or ", AN($idea), "\n";
-
 
  # CONVERT NUMERALS INTO ORDINALS (i.e. 1->1st, 2->2nd, 3->3rd, etc.)
 
@@ -1684,11 +1652,9 @@ version 0.2603230
     $words = NUMWORDS(1234);      # "one thousand, two hundred and thirty-four"
     $words = NUMWORDS(ORD(1234)); # "one thousand, two hundred and thirty-fourth"
 
-
  # IN A LIST CONTEXT: GET BACK A LIST OF STRINGSi, ONE FOR EACH "CHUNK"...
 
     @words = NUMWORDS(1234);    # ("one thousand","two hundred and thirty-four")
-
 
  # OPTIONAL PARAMETERS CHANGE TRANSLATION:
 
@@ -1734,7 +1700,6 @@ version 0.2603230
     $list = WORDLIST("apple", "banana", "carrot", {final_sep=>""});
                 # "apple, banana and carrot"
 
-
  # REQUIRE "CLASSICAL" PLURALS (EG: "focus"->"foci", "cherub"->"cherubim")
 
       classical;          # USE ALL CLASSICAL PLURALS
@@ -1758,8 +1723,6 @@ version 0.2603230
       classical ancient=>1;  # "2 formulae" INSTEAD OF "2 formulas"
       classical ancient=>0;  # "2 formulas" INSTEAD OF "2 formulae"
 
-
-
  # INTERPOLATE "PL()", "PL_N()", "PL_V()", "PL_ADJ()", A()", "AN()"
  # "NUM()" AND "ORD()" WITHIN STRINGS:
 
@@ -1772,7 +1735,6 @@ version 0.2603230
       print inflect("There NUM($errors,) PL_V(was) NO(error)\n";
       print inflect("Did you want A($thing) or AN($idea)\n");
       print inflect("It was ORD($position) from the left\n");
-
 
  # ADD USER-DEFINED INFLECTIONS (OVERRIDING INBUILT RULES):
 
@@ -1787,7 +1749,6 @@ version 0.2603230
       def_a "h"         # "AY HALWAYS SEZ 'HAITCH'!"
 
       def_an    "horrendous.*"      # "AN HORRENDOUS AFFECTATION"
-
 
 =head1 DESCRIPTION
 
@@ -1850,13 +1811,11 @@ pronoun and returns its plural. Pronouns in the nominative ("I" ->
 "we") and accusative ("me" -> "us") cases are handled, as are
 possessive pronouns ("mine" -> "ours").
 
-
 =item C<PL_V($;$)>
 
 The exportable subroutine C<PL_V()> takes the I<singular> form of a
 conjugated verb (that is, one which is already in the correct "person"
 and "mood") and returns the corresponding plural conjugation.
-
 
 =item C<PL_ADJ($;$)>
 
@@ -1866,7 +1825,6 @@ Adjectives that are correctly handled include: "numerical" adjectives
 ("a" -> "some"), demonstrative adjectives ("this" -> "these", "that" ->
 "those"), and possessives ("my" -> "our", "cat's" -> "cats'", "child's"
 -> "childrens'", etc.)
-
 
 =item C<PL($;$)>
 
@@ -1890,7 +1848,6 @@ C<PL_ADJ> should be used in preference to C<PL>.
 Note that all these subroutines ignore any whitespace surrounding the
 word being inflected, but preserve that whitespace when the result is
 returned. For example, C<S<PL(" cat  ")>> returns S<" cats  ">.
-
 
 =head2 Numbered plurals
 
@@ -1922,7 +1879,6 @@ rather than:
 Note that the name of the subroutine is a pun: the subroutine
 returns either a number (a I<No.>) or a C<"no">, in front of the
 inflected word.
-
 
 =head2 Reducing the number of counts required
 
@@ -1960,7 +1916,6 @@ instead of its first argument. For example:
     print PL_ADJ("This"), PL_N(" error"), PL_V(" was"), "fatal.\n"
         if $severity > 1;
     
-
 
 =head2 Number-insensitive equality
 
@@ -2024,7 +1979,6 @@ case-insensitive (that is, C<PL("time","Times")> returns false. To obtain
 both number and case insensitivity, prefix both arguments with C<lc>
 (that is, C<PL(lc "time", lc "Times")> returns true).
 
-
 =head1 OTHER VERB FORMS
 
 =head2 Present participles
@@ -2038,7 +1992,6 @@ correctly inflect it to its present participle:
     PART_PRES("eats")   # "eating"
     PART_PRES("bats")   # "batting"
     PART_PRES("spies")  # "spying"
-
 
 =head1 PROVIDING INDEFINITE ARTICLES
 
@@ -2083,7 +2036,6 @@ exists at the start of the string. Thus:
     #     a giraffe
     #     a ewe
     #     an orangutan
-
 
 C<A()> and C<AN()> both take an optional second argument. As with the
 C<PL_...> subroutines, this second argument is a "number" specifier. If
@@ -2167,7 +2119,6 @@ Note that rules 1 and 3 together imply that the presence or absence of
 punctuation may change the selection of indefinite article for a
 particular initialism (for example, "a FAQ" but "an F.A.Q.").
 
-
 =head2 Indefinite articles and "soft H's"
 
 Words beginning in the letter 'H' present another type of difficulty
@@ -2187,7 +2138,6 @@ At present, the C<A()> and C<AN()> subroutines ignore soft H's and use
 "a" for any voiced 'H'. The author would, however, welcome feedback on
 this decision (envisaging a possible future "soft H" mode).
 
-
 =head1 INFLECTING ORDINALS
 
 Occasionally it is useful to present an integer value as an ordinal
@@ -2201,7 +2151,6 @@ rather than as a numeral. For example:
 To this end, Lingua::ENG::Inflect provides the C<ORD()> subroutine.
 <ORD()> takes a single argument and forms its ordinal equivalent.
 If the argument isn't a numerical integer, it just adds "-th".
-
 
 =head1 CONVERTING NUMBERS TO WORDS
 
@@ -2377,7 +2326,6 @@ These are identical in effect, except when $number contains a decimal:
 
 Use whichever you feel is most appropriate.
 
-
 =head1 CONVERTING LISTS OF WORDS TO PHRASES
 
 When creating a list of words, commas are used between adjacent items,
@@ -2410,7 +2358,6 @@ The available options are:
     sep             Inter-item separator     ","
     last_sep        Final separator          value of 'sep' option
 
-
 =head1 INTERPOLATING INFLECTIONS IN STRINGS
 
 By far the commonest use of the inflection subroutines is to
@@ -2439,7 +2386,6 @@ number" value before it returns its interpolated string. This means that
 calls to C<NUM()> which are embedded in an C<inflect()>-interpolated
 string do not "escape" and interfere with subsequent inflections.
 
-
 =head1 MODERN VS CLASSICAL INFLECTIONS
 
 Certain words, mainly of Latin or Ancient Greek origin, can form
@@ -2452,7 +2398,6 @@ their original Latin or Greek inflections. For example:
         PL("millennium")        # -> "millenniums" or "millennia"
         PL("ganglion")          # -> "ganglions" or "ganglia"
         PL("octopus")           # -> "octopuses" or "octopodes"
-
 
 Lingua::ENG::Inflect caters to such words by providing an
 "alternate state" of inflection known as "classical mode".
@@ -2554,7 +2499,6 @@ singular form replace earlier definitions of the same form. For example:
       # FINALLY, RESTORE THE DEFAULT BEHAVIOUR...
       def_noun  'aviatrix' => undef;
 
-
 Special care is also required when defining general patterns and
 associated specific exceptions: put the more specific cases I<after>
 the general pattern. For example:
@@ -2564,7 +2508,6 @@ the general pattern. For example:
 
 This "try-most-recently-defined-first" approach to matching
 user-defined words is also used by C<def_verb>, C<def_a> and C<def_an>.
-
 
 =item C<def_verb($$$$$$)>
 
@@ -2586,7 +2529,6 @@ Note that as with C<def_noun>, modern/classical variants of plurals
 may be separately specified, subsequent definitions replace previous
 ones, and C<undef>'ed plural forms revert to the standard behaviour.
 
-
 =item C<def_adj($$)>
 
 The C<def_adj> subroutine takes a pair of string arguments, which specify
@@ -2601,7 +2543,6 @@ run-time-interpolated patterns, whilst the plural forms are specifications of
 As previously, modern/classical variants of plurals
 may be separately specified, subsequent definitions replace previous
 ones, and C<undef>'ed plural forms revert to the standard behaviour.
-
 
 =item C<def_a($)> and C<def_an($)>
 
@@ -2644,12 +2585,10 @@ permanently and universally modify the behaviour of the module. For example
 
       def_a     "Euler.*";              # "Yewler" TURNS IN HIS GRAVE
 
-
 Note that calls to the C<def_...> subroutines from within a program
 will take precedence over the contents of the home directory
 F<.inflectrc> file, which in turn takes precedence over the system-wide
 F<.inflectrc> file.
-
 
 =head1 DIAGNOSTICS
 
@@ -2731,7 +2670,6 @@ constructed, the 2nd person plural form is always preferred.
 The author is not currently aware of any such verbs in English, but is
 not quite arrogant enough to assume I<ipso facto> that none exist.
 
-
 =head2 Nominative precedence
 
 The singular pronoun "it" presents a special problem because its plural form
@@ -2748,7 +2686,6 @@ However, when asked for the plural of an unambiguously I<accusative>
 "it" (namely, C<PL("to it")>, C<PL_N("from it")>, C<PL("with it")>,
 etc.), both subroutines will correctly return the accusative plural
 ("to them", "from them", "with them", etc.)
-
 
 =head2 The plurality of zero
 
@@ -2780,7 +2717,6 @@ produces "There were no choices", whereas:
       print inflect "There PL(was) NO(choice)";
 
 it will print "There was no choice".
-
 
 =head2 Homographs with heterogeneous plurals
 
@@ -2840,7 +2776,6 @@ Despite the populist pandering of certain New World dictionaries, the
 plural is "octopuses" or (for the pendantic classicist) "octopodes". The
 suffix "-pus" is Greek, not Latin, so the plural is "-podes", not "pi".
 
-
 =item "virus".
 
 Had no plural in Latin (possibly because it was a mass noun).
@@ -2850,12 +2785,12 @@ The only plural is the Anglicized "viruses".
 
 =head1 AUTHORS
 
-Damian Conway (damian@conway.org)
-Matthew Persico (ORD inflection)
-
-Maintenance
-PetaMem s.r.o. <info@petamem.com>
-
+ initial coding:
+   Damian Conway E<lt>damian@conway.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 BUGS AND IRRITATIONS
 
@@ -2865,10 +2800,17 @@ The endless inconsistencies of English.
 indefinite article is not formed, so that the reliability
 of Lingua::ENG::Inflect can be improved.)
 
-
-
 =head1 COPYRIGHT
 
  Copyright (c) 1997-2000, Damian Conway. All Rights Reserved.
  This module is free software. It may be used, redistributed
      and/or modified under the same terms as Perl itself.
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
+
+=cut

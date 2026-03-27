@@ -16,19 +16,6 @@
 #endif
 
 
-#if !HAVE_PERL_VERSION(5, 22, 0)
-#  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
-#  define newPADNAMEpvn(p,n)      S_newPADNAMEpvn(aTHX_ p,n)
-static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
-{
-  PADNAME *pn = newSVpvn(pv, n);
-  /* PADNAMEs need to be at least SVt_PVNV in order to store the COP_SEQ_*
-   * fields */
-  sv_upgrade(pn, SVt_PVNV);
-  return pn;
-}
-#  define PadnameREFCNT_dec(pn)   SvREFCNT_dec(pn)
-#endif
 
 #ifndef av_count
 #  define av_count(av)           (AvFILL(av) + 1)
@@ -134,13 +121,7 @@ static OP *S_op_convert_list(pTHX_ I32 type, I32 flags, OP *o)
 #endif
 
 #ifndef PARENT_PAD_INDEX_set
-#  if HAVE_PERL_VERSION(5, 22, 0)
-#    define PARENT_PAD_INDEX_set(pn,val) (PARENT_PAD_INDEX(pn) = val)
-#  else
-     /* stolen from perl-5.20.0's pad.c */
-#    define PARENT_PAD_INDEX_set(sv,val) \
-        STMT_START { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = (val); } STMT_END
-#  endif
+#  define PARENT_PAD_INDEX_set(pn,val) (PARENT_PAD_INDEX(pn) = val)
 #endif
 
 /* On Perl 5.14 this had a different name */

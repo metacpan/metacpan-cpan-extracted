@@ -1,0 +1,46 @@
+======================================================================
+ mb::JSON 速查表                                          [ZH] 中文（简体）
+======================================================================
+
+[ 数据类型对照 ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "字符串"   -> 标量字符串
+  123        -> 标量数值
+  3.14       -> 标量浮点数
+  true       -> mb::JSON::Boolean（数值上下文为 1）
+  false      -> mb::JSON::Boolean（数值上下文为 0）
+  null       -> undef
+  [...]      -> 数组引用
+  {...}      -> 哈希引用
+
+[ 1. 加载模块 ]
+  use mb::JSON;
+
+[ 2. decode：JSON -> Perl ]
+  my $data = mb::JSON::decode($json_text);
+  my $data = mb::JSON::parse($json_text);  # 兼容别名
+
+[ 3. encode：Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. 布尔值 ]
+  mb::JSON::true   -> JSON: true
+  mb::JSON::false  -> JSON: false
+  数字 1 或 0      -> JSON 数字（非布尔值）
+
+[ 5. null / undef ]
+  undef -> null（编码时）
+  null  -> undef（解码时）
+
+[ 6. 哈希键按字母顺序排序 ]
+  encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
+
+[ 7. UTF-8 字符原样输出（不转义为 \uXXXX）]
+  encode({"name"=>"田中"}) -> '{"name":"田中"}'
+
+[ 8. 示例 ]
+  my $h = mb::JSON::decode('{"name":"张三","age":30}');
+  print $h->{name};   # 张三
+  my $j = mb::JSON::encode({name=>'张三', ok=>mb::JSON::true});
+  # -> {"name":"张三","ok":true}

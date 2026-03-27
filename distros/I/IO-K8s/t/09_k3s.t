@@ -10,12 +10,13 @@ use IO::K8s::K3s;
 # --- All K3s CRD classes ---
 
 my %classes = (
-    HelmChart       => { api_version => 'helm.cattle.io/v1',  plural => 'helmcharts' },
-    HelmChartConfig => { api_version => 'helm.cattle.io/v1',  plural => 'helmchartconfigs' },
-    Addon           => { api_version => 'k3s.cattle.io/v1',   plural => 'addons' },
+    HelmChart        => { api_version => 'helm.cattle.io/v1',  plural => 'helmcharts',        namespaced => 1 },
+    HelmChartConfig  => { api_version => 'helm.cattle.io/v1',  plural => 'helmchartconfigs',  namespaced => 1 },
+    Addon            => { api_version => 'k3s.cattle.io/v1',   plural => 'addons',            namespaced => 1 },
+    ETCDSnapshotFile => { api_version => 'k3s.cattle.io/v1',   plural => 'etcdsnapshotfiles', namespaced => 0 },
 );
 
-# --- Load all 3 classes ---
+# --- Load all 4 classes ---
 
 subtest 'load all K3s classes' => sub {
     for my $kind (sort keys %classes) {
@@ -34,7 +35,11 @@ subtest 'class metadata' => sub {
         is($class->api_version, $info->{api_version}, "$kind api_version");
         is($class->kind, $kind, "$kind kind");
         is($class->resource_plural, $info->{plural}, "$kind resource_plural");
-        ok($class->does('IO::K8s::Role::Namespaced'), "$kind is namespaced");
+        if ($info->{namespaced}) {
+            ok($class->does('IO::K8s::Role::Namespaced'), "$kind is namespaced");
+        } else {
+            ok(!$class->does('IO::K8s::Role::Namespaced'), "$kind is cluster-scoped (not namespaced)");
+        }
     }
 };
 
@@ -45,7 +50,7 @@ subtest 'IO::K8s::K3s resource_map' => sub {
     ok($provider->does('IO::K8s::Role::ResourceMap'), 'consumes ResourceMap role');
 
     my $map = $provider->resource_map;
-    is(scalar keys %$map, 3, 'resource_map has 3 entries');
+    is(scalar keys %$map, 4, 'resource_map has 4 entries');
 
     for my $kind (sort keys %classes) {
         ok(exists $map->{$kind}, "$kind in resource_map");
@@ -71,6 +76,9 @@ subtest 'with constructor parameter' => sub {
     is($k8s->expand_class('k3s.cattle.io/v1/Addon'),
         'IO::K8s::K3s::V1::Addon',
         'domain-qualified Addon resolves');
+    is($k8s->expand_class('k3s.cattle.io/v1/ETCDSnapshotFile'),
+        'IO::K8s::K3s::V1::ETCDSnapshotFile',
+        'domain-qualified ETCDSnapshotFile resolves');
 
     # Core resources are unaffected
     is($k8s->expand_class('Pod'), 'IO::K8s::Api::Core::V1::Pod',
@@ -122,6 +130,24 @@ subtest 'new_object and inflate round-trip' => sub {
     my $addon_re = $k8s->inflate($k8s->object_to_json($addon));
     isa_ok($addon_re, 'IO::K8s::K3s::V1::Addon');
     is($addon_re->metadata->name, 'coredns', 'Addon round-trip');
+
+    # Create an ETCDSnapshotFile (cluster-scoped, no namespace)
+    my $snap = $k8s->new_object('ETCDSnapshotFile',
+        metadata => { name => 'etcd-snapshot-node1-1234567890' },
+        spec => {
+            snapshotName => 'etcd-snapshot-node1-1234567890',
+            nodeName     => 'node1',
+            location     => 'file:///var/lib/rancher/k3s/server/db/snapshots/etcd-snapshot-node1-1234567890',
+        },
+    );
+    isa_ok($snap, 'IO::K8s::K3s::V1::ETCDSnapshotFile');
+    is($snap->api_version, 'k3s.cattle.io/v1', 'ETCDSnapshotFile api_version');
+    ok(!$snap->does('IO::K8s::Role::Namespaced'), 'ETCDSnapshotFile is cluster-scoped');
+
+    # Round-trip ETCDSnapshotFile
+    my $snap_re = $k8s->inflate($k8s->object_to_json($snap));
+    isa_ok($snap_re, 'IO::K8s::K3s::V1::ETCDSnapshotFile');
+    is($snap_re->metadata->name, 'etcd-snapshot-node1-1234567890', 'ETCDSnapshotFile round-trip');
 };
 
 # --- to_yaml output ---
@@ -154,6 +180,9 @@ subtest 'domain-qualified expand_class' => sub {
     is($k8s->expand_class('k3s.cattle.io/v1/Addon'),
         'IO::K8s::K3s::V1::Addon',
         'k3s.cattle.io/v1/Addon resolves');
+    is($k8s->expand_class('k3s.cattle.io/v1/ETCDSnapshotFile'),
+        'IO::K8s::K3s::V1::ETCDSnapshotFile',
+        'k3s.cattle.io/v1/ETCDSnapshotFile resolves');
 
     # api_version parameter style
     is($k8s->expand_class('HelmChart', 'helm.cattle.io/v1'),

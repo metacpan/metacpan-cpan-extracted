@@ -1,0 +1,11 @@
+Revision history for Slug
+
+0.01    2026-03-26
+        First version.
+        - slug() with custom separator support
+        - slug_ascii() for transliteration only
+        - slug_custom() with full options (separator, max_length, lowercase, transliterate, trim_separator)
+        - Unicode transliteration: Latin-1/Extended-A/B, Greek, Cyrillic, Vietnamese, symbols, ligatures, fullwidth
+        - Custom ops on Perl 5.14+ for zero-overhead dispatch
+        - Pure C core reusable from other projects via include_dir()
+

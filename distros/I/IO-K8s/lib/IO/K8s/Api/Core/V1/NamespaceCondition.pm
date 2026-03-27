@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NamespaceCondition;
 # ABSTRACT: NamespaceCondition contains details about state of namespace.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::NamespaceCondition - NamespaceCondition contains details
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 status
 

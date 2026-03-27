@@ -1,8 +1,12 @@
 #!/usr/bin/env perl
 
+# Copyright (C) 2013-2026 Richard Kelsch
+# All Rights Reserved
+
 use 5.020;
 use strict;
 use warnings FATAL => 'all';
+use POSIX qw(getuid);
 use constant {
     TRUE  => 1,
     FALSE => 0,
@@ -36,19 +40,21 @@ while (my $line = <DATA>) {
 }
 print $banner;
 
-if ($^O =~ /MSWin/i) { # Some people will still try
-    print colored(['white on_red']," This module does not work natively on MS Windows.  It will only function in emulation mode, and you will not be able to see the output.  Please read the documentation on emulation mode. \n\n");
-    $pmt = ExtUtils::MakeMaker::prompt('Do you really wish to install anyway?  ','N');
+
+if ($^O ne 'linux') { # Some people will still try
+    print colored(['white on_red']," This module only works on Linux.\n\n");
+	print "Install not possible\n\n";
+    $pmt = 'N';
 } elsif (defined($ENV{'DISPLAY'})) {
     print
       colored(['white on_red'],' ' x 79),"\n",
-      colored(['white on_red'],' Graphics::Framebuffer should not be installed from within X-Windows!  You     '),"\n",
-      colored(['white on_red'],' should install it from the console itself, and not a console window.          '),"\n",
+      colored(['white on_red'],' Graphics::Framebuffer should not be installed from within Wayland/X-Windows!  '),"\n",
+      colored(['white on_red'],' you should install it from the console itself, and not a console window.      '),"\n",
       colored(['white on_red'],' ' x 79),"\n",
       colored(['black on_yellow'],' ' x 79),"\n",
       colored(['black on_yellow'],' If you insist on installing from within X-Windows, please keep in mind that   '),"\n",
-      colored(['black on_yellow'],' the tests will show nothing, as they will be unable to draw to the screen,    '),"\n",
-      colored(['black on_yellow'],' since X-Windows is using it.  Thus the tests will run in emulation mode only. '),"\n",
+      colored(['black on_yellow'],' the tests will fail, as they will be unable to draw to the screen, since      '),"\n",
+      colored(['black on_yellow'],' Waylan/X-Windows is using it.  Thus the tests will run in emulation mode only.'),"\n",
       colored(['black on_yellow'],' ' x 79), "\n\n";
     $pmt = ExtUtils::MakeMaker::prompt('Do you wish to install anyway?  ','Y');
 } elsif (no_framebuffer()) {
@@ -56,6 +62,25 @@ if ($^O =~ /MSWin/i) { # Some people will still try
       colored(['white on_red'],' Your system does not appear to have a framebuffer device!  This is required '),"\n",
       colored(['white on_red'],' for this library to function.                                               '),"\n\n";
     $pmt = ExtUtils::MakeMaker::prompt('Do you wish to install anyway?  ','Y');
+}
+
+my $user = _username_for_tests();
+
+print colored(['bright_yellow'], ' Is '), colored(['cyan'], $user), colored(['bright_yellow'],' a member of '), colored(['green'], 'video'), '? ... ';
+
+if (_user_in_group($user, 'video')) {
+	print colored(['bright_green'], 'Yes'), "\n";
+} else {
+	print colored(['bright_red'], 'No'), "\n";
+	my $add_cmd = "sudo usermod -aG video $user";
+	print "\n", colored(['yellow'], 'This module requires access to the Linux Framebuffer and the user needs to be'), "\n";
+	print colored(['yellow'], 'a member of the '), colored(['green'],'video'), colored(['yellow'], ' group.'), "\n\n";
+	print 'User '. colored(['cyan'], $user), ' does not appear to be in the group ', colored(['green'], 'video'), ".  To add your user account\n";
+	print 'to the ', colored(['green'], 'video'), " group, run the following command, then logout of your account\n";
+	print 'completely and then login, and then ', colored(['cyan'], $user), ' will be a member of the ', colored(['green'], 'video'), " group\n\n";
+	print '    ', colored(['on_black', 'bright_white'], $add_cmd), "\n\n";
+	print "Once you have done that, try running the install process again.\n\n";
+	$pmt = 'N';
 }
 unless($pmt =~ /^Y/i) {
     print "\n\nInstall Aborted.\n\n";
@@ -114,7 +139,7 @@ if ($meta =~ /^(.*?)\n/s) {
     print colored(['bright_yellow'],'                     Author') . ' ... ', colored(['bright_green'],"$email") . "\n";
 }
 
-print colored(['bright_white'],'Framebuffer.pm Modification'), ' ... ';
+print colored(['bright_yellow'],'Framebuffer.pm Modification'), ' ... ';
 open(my $FILE,'>','lib/Graphics/Framebuffer.pm') || die "Cannot open 'lib/Graphics/Framebuffer.pm' for writing" ;
 print $FILE $template;
 close($FILE);
@@ -259,14 +284,25 @@ sub no_framebuffer {
     return($fb_absent);
 }
 
-__END__
+sub _username_for_tests {
+	# Prefer SUDO_USER when running under sudo so we check the human account
+	# that will be logging in/out and being added to groups.
+	return $ENV{SUDO_USER} if defined $ENV{SUDO_USER} && length $ENV{SUDO_USER};
+	return $ENV{USER}      if defined $ENV{USER}      && length $ENV{USER};
+	chomp(my $u = `id -un 2>/dev/null`);
+	return $u || 'YOUR_USERNAME';
+}
 
-=pod
-
-Copyright (C) 2013-2026 Richard Kelsch
-All Rights Reserved
-
-=cut
+sub _user_in_group {
+	my ($user, $group) = @_;
+	my $cmd = qq{/usr/bin/id -nG "$user" 2>/dev/null};
+	my $groups = `$cmd` || '';
+	if ($groups =~ /video/) {
+		return(1);
+	} else {
+		return(0);
+	}
+}
 
 __DATA__
 [31;41m---------------------------- Graphics::Framebuffer ----------------------------[0m

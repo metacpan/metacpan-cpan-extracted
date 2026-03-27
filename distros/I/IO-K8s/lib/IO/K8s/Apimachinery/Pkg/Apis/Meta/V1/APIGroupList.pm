@@ -1,5 +1,5 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList;
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 # ABSTRACT: Deprecated - use IO::K8s::List instead
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::APIGroupList - Deprecated - use IO::
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 SUPPORT
 

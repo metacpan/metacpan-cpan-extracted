@@ -1,0 +1,6 @@
+Revision history for Task-Lingua-PetaMem
+
+0.2603260  2026-03-26
+    - improve CPAN kwalitee: Changes, META.json, LICENSE POD, MetaResources
+    - fix 78 audit findings: typos, wrong comments, stale POD, language list
+

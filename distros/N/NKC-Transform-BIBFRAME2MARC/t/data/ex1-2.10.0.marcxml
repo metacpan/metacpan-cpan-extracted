@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<marc:record xmlns:marc="http://www.loc.gov/MARC21/slim">
+  <marc:leader xml:space="preserve">     nam a22      i 4500</marc:leader>
+  <marc:controlfield xml:space="preserve" tag="001">nkc20172955079</marc:controlfield>
+  <marc:controlfield xml:space="preserve" tag="003">CZ PrNK</marc:controlfield>
+  <marc:controlfield xml:space="preserve" tag="005">DATE</marc:controlfield>
+  <marc:controlfield xml:space="preserve" tag="007">t|</marc:controlfield>
+  <marc:controlfield xml:space="preserve" tag="008">700101s2017    xr     g      000 d cze  </marc:controlfield>
+  <marc:datafield tag="015" ind1=" " ind2=" ">
+    <marc:subfield code="a">cnb002955079</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="020" ind1=" " ind2=" ">
+    <marc:subfield code="a">978-80-88183-09-9</marc:subfield>
+    <marc:subfield code="q">Nadační fond Česká knižnice</marc:subfield>
+    <marc:subfield code="q">vázáno</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="020" ind1=" " ind2=" ">
+    <marc:subfield code="a">978-80-88069-33-1</marc:subfield>
+    <marc:subfield code="q">Ústav pro českou literaturu AV ČR</marc:subfield>
+    <marc:subfield code="q">vázáno</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="020" ind1=" " ind2=" ">
+    <marc:subfield code="a">978-80-7491-943-5</marc:subfield>
+    <marc:subfield code="q">Host</marc:subfield>
+    <marc:subfield code="q">vázáno</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="035" ind1=" " ind2=" ">
+    <marc:subfield code="a">(ocolc)1019658948</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="040" ind1=" " ind2=" ">
+    <marc:subfield code="a">BOA001</marc:subfield>
+    <marc:subfield code="b">cze</marc:subfield>
+    <marc:subfield code="e">rda</marc:subfield>
+    <marc:subfield code="c">BOA001</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="072" ind1=" " ind2="7">
+    <marc:subfield code="a">821.162.3-2</marc:subfield>
+    <marc:subfield code="x">České</marc:subfield>
+    <marc:subfield code="x">drama</marc:subfield>
+    <marc:subfield code="2">Konspekt</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="100" ind1="1" ind2=" ">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011</marc:subfield>
+    <marc:subfield code="4">http://id.loc.gov/vocabulary/relators/aut</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="245" ind1="1" ind2="0">
+    <marc:subfield code="a">Hry /</marc:subfield>
+    <marc:subfield code="c">Václav Havel.</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="250" ind1=" " ind2=" ">
+    <marc:subfield code="a">V České knižnici vydání první.</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="264" ind1=" " ind2="1">
+    <marc:subfield code="a">Praha :</marc:subfield>
+    <marc:subfield code="b">Nadační fond Česká knižnice ÚČLK FF UK :</marc:subfield>
+    <marc:subfield code="b">Ústav pro českou literaturu AV ČR, v.v.i.</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="264" ind1=" " ind2="1">
+    <marc:subfield code="a">Praha :</marc:subfield>
+    <marc:subfield code="b">Nadační fond Česká knižnice ÚČLK FF UK :</marc:subfield>
+    <marc:subfield code="b">Ústav pro českou literaturu AV ČR, v.v.i.</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="264" ind1=" " ind2="1">
+    <marc:subfield code="a">Brno :</marc:subfield>
+    <marc:subfield code="b">Host,</marc:subfield>
+    <marc:subfield code="c">2017.</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="300" ind1=" " ind2=" ">
+    <marc:subfield code="a">550 stran</marc:subfield>
+    <marc:subfield code="c">21 cm</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="334" ind1=" " ind2=" ">
+    <marc:subfield code="b">mono</marc:subfield>
+    <marc:subfield code="0">http://id.loc.gov/vocabulary/issuance/mono</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="336" ind1=" " ind2=" ">
+    <marc:subfield code="a">text</marc:subfield>
+    <marc:subfield code="b">txt</marc:subfield>
+    <marc:subfield code="2">rdacontent</marc:subfield>
+    <marc:subfield code="0">http://id.loc.gov/vocabulary/contentTypes/txt</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="337" ind1=" " ind2=" ">
+    <marc:subfield code="a">bez média</marc:subfield>
+    <marc:subfield code="b">n</marc:subfield>
+    <marc:subfield code="2">rdamedia</marc:subfield>
+    <marc:subfield code="0">http://id.loc.gov/vocabulary/mediaTypes/n</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="338" ind1=" " ind2=" ">
+    <marc:subfield code="a">svazek</marc:subfield>
+    <marc:subfield code="b">nc</marc:subfield>
+    <marc:subfield code="2">rdacarrier</marc:subfield>
+    <marc:subfield code="0">http://id.loc.gov/vocabulary/carriers/nc</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="490" ind1="0" ind2=" ">
+    <marc:subfield code="a">Česká knižnice ;</marc:subfield>
+    <marc:subfield code="v">sv. 93</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="504" ind1=" " ind2=" ">
+    <marc:subfield code="a">Obsahuje bibliografické odkazy</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="505" ind1="0" ind2=" ">
+    <marc:subfield code="a">Zahradní slavnost -- Vyrozumění -- Ztížená možnost soustředění -- Žebrácká opera -- Audience -- Vernisáž -- Largo desolato -- Pokoušení</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="655" ind1=" " ind2="7">
+    <marc:subfield code="a">Drama</marc:subfield>
+    <marc:subfield code="2">lcgft</marc:subfield>
+    <marc:subfield code="0">http://id.loc.gov/authorities/genreForms/gf2014026297</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="655" ind1=" " ind2="7">
+    <marc:subfield code="a">česká dramata</marc:subfield>
+    <marc:subfield code="0">http://example.org/nkc20172955079#GenreForm655-29</marc:subfield>
+    <marc:subfield code="2">czenas</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="655" ind1=" " ind2="7">
+    <marc:subfield code="a">výbory</marc:subfield>
+    <marc:subfield code="0">http://example.org/nkc20172955079#GenreForm655-30</marc:subfield>
+    <marc:subfield code="2">czenas</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="655" ind1=" " ind2="7">
+    <marc:subfield code="a">komentovaná vydání</marc:subfield>
+    <marc:subfield code="0">http://example.org/nkc20172955079#GenreForm655-31</marc:subfield>
+    <marc:subfield code="2">czenas</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="655" ind1=" " ind2="4">
+    <marc:subfield code="a">Czech drama</marc:subfield>
+    <marc:subfield code="0">http://example.org/nkc20172955079#GenreForm655-32</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="655" ind1=" " ind2="4">
+    <marc:subfield code="a">selected works</marc:subfield>
+    <marc:subfield code="0">http://example.org/nkc20172955079#GenreForm655-33</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="655" ind1=" " ind2="4">
+    <marc:subfield code="a">annotated editions</marc:subfield>
+    <marc:subfield code="0">http://example.org/nkc20172955079#GenreForm655-34</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Zahradní slavnost</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Vyrozumění</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Ztížená možnost soustředění</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Žebrácká opera</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Audience</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Vernisáž</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Largo desolato</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="700" ind1="1" ind2="2">
+    <marc:subfield code="a">Havel, Václav,</marc:subfield>
+    <marc:subfield code="d">1936-2011.</marc:subfield>
+    <marc:subfield code="t">Pokoušení</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="758" ind1=" " ind2=" ">
+    <marc:subfield code="4">http://id.loc.gov/ontologies/bibframe/instanceOf</marc:subfield>
+    <marc:subfield code="1">http://example.org/nkc20172955079#Work</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="758" ind1=" " ind2=" ">
+    <marc:subfield code="1">http://example.org/nkc20172955079#Instance</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="830" ind1=" " ind2="0">
+    <marc:subfield code="a">Česká knižnice (Host)</marc:subfield>
+  </marc:datafield>
+  <marc:datafield tag="884" ind1=" " ind2=" ">
+    <marc:subfield code="a">DLC bibframe2marc v2.10 (libxslt)</marc:subfield>
+    <marc:subfield code="g">DATE</marc:subfield>
+    <marc:subfield code="q">DLC</marc:subfield>
+    <marc:subfield code="u">https://github.com/lcnetdev/bibframe2marc/releases/tag/v2.10</marc:subfield>
+  </marc:datafield>
+</marc:record>

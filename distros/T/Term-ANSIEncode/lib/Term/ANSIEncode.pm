@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.96;
+package Term::ANSIEncode 1.99;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -59,7 +59,7 @@ BEGIN {
     our @EXPORT_OK = qw(ansi_colors);
 } ## end BEGIN
 
-our $VERSION = '1.96';
+our $VERSION = '1.99';
 
 # Package-level caches so large tables are built only once per process.
 our $GLOBAL_ANSI_META = _global_ansi_meta();
@@ -85,9 +85,9 @@ our %STYLES = (
     PARALLELOGRAM    => ['▰', '▰', '▰', '▰', '▰', '▰', '▰', '▰'],
     'BIG ARROWS'     => ['▶', '▶', '◀', '◀', '▶', '◀', '▲', '▼'],
     ARROWS           => ['🡕', '🡖', '🡔', '🡗', '🡒', '🡐', '🡑', '🡓'],
-	ARROWHEADS       => ['🠉', '🠋', '🠉', '🠋', '🠊', '🠈', '🠉', '🠋'],
-	'FAT ARROWHEADS' => ['🡅', '🡇', '🡅', '🡇', '🡆', '🡄', '🡅', '🡇'],
-	SOLID            => ['█', '█', '█', '█', '█', '█', '█', '█'],
+    ARROWHEADS       => ['🠉', '🠋', '🠉', '🠋', '🠊', '🠈', '🠉', '🠋'],
+    'FAT ARROWHEADS' => ['🡅', '🡇', '🡅', '🡇', '🡆', '🡄', '🡅', '🡇'],
+    SOLID            => ['█', '█', '█', '█', '█', '█', '█', '█'],
 );
 
 sub new {
@@ -105,13 +105,13 @@ sub new {
     };
 
     bless($self, $class);
-	$self->_ansi_detect_capability();
+    $self->_ansi_detect_capability();
 
     return ($self);
 } ## end sub new
 
 sub get_version {
-	my $self = shift;
+    my $self = shift;
 ###
     my $text = <<'VERSION';
 [% CLS %][% YELLOW %]╔═════════════════════════════════════════════════════════════════════════════╗[% RESET %]
@@ -134,13 +134,13 @@ VERSION
 ###
 
     $text =~ s/XXXX/$VERSION/gs;
-	return($text);
-}
+    return ($text);
+} ## end sub get_version
 
 sub expand_tokens {
-	my $self  = shift;
+    my $self = shift;
 
-	my $bar = '[% BRIGHT GREEN %]│[% RESET %]';
+    my $bar = '[% BRIGHT GREEN %]│[% RESET %]';
     my $to  = <<'TOKENS';
 [% CLS %]
 [% WRAP %]Tokens have to be encapsulated inside [ % TOKEN % ] (the TOKEN must be surrounded by at least one space on each side).  Colors beyond the standard 16 will require a terminal that supports 256 colors, up to 16 million colors.  It is also highly recommended that your terminal supports UTF-8 for advanced character/symbol support.  Some terminals may not support some features.[% ENDWRAP %]
@@ -161,11 +161,11 @@ TOKENS
     $to .= "$bar     ▐[% CYAN %]░[% RESET %]▌     ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌ ▐[% CYAN %]░[% RESET %]▌  ▐[% CYAN %]░[% RESET %]█▄▄▄▄▄▄▄▄▄  ▐[% CYAN %]░[% RESET %]▌     ▐[% CYAN %]░[% RESET %]▐[% CYAN %]░[% RESET %]▌  ▄▄▄▄▄▄▄▄▄█[% CYAN %]░[% RESET %]▌$bar\n";
     $to .= "$bar     ▐[% BLUE %]░[% RESET %]▌     ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌  ▐[% BLUE %]░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌ ▐[% BLUE %]░[% RESET %]▌      ▐[% BLUE %]░░[% RESET %]▌ ▐[% BLUE %]░░░░░░░░░░░[% RESET %]▌$bar\n";
     $to .= "$bar      ▀       ▀▀▀▀▀▀▀▀▀▀▀   ▀    ▀   ▀▀▀▀▀▀▀▀▀▀▀   ▀        ▀▀   ▀▀▀▀▀▀▀▀▀▀▀ $bar\n";
-
+###
     $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]CLEAR [% RESET %][% BRIGHT GREEN %]' . '═' x 27 . '╤' . '═' x 40 . '╡[% RESET %]' . "\n";
     {
-        my @names = (sort(keys %{$self->{'ansi_meta'}->{'clear'}}));
-        while(scalar(@names)) {
+        my @names = (sort(keys %{ $self->{'ansi_meta'}->{'clear'} }));
+        while (scalar(@names)) {
             my $name = shift(@names);
             $to .= $self->_add_row($bar, $name, $self->ansi_description('clear', $name));
         }
@@ -174,56 +174,56 @@ TOKENS
     $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]CURSOR [% RESET %][% BRIGHT GREEN %]' . '═' x 26 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
 
     {
-        my @names = (sort(keys %{$self->{'ansi_meta'}->{'cursor'}}));
-        while(scalar(@names)) {
+        my @names = (sort(keys %{ $self->{'ansi_meta'}->{'cursor'} }));
+        while (scalar(@names)) {
             my $name = shift(@names);
             $to .= $self->_add_row($bar, $name, $self->ansi_description('cursor', $name));
         }
-        $to .= $self->_add_row($bar, 'SPACES count', 'outputs "count" number of spaces');
-        $to .= $self->_add_row($bar, 'TABS count', 'outputs "count" number of tabs');
+        $to .= $self->_add_row($bar, 'SPACES count',         'outputs "count" number of spaces');
+        $to .= $self->_add_row($bar, 'TABS count',           'outputs "count" number of tabs');
         $to .= $self->_add_row($bar, 'CHAR character,count', 'character repeated "count" times');
-        $to .= $self->_add_row($bar, 'LOCATE column,row', 'Sets the cursor location');
-        $to .= $self->_add_row($bar, 'SCROLL UP count',   'Scrolls the screen up by "count" lines');
-        $to .= $self->_add_row($bar, 'SCROLL DOWN count', 'Scrolls the screen down by "count" lines');
+        $to .= $self->_add_row($bar, 'LOCATE column,row',    'Sets the cursor location');
+        $to .= $self->_add_row($bar, 'SCROLL UP count',      'Scrolls the screen up by "count" lines');
+        $to .= $self->_add_row($bar, 'SCROLL DOWN count',    'Scrolls the screen down by "count" lines');
     }
 
     $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]ATTRIBUTES [% RESET %][% BRIGHT GREEN %]' . '═' x 22 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
 
     {
-        my @names = grep(!/FONT \d/,(sort(keys %{$self->{'ansi_meta'}->{'attributes'}})));
-        while(scalar(@names)) {
-            my $name = shift(@names);
-            my $format  = Text::Format->new(
+        my @names = grep(!/FONT \d/, (sort(keys %{ $self->{'ansi_meta'}->{'attributes'} })));
+        while (scalar(@names)) {
+            my $name   = shift(@names);
+            my $format = Text::Format->new(
                 'columns'     => 37,
                 'tabstop'     => 4,
                 'extraSpace'  => TRUE,
                 'firstIndent' => 0,
             );
-            my $desc = $format->format($self->ansi_description('attributes',$name));
-            my @d = split(/\n/, $desc);
+            my $desc  = $format->format($self->ansi_description('attributes', $name));
+            my @d     = split(/\n/, $desc);
             my $first = TRUE;
-            while(scalar(@d)) {
+            while (scalar(@d)) {
                 my $line = shift(@d);
                 if ($first) {
                     if ($name =~ /FONT|HIDE|RING BELL|UNDERLINE COLOR/) {
-                        $to .= "$bar " . sprintf('%-34s',$name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-38s',$line) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
+                        $to .= "$bar " . sprintf('%-34s', $name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-38s', $line) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
                     } else {
-                        $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-34s',$name) . ' [% RESET %]' . "$bar " . sprintf('%-38s',$line) . " $bar\n";
+                        $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-34s', $name) . ' [% RESET %]' . "$bar " . sprintf('%-38s', $line) . " $bar\n";
                     }
                     $first = FALSE;
                 } else {
-                    $to .= sprintf('%s %-34s %s %-38s %s',$bar, ' ', $bar, $line, $bar) . "\n";
+                    $to .= sprintf('%s %-34s %s %-38s %s', $bar, ' ', $bar, $line, $bar) . "\n";
                 }
-            }
-        }
-        $to .= "$bar " . sprintf('%-34s','UNDERLINE COLOR color') . "$bar " . sprintf('%-38s','Set the underline color using color') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s','token.') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s ','WRAP') . "$bar " . sprintf('%-38s','Begin text block to be word-wrapped') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s ','ENDWRAP') . "$bar " . sprintf('%-38s','End text block to be word-wrapped') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s ','JUSTIFIED') . "$bar " . sprintf('%-38s','Begin text block to be word-wrapped') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s','and justified') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s ','ENDJUSTIFIED') . "$bar " . sprintf('%-38s','End text block to be word-wrapped') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s','and justified') . " $bar\n";
+            } ## end while (scalar(@d))
+        } ## end while (scalar(@names))
+        $to .= "$bar " . sprintf('%-34s',  'UNDERLINE COLOR color') . "$bar " . sprintf('%-38s', 'Set the underline color using color') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',  ' ') . " $bar " . sprintf('%-38s', 'token.') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s ', 'WRAP') . "$bar " . sprintf('%-38s', 'Begin text block to be word-wrapped') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s ', 'ENDWRAP') . "$bar " . sprintf('%-38s', 'End text block to be word-wrapped') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s ', 'JUSTIFIED') . "$bar " . sprintf('%-38s', 'Begin text block to be word-wrapped') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',  ' ') . " $bar " . sprintf('%-38s', 'and justified') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s ', 'ENDJUSTIFIED') . "$bar " . sprintf('%-38s', 'End text block to be word-wrapped') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s',  ' ') . " $bar " . sprintf('%-38s', 'and justified') . " $bar\n";
     }
 
     {
@@ -232,77 +232,77 @@ TOKENS
         $to .= '[% BRIGHT GREEN %]╞' . '═' x 36 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
         $to .= "$bar [% CYAN %]COLORS, START BACKGROUND WITH 'B_' $bar [% CYAN %]DESCRIPTION                            $bar\n";
 
-        foreach my $code ('ANSI 3 BIT','ANSI 4 BIT','ANSI 8 BIT','ANSI 24 BIT') {
+        foreach my $code ('ANSI 3 BIT', 'ANSI 4 BIT', 'ANSI 8 BIT', 'ANSI 24 BIT') {
             if (($code eq 'ANSI 3 BIT' && $self->{'CAPS'}->{'3 BIT'}) || ($code eq 'ANSI 4 BIT' && $self->{'CAPS'}->{'4 BIT'}) || ($code eq 'ANSI 8 BIT' && $self->{'CAPS'}->{'8 BIT'}) || ($code eq 'ANSI 24 BIT' && $self->{'CAPS'}->{'24 BIT'})) {
                 if ($code eq 'ANSI 3 BIT') {
-                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╤' . '═' x 4 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
+                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s', $code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╤' . '═' x 4 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
                 } else {
-                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s',$code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╪' . '═' x 4 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
+                    $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]' . sprintf('%-11s', $code) . ' [% RESET %][% BRIGHT GREEN %]' . '═' x 16 . '╪' . '═' x 4 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
                 }
-                my @names = grep(!/^(DEFAULT|COLOR|GRAY)/,(sort(keys %{$self->{'ansi_meta'}->{'foreground'}})));
-                unshift(@names,'DEFAULT');
+                my @names = grep(!/^(DEFAULT|COLOR|GRAY)/, (sort(keys %{ $self->{'ansi_meta'}->{'foreground'} })));
+                unshift(@names, 'DEFAULT');
                 if ($code eq 'ANSI 8 BIT') {
                     foreach my $count (16 .. 231) {
-                        push(@names,"COLOR $count");
+                        push(@names, "COLOR $count");
                     }
                     foreach my $count (0 .. 23) {
-                        push(@names,"GRAY $count");
+                        push(@names, "GRAY $count");
                     }
-                }
+                } ## end if ($code eq 'ANSI 8 BIT')
                 foreach my $name (@names) {
                     if ($self->_type($self->{'ansi_meta'}->{'foreground'}->{$name}->{'out'}) eq $code) {
                         if ($name =~ /^(DEFAULT|NAVY|GRAY [0-9]|COLOR 1[6-8]|BLACK|MEDIUM BLUE|ARMY GREEN|BISTRE|BULGARIAN ROSE|CHARCOAL|COOL BLACK|DARK BLUE|DARK GREEN|DARK JUNGLE GREEN|DARK MIDNIGHT BLUE|DUKE BLUE|EGYPTIAN BLUE|MEDIUM JUNGLE GREEN|MIDNIGHT BLUE|NAVY BLUE|ONYX|OXFORD BLUE|PHTHALO BLUE|PHTHALO GREEN|PRUSSIAN BLUE|SAINT PATRICK BLUE|SEAL BROWN|SMOKEY BLACK|ULTRAMARINE|ZINNWALDITE BROWN)$/) {
-                            $to .= $bar . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]│' . sprintf(' %-38s ',$self->ansi_description('foreground',$name)) . "$bar\n";
+                            $to .= $bar . sprintf(' %-29s ', $name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]│' . sprintf(' %-38s ', $self->ansi_description('foreground', $name)) . "$bar\n";
                         } else {
-                            $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-29s ',$name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]' . $bar . sprintf(' %-38s ',$self->ansi_description('foreground',$name)) . "$bar\n";
+                            $to .= $bar . '[% ' . $name . ' %]' . sprintf(' %-29s ', $name) . '[% RESET %]' . $bar . '[% B_' . $name . ' %]    [% RESET %]' . $bar . sprintf(' %-38s ', $self->ansi_description('foreground', $name)) . "$bar\n";
                         }
-                    }
-                }
-            }
-        }
+                    } ## end if ($self->_type($self...))
+                } ## end foreach my $name (@names)
+            } ## end if (($code eq 'ANSI 3 BIT'...))
+        } ## end foreach my $code ('ANSI 3 BIT'...)
         if ($self->{'CAPS'}->{'24 BIT'}) {
-            $to .= $bar . sprintf(' %-29s ','RGB red,green,blue') . '[% RESET %]' . $bar . '[% B_RED %] [% B_GREEN %] [% B_BLUE %] [% B_MAGENTA %] [% RESET %]' . $bar . sprintf(' %-38s ','Set color to a value 0-255 per primary') . "$bar\n";
-            $to .= $bar . sprintf(' %-29s ',' ') . '[% RESET %]' . $bar . '    ' . $bar . sprintf(' %-38s ','color.') . "$bar\n";
+            $to .= $bar . sprintf(' %-29s ', 'RGB red,green,blue') . '[% RESET %]' . $bar . '[% B_RED %] [% B_GREEN %] [% B_BLUE %] [% B_MAGENTA %] [% RESET %]' . $bar . sprintf(' %-38s ', 'Set color to a value 0-255 per primary') . "$bar\n";
+            $to .= $bar . sprintf(' %-29s ', ' ') . '[% RESET %]' . $bar . '    ' . $bar . sprintf(' %-38s ', 'color.') . "$bar\n";
         }
     }
 
     $to .= '[% BRIGHT GREEN %]╞══ [% BOLD %][% BRIGHT YELLOW %]SPECIAL [% RESET %][% BRIGHT GREEN %]' . '═' x 20 . '╧' . '═' x 4 . '╪' . '═' x 40 . '╡[% RESET %]' . "\n";
 
     {
-        my @names = (sort(keys %{$self->{'ansi_meta'}->{'special'}}));
-        while(scalar(@names)) {
+        my @names = (sort(keys %{ $self->{'ansi_meta'}->{'special'} }));
+        while (scalar(@names)) {
             my $name = shift(@names);
-            $to .= '[% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-34s',$name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-38s',$self->ansi_description('special',$name)) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
+            $to .= '[% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-34s', $name) . ' [% BRIGHT GREEN %]│[% RESET %] ' . sprintf('%-38s', $self->ansi_description('special', $name)) . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
         }
         $to .= '[% BRIGHT CYAN %]│ ' . '─' x 34 . " $bar [% BRIGHT CYAN %]" . '─' x 38 . ' │[% RESET %]' . "\n";
-        $to .= "$bar " . sprintf('%-34s', 'HORIZONTAL RULE color') . " $bar " . sprintf('%-38s','Horizontal rule the width of the') . " $bar\n";
-        $to .= "$bar                                    $bar " . sprintf('%-38s','screen in the specified color.') . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
+        $to .= "$bar " . sprintf('%-34s', 'HORIZONTAL RULE color') . " $bar " . sprintf('%-38s', 'Horizontal rule the width of the') . " $bar\n";
+        $to .= "$bar                                    $bar " . sprintf('%-38s', 'screen in the specified color.') . ' [% BRIGHT GREEN %]│[% RESET %]' . "\n";
         $to .= '[% BRIGHT CYAN %]│ ' . '─' x 34 . " $bar [% BRIGHT CYAN %]" . '─' x 38 . ' │[% RESET %]' . "\n";
-        $to .= "$bar " . sprintf('%-34s','BOX color,col,row,width,hght,type  ') . "$bar " . sprintf('%-38s', 'Shows framed text box in the') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s', 'selected frame type and color.  Text') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s', 'goes between the BOX and ENDBOX token') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s', '') . " $bar\n";
-        $to .= "$bar " . sprintf('%34s','types:') . " $bar " . sprintf('%-38s', 'DOUBLE, THIN, THICK, CIRCLE, WEDGE,') . " $bar\n";
-        $to .= "$bar " . sprintf('%34s','') . " $bar " . sprintf('%-38s',       'BIG WEDGE, DOTS, DIAMOND, STAR,') . " $bar\n";
-        $to .= "$bar " . sprintf('%34s','') . " $bar " . sprintf('%-38s',       'SQUARE, DITHERED, NOTES, BIG ARROWS,') . " $bar\n";
-        $to .= "$bar " . sprintf('%34s','') . " $bar " . sprintf('%-38s',       'CHRISTIAN, ARROWS, HEARTS, ROUNDED') . " $bar\n";
-        $to .= "$bar " . sprintf('%34s','') . " $bar " . sprintf('%-38s',       'PARALLELOGRAM') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s',' ') . " $bar " . sprintf('%-38s', '') . " $bar\n";
-        $to .= "$bar " . sprintf('%-34s','ENDBOX') . " $bar " . sprintf('%-38s', 'Ends the BOX token function') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', 'BOX color,col,row,width,hght,type  ') . "$bar " . sprintf('%-38s', 'Shows framed text box in the') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', ' ') . " $bar " . sprintf('%-38s', 'selected frame type and color.  Text') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', ' ') . " $bar " . sprintf('%-38s', 'goes between the BOX and ENDBOX token') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', ' ') . " $bar " . sprintf('%-38s', '') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s',  'types:') . " $bar " . sprintf('%-38s', 'DOUBLE, THIN, THICK, CIRCLE, WEDGE,') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s',  '') . " $bar " . sprintf('%-38s', 'BIG WEDGE, DOTS, DIAMOND, STAR,') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s',  '') . " $bar " . sprintf('%-38s', 'SQUARE, DITHERED, NOTES, BIG ARROWS,') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s',  '') . " $bar " . sprintf('%-38s', 'CHRISTIAN, ARROWS, HEARTS, ROUNDED') . " $bar\n";
+        $to .= "$bar " . sprintf('%34s',  '') . " $bar " . sprintf('%-38s', 'PARALLELOGRAM') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', ' ') . " $bar " . sprintf('%-38s', '') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', 'ENDBOX') . " $bar " . sprintf('%-38s', 'Ends the BOX token function') . " $bar\n";
         $to .= '[% BRIGHT CYAN %]│ ' . '─' x 34 . " $bar [% BRIGHT CYAN %]" . '─' x 38 . ' │[% RESET %]' . "\n";
-		$to .= "$bar " . sprintf('%-34s','SPACES count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of spaces') . " $bar\n";
-		$to .= "$bar " . sprintf('%-34s','CHAR character,count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of "character"') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', 'SPACES count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of spaces') . " $bar\n";
+        $to .= "$bar " . sprintf('%-34s', 'CHAR character,count') . " $bar " . sprintf('%-38s', 'Outputs "count" number of "character"') . " $bar\n";
     }
     $to .= '[% BRIGHT GREEN %]╰' . '─' x 36 . '┴' . '─' x 40 . '╯[% RESET %]' . "\n";
 
-    { # Post processing
+    {    # Post processing
         my $new = 'UNDERLINE COLOR [% UNDERLINE %][% UNDERLINE COLOR RED %][% FAINT %][% ITALIC %]co[% RESET %][% UNDERLINE %][% UNDERLINE COLOR GREEN %][% FAINT %][% ITALIC %]l[% RESET %][% UNDERLINE %][% UNDERLINE COLOR BLUE %][% FAINT %][% ITALIC %]or[% RESET %]';
         $to =~ s/UNDERLINE COLOR color/$new /gs;
 
         $new = '[% FAINT %][% ITALIC %] color     [% RESET %]';
         $to =~ s/ color     /$new/gs;
 
-		$new = '[% FAINT %][% ITALIC %]character[% RESET %],[% FAINT %][% ITALIC %]count[% RESET %]';
+        $new = '[% FAINT %][% ITALIC %]character[% RESET %],[% FAINT %][% ITALIC %]count[% RESET %]';
         $to =~ s/character,count/$new/gs;
 
         $new = '[% FAINT %][% ITALIC %] count     [% RESET %]';
@@ -317,51 +317,51 @@ TOKENS
         $new = ' [% FAINT %][% ITALIC %]color[% RESET %],[% FAINT %][% ITALIC %]col[% RESET %],[% FAINT %][% ITALIC %]row[% RESET %],[% FAINT %][% ITALIC %]width[% RESET %],[% FAINT %][% ITALIC %]hght[% RESET %],[% FAINT %][% ITALIC %]type[% RESET %]';
         $to =~ s/ color,col,row,width,hght,type/$new/gs;
     }
-    return($to);
-}
+    return ($to);
+} ## end sub expand_tokens
 
 sub _type {
-	my $self = shift;
-	my $text = substr(shift, 2);
+    my $self = shift;
+    my $text = substr(shift, 2);
 
-	if ($text =~ /^38;2;\d+;\d+;\d+m/) {
-		return ('ANSI 24 BIT');
-	} elsif ($text =~ /^38;5;\d+m/) {
-		return ('ANSI 8 BIT');
-	} elsif ($text =~ /^(\d+)m/) {
-		my $color = $1 + 0;
-		if (($color >= 30 && $color <= 37) || ($color >= 40 && $color <= 47) || $color == 39 || $color == 49) {
-			return('ANSI 3 BIT');
-		} elsif (($color >= 90 && $color <= 97) || ($color >= 100 && $color <= 107)) {
-			return('ANSI 4 BIT');
-		}
-	}
-}
+    if ($text =~ /^38;2;\d+;\d+;\d+m/) {
+        return ('ANSI 24 BIT');
+    } elsif ($text =~ /^38;5;\d+m/) {
+        return ('ANSI 8 BIT');
+    } elsif ($text =~ /^(\d+)m/) {
+        my $color = $1 + 0;
+        if (($color >= 30 && $color <= 37) || ($color >= 40 && $color <= 47) || $color == 39 || $color == 49) {
+            return ('ANSI 3 BIT');
+        } elsif (($color >= 90 && $color <= 97) || ($color >= 100 && $color <= 107)) {
+            return ('ANSI 4 BIT');
+        }
+    } ## end elsif ($text =~ /^(\d+)m/)
+} ## end sub _type
 
 sub _add_row {
     my ($self, $bar, $name, $desc) = @_;
 
-    my $text = '';
-    my $format  = Text::Format->new(
-		'columns'     => 38,
-		'tabstop'     => 4,
-		'extraSpace'  => TRUE,
-		'firstIndent' => 0,
-	);
+    my $text   = '';
+    my $format = Text::Format->new(
+        'columns'     => 38,
+        'tabstop'     => 4,
+        'extraSpace'  => TRUE,
+        'firstIndent' => 0,
+    );
     $desc = $format->format($desc);
-    my @d = split(/\n/, $desc);
+    my @d     = split(/\n/, $desc);
     my $first = TRUE;
-    while(scalar(@d)) {
-		my $line = shift(@d);
-		if ($first) {
-			$text .= sprintf('%s %-34s %s %-38s %s',$bar, $name, $bar, $line, $bar) . "\n";
-			$first = FALSE;
-		} else {
-			$text .= sprintf('%s %-34s %s %-38s %s',$bar, ' ', $bar, $line, $bar) . "\n";
-		}
-	}
-    return($text);
-}
+    while (scalar(@d)) {
+        my $line = shift(@d);
+        if ($first) {
+            $text .= sprintf('%s %-34s %s %-38s %s', $bar, $name, $bar, $line, $bar) . "\n";
+            $first = FALSE;
+        } else {
+            $text .= sprintf('%s %-34s %s %-38s %s', $bar, ' ', $bar, $line, $bar) . "\n";
+        }
+    } ## end while (scalar(@d))
+    return ($text);
+} ## end sub _add_row
 
 # Detecting ANSI terminal capability is a royal pain.
 sub _ansi_detect_capability {
@@ -375,6 +375,7 @@ sub _ansi_detect_capability {
     };
 
     if ($^O eq 'MSWin32') {
+
         # Windows-specific detection
         # Check for Windows 10 virtual terminal and others (like ConEmu)
         if (exists($ENV{'WT_SESSION'}) || $ENV{'ConEmuANSI'} || (exists $ENV{'OS'} && $ENV{'OS'} eq 'Windows_NT')) {
@@ -384,29 +385,30 @@ sub _ansi_detect_capability {
                 '8 BIT'  => TRUE,
                 '24 BIT' => ((exists($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} =~ /truecolor|24bit/) || (exists($ENV{'TERM_PROGRAM'}) && $ENV{'TERM_PROGRAM'} =~ /WarpTerminal/)) ? TRUE : FALSE,
             };
-        }
+        } ## end if (exists($ENV{'WT_SESSION'...}))
     } else {
+
         # UNIX-like systems, use tput where available, fallback to environment variables
         if (my $tput_caps = _detect_ansi_with_tput()) {
             $caps = $tput_caps;
         }
-    }
+    } ## end else [ if ($^O eq 'MSWin32') ]
 
-	$self->{'CAPS'} = $caps;
-}
+    $self->{'CAPS'} = $caps;
+} ## end sub _ansi_detect_capability
 
 sub _detect_ansi_with_tput {
-	local $ENV{'PATH'} = '/usr/bin';
+    local $ENV{'PATH'} = '/usr/bin';
     my $colors = `/usr/bin/tput colors 2>/dev/null`;
     chomp($colors);
 
     return {
-        '3 BIT'  => ($colors >= 8 ? TRUE : FALSE),
-        '4 BIT'  => ($colors >= 16 ? TRUE : FALSE),
-        '8 BIT'  => ($colors >= 256 ? TRUE : FALSE),
+        '3 BIT'  => ($colors >= 8                                                        ? TRUE : FALSE),
+        '4 BIT'  => ($colors >= 16                                                       ? TRUE : FALSE),
+        '8 BIT'  => ($colors >= 256                                                      ? TRUE : FALSE),
         '24 BIT' => (exists($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} =~ /truecolor|24bit/ ? TRUE : FALSE),
     };
-}
+} ## end sub _detect_ansi_with_tput
 
 # Returns a description of a token using the meta data.
 sub ansi_description {
@@ -427,7 +429,7 @@ sub ansi_colors {
             '8 BIT'  => FALSE,
             '24 BIT' => FALSE,
         };
-    }
+    } ## end unless (defined($params))
     my $grey   = '[% GRAY 8 %]';
     my $off    = '[% RESET %]';
     my $w      = 9;
@@ -436,7 +438,7 @@ sub ansi_colors {
         $string .= '[% BRIGHT YELLOW %][% BOLD %]4 BIT            [% RESET %]';
         $w = 26;
     }
-    if ($params-> {'24 BIT'}) {
+    if ($params->{'24 BIT'}) {
         $string .= '[% BRIGHT YELLOW %][% BOLD %]24 BIT[% RESET %]';
         $w = 59;
     }
@@ -467,38 +469,41 @@ sub ansi_colors {
             } else {
                 $string .= sprintf('%s %-7s %s', "\[\% BLACK \%\]\[\% B_$color \%\]", $color, $off);
             }
+
             # Loop through color ranges and call appropriate subroutine for blocks
             if ($params->{'24 BIT'}) {
                 foreach my $range ([0, 64, 2], [128, 64, -2], [128, 192, 2], [255, 192, -2]) {
                     if ($range->[0] < $range->[1]) {
                         for (my $count = $range->[0]; $count < $range->[1]; $count += $range->[2]) {
+
                             # Pass arguments to the subroutine and append the result
                             $string .= $actions{$index}->($count, $count + $range->[2]);
                         }
                     } else {
                         for (my $count = $range->[0]; $count > $range->[1]; $count += $range->[2]) {
+
                             # Pass arguments to the subroutine and append the result
                             $string .= $actions{$index}->($count, $count + $range->[2]);
                         }
-                    }
+                    } ## end else [ if ($range->[0] < $range...)]
                     if ($params->{'4 BIT'}) {
                         $string .= "\n" . sprintf('%s %-7s %s %s %-14s %s', "\[\% BLACK \%\]\[\% B_$color \%\]", ' ', $off, "\[\% BLACK \%\]\[\% B_BRIGHT $color \%\]", ' ', $off) . ' ' if ($range->[0] != 255);
                     } else {
                         $string .= "\n" . sprintf('%s %-7s %s', "\[\% BLACK \%\]\[\% B_$color \%\]", ' ', $off) . ' ' if ($range->[0] != 255);
                     }
                 } ## end foreach my $range ([0, 64, ...])
-            }
+            } ## end if ($params->{'24 BIT'...})
             $index++;
             $string .= '[% RESET %]' . "\n";
-        }
-    } ## end foreach my $color (@colors)
+        } ## end else [ if ($color eq 'BLACK')]
+    } ## end foreach my $color (qw(RED YELLOW GREEN CYAN BLUE MAGENTA WHITE BLACK))
 
     $string .= "\n[% BRIGHT YELLOW %][% BOLD %] 8 BIT$off\n" . ('─' x 60) . _generate_8bit_colors() if (defined($params) && $params->{'8 BIT'});
     return ($string);
 } ## end sub ansi_colors
 
 sub _generate_8bit_colors {
-    my $output = ''; # "\n";
+    my $output = '';    # "\n";
     foreach my $i (0 .. 5) {
         my $_i = ($i * 36) + 16;     # 16, 28, 40
         $output .= "\n";
@@ -534,7 +539,7 @@ sub _generate_8bit_colors {
                 $output .= '[% BLACK %][% B_COLOR ' . ($_i + $j) . ' %]' . sprintf(' %3d ', ($_i + $j)) . '[% RESET %]';
             }
         } ## end foreach my $j (0 .. 11)
-    } ## end foreach my $i (0 .. 6)
+    } ## end foreach my $i (0 .. 5)
     $output .= "\n" . '[% BRIGHT YELLOW %][% BOLD %] GRAY[% RESET %]' . "\n";
     foreach my $count (0 .. 23) {
         if ($count < 12) {
@@ -543,7 +548,7 @@ sub _generate_8bit_colors {
             $output .= "\n" if ($count == 12);
             $output .= '[% BLACK %][% B_GRAY ' . $count . ' %]' . sprintf(' %3d ', $count) . '[% RESET %]';
         }
-    }
+    } ## end foreach my $count (0 .. 23)
     $output .= "\n\n";
     return $output;
 } ## end sub _generate_8bit_colors
@@ -723,8 +728,9 @@ sub ansi_box {
     my $text = '';
 
     my $csi = "\e[";
+
     # Top line
-    $text .= $csi . $y .';' . $x . 'H' . $color . $tl . ($top x ($w - 2)) . $tr . '[% RESET %]';
+    $text .= $csi . $y . ';' . $x . 'H' . $color . $tl . ($top x ($w - 2)) . $tr . '[% RESET %]';
 
     # Middle lines
     for my $row (1 .. ($h - 2)) {
@@ -774,8 +780,9 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SS2' => { 'out' => $esc . 'N',  'desc' => 'Single Shift 2' },
             'SS3' => { 'out' => $esc . 'O',  'desc' => 'Single Shift 3' },
             'ST'  => { 'out' => $esc . "\\", 'desc' => 'String Terminator' },
-#           SPACES count
-#           CHAR count
+
+            #           SPACES count
+            #           CHAR count
         },
 
         'clear' => {
@@ -803,8 +810,9 @@ sub _global_ansi_meta {    # prefills the hash cache
             'SCREEN 1'      => { 'out' => $csi . '?1049l',   'desc' => 'Set display to screen 1' },
             'SCREEN 2'      => { 'out' => $csi . '?1049h',   'desc' => 'Set display to screen 2' },
             'UP'            => { 'out' => $csi . 'A',        'desc' => 'Move cursor up one line' },
-#           SCROLL UP count
-#           SCROLL DOWN count
+
+            #           SCROLL UP count
+            #           SCROLL DOWN count
         },
 
         'attributes' => {
@@ -1627,11 +1635,11 @@ sub _global_ansi_meta {    # prefills the hash cache
     foreach my $name (keys %{ $tmp->{'foreground'} }) {
         $tmp->{'background'}->{"B_$name"}->{'desc'} = $tmp->{'foreground'}->{$name}->{'desc'};
         if ($name =~ /BRIGHT/) {
-            $tmp->{'background'}->{"B_$name"}->{'out'}  = $csi . '10' . substr($tmp->{'foreground'}->{$name}->{'out'}, 3);
+            $tmp->{'background'}->{"B_$name"}->{'out'} = $csi . '10' . substr($tmp->{'foreground'}->{$name}->{'out'}, 3);
         } else {
-            $tmp->{'background'}->{"B_$name"}->{'out'}  = $csi . '4' . substr($tmp->{'foreground'}->{$name}->{'out'}, 3);
+            $tmp->{'background'}->{"B_$name"}->{'out'} = $csi . '4' . substr($tmp->{'foreground'}->{$name}->{'out'}, 3);
         }
-    }
+    } ## end foreach my $name (keys %{ $tmp...})
 
     # Alternate Fonts
     foreach my $count (1 .. 9) {
@@ -1639,8 +1647,8 @@ sub _global_ansi_meta {    # prefills the hash cache
             'desc' => "ANSI Font $count",
             'out'  => $csi . ($count + 10) . 'm',
         };
-    }
-    
+    } ## end foreach my $count (1 .. 9)
+
     # Generate 8 bit colors
     foreach my $count (16 .. 231) {
         $tmp->{'foreground'}->{ 'COLOR ' . $count } = {
@@ -1651,7 +1659,7 @@ sub _global_ansi_meta {    # prefills the hash cache
             'desc' => "ANSI 8 Bit Color $count",
             'out'  => $csi . "48;5;$count" . 'm',
         };
-    }
+    } ## end foreach my $count (16 .. 231)
 
     # Generate Gray colors
     foreach my $count (232 .. 255) {
@@ -1663,12 +1671,14 @@ sub _global_ansi_meta {    # prefills the hash cache
             'desc' => "ANSI 8 Bit Gray level " . ($count - 232),
             'out'  => $csi . "48;5;$count" . 'm',
         };
-    }
+    } ## end foreach my $count (232 .. 255)
 
     return ($tmp);
 } ## end sub _global_ansi_meta
 
 1;
+
+=pod
 
 =encoding UTF-8
 
@@ -1856,7 +1866,7 @@ Sets colors to default
 
 =head2 FOREGROUND
 
-There are many more foreground colors available than the sixteen below.  However, the ones below should work on any color terminal.  Other colors may require 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have 'Term256' and 'truecolor' features.  You can used the '-t' option (in the executable "ansi-encode" file) for all of the color tokens available or use the 'RGB' token for access to 16 million colors.
+There are many more foreground colors available than the sixteen below.  However, the ones below should work on any color terminal.  Other colors may require 256 and 16 million color support.  Most Linux X-Windows and Wayland terminal software should support the extra colors.  Some Windows terminal software should have 'Term256' and 'truecolor' features.  You can used the '-t' option (in the executable "ansiencode" file) for all of the color tokens available or use the 'RGB' token for access to 16 million colors.
 
 =over 4
 

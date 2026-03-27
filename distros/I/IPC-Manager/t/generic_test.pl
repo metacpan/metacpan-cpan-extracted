@@ -1,12 +1,14 @@
-use Test2::V1 -ipP;
+package GenericTest;
+use Test2::V1 -ip;
 
 use IPC::Manager::Serializer::JSON;
 
-use IPC::Manager qw/ipcm_connect ipcm_spawn/;
+use IPC::Manager qw/ipcm_connect ipcm_spawn ipcm_default_protocol/;
 
 note("Using $main::PROTOCOL");
+ipcm_default_protocol($main::PROTOCOL);
 
-my $guard = ipcm_spawn(protocol => $main::PROTOCOL);
+my $guard = ipcm_spawn(protocol => $main::PROTOCOL, do_sanity_check => 1);
 my $info = "$guard";
 
 isa_ok($guard, ['IPC::Manager::Spawn'], "Got a spawn object");
@@ -148,7 +150,5 @@ is(
     "Got warnings"
 );
 ok(!-e $info, "Info does not exist on the filesystem");
-
-done_testing;
 
 1;

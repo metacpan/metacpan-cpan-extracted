@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authentication::V1::TokenReview;
 # ABSTRACT: TokenReview attempts to authenticate a token to a known user. Note: TokenReview requests may be cached by the webhook token authenticator plugin in the kube-apiserver.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Authentication::V1::TokenReview - TokenReview attempts to authenti
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

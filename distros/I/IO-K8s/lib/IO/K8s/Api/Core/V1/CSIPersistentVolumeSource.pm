@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::CSIPersistentVolumeSource;
 # ABSTRACT: Represents storage that is managed by an external CSI volume driver (Beta feature)
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s controllerExpandSecretRef => 'Core::V1::SecretReference';
@@ -47,7 +47,7 @@ IO::K8s::Api::Core::V1::CSIPersistentVolumeSource - Represents storage that is m
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 controllerExpandSecretRef
 

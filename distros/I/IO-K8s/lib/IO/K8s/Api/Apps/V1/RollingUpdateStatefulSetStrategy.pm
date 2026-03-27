@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::RollingUpdateStatefulSetStrategy;
 # ABSTRACT: RollingUpdateStatefulSetStrategy is used to communicate parameter for RollingUpdateStatefulSetStrategyType.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s maxUnavailable => IntOrStr;
@@ -23,7 +23,7 @@ IO::K8s::Api::Apps::V1::RollingUpdateStatefulSetStrategy - RollingUpdateStateful
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 maxUnavailable
 

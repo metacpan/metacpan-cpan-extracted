@@ -1,6 +1,6 @@
 package IO::K8s::Role::CertManaged;
 # ABSTRACT: Role for cert-manager certificate and issuer management
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use Moo::Role;
 use Carp qw(croak);
 
@@ -149,7 +149,7 @@ IO::K8s::Role::CertManaged - Role for cert-manager certificate and issuer manage
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 SUPPORT
 

@@ -3,7 +3,6 @@
 #define make_croak_op(message)  S_make_croak_op(aTHX_ message)
 static OP *S_make_croak_op(pTHX_ SV *message)
 {
-#if HAVE_PERL_VERSION(5, 22, 0)
   sv_catpvs(message, " at %s line %d.\n");
   /* die sprintf($message, (caller)[1,2]) */
   return op_convert_list(OP_DIE, 0,
@@ -15,15 +14,6 @@ static OP *S_make_croak_op(pTHX_ SV *message)
             newSVOP(OP_CONST, 0, newSViv(1)),
             newSVOP(OP_CONST, 0, newSViv(2))),
           newOP(OP_CALLER, 0)))));
-#else
-  /* For some reason I can't work out, the above tree isn't correct. Attempts
-   * to correct it still make OP_SPRINTF crash with "Out of memory!". For now
-   * lets just avoid the sprintf
-   */
-  sv_catpvs(message, "\n");
-  return newLISTOP(OP_DIE, 0, newOP(OP_PUSHMARK, 0),
-    newSVOP(OP_CONST, 0, message));
-#endif
 }
 
 #if HAVE_PERL_VERSION(5, 26, 0)

@@ -19,7 +19,7 @@ never want to use directly.
 
 A data object can contain arbitrary number of named single-value
 parameters and arbitrary number of list objects. Whenever you need more
-then one count of something you will have to create a list object to
+than one count of something you will have to create a list object to
 store those things. For example if you only have one shipping address
 per customer - you can store it as a couple of properties in Customer
 object, but if you want a customer to have an address book - create list
@@ -179,7 +179,7 @@ details.
 
 This is an auto-incrementing unsigned at least 32-bit integer value. It
 is not guaranteed to be continuously incrementing, but new value is
-always greater then any previously assigned and greater then zero. There
+always greater than any previously assigned and greater than zero. There
 is no definition of what would happen if all integer values are used up.
 
 Can optionally have number of digits specified - <$AUTOINC/10$> to
@@ -224,20 +224,25 @@ illegal in future versions.
 
 =item maxvalue
 
-Maximum possible value for `integer' and `real' properties,
+Optional maximum possible value for `integer' and `real' properties,
 inclusive. Default is 2147483647 for integer property if minvalue is
-negative and 4294967295 if minvalue is zero or positive.
+negative and 4294967295 if minvalue is zero or positive. Larger values
+will force the database field to be a 64-bit integer.
 
-Depending on database driver used you may inmprove performance when you
-use minimal possible ranges for your values. This is true for MySQL at
-least.
+For the MySQL driver, the storage and performance might improve when you
+use the smallest possible range for your values. The database data type
+will be the smallest that fits the range (tinyint, smallint, etc).
+
+The value of 'maxvalue' can only be an integer, even for 'real'
+properties.
 
 =item minvalue
 
-Minimum possible value for `integer' and `real' properties,
-inclusive. Default is -2147483648 for integer property. If you use
-positive value or zero for integer property you're converting that
-property to unsigned integer value effectively.
+Optional minimum possible value for `integer' and `real' properties,
+inclusive. Default is -2147483648 for integer properties.
+
+For the MySQL driver, if you use a positive value or zero for integer
+properties, the database type will use an 'unsigned' qualifier.
 
 =item scale
 
@@ -374,6 +379,7 @@ sub build_structure ($%) {
     my %changed_scale;
     my %changed_default;
     my %changed_maxlength;
+    my %changed_minmax;
 
     my %result=(
         changed => 0,
@@ -409,7 +415,7 @@ sub build_structure ($%) {
                     if($v ne ($dbv || '')) {
                         $changed_charset{$name}=$v;
                         ++$result{'changed'};
-                        dprint "..changed charset for '$name': '$dbv' => '$v'";
+                        dprint "..changed '$n' for '$name': '$dbv' => '$v'";
                     }
                 }
                 elsif($n eq 'scale') {
@@ -421,7 +427,7 @@ sub build_structure ($%) {
                     elsif($v>$dbv) {
                         $changed_scale{$name}=$v;
                         ++$result{'changed'};
-                        dprint "..changed scale for '$name': '$dbv' => '$v'";
+                        dprint "..changed '$n' for '$name': '$dbv' => '$v'";
                     }
                 }
                 elsif($n eq 'default') {
@@ -429,7 +435,7 @@ sub build_structure ($%) {
                     if(!$match) {
                         $changed_default{$name}=$v;
                         ++$result{'changed'};
-                        dprint "..changed default for '$name': '$dbv' => '$v'";
+                        dprint "..changed '$n' for '$name': '$dbv' => '$v'";
                     }
                 }
                 elsif($n eq 'maxlength') {
@@ -439,7 +445,18 @@ sub build_structure ($%) {
                             throw $self "- 'maxlength' only makes sense for 'text' and 'blob' fields";
                         $changed_maxlength{$name}=$v;
                         ++$result{'changed'};
-                        dprint "..changed maxlength for '$name': '$dbv' => '$v'";
+                        dprint "..changed '$n' for '$name': '$dbv' => '$v'";
+                    }
+                }
+                elsif($n eq 'minvalue' || $n eq 'maxvalue') {
+                    my $match = defined $dbv && $v==$dbv;
+                    if(!$match) {
+                        $type eq 'integer' || $type eq 'real' ||
+                            throw $self "- '$n' only makes sense for 'integer' and 'real' fields";
+                        $changed_minmax{$name} ||= {};
+                        $changed_minmax{$name}{$n} = $v;
+                        ++$result{'changed'};
+                        dprint "..changed '$n' for '$name': '$dbv' => '$v'";
                     }
                 }
                 elsif(!defined $dbv || (defined $dbv && $dbv ne $v)) {
@@ -482,6 +499,12 @@ sub build_structure ($%) {
         changes     => \%changed_scale,
         structure   => $args,
         param       => 'scale',
+    );
+
+    $self->_build_structure_change(
+        changes     => \%changed_minmax,
+        structure   => $args,
+        param       => 'minmax',
     );
 
     $self->_build_structure_change(
@@ -830,7 +853,6 @@ get_new() on List object.
 B<It is safe to call detach() though.> You should do that in places
 where you think this is appropriate. Like that:
 
- ##
  # Printing all properties. Detach() will load all the values into
  # memory and allow speedy prints. The code will work in exactly the
  # same way with or without detach() but once detach() is implemented
@@ -963,7 +985,7 @@ Example:
 
 As a convenience (and an optimisation, because database driver would be
 able to optimise that into just one query into database in most cases)
-you can pass more then one property name into the get() method. In that
+you can pass more than one property name into the get() method. In that
 case it will return you an array of values in the same order that you
 passed property names.
 
@@ -1251,7 +1273,7 @@ error will be thrown.
 Value must meet constrains set for the placeholder, otherwise error will
 be thrown and no changes will be made.
 
-More then one name/value pair can be given on the same line. For
+More than one name/value pair can be given on the same line. For
 example, all three code snippets below will have the same effect, but
 first will be slower:
 
@@ -1348,10 +1370,10 @@ sub put ($$$) {
             }
 
             !defined($field->{'minvalue'}) || $value>=$field->{'minvalue'} ||
-                $self->throw("- {{INPUT:Value ($value) is less then $field->{'minvalue'} for $name}}");
+                $self->throw("- {{INPUT:Value ($value) is less than $field->{'minvalue'} for $name}}");
 
             !defined($field->{'maxvalue'}) || $value<=$field->{'maxvalue'} ||
-                $self->throw("- {{INPUT:Value ($value) is bigger then $field->{'maxvalue'} for $name}}");
+                $self->throw("- {{INPUT:Value ($value) is greater than $field->{'maxvalue'} for $name}}");
         }
         else {
             throw $self "- {{INTERNAL:Unknown field type '$type'}}";

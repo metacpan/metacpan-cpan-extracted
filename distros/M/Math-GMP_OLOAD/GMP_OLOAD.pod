@@ -45,8 +45,9 @@
 
 =head1 ACKNOWLEDGEMENTS
 
-  Thanks to Choroba for presenting, on the perlmonks website, the method
-  being employed here.
+  Thanks to Choroba for presenting the method being employed here
+  at https://www.perlmonks.org/?node_id=11167422 .
+
 
 =head1 LICENSE
 

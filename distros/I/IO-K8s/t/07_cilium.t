@@ -7,13 +7,13 @@ use Test::Exception;
 use IO::K8s;
 use IO::K8s::Cilium;
 
-# --- All Cilium CRD classes ---
+# --- All Cilium CRD classes (matching upstream Cilium v1.19.2) ---
 
 my %v2_classes = (
     CiliumNetworkPolicy            => { plural => 'ciliumnetworkpolicies',            namespaced => 1 },
     CiliumClusterwideNetworkPolicy => { plural => 'ciliumclusterwidenetworkpolicies', namespaced => 0 },
     CiliumLocalRedirectPolicy      => { plural => 'ciliumlocalredirectpolicies',      namespaced => 1 },
-    CiliumEgressGatewayPolicy      => { plural => 'ciliumegressgatewaypolicies',      namespaced => 1 },
+    CiliumEgressGatewayPolicy      => { plural => 'ciliumegressgatewaypolicies',      namespaced => 0 },
     CiliumIdentity                 => { plural => 'ciliumidentities',                 namespaced => 0 },
     CiliumEndpoint                 => { plural => 'ciliumendpoints',                  namespaced => 1 },
     CiliumNode                     => { plural => 'ciliumnodes',                      namespaced => 0 },
@@ -21,24 +21,22 @@ my %v2_classes = (
     CiliumLoadBalancerIPPool       => { plural => 'ciliumloadbalancerippools',        namespaced => 0 },
     CiliumEnvoyConfig              => { plural => 'ciliumenvoyconfigs',               namespaced => 1 },
     CiliumClusterwideEnvoyConfig   => { plural => 'ciliumclusterwideenvoyconfigs',    namespaced => 0 },
-    CiliumExternalWorkload         => { plural => 'ciliumexternalworkloads',          namespaced => 0 },
+    CiliumCIDRGroup                => { plural => 'ciliumcidrgroups',                 namespaced => 0 },
+    CiliumBGPClusterConfig         => { plural => 'ciliumbgpclusterconfigs',          namespaced => 0 },
+    CiliumBGPPeerConfig            => { plural => 'ciliumbgppeerconfigs',             namespaced => 0 },
+    CiliumBGPAdvertisement         => { plural => 'ciliumbgpadvertisements',          namespaced => 0 },
+    CiliumBGPNodeConfig            => { plural => 'ciliumbgpnodeconfigs',             namespaced => 0 },
+    CiliumBGPNodeConfigOverride    => { plural => 'ciliumbgpnodeconfigoverrides',     namespaced => 0 },
 );
 
 my %v2alpha1_classes = (
-    CiliumEndpointSlice         => { plural => 'ciliumendpointslices',         namespaced => 0 },
-    CiliumL2AnnouncementPolicy  => { plural => 'ciliuml2announcementpolicies', namespaced => 0 },
-    CiliumBGPPeeringPolicy      => { plural => 'ciliumbgppeeringpolicies',     namespaced => 0 },
-    CiliumBGPClusterConfig      => { plural => 'ciliumbgpclusterconfigs',      namespaced => 0 },
-    CiliumBGPPeerConfig         => { plural => 'ciliumbgppeerconfigs',         namespaced => 0 },
-    CiliumBGPAdvertisement      => { plural => 'ciliumbgpadvertisements',      namespaced => 0 },
-    CiliumBGPNodeConfig         => { plural => 'ciliumbgpnodeconfigs',         namespaced => 0 },
-    CiliumBGPNodeConfigOverride => { plural => 'ciliumbgpnodeconfigoverrides', namespaced => 0 },
-    CiliumGatewayClassConfig    => { plural => 'ciliumgatewayclassconfigs',    namespaced => 0 },
-    CiliumCIDRGroup             => { plural => 'ciliumcidrgroups',             namespaced => 0 },
-    CiliumPodIPPool             => { plural => 'ciliumpodippools',             namespaced => 0 },
+    CiliumEndpointSlice        => { plural => 'ciliumendpointslices',         namespaced => 0 },
+    CiliumL2AnnouncementPolicy => { plural => 'ciliuml2announcementpolicies', namespaced => 0 },
+    CiliumGatewayClassConfig   => { plural => 'ciliumgatewayclassconfigs',    namespaced => 1 },
+    CiliumPodIPPool            => { plural => 'ciliumpodippools',             namespaced => 0 },
 );
 
-# --- Load all 23 classes ---
+# --- Load all 21 classes ---
 
 subtest 'load all Cilium classes' => sub {
     for my $kind (sort keys %v2_classes) {
@@ -77,7 +75,11 @@ subtest 'V2alpha1 class metadata' => sub {
         is($class->api_version, 'cilium.io/v2alpha1', "$kind api_version");
         is($class->kind, $kind, "$kind kind");
         is($class->resource_plural, $info->{plural}, "$kind resource_plural");
-        ok(!$class->does('IO::K8s::Role::Namespaced'), "$kind is cluster-scoped");
+        if ($info->{namespaced}) {
+            ok($class->does('IO::K8s::Role::Namespaced'), "$kind is namespaced");
+        } else {
+            ok(!$class->does('IO::K8s::Role::Namespaced'), "$kind is cluster-scoped");
+        }
     }
 };
 
@@ -88,7 +90,7 @@ subtest 'IO::K8s::Cilium resource_map' => sub {
     ok($provider->does('IO::K8s::Role::ResourceMap'), 'consumes ResourceMap role');
 
     my $map = $provider->resource_map;
-    is(scalar keys %$map, 23, 'resource_map has 23 entries');
+    is(scalar keys %$map, 21, 'resource_map has 21 entries');
 
     for my $kind (sort keys %v2_classes) {
         ok(exists $map->{$kind}, "$kind in resource_map");
@@ -98,6 +100,10 @@ subtest 'IO::K8s::Cilium resource_map' => sub {
         ok(exists $map->{$kind}, "$kind in resource_map");
         is($map->{$kind}, "Cilium::V2alpha1::$kind", "$kind maps to correct class path");
     }
+
+    # Removed CRDs should not be present
+    ok(!exists $map->{CiliumExternalWorkload},  'CiliumExternalWorkload removed');
+    ok(!exists $map->{CiliumBGPPeeringPolicy},  'CiliumBGPPeeringPolicy removed');
 };
 
 # --- new(with => ['IO::K8s::Cilium']) integration ---
@@ -105,7 +111,7 @@ subtest 'IO::K8s::Cilium resource_map' => sub {
 subtest 'with constructor parameter' => sub {
     my $k8s = IO::K8s->new(with => ['IO::K8s::Cilium']);
 
-    # All 23 Cilium kinds should be resolvable by short name
+    # All 21 Cilium kinds should be resolvable by short name
     for my $kind (sort keys %v2_classes) {
         is($k8s->expand_class($kind), "IO::K8s::Cilium::V2::$kind",
             "expand_class('$kind') resolves");
@@ -119,8 +125,11 @@ subtest 'with constructor parameter' => sub {
     is($k8s->expand_class('cilium.io/v2/CiliumNetworkPolicy'),
         'IO::K8s::Cilium::V2::CiliumNetworkPolicy',
         'domain-qualified V2 resolves');
-    is($k8s->expand_class('cilium.io/v2alpha1/CiliumBGPPeeringPolicy'),
-        'IO::K8s::Cilium::V2alpha1::CiliumBGPPeeringPolicy',
+    is($k8s->expand_class('cilium.io/v2/CiliumBGPClusterConfig'),
+        'IO::K8s::Cilium::V2::CiliumBGPClusterConfig',
+        'domain-qualified V2 BGP resolves');
+    is($k8s->expand_class('cilium.io/v2alpha1/CiliumGatewayClassConfig'),
+        'IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig',
         'domain-qualified V2alpha1 resolves');
 
     # Core resources are unaffected
@@ -172,15 +181,24 @@ subtest 'new_object and inflate round-trip' => sub {
     isa_ok($node_re, 'IO::K8s::Cilium::V2::CiliumNode');
     is($node_re->metadata->name, 'worker-1', 'cluster-scoped round-trip');
 
-    # V2alpha1 resource
+    # BGP resource now in V2
     my $bgp = $k8s->new_object('CiliumBGPClusterConfig',
         metadata => { name => 'bgp-config' },
         spec => { nodeSelector => { matchLabels => { 'bgp' => 'true' } } },
     );
-    isa_ok($bgp, 'IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfig');
-    is($bgp->api_version, 'cilium.io/v2alpha1', 'V2alpha1 api_version');
+    isa_ok($bgp, 'IO::K8s::Cilium::V2::CiliumBGPClusterConfig');
+    is($bgp->api_version, 'cilium.io/v2', 'BGP V2 api_version');
     my $bgp_re = $k8s->inflate($k8s->object_to_json($bgp));
-    isa_ok($bgp_re, 'IO::K8s::Cilium::V2alpha1::CiliumBGPClusterConfig');
+    isa_ok($bgp_re, 'IO::K8s::Cilium::V2::CiliumBGPClusterConfig');
+
+    # V2alpha1 resource
+    my $gw = $k8s->new_object('CiliumGatewayClassConfig',
+        metadata => { name => 'gw-config', namespace => 'default' },
+        spec => { serviceType => 'LoadBalancer' },
+    );
+    isa_ok($gw, 'IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig');
+    is($gw->api_version, 'cilium.io/v2alpha1', 'GatewayClassConfig api_version');
+    ok($gw->does('IO::K8s::Role::Namespaced'), 'CiliumGatewayClassConfig is namespaced');
 };
 
 # --- to_yaml output ---
@@ -243,9 +261,9 @@ subtest 'pk8s DSL with Cilium kinds' => sub {
             spec => { nodeIdentity => 12345 },
         };
 
-        CiliumBGPPeeringPolicy {
-            name => 'bgp-peering',
-            spec => { virtualRouters => [] },
+        CiliumBGPClusterConfig {
+            name => 'bgp-config',
+            spec => { nodeSelector => {} },
         };
     };
     close $fh;
@@ -264,9 +282,9 @@ subtest 'pk8s DSL with Cilium kinds' => sub {
     is($node->kind, 'CiliumNode', 'pk8s CiliumNode kind');
     is($node->metadata->name, 'worker-1', 'pk8s CiliumNode name');
 
-    isa_ok($bgp, 'IO::K8s::Cilium::V2alpha1::CiliumBGPPeeringPolicy');
-    is($bgp->kind, 'CiliumBGPPeeringPolicy', 'pk8s BGP kind');
-    is($bgp->api_version, 'cilium.io/v2alpha1', 'pk8s BGP api_version');
+    isa_ok($bgp, 'IO::K8s::Cilium::V2::CiliumBGPClusterConfig');
+    is($bgp->kind, 'CiliumBGPClusterConfig', 'pk8s BGP kind');
+    is($bgp->api_version, 'cilium.io/v2', 'pk8s BGP api_version');
 };
 
 # --- No collision with core K8s kinds ---

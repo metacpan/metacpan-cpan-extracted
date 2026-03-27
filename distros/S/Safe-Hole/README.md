@@ -27,7 +27,7 @@ Safe::Hole - make a hole to the original main compartment in the Safe compartmen
   using share(), or can call methods through the object that is copied
   into the Safe compartment using varglob(). But that subroutines or
   methods are executed in the Safe compartment too, so they cannot call
-  another subroutines that are dinamically qualified with the package
+  another subroutines that are dynamically qualified with the package
   name such as class methods nor can they compile code that uses opcodes
   that are forbidden within the compartment.
 
@@ -35,7 +35,7 @@ Safe::Hole - make a hole to the original main compartment in the Safe compartmen
   original main compartment from the Safe compartment. 
 
     Note that if a subroutine called through Safe::Hole::call does a
-  Carp::croak() it will report the error as having occured within
+  Carp::croak() it will report the error as having occurred within
   Safe::Hole.  This can be avoided by including Safe::Hole::User in the
   @ISA for the package containing the subroutine.
 
@@ -56,7 +56,7 @@ Safe::Hole - make a hole to the original main compartment in the Safe compartmen
     constructor arguments.  The argument ROOT specifies the alternate root
     namespace for the object.  If the ROOT argument is not specified then
     Safe::Hole object will attempt restore as much as it can of the
-    environment in which it was constrtucted.  This includes the opcode
+    environment in which it was constructed.  This includes the opcode
     mask, `%INC` and `@INC`.  If a root namespace is specified then it
     would not make sense to restore the %INC and @INC from main:: so this
     is not done.  Also if a root namespace is given the opcode mask is not
@@ -65,7 +65,7 @@ Safe::Hole - make a hole to the original main compartment in the Safe compartmen
 - call $coderef \[,@args\]
 
     Object method. 
-      Call the subroutine refered by $coderef in the compartment that is
+      Call the subroutine referred to by $coderef in the compartment that is
     specified with constructor new. @args are passed as the arguments to
     the called $coderef.  Note that the arguments are not currently passed
     by reference although this may change in a future version.
@@ -106,7 +106,7 @@ may still be a way that the authors have not considered.  In
 particular it relies on the fact that a Perl program cannot change
 stuff inside the magic on a Perl variable.  If you install a module
 that allows a Perl program to fiddle inside the magic then this
-assuption breaks down.  One would hope that any system that was
+assumption breaks down.  One would hope that any system that was
 running un-trusted code would not have such a module installed.
 
 # AUTHORS

@@ -1,5 +1,5 @@
 package Thunderhorse;
-$Thunderhorse::VERSION = '0.102';
+$Thunderhorse::VERSION = '0.103';
 ##################################
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #

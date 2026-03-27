@@ -90,7 +90,9 @@ WriteMakefile(
         'Getopt::Long'      => '0',
 		'Text::Format'      => '0',
     },
-    EXE_FILES => ['bin/ansi-encode'],
+    EXE_FILES => ['bin/ansiencode'],
+	INSTALLSCRIPT => '/usr/local/bin',
+	INSTALLBIN => '/usr/local/bin',
     dist      => {
         COMPRESS => 'gzip -9f',
         SUFFIX   => 'gz',
@@ -122,6 +124,25 @@ sub get_version {
 	chop($version);
 	return($version);
 } ## end sub slurp_file
+
+
+###
+sub MY::postamble {
+    return <<'MAKE_FRAG';
+
+pure_install:: install_symlink
+
+install_symlink:
+	$(NOECHO) $(PERLRUN) -e "exit 0 if $$^O =~ /^(MSWin32|cygwin|dos|os2|VMS|MacOS|amigaos|mpeix)$$/; \
+                   unlink '$(DESTINSTALLSCRIPT)/ansi-encode'; \
+                   symlink 'ansiencode','$(DESTINSTALLSCRIPT)/ansi-encode' \
+                     or die qq(symlink failed\\n); \
+                   print qq(symlink ansiencode to ansi-encode created\\n);"
+
+MAKE_FRAG
+}
+###
+
 
 __END__
   

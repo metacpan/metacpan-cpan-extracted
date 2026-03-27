@@ -3,12 +3,15 @@ package Medusa;
 use 5.008003;
 use strict;
 use warnings;
-use Time::HiRes;
+use Time::HiRes qw/time/;
 use B;
 use Data::Dumper;
+use POSIX qw(strftime);
+use Data::GUID;
+
 our %LOG;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 BEGIN {
 	%LOG = (
@@ -22,6 +25,8 @@ BEGIN {
 				file => $LOG{LOG_FILE},
 			);
 		},
+		TIME => 'gmtime',
+		TIME_FORMAT => 'default', # example '%Y%m%dT%H:%M:%S.%ms',
 		LOG => undef,
 		LOG_FUNCTIONS => {
 			error => 'error',
@@ -29,13 +34,54 @@ BEGIN {
 			debug => 'debug',
 		},
 		QUOTE => '†',
+		OPTIONS => {
+			date => 1,
+			guid => 1,
+			level => 1,
+			elapsed_call => 1,
+			caller => 1,
+		},
 		FORMAT_MESSAGE => sub {
 			my %params = @_;
 			my $log_message = $params{message};
 			my $log_meth = $params{level} || $LOG{LOG_FUNCTIONS}{$LOG{LOG_LEVEL}};
-			my $message = sprintf("%s %s", scalar gmtime, uc($params{level}));
+			my $options = $LOG{OPTIONS};
+			my $time = ! $options->{date} 
+				? 0 
+				: $LOG{TIME_FORMAT} eq 'default' 
+					? $LOG{TIME} eq 'gmtime'
+						? gmtime
+						: localtime
+					: do {
+						my @now = $LOG{TIME} eq 'gmtime'
+							? gmtime
+							: localtime;
+						my ($format, $ms) = $LOG{TIME_FORMAT};
+						if ($format =~ s/\.\%ms$//) {
+							my $time = Time::HiRes::time;
+							$time =~ m/(\.\d+)/;
+							$ms = $1;
+						}
+						strftime($format, @now) . "$ms";
+					};
+			my $sprintf = "";
+			my @sprintf_params;
+			if ($time) {
+				$sprintf .= "%s ";
+				push @sprintf_params, $time;
+			}
+			if ($options->{guid} && $params{guid}) {
+				$sprintf .= "%s ";
+				push @sprintf_params, $params{guid};
+			}
+			if ($options->{level}) {
+				$sprintf .= "%s";
+				push @sprintf_params, uc $log_meth;
+			}
+			$sprintf =~ s/\s$//;
+			my $message = sprintf($sprintf, @sprintf_params);
 			for my $key (sort keys %params) {
-				next if $key =~ m/^prefix|level$/;
+				next if $key =~ m/^prefix|level|guid$/;
 				if (ref $params{$key}) {
 					my $ref = ref $params{$key};
 					my $len = $ref eq 'ARRAY' ? scalar @{$params{$key} || []} - 1 : 1;
@@ -95,7 +141,20 @@ sub MODIFY_CODE_ATTRIBUTES {
 		no strict 'refs';
 		no warnings 'redefine';
 		*{"${caller}::$meth"} = sub {
+			my $options = $LOG{OPTIONS};	
+			my ($n, $caller) = (0, "");
+			if ($options->{caller}) {
+				while (my @l = (caller($n))) {
+					$caller .= "->" if $caller;
+					$caller = sprintf "%s%s:%s", $caller, $l[0], $l[2];
+					$n++;
+				}
+			}
+			my $guid = !$options->{guid} ? 0 : Data::GUID->new->as_string;
+			my ($now, $after) = (0, 0);
 			log_message(
+				($caller ? ( caller => $caller ) : ()),
+				guid => $guid,
 				message => sprintf(
 					"subroutine %s called with args:",
 					$meth
@@ -103,16 +162,18 @@ sub MODIFY_CODE_ATTRIBUTES {
 				params => [@_],
 				prefix => 'arg'
 			);
-			my $now = Time::HiRes::time * 1000;
+			$now = time if $options->{elapsed_call};
 			my @out = $code->(@_);
-			my $after = Time::HiRes::time * 1000;
+			$after = time if $options->{elapsed_call};
 			log_message(
+				($caller ? ( caller => $caller ) : ()),
+				guid => $guid,
 				message => sprintf(
 					"subroutine %s returned:",
 					$meth
 				),
 				params => [@out],
-				elapsed => $after - $now,
+				($options->{elapsed_call} ? (elapsed_call => $after == $now ? 0 : $after - $now) : ()),
 				prefix => 'return'
 			);
 			return wantarray ? @out : shift @out;
@@ -143,7 +204,7 @@ Medusa - Subroutine auditing via attributes
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 

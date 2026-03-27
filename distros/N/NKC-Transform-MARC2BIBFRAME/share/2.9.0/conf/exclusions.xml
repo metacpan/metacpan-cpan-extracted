@@ -1,0 +1,4 @@
+<exclusions>
+    <exclusion text="replace-with-domains-to-be-excluded-repeat-as-necessary"/>
+    <exclusion text="some.example.com"/>
+</exclusions>

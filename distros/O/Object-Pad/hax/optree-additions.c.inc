@@ -14,9 +14,7 @@ static OP *S_newAELEMOP(pTHX_ U32 flags, OP *first, I32 key)
   return newBINOP(OP_AELEM, flags, first, newSVOP(OP_CONST, 0, newSViv(key)));
 }
 
-#if HAVE_PERL_VERSION(5, 22, 0)
-#  define HAVE_UNOP_AUX
-#endif
+#define HAVE_UNOP_AUX
 
 #ifndef HAVE_UNOP_AUX
 typedef struct UNOP_with_IV {
@@ -50,21 +48,16 @@ static OP *S_newUNOP_with_IV(pTHX_ I32 type, I32 flags, OP *first, IV iv)
 #define newMETHOD_REDIR_OP(rclass, methname, flags)  S_newMETHOD_REDIR_OP(aTHX_ rclass, methname, flags)
 static OP *S_newMETHOD_REDIR_OP(pTHX_ SV *rclass, SV *methname, I32 flags)
 {
-#if HAVE_PERL_VERSION(5, 22, 0)
   OP *op = newMETHOP_named(OP_METHOD_REDIR, flags, methname);
-#  ifdef USE_ITHREADS
+#ifdef USE_ITHREADS
   {
     /* cargoculted from S_op_relocate_sv() */
     PADOFFSET ix = pad_alloc(OP_CONST, SVf_READONLY);
     PAD_SETSV(ix, rclass);
     cMETHOPx(op)->op_rclass_targ = ix;
   }
-#  else
-  cMETHOPx(op)->op_rclass_sv = rclass;
-#  endif
 #else
-  OP *op = newUNOP(OP_METHOD, flags,
-    newSVOP(OP_CONST, 0, newSVpvf("%" SVf "::%" SVf, rclass, methname)));
+  cMETHOPx(op)->op_rclass_sv = rclass;
 #endif
 
   return op;

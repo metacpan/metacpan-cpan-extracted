@@ -1,0 +1,57 @@
+======================================================================
+ mb::JSON Qo'llanma Varaqasi                             [UZ] O'zbek
+======================================================================
+
+[ Ma'lumot Turlari Jadvali ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "matn"     -> skalar satr
+  123        -> skalar son
+  3.14       -> skalar kasr son
+  true       -> mb::JSON::Boolean (qiymat: 1)
+  false      -> mb::JSON::Boolean (qiymat: 0)
+  null       -> undef
+  [...]      -> massiv havolasi
+  {...}      -> xesh havolasi
+
+[ 1. Modulni Yuklash ]
+  use mb::JSON;
+
+[ 2. decode: JSON -> Perl ]
+  my $data = mb::JSON::decode($json_matn);
+  my $data = mb::JSON::decode();             # $_ ishlatiladi
+  my $data = mb::JSON::parse($json_matn);    # taxallus (moslik)
+
+[ 3. encode: Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. Mantiqiy Qiymatlar ]
+  mb::JSON::true   -> JSON: true
+  mb::JSON::false  -> JSON: false
+  1 yoki 0 soni    -> JSON: son (mantiqiy emas)
+
+[ 5. null va undef ]
+  undef  -> null (encode paytida)
+  null   -> undef (decode paytida)
+
+[ 6. Xesh kalitlari alifbo tartibida saralanadi ]
+  encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
+
+[ 7. UTF-8 satrlar o'zgarmaydi (\uXXXX ga aylantirilmaydi) ]
+
+[ 8. Misollar ]
+  # decode
+  my $h = mb::JSON::decode('{"ism":"Alisher","yosh":30}');
+  print $h->{ism};   # Alisher
+
+  # encode
+  my $j = mb::JSON::encode({
+      ism     => 'Alisher',
+      faol    => mb::JSON::true,
+      izoh    => undef,
+  });
+  # -> {"faol":true,"ism":"Alisher","izoh":null}
+
+  # ikki tomonlama (roundtrip)
+  my $data = mb::JSON::decode($json);
+  my $qayta = mb::JSON::encode($data);

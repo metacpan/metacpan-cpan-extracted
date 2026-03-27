@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourcePool;
 # ABSTRACT: ResourcePool describes the pool that ResourceSlices belong to.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s generation => Int, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourcePool - ResourcePool describes the pool
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 generation
 

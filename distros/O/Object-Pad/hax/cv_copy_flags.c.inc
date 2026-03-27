@@ -73,9 +73,7 @@ static CV *MY_cv_copy_flags(pTHX_ CV *orig, U32 flags)
     SAVESPTR(PL_comppad_name);
     PL_comppad_name = PadlistNAMES(CvPADLIST(orig));
     CvPADLIST_set(new, pad_new(padnew_CLONE|padnew_SAVE));
-#if HAVE_PERL_VERSION(5, 22, 0)
     CvPADLIST(new)->xpadl_id = CvPADLIST(orig)->xpadl_id;
-#endif
 
     PADNAMELIST *padnames = PadlistNAMES(CvPADLIST(orig));
     const PADOFFSET fnames = PadnamelistMAX(padnames);

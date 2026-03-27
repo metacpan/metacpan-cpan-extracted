@@ -8,7 +8,7 @@ use Data::MARC::Validator::Report::Plugin 0.02;
 use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool check_required);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 # Constructor.
 sub new {
@@ -119,7 +119,7 @@ sub set_filters {
 	return;
 }
 
-sub struct {
+sub report {
 	my $self = shift;
 
 	my $plugin_report = Data::MARC::Validator::Report::Plugin->new(
@@ -166,7 +166,7 @@ MARC::Validator::Abstract - Abstract class for MARC::Validator plugins.
  my $process = $obj->process($marc_record);
  $obj->postprocess;
  $obj->set_filters(@filters);
- my $struct_hr = $obj->struct;
+ my $report = $obj->report;
  my $version = $obj->version;
 
 =head1 DESCRIPTION
@@ -202,12 +202,6 @@ Record id definition in MARC field/subfield hierarchy.
 For control fields is simple number, for field/subfield is something like '015a'.
 
 Default value is '001' = control field 001.
-
-=item * C<struct>
-
-Structure for statistics. It could be returned by L<struct> method.
-
-Default value is {}.
 
 =item * C<verbose>
 
@@ -267,13 +261,13 @@ Set filters to the object.
 
 Returns undef.
 
-=head2 C<struct>
+=head2 C<report>
 
- my $struct_hr = $obj->struct;
+ my $report = $obj->report;
 
-Get output structure.
+Get output report object.
 
-Returns reference to hash.
+Returns L<Data::MARC::Validator::Report::Plugin> instance.
 
 =head2 C<version>
 
@@ -307,7 +301,11 @@ Returns string.
  use warnings;
 
  package MARC::Validator::Plugin::Foo;
+
  use base qw(MARC::Validator::Abstract);
+
+ use Data::MARC::Validator::Report::Error;
+ use Data::MARC::Validator::Report::Plugin::Errors;
 
  our $VERSION = 1.01;
 
@@ -326,16 +324,36 @@ Returns string.
  sub postprocess {
          my $self = shift;
 
-         $self->{'struct'}->{'stats'}->{'bar_stat'}
-                 = $self->{'struct'}->{'stats'}->{'foo_stat'} + 1;
+         # TODO
 
          return;
  }
  
  sub process {
          my ($self, $marc_record) = @_;
- 
-         $self->{'struct'}->{'stats'}->{'foo_stat'}++;
+
+         my $record_id = $self->{'cb_record_id'}->($marc_record);
+
+         my $error1 = Data::MARC::Validator::Report::Error->new(
+                 'error' => 'Fake error #1',
+                 'params' => {
+                         'key' => 'value',
+                  },
+         );
+         my $error2 = Data::MARC::Validator::Report::Error->new(
+                 'error' => 'Fake error #2',
+                 'params' => {
+                         'key' => 'value',
+                  },
+         );
+         push @{$self->{'errors'}}, Data::MARC::Validator::Report::Plugin::Errors->new(
+                'errors' => [
+                        $error1,
+                        $error2,
+                ],
+                'filters' => ['foo', 'bar'],
+                'record_id' => $record_id,
+         );
  
          return;
  }
@@ -344,17 +362,6 @@ Returns string.
          my $self = shift;
 
          return $VERSION;
- }
- 
- sub _init {
-         my $self = shift;
- 
-         $self->{'struct'}->{'module_name'} = __PACKAGE__;
-         $self->{'struct'}->{'module_version'} = $VERSION;
- 
-         $self->{'struct'}->{'stats'}->{'foo_stat'} = 0;
- 
-         return;
  }
 
  package main;
@@ -507,16 +514,22 @@ Returns string.
  $obj->postprocess;
 
  my $name = $obj->name;
- print "Name: $name\n";
+ print "Plugin name: $name\n";
 
- my $report = $obj->struct;
+ # Create report.
+ my $report = $obj->report;
+
+ my $record_id = $report->plugin_errors->[0]->record_id;
+ print "Record id: $record_id\n";
+
  print "Output report data object:\n";
  p $report;
 
  unlink $temp_file;
 
  # Output:
- # Name: foo
+ # Plugin name: foo
+ # Record id: ck8300078
  # Output report data object:
  # Data::MARC::Validator::Report::Plugin  {
  #     parents: Mo::Object
@@ -532,7 +545,9 @@ Returns string.
  #     internals: {
  #         module_name     "MARC::Validator::Plugin::Foo",
  #         name            "foo",
- #         plugin_errors   [],
+ #         plugin_errors   [
+ #             [0] Data::MARC::Validator::Report::Plugin::Errors
+ #         ],
  #         version         1.01
  #     }
  # }
@@ -569,6 +584,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.13
+0.14
 
 =cut

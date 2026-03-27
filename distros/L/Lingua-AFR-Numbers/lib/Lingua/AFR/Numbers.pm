@@ -3,19 +3,18 @@
 package Lingua::AFR::Numbers;
 # ABSTRACT: Converts numeric values into their Afrikaans equivalents.
 
-# {{{ use block
-
-use 5.10.1;
-
-use strict;
+use 5.16.0;
+use utf8;
 use warnings;
+
+# {{{ use block
 
 use Carp;
 use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 my $numbers = {
     0   =>      'nul',
@@ -247,11 +246,11 @@ sub _formatLarge {
 
 =head1 NAME
 
-Lingua::AFR::Numbers
+Lingua::AFR::Numbers - Number to word conversion in Afrikaans
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 DESCRIPTION
 
@@ -290,12 +289,14 @@ will be converted.
 
 None, but that does not mean there are not any.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Alistair Francis, <cpan@alizta.com>
-
-Maintenance:
- PetaMem s.r.o., <info@petamem.com>
+ initial coding:
+   Alistair Francis E<lt>cpan@alizta.comE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 LICENSE
 

@@ -1,30 +1,28 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::FRA::Word2Num;
-# ABSTRACT: Word 2 number conversion in FRA.
-
-# {{{ use block
+# ABSTRACT: Word to number conversion in French
 
 use 5.16.0;
 use utf8;
+use warnings;
 
-use base qw(Exporter);
+# {{{ use block
 
+use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
-our @EXPORT_OK  = qw(cardinal2num w2n);
+our $VERSION = '0.2603260';
 my $parser      = fra_numerals();
 
 # }}}
 
-# {{{ w2n                                         convert number to text
+# {{{ w2n                                         convert text to number
 
-sub w2n {
+sub w2n :Export {
     my $input = shift // return;
-
 
     return $parser->numeral($input);
 }
@@ -105,13 +103,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::FRA::Word2Num 
+Lingua::FRA::Word2Num - Word to number conversion in French
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Word 2 number conversion in FRA.
+version 0.2603260
 
 Lingua::FRA::Word2Num is module for converting text containing number
 representation in French back into number. Converts whole numbers from 0 up
@@ -133,7 +130,6 @@ Input text must be encoded in UTF-8.
  my $num = Lingua::FRA::Word2Num::w2n( 'cent vingt-trois' );
 
  print defined($num) ? $num : "sorry, can't convert this text into number.";
-
 
 =cut
 
@@ -175,7 +171,6 @@ Internal parser.
 
 =item w2n
 
-
 =back
 
 =cut
@@ -185,15 +180,22 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2004-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

@@ -2,19 +2,19 @@
 use strict;
 use warnings;
 
-use 5.032000;
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Word 2 number conversion in CES.",
+  "ABSTRACT" => "Word to number conversion in Czech",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Lingua-CES-Word2Num",
   "LICENSE" => "open_source",
-  "MIN_PERL_VERSION" => "5.032000",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::CES::Word2Num",
   "PREREQ_PM" => {
     "Export::Attrs" => 0,
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }

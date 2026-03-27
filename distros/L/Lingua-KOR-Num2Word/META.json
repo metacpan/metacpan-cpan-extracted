@@ -1,0 +1,51 @@
+{
+   "abstract" : "Number to word conversion in Korean",
+   "author" : [
+      "PetaMem s.r.o. <info@petamem.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-KOR-Num2Word",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Export::Attrs" : "0",
+            "Readonly" : "0",
+            "perl" : "v5.16.0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::KOR::Num2Word" : {
+         "file" : "lib/Lingua/KOR/Num2Word.pm",
+         "version" : "0.2603260"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://metacpan.org/author/PETAMEM"
+      }
+   },
+   "version" : "0.2603260",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "JSON::XS version 4.04",
+   "x_spdx_expression" : "Artistic-2.0 OR BSD-2-Clause"
+}
+

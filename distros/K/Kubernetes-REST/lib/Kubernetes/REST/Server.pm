@@ -1,5 +1,5 @@
 package Kubernetes::REST::Server;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: Kubernetes API server connection configuration
 use Moo;
 use Types::Standard qw/Str Bool/;
@@ -43,7 +43,7 @@ Kubernetes::REST::Server - Kubernetes API server connection configuration
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

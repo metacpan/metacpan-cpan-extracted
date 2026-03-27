@@ -19,6 +19,7 @@ t/apache/perl/testident		script to actually test ident within mod_perl
 t/apache/perl/testmodperl	script to test mod_perl operates OK
 t/async.t
 t/compat.t			script to test compatibility-mode FH->ident_lookup
+t/constructor.t			tests for new() and _passfh filehandle resolution
 t/export.t			tests for export hooks (:fh, :apache, :debug tags)
 t/hosts				Hosts to use for testing purposes
 t/Ident.t			test script that actually makes ident lookups

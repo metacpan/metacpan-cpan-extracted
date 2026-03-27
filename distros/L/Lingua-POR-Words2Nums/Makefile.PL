@@ -18,14 +18,14 @@ my %WriteMakefileArgs = (
   "NAME" => "Lingua::POR::Words2Nums",
   "PREREQ_PM" => {
     "Export::Attrs" => 0,
-    "utf8" => 0
+    "utf8" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }

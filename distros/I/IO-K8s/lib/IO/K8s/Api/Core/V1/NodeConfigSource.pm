@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeConfigSource;
 # ABSTRACT: NodeConfigSource specifies a source of node configuration. Exactly one subfield (excluding metadata) must be non-nil. This API is deprecated since 1.22
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s configMap => 'Core::V1::ConfigMapNodeConfigSource';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::NodeConfigSource - NodeConfigSource specifies a source o
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 configMap
 

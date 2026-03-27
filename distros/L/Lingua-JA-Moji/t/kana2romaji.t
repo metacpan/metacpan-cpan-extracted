@@ -1,6 +1,8 @@
 use FindBin '$Bin';
 use lib "$Bin";
-use LJMT;is (kana2romaji ('ドッグ'), 'doggu');
+use LJMT;
+
+is (kana2romaji ('ドッグ'), 'doggu');
 # Common
 is (kana2romaji ('ジェット', {style => 'common'}), 'jetto');
 is (kana2romaji ('ウェ', {style => 'common'}), 'we');
@@ -22,7 +24,18 @@ my $amazon = kana2romaji ($in, {ve_type => 'wapuro'},);
 is ($amazon, 'pa-texisumasuturi-');
 my $amazon2 = kana2romaji ($in, {style => 'common', ve_type => 'none'});
 is ($amazon2, 'patisumasutsuri');
+my $kunreidyo = kana2romaji ('ぢょう', {style => 'kunrei'});
+is ($kunreidyo, 'zyô', "ぢょう is zyo in Kunrei");
 
+my $wiki = kana2romaji ('shiitake', {wikipedia => 1});
+like ($wiki, qr/ī/, "Wikipedia romanisation");
+my $notwiki = kana2romaji ('shiitake');
+unlike ($notwiki, qr/ī/, "Not Wikipedia romanisation");
+
+my $truck = kana2romaji ('じょうほう', {style => 'common', truck => 1});
+like ($truck, qr/jy/, "Truck romanisation $truck");
+my $nottruck = kana2romaji ('じょうほう', {style => 'common'});
+unlike ($nottruck, qr/jy/, "Not truck romanisation $nottruck");
 
 TODO: {
     local $TODO = 'bugs';

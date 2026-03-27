@@ -2,7 +2,7 @@ package IPC::Manager::Message;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -130,7 +130,7 @@ Create a copy of the message with a new ID, and any overrides specified.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

@@ -21,8 +21,12 @@ sub valid_values {
         # '[ 1-9 ][ 0-9 ]*'
         keep       => [ 1, 2, 100, 999999, undef ],
         ll         => [ 1, 2, 100, 999999, undef ],
-        max_height => [ 1, 2, 100, 999999, undef ],
-        max_width  => [ 1, 2, 100, 999999, undef ],
+        #max_height => [ 1, 2, 100, 999999, undef ], # ###
+        #max_width  => [ 1, 2, 100, 999999, undef ],
+
+        # '(?:[2-9]|[ 1-9 ][ 0-9 ]+)'
+        max_height => [ 2, 100, 999999, undef ],
+        max_width  => [ 2, 100, 999999, undef ],
 
         # '[ 0-9 ]+'
         default     => [ 0, 1, 2, 100, 999999, undef ],

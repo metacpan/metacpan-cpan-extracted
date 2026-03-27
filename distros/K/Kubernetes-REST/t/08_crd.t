@@ -113,7 +113,7 @@ subtest 'get StaticWebSite' => sub {
 subtest 'list StaticWebSites' => sub {
     my $list = $api->list('StaticWebSite', namespace => 'perl-crd-test');
     ok($list, 'list returns');
-    my @items = $list->items->@*;
+    my @items = @{ $list->items };
     ok(scalar @items >= 1, 'has at least 1 item');
     is($items[0]->kind, 'StaticWebSite', 'item kind');
     is($items[0]->metadata->name, 'my-blog', 'item name');

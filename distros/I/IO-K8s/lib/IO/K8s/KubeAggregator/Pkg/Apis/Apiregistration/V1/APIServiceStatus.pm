@@ -1,6 +1,6 @@
 package IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceStatus;
 # ABSTRACT: APIServiceStatus contains derived information about an API server
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s conditions => ['KubeAggregator::V1::APIServiceCondition'];
@@ -20,7 +20,7 @@ IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIServiceStatus - APIS
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 conditions
 

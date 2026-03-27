@@ -1,15 +1,13 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 
 package Lingua::DEU::Num2Word;
-# ABSTRACT: Number 2 word conversion in DEU.
+# ABSTRACT: Number to word conversion in German
+
+use 5.16.0;
+use utf8;
+use warnings;
 
 # {{{ use block
-
-use 5.10.1;
-
-use strict;
-use warnings;
-use utf8;
 
 use Carp;
 use Export::Attrs;
@@ -19,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 # }}}
 
@@ -93,16 +91,15 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::DEU::Num2Word  
+Lingua::DEU::Num2Word - Number to word conversion in German
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Number 2 word conversion in DEU.
+version 0.2603260
 
 Lingua::DEU::Num2Word is module for converting numbers into their written
-representationin German. Converts whole numbers from 0 up to 999 999 999.
+representation in German. Converts whole numbers from 0 up to 999 999 999.
 
 Text must be encoded in UTF-8.
 
@@ -141,7 +138,6 @@ Text must be encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
-
 =back
 
 =cut
@@ -157,7 +153,6 @@ Only numbers from interval [0, 999_999_999] will be converted.
 
 =item num2deu_cardinal
 
-
 =back
 
 =cut
@@ -167,15 +162,24 @@ Only numbers from interval [0, 999_999_999] will be converted.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Roman Vasicek <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ coding (until 2005):
+   Roman Vasicek E<lt>info@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2002-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

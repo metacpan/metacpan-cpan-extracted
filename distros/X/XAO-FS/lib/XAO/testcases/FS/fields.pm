@@ -282,7 +282,7 @@ sub test_integer {
             $stored=0;
         };
         $self->assert(!$stored,
-                      "Allowed to store value bigger then maxvalue (max=$max)");
+                      "Allowed to store value larger than maxvalue (max=$max)");
         $self->assert($cust->get('int') == $value,
                       "Value was corrupted by unsuccessful store (max=$max)");
 
@@ -304,7 +304,7 @@ sub test_integer {
             $stored=0;
         };
         $self->assert(!$stored,
-                      "Allowed to store value less then minvalue (max=$max)");
+                      "Allowed to store value less than minvalue (max=$max)");
         $self->assert($cust->get('int') == $max,
                       "Value was corrupted by unsuccessful store (max=$max)");
 
@@ -368,7 +368,9 @@ sub test_real {
     my $odb=$self->get_odb();
     my $cust=$odb->fetch('/Customers/c1');
 
-    foreach my $max (100, 1e20) {
+    # 5e10 fits into 64-bit bigint, but overflows 32-bit
+    #
+    foreach my $max (100, 1e10) {
 
         $cust->add_placeholder(name => 'real',
                            type => 'real',
@@ -389,7 +391,7 @@ sub test_real {
             $stored=0;
         };
         $self->assert(!$stored,
-                      "Allowed to store value bigger then maxvalue (max=$max)");
+                      "Allowed to store value larger than maxvalue (max=$max)");
         $self->assert($cust->get('real') == $value,
                       "Value was corrupted by unsuccessful store (max=$max)");
 
@@ -411,7 +413,7 @@ sub test_real {
             $stored=0;
         };
         $self->assert(!$stored,
-                      "Allowed to store value less then minvalue (max=$max)");
+                      "Allowed to store value less than minvalue (max=$max)");
         $self->assert($cust->get('real') == $max,
                       "Value was corrupted by unsuccessful store (max=$max)");
 

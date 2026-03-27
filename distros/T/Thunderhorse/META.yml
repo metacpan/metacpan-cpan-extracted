@@ -24,8 +24,8 @@ requires:
   IO::Async: '0'
   JSON::MaybeXS: '0'
   Log::Handler: '0'
-  Mooish::Base: '1.001'
-  PAGI: '0.001014'
+  Mooish::Base: '1.005'
+  PAGI: '0.001020'
   Path::Tiny: '0'
   Template::Toolkit: '0'
   URI: '0'
@@ -33,7 +33,7 @@ requires:
 resources:
   bugtracker: https://github.com/Thunderhorse-Framework/Thunderhorse/issues
   repository: git://github.com/Thunderhorse-Framework/Thunderhorse.git
-version: '0.102'
+version: '0.103'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

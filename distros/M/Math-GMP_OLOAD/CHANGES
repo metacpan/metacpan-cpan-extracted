@@ -1,5 +1,7 @@
 # CHANGES file for Math::GMP_OLOAD
 
+0.03 - Fix portability with pre-5.18 builds of perl.
+
 0.02 - Add missing README.
      - Adjust the Makefile.PL 'ABSTRACT' and the GMP_OLOAD.pm 'DESCRIPTION'
        to better represent the purpose of this module.

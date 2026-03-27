@@ -1,5 +1,10 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.61 2026-03-26
+
+* Fixed bug in kana2romaji kunrei romanization
+* Added "wikipedia" option in kana2romaji for macroned ii.
+
 0.60 2024-02-14
 
 * Added is_small and is_katakana functions

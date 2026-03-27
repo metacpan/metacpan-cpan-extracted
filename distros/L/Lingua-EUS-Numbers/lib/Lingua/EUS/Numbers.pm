@@ -3,35 +3,24 @@
 package Lingua::EUS::Numbers;
 # ABSTRACT: Number 2 word conversion in EUS.
 
+use 5.16.0;
+use utf8;
+use warnings;
+
 # {{{ use block
 
-use 5.10.1;
-
-use warnings;
-use strict;
 use Carp;
-use vars qw(
-  @EXPORT_OK @ISA
-  %num2alpha
-);
-require Exporter;
+use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
 
-@ISA     = qw(Exporter);
-our $VERSION = '0.2603230';
-
-@EXPORT_OK = qw(
-  %num2alpha
-  &cardinal2alpha
-  &ordinal2alpha
-);
+our $VERSION = '0.2603260';
 
 # The Bask numeral system is vigesimal (base 20). So far, going to
 # 999_999_999_999.
 
-%num2alpha = (
+our %num2alpha :Export = (
     0          => 'zero',
     1          => 'bat',
     2          => 'bi',
@@ -84,7 +73,7 @@ my %block2alpha = (
 #returns a string (array), which is its Bask cardinal equivalent.
 # {{{ cardinal2alpha
 
-sub cardinal2alpha {
+sub cardinal2alpha :Export {
     my $orig_num = shift // return;
     my @result   = ();
     my ( $thousands, $hundreds, $tens, $units );
@@ -242,7 +231,7 @@ sub double_digit_handling {
 #returns a string (array), which is its Bask ordinal equivalent.
 # {{{ ordinal2alpha
 
-sub ordinal2alpha {
+sub ordinal2alpha :Export {
     my $num = shift // return;
     my @result;
 
@@ -270,7 +259,7 @@ Lingua::EUS::Numbers - Converts numbers into Bask (Euskara).
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -290,7 +279,7 @@ Incidentally, the Bask counting system is vigesimal, i.e. base 20.
 
 The module uses unified Bask (Euskara Batua), which sometimes varies from the
 Bask spoken in the seven Bask provinces, especially from Labourd (Lapurdi) in
-the Northen Bask Country (Ipar Euskal Herria).  However, Euskara Batua is the
+the Northern Bask Country (Ipar Euskal Herria).  However, Euskara Batua is the
 official Bask taught in Bask schools (Ikastolak) throughout the seven
 provinces.
 
@@ -364,12 +353,14 @@ version of Euskara.
 Esker asko to Deric Gerlach who reviewed my English and my overall pod
 documentation.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Isabelle Hernandez, <isabelle@cpan.org>
-
-Maintenance
-PetaMem s.r.o. <info@petamem.com>
+ initial coding:
+   Isabelle Hernandez E<lt>isabelle@cpan.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -377,6 +368,12 @@ Copyright 2002 by Isabelle Hernandez
 
 This library is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

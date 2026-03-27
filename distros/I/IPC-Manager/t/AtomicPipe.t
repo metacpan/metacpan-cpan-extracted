@@ -1,5 +1,5 @@
-use strict;
-use warnings;
+use Test2::V1 -ipP;
+use Test2::IPC;
 
 use Test2::Require::Module 'Atomic::Pipe';
 
@@ -8,4 +8,12 @@ use Test2::Require::Module 'Atomic::Pipe';
     $main::PROTOCOL = 'AtomicPipe';
 }
 
-do './t/generic_test.pl' or die $@;
+subtest general => sub {
+    do './t/generic_test.pl' or die $@;
+};
+
+subtest service => sub {
+    do './t/service_test.pl' or die $@;
+};
+
+done_testing;

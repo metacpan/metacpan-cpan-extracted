@@ -140,7 +140,7 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta);
 FieldMeta *ObjectPad_get_field_for_padix(pTHX_ PADOFFSET padix);
 
 enum {
-  /* Common flags for newMETHSTARTOP, newFIELDPADOP and newFIELDSVOP */
+  /* Common flags for newMETHSTARTOP and newFIELDSVOP */
   OPfMETHSTART_ROLE = (1 << 16),
 };
 
@@ -156,9 +156,6 @@ enum {
   OPpFIELDPAD_AV,  /* has @y */
   OPpFIELDPAD_HV,  /* has %z */
 };
-
-#define newFIELDPADOP(flags, padix, fieldix)  ObjectPad_newFIELDPADOP(aTHX_ flags, padix, fieldix)
-OP *ObjectPad_newFIELDPADOP(pTHX_ U32 flags, PADOFFSET padix, FIELDOFFSET fieldix);
 
 /* Deprecated */
 #define get_obj_backingav(self, repr, create)  ObjectPad_get_obj_backingav(aTHX_ self, repr, create)

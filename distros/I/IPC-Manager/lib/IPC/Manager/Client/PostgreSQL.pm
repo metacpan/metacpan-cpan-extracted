@@ -2,7 +2,7 @@ package IPC::Manager::Client::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
@@ -14,6 +14,15 @@ use Object::HashBase qw{
     +QDB
 };
 
+sub viable {
+    my $driver = 'DBIx::QuickDB::Driver::MySQL';
+    eval {
+        require DBIx::QuickDB;
+        my ($v) = DBIx::QuickDB->check_driver($driver, {});
+        return $v;
+    };
+}
+
 sub escape { '"' }
 
 sub dsn { $_[0]->{+ROUTE} }
@@ -24,7 +33,7 @@ sub table_sql {
             CREATE TABLE IF NOT EXISTS ipcm_peers(
                 "id"        VARCHAR(36)     NOT NULL PRIMARY KEY,
                 "pid"       INTEGER         DEFAULT NULL,
-                "active"    BOOL            NOT NULL DEFAULT TRUE,
+                "active"    NUMERIC         DEFAULT EXTRACT(epoch FROM NOW()),
                 "stats"     BYTEA           DEFAULT NULL
             );
         EOT
@@ -109,7 +118,7 @@ See L<IPC::Manager::Client>.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

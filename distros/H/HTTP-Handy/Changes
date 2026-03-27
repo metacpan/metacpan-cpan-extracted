@@ -1,5 +1,51 @@
 Revision history for HTTP-Handy
 
+1.03  2026-03-24 JST (Japan Standard Time)
+
+    Tests:
+    - Added t/lib/INA_CPAN_Check.pm: shared test library providing
+      TAP harness, file utilities, MANIFEST helpers, version/META
+      parsers, code scanner, and check_A through check_K
+      implementations (aligned with DB-Handy 1.07).
+    - Added t/9001-load.t: module load, $VERSION, sub-package
+      HTTP::Handy::Input, public methods (run/serve_static/etc.),
+      and INA_CPAN_Check library export verification.
+    - Added t/9010-encoding.t: US-ASCII, trailing whitespace, and
+      end-of-file newline checks (replaces t/0007-usascii.t).
+    - Added t/9020-perl5compat.t: Perl 5.005_03 syntax checks P1-P14
+      covering .pm, .t, and eg/*.pl (replaces t/0008-perl5compat.t;
+      adds P13 @-/@+ prohibition and P14 header order check).
+    - Added t/9030-distribution.t: MANIFEST, version consistency,
+      META integrity, Changes format, Makefile.PL, and test-suite
+      consistency (replaces t/0009-cpan_precheck.t categories A-J).
+    - Added t/9040-style.t: coding style E and K checks
+      (replaces t/0009-cpan_precheck.t categories E/K).
+    - Added t/9050-pod.t: POD structure/content G1-G11 including
+      VERSION format, TABLE OF CONTENTS completeness, DIAGNOSTICS
+      coverage, and Pod::Checker syntax check
+      (replaces t/0006-pod.t).
+    - Added t/9060-readme.t: README required sections check.
+    - Added t/9070-examples.t: eg/ script quality E1-E6
+      (no shebang, CVE fix, FindBin, boilerplate order,
+      filename comment, Demonstrates section).
+    - Added t/9080-cheatsheets.t: doc/ cheat sheet native script,
+      section numbering, and [XX] header tag checks.
+    - Removed t/0001-load.t: superseded by t/9001-load.t.
+    - Removed t/0006-pod.t: superseded by t/9050-pod.t.
+    - Removed t/0007-usascii.t: superseded by t/9010-encoding.t.
+    - Removed t/0008-perl5compat.t: superseded by t/9020-perl5compat.t.
+    - Removed t/0009-cpan_precheck.t: superseded by t/9030-t/9080.
+
+    Fixes:
+    - lib/HTTP/Handy.pm: warnings stub now guards with
+      !defined(&warnings::import) to suppress "import redefined"
+      warnings when multiple modules are loaded in sequence.
+    - lib/HTTP/Handy.pm: DIAGNOSTICS =item for "Cannot bind" error
+      corrected to E<lt>hostE<gt>:E<lt>portE<gt> form so that the
+      G10 DIAGNOSTICS-coverage check passes.
+    - t/0005-psgi-env.t: replaced my(undef,...) with array-index
+      form for Perl 5.005_03 compatibility (P3 check).
+
 1.02  2026-03-24 JST (Japan Standard Time)
 
     Documentation:

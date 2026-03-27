@@ -1,0 +1,55 @@
+======================================================================
+ mb::JSON チートシート                                        [JA] 日本語
+======================================================================
+
+[ データ型対応表 ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "文字列"   -> スカラー文字列
+  123        -> スカラー数値
+  3.14       -> スカラー数値（浮動小数点）
+  true       -> mb::JSON::Boolean（数値コンテキストで 1）
+  false      -> mb::JSON::Boolean（数値コンテキストで 0）
+  null       -> undef
+  [...]      -> 配列リファレンス
+  {...}      -> ハッシュリファレンス
+
+[ 1. ロード ]
+  use mb::JSON;
+
+[ 2. decode: JSON -> Perl ]
+  my $data = mb::JSON::decode($json_text);
+  my $data = mb::JSON::decode();           # $_ を使用
+  my $data = mb::JSON::parse($json_text);  # エイリアス（後方互換）
+
+[ 3. encode: Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. 真偽値 ]
+  mb::JSON::true   -> JSON: true
+  mb::JSON::false  -> JSON: false
+  数値の 1 や 0    -> JSON: 1 や 0（数値として出力）
+
+[ 5. null / undef ]
+  undef  -> null（encode 時）
+  null   -> undef（decode 時）
+
+[ 6. ハッシュキーはアルファベット順にソート ]
+  encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
+
+[ 7. UTF-8 マルチバイト文字はそのまま出力 ]
+  encode({"name"=>"田中"}) -> '{"name":"田中"}'
+  \uXXXX にはエスケープしない
+
+[ 8. 使用例 ]
+  # デコード
+  my $h = mb::JSON::decode('{"name":"田中","age":30}');
+  print $h->{name};   # 田中
+
+  # エンコード
+  my $j = mb::JSON::encode({
+      name   => '田中',
+      active => mb::JSON::true,
+      score  => undef,
+  });
+  # -> {"active":true,"name":"田中","score":null}

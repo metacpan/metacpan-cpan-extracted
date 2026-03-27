@@ -1,0 +1,33 @@
+======================================================================
+ mb::JSON Cheat Sheet                                      [MN] Монгол
+======================================================================
+
+[ 1. Load ]
+  use mb::JSON;
+
+[ 2. decode: JSON -> Perl ]
+  my $data = mb::JSON::decode($json_text);
+  my $data = mb::JSON::parse($json_text);  # alias
+
+[ 3. encode: Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. Boolean ]
+  mb::JSON::true  -> true
+  mb::JSON::false -> false
+
+[ 5. null / undef ]
+  undef -> null  /  null -> undef
+
+[ 6. Hash keys sorted, UTF-8 kept as-is ]
+
+[ 7. Type mapping ]
+  "string" -> scalar    123   -> number
+  true     -> Boolean   false -> Boolean
+  null     -> undef     [...]  -> arrayref
+  {...}  -> hashref
+
+[ 8. Example ]
+  my $h = mb::JSON::decode('{"name":"Alice","ok":true}');
+  my $j = mb::JSON::encode({name=>'Alice',ok=>mb::JSON::true});
+  # -> {"name":"Alice","ok":true}

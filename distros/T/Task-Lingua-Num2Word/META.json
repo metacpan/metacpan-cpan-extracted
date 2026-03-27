@@ -1,0 +1,95 @@
+{
+   "abstract" : "Install all PetaMem number-to-word conversion modules",
+   "author" : [
+      "PetaMem s.r.o. <info@petamem.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Task-Lingua-Num2Word",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::AFR::Numbers" : "0",
+            "Lingua::ARA::Num2Word" : "0",
+            "Lingua::BUL::Num2Word" : "0",
+            "Lingua::CAT::Num2Word" : "0",
+            "Lingua::CES::Num2Word" : "0",
+            "Lingua::DAN::Num2Word" : "0",
+            "Lingua::DEU::Num2Word" : "0",
+            "Lingua::ELL::Num2Word" : "0",
+            "Lingua::ENG::Inflect" : "0",
+            "Lingua::ENG::Numbers" : "0",
+            "Lingua::EST::Num2Word" : "0",
+            "Lingua::EUS::Numbers" : "0",
+            "Lingua::FAS::Num2Word" : "0",
+            "Lingua::FIN::Num2Word" : "0",
+            "Lingua::FRA::Numbers" : "0",
+            "Lingua::HEB::Num2Word" : "0",
+            "Lingua::HRV::Num2Word" : "0",
+            "Lingua::HUN::Num2Word" : "0",
+            "Lingua::IND::Nums2Words" : "0",
+            "Lingua::ISL::Num2Word" : "0",
+            "Lingua::ITA::Numbers" : "0",
+            "Lingua::JPN::Number" : "0",
+            "Lingua::KOR::Num2Word" : "0",
+            "Lingua::LAV::Num2Word" : "0",
+            "Lingua::LIT::Num2Word" : "0",
+            "Lingua::NLD::Num2Word" : "0",
+            "Lingua::NLD::Numbers" : "0",
+            "Lingua::NOR::Num2Word" : "0",
+            "Lingua::Num2Word" : "0",
+            "Lingua::POL::Numbers" : "0",
+            "Lingua::POR::Nums2Words" : "0",
+            "Lingua::RON::Num2Word" : "0",
+            "Lingua::RUS::Number" : "0",
+            "Lingua::SLK::Num2Word" : "0",
+            "Lingua::SPA::Numeros" : "0",
+            "Lingua::SWA::Num2Word" : "0",
+            "Lingua::SWE::Num2Word" : "0",
+            "Lingua::THA::Num2Word" : "0",
+            "Lingua::TUR::Num2Word" : "0",
+            "Lingua::UKR::Num2Word" : "0",
+            "Lingua::VIE::Num2Word" : "0",
+            "Lingua::ZHO::Numbers" : "0",
+            "perl" : "v5.16.0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Task::Lingua::Num2Word" : {
+         "file" : "lib/Task/Lingua/Num2Word.pm",
+         "version" : "0.2603260"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://metacpan.org/author/PETAMEM"
+      }
+   },
+   "version" : "0.2603260",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "JSON::XS version 4.04",
+   "x_spdx_expression" : "Artistic-2.0 OR BSD-2-Clause"
+}
+

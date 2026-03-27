@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::DeploymentCondition;
 # ABSTRACT: DeploymentCondition describes the state of a deployment at a certain point.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s lastTransitionTime => Time;
@@ -35,7 +35,7 @@ IO::K8s::Api::Apps::V1::DeploymentCondition - DeploymentCondition describes the 
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 lastTransitionTime
 

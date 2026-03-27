@@ -2,7 +2,7 @@ package IPC::Manager::Client::AtomicPipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use File::Spec;
 use Atomic::Pipe;
@@ -16,10 +16,13 @@ use Object::HashBase qw{
     +pipe_cache
 };
 
+sub viable { eval { require Atomic::Pipe; 1 } || 0 }
+
 sub check_path { -p $_[1] }
 sub path_type  { 'FIFO' }
 
-sub handles_for_select { $_[0]->{+PIPE}->rh }
+sub have_handles_for_select { 1 }
+sub handles_for_select { $_[0]->{+PIPE} ? $_[0]->{+PIPE}->rh : () }
 
 sub make_path {
     my $self  = shift;
@@ -153,7 +156,7 @@ See L<IPC::Manager::Client>.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

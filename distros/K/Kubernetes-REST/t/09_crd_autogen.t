@@ -153,7 +153,7 @@ subtest 'get with AutoGen CRD class' => sub {
 subtest 'list with AutoGen CRD class' => sub {
     my $list = $api->list('StaticWebSiteAG', namespace => 'perl-crd-ag-test');
     ok($list, 'list returns');
-    my @items = $list->items->@*;
+    my @items = @{ $list->items };
     ok(scalar @items >= 1, 'has items');
     is($items[0]->metadata->name, 'my-blog', 'item name');
 };

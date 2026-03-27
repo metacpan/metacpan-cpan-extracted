@@ -1,6 +1,6 @@
 package Geo::BUFR;
 
-# Copyright (C) 2010-2025 MET Norway
+# Copyright (C) 2010-2026 MET Norway
 #
 # This module is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
@@ -94,7 +94,7 @@ use Time::Local qw(timegm);
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-our $VERSION = '1.41';
+our $VERSION = '1.42';
 
 # This loads BUFR.so, the compiled version of BUFR.xs, which
 # contains bitstream2dec, bitstream2ascii, dec2bitstream,
@@ -1566,7 +1566,7 @@ sub _read_message {
             $self->{BAD_LENGTH} = 1;
             $msgisOK = 0;
             seek $filehandle, $pos+8, 0;
-            _complain("File %s not big enough to contain the stated"
+            _complain("File %s not big enough to contain the stated "
                       . "length of BUFR message", $self->{FILENAME});
             $pos += 8;
         } else {
@@ -6036,7 +6036,7 @@ message is reached, section 0-3 will also be decoded, the contents of
 which is then available through the access methods listed below. This
 is the main BUFR decoding routine in Geo::BUFR, and will call
 C<load_BDtables()> internally (unless decoding of section 4 has been
-turned off by use of C<set_nodata> or C<set_filter_db>), but not
+turned off by use of C<set_nodata> or C<set_filter_cb>), but not
 C<load_Ctable>. Consult L</"DECODING/ENCODING"> if you want more
 precise info about what is returned in $data and $descriptors.
 
@@ -6044,7 +6044,7 @@ C<next_observation> will return the empty list (so both $data and
 $descriptors will be undef) in the following cases: if there are no
 more BUFR messages in file/input buffer (so next call to C<eof()> will
 return false), if no decoding of section 4 was requested in
-C<set_nodata>, if filtering was turned on in C<set_filter_db> and the
+C<set_nodata>, if filtering was turned on in C<set_filter_cb> and the
 BUFR message met the filter criteria in the user defined callback
 function, or if the BUFR message contained 0 subsets. If you need to
 distinguish the first case from the rest, one way would be to check
@@ -6736,7 +6736,7 @@ L<https://wiki.met.no/bufr.pm/start>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2025 MET Norway
+Copyright (C) 2010-2026 MET Norway
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

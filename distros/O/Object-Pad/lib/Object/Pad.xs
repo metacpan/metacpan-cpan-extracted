@@ -76,6 +76,13 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta)
   }
 }
 
+static void S_freepadsv(pTHX_ PADOFFSET padix)
+{
+  SvREFCNT_dec(PAD_SVl(padix));
+  PAD_SVl(padix) = NULL;
+}
+#define SAVEFREEPADSV(padix)  SAVEDESTRUCTOR_X(S_freepadsv, (void *)(padix))
+
 #define bind_field_to_pad(sv, fieldix, private, padix)  S_bind_field_to_pad(aTHX_ sv, fieldix, private, padix)
 static void S_bind_field_to_pad(pTHX_ SV *sv, FIELDOFFSET fieldix, U8 private, PADOFFSET padix)
 {
@@ -98,7 +105,7 @@ static void S_bind_field_to_pad(pTHX_ SV *sv, FIELDOFFSET fieldix, U8 private, P
 
   SAVESPTR(PAD_SVl(padix));
   PAD_SVl(padix) = SvREFCNT_inc(val);
-  save_freesv(val);
+  SAVEFREEPADSV(padix);
 }
 
 #define methstart_common(is_role)  S_methstart_common(aTHX_ is_role)
@@ -126,19 +133,43 @@ static void S_methstart_common(pTHX_ bool is_role)
     PAD *pad1 = PadlistARRAY(CvPADLIST(find_runcv(0)))[1];
     SV *embeddingsv = PadARRAY(pad1)[PADIX_EMBEDDING];
 
-    if(embeddingsv && embeddingsv != &PL_sv_undef &&
-       (embedding = MUST_ROLEEMBEDDING(SvPVX(embeddingsv)))) {
-      if(embedding == &ObjectPad__embedding_standalone) {
-        classstash = NULL;
-        offset     = 0;
+    /* We should never see NULL */
+    assert(embeddingsv);
+
+    if(SvTYPE(embeddingsv) == SVt_PVHV) {
+      HV *applied_classes = (HV *)embeddingsv;
+      HV *stash = SvSTASH(SvRV(self));
+
+      if(stash == CvSTASH(find_runcv(0)))
+        croak("Cannot invoke a role method directly");
+
+      AV *isa = mro_get_linear_isa(stash);
+
+      for(UV idx = 0; idx < av_count(isa); idx++) {
+        HE *he = hv_fetch_ent(applied_classes, AvARRAY(isa)[idx], 0, 0);
+        if(!he)
+          continue;
+
+        /* HeVAL is a RoleEmbedding * directly */
+        embedding = MUST_ROLEEMBEDDING(HeVAL(he));
+        break;
       }
-      else {
-        classstash = embedding->classmeta->stash;
-        offset     = embedding->offset;
-      }
+
+      if(!embedding)
+        croak("Could not find embedding info for %" HEKf " in applied classes map",
+          HEKfARG(HvNAME_HEK(stash)));
     }
     else {
-      croak("Cannot invoke a role method directly");
+      embedding = MUST_ROLEEMBEDDING(SvPVX(embeddingsv));
+    }
+
+    if(embedding == &ObjectPad__embedding_standalone) {
+      classstash = NULL;
+      offset     = 0;
+    }
+    else {
+      classstash = embedding->classmeta->stash;
+      offset     = embedding->offset;
     }
   }
   else {
@@ -174,10 +205,9 @@ static void S_methstart_common(pTHX_ bool is_role)
   if(fieldstore) {
     SAVESPTR(PAD_SVl(PADIX_FIELDS));
     PAD_SVl(PADIX_FIELDS) = SvREFCNT_inc(fieldstore);
-    save_freesv(fieldstore);
+    SAVEFREEPADSV(PADIX_FIELDS);
   }
 
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
   UNOP_AUX_item *aux = cUNOP_AUX->op_aux;
   if(aux) {
     U32 fieldcount  = (aux++)->uv;
@@ -199,9 +229,6 @@ static void S_methstart_common(pTHX_ bool is_role)
       fieldcount--;
     }
   }
-#else
-  PERL_UNUSED_VAR(offset);
-#endif
 }
 
 static XOP xop_methstart;
@@ -222,13 +249,8 @@ OP *ObjectPad_newMETHSTARTOP(pTHX_ U32 flags)
 {
   OP *(*ppaddr)(pTHX) = (flags & OPfMETHSTART_ROLE) ? &pp_rolemethstart : &pp_methstart;
 
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-  /* We know we're on 5.22 or above, so no worries about assert failures */
   OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NULL);
   op->op_ppaddr = ppaddr;
-#else
-  OP *op = newOP_CUSTOM(ppaddr, flags);
-#endif
   op->op_private = (U8)(flags >> 8);
   if(flags & OPfMETHSTART_ROLE)
     op->op_flags |= OPf_SPECIAL;
@@ -262,52 +284,6 @@ OP *ObjectPad_newCOMMONMETHSTARTOP(pTHX_ U32 flags)
 {
   OP *op = newOP_CUSTOM(&pp_commonmethstart, flags);
   op->op_private = (U8)(flags >> 8);
-  return op;
-}
-
-static XOP xop_fieldpad;
-static OP *pp_fieldpad(pTHX)
-{
-#ifdef HAVE_UNOP_AUX
-  FIELDOFFSET fieldix = PTR2IV(cUNOP_AUX->op_aux);
-#else
-  UNOP_with_IV *op = (UNOP_with_IV *)PL_op;
-  FIELDOFFSET fieldix = op->iv;
-#endif
-  PADOFFSET padix = PL_op->op_targ;
-
-  if(PL_op->op_flags & OPf_SPECIAL) {
-    RoleEmbedding *embedding = get_embedding_from_pad();
-
-    if(embedding && embedding != &ObjectPad__embedding_standalone) {
-      fieldix += embedding->offset;
-    }
-  }
-
-  SV *fieldstore = PAD_SV(PADIX_FIELDS);
-
-  SV **fieldsvs = fieldstore_fields(fieldstore);
-  if(fieldix > fieldstore_maxfield(fieldstore))
-    croak("ARGH: instance does not have a field at index %ld", (long int)fieldix);
-
-  bind_field_to_pad(fieldsvs[fieldix], fieldix, PL_op->op_private, padix);
-
-  return PL_op->op_next;
-}
-
-OP *ObjectPad_newFIELDPADOP(pTHX_ U32 flags, PADOFFSET padix, FIELDOFFSET fieldix)
-{
-#ifdef HAVE_UNOP_AUX
-  OP *op = newUNOP_AUX(OP_CUSTOM, flags, NULL, NUM2PTR(UNOP_AUX_item *, fieldix));
-#else
-  OP *op = newUNOP_with_IV(OP_CUSTOM, flags, NULL, fieldix);
-#endif
-  op->op_targ = padix;
-  op->op_private = (U8)(flags >> 8);
-  if(flags & OPfMETHSTART_ROLE)
-    op->op_flags |= OPf_SPECIAL;
-  op->op_ppaddr = &pp_fieldpad;
-
   return op;
 }
 
@@ -2115,35 +2091,18 @@ done:
 BOOT:
   XopENTRY_set(&xop_methstart, xop_name, "methstart");
   XopENTRY_set(&xop_methstart, xop_desc, "enter method");
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
   XopENTRY_set(&xop_methstart, xop_class, OA_UNOP_AUX);
-#else
-  XopENTRY_set(&xop_methstart, xop_class, OA_BASEOP);
-#endif
   Perl_custom_op_register(aTHX_ &pp_methstart, &xop_methstart);
 
   XopENTRY_set(&xop_rolemethstart, xop_name, "rolemethstart");
   XopENTRY_set(&xop_rolemethstart, xop_desc, "enter role method");
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
   XopENTRY_set(&xop_rolemethstart, xop_class, OA_UNOP_AUX);
-#else
-  XopENTRY_set(&xop_rolemethstart, xop_class, OA_BASEOP);
-#endif
   Perl_custom_op_register(aTHX_ &pp_rolemethstart, &xop_rolemethstart);
 
   XopENTRY_set(&xop_commonmethstart, xop_name, "commonmethstart");
   XopENTRY_set(&xop_commonmethstart, xop_desc, "enter method :common");
   XopENTRY_set(&xop_commonmethstart, xop_class, OA_BASEOP);
   Perl_custom_op_register(aTHX_ &pp_commonmethstart, &xop_commonmethstart);
-
-  XopENTRY_set(&xop_fieldpad, xop_name, "fieldpad");
-  XopENTRY_set(&xop_fieldpad, xop_desc, "fieldpad()");
-#ifdef HAVE_UNOP_AUX
-  XopENTRY_set(&xop_fieldpad, xop_class, OA_UNOP_AUX);
-#else
-  XopENTRY_set(&xop_fieldpad, xop_class, OA_UNOP); /* technically a lie */
-#endif
-  Perl_custom_op_register(aTHX_ &pp_fieldpad, &xop_fieldpad);
 
   CvLVALUE_on(get_cv("Object::Pad::MOP::Field::value", 0));
 #ifdef HAVE_DMD_HELPER

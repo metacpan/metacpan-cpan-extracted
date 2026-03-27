@@ -2,30 +2,30 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in SWE.",
+  "ABSTRACT" => "Number to word conversion in Swedish",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Lingua-SWE-Num2Word",
   "LICENSE" => "open_source",
-  "MIN_PERL_VERSION" => "5.010001",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::SWE::Num2Word",
   "PREREQ_PM" => {
     "Export::Attrs" => 0,
-    "strict" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Test::More" => 0,
+    "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -1,5 +1,9 @@
 Revision history for Perl-Version-Bumper
 
+0.250 2026-03-27 BOOK
+    - documentation improvements
+    - ensure bump_file works correctly when given a string as filename
+
 0.245 2026-02-27 BOOK
     - add support for the 5.042 feature bundle
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Resource::V1alpha3::ResourceClaimConsumerReference;
 # ABSTRACT: ResourceClaimConsumerReference contains enough information to let you locate the consumer of a ResourceClaim. The user must be a resource in the same namespace as the ResourceClaim.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s apiGroup => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Resource::V1alpha3::ResourceClaimConsumerReference - ResourceClaim
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 apiGroup
 

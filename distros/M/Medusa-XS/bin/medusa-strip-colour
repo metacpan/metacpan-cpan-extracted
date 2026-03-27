@@ -1,0 +1,82 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Loo;
+
+=head1 NAME
+
+medusa-strip-colour - Strip ANSI colour codes from Medusa audit logs
+
+=head1 SYNOPSIS
+
+    medusa-strip-colour audit.log > plain.log
+    cat audit.log | medusa-strip-colour > plain.log
+    medusa-strip-colour -i audit.log          # edit in-place
+
+=head1 DESCRIPTION
+
+Converts a coloured Medusa audit log into a plain-text version by removing
+all ANSI escape sequences using Loo's XS-accelerated strip_colour function.
+
+Reads from file arguments or STDIN.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-i>
+
+Edit files in-place (overwrites the original file).
+
+=item B<-h>, B<--help>
+
+Print usage and exit.
+
+=back
+
+=cut
+
+my $inplace = 0;
+
+if (@ARGV && ($ARGV[0] eq '-h' || $ARGV[0] eq '--help')) {
+    print <<'USAGE';
+Usage: medusa-strip-colour [OPTIONS] [FILE ...]
+
+Strip ANSI colour codes from Medusa audit logs.
+
+Options:
+  -i          Edit file(s) in-place
+  -h, --help  Show this help
+
+Examples:
+  medusa-strip-colour audit.log > plain.log
+  cat audit.log | medusa-strip-colour
+  medusa-strip-colour -i audit.log
+USAGE
+    exit 0;
+}
+
+if (@ARGV && $ARGV[0] eq '-i') {
+    $inplace = 1;
+    shift @ARGV;
+    die "medusa-strip-colour: -i requires at least one file argument\n"
+        unless @ARGV;
+}
+
+if ($inplace) {
+    for my $file (@ARGV) {
+        open my $fh, '<', $file or die "Cannot read $file: $!\n";
+        my $content = do { local $/; <$fh> };
+        close $fh;
+
+        $content = Loo::strip_colour($content);
+
+        open $fh, '>', $file or die "Cannot write $file: $!\n";
+        print $fh $content;
+        close $fh;
+    }
+} else {
+    while (<>) {
+        print Loo::strip_colour($_);
+    }
+}

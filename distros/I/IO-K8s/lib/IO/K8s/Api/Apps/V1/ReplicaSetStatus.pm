@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::ReplicaSetStatus;
 # ABSTRACT: ReplicaSetStatus represents the current status of a ReplicaSet.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s availableReplicas => Int;
@@ -35,7 +35,7 @@ IO::K8s::Api::Apps::V1::ReplicaSetStatus - ReplicaSetStatus represents the curre
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 availableReplicas
 

@@ -1,0 +1,51 @@
+Lingua::HEB::Word2Num — Hebrew word to number conversion
+Lingua::HEB::Word2Num — המרת מילות מספר בעברית לספרות
+
+Converts Hebrew cardinal number text into its numeric value.
+Part of the PetaMem Lingua number conversion suite.
+
+SYNOPSIS
+
+    use Lingua::HEB::Word2Num qw(w2n);
+    my $num = w2n('...');
+
+    or via the multi-language wrapper:
+
+    use Lingua::Word2Num qw(cardinal);
+    my $num = cardinal('he', '...');
+
+    Both ISO 639-1 ('he') and ISO 639-3 ('heb') codes are accepted.
+
+INSTALLATION
+
+    shell> cpanm Lingua::HEB::Word2Num
+
+    or install all available languages at once:
+
+    shell> cpanm Task::Lingua::PetaMem
+
+SUPPORTED RANGE
+
+    Integers from 0 to 999,999,999.
+
+SEE ALSO
+
+    Lingua::HEB::Num2Word — the reverse direction
+    Lingua::Num2Word      — multi-language number-to-word wrapper
+    Lingua::Word2Num      — multi-language word-to-number wrapper
+    Task::Lingua::PetaMem — install all languages
+
+AUTHORS
+
+    Richard C. Jelinek <rj@petamem.com> (specification)
+    PetaMem AI Coding Agents (coding, 2025-present)
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) PetaMem, s.r.o. 2004-present
+
+    This package is free software, dual-licensed under the
+    Artistic License 2.0 and the BSD 2-Clause License.
+
+    https://opensource.org/licenses/Artistic-2.0
+    https://opensource.org/licenses/BSD-2-Clause

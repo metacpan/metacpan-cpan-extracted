@@ -1,11 +1,16 @@
 Revision history for Perl extension File::Path::Redirect.
 
-v0.1.2 2026/03/10 
+v0.1.3 2026-03-24
+  [fixes]
+    -Fix absolute path test on target path, not link path
+    -Fix limit reading of candidate redirect files to max path + magic length
+
+v0.1.2 2026-03-10 
   - fix meta data in Makefile.PL
 
-v0.1.1 2026/03/10 
+v0.1.1 2026-03-10 
   - fix meta data in Makefile.PL
 
-v0.1.0 2026/03/10 
+v0.1.0 2026-03-10 
   - Original version
 

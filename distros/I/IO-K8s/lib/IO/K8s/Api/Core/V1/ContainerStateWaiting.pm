@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ContainerStateWaiting;
 # ABSTRACT: ContainerStateWaiting is a waiting state of a container.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s message => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::ContainerStateWaiting - ContainerStateWaiting is a waiti
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 message
 

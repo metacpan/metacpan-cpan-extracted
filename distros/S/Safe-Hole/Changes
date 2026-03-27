@@ -1,5 +1,22 @@
 Revision history for Perl extension Safe::Hole.
 
+0.17 Mar 24 2026
+
+  [Improvements]
+  - Remove dead Exporter code (unused @ISA, @EXPORT, @EXPORT_OK) from
+    Hole.pm (PR #17)
+  - Narrow `no strict` to `no strict 'vars'` in AUTOLOAD wrapper for
+    tighter safety (PR #17)
+  - Regenerate README and README.md from current POD to include typo
+    fixes from PR #13 (PR #15)
+
+  [Maintenance]
+  - Add AI_POLICY.md documenting how AI tools are used in this project
+  - Update .gitignore for ExtUtils::MakeMaker build artifacts after
+    the Module::Build conversion in PR #10 (PR #16)
+  - Remove stale "To do" placeholder in t/01-hole.t — object wrapping
+    tests already exist in t/02-wrap-objects.t (PR #17)
+
 0.16 Mar 22 2026
 
   [Bug Fixes]

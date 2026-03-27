@@ -3,19 +3,15 @@
 package Lingua::NOR::Num2Word;
 # ABSTRACT: Number 2 word conversion in NOR.
 
-# {{{ use block
-
-use 5.10.1;
-
-use strict;
-use warnings;
+use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
-
-
+our $VERSION = '0.2603260';
 
 my %group1 = qw(  0 null         1 en           2 to
                   3 tre          4 fire         5 fem
@@ -144,7 +140,7 @@ Lingua::NOR::Num2Word - convert whole number to norwegian text. Output text is i
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -185,12 +181,16 @@ Converts a whole number to norwegian language.
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-  Kjetil Fikkan (kjetil@fikkan.org)
-
-  Maintenance
-  PetaMem <info@petamem.com>
+ initial coding:
+   Kjetil Fikkan E<lt>kjetil@fikkan.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ coding (until 2005):
+   Roman Vasicek E<lt>info@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
@@ -199,3 +199,12 @@ Converts a whole number to norwegian language.
 
  This module is free software. It may be used, redistributed
  and/or modified under the same terms as Perl itself.
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
+
+=cut

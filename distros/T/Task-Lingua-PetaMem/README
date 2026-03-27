@@ -1,0 +1,30 @@
+Task::Lingua::PetaMem
+
+Meta-package to install all PetaMem Lingua number conversion modules (all languages, both directions).
+Part of the PetaMem Lingua number conversion suite.
+
+INSTALLATION
+
+    shell> cpanm Task::Lingua::PetaMem
+
+    This installs all available languages in both directions.
+
+    For just one direction:
+
+    shell> cpanm Task::Lingua::Word2Num
+    shell> cpanm Task::Lingua::Num2Word
+
+AUTHORS
+
+    Richard C. Jelinek <rj@petamem.com> (specification)
+    PetaMem AI Coding Agents (coding, 2025-present)
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) PetaMem, s.r.o. 2004-present
+
+    This package is free software, dual-licensed under the
+    Artistic License 2.0 and the BSD 2-Clause License.
+
+    https://opensource.org/licenses/Artistic-2.0
+    https://opensource.org/licenses/BSD-2-Clause

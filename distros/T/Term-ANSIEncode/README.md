@@ -30,7 +30,7 @@ You will get best results if you use a font with all of the UTF-8 characters.  S
 ```
 ### To use the executable, run:
 ```
-ansi-encode [options] [File or Search]
+ansiencode [options] [File or Search]
 ```
 It is **HIGHLY** encouraged for your terminal be set as **UTF-8** for the advanced features in this module/utility.  It is also encouraged that you use a font having the graphics characters for frames and other features.
 
@@ -271,6 +271,6 @@ Please use the "-t" option to see all of the tokens.  This is only a partial lis
 
 * When making a tokenized file for output, first prepare what you want to show in just black and white text.
 * Make two copies of the output in the file and only work on the last copy for adding color and attributes, referring to the original above for reference.
-* Have a second terminal window open to run ```ansi-encode [filename]``` to quickly see what the output looks like, without having to exit your editor.
+* Have a second terminal window open to run ```ansiencode [filename]``` to quickly see what the output looks like, without having to exit your editor.
 * Remove the original copy, once everything looks great, then you are finished.
 

@@ -8,7 +8,7 @@ use JSON::MaybeXS;
 use Scalar::Util ();
 use namespace::clean;
 
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 
 # Track which classes we've auto-generated
 my %_autogen_cache;
@@ -580,7 +580,7 @@ IO::K8s - Objects representing things found in the Kubernetes API
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 SYNOPSIS
 

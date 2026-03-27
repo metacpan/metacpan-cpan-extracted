@@ -1,23 +1,24 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 package Lingua::DEU::Word2Num;
-# ABSTRACT: Word 2 Number conversion in DEU.
-
-# {{{ use block
+# ABSTRACT: Word to number conversion in German
 
 use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603231';
+our $VERSION = '0.2603260';
 my $parser   = deu_numerals();
 
 # }}}
 
-# {{{ w2n                       convert number to text
+# {{{ w2n                       convert text to number
 
 sub w2n :Export {
     my $input = shift // return;
@@ -101,13 +102,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::DEU::Word2Num  
+Lingua::DEU::Word2Num - Word to number conversion in German
+
 
 =head1 VERSION
 
-version 0.2603231
-
-Word 2 Number conversion in DEU.
+version 0.2603260
 
 Lingua::DEU::Word2Num is module for converting german numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -148,13 +148,11 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999].
 
-
 =item B<deu_numerals> (void)
 
   =>  obj  new parser object
 
 Internal parser.
-
 
 =back
 
@@ -171,7 +169,6 @@ Internal parser.
 
 =item w2n
 
-
 =back
 
 =cut
@@ -181,15 +178,24 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Roman Vasicek <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ coding (until 2005):
+   Roman Vasicek E<lt>info@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2004-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

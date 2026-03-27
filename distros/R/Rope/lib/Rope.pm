@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.44';
+our $VERSION = '0.45';
 use Rope::Object;
 use Rope::Pro;
 my (%META, %PRO);
@@ -429,7 +429,7 @@ BEGIN {
 						};
 					}
 				}
-				for ( sort { $build->{properties}->{$a}->{index} <=> $build->{properties}->{$b}->{index} } keys %{ $build->{properties} } ) {
+				for ( sort { ($build->{properties}->{$a}->{index} || 0) <=> ($build->{properties}->{$b}->{index} || 0) } keys %{ $build->{properties} } ) {
 					if ( !defined $build->{properties}->{$_}->{value} && defined $build->{properties}->{$_}->{builder}) {
 						my $builder = $build->{properties}->{$_}->{builder};
 						$build->{properties}->{$_}->{value} = ref $builder ? $builder->($build) : $caller->$builder($build);
@@ -661,7 +661,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.44
+Version 0.45
 
 =cut
 

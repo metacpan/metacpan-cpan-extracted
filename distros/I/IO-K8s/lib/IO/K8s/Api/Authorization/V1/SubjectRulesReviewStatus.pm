@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::SubjectRulesReviewStatus;
 # ABSTRACT: SubjectRulesReviewStatus contains the result of a rules check. This check can be incomplete depending on the set of authorizers the server is configured with and any errors experienced during evaluation. Because authorization rules are additive, if a rule appears in a list it's safe to assume the subject has that permission, even if that list is incomplete.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s evaluationError => Str;
@@ -29,7 +29,7 @@ IO::K8s::Api::Authorization::V1::SubjectRulesReviewStatus - SubjectRulesReviewSt
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 evaluationError
 

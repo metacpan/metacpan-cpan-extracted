@@ -4,7 +4,11 @@ use strict;
 use warnings;
 
 package MARC::Validator::Plugin::Foo;
+
 use base qw(MARC::Validator::Abstract);
+
+use Data::MARC::Validator::Report::Error;
+use Data::MARC::Validator::Report::Plugin::Errors;
 
 our $VERSION = 1.01;
 
@@ -23,8 +27,7 @@ sub name {
 sub postprocess {
         my $self = shift;
 
-        $self->{'struct'}->{'stats'}->{'bar_stat'}
-                = $self->{'struct'}->{'stats'}->{'foo_stat'} + 1;
+        # TODO
 
         return;
 }
@@ -32,7 +35,28 @@ sub postprocess {
 sub process {
         my ($self, $marc_record) = @_;
 
-        $self->{'struct'}->{'stats'}->{'foo_stat'}++;
+        my $record_id = $self->{'cb_record_id'}->($marc_record);
+
+        my $error1 = Data::MARC::Validator::Report::Error->new(
+                'error' => 'Fake error #1',
+                'params' => {
+                        'key' => 'value',
+                 },
+        );
+        my $error2 = Data::MARC::Validator::Report::Error->new(
+                'error' => 'Fake error #2',
+                'params' => {
+                        'key' => 'value',
+                 },
+        );
+        push @{$self->{'errors'}}, Data::MARC::Validator::Report::Plugin::Errors->new(
+               'errors' => [
+                       $error1,
+                       $error2,
+               ],
+               'filters' => ['foo', 'bar'],
+               'record_id' => $record_id,
+        );
 
         return;
 }
@@ -41,17 +65,6 @@ sub version {
         my $self = shift;
 
         return $VERSION;
-}
-
-sub _init {
-        my $self = shift;
-
-        $self->{'struct'}->{'module_name'} = __PACKAGE__;
-        $self->{'struct'}->{'module_version'} = $VERSION;
-
-        $self->{'struct'}->{'stats'}->{'foo_stat'} = 0;
-
-        return;
 }
 
 package main;
@@ -204,16 +217,22 @@ my $process = $obj->process($marc_record);
 $obj->postprocess;
 
 my $name = $obj->name;
-print "Name: $name\n";
+print "Plugin name: $name\n";
 
-my $report = $obj->struct;
+# Create report.
+my $report = $obj->report;
+
+my $record_id = $report->plugin_errors->[0]->record_id;
+print "Record id: $record_id\n";
+
 print "Output report data object:\n";
 p $report;
 
 unlink $temp_file;
 
 # Output:
-# Name: foo
+# Plugin name: foo
+# Record id: ck8300078
 # Output report data object:
 # Data::MARC::Validator::Report::Plugin  {
 #     parents: Mo::Object
@@ -229,7 +248,9 @@ unlink $temp_file;
 #     internals: {
 #         module_name     "MARC::Validator::Plugin::Foo",
 #         name            "foo",
-#         plugin_errors   [],
+#         plugin_errors   [
+#             [0] Data::MARC::Validator::Report::Plugin::Errors
+#         ],
 #         version         1.01
 #     }
 # }

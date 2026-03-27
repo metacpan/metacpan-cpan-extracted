@@ -67,6 +67,25 @@ EXPORTS
       connect, or reconnect without importing ipcm_spawn(), ipcm_connect(),
       or ipcm_reconnect() into your namespace.
 
+    $protocol = ipcm_default_protocol()
+
+    ipcm_default_protocol($protocol)
+
+      Get or set the default protocol. This is undef until set.
+
+    $protocol_list = ipcm_default_protocol_list()
+
+    ipcm_default_protocol_list(\@protocol_list)
+
+      Default set of protocols to try, in the order they should be tried.
+
+    $serializer = ipcm_default_serializer()
+
+    ipcm_default_serializer($serializer)
+
+      Get or set the default serializer. 'JSON' is the default unless this
+      is changed.
+
     $ipcm = ipcm_spawn()
 
     $ipcm = ipcm_spawn(protocol => $PROTOCOL)
@@ -205,7 +224,7 @@ CLEANUP
 SOURCE
 
     The source code repository for IPC::Manager can be found at
-    https://https://github.com/exodist/IPC-Manager.
+    https://github.com/exodist/IPC-Manager.
 
 MAINTAINERS
 

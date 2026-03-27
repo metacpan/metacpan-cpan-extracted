@@ -1,5 +1,21 @@
 Revision history for Object-Pad
 
+0.825   2026-03-25
+        [CHANGES]
+         * Don't provoke warnings of freed unreferenced scalars when
+           cancelling suspended methods (RT174087)
+
+0.824   2026-03-24
+        [CHANGES]
+         * Support anonymous and captured `method` closures inside roles,
+           allowing them to still be invoked on known-applied class instances
+         * Requires Perl version 5.22, removing a lot of back-compatibility
+           code previously guarded by `#ifdef`s
+
+        [BUGFIXES]
+         * Don't crash if lexicals that capture fields are rebound using
+           refalias assignment
+
 0.823   2025-12-08
         [CHANGES]
          * Added internals to support Feature::Compat::Class restricting the

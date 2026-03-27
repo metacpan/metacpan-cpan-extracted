@@ -1,5 +1,9 @@
 Change log for Graphics::Framebuffer
 
+6.92   March 25, 2026
+
+       Added a more helpful install process.
+
 6.91   March 17, 2026
 
        The latest VirtualBox version (7.2.6) has totally messed up its

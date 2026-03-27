@@ -29,20 +29,25 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008008"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/IO-Tty/issues"
+         "web" : "https://github.com/cpan-authors/IO-Tty/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/toddr/IO-Tty"
+         "url" : "https://github.com/cpan-authors/IO-Tty"
       }
    },
-   "version" : "1.21",
+   "version" : "1.23",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

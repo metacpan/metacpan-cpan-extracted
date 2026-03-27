@@ -2,11 +2,12 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Carp qw/croak/;
-use Errno qw/ESRCH/;
 use Scalar::Util qw/blessed weaken/;
+
+use IPC::Manager::Util qw/pid_is_running/;
 
 use IPC::Manager::Message;
 
@@ -48,7 +49,13 @@ sub pid_check { croak "Client used from wrong PID" if $_[0]->{+PID} != $$; $_[0]
 
 sub have_pending_messages { 0 }
 sub have_ready_messages   { croak "Not Implemented" }
-sub handles_for_select    { croak "Not Implemented" }
+
+sub have_handles_for_select { 0 }
+sub handles_for_select      { croak "Not Implemented" }
+
+sub have_handles_for_peer_change  { 0 }
+sub reset_handles_for_peer_change { croak "Not Implemented" }
+sub handles_for_peer_change       { croak "Not Implemented" }
 
 sub get_messages { croak "Not Implemented" }
 sub peer_exists  { croak "Not Implemented" }
@@ -59,18 +66,7 @@ sub send_message { croak "Not Implemented" }
 sub spawn        { croak "Not Implemented" }
 sub write_stats  { croak "Not Implemented" }
 sub all_stats    { croak "Not Implemented" }
-
-sub pid_is_running {
-    my $pid = pop;
-
-    croak "A pid is required" unless $pid;
-
-    local $!;
-
-    return 1 if kill(0, $pid);    # Running and we have perms
-    return 0 if $! == ESRCH;      # Does not exist (not running)
-    return -1;                    # Running, but not ours
-}
+sub viable       { croak "Not Implemented" }
 
 sub connect {
     my $class = shift;
@@ -176,7 +172,11 @@ sub disconnect {
 
     # Wait for any messages that are still being written
     my $err;
-    while ($self->pending_messages || $self->ready_messages) {
+    while (1) {
+        my $pend = $self->pending_messages;
+        my $ready = $self->ready_messages;
+        last unless $pend || $ready;
+
         if (my @ready = $self->get_messages) {
             @ready = grep { !$_->is_terminate } @ready;
             if (@ready) {
@@ -189,6 +189,9 @@ sub disconnect {
                     last;
                 }
             }
+        }
+        else {
+            sleep 1;
         }
     }
 
@@ -471,7 +474,7 @@ C<< $con->read_stats >> can read it.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

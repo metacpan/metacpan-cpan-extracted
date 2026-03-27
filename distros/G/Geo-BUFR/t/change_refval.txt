@@ -27,7 +27,7 @@ Section 3:
     Number of data subsets:            2
     Observed data:                     1
     Compressed data:                   0
-    Data descriptors unexpanded:       201129 203015 022040 203255 022040 201000 203000
+    Data descriptors unexpanded:       201129 203015 022040 203255 022040 203000 201000
 
 Subset 1
 

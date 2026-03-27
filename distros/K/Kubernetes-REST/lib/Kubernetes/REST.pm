@@ -1,5 +1,5 @@
 package Kubernetes::REST;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: A Perl REST Client for the Kubernetes API
 use Moo;
 use Carp qw(croak carp);
@@ -458,7 +458,7 @@ sub _process_log_chunk {
 # These methods expose the internal request/response pipeline as a stable API
 # for async wrappers (e.g. Net::Async::Kubernetes) that need to build requests,
 # process responses, and handle streaming without going through the sync
-# convenience methods (list, get, watch, log, port_forward, exec, etc.).
+# convenience methods (list, get, watch, log, port_forward, exec, attach, etc.).
 # ============================================================================
 
 sub build_path {
@@ -945,6 +945,68 @@ sub exec {
     );
 }
 
+sub attach {
+    my ($self, $short_class, @rest) = @_;
+
+
+    my %args;
+    if (@rest >= 1 && !ref($rest[0]) && $rest[0] !~ /^(name|namespace|container|stdin|stdout|stderr|tty|subprotocol|on_open|on_frame|on_close|on_error)$/) {
+        $args{name} = shift @rest;
+        %args = (%args, @rest);
+    } elsif (@rest % 2 == 0) {
+        %args = @rest;
+    } else {
+        croak "Invalid arguments to attach()";
+    }
+
+    croak "name required for attach" unless $args{name};
+
+    my $container = delete $args{container};
+    my $stdin  = delete($args{stdin})  ? 1 : 0;
+    my $stdout = exists($args{stdout}) ? (delete($args{stdout}) ? 1 : 0) : 1;
+    my $stderr = exists($args{stderr}) ? (delete($args{stderr}) ? 1 : 0) : 1;
+    my $tty    = delete($args{tty})    ? 1 : 0;
+
+    my $subprotocol = delete $args{subprotocol} // 'v4.channel.k8s.io';
+    my $on_open  = delete $args{on_open};
+    my $on_frame = delete $args{on_frame};
+    my $on_close = delete $args{on_close};
+    my $on_error = delete $args{on_error};
+
+    my $class = $self->expand_class($short_class);
+    my $path = $self->_build_path($class, %args) . '/attach';
+
+    my %params = (
+        stdin   => $stdin  ? 'true' : 'false',
+        stdout  => $stdout ? 'true' : 'false',
+        stderr  => $stderr ? 'true' : 'false',
+        tty     => $tty    ? 'true' : 'false',
+    );
+    $params{container} = $container if defined $container;
+
+    my $req = $self->_prepare_request('GET', $path,
+        parameters => \%params,
+        headers    => {
+            Accept                   => '*/*',
+            Connection               => 'Upgrade',
+            Upgrade                  => 'websocket',
+            'Sec-WebSocket-Protocol' => $subprotocol,
+        },
+    );
+
+    my $io = $self->io;
+    unless ($io->can('call_duplex')) {
+        croak "IO backend does not support attach(): missing call_duplex()";
+    }
+
+    return $io->call_duplex($req,
+        on_open  => $on_open,
+        on_frame => $on_frame,
+        on_close => $on_close,
+        on_error => $on_error,
+    );
+}
+
 1;
 
 __END__
@@ -959,7 +1021,7 @@ Kubernetes::REST - A Perl REST Client for the Kubernetes API
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 
@@ -976,7 +1038,7 @@ version 1.102
 
     # List all namespaces
     my $namespaces = $api->list('Namespace');
-    for my $ns ($namespaces->items->@*) {
+    for my $ns (@{ $namespaces->items }) {
         say $ns->metadata->name;
     }
 
@@ -1318,6 +1380,27 @@ currently provide duplex transport.
 Returns whatever the IO backend returns for C<call_duplex> (typically a
 session/handle object managed by that backend).
 
+=head2 attach
+
+    my $session = $api->attach('Pod', 'my-pod',
+        namespace => 'default',
+        container => 'app',
+        stdin     => 1,
+        stdout    => 1,
+        stderr    => 1,
+        tty       => 0,
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+    );
+
+Start a full-duplex pod attach session via the C</attach> subresource.
+
+This method requires an IO backend that implements C<call_duplex>. The default
+L<Kubernetes::REST::LWPIO> and L<Kubernetes::REST::HTTPTinyIO> backends do not
+currently provide duplex transport.
+
+Returns whatever the IO backend returns for C<call_duplex> (typically a
+session/handle object managed by that backend).
+
 =head1 NAME
 
 Kubernetes::REST - A Perl REST Client for the Kubernetes API
@@ -1334,7 +1417,7 @@ This version has been completely rewritten. Key changes that may affect your cod
 
 The old method-per-operation API (e.g., C<< $api->Core->ListNamespacedPod(...) >>)
 has been replaced with a simple API: C<list>, C<get>, C<create>, C<update>,
-C<patch>, C<delete>, C<watch>, C<log>, C<port_forward>, C<exec>.
+C<patch>, C<delete>, C<watch>, C<log>, C<port_forward>, C<exec>, C<attach>.
 
 =item * B<Old API still works but deprecated>
 
@@ -1733,6 +1816,49 @@ B<Required arguments:>
 =item name - Pod name
 
 =item command - Command as arrayref or scalar (e.g. C<['sh', '-c', 'id']>)
+
+=back
+
+B<Optional arguments:>
+
+=over 4
+
+=item namespace - Namespace (for namespaced resources)
+
+=item container - Container name (for multi-container pods)
+
+=item stdin, stdout, stderr, tty - Stream toggles (defaults: stdin=false, stdout=true, stderr=true, tty=false)
+
+=item subprotocol - WebSocket subprotocol (default: C<v4.channel.k8s.io>)
+
+=item on_open, on_frame, on_close, on_error - Duplex transport callbacks passed to IO backend
+
+=back
+
+Requires an IO backend implementing C<call_duplex>. The default sync backends
+currently do not provide duplex transport.
+
+=head2 attach($class, $name, %args)
+
+Start a Kubernetes pod attach session via the C</attach> subresource.
+
+    my $session = $api->attach('Pod', 'my-pod',
+        namespace => 'default',
+        container => 'app',
+        stdin     => 1,
+        stdout    => 1,
+        stderr    => 1,
+        tty       => 0,
+        on_frame  => sub { my ($channel, $payload) = @_; ... },
+        on_close  => sub { ... },
+        on_error  => sub { my ($err) = @_; ... },
+    );
+
+B<Required arguments:>
+
+=over 4
+
+=item name - Pod name
 
 =back
 

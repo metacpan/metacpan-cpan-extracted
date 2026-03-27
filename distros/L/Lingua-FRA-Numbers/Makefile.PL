@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,15 +14,16 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Lingua-FRA-Numbers",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::FRA::Numbers",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Exporter" => 0,
-    "strict" => 0,
+    "Export::Attrs" => 0,
     "utf8" => 0,
-    "vars" => 0
+    "vars" => 0,
+    "warnings" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => ""
   }
@@ -31,10 +32,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Exporter" => 0,
-  "strict" => 0,
+  "Export::Attrs" => 0,
   "utf8" => 0,
-  "vars" => 0
+  "vars" => 0,
+  "warnings" => 0
 );
 
 

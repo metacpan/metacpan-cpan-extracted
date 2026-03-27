@@ -147,8 +147,13 @@ sub sql_do ($$;@) {
             foreach my $v (@values) {
                 $sth->bind_param($i++, $v, Encode::is_utf8($v) ? undef : DBI::SQL_BINARY);
             }
-            $sth->execute() ||
+
+            if(!$sth->execute()) {
+                ### dprint "=========== $query";
+                ### dprint "=========<< " . join(' | ', @values);
                 throw $self "- SQL error: ".$self->{'sql'}->errstr;
+            }
+
             $sth->finish();
         }
     }

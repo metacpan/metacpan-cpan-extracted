@@ -1,6 +1,6 @@
 package IO::K8s::Api::Autoscaling::V2::ObjectMetricSource;
 # ABSTRACT: ObjectMetricSource indicates how to scale on a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s describedObject => 'Autoscaling::V2::CrossVersionObjectReference', 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Autoscaling::V2::ObjectMetricSource - ObjectMetricSource indicates
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 describedObject
 

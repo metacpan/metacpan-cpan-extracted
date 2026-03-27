@@ -1,6 +1,6 @@
 package IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService;
 # ABSTRACT: APIService represents a server for a particular GroupVersion. Name must be "version.group".
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject;
 
 
@@ -24,7 +24,7 @@ IO::K8s::KubeAggregator::Pkg::Apis::Apiregistration::V1::APIService - APIService
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

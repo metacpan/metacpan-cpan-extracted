@@ -2,13 +2,12 @@ package IPC::Manager::Client::UnixSocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use File::Spec;
 use Carp qw/croak/;
 use POSIX qw/mkfifo/;
 use IO::Socket::UNIX qw/SOCK_DGRAM/;
-use IO::Select;
 
 use parent 'IPC::Manager::Base::FS::Handle';
 use Object::HashBase qw{
@@ -17,9 +16,12 @@ use Object::HashBase qw{
     +socket_cache
 };
 
+sub viable { eval { require IO::Socket::UNIX; 1 } || 0 }
+
 sub check_path { -S $_[1] }
 sub path_type  { 'UNIX Socket' }
 
+sub have_handles_for_select { 1 }
 sub handles_for_select { $_[0]->{+SOCKET} }
 
 sub suspend { croak "suspend is not supported by the UnixSocket driver" }
@@ -67,10 +69,10 @@ sub get_messages {
     my @out;
 
     push @out => $self->read_resume_file;
-    push @out => @{$self->{+BUFFER}};
 
     my $s = $self->{+SOCKET};
-    while (my $msg = <$s>) {
+    push @{$self->{+BUFFER}} => <$s>;
+    for my $msg (@{$self->{+BUFFER}}) {
         $msg = IPC::Manager::Message->new($self->{+SERIALIZER}->deserialize($msg));
         push @out => $msg;
         $self->{+STATS}->{read}->{$msg->{from}}++;
@@ -141,7 +143,7 @@ See L<IPC::Manager::Client>.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

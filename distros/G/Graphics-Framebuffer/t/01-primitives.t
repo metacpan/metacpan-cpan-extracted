@@ -3,14 +3,16 @@
 use strict;
 
 use Time::HiRes 'sleep';
+use POSIX qw(geteuid);
 use Test::More tests => 2;
 
 # For debugging only
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '2.03';
+    our $VERSION = '2.04';
     use_ok('Graphics::Framebuffer');
+    # Module is Linux-only; make this explicit in tests.
 }
 
 my $b  = "\e[34m";
@@ -71,4 +73,8 @@ $F->splash(2);
 
 $F->acceleration(1);
 $F->splash(2);
+
 exit(0);
+
+
+__END__

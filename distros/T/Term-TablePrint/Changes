@@ -1,6 +1,13 @@
 Revision history for Term::TablePrint
 
 
+0.179   2026-03-27
+        - Code refactoring.
+        - Update scientific notation.
+
+0.178   2026-03-25
+        - Bugfix scientific notation.
+
 0.177   2026-03-15
         - Code refactoring.
         - Bugfix: undefined value in print_single_row.

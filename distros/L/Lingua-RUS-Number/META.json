@@ -1,0 +1,57 @@
+{
+   "abstract" : "Number 2 word conversion in RUS.",
+   "author" : [
+      "Vladislav A. Safronov <vlad at yandex.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Lingua-RUS-Number",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Export::Attrs" : "0",
+            "perl" : "v5.16.0",
+            "utf8" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::More::UTF8" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Lingua::RUS::Number" : {
+         "file" : "lib/Lingua/RUS/Number.pm",
+         "version" : "0.2603260"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://metacpan.org/author/PETAMEM"
+      }
+   },
+   "version" : "0.2603260",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "JSON::XS version 4.04",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

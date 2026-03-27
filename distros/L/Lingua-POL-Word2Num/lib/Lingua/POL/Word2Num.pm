@@ -1,25 +1,26 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::POL::Word2Num;
-# ABSTRACT: Word 2 number conversion in POL.
-
-# {{{ use block
+# ABSTRACT: Word to number conversion in Polish
 
 use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 my $COPY     = 'Copyright (c) PetaMem, s.r.o. 2003-present';
 my $parser   = pol_numerals();
 
 # }}}
 
-# {{{ w2n                                         convert number to text
+# {{{ w2n                                         convert text to number
 
 sub w2n :Export {
   my $input = shift // return;
@@ -119,13 +120,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::POL::Word2Num 
+Lingua::POL::Word2Num - Word to number conversion in Polish
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Word 2 number conversion in POL.
+version 0.2603260
 
 Lingua::POL::Word2Num is module for converting text containing number
 representation in polish back into number. Converts whole numbers from 0 up
@@ -167,13 +167,11 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
-
 =item B<pol_numerals> (void)
 
   =>  obj  returns new parser object
 
 Internal parser.
-
 
 =back
 
@@ -184,15 +182,22 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2003-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

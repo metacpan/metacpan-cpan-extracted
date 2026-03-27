@@ -1,21 +1,19 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); -*-
 
 package Lingua::SWE::Num2Word;
-# ABSTRACT: Number 2 word conversion in SWE.
+# ABSTRACT: Number to word conversion in Swedish
+
+use 5.16.0;
+use utf8;
+use warnings;
 
 # {{{ use block
 
-use 5.10.1;
-
-use strict;
-use warnings;
-
 use Export::Attrs;
-use utf8;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 # }}}
 # {{{ num2sv_cardinal                 convert number to text
@@ -79,13 +77,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::SWE::Num2Word 
+Lingua::SWE::Num2Word - Number to word conversion in Swedish
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Number 2 word conversion in SWE.
+version 0.2603260
 
 Lingua::SWE::Num2Word is module for converting numbers into their representation
 in Swedish. Converts whole numbers from 0 up to 999 999 999.
@@ -150,15 +147,22 @@ Convert number to text representation.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2004-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

@@ -9,4 +9,5 @@ cpanfile
 ^Makefile$
 \.github/
 ^Expat/Makefile$
+^Expat/Makefile\.old$
 ^CLAUDE.md$

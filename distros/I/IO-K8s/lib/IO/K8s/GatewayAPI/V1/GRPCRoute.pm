@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GRPCRoute;
 # ABSTRACT: Gateway API gRPC routing rules
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'grpcroutes';
@@ -25,7 +25,7 @@ IO::K8s::GatewayAPI::V1::GRPCRoute - Gateway API gRPC routing rules
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

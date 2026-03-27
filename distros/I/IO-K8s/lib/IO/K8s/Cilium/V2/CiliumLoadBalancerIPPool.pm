@@ -1,6 +1,6 @@
 package IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool;
 # ABSTRACT: Cilium load balancer IP address pool
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2',
     resource_plural => 'ciliumloadbalancerippools';
@@ -22,7 +22,7 @@ IO::K8s::Cilium::V2::CiliumLoadBalancerIPPool - Cilium load balancer IP address 
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

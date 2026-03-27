@@ -1,6 +1,6 @@
 package IO::K8s::Api::Discovery::V1::EndpointSlice;
 # ABSTRACT: EndpointSlice represents a subset of the endpoints that implement a service. For a given service there may be multiple EndpointSlice objects, selected by labels, which must be joined to produce the full set of endpoints.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject;
 with 'IO::K8s::Role::Namespaced';
 
@@ -27,7 +27,7 @@ IO::K8s::Api::Discovery::V1::EndpointSlice - EndpointSlice represents a subset o
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

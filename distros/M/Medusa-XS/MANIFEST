@@ -1,0 +1,34 @@
+bench/compare.pl
+bench/xs_benchmark.pl
+bin/medusa-strip-colour
+Changes
+ignore.txt
+lib/Medusa/XS.pm
+lib/Medusa/XS.xs
+lib/Medusa/XS/Logger.pm
+Makefile.PL
+MANIFEST			This list of files
+PLAN.md
+ppport.h
+README
+t/00-load.t
+t/01-xs-functions.t
+t/02-custom-ops.t
+t/03-audit-ops.t
+t/04-audit-attribute.t
+t/05-utilities-edge.t
+t/10-logger.t
+t/11-import.t
+t/12-audit-attribute-compat.t
+t/13-log-message.t
+t/14-custom-logger.t
+t/15-elapsed.t
+t/16-format-message.t
+t/17-custom-format.t
+t/18-dump-sv.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -6,18 +6,17 @@
 package Lingua::JPN::Number;
 # ABSTRACT: Number 2 word conversion in JPN.
 
-# {{{ use block
-
-use 5.10.1;
-
+use 5.16.0;
+use utf8;
 use warnings;
-use strict;
+
+# {{{ use block
 
 use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 my %N2J = qw(
   1 ichi 2 ni 3 san 4 yon 5 go 6 roku 7 nana 
@@ -105,7 +104,7 @@ Lingua::JPN::Number - Translate Numbers into Japanese
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -205,12 +204,14 @@ C<Lingua::JPN::Number::Misc> to cover the
 idiosyncrasies of japanese counting of tall and
 flat things, persons and miscellaneous items.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions:
-   Richard C. Jelinek <info@petamem.com>
  initial coding:
-   Mike Schilli <m@perlmeister.com>
+   Mike Schilli E<lt>m@perlmeister.comE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
@@ -218,6 +219,12 @@ Copyright (c) 2001 Mike Schilli. All rights
 reserved. This program is free software; you can
 redistribute it and/or modify it under the same
 terms as Perl itself.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

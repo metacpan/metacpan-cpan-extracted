@@ -60,13 +60,24 @@ my $one_or_greater = {
     keep       => '[ 1-9 ][ 0-9 ]*',
     ll         => '[ 1-9 ][ 0-9 ]*',
     max_cols   => '[ 1-9 ][ 0-9 ]*',
-    max_height => '[ 1-9 ][ 0-9 ]*',
-    max_width  => '[ 1-9 ][ 0-9 ]*',
 };
 my @val_one_or_greater = ( 1, 2, 100, 999999, undef );
 
 for my $opt ( sort keys %$one_or_greater ) {
     for my $val ( @val_one_or_greater ) {
+        ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
+    }
+}
+
+
+my $two_or_greater = {
+    max_height => '(?:[2-9]|[ 1-9 ][ 0-9 ]+)',
+    max_width  => '(?:[2-9]|[ 1-9 ][ 0-9 ]+)',
+};
+my @val_two_or_greater = ( 2, 100, 999999, undef );
+
+for my $opt ( sort keys %$two_or_greater ) {
+    for my $val ( @val_two_or_greater ) {
         ok( ! defined( $f = exception { $d = choose( $choices, { $opt => $val } ) } ), ( "|$f|:" // 'OK' ) . " $opt => $val" );
     }
 }

@@ -1,5 +1,5 @@
 package IO::K8s::Api::Rbac::V1alpha1::RoleBindingList;
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 # ABSTRACT: Deprecated - use IO::K8s::List instead
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ IO::K8s::Api::Rbac::V1alpha1::RoleBindingList - Deprecated - use IO::K8s::List i
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 SUPPORT
 

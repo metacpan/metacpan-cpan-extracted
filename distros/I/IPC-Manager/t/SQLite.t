@@ -1,5 +1,5 @@
-use strict;
-use warnings;
+use Test2::V1 -ipP;
+use Test2::IPC;
 
 use Test2::Require::Module 'DBI';
 use Test2::Require::Module 'DBD::SQLite';
@@ -12,4 +12,12 @@ skipall_unless_can_db(driver => 'SQLite');
     $main::PROTOCOL = 'SQLite';
 }
 
-do './t/generic_test.pl' or die $@;
+subtest general => sub {
+    do './t/generic_test.pl' or die $@;
+};
+
+subtest service => sub {
+    do './t/service_test.pl' or die $@;
+};
+
+done_testing;

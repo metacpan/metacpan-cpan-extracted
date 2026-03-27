@@ -1,5 +1,5 @@
 package Thunderhorse::App;
-$Thunderhorse::App::VERSION = '0.102';
+$Thunderhorse::App::VERSION = '0.103';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -10,7 +10,7 @@ use Thunderhorse::Context;
 use Thunderhorse::Router;
 use Thunderhorse::Controller;
 use Thunderhorse::AppController;
-use Path::Tiny;
+use Path::Tiny ();    # path attribute exists in this package
 
 use HTTP::Status qw(status_message);
 use IO::Async::Loop;

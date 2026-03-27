@@ -1,5 +1,5 @@
 package Kubernetes::REST::Call::v1::Storage::DeleteStorageClass;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: Deprecated - use the new Kubernetes::REST API instead
 use strict;
 use warnings;
@@ -18,7 +18,7 @@ Kubernetes::REST::Call::v1::Storage::DeleteStorageClass - Deprecated - use the n
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SUPPORT
 

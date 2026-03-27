@@ -4,6 +4,7 @@ author:
   - 'Torsten Raudssus <torsten@raudssus.de>'
   - 'Jose Luis Martinez Torres <jlmartin@cpan.org>'
 build_requires:
+  Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0'
 configure_requires:
@@ -32,7 +33,7 @@ resources:
   bugtracker: https://github.com/pplu/io-k8s-p5/issues
   homepage: https://github.com/pplu/io-k8s-p5
   repository: https://github.com/pplu/io-k8s-p5.git
-version: '1.009'
+version: '1.100'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -286,7 +287,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.009'
+          tag: '1.100'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

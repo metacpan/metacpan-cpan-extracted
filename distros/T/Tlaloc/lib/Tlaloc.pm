@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Tlaloc', $VERSION);
@@ -21,7 +21,7 @@ Tlaloc - Wetness magic on Perl scalars, blessed by the Aztec rain god
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -146,16 +146,15 @@ Ties the array or hash with wetness tracking. Returns the tied object,
 which you can use to call C<wetness()>, C<is_wet()>, C<is_dry()>,
 C<evap_rate()>, C<drench()>, C<wet()> methods.
 
-Element access (FETCH), existence checks, iterations, size checks, and
-removal operations (POP, SHIFT, SPLICE) all trigger evaporation. Stores
-and additions (STORE, PUSH, UNSHIFT) do NOT evaporate.
+Element access (FETCH), existence checks, iterations, and
+removal operations (POP, SHIFT, SPLICE) all trigger evaporation. Stores,
+additions (STORE, PUSH, UNSHIFT), and size queries do NOT evaporate.
 
     my @arr = (1, 2, 3);
     my $tied = wet_tie(\@arr, 10);
 
     # These evaporate:
     my $x = $arr[0];       # FETCH
-    my $len = scalar @arr; # FETCHSIZE
     for (@arr) { }         # iteration (FETCH per element)
     exists $arr[0];        # EXISTS
     my $p = pop @arr;      # POP
@@ -165,6 +164,7 @@ and additions (STORE, PUSH, UNSHIFT) do NOT evaporate.
     $arr[0] = 99;          # STORE
     push @arr, 4;          # PUSH
     unshift @arr, 0;       # UNSHIFT
+    my $len = scalar @arr; # FETCHSIZE (metadata only)
 
 =head2 untie_wet(\@array)
 

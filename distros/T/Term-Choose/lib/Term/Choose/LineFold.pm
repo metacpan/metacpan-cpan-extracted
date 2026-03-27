@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.780';
+our $VERSION = '1.781';
 
 use Exporter qw( import );
 
@@ -54,13 +54,6 @@ sub line_fold {
     if ( ! length $str ) {
         return $str;
     }
-    ################################### 24.03.2025
-    if ( defined $opt && ! ref $opt ) {
-        my $width = $opt;
-        $opt = $_[2] // {};
-        $opt->{width} = $width;
-    }
-    ###################################
     $opt //= {};
     $opt->{join} //= 1;
     if ( ! defined $opt->{width} ) {
@@ -195,7 +188,7 @@ Term::Choose::LineFold
 
 =head1 VERSION
 
-Version 1.780
+Version 1.781
 
 =cut
 

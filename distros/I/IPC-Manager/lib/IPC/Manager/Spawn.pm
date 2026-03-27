@@ -2,7 +2,9 @@ package IPC::Manager::Spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
+
+use POSIX();
 
 use Carp qw/croak/;
 use IPC::Manager::Serializer::JSON();
@@ -21,6 +23,8 @@ use Object::HashBase qw{
     <stash
     <pid
     <signal
+
+    do_sanity_check
 };
 
 sub init {
@@ -32,6 +36,38 @@ sub init {
     croak "'protocol' is a required attribute"   unless $self->{+PROTOCOL};
     croak "'route' is a required attribute"      unless $self->{+ROUTE};
     croak "'serializer' is a required attribute" unless $self->{+SERIALIZER};
+}
+
+sub cleave {
+    my $self = shift;
+
+    my ($rh, $wh);
+    pipe($rh, $wh) or die "Could not open a pipe: $!";
+
+    my $pid = fork() // die "Could not fork: $!";
+
+    if ($pid) {
+        close($wh);
+        chomp(my $out = <$rh>);
+        close($rh);
+        return $self->{+PID} = $out;
+    }
+
+    close($rh);
+    POSIX::setsid() or die "Can't start a new session: $!";
+
+    $pid = fork() // die "Could not fork: $!";
+
+    if ($pid) {
+        close($wh);
+        POSIX::_exit(0);
+    }
+
+    print $wh "$pid\n";
+    close($wh);
+
+    $self->{+PID} = $$;
+    return 0;
 }
 
 sub info {
@@ -143,7 +179,7 @@ sub shutdown {
 
     $self->terminate($con);
     $self->wait($con);
-    $self->sanity_check($con);
+    $self->sanity_check($con) if $self->do_sanity_check;
 
     $con->disconnect;
     $con = undef;
@@ -228,9 +264,21 @@ can also be used independently if you want to avoid exceptions.
 
 Get the serializer used by the IPC system.
 
+=item $pid_or_0 = $spawn->cleave()
+
+Uses double-fork and setsid to create a new process. The ownership of the spawn
+will be transferred away from the current process and into the new one. The
+original process can exit without ending the IPC state or terminating the new
+process.
+
+Returns a pid in the parent, 0 in the new process.
+
+This is essentially daemonize logic except that the parent does not exit, and
+IO is not disconnected.
+
 =item $spawn->shutdown()
 
-Shuws down the IPC system:
+Shuts down the IPC system:
 
     my $con = $spawn->connect('spawn');
 
@@ -276,7 +324,7 @@ Wait for all clients to disconnect.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

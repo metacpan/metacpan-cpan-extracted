@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::LifecycleHandler;
 # ABSTRACT: LifecycleHandler defines a specific action that should be taken in a lifecycle hook. One and only one of the fields, except TCPSocket must be specified.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s exec => 'Core::V1::ExecAction';
@@ -29,7 +29,7 @@ IO::K8s::Api::Core::V1::LifecycleHandler - LifecycleHandler defines a specific a
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 exec
 

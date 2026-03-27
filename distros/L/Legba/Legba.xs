@@ -144,39 +144,104 @@ static SV* cv_get_slot(pTHX_ CV *cv) {
 /* Old entersub checker */
 static Perl_check_t old_entersub_checker;
 
+/* Old peephole optimizer */
+static peep_t old_peepp;
+
+/* Count args in an entersub op (excluding pushmark and rv2cv) */
+static int count_entersub_args(pTHX_ OP *entersubop) {
+    OP *kid, *first;
+    int count = 0;
+    
+    if (!entersubop || entersubop->op_type != OP_ENTERSUB)
+        return -1;
+    
+    first = cUNOPx(entersubop)->op_first;
+    if (!first) return -1;
+    
+    /* Handle ex-list wrapping the args */
+    if (first->op_type == OP_NULL) {
+        first = cUNOPx(first)->op_first;
+        if (!first) return -1;
+    }
+    
+    /* Walk kids: pushmark, args..., rv2cv (or ex-rv2cv/gv) */
+    for (kid = first; kid; kid = OpSIBLING(kid)) {
+        if (kid->op_type == OP_PUSHMARK || kid->op_type == OP_PADRANGE)
+            continue;
+        /* Skip rv2cv and nullified rv2cv (ex-rv2cv) and direct gv */
+        if (kid->op_type == OP_RV2CV)
+            continue;
+        if (kid->op_type == OP_NULL && kid->op_targ == OP_RV2CV)
+            continue;
+        if (kid->op_type == OP_GV && !OpSIBLING(kid))
+            continue;  /* Last GV is the function */
+        count++;
+    }
+    return count;
+}
+
+/* Get the GV from an entersub op's rv2cv child */
+static GV* get_entersub_gv(pTHX_ OP *entersubop) {
+    OP *kid, *first, *cvop = NULL;
+    OP *gvop;
+    
+    if (!entersubop || entersubop->op_type != OP_ENTERSUB)
+        return NULL;
+    
+    first = cUNOPx(entersubop)->op_first;
+    if (!first) return NULL;
+    
+    /* Handle ex-list wrapping the args */
+    if (first->op_type == OP_NULL) {
+        first = cUNOPx(first)->op_first;
+        if (!first) return NULL;
+    }
+    
+    /* Find rv2cv or ex-rv2cv (nullified) - it's the last kid */
+    for (kid = first; kid; kid = OpSIBLING(kid)) {
+        cvop = kid;
+    }
+    
+    /* Handle both OP_RV2CV and nullified (ex-rv2cv) */
+    if (!cvop) return NULL;
+    if (cvop->op_type == OP_RV2CV) {
+        gvop = cUNOPx(cvop)->op_first;
+    } else if (cvop->op_type == OP_NULL && cvop->op_targ == OP_RV2CV) {
+        /* Nullified rv2cv - child is the gv */
+        gvop = cUNOPx(cvop)->op_first;
+    } else if (cvop->op_type == OP_GV) {
+        /* Direct gv (sometimes used) */
+        gvop = cvop;
+    } else {
+        return NULL;
+    }
+    
+    if (!gvop || gvop->op_type != OP_GV)
+        return NULL;
+    
+    return cGVOPx_gv(gvop);
+}
+
 /* Our entersub checker - replaces slot accessor calls with custom ops */
 static OP* legba_ck_entersub(pTHX_ OP *entersubop) {
-    OP *aop, *cvop;
     CV *cv;
     GV *gv;
     SV *slot;
     SLOTOP *slotop;
-    bool has_args = FALSE;
+    int argc;
     
     /* Call original checker first */
     entersubop = old_entersub_checker(aTHX_ entersubop);
     
-    /* Find the CV being called - it's the last kid */
-    aop = cUNOPx(entersubop)->op_first;
-    if (!aop) return entersubop;
+    /* Count args */
+    argc = count_entersub_args(aTHX_ entersubop);
     
-    /* Skip pushmark and args to find cvop */
-    for (cvop = aop; OpSIBLING(cvop); cvop = OpSIBLING(cvop)) {
-        if (cvop != aop && cvop->op_type != OP_PUSHMARK && cvop->op_type != OP_NULL) {
-            has_args = TRUE;
-        }
-    }
+    /* Only handle no-arg getters in checker */
+    /* Setters handled by peephole optimizer after op tree is finalized */
+    if (argc != 0) return entersubop;
     
-    /* Only optimize no-arg calls (getters) for now */
-    /* Setters fall back to XS accessor which is still fast */
-    if (has_args) return entersubop;
-    
-    /* cvop should be rv2cv(gv) or similar */
-    if (cvop->op_type != OP_RV2CV) return entersubop;
-    if (!cUNOPx(cvop)->op_first) return entersubop;
-    if (cUNOPx(cvop)->op_first->op_type != OP_GV) return entersubop;
-    
-    gv = cGVOPx_gv(cUNOPx(cvop)->op_first);
+    /* Get the GV being called */
+    gv = get_entersub_gv(aTHX_ entersubop);
     if (!gv || !GvCV(gv)) return entersubop;
     
     cv = GvCV(gv);
@@ -198,7 +263,65 @@ static OP* legba_ck_entersub(pTHX_ OP *entersubop) {
     return (OP*)slotop;
 }
 
-/* The slot accessor - fallback for when checker doesn't run */
+/* Peephole optimizer - catches setter calls and other patterns */
+static void legba_peep(pTHX_ OP *o) {
+    OP *orig_start = o;
+    OP *prev = NULL;
+    OP *prevprev = NULL;
+    GV *gv;
+    CV *cv;
+    SV *slot;
+    SLOTOP *slotop;
+    int argc;
+    
+    /* Call original peephole first */
+    old_peepp(aTHX_ o);
+    
+    /* Walk the op chain looking for entersub that calls slot accessor */
+    for (; o; prevprev = prev, prev = o, o = o->op_next) {
+        if (o->op_type != OP_ENTERSUB) continue;
+        if (!prev || !prevprev) continue;  /* Need 2 previous ops to splice around gv */
+        
+        /* Check arg count - only handle single-arg setters */
+        argc = count_entersub_args(aTHX_ o);
+        if (argc != 1) continue;
+        
+        /* prev should be the gv op that pushes the CV */
+        if (prev->op_type != OP_GV) continue;
+        
+        /* Get the GV */
+        gv = cGVOPx_gv(prev);
+        if (!gv || !GvCV(gv)) continue;
+        
+        cv = GvCV(gv);
+        slot = cv_get_slot(aTHX_ cv);
+        if (!slot) continue;
+        
+        /* This is a slot setter call - create SLOTOP and splice in */
+        NewOp(1101, slotop, 1, SLOTOP);
+        slotop->op_type = OP_CUSTOM;
+        slotop->op_ppaddr = pp_slot_set;
+        slotop->op_flags = o->op_flags & OPf_WANT;
+        slotop->op_private = 0;
+        slotop->op_next = o->op_next;
+        slotop->slot = slot;
+        
+        /* Splice: prevprev -> slotop, skipping both gv and entersub */
+        prevprev->op_next = (OP*)slotop;
+        
+        /* Nullify both gv and entersub */
+        prev->op_type = OP_NULL;
+        prev->op_ppaddr = PL_ppaddr[OP_NULL];
+        o->op_type = OP_NULL;
+        o->op_ppaddr = PL_ppaddr[OP_NULL];
+        
+        /* Continue from slotop */
+        prev = prevprev;
+        o = (OP*)slotop;
+    }
+}
+
+/* The slot accessor - fallback for when checker/peep doesn't run */
 XS(slot_accessor)
 {
     dXSARGS;
@@ -234,9 +357,13 @@ BOOT:
     slot_index = newHV();
     next_slot = 0;
     
-    /* Install entersub checker to optimize slot accessor calls */
+    /* Install entersub checker to optimize getter calls at compile time */
     old_entersub_checker = PL_check[OP_ENTERSUB];
     PL_check[OP_ENTERSUB] = legba_ck_entersub;
+    
+    /* Install peephole optimizer to optimize setter calls */
+    old_peepp = PL_peepp;
+    PL_peepp = legba_peep;
     
     /* Register custom op - XOP API requires 5.14+ */
 #if PERL_VERSION >= 14
@@ -461,7 +588,7 @@ import(...)
         stash = CopSTASH(PL_curcop);
         if (stash) {
             pkg_name = HvNAME(stash);
-            pkg_len = HvNAMELEN(stash);
+            pkg_len = HvNAMELEN_get(stash);
         } else {
             stash = PL_defstash;
             pkg_name = "main";

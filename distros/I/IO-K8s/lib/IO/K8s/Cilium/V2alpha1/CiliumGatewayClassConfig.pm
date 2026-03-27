@@ -1,9 +1,10 @@
 package IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig;
 # ABSTRACT: Cilium Gateway API class configuration
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject
     api_version     => 'cilium.io/v2alpha1',
     resource_plural => 'ciliumgatewayclassconfigs';
+with 'IO::K8s::Role::Namespaced';
 
 k8s spec   => { Str => 1 };
 k8s status => { Str => 1 };
@@ -22,7 +23,7 @@ IO::K8s::Cilium::V2alpha1::CiliumGatewayClassConfig - Cilium Gateway API class c
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

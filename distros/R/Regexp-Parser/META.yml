@@ -19,11 +19,12 @@ no_index:
     - t
     - inc
 requires:
+  parent: '0'
   perl: '5.016'
 resources:
-  bugtracker: https://github.com/toddr/Regexp-Parser/issues
-  homepage: http://wiki.github.com/toddr/Regexp-Parser
-  license: http://dev.perl.org/licenses/
-  repository: http://github.com/toddr/Regexp-Parser/tree/master
-version: '0.26'
+  bugtracker: https://github.com/cpan-authors/Regexp-Parser/issues
+  homepage: https://github.com/cpan-authors/Regexp-Parser
+  license: https://dev.perl.org/licenses/
+  repository: https://github.com/cpan-authors/Regexp-Parser.git
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

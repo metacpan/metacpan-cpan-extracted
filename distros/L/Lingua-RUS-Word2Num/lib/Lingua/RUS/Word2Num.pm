@@ -1,42 +1,38 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 
 package Lingua::RUS::Word2Num;
-# ABSTRACT: Word 2 number conversion in RUS.
+# ABSTRACT: Word to number conversion in Russian
+
+use 5.16.0;
+use utf8;
+use warnings;
 
 # {{{ use block
 
-use 5.10.1;
-
-use strict;
-use warnings;
-
-use utf8;
 use Export::Attrs;
 use Carp;
 use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 my  $parser  = ru_numerals();
 
 # }}}
 
-# {{{ w2n                                         convert number to text
+# {{{ w2n                                         convert text to number
 
 sub w2n :Export {
     my $input = shift // return;
 
-    $input =~ s/^\s+одна тысяча / тысяч /g;    # Thousand variations. We just want one
-    $input =~ s/ тысячи / тысяч /g;
-    $input =~ s/ тысячa / тысяч /g;
-    $input =~ s/ тысяча / тысяч /g;
+    $input .= " ";                             # Grant end space before normalizing
 
-    $input =~ s/^\s+один миллион / миллион /g; # Million variations. We just want one
-    $input =~ s/ миллиона / миллион /g;
-    $input =~ s/ миллионов / миллион /g;
+    $input =~ s/тысячи /тысяч /g;              # Thousand variations. Normalize to тысяч
+    $input =~ s/тысячa /тысяч /g;
+    $input =~ s/тысяча /тысяч /g;
 
-    $input .= " ";                             # Grant end space
+    $input =~ s/миллиона /миллион /g;          # Million variations. Normalize to миллион
+    $input =~ s/миллионов /миллион /g;
 
     return $parser->numeral($input);
 }
@@ -76,7 +72,7 @@ sub ru_numerals {
         |     'один '         { $return = 1; }
         |     'ноль '         { $return = 0; }
 
-      tens:   'двадцать '    { $return = 20; }                        # try to find a word that representates
+      tens:   'двадцать '    { $return = 20; }                        # try to find a word that represents
         |     'тридцать '    { $return = 30; }                        # values 20,30,..,90
         |     'сорок '       { $return = 40; }
         |     'пятьдесят '   { $return = 50; }
@@ -85,7 +81,7 @@ sub ru_numerals {
         |     'восемьдесят ' { $return = 80; }
         |     'девяносто '   { $return = 90; }
 
-     hundreds: 'сто '       { $return = 100; }                        # try to find a word that representates
+     hundreds: 'сто '       { $return = 100; }                        # try to find a word that represents
         |      'сотня '     { $return = 100; }                        # values 200,300,..,900
         |      'двести '    { $return = 200; }
         |      'триста '    { $return = 300; }
@@ -157,13 +153,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::RUS::Word2Num  
+Lingua::RUS::Word2Num - Word to number conversion in Russian
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Word 2 number conversion in RUS.
+version 0.2603260
 
 Lingua::RUS::Word2Num is module for converting text containing number
 representation in Russian back into number. Converts whole numbers
@@ -205,13 +200,11 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
-
 =item B<ru_numerals> (void)
 
   =>  obj  new parser object
 
 Internal parser.
-
 
 =back
 
@@ -226,7 +219,6 @@ Internal parser.
 
 =item w2n
 
-
 =back
 
 =cut
@@ -236,15 +228,22 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2004-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

@@ -36,14 +36,8 @@
 #  define DEBUG_SET_CURCOP_LINE(line)
 #endif
 
-#if HAVE_PERL_VERSION(5, 22, 0)
-#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
-      STMT_START { (sv)->xpadn_low = (val); } STMT_END
-#else
-  /* Before Perl 5.22, padnames were just normal SVs with some weird fields in them */
-#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
-      STMT_START { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = (val); } STMT_END
-#endif
+#define COP_SEQ_RANGE_LOW_set(sv,val)  \
+    STMT_START { (sv)->xpadn_low = (val); } STMT_END
 
 #ifndef COP_SEQMAX_INC
 #define COP_SEQMAX_INC \
@@ -607,7 +601,8 @@ void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
     }
     else {
       SvREFCNT_dec(PadARRAY(pad1)[PADIX_EMBEDDING]);
-      PadARRAY(pad1)[PADIX_EMBEDDING] = &PL_sv_undef;
+      /* Unembedded role CVs store the entire class map */
+      PadARRAY(pad1)[PADIX_EMBEDDING] = SvREFCNT_inc(meta->role.applied_classes);
     }
   }
 }
@@ -785,17 +780,13 @@ static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *bo
   }
 
   if(!is_common) {
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
     AV *fieldmap = newAV();
     U32 fieldcount = 0, max_fieldix = 0;
 
     SAVEFREESV((SV *)fieldmap);
-#endif
 
-#if HAVE_PERL_VERSION(5, 22, 0)
     PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
     U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
-#endif
 
     int i;
     for(i = 0; i < nfields; i++) {
@@ -804,14 +795,7 @@ static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *bo
       if(snames) {
         PADNAME *fieldname = snames[i + 1];
 
-        if(!fieldname
-#if HAVE_PERL_VERSION(5, 22, 0)
-          /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
-           * slots are actually being used
-           */
-           || PadnameREFCNT(fieldname) < 2
-#endif
-          )
+        if(!fieldname || PadnameREFCNT(fieldname) < 2)
             continue;
       }
 
@@ -831,20 +815,13 @@ static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *bo
         case '%': private = OPpFIELDPAD_HV; break;
       }
 
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
       PERL_UNUSED_VAR(opflags_if_role);
       assert((fieldix & ~FIELDIX_MASK) == 0);
       av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
       fieldcount++;
       if(fieldix > max_fieldix)
         max_fieldix = fieldix;
-#else
-      ops = op_append_list(OP_LINESEQ, ops,
-        /* alias the padix from the field */
-        newFIELDPADOP(private << 8 | opflags_if_role, padix, fieldix));
-#endif
 
-#if HAVE_PERL_VERSION(5, 22, 0)
       if(snames) {
         PADNAME *fieldname = snames[i + 1];
 
@@ -859,10 +836,8 @@ static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *bo
         COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
         COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
       }
-#endif
     }
 
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
     if(fieldcount) {
       UNOP_AUX_item *aux;
       Newx(aux, 2 + fieldcount*2, UNOP_AUX_item);
@@ -879,7 +854,6 @@ static OP *S_prepend_methstart_ops(pTHX_ ClassMeta *meta, CV *outerscope, OP *bo
         (aux++)->uv = SvUV(AvARRAY(fieldmap)[i]);
       }
     }
-#endif
   }
 
   return op_append_list(OP_LINESEQ, ops, body);

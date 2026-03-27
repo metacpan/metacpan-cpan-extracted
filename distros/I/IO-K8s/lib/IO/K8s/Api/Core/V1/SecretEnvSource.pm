@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::SecretEnvSource;
 # ABSTRACT: SecretEnvSource selects a Secret to populate the environment variables with. The contents of the target Secret's Data field will represent the key-value pairs as environment variables.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s name => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::SecretEnvSource - SecretEnvSource selects a Secret to po
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 name
 

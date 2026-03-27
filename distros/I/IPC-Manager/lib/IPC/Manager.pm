@@ -1,24 +1,48 @@
 package IPC::Manager;
 use strict;
 use warnings;
+use feature qw/state/;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
-use Carp qw/croak/;
+use Carp qw/croak carp/;
+use Time::HiRes qw/sleep time/;
+
+use POSIX();
+use Role::Tiny();
 
 use IPC::Manager::Spawn();
 use IPC::Manager::Serializer::JSON();
 
+use IPC::Manager::Util qw/require_mod clone_io/;
+
 use Importer Importer => 'import';
 
-our @EXPORT_OK = qw/ipcm_connect ipcm_reconnect ipcm_spawn ipcm/;
+our @EXPORT_OK = qw{
+    ipcm_connect
+    ipcm_reconnect
+    ipcm_spawn
+    ipcm
 
-sub ipcm()         { __PACKAGE__ }
-sub connect        { shift; ipcm_connect(@_) }
-sub reconnect      { shift; ipcm_reconnect(@_) }
-sub spawn          { shift; ipcm_spawn(@_) }
-sub ipcm_connect   { _connect(connect   => @_) }
-sub ipcm_reconnect { _connect(reconnect => @_) }
+    ipcm_default_protocol
+    ipcm_default_serializer
+    ipcm_default_protocol_list
+
+    ipcm_service
+    ipcm_worker
+};
+
+sub ipcm()                { __PACKAGE__ }
+sub connect               { shift; ipcm_connect(@_) }
+sub reconnect             { shift; ipcm_reconnect(@_) }
+sub spawn                 { shift; ipcm_spawn(@_) }
+sub service               { shift; ipcm_service(@_) }
+sub worker                { shift; ipcm_worker(@_) }
+sub default_protocol      { shift; ipcm_default_protocol(@_) }
+sub default_serializer    { shift; ipcm_default_serializer(@_) }
+sub default_protocol_list { shift; ipcm_default_protocol_list(@_) }
+sub ipcm_connect          { _connect(connect   => @_) }
+sub ipcm_reconnect        { _connect(reconnect => @_) }
 
 sub _parse_cinfo {
     my $cinfo = shift;
@@ -38,8 +62,8 @@ sub _parse_cinfo {
         croak "Not sure what to do with $cinfo";
     }
 
-    _require_mod($protocol);
-    _require_mod($serializer);
+    require_mod($protocol);
+    require_mod($serializer);
 
     return ($protocol, $serializer, $route);
 }
@@ -64,60 +88,258 @@ sub _connect {
     return $protocol->$meth($id, $serializer, $route, %params);
 }
 
-sub _require_mod {
-    my $mod = shift;
+sub ipcm_default_protocol {
+    state $default = undef;
 
-    my $file = $mod;
-    $file =~ s{::}{/}g;
-    $file .= ".pm";
+    if (@_) {
+        my $protocol = _parse_protocol(@_);
+        require_mod($protocol);
+        $default = $protocol;
+    }
 
-    require($file);
+    return $default;
+}
+
+sub ipcm_default_protocol_list {
+    state $default = [
+        'AtomicPipe',
+        'UnixSocket',
+        'SQLite',
+        'PostgreSQL',
+        'MariaDB',
+        'MySQL',
+        'MessageFiles',
+    ];
+
+    if (@_) {
+        if (@_ == 1 && ref($_[0]) eq 'ARRAY') {
+            $default = [ @{$_[0]} ];
+        }
+        else {
+            $default = [@_];
+        }
+    }
+
+    return $default;
+}
+
+sub ipcm_default_serializer {
+    state $default = 'JSON';
+
+    if (@_) {
+        my $serializer = _parse_serializer(@_);
+        require_mod($serializer);
+        $default = $serializer;
+    }
+
+    return $default;
 }
 
 sub ipcm_spawn {
     my %params = @_;
 
-    my $guard      = delete $params{guard}      // 1;
-    my $serializer = delete $params{serializer} // 'JSON';
-    my $protocol   = delete $params{protocol};
-    my $protocols  = delete $params{procotols} // [
-        'PostgreSQL',
-        'MariaDB',
-        'MySQL',
-        'SQLite',
-        'UnixSocket',
-        'AtomicPipe',
-        'MessageFiles',
-    ];
+    my $guard           = delete $params{guard}           // 1;
+    my $do_sanity_check = delete $params{do_sanity_check} // 0;
+    my $serializer      = delete $params{serializer}      // ipcm_default_serializer();
+    my $protocol        = delete $params{protocol}        // ipcm_default_protocol();
+    my $protocols       = delete $params{protocols}       // ipcm_default_protocol_list();
 
     if ($protocol) {
         $protocol = _parse_protocol($protocol);
-        _require_mod($protocol);
+        require_mod($protocol);
     }
     else {
         for my $prot (@$protocols) {
             $prot = _parse_protocol($prot);
 
             local $@;
-            eval { _require_mod($prot); $prot->viable } or next;
+            eval { require_mod($prot); $prot->viable } or next;
 
             $protocol = $prot;
             last;
         }
+
+        croak "Could not find a viable protocol" unless $protocol;
     }
 
     $serializer = _parse_serializer($serializer);
-    _require_mod($serializer);
+    require_mod($serializer);
 
     my ($route, $stash) = $protocol->spawn(%params, serializer => $serializer);
 
     return IPC::Manager::Spawn->new(
-        protocol   => $protocol,
-        serializer => $serializer,
-        route      => $route,
-        stash      => $stash,
-        guard      => $guard,
+        protocol        => $protocol,
+        serializer      => $serializer,
+        route           => $route,
+        stash           => $stash,
+        guard           => $guard,
+        do_sanity_check => $do_sanity_check,
     );
+}
+
+{
+    my $base_0 = $0;
+    my $service_inst;
+
+    sub ipcm_worker {
+        my ($name, $cb) = @_;
+
+        croak "ipcm_service_worker() can only be called from inside a service"
+            unless $service_inst && ref($service_inst) ne 'CODE';
+
+        my $pid = fork // die "Could not fork: $!";
+        if ($pid) {
+            $service_inst->register_worker($name => $pid);
+            return $pid;
+        }
+
+        $0 = "$0 $name";
+
+        $service_inst = $cb;
+        no warnings 'exiting';
+        redo SERVICE;
+        die "This should not be reachable";
+    }
+
+    sub ipcm_service {
+        my ($name, @args) = @_;
+
+        {
+            my $return_handle = defined(wantarray) ? 1 : 0;
+
+            my %params;
+            if (@args == 1 && ref($args[0]) eq 'CODE') {
+                $params{class}  = 'IPC::Manager::Service';
+                $params{on_all} = $args[0];
+            }
+            elsif (@args == 2 && ref($args[0]) eq 'HASH' && ref($args[1]) eq 'CODE') {
+                %params         = %{$args[0]};
+                $params{class}  = 'IPC::Manager::Service';
+                $params{on_all} = $args[1];
+            }
+            else {
+                %params = @_;
+            }
+
+            my $skip_role_checks = delete $params{skip_role_checks};
+
+            $params{name} = $name;
+
+            $params{orig_io} //= $service_inst ? $service_inst->orig_io : {
+                stderr => clone_io('>&', \*STDERR),
+                stdout => clone_io('>&', \*STDOUT),
+                stdin  => clone_io('<&', \*STDIN),
+            };
+
+            if ($service_inst && !$params{redirect}) {
+                if (my $redir = $service_inst->redirect) {
+                    $params{redirect} = $redir unless defined($redir->{inherit}) && !$redir->{inherit};
+                }
+            }
+
+            my $new_ipcm = delete $params{new_ipcm};
+
+            my $handle_params = delete $params{handle_params} // {};
+            if ($params{ipcm_info}) {
+                croak "'new_ipcm' and 'ipcm_info' may not be combined" if $new_ipcm;
+            }
+            else {
+                if ($service_inst && !$new_ipcm) {
+                    $handle_params->{_peer} = 1;
+                    $params{ipcm_info} = $service_inst->ipcm_info;
+                }
+                elsif ($return_handle) {
+                    $handle_params->{spawn} = ipcm_spawn();
+                    $params{ipcm_info} = $handle_params->{spawn}->info;
+                    $params{watch_pids} = [$$];
+                }
+                else {
+                    croak "Cannot be called in void context without providing 'ipcm_info'";
+                }
+            }
+
+            my $class = require_mod(delete $params{class} // 'IPC::Manager::Service');
+
+            croak "'$class' does not implement the 'IPC::Manager::Role::Service' role"
+                unless $skip_role_checks || Role::Tiny::does_role($class, 'IPC::Manager::Role::Service');
+
+            my $new_inst = $class->new(%params);
+
+            $new_inst->pre_fork_hook();
+
+            my $pid = fork // die "Could not fork: $!";
+
+            # In parent
+            if ($pid) {
+                return unless $return_handle;
+
+                my $out;
+
+                if (delete $handle_params->{_peer}) {
+                    $out = $new_inst->peer($params{name}, %$handle_params);
+                }
+                else {
+                    $out = $new_inst->handle(%$handle_params, name => "service_parent_$$");
+                }
+
+                my $timeout = $params{timeout} || 10;
+
+                my $start = time;
+                until ($out->ready) {
+                    my $delta = time - $start;
+                    last if $delta > $timeout;
+                    sleep 0.025;
+                }
+
+                croak "Timeout waiting for service to come up after ${timeout}s"
+                    unless $out->ready;
+
+                return $out;
+            }
+
+            $new_inst->set_pid($$);
+
+            $0 = delete($params{rebase_0}) ? "$base_0 $name" : "$0 $name";
+
+            # Figure out if we already had a service
+            my $prev_service = $service_inst ? 1 : 0;
+
+            # Set the new instance as the current one
+            $service_inst = $new_inst;
+
+            # If we want the stack to unwind, use this to unwind it (nested services)
+            if ($prev_service) {
+                no warnings 'exiting';
+                redo SERVICE;
+                die "This should not be reachable";
+            }
+        }
+
+        # Run the service
+        # We have this label here for the 'redo' above.
+        SERVICE: {
+            # Get a copy to work with, the $service_inst can be replaced before this block exits.
+            my $using_service = $service_inst;
+
+            eval {
+                if (ref($using_service) eq 'CODE') {
+                    my $exit = $using_service->();
+                    exit($exit);
+                }
+                else {
+                    my $exit = $using_service->run() // 0;
+                    $using_service->use_posix_exit ? POSIX::_exit($exit) : exit($exit);
+                }
+                1;
+            } or warn $@;
+
+            POSIX::_exit(255);
+        }
+
+        # This should not be reachable....
+        eval { warn "Scope leak in service '$name' process $$" };
+        POSIX::_exit(255);
+    }
 }
 
 1;
@@ -197,6 +419,25 @@ for you:
 C<ipcm()> is an alias for C<IPC::Manager>. You can use it to call spawn,
 connect, or reconnect without importing C<ipcm_spawn()>, C<ipcm_connect()>, or
 C<ipcm_reconnect()> into your namespace.
+
+=item $protocol = ipcm_default_protocol()
+
+=item ipcm_default_protocol($protocol)
+
+Get or set the default protocol. This is undef until set.
+
+=item $protocol_list = ipcm_default_protocol_list()
+
+=item ipcm_default_protocol_list(\@protocol_list)
+
+Default set of protocols to try, in the order they should be tried.
+
+=item $serializer = ipcm_default_serializer()
+
+=item ipcm_default_serializer($serializer)
+
+Get or set the default serializer. 'JSON' is the default unless this is
+changed.
 
 =item $ipcm = ipcm_spawn()
 
@@ -340,7 +581,7 @@ See L<IPC::Manager::Spawn> for more information.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

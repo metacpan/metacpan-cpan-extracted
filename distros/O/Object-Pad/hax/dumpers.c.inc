@@ -95,15 +95,9 @@ static void S_padlist_dump_depth(pTHX_ PADLIST *padlist, I32 depth)
         fprintf(stderr, " *OUTER");
       if(PadnameIsSTATE(pn))
         fprintf(stderr, " *STATE");
-#if HAVE_PERL_VERSION(5, 22, 0)
       if(PadnameLVALUE(pn))
         fprintf(stderr, " *LV");
-#endif
 
-#if !HAVE_PERL_VERSION(5, 22, 0)
-      /* before Perl 5.22's PADNAME structure, padix==0 does not have COP_SEQ */
-      if(padix > 0)
-#endif
       fprintf(stderr, " [%d..%d]",
           COP_SEQ_RANGE_LOW(pn), COP_SEQ_RANGE_HIGH(pn));
     }

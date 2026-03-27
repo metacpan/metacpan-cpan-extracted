@@ -1,0 +1,40 @@
+Slug - XS URL slug generator with custom ops
+
+SYNOPSIS
+
+    use Slug qw(slug slug_ascii slug_custom);
+
+    slug("Hello World!")              # "hello-world"
+    slug("Cafe Resume", "_")          # "cafe_resume"
+    slug_ascii("naive cafe")          # "naive cafe"
+    slug_custom("My Title", {         # "my-title"
+        separator  => '-',
+        max_length => 50,
+        lowercase  => 1,
+    });
+
+DESCRIPTION
+
+    Fast XS URL slug generator. Converts arbitrary UTF-8 strings into
+    URL-safe, SEO-friendly slugs. Features:
+
+    - Unicode to ASCII transliteration (Latin, Greek, Cyrillic, Vietnamese)
+    - Custom ops on Perl 5.14+ for zero-overhead dispatch
+    - Single-pass streaming algorithm
+    - Pure C core reusable from other projects
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+AUTHOR
+
+    lnation <email@lnation.org>
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

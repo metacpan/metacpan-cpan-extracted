@@ -1,27 +1,25 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::NOR::Word2Num;
-# ABSTRACT: Word 2 number conversion in NOR.
+# ABSTRACT: Word to number conversion in Norwegian
+
+use 5.16.0;
+use utf8;
+use warnings;
 
 # {{{ use block
-
-use 5.10.1;
-
-use strict;
-use warnings;
-use utf8;
 
 use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 my $parser = no_numerals();
 
 # }}}
 
-# {{{ w2n                                         convert number to text
+# {{{ w2n                                         convert text to number
 
 sub w2n :Export {
     my $input = shift // return;
@@ -71,7 +69,7 @@ sub no_numerals {
         |     'en'      { $return = 1; }
         |     'ett'     { $return = 1; }
 
-      tens:   'tjue'   { $return = 20; }                              # try to find a word that representates
+      tens:   'tjue'   { $return = 20; }                              # try to find a word that represents
         |     'tretti' { $return = 30; }                              # values 20,30,..,90
         |     'førti'  { $return = 40; }
         |     'femti'  { $return = 50; }
@@ -136,13 +134,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::NOR::Word2Num 
+Lingua::NOR::Word2Num - Word to number conversion in Norwegian
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Word 2 number conversion in NOR.
+version 0.2603260
 
 Lingua::NOR::Word2Num is module for converting text containing number
 representation in Norwegian back into number. Converts whole numbers
@@ -184,13 +181,11 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
-
 =item B<no_numerals> (void)
 
   =>  obj  new parser object
 
 Internal parser.
-
 
 =back
 
@@ -201,15 +196,22 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2004-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

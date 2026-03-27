@@ -3,18 +3,17 @@
 package Lingua::IND::Words2Nums;
 # ABSTRACT: Word 2 number conversion in IND.
 
-# {{{ use block
-
-use 5.10.1;
-
-use strict;
+use 5.16.0;
+use utf8;
 use warnings;
+
+# {{{ use block
 
 use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 our %Digits = (
         nol => 0, kosong => 0,
@@ -70,11 +69,9 @@ sub words2nums_simple :Export {
 
 ### private subs
 
-
 # for debugging
 our $DEBUG = 0;
 sub hmm___ {my @a = @_; print "(", (caller 1)[3], ") Hmm, ", @a if $DEBUG; return; }
-
 
 # {{{                         handle exponential
 sub w2n1 {
@@ -191,7 +188,6 @@ sub w2n4 {
         return $tot;
 }
 
-
 # {{{                         handle words after decimal (simple with no 'belas', 'puluh', 'ratus', ...)
 sub w2n5 {
         my $words = shift // '';
@@ -250,7 +246,7 @@ Lingua::IND::Words2Nums - convert Indonesian verbage to number.
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -314,12 +310,14 @@ private
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Steven Haryanto E<lt>sh@hhh.indoglobal.comE<gt>
-
-Maintenance
-PetaMem <info@petamem.com>
+ initial coding:
+   Steven Haryanto E<lt>sh@hhh.indoglobal.comE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 SEE ALSO
 
@@ -328,3 +326,12 @@ L<Lingua::IND::Nums2Words>
 =cut
 
 # }}}
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
+
+=cut

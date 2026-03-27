@@ -1,14 +1,40 @@
-Revision history for this software.
+Revision history for mb-JSON
 
-0.03  2022-01-23 00:00:00
-  - true in JSON makes !!1
-  - false in JSON makes !!0
-  - created by INABA Hitoshi
+0.04  2026-03-26 JST (Japan Standard Time)
 
-0.02  2021-09-19 00:00:00
-  - rename parse() to mb::JSON::parse()
-  - created by INABA Hitoshi
+    New features:
+    - Added mb::JSON::encode(): Perl data structure -> JSON text.
+      Hash keys are sorted alphabetically for deterministic output.
+      UTF-8 multibyte strings are output as-is (not \uXXXX-escaped).
+      undef encodes as null.
+    - Added mb::JSON::Boolean type (mb::JSON::true / mb::JSON::false).
+      Plain 1/0 encode as JSON numbers; use mb::JSON::true/false for
+      JSON booleans.
+    - decode() now returns mb::JSON::Boolean objects for JSON true/false
+      (previously returned !!1 / !!0).
+    - Added mb::JSON::decode() as the canonical name; parse() retained
+      as a backward-compatible alias.
+    - Added eg/01_decode.pl, eg/02_encode.pl sample scripts.
+    - Added t/1001-decode.t, t/1002-encode.t, t/1003-boolean.t.
+    - Added t/9001-load.t through t/9080-cheatsheets.t: distribution
+      quality checks aligned with DB-Handy 1.07, HTTP-Handy 1.03,
+      and LTSV-LINQ 1.07 (INA_CPAN_Check-based test suite).
+    - Added doc/json_cheatsheet.*.txt: JSON quick reference in 21
+      languages.
+    - Fixed: warnings stub now guards with !defined(&warnings::import)
+      to suppress "import redefined" warnings.
 
-0.01  2021-09-18 00:00:00
-  - original version
-  - created by INABA Hitoshi
+0.03  2022-01-23 JST (Japan Standard Time)
+
+    - parse(): JSON null   -> undef
+    - parse(): JSON true   -> !!1
+    - parse(): JSON false  -> !!0
+    - Supports UTF-8 multibyte strings
+
+0.02  2022-01-01 JST (Japan Standard Time)
+
+    - Bug fixes in string parsing
+
+0.01  2021-12-01 JST (Japan Standard Time)
+
+    - Initial release

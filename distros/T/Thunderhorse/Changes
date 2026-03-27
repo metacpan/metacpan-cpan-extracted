@@ -1,5 +1,10 @@
 Revision history for Thunderhorse
 
+0.103 - 2026-03-24
+	[Fixes]
+	- Fix an error caused by Path::Tiny import, ++lschierer
+	- Fix PAGI deprecation warnings
+
 0.102 - 2026-01-18
 	[Fixes]
 	- Fix an error caused by setting up a cache for the router

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::PodDNSConfigOption;
 # ABSTRACT: PodDNSConfigOption defines DNS resolver options of a pod.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s name => Str;
@@ -22,7 +22,7 @@ IO::K8s::Api::Core::V1::PodDNSConfigOption - PodDNSConfigOption defines DNS reso
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 name
 

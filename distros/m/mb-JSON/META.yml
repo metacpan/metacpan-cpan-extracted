@@ -3,25 +3,29 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb-JSON
-version: 0.03
-abstract: a simple JSON parser for multibyte string
+version: 0.04
+abstract: JSON encode/decode for multibyte (UTF-8) strings
 author:
   - ina <ina@cpan.org>
 license: perl
 generated_by: pmake.bat
 requires:
-  ExtUtils::MakeMaker: 5.4302
-  File::Basename: 2.6
-  File::Copy: 2.02
-  File::Path: 1.0401
-  FindBin: 1.42
-  Socket: 0
-  lib: 0
+  Carp: 0
   perl: 5.00503
   strict: 1.01
   vars: 0
+  warnings: 0
 build_requires:
   Test: 1.122
+minimum_perl_version: 5.00503
+provides:
+  mb::JSON:
+    file: lib/mb/JSON.pm
+    version: 0.04
+  mb::JSON::Boolean:
+    file: lib/mb/JSON.pm
+    version: 0.04
 resources:
   license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/mb-JSON/issues
   repository: https://github.com/ina-cpan/mb-JSON

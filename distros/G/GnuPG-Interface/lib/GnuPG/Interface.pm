@@ -29,7 +29,7 @@ use GnuPG::Options;
 use GnuPG::Handles;
 use Scalar::Util 'tainted';
 
-$VERSION = '1.05';
+$VERSION = '1.06';
 
 has passphrase => (
     isa     => 'Any',

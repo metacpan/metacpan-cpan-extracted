@@ -98,6 +98,6 @@ Revision history for Rope
 	- Extends Rope with a readonly keyword that assists in creating readonly properties
 	- Extends Rope::Lazier with ro and o for readonly
 
-0.44 	2025-05-11
+0.45 	2025-05-11
 	- Fix the readonly implementation
 	- Update Const::XS dependancy to be 1.01

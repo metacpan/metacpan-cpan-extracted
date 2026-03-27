@@ -21,7 +21,7 @@ kube_client - Kubernetes CLI client using Kubernetes::REST
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

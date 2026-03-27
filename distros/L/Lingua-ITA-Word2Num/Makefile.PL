@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Word 2 number conversion in ITA.",
+  "ABSTRACT" => "Word to number conversion in Italian",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,14 +19,14 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Export::Attrs" => 0,
     "Parse::RecDescent" => 0,
-    "utf8" => 0
+    "utf8" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }

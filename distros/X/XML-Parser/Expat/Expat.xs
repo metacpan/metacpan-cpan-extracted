@@ -17,20 +17,7 @@
 
 #undef convert
 
-#include "patchlevel.h"
 #include "encoding.h"
-
-
-/* Version 5.005_5x (Development version for 5.006) doesn't like sv_...
-   anymore, but 5.004 doesn't know about PL_sv..
-   Don't want to push up required version just for this. */
-
-#if PATCHLEVEL < 5
-#define PL_sv_undef	sv_undef
-#define PL_sv_no	sv_no
-#define PL_sv_yes	sv_yes
-#define PL_na		na
-#endif
 
 #define BUFSIZE 32768
 
@@ -48,8 +35,7 @@
   else\
     cbv->fld = newSVsv(fld)
 
-/* Macro to push old handler value onto return stack. This is done here
-   to get around a bug in 5.004 sv_2mortal function. */
+/* Macro to push old handler value onto return stack. */
 
 #define PUSHRET \
   ST(0) = RETVAL;\
@@ -117,31 +103,6 @@ static const char *QuantChar[] = {"", "?", "*", "+"};
 static void suspend_callbacks(CallbackVector *);
 static void resume_callbacks(CallbackVector *);
 
-#if PATCHLEVEL < 5 && SUBVERSION < 5
-
-/* ================================================================
-** This is needed where the length is explicitly given. The expat
-** library may sometimes give us zero-length strings. Perl's newSVpv
-** interprets a zero length as a directive to do a strlen. This
-** function is used when we want to force length to mean length, even
-** if zero.
-*/
-
-static SV *
-newSVpvn(char *s, STRLEN len)
-{
-  SV *sv;
-
-  sv = newSV(0);
-  sv_setpvn(sv, s, len);
-  return sv;
-}  /* End newSVpvn */
-
-#define ERRSV GvSV(errgv)
-#endif
-
-#ifdef SvUTF8_on
-
 static SV *
 newUTF8SVpv(char *s, STRLEN len) {
   SV *sv;
@@ -161,29 +122,14 @@ newUTF8SVpvn(char *s, STRLEN len) {
   return sv;
 }
 
-#else  /* SvUTF8_on not defined */
-
-#define newUTF8SVpv newSVpv
-#define newUTF8SVpvn newSVpvn
-
-#endif
-
 static void*
 mymalloc(size_t size) {
-#ifndef LEAKTEST
   return safemalloc(size);
-#else
-  return safexmalloc(328,size);
-#endif
 }
 
 static void*
 myrealloc(void *p, size_t s) {
-#ifndef LEAKTEST
   return saferealloc(p, s);
-#else
-  return safexrealloc(p, s);
-#endif
 }
 
 static void
@@ -992,9 +938,6 @@ externalEntityRef(XML_Parser parser,
 		  const char* pubid)
 {
   dSP;
-#if defined(USE_THREADS) && PATCHLEVEL==6
-  dTHX;
-#endif
 
   int count;
   int ret = 0;
@@ -1006,6 +949,16 @@ externalEntityRef(XML_Parser parser,
      when the user did not explicitly request ParseParamEnt, silently
      treat the PE as empty and let expat continue processing subsequent
      DTD declarations normally.  See GH #53. */
+  /* For parameter entities and DTD (context is NULL per expat docs),
+     when the user did not explicitly request ParseParamEnt, treat the
+     PE as empty content so expat continues dispatching subsequent DTD
+     declarations to their proper handlers (Attlist, Element, etc.).
+
+     We must actually create the sub-parser and feed it an empty document
+     rather than simply returning 1, because expat needs the sub-parser's
+     parse completion to finalize entity processing.  Without this, expat
+     routes all subsequent DTD declarations to the Default handler instead
+     of the dedicated handlers.  See GH #53 and GH #173. */
   if (open == NULL && !cbv->parseparam) {
     XML_Parser entpar = XML_ExternalEntityParserCreate(parser, open, 0);
     if (entpar) {

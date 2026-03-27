@@ -44,6 +44,7 @@ src/field.c
 src/suspended_compcv.c
 t/00use.t
 t/01method.t
+t/02fields-refalias.t
 t/02fields.t
 t/03create.t
 t/04adjust.t

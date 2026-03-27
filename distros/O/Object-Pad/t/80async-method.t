@@ -92,4 +92,32 @@ EOPERL
    pass( 'Required method declarations may be declared as async' );
 }
 
+# RT174087
+{
+   my $f1;
+   my $f2;
+
+   class RT174087 {
+      async method m {
+         await $f1 = Future->new;
+         await $f2 = Future->new;
+      }
+   }
+
+   my $obj = RT174087->new;
+   my $f = $obj->m;
+
+   $f1->done;
+
+   my $warnings = "";
+   {
+      local $SIG{__WARN__} = sub { $warnings .= $_[0]; };
+      $f->cancel;
+   }
+
+   # This would always pass anyway, but would have printed a warning about
+   # "Attempt to free unreferenced scalar ..."
+   is( $warnings, "", 'Cancelling a suspended async methods does not warn' );
+}
+
 done_testing;

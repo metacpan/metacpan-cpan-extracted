@@ -1,0 +1,42 @@
+======================================================================
+ mb::JSON 치트 시트                                           [KO] 한국어
+======================================================================
+
+[ 데이터 타입 대응 ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "문자열"   -> 스칼라 문자열
+  123        -> 스칼라 숫자
+  3.14       -> 스칼라 실수
+  true       -> mb::JSON::Boolean (숫자로 1)
+  false      -> mb::JSON::Boolean (숫자로 0)
+  null       -> undef
+  [...]      -> 배열 레퍼런스
+  {...}      -> 해시 레퍼런스
+
+[ 1. 모듈 로드 ]
+  use mb::JSON;
+
+[ 2. decode: JSON -> Perl ]
+  my $data = mb::JSON::decode($json_text);
+  my $data = mb::JSON::parse($json_text);  # 하위 호환 별칭
+
+[ 3. encode: Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. 불리언 값 ]
+  mb::JSON::true   -> JSON: true
+  mb::JSON::false  -> JSON: false
+  숫자 1, 0        -> JSON 숫자 (불리언 아님)
+
+[ 5. null / undef ]
+  undef -> null (인코딩)
+  null  -> undef (디코딩)
+
+[ 6. 해시 키는 알파벳순 정렬 ]
+
+[ 7. UTF-8 멀티바이트 문자 그대로 출력 ]
+
+[ 8. 예제 ]
+  my $h = mb::JSON::decode('{"name":"홍길동","age":30}');
+  print $h->{name};   # 홍길동

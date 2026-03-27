@@ -3,26 +3,22 @@
 # Copyright (c) PetaMem, s.r.o. 2002-present
 #
 package Lingua::Num2Word;
-# ABSTRACT: A wrapper for Lingua::XXX::num2word modules.
-
-# {{{ use block
+# ABSTRACT: Number to word conversion
 
 use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Carp;
 use Encode;
+use Export::Attrs;
 
 # }}}
-# {{{ BEGIN
-our $VERSION = '0.2603230';
-
-BEGIN {
-    use Exporter ();
-    use vars qw(@ISA @EXPORT_OK %known);
-    @ISA        = qw(Exporter);
-    @EXPORT_OK  = qw(cardinal get_interval known_langs langs preprocess_code);
-}
+# {{{ var block
+our $VERSION = '0.2603260';
+our %known;
 
 # }}}
 
@@ -37,173 +33,107 @@ my $template_obj  = q{ use __PACKAGE_WITH_VERSION__ ();
                        $result = $tmp_obj->__FUNCTION__($number);
                      };
 
-# }}}
-# {{{ %known                    language codes from iso639 mapped to respective interface
-
-%known = (
-    afr => {
-        package  => 'Numbers',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 99_999_999_999,
-        function => 'parse',
-        code     => $template_obj,
-    },
-    ces => {
-        package  => 'Num2Word',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999,
-        function => 'num2ces_cardinal',
-        code     => $template_func,
-    },
-    deu => {
-        package  => 'Num2Word',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999,
-        function => 'num2deu_cardinal',
-        code     => $template_func,
-    },
-    eng => {
-        package  => 'Numbers',
-        version  => '',
-        limit_lo => 1,
-        limit_hi => 999_999_999_999_999, # 1e63
-        function => '',
-        code     => q{ use __PACKAGE_WITH_VERSION__ qw(American);
-                       my $tmp_obj = new __PACKAGE__;
-                       $tmp_obj->parse($number);
-                       $result = $tmp_obj->get_string;
-                     },
-    },
-    eus => {
-        package  => 'Numbers',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999_999,
-        function => 'cardinal2alpha',
-        code     => $template_func,
-    },
-    fra => {
-        package  => 'Numbers',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999_999_999, # < 1e52
-        function => 'get_string',
-        code     => q{
-        use Lingua::FRA::Numbers;
-        my $tmp_obj = Lingua::FRA::Numbers->new($number);
-        $result = $tmp_obj->get_string;
-        },
-    },
-    ind => {
-        package  => 'Nums2Words',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999_999_999,
-        function => 'nums2words',
-        code     => $template_func,
-    },
-    ita => {
-        package  => 'Numbers',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999_999,
-        function => 'number_to_it',
-        code     => $template_func,
-    },
-    jpn => {
-        package  => 'Number',
-        version  => '',
-        limit_lo => 1,
-        limit_hi => 999_999_999_999_999,
-        function => 'to_string',
-        code     => q{ use __PACKAGE_WITH_VERSION__ ();
-                       my @words = __PACKAGE__::__FUNCTION__($number);
-                       $result = join ' ', @words;
-                     },
-    },
-    nld => {
-        package  => 'Num2Word',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999,
-        function => 'num2nld_cardinal',
-        code     => $template_func,
-    },
-    nor => {
-        package  => 'Num2Word',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999,
-        function => 'num2no_cardinal',
-        code     => $template_obj,
-    },
-    pol => {
-        package  => 'Numbers',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 9_999_999_999_999,
-        function => 'parse',
-        code     => $template_obj,
-    },
-    por => {
-        package  => 'Nums2Words',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999_999_999,
-        function => 'num2word',
-        code     => $template_func,
-    },
-    rus => {
-        package  => 'Number',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999_999_999,
-        function => 'rur_in_words',
-        code     => q{ use __PACKAGE_WITH_VERSION__ ();
-                       $result = __PACKAGE__::__FUNCTION__($number);
-                       if ($result) {
-                           if ($number) {
-                               $result =~ s/\s+\S+\s+\S+\s+\S+$//;
-                           }
-                           else {
-                               $result =~ s/\s+\S+$//;
-                           }
-                           $result =~ s/^\s+//;
-                       }
-                     },
-    },
-    spa => {
-        package  => 'Numeros',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999_999_999,
-        function => 'cardinal',
-        code     => $template_obj,
-    },
-    swe => {
-        package  => 'Num2Word',
-        version  => '',
-        limit_lo => 0,
-        limit_hi => 999_999_999,
-        function => 'num2sv_cardinal',
-        code     => $template_func,
-    },
-    zho => {
-        package  => 'Numbers',
-        version  => '',
-        limit_lo => 1,
-        limit_hi => 999_999_999_999_999,
-        function => '',
-        code     => q{ use __PACKAGE_WITH_VERSION__ qw(traditional);
-                       my $tmp_obj = new __PACKAGE__;
-                       $tmp_obj->parse($number);
-                       $result = $tmp_obj->get_string;
-                     },
-    },
+# ISO 639-1 to 639-3 mapping for supported languages
+# {{{ ISO 639-1 to 639-3 mapping
+my %iso1_to_3 = (
+    af => 'afr', ar => 'ara', bg => 'bul', ca => 'cat',
+    cs => 'ces', da => 'dan', de => 'deu', el => 'ell',
+    en => 'eng', es => 'spa', et => 'est', eu => 'eus',
+    fa => 'fas', fi => 'fin', fr => 'fra', he => 'heb',
+    hi => 'hin', hr => 'hrv', hu => 'hun', id => 'ind',
+    is => 'isl', it => 'ita', ja => 'jpn', ko => 'kor',
+    lt => 'lit', lv => 'lav', nl => 'nld', 'no' => 'nor',
+    pl => 'pol', pt => 'por', ro => 'ron', ru => 'rus',
+    sk => 'slk', sv => 'swe', sw => 'swa', th => 'tha',
+    tr => 'tur',
+    uk => 'ukr', vi => 'vie', zh => 'zho',
 );
+# }}}
+
+# {{{ %known — auto-discovered from lib/Lingua/*/Num2Word.pm
+
+# Override table for legacy modules with non-standard API
+my %n2w_override = (
+    afr => { package => 'Numbers',   function => 'parse',           code => $template_obj, limit_hi => 99_999_999_999  },
+    eng => { package => 'Numbers',   limit_lo => 1, limit_hi => 999_999_999_999_999,
+             code => q{ use __PACKAGE_WITH_VERSION__ qw(American);
+                        my $tmp_obj = new __PACKAGE__;
+                        $tmp_obj->parse($number);
+                        $result = $tmp_obj->get_string;
+                      },
+           },
+    eus => { package => 'Numbers',   function => 'cardinal2alpha',  limit_hi => 999_999_999_999 },
+    fra => { package => 'Numbers',   limit_hi => 999_999_999_999_999,
+             code => q{ use Lingua::FRA::Numbers;
+                        my $tmp_obj = Lingua::FRA::Numbers->new($number);
+                        $result = $tmp_obj->get_string;
+                      },
+           },
+    ind => { package => 'Nums2Words', function => 'nums2words',     limit_hi => 999_999_999_999_999 },
+    ita => { package => 'Numbers',   function => 'number_to_it',    limit_hi => 999_999_999_999 },
+    jpn => { package => 'Number',    function => 'to_string', limit_lo => 1, limit_hi => 999_999_999_999_999,
+             code => q{ use __PACKAGE_WITH_VERSION__ ();
+                        my @words = __PACKAGE__::__FUNCTION__($number);
+                        $result = join ' ', @words;
+                      },
+           },
+    nor => { function => 'num2no_cardinal', code => $template_obj },
+    pol => { package => 'Numbers',   function => 'parse',           code => $template_obj, limit_hi => 9_999_999_999_999 },
+    por => { package => 'Nums2Words', function => 'num2word',       limit_hi => 999_999_999_999_999 },
+    rus => { package => 'Number',    function => 'rur_in_words', limit_hi => 999_999_999_999_999,
+             code => q{ use __PACKAGE_WITH_VERSION__ ();
+                        $result = __PACKAGE__::__FUNCTION__($number);
+                        if ($result) {
+                            if ($number) {
+                                $result =~ s/\s+\S+\s+\S+\s+\S+$//;
+                            }
+                            else {
+                                $result =~ s/\s+\S+$//;
+                            }
+                            $result =~ s/^\s+//;
+                        }
+                      },
+           },
+    spa => { package => 'Numeros',   function => 'cardinal',        code => $template_obj, limit_hi => 999_999_999_999_999 },
+    swe => { function => 'num2sv_cardinal' },
+    zho => { package => 'Numbers',   limit_lo => 1, limit_hi => 999_999_999_999_999,
+             code => q{ use __PACKAGE_WITH_VERSION__ qw(traditional);
+                        my $tmp_obj = new __PACKAGE__;
+                        $tmp_obj->parse($number);
+                        $result = $tmp_obj->get_string;
+                      },
+           },
+);
+
+# auto-discover: scan for Lingua::*::Num2Word modules
+{
+    my $lingua_dir;
+    for my $inc (@INC) {
+        my $try = "$inc/Lingua";
+        if (-d $try) { $lingua_dir = $try; last; }
+    }
+
+    if ($lingua_dir) {
+        for my $dir (glob "$lingua_dir/*/") {
+            my ($lang) = $dir =~ m{/([A-Z]{3})/\z};
+            next unless $lang;
+            $lang = lc $lang;
+
+            # standard pattern: Num2Word.pm with num2XXX_cardinal function
+            if (-e "$dir/Num2Word.pm" || exists $n2w_override{$lang}) {
+                my $ov = $n2w_override{$lang} // {};
+                $known{$lang} = {
+                    package  => $ov->{package}  // 'Num2Word',
+                    version  => $ov->{version}  // '',
+                    limit_lo => $ov->{limit_lo} // 0,
+                    limit_hi => $ov->{limit_hi} // 999_999_999,
+                    function => $ov->{function} // "num2${lang}_cardinal",
+                    code     => $ov->{code}     // $template_func,
+                };
+            }
+        }
+    }
+}
 
 # }}}
 # {{{ new                       constructor
@@ -215,7 +145,7 @@ sub new {
 # }}}
 # {{{ known_langs               list of currently supported languages
 
-sub known_langs {
+sub known_langs :Export {
     return wantarray ? sort keys %known : [ sort keys %known ];
 }
 
@@ -227,9 +157,11 @@ sub known_langs {
 #  list or list reference (depending to calling context) with
 #  minimal and maximal supported number
 #
-sub get_interval {
+sub get_interval :Export {
     my $self = ref($_[0]) ? shift : Lingua::Num2Word->new();
     my $lang = shift // return;
+    $lang = lc $lang;
+    $lang = $iso1_to_3{$lang} if exists $iso1_to_3{$lang};
 
     return if (!defined $known{$lang});
 
@@ -241,13 +173,14 @@ sub get_interval {
 # }}}
 # {{{ cardinal                  convert number to text
 
-sub cardinal {
+sub cardinal :Export {
     my $self   = ref($_[0]) ? shift : Lingua::Num2Word->new();
     my $result = '';
     my $lang   = shift // return $result;
     my $number = shift // return $result;
 
     $lang = lc $lang;
+    $lang = $iso1_to_3{$lang} if exists $iso1_to_3{$lang};
 
     return $result if (!defined $known{$lang});
 
@@ -266,7 +199,7 @@ sub cardinal {
 # }}}
 # {{{ preprocess_code           prepare code for evaluation
 
-sub preprocess_code {
+sub preprocess_code :Export {
     my $self                  = shift;
     my $lang                  = shift // return;
 
@@ -300,13 +233,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::Num2Word 
+Lingua::Num2Word - Number to word conversion
+
 
 =head1 VERSION
 
-version 0.2603230
-
-A wrapper for Lingua::XXX::num2word modules.
+version 0.2603260
 
 Lingua::Num2Word is a wrapper for modules for converting numbers into
 their equivalent in written representation.
@@ -494,15 +426,24 @@ Currently supported languages/modules are:
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-   Richard C. Jelinek E<lt>development@petamem.comE<gt>
-   Roman Vasicek E<lt>development@petamem.comE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ coding (until 2005):
+   Roman Vasicek E<lt>info@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2002-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

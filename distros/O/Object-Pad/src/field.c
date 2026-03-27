@@ -688,7 +688,6 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
     case '%': private = OPpFIELDPAD_HV; break;
   }
 
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
   {
     UNOP_AUX_item *aux;
     Newx(aux, 2 + 1*2, UNOP_AUX_item);
@@ -700,12 +699,6 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
     (aux++)->uv = padix;
     (aux++)->uv = ((UV)private << FIELDIX_TYPE_SHIFT) | fieldix;
   }
-#else
-  {
-    ops = op_append_list(OP_LINESEQ, ops,
-      newFIELDPADOP(private << 8 | opflags_if_role, padix, fieldix));
-  }
-#endif
 
   /* Generate the basic ops here so the ordering doesn't matter if other
    * attributes want to modify these */

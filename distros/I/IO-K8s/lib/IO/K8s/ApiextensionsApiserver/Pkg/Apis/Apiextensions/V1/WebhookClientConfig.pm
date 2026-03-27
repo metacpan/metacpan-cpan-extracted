@@ -1,6 +1,6 @@
 package IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookClientConfig;
 # ABSTRACT: WebhookClientConfig contains the information to make a TLS connection with the webhook.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s caBundle => Str;
@@ -26,7 +26,7 @@ IO::K8s::ApiextensionsApiserver::Pkg::Apis::Apiextensions::V1::WebhookClientConf
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 caBundle
 

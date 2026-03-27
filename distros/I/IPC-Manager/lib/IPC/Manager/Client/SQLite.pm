@@ -2,12 +2,21 @@ package IPC::Manager::Client::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Carp qw/croak/;
 use File::Temp qw/tempfile/;
 
 use DBI;
+
+sub viable {
+    my $driver = 'DBIx::QuickDB::Driver::SQLite';
+    eval {
+        require DBIx::QuickDB;
+        my ($v) = DBIx::QuickDB->check_driver($driver, {});
+        return $v;
+    };
+}
 
 use parent 'IPC::Manager::Base::DBI';
 use Object::HashBase;
@@ -22,7 +31,7 @@ sub table_sql {
             CREATE TABLE IF NOT EXISTS ipcm_peers(
                 `id`        CHAR(36)        NOT NULL PRIMARY KEY,
                 `pid`       INTEGER         DEFAULT NULL,
-                `active`    BOOL            NOT NULL DEFAULT TRUE,
+                `active`    BIGINT          DEFAULT (strftime('%s', 'now')),
                 `stats`     BLOB            DEFAULT NULL
             );
         EOT
@@ -100,7 +109,7 @@ See L<IPC::Manager::Client>.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

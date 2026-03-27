@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::CSINodeSpec;
 # ABSTRACT: CSINodeSpec holds information about the specification of all CSI drivers installed on a node
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s drivers => ['Storage::V1::CSINodeDriver'], 'required';
@@ -20,7 +20,7 @@ IO::K8s::Api::Storage::V1::CSINodeSpec - CSINodeSpec holds information about the
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 drivers
 

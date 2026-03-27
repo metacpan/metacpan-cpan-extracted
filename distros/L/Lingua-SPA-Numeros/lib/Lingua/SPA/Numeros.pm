@@ -7,17 +7,17 @@
 package Lingua::SPA::Numeros;
 # ABSTRACT: Number 2 word conversion in SPA.
 
-# {{{ use block
-
 use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Carp;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
-
+our $VERSION = '0.2603260';
 
 our @EXPORT_OK = qw( $MALE $FEMALE $NEUTRAL $MALE $FEMALE $NEUTRAL);
 
@@ -523,7 +523,7 @@ Lingua::SPA::Numeros - Translates numbers to spanish text
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -1253,7 +1253,6 @@ Translation of $n to spanish text as a list of words.
 
 Everithing not fitting elsewere
 
-
 =head3 parse_num
 
 =over 4
@@ -1333,7 +1332,6 @@ Returns the adjusted $value.
 
 =back
 
-
 =head1 DEPENDENCIES
 
 Perl 5.006, Exporter, Carp
@@ -1342,12 +1340,14 @@ Perl 5.006, Exporter, Carp
 
 http://roble.pntic.mec.es/~msanto1/ortografia/numeros.htm
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jose Rey, <jrey@cpan.org>
-
-Maintenance
-PetaMem s.r.o., <info@petamem.com>
+ initial coding:
+   Jose Luis Rey Barreira E<lt>jrey@cpan.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -1357,6 +1357,11 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
 at your option, any later version of Perl 5 you may have available.
 
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

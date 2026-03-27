@@ -1,0 +1,108 @@
+NAME
+    NKC::Transform::BIBFRAME2MARC - bibframe2marc transformation class.
+
+SYNOPSIS
+     use NKC::Transform::BIBFRAME2MARC;
+
+     my $obj = NKC::Transform::BIBFRAME2MARC->new(%params);
+     my $version = $obj->version;
+     my $marc_xml = $obj->transform($bf_xml, @params);
+
+METHODS
+  "new"
+     my $obj = NKC::Transform::BIBFRAME2MARC->new(%params);
+
+    Constructor.
+
+    *       "version"
+
+            Transformation version.
+
+            Default value is '2.6.0'.
+
+            Default value is undef.
+
+    *       "xslt_transformation_file"
+
+            XSLT transformation file.
+
+            Default value is XSLT transformation file for '2.6.0' version.
+
+    Returns instance of object.
+
+  "version"
+     my $version = $obj->version;
+
+    Get bibframe2marc transformation version which is set to object.
+
+    Returns qr{\d\.\d\.\d} version string.
+
+  "transform"
+     my $marc_xml = $obj->transform($bf_xml, @params);
+
+    Transform BIBFRAME to MARC.
+
+    Returns MARC XML string.
+
+ERRORS
+     new():
+             Cannot read XSLT file.
+                     XSLT file: %s
+             Parameter 'version' is undefined.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use NKC::Transform::BIBFRAME2MARC;
+
+     # Object.
+     my $obj = NKC::Transform::BIBFRAME2MARC->new;
+
+     # Get version.
+     my $version = $obj->version;
+
+     # Print out.
+     print $version."\n";
+
+     # Output:
+     # 2.6.0
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, File::Share, XML::LibXML, XML::LibXSLT.
+
+SEE ALSO
+    NKC::Transform::MARC2BIBFRAME
+        marc2bibframe transformation class.
+
+    NKC::Transform::MARC2RDA
+        marc2rda transformation class.
+
+    NKC::Transform::BIBFRAME2MARC::Utils
+        Utilities for bibframe2marc transformations.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/NKC-Transform-BIBFRAME2MARC>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2024-2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+ACKNOWLEDGEMENTS
+    Development of this software has been made possible by institutional
+    support for the long-term strategic development of the National Library
+    of the Czech Republic as a research organization provided by the
+    Ministry of Culture of the Czech Republic (DKRVO 2024–2028), Area 11:
+    Linked Open Data.
+
+VERSION
+    0.04
+

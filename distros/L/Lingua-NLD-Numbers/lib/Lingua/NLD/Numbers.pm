@@ -1,305 +1,127 @@
-# For Emacs: -*- mode:cperl; mode:folding -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::NLD::Numbers;
-# ABSTRACT: Numbers 2 word conversion in NLD.
+# ABSTRACT: This module is deprecated. Please use L<Lingua::NLD::Num2Word instead.
+
+use 5.16.0;
+use utf8;
+use warnings;
 
 # {{{ use block
 
-use 5.10.1;
-
-use warnings;
-use strict;
-
-use Perl6::Export::Attrs;
+use Carp;
+use Export::Attrs;
+use Lingua::NLD::Num2Word qw(num2nld_cardinal);
 
 # }}}
-# {{{ variables declaration
+# {{{ var block
 
-our $VERSION = 0.0682;
-
-my $numbers = {
-        0       =>      'nul',
-        1       =>      'een',
-        2       =>      'twee',
-        3       =>      'drie',
-        4       =>      'vier',
-        5       =>      'vijf',
-        6       =>      'zes',
-        7       =>      'zeven',
-        8       =>      'acht',
-        9       =>      'negen',
-        10      =>      'tien',
-        11      =>      'elf',
-        12      =>      'twaalf',
-        13      =>      'dertien',
-        14      =>      'veertien',
-        15      =>      'vijftien',
-        16      =>      'zestien',
-        17      =>      'zeventien',
-        18      =>      'achtien',
-        19      =>      'negentien',
-        20      =>      'twintig',
-        30      =>      'dertig',
-        40      =>      'veertig',
-        50      =>      'vijftig',
-        60      =>      'zestig',
-        70      =>      'zeventig',
-        80      =>      'tachtig',
-        90      =>      'negentig',
-};
+our $VERSION = '0.2603260';
 
 # }}}
 
-# {{{ new
+# {{{ new                              constructor (deprecated)
 
 sub new {
-    my $class = shift;
-    my $number = shift || '';
+    my $class  = shift;
+    my $number = shift;
 
-    my $self = {};
-    bless $self, $class;
+    carp "Lingua::NLD::Numbers is deprecated, use Lingua::NLD::Num2Word instead";
 
-    if( $number =~ /\d+/ ) {
-        return( $self->parse($number) );
-    };
+    my $self = bless {}, $class;
 
-    return( $self );
-};
+    if (defined $number && $number =~ /^\d+$/) {
+        return $self->parse($number);
+    }
+
+    return $self;
+}
 
 # }}}
-# {{{ parse
+# {{{ parse                            delegate to Num2Word (deprecated)
 
 sub parse :Export {
-    my $self = shift;
+    my $self   = ref($_[0]) ? shift : __PACKAGE__->new();
     my $number = shift // return '';
 
-    my $digits;
-    my $ret = '';
-
-    if( defined($numbers->{$number}) ) {
-        $ret = $numbers->{$number};
-    }
-    else {
-        my $ret_array = [];
-
-        @{$digits} = reverse( split('', $number) );
-
-        # tens of billions
-        if( defined($digits->[10]) && ($digits->[10] != 0) ) {
-            my $temp = $self->_formatTens( $digits->[9], $digits->[10] );
-            unshift @{$ret_array}, "$temp biljoen";
-        }
-        elsif( defined($digits->[9]) && ($digits->[9] != 0) ) {
-            unshift @{$ret_array}, $self->_formatLarge( $digits->[9], ' biljoen' );
-        };
-
-        # hundreds of millions
-        if( defined($digits->[8]) && ($digits->[8] != 0) ) {
-            if( ($digits->[7] == 0) && ($digits->[6] == 0) ) {
-                unshift @{$ret_array}, $self->_formatLarge( $digits->[8], ' honderd miljard' );
-            }
-            else {
-                unshift @{$ret_array}, $self->_formatLarge( $digits->[8], ' honderd' );
-            };
-        };
-
-        # tens of millions
-        if( defined($digits->[7]) && ($digits->[7] != 0) ) {
-            my $temp = $self->_formatTens( $digits->[6], $digits->[7] );
-            unshift @{$ret_array}, "$temp miljard";
-        }
-        elsif( defined($digits->[6]) && ($digits->[6] != 0) ) {
-            unshift @{$ret_array}, $self->_formatLarge( $digits->[6], ' miljard' );
-        };
-
-        # hundreds of thousands
-        if( defined($digits->[5]) && ($digits->[5] != 0) ) {
-            if( ($digits->[4] == 0) && ($digits->[3] == 0) ) {
-                unshift @{$ret_array}, $self->_formatLarge( $digits->[5], ' honderd duizend' );
-            }
-            else {
-                unshift @{$ret_array}, $self->_formatLarge( $digits->[5], ' honderd' );
-            };
-        };
-
-        # tens of thousands
-        if( defined($digits->[4]) && ($digits->[4] != 0) ) {
-            my $temp = $self->_formatTens( $digits->[3], $digits->[4] );
-            unshift @{$ret_array}, "$temp duizend";
-        }
-        elsif( defined($digits->[3]) && ($digits->[3] == 1) && $number<2000) { # VSM - BUG
-            unshift @{$ret_array}, ' duizend';
-        }
-        elsif( defined($digits->[3]) && ($digits->[3] != 0) ) {
-            unshift @{$ret_array}, $self->_formatLarge( $digits->[3], ' duizend' );
-        };
-
-        # hundreds
-        if( defined($digits->[2]) && ($digits->[2] == 1) ) {
-            unshift @{$ret_array}, 'honderd';
-        }
-        elsif( defined($digits->[2]) && ($digits->[2] != 0) ) {
-            unshift @{$ret_array}, $self->_formatLarge( $digits->[2], 'honderd' );
-        };
-
-        # tens
-        unshift @{$ret_array}, $self->_formatTens( $digits->[0], $digits->[1], 'en' );
-
-        $ret = $self->_sortReturn( $ret_array, $digits );
-    };
-
-    return( $ret );
-};
-
-# }}}
-# {{{ _sortReturn
-
-sub _sortReturn {
-    my $self = shift;
-    my $ret_array = shift;
-    my $digits = shift;
-
-    my $large_nums = 0;
-    my $ret = '';
-
-    my $size = @{$ret_array};
-
-    if( $size == 1 ) {
-        return( $ret_array->[0] );
-    }
-    elsif( $size > 1 ) {
-        $large_nums = 1;
-    };
-
-    for( my $i = $size; $i > 0; $i-- ) {
-
-        if( defined($ret_array->[$i]) ) {
-            if( $ret_array->[$i] =~ /(miljard|duizend)/ ) {
-                $ret .= $ret_array->[$i] .', ';
-            }
-            else {
-                $ret .= $ret_array->[$i] .' ';
-            };
-        };
-    };
-
-    if( ($digits->[0] == 0) && ($digits->[1] == 0) ) {
-        # do nothing
-    }
-    elsif( ($digits->[0] == 0) || ($digits->[1] == 0) || ($digits->[1] == 1) ) {
-        if( $large_nums ) {
-            $ret .= ' en ';
-        };
-        $ret .= $ret_array->[0];
-    }
-    else {
-        $ret .= ' '. $ret_array->[0];
-    };
-
-    $ret =~ s/(^ |\s{2,}| $)/ /g;
-
-    return( $ret );
-};
-
-# }}}
-# {{{ _formatTens
-
-sub _formatTens {
-    my $self = shift;
-    my $units = shift;
-    my $tens = shift;
-    my $en = shift || ' en ';
-
-    # Both digits are zero
-    unless( $units || $tens ) {
-        return;
-    };
-
-    if( $tens == 0 ) {
-        return( $numbers->{$units} );
-    }
-    elsif( ($tens == 1) || ($units == 0) ) {
-        my $temp = $tens . $units;
-        return( $numbers->{$temp} );
-    };
-
-    my $temp = $tens . 0;
-    return( $numbers->{$units} . $en . $numbers->{$temp} );
-};
-
-# }}}
-# {{{ _formatLarge
-
-sub _formatLarge {
-    my $self = shift;
-    my $digit = shift;
-    my $word = shift;
-
-    my $ret = "$numbers->{$digit}$word";
-
-    return( $ret );
-};
+    return num2nld_cardinal($number) // '';
+}
 
 # }}}
 
 1;
 
+__END__
+
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
-Lingua::NLD::Numbers
+Lingua::NLD::Numbers - Number to word conversion in Dutch (DEPRECATED)
 
 =head1 VERSION
 
-version 0.0682
+version 0.2603260
 
 =head1 DESCRIPTION
 
-Numbers 2 word conversion in NLD.
+B<This module is deprecated.> Please use L<Lingua::NLD::Num2Word> instead.
 
-This is PetaMem release. Lingua::NLD::Numbers converts
-numeric values into their Dutch equivalents.
+This module is a thin wrapper that delegates to L<Lingua::NLD::Num2Word>
+for backward compatibility with code using the old C<Lingua::NLD::Numbers>
+API.
 
 =head1 SYNOPSIS
 
-  use Lingua::NLD::Numbers;
+ # Old API (deprecated):
+ use Lingua::NLD::Numbers;
+ my $obj = Lingua::NLD::Numbers->new();
+ my $text = $obj->parse(42);
 
-  my $numbers = Lingua::NLD::Numbers->new();
-
-  my $text = $numbers->parse( 123 );
-
-  # prints 'een honderd, drie en twintig'
-  print $text;
+ # New API (preferred):
+ use Lingua::NLD::Num2Word qw(num2nld_cardinal);
+ my $text = num2nld_cardinal(42);
 
 =head1 FUNCTIONS
 
-=over
+=over 2
 
-=item new
+=item B<new> (deprecated)
 
-=item parse
+Constructor. Emits a deprecation warning. Delegates to
+L<Lingua::NLD::Num2Word>.
 
-Private
+=item B<parse> (positional, deprecated)
+
+  1   num    number to convert
+  =>  str    Dutch cardinal text
+
+Delegates to C<num2nld_cardinal()>.
 
 =back
 
-=head1 KNOWN BUGS
+=head1 SEE ALSO
 
-None, but that does not mean there are not any.
+L<Lingua::NLD::Num2Word> — the replacement module.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Alistair Francis, <cpan@alizta.com>
+ initial coding:
+   Alistair Francis E<lt>cpan@alizta.comE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
-Maintenance
-  PetaMem s.r.o., <info@petamem.com>
+=head1 COPYRIGHT
+
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =head1 LICENSE
 
-Perl 5 license.
-
-Original license is not known. PetaMem added
-Perl 5 license as default.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5 itself.
 
 =cut

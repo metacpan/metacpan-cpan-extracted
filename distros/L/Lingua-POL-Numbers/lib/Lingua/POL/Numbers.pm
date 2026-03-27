@@ -3,11 +3,11 @@
 package Lingua::POL::Numbers;
 # ABSTRACT: Number 2 word conversion in POL.
 
-# {{{ use block
-
-use v5.32;
-use warnings;
+use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use vars qw($Idziesiatka);
 
@@ -18,7 +18,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 # }}}
 
@@ -394,7 +394,7 @@ Lingua::POL::Numbers - Perl module for converting numeric values into their Poli
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 DESCRIPTION
 
@@ -408,12 +408,10 @@ This is PetaMem release in iso-639-3 namespace.
 
   my $numbers = Lingua::POL::Numbers->new;
 
-
   my $text = $numbers->parse( 123 );
 
   # prints 'sto dwadzieścia trzy'
   print $text;
-
 
   my $currency = $numbers->currency ( 123.45 );
 
@@ -490,12 +488,14 @@ private
 
 None, but that does not mean there are not any.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Henrik Steffen, <cpan@topconcepts.de>
-
-Maintenance
-PetaMem s.r.o., <info@petamem.com>
+ initial coding:
+   Henrik Steffen E<lt>cpan@topconcepts.deE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 LICENSE
 

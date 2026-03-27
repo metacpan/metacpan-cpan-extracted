@@ -3,9 +3,11 @@
 package Lingua::ENG::Numbers;
 # ABSTRACT: Number 2 word conversion for ENG.
 
-# {{{ use block
-
 use 5.16.0;
+use utf8;
+use warnings;
+
+# {{{ use block
 
 use base qw(Exporter);
 use Carp;
@@ -34,7 +36,7 @@ use vars qw(
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 BEGIN {
 
@@ -133,7 +135,7 @@ BEGIN {
             10**21  =>      'sextillion',
             10**24  =>      'septillion',
             10**27  =>      'octillion',
-            10**30  =>      'nonillian',
+            10**30  =>      'nonillion',
             10**33  =>      'decillion',
             10**36  =>      'undecillion',
             10**39  =>      'duodecillion',
@@ -193,7 +195,7 @@ BEGIN {
             10**45  =>      'septilliard',
             10**48  =>      'octillion',
             10**51  =>      'octilliard',
-            10**54  =>      'nonillian',
+            10**54  =>      'nonillion',
             10**57  =>      'nonilliard',
             10**60  =>      'decillion',
             10**63  =>      'decilliard'
@@ -480,7 +482,7 @@ Lingua::ENG::Numbers - Converts numeric values into their English string equival
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -494,7 +496,6 @@ version 0.2603230
                 print "$s\n";
         }
 
-
         ## EXAMPLE 2
 
         use Lingua::ENG::Numbers;
@@ -503,12 +504,9 @@ version 0.2603230
         $n->parse(-1281);
         print "N = " . $n->get_string . "\n";
 
-
-
 =head1 REQUIRES
 
 Perl 5, Exporter, Carp
-
 
 =head1 DESCRIPTION
 
@@ -530,8 +528,7 @@ B<get_string> method. This method takes the parsed data and converts
 it from a data structure into a formatted string. Elements of the string's
 formatting can be tweaked between calls to the B<get_string> function.
 While such changes are unlikely, this has been done simply to provide
-maximum flexability.
-
+maximum flexibility.
 
 =head1 METHODS
 
@@ -588,7 +585,6 @@ Returns a formatted string based on the most recent B<parse>.
 
 =back
 
-
 =head1 CLASS VARIABLES
 
 =over 4
@@ -603,12 +599,12 @@ The current locale mode. Currently only B<American> is supported.
 
 =item %Lingua::ENG::Numbers::INPUT_GROUP_DELIMITER
 
-The delimiter which seperates number groups.
+The delimiter which separates number groups.
 B<Example:> "1B<,>321B<,>323" uses the comma 'B<,>' as the group delimiter.
 
 =item %Lingua::ENG::Numbers::INPUT_DECIMAL_DELIMITER
 
-The delimiter which seperates the main number from its decimal part.
+The delimiter which separates the main number from its decimal part.
 B<Example:> "132B<.>2" uses the period 'B<.>' as the decimal delimiter.
 
 =item %Lingua::ENG::Numbers::OUTPUT_BLOCK_DELIMITER
@@ -645,14 +641,13 @@ A list of names for positive and negative signs.
 
 =item $Lingua::ENG::Numbers::SIGN_POSITIVE
 
-A constant indicating the the current number is positive.
+A constant indicating the current number is positive.
 
 =item $Lingua::ENG::Numbers::SIGN_NEGATIVE
 
-A constant indicating the the current number is negative.
+A constant indicating the current number is negative.
 
 =back
-
 
 =head1 DIAGNOSTICS
 
@@ -672,10 +667,19 @@ A constant indicating the the current number is negative.
 
 =back
 
+=head1 AUTHORS
 
-=head1 AUTHOR
+ initial coding:
+   Stephen Pandich E<lt>pandich@yahoo.comE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
-Stephen Pandich, pandich@yahoo.com
+=head1 LICENSE
 
-Maintenance
-PetaMem s.r.o. <info@petamem.com>
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
+
+=cut

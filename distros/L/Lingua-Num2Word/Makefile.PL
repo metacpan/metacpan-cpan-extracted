@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "A wrapper for Lingua::XXX::num2word modules.",
+  "ABSTRACT" => "Number to word conversion",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,17 +19,16 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Encode" => 0,
-    "Exporter" => 0,
+    "Export::Attrs" => 0,
     "utf8" => 0,
-    "vars" => 0
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Data::Dumper" => 0,
     "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,11 +39,10 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Data::Dumper" => 0,
   "Encode" => 0,
-  "Exporter" => 0,
+  "Export::Attrs" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "utf8" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

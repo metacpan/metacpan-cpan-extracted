@@ -1,6 +1,6 @@
 package IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::WatchEvent;
 # ABSTRACT: Event represents a single event to a watched resource.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s object => { Str => 1 };
@@ -22,7 +22,7 @@ IO::K8s::Apimachinery::Pkg::Apis::Meta::V1::WatchEvent - Event represents a sing
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 object
 

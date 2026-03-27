@@ -1,0 +1,28 @@
+bench/benchmark.pl
+Changes
+ignore.txt
+include/slug.h
+include/slug_core.h
+include/slug_transform.h
+include/slug_unicode.h
+include/slug_utf8.h
+lib/Slug.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Slug.xs
+t/00-load.t
+t/01-basic.t
+t/02-separator.t
+t/03-unicode.t
+t/04-edge-cases.t
+t/05-max-length.t
+t/06-slug-ascii.t
+t/07-slug-custom.t
+t/08-utf8.t
+xt/01-pod.t
+xt/boilerplate.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

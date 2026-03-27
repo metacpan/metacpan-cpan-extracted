@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+
 {
   package Math::GMP_OLOAD;
   BEGIN {
@@ -9,7 +10,7 @@ use warnings;
     }
   }
 
-  $Math::GMP_OLOAD::VERSION = '0.02';
+  $Math::GMP_OLOAD::VERSION = '0.03';
 }
 
 {
@@ -43,29 +44,32 @@ use warnings;
     };
 
     use overload "/" => sub ($$$) {
-      my($x, $y) = (shift, shift);
+      my($x, $y, $s) = (shift, shift, shift);
       if(ref($y) eq 'Math::MPFR') {
-        return Math::MPFR->new($x) / $y;
+        #return Math::MPFR->new($x) / $y; # works ok, but less efficient.
+        return Math::MPFR::overload_div($y, $x, !$s);
       }
       if(ref($y) eq 'Math::GMPq') {
-        return Math::GMPq->new($x) / $y;
+        #return Math::GMPq->new($x) / $y; # works ok, but less efficient.
+        return Math::GMPq::overload_div($y, $x, !$s);
       }
       if(ref($y) eq 'Math::GMPz') {
         return Math::GMPz->new($x) / $y;
+        #return Math::GMPz::overload_div($y, $x, !$s); # Some tests fail.
       }
 
-      return Math::GMP::op_div($x, $y, shift);
+      return Math::GMP::op_div($x, $y, $s);
     };
 
     use overload "**" => sub {
       my($x, $y, $s) = (shift, shift, shift);
       if(ref($y) eq 'Math::MPFR') {
         # We've called GMP ** MPFR ($x ** $y)
-        return Math::MPFR::overload_pow($y, $x, 1);
+        return Math::MPFR::overload_pow($y, $x, !$s);
      }
       if(ref($y) eq 'Math::GMPq') {
         # We've called GMP ** GMPq ($x ** $y)
-        return Math::GMPq::overload_pow($y, $x, 1);
+        return Math::GMPq::overload_pow($y, $x, !$s);
       }
       if(ref($y) eq 'Math::GMPz') {
         # We've called GMP ** GMPz ($x ** $y)
@@ -79,19 +83,20 @@ use warnings;
       $s ? op_pow($y, $x) : op_pow($x, $y);
     };
 
+# Let the overload pragma handle the "ops with assign".
 #    use overload "**=" => sub {
 #      my($x, $y, $s) = (shift, shift, shift);
 #      if(ref($y) eq 'Math::MPFR') {
-#        # We've called GMP ** MPFR ($x ** $y)
+#        # We've called GMP **= MPFR ($x **= $y)
 #        return Math::MPFR::overload_pow($y, $x, 1);
-#     }
+#      }
 #      if(ref($y) eq 'Math::GMPq') {
-#        # We've called GMP ** GMPq ($x ** $y)
+#        # We've called GMP **= GMPq ($x **= $y)
 #        return Math::GMPq::overload_pow($y, $x, 1);
 #      }
 #      if(ref($y) eq 'Math::GMPz') {
-#        # We've called GMP ** GMPz ($x ** $y)
-#        return Math::GMPz::overload_pow(Math::GMPz->new($x), $y, 0);
+#        # We've called GMP **= GMPz ($x **= $y)
+#        return Math::GMPz::overload_pow($y, $x, 1);
 #      }
 #
 #      # We get to here because we've called either:

@@ -2,19 +2,12 @@ package IPC::Manager::Client::MessageFiles;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Carp qw/croak confess/;
 use File::Spec;
 
-BEGIN {
-    if (eval { require Linux::Inotify2; require IO::Select; Linux::Inotify2->can('fh') ? 1 : 0 }) {
-        *USE_INOTIFY = sub() { 1 };
-    }
-    else {
-        *USE_INOTIFY = sub() { 0 };
-    }
-}
+use IPC::Manager::Util qw/USE_INOTIFY/;
 
 use parent 'IPC::Manager::Base::FS';
 use Object::HashBase qw{
@@ -24,6 +17,8 @@ use Object::HashBase qw{
     +pend_count
     +ready_count
 };
+
+sub viable { 1 }
 
 sub check_path { -d $_[1] }
 sub make_path  { mkdir($_[1]) or die "Could not make dir '$_[1]': $!" }
@@ -40,15 +35,17 @@ sub init {
     return unless USE_INOTIFY;
 }
 
+sub have_handles_for_select { 1 }
 sub handles_for_select { $_[0]->inotify->fh }
 
 sub inotify {
     my $self = shift;
-    croak "Not Implemented (Or you are missing one of: Linux::Inotify2, IO::Select)" unless USE_INOTIFY();
+    croak "Not Implemented (Or you are missing Linux::Inotify2)" unless USE_INOTIFY();
 
     return $self->{+INOTIFY} if $self->{+INOTIFY};
 
     my $i = Linux::Inotify2->new;
+    $i->blocking(0);
     $i->watch($self->path, Linux::Inotify2::IN_CREATE());
 
     return $self->{+INOTIFY} = $i;
@@ -93,7 +90,12 @@ sub message_files {
     $self->pid_check;
     my ($ext) = @_;
 
-    return undef if USE_INOTIFY && !$self->select->can_read(0);
+    if (USE_INOTIFY && !$self->{+READY_COUNT} && !$self->{+PEND_COUNT}) {
+        return undef unless $self->select->can_read(0);
+
+        # Reset the status
+        $self->inotify->read;
+    }
 
     my (@pend, @ready);
     for my $file (readdir($self->dir_handle)) {
@@ -210,7 +212,7 @@ See L<IPC::Manager::Client>.
 =head1 SOURCE
 
 The source code repository for IPC::Manager can be found at
-L<https://https://github.com/exodist/IPC-Manager>.
+L<https://github.com/exodist/IPC-Manager>.
 
 =head1 MAINTAINERS
 

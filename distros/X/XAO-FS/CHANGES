@@ -1,6 +1,31 @@
 https://github.com/amaltsev/XAO-FS
 ----------------------------------
 
+commit d9fb3e9be7a9b47f2868f39d2b47d18f72fed419
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Tue Mar 24 17:57:50 2026 -0700
+
+    v1.27 Support for 64-bit integers
+    
+    The default minvalue & maxvalue for integers are still as they were,
+    matching 32-bit values. But custom values may exceed these values and
+    the field will be created using 'bigint' type on the MySQL backend.
+    
+    Also implemented an automatic conversion to bigint if maxvalue in the
+    existing database is changed.
+    
+    A minor incompatibility with the previous version: minvalue & maxvalue
+    themselves are stored as 'bigint' in Global_Fields now, not as 'double'.
+
+commit 096f36dfda7940cae389daf5fd34d4544396db4a
+Author: Andrew Maltsev <am@ejelta.com>
+Date:   Sun Mar 5 14:47:32 2023 -0800
+
+    v1.26 Minor fix allowing to sync structure on /
+    
+    Also added a force keeping of /project (hard-coded in database
+    initialization).
+
 commit 6b5f73e34261ce0ce28ed44bcd719e3df2c26904
 Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Mar 4 15:29:52 2023 -0800
@@ -65,19 +90,4 @@ Author: Andrew Maltsev <am@ejelta.com>
 Date:   Sat Aug 25 07:45:25 2018 -0700
 
     Force ExtUtils::MakeMaker 6.64
-
-commit aa9473e424b1372e29e8c74b9071f904946fc296
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Sat Jul 7 09:19:59 2018 -0700
-
-    1.21 Build fix, no functional changes
-
-commit 53e66ebe5058546675bb1b079c856fba84974e7f
-Author: Andrew Maltsev <am@ejelta.com>
-Date:   Fri Jul 6 19:20:12 2018 -0700
-
-    1.20 Fixed testing without a database present
-    
-    The previous solution for this did not work after switching to
-    Test::Unit::Lite
 

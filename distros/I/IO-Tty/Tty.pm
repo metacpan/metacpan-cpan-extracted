@@ -3,6 +3,8 @@
 
 package IO::Tty;
 
+use 5.008008;
+
 use strict;
 use warnings;
 use IO::Handle;
@@ -11,31 +13,17 @@ use IO::Tty::Constant;
 use Carp;
 
 require POSIX;
-require DynaLoader;
 
-use vars qw(@ISA $VERSION $XS_VERSION $CONFIG $DEBUG);
-
-$VERSION    = '1.21';
-$XS_VERSION = "1.21";
-@ISA        = qw(IO::Handle);
+our @ISA        = qw(IO::Handle);
+our $VERSION    = '1.23';
+our $XS_VERSION = '1.23';
+our ( $CONFIG, $DEBUG );
 
 eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
 push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
-BOOT_XS: {
-    # If I inherit DynaLoader then I inherit AutoLoader and I DON'T WANT TO
-    require DynaLoader;
-
-    # DynaLoader calls dl_load_flags as a static method.
-    *dl_load_flags = DynaLoader->can('dl_load_flags');
-
-    do {
-        defined(&bootstrap)
-          ? \&bootstrap
-          : \&DynaLoader::bootstrap;
-      }
-      ->(__PACKAGE__);
-}
+use XSLoader;
+XSLoader::load(__PACKAGE__, $XS_VERSION);
 
 sub import {
     IO::Tty::Constant->export_to_level( 1, @_ );
@@ -91,7 +79,7 @@ sub set_raw($) {
     my $self = shift;
     return 1 if not POSIX::isatty($self);
     my $ttyno   = fileno($self);
-    my $termios = new POSIX::Termios;
+    my $termios = POSIX::Termios->new;
     unless ($termios) {
         warn "set_raw: new POSIX::Termios failed: $!";
         return undef;
@@ -120,13 +108,15 @@ sub set_raw($) {
 
 __END__
 
+=for markdown [![testsuite](https://github.com/cpan-authors/IO-Tty/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/IO-Tty/actions/workflows/testsuite.yml)
+
 =head1 NAME
 
 IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 =head1 VERSION
 
-1.20
+1.23
 
 =head1 SYNOPSIS
 

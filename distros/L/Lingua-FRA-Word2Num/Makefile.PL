@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Word 2 number conversion in FRA.",
+  "ABSTRACT" => "Word to number conversion in French",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,17 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::FRA::Word2Num",
   "PREREQ_PM" => {
-    "Exporter" => 0,
+    "Export::Attrs" => 0,
     "Parse::RecDescent" => 0,
-    "base" => 0,
-    "utf8" => 0
+    "utf8" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,10 +34,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Exporter" => 0,
+  "Export::Attrs" => 0,
   "Parse::RecDescent" => 0,
   "Test::More" => 0,
-  "base" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

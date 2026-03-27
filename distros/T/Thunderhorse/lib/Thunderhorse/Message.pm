@@ -1,5 +1,5 @@
 package Thunderhorse::Message;
-$Thunderhorse::Message::VERSION = '0.102';
+$Thunderhorse::Message::VERSION = '0.103';
 use v5.40;
 use Mooish::Base -standard, -role;
 

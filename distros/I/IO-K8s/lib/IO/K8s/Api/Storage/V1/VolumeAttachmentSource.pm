@@ -1,6 +1,6 @@
 package IO::K8s::Api::Storage::V1::VolumeAttachmentSource;
 # ABSTRACT: VolumeAttachmentSource represents a volume that should be attached. Right now only PersistenVolumes can be attached via external attacher, in future we may allow also inline volumes in pods. Exactly one member can be set.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s inlineVolumeSpec => 'Core::V1::PersistentVolumeSpec';
@@ -23,7 +23,7 @@ IO::K8s::Api::Storage::V1::VolumeAttachmentSource - VolumeAttachmentSource repre
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 inlineVolumeSpec
 

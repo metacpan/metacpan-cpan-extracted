@@ -1,24 +1,25 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::SPA::Word2Num;
-# ABSTRACT: Word 2 number conversion in SPA.
-
-# {{{ use block
+# ABSTRACT: Word to number conversion in Spanish
 
 use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Parse::RecDescent;
 use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 my $parser   = spa_numerals();
 
 # }}}
 
-# {{{ w2n                                         convert number to text
+# {{{ w2n                                         convert text to number
 
 sub w2n :Export {
     my $input = shift // return;
@@ -119,13 +120,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::SPA::Word2Num  
+Lingua::SPA::Word2Num - Word to number conversion in Spanish
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Word 2 number conversion in SPA.
+version 0.2603260
 
 Lingua::SPA::Word2Num is module for converting text containing number
 representation in dutch back into number. Converts whole numbers from 0 up
@@ -162,7 +162,7 @@ Input text must be encoded in UTF-8.
 =item B<w2n> (positional)
 
   1   str    string to convert
-  =>  numr   converted number
+  =>  num    converted number
       undef  if input string is not known
 
 Convert text representation to number.
@@ -195,16 +195,22 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- specifications, refactoring & maintenance:
-
- initial coding:
-   Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2004-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

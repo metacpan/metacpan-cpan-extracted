@@ -4,7 +4,7 @@ use IO::Pty;
 require POSIX;
 $^W = 1;
 
-my $pty = new IO::Pty;
+my $pty = IO::Pty->new;
 my $pid;
 
 unless (@ARGV) {

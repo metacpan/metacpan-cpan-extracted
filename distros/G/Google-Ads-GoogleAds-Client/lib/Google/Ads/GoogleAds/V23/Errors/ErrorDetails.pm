@@ -27,6 +27,7 @@ sub new {
     policyFindingDetails            => $args->{policyFindingDetails},
     policyViolationDetails          => $args->{policyViolationDetails},
     quotaErrorDetails               => $args->{quotaErrorDetails},
+    reservationErrorDetails         => $args->{reservationErrorDetails},
     resourceCountDetails            => $args->{resourceCountDetails},
     unpublishedErrorCode            => $args->{unpublishedErrorCode}};
 

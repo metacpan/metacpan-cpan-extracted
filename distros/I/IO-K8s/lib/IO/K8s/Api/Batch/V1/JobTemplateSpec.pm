@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::JobTemplateSpec;
 # ABSTRACT: JobTemplateSpec describes the data a Job should have when created from a template
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject;
 
 
@@ -21,7 +21,7 @@ IO::K8s::Api::Batch::V1::JobTemplateSpec - JobTemplateSpec describes the data a 
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

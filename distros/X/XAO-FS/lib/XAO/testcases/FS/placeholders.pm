@@ -4,7 +4,6 @@ use XAO::Utils;
 use Error qw(:try);
 
 use base qw(XAO::testcases::FS::base);
-
 # If we have /Customers/Orders and /Orders and then drop_placeholder on
 # /Customers it also drops /Orders from _MEMORY_, not from the
 # database. Should not do that!
@@ -459,12 +458,22 @@ sub test_build_structure {
         },
         integer => {
             type => 'integer',
-            minvalue => 0,
+            minvalue => -100,
             maxvalue => 100
         },
         uns => {
             type => 'integer',
             minvalue => 0,
+        },
+        bi1 => {
+            type        => 'integer',
+            minvalue    => 0,
+            maxvalue    => 999_999_999_999,
+        },
+        bi2 => {
+            type        => 'integer',
+            minvalue    => -888_888_888_888,
+            maxvalue    => 888_888_888_888,
         },
         uq => {
             type => 'real',
@@ -494,7 +503,7 @@ sub test_build_structure {
     $self->assert($res && ref $res eq 'HASH',
         "Expected a hash from build_structure (A)");
 
-    $self->assert($res->{'added'} == 8,
+    $self->assert($res->{'added'} == 10,
         "Expected build_structure to report 8 additions (A)");
 
     $self->assert($res->{'changed'} == 0,
@@ -503,9 +512,18 @@ sub test_build_structure {
     $self->assert(!@{$res->{'orphans'}},
         "Expected build_structure to report no orphans (A)");
 
-    foreach my $name (qw(name text integer Orders)) {
+    foreach my $name (qw(name text integer bi1 bi2 uns Orders)) {
         $self->assert($cust->exists($name),
                       "Field ($name) doesn't exist after build_structure()");
+
+        if($name eq 'uns') {
+            my $min=$cust->describe($name)->{minvalue};
+            $self->assert($min == $structure{uns}->{minvalue},
+                          "Minvalue is wrong for 'uns' ($min)");
+            my $max=$cust->describe($name)->{maxvalue};
+            $self->assert($max == 0xFFFFFFFF,
+                          "Maxvalue is wrong for 'uns' ($max)");
+        }
     }
 
     $self->assert($cust->describe('blob')->{'maxlength'} == 10000,
@@ -530,30 +548,33 @@ sub test_build_structure {
     $self->assert($cust->describe('name')->{'charset'} eq 'latin1',
         "Failed to change charset to 'latin1' on 'name'");
 
-    $structure{'blob'}->{'maxlength'}=20000;
-    $structure{'name'}->{'maxlength'}=50;
-    $structure{'name'}->{'charset'}='utf8';
-    $structure{'text'}->{'charset'}='utf8';
+    my @changes = (
+        ['blob',    'maxlength' => 20000],
+        ['name',    'maxlength' => 50],
+        ['name',    'charset'   => 'utf8'],
+        ['text',    'charset'   => 'utf8'],
+        ['integer', 'minvalue'  => -1],
+        ['integer', 'maxvalue'  => 99999],          # 24-bit signed
+        ['uns',     'maxvalue'  => 5_555_555_555],  # 64-bit unsigned
+    );
 
-    $res=$cust->build_structure(\%structure);
+    foreach my $change (@changes) {
+        $structure{$change->[0]}->{$change->[1]} = $change->[2];
+        $structure{$change->[0]}->{'_force'} = 1;
+    }
 
-    $self->assert($res->{'changed'} == 4,
-        "Expected build_structure to report 4 changes (B)");
+    $res = $cust->build_structure(\%structure);
+
+    $self->assert($res->{'changed'} == scalar(@changes),
+        "Expected build_structure to report " . scalar(@changes) . " changes, got $res->{'changed'} (B)");
 
     $odb=$self->reconnect();
     $cust=$odb->fetch('/Customers/c1');
 
-    $self->assert($cust->describe('blob')->{'maxlength'} == 20000,
-        "Failed to change maxlength to 20000 on 'blob'");
-
-    $self->assert($cust->describe('name')->{'maxlength'} == 50,
-        "Failed to change maxlength to 50 on 'name'");
-
-    $self->assert($cust->describe('name')->{'charset'} eq 'utf8',
-        "Failed to change charset to 'utf8' on 'name'");
-
-    $self->assert($cust->describe('text')->{'charset'} eq 'utf8',
-        "Failed to change charset to 'utf8' on 'text'");
+    foreach my $change (@changes) {
+        $self->assert('' . $cust->describe($change->[0])->{$change->[1]} eq '' . $change->[2],
+            "Failed to change '$change->[1]' to '$change->[2]' on '$change->[0]'");
+    }
 
     # A new field
     #
@@ -572,14 +593,6 @@ sub test_build_structure {
     foreach my $name (qw(newf name text integer uns Orders)) {
         $self->assert($cust->exists($name),
                       "Field ($name) doesn't exist after build_structure()");
-        if($name eq 'uns') {
-            my $min=$cust->describe($name)->{minvalue};
-            $self->assert($min == $structure{uns}->{minvalue},
-                          "Minvalue is wrong for 'uns' ($min)");
-            my $max=$cust->describe($name)->{maxvalue};
-            $self->assert($max == 0xFFFFFFFF,
-                          "Maxvalue is wrong for 'uns' ($max)");
-        }
 
         next unless $name eq 'newf';
         $self->assert($cust->describe($name)->{index},

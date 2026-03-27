@@ -37,17 +37,10 @@ $^W=1;
 
 my %define;
 my @libs;
-my $Package_Version = '1.21';  # keep this consistent with Tty.pm
+my $Package_Version = '1.23';  # keep this consistent with Tty.pm
 my $Is_Beta = ($Package_Version =~ m/_/);
 
 open(SUB, ">xssubs.c") or die "open: $!";
-
-warn "WARNING: perl versions prior to 5.8 are untested and may have problems.\n"
-  if $] < 5.008;
-
-# improve backward-compatibility
-@define{qw(-DPL_sv_undef=sv_undef -DPL_dowarn=dowarn)} = (undef, undef)
-  if $] < 5.004_05;
 
 print <<_EOT_;
 Now let's see what we can find out about your system
@@ -155,6 +148,11 @@ foreach my $f (sort keys %funcs) {
 #ifdef __APPLE__
 #ifndef _DARWIN_C_SOURCE
 #define _DARWIN_C_SOURCE
+#endif
+#endif
+#ifdef __sun
+#ifndef __EXTENSIONS__
+#define __EXTENSIONS__
 #endif
 #endif
 
@@ -497,21 +495,20 @@ WriteMakefile1(
     'AUTHOR'         => 'Roland Giersig <RGiersig@cpan.org>',
     'ABSTRACT'       => 'Pseudo ttys and constants',
     'LICENSE'        => 'perl',
+    'MIN_PERL_VERSION' => '5.008008',
     'BUILD_REQUIRES' =>  {
 	'Test::More' => 0,  # For testing
     },
     'META_MERGE'     => {
 	'resources'    => {
             license => 'http://dev.perl.org/licenses/',
-            repository  => 'https://github.com/toddr/IO-Tty',
-            bugtracker => 'https://github.com/toddr/IO-Tty/issues',
+            repository  => 'https://github.com/cpan-authors/IO-Tty',
+            bugtracker => 'https://github.com/cpan-authors/IO-Tty/issues',
 	},
     },
 );
 
 sub MY::postamble {
-
-  return '' unless $] >= 5.00503;
 
 <<'ESQ';
 
@@ -537,9 +534,6 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
   delete $params{META_MERGE} if $eumm_version < 6.46;
   delete $params{META_ADD} if $eumm_version < 6.46;
   delete $params{LICENSE} if $eumm_version < 6.31;
-  delete $params{AUTHOR} if $] < 5.005;
-  delete $params{ABSTRACT_FROM} if $] < 5.005;
-  delete $params{BINARY_LOCATION} if $] < 5.005;
 
   WriteMakefile(%params);
 }

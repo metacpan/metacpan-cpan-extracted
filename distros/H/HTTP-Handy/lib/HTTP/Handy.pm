@@ -18,14 +18,14 @@ use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
 use strict;
-BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use IO::Socket;
 use Carp qw(croak);
 use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE);
-$VERSION = '1.02';
+$VERSION = '1.03';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
 
@@ -835,7 +835,7 @@ HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -1485,7 +1485,7 @@ The C<port> argument contains non-digit characters.
 
 The value passed to C<max_post_size> contains non-digit characters.
 
-=item C<HTTP::Handy: Cannot bind to HOST:PORT>
+=item C<HTTP::Handy: Cannot bind to E<lt>hostE<gt>:E<lt>portE<gt> - E<lt>reasonE<gt>>
 
 The server could not bind to the requested address and port.
 The most common cause is that another process is already listening on

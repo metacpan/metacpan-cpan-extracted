@@ -1,0 +1,14 @@
+Revision history for Loo
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.04	2026/03/26
+	- improve indentation handling
+
+0.05	2026/03/26
+	- Attempt to fix windows deparse bugs
+	- Add include_dir sub to assist in dynamically linking the reusable C headers
+
+0.06	2026/03/26
+	- Fix various bugs around parsing variable names via AELEM* should now hopefully support 5.10 -> latest

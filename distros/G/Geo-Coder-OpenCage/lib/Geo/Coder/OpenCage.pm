@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoding API
-$Geo::Coder::OpenCage::VERSION = '0.36';
+$Geo::Coder::OpenCage::VERSION = '0.38';
 use strict;
 use warnings;
 
@@ -152,13 +152,25 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 SYNOPSIS
 
     my $Geocoder = Geo::Coder::OpenCage->new(api_key => $my_api_key);
 
-    my $response = $Geocoder->geocode(location => "Donostia");
+    # forward geocoding
+    my $response = $Geocoder->geocode(location => "Berlin");
+
+    # reverse geocoding
+    my $response = $Geocoder->reverse_geocode(lat => 52.5432379, lng => 13.4142133 );
+
+    if ($response->{status}{code} == 200) {
+        foreach my $r (@{ $response->{results} }) {
+            print $r->{formatted}, "\n";
+            print 'lat: ' . $r->{geometry}{lat}, "\n";
+            print 'lng: ' . $r->{geometry}{lng}, "\n";
+        }
+    }
 
 =head1 DESCRIPTION
 
@@ -168,6 +180,12 @@ For full details of the API visit L<https://opencagedata.com/api>
 
 It is recommended you read the L<best practices for using the OpenCage geocoder|https://opencagedata.com/api#bestpractices> before you start.
 
+=head1 DEVELOPING WITH AI
+
+Please note there is an
+L<AI SKILL.md for working with the OpenCage Geocoding API|https://github.com/OpenCageData/opencage-skills/blob/master/opencage-geocoding-api/SKILL.md>
+which includes a reference file for developing in Perl using this module.
+
 =head1 METHODS
 
 =head2 new
@@ -176,7 +194,7 @@ It is recommended you read the L<best practices for using the OpenCage geocoder|
 
 Get your API key from L<https://opencagedata.com>.
 
-Optionally "http => 1" can also be specified in which case API requests will NOT be made via https
+Optionally "http => 1" can also be specified in which case API requests will NOT be made via https.
 
 =head2 ua
 
@@ -185,8 +203,9 @@ Optionally "http => 1" can also be specified in which case API requests will NOT
 
 Accessor for the UserAgent object. By default HTTP::Tiny is used. Useful if for
 example you want to specify that something like LWP::UserAgent::Throttled for 
-rate limiting. Even if a new UserAgent is specified the useragent string will 
-be specified as "Geo::Coder::OpenCage $version"
+rate limiting.
+
+Regardless of which UserAgent object is used, the User-Agent HTTP header will always be set to Geo::Coder::OpenCage/$version.
 
 =head2 geocode
 
@@ -199,7 +218,7 @@ warns and returns undef if the query fails for some reason.
 If you will be doing forward geocoding, please see the 
 L<OpenCage query formatting guidelines|https://opencagedata.com/guides/how-to-format-your-geocoding-query>
 
-You should check the always response status 
+You should always check the response status 
 
   $response->{status}{code} 
 
@@ -207,16 +226,23 @@ to ensure you have had a successful response, are not hitting rate limits, etc.
 Please see the 
 L<OpenCage geocoding API response codes|https://opencagedata.com/api#codes>
 
-The OpenCage Geocoder has a few optional parameters:
+  my $response = $geocoder->geocode(location => "Berlin");
+  unless (defined $response) {
+      die "Geocoding failed";
+  }
+  if ($response->{status}{code} != 200) {
+      warn "API error: " . $response->{status}{message};
+  }
 
-=over 1
+=over
 
 =item Supported Parameters
 
-please see L<the OpenCage geocoder documentation|https://opencagedata.com/api>. Most of
-L<the various optional parameters|https://opencagedata.com/api#forward-opt> are supported. For example:
+The OpenCage Geocoder has a few optional parameters.
 
-=over 2
+Please see L<the OpenCage geocoder documentation|https://opencagedata.com/api>. Most of L<the various optional parameters|https://opencagedata.com/api#forward-opt> are supported.
+
+The most commonly useful parameters are:
 
 =item language
 
@@ -233,22 +259,7 @@ Provides the geocoder with a hint to the country that the query resides in.
 This value will help the geocoder but will not restrict the possible results to
 the supplied country.
 
-The country code is a comma seperated list of 2 character code as defined by the ISO 3166-1 Alpha 2 standard.
-
-=back
-
-=item Not Supported
-
-=over 2
-
-=item jsonp
-
-This module always parses the response as a Perl data structure, so the jsonp
-option is never used.
-
-=back
-
-=back
+The countrycode is a comma separated list of 2 character code as defined by the ISO 3166-1 Alpha 2 standard.
 
 As a full example:
 
@@ -257,6 +268,17 @@ As a full example:
         language => "ru",
         countrycode => "ru",
     );
+
+=item Not Supported
+
+=item jsonp
+
+This module always parses the response as a Perl data structure, so the jsonp
+option is never used.
+
+All other API parameters are passed through directly
+
+=back
 
 =head2 reverse_geocode
 
@@ -287,7 +309,7 @@ Ed Freyfogle <cpan@opencagedata.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023 by OpenCage GmbH.
+This software is copyright (c) 2026 by OpenCage GmbH.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

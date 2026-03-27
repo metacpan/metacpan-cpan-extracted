@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "parent" : "0",
             "perl" : "5.016"
          }
       },
@@ -45,16 +46,16 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/toddr/Regexp-Parser/issues"
+         "web" : "https://github.com/cpan-authors/Regexp-Parser/issues"
       },
-      "homepage" : "http://wiki.github.com/toddr/Regexp-Parser",
+      "homepage" : "https://github.com/cpan-authors/Regexp-Parser",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/toddr/Regexp-Parser/tree/master"
+         "url" : "https://github.com/cpan-authors/Regexp-Parser.git"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

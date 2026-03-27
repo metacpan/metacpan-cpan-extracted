@@ -1,0 +1,44 @@
+Lingua::LAV::Num2Word — Latvian number to word conversion
+Lingua::LAV::Num2Word — Ciparu pārvēršana latviešu skaitļu vārdos
+
+Converts numbers into their Latvian cardinal text representation.
+Part of the PetaMem Lingua number conversion suite.
+
+SYNOPSIS
+
+    use Lingua::Num2Word qw(cardinal);
+    my $text = cardinal('lv', 42);
+
+INSTALLATION
+
+    shell> cpanm Lingua::LAV::Num2Word
+
+    or install all available languages at once:
+
+    shell> cpanm Task::Lingua::PetaMem
+
+SUPPORTED RANGE
+
+    Integers from 0 to 999,999,999.
+
+SEE ALSO
+
+    Lingua::LAV::Word2Num — the reverse direction
+    Lingua::Num2Word      — multi-language number-to-word wrapper
+    Lingua::Word2Num      — multi-language word-to-number wrapper
+    Task::Lingua::PetaMem — install all languages
+
+AUTHORS
+
+    Richard C. Jelinek <rj@petamem.com> (specification)
+    PetaMem AI Coding Agents (coding, 2025-present)
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) PetaMem, s.r.o. 2004-present
+
+    This package is free software, dual-licensed under the
+    Artistic License 2.0 and the BSD 2-Clause License.
+
+    https://opensource.org/licenses/Artistic-2.0
+    https://opensource.org/licenses/BSD-2-Clause

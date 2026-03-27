@@ -1,7 +1,7 @@
 package Pod::Simple::Role::StripVerbatimIndent;
 use Moo::Role;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.004001';
 $VERSION =~ tr/_//d;
 
 use Scalar::Util qw(weaken);

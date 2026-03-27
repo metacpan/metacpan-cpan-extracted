@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::QuobyteVolumeSource;
 # ABSTRACT: Represents a Quobyte mount that lasts the lifetime of a pod. Quobyte volumes do not support ownership management or SELinux relabeling.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s group => Str;
@@ -35,7 +35,7 @@ IO::K8s::Api::Core::V1::QuobyteVolumeSource - Represents a Quobyte mount that la
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 group
 

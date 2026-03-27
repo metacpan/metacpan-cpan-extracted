@@ -1,6 +1,6 @@
 package IO::K8s::Api::Discovery::V1::Endpoint;
 # ABSTRACT: Endpoint represents a single logical "backend" implementing a service.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s addresses => [Str], 'required';
@@ -41,7 +41,7 @@ IO::K8s::Api::Discovery::V1::Endpoint - Endpoint represents a single logical "ba
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 addresses
 

@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use v5.40;
+use feature 'signatures';
+
+use Getopt::Long qw(GetOptions);
+use TOON;
+
+my $pretty    = 0;
+my $canonical = 0;
+my $help      = 0;
+
+GetOptions(
+  'pretty!'    => \$pretty,
+  'canonical!' => \$canonical,
+  'help!'      => \$help,
+) or usage();
+
+usage() if $help;
+
+local $/;
+my $input = <>;
+my $toon  = TOON->new(
+  pretty    => $pretty,
+  canonical => $canonical,
+);
+
+my $data = $toon->decode($input);
+print $toon->encode($data), "\n";
+
+sub usage {
+  print <<'USAGE';
+Usage: toon_pp [--pretty] [--canonical] [file ...]
+
+Reads TOON from STDIN or files and writes normalised TOON to STDOUT.
+USAGE
+  exit;
+}

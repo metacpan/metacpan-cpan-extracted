@@ -1,7 +1,7 @@
 use v5.10;
 
 package Perl::Version::Bumper;
-$Perl::Version::Bumper::VERSION = '0.245';
+$Perl::Version::Bumper::VERSION = '0.250';
 
 use strict;
 use warnings;
@@ -718,7 +718,8 @@ sub bump {
 
 sub bump_file {
     my ( $self, $file ) = @_;
-    my $code   = Path::Tiny->new($file)->slurp;
+    $file = Path::Tiny->new($file);    # in case it's not a Path::Tiny yet
+    my $code   = $file->slurp;
     my $bumped = $self->bump( $code, $file );
     if ( $bumped ne $code ) {
         $file->append( { truncate => 1 }, $bumped );
@@ -814,13 +815,12 @@ Perl::Version::Bumper - Update C<use VERSION> on any Perl code
     my $bumped_code = $perv->bump($code);
 
     # bump the source of a file
-    $perv->bump_file($filename);
+    my $success = $perv->bump_file($filename);
 
     # safe versions (check the result compiles)
-
     my $bumped_ppi  = $perv->bump_ppi_safely($ppi_doc);
     my $bumped_code = $perv->bump_safely($code);
-    $perv->bump_file_safely( $filename, $version_limit );
+    my $success     = $perv->bump_file_safely( $filename, $version_limit );
 
 =head1 DESCRIPTION
 
@@ -1214,6 +1214,11 @@ will become:
 
 Once C<fc> is implicitely enabled, All uses of C<CORE::fc> will be
 replaced by a bare C<fc>.
+
+=item apostrophe_as_package_separator
+
+When the use of apostrophe (C<'>) as package separator is implicitely
+disabled, every C<'> used as such will be replaced by C<::>.
 
 =back
 

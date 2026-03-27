@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.16.0;
 
-our $VERSION = '0.177';
+our $VERSION = '0.179';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -147,9 +147,6 @@ my $enter_search_string  = 2;
 my $from_filtered_table  = 3;
 my $choose_and_print     = 4;
 
-my $tab_w;
-my $edge_w = 0;
-
 
 sub print_table {
     if ( ref $_[0] ne __PACKAGE__ ) {
@@ -173,9 +170,6 @@ sub print_table {
         for my $key ( keys %$opt ) {
             $self->{$key} = $opt->{$key} if defined $opt->{$key};
         }
-    }
-    if ( $self->{pad_row_edges} ) {
-        $edge_w = 1;
     }
     local $| = 1;
     local $SIG{INT} = sub {
@@ -219,16 +213,16 @@ sub print_table {
     }
     $self->{_search_regex} = '';
     $self->{_idx_search_matches} = [];
-    my ( $term_w, $tbl_print, $table_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig );
-    if ( ! defined $term_w ) {
+    my $width = {};
+    $width->{edge} = $self->{pad_row_edges} ? 1 : 0;
+    my ( $tbl_print, $header_rows ) = $self->__get_data( $tbl_orig, $width );
+    if ( ! defined $tbl_print ) {
         $self->__reset();
         return;
     }
 
     WRITE_TABLE: while ( 1 ) {
-        my $next = $self->__write_table(
-            $term_w, $tbl_orig, $tbl_print, $table_w, $header_rows, $w_col_names
-        );
+        my $next = $self->__write_table( $tbl_orig, $tbl_print, $header_rows, $width );
         if ( ! defined $next ) {
             die;
         }
@@ -236,8 +230,8 @@ sub print_table {
             last WRITE_TABLE;
         }
         elsif ( $next == $window_width_changed || $next == $choose_and_print ) {
-            ( $term_w, $tbl_print, $table_w, $header_rows, $w_col_names ) = $self->__get_data( $tbl_orig, $next );
-            if ( ! defined $term_w ) {
+            ( $tbl_print, $header_rows ) = $self->__get_data( $tbl_orig, $width, $next );
+            if ( ! defined $tbl_print ) {
                 $self->__reset();
                 return;
             }
@@ -258,12 +252,11 @@ sub print_table {
 
 
 sub __used_columns {
-    my ( $self, $term_w, $tbl_orig, $next ) = @_;
+    my ( $self, $tbl_orig, $width, $next ) = @_;
     my $tcu = Term::Choose::Util->new(
         { index => 1, all_by_default => 1, keep_chosen => 1, cs_begin => "\n", confirm => '-OK-', back => ' << ' } # pad_row_edges
     );
     my $cols;
-
     if ( defined $next && $next == $window_width_changed ) {
         $cols = [ @{$self->{_desired_cols_tbl_orig}} ];
     }
@@ -280,18 +273,18 @@ sub __used_columns {
     my $min_col_w_th = $self->{choose_columns} ? 3 : 2; # min_col_width_treshold
     my $desired_cols;
 
-    while ( ( $tab_w + $min_col_w_th ) * $#$cols + $min_col_w_th + $edge_w * 2 > $term_w ) {
-        $tab_w -= 2;
-        if ( $tab_w < 1 ) {
+    while ( ( $width->{tab} + $min_col_w_th ) * $#$cols + $min_col_w_th + $width->{edge} * 2 > $width->{term} ) {
+        $width->{tab} -= 2;
+        if ( $width->{tab} < 1 ) {
             if ( $self->{choose_columns} ) {
                 if ( ! $desired_cols ) {
                     $desired_cols = [ @$cols ];
                 }
-                $tab_w = $self->{tab_width};
+                $width->{tab} = $self->{tab_width};
                 if ( ! ( $self->{tab_width} % 2 ) ) {
-                     ++$tab_w;
+                     ++$width->{tab};
                 }
-                my $avail_w = $term_w - ( $edge_w * 2 + $min_col_w_th );
+                my $avail_w = $width->{term} - ( $width->{edge} * 2 + $min_col_w_th );
                 my $max_cols = 1 + int( $avail_w / ( 1 + $min_col_w_th ) );
                 my $cs_label = "Current window width only supports $max_cols columns.";
                 $cs_label .= "\nPlease reduce your selection or widen the terminal:";
@@ -300,7 +293,7 @@ sub __used_columns {
                 if ( ! defined $new_cols ) {
                     return;
                 }
-                $term_w = get_term_width() + EXTRA_W;
+                $width->{term} = get_term_width() + EXTRA_W;
                 $cols = [ @{$cols}[@$new_cols] ];
             }
             else {
@@ -326,13 +319,13 @@ sub __used_columns {
 
 
 sub __get_data {
-    my ( $self, $tbl_orig, $next ) = @_;
-    my $term_w = get_term_width() + EXTRA_W;
-    $tab_w = $self->{tab_width};
+    my ( $self, $tbl_orig, $width, $next ) = @_;
+    $width->{term}= get_term_width() + EXTRA_W;
+    $width->{tab} = $self->{tab_width};
     if ( ! ( $self->{tab_width} % 2 ) ) {
-        ++$tab_w;   # include the `|`
+        ++$width->{tab};   # include the `|`
     }
-    my ( $desired_cols, $possible_cols ) = $self->__used_columns( $term_w, $tbl_orig, $next );
+    my ( $desired_cols, $possible_cols ) = $self->__used_columns( $tbl_orig, $width, $next );
     if ( ! defined $desired_cols ) {
         return;
     }
@@ -344,37 +337,34 @@ sub __get_data {
         show_progress_bar => $self->{progress_bar} < $items_count,
     } );
     my $tbl_copy = $self->__copy_table( $tbl_orig, $progress );
-    my ( $w_col_names, $w_cols, $w_int, $w_fract ) = $self->__calc_col_width( $tbl_copy, $progress );
-    my $w_cols_calc = $self->__calc_avail_col_width( $term_w, $tbl_copy, $w_col_names, $w_cols, $w_int, $w_fract );
-    if ( ! defined $w_cols_calc ) {
-        return;
-    }
-    my $table_w = sum( @{$w_cols_calc}, $tab_w * $#{$w_cols_calc}, 2 * $edge_w );
-    my $tbl_print = $self->__cols_to_string( $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $progress );
+    $self->__calc_col_width( $tbl_copy, $width, $progress );
+    $self->__calc_avail_col_width( $tbl_copy, $width );
+    $width->{table} = sum( @{$width->{cols_calc}}, $width->{tab} * $#{$width->{cols_calc}}, 2 * $width->{edge} );
+    my $tbl_print = $self->__cols_to_string( $tbl_orig, $tbl_copy, $width, $progress );
     my @tmp_header_rows;
     if ( length $self->{prompt} ) {
         push @tmp_header_rows, $self->{prompt};
     }
     if ( length $self->{info} || length $self->{prompt} ) {
-        push @tmp_header_rows, $self->__header_sep( $w_cols_calc );
+        push @tmp_header_rows, $self->__header_sep( $width );
     }
     my $col_names = shift @{$tbl_print};
-    push @tmp_header_rows, $col_names, $self->__header_sep( $w_cols_calc );
+    push @tmp_header_rows, $col_names, $self->__header_sep( $width );
     my $header_rows = join "\n", @tmp_header_rows;
     if ( $self->{_info_row} ) {
-        if ( print_columns( $self->{_info_row} ) > $table_w ) {
-            push @{$tbl_print}, cut_to_printwidth( $self->{_info_row}, $table_w - 3 ) . '...';
+        if ( print_columns( $self->{_info_row} ) > $width->{table} ) {
+            push @{$tbl_print}, cut_to_printwidth( $self->{_info_row}, $width->{table} - 3 ) . '...';
         }
         else {
             push @{$tbl_print}, $self->{_info_row};
         }
     }
-    return $term_w, $tbl_print, $table_w, $header_rows, $w_col_names;
+    return $tbl_print, $header_rows;
 }
 
 
 sub __write_table {
-    my ( $self, $term_w, $tbl_orig, $tbl_print, $table_w, $header_rows, $w_col_names ) = @_;
+    my ( $self, $tbl_orig, $tbl_print, $header_rows, $width ) = @_;
     my @idxs_tbl_print;
     my $return;
     if ( $self->{_search_regex} ) {
@@ -399,7 +389,7 @@ sub __write_table {
     my $row_was_expanded = 0;
 
     while ( 1 ) {
-        if ( $term_w != get_term_width() + EXTRA_W ) {
+        if ( $width->{term} != get_term_width() + EXTRA_W ) {
             return $window_width_changed;
         }
         if ( ! @{$tbl_print} ) {
@@ -410,7 +400,7 @@ sub __write_table {
         my $row = choose(
             @idxs_tbl_print ? [ @{$tbl_print}[@idxs_tbl_print] ]
                             :     $tbl_print,
-            { info => $self->{info}, prompt => $header_rows, index => 1, default => $old_row, ll => $table_w, layout => 2,
+            { info => $self->{info}, prompt => $header_rows, index => 1, default => $old_row, ll => $width->{table}, layout => 2,
               clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, footer => $footer, color => $self->{color},
               codepage_mapping => $self->{codepage_mapping}, search => $self->{search}, keep => $self->{keep},
               page => $self->{page} }
@@ -471,7 +461,7 @@ sub __write_table {
         else {
             $orig_row = $row + 1; # because $tbl_print has no header row while $tbl_orig has a header row
         }
-        $self->__print_single_row( $tbl_orig, $orig_row, $w_col_names, $footer );
+        $self->__print_single_row( $tbl_orig, $orig_row, $width, $footer );
         delete $ENV{TC_RESET_AUTO_UP};
     }
 }
@@ -527,46 +517,46 @@ sub __copy_table {
 
 
 sub __calc_col_width {
-    my ( $self, $tbl_copy, $progress ) = @_;
+    my ( $self, $tbl_copy, $width, $progress ) = @_;
     $progress->set_progress_bar();            #
     my $ds = $self->{decimal_separator};
-    my $regex_int_fract = "^([^${ds}EeNn]*)(\Q${ds}\E[0-9]+)?\\z";
+    my $regex_int_fract = "^([^${ds}Ee]*)(\Q${ds}\E[0-9]+)?\\z";
     my @col_idx = ( 0 .. $#{$tbl_copy->[0]} );
     my $col_count = @col_idx;
-    my $w_col_names = [];
-    my $w_cols = [ ( 1 ) x $col_count ];
-    my $w_int   = [ ( 0 ) x $col_count ];
-    my $w_fract = [ ( 0 ) x $col_count ];
-    my $col_names = shift @$tbl_copy;
+    $width->{col_names} = [];
+    $width->{cols}      = [ ( 1 ) x $col_count ];
+    $width->{int}       = [ ( 0 ) x $col_count ];
+    $width->{fract}     = [ ( 0 ) x $col_count ];
     for my $col ( @col_idx ) {
-        $w_col_names->[$col] = print_columns( $col_names->[$col] );
+        $width->{col_names}[$col] = print_columns( $tbl_copy->[0][$col] );
     }
 
-    for my $row ( 0 .. $#$tbl_copy ) {
+    for my $row ( 1 .. $#$tbl_copy ) {
+
         for my $col ( @col_idx ) {
             if ( ! length $tbl_copy->[$row][$col] ) {
                 # nothing to do
             }
             elsif ( looks_like_number $tbl_copy->[$row][$col] ) {
                 if ( $tbl_copy->[$row][$col] =~ /$regex_int_fract/ ) {
-                    if ( ( length $1 // 0 ) > $w_int->[$col] ) {
-                        $w_int->[$col] = length $1;
+                    if ( ( length $1 // 0 ) > $width->{int}[$col] ) {
+                        $width->{int}[$col] = length $1;
                     }
-                    if ( ( length $2 // 0 ) > $w_fract->[$col] ) {
-                        $w_fract->[$col] = length $2;
+                    if ( ( length $2 // 0 ) > $width->{fract}[$col] ) {
+                        $width->{fract}[$col] = length $2;
                     }
                 }
                 else {
-                    # scientific notation, NaN, Inf, Infinity
-                    if ( length $tbl_copy->[$row][$col] > $w_cols->[$col] ) {
-                        $w_cols->[$col] = length $tbl_copy->[$row][$col];
+                    # scientific notation
+                    if ( length $tbl_copy->[$row][$col] > $width->{cols}[$col] ) {
+                        $width->{cols}[$col] = length $tbl_copy->[$row][$col];
                     }
                 }
             }
             else {
                 my $str_w = print_columns( $tbl_copy->[$row][$col] );
-                if ( $str_w > $w_cols->[$col] ) {
-                    $w_cols->[$col] = $str_w;
+                if ( $str_w > $width->{cols}[$col] ) {
+                    $width->{cols}[$col] = $str_w;
                 }
             }
         }
@@ -578,27 +568,28 @@ sub __calc_col_width {
     }
 
     for my $col ( @col_idx ) {
-        if ( $w_int->[$col] + $w_fract->[$col] > $w_cols->[$col] ) {
-            $w_cols->[$col] = $w_int->[$col] + $w_fract->[$col];
+        if ( $width->{int}[$col] + $width->{fract}[$col] > $width->{cols}[$col] ) {
+            $width->{cols}[$col] = $width->{int}[$col] + $width->{fract}[$col];
         }
     }
-    unshift @$tbl_copy, $col_names;
-    return $w_col_names, $w_cols, $w_int, $w_fract;
+    return;
 }
 
 
 sub __calc_avail_col_width {
-    my ( $self, $term_w, $tbl_copy, $w_col_names, $w_cols, $w_int, $w_fract ) = @_;
-    my $w_cols_calc = [ @{$w_cols} ];
-    my $avail_w = $term_w - ( $tab_w * $#$w_cols_calc + 2 * $edge_w );
-    my $sum = sum( @$w_cols_calc );
+    my ( $self, $tbl_copy, $width ) = @_;
+    $width->{cols_calc}  = [ @{$width->{cols}}  ];
+    $width->{fract_calc} = [ @{$width->{fract}} ];
+    my $avail_w = $width->{term} - ( $width->{tab} * $#{$width->{cols_calc}} + 2 * $width->{edge} );
+    my $sum = sum( @{$width->{cols_calc}} );
+    my @col_idx = (  0 .. $#{$width->{cols_calc}} );
     if ( $sum < $avail_w ) {
 
         HEAD: while ( 1 ) {
             my $prev_sum = $sum;
-            for my $col ( 0 .. $#$w_col_names ) {
-                if ( $w_col_names->[$col] > $w_cols_calc->[$col] ) {
-                    ++$w_cols_calc->[$col];
+            for my $col ( @col_idx ) {
+                if ( $width->{col_names}[$col] > $width->{cols_calc}[$col] ) {
+                    ++$width->{cols_calc}[$col];
                     ++$sum;
                     if ( $sum == $avail_w ) {
                         last HEAD;
@@ -615,13 +606,13 @@ sub __calc_avail_col_width {
 
             TRUNC_FRACT: while ( 1 ) {
                 my $prev_sum = $sum;
-                for my $col ( 0 .. $#$w_cols_calc ) {
-                    if (   $w_fract->[$col] && $w_fract->[$col] > 3 # 3 == 1 decimal separator + 2 decimal places
-                       #&& $w_int->[$col] + $w_fract->[$col] == $w_cols_calc->[$col] #
-                       ## the column width could be larger than w_int + w_fract, if the column contains non-digit strings
+                for my $col ( @col_idx ) {
+                    if (   $width->{fract_calc}[$col] && $width->{fract_calc}[$col] > 3 # 3 == 1 decimal separator + 2 decimal places
+                       #&& $width->{int}[$col] + $width->{fract_calc}[$col] == $width->{cols_calc}[$col] #
+                       ## the column width could be larger than width int + width fract_calc, if the column contains non-digit strings
                     ) {
-                        --$w_fract->[$col];
-                        --$w_cols_calc->[$col];
+                        --$width->{fract_calc}[$col];
+                        --$width->{cols_calc}[$col];
                         --$sum;
                         if ( $sum == $avail_w ) {
                             last TRUNC_FRACT;
@@ -639,31 +630,30 @@ sub __calc_avail_col_width {
         TRUNC_COLS: while ( $sum > $avail_w ) {
             ++$percent;
 
-            for my $col ( 0 .. $#$w_cols_calc ) {
-                if ( $w_cols_calc->[$col] > $min_col_width ) {
-                    my $reduced_col_w = _minus_x_percent( $w_cols_calc->[$col], $percent );
+            for my $col ( @col_idx ) {
+                if ( $width->{cols_calc}[$col] > $min_col_width ) {
+                    my $reduced_col_w = _minus_x_percent( $width->{cols_calc}[$col], $percent );
                     if ( $reduced_col_w < $min_col_width ) {
                         $reduced_col_w = $min_col_width;
                     }
-                    if ( $w_fract->[$col] > 2 ) {
-                        $w_fract->[$col] -= $w_cols_calc->[$col] - $reduced_col_w;
-                        if ( $w_fract->[$col] < 2 ) {
-                            $w_fract->[$col] = 2;
+                    if ( $width->{fract_calc}[$col] > 2 ) {
+                        $width->{fract_calc}[$col] -= $width->{cols_calc}[$col] - $reduced_col_w;
+                        if ( $width->{fract_calc}[$col] < 2 ) {
+                            $width->{fract_calc}[$col] = 2;
                         }
                     }
-                    #if ( $w_fract->[$col] > 0 ) {
-                    #     $w_fract->[$col] -= $w_cols_calc->[$col] - $reduced_col_w;
-                    #     if ( $w_fract->[$col] < 1 ) {
-                    #         $w_fract->[$col] = "0 but true";
+                    #if ( $width->{fract_calc}[$col] > 0 ) {
+                    #     $width->{fract_calc}[$col] -= $width->{cols_calc}[$col] - $reduced_col_w;
+                    #     if ( $width->{fract_calc}[$col] < 1 ) {
+                    #         $width->{fract_calc}[$col] = "0 but true";
                     #         # keep it true eaven if it is 0 for __cols_to_string to work properly.
                     #     }
                     #}
-                    $w_cols_calc->[$col] = $reduced_col_w;
+                    $width->{cols_calc}[$col] = $reduced_col_w;
                 }
             }
             my $prev_sum = $sum;
-            $sum = sum( @$w_cols_calc );
-
+            $sum = sum( @{$width->{cols_calc}}  );
             if ( $sum == $prev_sum ) {
                 --$min_col_width;
                 if ( $min_col_width < 2 ) { # never
@@ -676,9 +666,9 @@ sub __calc_avail_col_width {
 
             REMAINDER_W: while ( 1 ) {
                 my $prev_remainder_w = $remainder_w;
-                for my $col ( 0 .. $#$w_cols_calc ) {
-                    if ( $w_cols_calc->[$col] < $w_cols->[$col] ) {
-                        ++$w_cols_calc->[$col];
+                for my $col ( @col_idx ) {
+                    if ( $width->{cols_calc}[$col] < $width->{cols}[$col] ) {
+                        ++$width->{cols_calc}[$col];
                         --$remainder_w;
                         if ( $remainder_w == 0 ) {
                             last REMAINDER_W;
@@ -694,78 +684,78 @@ sub __calc_avail_col_width {
     #else {
     #    #$sum == $avail_w, nothing to do
     #}
-    return $w_cols_calc;
+    return;
 }
 
 
 sub __cols_to_string {
-    my ( $self, $tbl_orig, $tbl_copy, $w_cols_calc, $w_fract, $progress ) = @_;
+    my ( $self, $tbl_orig, $tbl_copy, $width, $progress ) = @_;
     $progress->set_progress_bar();
-    my $tab = ( ' ' x int( $tab_w / 2 ) ) . '|' . ( ' ' x int( $tab_w / 2 ) );
+    my $tab = ( ' ' x int( $width->{tab} / 2 ) ) . '|' . ( ' ' x int( $width->{tab} / 2 ) );
     my $one_precision_w = length sprintf "%.1e", 123;
     my $ds = $self->{decimal_separator};
     my $regex_fract = "(\Q${ds}\E[0-9]+)\\z";
-    my $lrb = ' ' x $edge_w;
+    my $lrb = ' ' x $width->{edge};
     my $str;
 
     ROW: for my $row ( 0 .. $#{$tbl_copy} ) {
         $str = $lrb;
 
-        COL: for my $col ( 0 .. $#{$w_cols_calc} ) {
+        COL: for my $col ( 0 .. $#{$width->{cols_calc}} ) {
             if ( ! length $tbl_copy->[$row][$col] ) {
-                $str .= ' ' x $w_cols_calc->[$col];
+                $str .= ' ' x $width->{cols_calc}[$col];
             }
             elsif ( looks_like_number $tbl_copy->[$row][$col] ) {
-                if ( $w_fract->[$col] ) {
+                if ( $width->{fract_calc}[$col] ) {
                     if ( $tbl_copy->[$row][$col] =~ /$regex_fract/ ) {
-                        if ( length $1 > $w_fract->[$col] ) {
-                            $tbl_copy->[$row][$col] = substr( $tbl_copy->[$row][$col], 0,  -( length( $1 ) - $w_fract->[$col] ) );
+                        if ( length $1 > $width->{fract_calc}[$col] ) {
+                            $tbl_copy->[$row][$col] = substr( $tbl_copy->[$row][$col], 0,  -( length( $1 ) - $width->{fract_calc}[$col] ) );
                         }
-                        elsif ( length $1 < $w_fract->[$col] ) {
-                            $tbl_copy->[$row][$col] .= ' ' x ( $w_fract->[$col] - length $1 );
+                        elsif ( length $1 < $width->{fract_calc}[$col] ) {
+                            $tbl_copy->[$row][$col] .= ' ' x ( $width->{fract_calc}[$col] - length $1 );
                         }
                     }
-                    else {
-                        $tbl_copy->[$row][$col] .= ' ' x $w_fract->[$col];
+                    elsif ( $tbl_copy->[$row][$col] !~ /[eE]/ ) {
+                        $tbl_copy->[$row][$col] .= ' ' x $width->{fract_calc}[$col];
+                    }
+                    elsif ( $tbl_copy->[$row][$col] =~ /[eE]-/ && $width->{fract}[$col] != $width->{fract_calc}[$col] ) {
+                        $tbl_copy->[$row][$col] = sprintf "%.*f", $width->{fract_calc}[$col] - 1, $tbl_copy->[$row][$col];
                     }
                 }
-                #else {
-                #    # integer, scientific notation (3.45e12), 'NaN', 'Inf', 'Infinity', '0 but true'
-                #}
-                if ( length $tbl_copy->[$row][$col] > $w_cols_calc->[$col] ) {
-                    my $signed_one_precision_w = $one_precision_w + ( $tbl_copy->[$row][$col] =~ /^-/ ? 1 : 0 );
-                    my $precision;
-                    if ( $w_cols_calc->[$col] < $signed_one_precision_w ) {
-                        # special treatment because zero precision has no dot
+                if ( length $tbl_copy->[$row][$col] > $width->{cols_calc}[$col] ) {
+                    my $precision = $width->{cols_calc}[$col] - ( $one_precision_w + ( $tbl_copy->[$row][$col] < 0 ? 1 : 0 ) ) + 1;
+                    # $one_precision_w + 1 if the number is signed (-)
+                    # $precision + 1 because $one_precision_w contains already one precision
+                    if ( $precision == -1 ) {
                         $precision = 0;
+                        # Difference between one-precision-width and zero-precision-width is 2 because zero precision has no dot.
                     }
-                    else {
-                        $precision = $w_cols_calc->[$col] - ( $signed_one_precision_w - 1 );
-                        # -1 because $signed_one_precision_w contains already one precision
+                    if ( $precision >= 0 ) {
+                        while ( length( $tbl_copy->[$row][$col] = sprintf "%.*e", $precision, $tbl_copy->[$row][$col] ) > $width->{cols_calc}[$col] ) { ##
+                            --$precision;
+                            last if $precision < 0;
+                        }
+
                     }
-                    $tbl_copy->[$row][$col] = sprintf "%.*e", $precision, $tbl_copy->[$row][$col];
-                    # if $tbl_copy->[$row][$col] is a scientific-notation-string which is to big for a conversation to a number
-                    # 'sprintf' returns 'Inf'.
-                    if ( length( $tbl_copy->[$row][$col] ) > $w_cols_calc->[$col] ) {
-                        $str .= ( '-' x $w_cols_calc->[$col] );
+                    if ( $precision < 0 ) {
+                        $str .= ( '-' x $width->{cols_calc}[$col] );
                     }
-                    elsif ( length $tbl_copy->[$row][$col] < $w_cols_calc->[$col] ) {
-                        # $w_cols_calc->[$col] == zero_precision_w + 1  or  $tbl_copy->[$row][$col] == Inf
-                        $str .= ' ' x ( $w_cols_calc->[$col] - length $tbl_copy->[$row][$col] ) . $tbl_copy->[$row][$col];
+                    elsif ( $precision == 0 && length $tbl_copy->[$row][$col] < $width->{cols_calc}[$col] ) {
+                        $str .= ' ' . $tbl_copy->[$row][$col];
                     }
                     else {
                         $str .= $tbl_copy->[$row][$col];
                     }
                 }
-                elsif ( length $tbl_copy->[$row][$col] < $w_cols_calc->[$col] ) {
-                    $str .= ' ' x ( $w_cols_calc->[$col] - length $tbl_copy->[$row][$col] ) . $tbl_copy->[$row][$col];
+                elsif ( length $tbl_copy->[$row][$col] < $width->{cols_calc}[$col] ) {
+                    $str .= ' ' x ( $width->{cols_calc}[$col] - length $tbl_copy->[$row][$col] ) . $tbl_copy->[$row][$col];
                 }
                 else {
                     $str .= $tbl_copy->[$row][$col];
                 }
             }
             else {
-                $str .= adjust_to_printwidth( $tbl_copy->[$row][$col], $w_cols_calc->[$col] );
+                $str .= adjust_to_printwidth( $tbl_copy->[$row][$col], $width->{cols_calc}[$col] );
             }
             if ( $self->{color} ) {
                 my $orig_col = $self->{_used_cols_tbl_orig}[$col];
@@ -786,7 +776,7 @@ sub __cols_to_string {
                     #}
                 }
             }
-            $str .= $col == $#$w_cols_calc ? $lrb : $tab;
+            $str .= $col == $#{$width->{cols_calc}} ? $lrb : $tab;
         }
         $tbl_copy->[$row] = $str;   # overwrite $tbl_copy to save memory
         if ( $progress->{show_progress_bar} ) {
@@ -803,12 +793,12 @@ sub __cols_to_string {
 
 
 sub __print_single_row {
-    my ( $self, $tbl_orig, $row, $w_col_names, $footer ) = @_;
+    my ( $self, $tbl_orig, $row, $width, $footer ) = @_;
     my $avail_w = get_term_width() - 1; ##
     if ( $self->{expanded_max_width} && $self->{expanded_max_width} < $avail_w ) {
         $avail_w = $self->{expanded_max_width};
     }
-    my $max_key_w = max( @{$w_col_names} ) + 1;
+    my $max_key_w = max( @{$width->{col_names}} ) + 1;
     if ( $max_key_w > int( $avail_w / 3 ) ) {
         $max_key_w = int( $avail_w / 3 );
     }
@@ -952,14 +942,14 @@ sub __reset_search {
 
 
 sub __header_sep {
-    my ( $self, $w_cols_calc ) = @_;
-    my $tab = ( '-' x int( $tab_w / 2 ) ) . '|' . ( '-' x int( $tab_w / 2 ) );
-    my $lrb = '-' x $edge_w;
+    my ( $self, $width ) = @_;
+    my $tab = ( '-' x int( $width->{tab} / 2 ) ) . '|' . ( '-' x int( $width->{tab} / 2 ) );
+    my $lrb = '-' x $width->{edge};
     my $header_sep = $lrb;
-    for my $col ( 0 .. $#$w_cols_calc - 1 ) {
-        $header_sep .= '-' x $w_cols_calc->[$col] . $tab;
+    for my $col ( 0 .. $#{$width->{cols_calc}} - 1 ) {
+        $header_sep .= '-' x $width->{cols_calc}[$col] . $tab;
     }
-    $header_sep .=  '-' x $w_cols_calc->[$#$w_cols_calc] . $lrb;
+    $header_sep .=  '-' x $width->{cols_calc}[$#{$width->{cols_calc}}] . $lrb;
     return $header_sep;
 }
 
@@ -995,7 +985,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.177
+Version 0.179
 
 =cut
 

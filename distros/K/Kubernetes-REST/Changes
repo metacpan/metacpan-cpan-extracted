@@ -1,9 +1,20 @@
 Revision history for Kubernetes-REST
 
+1.103     2026-03-25 20:09:12Z
+ - Add Claude Code skills (.claude/skills/) for kubernetes-rest API reference,
+   @Author::GETTY bundle, and dist.ini analysis
+ - Add .gitignore rules for .claude/ directory (track skills, ignore session data)
+ - Fix CPAN testers: replace ->@* postfix dereference with @{ } in t/08_crd.t
+   and t/09_crd_autogen.t for Perl < 5.24 compatibility
+
 1.102     2026-03-09 08:36:25Z
  - Pod Exec API: new `exec()` method in active v1 API.
    Builds `/exec` requests, supports repeated `command=` parameters and stream
    toggles (stdin/stdout/stderr/tty), and passes duplex callbacks
+   (on_open/on_frame/on_close/on_error) to IO backends.
+ - Pod Attach API: new `attach()` method in active v1 API.
+   Builds `/attach` requests with stream toggles
+   (stdin/stdout/stderr/tty) and passes duplex callbacks
    (on_open/on_frame/on_close/on_error) to IO backends.
 
 1.101     2026-03-08 23:49:18Z

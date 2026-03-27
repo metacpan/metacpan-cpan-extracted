@@ -1,13 +1,19 @@
+AI_POLICY.md
 ChangeLog
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 Pty.pm
-README
+README.md
+t/clone_winsize.t
+t/constants.t
 t/pty_destroy.t
 t/pty_get_winsize.t
 t/pty_set_raw.t
+t/slave.t
 t/test.t
+t/ttyname.t
+t/winsize.t
 try
 Tty.pm
 Tty.xs

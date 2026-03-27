@@ -7,8 +7,6 @@ build_requires:
   Test::More: '0'
   bignum: '0'
   strict: '0'
-  utf8: '0'
-  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -18,13 +16,21 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Lingua-ENG-Numbers
+provides:
+  Lingua::ENG::Numbers:
+    file: lib/Lingua/ENG/Numbers.pm
+    version: '0.2603260'
 requires:
   Carp: '0'
   Exporter: '0'
   base: '0'
   perl: v5.16.0
+  utf8: '0'
   vars: '0'
-version: '0.2603230'
+  warnings: '0'
+resources:
+  repository: https://metacpan.org/author/PETAMEM
+version: '0.2603260'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: GPL-2.0-only

@@ -141,55 +141,22 @@ B<Note:> Indexes only work with MySQL 3.23 and later.
 
 sub add_field_integer ($$$$$) {
     my $self=shift;
-    my ($table,$name,$index,$unique,$min,$max,$default,$connected)=@_;
+    my ($table, $name, $index, $unique, $min, $max, $default, $connected, $fdesc) = @_;
+
     $name.='_';
 
+    $fdesc ||= {};
+
     if($self->tr_loc_active || $self->tr_ext_active) {
-        throw $self "add_field_integer - modifying structure in transaction scope is not supported";
+        throw $self "- modifying structure in transaction scope is not supported";
     }
 
-    $min=-0x80000000 unless defined $min;
-    $min=int($min);
-    if(!defined($max)) {
-        $max=($min<0) ? 0x7FFFFFFF : 0xFFFFFFFF;
-    }
-
-    my $sql;
-    if($min<0) {
-        if($min>=-0x80 && $max<=0x7F) {
-            $sql='TINYINT';
-        }
-        elsif($min>=-0x8000 && $max<=0x7FFF) {
-            $sql='SMALLINT';
-        }
-        elsif($min>=-0x800000 && $max<=0x7FFFFF) {
-            $sql='MEDIUMINT';
-        }
-        else {
-            $sql='INT';
-        }
-    }
-    else {
-        if($max<=0xFF) {
-            $sql='TINYINT UNSIGNED';
-        }
-        elsif($max<=0xFFFF) {
-            $sql='SMALLINT UNSIGNED';
-        }
-        elsif($max<=0xFFFFFF) {
-            $sql='MEDIUMINT UNSIGNED';
-        }
-        else {
-            $sql='INT UNSIGNED';
-        }
-    }
-
-    $sql.=" NOT NULL DEFAULT $default";
-
-    $sql="ALTER TABLE $table ADD $name $sql";
+    my $sql =
+        "ALTER TABLE $table ADD $name " .
+        $self->integer_field_definition($min, $max);
 
     my $cn=$self->connector;
-    $cn->sql_do($sql);
+    $cn->sql_do($sql, [$default // 0]);
 
     if(($index || $unique) && (!$unique || !$connected)) {
         my $usql=$unique ? " UNIQUE" : "";
@@ -426,14 +393,21 @@ Adds a field to the list of things to alter on maxlength_change_execute()
 =cut
 
 sub maxlength_change_field ($$$$$$) {
-    my ($self,$csh,$name,$maxlength,$fdesc)=@_;
+    my ($self, $csh, $name, $maxlength, $fdesc) = @_;
 
-    my $def=$self->text_field_definition($fdesc->{'charset'} || 'binary',$maxlength);
+    my $type = $fdesc->{'type'};
+    my $def;
+    if($type eq 'text' || $type eq 'blob') {
+        $def = $self->text_field_definition($fdesc->{'charset'} || 'binary',$maxlength);
+    }
+    else {
+        throw $self "- cannot change 'maxlength' on '$type' fields";
+    }
 
-    $csh->{'sql'}.=', ' if $csh->{'sql'};
-    $csh->{'sql'}.="CHANGE ".
-                   $self->mangle_field_name($name)." ".
-                   $self->mangle_field_name($name)." ".$def;
+    $csh->{'sql'} .= ', ' if $csh->{'sql'};
+    $csh->{'sql'} .= "CHANGE ".
+        $self->mangle_field_name($name) . " " .
+        $self->mangle_field_name($name) . " " . $def;
 
     push(@{$csh->{'defaults'}},$fdesc->{'default'});
 }
@@ -450,6 +424,7 @@ sub maxlength_change_execute ($$) {
     my ($self,$csh)=@_;
 
     my $sql="ALTER TABLE ".$csh->{'table'}." ".$csh->{'sql'};
+
     $self->connector->sql_do($sql,$csh->{'defaults'});
 }
 
@@ -511,6 +486,77 @@ sub scale_change_execute ($$) {
     ### dprint "...SQL: $sql";
 
     $self->connector->sql_do($sql,$csh->{'defaults'});
+}
+
+###############################################################################
+
+=item minmax_change_prepare ($)
+
+Prepares an internal structure for a later one-shot modification of
+'minvalue' and 'maxvalue' in a table.
+
+=cut
+
+sub minmax_change_prepare ($$) {
+    my ($self,$table)=@_;
+
+    $table || throw $self "- no 'table' given";
+
+    return {
+        sql     => '',
+        table   => $table,
+        defaults=> [ ],
+    };
+}
+
+###############################################################################
+
+=item minmax_change_field
+
+Adds a field to the list of things to alter on minmax_change_execute()
+
+=cut
+
+sub minmax_change_field ($$$$$$) {
+    my ($self, $csh, $name, $minvalue, $maxvalue, $fdesc) = @_;
+
+    my $type = $fdesc->{'type'};
+
+    my $def;
+    if($type eq 'integer') {
+        $def = $self->integer_field_definition($minvalue, $maxvalue);
+    }
+    elsif($type eq 'real') {
+        $def = $self->real_field_definition($minvalue, $maxvalue, $fdesc->{'maxlength'});
+    }
+    else {
+        throw $self "- can't modify min/max on type '$type'";
+    }
+
+    $csh->{'sql'} .= ', ' if $csh->{'sql'};
+    $csh->{'sql'} .= "CHANGE " .
+                     $self->mangle_field_name($name) . " " .
+                     $self->mangle_field_name($name) . " " . $def;
+
+    push(@{$csh->{'defaults'}}, $fdesc->{'default'} // 0);
+}
+
+###############################################################################
+
+=item minmax_change_execute
+
+Executes actual SQL collected from minmax_change_field()
+
+=cut
+
+sub minmax_change_execute ($$) {
+    my ($self, $csh)=@_;
+
+    my $sql = "ALTER TABLE " . $csh->{'table'} . " " . $csh->{'sql'};
+
+    ### dprint "...SQL: $sql";
+
+    $self->connector->sql_do($sql, $csh->{'defaults'});
 }
 
 ###############################################################################
@@ -686,7 +732,7 @@ sub initialize_database ($) {
     my $self=shift;
 
     if($self->tr_loc_active || $self->tr_ext_active) {
-        throw $self "initialize_database - modifying structure in transaction scope is not supported";
+        throw $self "- modifying structure in transaction scope is not supported";
     }
 
     my $cn=$self->connector;
@@ -713,8 +759,8 @@ CREATE TABLE Global_Fields (
   default_ VARBINARY(30) DEFAULT NULL,
   charset_ CHAR(30) CHARACTER SET latin1 DEFAULT NULL,
   maxlength_ INT UNSIGNED DEFAULT NULL,
-  maxvalue_ DOUBLE DEFAULT NULL,
-  minvalue_ DOUBLE DEFAULT NULL,
+  minvalue_ BIGINT DEFAULT NULL,
+  maxvalue_ BIGINT DEFAULT NULL,
   PRIMARY KEY  (table_name_,field_name_),
   UNIQUE KEY unique_id (unique_id)
 )
@@ -871,23 +917,35 @@ sub load_structure ($) {
         # Checking if Global_Fields table has key_format_ and key_seq_
         # fields. Adding them if it does not.
         #
-        $sth=$cn->sql_execute("DESC Global_Fields");
-        my $flist=$cn->sql_first_column($sth);
-        if(! grep { $_ eq 'key_format_' } @$flist) {
+        $sth = $cn->sql_execute("DESC Global_Fields");
+        my %gf;
+        while(my $row=$cn->sql_fetch_row($sth)) {
+            $gf{$row->[0]} = $row->[1];
+        }
+
+        if(! $gf{'key_format_'}) {
             dprint "Old database detected, adding Global_Fields.key_format_";
             $cn->sql_do('ALTER TABLE Global_Fields ADD key_format_ CHAR(100) CHARACTER SET latin1 DEFAULT NULL');
         }
-        if(! grep { $_ eq 'key_seq_' } @$flist) {
+        if(! $gf{'key_seq_'}) {
             dprint "Old database detected, adding Global_Fields.key_seq_";
             $cn->sql_do('ALTER TABLE Global_Fields ADD key_seq_ INT UNSIGNED DEFAULT NULL');
         }
 
-        ##
         # Checking for charset field, adding it if needed.
         #
-        if(! grep { $_ eq 'charset_' } @$flist) {
+        if(! $gf{'charset_'}) {
             dprint "Old database detected, adding Global_Fields.charset_";
             $cn->sql_do(q{ALTER TABLE Global_Fields ADD charset_ CHAR(30) CHARACTER SET latin1 DEFAULT NULL});
+        }
+
+        # Checking if minvalue/maxvalue are 'double' (before version 1.27)
+        #
+        foreach my $n (qw(minvalue_ maxvalue_)) {
+            if($gf{$n} !~ /^bigint/i) {
+                dprint "Old database detected, updating Global_Fields.$n to bigint";
+                $cn->sql_do(qq{ALTER TABLE Global_Fields CHANGE $n $n BIGINT DEFAULT NULL});
+            }
         }
     }
 
@@ -1018,7 +1076,7 @@ sub load_structure ($) {
                     next if ($type eq 'list' || $type eq 'key' || $type eq 'connector');
 
                     my $tbdata=$tbdesc{$table}->{$fname.'_'} ||
-                        throw $self "load_structure - no table definition for $fname in $table (how could it be?)";
+                        throw $self "- no table definition for $fname in $table (how could it be?)";
 
                     if(defined($tbdata->{'default'}) && $tbdata->{'default'} =~ /^\s+$/) {
                         if(defined($flist->{$fname}->{'default'}) && $tbdata->{'default'} eq $flist->{$fname}->{'default'}) {
@@ -1243,12 +1301,16 @@ sub load_structure ($) {
                 }
             }
             if($sql) {
-                dprint "....preparing to execute, LAST CHANCE TO ABORT";
-                sleep 3;
-                dprint ".....executing SQL instructions, do not interrupt";
                 $sql="ALTER TABLE $table $sql";
-                ### dprint $sql;
+
+                dprint "....preparing to execute, LAST CHANCE TO ABORT";
+                dprint ".....SQL: $sql";
+                sleep 3;
+
+                dprint ".....executing SQL instructions, do not interrupt";
+
                 $cn->sql_do($sql,@deflist);
+
                 foreach my $fname (@altered_fields) {
                     $sql="UPDATE Global_Fields SET charset_='binary' WHERE table_name_='$table' AND field_name_='$fname'";
                     ### dprint $sql;
@@ -1576,6 +1638,78 @@ sub store_row ($$$$$$$) {
     }
 
     return $key_value;
+}
+
+###############################################################################
+
+sub integer_field_definition ($$$$) {
+    my ($self, $minvalue, $maxvalue) = @_;
+
+    # Historically, 32-bit values are the defaults
+    #
+    $minvalue = int($minvalue // -0x80000000);
+
+    if(!defined($maxvalue)) {
+        $maxvalue = ($minvalue < 0 ? 0x7FFFFFFF : 0xFFFFFFFF);
+    }
+
+    my $signed = ($minvalue < 0);
+
+    # Maxlength is the stored integer length in bytes. Autodetermined if
+    # undefined or zero (legacy default) or can be forced.
+    #
+    my $bytelen;
+    if($signed) {
+        if($minvalue >= -0x80 && $maxvalue <= 0x7F) {
+            $bytelen = 1;
+        }
+        elsif($minvalue >= -0x8000 && $maxvalue <= 0x7FFF) {
+            $bytelen = 2;
+        }
+        elsif($minvalue >= -0x800000 && $maxvalue <= 0x7FFFFF) {
+            $bytelen = 3;
+        }
+        elsif($minvalue >= -0x80000000 && $maxvalue <= 0x7FFFFFFF) {
+            $bytelen = 4;
+        }
+        else {
+            $bytelen = 8;
+        }
+    }
+    else {
+        if($maxvalue <= 0xFF) {
+            $bytelen = 1;
+        }
+        elsif($maxvalue <= 0xFFFF) {
+            $bytelen = 2;
+        }
+        elsif($maxvalue <= 0xFFFFFF) {
+            $bytelen = 3;
+        }
+        elsif($maxvalue <= 0xFFFFFFFF) {
+            $bytelen = 4;
+        }
+        else {
+            $bytelen = 8;
+        }
+    }
+
+    my %typemap = (
+        1 => 'TINYINT',
+        2 => 'SMALLINT',
+        3 => 'MEDIUMINT',
+        4 => 'INT',
+        8 => 'BIGINT',
+    );
+
+    my $sqltype = $typemap{$bytelen} ||
+        throw $self "- invalid integer byte length";
+
+    my $sql = $sqltype . ($signed ? '' : ' UNSIGNED') . ' NOT NULL DEFAULT ?';
+
+    ### dprint "......definition for integer(", $minvalue, ", ", $maxvalue, "): $sql";
+
+    return $sql;
 }
 
 ###############################################################################

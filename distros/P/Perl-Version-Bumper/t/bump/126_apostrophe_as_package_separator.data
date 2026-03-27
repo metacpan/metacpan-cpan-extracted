@@ -1,10 +1,16 @@
 ########## no feature apostrophe_as_package_separator
 no feature 'apostrophe_as_package_separator';
+use Test::More;
+isn't( 3, 4, '3 != 4' );
 ---
 use VERSION;
 no feature 'apostrophe_as_package_separator';
+use Test::More;
+isn't( 3, 4, '3 != 4' );
 --- v5.42
 use VERSION;
+use Test::More;
+isn't( 3, 4, '3 != 4' );
 ########## feature apostrophe_as_package_separator
 use feature 'apostrophe_as_package_separator';
 ---

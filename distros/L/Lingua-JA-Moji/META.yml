@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/Lingua-JA-Moji/issues
   repository: https://github.com/benkasminbullock/Lingua-JA-Moji
-version: '0.60'
+version: '0.61'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

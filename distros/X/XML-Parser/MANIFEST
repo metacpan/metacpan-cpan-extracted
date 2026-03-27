@@ -1,3 +1,4 @@
+AI_POLICY.md
 Changes				Change log
 Expat/encoding.h		Header file; describes *.enc structure
 Expat/Expat.pm			XML::Parser::Expat module
@@ -50,6 +51,7 @@ share/x-sjis-jdk117.enc		x-sjis-jdk117 encoding map
 share/x-sjis-jisx0221.enc	x-sjis-jisx0221 encoding map
 share/x-sjis-unicode.enc	x-sjis-unicode encoding map
 t/astress.t			Test script
+t/bare_glob_filehandle.t
 t/cdata.t			Test script
 t/char_end_doc.t
 t/checklib_findcc.t
@@ -92,6 +94,7 @@ t/stream.t			Test script
 t/stream_attr_escape.t
 t/stream_localize.t
 t/styles.t			Test script
+t/subs_inherited.t
 t/tree_entity_expand.t
 t/utf8_handling.t
 t/utf8_stream.t

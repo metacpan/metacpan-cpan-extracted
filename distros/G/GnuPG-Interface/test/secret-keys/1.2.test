@@ -6,9 +6,11 @@ sec   dsa1024 2000-02-06 [SCA]
 uid           [ unknown] GnuPG test key (for testing purposes only)
 uid           [ unknown] Foo Bar (1)
 ssb   elg768 2000-02-06 [E]
+      7466B7E98C4CCB64C2CE738BADB99D9C2E854A6B
 
 sec   rsa2048 2016-10-12 [SC]
       278F850AA702911F1318F0A61B913CE9B6747DDC
 uid           [ unknown] GnuPG::Interface Test key <test@example.org>
 ssb   rsa2048 2016-10-12 [E]
+      5031BC730FCA29EDFB7032A00DCD4B62AE441D0F
 

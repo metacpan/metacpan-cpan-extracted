@@ -10,7 +10,7 @@ use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 use English;
 use Error::Pure::Utils qw(err_get);
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 sub module_name {
 	my $self = shift;

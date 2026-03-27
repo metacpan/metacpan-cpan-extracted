@@ -1,16 +1,19 @@
 use warnings;
 use strict;
 
-use Test::More tests => 8;
+use Test::More tests => 10;
 use Config;
 
 my $perl = $Config{perlpath};
 
 # The bufr file t/set_filter.bufr starts with a GTS bulletin
 # containing 3 BUFR messages, where only the first one have AHL and
-# the second one is corrupt. Then 3 normal GTS bulletins, then a
-# corrrupt GTS bulletin, then lastly one GTS bulletin containing 2
-# BUFR messages with different AHls
+# the second one is corrupt. Then one GTS bulletin with missing '7777'
+# (will result in warning with bufrread.pl --strict_checking, and will
+# not be extracted by bufrextract.pl unless for option --only_ahl),
+# then 2 normal GTS bulletins, then a corrrupt GTS bulletin, then
+# lastly one GTS bulletin containing 2 BUFR messages with different
+# AHls
 
 my $output = `$perl ./bufrextract.pl t/set_filter.bufr --only_ahl`;
 my $expected = read_file('t/extract.txt1') ;
@@ -54,7 +57,13 @@ unlink 't/outext5';
 $expected = read_binary_file('t/extract.bufr3') ;
 is($output, $expected, 'testing bufrextract.pl --without_ahl');
 
+$output = `$perl ./bufrextract.pl t/set_filter.bufr --filter "dc=0 ic=1,2" --only_ahl`;
+$expected = read_file('t/extract.txt3') ;
+is($output, $expected, 'testing bufrextract.pl --filter');
 
+$output = `$perl ./bufrextract.pl t/empty_file --filter "dc=0 ic=1,2"`;
+$expected = '' ;
+is($output, $expected, 'testing bufrextract.pl --filter on empty file');
 
 
 # Testing of extraction of BUFR messages (with ahls) given as argument

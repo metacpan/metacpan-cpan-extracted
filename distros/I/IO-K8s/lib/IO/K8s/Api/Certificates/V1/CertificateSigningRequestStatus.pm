@@ -1,6 +1,6 @@
 package IO::K8s::Api::Certificates::V1::CertificateSigningRequestStatus;
 # ABSTRACT: CertificateSigningRequestStatus contains conditions used to indicate approved/denied/failed status of the request, and the issued certificate.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s certificate => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Certificates::V1::CertificateSigningRequestStatus - CertificateSig
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 certificate
 

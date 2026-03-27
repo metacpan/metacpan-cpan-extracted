@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.10.1;
 
-our $VERSION = '1.780';
+our $VERSION = '1.781';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose );
 
@@ -85,8 +85,8 @@ sub _valid_options {
         keep                => '[ 1-9 ][ 0-9 ]*',
         ll                  => '[ 1-9 ][ 0-9 ]*',
         max_cols            => '[ 1-9 ][ 0-9 ]*',
-        max_height          => '[ 1-9 ][ 0-9 ]*',
-        max_width           => '[ 1-9 ][ 0-9 ]*',
+        max_height          => '(?:[2-9]|[ 1-9 ][ 0-9 ]+)',
+        max_width           => '(?:[2-9]|[ 1-9 ][ 0-9 ]+)',
         default             => '[ 0-9 ]+',
         pad                 => '[ 0-9 ]+',
         margin              => 'Array_Int',
@@ -236,6 +236,15 @@ sub __reset_term {
 }
 
 
+sub __invalid_term_size {
+    my ( $self, $term_width, $term_height, $clear_choose ) = @_;
+    $self->__reset_term( $clear_choose );
+    die "Undefined term width."  if ! defined $term_width;
+    die "Undefined term height." if ! defined $term_height;
+    exit;
+}
+
+
 sub __get_key {
     my ( $self ) = @_;
     my $key;
@@ -257,6 +266,9 @@ sub __modify_options {
     my ( $self ) = @_;
     if ( defined $self->{max_cols} && $self->{max_cols} == 1 ) {
         $self->{layout} = 2;
+    }
+    if ( $self->{max_height} && $self->{max_height} < $self->{keep} ) {
+        $self->{keep} = $self->{max_height};                                ##
     }
     if ( length $self->{footer} && $self->{page} != 2 ) {
         $self->{page} = 2;
@@ -341,6 +353,9 @@ sub __choose {
     };
     $self->__init_term();
     ( $self->{term_width}, $self->{term_height} ) = get_term_size();
+    if ( ( $self->{term_width} // 0 ) < 2 || ( $self->{term_height} // 0 ) < 2 ) {
+        $self->__invalid_term_size( $self->{term_width}, $self->{term_height}, 0 );
+    }
     $self->__wr_first_screen();
     my $fast_page = 10;
     if ( $self->{pp_count} > 10_000 ) {
@@ -357,6 +372,9 @@ sub __choose {
         }
         $self->{pressed_key} = $key;
         my ( $new_width, $new_height ) = get_term_size();
+        if ( ( $new_width // 0 ) < 2 || ( $new_height // 0 ) < 2 ) {
+            $self->__invalid_term_size( $new_width, $new_height, 1 );
+        }
         if ( $new_width != $self->{term_width} || $new_height != $self->{term_height} ) {
             if ( $self->{ll} ) {
                 $self->__reset_term( 0 );
@@ -757,15 +775,20 @@ sub __beep {
 sub __wr_first_screen {
     my ( $self ) = @_;
     my $info_w = $self->{term_width} + EXTRA_W;
-    $info_w = $self->{max_width} if $self->{max_width} && $info_w > $self->{max_width};
-
     for my $opt ( qw( info prompt bottom_text ) ) {
         if ( length $self->{$opt} ) {
             my $init     = $self->{'tabs_' . $opt}[0] // 0;
             my $subseq   = $self->{'tabs_' . $opt}[1] // 0;
             my $r_margin = $self->{'tabs_' . $opt}[2] // 0;
+            if ( $init + $r_margin > $info_w - 6 || $subseq + $r_margin > $info_w - 6 ) { ##
+                ( $init, $subseq, $r_margin ) = ( 0, 0, 0 );
+            }
+            my $width = $info_w - $r_margin;
+            if ( $self->{max_width} && $width > $self->{max_width} ) {
+                $width = $self->{max_width} + ( $self->{margin_left} // 0 ); ##
+            }
             $self->{$opt . '_rows'} = [ line_fold(
-                $self->{$opt}, { width => $info_w - $r_margin, init_tab => $init, subseq_tab => $subseq,
+                $self->{$opt}, { width => $width, init_tab => $init, subseq_tab => $subseq,
                 color => $self->{color}, join => 0 }
             ) ];
         }
@@ -827,8 +850,15 @@ sub __avail_screen_size {
     }
     $self->{avail_width} -= $self->{margin_left}  if $self->{margin_left};
     $self->{avail_width} -= $self->{margin_right} if $self->{margin_right};
-    $self->{avail_width} = $self->{max_width}     if $self->{max_width} && $self->{avail_width} > $self->{max_width};
-    $self->{avail_width} = 1                      if $self->{avail_width} < 1;
+    if ( $self->{avail_width} < 6 ) { ##
+        delete $self->{margin_right};
+        delete $self->{margin_left};
+        $self->{avail_width} = $self->{term_width};
+        $self->{avail_width} += EXTRA_W if $self->{col_width} > $self->{avail_width};
+    }
+    if ( $self->{max_width} && $self->{avail_width} > $self->{max_width} ) {
+        $self->{avail_width} = $self->{max_width};
+    }
     #if ( $self->{ll} && $self->{ll} > $self->{avail_width} ) {
     #    return -2;
     #}
@@ -839,9 +869,11 @@ sub __avail_screen_size {
     $self->{avail_height}--                               if $self->{page};
     $self->{avail_height} -= @{$self->{bottom_text_rows}} if $self->{bottom_text_rows};
     $self->{avail_height} -= $self->{margin_bottom}       if $self->{margin_bottom};
-    $self->{avail_height} = $self->{max_height}           if $self->{max_height} && $self->{avail_height} > $self->{max_height};
     if ( $self->{avail_height} < $self->{keep} ) {
         $self->__avail_height_to_keep();
+    }
+    if ( $self->{max_height} && $self->{avail_height} > $self->{max_height} ) { ##
+        $self->{avail_height} = $self->{max_height};
     }
     $self->{count_pre_rows} = ( $self->{margin_top} // 0 ) + @{$self->{info_rows}//[]} + @{$self->{prompt_rows}//[]};
     if ( length $self->{search_info} ) {
@@ -884,17 +916,20 @@ sub __avail_height_to_keep {
     }
     if ( $self->{margin_right} || $self->{margin_left} ) {
         my $orig_margin_right = $self->{margin_right} // 0;
-        my $orig_margin_left = $self->{margin_left} // 0;
-        $self->{margin_right} = $self->{margin_right} ? 1 : 0;
-        $self->{margin_left} = $self->{margin_left} ? 1 : 0;
+        my $orig_margin_left  = $self->{margin_left}  // 0;
+        $self->{margin_right} = $self->{margin_right} && $self->{term_width} > 4 ? 1 : 0; ##
+        $self->{margin_left}  = $self->{margin_left}  && $self->{term_width} > 4 ? 1 : 0; ##
 
         for my $opt ( qw( info prompt bottom_text ) ) {
             if ( length $self->{$opt} ) {
-                # don't change tab_prompt, tab_info and tab_text, because they are not restored on win resize.
-                my $ts = 'tabs_' . $opt;
-                my $init     = defined $self->{$ts}[0] && $self->{$ts}[0] < $self->{margin_left} ? $self->{$ts}[0] : $self->{margin_left};
-                my $subseq   = defined $self->{$ts}[1] && $self->{$ts}[1] < $self->{margin_left} ? $self->{$ts}[1] : $self->{margin_left};
-                my $r_margin = defined $self->{$ts}[2] && $self->{$ts}[2] < $self->{margin_right} ? $self->{$ts}[2] : $self->{margin_right};
+                ## don't change tab_prompt, tab_info and tab_text, because they are not restored on win resize.
+                #my $ts = 'tabs_' . $opt;
+                #my $init     = defined $self->{$ts}[0] && $self->{$ts}[0] < $self->{margin_left} ? $self->{$ts}[0] : $self->{margin_left};
+                #my $subseq   = defined $self->{$ts}[1] && $self->{$ts}[1] < $self->{margin_left} ? $self->{$ts}[1] : $self->{margin_left};
+                #my $r_margin = defined $self->{$ts}[2] && $self->{$ts}[2] < $self->{margin_right} ? $self->{$ts}[2] : $self->{margin_right};
+                my $init     = $self->{margin_left};
+                my $subseq   = $self->{margin_left};
+                my $r_margin = $self->{margin_right};
                 my $prev_row_count = @{$self->{$opt . '_rows'}};
                 $self->{$opt . '_rows'} = [ line_fold(
                     $self->{$opt}, { width => $self->{term_width} + EXTRA_W - $r_margin, init_tab => $init,
@@ -905,59 +940,28 @@ sub __avail_height_to_keep {
         }
         $self->{avail_width} += ( $orig_margin_right - $self->{margin_right} ) + ( $orig_margin_left - $self->{margin_left} );
         $keep = $self->__keep_to_row_count( $keep );
-
     }
     if ( $keep <= $self->{avail_height} ) {
         return;
     }
-    # Now change method:
-    my $available_rows = 0;
-    if ( $self->{term_height} > $keep ) {
-        $self->{avail_height} = $keep;
-        $available_rows = $self->{term_height} - $self->{avail_height};
-    }
-    if ( length $self->{search_info} ) {
-        if ( $available_rows ) {
-            --$available_rows;
+    if ( $self->{info_rows} ) {
+        # Text rows above the menu (info_rows, prompt_rows, search_info) are not deleted. They are pushed upwards
+        # out of the terminal when the space reserved for them is deleted.
+        if ( @{$self->{info_rows}} >= $keep - $self->{avail_height} ) {
+            $self->{avail_height} = $keep;
         }
         else {
-            --$self->{avail_height};
+            $self->{avail_height} += @{$self->{info_rows}};
         }
     }
-    if ( $self->{page} ) {
-        if ( $available_rows ) {
-            --$available_rows;
-        }
-        else {
-            --$self->{avail_height};
-        }
-    }
-    if ( $self->{prompt_rows} ) {
-        if ( $available_rows ) {
-            if ( @{$self->{prompt_rows}} > $available_rows ) {
-                #splice @{$self->{prompt_rows}}, 0, @{$self->{prompt_rows}} - $available_rows;
-                $available_rows = 0;
-            }
-            else {
-                $available_rows -= @{$self->{prompt_rows}};
-            }
-        }
-        elsif ( $self->{avail_height} > 4 ) {
-            #$self->{prompt_rows} = [ $self->{prompt_rows}[-1] ];
-            --$self->{avail_height};
-        }
-        #else {
-        #    delete $self->{prompt_rows};
-        #}
-    }
-    if ( ! $available_rows ) {
-        #delete $self->{info_rows};
-        delete $self->{bottom_text_rows};
+    if ( $keep <= $self->{avail_height} ) {
         return;
     }
     if ( $self->{bottom_text_rows} ) {
-        if ( @{$self->{bottom_text_rows}} > $available_rows ) {
-            $#{$self->{bottom_text_rows}} = $available_rows - 1;
+        if ( @{$self->{bottom_text_rows}} > $keep - $self->{avail_height} ) {
+            splice( @{$self->{bottom_text_rows}}, -( $keep - $self->{avail_height} ) );
+            # bottom_text_rows are deleted because they are below the menu.
+            $self->{avail_height} = $keep;
             my $ellipsis = '...';
             my $ellipsis_w = length $ellipsis;
             my $avail_w = $self->{avail_width} + EXTRA_W + ( $self->{margin_left} // 0 );
@@ -967,19 +971,54 @@ sub __avail_height_to_keep {
                 }
                 $self->{bottom_text_rows}[-1] .= $ellipsis;
             }
-            $available_rows = 0;
         }
         else {
-            $available_rows -= @{$self->{bottom_text_rows}};
+            $self->{avail_height} += @{$self->{bottom_text_rows}};
+            delete $self->{bottom_text_rows};
         }
     }
-    #if ( ! $available_rows ) {
-    #    delete $self->{info_rows};
-    #    return;
-    #}
-    #if (  $self->{info_rows} ) {
-    #    if ( @{$self->{info_rows}} > $available_rows ) { ##
-    #        splice @{$self->{info_rows}}, 0, @{$self->{info_rows}} - $available_rows;
+    if ( $keep <= $self->{avail_height} ) {
+        return;
+    }
+    if ( $self->{prompt_rows} ) {
+        if ( @{$self->{prompt_rows}} > $keep - $self->{avail_height} ) {
+            $self->{avail_height} = $keep;
+        }
+        else {
+            if ( $self->{avail_height} + @{$self->{prompt_rows}} > 4 ) {
+                # keep the last prompt line
+                $self->{avail_height} += @{$self->{prompt_rows}} - 1;
+                --$keep;
+            }
+            else {
+                $self->{avail_height} += @{$self->{prompt_rows}};
+            }
+        }
+    }
+    if ( $keep <= $self->{avail_height} ) {
+        return;
+    }
+    if ( length $self->{search_info} ) {
+        if ( $self->{avail_height} > 2 ) {
+            --$keep;
+        }
+        else {
+            ++$self->{avail_height};
+        }
+    }
+    if ( $keep <= $self->{avail_height} ) {
+        return;
+    }
+    if ( $self->{page} ) {
+        --$keep;
+    }
+    #if ( $self->{page} ) {
+    #    if ( $self->{avail_height} > 1 ) {
+    #        --$keep;
+    #    }
+    #    else {
+    #        ++$self->{avail_height};
+    #        delete $self->{footer_fmt};
     #    }
     #}
 }
@@ -1457,7 +1496,7 @@ Term::Choose - Choose items from a list interactively.
 
 =head1 VERSION
 
-Version 1.780
+Version 1.781
 
 =cut
 
@@ -1893,7 +1932,7 @@ Height in this context means print rows.
 
 I<max_height> overwrites I<keep> if I<max_height> is set to a value less than I<keep>.
 
-Allowed values: 1 or greater
+Allowed values: 2 or greater
 
 (default: undefined)
 
@@ -1905,7 +1944,7 @@ To prevent the "auto-format" to use a width less than I<max_width> set I<layout>
 
 Width refers here to the number of print columns.
 
-Allowed values: 1 or greater
+Allowed values: 2 or greater
 
 (default: undefined)
 

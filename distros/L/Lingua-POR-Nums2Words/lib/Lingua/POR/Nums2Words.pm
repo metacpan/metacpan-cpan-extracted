@@ -3,16 +3,17 @@
 package Lingua::POR::Nums2Words;
 # ABSTRACT: Number 2 word conversion in POR.
 
-# {{{ use block
-
 use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 # }}}
 
@@ -131,7 +132,7 @@ Lingua::POR::Nums2Words - Converts numbers to Portuguese words
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -160,21 +161,19 @@ This is the only function in this module. It turns numbers into words.
   $number = num2word(77);
   # $number now holds "setenta e sete"
 
-
-
-
-
 =head1 SEE ALSO
 
 More tools for the Portuguese language processing can be found at the
 Natura project: http://natura.di.uminho.pt
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Jose Castro, <cog@cpan.org>
-
-Maintenance
-Petamem s.r.o., <info@petamem.com>
+ initial coding:
+   Jose Castro E<lt>cog@cpan.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT & LICENSE
 
@@ -182,6 +181,12 @@ Copyright 2004 Jose Castro, All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

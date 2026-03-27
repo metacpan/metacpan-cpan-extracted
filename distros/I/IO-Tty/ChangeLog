@@ -1,3 +1,49 @@
+1.23 2026-03-24 Todd Rinaldo <toddr@cpan.org>
+
+  Bug Fixes:
+    * PR #52 - Replace deprecated indirect object syntax (e.g. `new IO::Pty`)
+      with direct method calls (`IO::Pty->new`). Perl 5.36+ disables indirect
+      object calls, so this fixes forward compatibility.
+
+  Improvements:
+    * PR #53 - Add clone_winsize_from() test coverage (7 new tests) covering
+      basic clone between slave ttys, non-tty master fast path, croak on
+      non-tty source, and pixel dimension preservation.
+
+  Maintenance:
+    * PR #52 - Regenerate README from POD to fix stale version.
+    * PR #53 - Modernize `use vars` to `our` declarations in Tty.pm and
+      Pty.pm. Add missing `use warnings` to Pty.pm.
+    * Add AI_POLICY.md for transparency on AI-assisted contributions.
+    * Convert README to Markdown and update MANIFEST.
+
+1.22 2026-03-24 Todd Rinaldo <toddr@cpan.org>
+
+  Bug Fixes:
+    * GH #47, PR #48 - Fix function detection on Solaris by adding
+      __EXTENSIONS__ to expose BSD extensions (like strlcpy) that are
+      hidden when _XOPEN_SOURCE is defined.
+    * PR #49 - Fix file descriptor leaks in open_slave() error paths.
+      The master pty fd was not closed on several early-return error
+      paths, causing fd leaks when falling through multiple pty
+      allocation methods.
+
+  Improvements:
+    * PR #50 - Add unit tests for ttyname(), slave()/close_slave()
+      lifecycle, set_winsize()/get_winsize() round-trips,
+      pack_winsize/unpack_winsize, and constant importing (28 new tests).
+    * PR #51 - Replace DynaLoader with XSLoader and bump minimum perl
+      version to 5.8.8. XSLoader is simpler and has been in core since
+      perl 5.6.
+
+  Maintenance:
+    * PR #44 - Fix stale POD versions, add Perl 5.38/5.40 to CI, and
+      update repository URLs from toddr/IO-Tty to cpan-authors/IO-Tty.
+    * PR #45 - Remove dead Perl 5.003 compatibility code, modernize XS
+      (Nullch to NULL, perl_get_sv to get_sv, sprintf to snprintf).
+    * PR #46 - Modernize CI with dynamic perl version discovery via
+      perl-actions/perl-versions and add a disttest job.
+
 1.21 2026-03-22 Todd Rinaldo <toddr@cpan.org>
 
   Bug Fixes:

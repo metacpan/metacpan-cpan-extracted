@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::Addon;
 # ABSTRACT: K3s cluster addon
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject
     api_version     => 'k3s.cattle.io/v1',
     resource_plural => 'addons';
@@ -23,7 +23,7 @@ IO::K8s::K3s::V1::Addon - K3s cluster addon
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

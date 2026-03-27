@@ -56,6 +56,7 @@ t/delayed_repetition.bufr
 t/delayed_repetition.txt
 t/delayed_repetition_compressed.bufr
 t/delayed_repetition_compressed.txt
+t/empty_file
 t/encoded_ed3
 t/encoded_ed4
 t/extract.bufr
@@ -66,6 +67,7 @@ t/extract.bufr3
 t/extract.bufr_gts
 t/extract.txt1
 t/extract.txt2
+t/extract.txt3
 t/filter
 t/filter2
 t/firstorderstat.bufr

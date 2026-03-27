@@ -7,7 +7,7 @@ These files can be decoded by the ```ansi-encode``` binary to see their output. 
 Example:
 
 ```
-ansi-encode examples/usa.ans
+ansiencode examples/usa.ans
 ```
 
 ## AMD Logo

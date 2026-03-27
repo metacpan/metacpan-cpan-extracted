@@ -1,0 +1,57 @@
+======================================================================
+ mb::JSON Cheat Sheet                                   [TL] Filipino
+======================================================================
+
+[ Pagmamapa ng Uri ng Data ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "teksto"   -> scalar string
+  123        -> scalar numero
+  3.14       -> scalar desimal
+  true       -> mb::JSON::Boolean (numero: 1)
+  false      -> mb::JSON::Boolean (numero: 0)
+  null       -> undef
+  [...]      -> array reference
+  {...}      -> hash reference
+
+[ 1. Pag-load ng Module ]
+  use mb::JSON;
+
+[ 2. decode: JSON -> Perl ]
+  my $data = mb::JSON::decode($teksto_json);
+  my $data = mb::JSON::decode();              # gumagamit ng $_
+  my $data = mb::JSON::parse($teksto_json);   # alias (katugma)
+
+[ 3. encode: Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. Mga Boolean na Halaga ]
+  mb::JSON::true   -> JSON: true
+  mb::JSON::false  -> JSON: false
+  Numero 1 o 0     -> JSON: numero (hindi boolean)
+
+[ 5. null at undef ]
+  undef  -> null (sa encode)
+  null   -> undef (sa decode)
+
+[ 6. Mga susi ng hash ay inayos ayon sa alpabeto ]
+  encode({b=>2,a=>1}) -> '{"a":1,"b":2}'
+
+[ 7. Ang mga UTF-8 na string ay nananatiling buo (hindi \uXXXX) ]
+
+[ 8. Mga Halimbawa ]
+  # decode
+  my $h = mb::JSON::decode('{"pangalan":"Juan","edad":30}');
+  print $h->{pangalan};   # Juan
+
+  # encode
+  my $j = mb::JSON::encode({
+      pangalan => 'Juan',
+      aktibo   => mb::JSON::true,
+      memo     => undef,
+  });
+  # -> {"aktibo":true,"memo":null,"pangalan":"Juan"}
+
+  # roundtrip
+  my $data = mb::JSON::decode($json);
+  my $balik = mb::JSON::encode($data);

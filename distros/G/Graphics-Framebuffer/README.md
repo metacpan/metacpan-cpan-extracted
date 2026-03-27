@@ -10,6 +10,8 @@ Note, this module does NOT work (natively) in Microsoft Windows.  It will only f
 
 Use a Virtual Machine like VirtualBox or Docker to use on Windows, with a Linux distribution installed.
 
+![Divider](pink.jpg?raw=true "Divider")
+
 ## PREREQUISITES
 
 This module was developed for Linux and only Linux; not because of some fanatical appreciation for Linux, but because of how it accesses a Linux framebuffer.  If you know how to get it to work on Windows, Darwin, or even FreeBSD, then let me know how to do it.  Meanwwhile, it's Linux only.

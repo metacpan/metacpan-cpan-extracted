@@ -1,4 +1,3 @@
-test shine for:
-- fc
-- apostrophe_as_package_separator
+compare against PPIx::Literal
+- what to do with stuff that is *not* a literal
 

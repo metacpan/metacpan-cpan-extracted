@@ -1,12 +1,13 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8 -*-
 
 package Lingua::NLD::Num2Word;
-# ABSTRACT: Number 2 word conversion in NLD.
-
-# {{{ use block
+# ABSTRACT: Number to word conversion in Dutch
 
 use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Carp;
 use Readonly;
@@ -16,7 +17,7 @@ use Export::Attrs;
 # {{{ var block
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2015-present';
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 # }}}
 
@@ -86,16 +87,15 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::NLD::Num2Word  
+Lingua::NLD::Num2Word - Number to word conversion in Dutch
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Number 2 word conversion in NLD.
+version 0.2603260
 
 Lingua::NLD::Num2Word is module for converting numbers into their written
-representationin German. Converts whole numbers from 0 up to 999 999 999.
+representation in Dutch. Converts whole numbers from 0 up to 999 999 999.
 
 Text must be encoded in UTF-8.
 
@@ -134,7 +134,6 @@ Text must be encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
-
 =back
 
 =cut
@@ -150,7 +149,6 @@ Only numbers from interval [0, 999_999_999] will be converted.
 
 =item num2nld_cardinal
 
-
 =back
 
 =cut
@@ -160,14 +158,22 @@ Only numbers from interval [0, 999_999_999] will be converted.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2015-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

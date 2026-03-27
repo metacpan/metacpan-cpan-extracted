@@ -19,6 +19,27 @@ This module provides a simple lookup mechanism to return the DXCC entity from a 
 
 Returns a hashref with `dxcc` for the given callsign.
 
+### API Specification
+
+#### input
+
+    callsign:
+      optional: 0
+      position: 0
+      matches: '^([A-Z0-9]{1,3})([0-9])([A-Z]{1,4})$'
+      min: 3
+      type: string
+
+#### output
+
+    type: hashref
+
+## run
+
+You can also run this module from the command line:
+
+    perl lib/Ham/DXCC/Lookup.pm G4ABC
+
 # SUPPORT
 
 This module is provided as-is without any warranty.
@@ -33,7 +54,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

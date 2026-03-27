@@ -3,8 +3,6 @@
 package XML::Parser::Style::Tree;
 use strict;
 
-$XML::Parser::Built_In_Styles{Tree} = 1;
-
 sub Init {
     my $expat = shift;
     $expat->{Lists} = [];

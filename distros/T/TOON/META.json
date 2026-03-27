@@ -1,0 +1,44 @@
+{
+   "abstract" : "Token-Oriented Object Notation for Perl",
+   "author" : [
+      "Dave Cross <dave@perlhacks.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "TOON",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

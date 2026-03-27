@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeSelectorTerm;
 # ABSTRACT: A null or empty node selector term matches no objects. The requirements of them are ANDed. The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s matchExpressions => ['Core::V1::NodeSelectorRequirement'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::NodeSelectorTerm - A null or empty node selector term ma
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 matchExpressions
 

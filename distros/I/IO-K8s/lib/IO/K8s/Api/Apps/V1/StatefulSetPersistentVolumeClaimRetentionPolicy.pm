@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::StatefulSetPersistentVolumeClaimRetentionPolicy;
 # ABSTRACT: StatefulSetPersistentVolumeClaimRetentionPolicy describes the policy used for PVCs created from the StatefulSet VolumeClaimTemplates.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s whenDeleted => Str;
@@ -23,7 +23,7 @@ IO::K8s::Api::Apps::V1::StatefulSetPersistentVolumeClaimRetentionPolicy - Statef
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 whenDeleted
 

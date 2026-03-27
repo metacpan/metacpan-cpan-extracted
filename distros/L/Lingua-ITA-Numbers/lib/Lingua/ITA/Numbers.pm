@@ -3,12 +3,11 @@
 package Lingua::ITA::Numbers;
 # ABSTRACT: Number 2 Word conversion in ITA.
 
-# {{{ use block
-
-use 5.10.1;
-
-use strict;
+use 5.16.0;
+use utf8;
 use warnings;
+
+# {{{ use block
 
 use overload ( 
   '""' => \&get_string,
@@ -25,7 +24,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 our %SIGN_NAMES           = ('-' => 'meno',
                              '+'  => '');
@@ -336,7 +335,7 @@ Lingua::ITA::Numbers - Converts numeric values into their Italian string equival
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -356,7 +355,6 @@ version 0.2603230
  my $number = Lingua::ITA::Numbers->new( 123 );
  print $number->get_string;
  print $number->get_ordinate;
-
 
 =head1 DESCRIPTION
 
@@ -421,7 +419,6 @@ Changes the number contained in the instance.
 
 =back
 
-
 =head1 OPTIONS
 
 The representation of numbers by Lingua::ITA::Numbers can be influenced by means
@@ -466,9 +463,7 @@ will print 'duecentocinquantatre euro e zero centesimi', while
 
 will print 'duecentocinquantatre dollari e zero centesimi'.
 
-
 =back
-
 
 =head1 OVERLOADING
 
@@ -501,7 +496,6 @@ which will print: 'centoventitre + trecentoventuno = quattrocentoquarantaquattro
 
 Lingua::*::Numbers, overload.
 
-
 =head1 BUGS
 
 There is no control on options' values.
@@ -522,16 +516,16 @@ Add a package Lingua::ITA::Number::Currency for handling monetary values
 Check an italian grammar to verify that what I remember from primary school about 
 number writing hasn't changed.
 
-
-
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Leo "TheHobbit" Cacciari, E<lt>hobbit@cpan.orgE<gt>
-
-Maintenance
-PetaMem <info@petamem.com>
+ initial coding:
+   Leo Cacciari E<lt>hobbit@cpan.orgE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -541,6 +535,11 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,
 at your option, any later version of Perl 5 you may have available.
 
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

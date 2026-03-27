@@ -1,14 +1,17 @@
 package IO::K8s::K3s;
 # ABSTRACT: K3s CRD resource map provider for IO::K8s
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
 
+sub upstream_version { 'v1.35.1+k3s1' }
+
 sub resource_map {
     return {
-        HelmChart       => 'K3s::V1::HelmChart',
-        HelmChartConfig => 'K3s::V1::HelmChartConfig',
-        Addon           => 'K3s::V1::Addon',
+        HelmChart        => 'K3s::V1::HelmChart',
+        HelmChartConfig  => 'K3s::V1::HelmChartConfig',
+        Addon            => 'K3s::V1::Addon',
+        ETCDSnapshotFile => 'K3s::V1::ETCDSnapshotFile',
     };
 }
 
@@ -26,7 +29,7 @@ IO::K8s::K3s - K3s CRD resource map provider for IO::K8s
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -42,20 +45,20 @@ version 1.009
 =head1 DESCRIPTION
 
 Resource map provider for L<K3s|https://k3s.io/> Custom Resource Definitions.
-Registers 3 CRD classes covering C<helm.cattle.io/v1> and C<k3s.cattle.io/v1>.
+Registers 4 CRD classes covering C<helm.cattle.io/v1> and C<k3s.cattle.io/v1>.
 
 Not loaded by default — opt in via the C<with> constructor parameter of
 L<IO::K8s> or by calling C<< $k8s->add('IO::K8s::K3s') >> at runtime.
 
 =head2 Included CRDs (helm.cattle.io/v1)
 
-HelmChart, HelmChartConfig
+HelmChart, HelmChartConfig — namespace-scoped.
 
 =head2 Included CRDs (k3s.cattle.io/v1)
 
-Addon
+Addon — namespace-scoped.
 
-All resources are namespace-scoped.
+ETCDSnapshotFile — cluster-scoped.
 
 =head1 SEE ALSO
 

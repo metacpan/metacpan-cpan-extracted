@@ -1,6 +1,6 @@
 package IO::K8s::Api::Batch::V1::CronJobStatus;
 # ABSTRACT: CronJobStatus represents the current state of a cron job.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s active => ['Core::V1::ObjectReference'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Batch::V1::CronJobStatus - CronJobStatus represents the current st
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 active
 

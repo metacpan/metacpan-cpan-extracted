@@ -1,6 +1,6 @@
 package IO::K8s::GatewayAPI::V1::GatewayClass;
 # ABSTRACT: Gateway API controller class definition
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject
     api_version     => 'gateway.networking.k8s.io/v1',
     resource_plural => 'gatewayclasses';
@@ -22,7 +22,7 @@ IO::K8s::GatewayAPI::V1::GatewayClass - Gateway API controller class definition
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

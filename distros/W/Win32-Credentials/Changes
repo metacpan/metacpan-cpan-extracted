@@ -1,0 +1,14 @@
+Revision history for Win32-Credentials
+=================================
+
+0.03  2026-03-25 14:37:00 UTC
+
+- Fixed documentation adding translated comments to the code
+
+0.02  2026-03-25 13:48:00 UTC
+
+- Fixed documentation a some file mess up in dist
+
+0.01  2026-03-25 04:32:00 UTC
+
+- Initial release

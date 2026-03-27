@@ -38,7 +38,7 @@ resources:
   bugtracker: https://github.com/pplu/kubernetes-rest/issues
   homepage: https://github.com/pplu/kubernetes-rest
   repository: https://github.com/pplu/kubernetes-rest.git
-version: '1.102'
+version: '1.103'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -292,7 +292,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '1.102'
+          tag: '1.103'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

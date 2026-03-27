@@ -1,5 +1,5 @@
 package Kubernetes::REST::CLI::Watch;
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 # ABSTRACT: CLI for watching Kubernetes resources
 use Moo;
 use MooX::Options;
@@ -227,7 +227,7 @@ Kubernetes::REST::CLI::Watch - CLI for watching Kubernetes resources
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 SYNOPSIS
 

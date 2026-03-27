@@ -1,5 +1,16 @@
 Revision history for Perl extension Net::Ident.
 
+1.29 2026-03-24
+    [Improvements]
+    - PR #36 - Add constructor tests for new() and _passfh resolution
+      covering glob ref, string, qualified name, FileHandle, error-state
+      objects, newFromInAddr, and connected socket without identd
+
+    [Maintenance]
+    - PR #35 - Regenerate README.md from current POD to pick up badge,
+      example code, and typo fixes
+    - PR #37 - Fix .gitignore to match all dist directories, not just 0.x
+
 1.28 2026-03-22
     [Bug Fixes]
     - GH #26, PR #33 - Handle ECONNRESET from sysread on Windows where

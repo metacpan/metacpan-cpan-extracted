@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::EndpointSubset;
 # ABSTRACT: EndpointSubset is a group of addresses with a common set of ports. The expanded set of endpoints is the Cartesian product of Addresses x Ports.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s addresses => ['Core::V1::EndpointAddress'];
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::EndpointSubset - EndpointSubset is a group of addresses 
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 addresses
 

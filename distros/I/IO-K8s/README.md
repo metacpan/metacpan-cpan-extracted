@@ -66,12 +66,13 @@ my $k8s = IO::K8s->new(with => [
     'IO::K8s::CertManager',
     'IO::K8s::K3s',
     'IO::K8s::GatewayAPI',
+    'IO::K8s::AgentSandbox',
 ]);
 ```
 
-### Cilium (23 CRDs)
+### Cilium (21 CRDs)
 
-`IO::K8s::Cilium` covers `cilium.io/v2` and `cilium.io/v2alpha1`:
+`IO::K8s::Cilium` covers `cilium.io/v2` and `cilium.io/v2alpha1` (upstream v1.19.2):
 
 ```perl
 my $k8s = IO::K8s->new(with => ['IO::K8s::Cilium']);
@@ -105,9 +106,9 @@ my $cert = $k8s->new_object('Certificate',
 );
 ```
 
-### K3s (3 CRDs)
+### K3s (4 CRDs)
 
-`IO::K8s::K3s` covers `helm.cattle.io/v1` and `k3s.cattle.io/v1`:
+`IO::K8s::K3s` covers `helm.cattle.io/v1` and `k3s.cattle.io/v1` (upstream v1.35.1+k3s1):
 
 ```perl
 my $k8s = IO::K8s->new(with => ['IO::K8s::K3s']);
@@ -126,6 +127,18 @@ my $k8s = IO::K8s->new(with => ['IO::K8s::GatewayAPI']);
 my $gw = $k8s->new_object('Gateway',
     metadata => { name => 'my-gateway', namespace => 'default' },
     spec => { gatewayClassName => 'istio', listeners => [{ name => 'http', port => 80 }] },
+);
+```
+
+### AgentSandbox (4 CRDs)
+
+`IO::K8s::AgentSandbox` covers `agents.x-k8s.io/v1alpha1` and `extensions.agents.x-k8s.io/v1alpha1` (upstream v0.2.1):
+
+```perl
+my $k8s = IO::K8s->new(with => ['IO::K8s::AgentSandbox']);
+my $sandbox = $k8s->new_object('Sandbox',
+    metadata => { name => 'my-sandbox', namespace => 'default' },
+    spec => { replicas => 1, shutdownPolicy => 'Retain' },
 );
 ```
 

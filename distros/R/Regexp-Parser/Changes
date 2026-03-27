@@ -1,5 +1,24 @@
 HISTORY
 
+  0.27 -- Todd Rinaldo March 24, 2026
+   Features:
+   - Add (?(DEFINE)...) definition-only groups for defining named
+     subpatterns without matching (PR #27)
+   - Add (?(<name>)...) and (?('name')...) named capture conditions
+     with new 'define' and 'grouppn' object types (PR #27)
+
+   Maintenance:
+   - Replace `use base 'Exporter'` with `use parent 'Exporter'`; base
+     is discouraged since Perl 5.12 (PR #25)
+   - Remove unused `use NEXT` from Objects.pm; recommend `next::method`
+     from mro (core since 5.10) instead (PR #25)
+   - Remove duplicate `use strict; use warnings;` in Parser.pm (PR #25)
+   - Fix META_MERGE URLs to point to cpan-authors/Regexp-Parser with
+     HTTPS and fix dead wiki.github homepage URL (PR #25)
+   - Expand t/11errors.t from 17 to 240 tests covering all 28 RPe_*
+     error codes in Diagnostics.pm (PR #26)
+   - Add AI_POLICY.md for transparency
+
   0.26 -- Todd Rinaldo March 22, 2026
    Features:
    - Add \Q...\E (quotemeta) support for literal quoting in regular

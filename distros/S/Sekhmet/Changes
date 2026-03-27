@@ -1,0 +1,12 @@
+Revision history for Sekhmet
+
+0.01    2026-03-26
+        - Initial release
+        - ULID generation: ulid(), ulid_binary()
+        - Monotonic ULIDs: ulid_monotonic(), ulid_monotonic_binary()
+        - Utilities: ulid_time(), ulid_time_ms(), ulid_validate()
+        - Conversion: ulid_to_uuid(), uuid_to_ulid()
+        - Comparison: ulid_compare()
+        - Custom ops on Perl 5.14+, XSUB fallback on 5.8+
+        - Built on Horus C primitives (Crockford base32, CSPRNG, timestamps)
+

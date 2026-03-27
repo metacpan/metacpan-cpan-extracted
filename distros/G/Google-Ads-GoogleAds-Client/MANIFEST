@@ -5781,6 +5781,7 @@ lib/Google/Ads/GoogleAds/V23/Common/CalloutAsset.pm
 lib/Google/Ads/GoogleAds/V23/Common/CalloutFeedItem.pm
 lib/Google/Ads/GoogleAds/V23/Common/CallToActionAsset.pm
 lib/Google/Ads/GoogleAds/V23/Common/CampaignGoalSettings.pm
+lib/Google/Ads/GoogleAds/V23/Common/CampaignReservationQuote.pm
 lib/Google/Ads/GoogleAds/V23/Common/CampaignRetentionGoalSettings.pm
 lib/Google/Ads/GoogleAds/V23/Common/CampaignThirdPartyBrandLiftIntegrationPartner.pm
 lib/Google/Ads/GoogleAds/V23/Common/CampaignThirdPartyBrandSafetyIntegrationPartner.pm
@@ -5890,6 +5891,7 @@ lib/Google/Ads/GoogleAds/V23/Common/ImageDimension.pm
 lib/Google/Ads/GoogleAds/V23/Common/ImageFeedItem.pm
 lib/Google/Ads/GoogleAds/V23/Common/IncomeRangeInfo.pm
 lib/Google/Ads/GoogleAds/V23/Common/InFeedVideoAdInfo.pm
+lib/Google/Ads/GoogleAds/V23/Common/InsightsAudienceAttributeGroup.pm
 lib/Google/Ads/GoogleAds/V23/Common/InteractionTypeInfo.pm
 lib/Google/Ads/GoogleAds/V23/Common/IpBlockInfo.pm
 lib/Google/Ads/GoogleAds/V23/Common/ItemAttribute.pm
@@ -6387,6 +6389,7 @@ lib/Google/Ads/GoogleAds/V23/Enums/OperatingSystemVersionOperatorTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/OptimizationGoalTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PageOnePromotedStrategyGoalEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/ParentalStatusTypeEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/PartnershipOpportunityEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PaymentModeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PerformanceMaxUpgradeStatusEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PlacementTypeEnum.pm
@@ -6397,6 +6400,7 @@ lib/Google/Ads/GoogleAds/V23/Enums/PolicyTopicEvidenceDestinationMismatchUrlType
 lib/Google/Ads/GoogleAds/V23/Enums/PolicyTopicEvidenceDestinationNotWorkingDeviceEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PolicyTopicEvidenceDestinationNotWorkingDnsErrorTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PositiveGeoTargetTypeEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/PreviewTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PriceExtensionPriceQualifierEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PriceExtensionPriceUnitEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/PriceExtensionTypeEnum.pm
@@ -6428,6 +6432,7 @@ lib/Google/Ads/GoogleAds/V23/Enums/RealEstatePlaceholderFieldEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/RecommendationSubscriptionStatusEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/RecommendationTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/RegulatoryFeeTypeEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/ReservationRequestTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/ResourceChangeOperationEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/ResourceLimitTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/ResponseContentTypeEnum.pm
@@ -6498,6 +6503,7 @@ lib/Google/Ads/GoogleAds/V23/Enums/VerticalAdsItemVerticalTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/VideoAdFormatRestrictionEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/VideoAdSequenceInteractionTypeEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/VideoAdSequenceMinimumDurationEnum.pm
+lib/Google/Ads/GoogleAds/V23/Enums/VideoEnhancementSourceEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/VideoThumbnailEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/WebpageConditionOperandEnum.pm
 lib/Google/Ads/GoogleAds/V23/Enums/WebpageConditionOperatorEnum.pm
@@ -6514,6 +6520,7 @@ lib/Google/Ads/GoogleAds/V23/Errors/GoogleAdsFailure.pm
 lib/Google/Ads/GoogleAds/V23/Errors/PolicyFindingDetails.pm
 lib/Google/Ads/GoogleAds/V23/Errors/PolicyViolationDetails.pm
 lib/Google/Ads/GoogleAds/V23/Errors/QuotaErrorDetails.pm
+lib/Google/Ads/GoogleAds/V23/Errors/ReservationErrorDetails.pm
 lib/Google/Ads/GoogleAds/V23/Errors/ResourceCountDetails.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AccessibleBiddingStrategy.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AccountBudget.pm
@@ -6536,6 +6543,7 @@ lib/Google/Ads/GoogleAds/V23/Resources/AdGroupAsset.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AdGroupAssetSet.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AdGroupAudienceView.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AdGroupBidModifier.pm
+lib/Google/Ads/GoogleAds/V23/Resources/AdGroupCreativeAssetCombinationData.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AdGroupCriterion.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AdGroupCriterionCustomizer.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AdGroupCriterionLabel.pm
@@ -6561,6 +6569,7 @@ lib/Google/Ads/GoogleAds/V23/Resources/AndroidPrivacySharedKeyGoogleCampaign.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AndroidPrivacySharedKeyGoogleNetworkType.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AppCampaignSetting.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AppliedIncentive.pm
+lib/Google/Ads/GoogleAds/V23/Resources/AppTopCombinationView.pm
 lib/Google/Ads/GoogleAds/V23/Resources/Asset.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AssetAutomationSetting.pm
 lib/Google/Ads/GoogleAds/V23/Resources/AssetCoverage.pm
@@ -6905,6 +6914,7 @@ lib/Google/Ads/GoogleAds/V23/Resources/VideoAdSequenceStep.pm
 lib/Google/Ads/GoogleAds/V23/Resources/VideoAdSequenceStepSetting.pm
 lib/Google/Ads/GoogleAds/V23/Resources/VideoCampaignSettings.pm
 lib/Google/Ads/GoogleAds/V23/Resources/VideoCustomer.pm
+lib/Google/Ads/GoogleAds/V23/Resources/VideoEnhancement.pm
 lib/Google/Ads/GoogleAds/V23/Resources/Webpage.pm
 lib/Google/Ads/GoogleAds/V23/Resources/WebpageCondition.pm
 lib/Google/Ads/GoogleAds/V23/Resources/WebpageView.pm
@@ -7570,6 +7580,7 @@ lib/Google/Ads/GoogleAds/V23/Services/ReachPlanService/SurfaceTargetingCombinati
 lib/Google/Ads/GoogleAds/V23/Services/ReachPlanService/TargetFrequencySettings.pm
 lib/Google/Ads/GoogleAds/V23/Services/ReachPlanService/Targeting.pm
 lib/Google/Ads/GoogleAds/V23/Services/ReachPlanService/YouTubeSelectLineUp.pm
+lib/Google/Ads/GoogleAds/V23/Services/ReachPlanService/YouTubeSelectLineUpTargeting.pm
 lib/Google/Ads/GoogleAds/V23/Services/ReachPlanService/YouTubeSelectSettings.pm
 lib/Google/Ads/GoogleAds/V23/Services/RecommendationService.pm
 lib/Google/Ads/GoogleAds/V23/Services/RecommendationService/AdAssetApplyParameters.pm
@@ -7621,6 +7632,11 @@ lib/Google/Ads/GoogleAds/V23/Services/RemarketingActionService/MutateRemarketing
 lib/Google/Ads/GoogleAds/V23/Services/RemarketingActionService/MutateRemarketingActionsRequest.pm
 lib/Google/Ads/GoogleAds/V23/Services/RemarketingActionService/MutateRemarketingActionsResponse.pm
 lib/Google/Ads/GoogleAds/V23/Services/RemarketingActionService/RemarketingActionOperation.pm
+lib/Google/Ads/GoogleAds/V23/Services/ReservationService.pm
+lib/Google/Ads/GoogleAds/V23/Services/ReservationService/BookCampaignsRequest.pm
+lib/Google/Ads/GoogleAds/V23/Services/ReservationService/BookCampaignsResponse.pm
+lib/Google/Ads/GoogleAds/V23/Services/ReservationService/QuoteCampaignsRequest.pm
+lib/Google/Ads/GoogleAds/V23/Services/ReservationService/QuoteCampaignsResponse.pm
 lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService.pm
 lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService/AssetGroupIdentifier.pm
 lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService/GenerateShareablePreviewsRequest.pm
@@ -7628,6 +7644,7 @@ lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService/GenerateShareableP
 lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService/ShareablePreview.pm
 lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService/ShareablePreviewOrError.pm
 lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService/ShareablePreviewResult.pm
+lib/Google/Ads/GoogleAds/V23/Services/ShareablePreviewService/YouTubeLivePreviewResult.pm
 lib/Google/Ads/GoogleAds/V23/Services/SharedCriterionService.pm
 lib/Google/Ads/GoogleAds/V23/Services/SharedCriterionService/MutateSharedCriteriaRequest.pm
 lib/Google/Ads/GoogleAds/V23/Services/SharedCriterionService/MutateSharedCriteriaResponse.pm

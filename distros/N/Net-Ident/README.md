@@ -1,4 +1,4 @@
-[![](https://github.com/cpan-authors/Net-Ident/workflows/linux/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions) [![](https://github.com/cpan-authors/Net-Ident/workflows/macos/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions) [![](https://github.com/cpan-authors/Net-Ident/workflows/windows/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions)
+[\![testsuite](https://github.com/cpan-authors/Net-Ident/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/Net-Ident/actions/workflows/testsuite.yml)
 
 # NAME
 
@@ -109,12 +109,12 @@ calling method, these routines behave exactly the same.
     parameter specifies the timeout in seconds, just like the timeout parameter
     of the function calls above.
 
-     
+
 
     Some people do not like the way that \`\`proper'' object design is broken
     by letting one module add methods to another class. This is why, starting
     from version 1.20, you have to explicitly ask for this behaviour to occur.
-    Personally, I this it's a compromise: if you want an object-oriented
+    Personally, I think it's a compromise: if you want an object-oriented
     interface, then either you make a derived class, like a
     FileHandleThatCanPerformIdentLookups, and make sure all appropriate
     internal functions get wrappers that do the necessary re-blessing. Or,
@@ -178,12 +178,12 @@ waits for a connection on a port, tells you who you are and what time
 it is, and closes the connection again. The majority of the code will
 look very familiar if you just read [perlipc](https://metacpan.org/pod/perlipc).
 
-Excersize this server by telnetting to it, preferably from a machine
+Exercise this server by telnetting to it, preferably from a machine
 that has a suitable ident daemon installed.
 
     #!/usr/bin/perl -w
 
-    use Net::Ident;
+    use Net::Ident ':fh';
     # uncomment the below line if you want lots of debugging info
     # $Net::Ident::DEBUG = 2;
     use Socket;
@@ -237,10 +237,10 @@ oriented. The following methods are available:
     The constructor will always succeed. When it detects an error,
     however, it returns an object that "has already failed" internally. In
     this case, all methods will return `undef` except for the `geterror`
-    method, wich will return the error message.
+    method, which will return the error message.
 
     The timeout is _not_ implemented using `alarm()`. In fact you can
-    use `alarm()` completely independant of this library, they do not
+    use `alarm()` completely independent of this library, they do not
     interfere.
 
 - `newFromInAddr $localaddr, $remoteaddr, $timeout`
@@ -250,7 +250,7 @@ oriented. The following methods are available:
 
 - `query $obj`
 
-    This object method queries the remote rfc931 deamon, and blocks until
+    This object method queries the remote rfc931 daemon, and blocks until
     the connection to the ident daemon is writable, if necessary (but you
     are supposed to make sure it is, of course). Returns true on success
     (or rather it returns the _$obj_ itself), or undef on error.
@@ -299,7 +299,7 @@ oriented. The following methods are available:
     error. undef when there was no error.
 
 An asynchronous example implementing the above server in a multi-threaded
-way via select, is left as an excersize for the interested reader.
+way via select, is left as an exercise for the interested reader.
 
 # DISCLAIMER
 

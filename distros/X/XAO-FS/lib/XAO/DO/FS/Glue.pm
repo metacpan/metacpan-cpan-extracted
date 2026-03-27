@@ -760,8 +760,8 @@ B<never use the following methods in your applications>.
 
 =item _maxlength_change (%)
 
-Upgrades 'maxlength' information for the given text fields both in
-memory structures AND in the database tables.
+Upgrades 'maxlength' information for the given text and blob fields both
+in memory structures AND in the database tables.
 
 =cut
 
@@ -777,17 +777,21 @@ sub _maxlength_change ($%) {
     my $csh=$driver->maxlength_change_prepare($table);
 
     foreach my $name (keys %$flist) {
-        my $fdesc=$desc->{'fields'}->{$name} || throw $self "- something went wrong";
+        my $fdesc = $desc->{'fields'}->{$name} || throw $self "- something went wrong";
 
-        my $maxlength_new=$flist->{$name};
-        my $maxlength_old=$fdesc->{'maxlength'} || throw $self "- no existing maxlength on field '$name'";
-        dprint "...field $name, changing maxlength from '$maxlength_old' to '$maxlength_new'";
+        my $maxlength_new = $flist->{$name} || 0;
+        my $maxlength_old = $fdesc->{'maxlength'} || 0;
+        dprint "...field '$name', changing maxlength from '$maxlength_old' to '$maxlength_new'";
 
-        $driver->maxlength_change_field($csh,$name,$maxlength_new,$fdesc);
+        $maxlength_new >= $maxlength_old ||
+            throw $self "- decreasing 'maxlength' on '$name' is not supported";
 
-        $fdesc->{'maxlength'}=$maxlength_new;
+        $driver->maxlength_change_field($csh, $name, $maxlength_new, $fdesc);
+
+        $fdesc->{'maxlength'} = $maxlength_new;
     }
 
+    dprint "....SQL: $csh->{'sql'}";
     dprint "....preparing to execute, LAST CHANCE TO ABORT";
     sleep 3;
     dprint ".....executing";
@@ -828,13 +832,14 @@ sub _charset_change ($%) {
 
         my $charset_new=$flist->{$name};
         my $charset_old=$fdesc->{'charset'} || throw $self "- no existing charset on field '$name'";
-        dprint "...field $name, changing charset from '$charset_old' to '$charset_new'";
+        dprint "...field '$name', changing charset from '$charset_old' to '$charset_new'";
 
         $driver->charset_change_field($csh,$name,$charset_new,$fdesc->{'maxlength'},$fdesc->{'default'});
 
         $fdesc->{'charset'}=$charset_new;
     }
 
+    dprint "....SQL: $csh->{'sql'}";
     dprint "....preparing to execute, LAST CHANCE TO ABORT";
     sleep 3;
     dprint ".....executing";
@@ -874,15 +879,16 @@ sub _scale_change ($%) {
         my $fdesc=$desc->{'fields'}->{$name} || throw $self "- something went wrong";
 
         my $scale_new=$flist->{$name};
-        my $scale_old=$fdesc->{'maxlength'};
+        my $scale_old=$fdesc->{'maxlength'}; # SIC: Scale is stored in maxlength
 
-        dprint "...field $name, changing scale from ",$scale_old," to ",$scale_new;
+        dprint "...field '$name', changing scale from ",$scale_old," to ",$scale_new;
 
         $driver->scale_change_field($csh,$name,$scale_new,$fdesc->{'minvalue'},$fdesc->{'maxvalue'},$fdesc->{'default'});
 
         $fdesc->{'maxlength'}=$scale_new;
     }
 
+    dprint "....SQL: $csh->{'sql'}";
     dprint "....preparing to execute, LAST CHANCE TO ABORT";
     sleep 3;
     dprint ".....executing";
@@ -892,8 +898,70 @@ sub _scale_change ($%) {
     foreach my $name (keys %$flist) {
         my $fdesc=$self->describe($name) || throw $self "- something went wrong";
 
+        # Scale is stored in maxlength
+        #
         my $uid=$driver->unique_id('Global_Fields','field_name',$name,'table_name',$table);
         $driver->update_fields('Global_Fields',$uid,{ maxlength => $fdesc->{'maxlength'} });
+    }
+
+    dprint "...done";
+}
+
+###############################################################################
+
+=item _minmax_change (%)
+
+Changes 'minvalue' and 'maxvalue' on numeric fields ('integer' and
+'real').  The database data type will also change to accommodate new
+values. Converting the existing values to the new limits is up to the
+database.
+
+=cut
+
+sub _minmax_change ($%) {
+    my $self = shift;
+
+    my $flist = get_args(\@_);
+
+    my $desc = $self->_class_description;
+    my $table = $desc->{'table'};
+
+    my $driver = $self->_driver;
+    my $csh = $driver->minmax_change_prepare($table);
+
+    foreach my $name (keys %$flist) {
+        my $fdesc = $desc->{'fields'}->{$name} || throw $self "- something went wrong";
+
+        my $minvalue_old = $fdesc->{'minvalue'};
+        my $minvalue_new = $flist->{$name}->{'minvalue'} // $minvalue_old;
+
+        my $maxvalue_old = $fdesc->{'maxvalue'};
+        my $maxvalue_new = $flist->{$name}->{'maxvalue'} // $maxvalue_old;
+
+        dprint "...field '$name', changing minvalue/maxvalue from (", $minvalue_old, ":", $maxvalue_old, ") to (", $minvalue_new, ":", $maxvalue_new, ")";
+
+        $driver->minmax_change_field($csh, $name, $minvalue_new, $maxvalue_new, $fdesc);
+
+        $fdesc->{'minvalue'} = $minvalue_new;
+        $fdesc->{'maxvalue'} = $maxvalue_new;
+    }
+
+    dprint "....SQL: $csh->{'sql'}";
+    dprint "....preparing to execute, LAST CHANCE TO ABORT";
+    sleep 3;
+    dprint ".....executing";
+
+    $driver->minmax_change_execute($csh);
+
+    foreach my $name (keys %$flist) {
+        my $fdesc=$self->describe($name) || throw $self "- something went wrong";
+
+        my $uid=$driver->unique_id('Global_Fields','field_name',$name,'table_name',$table);
+
+        $driver->update_fields('Global_Fields', $uid, {
+            minvalue => $fdesc->{'minvalue'},
+            maxvalue => $fdesc->{'maxvalue'},
+        });
     }
 
     dprint "...done";
@@ -1059,6 +1127,7 @@ sub _field_default ($$) {
         if($type eq 'text' || $type eq 'blob') {
             !defined $desc->{'minlength'} || length $default >= $desc->{'minlength'} ||
                 throw $self "- default '$default' is shorter than minlength $desc->{'minlength'} for $field";
+
             !defined $desc->{'maxlength'} || length $default <= $desc->{'maxlength'} ||
                 throw $self "- default '$default' is longer than maxlength $desc->{'maxlength'} for $field";
         }
@@ -1071,8 +1140,10 @@ sub _field_default ($$) {
                 $default=~/^-?\d+(?:\.\d+)?$/ || $default=~/^-?\.\d+$/ ||
                     throw $self "- default '$default' is not a number for $field";
             }
+
             !defined $desc->{'minvalue'} || $default >= $desc->{'minvalue'} ||
                 throw $self "- default $default is below minvalue $desc->{'minvalue'} for $field";
+
             !defined $desc->{'maxvalue'} || $default <= $desc->{'maxvalue'} ||
                 throw $self "- default $default is above maxvalue $desc->{'maxvalue'} for $field";
         }
@@ -1090,13 +1161,16 @@ sub _field_default ($$) {
         my $minvalue=$desc->{'minvalue'};
         my $maxvalue=$desc->{'maxvalue'};
         if(!defined $minvalue) {
-            $default=!defined $maxvalue || $maxvalue>=0 ? 0 : $maxvalue;
+            $default = !defined $maxvalue || $maxvalue >= 0 ? 0 : $maxvalue;
         }
         elsif(!defined $maxvalue) {
-            $default=$minvalue<0 ? 0 : $minvalue;
+            $default = $minvalue < 0 ? 0 : $minvalue;
+        }
+        elsif(($minvalue < 0 && $maxvalue < 0) || ($minvalue > 0 && $maxvalue > 0)) {
+            $default = $minvalue;
         }
         else {
-            $default=$minvalue;
+            $default = 0;
         }
     }
     else {
@@ -2374,10 +2448,10 @@ sub _add_data_placeholder ($%) {
         $fdesc{'maxvalue'}//=$fdesc{'minvalue'}<0 ? 0x7FFFFFFF : 0xFFFFFFFF;
 
         $fdesc{'minvalue'} <= $fdesc{'maxvalue'} ||
-            throw $self "- minvalue $fdesc{'minvalue'} is above maxvalue $fdesc{'maxvalue'} for $name";
+            throw $self "- minvalue $fdesc{'minvalue'} is above maxvalue $fdesc{'maxvalue'} for '$name'";
 
-        $driver->add_field_integer($table,$name,$fdesc{'index'},$fdesc{'unique'},
-                                   $fdesc{'minvalue'},$fdesc{'maxvalue'},$fdesc{'default'},$connected);
+        $driver->add_field_integer($table, $name, $fdesc{'index'}, $fdesc{'unique'},
+                                   $fdesc{'minvalue'}, $fdesc{'maxvalue'}, $fdesc{'default'}, $connected, \%fdesc);
     }
     elsif ($type eq 'real') {
         $fdesc{'minvalue'}+=0 if defined($fdesc{'minvalue'});
@@ -2393,12 +2467,10 @@ sub _add_data_placeholder ($%) {
         $self->throw("- unknown type '$type'");
     }
 
-    ##
     # Updating in-memory data with our new field.
     #
     $desc->{'fields'}->{$name}=\%fdesc;
 
-    ##
     # Updating Global_Fields
     #
     $driver->store_row('Global_Fields',
@@ -2443,7 +2515,7 @@ sub _add_list_placeholder ($%) {
 
     my $key_length=$args->{'key_length'} || 30;
     $key_length < 255 ||
-        throw $self "_add_list_placeholder - key_length ($key_length) must be less then 255";
+        throw $self "_add_list_placeholder - key_length ($key_length) must be less than 255";
 
     my $key_charset=$args->{'key_charset'} || 'binary';
 

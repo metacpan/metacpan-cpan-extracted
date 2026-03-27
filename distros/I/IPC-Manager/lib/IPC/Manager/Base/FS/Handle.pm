@@ -2,7 +2,7 @@ package IPC::Manager::Base::FS::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.000005';
+our $VERSION = '0.000006';
 
 use Carp qw/croak/;
 
@@ -19,8 +19,14 @@ sub pending_messages {
     $self->pid_check;
 
     return 1 if $self->have_resume_file;
-    return 1 if @{$self->{+BUFFER}};
-    return 1 if $self->select->can_read(0);
+    return 1 if @{$self->{+BUFFER} // []};
+
+    if ($self->can_select) {
+        return 1 if $self->select->can_read(0);
+    }
+    else {
+        return 1 if $self->fill_buffer;
+    }
 
     return 0;
 }
@@ -31,7 +37,7 @@ sub ready_messages {
     $self->pid_check;
 
     return 1 if $self->have_resume_file;
-    return 1 if @{$self->{+BUFFER}};
+    return 1 if @{$self->{+BUFFER} // []};
 
     return 0 unless $self->pending_messages;
 

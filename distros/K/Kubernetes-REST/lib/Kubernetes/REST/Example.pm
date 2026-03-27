@@ -1,6 +1,6 @@
 package Kubernetes::REST::Example;
 # ABSTRACT: Working examples for Kubernetes::REST with Minikube, K3s, and other clusters
-our $VERSION = '1.102';
+our $VERSION = '1.103';
 1;
 
 __END__
@@ -15,7 +15,7 @@ Kubernetes::REST::Example - Working examples for Kubernetes::REST with Minikube,
 
 =head1 VERSION
 
-version 1.102
+version 1.103
 
 =head1 DESCRIPTION
 
@@ -183,7 +183,7 @@ If you have multiple contexts:
 
     my $list = $api->list('Namespace');
 
-    for my $ns ($list->items->@*) {
+    for my $ns (@{ $list->items }) {
         printf "%-20s %s\n",
             $ns->metadata->name,
             $ns->status->phase // 'Unknown';
@@ -193,7 +193,7 @@ If you have multiple contexts:
 
     my $pods = $api->list('Pod', namespace => 'kube-system');
 
-    for my $pod ($pods->items->@*) {
+    for my $pod (@{ $pods->items }) {
         my $name   = $pod->metadata->name;
         my $phase  = $pod->status->phase // 'Unknown';
         my $ip     = $pod->status->podIP // 'pending';
@@ -204,12 +204,12 @@ If you have multiple contexts:
 
     my $services = $api->list('Service', namespace => 'default');
 
-    for my $svc ($services->items->@*) {
+    for my $svc (@{ $services->items }) {
         my $name  = $svc->metadata->name;
         my $type  = $svc->spec->type // 'ClusterIP';
         my $ports = join ', ', map {
             $_->port . '/' . ($_->protocol // 'TCP')
-        } ($svc->spec->ports // [])->@*;
+        } @{ $svc->spec->ports // [] };
         printf "%-20s %-12s %s\n", $name, $type, $ports;
     }
 
@@ -217,7 +217,7 @@ If you have multiple contexts:
 
     my $nodes = $api->list('Node');
 
-    for my $node ($nodes->items->@*) {
+    for my $node (@{ $nodes->items }) {
         my $info = $node->status->nodeInfo;
         printf "%-20s OS=%-8s kubelet=%s\n",
             $node->metadata->name,
@@ -655,7 +655,7 @@ desired state:
     say "Node:  " . ($pod->spec->nodeName // 'unscheduled');
 
     # Container-level status
-    for my $cs (($pod->status->containerStatuses // [])->@*) {
+    for my $cs (@{ $pod->status->containerStatuses // [] }) {
         say "Container: " . $cs->name;
         say "  Ready:    " . ($cs->ready ? 'yes' : 'no');
         say "  Restarts: " . ($cs->restartCount // 0);
@@ -946,7 +946,7 @@ Once registered, CRDs work exactly like built-in resources:
 
     # List
     my $list = $api->list('StaticWebSite', namespace => 'default');
-    for my $s ($list->items->@*) {
+    for my $s (@{ $list->items }) {
         say $s->metadata->name . ": " . $s->spec->{domain};
     }
 

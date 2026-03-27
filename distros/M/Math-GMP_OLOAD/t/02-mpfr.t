@@ -197,7 +197,7 @@ cmp_ok($op_mpfr, '==', 15625, "MPFR **= GMP returns correct value");
 
 $op_gmp **=  $op_mpfr;
 cmp_ok(ref($op_gmp), 'eq', 'Math::MPFR', "GMP **= MPFR returns MPFR");
-cmp_ok($op_gmp, '==', 6 ** $op_mpfr, "MPFR **= GMP returns correct value"); # Line 194
+cmp_ok($op_gmp, '==', 6 ** $op_mpfr, "GMP **= MPFR returns correct value"); # Line 200
 
 ##################################
 cmp_ok(($gmp_tiny <=> $mpfr_big), '<', 0, "GMP_TINY <=> MPFR_BIG < 0");

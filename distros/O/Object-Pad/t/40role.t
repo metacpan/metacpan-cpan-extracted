@@ -147,4 +147,27 @@ class GClass {
    is( GClass->new->a, "A", 'GClass ->a method has constant' );
 }
 
+# Unembedded method closures in roles can still be invoked
+role HRole {
+   field $f = "Hello";
+   my $mref = method { return "$f, this is " . ref($self); };
+
+   method run_closure { $mref->( $self ); }
+}
+
+class HClass {
+   apply HRole;
+}
+
+class IClass {
+   inherit HClass;
+}
+
+{
+   is( HClass->new->run_closure, "Hello, this is HClass",
+      'HRole captured method can still run' );
+   is( IClass->new->run_closure, "Hello, this is IClass",
+      'HRole captured method can still run via subclass' );
+}
+
 done_testing;

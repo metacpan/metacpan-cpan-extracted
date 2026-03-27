@@ -1,7 +1,7 @@
 package Pod::Simple::Role::XHTML::WithAccurateTargets;
 use Moo::Role;
 
-our $VERSION = '0.004000';
+our $VERSION = '0.004001';
 $VERSION =~ tr/_//d;
 
 use Pod::Simple::XHTML ();
@@ -25,7 +25,7 @@ sub idify {
 }
 
 with 'Pod::Simple::Role::XHTML::RepairLinkEncoding'
-  if !defined &Pod::Simple::XHTML::decode_entities;
+  if Pod::Simple::XHTML::encode_url({}, "\x{1f408}") ne '%F0%9F%90%88';
 
 1;
 __END__

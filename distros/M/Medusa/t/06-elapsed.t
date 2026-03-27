@@ -15,22 +15,22 @@ plan tests => 4;
 	sub new { bless {}, $_[0]; }
 
 	sub audit :Audit {
+		select(undef, undef, undef, 0.25);
 		return 211;
 	}
 }
 
 my $lalala = LALALA->new();
-is($lalala->audit(-15), 211, 'value check');
+is($lalala->audit(0), 211, 'value check');
 
 open my $fh, '<', $file or die $!;
 my $content = do { local $/; <$fh> };
 close $fh;
-
 my @lines = split "\n", $content;
 
 like($lines[0], qr/args/, 'args');
 like($lines[1], qr/returned/, 'returns');
-like($lines[1], qr/elapsed=†0.*/, 'elapsed');
+like($lines[1], qr/elapsed_call=†0.*/, 'elapsed');
 
 unlink $file;
 

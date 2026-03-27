@@ -1,31 +1,30 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::ZHO::Word2Num;
-# ABSTRACT: Word 2 number conversion in ZHO.
+# ABSTRACT: Word to number conversion in Chinese
+
+use 5.16.0;
+use utf8;
+use warnings;
 
 # {{{ use block
-
-use 5.10.1;
-
-use strict;
-use warnings;
 
 use Export::Attrs;
 use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 my  $parser  = zho_numerals();
 
 # }}}
 
-# {{{ w2n                                         convert number to text
+# {{{ w2n                                         convert text to number
 
 sub w2n :Export {
     my $input = shift // return;
 
-    return 0 if ($input =~ m{\b(nul|ling)\b}xmsi);
+    return 0 if ($input =~ m{\b(nul|ling)\b}xmsi || $input =~ m{\A零\z}xms);
 
     $input .= " "; # Grant space at the end
 
@@ -56,8 +55,19 @@ sub zho_numerals {
         |     'Ba '  { $return = 8; }
         |     'Jiu ' { $return = 9; }
         |     'Shi ' { $return = 10; }
+        |     /零/  { $return = 0; }
+        |     /一/  { $return = 1; }
+        |     /二/  { $return = 2; }
+        |     /三/  { $return = 3; }
+        |     /四/  { $return = 4; }
+        |     /五/  { $return = 5; }
+        |     /六/  { $return = 6; }
+        |     /七/  { $return = 7; }
+        |     /八/  { $return = 8; }
+        |     /九/  { $return = 9; }
+        |     /十/  { $return = 10; }
 
-      tens: 'YiShi '  { $return = 10; }                               # try to find a word that representates
+      tens: 'YiShi '  { $return = 10; }                               # try to find a word that represents
         |   'ErShi '  { $return = 20; }                               # values 20,30,..,90
         |   'SanShi ' { $return = 30; }
         |   'SiShi '  { $return = 40; }
@@ -66,8 +76,17 @@ sub zho_numerals {
         |   'QiShi '  { $return = 70; }
         |   'BaShi '  { $return = 80; }
         |   'JiuShi ' { $return = 90; }
+        |   /一十/ { $return = 10; }
+        |   /二十/ { $return = 20; }
+        |   /三十/ { $return = 30; }
+        |   /四十/ { $return = 40; }
+        |   /五十/ { $return = 50; }
+        |   /六十/ { $return = 60; }
+        |   /七十/ { $return = 70; }
+        |   /八十/ { $return = 80; }
+        |   /九十/ { $return = 90; }
 
-      hundreds: 'YiBai '  { $return = 100; }                          # try to find a word that representates
+      hundreds: 'YiBai '  { $return = 100; }                          # try to find a word that represents
         |       'ErBai '  { $return = 200; }                          # values 100,200,..,900
         |       'SanBai ' { $return = 300; }
         |       'SiBai '  { $return = 400; }
@@ -76,8 +95,17 @@ sub zho_numerals {
         |       'QiBai '  { $return = 700; }
         |       'BaBai '  { $return = 800; }
         |       'JiuBai ' { $return = 900; }
+        |       /一百/ { $return = 100; }
+        |       /二百/ { $return = 200; }
+        |       /三百/ { $return = 300; }
+        |       /四百/ { $return = 400; }
+        |       /五百/ { $return = 500; }
+        |       /六百/ { $return = 600; }
+        |       /七百/ { $return = 700; }
+        |       /八百/ { $return = 800; }
+        |       /九百/ { $return = 900; }
 
-      thousands: 'YiQian '  { $return = 1000; }                       # try to find a word that representates
+      thousands: 'YiQian '  { $return = 1000; }                       # try to find a word that represents
         |        'ErQian '  { $return = 2000; }                       # values 1000,2000,..,9000
         |        'SanQian ' { $return = 3000; }
         |        'SiQian '  { $return = 4000; }
@@ -86,8 +114,17 @@ sub zho_numerals {
         |        'QiQian '  { $return = 7000; }
         |        'BaQian '  { $return = 8000; }
         |        'JiuQian ' { $return = 9000; }
+        |        /一千/ { $return = 1000; }
+        |        /二千/ { $return = 2000; }
+        |        /三千/ { $return = 3000; }
+        |        /四千/ { $return = 4000; }
+        |        /五千/ { $return = 5000; }
+        |        /六千/ { $return = 6000; }
+        |        /七千/ { $return = 7000; }
+        |        /八千/ { $return = 8000; }
+        |        /九千/ { $return = 9000; }
 
-      tenthousands: 'YiWan '  { $return = 10000; }                    # try to find a word that representates
+      tenthousands: 'YiWan '  { $return = 10000; }                    # try to find a word that represents
         |           'ErWan '  { $return = 20000; }                    # values 10000,20000,..,90000
         |           'SanWan ' { $return = 30000; }
         |           'SiWan '  { $return = 40000; }
@@ -96,6 +133,15 @@ sub zho_numerals {
         |           'QiWan '  { $return = 70000; }
         |           'BaWan '  { $return = 80000; }
         |           'JiuWan ' { $return = 90000; }
+        |           /一萬/ { $return = 10000; }
+        |           /二萬/ { $return = 20000; }
+        |           /三萬/ { $return = 30000; }
+        |           /四萬/ { $return = 40000; }
+        |           /五萬/ { $return = 50000; }
+        |           /六萬/ { $return = 60000; }
+        |           /七萬/ { $return = 70000; }
+        |           /八萬/ { $return = 80000; }
+        |           /九萬/ { $return = 90000; }
 
       decade: tens(?) number(?) number(?)                             # try to find words that represents values
               { $return = 0;                                          # from 0 to 20
@@ -130,7 +176,7 @@ sub zho_numerals {
                }
 
       million: millenium2(?) millenium1(?) century(?) decade(?)       # try to find words that represents values
-               ' Wan '                                                # from 1.000.000 to 999.999.999.999
+               wanmark                                                # from 1.000.000 to 999.999.999.999
                millenium2(?) millenium1(?) century(?) decade(?)
                { $return = 0;
                  for (@item) {
@@ -141,6 +187,9 @@ sub zho_numerals {
                    }
                  }
                }
+
+      wanmark: ' Wan ' { $return = "Wan"; }
+        |      /萬/ { $return = "Wan"; }
     });
 }
 
@@ -156,13 +205,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::ZHO::Word2Num 
+Lingua::ZHO::Word2Num - Word to number conversion in Chinese
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Word 2 number conversion in ZHO.
+version 0.2603260
 
 Lingua::ZHO::Word2Num is module for converting text containing number
 representation in Chinese back into number. Converts whole numbers
@@ -203,13 +251,11 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
-
 =item B<zho_numerals> (void)
 
   =>  obj  new parser object
 
 Internal parser.
-
 
 =back
 
@@ -235,15 +281,22 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-   Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2003-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

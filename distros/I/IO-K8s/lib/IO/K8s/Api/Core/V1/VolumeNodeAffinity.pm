@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::VolumeNodeAffinity;
 # ABSTRACT: VolumeNodeAffinity defines constraints that limit what nodes this volume can be accessed from.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s required => 'Core::V1::NodeSelector';
@@ -20,7 +20,7 @@ IO::K8s::Api::Core::V1::VolumeNodeAffinity - VolumeNodeAffinity defines constrai
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 required
 

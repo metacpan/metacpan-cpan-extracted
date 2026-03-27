@@ -2,7 +2,7 @@
 
 [![Graphics::Framebuffer Logo](../../GFB.png?raw=true "Graphics::Framebuffer")](https://youtu.be/qU5IFmtHmUo)
 
-# IMPORTANT
+## IMPORTANT
 
 The images in this directory were available on the public Internet, and are
 property of their various authors.  They are here for demonstration purposes

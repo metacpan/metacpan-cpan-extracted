@@ -7,11 +7,11 @@ use warnings;
 use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 use English;
-use Error::Pure::Utils qw(err_get);
+use Error::Pure::Utils qw(clean);
 use MARC::Leader 0.08;
 use MARC::Field008;
 
-our $VERSION = 0.13;
+our $VERSION = 0.14;
 
 sub module_name {
 	my $self = shift;
@@ -39,24 +39,12 @@ sub process {
 		)->parse($leader_string);
 	};
 	if ($EVAL_ERROR) {
-		my @errors = err_get(1);
-		foreach my $error (@errors) {
-			my %err_params = @{$error->{'msg'}}[1 .. $#{$error->{'msg'}}];
-			push @record_errors, Data::MARC::Validator::Report::Error->new(
-				'error' => $error->{'msg'}->[0],
-				'params' => \%err_params,
-			);
-		}
-		$self->_process_errors($record_id, \@record_errors, []);
+		clean();
 		return;
 	}
 
 	my $field_008_obj = $marc_record->field('008');
 	if (! defined $field_008_obj) {
-		push @record_errors, Data::MARC::Validator::Report::Error->new(
-			'error' => 'Field 008 is not present.',
-		);
-		$self->_process_errors($record_id, \@record_errors, []);
 		return;
 	}
 	my $field_008_string = $field_008_obj->as_string;
@@ -67,15 +55,7 @@ sub process {
 		)->parse($field_008_string);
 	};
 	if ($EVAL_ERROR) {
-		my @errors = err_get(1);
-		foreach my $error (@errors) {
-			my %err_params = @{$error->{'msg'}}[1 .. $#{$error->{'msg'}}];
-			push @record_errors, Data::MARC::Validator::Report::Error->new(
-				'error' => $error->{'msg'}->[0],
-				'params' => \%err_params,
-			);
-		}
-		$self->_process_errors($record_id, \@record_errors, []);
+		clean();
 		return;
 	}
 
@@ -112,7 +92,20 @@ sub process {
 		}
 	}
 
-	$self->_process_errors($record_id, \@record_errors, \@record_errors_recomm);
+	if (@record_errors) {
+		push @{$self->{'errors'}}, Data::MARC::Validator::Report::Plugin::Errors->new(
+			'errors' => \@record_errors,
+			'filters' => $self->{'filters'},
+			'record_id' => $record_id,
+		);
+	}
+	if (@record_errors_recomm) {
+		push @{$self->{'errors'}}, Data::MARC::Validator::Report::Plugin::Errors->new(
+			'errors' => \@record_errors_recomm,
+			'filters' => [@{$self->{'filters'}}, 'recommendation'],
+			'record_id' => $record_id,
+		);
+	}
 
 	return;
 }
@@ -121,27 +114,6 @@ sub version {
 	my $self = shift;
 
 	return $VERSION;
-}
-
-sub _process_errors {
-	my ($self, $record_id, $record_errors_ar, $record_errors_recomm_ar) = @_;
-
-	if (@{$record_errors_ar}) {
-		push @{$self->{'errors'}}, Data::MARC::Validator::Report::Plugin::Errors->new(
-			'errors' => $record_errors_ar,
-			'filters' => $self->{'filters'},
-			'record_id' => $record_id,
-		);
-	}
-	if (@{$record_errors_recomm_ar}) {
-		push @{$self->{'errors'}}, Data::MARC::Validator::Report::Plugin::Errors->new(
-			'errors' => $record_errors_recomm_ar,
-			'filters' => [@{$self->{'filters'}}, 'recommendation'],
-			'record_id' => $record_id,
-		);
-	}
-
-	return;
 }
 
 1;

@@ -930,6 +930,24 @@ sub init {
 
     push @{ $S->{next} }, qw< c) atom >;
 
+    # (?(DEFINE)...) — always-false condition for defining groups
+    if (${&Rx} =~ m{ \G DEFINE \) }xgc) {
+      push @{ $S->{next} }, qw< ifthen|2 ifthen| ifthen_atom >;
+      return $S->object(define =>);
+    }
+
+    # (?(<name>)...) — named capture condition
+    if (${&Rx} =~ m{ \G < ([a-zA-Z_]\w*) > \) }xgc) {
+      push @{ $S->{next} }, qw< ifthen|2 ifthen| ifthen_atom >;
+      return $S->object(grouppn => $1, '<');
+    }
+
+    # (?('name')...) — named capture condition (alternate syntax)
+    if (${&Rx} =~ m{ \G ' ([a-zA-Z_]\w*) ' \) }xgc) {
+      push @{ $S->{next} }, qw< ifthen|2 ifthen| ifthen_atom >;
+      return $S->object(grouppn => $1, "'");
+    }
+
     if (${&Rx} =~ m{ \G (.) }xgcs) {
       my $n = "$c$1";
       return $S->$n if $S->can($n);

@@ -51,7 +51,7 @@ END
     elsif (1 or ($^O =~ /(?:solaris|linux)/i)) {
         die <<'END';
 
-usgae:
+usage:
 
 $ ./pmake.bat
 $ ./pmake.bat test
@@ -220,7 +220,7 @@ for my $target (@ARGV) {
             perl                 5.005_03
         ));
         my %provides = ();
-        for my $file (grep /\.(pl|pm|t|bat)\z/i, @file) {
+        for my $file (grep m{\Alib/.*\.pm\z}i, @file) {
             if (open FILE, $file) {
                 while (<FILE>) {
                     chomp;
@@ -258,15 +258,21 @@ for my $target (@ARGV) {
         #                                                12345678
         my $requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$requires{$_}',}} sort keys %requires;
 
+        #                                                12345678901234567890
+        my $provides_as_makefile_pl = join ",\n", map {
+            my $f = $provides{$_};
+            qq{            '$_' => {\n                'file'    => '$f',\n                'version' => '$version',\n            }}
+        } sort keys %provides;
+
         # write Makefile.PL
         open(FH_MAKEFILEPL,'>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
         binmode FH_MAKEFILEPL;
-        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author);
+        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $provides_as_makefile_pl);
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
+my %%args = (
     'NAME'      => q{%s},
     'VERSION'   => q{%s},
     'ABSTRACT'  => q{%s},
@@ -275,6 +281,39 @@ WriteMakefile(
     },
     'AUTHOR'    => q{%s},
 );
+
+# LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
+# Passing it to older versions produces an "is not a known parameter" warning
+# without failing, but we suppress the noise by checking the version.
+if ($ExtUtils::MakeMaker::VERSION >= 6.31) {
+    $args{LICENSE} = q{perl};
+}
+
+# MIN_PERL_VERSION (6.48) and META_MERGE (6.46) arrived together in the
+# same EUMM release cycle; guard them under the higher threshold (6.48)
+# so both are always either present or absent.
+if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
+    $args{MIN_PERL_VERSION} = q{5.00503};
+    $args{META_MERGE} = {
+        'meta-spec' => { version => 2 },
+        'resources' => {
+            'license'    => [ 'http://dev.perl.org/licenses/' ],
+            'bugtracker' => {
+                'web' => 'https://github.com/ina-cpan/%s/issues',
+            },
+            'repository' => {
+                'url'  => 'https://github.com/ina-cpan/%s',
+                'web'  => 'https://github.com/ina-cpan/%s',
+                'type' => 'git',
+            },
+        },
+        'provides' => {
+%s
+        },
+    };
+}
+
+WriteMakefile(%%args);
 
 __END__
 END
@@ -300,13 +339,13 @@ END
         #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
 
         #                                      12     1234
-        my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}"} sort keys %provides;
-        my $requires_as_yml = join "\n", map {"  $_: $requires{$_}"}            sort keys %requires;
+        my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}\n    version: $version"} sort keys %provides;
+        my $requires_as_yml = join "\n", map {"  $_: $requires{$_}"}                                   sort keys %requires;
         #                                      12
 
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $requires_as_yml, $name_as_dist_on_url);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $requires_as_yml, $provides_as_yml, $name_as_dist_on_url, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
@@ -322,8 +361,12 @@ requires:
 %s
 build_requires:
   Test: 1.122
+minimum_perl_version: 5.00503
+provides:
+%s
 resources:
   license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/%s/issues
   repository: https://github.com/ina-cpan/%s
 END
         close(FH_METAYML);
@@ -350,12 +393,12 @@ END
 
         #                                          1234567890123456
         my $requires_as_json = join ",\n", map {qq{                "$_" : "$requires{$_}"}}                            sort keys %requires;
-        my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}"\n        }}} sort keys %provides;
+        my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}",\n            "version" : "$version"\n        }}} sort keys %provides;
         #                                          12345678          123456789012                          12345678
 
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json, $requires_as_json, $provides_as_json);
 {
     "name" : "%s",
     "version" : "%s",
@@ -377,8 +420,13 @@ END
         "license" : [
             "http://dev.perl.org/licenses/"
         ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/%s/issues"
+        },
         "repository" : {
-            "url" : "https://github.com/ina-cpan/%s"
+            "url"  : "https://github.com/ina-cpan/%s",
+            "web"  : "https://github.com/ina-cpan/%s",
+            "type" : "git"
         }
     },
     "prereqs" : {
@@ -396,7 +444,15 @@ END
             "requires" : {
 %s
             }
+        },
+        "test" : {
+            "requires" : {
+%s
+            }
         }
+    },
+    "provides" : {
+%s
     }
 }
 END
@@ -834,6 +890,31 @@ to license your work under the same license as that used by the project.
 TO_CONTRIBUTE
         close FH_CONTRIBUTING;
         check_usascii('CONTRIBUTING');
+
+        # write SECURITY.md
+        open(FH_SECURITY,'>SECURITY.md') || die "Can't open file: SECURITY.md\n";
+        binmode FH_SECURITY;
+        print FH_SECURITY <<'TO_SECURITY';
+# Security Policy
+
+## Reporting a Vulnerability
+
+If you discover a security vulnerability in this distribution, please report
+it by e-mail to the author at ina@cpan.org.
+
+Do NOT open a public GitHub issue for security vulnerabilities.  Please use
+private e-mail so that a fix can be prepared before public disclosure.
+
+You can expect an acknowledgement within a few days.  If you do not receive
+a response within one week, please follow up.
+
+## Supported Versions
+
+Only the most recent release on CPAN is actively maintained.  Please
+upgrade to the latest version before reporting security issues.
+TO_SECURITY
+        close FH_SECURITY;
+        check_usascii('SECURITY.md');
 
         # make work directory
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);

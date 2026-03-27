@@ -1,6 +1,6 @@
 {
     "name" : "LTSV-LINQ",
-    "version" : "1.06",
+    "version" : "1.07",
     "abstract" : "LINQ-style query interface for LTSV files",
     "author" : [
         "ina <ina@cpan.org>"
@@ -65,11 +65,11 @@
     "provides" : {
         "LTSV::LINQ" : {
             "file" : "lib/LTSV/LINQ.pm",
-            "version" : "1.06"
+            "version" : "1.07"
         },
         "LTSV::LINQ::Ordered" : {
             "file" : "lib/LTSV/LINQ.pm",
-            "version" : "1.06"
+            "version" : "1.07"
         }
     }
 }

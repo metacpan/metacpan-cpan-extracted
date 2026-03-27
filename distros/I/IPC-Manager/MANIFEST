@@ -228,9 +228,16 @@ lib/IPC/Manager/Client/PostgreSQL.pm
 lib/IPC/Manager/Client/SQLite.pm
 lib/IPC/Manager/Client/UnixSocket.pm
 lib/IPC/Manager/Message.pm
+lib/IPC/Manager/Role/Service.pm
+lib/IPC/Manager/Role/Service/Requests.pm
+lib/IPC/Manager/Role/Service/Select.pm
 lib/IPC/Manager/Serializer.pm
 lib/IPC/Manager/Serializer/JSON.pm
+lib/IPC/Manager/Service.pm
+lib/IPC/Manager/Service/Handle.pm
+lib/IPC/Manager/Service/Peer.pm
 lib/IPC/Manager/Spawn.pm
+lib/IPC/Manager/Util.pm
 perltidyrc
 t/AtomicPipe.t
 t/MariaDB.t
@@ -240,4 +247,5 @@ t/PostgreSQL.t
 t/SQLite.t
 t/UnixSocket.t
 t/generic_test.pl
+t/service_test.pl
 xt/author/pod-syntax.t

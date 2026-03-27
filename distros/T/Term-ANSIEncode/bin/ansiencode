@@ -1,0 +1,511 @@
+#!/usr/bin/env perl
+
+#######################################################################
+#            _   _  _____ _____   ______                     _        #
+#      ╱╲   | ╲ | |╱ ____|_   _| |  ____|                   | |       #
+#     ╱  ╲  |  ╲| | (___   | |   | |__   _ __   ___ ___   __| | ___   #
+#    ╱ ╱╲ ╲ | . ` |╲___ ╲  | |   |  __| | '_ ╲ ╱ __╱ _ \ / _` |╱ _ ╲  #
+#   ╱ ____ ╲| |╲  |____) |_| |_  | |____| | | | (_| (_) | (_| |  __╱  #
+#  ╱_╱    ╲_╲_| ╲_|_____╱|_____| |______|_| |_|╲___╲___╱ ╲__,_|╲___|  #
+#######################################################################
+#                     Written By Richard Kelsch                       #
+#                  © Copyright 2025 Richard Kelsch                    #
+#                        All Rights Reserved                          #
+#######################################################################
+
+use strict;
+use utf8;    # In Windows, Codepage 65001 needs to be set "chcp 65001 >nul"
+use warnings;
+use charnames();
+use constant {
+    TRUE  => 1,
+    FALSE => 0,
+    YES   => 1,
+    NO    => 0,
+};
+
+use Time::HiRes      qw( sleep );
+use Term::ANSIEncode qw( ansi_colors );
+use Getopt::Long;
+use List::Util qw(max);
+use Text::Format;
+
+# use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
+
+# Since UTF-8 is the norm, it's enabled for all needed handles
+binmode(STDERR, ":encoding(UTF-8)");
+binmode(STDOUT, ":encoding(UTF-8)");
+binmode(STDIN,  ":encoding(UTF-8)");
+
+our $VERSION = $Term::ANSIEncode::VERSION;    # Pull in the version from Term::ANSIEncode
+
+my $version    = FALSE;
+my $help       = FALSE;
+my $tokens     = FALSE;
+my $rawtokens  = FALSE;
+my $symbols    = FALSE;
+my $unicode    = FALSE;
+my $colors     = FALSE;
+my $Dump       = FALSE;
+my $frames     = FALSE;
+my $rules      = FALSE;
+my $ansi_modes = FALSE;
+my $width      = 80, my $baud = 0;
+my $speed      = 0;
+
+GetOptions(
+    'a|ansi-modes'       => \$ansi_modes,
+    'version'            => \$version,
+    'help'               => \$help,
+    'tokens'             => \$tokens,
+    'rawtokens'          => \$rawtokens,
+    'colors'             => \$colors,
+    'symbols'            => \$symbols,
+    'dump'               => \$Dump,
+    'unicode'            => \$unicode,
+    'frames'             => \$frames,
+    'h|horizontal-rules' => \$rules,
+    'baud=i'             => \$baud,
+    'width=i'            => \$width,
+);
+
+if ($baud > 0) {
+    $speed = calc_speed($baud);
+} else {
+    $baud  = 0;
+    $speed = 0;
+}
+
+my $ansi = Term::ANSIEncode->new('baud' => $baud, 'speed' => $speed, 'columns' => $width);
+
+my $header = '[% CLS %]For Best results, make sure your terminal type supports 256 (or more)
+colors like "xterm-256color".  You should be using the "Awesome" fonts for
+access to all Unicode characters and symbols:
+
+    http://github.com/gabrielelana/awesome-terminal-fonts
+
+I suggest "SourceCodePro-Powerline-Awesome" when selecting a font
+';
+
+###
+
+our @list = (0x20 .. 0x7F, 0xA0 .. 0xFF, 0x2010 .. 0x205F, 0x2070 .. 0x242F, 0x2440 .. 0x244F, 0x2460 .. 0x29FF, 0x1F300 .. 0x1F8BF, 0x1F900 .. 0x1FBBF, 0x1FBC0 .. 0x1FBCF, 0x1FBF0 .. 0x1FBFF,);
+
+my $bar = '[% BRIGHT GREEN %]│[% RESET %]';
+
+$| = 1;
+if ($version) {
+    $ansi->ansi_output($ansi->get_version());
+} elsif ($ansi_modes) {
+    my $out = "\n[% B_YELLOW %][% BOLD %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
+    if ($ansi->{'CAPS'}->{'3 BIT'}) {
+        $out .= "    ANSI  3 BIT:  [% GREEN %]Supported[% RESET %]\n";
+    } else {
+        $out .= "    ANSI  3 BIT:  [% RED %]Not Supported[% RESET %]\n";
+    }
+    if ($ansi->{'CAPS'}->{'4 BIT'}) {
+        $out .= "    ANSI  4 BIT:  [% GREEN %]Supported[% RESET %]\n";
+    } else {
+        $out .= "    ANSI  4 BIT:  [% RED %]Not Supported[% RESET %]\n";
+    }
+    if ($ansi->{'CAPS'}->{'8 BIT'}) {
+        $out .= "    ANSI  8 BIT:  [% GREEN %]Supported[% RESET %]\n";
+    } else {
+        $out .= "    ANSI  8 BIT:  [% RED %]Not Supported[% RESET %]\n";
+    }
+    if ($ansi->{'CAPS'}->{'24 BIT'}) {
+        $out .= "    ANSI 24 BIT:  [% GREEN %]Supported[% RESET %]\n";
+    } else {
+        $out .= "    ANSI 24 BIT:  [% RED %]Not Supported[% RESET %]\n";
+    }
+    $out .= "[% B_YELLOW %]                                 [% RESET %]\n\n";
+    $ansi->ansi_output($out);
+} elsif ($help) {
+    $ansi->ansi_output(help_text());
+} elsif ($tokens) {
+    $ansi->ansi_output($ansi->expand_tokens());
+} elsif ($frames) {
+###
+    my $sample_frames = <<'FRAMES';
+
+[% BOX BRIGHT YELLOW,1,9,17,5,DOUBLE             %]This is a text box with a DOUBLE frame[% ENDBOX %]
+[% BOX BRIGHT GREEN,18,9,20,5,THIN               %]This is a text box with a THIN frame[% ENDBOX %]
+[% BOX BRIGHT RED,39,9,16,5,THICK                %]This is a text box with a THICK frame[% ENDBOX %]
+[% BOX BRIGHT BLUE,56,9,16,5,CIRCLE              %]This is a text box with a CIRCLE frame[% ENDBOX %]
+[% BOX PINK,1,14,20,5,ROUNDED                    %]This is a text box with a ROUNDED frame[% ENDBOX %]
+[% BOX ORANGE,18,19,16,5,BLOCK                   %]This is a text box with a BLOCK frame[% ENDBOX %]
+[% BOX BRIGHT BLUE,1,19,16,5,WEDGE               %]This is a text box with a WEDGE frame[% ENDBOX %]
+[% BOX MAGENTA,53,18,14,6,DOTS                   %]This is a text box with a DOTS frame[% ENDBOX %]
+[% BOX CYAN,22,14,17,5,DIAMOND                   %]This is a text box with a DIAMOND frame[% ENDBOX %]
+[% BOX WHITE,41,14,22,4,STAR                     %]This is a text box with a STAR frame[% ENDBOX %]
+[% BOX RED,35,19,17,5,SQUARE                     %]This is a text box with a SQUARE frame[% ENDBOX %]
+[% BOX BRIGHT WHITE,1,24,17,5,DITHERED           %]This is a text box with a DITHERED frame[% ENDBOX %]
+[% BOX BRIGHT MAGENTA,19,24,17,5,HEARTS          %]This is a text box with a HEARTS frame[% ENDBOX %]
+[% BOX SADDLE BROWN,37,24,18,5,CHRISTIAN         %]This is a text box with a CHRISTIAN frame[% ENDBOX %]
+[% BOX ROYAL BLUE,56,24,17,5,ARROWS              %]This is a text box with an ARROWS frame[% ENDBOX %]
+[% BOX FOREST GREEN,1,29,22,5,PARALLELOGRAM      %]This is a text box with a PARALLELOGRAM frame[% ENDBOX %]
+[% BOX CRIMSON,24,29,17,5,BIG WEDGE              %]This is a text box with a BIG WEDGE frame[% ENDBOX %]
+[% BOX SALMON,42,29,17,5,BIG ARROWS              %]This is a text box with a BIG ARROWS frame[% ENDBOX %]
+[% BOX YELLOW,60,29,16,5,NOTES                   %]This is a text box with a NOTES frame[% ENDBOX %]
+[% BOX LIME,1,34,20,5,ARROWHEADS                 %]This is a text box with a ARROWHEADS frame[% ENDBOX %]
+[% BOX VIVID TANGERINE,23,34,22,5,FAT ARROWHEADS %]This is a text box with a FAT ARROWHEADS frame[% ENDBOX %]
+[% BOX WATERSPOUT,47,34,18,5,SOLID               %]This is a text box with a SOLID frame[% ENDBOX %]
+
+FRAMES
+###
+    $ansi->ansi_output("$header\n$sample_frames");
+} elsif ($rules) {
+    my $sample_horizontal_rules = "Horizontal rules\n\n" . '[% HORIZONTAL RULE PINK       %][% BLACK %][% B_PINK       %] PINK[% RESET       %]' . "\n" . '[% HORIZONTAL RULE GREEN      %][% BLACK %][% B_GREEN      %] GREEN[% RESET      %]' . "\n" . '[% HORIZONTAL RULE ORANGE     %][% BLACK %][% B_ORANGE     %] ORANGE[% RESET     %]' . "\n" . '[% HORIZONTAL RULE MAGENTA    %][% BLACK %][% B_MAGENTA    %] MAGENTA[% RESET    %]' . "\n" . '[% HORIZONTAL RULE CYAN       %][% BLACK %][% B_CYAN       %] CYAN[% RESET       %]' . "\n" . '[% HORIZONTAL RULE BLUE       %][% WHITE %][% B_BLUE       %] BLUE[% RESET       %]' . "\n" . '[% HORIZONTAL RULE RED        %][% WHITE %][% B_RED        %] RED[% RESET        %]' . "\n" . '[% HORIZONTAL RULE YELLOW     %][% BLACK %][% B_YELLOW     %] YELLOW[% RESET     %]' . "\n" . '[% HORIZONTAL RULE NAVY       %][% WHITE %][% B_NAVY       %] NAVY[% RESET       %]' . "\n" . '[% HORIZONTAL RULE ROYAL BLUE %][% WHITE %][% B_ROYAL BLUE %] ROYAL BLUE[% RESET %]' . "\n\n";
+    $ansi->ansi_output("$header\n$sample_horizontal_rules\rCan be all colors your terminal supports.\n\n");
+} elsif ($rawtokens) {
+    my $width = 2;
+    my $text  = "\n";
+    if ($width == 2) {
+        $text .= '[% GREEN %]╔' . '═' x 65 . '╗[% RESET %]' . "\n";
+        $text .= '[% GREEN %]║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 13 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 14 . '[% RESET %][% GREEN %]║[% RESET %]' . "\n";
+        $text .= '[% GREEN %]╠' . '═' x 32 . '╦' . '═' x 32 . '╣[% RESET %]' . "\n";
+    } else {
+        $text .= '[% GREEN %]╔' . '═' x 131 . '╗[% RESET %]' . "\n";
+        $text .= '[% GREEN %]║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . '[% RESET %][% GREEN %]║[% RESET %]' . "\n";
+        $text .= '[% GREEN %]╠' . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . '╣[% RESET %]' . "\n";
+    }
+    $text .= '[% GREEN %]║[% RESET %]';
+    my $count = 1;
+    foreach my $codes ('clear', 'cursor', 'attributes', 'foreground', 'background') {
+        foreach my $token (sort(keys %{ $ansi->{'ansi_meta'}->{$codes} })) {
+            $text .= sprintf(' %-31s', $token);
+            $count++;
+            if ($count > $width) {
+                $count = 1;
+                $text .= '[% GREEN %]║[% RESET %]' . "\n" . '[% GREEN %]║[% RESET %]';
+            } else {
+                $text .= '[% GREEN %]║[% RESET %]';
+            }
+        } ## end foreach my $token (sort(keys...))
+    } ## end foreach my $codes ('clear',...)
+    if ($width == 2) {
+        $text .= "\r" . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s',                                                  'JUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDJUSTIFIED') . '[% GREEN %]║[% RESET %]' . "\n";
+        $text .= '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'WRAP') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDWRAP') . '[% GREEN %]║[% RESET %]' . "\n";
+        $text .= '[% GREEN %]╚' . '═' x 32 . '╩' . '═' x 32 . '╝[% RESET %]' . "\n\n";
+    } else {
+        $text .= "\r" . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'JUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDJUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'WRAP') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDWRAP') . '[% GREEN %]║[% RESET %]' . "\n";
+        $text .= '[% GREEN %]╚' . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . '╝[% RESET %]' . "\n\n";
+    }
+    $ansi->ansi_output($text);
+} elsif ($Dump) {
+    my $temp = "\n\n";
+    my @names;
+    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
+    if (defined($search) && $search ne '') {
+        $temp .= charnames::string_vianame($search);
+    } else {
+        print "\nAssembling character dump...";
+        my $start = $ansi->{'start'};
+        foreach my $code (@list) {
+            my $name = charnames::viacode($code);
+            if (defined($name)) {
+                $temp .= charnames::string_vianame($name) . ' ';
+            }
+        } ## end foreach my $code (@list)
+    } ## end else [ if (defined($search) &&...)]
+    $ansi->ansi_output("$temp\n");
+} elsif ($unicode) {
+    print "\nAssembling unicode glyphs...";
+    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
+    my $text   = "\n\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭─────────╮[% RESET %]' . "\n";
+    if (defined($search)) {
+        $text .= '[% COLOR 52 %]│ [% BRIGHT CYAN %]Unicode[% COLOR 52 %] │[% RESET %]' . "\n";
+        $text .= '[% COLOR 52 %]├─────────┼─────[% RESET %]' . "\n";
+        $text .= '[% COLOR 52 %]│[% BRIGHT WHITE %]' . sprintf('U+%05s', $search) . ' [% COLOR 52 %]│[% RESET %] ' . charnames::string_vianame(charnames::viacode(hex($search)));
+        $text .= "\n";
+        $text .= '[% COLOR 52 %]╰─────────┴─────[% RESET %]' . "\n\n";
+    } else {
+        $text .= '[% COLOR 52 %]│ [% BRIGHT CYAN %]Unicode[% COLOR 52 %] │[% RESET %][% BRIGHT WHITE %] 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F[% RESET %]' . "\n";
+        $text .= '[% COLOR 52 %]├─────────┼' . '─' x 65 . '[% RESET %]' . "\n";
+        my $count = 0;
+        foreach my $code (@list) {
+            my ($name, $char, $hcode);
+            $name = charnames::viacode($code);
+            if (defined($name) && $name ne '') {
+                $char  = charnames::string_vianame($name) || ' ';
+                $hcode = sprintf('U+%-5s', substr(sprintf('0x%05X', $code), 2));
+                if ($hcode ne '') {
+                    unless ($count) {
+                        $text .= '[% COLOR 52 %]│[% BRIGHT WHITE %] ' . $hcode . ' [% COLOR 52 %]│[% RESET %] ' . $char;
+                    } else {
+                        $text .= '  ' . $char;
+                    }
+                    $count++;
+                    if ($count > 15) {
+                        $count = 0;
+                        $text .= "\n";
+                        $text .= '[% COLOR 52 %]├─────────┼' . '─' x 65 . '[% RESET %]' . "\n" if ($code < 0x1FBFF);
+                    }
+                } ## end if ($hcode ne '')
+            } ## end if (defined($name) && ...)
+        } ## end foreach my $code (@list)
+        $text .= "\n";
+        $text .= '[% COLOR 52 %]╰─────────┴' . '─' x 65 . '[% RESET %]' . "\n\n";
+    } ## end else [ if (defined($search)) ]
+    $ansi->ansi_output($text);
+} elsif ($symbols) {
+    print "\nAssembling symbols...";
+    my @names;
+    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
+    my $size   = 0;
+    if (defined($search) && $search ne '') {
+        if ($search =~ /^U\+/) {
+            $search = substr($search, 2);
+            foreach my $code (@list) {
+                my $ucode = sprintf('%X', $code);
+                if ($ucode =~ /^$search/i) {
+                    my $name = charnames::viacode($code);
+                    push(@names, $name);
+                    $size = max($size, length($name));
+                }
+            } ## end foreach my $code (@list)
+        } else {
+            foreach my $code (@list) {
+                my $name = charnames::viacode($code);
+                if (defined($name) && $name =~ /$search/i) {
+                    push(@names, $name);
+                    $size = max($size, length($name));
+                }
+            } ## end foreach my $code (@list)
+        } ## end else [ if ($search =~ /^U\+/)]
+    } else {
+        foreach my $code (@list) {
+            my $name = charnames::viacode($code);
+            if (defined($name)) {
+                push(@names, $name);
+                $size = max($size, length($name));
+            }
+        } ## end foreach my $code (@list)
+    } ## end else [ if (defined($search) &&...)]
+    if (scalar(@names)) {
+        my $text = "\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭─────────┬─' . '─' x $size . '─╮[% RESET %]' . "\n";
+        $text .= '[% COLOR 52 %]│[% B_BLACK %][% CYAN %] Unicode [% RESET %][% COLOR 52 %]│[% B_BLACK %]' . ' ' x ($size - 20) . '[% BRIGHT YELLOW %]Character Token Names [% RESET %]' . "[% COLOR 52 %]│[% RESET %]\n";
+        $text .= '[% COLOR 52 %]├─────────┼─' . '─' x $size . "─┤[% RESET %]\n";
+        while (scalar(@names)) {
+            my $name = shift(@names);
+            if ($name ne '') {
+                if ($name =~ /^COMBINING/) {
+                    $text .= sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s   %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n";
+                } else {
+                    $text .= sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n";
+                }
+            } ## end if ($name ne '')
+        } ## end while (scalar(@names))
+        $text .= '[% COLOR 52 %]╰─────────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
+        $ansi->ansi_output($text);
+    } else {
+        print "\nNothing found for $search\n\n";
+    }
+} elsif ($colors) {
+    $ansi->ansi_output($ansi->ansi_colors({ '3 BIT' => $ansi->{'CAPS'}->{'3 BIT'}, '4 BIT' => $ansi->{'CAPS'}->{'4 BIT'}, '8 BIT' => $ansi->{'CAPS'}->{'8 BIT'}, '24 BIT' => $ansi->{'CAPS'}->{'24 BIT'} }));
+} else {    # Output file to STDOUT
+    my $file = $ARGV[0];
+    if (defined $file && -e $file) {
+        open my $fh, '<:encoding(UTF-8)', $file
+          or do { warn "Could not open file '$file': $!\n"; exit 2; };
+
+        # Stream the file to the output renderer to avoid huge memory usage.
+        while (my $chunk = <$fh>) {
+            $ansi->ansi_output($chunk);
+        }
+        close $fh;
+    } else {
+        $ansi->ansi_output(help_text());
+        $| = 1;
+    }
+} ## end else [ if ($version) ]
+
+exit(0);
+
+sub calc_speed {
+    my $baud = shift;
+    return (1 / ($baud / 8));
+}
+
+sub help_text {
+    my $help_text = <<'SMALL';
+
+[% CLS %]╔═══════════════════════════════════════════════════════════════════════════╗
+║[% B_BLACK %]                 [% RED %]┏━┓ [% BRIGHT YELLOW %]┏┓╻ [% GREEN %]┏━┓ [% BRIGHT BLUE %]╻     [% BRIGHT WHITE %]┏━╸ ┏┓╻ ┏━╸ ┏━┓ ╺┳┓ ┏━╸                 [% RESET %]║
+║[% B_BLACK %]                 [% RED %]┣━┫ [% BRIGHT YELLOW %]┃┗┫ [% GREEN %]┗━┓ [% BRIGHT BLUE %]┃     [% BRIGHT WHITE %]┣╸  ┃┗┫ ┃   ┃ ┃  ┃┃ ┣╸                  [% RESET %]║
+║[% B_BLACK %]                 [% RED %]╹ ╹ [% BRIGHT YELLOW %]╹ ╹ [% GREEN %]┗━┛ [% BRIGHT BLUE %]╹     [% BRIGHT WHITE %]┗━╸ ╹ ╹ ┗━╸ ┗━┛ ╺┻┛ ┗━╸                 [% RESET %]║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] DESCRIPTION                                                               [% RESET %]║
+║     Markup text to ANSI encoder.                                          ║
+╟───────────────────────────────────────────────────────────────────────────╢
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] USAGE                                                                     [% RESET %]║
+║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                                     ║
+╟───────────────────────────────────────────────────────────────────────────╢
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                   [% RESET %]║
+║     -[% BRIGHT CYAN %]a[% RESET %] or --[% BRIGHT CYAN %]ansi-modes[% RESET %]                                                    ║
+║         Show supported ANSI color modes                                   ║
+║                                                                           ║
+║     --[% BRIGHT CYAN %]baud[% RESET %]=speed                                                          ║
+║         "speed" can be any baud rate. Default is full speed.              ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]c[% RESET %] or --[% BRIGHT CYAN %]colors[% RESET %]                                                        ║
+║         Show available colors                                             ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]d[% RESET %] or --[% BRIGHT CYAN %]dump[% RESET %] [search]                                                 ║
+║         Dump available sysmbols                                           ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]f[% RESET %] or --[% BRIGHT CYAN %]frames[% RESET %]                                                        ║
+║         Show sample frame types                                           ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]h[% RESET %] or --[% BRIGHT CYAN %]horizontal-rules[% RESET %]                                              ║
+║         Show sample horizontal rules                                      ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]r[% RESET %] or --[% BRIGHT CYAN %]rawtokens[% RESET %]                                                     ║
+║         Raw dump of available tokens.                                     ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]s[% RESET %] or --[% BRIGHT CYAN %]symbols[% RESET %] [search]                                              ║
+║         Show available symbols and character tokens by name               ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]t[% RESET %] or --[% BRIGHT CYAN %]tokens[% RESET %]                                                        ║
+║         Show most used tokens                                             ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]u[% RESET %] or --[% BRIGHT CYAN %]unicode[% RESET %] [search]                                              ║
+║         Show available symbols and character tokens by unicode            ║
+║                                                                           ║
+║     -[% BRIGHT CYAN %]v[% RESET %] or --[% BRIGHT CYAN %]version[% RESET %]                                                       ║
+║         Shows version and licensing info                                  ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+SMALL
+###
+    return ($help_text);
+} ## end sub help_text
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ANSIEncode
+
+=head1 SYNOPSIS
+
+A markup language to generate basic ANSI text.  A terminal that supports UTF-8 is highly recommended for graphics characters.
+
+=head1 USAGE
+
+ ansi_encode.pl [options] [file or search]
+
+See the manual page for "Term::ANSIEncode" for markup documentation.
+
+=head1 OPTIONS
+
+Using no options expects a file name.
+
+=over 4
+
+=item --B<version> or -B<v>
+
+Shows name, version information and brief licensing information.
+
+=item --B<help> or -B<h>
+
+Simple usage and options documentation
+
+=item --B<tokens> or -B<y>
+
+Shows the most used tokens available.  A token is encapsulated within [% and %] (with at lease one space on each side)
+
+=item --B<rawtokens> or B<r>
+
+Raw dump of useable tokens.
+
+=item --B<symbols> or -B<s> [search]
+
+Similar to "tokens", but instead shows special symbol character token names.
+
+You may also add a search string to shorten the list.
+
+IT IS HIGHLY SUGGESTED YOU USE A SEARCH STRING.  There are a lot of Unicode characters.  Each character has its own token.
+
+=item --B<unicode> or -B<u> [search]
+
+Similar to "tokens", but instead shows special symbol characters by unicode.
+
+You may also add a search string to shorten the list.
+
+IT IS HIGHLY SUGGESTED YOU USE A SEARCH STRING.
+
+=item --B<dump> or -B<d> [search]
+
+Does a raw dump of the symbols.
+
+=back
+
+=head1 MARKDOWN EXAMPLES
+
+=head2 IBM Logo
+
+   [% B_BLACK           %]                                                                                [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬                 ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬               ▬▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬             ▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬        ▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬           ▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬      ▬▬▬▬▬▬▬▬▬▬▬         ▬▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬  ▬▬▬▬▬   ▬▬▬▬▬  ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬      ▬▬▬▬▬▬▬    ▬▬▬▬▬▬▬▬▬    ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬        ▬▬▬▬▬▬     ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %]    ▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬       ▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬      ▬▬▬▬▬      ▬▬▬▬▬▬▬    [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬     ▬▬▬▬▬▬▬▬▬       ▬▬▬       ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK %][% BLUE %] ▬▬▬▬▬▬▬▬▬▬▬▬▬   ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬        ▬▬▬▬▬▬▬▬▬        ▬        ▬▬▬▬▬▬▬▬▬  [% RESET %]
+   [% B_BLACK           %]                                                                                [% RESET %]
+
+=head2 Atari Logo
+
+   [% B_BLACK %][% SPACES 84 %][% RESET %]
+   [% B_BLACK %][% YELLOW  %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]         db    888888888888    db         88888888ba   88  [% RESET %]
+   [% B_BLACK %][% LIME    %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]        d88b        88        d88b        88      "8b  88  [% RESET %]
+   [% B_BLACK %][% GREEN   %]         ## ### ##       [% RESET %][% B_BLACK %][% RED %]       d8'`8b       88       d8'`8b       88      ,8P  88  [% RESET %]
+   [% B_BLACK %][% CYAN    %]        ### ### ###      [% RESET %][% B_BLACK %][% RED %]      d8'  `8b      88      d8'  `8b      88    aa8P'  88  [% RESET %]
+   [% B_BLACK %][% BLUE    %]       ###  ###  ###     [% RESET %][% B_BLACK %][% RED %]     d8YaaaaY8b     88     d8YaaaaY8b     88   "88'    88  [% RESET %]
+   [% B_BLACK %][% MAGENTA %]      ###   ###   ###    [% RESET %][% B_BLACK %][% RED %]    d8""""""""8b    88    d8""""""""8b    88    "8b    88  [% RESET %]
+   [% B_BLACK %][% PINK    %]    ####    ###    ####  [% RESET %][% B_BLACK %][% RED %]   d8'        `8b   88   d8'        `8b   88     `8b   88  [% RESET %]
+   [% B_BLACK %][% RED     %]  ####      ###     #### [% RESET %][% B_BLACK %][% RED %]  d8'          `8b  88  d8'          `8b  88      `8b  88  [% RESET %]
+   [% B_BLACK %][% SPACES 84 %][% RESET %]
+
+=head2 Sinclair Research Logo
+
+   [% B_BLACK                   %]                                                                                                           [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]                 ▄▄                               ▄▄                ▄▄                  [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]  [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]                 ▀▀                               ██                ▀▀                 [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]   [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██████████████ ██ ██████████████ ██████████████ ██ ██████████████ ██ ██████████████ [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]    [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██▄▄▄▄▄▄▄▄▄▄▄▄ ██ ██          ██ ██             ██ ▄▄▄▄▄▄▄▄▄▄▄▄██ ██ ██            [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]     [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ▀▀▀▀▀▀▀▀▀▀▀▀██ ██ ██          ██ ██             ██ ███▀▀▀▀▀▀▀▀▀██ ██ ██           [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]      [% RESET %]
+   [% B_BLACK %][% BRIGHT WHITE %]  ██████████████ ██ ██          ██ ██████████████ ██ ██████████████ ██ ██          [% BRIGHT RED %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT RED %]   [% RESET %][% B_BRIGHT YELLOW %][% BRIGHT RED %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT YELLOW %][% BRIGHT YELLOW %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT YELLOW %]  [% RESET %][% B_BRIGHT GREEN %][% BRIGHT YELLOW %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% BLACK LOWER RIGHT TRIANGLE %][% B_BRIGHT GREEN %] [% RESET %][% B_BRIGHT GREEN %][% BRIGHT GREEN %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BRIGHT GREEN %][% BRIGHT CYAN %][% BLACK LOWER RIGHT TRIANGLE %][% BRIGHT CYAN %][% B_BRIGHT CYAN %]   [% RESET %][% BRIGHT CYAN %][% B_BLACK %][% INVERT %][% BLACK LOWER RIGHT TRIANGLE %][% RESET %][% B_BLACK %]       [% RESET %]
+   [% B_BLACK %][% ORANGE %]  ZX80 [% WHITE %]/[% BRIGHT RED %] ZX81 [% WHITE %]/[% BRIGHT WHITE %] ZX Spectrum [% WHITE %]/[% BRIGHT WHITE %] QL [% WHITE %]/[% BRIGHT WHITE %] PC200                                                                   [% RESET %]
+   [% B_BLACK                   %]                                                                                                           [% RESET %]
+ 
+=head1 AUTHOR & COPYRIGHT
+
+Richard Kelsch
+
+ Copyright (C) 2025 Richard Kelsch
+ All Rights Reserved
+ Perl Artistic License
+
+This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
+
+L<https://perlfoundation.org/artistic-license-20.html>
+
+=head1 GITHUB
+
+=over 4
+
+=item https://github.com/richcsst/ansi-encode
+
+=back
+
+=cut

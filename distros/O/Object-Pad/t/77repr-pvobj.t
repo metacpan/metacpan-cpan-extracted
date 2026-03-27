@@ -4,11 +4,7 @@ use v5.18;
 use warnings;
 
 use Test2::V0;
-
-BEGIN {
-   $^V ge v5.38 or
-      plan skip_all => "Not supported on Perl $^V";
-}
+use Test2::Require::Perl 'v5.38';
 
 use Object::Pad 0.800;
 

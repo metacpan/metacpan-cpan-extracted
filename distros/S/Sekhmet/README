@@ -1,0 +1,44 @@
+Sekhmet - Ultra-fast XS ULID generator built on Horus
+
+DESCRIPTION
+
+Sekhmet generates ULIDs (Universally Unique Lexicographically Sortable
+Identifiers) as defined at https://github.com/ulid/spec.
+
+Built on Horus's C primitives for Crockford base32 encoding, CSPRNG
+random bytes, and millisecond timestamps. Uses custom ops on Perl 5.14+
+for minimal dispatch overhead.
+
+Performance: ~12M ulid()/sec, ~24M ulid_binary()/sec.
+
+SYNOPSIS
+
+    use Sekhmet qw(:all);
+
+    my $ulid = ulid();                  # "01HYXZ3QXB8P6DYZ2TV4BPJ0E7"
+    my $mono = ulid_monotonic();        # guaranteed monotonic in same ms
+    my $bin  = ulid_binary();           # 16 raw bytes
+    my $ts   = ulid_time($ulid);        # epoch seconds
+    my $uuid = ulid_to_uuid($ulid);     # UUID v7 string
+    my $cmp  = ulid_compare($a, $b);    # -1, 0, 1
+    my $ok   = ulid_validate($string);  # 1 or 0
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    Horus >= 0.02
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

@@ -1,26 +1,26 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::EUS::Word2Num;
-# ABSTRACT: Word 2 number conversion in EUS.
+# ABSTRACT: Word to number conversion in Basque
+
+use 5.16.0;
+use utf8;
+use warnings;
 
 # {{{ use block
-
-use 5.10.1;
-use strict;
-use warnings;
 
 use Export::Attrs;
 
 use Parse::RecDescent;
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 my $parser = eu_numerals();
 
 # }}}
 
-# {{{ w2n                                         convert number to text
+# {{{ w2n                                         convert text to number
 #
 sub w2n :Export {
     my $input = shift // return;
@@ -40,7 +40,7 @@ sub w2n :Export {
 sub eu_numerals {
     return Parse::RecDescent->new(q{
       numeral: <rulevar: local $number = 0>
-      numeral: millions  { return $item[1]; }                        # root parse. go from maximum to minimum valeu
+      numeral: millions  { return $item[1]; }                        # root parse. go from maximum to minimum value
         |      million   { return $item[1]; }
         |      millenium { return $item[1]; }
         |      century   { return $item[1]; }
@@ -68,13 +68,12 @@ sub eu_numerals {
         |     'hemezortzi'    { $return = 18; }
         |     'hemeretzi'     { $return = 19; }
 
-
        base20: 'hogei'         { $return = 20; }                     # Base20: 20,40,60 and 80. All
         |      'berrogei'      { $return = 40; }                     # other numbers are an composition
         |      'hirurogei'     { $return = 60; }                     # of number and base 20.
         |      'laurogei'      { $return = 80; }
 
-     centuries: 'ehun'          { $return = 100; }                   # try to find a word that representates
+     centuries: 'ehun'          { $return = 100; }                   # try to find a word that represents
         |       'berrehun'      { $return = 200; }                   # values 100,200,300,...900
         |       'hirurehun'     { $return = 300; }
         |       'laurehun'      { $return = 400; }
@@ -135,7 +134,6 @@ sub eu_numerals {
                  }
                }
 
-
     });
 }
 # }}}
@@ -150,13 +148,12 @@ __END__
 
 =head1 NAME
 
-=head2 Lingua::EUS::Word2Num 
+Lingua::EUS::Word2Num - Word to number conversion in Basque
+
 
 =head1 VERSION
 
-version 0.2603230
-
-Word 2 number conversion in EUS.
+version 0.2603260
 
 Lingua::EUS::Word2Num is module for converting text containing number
 representation in Basque (Euskara) back into number. Converts whole numbers
@@ -200,7 +197,6 @@ Convert text representation to number.
 
 =item B<eu_numerals> (void)
 
-
   =>  obj  new parser object
 
 Internal parser.
@@ -220,7 +216,6 @@ Internal parser.
 
 =item w2n
 
-
 =back
 
 =cut
@@ -230,15 +225,22 @@ Internal parser.
 
 =pod
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- coding, maintenance, refactoring, extensions, specifications:
-
-  Vitor Serra Mori <info@petamem.com>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =head1 COPYRIGHT
 
 Copyright (c) PetaMem, s.r.o. 2004-present
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
 
 =cut
 

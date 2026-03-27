@@ -1,0 +1,69 @@
+---
+abstract: 'Install all PetaMem word-to-number conversion modules'
+author:
+  - 'PetaMem s.r.o. <info@petamem.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Task-Lingua-Word2Num
+provides:
+  Task::Lingua::Word2Num:
+    file: lib/Task/Lingua/Word2Num.pm
+    version: '0.2603260'
+requires:
+  Lingua::AFR::Word2Num: '0'
+  Lingua::ARA::Word2Num: '0'
+  Lingua::BUL::Word2Num: '0'
+  Lingua::CAT::Word2Num: '0'
+  Lingua::CES::Word2Num: '0'
+  Lingua::DAN::Word2Num: '0'
+  Lingua::DEU::Word2Num: '0'
+  Lingua::ELL::Word2Num: '0'
+  Lingua::ENG::Word2Num: '0'
+  Lingua::EST::Word2Num: '0'
+  Lingua::EUS::Word2Num: '0'
+  Lingua::FAS::Word2Num: '0'
+  Lingua::FIN::Word2Num: '0'
+  Lingua::FRA::Word2Num: '0'
+  Lingua::HEB::Word2Num: '0'
+  Lingua::HRV::Word2Num: '0'
+  Lingua::HUN::Word2Num: '0'
+  Lingua::IND::Words2Nums: '0'
+  Lingua::ISL::Word2Num: '0'
+  Lingua::ITA::Word2Num: '0'
+  Lingua::JPN::Word2Num: '0'
+  Lingua::KOR::Word2Num: '0'
+  Lingua::LAV::Word2Num: '0'
+  Lingua::LIT::Word2Num: '0'
+  Lingua::NLD::Word2Num: '0'
+  Lingua::NOR::Word2Num: '0'
+  Lingua::POL::Word2Num: '0'
+  Lingua::POR::Words2Nums: '0'
+  Lingua::RON::Word2Num: '0'
+  Lingua::RUS::Word2Num: '0'
+  Lingua::SLK::Word2Num: '0'
+  Lingua::SPA::Word2Num: '0'
+  Lingua::SWA::Word2Num: '0'
+  Lingua::SWE::Word2Num: '0'
+  Lingua::THA::Word2Num: '0'
+  Lingua::TUR::Word2Num: '0'
+  Lingua::UKR::Word2Num: '0'
+  Lingua::VIE::Word2Num: '0'
+  Lingua::Word2Num: '0'
+  Lingua::ZHO::Word2Num: '0'
+  perl: v5.16.0
+  utf8: '0'
+  warnings: '0'
+resources:
+  repository: https://metacpan.org/author/PETAMEM
+version: '0.2603260'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-2.0 OR BSD-2-Clause'

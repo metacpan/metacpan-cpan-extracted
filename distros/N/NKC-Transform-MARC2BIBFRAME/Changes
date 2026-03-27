@@ -1,0 +1,22 @@
+0.03 2026-03-27T08:52:54+01:00
+ - Add 3.0.0 version of transformation.
+ - Improve doc with possible version informations.
+ - Regen README file.
+
+0.02 2026-03-26T22:33:54+01:00
+ - Add 2.10.0 version of transformation.
+ - Add ACKNOWLEDGEMENTS section to doc.
+ - Add check to 'xslt_transformation_file' parameter.
+ - Add constructor tests.
+ - Add doc.
+ - Add tests for transform().
+ - Add tests for version().
+ - Add version() method.
+ - Add 'version' parameter.
+ - Fix transform() parameters.
+ - Move XSLT transformation files to versioned directory.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
+0.01 2024-04-27T12:49:36+02:00
+ - First version.

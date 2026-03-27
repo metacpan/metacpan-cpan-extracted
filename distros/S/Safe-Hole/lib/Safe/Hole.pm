@@ -8,12 +8,7 @@ use Carp;
 use strict;
 use warnings;
 
-require Exporter;
-
-our @ISA       = qw(Exporter);
-our @EXPORT    = qw();
-our @EXPORT_OK = qw();
-our $VERSION   = '0.16';
+our $VERSION = '0.17';
 
 use XSLoader;
 XSLoader::load( 'Safe::Hole', $VERSION );
@@ -115,7 +110,7 @@ sub wrap {
         *{ $wrapclass . '::AUTOLOAD' } = sub {
             $self->call(
                 sub {
-                    no strict;
+                    no strict 'vars';
                     my $self = shift;
                     return if $AUTOLOAD =~ /::DESTROY$/;
                     my $name = $AUTOLOAD;

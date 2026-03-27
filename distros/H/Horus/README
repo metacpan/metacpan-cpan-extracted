@@ -1,0 +1,40 @@
+Horus - Ultra-fast XS UUID/GUID generator supporting all RFC 9562 versions
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DESCRIPTION
+
+Horus is a pure XS UUID generator with no external C library dependencies.
+It supports all UUID versions defined in RFC 9562 (v1-v8) plus NIL and MAX,
+with 10 output format options.
+
+SUPPORTED VERSIONS
+
+    v1  - Time-based (Gregorian timestamp + clock sequence + node)
+    v2  - DCE Security (local domain identifiers)
+    v3  - MD5 namespace (deterministic)
+    v4  - Random (122 random bits)
+    v5  - SHA-1 namespace (deterministic)
+    v6  - Reordered time (lexically sortable)
+    v7  - Unix epoch time (monotonic, sortable)
+    v8  - Custom (application-defined)
+    NIL - All zeros
+    MAX - All ones
+
+OUTPUT FORMATS
+
+    Hyphenated, No hyphens, Braces, URN, Base64, Base32,
+    Crockford Base32, Binary, Uppercase variants
+
+LICENSE
+
+This software is Copyright (c) 2026 by LNATION.
+
+This is free software, licensed under The Artistic License 2.0 (GPL Compatible).

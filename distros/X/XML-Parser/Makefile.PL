@@ -1,4 +1,4 @@
-use 5.004005;    #Devel::CheckLib
+use 5.008;    #Devel::CheckLib
 use ExtUtils::MakeMaker;
 use lib './inc';
 use Devel::CheckLib;
@@ -131,8 +131,8 @@ Expat_Not_Installed;
     exit 0;
 }
 
-if ( not $expat_libpath and $] >= 5.006001 and $^O ne 'MSWin32' ) {
-    require ExtUtils::Liblist;    # Buggy before this
+if ( not $expat_libpath and $^O ne 'MSWin32' ) {
+    require ExtUtils::Liblist;
     ($expat_libpath) = ExtUtils::Liblist->ext('-lexpat');
 }
 
@@ -162,7 +162,7 @@ WriteMakefile1(
     ABSTRACT_FROM    => 'Parser.pm',
     AUTHOR           => 'Clark Cooper (coopercc@netheaven.com)',
     LICENSE          => 'perl',
-    MIN_PERL_VERSION => '5.00405',
+    MIN_PERL_VERSION => '5.008',
     META_MERGE       => {
         resources => {
             bugtracker => 'https://github.com/cpan-authors/XML-Parser/issues',

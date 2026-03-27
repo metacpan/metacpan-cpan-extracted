@@ -1,0 +1,87 @@
+NAME
+    NKC::Transform::MARC2BIBFRAME - marc2bibframe transformation class.
+
+SYNOPSIS
+     use NKC::Transform::MARC2BIBFRAME;
+
+     my $obj = NKC::Transform::MARC2BIBFRAME->new(%params);
+     my $version = $obj->version;
+     my $bf_xml = $obj->transform($marc_xml, @params);
+
+METHODS
+  "new"
+     my $obj = NKC::Transform::MARC2BIBFRAME->new(%params);
+
+    Constructor.
+
+    *       "version"
+
+            Transformation version.
+
+            Default value is '2.5.0'.
+
+            Possible versions are: '2.5.0', '2.9.0', '2.10.0' and '3.0.0'.
+
+            Default value is undef.
+
+    *       "xslt_transformation_file"
+
+            XSLT transformation file.
+
+            Default value is XSLT transformation file for '2.5.0' version.
+
+    Returns instance of object.
+
+  "version"
+     my $version = $obj->version;
+
+    Get marc2bibframe transformation version which is set to object.
+
+    Returns qr{\d\.\d\.\d} version string.
+
+  "transform"
+     my $bf_xml = $obj->transform($mar_xml, @params);
+
+    Transform MARC to BIBFRAME.
+
+    Returns BIBFRAME XML string.
+
+     new():
+             Cannot read XSLT file.
+                     XSLT file: %s
+             Parameter 'version' is undefined.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, File::Spec::Functions, File::Share,
+    XML::LibXML, XML::LibXSLT.
+
+SEE ALSO
+    NKC::Transform::BIBFRAME2MARC
+        bibframe2marc transformation class.
+
+    NKC::Transform::MARC2RDA
+        marc2rda transformation class.
+
+    NKC::Transform::BIBFRAME2MARC::Utils
+        Utilities for bibframe2marc transformations.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/NKC-Transform-MARC2BIBFRAME>
+
+LICENSE AND COPYRIGHT
+    © 2024-2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+ACKNOWLEDGEMENTS
+    Development of this software has been made possible by institutional
+    support for the long-term strategic development of the National Library
+    of the Czech Republic as a research organization provided by the
+    Ministry of Culture of the Czech Republic (DKRVO 2024–2028), Area 11:
+    Linked Open Data.
+
+VERSION
+    0.03
+

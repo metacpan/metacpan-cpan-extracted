@@ -12,6 +12,7 @@ requires 'Net::IP';
 on 'test' => sub {
     requires 'Test::More';
     requires 'Test::Exception';
+    requires 'Test::Deep';
 };
 
 on 'develop' => sub {

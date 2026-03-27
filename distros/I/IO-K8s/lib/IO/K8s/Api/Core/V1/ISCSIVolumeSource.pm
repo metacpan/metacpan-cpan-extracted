@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ISCSIVolumeSource;
 # ABSTRACT: Represents an ISCSI disk. ISCSI volumes can only be mounted as read/write once. ISCSI volumes support ownership management and SELinux relabeling.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s chapAuthDiscovery => Bool;
@@ -50,7 +50,7 @@ IO::K8s::Api::Core::V1::ISCSIVolumeSource - Represents an ISCSI disk. ISCSI volu
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 chapAuthDiscovery
 

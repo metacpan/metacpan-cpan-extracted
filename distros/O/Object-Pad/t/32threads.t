@@ -5,11 +5,9 @@ use warnings;
 
 use Test2::V0;
 use Test2::IPC;
+use Test2::Require::Threads;
 
 use Object::Pad 0.800;
-
-eval { require Config && $Config::Config{useithreads} } or
-   plan skip_all => "This perl does not support threads";
 
 require threads;
 

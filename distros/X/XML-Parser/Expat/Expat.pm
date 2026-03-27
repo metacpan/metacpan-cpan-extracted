@@ -8,9 +8,9 @@ use strict;
 use XSLoader;
 use Carp;
 
-our $VERSION = '2.51';
+our $VERSION = '2.53';
 
-our ( %Encoding_Table, @Encoding_Path, $have_File_Spec );
+our ( %Encoding_Table, @Encoding_Path );
 
 use File::Spec ();
 use File::ShareDir ();
@@ -549,10 +549,6 @@ sub parse {
         if ( ref($arg) and UNIVERSAL::isa( $arg, 'IO::Handle' ) ) {
             $ioref = $arg;
         }
-        elsif ( $] < 5.008 and defined tied($arg) ) {
-            require IO::Handle;
-            $ioref = $arg;
-        }
         else {
             require IO::Handle;
             eval {
@@ -560,6 +556,12 @@ sub parse {
                 if ( ref $arg eq 'GLOB' ) {
 
                     # Glob reference not recognized as IO::Handle
+                    $ioref = *{$arg}{IO};
+                }
+                elsif ( ref \$arg eq 'GLOB' ) {
+
+                    # Bare glob (*FH) — not a reference, but taking a
+                    # reference of it yields a GLOB ref. (GH#201)
                     $ioref = *{$arg}{IO};
                 }
                 elsif ( $arg =~ /\A[^\W\d]\w*(?:::\w+)*\z/

@@ -4,20 +4,22 @@ package XML::Parser::Style::Subs;
 use strict;
 
 sub Start {
+    no strict 'refs';
     my $expat = shift;
     my $tag   = shift;
-    my $sub   = $expat->{Pkg}->can($tag);
-    if ($sub) {
-        $sub->( $expat, $tag, @_ );
+    my $fname = $expat->{Pkg} . "::$tag";
+    if ( defined &$fname ) {
+        ( \&$fname )->( $expat, $tag, @_ );
     }
 }
 
 sub End {
+    no strict 'refs';
     my $expat = shift;
     my $tag   = shift;
-    my $sub   = $expat->{Pkg}->can("${tag}_");
-    if ($sub) {
-        $sub->( $expat, $tag );
+    my $fname = $expat->{Pkg} . "::${tag}_";
+    if ( defined &$fname ) {
+        ( \&$fname )->( $expat, $tag );
     }
 }
 

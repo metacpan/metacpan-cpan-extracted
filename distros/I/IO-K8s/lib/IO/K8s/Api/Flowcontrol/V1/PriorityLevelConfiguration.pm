@@ -1,6 +1,6 @@
 package IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfiguration;
 # ABSTRACT: PriorityLevelConfiguration represents the configuration of a priority level.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject;
 
 
@@ -23,7 +23,7 @@ IO::K8s::Api::Flowcontrol::V1::PriorityLevelConfiguration - PriorityLevelConfigu
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

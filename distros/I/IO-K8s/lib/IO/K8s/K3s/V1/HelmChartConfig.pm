@@ -1,6 +1,6 @@
 package IO::K8s::K3s::V1::HelmChartConfig;
 # ABSTRACT: K3s Helm chart value overrides
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::APIObject
     api_version     => 'helm.cattle.io/v1',
     resource_plural => 'helmchartconfigs';
@@ -23,7 +23,7 @@ IO::K8s::K3s::V1::HelmChartConfig - K3s Helm chart value overrides
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 DESCRIPTION
 

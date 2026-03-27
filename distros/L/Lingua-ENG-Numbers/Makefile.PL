@@ -20,17 +20,17 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Exporter" => 0,
     "base" => 0,
-    "vars" => 0
+    "utf8" => 0,
+    "vars" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => 0,
     "bignum" => 0,
-    "strict" => 0,
-    "utf8" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
-  "VERSION" => "0.2603230",
+  "VERSION" => "0.2603260",
   "test" => {
     "TESTS" => "t/*.t"
   }

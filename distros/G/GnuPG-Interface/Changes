@@ -1,5 +1,8 @@
 Revision history for GnuPG-Interface
 
+1.06 - 2026-03-26
+ - Make tests pass for GnuPG 2.5.18
+
 1.05 - 2025-08-12
  - Make tests pass for GnuPG 2.4 versions (2.4.0 - 2.4.8)
 

@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeRuntimeHandler;
 # ABSTRACT: NodeRuntimeHandler is a set of runtime handler information.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s features => 'Core::V1::NodeRuntimeHandlerFeatures';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::NodeRuntimeHandler - NodeRuntimeHandler is a set of runt
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 features
 

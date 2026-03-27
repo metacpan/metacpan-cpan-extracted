@@ -1,6 +1,6 @@
 package IO::K8s::Api::Apps::V1::DeploymentStatus;
 # ABSTRACT: DeploymentStatus is the most recently observed status of the Deployment.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s availableReplicas => Int;
@@ -41,7 +41,7 @@ IO::K8s::Api::Apps::V1::DeploymentStatus - DeploymentStatus is the most recently
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 availableReplicas
 

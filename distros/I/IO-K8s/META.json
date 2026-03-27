@@ -45,6 +45,7 @@
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0"
          }
@@ -64,7 +65,7 @@
       "x_IRC" : "irc://irc.perl.org/#kubernetes",
       "x_IRC_user" : "Getty"
    },
-   "version" : "1.009",
+   "version" : "1.100",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -391,7 +392,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.009",
+                  "tag" : "1.100",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

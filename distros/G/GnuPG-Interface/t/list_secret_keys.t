@@ -57,6 +57,9 @@ TEST
     elsif ( $gnupg->cmp_version( $gnupg->version, '2.4.6' ) < 0 ) {
         $keylist = '2.4.5';
     }
+    elsif ( $gnupg->cmp_version( $gnupg->version, '2.5' ) < 0 ) {
+        $keylist = '2.4';
+    }
     else {
         $keylist = '2';
     }

@@ -190,16 +190,11 @@ void ObjectPad__boot_classes(pTHX);
 /* Empty role embedding that is applied to all invokable role methods */
 extern struct RoleEmbedding ObjectPad__embedding_standalone;
 
-#ifdef HAVE_UNOP_AUX
-/*  this was only added in Perl 5.22.0 */
-#  define METHSTART_CONTAINS_FIELD_BINDINGS
-
 /* We'll reserve the top two bits of a UV for storing the `type` value for a
  * fieldpad operation; the remainder stores the fieldix itself */
-#  define UVBITS (UVSIZE*8)
-#  define FIELDIX_TYPE_SHIFT  (UVBITS-2)
-#  define FIELDIX_MASK        ((1LL<<FIELDIX_TYPE_SHIFT)-1)
-#endif
+#define UVBITS (UVSIZE*8)
+#define FIELDIX_TYPE_SHIFT  (UVBITS-2)
+#define FIELDIX_MASK        ((1LL<<FIELDIX_TYPE_SHIFT)-1)
 
 #if HAVE_PERL_VERSION(5, 38, 0)
 #  define HAVE_SVt_PVOBJ

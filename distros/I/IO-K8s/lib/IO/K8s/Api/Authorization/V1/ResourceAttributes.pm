@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::ResourceAttributes;
 # ABSTRACT: ResourceAttributes includes the authorization attributes available for resource requests to the Authorizer interface
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s fieldSelector => 'Authorization::V1::FieldSelectorAttributes';
@@ -44,7 +44,7 @@ IO::K8s::Api::Authorization::V1::ResourceAttributes - ResourceAttributes include
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 fieldSelector
 

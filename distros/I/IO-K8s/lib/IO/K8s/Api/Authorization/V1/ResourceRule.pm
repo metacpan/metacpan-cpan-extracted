@@ -1,6 +1,6 @@
 package IO::K8s::Api::Authorization::V1::ResourceRule;
 # ABSTRACT: ResourceRule is the list of actions the subject is allowed to perform on resources. The list ordering isn't significant, may contain duplicates, and possibly be incomplete.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s apiGroups => [Str];
@@ -29,7 +29,7 @@ IO::K8s::Api::Authorization::V1::ResourceRule - ResourceRule is the list of acti
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 apiGroups
 

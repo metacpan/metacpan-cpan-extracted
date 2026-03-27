@@ -1,0 +1,43 @@
+======================================================================
+ mb::JSON Aide-mémoire                                       [FR] Français
+======================================================================
+
+[ Types de données ]
+  JSON       -> Perl
+  -----------------------------------------------
+  "chaîne"   -> scalaire chaîne
+  123        -> scalaire nombre
+  3.14       -> scalaire flottant
+  true       -> mb::JSON::Boolean (vaut 1 en numérique)
+  false      -> mb::JSON::Boolean (vaut 0 en numérique)
+  null       -> undef
+  [...]      -> référence de tableau
+  {...}      -> référence de hachage
+
+[ 1. Chargement ]
+  use mb::JSON;
+
+[ 2. decode : JSON -> Perl ]
+  my $data = mb::JSON::decode($json_text);
+  my $data = mb::JSON::parse($json_text);  # alias compatible
+
+[ 3. encode : Perl -> JSON ]
+  my $json = mb::JSON::encode($data);
+
+[ 4. Valeurs booléennes ]
+  mb::JSON::true   -> JSON: true
+  mb::JSON::false  -> JSON: false
+  1 ou 0 ordinaire -> nombre JSON (pas booléen)
+
+[ 5. null / undef ]
+  undef -> null (encodage)
+  null  -> undef (décodage)
+
+[ 6. Clés de hachage triées alphabétiquement ]
+
+[ 7. UTF-8 conservé tel quel (pas d'échappement \uXXXX) ]
+
+[ 8. Exemples ]
+  my $h = mb::JSON::decode('{"nom":"Alice","age":30}');
+  my $j = mb::JSON::encode({nom=>'Alice', actif=>mb::JSON::true});
+  # -> {"actif":true,"nom":"Alice"}

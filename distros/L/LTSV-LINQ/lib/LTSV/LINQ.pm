@@ -18,12 +18,12 @@ use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
 use strict;
-BEGIN { if ($] < 5.006) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '1.06';
+$VERSION = '1.07';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
 
@@ -91,7 +91,7 @@ sub FromLTSV {
                 /\A(.+?):(.*)\z/ ? ($1, $2) : ()
             } split /\t/, $line;
 
-            return \%record if %record;
+            return { %record } if %record;
         }
         close $fh;
         return undef;
@@ -1085,7 +1085,7 @@ sub ToDictionary {
         $dictionary{$key} = $value;
     });
 
-    return \%dictionary;
+    return { %dictionary };
 }
 
 # ToLookup - convert sequence to hash of arrays
@@ -1108,7 +1108,7 @@ sub ToLookup {
         push @{$lookup{$key}}, $value;
     });
 
-    return \%lookup;
+    return { %lookup };
 }
 
 # DefaultIfEmpty - return default value if empty
@@ -1369,7 +1369,7 @@ LTSV::LINQ - LINQ-style query interface for LTSV files
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =head1 SYNOPSIS
 
@@ -4215,7 +4215,7 @@ Example:
   # Incorrect: single argument -- dies
   LTSV::LINQ->From([1,2,3])->Aggregate(sub { $_[0] + $_[1] });
 
-=item C<Cannot open 'filename': ...>
+=item C<Cannot open 'E<lt>filenameE<gt>': E<lt>reasonE<gt>>
 
 File I/O error when FromLTSV() cannot open the specified file.
 

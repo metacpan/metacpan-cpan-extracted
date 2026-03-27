@@ -1,8 +1,10 @@
 package IO::K8s::Cilium;
 # ABSTRACT: Cilium CRD resource map provider for IO::K8s
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use Moo;
 with 'IO::K8s::Role::ResourceMap';
+
+sub upstream_version { 'v1.19.2' }  # cilium/cilium
 
 sub resource_map {
     return {
@@ -18,18 +20,16 @@ sub resource_map {
         CiliumLoadBalancerIPPool       => 'Cilium::V2::CiliumLoadBalancerIPPool',
         CiliumEnvoyConfig              => 'Cilium::V2::CiliumEnvoyConfig',
         CiliumClusterwideEnvoyConfig   => 'Cilium::V2::CiliumClusterwideEnvoyConfig',
-        CiliumExternalWorkload         => 'Cilium::V2::CiliumExternalWorkload',
+        CiliumCIDRGroup                => 'Cilium::V2::CiliumCIDRGroup',
+        CiliumBGPClusterConfig         => 'Cilium::V2::CiliumBGPClusterConfig',
+        CiliumBGPPeerConfig            => 'Cilium::V2::CiliumBGPPeerConfig',
+        CiliumBGPAdvertisement         => 'Cilium::V2::CiliumBGPAdvertisement',
+        CiliumBGPNodeConfig            => 'Cilium::V2::CiliumBGPNodeConfig',
+        CiliumBGPNodeConfigOverride    => 'Cilium::V2::CiliumBGPNodeConfigOverride',
         # cilium.io/v2alpha1
         CiliumEndpointSlice            => 'Cilium::V2alpha1::CiliumEndpointSlice',
         CiliumL2AnnouncementPolicy     => 'Cilium::V2alpha1::CiliumL2AnnouncementPolicy',
-        CiliumBGPPeeringPolicy         => 'Cilium::V2alpha1::CiliumBGPPeeringPolicy',
-        CiliumBGPClusterConfig         => 'Cilium::V2alpha1::CiliumBGPClusterConfig',
-        CiliumBGPPeerConfig            => 'Cilium::V2alpha1::CiliumBGPPeerConfig',
-        CiliumBGPAdvertisement         => 'Cilium::V2alpha1::CiliumBGPAdvertisement',
-        CiliumBGPNodeConfig            => 'Cilium::V2alpha1::CiliumBGPNodeConfig',
-        CiliumBGPNodeConfigOverride    => 'Cilium::V2alpha1::CiliumBGPNodeConfigOverride',
         CiliumGatewayClassConfig       => 'Cilium::V2alpha1::CiliumGatewayClassConfig',
-        CiliumCIDRGroup                => 'Cilium::V2alpha1::CiliumCIDRGroup',
         CiliumPodIPPool                => 'Cilium::V2alpha1::CiliumPodIPPool',
     };
 }
@@ -48,7 +48,7 @@ IO::K8s::Cilium - Cilium CRD resource map provider for IO::K8s
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -64,8 +64,8 @@ version 1.009
 =head1 DESCRIPTION
 
 Resource map provider for L<Cilium|https://cilium.io/> Custom Resource
-Definitions. Registers 23 CRD classes covering C<cilium.io/v2> and
-C<cilium.io/v2alpha1>.
+Definitions. Registers 21 CRD classes covering C<cilium.io/v2> and
+C<cilium.io/v2alpha1>, matching upstream Cilium v1.19.2.
 
 Not loaded by default — opt in via the C<with> constructor parameter of
 L<IO::K8s> or by calling C<< $k8s->add('IO::K8s::Cilium') >> at runtime.
@@ -75,14 +75,14 @@ L<IO::K8s> or by calling C<< $k8s->add('IO::K8s::Cilium') >> at runtime.
 CiliumNetworkPolicy, CiliumClusterwideNetworkPolicy,
 CiliumLocalRedirectPolicy, CiliumEgressGatewayPolicy, CiliumIdentity,
 CiliumEndpoint, CiliumNode, CiliumNodeConfig, CiliumLoadBalancerIPPool,
-CiliumEnvoyConfig, CiliumClusterwideEnvoyConfig, CiliumExternalWorkload
+CiliumEnvoyConfig, CiliumClusterwideEnvoyConfig, CiliumCIDRGroup,
+CiliumBGPClusterConfig, CiliumBGPPeerConfig, CiliumBGPAdvertisement,
+CiliumBGPNodeConfig, CiliumBGPNodeConfigOverride
 
 =head2 Included CRDs (cilium.io/v2alpha1)
 
-CiliumEndpointSlice, CiliumL2AnnouncementPolicy, CiliumBGPPeeringPolicy,
-CiliumBGPClusterConfig, CiliumBGPPeerConfig, CiliumBGPAdvertisement,
-CiliumBGPNodeConfig, CiliumBGPNodeConfigOverride, CiliumGatewayClassConfig,
-CiliumCIDRGroup, CiliumPodIPPool
+CiliumEndpointSlice, CiliumL2AnnouncementPolicy,
+CiliumGatewayClassConfig, CiliumPodIPPool
 
 =head1 SEE ALSO
 

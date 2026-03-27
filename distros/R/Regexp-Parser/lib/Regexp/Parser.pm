@@ -3,13 +3,11 @@ package Regexp::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use 5.006;
 use Carp qw( carp croak );
-use base 'Exporter';
-use strict;
-use warnings;
+use parent 'Exporter';
 use charnames ();
 
 our %loaded;
@@ -30,12 +28,12 @@ use Regexp::Parser::Objects;
 use Regexp::Parser::Handlers;
 
 
-# this handles 'use base "Regexp::Parser"'
+# this handles 'use base/parent "Regexp::Parser"'
 # which wouldn't call 'import'
 {
   my ($level, $prev, $pkg);
   while (my ($curr) = caller $level++) {
-    $pkg = $curr, last if $prev and $prev eq "base" and $curr ne "base";
+    $pkg = $curr, last if $prev and ($prev eq "base" or $prev eq "parent") and $curr ne "base" and $curr ne "parent";
     $prev = $curr;
   }
   Regexp::Parser->export_to_level($level, $pkg, @EXPORT) if $pkg;

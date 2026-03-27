@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::WeightedPodAffinityTerm;
 # ABSTRACT: The weights of all of the matched WeightedPodAffinityTerm fields are added per-node to find the most preferred node(s)
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s podAffinityTerm => 'Core::V1::PodAffinityTerm', 'required';
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::WeightedPodAffinityTerm - The weights of all of the matc
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 podAffinityTerm
 

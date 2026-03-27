@@ -1,0 +1,7 @@
+Revision history for Lingua-DAN-Word2Num
+
+0.2603260  2026-03-26
+    - fix =head1 NAME to standard CPAN format: Module - description
+    - improve CPAN kwalitee: Changes, META.json, LICENSE POD, MetaResources
+    - fix 78 audit findings: typos, wrong comments, stale POD, language list
+

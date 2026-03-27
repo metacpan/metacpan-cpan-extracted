@@ -398,3 +398,28 @@
         MetaCPAN has this weird behavior using the bin/ansi-encode file for
 		the documentation.  Weird I made some changes to help minimize this
 		weirdness.
+
+1.96    Mar 25, 2026
+
+        Renamed the executable to "ansiencode" to get around the MetaCPAN
+		weirdness.
+
+1.98    Mar 25, 2026
+
+        Boy did I go on an adventure delving into the mysteries of
+		ExtUtils::MakeMaker.  GitHub A.I. and I struggled to add a symlink
+		ability to the "make install" feature, as I renamed the executable
+		from "ansi-encode" (a stupid MetaCPAN problem) to "ansiencode".
+		I wanted legacy compatibility so older calls wouldn't die so
+		the "make install" would create a symlink (in Unix-like systems)
+		to the old "ansi-encode".  So both "ansiencode" and "ansi-encode"
+		still works.  To quote Adrian from "Adrian's Digital Basement",
+		"It freaking works!" after nearly 45 minutes of back and forth wi
+		A.I. help.
+
+        As you can tell I am not a frequent user of "make", so this was a
+		nightmare.
+
+1.99    Mar 25, 2026
+
+        Yeah, MetaCPAN is really cheesing me off.  This should fix it.

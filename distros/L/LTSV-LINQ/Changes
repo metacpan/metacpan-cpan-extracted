@@ -1,5 +1,51 @@
 Revision history for LTSV::LINQ
 
+1.07  2026-03-25 JST (Japan Standard Time)
+
+    Tests:
+    - Added t/lib/INA_CPAN_Check.pm: shared test library providing
+      TAP harness, file utilities, MANIFEST helpers, version/META
+      parsers, code scanner, and check_A through check_K
+      implementations (aligned with DB-Handy 1.07 and HTTP-Handy 1.03).
+    - Added t/9001-load.t: module load, $VERSION, LTSV::LINQ::Ordered
+      sub-package, all public methods (From/Where/Select/etc.),
+      and INA_CPAN_Check library export verification.
+    - Added t/9010-encoding.t: US-ASCII, trailing whitespace, and
+      end-of-file newline checks (replaces t/0010-usascii.t).
+    - Added t/9020-perl5compat.t: Perl 5.005_03 syntax checks P1-P14
+      covering .pm, .t, and eg/*.pl (replaces t/0015-perl5compat.t;
+      adds P13 @-/@+ prohibition and P14 header order check).
+    - Added t/9030-distribution.t: MANIFEST, version consistency,
+      META integrity, Changes format, Makefile.PL, and test-suite
+      consistency (replaces t/0016-cpan_precheck.t categories A-J).
+    - Added t/9040-style.t: coding style E and K checks
+      (replaces t/0016-cpan_precheck.t categories E/K and
+      t/0014-style.t).
+    - Added t/9050-pod.t: POD structure/content G1-G11 including
+      VERSION format, TABLE OF CONTENTS completeness, DIAGNOSTICS
+      coverage, and Pod::Checker syntax check.
+    - Added t/9060-readme.t: README required sections check.
+    - Added t/9070-examples.t: eg/ script quality E1-E6
+      (no shebang, CVE fix, FindBin, boilerplate order,
+      filename comment, Demonstrates section with method verification).
+    - Added t/9080-cheatsheets.t: doc/ cheat sheet native script,
+      section numbering, and [XX] header tag checks.
+    - Removed t/0010-usascii.t: superseded by t/9010-encoding.t.
+    - Removed t/0014-style.t: superseded by t/9040-style.t.
+    - Removed t/0015-perl5compat.t: superseded by t/9020-perl5compat.t.
+    - Removed t/0016-cpan_precheck.t: superseded by t/9030-t/9080.
+
+    Fixes:
+    - lib/LTSV/LINQ.pm: warnings stub now guards with
+      !defined(&warnings::import) to suppress "import redefined"
+      warnings when multiple modules are loaded in sequence.
+    - lib/LTSV/LINQ.pm: return \%record / \%dictionary / \%lookup
+      changed to return { %record } / { %dictionary } / { %lookup }
+      (K3 coding style: use { %hash } form for hash references).
+    - lib/LTSV/LINQ.pm: DIAGNOSTICS =item for "Cannot open" error
+      corrected to E<lt>filenameE<gt>: E<lt>reasonE<gt> form so that
+      the G10 DIAGNOSTICS-coverage check passes.
+
 1.06  2026-03-23 JST (Japan Standard Time)
 
     Coding style aligned with DB-Handy and HTTP-Handy:

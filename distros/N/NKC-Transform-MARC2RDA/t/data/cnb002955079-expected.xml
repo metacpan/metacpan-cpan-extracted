@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:rdaw="http://rdaregistry.info/Elements/w/"
+         xmlns:rdawd="http://rdaregistry.info/Elements/w/datatype/"
+         xmlns:rdawo="http://rdaregistry.info/Elements/w/object/"
+         xmlns:rdae="http://rdaregistry.info/Elements/e/"
+         xmlns:rdaed="http://rdaregistry.info/Elements/e/datatype/"
+         xmlns:rdaeo="http://rdaregistry.info/Elements/e/object/"
+         xmlns:rdam="http://rdaregistry.info/Elements/m/"
+         xmlns:rdamd="http://rdaregistry.info/Elements/m/datatype/"
+         xmlns:rdamo="http://rdaregistry.info/Elements/m/object/"
+         xmlns:rdaa="http://rdaregistry.info/Elements/a/"
+         xmlns:rdaad="http://rdaregistry.info/Elements/a/datatype/"
+         xmlns:rdaao="http://rdaregistry.info/Elements/a/object/"
+         xmlns:rdan="http://rdaregistry.info/Elements/n/"
+         xmlns:rdand="http://rdaregistry.info/Elements/n/datatype/"
+         xmlns:rdano="http://rdaregistry.info/Elements/n/object/"
+         xmlns:ex="http://fakeIRI2.edu/"
+         xmlns:rdai="http://rdaregistry.info/Elements/i/"
+         xmlns:rdaid="http://rdaregistry.info/Elements/i/datatype/"
+         xmlns:rdaio="http://rdaregistry.info/Elements/i/object/"
+         xmlns:fake="http://fakePropertiesForDemo">
+   <rdf:Description rdf:about="http://fakeIRI2.edu/nkc20172955079wor">
+      <rdf:type rdf:resource="http://rdaregistry.info/Elements/c/C10001"/>
+      <rdawo:P10078 rdf:resource="http://fakeIRI2.edu/nkc20172955079exp"/>
+      <rdawd:P10002>nkc20172955079wor</rdawd:P10002>
+      <fake:rdawP10065>Havel, VÃ¡clav, 1936-2011 jk01040240 aut</fake:rdawP10065>
+      <!--MARC data begins-->
+      <fake:marcfield>F245 10 $a Hry / $c VÃ¡clav Havel</fake:marcfield>
+      <!--RDA data begins-->
+      <rdawd:P10088>Hry</rdawd:P10088>
+   </rdf:Description>
+   <rdf:Description rdf:about="http://fakeIRI2.edu/nkc20172955079exp">
+      <rdf:type rdf:resource="http://rdaregistry.info/Elements/c/C10006"/>
+      <rdaeo:P20059 rdf:resource="http://fakeIRI2.edu/nkc20172955079man"/>
+      <rdaeo:P20231 rdf:resource="http://fakeIRI2.edu/nkc20172955079wor"/>
+      <rdaed:P20002>nkc20172955079exp</rdaed:P20002>
+      <!--MARC data begins-->
+      <fake:marcfield>F336 ## $a text $b txt $2 rdacontent</fake:marcfield>
+      <!--RDA data begins-->
+      <rdaed:P20001>text</rdaed:P20001>
+      <rdaed:P20001>txt</rdaed:P20001>
+      <!--Source of rdaed:P20001 'hasContentType' value is coded 'rdacontent': lookup the value of rdaed:P20001 in that source, retrieve the IRI and insert it into the data as the direct value of rdaeo:P20001.-->
+   </rdf:Description>
+   <rdf:Description rdf:about="http://fakeIRI2.edu/nkc20172955079man">
+      <rdf:type rdf:resource="http://rdaregistry.info/Elements/c/C10007"/>
+      <rdamo:P30139 rdf:resource="http://fakeIRI2.edu/nkc20172955079exp"/>
+      <!--MARC data begins-->
+      <fake:marcfield>F020 ## $a 978-80-88183-09-9 $q (NadaÄ&#x8d;nÃ­ fond Ä&#x8c;eskÃ¡ kniÅ¾nice ; $q vÃ¡zÃ¡no)</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamo:P30004 rdf:resource="http://marc2rda.edu/fake/nom/d13e32"/>
+      <!--MARC data begins-->
+      <fake:marcfield>F020 ## $a 978-80-88069-33-1 $q (Ã&#x9a;stav pro Ä&#x8d;eskou literaturu AV Ä&#x8c;R ; $q vÃ¡zÃ¡no)</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamo:P30004 rdf:resource="http://marc2rda.edu/fake/nom/d13e44"/>
+      <!--MARC data begins-->
+      <fake:marcfield>F020 ## $a 978-80-7491-943-5 $q (Host ; $q vÃ¡zÃ¡no)</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamo:P30004 rdf:resource="http://marc2rda.edu/fake/nom/d13e56"/>
+      <!--MARC data begins-->
+      <fake:marcfield>F245 10 $a Hry / $c VÃ¡clav Havel</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamd:P30134>Hry</rdamd:P30134>
+      <rdamd:P30156>Hry</rdamd:P30156>
+      <rdamd:P30105>VÃ¡clav Havel</rdamd:P30105>
+      <!--MARC data begins-->
+      <fake:marcfield>F264 #1 $a Praha : $b NadaÄ&#x8d;nÃ­ fond Ä&#x8c;eskÃ¡ kniÅ¾nice Ã&#x9a;Ä&#x8c;LK FF UK : $b Ã&#x9a;stav pro Ä&#x8d;eskou literaturu AV Ä&#x8c;R, v.v.i. ; $a Brno : $b Host, $c 2017</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamd:P30111>Praha : NadaÄ&#x8d;nÃ­ fond Ä&#x8c;eskÃ¡ kniÅ¾nice Ã&#x9a;Ä&#x8c;LK FF UK : Ã&#x9a;stav pro Ä&#x8d;eskou literaturu AV Ä&#x8c;R, v.v.i. ; Brno : Host, 2017</rdamd:P30111>
+      <rdamd:P30088>Praha</rdamd:P30088>
+      <rdamd:P30088>Brno</rdamd:P30088>
+      <rdamd:P30176>NadaÄ&#x8d;nÃ­ fond Ä&#x8c;eskÃ¡ kniÅ¾nice Ã&#x9a;Ä&#x8c;LK FF UK :</rdamd:P30176>
+      <rdamd:P30176>Ã&#x9a;stav pro Ä&#x8d;eskou literaturu AV Ä&#x8c;R, v.v.i. ;</rdamd:P30176>
+      <rdamd:P30176>Host</rdamd:P30176>
+      <rdamd:P30011>2017</rdamd:P30011>
+      <!--MARC data begins-->
+      <fake:marcfield>F337 ## $a bez mÃ©dia $b n $2 rdamedia</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamd:P30002>bez mÃ©dia</rdamd:P30002>
+      <rdamd:P30002>n</rdamd:P30002>
+      <!--MARC data begins-->
+      <fake:marcfield>F338 ## $a svazek $b nc $2 rdacarrier</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamd:P30001>svazek</rdamd:P30001>
+      <rdamd:P30001>nc</rdamd:P30001>
+      <!--MARC data begins-->
+      <fake:marcfield>F490 1# $a Ä&#x8c;eskÃ¡ kniÅ¾nice ; $v sv. 93</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamd:P30106>Ä&#x8c;eskÃ¡ kniÅ¾nice ; sv. 93</rdamd:P30106>
+      <!--MARC data begins-->
+      <fake:marcfield>F504 ## $a Obsahuje bibliografickÃ© odkazy</fake:marcfield>
+      <!--RDA data begins-->
+      <rdamd:P30455>Obsahuje bibliografickÃ© odkazy</rdamd:P30455>
+   </rdf:Description>
+   <!--MARC data begins-->
+   <fake:marcfield>F020 ## $a 978-80-88183-09-9 $q (NadaÄ&#x8d;nÃ­ fond Ä&#x8c;eskÃ¡ kniÅ¾nice ; $q vÃ¡zÃ¡no)</fake:marcfield>
+   <!--RDA data begins-->
+   <rdf:Description rdf:about="http://marc2rda.edu/fake/nom/d13e32">
+      <rdand:P80068>978-80-88183-09-9</rdand:P80068>
+      <rdano:P80048 rdf:resource="http://fakeIRI2.edu/nkc20172955079man"/>
+      <rdan:P80069 rdf:resource="http://id.loc.gov/vocabulary/identifiers/isbn"/>
+      <rdand:P80071>NadaÄ&#x8d;nÃ­ fond Ä&#x8c;eskÃ¡ kniÅ¾nice; vÃ¡zÃ¡no</rdand:P80071>
+   </rdf:Description>
+   <!--MARC data begins-->
+   <fake:marcfield>F020 ## $a 978-80-88069-33-1 $q (Ã&#x9a;stav pro Ä&#x8d;eskou literaturu AV Ä&#x8c;R ; $q vÃ¡zÃ¡no)</fake:marcfield>
+   <!--RDA data begins-->
+   <rdf:Description rdf:about="http://marc2rda.edu/fake/nom/d13e44">
+      <rdand:P80068>978-80-88069-33-1</rdand:P80068>
+      <rdano:P80048 rdf:resource="http://fakeIRI2.edu/nkc20172955079man"/>
+      <rdan:P80069 rdf:resource="http://id.loc.gov/vocabulary/identifiers/isbn"/>
+      <rdand:P80071>Ã&#x9a;stav pro Ä&#x8d;eskou literaturu AV Ä&#x8c;R; vÃ¡zÃ¡no</rdand:P80071>
+   </rdf:Description>
+   <!--MARC data begins-->
+   <fake:marcfield>F020 ## $a 978-80-7491-943-5 $q (Host ; $q vÃ¡zÃ¡no)</fake:marcfield>
+   <!--RDA data begins-->
+   <rdf:Description rdf:about="http://marc2rda.edu/fake/nom/d13e56">
+      <rdand:P80068>978-80-7491-943-5</rdand:P80068>
+      <rdano:P80048 rdf:resource="http://fakeIRI2.edu/nkc20172955079man"/>
+      <rdan:P80069 rdf:resource="http://id.loc.gov/vocabulary/identifiers/isbn"/>
+      <rdand:P80071>Host; vÃ¡zÃ¡no</rdand:P80071>
+   </rdf:Description>
+</rdf:RDF>

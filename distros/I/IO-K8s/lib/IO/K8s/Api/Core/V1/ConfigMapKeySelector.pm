@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::ConfigMapKeySelector;
 # ABSTRACT: Selects a key from a ConfigMap.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s key => Str, 'required';
@@ -26,7 +26,7 @@ IO::K8s::Api::Core::V1::ConfigMapKeySelector - Selects a key from a ConfigMap.
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 key
 

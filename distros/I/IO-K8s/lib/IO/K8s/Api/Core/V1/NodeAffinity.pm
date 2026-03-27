@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::NodeAffinity;
 # ABSTRACT: Node affinity is a group of node affinity scheduling rules.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s preferredDuringSchedulingIgnoredDuringExecution => ['Core::V1::PreferredSchedulingTerm'];
@@ -23,7 +23,7 @@ IO::K8s::Api::Core::V1::NodeAffinity - Node affinity is a group of node affinity
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 preferredDuringSchedulingIgnoredDuringExecution
 

@@ -1,6 +1,6 @@
 package IO::K8s::Resource;
 # ABSTRACT: Base class for all Kubernetes resources
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use v5.10;
 use Moo ();
 use Moo::Role ();
@@ -112,6 +112,14 @@ sub _sanitize_attr_name {
     return $safe;
 }
 
+sub _generate_inline_struct {
+    my ($class_name, $fields) = @_;
+    __PACKAGE__->_setup_class($class_name);
+    for my $field_name (keys %$fields) {
+        __PACKAGE__->_k8s($class_name, $field_name, $fields->{$field_name});
+    }
+}
+
 sub _k8s {
     my ($class, $caller, $name, $type_spec, $required_marker) = @_;
 
@@ -174,17 +182,29 @@ sub _k8s {
             $isa = $required ? ArrayRef[InstanceOf[$full_class]] : Maybe[ArrayRef[InstanceOf[$full_class]]];
         }
     } elsif (ref $type_spec eq 'HASH') {
-        my ($inner) = keys %$type_spec;
-        if ($inner eq 'Str') {
-            $info{is_hash_of_str} = 1;
-            # Use plain HashRef without inner constraint - K8s has nested hashes
-            # in fields like fieldsV1, annotations, labels which can have any structure
-            $isa = $required ? HashRef : Maybe[HashRef];
+        my @keys = keys %$type_spec;
+        if (@keys == 1 && !ref($type_spec->{$keys[0]}) && $type_spec->{$keys[0]} eq '1') {
+            # Hash-of-X pattern: { TypeName => 1 }
+            my $inner = $keys[0];
+            if ($inner eq 'Str') {
+                $info{is_hash_of_str} = 1;
+                # Use plain HashRef without inner constraint - K8s has nested hashes
+                # in fields like fieldsV1, annotations, labels which can have any structure
+                $isa = $required ? HashRef : Maybe[HashRef];
+            } else {
+                my $full_class = _expand_class($inner);
+                $info{is_hash_of_objects} = 1;
+                $info{class} = $full_class;
+                $isa = $required ? HashRef[InstanceOf[$full_class]] : Maybe[HashRef[InstanceOf[$full_class]]];
+            }
         } else {
-            my $full_class = _expand_class($inner);
-            $info{is_hash_of_objects} = 1;
-            $info{class} = $full_class;
-            $isa = $required ? HashRef[InstanceOf[$full_class]] : Maybe[HashRef[InstanceOf[$full_class]]];
+            # Inline struct: { field => TypeSpec, ... }
+            my $inner_class = $caller . '::_' . ucfirst($attr_name);
+            _generate_inline_struct($inner_class, $type_spec);
+            $info{is_object} = 1;
+            $info{is_inline_struct} = 1;
+            $info{class} = $inner_class;
+            $isa = $required ? InstanceOf[$inner_class] : Maybe[InstanceOf[$inner_class]];
         }
     }
 
@@ -207,6 +227,15 @@ sub _k8s {
     if ($info{is_bool}) {
         @coerce = (coerce => sub { ref $_[0] ? (${$_[0]} ? 1 : 0) : ($_[0] ? 1 : 0) });
     }
+    # Inline struct: coerce plain hashref to inner class instance
+    elsif ($info{is_inline_struct}) {
+        my $ic = $info{class};
+        @coerce = (coerce => sub {
+            return $_[0] if blessed($_[0]);
+            return $ic->new(%{$_[0]}) if ref $_[0] eq 'HASH';
+            return $_[0];
+        });
+    }
     $has->($attr_name, is => 'rw', isa => $isa, @coerce,
         ($required ? (required => 1) : ()),
         ($attr_name ne $json_key ? (init_arg => $json_key) : ()),
@@ -227,7 +256,7 @@ IO::K8s::Resource - Base class for all Kubernetes resources
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -260,6 +289,15 @@ IO::K8s::Resource - Base class for Kubernetes resources
     k8s spec => 'Core::V1::PodSpec';           # Short class name
     k8s containers => ['Core::V1::Container']; # Array of objects
     k8s labels => { Str => 1 };                # Hash of strings
+    k8s spec => {                              # Inline struct
+        replicas => Int,
+        selector => Str,
+        template => { Str => 1 },
+    };
+
+Inline structs auto-generate an inner class (e.g. C<MyClass::_Spec>) with
+the declared fields. Hashrefs are auto-coerced to the inner class on
+construction.
 
 Short class names are auto-expanded:
 

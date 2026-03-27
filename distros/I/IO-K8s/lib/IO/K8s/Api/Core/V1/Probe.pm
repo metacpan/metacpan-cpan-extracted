@@ -1,6 +1,6 @@
 package IO::K8s::Api::Core::V1::Probe;
 # ABSTRACT: Probe describes a health check to be performed against a container to determine whether it is alive or ready to receive traffic.
-our $VERSION = '1.009';
+our $VERSION = '1.100';
 use IO::K8s::Resource;
 
 k8s exec => 'Core::V1::ExecAction';
@@ -47,7 +47,7 @@ IO::K8s::Api::Core::V1::Probe - Probe describes a health check to be performed a
 
 =head1 VERSION
 
-version 1.009
+version 1.100
 
 =head2 exec
 

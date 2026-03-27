@@ -1,5 +1,3 @@
-use NEXT;
-
 {
   package Regexp::Parser::__object__;  
 
@@ -1329,6 +1327,59 @@ use NEXT;
 
 
 {
+  # the DEFINE in (?(DEFINE)...) — always-false condition for defining groups
+  package Regexp::Parser::define;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'groupp',
+      type => 'define',
+    }, $class;
+    return $self;
+  }
+
+  sub visual {
+    "(DEFINE)";
+  }
+}
+
+
+{
+  # the <name> or 'name' in (?(<name>)t|f) / (?('name')t|f)
+  package Regexp::Parser::grouppn;
+  our @ISA = qw( Regexp::Parser::__object__ );
+
+  sub new {
+    my ($class, $rx, $name, $delim) = @_;
+    my $self = bless {
+      rx => $rx,
+      flags => $rx->{flags}[-1],
+      family => 'groupp',
+      type => 'grouppn',
+      name => $name,
+      delim => $delim || '<',
+    }, $class;
+    return $self;
+  }
+
+  sub name {
+    my $self = shift;
+    $self->{name};
+  }
+
+  sub visual {
+    my $self = shift;
+    my ($open, $close) = $self->{delim} eq '<' ? ('<', '>') : ("'", "'");
+    "($open$self->{name}$close)";
+  }
+}
+
+
+{
   # (?{ ... })
   package Regexp::Parser::eval;
 
@@ -2014,7 +2065,7 @@ character class's ender is an C<anyof_close> node.
 
 The general family of this object.  These are any of: alnum, anchor,
 anyof, anyof_char, anyof_class, anyof_range, assertion, branch, close,
-clump, digit, exact, flags, group, groupp, minmod, prop, open, quant, ref,
+clump, define, digit, exact, flags, group, groupp, grouppn, minmod, prop, open, quant, ref,
 reg_any.
 
 =item my $f = $obj->flags()
@@ -2074,12 +2125,12 @@ when using a walker (see L<Regexp::Parser/"Walking the Tree">).
 
 Objects may override these methods (as objects often do).
 
-=head3 Using F<NEXT::> instead of F<SUPER::>
+=head3 Using C<next::method> instead of C<SUPER::>
 
 You can't use C<< $obj->SUPER::method() >> inside the F<__object__> class,
 because F<__object__> doesn't inherit from anywhere.  You want to go along
-the I<object>'s inheritance tree.  Use Damian Conway's F<NEXT> module
-instead.  This module is standard with Perl 5.8.
+the I<object>'s inheritance tree.  Use C<next::method> from the L<mro>
+module instead (core since Perl 5.10).
 
 =head2 Object Attributes
 
@@ -2435,7 +2486,7 @@ Family: assertion
 Types: ifthen (C<(?(>)
 
 Data: array reference of two objects; first: I<ifmatch>, I<unlessm>,
-I<eval>, I<groupp>; second: I<branch>
+I<eval>, I<groupp>, I<define>, I<grouppn>; second: I<branch>
 
 Ender: tail
 
@@ -2444,6 +2495,24 @@ Ender: tail
 Family: groupp
 
 Types: groupp1, groupp2 .. grouppN (C<1>, C<2>, etc. when in C<(?(>)
+
+=head2 define
+
+Family: groupp
+
+Types: define (C<DEFINE> when in C<(?(>)
+
+The always-false condition in C<(?(DEFINE)...)> groups, used for defining
+named subpatterns without matching.
+
+=head2 grouppn
+
+Family: groupp
+
+Types: grouppn (C<< <name> >> or C<'name'> when in C<(?(>)
+
+Named capture condition, as in C<< (?(<name>)...) >> or C<(?('name')...)>.
+Tests whether the named capture group participated in the match.
 
 =head2 eval
 

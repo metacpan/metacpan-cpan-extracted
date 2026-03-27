@@ -6,19 +6,17 @@
 package Lingua::RUS::Number;
 # ABSTRACT: Number 2 word conversion in RUS.
 
-# {{{ use block
-
-use 5.10.1;
-
-use strict;
-use warnings;
+use 5.16.0;
 use utf8;
+use warnings;
+
+# {{{ use block
 
 use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603230';
+our $VERSION = '0.2603260';
 
 # Preloaded methods go here.
 use vars qw(%diw %nom);
@@ -156,7 +154,6 @@ sub get_string :Export{
 
 # }}}
 
-
 1;
 
 __END__
@@ -169,7 +166,7 @@ Lingua::RUS::Number - Converts numbers to money sum in words (in Russian roubles
 
 =head1 VERSION
 
-version 0.2603230
+version 0.2603260
 
 =head1 SYNOPSIS
 
@@ -204,13 +201,24 @@ Convert number to Russian currency string.
 
 seems have no bugs..
 
-=head1 AUTHOR
+=head1 AUTHORS
 
- fork coding, maintenance, refactoring, extensions:
-   Richard C. Jelinek <info@petamem.com>
  initial coding:
-   Vladislav A. Safronov, E<lt>F<vlads@yandex-team.ru>E<gt>, E<lt>F<vlad@yandex.ru>E<gt>
+   Vladislav A. Safronov E<lt>vlad at yandex.ruE<gt>
+ specification, maintenance:
+   Richard C. Jelinek E<lt>rj@petamem.comE<gt>
+ maintenance, coding (2025-present):
+   PetaMem AI Coding Agents
 
 =cut
 
 # }}}
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as the Artistic License 2.0 or the BSD 2-Clause
+License. See the LICENSE file in the distribution for details.
+
+=cut

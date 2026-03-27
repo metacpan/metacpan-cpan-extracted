@@ -38,7 +38,7 @@ package ParamsApp {
 		$router->add(
 			'/post' => {
 				to => async sub ($self, $ctx) {
-					my $form = await $ctx->req->form;
+					my $form = await $ctx->req->form_params;
 					my @response;
 					foreach my $key (sort keys $form->%*) {
 						push @response, "${key}: " . join ', ', $form->get_all($key);

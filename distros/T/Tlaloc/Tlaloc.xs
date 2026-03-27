@@ -834,7 +834,10 @@ FETCHSIZE(self)
         AV *data;
     CODE:
         tw = INT2PTR(tied_wetness_t *, SvIV(SvRV(self)));
-        tied_evaporate(tw);
+        /* Don't evaporate - FETCHSIZE is metadata access, not element access.
+         * Also avoids spurious evaporation when Perl calls FETCHSIZE internally
+         * before STORE on some platforms (e.g., Perl 5.18/Solaris).
+         */
         data = (AV *)SvRV(tw->data);
         RETVAL = av_len(data) + 1;
     OUTPUT:

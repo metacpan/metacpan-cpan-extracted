@@ -8,8 +8,6 @@ use Test::NoWarnings;
 # Test.
 my $self = {};
 my $value = '(1940)';
-my $struct_hr = {};
-my $id = 'ID';
 my $field = '260';
 my @errors = check_260c_year($self, $value, $field);
 isa_ok($errors[0], 'Data::MARC::Validator::Report::Error');

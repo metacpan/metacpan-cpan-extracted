@@ -9,7 +9,7 @@ use Text::CSV;
 use autodie qw(:all);
 
 my $file = 'downloads/cty.dat';
-my $filename = 'data/ctydat_full.csv';
+my $filename = 'data/cty.csv';
 
 if(!-d 'data') {
 	mkdir 'data', 0755;
@@ -19,7 +19,7 @@ my $force_flag;
 if(defined($ARGV[0]) && ($ARGV[0] eq '-f')) {
 	$force_flag++;
 } elsif($ENV{'AUTOMATED_TESTING'}) {
-	open my $out, '>', 'data/ctydat_full.csv';
+	open my $out, '>', $filename;
 	print $out "prefix,dxcc_name,iso,cq_zone,itu_zone,continent,latitude,longitude,gmt_offset,primary_prefix\n";
 	exit;
 }
@@ -32,7 +32,7 @@ if(-r $filename) {
 	unlink $filename;
 }
 
-open(my $out, '>:encoding(utf8)', 'data/ctydat_full.csv');
+open(my $out, '>:encoding(utf8)', $filename);
 
 my $csv = Text::CSV->new({ binary => 1, eol => "\n" });
 
@@ -104,4 +104,4 @@ while(my $line = <$cty>) {
 }
 
 close $out;
-print "Generated ctydat_full.csv with DXCC number and GMT offset fields\n";
+print "Generated cty.csv with DXCC number and GMT offset fields\n";
