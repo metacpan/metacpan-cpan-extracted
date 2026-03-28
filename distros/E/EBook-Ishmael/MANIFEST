@@ -51,11 +51,11 @@ lib/EBook/Ishmael/EBook/Text.pm
 lib/EBook/Ishmael/EBook/XHTML.pm
 lib/EBook/Ishmael/EBook/Zip.pm
 lib/EBook/Ishmael/EBook/zTXT.pm
+lib/EBook/Ishmael/HTML.pm
 lib/EBook/Ishmael/ImageID.pm
 lib/EBook/Ishmael/PDB.pm
 lib/EBook/Ishmael/ShellQuote.pm
 lib/EBook/Ishmael/TextBrowserDump.pm
-lib/EBook/Ishmael/TextToHtml.pm
 lib/EBook/Ishmael/Time.pm
 lib/EBook/Ishmael/Unzip.pm
 LICENSE

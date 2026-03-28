@@ -1,34 +1,27 @@
-BEGIN { print "1..3\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 3;
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
+
+# Test 1: module loads
+ok( 1, 'XML::Parser loaded' );
 
 my $stcount = 0;
 my $encount = 0;
 
-sub st {
-    my ( $exp, $el ) = @_;
-    $stcount++;
-    $exp->finish if $el eq 'loc';
-}
-
-sub end {
-    $encount++;
-}
-
-$parser = new XML::Parser(
+my $parser = XML::Parser->new(
     Handlers => {
-        Start => \&st,
-        End   => \&end
+        Start => sub {
+            my ( $exp, $el ) = @_;
+            $stcount++;
+            $exp->finish if $el eq 'loc';
+        },
+        End => sub { $encount++ },
     },
     ErrorContext => 2
 );
 
 $parser->parsefile('samples/REC-xml-19980210.xml');
 
-print "not " unless $stcount == 12;
-print "ok 2\n";
-
-print "not " unless $encount == 8;
-print "ok 3\n";
+is( $stcount, 12, 'finish() stops after 12 start tags' );
+is( $encount, 8,  'finish() delivers 8 end tags' );

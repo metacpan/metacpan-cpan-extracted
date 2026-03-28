@@ -49,8 +49,7 @@ else {
     is( Dump( Load( Dump($rx) ) ), "--- !!perl/regexp (?-xism:123)\n" );
 }
 
-SKIP: {
-    Test::More::skip "5.6 doesn't support printing regexes", 2 if ( $] < 5.007 );
+{
     my $rx_obj = bless qr/123/i => 'Foo';
     if (REGEX_CARET) {
         is( Dump($rx_obj),                 "--- !!perl/regexp:Foo (?^i:123)\n" );

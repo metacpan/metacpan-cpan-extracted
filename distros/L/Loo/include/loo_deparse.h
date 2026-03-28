@@ -433,6 +433,34 @@ ddc_deparse_binop(pTHX_ OP *o, DDCDeparse *ctx)
     ctx->prec = saved;
 }
 
+/* Helper: check if an op is a NEXTSTATE-like (statement boundary) */
+static int
+ddc_is_nextstate(OP *o)
+{
+    if (!o) return 0;
+    if (o->op_type == OP_NEXTSTATE || o->op_type == OP_DBSTATE)
+        return 1;
+    if (o->op_type == OP_NULL &&
+        (o->op_targ == OP_NEXTSTATE || o->op_targ == OP_DBSTATE))
+        return 1;
+    return 0;
+}
+
+/* Helper: check if next significant sibling is also a NEXTSTATE.
+   Skips PUSHMARK, ENTER, UNSTACK ops when peeking ahead.
+   Used to suppress blank lines from extra NEXTSTATE ops on
+   older Perls (5.10, 5.12). */
+static int
+ddc_next_sibling_is_nextstate(OP *kid)
+{
+    OP *nxt = OpSIBLING(kid);
+    while (nxt && (nxt->op_type == OP_PUSHMARK ||
+                   nxt->op_type == OP_ENTER ||
+                   nxt->op_type == OP_UNSTACK))
+        nxt = OpSIBLING(nxt);
+    return ddc_is_nextstate(nxt);
+}
+
 /* ── Statement sequence ───────────────────────────────────────── */
 
 static void
@@ -451,11 +479,11 @@ ddc_deparse_stmts(pTHX_ OP *o, DDCDeparse *ctx)
                 kid->op_type == OP_UNSTACK)
                 continue;
 
-            if (kid->op_type == OP_NEXTSTATE ||
-                kid->op_type == OP_DBSTATE ||
-                (kid->op_type == OP_NULL &&
-                 (kid->op_targ == OP_NEXTSTATE ||
-                  kid->op_targ == OP_DBSTATE))) {
+            if (ddc_is_nextstate(kid)) {
+                /* Skip NEXTSTATE followed by another NEXTSTATE to
+                   avoid blank lines on older Perls (5.10, 5.12) */
+                if (ddc_next_sibling_is_nextstate(kid))
+                    continue;
                 if (!first)
                     sv_catpvn(ctx->out, "\n", 1);
                 first = 0;
@@ -558,8 +586,9 @@ ddc_deparse_stmts(pTHX_ OP *o, DDCDeparse *ctx)
                             if (stmt == step_op) continue;
                             if (stype == OP_PUSHMARK ||
                                 stype == OP_ENTER) continue;
-                            if (stype == OP_NEXTSTATE ||
-                                stype == OP_DBSTATE) {
+                            if (ddc_is_nextstate(stmt)) {
+                                if (ddc_next_sibling_is_nextstate(stmt))
+                                    continue;
                                 if (!bfirst)
                                     sv_catpvn(ctx->out, "\n", 1);
                                 bfirst = 0;
@@ -943,8 +972,8 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
     }
 #endif
 
-    /* ── OP_EMPTYAVHV: empty anon hash/array {} or [] (5.40+) ── */
-#if PERL_VERSION >= 40
+    /* ── OP_EMPTYAVHV: empty anon hash/array {} or [] (5.36+) ── */
+#ifdef OP_EMPTYAVHV
     case OP_EMPTYAVHV: {
 #ifdef OPpEMPTYAVHV_IS_HV
         if (o->op_private & OPpEMPTYAVHV_IS_HV)
@@ -2101,7 +2130,9 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
                     /* Skip pushmark / enter */
                     if (stype == OP_PUSHMARK || stype == OP_ENTER)
                         continue;
-                    if (stype == OP_NEXTSTATE || stype == OP_DBSTATE) {
+                    if (ddc_is_nextstate(stmt)) {
+                        if (ddc_next_sibling_is_nextstate(stmt))
+                            continue;
                         if (!bfirst) sv_catpvn(ctx->out, "\n", 1);
                         bfirst = 0;
                         ddc_deparse_indent(aTHX_ ctx);
@@ -2194,7 +2225,9 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
                                     if (s2 == step2) continue;
                                     if (st == OP_PUSHMARK || st == OP_ENTER)
                                         continue;
-                                    if (st == OP_NEXTSTATE || st == OP_DBSTATE) {
+                                    if (ddc_is_nextstate(s2)) {
+                                        if (ddc_next_sibling_is_nextstate(s2))
+                                            continue;
                                         if (!bf2) sv_catpvn(ctx->out, "\n", 1);
                                         bf2 = 0;
                                         ddc_deparse_indent(aTHX_ ctx);

@@ -1,0 +1,262 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long qw(:config no_ignore_case bundling);
+use Eshu;
+
+my $fix       = 0;
+my $diff      = 0;
+my $check     = 0;
+my $lang;
+my $tabs      = 0;
+my $spaces;
+my $indent_pp = 0;
+my $no_indent_pp = 0;
+my $range;
+my @exclude;
+my @include;
+my $verbose   = 0;
+
+GetOptions(
+	'fix'          => \$fix,
+	'diff'         => \$diff,
+	'check'        => \$check,
+	'lang=s'       => \$lang,
+	'tabs'         => \$tabs,
+	'spaces=i'     => \$spaces,
+	'indent-pp'    => \$indent_pp,
+	'no-indent-pp' => \$no_indent_pp,
+	'range=s'      => \$range,
+	'exclude=s'    => \@exclude,
+	'include=s'    => \@include,
+	'verbose|v'    => \$verbose,
+) or usage();
+
+sub usage {
+	print STDERR <<'USAGE';
+Usage: eshu [OPTIONS] [FILE|DIR ...]
+
+Options:
+  --fix               Edit file(s) in-place
+  --diff              Show unified diff of changes (no write)
+  --check             Exit 1 if file(s) would change (for CI)
+  --lang <LANG>       Override language detection
+  --tabs              Use tabs for indentation (default)
+  --spaces <N>        Use N spaces per indent level
+  --indent-pp         Indent C preprocessor directives
+  --no-indent-pp      Leave preprocessor at column 0 (default)
+  --range START,END   Only reindent lines START through END (1-based)
+  --exclude <PATTERN> Skip files matching regex pattern (repeatable)
+  --include <PATTERN> Only process files matching regex pattern (repeatable)
+  --verbose, -v       Print each file processed
+
+If no FILE is given, reads from stdin and writes to stdout.
+If a directory is given, processes all recognised files recursively.
+USAGE
+	exit 2;
+}
+
+my %opts;
+if (defined $spaces) {
+	$opts{indent_char}  = ' ';
+	$opts{indent_width} = $spaces;
+} elsif ($tabs) {
+	$opts{indent_char}  = "\t";
+	$opts{indent_width} = 1;
+}
+$opts{indent_pp} = 1 if $indent_pp;
+$opts{indent_pp} = 0 if $no_indent_pp;
+if (defined $range) {
+	if ($range =~ /^(\d+),(\d+)$/) {
+		$opts{range_start} = $1;
+		$opts{range_end}   = $2;
+	} else {
+		die "eshu: --range must be START,END (e.g. --range 10,25)\n";
+	}
+}
+
+my $exit_code = 0;
+
+if (@ARGV) {
+	for my $arg (@ARGV) {
+		if (-d $arg) {
+			process_dir($arg);
+		} else {
+			process_file($arg);
+		}
+	}
+} else {
+	process_stdin();
+}
+
+exit $exit_code;
+
+sub process_dir {
+	my ($dir) = @_;
+
+	my %dir_opts;
+	$dir_opts{lang} = $lang if defined $lang;
+	$dir_opts{fix}  = 1 if $fix;
+	$dir_opts{diff} = 1 if $diff;
+	if (defined $spaces) {
+		$dir_opts{indent_char}  = ' ';
+		$dir_opts{indent_width} = $spaces;
+	} elsif ($tabs) {
+		$dir_opts{indent_char}  = "\t";
+		$dir_opts{indent_width} = 1;
+	}
+	$dir_opts{indent_pp} = 1 if $indent_pp;
+	$dir_opts{indent_pp} = 0 if $no_indent_pp;
+	if (@exclude) {
+		$dir_opts{exclude} = [ map { qr/$_/ } @exclude ];
+	}
+	if (@include) {
+		$dir_opts{include} = [ map { qr/$_/ } @include ];
+	}
+
+	my $report = Eshu->indent_dir($dir, %dir_opts);
+
+	if ($check) {
+		for my $c (@{$report->{changes}}) {
+			if ($c->{status} eq 'needs_fixing') {
+				print STDERR "$c->{file}\n";
+				$exit_code = 1;
+			}
+		}
+	} elsif ($diff) {
+		for my $c (@{$report->{changes}}) {
+			if ($c->{diff}) {
+				print $c->{diff};
+			}
+		}
+	}
+
+	if ($verbose || (!$check && !$diff && !$fix)) {
+		for my $c (@{$report->{changes}}) {
+			my $lang_str = $c->{lang} ? "[$c->{lang}]" : '';
+			if ($c->{status} eq 'skipped') {
+				printf "%s: skipped (%s)\n", $c->{file}, $c->{reason} || '?'
+					if $verbose;
+			} elsif ($c->{status} eq 'error') {
+				printf "%s: error (%s)\n", $c->{file}, $c->{error} || '?';
+			} elsif ($c->{status} eq 'changed') {
+				printf "%s: %s fixed\n", $c->{file}, $lang_str;
+			} elsif ($c->{status} eq 'needs_fixing') {
+				printf "%s: %s needs fixing\n", $c->{file}, $lang_str;
+			} elsif ($c->{status} eq 'unchanged') {
+				printf "%s: %s ok\n", $c->{file}, $lang_str if $verbose;
+			}
+		}
+		printf "---\n%d files checked, %d changed, %d skipped, %d errors\n",
+			$report->{files_checked}, $report->{files_changed},
+			$report->{files_skipped}, $report->{files_errored}
+			if $verbose || (!$check && !$diff && !$fix);
+	}
+}
+
+sub process_file {
+	my ($file) = @_;
+
+	open my $fh, '<', $file or die "eshu: cannot open '$file': $!\n";
+	my $src = do { local $/; <$fh> };
+	close $fh;
+
+	my $detected = $lang || Eshu->detect_lang($file) || 'c';
+	my $result = Eshu->indent_string($src, lang => $detected, %opts);
+
+	if ($check) {
+		if ($result ne $src) {
+			print STDERR "$file\n";
+			$exit_code = 1;
+		}
+		return;
+	}
+
+	if ($diff) {
+		if ($result ne $src) {
+			print_diff($file, $src, $result);
+		}
+		return;
+	}
+
+	if ($fix) {
+		if ($result ne $src) {
+			open my $out, '>', $file or die "eshu: cannot write '$file': $!\n";
+			print $out $result;
+			close $out;
+		}
+		return;
+	}
+
+	# Default: write to stdout
+	print $result;
+}
+
+sub process_stdin {
+	my $detected = $lang || 'c';
+	my $src = do { local $/; <STDIN> };
+	my $result = Eshu->indent_string($src, lang => $detected, %opts);
+
+	if ($check) {
+		$exit_code = 1 if $result ne $src;
+		return;
+	}
+
+	if ($diff) {
+		print_diff('stdin', $src, $result) if $result ne $src;
+		return;
+	}
+
+	print $result;
+}
+
+sub print_diff {
+	my ($label, $old, $new) = @_;
+	my @old_lines = split /^/m, $old;
+	my @new_lines = split /^/m, $new;
+
+	print "--- a/$label\n";
+	print "+++ b/$label\n";
+
+	# Simple line-by-line diff
+	my $max = @old_lines > @new_lines ? scalar @old_lines : scalar @new_lines;
+	my $hunk_start = -1;
+	my @hunk_old;
+	my @hunk_new;
+
+	for (my $i = 0; $i <= $max; $i++) {
+		my $ol = $i < @old_lines ? $old_lines[$i] : undef;
+		my $nl = $i < @new_lines ? $new_lines[$i] : undef;
+		my $same = defined $ol && defined $nl && $ol eq $nl;
+
+		if (!$same && $hunk_start < 0) {
+			$hunk_start = $i;
+			@hunk_old = ();
+			@hunk_new = ();
+		}
+
+		if ($hunk_start >= 0 && !$same) {
+			push @hunk_old, $ol if defined $ol;
+			push @hunk_new, $nl if defined $nl;
+		}
+
+		if ($same || $i == $max) {
+			if ($hunk_start >= 0) {
+				my $old_count = scalar @hunk_old;
+				my $new_count = scalar @hunk_new;
+				printf "@@ -%d,%d +%d,%d @@\n",
+					$hunk_start + 1, $old_count,
+					$hunk_start + 1, $new_count;
+				for my $l (@hunk_old) {
+					$l = "$l\n" unless $l =~ /\n$/;
+					print "-$l";
+				}
+				for my $l (@hunk_new) {
+					$l = "$l\n" unless $l =~ /\n$/;
+					print "+$l";
+				}
+				$hunk_start = -1;
+			}
+		}
+	}
+}

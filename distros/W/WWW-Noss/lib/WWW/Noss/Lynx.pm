@@ -2,7 +2,7 @@ package WWW::Noss::Lynx;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(lynx_dump);
@@ -19,16 +19,10 @@ sub lynx_dump {
     my ($file, %param) = @_;
     my $width = $param{ width } // 80;
 
-    my $cmd =
-        sprintf "lynx @DUMP_OPTS %s '%s'",
-        "-width '$width'",
-        $file;
-
-    my $dump = qx/$cmd/;
-
-    if ($? == -1) {
-        die "Failed to execute lynx, is it installed?\n";
-    }
+    open my $fh, '-|', 'lynx', @DUMP_OPTS, '-width', $width, $file
+        or die "Error executing lynx: $!\n";
+    my $dump = do { local $/; <$fh> };
+    close $fh;
 
     if ($? >> 8 != 0) {
         die "Failed to dump $file with lynx\n";

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::HTML;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use File::Spec;
 
 use XML::LibXML;
 
+use EBook::Ishmael::HTML qw(prepare_html);
 use EBook::Ishmael::EBook::Metadata;
 
 my $XHTML_NS = 'http://www.w3.org/1999/xhtml';
@@ -144,6 +145,7 @@ sub html {
     # entire tree if there is no body.
     my ($body) = $self->{_dom}->documentElement->findnodes('/html/body');
     $body //= $self->{_dom}->documentElement;
+    prepare_html($body);
 
     my $html = join '', map { $_->toString } $body->childNodes;
 
@@ -167,6 +169,7 @@ sub raw {
 
     my ($body) = $self->{_dom}->findnodes('/html/body');
     $body //= $self->{_dom}->documentElement;
+    prepare_html($body);
 
     my $raw = $body->textContent;
 

@@ -74,3 +74,4 @@
 CLAUDE.md
 Clone\-.*\.gz
 ^local/
+\.claude

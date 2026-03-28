@@ -135,7 +135,6 @@ assert_exact(
     'foreach loop with next and last',
     sub { next for (@_) },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    next;\n" .
     "  }\n" .

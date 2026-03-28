@@ -1,8 +1,9 @@
 Revision history for Lingua-Word2Num
 
-0.2603260  2026-03-26
-    - fix =head1 NAME to standard CPAN format: Module - description
-    - improve CPAN kwalitee: Changes, META.json, LICENSE POD, MetaResources
-    - fix 78 audit findings: typos, wrong comments, stale POD, language list
-    - add 6 languages: ARA EST FAS HEB ISL LAV
+0.2603270  2026-03-27
+    - add Sardinian (srd)
+    - add 6 European languages: CYM GLG GLE LTZ MLT OCI
+    - capabilities infrastructure: introspection + ordinal stub
+    - Lingua::Word2Num: complete POD rewrite, CPAN tests for overloaded arithmetic
+    - Lingua::Word2Num: overloaded numeral arithmetic and language detection
 

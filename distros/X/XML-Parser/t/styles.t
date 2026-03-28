@@ -177,6 +177,7 @@ use IO::File;
         sub EndTag        { push @events, ['EndTag', $_[1], $_] }
         sub EndDocument   { push @events, ['EndDocument'] }
     }
+    package main;
 
     $parser->parse('<msg>hello</msg>');
 
@@ -202,6 +203,7 @@ use IO::File;
         sub EndTag   { }    # suppress default print
         sub Text     { }    # suppress default print
     }
+    package main;
 
     XML::Parser->new( Style => 'Stream', Pkg => 'StreamAttrTest' )
         ->parse('<item key="val" num="3"/>');
@@ -223,6 +225,7 @@ use IO::File;
         sub item  { push @events, ['start', $_[1], @_[2..$#_]] }
         sub item_ { push @events, ['end',   $_[1]] }
     }
+    package main;
 
     $parser->parse('<item color="red">data</item>');
 

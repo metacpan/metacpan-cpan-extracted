@@ -15,7 +15,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my  $parser  = ru_numerals();
 
 # }}}
@@ -158,7 +158,7 @@ Lingua::RUS::Word2Num - Word to number conversion in Russian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::RUS::Word2Num is module for converting text containing number
 representation in Russian back into number. Converts whole numbers

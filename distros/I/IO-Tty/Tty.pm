@@ -15,11 +15,11 @@ use Carp;
 require POSIX;
 
 our @ISA        = qw(IO::Handle);
-our $VERSION    = '1.23';
-our $XS_VERSION = '1.23';
+our $VERSION    = '1.24';
+our $XS_VERSION = '1.24';
 our ( $CONFIG, $DEBUG );
 
-eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
+eval { local $^W = 0; local $SIG{__DIE__}; require IO::Stty };
 push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
 use XSLoader;
@@ -116,7 +116,7 @@ IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 =head1 VERSION
 
-1.23
+1.24
 
 =head1 SYNOPSIS
 

@@ -23,9 +23,13 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.2603260",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "strict" => 0
+  },
+  "VERSION" => "0.2603270",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -34,6 +38,8 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Export::Attrs" => 0,
   "Readonly" => 0,
+  "Test::More" => 0,
+  "strict" => 0,
   "utf8" => 0,
   "warnings" => 0
 );

@@ -10,7 +10,12 @@ Perl.
 ## Installing
 **noss** has been packaged for the following repositories:
 * CPAN: <https://metacpan.org/dist/WWW-Noss>
-* Alpine Linux: <https://pkgs.alpinelinux.org/packages?name=perl-www-noss>
+  - `cpan WWW::Noss`
+  - `cpanm WWW::Noss`
+* Debian/Ubuntu: <https://tracker.debian.org/pkg/noss>
+  - `apt install noss`
+* Alpine: <https://pkgs.alpinelinux.org/package/edge/community/x86_64/perl-www-noss>
+  - `apk add perl-www-noss`
 * Slackware Linux (SBo): <https://slackbuilds.org/repository/15.0/network/noss/>
 
 If you cannot install **noss** through any of the above repositories, you can

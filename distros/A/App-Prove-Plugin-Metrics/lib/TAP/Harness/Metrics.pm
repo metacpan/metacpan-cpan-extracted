@@ -4,7 +4,7 @@ use parent qw/TAP::Harness/;
 use strict;
 use warnings;
 
-our $VERSION='0.0.2';
+our $VERSION='0.0.3';
 
 use Carp qw/confess/;
 use Fcntl qw/:flock/;
@@ -16,6 +16,7 @@ my %options=(
 	label     =>0,
 	allowed   =>'-._/A-Za-z0-9',
 	rollup    =>0,
+	bubble    =>1,
 	#
 	type   =>'file',
 	append =>1,
@@ -73,19 +74,26 @@ sub name {
 	my ($self,%event)=@_;
 	my @path=@{$event{path}};
 	if(defined($$self{subdepth})&&($$self{subdepth}>=0)) { splice(@path,$$self{subdepth}) }
-	my @name=map {s/[^$$self{allowed}]//sgr} (($$self{prefix}?$$self{prefix}:()),$event{file},@path,($$self{label}?$event{label}:()));
+	my @name=map {s/[^$$self{allowed}]//sgr} (($$self{prefix}?$$self{prefix}:()),$event{file},@path,($$self{label}&&defined($event{label})?$event{label}:()));
 	return join($$self{sep},@name);
+}
+
+sub bubbled {
+	my ($self,%event)=@_;
+	if(!@{$event{path}}) { return }
+	$event{label}=pop(@{$event{path}});
+	return $self->name(%event);
 }
 
 sub collate {
 	my ($self,@metrics)=@_;
 	my (%res,%count);
 	foreach my $event (@metrics) {
-		my $name=$self->name(%$event);
+	foreach my $name ($self->name(%$event), ($$self{bubble}?$self->bubbled(%$event):())) {
 		$count{$name}++;
 		if($$self{rollup}) { $res{$name}+=$$event{pass} }
 		else { $res{$name}//=1; $res{$name}&&=$$event{pass} }
-	}
+	} }
 	if($$self{rollup}) { foreach my $k (keys %res) { $res{$k}/=$count{$k} } }
 	return %res;
 }

@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my  $parser  = zho_numerals();
 
 # }}}
@@ -37,7 +37,10 @@ sub w2n :Export {
 sub zho_numerals {
     return Parse::RecDescent->new(q{
       numeral: <rulevar: local $number = 0>
-      numeral: million    { return $item[1]; }                        # root parse. go from maximum to minimum value
+      numeral: hundred_million { return $item[1]; }                  # traditional 億-level
+        |      trad_million    { return $item[1]; }                  # traditional 萬-level
+        |      trad_sub9999    { return $item[1]; }                  # traditional sub-萬
+        |      million    { return $item[1]; }                       # pinyin 萬-level
         |      millenium2 { return $item[1]; }
         |      millenium1 { return $item[1]; }
         |      century    { return $item[1]; }
@@ -177,19 +180,101 @@ sub zho_numerals {
 
       million: millenium2(?) millenium1(?) century(?) decade(?)       # try to find words that represents values
                wanmark                                                # from 1.000.000 to 999.999.999.999
-               millenium2(?) millenium1(?) century(?) decade(?)
+               zeromark(?)
+               millenium1(?) century(?) decade(?)
                { $return = 0;
-                 for (@item) {
-                   if (ref $_ && defined $$_[0]) {
-                     $return += $$_[0];
-                   } elsif ($_ eq "Wan") {
-                     $return = ($return>0) ? $return * 100000 : 100000;
-                   }
+                 for my $i (1..4) {                                   # sum before 萬
+                   $return += $item[$i][0] if ref $item[$i] && defined $item[$i][0];
+                 }
+                                                                      # item[5] = wanmark
+                 $return = ($return > 0) ? $return * 10000 : 10000;
+                                                                      # item[6] = zeromark (ignored)
+                 for my $i (7..9) {                                   # sum after 萬
+                   $return += $item[$i][0] if ref $item[$i] && defined $item[$i][0];
                  }
                }
 
       wanmark: ' Wan ' { $return = "Wan"; }
         |      /萬/ { $return = "Wan"; }
+
+      yimark: /億/ { $return = "Yi"; }
+
+      zeromark: /零/ { $return = 0; }                                # pinyin path placeholder
+
+      # dedicated traditional character rules — isolated from pinyin path
+      trad_digit: /九/ {9} | /八/ {8} | /七/ {7} | /六/ {6} | /五/ {5}
+                | /四/ {4} | /三/ {3} | /二/ {2} | /一/ {1}
+
+      trad_tens:  /九十/ {90} | /八十/ {80} | /七十/ {70} | /六十/ {60}
+                | /五十/ {50} | /四十/ {40} | /三十/ {30} | /二十/ {20}
+                | /一十/ {10}
+
+      trad_decade: trad_tens trad_digit       { $item[1] + $item[2] }
+                 | trad_tens                   { $item[1] }
+                 | trad_digit                  { $item[1] }
+
+      trad_hundreds: /九百/ {900} | /八百/ {800} | /七百/ {700} | /六百/ {600}
+                   | /五百/ {500} | /四百/ {400} | /三百/ {300} | /二百/ {200}
+                   | /一百/ {100}
+
+      trad_century: trad_hundreds /零/ trad_decade  { $item[1] + $item[3] }
+                  | trad_hundreds trad_decade        { $item[1] + $item[2] }
+                  | trad_hundreds                    { $item[1] }
+
+      trad_thousands: /九千/ {9000} | /八千/ {8000} | /七千/ {7000} | /六千/ {6000}
+                    | /五千/ {5000} | /四千/ {4000} | /三千/ {3000} | /二千/ {2000}
+                    | /一千/ {1000}
+
+      trad_sub9999: trad_thousands /零/ trad_century  { $item[1] + $item[3] }
+                  | trad_thousands /零/ trad_decade    { $item[1] + $item[3] }
+                  | trad_thousands trad_century        { $item[1] + $item[2] }
+                  | trad_thousands                     { $item[1] }
+                  | trad_century
+                  | trad_decade
+
+      # traditional 億 rule — fully self-contained, no pinyin contamination
+      hundred_million:
+               trad_sub9999 /億/                                     # multiplier × 10^8
+               trad_sub9999 /萬/                                     # middle group × 10^4
+               /零/ trad_sub9999                                     # 零 + remainder
+               { $return = $item[1] * 100000000 + $item[3] * 10000 + $item[6]; }
+             | trad_sub9999 /億/
+               trad_sub9999 /萬/
+               trad_sub9999                                          # remainder without 零
+               { $return = $item[1] * 100000000 + $item[3] * 10000 + $item[5]; }
+             | trad_sub9999 /億/
+               trad_sub9999 /萬/                                     # no remainder
+               { $return = $item[1] * 100000000 + $item[3] * 10000; }
+             | trad_sub9999 /億/
+               /零/ trad_sub9999 /萬/                                # 億 + 零 + N萬 + 零 + remainder
+               /零/ trad_sub9999
+               { $return = $item[1] * 100000000 + $item[4] * 10000 + $item[7]; }
+             | trad_sub9999 /億/
+               /零/ trad_sub9999 /萬/                                # 億 + 零 + N萬 + remainder (no 零)
+               trad_sub9999
+               { $return = $item[1] * 100000000 + $item[4] * 10000 + $item[6]; }
+             | trad_sub9999 /億/
+               /零/ trad_sub9999 /萬/                                # 億 + 零 + N萬 (no remainder)
+               { $return = $item[1] * 100000000 + $item[4] * 10000; }
+             | trad_sub9999 /億/
+               /零/ trad_sub9999                                     # 億 + 零 + small remainder (no 萬)
+               { $return = $item[1] * 100000000 + $item[4]; }
+             | trad_sub9999 /億/
+               trad_sub9999                                          # 億 + remainder (no 萬, no 零)
+               { $return = $item[1] * 100000000 + $item[3]; }
+             | trad_sub9999 /億/                                     # bare N億
+               { $return = $item[1] * 100000000; }
+
+      # traditional 萬 rule
+      trad_million:
+               trad_sub9999 /萬/
+               /零/ trad_sub9999                                     # 萬 + 零 + remainder
+               { $return = $item[1] * 10000 + $item[4]; }
+             | trad_sub9999 /萬/
+               trad_sub9999                                          # 萬 + remainder
+               { $return = $item[1] * 10000 + $item[3]; }
+             | trad_sub9999 /萬/                                     # bare N萬
+               { $return = $item[1] * 10000; }
     });
 }
 
@@ -210,7 +295,7 @@ Lingua::ZHO::Word2Num - Word to number conversion in Chinese
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::ZHO::Word2Num is module for converting text containing number
 representation in Chinese back into number. Converts whole numbers

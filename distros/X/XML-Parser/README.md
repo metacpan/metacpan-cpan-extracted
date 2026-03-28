@@ -1,4 +1,5 @@
 [![Build Status](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml/badge.svg)](https://github.com/cpan-authors/XML-Parser/actions/workflows/testsuite.yml)
+
 # NAME
 
 XML::Parser - A perl module for parsing XML documents
@@ -32,7 +33,7 @@ XML::Parser - A perl module for parsing XML documents
 # DESCRIPTION
 
 This module provides ways to parse XML documents. It is built on top of
-[XML::Parser::Expat](https://metacpan.org/pod/XML::Parser::Expat), which is a lower level interface to James Clark's
+[XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat), which is a lower level interface to James Clark's
 expat library. Each call to one of the parsing methods creates a new
 instance of XML::Parser::Expat which is then used to parse the document.
 Expat options may be provided when the XML::Parser object is created.
@@ -101,7 +102,7 @@ the _Expat_ object, not the Parser object.
     - Namespaces
 
         This is an Expat option. If this is set to a true value, then namespace
-        processing is done during the parse. See ["Namespaces" in XML::Parser::Expat](https://metacpan.org/pod/XML::Parser::Expat#Namespaces)
+        processing is done during the parse. See ["Namespaces" in XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat#Namespaces)
         for further discussion of namespace processing.
 
     - NoExpand
@@ -163,6 +164,8 @@ the _Expat_ object, not the Parser object.
     or whatever is returned from the **Final** handler, if one is installed.
     In other words, what parse may return depends on the style.
 
+    See ["ERROR HANDLING"](#error-handling) below for how to catch and handle parse errors.
+
 - parsestring
 
     This is just an alias for parse for backwards compatibility.
@@ -170,7 +173,8 @@ the _Expat_ object, not the Parser object.
 - parsefile(FILE \[, OPT => OPT\_VALUE \[...\]\])
 
     Open FILE for reading, then call parse with the open handle. The file
-    is closed no matter how parse returns. Returns what parse returns.
+    is closed no matter how parse returns. A die call is thrown if the file
+    cannot be opened or if a parse error occurs. Returns what parse returns.
 
 - parse\_start(\[ OPT => OPT\_VALUE \[...\]\])
 
@@ -191,7 +195,7 @@ Expat is an event based parser. As the parser recognizes parts of the
 document (say the start or end tag for an XML element), then any handlers
 registered for that type of an event are called with suitable parameters.
 All handlers receive an instance of XML::Parser::Expat as their first
-argument. See ["METHODS" in XML::Parser::Expat](https://metacpan.org/pod/XML::Parser::Expat#METHODS) for a discussion of the
+argument. See ["METHODS" in XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat#METHODS) for a discussion of the
 methods that can be called on this object.
 
 ## Init                (Expat)
@@ -228,12 +232,10 @@ more consecutive Char events. This typically occurs with files larger than
 about 32 KiB and is not a bug. To obtain the complete text of an element,
 accumulate the strings delivered between Start and End events:
 
-```perl
-my $current_text;
-sub start_handler { $current_text = ''; }
-sub char_handler  { $current_text .= $_[1]; }
-sub end_handler   { print "complete text: $current_text\n"; }
-```
+    my $current_text;
+    sub start_handler { $current_text = ''; }
+    sub char_handler  { $current_text .= $_[1]; }
+    sub end_handler   { print "complete text: $current_text\n"; }
 
 The Stream style (`XML::Parser::Style::Stream`) already performs this
 accumulation automatically.
@@ -339,7 +341,7 @@ set, then this handler will not be called for unparsed entities.
 
 The element handler is called when an element declaration is found. Name
 is the element name, and Model is the content model as an XML::Parser::Content
-object. See ["XML::Parser::ContentModel Methods" in XML::Parser::Expat](https://metacpan.org/pod/XML::Parser::Expat#XML::Parser::ContentModel-Methods)
+object. See ["XML::Parser::ContentModel Methods" in XML::Parser::Expat](https://metacpan.org/pod/XML%3A%3AParser%3A%3AExpat#XML::Parser::ContentModel-Methods)
 for methods available for this class.
 
 ## Attlist                (Expat, Elname, Attname, Type, Default, Fixed)
@@ -376,9 +378,8 @@ including any internal or external DTD declarations.
 
 This handler is called for xml declarations. Version is a string containing
 the version. Encoding is either undefined or contains an encoding string.
-Standalone is either undefined, or the string `"yes"` or `"no"`.
-Undefined indicates that no standalone parameter was given in the XML
-declaration.
+Standalone will be either the string `"yes"`, `"no"`, or undefined if the
+standalone attribute is yes, no, or not made respectively.
 
 # STYLES
 
@@ -497,6 +498,37 @@ finds, it loads.
 If you wish to build your own encoding maps, check out the XML::Encoding
 module from CPAN.
 
+# ERROR HANDLING
+
+XML::Parser throws an exception (dies) when it encounters a parse error.
+This includes malformed XML, encoding errors, and other problems detected
+by the underlying expat library.
+
+The `parse`, `parsefile`, and `parse_done` methods may all throw
+exceptions. To handle parse errors gracefully in your application, wrap
+the parse call in an `eval` block:
+
+    my $parser = XML::Parser->new(Style => 'Tree');
+
+    my $tree = eval { $parser->parsefile('data.xml') };
+    if ($@) {
+      # Handle the parse error
+      warn "Parse failed: $@";
+    }
+
+The error message (in `$@`) will include the line number, column number,
+and byte position where the error was detected. For additional context
+around the error location, set the **ErrorContext** option when constructing
+the parser:
+
+    my $parser = XML::Parser->new(
+      Style        => 'Tree',
+      ErrorContext  => 2,
+    );
+
+This will include 2 lines of context on either side of the error in the
+error message.
+
 # AUTHORS
 
 Larry Wall <`larry@wall.org`> wrote version 1.0.
@@ -505,4 +537,10 @@ Clark Cooper <`coopercc@netheaven.com`> picked up support, changed the API
 for this version (2.x), provided documentation,
 and added some standard package features.
 
-Matt Sergeant <`matt@sergeant.org`> is now maintaining XML::Parser
+Matt Sergeant <`matt@sergeant.org`> was maintaining XML::Parser from 2003 to 2007.
+
+Alexandr Ciornii <`alexchorny@gmail.com`> was maintaining XML::Parser from 2007 to 2013.
+
+Todd Rinaldo <`toddr@cpan.org`> has been maintaining XML::Parser since 2013.
+
+The project started making use of Claude Code <`https://claude.ai/code`> in January 2026.

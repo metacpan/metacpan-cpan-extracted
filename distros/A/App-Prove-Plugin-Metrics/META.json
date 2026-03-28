@@ -1,5 +1,5 @@
 {
-	"version":"0.0.2",
+	"version":"0.0.3",
 	"name":"App-Prove-Plugin-Metrics",
 	"author":["Brian Blackmore <brian@mediaalpha.com>"],
 	"abstract":"Emit metrics from Perl unit tests",

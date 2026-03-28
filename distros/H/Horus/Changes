@@ -2,3 +2,9 @@ Revision history for Horus
 
 0.01    2026-03-26
         First version, released on an unsuspecting world.
+
+0.03    2026-03-27
+        - Link -lrt on older glibc/Solaris for clock_gettime
+        - Fix Windows Gregorian timestamp double-counting epoch offset
+        - Increase timestamp test tolerance from 2s to 5s
+        - Disable random pool under threaded Perls to prevent SEGV

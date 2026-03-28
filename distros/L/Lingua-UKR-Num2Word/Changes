@@ -1,7 +1,5 @@
 Revision history for Lingua-UKR-Num2Word
 
-0.2603260  2026-03-26
-    - fix =head1 NAME to standard CPAN format: Module - description
-    - improve CPAN kwalitee: Changes, META.json, LICENSE POD, MetaResources
-    - fix 78 audit findings: typos, wrong comments, stale POD, language list
+0.2603270  2026-03-27
+    - capabilities infrastructure: introspection + ordinal stub
 

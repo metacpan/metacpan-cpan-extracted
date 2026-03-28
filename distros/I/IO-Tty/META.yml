@@ -3,6 +3,7 @@ abstract: 'Pseudo ttys and constants'
 author:
   - 'Roland Giersig <RGiersig@cpan.org>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -22,6 +23,6 @@ requires:
 resources:
   bugtracker: https://github.com/cpan-authors/IO-Tty/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/cpan-authors/IO-Tty
-version: '1.23'
+  repository: https://github.com/cpan-authors/IO-Tty.git
+version: '1.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

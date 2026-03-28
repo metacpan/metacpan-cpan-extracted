@@ -1,5 +1,13 @@
 Revision history for Perl module EBook::Ishmael.
 
+2.04  Mar 27 2026
+  - ishmael now attempts to clean up HTML prior to dumping by removing
+    unnecessary elements like <img> and <style>.
+  - Remove character encoding debug print when dumping text files.
+  - Change test EPUB's date to fix test failures for systems with Time::Piece
+    1.38.
+  - Skip some tests that fail for Time::Piece <= 1.39.
+
 2.03  Mar 10 2026
   - Fix MobiHuff and PDB::Record package names.
 

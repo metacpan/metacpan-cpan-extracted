@@ -16,7 +16,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 my $parser = afr_numerals();
 
@@ -112,7 +112,7 @@ Lingua::AFR::Word2Num - Word to number conversion in Afrikaans
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::AFR::Word2Num is module for converting text containing number
 representation in afrikaans back into number. Converts whole numbers from 0 up

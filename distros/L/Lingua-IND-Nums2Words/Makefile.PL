@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in IND.",
+  "ABSTRACT" => "This module is deprecated. Please use Lingua::IND::Num2Word instead.",
   "AUTHOR" => "Steven Haryanto <sh\@hhh.indoglobal.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,7 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::IND::Nums2Words",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Export::Attrs" => 0,
+    "Lingua::IND::Num2Word" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
@@ -25,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603260",
+  "VERSION" => "0.2603270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +35,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Export::Attrs" => 0,
+  "Lingua::IND::Num2Word" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "utf8" => 0,

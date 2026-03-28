@@ -1,7 +1,7 @@
-# For Emacs: -*- mode:cperl; mode:folding; coding:utf-8 -*-
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::POL::Numbers;
-# ABSTRACT: Number 2 word conversion in POL.
+# ABSTRACT: This module is deprecated. Please use Lingua::POL::Num2Word instead.
 
 use 5.16.0;
 use utf8;
@@ -9,380 +9,55 @@ use warnings;
 
 # {{{ use block
 
-use vars qw($Idziesiatka);
-
-use lib $ENV{PMLIB_INC};
-
 use Carp;
 use Export::Attrs;
+use Lingua::POL::Num2Word qw(num2pol_cardinal parse num2pol_ordinal);
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+
+our $VERSION = '0.2603270';
 
 # }}}
 
-# {{{ new
+# {{{ re-export from Num2Word
+
+sub num2pol_cardinal :Export { goto &Lingua::POL::Num2Word::num2pol_cardinal }
+sub num2pol_ordinal  :Export { goto &Lingua::POL::Num2Word::num2pol_ordinal }
+
+# }}}
+# {{{ new                              constructor (deprecated)
 
 sub new {
-    my $class = shift;
-    my $number = shift || '';
-    $Idziesiatka=0;
+    my $class  = shift;
+    my $number = shift;
 
-    my $self = {};
-    bless $self, $class;
+    carp "Lingua::POL::Numbers is deprecated, use Lingua::POL::Num2Word instead";
 
-    if( $number =~ /\d+/ ) {
-        return( $self->parse($number) );
+    my $self = bless {}, $class;
+
+    if (defined $number && $number =~ /^\d+$/) {
+        return $self->parse($number);
     }
 
-    return( $self );
+    return $self;
 }
 
 # }}}
-# {{{ parse
+# {{{ parse                            delegate to Num2Word (deprecated)
 
 sub parse :Export {
-    my $self = shift;
-    my $number = shift;
+    my $self   = ref($_[0]) ? shift : __PACKAGE__->new();
+    my $number = shift // return '';
 
-    return( SLOWNIE($number,0) );
-}
-
-# }}}
-# {{{ currency
-
-sub currency {
-    my $self = shift;
-    my $number = shift;
-
-    return( SLOWNIE($number,1) );
-}
-
-# }}}
-# {{{ SLOWNIE
-
-sub SLOWNIE {
-    my $Numer = shift // 0;
-    my $currency = shift;
-
-    my ($temps, $tempd, $tempj, $zlote, $grosze, $Licznik, $grd, $grj, $MiejsceDz, $T_S, $SLOWNIE);
-
-    if ($Numer == 0) {
-        if ($currency) {
-            $SLOWNIE = "zero zl zero gr";
-        } else {
-            $SLOWNIE = "zero";
-        }
-    }
-    else {
-        if ($Numer > 9999999999999.99 || $Numer < 0) {
-            #carp "out of range in $Numer";
-            $SLOWNIE = "out of range";
-        }
-        else {
-            $Numer = Trim($Numer);
-            $MiejsceDz = InStr($Numer);
-            if ($MiejsceDz > 0 && Right($Numer,2) ne "00") {
-                if ($currency) {
-                    $grosze = Left(Mid($Numer, $MiejsceDz + 1)."00", 2);
-                    $grd = Dziesiatki(Right($grosze, 2));
-                    if ($Idziesiatka!=1) {
-                        $grj = Jednostki(Right($grosze, 1));
-                    }
-                    $grosze = " ".$grd.$grj."gr";
-                    $Numer = Trim(Left($Numer, $MiejsceDz - 1));
-                }
-                else {
-                    carp "no decimals allowed in parse mode in $Numer";
-                    $zlote = "no decimals allowed in parse mode in $Numer";
-                }
-            }
-            elsif ($currency) {
-                $grosze = " zero gr";
-            }
-            if ($Numer>0 && ($currency || !$MiejsceDz)) {
-                $Licznik = 1;
-                while ($Numer ne "") {
-                    $tempj = "";
-                    $temps = Setki(Right("000".$Numer, 3)) // '';
-                    $tempd = Dziesiatki(Right("00".$Numer, 2)) // '';
-                    if ($Idziesiatka!=1) {
-                        $tempj = Jednostki(Right($Numer, 1)) // '';
-                    }
-                    if ($Licznik==1) {
-                        $T_S = $temps.$tempd.$tempj;
-                    }
-                    elsif ($Licznik==2) {
-                        $T_S = $temps.$tempd.$tempj.KTys($Numer);
-                    } elsif ($Licznik==3||$Licznik==4||$Licznik==5) {
-                        $T_S = $temps.$tempd.$tempj.KMil($Numer, $Licznik);
-                    }
-                    $zlote = $T_S.($zlote // '');
-
-                    if (length($Numer) > 3) {
-                        $Numer = Left($Numer, length($Numer) - 3);
-                        $Licznik++;
-                    }
-                    else {
-                        $Numer = "";
-                    }
-                }
-            } elsif ($currency || !$MiejsceDz) {
-                $zlote = "zero "
-            }
-            if ($Numer !~ /^\d+$/ or $Numer > -1) {
-                if ($currency) {
-                    $SLOWNIE = $zlote."zl".$grosze;
-                } else {
-                    $SLOWNIE = $zlote;
-                }
-            }
-        }
-    }
-
-    return $SLOWNIE;
-}
-
-# }}}
-# {{{ KTys
-
-sub KTys {
-    my $Numer = shift;
-    my $KTys;
-    my $tys=Val(Right("000".$Numer, 3));
-
-    if ($tys == 0) {
-        $KTys = "";
-    }
-    else {
-        $tys = Val(Right($Numer, 2));
-        if ($tys == 1) {
-            $KTys = "ąc ";
-        }
-        else {
-            if ($tys == 12 || $tys == 13 || $tys == 14) {
-                $KTys = "ęcy ";
-            }
-            else {
-                $tys = Val(Right($Numer, 1));
-            }
-            if ( $tys == 2 || $tys == 3 || $tys == 4) {
-                $KTys = "ące ";
-            }
-            else {
-                $KTys = "ęcy ";
-            }
-        }
-        $KTys = "tysi".$KTys;
-    }
-
-    return $KTys;
-}
-
-# }}}
-# {{{ KMil
-
-sub KMil {
-    my ($Numer, $L)=@_;
-    my ($KMil,$mil);
-    my @RzadW;
-    $RzadW[3] = "milion";
-    $RzadW[4] = "miliard";
-    $RzadW[5] = "bilion";
-    $mil = Val(Right("000".$Numer, 3));
-    if ($mil == 0) {
-        $KMil = "";
-    }
-    else {
-        $mil = Val(Right($Numer, 2));
-        if ($mil == 1) {
-            $KMil = " ";
-        }
-        else {
-            if ($mil == 12 || $mil == 13 || $mil == 14) {
-                $KMil = "ów ";
-            }
-            else {
-                $mil = Val(Right($Numer, 1));
-                if ($mil == 2 || $mil == 3 || $mil == 4) {
-                    $KMil = "y ";
-                } else {
-                    $KMil = "ów ";
-                }
-            }
-        }
-        $KMil = $RzadW[$L].$KMil;
-    }
-
-    return $KMil;
-}
-
-# }}}
-# {{{ Setki
-
-sub Setki {
-    my $Numer=shift;
-    my ($setka, $wynik);
-    $setka = Val(Left($Numer, 1));
-    if ($setka == 1) {
-        $wynik= "sto ";
-    } elsif ($setka == 2) {
-        $wynik = 'dwieście ';
-    } elsif ($setka == 3) {
-        $wynik = 'trzysta ';
-    } elsif ($setka == 4) {
-        $wynik = 'czterysta ';
-    } elsif ($setka == 5) {
-        $wynik = 'pięćset ';
-    } elsif ($setka == 6) {
-        $wynik = 'sześćset ';
-    } elsif ($setka == 7) {
-        $wynik = 'siedemset ';
-    } elsif ($setka == 8) {
-        $wynik = 'osiemset ';
-    } elsif ($setka == 9) {
-        $wynik = 'dziewięćset ';
-    } else {
-        $wynik = '';
-    }
-
-    return $wynik;
-}
-
-# }}}
-# {{{ Dziesiatki
-
-sub Dziesiatki {
-    my $Number = shift;
-    my $wynik = '';
-
-    $Idziesiatka = Val(Left($Number, 1));
-    if ($Idziesiatka == 1) {
-        my $valnum = Val($Number);
-        if ($valnum == 10) { $wynik = 'dziesięć '; }
-        elsif ($valnum == 11) { $wynik = 'jedenaście '; }
-        elsif ($valnum == 12) { $wynik = 'dwanaście '; }
-        elsif ($valnum == 13) { $wynik = 'trzynaście '; }
-        elsif ($valnum == 14) { $wynik = 'czternaście '; }
-        elsif ($valnum == 15) { $wynik = 'piętnaście '; }
-        elsif ($valnum == 16) { $wynik = 'szesnaście '; }
-        elsif ($valnum == 17) { $wynik = 'siedemnaście '; }
-        elsif ($valnum == 18) { $wynik = 'osiemnaście '; }
-        elsif ($valnum == 19) { $wynik = 'dziewiętnaście '; }
-    }
-    else {
-        if ($Idziesiatka == 2) { $wynik = 'dwadzieścia '; }
-        if ($Idziesiatka == 3) { $wynik = 'trzydzieści '; }
-        if ($Idziesiatka == 4) { $wynik = 'czterdzieści '; }
-        if ($Idziesiatka == 5) { $wynik = 'pięćdziesiąt '; }
-        if ($Idziesiatka == 6) { $wynik = 'sześćdziesiąt '; }
-        if ($Idziesiatka == 7) { $wynik = 'siedemdziesiąt '; }
-        if ($Idziesiatka == 8) { $wynik = 'osiemdziesiąt '; }
-        if ($Idziesiatka == 9) { $wynik = 'dziewięćdziesiąt '; }
-    }
-
-    return $wynik;
-}
-
-# }}}
-# {{{ Jednostki
-
-sub Jednostki {
-        my $Numer=shift;
-        my ($jedst, $wynik);
-        $jedst = Val(Right($Numer, 1));
-        if ($jedst == 1) {
-                $wynik = "jeden ";
-        } elsif ($jedst == 2) {
-                $wynik = "dwa ";
-        } elsif ($jedst == 3) {
-                $wynik = "trzy ";
-        } elsif ($jedst == 4) {
-                $wynik = "cztery ";
-        } elsif ($jedst == 5) {
-                $wynik = "pięć ";
-        } elsif ($jedst == 6) {
-                $wynik = "sześć ";
-        } elsif ($jedst == 7) {
-                $wynik = "siedem ";
-        } elsif ($jedst == 8) {
-                $wynik = "osiem ";
-        } elsif ($jedst == 9) {
-                $wynik = "dziewięć ";
-        }
-        return $wynik;
-}
-
-# }}}
-# {{{ Left
-
-sub Left {
-    my ($Numer, $count) = @_;
-    $Numer = substr($Numer,0,$count);
-
-    return $Numer;
-}
-
-# }}}
-# {{{ Right
-
-sub Right {
-    my ($Numer, $count) = @_;
-    $Numer = substr($Numer,-$count);
-
-    return $Numer;
-}
-
-# }}}
-# {{{ Trim
-
-sub Trim {
-    my $Numer = shift;
-    $Numer=~s/^\s+//;
-    $Numer=~s/\s+$//;
-
-    return $Numer;
-}
-
-# }}}
-# {{{ Val
-
-sub Val {
-    my $Numer = shift;
-
-    $Numer=~s/\D//g;
-
-    return $Numer;
-}
-
-# }}}
-# {{{ Mid
-
-sub Mid {
-    my ($Numer, $count) = @_;
-
-    return ($Numer = substr($Numer,$count-1));
-}
-
-# }}}
-# {{{ InStr
-
-sub InStr {
-    my $Numer = shift;
-    my $ret=0;
-    if ($Numer=~/^(\d+)\./) {
-        $ret=length($1)+1;
-    }
-
-    return $ret;
+    return num2pol_cardinal($number) // '';
 }
 
 # }}}
 
 1;
 
-# {{{ POD
+__END__
 
 =pod
 
@@ -390,103 +65,52 @@ sub InStr {
 
 =head1 NAME
 
-Lingua::POL::Numbers - Perl module for converting numeric values into their Polish equivalents
+Lingua::POL::Numbers - Number to word conversion in Polish (DEPRECATED)
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 =head1 DESCRIPTION
 
-Number 2 word conversion in POL.
+B<This module is deprecated.> Please use L<Lingua::POL::Num2Word> instead.
 
-This is PetaMem release in iso-639-3 namespace.
+This module is a thin wrapper that delegates to L<Lingua::POL::Num2Word>
+for backward compatibility with code using the old C<Lingua::POL::Numbers>
+API.
 
 =head1 SYNOPSIS
 
-  use Lingua::POL::Numbers;
+ # Old API (deprecated):
+ use Lingua::POL::Numbers;
+ my $obj = Lingua::POL::Numbers->new();
+ my $text = $obj->parse(42);
 
-  my $numbers = Lingua::POL::Numbers->new;
-
-  my $text = $numbers->parse( 123 );
-
-  # prints 'sto dwadzieścia trzy'
-  print $text;
-
-  my $currency = $numbers->currency ( 123.45 );
-
-  # prints 'sto dwadzieścia trzy zl czterdzieści pięć gr'
-  print $currency;
+ # New API (preferred):
+ use Lingua::POL::Num2Word qw(num2pol_cardinal);
+ my $text = num2pol_cardinal(42);
 
 =head1 FUNCTIONS
 
-=over
+=over 2
 
-=item new
+=item B<new> (deprecated)
 
-Constructor
+Constructor. Emits a deprecation warning. Delegates to
+L<Lingua::POL::Num2Word>.
 
-=item parse
+=item B<parse> (positional, deprecated)
 
-Converts number into Polish
+  1   num    number to convert
+  =>  str    Polish cardinal text
 
-=item Dziesiatki
-
-private
-
-=item InStr
-
-private
-
-=item Jednostki
-
-private
-
-=item KMil
-
-private
-
-=item KTys
-
-private
-
-=item Left
-
-private
-
-=item Mid
-
-private
-
-=item Right
-
-private
-
-=item SLOWNIE
-
-private
-
-=item Setki
-
-private
-
-=item Trim
-
-private
-
-=item Val
-
-private
-
-=item currency
-
-private
+Delegates to C<num2pol_cardinal()>.
 
 =back
 
-=head1 KNOWN BUGS
+=head1 SEE ALSO
 
-None, but that does not mean there are not any.
+L<Lingua::POL::Num2Word> — the replacement module.
 
 =head1 AUTHORS
 
@@ -497,11 +121,13 @@ None, but that does not mean there are not any.
  maintenance, coding (2025-present):
    PetaMem AI Coding Agents
 
+=head1 COPYRIGHT
+
+Copyright (c) PetaMem, s.r.o. 2004-present
+
 =head1 LICENSE
 
-Original license is not known.
-PetaMem added Perl 5 licesne as default.
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5 itself.
 
 =cut
-
-# }}}

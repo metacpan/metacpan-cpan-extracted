@@ -15,10 +15,7 @@
 #    define WIN32_LEAN_AND_MEAN
 #  endif
 #  include <windows.h>
-   /* Windows FILETIME epoch (1601-01-01) to UUID epoch (1582-10-15)
-      offset in 100-nanosecond intervals: 6653 days × 86400 × 10^7 */
-#  define HORUS_WIN_TO_UUID_OFFSET UINT64_C(5748192000000000)
-   /* Windows FILETIME epoch to Unix epoch (1970-01-01)
+   /* Windows FILETIME epoch (1601-01-01) to Unix epoch (1970-01-01)
       offset in 100-nanosecond intervals */
 #  define HORUS_WIN_TO_UNIX_OFFSET UINT64_C(116444736000000000)
 #else
@@ -40,9 +37,8 @@ static inline uint64_t horus_gregorian_100ns(void) {
     GetSystemTimeAsFileTime(&ft);
     ui.LowPart  = ft.dwLowDateTime;
     ui.HighPart = ft.dwHighDateTime;
-    /* FILETIME_epoch + UUID_to_WIN offset = UUID epoch */
-    return ui.QuadPart + HORUS_WIN_TO_UUID_OFFSET
-         - HORUS_WIN_TO_UNIX_OFFSET + HORUS_UUID_EPOCH_OFFSET;
+    /* Convert: 100ns since 1601 -> 100ns since 1970 -> 100ns since 1582 */
+    return ui.QuadPart - HORUS_WIN_TO_UNIX_OFFSET + HORUS_UUID_EPOCH_OFFSET;
 #elif defined(CLOCK_REALTIME) && !defined(__APPLE__)
     /* Use clock_gettime for nanosecond resolution where available */
     struct timespec ts;

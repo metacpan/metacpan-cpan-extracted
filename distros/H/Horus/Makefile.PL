@@ -23,6 +23,9 @@ my %WriteMakefileArgs = (
     # XS configuration
     INC    => '-I. -Iinclude',
     OBJECT => '$(O_FILES)',
+    # clock_gettime lives in librt on older glibc (<2.17) and Solaris;
+    # the empty-string fallback lets it build where -lrt doesn't exist
+    LIBS   => ['-lrt', ''],
 
     # Install headers so dependent XS modules can find them
     PM => {

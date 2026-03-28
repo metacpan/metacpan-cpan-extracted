@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # }}}
 
@@ -81,6 +81,47 @@ sub num2deu_cardinal :Export {
 
 # }}}
 
+
+# {{{ num2deu_ordinal                 convert number to ordinal text
+
+sub num2deu_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Fully irregular forms
+    return 'erste'  if $number == 1;
+    return 'zweite' if $number == 2;
+    return 'dritte' if $number == 3;
+
+    # Stem irregulars: siebte (not siebente), achte (not achtte)
+    return 'siebte' if $number == 7;
+    return 'achte'  if $number == 8;
+
+    my $cardinal = num2deu_cardinal($number);
+
+    # Numbers 4-19 get suffix "te", 20+ get "ste"
+    my $suffix = $number < 20 ? 'te' : 'ste';
+
+    return $cardinal . $suffix;
+}
+
+# }}}
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 1,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -96,7 +137,7 @@ Lingua::DEU::Num2Word - Number to word conversion in German
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::DEU::Num2Word is module for converting numbers into their written
 representation in German. Converts whole numbers from 0 up to 999 999 999.
@@ -115,8 +156,10 @@ Text must be encoded in UTF-8.
  use Lingua::DEU::Num2Word;
 
  my $text = Lingua::DEU::Num2Word::num2deu_cardinal( 123 );
-
  print $text || "sorry, can't convert this number into german language.";
+
+ my $ord = Lingua::DEU::Num2Word::num2deu_ordinal( 3 );
+ print $ord;    # "dritte"
 
 =cut
 
@@ -138,6 +181,16 @@ Text must be encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2deu_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to its German ordinal text representation.
+Only numbers from interval [1, 999_999_999] will be converted.
+Handles irregular forms (erste, zweite, dritte, siebte, achte)
+and applies correct suffixes (-te for 4-19, -ste for 20+).
+
 =back
 
 =cut
@@ -152,6 +205,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2deu_cardinal
+
+=item num2deu_ordinal
 
 =back
 

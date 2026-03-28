@@ -17,44 +17,45 @@ my $euro = "\x{20ac}";
 # --- DumpFile with filename: no warning, correct roundtrip ---
 {
     local $YAML::Syck::ImplicitUnicode = 1;
-    my ($fh, $tmpfile) = tempfile(UNLINK => 1, SUFFIX => '.yml');
+    my ( $fh, $tmpfile ) = tempfile( UNLINK => 1, SUFFIX => '.yml' );
     close $fh;
 
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
-    DumpFile($tmpfile, $euro);
-    is(scalar @warnings, 0, 'DumpFile(filename): no wide character warnings');
+    DumpFile( $tmpfile, $euro );
+    is( scalar @warnings, 0, 'DumpFile(filename): no wide character warnings' );
 
     my $loaded = LoadFile($tmpfile);
-    is($loaded, $euro, 'DumpFile/LoadFile roundtrip via filename');
+    is( $loaded, $euro, 'DumpFile/LoadFile roundtrip via filename' );
 }
 
 # --- DumpFile with open filehandle: no warning, correct roundtrip ---
 {
     local $YAML::Syck::ImplicitUnicode = 1;
-    my ($fh, $tmpfile) = tempfile(UNLINK => 1, SUFFIX => '.yml');
+    my ( $fh, $tmpfile ) = tempfile( UNLINK => 1, SUFFIX => '.yml' );
     close $fh;
 
-    open(my $wfh, '>', $tmpfile) or die "Cannot open $tmpfile: $!";
+    open( my $wfh, '>', $tmpfile ) or die "Cannot open $tmpfile: $!";
 
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
-    DumpFile($wfh, $euro);
+    DumpFile( $wfh, $euro );
     close $wfh;
-    is(scalar @warnings, 0, 'DumpFile(filehandle): no wide character warnings');
+    is( scalar @warnings, 0, 'DumpFile(filehandle): no wide character warnings' );
 
     my $loaded = LoadFile($tmpfile);
-    is($loaded, $euro, 'DumpFile/LoadFile roundtrip via filehandle');
+    is( $loaded, $euro, 'DumpFile/LoadFile roundtrip via filehandle' );
 }
 
 # --- DumpFile with tied filehandle: no warning ---
 {
+
     package TiedFH28;
     sub TIEHANDLE { bless { data => '' }, shift }
-    sub WRITE     { $_[0]->{data} .= substr($_[1], $_[3] || 0, $_[2]); return $_[2] }
-    sub PRINT     { my $self = shift; $self->{data} .= join(defined $, ? $, : '', @_); $self->{data} .= defined $\ ? $\ : '' ; 1 }
+    sub WRITE     { $_[0]->{data} .= substr( $_[1], $_[3] || 0, $_[2] ); return $_[2] }
+    sub PRINT     { my $self = shift; $self->{data} .= join( defined $, ? $, : '', @_ ); $self->{data} .= defined $\ ? $\ : ''; 1 }
     sub data      { $_[0]->{data} }
 
     package main;
@@ -65,18 +66,16 @@ my $euro = "\x{20ac}";
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
-    DumpFile(\*TFH28, $euro);
-    is(scalar @warnings, 0, 'DumpFile(tied fh): no wide character warnings');
+    DumpFile( \*TFH28, $euro );
+    is( scalar @warnings, 0, 'DumpFile(tied fh): no wide character warnings' );
 
     my $yaml_data = tied(*TFH28)->data;
-    like($yaml_data, qr/\x{20ac}/, 'DumpFile(tied fh): output contains Euro sign');
+    like( $yaml_data, qr/\x{20ac}/, 'DumpFile(tied fh): output contains Euro sign' );
     untie *TFH28;
 }
 
 # --- DumpFile with in-memory file: no warning ---
-SKIP: {
-    skip "in-memory files require 5.8 or later", 2 unless $] >= 5.00800;
-    eval q[
+eval q[
         local $YAML::Syck::ImplicitUnicode = 1;
 
         my @warnings;
@@ -88,23 +87,22 @@ SKIP: {
         is(scalar @warnings, 0, 'DumpFile(in-memory file): no wide character warnings');
         like($s, qr/---/, 'DumpFile(in-memory file): produced valid YAML');
     ];
-}
 
 # --- Multi-byte characters beyond BMP ---
 {
     local $YAML::Syck::ImplicitUnicode = 1;
-    my ($fh, $tmpfile) = tempfile(UNLINK => 1, SUFFIX => '.yml');
+    my ( $fh, $tmpfile ) = tempfile( UNLINK => 1, SUFFIX => '.yml' );
     close $fh;
 
     # Test with various wide characters: Euro, CJK, emoji-range
-    my $wide_str = "\x{20ac}\x{4e16}\x{754c}";  # Euro + Chinese "world"
+    my $wide_str = "\x{20ac}\x{4e16}\x{754c}";    # Euro + Chinese "world"
 
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
-    DumpFile($tmpfile, $wide_str);
-    is(scalar @warnings, 0, 'DumpFile with multiple wide chars: no warnings');
+    DumpFile( $tmpfile, $wide_str );
+    is( scalar @warnings, 0, 'DumpFile with multiple wide chars: no warnings' );
 
     my $loaded = LoadFile($tmpfile);
-    is($loaded, $wide_str, 'DumpFile/LoadFile roundtrip with multiple wide chars');
+    is( $loaded, $wide_str, 'DumpFile/LoadFile roundtrip with multiple wide chars' );
 }

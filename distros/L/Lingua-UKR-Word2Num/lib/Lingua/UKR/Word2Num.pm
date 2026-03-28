@@ -15,7 +15,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my  $parser  = uk_numerals();
 
 # }}}
@@ -159,7 +159,7 @@ Lingua::UKR::Word2Num - Word to number conversion in Ukrainian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::UKR::Word2Num is module for converting text containing number
 representation in Ukrainian back into number. Converts whole numbers

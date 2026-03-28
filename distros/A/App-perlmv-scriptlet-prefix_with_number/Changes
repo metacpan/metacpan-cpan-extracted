@@ -1,3 +1,10 @@
+0.002   2026-03-27  Released-By: PERLANCAR; Backward-incompatible: yes; Urgency: medium
+
+        - [incompatible change] Rename interval argument to inc.
+
+        - Fix auto digits.
+
+
 0.001   2020-08-18  Released-By: PERLANCAR
 
         - First release.

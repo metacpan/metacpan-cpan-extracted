@@ -1,5 +1,10 @@
 Revision history for noss (WWW::Noss)
 
+2.03  Mar 27 2026
+  - noss list `--list-limit` with `--sort date` now shows the *last* N posts
+    instead of first posts (except with --reverse).
+  - Fix grammatical errors in documentation.
+
 2.02  Jan 10 2026
   - noss can now read compressed feeds.
   - Default timeout is now 45 seconds.

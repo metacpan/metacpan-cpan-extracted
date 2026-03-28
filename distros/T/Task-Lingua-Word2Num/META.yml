@@ -16,13 +16,15 @@ name: Task-Lingua-Word2Num
 provides:
   Task::Lingua::Word2Num:
     file: lib/Task/Lingua/Word2Num.pm
-    version: '0.2603260'
+    version: '0.2603270'
 requires:
   Lingua::AFR::Word2Num: '0'
   Lingua::ARA::Word2Num: '0'
+  Lingua::BEL::Word2Num: '0'
   Lingua::BUL::Word2Num: '0'
   Lingua::CAT::Word2Num: '0'
   Lingua::CES::Word2Num: '0'
+  Lingua::CYM::Word2Num: '0'
   Lingua::DAN::Word2Num: '0'
   Lingua::DEU::Word2Num: '0'
   Lingua::ELL::Word2Num: '0'
@@ -32,6 +34,8 @@ requires:
   Lingua::FAS::Word2Num: '0'
   Lingua::FIN::Word2Num: '0'
   Lingua::FRA::Word2Num: '0'
+  Lingua::GLE::Word2Num: '0'
+  Lingua::GLG::Word2Num: '0'
   Lingua::HEB::Word2Num: '0'
   Lingua::HRV::Word2Num: '0'
   Lingua::HUN::Word2Num: '0'
@@ -42,14 +46,22 @@ requires:
   Lingua::KOR::Word2Num: '0'
   Lingua::LAV::Word2Num: '0'
   Lingua::LIT::Word2Num: '0'
+  Lingua::LTZ::Word2Num: '0'
+  Lingua::MKD::Word2Num: '0'
+  Lingua::MLT::Word2Num: '0'
   Lingua::NLD::Word2Num: '0'
   Lingua::NOR::Word2Num: '0'
+  Lingua::OCI::Word2Num: '0'
   Lingua::POL::Word2Num: '0'
   Lingua::POR::Words2Nums: '0'
   Lingua::RON::Word2Num: '0'
   Lingua::RUS::Word2Num: '0'
   Lingua::SLK::Word2Num: '0'
+  Lingua::SLV::Word2Num: '0'
   Lingua::SPA::Word2Num: '0'
+  Lingua::SQI::Word2Num: '0'
+  Lingua::SRD::Word2Num: '0'
+  Lingua::SRP::Word2Num: '0'
   Lingua::SWA::Word2Num: '0'
   Lingua::SWE::Word2Num: '0'
   Lingua::THA::Word2Num: '0'
@@ -63,7 +75,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://metacpan.org/author/PETAMEM
-version: '0.2603260'
+version: '0.2603270'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-2.0 OR BSD-2-Clause'

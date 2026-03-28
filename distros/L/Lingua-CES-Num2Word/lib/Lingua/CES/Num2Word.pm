@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my %token1 = qw( 0 nula         1 jedna         2 dva
                  3 tři          4 čtyři         5 pět
                  6 šest         7 sedm          8 osm
@@ -128,6 +128,157 @@ sub num2ces_cardinal :Export {
 
 # }}}
 
+# {{{ num2ces_ordinal           number to ordinal string conversion
+
+sub num2ces_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'nultý',
+        1  => 'první',
+        2  => 'druhý',
+        3  => 'třetí',
+        4  => 'čtvrtý',
+        5  => 'pátý',
+        6  => 'šestý',
+        7  => 'sedmý',
+        8  => 'osmý',
+        9  => 'devátý',
+        10 => 'desátý',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Irregular teens 11-19
+    my %teens = (
+        11 => 'jedenáctý',
+        12 => 'dvanáctý',
+        13 => 'třináctý',
+        14 => 'čtrnáctý',
+        15 => 'patnáctý',
+        16 => 'šestnáctý',
+        17 => 'sedmnáctý',
+        18 => 'osmnáctý',
+        19 => 'devatenáctý',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'dvacátý',
+        30 => 'třicátý',
+        40 => 'čtyřicátý',
+        50 => 'padesátý',
+        60 => 'šedesátý',
+        70 => 'sedmdesátý',
+        80 => 'osmdesátý',
+        90 => 'devadesátý',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'stý',
+        200 => 'dvoustý',
+        300 => 'třístý',
+        400 => 'čtyřstý',
+        500 => 'pětistý',
+        600 => 'šestistý',
+        700 => 'sedmistý',
+        800 => 'osmistý',
+        900 => 'devítistý',
+    );
+
+    # For compound numbers: cardinal prefix + ordinal of the last part
+    # Czech ordinals for compound numbers use the cardinal for all but the
+    # last significant part, which gets the ordinal suffix.
+    # e.g., 21 = "dvacátý první", 100 = "stý", 125 = "sto dvacátý pátý"
+
+    # For numbers >= 1000, use cardinal for the large part, ordinal for remainder
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            my $prefix = num2ces_cardinal($millions);
+            if ($millions == 1) {
+                return 'miliontý';
+            }
+            return $prefix . ' miliontý';
+        }
+        my $prefix = num2ces_cardinal($millions);
+        my $mil_word = ($millions == 1) ? 'milion' :
+                       ($millions >= 2 && $millions <= 4) ? 'miliony' : 'milionů';
+        $mil_word = 'milion' if $millions == 1;
+        return $prefix . ' ' . $mil_word . ' ' . num2ces_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'tisící';
+            }
+            return num2ces_cardinal($thousands) . ' tisící';
+        }
+        my $prefix = num2ces_cardinal($thousands * 1_000);
+        # Use just the thousands cardinal part (without remainder)
+        # then ordinal of remainder
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'tisíc';
+        }
+        else {
+            $thou_cardinal = num2ces_cardinal($thousands) .
+                (($thousands % 100 >= 2 && $thousands % 100 <= 4 &&
+                  !($thousands % 100 >= 12 && $thousands % 100 <= 14))
+                 ? ' tisíce' : ' tisíc');
+        }
+        return $thou_cardinal . ' ' . num2ces_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2ces_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_ord{$t} . ' ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 1,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -143,7 +294,7 @@ Lingua::CES::Num2Word - Number to word conversion in Czech
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::CES::Num2Word is module for conversion numbers into their representation
 in Czech. It converts whole numbers from 0 up to 999 999 999.
@@ -198,6 +349,8 @@ be converted.
 =over 2
 
 =item num2ces_cardinal
+
+=item num2ces_ordinal
 
 =back
 

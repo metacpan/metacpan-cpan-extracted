@@ -1,8 +1,10 @@
-BEGIN { print "1..3\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 3;
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
+
+# Test 1: module loads
+ok( 1, 'XML::Parser loaded' );
 
 my $cnt = 0;
 my $str;
@@ -16,10 +18,10 @@ sub tmpchar {
     }
 }
 
-my $p = new XML::Parser(
+my $p = XML::Parser->new(
     Handlers => {
-        Comment => sub { $cnt++; },
-        Char => \&tmpchar
+        Comment => sub { $cnt++ },
+        Char    => \&tmpchar,
     }
 );
 
@@ -35,9 +37,5 @@ close($rec);
 
 $xpnb->parse_done;
 
-print "not " unless $cnt == 37;
-print "ok 2\n";
-
-print "not " unless $str eq '&draft.day;';
-print "ok 3\n";
-
+is( $cnt, 37,            'parse_start/parse_more counted 37 comments' );
+is( $str, '&draft.day;', 'original_string returns unexpanded entity ref' );

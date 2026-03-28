@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::PalmDoc;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use EBook::Ishmael::CharDet;
 use EBook::Ishmael::Decode qw(palmdoc_decode);
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::PDB;
-use EBook::Ishmael::TextToHtml;
+use EBook::Ishmael::HTML qw(text2html);
 
 my $TYPE    = 'TEXt';
 my $CREATOR = 'REAd';

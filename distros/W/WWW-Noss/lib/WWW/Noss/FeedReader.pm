@@ -2,7 +2,7 @@ package WWW::Noss::FeedReader;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(read_feed discover_feeds);

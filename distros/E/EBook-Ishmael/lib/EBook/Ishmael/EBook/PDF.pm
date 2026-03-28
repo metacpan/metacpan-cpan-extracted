@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::PDF;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -12,6 +12,7 @@ use XML::LibXML;
 
 use EBook::Ishmael::Dir;
 use EBook::Ishmael::EBook::Metadata;
+use EBook::Ishmael::HTML qw(prepare_html);
 use EBook::Ishmael::ImageID qw(image_path_id);
 use EBook::Ishmael::ShellQuote qw(safe_qx);
 
@@ -178,6 +179,7 @@ sub html {
     );
 
     my ($body) = $dom->findnodes('/html/body');
+    prepare_html($body);
 
     my $html = join '', map { $_->toString } $body->childNodes;
 
@@ -214,6 +216,7 @@ sub raw {
     );
 
     my ($body) = $dom->findnodes('/html/body');
+    prepare_html($body);
 
     my $raw = join '', $body->textContent;
 

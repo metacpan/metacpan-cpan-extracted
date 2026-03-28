@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = cat_numerals();
 
 # }}}
@@ -132,7 +132,7 @@ Lingua::CAT::Word2Num - Word to number conversion in Catalan
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::CAT::Word2Num is a module for converting text containing number
 representation in Catalan back into number. Converts whole numbers from 0 up

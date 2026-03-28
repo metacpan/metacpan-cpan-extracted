@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = lav_numerals();
 
 # }}}
@@ -114,7 +114,7 @@ Lingua::LAV::Word2Num - Word to number conversion in Latvian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::LAV::Word2Num is module for converting Latvian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

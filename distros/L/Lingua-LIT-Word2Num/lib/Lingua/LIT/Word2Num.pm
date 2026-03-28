@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = lit_numerals();
 
 # }}}
@@ -112,7 +112,7 @@ Lingua::LIT::Word2Num - Word to number conversion in Lithuanian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::LIT::Word2Num is module for converting Lithuanian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

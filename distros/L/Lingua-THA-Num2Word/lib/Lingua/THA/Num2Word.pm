@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # }}}
 
@@ -107,6 +107,17 @@ sub num2tha_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -124,7 +135,7 @@ Lingua::THA::Num2Word - Number to word conversion in Thai
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::THA::Num2Word is module for converting numbers into their written
 representation in Thai. Converts whole numbers from 0 up to 999 999 999.

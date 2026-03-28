@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = dan_numerals();
 
 # }}}
@@ -111,7 +111,7 @@ Lingua::DAN::Word2Num - Word to number conversion in Danish
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::DAN::Word2Num is module for converting danish numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

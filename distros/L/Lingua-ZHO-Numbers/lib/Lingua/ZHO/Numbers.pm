@@ -1,10 +1,7 @@
-# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
-#
-# (c) 2003-2010 PetaMem, s.r.o.
-#
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::ZHO::Numbers;
-# ABSTRACT: Number 2 word conversion in ZHO.
+# ABSTRACT: This module is deprecated. Please use Lingua::ZHO::Num2Word instead.
 
 use 5.16.0;
 use utf8;
@@ -13,261 +10,117 @@ use warnings;
 # {{{ use block
 
 use Carp;
-use Exporter;
-use base 'Exporter';
-use vars qw($Charset @EXPORT_OK);
+use Export::Attrs;
+use Lingua::ZHO::Num2Word;
 
 # }}}
-# {{{ variables declaration
-our $VERSION = '0.2603260';
+# {{{ var block
 
-@EXPORT_OK = 'number_to_zh';
+our $VERSION = '0.2603270';
 
-$Charset = 'pinyin';
+our $Charset;
 
-our %MAP = (
-($] >= 5.006) ? eval  ## no critic
-  q(
-    'traditional'   => {
-        mag => [ '', split(' ', "萬 億 兆 京 垓 秭 穰 溝 澗 正 載 極 恆河沙 阿僧祇 那由他 不可思議 無量大數") ],
-        ord => [ '', split(' ', "十 百 千") ],
-        dig => [ split(' ', "零 一 二 三 四 五 六 七 八 九 十") ],
-        dot => "點",
-        neg => "負",
-    },
-    'simplified'    => {
-        mag => [ '', split(' ', "万 亿 兆 京 垓 秭 穰 沟 涧 正 载 极 恒河沙 阿僧祗 那由他 不可思议 无量大数") ],
-        ord => [ '', split(' ', "十 百 千") ],
-        dig => [ split(' ', "零 一 二 三 四 五 六 七 八 九 十") ],
-        dot => "点",
-        neg => "负",
-    },
-) : (),
-    'big5'          => {
-        mag => [ '', split(' ', "\xB8U \xBB\xF5 \xA5\xFC \xA8\xCA \xAB\xB2 \xD2\xF1 \xF6\xF8 \xB7\xBE \xBC\xEE \xA5\xBF \xB8\xFC \xB7\xA5 \xAB\xED\xAAe\xA8F \xAA\xFC\xB9\xAC\xAC\xE9 \xA8\xBA\xA5\xD1\xA5L \xA4\xA3\xA5i\xAB\xE4\xC4\xB3 \xB5L\xB6q\xA4j\xBC\xC6") ],
-        ord => [ '', split(' ', "\xA4Q \xA6\xCA \xA4d") ],
-        dig => [ split(' ', "\xB9s \xA4\@ \xA4G \xA4T \xA5| \xA4\xAD \xA4\xBB \xA4C \xA4K \xA4E \xA4Q") ],
-        dot => "\xC2I",
-        neg => "\xADt",
-    },
-    'gb'            => {
-        mag => [ '', split(' ', "\xCD\xF2 \xD2\xDA \xD5\xD7 \xBE\xA9 \xDB\xF2 \xEF\xF6 \xF0\xA6 \xB9\xB5 \xBD\xA7 \xD5\xFD \xD4\xD8 \xBC\xAB \xBA\xE3\xBA\xD3\xC9\xB3 \xB0\xA2\xC9\xAE\xEC\xF3 \xC4\xC7\xD3\xC9\xCB\xFB \xB2\xBB\xBF\xC9\xCB\xBC\xD2\xE9 \xCE\xDE\xC1\xBF\xB4\xF3\xCA\xFD") ],
-        ord => [ '', split(' ', "\xCA\xAE \xB0\xD9 \xC7\xA7") ],
-        dig => [ split(' ', "\xC1\xE3 \xD2\xBB \xB6\xFE \xC8\xFD \xCB\xC4 \xCE\xE5 \xC1\xF9 \xC6\xDF \xB0\xCB \xBE\xC5 \xCA\xAE") ],
-        dot => "\xB5\xE3",
-        neg => "\xB8\xBA",
-    },
-    'pinyin'        => {
-        mag => [ '', map {$_ } qw(
-            Wan Yi Zhao Jing Gai Zi Rang Gou Jian Zheng Zai Ji
-            HengHeSha AZengZhi NaYouTa BuKeSiYi WuLiangDaShu
-        ) ],
-        ord => [ '', map {$_ } qw(Shi Bai Qian) ],
-        dig => [ qw(Ling Yi Er San Si Wu Liu Qi Ba Jiu Shi) ],
-        dot => ' Dian ',
-        neg => 'Fu ',
-    },
-);
 # }}}
 
-# {{{ import
+# {{{ import                           delegate charset selection to Num2Word
 
 sub import {
-    my ($class, $charset) = @_;
-    $class->charset($charset);
-    return $class->export_to_level(1, $class);
+    my $class = shift;
+    # pass charset args to the real module
+    Lingua::ZHO::Num2Word->charset($_[0]) if @_;
 }
 
 # }}}
-# {{{ charset
+# {{{ re-export from Num2Word
 
-sub charset {
-    my ($class, $charset) = @_;
-
-    no strict 'refs'; ## no critic
-    return ${"$class\::Charset"} unless defined $charset;
-
-    $charset = 'gb' if $charset =~ /^gb/i or $charset =~ /^euc-cn$/i;
-    $charset = 'big5' if $charset =~ /big5/i;
-    return ${"$class\::Charset"} = lc($charset) if exists ${"$class\::MAP"}{lc($charset)};
-}
+sub num2zho_cardinal :Export { goto &Lingua::ZHO::Num2Word::num2zho_cardinal }
+sub number_to_zh     :Export { goto &Lingua::ZHO::Num2Word::number_to_zh }
 
 # }}}
-# {{{ map_zho
+# {{{ charset                          delegate to Num2Word
 
-sub map_zho {
-    return \%MAP;
-}
+sub charset { return Lingua::ZHO::Num2Word->charset($_[1]) }
 
 # }}}
-# {{{ new
+# {{{ new                              constructor (deprecated)
 
 sub new {
-    my ($class, $num) = @_;
-    bless (\$num, $class);
+    my $class = shift;
+    carp "Lingua::ZHO::Numbers is deprecated, use Lingua::ZHO::Num2Word instead";
+    return Lingua::ZHO::Num2Word->new(@_);
 }
 
 # }}}
-# {{{ parse
+# {{{ parse                            delegate to Num2Word (deprecated)
 
-sub parse {
-    my ($self, $num) = @_;
-    ${$self} = $num;
-}
-
-# }}}
-# {{{ get_string
-
-sub get_string {
-    my ($self) = @_;
-    return number_to_zh($$self);
-}
-
-# }}}
-# {{{ number_to_zh
-
-sub number_to_zh {
-    my @a = @_;
-    return __PACKAGE__->_convert($MAP{$Charset}, @a);
-}
-
-# }}}
-# {{{ convert
-
-sub _convert {
-    my ($class, $map, $input) = @_;
-
-    croak 'You should specify a number from interval [0, trillion)'
-        if    !defined $input
-           || $input !~ m{\A[\-\.\d]+\z}xms
-           || $input >= 10 ** 15;
-
-    $input =~ s/[^\d\.\-]//;
-
-    my @dig = @{$map->{dig}};
-    my @ord = @{$map->{ord}};
-    my @mag = @{$map->{mag}};
-    my $dot = $map->{dot};
-    my $neg = $map->{neg};
-
-    my $out = '';
-    my $delta;
-    if ($input =~ s/\.(.*)//) {
-        $delta = $1;
-    }
-
-    $out = $neg if $input =~ s/^\-//;
-    $input =~ s/^0+//;
-    $input ||= '0';
-
-    my @chunks;
-    unshift @chunks, $1 while ($input =~ s/(\d{1,4})$//g);
-    my $mag = $#chunks;
-    my $zero = ($] >= 5.005) ? eval 'qr/$dig[0]$/' : quotemeta($dig[0]) . '$'; ## no critic
-
-    foreach my $num (@chunks) {
-        my $tmp = '';
-
-        for (reverse 0..3) {
-            my $n = int($num / (10 ** $_)) % 10;
-            next unless $tmp or $n;
-            $tmp .= $dig[$n] unless ($n == 0 and $tmp =~ $zero)
-                                 or ($_ == 1 and $n == 1 and not $tmp);
-            $tmp .= $ord[$_] if $n;
-        }
-
-        $tmp =~ s/$zero// unless $tmp eq $dig[0];
-        $tmp .= $mag[$mag] if $tmp;
-        $tmp = $dig[0].$tmp if $num < 1000 and $mag != $#chunks
-                                           and $out !~ $zero;
-        $out .= $tmp;
-        $mag--;
-    }
-
-    $out =~ s/$zero// unless $out eq $dig[0];
-
-    if ($delta) {
-        $delta =~ s/^0\.//;
-        $out .= $dot;
-        $out .= $dig[$_] for split(//, $delta);
-    }
-
-    return $out || $dig[0];
-}
+sub parse       { return Lingua::ZHO::Num2Word::parse(@_) }
+sub get_string  { return Lingua::ZHO::Num2Word::get_string(@_) }
 
 # }}}
 
 1;
+
 __END__
 
-# {{{ module documentation
+=pod
+
+=encoding utf-8
 
 =head1 NAME
 
-Lingua::ZHO::Numbers - Converts numeric values into their Chinese string equivalents
+Lingua::ZHO::Numbers - Number to word conversion in Chinese (DEPRECATED)
 
 =head1 VERSION
 
-version 0.2603260
-
-=head1 SYNOPSIS
-
-    # OO Style
-    use Lingua::ZHO::Numbers 'pinyin';
-    my $shuzi = Lingua::ZHO::Numbers->new( 123 );
-    print $shuzi->get_string;
-
-    my $lingyige_shuzi = Lingua::ZHO::Numbers->new;
-    $lingyige_shuzi->parse( 7340 );
-    $chinese_string = $lingyige_shuzi->get_string;
-
-    # Function style
-    print number_to_zh( 345 );  # automatically exported
-
-    # Change output format
-    Lingua::ZHO::Numbers->charset('big5');
-
-    Only numbers from interval [0, trillion) can be converted.
+version 0.2603270
 
 =head1 DESCRIPTION
 
-Number 2 word conversion in ZHO.
+B<This module is deprecated.> Please use L<Lingua::ZHO::Num2Word> instead.
 
-This module tries to convert a number into Chinese cardinal number.
-It supports decimals number, and five representation systems
-(I<charsets>): C<traditional>, C<simplified>, C<big5>, C<gb> and
-C<pinyin>.  The first two are returned as unicode strings; hence
-they are only available for Perl 5.6 and later versions.
+This module is a thin wrapper that delegates to L<Lingua::ZHO::Num2Word>
+for backward compatibility with code using the old C<Lingua::ZHO::Numbers>
+API. Charset selection via C<use Lingua::ZHO::Numbers 'big5'> is preserved
+and delegated to the new module.
 
-The interface conforms to the one defined in B<Lingua::EN::Number>,
-but you can also use this module in a functionnal manner by invoking
-the C<number_to_zh()> function.
+=head1 SYNOPSIS
+
+ # Old API (deprecated):
+ use Lingua::ZHO::Numbers 'traditional';
+ my $obj = Lingua::ZHO::Numbers->new(42);
+ my $text = $obj->get_string;
+
+ # New API (preferred):
+ use Lingua::ZHO::Num2Word 'traditional';
+ my $text = num2zho_cardinal(42);
 
 =head1 FUNCTIONS
 
-=over
+=over 2
 
-=item charset
+=item B<new> (deprecated)
 
-=item get_string
+Constructor. Emits a deprecation warning. Delegates to
+L<Lingua::ZHO::Num2Word>.
 
-=item map_zho
+=item B<charset>
 
-=item new
+Sets or gets the active charset. Delegates to
+C<Lingua::ZHO::Num2Word-E<gt>charset()>.
 
-=item number_to_zh
+=item B<parse>
 
-=item parse
+Delegates to C<Lingua::ZHO::Num2Word::parse()>.
+
+=item B<get_string>
+
+Delegates to C<Lingua::ZHO::Num2Word::get_string()>.
 
 =back
 
 =head1 SEE ALSO
 
-L<Lingua::EN::Numbers>
-
-=head1 ACKNOWLEDGMENTS
-
-Sean Burke for suggesting me to write this module.
+L<Lingua::ZHO::Num2Word> — the replacement module.
 
 =head1 AUTHORS
 
@@ -280,19 +133,11 @@ Sean Burke for suggesting me to write this module.
 
 =head1 COPYRIGHT
 
-Copyright 2002, 2003, 2004 by Autrijus Tang <autrijus@autrijus.org>.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
-See L<http://www.perl.com/perl/misc/Artistic.html>
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =head1 LICENSE
 
 This module is free software; you can redistribute it and/or modify it
-under the same terms as the Artistic License 2.0 or the BSD 2-Clause
-License. See the LICENSE file in the distribution for details.
+under the same terms as Perl 5 itself.
 
 =cut
-
-# }}}

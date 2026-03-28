@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.26 - Fri Mar 27 2026
+
+    * Update train names (patch by Lili Chelsea Urban)
+    * dbris: Indicate when we are waiting for a request
+
 Travel::Status::DE::DBRIS 0.25 - Thu Mar 05 2026
 
     * ...::Formation::Sector: Remove cube_meters and cube_percent accessors.

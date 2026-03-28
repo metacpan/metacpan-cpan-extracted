@@ -10,8 +10,8 @@ use IO::File;
 require POSIX;
 
 our @ISA     = qw(IO::Handle);
-our $VERSION = '1.23';    # keep same as in Tty.pm
-eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
+our $VERSION = '1.24';    # keep same as in Tty.pm
+eval { local $^W = 0; local $SIG{__DIE__}; require IO::Stty };
 push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
 sub new {
@@ -67,10 +67,15 @@ sub slave {
 
     my $tty = ${*$master}{'io_pty_ttyname'};
 
-    my $slave = IO::Tty->new;
+    my $slave_fd = IO::Tty::_open_tty($tty);
+    croak "Cannot open slave $tty: $!" if $slave_fd < 0;
 
-    $slave->open( $tty, O_RDWR | O_NOCTTY )
-      || croak "Cannot open slave $tty: $!";
+    my $slave = IO::Tty->new_from_fd( $slave_fd, "r+" );
+    croak "Cannot create IO::Tty from fd $slave_fd: $!" if not $slave;
+    $slave->autoflush(1);
+
+    ${*$slave}{'io_tty_ttyname'}    = $tty;
+    ${*$master}{'io_pty_slave'}     = $slave;
 
     return $slave;
 }
@@ -164,7 +169,7 @@ IO::Pty - Pseudo TTY object class
 
 =head1 VERSION
 
-1.23
+1.24
 
 =head1 SYNOPSIS
 

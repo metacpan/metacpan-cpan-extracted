@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "This module converts a number into a French cardinal or ordinal.",
+  "ABSTRACT" => "This module is deprecated. Please use Lingua::FRA::Num2Word instead.",
   "AUTHOR" => "Briac Pilpre <briac\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,13 +19,17 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Export::Attrs" => 0,
+    "Lingua::FRA::Num2Word" => 0,
     "utf8" => 0,
-    "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.2603260",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "strict" => 0
+  },
+  "VERSION" => "0.2603270",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -33,8 +37,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Export::Attrs" => 0,
+  "Lingua::FRA::Num2Word" => 0,
+  "Test::More" => 0,
+  "strict" => 0,
   "utf8" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

@@ -2,7 +2,7 @@ package WWW::Noss::Home;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(home);

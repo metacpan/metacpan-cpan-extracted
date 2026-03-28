@@ -58,9 +58,7 @@ is( LoadFile('loadfile.json'), "a simple scalar", 'LoadFile works with file name
 }
 
 # read via indirect file handles
-SKIP: {
-    skip "indirect file handles require 5.6 or later", 1 unless $] >= 5.006000;
-
+{
     open( my $h, 'loadfile.json' );
     is( LoadFile($h), "a simple scalar", 'LoadFile works with indirect filehandles' );
     close($h);
@@ -83,9 +81,7 @@ SKIP: {
 }
 
 # load from "in memory" file
-SKIP: {
-    skip "in-memory files require 5.8 or later", 1 unless $] >= 5.00800;
-
+{
     open( my $h, '<', \'a simple scalar' );
     is( LoadFile($h), "a simple scalar", 'LoadFile works with in-memory files' );
     close($h);

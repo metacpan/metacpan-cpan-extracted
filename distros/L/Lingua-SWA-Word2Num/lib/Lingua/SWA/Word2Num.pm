@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = swa_numerals();
 
 # }}}
@@ -50,7 +50,6 @@ sub swa_numerals {
                   | 'saba'       {  7 }
                   | 'nane'       {  8 }
                   | 'tisa'       {  9 }
-                  | 'kumi'       { 10 }
 
       tens:         'ishirini'   { 20 }
                   | 'thelathini' { 30 }
@@ -64,6 +63,12 @@ sub swa_numerals {
       deca:         tens 'na' number    { $item[1] + $item[3] }
                   | 'kumi' 'na' number  { 10 + $item[3]       }
                   | tens
+                  | 'kumi'              { 10 }
+                  | number
+
+      simpledeca:   'kumi' 'na' number  { 10 + $item[3]       }
+                  | tens
+                  | 'kumi'              { 10 }
                   | number
 
       hecto:        'mia' deca 'na' deca  { $item[2] * 100 + $item[4] }
@@ -80,7 +85,9 @@ sub swa_numerals {
       kOhOd:      kilo
                 | hOd
 
-      mega:       'milioni' hOd kOhOd { $item[2] * 1_000_000 + $item[3] }
+      mega:       'milioni' hOd 'elfu' 'mia' number 'na' simpledeca 'na' hOd /\Z/
+                    { $item[2] * 1_000_000 + ($item[5] * 100 + $item[7]) * 1000 + $item[9] }
+                | 'milioni' hOd kOhOd { $item[2] * 1_000_000 + $item[3] }
                 | 'milioni' hOd       { $item[2] * 1_000_000 }
     });
 }
@@ -102,7 +109,7 @@ Lingua::SWA::Word2Num - Word to number conversion in Swahili
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::SWA::Word2Num is a module for converting Swahili numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999.

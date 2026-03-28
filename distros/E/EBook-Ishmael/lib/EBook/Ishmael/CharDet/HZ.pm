@@ -1,6 +1,6 @@
 package EBook::Ishmael::CharDet::HZ;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -33,7 +33,7 @@ sub take {
     return TAKE_MUST_BE if $self->{Codes} >= $THRESHOLD;
 
     for my $i (0 .. length($data) - 1) {
-        my $b = ord(substr $data, $i, 1) % 0xff;
+        my $b = ord(substr $data, $i, 1) & 0xff;
         if ($self->{InCode}) {
             if ($self->{Tilde}) {
                 if ($b != ord '}') {

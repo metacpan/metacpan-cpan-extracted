@@ -74,4 +74,23 @@ WriteMakefile(
     : (),
 );
 
+# Suppress make's built-in .y -> .c implicit rule.
+# gram.c and gram.h are pre-generated and checked in;
+# yacc/bison is only needed when gram.y changes.
+sub MY::postamble {
+    return <<'MAKE';
+# gram.c and gram.h are pre-generated and checked in;
+# yacc/bison is only needed when gram.y changes.
+# Remove .y from the suffix list so make never infers a .y -> .c rule.
+.SUFFIXES:
+.SUFFIXES: .c .h .o .obj .xs
+
+# Regenerate gram.c and gram.h from gram.y (requires bison >= 3.0).
+# macOS ships bison 2.3; use Homebrew bison if available.
+BISON = $(shell command -v /opt/homebrew/opt/bison/bin/bison 2>/dev/null || command -v /usr/local/opt/bison/bin/bison 2>/dev/null || command -v /opt/homebrew/bin/bison 2>/dev/null || command -v /usr/local/bin/bison 2>/dev/null || echo bison)
+regen-grammar: gram.y
+	$(BISON) -o gram.c -d gram.y
+MAKE
+}
+
 #-cc_files

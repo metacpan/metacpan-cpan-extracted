@@ -1,13 +1,15 @@
 package App::perlmv::scriptlet::prefix_with_number;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-18'; # DATE
-our $DIST = 'App-perlmv-scriptlet-prefix_with_number'; # DIST
-our $VERSION = '0.001'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+use POSIX ();
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2026-03-27'; # DATE
+our $DIST = 'App-perlmv-scriptlet-prefix_with_number'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our $SCRIPTLET = {
     summary => 'Prefix filenames with number (usually to make them easily sortable)',
@@ -23,12 +25,12 @@ _
         },
         start => {
             summary => 'Number to start from',
-            schema => 'int*',
+            schema => 'float*',
             default => 1,
         },
-        interval => {
-            summary => 'Interval from one number to the next',
-            schema => 'int*',
+        inc => {
+            summary => 'Increment from one number to the next',
+            schema => 'float*',
             default => 1,
         },
     },
@@ -38,15 +40,23 @@ _
 
         use vars qw($ARGS $FILES $TESTING $i);
 
-        $ARGS //= {};
-        my $digits = $ARGS->{digits} // (@$FILES >= 1000 ? 4 : @$FILES >= 100 ? 3 : @$FILES >= 10 ? 2 : 1);
         my $start  = $ARGS->{start} // 1;
-        my $interval = $ARGS->{interval} // 1;
+        my $inc = $ARGS->{inc} // 1;
+
+        my $auto_digits;
+        {
+            my $largest_number = $start + (@$FILES-1)*$inc;
+            $largest_number = 1 if $largest_number <= 0;
+            $auto_digits = POSIX::ceil(log($largest_number)/log(10));
+        }
+
+        $ARGS //= {};
+        my $digits = $ARGS->{digits} // $auto_digits;
 
         $i //= 0;
         $i++ unless $TESTING;
 
-        my $num  = $start + ($i-1)*$interval;
+        my $num  = $start + ($i-1)*$inc;
         my $fnum = sprintf("%0${digits}d", $num);
         "$fnum-$_";
     },
@@ -68,7 +78,7 @@ App::perlmv::scriptlet::prefix_with_number - Prefix filenames with number (usual
 
 =head1 VERSION
 
-This document describes version 0.001 of App::perlmv::scriptlet::prefix_with_number (from Perl distribution App-perlmv-scriptlet-prefix_with_number), released on 2020-08-18.
+This document describes version 0.002 of App::perlmv::scriptlet::prefix_with_number (from Perl distribution App-perlmv-scriptlet-prefix_with_number), released on 2026-03-27.
 
 =head1 SYNOPSIS
 
@@ -98,9 +108,9 @@ Arguments can be passed using the C<-a> (C<--arg>) L<perlmv> option, e.g. C<< -a
 
 Required. Number of digits to use (1 means 1,2,3,..., 2 means 01,02,03,...); the default is to autodetect. 
 
-=head2 interval
+=head2 inc
 
-Interval from one number to the next. 
+Increment from one number to the next. 
 
 =head2 start
 
@@ -114,14 +124,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-perlmv
 
 Source repository is at L<https://github.com/perlancar/perl-App-perlmv-scriptlet-prefix_with_number>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-prefix_with_number>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<perlmv> (from L<App::perlmv>)
@@ -130,11 +132,37 @@ L<perlmv> (from L<App::perlmv>)
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-perlmv-scriptlet-prefix_with_number>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

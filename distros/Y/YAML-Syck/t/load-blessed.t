@@ -42,7 +42,6 @@ my @tests = (
         },
         loadblessed_enabled  => 'MY_REGEXP',
         loadblessed_disabled => 'Regexp',
-        perl_version         => 5.008
     },
     {
         msg    => 'code blessed as object',
@@ -56,16 +55,11 @@ my @tests = (
 );
 
 foreach my $t (@tests) {
-  SKIP: {
-        Test::More::skip "only for perl >= $t->{perl_version}", 2
-          if $t->{perl_version} && $] < $t->{perl_version};
+    $YAML::Syck::LoadBlessed = 1;
+    is ref Load( Dump( $t->{object}->() ) ) => $t->{loadblessed_enabled}, "$t->{msg} [ LoadBlessed = 1 ]";
 
-        $YAML::Syck::LoadBlessed = 1;
-        is ref Load( Dump( $t->{object}->() ) ) => $t->{loadblessed_enabled}, "$t->{msg} [ LoadBlessed = 1 ]";
-
-        $YAML::Syck::LoadBlessed = 0;
-        is ref Load( Dump( $t->{object}->() ) ) => $t->{loadblessed_disabled}, "$t->{msg} [ LoadBlessed = 0 ]";
-    }
+    $YAML::Syck::LoadBlessed = 0;
+    is ref Load( Dump( $t->{object}->() ) ) => $t->{loadblessed_disabled}, "$t->{msg} [ LoadBlessed = 0 ]";
 }
 
 exit;

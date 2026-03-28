@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = deu_numerals();
 
 # }}}
@@ -107,7 +107,7 @@ Lingua::DEU::Word2Num - Word to number conversion in German
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::DEU::Word2Num is module for converting german numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

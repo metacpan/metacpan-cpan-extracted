@@ -28,6 +28,11 @@ my @POST_138 = (
     "Thu Jan  1 00:00:00 2026 GMT",
     "Thu Jan  1 00:00:00 AM GMT 2026",
     "Thu, 01 Jan 2026 00:00:00 GMT",
+);
+
+# Times that only work after Time::Piece 1.39 (I do not know why, might have
+# something to do with how locale parsing behavior)
+my @POST_139 = (
     "Thursday, 01-Jan-26 00:00:00 GMT",
 );
 
@@ -40,6 +45,15 @@ SKIP: {
         skip '$Time::Piece::VERSION < 1.38', scalar @POST_138;
     }
     for my $tt (@POST_138) {
+        is(guess_time($tt), $TARGET, "guess_time('$tt') == $TARGET");
+    }
+}
+
+SKIP: {
+    unless ($Time::Piece::VERSION gt '1.39') {
+        skip '$Time::Piece::VERSION <= 1.39', scalar @POST_139;
+    }
+    for my $tt (@POST_139) {
         is(guess_time($tt), $TARGET, "guess_time('$tt') == $TARGET");
     }
 }

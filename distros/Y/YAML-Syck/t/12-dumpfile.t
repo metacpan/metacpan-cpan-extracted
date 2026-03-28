@@ -47,17 +47,12 @@ YAML
 }
 
 # dump to indirect file handles
-SKIP: {
-    skip "indirect file handles require 5.6 or later", 1 unless $] >= 5.006000;
-    eval q[
-
-    open(my $h, '>', 'dumpfile.yml');
-    DumpFile($h, $scalar);
+{
+    open( my $h, '>', 'dumpfile.yml' );
+    DumpFile( $h, $scalar );
     close $h;
-    file_contents_is('dumpfile.yml', $expected_yaml, 'DumpFile works with indirect file handles');
+    file_contents_is( 'dumpfile.yml', $expected_yaml, 'DumpFile works with indirect file handles' );
     unlink 'dumpfile.yml' or die $!;
-
-];
 }
 
 # dump to ordinary filehandles
@@ -97,16 +92,11 @@ SKIP: {
 }
 
 # dump to "in memory" file
-SKIP: {
-    skip "in-memory files require 5.8 or later", 1 unless $] >= 5.00800;
-    eval q[
-
-    open(my $h, '>', \my $s);
-    DumpFile($h, $scalar);
+{
+    open( my $h, '>', \my $s );
+    DumpFile( $h, $scalar );
     close($h);
-    is($s, $expected_yaml, 'DumpFile works with in-memory files');
-
-];
+    is( $s, $expected_yaml, 'DumpFile works with in-memory files' );
 }
 
 # dump to tied filehandle (rt.cpan.org #96882)

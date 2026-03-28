@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 our @EXPORT_OK  = qw(cardinal2num w2n);
 my $parser      = ita_numerals();
 
@@ -122,7 +122,7 @@ Lingua::ITA::Word2Num - Word to number conversion in Italian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::ITA::Word2Num is module for converting text containing number
 representation in italian back into number. Converts whole numbers from 0 up

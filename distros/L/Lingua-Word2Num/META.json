@@ -1,5 +1,5 @@
 {
-   "abstract" : "Word to number conversion",
+   "abstract" : "Lingua::Word2Num converts number words in natural language text into their numeric values. It supports 44 languages via auto-discovered Lingua::XXX::Word2Num modules and accepts both ISO 639-1 (de) and ISO 639-3 (deu) language codes.",
    "author" : [
       "PetaMem s.r.o. <info@petamem.com>"
    ],
@@ -23,7 +23,9 @@
          "requires" : {
             "Carp" : "0",
             "Export::Attrs" : "0",
+            "Lingua::Num2Word" : "0",
             "Readonly" : "0",
+            "overload" : "0",
             "perl" : "v5.16.0",
             "utf8" : "0",
             "warnings" : "0"
@@ -39,7 +41,7 @@
    "provides" : {
       "Lingua::Word2Num" : {
          "file" : "lib/Lingua/Word2Num.pm",
-         "version" : "0.2603260"
+         "version" : "0.2603270"
       }
    },
    "release_status" : "stable",
@@ -49,7 +51,7 @@
          "web" : "https://metacpan.org/author/PETAMEM"
       }
    },
-   "version" : "0.2603260",
+   "version" : "0.2603270",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "Artistic-2.0 OR BSD-2-Clause"

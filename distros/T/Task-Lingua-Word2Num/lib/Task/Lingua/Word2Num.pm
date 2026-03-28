@@ -6,7 +6,7 @@ use 5.16.0;
 use utf8;
 use warnings;
 
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 1;
 
@@ -22,7 +22,7 @@ Task::Lingua::Word2Num - Install all PetaMem word-to-number conversion modules
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 =head1 DESCRIPTION
 

@@ -131,7 +131,7 @@ char *get_inline( SyckParser *parser );
  * Parser for standard YAML Bytecode [UTF-8]
  */
 int
-sycklex_bytecode_utf8( YYSTYPE *sycklval, SyckParser *parser )
+sycklex_bytecode_utf8( SYCKSTYPE *sycklval, SyckParser *parser )
 {
     SyckLevel *lvl;
     syck_parser_ptr = parser;

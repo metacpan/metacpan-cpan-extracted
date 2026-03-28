@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = slk_numerals();
 
 # }}}
@@ -115,6 +115,7 @@ sub slk_numerals {
              |  hOd 'jeden' 'milión' kOhOd  { ($item[1] + 1) * 1_000_000 + $item[4] }
 
         megas:  /milión(y|ov)/
+             |  'milión'
     });
 }
 
@@ -137,7 +138,7 @@ Lingua::SLK::Word2Num - Word to number conversion in Slovak
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::SLK::Word2Num is module for converting Slovak numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

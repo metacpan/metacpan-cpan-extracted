@@ -3,7 +3,7 @@ package App::Prove::Plugin::Metrics;
 use strict;
 use warnings;
 
-our $VERSION='0.0.2';
+our $VERSION='0.0.3';
 
 sub load {
 	my ($class,$opt)=@_;
@@ -25,7 +25,7 @@ App::Prove::Plugin::Metrics - Emit metrics when running prove
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -133,6 +133,8 @@ The module must provide a C<save> function that will be called when metrics are 
 =head1 BUGS
 
 The plugin assumes that C<prove> is running with the standard console output formatter.
+
+Behavior of C<rollup> is subject to change.  Current rollup values may be inaccurate depending on other settings.
 
 =head1 SEE ALSO
 

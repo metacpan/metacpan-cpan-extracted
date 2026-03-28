@@ -17,7 +17,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 our %known;
 
 # }}}
@@ -45,7 +45,10 @@ my %iso1_to_3 = (
     lt => 'lit', lv => 'lav', nl => 'nld', 'no' => 'nor',
     pl => 'pol', pt => 'por', ro => 'ron', ru => 'rus',
     sk => 'slk', sv => 'swe', sw => 'swa', th => 'tha',
-    tr => 'tur',
+    be => 'bel', cy => 'cym', ga => 'gle', gl => 'glg',
+    lb => 'ltz', mk => 'mkd', mt => 'mlt', oc => 'oci',
+    sc => 'srd',
+    sl => 'slv', sq => 'sqi', sr => 'srp', tr => 'tur',
     uk => 'ukr', vi => 'vie', zh => 'zho',
 );
 # }}}
@@ -53,54 +56,30 @@ my %iso1_to_3 = (
 # {{{ %known — auto-discovered from lib/Lingua/*/Num2Word.pm
 
 # Override table for legacy modules with non-standard API
+# Override table: only for modules with non-default limits or legacy function names.
+# All modules now live in Num2Word.pm with num2XXX_cardinal as canonical function.
 my %n2w_override = (
-    afr => { package => 'Numbers',   function => 'parse',           code => $template_obj, limit_hi => 99_999_999_999  },
-    eng => { package => 'Numbers',   limit_lo => 1, limit_hi => 999_999_999_999_999,
-             code => q{ use __PACKAGE_WITH_VERSION__ qw(American);
-                        my $tmp_obj = new __PACKAGE__;
-                        $tmp_obj->parse($number);
-                        $result = $tmp_obj->get_string;
-                      },
-           },
-    eus => { package => 'Numbers',   function => 'cardinal2alpha',  limit_hi => 999_999_999_999 },
-    fra => { package => 'Numbers',   limit_hi => 999_999_999_999_999,
-             code => q{ use Lingua::FRA::Numbers;
-                        my $tmp_obj = Lingua::FRA::Numbers->new($number);
-                        $result = $tmp_obj->get_string;
-                      },
-           },
-    ind => { package => 'Nums2Words', function => 'nums2words',     limit_hi => 999_999_999_999_999 },
-    ita => { package => 'Numbers',   function => 'number_to_it',    limit_hi => 999_999_999_999 },
-    jpn => { package => 'Number',    function => 'to_string', limit_lo => 1, limit_hi => 999_999_999_999_999,
+    afr => { limit_hi => 99_999_999_999 },
+    eng => { limit_lo => 1, limit_hi => 999_999_999_999_999 },
+    eus => { limit_hi => 999_999_999_999 },
+    fra => { limit_hi => 999_999_999_999_999 },
+    ind => { limit_hi => 999_999_999_999_999 },
+    ita => { limit_hi => 999_999_999_999 },
+    jpn => { limit_lo => 1, limit_hi => 999_999_999_999_999,
              code => q{ use __PACKAGE_WITH_VERSION__ ();
-                        my @words = __PACKAGE__::__FUNCTION__($number);
+                        my @words = __PACKAGE__::to_string($number);
                         $result = join ' ', @words;
                       },
            },
     nor => { function => 'num2no_cardinal', code => $template_obj },
-    pol => { package => 'Numbers',   function => 'parse',           code => $template_obj, limit_hi => 9_999_999_999_999 },
-    por => { package => 'Nums2Words', function => 'num2word',       limit_hi => 999_999_999_999_999 },
-    rus => { package => 'Number',    function => 'rur_in_words', limit_hi => 999_999_999_999_999,
-             code => q{ use __PACKAGE_WITH_VERSION__ ();
-                        $result = __PACKAGE__::__FUNCTION__($number);
-                        if ($result) {
-                            if ($number) {
-                                $result =~ s/\s+\S+\s+\S+\s+\S+$//;
-                            }
-                            else {
-                                $result =~ s/\s+\S+$//;
-                            }
-                            $result =~ s/^\s+//;
-                        }
-                      },
-           },
-    spa => { package => 'Numeros',   function => 'cardinal',        code => $template_obj, limit_hi => 999_999_999_999_999 },
+    pol => { limit_hi => 9_999_999_999_999 },
+    por => { limit_hi => 999_999_999_999_999 },
+    rus => { limit_hi => 999_999_999_999_999 },
+    spa => { limit_hi => 999_999_999_999_999 },
     swe => { function => 'num2sv_cardinal' },
-    zho => { package => 'Numbers',   limit_lo => 1, limit_hi => 999_999_999_999_999,
-             code => q{ use __PACKAGE_WITH_VERSION__ qw(traditional);
-                        my $tmp_obj = new __PACKAGE__;
-                        $tmp_obj->parse($number);
-                        $result = $tmp_obj->get_string;
+    zho => { limit_lo => 1, limit_hi => 999_999_999_999_999,
+             code => q{ use Lingua::ZHO::Num2Word qw(traditional);
+                        $result = Lingua::ZHO::Num2Word::number_to_zh($number);
                       },
            },
 );
@@ -133,6 +112,97 @@ my %n2w_override = (
             }
         }
     }
+}
+
+# }}}
+# {{{ default capabilities
+
+my %default_capabilities = (
+    cardinal => 1,
+    ordinal  => 0,
+    negative => 0,
+    decimal  => 0,
+    currency => 0,
+);
+
+# }}}
+# {{{ capabilities              query what a language module can do
+
+sub capabilities :Export {
+    my $self = ref($_[0]) ? shift : undef;
+    my $lang = shift // return;
+
+    $lang = lc $lang;
+    $lang = $iso1_to_3{$lang} if exists $iso1_to_3{$lang};
+
+    return if !exists $known{$lang};
+
+    # try to load the module's capabilities() if it has one
+    my $pkg = 'Lingua::' . uc($lang) . '::' . $known{$lang}{package};
+    my $caps;
+    eval {
+        (my $file = $pkg) =~ s{::}{/}g;
+        require "$file.pm";
+        if ($pkg->can('capabilities')) {
+            $caps = $pkg->capabilities();
+        }
+    };
+
+    # merge with defaults — module caps override defaults
+    my %result = %default_capabilities;
+    if ($caps && ref $caps eq 'HASH') {
+        $result{$_} = $caps->{$_} for keys %{$caps};
+    }
+
+    # add range from %known
+    $result{range} = [$known{$lang}{limit_lo} // 0, $known{$lang}{limit_hi} // 999_999_999];
+
+    return \%result;
+}
+
+# }}}
+# {{{ has_capability            check if a language supports a feature
+
+sub has_capability :Export {
+    my $self = ref($_[0]) ? shift : undef;
+    my $lang    = shift // return 0;
+    my $feature = shift // return 0;
+
+    my $caps = capabilities($lang);
+    return 0 unless $caps;
+    return $caps->{$feature} ? 1 : 0;
+}
+
+# }}}
+# {{{ ordinal                   convert number to ordinal text
+
+sub ordinal :Export {
+    my $self   = ref($_[0]) ? shift : Lingua::Num2Word->new();
+    my $result = '';
+    my $lang   = shift // return $result;
+    my $number = shift // return $result;
+
+    $lang = lc $lang;
+    $lang = $iso1_to_3{$lang} if exists $iso1_to_3{$lang};
+
+    return $result if !exists $known{$lang};
+    return $result if !has_capability($lang, 'ordinal');
+
+    my $pkg = 'Lingua::' . uc($lang) . '::' . $known{$lang}{package};
+    # derive ordinal function name from cardinal (handles legacy names like num2sv_)
+    my $cardinal_func = $known{$lang}{function} // "num2${lang}_cardinal";
+    my $func;
+    if ($cardinal_func =~ /_cardinal$/) {
+        ($func = $cardinal_func) =~ s/_cardinal$/_ordinal/;
+    }
+    else {
+        $func = "num2${lang}_ordinal";  # fallback for OO/legacy modules
+    }
+
+    eval "use $pkg (); \$result = ${pkg}::${func}(\$number);"; ## no critic
+    carp $@ if $@;
+
+    return $result;
 }
 
 # }}}
@@ -238,7 +308,7 @@ Lingua::Num2Word - Number to word conversion
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::Num2Word is a wrapper for modules for converting numbers into
 their equivalent in written representation.

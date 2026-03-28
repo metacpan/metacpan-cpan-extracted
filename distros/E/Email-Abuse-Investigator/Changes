@@ -1,0 +1,122 @@
+Revision history for Email-Abuse-Investigator
+
+0.04	Fri Mar 27 22:01:05 EDT 2026
+
+  Bug fixes
+
+  - Fixed abuse_contacts() silently discarding discovery routes that resolve
+    to an address already seen.  When the same abuse address is found via
+    multiple routes (e.g. Google as both the sending ISP via rDNS and the
+    owner of a blogspot.com URL in the body), the second and subsequent
+    roles are now accumulated rather than dropped.  Each hashref in the
+    returned list gains a 'roles' arrayref holding the individual role
+    strings, and 'role' (singular) is set to their join(' and ', ...) for
+    backward compatibility.  The dry-run footer in submit_abuse_report.pl
+    now reflects this: a merged entry shows both roles on one line and the
+    total line reads "N recipients (M contact routes merged)" when merging
+    has occurred.
+
+  - Fixed _decode_multipart() not recursing into nested multipart/* parts.
+    A message with Content-Type: multipart/mixed containing a nested
+    multipart/alternative (a common structure for HTML+plaintext mail) had
+    its body silently discarded, causing embedded_urls() to find no URLs
+    and abuse_contacts() to miss all URL-host contacts.  _decode_multipart()
+    now detects nested multipart/* parts, extracts the inner boundary from
+    the Content-Type header, and recurses to decode the inner container.
+
+  - Fixed abuse_contacts() section 4 (account provider lookup) incorrectly
+    matching the domain of an @ sign appearing in a display name rather than
+    the actual addr-spec.  A From: header of the form:
+      "evil@gmail.com" <real@hotmail.com>
+    was matching gmail.com instead of hotmail.com.  The addr-spec is now
+    extracted from the rightmost angle-bracket pair before the domain is
+    parsed; without angle brackets the whole value is used as before.
+
+  New features
+
+  - Added implausible_timezone (MEDIUM, weight 2) risk flag.  Numeric
+    timezone offsets in the Date: header are now validated against the
+    real-world range of +1400 (Line Islands) to -1200 (Baker Island).
+    Offsets outside that range, or with a minutes field >= 60, raise this
+    flag.  Positive and negative bounds are checked separately; a symmetric
+    limit would wrongly accept values such as -1300.
+
+  - Added Blogger/Blogspot and Google Sites to the built-in provider table:
+      blogspot.com       -> abuse@google.com
+      blogger.com        -> abuse@google.com
+      sites.google.com   -> abuse@google.com
+    Blogspot subdomains (e.g. ruseriver.blogspot.com) are handled by the
+    existing subdomain-stripping logic.
+
+  - Added ActiveCampaign to the built-in provider table:
+      activecampaign.com  -> abuse@activecampaign.com
+      ac-tinker.com       -> abuse@activecampaign.com  (tracking domain)
+
+0.03	Fri Mar 27 19:54:32 EDT 2026
+
+  Bug fixes
+
+  - Fixed spurious abuse reports being sent to the registrar or ISP of the
+    message recipient.  Bulk mailers routinely embed the recipient's email
+    address in the message body (personalisation footers, unsubscribe
+    confirmations, "this email was sent to you@example.com" lines).
+    _extract_and_analyse_domains() was collecting domains from the body
+    without first excluding the To: and Cc: recipients, causing innocent
+    parties to receive abuse reports.  The To:, Cc:, and Received: "for"
+    envelope-recipient domains are now built into an exclusion set --
+    including their registrable eTLD+1 parents -- before any body or header
+    scanning takes place.
+
+  - Fixed "no abuse contacts could be determined" when analysing email
+    sent via Salesforce Marketing Cloud (ExactTarget).  Three separate
+    causes were identified and corrected:
+
+    1. Salesforce Marketing Cloud was absent from the built-in provider
+       table.  Added salesforce.com, mc.salesforce.com, exacttarget.com,
+       and et.exacttarget.com, all mapping to abuse@salesforce.com.
+
+    2. Non-routable hostnames such as iad4s13mta756.xt.local (injected
+       by Salesforce's MTA into the Message-ID) were passing through the
+       domain collection pipeline and consuming a WHOIS lookup slot that
+       could never return an actionable result.  The $record closure in
+       _extract_and_analyse_domains() now rejects any domain whose TLD is
+       not at least two alphabetic characters, and explicitly rejects the
+       pseudo-TLDs .local, .internal, .lan, .localdomain, and .arpa.
+
+    3. When a message carries multiple DKIM-Signature headers (common
+       with ESPs: the first signs for the customer domain, the second
+       for the ESP infrastructure), _parse_auth_results_cached() took
+       only the first d= tag and stopped.  It now collects all d= domains
+       and sets dkim_domain to whichever one has a hit in the provider
+       table -- identifying the actionable ESP -- falling back to the
+       first if none match.  All collected domains are fed into the
+       domain analysis pipeline via the new dkim_domains arrayref in the
+       auth results hashref.
+
+  - The --dry-run output of submit_abuse_report.pl now appends a compact
+    recipient summary at the foot of the report:
+
+        Total: 2 recipients
+
+          abuse@tpg.com.au (Sending ISP)
+          abuse@godaddy.com (Domain registrar for firmluminary.com)
+
+    Previously only the count was shown.  The summary allows a user to
+    confirm at a glance who would receive reports without scrolling back
+    through the full numbered table.
+
+  - submit_abuse_report now produces fully RFC 5965 (ARF) compliant
+    messages.  The MIME structure changed from multipart/mixed (two parts)
+    to multipart/report; report-type=feedback-report (three parts):
+      Part 1  text/plain                 human-readable abuse report
+      Part 2  message/feedback-report    ARF machine-readable metadata
+      Part 3  message/rfc822             original spam message verbatim
+    The feedback-report part includes Feedback-Type, Version, User-Agent,
+    Source-IP, Original-Mail-From, Original-Rcpt-To, Arrival-Date,
+    Reported-Domain, Reported-Uri (one per URL), and Authentication-Results.
+
+0.02	Fri Mar 27 19:04:37 EDT 2026
+  - Added bin/submit_abuse_report
+
+0.01	Fri Mar 27 14:23:09 EDT 2026
+        First draft

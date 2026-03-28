@@ -1,5 +1,5 @@
 {
-   "abstract" : "Number 2 word conversion for ENG.",
+   "abstract" : "This module is deprecated. Please use Lingua::ENG::Num2Word instead.",
    "author" : [
       "Stephen Pandich <pandich@yahoo.com>"
    ],
@@ -22,11 +22,10 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Exporter" : "0",
-            "base" : "0",
+            "Export::Attrs" : "0",
+            "Lingua::ENG::Num2Word" : "0",
             "perl" : "v5.16.0",
             "utf8" : "0",
-            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -42,7 +41,7 @@
    "provides" : {
       "Lingua::ENG::Numbers" : {
          "file" : "lib/Lingua/ENG/Numbers.pm",
-         "version" : "0.2603260"
+         "version" : "0.2603270"
       }
    },
    "release_status" : "stable",
@@ -52,7 +51,7 @@
          "web" : "https://metacpan.org/author/PETAMEM"
       }
    },
-   "version" : "0.2603260",
+   "version" : "0.2603270",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "GPL-2.0-only"

@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Colouring::In::XS', $VERSION);
@@ -47,7 +47,7 @@ Colouring::In::XS - color or colour.
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
@@ -332,7 +332,6 @@ Please report any bugs or feature requests to C<bug-colouring-in-xs at rt.cpan.o
 the web interface at L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Colouring-In-XS>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
@@ -358,7 +357,7 @@ L<https://metacpan.org/release/Colouring-In-XS>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2024->2025 by LNATION.
+This software is Copyright (c) 2024->2026 by LNATION.
 
 This is free software, licensed under:
 

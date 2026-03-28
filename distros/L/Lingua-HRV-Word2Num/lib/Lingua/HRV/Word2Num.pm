@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = hrv_numerals();
 
 # }}}
@@ -116,6 +116,7 @@ sub hrv_numerals {
              |  'milijun'                   { 1_000_000                              }
 
         megas:  'milijuna'
+             |  'milijun'
     });
 }
 
@@ -138,7 +139,7 @@ Lingua::HRV::Word2Num - Word to number conversion in Croatian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::HRV::Word2Num is module for converting Croatian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

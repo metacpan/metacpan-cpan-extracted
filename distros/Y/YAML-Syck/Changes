@@ -1,3 +1,28 @@
+1.42 Mar 27 2026
+
+  [Bug Fixes]
+  - Fix: replace strtok() with strpbrk() and fix sign-compare warnings in
+    perl_syck.h (PR #145)
+  - Fix: terminate plain scalars at document boundaries --- and ... (PR #150)
+  - Fix: skip %TAG and %YAML directives in document header (PR #151)
+  - Fix: plug SV leak when eval_pv croaks on bad perl/code blocks (PR #153)
+  - Fix: allow non-specific tag '!' before block scalars (GH #27, PR #102)
+  - Fix: remove spurious %type <nodeId> for indent_open in gram.y
+    (GH #157, PR #158)
+  - Fix: use modern bison %define api.prefix directive (GH #159, PR #160)
+
+  [Improvements]
+  - Implement YAML merge key (<<) support (PR #149)
+
+  [Maintenance]
+  - Remove dead Perl 5.6/5.8 version guards from test files (PR #146)
+  - Add YAML 1.0 spec compliance audit and coverage tests (PR #148)
+  - Add comprehensive round-trip tests for YAML 1.0 spec features (PR #152)
+  - Remove unneeded TODO in t/json-basic.t (PR #154)
+  - Add regex Dump/Load/round-trip tests to perl tag scheme (PR #155)
+  - Do not require a .y file to build YAML::Syck; add brew support for bison
+  - Don't ship docs/ directory in tarball
+
 1.41 Mar 22 2026
 
   [Bug Fixes]

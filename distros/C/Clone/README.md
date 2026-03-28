@@ -134,7 +134,7 @@ Clone properly handles circular references, preventing infinite loops:
 
 ## Limitations
 
-* **Maximum Recursion Depth**: Clone supports structures up to 32,000 levels deep. Deeper structures will cause the clone operation to fail with an error. This limit prevents stack overflow and ensures safe operation.
+* **Maximum Recursion Depth**: Clone uses a recursion depth counter to prevent stack overflow. The default limit is 4000 rdepth units on Linux/macOS and 2000 on Windows/Cygwin. Each nesting level consumes approximately 2 rdepth units, so the effective limits are roughly 2000 nesting levels on Linux/macOS and 1000 on Windows/Cygwin. For arrays, exceeding the limit triggers an iterative fallback. For other types, it produces a warning and a shallow copy. You can override the limit via `clone($data, $depth)`.
 
 * **Filehandles and IO Objects**: Filehandles and IO objects are cloned, but the underlying file descriptor is shared. Both the original and cloned filehandle will refer to the same file position. For DBI database handles and similar objects, Clone attempts to handle them safely, but behavior may vary depending on the object type.
 

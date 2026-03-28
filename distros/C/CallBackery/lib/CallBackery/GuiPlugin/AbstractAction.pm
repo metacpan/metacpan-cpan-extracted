@@ -70,6 +70,11 @@ has 'user'=> sub ($self) {
             return {};
         };
     }
+    unless (defined &MockUser::controller) {
+        *MockUser::controller = sub ($mockSelf) {
+            return undef;
+        };
+    }
     return $mockUser;
 };
 

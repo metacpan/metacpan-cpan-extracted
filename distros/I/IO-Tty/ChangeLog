@@ -1,3 +1,26 @@
+1.24 2026-03-27 Todd Rinaldo <toddr@cpan.org>
+
+  Bug Fixes:
+    * GH #54, PR #55 - Fix slave pty reopening on Solaris/illumos. After
+      close_slave(), reopening with plain Perl open() skipped pushing
+      STREAMS modules (ptem, ldterm, ttcompat), causing isatty() to
+      return false. Added _open_tty() XS function that opens the device
+      and pushes STREAMS modules on platforms that support I_PUSH.
+    * GH #56, PR #58 - Fix undef warnings on Perl 5.8.8 by removing the
+      undef operator on localized $SIG{__DIE__}, and fix XS ttyname() on
+      older Perls by avoiding the InOutStream typemap which can return
+      NULL for filehandles created via new_from_fd.
+    * GH #57, PR #59 - Add __BSD_VISIBLE for FreeBSD in function probes.
+      The _XOPEN_SOURCE definition hid BSD extensions like strlcpy,
+      causing probe failures and subsequent compile errors from
+      conflicting static/non-static declarations.
+
+  Maintenance:
+    * PR #60 - Modernize Makefile.PL: replace BUILD_REQUIRES with
+      TEST_REQUIRES (EUMM 6.64+), add CONFIGURE_REQUIRES, upgrade
+      META_MERGE to meta-spec v2, modernize generated Constant.pm to
+      use 'our' instead of 'use vars', and remove dead PPD postamble.
+
 1.23 2026-03-24 Todd Rinaldo <toddr@cpan.org>
 
   Bug Fixes:

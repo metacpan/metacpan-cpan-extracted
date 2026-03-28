@@ -100,8 +100,6 @@ result: !perl/code: '{ 42 + + 54ih a; $" }'
         $before = Devel::Leak::NoteSV($handle);
         eval { Load($yaml) } for ( 1 .. 10 );
         $diff = Devel::Leak::NoteSV($handle) - $before;
-        local $TODO = "It looks like evals leak, but we're better than Storable"
-          if $diff;
         is( $diff, 0, "No leaks - Load failure (code)" );
     }
 
@@ -136,8 +134,6 @@ result: !perl/code: '{ 42 + + 54ih a; $" }'
     }
     $diff = Devel::Leak::NoteSV($handle) - $before;
 
-    local $TODO = "It looks like evals leak, but we're better than Storable"
-      if $diff;
     is( $diff, 0, "No leaks - Dump code" );
 
     # Check if dumping a filehandle leaks (rt.cpan.org #41199)

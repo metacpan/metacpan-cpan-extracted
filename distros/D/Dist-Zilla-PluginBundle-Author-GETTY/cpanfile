@@ -7,6 +7,7 @@ requires 'Dist::Zilla::Plugin::Deprecated', '0.007';
 requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch', '0.006';
 requires 'Dist::Zilla::Plugin::GithubMeta', '0.28';
 requires 'Dist::Zilla::Plugin::InstallRelease', '0.008';
+requires 'Dist::Zilla::Plugin::MakeMaker::Awesome', '0.48';
 requires 'Dist::Zilla::Plugin::MakeMaker::SkipInstall', '1.100';
 requires 'Dist::Zilla::Plugin::ModuleBuildTiny', '0.008';
 requires 'Dist::Zilla::Plugin::PodWeaver', '3.101641';

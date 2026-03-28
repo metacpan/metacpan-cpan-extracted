@@ -13,7 +13,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 our %Digits = (
         nol => 0, kosong => 0,
@@ -246,7 +246,7 @@ Lingua::IND::Words2Nums - convert Indonesian verbage to number.
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 =head1 SYNOPSIS
 

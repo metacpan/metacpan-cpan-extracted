@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+# -----------------------------------------------------------------------
+# example_abuse_check.pl  --  demonstrate Email::Abuse::Investigator
+#
+# Usage:
+#   perl example_abuse_check.pl spam.eml
+#   perl example_abuse_check.pl < spam.eml
+# -----------------------------------------------------------------------
+use 5.010;
+
+use strict;
+use warnings;
+use autodie qw(:all);
+
+use utf8;
+use open qw(:std :encoding(UTF-8));
+use lib '.';					# find Mail/Message/Abuse.pm nearby
+use Email::Abuse::Investigator;
+
+# ---- Read the raw email ------------------------------------------------
+my $raw;
+if (@ARGV) {
+	open my $fh, '<:raw', $ARGV[0] or die "Cannot open $ARGV[0]: $!";
+	local $/;
+	$raw = <$fh>;
+	close $fh;
+} else {
+	binmode STDIN, ':raw';
+	local $/;
+	$raw = <STDIN>;
+}
+die 'No email data supplied' unless $raw && length $raw;
+
+# ---- Analyse -----------------------------------------------------------
+my $analyser = Email::Abuse::Investigator->new(
+	verbose => 1,
+	timeout => 15,
+	# List your own outbound relay IPs/CIDRs here so they are skipped
+	# when walking the Received: chain for the true origin:
+	# trusted_relays => ['192.0.2.1', '198.51.100.0/24'],
+);
+$analyser->parse_email($raw);
+
+# ---- Full analyst report -----------------------------------------------
+print $analyser->report();
+
+# ---- Send-ready abuse report text and contacts -------------------------
+my @contacts = $analyser->abuse_contacts();
+if (@contacts) {
+	print "\n";
+	print '=' x 72, "\n";
+	print "  ABUSE REPORT TEXT (send this to each contact below)\n";
+	print '=' x 72, "\n\n";
+	print $analyser->abuse_report_text();
+
+	print "\n";
+	print '=' x 72, "\n";
+	print "  SEND TO:\n";
+	print '=' x 72, "\n";
+	for my $c (@contacts) {
+		printf "  %-45s  %s\n", $c->{address}, $c->{role};
+	}
+	print "\n";
+} else {
+	print "\n(No abuse contacts could be determined.)\n";
+}
+
+exit 0;

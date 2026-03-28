@@ -64,16 +64,23 @@ t/tag-overflow.t
 t/TestYAML.pm
 t/yaml-alias.t
 t/yaml-blessed-ref.t
+t/yaml-block-scalars.t
 t/yaml-bytes-utf8.t
+t/yaml-comments.t
+t/yaml-directives.t
 t/yaml-dumpinto.t
 t/yaml-empty-collections.t
 t/yaml-equals-scalar.t
 t/yaml-implicit-typing.t
 t/yaml-implicit-warnings.t
 t/yaml-magic-vars.t
+t/yaml-merge-key.t
+t/yaml-multi-document.t
 t/yaml-nested-flow.t
+t/yaml-roundtrip.t
 t/yaml-str-colon-first.t
 t/yaml-tie.t
+t/yaml-timestamps.t
 t/yaml-utf.t
 token.c
 META.yml                                 Module YAML meta-data (added by MakeMaker)

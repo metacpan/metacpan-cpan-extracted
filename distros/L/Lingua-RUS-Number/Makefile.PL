@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in RUS.",
+  "ABSTRACT" => "This module is deprecated. Please use Lingua::RUS::Num2Word instead.",
   "AUTHOR" => "Vladislav A. Safronov <vlad at yandex.ru>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,9 +17,10 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::RUS::Number",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Export::Attrs" => 0,
+    "Lingua::RUS::Num2Word" => 0,
     "utf8" => 0,
-    "vars" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::More::UTF8" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603260",
+  "VERSION" => "0.2603270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,12 +36,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Export::Attrs" => 0,
+  "Lingua::RUS::Num2Word" => 0,
   "Test::More" => 0,
   "Test::More::UTF8" => 0,
   "strict" => 0,
   "utf8" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

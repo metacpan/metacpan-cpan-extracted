@@ -1,15 +1,15 @@
 use FindBin;
 BEGIN { push @INC, $FindBin::Bin }
 
-use TestYAML tests => 18;
+use TestYAML tests => 25;
 
 ok( YAML::Syck->VERSION );
 
 # These tests assume object creation.
 $YAML::Syck::LoadBlessed = 1;
 
-#use YAML;
-#use Test::More 'no_plan';
+# perl 5.13.5+ uses (?^:...) syntax for regex stringification
+use constant REGEX_CARET => qr// =~ /\Q(?^\E/;
 
 # This file is based on pyyaml wiki entry for PerlTagScheme, and Ingy's
 # guidance.
@@ -70,13 +70,46 @@ sub yaml_is {
 }
 
 {
-    # FIXME regexes
+    # Dump: unblessed regex
     my $regex = qr/a(b|c)d/;
+    if (REGEX_CARET) {
+        yaml_is( Dump($regex), "--- !!perl/regexp (?^:a(b|c)d)\n" );
+    }
+    else {
+        yaml_is( Dump($regex), "--- !!perl/regexp (?-xism:a(b|c)d)\n" );
+    }
 
-    #print Dump($regex);
+    # Dump: blessed regex
     bless $regex, "Foo::bar";
+    if (REGEX_CARET) {
+        yaml_is( Dump($regex), "--- !!perl/regexp:Foo::bar (?^:a(b|c)d)\n" );
+    }
+    else {
+        yaml_is( Dump($regex), "--- !!perl/regexp:Foo::bar (?-xism:a(b|c)d)\n" );
+    }
+}
 
-    #print Dump($regex);
+{
+    # Load: unblessed regex
+    my $yaml_re = REGEX_CARET ? "(?^:a(b|c)d)" : "(?-xism:a(b|c)d)";
+    my $re = Load("--- !!perl/regexp $yaml_re\n");
+    is( ref($re), "Regexp" );
+    ok( "abd" =~ $re, "loaded regexp matches" );
+}
+
+{
+    # Load: blessed regex
+    my $yaml_re = REGEX_CARET ? "(?^:a(b|c)d)" : "(?-xism:a(b|c)d)";
+    my $re = Load("--- !!perl/regexp:Foo::bar $yaml_re\n");
+    is( ref($re), "Foo::bar" );
+    ok( "acd" =~ $re, "loaded blessed regexp matches" );
+}
+
+{
+    # Round-trip
+    my $re = qr/hello\s+world/i;
+    my $loaded = Load( Dump($re) );
+    is( "$loaded", "$re", "regexp round-trips" );
 }
 
 {

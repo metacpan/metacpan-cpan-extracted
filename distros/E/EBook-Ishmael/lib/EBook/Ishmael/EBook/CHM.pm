@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::CHM;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -13,6 +13,7 @@ use XML::LibXML;
 
 use EBook::Ishmael::Dir;
 use EBook::Ishmael::EBook::Metadata;
+use EBook::Ishmael::HTML qw(prepare_html);
 use EBook::Ishmael::ImageID qw(image_path_id image_size);
 use EBook::Ishmael::ShellQuote qw(safe_qx);
 
@@ -223,9 +224,8 @@ sub html {
 
         my ($body) = $dom->findnodes('/html/body');
         $body //= $dom->documentElement;
-
         _clean_html($body);
-
+        prepare_html($body);
         map { $_->toString } $body->childNodes;
 
     } @{ $self->{_content} };
@@ -258,7 +258,7 @@ sub raw {
 
         my ($body) = $dom->findnodes('/html/body');
         $body //= $dom->documentElement;
-
+        prepare_html($body);
         $body->textContent;
 
     } @{ $self->{_content} };

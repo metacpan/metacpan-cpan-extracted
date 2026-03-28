@@ -1,6 +1,6 @@
 Revision history for Lingua-ZHO-Numbers
 
-0.2603260  2026-03-26
-    - improve CPAN kwalitee: Changes, META.json, LICENSE POD, MetaResources
-    - replace \x{HHHH} hex escapes with literal UTF-8 characters
+0.2603270  2026-03-27
+    - rename all 10 legacy Num2Word modules to canonical namespace
+    - capabilities infrastructure: introspection + ordinal stub
 

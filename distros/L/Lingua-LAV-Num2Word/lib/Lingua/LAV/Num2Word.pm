@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my %token1 = qw( 0 nulle           1 viens          2 divi
                  3 trīs            4 četri          5 pieci
                  6 seši            7 septiņi        8 astoņi
@@ -155,6 +155,17 @@ sub num2lav_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -172,7 +183,7 @@ Lingua::LAV::Num2Word - Number to word conversion in Latvian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::LAV::Num2Word is module for conversion of numbers into their
 representation in Latvian. It converts whole numbers from 0 up to

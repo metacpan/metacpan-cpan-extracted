@@ -1,0 +1,25 @@
+bin/abuse_check
+bin/submit_abuse_report
+Changes
+cpanfile
+lib/Email/Abuse/Investigator.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/critic.t
+t/edge-cases.t
+t/eof.t
+t/eol.t
+t/extended_tests.t
+t/function.t
+t/integration.t
+t/kwalitee.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

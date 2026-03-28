@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in POR.",
+  "ABSTRACT" => "This module is deprecated. Please use Lingua::POR::Num2Word instead.",
   "AUTHOR" => "Jose Castro <cog\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,14 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::POR::Nums2Words",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Export::Attrs" => 0,
+    "Lingua::POR::Num2Word" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.2603260",
+  "VERSION" => "0.2603270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,7 +34,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Export::Attrs" => 0,
+  "Lingua::POR::Num2Word" => 0,
   "Test::More" => 0,
   "utf8" => 0,
   "warnings" => 0

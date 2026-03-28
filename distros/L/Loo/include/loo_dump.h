@@ -833,15 +833,33 @@ ddc_dump_ref(pTHX_ SV *val, DDCStyle *style, int depth)
             return;
         }
 #else
-        /* Pre-5.12: regex is a blessed PVMG; detect by class name.
+        /* Pre-5.12: regex is a blessed PVMG; detect by class name
+           OR by the presence of PERL_MAGIC_qr (for re-blessed regexes).
            Stringify with SvPV on the ref, giving (?flags:pattern). */
-        if (clen == 6 && strEQ(classname, "Regexp")) {
+        if ((clen == 6 && strEQ(classname, "Regexp")) ||
+            (SvMAGICAL(inner) && mg_find(inner, PERL_MAGIC_qr))) {
+            int is_reblessed = !(clen == 6 && strEQ(classname, "Regexp"));
+            const char *bfn;
             STRLEN rlen;
             const char *rpv = SvPV(val, rlen);
-            SV *wrapped = newSVpvs("qr/");
+            SV *wrapped = newSVpvs("");
+
+            if (is_reblessed) {
+                bfn = (style->bless_str && style->bless_str[0])
+                      ? style->bless_str : "bless";
+                sv_catpvn(wrapped, bfn, strlen(bfn));
+                sv_catpvn(wrapped, "( ", 2);
+            }
+            sv_catpvn(wrapped, "qr/", 3);
             if (rpv && rlen)
                 sv_catpvn(wrapped, rpv, rlen);
             sv_catpvn(wrapped, "/", 1);
+            if (is_reblessed) {
+                sv_catpvn(wrapped, ", '", 3);
+                sv_catpvn(wrapped, classname, clen);
+                sv_catpvn(wrapped, "' )", 3);
+            }
+
             {
                 STRLEN wlen;
                 const char *wpv = SvPV(wrapped, wlen);

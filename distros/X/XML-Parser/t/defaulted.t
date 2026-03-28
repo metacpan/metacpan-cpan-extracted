@@ -1,10 +1,12 @@
-BEGIN { print "1..4\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 4;
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
 
-$doc = <<'End_of_Doc;';
+# Test 1: module loads
+ok( 1, 'XML::Parser loaded' );
+
+my $doc = <<'End_of_Doc;';
 <!DOCTYPE foo [
 <!ATTLIST bar zz CDATA 'there'>
 ]>
@@ -14,37 +16,34 @@ $doc = <<'End_of_Doc;';
 </foo>
 End_of_Doc;
 
-sub st {
-    my $xp = shift;
-    my $el = shift;
+# Track which test numbers to run for each <bar> element
+my $test_index = 2;
 
-    if ( $el eq 'bar' ) {
-        my %atts = @_;
-        my %isdflt;
-        my $specified = $xp->specified_attr;
+my $p = XML::Parser->new(
+    Handlers => {
+        Start => sub {
+            my $xp = shift;
+            my $el = shift;
 
-        for ( my $i = $specified; $i < @_; $i += 2 ) {
-            $isdflt{ $_[$i] } = 1;
-        }
+            if ( $el eq 'bar' ) {
+                my %atts = @_;
+                my %isdflt;
+                my $specified = $xp->specified_attr;
 
-        if ( defined $atts{xx} ) {
-            print 'not '
-              if $isdflt{'xx'};
-            print "ok 2\n";
+                for ( my $i = $specified; $i < @_; $i += 2 ) {
+                    $isdflt{ $_[$i] } = 1;
+                }
 
-            print 'not '
-              unless $isdflt{'zz'};
-            print "ok 3\n";
-        }
-        else {
-            print 'not '
-              if $isdflt{'zz'};
-            print "ok 4\n";
-        }
-
+                if ( defined $atts{xx} ) {
+                    ok( !$isdflt{'xx'}, 'xx attribute is not defaulted' );
+                    ok( $isdflt{'zz'},  'zz attribute is defaulted when xx is specified' );
+                }
+                else {
+                    ok( !$isdflt{'zz'}, 'zz attribute is not defaulted when explicitly set' );
+                }
+            }
+        },
     }
-}
-
-$p = new XML::Parser( Handlers => { Start => \&st } );
+);
 
 $p->parse($doc);

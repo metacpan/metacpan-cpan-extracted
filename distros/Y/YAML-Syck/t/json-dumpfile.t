@@ -47,17 +47,12 @@ my $expected_json = JSON::Syck::Dump($data);
 }
 
 # dump to indirect file handles
-SKIP: {
-    skip "indirect file handles require 5.6 or later", 1 unless $] >= 5.006000;
-    eval q[
-
-    open(my $h, '>', 'dumpfile.json');
-    DumpFile($h, $data);
+{
+    open( my $h, '>', 'dumpfile.json' );
+    DumpFile( $h, $data );
     close $h;
-    file_contents_is('dumpfile.json', $expected_json, 'DumpFile works with indirect file handles');
+    file_contents_is( 'dumpfile.json', $expected_json, 'DumpFile works with indirect file handles' );
     unlink 'dumpfile.json' or die $!;
-
-];
 }
 
 # dump to ordinary filehandles
@@ -81,16 +76,11 @@ SKIP: {
 }
 
 # dump to "in memory" file
-SKIP: {
-    skip "in-memory files require 5.8 or later", 1 unless $] >= 5.00800;
-    eval q[
-
-    open(my $h, '>', \my $s);
-    DumpFile($h, $data);
+{
+    open( my $h, '>', \my $s );
+    DumpFile( $h, $data );
     close($h);
-    is($s, $expected_json, 'DumpFile works with in-memory files');
-
-];
+    is( $s, $expected_json, 'DumpFile works with in-memory files' );
 }
 
 # dump to tied filehandle

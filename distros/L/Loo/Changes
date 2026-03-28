@@ -12,3 +12,9 @@ Revision history for Loo
 
 0.06	2026/03/26
 	- Fix various bugs around parsing variable names via AELEM* should now hopefully support 5.10 -> latest
+
+0.07	2026/03/27
+	- Fix deparse blank line on older Perls (5.10-5.12) for postfix for loops
+	- Fix OP_EMPTYAVHV guard to support Perl 5.36-5.38 empty {} and [] constructors
+	- Fix blessed regex detection on pre-5.12 Perls using PERL_MAGIC_qr
+	- Fix Sortkeys coderef test expecting array ref instead of hash ref

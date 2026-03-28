@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in ZHO.",
+  "ABSTRACT" => "This module is deprecated. Please use Lingua::ZHO::Num2Word instead.",
   "AUTHOR" => "Autrijus Tang <autrijus\@autrijus.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,18 +18,17 @@ my %WriteMakefileArgs = (
   "NAME" => "Lingua::ZHO::Numbers",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "Exporter" => 0,
-    "base" => 0,
-    "strict" => 0,
+    "Export::Attrs" => 0,
+    "Lingua::ZHO::Num2Word" => 0,
     "utf8" => 0,
-    "vars" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
-    "Test::More" => 0
+    "Test::More" => 0,
+    "strict" => 0
   },
-  "VERSION" => "0.2603260",
+  "VERSION" => "0.2603270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,13 +37,12 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Exporter" => 0,
+  "Export::Attrs" => 0,
+  "Lingua::ZHO::Num2Word" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
-  "base" => 0,
   "strict" => 0,
   "utf8" => 0,
-  "vars" => 0,
   "warnings" => 0
 );
 

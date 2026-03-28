@@ -1,35 +1,48 @@
 package Pod::Elemental::Transformer::Author::GETTY;
-# ABSTRACT: Transform custom POD commands to =head2
-our $VERSION = '0.304';
+# ABSTRACT: Transform custom POD commands to =head1 and =head2
+our $VERSION = '0.305';
 use Moose;
 with 'Pod::Elemental::Transformer';
 
 use namespace::autoclean;
 
 
-my @COMMANDS = qw(
+# Commands that transform to =head1 with specific content
+my %HEAD1_COMMANDS = (
+  synopsis    => 'SYNOPSIS',
+  description => 'DESCRIPTION',
+  seealso     => 'SEE ALSO',
+);
+
+# Commands that transform to =head2 (keeping content as-is)
+my @HEAD2_COMMANDS = qw(
   attr
   method
   func
   opt
   env
-  event
   hook
-  resource
-  seealso
   example
 );
 
-my %IS_COMMAND = map { $_ => 1 } @COMMANDS;
+my %IS_HEAD2_COMMAND = map { $_ => 1 } @HEAD2_COMMANDS;
 
 sub transform_node {
   my ($self, $node) = @_;
 
   for my $child (@{ $node->children }) {
-    # Transform matching commands to head2
-    if ($child->isa('Pod::Elemental::Element::Pod5::Command')
-        && $IS_COMMAND{ $child->command }) {
-      $child->{command} = 'head2';
+    if ($child->isa('Pod::Elemental::Element::Pod5::Command')) {
+      my $cmd = $child->command;
+
+      # Transform head1 commands (replace content with fixed heading)
+      if (my $heading = $HEAD1_COMMANDS{$cmd}) {
+        $child->{command} = 'head1';
+        $child->{content} = $heading;
+      }
+      # Transform head2 commands (keep content)
+      elsif ($IS_HEAD2_COMMAND{$cmd}) {
+        $child->{command} = 'head2';
+      }
     }
 
     # Recurse into nested structures
@@ -53,11 +66,11 @@ __END__
 
 =head1 NAME
 
-Pod::Elemental::Transformer::Author::GETTY - Transform custom POD commands to =head2
+Pod::Elemental::Transformer::Author::GETTY - Transform custom POD commands to =head1 and =head2
 
 =head1 VERSION
 
-version 0.304
+version 0.305
 
 =head1 SYNOPSIS
 
@@ -66,13 +79,31 @@ version 0.304
 
 =head1 DESCRIPTION
 
-This transformer converts custom POD commands into standard C<=head2> commands.
-The commands are left in place (not collected into sections), so documentation
-stays close to the code it documents.
+This transformer converts custom POD commands into standard C<=head1> and
+C<=head2> commands. The commands are left in place (not collected into
+sections), so documentation stays close to the code it documents.
 
 =head1 SUPPORTED COMMANDS
 
-The following commands are transformed to C<=head2>:
+=head2 Section Commands (transform to C<=head1>)
+
+=over 4
+
+=item *
+
+C<=synopsis> - transforms to C<=head1 SYNOPSIS>
+
+=item *
+
+C<=description> - transforms to C<=head1 DESCRIPTION>
+
+=item *
+
+C<=seealso> - transforms to C<=head1 SEE ALSO>
+
+=back
+
+=head2 Inline Commands (transform to C<=head2>)
 
 =over 4
 
@@ -98,19 +129,7 @@ C<=env> - for documenting environment variables
 
 =item *
 
-C<=event> - for documenting events
-
-=item *
-
 C<=hook> - for documenting hooks
-
-=item *
-
-C<=resource> - for documenting resources/features
-
-=item *
-
-C<=seealso> - for documenting related modules
 
 =item *
 
@@ -131,11 +150,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,7 +17,7 @@ use Export::Attrs;
 # {{{ var block
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2015-present';
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # }}}
 
@@ -77,6 +77,59 @@ sub num2nld_cardinal :Export {
 
 # }}}
 
+# {{{ num2nld_ordinal                 convert number to ordinal text
+
+sub num2nld_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals
+    return 'nulde'  if $number == 0;
+    return 'eerste' if $number == 1;
+    return 'tweede' if $number == 2;
+    return 'derde'  if $number == 3;
+
+    my $cardinal = num2nld_cardinal($number);
+
+    # Numbers 1-19 and compounds ending in 1-19: add "de"
+    # Numbers >= 20 that are round tens/hundreds/etc: add "ste"
+    # Rule: 2-19 get "de", 20+ get "ste", compounds follow last element
+
+    # Determine the suffix: "de" for 2-19, "ste" for >= 20
+    # For compound numbers, it depends on the last component
+    my $last_part = $number;
+    if ($number >= 20) {
+        $last_part = $number % 10;  # units digit
+        if ($last_part == 0) {
+            # Round number, use "ste"
+            return $cardinal . 'ste';
+        }
+        # compound: the ordinal is based on the whole cardinal + suffix
+        # For compounds with units 1-19: use "ste" (since total >= 20)
+        return $cardinal . 'ste';
+    }
+
+    # 4-19: cardinal + "de"
+    return $cardinal . 'de';
+}
+
+# }}}
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 1,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -92,7 +145,7 @@ Lingua::NLD::Num2Word - Number to word conversion in Dutch
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::NLD::Num2Word is module for converting numbers into their written
 representation in Dutch. Converts whole numbers from 0 up to 999 999 999.
@@ -148,6 +201,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2nld_cardinal
+
+=item num2nld_ordinal
 
 =back
 

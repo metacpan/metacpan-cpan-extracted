@@ -9,7 +9,7 @@ our @ISA       = qw(Exporter);
 our @EXPORT;
 our @EXPORT_OK = qw( clone );
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 XSLoader::load('Clone', $VERSION);
 
@@ -125,9 +125,20 @@ Clone properly handles circular references, preventing infinite loops:
 
 =item * Maximum Recursion Depth
 
-Clone supports structures up to 32,000 levels deep. Deeper structures
-will cause the clone operation to fail with an error. This limit prevents
-stack overflow and ensures safe operation.
+Clone uses a recursion depth counter to prevent stack overflow.
+The default limit is 4000 rdepth units on Linux/macOS and 2000 on
+Windows/Cygwin. Each nesting level consumes approximately 2 rdepth
+units, so the effective limits are roughly 2000 nesting levels on
+Linux/macOS and 1000 on Windows/Cygwin.
+
+For arrays, exceeding the limit triggers an iterative fallback that
+avoids stack overflow. For other reference types (hashes, scalars),
+exceeding the limit produces a warning and a shallow copy.
+
+You can override the depth limit by passing it as the second argument
+to C<clone()>:
+
+    my $copy = clone($data, 8000);  # allow deeper recursion
 
 =item * Filehandles and IO Objects
 

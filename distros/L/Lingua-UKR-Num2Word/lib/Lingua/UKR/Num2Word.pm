@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my %token1 = (
      0 => 'нуль',
      1 => 'один',          2 => 'два',
@@ -144,6 +144,17 @@ sub num2ukr_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -161,7 +172,7 @@ Lingua::UKR::Num2Word - Number to word conversion in Ukrainian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::UKR::Num2Word is module for conversion numbers into their representation
 in Ukrainian. It converts whole numbers from 0 up to 999 999 999.

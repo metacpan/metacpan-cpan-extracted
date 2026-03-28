@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $COPY     = 'Copyright (c) PetaMem, s.r.o. 2003-present';
 my $parser   = pol_numerals();
 
@@ -125,7 +125,7 @@ Lingua::POL::Word2Num - Word to number conversion in Polish
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::POL::Word2Num is module for converting text containing number
 representation in polish back into number. Converts whole numbers from 0 up

@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::FictionBook2;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use MIME::Base64;
 
 use XML::LibXML;
 
+use EBook::Ishmael::HTML qw(prepare_html);
 use EBook::Ishmael::ImageID qw(mimetype_id);
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::Time qw(guess_time);
@@ -185,6 +186,7 @@ sub html {
         '/FictionBook:FictionBook' .
         '/FictionBook:body'
     ) or die "Invalid FictionBook2 file $self->{Source}\n";
+    prepare_html(@bodies);
 
     my $html = join '',
         map { $_->toString }
@@ -218,6 +220,7 @@ sub raw {
         '/FictionBook:FictionBook' .
         '/FictionBook:body'
     ) or die "Invalid FictionBook2 file $self->{Source}\n";
+    prepare_html(@bodies);
 
     my $raw = join '', map { $_->textContent } @bodies;
 

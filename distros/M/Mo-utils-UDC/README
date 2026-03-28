@@ -1,0 +1,89 @@
+NAME
+    Mo::utils::UDC - Mo utilities for Universal Decimal Classification.
+
+SYNOPSIS
+     use Mo::utils::UDC qw(check_udc);
+
+     check_udc($self, $key);
+
+DESCRIPTION
+    Mo Universal Decimal Classification utilities for checking of data
+    objects.
+
+SUBROUTINES
+  "check_udc"
+     check_udc($self, $key);
+
+    Check parameter defined by $key if it's valid UDC (Universal Decimal
+    Classification) string. Value could be undefined or doesn't exist.
+
+    Returns undef.
+
+ERRORS
+     check_udc():
+             Parameter '%s' doesn't contain valid Universal Decimal Classification string.
+                     Error: %s
+                     Value: %s
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::UDC qw(check_udc);
+
+     my $self = {
+             'key' => '821.111(73)-31"19"',
+     };
+     check_udc($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::UDC qw(check_udc);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => '821:.5',
+     };
+     check_udc($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...UDC.pm:?] Parameter 'key' doesn't contain valid Universal Decimal Classification string.
+
+DEPENDENCIES
+    Business::UDC, Error::Pure, Exporter, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+    Mo::utils
+        Mo utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-UDC>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

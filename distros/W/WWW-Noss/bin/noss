@@ -940,7 +940,7 @@ the C<--time-format> option.
 
 =item "B<colors>": { "I<code>": "I<color>", ... }
 
-Key-value of map of color codes (range C<0>-C<16>) and their color names. A
+Key-value map of color codes (range C<0>-C<16>) and their color names. A
 list of default color codes values are documented under
 L</FORMATTING/Default Color Codes>.
 

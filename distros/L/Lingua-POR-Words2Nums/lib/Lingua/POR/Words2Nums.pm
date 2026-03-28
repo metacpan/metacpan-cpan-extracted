@@ -13,7 +13,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 my (%values,@values,%bigvalues,@bigvalues);
 
@@ -142,7 +142,7 @@ Lingua::POR::Words2Nums - Converts Portuguese words to numbers
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 =head1 SYNOPSIS
 

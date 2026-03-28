@@ -57,9 +57,7 @@ is( LoadFile('loadfile.yml'), "a simple scalar", 'LoadFile works with file names
 }
 
 # read via indirect file handles
-SKIP: {
-    skip "indirect file handles require 5.6 or later", 1 unless $] >= 5.006000;
-
+{
     open( my $h, 'loadfile.yml' );
     is( LoadFile($h), "a simple scalar", 'LoadFile works with indirect filehandles' );
     close($h);
@@ -96,9 +94,7 @@ SKIP: {
 }
 
 # load from "in memory" file
-SKIP: {
-    skip "in-memory files require 5.8 or later", 1 unless $] >= 5.00800;
-
+{
     my $string = 'a simple scalar';
     open( my $h, '<', \$string );
     is( LoadFile($h), "a simple scalar", 'LoadFile works with in-memory files' );

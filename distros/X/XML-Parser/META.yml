@@ -26,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/cpan-authors/XML-Parser/issues
   repository: https://github.com/cpan-authors/XML-Parser
-version: '2.53'
+version: '2.54'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

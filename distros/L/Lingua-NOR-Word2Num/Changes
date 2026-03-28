@@ -1,8 +1,9 @@
 Revision history for Lingua-NOR-Word2Num
 
-0.2603260  2026-03-26
-    - fix =head1 NAME to standard CPAN format: Module - description
-    - improve CPAN kwalitee: Changes, META.json, LICENSE POD, MetaResources
-    - fix 78 audit findings: typos, wrong comments, stale POD, language list
-    - fix typo: representates â represents in grammar comments
+0.2603270  2026-03-27
+    - add Sardinian (srd)
+    - add 6 European languages: CYM GLG GLE LTZ MLT OCI
+    - rename all 10 legacy Num2Word modules to canonical namespace
+    - ordinals for 14 languages: CES DAN DEU ENG FIN FRA HUN ITA NLD NOR POL SPA SWE TUR
+    - capabilities infrastructure: introspection + ordinal stub
 

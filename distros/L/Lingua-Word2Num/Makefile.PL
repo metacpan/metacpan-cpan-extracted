@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Word to number conversion",
+  "ABSTRACT" => "Lingua::Word2Num converts number words in natural language text into their numeric values. It supports 44 languages via auto-discovered Lingua::XXX::Word2Num modules and accepts both ISO 639-1 (de) and ISO 639-3 (deu) language codes.",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -19,7 +19,9 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Export::Attrs" => 0,
+    "Lingua::Num2Word" => 0,
     "Readonly" => 0,
+    "overload" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
@@ -27,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603260",
+  "VERSION" => "0.2603270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,8 +39,10 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Export::Attrs" => 0,
+  "Lingua::Num2Word" => 0,
   "Readonly" => 0,
   "Test::More" => 0,
+  "overload" => 0,
   "strict" => 0,
   "utf8" => 0,
   "warnings" => 0

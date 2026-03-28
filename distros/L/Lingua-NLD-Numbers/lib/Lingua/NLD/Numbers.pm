@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::NLD::Numbers;
-# ABSTRACT: This module is deprecated. Please use L<Lingua::NLD::Num2Word instead.
+# ABSTRACT: This module is deprecated. Please use Lingua::NLD::Num2Word instead.
 
 use 5.16.0;
 use utf8;
@@ -16,7 +16,7 @@ use Lingua::NLD::Num2Word qw(num2nld_cardinal);
 # }}}
 # {{{ var block
 
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # }}}
 
@@ -63,7 +63,7 @@ Lingua::NLD::Numbers - Number to word conversion in Dutch (DEPRECATED)
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 =head1 DESCRIPTION
 

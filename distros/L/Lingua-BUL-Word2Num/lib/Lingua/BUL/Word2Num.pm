@@ -15,7 +15,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my  $parser  = bul_numerals();
 
 # }}}
@@ -87,6 +87,8 @@ sub bul_numerals {
         |      'двеста '        { $return = 200; }
         |      'сто '           { $return = 100; }
 
+      connector: 'и '                                                  # Bulgarian "и" (and) connector
+
       decade: tens 'и ' number                                        # tens и units (e.g. двадесет и три)
               { $return = $item[1] + $item[3]; }
         |     tens                                                    # plain tens (e.g. петдесет)
@@ -119,10 +121,10 @@ sub bul_numerals {
         |      hundreds                                              # plain hundreds (e.g. двеста)
                { $return = $item[1]; }
 
-    millenium: century(?) decade(?) 'хиляда ' century(?) decade(?)   # try to find words that represents values
+    millenium: century(?) decade(?) 'хиляда ' connector(?) century(?) decade(?)   # try to find words that represents values
                { $return = 0;                                        # from 1.000 to 999.999
                  for (@item) {
-                   if (ref $_ && defined $$_[0]) {
+                   if (ref $_ && defined $$_[0] && $$_[0] =~ /^\d+$/) {
                      $return += $$_[0];
                    } elsif ($_ eq "хиляда ") {
                      $return = ($return>0) ? $return * 1000 : 1000;
@@ -133,10 +135,10 @@ sub bul_numerals {
 
       million: century(?) decade(?)                                  # try to find words that represents values
               'милион '                                              # from 1.000.000 to 999.999.999
-               millenium(?) century(?) decade(?)
+               millenium(?) connector(?) century(?) decade(?)
                { $return = 0;
                  for (@item) {
-                   if (ref $_ && defined $$_[0]) {
+                   if (ref $_ && defined $$_[0] && $$_[0] =~ /^\d+$/) {
                      $return += $$_[0];
                    } elsif ($_ eq "милион ") {
                      $return = ($return>0) ? $return * 1000000 : 1000000;
@@ -166,7 +168,7 @@ Lingua::BUL::Word2Num - Word to number conversion in Bulgarian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::BUL::Word2Num is module for converting text containing number
 representation in Bulgarian back into number. Converts whole numbers

@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::Word2Num;
-# ABSTRACT: Word to number conversion
+# ABSTRACT: Lingua::Word2Num converts number words in natural language text into their numeric values. It supports 44 languages via auto-discovered Lingua::XXX::Word2Num modules and accepts both ISO 639-1 (de) and ISO 639-3 (deu) language codes.
 
 use 5.16.0;
 use utf8;
@@ -17,7 +17,7 @@ use Readonly;
 # {{{ var block
 
 my  Readonly::Scalar $COPY    = 'Copyright (c) PetaMem, s.r.o. 2004-present';
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # templates for functional and object interface
 
@@ -39,7 +39,10 @@ my %iso1_to_3 = (
     lt => 'lit', lv => 'lav', nl => 'nld', 'no' => 'nor',
     pl => 'pol', pt => 'por', ro => 'ron', ru => 'rus',
     sk => 'slk', sv => 'swe', sw => 'swa', th => 'tha',
-    tr => 'tur',
+    be => 'bel', cy => 'cym', ga => 'gle', gl => 'glg',
+    lb => 'ltz', mk => 'mkd', mt => 'mlt', oc => 'oci',
+    sc => 'srd',
+    sl => 'slv', sq => 'sqi', sr => 'srp', tr => 'tur',
     uk => 'ukr', vi => 'vie', zh => 'zho',
 );
 # }}}
@@ -83,11 +86,102 @@ our %known;
 
 # }}}
 
-# {{{ new                       constructor
+# {{{ overload
+
+use overload
+    '+'    => \&_add,
+    '-'    => \&_sub,
+    '*'    => \&_mul,
+    '/'    => \&_div,
+    '%'    => \&_mod,
+    '++'   => \&_inc,
+    '--'   => \&_dec,
+    '0+'   => sub { $_[0]->{value} },
+    '""'   => sub { $_[0]->{value} },
+    '<=>'  => sub { $_[0]->{value} <=> (ref $_[1] ? $_[1]->{value} : $_[1]) },
+    'cmp'  => sub { $_[0]->{value} <=> (ref $_[1] ? $_[1]->{value} : $_[1]) },
+    fallback => 1;
+
+# }}}
+# {{{ new                       constructor — accepts number or text
 
 sub new {
-    return bless {}, shift;
+    my $class = shift;
+    my $input = shift;
+
+    my $self = bless { value => 0, lang => undef }, $class;
+
+    if (!defined $input) {
+        return $self;
+    }
+    elsif ($input =~ /\A-?\d+\z/) {
+        $self->{value} = $input;
+    }
+    else {
+        my ($val, $lang) = $self->cardinal_detect($input);
+        if (defined $val) {
+            $self->{value} = $val;
+            $self->{lang}  = $lang;
+        }
+        else {
+            carp "Could not parse '$input' as a numeral in any known language";
+        }
+    }
+
+    return $self;
 }
+
+# }}}
+# {{{ as                        convert to word form in given language
+
+sub as {
+    my $self = shift;
+    my $lang = shift // $self->{lang} // return;
+
+    require Lingua::Num2Word;
+    return Lingua::Num2Word::cardinal($lang, $self->{value});
+}
+
+# }}}
+# {{{ value                     return numeric value
+
+sub value { return $_[0]->{value} }
+
+# }}}
+# {{{ lang                      return detected language
+
+sub lang { return $_[0]->{lang} }
+
+# }}}
+# {{{ as_ordinal                convert to ordinal word form in given language
+
+sub as_ordinal {
+    my $self = shift;
+    my $lang = shift // $self->{lang} // return;
+
+    require Lingua::Num2Word;
+    return Lingua::Num2Word::ordinal($lang, $self->{value});
+}
+
+# }}}
+# {{{ _arith helpers            arithmetic with overloading
+
+sub _binop {
+    my ($self, $other, $swap, $op) = @_;
+    my $a = $self->{value};
+    my $b = ref $other ? $other->{value} : $other;
+    my $result = $swap ? $op->($b, $a) : $op->($a, $b);
+    return (ref $self)->new(int $result);
+}
+
+sub _add { _binop(@_, sub { $_[0] + $_[1] }) }
+sub _sub { _binop(@_, sub { $_[0] - $_[1] }) }
+sub _mul { _binop(@_, sub { $_[0] * $_[1] }) }
+sub _div { _binop(@_, sub { $_[1] ? int($_[0] / $_[1]) : 0 }) }
+sub _mod { _binop(@_, sub { $_[1] ? $_[0] % $_[1] : 0 }) }
+
+sub _inc { $_[0]->{value}++; $_[0] }
+sub _dec { $_[0]->{value}--; $_[0] }
 
 # }}}
 # {{{ cardinal                  convert text to number
@@ -117,6 +211,27 @@ sub cardinal :Export {
     }
 
     return '';
+}
+
+# }}}
+# {{{ cardinal_detect            convert text to number, also return detected language
+
+sub cardinal_detect :Export {
+    my $self   = ref($_[0]) ? shift : __PACKAGE__->new();
+    my $result = '';
+    my $word   = shift // return;
+
+    for my $lang (sort keys %known) {
+        $result = '';
+        eval $self->preprocess_code($lang);                     ## no critic 'eval'
+        next if $@;
+
+        if (defined $result && $result ne '') {
+            return wantarray ? ($result, $lang) : $result;
+        }
+    }
+
+    return;
 }
 
 # }}}
@@ -154,93 +269,139 @@ sub preprocess_code {
 1;
 __END__
 
-# {{{ POD HEAD
-
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
-Lingua::Word2Num - Word to number conversion
-
+Lingua::Word2Num - Multi-language word to number conversion with numeral arithmetic
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
-Lingua::Word2Num is a module for converting texts in their spoken
-language representation into numbers. This is wrapper for various
-Lingua::XXX::Word2Num modules. Input text must be in utf8 encoding.
+=head1 DESCRIPTION
 
-For further information about various limitations see documentation
-for currently used package.
+Lingua::Word2Num converts number words in natural language text into
+their numeric values. It supports 44 languages via auto-discovered
+Lingua::XXX::Word2Num modules and accepts both ISO 639-1 (C<de>) and
+ISO 639-3 (C<deu>) language codes.
 
-=cut
-
-# }}}
-# {{{ SYNOPSIS
-
-=pod
+The module also provides overloaded numeral objects that support
+arithmetic across languages with on-demand rendering into any
+supported language.
 
 =head1 SYNOPSIS
 
+=head2 Procedural Interface
+
+ use Lingua::Word2Num qw(cardinal);
+
+ # convert with explicit language code
+ my $num = cardinal('de', 'zweiundvierzig');    # 42
+ my $num = cardinal('cs', 'sto dvacet');        # 120
+
+ # auto-detect language
+ my $num = cardinal('*', 'quarante-deux');       # 42
+
+=head2 Language Detection
+
+ use Lingua::Word2Num qw(cardinal_detect);
+
+ my ($value, $lang) = cardinal_detect('zwanzig');
+ # $value = 20, $lang = 'deu'
+
+=head2 Object Interface with Numeral Arithmetic
+
  use Lingua::Word2Num;
 
- my $words = Lingua::Word2Num->new;
+ my $a = Lingua::Word2Num->new("zwanzig");      # German 20
+ my $b = Lingua::Word2Num->new("šestnáct");     # Czech 16
 
- # convert Czech text to number
- my $number = $words->cardinal( 'cs', 'sto dvacet' );
+ say $a + $b;                # 36
+ say ($a + $b)->as('de');    # sechsunddreissig
+ say ($a + $b)->as('cs');    # třicet šest
+ say ($a + $b)->as('fr');    # trente-six
 
- # or procedural usage
- my $number = Lingua::Word2Num::cardinal( 'de', 'zweiundvierzig');
+ $a++;
+ say $a->as('de');           # einundzwanzig
+ say $a->value;              # 21
+ say $a->lang;               # deu
 
- print $number // "sorry, can't convert this text into a number.";
+ # construct from number
+ my $c = Lingua::Word2Num->new(100);
+ say ($c - $b)->as('ja');    # hachi ju yon
 
-=cut
-
-# }}}
-# {{{ Functions Reference
-
-=pod
-
-=head1 Functions Reference
+=head1 METHODS
 
 =over 2
 
+=item B<new> (positional)
+
+  1   str|num  text in any language, or a number
+  =>  obj      Lingua::Word2Num object
+
+Constructor. If given text, auto-detects the language and converts
+to a number. If given a number, stores it directly. The detected
+language is available via C<< ->lang >>.
+
 =item B<cardinal> (positional)
 
-  1   str    language code
+  1   str    language code (ISO 639-1 or 639-3, or '*' for auto-detect)
   2   str    text to convert
   =>  num    converted number
-  =>  undef  if the input string is not known
+  =>  ''     if the input string is not recognized
 
-Conversion from a text in the specified language into a number.
+Procedural conversion from text in the specified language to a number.
+
+=item B<cardinal_detect> (positional)
+
+  1   str    text to convert (any language)
+  =>  (num, str)  in list context: (value, iso639-3 code)
+  =>  num         in scalar context: just the value
+  =>  undef       if no language matched
+
+Auto-detects the language and converts to number.
+
+=item B<as> (positional)
+
+  1   str    language code (ISO 639-1 or 639-3)
+  =>  str    number rendered as words in the requested language
+
+Converts the object's numeric value to word form.
+If no language is given, uses the originally detected language.
+
+=item B<value> (void)
+
+  =>  num    the numeric value stored in the object
+
+=item B<lang> (void)
+
+  =>  str    the ISO 639-3 code of the detected source language
+  =>  undef  if constructed from a number
 
 =item B<known_langs> (void)
 
-  =>  lref  list of known languages
-
-List of all currently supported languages.
-
-=item B<new> (void)
-
-  =>  obj  returns new object
-
-Constructor.
-
-=item B<preprocess_code> (void)
-
-  =>  str  returns a template
-
-Private.
+  =>  lref   sorted list of all supported ISO 639-3 codes
 
 =back
 
-=cut
+=head1 OVERLOADED OPERATORS
 
-# }}}
-# {{{ EXPORTED FUNCTIONS
+Lingua::Word2Num objects support the following operators. All
+arithmetic operations return new Lingua::Word2Num objects.
 
-=pod
+  +   addition          $a + $b, $a + 5
+  -   subtraction       $a - $b
+  *   multiplication    $a * $b
+  /   integer division  $a / $b
+  %   modulo            $a % $b
+  ++  increment         $a++
+  --  decrement         $a--
+  0+  numification      0 + $a, int($a)
+  ""  stringification   "$a" (returns the number)
+  <=> numeric compare   $a <=> $b, sort
 
 =head1 EXPORT_OK
 
@@ -248,70 +409,17 @@ Private.
 
 =item cardinal
 
+=item cardinal_detect
+
 =item known_langs
 
-=item langs
-
 =back
 
-=cut
+=head1 SEE ALSO
 
-# }}}
-# {{{ REQUIRED MODULES
+L<Lingua::Num2Word> — the reverse direction (number to words).
 
-=pod
-
-=head1 Required modules
-
-This module is only wrapper and requires other CPAN modules for requested
-conversions eg. Lingua::AFR::Numbers for Afrikaans.
-
-Currently supported languages/modules are:
-
-=over 2
-
-=item afr - L<Lingua::AFR::Word2Num>
-
-=item ces - L<Lingua::CES::Word2Num>
-
-=item deu - L<Lingua::DEU::Word2Num>
-
-=item eng - L<Lingua::ENG::Word2Num>
-
-=item eus - L<Lingua::EUS::Word2Num>
-
-=item fra - L<Lingua::FRA::Word2Num>
-
-=item ind - L<Lingua::IND::Words2Nums>
-
-=item ita - L<Lingua::ITA::Word2Num>
-
-=item jpn - L<Lingua::JPN::Word2Num>
-
-=item nld - L<Lingua::NLD::Word2Num>
-
-=item nor - L<Lingua::NOR::Word2Num>
-
-=item pol - L<Lingua::POL::Word2Num>
-
-=item por - L<Lingua::POR::Words2Nums>
-
-=item rus - L<Lingua::RUS::Word2Num>
-
-=item spa - L<Lingua::SPA::Word2Num>
-
-=item swe - L<Lingua::SWE::Word2Num>
-
-=item zho - L<Lingua::ZHO::Word2Num>
-
-=back
-
-=cut
-
-# }}}
-# {{{ POD FOOTER
-
-=pod
+L<Task::Lingua::PetaMem> — install all supported languages.
 
 =head1 AUTHORS
 
@@ -333,5 +441,3 @@ under the same terms as the Artistic License 2.0 or the BSD 2-Clause
 License. See the LICENSE file in the distribution for details.
 
 =cut
-
-# }}}

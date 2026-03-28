@@ -1,35 +1,32 @@
-BEGIN { print "1..5\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 5;
 use XML::Parser;
-$loaded = 1;
-print "ok 1\n";
 
+# Test 1: module loads
+ok( 1, 'XML::Parser loaded' );
+
+# Capture an expat object from a parse
 my $xp_saved;
-
-sub start {
-    my ($xp) = @_;
-    $xp_saved = $xp;
-}
-
-my $parser = new XML::Parser( Handlers => { Start => \&start } );
+my $parser = XML::Parser->new( Handlers => { Start => sub { $xp_saved = $_[0] } } );
 $parser->parse('<doc/>');
 
-# Test basic escaping of & and <
-my $result = $xp_saved->xml_escape('a & b < c');
-print "not " unless $result eq 'a &amp; b &lt; c';
-print "ok 2\n";
+# Test 2: basic escaping of & and <
+is( $xp_saved->xml_escape('a & b < c'),
+    'a &amp; b &lt; c',
+    'xml_escape handles & and <' );
 
-# Test multiple double quotes are all escaped
-$result = $xp_saved->xml_escape('say "hello" and "world"', '"');
-print "not " unless $result eq 'say &quot;hello&quot; and &quot;world&quot;';
-print "ok 3\n";
+# Test 3: multiple double quotes
+is( $xp_saved->xml_escape('say "hello" and "world"', '"'),
+    'say &quot;hello&quot; and &quot;world&quot;',
+    'xml_escape escapes double quotes' );
 
-# Test multiple single quotes are all escaped
-$result = $xp_saved->xml_escape("it's Bob's", "'");
-print "not " unless $result eq "it&apos;s Bob&apos;s";
-print "ok 4\n";
+# Test 4: multiple single quotes
+is( $xp_saved->xml_escape("it's Bob's", "'"),
+    "it&apos;s Bob&apos;s",
+    'xml_escape escapes single quotes' );
 
-# Test both quote types together
-$result = $xp_saved->xml_escape(q{He said "it's"}, '"', "'");
-print "not " unless $result eq 'He said &quot;it&apos;s&quot;';
-print "ok 5\n";
+# Test 5: both quote types together
+is( $xp_saved->xml_escape(q{He said "it's"}, '"', "'"),
+    'He said &quot;it&apos;s&quot;',
+    'xml_escape escapes both quote types' );

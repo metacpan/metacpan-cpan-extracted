@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in SPA.",
+  "ABSTRACT" => "This module is deprecated. Please use Lingua::SPA::Num2Word instead.",
   "AUTHOR" => "Jose Rey <jrey\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,17 +18,18 @@ my %WriteMakefileArgs = (
   "NAME" => "Lingua::SPA::Numeros",
   "PREREQ_PM" => {
     "Carp" => 0,
-    "fields" => 0,
-    "strict" => 0,
+    "Export::Attrs" => 0,
+    "Lingua::SPA::Num2Word" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "FindBin" => 0,
     "Test::More" => 0,
-    "lib" => 0
+    "lib" => 0,
+    "strict" => 0
   },
-  "VERSION" => "0.2603260",
+  "VERSION" => "0.2603270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,9 +38,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
+  "Export::Attrs" => 0,
   "FindBin" => 0,
+  "Lingua::SPA::Num2Word" => 0,
   "Test::More" => 0,
-  "fields" => 0,
   "lib" => 0,
   "strict" => 0,
   "utf8" => 0,

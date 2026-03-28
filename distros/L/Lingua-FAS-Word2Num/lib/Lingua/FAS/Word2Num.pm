@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = fas_numerals();
 
 # }}}
@@ -68,9 +68,9 @@ sub fas_numerals {
                   | "هشتاد"                   { 80 }
                   | "نود"                                   { 90 }
 
-      deca:         tens "و" number          { $item[1] + $item[3] }
+      deca:         teens
+                  | tens "و" number          { $item[1] + $item[3] }
                   | tens
-                  | teens
                   | number
 
       hundreds:     "نهصد"                                                   { 900 }
@@ -121,7 +121,7 @@ Lingua::FAS::Word2Num - Word to number conversion in Persian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::FAS::Word2Num is module for converting Persian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

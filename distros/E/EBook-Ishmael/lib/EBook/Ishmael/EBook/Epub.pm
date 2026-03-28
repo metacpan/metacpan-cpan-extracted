@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Epub;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -11,6 +11,7 @@ use File::Spec;
 use XML::LibXML;
 
 use EBook::Ishmael::EBook::Metadata;
+use EBook::Ishmael::HTML qw(prepare_html);
 use EBook::Ishmael::ImageID qw(mimetype_id);
 use EBook::Ishmael::Time qw(guess_time);
 use EBook::Ishmael::Unzip qw(unzip safe_tmp_unzip);
@@ -290,6 +291,7 @@ sub html {
 
         my ($body) = $xpc->findnodes('/html:html/html:body')
             or next;
+        prepare_html($body);
 
         map { $_->toString } $body->childNodes;
 
@@ -326,6 +328,7 @@ sub raw {
 
         my ($body) = $xpc->findnodes('/html:html/html:body')
             or next;
+        prepare_html($body);
 
         $body->textContent;
 

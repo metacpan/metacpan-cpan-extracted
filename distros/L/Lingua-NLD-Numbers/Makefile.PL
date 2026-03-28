@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "This module is deprecated. Please use L<Lingua::NLD::Num2Word instead.",
+  "ABSTRACT" => "This module is deprecated. Please use Lingua::NLD::Num2Word instead.",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -23,9 +23,13 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.2603260",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "strict" => 0
+  },
+  "VERSION" => "0.2603270",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -34,6 +38,8 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Export::Attrs" => 0,
   "Lingua::NLD::Num2Word" => 0,
+  "Test::More" => 0,
+  "strict" => 0,
   "utf8" => 0,
   "warnings" => 0
 );

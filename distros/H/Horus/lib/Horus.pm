@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Horus - Ultra-fast XS UUID/GUID generator supporting all RFC 9562 versions
+Horus - XS UUID/GUID generator supporting all RFC 9562 versions
 
 =head1 SYNOPSIS
 

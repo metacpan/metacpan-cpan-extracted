@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::NOR::Num2Word",
   "PREREQ_PM" => {
+    "Export::Attrs" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
@@ -24,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603260",
+  "VERSION" => "0.2603270",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Export::Attrs" => 0,
   "Test::More" => 0,
   "strict" => 0,
   "utf8" => 0,

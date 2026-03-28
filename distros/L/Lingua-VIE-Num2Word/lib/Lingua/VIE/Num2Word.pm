@@ -16,7 +16,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # }}}
 
@@ -130,6 +130,17 @@ sub num2vie_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -147,7 +158,7 @@ Lingua::VIE::Num2Word - Number to word conversion in Vietnamese
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::VIE::Num2Word is module for converting numbers into their written
 representation in Vietnamese. Converts whole numbers from 0 up to 999 999 999.

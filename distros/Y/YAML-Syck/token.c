@@ -239,8 +239,8 @@ void eat_comments( SyckParser * );
 char escape_seq( char );
 int is_newline( char *ptr );
 int newline_len( char *ptr );
-int sycklex_yaml_utf8( YYSTYPE *, SyckParser * );
-int sycklex_bytecode_utf8( YYSTYPE *, SyckParser * );
+int sycklex_yaml_utf8( SYCKSTYPE *, SyckParser * );
+int sycklex_bytecode_utf8( SYCKSTYPE *, SyckParser * );
 int syckwrap(void);
 
 /*
@@ -249,7 +249,7 @@ int syckwrap(void);
  * It's really nice to not rely on backtracking and such.
  */
 int
-sycklex( YYSTYPE *sycklval, SyckParser *parser )
+sycklex( SYCKSTYPE *sycklval, SyckParser *parser )
 {
     switch ( parser->input_type )
     {
@@ -274,7 +274,7 @@ sycklex( YYSTYPE *sycklval, SyckParser *parser )
  * Parser for standard YAML [UTF-8]
  */
 int
-sycklex_yaml_utf8( YYSTYPE *sycklval, SyckParser *parser )
+sycklex_yaml_utf8( SYCKSTYPE *sycklval, SyckParser *parser )
 {
     int doc_level = 0;
     syck_parser_ptr = parser;
@@ -316,7 +316,8 @@ Header:
 	case ' ':	goto yy12;
 	case 0x0A:	goto yy9;
 	case 0x0D:	goto yy11;
-	case '#':	goto yy5;
+	case '#':
+	case '%':	goto yy5;
 	case '-':	goto yy2;
 	case '.':	goto yy4;
 	default:	goto yy14;
@@ -1602,6 +1603,19 @@ yy113:
                         lvl = CURRENT_LEVEL();
 
                         if ( indt_len <= parentIndent )
+                        {
+                            RETURN_IMPLICIT();
+                        }
+
+                        /* Document boundary (--- or ...) at column 0
+                         * always terminates a plain scalar, regardless
+                         * of parentIndent level.
+                         */
+                        if ( YYCURSOR == YYLINEPTR &&
+                             ( ( YYCURSOR[0] == '-' && YYCURSOR[1] == '-' && YYCURSOR[2] == '-' ) ||
+                               ( YYCURSOR[0] == '.' && YYCURSOR[1] == '.' && YYCURSOR[2] == '.' ) ) &&
+                             ( YYCURSOR[3] == '\0' || YYCURSOR[3] == ' ' || YYCURSOR[3] == '\t' ||
+                               YYCURSOR[3] == '\n' || YYCURSOR[3] == '\r' ) )
                         {
                             RETURN_IMPLICIT();
                         }

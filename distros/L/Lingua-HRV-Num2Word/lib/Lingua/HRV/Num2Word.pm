@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my %token1 = qw( 0 nula         1 jedan         2 dva
                  3 tri          4 četiri        5 pet
                  6 šest         7 sedam         8 osam
@@ -143,6 +143,17 @@ sub num2hrv_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -160,7 +171,7 @@ Lingua::HRV::Num2Word - Number to word conversion in Croatian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::HRV::Num2Word is module for conversion numbers into their representation
 in Croatian. It converts whole numbers from 0 up to 999 999 999.

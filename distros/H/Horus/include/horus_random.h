@@ -124,6 +124,10 @@ static inline void horus_pool_refill(void) {
 }
 
 static inline void horus_random_bytes(unsigned char *buf, size_t len) {
+#ifdef HORUS_NO_POOL
+    /* Thread-safe path: bypass pool, go directly to OS CSPRNG */
+    horus_fill_raw(buf, len);
+#else
     if (len >= HORUS_POOL_SIZE) {
         /* Large request: bypass pool */
         horus_fill_raw(buf, len);
@@ -134,6 +138,7 @@ static inline void horus_random_bytes(unsigned char *buf, size_t len) {
     }
     memcpy(buf, horus_random_pool + horus_pool_pos, len);
     horus_pool_pos += (int)len;
+#endif
 }
 
 /* Fill a bulk buffer for batch UUID generation */

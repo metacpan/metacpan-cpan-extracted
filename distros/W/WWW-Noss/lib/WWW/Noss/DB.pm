@@ -2,7 +2,7 @@ package WWW::Noss::DB;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use List::Util qw(all any max none);
 
@@ -614,6 +614,7 @@ WHERE
 
     return undef unless defined $postref;
 
+    # TODO: Move DB -> Perl logic to seperate subroutine?
     $postref->{ category } =
         defined $postref->{ category }
         ? decode_json($postref->{ category })
@@ -784,6 +785,7 @@ sub look {
         : ('ASC',  'DESC', 'FIRST', 'LAST');
 
     my $order_clause;
+    my $rev_order_clause; # For sorting by date + limit
 
     if ($order eq 'feed') {
         $order_clause = qq{
@@ -806,14 +808,57 @@ END $asc NULLS $first,
 feed COLLATE NOCASE $asc,
 nossid $asc
         };
+        $rev_order_clause = qq{
+CASE
+    WHEN updated IS NOT NULL THEN updated
+    ELSE published
+END $desc NULLS $last,
+feed COLLATE NOCASE $desc,
+nossid $desc
+        };
     } else {
         die "Cannot order posts by '$order'";
     }
 
     my $limit_clause = $limit > 0 ? "LIMIT $limit" : '';
 
-    my $sth = $self->{ DB }->prepare(
-        qq{
+    my $sth;
+    if ($order eq 'date' and $limit > 0) {
+        # First get last (or first when --reverse) posts, then sort them in
+        # display order.
+        $sth = $self->{ DB }->prepare(
+            qq{
+SELECT
+    *
+FROM (
+    SELECT
+        nossid,
+        status,
+        feed,
+        title,
+        link,
+        author,
+        category,
+        summary,
+        published,
+        updated,
+        uid,
+        nossuid,
+        displaytitle
+    FROM
+        posts
+    $where
+    ORDER BY
+        $rev_order_clause
+    $limit_clause
+)
+ORDER BY
+    $order_clause
+            }
+        );
+    } else {
+        $sth = $self->{ DB }->prepare(
+            qq{
 SELECT
     nossid,
     status,
@@ -834,8 +879,9 @@ $where
 ORDER BY
     $order_clause
 $limit_clause;
-        }
-    );
+            }
+        );
+    }
 
     $sth->execute;
 

@@ -30,10 +30,9 @@ is( Load("--- Hello, world\n"), "Hello, world" );
     like( $out, qr/^feefifofum/, "unstructured text is a plain scalar" );
 }
 
-TODO: {
+# RT 23850 / GH #27 - non-specific tag '!' followed by block scalar indicator
+{
     my $out = eval { Load("---\n- ! >-\n") };
-
-    local $TODO = 'RT 23850 - META.yml of DMAKI/DateTime-Format-Japanese-0.01.tar.gz cannot be parsed';
-    is( $@, '', "Bad data dies on Load" );
-    is_deeply( $out, [''], "Bad data fails load" );
+    is( $@, '', "Non-specific tag with block scalar does not die" );
+    is_deeply( $out, [''], "Non-specific tag with block scalar parses correctly" );
 }

@@ -1,5 +1,30 @@
 Revision history for Perl extension XML::Parser.
 
+2.54 2026-03-27 (by Todd Rinaldo)
+
+  Fixes:
+    - PR #196 Plug XS memory leaks on error paths in Expat.xs
+      (externalEntityRef, parse_stream, ParserCreate)
+    - PR #204 Add defensive NULL checks in Expat.xs to prevent crashes
+      on memory exhaustion and undefined behavior on short input lines
+    - PR #203 Add explicit package main after inline package declarations
+      in test files to clarify scope
+
+  Improvements:
+    - PR #207 GH #205 Add GitHub Actions workflow to auto-create GitHub
+      Releases on tag push, enabling downstream notification via
+      GitHub's release watch
+    - PR #209 Update AUTHORS POD in Parser.pm and Expat.pm to reflect
+      full maintainer history
+    - PR #210 Add CI badge to POD via =for markdown directive so it
+      survives README.md regeneration
+    - Rename README to README.md and regenerate from POD
+
+  Maintenance:
+    - PR #208 Modernize 10 legacy test files from print-ok style to
+      Test::More (cdata, finish, deep_nesting, xml_escape, partial,
+      char_end_doc, current_length, combine_chars, utf8_stream, defaulted)
+
 2.53 2026-03-25 (by Todd Rinaldo)
 
   Fixes:

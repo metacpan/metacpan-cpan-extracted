@@ -17,7 +17,7 @@ name: Lingua-AFR-Word2Num
 provides:
   Lingua::AFR::Word2Num:
     file: lib/Lingua/AFR/Word2Num.pm
-    version: '0.2603260'
+    version: '0.2603270'
 requires:
   Carp: '0'
   Export::Attrs: '0'
@@ -27,7 +27,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://metacpan.org/author/PETAMEM
-version: '0.2603260'
+version: '0.2603270'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-2.0 OR BSD-2-Clause'

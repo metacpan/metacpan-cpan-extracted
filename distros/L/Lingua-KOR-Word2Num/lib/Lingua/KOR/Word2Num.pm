@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my  $parser  = kor_numerals();
 
 # }}}
@@ -39,6 +39,7 @@ sub kor_numerals {
     return Parse::RecDescent->new(q{
       numeral: <rulevar: local $number = 0>
       numeral: eok        { return $item[1]; }                        # root parse. go from maximum to minimum value
+        |      man        { return $item[1]; }
         |      millenium2 { return $item[1]; }
         |      millenium1 { return $item[1]; }
         |      century    { return $item[1]; }
@@ -182,17 +183,31 @@ sub kor_numerals {
                  }
                }
 
-      eok:     millenium2(?) millenium1(?) century(?) decade(?)       # try to find words that represents values
-               eokmark                                                # from 100.000.000 to 999.999.999.999
-               millenium2(?) millenium1(?) century(?) decade(?)
+      man:     millenium1(?) century(?) decade(?)                     # N만K = N * 10_000 + K where N is 1..9999
+               manmark                                                # handles values from 10_000 to 99_999_999
+               millenium1(?) century(?) decade(?)
                { $return = 0;
-                 my $pre_eok = 1;
+                 for (@item) {
+                   if (ref $_ && defined $$_[0]) {
+                     $return += $$_[0];
+                   } elsif (defined $_ && $_ eq "Man") {
+                     $return = ($return>0) ? $return * 10000 : 10000;
+                   }
+                 }
+               }
+
+      manmark: 'man ' { $return = "Man"; }
+        |      /만/   { $return = "Man"; }
+
+      eok:     millenium1(?) century(?) decade(?)                     # try to find words that represents values
+               eokmark                                                # from 100.000.000 to 999.999.999.999
+               man(?) millenium1(?) century(?) decade(?)
+               { $return = 0;
                  for (@item) {
                    if (ref $_ && defined $$_[0]) {
                      $return += $$_[0];
                    } elsif (defined $_ && $_ eq "Eok") {
                      $return = ($return>0) ? $return * 100000000 : 100000000;
-                     $pre_eok = 0;
                    }
                  }
                }
@@ -221,7 +236,7 @@ Lingua::KOR::Word2Num - Word to number conversion in Korean
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::KOR::Word2Num is module for converting text containing number
 representation in Korean (Sino-Korean system) back into number.

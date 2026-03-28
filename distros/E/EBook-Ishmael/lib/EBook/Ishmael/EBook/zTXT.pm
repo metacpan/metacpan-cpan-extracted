@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::zTXT;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use Encode qw(decode);
 use EBook::Ishmael::CharDet;
 use EBook::Ishmael::EBook::Metadata;
 use EBook::Ishmael::PDB;
-use EBook::Ishmael::TextToHtml;
+use EBook::Ishmael::HTML qw(text2html);
 
 my $TYPE = 'zTXT';
 

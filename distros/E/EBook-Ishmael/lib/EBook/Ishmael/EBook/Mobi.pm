@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Mobi;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -9,6 +9,7 @@ use Encode qw(from_to);
 use XML::LibXML;
 
 use EBook::Ishmael::Decode qw(palmdoc_decode);
+use EBook::Ishmael::HTML qw(prepare_html);
 use EBook::Ishmael::ImageID qw(image_id);
 use EBook::Ishmael::PDB;
 use EBook::Ishmael::Time qw(guess_time);
@@ -960,6 +961,7 @@ sub html {
             );
 
             my ($body) = $dom->findnodes('/html/body') or next;
+            prepare_html($body);
 
             $html .= join '', map { $_->toString } $body->childNodes;
 
@@ -975,6 +977,7 @@ sub html {
             encoding => $enc,
             recover => 2
         );
+        prepare_html($dom);
         $html = $dom->documentElement->toString;
     }
 
@@ -1007,6 +1010,7 @@ sub raw {
                 recover => 2,
             );
             my ($body) = $dom->findnodes('/html/body') or next;
+            prepare_html($body);
             $raw .= $body->textContent;
         }
 
@@ -1020,7 +1024,7 @@ sub raw {
             encoding => $enc,
             recover => 2,
         );
-
+        prepare_html($dom);
         $raw = $dom->documentElement->textContent;
 
     }

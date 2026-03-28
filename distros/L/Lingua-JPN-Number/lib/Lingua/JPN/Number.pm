@@ -1,10 +1,7 @@
-# For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
-#
-# Mike Schilli, 2001 (m@perlmeister.com)
-#
+# For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::JPN::Number;
-# ABSTRACT: Number 2 word conversion in JPN.
+# ABSTRACT: This module is deprecated. Please use Lingua::JPN::Num2Word instead.
 
 use 5.16.0;
 use utf8;
@@ -12,82 +9,39 @@ use warnings;
 
 # {{{ use block
 
+use Carp;
 use Export::Attrs;
+use Lingua::JPN::Num2Word qw(num2jpn_cardinal to_string);
 
 # }}}
-# {{{ variables declaration
-our $VERSION = '0.2603260';
+# {{{ var block
 
-my %N2J = qw(
-  1 ichi 2 ni 3 san 4 yon 5 go 6 roku 7 nana 
-  8 hachi 9 kyu 10 ju 100 hyaku 1000 sen);
-
-my %N2J_EXCP = qw(
-  300 san-byaku 600 ro-p-pyaku 800 ha-p-pyaku
-  3000 san-zen 8000 ha-s-sen);
-
-my @N2J_BLOCK = ("", "man", "oku", "cho");
-
-my %N2J_BLOCK_EXCP = qw( 1 i-t-cho 8 ha-t-cho 
-  0 ju-t-cho);
+our $VERSION = '0.2603270';
 
 # }}}
 
-# {{{ to_string
-sub to_string :Export {
-    my $n = shift;
+# {{{ re-export from Num2Word
 
-    if($n < 1 || $n >= 1E16) { 
-        warn "$n needs to be >=1 and <1E16.\n";
-        return;
-    }
+sub num2jpn_cardinal :Export { goto &Lingua::JPN::Num2Word::num2jpn_cardinal }
+sub to_string        :Export { goto &Lingua::JPN::Num2Word::to_string }
 
-    my @result = ();
-    $n         = reverse $n;
-    my $bix    = 0;
+# }}}
+# {{{ new                              constructor (deprecated)
 
-    while($n =~ /(\d{1,4})/g) {
-        my $b = scalar reverse($1);
-        my @r = blockof4_to_string($b);
-
-        if($bix && @r) {
-            if($bix == 3 && 
-                $b =~ /[1-9]0$|[18]$/) {
-                $r[-1] =  $N2J_BLOCK_EXCP{$b%10};
-            } else {
-                push @r, $N2J_BLOCK[$bix];
-            }
-        }
-        unshift @result, @r;
-        $bix++; 
-    }
-
-    return @result;
+sub new {
+    my $class = shift;
+    carp "Lingua::JPN::Number is deprecated, use Lingua::JPN::Num2Word instead";
+    return Lingua::JPN::Num2Word->new(@_);
 }
 
 # }}}
-# {{{ blockof4_to_string
+# {{{ parse                            delegate to Num2Word (deprecated)
 
-sub blockof4_to_string {
-    my $n = shift;
+sub parse :Export {
+    my $self   = ref($_[0]) ? shift : __PACKAGE__->new();
+    my $number = shift // return '';
 
-    return if $n > 9999 or $n < 0;
-    return "" unless $n;
-
-    my @result  = ();
-    my @digits  = split //, sprintf("%04d", $n);
-    my @weights = (1000, 100, 10, 1);
-
-    for my $i (0..3) {
-        next unless $digits[$i];
-        my $v = $digits[$i] * $weights[$i];
-        push @result, $N2J_EXCP{$v} || 
-                      $N2J{$v} ||
-                      ($N2J{$digits[$i]},
-                       $N2J{$weights[$i]});
-    }
-
-    return @result;
+    return num2jpn_cardinal($number) // '';
 }
 
 # }}}
@@ -96,113 +50,58 @@ sub blockof4_to_string {
 
 __END__
 
-# {{{ module documentation
+=pod
+
+=encoding utf-8
 
 =head1 NAME
 
-Lingua::JPN::Number - Translate Numbers into Japanese
+Lingua::JPN::Number - Number to word conversion in Japanese (DEPRECATED)
 
 =head1 VERSION
 
-version 0.2603260
-
-=head1 SYNOPSIS
-
-  use Lingua::JPN::Number;
-
-  my @words = Lingua::JPN::Number::to_string(1234);
-
-  print join('-', @words), "\n";
-                        # "sen-ni-hyaku-san-ju-yon"
+version 0.2603270
 
 =head1 DESCRIPTION
 
-Number 2 word conversion in JPN.
+B<This module is deprecated.> Please use L<Lingua::JPN::Num2Word> instead.
 
-C<Lingua::JPN::Number> translates numbers into Japanese.
-Its C<to_string> function takes a integer number
-and transforms it to the equivalent cardinal 
-number I<romaji> string. This'll show exactly how
-the number is pronounced in Japanese.
+This module is a thin wrapper that delegates to L<Lingua::JPN::Num2Word>
+for backward compatibility with code using the old C<Lingua::JPN::Number>
+API.
 
-Here's how the Japanese cardinal numbering scheme 
-works: The numbers 1..10 translate
-to I<ichi>, I<ni>, I<san>, I<yon>, I<go>, I<roku>,
-I<nana>, I<hachi>, I<kyu>. 10 is I<yu>, 100 is
-I<hyaku>, 1000 is I<sen> and 10000 is I<man>.
+=head1 SYNOPSIS
 
-Similar to English, multi-digit numbers are 
-put together using decimal weights: 15 is 
-10 + 5, 723 is 7*100 + 2*10 + 3 and
-6973 is 6*1000 + 9*100 + 7*10 + 3.
-Therefore, 15 is pronounced I<yu-go>, 
-123 is I<hyaku-ni-yu-san>
-and 6973 is I<roku-san-kyu-hyaku-nana-san>.
+ # Old API (deprecated):
+ use Lingua::JPN::Number;
+ my $obj = Lingua::JPN::Number->new();
+ my $text = $obj->parse(42);
 
-Like in all natural languages, there's a
-couple of exceptions: 300 isn't
-I<san-hyaku> but I<san-byaku>,
-600 isn't I<roku-hyaku> but I<ro-p-pyaku>
-and 800 isn't I<hachi-hyaku> but I<ha-p-pyaku>.
-Also, in the thousands, 3000 is I<san-zen>
-and 8000 is I<ha-s-sen>. Also, there's more
-exceptions for numbers of 1,000,000,000,000
-and greater.
+ # New API (preferred):
+ use Lingua::JPN::Num2Word qw(num2jpn_cardinal);
+ my $text = num2jpn_cardinal(42);
 
-And, numbers aren't split into groups of 3
-(like in 1,000,000) but in groups of 4, like
-in 100,0000, which is pronounced I<hyaku-man>
-(100 times 10000).
+=head1 FUNCTIONS
 
-=head1 EXAMPLE
+=over 2
 
-Here's a quick script I<jn> which will quiz
-you with random numbers (or I<romaji> strings
-if invoked as I<jn -r>) and reveal the solution
-after you hit the I<Enter> key. It requires
-C<Term::ReadKey>, which is available from CPAN:
+=item B<new> (deprecated)
 
-    #!/usr/bin/perl
-    use warnings;
-    use strict;
+Constructor. Emits a deprecation warning. Delegates to
+L<Lingua::JPN::Num2Word>.
 
-    use Term::ReadKey;
-    use Getopt::Std;
-    use Lingua::JPN::Number qw(to_string);
+=item B<parse> (positional, deprecated)
 
-    getopts('r', \ my %opts);
+  1   num    number to convert
+  =>  str    Japanese cardinal text
 
-    my @length = (2, 3, 4);  # Prompt for 2-,3-
-                             # and 4-digit numbers
-    $| = 1;
+Delegates to C<num2jpn_cardinal()>.
 
-    while(1) {
-        my $digits = $length[rand(@length)];
-        my $ques = int rand(10**$digits);
-        next unless $ques;
-        my $ans = join '-', to_string($ques);
-        if($opts{r}) {
-            ($ans, $ques) = ($ques, $ans);
-        }
-        print "$ques ... "; 
-        ReadMode("noecho");
-        ReadLine(0);
-        ReadMode("normal");
-        print $ans, "\n";
-    }
+=back
 
-=head1 BUGS
+=head1 SEE ALSO
 
-I've just taken a beginner's Japanese class,
-so bear with me. Bug reports are most welcome.
-
-Also, I'm planning on providing additional modules
-C<Lingua::JPN::Number::Tall>,
-C<Lingua::JPN::Number::Flat>,
-C<Lingua::JPN::Number::Person>,
-C<Lingua::JPN::Number::Misc> to cover the
-idiosyncrasies of japanese counting of tall and
-flat things, persons and miscellaneous items.
+L<Lingua::JPN::Num2Word> — the replacement module.
 
 =head1 AUTHORS
 
@@ -215,17 +114,11 @@ flat things, persons and miscellaneous items.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2001 Mike Schilli. All rights
-reserved. This program is free software; you can
-redistribute it and/or modify it under the same
-terms as Perl itself.
+Copyright (c) PetaMem, s.r.o. 2004-present
 
 =head1 LICENSE
 
 This module is free software; you can redistribute it and/or modify it
-under the same terms as the Artistic License 2.0 or the BSD 2-Clause
-License. See the LICENSE file in the distribution for details.
+under the same terms as Perl 5 itself.
 
 =cut
-
-# }}}

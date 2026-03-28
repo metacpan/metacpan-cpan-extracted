@@ -40,7 +40,7 @@
    "provides" : {
       "Lingua::Num2Word" : {
          "file" : "lib/Lingua/Num2Word.pm",
-         "version" : "0.2603260"
+         "version" : "0.2603270"
       }
    },
    "release_status" : "stable",
@@ -50,7 +50,7 @@
          "web" : "https://metacpan.org/author/PETAMEM"
       }
    },
-   "version" : "0.2603260",
+   "version" : "0.2603270",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "Artistic-2.0 OR BSD-2-Clause"

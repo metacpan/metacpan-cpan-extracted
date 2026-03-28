@@ -2,7 +2,7 @@ package WWW::Noss::Curl;
 use 5.016;
 use strict;
 use warnings;
-our $VERSION = '2.02';
+our $VERSION = '2.03';
 
 use Exporter qw(import);
 our @EXPORT_OK = qw(curl curl_error http_status_string parse_http_header);

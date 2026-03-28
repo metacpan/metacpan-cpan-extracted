@@ -93,7 +93,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.29';
+    $VERSION = '0.30';
 }
 
 # Constants for notices displayed to the user:

@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 my $parser   = eng_numerals();
 
@@ -113,7 +113,7 @@ Lingua::ENG::Word2Num - Word to number conversion in English
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::ENG::Word2Num is module for converting text containing number
 representation in English back into number. Converts whole numbers from 0 up

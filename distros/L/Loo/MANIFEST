@@ -9,6 +9,8 @@ lib/Loo.pm
 Loo.xs
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 ppport.h
 README
 t/00-load.t
@@ -61,10 +63,19 @@ t/46-deparse-complex-integration.t
 t/47-deparse-failures.t
 t/48-deparse-complex.t
 t/50-deparse-postfix.t
+t/51-edge-numeric.t
+t/52-edge-glob.t
+t/53-edge-blessed.t
+t/54-edge-options-combo.t
+t/55-edge-escaping.t
+t/56-edge-circular.t
+t/57-edge-structures.t
+t/58-edge-deepcopy-sparseseen.t
+t/59-edge-colour.t
+t/60-edge-maxrecurse.t
+t/61-edge-refs.t
 t/99-odea.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

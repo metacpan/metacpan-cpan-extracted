@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser = sv_numerals();
 
 # }}}
@@ -133,7 +133,7 @@ Lingua::SWE::Word2Num - Word to number conversion in Swedish
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::SWE::Word2Num is module for converting text containing number
 representation in svedish back into number. Converts whole numbers from 0 up

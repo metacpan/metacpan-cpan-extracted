@@ -57,50 +57,43 @@ my @tests = (
 
 plan tests => scalar @tests * ( 2 + $HAS_JSON ) * 2;
 
-TODO: {
-    for my $test_orig (@tests) {
-        for my $single_quote ( 0, 1 ) {
-            for my $unicode ( 0, 1 ) {
-                local $JSON::Syck::SingleQuote     = $single_quote;
-                local $JSON::Syck::ImplicitUnicode = $unicode;
-                my $test = $test_orig;
+for my $test_orig (@tests) {
+    for my $single_quote ( 0, 1 ) {
+        for my $unicode ( 0, 1 ) {
+            local $JSON::Syck::SingleQuote     = $single_quote;
+            local $JSON::Syck::ImplicitUnicode = $unicode;
+            my $test = $test_orig;
 
-                local $TODO;
-                if ( ref $test eq 'HASH' ) {
-                    if ($single_quote or substr($test->{TEST},2,1) =~ m|/|) {
-                        $TODO = $test->{TODO};
-                    }
-                    $test = $test->{TEST};
-                }
+            if ( ref $test eq 'HASH' ) {
+                $test = $test->{TEST};
+            }
 
-                if ($single_quote) {
-                    $test =~ s/'/\\'/g;
-                    $test =~ s/"/'/g;
-                }
+            if ($single_quote) {
+                $test =~ s/'/\\'/g;
+                $test =~ s/"/'/g;
+            }
 
-                my $data = eval { JSON::Syck::Load($test) };
-                my $json = JSON::Syck::Dump($data);
+            my $data = eval { JSON::Syck::Load($test) };
+            my $json = JSON::Syck::Dump($data);
 
-                #diag("json: $json");
-                utf8::encode($json) if !ref($json) && $unicode;
+            #diag("json: $json");
+            utf8::encode($json) if !ref($json) && $unicode;
 
-                # don't bother white spaces
-                for ( $test, $json ) {
-                    s/([,:]) /$1/eg;
-                }
+            # don't bother white spaces
+            for ( $test, $json ) {
+                s/([,:]) /$1/eg;
+            }
 
-                my $desc = "roundtrip $test -> " . Dumper($data)
-                  . " -> $json -> sq:$single_quote utf8:$unicode ";
-                utf8::encode($desc);
-                is $json, $test, $desc;
+            my $desc = "roundtrip $test -> " . Dumper($data) . " -> $json -> sq:$single_quote utf8:$unicode ";
+            utf8::encode($desc);
+            is $json, $test, $desc;
 
-                # try parsing the data with JSON.pm
-                if ( $HAS_JSON and !$single_quote ) {
-                    $SIG{__WARN__} = sub { 1 };
-                    utf8::encode($data) if defined($data) && !ref($data) && $unicode;
-                    my $data_pp = eval { JSON::jsonToObj($json) };
-                    is_deeply $data_pp, $data, "compatibility with JSON.pm $test";
-                }
+            # try parsing the data with JSON.pm
+            if ( $HAS_JSON and !$single_quote ) {
+                $SIG{__WARN__} = sub { 1 };
+                utf8::encode($data) if defined($data) && !ref($data) && $unicode;
+                my $data_pp = eval { JSON::jsonToObj($json) };
+                is_deeply $data_pp, $data, "compatibility with JSON.pm $test";
             }
         }
     }

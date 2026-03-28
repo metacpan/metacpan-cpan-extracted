@@ -1,3 +1,7 @@
+0.56.8 2026-03-27 16:21:24 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - MockUser now has a controller method returning undef, so Abstract::log will fall through to $self->app->log instead of crashing.
+
 0.56.7 2026-03-19 17:46:23 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - protect $self->controller->runEventActions('changeConfig'); in

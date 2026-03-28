@@ -45,6 +45,7 @@ static SV *hv_clone (SV *, SV *, HV *, int, int, AV *);
 static SV *av_clone (SV *, SV *, HV *, int, int, AV *);
 static SV *sv_clone (SV *, HV *, int, int, AV *);
 static SV *av_clone_iterative(SV *, HV *, int, AV *);
+static SV *hv_clone_iterative(SV *, HV *, int, AV *);
 
 #ifdef DEBUG_CLONE
 #define TRACEME(a) printf("%s:%d: ",__FUNCTION__, __LINE__) && printf a;
@@ -195,6 +196,49 @@ av_clone_iterative(SV * ref, HV* hseen, int rdepth, AV * weakrefs)
     return (SV*)root_clone;
 }
 
+/* Iterative hash clone for use when rdepth exceeds MAX_DEPTH.
+ * Mirrors av_clone_iterative: creates a new HV, registers it in hseen for
+ * circular-ref safety, then clones each value via sv_clone (which will
+ * re-enter this function for any nested HVs still above MAX_DEPTH). */
+static SV *
+hv_clone_iterative(SV * ref, HV* hseen, int rdepth, AV * weakrefs)
+{
+    HV *self;
+    HV *root_clone;
+    SV **seen = NULL;
+    HE *next = NULL;
+
+    if (!ref) return NULL;
+
+    self = (HV *)ref;
+
+    /* Return cached clone if we have already visited this HV (circular refs) */
+    if ((seen = CLONE_FETCH(ref))) {
+        return SvREFCNT_inc(*seen);
+    }
+
+    root_clone = newHV();
+    CLONE_STORE(ref, (SV *)root_clone);
+
+    /* Pre-size to avoid incremental resizing */
+    if (HvKEYS(self) > 0)
+        hv_ksplit(root_clone, HvKEYS(self));
+
+    /* Clone each value; sv_clone will use the iterative path again for any
+     * nested structures that are still above MAX_DEPTH. */
+    hv_iterinit(self);
+    while ((next = hv_iternext(self))) {
+        I32 klen;
+        char *kpv = hv_iterkey(next, &klen);
+        SV *val = sv_clone(hv_iterval(self, next), hseen, 1, rdepth, weakrefs);
+        if (HeKUTF8(next))
+            klen = -klen;
+        hv_store(root_clone, kpv, klen, val, HeHASH(next));
+    }
+
+    return (SV *)root_clone;
+}
+
 static SV *
 av_clone (SV * ref, SV * target, HV* hseen, int depth, int rdepth, AV * weakrefs)
 {
@@ -259,11 +303,22 @@ sv_clone (SV * ref, HV* hseen, int depth, int rdepth, AV * weakrefs)
         if (SvTYPE(ref) == SVt_PVAV) {
             return av_clone_iterative(ref, hseen, rdepth, weakrefs);
         }
+        if (SvTYPE(ref) == SVt_PVHV) {
+            return hv_clone_iterative(ref, hseen, rdepth, weakrefs);
+        }
         /* For RVs pointing to AVs, follow the reference and use the
          * iterative path -- this is the common case for [[[...]]] */
         if (SvROK(ref) && SvTYPE(SvRV(ref)) == SVt_PVAV) {
             SV *clone_av = av_clone_iterative(SvRV(ref), hseen, rdepth, weakrefs);
             SV *clone_rv = newRV_noinc(clone_av);
+            if (SvOBJECT(SvRV(ref)))
+                sv_bless(clone_rv, SvSTASH(SvRV(ref)));
+            return clone_rv;
+        }
+        /* For RVs pointing to HVs, use the iterative hash path */
+        if (SvROK(ref) && SvTYPE(SvRV(ref)) == SVt_PVHV) {
+            SV *clone_hv = hv_clone_iterative(SvRV(ref), hseen, rdepth, weakrefs);
+            SV *clone_rv = newRV_noinc(clone_hv);
             if (SvOBJECT(SvRV(ref)))
                 sv_bless(clone_rv, SvSTASH(SvRV(ref)));
             return clone_rv;
@@ -498,8 +553,7 @@ sv_clone (SV * ref, HV* hseen, int depth, int rdepth, AV * weakrefs)
             case 't':	/* PERL_MAGIC_taint */
             case '<': /* PERL_MAGIC_backref */
             case '@':  /* PERL_MAGIC_arylen_p */
-              continue;
-              break;
+              continue; /* resumes the outer magic iteration loop */
             case 'P': /* PERL_MAGIC_tied */
             case 'p': /* PERL_MAGIC_tiedelem */
             case 'q': /* PERL_MAGIC_tiedscalar */
@@ -552,33 +606,34 @@ sv_clone (SV * ref, HV* hseen, int depth, int rdepth, AV * weakrefs)
         mg->mg_virtual = (MGVTBL *) NULL;
     }
     /* 2: HASH/ARRAY  - (with 'internal' elements) */
-  if ( magic_ref )
+    /* For tied HV/AV (magic_ref > 0): skip direct element iteration;
+     * the tie magic cloned above handles the data. */
+  if ( !magic_ref )
   {
-    ;;
-  }
-  else if ( SvTYPE(ref) == SVt_PVHV )
-    clone = hv_clone (ref, clone, hseen, depth, rdepth, weakrefs);
-  else if ( SvTYPE(ref) == SVt_PVAV )
-    clone = av_clone (ref, clone, hseen, depth, rdepth, weakrefs);
+    if ( SvTYPE(ref) == SVt_PVHV )
+      clone = hv_clone (ref, clone, hseen, depth, rdepth, weakrefs);
+    else if ( SvTYPE(ref) == SVt_PVAV )
+      clone = av_clone (ref, clone, hseen, depth, rdepth, weakrefs);
     /* 3: REFERENCE (inlined for speed) */
-  else if (SvROK (ref))
-    {
-      TRACEME(("clone = 0x%x(%d)\n", clone, SvREFCNT(clone)));
-      SvREFCNT_dec(SvRV(clone));
-      SvRV(clone) = sv_clone (SvRV(ref), hseen, depth, rdepth, weakrefs); /* Clone the referent */
-      if (SvOBJECT(SvRV(ref)))
+    else if (SvROK (ref))
       {
-          sv_bless (clone, SvSTASH (SvRV (ref)));
+        TRACEME(("clone = 0x%x(%d)\n", clone, SvREFCNT(clone)));
+        SvREFCNT_dec(SvRV(clone));
+        SvRV(clone) = sv_clone (SvRV(ref), hseen, depth, rdepth, weakrefs); /* Clone the referent */
+        if (SvOBJECT(SvRV(ref)))
+        {
+            sv_bless (clone, SvSTASH (SvRV (ref)));
+        }
+        if (SvWEAKREF(ref)) {
+            /* Defer weakening until after the entire clone graph is built.
+             * sv_rvweaken decrements the referent's refcount, which can
+             * destroy it if no other strong references exist yet.
+             * By deferring, we ensure all strong references are in place
+             * before any weakening occurs. (fixes GH #15) */
+            av_push(weakrefs, SvREFCNT_inc_simple_NN(clone));
+        }
       }
-      if (SvWEAKREF(ref)) {
-          /* Defer weakening until after the entire clone graph is built.
-           * sv_rvweaken decrements the referent's refcount, which can
-           * destroy it if no other strong references exist yet.
-           * By deferring, we ensure all strong references are in place
-           * before any weakening occurs. (fixes GH #15) */
-          av_push(weakrefs, SvREFCNT_inc_simple_NN(clone));
-      }
-    }
+  }
 
   TRACEME(("clone = 0x%x(%d)\n", clone, SvREFCNT(clone)));
   return clone;

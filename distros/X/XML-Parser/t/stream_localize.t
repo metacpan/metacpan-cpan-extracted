@@ -16,6 +16,7 @@ my $xml = '<root><child attr="val">text</child></root>';
     sub EndTag    { }
     sub Text      { }
 }
+package main;
 
 my $parser = XML::Parser->new( Style => 'Stream', Pkg => 'StreamLocalizeTest' );
 

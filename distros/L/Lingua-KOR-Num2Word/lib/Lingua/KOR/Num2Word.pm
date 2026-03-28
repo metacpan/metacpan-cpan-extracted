@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # }}}
 
@@ -83,6 +83,17 @@ sub num2kor_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -100,7 +111,7 @@ Lingua::KOR::Num2Word - Number to word conversion in Korean
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::KOR::Num2Word is module for converting numbers into their written
 representation in Korean (Sino-Korean system). Converts whole numbers

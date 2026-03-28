@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Zip;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -16,12 +16,20 @@ use EBook::Ishmael::CharDet;
 use EBook::Ishmael::Dir;
 use EBook::Ishmael::ImageID qw(image_path_id is_image_path);
 use EBook::Ishmael::EBook::Metadata;
-use EBook::Ishmael::TextToHtml;
+use EBook::Ishmael::HTML qw(prepare_html text2html);
 use EBook::Ishmael::Unzip qw(unzip safe_tmp_unzip);
 
 # This isn't any official format, but generic zip archives are a common way of
 # distributing some ebooks. This module basically looks for any text or HTML
 # files and extracts content from those.
+
+# TODO: Sort files more accurately
+# For example, a zip file with these files would be sorted incorrectly:
+# z/file-1.html
+# z/file-2.html
+# ...
+# z/file-10.html   These will be sorted before file-2.html
+# z/file-11.html
 
 my $MAGIC = pack 'C4', ( 0x50, 0x4b, 0x03, 0x04 );
 
@@ -144,6 +152,7 @@ sub html {
             );
             my ($body) = $dom->findnodes('/html/body');
             $body //= $dom->documentElement;
+            prepare_html($body);
             $html .= join '', map { $_->toString } $body->childNodes;
         }
     }
@@ -186,6 +195,7 @@ sub raw {
             );
             my ($body) = $dom->findnodes('/html/body');
             $body //= $dom->documentElement;
+            prepare_html($body);
             $raw .= $body->textContent . "\n\n";
         }
     }

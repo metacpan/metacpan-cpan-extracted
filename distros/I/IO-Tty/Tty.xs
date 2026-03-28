@@ -828,16 +828,37 @@ pty_allocate()
 
 MODULE = IO::Tty	PACKAGE = IO::Tty
 
+int
+_open_tty(ttyname)
+	char *ttyname
+    CODE:
+	RETVAL = open(ttyname, O_RDWR | O_NOCTTY);
+	if (RETVAL >= 0) {
+#if defined(I_PUSH)
+	    ioctl(RETVAL, I_PUSH, "ptem");
+	    ioctl(RETVAL, I_PUSH, "ldterm");
+	    ioctl(RETVAL, I_PUSH, "ttcompat");
+#endif
+	}
+    OUTPUT:
+	RETVAL
+
 char *
-ttyname(handle)
-InOutStream handle
+ttyname(fh)
+    SV * fh
     CODE:
 #ifdef HAVE_TTYNAME
-	if (handle)
-	    RETVAL = ttyname(PerlIO_fileno(handle));
-	else {
-	    RETVAL = NULL;
-	    errno = EINVAL;
+	{
+	    IO *io = sv_2io(fh);
+	    PerlIO *f = io ? IoIFP(io) : NULL;
+	    if (!f && io)
+		f = IoOFP(io);
+	    if (f)
+		RETVAL = ttyname(PerlIO_fileno(f));
+	    else {
+		RETVAL = NULL;
+		errno = EINVAL;
+	    }
 	}
 #else
 	warn("IO::Tty::ttyname not implemented on this architecture");

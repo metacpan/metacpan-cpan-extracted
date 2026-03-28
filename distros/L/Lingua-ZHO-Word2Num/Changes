@@ -1,9 +1,7 @@
 Revision history for Lingua-ZHO-Word2Num
 
-0.2603260  2026-03-26
-    - fix =head1 NAME to standard CPAN format: Module - description
-    - improve CPAN kwalitee: Changes, META.json, LICENSE POD, MetaResources
-    - fix 78 audit findings: typos, wrong comments, stale POD, language list
-    - fix typo: representates â represents in grammar comments
-    - replace \x{HHHH} hex escapes with literal UTF-8 characters
+0.2603270  2026-03-27
+    - ZHO Word2Num: isolated traditional character grammar from pinyin path
+    - fix Word2Num parsers: 10 languages, 121 Galois walk failures resolved
+    - fix KOR ZHO BUL Word2Num parsers for large numbers (Galois walk finds)
 

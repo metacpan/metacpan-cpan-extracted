@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 
 # }}}
 
@@ -77,6 +77,67 @@ sub num2tur_cardinal :Export {
 
 # }}}
 
+# {{{ num2tur_ordinal                 convert number to ordinal text
+
+sub num2tur_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    my $cardinal = num2tur_cardinal($number);
+
+    # Turkish ordinals: cardinal + suffix determined by vowel harmony.
+    # Suffix has two forms depending on whether the cardinal ends in
+    # a vowel or consonant:
+    #   ends in consonant: ıncı / inci / uncu / üncü
+    #   ends in vowel:     ncı  / nci  / ncu  / ncü
+    # Consonant softening: final "t" becomes "d" (dört -> dörd).
+
+    $cardinal =~ s{dört\z}{dörd}xms;
+
+    my $last_vowel = q{};
+    if ($cardinal =~ m{([aeıioöuü])[^aeıioöuü]*\z}xms) {
+        $last_vowel = $1;
+    }
+
+    my $ends_in_vowel = $cardinal =~ m{[aeıioöuü]\z}xms;
+
+    my %suffix_v = (   # after vowel: drop the leading harmony vowel
+        'a' => 'ncı',  'ı' => 'ncı',
+        'e' => 'nci',  'i' => 'nci',
+        'o' => 'ncu',  'u' => 'ncu',
+        'ö' => 'ncü',  'ü' => 'ncü',
+    );
+    my %suffix_c = (   # after consonant: full suffix with harmony vowel
+        'a' => 'ıncı', 'ı' => 'ıncı',
+        'e' => 'inci',  'i' => 'inci',
+        'o' => 'uncu',  'u' => 'uncu',
+        'ö' => 'üncü',  'ü' => 'üncü',
+    );
+
+    my $suffix_table = $ends_in_vowel ? \%suffix_v : \%suffix_c;
+    my $suffix = $suffix_table->{$last_vowel} // 'inci';
+
+    return $cardinal . $suffix;
+}
+
+# }}}
+
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 1,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -94,7 +155,7 @@ Lingua::TUR::Num2Word - Number to word conversion in Turkish
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::TUR::Num2Word is module for converting numbers into their written
 representation in Turkish. Converts whole numbers from 0 up to 999 999 999.
@@ -116,6 +177,9 @@ Text is encoded in UTF-8.
 
  print $text || "sorry, can't convert this number into turkish language.";
 
+ my $ord = Lingua::TUR::Num2Word::num2tur_ordinal( 3 );
+ print $ord;    # "üçüncü"
+
 =cut
 
 # }}}
@@ -136,6 +200,14 @@ Text is encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2tur_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to ordinal text representation using Turkish vowel harmony.
+Only numbers from interval [1, 999_999_999] will be converted.
+
 =back
 
 =cut
@@ -150,6 +222,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2tur_cardinal
+
+=item num2tur_ordinal
 
 =back
 

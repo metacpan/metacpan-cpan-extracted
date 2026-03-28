@@ -20,7 +20,6 @@ assert_exact(
     'postfix for with print',
     sub { print $_ for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    print \$_;\n" .
     "  }\n" .
@@ -31,7 +30,6 @@ assert_exact(
     'postfix for with range',
     sub { print $_ for (1..10) },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (1 .. 10) {\n" .
     "    print \$_;\n" .
     "  }\n" .
@@ -42,7 +40,6 @@ assert_exact(
     'postfix for with warn',
     sub { warn $_ for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    warn \$_;\n" .
     "  }\n" .
@@ -55,7 +52,6 @@ assert_exact(
     'and-do block in postfix for',
     sub { $_ == 5 && do { print "found" } for (0..100) },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (0 .. 100) {\n" .
     "    if (\$_ == 5) {\n" .
     "      print 'found';\n" .
@@ -68,7 +64,6 @@ assert_exact(
     'or-do block in postfix for',
     sub { $_ || do { print "zero" } for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    unless (\$_) {\n" .
     "      print 'zero';\n" .
@@ -81,7 +76,6 @@ assert_exact(
     'and-do with last in postfix for',
     sub { $_ eq "stop" && do { last } for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    if (\$_ eq 'stop') {\n" .
     "      last;\n" .
@@ -96,7 +90,6 @@ assert_exact(
     'and-print in postfix for',
     sub { $_ > 0 && print "pos" for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    \$_ > 0 && print 'pos';\n" .
     "  }\n" .
@@ -107,7 +100,6 @@ assert_exact(
     'defined-and-print in postfix for',
     sub { defined $_ && print $_ for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    defined(\$_) && print \$_;\n" .
     "  }\n" .
@@ -120,7 +112,6 @@ assert_exact(
     'chomp in postfix for',
     sub { chomp $_ for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    chomp(\$_);\n" .
     "  }\n" .
@@ -131,7 +122,6 @@ assert_exact(
     'chop in postfix for',
     sub { chop $_ for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    chop(\$_);\n" .
     "  }\n" .
@@ -145,7 +135,6 @@ assert_exact(
     sub { my @out; push @out, $_ * 2 for @_ },
     "\$VAR1 = sub {\n" .
     "  my \@out;\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    push(\@out, \$_ * 2);\n" .
     "  }\n" .
@@ -158,7 +147,6 @@ assert_exact(
     'next in postfix for',
     sub { next for @_ },
     "\$VAR1 = sub {\n" .
-    ($] < 5.012 ? "  \n" : "") .
     "  for (\@_) {\n" .
     "    next;\n" .
     "  }\n" .

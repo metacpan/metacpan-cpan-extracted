@@ -1,6 +1,6 @@
 package EBook::Ishmael::EBook::Text;
 use 5.016;
-our $VERSION = '2.03';
+our $VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use File::Spec;
 
 use EBook::Ishmael::CharDet;
 use EBook::Ishmael::EBook::Metadata;
-use EBook::Ishmael::TextToHtml;
+use EBook::Ishmael::HTML qw(text2html);
 
 # Use -T to check if file is a text file. EBook.pm's ebook_id() makes sure
 # to use the Text heuristic last, so that it doesn't incorrectly identify other
@@ -82,7 +82,6 @@ sub raw {
     if (not defined $self->{Encode}) {
         $self->{Encode} = chardet($raw) // 'ASCII';
     }
-    say $self->{Encode};
     $raw = decode($self->{Encode}, $raw);
 
     if (defined $out) {

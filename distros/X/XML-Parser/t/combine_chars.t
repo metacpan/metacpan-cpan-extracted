@@ -1,9 +1,11 @@
-BEGIN { print "1..3\n"; }
-END { print "not ok 1\n" unless $loaded; }
+use strict;
+use warnings;
+use Test::More tests => 3;
 use XML::Parser;
 use File::Temp qw(tempfile);
-$loaded = 1;
-print "ok 1\n";
+
+# Test 1: module loads
+ok( 1, 'XML::Parser loaded' );
 
 # Test that character data spanning buffer boundaries is correctly delivered
 # across multiple Char handler calls (GitHub issue #56 / rt.cpan.org #122970).
@@ -13,13 +15,10 @@ print "ok 1\n";
 # chunk. This is documented, correct behaviour — user code must concatenate
 # successive Char calls between Start/End events.
 
-my $bufsize = 32768;    # must match BUFSIZE in Expat.xs
-
-# Build a document where text content deliberately spans the buffer boundary.
-# The element markup is kept short so nearly all bytes are character data.
-my $text_len = $bufsize + 512;    # guaranteed to cross at least one boundary
+my $bufsize   = 32768;              # must match BUFSIZE in Expat.xs
+my $text_len  = $bufsize + 512;     # guaranteed to cross at least one boundary
 my $long_text = 'A' x $text_len;
-my $doc = "<r>$long_text</r>";
+my $doc       = "<r>$long_text</r>";
 
 # Write to a temp file — string parsing hands expat the whole buffer at once,
 # so the split only occurs when parsing from a stream/file.
@@ -28,31 +27,21 @@ binmode($fh);
 print $fh $doc;
 close $fh;
 
-# --- Test 2: multiple Char calls are made for text crossing a boundary --------
-my $char_calls = 0;
+# Test 2: multiple Char calls are made for text crossing a boundary
+my $char_calls  = 0;
 my $accumulated = '';
 
-sub count_char {
-    my ( $xp, $str ) = @_;
-    $char_calls++;
-    $accumulated .= $str;
-}
-
-my $p = XML::Parser->new( Handlers => { Char => \&count_char } );
+my $p = XML::Parser->new(
+    Handlers => {
+        Char => sub {
+            $char_calls++;
+            $accumulated .= $_[1];
+        },
+    }
+);
 $p->parsefile($tmpfile);
 
-if ( $char_calls > 1 ) {
-    print "ok 2\n";
-}
-else {
-    print "not ok 2 # expected >1 Char calls, got $char_calls\n";
-}
+cmp_ok( $char_calls, '>', 1, 'multiple Char calls for text crossing buffer boundary' );
 
-# --- Test 3: concatenated chunks equal the original text ----------------------
-if ( $accumulated eq $long_text ) {
-    print "ok 3\n";
-}
-else {
-    my $got_len = length($accumulated);
-    print "not ok 3 # accumulated length $got_len, expected $text_len\n";
-}
+# Test 3: concatenated chunks equal the original text
+is( $accumulated, $long_text, 'accumulated character data matches original' );

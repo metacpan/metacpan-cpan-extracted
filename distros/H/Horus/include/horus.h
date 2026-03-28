@@ -20,6 +20,13 @@
 /* Route fatal errors through Perl's croak() */
 #define HORUS_FATAL(msg) croak("%s", (msg))
 
+/* When Perl is built with ithreads, disable the static random pool
+ * to avoid data races across interpreter threads.  Each call will
+ * go directly to the OS CSPRNG instead. */
+#ifdef USE_ITHREADS
+#  define HORUS_NO_POOL 1
+#endif
+
 /* Pull in the entire pure-C UUID library */
 #include "horus_core.h"
 

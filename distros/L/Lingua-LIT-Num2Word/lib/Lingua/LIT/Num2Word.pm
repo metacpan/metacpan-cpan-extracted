@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my %token1 = qw( 0 nulis          1 vienas         2 du
                  3 trys           4 keturi         5 penki
                  6 šeši           7 septyni        8 aštuoni
@@ -160,6 +160,17 @@ sub num2lit_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -177,7 +188,7 @@ Lingua::LIT::Num2Word - Number to word conversion in Lithuanian
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::LIT::Num2Word is module for conversion of numbers into their
 representation in Lithuanian. It converts whole numbers from 0 up to

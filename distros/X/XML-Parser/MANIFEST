@@ -19,7 +19,6 @@ Parser/Style/Objects.pm		Objects style parser
 Parser/Style/Stream.pm		Stream style parser
 Parser/Style/Subs.pm		Subs style parser
 Parser/Style/Tree.pm		Tree style parser
-README				Short explanation
 README.md
 samples/canonical		A utility to generate canonical XML
 samples/canontst.xml		An xml document to demonstrate canonical

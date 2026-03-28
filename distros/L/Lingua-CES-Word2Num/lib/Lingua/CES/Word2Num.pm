@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my $parser   = ces_numerals();
 
 # }}}
@@ -123,7 +123,7 @@ Lingua::CES::Word2Num - Word to number conversion in Czech
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::CES::Word2Num is module for converting czech numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

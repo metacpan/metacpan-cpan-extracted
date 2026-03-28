@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603260';
+our $VERSION = '0.2603270';
 my %token1 = qw( 0 nula         1 jedna         2 dva
                  3 tri          4 štyri         5 päť
                  6 šesť         7 sedem         8 osem
@@ -128,6 +128,17 @@ sub num2slk_cardinal :Export {
 
 # }}}
 
+
+# {{{ capabilities              declare supported features
+
+sub capabilities {
+    return {
+        cardinal => 1,
+        ordinal  => 0,
+    };
+}
+
+# }}}
 1;
 
 __END__
@@ -145,7 +156,7 @@ Lingua::SLK::Num2Word - Number to word conversion in Slovak
 
 =head1 VERSION
 
-version 0.2603260
+version 0.2603270
 
 Lingua::SLK::Num2Word is module for conversion numbers into their representation
 in Slovak. It converts whole numbers from 0 up to 999 999 999.

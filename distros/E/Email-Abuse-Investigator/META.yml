@@ -1,0 +1,42 @@
+---
+abstract: 'Analyse spam email to identify originating hosts, hosted URLs, and suspicious domains'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  MIME::Base64: '0'
+  MIME::QuotedPrint: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Test::DescribeMe: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Email-Abuse-Investigator
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  IO::Socket::INET: '0'
+  MIME::Base64: '0'
+  MIME::QuotedPrint: '0'
+  Object::Configure: '0'
+  Params::Get: '0'
+  Params::Validate::Strict: '0'
+  Readonly::Values::Months: '0'
+  Socket: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Email-Abuse-Investigator
+  homepage: https://metacpan.org/pod/Email::Abuse::Investigator
+  repository: git://github.com/nigelhorne/Email-Abuse-Investigator.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
