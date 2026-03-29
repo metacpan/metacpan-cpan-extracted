@@ -1,0 +1,35 @@
+use alienfile;
+use Path::Tiny;
+
+# Prefer the system libssh if pkg-config can find it.
+# Falls back to building from the bundled source tarball.
+
+probe [ 'pkg-config --exists libssh' ];
+
+sys {
+  gather sub {
+    my ($build) = @_;
+    chomp( my $cflags  = `pkg-config --cflags      libssh` );
+    chomp( my $libs    = `pkg-config --libs         libssh` );
+    chomp( my $version = `pkg-config --modversion   libssh` );
+    $build->runtime_prop->{cflags}  = $cflags;
+    $build->runtime_prop->{libs}    = $libs;
+    $build->runtime_prop->{version} = $version;
+  };
+};
+
+share {
+  start_url 'file://' . Path::Tiny->cwd->child('share/libssh-0.10.6.tar.xz')->stringify;
+  plugin 'Extract' => 'tar.xz';
+  plugin 'Build::CMake';
+
+  build [
+    '%{cmake}',
+    '-DCMAKE_INSTALL_PREFIX=%{.install.prefix}',
+    '-DCMAKE_BUILD_TYPE=Release',
+    '-DWITH_EXAMPLES=OFF',
+    '-DWITH_PCAP=OFF',
+    '-DWITH_GSSAPI=OFF',
+    '..',
+  ];
+};

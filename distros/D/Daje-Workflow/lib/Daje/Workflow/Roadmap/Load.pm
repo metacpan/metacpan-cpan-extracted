@@ -76,6 +76,14 @@ class Daje::Workflow::Roadmap::Load {
         my $activity = $self->get_activity($workflow_name, $state_name, $activity_name);
         return $activity->{post_checks};
     }
+
+    method get_que_activities( $workflow_name, $state_name, $activity_name) {
+        my $activity = $self->get_activity($workflow_name, $state_name, $activity_name);
+        if(exists $activity->{que_activities}) {
+            return $activity->{que_activities};
+        }
+        return [];
+    }
 }
 
 1;

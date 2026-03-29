@@ -1,6 +1,6 @@
 Revision history for Perl extension Daje-Database-Model
 
-0.25 2026-03-03T02:55:04Z
+0.35 2026-03-29T06:37:42Z
 
     - 2025-10-04 Base class for defaults added
     - 2025-10-04 Bug fix

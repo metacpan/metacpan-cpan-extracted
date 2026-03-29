@@ -9,14 +9,14 @@ use parent 'Class::Accessor';
 use DateTime::Duration;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 Travel::Routing::DE::DBRIS::Connection::Segment->mk_ro_accessors(
 	qw(
 	  dep_name dep_eva arr_name arr_eva
 	  train train_long train_mid train_short direction
-	  sched_dep rt_dep dep dep_platform
-	  sched_arr rt_arr arr arr_platform
+	  sched_dep rt_dep dep dep_platform dep_stop
+	  sched_arr rt_arr arr arr_platform arr_stop
 	  sched_duration rt_duration duration duration_percent
 	  arr_delay dep_delay delay feasibility is_unlikely transfer_duration
 	  journey_id
@@ -46,19 +46,21 @@ sub new {
 		journey_id  => $json->{journeyId},
 	};
 
+	bless( $ref, $obj );
+
 	if ( my $ts = $json->{abfahrtsZeitpunkt} ) {
-		$ref->{sched_dep} = $strptime->parse_datetime($ts);
+		$ref->{sched_dep} = $ref->parse_datetime( $strptime, $ts );
 	}
 	if ( my $ts = $json->{ezAbfahrtsZeitpunkt} ) {
-		$ref->{rt_dep} = $strptime->parse_datetime($ts);
+		$ref->{rt_dep} = $ref->parse_datetime( $strptime, $ts );
 	}
 	$ref->{dep} = $ref->{rt_dep} // $ref->{sched_dep};
 
 	if ( my $ts = $json->{ankunftsZeitpunkt} ) {
-		$ref->{sched_arr} = $strptime->parse_datetime($ts);
+		$ref->{sched_arr} = $ref->parse_datetime( $strptime, $ts );
 	}
 	if ( my $ts = $json->{ezAnkunftsZeitpunkt} ) {
-		$ref->{rt_arr} = $strptime->parse_datetime($ts);
+		$ref->{rt_arr} = $ref->parse_datetime( $strptime, $ts );
 	}
 	$ref->{arr} = $ref->{rt_arr} // $ref->{sched_arr};
 
@@ -156,13 +158,23 @@ sub new {
 	}
 
 	if ( @{ $ref->{route} // [] } ) {
+		$ref->{dep_stop}     = $ref->{route}[0];
+		$ref->{arr_stop}     = $ref->{route}[-1];
 		$ref->{dep_platform} = $ref->{route}[0]->platform;
 		$ref->{arr_platform} = $ref->{route}[-1]->platform;
 	}
 
-	bless( $ref, $obj );
-
 	return $ref;
+}
+
+sub parse_datetime {
+	my ( $self, $strp, $dt_str ) = @_;
+	my $ret;
+	eval { $ret = $strp->parse_datetime($dt_str); };
+	if ($@) {
+		warn("Cannot parse datetime $dt_str: $@");
+	}
+	return $ret;
 }
 
 sub attributes {

@@ -1,0 +1,10 @@
+Release history for Dist-Zilla-PluginBundle-DBIO
+
+0.900000  2026-03-29
+    - Standard plugin configuration for all DBIO distributions
+    - Pod::Weaver bundle with =attr and =method collectors
+    - Dual copyright via heritage flag (heritage = 1 for DBIx::Class derived code)
+    - NextRelease integration for automatic Changes file management
+    - Version from git tags (first_version 0.900000) for drivers
+    - VersionFromMainModule for core
+    - Self-bootstrapping via [Bootstrap::lib]

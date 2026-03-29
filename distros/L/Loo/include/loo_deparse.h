@@ -34,8 +34,8 @@
 #  define PadnameLEN(pn) SvCUR((SV *)(pn))
 #endif
 
-/* PADNAME type: pre-5.22 it was just SV */
-#if PERL_VERSION < 22
+/* PADNAME type: typedef'd as SV from 5.20; became a struct in 5.22 */
+#if PERL_VERSION < 20
    typedef SV PADNAME;
 #endif
 
@@ -678,10 +678,10 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
             }
         }
 
-        /* Optimised-away padsv_store (5.36+): my $x = expr or $x = expr
+        /* Optimised-away padsv_store (5.38+): my $x = expr or $x = expr
            The peephole converts sassign(rhs, padsv) → padsv_store(rhs)
            and a later pass may null it. */
-#if PERL_VERSION >= 36
+#if PERL_VERSION >= 38
         if (was == OP_PADSV_STORE) {
             const char *name = ddc_padname_for_targ(aTHX_ ctx, o->op_targ);
             if (o->op_private & OPpLVAL_INTRO)
@@ -782,6 +782,25 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
             }
         }
 
+        /* Optimised-away OP_EMPTYAVHV (5.36+): the peephole may null
+           the empty hash/array constructor.  Emit {} or []. */
+#if PERL_VERSION >= 36
+        if (was == OP_EMPTYAVHV) {
+#ifdef OPpEMPTYAVHV_IS_HV
+            if (o->op_private & OPpEMPTYAVHV_IS_HV)
+                sv_catpvn(ctx->out, "{}", 2);
+            else
+                sv_catpvn(ctx->out, "[]", 2);
+#else
+            if (o->op_flags & OPf_SPECIAL)
+                sv_catpvn(ctx->out, "{}", 2);
+            else
+                sv_catpvn(ctx->out, "[]", 2);
+#endif
+            return;
+        }
+#endif
+
         /* Optimised-away list/scope/other — recurse into children */
         if (o->op_flags & OPf_KIDS) {
             OP *kid = cUNOPo->op_first;
@@ -847,7 +866,7 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
         && type != OP_MULTICONCAT
 #endif
         && type != OP_PADSV && type != OP_PADAV && type != OP_PADHV
-#if PERL_VERSION >= 36
+#if PERL_VERSION >= 38
         && type != OP_PADSV_STORE
 #endif
 #if PERL_VERSION >= 40
@@ -929,8 +948,8 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
         break;
     }
 
-    /* ── OP_PADSV_STORE: combined assign-to-pad (5.36+) ──────── */
-#if PERL_VERSION >= 36
+    /* ── OP_PADSV_STORE: combined assign-to-pad (5.38+) ──────── */
+#if PERL_VERSION >= 38
     case OP_PADSV_STORE: {
         const char *name = ddc_padname_for_targ(aTHX_ ctx, o->op_targ);
         if (o->op_private & OPpLVAL_INTRO)
@@ -973,7 +992,7 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
 #endif
 
     /* ── OP_EMPTYAVHV: empty anon hash/array {} or [] (5.36+) ── */
-#ifdef OP_EMPTYAVHV
+#if PERL_VERSION >= 36
     case OP_EMPTYAVHV: {
 #ifdef OPpEMPTYAVHV_IS_HV
         if (o->op_private & OPpEMPTYAVHV_IS_HV)

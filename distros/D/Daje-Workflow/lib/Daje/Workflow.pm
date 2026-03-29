@@ -10,6 +10,7 @@ use Daje::Workflow::Database::Model;
 use Daje::Workflow::Checks;
 use Daje::Workflow::Activities;
 use Daje::Workflow::Errors::Error;
+use Daje::Workflow::Enqueue;
 
 # NAME
 # ====
@@ -73,6 +74,125 @@ use Daje::Workflow::Errors::Error;
 # them to what happens in real life -- you move from one action to another and
 # at each step ask: what happens next?
 #
+#  {
+#   "workflow": [
+#     {
+#       "name": "INITIAL",
+#       "auto": 1,
+#       "state": {
+#         "pre_checks": [
+#
+#         ],
+#         "activities": [
+#           {
+#             "name": "register_new_users_user",
+#             "activity": "Daje::Workflow::Activities::Signup::User",
+#             "activity_data": {
+#               "class": "Daje::Database::Model::UsersUsers"
+#             },
+#             "method": "save",
+#             "resulting_state": "OPEN",
+#             "pre_checks": [
+#               {
+#                 "name": "Mandatory fields",
+#                 "class": "Daje::Workflow::Checks::Mandatory",
+#                 "checks": "mail,password"
+#               },{
+#                 "name": "Record already exists",
+#                 "class": "Daje::Workflow::Checks::Exists",
+#                 "checks": {
+#                   "fields": "mail",
+#                   "table": "users_users",
+#                   "err_text": "This user already exists, maybe you should try to change password instead ?"
+#               }
+#             ],
+#             "post_checks":[],
+#             "observers": []
+#           },
+#           {
+#             "name": "save_users_user",
+#             "activity": "Daje::Workflow::Activities::Save",
+#             "activity_data": {
+#               "class": "Daje::Database::Model::UsersUsers"
+#             },
+#             "method": "save",
+#             "resulting_state": "OPEN",
+#             "pre_checks": [
+#               {
+#                 "name": "Mandatory fields",
+#                 "class": "Daje::Workflow::Checks::Mandatory",
+#                 "checks": "Daje::Database::Model::UsersUsers"
+#               }
+#             ],
+#             "post_checks":[],
+#             "observers": []
+#           }
+#         ],
+#         "post_checks": [
+#           {
+#             "check": ""
+#           }
+#         ]
+#       }
+#     },
+#     {
+#       "name": "OPEN",
+#       "auto": 1,
+#       "state": {
+#         "pre_checks": [],
+#         "activities": [
+#           {
+#             "name": "save_users_user",
+#             "activity": "Daje::Workflow::Activities::Save",
+#             "activity_data": {
+#               "class": "Daje::Database::Model::UsersUsers"
+#             },
+#             "method": "save",
+#             "resulting_state": "OPEN",
+#             "pre_checks": [
+#               {
+#                 "name": "Mandatory fields",
+#                 "class": "Daje::Workflow::Checks::Mandatory",
+#                 "checks": "Daje::Database::Model::UsersUsers"
+#               }
+#             ],
+#             "post_checks":[],
+#             "observers": []
+#           },
+#           {
+#             "name": "delete_users_user",
+#             "activity": "Daje::Workflow::Activities::Delete",
+#             "activity_data": {
+#               "class": "Daje::Database::Model::UsersUsers"
+#             },
+#             "method": "delete",
+#             "resulting_state": "OPEN",
+#             "pre_checks": [
+#               {
+#                 "name": "Mandatory fields",
+#                 "class": "Daje::Workflow::Checks::Mandatory",
+#                 "checks": "users_users_pkey,"
+#               }
+#             ],
+#             "post_checks":[],
+#             "observers": [],
+#             "que_activities": [
+#               {
+#                 "workflow": "workflow name",
+#                 "activity":  "name of activity"
+#               },
+#             ]
+#           }
+#         ],
+#         "post_checks": [
+#           {
+#             "check": ""
+#           }
+#         ]
+#       }
+#     }
+#   ]
+# }
 #
 # LICENSE
 # =======
@@ -87,7 +207,7 @@ use Daje::Workflow::Errors::Error;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.55";
+our $VERSION = "0.77";
 
 has 'workflow_name';    #
 has 'workflow_pkey';    #
@@ -99,6 +219,7 @@ has 'error';
 has 'workflow_data';
 has 'model';
 has 'next_activity';
+has 'minion';
 
 sub process($self, $activity_name) {
 
@@ -124,12 +245,41 @@ sub process($self, $activity_name) {
                                     if ($self->save_workflow($db)
                                         and $self->error->has_error() == 0) {
                                         $tx->commit();
+                                        $self->check_for_jobs_to_enque($activity_name);
                                         ($result, $activity_name, $auto) = $self->_is_it_auto($activity_name, $auto);
                                     }
                                 }
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+    return $result;
+}
+
+sub check_for_jobs_to_enque($self, $activity_name) {
+    my $result = 1;
+    if($self->minion) {
+        my $que_activities = $self->loader->get_que_activities(
+            $self->workflow_name, $self->workflow_data->{state}, $activity_name
+        );
+        if(defined $que_activities) {
+            my $length = scalar @{$que_activities};
+            for (my $i = 0; $i < $length; $i++) {
+                if($self->error->has_error() == 0) {
+                    $result = Daje::Workflow::Enqueue->new(
+                        error   => $self->error,
+                        model   => $self->model,
+                        minion  => $self->minion,
+                        context => $self->context
+                    )->enqueue_activity(
+                        @{$que_activities}[$i]->{workflow},
+                        @{$que_activities}[$i]->{activity}
+                    );
+                } else {
+                    $result = 0;
                 }
             }
         }
@@ -222,6 +372,7 @@ sub _activity_pre_checks($self, $activity_name) {
         $result = Daje::Workflow::Checks->new(
             error => $self->error,
             model => $self->model,
+            db    => $self->pg->db,
         )->check(
             $self->context, $checks
         );
@@ -238,6 +389,7 @@ sub _activity_post_checks($self, $activity_name) {
         $result = Daje::Workflow::Checks->new(
             error => $self->error,
             model => $self->model,
+            db    => $self->pg->db,
         )->check(
             $self->context, $checks
         );
@@ -254,11 +406,11 @@ sub _state_post_checks($self) {
         $result = Daje::Workflow::Checks->new(
             error => $self->error,
             model => $self->model,
+            db    => $self->pg->db,
         )->check(
             $self->context, $checks
         );
     }
-
 
     return $result;
 }
@@ -272,6 +424,7 @@ sub _state_pre_checks($self) {
         $result = Daje::Workflow::Checks->new(
             error => $self->error,
             model => $self->model,
+            db    => $self->pg->db,
         )->check(
             $self->context, $checks
         );
@@ -295,9 +448,11 @@ sub _init($self, $db) {
     if(length($err) > 0) {
         $self->error->add_error($err);
     }
+
     $self->workflow_data($data->workflow_data());
     $self->context($data->context());
     $self->workflow_pkey($self->workflow_data->{workflow_pkey});
+    $self->context->{context}->{workflow}->{workflow_fkey} = $self->workflow_data->{workflow_pkey};
     $self->model($data);
     return 1;
 }

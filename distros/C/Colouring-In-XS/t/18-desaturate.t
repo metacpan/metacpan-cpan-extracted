@@ -5,7 +5,7 @@ use Colouring::In::XS qw/desaturate/;
 # tests
 convert_colour(
 	colour => 'rgb(0, 120, 120)',
-	expected => [30, 89, 89],
+	expected => ['29|30', '89|90', '89|90'],
 	amount => 50
 );
 convert_colour(

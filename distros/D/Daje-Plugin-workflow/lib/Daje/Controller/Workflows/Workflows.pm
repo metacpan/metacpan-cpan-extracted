@@ -66,6 +66,15 @@ sub execute($self) {
         my $data->{context} = decode_json ($self->req->body);
         $data->{context}->{users_fkey} = $users_pkey;
         $data->{context}->{companies_fkey} = $companies_pkey;
+
+        if(exists $data->{context}->{payload}->{companies_companies_fkey} and $data->{context}->{payload}->{companies_companies_fkey} == 0 ) {
+            $data->{context}->{payload}->{companies_companies_fkey} = $companies_pkey;
+        }
+
+        if(exists $data->{context}->{payload}->{users_users_fkey} and $data->{context}->{payload}->{users_users_fkey} == 0 ) {
+            $data->{context}->{payload}->{users_users_fkey} = $users_pkey;
+        }
+
     #
     # push @{$data->{actions}}, "$self->stash('wf_action')";
     # $data->{workflow}->{workflow} = $self->stash('workflow');
@@ -84,7 +93,9 @@ sub execute($self) {
         $self->workflow_engine->context($data);
         $self->workflow_engine->process($data->{context}->{workflow}->{activity});
         if($self->workflow_engine->error->has_error() == 0) {
-            $self->render(json => {result => 1, data => 'OK'});
+            say "Daje::Controller::Workflow::Workflow::execute " . Dumper($self->workflow_engine->context());
+            my $context = decode_json $self->workflow_engine->context()->{context};
+            $self->render(json => {result => 1, data => 'OK', context => $context });
         } else {
             $self->app->log->error('Daje::Controller::Workflows::Workflows::execute ' . $self->workflow_engine->error->error());
             $self->render(json =>

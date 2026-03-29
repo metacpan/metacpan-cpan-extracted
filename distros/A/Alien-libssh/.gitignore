@@ -1,0 +1,5 @@
+.build/
+Alien-libssh-*/
+*.tar.gz
+blib/
+_alien/

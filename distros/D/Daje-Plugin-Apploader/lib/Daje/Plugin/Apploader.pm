@@ -81,7 +81,10 @@ use CPAN;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.35";
+our $VERSION = "0.45";
+
+use Data::Dumper;
+has 'pg';
 
 sub register ($self, $app, $config) {
 
@@ -116,6 +119,7 @@ sub register ($self, $app, $config) {
 
         $app->log->debug("routes namespace done");
         if(exists $loadables->{plugin}) {
+
             my $length = scalar @{$loadables->{plugin}};
             my @install = ();
             for(my $i = 0; $i < $length; $i++) {
@@ -123,13 +127,10 @@ sub register ($self, $app, $config) {
             }
             for(my $i = 0; $i < $length; $i++) {
                 if (exists @{$loadables->{plugin}}[$i]->{options}) {
-                    my %plugin = $self->_plugin_options(
+                    my $plugin = $self->_plugin_options(
                         $app,
                         @{$loadables->{plugin}}[$i]->{name},
                         @{$loadables->{plugin}}[$i]->{options}
-                    );
-                    $app->plugin(
-                        %plugin
                     );
                 } else {
                     $app->plugin(@{$loadables->{plugin}}[$i]->{name});
@@ -214,17 +215,19 @@ sub _plugin_options($self, $app, $name, $options) {
 
     my %plugin = ();
     my %result = ();
-
-    my $length = scalar @{$options};
-    for (my $i = 0; $i < $length; $i++) {
-        my $plug = @{$options}[$i]->{name};
-        my $data = @{$options}[$i]->{option};
-        %plugin =  ($plug => eval $data);
-    }
+    try {
+        my $length = scalar @{$options};
+        for (my $i = 0; $i < $length; $i++) {
+            my $plug = @{$options}[$i]->{name};
+            my $data = @{$options}[$i]->{option};
+            %plugin = ($plug => $data );
+        }
+    } catch($e) {
+        say "_plugin_options " . $e;
+    };
 
     $result{$name} = \%plugin;
-
-    return %result;
+    return \%plugin;;
 }
 1;
 __END__

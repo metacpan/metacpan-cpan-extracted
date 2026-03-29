@@ -27,7 +27,7 @@ static HV * MESSAGES;
 
 static SV * xs_new(SV * class, HV * hash) {
 	dTHX;
-	if (SvTYPE(class) != SVt_PV) {
+	if (SvROK(class)) {
 		char * name = HvNAME(SvSTASH(SvRV(class)));
 		class = newSVpv(name, strlen(name));
 	}
@@ -144,7 +144,7 @@ static SV * xs_rgba_to_obj(SV * class, colouring_rgba_t c) {
 
 static SV * xs_ensure_obj(SV * class, SV * colour) {
 	dTHX;
-	if (SvTYPE(colour) == SVt_PV) {
+	if (!SvROK(colour)) {
 		return xs_new_color(class, colour, newSVnv(1));
 	}
 	return colour;

@@ -42,7 +42,7 @@ use Mojo::Loader qw(load_class);
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 has 'pg';
 has 'migrations';

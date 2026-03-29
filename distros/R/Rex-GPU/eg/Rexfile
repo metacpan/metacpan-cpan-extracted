@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+# Example Rexfile for Rex::GPU + Rex::Rancher deployment
+#
+# Usage:
+#   rex -f eg/Rexfile -H <host> detect
+#   rex -f eg/Rexfile -H <host> setup
+#   rex -f eg/Rexfile -H <host> setup --runtime=k3s
+#   rex -f eg/Rexfile -H <host> node --hostname=worker-01 --domain=k8s.example.com
+#   rex -f eg/Rexfile -H <host> server --token=mysecret --tls_san=10.0.0.1
+#   rex -f eg/Rexfile -H <host> agent  --token=mysecret --server=https://10.0.0.1:6443
+#
+# SSH key: defaults to ~/.ssh/id_ed25519, override with REX_KEY env var
+# SSH user: defaults to root, override with REX_USER env var
+
+use Rex -feature => ['1.4'];
+use Rex::LibSSH;
+use Rex::GPU;
+use Rex::Rancher::Agent;
+use Rex::Rancher::Node;
+use Rex::Rancher::Server;
+use Rex::Rancher::Cilium;
+
+my $key  = $ENV{REX_KEY}  || "$ENV{HOME}/.ssh/id_ed25519";
+my $user = $ENV{REX_USER} || 'root';
+
+set connection  => 'LibSSH';
+set user        => $user;
+set private_key => $key;
+set public_key  => "$key.pub";
+set auth        => 'key';
+
+desc 'Detect GPUs on the host';
+task 'detect', sub {
+    my $gpus = Rex::GPU::gpu_detect();
+
+    if (@{ $gpus->{nvidia} // [] }) {
+        for my $gpu (@{ $gpus->{nvidia} }) {
+            Rex::Logger::info("NVIDIA: $gpu->{name}" . ($gpu->{compute} ? " (compute)" : ""));
+        }
+    }
+    else {
+        Rex::Logger::info("No NVIDIA GPUs detected");
+    }
+
+    if (@{ $gpus->{amd} // [] }) {
+        for my $gpu (@{ $gpus->{amd} }) {
+            Rex::Logger::info("AMD: $gpu->{name}");
+        }
+    }
+};
+
+desc 'Detect and install NVIDIA drivers + container toolkit';
+task 'setup', sub {
+    my ($params) = @_;
+    Rex::GPU::gpu_setup(
+        containerd_config => ($params->{runtime} // 'rke2'),
+        reboot            => ($params->{reboot}  // 0),
+    );
+};
+
+desc 'Prepare a Linux node for Kubernetes';
+task 'node', sub {
+    my ($params) = @_;
+    my %opts = (timezone => $params->{timezone} // 'UTC');
+    $opts{hostname} = $params->{hostname} if $params->{hostname};
+    $opts{domain}   = $params->{domain}   if $params->{domain};
+    Rex::Rancher::Node::prepare_node(%opts);
+};
+
+desc 'Full server deploy: prepare_node + install_server + Cilium';
+task 'server', sub {
+    my ($params) = @_;
+    my $distribution = $params->{distribution} // 'rke2';
+    die "token= required\n" unless $params->{token};
+
+    my %opts = (
+        distribution => $distribution,
+        token        => $params->{token},
+    );
+    $opts{tls_san}          = $params->{tls_san}          if $params->{tls_san};
+    $opts{hostname}         = $params->{hostname}         if $params->{hostname};
+    $opts{domain}           = $params->{domain}           if $params->{domain};
+    $opts{kubeconfig_file}  = $params->{kubeconfig_file}  if $params->{kubeconfig_file};
+    $opts{gpu}              = $params->{gpu}              if $params->{gpu};
+    $opts{reboot}           = $params->{reboot}           if $params->{reboot};
+
+    Rex::Rancher::Node::prepare_node(%opts);
+    Rex::Rancher::Server::install_server(%opts);
+    Rex::Rancher::Cilium::install_cilium(distribution => $distribution);
+};
+
+desc 'Full agent deploy: prepare_node + join cluster';
+task 'agent', sub {
+    my ($params) = @_;
+    my $distribution = $params->{distribution} // 'rke2';
+    die "token= required\n"  unless $params->{token};
+    die "server= required\n" unless $params->{server};
+
+    my %opts = (
+        distribution => $distribution,
+        token        => $params->{token},
+        server       => $params->{server},
+    );
+    $opts{hostname} = $params->{hostname} if $params->{hostname};
+    $opts{domain}   = $params->{domain}   if $params->{domain};
+
+    Rex::Rancher::Node::prepare_node(%opts);
+    Rex::Rancher::Agent::install_agent(%opts);
+};

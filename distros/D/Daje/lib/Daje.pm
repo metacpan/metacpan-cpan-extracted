@@ -35,7 +35,7 @@ use Mojo::Base 'Mojolicious', -signatures;
 use Cwd;
 use Mojo::Pg;
 
-our $VERSION = "0.10";
+our $VERSION = "0.30";
 # $ENV{DAJE_HOME} = '/home/jan/Project/Daje/'
 #     unless $ENV{DAJE_HOME};
 
@@ -60,7 +60,7 @@ sub startup ($self) {
   $self->helper(pg => sub {state $pg = Mojo::Pg->new->dsn(shift->config('pg'))});
   say $self->pg->db->query('select version() as version')->hash->{version};
   $self->log->debug($self->pg->db->query('select version() as version')->hash->{version});
-
+  $self->plugin('Minion'  => { Pg => $self->pg });
 
 
   my $r = $self->routes;
@@ -68,7 +68,8 @@ sub startup ($self) {
   my $auth = $r->under($self->config->{project} . '/api/' => sub ($c) {
     # say "authentichate " . $c->req->headers->header('X-Token-Check');
     # Authenticated
-    return 1 ;#if $c->login->authenticate($c->req->headers->header('X-Token-Check'));
+    say "Auth started";
+    return 1 if $c->login->authenticate($c->req->headers->header('X-Token-Check'));
     # Not authenticated
     $c->render(json => '{"error":"unknown error"}');
     say "Auth failed";
@@ -76,7 +77,7 @@ sub startup ($self) {
   });
 
   $self->auth($auth);
-  $self->plugin('Daje::Plugin::Apploader');
+  $self->plugin('Daje::Plugin::Apploader'  => { pg => $self->pg });
   # Configure the application
   $self->app->jwt->secret(@{$config->{secrets}}[0]);
 

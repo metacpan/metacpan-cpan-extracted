@@ -1,4 +1,10 @@
+0.000007  2026-03-28 12:05:47-07:00 America/Los_Angeles
+
+    - Fix issues with listed deps
+
 0.000006  2026-03-26 19:18:54-07:00 America/Los_Angeles
+
+    - Introduce 'Service' feature
 
 0.000005  2026-02-23 19:54:20-08:00 America/Los_Angeles
 

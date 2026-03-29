@@ -2,7 +2,7 @@
 package Test::Expander;
 
 # The versioning is conform with https://semver.org
-our $VERSION = '2.6.2';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.7.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -26,7 +26,7 @@ use Test2::Tools::Explain;
 use Test2::Tools::Subtest;
 
 use Test::Expander::Constants qw(
-  $DIE $FALSE
+  $COMMENT $DIE $FALSE
   $FMT_INVALID_COLOR $FMT_INVALID_DIRECTORY $FMT_INVALID_ENV_ENTRY $FMT_INVALID_VALUE $FMT_INVALID_SUBTEST_NUMBER
   $FMT_MISSING_TDT $FMT_KEEP_ENV_VAR $FMT_NEW_FAILED $FMT_NEW_SUCCEEDED $FMT_REPLACEMENT $FMT_REQUIRE_DESCRIPTION
   $FMT_REQUIRE_IMPLEMENTATION $FMT_SEARCH_PATTERN $FMT_SET_ENV_VAR $FMT_SET_TO $FMT_SKIP_ENV_VAR $FMT_UNSET_VAR
@@ -182,7 +182,7 @@ sub test_table {
 
   my %test_table;
   while ( my $title = shift( @data ) ) {
-    next if $title =~ /^[+\-$REGEX_TABLE_SEPARATOR]-/;
+    next if $title =~ /^(?:[+\-$REGEX_TABLE_SEPARATOR]-|$COMMENT)/;
     my @line;
     if ( $title_inline ) {
       ( undef, $title, @line ) = split( $REGEX_TABLE_SEPARATOR, $title );

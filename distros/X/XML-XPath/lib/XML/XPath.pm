@@ -6,7 +6,7 @@ XML::XPath - Parse and evaluate XPath statements.
 
 =head1 VERSION
 
-Version 1.48
+Version 1.49
 
 =cut
 
@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use parent qw/Exporter/;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 our $Namespaces = 1;
 our $ParseParamEnt = 1;
 our $Debug = 0;

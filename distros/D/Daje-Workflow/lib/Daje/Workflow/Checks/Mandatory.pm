@@ -1,5 +1,5 @@
 package Daje::Workflow::Checks::Mandatory;
-use Mojo::Base 'Daje::Workflow::Common::Checks::Base', -base, -signatures;
+use Mojo::Base 'Daje::Workflow::Checks::Super::Base', -base, -signatures;
 use v5.42;
 
 # NAME
@@ -71,7 +71,6 @@ sub check($self) {
         }
         my $length = scalar @fields;
         for (my $i = 0; $i < $length; $i++) {
-            my $temp = $self->context();
             if (!exists $self->context->{context}->{payload}->{$fields[$i]}) {
                 $result = 0;
                 $self->error->add_error("Mandatory field '$fields[$i]' is missing")

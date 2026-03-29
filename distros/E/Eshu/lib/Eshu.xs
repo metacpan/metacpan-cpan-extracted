@@ -3,6 +3,32 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/*
+ * On Windows threaded Perl (MULTIPLICITY), perl.h redefines standard C
+ * functions (malloc, free, stat, opendir, etc.) as macros that require
+ * the interpreter context (my_perl).  Our engine headers are pure C and
+ * must call the real libc functions, so undo those overrides here.
+ * This is safe: the XS code below uses Perl API directly and never
+ * relies on these macros.
+ */
+#ifdef WIN32
+#  undef malloc
+#  undef realloc
+#  undef calloc
+#  undef free
+#  undef stat
+#  undef lstat
+#  undef fstat
+#  undef opendir
+#  undef readdir
+#  undef closedir
+#  undef rename
+#  undef open
+#  undef close
+#  undef read
+#  undef write
+#endif
+
 #include "eshu.h"
 #include "eshu_c.h"
 #include "eshu_pod.h"

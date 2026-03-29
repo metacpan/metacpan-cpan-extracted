@@ -1780,5 +1780,254 @@ subtest '_provider_abuse_for_host -- hubspot.com already present' => sub {
     is $r->{email}, 'abuse@hubspot.com',       'correct abuse address';
 };
 
+
+# =============================================================================
+# 36. Regression: WordPress.com and Substack in provider table (0.05)
+# =============================================================================
+
+subtest '_provider_abuse_for_host -- wordpress.com in table' => sub {
+	my $a = new_ok('Email::Abuse::Investigator');
+	my $r = $a->_provider_abuse_for_host('wordpress.com');
+	ok defined $r,
+		'wordpress.com found in provider table';
+	is $r->{email}, 'abuse@wordpress.com',
+		'correct abuse address for WordPress.com';
+	like $r->{note}, qr/wordpress/i,
+		'note mentions WordPress';
+};
+
+subtest '_provider_abuse_for_host -- substack.com in table' => sub {
+	my $a = new_ok('Email::Abuse::Investigator');
+	my $r = $a->_provider_abuse_for_host('substack.com');
+	ok defined $r,
+		'substack.com found in provider table';
+	is $r->{email}, 'abuse@substack.com',
+		'correct abuse address for Substack';
+};
+
+subtest '_provider_abuse_for_host -- wordpress.com subdomain strips correctly' => sub {
+	# spammer.wordpress.com should resolve via subdomain stripping
+	my $a = new_ok('Email::Abuse::Investigator');
+	my $r = $a->_provider_abuse_for_host('spammer.wordpress.com');
+	ok defined $r,
+		'spammer.wordpress.com resolves via subdomain stripping';
+	is $r->{email}, 'abuse@wordpress.com',
+		'subdomain correctly resolves to WordPress.com abuse address';
+};
+
+subtest '_provider_abuse_for_host -- wp.com short domain in table' => sub {
+	# wp.com is WordPress.com's short domain used in some links
+	my $a = new_ok('Email::Abuse::Investigator');
+	my $r = $a->_provider_abuse_for_host('wp.com');
+	ok defined $r,
+		'wp.com found in provider table';
+	is $r->{email}, 'abuse@wordpress.com',
+		'wp.com maps to WordPress.com abuse address';
+};
+
+subtest 'abuse_contacts -- wordpress.com URL host produces correct contact' => sub {
+	# End-to-end: a message containing a wordpress.com URL should yield
+	# abuse@wordpress.com in abuse_contacts() without any network calls,
+	# via the provider-table route for URL hosts.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from        => 'Spammer <spam@spammer.example>',
+		return_path => '<bounce@spammer.example>',
+		to          => '<victim@nigelhorne.com>',
+		body        => 'Visit https://evilblog.wordpress.com/offer for details',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		my @contacts  = $a->abuse_contacts();
+		my @addresses = map { lc $_->{address} } @contacts;
+		ok scalar(grep { $_ eq 'abuse@wordpress.com' } @addresses),
+			'abuse@wordpress.com present when wordpress.com URL found in body';
+	}
+	restore_net();
+};
+
+subtest 'abuse_contacts -- substack.com URL host produces correct contact' => sub {
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from        => 'Spammer <spam@spammer.example>',
+		return_path => '<bounce@spammer.example>',
+		to          => '<victim@nigelhorne.com>',
+		body        => 'Read my newsletter at https://evilnews.substack.com/p/scam',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		my @contacts  = $a->abuse_contacts();
+		my @addresses = map { lc $_->{address} } @contacts;
+		ok scalar(grep { $_ eq 'abuse@substack.com' } @addresses),
+			'abuse@substack.com present when substack.com URL found in body';
+	}
+	restore_net();
+};
+
+
+# =============================================================================
+# 37. Regression: protocol-relative URLs, domain WHOIS fallback, role
+#     deduplication (0.05 fixes for badshamart.com spam campaign)
+# =============================================================================
+
+subtest '_extract_http_urls -- protocol-relative URL in plain img src' => sub {
+	# A bare //domain/path in the body should be extracted as https://domain/path
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Hello <img src="//tracker.badshamart.com/o/1/2/3/US">',
+		ct   => 'text/html',
+	));
+	my @urls  = $a->embedded_urls();
+	my @hosts = map { $_->{host} } @urls;
+	ok scalar(grep { /badshamart\.com/ } @hosts),
+		'protocol-relative //tracker.badshamart.com extracted as URL host';
+	restore_net();
+};
+
+subtest '_extract_http_urls -- protocol-relative URL in href attribute' => sub {
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => '<a href="//click.evilsite.example/go/123">Click here</a>',
+		ct   => 'text/html',
+	));
+	my @urls  = $a->embedded_urls();
+	my @hosts = map { $_->{host} } @urls;
+	ok scalar(grep { $_ eq 'click.evilsite.example' } @hosts),
+		'protocol-relative href //click.evilsite.example extracted';
+	my ($u) = grep { $_->{host} eq 'click.evilsite.example' } @urls;
+	like $u->{url}, qr{^https://click\.evilsite\.example},
+		'normalised URL has https:// scheme prefix';
+	restore_net();
+};
+
+subtest '_extract_http_urls -- protocol-relative does not match CSS comments' => sub {
+	# // inside a CSS comment must not be treated as a URL
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => "<style>/* // not a url */\nbody { color: red; }</style>",
+		ct   => 'text/html',
+	));
+	my @urls  = $a->embedded_urls();
+	is scalar(@urls), 0,
+		'CSS comment // does not produce a false-positive URL';
+	restore_net();
+};
+
+subtest 'abuse_contacts -- URL host domain WHOIS fallback when IP unresolvable' => sub {
+	# When a URL host cannot be resolved to an IP, _extract_and_resolve_urls()
+	# should fall back to domain WHOIS to recover the registrar abuse contact.
+	# This is the core fix for the badshamart.com case.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://newspam.badshamart.com/offer for details',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		# Simulate domain WHOIS returning a registrar abuse contact
+		local *Email::Abuse::Investigator::_domain_whois = sub {
+			my (undef, $dom) = @_;
+			return "Registrar: Dodgy Registrar Inc\n"
+			     . "Registrar Abuse Contact Email: abuse\@dodgyregistrar.example\n"
+				if $dom eq 'badshamart.com';
+			return undef;
+		};
+		my @contacts  = $a->abuse_contacts();
+		my @addresses = map { lc $_->{address} } @contacts;
+		ok scalar(grep { $_ eq 'abuse@dodgyregistrar.example' } @addresses),
+			'registrar abuse contact recovered via domain WHOIS fallback';
+	}
+	restore_net();
+};
+
+subtest 'abuse_contacts -- role deduplication: repeated label collapsed to (xN)' => sub {
+	# When the same role string ("URL host") accumulates multiple times for one
+	# address (e.g. four badshamart.com subdomains all resolving to the same
+	# registrar), the role display string should be "URL host (x4)" not
+	# "URL host and URL host and URL host and URL host".
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body =>   'https://a1.spamdomain.example/p1 '
+		        . 'https://a2.spamdomain.example/p2 '
+		        . 'https://a3.spamdomain.example/p3 '
+		        . 'https://a4.spamdomain.example/p4',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_domain_whois = sub {
+			my (undef, $dom) = @_;
+			return "Registrar: Example Registrar\n"
+			     . "Registrar Abuse Contact Email: abuse\@exampleregistrar.example\n"
+				if $dom eq 'spamdomain.example';
+			return undef;
+		};
+		my @contacts = $a->abuse_contacts();
+		my ($c) = grep { $_->{address} eq 'abuse@exampleregistrar.example' }
+		          @contacts;
+		ok defined $c, 'merged contact found';
+		is scalar(@{ $c->{roles} }), 4,
+			'roles arrayref has four entries (one per URL host)';
+		like $c->{role}, qr/\(x4\)/,
+			'role display string contains (x4) count suffix';
+		unlike $c->{role}, qr/URL host.*and.*URL host/,
+			'role display string does not repeat label verbatim';
+	}
+	restore_net();
+};
+
+subtest 'abuse_contacts -- role deduplication: distinct labels not collapsed' => sub {
+	# "Sending ISP and URL host" involves two *different* role labels --
+	# they must NOT be collapsed, only repeated identical labels are.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to       => '<victim@nigelhorne.com>',
+		body     => 'Visit https://evilblog.wordpress.com/offer',
+		received => 'from mail.wordpress.com (mail.wordpress.com [198.51.100.1])'
+		          . ' by mx.nigelhorne.com with ESMTP',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { '198.51.100.1' };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+		local *Email::Abuse::Investigator::_reverse_dns  =
+			sub { 'mail.wordpress.com' };
+		my @contacts = $a->abuse_contacts();
+		my ($wp) = grep { $_->{address} eq 'abuse@wordpress.com' } @contacts;
+		ok defined $wp, 'abuse@wordpress.com contact found';
+		if (defined $wp && scalar(@{ $wp->{roles} }) > 1) {
+			unlike $wp->{role}, qr/\(x\d+\)/,
+				'distinct labels not collapsed with (xN) suffix';
+			like $wp->{role}, qr/and/,
+				'distinct labels joined with "and"';
+		} else {
+			pass 'single role -- deduplication not triggered';
+		}
+	}
+	restore_net();
+};
+
 done_testing();
 

@@ -1,5 +1,9 @@
 Revision history for Perl extension Thrift::XS.
 
+1.11 -- Sat Mar 28 10:28:39 ADT 2026
+
+        - Fix Changes year for versions 1.07 through 1.09 (esabol)
+
 1.10 -- Sat Mar 14 14:41:32 ADT 2026
 
         - Move build/release to Dist::Zilla
@@ -8,7 +12,7 @@ Revision history for Perl extension Thrift::XS.
         - 1.09-TRIAL Removed the embedded (but unindexed) Thrift (Tim Legge)
         - Thrift is now a dependency
 
-1.09    2027-03-10
+1.09    2026-03-10
         - Remove the embedded (but unindexed) Thrift (Tim Legge) which
         fixes RT #173209	
         - The git repo accidentally has the unsquashed commits that
@@ -19,10 +23,10 @@ Revision history for Perl extension Thrift::XS.
             - Replace references to TTransportException with Thrift::TTransportException
             - Replace references to TType with Thrift::TType
 
-1.08    2027-02-16
+1.08    2026-02-16
         Fix smoker failures on old gcc versions (Tim Legge)
 
-1.07    2027-02-14
+1.07    2026-02-14
         Fix some smoker failures due to the endianness checks (Tim Legge)
 
 1.06    2026-01-28

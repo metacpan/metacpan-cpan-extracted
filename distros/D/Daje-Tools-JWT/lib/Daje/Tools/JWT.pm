@@ -34,7 +34,7 @@ use v5.42;
 
 use Mojo::JWT;
 
-our $VERSION = "0.10";
+our $VERSION = "0.25";
 
 has 'secret' => qw { lK1leAbOxGmUKdVmuMKbJtD7ru1wd2V9Y5e58zLPlL5UI4GP1AETmd7eZ3MRZEP };
 

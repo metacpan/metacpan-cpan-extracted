@@ -1,0 +1,81 @@
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+use Config;
+
+my @extra_libs;
+my @extra_ccflags;
+my @extra_ldflags;
+
+if ($^O eq 'darwin') {
+    # macOS - use Cocoa/WebKit
+    push @extra_ccflags, '-DWEBVIEW_COCOA=1';
+    push @extra_ccflags, '-DOBJC_OLD_DISPATCH_PROTOTYPES=1';
+    push @extra_ccflags, '-x objective-c';  # Compile as Objective-C
+    # System perl is arm64e; bundle must match for PAC-compatible IMPs
+    push @extra_ccflags, '-arch arm64e';
+    push @extra_ldflags, '-arch arm64e';
+    push @extra_ldflags, '-framework WebKit';
+    push @extra_ldflags, '-framework Cocoa';
+}
+elsif ($^O eq 'linux') {
+    # Linux - use GTK/WebKit2
+    push @extra_ccflags, '-DWEBVIEW_GTK=1';
+    my $gtk_cflags = `pkg-config --cflags gtk+-3.0 webkit2gtk-4.0 2>/dev/null`;
+    my $gtk_libs = `pkg-config --libs gtk+-3.0 webkit2gtk-4.0 2>/dev/null`;
+    chomp($gtk_cflags);
+    chomp($gtk_libs);
+    push @extra_ccflags, $gtk_cflags if $gtk_cflags;
+    push @extra_libs, $gtk_libs if $gtk_libs;
+}
+elsif ($^O eq 'MSWin32') {
+    # Windows - use MSHTML/Edge
+    push @extra_ccflags, '-DWEBVIEW_WINAPI=1';
+    push @extra_libs, '-lole32', '-lcomctl32', '-loleaut32', '-luuid', '-lgdi32';
+}
+
+WriteMakefile(
+    NAME              => 'Chandra',
+    VERSION_FROM      => 'lib/Chandra.pm',
+    ABSTRACT          => 'Perl bindings to webview-c for cross-platform GUIs',
+    AUTHOR            => 'Prototype',
+    LICENSE           => 'mit',
+    MIN_PERL_VERSION  => '5.010',
+    
+    TYPEMAPS          => ['typemap'],
+    INC               => '-I. -Iinclude',
+    CCFLAGS           => join(' ', $Config{ccflags}, @extra_ccflags),
+    LDDLFLAGS         => join(' ', $Config{lddlflags}, @extra_ldflags),
+    LIBS              => [join(' ', @extra_libs)],
+    
+    PREREQ_PM         => {},
+    TEST_REQUIRES     => {
+        'Test::More' => 0,
+    },
+    
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/javalikescript/webview-c.git',
+                web  => 'https://github.com/javalikescript/webview-c',
+            },
+        },
+    },
+);
+
+# Add custom target to download webview.h if not present
+sub MY::postamble {
+    return <<'MAKE';
+
+webview.h:
+	@echo "Downloading webview.h from GitHub..."
+	curl -sL https://raw.githubusercontent.com/javalikescript/webview-c/master/webview.h -o include/webview.h
+	curl -sL https://raw.githubusercontent.com/javalikescript/webview-c/master/webview-cocoa.c -o include/webview-cocoa.c
+	curl -sL https://raw.githubusercontent.com/javalikescript/webview-c/master/webview-gtk.c -o include/webview-gtk.c
+
+download: webview.h
+
+MAKE
+}

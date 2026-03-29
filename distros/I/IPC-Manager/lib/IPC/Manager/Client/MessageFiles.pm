@@ -2,7 +2,7 @@ package IPC::Manager::Client::MessageFiles;
 use strict;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use Carp qw/croak confess/;
 use File::Spec;
@@ -35,8 +35,8 @@ sub init {
     return unless USE_INOTIFY;
 }
 
-sub have_handles_for_select { 1 }
-sub handles_for_select { $_[0]->inotify->fh }
+sub have_handles_for_select { USE_INOTIFY() }
+sub handles_for_select { USE_INOTIFY() ? $_[0]->inotify->fh : () }
 
 sub inotify {
     my $self = shift;

@@ -1,12 +1,11 @@
 package Anonymous::Object;
 use strict;
 use warnings;
-use Data::Dumper;
-our $VERSION = 1.01;
+use Loo qw/dDump/;
+our $VERSION = 1.02;
 
 our $UNIQUE;
 BEGIN {
-	$Data::Dumper::Deparse = 1;
 	$UNIQUE = 0;
 }
 
@@ -371,11 +370,7 @@ sub build {
 sub stringify_struct {
 	my ( $self, $struct ) = @_;
 	return 'undefined' unless defined $struct;
-	$struct = ref $struct ? Dumper $struct : "'$struct'";
-	$struct =~ s/\$VAR1 = //;
-	$struct =~ s/\s*\n*\s*package Module\:\:Generate\;|use warnings\;|use strict\;//g;
-	$struct =~ s/{\s*\n*/{/;
-	$struct =~ s/;$//;
+	$struct = ref $struct ? aDump($struct) : "'$struct'";
 	return $struct;
 }
 
@@ -402,6 +397,11 @@ sub identify_type {
 	return $type_map->{default};
 }
 
+sub aDump {
+	my $loo = Loo->new([$_[0]]);
+	$loo->Terse(1)->Deparse(1)->Colour(0)->Indent(0);
+	return $loo->Dump;
+}
 
 1;
 
@@ -413,7 +413,7 @@ Anonymous::Object - Generate Anonymous Objects
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

@@ -53,8 +53,8 @@ sub save ($self) {
     my $data = $self->context->{context}->{payload};
     my $class = $self->activity_data->{class};
     if (my $e = load_class $class) {
-        $self->error->add_error($e);
         $self->error->add_error($class . " Not found ");
+        $self->error->add_error($e);
     }
     return 0 if $self->error->has_error();
     say "Class = " . $class;
@@ -64,7 +64,7 @@ sub save ($self) {
         say $dbclass->primary_key_name . " " . Dumper($data);
         if (exists $data->{$dbclass->primary_key_name} and $data->{$dbclass->primary_key_name} > 0) {
             $self->model->insert_history(
-                "Update object " . Dumper($data), " $class->update", 1
+                "Update object " . $dbclass->table_name() . Dumper($data), " $class->update", 2
             );
 
             my $result = $dbclass->update($data);
@@ -73,9 +73,14 @@ sub save ($self) {
             }
         } else {
             $self->model->insert_history(
-                "New object "  . Dumper($data), " $class->insert", 1
+                "New object " . $dbclass->table_name() . Dumper($data), " $class->insert", 2
             );
-            my $tools_object_index_pkey = $dbclass->insert($data);
+            $data->{$dbclass->workflow()} = $self->context->{context}->{workflow}->{workflow_fkey}
+                if($dbclass->can('workflow') && length($dbclass->workflow()) > 0);
+            my $pkey = $dbclass->insert($data);
+            $self->context->{context}->{payload}->{$dbclass->primary_key_name()} = $pkey->{data}->{$dbclass->primary_key_name()};
+            $self->context->{context}->{results}->{key} = $pkey->{data};
+
         }
     } catch ($e) {
         $self->error->add_error($e);

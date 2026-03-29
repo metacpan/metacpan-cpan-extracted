@@ -150,6 +150,28 @@ CREATE INDEX idx_workflow_connections_workflow_fkey_connector_connector_fkey
 
 DROP TABLE workflow_connections;
 
+-- 5 up
+
+CREATE TABLE IF NOT EXISTS workflow_automatic
+(
+    workflow_automatic serial not null primary key,
+    editnum bigint NOT NULL DEFAULT 1,
+    insby varchar NOT NULL DEFAULT 'System',
+    insdatetime timestamp without time zone NOT NULL DEFAULT NOW(),
+    modby varchar NOT NULL DEFAULT 'System',
+    moddatetime timestamp without time zone NOT NULL DEFAULT NOW(),
+    workflow_fkey BIGINT NULL,
+    priority BIGINT NOT NULL DEFAULT 0,
+    workflow VARCHAR NOT NULL,
+    activity VARCHAR NOT NULL,
+    context JSON,
+    inprogress BOOLEAN NOT NULL DEFAULT false,
+    done BOOLEAN NOT NULL DEFAULT false,
+    CONSTRAINT CREATE TABLE IF NOT EXISTS workflow_automatic_fkey FOREIGN KEY (workflow_fkey)
+        REFERENCES workflow (workflow_pkey)
+);
+
+-- 5 down
 __END__
 
 

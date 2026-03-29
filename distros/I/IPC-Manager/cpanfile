@@ -10,6 +10,7 @@ requires "Importer" => "0.026";
 requires "List::Util" => "1.33";
 requires "Object::HashBase" => "0.015";
 requires "POSIX" => "0";
+requires "Role::Tiny" => "2.002004";
 requires "Scalar::Util" => "0";
 requires "Sub::Util" => "1.40";
 requires "Test2::Util::UUID" => "0.002010";

@@ -1,3 +1,7 @@
+Travel::Status::DE::DBRIS 0.27 - Sat Mar 28 2026
+
+    * Handle wonky backend timestamps during DST transition (e.g. CET to CEST)
+
 Travel::Status::DE::DBRIS 0.26 - Fri Mar 27 2026
 
     * Update train names (patch by Lili Chelsea Urban)

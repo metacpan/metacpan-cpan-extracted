@@ -31,7 +31,7 @@ Module::Build->new(
 		'List::Util'                          => 0,
 		'LWP::UserAgent'                      => 0,
 		'LWP::Protocol::https'                => 0,
-		'Travel::Status::DE::DBRIS'           => '0.24',
+		'Travel::Status::DE::DBRIS'           => '0.27',
 		'UUID'                                => 0,
 	},
 	script_files => 'bin/',

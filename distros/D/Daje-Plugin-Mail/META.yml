@@ -1,0 +1,214 @@
+---
+abstract: 'Mojolicious Plugin'
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-Mail
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Controller::Mail::MailAttachements:
+    file: lib/Daje/Controller/Mail/MailAttachements.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailAttachementsList:
+    file: lib/Daje/Controller/Mail/MailAttachementsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailFallbackSettings:
+    file: lib/Daje/Controller/Mail/MailFallbackSettings.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailFallbackSettingsList:
+    file: lib/Daje/Controller/Mail/MailFallbackSettingsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailMails:
+    file: lib/Daje/Controller/Mail/MailMails.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailMailsList:
+    file: lib/Daje/Controller/Mail/MailMailsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailSettings:
+    file: lib/Daje/Controller/Mail/MailSettings.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailSettingsList:
+    file: lib/Daje/Controller/Mail/MailSettingsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailStatus:
+    file: lib/Daje/Controller/Mail/MailStatus.pm
+    version: '0.01'
+  Daje::Controller::Mail::MailStatusList:
+    file: lib/Daje/Controller/Mail/MailStatusList.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailAttachements:
+    file: lib/Daje/Controller/Mail/Super/MailAttachements.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailAttachementsList:
+    file: lib/Daje/Controller/Mail/Super/MailAttachementsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailFallbackSettings:
+    file: lib/Daje/Controller/Mail/Super/MailFallbackSettings.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailFallbackSettingsList:
+    file: lib/Daje/Controller/Mail/Super/MailFallbackSettingsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailMails:
+    file: lib/Daje/Controller/Mail/Super/MailMails.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailMailsList:
+    file: lib/Daje/Controller/Mail/Super/MailMailsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailSettings:
+    file: lib/Daje/Controller/Mail/Super/MailSettings.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailSettingsList:
+    file: lib/Daje/Controller/Mail/Super/MailSettingsList.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailStatus:
+    file: lib/Daje/Controller/Mail/Super/MailStatus.pm
+    version: '0.01'
+  Daje::Controller::Mail::Super::MailStatusList:
+    file: lib/Daje/Controller/Mail/Super/MailStatusList.pm
+    version: '0.01'
+  Daje::Database::Mail:
+    file: lib/Daje/Database/Mail.pm
+    version: '1'
+  Daje::Database::Model::MailAttachements:
+    file: lib/Daje/Database/Model/MailAttachements.pm
+    version: '0.01'
+  Daje::Database::Model::MailFallbackSettings:
+    file: lib/Daje/Database/Model/MailFallbackSettings.pm
+    version: '0.01'
+  Daje::Database::Model::MailMails:
+    file: lib/Daje/Database/Model/MailMails.pm
+    version: '0.01'
+  Daje::Database::Model::MailSettings:
+    file: lib/Daje/Database/Model/MailSettings.pm
+    version: '0.01'
+  Daje::Database::Model::MailStatus:
+    file: lib/Daje/Database/Model/MailStatus.pm
+    version: '0.01'
+  Daje::Database::Model::Super::MailAttachements:
+    file: lib/Daje/Database/Model/Super/MailAttachements.pm
+    version: '0.01'
+  Daje::Database::Model::Super::MailFallbackSettings:
+    file: lib/Daje/Database/Model/Super/MailFallbackSettings.pm
+    version: '0.01'
+  Daje::Database::Model::Super::MailMails:
+    file: lib/Daje/Database/Model/Super/MailMails.pm
+    version: '0.01'
+  Daje::Database::Model::Super::MailSettings:
+    file: lib/Daje/Database/Model/Super/MailSettings.pm
+    version: '0.01'
+  Daje::Database::Model::Super::MailStatus:
+    file: lib/Daje/Database/Model/Super/MailStatus.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailAttachements:
+    file: lib/Daje/Database/View/Super/vMailAttachements.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailAttachementsList:
+    file: lib/Daje/Database/View/Super/vMailAttachementsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailFallbackSettings:
+    file: lib/Daje/Database/View/Super/vMailFallbackSettings.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailFallbackSettingsList:
+    file: lib/Daje/Database/View/Super/vMailFallbackSettingsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailMails:
+    file: lib/Daje/Database/View/Super/vMailMails.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailMailsList:
+    file: lib/Daje/Database/View/Super/vMailMailsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailSettings:
+    file: lib/Daje/Database/View/Super/vMailSettings.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailSettingsList:
+    file: lib/Daje/Database/View/Super/vMailSettingsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailStatus:
+    file: lib/Daje/Database/View/Super/vMailStatus.pm
+    version: '0.01'
+  Daje::Database::View::Super::vMailStatusList:
+    file: lib/Daje/Database/View/Super/vMailStatusList.pm
+    version: '0.01'
+  Daje::Database::View::vMailAttachements:
+    file: lib/Daje/Database/View/vMailAttachements.pm
+    version: '0.01'
+  Daje::Database::View::vMailAttachementsList:
+    file: lib/Daje/Database/View/vMailAttachementsList.pm
+    version: '0.01'
+  Daje::Database::View::vMailFallbackSettings:
+    file: lib/Daje/Database/View/vMailFallbackSettings.pm
+    version: '0.01'
+  Daje::Database::View::vMailFallbackSettingsList:
+    file: lib/Daje/Database/View/vMailFallbackSettingsList.pm
+    version: '0.01'
+  Daje::Database::View::vMailMails:
+    file: lib/Daje/Database/View/vMailMails.pm
+    version: '0.01'
+  Daje::Database::View::vMailMailsList:
+    file: lib/Daje/Database/View/vMailMailsList.pm
+    version: '0.01'
+  Daje::Database::View::vMailSettings:
+    file: lib/Daje/Database/View/vMailSettings.pm
+    version: '0.01'
+  Daje::Database::View::vMailSettingsList:
+    file: lib/Daje/Database/View/vMailSettingsList.pm
+    version: '0.01'
+  Daje::Database::View::vMailStatus:
+    file: lib/Daje/Database/View/vMailStatus.pm
+    version: '0.01'
+  Daje::Database::View::vMailStatusList:
+    file: lib/Daje/Database/View/vMailStatusList.pm
+    version: '0.01'
+  Daje::Documents::Templates::Mail::Verify::VerifyLogin:
+    file: lib/Daje/Documents/Templates/Mail/Verify/VerifyLogin.pm
+  Daje::Plugin::Mail:
+    file: lib/Daje/Plugin/Mail.pm
+    version: '0.01'
+  Daje::Plugin::Mail::Authorities:
+    file: lib/Daje/Plugin/Mail/Authorities.pm
+  Daje::Plugin::Mail::Helpers:
+    file: lib/Daje/Plugin/Mail/Helpers.pm
+    version: '0.01'
+  Daje::Plugin::Mail::Routes:
+    file: lib/Daje/Plugin/Mail/Routes.pm
+    version: '0.01'
+  Daje::Tools::Mail::Manager:
+    file: lib/Daje/Tools/Mail/Manager.pm
+  Daje::Tools::Mail::Sender:
+    file: lib/Daje/Tools/Mail/Sender.pm
+  Daje::Workflow::Activities::Mail::Activity:
+    file: lib/Daje/Workflow/Activities/Mail/Activity.pm
+requires:
+  Authen::SASL: '2.2000'
+  Daje::Document::Builder: '0'
+  Email::MIME: '1.954'
+  Email::Sender::Simple: '2.601'
+  Email::Sender::Transport::SMTP: '2.601'
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-Mail/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-Mail
+  repository: https://github.com/janeskil1525/Daje-Plugin-Mail.git
+version: '0.01'
+x_contributors:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

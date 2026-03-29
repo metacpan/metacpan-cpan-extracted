@@ -1,0 +1,414 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CrockfordBase32Utils/cfbase32_rand
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2026-01-19'; # DATE
+our $DIST = 'App-CrockfordBase32Utils'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CrockfordBase32Utils/cfbase32_rand",
+    program_name => "cfbase32-rand",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Generate one or more Crockford Base 32 numbers
+# PODNAME: cfbase32-rand
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cfbase32-rand - Generate one or more Crockford Base 32 numbers
+
+=head1 VERSION
+
+This document describes version 0.002 of cfbase32-rand (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-19.
+
+=head1 SYNOPSIS
+
+B<cfbase32-rand> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<cfbase32-rand> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<cfbase32-rand> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--len|/"--len=s">>=I<int>] [B<L<--max-base32|/"--max-base32=s">>=I<str>] [B<L<--max-int|/"--max-int=s">>=I<int>] [B<L<--max-len|/"--max-len=s">>=I<int>] [B<L<--min-base32|/"--min-base32=s">>=I<str>] [B<L<--min-int|/"--min-int=s">>=I<int>] [B<L<--min-len|/"--min-len=s">>=I<int>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num|/"--num=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--prev-nums-file|/"--prev-nums-file=s">>=I<L<filename|Sah::Schema::filename>>] [B<L<--unique|/"--unique">>|B<L<--no-unique|/"--unique">>|B<L<--nounique|/"--unique">>] [B<L<--zero-prefix|/"--no-zero-prefix">>|B<L<--no-zero-prefix|/"--no-zero-prefix">>|B<L<--nozero-prefix|/"--no-zero-prefix">>]
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--no-zero-prefix>
+
+(No description)
+
+
+=item B<--prev-nums-file>=I<s>
+
+(No description)
+
+
+=item B<--unique>
+
+Whether to avoid generating previously generated numbers.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Quantity options
+
+=over
+
+=item B<--num>=I<s>, B<-n>
+
+Specify how many numbers to generate.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Range options
+
+=over
+
+=item B<--len>=I<s>
+
+Specify how many number of digits to generate for a number.
+
+Note that the first digit can still be 0 unless zero_prefix is set to false.
+
+
+=item B<--max-base32>=I<s>
+
+(No description)
+
+
+=item B<--max-int>=I<s>
+
+(No description)
+
+
+=item B<--max-len>=I<s>
+
+Specify how many maximum number of digits to generate.
+
+Note that the first digit can still be 0 unless zero_prefix is set to false.
+
+
+=item B<--min-base32>=I<s>
+
+(No description)
+
+
+=item B<--min-int>=I<s>
+
+(No description)
+
+
+=item B<--min-len>=I<s>
+
+Specify how many minimum number of digits to generate.
+
+Note that the first digit can still be 0 unless zero_prefix is set to false.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C cfbase32-rand cfbase32-rand
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete cfbase32-rand 'p/*/`cfbase32-rand`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Generate 5 random numbers from 12 digits each, first digit(s) can be 0
+
+ % cfbase32-rand --len 12 -n35
+ ZKKN9WBGHA31
+ GX7H1RG0ZX0Q
+ 4V36SNFSQ3NW
+ PFZVT6SRR1K3
+ 233VVNHQF897
+ CA7QZ2VN4WJ3
+ R97GRD6WDQTA
+ 8T86D2DEWDZ1
+ ZXQXJ26T1RHK
+ QK2TENPJ8SK0
+ TE9NE71JTC1S
+ 2V589A34NXN8
+ 6R0F75KGPGWD
+ QFVH5N9TK5SD
+ 636HC301W30Y
+ XF248VA8TQJ8
+ H15SJT1BW6AD
+ MYQWR9WAK4R6
+ CPK4J1SFSA0E
+ X0P0E6CGFC3T
+ DKW4D9EWP0CV
+ Z52MR4VAZC89
+ 92KW1NHBTKE4
+ TPM2ZDKHAH4P
+ 4B5EBKKDMJP9
+ NXHW8PG4K0M7
+ Z57F5E2F1894
+ 2W856WCCBHRF
+ 31DPYPBHBC2D
+ 69N5TKTG2S96
+ XZBRXF5P6T4V
+ DNPHYVKXN4BA
+ DT60CGNMM212
+ SAB88EN10A8B
+ 5TWZPRKQQGQV
+
+=head2 Generate 5 random numbers from 12 digits each, first digit(s) CANNOT be 0
+
+ % cfbase32-rand --len 12 -n35 --nozero-prefix
+ E914VFA8WW56
+ TZBZ34GG4J19
+ EWE2T0D5ZY3Z
+ RKBN8PGBGYME
+ TRHW278RMCPM
+ 5GNQ8NS48ZQW
+ RSH6B22ZNMT0
+ YCNZSMNPFD71
+ 7N6GG752XYM5
+ AVSPBCTKC46H
+ 5205CFVKWK8H
+ S2VY1HBJHXCA
+ HEGYRPSFBM71
+ TDK0T5KJJB48
+ J201GZDFYSTW
+ VHSNP7MFSXXT
+ DQ293Z3889V1
+ MQ4R0SWFAMQW
+ N54Q6T2G0M03
+ VKWK513EQAZS
+ P5ZZ5SG04AY5
+ FT6ZMH677T48
+ QP75RKPH4ST1
+ WA9JR9GJSQ3Y
+ 3ZD0Q47PBBXN
+ THVSE6J69QZP
+ XC3R0GCT4HEZ
+ 6138MGRDN8ZN
+ 6YJ946W2355R
+ TV1DKXHCMC5X
+ QXDGAMJMF7BA
+ 5HYG8A2300ZK
+ S6P6FQ0GPRF8
+ W7W1S1Y60JW8
+ Q4KTBS770JMF
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CrockfordBase32Utils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CrockfordBase32Utils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CrockfordBase32Utils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

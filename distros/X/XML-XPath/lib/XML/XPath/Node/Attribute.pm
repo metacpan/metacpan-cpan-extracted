@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use parent qw/XML::XPath::Node/;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 package XML::XPath::Node::AttributeImpl;
 
 use XML::XPath::Node ':node_keys';
 use parent qw/-norequire XML::XPath::NodeImpl XML::XPath::Node::Attribute/;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 sub new {
 	my $class = shift;

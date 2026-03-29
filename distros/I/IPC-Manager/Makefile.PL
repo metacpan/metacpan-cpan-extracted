@@ -26,6 +26,7 @@ my %WriteMakefileArgs = (
     "List::Util" => "1.33",
     "Object::HashBase" => "0.015",
     "POSIX" => 0,
+    "Role::Tiny" => "2.002004",
     "Scalar::Util" => 0,
     "Sub::Util" => "1.40",
     "Test2::Util::UUID" => "0.002010",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::QuickDB" => "0.000038",
     "Test2::V1" => "1.302219"
   },
-  "VERSION" => "0.000006",
+  "VERSION" => "0.000007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,6 +57,7 @@ my %FallbackPrereqs = (
   "List::Util" => "1.33",
   "Object::HashBase" => "0.015",
   "POSIX" => 0,
+  "Role::Tiny" => "2.002004",
   "Scalar::Util" => 0,
   "Sub::Util" => "1.40",
   "Test2::API" => "1.302219",

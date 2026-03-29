@@ -4,7 +4,7 @@ use 5.008003;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.09';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(Dump cDump ncDump dDump);

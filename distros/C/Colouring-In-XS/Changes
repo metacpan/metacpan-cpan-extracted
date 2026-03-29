@@ -1,5 +1,9 @@
 Revision history for Colouring-In-XS
 
+0.09    2026-03-29
+        Fix SEGV when SV type is not SVt_PV in xs_ensure_obj and xs_new (e.g. hash values on older Perls).
+        Fix desaturate test tolerance for floating-point rounding on i686/longdouble platforms.
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

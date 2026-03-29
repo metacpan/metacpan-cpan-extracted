@@ -20,7 +20,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 # {{{ Constructors
 
@@ -81,6 +81,8 @@ sub new {
 		if ( $conf{modes_of_transit} ) {
 			@mots = @{ $conf{modes_of_transit} // [] };
 		}
+
+		# arr → /ankuenfte
 		$req
 		  = 'https://www.bahn.de/web/api/reiseloesung/abfahrten'
 		  . '?datum='
@@ -500,7 +502,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 

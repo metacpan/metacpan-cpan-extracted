@@ -1,0 +1,10 @@
+0.002   2026-01-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: cfbase32-rand.
+
+        - [bugfix] Fix schema.
+
+
+0.001   2026-01-19  Released-By: PERLANCAR
+
+        - First release.

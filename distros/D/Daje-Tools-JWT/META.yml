@@ -26,7 +26,7 @@ no_index:
 provides:
   Daje::Tools::JWT:
     file: lib/Daje/Tools/JWT.pm
-    version: '0.10'
+    version: '0.25'
 requires:
   Mojo::Base: '0'
   Mojo::JWT: '0'
@@ -35,6 +35,6 @@ resources:
   bugtracker: https://github.com/janeskil1525/Daje-Tools-JWT/issues
   homepage: https://github.com/janeskil1525/Daje-Tools-JWT
   repository: https://github.com/janeskil1525/Daje-Tools-JWT.git
-version: '0.10'
+version: '0.25'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

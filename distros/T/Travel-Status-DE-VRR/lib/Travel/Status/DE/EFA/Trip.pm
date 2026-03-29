@@ -9,7 +9,7 @@ use Travel::Status::DE::EFA::Stop;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '3.19';
+our $VERSION = '3.20';
 
 Travel::Status::DE::EFA::Trip->mk_ro_accessors(
 	qw(operator product product_class name line number type id dest_name dest_id)
@@ -144,7 +144,13 @@ sub parse_dt {
 	my ( $self, $value ) = @_;
 
 	if ($value) {
-		my $dt = $self->{strptime_obj}->parse_datetime($value);
+		my $dt;
+		eval { $dt = $self->{strptime_obj}->parse_datetime($value); };
+		if ($@) {
+			my $strp_str = $self->{strptime_obj}->pattern;
+			warn(
+				"Trip $self->{id}: Cannot parse '$value' with '$strp_str': $@");
+		}
 		if ($dt) {
 			return $dt->set_time_zone('Europe/Berlin');
 		}
@@ -238,7 +244,7 @@ trip
 
 =head1 VERSION
 
-version 3.19
+version 3.20
 
 =head1 DESCRIPTION
 

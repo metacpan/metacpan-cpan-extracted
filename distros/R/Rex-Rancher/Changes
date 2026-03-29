@@ -1,0 +1,21 @@
+Revision history for Rex-Rancher
+
+0.001     2026-03-29 04:21:30Z
+  - Initial release
+  - RKE2 and K3s server/agent installation with unified config interface
+  - Node preparation (hostname, NTP, sysctl, kernel modules, swap disable)
+  - Cilium CNI installation and upgrades (idempotent: safe to re-run)
+  - Registry mirror configuration (registries.yaml) with live update support
+  - Kubernetes API operations via Kubernetes::REST (no kubectl required):
+    wait_for_api, deploy_nvidia_device_plugin, untaint_node
+  - Full deploy pipeline in rancher_deploy_server:
+    node prep -> GPU setup -> install -> kubeconfig save -> wait API -> Cilium -> device plugin
+  - kubeconfig saved locally with 127.0.0.1 patched to real server address
+  - Optional GPU support via Rex::GPU (gpu => 1, reboot => 1)
+  - NVIDIA device plugin DaemonSet deployment with nvidia.com/gpu capacity polling
+  - untaint_node for single-node clusters (removes control-plane/master taints)
+  - DPkg::Lock::Timeout=120 on apt-get calls for fresh-boot resilience
+  - Tested on Hetzner dedicated servers (Debian 13, Rocky Linux 10.1, Ubuntu 24.04 LTS)
+  - Requires Rex::LibSSH for deployment to SFTP-less hosts (common on Hetzner dedicated)
+  - Optional: Kubernetes::REST + IO::K8s for local K8s API operations
+

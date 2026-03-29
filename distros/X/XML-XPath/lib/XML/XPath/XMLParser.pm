@@ -11,7 +11,7 @@ use XML::XPath::Node::PI;
 use XML::XPath::Node::Attribute;
 use XML::XPath::Node::Namespace;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 my @options = qw(
         filename
@@ -69,7 +69,16 @@ sub parse {
         return $parser->parsefile($toparse);
     }
     else {
-        return $parser->parse($self->get_xml || $self->get_ioref);
+        my $input = $self->get_xml || $self->get_ioref;
+
+        # Check if the input is a string that looks like a glob (e.g., "*main::DATA")
+        # but isn't yet a proper reference.
+        if (defined $input && !ref($input) && $input =~ /^\*/) {
+            no strict 'refs';
+            $input = \*{$input};
+        }
+
+        return $parser->parse($input);
     }
 }
 

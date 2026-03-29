@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Colouring::In::XS', $VERSION);
@@ -17,6 +17,17 @@ sub import {
                 no strict 'refs';
                 *{"${caller}::${_}"} = \&{"${_[0]}::${_}"} foreach @exports;
         }
+}
+
+sub include_dir {
+        my $dir = $INC{'Colouring/In/XS.pm'};
+        # Installed: .../Colouring/In/XS.pm → .../Colouring/In/XS/include
+        (my $installed = $dir) =~ s{XS\.pm$}{XS/include};
+        return $installed if -d $installed;
+        # Development: lib/Colouring/In/XS.pm → include
+        (my $dev = $dir) =~ s{lib/Colouring/In/XS\.pm$}{include};
+        return $dev if -d $dev;
+        return $installed;
 }
 
 sub validate {
@@ -47,7 +58,7 @@ Colouring::In::XS - color or colour.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

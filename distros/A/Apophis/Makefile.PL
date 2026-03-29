@@ -10,9 +10,11 @@ my $has_xsmulti = eval { ExtUtils::MakeMaker->VERSION('7.12'); 1 };
 #   2. Fall back to sibling directory (development)
 my $horus_inc;
 eval {
+    no warnings 'redefine';
+    local *XSLoader::load = sub {};  # skip XS bootstrap
     require Horus;
     my $dir = Horus->include_dir();
-    $horus_inc = $dir if -d $dir;
+    $horus_inc = $dir if $dir && -d $dir;
 };
 if (!$horus_inc && -d '../Horus/include') {
     $horus_inc = '../Horus/include';
@@ -29,7 +31,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.010',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
-        'Horus'               => '0',
+        'Horus'               => '0.04',
     },
     BUILD_REQUIRES => {
         'Devel::PPPort' => '0',
@@ -38,7 +40,9 @@ my %WriteMakefileArgs = (
         'Test::More' => '0.88',
         'File::Temp' => '0',
     },
-    PREREQ_PM => {},
+    PREREQ_PM => {
+        'Horus' => '0.04',
+    },
 
     # Horus UUID library headers (resolved above)
     INC      => "-I$horus_inc",

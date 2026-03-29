@@ -17,7 +17,36 @@
 
 #include <sys/stat.h>
 #include <errno.h>
-#include <unistd.h>
+#ifndef _WIN32
+#  include <unistd.h>
+#else
+#  include <io.h>
+#  include <direct.h>
+#endif
+
+/*
+ * Windows compatibility:
+ * perl.h on threaded Windows redefines mkdir, stat, unlink etc. as macros
+ * requiring the interpreter context (my_perl).  Our static C helper functions
+ * don't have pTHX, so we undo those overrides and use the real libc calls.
+ */
+#ifdef WIN32
+#  undef mkdir
+#  undef stat
+#  undef unlink
+#  undef rename
+#  undef open
+#  undef close
+#  undef read
+#  undef write
+   /* Windows mkdir takes only one arg */
+#  define apophis_mkdir(p, m) _mkdir(p)
+#else
+#  define apophis_mkdir(p, m) mkdir(p, m)
+#endif
+
+/* Portable stat type — Stat_t handles struct w32_stat on Windows */
+#define apophis_stat_t Stat_t
 
 /* Horus UUID library - pure C, no Perl deps */
 #define HORUS_FATAL(msg) croak("%s", (msg))
@@ -142,7 +171,7 @@ apophis_mkdir_p(const char *path)
     for (p = buf + 1; *p; p++) {
         if (*p == '/') {
             *p = '\0';
-            if (mkdir(buf, 0777) != 0 && errno != EEXIST) {
+            if (apophis_mkdir(buf, 0777) != 0 && errno != EEXIST) {
                 croak("Apophis: cannot create directory '%s': %s",
                       buf, strerror(errno));
             }
@@ -150,7 +179,7 @@ apophis_mkdir_p(const char *path)
         }
     }
     /* Final component */
-    if (mkdir(buf, 0777) != 0 && errno != EEXIST) {
+    if (apophis_mkdir(buf, 0777) != 0 && errno != EEXIST) {
         croak("Apophis: cannot create directory '%s': %s",
               buf, strerror(errno));
     }
@@ -256,7 +285,7 @@ apophis_meta_read(pTHX_ const char *meta_path)
 {
     PerlIO *fh;
     HV *meta;
-    struct stat st;
+    apophis_stat_t st;
     char *buf, *p, *end;
     SSize_t nread;
 
@@ -424,7 +453,7 @@ pp_apophis_store(pTHX) {
     const char *store_dir;
     STRLEN store_dir_len;
     char path[APOPHIS_PATH_MAX];
-    struct stat st;
+    apophis_stat_t st;
 
     if (!sv_isobject(self_sv))
         croak("Apophis: pp_store: not an object");
@@ -479,7 +508,7 @@ pp_apophis_exists(pTHX) {
     const char *id_str;
     STRLEN id_len;
     char path[APOPHIS_PATH_MAX];
-    struct stat st;
+    apophis_stat_t st;
 
     if (!sv_isobject(self_sv))
         croak("Apophis: pp_exists: not an object");
@@ -516,7 +545,7 @@ pp_apophis_fetch(pTHX) {
     const char *id_str;
     STRLEN id_len;
     char path[APOPHIS_PATH_MAX];
-    struct stat st;
+    apophis_stat_t st;
 
     if (!sv_isobject(self_sv))
         croak("Apophis: pp_fetch: not an object");
@@ -912,7 +941,7 @@ store(self, content_ref, ...)
         STRLEN store_dir_len;
         char path[APOPHIS_PATH_MAX];
         int path_len;
-        struct stat st;
+        apophis_stat_t st;
     CODE:
         if (!sv_isobject(self))
             croak("Apophis::store: not an object");
@@ -988,7 +1017,7 @@ fetch(self, id, ...)
         STRLEN id_len;
         char path[APOPHIS_PATH_MAX];
         PerlIO *fh;
-        struct stat st;
+        apophis_stat_t st;
         SV *content;
         SSize_t nread;
     CODE:
@@ -1057,7 +1086,7 @@ exists(self, id, ...)
         const char *id_str;
         STRLEN id_len;
         char path[APOPHIS_PATH_MAX];
-        struct stat st;
+        apophis_stat_t st;
     CODE:
         if (!sv_isobject(self))
             croak("Apophis::exists: not an object");
@@ -1249,7 +1278,7 @@ store_many(self, refs, ...)
             unsigned char uuid[16];
             char id_str[HORUS_FMT_STR_LEN + 1];
             char path[APOPHIS_PATH_MAX];
-            struct stat st;
+            apophis_stat_t st;
 
             if (!svp || !SvROK(*svp))
                 croak("Apophis::store_many: element %d must be a scalar ref",
@@ -1318,7 +1347,7 @@ find_missing(self, ids, ...)
             const char *id_str;
             STRLEN id_len;
             char path[APOPHIS_PATH_MAX];
-            struct stat st;
+            apophis_stat_t st;
 
             if (!svp || !SvOK(*svp)) continue;
 
@@ -1440,7 +1469,7 @@ op_store(self, content_ref)
         const char *store_dir;
         STRLEN store_dir_len;
         char path[APOPHIS_PATH_MAX];
-        struct stat st;
+        apophis_stat_t st;
     CODE:
         if (!sv_isobject(self))
             croak("Apophis::op_store: not an object");
@@ -1483,7 +1512,7 @@ op_exists(self, id)
         const char *id_str;
         STRLEN id_len;
         char path[APOPHIS_PATH_MAX];
-        struct stat st;
+        apophis_stat_t st;
     CODE:
         if (!sv_isobject(self))
             croak("Apophis::op_exists: not an object");
@@ -1513,7 +1542,7 @@ op_fetch(self, id)
         STRLEN id_len;
         char path[APOPHIS_PATH_MAX];
         PerlIO *fh;
-        struct stat st;
+        apophis_stat_t st;
         SV *content;
         SSize_t nread;
     CODE:

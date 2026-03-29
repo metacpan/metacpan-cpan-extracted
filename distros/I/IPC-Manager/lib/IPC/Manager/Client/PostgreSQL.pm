@@ -2,7 +2,7 @@ package IPC::Manager::Client::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000006';
+our $VERSION = '0.000007';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;

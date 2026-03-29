@@ -1,0 +1,6 @@
+Revision history for Alien-libssh
+
+0.001     2026-03-29 02:38:55Z
+  - Initial release
+  - Provides libssh via pkg-config (system) or bundled source build (share)
+  - Bundles libssh-0.10.6.tar.xz — no network access required at build time

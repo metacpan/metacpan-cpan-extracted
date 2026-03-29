@@ -40,7 +40,7 @@ use v5.40;
 # janeskil1525 E<lt>janeskil1525@gmail.comE<gt>
 #
 
-our $VERSION = "0.35";
+our $VERSION = "0.45";
 
 use Data::Dumper;
 use Daje::Workflow::Database;
@@ -51,6 +51,8 @@ use Daje::Database::Migrator;
 sub register ($self, $app, $config) {
 
     $app->log->debug("Daje::Plugin::Workflow::register starts");
+
+    $self->create_workflow_engine($app);
 
     my $migration->{class} = 'Daje::Workflow::Database';
     $migration->{name} = 'workflow';
@@ -65,8 +67,46 @@ sub register ($self, $app, $config) {
     } catch ($e) {
         $app->log->error($e);
     };
-    push @{$app->routes->namespaces}, 'Daje::Controller::Workflows';
 
+    if (exists $app->config('workflow')->{minion} && $app->config('workflow')->{minion} == 1) {
+        $app->minion->add_task(execute_workflow => \&_execute_workflow);
+    }
+
+    $self->setup_controller($app);
+    $app->log->debug("Daje::Plugin::Workflow registered");
+}
+
+sub _execute_workflow($job, $context) {
+
+    try {
+        if(exists $context->{context}->{payload}->{workflow_fkey}) {
+            $job->app->workflow_engine->workflow_pkey($context->{context}->{payload}->{workflow_fkey});
+        } else {
+            $job->app->workflow_engine->workflow_pkey($context->{context}->{workflow}->{workflow_fkey});
+        }
+        $job->app->workflow_engine->workflow_name($context->{context}->{workflow}->{workflow});
+        $job->app->workflow_engine->context($context);
+        $job->app->workflow_engine->process($context->{context}->{workflow}->{activity});
+        if($job->app->workflow_engine->error->has_error() == 0) {
+            my $message = $context->{context}->{workflow}->{workflow} . " and activity " .  $context->{context}->{workflow}->{activity} . " ended successfully";
+            $job->finish((message => $message ));
+        } else {
+            $job->fail((errors => ['Daje::Controller::Workflows::Workflows::execute ' . $job->app->workflow_engine->error->error()]));
+        }
+    } catch ($e) {
+        say $e;
+    }
+}
+
+sub setup_controller($self, $app) {
+
+    push @{$app->routes->namespaces}, 'Daje::Controller::Workflows';
+    my $r = $app->auth;
+    $r->put('workflow/execute_que')->to('Workflowsque#execute');
+    $r->put('workflow/execute')->to('Workflows#execute');
+}
+
+sub create_workflow_engine($self, $app) {
     my $loader;
     try { # '/home/jan/Project/Daje-Workflow-Workflows/Workflows'
         $loader = Daje::Workflow::Loader->new(
@@ -87,17 +127,8 @@ sub register ($self, $app, $config) {
     } catch ($e) {
         $app->log->error($e);
     };
-
-    my $r = $app->auth;
-
-    $r->put('workflow/execute')->to('Workflows#execute');
-
     $app->helper(workflow_engine => sub {$workflow_engine});
-
-    $app->log->debug("Daje::Plugin::Workflow registered");
 }
-
-
 
 
 

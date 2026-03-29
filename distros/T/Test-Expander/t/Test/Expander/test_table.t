@@ -28,6 +28,7 @@ subtest success => sub {
    q(| 'param2' omitted             |  $FALSE  | 'abc'  |        |),
     '| both parameters set to true  |  $TRUE   | $TRUE  | $TRUE  |',
     '| both parameters set to false |  $FALSE  | $FALSE | $FALSE |',
+    '# Just a comment, this line should be skipped',
     '+-----------------------------------------------------------+',
   ];
   is( { $METHOD_REF->( $table ) }, $expected, 'title is in line' );

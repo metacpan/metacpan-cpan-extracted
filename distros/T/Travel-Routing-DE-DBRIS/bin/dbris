@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use utf8;
 use DateTime;
@@ -21,6 +21,8 @@ my ( $show_offers,    $show_upsell_offers, $show_cross_offers );
 my ( $first_class,    $passengers );
 my ( $developer_mode, $verbose );
 my ( $json_output,    $raw_json_output );
+my $interactive
+  = 1 * ( -t STDOUT and not( defined $ENV{TERM} and $ENV{TERM} eq 'dumb' ) );
 my $use_cache  = 1;
 my $use_colour = 'auto';
 my $cache;
@@ -73,6 +75,25 @@ GetOptions(
 
 ) or show_help(1);
 
+if ( $json_output or $raw_json_output ) {
+	$interactive = 0;
+}
+
+sub req_start {
+	my ($reason) = @_;
+	if ($interactive) {
+		$| = 1;
+		print "Querying bahn.de ($reason) …";
+	}
+}
+
+sub req_stop {
+	if ($interactive) {
+		print "\r\e[2K";
+		$| = 0;
+	}
+}
+
 if ( $use_colour eq 'auto'
 	and ( not -t STDOUT or ( defined $ENV{TERM} and $ENV{TERM} eq 'dumb' ) )
 	or $use_colour eq 'never' )
@@ -120,11 +141,13 @@ sub get_stop {
 		$stopover_duration = $+{duration};
 	}
 
+	req_start('stop lookup');
 	my $ris = Travel::Status::DE::DBRIS->new(
 		cache          => $cache,
 		locationSearch => $stop,
 		developer_mode => $developer_mode,
 	);
+	req_stop();
 	if ( my $err = $ris->errstr ) {
 		say STDERR "Request error while looking up '${stop}': ${err}";
 		exit 2;
@@ -192,8 +215,9 @@ if ( $date or $time ) {
 	$opt{datetime} = $dt;
 }
 
-if ( $mots and $mots eq 'help' ) {
-	say "Supported modes of transmit (-m / --modes-of-transit):";
+if ( $mots and $mots =~ m{ ^ ( help | [?] ) $ }ix ) {
+	say
+'Supported modes of transmit for -m / --modes-of-transit (case-insensitive):';
 	for my $mot ( sort keys %known_mot ) {
 		say $mot;
 	}
@@ -203,7 +227,7 @@ if ( $mots and $mots eq 'help' ) {
 if ($mots) {
 
 	# Passing unknown MOTs to the backend results in HTTP 422 Unprocessable Entity
-	my @mots = split( qr{, *}, $mots );
+	my @mots = map { uc } split( qr{, *}, $mots );
 	my $found_unknown;
 	for my $mot (@mots) {
 		if ( not $known_mot{$mot} ) {
@@ -288,7 +312,9 @@ sub format_delay {
 	return q{};
 }
 
+req_start('main request');
 my $ris = Travel::Routing::DE::DBRIS->new(%opt);
+req_stop();
 
 if ( my $err = $ris->errstr ) {
 	say STDERR "Request error: ${err}";
@@ -371,25 +397,38 @@ for my $connection ( $ris->connections ) {
 		}
 	}
 
-	say q{};
+	my $dep_ddmm
+	  = $connection->dep
+	  ? $connection->dep->strftime('%d.%m. ')
+	  : q{??.??. };
+	my $dep_hhmm
+	  = $connection->dep ? $connection->dep->strftime('%H:%M')
+	  : q{??:??}, my $arr_ddmm
+	  = $connection->arr ? $connection->arr->strftime('%d.%m. ')
+	  : q{??.??. };
+	my $arr_hhmm
+	  = $connection->arr ? $connection->arr->strftime('%H:%M') : q{??:??},
+
+	  say q{};
 	printf(
-		"%s %s%s%s  (%02d:%02d)  %s%s%s  %s%s\n",
-		$connection->dep ? $connection->dep->strftime('%d.%m.')
-		: q{??.??.},
+		"%s%s%s%s  (%02d:%02d)  %s%s%s%s  %s%s\n",
+		$dep_ddmm,
 		$format,
-		$connection->dep ? $connection->dep->strftime('%H:%M')
-		: q{??:??},
+		$dep_hhmm,
 		$output_reset,
 		$connection->duration->in_units( 'hours', 'minutes' ),
+		$arr_ddmm ne $dep_ddmm ? $arr_ddmm : q{},
 		$format,
-		$connection->arr ? $connection->arr->strftime('%H:%M') : q{??:??},
+		$arr_hhmm,
 		$output_reset,
-		$connection->is_cancelled ? "${output_critical}XX${output_reset}"
+		$connection->is_cancelled
+		? "${output_critical}XX${output_reset}"
 		: format_occupancy($connection),
 		$header,
 	);
 
 	if ($show_offers) {
+		req_start('offers');
 		my $offers_req = Travel::Routing::DE::DBRIS->new(
 			developer_mode => $developer_mode,
 			offers         => {
@@ -398,6 +437,7 @@ for my $connection ( $ris->connections ) {
 			passengers  => $opt{passengers},
 			first_class => $opt{first_class},
 		);
+		req_stop();
 		if ( my $err = $offers_req->errstr ) {
 			say STDERR "Request error while looking up offers: ${err}";
 		}
@@ -472,18 +512,19 @@ for my $connection ( $ris->connections ) {
 		elsif ( $segment->direction ) {
 			printf( "${output_bold}%s${output_reset} → %s  %s\n",
 				$segment->train_mid, $segment->direction,
-				format_occupancy($segment) );
+				$show_full_route ? q{} : format_occupancy($segment) );
 		}
 		else {
 			printf( "${output_bold}%s${output_reset}\n", $segment->train_long );
 		}
 
 		printf(
-			"%s%s  ab  %s%s\n",
-			$segment->dep->strftime('%H:%M'),
+			"%s%s  %s  %s%s\n",
+			$segment->dep ? $segment->dep->strftime('%H:%M') : q{??:??},
 			$max_delay_digits
 			? q{ } . format_delay( $segment->dep_delay, $max_delay_digits )
 			: q{},
+			$show_full_route ? format_occupancy( $segment->dep_stop ) : q{●},
 			$segment->dep_name,
 			$segment->dep_platform ? q{  } . $segment->dep_platform : q{},
 		);
@@ -504,13 +545,14 @@ for my $connection ( $ris->connections ) {
 		}
 
 		printf(
-			"%s%s%s%s  an  %s%s\n",
-			$segment->is_unlikely ? $output_critical : q{},
-			$segment->arr->strftime('%H:%M'),
-			$segment->is_unlikely ? $output_reset : q{},
+			"%s%s%s%s  %s  %s%s\n",
+			$segment->is_unlikely ? $output_critical                 : q{},
+			$segment->arr         ? $segment->arr->strftime('%H:%M') : q{??:??},
+			$segment->is_unlikely ? $output_reset                    : q{},
 			$max_delay_digits
 			? q{ } . format_delay( $segment->arr_delay, $max_delay_digits )
 			: q{},
+			$show_full_route ? format_occupancy( $segment->arr_stop ) : q{○},
 			$segment->arr_name,
 			$segment->arr_platform ? q{  } . $segment->arr_platform : q{},
 		);
@@ -549,7 +591,7 @@ B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-a>|B<-t> I<HH:MM>] [...] I<from-stop>
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 DESCRIPTION
 
@@ -611,6 +653,8 @@ Default: de.
 Only show connections with the specified modes of transit.
 Supported modes of transit are:
 ICE, EC_IC, IR, REGIONAL, SBAHN, BUS, SCHIFF, UBAHN, TRAM, ANRUFPFLICHTIG.
+I<mot> is case-insensitive; supported modes can also be queried with
+C<< -m help >> or C<< -m ? >>.
 Default: all modes.
 
 =item B<--no-cache>

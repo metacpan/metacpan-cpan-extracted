@@ -1,5 +1,8 @@
 Revision history for XML::XPath
 
+1.49  2026-03-28 MANWAR
+      - Proposed patch for the issue #213 caused by XML::Parser v2.48.
+
 1.48  2022-08-09 MANWAR
       - More contributions by @shawnm.
        a) pull request #11

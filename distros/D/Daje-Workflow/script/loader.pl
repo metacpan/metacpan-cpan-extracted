@@ -6,7 +6,8 @@ use Daje::Workflow::Loader;
 
 sub test_load() {
     my $loader = Daje::Workflow::Loader->new(
-        path => '/home/jan/Project/Daje-Workflow-Workflows/Workflows'
+        path => '/home/jan/Program/sentinel/workflows',
+        type => => 'workflow',
     );
 
     $loader->load();

@@ -1,0 +1,446 @@
+---
+abstract: 'Mojolicious Plugin'
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-Authorities
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Controller::Authorities::AuthoritiesFunction:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunction.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesFunctionList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunctionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesFunctionPermissions:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunctionPermissions.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesFunctionPermissionsList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunctionPermissionsList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesFunctionPluginRole:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunctionPluginRole.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesFunctionPluginRoleList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunctionPluginRoleList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesFunctionPluginRolePermission:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunctionPluginRolePermission.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesFunctionPluginRolePermissionList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesFunctionPluginRolePermissionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesLicense:
+    file: lib/Daje/Controller/Authorities/AuthoritiesLicense.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesLicenseFunction:
+    file: lib/Daje/Controller/Authorities/AuthoritiesLicenseFunction.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesLicenseFunctionList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesLicenseFunctionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesLicenseList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesLicenseList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesLicensePlugin:
+    file: lib/Daje/Controller/Authorities/AuthoritiesLicensePlugin.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesLicensePluginList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesLicensePluginList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesPermissions:
+    file: lib/Daje/Controller/Authorities/AuthoritiesPermissions.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesPermissionsList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesPermissionsList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesPlugin:
+    file: lib/Daje/Controller/Authorities/AuthoritiesPlugin.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesPluginList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesPluginList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesPluginRole:
+    file: lib/Daje/Controller/Authorities/AuthoritiesPluginRole.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesPluginRoleList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesPluginRoleList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesRole:
+    file: lib/Daje/Controller/Authorities/AuthoritiesRole.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesRoleFunction:
+    file: lib/Daje/Controller/Authorities/AuthoritiesRoleFunction.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesRoleFunctionList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesRoleFunctionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::AuthoritiesRoleList:
+    file: lib/Daje/Controller/Authorities/AuthoritiesRoleList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunction:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunction.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunctionList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunctionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunctionPermissions:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunctionPermissions.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunctionPermissionsList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunctionPermissionsList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunctionPluginRole:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunctionPluginRole.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunctionPluginRoleList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunctionPluginRoleList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunctionPluginRolePermission:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunctionPluginRolePermission.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesFunctionPluginRolePermissionList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesFunctionPluginRolePermissionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesLicense:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesLicense.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesLicenseFunction:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesLicenseFunction.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesLicenseFunctionList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesLicenseFunctionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesLicenseList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesLicenseList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesLicensePlugin:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesLicensePlugin.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesLicensePluginList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesLicensePluginList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesPermissions:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesPermissions.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesPermissionsList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesPermissionsList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesPlugin:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesPlugin.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesPluginList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesPluginList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesPluginRole:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesPluginRole.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesPluginRoleList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesPluginRoleList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesRole:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesRole.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesRoleFunction:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesRoleFunction.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesRoleFunctionList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesRoleFunctionList.pm
+    version: '0.01'
+  Daje::Controller::Authorities::Super::AuthoritiesRoleList:
+    file: lib/Daje/Controller/Authorities/Super/AuthoritiesRoleList.pm
+    version: '0.01'
+  Daje::Database::Authorities:
+    file: lib/Daje/Database/Authorities.pm
+    version: '1'
+  Daje::Database::Model::AuthoritiesFunction:
+    file: lib/Daje/Database/Model/AuthoritiesFunction.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesFunctionPermissions:
+    file: lib/Daje/Database/Model/AuthoritiesFunctionPermissions.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesFunctionPluginRole:
+    file: lib/Daje/Database/Model/AuthoritiesFunctionPluginRole.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesFunctionPluginRolePermission:
+    file: lib/Daje/Database/Model/AuthoritiesFunctionPluginRolePermission.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesLicense:
+    file: lib/Daje/Database/Model/AuthoritiesLicense.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesLicenseFunction:
+    file: lib/Daje/Database/Model/AuthoritiesLicenseFunction.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesLicensePlugin:
+    file: lib/Daje/Database/Model/AuthoritiesLicensePlugin.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesPermissions:
+    file: lib/Daje/Database/Model/AuthoritiesPermissions.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesPlugin:
+    file: lib/Daje/Database/Model/AuthoritiesPlugin.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesPluginRole:
+    file: lib/Daje/Database/Model/AuthoritiesPluginRole.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesRole:
+    file: lib/Daje/Database/Model/AuthoritiesRole.pm
+    version: '0.01'
+  Daje::Database::Model::AuthoritiesRoleFunction:
+    file: lib/Daje/Database/Model/AuthoritiesRoleFunction.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesFunction:
+    file: lib/Daje/Database/Model/Super/AuthoritiesFunction.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesFunctionPermissions:
+    file: lib/Daje/Database/Model/Super/AuthoritiesFunctionPermissions.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesFunctionPluginRole:
+    file: lib/Daje/Database/Model/Super/AuthoritiesFunctionPluginRole.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesFunctionPluginRolePermission:
+    file: lib/Daje/Database/Model/Super/AuthoritiesFunctionPluginRolePermission.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesLicense:
+    file: lib/Daje/Database/Model/Super/AuthoritiesLicense.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesLicenseFunction:
+    file: lib/Daje/Database/Model/Super/AuthoritiesLicenseFunction.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesLicensePlugin:
+    file: lib/Daje/Database/Model/Super/AuthoritiesLicensePlugin.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesPermissions:
+    file: lib/Daje/Database/Model/Super/AuthoritiesPermissions.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesPlugin:
+    file: lib/Daje/Database/Model/Super/AuthoritiesPlugin.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesPluginRole:
+    file: lib/Daje/Database/Model/Super/AuthoritiesPluginRole.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesRole:
+    file: lib/Daje/Database/Model/Super/AuthoritiesRole.pm
+    version: '0.01'
+  Daje::Database::Model::Super::AuthoritiesRoleFunction:
+    file: lib/Daje/Database/Model/Super/AuthoritiesRoleFunction.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunction:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunction.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunctionList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunctionList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunctionPermissions:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunctionPermissions.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunctionPermissionsList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunctionPermissionsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunctionPluginRole:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunctionPluginRole.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunctionPluginRoleList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunctionPluginRoleList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunctionPluginRolePermission:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunctionPluginRolePermission.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesFunctionPluginRolePermissionList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesFunctionPluginRolePermissionList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicense:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicense.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicenseCompanies:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicenseCompanies.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicenseCompaniesList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicenseCompaniesList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicenseFunction:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicenseFunction.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicenseFunctionList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicenseFunctionList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicenseList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicenseList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicensePlugin:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicensePlugin.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesLicensePluginList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesLicensePluginList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesPermissions:
+    file: lib/Daje/Database/View/Super/vAuthoritiesPermissions.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesPermissionsList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesPermissionsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesPlugin:
+    file: lib/Daje/Database/View/Super/vAuthoritiesPlugin.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesPluginList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesPluginList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesPluginRole:
+    file: lib/Daje/Database/View/Super/vAuthoritiesPluginRole.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesPluginRoleList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesPluginRoleList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRole:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRole.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRoleCompany:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRoleCompany.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRoleCompanyList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRoleCompanyList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRoleFunction:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRoleFunction.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRoleFunctionList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRoleFunctionList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRoleList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRoleList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRoleUser:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRoleUser.pm
+    version: '0.01'
+  Daje::Database::View::Super::vAuthoritiesRoleUserList:
+    file: lib/Daje/Database/View/Super/vAuthoritiesRoleUserList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunction:
+    file: lib/Daje/Database/View/vAuthoritiesFunction.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunctionList:
+    file: lib/Daje/Database/View/vAuthoritiesFunctionList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunctionPermissions:
+    file: lib/Daje/Database/View/vAuthoritiesFunctionPermissions.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunctionPermissionsList:
+    file: lib/Daje/Database/View/vAuthoritiesFunctionPermissionsList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunctionPluginRole:
+    file: lib/Daje/Database/View/vAuthoritiesFunctionPluginRole.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunctionPluginRoleList:
+    file: lib/Daje/Database/View/vAuthoritiesFunctionPluginRoleList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunctionPluginRolePermission:
+    file: lib/Daje/Database/View/vAuthoritiesFunctionPluginRolePermission.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesFunctionPluginRolePermissionList:
+    file: lib/Daje/Database/View/vAuthoritiesFunctionPluginRolePermissionList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesLicense:
+    file: lib/Daje/Database/View/vAuthoritiesLicense.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesLicenseFunction:
+    file: lib/Daje/Database/View/vAuthoritiesLicenseFunction.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesLicenseFunctionList:
+    file: lib/Daje/Database/View/vAuthoritiesLicenseFunctionList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesLicenseList:
+    file: lib/Daje/Database/View/vAuthoritiesLicenseList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesLicensePlugin:
+    file: lib/Daje/Database/View/vAuthoritiesLicensePlugin.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesLicensePluginList:
+    file: lib/Daje/Database/View/vAuthoritiesLicensePluginList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesPermissions:
+    file: lib/Daje/Database/View/vAuthoritiesPermissions.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesPermissionsList:
+    file: lib/Daje/Database/View/vAuthoritiesPermissionsList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesPlugin:
+    file: lib/Daje/Database/View/vAuthoritiesPlugin.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesPluginList:
+    file: lib/Daje/Database/View/vAuthoritiesPluginList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesPluginRole:
+    file: lib/Daje/Database/View/vAuthoritiesPluginRole.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesPluginRoleList:
+    file: lib/Daje/Database/View/vAuthoritiesPluginRoleList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesRole:
+    file: lib/Daje/Database/View/vAuthoritiesRole.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesRoleFunction:
+    file: lib/Daje/Database/View/vAuthoritiesRoleFunction.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesRoleFunctionList:
+    file: lib/Daje/Database/View/vAuthoritiesRoleFunctionList.pm
+    version: '0.01'
+  Daje::Database::View::vAuthoritiesRoleList:
+    file: lib/Daje/Database/View/vAuthoritiesRoleList.pm
+    version: '0.01'
+  Daje::Helper::Authorities::InsertPluginFunction:
+    file: lib/Daje/Helper/Authorities/InsertPluginFunction.pm
+  Daje::Plugin::Authorities:
+    file: lib/Daje/Plugin/Authorities.pm
+    version: '0.01'
+  Daje::Plugin::Authorities::Authorities:
+    file: lib/Daje/Plugin/Authorities/Authorities.pm
+  Daje::Plugin::Authorities::Helpers:
+    file: lib/Daje/Plugin/Authorities/Helpers.pm
+    version: '0.01'
+  Daje::Plugin::Authorities::Languages:
+    file: lib/Daje/Plugin/Authorities/Languages.pm
+  Daje::Plugin::Authorities::Routes:
+    file: lib/Daje/Plugin/Authorities/Routes.pm
+    version: '0.01'
+  Daje::Workflow::Activities::Authorities::Activity:
+    file: lib/Daje/Workflow/Activities/Authorities/Activity.pm
+  Daje::Workflow::Activities::Authorities::Standard::AdminRole:
+    file: lib/Daje/Workflow/Activities/Authorities/Standard/AdminRole.pm
+  Daje::Workflow::Activities::Authorities::Standard::Base:
+    file: lib/Daje/Workflow/Activities/Authorities/Standard/Base.pm
+  Daje::Workflow::Activities::Authorities::Standard::PowerUserRole:
+    file: lib/Daje/Workflow/Activities/Authorities/Standard/PowerUserRole.pm
+  Daje::Workflow::Activities::Authorities::Standard::UserRole:
+    file: lib/Daje/Workflow/Activities/Authorities/Standard/UserRole.pm
+requires:
+  Future::AsyncAwait: '0.52'
+  Mojo::Base: '0'
+  Mojolicious::Plugin: '0'
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-Authorities/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-Authorities
+  repository: https://github.com/janeskil1525/Daje-Plugin-Authorities.git
+version: '0.01'
+x_contributors:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'Data::Dumper' => '0',
+        'Loo' => '0.07',
 	'Scalar::Util' => '0',
         'Type::Tiny' => '1.010006',
 	#'Foo::Bar::Module' => '5.0401',

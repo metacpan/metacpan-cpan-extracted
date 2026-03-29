@@ -5,7 +5,7 @@ hosted URLs, and suspicious domains
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -2771,7 +2771,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Mail::Message::Abuse
+    perldoc Email::Abuse::Investigator
 
 You can also look for information at:
 
@@ -2789,7 +2789,7 @@ You can also look for information at:
 
 - CPAN Testers Dependencies
 
-    [http://deps.cpantesters.org/?module=Mail::Message::Abuse](http://deps.cpantesters.org/?module=Mail::Message::Abuse)
+    [http://deps.cpantesters.org/?module=Email::Abuse::Investigator](http://deps.cpantesters.org/?module=Email::Abuse::Investigator)
 
 # LICENCE AND COPYRIGHT
 

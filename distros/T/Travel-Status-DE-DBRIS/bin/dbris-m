@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use utf8;
 use DateTime;
@@ -386,7 +386,8 @@ if ( $opt{station} ) {
 
 	my @results = map { $_->[1] }
 	  sort { $a->[0] <=> $b->[0] }
-	  map { [ ( $_->dep // $_->arr )->epoch, $_ ] } $status->results;
+	  map  { [ $_->dep->epoch, $_ ] }
+	  grep { $_->dep } $status->results;
 
 	for my $result (@results) {
 		printf(
@@ -713,7 +714,7 @@ B<dbris-m> B<?>I<query>|I<lat>B<:>I<lon>
 
 =head1 VERSION
 
-version 0.26
+version 0.27
 
 =head1 DESCRIPTION
 
@@ -722,7 +723,7 @@ bahn.de. According to word of mouth, it uses the HAFAS backend that can also
 be accessed by Travel::Status::DE::HAFAS(3pm)'s DB service. However, the
 bahn.de entry point is likely more reliable in the long run.
 
-B<dbris-m> can serve as an arrival/departure monitor, request details about a
+B<dbris-m> can serve as a departure monitor, request details about a
 specific trip, and look up public transport stops by name or geolocation. The
 operating mode depends on the contents of its non-option argument.
 
@@ -787,7 +788,7 @@ Default: today.
 
 =item B<-j>, B<--with-jid> (departure monitor)
 
-Show JourneyID for each listed arrival/departure.
+Show JourneyID for each listed departure.
 These can be used to obtain details on individual trips with subsequent
 B<dbris-m> invocations.
 

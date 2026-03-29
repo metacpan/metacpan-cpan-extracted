@@ -1,0 +1,19 @@
+Revision history for Rex-GPU
+
+0.001     2026-03-29 04:20:30Z
+  - Initial release
+  - GPU hardware detection via PCI class codes (NVIDIA, AMD)
+  - NVIDIA driver installation (Debian 12/13, Ubuntu 22.04/24.04, RHEL/Rocky 8/9/10, openSUSE Leap 15.6/16.0)
+  - NVIDIA Container Toolkit installation with automatic repo setup
+  - CDI spec generation via nvidia-ctk cdi generate
+  - Containerd runtime configuration (RKE2, K3s, standalone)
+  - Support for Ubuntu 24.04: auto-detect nvidia-driver-NNN-server, handle virtual nvidia-smi package
+  - DPkg::Lock::Timeout=120 on all apt-get calls for resilience on fresh-boot systems
+  - All package installs use apt-get/dnf directly with dpkg/rpm verification
+    (Rex::Pkg dies on non-zero from DKMS/grub/initramfs post-install scripts)
+  - Reboot support with reconnect polling via Rex::LibSSH
+  - Tested on Hetzner dedicated servers with NVIDIA RTX 4000 SFF Ada Generation
+    (Debian 13, Rocky Linux 10.1, Ubuntu 24.04 LTS)
+  - eg/Rexfile example for GPU detection and cluster deployment
+  - Requires Rex::LibSSH for deployment to SFTP-less hosts
+

@@ -1,3 +1,10 @@
+Travel::Routing::DE::DBRIS 0.10 - Sat Mar 28 2026
+
+    * Handle wonky backend timestamps during DST transition (e.g. CET to CEST)
+    * dbris: -m / --modes-of-transit: identifiers are now case-insensitive
+    * Connection::Segment: new accessors: dep_stop, arr_stop
+    * dbris: Show arrival date for cross-midnight connections
+
 Travel::Routing::DE::DBRIS 0.09 - Mon Feb 23 2026
 
     * Increase default timeout to 20 seconds to deal with bahn.de's WAF now

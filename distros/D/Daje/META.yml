@@ -26,18 +26,18 @@ no_index:
 provides:
   Daje:
     file: lib/Daje.pm
-    version: '0.10'
+    version: '0.30'
 requires:
-  Daje::Plugin::Apploader: '0.03'
+  Daje::Plugin::Apploader: '0.35'
   Daje::Tools::JWT: '0'
   Mojo::JSON: '0'
   Mojo::Loader: '0'
   Mojo::Pg: '0'
-  perl: '5.040000'
+  perl: '5.042000'
 resources:
   bugtracker: https://github.com/janeskil1525/Daje/issues
   homepage: https://github.com/janeskil1525/Daje
   repository: https://github.com/janeskil1525/Daje.git
-version: '0.10'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

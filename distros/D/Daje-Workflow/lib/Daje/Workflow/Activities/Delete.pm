@@ -61,10 +61,9 @@ sub delete ($self) {
 
     try {
         my $dbclass = $class->new(db => $self->db);
-        say $dbclass->primary_key_name . " " . Dumper($data);
         if (exists $data->{$dbclass->primary_key_name} and $data->{$dbclass->primary_key_name} > 0) {
             $self->model->insert_history(
-                "Delete object " . Dumper($data), " $class->delete", 1
+                "Delete object " . $dbclass->table_name() . Dumper($data), " $class->delete", 2
             );
 
             my $result = $dbclass->delete($data->{$dbclass->primary_key_name});

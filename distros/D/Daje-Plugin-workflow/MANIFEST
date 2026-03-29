@@ -5,6 +5,7 @@ README.md
 conf/config.conf
 cpanfile
 lib/Daje/Controller/Workflows/Workflows.pm
+lib/Daje/Controller/Workflows/Workflowsque.pm
 lib/Daje/Plugin/Workflow.pm
 minil.toml
 t/00_compile.t

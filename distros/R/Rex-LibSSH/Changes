@@ -1,0 +1,11 @@
+Revision history for Rex-LibSSH
+
+0.002     2026-03-29 04:09:31Z
+  - Reset session timeout to 0 after connect to allow long-running commands
+
+0.001     2026-03-29 02:55:49Z
+  - Initial release
+  - Rex::Interface::Connection::LibSSH — SSH connection via Net::LibSSH
+  - Rex::Interface::Exec::LibSSH — command execution via SSH exec channels
+  - Rex::Interface::Fs::LibSSH — filesystem operations without SFTP
+  - Rex::Interface::File::LibSSH — file read/write via exec channels

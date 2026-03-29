@@ -1,7 +1,7 @@
 ---
 abstract: 'BeLike::GETTY when you build your dists'
 author:
-  - 'Torsten Raudssus <torsten@raudssus.de>'
+  - 'Torsten Raudssus <getty@cpan.org>'
 build_requires:
   Test::More: '0.96'
 configure_requires:
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues
   homepage: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty
   repository: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
-version: '0.305'
+version: '0.306'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -303,7 +303,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.305'
+          tag: '0.306'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '3.19';
+our $VERSION = '3.20';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -456,11 +456,14 @@ sub show_results {
 
 		my @output_line;
 		my $platform = $d->platform;
-		my $dtime    = (
+		my $dtime
+		  = $d->datetime
+		  ? (
 			$relative_times
 			? sprintf( '%2d min', $d->countdown )
 			: $d->datetime->strftime('%H:%M')
-		);
+		  )
+		  : q{??:??};
 
 		if (
 			   ( @grep_lines and none { $d->line eq $_ } @grep_lines )
@@ -636,7 +639,7 @@ B<efa-m> [B<-s> I<service>] I<tripid>
 
 =head1 VERSION
 
-version 3.19
+version 3.20
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,327 @@
+---
+abstract: 'Mojolicious Plugin'
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-Kanban
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Controller::Kanban::KanbanAssignees:
+    file: lib/Daje/Controller/Kanban/KanbanAssignees.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanAssigneesList:
+    file: lib/Daje/Controller/Kanban/KanbanAssigneesList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanAttachments:
+    file: lib/Daje/Controller/Kanban/KanbanAttachments.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanAttachmentsList:
+    file: lib/Daje/Controller/Kanban/KanbanAttachmentsList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanCards:
+    file: lib/Daje/Controller/Kanban/KanbanCards.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanCardsList:
+    file: lib/Daje/Controller/Kanban/KanbanCardsList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanComments:
+    file: lib/Daje/Controller/Kanban/KanbanComments.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanCommentsList:
+    file: lib/Daje/Controller/Kanban/KanbanCommentsList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanList:
+    file: lib/Daje/Controller/Kanban/KanbanList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanListList:
+    file: lib/Daje/Controller/Kanban/KanbanListList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanPlanboard:
+    file: lib/Daje/Controller/Kanban/KanbanPlanboard.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanPlanboardList:
+    file: lib/Daje/Controller/Kanban/KanbanPlanboardList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanPriority:
+    file: lib/Daje/Controller/Kanban/KanbanPriority.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanPriorityList:
+    file: lib/Daje/Controller/Kanban/KanbanPriorityList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanTask:
+    file: lib/Daje/Controller/Kanban/KanbanTask.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanTaskList:
+    file: lib/Daje/Controller/Kanban/KanbanTaskList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanTasks:
+    file: lib/Daje/Controller/Kanban/KanbanTasks.pm
+    version: '0.01'
+  Daje::Controller::Kanban::KanbanTasksList:
+    file: lib/Daje/Controller/Kanban/KanbanTasksList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanAssignees:
+    file: lib/Daje/Controller/Kanban/Super/KanbanAssignees.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanAssigneesList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanAssigneesList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanAttachments:
+    file: lib/Daje/Controller/Kanban/Super/KanbanAttachments.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanAttachmentsList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanAttachmentsList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanCards:
+    file: lib/Daje/Controller/Kanban/Super/KanbanCards.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanCardsList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanCardsList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanComments:
+    file: lib/Daje/Controller/Kanban/Super/KanbanComments.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanCommentsList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanCommentsList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanListList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanListList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanPlanboard:
+    file: lib/Daje/Controller/Kanban/Super/KanbanPlanboard.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanPlanboardList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanPlanboardList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanPriority:
+    file: lib/Daje/Controller/Kanban/Super/KanbanPriority.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanPriorityList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanPriorityList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanTask:
+    file: lib/Daje/Controller/Kanban/Super/KanbanTask.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanTaskList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanTaskList.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanTasks:
+    file: lib/Daje/Controller/Kanban/Super/KanbanTasks.pm
+    version: '0.01'
+  Daje::Controller::Kanban::Super::KanbanTasksList:
+    file: lib/Daje/Controller/Kanban/Super/KanbanTasksList.pm
+    version: '0.01'
+  Daje::Database::Kanban:
+    file: lib/Daje/Database/Kanban.pm
+    version: '1'
+  Daje::Database::Model::KanbanAssignees:
+    file: lib/Daje/Database/Model/KanbanAssignees.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanAttachments:
+    file: lib/Daje/Database/Model/KanbanAttachments.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanCards:
+    file: lib/Daje/Database/Model/KanbanCards.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanComments:
+    file: lib/Daje/Database/Model/KanbanComments.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanList:
+    file: lib/Daje/Database/Model/KanbanList.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanPlanboard:
+    file: lib/Daje/Database/Model/KanbanPlanboard.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanPriority:
+    file: lib/Daje/Database/Model/KanbanPriority.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanTask:
+    file: lib/Daje/Database/Model/KanbanTask.pm
+    version: '0.01'
+  Daje::Database::Model::KanbanTasks:
+    file: lib/Daje/Database/Model/KanbanTasks.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanAssignees:
+    file: lib/Daje/Database/Model/Super/KanbanAssignees.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanAttachments:
+    file: lib/Daje/Database/Model/Super/KanbanAttachments.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanCards:
+    file: lib/Daje/Database/Model/Super/KanbanCards.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanComments:
+    file: lib/Daje/Database/Model/Super/KanbanComments.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanList:
+    file: lib/Daje/Database/Model/Super/KanbanList.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanPlanboard:
+    file: lib/Daje/Database/Model/Super/KanbanPlanboard.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanPriority:
+    file: lib/Daje/Database/Model/Super/KanbanPriority.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanTask:
+    file: lib/Daje/Database/Model/Super/KanbanTask.pm
+    version: '0.01'
+  Daje::Database::Model::Super::KanbanTasks:
+    file: lib/Daje/Database/Model/Super/KanbanTasks.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanAssignees:
+    file: lib/Daje/Database/View/Super/vKanbanAssignees.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanAssigneesList:
+    file: lib/Daje/Database/View/Super/vKanbanAssigneesList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanAttachments:
+    file: lib/Daje/Database/View/Super/vKanbanAttachments.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanAttachmentsList:
+    file: lib/Daje/Database/View/Super/vKanbanAttachmentsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanCards:
+    file: lib/Daje/Database/View/Super/vKanbanCards.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanCardsList:
+    file: lib/Daje/Database/View/Super/vKanbanCardsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanComments:
+    file: lib/Daje/Database/View/Super/vKanbanComments.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanCommentsList:
+    file: lib/Daje/Database/View/Super/vKanbanCommentsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanList:
+    file: lib/Daje/Database/View/Super/vKanbanList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanListList:
+    file: lib/Daje/Database/View/Super/vKanbanListList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanPlanboard:
+    file: lib/Daje/Database/View/Super/vKanbanPlanboard.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanPlanboardList:
+    file: lib/Daje/Database/View/Super/vKanbanPlanboardList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanPriority:
+    file: lib/Daje/Database/View/Super/vKanbanPriority.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanPriorityList:
+    file: lib/Daje/Database/View/Super/vKanbanPriorityList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanTask:
+    file: lib/Daje/Database/View/Super/vKanbanTask.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanTaskList:
+    file: lib/Daje/Database/View/Super/vKanbanTaskList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanTasks:
+    file: lib/Daje/Database/View/Super/vKanbanTasks.pm
+    version: '0.01'
+  Daje::Database::View::Super::vKanbanTasksList:
+    file: lib/Daje/Database/View/Super/vKanbanTasksList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanAssignees:
+    file: lib/Daje/Database/View/vKanbanAssignees.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanAssigneesList:
+    file: lib/Daje/Database/View/vKanbanAssigneesList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanAttachments:
+    file: lib/Daje/Database/View/vKanbanAttachments.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanAttachmentsList:
+    file: lib/Daje/Database/View/vKanbanAttachmentsList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanCards:
+    file: lib/Daje/Database/View/vKanbanCards.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanCardsList:
+    file: lib/Daje/Database/View/vKanbanCardsList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanComments:
+    file: lib/Daje/Database/View/vKanbanComments.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanCommentsList:
+    file: lib/Daje/Database/View/vKanbanCommentsList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanList:
+    file: lib/Daje/Database/View/vKanbanList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanListList:
+    file: lib/Daje/Database/View/vKanbanListList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanPlanboard:
+    file: lib/Daje/Database/View/vKanbanPlanboard.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanPlanboardList:
+    file: lib/Daje/Database/View/vKanbanPlanboardList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanPriority:
+    file: lib/Daje/Database/View/vKanbanPriority.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanPriorityList:
+    file: lib/Daje/Database/View/vKanbanPriorityList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanTask:
+    file: lib/Daje/Database/View/vKanbanTask.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanTaskList:
+    file: lib/Daje/Database/View/vKanbanTaskList.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanTasks:
+    file: lib/Daje/Database/View/vKanbanTasks.pm
+    version: '0.01'
+  Daje::Database::View::vKanbanTasksList:
+    file: lib/Daje/Database/View/vKanbanTasksList.pm
+    version: '0.01'
+  Daje::Helper::Kanban::Planboard:
+    file: lib/Daje/Helper/Kanban/Planboard.pm
+  Daje::Plugin::Kanban:
+    file: lib/Daje/Plugin/Kanban.pm
+    version: '0.01'
+  Daje::Plugin::Kanban::Authorities:
+    file: lib/Daje/Plugin/Kanban/Authorities.pm
+  Daje::Plugin::Kanban::Helpers:
+    file: lib/Daje/Plugin/Kanban/Helpers.pm
+    version: '0.01'
+  Daje::Plugin::Kanban::Languages:
+    file: lib/Daje/Plugin/Kanban/Languages.pm
+  Daje::Plugin::Kanban::Routes:
+    file: lib/Daje/Plugin/Kanban/Routes.pm
+    version: '0.01'
+  Daje::Workflow::Activities::Kanban::Activity:
+    file: lib/Daje/Workflow/Activities/Kanban/Activity.pm
+requires:
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-Kanban/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-Kanban
+  repository: https://github.com/janeskil1525/Daje-Plugin-Kanban.git
+version: '0.01'
+x_contributors:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

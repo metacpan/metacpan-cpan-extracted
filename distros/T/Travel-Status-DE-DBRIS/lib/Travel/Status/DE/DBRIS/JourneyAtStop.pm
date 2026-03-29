@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 Travel::Status::DE::DBRIS::JourneyAtStop->mk_ro_accessors(
 	qw(type dep sched_dep rt_dep delay is_cancelled line stop_eva id platform rt_platform destination via_last
@@ -50,10 +50,16 @@ sub new {
 	bless( $ref, $obj );
 
 	if ( $json->{zeit} ) {
-		$ref->{sched_dep} = $strptime->parse_datetime( $json->{zeit} );
+		eval { $ref->{sched_dep} = $strptime->parse_datetime( $json->{zeit} ); };
+		if ($@) {
+			warn("Cannot parse sched_dep $json->{zeit}: $@");
+		}
 	}
 	if ( $json->{ezZeit} ) {
-		$ref->{rt_dep} = $strptime->parse_datetime( $json->{ezZeit} );
+		eval { $ref->{rt_dep} = $strptime->parse_datetime( $json->{ezZeit} ); };
+		if ($@) {
+			warn("Cannot parse rt_dep $json->{zeit}: $@");
+		}
 	}
 	$ref->{dep} = $ref->{rt_dep} // $ref->{sched_dep};
 

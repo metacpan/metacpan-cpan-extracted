@@ -13,7 +13,7 @@ use XML::XPath::Literal;
 use XML::XPath::Number;
 use XML::XPath::NodeSet;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 # Axis name to principal node type mapping
 my %AXES = (

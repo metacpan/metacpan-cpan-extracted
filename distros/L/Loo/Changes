@@ -18,3 +18,11 @@ Revision history for Loo
 	- Fix OP_EMPTYAVHV guard to support Perl 5.36-5.38 empty {} and [] constructors
 	- Fix blessed regex detection on pre-5.12 Perls using PERL_MAGIC_qr
 	- Fix Sortkeys coderef test expecting array ref instead of hash ref
+
+0.08	2026/03/28
+	- Fix PADNAME typedef guard for Perl 5.20 (was incorrectly guarded at < 22)
+	- Fix OP_PADSV_STORE version guard from >= 36 to >= 38 (introduced in 5.38)
+
+0.09	2026/03/29
+	- Fix OP_EMPTYAVHV preprocessor guards - use version check instead of #ifdef
+	  since OP_EMPTYAVHV is an enum value not a #define in Perl 5.36+

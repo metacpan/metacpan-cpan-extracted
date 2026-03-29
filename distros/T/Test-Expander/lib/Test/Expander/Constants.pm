@@ -1,6 +1,6 @@
 package Test::Expander::Constants;
 
-our $VERSION = '2.6.2';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
+our $VERSION = '2.7.0';                                     ## no critic (RequireUseStrict, RequireUseWarnings)
 
 use strict;
 use warnings
@@ -15,6 +15,8 @@ use Scalar::Readonly qw( readonly_on );
 use Test2::Tools::Basic;
 
 readonly_on( $VERSION );
+
+const our $COMMENT                     => '#';
 
 const our $DIE                         => sub { die( sprintf( $_[ 0 ], @_[ 1 .. $#_ ] ) ) };
 

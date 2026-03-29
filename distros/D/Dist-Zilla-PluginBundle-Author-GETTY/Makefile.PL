@@ -14,7 +14,7 @@ install_share dist => "share";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "BeLike::GETTY when you build your dists",
-  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>",
+  "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.305",
+  "VERSION" => "0.306",
   "test" => {
     "TESTS" => "t/*.t"
   }

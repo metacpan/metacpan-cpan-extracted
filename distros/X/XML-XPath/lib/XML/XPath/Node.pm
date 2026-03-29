@@ -5,7 +5,7 @@ use warnings;
 use parent qw/Exporter/;
 use Carp;
 
-our $VERSION = '1.48';
+our $VERSION = '1.49';
 
 sub UNKNOWN_NODE () {0;}
 sub ELEMENT_NODE () {1;}

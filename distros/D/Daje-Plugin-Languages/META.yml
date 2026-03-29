@@ -1,0 +1,187 @@
+---
+abstract: 'Mojolicious Plugin'
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-Languages
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Controller::Languages::LanguagesLan:
+    file: lib/Daje/Controller/Languages/LanguagesLan.pm
+    version: '0.01'
+  Daje::Controller::Languages::LanguagesLanList:
+    file: lib/Daje/Controller/Languages/LanguagesLanList.pm
+    version: '0.01'
+  Daje::Controller::Languages::LanguagesTranslationKeys:
+    file: lib/Daje/Controller/Languages/LanguagesTranslationKeys.pm
+    version: '0.01'
+  Daje::Controller::Languages::LanguagesTranslationKeysList:
+    file: lib/Daje/Controller/Languages/LanguagesTranslationKeysList.pm
+    version: '0.01'
+  Daje::Controller::Languages::LanguagesTranslations:
+    file: lib/Daje/Controller/Languages/LanguagesTranslations.pm
+    version: '0.01'
+  Daje::Controller::Languages::LanguagesTranslationsList:
+    file: lib/Daje/Controller/Languages/LanguagesTranslationsList.pm
+    version: '0.01'
+  Daje::Controller::Languages::LanguagesTypes:
+    file: lib/Daje/Controller/Languages/LanguagesTypes.pm
+    version: '0.01'
+  Daje::Controller::Languages::LanguagesTypesList:
+    file: lib/Daje/Controller/Languages/LanguagesTypesList.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesLan:
+    file: lib/Daje/Controller/Languages/Super/LanguagesLan.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesLanList:
+    file: lib/Daje/Controller/Languages/Super/LanguagesLanList.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesTranslationKeys:
+    file: lib/Daje/Controller/Languages/Super/LanguagesTranslationKeys.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesTranslationKeysList:
+    file: lib/Daje/Controller/Languages/Super/LanguagesTranslationKeysList.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesTranslations:
+    file: lib/Daje/Controller/Languages/Super/LanguagesTranslations.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesTranslationsList:
+    file: lib/Daje/Controller/Languages/Super/LanguagesTranslationsList.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesTypes:
+    file: lib/Daje/Controller/Languages/Super/LanguagesTypes.pm
+    version: '0.01'
+  Daje::Controller::Languages::Super::LanguagesTypesList:
+    file: lib/Daje/Controller/Languages/Super/LanguagesTypesList.pm
+    version: '0.01'
+  Daje::Controller::Languages::Translations:
+    file: lib/Daje/Controller/Languages/Translations.pm
+    version: '0.01'
+  Daje::Database::Languages:
+    file: lib/Daje/Database/Languages.pm
+    version: '1'
+  Daje::Database::Model::LanguagesLan:
+    file: lib/Daje/Database/Model/LanguagesLan.pm
+    version: '0.01'
+  Daje::Database::Model::LanguagesTranslationKeys:
+    file: lib/Daje/Database/Model/LanguagesTranslationKeys.pm
+    version: '0.01'
+  Daje::Database::Model::LanguagesTranslations:
+    file: lib/Daje/Database/Model/LanguagesTranslations.pm
+    version: '0.01'
+  Daje::Database::Model::LanguagesTypes:
+    file: lib/Daje/Database/Model/LanguagesTypes.pm
+    version: '0.01'
+  Daje::Database::Model::Super::LanguagesLan:
+    file: lib/Daje/Database/Model/Super/LanguagesLan.pm
+    version: '0.01'
+  Daje::Database::Model::Super::LanguagesTranslationKeys:
+    file: lib/Daje/Database/Model/Super/LanguagesTranslationKeys.pm
+    version: '0.01'
+  Daje::Database::Model::Super::LanguagesTranslations:
+    file: lib/Daje/Database/Model/Super/LanguagesTranslations.pm
+    version: '0.01'
+  Daje::Database::Model::Super::LanguagesTypes:
+    file: lib/Daje/Database/Model/Super/LanguagesTypes.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesLan:
+    file: lib/Daje/Database/View/Super/vLanguagesLan.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesLanList:
+    file: lib/Daje/Database/View/Super/vLanguagesLanList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesTranslationKeys:
+    file: lib/Daje/Database/View/Super/vLanguagesTranslationKeys.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesTranslationKeysList:
+    file: lib/Daje/Database/View/Super/vLanguagesTranslationKeysList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesTranslations:
+    file: lib/Daje/Database/View/Super/vLanguagesTranslations.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesTranslationsList:
+    file: lib/Daje/Database/View/Super/vLanguagesTranslationsList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesTranslationsWithKeysList:
+    file: lib/Daje/Database/View/Super/vLanguagesTranslationsWithKeysList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesTypes:
+    file: lib/Daje/Database/View/Super/vLanguagesTypes.pm
+    version: '0.01'
+  Daje::Database::View::Super::vLanguagesTypesList:
+    file: lib/Daje/Database/View/Super/vLanguagesTypesList.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesLan:
+    file: lib/Daje/Database/View/vLanguagesLan.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesLanList:
+    file: lib/Daje/Database/View/vLanguagesLanList.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesTranslationKeys:
+    file: lib/Daje/Database/View/vLanguagesTranslationKeys.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesTranslationKeysList:
+    file: lib/Daje/Database/View/vLanguagesTranslationKeysList.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesTranslations:
+    file: lib/Daje/Database/View/vLanguagesTranslations.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesTranslationsList:
+    file: lib/Daje/Database/View/vLanguagesTranslationsList.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesTranslationsWithKeysList:
+    file: lib/Daje/Database/View/vLanguagesTranslationsWithKeysList.pm
+  Daje::Database::View::vLanguagesTypes:
+    file: lib/Daje/Database/View/vLanguagesTypes.pm
+    version: '0.01'
+  Daje::Database::View::vLanguagesTypesList:
+    file: lib/Daje/Database/View/vLanguagesTypesList.pm
+    version: '0.01'
+  Daje::Helper::Languages::InsertKeys:
+    file: lib/Daje/Helper/Languages/InsertKeys.pm
+  Daje::Helper::Languages::Translations:
+    file: lib/Daje/Helper/Languages/Translations.pm
+  Daje::Plugin::Languages:
+    file: lib/Daje/Plugin/Languages.pm
+    version: '0.01'
+  Daje::Plugin::Languages::Authorities:
+    file: lib/Daje/Plugin/Languages/Authorities.pm
+  Daje::Plugin::Languages::Helpers:
+    file: lib/Daje/Plugin/Languages/Helpers.pm
+    version: '0.01'
+  Daje::Plugin::Languages::Languages:
+    file: lib/Daje/Plugin/Languages/Languages.pm
+  Daje::Plugin::Languages::Routes:
+    file: lib/Daje/Plugin/Languages/Routes.pm
+    version: '0.01'
+  Daje::Workflow::Activities::Languages::Activity:
+    file: lib/Daje/Workflow/Activities/Languages/Activity.pm
+requires:
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-Languages/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-Languages
+  repository: https://github.com/janeskil1525/Daje-Plugin-Languages.git
+version: '0.01'
+x_contributors:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

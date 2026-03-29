@@ -1,12 +1,12 @@
 # NAME
 
-**Test::Expander** - A convenience layer for Test2::V1 that automates common test boilerplate.
+``Test::Expander`` - A convenience layer for Test2::V1 that automates common test boilerplate.
 
 # SYNOPSIS
 
 ## Basic Usage
 
-Most tests need to reference the class and method under test. **Test::Expander**
+Most tests need to reference the class and method under test. ``Test::Expander``
 automatically derives these values from the test file's path and filename and
 exposes them as read-only variables.
 ```perl
@@ -25,14 +25,6 @@ exposes them as read-only variables.
 
   # Manually specify the class under test
   use Test::Expander -target => 'My::Class';
-```
-### Coloring of exported/unexported values
-```perl
-  # Enable color output
-  use Test::Expander -color => { exported => 'green', unexported => 'red' };
-
-  # Disable coloring
-  use Test::Expander -color => { exported => undef, unexported => undef };
 ```
 ### Adjusting @INC using -lib
 ```perl
@@ -87,6 +79,14 @@ exposes them as read-only variables.
   | both parameters set to false |     0    |   0   |   0   |
   +---------------------------------------------------------+
 ```
+### Coloring of exported/unexported values
+```perl
+  # Enable color output
+  use Test::Expander -color => { exported => 'green', unexported => 'red' };
+
+  # Disable coloring
+  use Test::Expander -color => { exported => undef, unexported => undef };
+```
 # MOTIVATION
 
 Writing consistent tests across a large codebase often means repeating the same
@@ -96,13 +96,13 @@ setup code in every file. Over time, this leads to:
 - brittle test files that break when renamed
 - hoisted boilerplate for tempdirs, paths, and module loading
 
-**Test::Expander** replaces this with a standardized, automated mechanism that
+``Test::Expander`` replaces this with a standardized, automated mechanism that
 reduces maintenance effort, improves readability, and allows test files to
 focus on asserting behavior.
 
 # DESCRIPTION
 
-**Test::Expander** provides a convenience layer on top of [Test2::V1](https://metacpan.org/pod/Test2::V1).
+``Test::Expander`` provides a convenience layer on top of [Test2::V1](https://metacpan.org/pod/Test2::V1).
 It streamlines test setup by automating common boilerplate tasks, reducing
 redundancy, and improving consistency across test suites.
 
@@ -120,7 +120,7 @@ This, of course, can be stored in additional variables declared somewhere at the
     to update all test files containing these names.
 
     If, however, both of these values can be determined from the path and base name of the current test file and saved
-    in the exported read-only variables **$CLASS** and **$METHOD**, the only effort necessary in case of such renaming is
+    in the exported read-only variables ``$CLASS`` and ``$METHOD``, the only effort necessary in case of such renaming is
     a single change of path and / or base name of the corresponding test file.
 
     An additional benefit of suggested approach is a better readability of tests, where chunks like
@@ -138,12 +138,12 @@ This is exactly why the [table driven testing](https://en.wikipedia.org/wiki/Dat
 ages ago (e.g. for [Java](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.452) and then full-blown for
 [Go](https://go.dev/wiki/TableDrivenTests) and other programming languagues).
 
-    As a result, the function **test\_table** is exported by default providing a possibility to avoid copy-and-paste
+    As a result, the function ``test_table`` is exported by default providing a possibility to avoid copy-and-paste
     implementing test cases differing by applied parameters only.
     This reduces the complexity of tests and hence increases its maintainability and adjustability in accordance with
     the changes of testee.
 
-    The function **test\_table** can be used in two different ways:
+    The function ``test_table`` can be used in two different ways:
 
     - Loading test table from a separate file.
 
@@ -153,19 +153,19 @@ ages ago (e.g. for [Java](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.45
 
         This way may be reasonable if a single table can be used for all test cases in the current test file.
 
-        Assuming such a test file should verify whether the function **Foo::Bar::baz** returns
+        Assuming such a test file should verify whether the function ``Foo::Bar::baz`` returns
 
-        - **0**
+        - ``0``
 
-            if the first parameter contains the string **'abc'** and the second parameter is omitted,
+            if the first parameter contains the string ``'abc'`` and the second parameter is omitted,
 
-        - **1**
+        - ``1``
 
-            if both the first and the second parameters contain **1**,
+            if both the first and the second parameters contain ``1``,
 
-        - and, finally, **0**
+        - and, finally, ``0``
 
-            if both the first and the second parameters contain **0**.
+            if both the first and the second parameters contain ``0``.
 
         Then the file **t/Foo/Bar/baz.tdt** might look as follows:
 
@@ -275,6 +275,8 @@ ages ago (e.g. for [Java](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.45
     followed by any number of minus characters followed by any other characters.
     The cell contents can have multiple lines, which are merged together.
 
+    Any line starting with the hash character **#** is skipped, which allows a temporary reduction of test cases.
+
     There are two different types of test tables:
 
     - Those with test case names in a separate column.
@@ -297,7 +299,7 @@ ages ago (e.g. for [Java](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.45
         Leads to the following hash:
         ```perl
           (
-            "'param2' omitted"             => { expected => 0, param1 => 'abc', param2 => '' },
+            "'param2' omitted"             => { expected => 0, param1 => 'abc', param2 => undef },
             'both parameters set to true'  => { expected => 1, param1 => 1,     param2 => 1  },
             'both parameters set to false' => { expected => 0, param1 => 0,     param2 => 0  },
           )
@@ -327,29 +329,29 @@ ages ago (e.g. for [Java](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.45
             |      0     |   0    |   0    |
             +------------------------------+
 
-- The frequent necessity of introduction of temporary directory and / or temporary file usually leads to the usage of
+- The frequent necessity of introduction of temporary directory and / or temporary file usually leads to the using of
 modules [File::Temp::tempdir](https://metacpan.org/pod/File::Temp) or [Path::Tiny](https://metacpan.org/pod/Path::Tiny)
-providing the methods / functions **tempdir** and **tempfile**.
+providing the methods / functions ``tempdir`` and ``tempfile``.
 
     This, however, can significantly be simplified (and the size of test file can be reduced) requesting such introduction
-    via the options supported by **Test::Expander**:
+    via the options supported by ``Test::Expander``:
     ```perl
       use Test::Expander -tempdir => {}, -tempfile => {};
     ```
 - Another fuctionality frequently used in tests relates to the work with files and directories:
 reading, writing, creation, etc. Because almost all features required in such cases are provided by
 [Path::Tiny](https://metacpan.org/pod/Path::Tiny), some functions of this module are also exported from
-**Test::Expander**.
+``Test::Expander``.
 - To provide a really environment-independent testing, we might need a possibility to run our tests in
 a clean environment, where only explicitly mentioned environment variables are set and environment variables from the
 "outside world" cannot affect the execution of tests.
-This can also be achieved manually by manipulation of **%ENV** hash at the very beginning of tests.
-However, even ignoring the test code inflation, this might be (in fact - is) necessary in many tests belonging to one
-and the same module, so that a possibility to outsource the definition of test environment provided by **Test::Expander**
+This can also be achieved manually by manipulation of ``%ENV`` hash at the very beginning of tests.
+However, even ignoring the test code inflation, this might be (in fact - it is) necessary in many tests belonging to one
+and the same module, so that a possibility to outsource the definition of test environment provided by ``Test::Expander``
 makes tests smaller, more maintainable, and much more reliable.
 - I stole the idea of subtest selection from
 [Test::Builder::SubtestSelection](https://metacpan.org/pod/Test::Builder::SubtestSelection).
-That's why the subtest selection supported by **Test::Expander** is partially compatible with the implementation provided
+That's why the subtest selection supported by ``Test::Expander`` is partially compatible with the implementation provided
 by [Test::Builder::SubtestSelection](https://metacpan.org/pod/Test::Builder::SubtestSelection).
 The term "partially" means that the option `--subtest` can only be applied to selection by name not by number.
 
@@ -364,20 +366,10 @@ The term "partially" means that the option `--subtest` can only be applied to se
     In both cases the options have to be supplied as arguments to the test script.
     To do so separate the arguments from prove's own arguments with the arisdottle (`::`).
 
-- Another idea inspired by other module namely by [Test::Most](https://metacpan.org/pod/Test::Most) is the idea of
-immediate stop of test file execution if one of the tests fails.
-
-    This feature can be applied both for the whole test file using the **-bail** option
-    ```perl
-      use Test::Expander -bail => 1;
-    ```
-    and for a part of it using the functions **bail\_on\_failure** and **restore\_failure\_handler** to activate and deactivate
-    this reaction, correspondingly.
-
     - Selection by name
 
         The selection by name means that the value supplied along with `--subtest_name` option is compared with all subtest
-        names in your test and only those, which names match this value in terms of regular expression, will be executed.
+        names in your test and only those will be executed, which names match this value in terms of regular expression.
         If this value cannot be treated as a valid regular expression, meta characters therein are properly quoted so that
         the RegEx match is in any case possible.
 
@@ -432,7 +424,7 @@ immediate stop of test file execution if one of the tests fails.
 
         The selection by number means that the value supplied along with `--subtest_number` option is the sequence of numbers
         representing required subtest in the test file.
-        Let's add to the source code of **t/my\_test.t** some comments illustrating the numbers of each subtest:
+        Let's add to the source code of **t/my\_test.t** some comments reflecting the numbers of each subtest:
         ```perl
           use strict;
           use warnings;
@@ -468,24 +460,35 @@ immediate stop of test file execution if one of the tests fails.
         ```sh
           prove -v -b t/basic.t :: --subtest_number '1/0/0' --subtest_number '2'
         ```
-**Test::Expander** combines all advanced possibilities provided by [Test2::V1](https://metacpan.org/pod/Test2::V1)
+
+- Another idea inspired by other module namely by [Test::Most](https://metacpan.org/pod/Test::Most) is the idea of
+immediate stop of test file execution if one of the tests fails.
+
+  This feature can be applied both for the whole test file using the ``-bail`` option
+  ```perl
+    use Test::Expander -bail => 1;
+  ```
+  and for a part of it using the functions ``bail_on_failure`` and ``restore_failure_handler`` to activate and deactivate
+  this reaction, correspondingly.
+
+``Test::Expander`` combines all advanced possibilities provided by [Test2::V1](https://metacpan.org/pod/Test2::V1)
 with some specific functions only available in the older module [Test::More](https://metacpan.org/pod/Test::More)
 (which allows a smooth migration from [Test::More](https://metacpan.org/pod/Test::More)-based tests to
 [Test2::V1](https://metacpan.org/pod/Test2::V1)-based ones) and handy functions from some other modules
 often used in test suites.
 
 Furthermore, this module allows automatic recognition of the class / module to be tested
-(see variable **$CLASS** below) so that in contrast to [Test2::V1](https://metacpan.org/pod/Test2::V1)
+(see variable ``$CLASS`` below) so that in contrast to [Test2::V1](https://metacpan.org/pod/Test2::V1)
 you do not need to specify this explicitly if the path to the test file is in accordance with the name
-of class / module to be tested i.e. file **t/Foo/Bar/baz.t** corresponds to class / module **Foo::Bar**.
+of class / module to be tested i.e. file **t/Foo/Bar/baz.t** corresponds to class / module ``Foo::Bar``.
 
 If such automated recognition is not intended, this can be deactivated by explicitly supplied
 undefined class / module name along with the option `-target`.
 
 A similar recognition is provided in regard to the method / subroutine to be tested
-(see variables **$METHOD** and **$METHOD\_REF** below) if the base name (without extension) of test file is
+(see variables ``$METHOD`` and ``$METHOD_REF`` below) if the base name (without extension) of test file is
 identical with the name of this method / subroutine i.e. file **t/Foo/Bar/baz.t**
-corresponds to method / subroutine **Foo::Bar::bar**.
+corresponds to method / subroutine ``Foo::Bar::bar``.
 
 Finally, a configurable setting of specific environment variables is provided so that
 there is no need to hard-code this in the test itself.
@@ -493,56 +496,56 @@ there is no need to hard-code this in the test itself.
 The following options are accepted:
 
 - Options specific for this module only are always expected to have values and their meaning is:
-    - **-bail** - activates immediate stop of test file execution if any test case in this file fails.
+    - ``-bail`` - activates immediate stop of test file execution if any test case in this file fails.
     The expected value is boolean. Defaults to **false** i.e. the execution continues even if tests fail.
 
         Even if activated, this behaviour can be deactivated at any point in the test file using the function
-        **restore\_failure\_handler**.
+        ``restore_failure_handler``.
 
-    - **-builtins** - overrides builtins in the name space of class / module to be tested.
+    - ``-builtins`` - overrides builtins in the name space of class / module to be tested.
     The expected value is a hash reference, where keys are the names of builtins and
     the values are code references overriding default behavior.
-    - **-color** - controls colorization of read-only variables **$CLASS**, **$METHOD**, and **$METHOD\_REF**
+    - ``-color`` - controls colorization of read-only variables ``$CLASS``, ``$METHOD``, and ``$METHOD\_REF``
     in the test notification header.
     The expected value is a hash reference, the only supported keys are **exported** and **unexported**:
         - **exported**
 
             Contains either a string describing the foreground color, in which these variables are displayed
-            if they are being exported, or **undef** in no colorization is required in such case.
+            if they are being exported, or ``undef`` in no colorization is required in such case.
 
-            Defaults to **'cyan'**.
+            Defaults to ``'cyan'``.
 
         - **unexported**
 
             The same as above, but for the case if these variables remains undefined and unexported.
 
-            Defaults to **'magenta'**.
-    - **-lib** - prepends directory list used by the Perl interpreter for search of modules to be loaded
-    (i.e. the **@INC** array) with values supplied in form of array reference.
+            Defaults to ``'magenta'``.
+    - ``-lib`` - prepends directory list used by the Perl interpreter for search of modules to be loaded
+    (i.e. the ``@INC`` array) with values supplied in form of array reference.
     Each element of this array is evaluated using [string eval](https://perldoc.perl.org/functions/eval) so that
-    any valid expression evaluated to string is supported if it is based on modules used by **Test::Expander** or
+    any valid expression evaluated to string is supported if it is based on modules used by ``Test::Expander`` or
     any module loaded before.
 
         Among other things this provides a possibility to temporary expand the module search path by directories located
-        in the temporary directory if the latter is defined with the option **-tempdir** (see below).
+        in the temporary directory if the latter is defined with the option ``-tempdir`` (see below).
 
-        **-lib** is interpreted as the very last option, that's why the variables defined by **Test::Expander** for export
-        e.g. **$TEMP\_DIR** can be used in the expressions determining such directories (see **SYNOPSYS** above).
+        ``-lib`` is interpreted as the very last option, that's why the variables defined by ``Test::Expander`` for export
+        e.g. ``$TEMP_DIR`` can be used in the expressions determining such directories (see **SYNOPSYS** above).
 
-    - **-method** - prevents any attempt to automatically determine method / subroutine to be tested.
+    - ``-method`` - prevents any attempt to automatically determine method / subroutine to be tested.
     If the value supplied along with this option is defined and found in the class / module to be test
-    (see **-target** below), this will be considered such method / subroutine so that the variables
-    **$METHOD** and **$METHOD\_REF** (see description of exported variables below) will be imported and accessible in test.
-    If this value is **undef**, these variables are not imported.
-    - **-target** - identical to the same-named option of [Test2::V1](https://metacpan.org/pod/Test2::V1) and, if contains
-    a defined value, has the same purpose namely the explicit definition of the class / module to be tested as the value.
-    However, if its value is **undef**, this is not passed through to [Test2::V1](https://metacpan.org/pod/Test2::V1) so that
-    no class / module will be loaded and the variable **$CLASS** will not be imported at all.
-    - **-tempdir** - activates creation of a temporary directory. The value has to be a hash reference with content
+    (see ``-target`` below), this will be considered such method / subroutine so that the variables
+    ``$METHOD`` and ``$METHOD_REF`` (see description of exported variables below) will be imported and accessible in test.
+    If this value is ``undef``, these variables are not imported.
+    - ``-target`` - identical to the same-named option of [Test2::V1](https://metacpan.org/pod/Test2::V1) and, if contains
+    a defined value, has the same purpose namely the explicit definition of the class / module to be tested.
+    However, if its value is ``undef``, this is not passed through to [Test2::V1](https://metacpan.org/pod/Test2::V1) so that
+    no class / module will be loaded and the variable ``$CLASS`` will not be imported at all.
+    - ``-tempdir`` - activates creation of a temporary directory. The value has to be a hash reference with content
     as explained in [File::Temp::tempdir](https://metacpan.org/pod/File::Temp). This means, you can control the creation of
     temporary directory by passing of necessary parameters in form of a hash reference or, if the default behavior is
     required, simply pass the empty hash reference as the option value.
-    - **-tempfile** - activates creation of a temporary file. The value has to be a hash reference with content as explained in
+    - ``-tempfile`` - activates creation of a temporary file. The value has to be a hash reference with content as explained in
     [File::Temp::tempfile](https://metacpan.org/pod/File::Temp). This means, you can control the creation of
     temporary file by passing of necessary parameters in form of a hash reference or, if the default behavior is
     required, simply pass the empty hash reference as the option value.
@@ -558,26 +561,26 @@ if the test file is located in the corresponding subdirectory.
 For instance, if the class / module to be tested is _Foo::Bar::Baz_, then the folder with test files
 related to this class / module should be **t/**_Foo_**/**_Bar_**/**_Baz_ or **xt/**_Foo_**/**_Bar_**/**_Baz_
 (the name of the top-level directory in this relative name - **t**, or **xt**, or **my\_test** is not important) -
-otherwise the module name cannot be put into the exported variable **$CLASS** and, if you want to use this variable,
-should be supplied as the value of **-target**:
-
+otherwise the module name cannot be put into the exported variable ``$CLASS`` and, if you want to use this variable,
+should be supplied as the value of ``-target``:
+  ```perl
     use Test::Expander -target => 'Foo::Bar::Baz';
-
-This recognition can explicitly be deactivated if the value of **-target** is **undef**, so that no class / module
-will be loaded and, correspondingly, the variables **$CLASS**, **$METHOD**, and **$METHOD\_REF** will not be exported.
+  ```
+This recognition can explicitly be deactivated if the value of ``-target`` is ``undef``, so that no class / module
+will be loaded and, correspondingly, the variables ``$CLASS``, ``$METHOD``, and ``$METHOD_REF`` will not be exported.
 
 Furthermore, the automated recognition of the name of the method / subroutine to be tested only works if the file
 containing the class / module mentioned above exists and if this class / module has the method / subroutine
 with the same name as the test file base name without the extension.
-If this is the case, the exported variables **$METHOD** and **$METHOD\_REF** contain the name of method / subroutine
+If this is the case, the exported variables ``$METHOD`` and ``$METHOD_REF`` contain the name of method / subroutine
 to be tested and its reference, correspondingly, otherwise both variables are neither evaluated nor exported.
 
-Also in this case evaluation and export of the variables **$METHOD** and **$METHOD\_REF** can be prevented
-by passing of **undef** as value of the option **-method**:
+Also in this case evaluation and export of the variables ``$METHOD`` and ``$METHOD_REF`` can be prevented
+by passing of ``undef`` as value of the option ``-method``:
 ```perl
-  use Test::Expander -target => undef;
+  use Test::Expander -method => undef;
 ```
-Finally, **Test::Expander** supports testing inside of a clean environment containing only some clearly
+Finally, ``Test::Expander`` supports testing inside of a clean environment containing only some clearly
 specified environment variables required for the particular test.
 Names and values of these environment variables should be configured in files,
 which names are identical with paths to single class / module levels or the method / subroutine to be tested,
@@ -597,22 +600,22 @@ If the **.env** files existing on different levels have identical names of envir
 the priority is the higher the later they have been detected.
 I.e. **VAR = 'VALUE0'** in **t/Foo/Bar/Baz/myMethod.env** overwrites **VAR = 'VALUE1'** in **t/Foo/Bar/Baz.env**.
 
-If none of these **.env** files exist, the environment isn't changed by **Test::Expander**
+If none of these **.env** files exist, the environment isn't changed by ``Test::Expander``
 during the execution of **t/Foo/Bar/Baz/myMethod.t**.
 
 An environment configuration file (**.env** file) is a line-based text file.
 Its content is interpreted as follows:
 
-- if such files don't exist, the **%ENV** hash remains unchanged;
-- otherwise, if at least one of such files exists, those elements of the **%ENV** hash are kept,
+- if such files don't exist, the ``%ENV`` hash remains unchanged;
+- otherwise, if at least one of such files exists, those elements of the ``%ENV`` hash are kept,
 which names are equal to names found in lines of **.env** file without values.
-All remaining elements of the **%ENV** hash gets emptied (without localization) and
-    - lines not matching the RegEx **/^\\w+\\s\*(?:=\\s\*\\S|$)?/** (some alphanumeric characters representing a name of
+All remaining elements of the ``%ENV`` hash gets emptied (without localization) and
+    - lines not matching the RegEx ``/^\w+\s\*(?:=\s*\S|$)?/`` (some alphanumeric characters representing a name of
     environment variable, optional blanks, optionally followed by the equal sign, again optional blanks,
     and at least one non-blank character representing the first character of environment variable value) are skipped;
     - in all other lines the value of the environment variable is everything from the first non-blank
     character after the equal sign until end of the line;
-    if this value is omitted, the corresponding environment variable remains unchanged as it originally was in the **%ENV**
+    if this value is omitted, the corresponding environment variable remains unchanged as it originally was in the ``%ENV``
     hash (if it existed there, of course);
     - the cascading definition of environment variables can be used, which means that
         - during the evaluation of current line environment variables defined in the same file above can be applied.
@@ -622,7 +625,7 @@ All remaining elements of the **%ENV** hash gets emptied (without localization) 
                 VAR2 = lc( $ENV{ VAR1 } )
 
             and neither **VAR1** nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same or other
-            **.env** files, the **%ENV** hash will contain at least the following entries:
+            **.env** files, the ``%ENV`` hash will contain at least the following entries:
 
                 VAR1 => 'ABC'
                 VAR2 => 'abc'
@@ -638,7 +641,7 @@ All remaining elements of the **%ENV** hash gets emptied (without localization) 
                 VAR2 = lc( $ENV{ VAR0 } . $ENV{ VAR1 } )
 
             and neither **VAR0**, nor **VAR1**, nor **VAR2** will be overwritten during the evaluation of subsequent lines in the same
-            or other **.env** files, the **%ENV** hash will contain at least the following entries:
+            or other **.env** files, the ``%ENV`` hash will contain at least the following entries:
 
                 VAR0 => 'XYZ '
                 VAR1 => 'ABC'
@@ -657,11 +660,11 @@ using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
 
 Another common feature within test suites is the creation of a temporary directory / file used as an
 isolated container for some testing actions.
-The module options **-tempdir** and **-tempfile** are fully syntactically compatible with
+The module options ``-tempdir`` and ``-tempfile`` are fully syntactically compatible with
 [File::Temp::tempdir](https://metacpan.org/pod/File::Temp#FUNCTIONS) /
 [File::Temp::tempfile](https://metacpan.org/pod/File::Temp#FUNCTIONS). They make sure that such temporary
-directory / file are created after **use Test::Expander** and that their names are stored in the variables
-**$TEMP\_DIR** / **$TEMP\_FILE**, correspondingly.
+directory / file are created after ``use Test::Expander`` and that their names are stored in the variables
+``$TEMP_DIR`` / ``$TEMP_FILE``, correspondingly.
 Both temporary directory and file are removed by default after execution.
 
 The following functions provided by this module are exported by default:
@@ -681,13 +684,6 @@ and often used in older tests but not supported by [Test2::V1](https://metacpan.
     - dies\_ok,
     - lives\_ok,
     - throws\_ok.
-
-    some functions exported by default from [Test2::Tools::Explain](https://metacpan.org/pod/Test2::Tools::Explain)
-    and often used in older tests but not supported by
-    [Test2::Tools::Explain](https://metacpan.org/pod/Test2::Tools::Explain):
-
-    - explain.
-
 - function exported by default from [Const::Fast](https://metacpan.org/pod/Const::Fast):
     - const.
 - some functions exported by request from [File::Temp](https://metacpan.org/pod/File::Temp):
@@ -699,38 +695,38 @@ and often used in older tests but not supported by [Test2::V1](https://metacpan.
 
 The following variables can be set and exported:
 
-- variable **$CLASS** containing the name of the class / module to be tested
+- variable ``$CLASS`` containing the name of the class / module to be tested
 if the class / module recognition is not disable and possible,
-- variable **$METHOD** containing the name of the method / subroutine to be tested
+- variable ``$METHOD`` containing the name of the method / subroutine to be tested
 if the method / subroutine recognition is not disable and possible,
-- variable **$METHOD\_REF** containing the reference to the subroutine to be tested
+- variable ``$METHOD_REF`` containing the reference to the subroutine to be tested
 if the method / subroutine recognition is not disable and possible,
-- variable **$TEMP\_DIR** containing the name of a temporary directory created at compile time
-if the option **-tempdir** is supplied,
-- variable **$TEMP\_FILE** containing the name of a temporary file created at compile time
-if the option **-tempfile** is supplied.
-- variable **$TEST\_FILE** containing the absolute name of the current test file (if any).
+- variable ``$TEMP_DIR`` containing the name of a temporary directory created at compile time
+if the option ``-tempdir`` is supplied,
+- variable ``$TEMP_FILE`` containing the name of a temporary file created at compile time
+if the option ``-tempfile`` is supplied.
+- variable ``$TEST_FILE`` containing the absolute name of the current test file (if any).
 In fact its content is identical with the content of special token
 [\_\_FILE\_\_](https://perldoc.perl.org/functions/__FILE__), but only in the test file itself!
 If, however, you need the test file name in a test submodule or in a **.env** file belonging to this test,
-[\_\_FILE\_\_](https://perldoc.perl.org/functions/__FILE__) can no longer be applied - whereas **$TEST\_FILE** is there.
+[\_\_FILE\_\_](https://perldoc.perl.org/functions/__FILE__) can no longer be applied - whereas ``$TEST_FILE`` is there.
 
 All variables mentioned above are read-only after their export.
 In this case they are logged to STDOUT using [note](https://metacpan.org/pod/Test2::Tools::Basic#DIAGNOSTICS).
 
-If any of the variables **$CLASS**, **$METHOD**, and **$METHOD\_REF** is undefined and hence not exported,
+If any of the variables ``$CLASS``, ``$METHOD``, and ``$METHOD_REF`` is undefined and hence not exported,
 this is reported at the very begin of test execution.
 
 # CAVEATS
 
-- **Test::Expander** is recommended to be the very first module in your test file.
+- ``Test::Expander`` is recommended to be the very first module in your test file.
 
     The only known exception is when some actions performed on the module level (e.g. determination of constants)
     rely upon results of other actions (e.g. mocking of built-ins).
 
-    To explain this let us assume that your test file should globally mock the built-in **close**
+    To explain this let us assume that your test file should globally mock the built-in ``close``
     (if this is only required in the name space of class / module to be tested,
-    the option **-builtin** should be used instead!)
+    the option ``-builtins`` should be used instead!)
     to verify if the testee properly reacts both on its success and failure.
     For this purpose a reasonable implementation might look as follows:
     ```perl
@@ -741,15 +737,15 @@ this is reported at the very begin of test execution.
 
       use Test::Expander;
     ```
-- Array elements of the value supplied along with the option **-lib** are evaluated using
+- Array elements of the value supplied along with the option ``-lib`` are evaluated using
 [string eval](https://perldoc.perl.org/functions/eval) so that constant strings would need duplicated quotes e.g.
   ```perl
     use Test::Expander -lib => [ q('my_test_lib') ];
   ```
 - If the value to be assigned to an environment variable after evaluation of an **.env** file is undefined,
 such assignment is skipped.
-- If **Test::Expander** is used in one-line mode (with the **-e** option),
-the variable **$TEST\_FILE** is unset and not exported.
+- If ``Test::Expander`` is used in one-line mode (with the ``-e`` option),
+the variable ``$TEST_FILE`` is unset and not exported.
 
 # AUTHOR
 

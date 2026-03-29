@@ -1,0 +1,12 @@
+requires 'perl', '5.042000';
+
+requires 'Email::Sender::Simple', '2.601';
+requires 'Email::Sender::Transport::SMTP', '2.601';
+requires 'Email::MIME', '1.954';
+requires 'Daje::Document::Builder','0';
+requires 'Authen::SASL', '2.2000';
+
+on 'test' => sub {
+    requires 'Test::More', '0.98';
+};
+

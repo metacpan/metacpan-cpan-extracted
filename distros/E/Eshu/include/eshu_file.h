@@ -14,8 +14,28 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <dirent.h>
-#include <unistd.h>
+#ifndef _WIN32
+#  include <dirent.h>
+#  include <unistd.h>
+#else
+#  include <io.h>
+#  include <direct.h>
+#  ifdef __MINGW32__
+#    include <dirent.h>
+#  else
+#    include "dirent_win.h"  /* MSVC needs a compat header */
+#  endif
+#  ifndef S_ISREG
+#    define S_ISREG(m) (((m) & _S_IFMT) == _S_IFREG)
+#  endif
+#  ifndef S_ISDIR
+#    define S_ISDIR(m) (((m) & _S_IFMT) == _S_IFDIR)
+#  endif
+#  ifndef S_ISLNK
+#    define S_ISLNK(m) 0  /* Windows has no symlinks via stat */
+#  endif
+#  define lstat stat
+#endif
 
 #define ESHU_MAX_FILE_SIZE 1048576  /* 1MB */
 #define ESHU_BINARY_SAMPLE  8192

@@ -143,8 +143,15 @@ my %PROVIDER_ABUSE = (
     # Mailgun
     'mailgun.com'         => { email => 'abuse@mailgun.com',       note => 'ESP abuse' },
     'mailgun.org'         => { email => 'abuse@mailgun.com',       note => 'Mailgun sending infrastructure' },
-    # Postmark
-    'postmarkapp.com'     => { email => 'abuse@postmarkapp.com',   note => 'ESP abuse' },
+	# Postmark
+	'postmarkapp.com'     => { email => 'abuse@postmarkapp.com',   note => 'ESP abuse' },
+	# WordPress.com -- Automattic-hosted blogs frequently used as spam
+	# landing pages.  Subdomains (e.g. spammer.wordpress.com) are handled
+	# by subdomain stripping to wordpress.com.
+	'wordpress.com'       => { email => 'abuse@wordpress.com',     note => 'WordPress.com hosted blog -- report via https://en.wordpress.com/abuse/' },
+	'wp.com'              => { email => 'abuse@wordpress.com',     note => 'WordPress.com short domain' },
+	# Substack -- newsletter platform abused for spam and phishing content
+	'substack.com'        => { email => 'abuse@substack.com',      note => 'Substack newsletter platform abuse' },
     # ActiveCampaign
     # Main sending domain plus ac-tinker.com which is used for tracking links.
     # Note: ac-tinker.com cannot be reached via subdomain stripping from
@@ -152,10 +159,6 @@ my %PROVIDER_ABUSE = (
     # must be listed explicitly.
     'activecampaign.com'  => { email => 'abuse@activecampaign.com', note => 'ActiveCampaign ESP' },
     'ac-tinker.com'       => { email => 'abuse@activecampaign.com', note => 'ActiveCampaign tracking infrastructure' },
-     # Salesforce Marketing Cloud (ExactTarget)
-     # Sending infrastructure domains follow the pattern *.mc.salesforce.com,
-     # *.exacttarget.com, and customer subdomains routed through their MTAs.
-    
         # Salesforce Marketing Cloud (ExactTarget)
     # Sending infrastructure domains follow the pattern *.mc.salesforce.com,
     # *.exacttarget.com, and customer subdomains routed through their MTAs.
@@ -184,11 +187,11 @@ hosted URLs, and suspicious domains
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -3507,8 +3510,20 @@ sub abuse_contacts {
             # host, which is useful context for the abuse report recipient.
             my $entry = $contacts[ $seen_idx{$addr} ];
             push @{ $entry->{roles} }, $args{role};
-            # Keep 'role' (singular) in sync for any caller using the old key
-            $entry->{role} = join(' and ', @{ $entry->{roles} });
+            # Keep 'role' (singular) in sync for any caller using the old key.
+            # Where the same role string appears multiple times (e.g. "URL host"
+            # discovered via four different badshamart.com subdomains), collapse
+            # repeated labels into "URL host (x4)" rather than joining them
+            # verbatim, which would produce the unreadable
+            # "URL host and URL host and URL host and URL host".
+            my %role_counts;
+            my @ordered_roles;
+            for my $r (@{ $entry->{roles} }) {
+                push @ordered_roles, $r unless $role_counts{$r}++;
+            }
+            $entry->{role} = join(' and ', map {
+                $role_counts{$_} > 1 ? "$_ (x$role_counts{$_})" : $_
+            } @ordered_roles);
             return;
         }
         # First time we have seen this address -- record its position and add it
@@ -4450,6 +4465,18 @@ sub _extract_and_resolve_urls {
         unless (exists $host_cache{$host}) {
             my $ip    = $self->_resolve_host($host) // '(unresolved)';
             my $whois = $ip ne '(unresolved)' ? $self->_whois_ip($ip) : {};
+
+            # If IP resolution failed or WHOIS returned nothing useful,
+            # fall back to a domain WHOIS lookup on the registrable parent.
+            # This recovers the registrar abuse contact for URL hosts that
+            # are unreachable at analysis time (e.g. freshly-registered
+            # spam domains, or hosts behind protocol-relative URLs).
+            if (!$whois->{abuse}) {
+                my $reg = _registrable($host) // $host;
+                my $dw  = $self->_parse_domain_whois_abuse($reg);
+                $whois  = $dw if $dw->{abuse};
+            }
+
             $host_cache{$host} = {
                 ip      => $ip,
                 org     => $whois->{org}     // '(unknown)',
@@ -4468,23 +4495,38 @@ sub _extract_and_resolve_urls {
 }
 
 sub _extract_http_urls {
-    my ($self, $body) = @_;
-    my @urls;
+	my ($self, $body) = @_;
+	my @urls;
 
-    if ($HAS_HTML_LINKEXTOR) {
-        my $p = HTML::LinkExtor->new(sub {
-            my ($tag, %attrs) = @_;
-            for my $attr (qw(href src action)) {
-                push @urls, $attrs{$attr}
-                    if ($attrs{$attr} // '') =~ m{^https?://}i;
-            }
-        });
-        $p->parse($body);
-    }
+	if ($HAS_HTML_LINKEXTOR) {
+		my $p = HTML::LinkExtor->new(sub {
+			my ($tag, %attrs) = @_;
+			for my $attr (qw(href src action)) {
+				my $val = $attrs{$attr} // '';
+				if ($val =~ m{^https?://}i) {
+					push @urls, $val;
+				} elsif ($val =~ m{^//[\w.-]}) {
+					# Protocol-relative URL (e.g. //example.com/path) --
+					# treat as https:// so the host is extracted and reported.
+					# These are common in tracking pixels and CDN references.
+					push @urls, 'https:' . $val;
+				}
+			}
+		});
+		$p->parse($body);
+	}
 
-    while ($body =~ m{(https?://[^\s<>"'\)\]]+)}gi) {
-        push @urls, $1;
-    }
+	# Absolute URLs
+	while ($body =~ m{(https?://[^\s<>"'\)\]]+)}gi) {
+		push @urls, $1;
+	}
+
+	# Protocol-relative URLs not caught by the structural pass above.
+	# Match // preceded only by whitespace, quote, or = to avoid
+	# false positives on CSS comments (/* ... */) and path segments.
+	while ($body =~ m{(?:^|[\s"'=])(//[\w.-][^\s<>"'\)\]]*)}gim) {
+		push @urls, 'https:' . $1;
+	}
 
 	my %seen;
 	my @all = grep { !$seen{$_}++ } @urls;
@@ -4896,6 +4938,34 @@ sub _domain_whois {
     return $self->_raw_whois($domain, $server);
 }
 
+# _parse_domain_whois_abuse( $domain ) -> hashref
+#
+# Lightweight domain WHOIS lookup that extracts only the registrar name
+# and registrar abuse contact email.  Used as a fallback in
+# _extract_and_resolve_urls() when a URL host cannot be resolved to an IP
+# and therefore _whois_ip() cannot be called.  Returns a hashref with
+# keys 'org' (registrar name) and 'abuse' (registrar abuse email), either
+# of which may be absent if not found in the WHOIS response.  Returns an
+# empty hashref on any WHOIS failure.  Results are not cached.
+sub _parse_domain_whois_abuse {
+	my ($self, $domain) = @_;
+	my $raw = $self->_domain_whois($domain) // return {};
+	my %info;
+	if ($raw =~ /Registrar:\s*(.+)/i) {
+		($info{org} = $1) =~ s/\s+$//;
+	}
+	for my $pat (
+		qr/Registrar Abuse Contact Email:\s*(\S+\@\S+)/i,
+		qr/Abuse Contact Email:\s*(\S+\@\S+)/i,
+		qr/abuse-contact:\s*(\S+\@\S+)/i,
+	) {
+		if (!$info{abuse} && $raw =~ $pat) {
+			($info{abuse} = $1) =~ s/\s+$//;
+		}
+	}
+	return \%info;
+}
+
 sub _rdap_lookup {
     my ($self, $ip) = @_;
     return {} unless $HAS_LWP;
@@ -5051,10 +5121,12 @@ sub _parse_rfc2822_date {
 }
 
 sub _decode_mime_words {
-    my ($self, $str) = @_;
-    return '' unless defined $str;
-    $str =~ s/=\?([^?]+)\?([BbQq])\?([^?]*)\?=/_decode_ew($1,$2,$3)/ge;
-    return $str;
+	my ($self, $str) = @_;
+
+	return '' unless defined $str;
+
+	$str =~ s/=\?([^?]+)\?([BbQq])\?([^?]*)\?=/_decode_ew($1,$2,$3)/ge;
+	return $str;
 }
 
 sub _decode_ew {
@@ -5148,14 +5220,16 @@ sub _country_name {
 
 # Look up provider abuse contact by plain domain name
 sub _provider_abuse_for_host {
-    my ($self, $host) = @_;
-    $host = lc $host;
-    # Try exact match, then strip successive subdomains
-    while ($host =~ /\./) {
-        return $PROVIDER_ABUSE{$host} if $PROVIDER_ABUSE{$host};
-        $host =~ s/^[^.]+\.//;
-    }
-    return undef;
+	my ($self, $host) = @_;
+
+	$host = lc $host;
+
+	# Try exact match, then strip successive subdomains
+	while ($host =~ /\./) {
+		return $PROVIDER_ABUSE{$host} if $PROVIDER_ABUSE{$host};
+		$host =~ s/^[^.]+\.//;
+	}
+	return;	# return undef
 }
 
 # Look up provider abuse contact by IP and/or rDNS hostname
@@ -5170,6 +5244,7 @@ sub _debug {
 	my ($self, $msg) = @_;
 
 	if($self->{logger}) {
+		# This may have been set by Object::Configure
 		$self->{logger}->debug($msg);
 	}
 	print STDERR '[', __PACKAGE__, "] $msg\n" if $self->{verbose};
@@ -5252,7 +5327,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Mail::Message::Abuse
+    perldoc Email::Abuse::Investigator
 
 You can also look for information at:
 
@@ -5272,7 +5347,7 @@ L<http://matrix.cpantesters.org/?dist=Email-Abuse-Investigator>
 
 =item * CPAN Testers Dependencies
 
-L<http://deps.cpantesters.org/?module=Mail::Message::Abuse>
+L<http://deps.cpantesters.org/?module=Email::Abuse::Investigator>
 
 =back
 

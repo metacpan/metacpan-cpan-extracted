@@ -1,0 +1,22 @@
+Revision history for Chandra
+
+0.02  2026-03-28
+    - Chandra::App - high-level OO application wrapper
+    - Chandra::Element - Moonshine-compatible DOM builder with render()
+    - Event handler compilation (onclick subs → JS wiring)
+    - Handler registry with unique IDs
+    - Chandra::Bind - function registry + JSON dispatch
+    - Chandra::Bridge - JS bridge auto-injection
+    - Chandra::Event - event object with accessors
+    - Promise-based return values (js_resolve + dispatch_eval_js)
+    - set_content, update, alert convenience methods
+    - Examples: bind_example, counter_app, element_example
+    - Comprehensive test suite (303 tests)
+
+0.01  2026-03-28
+    - Initial prototype
+    - Basic webview_run() support
+    - Event loop control (init/loop/exit)
+    - JavaScript evaluation
+    - JS -> Perl callback via external.invoke()
+    - macOS (Cocoa/WebKit), Linux (GTK/WebKit2), Windows (MSHTML) support

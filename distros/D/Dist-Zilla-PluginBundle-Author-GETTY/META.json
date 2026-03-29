@@ -1,7 +1,7 @@
 {
    "abstract" : "BeLike::GETTY when you build your dists",
    "author" : [
-      "Torsten Raudssus <torsten@raudssus.de>"
+      "Torsten Raudssus <getty@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -72,7 +72,7 @@
          "web" : "https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty"
       }
    },
-   "version" : "0.305",
+   "version" : "0.306",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -410,7 +410,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.305",
+                  "tag" : "0.306",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

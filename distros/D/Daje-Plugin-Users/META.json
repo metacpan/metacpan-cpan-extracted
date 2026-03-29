@@ -1,0 +1,237 @@
+{
+   "abstract" : "Mojolicious Plugin",
+   "author" : [
+      "janeskil1525 <janeskil1525@gmail.com"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.28",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Daje-Plugin-Users",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.42.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Daje::Controller::Users::Login" : {
+         "file" : "lib/Daje/Controller/Users/Login.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::Super::UsersDocumentation" : {
+         "file" : "lib/Daje/Controller/Users/Super/UsersDocumentation.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::Super::UsersDocumentationList" : {
+         "file" : "lib/Daje/Controller/Users/Super/UsersDocumentationList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::Super::UsersUsers" : {
+         "file" : "lib/Daje/Controller/Users/Super/UsersUsers.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::Super::UsersUsersList" : {
+         "file" : "lib/Daje/Controller/Users/Super/UsersUsersList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::Super::UsersVerificationCodes" : {
+         "file" : "lib/Daje/Controller/Users/Super/UsersVerificationCodes.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::Super::UsersVerificationCodesList" : {
+         "file" : "lib/Daje/Controller/Users/Super/UsersVerificationCodesList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::UsersDocumentation" : {
+         "file" : "lib/Daje/Controller/Users/UsersDocumentation.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::UsersDocumentationList" : {
+         "file" : "lib/Daje/Controller/Users/UsersDocumentationList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::UsersUsers" : {
+         "file" : "lib/Daje/Controller/Users/UsersUsers.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::UsersUsersList" : {
+         "file" : "lib/Daje/Controller/Users/UsersUsersList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::UsersVerificationCodes" : {
+         "file" : "lib/Daje/Controller/Users/UsersVerificationCodes.pm",
+         "version" : "0.01"
+      },
+      "Daje::Controller::Users::UsersVerificationCodesList" : {
+         "file" : "lib/Daje/Controller/Users/UsersVerificationCodesList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Model::Login" : {
+         "file" : "lib/Daje/Database/Model/Login.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Model::Super::UsersDocumentation" : {
+         "file" : "lib/Daje/Database/Model/Super/UsersDocumentation.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Model::Super::UsersUsers" : {
+         "file" : "lib/Daje/Database/Model/Super/UsersUsers.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Model::Super::UsersVerificationCodes" : {
+         "file" : "lib/Daje/Database/Model/Super/UsersVerificationCodes.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Model::UsersDocumentation" : {
+         "file" : "lib/Daje/Database/Model/UsersDocumentation.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Model::UsersUsers" : {
+         "file" : "lib/Daje/Database/Model/UsersUsers.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Model::UsersVerificationCodes" : {
+         "file" : "lib/Daje/Database/Model/UsersVerificationCodes.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::Users" : {
+         "file" : "lib/Daje/Database/Users.pm",
+         "version" : "1"
+      },
+      "Daje::Database::View::Super::vUsersDocumentation" : {
+         "file" : "lib/Daje/Database/View/Super/vUsersDocumentation.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::Super::vUsersDocumentationList" : {
+         "file" : "lib/Daje/Database/View/Super/vUsersDocumentationList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::Super::vUsersUsers" : {
+         "file" : "lib/Daje/Database/View/Super/vUsersUsers.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::Super::vUsersUsersList" : {
+         "file" : "lib/Daje/Database/View/Super/vUsersUsersList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::Super::vUsersVerificationCodes" : {
+         "file" : "lib/Daje/Database/View/Super/vUsersVerificationCodes.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::Super::vUsersVerificationCodesList" : {
+         "file" : "lib/Daje/Database/View/Super/vUsersVerificationCodesList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::vUsersDocumentation" : {
+         "file" : "lib/Daje/Database/View/vUsersDocumentation.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::vUsersDocumentationList" : {
+         "file" : "lib/Daje/Database/View/vUsersDocumentationList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::vUsersUsers" : {
+         "file" : "lib/Daje/Database/View/vUsersUsers.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::vUsersUsersList" : {
+         "file" : "lib/Daje/Database/View/vUsersUsersList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::vUsersVerificationCodes" : {
+         "file" : "lib/Daje/Database/View/vUsersVerificationCodes.pm",
+         "version" : "0.01"
+      },
+      "Daje::Database::View::vUsersVerificationCodesList" : {
+         "file" : "lib/Daje/Database/View/vUsersVerificationCodesList.pm",
+         "version" : "0.01"
+      },
+      "Daje::Helper::Users::Login" : {
+         "file" : "lib/Daje/Helper/Users/Login.pm",
+         "version" : "0.01"
+      },
+      "Daje::Helper::Users::VerificationCodes" : {
+         "file" : "lib/Daje/Helper/Users/VerificationCodes.pm"
+      },
+      "Daje::Plugin::Users" : {
+         "file" : "lib/Daje/Plugin/Users.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Users::Authorities" : {
+         "file" : "lib/Daje/Plugin/Users/Authorities.pm"
+      },
+      "Daje::Plugin::Users::Helpers" : {
+         "file" : "lib/Daje/Plugin/Users/Helpers.pm",
+         "version" : "0.01"
+      },
+      "Daje::Plugin::Users::Languages" : {
+         "file" : "lib/Daje/Plugin/Users/Languages.pm"
+      },
+      "Daje::Plugin::Users::Routes" : {
+         "file" : "lib/Daje/Plugin/Users/Routes.pm",
+         "version" : "0.01"
+      },
+      "Daje::Workflow::Activities::Signup::User" : {
+         "file" : "lib/Daje/Workflow/Activities/Signup/User.pm"
+      },
+      "Daje::Workflow::Activities::Users::Activity" : {
+         "file" : "lib/Daje/Workflow/Activities/Users/Activity.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/janeskil1525/Daje-Plugin-Users/issues"
+      },
+      "homepage" : "https://github.com/janeskil1525/Daje-Plugin-Users",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/janeskil1525/Daje-Plugin-Users.git",
+         "web" : "https://github.com/janeskil1525/Daje-Plugin-Users"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "janeskil1525 <janeskil1525@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

@@ -1,0 +1,124 @@
+---
+abstract: 'Mojolicious Plugin'
+author:
+  - 'janeskil1525 <janeskil1525@gmail.com'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.28, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daje-Plugin-Companies
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daje::Controller::Companies::CompaniesCompanies:
+    file: lib/Daje/Controller/Companies/CompaniesCompanies.pm
+    version: '0.01'
+  Daje::Controller::Companies::CompaniesCompaniesList:
+    file: lib/Daje/Controller/Companies/CompaniesCompaniesList.pm
+    version: '0.01'
+  Daje::Controller::Companies::CompaniesLoad:
+    file: lib/Daje/Controller/Companies/CompaniesLoad.pm
+    version: '0.01'
+  Daje::Controller::Companies::CompaniesSignup:
+    file: lib/Daje/Controller/Companies/CompaniesSignup.pm
+  Daje::Controller::Companies::CompaniesUsers:
+    file: lib/Daje/Controller/Companies/CompaniesUsers.pm
+    version: '0.01'
+  Daje::Controller::Companies::CompaniesUsersList:
+    file: lib/Daje/Controller/Companies/CompaniesUsersList.pm
+    version: '0.01'
+  Daje::Controller::Companies::Super::CompaniesCompanies:
+    file: lib/Daje/Controller/Companies/Super/CompaniesCompanies.pm
+    version: '0.01'
+  Daje::Controller::Companies::Super::CompaniesCompaniesList:
+    file: lib/Daje/Controller/Companies/Super/CompaniesCompaniesList.pm
+    version: '0.01'
+  Daje::Controller::Companies::Super::CompaniesUsers:
+    file: lib/Daje/Controller/Companies/Super/CompaniesUsers.pm
+    version: '0.01'
+  Daje::Controller::Companies::Super::CompaniesUsersList:
+    file: lib/Daje/Controller/Companies/Super/CompaniesUsersList.pm
+    version: '0.01'
+  Daje::Database::Companies:
+    file: lib/Daje/Database/Companies.pm
+    version: '1'
+  Daje::Database::Model::CompaniesCompanies:
+    file: lib/Daje/Database/Model/CompaniesCompanies.pm
+    version: '0.01'
+  Daje::Database::Model::CompaniesUsers:
+    file: lib/Daje/Database/Model/CompaniesUsers.pm
+    version: '0.01'
+  Daje::Database::Model::Super::CompaniesCompanies:
+    file: lib/Daje/Database/Model/Super/CompaniesCompanies.pm
+    version: '0.01'
+  Daje::Database::Model::Super::CompaniesUsers:
+    file: lib/Daje/Database/Model/Super/CompaniesUsers.pm
+    version: '0.01'
+  Daje::Database::View::Super::vCompaniesCompanies:
+    file: lib/Daje/Database/View/Super/vCompaniesCompanies.pm
+    version: '0.01'
+  Daje::Database::View::Super::vCompaniesCompaniesList:
+    file: lib/Daje/Database/View/Super/vCompaniesCompaniesList.pm
+    version: '0.01'
+  Daje::Database::View::Super::vCompaniesUsers:
+    file: lib/Daje/Database/View/Super/vCompaniesUsers.pm
+    version: '0.01'
+  Daje::Database::View::Super::vCompaniesUsersList:
+    file: lib/Daje/Database/View/Super/vCompaniesUsersList.pm
+    version: '0.01'
+  Daje::Database::View::vCompaniesCompanies:
+    file: lib/Daje/Database/View/vCompaniesCompanies.pm
+    version: '0.01'
+  Daje::Database::View::vCompaniesCompaniesList:
+    file: lib/Daje/Database/View/vCompaniesCompaniesList.pm
+    version: '0.01'
+  Daje::Database::View::vCompaniesUsers:
+    file: lib/Daje/Database/View/vCompaniesUsers.pm
+    version: '0.01'
+  Daje::Database::View::vCompaniesUsersList:
+    file: lib/Daje/Database/View/vCompaniesUsersList.pm
+    version: '0.01'
+  Daje::Helper::Companies::Load:
+    file: lib/Daje/Helper/Companies/Load.pm
+  Daje::Plugin::Companies:
+    file: lib/Daje/Plugin/Companies.pm
+    version: '0.01'
+  Daje::Plugin::Companies::Authorities:
+    file: lib/Daje/Plugin/Companies/Authorities.pm
+  Daje::Plugin::Companies::Helpers:
+    file: lib/Daje/Plugin/Companies/Helpers.pm
+    version: '0.01'
+  Daje::Plugin::Companies::Languages:
+    file: lib/Daje/Plugin/Companies/Languages.pm
+  Daje::Plugin::Companies::Routes:
+    file: lib/Daje/Plugin/Companies/Routes.pm
+    version: '0.01'
+  Daje::Workflow::Activities::Companies::Activity:
+    file: lib/Daje/Workflow/Activities/Companies/Activity.pm
+  Daje::Workflow::Activities::Companies::New:
+    file: lib/Daje/Workflow/Activities/Companies/New.pm
+requires:
+  perl: v5.42.0
+resources:
+  bugtracker: https://github.com/janeskil1525/Daje-Plugin-Companies/issues
+  homepage: https://github.com/janeskil1525/Daje-Plugin-Companies
+  repository: https://github.com/janeskil1525/Daje-Plugin-Companies.git
+version: '0.01'
+x_contributors:
+  - 'janeskil1525 <janeskil1525@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

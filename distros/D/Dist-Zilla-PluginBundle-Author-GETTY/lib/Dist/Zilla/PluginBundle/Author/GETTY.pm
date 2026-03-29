@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.305';
+our $VERSION = '0.306';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -102,7 +102,7 @@ has no_makemaker => (
   is      => 'ro',
   isa     => 'Bool',
   lazy    => 1,
-  default => sub { ($_[0]->payload->{no_makemaker} || $_[0]->is_alien || $_[0]->xs || $_[0]->xs_alien || $_[0]->alien_build) ? 1 : 0 },
+  default => sub { ($_[0]->payload->{no_makemaker} || $_[0]->is_alien || $_[0]->xs || $_[0]->xs_alien) ? 1 : 0 },
 );
 
 has alien_build => (
@@ -508,7 +508,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.305
+version 0.306
 
 =head1 SYNOPSIS
 
@@ -832,7 +832,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
