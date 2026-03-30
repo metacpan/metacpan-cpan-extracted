@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-01-19'; # DATE
+our $DATE = '2026-01-20'; # DATE
 our $DIST = 'App-CrockfordBase32Utils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CrockfordBase32Utils/cfbase32_rand",
@@ -40,7 +40,7 @@ cfbase32-rand - Generate one or more Crockford Base 32 numbers
 
 =head1 VERSION
 
-This document describes version 0.002 of cfbase32-rand (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-19.
+This document describes version 0.003 of cfbase32-rand (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<cfbase32-rand> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, 
 
 B<cfbase32-rand> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<cfbase32-rand> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--len|/"--len=s">>=I<int>] [B<L<--max-base32|/"--max-base32=s">>=I<str>] [B<L<--max-int|/"--max-int=s">>=I<int>] [B<L<--max-len|/"--max-len=s">>=I<int>] [B<L<--min-base32|/"--min-base32=s">>=I<str>] [B<L<--min-int|/"--min-int=s">>=I<int>] [B<L<--min-len|/"--min-len=s">>=I<int>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num|/"--num=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--prev-nums-file|/"--prev-nums-file=s">>=I<L<filename|Sah::Schema::filename>>] [B<L<--unique|/"--unique">>|B<L<--no-unique|/"--unique">>|B<L<--nounique|/"--unique">>] [B<L<--zero-prefix|/"--no-zero-prefix">>|B<L<--no-zero-prefix|/"--no-zero-prefix">>|B<L<--nozero-prefix|/"--no-zero-prefix">>]
+B<cfbase32-rand> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--fill-char-template|/"--fill-char-template=s, -f">>=I<str>|B<L<-f|/"--fill-char-template=s, -f">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--len|/"--len=s, -l">>=I<int>|B<L<-l|/"--len=s, -l">>=I<int>] [B<L<--max-base32|/"--max-base32=s">>=I<str>] [B<L<--max-int|/"--max-int=s">>=I<int>] [B<L<--max-len|/"--max-len=s">>=I<int>] [B<L<--min-base32|/"--min-base32=s">>=I<str>] [B<L<--min-int|/"--min-int=s">>=I<int>] [B<L<--min-len|/"--min-len=s">>=I<int>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num|/"--num=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--prev-file|/"--prev-file=s, -p">>=I<L<filename|Sah::Schema::filename>>|B<L<-p|/"--prev-file=s, -p">>=I<L<filename|Sah::Schema::filename>>] [B<L<--unique|/"--unique, -u">>|B<L<-u|/"--unique, -u">>|B<L<--no-unique|/"--unique, -u">>|B<L<--nounique|/"--unique, -u">>] [B<L<--zero-prefix|/"--no-zero-prefix">>|B<L<--no-zero-prefix|/"--no-zero-prefix">>|B<L<--nozero-prefix|/"--no-zero-prefix">>]
 
 
 
@@ -66,15 +66,6 @@ C<*> marks required options.
 
 (No description)
 
-
-=item B<--prev-nums-file>=I<s>
-
-(No description)
-
-
-=item B<--unique>
-
-Whether to avoid generating previously generated numbers.
 
 =back
 
@@ -118,6 +109,13 @@ Shortcut for --log-level=info.
 =head2 Output options
 
 =over
+
+=item B<--fill-char-template>=I<s>, B<-f>
+
+Provide a template for formatting number, e.g. "###-###-###".
+
+See L<String::FillCharTemplate> for more details.
+
 
 =item B<--format>=I<s>
 
@@ -166,6 +164,19 @@ This option will pipe the output to a specified pager program. If pager program
 is not specified, a suitable default e.g. C<less> is chosen.
 
 
+=item B<--prev-file>=I<s>, B<-p>
+
+Load list of previous numbers from the specified file.
+
+The file will be read per-line. Empty lines and lines starting with "#" will be
+skipped. Non-digits will be removed first. Lowercase will be converted to
+uppercase. I L will be normalized to 1, O will be normalized to 0.
+
+
+=item B<--unique>, B<-u>
+
+Whether to avoid generating previously generated numbers.
+
 =item B<--view-result>
 
 View output using a viewer.
@@ -195,7 +206,7 @@ Default value:
 
 =over
 
-=item B<--len>=I<s>
+=item B<--len>=I<s>, B<-l>
 
 Specify how many number of digits to generate for a number.
 
@@ -288,83 +299,88 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-=head2 Generate 5 random numbers from 12 digits each, first digit(s) can be 0
+=head2 Generate 35 random numbers from 12 digits each, first digit(s) can be 0
 
  % cfbase32-rand --len 12 -n35
- ZKKN9WBGHA31
- GX7H1RG0ZX0Q
- 4V36SNFSQ3NW
- PFZVT6SRR1K3
- 233VVNHQF897
- CA7QZ2VN4WJ3
- R97GRD6WDQTA
- 8T86D2DEWDZ1
- ZXQXJ26T1RHK
- QK2TENPJ8SK0
- TE9NE71JTC1S
- 2V589A34NXN8
- 6R0F75KGPGWD
- QFVH5N9TK5SD
- 636HC301W30Y
- XF248VA8TQJ8
- H15SJT1BW6AD
- MYQWR9WAK4R6
- CPK4J1SFSA0E
- X0P0E6CGFC3T
- DKW4D9EWP0CV
- Z52MR4VAZC89
- 92KW1NHBTKE4
- TPM2ZDKHAH4P
- 4B5EBKKDMJP9
- NXHW8PG4K0M7
- Z57F5E2F1894
- 2W856WCCBHRF
- 31DPYPBHBC2D
- 69N5TKTG2S96
- XZBRXF5P6T4V
- DNPHYVKXN4BA
- DT60CGNMM212
- SAB88EN10A8B
- 5TWZPRKQQGQV
+ SZBB2SPQ70NW
+ PJPNTXWN6ZHH
+ HWJE0YZKH7XZ
+ N4J7QGGT7FES
+ 891Z5RANA355
+ VPH5AWGZP00Q
+ KK3NFG13F76D
+ 7HXCC5KNPEWK
+ 2TN03TQWGHVR
+ XD6QWF9DZY33
+ MK3JKPPTZ1BK
+ 3V81GFXFSTJH
+ YWV21CNW7K15
+ XNCS45C0VYJ5
+ AZ69Y55JV558
+ W0250FAH5GBM
+ CBT5Y77VXDTK
+ 6ZRPJ7QT9A7B
+ 7EJNDRBXCJAN
+ S15KYZ1W5PF9
+ WT9Q3BNHWHEJ
+ 7BCB6R0VYBA9
+ PEQ50ZY7N9QS
+ 5W3S4K4NSXC1
+ AM8HFA19YBBR
+ FJVQQQ6MX279
+ A367BJ1EWE2V
+ B15Z1S4PEFGA
+ 29Q8J5D94NQX
+ 0Q2CVZMM6W3R
+ N3XW3HAY3Q6R
+ 57RD6N2DNYDY
+ GCAFDM59W2M2
+ DRR21S5MVVMP
+ T61KWK05RP4R
 
-=head2 Generate 5 random numbers from 12 digits each, first digit(s) CANNOT be 0
+=head2 Generate 35 random numbers from 12 digits each, first digit(s) CANNOT be 0
 
  % cfbase32-rand --len 12 -n35 --nozero-prefix
- E914VFA8WW56
- TZBZ34GG4J19
- EWE2T0D5ZY3Z
- RKBN8PGBGYME
- TRHW278RMCPM
- 5GNQ8NS48ZQW
- RSH6B22ZNMT0
- YCNZSMNPFD71
- 7N6GG752XYM5
- AVSPBCTKC46H
- 5205CFVKWK8H
- S2VY1HBJHXCA
- HEGYRPSFBM71
- TDK0T5KJJB48
- J201GZDFYSTW
- VHSNP7MFSXXT
- DQ293Z3889V1
- MQ4R0SWFAMQW
- N54Q6T2G0M03
- VKWK513EQAZS
- P5ZZ5SG04AY5
- FT6ZMH677T48
- QP75RKPH4ST1
- WA9JR9GJSQ3Y
- 3ZD0Q47PBBXN
- THVSE6J69QZP
- XC3R0GCT4HEZ
- 6138MGRDN8ZN
- 6YJ946W2355R
- TV1DKXHCMC5X
- QXDGAMJMF7BA
- 5HYG8A2300ZK
- S6P6FQ0GPRF8
- W7W1S1Y60JW8
- Q4KTBS770JMF
+ ESVKPY19Q495
+ AEBQXQP1HTJJ
+ YV5DXQ0RGFQ5
+ G59ZST9Y9HQW
+ A66NBZCHK8WG
+ SGBBGQXKY4MW
+ T6C9MSQXYQ91
+ T070Q3XVF5S8
+ MZAX0NJ9SCWC
+ CFN651N4YPA8
+ 23GXKYF0FX51
+ 35CWCETBMHN2
+ BXAQ34B6QM3Z
+ BV1VTFV28BEV
+ Z671RGH3HTZD
+ JB3T37FD02PG
+ XJ03NCTXC00H
+ JJSHERAYG8Q5
+ TN86N9CYNSGM
+ FYYZZMN2JQDW
+ GEDCBEPWJXBT
+ 76SPRG7VRTAZ
+ 31GK4HPQTBPE
+ T4NN2S27GAF7
+ K45K4A5BD4EX
+ M7EJCNFEPQ7Q
+ 86TXJGTWZ8RT
+ K8H9RAFTXKJQ
+ SH36A4AVA1D3
+ G00TMHSV0VHY
+ 3QBRFEE5RVFS
+ JRZVK1C9AHE1
+ DX4MXE7VZ182
+ 1DJKF29EQQE2
+ W432M94A7AD2
+
+=head2 Generate a formatted random code
+
+ % cfbase32-rand -f '###-###-###' -l9
+ XE7-NSE-VPX
 
 =head1 HOMEPAGE
 

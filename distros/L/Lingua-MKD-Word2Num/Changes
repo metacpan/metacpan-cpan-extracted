@@ -1,5 +1,5 @@
 Revision history for Lingua-MKD-Word2Num
 
-0.2603270  2026-03-27
-    - add 5 languages: BEL SLV SRP MKD SQI
+0.2603300  2026-03-30
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
 

@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::EUS::Num2Word;
-# ABSTRACT: Number 2 word conversion in EUS.
+# ABSTRACT: Converts numbers into Bask (Euskara).
 
 use 5.16.0;
 use utf8;
@@ -15,7 +15,7 @@ use Export::Attrs;
 # }}}
 # {{{ variables declaration
 
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # The Bask numeral system is vigesimal (base 20). So far, going to
 # 999_999_999_999.
@@ -266,13 +266,15 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::EUS::Num2Word - Converts numbers into Bask (Euskara).
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -333,6 +335,13 @@ This function accepts an integer (scalar) as a parameter and returns a string
 It returns C<undef> if a)the argument passed is not defined, or b)the
 argument is not an integer, or c)the integer passed does not fall between zero
 and 999,999,999,999.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

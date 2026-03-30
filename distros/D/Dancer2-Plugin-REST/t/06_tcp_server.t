@@ -4,7 +4,7 @@ use warnings;
 use Plack::Test;
 use HTTP::Request::Common qw(GET POST PUT DELETE);
 
-use Test::More tests => 1;
+use Test2::Bundle::More;
 
 { package Webservice;  
 
@@ -26,4 +26,4 @@ test_psgi $app, sub {
     is $res->content => '{"hello":"world"}';
 };
 
-
+done_testing;

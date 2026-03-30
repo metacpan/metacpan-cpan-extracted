@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::POR::Words2Nums;
-# ABSTRACT: Word 2 number conversion in POR.
+# ABSTRACT: Converts Portuguese words to numbers
 
 use 5.16.0;
 use utf8;
@@ -13,7 +13,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my (%values,@values,%bigvalues,@bigvalues);
 
@@ -127,6 +127,54 @@ sub word2num :Export {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Portuguese ordinals 1-10 are fully irregular
+    state $irregular = {
+        'primeiro'  => 'um',      'primeira'  => 'um',
+        'segundo'   => 'dois',    'segunda'   => 'dois',
+        'terceiro'  => 'três',    'terceira'  => 'três',
+        'quarto'    => 'quatro',  'quarta'    => 'quatro',
+        'quinto'    => 'cinco',   'quinta'    => 'cinco',
+        'sexto'     => 'seis',    'sexta'     => 'seis',
+        'sétimo'    => 'sete',    'sétima'    => 'sete',
+        'oitavo'    => 'oito',    'oitava'    => 'oito',
+        'nono'      => 'nove',    'nona'      => 'nove',
+        'décimo'    => 'dez',     'décima'    => 'dez',
+    };
+
+    return $irregular->{$input} if exists $irregular->{$input};
+
+    # Regular (11+): cardinal (drop final vowel) + "ésimo/ésima"
+    $input =~ s{ésim[oa]\z}{}xms or return;
+
+    # Portuguese drops the final vowel before adding -ésimo.  The dropped
+    # vowel varies by word, so we restore it based on the stem ending.
+
+    # stems ending in -z: onz→onze, doz→doze, trez→treze, catorz→catorze, quinz→quinze
+    if    ($input =~ m{z\z}xms)                  { $input .= 'e' }
+    # oito family: dezoit→dezoito, oit→oito
+    elsif ($input =~ m{oit\z}xms)                { $input .= 'o' }
+    # sete family: dezasset→dezassete, set→sete
+    elsif ($input =~ m{set\z}xms)                { $input .= 'e' }
+    # vinte: vint→vinte
+    elsif ($input =~ m{vint\z}xms)               { $input .= 'e' }
+    # decades (trinta, quarenta, etc.): trint→trinta, quarent→quarenta
+    elsif ($input =~ m{nt\z}xms)                 { $input .= 'a' }
+    # cinco: cinc→cinco
+    elsif ($input =~ m{c\z}xms)                  { $input .= 'o' }
+    # nove family: dezanov→dezanove, nov→nove
+    elsif ($input =~ m{ov\z}xms)                 { $input .= 'e' }
+    # quatro: quatr→quatro
+    elsif ($input =~ m{tr\z}xms)                 { $input .= 'o' }
+
+    return $input;
+}
+
+# }}}
 
 1;
 
@@ -136,13 +184,15 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::POR::Words2Nums - Converts Portuguese words to numbers
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -167,6 +217,14 @@ without commas; also, the word "bilião" is supported, but not "bilhão").
 
 Turns a word into a number
 
+=head2 ordinal2cardinal
+
+  1   str    ordinal text (e.g. 'primeiro', 'segundo', 'décimo')
+  =>  str    cardinal text (e.g. 'um', 'dois', 'dez')
+      undef  if input is not recognised as an ordinal
+
+Convert Portuguese ordinal text to cardinal text (morphological reversal).
+
   $result = num2word("cinco");
   # $result now holds 5
 
@@ -175,6 +233,15 @@ Turns a word into a number
 =over 6
 
 =item Implement function is_number()
+
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =back
 

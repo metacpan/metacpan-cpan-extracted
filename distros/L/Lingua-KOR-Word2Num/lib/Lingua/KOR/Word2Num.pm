@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my  $parser  = kor_numerals();
 
 # }}}
@@ -218,6 +218,54 @@ sub kor_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Korean ordinals append " 번째" to the number form.
+    # Special: "첫 번째" (1st) → Sino-Korean "일"
+    return '일' if $input eq '첫 번째';
+
+    # Must end with " 번째" to be an ordinal ([ ] needed because /x ignores bare spaces)
+    $input =~ s{[ ]번째\z}{}xms or return;
+
+    # Native Korean ones → Sino-Korean cardinal
+    state $native_ones = {
+        '한'   => '일',   '두'   => '이',   '세'   => '삼',
+        '네'   => '사',   '다섯' => '오',   '여섯' => '육',
+        '일곱' => '칠',   '여덟' => '팔',   '아홉' => '구',
+    };
+
+    # Native Korean tens → Sino-Korean cardinal
+    state $native_tens = {
+        '열'   => '십',     '스물' => '이십',   '서른' => '삼십',
+        '마흔' => '사십',   '쉰'   => '오십',   '예순' => '육십',
+        '일흔' => '칠십',   '여든' => '팔십',   '아흔' => '구십',
+    };
+
+    # Pure native ones (1-9)
+    return $native_ones->{$input} if exists $native_ones->{$input};
+
+    # Pure native tens (10,20,...,90)
+    return $native_tens->{$input} if exists $native_tens->{$input};
+
+    # Native compound: tens + ones (e.g. "스물세" → "이십삼")
+    # Try each tens prefix (longest first to avoid ambiguity)
+    for my $ten (sort { length $b <=> length $a } keys %{$native_tens}) {
+        if ($input =~ m{\A\Q$ten\E(.+)\z}xms) {
+            my $ones_part = $1;
+            if (exists $native_ones->{$ones_part}) {
+                return $native_tens->{$ten} . $native_ones->{$ones_part};
+            }
+        }
+    }
+
+    # For 100+, Sino-Korean cardinal is used directly — return as-is
+    return $input;
+}
+
+# }}}
 
 1;
 
@@ -236,7 +284,7 @@ Lingua::KOR::Word2Num - Word to number conversion in Korean
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::KOR::Word2Num is module for converting text containing number
 representation in Korean (Sino-Korean system) back into number.
@@ -286,6 +334,15 @@ Convert text representation to number.
   =>  obj  new parser object
 
 Internal parser.
+
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =back
 

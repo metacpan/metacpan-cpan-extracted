@@ -1,0 +1,35 @@
+======================================================================
+ mb Cheat Sheet                                              [UR] اردو
+======================================================================
+
+[ 1. ماڈیول لوڈ کریں ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. حرف پر مبنی length / substr ]
+  mb::length($str)              # حروف کی تعداد (بائٹس نہیں)
+  mb::substr($str, $pos, $len)  # حرف کی پوزیشن سے سب سٹرنگ
+
+[ 3. سٹرنگ تلاش ]
+  mb::index($str, $sub)         # حرف پوزیشن انڈیکس
+  mb::rindex($str, $sub)        # دائیں سے تلاش
+  mb::index_byte($str, $sub)    # بائٹ پوزیشن انڈیکس
+
+[ 4. حرف تبدیلی ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. حرف کوڈ ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. دیگر آپریشنز ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. سپورٹ کردہ انکوڈنگز ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. مثال ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "ہیلو دنیا";
+  printf "لمبائی=%d\n", mb::length($s);

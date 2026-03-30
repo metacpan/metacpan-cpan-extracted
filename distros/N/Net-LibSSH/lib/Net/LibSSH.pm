@@ -5,7 +5,7 @@ package Net::LibSSH;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use XSLoader;
 XSLoader::load('Net::LibSSH', $VERSION);
@@ -25,7 +25,7 @@ Net::LibSSH - Perl binding for libssh — SSH without SFTP dependency
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

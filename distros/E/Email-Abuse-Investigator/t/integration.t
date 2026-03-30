@@ -34,8 +34,7 @@ use POSIX             qw( strftime );
 
 use FindBin qw( $Bin );
 use lib "$Bin/../lib", "$Bin/..";
-
-use_ok('Email::Abuse::Investigator');
+use Email::Abuse::Investigator;
 
 # ---------------------------------------------------------------------------
 # Network stub infrastructure
@@ -175,7 +174,7 @@ WHOIS
         },
     );
 
-    my $a = new_ok('Email::Abuse::Investigator');
+    my $a = Email::Abuse::Investigator->new();
     $a->parse_email(make_raw_email(
         received => 'from badactor (badactor [91.198.174.42]) by mx.test',
         from     => 'Deals <deals@spamsite.example>',
@@ -838,8 +837,9 @@ WHOIS
         'Google MX-host abuse contact present';
     ok scalar(grep { $_ eq 'abuse@verisign.example'     } @addrs),
         'VeriSign NS-host abuse contact present';
-    ok scalar(grep { $_ eq 'abuse@godaddy.com'          } @addrs),
-        'GoDaddy registrar abuse contact present';
+    # GoDaddy is now form-only -- suppressed from abuse_contacts(), surfaced via form_contacts()
+    ok scalar(grep { $_->{form} =~ /godaddy/i } $a->form_contacts()),
+        'GoDaddy registrar appears in form_contacts() (form-only provider)';
 
     # All four addresses are distinct — no collapsing
     my %addr_seen;

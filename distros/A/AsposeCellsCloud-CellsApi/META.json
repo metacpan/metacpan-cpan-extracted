@@ -63,7 +63,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "26.2"
+         "version" : "26.3.1"
       },    
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
@@ -1589,6 +1589,12 @@
       "AsposeCellsCloud::Request::GetMergedCellsInWorksheetRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetMergedCellsInWorksheetRequest.pm"
       },
+      "AsposeCellsCloud::Request::AcceptAllRevisionsRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/AcceptAllRevisionsRequest.pm"
+      },
+      "AsposeCellsCloud::Request::AcceptAllRevisionsInRemoteSpreadsheetRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/AcceptAllRevisionsInRemoteSpreadsheetRequest.pm"
+      },
       "AsposeCellsCloud::Request::ProtectSpreadsheetRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/ProtectSpreadsheetRequest.pm"
       },
@@ -2761,6 +2767,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "26.2",
+   "version" : "26.3.1",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

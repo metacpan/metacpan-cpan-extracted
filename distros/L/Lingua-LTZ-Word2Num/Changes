@@ -1,5 +1,6 @@
 Revision history for Lingua-LTZ-Word2Num
 
-0.2603270  2026-03-27
-    - add 6 European languages: CYM GLG GLE LTZ MLT OCI
+0.2603300  2026-03-30
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
+    - add =encoding utf-8 to all POD sections (fixes no_pod_errors kwalitee)
 

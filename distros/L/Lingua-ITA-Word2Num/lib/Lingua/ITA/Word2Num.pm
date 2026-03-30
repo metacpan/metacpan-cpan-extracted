@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 our @EXPORT_OK  = qw(cardinal2num w2n);
 my $parser      = ita_numerals();
 
@@ -106,6 +106,75 @@ sub ita_numerals {
     });
 }
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Italian ordinals 0-10 are fully irregular
+    state $irregular = {
+        'primo'   => 'un',       'prima'   => 'un',
+        'secondo' => 'due',      'seconda' => 'due',
+        'terzo'   => 'tre',      'terza'   => 'tre',
+        'quarto'  => 'quattro',  'quarta'  => 'quattro',
+        'quinto'  => 'cinque',   'quinta'  => 'cinque',
+        'sesto'   => 'sei',      'sesta'   => 'sei',
+        'settimo' => 'sette',    'settima' => 'sette',
+        'ottavo'  => 'otto',     'ottava'  => 'otto',
+        'nono'    => 'nove',     'nona'    => 'nove',
+        'decimo'  => 'dieci',    'decima'  => 'dieci',
+    };
+
+    return $irregular->{$input} if exists $irregular->{$input};
+
+    # Regular: cardinal (drop final vowel) + "esimo/esima"
+    # Strip suffix, restore dropped vowel where needed
+    $input =~ s{esim[oa]\z}{}xms or return;
+
+    # Italian drops the final vowel before adding -esimo.  The dropped vowel
+    # varies by word, so we restore it based on the stem ending.
+    #
+    # Stems ending in a vowel may also need restoration when two vowels
+    # collapsed (ventidue→ventiduesimo: stem "ventidu" needs +e,
+    # ventisei→ventiseiesimo: stem "ventise" needs +i).
+
+    # dieci (10): centodiec→centodieci, diec→dieci
+    if    ($input =~ m{diec\z}xms)              { $input .= 'i' }
+    # -dici family: undic→undici, dodic→dodici, sedic→sedici, etc.
+    elsif ($input =~ m{ic\z}xms)                { $input .= 'i' }
+    # sette family: diciassett→diciassette, ventisett→ventisette
+    elsif ($input =~ m{ett\z}xms)               { $input .= 'e' }
+    # otto family: diciott→diciotto, ventott→ventotto, trentott→trentotto
+    elsif ($input =~ m{ott\z}xms)               { $input .= 'o' }
+    # nove family: diciannov→diciannove, ventinov→ventinove
+    elsif ($input =~ m{ov\z}xms)                { $input .= 'e' }
+    # quattro: ventiquattr→ventiquattro
+    elsif ($input =~ m{ttr\z}xms)               { $input .= 'o' }
+    # cinque: venticinqu→venticinque
+    elsif ($input =~ m{qu\z}xms)                { $input .= 'e' }
+    # uno: ventun→ventuno (parser also accepts "ventun" but full form is safe)
+    elsif ($input =~ m{un\z}xms)                { $input .= 'o' }
+    # due: ventidu→ventidue
+    elsif ($input =~ m{du\z}xms)                { $input .= 'e' }
+    # sei: ventise→ventisei
+    elsif ($input =~ m{se\z}xms)                { $input .= 'i' }
+    # venti (20): vent→venti
+    elsif ($input =~ m{vent\z}xms)              { $input .= 'i' }
+    # cento: cent→cento
+    elsif ($input =~ m{cent\z}xms)              { $input .= 'o' }
+    # mille (1000): mill→mille
+    elsif ($input =~ m{mill\z}xms)              { $input .= 'e' }
+    # mila (thousands): duemil→duemila, cinquemil→cinquemila, centomil→centomila
+    elsif ($input =~ m{mil\z}xms)               { $input .= 'a' }
+    # decades (trenta, quaranta, etc.): trent→trenta, quarant→quaranta
+    # The parser accepts contracted "trent", "quarant", etc. but
+    # the full form is also fine.
+    elsif ($input =~ m{ant\z}xms)               { $input .= 'a' }
+
+    return $input;
+}
+
+# }}}
 
 1;
 
@@ -115,6 +184,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::ITA::Word2Num - Word to number conversion in Italian
@@ -122,7 +193,7 @@ Lingua::ITA::Word2Num - Word to number conversion in Italian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::ITA::Word2Num is module for converting text containing number
 representation in italian back into number. Converts whole numbers from 0 up
@@ -164,6 +235,14 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'primo', 'secondo', 'ventesimo')
+  =>  str    cardinal text (e.g. 'un', 'due', 'venti')
+      undef  if input is not recognised as an ordinal
+
+Convert Italian ordinal text to cardinal text (morphological reversal).
+
 =item B<ita_numerals> (void)
 
   =>  obj  new parser object
@@ -184,6 +263,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

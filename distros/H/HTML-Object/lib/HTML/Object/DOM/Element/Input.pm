@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :input );
@@ -204,11 +205,13 @@ sub _set_up_down
     my $min = $self->attr( 'min' );
     my $max = $self->attr( 'max' );
     my $step = $self->attr( 'step' );
-    $step = 1 if( !defined( $step ) || !CORE::length( "$step" ) || lc( "$step" ) eq 'any' || "$step" !~ /$def->{step_re}/ );
+    $step = 1 if( !defined( $step ) );
+    $step = $step + 0;
+    $step = 1 if( !CORE::length( $step ) || lc( $step ) eq 'any' || $step !~ /$def->{step_re}/ );
     return( $self->error({
-        message => "This input step value provided ($step) is not a proper number.",
+        message => "This input step value provided '" . ( $step // 'undef' ) . "' (" . $self->_str_val( $step // 'undef' ) . ") is not a proper number.",
         class => 'HTML::Object::SyntaxError',
-    }) ) if( !$self->_is_number( "$step" ) );
+    }) ) if( !$self->_is_number( $step ) );
     
     my $parse;
     $parse = sub

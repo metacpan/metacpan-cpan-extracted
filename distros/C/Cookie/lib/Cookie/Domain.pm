@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Domain.pm
-## Version v0.1.7
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.1.8
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2025/07/30
+## Modified 2025/08/22
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ BEGIN
             )*
         )
     $/x;
-    our $VERSION = 'v0.1.7';
+    our $VERSION = 'v0.1.8';
 };
 
 use strict;
@@ -488,6 +488,13 @@ sub stat
     }
     return( $self->error( "Malformed domain name \"$name\"" ) ) if( $name !~ /$DOMAIN_RE/ );
     my $labels = $self->new_array( [split( /\./, $name )] );
+#     if( $labels->length == 1 && !$opts->{min_suffix} )
+#     {
+#         my $single = $labels->[0];
+#         my $name_out = defined( $idn ) ? Net::IDN::Encode::domain_to_unicode( $single ) : $single;
+#         return( Cookie::Domain::Result->new({ name => $name_out, sub => undef, suffix => '' }) );
+#     }
+
     my $any  = {};
     my $host = {};
     my $expt = {};
@@ -668,7 +675,7 @@ Cookie::Domain - Domain Name Public Suffix Query Interface
 
 =head1 VERSION
 
-    v0.1.7
+    v0.1.8
 
 =head1 DESCRIPTION
 

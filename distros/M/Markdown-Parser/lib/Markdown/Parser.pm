@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Markdown Parser Only - ~/lib/Markdown/Parser.pm
-## Version v0.5.1
+## Version v0.6.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/08/23
@@ -22,7 +22,7 @@ BEGIN
     use CSS::Object;
     use Scalar::Util ();
     our $DEBUG = 0;
-    our $VERSION = 'v0.5.1';
+    our $VERSION = 'v0.6.0';
     # Including vertical space like new lines
     our $ELEMENTS_DICTIONARY =
     {
@@ -52,6 +52,8 @@ sub init
     # See Markdown::Parser::Link
     $self->{default_email}                  = '';
     $self->{document}                       = '';
+    # By default, the markdown standard requires it, but you can disable it so that HTML code would show up as-is.
+    $self->{encode_html_entities}           = 1;
     $self->{email_obfuscate_class}          = 'courriel';
     $self->{email_obfuscate_data_host}      = 'host';
     $self->{email_obfuscate_data_user}      = 'user';
@@ -105,6 +107,8 @@ sub css_grid { return( shift->_set_get_boolean( 'css_grid', @_ ) ); }
 sub default_email { return( shift->_set_get_scalar_as_object( 'default_email', @_ ) ); }
 
 sub document { return( shift->_set_get_object( 'document', 'Markdown::Parser::Document', @_ ) ); }
+
+sub encode_html_entities { return( shift->_set_get_boolean( 'encode_html_entities', @_ ) ); }
 
 sub email_obfuscate_class { return( shift->_set_get_scalar_as_object( 'email_obfuscate_class', @_ ) ); }
 
@@ -161,6 +165,7 @@ sub from_html
         email_obfuscate_class       => $self->email_obfuscate_class,
         email_obfuscate_data_host   => $self->email_obfuscate_data_host,
         email_obfuscate_data_user   => $self->email_obfuscate_data_user,
+        encode_html_entities        => $self->encode_html_entities,
         css         => $self->css,
         debug       => $self->debug,
         tag_name    => 'top',
@@ -504,6 +509,7 @@ sub parse
             email_obfuscate_class       => $self->email_obfuscate_class,
             email_obfuscate_data_host   => $self->email_obfuscate_data_host,
             email_obfuscate_data_user   => $self->email_obfuscate_data_user,
+            encode_html_entities        => $self->encode_html_entities,
             css         => $self->css,
             debug       => $self->debug,
             tag_name    => 'top',
@@ -2685,7 +2691,7 @@ Markdown::Parser - Markdown Parser Only
 
 =head1 VERSION
 
-    v0.5.1
+    v0.6.0
 
 =head1 DESCRIPTION
 
@@ -2703,7 +2709,7 @@ To instantiate a new L<Markdown::Parser> object, pass an hash reference of follo
 
 =over 4
 
-=item abbreviation_case_sensitive
+=item C<abbreviation_case_sensitive>
 
 Boolean value to determine if abbreviation, that are extended markdown, should be case sensitive or not.
 Default is false, i.e. they are not case sensitive, so an abbreviation declaration like:
@@ -2712,13 +2718,13 @@ Default is false, i.e. they are not case sensitive, so an abbreviation declarati
 
 would match either C<HTML4> or C<html4> or even C<hTmL4>
 
-=item callback
+=item C<callback>
 
 Provided with a code reference, and this will register it as a callback to be triggered for every Markdown object encountered while parsing the data provided.
 
 You can also provide C<undef>
 
-=item css_grid
+=item C<css_grid>
 
 A boolean value to set whether to return the tables as a L<css grid|https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout> rather than as an L<html table|https://developer.mozilla.org/en-US/docs/Learn/HTML/Tables/Basics>.
 
@@ -2730,11 +2736,19 @@ To achieve this, this module uses L<CSS::Object> and inserts necessary css rules
 
 Once the parsing is complete, you can get the L<CSS::Object> object with L</css> method.
 
-=item I<debug>
+=item C<debug>
 
 This is an integer. The bigger it is and the more verbose is the output.
 
-=item I<mode>
+=item C<encode_html_entities>
+
+A boolean value to set whether any HTML encapsulated in a code block should have its tag encoded, or not.
+
+By default, the Markdown standard requires that an HTML tag like C<< <p> >> becomes C< &lt;p%gt; >.
+
+When this is set to a false value, any HTML enclosed in a code block will not be encoded.
+
+=item C<mode>
 
 This can be either I<strict> or I<extended>. By default it is set to I<strict>
 
@@ -2813,6 +2827,14 @@ See L<Markdown::Parser::Link/as_string>
 The fake user to use when performing email obfuscation.
 
 See L<Markdown::Parser::Link/as_string>
+
+=head2 encode_html_entities
+
+Sets or gets a boolean value that specify whether any HTML encapsulated in a code block should have its tag encoded, or not.
+
+By default, the Markdown standard requires that an HTML tag like C<< <p> >> becomes C< &lt;p%gt; >.
+
+When this is set to a false value, any HTML enclosed in a code block will not be encoded.
 
 =head2 encrypt_email
 

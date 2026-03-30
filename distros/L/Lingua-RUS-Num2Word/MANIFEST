@@ -9,3 +9,4 @@ Makefile.PL
 README
 SECURITY.md
 lib/Lingua/RUS/Num2Word.pm
+t/Num2Word.t

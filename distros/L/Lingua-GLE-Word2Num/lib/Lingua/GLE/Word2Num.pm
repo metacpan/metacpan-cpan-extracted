@@ -14,7 +14,7 @@ use Export::Attrs;
 use Parse::RecDescent;
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my $parser = gle_numerals();
 
@@ -148,6 +148,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::GLE::Word2Num - Word to number conversion in Irish (Gaeilge)
@@ -155,7 +157,7 @@ Lingua::GLE::Word2Num - Word to number conversion in Irish (Gaeilge)
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::GLE::Word2Num is a module for converting text containing number
 representation in Irish (Gaeilge) back into number. Converts whole numbers

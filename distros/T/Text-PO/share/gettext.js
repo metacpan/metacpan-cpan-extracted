@@ -1,11 +1,11 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v0.4.0
-* Copyright(c) 2021-2023 DEGUEST Pte. Ltd.
+* Version v1.0.3
+* Copyright(c) 2021-2026 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
-* Modified 2024/12/22
+* Modified 2026/02/23
 * All rights reserved
 * 
 * This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,24 +25,24 @@
      *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
      * @version   v4.2.8+1e68dce6
      */
-    
+
     (function (global, factory) {
         typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
         typeof define === 'function' && define.amd ? define(factory) :
         (global.ES6Promise = factory());
     }(this, (function () { 'use strict';
-    
+
     function objectOrFunction(x) {
       var type = typeof x;
       return x !== null && (type === 'object' || type === 'function');
     }
-    
+
     function isFunction(x) {
       return typeof x === 'function';
     }
-    
-    
-    
+
+
+
     var _isArray = void 0;
     if (Array.isArray) {
       _isArray = Array.isArray;
@@ -51,13 +51,13 @@
         return Object.prototype.toString.call(x) === '[object Array]';
       };
     }
-    
+
     var isArray = _isArray;
-    
+
     var len = 0;
     var vertxNext = void 0;
     var customSchedulerFn = void 0;
-    
+
     var asap = function asap(callback, arg) {
       queue[len] = callback;
       queue[len + 1] = arg;
@@ -73,23 +73,23 @@
         }
       }
     };
-    
+
     function setScheduler(scheduleFn) {
       customSchedulerFn = scheduleFn;
     }
-    
+
     function setAsap(asapFn) {
       asap = asapFn;
     }
-    
+
     var browserWindow = typeof window !== 'undefined' ? window : undefined;
     var browserGlobal = browserWindow || {};
     var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
     var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
-    
+
     // test for web worker but not in IE10
     var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
-    
+
     // node
     function useNextTick() {
       // node version 0.10.x displays a deprecation warning when nextTick is used recursively
@@ -98,7 +98,7 @@
         return process.nextTick(flush);
       };
     }
-    
+
     // vertx
     function useVertxTimer() {
       if (typeof vertxNext !== 'undefined') {
@@ -106,21 +106,21 @@
           vertxNext(flush);
         };
       }
-    
+
       return useSetTimeout();
     }
-    
+
     function useMutationObserver() {
       var iterations = 0;
       var observer = new BrowserMutationObserver(flush);
       var node = document.createTextNode('');
       observer.observe(node, { characterData: true });
-    
+
       return function () {
         node.data = iterations = ++iterations % 2;
       };
     }
-    
+
     // web worker
     function useMessageChannel() {
       var channel = new MessageChannel();
@@ -129,7 +129,7 @@
         return channel.port2.postMessage(0);
       };
     }
-    
+
     function useSetTimeout() {
       // Store setTimeout reference so es6-promise will be unaffected by
       // other code modifying setTimeout (like sinon.useFakeTimers())
@@ -138,22 +138,22 @@
         return globalSetTimeout(flush, 1);
       };
     }
-    
+
     var queue = new Array(1000);
     function flush() {
       for (var i = 0; i < len; i += 2) {
         var callback = queue[i];
         var arg = queue[i + 1];
-    
+
         callback(arg);
-    
+
         queue[i] = undefined;
         queue[i + 1] = undefined;
       }
-    
+
       len = 0;
     }
-    
+
     function attemptVertx() {
       try {
         var vertx = Function('return this')().require('vertx');
@@ -163,7 +163,7 @@
         return useSetTimeout();
       }
     }
-    
+
     var scheduleFlush = void 0;
     // Decide what async method to use to triggering processing of queued callbacks:
     if (isNode) {
@@ -177,19 +177,19 @@
     } else {
       scheduleFlush = useSetTimeout();
     }
-    
+
     function then(onFulfillment, onRejection) {
       var parent = this;
-    
+
       var child = new this.constructor(noop);
-    
+
       if (child[PROMISE_ID] === undefined) {
         makePromise(child);
       }
-    
+
       var _state = parent._state;
-    
-    
+
+
       if (_state) {
         var callback = arguments[_state - 1];
         asap(function () {
@@ -198,34 +198,34 @@
       } else {
         subscribe(parent, child, onFulfillment, onRejection);
       }
-    
+
       return child;
     }
-    
+
     /**
       `Promise.resolve` returns a promise that will become resolved with the
       passed `value`. It is shorthand for the following:
-    
+
       ```javascript
       let promise = new Promise(function(resolve, reject){
         resolve(1);
       });
-    
+
       promise.then(function(value){
         // value === 1
       });
       ```
-    
+
       Instead of writing the above, your code now simply becomes the following:
-    
+
       ```javascript
       let promise = Promise.resolve(1);
-    
+
       promise.then(function(value){
         // value === 1
       });
       ```
-    
+
       @method resolve
       @static
       @param {Any} value value that the returned promise will be resolved with
@@ -236,32 +236,32 @@
     function resolve$1(object) {
       /*jshint validthis:true */
       var Constructor = this;
-    
+
       if (object && typeof object === 'object' && object.constructor === Constructor) {
         return object;
       }
-    
+
       var promise = new Constructor(noop);
       resolve(promise, object);
       return promise;
     }
-    
+
     var PROMISE_ID = Math.random().toString(36).substring(2);
-    
+
     function noop() {}
-    
+
     var PENDING = void 0;
     var FULFILLED = 1;
     var REJECTED = 2;
-    
+
     function selfFulfillment() {
       return new TypeError("You cannot resolve a promise with itself");
     }
-    
+
     function cannotReturnOwn() {
       return new TypeError('A promises callback cannot return that same promise.');
     }
-    
+
     function tryThen(then$$1, value, fulfillmentHandler, rejectionHandler) {
       try {
         then$$1.call(value, fulfillmentHandler, rejectionHandler);
@@ -269,7 +269,7 @@
         return e;
       }
     }
-    
+
     function handleForeignThenable(promise, thenable, then$$1) {
       asap(function (promise) {
         var sealed = false;
@@ -288,17 +288,17 @@
             return;
           }
           sealed = true;
-    
+
           reject(promise, reason);
         }, 'Settle: ' + (promise._label || ' unknown promise'));
-    
+
         if (!sealed && error) {
           sealed = true;
           reject(promise, error);
         }
       }, promise);
     }
-    
+
     function handleOwnThenable(promise, thenable) {
       if (thenable._state === FULFILLED) {
         fulfill(promise, thenable._result);
@@ -312,7 +312,7 @@
         });
       }
     }
-    
+
     function handleMaybeThenable(promise, maybeThenable, then$$1) {
       if (maybeThenable.constructor === promise.constructor && then$$1 === then && maybeThenable.constructor.resolve === resolve$1) {
         handleOwnThenable(promise, maybeThenable);
@@ -326,7 +326,7 @@
         }
       }
     }
-    
+
     function resolve(promise, value) {
       if (promise === value) {
         reject(promise, selfFulfillment());
@@ -343,86 +343,86 @@
         fulfill(promise, value);
       }
     }
-    
+
     function publishRejection(promise) {
       if (promise._onerror) {
         promise._onerror(promise._result);
       }
-    
+
       publish(promise);
     }
-    
+
     function fulfill(promise, value) {
       if (promise._state !== PENDING) {
         return;
       }
-    
+
       promise._result = value;
       promise._state = FULFILLED;
-    
+
       if (promise._subscribers.length !== 0) {
         asap(publish, promise);
       }
     }
-    
+
     function reject(promise, reason) {
       if (promise._state !== PENDING) {
         return;
       }
       promise._state = REJECTED;
       promise._result = reason;
-    
+
       asap(publishRejection, promise);
     }
-    
+
     function subscribe(parent, child, onFulfillment, onRejection) {
       var _subscribers = parent._subscribers;
       var length = _subscribers.length;
-    
-    
+
+
       parent._onerror = null;
-    
+
       _subscribers[length] = child;
       _subscribers[length + FULFILLED] = onFulfillment;
       _subscribers[length + REJECTED] = onRejection;
-    
+
       if (length === 0 && parent._state) {
         asap(publish, parent);
       }
     }
-    
+
     function publish(promise) {
       var subscribers = promise._subscribers;
       var settled = promise._state;
-    
+
       if (subscribers.length === 0) {
         return;
       }
-    
+
       var child = void 0,
           callback = void 0,
           detail = promise._result;
-    
+
       for (var i = 0; i < subscribers.length; i += 3) {
         child = subscribers[i];
         callback = subscribers[i + settled];
-    
+
         if (child) {
           invokeCallback(settled, child, callback, detail);
         } else {
           callback(detail);
         }
       }
-    
+
       promise._subscribers.length = 0;
     }
-    
+
     function invokeCallback(settled, promise, callback, detail) {
       var hasCallback = isFunction(callback),
           value = void 0,
           error = void 0,
           succeeded = true;
-    
+
       if (hasCallback) {
         try {
           value = callback(detail);
@@ -430,7 +430,7 @@
           succeeded = false;
           error = e;
         }
-    
+
         if (promise === value) {
           reject(promise, cannotReturnOwn());
           return;
@@ -438,7 +438,7 @@
       } else {
         value = detail;
       }
-    
+
       if (promise._state !== PENDING) {
         // noop
       } else if (hasCallback && succeeded) {
@@ -451,7 +451,7 @@
         reject(promise, value);
       }
     }
-    
+
     function initializePromise(promise, resolver) {
       try {
         resolver(function resolvePromise(value) {
@@ -463,38 +463,38 @@
         reject(promise, e);
       }
     }
-    
+
     var id = 0;
     function nextId() {
       return id++;
     }
-    
+
     function makePromise(promise) {
       promise[PROMISE_ID] = id++;
       promise._state = undefined;
       promise._result = undefined;
       promise._subscribers = [];
     }
-    
+
     function validationError() {
       return new Error('Array Methods must be provided an Array');
     }
-    
+
     var Enumerator = function () {
       function Enumerator(Constructor, input) {
         this._instanceConstructor = Constructor;
         this.promise = new Constructor(noop);
-    
+
         if (!this.promise[PROMISE_ID]) {
           makePromise(this.promise);
         }
-    
+
         if (isArray(input)) {
           this.length = input.length;
           this._remaining = input.length;
-    
+
           this._result = new Array(this.length);
-    
+
           if (this.length === 0) {
             fulfill(this.promise, this._result);
           } else {
@@ -508,18 +508,18 @@
           reject(this.promise, validationError());
         }
       }
-    
+
       Enumerator.prototype._enumerate = function _enumerate(input) {
         for (var i = 0; this._state === PENDING && i < input.length; i++) {
           this._eachEntry(input[i], i);
         }
       };
-    
+
       Enumerator.prototype._eachEntry = function _eachEntry(entry, i) {
         var c = this._instanceConstructor;
         var resolve$$1 = c.resolve;
-    
-    
+
+
         if (resolve$$1 === resolve$1) {
           var _then = void 0;
           var error = void 0;
@@ -530,7 +530,7 @@
             didError = true;
             error = e;
           }
-    
+
           if (_then === then && entry._state !== PENDING) {
             this._settledAt(entry._state, i, entry._result);
           } else if (typeof _then !== 'function') {
@@ -553,77 +553,77 @@
           this._willSettleAt(resolve$$1(entry), i);
         }
       };
-    
+
       Enumerator.prototype._settledAt = function _settledAt(state, i, value) {
         var promise = this.promise;
-    
-    
+
+
         if (promise._state === PENDING) {
           this._remaining--;
-    
+
           if (state === REJECTED) {
             reject(promise, value);
           } else {
             this._result[i] = value;
           }
         }
-    
+
         if (this._remaining === 0) {
           fulfill(promise, this._result);
         }
       };
-    
+
       Enumerator.prototype._willSettleAt = function _willSettleAt(promise, i) {
         var enumerator = this;
-    
+
         subscribe(promise, undefined, function (value) {
           return enumerator._settledAt(FULFILLED, i, value);
         }, function (reason) {
           return enumerator._settledAt(REJECTED, i, reason);
         });
       };
-    
+
       return Enumerator;
     }();
-    
+
     /**
       `Promise.all` accepts an array of promises, and returns a new promise which
       is fulfilled with an array of fulfillment values for the passed promises, or
       rejected with the reason of the first passed promise to be rejected. It casts all
       elements of the passed iterable to promises as it runs this algorithm.
-    
+
       Example:
-    
+
       ```javascript
       let promise1 = resolve(1);
       let promise2 = resolve(2);
       let promise3 = resolve(3);
       let promises = [ promise1, promise2, promise3 ];
-    
+
       Promise.all(promises).then(function(array){
         // The array here would be [ 1, 2, 3 ];
       });
       ```
-    
+
       If any of the `promises` given to `all` are rejected, the first promise
       that is rejected will be given as an argument to the returned promises's
       rejection handler. For example:
-    
+
       Example:
-    
+
       ```javascript
       let promise1 = resolve(1);
       let promise2 = reject(new Error("2"));
       let promise3 = reject(new Error("3"));
       let promises = [ promise1, promise2, promise3 ];
-    
+
       Promise.all(promises).then(function(array){
         // Code here never runs because there are rejected promises!
       }, function(error) {
         // error.message === "2"
       });
       ```
-    
+
       @method all
       @static
       @param {Array} entries array of promises
@@ -636,51 +636,51 @@
     function all(entries) {
       return new Enumerator(this, entries).promise;
     }
-    
+
     /**
       `Promise.race` returns a new promise which is settled in the same way as the
       first passed promise to settle.
-    
+
       Example:
-    
+
       ```javascript
       let promise1 = new Promise(function(resolve, reject){
         setTimeout(function(){
           resolve('promise 1');
         }, 200);
       });
-    
+
       let promise2 = new Promise(function(resolve, reject){
         setTimeout(function(){
           resolve('promise 2');
         }, 100);
       });
-    
+
       Promise.race([promise1, promise2]).then(function(result){
         // result === 'promise 2' because it was resolved before promise1
         // was resolved.
       });
       ```
-    
+
       `Promise.race` is deterministic in that only the state of the first
       settled promise matters. For example, even if other promises given to the
       `promises` array argument are resolved, but the first settled promise has
       become rejected before the other promises became fulfilled, the returned
       promise will become rejected:
-    
+
       ```javascript
       let promise1 = new Promise(function(resolve, reject){
         setTimeout(function(){
           resolve('promise 1');
         }, 200);
       });
-    
+
       let promise2 = new Promise(function(resolve, reject){
         setTimeout(function(){
           reject(new Error('promise 2'));
         }, 100);
       });
-    
+
       Promise.race([promise1, promise2]).then(function(result){
         // Code here never runs
       }, function(reason){
@@ -688,13 +688,13 @@
         // promise 1 became fulfilled
       });
       ```
-    
+
       An example real-world use case is implementing timeouts:
-    
+
       ```javascript
       Promise.race([ajax('foo.json'), timeout(5000)])
       ```
-    
+
       @method race
       @static
       @param {Array} promises array of promises to observe
@@ -705,7 +705,7 @@
     function race(entries) {
       /*jshint validthis:true */
       var Constructor = this;
-    
+
       if (!isArray(entries)) {
         return new Constructor(function (_, reject) {
           return reject(new TypeError('You must pass an array to race.'));
@@ -719,35 +719,35 @@
         });
       }
     }
-    
+
     /**
       `Promise.reject` returns a promise rejected with the passed `reason`.
       It is shorthand for the following:
-    
+
       ```javascript
       let promise = new Promise(function(resolve, reject){
         reject(new Error('WHOOPS'));
       });
-    
+
       promise.then(function(value){
         // Code here doesn't run because the promise is rejected!
       }, function(reason){
         // reason.message === 'WHOOPS'
       });
       ```
-    
+
       Instead of writing the above, your code now simply becomes the following:
-    
+
       ```javascript
       let promise = Promise.reject(new Error('WHOOPS'));
-    
+
       promise.then(function(value){
         // Code here doesn't run because the promise is rejected!
       }, function(reason){
         // reason.message === 'WHOOPS'
       });
       ```
-    
+
       @method reject
       @static
       @param {Any} reason value that the returned promise will be rejected with.
@@ -761,80 +761,80 @@
       reject(promise, reason);
       return promise;
     }
-    
+
     function needsResolver() {
       throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
     }
-    
+
     function needsNew() {
       throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
     }
-    
+
     /**
       Promise objects represent the eventual result of an asynchronous operation. The
       primary way of interacting with a promise is through its `then` method, which
       registers callbacks to receive either a promise's eventual value or the reason
       why the promise cannot be fulfilled.
-    
+
       Terminology
       -----------
-    
+
       - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
       - `thenable` is an object or function that defines a `then` method.
       - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
       - `exception` is a value that is thrown using the throw statement.
       - `reason` is a value that indicates why a promise was rejected.
       - `settled` the final resting state of a promise, fulfilled or rejected.
-    
+
       A promise can be in one of three states: pending, fulfilled, or rejected.
-    
+
       Promises that are fulfilled have a fulfillment value and are in the fulfilled
       state.  Promises that are rejected have a rejection reason and are in the
       rejected state.  A fulfillment value is never a thenable.
-    
+
       Promises can also be said to *resolve* a value.  If this value is also a
       promise, then the original promise's settled state will match the value's
       settled state.  So a promise that *resolves* a promise that rejects will
       itself reject, and a promise that *resolves* a promise that fulfills will
       itself fulfill.
-    
-    
+
+
       Basic Usage:
       ------------
-    
+
       ```js
       let promise = new Promise(function(resolve, reject) {
         // on success
         resolve(value);
-    
+
         // on failure
         reject(reason);
       });
-    
+
       promise.then(function(value) {
         // on fulfillment
       }, function(reason) {
         // on rejection
       });
       ```
-    
+
       Advanced Usage:
       ---------------
-    
+
       Promises shine when abstracting away asynchronous interactions such as
       `XMLHttpRequest`s.
-    
+
       ```js
       function getJSON(url) {
         return new Promise(function(resolve, reject){
           let xhr = new XMLHttpRequest();
-    
+
           xhr.open('GET', url);
           xhr.onreadystatechange = handler;
           xhr.responseType = 'json';
           xhr.setRequestHeader('Accept', 'application/json');
           xhr.send();
-    
+
           function handler() {
             if (this.readyState === this.DONE) {
               if (this.status === 200) {
@@ -846,16 +846,16 @@
           };
         });
       }
-    
+
       getJSON('/posts.json').then(function(json) {
         // on fulfillment
       }, function(reason) {
         // on rejection
       });
       ```
-    
+
       Unlike callbacks, promises are great composable primitives.
-    
+
       ```js
       Promise.all([
         getJSON('/posts'),
@@ -863,29 +863,29 @@
       ]).then(function(values){
         values[0] // => postsJSON
         values[1] // => commentsJSON
-    
+
         return values;
       });
       ```
-    
+
       @class Promise
       @param {Function} resolver
       Useful for tooling.
       @constructor
     */
-    
+
     var Promise$2 = function () {
       function Promise(resolver) {
         this[PROMISE_ID] = nextId();
         this._result = this._state = undefined;
         this._subscribers = [];
-    
+
         if (noop !== resolver) {
           typeof resolver !== 'function' && needsResolver();
           this instanceof Promise ? initializePromise(this, resolver) : needsNew();
         }
       }
-    
+
       /**
       The primary way of interacting with a promise is through its `then` method,
       which registers callbacks to receive either a promise's eventual value or the
@@ -1046,7 +1046,7 @@
       Useful for tooling.
       @return {Promise}
       */
-    
+
       /**
       `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
       as the catch block of a try/catch statement.
@@ -1070,18 +1070,18 @@
       Useful for tooling.
       @return {Promise}
       */
-    
-    
+
+
       Promise.prototype.catch = function _catch(onRejection) {
         return this.then(null, onRejection);
       };
-    
+
       /**
         `finally` will be invoked regardless of the promise's fate just as native
         try/catch/finally behaves
-      
+
         Synchronous example:
-      
+
         ```js
         findAuthor() {
           if (Math.random() > 0.5) {
@@ -1089,7 +1089,7 @@
           }
           return new Author();
         }
-      
+
         try {
           return findAuthor(); // succeed or fail
         } catch(error) {
@@ -1099,9 +1099,9 @@
           // doesn't affect the return value
         }
         ```
-      
+
         Asynchronous example:
-      
+
         ```js
         findAuthor().catch(function(reason){
           return findOtherAuther();
@@ -1109,17 +1109,17 @@
           // author was either found, or not
         });
         ```
-      
+
         @method finally
         @param {Function} callback
         @return {Promise}
       */
-    
-    
+
+
       Promise.prototype.finally = function _finally(callback) {
         var promise = this;
         var constructor = promise.constructor;
-    
+
         if (isFunction(callback)) {
           return promise.then(function (value) {
             return constructor.resolve(callback()).then(function () {
@@ -1131,13 +1131,13 @@
             });
           });
         }
-    
+
         return promise.then(callback, callback);
       };
-    
+
       return Promise;
     }();
-    
+
     Promise$2.prototype.then = then;
     Promise$2.all = all;
     Promise$2.race = race;
@@ -1146,11 +1146,11 @@
     Promise$2._setScheduler = setScheduler;
     Promise$2._setAsap = setAsap;
     Promise$2._asap = asap;
-    
+
     /*global self*/
     function polyfill() {
       var local = void 0;
-    
+
       if (typeof global !== 'undefined') {
         local = global;
       } else if (typeof self !== 'undefined') {
@@ -1162,9 +1162,9 @@
           throw new Error('polyfill failed because global object is unavailable in this environment');
         }
       }
-    
+
       var P = local.Promise;
-    
+
       if (P) {
         var promiseToString = null;
         try {
@@ -1172,23 +1172,23 @@
         } catch (e) {
           // silently ignored
         }
-    
+
         if (promiseToString === '[object Promise]' && !P.cast) {
           return;
         }
       }
-    
+
       local.Promise = Promise$2;
     }
-    
+
     // Strange compat..
     Promise$2.polyfill = polyfill;
     Promise$2.Promise = Promise$2;
-    
+
     Promise$2.polyfill();
-    
+
     return Promise$2;
-    
+
     })));
 }());
 
@@ -1467,10 +1467,10 @@
             var off = typeof tz == 'number' ? tz : -d.getTimezoneOffset();
             return (off < 0 ? '-' : '+') + pad(Math.floor(Math.abs(off) / 60)) + pad(Math.abs(off) % 60);
           }
-        
+
         // XXX 2018-10-20: Added by Jacques to get miliseconds
         case 'Q': return d.getMilliseconds();
-        
+
         default: return c;
       }
     });
@@ -1823,7 +1823,7 @@ function printf() {
      */
     // eslint-disable-line no-control-regex
     var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g;
-    
+
     /**
      * RegExp to match quoted-pair in RFC 7230 sec 3.2.6
      *
@@ -1847,7 +1847,7 @@ function printf() {
     var TYPE_REGEXP  = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
     var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
     var TEXT_REGEXP  = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
-    
+
     var LOCALE_REGEXP = /^[a-z]{2}((?:[_-][A-Z]{2})(?:\.[\w-]+)?)?$/;
 
     var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
@@ -1938,7 +1938,7 @@ function printf() {
             (function(global)
             {
                 'use strict';
-    
+
                 // Define the URI class
                 /*
                  * Instantiate a new URI object. All arguments are optional, and if none is provided, it defaults to window.location.href
@@ -1954,7 +1954,7 @@ function printf() {
                     {
                         throw new TypeError( "Class constructors must be invoked with 'new'" );
                     }
-    
+
                     // Create a URL object
                     var tempURL;
                     if( !relativePath && !base )
@@ -1968,10 +1968,10 @@ function printf() {
                         base = base || window.location.href;
                         tempURL = new URL(relativePath, base);
                     }
-    
+
                     // Store the URL instance for internal reference
                     this._url = tempURL;
-    
+
                     // Define property accessors for URL properties
                     var properties = ['href', 'protocol', 'host', 'hostname', 'port', 'pathname', 'search', 'hash', 'password', 'username'];
                     properties.forEach(function(prop)
@@ -2017,19 +2017,19 @@ function printf() {
                         configurable: true
                     });
                 }
-    
+
                 // Inherit from URL.prototype
                 URI.prototype = Object.create(URL.prototype);
-    
+
                 // Fix the constructor reference
                 URI.prototype.constructor = URI;
-    
+
                 // Override the `toString` method to delegate to the URL instance
                 URI.prototype.toString = function()
                 {
                     return this._url.toString();
                 };
-    
+
                 // Static methods
                 URI.canParse = function(url, base)
                 {
@@ -2043,29 +2043,29 @@ function printf() {
                         return false;
                     }
                 };
-    
+
                 // Note: createObjectURL and revokeObjectURL are methods of URL but relate to Blobs, not URL manipulation
                 URI.createObjectURL = function(blob)
                 {
                     return URL.createObjectURL(blob);
                 };
-    
+
                 URI.revokeObjectURL = function(objectURL)
                 {
                     URL.revokeObjectURL(objectURL);
                 };
-    
+
                 URI.parse = function(url, base)
                 {
                     return new URL(url, base);
                 };
-    
+
                 // Instance method
                 URI.prototype.toJSON = function()
                 {
                     return this._url.toJSON();
                 };
-    
+
                 // Credits: Grok (xAI)
                 /*
                  * This takes an array of segments that will be added to the current object pathname.
@@ -2076,23 +2076,23 @@ function printf() {
                 URI.prototype.appendToPath = function()
                 {
                     var segments = Array.prototype.slice.call(arguments, 0);
-    
+
                     // Split path into segments, handling multiple slashes
                     var path = this._url.pathname.split( /\/{1,}/ );
-    
+
                     // Append new segments
                     for( var i = 0; i < segments.length; i++ )
                     {
                         path.push(segments[i]);
                     }
-    
+
                     // Reconstruct the path
                     this._url.pathname = path.join('/');
-    
+
                     // Return this for method chaining
                     return this;
                 };
-    
+
                 // Expose the URI class globally
                 global.URI = URI;
             })(this);
@@ -2109,7 +2109,7 @@ function printf() {
     window.POGenericClass = POBaseClass.extend(
     {
         __class__: "POGenericClass",
-        
+
         init: function( opts )
         {
             var self = this;
@@ -2145,7 +2145,7 @@ function printf() {
             {
                 self[key] = tmpParams[key];
             });
-            
+
             // For local storage and setSitePrefs() and getSitePrefs()
             self.ai_data = 'ai_data';
             // To contain cached data loaded from /public/l10n.json
@@ -2213,6 +2213,14 @@ function printf() {
             var logType = "log";
             // Credits: https://stackoverflow.com/a/19790505/4814971
             var toPrint = [];
+            var logTypes = {
+                debug: console.debug,
+                error: console.error,
+                info: console.info,
+                log: console.log,
+                trace: console.trace,
+                warn: console.warn
+            };
             for( var i = 0; i < arguments.length; ++i ) 
             {
                 toPrint.push( arguments[i] );
@@ -2228,6 +2236,11 @@ function printf() {
             if( !self.debug_level && logType !== 'error' )
             {
                 return(false);
+            }
+            var logFunction = console.log;
+            if( typeof( logType ) === 'string' && logTypes.hasOwnProperty( logType ) )
+            {
+                logFunction = logTypes[ logType ];
             }
             var callerFuncName = '';
             if( arguments.callee.caller !== null )
@@ -2318,7 +2331,7 @@ function printf() {
                     isSprintf = true;
                 }
             }
-            
+
             // offset 0 is our own function ui.log, so we check for our caller at offset 1
             var j = 1;
             var ref = stackTrace[j];
@@ -2349,11 +2362,6 @@ function printf() {
                 // break;
             }
             toPrint.unshift( strftime( '%Y-%m-%d %H:%M:%S.%Q ', (new Date()).getTime() ) );
-            var logFunction = console.log;
-            if( typeof( logType ) === 'string' )
-            {
-                logFunction = eval( "console." + logType );
-            }
             logFunction.apply( null, toPrint );
         },
 
@@ -2452,7 +2460,7 @@ function printf() {
             return func.apply(this._value, arguments);
         };
     });
-    
+
     GettextString.prototype.setLocale = function(locale)
     {
         this.locale = locale;
@@ -2462,7 +2470,7 @@ function printf() {
     {
         return(this.locale);
     };
-    
+
     GettextString.prototype.setLang = function(locale)
     {
         this.locale = locale;
@@ -2689,7 +2697,7 @@ function printf() {
             {
                 opts.locale = self.locale;
             }
-            
+
             self.debug( "Fetching data has for domain \"" + domain + "\". and for locale \"" + opts.locale + "\", and for msgid '" + msgid + "'" );
             var data = self.getDomainHash({ domain: domain });
             var plural = self.plural;
@@ -2905,7 +2913,7 @@ function printf() {
             }
             var args = Array.from(arguments);
             args.splice(0,3);
-            
+
             var hash = self.getDomainHash();
             var spans = [];
             // Browsing through each available locale language
@@ -2996,9 +3004,17 @@ function printf() {
                         if( this.status == 0 || ( this.status >= 200 && this.status < 400 ) )
                         {
                             self.debug( "HTTP response code is: '" + this.status + "'." );
-                            // resolve(xhr.response);
-                            data = eval( '(' + xhr.responseText  + ')');
-                            resolve(data);
+                            var data;
+                            try
+                            {
+                                data = JSON.parse( xhr.responseText );
+                            }
+                            catch( parseErr )
+                            {
+                                reject( new Error( "Unable to parse JSON response from uri \"" + opts.url + "\": " + parseErr.message ) );
+                                return;
+                            }
+                            resolve( data );
                         }
                         else
                         {
@@ -3207,7 +3223,7 @@ function printf() {
                 throw new Error( "Locale provided (" + lang + ") is in an unsupported format." );
             }
             lang = lang.replace( '-', '_' );
-            
+
             if( !self.isSupportedLanguage( lang ) )
             {
                 throw new Error( "Language provided (" + lang + "), to get its dictionary, is unsupported." );
@@ -3476,7 +3492,7 @@ function printf() {
             {
                 return( this.plural );
             }
-            
+
             var meta = self.getMetaData();
             self.debug( "Meta data hash found for domain \"" + self.domain + "\" and locale \"" + self.locale + "\" is: " + JSON.stringify( meta ) );
             if( meta.hasOwnProperty( 'Plural-Forms' ) )
@@ -3590,7 +3606,7 @@ function printf() {
             {
                 return( new XMLHttpRequest() );
             }
-            
+
             // Not sure it is worth it to keep supporting IE
             if( window.ActiveXObject )
             {
@@ -3617,7 +3633,7 @@ function printf() {
          */
         isSupportedLanguage: function( lang )
         {
-            if( this.supported_languages.indexOf( lang ) )
+            if( this.supported_languages.indexOf( lang ) !== -1 )
             {
                 return( true );
             }
@@ -3669,16 +3685,16 @@ function printf() {
         {
             var self = this;
             opts = opts || {};
-        
+
             opts.path     = ( opts.path || this.path );
             opts.locale   = ( opts.locale || this.locale );
             opts.domain   = ( opts.domain || this.domain );
             opts.category = ( opts.category || this.category );
             opts.locale   = opts.locale.replace('-','_');
-        
+
             // var dataUri = opts.path + "/" + opts.locale + "/" + opts.domain + ".json";
             var dataUri = opts.path + "/" + opts.locale + "/" + ( ( typeof( opts.category ) === 'string' && opts.category.length > 0 ) ? opts.category + "/" : "" ) + opts.domain + ".json";
-        
+
             return self.getData({ url: dataUri, method: "GET" }).then(function(data)
             {
                 self.debug( "Data retrieved is: " + JSON.stringify( data, null, 4 ) );
@@ -4033,26 +4049,26 @@ function printf() {
         {
             var self = this;
             self.debug( "Fetching domain data for \"" + domain + "\"." );
-        
+
             if( typeof( domain ) !== 'string' )
             {
                 self.warn( "The domain provided \"" + domain + "\" is of type " + typeof( domain ) + " while I was expecting a string." );
                 return Promise.reject( new Error( "Invalid domain type" ) );
             }
-        
+
             if( domain.trim() === '' )
             {
                 self.warn( "The domain value you provided is actually empty." );
                 return Promise.reject( new Error( "Empty domain provided" ) );
             }
-        
+
             self.domain = domain;
             var hash = window.Gettext.L10N;
             if( !hash.hasOwnProperty( self.domain ) )
             {
                 hash[self.domain] = {};
             }
-        
+
             if( !hash[ self.domain ].hasOwnProperty( self.locale ) || 
                 !Object.keys( hash[ self.domain ][ self.locale ] ).length == 0 )
             {
@@ -4074,15 +4090,22 @@ function printf() {
             }
         },
 
-        _getSeparator: function(locale, separatorType)
+        _getSeparator: function( locale, separatorType )
         {
-            var self = this;
-            const numberWithGroupAndDecimalSeparator = 1000.1;
-            return Intl.NumberFormat(locale)
-                .formatToParts(numberWithGroupAndDecimalSeparator)
-                .find(part => part.type === separatorType)
-                .value;
-        }        
+            var numberWithGroupAndDecimalSeparator = 1000.1;
+            var parts = Intl.NumberFormat( locale ).formatToParts( numberWithGroupAndDecimalSeparator );
+            var i;
+
+            for( i = 0; i < parts.length; i++ )
+            {
+                if( parts[i] && parts[i].type === separatorType )
+                {
+                    return parts[i].value;
+                }
+            }
+
+            return '';
+        }
     });
     window.Gettext.L10N = {};
     window.Gettext.ERROR = '';
@@ -4590,7 +4613,7 @@ Or:
 
 =head1 VERSION
 
-    v0.4.0
+    v1.0.3
 
 =head1 DESCRIPTION
 
@@ -5020,7 +5043,7 @@ This basically look at the current dictionaries loaded so far for various langua
 Returns a string containing the value of the header C<Language>.
 
     p.language();
-    
+
 =head2 languageTeam
 
 Returns a string containing the value of the header C<Language-Team>.

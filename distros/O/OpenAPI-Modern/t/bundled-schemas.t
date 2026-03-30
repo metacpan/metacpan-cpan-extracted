@@ -37,7 +37,7 @@ subtest 'OAS metaschemas sanity check for version '.$_ => sub {
       metaschema_uri => $metaschema_uri,
       evaluator => $evaluator,
     );
-    cmp_result(
+    is_equal(
       $result->TO_JSON,
       { valid => true },
       $metaschema_uri.' can be used to validate a simple OAD',
@@ -76,7 +76,7 @@ subtest 'customized 3.1 strict schema and dialect when version is omitted' => su
     },
   );
 
-  cmp_result([ map $_->TO_JSON, $doc->errors ], [], 'no document errors');
+  is_equal([ map $_->TO_JSON, $doc->errors ], [], 'no document errors');
   is($doc->metaschema_uri, STRICT_METASCHEMA->{3.1}, '3.1-identified strict metaschema is swapped in');
 };
 
@@ -85,7 +85,7 @@ subtest '3.0.x schema is also available' => sub {
   my $id = DEFAULT_METASCHEMA->{'3.0'};
   my $doc = load_cached_document($evaluator, $id);
 
-  cmp_result(
+  is_equal(
     $evaluator->evaluate(
       {
         openapi => 'not an openapi version',

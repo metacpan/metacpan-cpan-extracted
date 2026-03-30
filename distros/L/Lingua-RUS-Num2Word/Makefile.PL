@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in RUS.",
+  "ABSTRACT" => "Converts numbers to money sum in words (in Russian roubles)",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,20 +17,30 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::RUS::Num2Word",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Export::Attrs" => 0,
     "utf8" => 0,
     "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.2603270",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "Test::More::UTF8" => 0,
+    "strict" => 0
+  },
+  "VERSION" => "0.2603300",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Export::Attrs" => 0,
+  "Test::More" => 0,
+  "Test::More::UTF8" => 0,
+  "strict" => 0,
   "utf8" => 0,
   "vars" => 0,
   "warnings" => 0

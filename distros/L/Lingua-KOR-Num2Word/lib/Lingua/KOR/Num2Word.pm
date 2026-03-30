@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -84,12 +84,52 @@ sub num2kor_cardinal :Export {
 # }}}
 
 
+# {{{ num2kor_ordinal                 convert number to ordinal text
+
+sub num2kor_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999_999;
+
+    # Korean ordinals use native Korean numbers + 번째 (beonjjae).
+    # 1st is the special form 첫 번째 (cheot beonjjae).
+    # Native Korean numbers exist for 1-99; beyond that, use
+    # Sino-Korean cardinal + 번째.
+
+    return '첫 번째' if $number == 1;
+
+    # Native Korean ones (adnominal/counter forms used before 번째)
+    # Index maps to digit value: 0=unused, 1=한, 2=두, ...
+    my @native_ones = ('', '한', '두', '세', '네', '다섯', '여섯', '일곱', '여덟', '아홉');
+    my @native_tens = ('열', '스물', '서른', '마흔', '쉰', '예순', '일흔', '여든', '아흔');
+
+    if ($number >= 2 && $number <= 99) {
+        my $tens = int($number / 10);
+        my $ones = $number % 10;
+
+        my $out = '';
+        $out .= $native_tens[$tens - 1] if $tens > 0;
+        $out .= $native_ones[$ones]     if $ones > 0;
+        $out .= ' 번째';
+        return $out;
+    }
+
+    # For 100+, fall back to Sino-Korean cardinal + 번째
+    return num2kor_cardinal($number) . ' 번째';
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -111,7 +151,7 @@ Lingua::KOR::Num2Word - Number to word conversion in Korean
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::KOR::Num2Word is module for converting numbers into their written
 representation in Korean (Sino-Korean system). Converts whole numbers
@@ -135,6 +175,9 @@ Text output is encoded in UTF-8 using Korean characters.
 
  print $text || "sorry, can't convert this number into korean language.";
 
+ my $ord = Lingua::KOR::Num2Word::num2kor_ordinal( 3 );
+ print $ord;    # "세 번째"
+
 =cut
 
 # }}}
@@ -155,6 +198,23 @@ Text output is encoded in UTF-8 using Korean characters.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999_999] will be converted.
 
+=item B<num2kor_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to ordinal text using native Korean numbers + 번째.
+For 1, returns the special form 첫 번째. For 2-99, uses native Korean
+numerals. For 100+, falls back to Sino-Korean cardinal + 번째.
+Only numbers from interval [1, 999_999_999_999] will be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -169,6 +229,8 @@ Only numbers from interval [0, 999_999_999_999] will be converted.
 =over 2
 
 =item num2kor_cardinal
+
+=item num2kor_ordinal
 
 =back
 

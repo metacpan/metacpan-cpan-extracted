@@ -116,9 +116,9 @@ myscript - a useful script
 	myscript [options] <input>
 
 	Options:
-	-v, --verbose    Enable verbose output
-	-o, --output     Output file
-	-h, --help       Show help
+	    -v, --verbose    Enable verbose output
+	    -o, --output     Output file
+	    -h, --help       Show help
 
 =head1 DESCRIPTION
 
@@ -272,7 +272,7 @@ END
 Create an object:
 
 	my $obj = Foo->new(
-	name => 'test',
+	    name => 'test',
 	);
 
 Then call methods:
@@ -283,8 +283,8 @@ Then call methods:
 Or chain them:
 
 	Foo->new(name => 'test')
-	->run
-	->finish;
+	    ->run
+	    ->finish;
 
 =cut
 END
@@ -335,8 +335,8 @@ HELP
 The help output looks like:
 
 	Usage: tool [options]
-	--verbose    be verbose
-	--quiet      be quiet
+	  --verbose    be verbose
+	  --quiet      be quiet
 
 =cut
 

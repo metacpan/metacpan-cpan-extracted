@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic );
     use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
     use HTML::Object::XPath::Boolean;

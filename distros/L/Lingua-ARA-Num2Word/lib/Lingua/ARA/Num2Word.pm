@@ -16,7 +16,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -253,7 +253,7 @@ Lingua::ARA::Num2Word - Number to word conversion in Arabic
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::ARA::Num2Word is module for converting numbers into their written
 representation in Modern Standard Arabic (masculine counting forms).
@@ -299,6 +299,13 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =item B<_convert> (positional)
 
   Internal recursive conversion engine. Not exported.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

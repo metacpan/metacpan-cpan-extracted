@@ -271,7 +271,6 @@ sub structure
     # SQLite: cid, name, type, notnull, dflt_value, pk
     while( $ref = $sth->fetchrow_hashref() )
     {
-        $self->messagec( 6, "Checking table ${table} field {green}", $ref->{name}, "{/} with type {green}", $ref->{type}, "{/} -> ", sub{ $self->Module::Generic::dump( $ref ) } );
         my $def =
         {
             name            => $ref->{name},
@@ -313,7 +312,6 @@ sub structure
             @$dict{ @$const_keys } = @$const_def{ @$const_keys };
             $def->{datatype} = $dict;
         }
-        $self->messagec( 6, "\tField {green}", $def->{name}, "{/} has type {green}", $def->{type}, "{/}, not null is {green}", $ref->{notnull}, "{/} and dictionary -> ", sub{ $self->Module::Generic::dump( $def ) } );
         $def->{query_object} = $q;
         $def->{table_object} = $self;
         my @define = ( $def->{type} );

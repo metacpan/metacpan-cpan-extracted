@@ -1957,11 +1957,40 @@ subtest 'abuse_contacts -- URL host domain WHOIS fallback when IP unresolvable' 
 	restore_net();
 };
 
-subtest 'abuse_contacts -- role deduplication: repeated label collapsed to (xN)' => sub {
-	# When the same role string ("URL host") accumulates multiple times for one
-	# address (e.g. four badshamart.com subdomains all resolving to the same
-	# registrar), the role display string should be "URL host (x4)" not
-	# "URL host and URL host and URL host and URL host".
+subtest 'abuse_contacts -- role deduplication: same hostname twice collapsed' => sub {
+	# Role strings now include the hostname ("URL host: host.example"), so
+	# two URLs on the SAME host produce identical role strings and collapse
+	# to (x2).  Two URLs on DIFFERENT hosts produce distinct role strings
+	# and are joined with "and" -- they should NOT be collapsed since each
+	# hostname is individually actionable.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		# Same Blogspot subdomain linked twice -- same role string twice
+		body =>   'https://spamblog.blogspot.com/page1 '
+		        . 'https://spamblog.blogspot.com/page2 ',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+		my @contacts = $a->abuse_contacts();
+		my ($c) = grep { $_->{address} eq 'abuse@google.com' } @contacts;
+		ok defined $c, 'google abuse contact found for blogspot URLs';
+		# Same host deduped by _extract_and_resolve_urls -- only one URL host role
+		is scalar(grep { /URL host/ } @{ $c->{roles} }), 1,
+			'same hostname only produces one URL host role entry';
+	}
+	restore_net();
+};
+
+subtest 'abuse_contacts -- role deduplication: different subdomains each get own role' => sub {
+	# Four different subdomains resolving to the same registrar abuse address
+	# produce four distinct role strings (one per hostname), joined with "and".
+	# They must NOT be collapsed to (xN) since each hostname is distinct and
+	# individually actionable information for the abuse desk.
 	null_net();
 	my $a = new_ok('Email::Abuse::Investigator');
 	$a->parse_email(make_email(
@@ -1988,10 +2017,12 @@ subtest 'abuse_contacts -- role deduplication: repeated label collapsed to (xN)'
 		ok defined $c, 'merged contact found';
 		is scalar(@{ $c->{roles} }), 4,
 			'roles arrayref has four entries (one per URL host)';
-		like $c->{role}, qr/\(x4\)/,
-			'role display string contains (x4) count suffix';
-		unlike $c->{role}, qr/URL host.*and.*URL host/,
-			'role display string does not repeat label verbatim';
+		unlike $c->{role}, qr/\(x4\)/,
+			'distinct hostnames not collapsed with (xN)';
+		like $c->{role}, qr/a1\.spamdomain\.example/,
+			'first hostname present in role string';
+		like $c->{role}, qr/a4\.spamdomain\.example/,
+			'last hostname present in role string';
 	}
 	restore_net();
 };
@@ -2029,5 +2060,530 @@ subtest 'abuse_contacts -- role deduplication: distinct labels not collapsed' =>
 	restore_net();
 };
 
-done_testing();
 
+# =============================================================================
+# 38. Regression: nested multipart/* recursion (0.04 fix)
+#     Before the fix, multipart/mixed containing multipart/alternative had its
+#     inner body silently discarded, so embedded_urls() found no URLs.
+# =============================================================================
+
+subtest 'nested MIME: multipart/mixed > multipart/alternative -- URLs extracted' => sub {
+	# Build a multipart/mixed message whose only text part is wrapped inside
+	# a nested multipart/alternative.  This is the exact structure that was
+	# broken before the 0.04 fix.
+	null_net();
+	my $inner_boundary = 'inner_boundary_001';
+	my $outer_boundary = 'outer_boundary_001';
+
+	my $inner = join("\r\n",
+		"--$inner_boundary",
+		'Content-Type: text/plain; charset=us-ascii',
+		'',
+		'Plain text part with no URL.',
+		"--$inner_boundary",
+		'Content-Type: text/html; charset=us-ascii',
+		'',
+		'<html><body><a href="https://spamlink.badshamart.example/go">click</a></body></html>',
+		"--${inner_boundary}--",
+		'',
+	);
+
+	my $outer_body = join("\r\n",
+		"--$outer_boundary",
+		"Content-Type: multipart/alternative; boundary=\"$inner_boundary\"",
+		'',
+		$inner,
+		"--${outer_boundary}--",
+		'',
+	);
+
+	my $raw = join("\r\n",
+		'Received: from ext (ext [198.51.100.1]) by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Nested MIME test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <nested@test>',
+		"Content-Type: multipart/mixed; boundary=\"$outer_boundary\"",
+		'',
+		$outer_body,
+	);
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email($raw);
+
+	my @urls  = $a->embedded_urls();
+	my @hosts = map { $_->{host} } @urls;
+
+	ok scalar(@urls) > 0,
+		'embedded_urls() finds URLs in nested multipart/mixed > multipart/alternative';
+	ok scalar(grep { /badshamart\.example/ } @hosts),
+		'correct hostname extracted from nested HTML part';
+	restore_net();
+};
+
+subtest 'nested MIME: three levels deep -- URLs still extracted' => sub {
+	# Ensure recursion handles arbitrary nesting depth, not just two levels.
+	null_net();
+	my $b1 = 'boundary_level1';
+	my $b2 = 'boundary_level2';
+	my $b3 = 'boundary_level3';
+
+	my $level3 = join("\r\n",
+		"--$b3",
+		'Content-Type: text/html; charset=us-ascii',
+		'',
+		'<a href="https://deep.nested.example/path">deep link</a>',
+		"--${b3}--",
+		'',
+	);
+	my $level2 = join("\r\n",
+		"--$b2",
+		"Content-Type: multipart/alternative; boundary=\"$b3\"",
+		'',
+		$level3,
+		"--${b2}--",
+		'',
+	);
+	my $level1 = join("\r\n",
+		"--$b1",
+		"Content-Type: multipart/related; boundary=\"$b2\"",
+		'',
+		$level2,
+		"--${b1}--",
+		'',
+	);
+
+	my $raw = join("\r\n",
+		'Received: from ext (ext [198.51.100.1]) by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Deep nesting test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <deep@test>',
+		"Content-Type: multipart/mixed; boundary=\"$b1\"",
+		'',
+		$level1,
+	);
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email($raw);
+
+	my @urls = $a->embedded_urls();
+	ok scalar(@urls) > 0,
+		'embedded_urls() finds URLs three MIME levels deep';
+	ok scalar(grep { $_->{host} eq 'deep.nested.example' } @urls),
+		'correct hostname extracted from three-level nested part';
+	restore_net();
+};
+
+subtest 'nested MIME: non-multipart sibling parts still decoded' => sub {
+	# A multipart/mixed with one attachment part and one multipart/alternative
+	# part -- the attachment must be skipped cleanly and the alternative decoded.
+	null_net();
+	my $outer = 'outer_sib_001';
+	my $inner = 'inner_sib_001';
+
+	my $body = join("\r\n",
+		"--$outer",
+		'Content-Type: application/octet-stream',
+		'Content-Disposition: attachment; filename="file.bin"',
+		'',
+		'binarydata',
+		"--$outer",
+		"Content-Type: multipart/alternative; boundary=\"$inner\"",
+		'',
+		"--$inner",
+		'Content-Type: text/plain',
+		'',
+		'Plain sibling text.',
+		"--$inner",
+		'Content-Type: text/html',
+		'',
+		'<a href="https://sibling.example/link">click</a>',
+		"--${inner}--",
+		'',
+		"--${outer}--",
+		'',
+	);
+
+	my $raw = join("\r\n",
+		'Received: from ext (ext [198.51.100.1]) by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Sibling parts test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <sib@test>',
+		"Content-Type: multipart/mixed; boundary=\"$outer\"",
+		'',
+		$body,
+	);
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email($raw);
+
+	my @urls = $a->embedded_urls();
+	ok scalar(grep { $_->{host} eq 'sibling.example' } @urls),
+		'URL in multipart/alternative sibling of attachment part is found';
+	restore_net();
+};
+
+# =============================================================================
+# 39. Regression: abuse_contacts() role merging (0.04 fix)
+#     Before the fix, duplicate addresses from multiple discovery routes
+#     were silently dropped; now they accumulate into roles/role.
+# =============================================================================
+
+subtest 'abuse_contacts role merging -- roles arrayref accumulates all routes' => sub {
+	# Arrange a message where the same provider (Google) is found via two
+	# distinct routes: as the sending ISP (rDNS match) and as a URL host.
+	# Both roles must appear in the merged entry.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		received    => 'from mail-wm1-f67.google.com (mail-wm1-f67.google.com'
+		             . ' [209.85.128.67]) by mx.nigelhorne.com with ESMTP',
+		from        => 'Spammer <spam@spammer.example>',
+		return_path => '<bounce@spammer.example>',
+		to          => '<victim@nigelhorne.com>',
+		body        => 'Visit https://evilblog.blogspot.com/scam for details',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host =
+			sub { '209.85.128.67' };
+		local *Email::Abuse::Investigator::_reverse_dns  =
+			sub { 'mail-wm1-f67.google.com' };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+
+		my @contacts = $a->abuse_contacts();
+		my ($google)  = grep { $_->{address} eq 'abuse@google.com' } @contacts;
+
+		ok defined $google,
+			'abuse@google.com contact present';
+		ok defined $google->{roles},
+			'roles arrayref present on merged entry';
+		cmp_ok scalar(@{ $google->{roles} }), '>=', 2,
+			'at least two roles accumulated for abuse@google.com';
+		like $google->{role}, qr/and|x\d/,
+			'role string reflects multiple routes (joined or counted)';
+	}
+	restore_net();
+};
+
+subtest 'abuse_contacts role merging -- role (singular) stays in sync' => sub {
+	# The legacy role key must always equal join(" and ", @{roles}) or the
+	# deduplicated (xN) form -- never be stale from the first discovery.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		received    => 'from mail-wm1-f67.google.com (mail-wm1-f67.google.com'
+		             . ' [209.85.128.67]) by mx.nigelhorne.com with ESMTP',
+		from        => 'Spammer <spam@spammer.example>',
+		return_path => '<bounce@spammer.example>',
+		to          => '<victim@nigelhorne.com>',
+		body        => 'Visit https://evilblog.blogspot.com/scam for details',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host =
+			sub { '209.85.128.67' };
+		local *Email::Abuse::Investigator::_reverse_dns  =
+			sub { 'mail-wm1-f67.google.com' };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+
+		my @contacts = $a->abuse_contacts();
+		my ($google)  = grep { $_->{address} eq 'abuse@google.com' } @contacts;
+		ok defined $google, 'abuse@google.com found';
+
+		# role must be consistent with roles arrayref
+		my %counts;
+		$counts{$_}++ for @{ $google->{roles} };
+		my $expected = join(' and ', map {
+			$counts{$_} > 1 ? "$_ (x$counts{$_})" : $_
+		} do { my %seen; grep { !$seen{$_}++ } @{ $google->{roles} } });
+		is $google->{role}, $expected,
+			'role (singular) is consistent with roles arrayref';
+	}
+	restore_net();
+};
+
+subtest 'abuse_contacts role merging -- first address not dropped when duplicate found' => sub {
+	# The very first discovery route must not be lost when a second route
+	# finds the same address.  Before the 0.04 fix the second $add() call
+	# returned early without updating anything, so the first role was kept
+	# but no merging occurred.  Now both roles must be present.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	# Two URLs on different blogspot subdomains -- both resolve to
+	# abuse@google.com via the provider table.
+	$a->parse_email(make_email(
+		from        => 'Spammer <spam@spammer.example>',
+		return_path => '<bounce@spammer.example>',
+		to          => '<victim@nigelhorne.com>',
+		body        => 'See https://spam1.blogspot.com/a '
+		             . 'and https://spam2.blogspot.com/b',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+
+		my @contacts  = $a->abuse_contacts();
+		my @google    = grep { $_->{address} eq 'abuse@google.com' } @contacts;
+
+		is scalar(@google), 1,
+			'abuse@google.com appears exactly once (deduplicated)';
+		cmp_ok scalar(@{ $google[0]->{roles} }), '>=', 2,
+			'both URL host routes merged into single entry';
+	}
+	restore_net();
+};
+
+
+# =============================================================================
+# 40. Regression: form_contacts() and web-form provider table entries (0.06)
+# =============================================================================
+
+subtest 'form_contacts -- markmonitor.com in provider table with form key' => sub {
+	my $a = new_ok('Email::Abuse::Investigator');
+	my $pa = $a->_provider_abuse_for_host('markmonitor.com');
+	ok defined $pa,
+		'markmonitor.com found in provider table';
+	ok !$pa->{email},
+		'markmonitor.com has no email key (form-only)';
+	ok $pa->{form},
+		'markmonitor.com has form key';
+	like $pa->{form}, qr{markmonitor\.com},
+		'form URL references markmonitor.com';
+	ok $pa->{form_paste},
+		'markmonitor.com has form_paste hint';
+	ok $pa->{form_upload},
+		'markmonitor.com has form_upload hint';
+};
+
+subtest 'form_contacts -- globaldomaingroup.com in provider table with form key' => sub {
+	my $a = new_ok('Email::Abuse::Investigator');
+	my $pa = $a->_provider_abuse_for_host('globaldomaingroup.com');
+	ok defined $pa,
+		'globaldomaingroup.com found in provider table';
+	ok !$pa->{email},
+		'globaldomaingroup.com has no email key (form-only)';
+	ok $pa->{form},
+		'globaldomaingroup.com has form key';
+	like $pa->{form}, qr{globaldomaingroup\.com},
+		'form URL references globaldomaingroup.com';
+};
+
+subtest 'form_contacts -- markmonitor.com not returned by abuse_contacts()' => sub {
+	# form-only entries must never appear in abuse_contacts() since they
+	# have no email address -- the $add guard filters them out.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now at https://spamsite.example/offer',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_analyse_domain = sub {
+			my ($self, $dom) = @_;
+			return $self->{_domain_info}{$dom}
+				if $self->{_domain_info}{$dom};
+			my %info = (
+				registrar       => 'MarkMonitor Inc.',
+				registrar_abuse => 'abusecomplaints@markmonitor.com',
+			);
+			$self->{_domain_info}{$dom} = \%info;
+			return \%info;
+		};
+
+		my @contacts = $a->abuse_contacts();
+		my @mm = grep { ($_->{address} // '') =~ /markmonitor/i } @contacts;
+		is scalar(@mm), 0,
+			'markmonitor.com does not appear in abuse_contacts() (no email)';
+	}
+	restore_net();
+};
+
+subtest 'form_contacts -- registrar with form key appears in form_contacts()' => sub {
+	# When WHOIS identifies markmonitor.com as the registrar, form_contacts()
+	# must return it with the correct form URL and hints.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now at https://spamsite.example/offer',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_analyse_domain = sub {
+			my ($self, $dom) = @_;
+			return $self->{_domain_info}{$dom}
+				if $self->{_domain_info}{$dom};
+			my %info = (
+				registrar       => 'MarkMonitor Inc.',
+				registrar_abuse => 'abusecomplaints@markmonitor.com',
+			);
+			$self->{_domain_info}{$dom} = \%info;
+			return \%info;
+		};
+
+		my @fcs = $a->form_contacts();
+		my ($mm) = grep { $_->{form} =~ /markmonitor/i } @fcs;
+
+		ok defined $mm,
+			'markmonitor.com form contact present in form_contacts()';
+		like $mm->{role}, qr/registrar/i,
+			'role identifies this as a registrar contact';
+		like $mm->{form}, qr{markmonitor\.com},
+			'form URL is the MarkMonitor abuse form';
+		ok $mm->{form_paste},
+			'form_paste hint present';
+		ok $mm->{form_upload},
+			'form_upload hint present';
+		is $mm->{via}, 'provider-table',
+			'via is provider-table';
+	}
+	restore_net();
+};
+
+subtest 'form_contacts -- registrar_abuse domain drives lookup (self-extending)' => sub {
+	# The lookup must be driven by the domain in registrar_abuse, not a
+	# hardcoded list.  Use globaldomaingroup.com to verify the mechanism
+	# works for a second provider independently.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://scamdomain.example/go',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_analyse_domain = sub {
+			my ($self, $dom) = @_;
+			return $self->{_domain_info}{$dom}
+				if $self->{_domain_info}{$dom};
+			my %info = (
+				registrar       => 'Global Domain Group',
+				registrar_abuse => 'abuse@globaldomaingroup.com',
+			);
+			$self->{_domain_info}{$dom} = \%info;
+			return \%info;
+		};
+
+		my @fcs = $a->form_contacts();
+		my ($gdg) = grep { $_->{form} =~ /globaldomaingroup/i } @fcs;
+
+		ok defined $gdg,
+			'globaldomaingroup.com form contact found via registrar_abuse domain';
+		like $gdg->{form}, qr{globaldomaingroup\.com},
+			'correct form URL for Global Domain Group';
+	}
+	restore_net();
+};
+
+subtest 'form_contacts -- form URL deduplicated across multiple domains' => sub {
+	# If two contact domains both have MarkMonitor as registrar, form_contacts()
+	# must return only one entry for the MarkMonitor form, not two.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from        => 'Spammer <spam@domain1.example>',
+		return_path => '<bounce@domain2.example>',
+		to          => '<victim@nigelhorne.com>',
+		body        => 'Test body',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_analyse_domain = sub {
+			my ($self, $dom) = @_;
+			return $self->{_domain_info}{$dom}
+				if $self->{_domain_info}{$dom};
+			# Both domains share the same registrar
+			my %info = (
+				registrar       => 'MarkMonitor Inc.',
+				registrar_abuse => 'abusecomplaints@markmonitor.com',
+			);
+			$self->{_domain_info}{$dom} = \%info;
+			return \%info;
+		};
+
+		my @fcs  = $a->form_contacts();
+		my @mm   = grep { $_->{form} =~ /markmonitor/i } @fcs;
+		is scalar(@mm), 1,
+			'MarkMonitor form URL appears only once despite two domains sharing it';
+	}
+	restore_net();
+};
+
+subtest 'form_contacts -- report() includes web-form section when form contacts exist' => sub {
+	# Mock _domain_whois to return MarkMonitor registrar data for any domain.
+	# This is more robust than mocking _analyse_domain because it does not
+	# rely on local() scoping of typeglobs inside nested anonymous subs,
+	# which interacts poorly with make test's test harness.
+	# All network stubs are set before parse_email() so that no cached
+	# state is built up with the wrong stubs active.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub {
+		return "Registrar: MarkMonitor Inc.\n"
+		     . "Registrar Abuse Contact Email: abusecomplaints\@markmonitor.com\n";
+	};
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now at https://spamsite.example/offer',
+	));
+
+	my $report = $a->report();
+	like $report, qr/WHERE TO FILE WEB-FORM REPORTS/,
+		'report() contains web-form section heading';
+	like $report, qr/markmonitor\.com/i,
+		'report() web-form section mentions markmonitor.com';
+	like $report, qr/Form URL\s*:/,
+		'report() web-form section contains Form URL line';
+	like $report, qr/Paste\s*:/,
+		'report() web-form section contains Paste line';
+	like $report, qr/Upload\s*:/,
+		'report() web-form section contains Upload line';
+};
+
+subtest 'form_contacts -- report() omits web-form section when no form contacts' => sub {
+	# When no form-only providers are involved the section must be absent
+	# entirely -- no placeholder text.
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://evilblog.wordpress.com/offer',
+	));
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+		local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+
+		my $report = $a->report();
+		unlike $report, qr/WHERE TO FILE WEB-FORM REPORTS/,
+			'report() has no web-form section when no form contacts present';
+	}
+	restore_net();
+};
+
+done_testing();

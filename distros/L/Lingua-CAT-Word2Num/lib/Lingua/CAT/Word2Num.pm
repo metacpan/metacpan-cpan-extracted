@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = cat_numerals();
 
 # }}}
@@ -114,6 +114,65 @@ sub cat_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Catalan ordinals 1-10 are fully irregular
+    # Masculine (-è / special) and feminine (-a) forms
+    state $irregular = {
+        'primer'   => 'un',      'primera'  => 'un',
+        'segon'    => 'dos',     'segona'   => 'dos',
+        'tercer'   => 'tres',    'tercera'  => 'tres',
+        'quart'    => 'quatre',  'quarta'   => 'quatre',
+        'cinquè'   => 'cinc',    'cinquena' => 'cinc',
+        'sisè'     => 'sis',     'sisena'   => 'sis',
+        'setè'     => 'set',     'setena'   => 'set',
+        'vuitè'    => 'vuit',    'vuitena'  => 'vuit',
+        'novè'     => 'nou',     'novena'   => 'nou',
+        'desè'     => 'deu',     'desena'   => 'deu',
+    };
+
+    return $irregular->{$input} if exists $irregular->{$input};
+
+    # Regular (11+): cardinal stem + "è" (masc) or "ena" (fem)
+    # Try feminine first (longer suffix)
+    if ($input =~ s{ena\z}{}xms) {
+        _cat_restore_vowel(\$input);
+        return $input;
+    }
+
+    # Masculine: strip "è"
+    $input =~ s{è\z}{}xms or return;
+
+    _cat_restore_vowel(\$input);
+
+    return $input;
+}
+
+# }}}
+# {{{ _cat_restore_vowel                          restore dropped vowel on stem
+
+sub _cat_restore_vowel {
+    my $ref = shift;
+
+    # Catalan drops the final vowel before ordinal suffixes.  The dropped
+    # vowel varies by word, so we restore it based on the stem ending.
+
+    # nou family: dino→dinou, vint-i-no→vint-i-nou (stem ends in "o" vowel → need "u")
+    if    ($$ref =~ m{no\z}xms)                  { $$ref .= 'u' }
+    # quatre: vint-i-quatr→vint-i-quatre
+    elsif ($$ref =~ m{tr\z}xms)                  { $$ref .= 'e' }
+    # decades (trenta, quaranta, etc.): trent→trenta, quarant→quaranta
+    elsif ($$ref =~ m{[ae]nt\z}xms)              { $$ref .= 'a' }
+    # teens ending in -z: onz→onze, dotz→dotze, tretz→tretze, etc.
+    elsif ($$ref =~ m{z\z}xms)                   { $$ref .= 'e' }
+
+    return;
+}
+
+# }}}
 
 1;
 
@@ -132,7 +191,7 @@ Lingua::CAT::Word2Num - Word to number conversion in Catalan
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::CAT::Word2Num is a module for converting text containing number
 representation in Catalan back into number. Converts whole numbers from 0 up
@@ -174,6 +233,14 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'primer', 'segon', 'vint-i-unè')
+  =>  str    cardinal text (e.g. 'un', 'dos', 'vint-i-un')
+      undef  if input is not recognised as an ordinal
+
+Convert Catalan ordinal text to cardinal text (morphological reversal).
+
 =item B<cat_numerals> (void)
 
   =>  obj  new parser object
@@ -194,6 +261,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

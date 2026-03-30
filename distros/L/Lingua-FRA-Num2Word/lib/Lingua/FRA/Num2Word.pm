@@ -1,6 +1,6 @@
 
 package Lingua::FRA::Num2Word;
-# ABSTRACT: This module converts a number into a French cardinal or ordinal.
+# ABSTRACT: Number to word conversion in French
 
 use 5.16.0;
 use utf8;
@@ -16,7 +16,7 @@ use vars qw(
   $SIGN_NAMES
 );
 
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 $SIGN_NAMES               = ('moins');
 $OUTPUT_DECIMAL_DELIMITER = ('virgule');
 %NUMBER_NAMES             = (
@@ -325,13 +325,15 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::FRA::Num2Word - Number to word conversion in French
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -452,6 +454,22 @@ in French, lowercased.
 
 (W) The number is too big to be converted into a string. Numbers must be
 lower than 1e75-1.
+
+
+
+=item B<num2fra_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    ordinal text representation
+      undef  if conversion fails
+
+Convert number to ordinal text representation.
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

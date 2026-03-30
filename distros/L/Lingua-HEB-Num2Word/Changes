@@ -1,5 +1,6 @@
 Revision history for Lingua-HEB-Num2Word
 
-0.2603270  2026-03-27
-    - capabilities infrastructure: introspection + ordinal stub
+0.2603300  2026-03-30
+    - POD coverage + test suite fixes for 61-language Lingua suite
+    - ordinals for 33 more languages (47/61 total)
 

@@ -1,0 +1,33 @@
+---
+abstract: 'Number to word conversion in Kazakh'
+author:
+  - 'PetaMem s.r.o. <info@petamem.com>'
+build_requires:
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Lingua-KAZ-Num2Word
+provides:
+  Lingua::KAZ::Num2Word:
+    file: lib/Lingua/KAZ/Num2Word.pm
+    version: '0.2603300'
+requires:
+  Carp: '0'
+  Export::Attrs: '0'
+  Readonly: '0'
+  perl: v5.16.0
+  utf8: '0'
+  warnings: '0'
+resources:
+  repository: https://metacpan.org/author/PETAMEM
+version: '0.2603300'
+x_generated_by_perl: v5.42.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-2.0 OR BSD-2-Clause'

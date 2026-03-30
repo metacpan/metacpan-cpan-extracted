@@ -25,6 +25,12 @@ elsif ($^O eq 'linux') {
     my $gtk_libs = `pkg-config --libs gtk+-3.0 webkit2gtk-4.0 2>/dev/null`;
     chomp($gtk_cflags);
     chomp($gtk_libs);
+    if (!$gtk_cflags || !$gtk_libs) {
+        warn "*** gtk+-3.0 and webkit2gtk-4.0 development libraries are required on Linux.\n";
+        warn "*** Install them with: sudo apt-get install libgtk-3-dev libwebkit2gtk-4.0-dev\n";
+        warn "***                or: sudo dnf install gtk3-devel webkit2gtk3-devel\n";
+        exit 0;  # exit 0 = NA for CPAN Testers
+    }
     push @extra_ccflags, $gtk_cflags if $gtk_cflags;
     push @extra_libs, $gtk_libs if $gtk_libs;
 }
@@ -38,17 +44,23 @@ WriteMakefile(
     NAME              => 'Chandra',
     VERSION_FROM      => 'lib/Chandra.pm',
     ABSTRACT          => 'Perl bindings to webview-c for cross-platform GUIs',
-    AUTHOR            => 'Prototype',
+    AUTHOR            => 'LNATION <email@lnation.org>',
     LICENSE           => 'mit',
     MIN_PERL_VERSION  => '5.010',
     
     TYPEMAPS          => ['typemap'],
-    INC               => '-I. -Iinclude',
+    INC               => '-I. -Iinclude -Iinclude/chandra',
+    OBJECT            => 'Chandra$(OBJ_EXT) include/chandra/chandra_error$(OBJ_EXT)',
     CCFLAGS           => join(' ', $Config{ccflags}, @extra_ccflags),
     LDDLFLAGS         => join(' ', $Config{lddlflags}, @extra_ldflags),
     LIBS              => [join(' ', @extra_libs)],
     
-    PREREQ_PM         => {},
+    PREREQ_PM         => {
+        'Cpanel::JSON::XS' => 0,
+        'IO::Socket::UNIX' => 0,
+        'IO::Select'       => 0,
+        'File::Spec'       => 0,
+    },
     TEST_REQUIRES     => {
         'Test::More' => 0,
     },
@@ -67,7 +79,18 @@ WriteMakefile(
 
 # Add custom target to download webview.h if not present
 sub MY::postamble {
-    return <<'MAKE';
+    # On macOS with SDK Perl, the headers live inside the sysroot
+    # and need -iwithsysroot instead of -I.
+    my $perl_inc_flag = ($^O eq 'darwin')
+        ? '-iwithsysroot "$(PERL_INC)"'
+        : '"-I$(PERL_INC)"';
+    my $c_rule = <<"END_RULE";
+
+include/chandra/chandra_error\$(OBJ_EXT): include/chandra/chandra_error.c include/chandra/chandra.h
+\t\$(CC) -c \$(CCFLAGS) \$(OPTIMIZE) \$(CCCDLFLAGS) \$(PASTHRU_DEFINE) \$(DEFINE) -DVERSION=\\"\$(VERSION)\\" -DXS_VERSION=\\"\$(XS_VERSION)\\" \$(INC) $perl_inc_flag -o \$\@ include/chandra/chandra_error.c
+END_RULE
+
+    return $c_rule . <<'MAKE';
 
 webview.h:
 	@echo "Downloading webview.h from GitHub..."

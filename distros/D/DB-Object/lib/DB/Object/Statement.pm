@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Statement.pm
-## Version v0.8.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib/DB/Object/Statement.pm
+## Version v0.9.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/03/27
 ## All rights reserved
 ## 
 ## 
@@ -23,11 +23,12 @@ BEGIN
     use warnings;
     use parent qw( DB::Object );
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
+    use Scalar::Util ();
     use Class::Struct qw( struct );
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.8.0';
+    our $VERSION = 'v0.9.0';
 };
 
 use strict;
@@ -240,32 +241,35 @@ sub execute
 {
     my $self = shift( @_ );
     my @args = @_;
-    $self->messagec( 5, "{green}", scalar( @args ), "{/} arguments provided." );
-    my( $pack, $file, $line ) = caller();
-    my $sub = ( caller(1) )[3];
-    # What we want is to get the point from where we were originatly called
-    my $class = 'DB::Object';
-    if( substr( $pack, 0, length( $class ) ) eq $class )
+    # Resolve caller context only when needed for error reporting or debug.
+    # Calling caller() unconditionally on every execute() is expensive.
+    if( $self->debug || !$self->{pack} )
     {
-        for( my $i = 1; $i < 5; $i++ )
+        my( $pack, $file, $line ) = caller();
+        my $sub = ( caller(1) )[3];
+        # What we want is to get the point from where we were originatly called
+        my $class = 'DB::Object';
+        if( substr( $pack, 0, length( $class ) ) eq $class )
         {
-            ( $pack, $file, $line ) = caller( $i );
-            $sub = ( caller( $i + 1 ) )[3];
-            last if( substr( $pack, 0, length( $class ) ) ne $class );
+            for( my $i = 1; $i < 5; $i++ )
+            {
+                ( $pack, $file, $line ) = caller( $i );
+                $sub = ( caller( $i + 1 ) )[3];
+                last if( substr( $pack, 0, length( $class ) ) ne $class );
+            }
         }
+        $self->{pack} = $pack;
+        $self->{file} = $file;
+        $self->{line} = $line;
+        $self->{sub}  = $sub;
     }
-    $self->{pack} = $pack;
-    $self->{file} = $file;
-    $self->{line} = $line;
-    $self->{sub}  = $sub;
     $self->{executed}++;
     my $q = $self->query_object;
-    $self->messagec( 5, "Query object for this statement is {green}", overload::StrVal( $q // 'undef' ), "{/}" );
     $q->final(1) if( $q );
     my @binded = ();
     my @binded_types = ();
-    # Boolean used so we do not automatically change a string litteral into an array
-    # if the number of types and values are not the same, as it would lead to undesirable results.
+    # Boolean used so we do not automatically change a string litteral into an array if
+    # the number of types and values are not the same, as it would lead to undesirable results.
     my $bind_mismatch = 0;
     my $el;
     # As a rule, if the first placeholder is a numbered one, then all are, because we cannot mix numbered placeholder and non-numbered ones.
@@ -274,15 +278,12 @@ sub execute
         ( $el = $q->elements ) &&
         $el->types->length )
     {
-        $self->messagec( 5, "There are {green}", $el->length, "{/} elements for this query." );
         my $types = $q->binded_types_as_param;
-        $self->messagec( 5, "Using {green}", $el->types->length, "{/} binded types from the query object ($q) -> ", sub{ $self->Module::Generic::dump( $types ) } );
         @binded_types = @$types;
     }
 
     if( defined( $el ) )
     {
-        $self->messagec( 5, "{green}", $el->elements->length, "{/} elements set and {green}", scalar( @binded_types ), "{/} types set so far with \$q->binded_types_as_param." );
     }
 
     # Get the values to bind
@@ -390,13 +391,12 @@ sub execute
     {
         # Flag we use a bit below
         $bind_mismatch++;
-        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", @binded_types ) ) );
+        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", map{ ref( $_ ) eq 'HASH' ? $self->Module::Generic::dump( $_ ) : $_ } @binded_types ) ) );
         # Cancel it, because it will create problems
         @binded_types = ();
     }
 
     # If there are any array object of some sort provided, make sure they are transformed into a regular array so DBD::Ph can then transform it into a Postgres array.
-    $self->messagec( 6, "There are {green}", scalar( @binded ), "{/} value(s) to bind for query: ", $self->{query} );
     for( my $i = 0; $i < scalar( @binded ); $i++ )
     {
         next if( !defined( $binded[$i] ) );
@@ -418,7 +418,6 @@ sub execute
             !$self->_is_array( $binded[$i] ) &&
             defined( $binded[$i] ) )
         {
-            $self->messagec( 5, "Transforming value {green}", $binded[$i], "{/} into an array." );
             $binded[$i] = $self->_is_number( $binded[$i] ) ? [$binded[$i]] : [$self->database_object->quote( $binded[$i] )];
         }
         elsif( defined( $el ) && 
@@ -429,7 +428,6 @@ sub execute
             ( $elem->fo->type eq 'jsonb' || $elem->fo->type eq 'json' ) &&
             $self->_is_hash( $binded[$i] => 'strict' ) )
         {
-            $self->messagec( 5, "Transforming hash value {green}", $binded[$i], "{/} into a JSON string." );
             # try-catch
             local $@;
             my $json = eval
@@ -514,15 +512,21 @@ sub execute
     $error ||= $self->{sth}->errstr if( !$rv );
     if( $q )
     {
-        if( $q->join_tables->length > 0 )
+        # Only reset the table's query object if this is NOT a cached/reused joined statement.
+        # For joined statements, the query object ($q_source) is permanently attached to the
+        # statement handle and resetting the table creates a new ~500KB query object on every
+        # execute() that is never freed (the old one is orphaned). The reset serves to prepare
+        # the table for a fresh query after a one-shot select(), which is not the case here.
+        # A joined statement is identified by having join_tables populated.
+        # For a joined statement that is reused in a loop (exec() called multiple times),
+        # calling reset() on any of the tables is wasteful: it creates a new ~500KB query
+        # object for every single exec() call, and those objects are never freed because the
+        # allocator retains the arena pages. The reset was designed for one-shot select()
+        # usage, not for reused prepared statements. Skip it entirely for joined statements.
+        if( $q->join_tables->length == 0 )
         {
-            $q->join_tables->foreach(sub{
-                my $tbl = shift( @_ );
-                return if( !$tbl || !ref( $tbl ) );
-                $tbl->reset;
-            });
+            $q->table_object->reset;
         }
-        $q->table_object->reset;
     }
     my $tie = $self->{tie} || {};
     # Maybe it is time to bind SQL result to possible provided perl variables?
@@ -894,6 +898,19 @@ sub join
     my $new_db     = '';
     my $class      = ref( $self );
     my $q_source   = $q->clone;
+    # clone() does a shallow copy - $q_source->{elements} would share the same object
+    # as $q->{elements}. Any subsequent _save_bind() on $q would then corrupt the
+    # element list of the cached statement. We reset elements here so $q_source gets
+    # its own fresh object, populated by _query_components below.
+    $q_source->{elements} = $q_source->new_elements;
+    # clone() copies the hash shallowly, which means {table_object} is a strong reference
+    # in the clone even though _query_object_create() weakens it for freshly created query
+    # objects. If left strong, $q_source permanently retains the table object, which in turn
+    # retains every new query object created by _reset_query() on each execute() cycle,
+    # causing an ~8 MB per-iteration memory leak. Weaken it here to restore correct ownership.
+    Scalar::Util::weaken( $q_source->{table_object} ) if( $q_source->{table_object} && !Scalar::Util::isweak( $q_source->{table_object} ) );
+    Scalar::Util::weaken( $q_source->{database_object} ) if( $q_source->{database_object} && !Scalar::Util::isweak( $q_source->{database_object} ) );
+
     my $q_target;
     # On the duplicated table object, add the current table in the join
     $q_source->join_tables( $tbl_o ) if( !$q_source->join_tables->length );
@@ -909,7 +926,6 @@ sub join
         my $join_tbl;
         if( $self->_is_object( $data ) && $data->isa( 'DB::Object::Tables' ) )
         {
-            $self->messagec( 4, "Object table {green}", $data->name, "{/} object ", overload::StrVal( $data ), " is provided." );
             $join_tbl = $data;
         }
         elsif( $self->_is_object( $data ) )
@@ -918,7 +934,6 @@ sub join
         }
         else
         {
-            $self->messagec( 4, "Table name provided for join '{green}${data}{/}' (", overload::StrVal( $data ), ")." );
             return( $self->error( "No such table \"$data\" exists in database \"$db\"." ) ) if( !$self->database_object->table_exists( $data ) );
             $join_tbl = $self->database_object->table( $data );
             return( $self->error( "Could not get a table object from \"$data\"." ) ) if( !$join_tbl );
@@ -949,27 +964,24 @@ sub join
     $q_source->join_tables->push( $q_target->table_object );
     if( $q->where && $q_target->where )
     {
-        $self->messagec( 5, "Merging the where clause of target table {green}", $q_target->table_object->name, "{/} with source table {green}", $q_source->table_object->name, "{/}" );
-        $q_source->where(
-            $self->AND(
-                ( $q->where ),
-                $q_target->new_clause({ value => '( ' . ( $q_target->where ) . ' )' })
-            )
-        );
+        # We must NOT call $q_source->where( AND(...) ) here because _where_having would
+        # reconstruct the WHERE via process_where_condition, losing the bind elements that
+        # were built up in $q->where. Instead we build a merged Clause directly, copying
+        # the existing elements from $q->where so they are available to _save_bind below.
+        my $merged = $q_source->new_clause;
+        $merged->merge( $self->AND( $q->where, $q_target->new_clause({ value => '( ' . ( $q_target->where ) . ' )' }) ) );
+        $q_source->{where} = $merged;
     }
     elsif( $q_target->where )
     {
-        $self->messagec( 5, "Souce table has no where clause. Setting the where clause of target table {green}", $q_target->table_object->name, "{/} to that of the source table {green}", $q_source->table_object->name, "{/}" );
         $q_source->where( $q_target->where );
     }
     if( my $group_target = $q_target->group )
     {
-        $self->messagec( 5, "Adding group clause clause of the target table {green}", $q_target->table_object->name, "{/} to the source table {green}", $q_source->table_object->name, "{/} -> ", ( $group_target->value->length ? 'yes' : 'no, nothing to set' ) );
         $q_source->group( $group_target ) if( $group_target->value->length );
     }
     if( my $order_target = $q_target->order )
     {
-        $self->messagec( 5, "Adding order clause clause of the target table {green}", $q_target->table_object->name, "{/} to the source table {green}", $q_source->table_object->name, "{/} -> ", ( $order_target->value->length ? 'yes' : 'no, nothing to set' ) );
         $q_source->order( $order_target ) if( $order_target->value->length );
     }
 
@@ -1012,7 +1024,6 @@ sub join
                 my $sub_obj = shift( @$vals );
                 my $sub_op = $sub_obj->operator;
                 my( @sub_vals ) = $sub_obj->value;
-                $self->messagec( 5, "format_condition(): Value '", overload::StrVal( $vals->[0] ), "' is a DB::Object::Operator object with operator name {green}${sub_obj}{/} and values -> ", sub{ $self->Module::Generic::dump( \@sub_vals ) } );
                 my $this_ref = $format_condition->( \@sub_vals, $sub_op );
                 CORE::push( @res, $this_ref->{clause} ) if( length( $this_ref->{clause} ) );
                 my $tmp = $this_ref->{fields_tables};
@@ -1023,7 +1034,6 @@ sub join
             {
                 if( $self->_is_object( $vals->[0] ) && $vals->[0]->isa( 'DB::Object::Fields::Overloaded' ) )
                 {
-                    $self->messagec( 5, "format_condition(): Value '", overload::StrVal( $vals->[0] ), "' is an overloaded field object DB::Object::Fields::Overloaded" );
                     my $f1 = shift( @$vals );
                     $f1->field->prefixed( $multi_db ? 3 : 1 );
                     CORE::push( @res, "$f1" );
@@ -1042,7 +1052,6 @@ sub join
                 my( $field1, $field2 );
                 if( $self->_is_object( $f1 ) && $f1->isa( 'DB::Object::Fields::Field' ) )
                 {
-                    $self->messagec( 5, "format_condition(): \$f1 is a field object ({green}", $f1->name, "{/}). Adding its related table {green}", $f1->table, "{/} as known." );
                     $f1->prefixed( $multi_db ? 3 : 1 );
                     $field1 = $f1->name;
                     $fields_tables->{ $f1->table }++ if( !$fields_tables->{ $f1->table } );
@@ -1053,7 +1062,6 @@ sub join
                 }
                 if( $self->_is_object( $f2 ) && $f2->isa( 'DB::Object::Fields::Field' ) )
                 {
-                    $self->messagec( 5, "format_condition(): \$f2 is a field object ({green}", $f2->name, "{/}). Adding its related table {green}", $f2->table, "{/} as known." );
                     $f2->prefixed( $multi_db ? 3 : 1 );
                     $field2 = $f2->name;
                     $fields_tables->{ $f2->table }++ if( !$fields_tables->{ $f2->table } );
@@ -1142,6 +1150,29 @@ sub join
     }
     my $from = $q_source->from_table->join( ', ' );
     my $clause = $q_source->_query_components( 'select', { no_bind_copy => 1 } );
+    # Copy WHERE (and other clause) elements directly into $q_source->elements so that
+    # Statement::execute() can find the bind types regardless of the use_bind setting.
+    # We do this explicitly rather than via _save_bind() because _save_bind() is gated
+    # on use_bind, which may be 0 even when placeholders are present.
+    # NOTE: $where->elements returns a Module::Generic::Array of Element objects directly
+    # (NOT an Elements wrapper). Pass ->list to Elements::push(), not the array object itself.
+    {
+        my $elems = $q_source->new_elements;
+        my $where = $q_source->where;
+        my $limit = $q_source->limit;
+        if( $where )
+        {
+            my $where_arr = $where->elements;
+            $elems->push( $where_arr->list ) if( $where_arr && $where_arr->length );
+        }
+        if( $limit )
+        {
+            my $limit_arr = $limit->elements;
+            $elems->push( $limit_arr->list ) if( $limit_arr && $limit_arr->length );
+        }
+        $q_source->elements( $elems );
+
+    }
     my @query = ( "SELECT ${fields} FROM ${from} ${left_join}" );
     push( @query, @$clause ) if( @$clause );
     my $statement = CORE::join( ' ', @query );
@@ -1632,7 +1663,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.8.0
+v0.9.0
 
 =head1 DESCRIPTION
 

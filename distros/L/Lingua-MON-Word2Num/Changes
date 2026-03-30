@@ -1,0 +1,6 @@
+Revision history for Lingua-MON-Word2Num
+
+0.2603300  2026-03-30
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
+    - add 10 languages: AZE HYE HIN KAZ KIR LAT MON SOM UIG YID
+

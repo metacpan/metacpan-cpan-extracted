@@ -1,0 +1,36 @@
+======================================================================
+ mb Cheat Sheet                                             [HI] हिंदी
+======================================================================
+
+[ 1. मॉड्यूल लोड करें ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. अक्षर-आधारित length / substr ]
+  mb::length($str)              # अक्षरों की संख्या (बाइट नहीं)
+  mb::substr($str, $pos, $len)  # अक्षर स्थिति से सबस्ट्रिंग
+
+[ 3. स्ट्रिंग खोज ]
+  mb::index($str, $sub)         # अक्षर स्थिति सूचकांक
+  mb::rindex($str, $sub)        # दाईं ओर से खोज
+  mb::index_byte($str, $sub)    # बाइट स्थिति सूचकांक
+
+[ 4. वर्ण रूपांतरण ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. वर्ण कोड ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. अन्य संचालन ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. समर्थित एन्कोडिंग ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. उदाहरण ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "नमस्ते दुनिया";
+  printf "लंबाई=%d\n", mb::length($s);
+  printf "भाग=%s\n",   mb::substr($s,0,5);

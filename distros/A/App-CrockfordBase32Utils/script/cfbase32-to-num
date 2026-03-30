@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-01-19'; # DATE
+our $DATE = '2026-01-20'; # DATE
 our $DIST = 'App-CrockfordBase32Utils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CrockfordBase32Utils/cfbase32_to_num",
@@ -40,7 +40,7 @@ cfbase32-to-num - Convert Crockford's Base 32 encoding to integer decimal number
 
 =head1 VERSION
 
-This document describes version 0.002 of cfbase32-to-num (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-19.
+This document describes version 0.003 of cfbase32-to-num (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
 
 =head1 SYNOPSIS
 

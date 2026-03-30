@@ -1,7 +1,7 @@
 Revision history for Lingua-ZHO-Word2Num
 
-0.2603270  2026-03-27
-    - ZHO Word2Num: isolated traditional character grammar from pinyin path
-    - fix Word2Num parsers: 10 languages, 121 Galois walk failures resolved
-    - fix KOR ZHO BUL Word2Num parsers for large numbers (Galois walk finds)
+0.2603300  2026-03-30
+    - POD coverage + test suite fixes for 61-language Lingua suite
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
+    - add =encoding utf-8 to all POD sections (fixes no_pod_errors kwalitee)
 

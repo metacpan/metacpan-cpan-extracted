@@ -374,7 +374,7 @@ DB::Object::Query::Elements - Query Elements Manipulation Class
 
     use DB::Object::Query::Elements;
     my $elems = DB::Object::Query::Elements->new( debug => 4 ) || 
-        die( DB::Object::Query::Elements->error, "\n" );
+        die( DB::Object::Query::Elements->error );
     $elems->push( $new_element );
     $elems->push({
         field => $some_field_name,

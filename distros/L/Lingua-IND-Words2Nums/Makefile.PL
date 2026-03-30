@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Word 2 number conversion in IND.",
+  "ABSTRACT" => "convert Indonesian verbage to number.",
   "AUTHOR" => "Steven Haryanto <sh\@hhh.indoglobal.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603270",
+  "VERSION" => "0.2603300",
   "test" => {
     "TESTS" => "t/*.t"
   }

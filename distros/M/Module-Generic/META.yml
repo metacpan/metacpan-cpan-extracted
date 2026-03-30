@@ -70,6 +70,7 @@ requires:
   URI::Escape: '5.09'
   URI::file: '5.09'
   Wanted: v0.1.0
+  XSLoader: '0.31'
   common::sense: '0'
   overload: '0'
   overloading: '0'
@@ -82,5 +83,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
   repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v1.2.5
+version: v1.3.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

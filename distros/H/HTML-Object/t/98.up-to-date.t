@@ -5,30 +5,37 @@ BEGIN
     use warnings;
     use lib './lib';
     use vars qw( $DEBUG $MODULES_EXISTS );
+    use open ':std' => 'utf8';
     use Test::More;
 	unless( ( $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING} ) && -e( './dev' ) )
 	{
 		plan(skip_all => 'These tests are for author or release candidate testing');
 	}
-    use constant ELEMENTS_URL => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element';
+    # use constant ELEMENTS_URL => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element';
+    # The URL changed in 2025 to:
+    use constant ELEMENTS_URL => 'https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements';
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 BEGIN
 {
-    use Data::Dump;
+    # use Data::Dump;
+    use Data::Pretty qw( dump );
     use DateTime;
     use DateTime::Format::Strptime;
     use DateTime::TimeZone;
     use HTML::Entities ();
-    use HTML::Object::DOM;
+    use HTML::Object::DOM ':node', global_dom => 1;
     use HTML::Object::DOM::Element::Shared;
+    use HTML::Object::XQuery;
     use JSON;
-    use LWP::UserAgent;
+    use HTTP::Promise;
+    use Markdown::Parser;
     use Module::Generic::Array;
     use Module::Generic::File qw( file );
     use URI;
     use constant MOZILLA_BASE_URL => 'https://developer.mozilla.org';
+    use constant GITHUB_RAW_URL   => 'https://raw.githubusercontent.com';
     use open ':std' => ':utf8';
     our $MODULES_EXISTS = {};
 };
@@ -37,10 +44,14 @@ our $base_dir = file( __FILE__ )->parent->parent;
 # my $ua_name = "HTML::Object/$VERSION";
 my $ua_name = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:95.0) Gecko/20100101 Firefox/95.0';
 our $j = JSON->new->relaxed->pretty->canonical->allow_nonref->allow_blessed->convert_blessed;
-our $ua = LWP::UserAgent->new(
-    agent   => $ua_name,
-    timeout => 5,
-);
+our $ua = HTTP::Promise->new(
+    agent       => $ua_name,
+    use_promise => 0,
+    ext_vary    => 1,
+    timeout     => 5,
+    ( $$DEBUG > 5 ? ( debug => $DEBUG ) : () ),
+) || BAIL_OUT( HTTP::Promise->error );
+
 my $cache_dir = file('./dev/mozilla_doc');
 $cache_dir->mkdir if( !$cache_dir->exists );
 my $elements_cache_file = $cache_dir->child( 'elements.html' );
@@ -48,19 +59,26 @@ my $dict_file = file( './lib/HTML/html_tags_dict.json' );
 my $dict_data = $dict_file->load_utf8;
 my $repo = $j->decode( $dict_data );
 my $dict = $repo->{dict};
-our $log;
+our( $log, $tz );
 
 our $mod_elements_base_dir = $base_dir->child( './lib/HTML/Object/DOM/Element' );
 my $mod_shared = $mod_elements_base_dir->child( 'Shared.pm' );
 
-my $p = HTML::Object::DOM->new;
+my $bak_dict_file = file( "${dict_file}.bak" );
+if( $bak_dict_file->exists )
+{
+    die( "There is a backup file $bak_dict_file, so remove it first." );
+}
+
+my $p = HTML::Object::DOM->new( ( $DEBUG > 5 ? ( debug => $DEBUG ) : () ) );
 # my $dict = $p->dictionary;
 my $doc = &_check_cache_http({ file => $elements_cache_file, uri => ELEMENTS_URL });
 
-my $art = $doc->getElementById( 'content' );
+# my $art = $doc->getElementById( 'content' );
+my $art = $doc->look_down( id => 'content' )->first;
 if( !$art )
 {
-    die( "Unable to find the article tag with id \"content\".\n" );
+    die( "Unable to find the article tag with id \"content\" at URI '", ELEMENTS_URL, "'.\n" );
 }
 my $links = $art->getElementsByTagName( 'a' );
 diag( sprintf( "%d links found.", $links->length ) );
@@ -68,8 +86,9 @@ my $tags = Module::Generic::Array->new;
 my $seen = {};
 $links->foreach(sub
 {
+    # Example: https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/span
     my $uri = $_->href;
-    if( $uri->path =~ /\/Element\/([a-zA-Z]+)$/ )
+    if( $uri->path =~ /\/Elements\/([a-zA-Z]+)$/ )
     {
         my $tag = $1;
         # Avoid duplicates
@@ -89,11 +108,24 @@ done_testing();
 
 # $tags->push({ tag => 'canvas', uri => URI->new( 'https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas' ) });
 exit(0) unless( !$tags->is_empty );
-diag( sprintf( "Procssing %d missing tag.", $tags->length ) );
+diag( sprintf( "Processing %d missing tag.", $tags->length ) );
+# For each missing tga, we collect the data and create the module with collect_tag_information() which calls fetch_class_info_and_create_module
 $tags->foreach(sub
 {
     my $def = shift( @_ );
-    $def = &fetch( $def );
+    # From a previous tag. Although this is not strictly necessary, since the file would close upon object extinction.
+    # But this is more explicit and cleaner coding.
+    $log->close if( $log && $log->is_opened );
+    # Log file for this specific tag.
+    $log = $cache_dir->child( 'mozilla_doc_log_${tag}.txt' );
+    $log->open( '>', { binmode => 'utf-8', autoflush => 1 } ) || die( $log->error );
+
+    $def = &collect_tag_information( $def );
+    diag( "collect_tag_information() returned \$def -> ", dump( $def ) );
+    unless( $def->{tag} && $def->{description} )
+    {
+        die( "Missing critical information returned by collect_tag_information()" );
+    }
     my $this = {};
     $this->{description} = ( $def->{description} // '' );
     $this->{is_empty} = ( $def->{is_empty} // \0 );
@@ -103,7 +135,9 @@ $tags->foreach(sub
     $this->{is_svg} = delete( $def->{is_svg} ) if( exists( $def->{is_svg} ) );
     $this->{link_in} = delete( $def->{link_in} ) if( exists( $def->{link_in} ) && ref( $def->{link_in} ) eq 'ARRAY' );
     $dict->{ $def->{tag} } = $this;
-    diag( "Adding tag \"", $def->{tag}, "\" with data: ", Data::Dump::dump( $this ) );
+    diag( "Adding tag \"", $def->{tag}, "\" with data: ", Data::Pretty::dump( $this ) );
+    # Place holder to avoid 'diag' above which returns true from exiting our `foreach` loop. A non-undefined false value ends the loop.
+    return(1);
 });
 
 if( !$tags->is_empty )
@@ -116,45 +150,222 @@ if( !$tags->is_empty )
     $dict_file->close;
 }
 
-sub fetch
+# NOTE: This is the tag page from which we scrap key information.
+sub collect_tag_information
 {
     my $opts = shift( @_ );
     my $tag = $opts->{tag};
     my $uri = $opts->{uri};
     my $def = { tag => $tag, 'ref' => $uri };
-    
+
     my $cache_file = $cache_dir->child( "tag_$tag.html" );
+    diag( "Fetching the HTML content for URI $uri" );
     my $doc = &_check_cache_http({ file => $cache_file, uri => $uri });
-    
+
     # Try to find the article element
-    my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
-    die( "No tag 'article' with class 'main-page-content' found in html data for tag \"$tag\" at url \"$uri\"\n" ) if( !$art );
-    
-    my $desc_divs = $art->look_down( _tag => 'div' );
-    diag( sprintf( "Found %d divs for tag \"$tag\".", $desc_divs->length ) );
-    my $desc_div;
-    foreach( @$desc_divs )
+    # my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
+    my $art = $doc->look_down( _tag => 'main', class => 'reference-layout__content' )->first;
+    die( "No page article found with tag 'main' with class 'reference-layout__content' found in html data for tag \"$tag\" at url \"$uri\"\n" ) if( !$art );
+
+    my $header = $art->look_down( _tag => 'div', class => 'reference-layout__header' )->first;
+    die( "No page header found with tag 'div' with class 'reference-layout__header' found in html data for tag \"$tag\" at url \"$uri\"\n" ) if( !$header );
+
+    my $header_content = $header->look_down( _tag => 'section', class => 'content-section' )->first;
+    die( "No tag 'section' with class 'content-section' found in html data for tag \"$tag\" at url \"$uri\"\n" ) if( !$header_content );
+
+    # my $header_elems = $header_content->children->grep(sub{ $_->nodeType == ELEMENT_NODE });
+    my $header_elems = $header_content->childNodes->grep(sub{ $_->nodeType == ELEMENT_NODE });
+    diag( $header_elems->length, " header elements found: ", $header_elems->join( ', ' ) );
+    if( !$header_elems->length )
     {
-        if( $_->attr( 'class' ) eq 'notecard deprecated' )
+        diag( "Failed to find any description in the following HTML portion:\n", $header_content->as_string );
+    }
+
+    # NOTE: Collect basic tag description
+    my $desc_div;
+    foreach( @$header_elems )
+    {
+        if( $_->attr( 'class' ) =~ /\bdeprecated\b/ )
         {
             $def->{is_deprecated} = \1;
+            diag( "\tTag '$tag' is marked as deprecated." );
             next;
         }
-        else
+        if( $_->attr( 'class' ) =~ /\bexperimental\b/ )
+        {
+            $def->{is_experimental} = \1;
+            diag( "\tTag '$tag' is marked as experimental." );
+            next;
+        }
+        # There may be more than one 'p' tag. We use the first one only.
+        elsif( $_->tag eq 'p' )
         {
             $desc_div = $_;
             last;
         }
     }
-    
+
     if( $desc_div )
     {
         my $desc = $desc_div->as_trimmed_text;
         # diag( "Description text found is: '$desc'" );
         my @phrases = split( /(?<=\S)\.(?=[[:blank:]\h])/, $desc );
-        $def->{description} = _cleanup( $phrases[0] );
+        # $def->{description} = _cleanup( $phrases[0] );
+        $def->{description} = $phrases[0];
     }
-    
+    else
+    {
+        warn( "Could not find any description for this tag $tag at URI $uri" );
+    }
+
+    # NOTE: Collect attributes
+    my $attributes_section = $art->look_down( _tag => 'section', 'aria-labelledby' => 'attributes' )->first;
+    if( !$attributes_section )
+    {
+        diag( "No attributes found for tag $tag at URI $uri" );
+    }
+    else
+    {
+        my $dts = $attributes_section->getElementsByTagName( 'dt' );
+        my $dds = $attributes_section->getElementsByTagName( 'dd' );
+        &logf( "%d attributes and %d definitions found at URI $uri\n", $dts->length, $dds->length );
+        die( "Number of attributes does not match the total definitions found.\n" ) if( $dts->length != $dds->length );
+        my $old_attributes = {};
+        my $attrs = {};
+        $dts->for(sub
+        {
+            my( $i, $elem ) = @_;
+            my $firstElem = $elem->firstElementChild;
+            my( $link, $attr );
+            my $attr_def = {};
+            if( $firstElem->getName eq 'a' )
+            {
+                $link = $firstElem;
+                $attr = $firstElem->as_trimmed_text;
+            }
+            # alternatively, there is a <code> enclosing the property name
+            elsif( $firstElem->getName eq 'code' )
+            {
+                $attr = $firstElem->as_trimmed_text;
+            }
+            else
+            {
+                print( STDERR "Element children are:\n" );
+                foreach my $el ( $elem->children->list )
+                {
+                    print( STDERR "* ", $el->tag, " (", $el->class, ") with ", $el->children->length, " childnren.\n" );
+                }
+                die( "In attributes section, unknown first element tag '", $firstElem->tag, "': ", $elem->as_string, "; I was expecting either <a> or <code>\n" );
+            }
+            ( my $html_class, $attr ) = split( /\./, $attr, 2 ) if( index( $attr, '.' ) != -1 );
+            &logf( "%d. $attr\n", $i + 1 );
+            if( exists( $def->{attributes}->{ $attr } ) )
+            {
+                $attrs->{ $attr } = $def->{attributes}->{ $attr };
+                &log( "\tFound cache data in json for attribute \"$attr\".\n" );
+                return(1);
+            }
+
+            if( defined( $link ) &&
+                $link->attr( 'class' ) ne 'page-not-created' )
+            {
+                $attr_def->{link} = $link->getAttribute( 'href' );
+                die( "No link found for property: ", $elem->as_string, "\n" ) if( !$attr_def->{link} );
+                if( substr( $attr_def->{link}, 0, 1 ) eq '#' )
+                {
+                    diag( "Link found for attribute $attr is just an achor, ignoring." );
+                }
+                else
+                {
+                    my $uri = URI->new_abs( $attr_def->{link}, $uri );
+                    $attr_def->{link} = $uri;
+                    my $attr_cache_file = $cache_dir->child( "${tag}_${attr}.html" );
+                    &log( "Fetching detail attribute \"$attr\" information from $uri\n" );
+                    my $codes = _get_detail_page_info( $uri => $attr_cache_file, { referrer => $url } );
+                    $attr_def->{codes} = $codes;
+                }
+            }
+            else
+            {
+                my $u2 = $url->clone;
+                $u2->path( $u2->path . "/$attr" );
+                $attr_def->{link} = $u2;
+                $attr_def->{no_link}++;
+            }
+            my $ro = $elem->look_down( _tag => 'span', class => qr/\breadonly\b/ );
+            $attr_def->{is_readonly} = ( $ro->length && lc( $ro->first->as_trimmed_text ) eq 'read only' ) ? 1 : 0;
+            &log( "\tIs $attr read-only ? ", ( $attr_def->{is_readonly} ? 'yes' : 'no' ), "\n" );
+            my $deprecated = $elem->look_down( class => qr/\bicon\-deprecated\b/ );
+            $attr_def->{is_deprecated} = ( $deprecated->length ? 1 : 0 );
+            &log( "\tIs $attr deprecated ? ", ( $attr_def->{is_deprecated} ? 'yes' : 'no' ), "\n" );
+            $attr_def->{class} = $html_class;
+            my $prop_desc = $dds->[$i]->as_trimmed_text;
+            $prop_desc = join( "\n", split( /[[:blank:]\h]*\n[[:blank:]\h]*/, $prop_desc ) );
+            $prop_desc =~ s/[[:blank:]\h]{2,}/ /gs;
+            $prop_desc = _cleanup( $prop_desc );
+            $attr_def->{description} = $prop_desc;
+            if( $attr_def->{is_deprecated} )
+            {
+                $old_attributes->{ $attr } = $attrs;
+            }
+            else
+            {
+                $attrs->{ $attr } = $attr_def;
+            }
+            # _save_to_json( $def => $json_file );
+            return(1);
+        });
+        $def->{deprecated_attributes} = $old_attributes;
+        $def->{attributes} = $attrs;
+    }
+
+    # NOTE: Collect example
+    # The code examples are rendered in the HTML page as shadow-root, which we cannot access without a headless JavaScript-capable browser.
+    # Instead, we circumvent the problem by accessing the Github Markdown page.
+    my $links = $doc->look_down( _tag => 'a', class => qr/\bexternal\b/, href => qr/github.com\/mdn\/content\/blob/ );
+    if( !$links->length )
+    {
+        die( "Failed to find the link to github." );
+    }
+    # The link of the Github page is something like:
+    # https://github.com/mdn/content/blob/main/files/en-us/web/html/reference/elements/fencedframe/index.md?plain=1
+    # We make it look like:
+    # https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/html/reference/elements/fencedframe/index.md
+    my $github_uri = $links->first->href ||
+        die( "No github URI found in link!" );
+    $github_uri = URI->new( $github_uri );
+    my $github_raw_uri = URI->new( GITHUB_RAW_URL );
+    if( $github_uri->path =~ m,^/(?<owner>[^/]+)/content/blob/(?<repo>[^/]+)/(?<path>.+?)$, )
+    {
+        my $re = { %+ };
+        $github_raw_uri->path( "/$re->{owner}/content/$re->{repo}/$re->{path}" );
+    }
+    else
+    {
+        die( "Github URI found has an unexpected format -> $github_uri" );
+    }
+    my $md_file = $cache_file->extension( 'md' );
+    $doc = &_check_cache_http({ type => 'markdown', file => $md_file, uri => $github_raw_uri });
+    my $codes = $doc->look_down( tag => 'code' );
+    diag( "Found ", $codes->length, " code blocks." );
+    my $examples = $codes->grep(sub
+    {
+        $_->fenced && $_->class->has( 'html' );
+    });
+    diag( "Collected ", $examples->length, " examples." );
+    $def->{examples} = $examples;
+
+    if( $DEBUG )
+    {
+        foreach my $code ( @$examples )
+        {
+            diag( $code->children->map(sub{ $_->as_string })->join( '' ) );
+            diag( "-" x 10 );
+        }
+    }
+
+    # NOTE: Search for the link to the tag class detail page.
+    # <section class="content-section" aria-labelledby="technical_summary">
     my $table = $art->look_down( _tag => 'table', class => 'properties' )->first;
     # No need to go further
     if( !$table )
@@ -162,118 +373,193 @@ sub fetch
         diag( "No table property found for tag \"$tag\"." );
         return( $def );
     }
-    my $tr = $table->look_down( _tag => 'tr' )->last;
-    die( "Cannot find any row in the property table for tag \"$tag\" at url \"$uri\".\n" ) if( !$tr );
-    my $th = $tr->look_down( _tag => 'th' )->first;
-    die( "Cannot find any <th> in the last row of table property for tag \"$tag\" at url \"$uri\".\n" ) if( !$th );
-    my $th_text = $th->as_trimmed_text;
-    die( "I was expecting this last <th> in table property for tag \"$tag\" to contain 'DOM interface', but instead I found '${th_text}'.\n" ) if( $th_text ne 'DOM interface' );
-    my $class_links = $tr->look_down( _tag => 'a' );
-    diag( sprintf( "%d link(s) found.", $class_links->length ) );
-    my $class_link;
-    my $class;
-    # There should not be more than 1, but let us not assume
-    foreach( @$class_links )
+
+    my( $class_link, $class );
+    my $trs = $table->look_down( _tag => 'tr' );
+    diag( "Found ", scalar( @$trs ), " rows in the Technical Summary table." );
+    foreach my $tr ( @$trs )
     {
-        # e.g.: /en-US/docs/Web/API/HTMLCanvasElement
-        if( $_->href->path =~ /\/API\/([a-zA-Z]+)$/ )
+        my $row_header = $tr->look_down( _tag => 'th' )->first;
+        unless( $row_header )
         {
-            $class_link = $_;
-            $class = $1;
-            last;
+            die( "Cannot find a row header for tag $tag in Technical Summary table: ", $tr->as_string );
+        }
+        my $row_title = $row_header->as_trimmed_text;
+        my $row_value = $tr->getElementsByTagName( 'td' )->first->as_trimmed_text;
+        if( $row_title =~ /Permitted[[:blank:]]+content/i )
+        {
+            diag( "Tag $tag accept children ? ", $row_value =~ /\bNone\b/i ? 'no' : 'yes' );
+        }
+        elsif( $row_title =~ /\bTag[[:blank:]]+omission\b/i )
+        {
+            # Example: None, both the starting and ending tag are mandatory.
+            $def->{is_empty} = ( $row_value =~ /^[[:blank:]]*None\b/i ? \0 : \1 );
+        }
+        elsif( $row_title =~ /\bDOM[[:blank:]]+interface\b/i )
+        {
+            my $class_links = $tr->look_down( _tag => 'a' );
+            diag( sprintf( "%d link(s) found.", $class_links->length ) );
+            # There should not be more than 1, but let us not assume
+            foreach( @$class_links )
+            {
+                # e.g.: /en-US/docs/Web/API/HTMLCanvasElement
+                if( $_->href->path =~ /\/API\/([a-zA-Z]+)$/ )
+                {
+                    $class_link = $_;
+                    $class = $1;
+                    last;
+                }
+            }
         }
     }
+
     if( !defined( $class ) )
     {
         die( "Unable to find any class link for tag \"$tag\" at url \"$uri\".\n" );
     }
     $class =~ s/^HTML((?>(?!Element).)+)Element$/$1/;
-    $def = &fetch_class({ tag => $tag, class => $class, uri => $class_link->href->abs( $uri ) });
+    diag( "Collecting tag $tag class '$class' detailed information from ", $class_link->href->abs( $uri ) ) if( $DEBUG );
+    # fetch_class_info_and_create_module() will collect more detailed information, and use it to build the related Perl module.
+    # It returns an hash reference of those information collected.
+    # If there is anything interesting in it, we copy it onto our $def hash reference of tag information, which, in turn, is used to populate the tag entry in the file html_tags_dict.json
+    my $def_class = &fetch_class_info_and_create_module({
+        tag     => $tag,
+        class   => $class,
+        uri     => $class_link->href->abs( $uri ),
+        data    => $def,
+    });
+    # We copy what we need
+    return( $def );
 }
 
-sub fetch_class
+sub fetch_class_info_and_create_module
 {
     my $opts = shift( @_ );
     my $tag   = $opts->{tag} || die( "No tag name was provided.\n" );
     my $class = $opts->{class} || die( "No class name provided.\n" );
     $opts->{uri} //= "https://developer.mozilla.org/en-US/docs/Web/API/HTML${class}Element";
     my $url = $opts->{uri};
+    # Already collected data from the previous collect_tag_information() subroutine
+    my $data = $opts->{data};
 
     my $cache_file = $cache_dir->child( "$class.html" );
-    $log = $cache_dir->child( 'mozilla_doc_log_${class}.txt' );
     my $json_file = $cache_dir->child( "$class.json" );
-    
+
     my $mod_file = $mod_elements_base_dir->child( "${class}.pm" );
-    
-    $log->open( '>', { binmode => 'utf-8', autoflush => 1 } ) || die( $log->error );
-    our $json = {};
+
+    my $def = {};
     if( $json_file->exists )
     {
         my $json_data = $json_file->load_utf8;
-        local $@;
-        # try-catch
-        eval
+        $def = $json_file->load_json || die( $json_file->error );
+        my $crawl;
+        $crawl = sub
         {
-            $json = $j->decode( $json_data );
-            $json_file->close;
-            my $crawl;
-            $crawl = sub
+            my $ref = shift( @_ );
+            foreach my $this ( keys( %$ref ) )
             {
-                my $ref = shift( @_ );
-                foreach my $this ( keys( %$ref ) )
+                if( ref( $ref->{ $this } ) eq 'ARRAY' )
                 {
-                    if( ref( $ref->{ $this } ) eq 'ARRAY' )
-                    {
-                        $ref->{ $this } = Module::Generic::Array->new( $ref->{ $this } );
-                    }
-                    elsif( ref( $ref->{ $this } ) eq 'HASH' )
-                    {
-                        $crawl->( $ref->{ $this } );
-                    }
+                    $ref->{ $this } = Module::Generic::Array->new( $ref->{ $this } );
                 }
-            };
-            $crawl->( $json );
+                elsif( ref( $ref->{ $this } ) eq 'HASH' )
+                {
+                    $crawl->( $ref->{ $this } );
+                }
+            }
         };
-        if( $@ )
-        {
-            die( "An error occurred while trying to decode json: $@\n" );
-        }
+        $crawl->( $def );
     }
     else
     {
-        $json->{properties} = {};
-        $json->{methods} = {};
-        $json->{events} = {};
-        $json->{handlers} = {};
+        $def->{properties} = {};
+        $def->{methods} = {};
+        $def->{events} = {};
+        $def->{handlers} = {};
     }
-    
+
+    $def->{tag} = $tag;
+    $def->{class} = $class;
+    $def->{uri} = $url;
+
     &log( "Resource url for tag \"$tag\" class \"$class\" is: $url\n" );
     my $doc = &_check_cache_http({ uri => $url, file => $cache_file });
 
-    my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
-    die( "Unable to find the article tag with class 'main-page-content'\n" ) if( !$art );
-    my $title = $art->getElementsByTagName( 'h1' )->first;
-    # my $desc_div = $title->nextElementSibling;
-    my $desc_div = $art->look_down( _tag => 'div', class => 'section-content' )->first;
-    die( "Unable to find a div containing the class description.\n" ) if( !ref( $desc_div ) );
-    die( "Element found to contain the class description is not a div -> '", $desc_div->getName, "'\n" ) if( $desc_div->getName ne 'div' );
-    my $desc_p = $desc_div->getElementsByTagName( 'p' )->first;
+    # Searching for the main DOM container
+    # my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
+    my $art = $doc->look_down( _tag => 'main', id => 'content' )->first;
+    # die( "Unable to find the article tag with class 'main-page-content'\n" ) if( !$art );
+    die( "No tag 'main' with ID 'content' found in html data for tag \"$tag\" at url \"$uri\"\n" ) if( !$art );
+
+    my $header = $art->look_down( _tag => 'div', class => 'reference-layout__header' )->first;
+    die( "No page header found with tag 'div' with class 'reference-layout__header' found in html data for tag \"$tag\" at url \"$uri\"\n" ) if( !$header );
+
+    my $header_content = $header->look_down( _tag => 'section', class => 'content-section' )->first;
+    die( "No tag 'section' with class 'content-section' found in html data for tag \"$tag\" at url \"$uri\"\n" ) if( !$header_content );
+
+    # NOTE: class title
+    my $title = $header_content->getElementsByTagName( 'h1' )->first;
+    if( $title )
+    {
+        $def->{title} = $title->as_trimmed_text;
+    }
+
+    my $header_elems = $header_content->children->grep(sub{ $_->nodeType == ELEMENT_NODE });
+    diag( $header_elems->length, " header elements found: ", $header_elems->join( ', ' ) );
+
+    # NOTE: Collect basic tag description
+    my $desc_p;
+    foreach( @$header_elems )
+    {
+        if( $_->attr( 'class' ) =~ /\bdeprecated\b/ )
+        {
+            $def->{is_deprecated} = \1;
+            diag( "\tTag '$tag' is marked as deprecated." ) if( $DEBUG );
+            next;
+        }
+        if( $_->attr( 'class' ) =~ /\bexperimental\b/ )
+        {
+            $def->{is_experimental} = \1;
+            diag( "\tTag '$tag' is marked as experimental." ) if( $DEBUG );
+            next;
+        }
+        elsif( $_->tag eq 'p' )
+        {
+            $desc_p = $_;
+            last;
+        }
+    }
+
     die( "No paragraph containing the description could be found.\n" ) if( !ref( $desc_p ) );
     my $desc = $desc_p->as_trimmed_text;
     $desc =~ s/\bThe[[:blank:]\h]+HTML${class}Element[[:blank:]\h]+interface\b/This interface/g;
-    $desc = _cleanup( $desc );
-    
+    # diag( "Description text found is: '$desc'" );
+    # We take only the first sentence.
+    my @phrases = split( /(?<=\S)\.(?=[[:blank:]\h])/, $desc );
+    $def->{description} = _cleanup( $phrases[0] );
+    # $desc = _cleanup( $desc );
+    $def->{description} = $desc;
+
     my $props = {};
-    my $prop_title = $art->getElementById( 'properties' );
+    my $methods = {};
+    my $events = {};
+    my $handlers = {};
+    my $old_props = {};
+
+    # NOTE: Collect class properties
+    # my $prop_title = $art->getElementById( 'properties' );
+    my $prop_title = $art->look_down( _tag => 'section', class => 'content-section', 'aria-labelledby' => 'instance_properties' )->first;
     if( !$prop_title )
     {
         warn( "Warning only: unable to find the div with id 'properties'\n" );
     }
     else
     {
-        my $prop_div = $prop_title->nextElementSibling;
+        # my $prop_div = $prop_title->nextElementSibling;
+        # As of 2025-10-16, Mozilla created a 'section' with the title (h2) and content altogether.
+        my $prop_div = $prop_title;
         die( "Unable to get a next sibling to id 'properties'\n" ) if( !$prop_div );
-        die( "Element found to contain properties is not a div: '", $prop_div->getName, "' (", overload::StrVal( $prop_div ), ")\n" ) if( $prop_div->getName ne 'div' );
+        # die( "Element found to contain properties is not a div: '", $prop_div->getName, "' (", overload::StrVal( $prop_div ), ")\n" ) if( $prop_div->getName ne 'div' );
         # This one contains a link whose text is the class name and property name separated by a dot.
         my $dts = $prop_div->getElementsByTagName( 'dt' );
         # This one contains soem paragraph and links, which we ignore and we get the overall as pure text to serve as property description.
@@ -285,7 +571,7 @@ sub fetch_class
             my( $i, $elem ) = @_;
             my $firstElem = $elem->firstElementChild;
             my $link;
-            my $def = {};
+            my $prop_def = {};
             my $prop;
             if( $firstElem->getName eq 'a' )
             {
@@ -299,64 +585,81 @@ sub fetch_class
             }
             else
             {
-                die( "Unknown first element for property in tag '", $firstElem->tag, "': ", $elem->as_string, "; I was expecting either <a> or <code>\n" );
+                print( STDERR "Element children are:\n" );
+                foreach my $el ( $elem->children->list )
+                {
+                    print( STDERR "* ", $el->tag, " (", $el->class, ") with ", $el->children->length, " childnren.\n" );
+                }
+                die( "In properties section, unknown first element tag '", $firstElem->tag, "': ", $elem->as_string, "; I was expecting either <a> or <code>\n" );
             }
             ( my $html_class, $prop ) = split( /\./, $prop, 2 ) if( index( $prop, '.' ) != -1 );
             &logf( "%d. $prop\n", $i + 1 );
-            if( exists( $json->{properties}->{ $prop } ) )
+            if( exists( $def->{properties}->{ $prop } ) )
             {
-                $props->{ $prop } = $json->{properties}->{ $prop };
+                $props->{ $prop } = $def->{properties}->{ $prop };
                 &log( "\tFound cache data in json for property \"$prop\".\n" );
                 return(1);
             }
-        
+
             if( defined( $link ) && $link->attr( 'class' ) ne 'page-not-created' )
             {
-                $def->{link} = $link->getAttribute( 'href' );
-                die( "No link found for property: ", $elem->as_string, "\n" ) if( !$def->{link} );
-                my $uri = URI->new_abs( $def->{link}, MOZILLA_BASE_URL );
-                $def->{link} = $uri;
+                $prop_def->{link} = $link->getAttribute( 'href' );
+                die( "No link found for property: ", $elem->as_string, "\n" ) if( !$prop_def->{link} );
+                my $uri = URI->new_abs( $prop_def->{link}, MOZILLA_BASE_URL );
+                $prop_def->{link} = $uri;
                 my $prop_cache_file = $cache_dir->child( "${class}_${prop}.html" );
                 &log( "Fetching detail property \"$prop\" information from $uri\n" );
                 my $codes = _get_detail_page_info( $uri => $prop_cache_file, { referrer => $url } );
-                $def->{codes} = $codes;
+                $prop_def->{codes} = $codes;
             }
             else
             {
                 my $u2 = $url->clone;
                 $u2->path( $u2->path . "/$prop" );
-                $def->{link} = $u2;
-                $def->{no_link}++;
+                $prop_def->{link} = $u2;
+                $prop_def->{no_link}++;
             }
             my $ro = $elem->look_down( _tag => 'span', class => qr/\breadonly\b/ );
-            $def->{is_readonly} = ( $ro->length && lc( $ro->first->as_trimmed_text ) eq 'read only' ) ? 1 : 0;
-            &log( "\tIs $prop read-only ? ", ( $def->{is_readonly} ? 'yes' : 'no' ), "\n" );
-            $def->{property} = $prop;
-            $def->{class} = $html_class;
+            $prop_def->{is_readonly} = ( $ro->length && lc( $ro->first->as_trimmed_text ) eq 'read only' ) ? 1 : 0;
+            &log( "\tIs $prop read-only ? ", ( $prop_def->{is_readonly} ? 'yes' : 'no' ), "\n" );
+            my $deprecated = $elem->look_down( class => qr/\bicon\-deprecated\b/ );
+            $prop_def->{is_deprecated} = ( $deprecated->length ? 1 : 0 );
+            &log( "\tIs $prop deprecated ? ", ( $prop_def->{is_deprecated} ? 'yes' : 'no' ), "\n" );
+            $prop_def->{property} = $prop;
+            $prop_def->{class} = $html_class;
             my $prop_desc = $dds->[$i]->as_trimmed_text;
             $prop_desc = join( "\n", split( /[[:blank:]\h]*\n[[:blank:]\h]*/, $prop_desc ) );
             $prop_desc =~ s/[[:blank:]\h]{2,}/ /gs;
             $prop_desc = _cleanup( $prop_desc );
-            $def->{description} = $prop_desc;
-            $props->{ $prop } = $def;
-            $json->{properties} = $props;
-            _save_to_json( $json => $json_file );
+            $prop_def->{description} = $prop_desc;
+            if( $prop_def->{is_deprecated} )
+            {
+                $old_props->{ $prop } = $prop_def;
+            }
+            else
+            {
+                $props->{ $prop } = $def;
+            }
+            _save_to_json( $def => $json_file );
             return(1);
         });
+        $def->{deprecated_properties} = $old_props;
+        $def->{properties} = $props;
     }
-    
-    my $methods = {};
+
+    # NOTE: Collect class methods
     my( $dts, $dds );
-    my $meth_title = $art->getElementById( 'methods' );
+    # my $meth_title = $art->getElementById( 'methods' );
+    my $meth_title = $art->look_down( _tag => 'section', 'aria-labelledby' => 'methods' )->first;
     if( !$meth_title )
     {
         warn( "Unable to find the div with id 'methods'\n" );
     }
     else
     {
-        my $meth_div = $meth_title->nextElementSibling;
+        my $meth_div = $meth_title;
         die( "Unable to get a next sibling to id 'methods'\n" ) if( !$meth_div );
-        die( "Element found to contain methods is not a div: '", $meth_div->getName, "' (", overload::StrVal( $meth_div ), ")\n" ) if( $meth_div->getName ne 'div' );
+        # die( "Element found to contain methods is not a div: '", $meth_div->getName, "' (", overload::StrVal( $meth_div ), ")\n" ) if( $meth_div->getName ne 'div' );
         $dts = $meth_div->getElementsByTagName( 'dt' );
         $dds = $meth_div->getElementsByTagName( 'dd' );
         &logf( "%d methods found and %d definitions\n", $dts->length, $dds->length );
@@ -366,61 +669,67 @@ sub fetch_class
             my( $i, $elem ) = @_;
             my $link = $elem->getElementsByTagName( 'a' )->first;
             die( "No link found for method in tag: ", $elem->as_string, "\n" ) if( !ref( $link ) );
-            my $def = {};
+            my $meth_def = {};
             my $meth = $link->as_trimmed_text;
             ( my $html_class, $meth ) = split( /\./, $meth, 2 ) if( index( $meth, '.' ) != -1 );
             $meth =~ s/\(\)$//;
             &logf( "%d. $meth\n", $i + 1 );
-            if( exists( $json->{methods}->{ $meth } ) )
+            if( exists( $def->{methods}->{ $meth } ) )
             {
-                $methods->{ $meth } = $json->{methods}->{ $meth };
+                $methods->{ $meth } = $def->{methods}->{ $meth };
                 &log( "\tFound cache data in json for method \"$meth\".\n" );
                 return(1);
             }
-        
+
             if( $link->attr( 'class' ) ne 'page-not-created' )
             {
-                $def->{link} = $link->getAttribute( 'href' );
-                die( "No link found for method: ", $elem->as_string, "\n" ) if( !$def->{link} );
-                my $uri = URI->new_abs( $def->{link}, MOZILLA_BASE_URL );
-                $def->{link} = $uri;
+                $meth_def->{link} = $link->getAttribute( 'href' );
+                die( "No link found for method: ", $elem->as_string, "\n" ) if( !$meth_def->{link} );
+                my $uri = URI->new_abs( $meth_def->{link}, MOZILLA_BASE_URL );
+                $meth_def->{link} = $uri;
                 my $meth_cache_file = $cache_dir->child( "${class}_${meth}.html" );
                 &log( "Fetching detail method \"$meth\" information from $uri\n" );
                 my $codes = _get_detail_page_info( $uri => $meth_cache_file, { referrer => $url } );
-                $def->{codes} = $codes;
+                $meth_def->{codes} = $codes;
             }
             else
             {
                 my $u2 = $url->clone;
                 $u2->path( $u2->path . "/$meth" );
-                $def->{link} = $u2;
-                $def->{no_link}++;
+                $meth_def->{link} = $u2;
+                $meth_def->{no_link}++;
             }
-            $def->{method} = $meth;
-            $def->{class} = $html_class;
+            my $deprecated = $elem->look_down( class => qr/\bicon-deprecated\b/ );
+            $meth_def->{is_deprecated} = ( $deprecated->length ? 1 : 0 );
+            $meth_def->{method} = $meth;
+            $meth_def->{class} = $html_class;
             my $meth_desc = $dds->[$i]->as_trimmed_text;
             $meth_desc = join( "\n", split( /[[:blank:]\h]*\n[[:blank:]\h]*/, $meth_desc ) );
             $meth_desc =~ s/[[:blank:]\h]{2,}/ /gs;
             $meth_desc = _cleanup( $meth_desc );
-            $def->{description} = $meth_desc;
-            $methods->{ $meth } = $def;
-            $json->{methods} = $methods;
-            _save_to_json( $json => $json_file );
+            $meth_def->{description} = $meth_desc;
+            $methods->{ $meth } = $meth_def;
+            $def->{methods} = $methods;
+            _save_to_json( $def => $json_file );
             return(1);
         });
     }
-    
-    my $events = {};
-    my $events_title = $art->getElementById( 'events' );
+
+    # NOTE: Collect class events
+    # Now, as of 2025-10-16:
+    # <section class="content-section" aria-labelledby="events">
+    # my $events_title = $art->getElementById( 'events' );
+    my $events_title = $art->look_down( _tag => 'section', 'aria-labelledby' => 'events' )->first;
     if( !$events_title )
     {
         &log( "No events found.\n" );
     }
     else
     {
-        my $events_div = $events_title->nextElementSibling;
+        # my $events_div = $events_title->nextElementSibling;
+        my $events_div = $events_title;
         die( "Unable to get a next sibling to id 'events'\n" ) if( !$events_div );
-        die( "Element found to contain events is not a div: '", $events_div->getName, "' (", overload::StrVal( $events_div ), ")\n" ) if( $events_div->getName ne 'div' );
+        # die( "Element found to contain events is not a div: '", $events_div->getName, "' (", overload::StrVal( $events_div ), ")\n" ) if( $events_div->getName ne 'div' );
         $dts = $events_div->getElementsByTagName( 'dt' );
         $dds = $events_div->getElementsByTagName( 'dd' );
         # Try searching for event subsections
@@ -453,14 +762,14 @@ sub fetch_class
             $dds->push( $sub_dds->list );
             &logf( "%d events added from sub section '%s'\n", $sub_dts->length, $section->id );
         }
-        
+
         &logf( "%d events found and %d definitions\n", $dts->length, $dds->length );
         die( "Number of events does not match the total definitions found.\n" ) if( $dts->length != $dds->length );
         $dts->for(sub
         {
             my( $i, $elem ) = @_;
             my $link = $elem->getElementsByTagName( 'a' )->first;
-            my $def = {};
+            my $event_def = {};
             my $event;
             if( !ref( $link ) )
             {
@@ -474,56 +783,58 @@ sub fetch_class
             }
             ( my $html_class, $event ) = split( /\./, $event, 2 ) if( index( $event, '.' ) != -1 );
             &logf( "%d. $event\n", $i + 1 );
-            if( exists( $json->{events}->{ $event } ) )
+            if( exists( $def->{events}->{ $event } ) )
             {
-                $events->{ $event } = $json->{events}->{ $event };
+                $events->{ $event } = $def->{events}->{ $event };
                 &log( "\tFound cache data in json for event \"$event\".\n" );
                 return(1);
             }
-        
+
             if( $link->attr( 'class' ) ne 'page-not-created' )
             {
-                $def->{link} = $link->getAttribute( 'href' );
-                die( "No link found for event: ", $elem->as_string, "\n" ) if( !$def->{link} );
-                my $uri = URI->new_abs( $def->{link}, MOZILLA_BASE_URL );
-                $def->{link} = $uri;
+                $event_def->{link} = $link->getAttribute( 'href' );
+                die( "No link found for event: ", $elem->as_string, "\n" ) if( !$event_def->{link} );
+                my $uri = URI->new_abs( $event_def->{link}, MOZILLA_BASE_URL );
+                $event_def->{link} = $uri;
                 my $event_cache_file = $cache_dir->child( "${class}_${event}.html" );
                 &log( "Fetching detail event \"$event\" information from $uri\n" );
                 my $codes = _get_detail_page_info( $uri => $event_cache_file, { referrer => $url } );
-                $def->{codes} = $codes;
+                $event_def->{codes} = $codes;
             }
             else
             {
                 my $u2 = $url->clone;
                 $u2->path( $u2->path . "/$event" );
-                $def->{link} = $u2;
-                $def->{no_link}++;
+                $event_def->{link} = $u2;
+                $event_def->{no_link}++;
             }
-            $def->{event} = $event;
-            $def->{class} = $html_class;
+            $event_def->{event} = $event;
+            $event_def->{class} = $html_class;
             my $event_desc = $dds->[$i]->as_trimmed_text;
             $event_desc = join( "\n", split( /[[:blank:]\h]*\n[[:blank:]\h]*/, $event_desc ) );
             $event_desc =~ s/[[:blank:]\h]{2,}/ /gs;
             $event_desc = _cleanup( $event_desc );
-            $def->{description} = $event_desc;
-            $events->{ $event } = $def;
+            $event_def->{description} = $event_desc;
+            $events->{ $event } = $event_def;
             &log( "\tDescription: $event_desc\n" );
-            $json->{events} = $events;
-            _save_to_json( $json => $json_file );
+            $def->{events} = $events;
+            _save_to_json( $def => $json_file );
         });
     }
-    
-    my $handlers = {};
-    my $handlers_title = $doc->getElementById( 'event_handlers' );
+
+    # NOTE: Collect class event handlers
+    # my $handlers_title = $doc->getElementById( 'event_handlers' );
+    my $handlers_title = $art->look_down( _tag => 'section', 'aria-labelledby' => 'event_handlers' )->first;
     if( !$handlers_title )
     {
         &log( "No event handlers found.\n" );
     }
     else
     {
-        my $handlers_div = $handlers_title->nextElementSibling;
+        # my $handlers_div = $handlers_title->nextElementSibling;
+        my $handlers_div = $handlers_title;
         die( "Unable to get a next sibling to id 'event_handlers'\n" ) if( !$handlers_div );
-        die( "Element found to contain event handlers is not a div: '", $handlers_div->getName, "' (", overload::StrVal( $handlers_div ), ")\n" ) if( $handlers_div->getName ne 'div' );
+        # die( "Element found to contain event handlers is not a div: '", $handlers_div->getName, "' (", overload::StrVal( $handlers_div ), ")\n" ) if( $handlers_div->getName ne 'div' );
         $dts = $handlers_div->getElementsByTagName( 'dt' );
         $dds = $handlers_div->getElementsByTagName( 'dd' );
         &logf( "%d event handlers found and %d definitions\n", $dts->length, $dds->length );
@@ -533,7 +844,7 @@ sub fetch_class
             my( $i, $elem ) = @_;
             my $firstElem = $elem->firstElementChild();
             my $link = $elem->getElementsByTagName( 'a' )->first;
-            my $def = {};
+            my $evt_handler_def = {};
             my $handler;
             if( !ref( $link ) )
             {
@@ -546,46 +857,132 @@ sub fetch_class
             }
             ( my $html_class, $handler ) = split( /\./, $handler, 2 ) if( index( $handler, '.' ) != -1 );
             &logf( "%d. $handler\n", $i + 1 );
-            if( exists( $json->{handlers}->{ $handler } ) )
+            if( exists( $def->{handlers}->{ $handler } ) )
             {
-                $handlers->{ $handler } = $json->{handlers}->{ $handler };
+                $handlers->{ $handler } = $def->{handlers}->{ $handler };
                 &log( "\tFound cache data in json for event handler \"$handler\".\n" );
                 return(1);
             }
-        
+
             if( defined( $link ) && $link->attr( 'class' ) ne 'page-not-created' )
             {
-                $def->{link} = $link->getAttribute( 'href' );
-                die( "No link found for event handler: ", $elem->as_string, "\n" ) if( !$def->{link} );
-                my $uri = URI->new_abs( $def->{link}, MOZILLA_BASE_URL );
-                $def->{link} = $uri;
+                $evt_handler_def->{link} = $link->getAttribute( 'href' );
+                die( "No link found for event handler: ", $elem->as_string, "\n" ) if( !$evt_handler_def->{link} );
+                my $uri = URI->new_abs( $evt_handler_def->{link}, MOZILLA_BASE_URL );
+                $evt_handler_def->{link} = $uri;
                 my $handler_cache_file = $cache_dir->child( "${class}_${handler}.html" );
                 &log( "Fetching detail event handler \"$handler\" information from $uri\n" );
                 my $codes = _get_detail_page_info( $uri => $handler_cache_file, { referrer => $url } );
-                $def->{codes} = $codes;
+                $evt_handler_def->{codes} = $codes;
             }
             else
             {
                 my $u2 = $url->clone;
                 $u2->path( $u2->path . "/$handler" );
-                $def->{link} = $u2;
-                $def->{no_link}++;
+                $evt_handler_def->{link} = $u2;
+                $evt_handler_def->{no_link}++;
             }
-            $def->{handler} = $handler;
-            $def->{class} = $html_class;
+            $evt_handler_def->{handler} = $handler;
+            $evt_handler_def->{class} = $html_class;
             my $handler_desc = $dds->[$i]->as_trimmed_text;
             $handler_desc = join( "\n", split( /[[:blank:]\h]*\n[[:blank:]\h]*/, $handler_desc ) );
             $handler_desc =~ s/[[:blank:]\h]{2,}/ /gs;
             $handler_desc = _cleanup( $handler_desc );
-            $def->{description} = $handler_desc;
-            $handlers->{ $handler } = $def;
+            $evt_handler_def->{description} = $handler_desc;
+            $handlers->{ $handler } = $evt_handler_def;
             &log( "\tDescription: $handler_desc\n" );
-            $json->{handlers} = $handlers;
-            _save_to_json( $json => $json_file );
+            $def->{handlers} = $handlers;
+            _save_to_json( $def => $json_file );
         });
     }
-    
-    &logf( "Results: %d properties, %d methods, %d events and %d event handlers found.\n", scalar( keys( %$props ) ), scalar( keys( %$methods ) ), scalar( keys( %$events ) ), scalar( keys( %$handlers ) ) );
+
+    # NOTE: Collect class obsolete / deprecated properties
+    # my $old_props_title = $art->getElementById( 'deprecated_properties' );
+    my $old_props_title = $art->look_down( id => qr/^(deprecated_properties|obsolete_properties)$/, { max_match => 1 } )->first;
+    if( !$old_props_title )
+    {
+        &log( "No deprecated properties defined.\n" );
+    }
+    else
+    {
+        my $prop_div = $old_props_title->nextElementSibling;
+        die( "Unable to get a next sibling to id 'deprecated_properties'\n" ) if( !$prop_div );
+        die( "Element found to contain deprecated properties is not a div: '", $prop_div->getName, "' (", overload::StrVal( $prop_div ), ")\n" ) if( $prop_div->getName ne 'div' );
+        # This one contains a link whose text is the class name and property name separated by a dot.
+        my $dts = $prop_div->getElementsByTagName( 'dt' );
+        # This one contains soem paragraph and links, which we ignore and we get the overall as pure text to serve as property description.
+        my $dds = $prop_div->getElementsByTagName( 'dd' );
+        &logf( "%d deprecated properties found and %d definitions\n", $dts->length, $dds->length );
+        die( "Number of deprecated properties does not match the total definitions found.\n" ) if( $dts->length != $dds->length );
+        $dts->for(sub
+        {
+            my( $i, $elem ) = @_;
+            my $firstElem = $elem->firstElementChild;
+            my $link;
+            my $old_prop_def = {};
+            my $prop;
+            if( $firstElem->getName eq 'a' )
+            {
+                $link = $firstElem;
+                $prop = $firstElem->as_trimmed_text;
+            }
+            # alternatively, there is a <code> enclosing the property name
+            elsif( $firstElem->getName eq 'code' )
+            {
+                $prop = $firstElem->as_trimmed_text;
+            }
+            else
+            {
+                die( "Unknown first element for deprecated property in tag '", $firstElem->tag, "': ", $elem->as_string, "; I was expecting either <a> or <code>\n" );
+            }
+            ( my $html_class, $prop ) = split( /\./, $prop, 2 ) if( index( $prop, '.' ) != -1 );
+            &logf( "%d. $prop\n", $i + 1 );
+            if( exists( $def->{deprecated_properties}->{ $prop } ) )
+            {
+                $old_props->{ $prop } = $def->{deprecated_properties}->{ $prop };
+                &log( "\tFound cache data in json for deprecated property \"$prop\".\n" );
+                return(1);
+            }
+
+            if( defined( $link ) && $link->attr( 'class' ) ne 'page-not-created' )
+            {
+                $old_prop_def->{link} = $link->getAttribute( 'href' );
+                die( "No link found for deprecated property: ", $elem->as_string, "\n" ) if( !$old_prop_def->{link} );
+                my $uri = URI->new_abs( $old_prop_def->{link}, MOZILLA_BASE_URL );
+                $old_prop_def->{link} = $uri;
+                my $prop_cache_file = $cache_dir->child( "${class}_${prop}.html" );
+                &log( "Fetching detail deprecated property \"$prop\" information from $uri\n" );
+                my $codes = _get_detail_page_info( $uri => $prop_cache_file, { referrer => $url } );
+                $old_prop_def->{codes} = $codes;
+            }
+            else
+            {
+                my $u2 = $url->clone;
+                $u2->path( $u2->path . "/$prop" );
+                $old_prop_def->{link} = $u2;
+                $old_prop_def->{no_link}++;
+            }
+            my $ro = $elem->look_down( _tag => 'span', class => qr/\breadonly\b/ );
+            $old_prop_def->{is_readonly} = ( $ro->length && lc( $ro->first->as_trimmed_text ) eq 'read only' ) ? 1 : 0;
+            &log( "\tIs deprecated $prop read-only ? ", ( $old_prop_def->{is_readonly} ? 'yes' : 'no' ), "\n" );
+            $old_prop_def->{property} = $prop;
+            $old_prop_def->{class} = $html_class;
+            $old_prop_def->{is_deprecated} = 1;
+            my $prop_desc = $dds->[$i]->as_trimmed_text;
+            $prop_desc = join( "\n", split( /[[:blank:]\h]*\n[[:blank:]\h]*/, $prop_desc ) );
+            $prop_desc =~ s/[[:blank:]\h]{2,}/ /gs;
+            $prop_desc = _cleanup( $prop_desc );
+            $old_prop_def->{description} = $prop_desc;
+            $old_props->{ $prop } = $old_prop_def;
+            $def->{deprecated_properties} = $old_props;
+            _save_to_json( $def => $json_file );
+            return(1);
+        });
+    }
+
+    # NOTE: Summary of collected data
+    &logf( "Results: %d properties, %d methods, %d events, %d event handlers and %d deprecated properties found.\n", scalar( keys( %$props ) ), scalar( keys( %$methods ) ), scalar( keys( %$events ) ), scalar( keys( %$handlers ) ), scalar( keys( %$old_props ) ) );
+
     my $subs = $p->new_array( [sort( keys( %$props ) )] );
     $subs = $subs->push( keys( %$methods ) )->unique(1)->sort;
     my $handlers2 = { %$handlers };
@@ -602,26 +999,33 @@ sub fetch_class
         }
         $subs = $subs->unique(1)->sort;
     }
-    
+    if( scalar( keys( %$old_props ) ) )
+    {
+        $subs->push( keys( %$old_props ) );
+        $subs = $subs->unique(1)->sort;
+    }
+
     # Check if we have method to inherit
     my $has_inheritance = 0;
     foreach my $meth ( @$subs )
     {
         $has_inheritance++ if( HTML::Object::DOM::Element::Shared->can( $meth ) );
     }
-    
+
+    # NOTE: Create module
     if( $mod_file->exists )
     {
         &log( "Creating backup for \"${mod_file}\" to \"${mod_file}.bak\".\n" );
         $mod_file->copy( "${mod_file}.bak" ) || die( $mod_file->error, "\n" );
     }
-    
+
     &log( "Writing to module file \"${mod_file}\".\n" );
     $mod_file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || die( $mod_file->error, "\n" );
     my $today = DateTime->now;
     my $ymd = $today->strftime( '%Y/%m/%d' );
     my $year = $today->year;
     my $rel_file = $mod_file->relative( $base_dir );
+    # NOTE: Create module headers
     $mod_file->print( <<EOT );
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/${rel_file}
@@ -663,7 +1067,8 @@ sub init
 }
 
 EOT
-    
+
+    # NOTE: Create module methods
     my @inherited = ();
     foreach my $meth ( @$subs )
     {
@@ -678,6 +1083,20 @@ EOT
             else
             {
                 $mod_file->print( "# Note: property $meth", ( $def->{is_readonly} ? ' read-only' : '' ), "\n" );
+                $mod_file->print( "sub $meth : lvalue { return( shift->_set_get_property( '\L$meth\E', \@_ ) ); }\n\n" );
+            }
+        }
+        elsif( exists( $old_props->{ $meth } ) )
+        {
+            my $def = $old_props->{ $meth };
+            if( $opts->{shared} && HTML::Object::DOM::Element::Shared->can( $meth ) )
+            {
+                $mod_file->print( "# Note: deprecated property $meth", ( $def->{is_readonly} ? ' read-only' : '' ), " is inherited\n\n" );
+                push( @inherited, $meth );
+            }
+            else
+            {
+                $mod_file->print( "# Note: deprecated property $meth", ( $def->{is_readonly} ? ' read-only' : '' ), "\n" );
                 $mod_file->print( "sub $meth : lvalue { return( shift->_set_get_property( '\L$meth\E', \@_ ) ); }\n\n" );
             }
         }
@@ -712,7 +1131,8 @@ EOT
             }
         }
     }
-    
+
+    # NOTE: Create module POD
     $mod_file->print( <<EOT );
 1;
 # NOTE POD
@@ -728,7 +1148,7 @@ HTML::Object::DOM::Element::${class} - HTML Object DOM ${class} Class
 
     use HTML::Object::DOM::Element::${class};
     my \$\L$class\E = HTML::Object::DOM::Element::${class}->new || 
-        die( HTML::Object::DOM::Element::${class}->error, "\\n" );
+        die( HTML::Object::DOM::Element::${class}->error );
 
 =head1 VERSION
 
@@ -738,12 +1158,38 @@ HTML::Object::DOM::Element::${class} - HTML Object DOM ${class} Class
 
 $desc
 
+EOT
+    if( exists( $data->{examples} ) &&
+        ref( $data->{examples} ) eq 'ARRAY' &&
+        scalar( @{$data->{examples}} ) )
+    {
+        my $n = scalar( @{$data->{examples}} );
+        for( my $i = 0; $i < $n; $i++ )
+        {
+            my $ex = $data->{examples}->[$i];
+            if( $n > 1 &&
+                ( $i + 1 ) < $n )
+            {
+                $mod_file->print( <<EOT );
+
+or
+
+EOT
+            }
+            my $str = '    ' . join( "\n", split( /\n    /, $ex ) );
+            $str =~ s/^[[:blank:]]+$//gm;
+            $mod_file->print( $str, "\n" );
+        }
+    }
+
+    $mod_file->print( <<EOT );
 =head1 PROPERTIES
 
 Inherits properties from its parent L<HTML::Object::DOM::Element>
 
 EOT
 
+    # NOTE: Creating properties in POD
     foreach my $prop ( sort( keys( %$props ) ) )
     {
         my $def = $props->{ $prop };
@@ -776,7 +1222,8 @@ EOT
             $mod_file->printf( "See also L<Mozilla documentation|%s>\n\n", $def->{link} );
         }
     }
-    
+
+    # NOTE: Creating methods in POD
     $mod_file->print( "=head1 METHODS\n\n" );
     $mod_file->print( "Inherits methods from its parent L<HTML::Object::DOM::Element>\n\n" );
     foreach my $meth ( sort( keys( %$methods ) ) )
@@ -806,19 +1253,21 @@ EOT
             $mod_file->printf( "See also L<Mozilla documentation|%s>\n\n", $def->{link} );
         }
     }
-    
+
+    # NOTE: Creating events in POD
     if( scalar( keys( %$events ) ) )
     {
+        my $first = [sort( keys( %$events ) )]->[0];
         $mod_file->print( <<EOT );
 =head1 EVENTS
 
 Event listeners for those events can also be found by prepending C<on> before the event type:
 
-C<click> event listeners can be set also with C<onclick> method:
+For example, C<${first}> event listeners can be set also with C<on${first}> method:
 
-    \$e->onclick(sub{ # do something });
+    \$e->on${first}(sub{ # do something });
     # or as an lvalue method
-    \$e->onclick = sub{ # do something };
+    \$e->on${first} = sub{ # do something };
 
 EOT
         foreach my $event ( sort( keys( %$events ) ) )
@@ -849,7 +1298,8 @@ EOT
             }
         }
     }
-    
+
+    # NOTE: Creating even handlers in POD
     if( scalar( keys( %$handlers ) ) )
     {
         $mod_file->print( "=head1 EVENT HANDLERS\n\n" );
@@ -881,6 +1331,47 @@ EOT
             }
         }
     }
+
+    # NOTE: Creating deprecated properties in POD
+    if( scalar( keys( %$old_props ) ) )
+    {
+        $mod_file->print( "=head1 DEPRECATED PROPERTIES\n\n" );
+        foreach my $prop ( sort( keys( %$old_props ) ) )
+        {
+            my $def = $old_props->{ $prop };
+            $mod_file->print( "=head2 $prop\n\n" );
+            if( $def->{is_readonly} )
+            {
+                $mod_file->print( "Read-only.\n\n" );
+            }
+            $mod_file->print( $def->{description}, "\n\n" ) if( $def->{description} );
+            my $codes = $def->{codes};
+            # print( "# \$codes is '$codes'\n" );
+            if( $codes && !$codes->is_empty )
+            {
+                $mod_file->print( "Example:\n\n" );
+                $codes->for(sub
+                {
+                    my( $i, $ref ) = @_;
+                    my $formatted = "    " . join( "\n    ", split( /\n/, $ref->{perl} ) );
+                    # Remove empty space, because perl pod would produce warnings
+                    $formatted =~ s/\n[[:blank:]\h]+\n/\n\n/gs;
+                    $mod_file->print( $formatted, "\n\n" );
+                    if( $i > 0 && $i != $codes->size )
+                    {
+                        $mod_file->print( "Another example:\n\n" );
+                    }
+                });
+            }
+            if( $def->{link} )
+            {
+                $mod_file->printf( "See also L<Mozilla documentation|%s>\n\n", $def->{link} );
+            }
+        }
+
+    }
+
+    # NOTE: Creating POD footer
     $mod_file->print( <<EOT );
 =head1 AUTHOR
 
@@ -902,16 +1393,18 @@ This program is free software; you can redistribute it and/or modify it under th
 
 EOT
     $log->close;
+
+    # NOTE: Checking for inherited methods
     if( scalar( @inherited ) && CORE::exists( $HTML::Object::DOM::Element::Shared::EXPORT_TAGS{ $tag } ) )
     {
         diag( "Found an existing entry in HTML::Object::DOM::Element::Shared EXPORT_TAGS for tag \"$tag\"." );
         if( "@inherited" eq join( ' ', @{$HTML::Object::DOM::Element::Shared::EXPORT_TAGS{ $tag }} ) )
         {
-            diag( "\tBoth our version and the existing version in HTML::Object::DOM::Element::Shared are the same." );
+            diag( "\tBoth our version and the existing version in HTML::Object::DOM::Element::Shared are the same." ) if( $DEBUG );
         }
         else
         {
-            diag( "\tOur methods are: '@inherited' and HTML::Object::DOM::Element::Shared's ones are: '", join( ' ', @{$HTML::Object::DOM::Element::Shared::EXPORT_TAGS{ $tag }} ), "'" );
+            diag( "\tOur methods are: '@inherited' and HTML::Object::DOM::Element::Shared's ones are: '", join( ' ', @{$HTML::Object::DOM::Element::Shared::EXPORT_TAGS{ $tag }} ), "'" ) if( $DEBUG );
         }
     }
     elsif( scalar( @inherited ) )
@@ -932,7 +1425,7 @@ EOT
             $spaces = "    ";
         }
         my $new_line = "        \L${class}\E${spaces}=> [qw( @inherited )],\n";
-        
+
         for( my $i = 0; $i < $len; $i++ )
         {
             if( $found_export )
@@ -945,7 +1438,7 @@ EOT
                     $ok++;
                     last;
                 }
-                
+
                 if( $lines->[$i] =~ /^[[:blank:]\h]+([a-z]+)[[:blank:]\h]+\=\>[[:blank:]\h]+\[qw\(/ )
                 {
                     my $def = { 'pos' => $i => tag => $1 };
@@ -966,13 +1459,13 @@ EOT
                     }
                 }
             }
-            
+
             if( $lines->[$i] =~ /^[[:blank:]\h]+our[[:blank:]\h]+\%EXPORT_TAGS/ )
             {
                 $found_export++;
             }
         }
-        
+
         if( $ok )
         {
             diag( "Backing up \"$mod_shared\" to \"${mod_shared}.bak\"." );
@@ -984,9 +1477,10 @@ EOT
             diag( sprintf( "Wrote %d lines to shared module \"$mod_shared\".", $lines->length ) );
         }
     }
-    exit(0);
+    return( $def );
 }
 
+# Those are not general log, but log for each tag processed. This is used inside fetch_class_info_and_create_module()
 sub log
 {
     CORE::print( @_ );
@@ -1032,15 +1526,17 @@ sub _get_detail_page_info
     else
     {
         &log( "\tNo cache yet, making a query to $link\n" );
-        my $resp = $ua->get( $link, ( $opts->{referrer} ? ( 'Referer' => $opts->{referrer} ) : () ) );
+        my $resp = $ua->get( $link, ( $opts->{referrer} ? ( Referer => $opts->{referrer} ) : () ) );
         die( "Unable to get url \"$link\": ", $resp->status_line, "\n" ) if( !$resp->is_success );
-        $html = $resp->decoded_content;
+        $html = $resp->decoded_content_utf8;
         $cache->unload_utf8( $html );
     }
-    my $p = HTML::Object::DOM->new;
+    my $p = HTML::Object::DOM->new( ( $DEBUG > 5 ? ( debug => $DEBUG ) : () ) );
     my $doc = $p->parse_data( $html );
-    my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
-    die( "Unable to find the article section\n" ) if( !ref( $art ) );
+    # my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
+    my $art = $doc->look_down( _tag => 'main', id => 'content' )->first;
+    # die( "Unable to find the article section\n" ) if( !ref( $art ) );
+    die( "No tag 'main' with ID 'content' found in html data at url \"$link\"\n" ) if( !$art );
     my $codes = $art->getElementsByClassName( 'code-example' );
     &logf( "%d code examples found for $link\n", $codes->length );
     my $ref = $p->new_array;
@@ -1108,9 +1604,9 @@ sub _cleanup
     my $str = shift( @_ );
     my $map =
     {
-    DOMTokenList    => 'HTML::Object::TokenList',
-    HTMLCollection  => 'HTML::Object::DOM::Collection',
-    VTTCue          => 'HTML::Object::DOM::VTTCue',
+        DOMTokenList    => 'HTML::Object::TokenList',
+        HTMLCollection  => 'HTML::Object::DOM::Collection',
+        VTTCue          => 'HTML::Object::DOM::VTTCue',
     };
     $str =~ s/\b(?:DOMString|USVString)\b/string/g;
     $str = HTML::Entities::decode_entities( $str );
@@ -1125,7 +1621,7 @@ sub _cleanup
             my $f = $mod_elements_base_dir->child( "${class}.pm" );
             $MODULES_EXISTS->{ $class } = $f->exists ? 1 : 0;
         }
-        
+
         if( $MODULES_EXISTS->{ $class } )
         {
             "L<HTML::Object::DOM::Element::${class}>";
@@ -1152,79 +1648,105 @@ sub _cleanup
     return( $str );
 }
 
-sub _set_datetime_formatter_for_http
-{
-    my $dt = shift( @_ );
-    # HTTP Date format
-    my $dt_fmt = DateTime::Format::Strptime->new(
-        pattern => '%a, %d %b %Y %H:%M:%S GMT',
-        locale => 'en_GB',
-        time_zone => 'GMT',
-    );
-    $dt->set_formatter( $dt_fmt );
-    return( $dt );
-}
-
 sub _check_cache_http
 {
     my $opts = shift( @_ );
     my $uri  = $opts->{uri} || die( "No uri was provided.\n" );
     my $file = $opts->{file} || die( "No file was provided,\n" );
+    my $type = $opts->{type} // 'html'; # Can also be markdown
     my $headers = {};
     my $mtime;
     if( $file->exists )
     {
         $mtime = $file->mtime;
-        &_set_datetime_formatter_for_http( $mtime );
-        $headers->{ 'If-Modified-Since' } = "$mtime";
-        diag( "Cache file \"$file\" exists. Setting http header If-Modified-Since to '$mtime'" );
+        diag( "Cache file \"$file\" exists. Setting http header If-Modified-Since to '", $mtime->iso8601, "'" );
     }
     else
     {
         diag( "No cache file \"$file\" yet." );
     }
     diag( "Making query to \"$uri\"." );
-    my $resp = $ua->get( $uri, %$headers );
-    my $last_mod = $resp->header( 'Last-Modified' );
-    my $data = $resp->decoded_content( default_charset => 'utf-8', alt_charset => 'utf-8' );
-    diag( sprintf( "Retrieved %d bytes of html data.", length( $data ) ) );
-    my $parser = HTML::Object::DOM->new;
-    diag( "Last-Modified header value found: '$last_mod'" );
-    my $tz;
-    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
-    # "Cannot determine local time zone"
-    local $@;
-    # try-catch
-    eval
+    my $resp = $ua->get( $uri,
+        ( defined( $mtime ) ? ( If_Modified_Since => $mtime ) : () ),
+    ) || die( $ua->error );
+    if( $DEBUG )
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
-    };
-    if( $@ )
-    {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
-        warn( "Your system is missing key timezone components. Reverting to UTC instead of local time zone.\n" );
+        diag( "Status: ", $resp->code );
+        diag( "StatusText: ", $resp->status_line );
+        diag( "HttpVersion: ", $resp->version );
+        diag( "HTTP response headers:" );
+        $resp->headers->scan(sub
+        {
+            my( $name, $value ) = @_;
+            diag( "\t$name: $value" );
+        });
     }
+    my $data = $resp->decoded_content_utf8;
+    diag( sprintf( "Retrieved %d bytes of html data.", length( $data // '' ) ) ) if( $DEBUG );
+    my $last_mod = $resp->headers->last_modified // '';
+    diag( "Last-Modified header value found: '", ( $last_mod ? $last_mod->iso8601 : 'undef' ), "'" );
+    unless( $tz )
+    {
+        # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+        # "Cannot determine local time zone"
+        local $@;
+        # try-catch
+        eval
+        {
+            $tz = DateTime::TimeZone->new( name => 'local' );
+        };
+        if( $@ )
+        {
+            $tz = DateTime::TimeZone->new( name => 'UTC' );
+            warn( "Your system is missing key timezone components. Reverting to UTC instead of local time zone.\n" );
+        }
+    }
+
     if( $last_mod )
     {
-        my $p = $parser->new;
-        my $dt = $p->_parse_timestamp( "$last_mod" ) ||
-            die( $p->error );
-        $last_mod = $dt->set_time_zone( $tz );
+        $last_mod->set_time_zone( $tz );
     }
     else
     {
-        $last_mod = DateTime->now( time_zone => 'local' );
+        $last_mod = DateTime->now( time_zone => $tz );
     }
+
     my $epoch = $last_mod->epoch;
-    my $code = $resp->code;
-    diag( "Returned code for \"$uri\" is '$code' and modification time is '$last_mod'" );
+    my $code  = $resp->code;
+    diag( "Returned code for \"$uri\" is '$code' and modification time is '", $last_mod->iso8601, "'" );
+    my $parse_data = sub
+    {
+        my $data = shift( @_ );
+        my $doc;
+        if( $type eq 'html' )
+        {
+            my $parser = HTML::Object::DOM->new( ( $DEBUG > 5 ? ( debug => $DEBUG ) : () ) );
+            diag( "Parsing ", length( $$data ), " bytes of HTML data." );
+            $doc = $parser->parse_data( $$data ) || die( $parser->error );
+        }
+        elsif( $type eq 'markdown' )
+        {
+            my $parser = Markdown::Parser->new(
+                mode => 'extended',
+                debug => 0,
+                encode_html_entities => 0,
+            );
+            $doc = $parser->parse( $$data, scope => [qw( all extended )] ) || die( $parser->error );
+        }
+        else
+        {
+            die( "Unknown data type '$type'." );
+        }
+        return( $doc );
+    };
+
     my $doc;
     if( $code == 304 || 
         ( !$file->is_empty && defined( $mtime ) && $mtime == $epoch ) )
     {
-        diag( "Remote html page at url \"$uri\" has not changed since last time on $mtime." );
-        my $html = $file->load_utf8;
-        $doc = $parser->parse_data( $html ) || die( $parser->error );
+        diag( "Remote $type page at url \"$uri\" has not changed since last time on ", ( $mtime ? $mtime->iso8601 : 'undef' ), ". Loading data from cache file $file" );
+        $data = $file->load_utf8;
+        $doc = $parse_data->( \$data );
     }
     elsif( $code ne 200 )
     {
@@ -1242,7 +1764,7 @@ sub _check_cache_http
             die( "Unable to open html file \"$file\" in write mode: ", $file->error );
         $file->unlock;
         $file->utime( $epoch, $epoch );
-        $doc = $parser->parse_data( $data ) || die( $parser->error );
+        $doc = $parse_data->( \$data );
     }
     return( $doc );
 }

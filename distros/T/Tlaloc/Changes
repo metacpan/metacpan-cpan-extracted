@@ -1,5 +1,8 @@
 Revision history for Tlaloc
 
+0.04    2026-03-29
+        Fix compilation on Perl < 5.14 (backport mg_findext, sv_unmagicext via ppport.h; add GvCV_set compat macro).
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

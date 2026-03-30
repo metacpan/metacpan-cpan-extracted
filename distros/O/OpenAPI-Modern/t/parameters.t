@@ -921,7 +921,7 @@ subtest 'path parameters' => sub {
       my $todo;
       $todo = todo $test->{todo} if $test->{todo};
 
-      cmp_result(
+      is_equal(
         [ map $_->TO_JSON, $state->{errors}->@* ],
         $test->{errors}//[],
         ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
@@ -943,160 +943,1037 @@ subtest 'path parameters' => sub {
   }
 };
 
+my @query_tests;
+
 subtest 'query parameters' => sub {
   my @tests = (
-    # param_obj
-    # queries => raw query string
-    # content => data passed to _evaluate_subschema (expected)
-    # errors => collected from state (expected), defaults to []
+    # name (test name)
+    # param_obj (from OAD)
+    # queries => raw query string, without leading '?'
+    # content => expected data to be passed to _evaluate_subschema (omit when evaluation is omitted)
+    # errors => compared to what is collected from $state, defaults to []
     # todo
     {
-      param_obj => { name => 'reserved', in => 'query', allowEmptyValue => true },
-      queries => 'reserved=bloop',
-      content => 'bloop', # parameter is validated as normal
-      errors => [],
-    },
-    {
-      param_obj => { name => 'reserved', in => 'query', allowEmptyValue => true },
-      queries => 'reserved=',
-      content => undef, # empty parameter is not validated
-      errors => [],
-    },
-    {
-      param_obj => { name => 'missing_encoded_not_required', in => 'query', content => { 'application/json' => { schema => { type => 'object' } } } },
+      name => 'missing but not required',
+      param_obj => { name => 'q', content => { 'application/json' => { schema => { type => 'object' } } } },
       queries => 'foo=1&bar=2',
-      content => undef,
     },
     {
-      param_obj => { name => 'missing_encoded_required', in => 'query', required => true, content => { 'application/json' => { schema => { type => 'object' } } } },
+      name => 'missing, required',
+      param_obj => { name => 'q', required => true, content => { 'text/plain' => { schema => {} } } },
       queries => 'foo=1&bar=2',
-      content => undef,
       errors => [
         {
           instanceLocation => '/request/uri/query',
           keywordLocation => $keyword_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'missing query parameter: missing_encoded_required',
+          error => 'missing query parameter: q',
         },
       ],
     },
     {
-      param_obj => { name => 'foo', in => 'query', content => { 'application/json' => { schema => { type => 'integer' } } } },
+      name => 'empty string, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, content => { 'text/plain' => { schema => {} } } },
+      queries => 'foo=1&q=&bar=2',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'empty string, allowEmptyValue=true, required',
+      param_obj => { name => 'q', allowEmptyValue => true, required => true, content => { 'text/plain' => { schema => {} } } },
+      queries => 'foo=1&q=&bar=2',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      param_obj => { name => 'foo', content => { 'application/json' => { schema => {} } } },
       queries => 'foo=1&bar=2',
       content => 1, # number, not string!
     },
     {
-      param_obj => { name => 'reserved', in => 'query', allowReserved => true },
-      queries => 'reserved=!@$',
-      content => undef,
+      param_obj => { name => 'foo', content => { 'application/json' => { schema => {} } } },
+      queries => 'foo=%7B%22a%22:1,%22b%22:2%7D',
+      content => { a => 1, b => 2 },
+    },
+
+    # style=form
+
+    [
+      [ qw(style content queries skip_cookie) ],
+      [ 'form', undef, 'q', 1 ],               # not reversible
+      [ 'form', undef, 'q=' ],                 # not reversible
+      [ 'form', 0, 'q=0' ],
+      [ 'form', 1, 'q=1' ],
+      [ 'form', false, 'q', 1 ],               # not reversible
+      [ 'form', false, 'q=' ],                 # not reversible
+      [ 'form', false, 'q=0' ],
+      [ 'form', true, 'q=1' ],
+      [ 'form', false, 'q=false' ],            # not reversible
+      [ 'form', true, 'q=true' ],              # not reversible
+      [ 'form', 0, 'q=0' ],
+      [ 'form', 1, 'q=1' ],
+      [ 'form', -42, 'q=-42' ],
+      [ 'form', '', 'q', 1 ],                  # not reversible
+      [ 'form', '', 'q=' ],
+      [ 'form', 'red', 'q=red' ],
+      [ 'form', '3', 'q=3' ],
+      [ 'form', '3', 'q=1&q=2&q=3&a=1&b=2' ],  # not reversible
+      [ 'form', 'a+b', 'q=a%2Bb' ],
+      [ 'form', 'a&b', 'q=a%26b' ],
+      [ 'form', 'a#b', 'q=a%23b' ],
+      [ 'form', 'a?b', 'q=a%3Fb' ],
+      [ 'form', '100%', 'q=100%25' ],
+      [ 'form', '100%25', 'q=100%2525' ],
+      [ 'form', 'x=y', 'q=x%3Dy' ],
+    ],
+    [
+      [ qw(style name content queries) ],
+      [ 'form', 'cølör', 'blue/blåck', 'c%C3%B8l%C3%B6r=blue%2Fbl%C3%A5ck&a=b&c=d' ],
+      [ 'form', 'cølör', 'blue/blåck', 'c%C3%B8l%C3%B6r=blue%2Fbl%C3%A5ck' ],
+    ],
+    [
+      [ qw(style explode content queries skip_cookie) ],
+      [ 'form', false, [], 'q' ],                     # not reversible
+      [ 'form', false, [], 'q=' ],
+      [ 'form', true,  [''], 'q', 1 ],                # not reversible
+      [ 'form', true,  [''], 'q=' ],
+      [ 'form', false, [ '', '', '' ], 'q=,,' ],
+      [ 'form', true,  [ '', '', '' ], 'q=&q=&q=' ],
+      [ 'form', false, [ 'red' ], 'q=red' ],
+      [ 'form', false, [ '0', '1', '2' ], 'q=0,1,2' ],
+      [ 'form', false, [ '0', '0', '0' ], 'q=0,0,0' ],
+      [ 'form', false, [ qw(blue black brown) ], 'q=blue,black,brown' ],
+      [ 'form', true,  [ qw(blue black brown) ], 'q=blue&q=black&q=brown' ],
+
+      [ 'form', false, {}, 'q' ],                     # not reversible
+      [ 'form', false, {}, 'q=' ],
+      [ 'form', true,  { q => '' }, 'q', 1 ],         # not reversible
+      [ 'form', true,  { q => '' }, 'q=' ],
+      [ 'form', true,  { x => '' }, 'x', 1 ],         # not reversible
+      [ 'form', true,  { x => '' }, 'x=' ],
+      [ 'form', false, { R => '', G => '', B => '' }, 'q=R,,G,,B,' ],
+      [ 'form', true,  { R => '', G => '', B => '' }, 'R=&G&=&B=' ],
+      [ 'form', false, { R => '100', G => '200', B => '' }, 'q=R,100,G,200,B,' ],
+      [ 'form', true,  { R => '100', G => '200', B => '' }, 'R=100&G=200&B=' ],
+      [ 'form', false, { qw(R 100 G 200 B 150) }, 'q=R,100,G,200,B,150' ],
+      [ 'form', true,  { qw(R 100 G 200 B 150) }, 'R=100&G=200&B=150' ],
+      [ 'form', false, { 'blue−black', 'yes!', 'blackish﹠green', '¿no?', '100𝑥brown', 'fl¡p' },
+        'q=blue%E2%88%92black,yes!,blackish%EF%B9%A0green,%C2%BFno?,100%F0%9D%91%A5brown,fl%C2%A1p' ],
+      [ 'form', true,  { 'blue−black', 'yes!', 'blackish﹠green', '¿no?', '100𝑥brown', 'fl¡p' },
+        'blue%E2%88%92black=yes!&blackish%EF%B9%A0green=%C2%Bfno?&100%f0%9D%91%A5brown=fl%C2%A1p' ],
+    ],
+    [
+      [ qw(style explode name content queries) ],
+      [ 'form', false, 'cølör', [ 'blue−black', 'black/ish&green', '100𝑥brown' ],
+        'c%C3%B8l%C3%B6r=blue%E2%88%92black,black%2Fish%26green,100%F0%9D%91%A5brown' ],
+      [ 'form', true,  'cølör', [ 'blue−black', 'black/ish&gr,e,en', '100𝑥brown' ],
+        'c%C3%B8l%C3%B6r=blue%E2%88%92black&c%C3%B8l%C3%B6r=black%2Fish%26gr%2Ce%2Cen&c%C3%B8l%C3%B6r=100%F0%9D%91%A5brown' ],
+      [ 'form', false, 'cølör', { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+        'c%C3%B8l%C3%B6r=r%C3%A9d,100%F0%9D%91%A5,gr%C9%98%C9%87n,%C2%A1ja,bl%C3%B8%C3%B6,%C2%BFne%C3%AEn&a=b&c=d' ],
+      [ 'form', true,  'cølör', { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+        'r%C3%A9d=100%F0%9D%91%A5&gr%C9%98%C9%87n=%C2%A1ja&bl%C3%B8%C3%B6=%C2%BFne%C3%AEn' ],
+    ],
+
+    {
+      name => 'missing',
+      param_obj => { name => 'q' },
+      queries => 'a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'missing, required',
+      param_obj => { name => 'q', required => true },
+      queries => 'a=b&c=d',
       errors => [
         {
-          instanceLocation => '/request/uri/query/reserved',
-          keywordLocation => $keyword_path.'/allowReserved',
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'allowReserved: true is not yet supported',
+          error => 'missing query parameter: q',
         },
       ],
-      todo => 'allowReserved not yet supported',
     },
     {
-      param_obj => { name => 'color', in => 'query', schema => { type => 'integer' } },
-      queries => 'R=100&G=200&B=150',
-      content => undef,
+      name => 'empty string, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true },
+      queries => 'q=&a=b&c=d',
+      # content not extracted, but also no errors
     },
     {
-      param_obj => { name => 'R', in => 'query', schema => { type => 'integer' } },
-      queries => 'color=blue&R=100&G=200&B=150',
-      content => 100,
-    },
-    { # form, string, empty
-      param_obj => { name => 'color' },
-      queries => 'color=&R=100&G=200&B=150',
+      name => 'with boolean schema, return empty string as string',
+      param_obj => { name => 'q', schema => false },
+      queries => 'q=',
       content => '',
     },
-    { # form, string
-      param_obj => { name => 'color' },
-      queries => 'color=20',
-      content => '20',
+    {
+      name => 'with boolean schema, return encoded data as decoded string',
+      param_obj => { name => 'color', schema => false },
+      queries => 'color=red%EF%B9%A0green',
+      content => 'red﹠green',
     },
-    { # form, number
-      param_obj => { name => 'color', schema => { type => 'number' } },
-      queries => 'color=20',
-      content => 20,
+    {
+      name => 'explode=false, any type is permitted, default to string',
+      param_obj => { name => 'color', explode => false, schema => {} },
+      queries => 'color=red,green,blue',
+      content => 'red,green,blue',
+      skip_cookie => 1,
     },
-    { # form, number chosen over string
+    {
+      name => 'explode=true, any type is permitted, default to string',
+      param_obj => { name => 'color', schema => {} },
+      queries => 'color=red,green,blue',
+      content => 'red,green,blue',
+      skip_cookie => 1,
+    },
+    {
+      name => 'no type is permitted',
+      param_obj => { name => 'color', schema => { allOf => [ { type => 'string' }, { type => 'null' } ] } },
+      queries => 'color=red',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'cannot deserialize to any type',
+        },
+      ],
+    },
+    {
+      name => 'empty string but not deserializable',
+      param_obj => { name => 'q', schema => { type => 'number' } },
+      queries => 'q=',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/q',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'cannot deserialize to requested type (number)',
+        },
+      ],
+    },
+    {
+      name => 'number preferred over string',
       param_obj => { name => 'color', schema => { type => [ qw(string number) ] } },
       queries => 'color=20',
       content => 20,
     },
-    { # form, array, false
-      param_obj => { name => 'color', explode => false },
-      queries => 'color=blue,black,brown&R=100&G=200&B=150',
-      content => [ qw(blue black brown) ],
-      todo => 'style=form, explode=false, parse as array',
+    {
+      name => 'explode=false, array, missing',
+      param_obj => { name => 'q', explode => false, schema => { type => 'array' } },
+      queries => 'a=b&c=d',
+      # content not extracted, but also no errors
     },
-    { # form, array, true
-      param_obj => { name => 'color', explode => true, schema => { type => 'array' } },
-      queries => 'color=blue&color=black&color=brown&R=100&G=200&B=150',
-      content => [ qw(blue black brown) ],
-      todo => 'style=form, explode=true, parse as array',
+    {
+      name => 'explode=false, array, missing, required',
+      param_obj => { name => 'q', explode => false, required => true, schema => { type => 'array' } },
+      queries => 'a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
     },
-    { # form, object, false
-      param_obj => { name => 'color', explode => false, required => true, schema => { type => 'object' } },
-      queries => 'color=R,100,G,200,B,150&R=1&G=2&B=3',
+    {
+      name => 'explode=false, array, missing, allowEmptyValue=true',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=false, array, missing, allowEmptyValue=true, required',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, required => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'explode=false, empty array, allowEmptyValue=true',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+    },
+    {
+      name => 'explode=false, empty array, allowEmptyValue=true, required',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, required => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'explode=false, array, empty elements, allowEmptyValue=true',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=,,&a=b&c=d',
+      content => [ '', '', '' ],
+    },
+    {
+      name => 'explode=false, ask for array or object; object will fail',
+      param_obj => { name => 'color', explode => false, schema => { type => [ qw(array object) ] } },
+      queries => 'color=R,100,G,200,B',
+      content => [ qw(R 100 G 200 B) ],
+    },
+    {
+      name => 'explode=false, array with non-string items',
+      param_obj => { name => 'color', explode => false, schema => {
+          type => 'array',
+          prefixItems => [
+            { type => 'null' },
+            { type => 'boolean' },
+            { type => 'integer' },
+            { type => 'string' },
+          ],
+        } },
+      queries => 'color=,0,42,100',
+      content => [ undef, false, 42, '100' ],
+    },
+    {
+      name => 'explode=true, array, missing',
+      param_obj => { name => 'q', schema => { type => 'array' } },
+      queries => 'a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=true, array, missing, required',
+      param_obj => { name => 'q', required => true, schema => { type => 'array' } },
+      queries => 'a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'explode=true, array, missing, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=true, array, missing, allowEmptyValue=true, required',
+      param_obj => { name => 'q', allowEmptyValue => true, required => true, schema => { type => 'array' } },
+      queries => 'q=&q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'empty array, explode=true, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+    },
+    {
+      name => 'empty array, explode=true, allowEmptyValue=true, required',
+      param_obj => { name => 'q', allowEmptyValue => true, required => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'explode=true, array, some empty elements, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=1&q=&q=&a=b&c=d',
+      content => [ '1' ],
+    },
+    {
+      name => 'explode=true, array, all empty elements, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=&q=&q=&a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=true, array with non-string items',
+      param_obj => { name => 'color', schema => {
+          type => 'array',
+          prefixItems => [
+            { type => 'null' },
+            { type => 'boolean' },
+            { type => 'integer' },
+            { type => 'string' },
+          ],
+        } },
+      queries => 'color=&color=0&color=42&color=100',
+      content => [ undef, false, 42, '100' ],
+    },
+    {
+      name => 'explode=false, object, missing',
+      param_obj => { name => 'q', explode => false, schema => { type => 'object' } },
+      queries => 'a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=false, object, missing, required',
+      param_obj => { name => 'q', explode => false, required => true, schema => { type => 'object' } },
+      queries => 'a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'explode=false, object, missing, allowEmptyValue=true',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q=&a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=false, object, missing, allowEmptyValue=true, required',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, required => true, schema => { type => 'object' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'explode=false, empty object, allowEmptyValue=true',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q=&a=b&c=d',
+    },
+    {
+      name => 'explode=false, empty object, allowEmptyValue=true, required',
+      param_obj => { name => 'q', explode => false, allowEmptyValue => true, required => true, schema => { type => 'object' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'explode=false, bad object',
+      param_obj => { name => 'color', explode => false, schema => { type => 'object' } },
+      queries => 'color=R,100,G,200,B',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'cannot deserialize to requested type (object)',
+        },
+      ],
+      skip_cookie => 1,
+    },
+    {
+      name => 'explode=false, bad object, fall through to string',
+      param_obj => { name => 'color', explode => false, schema => { type => [ qw(object string) ] } },
+      queries => 'color=R,100,G,200,B',
+      content => 'R,100,G,200,B',
+      skip_cookie => 1,
+    },
+    {
+      name => 'explode=false, bad object, requested array or object',
+      param_obj => { name => 'color', explode => false, schema => { type => [qw(object array)] } },
+      queries => 'color=R,100,G,200,B',
+      content => [ qw(R 100 G 200 B) ],
+    },
+    {
+      name => 'explode=false, prefer object',
+      param_obj => { name => 'color', explode => false, schema => { type => [qw(object array)] } },
+      queries => 'color=R,100,G,200,B,150&a=b&c=d',
       content => { R => '100', G => '200', B => '150' },
-      todo => 'style=form, explode=false, parse as object',
     },
-    { # form, object, true
-      param_obj => { name => 'color', explode => true, required => true, schema => { type => 'object' } },
-      queries => 'color=blue&R=100&G=200&B=150',
-      content => { color => 'blue', R => '100', G => '200', B => '150' },
-      todo => 'style=form, explode=true, parse as object',
+    {
+      name => 'explode=false, object with non-string properties',
+      param_obj => { name => 'color', explode => false, schema => {
+          type => 'object',
+          properties => {
+            a => { type => 'null' },
+            b => { type => 'boolean' },
+            c => { type => 'integer' },
+            d => { type => 'string' },
+          },
+        } },
+      queries => 'color=a,,b,0,c,42,d,100',
+      content => { a => undef, b => false, c => 42, d => '100' },
+    },
+    {
+      name => 'explode=true, object, no parameters',
+      param_obj => { name => 'q', schema => { type => 'object' } },
+      queries => '',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=true, object, no parameters, required',
+      param_obj => { name => 'q', required => true, schema => { type => 'object' } },
+      queries => '',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameters',
+        },
+      ],
+    },
+    {
+      name => 'explode=true, empty object, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q=&a=&c=',
+    },
+    {
+      name => 'explode=true, empty object, allowEmptyValue=true, required',
+      param_obj => { name => 'q', allowEmptyValue => true, required => true, schema => { type => 'object' } },
+      queries => 'q=&a=&c=',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameters',
+        },
+      ],
+    },
+    {
+      name => 'explode=true, object, all empty string parameters, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q=&a=&c=',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'explode=true, object, some empty string parameters, allowEmptyValue=true',
+      param_obj => { name => 'q', allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q=&a=1&c=2',
+      content => { a => '1', c => '2' },
+    },
+    {
+      name => 'explode=true, object, missing named parameter',
+      param_obj => { name => 'q', schema => { type => 'object' } },
+      queries => 'a=b&c=d',
+      content => { a => 'b', c => 'd' },
+    },
+    {
+      name => 'explode=true, object, missing named parameter, required',
+      param_obj => { name => 'q', required => true, schema => { type => 'object' } },
+      queries => 'a=b&c=d',
+      content => { a => 'b', c => 'd' },
+    },
+    {
+      name => 'explode=true, object, missing all parameters, required',
+      param_obj => { name => 'q', required => true, schema => { type => 'object' } },
+      queries => '',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameters',
+        },
+      ],
+    },
+    {
+      name => 'explode=true, object with non-string properties',
+      param_obj => { name => 'color', schema => {
+          type => 'object',
+          properties => {
+            a => { type => 'null' },
+            b => { type => 'boolean' },
+            c => { type => 'integer' },
+            d => { type => 'string' },
+          },
+        } },
+      queries => 'a=&b=0&c=42&d=100',
+      content => { a => undef, b => false, c => 42, d => '100' },
     },
 
-    # TODO:
-    # spaceDelimited, string - not supported
-    # spaceDelimited, array/object, true - not supported
-    # spaceDelimited, array, false
-    # spaceDelimited, object, false
-    # pipeDelimited, string - not supported
-    # pipeDelimited, array/object, true - not supported
-    # pipeDelimited, array, false
-    # pipeDelimited, object, false
-    # deepObject, string - not supported
-    # deepObject, array - not supported
-    # deepObject, object, false - not supported
-    # deepObject, object, true
+    # style=spaceDelimited
+
+    [
+      [ qw(style content queries) ],
+      [ 'spaceDelimited', [], 'q' ],             # not reversible
+      [ 'spaceDelimited', [], 'q=' ],
+      [ 'spaceDelimited', [], 'q=&a=b&c=d' ],
+      [ 'spaceDelimited', [ '', '', '' ], 'q=%20%20&a=b&c=d' ],
+      [ 'spaceDelimited', [ '', '', '' ], 'q=%20%20' ],
+      [ 'spaceDelimited', {}, 'q' ],             # not reversible
+      [ 'spaceDelimited', {}, 'q=' ],
+      [ 'spaceDelimited', {}, 'q=&a=b&c=d' ],
+      [ 'spaceDelimited', { R => '', G => '', B => '' }, 'q=R%20%20G%20%20B%20' ],
+      [ 'spaceDelimited', [ 'red' ], 'q=red' ],
+      [ 'spaceDelimited', [ qw(blue black brown) ], 'q=blue%20black%20brown' ],
+      [ 'spaceDelimited', { R => '', G => '', B => '' }, 'q=R%20%20G%20%20B%20' ],
+      [ 'spaceDelimited', { R => '100', G => '200', B => '' }, 'q=R%20100%20G%20200%20B%20' ],
+      [ 'spaceDelimited', { qw(R 100 G 200 B 150) }, 'q=R%20100%20G%20200%20B%20150' ],
+      [ 'spaceDelimited', [ 'a+b' ], 'q=a%2Bb' ],
+      [ 'spaceDelimited', [ 'a&b' ], 'q=a%26b' ],
+      [ 'spaceDelimited', [ 'a#b' ], 'q=a%23b' ],
+      [ 'spaceDelimited', [ 'a?b' ], 'q=a%3Fb' ],
+      [ 'spaceDelimited', [ '100%' ], 'q=100%25' ],
+      [ 'spaceDelimited', [ '100%25' ], 'q=100%2525' ],
+      [ 'spaceDelimited', [ 'a+b', 'c' ], 'q=a%2Bb%20c' ],
+      [ 'spaceDelimited', [ 'x=y', 'z' ], 'q=x%3Dy%20z' ],
+      [ 'spaceDelimited', [ 'a&b', 'c' ], 'q=a%26b%20c' ],
+    ],
+    [
+      [ qw(style name content queries) ],
+      [ 'spaceDelimited', 'cølör', [ 'blue−black', 'black/ish﹠green', '100𝑥brown' ],
+        'c%C3%B8l%C3%B6r=blue%E2%88%92black%20black%2Fish%EF%B9%A0green%20100%F0%9D%91%A5brown' ],
+      [ 'spaceDelimited', 'cølör', { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+        'c%C3%B8l%C3%B6r=r%C3%A9d%20100%F0%9D%91%A5%20gr%C9%98%C9%87n%20%C2%A1ja%20bl%C3%B8%C3%B6%20%C2%BFne%C3%AEn&a=b&c=d' ],
+    ],
+
+    {
+      name => 'no type is permitted',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => { allOf => [ { type => 'array' }, { type => 'object' } ] } },
+      queries => 'color=red',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'spaceDelimited style can only deserialize to arrays or objects',
+        },
+      ],
+    },
+    {
+      name => 'primitive',
+      param_obj => { name => 'color', style => 'spaceDelimited' },
+      queries => 'color=blue&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'spaceDelimited style can only deserialize to arrays or objects',
+        },
+      ],
+    },
+    {
+      name => 'array, missing',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => { type => 'array' } },
+      queries => 'a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'array, missing, required',
+      param_obj => { name => 'q', style => 'spaceDelimited', required => true, schema => { type => 'array' } },
+      queries => 'a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'empty array, allowEmptyValue=true',
+      param_obj => { name => 'q', style => 'spaceDelimited', allowEmptyValue => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'empty array, allowEmptyValue=true, required',
+      param_obj => { name => 'q', style => 'spaceDelimited', allowEmptyValue => true, required => true, schema => { type => 'array' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'empty object, allowEmptyValue=true',
+      param_obj => { name => 'q', style => 'spaceDelimited', allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q=&a=b&c=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'empty object, allowEmptyValue=true, required',
+      param_obj => { name => 'q', style => 'spaceDelimited', allowEmptyValue => true, required => true, schema => { type => 'object' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'wrong type, allowEmptyValue=true',
+      param_obj => { name => 'q', style => 'spaceDelimited', allowEmptyValue => true, schema => { type => 'string' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/q',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'spaceDelimited style can only deserialize to arrays or objects',
+        },
+      ],
+    },
+    {
+      name => 'ask for array or object; object will fail',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => { type => [ qw(array object) ] } },
+      queries => 'color=R%20100%20G%20200%20B',
+      content => [ qw(R 100 G 200 B) ],
+    },
+    {
+      name => 'array with non-string items',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => {
+          type => 'array',
+          prefixItems => [
+            { type => 'null' },
+            { type => 'boolean' },
+            { type => 'integer' },
+            { type => 'string' },
+          ],
+        } },
+      queries => 'color=%200%2042%20100',
+      content => [ undef, false, 42, '100' ],
+    },
+    {
+      name => 'explode=true, array',
+      param_obj => { name => 'color', style => 'spaceDelimited', explode => true, schema => { type => 'array' } },
+      queries => 'color=blue%20black%20brown&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path.'/explode',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/explode',
+          error => 'explode=true is not supported for style=spaceDelimited',
+        },
+      ],
+    },
+    {
+      name => 'bad object',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => { type => 'object' } },
+      queries => 'color=R%20100%20G%20200%20B',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'cannot deserialize to requested type (object)',
+        },
+      ],
+    },
+    {
+      name => 'bad object, requested array or object',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => { type => [qw(object array)] } },
+      queries => 'color=R%20100%20G%20200%20B',
+      content => [ qw(R 100 G 200 B) ],
+    },
+    {
+      name => 'prefer object',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => { type => [qw(object array)] } },
+      queries => 'color=R%20100%20G%20200%20B%20150&a=b&c=d',
+      content => { R => '100', G => '200', B => '150' },
+    },
+    {
+      name => 'object with non-string properties',
+      param_obj => { name => 'color', style => 'spaceDelimited',, schema => {
+          type => 'object',
+          properties => {
+            a => { type => 'null' },
+            b => { type => 'boolean' },
+            c => { type => 'integer' },
+            d => { type => 'string' },
+          },
+        } },
+      queries => 'color=a%20%20b%200%20c%2042%20d%20100',
+      content => { a => undef, b => false, c => 42, d => '100' },
+    },
+    {
+      name => 'object, malformed',
+      param_obj => { name => 'color', style => 'spaceDelimited', schema => { type => 'object' } },
+      queries => 'color=R%20100%20G%20200%20B&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'cannot deserialize to requested type (object)',
+        },
+      ],
+    },
+    {
+      name => 'explode=true, object',
+      param_obj => { name => 'color', style => 'spaceDelimited', explode => true, schema => { type => 'object' } },
+      queries => 'color=R%20100%20G%20200%20B%20150&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path.'/explode',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/explode',
+          error => 'explode=true is not supported for style=spaceDelimited',
+        },
+      ],
+    },
+
+    # style=pipeDelimited - cloned from spaceDelimited
+
+    # style=deepObject
+
+    [
+      [ qw(style explode content queries) ],
+      [ 'deepObject', true, { qw(R 100 G 200 B 150) }, 'q[R]=100&q[G]=200&q[B]=150' ],
+      [ 'deepObject', true, { qw(R 100 G 200 B 150) }, 'q%5BR%5D=100&q%5BG%5D=200&q%5BB%5D=150' ],
+      [ 'deepObject', true, { 'x+y' => 'a+b' }, 'q[x%2By]=a%2Bb' ],
+      [ 'deepObject', true, { 'x+y' => 'a+b' }, 'q%5Bx%2By%5D=a%2Bb' ],
+      [ 'deepObject', true, { 'x&y' => 'a&b' }, 'q[x%26y]=a%26b' ],
+      [ 'deepObject', true, { 'x&y' => 'a&b' }, 'q%5Bx%26y%5D=a%26b' ],
+      # '#' must always be escaped, as it marks the end of the query and start of the fragment
+      [ 'deepObject', true, { 'x#y' => 'a#b' }, 'q%5Bx%23y%5D=a%23b' ],
+      [ 'deepObject', true, { 'x?y' => 'a?b' }, 'q[x?y]=a?b' ],
+      [ 'deepObject', true, { 'x?y' => 'a?b' }, 'q%5Bx%3Fy%5D=a%3Fb' ],
+      # ']' cannot be used in a key name, but '[' can
+      [ 'deepObject', true, { 'x[y' => 'a[b]' }, 'q[x%5By]=a[b]' ],
+      [ 'deepObject', true, { 'x[y' => 'a[b]' }, 'q%5Bx%5By%5D=a%5Bb%5D' ],
+      [ 'deepObject', true, { '100%' => '100%' }, 'q[100%25]=100%25' ],
+      [ 'deepObject', true, { '100%' => '100%' }, 'q%5B100%25%5D=100%25' ],
+      [ 'deepObject', true, { '100%25' => '100%25' }, 'q[100%2525]=100%2525' ],
+      [ 'deepObject', true, { name => 'John Doe', email => 'john@example.com' },
+        'q[name]=John%20Doe&q[email]=john%40example.com' ],
+      [ 'deepObject', true, { R => '', G => '200', B => '' }, 'q[R]=&q[G]=200&q[B]=' ],
+    ],
+
+    {
+      name => 'empty param names and values',
+      param_obj => { name => '', style => 'deepObject', schema => { type => 'object' } },
+      queries => 'color[R]=100&[]=&color[G]=200&color[B]=150&a[1]=b&c[2]=d',
+      content => { '' => '' },
+    },
+    {
+      name => 'object is not specified',
+      param_obj => { name => 'color', style => 'deepObject', schema => { type => [qw(null number string array)] } },
+      queries => 'color[red]=1&color[green]=2',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/color',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'deepObject style can only deserialize to objects',
+        },
+      ],
+    },
+    {
+      name => 'missing',
+      param_obj => { name => 'q', style => 'deepObject', schema => { type => 'object' } },
+      queries => 'floop[a]=1&floop[b]=2&a[1]=b&c[2]=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'missing, required',
+      param_obj => { name => 'q', style => 'deepObject', required => true, schema => { type => 'object' } },
+      queries => 'floop[a]=1&floop[b]=2&a[1]=b&c[2]=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'empty object, allowEmptyValue=true',
+      param_obj => { name => 'q', style => 'deepObject', allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q[a]=&a[x]=b&c[y]=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'empty object, allowEmptyValue=true, required',
+      param_obj => { name => 'q', style => 'deepObject', allowEmptyValue => true, required => true, schema => { type => 'object' } },
+      queries => 'q[a]=&a[x]=b&c[y]=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'some values are empty string, allowEmptyValue=true',
+      param_obj => { name => 'q', style => 'deepObject', allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q[a]=&q[b]=&q[c]=1&a[1]=b&c[2]=d',
+      content => { c => '1' },
+    },
+    {
+      name => 'all values are empty string, allowEmptyValue=true',
+      param_obj => { name => 'q', style => 'deepObject', allowEmptyValue => true, schema => { type => 'object' } },
+      queries => 'q[a]=&q[b]=&a[1]=b&c[2]=d',
+      # content not extracted, but also no errors
+    },
+    {
+      name => 'empty string values, allowEmptyValue=true, required',
+      param_obj => { name => 'q', style => 'deepObject', allowEmptyValue => true, required => true, schema => { type => 'object' } },
+      queries => 'q[a]=&q[b]=&a[1]=b&c[2]=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing query parameter: q',
+        },
+      ],
+    },
+    {
+      name => 'wrong type, allowEmptyValue=true',
+      param_obj => { name => 'q', style => 'deepObject', allowEmptyValue => true, schema => { type => 'string' } },
+      queries => 'q=&a=b&c=d',
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/q',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'deepObject style can only deserialize to objects',
+        },
+      ],
+    },
+    {
+      name => 'object with non-string properties',
+      param_obj => { name => 'color', style => 'deepObject', schema => {
+          type => 'object',
+          properties => {
+            a => { type => 'null' },
+            b => { type => 'boolean' },
+            c => { type => 'integer' },
+            d => { type => 'string' },
+          },
+        } },
+      # "color[a]" => "", "color[b]" => 0, "color[c]" => 42, "color[d]" => 100
+      queries => 'color%5Ba%5D=&color%5Bb%5D=0&color%5Bc%5D=42&color%5Bd%5D=100',
+      content => { a => undef, b => false, c => 42, d => '100' },
+    },
+    {
+      name => 'with encoded name and values',
+      param_obj => { name => 'cølör', style => 'deepObject', schema => { type => 'object' } },
+      queries => 'c%C3%B8l%C3%B6r%5Br%C3%A9d%5D=100%F0%9D%91%A5&c%C3%B8l%C3%B6r%5Bgr%C9%98%C9%87n%5D=%C2%A1ja&c%C3%B8l%C3%B6r%5Bbl%C3%B8%C3%B6%5D=%C2%BFne%C3%AEn&a%5B1%5D=b&c%5B2%5D=d',
+      content => { 'réd' => '100𝑥', 'grɘɇn' => '¡ja', 'bløö' => '¿neîn' },
+    },
   );
 
+  # clone spaceDelimited tests to pipeDelimited; save a copy for cookie testing
+  @query_tests = @tests = map +(
+    (($_->{param_obj}{style}//'form') eq 'spaceDelimited' ? ($_, +{
+    %$_,
+    name => $_->{name} =~ s/spaceDelimited/pipeDelimited/r,
+    param_obj => { $_->{param_obj}->%*, style => 'pipeDelimited' },
+    queries => $_->{queries} =~ s/%20/%7C/gr,
+    $_->{errors} ? (errors => [ map +{ %$_, error => $_->{error} =~ s/spaceDelimited/pipeDelimited/r }, $_->{errors}->@* ]) : (),
+    }) : $_)
+  ),
+
+  map +(
+    ref eq 'ARRAY'
+      ? map +{
+          name => defined $_->{explode} ? 'explode='.($_->{explode}?'true':'false') : '',
+          param_obj => {
+            name => $_->{name}//'q',
+            style => $_->{style},
+            defined $_->{explode} ? $_->%{explode} : (),
+            schema => { type => get_type($_->{content}) },
+            defined $_->{allowReserved} ? $_->%{allowReserved} : (),
+          },
+          $_->%{qw(queries content skip_cookie)},
+        }, arrays_to_hashes($_)->@*
+      : $_
+  ), @tests;
+
   foreach my $test (@tests) {
-    my $param_obj = +{
-      # default to type=string in the absence of an override
-      exists $test->{param_obj}{content} ? () : (schema => { type => 'string' }),
-      $test->{param_obj}->%*,
-      in => 'query',
-    };
+    die 'missing test param "param_obj"' if not exists $test->{param_obj};
+    die 'missing test param "queries"' if not exists $test->{queries};
 
-    undef $parameter_content;
+    subtest 'query '
+        .($test->{param_obj}{content} ? 'encoded with media-type' : 'style='.($test->{param_obj}{style}//'form'))
+        .(length $test->{name} ? ', '.$test->{name} : '').': '
+        .'"'.$test->{queries}.'"'.(exists $test->{content} ? ' -> '.$::dumper->encode($test->{content}) : '') => sub {
 
-    my $state = _init_test('/request/uri/query', +{ $param_obj->%{qw(schema content)} });
+      my $param_obj = +{
+        # default to type=string in the absence of an override
+        exists $test->{param_obj}{content} ? () : (schema => { type => 'string' }),
+        $test->{param_obj}->%*,
+        in => 'query',
+      };
 
-    my $name = $param_obj->{name};
-    ()= $openapi->_validate_query_parameter($state, $param_obj, Mojo::URL->new('https://example.com/blah?'.$test->{queries}));
+      my $result = $openapi->evaluator->evaluate(
+        $param_obj,
+        OpenAPI::Modern::Utilities::DEFAULT_METASCHEMA()->{'3.2'}.'#/$defs/parameter',
+      );
+      fail('parameter object is valid'), note($result), return if not $result->valid;
 
-    todo_maybe($test->{todo}, sub {
+      undef $parameter_content;
+      my $previous_call_count = $call_count;
+
+      my $state = _init_test('/request/uri/query', +{ $param_obj->%{qw(schema content)} });
+
+      my $valid = $openapi->_validate_query_parameter($state, $param_obj, Mojo::URL->new('https://example.com/blah?'.$test->{queries})->query);
+      die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
+        $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
+
+      my $todo;
+      $todo = todo $test->{todo} if $test->{todo};
+
       is_equal(
         [ map $_->TO_JSON, $state->{errors}->@* ],
         $test->{errors}//[],
-        'query '.$name.' from '.$test->{queries}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
+        ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
       );
 
-      is_equal(
-        $parameter_content,
-        $test->{content},
-        'query '.$name.' from '.$test->{queries}.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-      );
-    });
+      if (not exists $test->{content}) {
+        is($call_count, $previous_call_count, 'no content was extracted')
+          or note("extracted content:\n", $::encoder->encode($parameter_content));
+      }
+      else {
+        is($call_count, $previous_call_count+1, 'schema would be evaluated');
+        is_equal(
+          $parameter_content,
+          $test->{content},
+          defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
+        );
+      }
+    };
   }
 };
 
@@ -1348,7 +2225,432 @@ subtest 'header parameters' => sub {
       my $todo;
       $todo = todo $test->{todo} if $test->{todo};
 
-      cmp_result(
+      is_equal(
+        [ map $_->TO_JSON, $state->{errors}->@* ],
+        $test->{errors}//[],
+        ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
+      );
+
+      if (not exists $test->{content}) {
+        is($call_count, $previous_call_count, 'no content was extracted')
+          or note("extracted content:\n", $::encoder->encode($parameter_content));
+      }
+      else {
+        is($call_count, $previous_call_count+1, 'schema would be evaluated');
+        is_equal(
+          $parameter_content,
+          $test->{content},
+          defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted',
+        );
+      }
+    };
+  }
+};
+
+subtest 'cookie parameters' => sub {
+  my @tests = (
+    # name (test name)
+    # param_obj (from OAD)
+    # cookie => raw Cookie header string
+    # content => expected data to be passed to _evaluate_subschema (omit when evaluation is omitted)
+    # errors => compared to what is collected from $state, defaults to []
+    # todo
+
+    {
+      name => 'missing header but not required',
+      param_obj => { content => { 'application/json' => { schema => { type => 'object' } } } },
+    },
+    {
+      name => 'missing header, required',
+      param_obj => { required => true, content => { 'text/plain' => { schema => {} } } },
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing header: Cookie',
+        },
+      ],
+    },
+    {
+      name => 'empty header but not required',
+      param_obj => { name => 'q', content => { 'application/json' => {} } },
+      cookie => 'foo=bar; baz=qux',
+    },
+    {
+      name => 'empty header, required',
+      param_obj => { name => 'q', required => true, content => { 'application/json' => {} } },
+      cookie => 'foo=bar; baz=qux',
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing cookie parameter: q',
+        },
+      ],
+    },
+    {
+      param_obj => { name => 'foo', content => { 'application/json' => { schema => {} } } },
+      cookie => 'foo=1',
+      content => 1, # number, not string!
+    },
+    {
+      name => 'adjacent to styled cookie parameters',
+      param_obj => { name => 'color', content => { 'application/json' => { schema => {} } } },
+      cookie => 'foo=bar; color=1',
+      content => 1,  # numeric value, carefully avoiding comma
+    },
+    {
+      name => 'wide characters in cookie header (name)',
+      param_obj => { name => 'ಠ_ಠ', content => { 'application/json' => { schema => { type => 'string' } } } },
+      cookie => 'ಠ_ಠ=foo',
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'invalid cookie name: "ಠ_ಠ"',
+        },
+      ],
+    },
+    {
+      name => 'wide characters in cookie header (value)',
+      param_obj => { content => { 'application/json' => { schema => { type => 'string' } } } },
+      cookie => 'q=ಠ_ಠ',
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path,
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          error => 'invalid cookie value: "ಠ_ಠ"',
+        },
+      ],
+    },
+
+    # style=form - copied from query tests
+
+    (map +(
+      !exists $_->{param_obj}{content}
+        && !$_->{param_obj}{allowEmptyValue}
+        && (($_->{param_obj}//{})->{style}//'form') eq 'form'
+      ? do {
+        $_->{cookie} = delete $_->{queries};
+        $_->{errors} = +[ map +{
+          %$_,
+          instanceLocation => $_->{instanceLocation} =~ s{uri/query}{header/Cookie}r,
+          error => $_->{error} =~ s/query/cookie/r,
+        }, $_->{errors}->@* ] if $_->{errors};
+        $_;
+      }
+      : ()
+    ), @query_tests),
+
+    {
+      name => 'missing but not required',
+      param_obj => {},
+      cookie => 'foo=1&bar=2',
+    },
+    {
+      name => 'missing, required',
+      param_obj => { required => true },
+      cookie => 'foo=1&bar=2',
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing cookie parameter: q',
+        },
+      ],
+    },
+
+    [
+      [ qw(style content cookie) ],
+      [ 'form', '', 'q=' ],
+      [ 'form', 'red', '  q=red  ' ],
+      [ 'form', '"red"', 'q="red"' ],
+      [ 'form', '1', 'q=1&r=2&s=3' ],         # nonsensical if requesting a primitive, but still works
+      [ 'form', '3', 'q=1; q=2; q=3' ],       # we take the last one when primitive is requested
+      [ 'form', '1', 'q=1; r=2&s=3' ],
+      [ 'form', '1', 'q=1; r=2; s=3' ],
+    ],
+    [
+      [ qw(style name content cookie) ],
+      [ 'form', 'cølör', 'blue/blåck', 'c%C3%B8l%C3%B6r=blue%2Fbl%C3%A5ck' ],
+      [ 'form', 'cølör', 'blue/blåck', '%63%C3%B8%6C%C3%B6%72=blue%2Fbl%C3%A5ck' ],
+    ],
+    [
+      [ qw(style explode content cookie) ],
+      [ 'form', true,  [ '1' ], 'q=1' ],
+      [ 'form', true,  [ '1' ], 'a=42; q=1; r=2; x=3' ],
+      [ 'form', true,  [ qw(1 2) ], 'a=42; q=1&q=2; r=2; x=3' ],
+      [ 'form', true,  { a => 'b', c => 'd' }, 'a=b&c=d' ],
+    ],
+
+    {
+      name => 'multiple cookie entries with object',
+      param_obj => { name => 'foo', schema => { type => 'object' } },
+      cookie => 'a=b&c=d; foo=bar; foo=baz',
+      # the content we really want is { a => 'b', c => 'd' }, not foo
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie/foo',
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          error => 'cannot deserialize into an object with style=form, explode=true when multiple cookies are present',
+        },
+      ],
+    },
+
+    # style=cookie
+
+    {
+      name => 'with boolean schema, return empty string as string',
+      param_obj => { name => 'color', schema => true },
+      cookie => 'color=',
+      content => '',
+    },
+    {
+      name => 'with boolean schema, return data as string',
+      param_obj => { name => 'color', schema => true },
+      cookie => 'color=42',
+      content => '42',
+    },
+    [
+      [ qw(style content cookie) ],
+      [ 'cookie', undef, 'q=' ],
+      [ 'cookie', false, 'q=' ],                     # not reversible
+      [ 'cookie', false, 'q=0' ],
+      [ 'cookie', true, 'q=1' ],
+      [ 'cookie', false, 'q=false' ],                # not reversible
+      [ 'cookie', true, 'q=true' ],                  # not reversible
+      [ 'cookie', 0, 'q=0' ],
+      [ 'cookie', 1, 'q=1' ],
+      [ 'cookie', -42, 'q=-42' ],
+      [ 'cookie', '', 'q=' ],
+      [ 'cookie', 'red', 'q=red' ],
+      [ 'cookie', 'red', '  q=red  ' ],              # not reversible
+      [ 'cookie', '3', 'q=3' ],
+      [ 'cookie', '3', 'q=1; q=2; q=3; a=1; b=2' ],  # not reversible
+      [ 'cookie', '1', 'q=1; r=2&s=3' ],
+      [ 'cookie', '1', 'q=1; r=2; s=3' ],
+      [ 'cookie', 'a%2Bb', 'q=a%2Bb' ],
+      [ 'cookie', 'a%26b', 'q=a%26b' ],
+      [ 'cookie', 'a%23b', 'q=a%23b' ],
+      [ 'cookie', 'a%3Fb', 'q=a%3Fb' ],
+      [ 'cookie', '100%25', 'q=100%25' ],
+      [ 'cookie', '100%2525', 'q=100%2525' ],
+      [ 'cookie', 'x%3Dy', 'q=x%3Dy' ],
+    ],
+    [
+      [ qw(style name content cookie) ],
+      [ 'cookie', 'color', 'red-green', "color=red-green" ],
+    ],
+    [
+      [ qw(style explode content cookie) ],
+      [ 'cookie', true,  [''], 'q=' ],
+      [ 'cookie', true,  [ '', '', '' ], 'q=; q=; q=' ],
+      [ 'cookie', true,  [ qw(blue black brown) ], 'q=blue; q=black; q=brown' ],
+      [ 'cookie', true,  { q => '' }, 'q=' ],
+      [ 'cookie', true,  { R => '', G => '', B => '' }, 'R=; G=; B=' ],
+      [ 'cookie', true,  { R => '100', G => '200', B => '' }, 'R=100; G=200; B=' ],
+      [ 'cookie', true,  { qw(R 100 G 200 B 150) }, 'R=100; G=200; B=150' ],
+    ],
+
+    {
+      name => 'missing header but not required',
+      param_obj => { style => 'cookie' },
+    },
+    {
+      name => 'missing header, required',
+      param_obj => { style => 'cookie', required => true },
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing header: Cookie',
+        },
+      ],
+    },
+    {
+      name => 'missing cookie parameter but not required',
+      param_obj => { style => 'cookie' },
+      cookie => 'foo=bar; baz=qux',
+    },
+    {
+      name => 'missing header, required',
+      param_obj => { style => 'cookie', required => true },
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/required',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+          error => 'missing header: Cookie',
+        },
+      ],
+    },
+    {
+      name => 'missing cookie-value',
+      param_obj => { style => 'cookie' },
+      cookie => 'q',
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          error => 'cookie-string "q" is missing a value',
+        },
+      ],
+    },
+    {
+      name => 'missing cookie-values',
+      param_obj => { style => 'cookie' },
+      cookie => 'q; r',
+      errors => [
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          error => 'cookie-string "q" is missing a value',
+        },
+        {
+          instanceLocation => '/request/header/Cookie',
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
+          error => 'cookie-string "r" is missing a value',
+        },
+      ],
+    },
+    {
+      name => 'with boolean schema, return empty string as string',
+      param_obj => { style => 'cookie', schema => true },
+      cookie => 'q=',
+      content => '',
+    },
+    {
+      name => 'with boolean schema, return data as string',
+      param_obj => { style => 'cookie', schema => true },
+      cookie => 'q=42',
+      content => '42',
+    },
+    (map +(
+      {
+        name => 'parameter name is valid even if not valid as a cookie name',
+        param_obj => { name => 'q=hello', style => $_, schema => { type => 'object' } },
+        cookie => 'q=hello=there',
+        content => { q => 'hello=there' },
+      },
+      {
+        name => 'invalid cookie name, but wrong name is parsed so value is not found',
+        param_obj => { name => 'q=hello', style => $_, schema => { type => 'string' } },
+        cookie => 'q=hello=there',
+        # parsed as name = 'q', value = 'hello=there'
+      },
+      {
+        name => 'invalid cookie name',
+        param_obj => { name => 'foo[bar]', style => $_, schema => { type => 'string' } },
+        cookie => 'foo[bar]=hi',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'invalid cookie name: "foo[bar]"',
+          },
+        ],
+      },
+      {
+        name => 'invalid cookie values (bad character)',
+        param_obj => { style => $_, schema => { type => 'string' } },
+        cookie => 'foo=bad,value; bar=worse,value',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'invalid cookie values: "bad,value", "worse,value"',
+          },
+        ],
+      },
+      {
+        name => 'invalid cookie values (mismatched quotes)',
+        param_obj => { style => $_, schema => { type => 'string' } },
+        cookie => 'foo=bad"',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'invalid cookie value: "bad\""',
+          },
+        ],
+      },
+    ), qw(form cookie)),
+  );
+
+  @tests = map +(
+    ref eq 'ARRAY'
+      ? map +{
+          name => defined $_->{explode} ? 'explode='.($_->{explode}?'true':'false') : '',
+          param_obj => {
+            name => $_->{name}//'q',
+            style => $_->{style},
+            defined $_->{explode} ? $_->%{explode} : (),
+            schema => { type => get_type($_->{content}) },
+          },
+          $_->%{qw(cookie content)},
+        }, arrays_to_hashes($_)->@*
+      : $_
+  ), @tests;
+
+  foreach my $test (@tests) {
+    die 'missing test param "param_obj"' if not exists $test->{param_obj};
+
+    subtest 'cookie '
+        .($test->{param_obj}{content} ? 'encoded with media-type' : 'style='.($test->{param_obj}{style}//'form'))
+        .(length $test->{name} ? ', '.$test->{name} : '').': '
+        .(defined $test->{cookie} ? '"'.$test->{cookie}.'"' : '<missing>')
+        .' -> '.$::dumper->encode($test->{content}) => sub {
+
+      skip_all 'not valid in cookie' if $test->{skip_cookie};
+
+      my $param_obj = +{
+        # default to type=string in the absence of an override
+        exists $test->{param_obj}{content} ? () : (schema => { type => 'string' }),
+        name => 'q',
+        $test->{param_obj}->%*,
+        in => 'cookie',
+      };
+
+      my $type = get_type($test->{content});
+      skip_all "explode=false and $type not compatible with Cookie header"
+        if not ($param_obj->{explode}//true) and ($type eq 'array' or $type eq 'object');
+
+      my $result = $openapi->evaluator->evaluate(
+        $param_obj,
+        OpenAPI::Modern::Utilities::DEFAULT_METASCHEMA()->{'3.2'}.'#/$defs/parameter',
+        { with_defaults => 1 },
+      );
+      fail('parameter object is valid'), note($result), return if not $result->valid;
+
+      undef $parameter_content;
+      my $previous_call_count = $call_count;
+
+      my $state = _init_test('/request/header/Cookie', +{ $param_obj->%{qw(schema content)} });
+
+      my $headers = Mojo::Headers->new;
+      $headers->add('Cookie', $test->{cookie}) if defined $test->{cookie};
+
+      my $valid = $openapi->_validate_cookie_parameter($state, $param_obj, $headers);
+      die 'validity inconsistent with error count; got valid=', 0+!!$valid, ', errors are: ',
+        $::encoder->encode($state->{errors}) if $valid xor !$state->{errors}->@*;
+
+      my $todo;
+      $todo = todo $test->{todo} if $test->{todo};
+
+      is_equal(
         [ map $_->TO_JSON, $state->{errors}->@* ],
         $test->{errors}//[],
         ($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred',
@@ -1638,7 +2940,7 @@ YAML
         foreach grep substr($_, 0, $len) eq $path, keys $openapi->openapi_document->{_type_in_schema}->%*;
 
       my @types = $openapi->_type_in_schema($schema, { %$state });
-      cmp_result(
+      is_equal(
         [ sort @types], [ sort @$expected_types ],
             (is_bool($schema) ? 'schema is boolean'
           : 'schema has '.(!keys %$schema ? 'no keywords'

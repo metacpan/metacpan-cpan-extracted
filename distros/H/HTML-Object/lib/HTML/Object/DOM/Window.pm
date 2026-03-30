@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Window.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.0_1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/31
-## Modified 2022/09/18
+## Modified 2026/03/29
 ## All rights reserved
 ## 
 ## 
@@ -16,11 +16,12 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::EventTarget );
     use vars qw( @LVALUE_METHODS $VERSION );
     # perl -nE 'print if( s,^sub (\w+) : lvalue.*?$,$1, )' ./lib/HTML/Object/DOM/Window.pm | tr "\n" " "
     our @LVALUE_METHODS = qw( closed document event frames fullScreen innerHeight innerWidth isSecureContext location name onappinstalled onbeforeinstallprompt ondevicemotion ondeviceorientation ondeviceorientationabsolute ondeviceproximity onerror ongamepadconnected ongamepaddisconnected onlanguagechange onorientationchange onrejectionhandled onresize onstorage onuserproximity onvrdisplayactivate onvrdisplayblur onvrdisplayconnect onvrdisplaydeactivate onvrdisplaydisconnect onvrdisplayfocus onvrdisplaypresentchange outerHeight outerWidth parent screen scrollX scrollY self status top visualViewport );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.0_1';
 };
 
 use strict;
@@ -246,7 +247,10 @@ sub pageXOffset { return; }
 sub pageYOffset { return; }
 
 # Note: property parent read-only
-sub parent : lvalue { return( shift->_set_get_object_lvalue( 'parent', 'HTML::Object::DOM::Window', @_ ) ); }
+sub parent : lvalue { return( shift->_set_get_object_lvalue({
+    field  => 'parent',
+    weaken => 1,
+}, 'HTML::Object::DOM::Window', @_ ) ); }
 
 # Note: property performance read-only
 sub performance { return; }
@@ -376,7 +380,7 @@ HTML::Object::DOM::Window - HTML Object DOM Window Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.0_1
 
 =head1 DESCRIPTION
 
@@ -1477,7 +1481,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 onvrdisplayblur
 
-Represents an event handler that will run when presentation to a display has been paused for some reason by the browser, OS, or VR hardware (when the vrdisplayblur event fires) — for example, while the user is interacting with a system menu or browser, to prevent tracking or loss of experience.
+Represents an event handler that will run when presentation to a display has been paused for some reason by the browser, OS, or VR hardware (when the vrdisplayblur event fires) - for example, while the user is interacting with a system menu or browser, to prevent tracking or loss of experience.
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Window/onvrdisplayblur>
 
@@ -1507,7 +1511,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 onvrdisplaypresentchange
 
-represents an event handler that will run when the presenting state of a VR device changes — i.e. goes from presenting to not presenting, or vice versa (when the vrdisplaypresentchange event fires).
+represents an event handler that will run when the presenting state of a VR device changes - i.e. goes from presenting to not presenting, or vice versa (when the vrdisplaypresentchange event fires).
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/Window/onvrdisplaypresentchange>
 

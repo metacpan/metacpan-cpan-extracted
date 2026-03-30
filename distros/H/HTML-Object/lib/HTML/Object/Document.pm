@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::Element );
     use vars qw( $VERSION );
     use Scalar::Util ();

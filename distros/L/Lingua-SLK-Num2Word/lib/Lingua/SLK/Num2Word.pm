@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = qw( 0 nula         1 jedna         2 dva
                  3 tri          4 štyri         5 päť
                  6 šesť         7 sedem         8 osem
@@ -128,13 +128,145 @@ sub num2slk_cardinal :Export {
 
 # }}}
 
+# {{{ num2slk_ordinal           number to ordinal string conversion
+
+sub num2slk_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'nultý',
+        1  => 'prvý',
+        2  => 'druhý',
+        3  => 'tretí',
+        4  => 'štvrtý',
+        5  => 'piaty',
+        6  => 'šiesty',
+        7  => 'siedmy',
+        8  => 'ôsmy',
+        9  => 'deviaty',
+        10 => 'desiaty',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Irregular teens 11-19
+    my %teens = (
+        11 => 'jedenásty',
+        12 => 'dvanásty',
+        13 => 'trinásty',
+        14 => 'štrnásty',
+        15 => 'pätnásty',
+        16 => 'šestnásty',
+        17 => 'sedemnásty',
+        18 => 'osemnásty',
+        19 => 'devätnásty',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'dvadsiaty',
+        30 => 'tridsiaty',
+        40 => 'štyridsiaty',
+        50 => 'päťdesiaty',
+        60 => 'šesťdesiaty',
+        70 => 'sedemdesiaty',
+        80 => 'osemdesiaty',
+        90 => 'deväťdesiaty',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'stý',
+        200 => 'dvojstý',
+        300 => 'trojstý',
+        400 => 'štvorsťý',
+        500 => 'päťstý',
+        600 => 'šesťstý',
+        700 => 'sedemstý',
+        800 => 'osemstý',
+        900 => 'deväťstý',
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            my $prefix = num2slk_cardinal($millions);
+            if ($millions == 1) {
+                return 'milióntý';
+            }
+            return $prefix . ' milióntý';
+        }
+        my $prefix = num2slk_cardinal($millions);
+        my $mil_word = ($millions == 1) ? 'milión' :
+                       ($millions >= 2 && $millions <= 4) ? 'milióny' : 'miliónov';
+        $mil_word = 'milión' if $millions == 1;
+        return $prefix . ' ' . $mil_word . ' ' . num2slk_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'tisíci';
+            }
+            return num2slk_cardinal($thousands) . ' tisíci';
+        }
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'tisíc';
+        }
+        else {
+            $thou_cardinal = num2slk_cardinal($thousands) .
+                (($thousands % 100 >= 2 && $thousands % 100 <= 4 &&
+                  !($thousands % 100 >= 12 && $thousands % 100 <= 14))
+                 ? ' tisíce' : ' tisíc');
+        }
+        return $thou_cardinal . ' ' . num2slk_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2slk_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_ord{$t} . ' ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -156,7 +288,7 @@ Lingua::SLK::Num2Word - Number to word conversion in Slovak
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SLK::Num2Word is module for conversion numbers into their representation
 in Slovak. It converts whole numbers from 0 up to 999 999 999.
@@ -197,6 +329,20 @@ Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will
 be converted.
 
+=item B<num2slk_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    ordinal string (e.g. 'prvý', 'druhý')
+
+Convert number to its Slovak ordinal form.
+Only numbers from interval [0, 999_999_999] will be converted.
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -211,6 +357,8 @@ be converted.
 =over 2
 
 =item num2slk_cardinal
+
+=item num2slk_ordinal
 
 =back
 

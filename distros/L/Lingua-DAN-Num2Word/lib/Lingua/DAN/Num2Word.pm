@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -215,7 +215,7 @@ Lingua::DAN::Num2Word - Number to word conversion in Danish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::DAN::Num2Word is module for converting numbers into their written
 representation in Danish. Converts whole numbers from 0 up to 999 999 999.
@@ -267,6 +267,13 @@ Only numbers from interval [0, 999_999_999] will be converted.
 Convert number to its Danish ordinal text representation.
 Handles irregular forms (første, anden, tredje, etc.)
 and applies correct suffixes for regular forms.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

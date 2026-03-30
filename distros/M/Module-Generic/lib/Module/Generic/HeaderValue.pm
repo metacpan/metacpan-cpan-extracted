@@ -289,7 +289,7 @@ sub as_string
                     my $qstr = $self->qstring( $value, (
                             ( ref( $opts->{quote} ) eq 'ARRAY' && scalar( grep( $params->[$i], @{$opts->{quote}} ) ) )
                             ||
-                            ( !ref( $opts->{quote} ) && $opts->{quote} eq $params->[$i] ) 
+                            ( !ref( $opts->{quote} ) && ( $opts->{quote} // '' ) eq $params->[$i] ) 
                         ) ? ( quote => 1 ) : ()
                     );
                     if( !defined( $qstr ) )

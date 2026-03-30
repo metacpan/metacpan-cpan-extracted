@@ -1,0 +1,35 @@
+======================================================================
+ mb Cheat Sheet                                           [MY] ဗမာဘာသာ
+======================================================================
+
+[ 1. မော်ဂျူးတင်သွင်းခြင်း ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. စာလုံးအခြေခံ length / substr ]
+  mb::length($str)              # စာလုံးအရေအတွက် (bytes မဟုတ်)
+  mb::substr($str, $pos, $len)  # စာလုံးအနေအထားဖြင့် substring
+
+[ 3. စာကြောင်းရှာဖွေခြင်း ]
+  mb::index($str, $sub)         # စာလုံးအနေအထား index
+  mb::rindex($str, $sub)        # ညာဘက်မှ ရှာဖွေခြင်း
+  mb::index_byte($str, $sub)    # bytes အနေအထား index
+
+[ 4. စာလုံးပြောင်းလဲခြင်း ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. စာလုံးကုဒ် ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. အခြားလုပ်ဆောင်ချက်များ ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. ပံ့ပိုးသည့် encoding များ ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. နမူနာ ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "မင်္ဂလာပါ";
+  printf "အရှည်=%d\n", mb::length($s);

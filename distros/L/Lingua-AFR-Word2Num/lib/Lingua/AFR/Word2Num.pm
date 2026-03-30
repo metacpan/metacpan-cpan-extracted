@@ -16,7 +16,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my $parser = afr_numerals();
 
@@ -96,6 +96,28 @@ sub afr_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Inverse of Afrikaans ordinal morphology: restore cardinal from ordinal text.
+    # Irregulars (standalone or as final element of compound)
+    $input =~ s{eerste\z}{een}xms     and return $input;
+    $input =~ s{tweede\z}{twee}xms    and return $input;
+    $input =~ s{derde\z}{drie}xms     and return $input;
+    $input =~ s{negende\z}{nege}xms   and return $input;
+
+    # Regular: strip -ste (20+ and compounds ending in tens/honderd/duisend)
+    $input =~ s{ste\z}{}xms           and return $input;
+
+    # Regular: strip -de (4-19 except 9)
+    $input =~ s{de\z}{}xms            and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -105,6 +127,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::AFR::Word2Num - Word to number conversion in Afrikaans
@@ -112,7 +136,7 @@ Lingua::AFR::Word2Num - Word to number conversion in Afrikaans
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::AFR::Word2Num is module for converting text containing number
 representation in afrikaans back into number. Converts whole numbers from 0 up
@@ -154,6 +178,14 @@ Convert text representation to number.
 If the input string is not known, or out of the
 interval, undef is returned.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'derde', 'twaalfde', 'twintigste')
+  =>  str    cardinal text (e.g. 'drie', 'twaalf', 'twintig')
+      undef  if input is not recognised as an ordinal
+
+Convert Afrikaans ordinal text to cardinal text (morphological reversal).
+
 =item B<afr_numerals> (void)
 
   =>  obj  new parser object
@@ -174,6 +206,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

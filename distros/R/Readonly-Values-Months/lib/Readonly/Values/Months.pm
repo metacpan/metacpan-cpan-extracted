@@ -13,11 +13,15 @@ Readonly::Values::Months - Months Constants
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
+
+=head1 ABSTRACT
+
+Provides %months keyed on lowercase full and abbreviated names
 
 =head1 SYNOPSIS
 
@@ -53,29 +57,20 @@ our $VERSION = '0.03';
 Readonly::Enum our ($JAN, $FEB, $MAR, $APR, $MAY, $JUN, $JUL, $AUG, $SEP, $OCT, $NOV, $DEC) => 1;
 
 Readonly::Hash our %months => (
-	'jan' => $JAN,
-	'january' => $JAN,
-	'feb' => $FEB,
-	'february' => $FEB,
-	'mar' => $MAR,
-	'march' => $MAR,
-	'apr' => $APR,
-	'april' => $APR,
-	'may' => $MAY,
-	'jun' => $JUN,
-	'june' => $JUN,
-	'jul' => $JUL,
-	'july' => $JUL,
-	'aug' => $AUG,
-	'august' => $AUG,
-	'sep' => $SEP,
-	'september' => $SEP,
-	'oct' => $OCT,
-	'october' => $OCT,
-	'nov' => $NOV,
-	'november' => $NOV,
-	'dec' => $DEC,
-	'december' => $DEC
+	# Full names
+	'january'   => $JAN,  'february'  => $FEB,  'march'     => $MAR,
+	'april'     => $APR,  'may'       => $MAY,  'june'      => $JUN,
+	'july'      => $JUL,  'august'    => $AUG,  'september' => $SEP,
+	'october'   => $OCT,  'november'  => $NOV,  'december'  => $DEC,
+
+	# Abbreviations
+	'jan' => $JAN,  'feb' => $FEB,  'mar' => $MAR,
+	'apr' => $APR,  'may' => $MAY,  'jun' => $JUN,
+	'jul' => $JUL,  'aug' => $AUG,  'sep' => $SEP,
+	'oct' => $OCT,  'nov' => $NOV,  'dec' => $DEC,
+
+	# Alternative abbreviations
+	'sept' => $SEP,	# Common alternative for September
 );
 
 Readonly::Array our @month_names => (
@@ -107,8 +102,11 @@ our @EXPORT = qw(
 
 # Helper routine: Shorten strings to their first three characters
 sub _shorten {
-	return substr(shift, 0, 3);
-};
+	my $str = $_[0];
+
+	return unless defined $str;
+	return substr($str, 0, 3);
+}
 
 =head1 AUTHOR
 
@@ -156,7 +154,7 @@ L<http://deps.cpantesters.org/?module=Readonly::Values::Months>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

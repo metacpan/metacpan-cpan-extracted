@@ -35,7 +35,7 @@ static bool key_eq(const char* name, const char* key) {
 		if (*name != *key && *name != '_' && *key != '-')
 			return FALSE;
 	}
-	return true;
+	return TRUE;
 }
 
 static const entry* S_map_find(pTHX_ const map table, size_t table_size, const char* name, size_t name_length) {
@@ -167,6 +167,12 @@ static const map errors = {
 	{ STR_WITH_LEN("token resource exceeded"), CKR_TOKEN_RESOURCE_EXCEEDED },
 	{ STR_WITH_LEN("operation cancel failed"), CKR_OPERATION_CANCEL_FAILED },
 	{ STR_WITH_LEN("key exhausted"), CKR_KEY_EXHAUSTED },
+	{ STR_WITH_LEN("pending"), CKR_PENDING },
+	{ STR_WITH_LEN("session async not supported"), CKR_SESSION_ASYNC_NOT_SUPPORTED },
+	{ STR_WITH_LEN("seed random required"), CKR_SEED_RANDOM_REQUIRED },
+	{ STR_WITH_LEN("operation not validated"), CKR_OPERATION_NOT_VALIDATED },
+	{ STR_WITH_LEN("token not initialized"), CKR_TOKEN_NOT_INITIALIZED },
+	{ STR_WITH_LEN("parameter set not supported"), CKR_PARAMETER_SET_NOT_SUPPORTED },
 	{ STR_WITH_LEN("vendor defined"), CKR_VENDOR_DEFINED },
 };
 
@@ -203,11 +209,14 @@ static const map token_flags = {
 	{ STR_WITH_LEN("so-pin-locked"), CKF_SO_PIN_LOCKED },
 	{ STR_WITH_LEN("so-pin-to-be-changed"), CKF_SO_PIN_TO_BE_CHANGED },
 	{ STR_WITH_LEN("error-state"), CKF_ERROR_STATE },
+	{ STR_WITH_LEN("seed-random-required"), CKF_SEED_RANDOM_REQUIRED },
+	{ STR_WITH_LEN("async-session-supported"), CKF_ASYNC_SESSION_SUPPORTED },
 };
 
 static const map session_flags = {
 	{ STR_WITH_LEN("rw-session"), CKF_RW_SESSION },
 	{ STR_WITH_LEN("serial-session"), CKF_SERIAL_SESSION },
+	{ STR_WITH_LEN("async-session"), CKF_ASYNC_SESSION },
 };
 
 static const map mechanism_flags = {
@@ -439,18 +448,18 @@ static const map mechanisms = {
 	{ STR_WITH_LEN("cast3-mac"), CKM_CAST3_MAC },
 	{ STR_WITH_LEN("cast3-mac-general"), CKM_CAST3_MAC_GENERAL },
 	{ STR_WITH_LEN("cast3-cbc-pad"), CKM_CAST3_CBC_PAD },
-	{ STR_WITH_LEN("cast5-key-gen"), CKM_CAST5_KEY_GEN },
 	{ STR_WITH_LEN("cast128-key-gen"), CKM_CAST128_KEY_GEN },
-	{ STR_WITH_LEN("cast5-ecb"), CKM_CAST5_ECB },
+	{ STR_WITH_LEN("cast5-key-gen"), CKM_CAST5_KEY_GEN },
 	{ STR_WITH_LEN("cast128-ecb"), CKM_CAST128_ECB },
-	{ STR_WITH_LEN("cast5-cbc"), CKM_CAST5_CBC },
+	{ STR_WITH_LEN("cast5-ecb"), CKM_CAST5_ECB },
 	{ STR_WITH_LEN("cast128-cbc"), CKM_CAST128_CBC },
-	{ STR_WITH_LEN("cast5-mac"), CKM_CAST5_MAC },
+	{ STR_WITH_LEN("cast5-cbc"), CKM_CAST5_CBC },
 	{ STR_WITH_LEN("cast128-mac"), CKM_CAST128_MAC },
-	{ STR_WITH_LEN("cast5-mac-general"), CKM_CAST5_MAC_GENERAL },
+	{ STR_WITH_LEN("cast5-mac"), CKM_CAST5_MAC },
 	{ STR_WITH_LEN("cast128-mac-general"), CKM_CAST128_MAC_GENERAL },
-	{ STR_WITH_LEN("cast5-cbc-pad"), CKM_CAST5_CBC_PAD },
+	{ STR_WITH_LEN("cast5-mac-general"), CKM_CAST5_MAC_GENERAL },
 	{ STR_WITH_LEN("cast128-cbc-pad"), CKM_CAST128_CBC_PAD },
+	{ STR_WITH_LEN("cast5-cbc-pad"), CKM_CAST5_CBC_PAD },
 	{ STR_WITH_LEN("rc5-key-gen"), CKM_RC5_KEY_GEN },
 	{ STR_WITH_LEN("rc5-ecb"), CKM_RC5_ECB },
 	{ STR_WITH_LEN("rc5-cbc"), CKM_RC5_CBC },
@@ -503,10 +512,10 @@ static const map mechanisms = {
 	{ STR_WITH_LEN("pbe-md5-des-cbc"), CKM_PBE_MD5_DES_CBC },
 	{ STR_WITH_LEN("pbe-md5-cast-cbc"), CKM_PBE_MD5_CAST_CBC },
 	{ STR_WITH_LEN("pbe-md5-cast3-cbc"), CKM_PBE_MD5_CAST3_CBC },
-	{ STR_WITH_LEN("pbe-md5-cast5-cbc"), CKM_PBE_MD5_CAST5_CBC },
 	{ STR_WITH_LEN("pbe-md5-cast128-cbc"), CKM_PBE_MD5_CAST128_CBC },
-	{ STR_WITH_LEN("pbe-sha1-cast5-cbc"), CKM_PBE_SHA1_CAST5_CBC },
+	{ STR_WITH_LEN("pbe-md5-cast5-cbc"), CKM_PBE_MD5_CAST5_CBC },
 	{ STR_WITH_LEN("pbe-sha1-cast128-cbc"), CKM_PBE_SHA1_CAST128_CBC },
+	{ STR_WITH_LEN("pbe-sha1-cast5-cbc"), CKM_PBE_SHA1_CAST5_CBC },
 	{ STR_WITH_LEN("pbe-sha1-rc4-128"), CKM_PBE_SHA1_RC4_128 },
 	{ STR_WITH_LEN("pbe-sha1-rc4-40"), CKM_PBE_SHA1_RC4_40 },
 	{ STR_WITH_LEN("pbe-sha1-des3-ede-cbc"), CKM_PBE_SHA1_DES3_EDE_CBC },
@@ -584,8 +593,8 @@ static const map mechanisms = {
 	{ STR_WITH_LEN("baton-counter"), CKM_BATON_COUNTER },
 	{ STR_WITH_LEN("baton-shuffle"), CKM_BATON_SHUFFLE },
 	{ STR_WITH_LEN("baton-wrap"), CKM_BATON_WRAP },
-	{ STR_WITH_LEN("ecdsa-key-pair-gen"), CKM_ECDSA_KEY_PAIR_GEN },
 	{ STR_WITH_LEN("ec-key-pair-gen"), CKM_EC_KEY_PAIR_GEN },
+	{ STR_WITH_LEN("ecdsa-key-pair-gen"), CKM_ECDSA_KEY_PAIR_GEN },
 	{ STR_WITH_LEN("ecdsa"), CKM_ECDSA },
 	{ STR_WITH_LEN("ecdsa-sha1"), CKM_ECDSA_SHA1 },
 	{ STR_WITH_LEN("ecdsa-sha224"), CKM_ECDSA_SHA224 },
@@ -727,6 +736,43 @@ static const map mechanisms = {
 	{ STR_WITH_LEN("ike1-extended-derive"), CKM_IKE1_EXTENDED_DERIVE },
 	{ STR_WITH_LEN("hss-key-pair-gen"), CKM_HSS_KEY_PAIR_GEN },
 	{ STR_WITH_LEN("hss"), CKM_HSS },
+	{ STR_WITH_LEN("xmss-key-pair-gen"), CKM_XMSS_KEY_PAIR_GEN },
+	{ STR_WITH_LEN("xmssmt-key-pair-gen"), CKM_XMSSMT_KEY_PAIR_GEN },
+	{ STR_WITH_LEN("xmss"), CKM_XMSS },
+	{ STR_WITH_LEN("xmssmt"), CKM_XMSSMT },
+	{ STR_WITH_LEN("ecdh-x-aes-key-wrap"), CKM_ECDH_X_AES_KEY_WRAP },
+	{ STR_WITH_LEN("ecdh-cof-aes-key-wrap"), CKM_ECDH_COF_AES_KEY_WRAP },
+	{ STR_WITH_LEN("pub-key-from-priv-key"), CKM_PUB_KEY_FROM_PRIV_KEY },
+	{ STR_WITH_LEN("ml-kem-key-pair-gen"), CKM_ML_KEM_KEY_PAIR_GEN },
+	{ STR_WITH_LEN("ml-kem"), CKM_ML_KEM },
+	{ STR_WITH_LEN("ml-dsa-key-pair-gen"), CKM_ML_DSA_KEY_PAIR_GEN },
+	{ STR_WITH_LEN("ml-dsa"), CKM_ML_DSA },
+	{ STR_WITH_LEN("hash-ml-dsa"), CKM_HASH_ML_DSA },
+	{ STR_WITH_LEN("hash-ml-dsa-sha224"), CKM_HASH_ML_DSA_SHA224 },
+	{ STR_WITH_LEN("hash-ml-dsa-sha256"), CKM_HASH_ML_DSA_SHA256 },
+	{ STR_WITH_LEN("hash-ml-dsa-sha384"), CKM_HASH_ML_DSA_SHA384 },
+	{ STR_WITH_LEN("hash-ml-dsa-sha512"), CKM_HASH_ML_DSA_SHA512 },
+	{ STR_WITH_LEN("hash-ml-dsa-sha3_224"), CKM_HASH_ML_DSA_SHA3_224 },
+	{ STR_WITH_LEN("hash-ml-dsa-sha3_256"), CKM_HASH_ML_DSA_SHA3_256 },
+	{ STR_WITH_LEN("hash-ml-dsa-sha3_384"), CKM_HASH_ML_DSA_SHA3_384 },
+	{ STR_WITH_LEN("hash-ml-dsa-sha3_512"), CKM_HASH_ML_DSA_SHA3_512 },
+	{ STR_WITH_LEN("hash-ml-dsa-shake128"), CKM_HASH_ML_DSA_SHAKE128 },
+	{ STR_WITH_LEN("hash-ml-dsa-shake256"), CKM_HASH_ML_DSA_SHAKE256 },
+	{ STR_WITH_LEN("slh-dsa-key-pair-gen"), CKM_SLH_DSA_KEY_PAIR_GEN },
+	{ STR_WITH_LEN("slh-dsa"), CKM_SLH_DSA },
+	{ STR_WITH_LEN("hash-slh-dsa"), CKM_HASH_SLH_DSA },
+	{ STR_WITH_LEN("hash-slh-dsa-sha224"), CKM_HASH_SLH_DSA_SHA224 },
+	{ STR_WITH_LEN("hash-slh-dsa-sha256"), CKM_HASH_SLH_DSA_SHA256 },
+	{ STR_WITH_LEN("hash-slh-dsa-sha384"), CKM_HASH_SLH_DSA_SHA384 },
+	{ STR_WITH_LEN("hash-slh-dsa-sha512"), CKM_HASH_SLH_DSA_SHA512 },
+	{ STR_WITH_LEN("hash-slh-dsa-sha3_224"), CKM_HASH_SLH_DSA_SHA3_224 },
+	{ STR_WITH_LEN("hash-slh-dsa-sha3_256"), CKM_HASH_SLH_DSA_SHA3_256 },
+	{ STR_WITH_LEN("hash-slh-dsa-sha3_384"), CKM_HASH_SLH_DSA_SHA3_384 },
+	{ STR_WITH_LEN("hash-slh-dsa-sha3_512"), CKM_HASH_SLH_DSA_SHA3_512 },
+	{ STR_WITH_LEN("hash-slh-dsa-shake128"), CKM_HASH_SLH_DSA_SHAKE128 },
+	{ STR_WITH_LEN("hash-slh-dsa-shake256"), CKM_HASH_SLH_DSA_SHAKE256 },
+	{ STR_WITH_LEN("tls12_extended-master-key-derive"), CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE },
+	{ STR_WITH_LEN("tls12_extended-master-key-derive-dh"), CKM_TLS12_EXTENDED_MASTER_KEY_DERIVE_DH },
 	{ STR_WITH_LEN("vendor-defined"), CKM_VENDOR_DEFINED },
 };
 
@@ -773,6 +819,12 @@ static const map kdfs = {
 	{ STR_WITH_LEN("blake2b-256"), CKD_BLAKE2B_256_KDF },
 	{ STR_WITH_LEN("blake2b-384"), CKD_BLAKE2B_384_KDF },
 	{ STR_WITH_LEN("blake2b-512"), CKD_BLAKE2B_512_KDF },
+};
+
+static const map hedge_types = {
+	{ STR_WITH_LEN("hedge-preferred"), CKH_HEDGE_PREFERRED },
+	{ STR_WITH_LEN("hedge-required"), CKH_HEDGE_REQUIRED },
+	{ STR_WITH_LEN("deterministic-required"), CKH_DETERMINISTIC_REQUIRED },
 };
 
 #define INIT_PARAMS(TYPE) \
@@ -989,6 +1041,14 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 			break;
 		}
 
+		case CKM_AES_KEY_WRAP:
+		case CKM_AES_KEY_WRAP_PAD:
+		case CKM_AES_KEY_WRAP_PKCS7:
+		case CKM_AES_KEY_WRAP_KWP:
+			if (array_len > 0)
+				result.pParameter = get_buffer(array[0], &result.ulParameterLen);
+			break;
+
 		case CKM_RSA_PKCS_OAEP: {
 			if (array_len < 1)
 				croak("Insufficient parameters for rsa-pkcs-oaep");
@@ -1006,6 +1066,31 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 			break;
 		}
 
+		case CKM_RSA_AES_KEY_WRAP: {
+			if (array_len < 2)
+				croak("Insufficient parameters for rsa-aes-key-wrap");
+
+			INIT_PARAMS(CK_RSA_AES_KEY_WRAP_PARAMS);
+
+			params->ulAESKeyBits = SvIV(array[0]);
+
+			CK_RSA_PKCS_OAEP_PARAMS* oaep_params;
+			Newxz(oaep_params, 1, CK_RSA_PKCS_OAEP_PARAMS);
+			SAVEFREEPV(oaep_params);
+			params->pOAEPParams = oaep_params;
+
+			oaep_params->source = CKZ_DATA_SPECIFIED;
+
+			oaep_params->hashAlg = get_mechanism_type(array[1]);
+			SV* mgf_argument = array_len > 2 ? array[2] : array[1];
+			oaep_params->mgf = map_get(generators, mgf_argument, "generator");
+
+			if (array_len > 3)
+				oaep_params->pSourceData = get_buffer(array[3], &oaep_params->ulSourceDataLen);
+
+			break;
+		}
+
 		case CKM_EDDSA: {
 			if (array_len) {
 				INIT_PARAMS(CK_EDDSA_PARAMS);
@@ -1015,6 +1100,53 @@ static CK_MECHANISM S_specialize_mechanism(pTHX_ CK_MECHANISM_TYPE type, SV** ar
 
 				if (array_len > 1)
 					params->phFlag = SvTRUE(array[0]);
+			}
+		}
+
+		case CKM_ML_DSA:
+		case CKM_HASH_ML_DSA_SHA224:
+		case CKM_HASH_ML_DSA_SHA256:
+		case CKM_HASH_ML_DSA_SHA384:
+		case CKM_HASH_ML_DSA_SHA512:
+		case CKM_HASH_ML_DSA_SHA3_224:
+		case CKM_HASH_ML_DSA_SHA3_256:
+		case CKM_HASH_ML_DSA_SHA3_384:
+		case CKM_HASH_ML_DSA_SHA3_512:
+		case CKM_HASH_ML_DSA_SHAKE128:
+		case CKM_HASH_ML_DSA_SHAKE256:
+		case CKM_SLH_DSA:
+		case CKM_HASH_SLH_DSA_SHA224:
+		case CKM_HASH_SLH_DSA_SHA256:
+		case CKM_HASH_SLH_DSA_SHA384:
+		case CKM_HASH_SLH_DSA_SHA512:
+		case CKM_HASH_SLH_DSA_SHA3_224:
+		case CKM_HASH_SLH_DSA_SHA3_256:
+		case CKM_HASH_SLH_DSA_SHA3_384:
+		case CKM_HASH_SLH_DSA_SHA3_512:
+		case CKM_HASH_SLH_DSA_SHAKE128:
+		case CKM_HASH_SLH_DSA_SHAKE256: {
+			if (array_len) {
+				INIT_PARAMS(CK_SIGN_ADDITIONAL_CONTEXT);
+				params->pContext = get_buffer(array[0], &params->ulContextLen);
+
+				if (array_len > 1)
+					params->hedgeVariant = map_get(hedge_types, array[1], "hedge type");
+			}
+		}
+
+		case CKM_HASH_ML_DSA:
+		case CKM_HASH_SLH_DSA: {
+			if (array_len == 0)
+				croak("Insufficient parameters for PQC hash");
+
+			INIT_PARAMS(CK_HASH_SIGN_ADDITIONAL_CONTEXT);
+			CK_MECHANISM_TYPE hash = get_mechanism_type(array[0]);
+
+			if (array_len > 1) {
+				params->pContext = get_buffer(array[0], &params->ulContextLen);
+
+				if (array_len > 2)
+					params->hedgeVariant = map_get(hedge_types, array[1], "hedge type");
 			}
 		}
 	}
@@ -1034,6 +1166,8 @@ static const map object_classes = {
 	{ STR_WITH_LEN("mechanism"), CKO_MECHANISM },
 	{ STR_WITH_LEN("otp-key"), CKO_OTP_KEY },
 	{ STR_WITH_LEN("profile"), CKO_PROFILE },
+	{ STR_WITH_LEN("validation"), CKO_VALIDATION },
+	{ STR_WITH_LEN("trust"), CKO_TRUST },
 	{ STR_WITH_LEN("vendor-defined"), CKO_VENDOR_DEFINED },
 };
 #define get_object_class(input) map_get(object_classes, input, "object class")
@@ -1042,8 +1176,8 @@ static const map key_types = {
 	{ STR_WITH_LEN("rsa"), CKK_RSA },
 	{ STR_WITH_LEN("dsa"), CKK_DSA },
 	{ STR_WITH_LEN("dh"), CKK_DH },
-	{ STR_WITH_LEN("ecdsa"), CKK_ECDSA },
 	{ STR_WITH_LEN("ec"), CKK_EC },
+	{ STR_WITH_LEN("ecdsa"), CKK_ECDSA },
 	{ STR_WITH_LEN("x9-42-dh"), CKK_X9_42_DH },
 	{ STR_WITH_LEN("kea"), CKK_KEA },
 	{ STR_WITH_LEN("generic-secret"), CKK_GENERIC_SECRET },
@@ -1054,8 +1188,8 @@ static const map key_types = {
 	{ STR_WITH_LEN("des3"), CKK_DES3 },
 	{ STR_WITH_LEN("cast"), CKK_CAST },
 	{ STR_WITH_LEN("cast3"), CKK_CAST3 },
-	{ STR_WITH_LEN("cast5"), CKK_CAST5 },
 	{ STR_WITH_LEN("cast128"), CKK_CAST128 },
+	{ STR_WITH_LEN("cast5"), CKK_CAST5 },
 	{ STR_WITH_LEN("rc5"), CKK_RC5 },
 	{ STR_WITH_LEN("idea"), CKK_IDEA },
 	{ STR_WITH_LEN("skipjack"), CKK_SKIPJACK },
@@ -1102,6 +1236,11 @@ static const map key_types = {
 	{ STR_WITH_LEN("sha512-256-hmac"), CKK_SHA512_256_HMAC },
 	{ STR_WITH_LEN("sha512-t-hmac"), CKK_SHA512_T_HMAC },
 	{ STR_WITH_LEN("hss"), CKK_HSS },
+	{ STR_WITH_LEN("xmss"), CKK_XMSS },
+	{ STR_WITH_LEN("xmssmt"), CKK_XMSSMT },
+	{ STR_WITH_LEN("ml-kem"), CKK_ML_KEM },
+	{ STR_WITH_LEN("ml-dsa"), CKK_ML_DSA },
+	{ STR_WITH_LEN("slh-dsa"), CKK_SLH_DSA },
 	{ STR_WITH_LEN("vendor-defined"), CKK_VENDOR_DEFINED },
 };
 #define get_key_type(input) map_get(key_types, input, "key type")
@@ -1165,6 +1304,53 @@ static const map security_domains = {
 };
 #define get_security_domain(input) map_get(security_domains, input, "security domain")
 
+static const map session_validation_flags = {
+	{ STR_WITH_LEN("last_validation_ok"), CKS_LAST_VALIDATION_OK },
+};
+
+static const map parameter_sets = {
+	{ STR_WITH_LEN("ml-dsa-44"), CKP_ML_DSA_44 },
+	{ STR_WITH_LEN("ml-dsa-65"), CKP_ML_DSA_65 },
+	{ STR_WITH_LEN("ml-dsa-87"), CKP_ML_DSA_87 },
+	{ STR_WITH_LEN("slh-dsa-sha2-128s"), CKP_SLH_DSA_SHA2_128S },
+	{ STR_WITH_LEN("slh-dsa-shake-128s"), CKP_SLH_DSA_SHAKE_128S },
+	{ STR_WITH_LEN("slh-dsa-sha2-128f"), CKP_SLH_DSA_SHA2_128F },
+	{ STR_WITH_LEN("slh-dsa-shake-128f"), CKP_SLH_DSA_SHAKE_128F },
+	{ STR_WITH_LEN("slh-dsa-sha2-192s"), CKP_SLH_DSA_SHA2_192S },
+	{ STR_WITH_LEN("slh-dsa-shake-192s"), CKP_SLH_DSA_SHAKE_192S },
+	{ STR_WITH_LEN("slh-dsa-sha2-192f"), CKP_SLH_DSA_SHA2_192F },
+	{ STR_WITH_LEN("slh-dsa-shake-192f"), CKP_SLH_DSA_SHAKE_192F },
+	{ STR_WITH_LEN("slh-dsa-sha2-256s"), CKP_SLH_DSA_SHA2_256S },
+	{ STR_WITH_LEN("slh-dsa-shake-256s"), CKP_SLH_DSA_SHAKE_256S },
+	{ STR_WITH_LEN("slh-dsa-sha2-256f"), CKP_SLH_DSA_SHA2_256F },
+	{ STR_WITH_LEN("slh-dsa-shake-256f"), CKP_SLH_DSA_SHAKE_256F },
+	{ STR_WITH_LEN("ml-kem-512"), CKP_ML_KEM_512 },
+	{ STR_WITH_LEN("ml-kem-768"), CKP_ML_KEM_768 },
+	{ STR_WITH_LEN("ml-kem-1024"), CKP_ML_KEM_1024 },
+};
+
+static const map validation_types = {
+	{ STR_WITH_LEN("type-unspecified"), CKV_TYPE_UNSPECIFIED },
+	{ STR_WITH_LEN("type-software"), CKV_TYPE_SOFTWARE },
+	{ STR_WITH_LEN("type-hardware"), CKV_TYPE_HARDWARE },
+	{ STR_WITH_LEN("type-firmware"), CKV_TYPE_FIRMWARE },
+	{ STR_WITH_LEN("type-hybrid"), CKV_TYPE_HYBRID },
+};
+
+static const map authority_types = {
+	{ STR_WITH_LEN("authority-type-unspecified"), CKV_AUTHORITY_TYPE_UNSPECIFIED },
+	{ STR_WITH_LEN("authority-type-nist-cmvp"), CKV_AUTHORITY_TYPE_NIST_CMVP },
+	{ STR_WITH_LEN("authority-type-common-criteria"), CKV_AUTHORITY_TYPE_COMMON_CRITERIA },
+};
+
+static const map trust_types = {
+	{ STR_WITH_LEN("trust-unknown"), CKT_TRUST_UNKNOWN },
+	{ STR_WITH_LEN("trusted"), CKT_TRUSTED },
+	{ STR_WITH_LEN("trust-anchor"), CKT_TRUST_ANCHOR },
+	{ STR_WITH_LEN("not-trusted"), CKT_NOT_TRUSTED },
+	{ STR_WITH_LEN("trust-must-verify-trust"), CKT_TRUST_MUST_VERIFY_TRUST },
+};
+
 typedef struct Attributes {
 	CK_ULONG length;
 	CK_ATTRIBUTE* member;
@@ -1172,7 +1358,7 @@ typedef struct Attributes {
 
 static const Attributes empty = { 0, NULL };
 
-enum Attribute_type { IntAttr, BoolAttr, StrAttr, ByteAttr, ClassAttr, BigIntAttr, KeyTypeAttr, CertTypeAttr, CertCatAttr, HardwareTypeAttr, ProfileIdAttr, MechanismAttr, OtpFormatAttr, OtpParamAttr, TokenFlagsAttr, SecurityDomainAttr, IntArrayAttr, MechanismArrayAttr, AttrAttr };
+enum Attribute_type { IntAttr, BoolAttr, StrAttr, ByteAttr, ClassAttr, BigIntAttr, KeyTypeAttr, CertTypeAttr, CertCatAttr, HardwareTypeAttr, ProfileIdAttr, MechanismAttr, OtpFormatAttr, OtpParamAttr, TokenFlagsAttr, SecurityDomainAttr, ParameterSetAttr, TrustAttr, ValidationTypeAttr, ValidationAuthorityAttr, VersionAttr, IntArrayAttr, MechanismArrayAttr, AttrAttr };
 
 typedef struct { const char* key; size_t length; CK_ULONG value; enum Attribute_type type; } attribute_entry;
 typedef attribute_entry attribute_map[];
@@ -1241,8 +1427,8 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("modifiable"), CKA_MODIFIABLE, BoolAttr },
 	{ STR_WITH_LEN("copyable"), CKA_COPYABLE, BoolAttr },
 	{ STR_WITH_LEN("destroyable"), CKA_DESTROYABLE, BoolAttr },
-	{ STR_WITH_LEN("ecdsa-params"), CKA_ECDSA_PARAMS, ByteAttr },
 	{ STR_WITH_LEN("ec-params"), CKA_EC_PARAMS, ByteAttr },
+	{ STR_WITH_LEN("ecdsa-params"), CKA_ECDSA_PARAMS, ByteAttr },
 	{ STR_WITH_LEN("ec-point"), CKA_EC_POINT, BigIntAttr },
 	{ STR_WITH_LEN("secondary-auth"), CKA_SECONDARY_AUTH, BoolAttr },
 	{ STR_WITH_LEN("auth-pin-flags"), CKA_AUTH_PIN_FLAGS, TokenFlagsAttr },
@@ -1310,6 +1496,33 @@ static const attribute_map attributes = {
 	{ STR_WITH_LEN("hss-lms-types"), CKA_HSS_LMS_TYPES, IntArrayAttr },
 	{ STR_WITH_LEN("hss-lmots-types"), CKA_HSS_LMOTS_TYPES, IntArrayAttr },
 	{ STR_WITH_LEN("hss-keys-remaining"), CKA_HSS_KEYS_REMAINING, IntAttr },
+	{ STR_WITH_LEN("parameter-set"), CKA_PARAMETER_SET, ParameterSetAttr },
+	{ STR_WITH_LEN("object-validation-flags"), CKA_OBJECT_VALIDATION_FLAGS, IntAttr },
+	{ STR_WITH_LEN("validation-type"), CKA_VALIDATION_TYPE, ValidationTypeAttr },
+	{ STR_WITH_LEN("validation-version"), CKA_VALIDATION_VERSION, VersionAttr },
+	{ STR_WITH_LEN("validation-level"), CKA_VALIDATION_LEVEL, IntAttr },
+	{ STR_WITH_LEN("validation-module-id"), CKA_VALIDATION_MODULE_ID, StrAttr },
+	{ STR_WITH_LEN("validation-flag"), CKA_VALIDATION_FLAG, IntAttr },
+	{ STR_WITH_LEN("validation-authority-type"), CKA_VALIDATION_AUTHORITY_TYPE, ValidationAuthorityAttr },
+	{ STR_WITH_LEN("validation-country"), CKA_VALIDATION_COUNTRY, StrAttr },
+	{ STR_WITH_LEN("validation-certificate-identifier"), CKA_VALIDATION_CERTIFICATE_IDENTIFIER, StrAttr },
+	{ STR_WITH_LEN("validation-certificate-uri"), CKA_VALIDATION_CERTIFICATE_URI, StrAttr },
+	{ STR_WITH_LEN("validation-vendor-uri"), CKA_VALIDATION_VENDOR_URI, StrAttr },
+	{ STR_WITH_LEN("validation-profile"), CKA_VALIDATION_PROFILE, StrAttr },
+	{ STR_WITH_LEN("encapsulate-template"), CKA_ENCAPSULATE_TEMPLATE, AttrAttr },
+	{ STR_WITH_LEN("decapsulate-template"), CKA_DECAPSULATE_TEMPLATE, AttrAttr },
+	{ STR_WITH_LEN("trust-server-auth"), CKA_TRUST_SERVER_AUTH, TrustAttr },
+	{ STR_WITH_LEN("trust-client-auth"), CKA_TRUST_CLIENT_AUTH, TrustAttr },
+	{ STR_WITH_LEN("trust-code-signing"), CKA_TRUST_CODE_SIGNING, TrustAttr },
+	{ STR_WITH_LEN("trust-email-protection"), CKA_TRUST_EMAIL_PROTECTION, TrustAttr },
+	{ STR_WITH_LEN("trust-ipsec-ike"), CKA_TRUST_IPSEC_IKE, TrustAttr },
+	{ STR_WITH_LEN("trust-time-stamping"), CKA_TRUST_TIME_STAMPING, TrustAttr },
+	{ STR_WITH_LEN("trust-ocsp-signing"), CKA_TRUST_OCSP_SIGNING, TrustAttr },
+	{ STR_WITH_LEN("encapsulate"), CKA_ENCAPSULATE, BoolAttr },
+	{ STR_WITH_LEN("decapsulate"), CKA_DECAPSULATE, BoolAttr },
+	{ STR_WITH_LEN("hash-of-certificate"), CKA_HASH_OF_CERTIFICATE, ByteAttr },
+	{ STR_WITH_LEN("public-crc64_value"), CKA_PUBLIC_CRC64_VALUE, ByteAttr },
+	{ STR_WITH_LEN("seed"), CKA_SEED },
 	{ STR_WITH_LEN("vendor-defined"), CKA_VENDOR_DEFINED, ByteAttr },
 };
 
@@ -1394,6 +1607,15 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 					current->pValue = get_buffer(value, &current->ulValueLen);
 					break;
 				}
+				case VersionAttr: {
+					CK_VERSION* version;
+					Newxz(version, 1, CK_VERSION);
+					SAVEFREEPV(current->pValue);
+					version->major = SvIV(value);
+					version->minor = round((SvNV(value) - SvIV(value)) * 100);
+					current->pValue = version;
+					current->ulValueLen = sizeof *version;
+				}
 				case ClassAttr: {
 					set_intval(current, get_object_class(value));
 					break;
@@ -1435,6 +1657,22 @@ static struct Attributes S_get_attributes(pTHX_ SV* attributes_sv) {
 				}
 				case SecurityDomainAttr: {
 					set_intval(current, get_security_domain(value));
+					break;
+				}
+				case ParameterSetAttr: {
+					set_intval(current, map_get(parameter_sets, value, "parameter set"));
+					break;
+				}
+				case TrustAttr: {
+					set_intval(current, map_get(trust_types, value, "trust type"));
+					break;
+				}
+				case ValidationTypeAttr: {
+					set_intval(current, map_get(validation_types, value, "validation type"));
+					break;
+				}
+				case ValidationAuthorityAttr: {
+					set_intval(current, map_get(authority_types, value, "authority type"));
 					break;
 				}
 
@@ -1497,6 +1735,11 @@ static SV* S_entry_to_sv(pTHX_ const entry* item) {
 	return item ? newSVpvn(item->key, item->length) : newSVpvs("unknown");
 }
 #define entry_to_sv(item) S_entry_to_sv(aTHX_ item)
+
+static SV* S_version_to_sv(pTHX_ CK_VERSION* version) {
+	return newSVpvf("%d.%02d", version->major, version->minor);
+}
+#define version_to_sv(version) S_version_to_sv(aTHX_ version)
 
 #define reverse_attribute(attr) S_reverse_attribute(aTHX_ attr)
 static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
@@ -1587,6 +1830,25 @@ static SV* S_reverse_attribute(pTHX_ CK_ATTRIBUTE* attribute) {
 			CK_ULONG integer = get_intval(pointer);
 			return entry_to_sv(map_reverse_find(security_domains, integer));
 		}
+		case ParameterSetAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return newSVuv(integer);
+		}
+		case TrustAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return entry_to_sv(map_reverse_find(trust_types, integer));
+		}
+		case ValidationTypeAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return entry_to_sv(map_reverse_find(validation_types, integer));
+		}
+		case ValidationAuthorityAttr: {
+			CK_ULONG integer = get_intval(pointer);
+			return entry_to_sv(map_reverse_find(authority_types, integer));
+		}
+		case VersionAttr: {
+			return version_to_sv((CK_VERSION*)pointer);
+		}
 		case IntArrayAttr: {
 			AV* result = newAV();
 			CK_ULONG* values = (CK_ULONG*) pointer;
@@ -1633,11 +1895,6 @@ static SV* S_trimmed_value(pTHX_ const CK_BYTE* ptr, size_t max) {
 	return newSVpvn((const char*)ptr, last + 1);
 }
 #define trimmed_value(ptr, max) S_trimmed_value(aTHX_ ptr, max)
-
-static SV* S_version_to_sv(pTHX_ CK_VERSION* version) {
-	return newSVpvf("%d.%02d", version->major, version->minor);
-}
-#define version_to_sv(version) S_version_to_sv(aTHX_ version)
 
 struct Provider {
 	Refcount refcount;
@@ -2625,7 +2882,7 @@ CODE:
 	CK_ULONG length;
 	CK_RV result = session_funcs(self)->C_WrapKey(self->handle, &mechanism, wrappingKey->handle, key->handle, NULL, &length);
 	if (result != CKR_OK)
-		croak_with("Couldn't compute wraped length", result);
+		croak_with("Couldn't compute wrapped length", result);
 
 	RETVAL = newSV(length);
 	SvPOK_only(RETVAL);

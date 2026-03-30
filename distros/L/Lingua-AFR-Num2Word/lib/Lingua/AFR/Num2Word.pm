@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::AFR::Num2Word;
-# ABSTRACT: Converts numeric values into their Afrikaans equivalents.
+# ABSTRACT: Number to word conversion in Afrikaans
 
 use 5.16.0;
 use utf8;
@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my $numbers = {
     0   =>      'nul',
@@ -247,12 +247,39 @@ sub _formatLarge {
 # }}}
 
 
+# {{{ num2afr_ordinal                  convert number to ordinal text
+
+sub num2afr_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 99_999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 99_999_999_999;
+
+    # Fully irregular forms
+    return 'eerste'   if $number == 1;
+    return 'tweede'   if $number == 2;
+    return 'derde'    if $number == 3;
+    return 'negende'  if $number == 9;
+
+    my $cardinal = num2afr_cardinal($number);
+
+    # 4-19 get suffix "de", 20+ get "ste"
+    my $suffix = $number < 20 ? 'de' : 'ste';
+
+    return $cardinal . $suffix;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -261,13 +288,15 @@ sub capabilities {
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::AFR::Num2Word - Number to word conversion in Afrikaans
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 DESCRIPTION
 
@@ -299,6 +328,20 @@ constructor
 Convert number to string.
 Only numbers from interval [0, 99 999 999 999]
 will be converted.
+
+=item num2afr_ordinal
+
+Convert number to its Afrikaans ordinal text representation.
+Only numbers from interval [1, 99_999_999_999] will be converted.
+Handles irregular forms (eerste, tweede, derde) and applies correct
+suffixes (-de for 4-19, -ste for 20+).
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

@@ -1,7 +1,7 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Query/Element.pm
-## Version v0.3.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
 ## Modified 2026/03/22
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
     use Wanted;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -136,6 +136,7 @@ sub placeholder { return( shift->_set_get_scalar_as_object({
             # $val is a scalar object (Module::Generic::Scalar)
             my( $self, $val ) = @_;
             my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
+            return( $val ) if( $self->_is_scalar( $val ) && $self->_can( $val => 'defined' ) && !$val->defined );
             if( defined( $val ) && "$val" =~ /^(?:$placeholder_re)$/ )
             {
                 # Could be undef
@@ -267,11 +268,11 @@ DB::Object::Query::Element - Database Object Interface
         query_object => $object,
         type => $sql_type,
         value => $some_value,
-    ) || die( DB::Object::Query::Element->error, "\n" );
+    ) || die( DB::Object::Query::Element->error );
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

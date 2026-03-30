@@ -1,0 +1,64 @@
+{
+   "abstract" : "Sign PDF files with CMS/CAdES signatures and RFC3161 timestamps",
+   "author" : [
+      "Massimiliano Citterio"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PDF-Sign",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "LWP::UserAgent" : "0",
+            "PDF::API2" : "0"
+         },
+         "requires" : {
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "MIME::Base64" : "0",
+            "POSIX" : "0",
+            "perl" : "5.016"
+         },
+         "suggests" : {
+            "PDF::Builder" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "cvs"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

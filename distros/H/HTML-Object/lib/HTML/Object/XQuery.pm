@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM );
     use vars qw( @EXPORT $DEBUG $VERSION );
     our @EXPORT = qw( xq );
@@ -206,7 +207,7 @@ sub isFunction
     return(0);
 }
 
-sub isNumeric { return( shift->_is_number( @_ ) ); }
+sub isNumeric { return( shift->_look_like_number( @_ ) ); }
 
 sub isPlainObject { return( shift->_is_hash( shift( @_ ), 'strict' ) ); }
 
@@ -451,6 +452,10 @@ sub type
     {
         return( 'number' );
     }
+    elsif( $self->_look_like_number( $this ) )
+    {
+        return( 'number' );
+    }
     else
     {
         return( 'string' );
@@ -572,7 +577,7 @@ sub add
     {
         $collection->children->push( $self );
     }
-    
+
     if( !defined( $this ) )
     {
         return( $collection )
@@ -616,7 +621,7 @@ sub add
     {
         return( $self->error( "I was expecting an HTML::Object::DOM::Element, an HTML::Object::Collection, an html string or a selector., but instead I got '$this'." ) );
     }
-    
+
     # We now have either an element object or a collection of them
     # We return a new collection either way
     if( $self->isa_collection( $this ) )
@@ -676,7 +681,7 @@ sub addClass
         $e->attr( class => $curr->join( ' ' )->scalar );
         $e->reset(1);
     };
-    
+
     if( $self->isa_collection )
     {
         $self->children->for( $set_attr );
@@ -985,7 +990,7 @@ sub ajax
         }
         $complete = $opts->{complete};
     }
-    
+
     # NOTE dataFilter
     my $dataFilter = ( $self->_is_code( $opts->{dataFilter} ) ? $opts->{dataFilter} : sub{ $_[0] } );
     my $code2status = sub
@@ -1290,7 +1295,7 @@ sub attr
             }
             return(1);
         };
-        
+
         if( $self->isa_collection )
         {
             $self->children->foreach(sub
@@ -1360,7 +1365,7 @@ sub closest
     {
         return( $self->error( "I was expecting a selector or an HTML::Object::DOM::Element, but instead received '$this'" ) );
     }
-    
+
     my $xpath;
     if( !ref( $this ) )
     {
@@ -1482,7 +1487,7 @@ sub css
     return( $self->error( "Method css() must be called on an HTML::Object::DOM::Element." ) ) if( ( !$self->isa_element && !$self->isa_collection ) || $self->tag->substr( 0, 1 ) CORE::eq '_' );
     my( $name, $more ) = @_;
     return( $self->error( "No css property was provided." ) ) if( !defined( $name ) || !CORE::length( $name ) );
-    
+
     my $process;
     $process = sub
     {
@@ -1533,9 +1538,9 @@ sub css
                     $prop =~ tr/_/-/;
                     my $obj = $main->get_property_by_name( $prop );
                     # next
-                    return( 1 ) if( !defined( $obj ) );
+                    return(1) if( !defined( $obj ) );
                     $res->{ $prop } = $obj->value->as_string;
-                    return( 1 );
+                    return(1);
                 });
                 return( $res );
             }
@@ -1548,7 +1553,7 @@ sub css
                     my( $prop, $value ) = @_;
                     my $obj = $main->get_property_by_name( $prop );
                     # if the value is undef, remove the property from the set of css properties
-                    # "Setting the value of a style property to an empty string — e.g. $( "#mydiv" ).css( "color", "" ) — removes that property from an element if it has already been directly applied,"
+                    # "Setting the value of a style property to an empty string - e.g. $( "#mydiv" ).css( "color", "" ) - removes that property from an element if it has already been directly applied,"
                     # <https://api.jquery.com/css/#css-propertyName-value>
                     if( !defined( $value ) || !CORE::length( $value ) )
                     {
@@ -1629,7 +1634,7 @@ sub css
                     }
                 }
             }
-        
+
             if( defined( $rule ) && $rule->elements->length > 0 )
             {
                 my $style = $rule->as_string;
@@ -1642,7 +1647,7 @@ sub css
             return( $elem );
         }
     };
-    
+
     if( $self->isa_collection )
     {
         $self->children->foreach(sub
@@ -1720,7 +1725,7 @@ sub data
     {
         $elem = $self;
     }
-    
+
     if( $self->_is_hash( $this ) )
     {
         my $changed = 0;
@@ -1852,7 +1857,10 @@ sub empty
     return( $self );
 }
 
-sub end { return( shift->_set_get_object( 'end', 'HTML::Object::DOM::Element', @_ ) ); }
+sub end { return( shift->_set_get_object({
+    field  => 'end',
+    weaken => 1,
+}, 'HTML::Object::DOM::Element', @_ ) ); }
 
 sub eq { return( shift->children->index( shift( @_ ) ) ); }
 
@@ -1981,7 +1989,7 @@ sub find
     my( $self, $this ) = @_;
     my $collection = $self->new_collection;
     return( $collection ) if( !defined( $this ) );
-    
+
     if( ref( $this ) && $self->_is_object( $this ) && $this->isa( 'HTML::Object::DOM::Element' ) )
     {
         my $a = $self->new_array( $self->isa_collection( $this ) ? $this->children : [ $this ] );
@@ -2016,13 +2024,57 @@ sub find
     {
         if( ref( $this ) &&
             (
-                !overload::Overloaded( $this ) || 
-                ( overload::Overloaded( $this ) && !overload::Method( $this, '""' ) )
+                !overload::Overloaded( $this ) ||
+                ( overload::Overloaded( $this ) && !overload::Method( $this, '\"\"' ) )
             ) )
         {
             return( $self->error( "I was expecting an xpath string, but instead I got '$this'." ) );
         }
-        my $xpath = $self->_xpath_value( $this ) || return( $self->pass_error );
+
+        # Fast paths pour les sélecteurs simples - évite le pipeline XPath complet
+        my $str = "$this";
+
+        # Fast path: #id
+        if( $str =~ /\A#([\w][\w-]*)\z/ )
+        {
+            my $id = $1;
+            my $found = $self->_fast_find_by(sub
+            {
+                my $e = shift( @_ );
+                my $v = $e->attributes->get( 'id' );
+                return( defined( $v ) && $v eq $id );
+            });
+            $collection->children->push( $found->list );
+            return( $collection );
+        }
+        # Fast path: .class (une seule classe, pas de combinaison)
+        elsif( $str =~ /\A\.([\w][\w-]*)\z/ )
+        {
+            my $class = $1;
+            my $found = $self->_fast_find_by(sub
+            {
+                my $e = shift( @_ );
+                my $v = $e->attributes->get( 'class' );
+                return( defined( $v ) && $v =~ /(?:\A|[[:blank:]\h]+)\Q${class}\E(?:[[:blank:]\h]+|\Z)/ );
+            });
+            $collection->children->push( $found->list );
+            return( $collection );
+        }
+        # Fast path: tag simple (lettres uniquement, pas de combinaison)
+        elsif( $str =~ /\A([a-zA-Z][a-zA-Z0-9]*)\z/ )
+        {
+            my $tag = lc( $1 );
+            my $found = $self->_fast_find_by(sub
+            {
+                my $e = shift( @_ );
+                return( lc( "$e->{tag}" ) eq $tag );
+            });
+            $collection->children->push( $found->list );
+            return( $collection );
+        }
+
+        # Fallback : pipeline XPath complet
+        my $xpath = $self->_xpath_value( $str ) || return( $self->pass_error );
 #         $self->children->foreach(sub
 #         {
 #             my $child = shift( @_ );
@@ -2047,7 +2099,7 @@ sub find
         };
         if( $@ )
         {
-            warn( "Error while calling findnodes on element id \"", $_->id, "\" and tag \"", $_->tag, "\": $@\n" );
+            warn( "Error while calling findnodes on element id \"", $self->id, "\" and tag \"", $self->tag, "\": $@\n" );
         }
     }
     return( $collection );
@@ -2062,6 +2114,7 @@ sub find_xpath
 sub findnodes
 {
     my( $self, $path ) = @_;
+    # xp()->debug( $self->debug );
     return( $self->xp->findnodes( $path, $self ) );
 }
 
@@ -2356,7 +2409,7 @@ sub has
             return( $self->error( "I was expecting an xpath value, but got '$this' instead." ) );
         }
         my $xpath = $self->_xpath_value( "$this" ) || return;
-        
+
         my $lookup;
         $lookup = sub
         {
@@ -2369,7 +2422,7 @@ sub has
                 {
                     $found = $child;
                     # No need to look further, we found a match
-                    return;
+                    return(1);
                 }
                 if( $child->children->length > 0 )
                 {
@@ -2377,13 +2430,13 @@ sub has
                     if( $rc )
                     {
                         $found = $rc;
-                        return;
+                        return(1);
                     }
                 }
             });
             return( $found );
         };
-        
+
         $self->children->foreach(sub
         {
             $collection->children->push( $_ ) if( $lookup->( $_->children ) );
@@ -2396,7 +2449,7 @@ sub hasClass
 {
     my $self = shift( @_ );
     my $class = shift( @_ );
-    return( 0 ) if( !CORE::length( $class ) );
+    return(0) if( !CORE::length( $class ) );
     my $found = 0;
     if( $self->isa_collection )
     {
@@ -2405,18 +2458,22 @@ sub hasClass
             my $e = shift( @_ );
             my $classes = $e->attributes->get( 'class' );
             # No class attribute, skip to next element
-            return( 1 ) if( !defined( $classes ) );
+            return(1) if( !defined( $classes ) );
             # Found a match, no need to go further since we only need to return true or false
-            $found++, return( undef() ) if( $classes =~ /(?:\A|[[:blank:]\h]+)${class}(?:[[:blank:]\h]+|\Z)/ );
-            return( 1 );
+            if( $classes =~ /(?:\A|[[:blank:]\h]+)${class}(?:[[:blank:]\h]+|\Z)/ )
+            {
+                $found++;
+                return(0);
+            }
+            return(1);
         });
     }
     else
     {
         my $classes = $self->attributes->get( 'class' );
-        return( 0 ) if( !defined( $classes ) );
-        return( 1 ) if( $classes =~ /(?:\A|[[:blank:]\h]+)${class}(?:[[:blank:]\h]+|\Z)/ );
-        return( 0 );
+        return(0) if( !defined( $classes ) );
+        return(1) if( $classes =~ /(?:\A|[[:blank:]\h]+)${class}(?:[[:blank:]\h]+|\Z)/ );
+        return(0);
     }
 }
 
@@ -2458,7 +2515,7 @@ sub hide
             $e->_css_object( $rule );
         }
     };
-    
+
     if( $self->isa_collection )
     {
         $self->children->foreach(sub
@@ -2499,7 +2556,7 @@ sub html
         {
             return( $self->error( "I was expecting some html data or a code reference in replacement of html for this element \"", $self->tag, "\", but instead got '$this'." ) );
         }
-        
+
         my $is_code = ref( $this ) eq 'CODE' ? 1 : 0;
         my $process = sub
         {
@@ -2643,7 +2700,7 @@ sub index
                     {
                         $found = $i;
                         # Exit the for loop
-                        return;
+                        return(1);
                     }
                 });
                 return( $self->new_number(-1) ) if( !defined( $found ) );
@@ -2723,7 +2780,7 @@ sub is
                 if( $this->( $i, $e ) )
                 {
                     $found = $self->true;
-                    return;
+                    return(1);
                 }
             });
         }
@@ -2765,7 +2822,7 @@ sub is
                 if( $_->eid CORE::eq $self->eid )
                 {
                     $found = $self->true;
-                    return;
+                    return(1);
                 }
             });
         }
@@ -2788,7 +2845,7 @@ sub is
                 if( $_->matches( $xpath ) )
                 {
                     $found = $self->true;
-                    return;
+                    return(1);
                 }
             });
         }
@@ -2874,7 +2931,7 @@ sub load
     {
         $opts = pop( @_ );
     }
-    
+
     return( $self->error( "No url was provided to load data" ) ) if( !defined( $url ) || !CORE::length( "$url" ) );
     if( !defined( $complete ) && defined( $data ) && ref( $data ) eq 'CODE' )
     {
@@ -2883,13 +2940,14 @@ sub load
     }
     if( defined( $data ) && ref( $data ) ne 'HASH' )
     {
+        warn( "Data to be submitted to $url was provided, but I was expecting an hash reference and I got '", overload::StrVal( $data ), "'" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
         return( $self->error( "Data to be submitted to $url was provided, but I was expecting an hash reference and I got '", overload::StrVal( $data ), "'" ) );
     }
     if( defined( $complete ) && ref( $complete ) ne 'CODE' )
     {
         return( $self->error( "A callback parameter was provided, and I was expecting a code reference, such as an anonymous subroutine, but instead I got '", overload::StrVal( $complete ), "'" ) );
     }
-    
+
     # No need to go further if there is nothing in our collection
     my $children = $self->isa_collection ? $self->children : $self->new_array( $self );
     return( $self ) if( !$children->length );
@@ -2905,10 +2963,10 @@ sub load
 #         }
 #         return( $self );
 #     }
-    
+
     # Ultimately, if the callback is not set, we set a dummy one instead
     $complete = sub{1} if( !defined( $complete ) );
-    
+
     if( !$self->_load_class( 'HTTP::Promise', { version => 'v0.5.0' } ) )
     {
         return( $self->error( "HTTP::Promise version v0.5.0 or higher is required to use load()" ) );
@@ -2923,7 +2981,7 @@ sub load
     # e.g.: $( "#new-projects" )->load( "/resources/load.html #projects li" );
     # <https://api.jquery.com/load/#load-url-data-complete>
     ( $url, my $target ) = split( /[[:blank:]\h]+/, $url, 2 );
-    
+
     my $uri;
     # try-catch
     local $@;
@@ -2935,7 +2993,7 @@ sub load
     {
         return( $self->error( "Bad url provided \"$url\": $@" ) );
     }
-    
+
     my $content;
     my $resp;
     my @http_options = qw(
@@ -2955,7 +3013,8 @@ sub load
     $params->{use_promise} = 0;
     # try-catch
     my $ua = HTTP::Promise->new( %$params );
-    
+    return( $self->pass_error( HTTP::Promise->error ) ) if( !defined( $ua ) );
+
     # Contextual URL that requires a base URL.
     # We check for documentURI of the root element, if any
     my( $doc_root, $doc_uri );
@@ -2983,7 +3042,7 @@ sub load
         {
             $resp = $ua->get( $uri, ( ref( $opts->{headers} ) eq 'HASH' && scalar( keys( %{$opts->{headers}} ) ) ) ? %{$opts->{headers}} : () );
         }
-        
+
         if( !$resp )
         {
             $self->_load_class( 'HTTP::Promise::Response' ) || return( $self->pass_error );
@@ -2996,7 +3055,7 @@ sub load
             }) );
         }
         $content = $resp->decoded_content;
-        
+
         if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
         {
             $complete->( $content, 'error', $resp, $ua );
@@ -3048,6 +3107,7 @@ sub load
         # "When this method executes, it retrieves the content of ajax/test.html, but then jQuery parses the returned document to find the element with an ID of container. This element, along with its contents, is inserted into the element with an ID of result, and the rest of the retrieved document is discarded."
         if( defined( $target ) )
         {
+            $doc->debug( $self->debug );
             my $elem = $doc->find( $target ) || return( $self->pass_error( $doc->error ) );
             # $new = $self->new_array( $elem );
             $new = $elem->children;
@@ -3059,7 +3119,7 @@ sub load
         my $txt = $self->new_text( value => '' ) || return( $self->pass_error );
         $new = $self->new_array( $txt );
     }
-    
+
     # "If a "complete" callback is provided, it is executed after post-processing and HTML insertion has been performed. The callback is fired once for each element in the collection, and $_ is set to each DOM element in turn."
     $children->foreach(sub
     {
@@ -3175,8 +3235,8 @@ sub not
             $to_exclude->foreach(sub
             {
                 my $e = shift( @_ );
-                return( 1 ) if( !$self->_is_object( $e ) || !$e->isa( 'HTML::Object::DOM::Element' ) );
-                return( 1 ) if( !$e->isa( 'HTML::Object::DOM::Comment' ) || $e->isa( 'HTML::Object::DOM::Text' ) || $e->isa( 'HTML::Object::DOM::Declaration' ) || $e->isa( 'HTML::Object::DOM::Space' ) );
+                return(1) if( !$self->_is_object( $e ) || !$e->isa( 'HTML::Object::DOM::Element' ) );
+                return(1) if( !$e->isa( 'HTML::Object::DOM::Comment' ) || $e->isa( 'HTML::Object::DOM::Text' ) || $e->isa( 'HTML::Object::DOM::Declaration' ) || $e->isa( 'HTML::Object::DOM::Space' ) );
                 # This element matches the xpath of one of the collection element, so we exclude it from the result
                 if( $e->matches( $path ) )
                 {
@@ -3187,7 +3247,7 @@ sub not
         });
         return( $kids->clone->remove( $exclude ) );
     };
-    
+
     # No parameter provided, thus we return an empty collection
     if( !defined( $this ) )
     {
@@ -3321,7 +3381,7 @@ sub prop
     my $ro = $self->new_array( [qw(
         childelementcount children firstelementchild
     )] );
-    
+
     # Get
     if( scalar( @_ ) == 1 )
     {
@@ -3345,7 +3405,7 @@ sub prop
             {
                 next;
             }
-            
+
             # process the html
             if( $prop eq 'innerHTML' )
             {
@@ -3417,7 +3477,7 @@ sub prop
                 }
                 next;
             }
-            
+
             $all->foreach(sub
             {
                 my $e = shift( @_ );
@@ -3569,11 +3629,16 @@ sub removeClass
         my $failed = 0;
         $a->foreach(sub
         {
-            $failed++, return( $self->error( "Class provided to be removed \"$_\" is not a string nor an overloaded object." ) ) if( ref( $_ ) && !( overload::Overloaded( $_ ) && overload::Method( $_, '""' ) ) );
+            if( ref( $_ ) && !( overload::Overloaded( $_ ) && overload::Method( $_, '""' ) ) )
+            {
+                $failed++;
+                $self->error( "Class provided to be removed \"$_\" is not a string nor an overloaded object." );
+                return(0);
+            }
         });
         return( $self ) if( $failed );
     }
-    
+
     my $process;
     $process = sub
     {
@@ -3638,7 +3703,7 @@ sub removeData
     {
         $elem = $self;
     }
-    
+
     my $keys;
     # If no @_ is provided this is undef and it is ok, we would remove all data attributes then
     if( @_ )
@@ -3715,7 +3780,7 @@ sub replaceWith
     {
         return( $self->error( "I do not know what to do with '$this'. I was expecing an html string, or an HTML::Object::DOM::Element or an array of element objects or a collection object (HTML::Object::Collection) or a code reference." ) );
     }
-    
+
     if( $self->isa_collection )
     {
         my $failed = 0;
@@ -3726,7 +3791,12 @@ sub replaceWith
             {
                 local $_ = $elem;
                 my $res = $this->( $elem );
-                $failed++, return( $self->error( "An error occurred while executing code reference to replace html element(s). Code reference returned undef." ) ) if( !defined( $res ) );
+                if( !defined( $res ) )
+                {
+                    $failed++;
+                    $self->error( "An error occurred while executing code reference to replace html element(s). Code reference returned undef." );
+                    return(0);
+                }
                 if( $self->_is_object( $res ) && $res->isa( 'HTML::Object::DOM::Element' ) )
                 {
                     $a = $self->new_array( [ $res ] );
@@ -3734,17 +3804,31 @@ sub replaceWith
                 elsif( overload::Overloaded( $res ) && overload::Method( $res, '""' ) )
                 {
                     my $elem = $self->new_parser( "$res" );
-                    $failed++, return if( !defined( $elem ) );
+                    if( !defined( $elem ) )
+                    {
+                        $failed++;
+                        return(0);
+                    }
                     $a = $self->new_array( [ $elem ] );
                 }
                 else
                 {
-                    $failed++, return( $self->error( "Value returned from code reference to be used in replaceWith is neither a string nor a HTML::Object::DOM::Element, so I do not know what to do with it." ) );
+                    $failed++;
+                    $self->error( "Value returned from code reference to be used in replaceWith is neither a string nor a HTML::Object::DOM::Element, so I do not know what to do with it." );
+                    return(0);
                 }
             }
-            return( $self->error( "Found an element within a collection that has no parent! Element has tag \"", $elem->tag, "\"." ) ) if( !$elem->parent );
+            if( !$elem->parent )
+            {
+                $self->error( "Found an element within a collection that has no parent! Element has tag \"", $elem->tag, "\"." );
+                return(0);
+            }
             my $pos = $elem->parent->pos( $elem );
-            return( $self->error( "This element with tag \"", $self->tag, "\" has a parent and yet I could not find its position." ) ) if( !defined( $pos ) );
+            if( !defined( $pos ) )
+            {
+                $self->error( "This element with tag \"", $self->tag, "\" has a parent and yet I could not find its position." );
+                return(0);
+            }
             my $new = $self->new_array;
             $a->foreach(sub
             {
@@ -3784,7 +3868,7 @@ sub replaceWith
                 return( $self->error( "Value returned from code reference to be used in replaceWith is neither a string nor a HTML::Object::DOM::Element, so I do not know what to do with it." ) );
             }
         }
-        
+
         # Object has no parent, so we are essentially replace 1 element for one or more others with no attachment to the dom
         if( !$self->parent )
         {
@@ -3865,14 +3949,14 @@ sub show
             }
         }
         # otherwise, there is no rule inline defined, and thus, nothing to do.
-        
+
         # Is there any rule and properties to save back?
         if( defined( $rule ) && $rule->elements->length > 0 )
         {
             $e->_css_object( $rule );
         }
     };
-    
+
     if( $self->isa_collection )
     {
         $self->children->foreach(sub
@@ -3972,7 +4056,7 @@ sub text
         {
             return( $self->error( "I was expecting some text data or a code reference in replacement of text for this element \"", $self->tag, "\", but instead got '$this'." ) );
         }
-        
+
         my $is_code = ref( $this ) eq 'CODE' ? 1 : 0;
         my $process = sub
         {
@@ -4086,7 +4170,7 @@ sub toggleClass
         # Make sure the classes we are provided are unique
         $a->unique(1);
     }
-    
+
     my $process;
     $process = sub
     {
@@ -4101,7 +4185,7 @@ sub toggleClass
             $ref->{original_classes} //= $classes;
         }
         # No class on this element yet
-        
+
         if( $has_code )
         {
             local $_ = $e;
@@ -4121,7 +4205,7 @@ sub toggleClass
             }
             $a->unique(1);
         }
-        
+
         # No class set yet on this element
         if( !defined( $classes ) )
         {
@@ -4163,7 +4247,7 @@ sub toggleClass
             }
         }
     };
-    
+
     if( $self->isa_collection )
     {
         $self->children->for( $process );
@@ -4424,10 +4508,12 @@ sub xq
             if( defined( $HTML::Object::DOM::GLOBAL_DOM ) )
             {
                 my $collection = $HTML::Object::DOM::GLOBAL_DOM->find( $this ) || return;
+                $collection->debug( $self->debug );
                 return( $collection );
             }
             else
             {
+                warn( "No context was specified for '$this'. You need to provide some context to the selector by supplying an HTML::Object::DOM::Element object." ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
                 return( HTML::Object::DOM->error( "You need to provide some context to the selector by supplying an HTML::Object::DOM::Element object." ) );
             }
         }
@@ -4480,7 +4566,7 @@ sub _append_prepend
     {
         return( $self->error( "I do not know what to do with '$this'. I was expecing an html string, or an HTML::Object::DOM::Element or an array of element objects or a collection object (HTML::Object::Collection) or a code reference." ) );
     }
-    
+
     if( $self->isa_collection )
     {
         my $failed = 0;
@@ -4496,7 +4582,12 @@ sub _append_prepend
             {
                 local $_ = $e;
                 my $res = $this->( $pos, $e->as_string );
-                $failed++, return( $self->error( "An error occurred while executing code reference to $opts->{action} html element(s). Code reference returned undef." ) ) if( !defined( $res ) );
+                if( !defined( $res ) )
+                {
+                    $failed++;
+                    $self->error( "An error occurred while executing code reference to $opts->{action} html element(s). Code reference returned undef." );
+                    return(0);
+                }
                 if( $self->_is_object( $res ) && $res->isa( 'HTML::Object::DOM::Element' ) )
                 {
                     $a = $self->new_array( [ $res ] );
@@ -4504,12 +4595,18 @@ sub _append_prepend
                 elsif( overload::Overloaded( $res ) && overload::Method( $res, '""' ) )
                 {
                     my $elem = $self->new_parser( "$res" );
-                    $failed++, return if( !defined( $elem ) );
+                    if( !defined( $elem ) )
+                    {
+                        $failed++;
+                        return(0);
+                    }
                     $a = $self->new_array( [ $elem ] );
                 }
                 else
                 {
-                    $failed++, return( $self->error( "Value returned from code reference to be used in $opts->{action}\(\) is neither a string nor a HTML::Object::DOM::Element, so I do not know what to do with it." ) );
+                    $failed++;
+                    $self->error( "Value returned from code reference to be used in $opts->{action}\(\) is neither a string nor a HTML::Object::DOM::Element, so I do not know what to do with it." );
+                    return(0);
                 }
             }
             $a->foreach(sub
@@ -4639,7 +4736,7 @@ sub _append_prepend_to
     {
         return( $self->error( "I do not know what to do with \"$this\". I was expecting a selector, html data, an element object or an array." ) );
     }
-    
+
     # If the content to be inserted is a collection, we loop through it, duplicate each element and insert them
     if( $self->isa_collection )
     {
@@ -4749,7 +4846,7 @@ sub _before_after
     {
         return( $self->error( "I do not know what to do with '$this'. I was expecing an html string, or an HTML::Object::DOM::Element or an array of element objects or a collection object (HTML::Object::Collection) or a code reference." ) );
     }
-    
+
     if( $self->isa_collection )
     {
         my $failed = 0;
@@ -4771,12 +4868,22 @@ sub _before_after
                 # $pos = $parent->children->pos( $e->close_tag ? $e->close_tag : $e );
                 $pos = $parent->children->pos( $e );
             }
-            $failed++, return( $self->error( "Element with tag \"", $e->tag, "\" has a parent, but I could not find it among its children elements." ) ) if( !defined( $pos ) );
+            if( !defined( $pos ) )
+            {
+                $failed++;
+                $self->error( "Element with tag \"", $e->tag, "\" has a parent, but I could not find it among its children elements." );
+                return(0);
+            }
             if( ref( $this ) CORE::eq 'CODE' )
             {
                 local $_ = $e;
                 my $res = $this->( $pos, $e->as_string );
-                $failed++, return( $self->error( "An error occurred while executing code reference to $opts->{action} html element(s). Code reference returned undef." ) ) if( !defined( $res ) );
+                if( !defined( $res ) )
+                {
+                    $failed++;
+                    $self->error( "An error occurred while executing code reference to $opts->{action} html element(s). Code reference returned undef." );
+                    return(0);
+                }
                 if( $self->_is_object( $res ) && $res->isa( 'HTML::Object::DOM::Element' ) )
                 {
                     $a = $self->new_array( [ $res ] );
@@ -4784,12 +4891,18 @@ sub _before_after
                 elsif( overload::Overloaded( $res ) && overload::Method( $res, '""' ) )
                 {
                     my $elem = $self->new_parser( "$res" );
-                    $failed++, return if( !defined( $elem ) );
+                    if( !defined( $elem ) )
+                    {
+                        $failed++;
+                        return(0);
+                    }
                     $a = $self->new_array( [ $elem ] );
                 }
                 else
                 {
-                    $failed++, return( $self->error( "Value returned from code reference to be used in $opts->{action}\(\) is neither a string nor a HTML::Object::DOM::Element, so I do not know what to do with it." ) );
+                    $failed++;
+                    $self->error( "Value returned from code reference to be used in $opts->{action}\(\) is neither a string nor a HTML::Object::DOM::Element, so I do not know what to do with it." );
+                    return(0);
                 }
             }
             $a->foreach(sub
@@ -4929,6 +5042,42 @@ sub _css_builder
     return( $css->builder->select( 'inline' ) );
 }
 
+# Private method : BFS (Breadth-First Search) on the sub-tree of $self, returns an array
+# of all the elements for which $test->($elem) is true. Ignores the nodes text/space/comment.
+sub _fast_find_by
+{
+    my( $self, $test ) = @_;
+    my $result = $self->new_array;
+    # Racine(s) à parcourir
+    my @roots;
+    if( $self->isa_collection )
+    {
+        @roots = $self->children->list;
+    }
+    else
+    {
+        @roots = ( $self );
+    }
+    my @queue = @roots;
+    while( @queue )
+    {
+        my $node = shift( @queue );
+        # We only test on the true elements, no on Text, Space, or Comment
+        if( $node->isa( 'HTML::Object::DOM::Element' ) &&
+            $node->{tag} &&
+            substr( "$node->{tag}", 0, 1 ) ne '_' )
+        {
+            $result->push( $node ) if( $test->( $node ) );
+        }
+        # Crawl down in te children if the method exists.
+        if( $node->can( 'children' ) && $node->children->length )
+        {
+            push( @queue, $node->children->list );
+        }
+    }
+    return( $result );
+}
+
 # Takes selector, html, element or array
 # xq( '<p>Test</p>' )->insertBefore( xq( '.inner', $doc ) );
 # $elem->insertBefore( '.inner' );
@@ -4977,7 +5126,7 @@ sub _insert_before_after
     {
         return( $self->error( "I do not know what to do with \"$this\". I was expecting a selector, html data, an element object or an array." ) );
     }
-    
+
     # If the content to be inserted is a collection, we loop through it, duplicate each element and insert them
     if( $self->isa_collection )
     {
@@ -4989,7 +5138,7 @@ sub _insert_before_after
             $elem->reset(1);
             my $pos = $parent->children->pos( $elem );
             warn( "Found a parent for tag \"", $elem->tag, "\", but somehow I could not find its position among its children elements.\n" ) if( !defined( $pos ) );
-            return( 1 ) if( !defined( $pos ) );
+            return(1) if( !defined( $pos ) );
             $self->children->foreach(sub
             {
                 my $e = shift( @_ );

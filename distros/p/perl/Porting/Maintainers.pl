@@ -231,8 +231,8 @@ our %Modules = (
     },
 
     'Compress::Raw::Zlib' => {
-        'DISTRIBUTION' => 'PMQS/Compress-Raw-Zlib-2.213.tar.gz',
-        'SYNCINFO'     => 'jkeenan on Wed Aug 28 13:58:29 2024',
+        'DISTRIBUTION' => 'PMQS/Compress-Raw-Zlib-2.222.tar.gz',
+        'SYNCINFO'     => 'jkeenan on Wed Mar 11 21:59:54 2026',
         'FILES'    => q[cpan/Compress-Raw-Zlib],
         'EXCLUDED' => [
             qr{^examples/},
@@ -240,7 +240,8 @@ our %Modules = (
             qr{^t/meta},
             qw( t/000prereq.t
                 t/99pod.t
-                ),
+                SECURITY.md
+            ),
         ],
     },
 
@@ -249,9 +250,9 @@ our %Modules = (
         'SYNCINFO'     => 'jkeenan on Fri Jan 17 14:43:53 2025',
         'FILES'        => q[cpan/Config-Perl-V],
         'EXCLUDED'     => [qw(
-		examples/show-v.pl
-		SECURITY.md
-		)],
+            examples/show-v.pl
+            SECURITY.md
+        )],
     },
 
     'constant' => {

@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::GLE::Num2Word;
-# ABSTRACT: This module converts numbers (cardinals) into their Irish (Gaeilge) equivalents using the modern decimal counting system. It accepts positive integers up to, but not including, 1 billion.
+# ABSTRACT: Number to word conversion in Irish (Gaeilge)
 
 use 5.16.0;
 use utf8;
@@ -15,7 +15,7 @@ use Export::Attrs;
 # }}}
 # {{{ variable declarations
 
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # Irish (Gaeilge) uses a decimal counting system in modern usage.
 # The counting form uses the "a" prefix before unit digits.
@@ -156,13 +156,15 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::GLE::Num2Word - Number to word conversion in Irish (Gaeilge)
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::GLE::Num2Word is a module for converting numbers into their written
 representation in Irish (Gaeilge). Converts whole numbers from 0 up to
@@ -203,6 +205,13 @@ Text output is encoded in UTF-8.
 
 Convert number to Irish text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

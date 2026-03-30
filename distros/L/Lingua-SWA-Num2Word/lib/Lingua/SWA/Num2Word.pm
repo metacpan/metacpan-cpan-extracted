@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -78,12 +78,42 @@ sub num2swa_cardinal :Export {
 # }}}
 
 
+# {{{ num2swa_ordinal                 convert number to ordinal text
+
+sub num2swa_ordinal :Export {
+    my $number = shift;
+    my $prefix = shift // 'wa';    # noun-class prefix; default = wa (persons)
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Swahili ordinals: {noun-class-prefix} + "-a" + ordinal word.
+    # 1st through 5th and 8th have special stems; the rest use cardinals.
+    my %special = (
+        1 => 'kwanza',
+        2 => 'pili',
+        3 => 'tatu',
+        4 => 'nne',
+        5 => 'tano',
+        8 => 'nane',
+    );
+
+    my $ordinal_word = $special{$number} // num2swa_cardinal($number);
+
+    return $prefix . ' ' . $ordinal_word;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -96,6 +126,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::SWA::Num2Word - Number to word conversion in Swahili
@@ -103,7 +135,7 @@ Lingua::SWA::Num2Word - Number to word conversion in Swahili
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SWA::Num2Word is a module for converting numbers into their written
 representation in Swahili. Converts whole numbers from 0 up to 999 999 999.
@@ -117,11 +149,18 @@ representation in Swahili. Converts whole numbers from 0 up to 999 999 999.
 
 =head1 SYNOPSIS
 
- use Lingua::SWA::Num2Word qw(num2swa_cardinal);
+ use Lingua::SWA::Num2Word qw(num2swa_cardinal num2swa_ordinal);
 
  my $text = num2swa_cardinal( 123 );
 
  print $text || "sorry, can't convert this number into Swahili.";
+
+ my $ord = num2swa_ordinal( 3 );
+ print $ord;    # "wa tatu"
+
+ # With noun-class prefix:
+ my $ord2 = num2swa_ordinal( 3, 'ya' );
+ print $ord2;   # "ya tatu"
 
 =cut
 
@@ -143,6 +182,23 @@ representation in Swahili. Converts whole numbers from 0 up to 999 999 999.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2swa_ordinal> (positional)
+
+  1   num    number to convert
+  2   str    noun-class prefix (default: "wa")
+  =>  str    converted ordinal string
+
+Convert number to ordinal text. Uses special stems for 1st-5th and 8th,
+cardinal forms for the rest. The optional second argument specifies the
+Swahili noun-class concord prefix (wa, ya, la, za, etc.).
+Only numbers from interval [1, 999_999_999] will be converted.
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -157,6 +213,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2swa_cardinal
+
+=item num2swa_ordinal
 
 =back
 

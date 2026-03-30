@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = ron_numerals();
 
 # }}}
@@ -102,6 +102,65 @@ sub ron_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Romanian ordinals:
+    #   "primul/prima" → suppletive for 1st (cardinal: "unu"/"una")
+    #   2-10: "al doilea/a doua" etc. — irregular stems
+    #   11+:  "al " + cardinal + "lea" / "a " + cardinal + "a"
+
+    # Masculine suppletive 1st
+    return 'unu'  if $input =~ m{\A primul \z}xms;
+    return 'una'  if $input =~ m{\A prima  \z}xms;
+
+    # Feminine ordinals: "a <cardinal>a"
+    # (must check before masculine to avoid ambiguity)
+    state $fem_irregular = {
+        'a doua'    => 'două',
+        'a treia'   => 'trei',
+        'a patra'   => 'patru',
+        'a cincea'  => 'cinci',
+        'a șasea'   => 'șase',
+        'a șaptea'  => 'șapte',
+        'a opta'    => 'opt',
+        'a noua'    => 'nouă',
+        'a zecea'   => 'zece',
+    };
+
+    return $fem_irregular->{$input} if exists $fem_irregular->{$input};
+
+    # Masculine ordinals: "al <stem>lea"
+    state $masc_irregular = {
+        'al doilea'   => 'doi',
+        'al treilea'  => 'trei',
+        'al patrulea' => 'patru',
+        'al cincilea' => 'cinci',
+        'al șaselea'  => 'șase',
+        'al șaptelea' => 'șapte',
+        'al optulea'  => 'opt',
+        'al nouălea'  => 'nouă',
+        'al zecelea'  => 'zece',
+    };
+
+    return $masc_irregular->{$input} if exists $masc_irregular->{$input};
+
+    # Regular masculine (11+): "al " + cardinal + "lea"
+    if ($input =~ m{\A al \s+ (?<card>.+?) lea \z}xms) {
+        return $+{card};
+    }
+
+    # Regular feminine (11+): "a " + cardinal + "a"
+    if ($input =~ m{\A a \s+ (?<card>.+?) a \z}xms) {
+        return $+{card};
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -120,7 +179,7 @@ Lingua::RON::Word2Num - Word to number conversion in Romanian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::RON::Word2Num is module for converting Romanian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -161,6 +220,14 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'primul', 'al doilea', 'al zecelea')
+  =>  str    cardinal text (e.g. 'unu', 'doi', 'zece')
+      undef  if input is not recognised as an ordinal
+
+Convert Romanian ordinal text to cardinal text (morphological reversal).
+
 =item B<ron_numerals> (void)
 
   =>  obj  new parser object
@@ -181,6 +248,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

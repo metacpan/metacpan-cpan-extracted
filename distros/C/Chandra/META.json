@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl bindings to webview-c for cross-platform GUIs",
    "author" : [
-      "Prototype"
+      "LNATION <email@lnation.org>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
@@ -32,6 +32,10 @@
       },
       "runtime" : {
          "requires" : {
+            "Cpanel::JSON::XS" : "0",
+            "File::Spec" : "0",
+            "IO::Select" : "0",
+            "IO::Socket::UNIX" : "0",
             "perl" : "5.010"
          }
       },
@@ -49,6 +53,6 @@
          "web" : "https://github.com/javalikescript/webview-c"
       }
    },
-   "version" : "0.02",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

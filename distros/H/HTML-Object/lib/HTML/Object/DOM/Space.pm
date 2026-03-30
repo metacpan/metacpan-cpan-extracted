@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Space.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.0_1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2022/09/18
+## Modified 2026/03/29
 ## All rights reserved
 ## 
 ## 
@@ -16,9 +16,10 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::Space HTML::Object::DOM::CharacterData );
     use vars qw( $VERSION );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.0_1';
 };
 
 use strict;
@@ -70,7 +71,10 @@ sub isEqualNode
 # Note: Property
 sub nodeValue : lvalue { return( shift->_set_get_lvalue( 'value', @_ ) ); }
 
-sub parent { return( shift->_set_get_object_without_init( 'parent', 'HTML::Object::DOM::Node', @_ ) ); }
+sub parent { return( shift->_set_get_object_without_init({
+    field  => 'parent',
+    weaken => 1,
+}, 'HTML::Object::DOM::Node', @_ ) ); }
 
 sub string_value { return( shift->value ); }
 
@@ -92,7 +96,7 @@ HTML::Object::DOM::Space - HTML Object DOM Space Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.0_1
 
 =head1 DESCRIPTION
 

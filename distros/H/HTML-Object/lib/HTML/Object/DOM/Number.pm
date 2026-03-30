@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic::Number );
     use vars qw( $EPSILON $VERSION );
     use Config;
@@ -202,7 +203,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/Ja
 
 =head2 MIN_VALUE
 
-The smallest positive representable number—that is, the positive number closest to zero (without actually being zero).
+The smallest positive representable number-that is, the positive number closest to zero (without actually being zero).
 
 Example:
 

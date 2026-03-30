@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = vie_numerals();
 
 # }}}
@@ -98,6 +98,24 @@ sub vie_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Vietnamese ordinals: prefix "thứ " to cardinal, with two specials.
+    # "thứ nhất" (1st) → "một"
+    return 'một' if $input eq 'thứ nhất';
+    # "thứ tư" (4th) → "bốn"
+    return 'bốn' if $input eq 'thứ tư';
+
+    # Regular: strip "thứ " prefix ([ ] needed because /x ignores bare spaces)
+    $input =~ s{\Athứ[ ]}{}xms and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -116,7 +134,7 @@ Lingua::VIE::Word2Num - Word to number conversion in Vietnamese
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::VIE::Word2Num is module for converting Vietnamese numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -162,6 +180,15 @@ You can specify a numeral from interval [0,999_999_999].
   =>  obj  new parser object
 
 Internal parser.
+
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =back
 

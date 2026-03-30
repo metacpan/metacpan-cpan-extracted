@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = slk_numerals();
 
 # }}}
@@ -120,6 +120,86 @@ sub slk_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Slovak ordinals: strip gender suffixes, then map stems.
+    # Inflection: -ý/-á/-é/-ého/-ému/-ém/-ým (masc/fem/neut/oblique).
+
+    my %irregular = (
+        'nultý'       => 'nula',
+        'prvý'        => 'jeden',
+        'druhý'       => 'dva',
+        'tretí'       => 'tri',
+        'štvrtý'      => 'štyri',
+        'piaty'       => 'päť',
+        'šiesty'      => 'šesť',
+        'siedmy'      => 'sedem',
+        'ôsmy'        => 'osem',
+        'deviaty'     => 'deväť',
+        'desiaty'     => 'desať',
+        'jedenásty'   => 'jedenásť',
+        'dvanásty'    => 'dvanásť',
+        'trinásty'    => 'trinásť',
+        'štrnásty'    => 'štrnásť',
+        'pätnásty'    => 'pätnásť',
+        'šestnásty'   => 'šestnásť',
+        'sedemnásty'  => 'sedemnásť',
+        'osemnásty'   => 'osemnásť',
+        'devätnásty'  => 'devätnásť',
+        'dvadsiaty'   => 'dvadsať',
+        'tridsiaty'   => 'tridsať',
+        'štyridsiaty' => 'štyridsať',
+        'päťdesiaty'  => 'päťdesiat',
+        'šesťdesiaty' => 'šesťdesiat',
+        'sedemdesiaty' => 'sedemdesiat',
+        'osemdesiaty' => 'osemdesiat',
+        'deväťdesiaty' => 'deväťdesiat',
+        'dvojstý'     => 'dvesto',
+        'trojstý'     => 'tristo',
+        'štvorstý'    => 'štyristo',
+        'päťstý'      => 'päťsto',
+        'šesťstý'     => 'šesťsto',
+        'sedemstý'    => 'sedemsto',
+        'osemstý'     => 'osemsto',
+        'deväťstý'    => 'deväťsto',
+        'stý'         => 'sto',
+        'tisíci'      => 'tisíc',
+        'miliónty'    => 'milión',
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip gender/case suffixes to masculine nominative
+        my $norm = $word;
+        $norm =~ s{(í)ho\z}{$1}xms
+            or $norm =~ s{ého\z}{ý}xms
+            or $norm =~ s{ému\z}{ý}xms
+            or $norm =~ s{ém\z}{ý}xms
+            or $norm =~ s{ým\z}{ý}xms
+            or $norm =~ s{á\z}{ý}xms
+            or $norm =~ s{é\z}{ý}xms;
+
+        if (exists $irregular{$norm}) {
+            push @result, $irregular{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors, etc.)
+        }
+    }
+
+    return $matched ? join(' ', @result) : undef;
+}
+
+# }}}
 
 1;
 
@@ -138,7 +218,7 @@ Lingua::SLK::Word2Num - Word to number conversion in Slovak
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SLK::Word2Num is module for converting Slovak numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -178,6 +258,15 @@ expected to be in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'piaty', 'dvadsiaty', 'tretí')
+  =>  str    cardinal text (e.g. 'päť', 'dvadsať', 'tri')
+      undef  if input is not a recognized ordinal
+
+Convert Slovak ordinal text to cardinal text via morphological reversal.
+Handles all gender/case inflections.
+
 =item B<slk_numerals> (void)
 
   =>  obj  object of the parser
@@ -198,6 +287,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::TextTrackCue );
     use vars qw( $VERSION );
     use HTML::Object::Exception;
@@ -132,7 +133,7 @@ HTML::Object::DOM::VTTCue - HTML Object DOM VTTCue Class
 
 This implements a C<VTTCue> object representing a cue which will be presented during the time span given.
 
-The C<VTTCue> interface—part of the Web API for handling C<WebVTT> (text tracks on media presentations)—describes and controls the text track associated with a particular L<<track> element|HTML::Object::DOM::Element::Track>.
+The C<VTTCue> interface-part of the Web API for handling C<WebVTT> (text tracks on media presentations)-describes and controls the text track associated with a particular L<<track> element|HTML::Object::DOM::Element::Track>.
 
 =head1 INHERITANCE
 

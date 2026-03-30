@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = (
      0 => 'нуль',
      1 => 'один',          2 => 'два',
@@ -144,13 +144,161 @@ sub num2ukr_cardinal :Export {
 
 # }}}
 
+# {{{ num2ukr_ordinal           number to ordinal string conversion
+
+sub num2ukr_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'нульовий',
+        1  => 'перший',
+        2  => 'другий',
+        3  => 'третій',
+        4  => 'четвертий',
+        5  => "п'ятий",
+        6  => 'шостий',
+        7  => 'сьомий',
+        8  => 'восьмий',
+        9  => "дев'ятий",
+        10 => 'десятий',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Teens ordinals 11-19
+    my %teens = (
+        11 => 'одинадцятий',
+        12 => 'дванадцятий',
+        13 => 'тринадцятий',
+        14 => 'чотирнадцятий',
+        15 => "п'ятнадцятий",
+        16 => 'шістнадцятий',
+        17 => 'сімнадцятий',
+        18 => 'вісімнадцятий',
+        19 => "дев'ятнадцятий",
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'двадцятий',
+        30 => 'тридцятий',
+        40 => 'сороковий',
+        50 => "п'ятдесятий",
+        60 => 'шістдесятий',
+        70 => 'сімдесятий',
+        80 => 'вісімдесятий',
+        90 => "дев'яностий",
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'сотий',
+        200 => 'двохсотий',
+        300 => 'трьохсотий',
+        400 => 'чотирьохсотий',
+        500 => "п'ятисотий",
+        600 => 'шестисотий',
+        700 => 'семисотий',
+        800 => 'восьмисотий',
+        900 => "дев'ятисотий",
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            if ($millions == 1) {
+                return 'мільйонний';
+            }
+            return num2ukr_cardinal($millions) . ' мільйонний';
+        }
+        my $prefix = num2ukr_cardinal($millions);
+        my $tmp4 = $millions % 10;
+        my $tmp3 = $millions % 100;
+        my $mil_word;
+        if ($tmp3 < 9 || $tmp3 > 20) {
+            if ($tmp4 == 1) {
+                $mil_word = 'мільйон';
+            }
+            elsif ($tmp4 > 1 && $tmp4 < 5) {
+                $mil_word = 'мільйони';
+            }
+            else {
+                $mil_word = 'мільйонів';
+            }
+        }
+        else {
+            $mil_word = 'мільйонів';
+        }
+        return $prefix . ' ' . $mil_word . ' ' . num2ukr_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'тисячний';
+            }
+            return num2ukr_cardinal($thousands) . ' тисячний';
+        }
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'тисяча';
+        }
+        elsif ($thousands == 2) {
+            $thou_cardinal = 'дві тисячі';
+        }
+        elsif ($thousands >= 3 && $thousands <= 4) {
+            $thou_cardinal = num2ukr_cardinal($thousands) . ' тисячі';
+        }
+        else {
+            $thou_cardinal = num2ukr_cardinal($thousands) . ' тисяч';
+        }
+        return $thou_cardinal . ' ' . num2ukr_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2ukr_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_ord{$t} . ' ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -172,7 +320,7 @@ Lingua::UKR::Num2Word - Number to word conversion in Ukrainian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::UKR::Num2Word is module for conversion numbers into their representation
 in Ukrainian. It converts whole numbers from 0 up to 999 999 999.
@@ -213,6 +361,13 @@ Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will
 be converted.
 
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -227,6 +382,8 @@ be converted.
 =over 2
 
 =item num2ukr_cardinal
+
+=item num2ukr_ordinal
 
 =back
 

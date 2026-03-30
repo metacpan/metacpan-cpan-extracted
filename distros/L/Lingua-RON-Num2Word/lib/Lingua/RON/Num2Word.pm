@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -108,12 +108,47 @@ sub num2ron_cardinal :Export {
 # }}}
 
 
+# {{{ num2ron_ordinal                  convert number to ordinal text
+
+sub num2ron_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Irregular ordinals 1-10
+    my %irregular = (
+        1  => 'primul',
+        2  => 'al doilea',
+        3  => 'al treilea',
+        4  => 'al patrulea',
+        5  => 'al cincilea',
+        6  => 'al șaselea',
+        7  => 'al șaptelea',
+        8  => 'al optulea',
+        9  => 'al nouălea',
+        10 => 'al zecelea',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # For 11+, form: "al" + cardinal + "lea"
+    my $cardinal = num2ron_cardinal($number);
+
+    return 'al ' . $cardinal . 'lea';
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -135,7 +170,7 @@ Lingua::RON::Num2Word - Number to word conversion in Romanian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::RON::Num2Word is module for converting numbers into their written
 representation in Romanian. Converts whole numbers from 0 up to 999 999 999.
@@ -177,6 +212,20 @@ Text output is encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2ron_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    ordinal string (e.g. 'primul', 'al doilea')
+
+Convert number to its Romanian ordinal form.
+Only numbers from interval [1, 999_999_999] will be converted.
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -191,6 +240,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2ron_cardinal
+
+=item num2ron_ordinal
 
 =back
 

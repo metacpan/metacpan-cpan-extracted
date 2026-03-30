@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -115,7 +115,7 @@ Lingua::FAS::Num2Word - Number to word conversion in Persian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::FAS::Num2Word is module for converting numbers into their written
 representation in Persian (Farsi). Converts whole numbers from 0 up to
@@ -157,6 +157,13 @@ Text is encoded in UTF-8 and uses Arabic script as standard for Persian.
 
 Convert number to text representation in Persian.
 Only numbers from interval [0, 999_999_999] will be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

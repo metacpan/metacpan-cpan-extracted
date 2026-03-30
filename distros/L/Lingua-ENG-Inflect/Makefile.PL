@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Plural inflection for ENG.",
+  "ABSTRACT" => "Convert singular to plural. Select \"a\" or \"an\".",
   "AUTHOR" => "Damian Conway <damian\@conway.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603270",
+  "VERSION" => "0.2603300",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -3,7 +3,7 @@ package Chandra::Bridge;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 # JavaScript bridge code that gets injected into every page
 # This provides the window.chandra object for JS -> Perl communication
@@ -11,11 +11,11 @@ our $VERSION = '0.02';
 use constant JS_BRIDGE => <<'END_EOF';
 (function() {
     if (window.chandra) return;
-    
+
     window.chandra = {
         _callbacks: {},
         _id: 0,
-        
+
         invoke: function(method, args) {
             var self = this;
             return new Promise(function(resolve, reject) {
@@ -29,12 +29,12 @@ use constant JS_BRIDGE => <<'END_EOF';
                 }));
             });
         },
-        
+
         call: function(method) {
             var args = Array.prototype.slice.call(arguments, 1);
             return this.invoke(method, args);
         },
-        
+
         _resolve: function(id, result, error) {
             var cb = this._callbacks[id];
             if (!cb) return;
@@ -45,7 +45,7 @@ use constant JS_BRIDGE => <<'END_EOF';
                 cb.resolve(result);
             }
         },
-        
+
         _event: function(handlerId, eventData) {
             window.external.invoke(JSON.stringify({
                 type: 'event',
@@ -53,7 +53,7 @@ use constant JS_BRIDGE => <<'END_EOF';
                 event: eventData || {}
             }));
         },
-        
+
         _eventData: function(e, extra) {
             var data = {
                 type: e.type,
@@ -77,16 +77,16 @@ END_EOF
 
 # Return the bridge code
 sub js_code {
-    return JS_BRIDGE;
+	return JS_BRIDGE;
 }
 
 # Return bridge code wrapped for eval
 sub js_code_escaped {
-    my $code = JS_BRIDGE;
-    $code =~ s/\\/\\\\/g;
-    $code =~ s/'/\\'/g;
-    $code =~ s/\n/\\n/g;
-    return $code;
+	my $code = JS_BRIDGE;
+	$code =~ s/\\/\\\\/g;
+	$code =~ s/'/\\'/g;
+	$code =~ s/\n/\\n/g;
+	return $code;
 }
 
 1;
@@ -99,27 +99,49 @@ Chandra::Bridge - JavaScript bridge code for Perl communication
 
 =head1 SYNOPSIS
 
-    use Chandra::Bridge;
-    
-    # Get the JS code to inject
-    my $js = Chandra::Bridge->js_code;
-    
-    # Inject into webview
-    $app->eval_js($js);
+	use Chandra::Bridge;
+
+	# Get the JS code to inject
+	my $js = Chandra::Bridge->js_code;
+
+	# Get the JS code escaped for eval
+	my $escaped = Chandra::Bridge->js_code_escaped;
 
 =head1 DESCRIPTION
 
 This module contains the JavaScript bridge code that enables
-communication between JavaScript and Perl via window.chandra.
+communication between JavaScript and Perl via C<window.chandra>.
+
+You normally do not use this module directly; L<Chandra::App> injects
+the bridge automatically.
 
 =head2 JavaScript API
 
 After injection, the following is available in JavaScript:
 
-    // Call a Perl function (returns Promise)
-    const result = await window.chandra.invoke('method_name', [arg1, arg2]);
-    
-    // Shorthand
-    const result = await window.chandra.call('method_name', arg1, arg2);
+	// Call a Perl function (returns Promise)
+	const result = await window.chandra.invoke('method_name', [arg1, arg2]);
+
+	// Shorthand
+	const result = await window.chandra.call('method_name', arg1, arg2);
+
+=head1 METHODS
+
+=head2 js_code
+
+	my $js = Chandra::Bridge->js_code;
+
+Class method. Returns the raw JavaScript source for the bridge.
+
+=head2 js_code_escaped
+
+	my $js = Chandra::Bridge->js_code_escaped;
+
+Class method. Returns the bridge code wrapped for injection via
+C<eval_js> (newlines and quotes escaped).
+
+=head1 SEE ALSO
+
+L<Chandra::App>, L<Chandra::Bind>
 
 =cut

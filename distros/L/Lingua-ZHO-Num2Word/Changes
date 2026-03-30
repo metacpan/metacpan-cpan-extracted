@@ -1,5 +1,7 @@
 Revision history for Lingua-ZHO-Num2Word
 
-0.2603270  2026-03-27
-    - rename all 10 legacy Num2Word modules to canonical namespace
+0.2603300  2026-03-30
+    - POD coverage + test suite fixes for 61-language Lingua suite
+    - ordinals for 33 more languages (47/61 total)
+    - add =encoding utf-8 to all POD sections (fixes no_pod_errors kwalitee)
 

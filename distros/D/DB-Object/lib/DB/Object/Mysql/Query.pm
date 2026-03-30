@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql/Query.pm
-## Version v0.5.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.5.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/03/26
 ## All rights reserved
 ## 
 ## 
@@ -22,7 +22,7 @@ BEGIN
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.5.0';
+    our $VERSION = 'v0.5.1';
 };
 
 use strict;
@@ -348,7 +348,7 @@ sub _query_components
     $on_conflict = $self->on_conflict;
     my @query = ();
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
-    if( $where && $where->types->length )
+    if( $where && $where->elements->length )
     {
         $self->elements->push( $where ) unless( $opts->{no_bind_copy} );
     }
@@ -395,7 +395,7 @@ DB::Object::Mysql::Query - Query Object for MySQL
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

@@ -518,7 +518,6 @@ FROM information_schema.columns a
 WHERE table_name = ?
 ORDER BY a.ordinal_position
 EOT
-    $self->messagec( 5, "Executing SQL query to get the table structure for table {green}${table}{/}" );
     my $sth = $dbh->prepare_cached( $query ) ||
         return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $dbh->errstr() ) );
     $sth->execute( $table ) ||
@@ -535,7 +534,6 @@ EOT
             # For example: ORDINAL_POSITION -> ordinal_position
             $ref->{ lc( $k ) } = CORE::delete( $ref->{ $k } );
         }
-        $self->messagec( 6, "Checking table ${table} field {green}", $ref->{field}, "{/} with type {green}", $ref->{type}, "{/}" );
         my $def =
         {
             name            => $ref->{field},
@@ -576,7 +574,6 @@ EOT
             @$dict{ @$const_keys } = @$const_def{ @$const_keys };
             $def->{datatype} = $dict;
         }
-        $self->messagec( 6, "\tField {green}", $def->{name}, "{/} has type {green}", $def->{type}, "{/} and dictionary -> ", sub{ $self->Module::Generic::dump( $def ) } );
         $def->{query_object} = $q;
         $def->{table_object} = $self;
         # The information schema field 'column_type' provides already what is needed, such as 'varchar(255)'

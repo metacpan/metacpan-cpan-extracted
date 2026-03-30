@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; mode:folding; coding:utf-8 -*-
 
 package Lingua::POL::Num2Word;
-# ABSTRACT: Number 2 word conversion in POL.
+# ABSTRACT: Perl module for converting numeric values into their Polish equivalents
 
 use 5.16.0;
 use utf8;
@@ -18,7 +18,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -526,7 +526,7 @@ Lingua::POL::Num2Word - Perl module for converting numeric values into their Pol
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 DESCRIPTION
 
@@ -617,6 +617,13 @@ Converts number to Polish ordinal (e.g. 1 => "pierwszy", 21 => "dwudziesty pierw
 =item currency
 
 private
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -93,21 +93,26 @@ sub num2deu_ordinal :Export {
            || $number < 1
            || $number > 999_999_999;
 
-    # Fully irregular forms
-    return 'erste'  if $number == 1;
-    return 'zweite' if $number == 2;
-    return 'dritte' if $number == 3;
-
-    # Stem irregulars: siebte (not siebente), achte (not achtte)
-    return 'siebte' if $number == 7;
-    return 'achte'  if $number == 8;
-
     my $cardinal = num2deu_cardinal($number);
 
-    # Numbers 4-19 get suffix "te", 20+ get "ste"
-    my $suffix = $number < 20 ? 'te' : 'ste';
+    # Ordinal morphology is text-based: the suffix and any stem
+    # changes depend on the final element of the cardinal text.
 
-    return $cardinal . $suffix;
+    # Irregulars anchored at end of word (standalone or compound)
+    $cardinal =~ s{ein\z}{erste}xms   and return $cardinal;
+    $cardinal =~ s{zwei\z}{zweite}xms and return $cardinal;
+    $cardinal =~ s{drei\z}{dritte}xms and return $cardinal;
+    $cardinal =~ s{sieben\z}{siebte}xms and return $cardinal;
+    $cardinal =~ s{acht\z}{achte}xms  and return $cardinal;
+
+    # Teens (4-19 range endings): -te
+    $cardinal =~ s{(zehn|elf|zwölf)\z}{$1te}xms and return $cardinal;
+
+    # Regular units: -te  (vier, fünf, sechs, neun)
+    $cardinal =~ s{(vier|fünf|sechs|neun)\z}{$1te}xms and return $cardinal;
+
+    # Tens, hundert, tausend, million: -ste
+    return $cardinal . 'ste';
 }
 
 # }}}
@@ -130,6 +135,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::DEU::Num2Word - Number to word conversion in German
@@ -137,7 +144,7 @@ Lingua::DEU::Num2Word - Number to word conversion in German
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::DEU::Num2Word is module for converting numbers into their written
 representation in German. Converts whole numbers from 0 up to 999 999 999.
@@ -190,6 +197,13 @@ Convert number to its German ordinal text representation.
 Only numbers from interval [1, 999_999_999] will be converted.
 Handles irregular forms (erste, zweite, dritte, siebte, achte)
 and applies correct suffixes (-te for 4-19, -ste for 20+).
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

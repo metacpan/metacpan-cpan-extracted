@@ -8,6 +8,7 @@ BEGIN
     use Test::More;
     use vars qw( $DEBUG );
     use_ok( 'Cookie::Domain' );
+    use Data::Pretty qw( dump ); # REMOVE ME
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     require( "./t/env.pl" ) if( -e( "t/env.pl" ) );
 };
@@ -172,6 +173,8 @@ SKIP:
                     $expect->{ $k } ne $res->{ $k } )
                 {
                     diag( "\tCould not find property '$k' or our expected value '", $expect->{ $k }, "' does not match what we received '", $res->{ $k }, "'" );
+                    # diag( "Expecting: ", dump( $expect ) ) if( $DEBUG ); # REMOVE ME
+                    diag( "Received: ", dump( $res ) ) if( $DEBUG ); # REMOVE ME
                     $all_ok = 0;
                     last;
                 }

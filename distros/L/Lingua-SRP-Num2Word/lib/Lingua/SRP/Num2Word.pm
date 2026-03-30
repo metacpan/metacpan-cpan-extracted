@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = qw( 0 нула          1 један         2 два
                   3 три           4 четири        5 пет
                   6 шест          7 седам         8 осам
@@ -143,13 +143,145 @@ sub num2srp_cardinal :Export {
 
 # }}}
 
+# {{{ num2srp_ordinal           number to ordinal string conversion
+
+sub num2srp_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'нулти',
+        1  => 'први',
+        2  => 'други',
+        3  => 'трећи',
+        4  => 'четврти',
+        5  => 'пети',
+        6  => 'шести',
+        7  => 'седми',
+        8  => 'осми',
+        9  => 'девети',
+        10 => 'десети',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Irregular teens 11-19
+    my %teens = (
+        11 => 'једанаести',
+        12 => 'дванаести',
+        13 => 'тринаести',
+        14 => 'четрнаести',
+        15 => 'петнаести',
+        16 => 'шеснаести',
+        17 => 'седамнаести',
+        18 => 'осамнаести',
+        19 => 'деветнаести',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'двадесети',
+        30 => 'тридесети',
+        40 => 'четрдесети',
+        50 => 'педесети',
+        60 => 'шездесети',
+        70 => 'седамдесети',
+        80 => 'осамдесети',
+        90 => 'деведесети',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'стоти',
+        200 => 'двестоти',
+        300 => 'тристоти',
+        400 => 'четиристоти',
+        500 => 'петстоти',
+        600 => 'шестстоти',
+        700 => 'седамстоти',
+        800 => 'осамстоти',
+        900 => 'деветстоти',
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            if ($millions == 1) {
+                return 'милионити';
+            }
+            return num2srp_cardinal($millions) . ' милионити';
+        }
+        my $prefix = num2srp_cardinal($millions);
+        my $mil_word = ($millions == 1) ? 'један милион' : 'милиона';
+        return $prefix . ' ' . $mil_word . ' ' . num2srp_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'хиљадити';
+            }
+            return num2srp_cardinal($thousands) . ' хиљадити';
+        }
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'хиљада';
+        }
+        elsif ($thousands == 2) {
+            $thou_cardinal = 'две хиљаде';
+        }
+        elsif ($thousands >= 3 && $thousands <= 4) {
+            $thou_cardinal = num2srp_cardinal($thousands) . ' хиљаде';
+        }
+        else {
+            $thou_cardinal = num2srp_cardinal($thousands) . ' хиљада';
+        }
+        return $thou_cardinal . ' ' . num2srp_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2srp_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_ord{$t} . ' ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -171,7 +303,7 @@ Lingua::SRP::Num2Word - Number to word conversion in Serbian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SRP::Num2Word is module for conversion numbers into their representation
 in Serbian (Cyrillic script). It converts whole numbers from 0 up to 999 999 999.
@@ -212,6 +344,13 @@ Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will
 be converted.
 
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -226,6 +365,8 @@ be converted.
 =over 2
 
 =item num2srp_cardinal
+
+=item num2srp_ordinal
 
 =back
 

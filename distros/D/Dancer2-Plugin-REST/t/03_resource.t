@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Dancer2::Core::Request;
-use Test::More import => ['!pass'], tests => 8;
+use Test2::Bundle::More;
 use Plack::Test;
 use HTTP::Request::Common qw(GET POST PUT DELETE);
 
@@ -11,7 +11,7 @@ use JSON;
     package Webservice;
     use Dancer2;
     use Dancer2::Plugin::REST;
-    use Test::More import => ['!pass'];
+    use Test2::Bundle::More;
 
     set show_errors => 1;
     set serializer => 'JSON';
@@ -102,3 +102,4 @@ test_psgi $app, sub {
         "create user works";
 };
 
+done_testing;

@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use vars qw( $DEBUG $VERSION );
     use overload (
         '""'  => \&value,

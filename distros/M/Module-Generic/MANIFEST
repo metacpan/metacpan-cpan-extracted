@@ -83,6 +83,7 @@ t/29.null.t
 t/30.modperl.t
 t/31.global.t
 t/32.file_magic.t
+t/33.xs_methods.t
 t/90.coverage.t
 t/91.signature.t
 t/99.kwalitee.t

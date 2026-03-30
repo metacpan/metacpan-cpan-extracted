@@ -1,0 +1,49 @@
+PDF-Sign
+
+Sign PDF files with CMS/CAdES digital signatures and RFC3161 timestamps,
+producing PAdES-compliant output.
+
+INSTALLATION
+
+    # install dependencies automatically (recommended):
+    cpanm --installdeps .
+
+    # then install the module:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+    # or in one step:
+    cpanm PDF-Sign-0.01.tar.gz
+
+DEPENDENCIES
+
+    PDF::API2 or PDF::Builder (one required)
+    Crypt::OpenSSL::X509
+    File::Slurp
+    MIME::Base64 (core)
+    POSIX (core)
+    External: openssl binary
+    External: curl binary (optional, falls back to LWP::UserAgent)
+
+TESTING
+
+    # included openssl.cnf for selfsigned certificate generation
+
+    # included example.pl
+    perl example.pl
+
+    # basic load test (no certificates needed, use selfsigned tmp certs):
+    make test
+
+    # TSA test (requires network):
+    TSA_TEST=1 make test
+
+COPYRIGHT AND LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself (GPL/Artistic License).
+
+Originally inspired by Martin Schuette <info@mschuette.name> (2012)
+https://mschuette.name/files/pdfsign.pl — BSD 2-Clause License retained in source.

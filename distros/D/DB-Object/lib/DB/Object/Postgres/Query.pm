@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.4.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.4.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/03/26
 ## All rights reserved
 ## 
 ## 
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $DEBUG $EXCEPTION_CLASS );
     use Wanted;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -229,13 +229,14 @@ sub format_statement
                     # {
                     #     CORE::push( @types, '' );
                     # }
-                    if( $value =~ /^($placeholder_re)$/ )
+                    if( $value =~ /($placeholder_re)/ )
                     {
                         $elem->placeholder( $1 );
                         if( defined( $+{index} ) )
                         {
                             $elem->index( $+{index} );
                         }
+                        $elem->format( $value );
                     }
                     else
                     {
@@ -245,7 +246,6 @@ sub format_statement
                 }
                 else
                 {
-                    # push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
                     if( $value =~ /^$placeholder_re$/ )
                     {
                         $elem->format( $self->format_from_epoch({ value => $value, bind => 1 }) );
@@ -271,10 +271,10 @@ sub format_statement
             {
                 push( @format_values, $$value );
             }
-            elsif( $value =~ /^($placeholder_re)$/ )
+            elsif( $value =~ /($placeholder_re)/ )
             {
                 $elem->placeholder( $1 );
-                $elem->format( $1 );
+                $elem->format( $value );
                 if( defined( $+{index} ) )
                 {
                     $elem->index( $+{index} );
@@ -398,7 +398,6 @@ sub format_statement
 
         if( $field_prefix ) 
         {
-            # $self->message_colour( 3, "Prefix to be used is '<green>$field_prefix</>'." );
             $field =~ s{
                 (?<![\.\"])\b($ok_list)\b(\s*)?(?!\.)
             }
@@ -557,7 +556,6 @@ sub on_conflict
                         $self->{_on_conflict} = $hash;
                         $self->{on_conflict} = join( ' ', @comp );
                         $self->elements->push( $elems->elements->list );
-                        $self->messagec( 5, "There are now {green}", $elems->length, "{/} elements for this UPSERT query." );
                         # Usable only once
                         CORE::delete( $self->{_on_conflict_callback} );
                     };
@@ -704,7 +702,7 @@ sub _query_components
     $on_conflict = $self->on_conflict;
     my @query = ();
     push( @query, "WHERE $where" ) if( $where && $type ne 'insert' );
-    if( $where && $where->types->length )
+    if( $where && $where->elements->length )
     {
         # $self->binded_types->push( $where->bind->types->list ) unless( $opts->{no_bind_copy} );
         $self->elements->push( $where ) unless( $opts->{no_bind_copy} );
@@ -755,7 +753,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.1
 
 =head1 DESCRIPTION
 

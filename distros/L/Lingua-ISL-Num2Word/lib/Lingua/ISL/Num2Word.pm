@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -116,12 +116,93 @@ sub num2isl_neuter {
 # }}}
 
 
+# {{{ num2isl_ordinal                  convert number to ordinal text
+
+sub num2isl_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Fully irregular forms (masculine nominative)
+    my %irregular = (
+        1  => 'fyrsti',
+        2  => 'annar',
+        3  => 'þriðji',
+        4  => 'fjórði',
+        5  => 'fimmti',
+        6  => 'sjötti',
+        7  => 'sjöundi',
+        8  => 'áttundi',
+        9  => 'níundi',
+        10 => 'tíundi',
+        11 => 'ellefti',
+        12 => 'tólfti',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # 13-19: cardinal stem + "di"
+    if ($number >= 13 && $number <= 19) {
+        my %teens = (
+            13 => 'þrettándi',
+            14 => 'fjórtándi',
+            15 => 'fimmtándi',
+            16 => 'sextándi',
+            17 => 'sautjándi',
+            18 => 'átjándi',
+            19 => 'nítjándi',
+        );
+        return $teens{$number};
+    }
+
+    # Compound numbers: ordinal applies to last component
+    # For round tens (20,30,...), use specific ordinal tens
+    my %ordinal_tens = (
+        20 => 'tuttugasti',
+        30 => 'þrítugasti',
+        40 => 'fertugasti',
+        50 => 'fimmtugasti',
+        60 => 'sextugasti',
+        70 => 'sjötugasti',
+        80 => 'áttugasti',
+        90 => 'nítugasti',
+    );
+
+    return $ordinal_tens{$number} if exists $ordinal_tens{$number};
+
+    # 21-99 (non-round): cardinal tens + "og" + ordinal unit
+    if ($number > 20 && $number < 100) {
+        my @tens = qw(tuttugu þrjátíu fjörutíu fimmtíu sextíu sjötíu áttatíu níutíu);
+        my $ten_idx = int($number / 10);
+        my $remain  = $number % 10;
+        return $tens[$ten_idx - 2] . ' og ' . num2isl_ordinal($remain);
+    }
+
+    # 100+: cardinal prefix + ordinal of the last part
+    # Round hundreds/thousands/millions get suffix "asti"
+    if ($number == 100)       { return 'hundraðasti' }
+    if ($number == 1000)      { return 'þúsundasti' }
+    if ($number == 1_000_000) { return 'milljónasti' }
+
+    # For compound numbers above 100, build cardinal prefix + ordinal tail
+    my $cardinal = num2isl_cardinal($number);
+
+    # Numbers 20+ get "asti", under 20 get "di" (but those are handled above)
+    return $cardinal . 'asti';
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -143,7 +224,7 @@ Lingua::ISL::Num2Word - Number to word conversion in Icelandic
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::ISL::Num2Word is module for converting numbers into their written
 representation in Icelandic. Converts whole numbers from 0 up to 999 999 999.
@@ -192,6 +273,23 @@ Only numbers from interval [0, 999_999_999] will be converted.
 
 Internal helper for neuter number forms used with hundrað/þúsund.
 
+=item B<num2isl_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to its Icelandic ordinal text representation (masculine nominative).
+Only numbers from interval [1, 999_999_999] will be converted.
+Handles irregular forms (fyrsti, annar, þriðji, etc.)
+and applies correct suffixes.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -206,6 +304,8 @@ Internal helper for neuter number forms used with hundrað/þúsund.
 =over 2
 
 =item num2isl_cardinal
+
+=item num2isl_ordinal
 
 =back
 

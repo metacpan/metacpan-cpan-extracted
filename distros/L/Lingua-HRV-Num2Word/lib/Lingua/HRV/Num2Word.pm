@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = qw( 0 nula         1 jedan         2 dva
                  3 tri          4 četiri        5 pet
                  6 šest         7 sedam         8 osam
@@ -143,13 +143,145 @@ sub num2hrv_cardinal :Export {
 
 # }}}
 
+# {{{ num2hrv_ordinal           number to ordinal string conversion
+
+sub num2hrv_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'nulti',
+        1  => 'prvi',
+        2  => 'drugi',
+        3  => 'treći',
+        4  => 'četvrti',
+        5  => 'peti',
+        6  => 'šesti',
+        7  => 'sedmi',
+        8  => 'osmi',
+        9  => 'deveti',
+        10 => 'deseti',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Irregular teens 11-19
+    my %teens = (
+        11 => 'jedanaesti',
+        12 => 'dvanaesti',
+        13 => 'trinaesti',
+        14 => 'četrnaesti',
+        15 => 'petnaesti',
+        16 => 'šesnaesti',
+        17 => 'sedamnaesti',
+        18 => 'osamnaesti',
+        19 => 'devetnaesti',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'dvadeseti',
+        30 => 'trideseti',
+        40 => 'četrdeseti',
+        50 => 'pedeseti',
+        60 => 'šezdeseti',
+        70 => 'sedamdeseti',
+        80 => 'osamdeseti',
+        90 => 'devedeseti',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'stoti',
+        200 => 'dvjestoti',
+        300 => 'tristoti',
+        400 => 'četiristoti',
+        500 => 'petstoti',
+        600 => 'šeststoti',
+        700 => 'sedamstoti',
+        800 => 'osamstoti',
+        900 => 'devetstoti',
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            if ($millions == 1) {
+                return 'milijunti';
+            }
+            return num2hrv_cardinal($millions) . ' milijunti';
+        }
+        my $prefix = num2hrv_cardinal($millions);
+        my $mil_word = ($millions == 1) ? 'jedan milijun' : 'milijuna';
+        return $prefix . ' ' . $mil_word . ' ' . num2hrv_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'tisućiti';
+            }
+            return num2hrv_cardinal($thousands) . ' tisućiti';
+        }
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'tisuća';
+        }
+        elsif ($thousands == 2) {
+            $thou_cardinal = 'dvije tisuće';
+        }
+        elsif ($thousands >= 3 && $thousands <= 4) {
+            $thou_cardinal = num2hrv_cardinal($thousands) . ' tisuće';
+        }
+        else {
+            $thou_cardinal = num2hrv_cardinal($thousands) . ' tisuća';
+        }
+        return $thou_cardinal . ' ' . num2hrv_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2hrv_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_ord{$t} . ' ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -171,7 +303,7 @@ Lingua::HRV::Num2Word - Number to word conversion in Croatian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::HRV::Num2Word is module for conversion numbers into their representation
 in Croatian. It converts whole numbers from 0 up to 999 999 999.
@@ -212,6 +344,13 @@ Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will
 be converted.
 
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -226,6 +365,8 @@ be converted.
 =over 2
 
 =item num2hrv_cardinal
+
+=item num2hrv_ordinal
 
 =back
 

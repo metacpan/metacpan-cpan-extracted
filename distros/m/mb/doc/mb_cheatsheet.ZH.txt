@@ -1,0 +1,46 @@
+======================================================================
+ mb Cheat Sheet                                      [ZH] 中文（简体）
+======================================================================
+
+[ 1. 加载模块 ]
+  use mb;
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+
+[ 2. 按字符操作 length / substr ]
+  mb::length($str)              # 字符数（非字节数）
+  mb::substr($str, $pos, $len)  # 按字符位置截取子串
+  mb::substr($str, $pos, $len, $replacement)
+
+[ 3. 字符串搜索 ]
+  mb::index($str, $sub)         # 按字符位置查找
+  mb::index($str, $sub, $pos)   # 从 $pos 开始查找
+  mb::rindex($str, $sub)        # 从右侧查找
+  mb::index_byte($str, $sub)    # 按字节位置查找（JPerl 语义）
+  mb::rindex_byte($str, $sub)
+
+[ 4. 大小写转换 ]
+  mb::uc($str)                  # 转大写
+  mb::lc($str)                  # 转小写
+  mb::ucfirst($str)             # 首字符大写
+  mb::lcfirst($str)
+
+[ 5. 字符编码 ]
+  mb::ord($str)                 # 首字符的码点
+  mb::chr($n)                   # 码点转字符
+
+[ 6. 其他字符串操作 ]
+  mb::chop($str)                # 删除末尾字符
+  mb::reverse(@list)            # 反转字符串或列表
+  mb::getc(FH)                  # 从文件句柄读取一个字符
+  mb::tr($str, $from, $to)      # 字符替换
+
+[ 7. 支持的编码 ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. 示例 ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "你好世界";
+  printf "字符数=%d\n", mb::length($s);     # 4
+  printf "子串=%s\n",   mb::substr($s,0,2); # "你好"
+  printf "位置=%d\n",   mb::index($s,"世界"); # 2

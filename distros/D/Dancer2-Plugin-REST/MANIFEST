@@ -1,3 +1,5 @@
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
 Changes
 INSTALL
 LICENSE
@@ -7,6 +9,7 @@ META.yml
 Makefile.PL
 README
 README.mkdn
+SECURITY.md
 SIGNATURE
 cpanfile
 doap.xml

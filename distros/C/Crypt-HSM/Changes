@@ -1,5 +1,9 @@
 Revision history for Crypt-HSM
 
+0.030     2026-03-29 18:58:59+02:00 Europe/Brussels
+          - Add partial support for PKCS #11 3.2
+          - Use TRUE instead of true for backwards compatability
+
 0.029     2026-03-18 23:48:02+01:00 Europe/Brussels
           - Make Mechanism and Session hold a Slot instead of a Provider
           - Make Session, Object and Stream instances thread-clone safe

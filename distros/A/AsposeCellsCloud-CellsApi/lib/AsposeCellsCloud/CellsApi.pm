@@ -1721,6 +1721,7 @@ sub split_spreadsheet{
 # @tableName  string (required)  Data table that needs to be split.  
 # @splitColumnName  string (required)  Column name to split by.  
 # @saveSplitColumn  boolean (required)  Whether to keep the data in the split column.  
+# @splitRowNumber  int (required)    
 # @toNewWorkbook  boolean (required)  Export destination control: true - Creates new workbook files containing the split data; false - Adds a new worksheet to the current workbook.  
 # @toMultipleFiles  boolean (required)  true - Exports table data as **multiple separate files** (returned as ZIP archive);false - Stores all data in a **single file** with multiple sheets. Default: false.  
 # @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
@@ -2412,6 +2413,88 @@ sub get_merged_cells_in_worksheet{
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('ARRAY[CellArea]', $response);
+    return $_response_object;
+}
+
+#
+# AcceptAllRevisionsRequest
+#
+# 
+# 
+# @Spreadsheet  string (required)  Upload spreadsheet file.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'AcceptAllRevisionsRequest',
+            description => 'AcceptAllRevisions Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'accept_all_revisions' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub accept_all_revisions{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
+    return $_response_object;
+}
+
+#
+# AcceptAllRevisionsInRemoteSpreadsheetRequest
+#
+# 
+# 
+# @name  string (required)    
+# @folder  string     
+# @storageName  string   (Optional) The name of the storage if using custom cloud storage. Use default storage if omitted.  
+# @outPath  string   (Optional) The folder path where the workbook is stored. The default is null.  
+# @outStorageName  string   Output file Storage Name.  
+# @fontsLocation  string   Use Custom fonts.  
+# @region  string   The spreadsheet region setting.  
+# @password  string   The password for opening spreadsheet file.   
+#
+{
+    my $params = {
+       'request' =>{
+            data_type => 'AcceptAllRevisionsInRemoteSpreadsheetRequest',
+            description => 'AcceptAllRevisionsInRemoteSpreadsheet Request.',
+            required => '0',
+       }
+    };
+    __PACKAGE__->method_documentation->{ 'accept_all_revisions_in_remote_spreadsheet' } = { 
+    	summary => '',
+        params => $params,
+        returns => 'string',
+    };
+}
+#
+# @return string
+#
+sub accept_all_revisions_in_remote_spreadsheet{
+    my ($self, %args) = @_;
+    my $request = $args{'request'};
+    my $response = $request->run_http_request('client' => $self->{api_client} );
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('string', $response);
     return $_response_object;
 }
 

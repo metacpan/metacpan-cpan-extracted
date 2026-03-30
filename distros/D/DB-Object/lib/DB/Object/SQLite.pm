@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/SQLite.pm
-## Version v1.3.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib/DB/Object/SQLite.pm
+## Version v1.3.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/03/26
 ## All rights reserved
 ## 
 ## 
@@ -79,9 +79,9 @@ BEGIN
             type => 'text'
         };
     }
-    our $PLACEHOLDER_REGEXP = qr/\?(?<index>\d+)/;
+    our $PLACEHOLDER_REGEXP = qr/(?:(?<![?\w])\?(?<index>[1-9]\d*)(?!\w))/;
     our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.3.1';
 };
 
 use strict;
@@ -1427,7 +1427,7 @@ DB::Object::SQLite - DB Object SQLite Driver
 
 =head1 VERSION
 
-    v1.3.0
+    v1.3.1
 
 =head1 DESCRIPTION
 

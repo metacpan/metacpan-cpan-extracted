@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Module::Runtime qw(use_module);
-use Test::More import => ['!pass'];
+use Test2::Bundle::More;
 use Plack::Test;
 use HTTP::Request::Common;
 

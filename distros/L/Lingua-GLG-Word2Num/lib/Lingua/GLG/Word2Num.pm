@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = glg_numerals();
 
 # }}}
@@ -112,6 +112,56 @@ sub glg_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Galician ordinals 1-10 are fully irregular
+    state $irregular = {
+        'primeiro'  => 'un',      'primeira'  => 'un',
+        'segundo'   => 'dous',    'segunda'   => 'dous',
+        'terceiro'  => 'tres',    'terceira'  => 'tres',
+        'cuarto'    => 'catro',   'cuarta'    => 'catro',
+        'quinto'    => 'cinco',   'quinta'    => 'cinco',
+        'sexto'     => 'seis',    'sexta'     => 'seis',
+        'sétimo'    => 'sete',    'sétima'    => 'sete',
+        'oitavo'    => 'oito',    'oitava'    => 'oito',
+        'noveno'    => 'nove',    'novena'    => 'nove',
+        'décimo'    => 'dez',     'décima'    => 'dez',
+    };
+
+    return $irregular->{$input} if exists $irregular->{$input};
+
+    # Regular (11+): cardinal (drop final vowel) + "ésimo/ésima"
+    $input =~ s{ésim[oa]\z}{}xms or return;
+
+    # Galician drops the final vowel before adding -ésimo.  The dropped
+    # vowel varies by word, so we restore it based on the stem ending.
+
+    # cinco: cinc→cinco (must precede the general -c rule)
+    if    ($input =~ m{\Acinc\z}xms)             { $input .= 'o' }
+    # also "vinte e cinc" etc. — cinc at end of compound
+    elsif ($input =~ m{cinc\z}xms)               { $input .= 'o' }
+    # teens ending in -c: onc→once, doc→doce, trec→trece, catorc→catorce, quinc→quince
+    elsif ($input =~ m{c\z}xms)                  { $input .= 'e' }
+    # oito family: dezaoit→dezaoito, oit→oito
+    elsif ($input =~ m{oit\z}xms)                { $input .= 'o' }
+    # sete family: dezaset→dezasete, set→sete
+    elsif ($input =~ m{set\z}xms)                { $input .= 'e' }
+    # vinte: vint→vinte
+    elsif ($input =~ m{vint\z}xms)               { $input .= 'e' }
+    # decades (trinta, corenta, etc.): trint→trinta, corent→corenta
+    elsif ($input =~ m{nt\z}xms)                 { $input .= 'a' }
+    # nove family: dezanov→dezanove, nov→nove
+    elsif ($input =~ m{ov\z}xms)                 { $input .= 'e' }
+    # catro: catr→catro
+    elsif ($input =~ m{tr\z}xms)                 { $input .= 'o' }
+
+    return $input;
+}
+
+# }}}
 
 1;
 
@@ -130,7 +180,7 @@ Lingua::GLG::Word2Num - Word to number conversion in Galician
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::GLG::Word2Num is a module for converting text containing number
 representation in Galician back into number. Converts whole numbers from 0 up
@@ -172,6 +222,14 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'primeiro', 'segundo', 'décimo')
+  =>  str    cardinal text (e.g. 'un', 'dous', 'dez')
+      undef  if input is not recognised as an ordinal
+
+Convert Galician ordinal text to cardinal text (morphological reversal).
+
 =item B<glg_numerals> (void)
 
   =>  obj  new parser object
@@ -192,6 +250,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

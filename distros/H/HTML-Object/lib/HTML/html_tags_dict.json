@@ -525,6 +525,12 @@
          "is_svg" : true,
          "ref" : "https://developer.mozilla.org/en-US/docs/Web/SVG/Element/feTurbulence"
       },
+      "fencedframe" : {
+         "description" : "The C<fencedframe> HTML element represents a nested browsing context, embedding another HTML page into the current one",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/fencedframe"
+      },
       "fieldset" : {
          "description" : "Groups related elements in a form",
          "is_empty" : false,

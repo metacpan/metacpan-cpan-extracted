@@ -1,5 +1,41 @@
 Revision history for this software.
 
+0.59  2026-03-29 JST (Japan Standard Time)
+  - add t/lib/INA_CPAN_Check.pm: shared test library aligned with
+    DB-Handy 1.07, HTTP-Handy 1.03, LTSV-LINQ 1.07, mb-JSON 0.04
+  - add t/9001-load.t: module load, $VERSION, public API (mb::*) (32 tests)
+  - add t/9010-encoding.t: US-ASCII, trailing whitespace, newline checks
+  - add t/9020-perl5compat.t: Perl 5.005_03 compatibility; P1-P14 for
+    lib/*.pm and t/9xxx, M1-M7 for Makefile.PL (160 tests)
+  - add t/9025-perl542compat.t: unit tests for
+    _insert_source_encoding_unimport() (11 tests)
+  - add t/9030-distribution.t: MANIFEST, version, META, Changes checks
+  - add t/9040-style.t: ina@CPAN coding style E and K checks
+  - add t/9050-pod.t: POD structure G1-G12 including Pod::Checker (6 tests)
+  - add t/9060-readme.t: README required sections R1-R5 check (10 tests)
+  - add t/9080-cheatsheets.t: doc/ cheat sheet quality checks
+  - add doc/mb_cheatsheet.*.txt: mb quick reference in 21 languages
+  - add SECURITY.md
+  - fix lib/mb.pm: warnings stub now guards with
+    !defined(&warnings::import) to suppress "import redefined" warnings
+  - fix lib/mb.pm: supports Perl 5.42 source::encoding pragma;
+    add _insert_source_encoding_unimport() helper that appends
+    "no source::encoding;" on the same line as "use v5.41" or later
+    statements (before any trailing comment) so that line numbers in
+    error messages are not shifted between original and transpiled script
+  - fix lib/mb.pm: add =head2 Perl 5.42 and source::encoding in POD
+  - fix lib/mb.pm: remove whitespace-only lines in POD verbatim blocks
+    (Pod::Checker warnings=0 achieved)
+  - fix lib/mb.pm: update "newest perl" to "perl 5.42" in SYNOPSIS POD
+  - fix README: add INSTALLATION, AUTHOR, LICENSE AND COPYRIGHT,
+    PERL 5.42 AND source::encoding sections;
+    update "newest perl" to "perl 5.42"
+  - fix t/lib/INA_CPAN_Check.pm: _slurp and _slurp_lines strip CR (\r)
+    to handle CRLF line endings on Windows
+  - fix pmake.bat: add CVE-2016-1238 mitigation (pop @INC) to
+    generated Makefile.PL
+  - created by INABA Hitoshi
+
 0.58  2024-07-07 00:00:00
   - supports ^^ logical xor operator
   - created by INABA Hitoshi

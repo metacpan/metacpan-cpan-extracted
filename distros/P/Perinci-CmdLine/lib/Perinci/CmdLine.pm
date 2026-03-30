@@ -3,9 +3,9 @@
 package Perinci::CmdLine;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2024-11-12'; # DATE
+our $DATE = '2026-03-30'; # DATE
 our $DIST = 'Perinci-CmdLine'; # DIST
-our $VERSION = '2.000.1'; # VERSION
+our $VERSION = '2.000.2'; # VERSION
 
 sub new {
     die "Perinci::CmdLine::Lite is empty. Please use of the implementations: Perinci::CmdLine::Plugin, Perinci::CmdLine::Inline, etc";
@@ -26,7 +26,7 @@ Perinci::CmdLine - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 2.000.1 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2024-11-12.
+This document describes version 2.000.2 of Perinci::CmdLine (from Perl distribution Perinci-CmdLine), released on 2026-03-30.
 
 =head1 DESCRIPTION
 
@@ -89,7 +89,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

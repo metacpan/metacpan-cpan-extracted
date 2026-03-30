@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::Bundle::More;
 use Plack::Test;
 use HTTP::Request::Common;
 
@@ -51,5 +51,3 @@ sub test_app {
     is( $res->code, 200, '[POST: Check Name  ] ' );
     is_deeply( from_json( $res->content ), from_json($json), "Check If response JSON matches Input");
 }
-
-

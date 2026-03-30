@@ -1,5 +1,45 @@
 Revision history for Chandra
 
+0.06  2026-03-30
+    - Add system tray integration and example
+    - Another attempt at fixing windows to run
+    - Start porting code into XS, using the INCLUDE technique
+
+0.05  2026-03-29
+    - Fix Errno portability: use POSIX qw(EAGAIN EWOULDBLOCK) instead of Errno
+    - Fix Bind.pm dispatch crash on non-hashref JSON (e.g. numeric/string payloads)
+    - Fix Connection.pm missing Errno import for Perl 5.10 compatibility
+    - Remove unused Errno import from Hub.pm
+    - Comprehensive POD documentation for all 14 modules
+    - Added SEE ALSO cross-references across all modules
+    - Windows: add webview-win32.c MSHTML backend (OLE WebBrowser embedding)
+    - Windows: fix MULTIPLICITY build - undef Perl calloc/free macros for webview.h
+    - Chandra::Tray - system tray icon with context menu (macOS/GTK/Win32)
+    - Tray: add_item, add_separator, add_submenu, set_icon, set_tooltip
+    - Tray: on_click handler, update_item, show/remove lifecycle
+    - App: tray() lazy accessor for Chandra::Tray integration
+
+0.04  2026-03-29
+    - Chandra::Socket::Hub - IPC server with Unix domain socket and TCP transport
+    - Chandra::Socket::Client - IPC client with auto-reconnect and request/response
+    - Chandra::Socket::Connection - length-prefixed JSON wire protocol
+    - App: hub(), client() methods with integrated poll loop
+    - Channel-based message routing, broadcast, send_to
+    - on_connect/on_disconnect lifecycle hooks
+    - Security: token-based handshake authentication
+    - Security: socket path in $XDG_RUNTIME_DIR with 0600 permissions
+    - Security: token file (0600) written alongside socket for client auth
+    - Security: max frame size (16 MB) and buffer overflow protection (64 MB)
+    - Security: malformed JSON frame warnings
+    - Security: duplicate client name collision handling
+    - TCP transport: opt-in TLS via IO::Socket::SSL (tls_cert, tls_key, tls)
+    - Examples: socket_ipc_example.pl, chat_hub.pl, chat_window.pl
+
+0.03  2026-03-29
+    - Switch from JSON to Cpanel::JSON::XS
+    - Add Cpanel::JSON::XS to PREREQ_PM
+    - Bail out of Makefile.PL on Linux when GTK/WebKit2 dev libraries are missing
+
 0.02  2026-03-28
     - Chandra::App - high-level OO application wrapper
     - Chandra::Element - Moonshine-compatible DOM builder with render()

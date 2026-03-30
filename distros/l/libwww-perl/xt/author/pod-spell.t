@@ -54,6 +54,7 @@ Chase
 Chatterjee
 Christopher
 Chrysostomos
+Church
 Colin
 ConnCache
 Coppit
@@ -63,6 +64,7 @@ Dahan
 Daignault
 Daina
 Dalgleish
+Dan
 Daniel
 David
 Debug
@@ -336,6 +338,7 @@ afPuUsSedvhx
 akiym
 amir
 amire80
+amphetamachine
 andreas
 andrew
 anirvan

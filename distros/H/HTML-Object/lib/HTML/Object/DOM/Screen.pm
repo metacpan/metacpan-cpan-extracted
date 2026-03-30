@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::EventTarget );
     use vars qw( $VERSION );
     our $VERSION = 'v0.2.0';
@@ -27,6 +28,7 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
+    $self->{tag} = 'screen';
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
     return( $self );

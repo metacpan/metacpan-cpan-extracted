@@ -1,6 +1,5 @@
 Revision history for Lingua-SRP-Word2Num
 
-0.2603270  2026-03-27
-    - fix Word2Num parsers: 10 languages, 121 Galois walk failures resolved
-    - add 5 languages: BEL SLV SRP MKD SQI
+0.2603300  2026-03-30
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
 

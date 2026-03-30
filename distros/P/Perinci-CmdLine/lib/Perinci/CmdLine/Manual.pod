@@ -22,9 +22,59 @@ Perinci::CmdLine::Manual - Perinci::CmdLine manual
 
 =head1 VERSION
 
-This document describes version 2.000.1 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2024-11-12.
+This document describes version 2.000.2 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2026-03-30.
 
 =head1 DESCRIPTION
+
+=head2 List Of Documents Included In This Distribution
+
+This is the list of PODs included in this distribution:
+
+=over
+
+=item * L<Perinci::CmdLine::Manual>
+
+=item * L<Perinci::CmdLine::Manual::Explanation::ArgumentValidation>
+
+=item * L<Perinci::CmdLine::Manual::FAQ>
+
+=item * L<Perinci::CmdLine::Manual::HowTo::99Examples>
+
+=item * L<Perinci::CmdLine::Manual::HowTo::Completion>
+
+=item * L<Perinci::CmdLine::Manual::HowTo::Debugging>
+
+=back
+
+=head2 About This Manual
+
+This manual is organized using the documentation structure described in [1],
+where each documentation is categorized into one of four types:
+
+                                               |
+                    TUTORIAL                   |               HOW-TO GUIDE
+                                               |
+     - learning-oriented                       |  - problem-oriented
+     - goal: allow newcomer to get started     |  - goal: show how to solve specific problem
+     - form: lessons                           |  - form: a series of steps
+     - analogy: teaching a child to cook       |  - analogy: a recipe in a cookery book
+                                               |
+ ------(Most useful when we're studying)-------+-------(Most useful when we're working)------
+                                               |
+                   EXPLANATION                 |               REFERENCE
+                                               |
+     - understanding-oriented                  |  - information-oriented
+     - goal: explain                           |  - goal: describe the machinery
+     - form: discursive explanation            |  - form: dry description
+     - analogy: article on culinary social     |  - analogy: a reference encyclopedia
+       history                                 |    article
+
+[1] https://docs.divio.com/documentation-system/
+
+However, a lot of existing documentation are still not migrated to the above
+system.
+
+=head2 About Perinci::CmdLine
 
 Perinci::CmdLine is a command-line application framework. It parses command-line
 options and dispatches to one of your specified Perl functions, passing the
@@ -77,35 +127,7 @@ recognized.
 
 =back
 
-=head1 ABOUT THIS MANUAL
-
-This manual is organized using the documentation structure described in [1],
-where each documentation is categorized into one of four types:
-
-                                               |
-                    TUTORIAL                   |               HOW-TO GUIDE
-                                               |
-     - learning-oriented                       |  - problem-oriented
-     - goal: allow newcomer to get started     |  - goal: show how to solve specific problem
-     - form: lessons                           |  - form: a series of steps
-     - analogy: teaching a child to cook       |  - analogy: a recipe in a cookery book
-                                               |
- ------(Most useful when we're studying)-------+-------(Most useful when we're working)------
-                                               |
-                   EXPLANATION                 |               REFERENCE
-                                               |
-     - understanding-oriented                  |  - information-oriented
-     - goal: explain                           |  - goal: describe the machinery
-     - form: discursive explanation            |  - form: dry description
-     - analogy: article on culinary social     |  - analogy: a reference encyclopedia
-       history                                 |    article
-
-[1] https://docs.divio.com/documentation-system/
-
-However, a lot of existing documentation are still not migrated to the above
-system.
-
-=head1 CONCEPTS
+=head2 Concepts
 
 Perinci::CmdLine is very function-oriented (and not object-oriented, on
 purpose). You write your "business logic" in a function (of course, you are free
@@ -162,7 +184,7 @@ To run a remote function, you can simply specify a remote URL, e.g.
 C<http://example.com/api/somefunc>. All the features like options parsing,
 help/usage, as well as tab completion will work with remote functions as well.
 
-=head1 LOGGING
+=head2 Logging
 
 Logging is done with L<Log::ger> (for producing). For displaying logs,
 L<Log::ger::App> is used.
@@ -174,7 +196,91 @@ like:
 
  % PERL5OPT=-MLog::ger::App TRACE=1 yourcli.pl
 
-=head1 COMMAND-LINE OPTION/ARGUMENT PARSING
+=head2 Configuration File
+
+Configuration files are read to preset the value of arguments, before
+potentially overridden/merged with command-line options. Configuration files are
+in L<IOD> format, which is basically C<INI> with some extra features.
+
+By default, configuration files are searched in home directory then C</etc>,
+with the name of I<program_name> + C<.conf>. If multiple files are found, the
+contents are merged together.
+
+If user wants to use a custom configuration file, she can issue C<--config-path>
+command-line option.
+
+If user does not want to read configuration file, she can issue C<--no-config>
+command-line option.
+
+INI files have the concept of "sections". In Perinci::CmdLine, you can use
+sections to put settings that will only be applied to a certain subcommand, or a
+certain "profile", or other conditions. "Config profiles" is a way to specify
+multiple sets/cases/scenarios in a single configuration file.
+
+Example 1 (without any profile or subcommand):
+
+ ; prog.conf
+
+ foo=1
+ bar=2
+
+When executing program (the comments will show what arguments are set):
+
+ % prog; # {foo=>1, bar=>2}
+ % prog --foo 10; # {foo=>10, bar=>2}
+
+Example 2 (with profiles):
+
+ ; prog.conf
+
+ [profile=profile1]
+ foo=1
+ bar=2
+
+ [profile=profile2]
+ foo=10
+ bar=20
+
+When executing program:
+
+ % prog; # {}
+ % prog --config-profile profile1; # {foo=>1, bar=>2}
+ % prog --config-profile profile2; # {foo=>10, bar=>20}
+
+Example 3 (with subcommands):
+
+ ; prog.conf
+
+ [subcommand=sc1]
+ foo=1
+ bar=2
+
+ [subcommand=sc2]
+ baz=3
+ qux=4
+
+When executing program:
+
+ % prog sc1; # {foo=>1, bar=>2}
+ % prog sc2; # {baz=>3, qux=>4}
+
+Example 4 (with subcommands and profiles):
+
+ ; prog.conf
+ [subcommand=sc1 profile=profile1]
+ foo=1
+ bar=2
+
+ [profile=profile2 subcommand=sc1]
+ foo=10
+ bar=20
+
+When executing program:
+
+ % prog sc1 --config-profile profile1; # {foo=>1, bar=>2}
+ % prog sc1 --config-profile profile2; # {foo=>10, bar=>20}
+
+=head2 Command-line Option/Argument Parsing
 
 This section describes how Perinci::CmdLine parses command-line
 options/arguments into function arguments. Command-line option parsing is
@@ -276,7 +382,7 @@ The resulting argument will be:
 
 For more examples on argument submetadata, see L<Perinci::Examples::SubMeta>.
 
-=head1 SHELL COMPLETION
+=head2 Shell Completion
 
 The framework can detect when C<COMP_LINE> and C<COMP_POINT> environment
 variables (set by bash when completing using external command) are set and then
@@ -302,95 +408,11 @@ completion scripts for them. It supports several shells. Combined with
 L<cpanm-shcompgen>, you can install modules and have the shell completion of
 scripts activated immediately.
 
-=head1 PROGRESS INDICATOR
+=head2 Progress Indicator
 
 For functions that express that they do progress updating (by setting their
 C<progress> feature to true), Perinci::CmdLine will setup an output, currently
 either L<Progress::Any::Output::TermProgressBar> if program runs interactively.
-
-=head1 CONFIGURATION FILE
-
-Configuration files are read to preset the value of arguments, before
-potentially overridden/merged with command-line options. Configuration files are
-in L<IOD> format, which is basically C<INI> with some extra features.
-
-By default, configuration files are searched in home directory then C</etc>,
-with the name of I<program_name> + C<.conf>. If multiple files are found, the
-contents are merged together.
-
-If user wants to use a custom configuration file, she can issue C<--config-path>
-command-line option.
-
-If user does not want to read configuration file, she can issue C<--no-config>
-command-line option.
-
-INI files have the concept of "sections". In Perinci::CmdLine, you can use
-sections to put settings that will only be applied to a certain subcommand, or a
-certain "profile", or other conditions. "Config profiles" is a way to specify
-multiple sets/cases/scenarios in a single configuration file.
-
-Example 1 (without any profile or subcommand):
-
- ; prog.conf
-
- foo=1
- bar=2
-
-When executing program (the comments will show what arguments are set):
-
- % prog; # {foo=>1, bar=>2}
- % prog --foo 10; # {foo=>10, bar=>2}
-
-Example 2 (with profiles):
-
- ; prog.conf
-
- [profile=profile1]
- foo=1
- bar=2
-
- [profile=profile2]
- foo=10
- bar=20
-
-When executing program:
-
- % prog; # {}
- % prog --config-profile profile1; # {foo=>1, bar=>2}
- % prog --config-profile profile2; # {foo=>10, bar=>20}
-
-Example 3 (with subcommands):
-
- ; prog.conf
-
- [subcommand=sc1]
- foo=1
- bar=2
-
- [subcommand=sc2]
- baz=3
- qux=4
-
-When executing program:
-
- % prog sc1; # {foo=>1, bar=>2}
- % prog sc2; # {baz=>3, qux=>4}
-
-Example 4 (with subcommands and profiles):
-
- ; prog.conf
- [subcommand=sc1 profile=profile1]
- foo=1
- bar=2
-
- [profile=profile2 subcommand=sc1]
- foo=10
- bar=20
-
-When executing program:
-
- % prog sc1 --config-profile profile1; # {foo=>1, bar=>2}
- % prog sc1 --config-profile profile2; # {foo=>10, bar=>20}
 
 =head1 HOMEPAGE
 
@@ -429,7 +451,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

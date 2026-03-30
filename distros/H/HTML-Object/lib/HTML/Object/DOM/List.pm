@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::EventTarget );
     use vars qw( $VERSION );
     use HTML::Object::Event;
@@ -72,7 +73,7 @@ sub addEventListener
             {
                 if( !CORE::exists( $this->{ $_ } ) || !defined( $this->{ $_ } ) || !CORE::length( $this->{ $_ } ) )
                 {
-                    warnings::warn( "Dictionary property \"$_\" is missing or empty.\n" ) if( warnings::enabled( 'HTML::Object' ) );
+                    warn( "Dictionary property \"$_\" is missing or empty.\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
                     next OP;
                 }
                 elsif( $_ ne 'add' && $_ ne 'remove' )
@@ -85,13 +86,13 @@ sub addEventListener
             my $subref = $self->can( $this->{property} );
             if( !defined( $subref ) )
             {
-                warnings::warn( "This object class \"" . ( ref( $self ) || $self ) . "\" does not support method \"" . $this->{property} . "\".\n" ) if( warnings::enabled( 'HTML::Object' ) );
+                warn( "This object class \"" . ( ref( $self ) || $self ) . "\" does not support method \"" . $this->{property} . "\".\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
                 next;
             }
             my $data = $subref->( $self );
             if( !$self->_is_object( $data ) || !$data->can( 'callback' ) )
             {
-                warnings::warn( "Object from class \"" . ( ref( $data ) || $data ) . "\" does not have a \"callback\" method.\n" ) if( warnings::enabled( 'HTML::Object' ) );
+                warn( "Object from class \"" . ( ref( $data ) || $data ) . "\" does not have a \"callback\" method.\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
                 next;
             }
             my $cb = $data->callback( $this->{type} );

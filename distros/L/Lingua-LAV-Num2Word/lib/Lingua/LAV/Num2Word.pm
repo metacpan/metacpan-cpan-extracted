@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = qw( 0 nulle           1 viens          2 divi
                  3 trīs            4 četri          5 pieci
                  6 seši            7 septiņi        8 astoņi
@@ -156,12 +156,143 @@ sub num2lav_cardinal :Export {
 # }}}
 
 
+# {{{ num2lav_ordinal                  convert number to ordinal text
+
+sub num2lav_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Unique ordinal forms for 1-19 (masculine nominative)
+    my %ordinals = (
+        1  => 'pirmais',
+        2  => 'otrais',
+        3  => 'trešais',
+        4  => 'ceturtais',
+        5  => 'piektais',
+        6  => 'sestais',
+        7  => 'septītais',
+        8  => 'astotais',
+        9  => 'devītais',
+        10 => 'desmitais',
+        11 => 'vienpadsmitais',
+        12 => 'divpadsmitais',
+        13 => 'trīspadsmitais',
+        14 => 'četrpadsmitais',
+        15 => 'piecpadsmitais',
+        16 => 'sešpadsmitais',
+        17 => 'septiņpadsmitais',
+        18 => 'astoņpadsmitais',
+        19 => 'deviņpadsmitais',
+    );
+
+    return $ordinals{$number} if exists $ordinals{$number};
+
+    # Round tens: cardinal + "ais"
+    my %ordinal_tens = (
+        20 => 'divdesmitais',
+        30 => 'trīsdesmitais',
+        40 => 'četrdesmitais',
+        50 => 'piecdesmitais',
+        60 => 'sešdesmitais',
+        70 => 'septiņdesmitais',
+        80 => 'astoņdesmitais',
+        90 => 'deviņdesmitais',
+    );
+
+    return $ordinal_tens{$number} if exists $ordinal_tens{$number};
+
+    # Compound 21-99: cardinal tens + ordinal unit
+    if ($number > 20 && $number < 100) {
+        my $remain = $number % 10;
+        my $tens   = $number - $remain;
+        return $token2{$tens} . ' ' . num2lav_ordinal($remain);
+    }
+
+    # Round hundreds
+    if ($number >= 100 && $number < 1000 && $number % 100 == 0) {
+        return _hundreds($number) . 'ais';
+    }
+
+    # Compound hundreds: cardinal hundreds + ordinal remainder
+    if ($number >= 100 && $number < 1000) {
+        my $remain = $number % 100;
+        return _hundreds($number) . ' ' . num2lav_ordinal($remain);
+    }
+
+    # Round thousands
+    if ($number >= 1000 && $number < 1_000_000 && $number % 1000 == 0) {
+        my $thousands = int($number / 1000);
+        my $suffix    = _decline($thousands, 'tūkstošais', 'tūkstošais');
+
+        if ($thousands == 1) {
+            return 'tūkstošais';
+        }
+        return num2lav_cardinal($thousands) . ' ' . $suffix;
+    }
+
+    # Compound thousands
+    if ($number >= 1000 && $number < 1_000_000) {
+        my $thousands = int($number / 1000);
+        my $remain    = $number % 1000;
+        my $suffix    = _decline($thousands, 'tūkstotis', 'tūkstoši');
+
+        my $prefix;
+        if ($thousands == 1) {
+            $prefix = 'viens tūkstotis';
+        }
+        elsif ($thousands < 20) {
+            $prefix = $token1{$thousands} . ' ' . $suffix;
+        }
+        else {
+            $prefix = num2lav_cardinal($thousands) . ' ' . $suffix;
+        }
+        return $prefix . ' ' . num2lav_ordinal($remain);
+    }
+
+    # Round millions
+    if ($number >= 1_000_000 && $number < 1_000_000_000 && $number % 1_000_000 == 0) {
+        my $millions = int($number / 1_000_000);
+        if ($millions == 1) {
+            return 'miljontais';
+        }
+        return num2lav_cardinal($millions) . ' miljontais';
+    }
+
+    # Compound millions
+    if ($number >= 1_000_000 && $number < 1_000_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remain   = $number % 1_000_000;
+        my $suffix   = _decline($millions, 'miljons', 'miljoni');
+
+        my $prefix;
+        if ($millions == 1) {
+            $prefix = 'viens miljons';
+        }
+        elsif ($millions < 20) {
+            $prefix = $token1{$millions} . ' ' . $suffix;
+        }
+        else {
+            $prefix = num2lav_cardinal($millions) . ' ' . $suffix;
+        }
+        return $prefix . ' ' . num2lav_ordinal($remain);
+    }
+
+    return;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -183,7 +314,7 @@ Lingua::LAV::Num2Word - Number to word conversion in Latvian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::LAV::Num2Word is module for conversion of numbers into their
 representation in Latvian. It converts whole numbers from 0 up to
@@ -235,12 +366,28 @@ be converted.
 Internal helper. Selects the correct Latvian noun declension
 based on the number.
 
+=item B<num2lav_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string (masculine nominative)
+
+Convert number to its Latvian ordinal text representation.
+Only numbers from interval [1, 999_999_999] will be converted.
+Handles all unique ordinal forms (pirmais, otrais, trešais, etc.).
+
 =item B<_hundreds> (positional)
 
   1   num    number in range [100, 999]
   =>  str    hundreds part as text
 
 Internal helper. Converts the hundreds component of a number to text.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 
@@ -256,6 +403,8 @@ Internal helper. Converts the hundreds component of a number to text.
 =over 2
 
 =item num2lav_cardinal
+
+=item num2lav_ordinal
 
 =back
 

@@ -16,7 +16,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -131,12 +131,35 @@ sub num2vie_cardinal :Export {
 # }}}
 
 
+# {{{ num2vie_ordinal                 convert number to ordinal text
+
+sub num2vie_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Vietnamese ordinals: thứ + cardinal
+    # Special cases: 1st = "thứ nhất", 4th = "thứ tư"
+    return 'thứ nhất' if $number == 1;
+    return 'thứ tư'   if $number == 4;
+
+    my $cardinal = num2vie_cardinal($number);
+
+    return 'thứ ' . $cardinal;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -158,7 +181,7 @@ Lingua::VIE::Num2Word - Number to word conversion in Vietnamese
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::VIE::Num2Word is module for converting numbers into their written
 representation in Vietnamese. Converts whole numbers from 0 up to 999 999 999.
@@ -180,6 +203,9 @@ Text output is encoded in UTF-8.
 
  print $text || "sorry, can't convert this number into Vietnamese.";
 
+ my $ord = Lingua::VIE::Num2Word::num2vie_ordinal( 3 );
+ print $ord;    # "thứ ba"
+
 =cut
 
 # }}}
@@ -200,6 +226,21 @@ Text output is encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2vie_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to ordinal text by prepending "thứ" to the cardinal form.
+Special cases: 1st = "thứ nhất", 4th = "thứ tư".
+Only numbers from interval [1, 999_999_999] will be converted.
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -214,6 +255,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2vie_cardinal
+
+=item num2vie_ordinal
 
 =back
 

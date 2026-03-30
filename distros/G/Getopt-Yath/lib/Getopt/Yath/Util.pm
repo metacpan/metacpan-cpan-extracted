@@ -7,7 +7,7 @@ use Cpanel::JSON::XS();
 use Importer Importer => 'import';
 use File::Temp qw/ tempfile /;
 
-our $VERSION = '2.000007';
+our $VERSION = '2.000008';
 
 our @EXPORT_OK = qw{
     decode_json

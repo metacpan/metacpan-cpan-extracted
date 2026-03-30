@@ -1,0 +1,35 @@
+======================================================================
+ mb Cheat Sheet                                             [SI] සිංහල
+======================================================================
+
+[ 1. මොඩියුලය පූරණය කිරීම ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. අක්ෂර-පදනම් length / substr ]
+  mb::length($str)              # අක්ෂර ගණන (bytes නොවේ)
+  mb::substr($str, $pos, $len)  # අක්ෂර ස්ථානයෙන් substring
+
+[ 3. string සෙවීම ]
+  mb::index($str, $sub)         # අක්ෂර ස්ථාන දර්ශකය
+  mb::rindex($str, $sub)        # දකුණු පසින් සෙවීම
+  mb::index_byte($str, $sub)    # byte ස්ථාන දර්ශකය
+
+[ 4. අක්ෂර පරිවර්තනය ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. අක්ෂර කේතය ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. අනෙකුත් මෙහෙයුම් ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. සහාය දක්වන කේතීකරණ ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. උදාහරණය ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "ආයුබෝවන්";
+  printf "දිග=%d\n", mb::length($s);

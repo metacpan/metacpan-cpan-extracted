@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $COPY     = 'Copyright (c) PetaMem, s.r.o. 2003-present';
 my $parser   = pol_numerals();
 
@@ -107,6 +107,87 @@ sub pol_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Polish ordinals: strip gender/case suffixes, then map stems.
+    # Inflection: -y/-a/-e/-ego/-emu/-ym (masc/fem/neut/oblique).
+    # Special: -i forms for 3rd (trzeci).
+
+    my %irregular = (
+        'zerowy'          => 'zero',
+        'pierwszy'        => 'jeden',
+        'drugi'           => 'dwa',
+        'trzeci'          => 'trzy',
+        'czwarty'         => 'cztery',
+        'piąty'           => 'pięć',
+        'szósty'          => 'sześć',
+        'siódmy'          => 'siedem',
+        'ósmy'            => 'osiem',
+        'dziewiąty'       => 'dziewięć',
+        'dziesiąty'       => 'dziesięć',
+        'jedenasty'       => 'jedenaście',
+        'dwunasty'        => 'dwanaście',
+        'trzynasty'       => 'trzynaście',
+        'czternasty'      => 'czternaście',
+        'piętnasty'       => 'piętnaście',
+        'szesnasty'       => 'szesnaście',
+        'siedemnasty'     => 'siedemnaście',
+        'osiemnasty'      => 'osiemnaście',
+        'dziewiętnasty'   => 'dziewiętnaście',
+        'dwudziesty'      => 'dwadzieścia',
+        'trzydziesty'     => 'trzydzieści',
+        'czterdziesty'    => 'czterdzieści',
+        'pięćdziesiąty'   => 'pięćdziesiąt',
+        'sześćdziesiąty'  => 'sześćdziesiąt',
+        'siedemdziesiąty' => 'siedemdziesiąt',
+        'osiemdziesiąty'  => 'osiemdziesiąt',
+        'dziewięćdziesiąty' => 'dziewięćdziesiąt',
+        'dwusetny'        => 'dwieście',
+        'trzechsetny'     => 'trzy sta',
+        'czterechsetny'   => 'cztery sta',
+        'pięćsetny'       => 'pięć set',
+        'sześćsetny'      => 'sześć set',
+        'siedemsetny'     => 'siedem set',
+        'osiemsetny'      => 'osiem set',
+        'dziewięćsetny'   => 'dziewięć set',
+        'setny'           => 'sto',
+        'tysięczny'       => 'tysiąc',
+        'milionowy'       => 'milion',
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip gender/case suffixes to masculine nominative
+        my $norm = $word;
+        $norm =~ s{(i)ego\z}{$1}xms         # trzeciego → trzeci
+            or $norm =~ s{ego\z}{y}xms       # czwartego → czwarty
+            or $norm =~ s{emu\z}{y}xms       # czwartemu → czwarty
+            or $norm =~ s{ym\z}{y}xms        # czwartym  → czwarty
+            or $norm =~ s{a\z}{y}xms         # czwarta   → czwarty
+            or $norm =~ s{(i)ej\z}{$1}xms    # trzeciej  → trzeci
+            or $norm =~ s{ej\z}{y}xms;       # czwartej  → czwarty
+
+        if (exists $irregular{$norm}) {
+            push @result, $irregular{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors, etc.)
+        }
+    }
+
+    return $matched ? join(' ', @result) : undef;
+}
+
+# }}}
 
 1;
 
@@ -125,7 +206,7 @@ Lingua::POL::Word2Num - Word to number conversion in Polish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::POL::Word2Num is module for converting text containing number
 representation in polish back into number. Converts whole numbers from 0 up
@@ -167,11 +248,37 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'piąty', 'dwudziesty', 'trzeci')
+  =>  str    cardinal text (e.g. 'pięć', 'dwadzieścia', 'trzy')
+      undef  if input is not a recognized ordinal
+
+Convert Polish ordinal text to cardinal text via morphological reversal.
+Handles all gender/case inflections.
+
 =item B<pol_numerals> (void)
 
   =>  obj  returns new parser object
 
 Internal parser.
+
+=back
+
+=cut
+
+# }}}
+# {{{ EXPORTED FUNCTIONS
+
+=pod
+
+=head1 EXPORT_OK
+
+=over 2
+
+=item w2n
+
+=item ordinal2cardinal
 
 =back
 

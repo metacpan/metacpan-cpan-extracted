@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -183,13 +183,50 @@ sub num2heb_cardinal :Export {
 
 # }}}
 
+# {{{ num2heb_ordinal                  convert number to ordinal text
+
+sub num2heb_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # {{{ tokens — ordinals 1-10 (masculine)
+
+    my @ordinals = (
+        '',           # 0 placeholder
+        'ראשון',      # 1st  rishon
+        'שני',        # 2nd  sheni
+        'שלישי',      # 3rd  shlishi
+        'רביעי',      # 4th  revi'i
+        'חמישי',      # 5th  chamishi
+        'שישי',       # 6th  shishi
+        'שביעי',      # 7th  shvi'i
+        'שמיני',      # 8th  shmini
+        'תשיעי',      # 9th  tshi'i
+        'עשירי',      # 10th asiri
+    );
+
+    # }}}
+
+    # 1-10: dedicated ordinal forms
+    return $ordinals[$number] if $number >= 1 && $number <= 10;
+
+    # 11+: Hebrew uses the cardinal form for ordinals
+    return num2heb_cardinal($number);
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -211,7 +248,7 @@ Lingua::HEB::Num2Word - Number to word conversion in Hebrew
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::HEB::Num2Word is module for converting numbers into their written
 representation in Hebrew. Converts whole numbers from 0 up to 999 999 999.
@@ -231,8 +268,10 @@ Text is encoded in UTF-8.
  use Lingua::HEB::Num2Word;
 
  my $text = Lingua::HEB::Num2Word::num2heb_cardinal( 123 );
-
  print $text || "sorry, can't convert this number into Hebrew.";
+
+ my $ord = Lingua::HEB::Num2Word::num2heb_ordinal( 3 );
+ print $ord;    # "שלישי"
 
 =cut
 
@@ -255,6 +294,25 @@ Convert number to Hebrew text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 Uses masculine (counting) forms.
 
+=item B<num2heb_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string (UTF-8 Hebrew)
+      undef  if input number is not known
+
+Convert number to Hebrew ordinal text representation.
+Only numbers from interval [1, 999_999_999] will be converted.
+Uses masculine forms. For 1-10, dedicated ordinal forms are used
+(rishon, sheni, shlishi, etc.). For 11 and above, Hebrew uses
+the cardinal number form as ordinal.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -269,6 +327,8 @@ Uses masculine (counting) forms.
 =over 2
 
 =item num2heb_cardinal
+
+=item num2heb_ordinal
 
 =back
 

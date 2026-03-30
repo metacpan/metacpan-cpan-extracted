@@ -20,3 +20,4 @@ t/01-session.t
 t/02-integration.t
 t/author-pod-syntax.t
 t/lib/TestSSHD.pm
+typemap

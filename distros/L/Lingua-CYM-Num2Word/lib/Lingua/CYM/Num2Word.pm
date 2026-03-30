@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -165,6 +165,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::CYM::Num2Word - Number to word conversion in Welsh (Cymraeg)
@@ -172,7 +174,7 @@ Lingua::CYM::Num2Word - Number to word conversion in Welsh (Cymraeg)
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::CYM::Num2Word is a module for converting numbers into their written
 representation in Welsh, using the modern decimal counting system.

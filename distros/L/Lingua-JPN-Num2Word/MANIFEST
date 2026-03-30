@@ -9,3 +9,5 @@ Makefile.PL
 README
 SECURITY.md
 lib/Lingua/JPN/Num2Word.pm
+t/01_ini.t
+t/02_samples.t

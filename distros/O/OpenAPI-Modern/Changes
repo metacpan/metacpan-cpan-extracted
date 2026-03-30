@@ -1,5 +1,13 @@
 Revision history for OpenAPI-Modern
 
+0.132     2026-03-29 19:14:44Z
+          - full support for parsing of "query" parameters: form,
+            spaceDelimited, pipeDelimited and deepObject styles, as well as
+            parsing into arrays and objects
+          - full support for parsing of the Cookie header via "cookie"
+            parameters: form and cookie styles and media-type-encoded content,
+            as well as parsing into arrays and objects
+
 0.131     2026-03-23 16:41:59Z
           - fix handling of zero-length path parameters using the default
             style when no schema is provided

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Node.pm
-## Version v0.3.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.3.0_1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2025/10/16
+## Modified 2026/03/29
 ## All rights reserved
 ## 
 ## 
@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::EventTarget );
     use vars qw( @EXPORT $XP $VERSION );
     use Wanted;
@@ -72,7 +73,7 @@ BEGIN
         'eq'    => \&isSameNode,
     );
     our $XP;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.0_1';
 };
 
 use strict;
@@ -174,7 +175,7 @@ sub appendChild
     my $new_array = $self->new_array( $self->_is_a( $new => 'HTML::Object::DOM::DocumentFragment' ) ? $new->children : $new );
     $new_array->foreach(sub
     {
-        next if( !$self->_is_a( $_ => 'HTML::Object::DOM::Node' ) );
+        return(1) if( !$self->_is_a( $_ => 'HTML::Object::DOM::Node' ) );
         $_->parent( $self );
     });
     $nodes->push( $new_array->list );
@@ -507,7 +508,7 @@ sub contains
             if( $_->eid eq $elem->eid )
             {
                 $found++;
-                return;
+                return(1);
             }
             return( $traverse->( $_ ) );
         });
@@ -552,7 +553,7 @@ sub findNode
                     {
                         $results->push( $child );
                         # We've added this child. Move to next child.
-                        return( 1 );
+                        return(1);
                     }
                 });
                 if( $child->children->length > 0 )
@@ -821,7 +822,7 @@ sub isEqualNode
         if( $v1 ne $v2 )
         {
             $failed++;
-            return;
+            return(0);
         }
     });
     return(0) if( $failed );
@@ -1024,7 +1025,10 @@ sub ownerDocument
     return( $root );
 }
 
-sub parent { return( shift->_set_get_object_without_init( 'parent', 'HTML::Object::DOM::Node', @_ ) ); }
+sub parent { return( shift->_set_get_object_without_init({
+    field  => 'parent',
+    weaken => 1,
+}, 'HTML::Object::DOM::Node', @_ ) ); }
 
 # Note: Property
 sub parentNode { return( shift->parent ); }
@@ -1206,7 +1210,7 @@ sub replaceChild
     my $new_array = $self->new_array( $self->_is_a( $new => 'HTML::Object::DOM::DocumentFragment' ) ? $new->children : $new );
     $new_array->foreach(sub
     {
-        next if( !$self->_is_a( $_ => 'HTML::Object::DOM::Node' ) );
+        return(1) if( !$self->_is_a( $_ => 'HTML::Object::DOM::Node' ) );
         $_->parent( $self );
     });
     $nodes->splice( $oldPos, 1, $new_array->list );
@@ -1402,7 +1406,7 @@ HTML::Object::DOM::Node - HTML Object DOM Node Class
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.0_1
 
 =head1 DESCRIPTION
 

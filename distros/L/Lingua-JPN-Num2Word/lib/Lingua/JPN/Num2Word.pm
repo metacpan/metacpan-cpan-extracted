@@ -4,7 +4,7 @@
 #
 
 package Lingua::JPN::Num2Word;
-# ABSTRACT: Number 2 word conversion in JPN.
+# ABSTRACT: Translate Numbers into Japanese
 
 use 5.16.0;
 use utf8;
@@ -16,7 +16,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my %N2J = qw(
   1 ichi 2 ni 3 san 4 yon 5 go 6 roku 7 nana 
@@ -95,12 +95,31 @@ sub blockof4_to_string {
 # }}}
 
 
+# {{{ num2jpn_ordinal                 convert number to ordinal text
+
+sub num2jpn_ordinal :Export {
+    my $number = shift;
+
+    if (!defined $number || $number < 1 || $number >= 1E16) {
+        warn "ordinal needs to be >=1 and <1E16.\n";
+        return;
+    }
+
+    # Japanese ordinals: cardinal + 番目 (ban-me)
+    my @parts = to_string($number);
+    return unless @parts;
+
+    return join('-', @parts) . '-ban-me';
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -111,13 +130,15 @@ __END__
 
 # {{{ module documentation
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::JPN::Num2Word - Translate Numbers into Japanese
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -203,6 +224,25 @@ C<Term::ReadKey>, which is available from CPAN:
         ReadMode("normal");
         print $ans, "\n";
     }
+
+=head1 FUNCTIONS
+
+=over
+
+=item num2jpn_ordinal
+
+Convert number to ordinal romaji string by appending C<-ban-me> (番目)
+to the cardinal form. Returns a hyphen-joined string.
+Only numbers from interval [1, 1E16) will be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
+=back
 
 =head1 BUGS
 

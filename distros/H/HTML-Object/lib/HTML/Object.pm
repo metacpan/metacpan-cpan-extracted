@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.6.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.6.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2025/10/16
+## Modified 2026/03/29
 ## All rights reserved
 ## 
 ## 
@@ -33,7 +33,7 @@ BEGIN
     use JSON;
     use Module::Generic::File qw( file );
     use Scalar::Util ();
-    our $VERSION = 'v0.6.0';
+    our $VERSION = 'v0.6.1';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -269,7 +269,8 @@ sub add_default
     my $parent = $self->current_parent;
     if( !length( $opts->{tag} ) )
     {
-        return( $self->add_text( @args ) );
+        my @args_keys = qw( p raw col line offset offset_end );
+        return( $self->add_text( @$opts{ @args_keys } ) );
     }
     # Check the current parent and see if we need to close it.
     # If this new tag is a non-empty tag (i.e. non-void) and the current parent has not been closed, 
@@ -387,17 +388,17 @@ sub add_start
     my $e;
     my $params = 
     {
-    attributes => $opts->{attr},
-    attributes_sequence => $opts->{seq},
-    column   => $opts->{col},
-    is_empty => $def->{is_empty},
-    line     => $opts->{line},
-    offset   => $opts->{offset},
-    original => $opts->{raw},
-    parent   => $parent,
-    tag      => $opts->{tag},
-    # and
-    debug    => $self->debug,
+        attributes => $opts->{attr},
+        attributes_sequence => $opts->{seq},
+        column   => $opts->{col},
+        is_empty => $def->{is_empty},
+        line     => $opts->{line},
+        offset   => $opts->{offset},
+        original => $opts->{raw},
+        parent   => $parent,
+        tag      => $opts->{tag},
+        # and
+        debug    => $self->debug,
     };
     
     # If this tag is handled by a special class, instantiate the object by this class
@@ -901,7 +902,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.6.0
+    v0.6.1
 
 =head1 DESCRIPTION
 

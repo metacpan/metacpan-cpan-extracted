@@ -100,7 +100,7 @@ Quick way to create a class with feature-rich methods
 
 # VERSION
 
-    v1.0.6
+    v1.3.0
 
 # DESCRIPTION
 
@@ -109,6 +109,10 @@ It is designed to be fast and provide a useful framework and speed up coding and
 It contains standard and support methods that may be superseded by your module.
 
 It also contains an AUTOLOAD transforming any hash object key into dynamic methods and also recognize the dynamic routine a la AutoLoader. The reason is that while `AutoLoader` provides the user with a convenient AUTOLOAD, I wanted a way to also keep the functionnality of [Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric) AUTOLOAD that were not included in `AutoLoader`. So the only solution was a merger.
+
+# PERFORMANCE
+
+Several frequently-called utility methods (["\_is\_array"](#_is_array), ["\_is\_hash"](#_is_hash), ["\_is\_object"](#_is_object), ["\_obj2h"](#_obj2h), etc.) are implemented in XS when the compiled shared library is available, providing a significant performance improvement for all code inheriting from [Module::Generic](https://metacpan.org/pod/Module%3A%3AGeneric). The XS backend is loaded automatically at startup; pure-Perl fallbacks are used transparently when the library is absent, so no C compiler is required to install this module.
 
 # METHODS
 
@@ -215,6 +219,10 @@ Parameters are:
 
     The possible values are: _bold_, _italic_, _underline_, _blink_, _reverse_, _conceal_, _strike_
 
+## colour\_max\_depth
+
+Set or get the maximum level of recursion when processing colourised debugging message with ["message\_colour"](#message_colour)
+
 ## colour\_open
 
 The marker to be used to set the opening of a command line colour sequence.
@@ -223,7 +231,16 @@ Defaults to "<"
 
 ## colour\_parse
 
-Provided with a string, this will parse the string for colour formatting. Formatting can be encapsulated in another formatting, and can be expressed in 2 different ways. For example:
+    $self->colour_parse( "And {bold light red on white}what about{/} {underline yellow}me too{/} ?" );
+    $self->colour_parse( "And {style => 'i|b', color => green}what about{/} {style => 'blink', color => yellow}me{/} ?" );
+
+Parses a string or list of strings containing colour and style formatting tags and returns the string with appropriate ANSI escape codes applied for terminal display. The method supports nested formatting, custom delimiters, and both named colours (e.g., `red`, `light blue`) and RGB/RGBA formats. It is designed to work in both TTY (terminal) and non-TTY environments, with formatting stripped in non-TTY contexts.
+
+If multiple strings are provided, they are concatenated with no separator before processing.
+
+For the purpose of this section, a `delimiter` is one or more characters that mark the start or end of a `tag`, such as `{`, `}`, `[`, or `]`. A `tag` is container of instruction for colour formatting. There are opening, and closing tag, such as `{/}`
+
+For example:
 
     $self->colour_parse( "And {style => 'i|b', color => green}what about{/} {style => 'blink', color => yellow}me{/} ?" );
 
@@ -239,7 +256,142 @@ would return a string with the words `what about` in light red bold text on a wh
 
 would return a string with the words `everyone! This is` in bold red characters on white background and the word `embedded` in underline blue color
 
-The idea for this syntax, not the code, is taken from [Term::ANSIColor](https://metacpan.org/pod/Term%3A%3AANSIColor)
+The default prospective delimiters are `{`, `}`, `<`, and `>`. Those default delimiters can be overriden by setting alternate ones using the methods ["colour\_open"](#colour_open), and ["colour\_close"](#colour_close).
+
+Delimiters must be non-empty scalar strings and should not be identical to avoid ambiguity (a warning is issued if they are). Once a delimiter pair is chosen for a string, it is used consistently throughout parsing, and all other delimiter candidates are ignored for that parse run; mixed delimiters, such as `{` and `<`, are treated as literal content unless they match the current delimiter pair.
+
+Tags, that are made up of an opening and closing delimiters are used to specify a colouring style, such as `bold`, `underline`, and colours, such as `red`, `rgb(255,255,255)`. As shown above, `colour_parse` supports two syntaxes for colour parameters.
+
+- 1. natural
+
+    Uses a concise format with styles and colours separated by spaces, optionally including a background colour with `on`.
+
+        {bold light red on white}
+
+- 2. hash-like
+
+    Uses Perl-like key-value pairs to specify styles and colours.
+
+        {style => 'bold', color => 'red'}
+
+    Only a subset of plain scalar values is allowed. Attempting to use Perl expressions is not supported. Invalid or unsafe input is treated as literal.
+
+Tags must start with an alphabetic character (style or colour name) immediately following the opening delimiter, with no leading whitespace. For example, `{bold red}` is valid, but `{ bold red}` is treated as literal text.
+
+    { bold red}   # INVALID, literal
+    {bold red}    # VALID
+
+The method supports nested tags up to a maximum default depth of 10, but can be changed using the method ["colour\_max\_depth"](#colour_max_depth), and handles malformed tags gracefully by either ignoring them or treating them as literal text. In non-TTY environments (influenced by ["force\_tty"](#force_tty) or terminal detection with ["\_is\_tty"](#_is_tty)), formatting tags are stripped, and only the content is returned.
+
+Perl variables like `${variable}` are preserved as literal text, as the method ensures that `{` or `[` preceded by a `$` is not treated as a formatting tag.
+
+### Supported Styles
+
+The following styles are supported:
+
+- `bold` (or `b`, `strong`): Bold text (ANSI: `\e[1m`).
+- `italic` (or `i`): Italic text (ANSI: `\e[3m`).
+- `underline` (or `u`, `underlined`): Underlined text (ANSI: `\e[4m`).
+- `blink`: Blinking text (ANSI: `\e[5m`).
+- `reverse` (or `r`, `reversed`): Reverse video (ANSI: `\e[7m`).
+- `conceal` (or `c`, `concealed`): Concealed text (ANSI: `\e[8m`).
+- `strike` (or `striked`, `striken`): Strikethrough text (ANSI: `\e[9m`).
+
+Multiple styles can be combined in key-value syntax using `|`, such as `style => 'bold|italic'`.
+
+### Supported colours
+
+Colours can be specified as:
+
+- Named colours: e.g., `red`, `light blue`, `bright green`.
+- RGB: e.g., `rgb(255,255,255)` or `rgb(255255255)` (comma-less).
+- RGBA: e.g., `rgba(255,0,0,0.5)` for 50% opacity, blended with the background (default: white).
+
+Both 8-bit (`38;5;NNN` or `48;5;NNN`) and 24-bit (`38;2;R;G;B` or `48;2;R;G;B`) ANSI codes are generated for compatibility.
+
+### Delimiter Rules
+
+- Default delimiters are `{` and `}` or `<` and `>` unless overridden by ["colour\_open"](#colour_open) and ["colour\_close"](#colour_close).
+- Tags must start with a letter, such as `bold`, `red` or be a closing tag (`{/}`).
+- A `$` prefix before `{` or `[` (e.g., `${variable}`) prevents interpretation as a tag.
+- Custom delimiters must be non-empty scalars and are used consistently within a single string.
+- Mixed delimiters (e.g., `{bold red}A <underline green`**/**>) are treated as literal content within the chosen delimiter pair.
+
+### Error Handling
+
+- Invalid tags (e.g., `{in valid}`) are ignored, and their content is returned without formatting.
+- Stray closing tags (e.g., `{/}`) are treated as literal text.
+- Unclosed tags (e.g., `{bold red}text`) apply formatting to the remaining text.
+- Excessive nesting (beyond 10 levels) results in partial formatting up to the limit, with remaining tags treated as literal.
+- Out-of-range RGB values (e.g., `rgb(300,-1,260)`) are ignored, and the tag is treated as literal.
+
+### Examples
+
+    my $m = Module::Generic->new;
+
+- Basic formatting with key-value syntax:
+
+        $m->colour_parse( "Hello {style => 'bold', color => 'red'}world{/}" );
+        # Returns: "Hello \e[38;5;224;1m\e[38;2;255;0;0;1mworld\e[m"
+
+- Compact syntax with background colour:
+
+        $m->colour_parse( "Text {bold light red on white}coloured{/} here" );
+        # Returns: "Text \e[38;5;224;48;5;255;1m\e[38;2;255;0;0;48;2;255;255;255;1mcoloured\e[m here"
+
+- Nested formatting:
+
+        $m->colour_parse( "Outer {bold red}inner {underline green}green{/} text{/}" );
+        # Returns: "Outer \e[38;5;224;1m\e[38;2;255;0;0;1minner \e[38;5;28;4m\e[38;2;0;255;0;4mgreen\e[m text\e[m"
+
+- RGB and RGBA colours:
+
+        $m->colour_parse( "Blue {underline rgb(0,0,255)}text{/}" );
+        # Returns: "Blue \e[38;5;3;4m\e[38;2;0;0;255;4mtext\e[m"
+        $m->colour_parse( "Red {bold rgba(255,0,0,0.5)}text{/}" );
+        # Returns: "Red \e[38;5;237;1m\e[38;2;255;128;128;1mtext\e[m" (blended with white background)
+
+- Preserving Perl variables and literal braces:
+
+        $m->colour_parse( 'Code ${variable} here' );
+        # Returns: "Code ${variable} here"
+        $m->colour_parse( "{bold red}code { x: 1 } here{/}" );
+        # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1mcode { x: 1 } here\e[m"
+
+- Malformed tags:
+
+        $m->colour_parse( "{in valid}text{/}" );
+        # Returns: "text"
+        $m->colour_parse( "{bold red}missing close" );
+        # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1mmissing close"
+
+    Be careful that in this last example, if the colour formatting is not closed, the active colour formatting will affect any subsequent output lines.
+
+- Deep nesting:
+
+        $m->colour_parse( "{bold red}{underline green}{underline green}deep{/}{/}{/}" );
+        # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1m\e[38;5;28;4m\e[38;2;0;255;0;4m\e[38;5;28;4m\e[38;2;0;255;0;4mdeep\e[m\e[m\e[m"
+
+- Custom delimiters:
+
+        $m->colour_open( '[[');
+        $m->colour_close(']]' );
+        $m->colour_parse( "Text [[bold red]]coloured[[/]]" );
+        # Returns: "Text \e[38;5;224;1m\e[38;2;255;0;0;1mcoloured\e[m"
+
+- Non-TTY environment (formatting stripped):
+
+        my $m = Module::Generic->new( force_tty => 0 );
+        $m->colour_parse( "{bold red}text{/}" );
+        # Returns: "text"
+
+Note that this method uses ANSI escape codes for formatting, which may not be supported by all terminals.
+
+And, in non-TTY environments, all formatting is stripped, and only the content within tags is returned. This is particularly necessary if, instead of displaying those messages in a terminal, you redirect the output to a file.
+
+This method returns a string with ANSI escape codes applied for valid formatting tags, or the content with tags stripped in non-TTY environments. Malformed or unrecognised tags are either ignored or treated as literal text.
+
+See also [Term::ANSIColor](https://metacpan.org/pod/Term%3A%3AANSIColor) for ANSI escape code details.
 
 ## colour\_to\_rgb
 
@@ -559,6 +711,15 @@ You can enable it in your own package by initialising it in your own `init` meth
         $self->{fatal} = 1;
         return( $self->SUPER::init( @_ ) );
     }
+
+## force\_tty
+
+Set or get this flag that specify whether the environment is running under TTY or not.
+Normally, this is derived automatically with the method ["\_is\_tty"](#_is_tty), but you can use this method to force your code.
+
+It is by default `undef`. Set it to false to indicate your code is not running under TTY, and a true value otherwise.
+
+This is used in ["colour\_parse"](#colour_parse)
 
 ## get
 
@@ -1589,6 +1750,20 @@ Provided with a non-zero length value and this will check if it looks like a val
 
 An empty string or `undef` can be provided and will not be checked.
 
+## \_is\_version
+
+    my $vers = 'v1.2.3';
+    # or
+    my $vers = 1.2;
+    # or
+    my $vers = 5.006000
+
+    say $obj->_is_version( $vers ) ? "ok" : "not ok"; # ok
+
+This takes a string, and checks if it looks like a version number based on a regular expression taken from [Changes::Version](https://metacpan.org/pod/Changes%3A%3AVersion)
+
+Returns true (`1`) upon success or false `0` if the string does not look like a version number.
+
 ## \_list\_symbols
 
     my $obj = My::Class->new;
@@ -1656,6 +1831,24 @@ Perl caches loaded modules, but if two threads try to load the same module simul
 This will load multiple classes by providing it an array reference of class name to load and an optional hash or hash reference of options, similar to those provided to ["\_load\_class"](#_load_class)
 
 If one of those classes failed to load, it will return immediately after setting an ["error"](#error).
+
+## \_looks\_like\_path
+
+    my $path = 'C:\dir\file.txt';
+    my $path = 'C:/dir';
+    my $unc_share = '\\Server\Share\...';
+    my $path = '~john/some/where';
+    my $path = './foo';
+    my $path = '../bar';
+    # Windows style
+    my $path = '.\foo';
+    my $path = '..\bar';
+    my $path = 'config.json';
+    say $obj->_looks_like_path( $path ) ? "ok" : "not ok"; # ok
+
+This takes a string, and checks conservatively if it looks like a file path.
+
+It returns true (`1`) upon success, and false (`0`) otherwise.
 
 ## \_lvalue
 
@@ -3669,7 +3862,7 @@ Or use a dynamic delegation pattern via AUTOLOAD:
         return $self->{dynamic_methods}{$method}->(@_);
     }
 
-However, if you truly need to define package-level symbols, this method remains appropriate — just observe the threading caveats above.
+However, if you truly need to define package-level symbols, this method remains appropriate; just observe the threading caveats above.
 
 ## \_str\_val
 
@@ -4158,5 +4351,4 @@ Jacques Deguest <`jack@deguest.jp`>
 
 Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
 
-You can use, copy, modify and redistribute this package and associated
-files under the same terms as Perl itself.
+You can use, copy, modify and redistribute this package and associated files under the same terms as Perl itself.

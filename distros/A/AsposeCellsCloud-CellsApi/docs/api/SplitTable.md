@@ -26,6 +26,7 @@ This method performs a split operation on the source table by grouping rows acco
 |tableName|String|Query|Data table that needs to be split.|
 |splitColumnName|String|Query|Column name to split by.|
 |saveSplitColumn|Boolean|Query|Whether to keep the data in the split column.|
+|splitRowNumber|Integer|Query||
 |toNewWorkbook|Boolean|Query|Export destination control: true - Creates new workbook files containing the split data; false - Adds a new worksheet to the current workbook.|
 |toMultipleFiles|Boolean|Query|true - Exports table data as **multiple separate files** (returned as ZIP archive);false - Stores all data in a **single file** with multiple sheets. Default: false.|
 |outPath|String|Query|(Optional) The folder path where the workbook is stored. The default is null.|

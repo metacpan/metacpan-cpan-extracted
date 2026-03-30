@@ -40,8 +40,8 @@ requires:
   JSON: '4.10'
   List::Util: '1.56'
   Locale::Unicode: v0.3.11
-  Locale::Unicode::Data: v1.4.0
-  Module::Generic: v1.1.1
+  Locale::Unicode::Data: v1.8.0
+  Module::Generic: v1.3.0
   POSIX: '0'
   Promise::Me: v0.6.0
   Scalar::Util: '1.60'
@@ -60,5 +60,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/HTML-Object/issues
   repository: https://gitlab.com/jackdeguest/HTML-Object
-version: v0.6.0
+version: v0.6.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

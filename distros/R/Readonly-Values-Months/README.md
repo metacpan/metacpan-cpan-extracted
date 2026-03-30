@@ -4,7 +4,11 @@ Readonly::Values::Months - Months Constants
 
 # VERSION
 
-Version 0.03
+Version 0.04
+
+# ABSTRACT
+
+Provides %months keyed on lowercase full and abbreviated names
 
 # SYNOPSIS
 
@@ -77,7 +81,7 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

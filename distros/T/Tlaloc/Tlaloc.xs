@@ -2,7 +2,14 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+
+#define NEED_mg_findext
+#define NEED_sv_unmagicext
 #include "ppport.h"
+
+#ifndef GvCV_set
+#define GvCV_set(gv, cv) (GvCV(gv) = (CV *)(cv))
+#endif
 
 /* ------------------------------------------------------------------ */
 /* Custom op forward declarations (5.14+ only)                        */

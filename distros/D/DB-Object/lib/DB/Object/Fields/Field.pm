@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Fields/Field.pm
-## Version v1.3.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.4.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/01
-## Modified 2026/03/22
+## Modified 2026/03/27
 ## All rights reserved
 ## 
 ## 
@@ -20,6 +20,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $FIELD_NAMES $EXCEPTION_CLASS );
     use DB::Object::Fields::Overloaded;
+    use Scalar::Util qw( weaken );
     use Module::Generic::Array;
     use overload (
         '""'    => 'as_string',
@@ -52,7 +53,7 @@ BEGIN
         fallback => 1,
     );
     use Wanted;
-    our $VERSION = 'v1.3.0';
+    our $VERSION = 'v1.4.0';
     our $FIELD_NAMES = [qw(
         check_name comment datatype default foreign_name index_name is_array is_check
         is_foreign is_nullable is_primary is_unique name pos prefixed size type
@@ -94,7 +95,6 @@ sub init
 #     return( $self->error( "Table object provided is not an object." ) ) if( !$self->_is_object( $self->{table_object} ) );
 #     return( $self->error( "Table object provided is not a DB::Object::Tables object." ) ) if( !$self->{table_object}->isa( 'DB::Object::Tables' ) );
 #     return( $self->error( "No name was provided for this field." ) ) if( !$self->{name} );
-    $self->{trace} = $self->_get_stack_trace;
     return( $self );
 }
 
@@ -350,9 +350,22 @@ sub _op_overload
     my $qo = $self->query_object;
     my $placeholder_re = $dbo->_placeholder_regexp;
     my $const = $self->datatype->constant;
-    # $op = 'IS' if( $op eq '=' and $val eq 'NULL' );
+    # When the RHS is NULL, SQL requires IS NULL / IS NOT NULL - never = NULL or <> NULL,
+    # as those predicates always evaluate to NULL (never TRUE) per the SQL standard.
+    if( !ref( $val ) && uc( $val ) eq 'NULL' )
+    {
+        my $null_expr = $op eq '<>' ? "${field} IS NOT NULL" : "${field} IS NULL";
+        my $null_overloaded = DB::Object::Fields::Overloaded->new(
+            expression   => $null_expr,
+            field        => $self,
+            query_object => $qo,
+            debug        => $self->debug,
+        );
+        weaken( $null_overloaded->{query_object} ) if( $null_overloaded && $null_overloaded->{query_object} );
+        return( $null_overloaded );
+    }
     # If the value specified in the operation is a placeholder, or a field object or a statement object, we do not want to quote process it
-    unless( $val =~ /^$placeholder_re$/ || 
+    unless( $val =~ /$placeholder_re/ || 
             ( $self->_is_object( $val ) && 
               (
                 $val->isa( 'DB::Object::Fields::Field' ) ||
@@ -370,7 +383,6 @@ sub _op_overload
     # If the value is a statement object, stringify it, surround it with parenthesis and use it
     if( $self->_is_a( $val, 'DB::Object::Statement' ) )
     {
-        $self->messagec( 5, "Merging {green}", $val->query_object->elements->length, "{/} elements from this statement object associated with out field {green}", $self->as_string, "{/}" );
         $qo->elements->merge( $val->query_object->elements );
         $val = '(' . $val->as_string . ')';
     }
@@ -378,10 +390,12 @@ sub _op_overload
     {
         $types = $dbo->placeholder->replace( $self->_is_scalar( $val ) ? $val : \$val );
     }
-    # A placeholder, but don't know the type
-    elsif( $val =~ /^$placeholder_re$/ )
+    # A placeholder (pure: ?) or embedded (e.g. UPPER(?), COALESCE(?,?)):
+    # count the number of placeholders in $val and register one empty type per bind slot.
+    elsif( $val =~ /$placeholder_re/ )
     {
-        $types = Module::Generic::Array->new( [''] );
+        my @matches = ( $val =~ /$placeholder_re/g );
+        $types = Module::Generic::Array->new( [ ( '' ) x scalar( @matches ) ] );
     }
     elsif( $self->_is_scalar( $val ) )
     {
@@ -404,6 +418,9 @@ sub _op_overload
 #         # binded_offset => ( $val =~ /^$placeholder_re$/ && defined( $+{offset} ) ) ? ( $+{offset} - 1 ) : undef,
 #         # types => $types,
 #     ) );
+    # Capture the placeholder before calling new() - $1 can be clobbered by any
+    # subsequent regex match inside the argument list evaluation or inside new() itself.
+    my $captured_placeholder = ( $val =~ /($placeholder_re)/ ) ? $1 : undef;
     my $over = DB::Object::Fields::Overloaded->new(
         expression => 
             (
@@ -411,18 +428,20 @@ sub _op_overload
                     ? "${val} ${op} ${field}" 
                     : "${field} ${op} ${val}"
             ),
-        field => $self,
-        # binded => ( $val =~ /^$placeholder_re$/ || $types ) ? 1 : 0,
-        ( $val =~ /^$placeholder_re$/ ? ( placeholder => $val ) : () ),
+        field        => $self,
+        # query_object must be initialised before placeholder, because the placeholder
+        # setter calls $self->query_object->database_object->_placeholder_regexp
+        query_object => $qo,
+        debug        => $self->debug,
+        ( defined( $captured_placeholder ) ? ( placeholder => $captured_placeholder ) : () ),
         # Actually type() will return us the actual data type, not the driver constant
         # type => $self->type,
         ( defined( $const ) ? ( type => $const ) : () ),
-        query_object => $qo,
-        debug => $self->debug,
-        ( $val !~ /^$placeholder_re$/ ? ( value => $val ) : () ),
-        # binded_offset => ( $val =~ /^$placeholder_re$/ && defined( $+{offset} ) ) ? ( $+{offset} - 1 ) : undef,
+        ( !defined( $captured_placeholder ) ? ( value => $val ) : () ),
+        # binded_offset => ( defined( $captured_placeholder ) && defined( $+{index} ) ) ? ( $+{index} - 1 ) : undef,
         # types => $types,
     );
+    weaken( $over->{query_object} ) if( $over && $over->{query_object} );
     return( $over );
 }
 
@@ -585,7 +604,7 @@ This would yield:
 
 =head1 VERSION
 
-    v1.3.0
+    v1.4.0
 
 =head1 DESCRIPTION
 

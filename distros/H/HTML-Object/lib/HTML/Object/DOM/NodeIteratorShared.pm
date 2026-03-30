@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     # To import its constants
@@ -109,7 +110,7 @@ sub nextNode
     # We reached the end of this array
     return if( $self->{_pos} >= $size );
     my $whattoshow = $self->whatToShow;
-    return( $self->error( "Somehow the bitwise value of what to show is not an integer!" ) ) if( !$self->_is_integer( $whattoshow ) );
+    return( $self->error( "Somehow the bitwise value of what to show (", ( $whattoshow // 'undef' ), ") is not an integer!" ) ) if( !$self->_is_integer( $whattoshow ) );
     my $filter = $self->filter;
     my $class = ref( $self );
     # Somehow it has been changed maybe? End our iteration

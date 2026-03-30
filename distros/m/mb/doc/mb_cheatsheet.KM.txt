@@ -1,0 +1,35 @@
+======================================================================
+ mb Cheat Sheet                                         [KM] ភាសាខ្មែរ
+======================================================================
+
+[ 1. ផ្ទុកម៉ូឌុល ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. ប្រវែង / substr តាមតួអក្សរ ]
+  mb::length($str)              # ចំនួនតួអក្សរ (មិនមែន bytes)
+  mb::substr($str, $pos, $len)  # substring តាមទីតាំងតួអក្សរ
+
+[ 3. ស្វែងរកខ្សែអក្សរ ]
+  mb::index($str, $sub)         # លិបិក្រមទីតាំងតួអក្សរ
+  mb::rindex($str, $sub)        # ស្វែងរកពីខាងស្ដាំ
+  mb::index_byte($str, $sub)    # លិបិក្រមទីតាំង byte
+
+[ 4. បំលែងតួអក្សរ ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. លេខកូដតួអក្សរ ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. ប្រតិបត្តិការផ្សេងទៀត ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. ការអ៊ីនកូដដែលគាំទ្រ ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. ឧទាហរណ៍ ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "សួស្ដី";
+  printf "ប្រវែង=%d\n", mb::length($s);

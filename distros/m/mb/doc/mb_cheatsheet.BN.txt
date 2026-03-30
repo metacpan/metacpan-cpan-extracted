@@ -1,0 +1,35 @@
+======================================================================
+ mb Cheat Sheet                                             [BN] বাংলা
+======================================================================
+
+[ 1. মডিউল লোড করুন ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. অক্ষর-ভিত্তিক length / substr ]
+  mb::length($str)              # অক্ষরের সংখ্যা (বাইট নয়)
+  mb::substr($str, $pos, $len)  # অক্ষর অবস্থান দিয়ে সাবস্ট্রিং
+
+[ 3. স্ট্রিং অনুসন্ধান ]
+  mb::index($str, $sub)         # অক্ষর অবস্থানের সূচক
+  mb::rindex($str, $sub)        # ডান দিক থেকে অনুসন্ধান
+  mb::index_byte($str, $sub)    # বাইট অবস্থানের সূচক
+
+[ 4. অক্ষর রূপান্তর ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. অক্ষর কোড ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. অন্যান্য অপারেশন ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. সমর্থিত এনকোডিং ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. উদাহরণ ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "হ্যালো";
+  printf "দৈর্ঘ্য=%d\n", mb::length($s);

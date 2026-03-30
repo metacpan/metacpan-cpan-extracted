@@ -15,7 +15,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my  $parser  = bul_numerals();
 
 # }}}
@@ -150,6 +150,106 @@ sub bul_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Bulgarian (Cyrillic) ordinals: strip gender/definiteness suffixes, then map stems.
+    # Indefinite: -и/-а/-о (masc/fem/neut).
+    # Definite:   -ият/-ата/-ото (masc/fem/neut), -ия (count form).
+    # Special: нулев-и has -ев- insert.
+
+    my %irregular = (
+        'нулев'           => 'нула',
+        'първ'            => 'един',
+        'втор'            => 'два',
+        'трет'            => 'три',
+        'четвърт'         => 'четири',
+        'пет'             => 'пет',
+        'шест'            => 'шест',
+        'седм'            => 'седем',
+        'осм'             => 'осем',
+        'девет'           => 'девет',
+        'десет'           => 'десет',
+        'единадесет'      => 'единадесет',
+        'дванадесет'      => 'дванадесет',
+        'тринадесет'      => 'тринадесет',
+        'четиринадесет'   => 'четиринадесет',
+        'петнадесет'      => 'петнадесет',
+        'шестнадесет'     => 'шестнадесет',
+        'седемнадесет'    => 'седемнадесет',
+        'осемнадесет'     => 'осемнадесет',
+        'деветнадесет'    => 'деветнадесет',
+        'двадесет'        => 'двадесет',
+        'тридесет'        => 'тридесет',
+        'четиридесет'     => 'четиридесет',
+        'петдесет'        => 'петдесет',
+        'шестдесет'       => 'шестдесет',
+        'седемдесет'      => 'седемдесет',
+        'осемдесет'       => 'осемдесет',
+        'деветдесет'      => 'деветдесет',
+        'двестотен'       => 'двеста',
+        'тристотен'       => 'триста',
+        'четиристотен'    => 'четиристотин',
+        'петстотен'       => 'петстотин',
+        'шестстотен'      => 'шестстотин',
+        'седемстотен'     => 'седемстотин',
+        'осемстотен'      => 'осемстотин',
+        'деветстотен'     => 'деветстотин',
+        'стотен'          => 'сто',
+        'хиляден'         => 'хиляда',
+        'милионен'        => 'милион',
+    );
+
+    # Hundreds cardinals that require "и" connector in cardinal form
+    my %is_hundred = map { $_ => 1 } qw(
+        сто двеста триста четиристотин петстотин
+        шестстотин седемстотин осемстотин деветстотин
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip definiteness + gender suffixes to get ordinal stem
+        my $norm = $word;
+        $norm =~ s{ият\z}{}xms            # masc definite: петият → пет
+            or $norm =~ s{ата\z}{}xms     # fem definite: петата → пет
+            or $norm =~ s{ото\z}{}xms     # neut definite: петото → пет
+            or $norm =~ s{ия\z}{}xms      # count form: петия → пет
+            or $norm =~ s{и\z}{}xms       # masc indef: пети → пет
+            or $norm =~ s{а\z}{}xms       # fem indef: пета → пет
+            or $norm =~ s{о\z}{}xms;      # neut indef: пето → пет
+
+        if (exists $irregular{$norm}) {
+            push @result, $irregular{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors like "и")
+        }
+    }
+
+    return undef unless $matched;
+
+    # Bulgarian cardinals require "и" between hundreds and what follows
+    # when there's a single-value remainder (unit/teen/round-tens):
+    #   "сто първи"           → "сто и един"       (2 words, no existing "и")
+    #   "сто двадесети и първи" → "сто двадесет и един" (already has "и")
+    # Rule: insert "и" after the hundreds token when no "и" follows yet.
+    if (@result >= 2 && exists $is_hundred{$result[0]}
+        && !grep { $_ eq 'и' } @result) {
+        splice @result, 1, 0, 'и';
+    }
+
+    return join(' ', @result);
+}
+
+# }}}
 
 1;
 
@@ -168,7 +268,7 @@ Lingua::BUL::Word2Num - Word to number conversion in Bulgarian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::BUL::Word2Num is module for converting text containing number
 representation in Bulgarian back into number. Converts whole numbers
@@ -210,6 +310,15 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'пети', 'десети', 'трети')
+  =>  str    cardinal text (e.g. 'пет', 'десет', 'три')
+      undef  if input is not a recognized ordinal
+
+Convert Bulgarian (Cyrillic) ordinal text to cardinal text via morphological reversal.
+Handles gender and definiteness inflections (-и/-а/-о, -ият/-ата/-ото).
+
 =item B<bul_numerals> (void)
 
   =>  obj  new parser object
@@ -230,6 +339,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

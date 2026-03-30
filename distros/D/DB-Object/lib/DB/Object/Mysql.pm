@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Mysql.pm
-## Version v1.5.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib/DB/Object/Mysql.pm
+## Version v1.5.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/03/26
 ## All rights reserved
 ## 
 ## 
@@ -260,9 +260,9 @@ BEGIN
         },
     };
     # DBI->trace(5);
-    our $PLACEHOLDER_REGEXP = qr/\?/;
+    our $PLACEHOLDER_REGEXP = qr/(?<![?\w])\?(?![?\w])/;
     our $EXCEPTION_CLASS    = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.5.0';
+    our $VERSION = 'v1.5.1';
 };
 
 use strict;
@@ -929,7 +929,7 @@ DB::Object::Mysql - Mysql Database Object
 
 =head1 VERSION
 
-    v1.5.0
+    v1.5.1
 
 =head1 DESCRIPTION
 

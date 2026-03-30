@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser      = fra_numerals();
 
 # }}}
@@ -92,6 +92,33 @@ sub fra_numerals {
     });
 }
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # French ordinals:
+    #   "premier" / "première" → "un" (fully suppletive for 1st)
+    #   All others: cardinal stem + "ième"
+    #   Reverse stem changes: cinqu→cinq, neuv→neuf
+
+    return 'un' if $input =~ m{\A premi(?:er|ère) \z}xms;
+
+    # Must end with "ième" to be an ordinal
+    $input =~ s{ième\z}{}xms or return;
+
+    # Reverse stem changes
+    $input =~ s{cinqu\z}{cinq}xms;
+    $input =~ s{neuv\z}{neuf}xms;
+
+    # French drops final -e before -ième (quatre→quatrième, onze→onzième).
+    # Restore it unless the stem already ends in a vowel.
+    $input .= 'e' if $input =~ m{[^aeiouyâêîôûéèëïü]\z}xms;
+
+    return $input;
+}
+
+# }}}
 
 1;
 
@@ -101,6 +128,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::FRA::Word2Num - Word to number conversion in French
@@ -108,7 +137,7 @@ Lingua::FRA::Word2Num - Word to number conversion in French
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::FRA::Word2Num is module for converting text containing number
 representation in French back into number. Converts whole numbers from 0 up
@@ -150,6 +179,14 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'premier', 'deuxième', 'cinquième')
+  =>  str    cardinal text (e.g. 'un', 'deux', 'cinq')
+      undef  if input is not recognised as an ordinal
+
+Convert French ordinal text to cardinal text (morphological reversal).
+
 =item B<fra_numerals> (void)
 
   =>  obj  new parser object
@@ -170,6 +207,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

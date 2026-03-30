@@ -21,7 +21,7 @@ SYNOPSIS
             $self->{_private_param} = 'some value';
             return( $self );
         }
-    
+
         sub active { return( shift->_set_get_boolean( 'active', @_ ) ); }
         sub address { return( shift->_set_get_object( 'address', 'My::Address', @_ ) ); }
         sub age { return( shift->_set_get_number( 'age', @_ ) ); }
@@ -57,14 +57,53 @@ SYNOPSIS
             }, @_ ) );
         }
 
+    Quick way to create a class with feature-rich methods
+
+        create_class My::Package extends => 'Other::Package';
+        # or, maybe
+        create_class My::Package extends => 'Other::Package', method =>
+        {
+            since => 'datetime',
+            uri => 'uri',
+            tags => 'array_object',
+            meta => 'hash',
+            active => 'boolean',
+            callback => 'code',
+            config => 'file',
+            allowed_from => 'ip',
+            total => 'number',
+            id => 'uuid',
+            version => 'version',
+            filehandle => 'glob',
+            object => { type => 'object', class => 'Some::Class' },
+            customer => 
+            {
+                type => 'class',
+                def =>
+                {
+                    id => 'uuid',
+                    since => 'datetime',
+                    name => 'scalar_as_object',
+                    age => 'decimal',
+                }
+            }
+        };
+        my $obj = My::Package->new;
+        my $cust = $obj->customer(
+            name => 'John Doe',
+            age => 32,
+            since => 'now',
+        );
+        $obj->customer->id( '44d9a3ab-32e2-4c46-b6c9-8b307f273d47' );
+
 VERSION
-        v0.32.4
+        v1.3.0
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
-    from. It is designed to provide a useful framework and speed up coding
-    and debugging. It contains standard and support methods that may be
-    superseded by your module.
+    from. It is designed to be fast and provide a useful framework and speed
+    up coding and debugging. It contains standard and support methods that
+    may be superseded by your module.
 
     It also contains an AUTOLOAD transforming any hash object key into
     dynamic methods and also recognize the dynamic routine a la AutoLoader.
@@ -72,6 +111,15 @@ DESCRIPTION
     convenient AUTOLOAD, I wanted a way to also keep the functionnality of
     Module::Generic AUTOLOAD that were not included in "AutoLoader". So the
     only solution was a merger.
+
+PERFORMANCE
+    Several frequently-called utility methods ("_is_array", "_is_hash",
+    "_is_object", "_obj2h", etc.) are implemented in XS when the compiled
+    shared library is available, providing a significant performance
+    improvement for all code inheriting from Module::Generic. The XS backend
+    is loaded automatically at startup; pure-Perl fallbacks are used
+    transparently when the library is absent, so no C compiler is required
+    to install this module.
 
 METHODS
   import
@@ -140,6 +188,11 @@ METHODS
     This way the end user may be sure that if "$obj-"error()> returns true
     something wrong has occured.
 
+    Note that all helper method such as "_set_get_*" use this method when
+    used as mutator. This means that if those methods are used to set some
+    value, and they do so successfully, they will reset any previous error.
+    When used as accessor, any previous error set will remain.
+
   clone
     Clone the current object if it is of type hash or array reference. It
     returns an error if the type is neither.
@@ -165,14 +218,17 @@ METHODS
 
     Parameters are:
 
-    *text* or *message*
+    *   "text" or *message*
+
         This is the text to be formatted in colour.
 
-    *bgcolour* or *bgcolor* or *bg_colour* or *bg_color*
+    *   "bgcolour" or *bgcolor* or *bg_colour* or *bg_color*
+
         The value for the background colour.
 
-    *colour* or *color* or *fg_colour* or *fg_color* or *fgcolour* or
-    *fgcolor*
+    *   "colour" or *color* or *fg_colour* or *fg_color* or *fgcolour* or
+        *fgcolor*
+
         The value for the foreground colour.
 
         Valid value can be a colour name, an rgb value like 255255255, a rgb
@@ -188,9 +244,14 @@ METHODS
         It returns the text properly formatted to be outputted in a
         terminal.
 
-    *style*
+    *   "style"
+
         The possible values are: *bold*, *italic*, *underline*, *blink*,
         *reverse*, *conceal*, *strike*
+
+  colour_max_depth
+    Set or get the maximum level of recursion when processing colourised
+    debugging message with "message_colour"
 
   colour_open
     The marker to be used to set the opening of a command line colour
@@ -199,9 +260,26 @@ METHODS
     Defaults to "<"
 
   colour_parse
-    Provided with a string, this will parse the string for colour
-    formatting. Formatting can be encapsulated in another formatting, and
-    can be expressed in 2 different ways. For example:
+        $self->colour_parse( "And {bold light red on white}what about{/} {underline yellow}me too{/} ?" );
+        $self->colour_parse( "And {style => 'i|b', color => green}what about{/} {style => 'blink', color => yellow}me{/} ?" );
+
+    Parses a string or list of strings containing colour and style
+    formatting tags and returns the string with appropriate ANSI escape
+    codes applied for terminal display. The method supports nested
+    formatting, custom delimiters, and both named colours (e.g., "red",
+    "light blue") and RGB/RGBA formats. It is designed to work in both TTY
+    (terminal) and non-TTY environments, with formatting stripped in non-TTY
+    contexts.
+
+    If multiple strings are provided, they are concatenated with no
+    separator before processing.
+
+    For the purpose of this section, a "delimiter" is one or more characters
+    that mark the start or end of a "tag", such as "{", "}", "[", or "]". A
+    "tag" is container of instruction for colour formatting. There are
+    opening, and closing tag, such as "{/}"
+
+    For example:
 
         $self->colour_parse( "And {style => 'i|b', color => green}what about{/} {style => 'blink', color => yellow}me{/} ?" );
 
@@ -222,7 +300,196 @@ METHODS
     characters on white background and the word "embedded" in underline blue
     color
 
-    The idea for this syntax, not the code, is taken from Term::ANSIColor
+    The default prospective delimiters are "{", "}", "<", and ">". Those
+    default delimiters can be overriden by setting alternate ones using the
+    methods "colour_open", and "colour_close".
+
+    Delimiters must be non-empty scalar strings and should not be identical
+    to avoid ambiguity (a warning is issued if they are). Once a delimiter
+    pair is chosen for a string, it is used consistently throughout parsing,
+    and all other delimiter candidates are ignored for that parse run; mixed
+    delimiters, such as "{" and "<", are treated as literal content unless
+    they match the current delimiter pair.
+
+    Tags, that are made up of an opening and closing delimiters are used to
+    specify a colouring style, such as "bold", "underline", and colours,
+    such as "red", "rgb(255,255,255)". As shown above, "colour_parse"
+    supports two syntaxes for colour parameters.
+
+    1. natural
+        Uses a concise format with styles and colours separated by spaces,
+        optionally including a background colour with "on".
+
+            {bold light red on white}
+
+    2. hash-like
+        Uses Perl-like key-value pairs to specify styles and colours.
+
+            {style => 'bold', color => 'red'}
+
+        Only a subset of plain scalar values is allowed. Attempting to use
+        Perl expressions is not supported. Invalid or unsafe input is
+        treated as literal.
+
+    Tags must start with an alphabetic character (style or colour name)
+    immediately following the opening delimiter, with no leading whitespace.
+    For example, "{bold red}" is valid, but "{ bold red}" is treated as
+    literal text.
+
+        { bold red}   # INVALID, literal
+        {bold red}    # VALID
+
+    The method supports nested tags up to a maximum default depth of 10, but
+    can be changed using the method "colour_max_depth", and handles
+    malformed tags gracefully by either ignoring them or treating them as
+    literal text. In non-TTY environments (influenced by "force_tty" or
+    terminal detection with "_is_tty"), formatting tags are stripped, and
+    only the content is returned.
+
+    Perl variables like "${variable}" are preserved as literal text, as the
+    method ensures that "{" or "[" preceded by a "$" is not treated as a
+    formatting tag.
+
+   Supported Styles
+    The following styles are supported:
+
+    *   "bold" (or "b", "strong"): Bold text (ANSI: "\e[1m").
+
+    *   "italic" (or "i"): Italic text (ANSI: "\e[3m").
+
+    *   "underline" (or "u", "underlined"): Underlined text (ANSI: "\e[4m").
+
+    *   "blink": Blinking text (ANSI: "\e[5m").
+
+    *   "reverse" (or "r", "reversed"): Reverse video (ANSI: "\e[7m").
+
+    *   "conceal" (or "c", "concealed"): Concealed text (ANSI: "\e[8m").
+
+    *   "strike" (or "striked", "striken"): Strikethrough text (ANSI:
+        "\e[9m").
+
+    Multiple styles can be combined in key-value syntax using "|", such as
+    "style => 'bold|italic'".
+
+   Supported colours
+    Colours can be specified as:
+
+    *   Named colours: e.g., "red", "light blue", "bright green".
+
+    *   RGB: e.g., "rgb(255,255,255)" or "rgb(255255255)" (comma-less).
+
+    *   RGBA: e.g., "rgba(255,0,0,0.5)" for 50% opacity, blended with the
+        background (default: white).
+
+    Both 8-bit ("38;5;NNN" or "48;5;NNN") and 24-bit ("38;2;R;G;B" or
+    "48;2;R;G;B") ANSI codes are generated for compatibility.
+
+   Delimiter Rules
+    *   Default delimiters are "{" and "}" or "<" and ">" unless overridden
+        by "colour_open" and "colour_close".
+
+    *   Tags must start with a letter, such as "bold", "red" or be a closing
+        tag ("{/}").
+
+    *   A "$" prefix before "{" or "[" (e.g., "${variable}") prevents
+        interpretation as a tag.
+
+    *   Custom delimiters must be non-empty scalars and are used
+        consistently within a single string.
+
+    *   Mixed delimiters (e.g., "{bold red}A <underline green"/>) are
+        treated as literal content within the chosen delimiter pair.
+
+   Error Handling
+    *   Invalid tags (e.g., "{in valid}") are ignored, and their content is
+        returned without formatting.
+
+    *   Stray closing tags (e.g., "{/}") are treated as literal text.
+
+    *   Unclosed tags (e.g., "{bold red}text") apply formatting to the
+        remaining text.
+
+    *   Excessive nesting (beyond 10 levels) results in partial formatting
+        up to the limit, with remaining tags treated as literal.
+
+    *   Out-of-range RGB values (e.g., "rgb(300,-1,260)") are ignored, and
+        the tag is treated as literal.
+
+   Examples
+        my $m = Module::Generic->new;
+
+    *   Basic formatting with key-value syntax:
+
+            $m->colour_parse( "Hello {style => 'bold', color => 'red'}world{/}" );
+            # Returns: "Hello \e[38;5;224;1m\e[38;2;255;0;0;1mworld\e[m"
+
+    *   Compact syntax with background colour:
+
+            $m->colour_parse( "Text {bold light red on white}coloured{/} here" );
+            # Returns: "Text \e[38;5;224;48;5;255;1m\e[38;2;255;0;0;48;2;255;255;255;1mcoloured\e[m here"
+
+    *   Nested formatting:
+
+            $m->colour_parse( "Outer {bold red}inner {underline green}green{/} text{/}" );
+            # Returns: "Outer \e[38;5;224;1m\e[38;2;255;0;0;1minner \e[38;5;28;4m\e[38;2;0;255;0;4mgreen\e[m text\e[m"
+
+    *   RGB and RGBA colours:
+
+            $m->colour_parse( "Blue {underline rgb(0,0,255)}text{/}" );
+            # Returns: "Blue \e[38;5;3;4m\e[38;2;0;0;255;4mtext\e[m"
+            $m->colour_parse( "Red {bold rgba(255,0,0,0.5)}text{/}" );
+            # Returns: "Red \e[38;5;237;1m\e[38;2;255;128;128;1mtext\e[m" (blended with white background)
+
+    *   Preserving Perl variables and literal braces:
+
+            $m->colour_parse( 'Code ${variable} here' );
+            # Returns: "Code ${variable} here"
+            $m->colour_parse( "{bold red}code { x: 1 } here{/}" );
+            # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1mcode { x: 1 } here\e[m"
+
+    *   Malformed tags:
+
+            $m->colour_parse( "{in valid}text{/}" );
+            # Returns: "text"
+            $m->colour_parse( "{bold red}missing close" );
+            # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1mmissing close"
+
+        Be careful that in this last example, if the colour formatting is
+        not closed, the active colour formatting will affect any subsequent
+        output lines.
+
+    *   Deep nesting:
+
+            $m->colour_parse( "{bold red}{underline green}{underline green}deep{/}{/}{/}" );
+            # Returns: "\e[38;5;224;1m\e[38;2;255;0;0;1m\e[38;5;28;4m\e[38;2;0;255;0;4m\e[38;5;28;4m\e[38;2;0;255;0;4mdeep\e[m\e[m\e[m"
+
+    *   Custom delimiters:
+
+            $m->colour_open( '[[');
+            $m->colour_close(']]' );
+            $m->colour_parse( "Text [[bold red]]coloured[[/]]" );
+            # Returns: "Text \e[38;5;224;1m\e[38;2;255;0;0;1mcoloured\e[m"
+
+    *   Non-TTY environment (formatting stripped):
+
+            my $m = Module::Generic->new( force_tty => 0 );
+            $m->colour_parse( "{bold red}text{/}" );
+            # Returns: "text"
+
+    Note that this method uses ANSI escape codes for formatting, which may
+    not be supported by all terminals.
+
+    And, in non-TTY environments, all formatting is stripped, and only the
+    content within tags is returned. This is particularly necessary if,
+    instead of displaying those messages in a terminal, you redirect the
+    output to a file.
+
+    This method returns a string with ANSI escape codes applied for valid
+    formatting tags, or the content with tags stripped in non-TTY
+    environments. Malformed or unrecognised tags are either ignored or
+    treated as literal text.
+
+    See also Term::ANSIColor for ANSI escape code details.
 
   colour_to_rgb
     Convert a human colour keyword like "red", "green" into a rgb
@@ -391,6 +658,30 @@ METHODS
     Sets or gets an error number.
 
   error
+        my $o = Foo::Bar->new;
+        $o->do_something || return( $self->error( "Some error", "message." ) );
+        # or
+        $o->do_something || return( $self->error({
+            message => "Some error message.",
+            # will be loaded if necessary
+            class => 'My::Exception::Class',
+            # by default 'object' only
+            # it could also be simply 'all' to imply all the ones below
+            want => [qw( array code glob hash object scalar )],
+            debug => 4,
+            # code to execute upon error
+            callback => sub
+            {
+                # do some cleanup
+                $dbh->rollback if( $dbh->transaction );
+            },
+            # make it fatal
+            fatal => 1,
+            # When used inside an lvalue method
+            # lvalue => 1,
+            # assign => 1,
+        }) );
+
     Provided with a list of strings or an hash reference of parameters and
     this will set the current error issuing a Module::Generic::Exception
     object, call "warn" in perlfunc, or "$r-"warn> under Apache2 modperl,
@@ -416,7 +707,18 @@ METHODS
     If you want to use an hash reference instead, you can pass the following
     parameters. Any other parameters will be passed to the exception class.
 
-    *class*
+    *   "assign"
+
+        Boolean. Set this to a true value if this is called within an assign
+        method, such as one using lvalue.
+
+    *   "callback"
+
+        Specify a code reference such as a reference to a subroutine. This
+        is designed to be called upon error to do some cleanup for example.
+
+    *   "class"
+
         The package name or class to use to instantiate the error object. By
         default, it will use Module::Generic::Exception class or the one
         specified with the object property "_exception_class"
@@ -433,10 +735,29 @@ METHODS
         reason, "error" in Module::Generic will die since this would be an
         error within another error.
 
-    *message*
+    *   "debug"
+
+        Integer. Specify a value to set the debugging value for this
+        exception.
+
+    *   "fatal"
+
+        Boolean. Specify a true value to make this error fatal. This means
+        that instead of issuing a "warn", it will die.
+
+    *   "lvalue"
+
+        Boolean. Set this to a true value if this is called within an assign
+        method, such as one using lvalue.
+
+    *   "message"
+
+        Specify a string for the error message.
+
         The error message.
 
-    *want*
+    *   "want"
+
         An array reference of data types that you allow this method to
         return when such data type is expected by the original caller.
 
@@ -559,6 +880,16 @@ METHODS
             return( $self->SUPER::init( @_ ) );
         }
 
+  force_tty
+    Set or get this flag that specify whether the environment is running
+    under TTY or not. Normally, this is derived automatically with the
+    method "_is_tty", but you can use this method to force your code.
+
+    It is by default "undef". Set it to false to indicate your code is not
+    running under TTY, and a true value otherwise.
+
+    This is used in "colour_parse"
+
   get
     Uset to get an object data key value:
 
@@ -571,8 +902,8 @@ METHODS
     This is no more needed, as it has been more conveniently bypassed by the
     AUTOLOAD generic routine with which you may say:
 
-        $obj->verbose( 1 );
-        $obj->debug( 0 );
+        $obj->verbose(1);
+        $obj->debug(0);
         ## ...
         my $verbose = $obj->verbose();
 
@@ -739,16 +1070,19 @@ METHODS
     "message" also takes an optional hash reference as the last parameter
     with the following recognised options:
 
-    *caller_info*
+    *   "caller_info"
+
         This is a boolean value, which is true by default.
 
         When true, this will prepend the debug message with information
         about the caller of "message"
 
-    *level*
+    *   "level"
+
         An integer. Debugging level.
 
-    *message*
+    *   "message"
+
         The text of the debugging message. This is optional since this can
         be provided as first or consecutive arguments like in a list as
         demonstrated in the example above. This allows you to do something
@@ -760,15 +1094,18 @@ METHODS
 
             $self->message( { message => "Some debug message here", prefix => ">>", level => 2 });
 
-    *no_encoding*
+    *   "no_encoding"
+
         Boolean value. If true and when the debugging is set to be printed
         to a file, this will not set the binmode to "utf-8"
 
-    *prefix*
+    *   "prefix"
+
         By default this is set to "##". This value is used as the prefix
         used in debugging output.
 
-    *type*
+    *   "type"
+
         Type of debugging
 
   message_check
@@ -794,6 +1131,9 @@ METHODS
   message_frame
     Return the optional hash reference of parameters, if any, that can be
     provided as the last argument to "message"
+
+  messagec
+    This is an alias for "message_colour"
 
   messagef
     This works like "sprintf" in perlfunc, so provided with a format and a
@@ -876,6 +1216,93 @@ METHODS
     "convert_blessed" in JSON
     "relaxed" in JSON
 
+    Additional supported options are as follows, including any of the JSON
+    supported options:
+
+    *   "allow_blessed"
+
+        Boolean. When enabled, this will not return an error when it
+        encounters a blessed reference that JSON cannot convert otherwise.
+        Instead, a JSON "null" value is encoded instead of the object.
+
+    *   "allow_nonref"
+
+        Boolean. When enabled, this will convert a non-reference into its
+        corresponding string, number or null JSON value. Default is enabled.
+
+    *   "allow_tags"
+
+        Boolean. When enabled, upon encountering a blessed object, this will
+        check for the availability of the "FREEZE" method on the object's
+        class. If found, it will be used to serialise the object into a
+        nonstandard tagged JSON value (that JSON decoders cannot decode).
+
+    *   "allow_unknown"
+
+        Boolean. When enabled, this will not return an error when JSON
+        encounters values it cannot represent in JSON (for example,
+        filehandles) but instead will encode a JSON "null" value.
+
+    *   "ascii"
+
+        Boolean. When enabled, will not generate characters outside the code
+        range 0..127 (which is ASCII).
+
+    *   "canonical" or "ordered"
+
+        Boolean value. If true, the JSON data will be ordered. Note that it
+        will be slower, especially on a large set of data.
+
+    *   "convert_blessed"
+
+        Boolean. When enabled, upon encountering a blessed object, JSON will
+        check for the availability of the "TO_JSON" method on the object's
+        class. If found, it will be called in scalar context and the
+        resulting scalar will be encoded instead of the object.
+
+    *   "indent"
+
+        Boolean. When enabled, this will use a multiline format as output,
+        putting every array member or object/hash key-value pair into its
+        own line, indenting them properly.
+
+    *   "latin1"
+
+        Boolean. When enabled, this will encode the resulting JSON text as
+        latin1 (or iso-8859-1),
+
+    *   "max_depth"
+
+        Integer. This sets the maximum nesting level (default 512) accepted
+        while encoding or decoding. When the limit is reached, this will
+        return an error.
+
+    *   "pretty"
+
+        Boolean value. If true, the JSON data will be generated in a human
+        readable format. Note that this will take considerably more space.
+
+    *   "space_after"
+
+        Boolean. When enabled, this will add an extra optional space after
+        the ":" separating keys from values.
+
+    *   "space_before"
+
+        Boolean. When enabled, this will add an extra optional space before
+        the ":" separating keys from values.
+
+    *   "utf8"
+
+        Boolean. This option is ignored, because the JSON data are saved to
+        file using UTF-8 and double encoding would produce mojibake.
+
+  new_json_safe
+    This is the same as new_json, except that it uses Module::Generic::JSON,
+    which is a thin, and reliable wrapper around JSON. Module::Generic::JSON
+    never dies, but instead sets an error object, and returns "undef", or an
+    empty list depending on the caller context.
+
   new_null
     Returns a null value based on the expectations of the caller and thus
     without breaking the caller's call flow.
@@ -905,7 +1332,7 @@ METHODS
     Without using "new_null", if you return simply undef, like:
 
         my $val = $object->return_false->[0];
-    
+
         sub return_false { return }
 
     The above would trigger an error that the value returned by
@@ -919,15 +1346,15 @@ METHODS
         my $this = My::Object->new;
         my $val  = $this->call1;
         # return undef)
-    
+
         # object context
         $val = $this->call1->call_again;
         # $val is undefined
-    
+
         # hash reference context
         $val = $this->call1->fake->{name};
         # $val is undefined
-    
+
         # array reference context
         $val = $this->call1->fake->[0];
         # $val is undefined
@@ -1045,13 +1472,36 @@ METHODS
 
         return( $self->pass_error( $obj->error, { class => 'My::Exception', code => 400 } ) );
 
+    Or, you could also pass all parameters as an hash reference, such as:
+
+        return( $self->pass_error({
+            error => $obj->error,
+            class => 'My::Exception',
+            code => 400,
+        }) );
+
     Supported options are:
 
-    "class"
+    *   "callback"
+
+        A code reference, such as a subroutine reference or an anonymous
+        code that will be executed. This is designed to be used to do some
+        cleanup.
+
+    *   "class"
+
         The name of a class name to re-bless the error object provided.
 
-    "code"
+    *   "code"
+
         The error code to set in the error object being passed.
+
+    *   "error"
+
+        The error object to be passed on.
+
+        If this is not provided, it will get it with the object "error"
+        method, or the class global variable $ERROR
 
   quiet
     Set or get the object property *quiet* to true or false. If this is
@@ -1090,12 +1540,12 @@ METHODS
 
     The supported parameters are:
 
-    *   *append*
+    *   "append"
 
         Boolean. If true, the serialised data will be appended to the given
         file. This works only in conjonction with *file*
 
-    *   *base64*
+    *   "base64"
 
         Thise can be set to a true value like 1, or to your preferred base64
         encoder/decoder, or to an array reference containing 2 code
@@ -1111,23 +1561,23 @@ METHODS
         If this option is set and no appropriate module could be found,
         "serialise" will return an error.
 
-    *   *file*
+    *   "file"
 
         String. A file path where to store the serialised data.
 
-    *   *io*
+    *   "io"
 
         A file handle. This is used when the serialiser is
         Storable::Improved / Storable to call its function "store_fd" in
         Storable::Improved and "fd_retrieve" in Storable::Improved
 
-    *   *lock*
+    *   "lock"
 
         Boolean. If true, this will lock the file before writing to it. This
         works only in conjonction with *file* and the serialiser
         Storable::Improved
 
-    *   *serialiser* or *serializer*
+    *   "serialiser" or "serializer"
 
         A string being the class of the serialiser to use. This can be only
         either Sereal or Storable::Improved
@@ -1305,6 +1755,9 @@ SUPPORT METHODS
         Optional. A code reference like an anonymous subroutine that will be
         called with the class and an array reference of values provided, but
         possibly empty.
+
+        The current object is accessible in the callback as the special
+        variable $_
 
     This is a useful callback when the module instantiation either does not
     use the "new" method or does not simply take one or multiple arguments,
@@ -1622,6 +2075,18 @@ SUPPORT METHODS
   _is_hash
     Same as "_is_array", but for hash reference.
 
+    You can pass also the additional argument "strict", in which case, this
+    will apply only to non-objects.
+
+    For example:
+
+        my $hash = {};
+        say $this->_is_hash( $hash ); # true
+        my $obj = Foo::Bar->new;
+        say $this->_is_hash( $obj ); # true
+        # but...
+        say $this->_is_hash( $obj => 'strict' ); # false
+
   _is_integer
     Returns true if the value provided is an integer, or false otherwise. A
     valid value includes an integer starting with "+" or "-"
@@ -1659,6 +2124,21 @@ SUPPORT METHODS
     Module::Generic::Scalar object.
 
     An empty string or "undef" can be provided and will not be checked.
+
+  _is_version
+        my $vers = 'v1.2.3';
+        # or
+        my $vers = 1.2;
+        # or
+        my $vers = 5.006000
+
+        say $obj->_is_version( $vers ) ? "ok" : "not ok"; # ok
+
+    This takes a string, and checks if it looks like a version number based
+    on a regular expression taken from Changes::Version
+
+    Returns true (1) upon success or false 0 if the string does not look
+    like a version number.
 
   _list_symbols
         my $obj = My::Class->new;
@@ -1700,11 +2180,13 @@ SUPPORT METHODS
 
     Possible options are:
 
-    *caller*
+    *   "caller"
+
         The package name of the caller. If this is not provided, it will
         default to the value provided with "caller" in perlfunc
 
-    *no_import*
+    *   "no_import"
+
         Set to a true value and this will prevent the loaded module from
         importing anything into your namespace.
 
@@ -1712,9 +2194,30 @@ SUPPORT METHODS
 
             use My::Module ();
 
-    *version*
+    *   "version"
+
         The minimum version for this class to load. This value is passed
         directly to "use" in perlfunc
+
+   THREAD SAFETY WARNING
+    _load_class is mostly thread-safe, but dynamic class loading using
+    "eval" and "use" at runtime can pose risks in threaded environments.
+
+    Perl caches loaded modules, but if two threads try to load the same
+    module simultaneously, and the module performs initialization in "BEGIN"
+    blocks or via side effects in its import mechanism, this can lead to
+    race conditions or partial loading.
+
+   Safe Usage Recommendations
+    *   Call "_load_class" during application startup or before any threads
+        are spawned.
+
+    *   Avoid dynamically loading classes at runtime inside threads unless
+        you are certain the modules being loaded are themselves thread-safe
+        and have no side effects on import.
+
+    *   To ensure full safety, preload modules at initialization time using
+        "use" or call "_load_class" during the main thread's setup phase.
 
   _load_classes
     This will load multiple classes by providing it an array reference of
@@ -1723,6 +2226,24 @@ SUPPORT METHODS
 
     If one of those classes failed to load, it will return immediately after
     setting an "error".
+
+  _looks_like_path
+        my $path = 'C:\dir\file.txt';
+        my $path = 'C:/dir';
+        my $unc_share = '\\Server\Share\...';
+        my $path = '~john/some/where';
+        my $path = './foo';
+        my $path = '../bar';
+        # Windows style
+        my $path = '.\foo';
+        my $path = '..\bar';
+        my $path = 'config.json';
+        say $obj->_looks_like_path( $path ) ? "ok" : "not ok"; # ok
+
+    This takes a string, and checks conservatively if it looks like a file
+    path.
+
+    It returns true (1) upon success, and false (0) otherwise.
 
   _lvalue
     This provides a generic lvalue method that can be used both in assign
@@ -1819,6 +2340,22 @@ SUPPORT METHODS
   _set_get
         sub name { return( shift->_set_get( 'name', @_ ) ); }
 
+    or
+
+        sub name { return( shift->_set_get({
+            field => 'name',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object property name and some value and this will set
     or get that value for that property.
 
@@ -1828,7 +2365,52 @@ SUPPORT METHODS
     scalar context, it returns whatever the value is, such as array
     reference, hash reference or string, etc.
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
   _set_get_array
+        sub my_array { return( shift->_set_get_array( 'my_array', @_ ) ); }
+        my $ref = $self->my_array( @some_values );
+        my $ref = $self->my_array( $array_ref );
+
+    or
+
+        sub name { return( shift->_set_get_array({
+            field => 'name',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object property name and some data and this will store
     the data as an array reference.
 
@@ -1839,7 +2421,50 @@ SUPPORT METHODS
 
         sub products { return( shift->_set_get_array( 'products', @_ ) ); }
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
   _set_get_array_as_object
+        sub name { return( shift->_set_get_array_as_object( 'name', @_ ) ); }
+
+    or
+
+        sub name { return( shift->_set_get_array_as_object({
+            field => 'name',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object property name and some data and this will store
     the data as an object of Module::Generic::Array
 
@@ -1857,19 +2482,36 @@ SUPPORT METHODS
         $object->products->push( $new_product );
 
     Alternatively, you can pass an hash reference instead of an object
-    property to provide callbacks that will be called upon addition or
-    removal of value.
+    property to provide additional parameters, such as:
 
-    This hash reference can contain the following properties:
+    *   callbacks
 
-    callbacks
         An hash reference of operation type "add" (or "set")) to callback
         subroutine name or code reference pairs.
 
-    field
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   field
+
         The object property name
 
-    wantlist
+    *   wantlist
+
         Boolean. If true, then it will return a list in list context instead
         of the array object.
 
@@ -1888,6 +2530,22 @@ SUPPORT METHODS
 
   _set_get_boolean
         sub is_true { return( shift->_set_get_boolean( 'is_true', @_ ) ); }
+
+    or
+
+        sub name { return( shift->_set_get_boolean({
+            field => 'name',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     Provided with an object property name and some data and this will store
     the data as a boolean value.
@@ -1917,12 +2575,31 @@ SUPPORT METHODS
 
     This hash reference can contain the following properties:
 
-    field
+    *   "field"
+
         The object property name
 
-    callbacks
-        An hash reference of operation type "add" (or "set") to callback
-        subroutine name or code reference pairs.
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
 
     For example:
 
@@ -2140,7 +2817,7 @@ SUPPORT METHODS
 
             $obj->pointless();
 
-    See also Want for more on this context-rich information.
+    See also Wanted for more on this context-rich information.
 
   _set_get_class
     Given an object property name, a dynamic class fiels definition hash
@@ -2244,21 +2921,88 @@ SUPPORT METHODS
     above data.
 
   _set_get_class_array_object
-    Same as "=head2 _set_get_class_array", but this returns an array object
-    instead of just a perl array.
+    Same as "_set_get_class_array", but this returns an array object instead
+    of just a perl array.
 
     When called in list context, it will return its values as a list,
     otherwise it will return an array object
 
   _set_get_code
+        sub name { return( shift->_set_get_code( 'name', @_ ) ); }
+
+    or
+
+        sub name { return( shift->_set_get_code({
+            field => 'name',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object property name and some code reference and this
     stores and retrieve the current value.
 
-    It returns under and set an error if the provided value is not a code
+    It returns "undef" and set an error if the provided value is not a code
     reference.
+
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
 
   _set_get_datetime
         sub created_on { return( shift->_set_get_datetime( 'created_on', @_ ) ); }
+
+    or
+
+        sub created_on { return( shift->_set_get_datetime({
+            field => 'created_on',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+            # optionally specify a format to use for all objects
+            format => '%FT%TZ',
+            # Can also use 'time_zone'
+            tz => 'UTC',
+        }, @_ ) ); }
 
     Provided with an object property name and asome date or datetime string
     and this will attempt to parse it and save it as a DateTime object.
@@ -2284,8 +3028,131 @@ SUPPORT METHODS
     method produced by Module::Generic::Null. The return value of a method
     should always be checked.
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
+
+    *   "format"
+
+        An optional format that will be used to create a
+        DateTime::Format::Strptime that will be attached to the DateTime
+        object.
+
+    *   "tz"
+
+        A string representing the time zone for the the datetime.
+
+  _set_get_enum
+        sub choice { return( shift->_set_get_enum( 'choice', [qw( yes no )], @_ ) ); }
+        # or
+        sub choice : lvalue { return( shift->_set_get_enum({
+            field   => 'choice',
+            allowed => [qw( yes no )],
+            # case insensitive
+            case    => 0,
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
+    This support method handles "enum" values, i.e. a list of allowed values
+    that can be set.
+
+    It takes either a "field" name, and an array of "allowed" values; or an
+    hash reference with the following supported options:
+
+    *   "allowed"
+
+        An array reference of allowed values.
+
+    *   "case"
+
+        A boolean value as to whether the value received should be compared
+        in a case sensitive (true) or case insensitive (false) way against
+        the allowed value.
+
+        Thus, if true, an hypothetical value "yes" would match against the
+        "allowed" values "['yes', 'no']", but would fail if that value were
+        "YES"
+
+        Default is true.
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The field name.
+
   _set_get_file
         sub file { return( shift->_set_get_file( 'file', @_ ) ); }
+
+    or
+
+        sub file { return( shift->_set_get_file({
+            field => 'file',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     Provided with an object property name and a file and this will store the
     given file as a Module::Generic::File object.
@@ -2296,16 +3163,106 @@ SUPPORT METHODS
     Note that the files does not need to exist and it can also be a
     directory or a symbolic link or any other file on the system.
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
+
   _set_get_glob
         sub handle { return( shift->_set_get_glob( 'handle', @_ ) ); }
+
+    or
+
+        sub handle { return( shift->_se_set_get_globt_get({
+            field => 'handle',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     Provided with an object property name and a glob (file handle) and this
     will store the given glob.
 
     It returns "undef" and set an error if the provided value is not a glob.
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
+
   _set_get_hash
         sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
+
+    or
+
+        sub metadata { return( shift->_set_get_hash({
+            field => 'metadata',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     Provided with an object property name and an hash reference and this set
     the property name with this hash reference.
@@ -2320,8 +3277,53 @@ SUPPORT METHODS
 
         my $hash = $object->metadata;
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
+
   _set_get_hash_as_mix_object
         sub metadata { return( shift->_set_get_hash_as_mix_object( 'metadata', @_ ) ); }
+
+    or
+
+        sub metadata { return( shift->_set_get_hash_as_mix_object({
+            field => 'metadata',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     Provided with an object property name, and an optional hash reference
     and this returns a Module::Generic::Hash object, which allows to
@@ -2330,6 +3332,35 @@ SUPPORT METHODS
 
     This is different from "_set_get_hash_as_object" below whose keys and
     values are accessed as dynamic methods and method arguments.
+
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
 
   _set_get_hash_as_object
     Provided with an object property name, an optional class name and an
@@ -2359,8 +3390,32 @@ SUPPORT METHODS
 
         printf( "Customer name is %s\n", $object->metadata->last_name );
 
+   THREAD SAFETY
+    This method uses Module::Generic::Dynamic, and thus is not thread-safe.
+    It should be invoked only during initialization, before any threads are
+    spawned.
+
+    For safe usage in multi-threaded environments, avoid using dynamic class
+    creation features at runtime.
+
   _set_get_ip
         sub ip { return( shift->_set_get_ip( 'ip', @_ ) ); }
+
+    or
+
+        sub ip { return( shift->_set_get_ip({
+            field => 'ip',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     This helper method takes a value and check if it is a valid IP address
     using "_is_ip". If "undef" or zero-byte value is provided, it will
@@ -2372,6 +3427,35 @@ SUPPORT METHODS
     From there you can pass the result to Net::IP in your own code, assuming
     you have that module installed.
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
+
   _set_get_lvalue
     This is now an alias for "_set_get_callback"
 
@@ -2379,21 +3463,45 @@ SUPPORT METHODS
     Provided with an object property name and a number, and this will create
     a Module::Generic::Number object and return it.
 
-    As of version v0.13.0 it also works as a lvalue method. See perlsub
+    If an invalid value is provided (e.g., empty string, non-stringifiable
+    reference, or value failing the constraint), an error is returned,
+    accessible via the object's "error" method.
+
+    As of version "v0.13.0" it also works as a lvalue method. See perlsub
 
     In your module:
 
         package MyObject;
         use parent qw( Module::Generic );
-    
+
         sub level : lvalue { return( shift->_set_get_number( 'level', @_ ) ); }
+
+    # or
+
+        sub level : lvalue { return( shift->_set_get_number({
+            field => 'level',
+            check => sub {
+                my( $self, $value ) = @_;
+                # do some check here
+                return(1); # Do not forget to return true
+            },
+            constraint => 'unsigned_int',
+            # or
+            # constraint => qr/\d+/,
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     In the script using module "MyObject":
 
         my $obj = MyObject->new;
         $obj->level = 3; # level is now 3
         # or
-        $obj->level( 4 ) # level is now 4
+        $obj->level(4) # level is now 4
         print( "Level is: ", $obj->level, "\n" ); # Level is 4
         print( "Is it an odd number: ", $obj->level->is_odd ? 'yes' : 'no', "\n" );
         # Is it an od number: no
@@ -2407,8 +3515,95 @@ SUPPORT METHODS
 
     *   "callbacks"
 
-        An hash reference of operation type "add" (or "set") to callback
-        subroutine name or code reference pairs.
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "constraint"
+
+        Either a regular expression provided using the operator "qr//", or a
+        known token:
+
+        *       "bin", "binary"
+
+                A binary, supporting fractional values (e.g., 101.11) and
+                scientific notation (e.g., 101.11E-2).
+
+        *       "hex", "hexadecimal"
+
+                A hexadecimal, supporting fractional values (e.g., "FF.1A")
+                and scientific notation (e.g., "FF.1AE-2").
+
+        *       "int", "integer"
+
+        *       "long"
+
+                A long integer, i.e. an integer between "-2,147,483,648",
+                and "2,147,483,647"
+
+        *       "negative_int"
+
+                A negative integer
+
+        *       "oct", "octal"
+
+                An octal number, supporting fractional values (e.g., 77.33)
+                and scientific notation (e.g., 77.33E-2).
+
+        *       "short"
+
+                A short integer, i.e. an integer between "-32,768", and
+                "32,767"
+
+        *       "unsigned_int", "unsigned_integer", "positive_int"
+
+                An unsigned integer, on which is aliased a positive integer
+
+        *       "unsigned_long"
+
+                An unsigned long integer, i.e. an integer between 0, and
+                "4,294,967,295" (2^32-1)
+
+        *       "unsigned_real", "unsigned_dec", "unsigned_decimal",
+                "unsigned_float", "unsigned_double", "positive_real",
+                "positive_dec", "positive_decimal", "positive_float",
+                "positive_double"
+
+                A positive decimal number.
+
+        *       "unsigned_short"
+
+                An unsigned short integer, i.e. an integer between 0, and
+                "65,535" (2^16-1)
+
+        *       "real", "dec", "decimal", "double", "float"
+
+                A real number, on which is aliased decimal number,
+                double-precision number, and floating-point number
+
+        *       "signed_byte", "byte"
+
+                A signed byte, i.e., an integer between -128 and 127.
+
+        *       "unsigned_byte"
+
+                An unsigned byte, i.e., an integer between 0 and 255.
 
     *   "field"
 
@@ -2422,7 +3617,7 @@ SUPPORT METHODS
 
     For example:
 
-        sub length { return( shift->set_get_number({
+        sub length { return( shift->_set_get_number({
             field => 'length',
             callbacks => 
             {
@@ -2432,6 +3627,57 @@ SUPPORT METHODS
 
     The value of the callback can be either a subroutine name or a code
     reference.
+
+  _set_get_number_as_scalar
+        sub name { return( shift->_set_get_number_as_scalar( 'name', @_ ) ); }
+
+    or
+
+        sub name { return( shift->_set_get({
+            field => 'name',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
+    This sets or gets a number as a regular string, but checking the value
+    is indeed a number by using Regexp::Common
+
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
 
   _set_get_number_or_object
     Provided with an object property name and a number or an object and this
@@ -2447,6 +3693,10 @@ SUPPORT METHODS
             {
                 my( $class, $args ) = @_;
                 return( $class->new( $args->[0] ) );
+            },
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
             },
         }, My::Class, @_ ) ); }
 
@@ -2471,6 +3721,18 @@ SUPPORT METHODS
         would be set and "undef" would be returned in scalar context, or an
         empty list in list context.
 
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
     *   "field"
 
         The actual property name
@@ -2489,11 +3751,230 @@ SUPPORT METHODS
 
     It returns the object currently set, if any.
 
+  _set_get_object_array
+        sub mymethod { return( shift->_set_get_object_array( 'mymethod', 'Some::Module', @_ ) ); }
+        # or
+        sub mymethod { return( shift->_set_get_object_array({
+            field => 'mymethod',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->new( $args->[0] ) );
+            },
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks =>
+            {
+                array_add => sub
+                {
+                    my $def = shift( @_ );
+                    my( $pos, $ref ) = @$def{qw( start added )};
+                    return unless( blessed( $ref->[0] ) && $ref->[0]->isa( 'MyPackage') );
+                    return(1);
+                },
+                array_remove => sub
+                {
+                    my $def = shift( @_ );
+                    my( $start, $end ) = @$def{qw( start end )};
+                    printf( STDERR "Called from package %s at line %d\n", @{$def->{caller}}[0,2] );
+                    # Do some check to accept or reject
+                    return(1); # always return true to accept
+                },
+            },
+        }, 'Some::Module', @_ ) ); }
+
+    Provided with an object property name and a class/package name and
+    similar to "_set_get_object_array2" this will create an array reference
+    of objects.
+
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+    *   "callbacks"
+
+        Optional. An hash of keys-callbacks pairs. The supported callback
+        types are: "array_add", and "array_remove"
+
+        When set, those callbacks will be called when data is added or
+        removed to the array. Be careful that this may slow down your
+        application depending on the frequency of the array call, and what
+        the callback routine does.
+
+        See the "callback" in Module::Generic::Array for more information,
+        and also the methods "get_callback" in Module::Generic::Array, and
+        "has_callback" in Module::Generic::Array
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
+
+        sub emails { return( shift->_set_get_object_array({
+            field => 'emails',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->parse_bare_address( $args->[0] ) );
+            },
+        }, 'Email::Address::XS', @_ ) ); }
+
+  _set_get_object_array2
+        sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
+        # or
+        sub mymethod { return( shift->_set_get_object_array2({
+            field => 'mymethod',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->new( $args->[0] ) );
+            },
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+        }, 'Some::Module', @_ ) ); }
+
+    Provided with an object property name, a class/package name and some
+    array reference itself containing array references each containing hash
+    references or objects, and this will create an array of array of
+    objects.
+
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
+
+  _set_get_object_array_object
+    Provided with an object property name, a class/package name and some
+    data and this will create an array of object similar to
+    "_set_get_object_array", except the array produced is a
+    Module::Generic::Array
+
+    This method accepts the same arguments as "_set_get_object_array"
+
   _set_get_object_lvalue
     Same as "_set_get_object_without_init" but with the possibility of
     setting the object value as an lvalue method:
 
         $o->my_property = $my_object;
+
+  _set_get_object_variant
+        sub name { return( shift->_set_get_object_variant( 'name', @_ ) ); }
+
+    or
+
+        sub name { return( shift->_set_get_object_variant({
+            field => 'name',
+            check => sub {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
+    Provided with an object property name, a class/package name and some
+    data, and depending whether the data provided is an hash reference or an
+    array reference, this will either instantiate an object for the given
+    hash reference or an array of objects with the hash references in the
+    given array.
+
+    This means the value stored for the object property will vary between an
+    hash or array reference.
+
+    Alternatively, you can pass an hash reference, instead of the object
+    property name, with the following properties:
+
+    *   "field"
+
+        Mandatory. The object property name.
+
+    *   "callback"
+
+        Optional. A code reference like an anonymous subroutine that will be
+        called with the class and an array reference of values provided, but
+        possibly empty.
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    This is a useful callback when the module instantiation either does not
+    use the "new" method or does not simply take one or multiple arguments,
+    such as when the instantiation method would require an hash of
+    parameters, such as Email::Address::XS
+
+        sub emails { return( shift->_set_get_object_variant({
+            field => 'emails',
+            callback => sub
+            {
+                my( $class, $args ) = @_;
+                return( $class->parse_bare_address( $args->[0] ) );
+            },
+        }, 'Email::Address::XS', @_ ) ); }
 
   _set_get_object_without_init
         sub mymethod { return( shift->_set_get_object_without_init( 'mymethod', 'Some::Module', @_ ) ); }
@@ -2504,6 +3985,11 @@ SUPPORT METHODS
             {
                 my( $class, $args ) = @_;
                 return( $class->new( $args->[0] ) );
+            },
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
             },
         }, 'Some::Module', @_ ) ); }
         # then
@@ -2530,144 +4016,118 @@ SUPPORT METHODS
 
         Whatever this returns will set the value for this object property.
 
-    This is a useful callback when the module instantiation either does not
-    use the "new" method or does not simply take one or multiple arguments,
-    such as when the instantiation method would require an hash of
-    parameters, such as Email::Address::XS
+    *   "check"
 
-  _set_get_object_array2
-        sub mymethod { return( shift->_set_get_object_array2( 'mymethod', 'Some::Module', @_ ) ); }
-        # or
-        sub mymethod { return( shift->_set_get_object_array2({
-            field => 'mymethod',
-            callback => sub
-            {
-                my( $class, $args ) = @_;
-                return( $class->new( $args->[0] ) );
-            },
-        }, 'Some::Module', @_ ) ); }
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
 
-    Provided with an object property name, a class/package name and some
-    array reference itself containing array references each containing hash
-    references or objects, and this will create an array of array of
-    objects.
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
 
-    Alternatively, you can pass an hash reference, instead of the object
-    property name, with the following properties:
-
-    *   "field"
-
-        Mandatory. The object property name.
-
-    *   "callback"
-
-        Optional. A code reference like an anonymous subroutine that will be
-        called with the class and an array reference of values provided, but
-        possibly empty.
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
 
     This is a useful callback when the module instantiation either does not
     use the "new" method or does not simply take one or multiple arguments,
     such as when the instantiation method would require an hash of
     parameters, such as Email::Address::XS
-
-  _set_get_object_array
-        sub mymethod { return( shift->_set_get_object_array( 'mymethod', 'Some::Module', @_ ) ); }
-        # or
-        sub mymethod { return( shift->_set_get_object_array({
-            field => 'mymethod',
-            callback => sub
-            {
-                my( $class, $args ) = @_;
-                return( $class->new( $args->[0] ) );
-            },
-        }, 'Some::Module', @_ ) ); }
-
-    Provided with an object property name and a class/package name and
-    similar to "_set_get_object_array2" this will create an array reference
-    of objects.
-
-    Alternatively, you can pass an hash reference, instead of the object
-    property name, with the following properties:
-
-    *   "field"
-
-        Mandatory. The object property name.
-
-    *   "callback"
-
-        Optional. A code reference like an anonymous subroutine that will be
-        called with the class and an array reference of values provided, but
-        possibly empty.
-
-    This is a useful callback when the module instantiation either does not
-    use the "new" method or does not simply take one or multiple arguments,
-    such as when the instantiation method would require an hash of
-    parameters, such as Email::Address::XS
-
-        sub emails { return( shift->_set_get_object_array({
-            field => 'emails',
-            callback => sub
-            {
-                my( $class, $args ) = @_;
-                return( $class->parse_bare_address( $args->[0] ) );
-            },
-        }, 'Email::Address::XS', @_ ) ); }
-
-  _set_get_object_array_object
-    Provided with an object property name, a class/package name and some
-    data and this will create an array of object similar to
-    "_set_get_object_array", except the array produced is a
-    Module::Generic::Array
-
-    This method accepts the same arguments as "_set_get_object_array"
-
-  _set_get_object_variant
-    Provided with an object property name, a class/package name and some
-    data, and depending whether the data provided is an hash reference or an
-    array reference, this will either instantiate an object for the given
-    hash reference or an array of objects with the hash references in the
-    given array.
-
-    This means the value stored for the object property will vary between an
-    hash or array reference.
-
-    Alternatively, you can pass an hash reference, instead of the object
-    property name, with the following properties:
-
-    *   "field"
-
-        Mandatory. The object property name.
-
-    *   "callback"
-
-        Optional. A code reference like an anonymous subroutine that will be
-        called with the class and an array reference of values provided, but
-        possibly empty.
-
-    This is a useful callback when the module instantiation either does not
-    use the "new" method or does not simply take one or multiple arguments,
-    such as when the instantiation method would require an hash of
-    parameters, such as Email::Address::XS
-
-        sub emails { return( shift->_set_get_object_variant({
-            field => 'emails',
-            callback => sub
-            {
-                my( $class, $args ) = @_;
-                return( $class->parse_bare_address( $args->[0] ) );
-            },
-        }, 'Email::Address::XS', @_ ) ); }
 
   _set_get_scalar
         sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
+
+    or
+
+        sub name { return( shift->_set_get_scalar({
+            field => 'name',
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks =>
+            {
+                set => sub
+                {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
 
     Provided with an object property name, and a string, possibly a number
     or anything really and this will set the property value accordingly.
     Very straightforward.
 
+    Alternatively, you can pass an hash reference instead of an object
+    property to provide callbacks that will be called upon addition or
+    removal of value.
+
+    This hash reference can contain the following properties:
+
+    *   "field"
+
+        The object property name
+
+    *   "callbacks"
+
+        An hash reference of operation type "add" (or "set"), or "get" to
+        callback subroutine name or code reference pairs.
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    For example:
+
+        sub name { return( shift->set_get_scalar({
+            field => 'name',
+            callbacks => 
+            {
+                set => '_some_add_callback',
+                get => sub
+                {
+                    my $self = shift( @_ );
+                    # do something that returns a value.
+                },
+            },
+        }), @_ ); }
+
+    The value of the callback can be either a subroutine name or a code
+    reference.
+
     It returns the currently value stored.
 
   _set_get_scalar_as_object
+        sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
+
+    or
+
+        sub name { return( shift->_set_get_scalar_as_object({
+            field => 'name',
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => 
+            {
+                set => sub
+                {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object property name, and a string or a scalar
     reference and this stores it as an object of Module::Generic::Scalar
 
@@ -2697,12 +4157,26 @@ SUPPORT METHODS
 
     This hash reference can contain the following properties:
 
-    field
+    *   "field"
+
         The object property name
 
-    callbacks
-        An hash reference of operation type "add" (or "set") to callback
-        subroutine name or code reference pairs.
+    *   "callbacks"
+
+        An hash reference of operation type "add" (or "set"), or "get" to
+        callback subroutine name or code reference pairs.
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
 
     For example:
 
@@ -2729,16 +4203,59 @@ SUPPORT METHODS
         sub uri { return( shift->_set_get_uri( 'uri', @_ ) ); }
         sub uri { return( shift->_set_get_uri( { field => 'uri', class => 'URI::Fast' }, @_ ) ); }
 
+    or
+
+        sub uri { return( shift->_set_get_uri({
+            field => 'uri',
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks => 
+            {
+                set => sub
+                {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object property name, and an uri and this creates an
     URI object and sets the property value accordingly.
 
     Alternatively, the property name can be an hash with the following
     properties:
 
-    *field*
+    *   "field"
+
         The object property name
 
-    *class*
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "class"
+
         The URI class to use. By default, URI, but you could also use
         URI::Fast, or other class of your choice. That class will be loaded,
         if it is not loaded already.
@@ -2751,6 +4268,27 @@ SUPPORT METHODS
     Module::Generic::Null object ?
 
   _set_get_uuid
+        sub id { return( shift->_set_get_uuid( 'id', @_ ) ); }
+
+    or
+
+        sub id { return( shift->_set_get_uuid({
+            field => 'id',
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks =>
+            {
+                set => sub
+                {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object, a property name, and an UUID (Universal Unique
     Identifier) and this stores it as an object of Module::Generic::Scalar.
 
@@ -2761,6 +4299,35 @@ SUPPORT METHODS
     Module::Generic::Null object that prevents perl error that whatever
     method follows was called on an undefined value.
 
+    Alternatively, you can provide an hash reference instead of a field
+    name, and pass additional parameters, such as:
+
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "field"
+
+        The object property name
+
   _set_get_version
         sub version { return( shift->_set_get_version( 'version', @_ ) ); }
         # or
@@ -2768,16 +4335,58 @@ SUPPORT METHODS
         # or
         sub version : lvalue { return( shift->_set_get_version( { field => 'version', class => 'Perl::Version' }, @_ ) ); }
 
+    or
+
+        sub version { return( shift->_set_get_version({
+            field => 'version',
+            check => sub
+            {
+                my( $self, $value ) = @_; # do some check
+                return(1); # Do not forget to return true
+            },
+            callbacks =>
+            {
+                set => sub {
+                    my( $self, $value ) = @_;
+                    # Do something here with the value set.
+                },
+            },
+        }, @_ ) ); }
+
     Provided with an object, a property name, and a version string and this
     stores it as an object of version by default.
 
     Alternatively, the property name can be an hash with the following
     properties:
 
-    *field*
+    *   "field"
+
         The object property name
 
-    *class*
+    *   "check"
+
+        A "check" anonymous subroutine that will be called with 2 arguments,
+        the current object, and the value being set, but before it is set.
+
+        If this callback returns false, then an error of "Invalid value
+        provided." will be returned, so make sure to return true to indicate
+        that the check passed.
+
+        The callback can die, and it will be caught, and be interpreted as
+        "false"
+
+    *   "callbacks"
+
+        An hash reference of callbacks. You can use either "set" or "add"
+        whichever you prefer.
+
+        The callback will be called with the current object, and the value
+        that has already been set.
+
+        Any fatal exception during the callback will not be caught.
+
+    *   "class"
+
         The version class to use. By default, version, but you could also
         use Perl::Version, or other class of your choice. That class will be
         loaded, if it is not loaded already.
@@ -2801,6 +4410,227 @@ SUPPORT METHODS
     that class already, and return it, or else it will return an empty
     string or undef whatever you will have set in your object for this
     property.
+
+  _set_symbol
+        $o->_set_symbol(
+            # class defaults to the current object class
+            variable => '$some_scalar_ref',
+            # variable value defaults to scalar reference to undef
+            # or [], {}, sub{} depending on the variable type
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            variable => '$some_scalar_name',
+            value => \"some string reference",
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            variable => '@some_array_name',
+            value => $an_array_reference,
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            variable => '%some_array_name',
+            value => $an_hash_reference,
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            variable => '&some_sub_name',
+            value => $a_code_reference,
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            # explicitly specify the variable type
+            type => 'hash',
+            variable => '$some_hash_name',
+            value => $an_hash_reference,
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            type => 'array',
+            variable => '$some_array_name',
+            value => $an_array_reference,
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            type => 'scalar',
+            variable => '$some_array_name',
+            value => $a_scalar_reference,
+        );
+        # or
+        $o->_set_symbol(
+            class => 'Foo::Bar',
+            type => 'code',
+            variable => '$some_sub_name',
+            # Like \&some_thing, or maybe sub{ # do something here }
+            value => $a_code_reference,
+        );
+
+    This method is used to dynamically add a new symbol to a given class,
+    a.k.a. package. A proper symbol type can only be an array reference, an
+    hash reference, a scalar, a code reference, or a glob. This is useful
+    for metaprogramming or creating dynamically extensible APIs.
+
+    This takes the following options:
+
+    *   "class"
+
+        The class, or package name to add the new symbol to.
+
+    *   "end_line"
+
+        An integer to specify the end line of the the code reference,
+        represented by the variable, in the class provided. If none is
+        provided, the value for "start_line" will be used.
+
+    *   "filename"
+
+        An optional filename to associate the new symbol with. For example
+        "/some/where/file.pl"
+
+        This is only used when perl debugging is enabled and for variables
+        that are code reference.
+
+        If no filename is provided, it will default to the value returned by
+        "caller" in perlfunc
+
+    *   "start_line"
+
+        An integer to specify the start line of the code reference,
+        represented by the variable, in the class provided.
+
+        If no start line is provided, it will default to 0.
+
+    *   "type"
+
+        Optional. Explicitly define the type of the symbol: "scalar",
+        "array", "hash", "code", or "glob". This can override the sigil
+        detection logic.
+
+        If this is not explicitly specified, the type will be derived from
+        the sigil, i.e. the first character of the variable name.
+
+        The sigil will determine how the variable will be accessed from the
+        package name. For example:
+
+            $o->_set_symbol(
+                class => 'Foo::Bar',
+                variable => '@some_array',
+                value => [qw( John Peter Paul )],
+            );
+
+        The @Foo::Bar::some_array is accessible, but not
+        $Foo::Bar::some_array, but if you do:
+
+            $o->_set_symbol(
+                class => 'Foo::Bar',
+                variable => '$some_array',
+                value => [qw( John Peter Paul )],
+            );
+
+        then, $Foo::Bar::some_array is accessible, but not
+        @Foo::Bar::some_array
+
+        If you prefer providing a variable with a dollar for the name,
+        because you use a reference, it is ok too. The type will be derived
+        from the value you provide if the value is an array, a code
+        reference or an hash.
+
+        There will be a slight difference in the symbol table. Variable
+        starting with "%", or "@" can only then be retrieved with the same
+        sigil. If an array, hash or code reference variable is stored with
+        "$", it will be stored as "REF", and must be dereferenced when the
+        symbol is later retrieved. For example:
+
+            $o->_set_symbol(
+                variable => '$some_array_name',
+                value => [qw( John Peter Paul )],
+            );
+            my $sym = $o->_get_symbol( '$some_array_name' );
+            my $ref = $$sym;
+            say "@$ref"; # John Peter Paul
+
+        Whereas:
+
+            $o->_set_symbol(
+                variable => '@some_array_name',
+                value => [qw( John Peter Paul )],
+            );
+            my $sym = $o->_get_symbol( '@some_array_name' );
+            say "@$sym"; # John Peter Paul
+
+        Acceptable value types are: "array", "code", "glob", "hash", or
+        "scalar", but also "lvalue", "regexp", and "vstring"
+
+    *   "value"
+
+        A reference to the value you want to assign to that new symbol. For
+        example, a scalar reference, an arrayref, a coderef, etc.
+
+        If the value is not suitable for the new symbol, an error is
+        returned.
+
+    *   "variable"
+
+        A variable including its "sigil", i.e. the first character of a
+        variable name, such as "$", "%", "@", or "&"
+
+    See also "_get_symbol" to retrieve the symbol set.
+
+   THREAD SAFETY WARNING
+    _set_symbol is not thread-safe. It modifies the package's symbol table
+    (via "*{...}" operations), which is global and shared across all
+    threads.
+
+    Injecting or redefining symbols dynamically after threads have been
+    created can cause race conditions, unexpected behavior, or crashes.
+
+   Safe Usage Recommendations
+    *   Call "_set_symbol" *only before* any threads are created (i.e.,
+        during startup/init phase).
+
+    *   Avoid calling this method at runtime inside threads or shared
+        libraries if thread safety is a concern.
+
+    *   If using with threads, consider guarding symbol modification with
+        external synchronization (e.g., a global mutex). However, this
+        cannot prevent race conditions if the symbol is already in use.
+
+   Possible Safer Alternatives
+    Per-object or closure-based dispatch may be preferable if your use case
+    allows:
+
+        $object->{some_accessor} = sub { ... };
+
+    Or use a dynamic delegation pattern via AUTOLOAD:
+
+        sub AUTOLOAD {
+            my $method = our $AUTOLOAD;
+            return $self->{dynamic_methods}{$method}->(@_);
+        }
+
+    However, if you truly need to define package-level symbols, this method
+    remains appropriate; just observe the threading caveats above.
+
+  _str_val
+        my $str = $self->_str_val( $some_object );
+
+    This takes a value, possibly an object, especially one that stringifies,
+    and it returns its string representation.
+
+    This does the same thing as "overload::StrVal", expect it handles
+    undefined value, and is called on your class object.
+
+    If the value provided is "undef", or if no value was provided at all,
+    this will simply return an empty string ''. This is designed so perl
+    will not warn of undefined value being used.
 
   _to_array_object
     Provided with arguments or not, and this will return a
@@ -2910,6 +4740,10 @@ ERROR & EXCEPTION HANDLING
     you can use the try-catch block using an experimental feature "use
     feature 'try';", but this does not support "catch" by exception class.
 
+    Note that all helper methods such as "_set_get_*". when used as mutator,
+    meaning when some values are set successfully, will clear any previous
+    error set. When used as accessor, any previous error set will remain.
+
 SERIALISATION
     The modules in the Module::Generic distribution all supports
     Storable::Improved (or the legacy Storable), Sereal and CBOR
@@ -2940,6 +4774,445 @@ SERIALISATION
     modules will work too, since this option enables support for the
     "FREEZE" and "THAW" methods.
 
+CLASS FUNCTIONS
+  create_class
+    Dynamically creates a Perl package with inheritance, optionally
+    injecting getter/setter methods for a variety of data types, including
+    objects, arrays, and more.
+
+    This method is provided by Module::Generic and can be called directly or
+    via the "UNIVERSAL" namespace.
+
+        create_class My::Package extends => 'Other::Package';
+        create_class My::Package extends => 'Other::Package', method =>
+        {
+            since => 'datetime',
+            uri => 'uri',
+            tags => 'array_object',
+            meta => 'hash',
+            active => 'boolean',
+            callback => 'code',
+            config => 'file',
+            allowed_from => 'ip',
+            total => 'number',
+            id => 'uuid',
+            version => 'version',
+            filehandle => 'glob',
+            object => { type => 'object', class => 'Some::Class' },
+            customer => 
+            {
+                type => 'class',
+                def =>
+                {
+                    id => 'uuid',
+                    since => 'datetime',
+                    name => 'scalar_as_object',
+                    age => 'decimal',
+                }
+            }
+        };
+
+    Provided with a class name and an optional hash or hash reference of
+    options, and this will create that class possibly with the requested
+    methods.
+
+    Supported options are:
+
+    *   "extends"
+
+        This represents a parent class to inherit from. If none is provided,
+        it will inherit from Module::Generic by default.
+
+        You may also use the synonym "parent" instead of "extends" if you
+        prefer.
+
+    *   "method" or "methods"
+
+        A hash reference of method name to their definition, which may be
+        either a string representing a method "type", or a hash reference,
+        including a "type" property.
+
+        Possible method types supported are:
+
+        *       "array"
+
+                Will use the method "_set_get_array"
+
+        *       "array_as_object"
+
+                Will use the method "_set_get_array_as_object"
+
+        *       "boolean"
+
+                Will use the method "_set_get_boolean"
+
+        *       "class"
+
+                    create_class My::Class method =>
+                    {
+                        # Will automatically create, when needed, a class My::Class::Customer
+                        # with the following methods:
+                        customer => 
+                        {
+                            type => 'class',
+                            def =>
+                            {
+                                id => 'uuid',
+                                since => 'datetime',
+                                name => 'scalar_as_object',
+                                age => 'decimal',
+                            }
+                        }
+                    };
+                    # Then, you could use it like this:
+                    my $obj = My::Class->new;
+                    my $cust = $obj->customer(
+                        # A Module::Generic::Scalar object
+                        name => 'John Doe',
+                        id => 'c47e1113-8336-4437-ba20-54f8cd0afb18',
+                        # A DateTime object
+                        since => 'now',
+                        # A Module::Generic::Number object
+                        age => 32,
+                    );
+                    say $obj->name, " is ", $obj->age, " years old.";
+
+                Will use the method "_set_get_class" that dynamically
+                creates object classes based on the method name it is called
+                upon.
+
+                If the class name provided is not already loaded, it will be
+                created dynamically using "create_class".
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "def" or "definition"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+                See also "class_array" and "class_array_object".
+
+        *       "class_array"
+
+                Will use the method "_set_get_class_array" to return a
+                conventional perl array of specified object class.
+
+                If the class name provided is not already loaded, it will be
+                created dynamically using "create_class".
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "def" or "definition"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+        *       "class_array_object"
+
+                Will use the method "_set_get_class_array_object" to return
+                an object array of specified object class.
+
+                If the class name provided is not already loaded, it will be
+                created dynamically using "create_class".
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "def" or "definition"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+        *       "code"
+
+                Will use the method "_set_get_code"
+
+        *       "datetime"
+
+                Will use the method "_set_get_datetime"
+
+        *       "decimal"
+
+                Will use the method "_set_get_number"
+
+        *       "file"
+
+                Will use the method "_set_get_file"
+
+        *       "float"
+
+                Will use the method "_set_get_number"
+
+        *       "glob"
+
+                Will use the method "_set_get_glob"
+
+        *       "hash"
+
+                Will use the method "_set_get_hash"
+
+        *       "hash_as_object"
+
+                Will use the method "_set_get_hash_as_mix_object"
+
+        *       "integer"
+
+                Will use the method "_set_get_number"
+
+        *       "ip"
+
+                Will use the method "_set_get_ip"
+
+        *       "long"
+
+                Will use the method "_set_get_number"
+
+        *       "number"
+
+                Will use the method "_set_get_number"
+
+        *       "object"
+
+                Will use the method "_set_get_object"
+
+                This means that if the method is chained, it will
+                instantiate automatically a new object, if none is set yet.
+                If you want to not automatically instantiate an object, use
+                the type "object_no_init" instead.
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "class" or "packages"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+        *       "object_array"
+
+                Will use the method "_set_get_object_array"
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "class" or "packages"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+        *       "object_array_object"
+
+                Will use the method "_set_get_object_array_object"
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "class" or "packages"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+        *       "object_no_init"
+
+                Will use the method "_set_get_object_without_init"
+
+                This means that if the method is chained, instead of
+                instantiating automatically a new object, it will return
+                instead Module::Generic::Null. If you want to automatically
+                instantiate an object, use the type "object"
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "class" or "packages"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+        *       "scalar"
+
+                Will use the method "_set_get_scalar"
+
+        *       "scalar_as_object"
+
+                Will use the method "_set_get_scalar_as_object"
+
+        *       "scalar_or_object"
+
+                Will use the method "_set_get_scalar_or_object"
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "class" or "packages"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+        *       "uri"
+
+                Will use the method "_set_get_uri"
+
+        *       "uuid"
+
+                Will use the method "_set_get_uuid"
+
+        *       "version"
+
+                Will use the method "_set_get_version"
+
+                For this "type", you will also need to provide 1 other
+                property:
+
+                1. "def" or "definition"
+                            A hash reference used for the definition of this
+                            dynamic class.
+
+   Shortcut Usage
+    Instead of a full method definition, you may use a simple string:
+
+        methods => 
+        {
+            name => 'scalar',
+            age  => 'integer'
+        }
+
+    This is equivalent to:
+
+        methods => 
+        {
+            name => { type => 'scalar' },
+            age  => { type => 'integer' }
+        }
+
+   Return Value
+    Upon success, it returns the fully qualified class name created, or the
+    already-loaded class if it existed.
+
+    Upon error, it sets an error object, and returns an empty list in list
+    context, or "undef" in scalar context, so you can do:
+
+        create_class( My::Package, @sone_arguments ) || die( Module::Generic->error );
+
+THREAD & PROCESS SAFETY
+    This module is thread-safe. All shared internal variables are properly
+    protected using Module::Generic::Global, which employs threads::shared
+    and "lock" when Perl ithreads support is available, or APR::ThreadRWLock
+    when running under mod_perl with threaded MPMs (Worker or Event). In
+    non-threaded environments, locking operations are skipped automatically.
+
+    Errors are stored using Module::Generic::Global, which provides
+    thread/process-safe global storage with automatic locking and
+    serialisation.
+
+    There are various scenarios under which we need to be careful about
+    global variables and they are:
+
+    1. Perl is non-threaded
+        This is safe. No global variables are shared
+
+    2. Perl is built as threaded
+        If the code runs inside a thread, then we ensure thread-safety of
+        global variables, otherwise they are safe. We check for this even
+        during runtime using "HAS_THREADS" below.
+
+    3. Perl is running under Apache2/modperl with Prefork
+        Apache/modperl creates separate instances of the global variables,
+        and there is no risk of collision.
+
+    4. Perl is running under Apache/modperl with Worker or Event MPM
+    <https://httpd.apache.org/docs/2.4/en/mod/worker.html> (Multi-Processing
+    Module)
+        This setup requires that your version of Perl be compiled with
+        "ithreads" (Interpreter Threads) enabled as documented in the
+        modperl documentation
+        <https://perl.apache.org/docs/2.0/user/install/install.html#item_Thr
+        eaded_MPMs>
+
+        Since there is a risk of collision of global variables,
+        Module::Generic::Global detects it, and uses threads::shared or
+        APR::ThreadRWLock as necessary.
+
+  Thread Checking
+    This module provides subroutines to check thread support and usage, used
+    internally for thread-safe error handling and other operations. These
+    are imported from Module::Generic::Global via "use
+    Module::Generic::Global ':const'".
+
+    CAN_THREADS
+        A constant indicating whether Perl is compiled with thread support
+        ($Config{useithreads}). Returns 1 if threads are supported, 0
+        otherwise.
+
+            if( Module::Generic::CAN_THREADS )
+            {
+                print( "Perl supports threads\n" );
+            }
+
+    HAS_THREADS
+        A subroutine (not a constant) that returns 1 if Perl supports
+        threads and the "threads" module is loaded ($INC{'threads.pm'}), 0
+        otherwise. Evaluated at runtime to detect dynamic loading of
+        "threads".
+
+            if( Module::Generic::HAS_THREADS )
+            {
+                print( "Threads are in use\n" );
+            }
+
+        Note that some modules, such as forks, may manipulate %INC to
+        emulate "threads". In such cases, "HAS_THREADS" may return 1 even if
+        "threads.pm" is not loaded. This is typically safe, as "forks"
+        provides a compatible "tid" method, but in untrusted environments,
+        consider additional checks (e.g., verifying $INC{'threads.pm'}
+        points to the actual "threads.pm").
+
+    IN_THREAD
+        A subroutine (not a constant) that returns 1 if Perl supports
+        threads, the "threads" module is loaded, and the current execution
+        is in a child thread ("threads-"tid != 0>), 0 otherwise. Evaluated
+        at runtime.
+
+            if( Module::Generic::IN_THREAD() )
+            {
+                print( "Running in a child thread\n" );
+            }
+
+  Thread-Safety Considerations
+    The "HAS_THREADS" and "IN_THREAD" subroutines rely on $INC{'threads.pm'}
+    to detect thread usage. While this is reliable for standard Perl modules
+    like "threads", some modules (e.g., forks) may set $INC{'threads.pm'} to
+    emulate thread behaviour. In such cases, "HAS_THREADS" and "IN_THREAD"
+    may return 1 when forks is loaded instead of threads. Since forks
+    provides a compatible "tid" method, this is generally safe.
+
+    Errors are stored in both instance-level ("$self->{error}") and
+    class-level ("Module::Generic::Global" repository under the "errors"
+    namespace) storage to support patterns like "My::Module->new || die(
+    My::Module->error )". Each class-process-thread combination (keyed by
+    "class;pid;tid" or "class;pid") has at most one error in the repository,
+    as subsequent errors overwrite the previous entry, preventing memory
+    growth.
+
+    In mod_perl environments with Prefork MPM, errors are per-process,
+    behaving like a non-threaded environment, requiring no additional
+    handling. In threaded MPMs (Worker or Event), threads within a process
+    share the error repository, necessitating thread-safety. Since
+    mod_perl’s threaded MPMs require Perl to be compiled with thread support
+    ($Config{useithreads} is true), the repository is made thread-safe using
+    "threads::shared" and "CORE::lock". If nevertheless, somehow threads is
+    not loaded, a warning is issued, indicating potential data corruption in
+    concurrent access scenarios.
+
+    In untrusted or complex environments where %INC manipulation is a
+    concern, you may wish to add custom checks (e.g., verifying
+    $INC{'threads.pm'} points to "threads.pm" rather than "forks.pm"). For
+    most applications, the default behaviour is sufficient, as forks and
+    similar modules are designed to be compatible with threads.
+
+    Warning: When using mod_perl with threaded MPMs, certain Perl functions
+    and operations may be unsafe or affect all threads in a process. Users
+    should consult perlthrtut <http://perldoc.perl.org/perlthrtut.html> and
+    the mod_perl documentation
+    <https://perl.apache.org/docs/2.0/user/coding/coding.html#Thread_environ
+    ment_Issues> for details on thread-unsafe functions and thread-locality
+    issues.
+
 SEE ALSO
     Module::Generic::Exception, Module::Generic::Array,
     Module::Generic::Scalar, Module::Generic::Boolean,
@@ -2953,7 +5226,7 @@ AUTHOR
     Jacques Deguest <jack@deguest.jp>
 
 COPYRIGHT & LICENSE
-    Copyright (c) 2000-2020 DEGUEST Pte. Ltd.
+    Copyright (c) 2000-2024 DEGUEST Pte. Ltd.
 
     You can use, copy, modify and redistribute this package and associated
     files under the same terms as Perl itself.

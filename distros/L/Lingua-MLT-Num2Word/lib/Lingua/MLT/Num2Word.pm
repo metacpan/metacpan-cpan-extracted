@@ -16,7 +16,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -259,7 +259,7 @@ Lingua::MLT::Num2Word - Number to word conversion in Maltese
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::MLT::Num2Word is module for converting numbers into their written
 representation in Maltese (Malti). Converts whole numbers from 0 up to

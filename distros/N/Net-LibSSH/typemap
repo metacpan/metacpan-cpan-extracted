@@ -1,0 +1,51 @@
+TYPEMAP
+Net::LibSSH          T_NET_LIBSSH
+Net::LibSSH::Channel T_NET_LIBSSH_CHANNEL
+Net::LibSSH::SFTP    T_NET_LIBSSH_SFTP
+
+INPUT
+T_NET_LIBSSH
+	{
+	SV *_sv = $arg;
+	MAGIC *_mg = SvROK(_sv) && SvMAGICAL(SvRV(_sv))
+	    ? mg_findext(SvRV(_sv), PERL_MAGIC_ext, &Net__LibSSH_magic) : NULL;
+	if (_mg)
+	    $var = (Net__LibSSH)(void *)_mg->mg_ptr;
+	else
+	    Perl_croak(aTHX_ \"%s: not a valid Net::LibSSH object\", \"${pname}\");
+	}
+
+T_NET_LIBSSH_CHANNEL
+	{
+	SV *_sv = $arg;
+	MAGIC *_mg = SvROK(_sv) && SvMAGICAL(SvRV(_sv))
+	    ? mg_findext(SvRV(_sv), PERL_MAGIC_ext, &Net__LibSSH__Channel_magic) : NULL;
+	if (_mg)
+	    $var = (Net__LibSSH__Channel)(void *)_mg->mg_ptr;
+	else
+	    Perl_croak(aTHX_ \"%s: not a valid Net::LibSSH::Channel object\", \"${pname}\");
+	}
+
+T_NET_LIBSSH_SFTP
+	{
+	SV *_sv = $arg;
+	MAGIC *_mg = SvROK(_sv) && SvMAGICAL(SvRV(_sv))
+	    ? mg_findext(SvRV(_sv), PERL_MAGIC_ext, &Net__LibSSH__SFTP_magic) : NULL;
+	if (_mg)
+	    $var = (Net__LibSSH__SFTP)(void *)_mg->mg_ptr;
+	else
+	    Perl_croak(aTHX_ \"%s: not a valid Net::LibSSH::SFTP object\", \"${pname}\");
+	}
+
+OUTPUT
+T_NET_LIBSSH
+	sv_magicext(newSVrv($arg, \"Net::LibSSH\"), NULL, PERL_MAGIC_ext,
+	    &Net__LibSSH_magic, (const char *)$var, 0);
+
+T_NET_LIBSSH_CHANNEL
+	sv_magicext(newSVrv($arg, \"Net::LibSSH::Channel\"), NULL, PERL_MAGIC_ext,
+	    &Net__LibSSH__Channel_magic, (const char *)$var, 0);
+
+T_NET_LIBSSH_SFTP
+	sv_magicext(newSVrv($arg, \"Net::LibSSH::SFTP\"), NULL, PERL_MAGIC_ext,
+	    &Net__LibSSH__SFTP_magic, (const char *)$var, 0);

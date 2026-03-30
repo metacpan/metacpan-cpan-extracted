@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = lav_numerals();
 
 # }}}
@@ -97,6 +97,93 @@ sub lav_numerals {
 
 # }}}
 
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Latvian ordinals are adjectival with -ais (masc) / -ā (fem) endings.
+    # Fully suppletive stems for most ordinals.
+    # Compounds: space-separated, only last element is ordinal.
+
+    my %ordinal_to_cardinal = (
+        'pirmais'     => 'viens',
+        'pirmā'       => 'viens',
+        'otrais'      => 'divi',
+        'otrā'        => 'divi',
+        'trešais'     => 'trīs',
+        'trešā'       => 'trīs',
+        'ceturtais'   => 'četri',
+        'ceturtā'     => 'četri',
+        'piektais'    => 'pieci',
+        'piektā'      => 'pieci',
+        'sestais'     => 'seši',
+        'sestā'       => 'seši',
+        'septītais'   => 'septiņi',
+        'septītā'     => 'septiņi',
+        'astotais'    => 'astoņi',
+        'astotā'      => 'astoņi',
+        'devītais'    => 'deviņi',
+        'devītā'      => 'deviņi',
+        'desmitais'   => 'desmit',
+        'desmitā'     => 'desmit',
+        # Teens
+        'vienpadsmitais'  => 'vienpadsmit',
+        'vienpadsmitā'    => 'vienpadsmit',
+        'divpadsmitais'   => 'divpadsmit',
+        'divpadsmitā'     => 'divpadsmit',
+        'trīspadsmitais'  => 'trīspadsmit',
+        'trīspadsmitā'    => 'trīspadsmit',
+        'četrpadsmitais'  => 'četrpadsmit',
+        'četrpadsmitā'    => 'četrpadsmit',
+        'piecpadsmitais'  => 'piecpadsmit',
+        'piecpadsmitā'    => 'piecpadsmit',
+        'sešpadsmitais'   => 'sešpadsmit',
+        'sešpadsmitā'     => 'sešpadsmit',
+        'septiņpadsmitais' => 'septiņpadsmit',
+        'septiņpadsmitā'   => 'septiņpadsmit',
+        'astoņpadsmitais'  => 'astoņpadsmit',
+        'astoņpadsmitā'    => 'astoņpadsmit',
+        'deviņpadsmitais'  => 'deviņpadsmit',
+        'deviņpadsmitā'    => 'deviņpadsmit',
+    );
+
+    # Hundreds/thousands ordinals with stem changes — handle before generic compound splitter.
+    # Standalone: "tūkstošais" → "viens tūkstotis" (parser needs number + tūkstotis)
+    # Compound: "divi tūkstošais" → "divi tūkstoši"
+    if ($input =~ m{tūkstošai[s]?\z}xms || $input =~ m{tūkstošā\z}xms) {
+        return 'viens tūkstotis' if $input eq 'tūkstošais';
+        return 'viens tūkstotis' if $input eq 'tūkstošā';
+        $input =~ s{tūkstošais\z}{tūkstoši}xms and return $input;
+        $input =~ s{tūkstošā\z}{tūkstoši}xms   and return $input;
+    }
+
+    # Compound: "divdesmit trešais" → convert last part only
+    if ($input =~ m{\s}xms) {
+        my @words = split /\s+/, $input;
+        my $last  = pop @words;
+        my $cardinal = ordinal2cardinal($last) // return;
+        push @words, $cardinal;
+        return join ' ', @words;
+    }
+
+    return $ordinal_to_cardinal{$input} if exists $ordinal_to_cardinal{$input};
+
+    # Hundreds ordinal: simtais → simts (parser expects /simts/)
+    $input =~ s{simtais\z}{simts}xms   and return $input;
+    $input =~ s{simtā\z}{simts}xms     and return $input;
+
+    # Tens ordinals: strip -ais/-ā from compound tens
+    # divdesmitais → divdesmit, etc.
+    if ($input =~ s{ais\z}{}xms || $input =~ s{ā\z}{}xms) {
+        return $input;
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
+
 1;
 
 __END__
@@ -114,7 +201,7 @@ Lingua::LAV::Word2Num - Word to number conversion in Latvian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::LAV::Word2Num is module for converting Latvian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -155,6 +242,16 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0, 999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'pirmais', 'trešais', 'desmitais')
+  =>  str    cardinal text (e.g. 'viens', 'trīs', 'desmit')
+      undef  if input is not recognised as an ordinal
+
+Convert Latvian ordinal text to cardinal text (morphological reversal).
+Handles both masculine (-ais) and feminine (-ā) endings.
+Compounds are split on whitespace and the last part is converted.
+
 =item B<lav_numerals> (void)
 
   =>  obj  new parser object
@@ -175,6 +272,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env perl
 # -----------------------------------------------------------------------
-# submit_abuse_report -- analyse a spam/phishing email and send abuse
+# submit_abuse_report.pl -- analyse a spam/phishing email and send abuse
 #                           reports to all relevant parties.
 #
 # Usage:
-#   submit_abuse_report [options] spam.eml
-#   submit_abuse_report [options] < spam.eml
+#   submit_abuse_report.pl [options] spam.eml
+#   submit_abuse_report.pl [options] < spam.eml
 #
 # Options:
 #   --dry-run              Show what would be sent and to whom; do not
@@ -21,13 +21,13 @@
 #
 # Examples:
 #   # Dry run -- see what would be sent without sending anything
-#   submit_abuse_report --dry-run spam.eml
+#   submit_abuse_report.pl --dry-run spam.eml
 #
 #   # Send reports via the local MTA
-#   submit_abuse_report --from postmaster@myisp.example spam.eml
+#   submit_abuse_report.pl --from postmaster@myisp.example spam.eml
 #
 #   # Send via a specific SMTP relay, skipping our own outbound IP
-#   submit_abuse_report \
+#   submit_abuse_report.pl \
 #       --from abuse-reporter@example.com \
 #       --smtp mail.example.com:587 \
 #       --trusted 203.0.113.0/24 \
@@ -267,6 +267,29 @@ sub _dry_run_report {
     for my $c (@{$contacts}) {
         printf "  %s (%s)\n", $c->{address}, $c->{role};
     }
+
+    # Web-form contacts -- providers that do not accept email
+    my @form_cs = $inv->form_contacts();
+    if (@form_cs) {
+        print "\n$bar\n";
+        print "  MANUAL ACTION REQUIRED -- WEB FORM SUBMISSION\n";
+        print "  The following parties do not accept email abuse reports.\n";
+        print "  Open each URL in a browser and complete the form as instructed.\n";
+        print "$bar\n\n";
+        for my $c (@form_cs) {
+            printf "  Role     : %s\n", $c->{role};
+            printf "  Form URL : %s\n", $c->{form};
+            printf "  Domain   : %s\n", $c->{form_domain} if $c->{form_domain};
+            if ($c->{form_paste}) {
+                printf "  Paste    : %s\n", $c->{form_paste};
+            }
+            if ($c->{form_upload}) {
+                printf "  Upload   : %s\n", $c->{form_upload};
+            }
+            print "\n";
+        }
+    }
+
     print "$bar\n";
 }
 
@@ -430,11 +453,18 @@ sub _build_mime_message {
     my $boundary = sprintf 'arf_report_%s_%d',
         strftime('%Y%m%d%H%M%S', gmtime), $$;
 
-    # Normalise line endings to CRLF throughout
+    # Normalise line endings to CRLF throughout, then encode to raw UTF-8
+    # bytes.  Net::SMTP->datasend() calls syswrite() on a raw socket and
+    # cannot handle Perl strings with the Unicode flag set (wide characters).
+    # The body may contain non-ASCII characters (e.g. emoji in decoded subject
+    # lines) so we must encode explicitly rather than rely on the socket layer.
+    require Encode;
     (my $body_crlf     = $a{body}) =~ s/\r?\n/\r\n/g;
+    $body_crlf = Encode::encode('UTF-8', $body_crlf);
     my $original_crlf  = '';
     if (defined $a{original} && length ${ $a{original} }) {
         ($original_crlf = ${ $a{original} }) =~ s/\r?\n/\r\n/g;
+        $original_crlf = Encode::encode('UTF-8', $original_crlf);
     }
     my $feedback_report = _build_feedback_report($a{inv});
 
@@ -450,7 +480,7 @@ sub _build_mime_message {
     push @msg, "Content-Type: multipart/report;";
     push @msg, "    report-type=feedback-report;";
     push @msg, "    boundary=\"$boundary\"";
-    push @msg, "X-Mailer: Email::Abuse::Investigator submit_abuse_report";
+    push @msg, "X-Mailer: Email::Abuse::Investigator submit_abuse_report.pl";
     push @msg, "";
 
     # Preamble for non-MIME clients
@@ -508,13 +538,13 @@ __END__
 
 =head1 NAME
 
-submit_abuse_report -- analyse a spam/phishing email and send abuse
+submit_abuse_report.pl -- analyse a spam/phishing email and send abuse
 reports to all relevant parties
 
 =head1 SYNOPSIS
 
-    submit_abuse_report [options] spam.eml
-    submit_abuse_report [options] < spam.eml
+    submit_abuse_report.pl [options] spam.eml
+    submit_abuse_report.pl [options] < spam.eml
 
 =head1 OPTIONS
 

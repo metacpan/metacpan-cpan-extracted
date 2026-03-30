@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = dan_numerals();
 
 # }}}
@@ -93,6 +93,147 @@ sub dan_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Danish ordinal→cardinal: reverse lookup for irregular forms,
+    # suffix stripping for regular/compound forms.
+
+    # Fully irregular 1-12
+    my %irregular = (
+        'første'   => 'en',
+        'anden'    => 'to',
+        'tredje'   => 'tre',
+        'fjerde'   => 'fire',
+        'femte'    => 'fem',
+        'sjette'   => 'seks',
+        'syvende'  => 'syv',
+        'ottende'  => 'otte',
+        'niende'   => 'ni',
+        'tiende'   => 'ti',
+        'ellevte'  => 'elleve',
+        'tolvte'   => 'tolv',
+    );
+
+    # Teens 13-19 (-de/-ende suffix on cardinal stem)
+    my %teens = (
+        'trettende'  => 'tretten',
+        'fjortende'  => 'fjorten',
+        'femtende'   => 'femten',
+        'sekstende'  => 'seksten',
+        'syttende'   => 'sytten',
+        'attende'    => 'atten',
+        'nittende'   => 'nitten',
+    );
+
+    # Tens ordinals — values must match what the w2n parser expects
+    my %tens = (
+        'tyvende'                => 'tyve',
+        'tredivte'               => 'tredive',
+        'fyrretyvende'           => 'fyrre',
+        'halvtredsindstyvende'   => 'halvtreds',
+        'tresindstyvende'        => 'tres',
+        'halvfjerdsindstyvende'  => 'halvfjerds',
+        'firsindstyvende'        => 'firs',
+        'halvfemsindstyvende'    => 'halvfems',
+    );
+
+    # Exact match: standalone ordinals
+    return $irregular{$input} if exists $irregular{$input};
+    return $teens{$input}     if exists $teens{$input};
+    return $tens{$input}      if exists $tens{$input};
+
+    # Round hundreds/thousands (split fused forms for the parser)
+    my %higher = (
+        'hundredede'       => 'et hundrede',
+        'ethundredede'     => 'et hundrede',
+        'tohundredede'     => 'to hundrede',
+        'trehundredede'    => 'tre hundrede',
+        'firehundredede'   => 'fire hundrede',
+        'femhundredede'    => 'fem hundrede',
+        'sekshundredede'   => 'seks hundrede',
+        'syvhundredede'    => 'syv hundrede',
+        'ottehundredede'   => 'otte hundrede',
+        'nihundredede'     => 'ni hundrede',
+        'ethundrede'       => 'et hundrede',
+        'tohundrede'       => 'to hundrede',
+        'trehundrede'      => 'tre hundrede',
+        'firehundrede'     => 'fire hundrede',
+        'femhundrede'      => 'fem hundrede',
+        'sekshundrede'     => 'seks hundrede',
+        'syvhundrede'      => 'syv hundrede',
+        'ottehundrede'     => 'otte hundrede',
+        'nihundrede'       => 'ni hundrede',
+        'tusindende'       => 'tusind',
+        'tusinde'          => 'tusind',
+        'entusinde'        => 'et tusind',
+        'entusind'         => 'et tusind',
+        'totusinde'        => 'to tusind',
+        'totusind'         => 'to tusind',
+        'tretusinde'       => 'tre tusind',
+        'tretusind'        => 'tre tusind',
+        'firetusinde'      => 'fire tusind',
+        'firetusind'       => 'fire tusind',
+        'femtusinde'       => 'fem tusind',
+        'femtusind'        => 'fem tusind',
+        'sekstusinde'      => 'seks tusind',
+        'sekstusind'       => 'seks tusind',
+        'syvtusinde'       => 'syv tusind',
+        'syvtusind'        => 'syv tusind',
+        'ottetusinde'      => 'otte tusind',
+        'ottetusind'       => 'otte tusind',
+        'nitusinde'        => 'ni tusind',
+        'nitusind'         => 'ni tusind',
+        'millionte'        => 'en million',
+    );
+    return $higher{$input} if exists $higher{$input};
+
+    # Fused higher-order compounds: e.g. "entusindførste" → "et tusind" + "første" → "en"
+    # Try matching each higher key as a prefix, then convert the remainder.
+    for my $hkey (sort { length $b <=> length $a } keys %higher) {
+        if ($input =~ m{\A\Q$hkey\E(.+)\z}xms) {
+            my $remainder = $1;
+            my $tail = ordinal2cardinal($remainder);
+            if (defined $tail) {
+                return $higher{$hkey} . ' ' . $tail;
+            }
+        }
+    }
+
+    # Danish compounds 21-99: unit + "og" + tens ordinal
+    # e.g. "enogtyvende" → "en" + "og" + "tyvende" → "en" + "og" + "tyve" = "enogtyve"
+    # Also: unit ordinal + "og" + tens cardinal: "tredjeogtyve" (rare, but handle)
+    # Primary pattern: cardinal unit + "og" + ordinal tens
+    for my $ord (sort { length $b <=> length $a } keys %tens) {
+        if ($input =~ m{\A(.+)og\Q$ord\E\z}xms) {
+            my $unit_part = $1;
+            return $unit_part . 'og' . $tens{$ord};
+        }
+    }
+
+    # Compound with ordinal unit at end (unit is ordinal, tens is cardinal)
+    # e.g. "tyveførste" → "tyve" + "første" → "tyve" not standard Danish,
+    # but handle for robustness
+    for my $ord (sort { length $b <=> length $a } keys %irregular) {
+        if ($input =~ m{\A(.+)og\Q$ord\E\z}xms) {
+            my $prefix = $1;
+            return $prefix . 'og' . $irregular{$ord};
+        }
+    }
+
+    # Hundreds ordinal: "hundrede" as standalone → "hundrede" (already cardinal)
+    # Strip trailing -nde/-te for generic fallback
+    $input =~ s{indstyvende\z}{indstyve}xms and return $input;
+    $input =~ s{ende\z}{e}xms               and return $input;
+    $input =~ s{nde\z}{}xms                 and return $input;
+    $input =~ s{te\z}{}xms                  and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -111,7 +252,7 @@ Lingua::DAN::Word2Num - Word to number conversion in Danish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::DAN::Word2Num is module for converting danish numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -152,6 +293,15 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'tredje', 'enogtyvende', 'femtende')
+  =>  str    cardinal text (e.g. 'tre', 'enogtyve', 'femten')
+  =>  undef  if input is not a recognized ordinal
+
+Convert Danish ordinal text to cardinal text (text-level morphological
+transformation, no numbers involved).
+
 =item B<dan_numerals> (void)
 
   =>  obj  new parser object
@@ -172,6 +322,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

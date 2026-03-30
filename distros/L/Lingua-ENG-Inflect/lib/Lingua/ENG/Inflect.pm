@@ -1,5 +1,5 @@
 package Lingua::ENG::Inflect;
-# ABSTRACT: Plural inflection for ENG.
+# ABSTRACT: Convert singular to plural. Select "a" or "an".
 
 use 5.16.0;
 use utf8;
@@ -10,7 +10,7 @@ use Env;
 
 require Exporter;
 @ISA = qw(Exporter);
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 %EXPORT_TAGS =
 (
@@ -1590,13 +1590,15 @@ sub WORDLIST {
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::ENG::Inflect - Convert singular to plural. Select "a" or "an".
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 

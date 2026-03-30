@@ -1,5 +1,5 @@
 {
-   "abstract" : "Number 2 Word conversion in ITA.",
+   "abstract" : "Number to word conversion in Italian",
    "author" : [
       "PetaMem s.r.o. <info@petamem.com>"
    ],
@@ -34,7 +34,7 @@
    "provides" : {
       "Lingua::ITA::Num2Word" : {
          "file" : "lib/Lingua/ITA/Num2Word.pm",
-         "version" : "0.2603270"
+         "version" : "0.2603300"
       }
    },
    "release_status" : "stable",
@@ -44,7 +44,7 @@
          "web" : "https://metacpan.org/author/PETAMEM"
       }
    },
-   "version" : "0.2603270",
+   "version" : "0.2603300",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "Artistic-2.0 OR BSD-2-Clause"

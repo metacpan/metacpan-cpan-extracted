@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my  $parser  = zho_numerals();
 
 # }}}
@@ -279,6 +279,19 @@ sub zho_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Chinese ordinals: prefix 第 (dì) to cardinal.
+    # Strip 第 prefix; return cardinal remainder.
+    $input =~ s{\A第}{}xms and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -288,6 +301,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::ZHO::Word2Num - Word to number conversion in Chinese
@@ -295,7 +310,7 @@ Lingua::ZHO::Word2Num - Word to number conversion in Chinese
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::ZHO::Word2Num is module for converting text containing number
 representation in Chinese back into number. Converts whole numbers
@@ -341,6 +356,15 @@ Convert text representation to number.
   =>  obj  new parser object
 
 Internal parser.
+
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =back
 

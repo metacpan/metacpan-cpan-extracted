@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::DBIO;
 # ABSTRACT: Pod::Weaver configuration for DBIO distributions
-our $VERSION = '0.900000';
+our $VERSION = '0.900001';
 use strict;
 use warnings;
 
@@ -71,7 +71,7 @@ Pod::Weaver::PluginBundle::DBIO - Pod::Weaver configuration for DBIO distributio
 
 =head1 VERSION
 
-version 0.900000
+version 0.900001
 
 =head1 SYNOPSIS
 

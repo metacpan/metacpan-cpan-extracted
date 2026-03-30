@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my %token1 = qw( 0 нула          1 еден         2 два
                   3 три           4 четири        5 пет
@@ -142,13 +142,144 @@ sub num2mkd_cardinal :Export {
 
 # }}}
 
+# {{{ num2mkd_ordinal           number to ordinal string conversion
+
+sub num2mkd_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    # Macedonian ordinals (masculine): прв, втор, трет, четврт, пет + -ти suffix
+    my %irregular = (
+        0  => 'нулти',
+        1  => 'прв',
+        2  => 'втор',
+        3  => 'трет',
+        4  => 'четврт',
+        5  => 'петти',
+        6  => 'шести',
+        7  => 'седми',
+        8  => 'осми',
+        9  => 'деветти',
+        10 => 'десетти',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Teens ordinals 11-19
+    my %teens = (
+        11 => 'единаесетти',
+        12 => 'дванаесетти',
+        13 => 'тринаесетти',
+        14 => 'четиринаесетти',
+        15 => 'петнаесетти',
+        16 => 'шестнаесетти',
+        17 => 'седумнаесетти',
+        18 => 'осумнаесетти',
+        19 => 'деветнаесетти',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'дваесетти',
+        30 => 'триесетти',
+        40 => 'четириесетти',
+        50 => 'педесетти',
+        60 => 'шеесетти',
+        70 => 'седумдесетти',
+        80 => 'осумдесетти',
+        90 => 'деведесетти',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'стоти',
+        200 => 'двестоти',
+        300 => 'тристоти',
+        400 => 'четиристотинити',
+        500 => 'петстотинити',
+        600 => 'шестстотинити',
+        700 => 'седумстотинити',
+        800 => 'осумстотинити',
+        900 => 'деветстотинити',
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            if ($millions == 1) {
+                return 'милионити';
+            }
+            return _num_to_words($millions) . ' милионити';
+        }
+        my $prefix = ($millions == 1) ? 'еден милион' :
+                     _num_to_words($millions) . ' милиони';
+        return $prefix . ' ' . num2mkd_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'илјадити';
+            }
+            return _num_to_words($thousands) . ' илјадити';
+        }
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'илјада';
+        }
+        elsif ($thousands == 2) {
+            $thou_cardinal = 'две илјади';
+        }
+        else {
+            $thou_cardinal = _num_to_words($thousands) . ' илјади';
+        }
+        return $thou_cardinal . ' ' . num2mkd_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2mkd_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        # Macedonian compound: tens "и" unit-ordinal
+        return $tens_ord{$t} . ' и ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -170,7 +301,7 @@ Lingua::MKD::Num2Word - Number to word conversion in Macedonian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::MKD::Num2Word is module for conversion numbers into their representation
 in Macedonian. It converts whole numbers from 0 up to 999 999 999.
@@ -218,6 +349,13 @@ be converted.
 
 Internal helper for converting numbers 1-999 to words.
 
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -232,6 +370,8 @@ Internal helper for converting numbers 1-999 to words.
 =over 2
 
 =item num2mkd_cardinal
+
+=item num2mkd_ordinal
 
 =back
 

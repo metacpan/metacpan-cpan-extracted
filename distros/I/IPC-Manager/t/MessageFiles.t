@@ -1,6 +1,5 @@
 use Test2::V1 -ipP;
 use Test2::IPC;
-use Carp::Always;
 
 {
     no warnings 'once';

@@ -203,7 +203,7 @@ sub call_api {
     # build header
 
     $header_params->{'x-aspose-client'} = 'perl sdk';
-    $header_params->{'x-aspose-client-version'} = '26.2';  
+    $header_params->{'x-aspose-client-version'} = '26.3.1';  
     # build query 
     if (%$query_params) {
         $_url = ($_url . '?' . eval { URI::Query->new($query_params)->stringify });

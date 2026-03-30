@@ -1,0 +1,40 @@
+======================================================================
+ mb Cheat Sheet                                            [KO] 한국어
+======================================================================
+
+[ 1. 모듈 로드 ]
+  use mb;
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+
+[ 2. 문자 단위 length / substr ]
+  mb::length($str)              # 문자 수 (바이트 수 아님)
+  mb::substr($str, $pos, $len)  # 문자 위치로 부분 문자열 추출
+  mb::substr($str, $pos, $len, $replacement)
+
+[ 3. 문자열 검색 ]
+  mb::index($str, $sub)         # 문자 위치 인덱스
+  mb::index($str, $sub, $pos)   # $pos 부터 검색
+  mb::rindex($str, $sub)        # 오른쪽부터 검색
+  mb::index_byte($str, $sub)    # 바이트 위치 인덱스 (JPerl 호환)
+  mb::rindex_byte($str, $sub)
+
+[ 4. 대소문자 변환 ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. 문자 코드 ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. 기타 문자열 연산 ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. 지원 인코딩 ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. 예제 ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "안녕하세요";
+  printf "문자수=%d\n",   mb::length($s);
+  printf "부분=%s\n",     mb::substr($s,0,3);
+  printf "위치=%d\n",     mb::index($s,"하세요");

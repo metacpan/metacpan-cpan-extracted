@@ -13,7 +13,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 # {{{ num2sv_cardinal                 convert number to text
@@ -184,6 +184,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::SWE::Num2Word - Number to word conversion in Swedish
@@ -191,7 +193,7 @@ Lingua::SWE::Num2Word - Number to word conversion in Swedish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SWE::Num2Word is module for converting numbers into their representation
 in Swedish. Converts whole numbers from 0 up to 999 999 999.
@@ -243,6 +245,12 @@ Convert number to text representation.
 Convert number to its Swedish ordinal text representation.
 Handles irregular forms (första, andra, tredje, etc.)
 and applies correct suffixes for regular forms.
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

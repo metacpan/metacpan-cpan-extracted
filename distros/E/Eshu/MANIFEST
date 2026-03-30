@@ -86,6 +86,9 @@ t/89-pod-over-back.t
 t/90-pod-in-perl.t
 t/91-pod-pm-module.t
 t/92-pod-pl-script.t
+t/93-pl-defined-or.t
+t/94-pl-end-data.t
+t/95-pod-verbatim-relative.t
 t/lib/Sample/Cache.pm
 t/lib/Sample/Router.pm
 t/lib/sample_hashtable.h

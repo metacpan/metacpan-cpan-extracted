@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = lit_numerals();
 
 # }}}
@@ -95,6 +95,89 @@ sub lit_numerals {
 
 # }}}
 
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Lithuanian ordinals are adjectival with -as/-a (masc/fem) endings.
+    # Most have unique stems that must be mapped to cardinal forms.
+    # Compounds: space-separated, only last element is ordinal.
+
+    my %ordinal_to_cardinal = (
+        'pirmas'      => 'vienas',
+        'pirma'       => 'vienas',
+        'antras'      => 'du',
+        'antra'       => 'du',
+        'trečias'     => 'trys',
+        'trečia'      => 'trys',
+        'ketvirtas'   => 'keturi',
+        'ketvirta'    => 'keturi',
+        'penktas'     => 'penki',
+        'penkta'      => 'penki',
+        'šeštas'      => 'šeši',
+        'šešta'       => 'šeši',
+        'septintas'   => 'septyni',
+        'septinta'    => 'septyni',
+        'aštuntas'    => 'aštuoni',
+        'aštunta'     => 'aštuoni',
+        'devintas'    => 'devyni',
+        'devinta'     => 'devyni',
+        'dešimtas'    => 'dešimt',
+        'dešimta'     => 'dešimt',
+        # Teens
+        'vienuoliktas'   => 'vienuolika',
+        'vienuolikta'    => 'vienuolika',
+        'dvyliktas'      => 'dvylika',
+        'dvylikta'       => 'dvylika',
+        'tryliktas'      => 'trylika',
+        'trylikta'       => 'trylika',
+        'keturioliktas'  => 'keturiolika',
+        'keturiolikta'   => 'keturiolika',
+        'penkioliktas'   => 'penkiolika',
+        'penkiolikta'    => 'penkiolika',
+        'šešioliktas'    => 'šešiolika',
+        'šešiolikta'     => 'šešiolika',
+        'septynioliktas' => 'septyniolika',
+        'septyniolikta'  => 'septyniolika',
+        'aštuonioliktas' => 'aštuoniolika',
+        'aštuoniolikta'  => 'aštuoniolika',
+        'devynioliktas'  => 'devyniolika',
+        'devyniolikta'   => 'devyniolika',
+    );
+
+    # Hundreds/thousands ordinals with special stems:
+    # Standalone: "šimtasis" → "vienas šimtas", "tūkstantasis" → "vienas tūkstantis"
+    # Compound: "du šimtasis" → "du šimtai", "penki tūkstantasis" → "penki tūkstantis"
+    if ($input =~ m{šimtasis\z}xms || $input =~ m{tūkstantasis\z}xms) {
+        if ($input eq 'šimtasis')      { return 'vienas šimtas' }
+        if ($input eq 'tūkstantasis')  { return 'vienas tūkstantis' }
+        $input =~ s{šimtasis\z}{šimtai}xms         and return $input;
+        $input =~ s{tūkstantasis\z}{tūkstantis}xms and return $input;
+    }
+
+    # Compound: "dvidešimt trečias" → convert last part only
+    if ($input =~ m{\s}xms) {
+        my @words = split /\s+/, $input;
+        my $last  = pop @words;
+        my $cardinal = ordinal2cardinal($last) // return;
+        push @words, $cardinal;
+        return join ' ', @words;
+    }
+
+    return $ordinal_to_cardinal{$input} if exists $ordinal_to_cardinal{$input};
+
+    # Tens ordinals: strip -as/-a ending
+    # dvidešimtas → dvidešimt, trisdešimtas → trisdešimt, etc.
+    if ($input =~ s{(?:as|a)\z}{}xms) {
+        return $input;
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
+
 1;
 
 __END__
@@ -112,7 +195,7 @@ Lingua::LIT::Word2Num - Word to number conversion in Lithuanian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::LIT::Word2Num is module for converting Lithuanian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -153,6 +236,16 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0, 999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'pirmas', 'trečias', 'dešimtas')
+  =>  str    cardinal text (e.g. 'vienas', 'trys', 'dešimt')
+      undef  if input is not recognised as an ordinal
+
+Convert Lithuanian ordinal text to cardinal text (morphological reversal).
+Handles both masculine (-as) and feminine (-a) endings.
+Compounds are split on whitespace and the last part is converted.
+
 =item B<lit_numerals> (void)
 
   =>  obj  new parser object
@@ -173,6 +266,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

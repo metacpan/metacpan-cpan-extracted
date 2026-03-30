@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "This module converts numbers (cardinals) into their Irish (Gaeilge) equivalents using the modern decimal counting system. It accepts positive integers up to, but not including, 1 billion.",
+  "ABSTRACT" => "Number to word conversion in Irish (Gaeilge)",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "0.2603270",
+  "VERSION" => "0.2603300",
   "test" => {
     "TESTS" => "t/*.t"
   }

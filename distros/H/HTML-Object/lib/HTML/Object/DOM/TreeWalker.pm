@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::NodeIteratorShared );
     use vars qw( $VERSION );
     # To import its constants
@@ -209,7 +210,7 @@ With just one argument, this default to search for everything (C<SHOW_ALL>) and 
 
     use HTML::Object::DOM::TreeWalker;
     my $walker = HTML::Object::DOM::TreeWalker->new( $doc->body ) || 
-        die( HTML::Object::DOM::TreeWalker->error, "\n" );
+        die( HTML::Object::DOM::TreeWalker->error );
 
 Or, passing an anonymous subroutine as the filter
 
@@ -217,7 +218,7 @@ Or, passing an anonymous subroutine as the filter
         $root_node,
         $what_to_show_bit,
         sub{ return( FILTER_ACCEPT ); }
-    ) || die( HTML::Object::DOM::TreeWalker->error, "\n" );
+    ) || die( HTML::Object::DOM::TreeWalker->error );
 
 Or, passing an hash reference with a property 'acceptNode' whose value is an anonymous subroutine, as the filter
 
@@ -227,7 +228,7 @@ Or, passing an hash reference with a property 'acceptNode' whose value is an ano
         {
             acceptNode => sub{ return( FILTER_ACCEPT ); }
         }
-    ) || die( HTML::Object::DOM::TreeWalker->error, "\n" );
+    ) || die( HTML::Object::DOM::TreeWalker->error );
 
 Or, passing an object that implements the method "acceptNode"
 
@@ -236,7 +237,7 @@ Or, passing an object that implements the method "acceptNode"
         $what_to_show_bit,
         # This object must implement the acceptNode method
         My::Customer::NodeFilter->new
-    ) || die( HTML::Object::DOM::TreeWalker->error, "\n" );
+    ) || die( HTML::Object::DOM::TreeWalker->error );
 
 There is also L<HTML::Object::DOM::TreeWalker>, which performs a somewhat similar function.
 

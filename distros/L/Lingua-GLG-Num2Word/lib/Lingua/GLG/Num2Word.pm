@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1); coding:utf-8; -*-
 
 package Lingua::GLG::Num2Word;
-# ABSTRACT: Number 2 word conversion in GLG.
+# ABSTRACT: Converts numbers to Galician words
 
 use 5.16.0;
 use utf8;
@@ -9,11 +9,12 @@ use warnings;
 
 # {{{ use block
 
+use Carp;
 use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -122,13 +123,50 @@ sub num2word :Export {
 
 # }}}
 
+# {{{ num2glg_ordinal                  convert number to ordinal text
+
+sub num2glg_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Irregular ordinals 1-10
+    my %irregular = (
+        1  => 'primeiro',
+        2  => 'segundo',
+        3  => 'terceiro',
+        4  => 'cuarto',
+        5  => 'quinto',
+        6  => 'sexto',
+        7  => 'sétimo',
+        8  => 'oitavo',
+        9  => 'noveno',
+        10 => 'décimo',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # For 11+, get the cardinal form and append "ésimo"
+    # Drop trailing vowel if present, then add "ésimo"
+    my $cardinal = num2word($number);
+
+    $cardinal =~ s/[aeiou]$//;
+
+    return $cardinal . 'ésimo';
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -148,7 +186,7 @@ Lingua::GLG::Num2Word - Converts numbers to Galician words
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -180,6 +218,16 @@ This is the main function in this module. It turns numbers into words.
 =head2 num2glg_cardinal
 
 Alias for num2word.
+
+=head2 num2glg_ordinal
+
+Converts a number to its Galician ordinal form.
+
+  my $ord = num2glg_ordinal(1);   # 'primeiro'
+  my $ord = num2glg_ordinal(5);   # 'quinto'
+  my $ord = num2glg_ordinal(21);  # 'vinte e unésimo'
+
+Only numbers from interval [1, 999_999_999] are supported.
 
 =head2 capabilities
 

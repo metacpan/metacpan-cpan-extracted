@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = srd_numerals();
 
 # }}}
@@ -150,7 +150,7 @@ Lingua::SRD::Word2Num - Word to number conversion in Sardinian (Logudorese)
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SRD::Word2Num is a module for converting text containing number
 representation in Sardinian (Logudorese variant) back into number. Converts

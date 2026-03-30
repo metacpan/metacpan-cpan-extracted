@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic );
     use vars qw( $BASE_CLASS $DEBUG $VERSION );
     use constant {
@@ -249,11 +250,11 @@ sub axis_descendant
     my $self = shift( @_ );
     my( $context, $results ) = @_;
 
-    my @stack = $context->getChildNodes;
+    my @queue = $context->getChildNodes;
 
-    while( @stack )
+    while( @queue )
     {
-        my $node = shift( @stack );
+        my $node = shift( @queue );
         if( $self->node_test( $node ) )
         {
             $results->push( $node );
@@ -262,7 +263,7 @@ sub axis_descendant
         {
             # Node failed the test.
         }
-        unshift( @stack, $node->getChildNodes );
+        push( @queue, $node->getChildNodes );
     }
 }
 
@@ -270,18 +271,25 @@ sub axis_descendant_or_self
 {
     my $self = shift( @_ );
     my( $context, $results ) = @_;
-    
-    my @stack = ( $context );
 
-    while( @stack )
+    # Use a queue (FIFO) instead of a stack (LIFO) for traversal.
+    # push/shift (BFS) vs unshift/shift (DFS) yields the same node set for
+    # descendant-or-self since all nodes are visited regardless of order.
+    # BFS is O(1) per enqueue (push appends), whereas DFS via unshift is
+    # O(n) per step because it must shift all existing elements rightward.
+    # On a document with many siblings, this makes a significant difference
+    # in both CPU time and peak memory (the queue never grows beyond the
+    # width of the widest level, vs a DFS stack that holds entire subtrees).
+    my @queue = ( $context );
+
+    while( @queue )
     {
-        my $node = shift( @stack );
+        my $node = shift( @queue );
         if( $self->node_test( $node ) )
         {
             $results->push( $node );
         }
-        # warn "node is a ", ref( $node);
-        unshift( @stack, $node->getChildNodes );
+        push( @queue, $node->getChildNodes );
     }
 }
 
@@ -416,7 +424,16 @@ sub evaluate
     for( my $i = 1; $i <= $from->size; $i++ )
     {
         $self->{pp}->_set_context_pos( $i );
-        $initial_nodeset->append( $self->evaluate_node( $from->get_node( $i ) ) );
+        # Capture the intermediate NodeSet in a lexical variable and release
+        # it immediately after appending its nodes to $initial_nodeset.
+        # Without this, the temporary NodeSet returned by evaluate_node()
+        # would stay alive until the end of the for() scope, causing
+        # accumulated memory pressure when $from is large (e.g. after a
+        # descendant-or-self step that returns every node in the document).
+        {
+            my $tmp = $self->evaluate_node( $from->get_node( $i ) );
+            $initial_nodeset->append( $tmp );
+        }
     }
     
     # warn "Step::evaluate initial nodeset size: ", $initial_nodeset->size, "\n";

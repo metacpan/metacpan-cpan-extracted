@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser = ja_numerals();
 
 # }}}
@@ -139,6 +139,19 @@ sub ja_numerals {
     });
 }
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Japanese ordinals (romaji): append "-ban-me" to cardinal.
+    # Strip the suffix; return cardinal remainder.
+    $input =~ s{-ban-me\z}{}xms and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -148,6 +161,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::JPN::Word2Num - Word to number conversion in Japanese
@@ -155,7 +170,7 @@ Lingua::JPN::Word2Num - Word to number conversion in Japanese
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::JPN::Word2Num is module for converting text containing number
 representation in Japanese back into number. Converts whole numbers from 0 up
@@ -202,6 +217,15 @@ Convert text representation to number.
   =>  obj  new parser object
 
 Internal parser.
+
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =back
 

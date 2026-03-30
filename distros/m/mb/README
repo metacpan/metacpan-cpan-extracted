@@ -76,7 +76,7 @@ SYNOPSIS
     and Other Systems
 
   Supported perl versions:
-    perl version 5.005_03 to newest perl
+    perl version 5.005_03 to perl 5.42
 
 DESCRIPTION
 
@@ -115,6 +115,50 @@ Larry Wall-san's Way
   "Easy jobs must be easy."
 
   Welcome to world of Larry Wall-san's Way!!
+
+INSTALLATION
+
+  perl mb.pm install
+
+  or
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+PERL 5.42 AND source::encoding
+
+  Perl 5.42 introduces the source::encoding pragma and automatically enables
+  ASCII-only source checking for scripts that use v5.41 and later.
+
+  mb transpiles most program tokens into US-ASCII, but intentionally keeps
+  comments and POD as-is.  Those may contain multibyte characters.
+
+  Therefore, when mb runs as a command and writes a transpiled .oo.* file,
+  it inserts a defensive BEGIN block that disables source::encoding checking
+  when the pragma exists:
+
+    BEGIN { eval { require source::encoding; source::encoding->unimport; 1 } }
+
+  This block is harmless on Perl 5.005_03 through 5.41, where the pragma
+  does not exist.
+
+AUTHOR
+
+  INABA Hitoshi <ina@cpan.org>
+
+  This software was made referring to software and the document that the
+  following hackers or persons had made. I am thankful to all persons.
+
+    Larry Wall, Perl
+    http://www.perl.org/
+
+LICENSE AND COPYRIGHT
+
+  This software is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+  See L<perlartistic>.
 
 SEE ALSO
 

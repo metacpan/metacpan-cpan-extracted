@@ -15,6 +15,7 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use lib 't/lib';
 use Helper;
+use Test2::Warnings qw(:no_end_test warnings had_no_warnings);
 use JSON::Schema::Modern::Utilities qw(jsonp get_type);
 use OpenAPI::Modern::Utilities 'uri_encode';
 
@@ -41,7 +42,7 @@ YAML
     'request must be passed',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(bless({}, 'Bespoke::Request'), my $options = {})->TO_JSON,
     {
       valid => false,
@@ -89,7 +90,7 @@ paths:
           pattern: ^[0-9]+$
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo'))->TO_JSON,
     {
       valid => false,
@@ -105,7 +106,7 @@ YAML
     'path parameter is missing',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo'), my $options = { path_captures => { foo_id => 1 } })->TO_JSON,
     {
       valid => false,
@@ -148,7 +149,7 @@ paths:
           pattern: ^[0-9]+$
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo/bar'))->TO_JSON,
     {
       valid => false,
@@ -200,7 +201,7 @@ YAML
     'corrupt data is detected, even when there is no schema',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo/{}', [ Bar => 1 ]))->TO_JSON,
     { valid => true },
     'valid encoded content is always valid when there is no schema, and unknown media types are okay',
@@ -239,7 +240,7 @@ YAML
     'errors during media-type decoding are detected',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo/{"hello":"there"}'))->TO_JSON,
     {
       valid => false,
@@ -255,7 +256,7 @@ YAML
     'parameters are decoded using the indicated media type and then validated against the content schema',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo/%7B%22key%22:1%7D'))->TO_JSON,
     { valid => true },
     'path parameter is uri-decoded first before evaluating',
@@ -292,7 +293,7 @@ paths:
           maxLength: 1
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo/foo/bar/bar'))->TO_JSON,
     {
       valid => false,
@@ -326,7 +327,7 @@ YAML
     },
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo/foo'))->TO_JSON,
     {
       valid => false,
@@ -350,7 +351,7 @@ subtest $::TYPE.': path-item lookup' => sub {
   );
   my $result = $openapi->validate_request(request('GET', 'https://example.com'), my $options = {});
   isa_ok($result, ['JSON::Schema::Modern::Result'], 'got a result object back');
-  cmp_result(
+  is_equal(
     $result->TO_JSON,
     {
       valid => false,
@@ -386,7 +387,7 @@ paths:
 YAML
 
   my $request = request('POST', 'http://example.com/foo');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'operation can be empty',
@@ -403,7 +404,7 @@ paths:
       - $ref: 'http://example.com/otherapi#/i_do_not_exist'
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -430,7 +431,7 @@ paths:
     post: {}
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -461,7 +462,7 @@ paths:
       - $ref: '#/components/parameters/foo'
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -475,37 +476,6 @@ YAML
       ],
     },
     'bad $ref to $ref in operation parameters',
-  );
-
-
-  $openapi = OpenAPI::Modern->new(
-    openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
-paths:
-  /foo:
-    post:
-      parameters:
-      - name: yum
-        in: cookie
-        required: false
-        schema:
-          type: string
-YAML
-
-  cmp_result(
-    $openapi->validate_request($request)->TO_JSON,
-    {
-      valid => false,
-      errors => [
-        {
-          instanceLocation => '/request/header/Cookie',
-          keywordLocation => jsonp(qw(/paths /foo post parameters 0)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0)))->to_string,
-          error => 'cookie parameters not yet supported',
-        },
-      ],
-    },
-    'cookie parameters are not yet supported',
   );
 
 
@@ -581,7 +551,7 @@ paths:
 YAML
   # note that bar_id is not listed as a path parameter
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -610,7 +580,7 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo?alpha=1&gamma=foo&delta=bar', [ Alpha => 1, Beta => 1 ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -628,7 +598,7 @@ YAML
 
   $openapi->add_media_type('unknown/*' => sub ($value) { $value });
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -646,7 +616,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ Alpha => 1, Beta => 1 ]);
   query_params($request, [ alpha => 1, epsilon => '{"foo":42}' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -665,7 +635,7 @@ YAML
   $openapi->add_media_type('image/*' => sub ($value) { $value });
 
   $request = request('POST', 'http://example.com/foo?alpha=1&zeta=binary', [ Alpha => 1, Beta => 1 ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -683,7 +653,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo?alpha=hello&beta=3.1415',
     [ 'alpha' => 'header value', Beta => 1 ]);    # exactly matches query parameter
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -757,7 +727,7 @@ YAML
 
   $request = request('GET', 'http://example.com/foo/bar/baz?null_query=foo&boolean_query=no',
     [ NullHeader => 'foo', BooleanHeader => 'no' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -805,7 +775,7 @@ YAML
 
   $request = request('GET', 'http://example.com/foo//true?null_query=&boolean_query=1',
     [ NullHeader => '', BooleanHeader => 1 ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'query and header parameters are successfully parsed to their requested types',
@@ -844,8 +814,8 @@ paths:
             schema: {}
 YAML
 
-  cmp_result(
-    $openapi->validate_request(request('GET', 'http://example.com/foo?q=1'))->TO_JSON,
+  is_equal(
+    $openapi->validate_request(request('GET', 'http://example.com/foo'))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -860,8 +830,8 @@ YAML
     'query and querystring conflicting across path-item and operation is detected at runtime',
   );
 
-  cmp_result(
-    $openapi->validate_request(request('GET', 'http://example.com/bar?q=1'))->TO_JSON,
+  is_equal(
+    $openapi->validate_request(request('GET', 'http://example.com/bar'))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -904,6 +874,17 @@ paths:
               type: string
               maxLength: 1
               const: ಠ
+  /emptystring:
+    get:
+      parameters:
+      - name: qs      # the name is not used in the querystring
+        in: querystring
+        required: true
+        content:
+          text/plain;charset=utf-8:
+            schema:
+              type: string
+              maxLength: 0
   /application/json:
     get:
       parameters:
@@ -924,7 +905,7 @@ paths:
               $ref: '#/components/schemas/simple_object'
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/string'))->TO_JSON,
     {
       valid => false,
@@ -940,7 +921,40 @@ YAML
     'when querystring is required, the URI must have a query',
   );
 
-  cmp_result(
+  is_equal(
+    $openapi->validate_request(request('GET', 'http://example.com/emptystring?'))->TO_JSON,
+    { valid => true },
+    'empty querystring still counts as being provided',
+  );
+
+  if ($::TYPE eq 'mojo') {
+    my @warnings = warnings {
+      my $request = request('GET', 'http://example.com/string?hi');
+      ()= $request->url->query->pairs;
+      is_equal(
+        $openapi->validate_request($request)->TO_JSON,
+        {
+          valid => false,
+          errors => [
+            {
+              instanceLocation => '/request/uri/query',
+              keywordLocation => jsonp(qw(/paths /string get parameters 0 required)),
+              absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /string get parameters 0 required)))->to_string,
+              error => 'missing querystring',
+            },
+          ],
+        },
+        'querystring cannot be found after something else tampered with the uri query parameters',
+      );
+    };
+    cmp_result(
+      \@warnings,
+      [ re(qr{^\Qrequest uri querystring has been lost: see L<OpenAPI::Modern/LIMITATIONS> for how to avoid\E}) ],
+      'warning issued after something else tampered with the uri query parameters',
+    );
+  }
+
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/string?hi'))->TO_JSON,
     {
       valid => false,
@@ -962,7 +976,7 @@ YAML
     'text/plain querystring is parsed as a string',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request = request('GET', 'http://example.com/string?%23'))->TO_JSON,
     {
       valid => false,
@@ -978,13 +992,13 @@ YAML
     'text/plain querystring is percent-decoded and then parsed as a string',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request = request('GET', 'http://example.com/string?%e0%b2%a0'))->TO_JSON,
     { valid => true },
     'text/plain querystring is percent-decoded and then parsed as a string, respecting the charset',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request = request('GET', 'http://example.com/application/json?%7B%7D'))->TO_JSON,
     {
       valid => false,
@@ -1007,13 +1021,13 @@ YAML
   );
 
   # perl -Mutf8 -MMojo::Util=url_escape -MCpanel::JSON::XS -wlE'say url_escape(Cpanel::JSON::XS->new->pretty(0)->canonical->utf8->encode({ key => "ಠ", hello => 1 }))'
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request = request('GET', 'http://example.com/application/json?%7B%22hello%22%3A1%2C%22key%22%3A%22%E0%B2%A0%22%7D'))->TO_JSON,
     { valid => true },
     'application/json querystring is url-decoded and properly json-decoded',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request = request('GET', 'http://example.com/application/x-www-form-urlencoded?foo=1'))->TO_JSON,
     {
       valid => false,
@@ -1035,7 +1049,7 @@ YAML
     'application/x-www-form-urlencoded querystring is parsed as an object',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request = request('GET', 'http://example.com/application/x-www-form-urlencoded?key=%e0%b2%a0&bar=2'))->TO_JSON,
     { valid => true },
     'application/x-www-form-urlencoded querystring is url-decoded and properly decoded',
@@ -1071,12 +1085,218 @@ YAML
 
   foreach my $username (qw(diṅnāga الخوارزميّ)) {
     $request = request('GET', 'http://example.com/foo/'.$username);
-    cmp_result(
+    is_equal(
       $openapi->validate_request($request)->TO_JSON,
       { valid => true },
       'all path parameters are validated',
     );
   }
+
+
+  # see examples in 3.2.0 §4.12.8
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get: {}
+    parameters:
+      - name: thing
+        in: query
+        required: true
+        schema:
+          type: array
+          items:
+            type: string
+          const:
+            - one thing
+            - another thing
+        style: form
+        explode: true
+        examples:
+          ObjectList:
+            dataValue:
+              - one thing
+              - another thing
+            serializedValue: "thing=one%20thing&thing=another%20thing"
+      - name: coordinates
+        in: query
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lat
+                - long
+              properties:
+                lat:
+                  type: number
+                long:
+                  type: number
+            examples:
+              New York:
+                dataValue:
+                  lat: 40.6
+                  long: -73.9
+                serializedValue: '{"lat":40.6,"long":-73.9}'
+        examples:
+          New York:
+            dataValue:
+              lat: 40.6
+              long: -73.9
+            serializedValue: coordinates=%7B%22lat%22%3A40.6%2C%22long%22%3A-73.9%7D
+YAML
+
+  $request = request('GET', 'http://example.com/foo?'.join('&',
+      'thing=one%20thing&thing=another%20thing',
+      'coordinates=%7B%22lat%22%3A40.6%2C%22long%22%3A-73.9%7D'));
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'all query parameters are deserialized correctly',
+  );
+
+
+  # see examples in 3.2.0 §4.12.8
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get: {}
+    parameters:
+      - description: 'A free-form query parameter, allowing arbitrary parameters of type: "integer"'
+        name: freeForm
+        in: query
+        required: true
+        schema:
+          type: object
+          additionalProperties:
+            type: integer
+          const:
+            page: 4
+            pageSize: 50
+        style: form
+        examples:
+          Pagination:
+            dataValue:
+              page: 4
+              pageSize: 50
+            serializedValue: page=4&pageSize=50
+YAML
+
+  $request = request('GET', 'http://example.com/foo?page=4&pageSize=50');
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'entire querystring is deserialized correctly into an object',
+  );
+
+
+  # see examples in 3.2.0 §4.12.8
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get: {}
+    parameters:
+      - name: selector
+        in: querystring
+        content:
+          application/jsonpath:
+            schema:
+              type: string
+            example: $.a.b[1:1]
+        examples:
+          Selector:
+            serializedValue: "%24.a.b%5B1%3A1%5D"
+YAML
+
+  $openapi->add_media_type('application/jsonpath', sub ($x) { $x });
+  $request = request('GET', 'http://example.com/foo?%24.a.b%5B1%3A1%5D');
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'entire querystring is deserialized correctly as a string',
+  );
+
+
+  # see examples in 3.2.0 §4.12.8
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get: {}
+    parameters:
+      - description: 'A cookie parameter relying on the percent-encoding behavior of the default `style: "form"`'
+        name: greeting
+        in: cookie
+        schema:
+          $comment: this parameter will fetch just the named parameter, as a string, using style=form
+          type: string
+        examples:
+          Greeting:
+            description: |
+              Note that in this approach, RFC6570's percent-encoding
+              process applies, so unsafe characters are not
+              pre-percent-encoded.  This results in all non-URL-safe
+              characters, rather than just the one non-cookie-safe
+              character, getting percent-encoded.
+            dataValue: Hello, world!
+            serializedValue: "greeting=Hello%2C%20world%21"
+YAML
+
+  $request = request('GET', 'http://example.com/foo', [ Cookie => 'greeting=Hello%2C%20world%21' ]);
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'cookie parameter is validated',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    get: {}
+    parameters:
+      - description: 'A cookie parameter with an exploded object (the default for `style: "cookie"`)'
+        name: cookie
+        in: cookie
+        style: cookie
+        schema:
+          $comment: this parameter will fetch all cookie parameters as an object
+          type: object
+          properties:
+            greeting:
+              type: string
+            code:
+              type: integer
+              minimum: 0
+        examples:
+          Object:
+            description: |
+                Note that the comma (,) has been pre-percent-encoded
+                to "%2C" in the data, as it is forbidden in
+                cookie values.  However, the exclamation point (!)
+                is legal in cookies, so it can be left unencoded.
+                (and fixed, to remove the un-encoded space)
+            dataValue:
+              greeting: Hello%2C%20world!
+              code: 42
+            serializedValue: "greeting=Hello%2C%20world!; code=42"
+YAML
+
+  $request = request('GET', 'http://example.com/foo', [ Cookie => 'greeting=Hello%2C%20world!; code=42' ]);
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'cookie parameter is validated',
+  );
 
 
   $openapi = OpenAPI::Modern->new(
@@ -1122,7 +1342,7 @@ paths:
 YAML
 
   $request = request('GET', 'http://example.com/foo/12345678,90099', [ 'X-Token' => '12345678,90099' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'all path and header parameters are validated',
@@ -1279,6 +1499,95 @@ paths:
         schema:
           type: object
           const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+      - name: query−form−string
+        in: query
+        required: true
+        schema:
+          type: string
+          const: blue/blåck
+      - name: query−form−array−false
+        in: query
+        required: true
+        explode: false
+        schema:
+          type: array
+          const: [ blue−black, black/ish﹠green, 100𝑥brown ]
+      - name: query−form−array−true
+        in: query
+        required: true
+        schema:
+          type: array
+          const: [ blue−black, black/ish﹠green, 100𝑥brown ]
+      - name: query−form−object−false
+        in: query
+        required: true
+        explode: false
+        schema:
+          type: object
+          const: { réd: 100𝑥, grɘɇn: ¡ja, bløö: ¿neîn }
+      # style=form, explode=true, type=object not tested here, as it pulls in the entire querystring
+
+      - name: query−spaceDelimited−array
+        in: query
+        required: true
+        style: spaceDelimited
+        schema:
+          type: array
+          const: [ blue−black, black/ish﹠green, 100𝑥brown ]
+      - name: query−spaceDelimited−object
+        in: query
+        required: true
+        style: spaceDelimited
+        schema:
+          type: object
+          const: { réd: 100𝑥, grɘɇn: ¡ja, bløö: ¿neîn }
+      - name: query−pipeDelimited−array
+        in: query
+        required: true
+        style: pipeDelimited
+        schema:
+          type: array
+          const: [ blue−black, black/ish﹠green, 100𝑥brown ]
+      - name: query−pipeDelimited−object
+        in: query
+        required: true
+        style: pipeDelimited
+        schema:
+          type: object
+          const: { réd: 100𝑥, grɘɇn: ¡ja, bløö: ¿neîn }
+      - name: query−deepObject
+        in: query
+        required: true
+        style: deepObject
+        schema:
+          const: { réd: 100𝑥, grɘɇn: ¡ja, bløö: ¿neîn }
+      - name: cookie−form−string
+        in: cookie
+        required: true
+        schema:
+          type: string
+          const: blue/blåck
+      - name: cookie−form−array−true
+        in: cookie
+        required: true
+        schema:
+          type: array
+          const: [ blue−black, black/ish﹠green, 100𝑥brown ]
+      # style=form, explode=true, type=object not tested here, as it pulls in all cookie values
+      - name: cookie-cookie-string
+        in: cookie
+        style: cookie
+        required: true
+        schema:
+          type: string
+          const: blue/black
+      - name: cookie-cookie-array-true
+        in: cookie
+        style: cookie
+        required: true
+        schema:
+          type: array
+          const: [ blue-black, black/ish&green, 100xbrown ]
 YAML
 
   $request = request('GET', 'http://st💩g.example.com/'.join('/', map uri_encode($_), '🐙',
@@ -1296,20 +1605,125 @@ YAML
     '.blue−black.blackish﹠green.100𝑥brown',
     '.blue−black,yes!,blackish﹠green,¿no?,100𝑥brown,fl¡p',
     '.blue−black=yes!.blackish﹠green=¿no?.100𝑥brown=fl¡p',
-  ),
+    )
+    .'?'.join('&', map uri_encode($_->[0]).'='.$_->[1], pairs(
+      'query−form−string', 'blue%2Fbl%C3%A5ck',
+      'query−form−array−false', 'blue%E2%88%92black,black%2Fish%EF%B9%A0green,100%F0%9D%91%A5brown',
+      'query−form−array−true', 'blue%E2%88%92black',
+      'query−form−array−true', 'black%2Fish%EF%B9%A0green',
+      'query−form−array−true', '100%F0%9D%91%A5brown',
+      'query−form−object−false', 'r%C3%A9d,100%F0%9D%91%A5,gr%C9%98%C9%87n,%C2%A1ja,bl%C3%B8%C3%B6,%C2%BFne%C3%AEn',
+      'query−spaceDelimited−array', 'blue%E2%88%92black%20black%2Fish%EF%B9%A0green%20100%F0%9D%91%A5brown',
+      'query−spaceDelimited−object', 'r%C3%A9d%20100%F0%9D%91%A5%20gr%C9%98%C9%87n%20%C2%A1ja%20bl%C3%B8%C3%B6%20%C2%BFne%C3%AEn',
+      'query−pipeDelimited−array', 'blue%E2%88%92black%7Cblack%2Fish%EF%B9%A0green%7C100%F0%9D%91%A5brown',
+      'query−pipeDelimited−object', 'r%C3%A9d%7C100%F0%9D%91%A5%7Cgr%C9%98%C9%87n%7C%C2%A1ja%7Cbl%C3%B8%C3%B6%7C%C2%BFne%C3%AEn',
+      'query−deepObject[réd]', '100%F0%9D%91%A5',
+      'query−deepObject[grɘɇn]', '%C2%A1ja',
+      'query−deepObject[bløö]', '%C2%BFne%C3%AEn',
+    )),
     [
       "header-simple-string" => "red\xef\xb9\xa0green",
       "header-simple-array-false" => "blue\xe2\x88\x92black,blackish\xef\xb9\xa0green,100\xf0\x9d\x91\xa5brown",
       "header-simple-array-true" => "blue\xe2\x88\x92black,blackish\xef\xb9\xa0green,100\xf0\x9d\x91\xa5brown",
       "header-simple-object-false" => "blue\xe2\x88\x92black,yes!,blackish\xef\xb9\xa0green,\xc2\xbfno?,100\xf0\x9d\x91\xa5brown,fl\xc2\xa1p",
       "header-simple-object-true" => "blue\xe2\x88\x92black=yes!,blackish\xef\xb9\xa0green=\xc2\xbfno?,100\xf0\x9d\x91\xa5brown=fl\xc2\xa1p",
+      Cookie => join('; ',
+        (map +(join '=', @$_), pairs(
+          'cookie%E2%88%92form%E2%88%92string', 'blue%2Fbl%C3%A5ck',
+          'cookie-cookie-string' => 'blue/black',
+          'cookie-cookie-array-true' => 'blue-black',
+          'cookie-cookie-array-true' => 'black/ish&green',
+          'cookie-cookie-array-true' => '100xbrown',
+        )),
+        join('&', map +(join '=', @$_), pairs(
+          'cookie%E2%88%92form%E2%88%92array%E2%88%92true', 'blue%E2%88%92black',
+          'cookie%E2%88%92form%E2%88%92array%E2%88%92true', 'black%2Fish%EF%B9%A0green',
+          'cookie%E2%88%92form%E2%88%92array%E2%88%92true', '100%F0%9D%91%A5brown',
+        )),
+      ),
     ],
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
-    'all path and header parameters are validated',
+    'all path, header, query and cookie parameters are deserialized correctly',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /:
+    get: {}
+    parameters:
+      - name: query-form-object-true
+        in: query
+        required: true
+        explode: true
+        schema:
+          type: object
+          const: { réd: 100𝑥, grɘɇn: ¡ja, bløö: ¿neîn }
+YAML
+
+  $request = request('GET', 'http://example.com?'
+    .join('&', map join('=', @$_), pairs map uri_encode($_), qw(réd 100𝑥 grɘɇn ¡ja bløö ¿neîn)));
+
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'query parameter with style=form, explode=true is deserialized correctly into an object',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /:
+    get: {}
+    parameters:
+      - name: cookie-form-object-true
+        in: cookie
+        required: true
+        explode: true
+        schema:
+          type: object
+          const: { réd: 100𝑥, grɘɇn: ¡ja, bløö: ¿neîn }
+YAML
+
+  $request = request('GET', 'http://example.com', [ Cookie => 'r%C3%A9d=100%F0%9D%91%A5&gr%C9%98%C9%87n=%C2%A1ja&bl%C3%B8%C3%B6=%C2%BFne%C3%AEn' ]);
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'single cookie parameter with style=form, explode=true is deserialized correctly into an object',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /:
+    get: {}
+    parameters:
+      - name: cookie-cookie-object-true
+        in: cookie
+        style: cookie
+        required: true
+        explode: true
+        schema:
+          type: object
+          const: { red: 100x, green: ja, bloo: nein }
+YAML
+
+  $request = request('GET', 'http://example.com',
+    [ Cookie => join('; ', map +($_->[0].'='.$_->[1]), pairs(qw(red 100x green ja bloo nein))) ]);
+  is_equal(
+    $openapi->validate_request($request)->TO_JSON,
+    { valid => true },
+    'all query parameters are deserialized correctly',
   );
 
 
@@ -1362,7 +1776,7 @@ YAML
 
   $request = request('GET', 'http://example.com/foo', [ 'Header1' => '{"hello":"there"}' ]);
   query_params($request, [ query1 => '{"hello":"there"}' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1432,7 +1846,7 @@ paths:
 YAML
 
   $request = request('GET', 'http://example.com/foo?alpha=hihihi&beta=hihihi', [ Alpha => 'hihihi', Beta => 'hihihi' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1477,7 +1891,7 @@ paths:
         $ref: 'http://example.com/otherapi#/i_do_not_exist'
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1536,7 +1950,7 @@ YAML
   $request = request('POST', 'http://example.com/foo',
     [ 'Content-Type' => 'text/plain', 'Content-Length' => 4, 'Transfer-Encoding' => 'chunked' ],
     "4\r\nabcd\r\n0\r\n\r\n");
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1561,7 +1975,7 @@ YAML
 
   # note: no content!
   $request = request('POST', 'http://example.com/foo');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1586,7 +2000,7 @@ YAML
     $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'éclair');
     remove_header($request, 'Content-Length');
 
-    cmp_result(
+    is_equal(
       $openapi->validate_request($request)->TO_JSON,
       {
         valid => false,
@@ -1604,7 +2018,7 @@ YAML
   }
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1621,7 +2035,7 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1638,7 +2052,7 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'blOOp/HTML' ], 'html text (bloop style)');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1658,7 +2072,7 @@ YAML
   # we have to add media-types in foldcased format
   $openapi->add_media_type('bloop/html' => sub ($content_ref) { $content_ref });
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1678,7 +2092,7 @@ YAML
   $openapi->add_media_type('unknown/*' => sub ($value) { $value });
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unknown/encodingtype' ], 'binary');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1699,7 +2113,7 @@ YAML
   # but we have no media-type registry for image/*, only image/jpeg
   $openapi->add_media_type('image/jpeg' => sub ($value) { $value });
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'image/jpeg' ], 'binary');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1735,7 +2149,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
     chr(0xe9).'clair');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'latin1 content can be successfully decoded',
@@ -1797,7 +2211,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'application/json is utf-8 encoded',
@@ -1805,7 +2219,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'charset is ignored for application/json',
@@ -1813,7 +2227,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "foo", "gamma": "o.o"}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1845,7 +2259,7 @@ YAML
   my $disapprove = v224.178.160.95.224.178.160; # utf-8-encoded "ಠ_ಠ"
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "gamma": "'.$disapprove.'"}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'decoded content matches the schema',
@@ -1867,7 +2281,7 @@ paths:
 YAML
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'unsupported/unsupported' ], '!!!');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1884,7 +2298,7 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'a/b' ], '0');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -1932,13 +2346,13 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], '{}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'valid encoded content is always valid when there is no schema',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Type' => 'electric/boogaloo' ], 'blah'))->TO_JSON,
     { valid => true },
     '..even when the media-type is unknown',
@@ -1965,7 +2379,7 @@ paths:
     get: {}
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2000,7 +2414,7 @@ paths:
       - $ref: '#/components/parameters/alpha'
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2033,7 +2447,7 @@ YAML
 
   # bypass auto-initialization of Content-Length, Content-Type
   $request = request('POST', 'http://example.com/foo', [ 'Content-Length' => 1 ], '!');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2051,7 +2465,7 @@ YAML
 
   # bypass auto-initialization of Content-Length, Content-Type; leave Content-Length empty
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], '!');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2068,7 +2482,7 @@ YAML
   );
 
   $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'request body is missing but not required',
@@ -2115,7 +2529,7 @@ YAML
 
   my $request = request('POST', 'http://example.com/foo/123?bar=456',
     [ 'Foo-Bar' => 789, 'Content-Type' => 'text/plain' ], 666);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request, my $options = { path_captures => { foo_id => 123 } })->TO_JSON,
     my $expected = {
       valid => false,
@@ -2154,7 +2568,7 @@ YAML
   );
   is(get_type($options->{path_captures}{foo_id}), 'integer', 'passed-in path value is preserved as a number');
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request, $options = {})->TO_JSON,
     $expected,
     'parsed numeric values are treated as both strings and numbers, when no explicit type is requested',
@@ -2195,13 +2609,13 @@ YAML
 
   $request = request('POST', 'http://example.com/foo/123?bar=456',
     [ 'Foo-Bar' => 789, 'Content-Type' => 'text/plain' ], 666);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request, { path_captures => { foo_id => 123 } })->TO_JSON,
     { valid => true },
     'all parameter and body values are treated as strings',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'all parameter and body values are parsed from the request as strings',
@@ -2239,7 +2653,7 @@ paths:
               type: number
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request, { path_captures => { foo_id => 123 } })->TO_JSON,
     $expected = {
       valid => false,
@@ -2255,7 +2669,7 @@ YAML
     'numeric values are seen as numeric types when requested, but only in parameters and not bodies',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     $expected,
     'parsed numeric values are seen as numeric types when requested, but only in parameters and not bodies',
@@ -2323,7 +2737,7 @@ YAML
 
   $request = request('POST', 'http://example.com/foo/11/bar/12?query_plain=13&query_encoded=14',
     [ 'Header-Plain' => 15, 'Header-Encoded' => 16, 'Content-Type' => 'text/plain' ], 17);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request, { path_captures => { path_plain => 11, path_encoded => 12 } })->TO_JSON,
     {
       valid => false,
@@ -2378,7 +2792,7 @@ YAML
 
   my $val = 20; my $str = sprintf("%s\n", $val);
   $request = request('POST', 'http://example.com/foo/20/bar/hi', [ 'Content-Type' => 'text/plain' ], $val);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request,
       { path_captures => { path_plain => $val, path_encoded => 'hi' } })->TO_JSON,
     {
@@ -2484,14 +2898,14 @@ paths:
 YAML
 
   my $request = request('GET', 'http://example.com/foo', [ SingleValue => '  mystring  ' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'a single header value has its leading and trailing whitespace stripped',
   );
 
   $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsRawString => '  one , two  , three  ' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'multiple values in a single header are validated as a string, with only leading and trailing whitespace stripped',
@@ -2505,7 +2919,7 @@ YAML
       MultipleValuesAsString => ' two  ',
       MultipleValuesAsString => 'three  ',
     ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'multiple headers on separate lines are validated as a string, with leading and trailing whitespace stripped',
@@ -2513,7 +2927,7 @@ YAML
   }
 
   $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsArray => '  one, two, three  ' ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'headers can be parsed into an array in order to test multiple values without sorting',
@@ -2527,7 +2941,7 @@ YAML
     MultipleValuesAsArray => ' one ',
     MultipleValuesAsArray => ' three ',
   ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2554,7 +2968,7 @@ YAML
       MultipleValuesAsObjectExplodeTrue => ' R=100  , B=150 ',
       MultipleValuesAsObjectExplodeTrue => '  G=200 ',
     ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2596,7 +3010,7 @@ YAML
       ArrayWithAllOfAndRef => 'one, three, three',
       ArrayWithBrokenRef => 'hi',
     ]);
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2661,7 +3075,7 @@ YAML
     { type => 'array', minItems => 3 },
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://example.com/foo', [ ZeroSchema => 'foo,bar' ]))->TO_JSON,
     {
       valid => false,
@@ -2697,7 +3111,7 @@ paths:
 YAML
 
   my $request = request('POST', 'http://example.com/foo');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2732,7 +3146,7 @@ paths:
 YAML
 
   my $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ], '{"foo":1}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     {
       valid => false,
@@ -2791,13 +3205,13 @@ YAML
 
   my $request = request('POST', 'http://example.com/foo?a=1&b=2',
     [ 'Content-Type' => 'application/json' ], '{"c":1,"d":2}');
-  cmp_result(
+  is_equal(
     $openapi->validate_request($request)->TO_JSON,
     { valid => true },
     'readOnly values are still valid in a request',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'hi'))->TO_JSON,
     { valid => true },
     'no errors when processing an empty body schema',
@@ -2815,7 +3229,7 @@ paths:
     post: {}
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request($_, 'http://example.com/foo', [], 'content'))->TO_JSON,
     {
       valid => false,
@@ -2831,7 +3245,7 @@ YAML
     'no body permitted for '.$_,
   ) foreach qw(GET HEAD);
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('POST', 'http://example.com/foo', [], 'content'))->TO_JSON,
     { valid => true },
     'no errors from POST with body',
@@ -2840,7 +3254,7 @@ YAML
 SKIP: {
   # "Bad Content-Length: maybe client disconnect? (1 bytes remaining)"
   skip 'plack dies on this input', 3 if $::TYPE eq 'plack' or $::TYPE eq 'catalyst' or $::TYPE eq 'dancer2';
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request($_, 'http://example.com/foo', [ 'Content-Length' => 1 ]))->TO_JSON,
     {
       valid => false,
@@ -2856,7 +3270,7 @@ SKIP: {
     'non-zero Content-Length not permitted for '.$_,
   ) foreach qw(GET HEAD);
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('POST', 'http://example.com/foo', [ 'Content-Length' => 1 ]))->TO_JSON,
     { valid => true },
     'no errors from POST with Content-Length',
@@ -2884,6 +3298,10 @@ paths:
         in: query
         required: true
         schema: false
+      - name: foo
+        in: cookie
+        required: true
+        schema: false
       - name: bar_id
         in: path
         required: true
@@ -2905,6 +3323,13 @@ paths:
           text/plain:
             schema:
               false
+      - name: bar
+        in: cookie
+        required: true
+        content:
+          text/plain:
+            schema:
+              false
       requestBody:
         content:
           '*/*':
@@ -2921,9 +3346,9 @@ paths:
               false
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('POST', 'http://example.com/foo/1/2?foo=1&bar=2',
-      [ Foo => 1, Bar => 2, 'Content-Type' => 'text/plain' ], 'hi'))->TO_JSON,
+      [ Foo => 1, Bar => 2, Cookie => 'foo=1; bar=2', 'Content-Type' => 'text/plain' ], 'hi'))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -2946,22 +3371,34 @@ YAML
           error => 'query parameter not permitted',
         },
         {
+          instanceLocation => '/request/header/Cookie/foo',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 3 schema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 3 schema)))->to_string,
+          error => 'cookie parameter not permitted',
+        },
+        {
           instanceLocation => '/request/uri/path/bar_id',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 3 content text/plain schema)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 3 content text/plain schema)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 4 content text/plain schema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 4 content text/plain schema)))->to_string,
           error => 'path parameter not permitted',
         },
         {
           instanceLocation => '/request/header/Bar',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 4 content text/plain schema)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 4 content text/plain schema)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 5 content text/plain schema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 5 content text/plain schema)))->to_string,
           error => 'request header not permitted',
         },
         {
           instanceLocation => '/request/uri/query/bar',
-          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 5 content text/plain schema)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 5 content text/plain schema)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 6 content text/plain schema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 6 content text/plain schema)))->to_string,
           error => 'query parameter not permitted',
+        },
+        {
+          instanceLocation => '/request/header/Cookie/bar',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 7 content text/plain schema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id}/{bar_id} post parameters 7 content text/plain schema)))->to_string,
+          error => 'cookie parameter not permitted',
         },
         {
           instanceLocation => '/request/body',
@@ -2974,7 +3411,7 @@ YAML
     'custom error message when the entity is not permitted',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('POST', 'http://example.com/bar?bar=1'))->TO_JSON,
     {
       valid => false,
@@ -3014,7 +3451,7 @@ YAML
     minimum => 5,
   });
 
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'http://mycorp.com/foo/1'))->TO_JSON,
     {
       valid => false,
@@ -3115,7 +3552,7 @@ YAML
 
   # path-item in main document refs to second document.
   # now the path-item parameter starts here, a header has an error.
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'https://example.com/alpha', ['Content-Type' => 'text/plain'], 'hi'))->TO_JSON,
     {
       valid => false,
@@ -3134,7 +3571,7 @@ YAML
   # path-item in main document
   # we jump to a parameter in the second document
   # that parameter has an error.
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'https://example.com/beta'))->TO_JSON,
     {
       valid => false,
@@ -3153,7 +3590,7 @@ YAML
   # path-item in main document refs to second document
   # parameter passes validation
   # but the requestBody is a $ref back to the main document, and it has an error.
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'https://example.com/alpha', [ Blah => 'a' ]))->TO_JSON,
     {
       valid => false,
@@ -3171,7 +3608,7 @@ YAML
 
   # $ref to a secondary document, in which we evaluate a json schema with an $id in it
   # and this document uses a custom dialect via jsonSchemaDialect
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'https://example.com/beta',
         [Blah => 1, 'Content-Type' => 'application/json'], '{"a":"hi","b":"oh noes"}'))->TO_JSON,
     {
@@ -3197,7 +3634,7 @@ YAML
 
 
   # now we switch dialects via $schema in the subschema
-  cmp_result(
+  is_equal(
     $openapi->validate_request(request('GET', 'https://example.com/beta',
         [Blah => 1, 'Content-Type' => 'application/yaml'], '["hi","oh noes"]'))->TO_JSON,
     {
@@ -3232,4 +3669,5 @@ if (++$type_index < @::TYPES) {
   goto START;
 }
 
+had_no_warnings() if $ENV{AUTHOR_TESTING};
 done_testing;

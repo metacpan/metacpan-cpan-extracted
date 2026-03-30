@@ -1,0 +1,15 @@
+Revision history for PDF-Sign
+
+0.01  2026-03-29
+    - Initial CPAN release
+    - prepare_file, sign_file: CMS/CAdES signature support
+    - prepare_ts, ts_file: RFC3161 DocTimeStamp support
+    - cms_sign: openssl cms fallback smime via open() list form (no shell injection)
+    - ts_query: openssl ts via open() list form
+    - tsa_fetch: curl with LWP::UserAgent fallback
+    - verify_signatures: estract cms and tsa
+    - OpenSSL 1.x / 3.x compatibility (-cades, ETSI.CAdES.detached)
+    - PDF::API2 or PDF::Builder backend autodetection
+    - Cross-platform timezone handling (Linux / Windows)
+    - Process-safe temp files (PID in filename)
+    - PDF32000-2008 12.8.1 compliant ByteRange implementation

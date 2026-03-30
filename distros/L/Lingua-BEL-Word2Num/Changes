@@ -1,5 +1,7 @@
 Revision history for Lingua-BEL-Word2Num
 
-0.2603270  2026-03-27
-    - add 5 languages: BEL SLV SRP MKD SQI
+0.2603300  2026-03-30
+    - POD coverage + test suite fixes for 61-language Lingua suite
+    - add 10 languages: AZE HYE HIN KAZ KIR LAT MON SOM UIG YID
+    - remove hardcoded language counts from POD â use generic phrasing
 

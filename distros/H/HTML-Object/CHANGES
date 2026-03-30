@@ -1,5 +1,15 @@
 Revision history for Perl module HTML::Object
 
+v0.6.1 2026-03-30T09:28:10+0900
+    - Corrected a minor error on arguments list in add_default() in HTML::Object
+    - Corrected method firstElementChild() and lastElementChild() in HTML::Object::DOM::Element
+    - Corrected method control() in HTML::Object::DOM::Element::Label
+    - Corrected methods appendChild(), contains() and replaceChild() in HTML::Object::DOM::Node
+    - Corrected methods replaceWholeText() and _get_adjacent_nodes() in HTML::Object::DOM::Text
+    - Corrected method dispatchEvent() in HTML::Object::EventTarget
+    - Corrected methods has(), hasClass(), index(), is(), removeClass(), _append_prepend(), _before_after(), _insert_before_after() in HTML::Object::XQuery
+    - Improved method find() in HTML::Object::XQuery to use a fast approach for simple queries.
+
 v0.6.0 2025-10-16T09:22:23+0900
     - Update dependency from Want to Wanted
 

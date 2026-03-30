@@ -2,21 +2,35 @@
 
 =head1 NAME
 
-perldelta - what is new for perl v5.42.1
+perldelta - what is new for perl v5.42.2
 
 =head1 DESCRIPTION
 
-This document describes differences between the 5.42.0 release and the 5.42.1
+This document describes differences between the 5.42.1 release and the 5.42.2
 release.
 
-If you are upgrading from an earlier release such as 5.40.0, first read
-L<perl5420delta>, which describes differences between 5.40.0 and 5.42.0.
+If you are upgrading from an earlier release such as 5.42.0, first read
+L<perl5421delta>, which describes differences between 5.42.0 and 5.42.1.
+
+=head1 Security
+
+=head2 [CVE-2026-4176] Vulnerability in Compress::Raw::Zlib
+
+L<Compress::Raw::Zlib> is included in Perl as a dual-life core module, and was
+vulnerable to [L<CVE-2026-3381|https://www.cve.org/CVERecord?id=CVE-2026-3381>]
+due to a vendored version of zlib which had several vulnerabilities, including
+[L<CVE-2026-27171|https://www.cve.org/CVERecord?id=CVE-2026-27171>].
+
+This problem was assigned
+[L<CVE-2026-4176|https://www.cve.org/CVERecord?id=CVE-2026-4176>] by the
+L<CPAN Security Group|https://security.metacpan.org/>.
+
 
 =head1 Incompatible Changes
 
-There are no changes intentionally incompatible with Perl 5.42.0.  If any
-exist, they are bugs, and we request that you submit a report.  See
-L</Reporting Bugs> below.
+There are no changes intentionally incompatible with 5.42.1.  If any exist,
+they are bugs, and we request that you submit a report.  See L</Reporting Bugs>
+below.
 
 =head1 Modules and Pragmata
 
@@ -26,11 +40,11 @@ L</Reporting Bugs> below.
 
 =item *
 
-L<Module::CoreList> has been upgraded from version 5.20250702 to 5.20260308.
+L<Compress::Raw::Zlib> has been upgraded from version 2.213 to 2.222.
 
 =item *
 
-L<POSIX> has been upgraded from version 2.23 to 2.23_01.
+L<Module::CoreList> has been upgraded from version 5.20260308 to 5.20260329_42.
 
 =back
 
@@ -42,122 +56,26 @@ We have attempted to update the documentation to reflect the changes listed in
 this document.  If you find any we have missed, open an issue at
 L<https://github.com/Perl/perl5/issues>.
 
-=head1 Configuration and Compilation
-
-=over 4
-
-=item *
-
-It is now possible to pass to F<Configure> the values dealing with POSIX locale
-categories, overriding its automatic calculation of these.  This enables
-cross-compilation to work.  The easiest way to do this is to extract the C
-program that does the calculation from F<Configure> and then run it on the
-target machine, and then pass the values it outputs to F<Configure> on the
-other machine.  F<Porting/Glossary> has examples.
-[L<GH #22992|https://github.com/Perl/perl5/issues/22992>]
-
-=back
-
 =head1 Testing
 
 Tests were added and changed to reflect the other additions and changes in this
 release.
 
-=head1 Platform Support
-
-=head2 Platform-Specific Notes
-
-=over 4
-
-=item AIX
-
-Thread-safe locale handling has been turned off on all releases due to
-apparent bugs in the underlying operating system support.
-[L<GH #23825|https://github.com/Perl/perl5/issues/23825>]
-
-=item Win32
-
-Fix builds with C<USE_IMP_SYS> defined but C<USE_ITHREADS> not defined.
-
-=back
-
-=head1 Selected Bug Fixes
-
-=over 4
-
-=item *
-
-S<C<use 5.42>> now turns on S<C<use source::encoding "ascii">> for the
-remainder of the line (besides subsequent lines).
-[L<GH #23881|https://github.com/Perl/perl5/issues/23881>]
-
-=item *
-
-Perl 5.42.0 does not handle the transition to/from daylight savings time
-properly.  The time and/or timezone can be off by an hour in the intervals
-surrounding such transitions.  This is a regression from earlier releases, and
-is now fixed.  This bug was evident from perl space in the L<POSIX/strftime>
-function, and in XS code with any of L<perlapi/my_strftime>,
-L<perlapi/sv_strftime_ints>, or L<perlapi/sv_strftime_tm>.
-[L<GH #23878|https://github.com/Perl/perl5/issues/23878>]
-
-=item *
-
-Certain constructs involving a two-variable C<for> loop would crash the perl
-compiler in Perl 5.42.0:
-
-    # Two-variable for loop over a list returned from a method call:
-    for my ($x, $y) (Some::Class->foo()) { ... }
-    for my ($x, $y) ($object->foo()) { ... }
-
-and
-
-    # Two-variable for loop over a list returned from a call to a
-    # lexical(ly imported) subroutine, all inside a lexically scoped
-    # or anonymous subroutine:
-    my sub foo { ... }
-    my $fn = sub {
-        for my ($x, $y) (foo()) { ... }
-    };
-
-    use builtin qw(indexed);  # lexical import!
-    my sub bar {
-        for my ($x, $y) (indexed(...)) { ... }
-    }
-
-These have been fixed.
-[L<GH #23405|https://github.com/Perl/perl5/issues/23405>]
-
-=item *
-
-Since Perl 5.32.0, the second branch of a ternary condition operator wasn't
-getting the correct autovivification context applied.  For example in something
-like
-
-    @{ $cond ? $h{foo} : $h{bar} } = ...;
-
-the first branch would correctly autovivify C<$h{foo}> to an array ref, but the
-second branch might incorrectly autovivify C<$h{bar}> to a hash ref.
-[L<GH #18669|https://github.com/Perl/perl5/issues/18669>].
-
-=back
-
 =head1 Acknowledgements
 
-Perl 5.42.1 represents approximately 8 months of development since Perl 5.42.0
-and contains approximately 7,200 lines of changes across 55 files from 12
+Perl 5.42.2 represents approximately 3 weeks of development since Perl 5.42.1
+and contains approximately 2,900 lines of changes across 57 files from 6
 authors.
 
 Excluding auto-generated files, documentation and release tools, there were
-approximately 1,700 lines of changes to 16 .pm, .t, .c and .h files.
+approximately 1,900 lines of changes to 23 .pm, .t, .c and .h files.
 
 Perl continues to flourish into its fourth decade thanks to a vibrant community
 of users and developers.  The following people are known to have contributed
-the improvements that became Perl 5.42.1:
+the improvements that became Perl 5.42.2:
 
-David Mitchell, Eric Herman, Karen Etheridge, Karl Williamson, Lukas Mai, Max
-Maischein, Philippe Bruhat (BooK), Richard Leach, Steve Hay, Thibault
-Duponchelle, Tony Cook, Yitzchak Scott-Thoennes.
+Eric Herman, James E Keenan, Olaf Alders, Paul Marquess, Richard Leach, Steve
+Hay.
 
 The list above is almost certainly incomplete as it is automatically generated
 from version control history.  In particular, it does not include the names of
@@ -182,9 +100,8 @@ L<https://github.com/Perl/perl5/issues>.  Be sure to trim your bug down to a
 tiny but sufficient test case.
 
 If the bug you are reporting has security implications which make it
-inappropriate to send to a public issue tracker, then see
-L<perlsec/SECURITY VULNERABILITY CONTACT INFORMATION> for details of how to
-report the issue.
+inappropriate to send to a public issue tracker, then see L<perlsec/SECURITY
+VULNERABILITY CONTACT INFORMATION> for details of how to report the issue.
 
 =head1 Give Thanks
 

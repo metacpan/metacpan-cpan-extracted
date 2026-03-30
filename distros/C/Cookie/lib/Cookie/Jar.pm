@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.3.3
+## Version v0.3.4
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
@@ -38,7 +38,7 @@ BEGIN
     use Module::Generic::HeaderValue;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.3.3';
+    our $VERSION = 'v0.3.4';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -81,9 +81,9 @@ sub init
         my $type = $self->type;
         my $type2sub = 
         {
-        json => \&load,
-        lwp  => \&load_as_lwp,
-        netscape => \&load_as_netscape,
+            json => \&load,
+            lwp  => \&load_as_lwp,
+            netscape => \&load_as_netscape,
         };
         return( $self->error( "Unknown cookie jar type '$type'. This can be either json, lwp or netscape" ) ) if( !CORE::exists( $type2sub->{ $type } ) );
         my $loader = $type2sub->{ $type };
@@ -235,8 +235,8 @@ sub add_request_header
     # <https://datatracker.ietf.org/doc/html/rfc6265#section-5.4>
     foreach my $c ( @$cookies )
     {
-        unless( $c->host_only && $root eq $c->domain ||
-                !$c->host_only && $host eq $c->domain )
+        unless( ( $c->host_only  && $root eq $c->domain ) ||
+                ( !$c->host_only && $self->_domain_match( $host, $c->domain ) ) )
         {
             next;
         }
@@ -486,9 +486,11 @@ sub extract
     if( $host = $resp->header( 'Host' ) ||
         ( $resp->request && ( $host = $resp->request->header( 'Host' ) ) ) )
     {
-        $host =~ s/:(\d+)$//;
+        if( $host =~ s/:(\d+)$// )
+        {
+            $port = $1;
+        }
         $host = lc( $host );
-        $port = $1;
     }
     else
     {
@@ -2174,6 +2176,16 @@ sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 sub _cookies { return( shift->_set_get_array_as_object( '_cookies', @_ ) ); }
 
+sub _domain_match
+{
+    my $self   = shift( @_ );
+    my $host   = lc( shift( @_ ) // '' );
+    my $domain = lc( shift( @_ ) // '' );
+    return(1) if( $host eq $domain );
+    return(1) if( $host =~ /\.\Q$domain\E$/ );
+    return(0);
+}
+
 sub _encrypt_objects
 {
     my $self = shift( @_ );
@@ -2265,10 +2277,10 @@ sub DESTROY
         my $type = $self->type;
         my $type2sub = 
         {
-        json => \&save,
-        lwp  => \&save_as_lwp,
-        mozilla => \&save_as_mozilla,
-        netscape => \&save_as_netscape,
+            json     => \&save,
+            lwp      => \&save_as_lwp,
+            mozilla  => \&save_as_mozilla,
+            netscape => \&save_as_netscape,
         };
         if( !CORE::exists( $type2sub->{ $type } ) )
         {
@@ -2420,7 +2432,7 @@ Cookie::Jar - Cookie Jar Class for Server & Client
 
 =head1 VERSION
 
-    v0.3.3
+    v0.3.4
 
 =head1 DESCRIPTION
 

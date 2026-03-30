@@ -1,6 +1,6 @@
 Revision history for Lingua-CES-Num2Word
 
-0.2603270  2026-03-27
-    - ordinals for 14 languages: CES DAN DEU ENG FIN FRA HUN ITA NLD NOR POL SPA SWE TUR
-    - capabilities infrastructure: introspection + ordinal stub
+0.2603300  2026-03-30
+    - POD coverage + test suite fixes for 61-language Lingua suite
+    - add =encoding utf-8 to all POD sections (fixes no_pod_errors kwalitee)
 

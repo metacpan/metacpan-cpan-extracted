@@ -4,7 +4,7 @@
 #
 
 package Lingua::RUS::Num2Word;
-# ABSTRACT: Number 2 word conversion in RUS.
+# ABSTRACT: Converts numbers to money sum in words (in Russian roubles)
 
 use 5.16.0;
 use utf8;
@@ -12,11 +12,12 @@ use warnings;
 
 # {{{ use block
 
+use Carp;
 use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # Preloaded methods go here.
 use vars qw(%diw %nom);
@@ -157,12 +158,260 @@ sub get_string :Export{
 # }}}
 
 
+# {{{ num2rus_ordinal           number to ordinal string conversion
+
+sub num2rus_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'нулевой',
+        1  => 'первый',
+        2  => 'второй',
+        3  => 'третий',
+        4  => 'четвёртый',
+        5  => 'пятый',
+        6  => 'шестой',
+        7  => 'седьмой',
+        8  => 'восьмой',
+        9  => 'девятый',
+        10 => 'десятый',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Teens ordinals 11-19
+    my %teens = (
+        11 => 'одиннадцатый',
+        12 => 'двенадцатый',
+        13 => 'тринадцатый',
+        14 => 'четырнадцатый',
+        15 => 'пятнадцатый',
+        16 => 'шестнадцатый',
+        17 => 'семнадцатый',
+        18 => 'восемнадцатый',
+        19 => 'девятнадцатый',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'двадцатый',
+        30 => 'тридцатый',
+        40 => 'сороковой',
+        50 => 'пятидесятый',
+        60 => 'шестидесятый',
+        70 => 'семидесятый',
+        80 => 'восьмидесятый',
+        90 => 'девяностый',
+    );
+
+    # Cardinal tens (for compound numbers)
+    my %tens_card = (
+        20 => 'двадцать',
+        30 => 'тридцать',
+        40 => 'сорок',
+        50 => 'пятьдесят',
+        60 => 'шестьдесят',
+        70 => 'семьдесят',
+        80 => 'восемьдесят',
+        90 => 'девяносто',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'сотый',
+        200 => 'двухсотый',
+        300 => 'трёхсотый',
+        400 => 'четырёхсотый',
+        500 => 'пятисотый',
+        600 => 'шестисотый',
+        700 => 'семисотый',
+        800 => 'восьмисотый',
+        900 => 'девятисотый',
+    );
+
+    # Cardinal hundreds (for compound numbers)
+    my %hundreds_card = (
+        100 => 'сто',
+        200 => 'двести',
+        300 => 'триста',
+        400 => 'четыреста',
+        500 => 'пятьсот',
+        600 => 'шестьсот',
+        700 => 'семьсот',
+        800 => 'восемьсот',
+        900 => 'девятьсот',
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            if ($millions == 1) {
+                return 'миллионный';
+            }
+            return _rus_cardinal($millions) . ' миллионный';
+        }
+        my $prefix = _rus_cardinal($millions);
+        my $tmp4 = $millions % 10;
+        my $tmp3 = $millions % 100;
+        my $mil_word;
+        if ($tmp3 >= 11 && $tmp3 <= 19) {
+            $mil_word = 'миллионов';
+        }
+        elsif ($tmp4 == 1) {
+            $mil_word = 'миллион';
+        }
+        elsif ($tmp4 >= 2 && $tmp4 <= 4) {
+            $mil_word = 'миллиона';
+        }
+        else {
+            $mil_word = 'миллионов';
+        }
+        return $prefix . ' ' . $mil_word . ' ' . num2rus_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'тысячный';
+            }
+            return _rus_cardinal($thousands) . ' тысячный';
+        }
+        my $tmp4 = $thousands % 10;
+        my $tmp3 = $thousands % 100;
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'тысяча';
+        }
+        elsif ($thousands == 2) {
+            $thou_cardinal = 'две тысячи';
+        }
+        elsif ($tmp3 >= 11 && $tmp3 <= 19) {
+            $thou_cardinal = _rus_cardinal($thousands) . ' тысяч';
+        }
+        elsif ($tmp4 == 1) {
+            $thou_cardinal = _rus_cardinal($thousands - 1) . ' одна тысяча';
+        }
+        elsif ($tmp4 == 2) {
+            $thou_cardinal = _rus_cardinal($thousands - 2) . ' две тысячи';
+        }
+        elsif ($tmp4 >= 3 && $tmp4 <= 4) {
+            $thou_cardinal = _rus_cardinal($thousands) . ' тысячи';
+        }
+        else {
+            $thou_cardinal = _rus_cardinal($thousands) . ' тысяч';
+        }
+        $thou_cardinal =~ s{^\s+}{};
+        return $thou_cardinal . ' ' . num2rus_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $hundreds_card{$h} . ' ' . num2rus_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_card{$t} . ' ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
+
+# {{{ _rus_cardinal             internal: number to cardinal words (for ordinal composition)
+
+sub _rus_cardinal {
+    my ($number) = @_;
+
+    return '' if $number == 0;
+
+    my %card_units = (
+        1 => 'один',   2 => 'два',     3 => 'три',
+        4 => 'четыре', 5 => 'пять',    6 => 'шесть',
+        7 => 'семь',   8 => 'восемь',  9 => 'девять',
+        10 => 'десять',
+        11 => 'одиннадцать', 12 => 'двенадцать',
+        13 => 'тринадцать',  14 => 'четырнадцать',
+        15 => 'пятнадцать',  16 => 'шестнадцать',
+        17 => 'семнадцать',  18 => 'восемнадцать',
+        19 => 'девятнадцать',
+    );
+
+    my %card_tens = (
+        20 => 'двадцать',    30 => 'тридцать',
+        40 => 'сорок',       50 => 'пятьдесят',
+        60 => 'шестьдесят',  70 => 'семьдесят',
+        80 => 'восемьдесят', 90 => 'девяносто',
+    );
+
+    my %card_hundreds = (
+        100 => 'сто',        200 => 'двести',
+        300 => 'триста',     400 => 'четыреста',
+        500 => 'пятьсот',    600 => 'шестьсот',
+        700 => 'семьсот',    800 => 'восемьсот',
+        900 => 'девятьсот',
+    );
+
+    return $card_units{$number} if exists $card_units{$number};
+
+    my $result = '';
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        $result = $card_hundreds{$h};
+        $number %= 100;
+        return $result if $number == 0;
+        $result .= ' ';
+    }
+
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        $result .= $card_tens{$t};
+        $number %= 10;
+        return $result if $number == 0;
+        $result .= ' ' . $card_units{$number};
+        return $result;
+    }
+
+    if ($number > 0) {
+        $result .= $card_units{$number};
+    }
+
+    return $result;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -173,13 +422,15 @@ __END__
 
 # {{{ module documentation
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::RUS::Num2Word - Converts numbers to money sum in words (in Russian roubles)
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -207,6 +458,18 @@ Test::More::UTF8 in use in test because of encoding problems.
 Convert number to Russian currency string.
 
 =item get_string
+
+=item num2rus_ordinal
+
+Convert number to Russian ordinal text representation.
+Only numbers from interval [0, 999_999_999] will be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

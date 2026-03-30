@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/m
-## Version v1.9.1
+## Database Object Interface - ~/lib/DB/Object.pm
+## Version v1.10.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/03/27
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
         $SERIALISATION_VERSION $EXCEPTION_CLASS
     );
     use Regexp::Common;
-    use Scalar::Util qw( blessed );
+    use Scalar::Util qw( blessed weaken );
     use DB::Object::Cache::Tables;
     use DBI;
     use JSON;
@@ -35,9 +35,9 @@ BEGIN
     use Module::Generic::Global qw( :const );
     use POSIX ();
     use Wanted;
-    our $PLACEHOLDER_REGEXP = qr/\b\?\b/;
+    our $PLACEHOLDER_REGEXP = qr/(?<![?\w])\?(?![?\w])/;
     our $EXCEPTION_CLASS    = 'DB::Object::Exception';
-    our $VERSION = 'v1.9.1';
+    our $VERSION = 'v1.10.0';
 };
 
 use strict;
@@ -1571,7 +1571,6 @@ sub table
     my $table  = shift( @_ ) || 
         return( $self->error( "You must provide a table name to access the table methods." ) );
     my $table_class = "${base_class}::Tables";
-    $self->messagec( 4, "Getting table {green}${table}{/} object with class {green}${table_class}{/}" );
     $self->_load_class( $table_class ) || return( $self->pass_error );
     my $host   = $self->{server} // '';
     my $db     = $self->{database} // '';
@@ -1600,11 +1599,9 @@ sub table
             dbo   => $self,
             debug => $self->debug,
         ) || return( $self->pass_error( $table_class->error ) );
-        $self->messagec( 6, "Object for table {green}${table}{/} created." );
         $tbl->reset;
         if( $self->cache_table )
         {
-            $self->messagec( 6, "Caching table {green}${table}{/}" );
             $self->_cache_table(
                 host     => $self->host,
                 database => $self->database,
@@ -1615,7 +1612,6 @@ sub table
     $tbl->no_bind( $self->no_bind );
     # We set debug and again here in case it changed since the table object was instantiated
     $tbl->debug( $self->debug );
-    $self->messagec( 6, "Returning table {green}${table}{/} object." );
     return( $tbl );
 }
 
@@ -1892,7 +1888,6 @@ sub _cache_table
             $updated++;
         }
     }
-    $self->messagec( 6, "There are {green}", scalar( keys( %{$cache->{ $host }->{ $database }} ) ), "{/} elements in hash reference \$cache->\{ $host \}->\{ $database \}" );
     # The caller has not provided any table value, hinting it wants the entire hash repository for this database.
     if( !defined( $table ) )
     {
@@ -2841,7 +2836,6 @@ sub _operator_object_create
     my $class = shift( @_ ) || return( $self->error( "No operator class was provided." ) );
     my $q = $self->_reset_query;
     my $args = ( scalar( @_ ) == 1 && ref( $_[0] ) eq 'ARRAY' ) ? [ @{$_[0]} ] : [ @_ ];
-    $self->messagec( 5, "Creating an operator object for class {green}${class}{/} and values '{green}" . join( "{/}', '{green}", map( overload::StrVal( $_ ), @$args ) ) . "{/}'" );
     return( $class->new(
         debug => $self->debug,
         query_object => $q,
@@ -2890,18 +2884,22 @@ sub _query_object_create
     my $self = shift( @_ );
     my $base = $self->base_class;
     my $query_class = "${base}::Query";
-    $self->messagec( 6, "Loading query class {green}${query_class}{/}" );
     $self->_load_class( $query_class ) ||
         return( $self->error( "Unable to load Query builder module $query_class: ", $self->error->message ) );
-    $self->messagec( 5, "Creating new query object with class $query_class for table '{green}", ( $self->isa( 'DB::Object::Tables' ) ? $self->name : '' ), "{/}' and alias {green}", ( $self->isa( 'DB::Object::Tables' ) ? ( $self->as || 'undef' ) : 'undef' ), "{/}." );
-    $self->messagec( 6, "Instantiating new object for query class {green}${query_class}{/}" );
     my $o = $query_class->new;
     $o->debug( $self->debug );
     $o->enhance( $self->{enhance} ) if( CORE::length( $self->{enhance} ) );
     if( $self->isa( 'DB::Object::Tables' ) )
     {
         $o->table_object( $self ) || return( $self->pass_error( $o->error ) );
+        # Weaken the back-reference from the Query object to its owning Table to break
+        # the circular reference cycle (Table -> query_object -> Query -> table_object -> Table)
+        # that prevents Perl's garbage collector from reclaiming old Query objects.
+        weaken( $o->{table_object} );
         $o->database_object( $self->database_object ) || return( $self->pass_error( $o->error ) );
+        # Also weaken the database_object reference - the dbo is a long-lived singleton
+        # and does not own Query objects, so a weak reference is safe here.
+        weaken( $o->{database_object} );
         # Set the table alias if any has been set
         if( my $table_alias = $self->as )
         {
@@ -2931,7 +2929,6 @@ sub _query_object_get_or_create
     }
     if( !$obj )
     {
-        $self->messagec( 5, "Query object for table '{green}", ( $self->isa( 'DB::Object::Tables' ) ? $self->name : '' ), "{/}' does not exist yet, instantiating a new one." );
         $obj = $self->_query_object_create || return( $self->pass_error );
         $self->query_object( $obj );
     }
@@ -3327,7 +3324,7 @@ sub _opt_overload
     my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
     my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
         ? $val->name
-        : ( $val =~ /^$placeholder_re$/ || $self->_is_number( $val ) )
+        : ( $val =~ $placeholder_re || $self->_is_number( $val ) )
             ? $val
             : qq{'${val}'};
     return( DB::Object::Expression->new( "${lval} ${not}${in}" ) );
@@ -3413,7 +3410,7 @@ sub _opt_overload
     my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
     my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
         ? $val->name
-        : ( $val =~ /^$placeholder_re$/ || $self->_is_number( $val ) )
+        : ( $val =~ $placeholder_re || $self->_is_number( $val ) )
             ? $val
             : qq{'${val}'};
     return( DB::Object::Expression->new( "${lval} ${not}${in}" ) );
@@ -3518,7 +3515,7 @@ sub _opt_overload
     my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
     my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
         ? $val->name
-        : ( $val =~ /^$placeholder_re$/ || $self->_is_number( $val ) )
+        : ( $val =~ $placeholder_re || $self->_is_number( $val ) )
             ? $val
             : qq{'${val}'};
     return( DB::Object::Expression->new( "${lval} ${not}${in}" ) );
@@ -3578,7 +3575,7 @@ sub _opt_overload
     my $placeholder_re = $self->query_object->database_object->_placeholder_regexp;
     my $lval = ( Scalar::Util::blessed( $val ) && $val->isa( 'DB::Object::Fields::Field' ) )
         ? $val->name
-        : ( $val =~ /^$placeholder_re$/ || $self->_is_number( $val ) )
+        : ( $val =~ $placeholder_re || $self->_is_number( $val ) )
             ? $val
             : qq{'${val}'};
     return( DB::Object::Expression->new( "${lval} ${not}${like}" ) );
@@ -3765,7 +3762,7 @@ In future release, other operators than C<=> will be implemented for C<JSON> and
 
 =head1 VERSION
 
-    v1.9.1
+    v1.10.0
 
 =head1 DESCRIPTION
 

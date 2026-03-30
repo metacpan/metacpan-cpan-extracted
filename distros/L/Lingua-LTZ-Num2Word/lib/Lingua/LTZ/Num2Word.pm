@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -124,12 +124,42 @@ sub _connector {
 }
 
 # }}}
+# {{{ num2ltz_ordinal                  convert number to ordinal text
+
+sub num2ltz_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Fully irregular forms
+    return 'éischt'  if $number == 1;
+    return 'zweet'   if $number == 2;
+    return 'drëtt'   if $number == 3;
+
+    # Stem irregulars
+    return 'siiwent' if $number == 7;
+    return 'aacht'   if $number == 8;
+
+    my $cardinal = num2ltz_cardinal($number);
+
+    # Numbers 4-19 get suffix "t", 20+ get "st"
+    my $suffix = $number < 20 ? 't' : 'st';
+
+    return $cardinal . $suffix;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -142,6 +172,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::LTZ::Num2Word - Number to word conversion in Luxembourgish
@@ -149,7 +181,7 @@ Lingua::LTZ::Num2Word - Number to word conversion in Luxembourgish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::LTZ::Num2Word is module for converting numbers into their written
 representation in Luxembourgish (Lëtzebuergesch). Converts whole numbers
@@ -191,9 +223,19 @@ Text is encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2ltz_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to its Luxembourgish ordinal text representation.
+Only numbers from interval [1, 999_999_999] will be converted.
+Handles irregular forms (éischt, zweet, drëtt, siiwent, aacht)
+and applies correct suffixes (-t for 4-19, -st for 20+).
+
 =item B<capabilities> (void)
 
-  =>  hashref  supported features (cardinal => 1, ordinal => 0)
+  =>  hashref  supported features (cardinal => 1, ordinal => 1)
 
 Returns a hashref indicating which conversion types are supported.
 
@@ -211,6 +253,8 @@ Returns a hashref indicating which conversion types are supported.
 =over 2
 
 =item num2ltz_cardinal
+
+=item num2ltz_ordinal
 
 =back
 

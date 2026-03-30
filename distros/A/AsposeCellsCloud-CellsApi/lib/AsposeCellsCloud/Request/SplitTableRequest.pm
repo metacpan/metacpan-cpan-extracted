@@ -65,6 +65,7 @@ sub new {
 # SplitTableRequest.tableName : Data table that needs to be split.  ,
 # SplitTableRequest.splitColumnName : Column name to split by.  ,
 # SplitTableRequest.saveSplitColumn : Whether to keep the data in the split column.  ,
+# SplitTableRequest.splitRowNumber :   ,
 # SplitTableRequest.toNewWorkbook : Export destination control: true - Creates new workbook files containing the split data; false - Adds a new worksheet to the current workbook.  ,
 # SplitTableRequest.toMultipleFiles : true - Exports table data as **multiple separate files** (returned as ZIP archive);false - Stores all data in a **single file** with multiple sheets. Default: false.  ,
 # SplitTableRequest.outPath : (Optional) The folder path where the workbook is stored. The default is null.  ,
@@ -122,6 +123,10 @@ sub run_http_request {
 
     if(defined $self->save_split_column){
         $query_params->{'saveSplitColumn'} = $client->to_query_value($self->save_split_column);      
+    }
+
+    if(defined $self->split_row_number){
+        $query_params->{'splitRowNumber'} = $client->to_query_value($self->split_row_number);      
     }
 
     if(defined $self->to_new_workbook){
@@ -204,6 +209,13 @@ __PACKAGE__->method_documentation({
      	format => '',
      	read_only => '',
      		},
+     'split_row_number' => {
+     	datatype => 'int',
+     	base_name => 'splitRowNumber',
+     	description => '',
+     	format => '',
+     	read_only => '',
+     		},
      'to_new_workbook' => {
      	datatype => 'string',
      	base_name => 'toNewWorkbook',
@@ -262,6 +274,7 @@ __PACKAGE__->attribute_map( {
     'table_name' => 'tableName',
     'split_column_name' => 'splitColumnName',
     'save_split_column' => 'saveSplitColumn',
+    'split_row_number' => 'splitRowNumber',
     'to_new_workbook' => 'toNewWorkbook',
     'to_multiple_files' => 'toMultipleFiles',
     'out_path' => 'outPath',

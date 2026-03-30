@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :form );
@@ -109,7 +110,7 @@ HTML::Object::DOM::Element::Form - HTML Object DOM Form Class
 
 =head1 DESCRIPTION
 
-This interface represents a <form> element in the DOM. It allows access to—and, in some cases, modification of—aspects of the form, as well as access to its component elements.
+This interface represents a <form> element in the DOM. It allows access to-and, in some cases, modification of-aspects of the form, as well as access to its component elements.
 
 =head1 INHERITANCE
 

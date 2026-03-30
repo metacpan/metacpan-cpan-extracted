@@ -1,5 +1,40 @@
 Revision history for Perl module Module::Generic
 
+v1.3.0 2026-03-28T10:23:07+0900
+    - Added XS implementations of twelve frequently-called utility methods, providing a
+      measurable performance improvement for all code inheriting from Module::Generic.
+      The XS versions are loaded automatically at startup via XSLoader and fall back
+      transparently to the pure-Perl implementations when the compiled shared library is
+      unavailable (pure-Perl installs remain fully functional without a C compiler).
+      The following methods are now accelerated by XS:
+        _get_args_as_array, _is_array, _is_code, _is_glob, _is_hash, _is_integer,
+        _is_number, _is_object, _is_overloaded, _is_scalar, _obj2h, _refaddr.
+    - The XS helper mg_get_sv_arg() correctly handles tied scalars (such as
+      Module::Generic::LvalueGuard) by using sv_mortalcopy() to trigger the FETCH magic
+      before inspecting SV flags, mirroring the behaviour of Scalar::Util::reftype() in
+      all cases.
+    - Extended Generic.xs (previously only used by Module::Generic::File::Magic) with a
+      new MODULE = Module::Generic / PACKAGE = Module::Generic section for the utility
+      method XS functions. A shared double-load guard ($Module::Generic::XS_LOADED)
+      prevents the "subroutine redefined" warnings that would otherwise occur when both
+      Module::Generic and Module::Generic::File::Magic trigger XSLoader on the same .so.
+    - Fixed a latent bug in the pure-Perl implementations of _is_array, _is_code,
+      _is_glob, _is_integer, _is_number, _is_scalar: the guard
+      'return(0) if( scalar( @_ < 2 ) )' was incorrectly testing the boolean result of
+      the comparison rather than the argument count. Corrected to
+      'return(0) if( scalar( @_ ) < 2 )'.
+    - Fixed _is_overloaded, _is_object to return 0 (explicit false integer) instead of
+      undef in all negative cases, in line with the boolean contract of the _is_* family.
+    - Fixed _is_code to use Scalar::Util::reftype() instead of ref() so that blessed
+      coderefs are correctly recognised (ref() returns the class name, not 'CODE', for
+      blessed coderefs).
+    - Added unit test t/33.xs_methods.t covering all twelve XS-accelerated methods,
+      verifying correctness of edge cases including undef arguments, blessed references,
+      tied scalars, strict mode for _is_hash, and element mutability for _get_args_as_array.
+    - Fixed GV_ADD | GV_ADDMULTI in _set_backend() within Generic.xs to suppress the
+      spurious 'Name used only once: possible typo' warning emitted by DynaLoader for
+      $Module::Generic::File::Magic::BACKEND.
+
 v1.2.5 2026-03-22T22:04:02+0900
     - Corrected Module::Generic::Number to return a number to JSON
     - Corrected DESTROY in Module::Generic::Scalar::IO

@@ -63,6 +63,8 @@ This Developer Guide serves as the complete technical reference for the Aspose.C
 | [RepairSpreadsheet](api/RepairSpreadsheet.md) | The Web API endpoint allows users to repair a spreadsheet. |
 | [GetMergedCellsInRemotedWorksheet](api/GetMergedCellsInRemotedWorksheet.md) | Get all merged cell area form a remote spreadsheet worksheet. |
 | [GetMergedCellsInWorksheet](api/GetMergedCellsInWorksheet.md) | Get all merged cell area form a local spreadsheet worksheet. |
+| [AcceptAllRevisions](api/AcceptAllRevisions.md) |  |
+| [AcceptAllRevisionsInRemoteSpreadsheet](api/AcceptAllRevisionsInRemoteSpreadsheet.md) |  |
 | [ProtectSpreadsheet](api/ProtectSpreadsheet.md) | Applies dual-layer password protection to Excel spreadsheets, supporting both open and modify passwords with encryption. |
 | [UnprotectSpreadsheet](api/UnprotectSpreadsheet.md) | Removes dual-layer password protection from Excel spreadsheets, supporting both open and modify passwords with encryption. |
 | [SpreadsheetDigitalsignature](api/SpreadsheetDigitalsignature.md) |  |

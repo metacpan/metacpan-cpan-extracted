@@ -18,7 +18,7 @@ use Module::Load qw( load );
 use Scalar::Util qw(blessed openhandle);
 use Try::Tiny qw(try catch);
 
-our $VERSION = '6.81';
+our $VERSION = '6.82';
 
 sub new
 {
@@ -1169,9 +1169,12 @@ sub env_proxy {
         }
 	$k = lc($k);
         if (my $from_key= $seen{$k}) {
-            warn "Environment contains multiple differing definitions for '$k'.\n".
-                 "Using value from '$from_key' ($ENV{$from_key}) and ignoring '$real_key' ($v)"
-                if $v ne $ENV{$from_key};
+            # Only warn about proxy-related env vars, not unrelated ones (GH #372)
+            if ($k =~ /^(.*)_proxy$/) {
+                warn "Environment contains multiple differing definitions for '$k'.\n".
+                     "Using value from '$from_key' ($ENV{$from_key}) and ignoring '$real_key' ($v)"
+                    if $v ne $ENV{$from_key};
+            }
             next;
         } else {
             $seen{$k}= $real_key;
@@ -1631,7 +1634,7 @@ external module, SSL certificate verification was harmonized to behave in sync w
 L<IO::Socket::SSL>. With this change, setting this option no longer disables all SSL
 certificate verification, only the hostname checks. To disable all verification,
 use the C<SSL_verify_mode> option in the C<ssl_opts> attribute. For example:
-C<$ua->ssl_opts(SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE);>
+C<< $ua->ssl_opts(SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE); >>
 
 =item C<SSL_ca_file> => $path
 

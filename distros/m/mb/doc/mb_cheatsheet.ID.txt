@@ -1,0 +1,46 @@
+======================================================================
+ mb Cheat Sheet                                  [ID] Bahasa Indonesia
+======================================================================
+
+[ 1. Load ]
+  use mb;
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+
+[ 2. Character-oriented length / substr ]
+  mb::length($str)              # number of characters (not bytes)
+  mb::substr($str, $pos, $len)  # substring by character position
+  mb::substr($str, $pos, $len, $replacement)
+
+[ 3. Search ]
+  mb::index($str, $sub)         # character-position index
+  mb::index($str, $sub, $pos)   # search from $pos
+  mb::rindex($str, $sub)        # right-side search
+  mb::index_byte($str, $sub)    # byte-position index (JPerl semantics)
+  mb::rindex_byte($str, $sub)
+
+[ 4. Character conversion ]
+  mb::uc($str)                  # uppercase
+  mb::lc($str)                  # lowercase
+  mb::ucfirst($str)             # capitalize first char
+  mb::lcfirst($str)
+
+[ 5. Character code ]
+  mb::ord($str)                 # codepoint of first character
+  mb::chr($n)                   # character from codepoint
+
+[ 6. Other string operations ]
+  mb::chop($str)                # remove last character
+  mb::reverse(@list)            # reverse characters or list
+  mb::getc(FH)                  # read one character from filehandle
+  mb::tr($str, $from, $to)      # transliterate characters
+
+[ 7. Supported encodings ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. Example ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "Hello World";
+  printf "length=%d\n", mb::length($s);    # character count
+  printf "sub=%s\n",    mb::substr($s,0,5); # "Hello"
+  printf "pos=%d\n",    mb::index($s,"World"); # 6

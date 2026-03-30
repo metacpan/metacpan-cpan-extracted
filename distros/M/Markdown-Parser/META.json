@@ -33,8 +33,8 @@
       "runtime" : {
          "requires" : {
             "CSS::Object" : "v0.2.0",
-            "HTML::Object" : "v0.6.0",
-            "Module::Generic" : "v1.1.3",
+            "HTML::Object" : "v0.6.1",
+            "Module::Generic" : "v1.3.0",
             "POSIX" : "1.53_01",
             "Regexp::Common::Markdown" : "v0.1.8",
             "URI" : "5.21",
@@ -63,6 +63,6 @@
          "web" : "https://gitlab.com/jackdeguest/Markdown-Parser"
       }
    },
-   "version" : "v0.5.1",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v0.6.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

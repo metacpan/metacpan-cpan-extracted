@@ -1,0 +1,35 @@
+======================================================================
+ mb Cheat Sheet                                            [NE] नेपाली
+======================================================================
+
+[ 1. मोड्युल लोड गर्नुहोस् ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. अक्षर-आधारित length / substr ]
+  mb::length($str)              # अक्षरको सङ्ख्या (बाइट होइन)
+  mb::substr($str, $pos, $len)  # अक्षर स्थितिबाट सबस्ट्रिङ
+
+[ 3. स्ट्रिङ खोज्ने ]
+  mb::index($str, $sub)         # अक्षर स्थिति सूचकाङ्क
+  mb::rindex($str, $sub)        # दायाँबाट खोज्ने
+  mb::index_byte($str, $sub)    # बाइट स्थिति सूचकाङ्क
+
+[ 4. वर्ण रूपान्तरण ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. वर्ण कोड ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. अन्य सञ्चालन ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. समर्थित इन्कोडिङ ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. उदाहरण ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "नमस्ते संसार";
+  printf "लम्बाइ=%d\n", mb::length($s);

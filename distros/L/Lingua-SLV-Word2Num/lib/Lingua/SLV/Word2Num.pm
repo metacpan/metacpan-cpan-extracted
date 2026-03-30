@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = slv_numerals();
 
 # }}}
@@ -125,6 +125,86 @@ sub slv_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Slovenian ordinals: strip gender/case suffixes, then map stems.
+    # Inflection: -i/-a/-o/-ega/-emu/-em/-im (masc/fem/neut/oblique).
+
+    my %irregular = (
+        'ničti'        => 'nič',
+        'prvi'         => 'ena',
+        'drugi'        => 'dva',
+        'tretji'       => 'tri',
+        'četrti'       => 'štiri',
+        'peti'         => 'pet',
+        'šesti'        => 'šest',
+        'sedmi'        => 'sedem',
+        'osmi'         => 'osem',
+        'deveti'       => 'devet',
+        'deseti'       => 'deset',
+        'enajsti'      => 'enajst',
+        'dvanajsti'    => 'dvanajst',
+        'trinajsti'    => 'trinajst',
+        'štirinajsti'  => 'štirinajst',
+        'petnajsti'    => 'petnajst',
+        'šestnajsti'   => 'šestnajst',
+        'sedemnajsti'  => 'sedemnajst',
+        'osemnajsti'   => 'osemnajst',
+        'devetnajsti'  => 'devetnajst',
+        'dvajseti'     => 'dvajset',
+        'trideseti'    => 'trideset',
+        'štirideseti'  => 'štirideset',
+        'petdeseti'    => 'petdeset',
+        'šestdeseti'   => 'šestdeset',
+        'sedemdeseti'  => 'sedemdeset',
+        'osemdeseti'   => 'osemdeset',
+        'devetdeseti'  => 'devetdeset',
+        'dvestoti'     => 'dvesto',
+        'tristoti'     => 'tristo',
+        'štiristoti'   => 'štiristo',
+        'petstoti'     => 'petsto',
+        'šeststoti'    => 'šeststo',
+        'sedemstoti'   => 'sedemsto',
+        'osemstoti'    => 'osemsto',
+        'devetstoti'   => 'devetsto',
+        'stoti'        => 'sto',
+        'tisočti'      => 'tisoč',
+        'tisoči'       => 'tisoč',
+        'milijonti'    => 'milijon',
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip gender/case suffixes to masculine nominative (-i)
+        my $norm = $word;
+        $norm =~ s{ega\z}{i}xms
+            or $norm =~ s{emu\z}{i}xms
+            or $norm =~ s{em\z}{i}xms
+            or $norm =~ s{im\z}{i}xms
+            or $norm =~ s{a\z}{i}xms      # fem: prva → prvi
+            or $norm =~ s{o\z}{i}xms;     # neut: prvo → prvi
+
+        if (exists $irregular{$norm}) {
+            push @result, $irregular{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors, etc.)
+        }
+    }
+
+    return $matched ? join(' ', @result) : undef;
+}
+
+# }}}
 
 1;
 
@@ -143,7 +223,7 @@ Lingua::SLV::Word2Num - Word to number conversion in Slovenian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SLV::Word2Num is module for converting Slovenian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -183,6 +263,15 @@ expected to be in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'peti', 'deseti', 'tretji')
+  =>  str    cardinal text (e.g. 'pet', 'deset', 'tri')
+      undef  if input is not a recognized ordinal
+
+Convert Slovenian ordinal text to cardinal text via morphological reversal.
+Handles all gender/case inflections.
+
 =item B<slv_numerals> (void)
 
   =>  obj  object of the parser
@@ -203,6 +292,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

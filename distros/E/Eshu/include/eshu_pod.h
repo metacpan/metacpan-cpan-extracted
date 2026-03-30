@@ -20,15 +20,17 @@
  * ══════════════════════════════════════════════════════════════════ */
 
 typedef struct {
-	int             in_verbatim;  /* currently in a code block?       */
-	int             over_depth;   /* =over nesting depth              */
+	int             in_verbatim;    /* currently in a code block?       */
+	int             verbatim_base;  /* base indent of current block     */
+	int             over_depth;     /* =over nesting depth              */
 	eshu_config_t   cfg;
 } eshu_pod_ctx_t;
 
 static void eshu_pod_ctx_init(eshu_pod_ctx_t *ctx, const eshu_config_t *cfg) {
-	ctx->in_verbatim = 0;
-	ctx->over_depth  = 0;
-	ctx->cfg         = *cfg;
+	ctx->in_verbatim   = 0;
+	ctx->verbatim_base = 0;
+	ctx->over_depth    = 0;
+	ctx->cfg           = *cfg;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -109,10 +111,25 @@ static void eshu_pod_process_line(eshu_pod_ctx_t *ctx, eshu_buf_t *out,
 
 	/* ── Verbatim/code block: line starts with whitespace ── */
 	if (has_leading_ws) {
-		ctx->in_verbatim = 1;
+		int line_indent = eshu_pod_measure_indent(line_start, eol);
 
-		/* Remove original leading whitespace, apply one indent level */
+		if (!ctx->in_verbatim) {
+			/* First line of a new verbatim block — record base indent */
+			ctx->in_verbatim = 1;
+			ctx->verbatim_base = line_indent;
+		}
+
+		/* Compute relative indent beyond the block's base */
+		int extra = line_indent - ctx->verbatim_base;
+		if (extra < 0) extra = 0;
+
+		/* Emit: one base indent level + extra relative whitespace */
 		eshu_emit_indent(out, 1, &ctx->cfg);
+		{
+			int i;
+			for (i = 0; i < extra; i++)
+				eshu_buf_putc(out, ' ');
+		}
 		eshu_buf_write_trimmed(out, content, content_len);
 		eshu_buf_putc(out, '\n');
 		return;

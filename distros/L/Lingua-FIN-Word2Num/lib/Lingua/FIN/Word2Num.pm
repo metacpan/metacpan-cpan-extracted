@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = fin_numerals();
 
 # }}}
@@ -96,6 +96,132 @@ sub fin_numerals {
 
 # }}}
 
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Finnish ordinals: suppletive 1st/2nd, regular -s suffix for 3+.
+    # Compounds: cardinal prefix + ordinal tail.
+    # Order of matching matters: hundreds before tens to avoid
+    # false matches on prefixed forms.
+
+    my %irregular = (
+        'ensimmäinen' => 'yksi',
+        'toinen'       => 'kaksi',
+    );
+
+    return $irregular{$input} if exists $irregular{$input};
+
+    # Ordinal stem → cardinal mappings for units
+    my %ord_stem_to_cardinal = (
+        'yhde'       => 'yksi',
+        'kahde'      => 'kaksi',
+        'kolma'      => 'kolme',
+        'neljä'      => 'neljä',
+        'viide'      => 'viisi',
+        'kuude'      => 'kuusi',
+        'seitsemä'   => 'seitsemän',
+        'kahdeksa'   => 'kahdeksan',
+        'yhdeksä'    => 'yhdeksän',
+    );
+
+    # Ordinal hundreds prefix → cardinal hundreds prefix
+    # "toinensadas" (200th) → "kaksi", "kolmassadas" → "kolme", etc.
+    # The stem before "sadas" is the ordinal form of the multiplier.
+    my %ord_hundreds_pfx = (
+        'toinen'     => 'kaksi',     # 200th uses suppletive "toinen"
+        'kolmas'     => 'kolme',
+        'neljäs'     => 'neljä',
+        'viides'     => 'viisi',
+        'kuudes'     => 'kuusi',
+        'seitsemäs'  => 'seitsemän',
+        'kahdeksas'  => 'kahdeksan',
+        'yhdeksäs'   => 'yhdeksän',
+    );
+
+    # === HUNDREDS: check before tens to avoid false prefix matches ===
+
+    # Round hundreds ordinal: "sadas" (100th), "toinensadas" (200th), etc.
+    if ($input eq 'sadas') {
+        return 'sata';
+    }
+    if ($input =~ m{\A (.+) sadas \z}xms) {
+        my $pfx = $1;
+        my $card_pfx = $ord_hundreds_pfx{$pfx};
+        return $card_pfx . 'sataa' if defined $card_pfx;
+    }
+
+    # Compound 100+rest: "sata" + ordinal(rest) → "sata" + cardinal(rest)
+    if ($input =~ m{\A sata (?<rest>.+) \z}xms) {
+        my $rest = $+{rest};
+        my $cardinal = ordinal2cardinal($rest);
+        return defined $cardinal ? 'sata' . $cardinal : undef;
+    }
+
+    # Compound N*100+rest: cardinal(N) + "sata" + ordinal(rest)
+    # Cardinal form uses "sataa" for N≥2: "kaksisataayksi" (201)
+    for my $stem (sort { length($b) <=> length($a) } keys %ord_stem_to_cardinal) {
+        my $card = $ord_stem_to_cardinal{$stem};
+        if ($input =~ m{\A \Q$card\E sata (?<rest>.+) \z}xms) {
+            my $rest = $+{rest};
+            my $cardinal = ordinal2cardinal($rest);
+            return defined $cardinal ? $card . 'sataa' . $cardinal : undef;
+        }
+    }
+
+    # === TENS ===
+
+    # Standalone "kymmenes" → "kymmenen" (10th)
+    return 'kymmenen' if $input eq 'kymmenes';
+
+    # Compound tens + ones: "kahdeskymmenesviides" (25th)
+    if ($input =~ m{\A (?<tpfx>.+?) s? kymmenes (?<rest>.+) \z}xms) {
+        my $tens_stem = $+{tpfx};
+        my $rest      = $+{rest};
+        my $tens_cardinal = $ord_stem_to_cardinal{$tens_stem} // return;
+        my $tens_word = $tens_cardinal . 'kymmentä';
+        my $ones_cardinal = ordinal2cardinal($rest) // return;
+        return $tens_word . $ones_cardinal;
+    }
+
+    # Round tens ordinal: "kahdeskymmenes" (20th)
+    if ($input =~ m{\A (?<tpfx>.+?) s? kymmenes \z}xms) {
+        my $tens_stem = $+{tpfx};
+        my $tens_cardinal = $ord_stem_to_cardinal{$tens_stem} // return;
+        return $tens_cardinal . 'kymmentä';
+    }
+
+    # === TEENS ===
+
+    if ($input =~ m{\A (?<stem>.+) stoista \z}xms) {
+        my $stem = $+{stem};
+        return $ord_stem_to_cardinal{$stem} . 'toista'
+            if exists $ord_stem_to_cardinal{$stem};
+    }
+    if ($input =~ m{\A (?<stem>.+?) s toista \z}xms) {
+        my $stem = $+{stem};
+        return $ord_stem_to_cardinal{$stem} . 'toista'
+            if exists $ord_stem_to_cardinal{$stem};
+    }
+    if ($input =~ m{\A (?<stem>.+?) toista \z}xms) {
+        my $stem = $+{stem};
+        $stem =~ s{s\z}{}xms;
+        return $ord_stem_to_cardinal{$stem} . 'toista'
+            if exists $ord_stem_to_cardinal{$stem};
+    }
+
+    # === REGULAR: strip -s suffix and map stem ===
+    if ($input =~ s{s\z}{}xms) {
+        return $ord_stem_to_cardinal{$input} if exists $ord_stem_to_cardinal{$input};
+        return $input;
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
+
 1;
 
 __END__
@@ -113,7 +239,7 @@ Lingua::FIN::Word2Num - Word to number conversion in Finnish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::FIN::Word2Num is module for converting Finnish numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -154,6 +280,16 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'ensimmäinen', 'kolmas', 'kymmenes')
+  =>  str    cardinal text (e.g. 'yksi', 'kolme', 'kymmenen')
+      undef  if input is not recognised as an ordinal
+
+Convert Finnish ordinal text to cardinal text (morphological reversal).
+Handles suppletive forms (ensimmäinen, toinen), regular -s ordinals,
+and compound forms with teens (-toista) and tens (-kymmentä).
+
 =item B<fin_numerals> (void)
 
   =>  obj  new parser object
@@ -174,6 +310,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

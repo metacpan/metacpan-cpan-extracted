@@ -1,5 +1,9 @@
 Revision history for File-StatX
 
+0.005     2026-03-29 12:56:20+02:00 Europe/Brussels
+          - Use correct define in optional methods
+          - Fix detecting attribute availability
+
 0.004     2026-03-05 19:44:58+01:00 Europe/Brussels
           - Define mXPUSHp on perl <5.38
 

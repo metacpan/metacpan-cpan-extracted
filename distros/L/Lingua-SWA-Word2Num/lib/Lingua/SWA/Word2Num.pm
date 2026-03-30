@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = swa_numerals();
 
 # }}}
@@ -93,6 +93,39 @@ sub swa_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Inverse of Swahili ordinal morphology: restore cardinal from ordinal text.
+    # Swahili ordinals use noun-class prefixes (wa-, ya-, cha-, vya-, etc.)
+    # followed by a special ordinal stem (1-5, 8) or the cardinal itself (6,7,9,10+).
+    #
+    # Special stems: kwanza→moja (1), pili→mbili (2)
+    # Identical stems (3,4,5,8): tatu, nne, tano, nane — no change needed.
+    # For 6,7,9,10+: ordinal = prefix + cardinal — strip prefix.
+
+    # Strip noun-class prefix: "wa kwanza" → "kwanza", "ya pili" → "pili"
+    # The prefix is everything up to the last space; the ordinal word is the last token.
+    # For numbers >= 6 (except 8), the ordinal word IS the cardinal multi-word form,
+    # so we must preserve all tokens after the single-word prefix.
+    # Swahili ordinal format: <prefix> <ordinal-word(s)>
+    # where prefix is a single noun-class marker (wa, ya, cha, ki, vi, etc.)
+    $input =~ s{\A\S+\s+}{}xms;
+
+    # Special ordinal stems that differ from cardinal
+    $input =~ s{\Akwanza\z}{moja}xms  and return $input;
+    $input =~ s{\Apili\z}{mbili}xms   and return $input;
+
+    # For 3,4,5,8 the ordinal stem IS the cardinal — return as-is
+    return $input if $input =~ m{\A (?: tatu | nne | tano | nane ) \z}xms;
+
+    # For 6,7,9 and all 10+ the ordinal form equals the cardinal — return as-is
+    return $input;
+}
+
+# }}}
 
 1;
 
@@ -102,6 +135,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::SWA::Word2Num - Word to number conversion in Swahili
@@ -109,7 +144,7 @@ Lingua::SWA::Word2Num - Word to number conversion in Swahili
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SWA::Word2Num is a module for converting Swahili numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999.
@@ -149,6 +184,14 @@ numbers. Converts whole numbers from 0 up to 999 999 999.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'kwanza', 'pili', 'wa-tatu')
+  =>  str    cardinal text (e.g. 'moja', 'mbili', 'tatu')
+      undef  if input is not recognised as an ordinal
+
+Convert Swahili ordinal text to cardinal text (morphological reversal).
+
 =item B<swa_numerals> (void)
 
   =>  obj  new parser object
@@ -169,6 +212,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

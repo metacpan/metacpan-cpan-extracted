@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic::File );
     use vars qw( $VERSION );
     use DateTime::Format::Strptime;

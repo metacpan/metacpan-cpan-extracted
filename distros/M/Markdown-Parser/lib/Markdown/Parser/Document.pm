@@ -42,6 +42,7 @@ sub init
     $self->{email_obfuscate_class}          = 'courriel';
     $self->{email_obfuscate_data_host}      = 'host';
     $self->{email_obfuscate_data_user}      = 'user';
+    $self->{encode_html_entities}           = 1;
     $self->{emphasis}                       = {};
     ## All footnotes objects ordered
     $self->{footnotes}                      = [];
@@ -321,6 +322,8 @@ sub email_obfuscate_data_user
     }
     return( $self->_set_get_scalar_as_object( 'email_obfuscate_data_user' ) );
 }
+
+sub encode_html_entities { return( shift->_set_get_boolean( 'encode_html_entities', @_ ) ); }
 
 sub emphasis { return( shift->_set_get_hash_as_mix_object( 'emphasis', @_ ) ); }
 
@@ -661,6 +664,14 @@ See L<Markdown::Parser::Link/as_string>
 Sets or gets an hash reference of key-value paris used for emphasis.
 
 This returns a L<Module::Generic::Hash> object.
+
+=head2 encode_html_entities
+
+Sets or gets a boolean value that specify whether any HTML encapsulated in a code block should have its tag encoded, or not.
+
+By default, the Markdown standard requires that an HTML tag like C<< <p> >> becomes C< &lt;p%gt; >.
+
+When this is set to a false value, any HTML enclosed in a code block will not be encoded.
 
 =head2 footnotes
 

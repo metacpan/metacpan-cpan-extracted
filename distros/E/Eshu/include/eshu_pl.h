@@ -44,6 +44,9 @@ typedef struct {
 	/* POD buffering */
 	eshu_buf_t      pod_buf;
 	int             pod_active;
+
+	/* __END__ / __DATA__ — everything after is non-code */
+	int             past_end;
 } eshu_pl_ctx_t;
 
 static void eshu_pl_ctx_init(eshu_pl_ctx_t *ctx, const eshu_config_t *cfg) {
@@ -62,6 +65,7 @@ static void eshu_pl_ctx_init(eshu_pl_ctx_t *ctx, const eshu_config_t *cfg) {
 	ctx->last_was_value  = 0;
 	eshu_buf_init(&ctx->pod_buf, 256);
 	ctx->pod_active      = 0;
+	ctx->past_end        = 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -346,6 +350,14 @@ static void eshu_pl_scan_line(eshu_pl_ctx_t *ctx,
 				ctx->last_was_value = 1;
 				continue;
 			} else if (c == '/' && eshu_pl_expects_regex(ctx)) {
+				/* Check for // (defined-or) — not a regex even in regex context */
+				if (p + 1 < end && *(p + 1) == '/') {
+					/* // or //= — defined-or operator */
+					p += 2;
+					if (p < end && *p == '=') p++; /* //= */
+					ctx->last_was_value = 0;
+					continue;
+				}
 				/* regex literal */
 				ctx->rx_delim = '/';
 				ctx->state = ESHU_REGEX;
@@ -363,7 +375,13 @@ static void eshu_pl_scan_line(eshu_pl_ctx_t *ctx,
 				if (isalnum((unsigned char)c))
 					ctx->last_was_value = 0;
 			} else if (c == '/' && !eshu_pl_expects_regex(ctx)) {
-				/* division operator */
+				/* division or // (defined-or) operator */
+				if (p + 1 < end && *(p + 1) == '/') {
+					p += 2;
+					if (p < end && *p == '=') p++; /* //= */
+					ctx->last_was_value = 0;
+					continue;
+				}
 				ctx->last_was_value = 0;
 			} else if (c == '$' || c == '@' || c == '%') {
 				/* variable sigil — skip the variable name */
@@ -561,6 +579,34 @@ static void eshu_pl_process_line(eshu_pl_ctx_t *ctx, eshu_buf_t *out,
 	}
 
 	line_len = (int)(eol - content);
+
+	/* ── Past __END__ / __DATA__: pass through verbatim ── */
+	if (ctx->past_end) {
+		/* Still detect POD starts within __END__ section */
+		if (content == line_start && eshu_pl_is_pod_start(content, eol)) {
+			ctx->state = ESHU_POD;
+			ctx->pod_active = 1;
+			eshu_buf_write(&ctx->pod_buf, content, (int)(eol - content));
+			eshu_buf_putc(&ctx->pod_buf, '\n');
+			return;
+		}
+		/* verbatim — don't change indentation */
+		eshu_buf_write_trimmed(out, line_start, (int)(eol - line_start));
+		eshu_buf_putc(out, '\n');
+		return;
+	}
+
+	/* ── __END__ / __DATA__ detection ── */
+	if (content == line_start &&
+	    ((line_len >= 7 && memcmp(content, "__END__", 7) == 0 &&
+	      (line_len == 7 || content[7] == ' ' || content[7] == '\t' || content[7] == '\r')) ||
+	     (line_len >= 8 && memcmp(content, "__DATA__", 8) == 0 &&
+	      (line_len == 8 || content[8] == ' ' || content[8] == '\t' || content[8] == '\r')))) {
+		ctx->past_end = 1;
+		eshu_buf_write_trimmed(out, content, line_len);
+		eshu_buf_putc(out, '\n');
+		return;
+	}
 
 	/* ── Pod start detection (= at column 0) ── */
 	if (content == line_start && eshu_pl_is_pod_start(content, eol)) {

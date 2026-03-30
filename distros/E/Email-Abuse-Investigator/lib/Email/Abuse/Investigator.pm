@@ -3,6 +3,7 @@ package Email::Abuse::Investigator;
 use strict;
 use warnings;
 
+use utf8;
 use IO::Socket::INET;
 use MIME::QuotedPrint qw( decode_qp );
 use MIME::Base64 qw( decode_base64 );
@@ -56,6 +57,7 @@ my @RECEIVED_IP_RE = (
 my %TRUSTED_DOMAINS = map { $_ => 1 } qw(
 	gmail.com googlemail.com yahoo.com outlook.com hotmail.com
 	google.com microsoft.com apple.com amazon.com
+	googlegroups.com groups.google.com
 );
 
 # Known URL shortener / redirect domains — real destination is hidden
@@ -109,8 +111,19 @@ my %PROVIDER_ABUSE = (
     'akamaitechnologies.com' => { email => 'abuse@akamai.com', note => 'Akamai CDN' },
     # Namecheap
     'namecheap.com'     => { email => 'abuse@namecheap.com',   note => 'Registrar abuse' },
-    # GoDaddy
-    'godaddy.com'       => { email => 'abuse@godaddy.com',     note => 'Registrar/host abuse' },
+    # GoDaddy -- explicitly rejects email abuse reports per autoresponse;
+    # web form only.  The email address abuse@godaddy.com bounces with
+    # instructions to use the web form instead.
+    'godaddy.com'       => {
+        form        => 'https://supportcenter.godaddy.com/AbuseReport',
+        form_paste  => 'Select the abuse type (spam, phishing, malware etc). '
+                     . 'Enter the domain name in the Domain field. '
+                     . 'Paste the originating IP, risk flags, and the relevant '
+                     . 'Received: headers from the report below.',
+        form_upload => 'Take a screenshot of the report as a .png or .jpg, '
+                     . 'or export it as a .pdf.',
+        note        => 'Registrar/host -- email reports not monitored, use web form',
+    },
     # SendGrid / Twilio
     'sendgrid.net'      => { email => 'abuse@sendgrid.com',    note => 'ESP — include full headers' },
     'sendgrid.com'      => { email => 'abuse@sendgrid.com',    note => 'ESP — include full headers' },
@@ -174,6 +187,30 @@ my %PROVIDER_ABUSE = (
     'leaseweb.com'        => { email => 'abuse@leaseweb.com',      note => 'Leaseweb hosting' },
     # M247
     'm247.com'            => { email => 'abuse@m247.com',          note => 'M247 hosting' },
+    # MarkMonitor -- major brand-protection registrar.
+    # Explicitly rejects email abuse reports per autoresponse; web form only.
+    # WHOIS returns abusecomplaints@markmonitor.com but that address bounces.
+    'markmonitor.com'       => {
+        form        => 'https://corp.markmonitor.com/domain/ui/abuse-report',
+        form_paste  => 'Complete all fields including the domain name and your '
+                     . 'description of the abuse.  Paste the originating IP, '
+                     . 'risk flags, and the relevant Received: headers from the '
+                     . 'report below.',
+        form_upload => 'Take a screenshot of the report as a .png or .jpg, or export it as a .pdf.  MarkMonitor does not accept .eml files.',
+        note        => 'Brand-protection registrar -- email reports not processed',
+    },
+    # Global Domain Group -- registrar that explicitly rejects email reports.
+    # Only ICANN RAA s3.18.3 contacts (law enforcement, registries) may use
+    # the email address; all other abuse reports must use the web form.
+    'globaldomaingroup.com' => {
+        form        => 'https://globaldomaingroup.com/report-abuse',
+        form_paste  => 'Complete all fields including the domain name and your '
+                     . 'description of the abuse.  Paste the originating IP, '
+                     . 'risk flags, and the relevant Received: headers from the '
+                     . 'report below.',
+        form_upload => 'Attach the original spam message as an .eml file.',
+        note        => 'Registrar -- email reports explicitly not accepted',
+    },
     # TPG / Internode (Australia)
     'tpgi.com.au'       => { email => 'abuse@tpg.com.au',      note => 'TPG Telecom Australia' },
     'tpg.com.au'        => { email => 'abuse@tpg.com.au',      note => 'TPG Telecom Australia' },
@@ -187,11 +224,11 @@ hosted URLs, and suspicious domains
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -3141,6 +3178,20 @@ sub abuse_report_text {
         push @out, '';
     }
 
+    my @form_cs = $self->form_contacts();
+    if (@form_cs) {
+        push @out, "WEB-FORM REPORTS REQUIRED:";
+        push @out, "  The following parties do not accept email -- submit manually:";
+        for my $c (@form_cs) {
+            push @out, "  [$c->{role}]";
+            push @out, "    Form   : $c->{form}";
+            push @out, "    Domain : $c->{form_domain}" if $c->{form_domain};
+            push @out, "    Paste  : $c->{form_paste}"  if $c->{form_paste};
+            push @out, "    Upload : $c->{form_upload}" if $c->{form_upload};
+        }
+        push @out, "";
+    }
+
 	push @out, '-' x 72;
 	push @out, 'ORIGINAL MESSAGE HEADERS:';
 	push @out, '-' x 72;
@@ -3491,8 +3542,8 @@ malformed messages.
 =cut
 
 sub abuse_contacts {
-    my ($self) = @_;
-    my (@contacts, %seen_idx);
+	my $self = $_[0];
+	my (@contacts, %seen_idx);
 
     # $add records an abuse contact.  If the address has already been seen,
     # the new role is appended to the existing entry rather than discarded.
@@ -3503,6 +3554,17 @@ sub abuse_contacts {
         my (%args) = @_;
         my $addr = lc($args{address} // '');
         return unless $addr && $addr =~ /\@/;
+	# Suppress addresses whose domain belongs to a form-only provider
+        # (a %PROVIDER_ABUSE entry that has a form key but no email key).
+        # Such addresses are nominally valid but explicitly non-functional
+        # per the provider's own autoresponse (e.g. MarkMonitor's
+        # abusecomplaints@markmonitor.com).  These contacts are handled
+        # instead by form_contacts().
+        if ($addr =~ /\@([\w.-]+)$/) {
+            my $dom = $1;
+            my $pa  = $self->_provider_abuse_for_host($dom);
+            return if $pa && $pa->{form} && !$pa->{email};
+        }
         if (exists $seen_idx{$addr}) {
             # Address already present -- merge the new role into the existing entry
             # rather than dropping it.  This preserves the information that, for
@@ -3537,7 +3599,7 @@ sub abuse_contacts {
     if ($orig) {
         my $pa = $self->_provider_abuse_for_ip($orig->{ip}, $orig->{rdns});
         if ($pa) {
-            $add->(role    => 'Sending ISP (provider table)',
+            $add->(role    => 'Sending ISP',
                    address => $pa->{email},
                    note    => "$orig->{ip} ($orig->{rdns}) — $pa->{note}",
                    via     => 'provider-table');
@@ -3556,13 +3618,13 @@ sub abuse_contacts {
         next if $url_host_seen{ $u->{host} }++;
         my $pa = $self->_provider_abuse_for_host($u->{host});
         if ($pa) {
-            $add->(role    => "URL host (provider table)",
+            $add->(role    => "URL host: $u->{host}",
                    address => $pa->{email},
                    note    => "$u->{host} — $pa->{note}",
                    via     => 'provider-table');
         }
         if ($u->{abuse} && $u->{abuse} ne '(unknown)') {
-            $add->(role    => 'URL host',
+            $add->(role    => "URL host: $u->{host}",
                    address => $u->{abuse},
                    note    => "Hosting $u->{host} ($u->{ip}, $u->{org})",
                    via     => 'ip-whois');
@@ -3577,7 +3639,7 @@ sub abuse_contacts {
         if ($d->{web_abuse}) {
             my $pa = $self->_provider_abuse_for_host($dom);
             if ($pa) {
-                $add->(role    => "Web host of $dom (provider table)",
+                $add->(role    => "Web host of $dom",
                        address => $pa->{email},
                        note    => $pa->{note},
                        via     => 'provider-table');
@@ -3652,16 +3714,18 @@ sub abuse_contacts {
         # Look up the domain (and its parents via subdomain stripping) in
         # the built-in provider table.  A hit means the account is hosted
         # by a known webmail or ESP provider we can contact directly.
-        my $pa = $self->_provider_abuse_for_host($addr_domain);
+	my $pa = $self->_provider_abuse_for_host($addr_domain);
         if ($pa) {
-            $add->(role    => "Account provider ($hname: $val)",
+            my $role_addr = $addr_spec =~ /@/ ? $addr_spec : $val;
+            $role_addr =~ s/^\s+|\s+$//g;
+            $add->(role    => "Account provider ($hname: $role_addr)",
                    address => $pa->{email},
                    note    => $pa->{note},
                    via     => 'provider-table');
         }
     }
 
-    # 5. DKIM signing domain — the organisation that vouches for the message
+    # 5. DKIM signing domain
     # The full domain pipeline (web/MX/NS/WHOIS) is already run on the DKIM
     # domain via mailto_domains(), so here we only need the provider-table
     # lookup for fast resolution of well-known ESPs.
@@ -3669,7 +3733,7 @@ sub abuse_contacts {
     if ($auth->{dkim_domain}) {
         my $pa = $self->_provider_abuse_for_host($auth->{dkim_domain});
         if ($pa) {
-            $add->(role    => "DKIM signer (provider table): $auth->{dkim_domain}",
+            $add->(role    => "DKIM signer: $auth->{dkim_domain}",
                    address => $pa->{email},
                    note    => $pa->{note},
                    via     => 'provider-table');
@@ -3700,6 +3764,185 @@ sub abuse_contacts {
     }
 
     return @contacts;
+}
+
+=head2 form_contacts()
+
+Returns the list of parties that require abuse reports to be submitted via
+a web form rather than (or in addition to) email.  These are providers whose
+C<%PROVIDER_ABUSE> entry has a C<form> key.  Each hashref contains the form
+URL, instructions on what to paste, instructions on what to upload (if
+applicable), the role, and the discovery note.
+
+Returns a list (not an arrayref) of hashrefs, one per unique form contact,
+in discovery order.  Returns an empty list if no form-only or form-plus-email
+contacts are found.
+
+Each hashref contains:
+
+=over 4
+
+=item C<form> (string) -- the URL of the web form
+
+=item C<role> (string) -- human-readable role, same format as C<abuse_contacts()>
+
+=item C<note> (string) -- supporting detail about the provider
+
+=item C<form_paste> (string, optional) -- what text to paste into the form
+
+=item C<form_upload> (string, optional) -- what file to attach to the form
+
+=item C<via> (string) -- always C<'provider-table'>
+
+=back
+
+=cut
+
+sub form_contacts {
+	my ($self) = @_;
+	my (@contacts, %seen);
+
+	my $add = sub {
+		my (%args) = @_;
+		my $form = $args{form} // '';
+		return unless $form;
+		return if $seen{$form}++;
+		push @contacts, \%args;
+	};
+
+	# Route 1 -- Sending ISP
+	my $orig = $self->originating_ip();
+	if ($orig) {
+		my $pa = $self->_provider_abuse_for_ip($orig->{ip}, $orig->{rdns});
+		if ($pa && $pa->{form}) {
+			$add->(
+				role        => 'Sending ISP',
+				form        => $pa->{form},
+				note        => $pa->{note} // '',
+				form_paste  => $pa->{form_paste}  // '',
+				form_upload => $pa->{form_upload} // '',
+				via         => 'provider-table',
+			);
+		}
+	}
+
+	# Route 2 -- URL hosts
+	my %url_host_seen;
+	for my $u ($self->embedded_urls()) {
+		next if $url_host_seen{ $u->{host} }++;
+		my $pa = $self->_provider_abuse_for_host($u->{host});
+		if ($pa && $pa->{form}) {
+			$add->(
+				role        => 'URL host',
+				form        => $pa->{form},
+				form_domain => $u->{host},
+				note        => $pa->{note} // '',
+				form_paste  => $pa->{form_paste}  // '',
+				form_upload => $pa->{form_upload} // '',
+				via         => 'provider-table',
+			);
+		}
+	}
+
+	# Route 3 -- Contact domains (web host + registrar)
+	for my $d ($self->mailto_domains()) {
+		my $dom = $d->{domain};
+		my $pa  = $self->_provider_abuse_for_host($dom);
+		if ($pa && $pa->{form}) {
+			$add->(
+				role        => "Web host of $dom)",
+				form        => $pa->{form},
+				form_domain => $dom,
+				note        => $pa->{note} // '',
+				form_paste  => $pa->{form_paste}  // '',
+				form_upload => $pa->{form_upload} // '',
+				via         => 'provider-table',
+			);
+		}
+		# Registrar identified via WHOIS -- check whether the registrar has
+		# a provider-table entry with a web form.  Derive the registrar's
+		# domain from the registrar_abuse email address (e.g.
+		# "abusecomplaints@markmonitor.com" -> "markmonitor.com") and look
+		# that up via _provider_abuse_for_host().  Self-extending: any new
+		# form-only registrar added to %PROVIDER_ABUSE is picked up here
+		# automatically without changing this code.
+		if ($d->{registrar_abuse} && $d->{registrar_abuse} =~ /\@([\w.-]+)/) {
+			my $reg_domain = lc $1;
+			my $rpa = $self->_provider_abuse_for_host($reg_domain);
+			if ($rpa && $rpa->{form}) {
+				$add->(
+					role        => "Domain registrar for $dom (web form only)",
+					form        => $rpa->{form},
+					form_domain => $dom,
+					note        => $rpa->{note} // '',
+					form_paste  => $rpa->{form_paste}  // '',
+					form_upload => $rpa->{form_upload} // '',
+					via         => 'provider-table',
+				);
+			}
+		}
+	}
+
+	# Route 4 -- Account provider headers
+	for my $hname (qw(from reply-to return-path sender)) {
+		my $val = $self->_header_value($hname) // next;
+		my $addr_spec = ($val =~ /<([^>]*)>\s*$/) ? $1 : $val;
+		my ($addr_domain) = $addr_spec =~ /\@([\w.-]+)/;
+		next unless $addr_domain;
+		my $pa = $self->_provider_abuse_for_host($addr_domain);
+        if ($pa && $pa->{form}) {
+            my $role_addr = $addr_spec =~ /@/ ? $addr_spec : $val;
+            $role_addr =~ s/^\s+|\s+$//g;
+            $add->(
+                role        => "Account provider ($hname: $role_addr)",
+				form        => $pa->{form},
+				note        => $pa->{note} // '',
+				form_paste  => $pa->{form_paste}  // '',
+				form_upload => $pa->{form_upload} // '',
+				via         => 'provider-table',
+			);
+		}
+	}
+
+	# Route 5 -- DKIM signer
+	my $auth = $self->_parse_auth_results_cached();
+	if ($auth->{dkim_domain}) {
+		my $pa = $self->_provider_abuse_for_host($auth->{dkim_domain});
+		if ($pa && $pa->{form}) {
+			$add->(
+				role        => "DKIM signer: $auth->{dkim_domain}",
+				form        => $pa->{form},
+				note        => $pa->{note} // '',
+				form_paste  => $pa->{form_paste}  // '',
+				form_upload => $pa->{form_upload} // '',
+				via         => 'provider-table',
+			);
+		}
+	}
+
+	# Route 6 -- List-Unsubscribe
+	my $unsub = $self->_header_value('list-unsubscribe');
+	if ($unsub) {
+		my @unsub_domains;
+		while ($unsub =~ m{https?://([^/:?\s>]+)}gi) { push @unsub_domains, lc $1 }
+		while ($unsub =~ m{mailto:[^@\s>]+\@([\w.-]+)}gi) { push @unsub_domains, lc $1 }
+		my %useen;
+		for my $dom (grep { !$useen{$_}++ } @unsub_domains) {
+			my $pa = $self->_provider_abuse_for_host($dom);
+			if ($pa && $pa->{form}) {
+				$add->(
+					role        => "ESP / bulk sender (List-Unsubscribe: $dom)",
+					form        => $pa->{form},
+					note        => $pa->{note} // '',
+					form_paste  => $pa->{form_paste}  // '',
+					form_upload => $pa->{form_upload} // '',
+					via         => 'provider-table',
+				);
+			}
+		}
+	}
+
+	return @contacts;
 }
 
 =head2 report()
@@ -4141,6 +4384,39 @@ sub report {
     } else {
         push @out, '  (no abuse contacts could be determined)';
         push @out, '';
+    }
+
+    # ---- Web-form contacts (providers that do not accept email) ----
+    my @form_cs = $self->form_contacts();
+    if (@form_cs) {
+        push @out, "[ WHERE TO FILE WEB-FORM REPORTS ]";
+        push @out, "  The following parties require manual submission via a web form.";
+        push @out, "  Open each URL in a browser, then follow the instructions below it.";
+        push @out, "";
+        for my $c (@form_cs) {
+            push @out, "  Role         : $c->{role}";
+            push @out, "  Form URL     : $c->{form}";
+            push @out, "  Domain/URL   : $c->{form_domain}" if $c->{form_domain};
+            push @out, "  Note         : $c->{note}" if $c->{note};
+            if ($c->{form_paste}) {
+                my $hint = $c->{form_paste};
+                my @words = split /\s+/, $hint;
+                my (@lines, $line);
+                for my $w (@words) {
+                    if (defined $line && length("$line $w") > 66) {
+                        push @lines, $line;
+                        $line = $w;
+                    } else {
+                        $line = defined $line ? "$line $w" : $w;
+                    }
+                }
+                push @lines, $line if defined $line;
+                push @out, "  Paste        : " . shift @lines if @lines;
+                push @out, "                 $_" for @lines;
+            }
+            push @out, "  Upload       : $c->{form_upload}" if $c->{form_upload};
+            push @out, "";
+        }
     }
 
 	push @out, '=' x 72;
@@ -5143,13 +5419,13 @@ sub _decode_ew {
         # For non-UTF-8 charsets just return the raw bytes — good enough
         # for display-name spoof detection which only needs ASCII matching
     }
-    return $raw;
+	return $raw;
 }
 
 sub _parse_auth_results_cached {
 	my $self = $_[0];
 
-    return $self->{_auth_results} if $self->{_auth_results};
+	return $self->{_auth_results} if $self->{_auth_results};
 
     my %auth;
     my $raw = join('; ',

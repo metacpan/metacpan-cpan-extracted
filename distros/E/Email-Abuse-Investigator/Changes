@@ -1,5 +1,113 @@
 Revision history for Email-Abuse-Investigator
 
+0.06	Sun Mar 29 11:28:02 EDT 2026
+
+  New features
+
+  - Added form_contacts() public method, parallel to abuse_contacts(), which
+    returns the set of parties that require abuse reports to be submitted via
+    a web form rather than email.  Returns a list of hashrefs each containing
+    the form URL, role, note, and instructions on what to paste and what file
+    to upload.  Providers are identified via a new optional 'form',
+    'form_paste', and 'form_upload' key in %PROVIDER_ABUSE entries.
+
+  - Added MarkMonitor and Global Domain Group to %PROVIDER_ABUSE as
+    form-only entries (no 'email' key).  Both registrars explicitly reject
+    email abuse reports per their autoresponse:
+      markmonitor.com ->
+        https://corp.markmonitor.com/domain/ui/abuse-report
+      globaldomaingroup.com ->
+        https://globaldomaingroup.com/report-abuse
+    The form_paste and form_upload hints in each entry tell the user exactly
+    what to paste into the form and what file to attach.
+
+  - Added [ WHERE TO FILE WEB-FORM REPORTS ] section to report(), appearing
+    after [ WHERE TO SEND ABUSE REPORTS ] when form_contacts() returns
+    results.  Each entry shows the form URL, role, paste instructions
+    (word-wrapped at 66 characters), and upload instructions.
+
+  - Added WEB-FORM REPORTS REQUIRED: block to abuse_report_text() listing
+    form-only contacts with their form URL, paste hint, and upload hint.
+
+  - Added MANUAL ACTION REQUIRED -- WEB FORM SUBMISSION block to the
+    --dry-run footer of submit_abuse_report.pl, listing form-only contacts
+    separately from email recipients so the user knows which parties require
+    manual browser submission.
+
+  Bug fixes / refactoring
+
+  - Fixed abuse_contacts() passing form-only provider addresses (e.g.
+    abusecomplaints@markmonitor.com) through to the email contact list.
+    Such addresses are syntactically valid but explicitly non-functional per
+    the provider's own autoresponse.  The $add closure now checks whether the
+    address domain belongs to a form-only %PROVIDER_ABUSE entry (one with a
+    'form' key but no 'email' key) and suppresses it; the contact is surfaced
+    correctly via form_contacts() instead.
+
+  - Refactored the domain WHOIS fallback in _extract_and_resolve_urls() to
+    call _analyse_domain() instead of the separate _parse_domain_whois_abuse()
+    helper introduced in 0.05.  _analyse_domain() is already cached in
+    $self->{_domain_info}, so when the same spam domain appears in multiple
+    URLs the domain WHOIS is performed only once rather than once per unique
+    hostname.  _parse_domain_whois_abuse() has been removed.
+
+  - Added use utf8; pragma to Investigator.pm so that the em-dash characters
+    in user-facing detail strings are handled correctly under all Perl
+    configurations without relying on the source file's implicit encoding.
+
+  - Added GoDaddy to %PROVIDER_ABUSE as a form-only entry.  GoDaddy
+    explicitly rejects email abuse reports per their autoresponse, directing
+    reporters to their web form instead:
+      godaddy.com -> https://supportcenter.godaddy.com/AbuseReport
+    The form_upload hint reflects that GoDaddy accepts screenshots or PDFs,
+    not .eml files.
+
+  - Added googlegroups.com and groups.google.com to %TRUSTED_DOMAINS.
+    Google Groups message IDs (e.g. @googlegroups.com) were entering the
+    domain intelligence pipeline and triggering a MarkMonitor web-form
+    contact, since Google uses MarkMonitor to register its infrastructure
+    domains.  This was a false positive -- MarkMonitor cannot act on a
+    Google-owned domain.  Both domains are now filtered at the same point
+    as google.com, gmail.com, and other trusted Google infrastructure.
+
+  - Added form_domain field to form_contacts() hashrefs, surfaced as
+    Domain/URL in report(), Domain in abuse_report_text(), and Domain in
+    the --dry-run footer of submit_abuse_report.pl.  Providers such as
+    MarkMonitor and GoDaddy have a dedicated "Domain or URL" field in their
+    web forms; this field gives the user the exact value to paste into it
+    without having to work it out from context.
+
+  - Improved clarity of role strings in abuse_contacts():
+    1. Removed the "(provider table)" suffix from Sending ISP, URL host,
+       Web host, and DKIM signer roles.  This was implementation detail
+       that added length without helping the recipient understand what action
+       to take.  "Sending ISP" is clearer than "Sending ISP (provider
+       table)"; the via field already records how the contact was found.
+    2. Included the hostname in URL host roles -- "URL host: host.example"
+       rather than the generic "URL host".  When multiple routes converge on
+       the same abuse address (e.g. a Blogspot URL and a Gmail sending IP
+       both map to abuse@google.com), the merged role now makes clear which
+       specific URL is being reported, giving the abuse team an actionable
+       reference without requiring them to read the full report headers.
+    3. Stripped the display name from Account provider roles.  The role
+       previously included the full From: header value including the
+       spammer's chosen display name (e.g. "Account provider (from: Evil
+       Spammer <spam@gmail.com>)").  The display name is irrelevant to the
+       abuse report, may contain non-ASCII characters, and makes the merged
+       role string much longer than necessary.  The role now shows only the
+       email address: "Account provider (from: spam@gmail.com)".
+
+  - Fixed Wide character in syswrite error when submitting reports for
+    messages whose decoded subject line contains non-ASCII characters (e.g.
+    emoji).  submit_abuse_report.pl uses "use utf8" and
+    "use open qw(:std :encoding(UTF-8))", which causes all string operations
+    to produce Unicode-flagged strings.  Net::SMTP->datasend() calls
+    syswrite() on a raw socket and cannot handle wide characters.
+    _build_mime_message() now calls Encode::encode('UTF-8', ...) on the
+    report body and original message after CRLF normalisation, converting
+    the internal Unicode strings to raw byte strings before transmission.
+    Encode is a core module since Perl 5.8 so no new dependency is added.
+
 0.05	Sat Mar 28 11:52:05 EDT 2026
 
   Bug fixes

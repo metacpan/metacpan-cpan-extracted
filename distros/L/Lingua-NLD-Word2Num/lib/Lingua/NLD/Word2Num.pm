@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my  $parser  = nld_numerals();
 
 # }}}
@@ -130,6 +130,27 @@ sub nld_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Inverse of Dutch ordinal morphology: restore cardinal from ordinal text.
+    # Irregulars (standalone or as final element of compound)
+    $input =~ s{eerste\z}{een}xms     and return $input;
+    $input =~ s{tweede\z}{twee}xms    and return $input;
+    $input =~ s{derde\z}{drie}xms     and return $input;
+
+    # Regular: strip -ste (20+ and compounds ending in tens/honderd/duizend)
+    $input =~ s{ste\z}{}xms           and return $input;
+
+    # Regular: strip -de (4-19)
+    $input =~ s{de\z}{}xms            and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -139,6 +160,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::NLD::Word2Num - Word to number conversion in Dutch
@@ -146,7 +169,7 @@ Lingua::NLD::Word2Num - Word to number conversion in Dutch
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::NLD::Word2Num is module for converting text containing number
 representation in Dutch back into number. Converts whole numbers from 0 up
@@ -188,6 +211,14 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'derde', 'twaalfde', 'twintigste')
+  =>  str    cardinal text (e.g. 'drie', 'twaalf', 'twintig')
+      undef  if input is not recognised as an ordinal
+
+Convert Dutch ordinal text to cardinal text (morphological reversal).
+
 =item B<nld_numerals> (void)
 
   =>  obj  new parser object
@@ -208,6 +239,8 @@ Internal pareser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

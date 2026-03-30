@@ -3,9 +3,9 @@ NAME
     of modules in the distribution
 
 VERSION
-    This document describes version 0.031 of
+    This document describes version 0.032 of
     Dist::Zilla::Plugin::InsertModulesList (from Perl distribution
-    Dist-Zilla-Plugin-InsertModulesList), released on 2023-03-02.
+    Dist-Zilla-Plugin-InsertModulesList), released on 2026-03-30.
 
 SYNOPSIS
     In dist.ini:
@@ -48,7 +48,8 @@ SYNOPSIS
 
 DESCRIPTION
     This plugin finds "# INSERT_MODULES_LIST" directive in your POD/code and
-    replace it with a POD containing list of modules in the distribution.
+    replace it with a POD containing list of "modules" (i.e.: ".pm" and
+    ".pod" files) in the distribution (see "SYNOPSIS" for sample result).
 
     To exclude a module from the generated list, use:
 
@@ -67,6 +68,12 @@ DESCRIPTION
     Excludes and includes can be combined.
 
 CONFIGURATION
+  include_pm
+    Bool, default true. Can be used to exclude ".pm" files.
+
+  include_pod
+    Bool, default true. Can be used to exclude ".pod" files.
+
   ordered
     Bool. Can be set to true to always generate an ordered list, or false to
     always generate an unordered list. If unset, will use unordered list for
@@ -103,8 +110,7 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2023, 2019, 2015 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

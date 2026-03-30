@@ -12,7 +12,7 @@ our @CARP_NOT = (
 use Getopt::Yath::Util qw/mod2file fqmod/;
 use Getopt::Yath::Term qw/USE_COLOR color/;
 
-our $VERSION = '2.000007';
+our $VERSION = '2.000008';
 
 use Getopt::Yath::HashBase qw{
     <title

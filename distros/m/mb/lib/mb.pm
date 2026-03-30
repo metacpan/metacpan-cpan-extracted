@@ -7,13 +7,13 @@ package mb;
 #
 # https://metacpan.org/release/mb
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023, 2024 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.58';
+$VERSION = '0.59';
 $VERSION = $VERSION;
 
 # internal use
@@ -21,7 +21,7 @@ $mb::last_s_passed = 0; # last s/// status (1 if s/// passed)
 
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 
 # set OSNAME
 my $OSNAME = $^O;
@@ -77,7 +77,7 @@ sub import {
     # confirm version
     if (defined($_[0]) and ($_[0] =~ /\A [0-9] /xms)) {
         if ($_[0] ne $mb::VERSION) {
-            my($package,$filename,$line) = caller;
+            my($package, $filename, $line) = caller;
             die "$filename requires @{[__PACKAGE__]} $_[0], however @{[__FILE__]} am only $mb::VERSION, stopped at $filename line $line.\n";
         }
         shift @_;
@@ -103,7 +103,7 @@ sub import {
     # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
     no strict qw(refs);
     tie my %mb, 'mb';
-    *{caller().'::mb'} = \%mb;
+    *{caller().'::mb'} = { %mb };
 
     # $^X($EXECUTABLE_NAME) for execute MBCS Perl script
     $mb::PERL = qq{$^X @{[__FILE__]}};
@@ -196,7 +196,7 @@ END
         local $SIG{__DIE__} = sub { rmdir "$ARGV[0].lock"; };
         if (mkdir "$ARGV[0].lock", 0755) {
             mb::_open_w(my $fh, $script_oo) or die "$0(@{[__LINE__]}): can't open file: $script_oo\n";
-            print {$fh} mb::parse();
+            print {$fh} mb::_insert_source_encoding_unimport(mb::parse());
             close $fh;
             rmdir "$ARGV[0].lock";
         }
@@ -276,7 +276,7 @@ END
 sub cluck {
     my $i = 0;
     my @cluck = ();
-    while (my($package,$filename,$line,$subroutine) = caller($i)) {
+    while (my($package, $filename, $line, $subroutine) = caller($i)) {
         push @cluck, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
@@ -289,7 +289,7 @@ sub cluck {
 sub confess {
     my $i = 0;
     my @confess = ();
-    while (my($package,$filename,$line,$subroutine) = caller($i)) {
+    while (my($package, $filename, $line, $subroutine) = caller($i)) {
         push @confess, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
@@ -361,7 +361,7 @@ sub mb::do ($) {
                 local $SIG{__DIE__} = sub { rmdir "$prefix_file.lock"; };
                 if (mkdir "$prefix_file.lock", 0755) {
                     mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
-                    print {$fh} mb::parse();
+                    print {$fh} mb::_insert_source_encoding_unimport(mb::parse());
                     close $fh;
                     rmdir "$prefix_file.lock";
                 }
@@ -617,7 +617,7 @@ sub mb::require (;$) {
                     local $SIG{__DIE__} = sub { rmdir "$prefix_file.lock"; };
                     if (mkdir "$prefix_file.lock", 0755) {
                         mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
-                        print {$fh} mb::parse();
+                        print {$fh} mb::_insert_source_encoding_unimport(mb::parse());
                         close $fh;
                         rmdir "$prefix_file.lock";
                     }
@@ -1869,6 +1869,39 @@ sub parse {
 
     # return octet-oriented Perl script
     return $parsed_script;
+}
+
+#---------------------------------------------------------------------
+# Perl 5.42 introduces source::encoding and automatically enables
+# ASCII-only checking for "use v5.41" and later.
+#
+# mb transpiles scripts to mostly US-ASCII, but it intentionally keeps
+# comments and POD as-is. Those may contain multibyte characters.
+#
+# source::encoding is only activated when "use v5.41" or later appears
+# in the script. We append "no source::encoding;" on the same line as
+# the "use VERSION" statement (replacing any trailing semicolon first)
+# to avoid introducing extra lines that would shift line numbers in
+# error messages.
+sub _insert_source_encoding_unimport {
+    my($script) = @_;
+
+    # append "no source::encoding;" on the same line as "use v5.41" or later,
+    # before any trailing comment, to avoid line number shifts in error messages.
+    # matches: use v5.41; use v5.42; use 5.041; use 5.042; etc.
+    $script =~ s{
+        ( \buse \s+
+          (?: v5\. (?:4[1-9]|[5-9]\d|\d{3,})   # use v5.41 and later
+            | 5\.0(?:4[1-9]|[5-9]\d|\d{3,})      # use 5.041 and later
+          )
+          [^\n#;]*                                 # rest of statement (no # or ;)
+        )
+        ;?                                         # consume trailing semicolon
+        ( [^\n]* )                                 # trailing comment (if any)
+        ( (?:\r\n|\r|\n) )                         # line ending
+    }{$1; no source::encoding;$2$3}xmsg;
+
+    return $script;
 }
 
 #---------------------------------------------------------------------
@@ -5418,7 +5451,7 @@ mb - Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...
     and Other Systems
 
   Supported perl versions:
-    perl version 5.005_03 to newest perl
+    perl version 5.005_03 to perl 5.42
 
 =head1 INSTALLATION BY MAKE-COMMAND
 
@@ -5446,6 +5479,18 @@ In any case, it is certain that "M" and "B" in mb.pm modulino are the first two 
 
 mb.pm modulino is a solution that can run your Perl script written in MBCS encoding.
 This software is a source code filter, a transpiler-modulino.
+
+=head2 Perl 5.42 and source::encoding
+
+Perl 5.42 introduces the C<source::encoding> pragma, and enables
+ASCII-only checking automatically for C<use v5.41> and later.
+
+mb transpiles most program tokens into US-ASCII, but it intentionally keeps
+comments and POD as-is. Those may contain multibyte characters.
+
+Therefore, when mb runs as a command and writes a transpiled C<.oo.*> file, it
+inserts a defensive C<BEGIN> block that disables C<source::encoding> checking
+when the pragma exists.
 
 Perl is said to have been able to handle Unicode since version 5.8.
 However, unlike JPerl, "Easy jobs must be easy" has been lost.
@@ -6271,7 +6316,7 @@ $mb::PERL
 $^X means perl interpreter of MBCS version
 
   system(qq{ $^X perl_script.pl });              # had been write this...
-  
+
                                                  # on mb.pm modulino
   system(qq{ $^X       SBCS_perl_script.pl });   # for SBCS script
   system(qq{ $mb::PERL MBCS_perl_script.pl });   # for MBCS script
@@ -6283,7 +6328,7 @@ $mb::ORIG_PROGRAM_NAME
 $mb::ORIG_PROGRAM_NAME means $0 before transpiled it
 
   if ($0 =~ /-x64\.pl\z/) { ... }                # had been write this...
-  
+
                                                  # on mb.pm modulino
   if ($0 =~ /-x64\.pl\z/) { ... }                # means program name translated by mb.pm modulino (are you right?)
   if ($mb::ORIG_PROGRAM_NAME =~ /-x64\.pl\z/) { ... }  # means original program name not translated by mb.pm modulino
@@ -6534,7 +6579,7 @@ Single quotes are follows
   qr''
   qx''
   ------------------------------------------------------------------
- 
+
 In single quote, DAMEMOJI are double-byte characters that include the following metacharacters at second octet
 
   ------------------------------------------------------------------
@@ -7810,7 +7855,7 @@ But this software helps it.
   if ($OSNAME =~ /MSWin32/) {
       my @argv = ();
       for (@ARGV) {
-  
+
           # has space
           if (/\A (?:$x)*? [ ] /xms) {
               if (my @glob = mb::dosglob(qq{"$_"})) {
@@ -7820,7 +7865,7 @@ But this software helps it.
                   push @argv, $_;
               }
           }
-  
+
           # has wildcard metachar
           elsif (/\A (?:$x)*? [*?] /xms) {
               if (my @glob = mb::dosglob($_)) {
@@ -7830,7 +7875,7 @@ But this software helps it.
                   push @argv, $_;
               }
           }
-  
+
           # no wildcard globbing
           else {
               push @argv, $_;
@@ -7858,14 +7903,14 @@ Function chdir() cannot work if path is ended by chr(0x5C).
 
   This problem is specific to Microsoft Windows. It is not caused by the mb.pm
   modulino or the perl interpreter.
-  
+
   # chdir.pl
   mkdir((qw( ソ ))[0], 0777);
   print "got=", chdir((qw( ソ ))[0]), " cwd=", `cd`;
-  
+
   C:\HOME>perl5.00503.exe chdir.pl
     GOOD ==> got=1 cwd=C:\HOME\ソ
-  
+
   C:\HOME>strawberry-perl-5.8.9.5.exe chdir.pl
     BAD ==> got=1 cwd=C:\HOME
 
@@ -7887,19 +7932,19 @@ only perl 5.30.0 or later can treat the codepoint string which exceeds 65534 oct
 and only perl 5.10.1 or later can 32766 octets.
 
   see also,
-  
+
   The upper limit "n" specifiable in a regular expression quantifier of the form "{m,n}" has been doubled to 65534
   https://metacpan.org/pod/release/XSAWYERX/perl-5.30.0/pod/perldelta.pod#The-upper-limit-%22n%22-specifiable-in-a-regular-expression-quantifier-of-the-form-%22%7Bm,n%7D%22-has-been-doubled-to-65534
-  
+
   In 5.10.0, the * quantifier in patterns was sometimes treated as {0,32767}
   http://perldoc.perl.org/perl5101delta.html
-  
+
   [perl #116379] \G can't treat over 32767 octet
   http://www.nntp.perl.org/group/perl.perl5.porters/2013/01/msg197320.html
-  
+
   perlre - Perl regular expressions
   http://perldoc.perl.org/perlre.html
-  
+
   perlre length limit
   http://stackoverflow.com/questions/4592467/perlre-length-limit
 
@@ -7950,11 +7995,11 @@ value, you can use mb::tr().
   $var1 = 'AAA';
   $got = $var1 =~ tr/A/1/s; # works as $got = $var1 =~ s{[\x00-\xFF]*}{mb::tr($&,q/A/,q/1/,'sr')}e;
     BAD ==> got 1
-  
+
   $var2 = 'BBB';
   $got = $var2 =~ tr/A/1/s; # works as $got = $var2 =~ s{[\x00-\xFF]*}{mb::tr($&,q/A/,q/1/,'sr')}e;
     BAD ==> got 1
-  
+
   $var3 = 'AAA';
   $got = mb::tr($var3,'A','1','s'); # works as $got = mb::tr($var3,'A','1','s');
     GOOD ==> got 3
@@ -7963,7 +8008,7 @@ Usage of mb::tr()
 
   $transliterated_codepoint_count =
   mb::tr($MBCS_string, $searchlist, $replacementlist, $modifier);
-  
+
   $transliterated_codepoint_count =
   mb::tr($MBCS_string, $searchlist, $replacementlist);
 
@@ -8080,7 +8125,7 @@ A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N
   # suggested module name
   use mb::Charnames qw( %N ); # supports for all MBCS, including UTF-8
   print "$N{'GREEK SMALL LETTER EPSILON'}";
-  
+
   # By the way, you know how great it is to be able to write MBCS literal strings in your Perl scripts, right?
 
 =item *
@@ -8163,7 +8208,7 @@ However,
     its inside that has
     its inside that has
     its inside that has ...
-  
+
   Every outside has
     its outside that has
     its outside that has
@@ -8966,7 +9011,7 @@ This software is distributed in the hope that it will be useful, but WITHOUT ANY
 
  On Perl 7 and the Perl Steering Committee
  https://lwn.net/Articles/828384/
-  
+
  Perl7 and the future of Perl
  http://www.softpanorama.org/Scripting/Language_wars/perl7_and_the_future_of_perl.shtml
 
@@ -9013,6 +9058,21 @@ This software is distributed in the hope that it will be useful, but WITHOUT ANY
 
  Win32::Symlinks - A maintained, working implementation of Perl symlink built in features for Windows.
  https://metacpan.org/pod/Win32::Symlinks
+
+ IBM Kanji Code List
+ https://www.yscjp.com/webpetit/ibmKanju.html
+
+ I wanted to get a table to convert IBM kanji code to UTF8 or SJIS → I got it
+ https://qiita.com/madilloar/items/12b9e270388c92d0482d
+
+ Locale 'Chinese (Simplified)_China.936' is unsupported, and may crash the interpreter. #145
+ https://github.com/StrawberryPerl/Perl-Dist-Strawberry/issues/145
+
+ Locale 'Korean_Korea.949' is unsupported, and may crash the interpreter. with perl 5.38.0.1 #119
+ https://github.com/StrawberryPerl/Perl-Dist-Strawberry/issues/119
+
+ 5.38 UTF-8 LANG environment variable set results in locale error #150
+ https://github.com/StrawberryPerl/Perl-Dist-Strawberry/issues/150
 
  TANABATA - The Star Festival - common legend of east asia
  https://ja.wikipedia.org/wiki/%E4%B8%83%E5%A4%95

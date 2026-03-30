@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::ITA::Num2Word;
-# ABSTRACT: Number 2 Word conversion in ITA.
+# ABSTRACT: Number to word conversion in Italian
 
 use 5.16.0;
 use utf8;
@@ -24,7 +24,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 our %SIGN_NAMES           = ('-' => 'meno',
                              '+'  => '');
@@ -384,13 +384,15 @@ __END__
 
 # {{{ module documentation
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::ITA::Num2Word - Number to word conversion in Italian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -456,6 +458,13 @@ is equivalent to
   };
 
 See L</"OPTIONS"> for avalaible options for B<number_to_it>
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

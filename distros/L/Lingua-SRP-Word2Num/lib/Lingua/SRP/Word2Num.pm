@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = srp_numerals();
 
 # }}}
@@ -121,6 +121,86 @@ sub srp_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Serbian (Cyrillic) ordinals: strip gender/case suffixes, then map stems.
+    # Inflection: -и/-а/-о/-ог(а)/-ом(у)/-им (masc/fem/neut/oblique).
+
+    my %irregular = (
+        'нулти'       => 'нула',
+        'први'        => 'један',
+        'други'       => 'два',
+        'трећи'       => 'три',
+        'четврти'     => 'четири',
+        'пети'        => 'пет',
+        'шести'       => 'шест',
+        'седми'       => 'седам',
+        'осми'        => 'осам',
+        'девети'      => 'девет',
+        'десети'      => 'десет',
+        'једанаести'  => 'једанаест',
+        'дванаести'   => 'дванаест',
+        'тринаести'   => 'тринаест',
+        'четрнаести'  => 'четрнаест',
+        'петнаести'   => 'петнаест',
+        'шеснаести'   => 'шеснаест',
+        'седамнаести' => 'седамнаест',
+        'осамнаести'  => 'осамнаест',
+        'деветнаести' => 'деветнаест',
+        'двадесети'   => 'двадесет',
+        'тридесети'   => 'тридесет',
+        'четрдесети'  => 'четрдесет',
+        'педесети'    => 'педесет',
+        'шездесети'   => 'шездесет',
+        'седамдесети' => 'седамдесет',
+        'осамдесети'  => 'осамдесет',
+        'деведесети'  => 'деведесет',
+        'двестоти'    => 'двеста',
+        'тристоти'    => 'триста',
+        'четиристоти' => 'четиристо',
+        'петстоти'    => 'петсто',
+        'шестстоти'   => 'шестсто',
+        'седамстоти'  => 'седамсто',
+        'осамстоти'   => 'осамсто',
+        'деветстоти'  => 'деветсто',
+        'стоти'       => 'сто',
+        'хиљадити'    => 'хиљада',
+        'милионти'    => 'милион',
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip gender/case suffixes to masculine nominative (-и)
+        my $norm = $word;
+        $norm =~ s{ога\z}{и}xms
+            or $norm =~ s{ог\z}{и}xms
+            or $norm =~ s{ому\z}{и}xms
+            or $norm =~ s{ом\z}{и}xms
+            or $norm =~ s{им\z}{и}xms
+            or $norm =~ s{а\z}{и}xms      # fem: прва → први
+            or $norm =~ s{о\z}{и}xms;     # neut: прво → први
+
+        if (exists $irregular{$norm}) {
+            push @result, $irregular{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors, etc.)
+        }
+    }
+
+    return $matched ? join(' ', @result) : undef;
+}
+
+# }}}
 
 1;
 
@@ -139,7 +219,7 @@ Lingua::SRP::Word2Num - Word to number conversion in Serbian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SRP::Word2Num is module for converting Serbian numerals (Cyrillic script)
 into numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -179,6 +259,15 @@ expected to be in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'пети', 'десети', 'трећи')
+  =>  str    cardinal text (e.g. 'пет', 'десет', 'три')
+      undef  if input is not a recognized ordinal
+
+Convert Serbian (Cyrillic) ordinal text to cardinal text via morphological reversal.
+Handles all gender/case inflections.
+
 =item B<srp_numerals> (void)
 
   =>  obj  object of the parser
@@ -199,6 +288,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( @EXPORT_OK %EXPORT_TAGS $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :media );

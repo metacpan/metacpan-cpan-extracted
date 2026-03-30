@@ -16,7 +16,8 @@ BEGIN
 {
     use strict;
     use warnings;
-    use parent qw( HTML::Object::DOM::Element );
+     warnings::register_categories( 'HTML::Object' );
+   use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :select );
     our $VERSION = 'v0.2.0';

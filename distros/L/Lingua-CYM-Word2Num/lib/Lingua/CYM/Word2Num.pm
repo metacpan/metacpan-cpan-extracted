@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = cym_numerals();
 
 # }}}
@@ -132,6 +132,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::CYM::Word2Num - Word to number conversion in Welsh (Cymraeg)
@@ -139,7 +141,7 @@ Lingua::CYM::Word2Num - Word to number conversion in Welsh (Cymraeg)
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::CYM::Word2Num is a module for converting Welsh numerals into
 numbers, using the modern decimal counting system. Converts whole numbers

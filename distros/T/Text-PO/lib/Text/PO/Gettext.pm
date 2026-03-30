@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v0.3.2
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2025/11/29
+## Modified 2026/01/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,14 +17,10 @@ BEGIN
     use warnings;
     warnings::register_categories( 'Text::PO' );
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $L10N $DOMAIN_RE $LOCALE_RE );
+    use vars qw( $VERSION $DOMAIN_RE $LOCALE_RE );
     use I18N::Langinfo qw( langinfo );
-    use Module::Generic::Global ':const';
     use POSIX ();
     use Text::PO;
-    # l10n_id => lang => string => local string
-    # our $L10N = {};
-    # Since version v0.3.2, we now use Module::Generic::Global for thread safety
     our $DOMAIN_RE = qr/^[a-z]+(\.[a-zA-Z0-9\_\-]+)*$/;
     # Taken from Unicode BCP47 via Locale::Unicode
     our $LOCALE_RE = qr/
@@ -94,7 +90,7 @@ BEGIN
         (?:\.(?<locale_encoding>[\w-]+))?
     )
     /xi;
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
@@ -134,19 +130,39 @@ sub addItem
     {
         return( $self->error( "Language requested \"${locale}\" to add item is not supported." ) );
     }
-    $hash->{ $locale }->{ $key } = { msgid => $key, msgstr => $value };
-    return( $hash->{ $locale }->{ $key } );
+    $hash->{ $key } = { msgid => $key, msgstr => $value };
+    return( $hash->{ $key } );
 }
 
 sub category { return( shift->_set_get_scalar_as_object( 'category', @_ ) ); }
 
-sub charset { return( shift->_get_po->charset ); }
+sub charset
+{
+    my $self = shift( @_ );
+    warn( "This method charset() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub contentEncoding { return( shift->_get_po->content_encoding ); }
+sub contentEncoding
+{
+    my $self = shift( @_ );
+    warn( "This method contentEncoding() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub contentType { return( shift->_get_po->content_type ); }
+sub contentType
+{
+    my $self = shift( @_ );
+    warn( "This method contentType() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub currentLang { return( shift->_get_po->current_lang ); }
+# <https://superuser.com/questions/392439/lang-and-language-environment-variable-in-debian-based-systems>
+sub currentLang
+{
+    my $self = shift( @_ );
+    warn( "This method currentLang() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+    return( '' ) if( !CORE::exists( $ENV{LANGUAGE} ) && !CORE::exists( $ENV{LANG} ) );
+    return( ( $ENV{LANGUAGE} || $ENV{LANG} ) ? [split( /:/, ( $ENV{LANGUAGE} || $ENV{LANG} ) )]->[0] : '' );
+    return( $self->{locale} );
+}
 
 sub dgettext { return( shift->dngettext( @_ ) ); }
 
@@ -162,26 +178,20 @@ sub dngettext
     {
         $default = $msgidPlural || $msgid;
     }
-    if( !exists( $opts->{locale} ) || !length( $opts->{locale} ) )
+    if( exists( $opts->{locale} ) && length( $opts->{locale} // '' ) )
     {
-        $opts->{locale} = $self->locale;
+        warn( "Specifying a locale in dngettext() / gettext() is deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
     }
-    my $hash = $self->getDomainHash({ domain => $domain });
+    my $dict = $self->getDomainHash({ domain => $domain });
     my $plural = $self->plural;
-    if( !exists( $hash->{ $opts->{locale} } ) )
-    {
-        warn( "No locale \"$opts->{locale}\" found for the domain \"${domain}\".\n" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
-        return( Text::PO::String->new( $default ) );
-    }
-    my $l10n = $hash->{ $opts->{locale} };
-    my $dict = $l10n->{ $msgid };
-    if( $dict )
+    my $def = $dict->{ $msgid };
+    if( $def )
     {
         if( $plural->length == 0 )
         {
             $plural = $self->getPlural();
         }
-        if( ref( $dict->{msgstr} ) eq 'ARRAY' )
+        if( ref( $def ) eq 'ARRAY' )
         {
             if( $self->_is_number( $count ) &&
                 int( $plural->[0] ) > 0 )
@@ -204,12 +214,12 @@ sub dngettext
             {
                 $index = 0;
             }
-            # return( join( '', @{$dict->{msgstr}->[ $index ]} ) || $default );
-            my $locale_str = ref( $dict->{msgstr}->[ $index ] ) eq 'ARRAY' ? join( '', @{$dict->{msgstr}->[ $index ]} ) : $dict->{msgstr}->[ $index ];
+            # return( join( '', @{$def->{msgstr}->[ $index ]} ) || $default );
+            my $locale_str = ref( $def->[ $index ] ) eq 'ARRAY' ? join( '', @{$def->[ $index ]} ) : $def->[ $index ];
             return( Text::PO::String->new( $locale_str => $opts->{locale} ) ) if( length( "$locale_str" ) );
             return( Text::PO::String->new( $default ) );
         }
-        return( $dict->{msgstr} || $default );
+        return( $def || $default );
     }
     else
     {
@@ -245,6 +255,7 @@ sub exists
 {
     my $self = shift( @_ );
     my $lang = shift( @_ );
+    warn( "This method exists() is deprecated. The only dictionary version available is the one matching the locale set upon instantiation." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
     if( !defined( $lang ) )
     {
         return( $self->error( "No language to check for existence was provided." ) );
@@ -258,23 +269,17 @@ sub exists
         return( $self->error( "Unsupported locale format \"${lang}\"." ) );
     }
     $lang = $self->locale_unix( $lang );
-    my $hash = $self->getDomainHash();
-    return( exists( $hash->{ $lang } ) );
+    return( lc( $self->locale_unix ) eq lc( $lang ) ? 1 : 0 );
 }
 
 sub fetchLocale
 {
     my $self = shift( @_ );
     my $key  = shift( @_ );
-    my $hash = $self->getDomainHash();
-    my $spans = [];
-    # Browsing through each available locale language
-    # Make it predictable using sort()
-    foreach my $k ( sort( keys( %$hash ) ) )
-    {
-        my $locWeb = $self->locale_web( $k );
-        push( @$spans, "<span lang=\"${locWeb}\">" . $self->dngettext( $self->domain, $key, { locale => $k }) . '</span>' );
-    }
+    warn( "fetchLocale() is now deprecated. There is only one locale per instance of this class." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+    my $dict = $self->getDomainHash();
+    my $locWeb = $self->locale_web;
+    my $spans = ["<span lang=\"${locWeb}\">" . $self->dngettext( $self->domain, $key ) . '</span>'];
     return( $self->new_array( $spans ) );
 }
 
@@ -314,25 +319,16 @@ sub getDomainHash
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{domain} //= $self->domain;
     my $class = ref( $self ) || $self;
-
-    my $repo = Module::Generic::Global->new( 'l10n' => $class );
-    my $hash = $repo->get // {};
-    if( !exists( $hash->{ $opts->{domain} } ) )
+    if( $opts->{locale} )
     {
-        return( $self->error( "No locale data for domain \"$opts->{domain}\"." ) );
-    }
-    my $l10n = $hash->{ $opts->{domain} };
-    if( exists( $opts->{locale} ) && 
-        defined( $opts->{locale} ) )
-    {
-        $opts->{locale} = $self->locale_unix( $opts->{locale} );
-        if( length( $opts->{locale} ) == 0 )
+        warn( "Calling getDomainHash() with a locale is deprecated. The only locale version is the one stored in this object. If you want other locales, you need to instantiate other objects." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+        if( lc( $self->locale_unix( $opts->{locale} ) ) ne lc( $self->locale_unix ) )
         {
-            return( $self->error( "Locale was provided, but is empty." ) );
+            return;
         }
-        return( $l10n->{ $opts->{locale} } );
     }
-    return( $l10n );
+    my $dict = $self->{_dict};
+    return( $dict );
 }
 
 sub getLangDataPath { return( $ENV{TEXTLOCALEDIR} ); }
@@ -340,23 +336,17 @@ sub getLangDataPath { return( $ENV{TEXTLOCALEDIR} ); }
 sub getLanguageDict
 {
     my $self = shift( @_ );
-    my $lang = shift( @_ ) || return( $self->error( "Language provided, to get its dictionary, is undefined or null." ) );
-    if( $lang !~ /^$LOCALE_RE$/ )
+    my $lang = shift( @_ );
+    if( defined( $lang ) )
     {
-        return( $self->error( "Locale provided (${lang}) is in an unsupported format." ) );
+        warn( "Specifying a locale in getLanguageDict() is now deprecated. Only the locale set upon instantiation is used." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
     }
-    $lang = $self->locale_unix( $lang );
-
-    if( !$self->isSupportedLanguage( $lang ) )
+    if( lc( $self->locale_unix( $lang ) ) ne lc( $self->locale_unix ) )
     {
-        return( $self->error( "Language provided (${lang}), to get its dictionary, is unsupported." ) );
+        return;
     }
-    my $hash = $self->getDomainHash();
-    if( !exists( $hash->{ $lang } ) )
-    {
-        return( $self->error( "Language provided (${lang}), to get its dictionary, could not be found. This is weird. Most likely a configuration mistake." ) );
-    }
-    return( $hash->{ $lang } );
+    my $dict = $self->getDomainHash();
+    return( $dict );
 }
 
 sub getLocale { return( shift->locale ); }
@@ -398,18 +388,16 @@ sub getLocalesf
 sub getMetaKeys
 {
     my $self = shift( @_ );
-    my $hash = $self->getDomainHash({ locale => $self->locale });
-    my $po = $hash->{_po} || return( $self->error( "Unable to get the po object in the locale data hash" ) );
-    return( $po->meta_keys );
+    # Deprecated, because it forces us to keep in memory the Text::PO object for virtually no gain.
+    warn( "getMetaKeys() is deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
 }
 
 sub getMetaValue
 {
     my $self = shift( @_ );
     my $field = shift( @_ ) || return( $self->error( "No meta field provided to get its value." ) );
-    my $hash = $self->getDomainHash({ locale => $self->locale });
-    my $po = $hash->{_po} || return( $self->error( "Unable to get the po object in the locale data hash" ) );
-    return( $po->meta( $field ) );
+    # Deprecated, because it forces us to keep in memory the Text::PO object for virtually no gain.
+    warn( "getMetaValue() is deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
 }
 
 sub getMonthsLong
@@ -443,8 +431,7 @@ sub getNumericPosixDict
 sub getPlural
 {
     my $self = shift( @_ );
-    my $po = $self->_get_po || return( $self->error( "Unable to get the po object in the locale data hash" ) );
-    return( $po->plural );
+    return( $self->{_plural} );
 }
 
 sub getText
@@ -452,7 +439,11 @@ sub getText
     my $self = shift( @_ );
     my( $key, $lang ) = @_;
     return( $self->error( "No text to get its localised equivalent was provided." ) ) if( !defined( $key ) || !length( $key ) );
-    return( $self->dngettext( $self->domain, $key, { locale => $lang }) );
+    if( defined( $lang ) && CORE::length( $lang // '' ) ) 
+    {
+        warn( "Specifying a locale is deprecated for getText()" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+    }
+    return( $self->dngettext( $self->domain, $key ) );
 }
 
 sub getTextf
@@ -460,9 +451,15 @@ sub getTextf
     my $self = shift( @_ );
     my $opts = {};
     $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    $opts->{lang} = $self->locale || $self->currentLang();
+    # $opts->{lang} = $self->locale || $self->currentLang();
+    if( CORE::exists( $opts->{lang} ) &&
+        defined( $opts->{lang} ) &&
+        CORE::length( $opts->{lang} // '' ) )
+    {
+        warn( "Specifying a locale is deprecated for getTextf()" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+    }
     my $key  = shift( @_ );
-    my $text = $self->getText( $key, $opts->{lang} );
+    my $text = $self->getText( $key );
     return( sprintf( $text, @_ ) );
 }
 
@@ -480,28 +477,33 @@ sub isSupportedLanguage
     my $lang  = shift( @_ ) || return(0);
     my $class = ref( $self ) || $self;
     $lang = $self->locale_unix( $lang );
-    my $dom  = $self->domain;
-    my $repo = Module::Generic::Global->new( 'l10n' => $class );
-    my $l10n = $repo->get // {};
-    return( $self->error( "No domain \"$dom\" set!" ) ) if( !CORE::exists( $l10n->{ $dom } ) );
-    my $dict = $l10n->{ $dom };
-    if( CORE::exists( $dict->{ $lang } ) )
-    {
-        return(1);
-    }
-    else
-    {
-        return(0);
-    }
+    warn( "isSupportedLanguage() is now deprecated since there is only 1 supported language: the one you provided upon object instantiation." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+    return( lc( $lang ) eq lc( $self->locale_unix ) ? 1 : 0 );
 }
 
-sub language { return( shift->_get_po->language ); }
+sub language
+{
+    my $self  = shift( @_ );
+    warn( "This method language() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub languageTeam { return( shift->_get_po->language_team ); }
+sub languageTeam
+{
+    my $self  = shift( @_ );
+    warn( "This method languageTeam() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub lastTranslator { return( shift->_get_po->last_translator ); }
+sub lastTranslator
+{
+    my $self  = shift( @_ );
+    warn( "This method lastTranslator() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub mimeVersion { return( shift->_get_po->mime_version ); }
+sub mimeVersion
+{
+    my $self  = shift( @_ );
+    warn( "This method mimeVersion() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
 sub locale
 {
@@ -590,17 +592,41 @@ sub plural
     }
 }
 
-sub pluralForms { return( shift->_get_po->plural_forms ); }
+sub pluralForms
+{
+    my $self  = shift( @_ );
+    warn( "This method pluralForms() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub po_object { return( shift->_get_po ); }
+sub po_object
+{
+    my $self  = shift( @_ );
+    warn( "This method po_object() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub poRevisionDate { return( shift->_get_po->po_revision_date ); }
+sub poRevisionDate
+{
+    my $self  = shift( @_ );
+    warn( "This method poRevisionDate() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub potCreationDate { return( shift->_get_po->pot_creation_date ); }
+sub potCreationDate
+{
+    my $self  = shift( @_ );
+    warn( "This method potCreationDate() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub projectIdVersion { return( shift->_get_po->project_id_version ); }
+sub projectIdVersion
+{
+    my $self  = shift( @_ );
+    warn( "This method projectIdVersion() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
-sub reportBugsTo { return( shift->_get_po->report_bugs_to ); }
+sub reportBugsTo
+{
+    my $self  = shift( @_ );
+    warn( "This method reportBugsTo() is now deprecated." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+}
 
 sub textdomain
 {
@@ -634,6 +660,7 @@ sub textdomain
     elsif( $path_mo->exists )
     {
         $file = $path_mo;
+        require Text::PO::MO;
         my $mo = Text::PO::MO->new( $file, { domain => $dom, debug => $self->debug }) ||
             return( $self->pass_error( Text::PO::MO->error ) );
         $po = $mo->as_object ||
@@ -643,19 +670,24 @@ sub textdomain
     {
         return( $self->error( "No data file could be found for \"$dom\" for either json, po, or mo file." ) );
     }
-    my $repo = Module::Generic::Global->new( 'l10n' => $class );
-    $repo->lock;
-    my $l10n = $repo->get // {};
-    $l10n->{ $dom } = {} if( ref( $l10n->{ $dom } ) ne 'HASH' );
-    my $dict = $l10n->{ $dom }->{ $lang } = {} if( ref( $l10n->{ $dom }->{ $lang } ) ne 'HASH' );
-    $dict->{_po} = $po;
+    my $dict = {};
     $po->elements->foreach(sub
     {
-        my $ref = shift( @_ );
-        $dict->{ $ref->{msgid} } = $ref;
+        my $e = shift( @_ );
+        my $msgid  = $e->msgid_as_text;
+        my $msgstr = $e->msgstr;
+        # We store the msgid
+        $dict->{ $msgid } = $msgstr;
+        # Also store the plural version, if any
+        my $msgid_plural = $e->msgid_plural_as_text;
+        if( defined( $msgid_plural ) && CORE::length( $msgid_plural // '' ) )
+        {
+            $dict->{ $msgid_plural } = $msgstr;
+        }
     });
-    $repo->set( $l10n );
-    $repo->unlock;
+    # Save this hash to our object.
+    $self->{_dict}   = $dict;
+    $self->{_plural} = $po->plural;
     return( $self );
 }
 
@@ -739,13 +771,6 @@ sub _get_numeric_dict
     $lconv->{mon_grouping} = unpack( "C*", $lconv->{mon_grouping} ) if( CORE::exists( $lconv->{mon_grouping} ) && defined( $lconv->{mon_grouping} ) );
     $lconv = $self->new_hash( $lconv );
     return( [ $def, $lconv ] );
-}
-
-sub _get_po
-{
-    my $self = shift( @_ );
-    my $hash = $self->getDomainHash({ locale => $self->locale });
-    return( $hash->{_po} );
 }
 
 # NOTE: Text::PO::String class
@@ -888,7 +913,7 @@ Text::PO::Gettext - Object-oriented GNU Gettext-style implementation
 
 =head1 VERSION
 
-    v0.3.2
+    v1.0.0
 
 =head1 DESCRIPTION
 
@@ -1662,8 +1687,6 @@ Given a string representing a domain, such as C<com.example.api> and this will l
 
 Normally you do not need to call this directly; lookups such as L</gettext> will ensure the relevant domain is available.
 
-Internally, domain data is cached in a per-class repository (using L<Module::Generic::Global>) so that repeated lookups for the same domain and locale are efficient and thread-safe.
-
 =head2 use_json
 
     my $flag = $po->use_json; # 1
@@ -1671,17 +1694,13 @@ Internally, domain data is cached in a per-class repository (using L<Module::Gen
 
 Takes a boolean and if set, L<Text::PO::Gettext> will use a json po data if it exists, otherwise it will use a C<.po> file or a C<.mo> file in that order of preference.
 
-=head2 _get_po
-
-Returns the L<Text::PO> object used.
-
 =head1 JAVASCRIPT COMPANION
 
 This distribution provides a JavaScript companion library (see the C<share> directory in the L<Text::PO> distribution) that can read JSON-based PO data generated from your C<.po> or C<.mo> files. This makes it straightforward to share the same localisation data between Perl and browser-side code.
 
 =head1 THREAD & PROCESS SAFETY
 
-L<Text::PO::Gettext> is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event. It combines system-level file locking (C<flock>) with Perl-level synchronisation via L<Module::Generic::Global> to provide robust, system-wide thread-safe, and process-safe file operations.
+L<Text::PO::Gettext> is designed to be fully thread-safe and process-safe, ensuring data integrity across Perl ithreads and mod_perl’s threaded Multi-Processing Modules (MPMs) such as Worker or Event.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ use warnings;
 
 use Carp qw/croak/;
 
-our $VERSION = '2.000007';
+our $VERSION = '2.000008';
 
 use parent 'Getopt::Yath::Option';
 use Getopt::Yath::HashBase;

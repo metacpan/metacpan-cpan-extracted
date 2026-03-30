@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.3.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Version v0.3.0_1
+## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2025/10/16
+## Modified 2026/03/29
 ## All rights reserved
 ## 
 ## 
@@ -18,7 +18,7 @@ BEGIN
     use v5.10.1;
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic );
     use vars qw( $LOOK_LIKE_HTML $LOOK_LIKE_IT_HAS_HTML $ATTRIBUTE_NAME_RE $VERSION );
     use Data::UUID;
@@ -34,7 +34,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.0_1';
 };
 
 use strict;
@@ -79,7 +79,7 @@ sub init
     my $attr = $opts->{attributes};
     if( !$opts->{is_empty} && exists( $attr->{'/'} ) )
     {
-        warnings::warn( "Tag initiated \"$opts->{tag}\" is marked as non-empty (non-void), but ends with \"/>\" at line $opts->{line} and column $opts->{column}: $opts->{original}\n" ) if( warnings::enabled() );
+        warn( "Tag initiated \"$opts->{tag}\" is marked as non-empty (non-void), but ends with \"/>\" at line $opts->{line} and column $opts->{column}: $opts->{original}\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
         $self->is_empty(1);
     }
     $self->checksum( $self->set_checksum );
@@ -170,7 +170,7 @@ sub as_string
             $self->attributes_sequence->foreach(sub
             {
                 my $k = shift( @_ );
-                return( 1 ) if( $k eq '/' );
+                return(1) if( $k eq '/' );
                 my $v = $self->attributes->get( $k );
                 # Ensure double quotes are escaped
                 $v =~ s/(?<!\\)\"/\\\"/gs;
@@ -183,7 +183,7 @@ sub as_string
     {
         if( $self->is_empty )
         {
-            warnings::warn( "This tag \"$tag\" is supposed to be an empty / void one, but it has " . $self->children->length . " children.\n" ) if( warnings::enabled() );
+            warn( "This tag \"$tag\" is supposed to be an empty / void one, but it has " . $self->children->length . " children.\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
         }
         # The user is alway right, so let's add those children
         $res->push( $a->join( ' ' )->scalar );
@@ -451,7 +451,7 @@ sub close
     return( $self ) if( $self->is_empty );
 #     if( !$parent )
 #     {
-#         warnings::warn( "No parent set for this element \"" . $self->tag . "\".\n" ) if( warnings::enabled( 'HTML::Object' ) );
+#         warn( "No parent set for this element \"" . $self->tag . "\".\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
 #         return( $self );
 #     }
     my $e = $self->new_closing({
@@ -1146,7 +1146,10 @@ sub offset { return( shift->reset(@_)->_set_get_number_as_object( 'offset', @_ )
 
 sub original { return( shift->_set_get_scalar_as_object( 'original', @_ ) ); }
 
-sub parent { return( shift->_set_get_object_without_init( 'parent', 'HTML::Object::Element', @_ ) ); }
+sub parent { return( shift->_set_get_object_without_init({
+    field  => 'parent',
+    weaken => 1,
+}, 'HTML::Object::Element', @_ ) ); }
 
 # Note: Different from the one in HTML::Element
 sub pos
@@ -1446,7 +1449,7 @@ sub _get_elements_list
         my $addr = Scalar::Util::refaddr( $_ );
         if( ++$seen->{ $addr } > 1 )
         {
-            warnings::warn( "Warnings only: found duplicate element with tag '" . $_->tag . "' provided in replace_with()\n" ) if( warnings::enabled( 'HTML::Object' ) );
+            warn( "Warnings only: found duplicate element with tag '" . $_->tag . "' provided in replace_with()\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
             next;
         }
         return( $self->error( "Replacement list contains a copy of target!" ) ) if( $self_addr eq $addr );
@@ -1646,7 +1649,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.0_1
 
 =head1 DESCRIPTION
 

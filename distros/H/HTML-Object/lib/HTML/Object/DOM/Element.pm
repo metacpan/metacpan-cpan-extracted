@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use HTML::Object::DOM::Node qw( TEXT_NODE COMMENT_NODE );
     use parent qw( HTML::Object::DOM::Node );
     use vars qw( @EXPORT_OK $VERSION );
@@ -208,7 +209,7 @@ sub cmp
     # the 2 elements are not in the same twig
     unless( $a_pile->last == $b_pile->last ) 
     {
-        warnings::warn( "2 nodes not in the same pile: " . ref( $a ) . " - " . ref( $b ) . "\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warn( "2 nodes not in the same pile: " . ref( $a ) . " - " . ref( $b ) . "\n" ) if( warnings::enabled( 'HTML::Object' ) );
         # print "a: ", $a->string_value, "\nb: ", $b->string_value, "\n";
         return;
     }
@@ -279,7 +280,7 @@ sub firstElementChild
         if( $_->isa( 'HTML::Object::DOM::Element' ) )
         {
             $elem = $_;
-            return;
+            return(0);
         }
         return(1);
     });
@@ -498,7 +499,7 @@ sub getNodePath
             }
         }
         # Continue to the next one
-        return( 1 );
+        return(1);
     });
     $a->unshift( $nth > 1 ? "${tag}\[${pos}\]" : $tag );
     return( $parent->getNodePath( $a ) ) unless( $init );
@@ -938,7 +939,7 @@ sub lastElementChild
         if( $_->isa( 'HTML::Object::DOM::Element' ) )
         {
             $elem = $_;
-            return;
+            return(0);
         }
         return(1);
     });
@@ -2084,7 +2085,7 @@ HTML::Object::DOM::Element - HTML Object
 
     use HTML::Object::DOM::Element;
     my $this = HTML::Object::DOM::Element->new || 
-        die( HTML::Object::DOM::Element->error, "\n" );
+        die( HTML::Object::DOM::Element->error );
 
 =head1 VERSION
 
@@ -2093,6 +2094,12 @@ HTML::Object::DOM::Element - HTML Object
 =head1 DESCRIPTION
 
 This module represents an HTML element and contains also all the methods for L<DOM nodes|https://developer.mozilla.org/en-US/docs/Web/API/Node>. It is inherited by all other element objects in a L<document|HTML::Object::Document>.
+
+If you want to get the children elements (i.e. children excluding text, comments and space) from any given tag, you want to do something like this:
+
+    use HTML::Object::DOM ':node'; # Load up the node related constants
+    # This will return an array object of HTML::Object::DOM::Element objects only.
+    my $array_ref_of_elements = $parent_element->children->grep(sub{ $_->nodeType == ELEMENT_NODE });
 
 This module inherits from L<HTML::Object::Node> and is extended by L<HTML::Object::XQuery>
 

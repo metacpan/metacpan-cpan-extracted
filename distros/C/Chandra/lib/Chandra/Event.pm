@@ -3,15 +3,15 @@ package Chandra::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.06';
 
 # Event object passed to event handlers
 # Contains data from the JavaScript event
 
 sub new {
-    my ($class, $data) = @_;
-    $data //= {};
-    return bless $data, $class;
+	my ($class, $data) = @_;
+	$data //= {};
+	return bless $data, $class;
 }
 
 # Event type (click, change, keyup, etc.)
@@ -37,18 +37,18 @@ sub key_code { shift->{keyCode} }
 
 # Custom data (from data-* attributes or explicit)
 sub data {
-    my ($self, $key) = @_;
-    if (defined $key) {
-        return $self->{data}{$key} if ref $self->{data} eq 'HASH';
-        return undef;
-    }
-    return $self->{data};
+	my ($self, $key) = @_;
+	if (defined $key) {
+		return $self->{data}{$key} if ref $self->{data} eq 'HASH';
+		return undef;
+	}
+	return $self->{data};
 }
 
 # Get any arbitrary field
 sub get {
-    my ($self, $key) = @_;
-    return $self->{$key};
+	my ($self, $key) = @_;
+	return $self->{$key};
 }
 
 1;
@@ -61,20 +61,38 @@ Chandra::Event - Event object for element handlers
 
 =head1 SYNOPSIS
 
-    # In an element handler:
-    onclick => sub {
-        my ($event, $app) = @_;
-        
-        print "Event type: ", $event->type, "\n";
-        print "Target ID: ", $event->target_id, "\n";
-        print "Value: ", $event->value, "\n";
-    }
+	# In an element handler:
+	onclick => sub {
+	    my ($event, $app) = @_;
+
+	print "Event type: ", $event->type, "\n";
+	print "Target ID: ", $event->target_id, "\n";
+	print "Value: ", $event->value, "\n";
+	}
+
+=head1 DESCRIPTION
+
+Chandra::Event wraps the event data sent from JavaScript when a DOM event
+fires. It is passed as the first argument to element event handlers
+(C<onclick>, C<onchange>, etc.).
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+	my $event = Chandra::Event->new(\%data);
+
+Creates a new event from a hashref. Typically called internally by
+L<Chandra::Bind> during dispatch, not by user code.
+
+The C<%data> hash may contain: C<type>, C<targetId>, C<targetName>,
+C<value>, C<checked>, C<key>, C<keyCode>, and any custom fields.
 
 =head1 METHODS
 
 =head2 type
 
-The event type (click, change, keyup, submit, etc.)
+The event type (C<click>, C<change>, C<keyup>, C<submit>, etc.).
 
 =head2 target_id
 
@@ -100,8 +118,20 @@ The key pressed (for keyboard events).
 
 The numeric key code (for keyboard events).
 
-=head2 data($key)
+=head2 data
+
+	my $val = $event->data($key);
 
 Access custom data passed with the event or data-* attributes.
+
+=head2 get
+
+	my $val = $event->get($key);
+
+Access any arbitrary field from the raw event data by key.
+
+=head1 SEE ALSO
+
+L<Chandra::Element>, L<Chandra::Bind>
 
 =cut

@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -108,12 +108,31 @@ sub num2tha_cardinal :Export {
 # }}}
 
 
+# {{{ num2tha_ordinal                 convert number to ordinal text
+
+sub num2tha_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Thai ordinals: ที่ (thi) + cardinal
+    my $cardinal = num2tha_cardinal($number);
+
+    return 'ที่' . $cardinal;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -135,7 +154,7 @@ Lingua::THA::Num2Word - Number to word conversion in Thai
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::THA::Num2Word is module for converting numbers into their written
 representation in Thai. Converts whole numbers from 0 up to 999 999 999.
@@ -156,6 +175,9 @@ Text is encoded in UTF-8.
  my $text = Lingua::THA::Num2Word::num2tha_cardinal( 223 );
 
  print $text || "sorry, can't convert this number into Thai.";
+
+ my $ord = Lingua::THA::Num2Word::num2tha_ordinal( 3 );
+ print $ord;    # "ที่สาม"
 
 =cut
 
@@ -193,6 +215,20 @@ B<ยี่> (yi) replaces B<สอง> (song) for the digit 2 in the tens posit
 
 =back
 
+=item B<num2tha_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to ordinal text by prepending ที่ (thi) to the cardinal form.
+Only numbers from interval [1, 999_999_999] will be converted.
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -207,6 +243,8 @@ B<ยี่> (yi) replaces B<สอง> (song) for the digit 2 in the tens posit
 =over 2
 
 =item num2tha_cardinal
+
+=item num2tha_ordinal
 
 =back
 

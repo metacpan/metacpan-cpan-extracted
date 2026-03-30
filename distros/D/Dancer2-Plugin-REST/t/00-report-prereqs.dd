@@ -2,10 +2,14 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Software::Security::Policy::Individual' => '0',
                                       'Test::More' => '0.96',
                                       'Test::Vars' => '0'
                                     }
@@ -40,6 +44,7 @@ do { my $x = {
                                    'JSON' => '0',
                                    'Module::Runtime' => '0',
                                    'Plack::Test' => '0',
+                                   'Test2::Bundle::More' => '0',
                                    'Test::More' => '0',
                                    'Test::Requires' => '0'
                                  }

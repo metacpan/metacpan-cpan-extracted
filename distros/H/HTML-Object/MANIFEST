@@ -37,6 +37,7 @@ lib/HTML/Object/DOM/Element/Directory.pm
 lib/HTML/Object/DOM/Element/Div.pm
 lib/HTML/Object/DOM/Element/DList.pm
 lib/HTML/Object/DOM/Element/Embed.pm
+lib/HTML/Object/DOM/Element/FencedFrame.pm
 lib/HTML/Object/DOM/Element/FieldSet.pm
 lib/HTML/Object/DOM/Element/Form.pm
 lib/HTML/Object/DOM/Element/Head.pm
@@ -183,6 +184,11 @@ t/10.text.t
 t/10.title.t
 t/20.xpath.t
 t/30.add.t
+t/30.xquery-01-dom-css.t
+t/30.xquery-02-contents-data.t
+t/30.xquery-03-load.t
+t/30.xquery-04-wrap-contains.t
+t/30.xquery-05-utilities.t
 t/30.xquery.t
 t/90.pod.t
 t/91.coverage.t

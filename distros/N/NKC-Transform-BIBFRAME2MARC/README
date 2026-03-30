@@ -74,6 +74,9 @@ DEPENDENCIES
     Class::Utils, Error::Pure, File::Share, XML::LibXML, XML::LibXSLT.
 
 SEE ALSO
+    Biblio::BF2MARC
+        Convert BIBFRAME RDF to MARC
+
     NKC::Transform::MARC2BIBFRAME
         marc2bibframe transformation class.
 
@@ -104,5 +107,5 @@ ACKNOWLEDGEMENTS
     Linked Open Data.
 
 VERSION
-    0.04
+    0.05
 

@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = ces_numerals();
 
 # }}}
@@ -105,6 +105,87 @@ sub ces_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Czech ordinals: strip gender suffixes first, then map stems.
+    # Ordinals inflect: -ý/-á/-é/-ého/-ému/-ém/-ým (masc/fem/neut/oblique).
+    # Normalize to masculine nominative (-ý / -í) for lookup.
+
+    my %irregular = (
+        'nultý'      => 'nula',
+        'první'      => 'jedna',
+        'druhý'      => 'dva',
+        'třetí'      => 'tři',
+        'čtvrtý'     => 'čtyři',
+        'pátý'       => 'pět',
+        'šestý'      => 'šest',
+        'sedmý'      => 'sedm',
+        'osmý'       => 'osm',
+        'devátý'     => 'devět',
+        'desátý'     => 'deset',
+        'jedenáctý'  => 'jedenáct',
+        'dvanáctý'   => 'dvanáct',
+        'třináctý'   => 'třináct',
+        'čtrnáctý'   => 'čtrnáct',
+        'patnáctý'   => 'patnáct',
+        'šestnáctý'  => 'šestnáct',
+        'sedmnáctý'  => 'sedmnáct',
+        'osmnáctý'   => 'osmnáct',
+        'devatenáctý' => 'devatenáct',
+        'dvacátý'    => 'dvacet',
+        'třicátý'    => 'třicet',
+        'čtyřicátý'  => 'čtyřicet',
+        'padesátý'   => 'padesát',
+        'šedesátý'   => 'šedesát',
+        'sedmdesátý' => 'sedmdesát',
+        'osmdesátý'  => 'osmdesát',
+        'devadesátý' => 'devadesát',
+        'dvoustý'    => 'dvě stě',
+        'třístý'     => 'tři sta',
+        'čtyřstý'    => 'čtyři sta',
+        'pětistý'    => 'pět set',
+        'šestistý'   => 'šest set',
+        'sedmistý'   => 'sedm set',
+        'osmistý'    => 'osm set',
+        'devítistý'  => 'devět set',
+        'stý'        => 'sto',
+        'tisící'     => 'tisíc',
+        'miliontý'   => 'milion',
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip gender/case suffixes to get masculine nominative base
+        my $norm = $word;
+        $norm =~ s{(í)ho\z}{$1}xms        # třetí-ho → třetí
+            or $norm =~ s{ého\z}{ý}xms    # dvacáté-ho → dvacátý
+            or $norm =~ s{ému\z}{ý}xms    # dvacáté-mu → dvacátý
+            or $norm =~ s{ém\z}{ý}xms     # dvacáté-m  → dvacátý
+            or $norm =~ s{ým\z}{ý}xms     # dvacátý-m  → dvacátý
+            or $norm =~ s{á\z}{ý}xms      # dvacátá    → dvacátý
+            or $norm =~ s{é\z}{ý}xms;     # dvacáté    → dvacátý
+
+        if (exists $irregular{$norm}) {
+            push @result, $irregular{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors, etc.)
+        }
+    }
+
+    return $matched ? join(' ', @result) : undef;
+}
+
+# }}}
 
 1;
 
@@ -123,7 +204,7 @@ Lingua::CES::Word2Num - Word to number conversion in Czech
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::CES::Word2Num is module for converting czech numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -163,6 +244,15 @@ expected to be in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'pátý', 'dvacátý', 'třetí')
+  =>  str    cardinal text (e.g. 'pět', 'dvacet', 'tři')
+      undef  if input is not a recognized ordinal
+
+Convert Czech ordinal text to cardinal text via morphological reversal.
+Handles all gender/case inflections (masculine, feminine, neuter, oblique).
+
 =item B<ces_numerals> (void)
 
   =>  obj  object of the parser
@@ -183,6 +273,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

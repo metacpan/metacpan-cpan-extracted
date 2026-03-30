@@ -1,10 +1,23 @@
-2.000.1  2024-11-12  Released-By: PERLANCAR; Urgency: low
+2.000.2  2026-03-30  Released-By: PERLANCAR; Urgency: low
 
          - No functional changes.
 
          [DOCUMENTATION]
 
-         - [doc] Describe the organization system.
+         - Add a how-to document: Completion.
+
+         - [main document] Add list of manuals to main manual page.
+
+         - [main document] [formatting] Change most =head1 to =head2 to resolve
+           ordering issue (=head1 is ordered automatically by a Pod::Weaver
+           plugin).
+
+
+2.000.1  2024-11-12  Released-By: PERLANCAR; Urgency: low
+
+         [DOCUMENTATION]
+
+         - Describe the organization system.
 
          - Move Examples under HowTo::.
 

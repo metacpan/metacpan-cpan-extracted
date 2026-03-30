@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = qw( 0 nula         1 jedna         2 dva
                  3 tři          4 čtyři         5 pět
                  6 šest         7 sedm          8 osm
@@ -287,6 +287,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::CES::Num2Word - Number to word conversion in Czech
@@ -294,7 +296,7 @@ Lingua::CES::Num2Word - Number to word conversion in Czech
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::CES::Num2Word is module for conversion numbers into their representation
 in Czech. It converts whole numbers from 0 up to 999 999 999.
@@ -334,6 +336,13 @@ in Czech. It converts whole numbers from 0 up to 999 999 999.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will
 be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

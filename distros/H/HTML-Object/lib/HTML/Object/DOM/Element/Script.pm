@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :script );
@@ -140,7 +141,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 noModule
 
-Is a boolean value that if true, stops the script's execution in browsers that support ES2015 modules — used to run fallback scripts in older browsers that do not support C<JavaScript> modules.
+Is a boolean value that if true, stops the script's execution in browsers that support ES2015 modules - used to run fallback scripts in older browsers that do not support C<JavaScript> modules.
 
 See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/API/HTMLScriptElement/noModule>
 

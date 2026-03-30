@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = qw( 0 nič            1 ena            2 dva
                  3 tri            4 štiri          5 pet
                  6 šest           7 sedem          8 osem
@@ -135,13 +135,140 @@ sub num2slv_cardinal :Export {
 
 # }}}
 
+# {{{ num2slv_ordinal           number to ordinal string conversion
+
+sub num2slv_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'ničti',
+        1  => 'prvi',
+        2  => 'drugi',
+        3  => 'tretji',
+        4  => 'četrti',
+        5  => 'peti',
+        6  => 'šesti',
+        7  => 'sedmi',
+        8  => 'osmi',
+        9  => 'deveti',
+        10 => 'deseti',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Irregular teens 11-19
+    my %teens = (
+        11 => 'enajsti',
+        12 => 'dvanajsti',
+        13 => 'trinajsti',
+        14 => 'štirinajsti',
+        15 => 'petnajsti',
+        16 => 'šestnajsti',
+        17 => 'sedemnajsti',
+        18 => 'osemnajsti',
+        19 => 'devetnajsti',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'dvajseti',
+        30 => 'trideseti',
+        40 => 'štirideseti',
+        50 => 'petdeseti',
+        60 => 'šestdeseti',
+        70 => 'sedemdeseti',
+        80 => 'osemdeseti',
+        90 => 'devetdeseti',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'stoti',
+        200 => 'dvestoti',
+        300 => 'tristoti',
+        400 => 'štiristoti',
+        500 => 'petstoti',
+        600 => 'šeststoti',
+        700 => 'sedemstoti',
+        800 => 'osemstoti',
+        900 => 'devetstoti',
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            if ($millions == 1) {
+                return 'milijonti';
+            }
+            return num2slv_cardinal($millions) . ' milijonti';
+        }
+        my $prefix = num2slv_cardinal($millions);
+        my $mil_word = ($millions == 1) ? 'en milijon' : 'milijonov';
+        return $prefix . ' ' . $mil_word . ' ' . num2slv_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'tisočti';
+            }
+            return num2slv_cardinal($thousands) . ' tisočti';
+        }
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'tisoč';
+        }
+        else {
+            $thou_cardinal = num2slv_cardinal($thousands) . ' tisoč';
+        }
+        return $thou_cardinal . ' ' . num2slv_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2slv_ordinal($remainder);
+    }
+
+    # 20-99 compound: Slovenian uses unit+in+tens for cardinals,
+    # but ordinals follow the same compound pattern
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_ord{$t} . ' ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -163,7 +290,7 @@ Lingua::SLV::Num2Word - Number to word conversion in Slovenian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SLV::Num2Word is module for conversion numbers into their representation
 in Slovenian. It converts whole numbers from 0 up to 999 999 999.
@@ -204,6 +331,13 @@ Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will
 be converted.
 
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -218,6 +352,8 @@ be converted.
 =over 2
 
 =item num2slv_cardinal
+
+=item num2slv_ordinal
 
 =back
 

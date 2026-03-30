@@ -1,0 +1,14 @@
+Changes
+cpanfile
+lib/PDF/Sign.pm
+Makefile.PL
+openssl.cnf
+example.pl
+MANIFEST
+README
+t/00-load.t
+t/01-cms-sign.t
+t/02-tsa.t
+t/03-sign_file.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

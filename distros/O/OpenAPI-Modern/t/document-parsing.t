@@ -266,8 +266,8 @@ YAML
     schema => $yamlpp->load_string($yaml),
   );
 
-  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
-  cmp_result(
+  is_equal([ $doc->errors ], [], 'no errors when parsing this document');
+  is_equal(
     $doc->_operationIds,
     {
       operation_id_a => '/components/callbacks/callback_a/$url_a/patch',
@@ -617,7 +617,7 @@ YAML
     'subschema resources are correctly identified in the document',
   );
 
-  cmp_result(
+  is_equal(
     $doc->_entities,
     {
       '/components/headers/my_header/schema' => 0,
@@ -750,7 +750,7 @@ YAML
     },
   );
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       map +(
@@ -860,7 +860,7 @@ paths:
   /foo/beta: {}
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
+  is_equal([ $doc->errors ], [], 'no errors when parsing this document');
   memory_cycle_ok($doc, 'no leaks in the document object');
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
@@ -931,7 +931,7 @@ paths:
             schema: {}
 YAML
 
-  cmp_result(
+  is_equal(
     ($doc->errors)[0]->TO_JSON,
     {
       instanceLocation => jsonp(qw(/paths /foo get parameters)),
@@ -1034,9 +1034,9 @@ paths:
       tags: [whee, baz]
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors when parsing this document');
+  is_equal([ $doc->errors ], [], 'no errors when parsing this document');
 
-  cmp_result(
+  is_equal(
     $doc->{_tags},
     {
       foo => '/tags/0',
@@ -1053,7 +1053,7 @@ YAML
   is($doc->tag_path('blech'), '/tags/3', 'tag_path for blech');
   is($doc->tag_path('zip'), undef, 'tag_path for zip');
 
-  cmp_result(
+  is_equal(
     $doc->{_operation_tags},
     {
       foo => ['/paths/~1foo/get'],
@@ -1066,12 +1066,12 @@ YAML
     'all tag operation locations, even those not defined by a tag object',
   );
 
-  cmp_result([$doc->operations_with_tag('foo')], ['/paths/~1foo/get'], 'operations_with_tag("foo")');
-  cmp_result([$doc->operations_with_tag('bar')], ['/paths/~1foo/post'], 'operations_with_tag("bar")');
-  cmp_result([$doc->operations_with_tag('baz')], ['/paths/~1bar/get', '/paths/~1foo/post'], 'operations_with_tag("baz")');
-  cmp_result([$doc->operations_with_tag('blech')], ['/paths/~1foo/get'], 'operations_with_tag("blech")');
-  cmp_result([$doc->operations_with_tag('zip')], ['/paths/~1foo/post'], 'operations_with_tag("zip")');
-  cmp_result([$doc->operations_with_tag('yup')], [], 'operations_with_tag("yup")');
+  is_equal([$doc->operations_with_tag('foo')], ['/paths/~1foo/get'], 'operations_with_tag("foo")');
+  is_equal([$doc->operations_with_tag('bar')], ['/paths/~1foo/post'], 'operations_with_tag("bar")');
+  is_equal([$doc->operations_with_tag('baz')], ['/paths/~1bar/get', '/paths/~1foo/post'], 'operations_with_tag("baz")');
+  is_equal([$doc->operations_with_tag('blech')], ['/paths/~1foo/get'], 'operations_with_tag("blech")');
+  is_equal([$doc->operations_with_tag('zip')], ['/paths/~1foo/post'], 'operations_with_tag("zip")');
+  is_equal([$doc->operations_with_tag('yup')], [], 'operations_with_tag("yup")');
 };
 
 subtest 'bad references' => sub {
@@ -1100,7 +1100,7 @@ paths:
     $ref: '#/components/pathItems/bloop'              # does not exist
 YAML
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -1196,7 +1196,7 @@ components:
           # no "minimum" or "maximum" here either
 YAML
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -1292,7 +1292,7 @@ paths:
     $ref: '#/components/pathItems/bloop'              # does not exist
 YAML
 
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -1406,9 +1406,9 @@ paths:
     $ref: '#/paths/~1foo~1bar'
 YAML
 
-  cmp_result([ $doc->errors ], [], 'no errors in a 3.0 OAD');
+  is_equal([ $doc->errors ], [], 'no errors in a 3.0 OAD');
 
-  cmp_result(
+  is_equal(
     $doc->_entities,
     {
       '/components/headers/header0/schema' => 0,
@@ -1447,7 +1447,7 @@ YAML
     'all entities are identified in the document',
   );
 
-  cmp_result(
+  is_equal(
     $doc->_operationIds,
     { foobar => '/paths/~1foo~1bar/get' },
     'extracted the correct location of all operationIds',
@@ -1475,7 +1475,7 @@ YAML
   );
 
   $js->add_document($doc);
-  cmp_result(
+  is_equal(
     $js->evaluate([ 1 ], 'foo/api.json#/components/schemas/OAS_3.0_schema')->TO_JSON,
     {
       valid => false,
@@ -1497,7 +1497,7 @@ YAML
     'can evaluate an invalid schema in a 3.0 document',
   );
 
-  cmp_result(
+  is_equal(
     $js->evaluate([ undef ], 'foo/api.json#/components/schemas/OAS_3.0_schema')->TO_JSON,
     { valid => true },
     'can evaluate a valid schema in a 3.0 document',
@@ -1518,7 +1518,7 @@ components:
       schema: {}
 YAML
 
-  cmp_result(
+  is_equal(
     $doc->defaults,
     {
       '/components/parameters/MyParameter/allowReserved' => false,

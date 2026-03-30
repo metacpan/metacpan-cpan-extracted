@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::Element::Media );
     use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :video );

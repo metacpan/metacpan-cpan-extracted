@@ -19,14 +19,14 @@ END
 =head1 SYNOPSIS
 
 	my $obj = My::Module->new();
-	$obj->do_something();
-	$obj->finish();
+	    $obj->do_something();
+	  $obj->finish();
 
 =cut
 END
 
 	my $got = Eshu->indent_pod($input);
-	is($got, $expected, 'code examples normalized to one indent level');
+	is($got, $expected, 'code examples preserve relative indentation');
 }
 
 # Code example with tab indentation

@@ -1,5 +1,16 @@
 Release history for Dist-Zilla-PluginBundle-DBIO
 
+0.900001  2026-03-29
+    - Expanded POD documentation: per-section descriptions for driver/heritage/core workflows
+    - =attr heritage now documents @DBIO::Heritage PodWeaver bundle explicitly
+    - Clarified first_version 0.900000 only applies to brand-new distributions without tags
+
+0.900001  2026-03-29
+    - copyright_holder set automatically: heritage => "DBIO & DBIx::Class Authors", default => "DBIO Authors"
+    - LICENSE always gathered from git; [License] plugin removed
+    - @DBIO::Heritage PodWeaver subclass for DBIx::Class attribution in POD
+    - ConfirmRelease + UploadToCPAN added to release workflow
+
 0.900000  2026-03-29
     - Standard plugin configuration for all DBIO distributions
     - Pod::Weaver bundle with =attr and =method collectors

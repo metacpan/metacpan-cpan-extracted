@@ -9,9 +9,9 @@ use Log::ger;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-01-19'; # DATE
+our $DATE = '2026-01-20'; # DATE
 our $DIST = 'App-CrockfordBase32Utils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our @EXPORT_OK = qw(
                        num_to_cfbase32
@@ -96,7 +96,7 @@ sub cfbase32_encode {
 
 $SPEC{cfbase32_decode} = {
     v => 1.1,
-    summary => "Decode Crockford's Base32 encoding",
+    summary => "Decode Crockford's Base32-encoded string",
     args => {
         str => {
             schema => 'str*',
@@ -115,6 +115,9 @@ sub cfbase32_decode {
     [200, "OK", Convert::Base32::Crockford::decode_base32($str)];
 }
 
+my $cfbase32_digit_re    = qr/[0-9A-HJ-NP-TV-Z]/;
+my $cfbase32_nondigit_re = qr/[^0-9A-HJ-NP-TV-Z]/;
+
 my @cfbase32_digits = qw(0 1 2 3 4 5 6 7 8 9
                          A B C D E F G H J K
                          M N P Q R S T V W X Y Z);
@@ -122,16 +125,18 @@ my @cfbase32_digits_x0 = qw(1 2 3 4 5 6 7 8 9
                             A B C D E F G H J K
                             M N P Q R S T V W X Y Z);
 sub _gen_rand_cfbase32 {
+    require Math::Random::Secure;
+
     my ($min_len, $max_len, $zero_prefix) = @_;
-    my $len = int($min_len + rand()*($max_len - $min_len + 1));
+    my $len = $min_len + Math::Random::Secure::irand($max_len - $min_len + 1);
 
     my @digits;
     for my $i (1..$len) {
         my $digit;
         if ($i == 1 && !$zero_prefix) {
-            $digit = $cfbase32_digits_x0[rand @cfbase32_digits_x0];
+            $digit = $cfbase32_digits_x0[Math::Random::Secure::irand(scalar @cfbase32_digits_x0)];
         } else {
-            $digit = $cfbase32_digits[rand @cfbase32_digits];
+            $digit = $cfbase32_digits[Math::Random::Secure::irand(scalar @cfbase32_digits)];
         }
         push @digits, $digit;
     }
@@ -191,6 +196,7 @@ Note that the first digit can still be 0 unless zero_prefix is set to false.
 
 MARKDOWN
             schema => ['int*', min=>1],
+            cmdline_aliases => {l=>{}},
             tags => ['category:range'],
         },
 
@@ -202,12 +208,36 @@ MARKDOWN
             tags => ['category:quantity'],
         },
 
+        fill_char_template => {
+            schema => 'str*',
+            summary => 'Provide a template for formatting number, e.g. "###-###-###"',
+            description => <<'MARKDOWN',
+
+See <pm:String::FillCharTemplate> for more details.
+
+MARKDOWN
+            cmdline_aliases => {f=>{}},
+            tags => ['category:output'],
+        },
         unique => {
             schema => 'bool*',
             summary => 'Whether to avoid generating previously generated numbers',
+            cmdline_aliases => {u=>{}},
+            tags => ['category:output'],
         },
-        prev_nums_file => {
+        prev_file => {
             schema => 'filename*',
+            description => <<'MARKDOWN',
+
+Load list of previous numbers from the specified file.
+
+The file will be read per-line. Empty lines and lines starting with "#" will be
+skipped. Non-digits will be removed first. Lowercase will be converted to
+uppercase. I L will be normalized to 1, O will be normalized to 0.
+
+MARKDOWN
+            tags => ['category:output'],
+            cmdline_aliases => {p=>{}},
         },
     },
     args_rels => {
@@ -222,19 +252,26 @@ MARKDOWN
     },
     examples => [
         {
-            summary => 'Generate 5 random numbers from 12 digits each, first digit(s) can be 0',
+            summary => 'Generate 35 random numbers from 12 digits each, first digit(s) can be 0',
             argv => [qw/--len 12 -n35/],
             test => 0,
         },
         {
-            summary => 'Generate 5 random numbers from 12 digits each, first digit(s) CANNOT be 0',
+            summary => 'Generate 35 random numbers from 12 digits each, first digit(s) CANNOT be 0',
             argv => [qw/--len 12 -n35 --nozero-prefix/],
+            test => 0,
+        },
+        {
+            summary => 'Generate a formatted random code',
+            argv => ['-f', '###-###-###', '-l9'],
             test => 0,
         },
     ],
 };
 sub cfbase32_rand {
     require Encode::Base32::Crockford;
+    require Math::Random::Secure;
+    require String::FillCharTemplate;
 
     my %args = @_;
     my ($gen, $from, $to, $fmt);
@@ -242,14 +279,14 @@ sub cfbase32_rand {
         if ($args{len} >= 9) {
             $gen = sub { _gen_rand_cfbase32($args{len}, $args{len}, $args{zero_prefix}) };
         } else {
-            $from = 32 ** ($args{len} - 1);
+            $from = 32 ** ($args{len} - 1); $from = 0 if $from == 1;
             $to = 32 ** ($args{len}) - 1;
         }
     } elsif (defined($args{min_len})) {
         if ($args{min_len} >= 9 || $args{max_len} >= 9) {
             $gen = sub { _gen_rand_cfbase32($args{min_len}, $args{max_len}, $args{zero_prefix}) };
         } else {
-            $from = 32 ** int($args{min_len} - 1);
+            $from = 32 ** int($args{min_len} - 1); $from = 0 if $from == 1;
             $to   = 32 ** int($args{max_len}) - 1;
         }
     } elsif (defined($args{min_int})) {
@@ -263,16 +300,38 @@ sub cfbase32_rand {
     }
     log_trace "from: %s   to: %s", $from, $to;
 
+    my %seen;
+    if ($args{prev_file}) {
+        open my $fh, "<", $args{prev_file} or return [500, "Can't open prev_file '$args{prev_file}': $!"];
+        while (defined(my $line = <$fh>)) {
+            chomp $line;
+            $line = uc($line);
+            $line =~ s/^($cfbase32_nondigit_re)+//g;
+            next unless length $line;
+            $seen{$line}++;
+        }
+        #use DD; dd \%seen;
+    }
+
     my @res;
-    for my $i (1 .. $args{num}) {
+    my $i = 1;
+    while ($i <= $args{num}) {
         my $enc;
         if ($gen) {
             $enc = $gen->();
         } else {
-            my $num = int(rand() * ($to - $from + 1) + $from);
+            my $num = $from + Math::Random::Secure::irand($to - $from + 1);
+            #say "from=$from, to=$to, num=$num";
             $enc = Encode::Base32::Crockford::base32_encode($num);
         }
+        if ($args{unique} && $seen{$enc}++) {
+            next;
+        }
+        if (defined $args{fill_char_template}) {
+            $enc = String::FillCharTemplate::fill_char_template($args{fill_char_template}, $enc);
+        }
         push @res, $enc;
+        $i++;
     }
 
     [200, "OK", \@res];
@@ -293,7 +352,7 @@ App::CrockfordBase32Utils - Utilities related to Crockford's Base 32 encoding
 
 =head1 VERSION
 
-This document describes version 0.002 of App::CrockfordBase32Utils (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-19.
+This document describes version 0.003 of App::CrockfordBase32Utils (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
 
 =head1 DESCRIPTION
 
@@ -324,7 +383,7 @@ Usage:
 
  cfbase32_decode(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Decode Crockford's Base32 encoding.
+Decode Crockford's Base32-encoded string.
 
 This function is not exported by default, but exportable.
 
@@ -398,7 +457,7 @@ Examples:
 
 =over
 
-=item * Generate 5 random numbers from 12 digits each, first digit(s) can be 0:
+=item * Generate 35 random numbers from 12 digits each, first digit(s) can be 0:
 
  cfbase32_rand(len => 12, num => 35);
 
@@ -408,46 +467,46 @@ Result:
    200,
    "OK",
    [
-     "S19WAC3HG0RW",
-     "DBD7KC1Z4R2S",
-     "FNJE31GGWXHC",
-     "5Y8BTWC4V387",
-     "AQK25BFF9J2T",
-     "J1X3YT947R2K",
-     "3R4GFCKM36CC",
-     "SK3X0X75SEMP",
-     "15F8XWJ6SK61",
-     "9TP7F5TCCJKF",
-     "4RWYJX2PKJ3Q",
-     "WCP48G44QQ69",
-     "XCKAN0WSQ193",
-     "EG3SCKG3H7E9",
-     "X6NNHSMXHYSP",
-     "884AZ0BBZRZ8",
-     "GEFT3K6N5Y4P",
-     "K8J6DBJG60FF",
-     "T4ZPJRFPT8QQ",
-     "HPTG7CJ4EZTB",
-     "Z3V9PPW27K5Z",
-     "YB3MQP9NVTB2",
-     "Z04PXT0ZW58Z",
-     "19G8YRFPNFBC",
-     "03J3DT1813ZR",
-     "9RWQVT6F1JXM",
-     "EP58YN26H7VY",
-     "A892VRX7FR6N",
-     "PFAP10YVEM4V",
-     "W2EAP0F9SZH4",
-     "83P4TPXVEEZF",
-     "NEC8VT2S7B78",
-     "3RR7D7HWKF6P",
-     "VYREC7Q7XT62",
-     "C2WHFKM3FYMJ",
+     "BSNSRF2F9Y7C",
+     "0KRQJKYRY3GC",
+     "6AP4BK914YFT",
+     "D99V5RGJ35RJ",
+     "N4BYJ56754H4",
+     "QNC1CT4XFXXD",
+     "QTS5S2B6VV9G",
+     "Z8SF1198XZED",
+     "GGZBSW7X1A10",
+     "7F47C6Y05B37",
+     "5GVPQ07YRWHE",
+     "54N37HV0EZT9",
+     "8ZNYJ7VYKCQD",
+     "5N93ZGT4VSCQ",
+     "AYC79RT3PJVS",
+     "E50QDKJBNWF0",
+     "Q6GD5WT7PJ9B",
+     "ZETH5SN1DDV3",
+     "RD4K3TDGZQF6",
+     "4B65QF8SNCGT",
+     "RW86Z1WDG3WC",
+     "Q8QHFN9GC6WH",
+     "5V4RW9RG07FW",
+     "N84VMR010KZT",
+     "83R3EC2Y9SA5",
+     "K1TDKKYD5T31",
+     "JZYTSCP5MB0A",
+     "AKYTNZ2JTZCB",
+     "RZ8DSJP1JEKH",
+     "3C65NKR77B82",
+     "KS5C0YK587R0",
+     "T60WN6Z6MGWS",
+     "01W64RP5T642",
+     "7FPZ2MFQ895H",
+     "2JYVCZ3A5KZV",
    ],
    {},
  ]
 
-=item * Generate 5 random numbers from 12 digits each, first digit(s) CANNOT be 0:
+=item * Generate 35 random numbers from 12 digits each, first digit(s) CANNOT be 0:
 
  cfbase32_rand(len => 12, num => 35, zero_prefix => 0);
 
@@ -457,44 +516,48 @@ Result:
    200,
    "OK",
    [
-     "1GKRJ5V7GSRS",
-     "HNA0SBZYSJRF",
-     "YVVNS31GAWSZ",
-     "S2G0FGM6HGAB",
-     "VZ4M8K2Y6EQD",
-     "S2KNNJSBP412",
-     "YQSEX35KJ3JR",
-     "T0CGK19AXF13",
-     "YNDHTFQCH8NB",
-     "G1N75MYAC0V8",
-     "77N3N0DPB4C2",
-     "X874R7QT425Y",
-     "Z0YYYK3X9Q6C",
-     "Q3GYF41BFRZG",
-     "49P8QC6Z28QS",
-     "NR700A3SA79M",
-     "Q3N82TWHM3H4",
-     "92EN559RSSR4",
-     "VSDH8B1SQRFF",
-     "BR1WQX6GGRK8",
-     "C1R69F0K196H",
-     "G7AZZVN7DF6A",
-     "G9V8BSMF0205",
-     "VM6VGG8VMXMK",
-     "8W2VBFFN1ZZY",
-     "1K6N6Y997XPQ",
-     "5H5MWPN8VTEW",
-     "3BC87J5W3M1N",
-     "3EYXJGFYBCQS",
-     "BHR03PMWYZ7Q",
-     "K7NT926VG8JV",
-     "K4PC04BZ2DPM",
-     "J34K0VBWQ3QZ",
-     "J24C00NMT8A2",
-     "8R3PJ910J6CN",
+     "PMQ1620K7R90",
+     "KQ3JSZDZ3T21",
+     "FG1M8HH4PRRK",
+     "YB77RJN7RK1A",
+     "NTEKN45NDRQQ",
+     "FZ1BKNTS36RF",
+     "4DVC5NR22FJM",
+     "1B6PKA8PFVGY",
+     "KVHBM642RRMA",
+     "XD2C0P1C6DJY",
+     "RWRR4HH3535S",
+     "7YFYR1XGMPGP",
+     "VBV2P0XG48TC",
+     "PZKSE2PRVQVV",
+     "2G97XHA4ZW6Y",
+     "HRJCZVEERZ0E",
+     "MN82PPHMA7EG",
+     "WTW776EX7VCH",
+     "QG8AR7MCB8P6",
+     "XTYM2HHYF387",
+     "Y1F2WJSENH7H",
+     "XK43A6NFW4HB",
+     "BE9XYDT7X0ZC",
+     "VK0Q9NJH9X9Y",
+     "5K6XEWB37R3T",
+     "2T9ZKN0K1CVF",
+     "4CYBM1SX1427",
+     "49HNW725F500",
+     "C8VE23QWV4HR",
+     "FSZ8VBF8VVMF",
+     "KDJNZ47GWWY1",
+     "5CN3F0Z8VR86",
+     "7MBA0J51GSNF",
+     "SFWJ74DFNKT9",
+     "85J79X5V1789",
    ],
    {},
  ]
+
+=item * Generate a formatted random code:
+
+ cfbase32_rand(fill_char_template => "###-###-###", len => 9); # -> [200, "OK", ["GS1-F5B-5PC"], {}]
 
 =back
 
@@ -503,6 +566,12 @@ This function is not exported by default, but exportable.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<fill_char_template> => I<str>
+
+Provide a template for formatting number, e.g. "###-###-###".
+
+See L<String::FillCharTemplate> for more details.
 
 =item * B<len> => I<int>
 
@@ -542,9 +611,13 @@ Note that the first digit can still be 0 unless zero_prefix is set to false.
 
 Specify how many numbers to generate.
 
-=item * B<prev_nums_file> => I<filename>
+=item * B<prev_file> => I<filename>
 
-(No description)
+Load list of previous numbers from the specified file.
+
+The file will be read per-line. Empty lines and lines starting with "#" will be
+skipped. Non-digits will be removed first. Lowercase will be converted to
+uppercase. I L will be normalized to 1, O will be normalized to 0.
 
 =item * B<unique> => I<bool>
 

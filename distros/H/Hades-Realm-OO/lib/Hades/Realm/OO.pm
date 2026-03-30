@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Hades::Myths { as_keywords => 1 };
 use base qw/Hades/;
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub new {
 	my ( $cls, %args ) = ( shift(), scalar @_ == 1 ? %{ $_[0] } : @_ );
@@ -823,7 +823,7 @@ Hades::Realm::OO - Hades realm for object orientation
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

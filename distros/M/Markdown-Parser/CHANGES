@@ -1,5 +1,9 @@
 Revision history for Perl module Markdown::Parser
 
+v0.6.0 2026-03-30T09:35:02+0900
+    - Added encode_html_entities() to change the default behaviour of encoding HTML entities in code blocks
+    - Updated dependencies
+
 v0.5.1 2025-10-25T08:19:51+0900
     - Updated dependency to improve handling of HTML blocks.
 

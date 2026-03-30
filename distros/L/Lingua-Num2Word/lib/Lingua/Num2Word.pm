@@ -3,7 +3,7 @@
 # Copyright (c) PetaMem, s.r.o. 2002-present
 #
 package Lingua::Num2Word;
-# ABSTRACT: Number to word conversion
+# ABSTRACT: Multi-language number to word conversion wrapper
 
 use 5.16.0;
 use utf8;
@@ -17,7 +17,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 our %known;
 
 # }}}
@@ -36,20 +36,23 @@ my $template_obj  = q{ use __PACKAGE_WITH_VERSION__ ();
 # ISO 639-1 to 639-3 mapping for supported languages
 # {{{ ISO 639-1 to 639-3 mapping
 my %iso1_to_3 = (
-    af => 'afr', ar => 'ara', bg => 'bul', ca => 'cat',
+    af => 'afr', ar => 'ara', az => 'aze', bg => 'bul', ca => 'cat',
     cs => 'ces', da => 'dan', de => 'deu', el => 'ell',
     en => 'eng', es => 'spa', et => 'est', eu => 'eus',
     fa => 'fas', fi => 'fin', fr => 'fra', he => 'heb',
-    hi => 'hin', hr => 'hrv', hu => 'hun', id => 'ind',
-    is => 'isl', it => 'ita', ja => 'jpn', ko => 'kor',
-    lt => 'lit', lv => 'lav', nl => 'nld', 'no' => 'nor',
+    hi => 'hin', hr => 'hrv', hu => 'hun', hy => 'hye',
+    id => 'ind', is => 'isl', it => 'ita', ja => 'jpn',
+    kk => 'kaz', ko => 'kor', ky => 'kir', la => 'lat',
+    lt => 'lit', lv => 'lav', mn => 'mon', nl => 'nld',
+    'no' => 'nor',
     pl => 'pol', pt => 'por', ro => 'ron', ru => 'rus',
     sk => 'slk', sv => 'swe', sw => 'swa', th => 'tha',
     be => 'bel', cy => 'cym', ga => 'gle', gl => 'glg',
     lb => 'ltz', mk => 'mkd', mt => 'mlt', oc => 'oci',
     sc => 'srd',
-    sl => 'slv', sq => 'sqi', sr => 'srp', tr => 'tur',
-    uk => 'ukr', vi => 'vie', zh => 'zho',
+    sl => 'slv', so => 'som', sq => 'sqi', sr => 'srp',
+    tr => 'tur', ug => 'uig', uk => 'ukr', vi => 'vie',
+    yi => 'yid', zh => 'zho',
 );
 # }}}
 
@@ -303,12 +306,12 @@ __END__
 
 =head1 NAME
 
-Lingua::Num2Word - Number to word conversion
+Lingua::Num2Word - Multi-language number to word conversion wrapper
 
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::Num2Word is a wrapper for modules for converting numbers into
 their equivalent in written representation.
@@ -407,6 +410,33 @@ reference to list depending on calling context.
 
 Constructor.
 
+=item B<ordinal> (positional)
+
+  1   str    target language (ISO 639-3 or 639-1)
+  2   num    number to convert
+  =>  str    ordinal text representation
+  =>  ''     if language has no ordinal support or input is out of range
+
+Conversion from number to ordinal text representation in specified language.
+Requires the language module to export a C<num2XXX_ordinal> function and
+to declare C<< ordinal => 1 >> in its C<capabilities()>.
+
+=item B<capabilities> (positional)
+
+  1   str    language (ISO 639-3 or 639-1)
+  =>  href   hashref of capabilities
+  =>  undef  if language is not known
+
+Query what a language module can do.  The returned hashref contains keys
+C<cardinal>, C<ordinal>, C<negative>, C<decimal>, C<currency>, and
+C<range> (an arrayref C<[$lo, $hi]>).
+
+=item B<has_capability> (positional)
+
+  1   str    language (ISO 639-3 or 639-1)
+  2   str    feature name (e.g. 'ordinal', 'cardinal')
+  =>  bool   1 if the language supports the feature, 0 otherwise
+
 =item B<preprocess_code> (void)
 
   =>  undef  if lang is not specified
@@ -429,6 +459,12 @@ Private function.
 
 =item cardinal
 
+=item ordinal
+
+=item capabilities
+
+=item has_capability
+
 =item get_interval
 
 =item known_langs
@@ -444,50 +480,15 @@ Private function.
 
 =pod
 
-=head1 Required modules
+=head1 Supported languages
 
-This module is only wrapper and requires other CPAN modules for requested
-conversions eg. Lingua::AFR::Numbers for Afrikaans.
+Languages are auto-discovered at load time from installed
+C<Lingua::*::Num2Word> modules.  Use C<known_langs()> to obtain the
+current list programmatically.
 
-Currently supported languages/modules are:
-
-=over 2
-
-=item afr - L<Lingua::AFR::Numbers>
-
-=item ces - L<Lingua::CES::Num2Word>
-
-=item deu - L<Lingua::DEU::Num2Word>
-
-=item eng - L<Lingua::ENG::Numbers>
-
-=item eus - L<Lingua::EUS::Numbers>
-
-=item fra - L<Lingua::FRA::Numbers>
-
-=item ind - L<Lingua::IND::Nums2Words>
-
-=item ita - L<Lingua::ITA::Numbers>
-
-=item jpn - L<Lingua::JPN::Number>
-
-=item nld - L<Lingua::NLD::Num2Word>
-
-=item nor - L<Lingua::NOR::Num2Word>
-
-=item pol - L<Lingua::POL::Numbers>
-
-=item por - L<Lingua::POR::Nums2Words>
-
-=item rus - L<Lingua::RUS::Number>
-
-=item spa - L<Lingua::SPA::Numeros>
-
-=item swe - L<Lingua::SWE::Num2Word>
-
-=item zho - L<Lingua::ZHO::Numbers>
-
-=back
+Each language is identified by its ISO 639-3 code (e.g. C<deu>, C<eng>,
+C<fra>).  ISO 639-1 two-letter codes (C<de>, C<en>, C<fr>) are accepted
+as aliases and mapped automatically.
 
 =cut
 

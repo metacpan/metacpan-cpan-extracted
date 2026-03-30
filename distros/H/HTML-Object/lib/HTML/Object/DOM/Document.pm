@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::Document HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     use HTML::Object::ErrorEvent;
@@ -405,7 +406,7 @@ sub documentElement : lvalue
     my $self = shift( @_ );
     if( @_ )
     {
-        warnings::warn( "This property \"documentElement\" is read-only.\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warn( "This property \"documentElement\" is read-only.\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
     }
     my $html;
     # It should be the first one, but let's not assume anything

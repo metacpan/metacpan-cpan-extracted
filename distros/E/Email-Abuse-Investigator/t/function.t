@@ -86,7 +86,7 @@ sub any_addr {
 # ===========================================================================
 note '=== 1. Constructor ===';
 {
-    my $a = new_ok('Email::Abuse::Investigator');
+    my $a = Email::Abuse::Investigator->new();
     isa_ok $a, 'Email::Abuse::Investigator', 'new() returns blessed ref';
     is $a->{timeout},  10,  'default timeout 10';
     is $a->{verbose},   0,  'default verbose 0';
@@ -1205,7 +1205,9 @@ note '=== 25. abuse_contacts ===';
 
     ok any_addr(\@contacts, 'abuse@google.com'),     'google abuse contact present';
     ok any_addr(\@contacts, 'abuse@cloudflare.com'), 'cloudflare abuse contact present';
-    ok any_addr(\@contacts, 'abuse@godaddy.com'),    'godaddy registrar abuse present';
+    # GoDaddy is now form-only -- suppressed from abuse_contacts(), surfaced via form_contacts()
+    ok scalar(grep { $_->{form} =~ /godaddy/i } $a->form_contacts()),
+        'godaddy registrar appears in form_contacts() (form-only provider)';
 
     # google.com not duplicated even though it appears as XOIP, MX, From:
     is scalar(grep { lc($_->{address}) eq 'abuse@google.com' } @contacts),

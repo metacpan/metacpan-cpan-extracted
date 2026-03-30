@@ -192,7 +192,10 @@ sub add_element
     my $text = $elem->text;
     if( $text )
     {
-        $self->encode_html( [qw( < > & )] => $text ) || warn( $self->error );
+        if( $self->document->encode_html_entities )
+        {
+            $self->encode_html( [qw( < > & )] => $text ) || warn( $self->error );
+        }
         if( $self->inline )
         {
             $elem->text( $text );

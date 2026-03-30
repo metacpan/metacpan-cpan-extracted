@@ -1,3 +1,18 @@
+0.003   2026-01-20  Released-By: PERLANCAR; Urgency: medium
+
+        [cli cfbase32-rand]
+
+        - Use Math::Random::Secure for random number.
+
+        - [bugfix] Fix setting range with --len / --min-len / --max-len.
+
+        - Implement options --unique (-u), --prev-file (-p).
+
+        - Add option: --fill-char-template (-f).
+
+        - [ux] Add shorter alias -l for --len.
+
+
 0.002   2026-01-19  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: cfbase32-rand.

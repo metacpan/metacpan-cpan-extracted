@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = spa_numerals();
 
 # }}}
@@ -110,6 +110,158 @@ sub spa_numerals {
 
 # }}}
 
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Spanish ordinals have gender: -o (masc), -a (fem), and sometimes
+    # apocopated forms (primer, tercer).  All unique stems.
+    # For 11+, compositional ordinals exist (undécimo, duodécimo, vigésimo, etc.)
+    # Compounds: "vigésimo primero" → convert each part.
+
+    my %ordinal_to_cardinal = (
+        # Units (masculine, feminine, apocopated)
+        'primero'    => 'un',
+        'primera'    => 'un',
+        'primer'     => 'un',
+        'segundo'    => 'dos',
+        'segunda'    => 'dos',
+        'tercero'    => 'tres',
+        'tercera'    => 'tres',
+        'tercer'     => 'tres',
+        'cuarto'     => 'cuatro',
+        'cuarta'     => 'cuatro',
+        'quinto'     => 'cinco',
+        'quinta'     => 'cinco',
+        'sexto'      => 'seis',
+        'sexta'      => 'seis',
+        'séptimo'    => 'siete',
+        'séptima'    => 'siete',
+        'octavo'     => 'ocho',
+        'octava'     => 'ocho',
+        'noveno'     => 'nueve',
+        'novena'     => 'nueve',
+        'décimo'     => 'diez',
+        'décima'     => 'diez',
+        # Teens (11-19)
+        'undécimo'       => 'once',
+        'undécima'       => 'once',
+        'duodécimo'      => 'doce',
+        'duodécima'      => 'doce',
+        'decimotercero'  => 'trece',
+        'decimotercera'  => 'trece',
+        'decimocuarto'   => 'catorce',
+        'decimocuarta'   => 'catorce',
+        'decimoquinto'   => 'quince',
+        'decimoquinta'   => 'quince',
+        'decimosexto'    => 'dieciséis',
+        'decimosexta'    => 'dieciséis',
+        'decimoséptimo'  => 'diecisiete',
+        'decimoséptima'  => 'diecisiete',
+        'decimoctavo'    => 'dieciocho',
+        'decimoctava'    => 'dieciocho',
+        'decimonoveno'   => 'diecinueve',
+        'decimonovena'   => 'diecinueve',
+        # Fused twenties (21-29): Num2Word produces "vigesimoprimero" etc.
+        'vigesimoprimero'  => 'veintiun',
+        'vigesimoprimera'  => 'veintiun',
+        'vigesimoprimer'   => 'veintiun',
+        'vigesimosegundo'  => 'veintidós',
+        'vigesimosegunda'  => 'veintidós',
+        'vigesimotercero'  => 'veintitrés',
+        'vigesimotercera'  => 'veintitrés',
+        'vigesimotercer'   => 'veintitrés',
+        'vigesimocuarto'   => 'veinticuatro',
+        'vigesimocuarta'   => 'veinticuatro',
+        'vigesimoquinto'   => 'veinticinco',
+        'vigesimoquinta'   => 'veinticinco',
+        'vigesimosexto'    => 'veintiséis',
+        'vigesimosexta'    => 'veintiséis',
+        'vigesimoséptimo'  => 'veintisiete',
+        'vigesimoséptima'  => 'veintisiete',
+        'vigesimooctavo'   => 'veintiocho',
+        'vigesimooctava'   => 'veintiocho',
+        'vigesimoctavo'    => 'veintiocho',
+        'vigesimoctava'    => 'veintiocho',
+        'vigesimonoveno'   => 'veintinueve',
+        'vigesimonovena'   => 'veintinueve',
+        # Tens
+        'vigésimo'        => 'veinte',
+        'vigésima'        => 'veinte',
+        'trigésimo'       => 'treinta',
+        'trigésima'       => 'treinta',
+        'cuadragésimo'    => 'cuarenta',
+        'cuadragésima'    => 'cuarenta',
+        'quincuagésimo'   => 'cincuenta',
+        'quincuagésima'   => 'cincuenta',
+        'sexagésimo'      => 'sesenta',
+        'sexagésima'      => 'sesenta',
+        'septuagésimo'    => 'setenta',
+        'septuagésima'    => 'setenta',
+        'octogésimo'      => 'ochenta',
+        'octogésima'      => 'ochenta',
+        'nonagésimo'      => 'noventa',
+        'nonagésima'      => 'noventa',
+        # Hundreds
+        'centésimo'       => 'cien',
+        'centésima'       => 'cien',
+        'ducentésimo'     => 'dos cientos',
+        'ducentésima'     => 'dos cientos',
+        'tricentésimo'    => 'tres cientos',
+        'tricentésima'    => 'tres cientos',
+        'cuadringentésimo' => 'cuatro cientos',
+        'cuadringentésima' => 'cuatro cientos',
+        'quingentésimo'   => 'quinientos',
+        'quingentésima'   => 'quinientos',
+        'sexcentésimo'    => 'seis cientos',
+        'sexcentésima'    => 'seis cientos',
+        'septingentésimo' => 'siete cientos',
+        'septingentésima' => 'siete cientos',
+        'octingentésimo'  => 'ocho cientos',
+        'octingentésima'  => 'ocho cientos',
+        'noningentésimo'  => 'nueve cientos',
+        'noningentésima'  => 'nueve cientos',
+        # Thousands
+        'milésimo'        => 'mil',
+        'milésima'        => 'mil',
+        'millonésimo'     => 'un millón',
+        'millonésima'     => 'un millón',
+    );
+
+    # Compound: "vigésimo primero" → convert each part
+    # For 30+, the parser expects "tens y number" (e.g. "treinta y un"),
+    # so we insert "y" between the tens and units cardinal parts.
+    if ($input =~ m{\s}xms) {
+        my @words = split /\s+/, $input;
+        my @cardinals;
+        for my $word (@words) {
+            my $card = ordinal2cardinal($word) // return;
+            push @cardinals, $card;
+        }
+
+        # Insert "y" between tens (30+) and units in the final position.
+        # Works for both 2-word ("trigésimo primero" → "treinta y un")
+        # and 3-word ("centésimo trigésimo primero" → "cien treinta y un").
+        if (@cardinals >= 2) {
+            my %tens_needing_y = map { $_ => 1 }
+                qw(treinta cuarenta cincuenta sesenta setenta ochenta noventa);
+            my $pen = $cardinals[-2];  # penultimate
+            if ($tens_needing_y{$pen}) {
+                splice @cardinals, -1, 0, 'y';
+            }
+        }
+
+        return join ' ', @cardinals;
+    }
+
+    return $ordinal_to_cardinal{$input} if exists $ordinal_to_cardinal{$input};
+
+    return;  # not an ordinal
+}
+
+# }}}
+
 1;
 
 __END__
@@ -118,6 +270,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::SPA::Word2Num - Word to number conversion in Spanish
@@ -125,7 +279,7 @@ Lingua::SPA::Word2Num - Word to number conversion in Spanish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SPA::Word2Num is module for converting text containing number
 representation in dutch back into number. Converts whole numbers from 0 up
@@ -167,6 +321,16 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'primero', 'vigésimo tercero', 'centésimo')
+  =>  str    cardinal text (e.g. 'un', 'veinte tres', 'cien')
+      undef  if input is not recognised as an ordinal
+
+Convert Spanish ordinal text to cardinal text (morphological reversal).
+Handles masculine (-o), feminine (-a), and apocopated (primer, tercer) forms.
+Compounds are split on whitespace and each part is converted.
+
 =item B<spa_numerals> (void)
 
   =>  obj  new parser object
@@ -185,6 +349,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

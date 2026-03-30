@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my %token1 = qw( 0 нула          1 едно          2 две
                   3 три           4 четири        5 пет
@@ -145,13 +145,143 @@ sub num2bul_cardinal :Export {
 
 # }}}
 
+# {{{ num2bul_ordinal           number to ordinal string conversion
+
+sub num2bul_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [0, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 0
+           || $number > 999_999_999;
+
+    # Irregular ordinals 0-10
+    my %irregular = (
+        0  => 'нулев',
+        1  => 'първи',
+        2  => 'втори',
+        3  => 'трети',
+        4  => 'четвърти',
+        5  => 'пети',
+        6  => 'шести',
+        7  => 'седми',
+        8  => 'осми',
+        9  => 'девети',
+        10 => 'десети',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # Teens ordinals 11-19
+    my %teens = (
+        11 => 'единадесети',
+        12 => 'дванадесети',
+        13 => 'тринадесети',
+        14 => 'четиринадесети',
+        15 => 'петнадесети',
+        16 => 'шестнадесети',
+        17 => 'седемнадесети',
+        18 => 'осемнадесети',
+        19 => 'деветнадесети',
+    );
+
+    return $teens{$number} if exists $teens{$number};
+
+    # Tens ordinals
+    my %tens_ord = (
+        20 => 'двадесети',
+        30 => 'тридесети',
+        40 => 'четиридесети',
+        50 => 'петдесети',
+        60 => 'шестдесети',
+        70 => 'седемдесети',
+        80 => 'осемдесети',
+        90 => 'деветдесети',
+    );
+
+    # Hundreds ordinals
+    my %hundreds_ord = (
+        100 => 'стотен',
+        200 => 'двестотен',
+        300 => 'тристотен',
+        400 => 'четиристотен',
+        500 => 'петстотен',
+        600 => 'шестстотен',
+        700 => 'седемстотен',
+        800 => 'осемстотен',
+        900 => 'деветстотен',
+    );
+
+    # For numbers >= 1_000_000
+    if ($number >= 1_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remainder = $number % 1_000_000;
+        if ($remainder == 0) {
+            if ($millions == 1) {
+                return 'милионен';
+            }
+            return _num_to_words($millions) . ' милионен';
+        }
+        my $prefix = ($millions == 1) ? 'един милион' :
+                     ($millions == 2) ? 'два милиона' :
+                     _num_to_words($millions) . ' милиона';
+        return $prefix . ' ' . num2bul_ordinal($remainder);
+    }
+
+    if ($number >= 1_000) {
+        my $thousands = int($number / 1_000);
+        my $remainder = $number % 1_000;
+        if ($remainder == 0) {
+            if ($thousands == 1) {
+                return 'хиляден';
+            }
+            return _num_to_words($thousands) . ' хиляден';
+        }
+        my $thou_cardinal;
+        if ($thousands == 1) {
+            $thou_cardinal = 'хиляда';
+        }
+        elsif ($thousands == 2) {
+            $thou_cardinal = 'две хиляди';
+        }
+        else {
+            $thou_cardinal = _num_to_words($thousands) . ' хиляди';
+        }
+        return $thou_cardinal . ' ' . num2bul_ordinal($remainder);
+    }
+
+    if ($number >= 100) {
+        my $h = int($number / 100) * 100;
+        my $remainder = $number % 100;
+        if ($remainder == 0) {
+            return $hundreds_ord{$h};
+        }
+        return $token3{$h} . ' ' . num2bul_ordinal($remainder);
+    }
+
+    # 20-99 compound
+    if ($number >= 20) {
+        my $t = int($number / 10) * 10;
+        my $remainder = $number % 10;
+        if ($remainder == 0) {
+            return $tens_ord{$t};
+        }
+        return $tens_ord{$t} . ' и ' . $irregular{$remainder};
+    }
+
+    # Should not reach here
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -173,7 +303,7 @@ Lingua::BUL::Num2Word - Number to word conversion in Bulgarian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::BUL::Num2Word is module for conversion numbers into their representation
 in Bulgarian. It converts whole numbers from 0 up to 999 999 999.
@@ -221,6 +351,13 @@ be converted.
 
 Internal helper for converting numbers 1-999 to words.
 
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -235,6 +372,8 @@ Internal helper for converting numbers 1-999 to words.
 =over 2
 
 =item num2bul_cardinal
+
+=item num2bul_ordinal
 
 =back
 

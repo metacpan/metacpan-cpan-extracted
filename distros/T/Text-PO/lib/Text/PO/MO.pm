@@ -82,7 +82,7 @@ sub as_object
     });
     push( @{$po->{elements}}, $e );
 
-    # Process order to handle contexts and plurals (from previous fix—keep if you applied)
+    # Process order to handle contexts and plurals (from previous fix-keep if you applied)
     foreach my $k ( @$order )
     {
         next if( !length( $k ) );  # Skip meta

@@ -15,7 +15,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my  $parser  = ru_numerals();
 
 # }}}
@@ -140,6 +140,85 @@ sub ru_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Russian (Cyrillic) ordinals: strip gender/case suffixes, then map stems.
+    # Inflection: -ый/-ой/-ий/-ая/-ое/-ого/-ому/-ым/-ом.
+
+    my %irregular = (
+        'нулевой'         => 'ноль',
+        'первый'          => 'один',
+        'второй'          => 'два',
+        'третий'          => 'три',
+        'четвёртый'       => 'четыре',
+        'пятый'           => 'пять',
+        'шестой'          => 'шесть',
+        'седьмой'         => 'семь',
+        'восьмой'         => 'восемь',
+        'девятый'         => 'девять',
+        'десятый'         => 'десять',
+        'одиннадцатый'    => 'одинадцать',
+        'двенадцатый'     => 'двенадцать',
+        'тринадцатый'     => 'тринадцать',
+        'четырнадцатый'   => 'четырнадцать',
+        'пятнадцатый'     => 'пятнадцать',
+        'шестнадцатый'    => 'шестнадцать',
+        'семнадцатый'     => 'семнадцать',
+        'восемнадцатый'   => 'восемнадцать',
+        'девятнадцатый'   => 'девятнадцать',
+        'двадцатый'       => 'двадцать',
+        'тридцатый'       => 'тридцать',
+        'сороковой'       => 'сорок',
+        'пятидесятый'     => 'пятьдесят',
+        'шестидесятый'    => 'шестьдесят',
+        'семидесятый'     => 'семьдесят',
+        'восьмидесятый'   => 'восемьдесят',
+        'девяностый'      => 'девяносто',
+        'сотый'           => 'сто',
+        'двухсотый'       => 'двести',
+        'трёхсотый'       => 'триста',
+        'четырёхсотый'    => 'четыреста',
+        'пятисотый'       => 'пятьсот',
+        'шестисотый'      => 'шестьсот',
+        'семисотый'       => 'семьсот',
+        'восьмисотый'     => 'восемьсот',
+        'девятисотый'     => 'девятьсот',
+        'тысячный'        => 'тысяч',
+        'миллионный'      => 'миллион',
+    );
+
+    # Normalize gender/case to masculine nominative
+    my $norm = $input;
+    $norm =~ s{(и)его\z}{$1й}xms      # третьего → третий
+        or $norm =~ s{ого\z}{ый}xms    # пятого → пятый
+        or $norm =~ s{ому\z}{ый}xms    # пятому → пятый
+        or $norm =~ s{ым\z}{ый}xms     # пятым → пятый
+        or $norm =~ s{ом\z}{ой}xms     # шестом → шестой
+        or $norm =~ s{ая\z}{ый}xms     # пятая → пятый
+        or $norm =~ s{яя\z}{ий}xms     # третья → третий (gen fem → masc)
+        or $norm =~ s{ое\z}{ый}xms     # пятое → пятый
+        or $norm =~ s{ее\z}{ий}xms     # третье → третий
+        or $norm =~ s{ей\z}{ий}xms;    # третьей → третий
+
+    # Handle -ой endings that should stay as -ой (второй, шестой, седьмой, восьмой)
+    # They already match as-is in the hash.
+
+    # Compound ordinal: only last word is ordinal
+    my @words = split /\s+/, $norm;
+    my $last  = pop @words;
+
+    if (exists $irregular{$last}) {
+        push @words, $irregular{$last};
+        return join ' ', @words;
+    }
+
+    return;  # not a recognized ordinal
+}
+
+# }}}
 
 1;
 
@@ -158,7 +237,7 @@ Lingua::RUS::Word2Num - Word to number conversion in Russian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::RUS::Word2Num is module for converting text containing number
 representation in Russian back into number. Converts whole numbers
@@ -200,6 +279,15 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'пятый', 'двадцатый', 'третий')
+  =>  str    cardinal text (e.g. 'пять', 'двадцать', 'три')
+      undef  if input is not a recognized ordinal
+
+Convert Russian (Cyrillic) ordinal text to cardinal text via morphological reversal.
+Handles all gender/case inflections (-ый/-ой/-ий/-ая/-ое/-ого/-ому/-ым).
+
 =item B<ru_numerals> (void)
 
   =>  obj  new parser object
@@ -218,6 +306,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

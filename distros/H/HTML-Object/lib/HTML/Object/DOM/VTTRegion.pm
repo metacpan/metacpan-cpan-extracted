@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     our $VERSION = 'v0.2.0';
@@ -78,7 +79,7 @@ HTML::Object::DOM::VTTRegion - HTML Object DOM VTTRegion Class
 
 =head1 DESCRIPTION
 
-The C<VTTRegion> interface—part of the API for handling C<WebVTT> (text tracks on media presentations)—describes a portion of the video to render a L<HTML::Object::DOM::VTTCue> onto.
+The C<VTTRegion> interface-part of the API for handling C<WebVTT> (text tracks on media presentations)-describes a portion of the video to render a L<HTML::Object::DOM::VTTCue> onto.
 
 =head1 PROPERTIES
 

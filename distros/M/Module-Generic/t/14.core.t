@@ -894,6 +894,26 @@ subtest 'threaded object creation' => sub
     }
 };
 
+# NOTE: _str_val
+subtest '_str_val' => sub
+{
+    {
+        package
+            My::Stringified;
+        use overload '""' => sub { 'STRINGIFIED' }, fallback => 1;
+        sub new { bless {}, shift }
+    }
+
+    is( $o->_str_val( undef ),  '',   '_str_val: undef -> ""' );
+    is( $o->_str_val( 42 ),     '42', '_str_val: integer -> "42"' );
+    is( $o->_str_val( 'hello'), 'hello', '_str_val: string -> same string' );
+    # With overloading disabled, should return the raw ref address form
+    my $obj = My::Stringified->new;
+    my $raw = $o->_str_val( $obj );
+    isnt( $raw, 'STRINGIFIED', '_str_val: overloaded object bypasses overloading' );
+    like( $raw, qr/My::Stringified=HASH/, '_str_val: returns raw ref string' );
+};
+
 done_testing();
 
 # NOTE: Fake class MyObject

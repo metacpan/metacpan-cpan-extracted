@@ -51,7 +51,7 @@ components:
               const: true
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->evaluator->evaluate(
       { meow => true },
       $doc_uri->clone->fragment('/components/schemas/pet'),
@@ -98,7 +98,7 @@ YAML
     'petType exists in /components/schemas/; false result',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->evaluator->evaluate(
       {
           petType => 'cat',
@@ -138,7 +138,7 @@ YAML
     'petType does not exist in /components/schemas/, but a mapping exists; false result',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->evaluator->evaluate(
       {
         petType => 'fish',
@@ -185,7 +185,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(openapi_uri => $doc_uri, openapi_schema => $schema);
 
-  cmp_result(
+  is_equal(
     $openapi->evaluator->evaluate(
       {
         # petType not provided - use defaultMapping
@@ -257,7 +257,7 @@ components:
             const: 'null'
 YAML
 
-  cmp_result(
+  is_equal(
     $openapi->evaluator->evaluate(
       { petType => 'Cat', sound => 'meow' },
       $doc_uri->clone->fragment('/components/schemas/petType'),
@@ -266,7 +266,7 @@ YAML
     'discriminator can be defined in the base class',
   );
 
-  cmp_result(
+  is_equal(
     $openapi->evaluator->evaluate(
       { petType => 'dog', sound => 'yipyip' },
       $doc_uri->clone->fragment('/components/schemas/petType'),

@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2002-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -92,12 +92,114 @@ sub num2est_cardinal :Export {
 # }}}
 
 
+# {{{ num2est_ordinal                  convert number to ordinal text
+
+sub num2est_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # 1-10: unique ordinal forms
+    my %base_ordinals = (
+        1  => 'esimene',
+        2  => 'teine',
+        3  => 'kolmas',
+        4  => 'neljas',
+        5  => 'viies',
+        6  => 'kuues',
+        7  => 'seitsmes',
+        8  => 'kaheksas',
+        9  => 'üheksas',
+        10 => 'kümnes',
+    );
+
+    return $base_ordinals{$number} if exists $base_ordinals{$number};
+
+    # 11-19: stem + "teistkümnes"
+    if ($number >= 11 && $number <= 19) {
+        my @teen_stems = qw(. ühe kahe kolme nelja viie kuue seitse kaheksa üheksa);
+        return $teen_stems[$number - 10] . 'teistkümnes';
+    }
+
+    # Round tens 20-90: stem + "kümnes"
+    if ($number >= 20 && $number < 100 && $number % 10 == 0) {
+        my @tens_stems = qw(. . kahe kolme nelja viie kuue seitse kaheksa üheksa);
+        my $tens_idx = int($number / 10);
+        return $tens_stems[$tens_idx] . 'kümnes';
+    }
+
+    # Compound 21-99: cardinal tens prefix + ordinal unit
+    if ($number > 20 && $number < 100) {
+        my @tens_prefix = qw(. . kaks kolm neli viis kuus seitse kaheksa üheksa);
+        my $tens_idx = int($number / 10);
+        my $remain   = $number % 10;
+        return $tens_prefix[$tens_idx] . 'kümmend ' . num2est_ordinal($remain);
+    }
+
+    # Round hundreds
+    if ($number >= 100 && $number < 1000 && $number % 100 == 0) {
+        my $h = int($number / 100);
+        my @ones = qw(. üks kaks kolm neli viis kuus seitse kaheksa üheksa);
+        my $prefix = $h == 1 ? 'sajas' : $ones[$h] . 'sajas';
+        return $prefix;
+    }
+
+    # Compound hundreds
+    if ($number >= 100 && $number < 1000) {
+        my $h = int($number / 100);
+        my $remain = $number % 100;
+        my @ones = qw(. üks kaks kolm neli viis kuus seitse kaheksa üheksa);
+        my $prefix = $h == 1 ? 'sada' : $ones[$h] . 'sada';
+        return $prefix . ' ' . num2est_ordinal($remain);
+    }
+
+    # Round thousands
+    if ($number >= 1000 && $number < 1_000_000 && $number % 1000 == 0) {
+        my $t = int($number / 1000);
+        my $prefix = $t == 1 ? 'tuhandes' : num2est_cardinal($t) . ' tuhandes';
+        return $prefix;
+    }
+
+    # Compound thousands
+    if ($number >= 1000 && $number < 1_000_000) {
+        my $t = int($number / 1000);
+        my $remain = $number % 1000;
+        my $prefix = $t == 1 ? 'tuhat' : num2est_cardinal($t) . ' tuhat';
+        return $prefix . ' ' . num2est_ordinal($remain);
+    }
+
+    # Round millions
+    if ($number >= 1_000_000 && $number < 1_000_000_000 && $number % 1_000_000 == 0) {
+        my $m = int($number / 1_000_000);
+        if ($m == 1) {
+            return 'miljones';
+        }
+        return num2est_cardinal($m) . ' miljones';
+    }
+
+    # Compound millions
+    if ($number >= 1_000_000 && $number < 1_000_000_000) {
+        my $m = int($number / 1_000_000);
+        my $remain = $number % 1_000_000;
+        my $prefix = $m == 1 ? 'miljon' : num2est_cardinal($m) . ' miljonit';
+        return $prefix . ' ' . num2est_ordinal($remain);
+    }
+
+    return;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -119,7 +221,7 @@ Lingua::EST::Num2Word - Number to word conversion in Estonian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::EST::Num2Word is module for converting numbers into their written
 representation in Estonian. Converts whole numbers from 0 up to 999 999 999.
@@ -161,6 +263,23 @@ Text is encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2est_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string
+
+Convert number to its Estonian ordinal text representation.
+Only numbers from interval [1, 999_999_999] will be converted.
+Estonian ordinals use distinct stems (esimene, teine, kolmas, etc.)
+rather than simple suffixing of cardinals.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -175,6 +294,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2est_cardinal
+
+=item num2est_ordinal
 
 =back
 

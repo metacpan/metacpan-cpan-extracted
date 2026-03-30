@@ -26,7 +26,7 @@ exit
 $VERSIONE = '0.27';
 $VERSIONE = $VERSIONE;
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 use FindBin;
 use File::Path;
 use File::Copy;
@@ -263,7 +263,8 @@ for my $target (@ARGV) {
         binmode FH_MAKEFILEPL;
         printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author);
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -317,6 +318,7 @@ abstract: %s
 author:
   - %s
 license: perl
+minimum_perl_version: 5.00503
 generated_by: pmake.bat
 requires:
 %s
@@ -714,21 +716,21 @@ Definitions:
 
 -    "Package" refers to the collection of files distributed by the Copyright
      Holder, and derivatives of that collection of files created through textual
-     modification. 
+     modification.
 -    "Standard Version" refers to such a Package if it has not been modified,
      or has been modified in accordance with the wishes of the Copyright
-     Holder. 
+     Holder.
 -    "Copyright Holder" is whoever is named in the copyright or copyrights for
-     the package. 
+     the package.
 -    "You" is you, if you're thinking about copying or distributing this Package.
 -    "Reasonable copying fee" is whatever you can justify on the basis of
      media cost, duplication charges, time of people involved, and so on. (You
      will not be required to justify it to the Copyright Holder, but only to the
-     computing community at large as a market that must bear the fee.) 
+     computing community at large as a market that must bear the fee.)
 -    "Freely Available" means that no fee is charged for the item itself, though
      there may be fees involved in handling the item. It also means that
      recipients of the item may redistribute it under the same conditions they
-     received it. 
+     received it.
 
 1. You may make and give away verbatim copies of the source form of the
 Standard Version of this Package without restriction, provided that you duplicate
@@ -981,7 +983,7 @@ TO_CONTRIBUTE
 ######################################################################
 
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 
 if (scalar(@ARGV) == 0) {
     die <<END;

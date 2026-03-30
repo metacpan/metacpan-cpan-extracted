@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser = no_numerals();
 
 # }}}
@@ -123,6 +123,93 @@ sub no_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Norwegian ordinal→cardinal: reverse lookup for irregular forms,
+    # suffix stripping for regular/compound forms.
+
+    # Fully irregular 1-12
+    my %irregular = (
+        'første'   => 'en',
+        'andre'    => 'to',
+        'tredje'   => 'tre',
+        'fjerde'   => 'fire',
+        'femte'    => 'fem',
+        'sjette'   => 'seks',
+        'sjuende'  => 'sju',
+        'åttende'  => 'åtte',
+        'niende'   => 'ni',
+        'tiende'   => 'ti',
+        'ellevte'  => 'ellve',
+        'tolvte'   => 'tolv',
+    );
+
+    # Teens 13-19
+    my %teens = (
+        'trettende'  => 'tretten',
+        'fjortende'  => 'fjorten',
+        'femtende'   => 'femten',
+        'sekstende'  => 'seksten',
+        'syttende'   => 'sytten',
+        'attende'    => 'atten',
+        'nittende'   => 'nitten',
+    );
+
+    # Tens ordinals
+    my %tens = (
+        'tjuende'    => 'tjue',
+        'trettiende' => 'tretti',
+        'førtiende'  => 'førti',
+        'femtiende'  => 'femti',
+        'sekstiende' => 'seksti',
+        'syttiende'  => 'sytti',
+        'åttiende'   => 'åtti',
+        'nittiende'  => 'nitti',
+    );
+
+    # Exact match: standalone ordinals
+    return $irregular{$input} if exists $irregular{$input};
+    return $teens{$input}     if exists $teens{$input};
+    return $tens{$input}      if exists $tens{$input};
+
+    # Round hundreds: "hundrede" → "hundre"
+    $input =~ s{hundrede\z}{hundre}xms and return $input;
+
+    # Thousands ordinal: "tusende" → "tusen" (e.g. "ett tusende" → "ett tusen")
+    $input =~ s{tusende\z}{tusen}xms   and return $input;
+
+    # Compounds 21-99: tens cardinal prefix + ordinal unit tail
+    # e.g. "tjueførste" → "tjue" + "første" → "tjue" + "en" = "tjueen"
+    for my $ord (sort { length $b <=> length $a } keys %irregular) {
+        if ($input =~ m{\A(.+)\Q$ord\E\z}xms) {
+            my $prefix = $1;
+            return $prefix . $irregular{$ord};
+        }
+    }
+
+    # Compound with teen tail (for hundreds + teen ordinal)
+    for my $ord (sort { length $b <=> length $a } keys %teens) {
+        if ($input =~ m{\A(.+)\Q$ord\E\z}xms) {
+            my $prefix = $1;
+            return $prefix . $teens{$ord};
+        }
+    }
+
+    # Compound with tens tail (for hundreds + tens ordinal)
+    for my $ord (sort { length $b <=> length $a } keys %tens) {
+        if ($input =~ m{\A(.+)\Q$ord\E\z}xms) {
+            my $prefix = $1;
+            return $prefix . $tens{$ord};
+        }
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -132,6 +219,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::NOR::Word2Num - Word to number conversion in Norwegian
@@ -139,7 +228,7 @@ Lingua::NOR::Word2Num - Word to number conversion in Norwegian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::NOR::Word2Num is module for converting text containing number
 representation in Norwegian back into number. Converts whole numbers
@@ -180,6 +269,15 @@ Input text must be encoded in UTF-8.
       undef  if input string is not known
 
 Convert text representation to number.
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'tredje', 'tjueførste', 'femtiende')
+  =>  str    cardinal text (e.g. 'tre', 'tjueen', 'femti')
+  =>  undef  if input is not a recognized ordinal
+
+Convert Norwegian ordinal text to cardinal text (text-level morphological
+transformation, no numbers involved).
 
 =item B<no_numerals> (void)
 

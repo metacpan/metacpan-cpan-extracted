@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Magic.pm
-## Version v0.1.1
+## Version v0.2.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/07
-## Modified 2026/03/10
+## Modified 2026/03/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use File::Spec  ();
     use File::Temp  ();
     use Scalar::Util qw( looks_like_number );
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.2.0';
 
     # $BACKEND is set by the XS BOOT block at load time:
     #   "xs"   - libmagic loaded successfully via dlopen
@@ -95,15 +95,32 @@ use warnings;
 # PACKAGE = Module::Generic::File::Magic means all XS functions land in our namespace.
 # If the .so is absent, XSLoader croaks - we catch that and stay on the pure-Perl backends.
 # When the .so is present, its BOOT block sets $BACKEND to "xs".
-use XSLoader;
-eval
+# The .so is shared with Module::Generic which may have already loaded it.
+# We guard against double-loading by checking if a known Magic XS function
+# is already installed. If Module::Generic loaded the .so first, the BOOT
+# block already ran and all magic_* functions are in our namespace.
+require XSLoader;
+if( !$Module::Generic::XS_LOADED )
 {
-    XSLoader::load( 'Module::Generic', $Module::Generic::VERSION // $VERSION );
-};
-if( $@ )
-{
-    # .so absent or failed to load - stay on the pure-Perl backend
-    $BACKEND //= 'json';
+    eval
+    {
+        XSLoader::load( 'Module::Generic', $Module::Generic::VERSION // $VERSION );
+        $Module::Generic::XS_LOADED = 1;
+    };
+    if( $@ )
+    {
+        # .so absent or failed to load - stay on the pure-Perl backend
+        $BACKEND //= 'json';
+    }
+    else
+    {
+        # Ensure $BACKEND is initialised in this package's symbol table.
+        # When Module::Generic loads the .so first, the BOOT block runs before
+        # Magic.pm is compiled, so the assignment lands in a not-yet-existing
+        # stash and DynaLoader warns "used only once". Reading it here after
+        # load ensures the symbol is live in our package.
+        $BACKEND //= 'json';
+    }
 }
 
 # NOTE: Package-level backend caches (populated lazily, shared by all instances)
@@ -960,7 +977,7 @@ Module::Generic::File::Magic - File type and MIME detection with 3-level backend
 
 =head1 VERSION
 
-    v0.1.1
+    v0.2.0
 
 =head1 DESCRIPTION
 

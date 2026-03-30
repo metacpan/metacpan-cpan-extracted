@@ -113,6 +113,6 @@ command! -range EshuFixRange <line1>,<line2>call s:EshuFixRange()
 
 " Default mappings — override g:eshu_no_mappings = 1 to disable
 if !get(g:, 'eshu_no_mappings', 0)
-  nnoremap <silent> <F6> :EshuFix<CR>
-  vnoremap <silent> <F6> :EshuFixRange<CR>
+  nnoremap <silent> <Leader>ef :EshuFix<CR>
+  vnoremap <silent> <Leader>ef :EshuFixRange<CR>
 endif

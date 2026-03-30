@@ -10,7 +10,7 @@ use File::Share ':all';
 use XML::LibXML;
 use XML::LibXSLT;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub new {
 	my ($class, @params) = @_;
@@ -19,7 +19,7 @@ sub new {
 	my $self = bless {}, $class;
 
 	# Version of transformation.
-	$self->{'version'} = '2.5.0';
+	$self->{'version'} = '3.0.0';
 
 	# XSLT transformation file.
 	$self->{'xslt_transformation_file'} = undef;
@@ -190,6 +190,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

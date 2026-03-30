@@ -8,7 +8,7 @@ use Test::NoWarnings;
 # Test.
 my $obj = NKC::Transform::BIBFRAME2MARC->new;
 my $ret = $obj->version;
-is($ret, '2.6.0', 'Get version (2.6.0).');
+is($ret, '3.0.0', 'Get version (default - 3.0.0).');
 
 # Test.
 $obj = NKC::Transform::BIBFRAME2MARC->new(

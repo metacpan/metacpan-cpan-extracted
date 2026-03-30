@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::IND::Num2Word;
-# ABSTRACT: Number 2 word conversion in IND.
+# ABSTRACT: convert number to Indonesian verbage.
 
 use 5.16.0;
 use utf8;
@@ -9,11 +9,12 @@ use warnings;
 
 # {{{ use block
 
+use Carp;
 use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 our $Dec_char  = ".";
 our $Neg_word  = "negatif";
@@ -210,12 +211,35 @@ sub join_it {
 # }}}
 
 
+# {{{ num2ind_ordinal                 convert number to ordinal text
+
+sub num2ind_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999_999;
+
+    # Indonesian ordinals: "ke-" + cardinal
+    # Special case: 1st = "pertama"
+    return 'pertama' if $number == 1;
+
+    my $cardinal = nums2words($number);
+    $cardinal =~ s{\A\s+|\s+\z}{}gxms;   # trim whitespace
+
+    return 'ke' . $cardinal;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -225,13 +249,15 @@ __END__
 
 # {{{ module documentation
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::IND::Num2Word - convert number to Indonesian verbage.
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -269,9 +295,22 @@ Numbers > 10 ** 15 returns 0.
 
 =item n2w5
 
+=item num2ind_ordinal
+
+Convert number to ordinal text using "ke-" prefix.
+Special case: 1st = "pertama".
+Only numbers from interval [1, 999_999_999_999] will be converted.
+
 =item nums2words
 
 =item nums2words_simple
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

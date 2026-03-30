@@ -15,7 +15,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my  $parser  = mkd_numerals();
 
 # }}}
@@ -174,6 +174,103 @@ sub mkd_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Macedonian (Cyrillic) ordinals: strip gender/definiteness suffixes, then map stems.
+    # Masc indef: -и, fem: -а, neut: -о, masc definite: -от/-иот.
+    # Stem-based lookup after stripping the single-char suffix.
+
+    my %stem_to_cardinal = (
+        'прв'            => 'еден',
+        'втор'           => 'два',
+        'трет'           => 'три',
+        'четврт'         => 'четири',
+        'петт'           => 'пет',
+        'шест'           => 'шест',
+        'седм'           => 'седум',
+        'осм'            => 'осум',
+        'деветт'         => 'девет',
+        'десетт'         => 'десет',
+        'единаесетт'     => 'единаесет',
+        'дванаесетт'     => 'дванаесет',
+        'тринаесетт'     => 'тринаесет',
+        'четиринаесетт'  => 'четиринаесет',
+        'петнаесетт'     => 'петнаесет',
+        'шестнаесетт'    => 'шестнаесет',
+        'седумнаесетт'   => 'седумнаесет',
+        'осумнаесетт'    => 'осумнаесет',
+        'деветнаесетт'   => 'деветнаесет',
+        'дваесетт'       => 'дваесет',
+        'триесетт'       => 'триесет',
+        'четириесетт'    => 'четириесет',
+        'педесетт'       => 'педесет',
+        'шеесетт'        => 'шеесет',
+        'седумдесетт'    => 'седумдесет',
+        'осумдесетт'     => 'осумдесет',
+        'деведесетт'     => 'деведесет',
+        'двестот'        => 'двесте',
+        'тристот'        => 'триста',
+        'четиристотинит' => 'четиристотини',
+        'петстотинит'    => 'петстотини',
+        'шестстотинит'   => 'шестстотини',
+        'седумстотинит'  => 'седумстотини',
+        'осумстотинит'   => 'осумстотини',
+        'деветстотинит'  => 'деветстотини',
+        'стот'           => 'сто',
+        'илјадит'        => 'илјада',
+        'милионт'        => 'милион',
+        'нулт'           => 'нула',
+    );
+
+    # Hundreds cardinals that require "и" connector in cardinal form
+    my %is_hundred = map { $_ => 1 } qw(
+        сто двесте триста четиристотини петстотини
+        шестстотини седумстотини осумстотини деветстотини
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip gender/definiteness suffixes to get ordinal stem
+        my $norm = $word;
+        $norm =~ s{иот\z}{}xms            # masc definite: првиот → прв
+            or $norm =~ s{от\z}{}xms      # masc definite short: првот → прв
+            or $norm =~ s{ата\z}{}xms     # fem definite: првата → прв
+            or $norm =~ s{ото\z}{}xms     # neut definite: првото → прв
+            or $norm =~ s{и\z}{}xms       # masc indef: први → прв
+            or $norm =~ s{а\z}{}xms       # fem indef: прва → прв
+            or $norm =~ s{о\z}{}xms;      # neut indef: прво → прв
+
+        if (exists $stem_to_cardinal{$norm}) {
+            push @result, $stem_to_cardinal{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors like "и")
+        }
+    }
+
+    return undef unless $matched;
+
+    # Macedonian cardinals require "и" between hundreds and what follows
+    # when there's a single-value remainder (unit/teen/round-tens).
+    # Insert "и" after hundreds token when no "и" follows yet.
+    if (@result >= 2 && exists $is_hundred{$result[0]}
+        && !grep { $_ eq 'и' } @result) {
+        splice @result, 1, 0, 'и';
+    }
+
+    return join(' ', @result);
+}
+
+# }}}
 
 1;
 
@@ -192,7 +289,7 @@ Lingua::MKD::Word2Num - Word to number conversion in Macedonian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::MKD::Word2Num is module for converting text containing number
 representation in Macedonian back into number. Converts whole numbers
@@ -234,6 +331,15 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'петти', 'десетти', 'трети')
+  =>  str    cardinal text (e.g. 'пет', 'десет', 'три')
+      undef  if input is not a recognized ordinal
+
+Convert Macedonian (Cyrillic) ordinal text to cardinal text via morphological reversal.
+Handles gender and definiteness inflections (-ти/-та/-то/-от).
+
 =item B<mkd_numerals> (void)
 
   =>  obj  new parser object
@@ -254,6 +360,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

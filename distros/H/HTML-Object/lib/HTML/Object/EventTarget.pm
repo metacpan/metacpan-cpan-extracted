@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     # Changed inheritance from Module::Generic to HTML::Object::Element, because I need modules like
     # HTML::Object::DOM::TextTrack that inherits from EventTarget to also have the parent method provided
     # by the core module HTML::Object::Element
@@ -36,6 +37,7 @@ use warnings;
 sub init
 {
     my $self = shift( @_ );
+    $self->{tag} = 'eventtarget';
     $self->{_init_strict_use_sub} = 1 unless( CORE::exists( $self->{_init_strict_use_sub} ) );
     $self->{_exception_class} = 'HTML::Object::Exception' unless( CORE::exists( $self->{_exception_class} ) );
     $self->SUPER::init( @_ ) || return( $self->pass_error );
@@ -72,7 +74,7 @@ sub addEventListener
     $post_processing = CORE::delete( $opts->{post_processing} ) if( CORE::exists( $opts->{post_processing} ) && ref( $opts->{post_processing} ) eq 'CODE' );
     if( scalar( keys( %$opts ) ) )
     {
-        warnings::warn( "Unrecognised options: '" . join( "', '", sort( keys( %$opts ) ) ) . "'\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warn( "Unrecognised options: '" . join( "', '", sort( keys( %$opts ) ) ) . "'\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
     }
     $params->{capture} //= 0;
     $params->{once}    //= 0;
@@ -137,7 +139,7 @@ sub dispatchEvent
         };
         if( $can_cancel && $event->cancelled )
         {
-            return;
+            return(0);
         }
         # Make sure to return true to keep looping
         return(1);
@@ -163,7 +165,7 @@ sub dispatchEvent
         };
         if( $can_cancel && $event->cancelled )
         {
-            return;
+            return(0);
         }
         # Make sure to return true to keep looping
         return(1);
@@ -368,7 +370,7 @@ sub removeEventListener
     @$params{ @ok_params } = CORE::delete( @$opts{ @ok_params } );
     if( scalar( keys( %$opts ) ) )
     {
-        warnings::warn( "Unrecognised options: '" . join( "', '", sort( keys( %$opts ) ) ) . "'\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warn( "Unrecognised options: '" . join( "', '", sort( keys( %$opts ) ) ) . "'\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
     }
     $params->{capture} //= 0;
     my $key = join( ';', $type, Scalar::Util::refaddr( $callback ), $params->{capture} );
@@ -386,7 +388,7 @@ sub _signal_remove_listeners
     my $sig = shift( @_ ) || 
     do
     {
-        warnings::warn( "Warning only: no signal was provided in HTML::Object::EventTarget::_signal_remove_listeners\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warn( "Warning only: no signal was provided in HTML::Object::EventTarget::_signal_remove_listeners\n" ) if( warnings::enabled( 'HTML::Object' ) );
         return;
     };
     my $all = $SIGNALS->{ $sig };
@@ -731,9 +733,9 @@ L<https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers>
 
 L<https://domevents.dev/> a very useful interactive playground app that enables learning about the behavior of the DOM Event system through exploration.
 
-L<https://www.quirksmode.org/js/events_order.html> discussion of capturing and bubbling — an excellently detailed piece by Peter-Paul Koch.
+L<https://www.quirksmode.org/js/events_order.html> discussion of capturing and bubbling - an excellently detailed piece by Peter-Paul Koch.
 
-L<https://www.quirksmode.org/js/events_access.html> discussion of the event object — another excellently detailed piece by Peter-Paul Koch.
+L<https://www.quirksmode.org/js/events_access.html> discussion of the event object - another excellently detailed piece by Peter-Paul Koch.
 
 =head1 COPYRIGHT & LICENSE
 

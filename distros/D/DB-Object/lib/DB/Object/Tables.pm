@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Tables.pm
-## Version v1.2.0
+## Database Object Interface - ~/lib/DB/Object/Tables.pm
+## Version v1.2.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2026/03/22
+## Modified 2026/03/27
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
     use Wanted;
     our $DEBUG           = 0;
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.2.0';
+    our $VERSION = 'v1.2.1';
 };
 
 use strict;
@@ -348,15 +348,23 @@ sub fields
         my $field = shift( @_ );
         return( $self->error( "No field name was provided." ) ) if( !CORE::length( $field // '' ) );
         my $obj = $fields->{ $field } || return( $self->error( "No field object found for \"", ( $field // 'undef' ), "\"." ) );
-        return( $obj->clone );
+        # NOTE: We return the canonical Field object directly rather than cloning it.
+        # The immediate caller (_initiate_field_object) overwrites table_object,
+        # query_object, prefixed, and debug right after this call, so a full Clone::clone
+        # of all the field data attributes (name, type, pos, is_nullable, etc.) is wasteful.
+        # The data attributes are read-only after structure() populates them.
+        return( $obj );
     }
     # return( +{ map{ $_ => $fields->{ $_ }->clone } keys( %$fields ) } );
     my $ref = {};
+    # NOTE: Return the canonical Field objects directly rather than cloning each one.
+    # Fields are populated once by structure() and their data attributes (name, type,
+    # pos, is_nullable, etc.) are never modified after that. The mutable attributes
+    # (table_object, query_object, prefixed, debug) are always overwritten by the caller.
     foreach my $f ( keys( %$fields ) )
     {
         $fields->{ $f }->debug( $self->debug );
-        my $new = $fields->{ $f }->clone || return( $self->pass_error( $fields->{ $f }->error ) );
-        $ref->{ $f } = $new;
+        $ref->{ $f } = $fields->{ $f };
     }
     return( $ref );
 }
@@ -386,7 +394,6 @@ sub fields_object
     $self->_reset_query;
     my $qo = $self->query_object;
     $qo->table_object( $self );
-    $self->messagec( 5, "Called for table {green}", $self->name, "{/} aliased to {green}", ( $self->as // 'undef' ), "{/}" );
     if( $o && $self->_is_object( $o ) )
     {
         $o->prefixed( $self->{prefixed} );
@@ -432,7 +439,6 @@ EOT
         debug           => $self->debug,
     );
     $o->prefixed( $self->{prefixed} );
-    $self->messagec( 5, "Saving fields object whose table object has name {green}", $o->table_object->name, "{/} and alias {green}", $o->table_object->as, "{/}. Fields object has debug value '", $o->debug, "'" );
     $self->{fields_object} = $o;
     return( $o );
 }
@@ -770,11 +776,8 @@ sub select
     }
     else
     {
-        $self->messagec( 5, "Calling select() on query object for table {green}", $self->name, "{/} with alias {green}", $self->as, "{/}" );
         my $val = $q->select( @_ ) || return( $self->pass_error( $q->error ) );
-        $self->messagec( 5, "select() on query object for table {green}", $self->name, "{/} with alias {green}", $self->as, "{/} returned {green}", $val, "{/}" );
         $self->reset;
-        $self->messagec( 5, "Table alias for {green}", $self->name, "{/} is {green}", ( $self->as || 'undef' ), "{/}" );
         return( $val );
     }
 }
@@ -1097,7 +1100,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    v1.2.0
+    v1.2.1
 
 =head1 DESCRIPTION
 

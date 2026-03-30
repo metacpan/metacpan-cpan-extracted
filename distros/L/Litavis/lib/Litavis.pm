@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 require XSLoader;
 XSLoader::load('Litavis', $VERSION);
@@ -61,11 +61,6 @@ Litavis - CSS preprocessor and compiler implemented in C via XS
 Litavis is a CSS preprocessor and compiler with its entire engine implemented
 in C via reusable header files, exposed to Perl through XS. It succeeds
 Crayon with a focus on correctness and performance.
-
-This module is an evolution from Hazy -> Crayon -> Litavis. I personally have some dependancy 
-on Crayon even though it is buggy so instead of breaking that compatibility I created this.
-This module aims to be fully compliant with CSS specification preserving overriding rules
-while still merging where possible.
 
 =head2 Features
 

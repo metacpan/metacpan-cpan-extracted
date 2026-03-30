@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = hrv_numerals();
 
 # }}}
@@ -121,6 +121,86 @@ sub hrv_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal             convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Croatian ordinals: strip gender/case suffixes, then map stems.
+    # Inflection: -i/-a/-o/-og(a)/-om(u)/-im (masc/fem/neut/oblique).
+
+    my %irregular = (
+        'nulti'       => 'nula',
+        'prvi'        => 'jedan',
+        'drugi'       => 'dva',
+        'treći'       => 'tri',
+        'četvrti'     => 'četiri',
+        'peti'        => 'pet',
+        'šesti'       => 'šest',
+        'sedmi'       => 'sedam',
+        'osmi'        => 'osam',
+        'deveti'      => 'devet',
+        'deseti'      => 'deset',
+        'jedanaesti'  => 'jedanaest',
+        'dvanaesti'   => 'dvanaest',
+        'trinaesti'   => 'trinaest',
+        'četrnaesti'  => 'četrnaest',
+        'petnaesti'   => 'petnaest',
+        'šesnaesti'   => 'šesnaest',
+        'sedamnaesti' => 'sedamnaest',
+        'osamnaesti'  => 'osamnaest',
+        'devetnaesti' => 'devetnaest',
+        'dvadeseti'   => 'dvadeset',
+        'trideseti'   => 'trideset',
+        'četrdeseti'  => 'četrdeset',
+        'pedeseti'    => 'pedeset',
+        'šezdeseti'   => 'šezdeset',
+        'sedamdeseti' => 'sedamdeset',
+        'osamdeseti'  => 'osamdeset',
+        'devedeseti'  => 'devedeset',
+        'dvjestoti'   => 'dvjesto',
+        'tristoti'    => 'tristo',
+        'četiristoti' => 'četiristo',
+        'petstoti'    => 'petsto',
+        'šeststoti'   => 'šeststo',
+        'sedamstoti'  => 'sedamsto',
+        'osamstoti'   => 'osamsto',
+        'devetstoti'  => 'devetsto',
+        'stoti'       => 'sto',
+        'tisućiti'    => 'tisuća',
+        'milijunti'   => 'milijun',
+    );
+
+    # Compound ordinals: ALL components are ordinal forms.
+    # Normalize each word individually, then look up in the mapping.
+    my @words = split /\s+/, $input;
+    my @result;
+    my $matched = 0;
+
+    for my $word (@words) {
+        # Strip gender/case suffixes to masculine nominative (-i)
+        my $norm = $word;
+        $norm =~ s{oga\z}{i}xms
+            or $norm =~ s{og\z}{i}xms
+            or $norm =~ s{omu\z}{i}xms
+            or $norm =~ s{om\z}{i}xms
+            or $norm =~ s{im\z}{i}xms
+            or $norm =~ s{a\z}{i}xms      # fem: prva → prvi
+            or $norm =~ s{o\z}{i}xms;     # neut: prvo → prvi
+
+        if (exists $irregular{$norm}) {
+            push @result, $irregular{$norm};
+            $matched = 1;
+        }
+        else {
+            push @result, $word;  # pass through unchanged (connectors, etc.)
+        }
+    }
+
+    return $matched ? join(' ', @result) : undef;
+}
+
+# }}}
 
 1;
 
@@ -139,7 +219,7 @@ Lingua::HRV::Word2Num - Word to number conversion in Croatian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::HRV::Word2Num is module for converting Croatian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -179,6 +259,15 @@ expected to be in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'peti', 'deseti', 'treći')
+  =>  str    cardinal text (e.g. 'pet', 'deset', 'tri')
+      undef  if input is not a recognized ordinal
+
+Convert Croatian ordinal text to cardinal text via morphological reversal.
+Handles all gender/case inflections.
+
 =item B<hrv_numerals> (void)
 
   =>  obj  object of the parser
@@ -199,6 +288,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

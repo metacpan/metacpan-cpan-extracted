@@ -1,5 +1,65 @@
 Revision history for Perl module DB::Object
 
+v1.10.0 2026-03-28T14:28:52+0900
+    - Correcting wrong version number for DB::Object::Placeholder
+    - Fixed support for SQL function wrappers around placeholders, such as UPPER(?),
+      in WHERE clauses built via the overloaded == operator on field objects.
+      The fix encompasses 9 interrelated bugs across 7 modules:
+
+      DB::Object::Postgres (and DB::Object base):
+      - PLACEHOLDER_REGEXP was too restrictive (used \b?\b) and failed to match ?
+        inside SQL function calls like UPPER(?). Replaced with a lookaround-based
+        regexp that correctly recognises standalone ? and $N placeholders without
+        false-positives on ?? (PostgreSQL JSON operator) or ?1 (SQLite numbered
+        placeholders).
+
+      DB::Object::Fields::Field (_op_overload):
+      - Placeholder detection used anchored matches /^$re$/ that rejected UPPER(?)
+        since the expression is not a placeholder in its entirety. Changed to
+        unanchored matches so expressions containing a placeholder are handled.
+      - $1 was being clobbered by subsequent regex matches inside
+        Module::Generic::init() before it could be stored. Fixed by capturing $1
+        into a lexical $captured_placeholder before calling Overloaded->new().
+      - query_object was passed after placeholder in Overloaded->new(), but the
+        placeholder setter calls $self->query_object->..., so it failed silently.
+        Reordered arguments so query_object is initialised first.
+      - $tbl->fo->field == 'NULL' was generating "field = NULL" (which always
+        evaluates to NULL in SQL, never TRUE). Now correctly generates "field IS NULL"
+        (or IS NOT NULL for !=).
+
+      DB::Object::Query::Clause (merge):
+      - When merging an AND clause, DB::Object::Fields::Overloaded objects were added
+        to the SQL string (@clause) but their bind elements were silently discarded.
+        Fixed to also push them into $elems when they carry a placeholder.
+
+      DB::Object::Postgres::Query and DB::Object::Mysql::Query (_query_components):
+      - The guard condition for copying WHERE bind elements was $where->types->length,
+        which calls type() on sub-Clause objects (returning the string 'where', not a
+        DBI type constant), so the condition was always false. Changed to the correct
+        $where->elements->length, consistent with the existing $limit handling.
+
+      DB::Object::Query (reset and _save_bind):
+      - reset() did not reinitialise the elements object, so a fresh query could
+        inherit stale elements from the previous query via the same object reference.
+        Fixed to always create a fresh Elements object in reset().
+      - _save_bind() was appending to $self->elements (via the method, which may
+        return a copy), causing accumulation across multiple select() calls on the
+        same table object. Fixed to build a fresh Elements object and assign it
+        directly via $self->{elements}.
+
+      DB::Object::Statement (join):
+      - After $q->clone, $q_source->{elements} shared the same object reference as
+        $q->{elements}. Any subsequent _save_bind() on $q then silently corrupted
+        the element list of the cached join statement. Fixed by reinitialising
+        $q_source->{elements} immediately after the clone.
+      - The WHERE bind elements were never transferred into $q_source->elements for
+        joined statements, because _query_components is called with no_bind_copy=>1
+        (to prevent duplication), and _save_bind is gated on use_bind (default 0).
+        Fixed by explicitly copying WHERE elements into $q_source->elements in
+        join() after _query_components, using $where->elements->list (a
+        Module::Generic::Array, not an Elements wrapper - passing the array object
+        directly to Elements::push caused a silent failure).
+
 v1.9.1 2026-03-22T17:52:55+0900
     - Correcting wrong version number for DB::Object::Placeholder
 

@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = qw( 0 nulis          1 vienas         2 du
                  3 trys           4 keturi         5 penki
                  6 šeši           7 septyni        8 aštuoni
@@ -161,12 +161,145 @@ sub num2lit_cardinal :Export {
 # }}}
 
 
+# {{{ num2lit_ordinal                  convert number to ordinal text
+
+sub num2lit_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Unique ordinal forms for 1-19 (masculine nominative singular)
+    my %ordinals = (
+        1  => 'pirmas',
+        2  => 'antras',
+        3  => 'trečias',
+        4  => 'ketvirtas',
+        5  => 'penktas',
+        6  => 'šeštas',
+        7  => 'septintas',
+        8  => 'aštuntas',
+        9  => 'devintas',
+        10 => 'dešimtas',
+        11 => 'vienuoliktas',
+        12 => 'dvyliktas',
+        13 => 'tryliktas',
+        14 => 'keturioliktas',
+        15 => 'penkioliktas',
+        16 => 'šešioliktas',
+        17 => 'septynioliktas',
+        18 => 'aštuonioliktas',
+        19 => 'devynioliktas',
+    );
+
+    return $ordinals{$number} if exists $ordinals{$number};
+
+    # Round tens: ordinal tens forms
+    my %ordinal_tens = (
+        20 => 'dvidešimtas',
+        30 => 'trisdešimtas',
+        40 => 'keturiasdešimtas',
+        50 => 'penkiasdešimtas',
+        60 => 'šešiasdešimtas',
+        70 => 'septyniasdešimtas',
+        80 => 'aštuoniasdešimtas',
+        90 => 'devyniasdešimtas',
+    );
+
+    return $ordinal_tens{$number} if exists $ordinal_tens{$number};
+
+    # Compound 21-99: cardinal tens + ordinal unit
+    if ($number > 20 && $number < 100) {
+        my $remain = $number % 10;
+        my $tens   = $number - $remain;
+        return $token2{$tens} . ' ' . num2lit_ordinal($remain);
+    }
+
+    # Round hundreds
+    if ($number >= 100 && $number < 1000 && $number % 100 == 0) {
+        my $h = int($number / 100);
+        if ($h == 1) {
+            return 'šimtasis';
+        }
+        return $token1{$h} . ' šimtasis';
+    }
+
+    # Compound hundreds
+    if ($number >= 100 && $number < 1000) {
+        my $remain = $number % 100;
+        return _hundreds($number) . ' ' . num2lit_ordinal($remain);
+    }
+
+    # Round thousands
+    if ($number >= 1000 && $number < 1_000_000 && $number % 1000 == 0) {
+        my $thousands = int($number / 1000);
+        if ($thousands == 1) {
+            return 'tūkstantasis';
+        }
+        return num2lit_cardinal($thousands) . ' tūkstantasis';
+    }
+
+    # Compound thousands
+    if ($number >= 1000 && $number < 1_000_000) {
+        my $thousands = int($number / 1000);
+        my $remain    = $number % 1000;
+        my $suffix    = _decline($thousands, 'tūkstantis', 'tūkstančiai', 'tūkstančių');
+
+        my $prefix;
+        if ($thousands == 1) {
+            $prefix = 'vienas tūkstantis';
+        }
+        elsif ($thousands < 20) {
+            $prefix = $token1{$thousands} . ' ' . $suffix;
+        }
+        else {
+            $prefix = num2lit_cardinal($thousands) . ' ' . $suffix;
+        }
+        return $prefix . ' ' . num2lit_ordinal($remain);
+    }
+
+    # Round millions
+    if ($number >= 1_000_000 && $number < 1_000_000_000 && $number % 1_000_000 == 0) {
+        my $millions = int($number / 1_000_000);
+        if ($millions == 1) {
+            return 'milijonasis';
+        }
+        return num2lit_cardinal($millions) . ' milijonasis';
+    }
+
+    # Compound millions
+    if ($number >= 1_000_000 && $number < 1_000_000_000) {
+        my $millions = int($number / 1_000_000);
+        my $remain   = $number % 1_000_000;
+        my $suffix   = _decline($millions, 'milijonas', 'milijonai', 'milijonų');
+
+        my $prefix;
+        if ($millions == 1) {
+            $prefix = 'vienas milijonas';
+        }
+        elsif ($millions < 20) {
+            $prefix = $token1{$millions} . ' ' . $suffix;
+        }
+        else {
+            $prefix = num2lit_cardinal($millions) . ' ' . $suffix;
+        }
+        return $prefix . ' ' . num2lit_ordinal($remain);
+    }
+
+    return;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -188,7 +321,7 @@ Lingua::LIT::Num2Word - Number to word conversion in Lithuanian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::LIT::Num2Word is module for conversion of numbers into their
 representation in Lithuanian. It converts whole numbers from 0 up to
@@ -241,12 +374,28 @@ be converted.
 Internal helper. Selects the correct Lithuanian noun declension
 based on the number.
 
+=item B<num2lit_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string (masculine nominative singular)
+
+Convert number to its Lithuanian ordinal text representation.
+Only numbers from interval [1, 999_999_999] will be converted.
+Handles all unique ordinal forms (pirmas, antras, trečias, etc.).
+
 =item B<_hundreds> (positional)
 
   1   num    number in range [100, 999]
   =>  str    hundreds part as text
 
 Internal helper. Converts the hundreds component of a number to text.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 
@@ -262,6 +411,8 @@ Internal helper. Converts the hundreds component of a number to text.
 =over 2
 
 =item num2lit_cardinal
+
+=item num2lit_ordinal
 
 =back
 

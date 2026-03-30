@@ -100,7 +100,7 @@ YAML
 
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => {});
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -112,7 +112,7 @@ YAML
   );
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => undef });
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -124,7 +124,7 @@ YAML
   );
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => { openapi => 'blah' });
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {
@@ -143,7 +143,7 @@ YAML
       paths => {},
     },
   );
-  cmp_result(
+  is_equal(
     [ map $_->TO_JSON, $doc->errors ],
     [
       {

@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = sqi_numerals();
 
 # }}}
@@ -111,7 +111,7 @@ Lingua::SQI::Word2Num - Word to number conversion in Albanian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SQI::Word2Num is a module for converting Albanian numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is

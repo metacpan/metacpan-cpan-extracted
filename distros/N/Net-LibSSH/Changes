@@ -1,5 +1,12 @@
 Revision history for Net-LibSSH
 
+0.002     2026-03-29 14:49:04Z
+  - Refactor XS internals: replace sv_setref_pv/DESTROY with
+    sv_magicext + MGVTBL (svt_free) for automatic GC-driven cleanup
+  - Typemap INPUT now uses mg_findext with type-specific vtable pointer
+    for strict type checking at the XS boundary
+  - No user-visible behaviour change
+
 0.001     2026-03-29 02:46:04Z
   - Initial release
   - Session: connect, auth_password, auth_publickey, auth_agent

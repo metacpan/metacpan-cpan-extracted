@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     # use parent qw( Module::Generic );
     use parent qw( Module::Generic::Array );
     use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
@@ -36,8 +37,8 @@ use warnings;
 
 sub new
 {
-    my $this = shift( @_ );
-    return( bless( [] => ( ref( $this ) || $this ) ) );
+    my $this = CORE::shift( @_ );
+    return( CORE::bless( [] => ( CORE::ref( $this ) || $this ) ) );
 }
 
 sub append
@@ -60,13 +61,13 @@ sub get_nodelist { return( @{$_[0]} ); }
 sub getChildNodes
 {
     my $self = CORE::shift( @_ );
-    return( map{ $_->getChildNodes } @$self );
+    return( CORE::map{ $_->getChildNodes } @$self );
 }
 
 sub getElementById
 {
     my $self = CORE::shift( @_ );
-    return( map{ $_->getElementById } @$self );
+    return( CORE::map{ $_->getElementById } @$self );
 }
        
 sub getRootNode
@@ -75,9 +76,9 @@ sub getRootNode
     return( $self->[0]->getRootNode );
 }
 
-sub new_literal { return( shift->_class_for( 'Literal' )->new( @_ ) ); }
+sub new_literal { return( CORE::shift->_class_for( 'Literal' )->new( @_ ) ); }
 
-sub new_number { return( shift->_class_for( 'Number' )->new( @_ ) ); }
+sub new_number { return( CORE::shift->_class_for( 'Number' )->new( @_ ) ); }
 
 sub pop
 {
@@ -116,7 +117,7 @@ sub remove_duplicates
 sub reverse
 {
     my $self = CORE::shift( @_ );
-    @$self = reverse( @$self );
+    @$self = CORE::reverse( @$self );
     return( $self );
 }
 
@@ -129,7 +130,7 @@ sub shift
 sub size
 {
     my $self = CORE::shift( @_ );
-    return( scalar( @$self ) );
+    return( CORE::scalar( @$self ) );
 }
 
 sub sort
@@ -149,7 +150,7 @@ sub string_value
 sub string_values
 {
     my $self = CORE::shift( @_ );
-    return( map{ $_->string_value } @$self );
+    return( CORE::map{ $_->string_value } @$self );
 }
 
 sub to_boolean
@@ -161,13 +162,13 @@ sub to_boolean
 sub to_final_value
 {
     my $self = CORE::shift( @_ );
-    return( join( '', map{ $_->string_value } @$self ) );
+    return( CORE::join( '', CORE::map{ $_->string_value } @$self ) );
 }
 
 sub to_literal
 {
     my $self = CORE::shift( @_ );
-    return( $self->new_literal( join( '', map{ $_->string_value } @$self ) ) );
+    return( $self->new_literal( CORE::join( '', CORE::map{ $_->string_value } @$self ) ) );
 }
 
 sub to_number

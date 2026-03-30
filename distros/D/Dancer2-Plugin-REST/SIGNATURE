@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.93.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,35 +12,38 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 5bf063f7c3b5d265ae9435d1c53d03f386a4e655 Changes
-SHA1 caddacafe099c9c8c7e615d34f33007397e33195 INSTALL
-SHA1 74a39e57d27fb7e37c99d03ea23648b1cb90e9cc LICENSE
-SHA1 9291a099a97ebd9ac518dccaea2e8ad68ff131a4 MANIFEST
-SHA1 87db05838008a08e78d4158e9d9427830595f8a5 META.json
-SHA1 5b7a73e6292c1446bf305b8cbe9beaea6ec5e1fe META.yml
-SHA1 8b333631c8d9a19ef285816d09297cb2ba9abd8b Makefile.PL
-SHA1 97f8433158bffca81374cc36c17e4b51b71af6d2 README
-SHA1 cd8591477f3aba79920a7cd7b38cbd1166c1934a README.mkdn
-SHA1 746f73b036aa1a4699c6d780e19dc38eb79f5533 cpanfile
-SHA1 07fe2afbe7f2b3b576c0a3fce624eef2a7586ed4 doap.xml
-SHA1 a71d216ab41f9b4a1c144aae58077428ae41bfcc lib/Dancer2/Plugin/REST.pm
-SHA1 6c6203d59c3188fcd2e07b5f44571941bc1fd55b t/00-compile.t
-SHA1 442dda5b027cdfb1965a1186fae33c2d8ea6879c t/00-report-prereqs.dd
-SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
-SHA1 2027b6ffbc740fd7f96f6d84da98d4e201211b87 t/02_prepare_serializer_for_format.t
-SHA1 0a8c2809bac263bb2d23eb9adc254ade3adc5d03 t/03_resource.t
-SHA1 ee83ba6ac37c73a5bbd7876ccad2bd6537266fda t/04_helpers.t
-SHA1 13f1aa25eca5364affa86f510787888a77c82400 t/04_plugin_settings.t
-SHA1 449ae0f1f11ca034f9ae7b4c149cbeca336d7ef3 t/05_named_captures.t
-SHA1 d2705253f5857c2aa924c98797d124308657098f t/06_tcp_server.t
-SHA1 5a59fb046dbea0a6bb4abe54ed8e87cd44e3b68a t/gh14-deserialized.t
-SHA1 56e82843de2534be42ebfb0e2e62742781499602 utils/list_helpers.pl
-SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+SHA256 99d92e75f4d997758dd368a6eb5f70a137a1aa6ed5bfe8fa70ff1353deed208a CODE_OF_CONDUCT.md
+SHA256 576a2aa865439b26e3a81d8129d40fc8b5f6dc2fd611bad2b1bc55270a8352e2 CONTRIBUTING.md
+SHA256 c5ad187b058084d3236c8982941944084acbeaf6ed9d8ed4b79bd3f2b528e420 Changes
+SHA256 5fff519148ca0ebcc530d28fca48a2f10f23ecb9814a3b8ee03f136c63f11d2f INSTALL
+SHA256 9194e6d80aaf4dbe9968e0cec095e46175270aa11b5b25eb31afdff6d4c54784 LICENSE
+SHA256 747b390c744d01a1abe1ebb489755d3aea77eb97862806ab5fb3fb60bf68c53a MANIFEST
+SHA256 874f268c1b9666f00928299bdb7b3144172158c9d3b9a96325033d41352a605f META.json
+SHA256 a090085351a8f853cc67eb712f32b560cc14f5d173c38e9a2d1a1787d16188e2 META.yml
+SHA256 28bbe8b938e9d833b6c61aa346f5c040a66bd896d33997675828a67d5a759540 Makefile.PL
+SHA256 7a422ac46865d293da9734a9c3f31a7b2b5484ba242c754f9ad98701b6d2a9b1 README
+SHA256 c598f86cb25602f1bd404ad4b72fc1b77308fa0aca7d31f1b5f2a79dac65deaf README.mkdn
+SHA256 55385719537ea659a40ff9304d91448ddcc09e80df45ae4a8fd2d9ebdef94de0 SECURITY.md
+SHA256 f464e08c74fa1c4a2bba8869a96a16500a0276f1fb23b8b5be1c5a2cb636fe10 cpanfile
+SHA256 661e0f59a44419a77fd5eb88ec9c628c2bc5fa631cdabb66ca6c8b6458bde65e doap.xml
+SHA256 64f09a4e5f8c0eab542fa7e5722b7ddc5e54a989df354aeb8eee889bf81f0155 lib/Dancer2/Plugin/REST.pm
+SHA256 b1d38c35b7763b304b8887b6f3dc17edde12936bd5bb2242a69708eef1dd2442 t/00-compile.t
+SHA256 29fb52beeb5fc2576adba2ecba881878fa8769dc0d84df7c26a6b1614c99bcbf t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 a51580976fe205ee75591327d80367822330c76b49e0e20633fa846031b1a1e9 t/02_prepare_serializer_for_format.t
+SHA256 e310d435c2f0de48c90f04cb45f2bdebfd247e9c47e26a424594659144ae3e6d t/03_resource.t
+SHA256 182c54206225e728f8a1f95320775ba2244ae1343541f6c483607015a39f2c37 t/04_helpers.t
+SHA256 3bfa6dab23376a6e77fc72459249bd1635b5a7726ed04fa7c3828f8b1ff68331 t/04_plugin_settings.t
+SHA256 b05f33e875980ff6449309ee537e21d344b37bff8e90b7201de0d934a7975c2e t/05_named_captures.t
+SHA256 471fb1a829a2e2997c3d374761fe003eb65bb21a784ffff057567ec1bc03645a t/06_tcp_server.t
+SHA256 0993fd96cb88c12dbd26a4a6c28228f5987964d0d5c45a5d1e4fe495f597863c t/gh14-deserialized.t
+SHA256 f0ccb161349f7663e25932c309fef24ba30e1870813e41ad2ab4a470f353f4fc utils/list_helpers.pl
+SHA256 d34f839d8340478663bd6ae59c72760d7e1a2b7a2d4879ad1ec97db1a2271b2f xt/release/unused-vars.t
 -----BEGIN PGP SIGNATURE-----
 
-iEYEARECAAYFAllxQlcACgkQ34Hwf+GwC4xj9QCgrfzePeODTuE87FAegmIQjlid
-geoAoMxXka1m3mP9hZzjsZgtIdkRBDcM
-=O6TR
+iF0EAREDAB0WIQS4RMr2LZlyA/IlbHHfgfB/4bALjAUCaclOVAAKCRDfgfB/4bAL
+jB4RAJ9PvDHGkhIWhR83Ul6u8/SEwCaTRwCfVm4nwFWsxEO9BEwYevsUIyV23Pw=
+=EWcW
 -----END PGP SIGNATURE-----

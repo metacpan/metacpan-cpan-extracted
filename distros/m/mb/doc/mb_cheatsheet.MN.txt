@@ -1,0 +1,35 @@
+======================================================================
+ mb Cheat Sheet                                            [MN] Монгол
+======================================================================
+
+[ 1. Модуль ачаалах ]
+  use mb;
+  mb::set_script_encoding('utf8');
+
+[ 2. Тэмдэгт дээр суурилсан length / substr ]
+  mb::length($str)              # Тэмдэгтийн тоо (байт биш)
+  mb::substr($str, $pos, $len)  # Тэмдэгтийн байрлалаар дэд мөр
+
+[ 3. Мөр хайх ]
+  mb::index($str, $sub)         # Тэмдэгтийн байрлалын индекс
+  mb::rindex($str, $sub)        # Баруун талаас хайх
+  mb::index_byte($str, $sub)    # Байтын байрлалын индекс
+
+[ 4. Тэмдэгт хөрвүүлэх ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. Тэмдэгтийн код ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. Бусад үйлдлүүд ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. Дэмжигдэх кодчилол ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. Жишээ ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "Сайн байна уу";
+  printf "урт=%d\n", mb::length($s);

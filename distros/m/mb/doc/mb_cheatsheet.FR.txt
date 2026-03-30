@@ -1,0 +1,40 @@
+======================================================================
+ mb Cheat Sheet                                          [FR] Français
+======================================================================
+
+[ 1. Chargement ]
+  use mb;
+  mb::set_script_encoding('utf8'); # utf8 / sjis / eucjp / big5 / gbk / uhc
+
+[ 2. length / substr par caractère ]
+  mb::length($str)              # nombre de caractères (pas d'octets)
+  mb::substr($str, $pos, $len)  # sous-chaîne par position de caractère
+  mb::substr($str, $pos, $len, $replacement)
+
+[ 3. Recherche ]
+  mb::index($str, $sub)         # index par position de caractère
+  mb::index($str, $sub, $pos)   # recherche depuis $pos
+  mb::rindex($str, $sub)        # recherche depuis la droite
+  mb::index_byte($str, $sub)    # index par position d'octet (JPerl)
+  mb::rindex_byte($str, $sub)
+
+[ 4. Casse ]
+  mb::uc($str)  mb::lc($str)  mb::ucfirst($str)  mb::lcfirst($str)
+
+[ 5. Code de caractère ]
+  mb::ord($str)  mb::chr($n)
+
+[ 6. Autres opérations ]
+  mb::chop($str)   mb::reverse(@list)
+  mb::getc(FH)     mb::tr($str,$from,$to)
+
+[ 7. Encodages supportés ]
+  utf8  sjis  eucjp  big5  big5hkscs  gbk  uhc  gb18030  rfc2279  wtf8
+
+[ 8. Exemple ]
+  use mb;
+  mb::set_script_encoding('utf8');
+  my $s = "Bonjour le monde";
+  printf "longueur=%d\n", mb::length($s);
+  printf "sous=%s\n",     mb::substr($s,0,7);
+  printf "pos=%d\n",      mb::index($s,"monde");

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v0.9.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.0.0
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2025/12/05
+## Modified 2026/01/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     use Scalar::Util;
     use Text::PO::Element;
     use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v0.9.1';
+    our $VERSION = 'v1.0.0';
 };
 
 use strict;
@@ -1736,7 +1736,7 @@ Or, maybe using the object overloading directly:
 
 =head1 VERSION
 
-    v0.9.1
+    v1.0.0
 
 =head1 DESCRIPTION
 

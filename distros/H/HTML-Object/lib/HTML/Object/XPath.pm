@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic );
     use vars qw(
         $CACHE $AXES $AXES_KEYS $NC_NAME_RE $QNAME_RE $NC_WILD_RE $QN_WILD_RE 

@@ -28,6 +28,12 @@ for my $slot ( @slots ) {
 	note explain $tokenInfo;
 }
 
+for my $mechanism ($slots[0]->mechanisms) {
+	my $info = $mechanism->info;
+	my @flags = $info->flags;
+	note $mechanism->name, ': ', join ', ', @flags;
+}
+
 my $session = $slots[0]->open_session('rw-session' => 0);
 
 undef $provider;
@@ -50,6 +56,7 @@ my %public_key_template = (
 my %private_key_template = (
 	token => 0,
 	sensitive => 1,
+	extractable => 1,
 	decrypt => 1,
 	sign => 1,
 	label => 'test private key',
@@ -98,9 +105,6 @@ is $attributes->{public_exponent}, 65537, 'public exponent is 65537';
 my $modulus = $public_key->get_attribute('modulus');
 is($modulus, $attributes->{modulus}, 'modulus is modulus');
 
-$public_key->destroy_object;
-$private_key->destroy_object;
-
 my $aes_key = $session->generate_key('aes-key-gen', { 'value-len' => 32, token => 0 });
 
 ok $aes_key, 'aes key successfully generated';
@@ -108,9 +112,21 @@ ok $aes_key, 'aes key successfully generated';
 my $iv = "\0" x 16;
 my $encoder = $session->open_encrypt('aes-cbc-pad', $aes_key, $iv);
 
-my $ciphertext = $encoder->add_data($plain_text x 3);
+my $tripled = $plain_text x 3;
+my $ciphertext = $encoder->add_data($tripled);
 $ciphertext .= $encoder->finalize;
 
-is $session->decrypt('aes-cbc-pad', $aes_key, $ciphertext, $iv), $plain_text x 3;
+is $session->decrypt('aes-cbc-pad', $aes_key, $ciphertext, $iv), $tripled, 'AES decrypts correctly';
+
+{
+	my $wrapped = $session->wrap_key('aes-key-wrap', $aes_key, $private_key);
+	ok $wrapped;
+
+	my $unwrapped = $session->unwrap_key('aes-key-wrap', $aes_key, $wrapped, { class => 'private-key', key_type => 'rsa', %private_key_template });
+	ok $unwrapped;
+}
+
+$public_key->destroy_object;
+$private_key->destroy_object;
 
 done_testing;

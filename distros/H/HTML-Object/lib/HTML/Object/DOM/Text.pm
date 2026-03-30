@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Text.pm
-## Version v0.2.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.1_1
+## Copyright(c) 2024 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2024/04/20
+## Modified 2026/03/29
 ## All rights reserved
 ## 
 ## 
@@ -16,9 +16,10 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::Text HTML::Object::DOM::CharacterData );
     use vars qw( $VERSION );
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.1_1';
 };
 
 use strict;
@@ -88,7 +89,10 @@ sub isTextNode { return(1); }
 # Note: Property
 sub nodeValue : lvalue { return( shift->_set_get_lvalue( 'value', @_ ) ); }
 
-sub parent { return( shift->_set_get_object_without_init( 'parent', 'HTML::Object::DOM::Node', @_ ) ); }
+sub parent { return( shift->_set_get_object_without_init({
+    field  => 'parent',
+    weaken => 1,
+}, 'HTML::Object::DOM::Node', @_ ) ); }
 
 sub replaceWholeText
 {
@@ -118,7 +122,7 @@ sub replaceWholeText
         if( !$self->_is_a( $_ => 'HTML::Object::DOM::Text' ) &&
             !$self->_is_a( $_ => 'HTML::Object::DOM::Space' ) )
         {
-            return;
+            return(1);
         }
         $start--;
     });
@@ -128,7 +132,7 @@ sub replaceWholeText
         if( !$self->_is_a( $_ => 'HTML::Object::DOM::Text' ) &&
             !$self->_is_a( $_ => 'HTML::Object::DOM::Space' ) )
         {
-            return;
+            return(1);
         }
         $last++;
     });
@@ -200,7 +204,7 @@ sub _get_adjacent_nodes
         if( !$self->_is_a( $_ => 'HTML::Object::DOM::Text' ) &&
             !$self->_is_a( $_ => 'HTML::Object::DOM::Space' ) )
         {
-            return;
+            return(1);
         }
         $res->unshift( $_ );
     });
@@ -209,7 +213,7 @@ sub _get_adjacent_nodes
         if( !$self->_is_a( $_ => 'HTML::Object::DOM::Text' ) &&
             !$self->_is_a( $_ => 'HTML::Object::DOM::Space' ) )
         {
-            return;
+            return(1);
         }
         $res->push( $_ );
     });
@@ -234,7 +238,7 @@ HTML::Object::DOM::Text - HTML Object DOM Text Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.1_1
 
 =head1 DESCRIPTION
 

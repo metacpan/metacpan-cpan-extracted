@@ -164,6 +164,7 @@ while( $node = $it->nextNode )
 
 $it = $doc->createTreeWalker( $doc->body, SHOW_COMMENT );
 $node = $it->nextNode;
+diag( $it->error ) if( !defined( $node ) );
 is( $node->nodeValue, ' Some comment here ', 'SHOW_COMMENT' );
 
 done_testing();

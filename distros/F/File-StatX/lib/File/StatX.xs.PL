@@ -1,5 +1,7 @@
-my $output_name = shift;
+use strict;
+use warnings;
 
+my $output_name = shift;
 open my $fh, '>', $output_name;
 
 print $fh <<'END';
@@ -126,22 +128,25 @@ END
 }
 
 my %maybe_methods = (
-	mnt_id                    => 'STATX_MNT_ID',
-	subvol                    => 'STATX_SUBVOL',
-	atomic_write_unit_min     => 'STATX_WRITE_ATOMIC',
-	atomic_write_unit_max     => 'STATX_WRITE_ATOMIC',
-	atomic_write_segments_max => 'STATX_WRITE_ATOMIC',
-	atomic_write_unit_max_opt => 'HAS_WRITE_UNIX_MAX_OPT',
-	dio_mem_align             => 'STATX_DIO_ALIGN',
-	dio_offset_align          => 'STATX_DIO_ALIGN',
-	dio_read_offset_align     => 'STATX_DIO_READ_ALIGN',
+	mnt_id                    => 'MNT_ID',
+	subvol                    => 'SUBVOL',
+	atomic_write_unit_min     => 'WRITE_ATOMIC',
+	atomic_write_unit_max     => 'WRITE_ATOMIC',
+	atomic_write_segments_max => 'WRITE_ATOMIC',
+	atomic_write_unit_max_opt => 'WRITE_ATOMIC',
+	dio_mem_align             => 'DIO_ALIGN',
+	dio_offset_align          => 'DIO_ALIGN',
+	dio_read_offset_align     => 'DIO_READ_ALIGN',
 );
+my %maybe_defines = map { $_ => "STATX_$maybe_methods{$_}" } keys %maybe_methods;
+$maybe_defines{atomic_write_unit_max_opt} = 'HAS_WRITE_UNIX_MAX_OPT';
+
 for my $key (sort keys %maybe_methods) {
 	print $fh <<"END";
 SV* $key(File::StatX self)
 CODE:
-#ifdef STATX_$maybe_methods{$key}
-	if (self->stx_mask & $maybe_methods{$key})
+#ifdef $maybe_defines{$key}
+	if (self->stx_mask & STATX_$maybe_methods{$key})
 		RETVAL = newSVuv(self->stx_$key);
 	else
 #endif
@@ -157,7 +162,7 @@ for my $key (sort @attributes) {
 	print $fh <<"END";
 SV* $key(File::StatX self)
 CODE:
-#ifdef STATX_\U$key\E
+#ifdef STATX_ATTR_\U$key\E
 	if (self->stx_attributes_mask & STATX_ATTR_\U$key\E)
 		RETVAL = newSVbool(self->stx_attributes & STATX_ATTR_\U$key\E);
 	else

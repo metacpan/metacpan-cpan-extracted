@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = tur_numerals();
 
 # }}}
@@ -84,6 +84,55 @@ sub tur_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal            convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Known cardinal words (from parser vocabulary).
+    state $cardinals = { map { $_ => 1 } qw(
+        sıfır bir iki üç dört beş altı yedi sekiz dokuz
+        on yirmi otuz kırk elli altmış yetmiş seksen doksan
+        yüz bin milyon
+    )};
+
+    # Turkish ordinal suffixes (vowel harmony).
+    # After vowel-final stem:     -ncı  -nci  -ncu  -ncü
+    # After consonant-final stem: -ıncı -inci -uncu -üncü
+    # For compound numerals the suffix attaches to the last word only.
+    my @harmony = (
+        [ 'ncı', 'ıncı' ],
+        [ 'nci', 'inci' ],
+        [ 'ncu', 'uncu' ],
+        [ 'ncü', 'üncü' ],
+    );
+
+    for my $pair (@harmony) {
+        my ($short, $long) = @{$pair};
+
+        for my $suffix ($long, $short) {
+            next unless $input =~ /\Q$suffix\E\z/xms;
+            my $candidate = $input =~ s/\Q$suffix\E\z//xmsr;
+            next unless length $candidate;
+
+            # For compounds, extract the last word for validation
+            my ($last_word) = $candidate =~ /(\S+)\z/xms;
+
+            # Reverse consonant softening before lookup
+            my $lookup = $last_word;
+            $lookup =~ s/dörd\z/dört/xms;
+
+            if ( exists $cardinals->{$lookup} ) {
+                $candidate =~ s/dörd\z/dört/xms;
+                return $candidate;
+            }
+        }
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -102,7 +151,7 @@ Lingua::TUR::Word2Num - Word to number conversion in Turkish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::TUR::Word2Num is module for converting Turkish numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -143,6 +192,15 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'beşinci')
+  =>  str    cardinal text (e.g. 'beş')
+      undef  if input is not a recognised ordinal form
+
+Convert Turkish ordinal text to cardinal text by stripping the ordinal
+suffix and reversing consonant softening where applicable.
+
 =item B<tur_numerals> (void)
 
   =>  obj  new parser object
@@ -163,6 +221,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

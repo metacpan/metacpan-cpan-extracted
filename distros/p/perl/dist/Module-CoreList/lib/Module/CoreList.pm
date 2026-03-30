@@ -4,7 +4,7 @@ use strict;
 our ( %released, %version, %families, %upstream, %bug_tracker, %deprecated, %delta );
 
 use version;
-our $VERSION = '5.20260308';
+our $VERSION = '5.20260329_42';
 
 sub PKG_PATTERN () { q#\A[a-zA-Z_][0-9a-zA-Z_]*(?:(::|')[0-9a-zA-Z_]+)*\z# }
 sub _looks_like_invocant ($) { local $@; !!eval { $_[0]->isa(__PACKAGE__) } }
@@ -454,6 +454,8 @@ sub changes_between {
     5.043007 => '2026-01-19',
     5.043008 => '2026-02-20',
     5.042001 => '2026-03-08',
+    5.043009 => '2026-03-20',
+    5.042002 => '2026-03-29',
   );
 
 for my $version ( sort { $a <=> $b } keys %released ) {
@@ -24495,6 +24497,145 @@ for my $version ( sort { $a <=> $b } keys %released ) {
         removed => {
         }
     },
+    5.043009 => {
+        delta_from => 5.043008,
+        changed => {
+            'B'                     => '1.92',
+            'B::Op_private'         => '5.043009',
+            'CPAN::Meta'            => '2.150013',
+            'CPAN::Meta::Converter' => '2.150013',
+            'CPAN::Meta::Feature'   => '2.150013',
+            'CPAN::Meta::History'   => '2.150013',
+            'CPAN::Meta::Merge'     => '2.150013',
+            'CPAN::Meta::Prereqs'   => '2.150013',
+            'CPAN::Meta::Requirements'=> '2.145',
+            'CPAN::Meta::Requirements::Range'=> '2.145',
+            'CPAN::Meta::Spec'      => '2.150013',
+            'CPAN::Meta::Validator' => '2.150013',
+            'Compress::Raw::Bzip2'  => '2.218',
+            'Compress::Raw::Zlib'   => '2.222',
+            'Compress::Zlib'        => '2.219',
+            'Config'                => '5.043009',
+            'Cwd'                   => '3.95',
+            'ExtUtils::CBuilder'    => '0.280243',
+            'ExtUtils::CBuilder::Base'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::Unix'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::VMS'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::Windows'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::Windows::BCC'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::Windows::GCC'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::Windows::MSVC'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::aix'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::android'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::cygwin'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::darwin'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::dec_osf'=> '0.280243',
+            'ExtUtils::CBuilder::Platform::os2'=> '0.280243',
+            'ExtUtils::Command'     => '7.78',
+            'ExtUtils::Command::MM' => '7.78',
+            'ExtUtils::Liblist'     => '7.78',
+            'ExtUtils::Liblist::Kid'=> '7.78',
+            'ExtUtils::MM'          => '7.78',
+            'ExtUtils::MM_AIX'      => '7.78',
+            'ExtUtils::MM_Any'      => '7.78',
+            'ExtUtils::MM_BeOS'     => '7.78',
+            'ExtUtils::MM_Cygwin'   => '7.78',
+            'ExtUtils::MM_DOS'      => '7.78',
+            'ExtUtils::MM_Darwin'   => '7.78',
+            'ExtUtils::MM_MacOS'    => '7.78',
+            'ExtUtils::MM_NW5'      => '7.78',
+            'ExtUtils::MM_OS2'      => '7.78',
+            'ExtUtils::MM_OS390'    => '7.78',
+            'ExtUtils::MM_QNX'      => '7.78',
+            'ExtUtils::MM_UWIN'     => '7.78',
+            'ExtUtils::MM_Unix'     => '7.78',
+            'ExtUtils::MM_VMS'      => '7.78',
+            'ExtUtils::MM_VOS'      => '7.78',
+            'ExtUtils::MM_Win32'    => '7.78',
+            'ExtUtils::MM_Win95'    => '7.78',
+            'ExtUtils::MY'          => '7.78',
+            'ExtUtils::MakeMaker'   => '7.78',
+            'ExtUtils::MakeMaker::Config'=> '7.78',
+            'ExtUtils::MakeMaker::Locale'=> '7.78',
+            'ExtUtils::MakeMaker::version'=> '7.78',
+            'ExtUtils::MakeMaker::version::regex'=> '7.78',
+            'ExtUtils::Mkbootstrap' => '7.78',
+            'ExtUtils::Mksymlists'  => '7.78',
+            'ExtUtils::testlib'     => '7.78',
+            'File::Glob'            => '1.43',
+            'File::Spec'            => '3.95',
+            'File::Spec::AmigaOS'   => '3.95',
+            'File::Spec::Cygwin'    => '3.95',
+            'File::Spec::Epoc'      => '3.95',
+            'File::Spec::Functions' => '3.95',
+            'File::Spec::Mac'       => '3.95',
+            'File::Spec::OS2'       => '3.95',
+            'File::Spec::Unix'      => '3.95',
+            'File::Spec::VMS'       => '3.95',
+            'File::Spec::Win32'     => '3.95',
+            'IO'                    => '1.56',
+            'IO::Compress'          => '2.219',
+            'IO::Compress::Adapter::Bzip2'=> '2.219',
+            'IO::Compress::Adapter::Deflate'=> '2.219',
+            'IO::Compress::Adapter::Identity'=> '2.219',
+            'IO::Compress::Base'    => '2.219',
+            'IO::Compress::Base::Common'=> '2.219',
+            'IO::Compress::Bzip2'   => '2.219',
+            'IO::Compress::Deflate' => '2.219',
+            'IO::Compress::Gzip'    => '2.219',
+            'IO::Compress::Gzip::Constants'=> '2.219',
+            'IO::Compress::RawDeflate'=> '2.219',
+            'IO::Compress::Zip'     => '2.219',
+            'IO::Compress::Zip::Constants'=> '2.219',
+            'IO::Compress::Zlib::Constants'=> '2.219',
+            'IO::Compress::Zlib::Extra'=> '2.219',
+            'IO::Dir'               => '1.56',
+            'IO::File'              => '1.56',
+            'IO::Handle'            => '1.56',
+            'IO::Pipe'              => '1.56',
+            'IO::Seekable'          => '1.56',
+            'IO::Select'            => '1.56',
+            'IO::Socket'            => '1.56',
+            'IO::Socket::INET'      => '1.56',
+            'IO::Socket::UNIX'      => '1.56',
+            'IO::Uncompress::Adapter::Bunzip2'=> '2.219',
+            'IO::Uncompress::Adapter::Identity'=> '2.219',
+            'IO::Uncompress::Adapter::Inflate'=> '2.219',
+            'IO::Uncompress::AnyInflate'=> '2.219',
+            'IO::Uncompress::AnyUncompress'=> '2.219',
+            'IO::Uncompress::Base'  => '2.219',
+            'IO::Uncompress::Bunzip2'=> '2.219',
+            'IO::Uncompress::Gunzip'=> '2.219',
+            'IO::Uncompress::Inflate'=> '2.219',
+            'IO::Uncompress::RawInflate'=> '2.219',
+            'IO::Uncompress::Unzip' => '2.219',
+            'Module::CoreList'      => '5.20260320',
+            'Module::CoreList::Utils'=> '5.20260320',
+            'Opcode'                => '1.71',
+            'POSIX'                 => '2.26',
+            'Parse::CPAN::Meta'     => '2.150013',
+            'Storable'              => '3.40',
+            'XS::APItest'           => '1.50',
+            'feature'               => '2.02',
+            'threads'               => '2.45',
+            'threads::shared'       => '1.73',
+            'warnings'              => '1.78',
+        },
+        removed => {
+        }
+    },
+    5.042002 => {
+        delta_from => 5.042001,
+        changed => {
+            'B::Op_private'         => '5.042002',
+            'Compress::Raw::Zlib'   => '2.222',
+            'Config'                => '5.042002',
+            'Module::CoreList'      => '5.20260329_42',
+            'Module::CoreList::Utils'=> '5.20260329_42',
+        },
+        removed => {
+        }
+    },
 );
 
 sub is_core
@@ -26220,6 +26361,20 @@ sub is_core
     },
     5.042001 => {
         delta_from => 5.042,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.043009 => {
+        delta_from => 5.043008,
+        changed => {
+        },
+        removed => {
+        }
+    },
+    5.042002 => {
+        delta_from => 5.042001,
         changed => {
         },
         removed => {

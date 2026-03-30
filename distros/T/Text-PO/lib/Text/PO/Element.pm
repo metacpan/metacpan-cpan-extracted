@@ -223,6 +223,15 @@ sub msgid_plural_as_string
     return( $self->normalise( 'msgid_plural', $self->{msgid_plural} ) );
 }
 
+sub msgid_plural_as_text 
+{
+    my $self = shift( @_ );
+    # Important to return undef and not an empty string if there is no plural msgid
+    # undef will not be added to the list, but empty string would
+    my $msgid = $self->_is_array( $self->{msgid_plural} ) ? join( '', @{$self->{msgid_plural}} ) : $self->{msgid_plural};
+    return( $msgid );
+}
+
 sub msgstr
 {
     my $self = shift( @_ );
@@ -914,6 +923,10 @@ This returns a simple text representation of the C<msgid>. It differs from L<msg
 =head2 msgid_plural_as_string
 
 Returns the C<msgid> property as a string when it has plural implemented.
+
+=head2 msgid_plural_as_text
+
+This returns a simple text representation of the C<msgid_plural>. It differs from L<msgid_plural_as_string|/msgid_plural_as_string> in that this is simply the string representation of the C<msgid_plural>, but would not be suitable for a PO file.
 
 =head2 msgstr
 

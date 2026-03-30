@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Database Object Interface - ~/lib/DB/Object/Query/Clause.pm
-## Version v1.1.0
-## Copyright(c) 2024 DEGUEST Pte. Ltd.
+## Database Object Interface - ~/lib//mnt/src/perl/DB-Object/lib/DB/Object/Query/Clause.pm
+## Version v1.1.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/08
-## Modified 2026/03/22
+## Modified 2026/03/26
 ## All rights reserved
 ## 
 ## 
@@ -24,7 +24,7 @@ BEGIN
         fallback => 1,
     );
     our $EXCEPTION_CLASS = $DB::Object::EXCEPTION_CLASS;
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -61,7 +61,6 @@ sub as_string
     return( $self->{_cache_clause} ) if( $self->{_cache_clause} && !CORE::length( $self->{_reset} // '' ) );
     CORE::delete( $self->{_reset} );
     my $str = $self->value;
-    # return( $str ) if( !$fields->length );
     return( $self->{_cache_clause} = $str ) if( !length( $str // '' ) || $str !~ /(?<!\%)\%\s\d/ );
     # Stringification of the fields will automatically format them properly, ie with a table prefix, schema prefix, database prefix as necessary
     return( $self->{_cache_clause} = Module::Generic::Scalar->new( CORE::sprintf( $str, @$fields ) ) );
@@ -126,6 +125,8 @@ sub merge
             if( $self->_is_a( $this => [qw( DB::Object::Fields::Overloaded DB::Object::Expression )] ) )
             {
                 push( @clause, $this );
+                # Also transfer any bind element so execute() can find the placeholder types
+                $elems->push( $this ) if( $self->_is_a( $this => 'DB::Object::Fields::Overloaded' ) && $this->placeholder );
                 next;
             }
 
@@ -345,7 +346,7 @@ And the associated values would be automatically bound to the query upon executi
 
 =head1 VERSION
 
-v1.1.0
+v1.1.1
 
 =head1 DESCRIPTION
 

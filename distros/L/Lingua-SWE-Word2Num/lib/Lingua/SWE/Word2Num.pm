@@ -14,7 +14,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser = sv_numerals();
 
 # }}}
@@ -117,6 +117,83 @@ sub sv_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Swedish ordinal→cardinal: reverse lookup for irregular forms,
+    # suffix stripping for regular/compound forms.
+
+    # Fully irregular 1-12
+    my %irregular = (
+        'första'    => 'ett',
+        'andra'     => 'två',
+        'tredje'    => 'tre',
+        'fjärde'    => 'fyra',
+        'femte'     => 'fem',
+        'sjätte'    => 'sex',
+        'sjunde'    => 'sju',
+        'åttonde'   => 'åtta',
+        'nionde'    => 'nio',
+        'tionde'    => 'tio',
+        'elfte'     => 'elva',
+        'tolfte'    => 'tolv',
+    );
+
+    # Teens 13-19 (regular -de suffix on cardinal stem)
+    my %teens = (
+        'trettonde'  => 'tretton',
+        'fjortonde'  => 'fjorton',
+        'femtonde'   => 'femton',
+        'sextonde'   => 'sexton',
+        'sjuttonde'  => 'sjutton',
+        'artonde'    => 'arton',
+        'nittonde'   => 'nitton',
+    );
+
+    # Tens ordinals (-onde/-ionde suffix)
+    my %tens = (
+        'tjugonde'   => 'tjugo',
+        'trettionde' => 'trettio',
+        'fyrtionde'  => 'fyrtio',
+        'femtionde'  => 'femtio',
+        'sextionde'  => 'sextio',
+        'sjuttionde' => 'sjutio',
+        'åttionde'   => 'åttio',
+        'nittionde'  => 'nittio',
+    );
+
+    # Exact match: standalone ordinals
+    return $irregular{$input} if exists $irregular{$input};
+    return $teens{$input}     if exists $teens{$input};
+    return $tens{$input}      if exists $tens{$input};
+
+    # Round hundreds: "hundrade" → "hundra", "tvåhundrade" → "tvåhundra"
+    $input =~ s{hundrade\z}{hundra}xms and return $input;
+
+    # Thousands ordinal: "tusende" → "tusen" (e.g. "etttusende" → "etttusen")
+    $input =~ s{tusende\z}{tusen}xms   and return $input;
+
+    # Compound matching — longest suffix first to avoid partial matches.
+    # E.g. "sjuttionde" (10 chars) must match before "tionde" (6 chars).
+    # Merge all suffix maps, sort by key length descending.
+    my @all_suffixes;
+    push @all_suffixes, map { [ $_, $tens{$_}      ] } keys %tens;
+    push @all_suffixes, map { [ $_, $teens{$_}     ] } keys %teens;
+    push @all_suffixes, map { [ $_, $irregular{$_} ] } keys %irregular;
+
+    for my $pair (sort { length $b->[0] <=> length $a->[0] } @all_suffixes) {
+        my ($ord, $cardinal) = @$pair;
+        if ($input =~ m{\A(.+)\Q$ord\E\z}xms) {
+            return $1 . $cardinal;
+        }
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -126,6 +203,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::SWE::Word2Num - Word to number conversion in Swedish
@@ -133,7 +212,7 @@ Lingua::SWE::Word2Num - Word to number conversion in Swedish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SWE::Word2Num is module for converting text containing number
 representation in svedish back into number. Converts whole numbers from 0 up
@@ -174,6 +253,15 @@ Input text must be encoded in UTF-8.
   =>  undef  if input string is not known
 
 Convert text representation to number.
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'tredje', 'tjugoförsta', 'femtionde')
+  =>  str    cardinal text (e.g. 'tre', 'tjugoett', 'femtio')
+  =>  undef  if input is not a recognized ordinal
+
+Convert Swedish ordinal text to cardinal text (text-level morphological
+transformation, no numbers involved).
 
 =item B<sv_numerals> (void)
 

@@ -87,6 +87,8 @@ subtest 'time' => sub
     isa_ok( $input => 'HTML::Object::DOM::Element::Input' );
     is( $input->value, undef, 'initial value' );
     my $rv = $input->stepDown;
+    ok( $rv, 'stepDown' );
+    diag( "Error with stepDown: ", $input->error ) if( !defined( $rv ) );
     my $val = $input->value;
     # diag( "Possibly error: ", $input->error ) if( !defined( $val ) && $DEBUG );
     is( $val, '17:00:00', 'input->stepDown -> 17:00:00' );

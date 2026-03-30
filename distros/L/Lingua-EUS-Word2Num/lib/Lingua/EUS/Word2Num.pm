@@ -14,7 +14,7 @@ use Export::Attrs;
 use Parse::RecDescent;
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my $parser = eu_numerals();
 
@@ -146,6 +146,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::EUS::Word2Num - Word to number conversion in Basque
@@ -153,7 +155,7 @@ Lingua::EUS::Word2Num - Word to number conversion in Basque
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::EUS::Word2Num is module for converting text containing number
 representation in Basque (Euskara) back into number. Converts whole numbers

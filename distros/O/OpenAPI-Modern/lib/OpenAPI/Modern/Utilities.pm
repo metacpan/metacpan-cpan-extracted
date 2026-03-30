@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 
 use 5.020;
 use strictures 2;
@@ -46,6 +46,8 @@ our @EXPORT_OK = qw(
   uri_encode_strict
   intersect_types
   coerce_primitive
+  is_cookie_name
+  is_cookie_value
 );
 
 our %EXPORT_TAGS = (
@@ -216,6 +218,23 @@ sub coerce_primitive ($dataref, $types = []) {
   $$dataref = ''.$$dataref, return 1 if any { $_ eq 'string' } @$types;
 }
 
+# RFC6265 §3.1 and §4.2.1
+# cookie-header = "Cookie:" OWS cookie-string OWS
+# cookie-string = cookie-pair *( ";" SP cookie-pair )
+# cookie-pair   = cookie-name "=" cookie-value
+# cookie-name   = token (defined in RFC2616 §2.2)
+# cookie-value  = *cookie-octet / ( DQUOTE *cookie-octet DQUOTE )
+# cookie-octet  = %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E ; US-ASCII characters excluding
+#                                   CTLs, whitespace, DQUOTE, comma, semicolon, and backslash
+
+sub is_cookie_name ($name) {
+  !!($name =~ /^[A-Za-z0-9!#\$%&'*+.^_`|~-]+\z/);
+}
+
+sub is_cookie_value ($value) {
+  !!($value =~ /^("?)[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*\1\z/);
+}
+
 {
   # make all bundled schemas available via JSON::Schema::Modern::load_cached_document
   my $share_dir = dist_dir('OpenAPI-Modern');
@@ -238,7 +257,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.131
+version 0.132
 
 =head1 SYNOPSIS
 
@@ -263,6 +282,8 @@ uri_encode
 uri_encode_strict
 intersect_types
 coerce_primitive
+is_cookie_name
+is_cookie_value
 
 The constant values are updated automatically by C<update-schemas>, in the root of this distribution.
 

@@ -93,7 +93,7 @@ My::Module - does something useful
 	use My::Module;
 
 	my $obj = My::Module->new(
-	handler => sub { return shift },
+	    handler => sub { return shift },
 	);
 
 	my $result = $obj->process($data);
@@ -221,13 +221,13 @@ END
 =head1 CONFIGURATION
 
 	my $config = {
-	database => {
-	host => 'localhost',
-	port => 5432,
-	},
-	cache => {
-	ttl => 3600,
-	},
+	    database => {
+	        host => 'localhost',
+	        port => 5432,
+	    },
+	    cache => {
+	        ttl => 3600,
+	    },
 	};
 
 Pass it to the constructor:
@@ -357,7 +357,7 @@ sub remove { }
 Register a handler:
 
 	$reg->register(foo => sub {
-	return 'bar';
+	    return 'bar';
 	});
 
 =item lookup($name)

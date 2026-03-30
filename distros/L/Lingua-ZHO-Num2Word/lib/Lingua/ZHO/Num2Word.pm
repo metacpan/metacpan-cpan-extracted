@@ -4,7 +4,7 @@
 #
 
 package Lingua::ZHO::Num2Word;
-# ABSTRACT: Number 2 word conversion in ZHO.
+# ABSTRACT: Converts numeric values into their Chinese string equivalents
 
 use 5.16.0;
 use utf8;
@@ -19,9 +19,9 @@ use vars qw($Charset @EXPORT_OK);
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
-@EXPORT_OK = 'number_to_zh';
+@EXPORT_OK = ('number_to_zh', 'num2zho_ordinal');
 
 $Charset = 'pinyin';
 
@@ -200,12 +200,31 @@ sub _convert {
 # }}}
 
 
+# {{{ num2zho_ordinal                 convert number to ordinal text
+
+sub num2zho_ordinal {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999_999;
+
+    # Chinese ordinals: 第 (dì) + cardinal in traditional characters
+    my $cardinal = __PACKAGE__->_convert($MAP{'traditional'}, $number);
+
+    return '第' . $cardinal;
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -215,13 +234,15 @@ __END__
 
 # {{{ module documentation
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::ZHO::Num2Word - Converts numeric values into their Chinese string equivalents
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -270,7 +291,20 @@ the C<number_to_zh()> function.
 
 =item number_to_zh
 
+=item num2zho_ordinal
+
+Convert number to ordinal text using traditional Chinese characters.
+Prepends 第 (dì) to the traditional cardinal form.
+Only numbers from interval [1, 999_999_999_999] will be converted.
+
 =item parse
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

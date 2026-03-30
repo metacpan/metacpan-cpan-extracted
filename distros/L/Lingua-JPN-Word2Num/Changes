@@ -1,9 +1,7 @@
 Revision history for Lingua-JPN-Word2Num
 
-0.2603270  2026-03-27
-    - add Sardinian (srd)
-    - add 6 European languages: CYM GLG GLE LTZ MLT OCI
-    - rename all 10 legacy Num2Word modules to canonical namespace
-    - ordinals for 14 languages: CES DAN DEU ENG FIN FRA HUN ITA NLD NOR POL SPA SWE TUR
-    - capabilities infrastructure: introspection + ordinal stub
+0.2603300  2026-03-30
+    - POD coverage + test suite fixes for 61-language Lingua suite
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
+    - add =encoding utf-8 to all POD sections (fixes no_pod_errors kwalitee)
 

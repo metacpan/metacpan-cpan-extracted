@@ -15,7 +15,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ variable declarations
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my  $parser  = bel_numerals();
 
 # }}}
@@ -156,7 +156,7 @@ Lingua::BEL::Word2Num - Word to number conversion in Belarusian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::BEL::Word2Num is module for converting text containing number
 representation in Belarusian back into number. Converts whole numbers

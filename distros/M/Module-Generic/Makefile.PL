@@ -76,6 +76,7 @@ my %WriteMakefileArgs = (
         'URI::Escape'           => '5.09',
         'URI::file'             => '5.09',
         'Wanted'                => 'v0.1.0',
+        'XSLoader'              => '0.31',
     },
     TEST_REQUIRES =>
     {

@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::List );
     use vars qw( $VERSION );
     our $VERSION = 'v0.2.0';
@@ -317,7 +318,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 onchange
 
-An event handler to be called when the change event occurs — that is, when the value of the selected property for a track has changed, due to the track being made active or inactive.
+An event handler to be called when the change event occurs - that is, when the value of the selected property for a track has changed, due to the track being made active or inactive.
 
 Example:
 

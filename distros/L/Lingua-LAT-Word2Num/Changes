@@ -1,0 +1,7 @@
+Revision history for Lingua-LAT-Word2Num
+
+0.2603300  2026-03-30
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
+    - add =encoding utf-8 to all POD sections (fixes no_pod_errors kwalitee)
+    - add 10 languages: AZE HYE HIN KAZ KIR LAT MON SOM UIG YID
+

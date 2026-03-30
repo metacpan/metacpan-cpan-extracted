@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Number 2 word conversion in POL.",
+  "ABSTRACT" => "Perl module for converting numeric values into their Polish equivalents",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -24,9 +24,13 @@ my %WriteMakefileArgs = (
     "vars" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.2603270",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "strict" => 0
+  },
+  "VERSION" => "0.2603300",
   "test" => {
-    "TESTS" => ""
+    "TESTS" => "t/*.t"
   }
 );
 
@@ -34,7 +38,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Export::Attrs" => 0,
+  "Test::More" => 0,
   "lib" => 0,
+  "strict" => 0,
   "utf8" => 0,
   "vars" => 0,
   "warnings" => 0

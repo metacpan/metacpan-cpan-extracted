@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = oci_numerals();
 
 # }}}
@@ -110,6 +110,66 @@ sub oci_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Occitan ordinals 1-10 are fully irregular
+    state $irregular = {
+        'primièr'   => 'un',      'primièra'  => 'un',
+        'segond'    => 'dos',     'segonda'   => 'dos',
+        'tresen'    => 'tres',    'tresena'   => 'tres',
+        'quatren'   => 'quatre',  'quatrena'  => 'quatre',
+        'cinquen'   => 'cinc',    'cinquena'  => 'cinc',
+        'sièisen'   => 'sièis',   'sièisena'  => 'sièis',
+        'seten'     => 'sèt',     'setena'    => 'sèt',
+        'uèchen'    => 'uèch',    'uèchena'   => 'uèch',
+        'nòven'     => 'nòu',     'nòvena'    => 'nòu',
+        'desen'     => 'dètz',    'desena'    => 'dètz',
+    };
+
+    return $irregular->{$input} if exists $irregular->{$input};
+
+    # Regular (11+): cardinal stem + "en" (masc) or "ena" (fem)
+    # Try feminine first (longer suffix)
+    if ($input =~ s{ena\z}{}xms) {
+        _oci_restore_vowel(\$input);
+        return $input;
+    }
+
+    # Masculine: strip "en"
+    $input =~ s{en\z}{}xms or return;
+
+    _oci_restore_vowel(\$input);
+
+    return $input;
+}
+
+# }}}
+# {{{ _oci_restore_vowel                          restore dropped vowel on stem
+
+sub _oci_restore_vowel {
+    my $ref = shift;
+
+    # Occitan drops the final vowel before ordinal suffixes.  The dropped
+    # vowel varies by word, so we restore it based on the stem ending.
+
+    # nòu family: dètz-e-nò→dètz-e-nòu (stem ends in "ò" vowel → need "u")
+    if    ($$ref =~ m{n[oò]\z}xms)               { $$ref .= 'u' }
+    # quatre: vint-e-quatr→vint-e-quatre
+    elsif ($$ref =~ m{tr\z}xms)                   { $$ref .= 'e' }
+    # decades (trenta, quaranta, etc.): trent→trenta, quarant→quaranta
+    elsif ($$ref =~ m{[ae]nt\z}xms)               { $$ref .= 'a' }
+    # mila: mil→mila (Occitan "mila" for 1000)
+    elsif ($$ref =~ m{mil\z}xms)                   { $$ref .= 'a' }
+    # teens ending in -z: onz→onze, dotz→dotze, tretz→tretze, etc.
+    elsif ($$ref =~ m{z\z}xms)                     { $$ref .= 'e' }
+
+    return;
+}
+
+# }}}
 
 1;
 
@@ -127,7 +187,7 @@ Lingua::OCI::Word2Num - Word to number conversion in Occitan
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::OCI::Word2Num is a module for converting text containing number
 representation in Occitan (Languedocien standard) back into number. Converts
@@ -169,6 +229,14 @@ Input text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'primièr', 'segond', 'desen')
+  =>  str    cardinal text (e.g. 'un', 'dos', 'dètz')
+      undef  if input is not recognised as an ordinal
+
+Convert Occitan ordinal text to cardinal text (morphological reversal).
+
 =item B<oci_numerals> (void)
 
   =>  obj  new parser object
@@ -189,6 +257,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

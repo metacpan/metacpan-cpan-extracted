@@ -1,5 +1,6 @@
 Revision history for Lingua-KOR-Word2Num
 
-0.2603270  2026-03-27
-    - fix KOR ZHO BUL Word2Num parsers for large numbers (Galois walk finds)
+0.2603300  2026-03-30
+    - POD coverage + test suite fixes for 61-language Lingua suite
+    - fix ordinal roundtrip for 8 languages + fix SOM/MON cardinal parsers
 

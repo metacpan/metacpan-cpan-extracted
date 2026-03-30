@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use vars qw( @EXPORT_OK %EXPORT_TAGS $VERSION );
     use Exporter qw( import );
     our @EXPORT_OK = qw(
@@ -35,6 +36,7 @@ BEGIN
         div     => [qw( align )],
         dl      => [qw( compact )],
         embed   => [qw( align height name src width )],
+        fencedframe    => [qw( height width )],
         fieldset    => [qw( disabled checkValidity form name reportValidity setCustomValidity validationMessage validity willValidate )],
         form    => [qw(
             accept autocapitalize autocomplete name
@@ -558,7 +560,7 @@ See also L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/AP
 
 =head2 hash
 
-The hash property of the Location interface returns a string containing a '#' followed by the fragment identifier of the URL — the ID on the page that the URL is trying to target.
+The hash property of the Location interface returns a string containing a '#' followed by the fragment identifier of the URL - the ID on the page that the URL is trying to target.
 
 The fragment is not percent-decoded. If the URL does not have a fragment identifier, this property contains an empty string, "". 
 

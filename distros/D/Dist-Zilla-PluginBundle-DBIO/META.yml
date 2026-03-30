@@ -14,15 +14,18 @@ meta-spec:
   version: '1.4'
 name: Dist-Zilla-PluginBundle-DBIO
 provides:
+  Dist::Zilla::Plugin::DBIO::SetCopyrightHolder:
+    file: lib/Dist/Zilla/PluginBundle/DBIO.pm
+    version: '0.900001'
   Dist::Zilla::PluginBundle::DBIO:
     file: lib/Dist/Zilla/PluginBundle/DBIO.pm
-    version: '0.900000'
+    version: '0.900001'
   Pod::Weaver::PluginBundle::DBIO:
     file: lib/Pod/Weaver/PluginBundle/DBIO.pm
-    version: '0.900000'
+    version: '0.900001'
   Pod::Weaver::PluginBundle::DBIO::Heritage:
     file: lib/Pod/Weaver/PluginBundle/DBIO/Heritage.pm
-    version: '0.900000'
+    version: '0.900001'
 requires:
   Dist::Zilla: '6.000'
   Dist::Zilla::Plugin::Bootstrap::lib: '0'
@@ -43,7 +46,7 @@ resources:
   bugtracker: https://github.com/p5-dbio/dbio-dzil/issues
   homepage: https://github.com/p5-dbio/dbio-dzil
   repository: https://github.com/p5-dbio/dbio-dzil.git
-version: '0.900000'
+version: '0.900001'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -60,12 +63,15 @@ x_Dist_Zilla:
       name: Bootstrap::lib
       version: '1.001002'
     -
+      class: Dist::Zilla::Plugin::DBIO::SetCopyrightHolder
+      name: '@DBIO/DBIO::SetCopyrightHolder'
+      version: ~
+    -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
           exclude_filename:
             - CLAUDE.md
-            - LICENSE
             - MANIFEST
             - META.json
             - META.yml
@@ -207,10 +213,6 @@ x_Dist_Zilla:
       name: '@DBIO/MakeMaker'
       version: '6.037'
     -
-      class: Dist::Zilla::Plugin::License
-      name: '@DBIO/License'
-      version: '6.037'
-    -
       class: Dist::Zilla::Plugin::Readme
       name: '@DBIO/Readme'
       version: '6.037'
@@ -311,7 +313,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900000
+          tag: v0.900001
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

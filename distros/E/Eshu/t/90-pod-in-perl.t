@@ -174,7 +174,7 @@ END
 =begin text
 
 	This is preformatted text.
-	Indented more.
+	  Indented more.
 
 =end text
 
@@ -182,7 +182,7 @@ END
 END
 
 	my $got = Eshu->indent_pod($input);
-	is($got, $expected, 'POD with =begin/=end blocks');
+	is($got, $expected, 'POD with =begin/=end blocks preserves relative indent');
 }
 
 # indent_string with lang=pod

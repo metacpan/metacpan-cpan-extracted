@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( Module::Generic );
     use vars qw( $TRUE $FALSE $BASE_CLASS $DEBUG $VERSION );
     use HTML::Object::XPath::Boolean;
@@ -97,7 +98,7 @@ sub value
 sub value_as_number
 {
     my $self = shift( @_ );
-    warnings::warn( "numifying '" . $$self . "' to '" . +$$self . "'\n" ) if( warnings::enabled( $BASE_CLASS ) );
+    warn( "numifying '" . $$self . "' to '" . +$$self . "'\n" ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
     return( +$$self );
 }
 

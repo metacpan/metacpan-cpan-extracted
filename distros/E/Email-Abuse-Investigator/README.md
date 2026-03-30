@@ -2465,6 +2465,27 @@ malformed messages.
 
     # Empty list when no actionable abuse contacts can be determined.
 
+## form\_contacts()
+
+Returns the list of parties that require abuse reports to be submitted via
+a web form rather than (or in addition to) email.  These are providers whose
+`%PROVIDER_ABUSE` entry has a `form` key.  Each hashref contains the form
+URL, instructions on what to paste, instructions on what to upload (if
+applicable), the role, and the discovery note.
+
+Returns a list (not an arrayref) of hashrefs, one per unique form contact,
+in discovery order.  Returns an empty list if no form-only or form-plus-email
+contacts are found.
+
+Each hashref contains:
+
+- `form` (string) -- the URL of the web form
+- `role` (string) -- human-readable role, same format as `abuse_contacts()`
+- `note` (string) -- supporting detail about the provider
+- `form_paste` (string, optional) -- what text to paste into the form
+- `form_upload` (string, optional) -- what file to attach to the form
+- `via` (string) -- always `'provider-table'`
+
 ## report()
 
 Returns a formatted plain-text abuse report.

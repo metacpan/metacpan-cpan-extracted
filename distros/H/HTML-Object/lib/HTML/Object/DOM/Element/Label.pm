@@ -16,6 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     use HTML::Object::DOM::Element::Shared qw( :label );
@@ -59,7 +60,8 @@ sub control
             if( $tag ne 'input' ||
                 ( $tag eq 'input' && lc( $_->attr( 'type' ) // '' ) ne 'hidden' ) )
             {
-                $elem = $_, return;
+                $elem = $_;
+                return(0);
             }
         });
         return( $elem );

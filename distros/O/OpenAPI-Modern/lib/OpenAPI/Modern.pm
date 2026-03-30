@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.130-13-gf11f2ecc
+package OpenAPI::Modern; # git description: v0.131-10-g8c69c5c4
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.131';
+our $VERSION = '0.132';
 
 use 5.020;
 use utf8;
@@ -19,7 +19,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
-use Carp 'croak';
+use Carp qw(carp croak);
 use Safe::Isa;
 use List::Util qw(first pairs);
 use if "$]" < 5.041010, 'List::Util' => 'any';
@@ -29,7 +29,7 @@ use Feature::Compat::Try;
 use Encode 2.89 ();
 use JSON::Schema::Modern;
 use JSON::Schema::Modern::Utilities qw(jsonp unjsonp canonical_uri E abort is_equal true false get_type);
-use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas uri_decode intersect_types coerce_primitive uri_encode);
+use OpenAPI::Modern::Utilities qw(add_vocab_and_default_schemas uri_decode intersect_types coerce_primitive uri_encode uri_encode_strict is_cookie_name is_cookie_value);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::TypeTiny 0.002002;
 use Types::Standard qw(InstanceOf Bool);
@@ -154,10 +154,10 @@ sub validate_request ($self, $request, $options = {}) {
 
         my $valid =
             $param_obj->{in} eq 'path' ? $self->_validate_path_parameter({ %$state, data_path => '/request/uri/path' }, $param_obj, $options->{path_captures})
-          : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter({ %$state, data_path => '/request/uri/query' }, $param_obj, $request->url)
+          : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter({ %$state, data_path => '/request/uri/query' }, $param_obj, $request->url->query->clone)
           : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter({ %$state, data_path => '/request/header' }, $param_obj->{name}, $param_obj, $request->headers)
-          : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, data_path => '/request/header/Cookie' }, $param_obj)
-          : $param_obj->{in} eq 'querystring' ? $self->_validate_querystring_parameter({ %$state, data_path => '/request/uri/query' }, $param_obj, $request->url)
+          : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter({ %$state, data_path => '/request/header/Cookie' }, $param_obj, $request->headers)
+          : $param_obj->{in} eq 'querystring' ? $self->_validate_querystring_parameter({ %$state, data_path => '/request/uri/query' }, $param_obj, $request->url->query->clone)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
     }
@@ -807,7 +807,7 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
   $data = $self->_deserialize_style($data, my $s = { %$state, errors => [] },
     style => $param_obj->{style}//'simple',
     explode => $param_obj->{explode}//false,
-    $param_obj->%{qw(name schema)},
+    $param_obj->%{qw(in name schema)},
   );
 
   if ($s->{errors}->@*) {
@@ -820,56 +820,61 @@ sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
       keyword_path => $state->{keyword_path}.'/schema', depth => $state->{depth}+1 });
 }
 
-sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
-  # parse the query parameters out of uri
-  my $query_params = +{ $uri->query->pairs->@* };
+sub _validate_query_parameter ($self, $state, $param_obj, $params) {
+  croak '$params must be a Mojo::Parameters object' if not $params->$_isa('Mojo::Parameters');
 
-  if (not exists $query_params->{$param_obj->{name}}) {
-    return E({ %$state, keyword => 'required' }, 'missing query parameter: %s', $param_obj->{name})
-      if $param_obj->{required};
+  if (exists $param_obj->{content}) {
+    my $data = $params->param($param_obj->{name});
+    if (not defined $data or ($param_obj->{allowEmptyValue} and not length $data)) {
+      return E({ %$state, keyword => 'required' }, 'missing query parameter: %s', $param_obj->{name})
+        if $param_obj->{required};
+      return 1;
+    }
+
+    return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1,
+      data_path => jsonp($state->{data_path}, $param_obj->{name}) },
+      $param_obj, \$data);
+  }
+
+  # Note that since we already percent-decoded all extracted query components via $params->parse
+  # (called by param, every_param and pairs), we do not do so again here. If the user wishes to
+  # embed delimiter characters (',' or '&') within the value and not have them confused with the
+  # chosen style decoding, they must be escaped first and decoded by the application.
+
+  my $style = $param_obj->{style}//'form';
+  my $explode = $param_obj->{explode} // ($style eq 'form' ? true : false);
+
+  # We put the return value into an array so we can tell the difference between null: (undef) and
+  # the value not existing: (); we cannot check for existence here because different styles use
+  # different parts of the querystring
+  my @result = $self->_deserialize_style($params, my $s = { %$state, errors => [] },
+    style => $style,
+    explode => $explode,
+    allowEmptyValue => $param_obj->{allowEmptyValue}//false,
+    $param_obj->%{qw(in name schema)},
+  );
+
+  if ($s->{errors}->@*) {
+    push $state->{errors}->@*, $s->{errors}->@*;
+    return;
+  }
+
+  if (not @result) {
+    if ($param_obj->{required}) {
+      my @types = $self->_type_in_schema($param_obj->{schema},
+        { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+      return E({ %$state, keyword => 'required' },
+        $style eq 'form' && $explode && @types != 6 && (any { $_ eq 'object' } @types)
+          ? 'missing query parameters'
+          : ('missing query parameter: %s', $param_obj->{name}));
+    }
     return 1;
   }
 
-  $state->{data_path} = jsonp($state->{data_path}, $param_obj->{name});
-  my $data = $query_params->{$param_obj->{name}};
-
-  return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 }, $param_obj, \$data)
-    if exists $param_obj->{content};
-
-  # v3.2.0 §4.12, "Parameter Object -> allowEmptyValue": "If `true`, clients MAY pass a zero-length
-  # string value in place of parameters that would otherwise be omitted entirely, which the server
-  # SHOULD interpret as the parameter being unused."
-  return if $param_obj->{allowEmptyValue}
-    and ($param_obj->{style}//'form') eq 'form'
-    and not length($data);
-
-  # TODO: check 'allowReserved'; difficult to do without access to the raw request string
-
-  # TODO: support different styles.
-  # for now, we only support style=form and do not allow for multiple values per
-  # property (i.e. 'explode' is not checked at all.)
-  # (other possible style values: spaceDelimited, pipeDelimited, deepObject)
-
-  return E({ %$state, keyword => 'style' }, 'only style: form is supported in query parameters')
-    if ($param_obj->{style}//'form') ne 'form';
-
-  my @types = $self->_type_in_schema($param_obj->{schema}, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
-
-  if (any { $_ eq 'string' || $_ eq 'number' || $_ eq 'boolean' || $_ eq 'null' } @types) {
-    return E($state,
-        'cannot deserialize to %s type%s%s', !@types ? 'any' : 'requested', @types > 1 ? 's' : '',
-        @types ? ' ('.join(', ', @types).')' : '')
-      if not coerce_primitive(\$data, \@types);
-  }
-  elsif (any { $_ eq 'array' || $_ eq 'object' } @types) {
-    return E($state, 'deserializing query parameters to arrays or objects is not currently supported');
-  }
-  else {
-    return E($state, 'cannot deserialize to any types');
-  }
-
+  my $data = shift @result;
   $self->_evaluate_subschema(\$data, $param_obj->{schema},
-    { %$state, keyword_path => $state->{keyword_path}.'/schema', depth => $state->{depth}+1 });
+    { %$state, data_path => jsonp($state->{data_path}, $param_obj->{name}),
+      keyword_path => $state->{keyword_path}.'/schema', depth => $state->{depth}+1 });
 }
 
 # validates a header, from either the request or the response
@@ -919,6 +924,7 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
         map s/^\s*//r =~ s/\s*\z//r, $headers->every_header($header_name)->@*),
       '^A-Za-z0-9\-._~:/?#[\]@!$&\'()*+,;='),  # unreserved and reserved
     my $s = { %$state, errors => [] },
+    in => 'header',
     style => $header_obj->{style}//'simple',
     explode => $header_obj->{explode}//false,
     name => $header_name,
@@ -936,17 +942,134 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
       keyword_path => $state->{keyword_path}.'/schema', depth => $state->{depth}+1 });
 }
 
-sub _validate_cookie_parameter ($self, $state, $param_obj, @args) {
-  return E($state, 'cookie parameters not yet supported');
+sub _validate_cookie_parameter ($self, $state, $param_obj, $headers) {
+  croak '$headers must be a Mojo::Headers object' if not $headers->$_isa('Mojo::Headers');
+
+  my $cookie = $headers->every_header('Cookie');
+
+  if (not @$cookie) {
+    return E({ %$state, keyword => 'required' }, 'missing header: Cookie') if $param_obj->{required};
+    return 1;
+  }
+
+  return E($state, 'RFC6265 §5.4: "When the user agent generates an HTTP request, the user agent MUST NOT attach more than one Cookie header field."') if @$cookie > 1;
+
+  my $data = $cookie->[0] =~ s/^\s*|\s*\z//gr;
+
+  # parse into individual cookie parameters as per RFC6265 §4.2.1
+  my @pairs = map [ split /=/, $_, 2 ], split /; /, $data;
+
+  if (my @missing_values = grep !defined $_->[1], @pairs) {
+    ()= E({ %$state, keyword => 'style' }, 'cookie-string "%s" is missing a value', $_->[0])
+      foreach @missing_values;
+    return;
+  }
+
+  if (my @bad_names = map s/"/\\"/gr, grep !is_cookie_name($_), map $_->[0], @pairs) {
+    return E($state, 'invalid cookie name%s: "%s"',
+      @bad_names > 1 ? 's' : '', join '", "', @bad_names);
+  }
+
+  if (my @bad_values = map s/"/\\"/gr, grep !is_cookie_value($_), map $_->[1], @pairs) {
+    return E($state, 'invalid cookie value%s: "%s"',
+      @bad_values > 1 ? 's' : '', join '", "', @bad_values);
+  }
+
+  if (exists $param_obj->{content}) {
+    $data = ((grep +($_->[0] eq $param_obj->{name}), @pairs)[-1]//[])->[1];
+
+    if (not defined $data) {
+      return E({ %$state, keyword => 'required' }, 'missing cookie parameter: %s', $param_obj->{name})
+        if $param_obj->{required};
+      return 1;
+    }
+
+    return $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1,
+      data_path => jsonp($state->{data_path}, $param_obj->{name}) }, $param_obj, \$data);
+  }
+
+  my $style = $param_obj->{style}//'form';
+  my $explode = $param_obj->{explode}//true;
+
+  if ($style eq 'form') {
+    my @types = $self->_type_in_schema($param_obj->{schema},
+      { %$state, data_path => jsonp($state->{data_path}, $param_obj->{name}),
+        keyword_path => $state->{keyword_path}.'/schema' });
+
+    if ($explode and @types != 6 and (any { $_ eq 'object' } @types)) {
+      if (@pairs > 1) {
+        return E({ %$state, data_path => jsonp($state->{data_path}, $param_obj->{name}),
+            keyword => 'style' },
+          'cannot deserialize into an object with style=form, explode=true when multiple cookies are present');
+      }
+
+      # deserialize this entire cookie string as form-style-encoded
+      $data = Mojo::Parameters->new(@pairs ? join('=', $pairs[0]->@*) : ());
+    }
+    else {
+      # find the matching cookie parameter and parse it as form-style-encoded
+      # we construct the object as a string, not as pairs, so any embedded '&' and '=' do not become
+      # encoded
+      my @data = grep +(uri_decode($_->[0]) eq $param_obj->{name}), @pairs;
+      $data = Mojo::Parameters->new(@data ? uri_encode_strict($param_obj->{name}).'='.($data[-1]->[1]//'') : ());
+    }
+  }
+
+  # for style=cookie, we send the entire header string to be parsed
+
+  # We put the return value into an array so we can tell the difference between null: (undef) and
+  # the value not existing: (); we cannot check for existence here because different styles use
+  # different parts of the header string
+  my @result = $self->_deserialize_style(
+    $data,
+    my $s = { %$state, errors => [] },
+    style => $style,
+    explode => $explode,
+    $param_obj->%{qw(in name schema)},
+  );
+
+  if ($s->{errors}->@*) {
+    push $state->{errors}->@*, $s->{errors}->@*;
+    return;
+  }
+
+  if (not @result) {
+    if ($param_obj->{required}) {
+      my @types = $self->_type_in_schema($param_obj->{schema},
+        { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+      return E({ %$state, keyword => 'required' },
+        $style eq 'form' && $explode && @types != 6 && (any { $_ eq 'object' } @types)
+          ? 'missing cookie parameters'
+          : ('missing cookie parameter: %s', $param_obj->{name}));
+    }
+    return 1;
+  }
+
+  $data = shift @result;
+
+  $self->_evaluate_subschema(\$data, $param_obj->{schema},
+    { %$state, data_path => jsonp($state->{data_path}, $param_obj->{name}),
+      keyword_path => $state->{keyword_path}.'/schema', depth => $state->{depth}+1 });
 }
 
-sub _validate_querystring_parameter ($self, $state, $param_obj, $uri) {
-  # note: if something has caused the Mojo::Parameters object to be normalized (e.g. calling
-  # 'pairs'), the raw string value is lost
-  return E({ %$state, keyword => 'required' }, 'missing querystring')
-    if $param_obj->{required} and not length $uri->query->{string};
+sub _validate_querystring_parameter ($self, $state, $param_obj, $params) {
+  die '$params must be a Mojo::Parameters object' if not $params->$_isa('Mojo::Parameters');
 
-  my $content = $uri->query->{string};
+  # note: if something has caused the Mojo::Parameters object to be normalized (e.g. calling
+  # 'pairs'), the raw string value is lost -- we could try stringifying it again, but if the
+  # data is incompatible with application/x-www-form-urlencoded, we may not be able to recover
+  # all the intended data.
+
+  if (not exists $params->{string}) {
+    # $params->clone (done above) will create empty pairs if {string} is missing
+    carp 'request uri querystring has been lost: see L<OpenAPI::Modern/LIMITATIONS> for how to avoid'
+      if exists $params->{pairs} and $params->{pairs}->@*;
+
+    return E({ %$state, keyword => 'required' }, 'missing querystring') if $param_obj->{required};
+    return 1;
+  }
+
+  my $content = $params->{string};
 
   # query parameters are always percent-encoded
   return E($state, 'non-ascii character detected in parameter value: not deserializable')
@@ -954,23 +1077,23 @@ sub _validate_querystring_parameter ($self, $state, $param_obj, $uri) {
 
   # Replace "+" with whitespace, unescape and decode as in Mojo::Parameters::pairs
   # We do not UTF-8-decode the content: this is the responsibility of the media-type decoder.
-
   $self->_validate_parameter_content({ %$state, depth => $state->{depth}+1 },
     $param_obj, \ url_unescape($content =~ s/\+/ /gr));
 }
 
-# data comes in as a string
-# when parsing fails, $state->{errors} is populated;
+# Data comes in as a string, or for some styles as a Mojo::Parameters object.
+# When parsing fails, $state->{errors} is populated and nothing is returned;
 # otherwise, the return value is the fully deserialized data, parsed into the correct type(s)
 # (which may be undef = null; note the difference from () which indicates no data, and possibly an
 # error)
-# %opt is (:$style, :$explode, :$name, :$schema, $strip_internal_ws)
+# %opt is (:$in, :$style, :$explode, :$allowEmptyValue, :$name, :$schema, $strip_internal_ws)
 sub _deserialize_style ($self, $data, $state, %opt) {
   # numbers and builtin bools can be treated as strings, but reject undef and references
-  croak 'only strings can be deserialized' if not defined $data or ref $data;
+  croak 'only strings can be deserialized' if not defined $data
+    or (ref $data and ref $data ne 'Mojo::Parameters');
 
-  my ($style, $explode, $name, $schema, $strip_internal_ws) =
-    @opt{qw(style explode name schema strip_internal_ws)};
+  my ($in, $style, $explode, $allowEmptyValue, $name, $schema, $strip_internal_ws) =
+    @opt{qw(in style explode allowEmptyValue name schema strip_internal_ws)};
 
   my @types = $self->_type_in_schema($schema, { %$state,
       data_path => jsonp($state->{data_path}, $name),
@@ -1118,6 +1241,168 @@ sub _deserialize_style ($self, $data, $state, %opt) {
       return;
     }
   }
+
+  elsif ($style eq 'form') {
+    # $data is a Mojo::Parameters object for this style
+    croak 'form style requires a parameter object' if ref $data ne 'Mojo::Parameters';
+    my $params = $data;
+
+    # if all types are acceptable, fall through to returning string immediately
+
+    if ($explode and @types != 6) {
+      if (any { $_ eq 'array' } @types) {
+        $data = $params->every_param($name);
+        $data = [ grep length, @$data ] if $allowEmptyValue;
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        return @$data ? $data : ();
+      }
+
+      if (any { $_ eq 'object' } @types) {
+        # treat the entire querystring as the hash of keys and values; if duplicate, last entry wins
+        $data = +{ $params->pairs->@* };
+        delete $data->@{grep +(!length $data->{$_}), keys %$data} if $allowEmptyValue;
+        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        return keys %$data ? $data : ();
+      }
+    }
+
+    # single parameter value used for primitives, and for array and object when explode=false
+    # (explode=false is not valid with array, object for cookies)
+    # if the parameter name appears more than once, the last value will be used
+    $data = $params->param($name);
+    return if not defined $data or $allowEmptyValue and not length $data;
+
+    if ($in ne 'cookie' and not $explode and @types != 6 and any { $_ eq 'array' || $_ eq 'object' } @types) {
+      # note: all ',' characters will be seen as delimiters, unless double encoding is done (and an
+      # extra encoding pass done in the application). If this is a problem, switch from
+      # explode=false to explode=true.
+      my @values = split /,/, $data, -1;
+      if (not @values % 2 and any { $_ eq 'object' } @types) {
+        $data = +{ @values };
+        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        return $data;
+      }
+      if (any { $_ eq 'array' } @types) {
+        $data = \@values;
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        return $data;
+      }
+    }
+
+    return $data if @types == 6 or coerce_primitive(\$data, \@types);
+  }
+
+  elsif ($style eq 'spaceDelimited' or $style eq 'pipeDelimited') {
+    croak 'query parameters require a parameter object' if ref $data ne 'Mojo::Parameters';
+
+    return E({ %$state, data_path => jsonp($state->{data_path}, $name), keyword => 'explode' },
+        'explode=true is not supported for style=%s', $style)
+      if $explode;
+
+    return E({ %$state, data_path => jsonp($state->{data_path}, $name) },
+        '%s style can only deserialize to arrays or objects', $style)
+      if not any { $_ eq 'array' || $_ eq 'object' } @types;
+
+    # $data argument is a Mojo::Parameters object for this style
+    $data = $data->param($name);
+    return if not defined $data or $allowEmptyValue and not length $data;
+
+    # we do NOT perform another decoding pass here:
+    # v3.2.0 §E.6 "Percent-Encoding and Illegal or Reserved Delimiters": For maximum
+    # interoperability, it is RECOMMENDED to either define and document an additional escape
+    # convention while percent-encoding the delimiters for these styles [deepObject, pipeDelimited,
+    # and spaceDelimited], or to avoid these styles entirely. The exact method of additional
+    # encoding/escaping is left to the API designer, and is expected to be performed before
+    # serialization and encoding described in this specification, and reversed after this
+    # specification’s encoding and serialization steps are reversed. This keeps it outside of the
+    # processes governed by this specification.
+
+    # if the parameter name appears more than once, the last value will be used
+    my $delimiter = $style eq 'spaceDelimited' ? ' ' : $style eq 'pipeDelimited' ? '\|' : die;
+    my @values = split /$delimiter/, $data, -1;
+
+    if (not @values % 2 and any { $_ eq 'object' } @types) {
+      $data = +{ @values };
+      $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+      return $data;
+    }
+    if (any { $_ eq 'array' } @types) {
+      $data = \@values;
+      $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+      return $data;
+    }
+  }
+
+  elsif ($style eq 'deepObject') {
+    croak 'query parameters require a parameter object' if ref $data ne 'Mojo::Parameters';
+
+    # v3.1.1 4.8.12.2.2: "Note that despite false being the default for deepObject, the combination
+    # of false with deepObject is undefined."
+    # v3.2.0 4.12.2.2: "...when style is "deepObject", [explode] has no effect."
+    return E({ %$state, data_path => jsonp($state->{data_path}, $name), keyword => 'explode' },
+        '"explode" cannot be false with style=deepObject')
+      if not $explode and $self->openapi_document->oas_version < '3.2';
+
+    return E({ %$state, data_path => jsonp($state->{data_path}, $name) },
+        'deepObject style can only deserialize to objects')
+      if not any { $_ eq 'object' } @types;
+
+    # $data is a Mojo::Parameters object for this style
+    croak 'query parameters require a parameter object' if ref $data ne 'Mojo::Parameters';
+    my $params = $data;
+    $data = {};
+    foreach my $pair (pairs $params->pairs->@*) {
+      if ($pair->[0] =~ /^([^\[]*)\[([^\]]*)\]\z/) {
+        # we do NOT perform another decoding pass here: see v3.2.0 §E.6 (as above).
+        $data->{$2} = $pair->[1] if $1 eq $name and (not $allowEmptyValue or length $pair->[1]);
+      }
+    }
+
+    $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+    return keys %$data ? $data : ();
+  }
+
+  elsif ($style eq 'cookie') {
+    # v3.2.0 §4.12.3 "Analogous to form, but following RFC6265 Cookie syntax rules, meaning that
+    # name-value pairs are separated by a semicolon followed by a single space (e.g. n1=v1; n2=v2),
+    # and no percent-encoding or other escaping is applied; data values that require any sort of
+    # escaping MUST be provided in escaped form."
+
+    my @pairs = map [ split /=/, $_, 2 ], split /; /, $data;
+
+    if (my @missing_values = grep !defined $_->[1], @pairs) {
+      ()= E({ %$state, keyword => 'style' }, 'cookie-string "%s" is missing a value', $_->[0])
+        foreach @missing_values;
+      return;
+    }
+
+    # if all types are acceptable, fall through to returning string immediately
+
+    if ($explode and @types != 6) {
+      if (any { $_ eq 'array' } @types) {
+        $data = [ map +($_->[0] eq $name ? $_->[1] : ()), @pairs ];
+        $self->_coerce_array_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        return @$data ? $data : ();
+      }
+
+      if (any { $_ eq 'object' } @types) {
+        # treat the entire header string as the hash of keys and values; if duplicate, last entry wins
+        $data = +{ map @$_, @pairs };
+        $self->_coerce_object_elements($data, $schema, { %$state, keyword_path => $state->{keyword_path}.'/schema' });
+        return keys %$data ? $data : ();
+      }
+    }
+
+    # single parameter value used for primitives; explode=false is not valid with array, object
+    # if the parameter name appears more than once, the last value will be used
+
+    my @every_param = grep +($_->[0] eq $name), @pairs;
+    $data = ($every_param[-1]//[])->[1];
+
+    return if not defined $data;
+    return $data if @types == 6 or coerce_primitive(\$data, \@types);
+  }
+
   else {
     die 'unsupported style ', $style;
   }
@@ -1545,11 +1830,12 @@ sub _evaluate_subschema ($self, $dataref, $schema, $state) {
     my @location = unjsonp($state->{data_path});
     my $location =
         $location[-1] eq 'body' ? join(' ', @location[-2..-1])
-      : $location[-2] eq 'query' ? 'query parameter'  # query
-      : $location[-2] eq 'path' ? 'path parameter'    # this should never happen
-      : $location[-2] eq 'header' ? join(' ', @location[-3..-2])
-      : $location[-1] eq 'query' ? 'query parameter'  # querystring
-      : die 'unknown location';  # cookie TBD
+      : $location[-2] eq 'query' ? 'query parameter'                                # query
+      : $location[-2] eq 'path' ? 'path parameter'                                  # path
+      : $location[-2] eq 'header' ? join(' ', @location[-3..-2])                    # header
+      : $location[-3] eq 'header' && $location[-2] eq 'Cookie' ? 'cookie parameter' # cookie
+      : $location[-1] eq 'query' ? 'query parameter'                                # querystring
+      : die 'unknown location';
     return E($state, '%s not permitted', $location);
   }
 
@@ -1682,7 +1968,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.131
+version 0.132
 
 =head1 SYNOPSIS
 
@@ -1811,6 +2097,7 @@ aims to be but some features are not yet available.
 =for Pod::Coverage BUILDARGS FREEZE THAW
 
 =for stopwords schema jsonSchemaDialect metaschema subschema perlish operationId openapi Mojolicious
+querystring unencoded
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -2172,17 +2459,39 @@ encoding characters that are not canonically required to be encoded according to
 L<RFC3986 §2.1|https://www.rfc-editor.org/rfc/rfc3986#section-2.1>, may result in the message not
 being correctly deserialized nor parameter values correctly extracted.
 
-=head2 Unimplemented sections of the specification
+Caution is advised when using non-default settings with parameters, as certain combinations of
+characters in string data will not serialize well with certain delimiters.  The default settings
+for C<path> and C<query> parameters (C<style: simple> and C<explode: false>, and C<style: form> and
+C<explode: true>, respectively) are safe to use; for C<header> parameters, unencoded C<,> should be
+avoided in arrays and objects, and for C<cookie> parameters, always use C<style: cookie> with
+C<explode: true>.
+
+=head2 Querystring parameters
+
+The use of media-type encoding in C<in: querystring> parameters (see
+L<https://spec.openapis.org/oas/latest#parameter-locations>)
+requires the raw string value of the query portion to be preserved in the request URL; directly
+accessing the URL's query parameters in your application can cause can cause request data to become
+normalized according to C<application/x-www-form-urlencoded> rules and some data may be lost,
+resulting in the data being unparsable for OpenAPI validation. To avoid this, do not
+use these constructs in your Mojolicious application in those situations (instead use the more
+specific C<< $c->req->body_params >> or C<< $c->stash >> to access non-query parameters):
 
 =over 4
 
 =item *
 
-for query parameters, only C<style: form> and C<explode: true> is supported, only the first value of each parameter name is considered, and C<allowEmptyValue> and C<allowReserved> are not checked
+C<param>, C<every_param>, C<params>, C<query_params> on C<< $c->req >>
 
 =item *
 
-cookie parameters are not checked at all yet
+C<param>, C<every_param>, C<params> on C<$c>
+
+=back
+
+=head2 Unimplemented sections of the specification
+
+=over 4
 
 =item *
 

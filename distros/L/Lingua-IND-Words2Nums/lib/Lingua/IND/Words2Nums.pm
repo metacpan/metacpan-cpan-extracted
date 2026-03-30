@@ -1,7 +1,7 @@
 # For Emacs: -*- mode:cperl; eval: (folding-mode 1) -*-
 
 package Lingua::IND::Words2Nums;
-# ABSTRACT: Word 2 number conversion in IND.
+# ABSTRACT: convert Indonesian verbage to number.
 
 use 5.16.0;
 use utf8;
@@ -13,7 +13,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 our %Digits = (
         nol => 0, kosong => 0,
@@ -234,11 +234,29 @@ sub split_it {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Indonesian ordinals: prefix "ke" to cardinal.
+    # Special: "pertama" (1st) → "satu"
+    return 'satu' if $input eq 'pertama';
+
+    # Regular: strip "ke" prefix (e.g. "kedua" → "dua", "ketiga" → "tiga")
+    $input =~ s{\Ake}{}xms and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 __END__
 
 # {{{ module documentation
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -246,7 +264,7 @@ Lingua::IND::Words2Nums - convert Indonesian verbage to number.
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 =head1 SYNOPSIS
 
@@ -307,6 +325,15 @@ private
 =item w2n5
 
 private
+
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =back
 

@@ -109,7 +109,7 @@ See L<https://api.jquery.com/addClass/>
 
 Insert content, specified by the parameter, after each element in the set of matched elements.
 
-L</after> and L</insertAfter> methods perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</after>, the content to be inserted comes from the method's argument: 
+L</after> and L</insertAfter> methods perform the same task. The major difference is in the syntax-specifically, in the placement of the content and target. With L</after>, the content to be inserted comes from the method's argument: 
 
     xq(target)->after( contentToBeInserted );
 
@@ -816,7 +816,7 @@ L<https://api.jquery.com/attr/>
 
 =head2 before
 
-L</before> and L</insertBefore> methods perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</before>, the content to be inserted comes from the method's argument: 
+L</before> and L</insertBefore> methods perform the same task. The major difference is in the syntax-specifically, in the placement of the content and target. With L</before>, the content to be inserted comes from the method's argument: 
 
     xq($target)->before( $contentToBeInserted )
 
@@ -1597,7 +1597,7 @@ if the current object is a collection, all of its elements contained will be ins
 
 If the current object is just an L<HTML::Object::DOM::Element> object, it will be moved (not copied) after the target.
 
-L</after> and L</insertAfter> perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</after>, the object used to call the method is the container after which the content is inserted. While with L</insertAfter>, it is the opposite.
+L</after> and L</insertAfter> perform the same task. The major difference is in the syntax-specifically, in the placement of the content and target. With L</after>, the object used to call the method is the container after which the content is inserted. While with L</insertAfter>, it is the opposite.
 
 For example, consider the following HTML:
 
@@ -1650,7 +1650,7 @@ if the current object is a collection, all of its elements contained will be ins
 
 If the current object is just an L<HTML::Object::DOM::Element> object, it will be moved (not copied) before the target.
 
-L</before> and L</insertBefore> perform the same task. The major difference is in the syntax—specifically, in the placement of the content and target. With L</before>, the object used to call the method is the container before which the content is inserted. While with L</insertBefore>, it is the opposite.
+L</before> and L</insertBefore> perform the same task. The major difference is in the syntax-specifically, in the placement of the content and target. With L</before>, the object used to call the method is the container before which the content is inserted. While with L</insertBefore>, it is the opposite.
 
 For example, consider the following HTML:
 
@@ -1821,7 +1821,7 @@ For example:
 
 Upon error, be it internal, or when the returned http code is not a 2XX code, C<$textStatus> is set to C<error>
 
-If no element is matched by the selector — in this case, if the document does not contain an element with C<id="result"> — the http request will not be sent.
+If no element is matched by the selector - in this case, if the document does not contain an element with C<id="result"> - the http request will not be sent.
 
 It returns the current element object upon success, or upon error, sets an L<error|Module::Generic/error> and returns undef.
 

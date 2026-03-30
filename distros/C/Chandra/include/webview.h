@@ -157,6 +157,36 @@ WEBVIEW_API void webview_exit(struct webview *w);
 WEBVIEW_API void webview_debug(const char *format, ...);
 WEBVIEW_API void webview_print_log(const char *s);
 
+/* ---- System Tray API ---- */
+
+#define WEBVIEW_TRAY_MAX_ITEMS 64
+
+typedef void (*webview_tray_cb)(struct webview *w, int item_id);
+
+struct webview_tray_item {
+  int id;
+  const char *label;
+  int is_separator;
+  int is_disabled;
+  int is_checked;
+  int submenu_count;
+  struct webview_tray_item *submenu;
+};
+
+struct webview_tray {
+  struct webview *w;
+  const char *icon_path;
+  const char *tooltip;
+  webview_tray_cb menu_cb;
+  int item_count;
+  struct webview_tray_item items[WEBVIEW_TRAY_MAX_ITEMS];
+  void *_priv;   /* platform-specific tray handle */
+};
+
+WEBVIEW_API int webview_tray_create(struct webview_tray *t);
+WEBVIEW_API void webview_tray_update(struct webview_tray *t);
+WEBVIEW_API void webview_tray_destroy(struct webview_tray *t);
+
 #ifdef WEBVIEW_IMPLEMENTATION
 #undef WEBVIEW_IMPLEMENTATION
 
@@ -260,6 +290,15 @@ WEBVIEW_API int webview_inject_css(struct webview *w, const char *css) {
 
 #include "webview-cocoa.c"
 
+#endif
+
+/* ---- System Tray platform implementations ---- */
+#if defined(WEBVIEW_GTK)
+#include "webview-tray-gtk.c"
+#elif defined(WEBVIEW_WINAPI)
+#include "webview-tray-win32.c"
+#elif defined(WEBVIEW_COCOA)
+#include "webview-tray-cocoa.c"
 #endif
 
 #endif /* WEBVIEW_IMPLEMENTATION */

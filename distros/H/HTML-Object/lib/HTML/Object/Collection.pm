@@ -16,7 +16,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'HTML::Object' );
     use parent qw( HTML::Object::DOM::Element );
     use vars qw( $VERSION );
     our $VERSION = 'v0.2.0';
@@ -42,7 +42,7 @@ sub init
         # ${"${class}\::ERROR"} = $ex;
         no warnings 'once';
         $HTML::Object::ERROR = $ex;
-        warnings::warn( $ex ) if( warnings::enabled( 'HTML::Object' ) );
+        warn( $ex ) if( $self->_is_warnings_enabled( 'HTML::Object' ) );
     };
     return( $self );
 }
@@ -79,7 +79,10 @@ sub as_string
     }
 }
 
-sub end { return( shift->_set_get_object( 'end', 'HTML::Object::Element', @_ ) ); }
+sub end { return( shift->_set_get_object({
+    field  => 'end',
+    weaken => 1,
+}, 'HTML::Object::Element', @_ ) ); }
 
 # Note: Property
 sub nodeValue { return; }

@@ -9,7 +9,7 @@ use File::Share ':all';
 use XML::LibXML;
 use XML::LibXSLT;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub new {
 	my ($class, @params) = @_;
@@ -18,7 +18,7 @@ sub new {
 	my $self = bless {}, $class;
 
 	# Version of transformation.
-	$self->{'version'} = '2.6.0';
+	$self->{'version'} = '3.0.0';
 
 	# XSLT transformation file.
 	$self->{'xslt_transformation_file'} = undef;
@@ -177,6 +177,10 @@ L<XML::LibXSLT>.
 
 =over
 
+=item L<Biblio::BF2MARC>
+
+Convert BIBFRAME RDF to MARC
+
 =item L<NKC::Transform::MARC2BIBFRAME>
 
 marc2bibframe transformation class.
@@ -216,6 +220,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my $parser   = eng_numerals();
 
@@ -98,6 +98,54 @@ sub eng_numerals {
 
 # }}}
 
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # English ordinals: irregulars, -ieth (tens), regular -th
+    # For compounds like "twenty-first", only the last element is ordinal.
+
+    my %irregular = (
+        'first'    => 'one',
+        'second'   => 'two',
+        'third'    => 'three',
+        'fifth'    => 'five',
+        'eighth'   => 'eight',
+        'ninth'    => 'nine',
+        'twelfth'  => 'twelve',
+    );
+
+    # Compound: "twenty-first" or "twenty first" → convert last word only
+    # Num2Word produces space-separated: "twenty first", "one hundred third"
+    if ($input =~ m{\A (?<prefix>.+) [-\s] (?<last>\S+) \z}xms) {
+        my $prefix = $+{prefix};
+        my $last   = $+{last};
+        my $sep    = ($input =~ m{-}) ? '-' : ' ';
+
+        # Convert the last (ordinal) element to cardinal
+        my $cardinal = ordinal2cardinal($last) // return;
+        return "${prefix}${sep}${cardinal}";
+    }
+
+    # Irregular standalone
+    return $irregular{$input} if exists $irregular{$input};
+
+    # Tens ending in -ieth: twentieth→twenty, thirtieth→thirty, etc.
+    if ($input =~ s{ieth\z}{y}xms) {
+        return $input;
+    }
+
+    # Regular -th: fourteenth→fourteen, hundredth→hundred, etc.
+    if ($input =~ s{th\z}{}xms) {
+        return $input;
+    }
+
+    return;  # not an ordinal
+}
+
+# }}}
+
 1;
 
 __END__
@@ -106,6 +154,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::ENG::Word2Num - Word to number conversion in English
@@ -113,7 +163,7 @@ Lingua::ENG::Word2Num - Word to number conversion in English
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::ENG::Word2Num is module for converting text containing number
 representation in English back into number. Converts whole numbers from 0 up
@@ -155,6 +205,15 @@ Text must be encoded in UTF-8.
 
 Convert text representation to number.
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'first', 'twenty-third', 'fiftieth')
+  =>  str    cardinal text (e.g. 'one', 'twenty-three', 'fifty')
+      undef  if input is not recognised as an ordinal
+
+Convert English ordinal text to cardinal text (morphological reversal).
+Handles irregular forms, -ieth tens, regular -th, and hyphenated compounds.
+
 =item B<eng_numerals> (void)
 
   =>  obj  new parser object
@@ -175,6 +234,8 @@ Internal function.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

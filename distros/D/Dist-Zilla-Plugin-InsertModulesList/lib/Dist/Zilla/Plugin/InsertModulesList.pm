@@ -12,14 +12,18 @@ with (
     },
 );
 
+has include_pm => (is => 'rw');
+
+has include_pod => (is => 'rw');
+
 has ordered => (is => 'rw');
 
 use namespace::autoclean;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-02'; # DATE
+our $DATE = '2026-03-30'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-InsertModulesList'; # DIST
-our $VERSION = '0.031'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 sub munge_files {
     my $self = shift;
@@ -45,12 +49,18 @@ sub _insert_modules_list {
 
     $opts = [split /\s+/, $opts];
 
+    my $include_pm  = $self->include_pm // 1;
+    my $include_pod = $self->include_pod // 1;
+
     my @list0;
     for my $file (@{ $self->found_files }) {
         my $name = $file->name;
         next unless $name =~ s!^lib[/\\]!!;
         $name =~ s![/\\]!::!g;
-        $name =~ s/\.(pm|pod)$//;
+        next unless $name =~ s/\.(pm|pod)$//;
+        my $ext = $1;
+        next if !$include_pm  && $ext eq 'pm';
+        next if !$include_pod && $ext eq 'pod';
         push @list0, $name;
     }
 
@@ -115,7 +125,7 @@ Dist::Zilla::Plugin::InsertModulesList - Insert a POD containing a list of modul
 
 =head1 VERSION
 
-This document describes version 0.031 of Dist::Zilla::Plugin::InsertModulesList (from Perl distribution Dist-Zilla-Plugin-InsertModulesList), released on 2023-03-02.
+This document describes version 0.032 of Dist::Zilla::Plugin::InsertModulesList (from Perl distribution Dist-Zilla-Plugin-InsertModulesList), released on 2026-03-30.
 
 =head1 SYNOPSIS
 
@@ -160,7 +170,8 @@ After build, F<lib/Foo.pm> will contain:
 =head1 DESCRIPTION
 
 This plugin finds C<< # INSERT_MODULES_LIST >> directive in your POD/code and
-replace it with a POD containing list of modules in the distribution.
+replace it with a POD containing list of "modules" (i.e.: C<.pm> and C<.pod>
+files) in the distribution (see L</SYNOPSIS> for sample result).
 
 To exclude a module from the generated list, use:
 
@@ -181,6 +192,14 @@ Excludes and includes can be combined.
 =for Pod::Coverage .+
 
 =head1 CONFIGURATION
+
+=head2 include_pm
+
+Bool, default true. Can be used to exclude C<.pm> files.
+
+=head2 include_pod
+
+Bool, default true. Can be used to exclude C<.pod> files.
 
 =head2 ordered
 
@@ -224,7 +243,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2023, 2019, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

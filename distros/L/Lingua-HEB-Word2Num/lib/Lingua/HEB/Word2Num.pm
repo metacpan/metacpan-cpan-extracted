@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = heb_numerals();
 
 # }}}
@@ -125,6 +125,33 @@ sub heb_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Hebrew ordinal specials (1-10) → cardinal forms expected by w2n parser.
+    # The parser uses masculine construct forms (אחד, שניים, שלושה, etc.)
+    state $specials = {
+        'ראשון'  => 'אחד',        # 1st  → אחד   (parser: 1)
+        'שני'    => 'שניים',       # 2nd  → שניים  (parser: 2)
+        'שלישי'  => 'שלושה',       # 3rd  → שלושה  (parser: 3)
+        'רביעי'  => 'ארבעה',       # 4th  → ארבעה  (parser: 4)
+        'חמישי'  => 'חמישה',       # 5th  → חמישה  (parser: 5)
+        'שישי'   => 'שישה',        # 6th  → שישה   (parser: 6)
+        'שביעי'  => 'שבעה',        # 7th  → שבעה   (parser: 7)
+        'שמיני'  => 'שמונה',       # 8th  → שמונה  (parser: 8)
+        'תשיעי'  => 'תשעה',        # 9th  → תשעה   (parser: 9)
+        'עשירי'  => 'עשרה',        # 10th → עשרה   (parser: 10)
+    };
+
+    return $specials->{$input} if exists $specials->{$input};
+
+    # For 11+, ordinals ARE the cardinal form — return unchanged.
+    return $input;
+}
+
+# }}}
 
 1;
 
@@ -143,7 +170,7 @@ Lingua::HEB::Word2Num - Word to number conversion in Hebrew
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::HEB::Word2Num is module for converting Hebrew numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -189,6 +216,15 @@ You can specify a numeral from interval [0,999_999_999].
   =>  obj  new parser object
 
 Internal parser.
+
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =back
 

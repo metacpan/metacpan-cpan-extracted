@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.2.5
+## Version v1.3.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/03/22
+## Modified 2026/03/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -29,6 +29,7 @@ BEGIN
     $PARSE_DATE_DOTTED_ONLY_EU_RE $PARSE_DATE_ROMAN_RE $PARSE_DATE_DIGITS_ONLY_RE
     $PARSE_DATE_ONLY_JP_RE $PARSE_DATETIME_JP_RE $PARSE_DATE_TIMESTAMP_RE 
     $PARSE_DATETIME_RELATIVE_RE $PARSE_DATES_ALL_RE $PARSE_DATE_NON_STDANDARD2_RE
+    $XS_LOADED
     );
     use utf8;
     use B ();
@@ -47,6 +48,7 @@ BEGIN
     # To get some context on what the caller expect. This is used in our error() method to allow chaining without breaking
     use version;
     use Wanted;
+    use XSLoader;
     use Exporter ();
     our @ISA         = qw( Exporter );
     our @EXPORT      = qw( );
@@ -100,8 +102,29 @@ BEGIN
         (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
         )
     )/;
-    our $VERSION     = 'v1.2.5';
+    our $XS_LOADED = 0;
+    our $VERSION   = 'v1.3.0';
 };
+
+# Load the XS shared library (Generic.so) which provides faster implementations of
+# some methods like _is_object, _is_array, _is_hash, _obj2h and _refaddr.
+# The same .so is also loaded by Module::Generic::File::Magic when needed.
+#
+# $XS_LOADED is set to 1 on success so that Module::Generic::File::Magic,
+# which shares the same .so, can skip its own XSLoader::load call and avoid
+# the "subroutine redefined" warnings that a double bootstrap causes.
+#
+# NOTE: If the .so fails to load, the pure-Perl implementations defined later
+# in this file serve as fallback, so pure-Perl installs remain fully functional, and
+# $XS_LOADED remains 0.
+{
+    local $@;
+    eval
+    {
+        XSLoader::load( 'Module::Generic', $Module::Generic::VERSION );
+        $XS_LOADED = 1;
+    };
+}
 
 use v5.26.1;
 use utf8;
@@ -2842,22 +2865,6 @@ sub _can
     }
 }
 
-sub _get_args_as_array
-{
-    my $self = shift( @_ );
-    return( [] ) if( !scalar( @_ ) );
-    my $ref = [];
-    if( scalar( @_ ) == 1 && $self->_is_array( $_[0] ) )
-    {
-        $ref = shift( @_ );
-    }
-    else
-    {
-        $ref = [ @_ ];
-    }
-    return( $ref );
-}
-
 sub _get_args_as_hash
 {
     my $self = shift( @_ );
@@ -2993,17 +3000,6 @@ sub _is_a
     }
 }
 
-# UNIVERSAL::isa works for both array or array as objects
-# sub _is_array { return( UNIVERSAL::isa( $_[1], 'ARRAY' ) ); }
-sub _is_array
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) );
-    my $type = Scalar::Util::reftype( $_[1] );
-    return(0) if( !defined( $type ) );
-    return( $type eq 'ARRAY' );
-}
-
 sub _is_class_loadable
 {
     my $self = shift( @_ );
@@ -3113,48 +3109,6 @@ sub _is_class_loaded
     return(0);
 }
 
-sub _is_code
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) );
-    my $type = ref( $_[1] );
-    return(0) if( !defined( $type ) );
-    return( $type eq 'CODE' );
-}
-
-sub _is_glob
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) );
-    my $type = Scalar::Util::reftype( $_[1] );
-    return(0) if( !defined( $type ) );
-    return( $type eq 'GLOB' );
-}
-
-sub _is_hash
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) );
-    my $type;
-    if( @_ > 2 && defined( $_[2] ) && $_[2] eq 'strict' )
-    {
-        $type = ref( $_[1] );
-    }
-    else
-    {
-        $type = Scalar::Util::reftype( $_[1] );
-    }
-    return(0) if( !defined( $type ) );
-    return( $type eq 'HASH' );
-}
-
-sub _is_integer
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
-    return( $_[1] =~ /^[\+\-]?\d+$/ ? 1 : 0 );
-}
-
 sub _is_ip
 {
     my $self = shift( @_ );
@@ -3170,46 +3124,9 @@ sub _is_ip
     return( $ip =~ /^$ip4or6$/ ? 1 : 0 );
 }
 
-sub _is_number
-{
-    return(0) if( scalar( @_ < 2 ) );
-    my( $self, $v ) = @_;
-
-    return(0) unless( defined( $v ) );
-    return(0) if( ref( $v ) );
-
-    # Accept only scalars that actually carry numeric flags.
-    # JSON marks numbers with IOK/NOK; plain strings (even "12") will not have them.
-    my $sv    = B::svref_2object( \$v );
-    my $flags = $sv->FLAGS;
-
-    local $@;
-    # SVf_IOK = 0x02000000, SVf_NOK = 0x04000000 on most builds;
-    # we do not hardcode constants-B::SV’s FLAGS is stable to test with these bitmasks.
-    # Use string eval to avoid importing platform-specific constants.
-    my $SVf_IOK = eval{ B::SVf_IOK() } || 0x02000000;
-    my $SVf_NOK = eval{ B::SVf_NOK() } || 0x04000000;
-
-    return( ( $flags & ( $SVf_IOK | $SVf_NOK ) ) ? 1 : 0 );
-}
-
-sub _is_object
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) );
-    return( Scalar::Util::blessed( $_[1] ) );
-}
-
-sub _is_scalar
-{
-    return(0) if( scalar( @_ < 2 ) );
-    return(0) if( !defined( $_[1] ) );
-    return( ( Scalar::Util::reftype( $_[1] ) // '' ) eq 'SCALAR' );
-}
-
 sub _is_uuid
 {
-    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( scalar( @_ ) < 2 );
     return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
     return( $_[1] =~ /^[a-fA-F0-9]{8}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{4}\-[a-fA-F0-9]{12}$/ ? 1 : 0 );
 }
@@ -3230,7 +3147,7 @@ sub _load_class
     #$self->__message( 112, "Using the parameters to load class $class: ", sub{ $self->dump( $opts ) } );
 
     # Validate options
-    my %valid_opts = map{ $_ => 1 } qw( caller version no_import force );
+    my %valid_opts = map{ $_ => 1 } qw( caller force no_import no_warning version );
     foreach my $key ( keys( %$opts ) )
     {
         return( $self->error( "Invalid option: $key" ) ) unless ( exists( $valid_opts{ $key } ) );
@@ -3318,7 +3235,7 @@ sub _load_classes
 
 sub _look_like_number
 {
-    return(0) if( scalar( @_ < 2 ) );
+    return(0) if( scalar( @_ ) < 2 );
     my( $self, $num ) = @_;
     return(0) if( !defined( $num ) || !length( $num ) );
     if( my $isok = Scalar::Util::looks_like_number( $num ) )
@@ -3716,49 +3633,6 @@ sub __messagef
     return(1);
 }
 
-sub _obj2h
-{
-    my $self = shift( @_ );
-    # The method that called message was itself called using the package name like My::Package->some_method
-    # We are going to check if global $DEBUG or $VERBOSE variables are set and create the related debug and verbose entry into the hash we return
-    no strict 'refs';
-    if( !ref( $self ) )
-    {
-        my $class = $self;
-        my $hash =
-        {
-            debug   => ${ "${class}\::DEBUG" },
-            verbose => ${ "${class}\::VERBOSE" },
-            error   => ${ "${class}\::ERROR" },
-        };
-        return( bless( $hash => $class ) );
-    }
-    elsif( ( Scalar::Util::reftype( $self ) // '' ) eq 'HASH' )
-    {
-        return( $self );
-    }
-    elsif( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' )
-    {
-        if( ref( *$self ) eq 'HASH' )
-        {
-            return( *$self );
-        }
-        else
-        {
-            return( \%{*$self} );
-        }
-    }
-    # Because object may be accessed as My::Package->method or My::Package::method
-    # there is not always an object available, so we need to fake it to avoid error
-    # This is primarly itended for generic methods error(), errstr() to work under any conditions.
-    else
-    {
-        return( {} );
-    }
-}
-
-sub _refaddr { return( Scalar::Util::refaddr( $_[1] ) ); }
-
 sub _set_get
 {
     my $self  = shift( @_ );
@@ -3991,6 +3865,8 @@ sub _set_get_array_as_object : lvalue
                     }
                 }
             }
+            # If we are required to weaken the reference, and this is an object, and it is not already weakened, then we weaken it now.
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
 
             if( $def->{wantlist} && $ctx->{list} )
             {
@@ -4097,6 +3973,7 @@ sub _set_get_array_as_object : lvalue
                     }
                 }
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
 
             if( $def->{wantlist} && $ctx->{list} )
             {
@@ -4215,6 +4092,7 @@ sub _set_get_boolean : lvalue
                     $data->{ $field } = $$val ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
                 }
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -4403,6 +4281,7 @@ sub _set_get_boolean : lvalue
                     $data->{ $field } = $val ? Module::Generic::Boolean->true : Module::Generic::Boolean->false;
                 }
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -4708,6 +4587,7 @@ sub _set_get_class
         return;
     }
 
+    my $weaken = CORE::delete( $def->{weaken} );
     $self->__message( 112, "Creating class for field $field with definition -> ", sub{ $self->Module::Generic::dump( $def ) } );
     my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
 
@@ -4729,6 +4609,7 @@ sub _set_get_class
         $o->debug( $self->debug ) if( $o && $o->can( 'debug' ) );
         $data->{ $field } = $o;
     }
+    Scalar::Util::weaken( $data->{ $field } ) if( $weaken && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
     return( $data->{ $field } );
 }
 
@@ -4746,6 +4627,7 @@ sub _set_get_class_array
     }
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
     my $class = $self->__create_class( $field, $def ) || die( "Failed to create the dynamic class for field \"$field\".\n" );
+    my $weaken = CORE::delete( $def->{weaken} );
     # return( $self->_set_get_object_array( $field, $class, @_ ) );
     if( @_ )
     {
@@ -4761,6 +4643,7 @@ sub _set_get_class_array
             my $o = $self->__instantiate_object( $field, $class, $ref->[$i] ) || return( $self->pass_error );
             # If an error occurred, we report it to the caller and do not add it, since even if we did add it, it would be undef, because no object would have been created.
             # And the caller needs to know there has been some errors
+            Scalar::Util::weaken( $o ) if( $weaken && $self->_is_object( $o ) && !Scalar::Util::isweak( $o ) );
             CORE::push( @$arr, $o );
         }
         $data->{ $field } = $arr;
@@ -4791,7 +4674,7 @@ sub _set_get_code : lvalue
             $field = undef;
         }
     }
-    $opts->{undef_ok} //= 0;
+    $opts->{undef_ok}     //= 0;
     $opts->{return_undef} //= 0;
 
     return( $self->_set_get_callback({
@@ -4806,6 +4689,7 @@ sub _set_get_code : lvalue
             {
                 return( sub{} );
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $opts->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -4829,6 +4713,7 @@ sub _set_get_code : lvalue
             {
                 return( sub{} );
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $opts->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -4877,6 +4762,7 @@ sub _set_get_file : lvalue
                 $data->{ $field } = Module::Generic::File->new( $data->{ $field } . '' ) ||
                     return( $self->error( Module::Generic::File->error ) );
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } )
         },
         set => sub
@@ -4942,6 +4828,7 @@ sub _set_get_file : lvalue
                     $data->{ $field } = $rv;
                 }
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -4982,6 +4869,7 @@ sub _set_get_glob : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_glob( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -5044,6 +4932,7 @@ sub _set_get_glob : lvalue
                 }
             }
 
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_glob( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -5084,6 +4973,7 @@ sub _set_get_hash : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -5158,6 +5048,7 @@ sub _set_get_hash : lvalue
                     $data->{ $field } = $rv;
                 }
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -5226,6 +5117,7 @@ sub _set_get_hash_as_mix_object : lvalue
                 my $o = Module::Generic::Hash->new( $data->{ $field } );
                 $data->{ $field } = $o;
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $opts->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -5361,6 +5253,7 @@ sub _set_get_hash_as_mix_object : lvalue
                     $data->{ $field } = $rv;
                 }
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $opts->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -5485,9 +5378,16 @@ sub _set_get_ip : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
-            my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
-                ? $data->{ $field }
-                : $self->new_scalar( $data->{ $field } );
+            my $v;
+            if( $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' ) )
+            {
+                $v = $data->{ $field };
+            }
+            else
+            {
+                $v = $data->{ $field } = $self->new_scalar( $data->{ $field } );
+            }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             if( !$v->defined )
             {
                 return;
@@ -5531,9 +5431,14 @@ sub _set_get_ip : lvalue
             }
             $data->{ $field } = $self->new_scalar( $v );
 
-            $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
-                ? $data->{ $field }
-                : $self->new_scalar( $data->{ $field } );
+            if( $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' ) )
+            {
+                $v = $data->{ $field };
+            }
+            else
+            {
+                $v = $data->{ $field } = $self->new_scalar( $data->{ $field } );
+            }
             $self->clear_error;
 
             if( scalar( keys( %$callbacks ) ) && 
@@ -5568,17 +5473,18 @@ sub _set_get_ip : lvalue
                     $data->{ $field } = $v;
                 }
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
 
-            if( defined( $v ) && 
-                Scalar::Util::blessed( $v ) && 
-                $v->can( 'defined' ) && 
-                !$v->defined )
+            if( defined( $data->{ $field } ) && 
+                Scalar::Util::blessed( $data->{ $field } ) && 
+                $data->{ $field }->can( 'defined' ) && 
+                !$data->{ $field }->defined )
             {
                 return;
             }
             else
             {
-                return( $v );
+                return( $data->{ $field } );
             }
         },
         field => $field,
@@ -5985,6 +5891,7 @@ sub _set_get_number : lvalue
                 my $v = Module::Generic::Number->new( $data->{ $field } );
                 $data->{ $field } = $v if( defined( $v ) );
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $opts->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -6045,6 +5952,7 @@ sub _set_get_number : lvalue
                 my $v = Module::Generic::Number->new( $data->{ $field } );
                 $data->{ $field } = $v if( defined( $v ) );
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $opts->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             $self->clear_error;
             return( $data->{ $field } );
         },
@@ -6123,6 +6031,7 @@ sub _set_get_number_as_scalar : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -6152,6 +6061,7 @@ sub _set_get_number_as_scalar : lvalue
             $data->{ $field } = $v;
             $do_callback->();
 
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             $self->clear_error;
             return( $data->{ $field } );
         },
@@ -6364,6 +6274,7 @@ sub _set_get_object
             return( $o );
         }        
     }
+    Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
     return( $data->{ $field } );
 }
 
@@ -6464,6 +6375,7 @@ sub _set_get_object_array
     {
         $data->{ $field } = $process->( $data->{ $field } ) || return( $self->pass_error );
     }
+    Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
     return( $data->{ $field } );
 }
 
@@ -6563,6 +6475,7 @@ sub _set_get_object_array_object
     {
         $data->{ $field } = $process->( CORE::defined( $data->{ $field } ) ? $data->{ $field } : () );
     }
+    Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
     return( $data->{ $field } );
 }
 
@@ -6647,6 +6560,7 @@ sub _set_get_object_array2
                     $o = $self->_instantiate_object( { field => $field, ( defined( $callback ) ? ( callback => $callback ) : () ) }, $class );
                 }
                 return( $self->error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
+                Scalar::Util::weaken( $o ) if( $def->{weaken} && $self->_is_object( $o ) && !Scalar::Util::isweak( $o ) );
                 # $o->{_parent} = $self->{_parent};
                 push( @$arr, $o );
             }
@@ -6684,9 +6598,9 @@ sub _set_get_object_lvalue : lvalue
             $field = undef;
         }
         # Should have been 'callbacks', but we catch it anyway.
-        $callbacks = $def->{callback} if( CORE::exists( $def->{callback} ) && ref( $def->{callback} ) eq 'HASH' );
+        $callbacks = $def->{callback}  if( CORE::exists( $def->{callback} )  && ref( $def->{callback} )  eq 'HASH' );
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
-        $check = $def->{check} if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
+        $check     = $def->{check}     if( CORE::exists( $def->{check} )     && ref( $def->{check} )     eq 'CODE' );
     }
 
     return( $self->_set_get_callback({
@@ -6694,6 +6608,7 @@ sub _set_get_object_lvalue : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -6773,6 +6688,7 @@ sub _set_get_object_lvalue : lvalue
             # we would return our object as coded below, and that object will be assigned the
             # very value we will have passed in assignment !
             return( $data->{__dummy} = 'dummy' ) if( $ctx->{assign} );
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -6853,6 +6769,7 @@ sub _set_get_object_variant
         $data->{ $field } = $process->( @_ ) || return( $self->pass_error );
         $self->clear_error;
     }
+    Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
     return( $data->{ $field } );
 }
 
@@ -7035,6 +6952,7 @@ sub _set_get_object_without_init
             # Update with callback’s result if defined
             $data->{ $field } = $rv;
         }
+        Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
         $self->clear_error;
     }
 
@@ -7050,7 +6968,9 @@ sub _set_get_object_without_init
             $v = $callbacks->{get}->( $self, $v );
         }
         $self->__message( 112, "Returning property '$field' value -> '", $self->_str_val( $v // 'undef' ), "'" );
-        return( $v );
+        $data->{ $field } = $v;
+        Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
+        return( $data->{ $field } );
     }
     # If nothing has been set for this field, ie no object, but we are called in chain, this will fail on purpose.
     # To avoid this, use _set_get_object
@@ -7099,6 +7019,8 @@ sub _set_get_scalar : lvalue
                 $v = $callbacks->{get}->( $self, $v );
             }
             $self->__message( 112, "Returning property '$field' value -> '", $self->_str_val( $v // 'undef' ), "'" );
+            $data->{ $field } = $v;
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $v );
         },
         set => sub
@@ -7160,6 +7082,7 @@ sub _set_get_scalar : lvalue
                 $data->{ $field } = $rv;
             }
             $self->__message( 106, "Returning field '$field' value '", ( $data->{ $field } // 'undef' ), "'." );
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -7244,6 +7167,7 @@ sub _set_get_scalar_as_object : lvalue
                     return( $self->pass_error( Module::Generic::Scalar->error ) );
                 }
             }
+            my $is_weak = Scalar::Util::isweak( $data->{ $field } ) ? 1 : 0;
             my $v = $data->{ $field };
             # If we have a callback, call it and get the resulting value
             if( scalar( keys( %$callbacks ) ) && 
@@ -7251,6 +7175,8 @@ sub _set_get_scalar_as_object : lvalue
                 ref( $callbacks->{get} ) eq 'CODE' )
             {
                 $v = $callbacks->{get}->( $self, $v );
+                # Did the callback return a weak reference; if so, we respect it
+                $is_weak = Scalar::Util::isweak( $v ) ? 1 : 0;
             }
 
             if( !$self->_is_a( $v => 'Module::Generic::Scalar' ) )
@@ -7264,16 +7190,25 @@ sub _set_get_scalar_as_object : lvalue
                     warn( Module::Generic::Scalar->error );
                     return( $self->pass_error( Module::Generic::Scalar->error ) );
                 }
+                $data->{ $field } = $v;
+                Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
+            }
+            else
+            {
+                $data->{ $field } = $v;
+                # We weaken the reference if the original value was weak, or if we are instructed to make it weak.
+                Scalar::Util::weaken( $data->{ $field } ) if( ( $def->{weaken} || $is_weak ) && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             }
 
-            if( !CORE::defined( $v ) || !$v->defined )
+            # We avoid copying the reference, as it would make it a strong reference
+            if( !CORE::defined( $data->{ $field } ) || !$data->{ $field }->defined )
             {
                 # We might have need to specify, because I found a race condition where
                 # even though the context is object, once in Null, the context became 'code'
                 # return( Module::Generic::Null->new( wants => 'OBJECT' ) );
-                if( $ctx->{object} && CORE::defined( $v ) )
+                if( $ctx->{object} && CORE::defined( $data->{ $field } ) )
                 {
-                    return( $v );
+                    return( $data->{ $field } );
                 }
                 else
                 {
@@ -7282,7 +7217,7 @@ sub _set_get_scalar_as_object : lvalue
             }
             else
             {
-                return( $v );
+                return( $data->{ $field } );
             }
         },
         set => sub
@@ -7331,9 +7266,9 @@ sub _set_get_scalar_as_object : lvalue
 
             my $o = $data->{ $field };
             # $self->__message( 112, "Got here for value '", $self->_str_val( $val // 'undef' ), "' and current value '", $self->_str_val( $o // 'undef' ), "'" );
-            if( ref( $o ) )
+            if( ref( $data->{ $field } ) )
             {
-                $o->set( $val );
+                $data->{ $field }->set( $val );
             }
             else
             {
@@ -7402,16 +7337,16 @@ sub _set_get_scalar_as_object : lvalue
                 $self->__message( 104, "After Module::Generic::Scalar object instantiation, \$data->{ $field } is now '", $self->_str_val( $data->{ $field } ). "' (", ( $data->{ $field } // 'undef' ), ")." );
             }
 
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             $self->__message( 104, "\$data->{ $field } is now '", $self->_str_val( $data->{ $field } ), "'" );
-            my $v = $data->{ $field };
-            if( !$v->defined )
+            if( !$data->{ $field }->defined )
             {
                 # We might have need to specify, because I found a race condition where
                 # even though the context is object, once in Null, the context became 'code'
                 # return( Module::Generic::Null->new( wants => 'OBJECT' ) );
                 if( $ctx->{object} )
                 {
-                    return( $v );
+                    return( $data->{ $field } );
                 }
                 else
                 {
@@ -7420,7 +7355,7 @@ sub _set_get_scalar_as_object : lvalue
             }
             else
             {
-                return( $v );
+                return( $data->{ $field } );
             }
         },
         field => $field,
@@ -7470,6 +7405,7 @@ sub _set_get_scalar_or_object
         my $null = Module::Generic::Null->new({ debug => $this->{debug}, has_error => 1 });
         rreturn( $null );
     }
+    Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && defined( $data->{ $field } ) && ref( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
     return( $data->{ $field } );
 }
 
@@ -7483,9 +7419,10 @@ sub _set_get_uri : lvalue
     my $uri_class = 'URI';
     my $callbacks = {};
     my $check;
+    my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = $field;
+        $def = $field;
         if( CORE::exists( $def->{field} ) && 
             defined( $def->{field} ) && 
             CORE::length( $def->{field} ) )
@@ -7515,6 +7452,7 @@ sub _set_get_uri : lvalue
                 # Force stringification if this is an overloaded value
                 $data->{ $field } = $uri_class->new( $data->{ $field } . '' );
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -7608,6 +7546,7 @@ sub _set_get_uri : lvalue
                 }
             }
 
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -7647,16 +7586,18 @@ sub _set_get_uuid : lvalue
         {
             my $self = shift( @_ );
             return( $self->error( "No field name was provided." ) ) if( !defined( $field ) );
-            my $v = $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' )
-                ? $data->{ $field }
-                : $self->new_scalar( $data->{ $field } );
-            if( !$v->defined )
+            unless( $self->_is_a( $data->{ $field }, 'Module::Generic::Scalar' ) )
+            {
+                $data->{ $field } = $self->new_scalar( $data->{ $field } );
+            }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
+            if( !$data->{ $field }->defined )
             {
                 return;
             }
             else
             {
-                return( $v );
+                return( $data->{ $field } );
             }
         },
         set => sub
@@ -7675,7 +7616,7 @@ sub _set_get_uuid : lvalue
             {
                 return( $self->error( "Value provided is not a valid uuid." ) );
             }
-            $v = $data->{ $field } = $self->new_scalar( $v );
+            $data->{ $field } = $self->new_scalar( $v );
             $self->clear_error;
 
             if( scalar( keys( %$callbacks ) ) && 
@@ -7709,13 +7650,14 @@ sub _set_get_uuid : lvalue
                 }
             }
 
-            if( !$v->defined )
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
+            if( !$data->{ $field }->defined )
             {
                 return;
             }
             else
             {
-                return( $v );
+                return( $data->{ $field } );
             }
         },
         field => $field,
@@ -7732,9 +7674,10 @@ sub _set_get_version : lvalue
     my $version_class = 'version';
     my $callbacks = {};
     my $check;
+    my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = $field;
+        $def = $field;
         if( CORE::exists( $def->{field} ) && 
             defined( $def->{field} ) && 
             CORE::length( $def->{field} ) )
@@ -7765,22 +7708,23 @@ sub _set_get_version : lvalue
             }
             else
             {
-                my $v = $data->{ $field };
-                if( CORE::length( "$v" ) &&
-                    !$self->_is_a( $v => $version_class ) )
+                if( CORE::length( "$data->{ $field }" ) &&
+                    !$self->_is_a( $data->{ $field } => $version_class ) )
                 {
                     # try-catch
                     local $@;
-                    eval
+                    my $v = eval
                     {
-                        $v = $version_class->can( 'parse' ) ? $version_class->parse( "$v" ) : $version_class->new( "$v" );
+                        $version_class->can( 'parse' ) ? $version_class->parse( "$data->{ $field }" ) : $version_class->new( "$data->{ $field }" );
                     };
                     if( $@ )
                     {
                         warn( "Value set for property '${field}' is not a valid version: $@\n" );
                     }
+                    $data->{ $field } = $v;
                 }
-                return( $v );
+                Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
+                return( $data->{ $field } );
             }
         },
         set => sub
@@ -7881,21 +7825,22 @@ sub _set_get_version : lvalue
             }
             else
             {
-                my $v = $data->{ $field };
-                if( CORE::length( "$v" ) &&
-                    !$self->_is_a( $v => $version_class ) )
+                if( CORE::length( "$data->{ $field }" ) &&
+                    !$self->_is_a( $data->{ $field } => $version_class ) )
                 {
                     # try-catch
                     local $@;
-                    eval
+                    my $v = eval
                     {
-                        $v = $version_class->can( 'parse' ) ? $version_class->parse( "$v" ) : $version_class->new( "$v" );
+                        $version_class->can( 'parse' ) ? $version_class->parse( "$data->{ $field }" ) : $version_class->new( "$data->{ $field }" );
                     };
                     if( $@ )
                     {
                         warn( "Value set for property '${field}' is not a valid version: $@\n" );
                     }
+                    $data->{ $field } = $v;
                 }
+                Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
                 return( $v );
             }
         },
@@ -9927,6 +9872,25 @@ sub _can_overload
     }
 }
 PERL
+    # NOTE: _get_args_as_array
+    _get_args_as_array => <<'PERL',
+# NOTE: sub _get_args_as_array() is now a XS method
+sub _get_args_as_array
+{
+    my $self = shift( @_ );
+    return( [] ) if( !scalar( @_ ) );
+    my $ref = [];
+    if( scalar( @_ ) == 1 && $self->_is_array( $_[0] ) )
+    {
+        $ref = shift( @_ );
+    }
+    else
+    {
+        $ref = [ @_ ];
+    }
+    return( $ref );
+}
+PERL
     # NOTE: _get_datetime_regexp
     _get_datetime_regexp => <<'PERL',
 sub _get_datetime_regexp
@@ -10581,6 +10545,30 @@ sub _implement_freeze_thaw
     }
 }
 PERL
+    # NOTE: _is_array()
+    _is_array => <<'PERL',
+# NOTE: sub _is_array() is now a XS method
+sub _is_array
+{
+    return(0) if( scalar( @_ ) < 2 );
+    return(0) if( !defined( $_[1] ) );
+    my $type = Scalar::Util::reftype( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'ARRAY' );
+}
+PERL
+    # NOTE: _is_code()
+    _is_code => <<'PERL',
+# NOTE: sub _is_code() is now a XS method
+sub _is_code
+{
+    return(0) if( scalar( @_ ) < 2 );
+    return(0) if( !defined( $_[1] ) );
+    my $type = Scalar::Util::reftype( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'CODE' );
+}
+PERL
     # NOTE: _is_empty()
     _is_empty => <<'PERL',
 sub _is_empty
@@ -10621,17 +10609,106 @@ sub _is_empty
     return(0);
 }
 PERL
+    # NOTE: _is_glob()
+    _is_glob => <<'PERL',
+# NOTE: sub _is_glob() is now a XS method
+sub _is_glob
+{
+    return(0) if( scalar( @_ ) < 2 );
+    return(0) if( !defined( $_[1] ) );
+    my $type = Scalar::Util::reftype( $_[1] );
+    return(0) if( !defined( $type ) );
+    return( $type eq 'GLOB' );
+}
+PERL
+    # NOTE: _is_hash()
+    _is_hash => <<'PERL',
+# NOTE: sub _is_hash() is now a XS method
+sub _is_hash
+{
+    return(0) if( scalar( @_ ) < 2 );
+    return(0) if( !defined( $_[1] ) );
+    my $type;
+    if( @_ > 2 && defined( $_[2] ) && $_[2] eq 'strict' )
+    {
+        $type = ref( $_[1] );
+    }
+    else
+    {
+        $type = Scalar::Util::reftype( $_[1] );
+    }
+    return(0) if( !defined( $type ) );
+    return( $type eq 'HASH' ? 1 : 0 );
+}
+PERL
+    # NOTE: _is_integer()
+    _is_integer => <<'PERL',
+# NOTE: sub _is_integer() is now a XS method
+sub _is_integer
+{
+    return(0) if( scalar( @_ ) < 2 );
+    return(0) if( !defined( $_[1] ) || !length( $_[1] ) );
+    return( $_[1] =~ /^[\+\-]?\d+$/ ? 1 : 0 );
+}
+PERL
+    # NOTE: _is_number()
+    _is_number => <<'PERL',
+# NOTE: sub _is_number() is now a XS method
+sub _is_number
+{
+    return(0) if( scalar( @_ ) < 2 );
+    my( $self, $v ) = @_;
+
+    return(0) unless( defined( $v ) );
+    return(0) if( ref( $v ) );
+
+    # Accept only scalars that actually carry numeric flags.
+    # JSON marks numbers with IOK/NOK; plain strings (even "12") will not have them.
+    my $sv    = B::svref_2object( \$v );
+    my $flags = $sv->FLAGS;
+
+    local $@;
+    # SVf_IOK = 0x02000000, SVf_NOK = 0x04000000 on most builds;
+    # we do not hardcode constants-B::SV’s FLAGS is stable to test with these bitmasks.
+    # Use string eval to avoid importing platform-specific constants.
+    my $SVf_IOK = eval{ B::SVf_IOK() } || 0x02000000;
+    my $SVf_NOK = eval{ B::SVf_NOK() } || 0x04000000;
+
+    return( ( $flags & ( $SVf_IOK | $SVf_NOK ) ) ? 1 : 0 );
+}
+PERL
+    # NOTE: _is_object()
+    _is_object => <<'PERL',
+# NOTE: sub _is_object() is now a XS method
+sub _is_object
+{
+    return(0) if( scalar( @_ ) < 2 );
+    return(0) if( !defined( $_[1] ) );
+    return( Scalar::Util::blessed( $_[1] ) ? 1 : 0 );
+}
+PERL
     # NOTE: _is_overloaded()
     _is_overloaded => <<'PERL',
+# NOTE: sub _is_overloaded() is now a XS method
 sub _is_overloaded
 {
     my $self = shift( @_ );
     no overloading;
     # Nothing provided
-    return if( !scalar( @_ ) );
-    return if( !defined( $_[0] ) );
-    return if( !Scalar::Util::blessed( $_[0] ) );
+    return(0) if( !scalar( @_ ) );
+    return(0) if( !defined( $_[0] ) );
+    return(0) if( !Scalar::Util::blessed( $_[0] ) );
     return( overload::Overloaded( $_[0] ) ? 1 : 0 );
+}
+PERL
+    # NOTE: _is_scalar()
+    _is_scalar => <<'PERL',
+# NOTE: sub _is_scalar() is now a XS method
+sub _is_scalar
+{
+    return(0) if( scalar( @_ ) < 2 );
+    return(0) if( !defined( $_[1] ) );
+    return( ( Scalar::Util::reftype( $_[1] ) // '' ) eq 'SCALAR' ? 1 : 0 );
 }
 PERL
     # NOTE: _is_tty
@@ -10845,6 +10922,50 @@ sub _looks_like_path
     return(1) if( $_[0] =~ /$lone_filename_re/ );
 
     return(0);
+}
+PERL
+    # NOTE: _obj2h()
+    _obj2h => <<'PERL',
+# NOTE: sub _obj2h() is now a XS method
+sub _obj2h
+{
+    my $self = shift( @_ );
+    # The method that called message was itself called using the package name like My::Package->some_method
+    # We are going to check if global $DEBUG or $VERBOSE variables are set and create the related debug and verbose entry into the hash we return
+    no strict 'refs';
+    if( !ref( $self ) )
+    {
+        my $class = $self;
+        my $hash =
+        {
+            debug   => ${ "${class}\::DEBUG" },
+            verbose => ${ "${class}\::VERBOSE" },
+            error   => ${ "${class}\::ERROR" },
+        };
+        return( bless( $hash => $class ) );
+    }
+    elsif( ( Scalar::Util::reftype( $self ) // '' ) eq 'HASH' )
+    {
+        return( $self );
+    }
+    elsif( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' )
+    {
+        if( ref( *$self ) eq 'HASH' )
+        {
+            return( *$self );
+        }
+        else
+        {
+            return( \%{*$self} );
+        }
+    }
+    # Because object may be accessed as My::Package->method or My::Package::method
+    # there is not always an object available, so we need to fake it to avoid error
+    # This is primarly itended for generic methods error(), errstr() to work under any conditions.
+    else
+    {
+        return( {} );
+    }
 }
 PERL
     # NOTE: _on_error()
@@ -11586,6 +11707,16 @@ sub _parse_timestamp
     return( $dt );
 }
 PERL
+    # NOTE: _refaddr
+    _refaddr => <<'PERL',
+# NOTE: sub _refaddr() is now a XS method
+sub _refaddr
+{
+    return if( scalar( @_ ) < 2 );
+    return if( !defined( $_[1] ) );
+    return( Scalar::Util::refaddr( $_[1] ) );
+}
+PERL
     # NOTE: _set_get_class_array_object
     _set_get_class_array_object => <<'PERL',
 sub _set_get_class_array_object
@@ -11619,6 +11750,7 @@ sub _set_get_class_array_object
     }
     else
     {
+        Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
         return( $data->{ $field } );
     }
 }
@@ -11635,9 +11767,10 @@ sub _set_get_datetime : lvalue
 
     my( $opts, $check, $fmt, $tz );
     my $callbacks = {};
+    my $def = {};
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = { %$field };
+        $def = { %$field };
         if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) )
         {
             $field = CORE::delete( $def->{field} );
@@ -11837,6 +11970,7 @@ sub _set_get_datetime : lvalue
                 my $now = $process->( $data->{ $field } ) || return( $self->pass_error );
                 $data->{ $field } = $now;
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -11911,6 +12045,7 @@ sub _set_get_datetime : lvalue
                 my $now = $process->( $data->{ $field } ) || return( $self->pass_error );
                 $data->{ $field } = $now;
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         field => $field,
@@ -11929,10 +12064,11 @@ sub _set_get_enum : lvalue
     my $case_sensitive = 1;
     my $callbacks = {};
     my $check;
+    my $def = {};
     if( scalar( @_ ) && 
         ref( $_[0] // '' ) eq 'HASH' )
     {
-        my $def = shift( @_ );
+        $def = shift( @_ );
         if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) )
         {
             $field = CORE::delete( $def->{field} );
@@ -11983,6 +12119,7 @@ sub _set_get_enum : lvalue
             {
                 return;
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         },
         set => sub
@@ -12058,6 +12195,7 @@ sub _set_get_enum : lvalue
             {
                 return;
             }
+            Scalar::Util::weaken( $data->{ $field } ) if( $def->{weaken} && $self->_is_object( $data->{ $field } ) && !Scalar::Util::isweak( $data->{ $field } ) );
             return( $data->{ $field } );
         }
     }, @_ ) );
@@ -13078,7 +13216,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.2.5
+    v1.3.0
 
 =head1 DESCRIPTION
 
@@ -13087,6 +13225,10 @@ It is designed to be fast and provide a useful framework and speed up coding and
 It contains standard and support methods that may be superseded by your module.
 
 It also contains an AUTOLOAD transforming any hash object key into dynamic methods and also recognize the dynamic routine a la AutoLoader. The reason is that while C<AutoLoader> provides the user with a convenient AUTOLOAD, I wanted a way to also keep the functionnality of L<Module::Generic> AUTOLOAD that were not included in C<AutoLoader>. So the only solution was a merger.
+
+=head1 PERFORMANCE
+
+Several frequently-called utility methods (L</_is_array>, L</_is_hash>, L</_is_object>, L</_obj2h>, etc.) are implemented in XS when the compiled shared library is available, providing a significant performance improvement for all code inheriting from L<Module::Generic>. The XS backend is loaded automatically at startup; pure-Perl fallbacks are used transparently when the library is absent, so no C compiler is required to install this module.
 
 =head1 METHODS
 

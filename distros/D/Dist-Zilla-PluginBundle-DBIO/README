@@ -1,9 +1,9 @@
 This archive contains the distribution Dist-Zilla-PluginBundle-DBIO,
-version 0.900000:
+version 0.900001:
 
   Dist::Zilla plugin bundle for DBIO distributions
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by DBIO Authors.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

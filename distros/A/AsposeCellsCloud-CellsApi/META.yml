@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 26.2
+    version: 26.3.1
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -1041,6 +1041,10 @@ provides:
     file: lib/AsposeCellsCloud/Request/GetMergedCellsInRemotedWorksheetRequest.pm
   AsposeCellsCloud::Request::GetMergedCellsInWorksheetRequest:
     file: lib/AsposeCellsCloud/Request/GetMergedCellsInWorksheetRequest.pm
+  AsposeCellsCloud::Request::AcceptAllRevisionsRequest:
+    file: lib/AsposeCellsCloud/Request/AcceptAllRevisionsRequest.pm
+  AsposeCellsCloud::Request::AcceptAllRevisionsInRemoteSpreadsheetRequest:
+    file: lib/AsposeCellsCloud/Request/AcceptAllRevisionsInRemoteSpreadsheetRequest.pm
   AsposeCellsCloud::Request::ProtectSpreadsheetRequest:
     file: lib/AsposeCellsCloud/Request/ProtectSpreadsheetRequest.pm
   AsposeCellsCloud::Request::UnprotectSpreadsheetRequest:
@@ -1842,5 +1846,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 26.2
+version: 26.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

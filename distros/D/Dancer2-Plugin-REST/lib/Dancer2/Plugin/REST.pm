@@ -1,7 +1,7 @@
 package Dancer2::Plugin::REST;
 our $AUTHORITY = 'cpan:SUKRIA';
 # ABSTRACT: A plugin for writing RESTful apps with Dancer2
-$Dancer2::Plugin::REST::VERSION = '1.02';
+$Dancer2::Plugin::REST::VERSION = '1.03';
 use 5.12.0;  # for the sub attributes
 
 use strict;
@@ -22,7 +22,6 @@ my %content_types = (
     ''   => 'text/html',
 );
 
-# TODO check if we use the handles
 has '+app' => (
     handles => [qw/
         add_hook
@@ -150,7 +149,7 @@ Dancer2::Plugin::REST - A plugin for writing RESTful apps with Dancer2
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -351,7 +350,7 @@ Dancer Core Developers
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2011, 2010 by Alexis Sukrieh.
+This software is copyright (c) 2026, 2014, 2013 by Alexis Sukrieh.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

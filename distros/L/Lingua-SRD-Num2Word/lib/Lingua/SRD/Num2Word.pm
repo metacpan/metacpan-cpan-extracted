@@ -15,7 +15,7 @@ use Export::Attrs;
 # }}}
 # {{{ variable declarations
 
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 my @ONES  = qw(zeru unu duos tres bàtoro chimbe ses sete oto noe);
 my @TEENS = qw(deghe undighi doighi treighi batordighi bindighi seighi
@@ -148,7 +148,7 @@ Lingua::SRD::Num2Word - Number to word conversion in Sardinian (Logudorese)
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::SRD::Num2Word is a module for converting numbers into their written
 representation in Sardinian (Logudorese variant). Converts whole numbers
@@ -190,6 +190,13 @@ Output text is encoded in UTF-8.
 
 Convert number to Sardinian text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

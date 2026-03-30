@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = ltz_numerals();
 
 # }}}
@@ -99,6 +99,30 @@ sub ltz_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Inverse of Luxembourgish ordinal morphology: restore cardinal from ordinal text.
+    # Irregulars (standalone or as final element of compound)
+    $input =~ s{éischt\z}{eent}xms    and return $input;
+    $input =~ s{zweet\z}{zwee}xms     and return $input;
+    $input =~ s{drëtt\z}{dräi}xms     and return $input;
+    $input =~ s{sechst\z}{sechs}xms    and return $input;  # 6th: stem 's' consumed by suffix
+    $input =~ s{siiwent\z}{siwen}xms  and return $input;
+    $input =~ s{aacht\z}{aacht}xms    and return $input;  # 8th = cardinal (no change)
+
+    # Regular: strip -st (20+ and compounds ending in tens/honnert/dausend)
+    $input =~ s{st\z}{}xms            and return $input;
+
+    # Regular: strip -t (4-19)
+    $input =~ s{t\z}{}xms             and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -108,6 +132,8 @@ __END__
 
 =pod
 
+=encoding utf-8
+
 =head1 NAME
 
 Lingua::LTZ::Word2Num - Word to number conversion in Luxembourgish
@@ -115,7 +141,7 @@ Lingua::LTZ::Word2Num - Word to number conversion in Luxembourgish
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::LTZ::Word2Num is module for converting Luxembourgish
 (Lëtzebuergesch) numerals into numbers. Converts whole numbers from 0
@@ -156,6 +182,14 @@ up to 999 999 999. Input is expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'drëtt', 'fënneft', 'zwanzegst')
+  =>  str    cardinal text (e.g. 'dräi', 'fënnef', 'zwanzeg')
+      undef  if input is not recognised as an ordinal
+
+Convert Luxembourgish ordinal text to cardinal text (morphological reversal).
+
 =item B<ltz_numerals> (void)
 
   =>  obj  new parser object
@@ -176,6 +210,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

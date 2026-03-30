@@ -517,7 +517,6 @@ ORDER BY a.attnum
 EOT
     # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
     # select * from information_schema.columns where table_name = 'address'
-    $self->messagec( 5, "Executing SQL query to get the table structure for table {green}${table}{/}" );
     my $sth = $self->database_object->prepare_cached( $query ) ||
         return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr ) );
     $sth->execute( $table ) ||
@@ -532,7 +531,6 @@ EOT
     # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
     while( $ref = $sth->fetchrow_hashref() )
     {
-        $self->messagec( 6, "Checking table ${table} field {green}", $ref->{field}, "{/} with type {green}", $ref->{data_type}, "{/} -> ", sub{ $self->Module::Generic::dump( $ref ) } );
         my $def =
         {
             name            => $ref->{field},
@@ -623,7 +621,6 @@ EOT
             $def->{datatype} = $dict;
             # $def->{type} = $dict->{type};
         }
-        $self->messagec( 6, "\tField {green}", $def->{name}, "{/} has type {green}", $def->{type}, "{/} and dictionary -> ", sub{ $self->Module::Generic::dump( $def ) } );
         $def->{query_object} = $q;
         $def->{table_object} = $self;
         my @define = ( $def->{type} );

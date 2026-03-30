@@ -14,7 +14,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my %token1 = (
      0 => 'нуль',
      1 => 'адзін',          2 => 'два',
@@ -172,7 +172,7 @@ Lingua::BEL::Num2Word - Number to word conversion in Belarusian
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::BEL::Num2Word is module for conversion numbers into their representation
 in Belarusian. It converts whole numbers from 0 up to 999 999 999.
@@ -212,6 +212,13 @@ in Belarusian. It converts whole numbers from 0 up to 999 999 999.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will
 be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
 
 =back
 

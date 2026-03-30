@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = tha_numerals();
 
 # }}}
@@ -102,6 +102,19 @@ sub tha_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal                              convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Thai ordinals: prefix ที่ (thîi) to cardinal.
+    # Strip ที่ prefix; return cardinal remainder.
+    $input =~ s{\Aที่}{}xms and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -120,7 +133,7 @@ Lingua::THA::Word2Num - Word to number conversion in Thai
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::THA::Word2Num is module for converting Thai numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -174,6 +187,14 @@ B<เอ็ด> (et) for 1 in units position of compound numbers
 B<ยี่> (yi) for 2 in tens position (20-29)
 
 =back
+
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text
+  =>  str    cardinal text
+      undef  if input is not recognised as an ordinal
+
+Convert ordinal text to cardinal text (morphological reversal).
 
 =item B<tha_numerals> (void)
 

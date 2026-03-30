@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2004-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -103,12 +103,50 @@ sub num2cat_cardinal :Export {
 # }}}
 
 
+# {{{ num2cat_ordinal                  convert number to ordinal text
+
+sub num2cat_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # Irregular ordinals 1-10
+    my %irregular = (
+        1  => 'primer',
+        2  => 'segon',
+        3  => 'tercer',
+        4  => 'quart',
+        5  => 'cinquè',
+        6  => 'sisè',
+        7  => 'setè',
+        8  => 'vuitè',
+        9  => 'novè',
+        10 => 'desè',
+    );
+
+    return $irregular{$number} if exists $irregular{$number};
+
+    # For 11+, get the cardinal form and append "-è"
+    # Drop trailing vowel if present, then add "è"
+    my $cardinal = num2cat_cardinal($number);
+
+    $cardinal =~ s/[aeiou]$//;
+
+    return $cardinal . 'è';
+}
+
+# }}}
+
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -130,7 +168,7 @@ Lingua::CAT::Num2Word - Number to word conversion in Catalan
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::CAT::Num2Word is a module for converting numbers into their written
 representation in Catalan. Converts whole numbers from 0 up to 999 999 999.
@@ -172,6 +210,21 @@ Output text is encoded in UTF-8.
 Convert number to text representation.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2cat_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    ordinal string (e.g. 'primer', 'segon', 'tercer')
+
+Convert number to its Catalan ordinal form (masculine).
+Only numbers from interval [1, 999_999_999] will be converted.
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -186,6 +239,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2cat_cardinal
+
+=item num2cat_ordinal
 
 =back
 

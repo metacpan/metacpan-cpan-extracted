@@ -13,7 +13,7 @@ use Parse::RecDescent;
 
 # }}}
 # {{{ var block
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 my $parser   = isl_numerals();
 
 # }}}
@@ -99,6 +99,94 @@ sub isl_numerals {
 }
 
 # }}}
+# {{{ ordinal2cardinal          convert ordinal text to cardinal text
+
+sub ordinal2cardinal :Export {
+    my $input = shift // return;
+
+    # Icelandic ordinal→cardinal: reverse lookup for irregular forms,
+    # suffix stripping for regular/compound forms.
+
+    # Fully irregular 1-12
+    my %irregular = (
+        'fyrsti'    => 'einn',
+        'annar'     => 'tveir',
+        'þriðji'    => 'þrír',
+        'fjórði'    => 'fjórir',
+        'fimmti'    => 'fimm',
+        'sjötti'    => 'sex',
+        'sjöundi'   => 'sjö',
+        'áttundi'   => 'átta',
+        'níundi'    => 'níu',
+        'tíundi'    => 'tíu',
+        'ellefti'   => 'ellefu',
+        'tólfti'    => 'tólf',
+    );
+
+    # Teens 13-19 (-di suffix on cardinal stem)
+    my %teens = (
+        'þrettándi'  => 'þrettán',
+        'fjórtándi'  => 'fjórtán',
+        'fimmtándi'  => 'fimmtán',
+        'sextándi'   => 'sextán',
+        'sautjándi'  => 'sautján',
+        'átjándi'    => 'átján',
+        'nítjándi'   => 'nítján',
+    );
+
+    # Tens ordinals (-asti suffix)
+    my %tens = (
+        'tuttugasti'  => 'tuttugu',
+        'þrítugasti'  => 'þrjátíu',
+        'fertugasti'  => 'fjörutíu',
+        'fimmtugasti' => 'fimmtíu',
+        'sextugasti'  => 'sextíu',
+        'sjötugasti'  => 'sjötíu',
+        'áttugasti'   => 'áttatíu',
+        'nítugasti'   => 'níutíu',
+    );
+
+    # Special large number ordinals
+    my %special = (
+        'hundraðasti' => 'hundrað',
+        'þúsundasti'  => 'þúsund',
+    );
+
+    # Exact match: standalone ordinals
+    return $irregular{$input} if exists $irregular{$input};
+    return $teens{$input}     if exists $teens{$input};
+    return $tens{$input}      if exists $tens{$input};
+    return $special{$input}   if exists $special{$input};
+
+    # Compound ordinals: split on last " og " boundary, convert the tail recursively.
+    # e.g. "tuttugu og fyrsti" → "tuttugu og einn"
+    # e.g. "níu hundruð og níutíu og níuasti" → split at last "og" → prefix + converted tail
+    if ($input =~ m{\A(.+)\s+og\s+(.+)\z}xms) {
+        my ($prefix, $tail_ord) = ($1, $2);
+        my $tail_card = ordinal2cardinal($tail_ord) // return;
+        return $prefix . ' og ' . $tail_card;
+    }
+
+    # Compound ordinals without "og" (e.g. "tvö hundruðasti")
+    # Split on space, convert last token, rejoin.
+    if ($input =~ m{\s}xms) {
+        my @words = split /\s+/, $input;
+        my $last  = pop @words;
+        my $cardinal = ordinal2cardinal($last) // return;
+        push @words, $cardinal;
+        return join ' ', @words;
+    }
+
+    # Fallback: strip common ordinal suffixes
+    $input =~ s{asti\z}{}xms   and return $input;
+    $input =~ s{undi\z}{ur}xms and return $input;
+    $input =~ s{di\z}{}xms     and return $input;
+    $input =~ s{ti\z}{}xms     and return $input;
+
+    return;  # not an ordinal
+}
+
+# }}}
 
 1;
 
@@ -117,7 +205,7 @@ Lingua::ISL::Word2Num - Word to number conversion in Icelandic
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
 Lingua::ISL::Word2Num is module for converting Icelandic numerals into
 numbers. Converts whole numbers from 0 up to 999 999 999. Input is
@@ -158,6 +246,15 @@ expected to be in UTF-8.
 Convert text representation to number.
 You can specify a numeral from interval [0,999_999_999].
 
+=item B<ordinal2cardinal> (positional)
+
+  1   str    ordinal text (e.g. 'þriðji', 'tuttugu og fyrsti', 'fimmtugasti')
+  =>  str    cardinal text (e.g. 'þrír', 'tuttugu og einn', 'fimmtíu')
+  =>  undef  if input is not a recognized ordinal
+
+Convert Icelandic ordinal text to cardinal text (text-level morphological
+transformation, no numbers involved).
+
 =item B<isl_numerals> (void)
 
   =>  obj  new parser object
@@ -178,6 +275,8 @@ Internal parser.
 =over 2
 
 =item w2n
+
+=item ordinal2cardinal
 
 =back
 

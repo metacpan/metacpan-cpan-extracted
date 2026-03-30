@@ -17,7 +17,7 @@ use Readonly;
 # {{{ variable declarations
 
 my Readonly::Scalar $COPY = 'Copyright (c) PetaMem, s.r.o. 2004-present';
-our $VERSION = '0.2603270';
+our $VERSION = '0.2603300';
 
 # }}}
 
@@ -114,13 +114,157 @@ sub num2ell_cardinal :Export {
 
 # }}}
 
+# {{{ num2ell_ordinal                  convert number to ordinal text
+
+sub num2ell_ordinal :Export {
+    my $number = shift;
+
+    croak 'You should specify a number from interval [1, 999_999_999]'
+        if    !defined $number
+           || $number !~ m{\A\d+\z}xms
+           || $number < 1
+           || $number > 999_999_999;
+
+    # {{{ tokens
+
+    my @ones_ord = (
+        '',              # 0 placeholder
+        'πρώτος',        # 1st
+        'δεύτερος',      # 2nd
+        'τρίτος',        # 3rd
+        'τέταρτος',      # 4th
+        'πέμπτος',       # 5th
+        'έκτος',         # 6th
+        'έβδομος',       # 7th
+        'όγδοος',        # 8th
+        'ένατος',        # 9th
+        'δέκατος',       # 10th
+        'ενδέκατος',     # 11th
+        'δωδέκατος',     # 12th
+    );
+
+    # 13th-19th: δέκατος + unit ordinal
+    my @teens_ord = (
+        'δέκατος τρίτος',      # 13th
+        'δέκατος τέταρτος',    # 14th
+        'δέκατος πέμπτος',     # 15th
+        'δέκατος έκτος',       # 16th
+        'δέκατος έβδομος',     # 17th
+        'δέκατος όγδοος',      # 18th
+        'δέκατος ένατος',      # 19th
+    );
+
+    my @tens_ord = (
+        '',              # 0 placeholder
+        '',              # 10 placeholder
+        'εικοστός',      # 20th
+        'τριακοστός',    # 30th
+        'τεσσαρακοστός', # 40th
+        'πεντηκοστός',   # 50th
+        'εξηκοστός',     # 60th
+        'εβδομηκοστός',  # 70th
+        'ογδοηκοστός',   # 80th
+        'ενενηκοστός',   # 90th  (modern standard, Triantafyllidis)
+    );
+
+    my @hundreds_ord = (
+        '',                # 0 placeholder
+        'εκατοστός',       # 100th
+        'διακοσιοστός',    # 200th
+        'τριακοσιοστός',   # 300th
+        'τετρακοσιοστός',  # 400th
+        'πεντακοσιοστός',  # 500th
+        'εξακοσιοστός',    # 600th
+        'επτακοσιοστός',   # 700th
+        'οκτακοσιοστός',   # 800th
+        'εννεακοσιοστός',  # 900th
+    );
+
+    # }}}
+
+    return $ones_ord[$number]           if $number >= 1 && $number <= 12;
+    return $teens_ord[$number - 13]     if $number >= 13 && $number <= 19;
+
+    # {{{ 20..99
+
+    if ($number >= 20 && $number <= 99) {
+        my $ten_idx = int($number / 10);
+        my $unit    = $number % 10;
+
+        return $tens_ord[$ten_idx]      if $unit == 0;
+        return $tens_ord[$ten_idx] . ' ' . $ones_ord[$unit];
+    }
+
+    # }}}
+    # {{{ 100..999
+
+    if ($number >= 100 && $number <= 999) {
+        my $hun_idx = int($number / 100);
+        my $remain  = $number % 100;
+
+        return $hundreds_ord[$hun_idx]  if $remain == 0;
+        return $hundreds_ord[$hun_idx] . ' ' . num2ell_ordinal($remain);
+    }
+
+    # }}}
+    # {{{ 1000..999_999
+
+    if ($number >= 1000 && $number <= 999_999) {
+        my $thou_count = int($number / 1000);
+        my $remain     = $number % 1000;
+
+        my $out;
+        if ($thou_count == 1 && $remain == 0) {
+            return 'χιλιοστός';
+        }
+        elsif ($thou_count == 1) {
+            $out = 'χιλιοστός';
+        }
+        elsif ($thou_count == 2 && $remain == 0) {
+            return 'δισχιλιοστός';
+        }
+        elsif ($thou_count == 2) {
+            $out = 'δισχιλιοστός';
+        }
+        else {
+            # Cardinal prefix + χιλιοστός
+            $out = num2ell_cardinal($thou_count) . ' χιλιοστός';
+        }
+        $out .= ' ' . num2ell_ordinal($remain) if $remain;
+        return $out;
+    }
+
+    # }}}
+    # {{{ 1_000_000..999_999_999
+
+    if ($number >= 1_000_000 && $number <= 999_999_999) {
+        my $mil_count = int($number / 1_000_000);
+        my $remain    = $number % 1_000_000;
+
+        my $out;
+        if ($mil_count == 1) {
+            $out = 'εκατομμυριοστός';
+        }
+        else {
+            $out = num2ell_cardinal($mil_count) . ' εκατομμυριοστός';
+        }
+        $out .= ' ' . num2ell_ordinal($remain) if $remain;
+        return $out;
+    }
+
+    # }}}
+
+    return;
+}
+
+# }}}
 
 # {{{ capabilities              declare supported features
 
 sub capabilities {
     return {
         cardinal => 1,
-        ordinal  => 0,
+        ordinal  => 1,
     };
 }
 
@@ -142,12 +286,13 @@ Lingua::ELL::Num2Word - Number to word conversion in Greek
 
 =head1 VERSION
 
-version 0.2603270
+version 0.2603300
 
-Lingua::ELL::Num2Word is module for converting numbers into their written
+Lingua::ELL::Num2Word is a module for converting numbers into their written
 representation in Modern Greek. Converts whole numbers from 0 up to 999 999 999.
 
-Text is encoded in UTF-8.
+Follows Modern Standard Greek orthography (Triantafyllidis / single-ν forms,
+e.g. ενενήντα not εννενήντα). Text is encoded in UTF-8.
 
 =cut
 
@@ -161,8 +306,10 @@ Text is encoded in UTF-8.
  use Lingua::ELL::Num2Word;
 
  my $text = Lingua::ELL::Num2Word::num2ell_cardinal( 123 );
-
  print $text || "sorry, can't convert this number into Greek.";
+
+ my $ord = Lingua::ELL::Num2Word::num2ell_ordinal( 3 );
+ print $ord;    # "τρίτος"
 
 =cut
 
@@ -184,6 +331,23 @@ Text is encoded in UTF-8.
 Convert number to text representation in Modern Greek.
 Only numbers from interval [0, 999_999_999] will be converted.
 
+=item B<num2ell_ordinal> (positional)
+
+  1   num    number to convert
+  =>  str    converted ordinal string (masculine nominative singular)
+      undef  if input number is not known
+
+Convert number to Greek ordinal text representation.
+Only numbers from interval [1, 999_999_999] will be converted.
+Uses masculine forms (ending in -ος).
+
+
+=item B<capabilities> (void)
+
+  =>  href   hashref indicating supported conversion types
+
+Returns a hashref of capabilities for this language module.
+
 =back
 
 =cut
@@ -198,6 +362,8 @@ Only numbers from interval [0, 999_999_999] will be converted.
 =over 2
 
 =item num2ell_cardinal
+
+=item num2ell_ordinal
 
 =back
 

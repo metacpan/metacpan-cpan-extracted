@@ -1,5 +1,5 @@
-10-compile.t
 Changes
+cpanfile
 lib/Readonly/Values/Months.pm
 LICENSE
 Makefile.PL
@@ -7,6 +7,8 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 t/00-load.t
+t/10-compile.t
+t/30-basics.t
 t/eof.t
 t/eol.t
 t/pod-cm.t

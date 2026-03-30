@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More import => ['!pass'], tests => 17;
+use Test2::Bundle::More;
 use Plack::Test;
 use HTTP::Request::Common qw(GET POST PUT DELETE);
 
@@ -141,4 +141,6 @@ test_psgi $app, sub {
             is( $r->code, 418, $_ );
         }
     };
-}
+};
+
+done_testing;

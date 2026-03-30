@@ -1,5 +1,9 @@
 Revision history for Readonly-Values-Months - Months constants
 
+0.04	Sun Mar 29 19:11:47 EDT 2026
+	Sept is a common abbreviation for September
+	Added an Abstract version to the POD
+
 0.03	Tue Jul 15 20:40:39 EDT 2025
 	Added %month_names_to_short
 
