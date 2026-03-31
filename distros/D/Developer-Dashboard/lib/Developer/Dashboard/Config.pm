@@ -1,0 +1,327 @@
+package Developer::Dashboard::Config;
+$Developer::Dashboard::Config::VERSION = '0.72';
+use strict;
+use warnings;
+
+use File::Spec;
+use Cwd qw(cwd);
+
+use Developer::Dashboard::JSON qw(json_decode json_encode);
+
+# new(%args)
+# Constructs a configuration loader bound to files, paths, and plugins.
+# Input: files and paths objects, plus optional plugins and repo_root.
+# Output: Developer::Dashboard::Config object.
+sub new {
+    my ( $class, %args ) = @_;
+    my $files = $args{files} || die 'Missing file registry';
+    my $paths = $args{paths} || die 'Missing path registry';
+    return bless {
+        files => $files,
+        paths => $paths,
+        plugins => $args{plugins},
+        repo_root => $args{repo_root},
+    }, $class;
+}
+
+# load_global()
+# Loads the user-global dashboard configuration file.
+# Input: none.
+# Output: configuration hash reference.
+sub load_global {
+    my ($self) = @_;
+    my $file = $self->{files}->global_config;
+    return {} if !-f $file;
+    open my $fh, '<', $file or die "Unable to read $file: $!";
+    local $/;
+    return json_decode(<$fh>);
+}
+
+# save_global($config)
+# Saves the user-global dashboard configuration file.
+# Input: configuration hash reference.
+# Output: written file path string.
+sub save_global {
+    my ( $self, $config ) = @_;
+    my $file = $self->{files}->global_config;
+    open my $fh, '>', $file or die "Unable to write $file: $!";
+    print {$fh} json_encode( $config || {} );
+    close $fh;
+    return $file;
+}
+
+# load_repo()
+# Loads repo-local configuration from the active project root.
+# Input: none.
+# Output: configuration hash reference.
+sub load_repo {
+    my ($self) = @_;
+    $self->{repo_root} = $self->{paths}->current_project_root if !$self->{repo_root};
+    my $repo = $self->{repo_root} || return {};
+    my $file = File::Spec->catfile( $repo, '.developer-dashboard.json' );
+    return {} if !-f $file;
+    open my $fh, '<', $file or die "Unable to read $file: $!";
+    local $/;
+    return json_decode(<$fh>);
+}
+
+# merged()
+# Returns the merged global and repo-local configuration view.
+# Input: none.
+# Output: merged configuration hash reference.
+sub merged {
+    my ($self) = @_;
+    my $global = $self->load_global;
+    my $repo   = $self->load_repo;
+
+    return $self->_merge_hashes( $global, $repo );
+}
+
+# _merge_hashes($left, $right)
+# Recursively merges configuration hashes so nested config domains can extend each other.
+# Input: two hash references where right-hand values override left-hand values.
+# Output: merged hash reference.
+sub _merge_hashes {
+    my ( $self, $left, $right ) = @_;
+    $left  ||= {};
+    $right ||= {};
+
+    my %merged = (%{$left});
+    for my $key ( keys %{$right} ) {
+        if ( ref( $left->{$key} ) eq 'HASH' && ref( $right->{$key} ) eq 'HASH' ) {
+            $merged{$key} = $self->_merge_hashes( $left->{$key}, $right->{$key} );
+            next;
+        }
+        $merged{$key} = $right->{$key};
+    }
+
+    return \%merged;
+}
+
+# collectors()
+# Returns all configured collectors after config/plugin/startup merging.
+# Input: none.
+# Output: array reference of collector job hash references.
+sub collectors {
+    my ($self) = @_;
+    my $cfg = $self->merged;
+    my @jobs = ();
+
+    if ( ref( $cfg->{collectors} ) eq 'ARRAY' ) {
+        push @jobs, @{ $cfg->{collectors} };
+    }
+
+    if ( $self->{plugins} ) {
+        push @jobs, @{ $self->{plugins}->collectors };
+    }
+
+    if ( ref( $cfg->{plugins} ) eq 'ARRAY' ) {
+        for my $plugin ( @{ $cfg->{plugins} } ) {
+            next if ref($plugin) ne 'HASH';
+            push @jobs, @{ $plugin->{collectors} || [] } if ref( $plugin->{collectors} ) eq 'ARRAY';
+        }
+    }
+
+    push @jobs, @{ $self->startup_collectors };
+
+    if ( my $filter = $ENV{DEVELOPER_DASHBOARD_CHECKERS} ) {
+        my %wanted = map { $_ => 1 } grep { defined && $_ ne '' } split /:/, $filter;
+        @jobs = grep { ref($_) eq 'HASH' && $wanted{ $_->{name} } } @jobs;
+    }
+
+    return \@jobs;
+}
+
+# startup_collectors()
+# Loads collector definitions from the startup directory.
+# Input: none.
+# Output: array reference of collector job hash references.
+sub startup_collectors {
+    my ($self) = @_;
+    my $root = $self->{paths}->startup_root;
+    return [] if !-d $root;
+
+    opendir my $dh, $root or die "Unable to open startup root $root: $!";
+    my @jobs;
+
+    while ( my $entry = readdir $dh ) {
+        next if $entry eq '.' || $entry eq '..';
+        next if $entry !~ /\.json$/;
+
+        my $file = File::Spec->catfile( $root, $entry );
+        next if !-f $file;
+
+        open my $fh, '<', $file or die "Unable to read $file: $!";
+        local $/;
+        my $data = json_decode(<$fh>);
+
+        if ( ref($data) eq 'HASH' ) {
+            push @jobs, $data;
+        }
+        elsif ( ref($data) eq 'ARRAY' ) {
+            push @jobs, grep { ref($_) eq 'HASH' } @$data;
+        }
+    }
+    closedir $dh;
+
+    return \@jobs;
+}
+
+# path_aliases()
+# Returns configured path aliases from merged configuration.
+# Input: none.
+# Output: hash reference of path aliases.
+sub path_aliases {
+    my ($self) = @_;
+    my $cfg = $self->merged;
+    return {} if ref( $cfg->{path_aliases} ) ne 'HASH';
+    return $self->_expand_path_aliases( $cfg->{path_aliases} );
+}
+
+# global_path_aliases()
+# Returns only the user-global configured path aliases.
+# Input: none.
+# Output: hash reference of global path aliases.
+sub global_path_aliases {
+    my ($self) = @_;
+    my $cfg = $self->load_global;
+    return {} if ref( $cfg->{path_aliases} ) ne 'HASH';
+    return $self->_expand_path_aliases( $cfg->{path_aliases} );
+}
+
+# save_global_path_alias($name, $path)
+# Persists or updates a user-global path alias without disturbing other config domains.
+# Input: alias name string and target path string.
+# Output: hash reference containing the stored alias mapping.
+sub save_global_path_alias {
+    my ( $self, $name, $path ) = @_;
+    die 'Missing path alias name' if !defined $name || $name eq '';
+    die 'Missing path alias target' if !defined $path || $path eq '';
+
+    my $cfg = $self->load_global;
+    $cfg->{path_aliases} = {} if ref( $cfg->{path_aliases} ) ne 'HASH';
+    my $stored_path = $self->_normalize_home_path($path);
+    $cfg->{path_aliases}{$name} = $stored_path;
+    $self->save_global($cfg);
+
+    return {
+        name => $name,
+        path => $self->_expand_config_path($stored_path),
+    };
+}
+
+# remove_global_path_alias($name)
+# Deletes a user-global path alias when present and otherwise remains idempotent.
+# Input: alias name string.
+# Output: hash reference containing alias name and removal flag.
+sub remove_global_path_alias {
+    my ( $self, $name ) = @_;
+    die 'Missing path alias name' if !defined $name || $name eq '';
+
+    my $cfg = $self->load_global;
+    $cfg->{path_aliases} = {} if ref( $cfg->{path_aliases} ) ne 'HASH';
+    my $removed = delete $cfg->{path_aliases}{$name} ? 1 : 0;
+    $self->save_global($cfg);
+
+    return {
+        name    => $name,
+        removed => $removed,
+    };
+}
+
+# _normalize_home_path($path)
+# Rewrites home-relative absolute paths into portable $HOME-prefixed config values.
+# Input: path string that may live under the current home directory.
+# Output: path string suitable for config persistence.
+sub _normalize_home_path {
+    my ( $self, $path ) = @_;
+    return $path if !defined $path || $path eq '';
+
+    my $home = $self->{paths}->home;
+    return $path if !defined $home || $home eq '';
+    return '$HOME' if $path eq $home;
+
+    my $home_prefix = $home . '/';
+    return '$HOME/' . substr( $path, length($home_prefix) ) if index( $path, $home_prefix ) == 0;
+
+    return $path;
+}
+
+# _expand_config_path($path)
+# Expands stored $HOME-style config paths back into concrete local filesystem paths.
+# Input: stored path string that may start with $HOME or ~.
+# Output: expanded path string for runtime use.
+sub _expand_config_path {
+    my ( $self, $path ) = @_;
+    return $path if !defined $path || $path eq '';
+
+    my $home = $self->{paths}->home;
+    return $home if defined $home && $path eq '$HOME';
+    return $home . substr( $path, 5 ) if defined $home && $path =~ /^\$HOME(?=\/)/;
+    return $home . substr( $path, 1 ) if defined $home && $path =~ /^~/;
+
+    return $path;
+}
+
+# _expand_path_aliases($aliases)
+# Expands stored path-alias targets into runtime-ready absolute paths.
+# Input: hash reference of alias-to-path mappings.
+# Output: hash reference with expanded path values.
+sub _expand_path_aliases {
+    my ( $self, $aliases ) = @_;
+    my %expanded;
+    for my $name ( keys %{ $aliases || {} } ) {
+        $expanded{$name} = $self->_expand_config_path( $aliases->{$name} );
+    }
+    return \%expanded;
+}
+
+# docker_config()
+# Returns docker compose configuration from merged configuration.
+# Input: none.
+# Output: docker configuration hash reference.
+sub docker_config {
+    my ($self) = @_;
+    my $cfg = $self->merged;
+    return {} if ref( $cfg->{docker} ) ne 'HASH';
+    return { %{ $cfg->{docker} } };
+}
+
+# providers()
+# Returns configured provider page definitions.
+# Input: none.
+# Output: array reference of provider hashes.
+sub providers {
+    my ($self) = @_;
+    my $cfg = $self->merged;
+    my @providers = ();
+    push @providers, @{ $cfg->{providers} } if ref( $cfg->{providers} ) eq 'ARRAY';
+    push @providers, @{ $self->{plugins}->providers } if $self->{plugins};
+    return \@providers;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Developer::Dashboard::Config - merged configuration loader
+
+=head1 SYNOPSIS
+
+  my $config = Developer::Dashboard::Config->new(files => $files, paths => $paths);
+  my $merged = $config->merged;
+
+=head1 DESCRIPTION
+
+This module loads and merges global, repo-local, startup, and plugin-backed
+configuration for Developer Dashboard.
+
+=head1 METHODS
+
+=head2 new, load_global, save_global, load_repo, merged, collectors, startup_collectors, path_aliases, global_path_aliases, save_global_path_alias, remove_global_path_alias, docker_config, providers
+
+Load and expose configuration domains used by the runtime.
+
+=cut

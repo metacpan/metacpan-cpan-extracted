@@ -2,7 +2,7 @@ package IPC::Manager::ServicePeer;
 use strict;
 use warnings;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use Carp qw/croak/;
 use Scalar::Util qw/weaken/;

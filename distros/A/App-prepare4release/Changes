@@ -1,0 +1,55 @@
+Revision history for App::prepare4release
+
+0.01    2026-03-31
+        MY::postamble runs maint/inject-readme-badges.pl after pod2github/pod2markdown:
+        generated standalone Perl (core only) embeds frozen README shields so make
+        README.md does not require App::prepare4release at build time; commit the
+        script for CPAN clones. POD: section L</README badge injector (maint/inject-readme-badges.pl)>.
+        With --cpan: ensure LICENSE (Artistic/Copying from upstream or built-in fallback),
+        README stub when only README.md exists, default MANIFEST.SKIP if missing,
+        then perl Makefile.PL and make manifest. Version bump to 0.01.
+        xt/metacpan-live.t: import cmp_ok from Test2::Tools::Basic.
+        xt/author/cpants.t: remove tarball after analysis (fixes portability.t).
+        Ship LICENSE, README, MANIFEST.SKIP for CPANTS/kwalitee.
+
+0.001   CI: GitHub Actions / GitLab CI templates (Perl matrix via MetaCPAN ceiling),
+        optional ci.apt_packages, Alien::* scan hint, tests and expanded POD.
+        xt/metacpan-live.t runs against live MetaCPAN when RELEASE_TESTING is set.
+        Tests use Test2::V1; Makefile.PL author Sergey Kovalev.
+        Warn on Test::More/Test::Most in t/xt; xt/author extended tests (Synopsis, …).
+        Removed Test::Kwalitee::Extra / xt/author/kwalitee-extra.t.
+        xt/author/pause-permissions.t and pod-coverage.t use Test::More (not Test2)
+        so Test::PAUSE::Permissions / Test::Pod::Coverage load correctly.
+        Those tests' skip_all now includes $^X and $@ (diagnose wrong perl / @INC).
+        pause-permissions: use all_permissions_ok (CPAN API). pod-coverage: FQCN
+        pod_coverage_ok (avoid Test::More plan import clash).
+        xt/author/cpants.t: Module::CPANTS::Analyse on make tardist (RELEASE_TESTING=1).
+        cpants.t: require Module::CPANTS::Kwalitee->can(new); TEST_REQUIRES Kwalitee.
+        cpants.t: unlink existing tarball before tardist (non-interactive gzip).
+        Empty or whitespace-only prepare4release.json loads as {}; t/config-load.t.
+        META_MERGE patch: quotemeta resources head in s/// (brace in pattern).
+        Do not warn legacy Test::More on author tests that require Test::Builder.
+        Makefile.PL: fix META_MERGE (resources/bugtracker inside resources => {}).
+        Badges in README.md (after make/pod2conversion), not in POD; strip legacy POD
+        badge blocks. git.author required for --github/--gitlab unless git.repo is a
+        full path or URL. CI badge: GitHub only with --github; GitLab pipeline only
+        with --gitlab (host: git.server, else from git.repo URL, else gitlab.com).
+        Fix _pod_badge_markdown_line when called as a method (invocant shift).
+        README license badge: Makefile.PL LICENSE or infer from root LICENSE file;
+        link to repo LICENSE blob with --github/--gitlab and git.default_branch.
+        Perl badge minimum: min_perl_version / perl_min in JSON, else MIN_PERL_VERSION.
+        README badges: no HTML comment wrappers; strip prior shields by line pattern.
+        MetaCPAN matrix ceiling: GET /v1/release/perl (fix bogus sort=version first hit).
+        Ceiling tag: robust version parse; reject minors below 10 (bogus v5.8.x data).
+        GitHub CI: use shogo82148/actions-setup-perl (shivammathur/setup-perl does not exist).
+        Makefile.PL: TEST_REQUIRES only Test2::Suite; xt/author deps in META develop;
+        generated CI uses cpanm --installdeps . without --with-develop.
+        CI: perl Makefile.PL before installdeps; explicit cpanm Test2::Suite (cpanfile shortcut).
+        t/helpers-more.t: unit tests for URL/git helpers, badges, license inference,
+        README badge insert/strip, parse_argv, MetaCPAN ceiling helpers, list_files_for_eol_xt.
+        t/more-coverage.t: integration run() via fork+exec (FindBin-safe), apply_ci_files,
+        warn_legacy_test_frameworks, Makefile postamble/META_MERGE, strip POD badges, etc.
+        t/coverage-edge.t: MetaCPAN/HTTP fallbacks (mocked HTTP::Tiny::get), empty CI matrix,
+        split_pm without __END__, ensure_meta_merge skip, license/min-perl edge cases.
+        Fix _find_exe_in_path: was using invocant as program name (method needs ($class, $name)).
+        Integration runs use --verbose to exercise run() diagnostic warnings.

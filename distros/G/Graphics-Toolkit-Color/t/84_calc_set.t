@@ -2,13 +2,13 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 150;
+use Test::More tests => 154;
 BEGIN { unshift @INC, 'lib', '../lib'}
 
 my $module = 'Graphics::Toolkit::Color::SetCalculator';
 my $value_ref = 'Graphics::Toolkit::Color::Values';
 eval "use $module";
-is( not($@), 1, 'could load the module');
+is( not($@), 1, "could load the module $module");
 
 my $RGB = Graphics::Toolkit::Color::Space::Hub::get_space('RGB');
 my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
@@ -77,7 +77,7 @@ is( $values->[1],                       88,   'saturation is 88');
 $values = $colors[2]->shaped('HSL');
 is( $values->[0],                       93,  'hue value from third color is 93');
 is( $values->[2],                       56,   'lightness is 56');
-
+	
 @colors = $complement->($blue, 3, 2, []);
 is( int @colors,                        3,    '3 complements with tilt');
 $values = $colors[0]->shaped('HSL');
@@ -106,9 +106,15 @@ is( $values->[2],                       75,   'lightness of third color is 75');
 # @:colors, +steps, +tilt, :space --> @:values
 my $gradient = \&Graphics::Toolkit::Color::SetCalculator::gradient;
 @colors = $gradient->([$black, $white], 2, 0, $RGB);
-is( int @colors,                       2,  'gradient has length of two');
-is( $colors[0]->name,            'black',  'first one is black');
-is( $colors[1]->name,            'white',  'second one is white');
+is( int @colors,                       2,  'minimal gradient has same colors as input');
+$values = $colors[0]->normalized();
+is( $values->[0],                      0,  'so first color has to be black (red normalzed)');
+is( $values->[1],                      0,  'so first color has to be black (green normalzed)');
+is( $values->[2],                      0,  'so first color has to be black (blue normalzed)');
+$values = $colors[1]->normalized();
+is( $values->[0],                      1,  'ssecond color has to be white (red normalzed)');
+is( $values->[1],                      1,  'ssecond color has to be white (green normalzed)');
+is( $values->[2],                      1,  'ssecond color has to be white (blue normalzed)');
 
 @colors = $gradient->([$black, $white], 3, 0, $RGB);
 is( int @colors,                        3,  'gradient has length of three');

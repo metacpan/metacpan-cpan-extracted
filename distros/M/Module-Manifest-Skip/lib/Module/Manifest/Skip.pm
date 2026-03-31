@@ -1,6 +1,6 @@
 use strict; use warnings;
 package Module::Manifest::Skip;
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Moo;
 
@@ -27,9 +27,6 @@ sub import {
         print MS $text;
         close MS;
         exit;
-    }
-    else {
-        goto &Moo::import;
     }
 }
 

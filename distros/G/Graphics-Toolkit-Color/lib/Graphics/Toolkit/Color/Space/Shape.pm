@@ -114,6 +114,12 @@ sub is_axis_numeric {
     $self->{'type'}[$axis_nr] == 2 ? 0 : 1;
 
 }
+sub is_axis_euclidean {
+    my ($self, $axis_nr) = @_;
+    return 0 if not defined $axis_nr or not exists $self->{'type'}[$axis_nr];
+    $self->{'type'}[$axis_nr] == 1 ? 1 : 0;
+
+}
 sub axis_value_max { # --> +value
     my ($self, $axis_nr, $range) = @_;
     $range = $self->try_check_range_definition( $range );

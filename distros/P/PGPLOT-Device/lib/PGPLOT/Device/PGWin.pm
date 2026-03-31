@@ -7,9 +7,7 @@ use warnings;
 
 use v5.10;
 
-our @ISA = qw();
-
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use List::Util 1.33;
 
@@ -47,8 +45,7 @@ use PDL::Graphics::PGPLOT::Window ();
 sub new {
     my ( $class, $opt ) = @_;
 
-    my %opt = List::Util::pairmap { lc( $a ) => $b }
-    winopts => {},
+    my %opt = List::Util::pairmap { lc( $a ) => $b } winopts => {},
       defined $opt ? %$opt : ();
 
     my $self = {};
@@ -56,9 +53,9 @@ sub new {
         defined $opt{device}  ? $opt{device}  : (),
         defined $opt{devopts} ? $opt{devopts} : (),
     );
-    $self->{not_first}     = 0;
-    $self->{win}           = undef;
-    $self->{winopts}       = { %{ $opt{winopts} } };
+    $self->{not_first} = 0;
+    $self->{win}       = undef;
+    $self->{winopts}   = { %{ $opt{winopts} } };
 
     bless $self, $class;
 
@@ -89,8 +86,7 @@ sub _update_winopts {
 
     my @diffs = grep {
         !(
-            ( exists $lc_new{$_} && exists $lc_orig{$_} )
-            && (   ( !defined $lc_new{$_} && !defined $lc_orig{$_} )
+            ( exists $lc_new{$_} && exists $lc_orig{$_} ) && ( ( !defined $lc_new{$_} && !defined $lc_orig{$_} )
                 || ( $lc_new{$_} eq $lc_orig{$_} ) ) )
     } List::Util::uniq( keys %lc_new, keys %lc_orig );
 
@@ -171,8 +167,8 @@ sub device { $_[0]->{device} }
 
 
 
-sub next {
-    my $self = shift;
+sub next {    ## no critic ( BuiltinHomonyms )
+    my $self    = shift;
     my $winopts = 'HASH' eq ref $_[0] ? shift : undef;
 
     $self->override( @_ ) if @_;
@@ -184,8 +180,8 @@ sub next {
 
     if ( $self->{device}->would_change ) {
         $self->finish;
-        $self->{winopts} = { %$winopts } if defined $winopts;
-        $self->{win} = PDL::Graphics::PGPLOT::Window->new( {
+        $self->{winopts} = {%$winopts} if defined $winopts;
+        $self->{win}     = PDL::Graphics::PGPLOT::Window->new( {
                 Device => $self->{device}->next,
                 %{ $self->{winopts} } } );
     }
@@ -234,6 +230,8 @@ sub finish {
     }
 }
 
+1;
+
 __END__
 
 =pod
@@ -246,7 +244,7 @@ PGPLOT::Device::PGWin - convenience class for PDL::Graphics::PGPLOT::Window
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -384,7 +382,7 @@ object.
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device
+Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device>
 
 =head2 Source
 

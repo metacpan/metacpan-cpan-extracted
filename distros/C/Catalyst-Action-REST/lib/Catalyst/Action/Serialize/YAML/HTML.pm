@@ -1,5 +1,5 @@
 package Catalyst::Action::Serialize::YAML::HTML;
-$Catalyst::Action::Serialize::YAML::HTML::VERSION = '1.21';
+$Catalyst::Action::Serialize::YAML::HTML::VERSION = '1.22';
 use Moose;
 use namespace::autoclean;
 

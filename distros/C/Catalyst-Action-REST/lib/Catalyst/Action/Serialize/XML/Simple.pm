@@ -1,5 +1,5 @@
 package Catalyst::Action::Serialize::XML::Simple;
-$Catalyst::Action::Serialize::XML::Simple::VERSION = '1.21';
+$Catalyst::Action::Serialize::XML::Simple::VERSION = '1.22';
 use Moose;
 use namespace::autoclean;
 

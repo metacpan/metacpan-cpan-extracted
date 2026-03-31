@@ -13,16 +13,18 @@ implementation of any external TOON specification.
 
 - `null`
 - `true` / `false`
-- numbers
-- quoted strings with JSON-style escapes
+- numbers (integer and floating-point, including scientific notation)
+- quoted strings with JSON-style escapes (including `\uXXXX` unicode escapes)
 - arrays: `[1, 2, 3]`
 - objects: `{name: "Dave", count: 3}`
-- quoted object keys when needed
+- bareword object keys matching `[A-Za-z_][A-Za-z0-9_-]*`; other keys must be quoted
+- tabular sections: `name[count]{field1,field2,...}:` followed by CSV rows
 
 ## Example
 
 ```perl
 use TOON qw(encode_toon decode_toon);
+# Aliases: to_toon / from_toon are also available
 
 my $text = encode_toon({
   name   => 'Dave',
@@ -32,6 +34,19 @@ my $text = encode_toon({
 
 my $data = decode_toon($text);
 ```
+
+## Tabular syntax
+
+Top-level hashes whose values are arrays of uniform hashes are automatically
+encoded in the compact tabular format:
+
+```
+users[2]{id,name,role}:
+  1,Alice,admin
+  2,Bob,user
+```
+
+This format is also accepted on decode.
 
 ## OO interface
 

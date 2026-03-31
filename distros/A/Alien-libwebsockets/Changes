@@ -1,5 +1,8 @@
 Revision history for Alien::libwebsockets
 
+0.02    2026-03-30
+        - Improved cross-platform support and build determinism.
+
 0.01    2026-02-20
         - Initial release.
         - Bundles libwebsockets 4.3.3.

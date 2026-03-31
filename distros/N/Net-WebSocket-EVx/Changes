@@ -1,3 +1,6 @@
+- 0.19
+	Fix bugs, harden XS, expand tests, add CI
+
 - 0.18
 	support perl 5.8
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use utf8;
 use DateTime;
@@ -510,42 +510,60 @@ for my $connection ( $ris->connections ) {
 			next;
 		}
 		elsif ( $segment->direction ) {
-			printf( "${output_bold}%s${output_reset} → %s  %s\n",
-				$segment->train_mid, $segment->direction,
-				$show_full_route ? q{} : format_occupancy($segment) );
+			printf(
+				"${output_bold}%s%s${output_reset} → %s  %s%s\n",
+				$segment->is_cancelled ? $output_critical : q{},
+				$segment->train_mid,
+				$segment->direction,
+				$show_full_route       ? q{} : format_occupancy($segment),
+				$segment->is_cancelled ? '  (cancelled)' : q{}
+			);
 		}
 		else {
-			printf( "${output_bold}%s${output_reset}\n", $segment->train_long );
+			printf(
+				"${output_bold}%s%s${output_reset}%s\n",
+				$segment->is_cancelled ? $output_critical : q{},
+				$segment->train_long,
+				$segment->is_cancelled ? '  (cancelled)' : q{}
+			);
 		}
 
 		printf(
-			"%s%s  %s  %s%s\n",
+			"%s%s  %s  %s%s%s%s\n",
 			$segment->dep ? $segment->dep->strftime('%H:%M') : q{??:??},
 			$max_delay_digits
 			? q{ } . format_delay( $segment->dep_delay, $max_delay_digits )
 			: q{},
 			$show_full_route ? format_occupancy( $segment->dep_stop ) : q{●},
+			( $segment->dep_stop and $segment->dep_stop->is_cancelled )
+			? $output_critical
+			: q{},
 			$segment->dep_name,
+			( $segment->dep_stop and $segment->dep_stop->is_cancelled )
+			? $output_reset
+			: q{},
 			$segment->dep_platform ? q{  } . $segment->dep_platform : q{},
 		);
 
 		if ($show_full_route) {
 			for my $stop ( $segment->route ) {
 				printf(
-					"%s%s  %s  %s%s\n",
+					"%s%s  %s  %s%s%s%s\n",
 					$stop->arr ? $stop->arr->strftime('%H:%M') : q{     },
 					$max_delay_digits
 					? q{ } . format_delay( $stop->arr_delay, $max_delay_digits )
 					: q{},
 					format_occupancy($stop),
+					$stop->is_cancelled ? $output_critical : q{},
 					$stop->name,
-					$stop->platform ? q{  } . $stop->platform : q{},
+					$stop->is_cancelled ? $output_reset           : q{},
+					$stop->platform     ? q{  } . $stop->platform : q{},
 				);
 			}
 		}
 
 		printf(
-			"%s%s%s%s  %s  %s%s\n",
+			"%s%s%s%s  %s  %s%s%s%s\n",
 			$segment->is_unlikely ? $output_critical                 : q{},
 			$segment->arr         ? $segment->arr->strftime('%H:%M') : q{??:??},
 			$segment->is_unlikely ? $output_reset                    : q{},
@@ -553,7 +571,13 @@ for my $connection ( $ris->connections ) {
 			? q{ } . format_delay( $segment->arr_delay, $max_delay_digits )
 			: q{},
 			$show_full_route ? format_occupancy( $segment->arr_stop ) : q{○},
+			( $segment->arr_stop and $segment->arr_stop->is_cancelled )
+			? $output_critical
+			: q{},
 			$segment->arr_name,
+			( $segment->arr_stop and $segment->arr_stop->is_cancelled )
+			? $output_reset
+			: q{},
 			$segment->arr_platform ? q{  } . $segment->arr_platform : q{},
 		);
 
@@ -591,7 +615,7 @@ B<dbris> [B<-d> I<DD.MM.YYYY>] [B<-a>|B<-t> I<HH:MM>] [...] I<from-stop>
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 DESCRIPTION
 

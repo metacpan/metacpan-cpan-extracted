@@ -1,5 +1,5 @@
 package Catalyst::Action::Deserialize::JSON;
-$Catalyst::Action::Deserialize::JSON::VERSION = '1.21';
+$Catalyst::Action::Deserialize::JSON::VERSION = '1.22';
 use Moose;
 use namespace::autoclean;
 use Scalar::Util qw(openhandle);

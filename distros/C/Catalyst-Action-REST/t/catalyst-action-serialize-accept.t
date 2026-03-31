@@ -79,7 +79,7 @@ SKIP: {
     $req->remove_header('Content-Type');
     my $res = request($req);
     ok( $res->is_success, 'GET the serialized request succeeded' );
-    is( $res->content, "--- \nlou: is my cat\n", "Request returned proper data");
+    like( $res->content, qr/\A--- ?\nlou: is my cat\n\z/, "Request returned proper data");
 }
 
 done_testing;

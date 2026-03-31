@@ -223,6 +223,20 @@ __PACKAGE__->method_documentation({
         format => 'date-time',
         read_only => 'true',
             },
+    'rps' => {
+        datatype => 'double',
+        base_name => 'rps',
+        description => 'Requests per second observed for this operation.',
+        format => '',
+        read_only => 'true',
+            },
+    'status' => {
+        datatype => 'string',
+        base_name => 'status',
+        description => 'The status of the operation.',
+        format => '',
+        read_only => 'true',
+            },
 });
 
 __PACKAGE__->openapi_types( {
@@ -234,7 +248,9 @@ __PACKAGE__->openapi_types( {
     'id' => 'string',
     'created_at' => 'DateTime',
     'updated_at' => 'DateTime',
-    'last_seen_at' => 'DateTime'
+    'last_seen_at' => 'DateTime',
+    'rps' => 'double',
+    'status' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -246,7 +262,9 @@ __PACKAGE__->attribute_map( {
     'id' => 'id',
     'created_at' => 'created_at',
     'updated_at' => 'updated_at',
-    'last_seen_at' => 'last_seen_at'
+    'last_seen_at' => 'last_seen_at',
+    'rps' => 'rps',
+    'status' => 'status'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

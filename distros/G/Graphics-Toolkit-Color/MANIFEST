@@ -10,6 +10,7 @@ README
 cpanfile
 dist.ini
 lib/Graphics/Toolkit/Color.pm
+lib/Graphics/Toolkit/Color/Calculator.pm
 lib/Graphics/Toolkit/Color/Name.pm
 lib/Graphics/Toolkit/Color/Name/Constant.pm
 lib/Graphics/Toolkit/Color/Name/Scheme.pm

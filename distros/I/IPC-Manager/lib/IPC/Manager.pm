@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000008';
+our $VERSION = '0.000009';
 
 use Carp qw/croak carp/;
 use Time::HiRes qw/sleep time/;

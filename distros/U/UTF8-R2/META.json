@@ -1,6 +1,6 @@
 {
     "name" : "UTF8-R2",
-    "version" : "0.28",
+    "version" : "0.29",
     "abstract" : "makes UTF-8 scripting easy for enterprise use",
     "author" : [
         "ina <ina@cpan.org>"
@@ -19,58 +19,49 @@
         "license" : [
             "http://dev.perl.org/licenses/"
         ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/UTF8-R2/issues"
+        },
         "repository" : {
-            "url" : "https://github.com/ina-cpan/UTF8-R2"
+            "url"  : "https://github.com/ina-cpan/UTF8-R2",
+            "web"  : "https://github.com/ina-cpan/UTF8-R2",
+            "type" : "git"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "Cwd" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
                 "Symbol" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0"
+                "strict" : "1.01"
             }
         },
         "configure" : {
             "requires" : {
-                "Cwd" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
                 "Symbol" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0"
+                "strict" : "1.01"
             }
         },
         "runtime" : {
             "requires" : {
-                "Cwd" : "0",
-                "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
                 "Symbol" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0"
+                "strict" : "1.01"
             }
+        },
+        "test" : {
+            "requires" : {
+                "Symbol" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01"
+            }
+        }
+    },
+    "provides" : {
+        "UTF8::R2" : {
+            "file" : "lib/UTF8/R2.pm",
+            "version" : "0.29"
         }
     }
 }

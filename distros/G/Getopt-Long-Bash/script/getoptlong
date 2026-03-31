@@ -17,6 +17,7 @@ cat <<EOF
 #     [ counter  | c +                 # Counter  ]=0
 #     [ required | r :                 # Required ]=/dev/stdout
 #     [ optional | o ?                 # Optional ]=
+#     [ verbose  | v | ~q              # Deny     ]=
 #     [ array    | A @                 # Array    ]=
 #     [ hash     | H %                 # Hash     ]=
 #     [ integer  | i :=i               # Integer  ]=1
@@ -48,6 +49,7 @@ B<Option definition:>
         [ counter  | c +                 # Counter  ]=0
         [ required | r :                 # Required ]=/dev/stdout
         [ optional | o ?                 # Optional ]=
+        [ verbose  | v | ~q              # Deny     ]=
         [ array    | A @                 # Array    ]=
         [ hash     | H %                 # Hash     ]=
         [ integer  | i :=i               # Integer  ]=1
@@ -70,7 +72,7 @@ B<Or:>
 
 =head1 VERSION
 
-0.8.0
+0.8.1
 
 =head1 DESCRIPTION
 
@@ -89,6 +91,7 @@ with array name and arguments), and B<multi-step> for advanced control
 Supports short (C<-v>) and long (C<--verbose>) options with bundling
 (C<-vvv>). B<Option types>: I<flag>, I<required argument>, I<optional
 argument>, I<array>, I<hash>. B<Modifiers>: I<callback>, I<pass-through>.
+B<Aliases>: I<negative alias> for option negation.
 B<Validation>: I<integer>, I<float>, I<regex>. B<Help message> generation.
 B<Multiple invocations> for subcommand support.
 
@@ -149,6 +152,8 @@ Long option name (C<--name>). Hyphens become underscores in variables
 =item B<ALIAS>
 
 Additional names separated by C<|> (e.g., C<verbose|v|V>).
+Prefix with C<~> to create a B<negative alias> that negates the option
+(e.g., C<verbose|v|~q> makes C<-q> equivalent to C<--no-verbose>).
 
 =item B<TYPE>
 
@@ -189,11 +194,13 @@ Each option type determines how arguments are handled and stored.
 =head2 COUNTER FLAG (C<+> or none)
 
 A flag takes no argument. First use sets to C<1>, subsequent uses
-increment (useful for verbosity levels). Use C<< --no-<name> >> to reset to
-empty string. Bundling supported: C<-vvv> equals C<-v -v -v>.
+increment (useful for verbosity levels). Use C<< --no-<name> >> or a
+negative alias to reset to empty string. Bundling supported:
+C<-vvv> equals C<-v -v -v>.
 
     [verbose|v]=        # $verbose: 1 when specified
     [debug|d+]=0        # $debug: increments (-d -d -d or -ddd)
+    [verbose|v|~q]=     # -q is equivalent to --no-verbose
 
 Numeric initial value (like C<0>) enables counter display in help.
 
@@ -357,7 +364,8 @@ Set the usage line displayed at the top of help output:
 
 Text after C<#> in the option definition becomes the help description.
 If omitted, a description is auto-generated. Default values are shown
-as C<(default: value)>.
+as C<(default: value)>. Negative aliases are displayed with C<~>/C<~~>
+prefix instead of C<->/C<-->.
 
     [output|o: # Output file path]=/dev/stdout
 
@@ -422,6 +430,12 @@ Use C<-a>/C<--all> to show all internal state.
 Display help message. Optional C<SYNOPSIS> overrides C<&USAGE>/C<USAGE>.
 
     getoptlong help [SYNOPSIS]
+
+=head2 getoptlong version
+
+Display the library version.
+
+    getoptlong version
 
 =head1 CONFIGURATION
 

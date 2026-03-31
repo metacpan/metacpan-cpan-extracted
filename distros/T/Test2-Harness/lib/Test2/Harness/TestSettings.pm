@@ -2,7 +2,7 @@ package Test2::Harness::TestSettings;
 use strict;
 use warnings;
 
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 use Scalar::Util qw/blessed/;
 use Test2::Util qw/IS_WIN32/;
@@ -119,7 +119,7 @@ sub includes {
         );
     }
 
-    push @$out => split /;/, $ENV{T2_HARNESS_INCLUDES} if $ENV{T2_HARNESS_INCLUDES};
+    push @$out => grep { $_ ne '.' } split /;/, $ENV{T2_HARNESS_INCLUDES} if $ENV{T2_HARNESS_INCLUDES};
     push @$out => '.' if $self->{+UNSAFE_INC};
 
     if (my $ch_dir = $self->{+CH_DIR}) {

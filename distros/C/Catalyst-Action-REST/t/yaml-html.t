@@ -19,10 +19,10 @@ SKIP: {
     my $t = Test::Rest->new( 'content_type' => 'text/html' );
 
     my $monkey_template =
-"<html><title>Test::Serialize</title><body><pre>--- \nmonkey: likes chicken!\n</pre></body></html>";
+qr{\A<html><title>Test::Serialize</title><body><pre>--- ?\nmonkey: likes chicken!\n</pre></body></html>\z};
     my $mres = request( $t->get( url => '/monkey_get' ) );
     ok( $mres->is_success, 'GET the monkey succeeded' );
-    is( $mres->content, $monkey_template, "GET returned the right data" );
+    like( $mres->content, $monkey_template, "GET returned the right data" );
 
     my $post_data = { 'sushi' => 'is good for monkey', };
     my $mres_post =
@@ -31,10 +31,10 @@ SKIP: {
 
     # xss test - RT 63537
     my $xss_template =
-"<html><title>Test::Serialize</title><body><pre>--- \nmonkey: likes chicken &gt; sushi!\n</pre></body></html>";
+qr{\A<html><title>Test::Serialize</title><body><pre>--- ?\nmonkey: likes chicken &gt; sushi!\n</pre></body></html>\z};
     my $xres = request( $t->get( url => '/xss_get' ) );
     ok( $xres->is_success, 'GET the xss succeeded' );
-    is( $xres->content, $xss_template, "GET returned the right data" );
+    like( $xres->content, $xss_template, "GET returned the right data" );
 
 
 }

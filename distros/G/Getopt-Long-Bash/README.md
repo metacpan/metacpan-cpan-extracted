@@ -13,6 +13,7 @@ getoptlong - Option parsing that does what you mean, for Bash
         [ counter  | c +                 # Counter  ]=0
         [ required | r :                 # Required ]=/dev/stdout
         [ optional | o ?                 # Optional ]=
+        [ verbose  | v | ~q              # Deny     ]=
         [ array    | A @                 # Array    ]=
         [ hash     | H %                 # Hash     ]=
         [ integer  | i :=i               # Integer  ]=1
@@ -35,7 +36,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
 # VERSION
 
-0.7.2
+0.8.0
 
 # DESCRIPTION
 
@@ -54,6 +55,7 @@ with array name and arguments), and **multi-step** for advanced control
 Supports short (`-v`) and long (`--verbose`) options with bundling
 (`-vvv`). **Option types**: _flag_, _required argument_, _optional
 argument_, _array_, _hash_. **Modifiers**: _callback_, _pass-through_.
+**Aliases**: _negative alias_ for option negation.
 **Validation**: _integer_, _float_, _regex_. **Help message** generation.
 **Multiple invocations** for subcommand support.
 
@@ -112,6 +114,8 @@ The key format is:
 - **ALIAS**
 
     Additional names separated by `|` (e.g., `verbose|v|V`).
+    Prefix with `~` to create a **negative alias** that negates the option
+    (e.g., `verbose|v|~q` makes `-q` equivalent to `--no-verbose`).
 
 - **TYPE**
 
@@ -150,11 +154,13 @@ Each option type determines how arguments are handled and stored.
 ## COUNTER FLAG (`+` or none)
 
 A flag takes no argument. First use sets to `1`, subsequent uses
-increment (useful for verbosity levels). Use `--no-<name>` to reset to
-empty string. Bundling supported: `-vvv` equals `-v -v -v`.
+increment (useful for verbosity levels). Use `--no-<name>` or a
+negative alias to reset to empty string. Bundling supported:
+`-vvv` equals `-v -v -v`.
 
     [verbose|v]=        # $verbose: 1 when specified
     [debug|d+]=0        # $debug: increments (-d -d -d or -ddd)
+    [verbose|v|~q]=     # -q is equivalent to --no-verbose
 
 Numeric initial value (like `0`) enables counter display in help.
 
@@ -318,7 +324,8 @@ Set the usage line displayed at the top of help output:
 
 Text after `#` in the option definition becomes the help description.
 If omitted, a description is auto-generated. Default values are shown
-as `(default: value)`.
+as `(default: value)`. Negative aliases are displayed with `~`/`~~`
+prefix instead of `-`/`--`.
 
     [output|o: # Output file path]=/dev/stdout
 
@@ -383,6 +390,12 @@ Use `-a`/`--all` to show all internal state.
 Display help message. Optional `SYNOPSIS` overrides `&USAGE`/`USAGE`.
 
     getoptlong help [SYNOPSIS]
+
+## getoptlong version
+
+Display the library version.
+
+    getoptlong version
 
 # CONFIGURATION
 

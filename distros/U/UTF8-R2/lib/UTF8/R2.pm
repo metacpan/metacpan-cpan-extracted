@@ -5,24 +5,24 @@ package UTF8::R2;
 #
 # http://search.cpan.org/dist/UTF8-R2/
 #
-# Copyright (c) 2019, 2020, 2021, 2022, 2023 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2020, 2021, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.28';
+$VERSION = '0.29';
 $VERSION = $VERSION;
 
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 } use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 use Symbol ();
 
 my %utf8_codepoint = (
 
     # beautiful concept in young days, however disabled 5-6 octets for safety
     # https://www.ietf.org/rfc/rfc2279.txt
-    'RFC2279' => qr{(?>@{[join('', qw(
+    'RFC2279' => qr{(?>@{[join('',  qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
@@ -31,7 +31,7 @@ my %utf8_codepoint = (
     ))]})}x,
 
     # https://tools.ietf.org/rfc/rfc3629.txt
-    'RFC3629' => qr{(?>@{[join('', qw(
+    'RFC3629' => qr{(?>@{[join('',  qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
@@ -45,7 +45,7 @@ my %utf8_codepoint = (
     ))]})}x,
 
     # http://simonsapin.github.io/wtf-8/
-    'WTF8' => qr{(?>@{[join('', qw(
+    'WTF8' => qr{(?>@{[join('',  qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
@@ -57,7 +57,7 @@ my %utf8_codepoint = (
     ))]})}x,
 
     # optimized RFC3629 for ja_JP
-    'RFC3629.ja_JP' => qr{(?>@{[join('', qw(
+    'RFC3629.ja_JP' => qr{(?>@{[join('',  qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
         [\xC2-\xDF][\x80-\xBF]                       |
@@ -71,7 +71,7 @@ my %utf8_codepoint = (
     ))]})}x,
 
     # optimized WTF-8 for ja_JP
-    'WTF8.ja_JP' => qr{(?>@{[join('', qw(
+    'WTF8.ja_JP' => qr{(?>@{[join('',  qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xE1-\xEF][\x80-\xBF][\x80-\xBF]            |
         [\xC2-\xDF][\x80-\xBF]                       |
@@ -105,7 +105,7 @@ sub import {
     # confirm version
     if (defined($_[0]) and ($_[0] =~ /\A [0-9] /xms)) {
         if ($_[0] ne $UTF8::R2::VERSION) {
-            my($package,$filename,$line) = caller;
+            my($package, $filename, $line) = caller;
             die "$filename requires @{[__PACKAGE__]} $_[0], however @{[__FILE__]} am only $UTF8::R2::VERSION, stopped at $filename line $line.\n";
         }
         shift @_;
@@ -120,8 +120,6 @@ sub import {
             # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
             tie my %mb, 'UTF8::R2';
             *{caller().'::mb'} = \%mb;
-
-            # supports mb package
             *{caller().'::mb::ORIG_PROGRAM_NAME'} = \$UTF8::R2::ORIG_PROGRAM_NAME;
             *{caller().'::mb::PERL'}              = \$UTF8::R2::PERL;
             *{caller().'::mb::chop'}              = \&UTF8::R2::chop;
@@ -171,7 +169,7 @@ sub import {
 sub confess {
     my $i = 0;
     my @confess = ();
-    while (my($package,$filename,$line,$subroutine) = caller($i)) {
+    while (my($package, $filename, $line, $subroutine) = caller($i)) {
         push @confess, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
@@ -215,7 +213,7 @@ sub UTF8::R2::chr (;$) {
 sub UTF8::R2::do ($) {
 
     # run as Perl script
-    return CORE::eval sprintf(<<'END', (caller)[0,2,1]);
+    return CORE::eval sprintf(<<'END', (caller)[0, 2, 1]);
 package %s;
 #line %s "%s"
 CORE::do "$_[0]";
@@ -228,7 +226,7 @@ sub UTF8::R2::eval (;$) {
     local $_ = @_ ? $_[0] : $_;
 
     # run as Perl script in caller package
-    return CORE::eval sprintf(<<'END', (caller)[0,2,1], $_);
+    return CORE::eval sprintf(<<'END', (caller)[0, 2, 1], $_);
 package %s;
 #line %s "%s"
 %s
@@ -238,7 +236,7 @@ END
 #---------------------------------------------------------------------
 # getc() for UTF-8 codepoint string
 sub UTF8::R2::getc (;*) {
-    my $fh = @_ ? Symbol::qualify_to_ref($_[0],caller()) : \*STDIN;
+    my $fh = @_ ? Symbol::qualify_to_ref($_[0], caller()) : \*STDIN;
     my $getc = CORE::getc $fh;
     if ($getc =~ /\A [\x00-\x7F\x80-\xC1\xF5-\xFF] \z/xms) {
     }
@@ -339,35 +337,35 @@ sub list_all_by_hyphen_utf8_like {
         if (0) { }
         elsif (CORE::length($b) == 1) {
             return (
-$a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]                                         )), $a[1],
+$a[1]<=$b[1] ?  sprintf(join('',  qw( [\x%02x-\x%02x]                                         )), $a[1],
                                                                                                  $b[1]) : (),
             );
         }
         elsif (CORE::length($b) == 2) {
             return (
-                sprintf(join('', qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
-0xC2 < $b[1] ?  sprintf(join('', qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
-                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]       ),
+                sprintf(join('',  qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
+0xC2 < $b[1] ?  sprintf(join('',  qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
+                sprintf(join('',  qw( [\x%02x-\x7F]                                           )), $a[1]       ),
             );
         }
         elsif (CORE::length($b) == 3) {
             return (
-                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
-0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
-0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
-                sprintf(join('', qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                    ),
-                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]              ),
+                sprintf(join('',  qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
+0x80 < $b[2] ?  sprintf(join('',  qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
+0xE0 < $b[1] ?  sprintf(join('',  qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
+                sprintf(join('',  qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                    ),
+                sprintf(join('',  qw( [\x%02x-\x7F]                                           )), $a[1]              ),
             );
         }
         elsif (CORE::length($b) == 4) {
             return (
-                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
-0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
-0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
-0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
-                sprintf(join('', qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
-                sprintf(join('', qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                           ),
-                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]                     ),
+                sprintf(join('',  qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('',  qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('',  qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('',  qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+                sprintf(join('',  qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
+                sprintf(join('',  qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                           ),
+                sprintf(join('',  qw( [\x%02x-\x7F]                                           )), $a[1]                     ),
             );
         }
     }
@@ -375,33 +373,33 @@ $a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]                            
         if (0) { }
         elsif (CORE::length($b) == 2) {
             my $lower_limit = join('|',
-$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1     ) : (),
-                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]),
+$a[1] < 0xDF ?  sprintf(join('',  qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1     ) : (),
+                sprintf(join('',  qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]),
             );
             my $upper_limit = join('|',
-                sprintf(join('', qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
-0xC2 < $b[1] ?  sprintf(join('', qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
+                sprintf(join('',  qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
+0xC2 < $b[1] ?  sprintf(join('',  qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
             );
             return qq{(?=$lower_limit)(?=$upper_limit)};
         }
         elsif (CORE::length($b) == 3) {
             return (
-                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3] ),
-0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1      ) : (),
-0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1             ) : (),
-$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1             ) : (),
-                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]        ),
+                sprintf(join('',  qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3] ),
+0x80 < $b[2] ?  sprintf(join('',  qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1      ) : (),
+0xE0 < $b[1] ?  sprintf(join('',  qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1             ) : (),
+$a[1] < 0xDF ?  sprintf(join('',  qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1             ) : (),
+                sprintf(join('',  qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]        ),
             );
         }
         elsif (CORE::length($b) == 4) {
             return (
-                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
-0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
-0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
-0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
-                sprintf(join('', qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
-$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1                   ) : (),
-                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]              ),
+                sprintf(join('',  qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('',  qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('',  qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('',  qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+                sprintf(join('',  qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
+$a[1] < 0xDF ?  sprintf(join('',  qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1                   ) : (),
+                sprintf(join('',  qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]              ),
             );
         }
     }
@@ -409,26 +407,26 @@ $a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                
         if (0) { }
         elsif (CORE::length($b) == 3) {
             my $lower_limit = join('|',
-$a[1] < 0xEF ?  sprintf(join('', qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1            ) : (),
-$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1     ) : (),
-                sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]),
+$a[1] < 0xEF ?  sprintf(join('',  qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1            ) : (),
+$a[2] < 0xBF ?  sprintf(join('',  qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1     ) : (),
+                sprintf(join('',  qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]),
             );
             my $upper_limit = join('|',
-                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
-0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
-0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
+                sprintf(join('',  qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
+0x80 < $b[2] ?  sprintf(join('',  qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
+0xE0 < $b[1] ?  sprintf(join('',  qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
             );
             return qq{(?=$lower_limit)(?=$upper_limit)};
         }
         elsif (CORE::length($b) == 4) {
             return (
-                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
-0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
-0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
-0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
-$a[1] < 0xEF ?  sprintf(join('', qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1                   ) : (),
-$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1            ) : (),
-                sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]       ),
+                sprintf(join('',  qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('',  qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('',  qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('',  qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+$a[1] < 0xEF ?  sprintf(join('',  qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1                   ) : (),
+$a[2] < 0xBF ?  sprintf(join('',  qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1            ) : (),
+                sprintf(join('',  qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]       ),
             );
         }
     }
@@ -436,16 +434,16 @@ $a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]  
         if (0) { }
         elsif (CORE::length($b) == 4) {
             my $lower_limit = join('|',
-$a[1] < 0xF4 ?  sprintf(join('', qw( [\x%02x-\xF4] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1]+1                   ) : (),
-$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1], $a[2]+1            ) : (),
-$a[3] < 0xBF ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] )), $a[1], $a[2], $a[3]+1     ) : (),
-                sprintf(join('', qw(  \x%02x        \x%02x        \x%02x       [\x%02x-\xBF] )), $a[1], $a[2], $a[3], $a[4]),
+$a[1] < 0xF4 ?  sprintf(join('',  qw( [\x%02x-\xF4] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1]+1                   ) : (),
+$a[2] < 0xBF ?  sprintf(join('',  qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1], $a[2]+1            ) : (),
+$a[3] < 0xBF ?  sprintf(join('',  qw(  \x%02x        \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] )), $a[1], $a[2], $a[3]+1     ) : (),
+                sprintf(join('',  qw(  \x%02x        \x%02x        \x%02x       [\x%02x-\xBF] )), $a[1], $a[2], $a[3], $a[4]),
             );
             my $upper_limit = join('|',
-                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
-0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
-0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
-0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+                sprintf(join('',  qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('',  qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('',  qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('',  qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
             );
             return qq{(?=$lower_limit)(?=$upper_limit)};
         }
@@ -472,7 +470,7 @@ sub UTF8::R2::qr ($) {
         my $before = $1;
 
         # [^...] or [...]
-        if (my($negative,$class) = $before =~ /\A \[ (\^?) ((?>\\$x|$x)+?) \] \z/x) {
+        if (my($negative, $class) = $before =~ /\A \[ (\^?) ((?>\\$x|$x)+?) \] \z/x) {
             my @classmate = $class =~ /\G (?: \[:.+?:\] | \\x\{[0123456789ABCDEFabcdef]+\} | (?>\\$x) | $x ) /xg;
             my @sbcs = ();
             my @xbcs = ();
@@ -553,27 +551,27 @@ sub UTF8::R2::qr ($) {
             # [^...]
             if ($negative eq q[^]) {
                 push @after,
-                    ( @sbcs and  @xbcs) ? '(?:(?!' . join('|', @xbcs, '['.join('',@sbcs).']') . ")$x)" :
+                    ( @sbcs and  @xbcs) ? '(?:(?!' . join('|', @xbcs, '['.join('', @sbcs).']') . ")$x)" :
                     (!@sbcs and  @xbcs) ? '(?:(?!' . join('|', @xbcs                        ) . ")$x)" :
-                    ( @sbcs and !@xbcs) ? '(?:(?!' .                  '['.join('',@sbcs).']'  . ")$x)" :
+                    ( @sbcs and !@xbcs) ? '(?:(?!' .                  '['.join('', @sbcs).']'  . ")$x)" :
                     '';
             }
 
             # [...] on Perl 5.006
             elsif ($] =~ /\A5\.006/) {
                 push @after,
-                    ( @sbcs and  @xbcs) ? '(?:'    . join('|', @xbcs, '['.join('',@sbcs).']') .    ')' :
+                    ( @sbcs and  @xbcs) ? '(?:'    . join('|', @xbcs, '['.join('', @sbcs).']') .    ')' :
                     (!@sbcs and  @xbcs) ? '(?:'    . join('|', @xbcs                        ) .    ')' :
-                    ( @sbcs and !@xbcs) ?                             '['.join('',@sbcs).']'           :
+                    ( @sbcs and !@xbcs) ?                             '['.join('', @sbcs).']'           :
                     '';
             }
 
             # [...]
             else {
                 push @after,
-                    ( @sbcs and  @xbcs) ? '(?:(?=' . join('|', @xbcs, '['.join('',@sbcs).']') . ")$x)" :
+                    ( @sbcs and  @xbcs) ? '(?:(?=' . join('|', @xbcs, '['.join('', @sbcs).']') . ")$x)" :
                     (!@sbcs and  @xbcs) ? '(?:(?=' . join('|', @xbcs                        ) . ")$x)" :
-                    ( @sbcs and !@xbcs) ?                             '['.join('',@sbcs).']'           :
+                    ( @sbcs and !@xbcs) ?                             '['.join('', @sbcs).']'           :
                     '';
             }
         }
@@ -659,7 +657,7 @@ sub UTF8::R2::require (;$) {
                 # run as Perl script
                 # must use CORE::do to use <DATA>, because CORE::eval cannot do it.
                 local $@;
-                my $result = CORE::eval sprintf(<<'END', (caller)[0,2,1]);
+                my $result = CORE::eval sprintf(<<'END', (caller)[0, 2, 1]);
 package %s;
 #line %s "%s"
 CORE::do "$prefix_file";
@@ -701,7 +699,7 @@ sub UTF8::R2::reverse (@) {
         return (join '',
             CORE::reverse(
                 @_ ?
-                join('',@_) =~ /\G$x/g : # concatenates the elements of @_
+                join('', @_) =~ /\G$x/g : # concatenates the elements of @_
                 /\G$x/g                  # $_ when without arguments
             )
         );
@@ -743,7 +741,7 @@ sub UTF8::R2::split (;$$$) {
     if (defined($_[0]) and (($_[0] eq '') or ($_[0] =~ /\A \( \? \^? [-a-z]* : \) \z/x))) {
         my @x = (defined($_[1]) ? $_[1] : $_) =~ /\G$x/g;
         if (defined($_[2]) and ($_[2] > 0) and (scalar(@x) > $_[2])) {
-            @x = (@x[0..$_[2]-1-1], join('', @x[$_[2]-1..$#x]));
+            @x = (@x[0..$_[2]-1-1], join('',  @x[$_[2]-1..$#x]));
         }
         if (wantarray) {
             return @x;
@@ -836,13 +834,13 @@ sub list_all_ASCII_by_hyphen {
             $hyphened[$i+2] = ($hyphened[$i+2] eq '\\-') ? '-' : $hyphened[$i+2];
             if (0) { }
             elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/xms) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr range is not US-ASCII});
             }
             elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/xms) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr range is not US-ASCII});
             }
             elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr range is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
             }
             else {
                 push @list_all, map { CORE::chr($_) } (CORE::ord($hyphened[$i+0]) .. CORE::ord($hyphened[$i+2]));
@@ -868,7 +866,7 @@ sub UTF8::R2::tr ($$$;$) {
     my @x           = $_[0] =~ /\G($x)/xmsg;
     my @search      = list_all_ASCII_by_hyphen($_[1] =~ /\G(\\-|$x)/xmsg);
     my @replacement = list_all_ASCII_by_hyphen($_[2] =~ /\G(\\-|$x)/xmsg);
-    my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
+    my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split('', $_[3])) : ();
 
     my %tr = ();
     for (my $i=0; $i <= $#search; $i++) {
@@ -1362,8 +1360,8 @@ Traditional functions of Perl are useful still now in octet-oriented semantics.
 
   elder <<<---                                   age                                   --->>> younger
   ---------------------------------------------------------------------------------------------------
-  bare Perl4       JPerl4           use utf8;        mb.pm                   use UTF8::R2 qw(*mb);   
-  bare Perl5       JPerl5           pragma           modulino                module                  
+  bare Perl4       JPerl4           use utf8;        mb.pm                   use UTF8::R2 qw(*mb);
+  bare Perl5       JPerl5           pragma           modulino                module
   ---------------------------------------------------------------------------------------------------
   chop             ---              ---              chop                    chop
   chr              chr              bytes::chr       chr                     chr
@@ -1444,7 +1442,7 @@ UTF-8 codepoint semantics of regular expression is provided by new sintax.
   // or m// or qr//       $mb{qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{UTF8hex} [ \D \H \S \V \W \b \d \h \s \v \w \x{UTF8hex} \x{UTF8hex}-\x{UTF8hex} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxo}
                           $mb{qr/$utf8regex/imsxo}                   modifier i, m, s, x, o work on compile time
                           m<\G$mb{qr/$utf8regex/imsxo}>gc            modifier g,c work on run time
-                          
+
                           Special Escapes in Regex                   Support Perl Version
                           --------------------------------------------------------------------------------------------------
                           $mb{qr/ \x{UTF8hex} /}                     since perl 5.005
@@ -1567,20 +1565,20 @@ You can use subroutines by mb.pm-like names.
   mb.pm                     script with
   modulino                  use UTF8::R2 qw(*mb);
   --------------------------------------------------
-  mb::chop                  mb::chop                
-  mb::chr                   mb::chr                 
-  mb::do 'file'             mb::do 'file'           
-  mb::eval 'string'         mb::eval 'string'       
-  mb::getc                  mb::getc                
-  mb::index                 mb::index               
-  mb::index_byte            mb::index_byte          
-  mb::length                mb::length              
-  mb::ord                   mb::ord                 
-  mb::require 'file'        mb::require 'file'      
-  mb::reverse               mb::reverse             
-  mb::rindex                mb::rindex              
-  mb::rindex_byte           mb::rindex_byte         
-  mb::substr                mb::substr              
+  mb::chop                  mb::chop
+  mb::chr                   mb::chr
+  mb::do 'file'             mb::do 'file'
+  mb::eval 'string'         mb::eval 'string'
+  mb::getc                  mb::getc
+  mb::index                 mb::index
+  mb::index_byte            mb::index_byte
+  mb::length                mb::length
+  mb::ord                   mb::ord
+  mb::require 'file'        mb::require 'file'
+  mb::reverse               mb::reverse
+  mb::rindex                mb::rindex
+  mb::rindex_byte           mb::rindex_byte
+  mb::substr                mb::substr
   --------------------------------------------------
 
 However...
@@ -1589,9 +1587,9 @@ However...
   mb.pm                     script with
   modulino                  use UTF8::R2 qw(*mb);
   --------------------------------------------------
-  mb::use Module            use Module              
-  mb::no Module             no Module               
-  mb::dosglob               glob                    
+  mb::use Module            use Module
+  mb::no Module             no Module
+  mb::dosglob               glob
   --------------------------------------------------
 
 =head2 Use mb::* variables
@@ -1603,8 +1601,8 @@ You can use variables by mb.pm-like names.
   mb.pm                     script with
   modulino                  use UTF8::R2 qw(*mb);
   --------------------------------------------------
-  $mb::PERL                 $mb::PERL               
-  $mb::ORIG_PROGRAM_NAME    $mb::ORIG_PROGRAM_NAME  
+  $mb::PERL                 $mb::PERL
+  $mb::ORIG_PROGRAM_NAME    $mb::ORIG_PROGRAM_NAME
   --------------------------------------------------
 
 =head1 DEPENDENCIES
@@ -1648,7 +1646,7 @@ However,
     its inside that has
     its inside that has
     its inside that has ...
-  
+
   Every outside has
     its outside that has
     its outside that has
@@ -1933,12 +1931,12 @@ Description of combinations
   O-I-S     description
   ----------------------------------------------------------------------
   S-S-S     Best choice when I/O is Sjis encoding
-  S-S-U     
-  S-U-S     
+  S-S-U
+  S-U-S
   S-U-U     Better choice when I/O is UTF-8 encoding, since not so slow
   U-S-S     Better choice when I/O is Sjis  encoding, since not so slow
-  U-S-U     
-  U-U-S     
+  U-S-U
+  U-U-S
   U-U-U     Best choice when I/O is UTF-8 encoding
   ----------------------------------------------------------------------
 
@@ -2385,7 +2383,7 @@ This software is distributed in the hope that it will be useful, but WITHOUT ANY
 
  On Perl 7 and the Perl Steering Committee
  https://lwn.net/Articles/828384/
-  
+
  Perl7 and the future of Perl
  http://www.softpanorama.org/Scripting/Language_wars/perl7_and_the_future_of_perl.shtml
 
@@ -2443,7 +2441,7 @@ This software is distributed in the hope that it will be useful, but WITHOUT ANY
 =head1 ACKNOWLEDGEMENTS
 
 This software was made referring to software and the document that the
-following hackers or persons had made. 
+following hackers or persons had made.
 I am thankful to all persons.
 
  Larry Wall, Perl

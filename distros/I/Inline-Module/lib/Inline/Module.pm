@@ -1,7 +1,7 @@
 use strict; use warnings;
 package Inline::Module;
-our $VERSION = '0.34';
-our $API_VERSION = 'v2';
+our $VERSION = '0.35';
+our $API_VERSION = '0.35';
 
 use Carp 'croak';
 use Config();
@@ -361,6 +361,7 @@ use strict; use warnings;
 package $module;
 use base 'DynaLoader';
 bootstrap $module;
+sub import {}
 1;
 ...
 

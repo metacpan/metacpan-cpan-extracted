@@ -10,11 +10,14 @@ build_requires:
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
+  Mojo::DOM58: '1.00'
   Mozilla::CA: '0'
   Net::SSLeay: '1.49'
+  Sort::Versions: '0'
   Test::Alien: '0'
   Test::More: '0'
   URI: '0'
+  URI::Escape: '0'
 configure_requires:
   Alien::Build: '2.37'
   Alien::Build::MM: '2.37'
@@ -33,7 +36,7 @@ no_index:
 provides:
   Alien::libwebsockets:
     file: lib/Alien/libwebsockets.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Alien::Base: '2.37'
   Alien::Build: '2.37'
@@ -41,7 +44,7 @@ requires:
 resources:
   bugtracker: https://github.com/vividsnow/perl5-alien-libwebsockets/issues
   repository: https://github.com/vividsnow/perl5-alien-libwebsockets.git
-version: '0.01'
+version: '0.02'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:
@@ -52,8 +55,11 @@ x_alienfile:
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
+      Mojo::DOM58: '1.00'
       Mozilla::CA: '0'
       Net::SSLeay: '1.49'
+      Sort::Versions: '0'
       URI: '0'
+      URI::Escape: '0'
     system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

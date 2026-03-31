@@ -6,7 +6,7 @@ use feature 'signatures';
 use Exporter 'import';
 use TOON::PP ();
 
-our $VERSION   = '0.0.1';
+our $VERSION   = '0.1.0';
 our @EXPORT_OK = qw(
   encode_toon decode_toon
   to_toon from_toon

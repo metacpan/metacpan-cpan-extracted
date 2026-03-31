@@ -5,12 +5,12 @@ use EV ();
 use XSLoader ();
 our $VERSION;
 BEGIN {
-    $VERSION = '0.18';
+    $VERSION = '0.19';
     XSLoader::load(__PACKAGE__, $VERSION);
 }
-use constant { WS_FRAGMENTED_EOF => 0, WS_FRAGMENTED_ERROR => -1, WS_FRAGMENTED_DATA => 1 };
+use constant { WS_FRAGMENTED_EOF => 0, WS_FRAGMENTED_ERROR => -1, WS_FRAGMENTED_DATA => 1, WS_RSV1_BIT => 0x04 };
 use Exporter 'import';
-our @EXPORT = qw/WS_FRAGMENTED_EOF WS_FRAGMENTED_ERROR WS_FRAGMENTED_NODATA/;
+our @EXPORT = qw/WS_FRAGMENTED_EOF WS_FRAGMENTED_ERROR WS_FRAGMENTED_DATA WS_RSV1_BIT/;
 
 sub new {
     my (undef, $self) = @_;

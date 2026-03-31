@@ -54,9 +54,9 @@ END
 
 	my $expected = <<'END';
 my $result = Foo->new({
-		name => 'bar',
-		age => 42,
-	});
+	name => 'bar',
+	age => 42,
+});
 END
 
 	my $got = Eshu->indent_pl($input);

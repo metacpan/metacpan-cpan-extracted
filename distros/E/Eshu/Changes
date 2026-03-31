@@ -1,5 +1,14 @@
 Revision history for Eshu
 
+0.05    2026-03-30
+        - Fix $# (last array index) operator being misinterpreted as a
+          comment, causing incorrect depth tracking for the rest of the line.
+          Affects $#array, $#$arrayref, and $#{$arrayref} forms.
+        - Suppress paren depth for callback patterns: method(sub { ... })
+          and method([ ... ]) now indent the body +1 from the call site
+          instead of +2. The ( is suppressed when { or [ also opens on
+          the same line.
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

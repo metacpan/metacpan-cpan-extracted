@@ -11,7 +11,7 @@ use Exporter 'import';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2026-01-20'; # DATE
 our $DIST = 'App-CrockfordBase32Utils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(
                        num_to_cfbase32
@@ -146,6 +146,12 @@ sub _gen_rand_cfbase32 {
 $SPEC{cfbase32_rand} = {
     v => 1.1,
     summary => "Generate one or more Crockford Base 32 numbers",
+    description => <<'MARKDOWN',
+
+This routine uses <pm:Math::Random::Secure> for cryptographically secure random
+number generator.
+
+MARKDOWN
     args => {
         zero_prefix => {
             schema => 'bool*',
@@ -352,7 +358,7 @@ App::CrockfordBase32Utils - Utilities related to Crockford's Base 32 encoding
 
 =head1 VERSION
 
-This document describes version 0.003 of App::CrockfordBase32Utils (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
+This document describes version 0.004 of App::CrockfordBase32Utils (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
 
 =head1 DESCRIPTION
 
@@ -467,41 +473,41 @@ Result:
    200,
    "OK",
    [
-     "BSNSRF2F9Y7C",
-     "0KRQJKYRY3GC",
-     "6AP4BK914YFT",
-     "D99V5RGJ35RJ",
-     "N4BYJ56754H4",
-     "QNC1CT4XFXXD",
-     "QTS5S2B6VV9G",
-     "Z8SF1198XZED",
-     "GGZBSW7X1A10",
-     "7F47C6Y05B37",
-     "5GVPQ07YRWHE",
-     "54N37HV0EZT9",
-     "8ZNYJ7VYKCQD",
-     "5N93ZGT4VSCQ",
-     "AYC79RT3PJVS",
-     "E50QDKJBNWF0",
-     "Q6GD5WT7PJ9B",
-     "ZETH5SN1DDV3",
-     "RD4K3TDGZQF6",
-     "4B65QF8SNCGT",
-     "RW86Z1WDG3WC",
-     "Q8QHFN9GC6WH",
-     "5V4RW9RG07FW",
-     "N84VMR010KZT",
-     "83R3EC2Y9SA5",
-     "K1TDKKYD5T31",
-     "JZYTSCP5MB0A",
-     "AKYTNZ2JTZCB",
-     "RZ8DSJP1JEKH",
-     "3C65NKR77B82",
-     "KS5C0YK587R0",
-     "T60WN6Z6MGWS",
-     "01W64RP5T642",
-     "7FPZ2MFQ895H",
-     "2JYVCZ3A5KZV",
+     "N3JMT6M2B0YG",
+     "DBWTMFBKN9FE",
+     "ECXZ0V5NM50M",
+     "A6Y4C9SVQ6MX",
+     "04K9ESNZX5AS",
+     "WDWJEAZMEP90",
+     "VNWTY2GFMWZR",
+     "YEPGJ07130R2",
+     "8CWMYHH1CSHS",
+     "HV28X0F3H0N4",
+     "B34989JWPSF0",
+     "918Y3WJPMJMS",
+     "90S75ZA6MJ06",
+     "GBFJST7DRE0H",
+     "7ANA09TSMED6",
+     "KGJYYKYVPCCY",
+     "AT483B8M52KN",
+     "XCZ307G6DP6E",
+     "NVRMYT9CZB56",
+     "FHT5Q5343NK3",
+     "JDNGZ9XSJB84",
+     "58QW86W68A1M",
+     "QKTEQVF1HZW6",
+     "SMA4MWZ6ZQBG",
+     "35HZ7H7Q8AG8",
+     "5D9ESKZRCNWY",
+     "1KVJR6TP51TV",
+     "E5ZH7XFZ1WSR",
+     "40CR2BFKSVWG",
+     "EB9SCPETF17N",
+     "P7YD2HJ0FWD6",
+     "948KKKFYF48S",
+     "FKZ7Y78YRJ38",
+     "DVRJVT0BV18J",
+     "4ENMAQ4S7YGB",
    ],
    {},
  ]
@@ -516,50 +522,53 @@ Result:
    200,
    "OK",
    [
-     "PMQ1620K7R90",
-     "KQ3JSZDZ3T21",
-     "FG1M8HH4PRRK",
-     "YB77RJN7RK1A",
-     "NTEKN45NDRQQ",
-     "FZ1BKNTS36RF",
-     "4DVC5NR22FJM",
-     "1B6PKA8PFVGY",
-     "KVHBM642RRMA",
-     "XD2C0P1C6DJY",
-     "RWRR4HH3535S",
-     "7YFYR1XGMPGP",
-     "VBV2P0XG48TC",
-     "PZKSE2PRVQVV",
-     "2G97XHA4ZW6Y",
-     "HRJCZVEERZ0E",
-     "MN82PPHMA7EG",
-     "WTW776EX7VCH",
-     "QG8AR7MCB8P6",
-     "XTYM2HHYF387",
-     "Y1F2WJSENH7H",
-     "XK43A6NFW4HB",
-     "BE9XYDT7X0ZC",
-     "VK0Q9NJH9X9Y",
-     "5K6XEWB37R3T",
-     "2T9ZKN0K1CVF",
-     "4CYBM1SX1427",
-     "49HNW725F500",
-     "C8VE23QWV4HR",
-     "FSZ8VBF8VVMF",
-     "KDJNZ47GWWY1",
-     "5CN3F0Z8VR86",
-     "7MBA0J51GSNF",
-     "SFWJ74DFNKT9",
-     "85J79X5V1789",
+     "PGDH9MK94177",
+     "GVR2DNYFRRK2",
+     "DB0V0N779QTJ",
+     "AYNKPKJ4ZF09",
+     "XFTYF1MR0T68",
+     "AJ0FE5E7MTVA",
+     "TW424P6DG0FJ",
+     "ZTDCSQFHFPHQ",
+     "SN4HHMADK3XH",
+     "CB3GSGDRTM8T",
+     "BNCGYF8SDZ3V",
+     "HQYEPQFZGVM0",
+     "EN4FXQK16TB4",
+     "G36JTTAV66N7",
+     "METRYBJKW96H",
+     "H9F232BEB7EN",
+     "TZ0DSD7ZWSY3",
+     "D6FDSDKPBAM9",
+     "16CCRSW9SAPA",
+     "NW6S9RPF6TBK",
+     "7WT638GKRZGS",
+     "C9ZT146KW0S4",
+     "YMBY6B8SDMEE",
+     "VZFFAACX60ZV",
+     "PHV5Q2JXSNS0",
+     "RSF4X7Z9R05Y",
+     "ZJ4DCZ02T5PN",
+     "YAN01K86KMQ5",
+     "AACED7N0Y99E",
+     "ZHZ0JF7ZXNJR",
+     "D9R0A5S7ET68",
+     "3BTRMB7B1SP1",
+     "T9WTQ4VCM95P",
+     "DD6BCWBYZB3J",
+     "S5HEQ0AAWMFR",
    ],
    {},
  ]
 
 =item * Generate a formatted random code:
 
- cfbase32_rand(fill_char_template => "###-###-###", len => 9); # -> [200, "OK", ["GS1-F5B-5PC"], {}]
+ cfbase32_rand(fill_char_template => "###-###-###", len => 9); # -> [200, "OK", ["1A8-ZR5-PCY"], {}]
 
 =back
+
+This routine uses L<Math::Random::Secure> for cryptographically secure random
+number generator.
 
 This function is not exported by default, but exportable.
 

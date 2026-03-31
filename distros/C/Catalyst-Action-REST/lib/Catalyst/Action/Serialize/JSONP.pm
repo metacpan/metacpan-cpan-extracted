@@ -1,5 +1,5 @@
 package Catalyst::Action::Serialize::JSONP;
-$Catalyst::Action::Serialize::JSONP::VERSION = '1.21';
+$Catalyst::Action::Serialize::JSONP::VERSION = '1.22';
 use Moose;
 use namespace::autoclean;
 

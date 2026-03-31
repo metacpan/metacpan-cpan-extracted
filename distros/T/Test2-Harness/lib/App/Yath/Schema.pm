@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw/confess/;
 
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 use base 'DBIx::Class::Schema';
 
@@ -48,6 +48,11 @@ sub is_percona {
 sub is_mariadb {
     return 1 if $App::Yath::Schema::LOADED =~ m/MariaDB/;
     return 0;
+}
+
+sub can_store_null_character {
+    return 0 if is_postgresql();
+    return 1;
 }
 
 sub format_uuid_for_db {

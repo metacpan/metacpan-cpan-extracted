@@ -67,7 +67,7 @@
    "provides" : {
       "App::CrockfordBase32Utils" : {
          "file" : "lib/App/CrockfordBase32Utils.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -82,7 +82,7 @@
          "web" : "https://github.com/perlancar/perl-App-CrockfordBase32Utils"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"

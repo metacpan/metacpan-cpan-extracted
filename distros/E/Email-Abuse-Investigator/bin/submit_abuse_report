@@ -86,9 +86,8 @@ $smtp_port //= 25;
 # Read the raw email
 # -----------------------------------------------------------------------
 my $raw;
-if (@ARGV && -f $ARGV[0]) {
-    open my $fh, '<:raw', $ARGV[0]
-        or die basename($0) . ": cannot open '$ARGV[0]': $!\n";
+if (@ARGV) {
+	open my $fh, '<:raw', $ARGV[0] or die basename($0), ": cannot open '$ARGV[0]': $!";
     local $/;
     $raw = <$fh>;
     close $fh;

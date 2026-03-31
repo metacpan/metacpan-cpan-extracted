@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Carp qw/croak confess/;
-use Test2::Harness::Util qw/parse_exit mod2file/;
+use Test2::Harness::Util qw/parse_exit mod2file fqmod/;
 use Test2::Util::UUID qw/gen_uuid/;
 use Test2::Harness::Util::JSON qw/encode_json decode_json/;
 
@@ -16,7 +16,7 @@ use App::Yath::Schema::Importer;
 use App::Yath::Util qw/share_file/;
 use App::Yath::Schema::Util qw/qdb_driver dbd_driver/;
 
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 use Test2::Harness::Util::HashBase qw{
     <schema_config
@@ -172,6 +172,9 @@ sub start_server {
     my %params = @_;
 
     croak "Server already started with pid $self->{+PID}" if $self->{+PID};
+
+    my $launcher = $self->{+LAUNCHER} or die "No launcher specified, and default 'Starman' is not installed";
+    fqmod($launcher, ['Plack::Handler']);
 
     $self->{+ROOT_PID} //= $$;
     $self->_root_proc_check();

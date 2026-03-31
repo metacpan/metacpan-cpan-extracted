@@ -481,12 +481,13 @@ drain(SV* self_sv, UV limit)
     PPCODE:
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         if (limit == 0) XSRETURN_EMPTY;
-        shm_ss_drain_entry *entries = (shm_ss_drain_entry *)calloc(limit, sizeof(shm_ss_drain_entry));
-        if (!entries) croak("drain: out of memory");
+        shm_ss_drain_entry *entries;
+        Newxz(entries, limit, shm_ss_drain_entry);
+        
         SAVEFREEPV(entries);
         char *buf = NULL; uint32_t buf_cap = 0;
         uint32_t n = shm_ss_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
-        if (buf) SAVEFREEPV(buf);
+        
         EXTEND(SP, n * 2);
         for (uint32_t i = 0; i < n; i++) {
             SV *ksv = newSVpvn(buf + entries[i].key_off, entries[i].key_len);
@@ -496,6 +497,7 @@ drain(SV* self_sv, UV limit)
             if (entries[i].val_utf8) SvUTF8_on(vsv);
             mPUSHs(vsv);
         }
+        if (buf) free(buf);
         
 
 UV

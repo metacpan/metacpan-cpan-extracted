@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 use DateTime::Duration;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 Travel::Routing::DE::DBRIS::Connection::Segment->mk_ro_accessors(
 	qw(
@@ -21,7 +21,7 @@ Travel::Routing::DE::DBRIS::Connection::Segment->mk_ro_accessors(
 	  arr_delay dep_delay delay feasibility is_unlikely transfer_duration
 	  journey_id
 	  occupancy occupancy_first occupancy_second
-	  is_transfer is_walk walk_name distance_m
+	  is_cancelled is_transfer is_walk walk_name distance_m
 	)
 );
 
@@ -32,18 +32,19 @@ sub new {
 	my $strptime = $opt{strptime_obj};
 
 	my $ref = {
-		arr_eva     => $json->{ankunftsOrtExtId},
-		arr_name    => $json->{ankunftsOrt},
-		dep_eva     => $json->{abfahrtsOrtExtId},
-		dep_name    => $json->{abfahrtsOrt},
-		train       => $json->{verkehrsmittel}{name},
-		train_short => $json->{verkehrsmittel}{kurzText},
-		train_mid   => $json->{verkehrsmittel}{mittelText},
-		train_long  => $json->{verkehrsmittel}{langText},
-		direction   => $json->{verkehrsmittel}{richtung},
-		distance_m  => $json->{distanz},
-		feasibility => $json->{anschlussBewertungCode},
-		journey_id  => $json->{journeyId},
+		arr_eva      => $json->{ankunftsOrtExtId},
+		arr_name     => $json->{ankunftsOrt},
+		dep_eva      => $json->{abfahrtsOrtExtId},
+		dep_name     => $json->{abfahrtsOrt},
+		train        => $json->{verkehrsmittel}{name},
+		train_short  => $json->{verkehrsmittel}{kurzText},
+		train_mid    => $json->{verkehrsmittel}{mittelText},
+		train_long   => $json->{verkehrsmittel}{langText},
+		direction    => $json->{verkehrsmittel}{richtung},
+		distance_m   => $json->{distanz},
+		feasibility  => $json->{anschlussBewertungCode},
+		journey_id   => $json->{journeyId},
+		is_cancelled => $json->{is_cancelled},
 	};
 
 	bless( $ref, $obj );
@@ -162,6 +163,10 @@ sub new {
 		$ref->{arr_stop}     = $ref->{route}[-1];
 		$ref->{dep_platform} = $ref->{route}[0]->platform;
 		$ref->{arr_platform} = $ref->{route}[-1]->platform;
+		if ( $ref->{dep_stop}{is_cancelled} or $ref->{arr_stop}{is_cancelled} )
+		{
+			$ref->{is_cancelled} = 1;
+		}
 	}
 
 	return $ref;

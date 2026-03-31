@@ -1,6 +1,6 @@
 use utf8;
 package App::Yath::Schema::PostgreSQL::Event;
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 package
     App::Yath::Schema::Result::Event;

@@ -1,0 +1,41 @@
+# Version control
+\.git/
+\.gitignore
+
+# ExtUtils::MakeMaker / Module::Build
+^Makefile$
+^Makefile\.old$
+^Makefile\.bak$
+^MYMETA\.
+^pm_to_blib$
+^blib/
+^_build/
+^Build$
+^MANIFEST\.bak$
+
+# Coverage / local tooling
+^cover_db/
+^local/
+^\.carton/
+^\.prove$
+
+# Profiling / debugging (Devel::NYTProf, etc.)
+^nytprof/
+nytprof\.out
+^nytprof.*
+^callgrind\.out
+^cachegrind\.out
+^\.perl-proverc$
+
+# Release tarballs / make distdir (must not ship inside the next tarball)
+\.tar\.gz$
+\.zip$
+^App-prepare4release-
+
+# Editor / OS
+^\.vscode/
+^\.idea/
+\.DS_Store$
+
+# Author-only config in this dist (template lives in repo; not shipped)
+^prepare4release\.json$

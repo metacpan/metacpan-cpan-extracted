@@ -1,3 +1,26 @@
+2.000009  2026-03-30 16:17:42-07:00 America/Los_Angeles
+
+    - Fix scheduler bug when timing out test startups
+
+2.000008  2026-03-30 10:52:46-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fix undef error in some exception cases
+    - Fix . in @INC test
+    - Remove test file that should not exist
+
+2.000007  2026-03-29 21:19:04-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Remove Carp::Always accidentally left in
+    - Require updated Getopt::Yath
+    - Require Starman for a CLI based web server
+    - Removed old demo scripts
+    - Pagination for runs!
+    - Break out Getopt::Yath
+
+2.000006  2025-05-04 03:45:10-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    - Fixing accidental non-trial release
+
 2.000005  2025-05-04 01:16:20-07:00 America/Los_Angeles
 
     - Minting a fixed tarball, no actual changes

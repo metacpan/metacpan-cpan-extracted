@@ -2,7 +2,7 @@ package App::Yath::Options::WebServer;
 use strict;
 use warnings;
 
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 use Getopt::Yath;
 
@@ -13,10 +13,13 @@ include_options(
 option_group {group => 'webserver', category => "Web Server Options"} => sub {
     option launcher => (
         type => 'Scalar',
-        default => sub { eval { require Starman; 1 } ? 'Starman' : undef },
+        default => sub {
+            return 'Starman' if eval { require Starman; 1 };
+            return undef;
+        },
         description => 'Command to use to launch the server (--server argument to Plack::Runner) ',
         notes => "You can pass custom args to the launcher after a '::' like `yath server [ARGS] [LOG FILES(s)] :: [LAUNCHER ARGS]`",
-        default_text => "Will use 'Starman' if it installed otherwise whatever Plack::Runner uses by default.",
+        default_text => "Will use 'Starman' unless you specify something else. Will die if nothing is specified and Starman is not installed.",
     );
 
     option port_command => (

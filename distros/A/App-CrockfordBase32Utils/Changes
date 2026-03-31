@@ -1,3 +1,11 @@
+0.004   2026-01-20  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli cfbase32-rand] [doc] Mention the use of
+          Math::Random::Secure.
+
+
 0.003   2026-01-20  Released-By: PERLANCAR; Urgency: medium
 
         [cli cfbase32-rand]

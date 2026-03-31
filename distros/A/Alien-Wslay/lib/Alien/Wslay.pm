@@ -3,6 +3,7 @@ package Alien::Wslay;
 use strict;
 use warnings;
 
+our $VERSION = '0.3';
 use base 'Alien::Base';
 
 1;
@@ -11,7 +12,7 @@ __END__
 
 =head1 NAME
 
-Alien::Wslay
+Alien::Wslay - Discover or download and install Wslay
 
 =head1 SYNOPSIS
 

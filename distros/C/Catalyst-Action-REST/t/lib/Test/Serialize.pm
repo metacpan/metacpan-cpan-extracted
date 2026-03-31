@@ -7,7 +7,7 @@ use lib ("$FindBin::Bin/../lib");
 use Moose;
 use namespace::autoclean;
 
-use Catalyst::Runtime '5.70';
+use Catalyst::Runtime 5.70;
 
 use Catalyst;
 use Test::Catalyst::Log;

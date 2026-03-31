@@ -1,5 +1,5 @@
 package Catalyst::TraitFor::Request::REST::ForBrowsers;
-$Catalyst::TraitFor::Request::REST::ForBrowsers::VERSION = '1.21';
+$Catalyst::TraitFor::Request::REST::ForBrowsers::VERSION = '1.22';
 use Moose::Role;
 use namespace::autoclean;
 

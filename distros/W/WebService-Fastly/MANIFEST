@@ -97,6 +97,7 @@ docs/BrotliCompressionResponseLinksLinks.md
 docs/BrotliCompressionResponseProduct.md
 docs/BrotliCompressionResponseProductProduct.md
 docs/BrotliCompressionResponseService.md
+docs/BulkOperationResult.md
 docs/BulkUpdateAclEntriesRequest.md
 docs/BulkUpdateAclEntry.md
 docs/BulkUpdateAclEntryAllOf.md
@@ -366,6 +367,8 @@ docs/InlineResponse2007.md
 docs/InlineResponse2008.md
 docs/InlineResponse2009.md
 docs/InlineResponse201.md
+docs/InlineResponse207.md
+docs/InlineResponse2071.md
 docs/InlineResponse400.md
 docs/InsightsApi.md
 docs/Invitation.md
@@ -573,7 +576,12 @@ docs/ObservabilityTimeseriesApi.md
 docs/Offer.md
 docs/OfferAllOf.md
 docs/OperationBase.md
+docs/OperationBulkAddTags.md
+docs/OperationBulkCreate.md
+docs/OperationBulkCreateOperations.md
+docs/OperationBulkDelete.md
 docs/OperationCreate.md
+docs/OperationCreateExtra.md
 docs/OperationGet.md
 docs/OperationGetExtra.md
 docs/OperationUpdate.md
@@ -1158,6 +1166,7 @@ lib/WebService/Fastly/Object/BrotliCompressionResponseLinksLinks.pm
 lib/WebService/Fastly/Object/BrotliCompressionResponseProduct.pm
 lib/WebService/Fastly/Object/BrotliCompressionResponseProductProduct.pm
 lib/WebService/Fastly/Object/BrotliCompressionResponseService.pm
+lib/WebService/Fastly/Object/BulkOperationResult.pm
 lib/WebService/Fastly/Object/BulkUpdateAclEntriesRequest.pm
 lib/WebService/Fastly/Object/BulkUpdateAclEntry.pm
 lib/WebService/Fastly/Object/BulkUpdateAclEntryAllOf.pm
@@ -1395,6 +1404,8 @@ lib/WebService/Fastly/Object/InlineResponse2007.pm
 lib/WebService/Fastly/Object/InlineResponse2008.pm
 lib/WebService/Fastly/Object/InlineResponse2009.pm
 lib/WebService/Fastly/Object/InlineResponse201.pm
+lib/WebService/Fastly/Object/InlineResponse207.pm
+lib/WebService/Fastly/Object/InlineResponse2071.pm
 lib/WebService/Fastly/Object/InlineResponse400.pm
 lib/WebService/Fastly/Object/Invitation.pm
 lib/WebService/Fastly/Object/InvitationCreateData.pm
@@ -1562,7 +1573,12 @@ lib/WebService/Fastly/Object/ObjectStorageResponseProductProduct.pm
 lib/WebService/Fastly/Object/Offer.pm
 lib/WebService/Fastly/Object/OfferAllOf.pm
 lib/WebService/Fastly/Object/OperationBase.pm
+lib/WebService/Fastly/Object/OperationBulkAddTags.pm
+lib/WebService/Fastly/Object/OperationBulkCreate.pm
+lib/WebService/Fastly/Object/OperationBulkCreateOperations.pm
+lib/WebService/Fastly/Object/OperationBulkDelete.pm
 lib/WebService/Fastly/Object/OperationCreate.pm
+lib/WebService/Fastly/Object/OperationCreateExtra.pm
 lib/WebService/Fastly/Object/OperationGet.pm
 lib/WebService/Fastly/Object/OperationGetExtra.pm
 lib/WebService/Fastly/Object/OperationUpdate.pm

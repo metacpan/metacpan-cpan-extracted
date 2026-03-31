@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::PPPort;
-$Dist::Zilla::Plugin::PPPort::VERSION = '0.011';
+$Dist::Zilla::Plugin::PPPort::VERSION = '0.012';
 # vi:noet:sts=4:sw=4:ts=4
 use Moose;
 with qw/Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::PrereqSource Dist::Zilla::Role::AfterBuild Dist::Zilla::Role::FilePruner/;
@@ -84,11 +84,11 @@ sub after_build($self, $args) {
 		->requirements_for_module('perl') || '5.006';
 
 	if ($self->logger->get_debug) {
-		chomp(my $out = `$^X $filename --compat-version=$perl_prereq @files`);
+		chomp(my $out = `$^X $filename --compat-version=$perl_prereq --cplusplus @files`);
 		$self->log_debug($out) if $out;
 	}
 	else {
-		chomp(my $out = `$^X $filename --compat-version=$perl_prereq --quiet @files`);
+		chomp(my $out = `$^X $filename --compat-version=$perl_prereq --cplusplus --quiet @files`);
 		$self->log($out) if $out;
 	}
 }
@@ -126,7 +126,7 @@ Dist::Zilla::Plugin::PPPort - PPPort for Dist::Zilla
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

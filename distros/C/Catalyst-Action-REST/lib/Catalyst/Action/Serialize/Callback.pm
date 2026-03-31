@@ -1,5 +1,5 @@
 package Catalyst::Action::Serialize::Callback;
-$Catalyst::Action::Serialize::Callback::VERSION = '1.21';
+$Catalyst::Action::Serialize::Callback::VERSION = '1.22';
 use Moose;
 use namespace::autoclean;
 

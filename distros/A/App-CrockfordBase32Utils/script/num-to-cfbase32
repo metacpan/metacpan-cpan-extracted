@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2026-01-20'; # DATE
 our $DIST = 'App-CrockfordBase32Utils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CrockfordBase32Utils/num_to_cfbase32",
@@ -40,7 +40,7 @@ num-to-cfbase32 - Convert integer decimal number(s) to Crockford's Base 32 encod
 
 =head1 VERSION
 
-This document describes version 0.003 of num-to-cfbase32 (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
+This document describes version 0.004 of num-to-cfbase32 (from Perl distribution App-CrockfordBase32Utils), released on 2026-01-20.
 
 =head1 SYNOPSIS
 

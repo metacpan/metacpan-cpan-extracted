@@ -109,6 +109,29 @@ DEPENDENCIES
 
   perl version 5.005_03 to newest perl
 
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+AUTHOR
+
+  INABA Hitoshi <ina@cpan.org>
+
+  This software was made referring to software and the document that the
+  following hackers or persons had made. I am thankful to all persons.
+
+    Larry Wall, Perl
+    http://www.perl.org/
+
+LICENSE AND COPYRIGHT
+
+  This software is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.
+  See L<perlartistic>.
+
 SEE ALSO
 
   http://search.cpan.org/~ina/

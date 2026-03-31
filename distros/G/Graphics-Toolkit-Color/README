@@ -292,6 +292,7 @@ GETTER
     another color is valid: use th importable routine with the same name.
 
         if ($color->is_in_gamut([ RGB =>  255, 0, 0])){         # it has to be ..
+
         use Graphics::Toolkit::Color qw/is_in_gamut/;
         if (is_in_gamut('rgb: 0, 0, 300')){                     # too much blue ..
 
@@ -346,7 +347,10 @@ SINGLE COLOR
     carlculation takes place:
 
         my $linear_blue = $blue->apply( gamma => 2.2 );         # is same the as :
-        my $linear_blue = $blue->apply( gamma => [2.2, 2.2, 2.2], in => 'RGB' );
+        my $linear_blue = $blue->apply( gamma => {r => 2.2, g =>2.2, b => 2.2}, in => 'RGB' );
+
+    Applying a gamma value mages only sense in euclidean spaces with the
+    origin in one corner of the space like *RGB* or *CIEXYZ*.
 
   mix
     Create a new GTC object, that has the average values between the calling
@@ -514,6 +518,8 @@ ARGUMENTS
     a value list or hash.
 
 SEE ALSO
+    *   PDL::Transform::Color
+
     *   Color::Scheme
 
     *   Graphics::ColorUtils

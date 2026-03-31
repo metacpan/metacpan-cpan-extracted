@@ -47,6 +47,16 @@ typedef struct {
 
 	/* __END__ / __DATA__ — everything after is non-code */
 	int             past_end;
+
+	/* Paren suppression: when ( and { appear on the same line
+	 * (e.g. method(sub {), the ( doesn't add structural indent.
+	 * Track suppressed ( so matching ) doesn't decrement depth. */
+	int             suppressed_parens;
+
+	/* Per-line delta tracking for suppression detection */
+	int             line_paren_delta;
+	int             line_brace_delta;
+	int             line_bracket_delta;
 } eshu_pl_ctx_t;
 
 static void eshu_pl_ctx_init(eshu_pl_ctx_t *ctx, const eshu_config_t *cfg) {
@@ -66,6 +76,10 @@ static void eshu_pl_ctx_init(eshu_pl_ctx_t *ctx, const eshu_config_t *cfg) {
 	eshu_buf_init(&ctx->pod_buf, 256);
 	ctx->pod_active      = 0;
 	ctx->past_end        = 0;
+	ctx->suppressed_parens  = 0;
+	ctx->line_paren_delta   = 0;
+	ctx->line_brace_delta   = 0;
+	ctx->line_bracket_delta = 0;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -319,10 +333,29 @@ static void eshu_pl_scan_line(eshu_pl_ctx_t *ctx,
 		case ESHU_CODE:
 			if (c == '{' || c == '(' || c == '[') {
 				ctx->depth++;
+				if (c == '(') ctx->line_paren_delta++;
+				else if (c == '{') ctx->line_brace_delta++;
+				else ctx->line_bracket_delta++;
 				ctx->last_was_value = 0;
-			} else if (c == '}' || c == ')' || c == ']') {
+			} else if (c == '}' || c == ']') {
 				ctx->depth--;
 				if (ctx->depth < 0) ctx->depth = 0;
+				if (c == '}') ctx->line_brace_delta--;
+				else ctx->line_bracket_delta--;
+				ctx->last_was_value = 1;
+			} else if (c == ')') {
+				if (ctx->line_paren_delta > 0) {
+					/* closing a ( from this line — normal */
+					ctx->line_paren_delta--;
+					ctx->depth--;
+					if (ctx->depth < 0) ctx->depth = 0;
+				} else if (ctx->suppressed_parens > 0) {
+					/* closing a suppressed ( — don't change depth */
+					ctx->suppressed_parens--;
+				} else {
+					ctx->depth--;
+					if (ctx->depth < 0) ctx->depth = 0;
+				}
 				ctx->last_was_value = 1;
 			} else if (c == '"') {
 				ctx->state = ESHU_STRING_DQ;
@@ -387,6 +420,13 @@ static void eshu_pl_scan_line(eshu_pl_ctx_t *ctx,
 				/* variable sigil — skip the variable name */
 				ctx->last_was_value = 1;
 				p++;
+				/* $# is the "last index" operator: $#array, $#$ref */
+				if (c == '$' && p < end && *p == '#') {
+					p++;
+					/* $#$ref or $#{ — skip the extra sigil */
+					if (p < end && *p == '$')
+						p++;
+				}
 				while (p < end && (isalnum((unsigned char)*p) || *p == '_' || *p == ':'))
 					p++;
 				continue;
@@ -636,7 +676,9 @@ static void eshu_pl_process_line(eshu_pl_ctx_t *ctx, eshu_buf_t *out,
 	indent_depth = ctx->depth;
 
 	/* If line starts with closer, dedent this line */
-	if (*content == '}' || *content == ')' || *content == ']') {
+	if (*content == ')' && ctx->suppressed_parens > 0) {
+		/* suppressed paren — don't dedent */
+	} else if (*content == '}' || *content == ')' || *content == ']') {
 		indent_depth--;
 		if (indent_depth < 0) indent_depth = 0;
 	}
@@ -646,7 +688,19 @@ static void eshu_pl_process_line(eshu_pl_ctx_t *ctx, eshu_buf_t *out,
 	eshu_buf_putc(out, '\n');
 
 	/* scan for nesting changes */
+	ctx->line_paren_delta   = 0;
+	ctx->line_brace_delta   = 0;
+	ctx->line_bracket_delta = 0;
 	eshu_pl_scan_line(ctx, content, eol);
+
+	/* Suppress unmatched ( when { or [ also opened on the same line.
+	 * e.g. method(sub { or method([ — the ( is just call syntax,
+	 * only the { or [ should add structural indentation. */
+	if (ctx->line_paren_delta > 0 &&
+	    (ctx->line_brace_delta > 0 || ctx->line_bracket_delta > 0)) {
+		ctx->depth -= ctx->line_paren_delta;
+		ctx->suppressed_parens += ctx->line_paren_delta;
+	}
 
 	/* If a heredoc was detected on this line, enter heredoc state now */
 	if (ctx->heredoc_pending) {

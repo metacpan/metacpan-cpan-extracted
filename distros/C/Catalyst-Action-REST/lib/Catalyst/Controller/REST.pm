@@ -1,5 +1,5 @@
 package Catalyst::Controller::REST;
-$Catalyst::Controller::REST::VERSION = '1.21';
+$Catalyst::Controller::REST::VERSION = '1.22';
 use Moose;
 use namespace::autoclean;
 

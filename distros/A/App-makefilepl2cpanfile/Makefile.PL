@@ -27,6 +27,7 @@ WriteMakefile(
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, TEST_REQUIRES => {
+		'File::Slurp' => 0,
 		'Test::Carp' => 0,
 		'Test::Compile' => 0,
 		'Test::DescribeMe' => 0,
@@ -38,8 +39,10 @@ WriteMakefile(
 		'Test::Returns' => 0,
 		'Test::Warn' => 0,
 	}, PREREQ_PM => {
+		'autodie' => 0,
 		'File::HomeDir' => 0,
-		'File::Slurp' => 0,
+		'Path::Tiny' => 0,
+		'IPC::System::Simple' => 0,
 		'YAML::Tiny' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'App-makefilepl2cpanfile-*' },

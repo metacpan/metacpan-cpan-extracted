@@ -2,7 +2,7 @@ package App::Yath::IPC;
 use strict;
 use warnings;
 
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 use Carp qw/croak confess/;
 use File::Path qw/make_path/;
@@ -46,7 +46,8 @@ sub dir {
     my $base = clean_path($settings->yath->base_dir);
     my $sha = sha1_hex($base);
 
-    $ipc_dir = File::Spec->catdir($settings->yath->orig_tmp, "yath-ipc-$ENV{USER}-$sha");
+    my $user = $ENV{USER} // $ENV{LOGNAME} // 'unknown';
+    $ipc_dir = File::Spec->catdir($settings->yath->orig_tmp, "yath-ipc-$user-$sha");
 
     make_path($ipc_dir) unless -e $ipc_dir;
 
@@ -89,7 +90,7 @@ sub _find_ipcs {
         my %ipc  = $self->parse_ipc_file($full);
 
         if (my $err = $ipc{error}) {
-            warn "Skipping '$full': $@";
+            warn "Skipping '$full': $err";
             next;
         }
 

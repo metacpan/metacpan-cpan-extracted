@@ -1,0 +1,11 @@
+services:
+  blank-env:
+    build:
+      context: ../..
+      dockerfile: integration/blank-env/Dockerfile
+    working_dir: /opt/integration
+    volumes:
+      - ${DASHBOARD_TARBALL:?set DASHBOARD_TARBALL to a host-built Developer-Dashboard tarball}:/artifacts/Developer-Dashboard.tar.gz:ro
+    environment:
+      PERL_MM_USE_DEFAULT: "1"
+      NONINTERACTIVE_TESTING: "1"

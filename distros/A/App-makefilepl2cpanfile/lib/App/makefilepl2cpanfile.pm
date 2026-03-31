@@ -2,12 +2,11 @@ package App::makefilepl2cpanfile;
 
 use strict;
 use warnings;
+use autodie qw(:all);
 
-use File::Slurp qw(read_file);
+use Path::Tiny;
 use YAML::Tiny;
 use File::HomeDir;
-
-our $VERSION = '0.01';
 
 =head1 NAME
 
@@ -28,6 +27,14 @@ App::makefilepl2cpanfile - Convert Makefile.PL to a cpanfile automatically
 	open my $fh, '>', 'cpanfile' or die $!;
 	print $fh $cpanfile_text;
 	close $fh;
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+our $VERSION = '0.02';
 
 =head1 DESCRIPTION
 
@@ -97,12 +104,14 @@ sub generate {
 
 	my $makefile = $args{makefile} || 'Makefile.PL';
 	my $existing = $args{existing} || '';
-	my $with_dev = $args{with_develop};
+	my $with_dev = exists $args{with_develop} ? $args{with_develop} : 1;
 
 	my %deps;
 	my $min_perl;
 
-	my $content = read_file($makefile);
+	die "Cannot read '$makefile': $!" unless -r $makefile;
+
+	my $content = path($makefile)->slurp_utf8;
 
 	# MIN_PERL_VERSION
 	if ($content =~ /MIN_PERL_VERSION\s*=>\s*['"]?([\d._]+)['"]?/) {
@@ -126,6 +135,7 @@ sub generate {
 			\}
 		/gsx) {
 			my $block = $1;
+			$block =~ s/#[^\n]*//g;	# strip comments
 
 			while ($block =~ /
 				['"]([^'"]+)['"]
@@ -138,7 +148,7 @@ sub generate {
 	}
 
 	# Preserve existing develop block
-	if ($existing =~ /on\s+'develop'\s*=>\s*sub\s*\{(.*?)\};/s) {
+	if ($existing =~ /on\s+["']develop["']\s*=>\s*sub\s*\{(.*?)\};/s) {
 		while ($1 =~ /requires\s+['"]([^'"]+)['"](?:\s*,\s*['"]([^'"]+)['"])?/g) {
 			$deps{develop}{$1} //= $2 // 0;
 		}
@@ -157,7 +167,8 @@ sub generate {
 
 		my $cfg_file = File::HomeDir->my_home . '/.config/makefilepl2cpanfile.yml';
 		if (-r $cfg_file) {
-			my $y = YAML::Tiny->read($cfg_file)->[0];
+			my $yaml = YAML::Tiny->read($cfg_file) or die "Failed to parse $cfg_file: ", YAML::Tiny->errstr();
+			my $y = $yaml->[0];
 			%default = %{ $y->{develop} } if $y->{develop};
 		}
 
@@ -169,36 +180,67 @@ sub generate {
 	return _emit(\%deps, $min_perl);
 }
 
-# ----------------------------
-# Emit cpanfile text
-# ----------------------------
+# _emit - Render collected dependency data as a cpanfile-format string
+#
+#   Converts a structured hash of phase-keyed dependencies and an optional
+#   minimum Perl version into a valid cpanfile string ready to be written
+#   to disk.
+#
+# Entry:
+#   $_[0] - hashref of dependency data, keyed by phase name:
+#               'runtime', 'configure', 'build', 'test', 'develop'
+#           Each value is a hashref of Module::Name => version_string,
+#           where version_string may be 0 or '' to indicate no minimum.
+#   $_[1] - optional scalar containing the minimum Perl version string
+#           (e.g. '5.010'), or undef if none was declared.
+#
+# Exit:
+#   Returns a scalar string containing the complete cpanfile content,
+#   always terminated with a single newline. Never returns undef.
+#
+# Side effects:
+#   None.
+#
+# Notes:
+#   - Dependencies with a version of 0 or '' are emitted without a version
+#     constraint, as cpanfile treats an absent version as "any version".
+#   - The 'runtime' block is emitted without an enclosing 'on' block, per
+#     cpanfile convention.
+#   - Phase blocks (configure, build, test, develop) are separated by a
+#     blank line; no trailing blank line is emitted after the final block.
+#   - Modules within each phase are sorted alphabetically for reproducibility.
 sub _emit {
 	my ($deps, $min_perl) = @_;
 
-	my $out = "# Generated from Makefile.PL\n\n";
+	my $out = "# Generated from Makefile.PL using makefilepl2cpanfile\n\n";
 	$out .= "requires 'perl', '$min_perl';\n\n" if $min_perl;
 
 	if (my $rt = $deps->{runtime}) {
 		for my $m (sort keys %$rt) {
 			$out .= "requires '$m'";
-			$out .= ", '$rt->{$m}'" if $rt->{$m};
+			$out .= ", '$rt->{$m}'" if defined $rt->{$m} && $rt->{$m} ne '' && $rt->{$m} != 0;
 			$out .= ";\n";
 		}
 		$out .= "\n";
 	}
 
+	my @blocks;
+
 	for my $phase (qw(configure build test develop)) {
 		my $h = $deps->{$phase} or next;
 		next unless %$h;
 
-		$out .= "on '$phase' => sub {\n";
+		my $block = "on '$phase' => sub {\n";
 		for my $m (sort keys %$h) {
-			$out .= "	requires '$m'";
-			$out .= ", '$h->{$m}'" if $h->{$m};
-			$out .= ";\n";
+			$block .= "	requires '$m'";
+			$block .= ", '$h->{$m}'" if defined $h->{$m} && $h->{$m} ne '' && $h->{$m} != 0;
+			$block .= ";\n";
 		}
-		$out .= "};\n";
+		$block .= "};";
+		push @blocks, $block;
 	}
+
+	$out .= join("\n\n", @blocks) . "\n" if @blocks;
 
 	return $out;
 }
@@ -217,7 +259,7 @@ Nigel Horne <njh@nigelhorne.com>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

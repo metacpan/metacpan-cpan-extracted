@@ -1,6 +1,6 @@
 use utf8;
 package App::Yath::Schema::SQLite::SourceFile;
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 package
     App::Yath::Schema::Result::SourceFile;

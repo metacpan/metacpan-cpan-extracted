@@ -1,5 +1,5 @@
 package Catalyst::Action::DeserializeMultiPart;
-$Catalyst::Action::DeserializeMultiPart::VERSION = '1.21';
+$Catalyst::Action::DeserializeMultiPart::VERSION = '1.22';
 use Moose;
 use namespace::autoclean;
 

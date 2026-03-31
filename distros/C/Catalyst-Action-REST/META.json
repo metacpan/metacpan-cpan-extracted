@@ -4,7 +4,7 @@
       "Tomas Doran <bobtfish@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -60,9 +60,17 @@
       "bugtracker" : {
          "web" : "https://rt.cpan.org/Dist/Display.html?Name=Catalyst-Action-REST"
       },
+      "homepage" : "https://github.com/perl-catalyst/Catalyst-Action-REST",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perl-catalyst/Catalyst-Action-REST.git",
+         "web" : "https://github.com/perl-catalyst/Catalyst-Action-REST"
+      },
       "x_authority" : "cpan:BOBTFISH"
    },
-   "version" : "1.21",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+   "version" : "1.22",
+   "x_generated_by_perl" : "v5.43.9",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

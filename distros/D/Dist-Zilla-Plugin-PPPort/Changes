@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-PPPort
 
+0.012     2026-03-30 18:10:29+02:00 Europe/Brussels
+          - Allow c++ comments in XS
+
 0.011     2026-02-22 13:22:14+01:00 Europe/Brussels
           - Pass XS files to post-build check
           - Use signatures and autoclean

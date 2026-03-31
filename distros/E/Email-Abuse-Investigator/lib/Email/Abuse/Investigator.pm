@@ -58,6 +58,7 @@ my %TRUSTED_DOMAINS = map { $_ => 1 } qw(
 	gmail.com googlemail.com yahoo.com outlook.com hotmail.com
 	google.com microsoft.com apple.com amazon.com
 	googlegroups.com groups.google.com
+	w3.org
 );
 
 # Known URL shortener / redirect domains — real destination is hidden
@@ -224,11 +225,11 @@ hosted URLs, and suspicious domains
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -2907,12 +2908,17 @@ sub risk_assessment {
             $self->_decode_mime_words($subj_raw) . "')");
     }
 
-    # ---- URL checks ----
+	# ---- URL checks ----
     my (%shortener_seen, %url_host_seen);
     for my $u ($self->embedded_urls()) {
-        # URL shorteners
+        # Skip trusted infrastructure domains -- W3C namespace URLs,
+        # schema references, and similar boilerplate appear in HTML email
+        # templates but are not spam indicators.
         my $bare = lc $u->{host};
         $bare =~ s/^www\.//;
+        next if $TRUSTED_DOMAINS{$bare};
+
+        # URL shorteners
         if ($URL_SHORTENERS{$bare} && !$shortener_seen{$bare}++) {
             $flag->('MEDIUM', 'url_shortener',
                 "$u->{host} is a URL shortener - the real destination is hidden");
@@ -2964,8 +2970,8 @@ sub risk_assessment {
               : $score >= 2 ? 'LOW'
               :               'INFO';
 
-    $self->{_risk} = { level => $level, score => $score, flags => \@flags };
-    return $self->{_risk};
+	$self->{_risk} = { level => $level, score => $score, flags => \@flags };
+	return $self->{_risk};
 }
 
 =head2 abuse_report_text()
@@ -3677,11 +3683,15 @@ sub abuse_contacts {
 
         # Domain registrar
         if ($d->{registrar_abuse}) {
-            $add->(role    => "Domain registrar for $dom",
-                   address => $d->{registrar_abuse},
-                   note    => 'Registrar: ' . ($d->{registrar} // '(unknown)'),
-                   via     => 'domain-whois');
-        }
+		my $spoofable_only = $d->{source} =~ /^(?:From:|Return-Path:|Sender:) header$/ &&
+			!scalar(grep { $_->{host} && _registrable($_->{host}) eq (_registrable($dom) // $dom) } $self->embedded_urls());
+		unless ($spoofable_only) {
+			$add->(role    => "Domain registrar for $dom",
+			address => $d->{registrar_abuse},
+			note    => 'Registrar: ' . ($d->{registrar} // '(unknown)'),
+			via     => 'domain-whois');
+		}
+	}
     }
 
     # 4. From: / Reply-To: / Return-Path: / Sender: account provider
@@ -3710,6 +3720,7 @@ sub abuse_contacts {
         # Pull the domain from the right-hand side of the @ in the addr-spec.
         my ($addr_domain) = $addr_spec =~ /\@([\w.-]+)/;
         next unless $addr_domain;
+	next if $addr_spec =~ /\+SRS[0-9]?=/i;  # skip SRS-rewritten forwarder addresses
 
         # Look up the domain (and its parents via subdomain stripping) in
         # the built-in provider table.  A hit means the account is hosted
@@ -3763,6 +3774,31 @@ sub abuse_contacts {
         }
     }
 
+    # 7. Reply addresses in the message body
+    # Bare email addresses in the body (e.g. "contact us at spam@hotmail.com")
+    # are extracted and their domains looked up in the provider table.  This
+    # catches the common advance-fee / investment scam pattern where the
+    # sending address is spoofed but the real contact address is a free
+    # webmail account mentioned explicitly in the body text.
+    # Note: %TRUSTED_DOMAINS filtering is intentionally bypassed here --
+    # being hosted on a trusted provider (Hotmail, Gmail) is exactly what
+    # makes these addresses actionable; the spammer chose a free webmail
+    # account as their contact precisely because it is trustworthy-looking.
+    # Recipient domains are still excluded to avoid false positives.
+    my %body_addr_seen;
+    my $combined_body = $self->{_body_plain} . "\n" . $self->{_body_html};
+    for my $addr_dom ($self->_domains_from_text($combined_body)) {
+        next if $body_addr_seen{$addr_dom}++;
+        my $pa = $self->_provider_abuse_for_host($addr_dom);
+        next unless $pa && $pa->{email};
+        my ($example_addr) = $combined_body =~ /(\S+\@\Q$addr_dom\E)/i;
+        $example_addr //= "\@$addr_dom";
+        $add->(role    => "Reply address in body ($example_addr)",
+               address => $pa->{email},
+               note    => $pa->{note},
+               via     => 'provider-table');
+    }
+
     return @contacts;
 }
 
@@ -3799,7 +3835,7 @@ Each hashref contains:
 =cut
 
 sub form_contacts {
-	my ($self) = @_;
+	my $self = $_[0];
 	my (@contacts, %seen);
 
 	my $add = sub {
@@ -3889,6 +3925,7 @@ sub form_contacts {
 		my $addr_spec = ($val =~ /<([^>]*)>\s*$/) ? $1 : $val;
 		my ($addr_domain) = $addr_spec =~ /\@([\w.-]+)/;
 		next unless $addr_domain;
+		next if $addr_spec =~ /\+SRS[0-9]?=/i;  # skip SRS-rewritten forwarder addresses
 		my $pa = $self->_provider_abuse_for_host($addr_domain);
         if ($pa && $pa->{form}) {
             my $role_addr = $addr_spec =~ /@/ ? $addr_spec : $val;

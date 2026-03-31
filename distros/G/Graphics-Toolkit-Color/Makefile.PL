@@ -17,12 +17,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Graphics::Toolkit::Color",
   "PREREQ_PM" => {
+    "Carp" => 1,
     "Exporter" => 5
   },
   "TEST_REQUIRES" => {
-    "Test::More" => "1.3"
+    "Test::More" => "1.3",
+    "Test::Warn" => "0.30"
   },
-  "VERSION" => "2.01",
+  "VERSION" => "2.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,8 +32,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 1,
   "Exporter" => 5,
-  "Test::More" => "1.3"
+  "Test::More" => "1.3",
+  "Test::Warn" => "0.30"
 );
 
 

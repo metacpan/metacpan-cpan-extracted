@@ -1,0 +1,13 @@
+\bOLD_CODE\b
+^\.github/
+^SOFTWARE_SPEC\.md$
+^ELLEN\.md$
+^examples/
+^\.developer-dashboard/
+~$
+\.swp$
+\.swo$
+^blib/
+^Makefile$
+^pm_to_blib$
+^MYMETA\.

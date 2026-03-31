@@ -1,5 +1,33 @@
 Revision history for this software.
 
+0.29  2026-03-31 JST (Japan Standard Time)
+  - add t/lib/INA_CPAN_Check.pm: shared test library aligned with
+    DB-Handy 1.07, HTTP-Handy 1.03, LTSV-LINQ 1.07, mb-JSON 0.04, mb 0.59
+  - add t/9001-load.t: module load, $VERSION, public API (8 tests)
+  - add t/9010-encoding.t: US-ASCII, trailing whitespace, newline checks
+  - add t/9020-perl5compat.t: Perl 5.005_03 compatibility P1-P14 for
+    lib/*.pm and t/9xxx; M1-M7 for Makefile.PL
+  - add t/9030-distribution.t: MANIFEST, version, META, Changes checks
+  - add t/9040-style.t: ina@CPAN coding style E and K checks
+  - add t/9050-pod.t: POD structure G1-G12 including Pod::Checker (6 tests)
+  - add t/9060-readme.t: README required sections R1-R4 check (9 tests)
+  - add SECURITY.md
+  - fix lib/UTF8/R2.pm: warnings stub now guards with
+    !defined(&warnings::import) to suppress "import redefined" warnings
+  - fix lib/UTF8/R2.pm: copyright year 2026 added
+  - fix lib/UTF8/R2.pm: caller() return value variables now spaced
+  - fix lib/UTF8/R2.pm: keep \\%mb for tied hash (reverted { %mb })
+  - fix lib/UTF8/R2.pm: CORE::split //, $_[3] to CORE::split(\, $_[3])
+  - fix lib/UTF8/R2.pm: tr/// in error strings changed to tr range
+  - fix lib/UTF8/R2.pm: join(\,$x) changed to join(\, $x)
+  - fix lib/UTF8/R2.pm: (caller)[0,2,1] changed to (caller)[0, 2, 1]
+  - fix lib/UTF8/R2.pm: remove whitespace-only lines in POD verbatim blocks
+    (Pod::Checker warnings=0 achieved)
+  - fix README: add INSTALLATION, AUTHOR, LICENSE AND COPYRIGHT sections
+  - fix META.yml, META.json, Makefile.PL: version 0.28 -> 0.29
+  - fix t/9040-style.t: exempt \\%mb from K3 check (tied hash requires ref)
+  - created by INABA Hitoshi
+
 0.28  2023-03-23 00:00:00
   - add t/8101_mb_package.t
   - created by INABA Hitoshi

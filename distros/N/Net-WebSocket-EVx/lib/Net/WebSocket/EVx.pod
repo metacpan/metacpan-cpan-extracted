@@ -38,11 +38,12 @@ app.psgi for websocket echo server with compression support:
         sub {
             my $io = $env->{'psgix.io'};
             my $key = sha1_base64($env->{uc'http_sec_websocket_key'}.ws_guid);
-            my $got = syswrite $io, my $handshake = join crlf,
+            my $handshake = join crlf,
                 'HTTP/1.1 101 Switching Protocols', 'connection: upgrade', 'upgrade: websocket',
                 $deflate ? 'sec-websocket-extensions: permessage-deflate' : (),
                 "sec-websocket-accept: $key=", crlf;
-            die "failed to write ws handshake in one go $len/$got: $!" unless $got and $got == length $handshake;
+            my $got = syswrite $io, $handshake;
+            die "failed to write ws handshake in one go: $!" unless $got and $got == length $handshake;
             open(my $fh, '+<&', $io) or die $!;
             my $srv; $srv = Net::WebSocket::EVx->new({
                 fh => $fh, max_recv_size => ws_max_size,
@@ -121,12 +122,6 @@ This callback is called when library receives complete message. Close messages a
 
 Callback arguments: my ($rsv, $opcode, $msg, $status_code) = @_;
 
-=item on_msg_recv
-
-This callback is called when library receives complete message. Close messages aren't handled by this callback. When buffering is disabled $msg is always empty
-
-Callback arguments: my ($rsv, $opcode, $msg, $status_code) = @_;
-
 =item on_close
 
 Called when connection is closed.
@@ -161,12 +156,14 @@ Called when message is received. No arguments
 
 =head2 queue_msg( message, opcode )
 
-Queue message, opcode is optional default is 1 (text message)
+Queue message, opcode is optional default is 1 (text message).
+Returns 0 on success, negative wslay error code on failure.
 
 =head2 queue_msg_ex( message, opcode, rsv )
 
-Queue message, opcode is optional default is 1 (text message)
-rsv is optional default is WSLAY_RSV1_BIT
+Queue message, opcode is optional default is 1 (text message).
+rsv is optional default is WS_RSV1_BIT.
+Returns 0 on success, negative wslay error code on failure.
 
 =head2 queue_fragmented ( callback, opcode )
 
@@ -174,11 +171,13 @@ Queue fragmented message, opcode is optional, default is 2 (binary message)
 
 Callback arguments: my ($len) = @_;
 
-Callback must return array of two elements ( "scalar $len or less(can be 0) bytes length", status )
+Callback must return one or two elements: ( $data ) or ( $data, $status )
+
+When returning a single scalar, status defaults to WS_FRAGMENTED_DATA.
 
 Status can be:
 
-WS_FRAGMENTED_DATA - Data chunk, optional status value, you can just return one scalar with data. Wslay will constantly re-invoke callback when it returns WS_FRAGMENTED_DATA. It will let other events run, but you will get 100% CPU load if there is no data to send and your callback always returns WS_FRAGMENTED_DATA with empty scalar while waiting for data. To prevent this use ->stop_write to suspend all IO when there is no more data to send and ->start_write when new portion of data is ready.
+WS_FRAGMENTED_DATA - Data chunk. Wslay will constantly re-invoke callback when it returns WS_FRAGMENTED_DATA. It will let other events run, but you will get 100% CPU load if there is no data to send and your callback always returns WS_FRAGMENTED_DATA with empty scalar while waiting for data. To prevent this use ->stop_write to suspend all IO when there is no more data to send and ->start_write when new portion of data is ready.
 
 WS_FRAGMENTED_ERROR - Error. Don't call callback anymore
 
@@ -186,8 +185,8 @@ WS_FRAGMENTED_EOF - End of message.
 
 =head2 queue_fragmented_ex ( callback, opcode, rsv )
 
-Queue fragmented message, opcode is optional, default is 2 (binary message)
-rsv is optional default is WSLAY_RSV1_BIT
+Queue fragmented message, opcode is optional, default is 2 (binary message).
+rsv is optional default is WS_RSV1_BIT
 
 =head2 wait(cb)
 
@@ -201,13 +200,13 @@ Returns number of messages in send queue
 
 Start or stop all websocket IO
 
-=head2 start_read() and stop_write()
+=head2 start_write() and stop_write()
 
 =head2 start_read() and stop_read()
 
 =head2 shutdown_read() and shutdown_write()
 
-Disable read or write. There is no way to enable it again, use start_* and stop_* instead
+Permanently disable read or write at the wslay protocol level. Unlike stop_*/start_* which only pause the event watcher, shutdown is irreversible for the lifetime of the connection
 
 =head2 close( status_code, reason_data)
 
@@ -215,5 +214,9 @@ Queue close frame. Status and reason are optional.
 
 Possible attack vector: client can hold connection after receiving close frame and make a lot of connections.
 So if you want to guaranteed close connection, then call $ws->close() and ->wait until close frame will be sent, then close $ws->{fh}.
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

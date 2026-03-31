@@ -5,7 +5,7 @@ hosted URLs, and suspicious domains
 
 # VERSION
 
-Version 0.05
+Version 0.07
 
 # SYNOPSIS
 

@@ -39,6 +39,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.0.1",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg-cpan/toon/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davorg-cpan/toon.git",
+         "web" : "https://github.com/davorg-cpan/toon"
+      }
+   },
+   "version" : "v0.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

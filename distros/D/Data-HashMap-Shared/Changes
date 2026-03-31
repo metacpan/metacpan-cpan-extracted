@@ -1,5 +1,9 @@
 Revision history for Data-HashMap-Shared
 
+0.03  2026-03-30
+    - Fix "panic: free from wrong pool" on threaded/DEBUGGING Perls
+      (use Perl allocator for SAVEFREEPV-managed buffers)
+
 0.02  2026-03-17
     - New ops: add, update, swap, cas, pop, shift, drain, set_multi,
       get_multi, persist, set_ttl, touch, reserve, flush_expired_partial,

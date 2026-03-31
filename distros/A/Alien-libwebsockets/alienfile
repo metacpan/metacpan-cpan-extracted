@@ -7,7 +7,9 @@ plugin 'PkgConfig' => (
 
 share {
     plugin 'Download' => (
-        url => 'https://github.com/warmcat/libwebsockets/archive/refs/tags/v4.3.3.tar.gz',
+        url     => 'https://github.com/warmcat/libwebsockets/tags',
+        version => qr/v([\d\.]+)/,
+        filter  => qr/\.tar\.gz$/,
     );
 
     plugin 'Extract' => 'tar.gz';
@@ -28,6 +30,7 @@ share {
             '-DLWS_WITH_LIBCAP:BOOL=OFF',
             '-DLWS_WITH_SSL:BOOL=ON',
             '-DLWS_WITHOUT_EXTENSIONS:BOOL=OFF',
+            '-DLWS_WITH_EXTERNAL_POLL:BOOL=ON',
             '-DLWS_WITH_LIBUV:BOOL=OFF',
             '-DLWS_WITH_LIBEVENT:BOOL=OFF',
             '-DLWS_WITH_ZLIB:BOOL=ON',

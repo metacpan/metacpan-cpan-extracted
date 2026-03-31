@@ -4,7 +4,7 @@
       "Chad Granum <exodist@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -71,6 +71,7 @@
             "File::ShareDir" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "Getopt::Yath" : "2.000008",
             "HTTP::Tiny" : "0",
             "HTTP::Tiny::Multipart" : "0",
             "HTTP::Tiny::UNIX" : "0",
@@ -185,9 +186,9 @@
          "url" : "https://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "2.000005",
-   "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
+   "version" : "2.000009",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

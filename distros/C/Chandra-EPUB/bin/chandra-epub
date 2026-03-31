@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long qw(:config);
+use Chandra::EPUB;
+use File::ShareDir qw(dist_dir);
+
+my ($file, $width, $height, $title, $luck) = ("");
+
+GetOptions(
+        'file=s'       => \$file,
+        'width=i'      => \$width,
+        'height=i'      => \$height,
+        'title=s'      => \$title,
+        'luck'       => \$luck,
+) or usage();
+
+sub usage {
+        print STDERR <<'USAGE';
+Usage: eshu [OPTIONS] [FILE|DIR ...]
+
+Options:
+        --file 		The epub file to open
+	--width		The width of the chandra window
+	--height	The height of the chandra window
+	--title		The title of the chandra window
+	--luck		My book so you can test quickly
+USAGE
+	exit 2;
+}
+
+if ($luck) {
+	$file = dist_dir('Chandra-EPUB') . '/dishonesty.epub';
+}
+
+Chandra::EPUB->new(
+	file => $file,
+	($width ? (width => $width) : ()),
+	($height ? (height => $height) : ()),
+	($title ? (title => $title) : ())
+)->run();
+
+1;
+
+=head1 NAME
+
+Chandra::EPUB - A simple EPUB reader built with Perl and Chandra
+
+=head1 SYNOPSIS
+
+	chandra-epub --file mybook.epub --width 800 --height 600 --title "My Book"
+
+=head1 DESCRIPTION
+
+Chandra::EPUB is a simple EPUB reader built using the Chandra framework. It allows you to open and read EPUB files in a desktop application with a clean interface.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --file
+
+The path to the EPUB file you want to open.
+
+=item --width
+
+The width of the Chandra window in pixels.
+
+=item --height
+
+The height of the Chandra window in pixels.
+
+=item --title
+
+The title of the Chandra window.
+
+=item --luck
+
+A shortcut option to open the included "The Destiny Of Luck" EPUB for testing.
+
+=back

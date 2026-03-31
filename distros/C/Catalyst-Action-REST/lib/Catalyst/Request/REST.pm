@@ -1,5 +1,5 @@
 package Catalyst::Request::REST;
-$Catalyst::Request::REST::VERSION = '1.21';
+$Catalyst::Request::REST::VERSION = '1.22';
 use Moose;
 
 use Catalyst::Utils;

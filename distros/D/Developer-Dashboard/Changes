@@ -1,0 +1,180 @@
+Revision history for Developer Dashboard
+
+0.72  2026-03-31
+
+    - fixed legacy bookmark runtime output so returned hashes and arrays from `CODE*` blocks are dumped into the visible runtime output area while still merging into stash for Template Toolkit rendering
+    - documented that `CODE1: { a => 1 }` now both feeds `[% stash.a %]` and shows a legacy-style dumped value, while `CODE2: hide print $a` still keeps the printed `1`
+
+0.71  2026-03-31
+
+    - fixed bookmark runtime order so `CODE*` blocks run before Template Toolkit rendering and returned hashes can feed `[% stash.* %]` in `HTML:` and `FORM.TT:`
+    - fixed the `hide` helper so `hide print $a` keeps the printed stdout while suppressing the Perl return value instead of dropping the whole block output
+
+0.70  2026-03-31
+
+    - fixed bookmark Template Toolkit rendering so `[% title %]` receives the `TITLE:` value inside `HTML:` and `FORM.TT:` sections
+    - fixed transient play and view-source URLs so they keep the raw bookmark instruction text instead of baking rendered values such as `[% stash.foo %]` into `1` after a render pass
+
+0.69  2026-03-31
+
+    - fixed the browser editor boot path so raw Template Toolkit tokens such as `[% title %]` remain intact in `HTML:` sections after the page JavaScript initializes the editor and syntax highlight overlay
+    - added a web regression that checks the editor boot script and initial highlight both use the raw bookmark instruction text instead of the already-rendered page body
+
+0.68  2026-03-31
+
+    - expanded the README and main Developer::Dashboard POD to explain the product as a developer home, including what the web UI, helper/admin split, collectors, indicators, prompt rendering, CLI helpers, and Docker tooling offer together
+    - clarified that the browser interface listens on port 7890, exact numeric loopback on 127.0.0.1 is passwordless admin access, and helper accounts are the safe sharing tier for every other browser route
+    - added richer module-level descriptions across the README, POD, and architecture guide so the Developer::Dashboard::* surfaces describe their role in the overall ecosystem instead of reading like disconnected internals
+
+0.67  2026-03-31
+
+    - fixed the main Developer::Dashboard POD to declare `=encoding UTF-8` before the documented Unicode status glyph examples, preventing POD parsers from reporting non-ASCII content before the encoding declaration
+
+0.66  2026-03-31
+
+    - hardened the GitHub CPAN release workflow further by preinstalling the full `App::Cmd` prerequisite chain before `Dist::Zilla`, avoiding fragile on-the-fly dependency resolution on fresh Ubuntu runners
+    - documented that explicit release bootstrap path in the README and release guide after validating it inside a blank Ubuntu 24.04 container
+
+0.65  2026-03-31
+
+    - fixed the tarball-facing release metadata test so workflow-specific checks are skipped when `.github` is intentionally absent from the built archive
+    - hardened the managed-loop sort regression with a short bounded wait so slower build hosts still observe the forked test loops before asserting sort order
+    - kept the GitHub release workflow bootstrap fix and developer-home documentation refresh in the shipped release after the first 0.64 artifact exposed those tarball-only test gaps
+
+0.64  2026-03-31
+
+    - fixed the GitHub release workflow by bootstrapping `App::Cmd` before `Dist::Zilla`, preventing CPAN release jobs from failing on missing `App::Cmd::*` modules during release dependency installation
+    - rewrote the top-level README and main Developer::Dashboard POD positioning to describe the product as a developer home instead of abstract project-neutral infrastructure
+    - aligned the architecture guide intro and release documentation with the same developer-focused value statement and release bootstrap guidance
+
+0.63  2026-03-31
+
+    - rewrote the top-level README and main Developer::Dashboard POD positioning to describe the product as a developer home instead of abstract project-neutral infrastructure
+    - aligned the architecture guide intro with the same developer-focused value statement so the documentation speaks to day-to-day usage and purpose
+
+0.62  2026-03-30
+
+    - preserved raw Template Toolkit placeholders in editor and source views instead of rewriting `HTML:` sections with rendered output after a POST
+    - kept render and play flows using prepared TT output while edit and source flows now return the original bookmark text
+    - added a web regression for `HTML: <h1>[% title %]</h1>` so TT placeholders stay intact through the browser editor round-trip
+
+0.61  2026-03-30
+
+    - seeded configured collector indicators before the first run so prompt and page status views show all declared checks immediately as missing until they report
+    - prefixed collector prompt fragments with explicit success and failure glyphs (`✅` and `🚨`) so collector health is visible without relying on icon meaning alone
+    - added CLI and unit coverage for seeded collector indicators and prompt status glyph rendering
+
+0.60  2026-03-30
+
+    - added collector `code` support so collector jobs can run Perl directly while leaving `command` as shell execution
+    - kept collector indicators driven by collector exit code for both shell-command and Perl-code collectors
+    - defaulted collector indicator names and labels from the collector name so `indicator: { "icon": "..." }` is sufficient for common status checks
+    - documented the two collector execution modes in the README, POD, and release notes
+
+0.59  2026-03-30
+
+    - fixed release cleanup drift by removing stale `Developer-Dashboard-*` Dist::Zilla build directories as well as old tarballs before each new build
+    - updated the blank-environment release helper and release documentation to enforce full build-artifact cleanup before tarball verification
+
+0.58  2026-03-30
+
+    - made persisted custom path aliases portable by storing home-relative targets with `$HOME` in global config while expanding them back to concrete local paths when resolved
+    - kept `dashboard path add <name> <path>` and `dashboard path del <name>` idempotent so existing aliases can be re-added and missing aliases can be removed without error
+    - fixed named-path resolution so stored `$HOME/...` aliases expand correctly in installed shells and `cdr` continues to work from the tarball artifact
+
+0.55  2026-03-30
+
+    - fixed `dashboard docker compose` option parsing so real docker compose flags such as `-d` and `--build` pass through untouched instead of being treated as wrapper options
+    - changed non-`--dry-run` docker compose execution to `exec` the resolved `docker compose` command directly so normal compose output streams to the terminal instead of being wrapped in dashboard JSON
+    - auto-loaded isolated `config/docker/*` service folders by default when no service name is passed, while skipping folders that contain `disabled.yml`
+    - made isolated service folders contribute `development.compose.yml` when present, otherwise `compose.yml`, matching the old one-file-per-service precedence
+    - documented and enforced release cleanup so old `Developer-Dashboard-*.tar.gz` artifacts are removed before each new build
+
+0.50  2026-03-30
+
+    - scanned isolated docker service folders for activation markers when no service name is passed, so plain commands such as `dashboard docker compose config` preload only active isolated overlays before calling docker compose
+    - kept passthrough service-name inference for commands such as `dashboard docker compose config green` and continued to include isolated `development.compose.yml` overlays automatically for selected services
+
+0.49  2026-03-30
+
+    - inferred service names from passthrough docker compose arguments such as `dashboard docker compose config green` before building the final compose command
+    - included isolated `development.compose.yml` service overlays automatically when a matching isolated service folder is selected
+
+0.48  2026-03-30
+
+    - fixed release-metadata coverage so the shipped tarball accepts both repository and Dist::Zilla-generated Makefile.PL quoting for EXE_FILES entries
+    - versioned the release forward so cpanm validation runs against a tarball whose shipped metadata tests match the built archive format
+
+0.47  2026-03-30
+
+    - fixed shell helper path resolution so `cdr` and `which_dir` handle named dashboard paths such as `bookmarks_root` instead of only searching project names
+    - added CLI smoke coverage for `dashboard shell bash`, `which_dir bookmarks_root`, and `cdr bookmarks_root`
+
+0.46  2026-03-30
+
+    - restored old-style isolated docker service discovery so `dashboard docker compose --service <name>` automatically loads `~/.developer-dashboard/config/docker/<name>/compose.yml` when it exists
+    - added support for `development.compose.yml` alongside isolated service folders when a compose mode is requested
+    - exported `DDDC` as the global docker config root during compose resolution so compose YAML can keep using `${DDDC}` paths internally
+
+0.45  2026-03-30
+
+    - expanded environment variables such as `${DDDC}` and `$DDDC` inside configured docker compose overlay file paths before path resolution
+    - added docker-compose coverage that proves global config service overlays can resolve through `${DDDC}` into the dashboard config root
+
+0.44  2026-03-30
+
+    - fixed root-editor bookmark persistence so posting a legacy instruction document with `BOOKMARK: index` saves the page to the bookmark store and makes `/app/index` resolve immediately
+    - added a web regression that proves bookmarked root-editor posts are written to storage and load back through the legacy `/app/<name>` route
+
+0.43  2026-03-30
+
+    - fixed release-tarball tests so they validate shipped metadata from META.json when dist.ini is intentionally excluded from the archive
+    - versioned the release forward so the corrected 0.43 tarball no longer fails its own shipped test suite under cpanm
+
+0.42  2026-03-30
+
+    - renamed the YAML query command from `yjq` to `pyq` across the dashboard subcommand, standalone executable, tests, and documentation because `yjq` was a typo
+    - versioned the release forward so the published tarball name matches the corrected command surface
+
+0.41  2026-03-30
+
+    - versioned the release forward so the fixed standalone CLI and blank-container integration assets ship under a fresh CPAN artifact instead of reusing the stale 0.40 tarball
+    - added release metadata coverage that keeps lib/Developer/Dashboard.pm, dist.ini, Changes, Makefile.PL executable shipping, and tarball verification guidance aligned
+    - documented the explicit tarball verification step with `tar -tzf` and `cpanm /tmp/Developer-Dashboard-0.41.tar.gz -v` before publishing to PAUSE
+
+0.40  2026-03-30
+
+    - split `dashboard of`, `dashboard open-file`, `dashboard pjq`, `dashboard yjq`, `dashboard ptomq`, and `dashboard pjp` into standalone installed executables so those common paths no longer load the full dashboard runtime
+    - made the main `dashboard` script dispatch those built-in commands to sibling executables early for a lighter startup path
+    - fixed the host-tarball integration harness so it honors a supplied tarball path instead of always rebuilding first
+
+0.39  2026-03-30
+
+    - removed `dist.ini` from the Dist::Zilla release tarball so installed machines only receive runtime artifacts and not local release-builder configuration
+
+0.38  2026-03-30
+
+    - added built-in `dashboard pjq`, `dashboard yjq`, `dashboard ptomq`, and `dashboard pjp` commands for JSON, YAML, TOML, and Java properties querying
+    - added smoke coverage for scalar extraction across all four structured-data query commands
+    - made the structured-data query commands accept file and query arguments in either order and added `$d` as the explicit whole-document selector
+
+0.37  2026-03-30
+
+    - added built-in `dashboard of` and `dashboard open-file` commands for direct files, `file:line` targets, recursive pattern search, Perl module lookup, and Java class lookup
+    - added CLI smoke and unit coverage for open-file shorthand behavior plus module and Java class resolution
+
+0.36  2026-03-30
+
+    - added user CLI extension dispatch so unknown top-level `dashboard` subcommands exec matching programs from `~/.developer-dashboard/cli`
+    - added CLI smoke coverage for argv and stdin passthrough into user-provided dashboard extension executables
+
+0.35  2026-03-30
+
+    - removed the stale `DD` prompt fallback so blank installs no longer show an invented status token before any indicators exist
+    - added prompt coverage that verifies the empty-indicator case still renders the cwd without the old `DD` marker
+
+0.34  2026-03-30
+
+    - reset the release history to a fresh baseline for the open-source package
+    - restored the Dist::Zilla distribution metadata
+    - kept the current Developer Dashboard runtime, tests, and documentation aligned to version 0.34

@@ -49,6 +49,8 @@ GetOptions(
 
 usage() if $help;
 
+die '--with-develop and --no-develop are mutually exclusive' if $with_dev && $no_dev;
+
 $with_dev //= !$no_dev;
 
 # ----------------------------
@@ -69,10 +71,10 @@ my $out = App::makefilepl2cpanfile::generate(
 # Check flag: ensure all Makefile.PL deps are present
 # ----------------------------
 if ($check) {
-    my $content = read_file('Makefile.PL');
-    my %expected;
+	my $content = read_file('Makefile.PL');
+	my %expected;
 
-    for my $key (qw(PREREQ_PM TEST_REQUIRES CONFIGURE_REQUIRES)) {
+    for my $key (qw(BUILD_REQUIRES PREREQ_PM TEST_REQUIRES CONFIGURE_REQUIRES)) {
         while ($content =~ /
             $key\s*=>\s*\{
             ( (?: [^{}] | \{[^}]*\} )*? )
@@ -106,16 +108,16 @@ if ($check) {
 # Show diff if requested
 # ----------------------------
 if ($diff && $existing) {
-    print diff \$existing, \$out, { STYLE => 'Unified' };
-    exit;
+	print diff \$existing, \$out, { STYLE => 'Unified' };
+	exit;
 }
 
 # ----------------------------
 # Dry-run: print to STDOUT
 # ----------------------------
 if ($dry) {
-    print $out;
-    exit;
+	print $out;
+	exit;
 }
 
 # ----------------------------
@@ -131,7 +133,7 @@ print "cpanfile written successfully.\n";
 # Usage subroutine
 # ----------------------------
 sub usage {
-    print <<"EOF";
+	print <<"EOF";
 
 Usage: $0 [options]
 
@@ -147,13 +149,11 @@ EOF
     exit;
 }
 
-1;
-
 __END__
 
 =head1 SUPPORT
 
-This module is provided as-is without any warranty.
+This program is provided as-is without any warranty.
 
 =head1 AUTHOR
 
@@ -161,7 +161,7 @@ Nigel Horne <njh@nigelhorne.com>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

@@ -8,6 +8,15 @@ pmake.bat
 MANIFEST
 LICENSE
 CONTRIBUTING
+SECURITY.md
+t/lib/INA_CPAN_Check.pm
+t/9001-load.t
+t/9010-encoding.t
+t/9020-perl5compat.t
+t/9030-distribution.t
+t/9040-style.t
+t/9050-pod.t
+t/9060-readme.t
 t/1001_chop.t
 t/1002_chr.t
 t/1004_getc.t

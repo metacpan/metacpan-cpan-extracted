@@ -1,3 +1,9 @@
+2.02    2026-03-30   lichtkind
+-------
+    * = minor feature release
+    * + add method 'apply' with only argument 'gamma'
+    * + add argument 'only' to method 'invert', selecting axis to invert 
+
 2.01    2026-03-23    lichtkind
 -------
     * = bug fix release
@@ -252,4 +258,3 @@
     * = initial release - moved code out of Chart module
     * \ created own distro
     * ~ small POD fixes
-

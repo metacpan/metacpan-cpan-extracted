@@ -2,7 +2,7 @@ package Test2::Harness::Scheduler;
 use strict;
 use warnings;
 
-our $VERSION = '2.000005';
+our $VERSION = '2.000009';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -322,7 +322,7 @@ sub manage_tests {
 
         # Timeout if it takes too long to start
         if (!$job_data->{pid}) {
-            my $delta = time - $job_data;
+            my $delta = time - $job_data->{start};
             my $timeout = $self->runner->test_settings->event_timeout || 30;
 
             if ($delta > $timeout) {
@@ -333,7 +333,7 @@ sub manage_tests {
         }
 
         # Kill pid if run is terminated and it has a pid
-        if ($job_data->{run}->halt && !$job_data->{killed}) {
+        if ($job_data->{run} && $job_data->{run}->halt && !$job_data->{killed}) {
             next unless $job_data->{pid};
             CORE::kill('TERM', $job_data->{pid});
             $job_data->{killed} = 1;

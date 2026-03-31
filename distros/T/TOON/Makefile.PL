@@ -14,4 +14,17 @@ WriteMakefile(
     'Scalar::Util'=> 0,
   },
   test         => { TESTS => 't/*.t' },
+  META_MERGE   => {
+    'meta-spec' => { version => 2 },
+    resources   => {
+      repository => {
+        type => 'git',
+        url  => 'https://github.com/davorg-cpan/toon.git',
+        web  => 'https://github.com/davorg-cpan/toon',
+      },
+      bugtracker => {
+        web => 'https://github.com/davorg-cpan/toon/issues',
+      },
+    },
+  },
 );

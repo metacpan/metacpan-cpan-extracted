@@ -8,6 +8,8 @@ MANIFEST			This list of files
 README.md
 t/basics.t
 t/develop_block.t
+t/eof.t
+t/eol.t
 t/preserve.t
 t/verify_prereqs.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

@@ -40,11 +40,8 @@ sub short_axis_names { @{$_[0]{'axis_short_name'}} } # axis short names
 sub axis_iterator    { @{$_[0]{'axis_iterator'}} }   # counting all axis 0 .. -1
 sub axis_count   { int @{$_[0]{'axis_iterator'}} }   # amount of axis
 
-sub pos_from_long_axis_name  {  defined $_[1] ? $_[0]->{'long_name_order'}{ lc $_[1] } : undef }  # ~long_name  --> +pos
-sub pos_from_short_axis_name {  defined $_[1] ? $_[0]->{'short_name_order'}{ lc $_[1] } : undef } # ~short_name --> +pos
-
 #### predicates ########################################################
-sub is_name          {
+sub is_name          {   # --> ?                     # is this a valid name of this space
     return 0 if not defined $_[1];
     return 1 if uc $_[1] eq $_[0]{'space_name'};
     return 1 if $_[0]{'alias_name'} and uc $_[1] eq $_[0]{'alias_name'};
@@ -53,6 +50,11 @@ sub is_name          {
 sub is_long_axis_name   { (defined $_[1] and exists $_[0]->{'long_name_order'}{ lc $_[1] }) ? 1 : 0 } # ~long_name  --> ?
 sub is_short_axis_name  { (defined $_[1] and exists $_[0]->{'short_name_order'}{ lc $_[1] }) ? 1 : 0 }# ~short_name --> ?
 sub is_axis_name        { $_[0]->is_long_axis_name($_[1]) or $_[0]->is_short_axis_name($_[1]) }       # ~name       --> ?
+
+sub pos_from_long_axis_name  {  defined $_[1] ? $_[0]->{'long_name_order'}{ lc $_[1] } : undef }  # ~long_name  --> +pos
+sub pos_from_short_axis_name {  defined $_[1] ? $_[0]->{'short_name_order'}{ lc $_[1] } : undef } # ~short_name --> +pos
+sub pos_from_axis_name       {  pos_from_long_axis_name(@_) // pos_from_short_axis_name(@_) }
+
 sub is_hash {         # with all axis names as keys
     my ($self, $value_hash) = @_;
     $self->is_partial_hash( $value_hash ) and (keys %$value_hash == $self->axis_count);
@@ -64,7 +66,7 @@ sub is_partial_hash { # with some axis names as keys
     my @axis_visited;
     return 0 unless $key_count and $key_count <= $self->axis_count;
     for my $axis_name (keys %$value_hash) {
-        return 0 unless $self->is_axis_name( $axis_name );
+        return 0 unless $self->is_axis_name( $axis_name ) and defined $value_hash->{$axis_name};
         my $axis_pos = $self->pos_from_long_axis_name( $axis_name );
         $axis_pos = $self->pos_from_short_axis_name( $axis_name ) unless defined $axis_pos;
         $axis_visited[ $axis_pos ]++;
@@ -106,32 +108,20 @@ sub short_name_hash_from_tuple {
 sub tuple_from_hash {
     my ($self, $value_hash) = @_;
     return unless $self->is_hash( $value_hash );
-    my @values = (0) x $self->axis_count;
+    my $values = [ (0) x $self->axis_count ];
     for my $key (keys %$value_hash) {
-        if    ($self->is_long_axis_name( $key ))  { $values[ $self->pos_from_long_axis_name($key) ] = $value_hash->{ $key } }
-        elsif ($self->is_short_axis_name( $key )) { $values[ $self->pos_from_short_axis_name($key) ] = $value_hash->{ $key } }
-        else                                      { return "value of $key is missing" }
+		$values->[ $self->pos_from_axis_name( $key ) ] = $value_hash->{ $key };
     }
-    return \@values;
+    return $values;
 }
 sub tuple_from_partial_hash {
     my ($self, $value_hash) = @_;
     return unless $self->is_partial_hash( $value_hash );
     my $values = [];
     for my $key (keys %$value_hash) {
-        if    ( $self->is_long_axis_name( $key ) ) { $values->[$self->pos_from_long_axis_name($key) ] = $value_hash->{ $key } }
-        elsif ( $self->is_short_axis_name( $key )) { $values->[$self->pos_from_short_axis_name($key)] = $value_hash->{ $key } }
-        else                                       { return "value of $key is missing" }
+		$values->[ $self->pos_from_axis_name( $key ) ] = $value_hash->{ $key };
     }
     return $values;
-}
-sub select_tuple_value_from_axis_name {
-    my ($self, $name, $values) = @_;
-    $name = lc $name;
-    return unless $self->is_value_tuple( $values );
-    return $values->[ $self->{'long_name_order'}{$name} ] if exists $self->{'long_name_order'}{$name};
-    return $values->[ $self->{'short_name_order'}{$name} ] if exists $self->{'short_name_order'}{$name};
-    undef;
 }
 
 1;

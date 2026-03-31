@@ -1,6 +1,6 @@
 use Test::Most;
+use File::Slurp;
 use File::Temp qw(tempdir);
-use File::Slurp qw(write_file);
 use App::makefilepl2cpanfile;
 
 my $dir = tempdir(CLEANUP => 1);

@@ -11,6 +11,7 @@
 - Provides validation for integer, floating-point, and custom regular expression patterns
 - Enables registration of callback functions for each option for flexible processing
 - Supports multiple calls, which enables to use different options in subcommands or perform own option analysis within functions
+- Negative aliases (`~` prefix) for defining option names that negate the option
 - Automatic generation of help option and help messages. Help option is implemented without explicit definition. Help message is generated from the option definition.
 
 ## Table of Contents
@@ -722,6 +723,8 @@ The generated help message generally has the following structure:
 
     *   The description may include the initial value (`(default: ...)`).
 
+    *   Negative aliases (defined with `~` prefix) are displayed with `~` for short options and `~~` for long options, instead of the usual `-`/`--` prefix. This visually distinguishes them from regular aliases.
+
 ```
 (Synopsis line, e.g., Usage: myscript [options] <file>)
 
@@ -730,7 +733,7 @@ Options:
   -f, --file <path>          Specify the input file. (default: input.txt)
       --force                Force operation without confirmation.
   -n, --count <number>       Number of times to operate. (integer, default: 1)
-  -v, --verbose              Enable verbose output. (counter, default: 0)
+  -v, --verbose ~q ~~quiet   Enable verbose output. (counter, default: 0)
       --version              Show version information.
 ```
 

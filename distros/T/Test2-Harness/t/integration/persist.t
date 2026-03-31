@@ -11,6 +11,9 @@ use Test2::Plugin::Immiscible(sub { $ENV{TEST2_HARNESS_ACTIVE} ? 1 : 0 });
 
 use Test2::Harness::Util::JSON qw/decode_json/;
 
+my $pid = $$;
+END { yath(command => 'kill') if $pid == $$ }
+
 skip_all "This test is not run under automated testing"
     if $ENV{AUTOMATED_TESTING};
 
@@ -18,8 +21,6 @@ my $dir = __FILE__;
 $dir =~ s{\.t$}{}g;
 $dir =~ s{^\./}{};
 
-my $pid = $$;
-END { yath(command => 'kill') if $pid == $$ }
 
 yath(command => 'start', exit => 0);
 

@@ -18,6 +18,10 @@ App::makefilepl2cpanfile - Convert Makefile.PL to a cpanfile automatically
         print $fh $cpanfile_text;
         close $fh;
 
+# VERSION
+
+Version 0.02
+
 # DESCRIPTION
 
 This module parses a \`Makefile.PL\` and produces a \`cpanfile\` with:
@@ -76,7 +80,7 @@ Nigel Horne <njh@nigelhorne.com>
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
 Usage is subject to licence terms.
 

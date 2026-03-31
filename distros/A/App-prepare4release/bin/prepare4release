@@ -1,0 +1,79 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin ();
+use lib "$FindBin::Bin/../lib";
+
+use App::prepare4release;
+
+exit App::prepare4release->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+prepare4release - prepare a Perl module directory for release
+
+=head1 SYNOPSIS
+
+  prepare4release [--github | --gitlab] [--cpan] [--verbose]
+
+  prepare4release --usage
+
+  prepare4release --help
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--github>
+
+Use GitHub for C<META_MERGE> URLs and C<pod2github> in F<Makefile.PL>. If
+F<.github/workflows/ci.yml> is absent, create a GitHub Actions workflow (Perl
+matrix from F<Makefile.PL> / C<use v5> through latest stable via MetaCPAN).
+
+=item C<--gitlab>
+
+Use GitLab (default host L<https://gitlab.com/> unless C<git.server> is set) for
+URLs and C<pod2github> in F<Makefile.PL>. If F<.gitlab-ci.yml> is absent,
+create a GitLab CI pipeline with a similar Perl matrix.
+
+=item C<--cpan>
+
+Adds CPAN-oriented Markdown shield lines (Repology/MetaCPAN, fury.io, cpants) in
+F<README.md> together with license and Perl badges; see L<App::prepare4release>.
+CI badges follow C<--github> / C<--gitlab> as described there.
+
+=item C<--verbose>
+
+Print configuration, derived URLs, Perl matrix notes, and C<Alien::*> hints to
+stderr.
+
+=item C<--usage>
+
+Short usage (via L<Pod::Usage>).
+
+=item C<--help>
+
+Full documentation (via L<Pod::Usage>).
+
+=back
+
+=head1 DESCRIPTION
+
+Run in the distribution root (F<prepare4release.json> + F<Makefile.PL>).
+Configuration uses a nested C<git> object (C<author>, C<repo>, optional
+C<server>) and optional C<ci.apt_packages> for OS packages in generated CI.
+
+The tool fills in C<module_name>, C<version>, and C<dist_name> when omitted,
+patches F<Makefile.PL>, and optionally adds CI files. See L<App::prepare4release>
+for C<PREPARE4RELEASE_PERL_MAX>, matrix rules, apt behaviour, and author test
+F<xt/metacpan-live.t> (set C<RELEASE_TESTING=1>).
+
+=head1 SEE ALSO
+
+L<App::prepare4release>
+
+=cut

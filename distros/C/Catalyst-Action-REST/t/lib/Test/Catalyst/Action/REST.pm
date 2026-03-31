@@ -3,7 +3,7 @@ package Test::Catalyst::Action::REST;
 use Moose;
 use namespace::autoclean;
 
-use Catalyst::Runtime '5.70';
+use Catalyst::Runtime 5.70;
 
 use Catalyst;
 use FindBin;

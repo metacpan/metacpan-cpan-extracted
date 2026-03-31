@@ -2,7 +2,7 @@
 
 use v5.12;
 use warnings;
-use Test::More tests => 96;
+use Test::More tests => 110;
 BEGIN { unshift @INC, 'lib', '../lib'}
 use Graphics::Toolkit::Color qw/color/;
 
@@ -12,20 +12,25 @@ my $blue  = color('#0000FF');
 my $white = color('white');
 my $black = color('black');
 
-#### invert ############################################################
-is( ref $white->invert('-'),                     '',  'need a valid name space to invert');
-is( ref $white->invert( at => 'RGB'),            '',  'can not use invented arguments');
-is( ref $white->invert(),                   $module,  'works without argument');
-is( ref $white->invert(in => 'RGB'),        $module,  'can use "in" argument');
-is( $white->invert()->name,                 'black',  'black is white inverted');
-is( $white->invert('RGB')->name,            'black',  'explicit color space name works');
-is( $white->invert(in => 'RGB')->name,      'black',  'named argument works');
-is( $black->invert('RGB')->name,            'white',  'white is black inverted');
-is( $blue->invert('RGB')->name,            'yellow',  'yellow is blue inverted');
-is( $blue->invert('HSL')->name,              'gray',  'in HSL is gray opposite to any color');
-is( $blue->invert('LAB')->name,                  '',  'LAB is not symmetrical');
-is( $white->invert('HSL')->name,            'black',  'primary contrast works in HSL');
-is( $white->invert('HWB')->name,            'black',  'primary contrast works in HWB');
+#### apply gamma #######################################################
+say $red->apply( gamma => 2.4 );
+my @values = $red->apply( gamma => 2.4 )->values();
+is( int @values,                                          3, 'got 3 values from gamma correction');
+is( $values[0],                                         255, 'red value has to be max');
+is( $values[1],                                           0, 'green value zero');
+is( $values[2],                                           0, 'blue value has to be zero');
+
+my $nice_blue = color(10,20,200);
+@values = $nice_blue->apply( gamma => 0.4 )->values();
+is( int @values,                                          3, 'got 3 values from boosting gamma correction');
+is( $values[0],                                          70, 'red value has to be 70');
+is( $values[1],                                          92, 'green value is 92');
+is( $values[2],                                         231, 'blue value has to be 231');
+@values = $nice_blue->apply( gamma => {cyan => 2, m => 0.5}, in => 'CMY' )->values();
+is( int @values,                                          3, 'got 3 values from boosting gamma correction');
+is( $values[0],                                          20, 'red value has to be 20');
+is( $values[1],                                          10, 'green value is 10');
+is( $values[2],                                         200, 'blue is untouched');
 
 #### set_value #########################################################
 is( ref $white->set_value(),                             '',  'need some argument for "set_value"');
@@ -33,7 +38,7 @@ is( ref $white->set_value(ar => 3),                      '',  'reject invented a
 is( ref $white->set_value(r => 3, y => 1),               '',  'reject mixing axis frm different spaces');
 is( ref $white->set_value( red => 1),               $module,  'accept real axis names');
 is( ref $white->set_value( red => 1, in => 'RGB'),  $module,  'accept mixed arguments, axis name and space name');
-my @values = $white->set_value( red => 1 )->values();
+@values = $white->set_value( red => 1 )->values();
 is( int @values,                                          3, 'got 3 values');
 is( $values[0],                                           1, 'red value has the set number');
 is( $values[1],                                         255, 'green value has the old number');
@@ -131,5 +136,23 @@ is( $values[2],                                         204, 'blue value is 80% 
 is( $values[0],                                           0, 'red value is zero = 75% blue + 25% black = 0 + 0');
 is( $values[1],                                           0, 'green is same');
 is( $values[2],                                         191, 'blue value is 80% blue + nothing from black');
+
+#### invert ############################################################
+is( ref $white->invert('-'),                     '',  'need a valid name space to invert');
+is( ref $white->invert( at => 'RGB'),            '',  'can not use invented arguments');
+is( ref $white->invert(),                   $module,  'works without argument');
+is( ref $white->invert(in => 'RGB'),        $module,  'can use "in" argument');
+is( $white->invert()->name,                 'black',  'black is white inverted');
+is( $white->invert(only => 'b')->name,     'yellow',  'you get yellow if you invert only blue axis');
+is( $white->invert('RGB')->name,            'black',  'explicit color space name works');
+is( $white->invert(in => 'RGB')->name,      'black',  'named argument "in" works');
+is( $black->invert('RGB')->name,            'white',  'white is black inverted');
+is( $black->invert(only => ['red', 'green'])->name,     'yellow',  'you get yellow if you invert red and green');
+is( $blue->invert('RGB')->name,            'yellow',  'yellow is blue inverted');
+is( $blue->invert('HSL')->name,              'gray',  'in HSL is gray opposite to any color');
+is( $blue->invert('LAB')->name,                  '',  'LAB is not symmetrical');
+is( $white->invert('HSL')->name,            'black',  'primary contrast works in HSL');
+is( $white->invert('HWB')->name,            'black',  'primary contrast works in HWB');
+
 
 exit 0;

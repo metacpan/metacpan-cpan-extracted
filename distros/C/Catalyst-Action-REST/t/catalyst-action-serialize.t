@@ -14,7 +14,7 @@ use_ok 'Catalyst::Test', 'Test::Catalyst::Action::REST';
 
 my $res = request($t->get(url => '/serialize/test'));
 ok( $res->is_success, 'GET the serialized request succeeded' );
-is( $res->content, "--- \nlou: is my cat\n", "Request returned proper data");
+like( $res->content, qr/\A--- ?\nlou: is my cat\n\z/, "Request returned proper data");
 
 my $nt = Test::Rest->new('content_type' => 'text/broken');
 my $bres = request($nt->get(url => '/serialize/test'));
@@ -28,16 +28,16 @@ is ($bres->code, 415, 'GET on unknown Content-Type returns 415');
 # request.
 my $res2 = request($t->get(url => '/serialize/test_second'));
 ok( $res2->is_success, '2nd request succeeded' );
-is( $res2->content, "--- \nlou: is my cat\n", "request returned proper data");
+like( $res2->content, qr/\A--- ?\nlou: is my cat\n\z/, "request returned proper data");
 
 Test::Catalyst::Action::REST->controller('Serialize')->{serialize} = { };
 $res2 = request($t->get(url => '/serialize/test_second'));
 ok( $res2->is_success, 'request succeeded (deprecated config)' );
-is( $res2->content, "--- \nlou: is my cat\n", "request returned proper data");
+like( $res2->content, qr/\A--- ?\nlou: is my cat\n\z/, "request returned proper data");
 
 
 $res = request($t->get(url => '/serialize/empty_serialized'));
-is $res->content, "--- \nfoo: bar\n", 'normal case ok';
+like $res->content, qr/\A--- ?\nfoo: bar\n\z/, 'normal case ok';
 ok $res->header('Content-Length'), 'set content-length when we serialize';
 
 $res = request($t->get(url => '/serialize/empty_not_serialized_blank'));

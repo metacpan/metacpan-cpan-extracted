@@ -4,7 +4,7 @@ use v5.40;
 use feature 'signatures';
 use overload '""' => 'as_string', fallback => 1;
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.1.0';
 
 sub new ($class, %args) {
   return bless {

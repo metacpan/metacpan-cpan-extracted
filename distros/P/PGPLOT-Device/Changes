@@ -1,5 +1,24 @@
 Revision history for PGPLOT-Device
 
+0.13      2026-03-30 14:47:47 EDT
+
+  [BACKINCOMPAT]
+
+    * minimum Perl version is 5.12 as Alien::PGPLOT requires that.
+
+  [BUILD]
+
+    * PGPLOT (latest check was of 2.35) bundles PDL::Graphics::PGPLOT,
+      but doesn't require PDL, so if PDL is not installed, using
+      PDL::Graphics::PGPLOT will fail. Mock
+      PDL::Graphics::PGPLOT::Window to the extent reqired for compile
+      testing of PGPLOT::Device::PGWin to work.
+
+  [ENHANCEMENT]
+
+    * can now explicitly specify whether the user is prompted after a
+      plot is drawn.
+
 0.12      2021-09-21 09:02:17-04:00 America/New_York
 
   [ENHANCEMENT]

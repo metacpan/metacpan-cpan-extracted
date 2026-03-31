@@ -4,7 +4,7 @@
 package Graphics::Toolkit::Color::SetCalculator;
 use v5.12;
 use warnings;
-use Graphics::Toolkit::Color::Values;
+use Graphics::Toolkit::Color::Calculator;
 
 my $HSL = Graphics::Toolkit::Color::Space::Hub::get_space('HSL');
 my $half_hue_max = $HSL->shape->axis_value_max(0) / 2;
@@ -55,9 +55,10 @@ sub gradient { # @:colors, +steps, +tilt, :space --> @:values
         my $percent_in_gradient = $percent_in_gradient[$step_nr-2];
         my $current_segment_nr = int ($percent_in_gradient * $segment_count);
         my $percent_in_segment = 100 * $segment_count * ($percent_in_gradient - ($current_segment_nr / $segment_count));
-        push @result, $colors->[$current_segment_nr]->mix (
-                          [{color => $colors->[$current_segment_nr  ], percent => 100 - $percent_in_segment},
-                           {color => $colors->[$current_segment_nr+1], percent => $percent_in_segment}], $color_space );
+        push @result, Graphics::Toolkit::Color::Calculator::mix(
+		                $colors->[$current_segment_nr],
+                        [{color => $colors->[$current_segment_nr  ], percent => 100 - $percent_in_segment},
+                        {color => $colors->[$current_segment_nr+1], percent => $percent_in_segment}], $color_space );
     }
     push @result, pop @$colors if $steps > 1;
     return @result;

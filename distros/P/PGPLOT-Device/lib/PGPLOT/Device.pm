@@ -5,20 +5,37 @@ package PGPLOT::Device;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 
-our %Default = ( device => 'xs', );
+my %Default = ( device => 'xs', );
 
-our $ephemeral = qr{^xw$};
-our $NDevices;
-our %PGDevice;
-our %DevMap;
+my $NDevices;
+my %PGDevice;
+my %DevMap;
 
 sub _croak {
     require Carp;
     goto \&Carp::croak;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -99,7 +116,9 @@ sub new {
     my $self = {
         devn => 1,
         last => undef,
-        vars => {} };
+        vars => {},
+        ask  => undef,
+    };
     bless $self, $class;
 
     $self->_initialize( @_ );
@@ -167,9 +186,7 @@ sub _initialize {
         $self->{vars} = $opts->{vars};
     }
 
-
-    $self->{ask} = $self->is_interactive && $self->is_const;
-
+    $self->{ask} = $opts->{ask} // ( $self->is_interactive && $self->is_const );
 
     $self;
 }
@@ -256,7 +273,7 @@ sub _parse_spec {
 
     if ( defined $device && !exists $DevMap{ lc $device } ) {
         if ( defined $self->{device} ) {
-            $prefix .= '/' . $device;
+            $prefix .= q{/} . $device;
             undef $device;
         }
 
@@ -286,7 +303,7 @@ sub _parse_spec {
                 my $ext
                   = ( $spec{device} =~ m{^v?c?(ps)$}i )
                   ? ".$1"
-                  : '.' . $spec{device};
+                  : q{.} . $spec{device};
 
                 # make sure the appropriate suffix is in there
                 $prefix =~ s/${ext}$//;
@@ -294,12 +311,10 @@ sub _parse_spec {
                 $spec{prefix} = $prefix;
             }
 
-         # we've got a situation here. an interactive device with a nonparseable
-         # prefix.  better bail
+            # we've got a situation here. an interactive device with a nonparseable
+            # prefix.  better bail
             else {
-                _croak(
-                    "error: interactive device with unparseable prefix: $spec\n"
-                );
+                _croak( "error: interactive device with unparseable prefix: $spec\n" );
             }
         }
     }
@@ -307,7 +322,7 @@ sub _parse_spec {
     # only defined keys get through. makes it easier to override
     # things
     delete $spec{$_}
-      for grep { !defined $spec{$_} || '' eq $spec{$_} } keys %spec;
+      for grep { !defined $spec{$_} || q{} eq $spec{$_} } keys %spec;
 
     %spec;
 }
@@ -323,7 +338,7 @@ sub _parse_spec {
 
 
 
-sub next {
+sub next {    ## no critic ( BuiltinHomonyms )
     my $self = shift;
 
     $self->{last} = $self->_stringify;
@@ -355,7 +370,7 @@ sub current {
 
 
 
-sub last {
+sub last {    ## no critic ( AmbiguousNames BuiltinHomonyms )
     my $self = shift;
     $self->{last};
 }
@@ -378,7 +393,7 @@ sub _compare {
 sub is_const {
     my $self = shift;
     defined $self->{prefix}
-      ? ( $self->_stringify eq $self->{prefix} . '/' . $self->{device} )
+      ? ( $self->_stringify eq $self->{prefix} . q{/} . $self->{device} )
       : 1;
 }
 
@@ -425,7 +440,7 @@ sub is_interactive {
 
 sub is_ephemeral {
     my $self = shift;
-    $self->{device} =~ /$ephemeral/;
+    $self->{device} eq 'xw';
 }
 
 
@@ -433,7 +448,7 @@ sub _stringify {
     my $self = shift;
 
     # handle interpolated values
-    my $prefix = defined $self->{prefix} ? $self->{prefix} : '';
+    my $prefix = defined $self->{prefix} ? $self->{prefix} : q{};
 
     # get calling package
 
@@ -442,7 +457,7 @@ sub _stringify {
     ## no critic ( ProhibitNoStrict );
     no strict 'refs';
     my $pkg = ( caller( 1 ) )[0];
-    1 while $prefix =~ s/ \$\{ (\w+) (?::([^\}]+))? } /
+    1 while $prefix =~ s/ [\$][{] (\w+) (?::([^}]+))? } /
         $fmt = defined $2 ? $2 : '%s';
 
         $val =
@@ -466,7 +481,7 @@ sub _stringify {
         sprintf( $fmt, $val ) if defined $val;
   /ex;
 
-    $prefix . '/' . $self->{device};
+    $prefix . q{/} . $self->{device};
 }
 
 1;
@@ -493,7 +508,7 @@ PGPLOT::Device - autogenerate PGPLOT device names
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -611,8 +626,10 @@ I<device> is C</xw> or C</xs>.
 
 =item I<+N/device>
 
-N is an integer.  This will create a device which
-autoincrements. Usually I<device> is C</xw> or C</xs>.
+N is an integer.  Each plot will be went to a device with a different
+device id.  The initial id is C<N> and subsequent ids are
+auto-incremented from the last.  Usually I<device> is C</xw> or
+C</xs>.
 
 =item I<filename/device>
 
@@ -657,6 +674,22 @@ not forced to use a hash for its internal use:
   print $dev->next, "\n";
 
 will also result in C<foo34.ps>.
+
+=item ask
+
+Whether the user should be prompted after each plot.
+
+If not specified, the user is prompted if
+
+=over
+
+=item * the device is interactive; and
+
+=item * the device id is constant.
+
+=back
+
+Set to a true or false value to override the automatic configuration.
 
 =back
 
@@ -843,7 +876,7 @@ are generated within loops:
 
 =head2 Bugs
 
-Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or through the web interface at: https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device
+Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or through the web interface at: L<https://rt.cpan.org/Public/Dist/Display.html?Name=PGPLOT-Device>
 
 =head2 Source
 

@@ -1,0 +1,7 @@
+Revision history for Physics-Ellipsometry-VASE
+
+0.01    2026-03-27
+        - Initial release
+        - VASE object with load_data, set_model, fit methods
+        - Levenberg-Marquardt fitting via PDL::Fit::LM
+        - Automatic numerical Jacobian via finite differences

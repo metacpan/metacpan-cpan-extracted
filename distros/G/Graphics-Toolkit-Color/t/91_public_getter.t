@@ -14,6 +14,7 @@ my $black  = color( [0,0,0] );
 my $white  = color( 'cmy',0,0,0 );
 my @names;
 
+#### name ##############################################################
 is( $red->name,          'red', 'color name "red" is correct');
 is( $blue->name,        'blue', 'color name "blue" is correct');
 is( $purple->name,    'purple', 'color name "purple" is correct');
@@ -36,6 +37,7 @@ is( $names[0],             'blue', '"blue" is first, no default name space name 
 is( $names[1],            'blue1', '"blue1" is second"');
 is( $names[2],            'blue2', '"blue2" is third"');
 
+#### closest_name ######################################################
 my ($name, $d) = $red->closest_name;
 is( $name,               'red', 'color name is "red" also in array context');
 is( $d,                      0, 'and has no distance');
@@ -57,6 +59,8 @@ is( $snow->name,               '', 'this color has no name in default constants'
 ($name, $d) = $snow->closest_name;
 is( $name,             'white', 'color "white" is closest to snow');
 is( $d,                      1, 'and has a distance of 1');
+
+#### distance ##########################################################
 is( round_decimals($snow->distance($white), 5), 1, 'distance method calculates (almost) the same');
 is( round_decimals($snow->distance(to => $white), 5), 1, 'use named argument to calculate distance');
 is( round_decimals($snow->distance(to => $white, range => 510), 3), 2, 'test reaction to the "range" argument');
@@ -67,6 +71,7 @@ is( round_decimals($snow->distance(to => $white, in => 'cmy', range => 255), 5),
 is( ref $snow->distance( to => $white, blub => '-'),           '', 'false arguments get caught');
 is( ref $snow->distance( in => 'LAB'),                         '', 'missing required argument gets caught');
 
+#### values ############################################################
 my @values = $blue->values();
 is( int @values,                3, 'default result for "values" are 3 numbers');
 is( $values[0],                 0, 'red value is correct');
@@ -133,6 +138,7 @@ is( $values->{'h'},           240, '"hue" value is correct');
 is( $values->{'s'},           100, '"saturation" value is correct');
 is( $values->{'l'},            50, '"lightness" value is correct');
 
+#### is_in_gamut #######################################################
 is( $blue->is_in_gamut('hsl: 10,10,10'),    1, 'is_in_gamut method works with normal HSL color');
 is( $blue->is_in_gamut('hsl: -10,10,10'),   0, 'is_in_gamut method works with normal HSL color');
 

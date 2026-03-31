@@ -1,3 +1,5 @@
+Allow t/startup.pl and t/teardown.pl scripts that run before/after test run, for lightweight things
+
 Yath:
  * Improve test coverage
  * Use Module::Refresh for in-place reloading
@@ -14,7 +16,6 @@ Server:
  * Audit user settings
  * Custom views
   * Global custom views
- * Pager for dashboards
  * Pause authentication?
  * Security Audit
  * Single-page?

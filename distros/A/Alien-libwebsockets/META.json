@@ -29,9 +29,12 @@
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "URI" : "0"
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
          }
       },
       "configure" : {
@@ -58,7 +61,7 @@
    "provides" : {
       "Alien::libwebsockets" : {
          "file" : "lib/Alien/libwebsockets.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -72,7 +75,7 @@
          "web" : "https://github.com/vividsnow/perl5-alien-libwebsockets"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {
@@ -83,12 +86,15 @@
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "URI" : "0"
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
          },
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

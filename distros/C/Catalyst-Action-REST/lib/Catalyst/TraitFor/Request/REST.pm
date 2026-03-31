@@ -1,5 +1,5 @@
 package Catalyst::TraitFor::Request::REST;
-$Catalyst::TraitFor::Request::REST::VERSION = '1.21';
+$Catalyst::TraitFor::Request::REST::VERSION = '1.22';
 use Moose::Role;
 use HTTP::Headers::Util qw(split_header_words);
 use namespace::autoclean;
